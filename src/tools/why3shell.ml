@@ -33,10 +33,6 @@ module Protocol_shell = struct
     Debug.dprintf debug_proto "[request]";
     Debug.dprintf debug_proto "%a" print_request r
 
-  let print_msg_debug m =
-    Debug.dprintf debug_proto "[message]";
-    Debug.dprintf debug_proto "%a@." print_msg m
-
   let print_notify_debug n =
     Debug.dprintf debug_proto "[notification]";
     Debug.dprintf debug_proto "%a@." print_notify n
@@ -96,7 +92,6 @@ type node = {
   node_type: shell_node_type;
   mutable node_proved: bool;
   mutable children_nodes: node_ID list;
-  mutable node_detached: bool
   }
 
 let root_node_ID = root_node
@@ -112,7 +107,6 @@ let root_node = {
   node_type = SRoot;
   node_proved = false;
   children_nodes = [];
-  node_detached = false
 }
 
 module Hnode = Wstdlib.Hint
@@ -141,7 +135,7 @@ let get_result pa =
 let print_proof_attempt fmt pa_id =
   let pa = Hnode.find nodes pa_id in
   match pa.node_proof with
-  | None -> fprintf fmt "%s" pa.node_name
+  | None -> pp_print_string fmt pa.node_name
   | Some _pr ->
     fprintf fmt "@[<h>%s %a@]"
       pa.node_name
@@ -156,9 +150,9 @@ let rec print_proof_node (fmt: formatter) goal_id =
     goal_id = !cur_id
   in
   if current_goal then
-    fprintf fmt "**";
+    pp_print_string fmt "**";
   if goal.node_proved then
-    fprintf fmt "P";
+    pp_print_string fmt "P";
   let proof_attempts, transformations =
     List.partition (fun n -> let node = Hnode.find nodes n in
       node.node_type = SProofAttempt) goal.children_nodes
@@ -172,7 +166,7 @@ let rec print_proof_node (fmt: formatter) goal_id =
     (Pp.print_list Pp.semi print_trans_node) transformations;
 
   if current_goal then
-    fprintf fmt " **"
+    pp_print_string fmt " **"
 
 and print_trans_node fmt id =
   let trans = Hnode.find nodes id in
@@ -182,7 +176,7 @@ and print_trans_node fmt id =
   let parent = Hnode.find nodes trans.node_parent in
   let parent_name = parent.node_name in
   if trans.node_proved then
-    fprintf fmt "P";
+    pp_print_string fmt "P";
   fprintf fmt "@[<hv 2>{ Trans=%s;@ args=%a;@ parent=%s;@ [%a] }@]" name
     (Pp.print_option (Pp.print_list Pp.semi pp_print_string)) args parent_name
     (Pp.print_list Pp.semi print_proof_node) l
@@ -190,7 +184,7 @@ and print_trans_node fmt id =
 let print_theory fmt th_id : unit =
   let th = Hnode.find nodes th_id in
   if th.node_proved then
-    fprintf fmt "P";
+    pp_print_string fmt "P";
   fprintf fmt "@[<hv 1> Theory %s, id: %d;@ [%a]@]" th.node_name th_id
     (Pp.print_list Pp.semi print_proof_node) th.children_nodes
 
@@ -223,7 +217,7 @@ let return_proof_info (t: node_type) =
     Some Controller_itp.Scheduled
   | _ -> None
 
-let add_new_node fmt (n: node_ID) (parent: node_ID) (t: node_type) (name: string) (detached: bool) =
+let add_new_node fmt (n: node_ID) (parent: node_ID) (t: node_type) (name: string) =
   if t = NRoot then () else
   let new_node = {
     node_ID = n;
@@ -235,7 +229,6 @@ let add_new_node fmt (n: node_ID) (parent: node_ID) (t: node_type) (name: string
     node_type = convert_to_shell_type t;
     node_proved = false;
     children_nodes = [];
-    node_detached = detached
   } in
   try
     let parent = Hnode.find nodes parent in
@@ -251,20 +244,14 @@ let change_node fmt (n: node_ID) (u: update_info) =
     (match u with
     | Proved b ->
         node.node_proved <- b
-    | Proof_status_change (pas, b, _rl) when node.node_type = SProofAttempt ->
-        node.node_proof <- Some pas;
-        node.node_detached <- b (* TODO check and print this *)
+    | Proof_status_change (pas, _b, _rl) when node.node_type = SProofAttempt ->
+        node.node_proof <- Some pas
     | Proof_status_change _ ->
         (* TODO Probably case that cannot occur. *)
         ()
     | Name_change _ -> fprintf fmt "Not yet supported@.") (* TODO *)
   with
     Not_found -> fprintf fmt "Could not find node %d@." n
-
-let is_proof_attempt node_type =
-  match node_type with
-  | NProofAttempt -> true
-  | _ -> false
 
 (*************************)
 (* Notification Handling *)
@@ -295,8 +282,8 @@ let treat_notification fmt n =
   | Reset_whole_tree                        -> print_session fmt
   | Node_change (id, info)                  ->
       change_node fmt id info
-  | New_node (id, pid, typ, name, detached) ->
-      add_new_node fmt id pid typ name detached
+  | New_node (id, pid, typ, name, _detached) ->
+      add_new_node fmt id pid typ name
   | Remove _id                              -> (* TODO *)
       fprintf fmt "got a Remove notification not yet supported@."
   | Ident_notif_loc _loc                    ->

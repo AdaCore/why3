@@ -144,7 +144,7 @@ module MLPrinter (K: sig val keywords: string list end) = struct
   let print_global_ident ~sanitizer fmt id =
     let s = id_unique ~sanitizer tprinter id in
     Ident.forget_id tprinter id;
-    fprintf fmt "%s" s
+    pp_print_string fmt s
 
   let print_path ~sanitizer fmt (q, id) =
     assert (List.length q >= 1);
@@ -178,7 +178,7 @@ module MLPrinter (K: sig val keywords: string list end) = struct
     with
     | Not_found ->
         let s = id_unique ~sanitizer iprinter id in
-        fprintf fmt "%s" s
+        pp_print_string fmt s
     | Local ->
         let _, _, q = try Pmodule.restore_path id with Not_found ->
           Theory.restore_path id in
@@ -192,7 +192,7 @@ module MLPrinter (K: sig val keywords: string list end) = struct
     fprintf fmt "'%s" (id_unique aprinter tv.tv_name)
 
   let print_rs info fmt rs =
-    fprintf fmt "%a" (print_lident info) rs.rs_name
+    print_lident info fmt rs.rs_name
 
   let check_type_in_drv info ({id_loc = loc} as ty_id) =
     match query_syntax info.info_syn ty_id with
@@ -205,7 +205,7 @@ module MLPrinter (K: sig val keywords: string list end) = struct
     | Tvar tv ->
         print_tv fmt tv
     | Ttuple [] ->
-        fprintf fmt "unit"
+        pp_print_string fmt "unit"
     | Ttuple [t] ->
         print_ty ~paren info fmt t
     | Ttuple tl ->

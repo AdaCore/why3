@@ -83,6 +83,10 @@ module Python
     requires { [@expl:valid range] l <= u }
     ensures  { l <= result <= u }
 
+  use int.Power
+
+  function pow (x y: int) : int = power x y
+
   val input () : int
 
   val int (n: int) : int

@@ -104,7 +104,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-EXTINCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @MLMPFRINCLUDE@ @INFERINCLUDE@ @YOJSONINCLUDES@
+EXTINCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @INFERINCLUDE@ @YOJSONINCLUDES@
 
 # warnings are enabled and non fatal by default, except:
 # - disabled:
@@ -137,8 +137,8 @@ OLINKFLAGS += -linkpkg -linkall
 BLINKFLAGS += -linkpkg -linkall
 else
 FLAGS += $(EXTINCLUDES)
-OLINKFLAGS = -linkall @MLMPFR_LINK@ $(EXTCMXA)
-BLINKFLAGS = -linkall @MLMPFR_LINK@ $(EXTCMA)
+OLINKFLAGS = -linkall $(EXTCMXA)
+BLINKFLAGS = -linkall $(EXTCMA)
 endif
 
 ifeq (@enable_profiling@,yes)
@@ -153,8 +153,8 @@ CMP_CP = cmp -s $< $@ || cp $< $@
 # external libraries common to all binaries
 
 EXTOBJS = menhirLib
-EXTLIBS = @SEQLIB@ @RELIB@ unix nums dynlink result easy_format biniou yojson @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERLIB@
-EXTPKGS = menhirLib @SEQLIB@ @RELIB@ unix num dynlink yojson @ZIPLIB@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
+EXTLIBS = @SEQLIB@ @RELIB@ unix nums dynlink result easy_format biniou yojson @ZIPLIB@ @WHY3LIB@ @INFERLIB@
+EXTPKGS = menhirLib @SEQLIB@ @RELIB@ unix num dynlink yojson @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
 
 EXTCMA	= $(addsuffix .cmo,$(EXTOBJS)) $(addsuffix .cma,$(EXTLIBS))
 EXTCMXA = $(addsuffix .cmx,$(EXTOBJS)) $(addsuffix .cmxa,$(EXTLIBS))
@@ -203,6 +203,7 @@ endif
 .PHONY: pvs install-pvs uninstall-pvs clean-pvs
 .PHONY: install-isabelle
 .PHONY: plugins plugins.byte plugins.opt
+.PHONY: trywhy3 clean-trywhy3
 
 .SUFFIXES:
 
@@ -248,7 +249,7 @@ LIB_CORE = \
 	parser_tokens keywords \
 	task pretty dterm env trans printer model_parser
 
-LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer driver \
+LIB_DRIVER = prove_client call_provers driver_parser driver_lexer driver \
 		whyconf autodetection smtv2_model_defs collect_data_model sexp smtv2_model_parser
 
 LIB_MLW = ity expr pdecl eval_match typeinv vc pmodule dexpr big_real \
@@ -284,7 +285,7 @@ LIB_TRANSFORM = simplify_formula inlining split_goal \
 		rec_logic gnat_split_conj gnat_split_disj gnat_trivial \
 		eliminate_unused_hypo eliminate_literal induction induction_pr \
 		intro_vc_vars_counterexmp prepare_for_counterexmp \
-		induction induction_pr matching reflection
+		induction induction_pr reflection
 
 LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq\
 	      pvs isabelle \
@@ -294,6 +295,8 @@ LIB_SESSION = compress xml termcode session_itp \
               strategy strategy_parser controller_itp \
 	      server_utils itp_communication \
 	      itp_server json_util unix_scheduler
+
+LIB_CMIONLY = driver/driver_ast
 
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
@@ -314,11 +317,12 @@ endif
 
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 
-LIBDEP = $(addsuffix .dep, $(LIBMODULES))
+LIBDEP = $(addsuffix .dep, $(LIBMODULES)) $(LIB_CMIONLY:%=src/%.dep)
 LIBCMO = $(addsuffix .cmo, $(LIBMODULES))
 LIBCMX = $(addsuffix .cmx, $(LIBMODULES))
+LIBCMI = $(addsuffix .cmi, $(LIBMODULES)) $(LIB_CMIONLY:%=src/%.cmi)
 
-$(LIBDEP) $(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
+$(LIBDEP) $(LIBCMO) $(LIBCMX) $(LIBCMI): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why3
 
 $(LIBDEP): $(LIBGENERATED)
@@ -333,7 +337,7 @@ endif
 
 # Mlmpfr
 
-ifeq (@found_mlmpfr@,yes)
+ifeq (@enable_mpfr@,yes)
 src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_real.ml Makefile
 	$(CMP_CP)
 else
@@ -533,11 +537,16 @@ PLUGGENERATED = \
 PLUG_PARSER = genequlin dimacs
 PLUG_PRINTER =
 PLUG_TRANSFORM =
-PLUG_TPTP = tptp_ast tptp_parser tptp_typing tptp_lexer tptp_printer
-PLUG_PYTHON = py_ast py_parser py_lexer py_main
-PLUG_MICROC = mc_ast mc_parser mc_lexer mc_printer mc_main
-PLUG_CFG = cfg_ast cfg_parser cfg_lexer cfg_main
+PLUG_TPTP = tptp_parser tptp_typing tptp_lexer tptp_printer
+PLUG_PYTHON = py_parser py_lexer py_main
+PLUG_MICROC = mc_parser mc_lexer mc_printer mc_main
+PLUG_CFG = cfg_parser cfg_lexer cfg_paths cfg_main
+ifeq (@enable_stackify@,yes)
+PLUG_CFG += stackify cfg_stackify
+endif
 PLUG_ADA = ada_nametable ada_parser ada_lexer ada_main
+
+PLUG_CMIONLY = tptp/tptp_ast python/py_ast microc/mc_ast cfg/cfg_ast
 
 PLUGINS = genequlin dimacs tptp python microc cfg ada_terms gnat_json
 
@@ -584,14 +593,28 @@ PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(CFGMODULES) \
 	      $(ADAMODULES) $(GNATJSONMODULES)
 
-PLUGDEP = $(addsuffix .dep, $(PLUGMODULES))
+PLUGDEP = $(addsuffix .dep, $(PLUGMODULES)) $(PLUG_CMIONLY:%=plugins/%.dep)
 PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
 PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
+PLUGCMI = $(addsuffix .cmi, $(PLUGMODULES)) $(PLUG_CMIONLY:%=plugins/%.cmi)
 
 PLUGDIRS = parser printer transform tptp python microc cfg ada_terms gnat_json
 PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
 
-$(PLUGDEP) $(PLUGCMO) $(PLUGCMX): INCLUDES += $(PLUGINCLUDES)
+ifeq (@enable_stackify@,yes)
+plugins/cfg/stackify.cmx: EXTINCLUDES += -I @OCAMLGRAPHLIB@
+plugins/cfg/stackify.cmo: EXTINCLUDES += -I @OCAMLGRAPHLIB@
+plugins/cfg/stackify.cmx: EXTLIBS += graph.cmxa
+plugins/cfg/stackify.cmo: EXTOBJS += graph.cma
+ifeq (@enable_ocamlfind@,yes)
+plugins/cfg/stackify.cmx: FLAGS += -package ocamlgraph
+plugins/cfg/stackify.cmo: FLAGS += -package ocamlgraph
+lib/plugins/cfg.cmxs: FLAGS += -package ocamlgraph -dontlink "$(EXTPKGS)" -linkpkg
+lib/plugins/cfg.cma:  FLAGS += -package ocamlgraph -dontlink "$(EXTPKGS)" -linkpkg
+endif
+endif
+
+$(PLUGDEP) $(PLUGCMO) $(PLUGCMX) $(PLUGCMI): INCLUDES += $(PLUGINCLUDES)
 
 $(PLUGDEP): $(PLUGGENERATED)
 
@@ -1705,8 +1728,6 @@ install_local:: bin/why3doc.$(SHAREDBEST)
 # trywhy3
 #########
 
-.PHONY: trywhy3
-
 ifeq ($(DEBUGJS),yes)
  JSOO_DEBUG=--pretty --debug-info --source-map
  JS_MAPS=trywhy3.map why3_worker.map
@@ -1721,14 +1742,15 @@ TRYWHY3MODULES = $(addprefix src/trywhy3/, $(TRYWHY3_FILES))
 
 TRYWHY3DEP = $(addsuffix .dep, $(TRYWHY3MODULES))
 TRYWHY3CMO = $(addsuffix .cmo, $(TRYWHY3MODULES))
+TRYWHY3CMI = $(addsuffix .cmi, $(TRYWHY3MODULES))
 
-$(TRYWHY3DEP) $(TRYWHY3CMO): INCLUDES += -I src/trywhy3
+$(TRYWHY3DEP) $(TRYWHY3CMO) $(TRYWHY3CMI): INCLUDES += -I src/trywhy3
 
 TRYWHY3_PACK = \
 	trywhy3.js trywhy3.html trywhy3.css \
 	why3_worker.js alt-ergo-worker.js \
 	README.md examples/ \
-	trywhy3_custom.css gen_index.sh \
+	trywhy3_custom.css \
 	ace-builds/src-min-noconflict/ace.js \
 	ace-builds/src-min-noconflict/mode-why3.js \
 	ace-builds/src-min-noconflict/mode-python.js \
@@ -1767,7 +1789,8 @@ $(addprefix src/trywhy3/, worker_proto.cmo why3_worker.cmo): BFLAGS += -package 
 
 $(addprefix src/trywhy3/, bindings.cmo trywhy3.cmo): BFLAGS += -package js_of_ocaml -package js_of_ocaml-ppx
 
-TRYWHY3JSON = $(addprefix src/trywhy3/, json_base.ml json_parser.ml json_lexer.ml)
+TRYWHY3JSON_FILES = json_base json_parser json_lexer
+TRYWHY3JSON = $(TRYWHY3JSON_FILES:%=src/trywhy3/%.ml) $(TRYWHY3JSON_FILES:%=src/trywhy3/%.mli)
 
 $(TRYWHY3JSON): src/trywhy3/%: src/util/%
 	cp $< $@
@@ -1778,10 +1801,12 @@ $(TRYWHY3DEP): $(TRYWHY3JSON)
 
 MAKEINC += $(TRYWHY3DEP)
 
-clean::
+clean-trywhy3:
 	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte \
 	  src/trywhy3/why3_worker.js src/trywhy3/why3_worker.byte \
 	  trywhy3.tar.gz
+
+clean:: clean-trywhy3
 
 CLEANDIRS += src/trywhy3
 
@@ -1981,10 +2006,10 @@ MODULESTODOC = \
 	parser/ptree_helpers parser/typing parser/mlw_printer \
 	driver/whyconf driver/call_provers driver/driver \
 	transform/args_wrapper \
-	session/session_itp session/controller_itp \
-	session/itp_communication session/itp_server \
+	mlw/ity mlw/expr mlw/pdecl mlw/pmodule mlw/vc \
 	mlw/pinterp_core mlw/rac mlw/pinterp mlw/check_ce \
-	mlw/ity mlw/expr mlw/pdecl mlw/pmodule mlw/vc
+	session/session_itp session/controller_itp \
+	session/itp_communication session/itp_server
 
 MODULESMLTODOC = parser/ptree
 
@@ -2057,7 +2082,7 @@ STDLIBS = \
 	exn \
 	floating_point fmap function \
 	graph hashtbl \
-	ieee_float int \
+	ieee_float int io \
 	list \
 	map matrix \
 	null number option ocaml \
@@ -2170,6 +2195,10 @@ pl%gins/cfg/cfg_parser.ml pl%gins/cfg/cfg_parser.mli: src/parser/parser_common.m
 	        echo '$*.cmx : $*.cmi'; \
 	        echo '$*.cmi : $*.cmo') $(TOTARGET)
 
+%.dep: %.mli
+	$(SHOW) 'Ocamldep $<'
+	$(HIDE)$(OCAMLDEP) $(DEPFLAGS) $(INCLUDES) $< $(TOTARGET)
+
 bin/%.opt:
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
@@ -2247,10 +2276,10 @@ dist: $(MORE_DIST)
 headers:
 	headache -c misc/headache_config.txt -h misc/header.txt \
 		Makefile.in configure.in \
-		src/*/*.ml src/*/*.ml[iyl4] \
+		src/*/*.ml src/*/*.ml[ily] \
 		plugins/*/*.ml plugins/*/*.ml[ily] \
 		lib/coq/*.v lib/coq/*/*.v \
-		src/server/*.c src/server/*.h \
+		src/server/*.[ch] \
 		examples/use_api/*.ml
 
 #########

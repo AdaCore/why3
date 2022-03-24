@@ -1599,7 +1599,7 @@ Proof.
   rewrite e, Zmod_0_r.
   intros H.
   elim H.
-  easy; apply to_uint_nat.
+  try easy; apply to_uint_nat.
   split.
   apply Div_bound; split;[|apply Z.le_neq;split;[|auto]];apply to_uint_nat.
   apply (Z.le_lt_trans _ (to_uint v1)).

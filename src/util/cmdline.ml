@@ -99,5 +99,5 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | UnclosedDQuote s ->
       Format.fprintf fmt "unclosed double quote in string: %s" s
   | EmptyCommandLine ->
-      Format.fprintf fmt "empty command line"
+      Format.pp_print_string fmt "empty command line"
   | _ -> raise e)

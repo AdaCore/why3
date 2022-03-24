@@ -6,12 +6,13 @@ stages:
   - deploy
 
 variables:
-  BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2020-09-14"
+  BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2022-03-15"
   SPHINX_IMAGE: "$CI_REGISTRY_IMAGE:ci-sphinx"
   GIT_CLEAN_FLAGS: "-ffdxq"
 
 build-image:
   stage: docker
+  image: docker
   script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_JOB_TOKEN" "$CI_REGISTRY"
     - if docker pull "$BUILD_IMAGE"; then echo "Image already exists!"; exit 1; fi
@@ -22,10 +23,11 @@ build-image:
     variables:
       - $NEW_BUILD_IMAGE
   tags:
-    - shell
+    - large
 
 sphinx-image:
   stage: docker
+  image: docker
   script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_JOB_TOKEN" "$CI_REGISTRY"
     - if docker pull "$SPHINX_IMAGE"; then echo "Image already exists!"; exit 1; fi
@@ -36,13 +38,13 @@ sphinx-image:
     variables:
       - $NEW_SPHINX_IMAGE
   tags:
-    - shell
+    - medium
 
 .docker_template:
   image: "$BUILD_IMAGE"
   dependencies: []
   tags:
-    - docker
+    - medium
 
 build-system:
   stage: build
@@ -108,39 +110,27 @@ opam:
   stage: build
   script:
     - opam switch bench
-    - opam pin -n add why3 .
-    - opam pin -n add why3-ide .
-    - opam install -v why3
-    - opam install -v why3-ide
-    - opam exec -- ocamlfind ocamlopt -package why3 -o test -linkpkg misc/test_lib.ml
+    - misc/ci-opam.sh why3 why3-ide
   extends: .docker_template
 
 opam-latest:
   stage: test
   script:
     - opam switch latest
-    - opam pin -n add why3 .
-    - opam pin -n add why3-ide .
-    - opam install -v why3
-    - opam install -v why3-ide
-    - opam exec -- ocamlfind ocamlopt -package why3 -o test -linkpkg misc/test_lib.ml
+    - misc/ci-opam.sh why3 why3-ide
   extends: .docker_template
 
 opam-full:
   stage: test
   script:
     - opam switch full
-    - opam pin -n add why3 .
-    - opam pin -n add why3-ide .
-    - opam pin -n add why3-coq .
-    - opam install -v why3
-    - opam install -v why3-ide
-    - opam install -v why3-coq
+    - misc/ci-opam.sh why3 why3-ide why3-coq
     - opam exec -- ocamlfind ocamlopt -package why3 -o test -linkpkg misc/test_lib.ml
   extends: .docker_template
 
 deploy:
   stage: deploy
+  image: docker
   script:
     - BRANCH=$(echo $CI_COMMIT_REF_NAME | tr -cs "[:alnum:].\n" "-")
     - CACHE=$CI_REGISTRY_IMAGE:cache-$BRANCH
@@ -150,7 +140,7 @@ deploy:
     - docker pull "$IMAGE" || true
     - docker build --force-rm --cache-from="$CACHE" --target=builder -t "$CACHE" -f misc/Dockerfile.deploy .
     - docker build --force-rm --cache-from="$CACHE" --cache-from="$IMAGE" -t "$IMAGE" -f misc/Dockerfile.deploy .
-    - test -z "$CI_COMMIT_TAG" || docker push "$CACHE"
+    - test -n "$CI_COMMIT_TAG" || docker push "$CACHE"
     - docker push "$IMAGE"
     - docker rmi "$CACHE"
     - docker rmi "$IMAGE"
@@ -160,7 +150,7 @@ deploy:
     - /^bugfix[/]v[0-9.]*$/
     - tags
   tags:
-    - shell
+    - medium
 
 doc:
   stage: test
@@ -174,10 +164,11 @@ doc:
       - public
     expire_in: 1 day
   tags:
-    - docker
+    - medium
 
 pages:
   stage: deploy
+  image: busybox
   dependencies:
     - doc
   script:
@@ -189,4 +180,4 @@ pages:
   only:
     - master
   tags:
-    - docker
+    - small

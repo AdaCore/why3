@@ -67,13 +67,13 @@ let forget_tvs () = forget_all tvprinter
 
 let print_tv fmt tv =
   let n = id_unique tvprinter tv.tv_name in
-  fprintf fmt "%s" n
+  pp_print_string fmt n
 
 (* logic variables *)
 
 let print_vs fmt vs =
   let n = id_unique iprinter vs.vs_name in
-  fprintf fmt "%s" n
+  pp_print_string fmt n
 
 let forget_var vs = forget_id iprinter vs.vs_name
 
@@ -214,12 +214,6 @@ let number_format prty = {
     Number.frac_real_support =
       `Custom
         ((fun fmt i -> fprintf fmt "<num val=\"%s\"><type name=\"Real.real\"/></num>" i),
-         (fun fmt i n -> fprintf fmt
-                "<app>\
-                   <const name=\"Groups.times_class.times\"/>\
-                   <num val=\"%s\"><type name=\"Real.real\"/></num>\
-                   <num val=\"%s\"/>\
-                 </app>" i n),
          (fun fmt i n -> fprintf fmt
                 "<app>\
                    <const name=\"Why3_Real.why3_divide\"/>\

@@ -67,9 +67,6 @@ module Protocol_why3ide = struct
     Debug.dprintf debug_proto "request %a@." print_request r;
     Debug.dprintf debug_json "%a@." print_request_json r
 
-  let print_msg_debug m =
-    Debug.dprintf debug_proto "message %a@." print_msg m
-
   let print_notify_debug n =
     Debug.dprintf debug_proto "handling notification %a@." print_notify n;
     Debug.dprintf debug_json "%a@." print_notification_json n
@@ -102,10 +99,6 @@ module Protocol_why3ide = struct
     let l = List.rev !notification_list in
     notification_list := [];
     l
-
-  (* print_ext_any just use the pretty function here *)
-  let print_ext_any print_any fmt t =
-    print_any fmt t
 
 end
 
@@ -204,7 +197,7 @@ let env, gconfig =
 (********************************)
 
 
-let (why_lang, any_lang, why3py_lang, why3c_lang) =
+let (why_lang, why3py_lang, why3c_lang) =
   let main = Whyconf.get_main gconfig.config in
   let load_path = Filename.concat (Whyconf.datadir main) "lang" in
   let languages_manager =
@@ -218,10 +211,6 @@ let (why_lang, any_lang, why3py_lang, why3c_lang) =
         eprintf "language file for 'why3' not found in directory %s@."
           load_path;
         exit 1
-    | Some _ as l -> l in
-  let any_lang filename =
-    match languages_manager#guess_language ~filename () with
-    | None -> why_lang
     | Some _ as l -> l in
   let why3py_lang =
     match languages_manager#language "why3py" with
@@ -237,7 +226,7 @@ let (why_lang, any_lang, why3py_lang, why3c_lang) =
           load_path;
         exit 1
     | Some _ as l -> l in
-  (why_lang, any_lang, why3py_lang, why3c_lang)
+  (why_lang, why3py_lang, why3c_lang)
 
 (* Borrowed from Frama-C src/gui/source_manager.ml:
 Try to convert a source file either as UTF-8 or as locale. *)
@@ -1726,7 +1715,6 @@ let image_of_pa_status ~obsolete pa =
     end
 
 
-module S = Session_itp
 module C = Controller_itp
 
 
@@ -2175,26 +2163,6 @@ let get_word_around_iter iter =
   let end_iter = get_right_words iter in
   let text = start_iter#get_text ~stop:end_iter in
   (start_iter, text, end_iter)
-
-(* This function check for immediate quantification (not for scope yet) *)
-let rec get_qualif acc start_iter =
-  if start_iter#get_text ~stop:start_iter#forward_char = "." then
-    let (start_iter, text, _) = get_word_around_iter start_iter#backward_char in
-    if Strings.char_is_uppercase
-        (start_iter#get_text ~stop:start_iter#forward_char).[0] then
-      get_qualif (text :: acc) start_iter#backward_char
-    else
-      acc
-  else
-    acc
-
-let get_module (iter: GText.iter) =
-  match iter#backward_search "module" with
-  | None -> print_message ~kind:1 ~notif_kind:"Error"
-              "cannot find encapsulating module"; None
-  | Some (_, end_iter) ->
-      let (_, text, _) = get_word_around_iter end_iter#forward_char in
-      Some text
 
 (* find_cursor_ident: finds the ident under cursor and scroll to its definition
    get_back_loc: returns to the last position of a searched ident. *)

@@ -373,7 +373,7 @@ Proof.
   assert (length l <= length x).
   apply List.NoDup_incl_length. assumption.
   intros e h. rewrite G2. rewrite H2 in h. assumption.
-  omega.
+  lia.
 Qed.
 
 (* Why3 goal *)

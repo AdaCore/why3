@@ -189,7 +189,7 @@ let eval_float :
     incomplete "mlmpfr wrapper is not implemented"
 
 type 'a real_arity =
-  | Modeconst : Big_real.real real_arity
+  | Modeconst : (unit -> Big_real.real) real_arity
   | Mode1r : (Big_real.real -> Big_real.real) real_arity
   | Mode2r : (Big_real.real -> Big_real.real -> Big_real.real) real_arity
   | Mode_relr : (Big_real.real -> Big_real.real -> bool) real_arity
@@ -201,7 +201,7 @@ let eval_real : type a. a real_arity -> a -> rsymbol -> value list -> value opti
     | Mode1r, [Vreal r] -> Some (real_value (op r))
     | Mode2r, [Vreal r1; Vreal r2] -> Some (real_value (op r1 r2))
     | Mode_relr, [Vreal r1; Vreal r2] -> Some (bool_value (op r1 r2))
-    | Modeconst, [] -> Some (real_value op)
+    | Modeconst, [] -> Some (real_value (op ()))
     | _ -> incomplete "arity error in real operation"
   with
   | Big_real.Undetermined ->
@@ -209,6 +209,28 @@ let eval_real : type a. a real_arity -> a -> rsymbol -> value list -> value opti
       incomplete "computation on reals is undetermined"
   | Mlmpfr_wrapper.Not_Implemented ->
       incomplete "mlmpfr wrapper is not implemented"
+
+let io_print_newline _ _ =
+  print_newline ();
+  Some unit_value
+
+let io_print_int _ = function
+  | [{ v_desc = Vnum n }] ->
+      print_string (BigInt.to_string n);
+      Some unit_value
+  | _ -> assert false
+
+let io_print_string _ = function
+  | [{ v_desc = Vstring s }] ->
+      print_string s;
+      Some unit_value
+  | _ -> assert false
+
+let debug_print _ = function
+  | [v] ->
+      Format.eprintf "%a\n@?" print_value v;
+      Some unit_value
+  | _ -> assert false
 
 let builtin_progs = Hrs.create 17
 
@@ -283,6 +305,9 @@ let built_in_modules () =
       "True",          (fun _ _ -> Some (bool_value true));
       "False",         (fun _ _ -> Some (bool_value false));
     ];
+    builtin ["debug"] "Debug" [
+        "print", debug_print
+      ];
     builtin ["int"] "Int" int_ops;
     builtin ["int"] "MinMax" [
       "min",           eval_int_op BigInt.min;
@@ -303,6 +328,11 @@ let built_in_modules () =
       "RTN",           (fun _ _ -> Some (value (ty_app ts []) (Vfloat_mode Toward_Minus_Infinity)));
       "RTZ",           (fun _ _ -> Some (value (ty_app ts []) (Vfloat_mode Toward_Zero)));
     ]);
+    builtin ["io"] "StdIO" [
+        "print_int", io_print_int;
+        "print_newline", io_print_newline;
+        "print_string", io_print_string;
+      ];
     builtin ["real"] "Real" [
       op_infix "=",    eval_real Mode_relr Big_real.eq;
       op_infix "<",    eval_real Mode_relr Big_real.lt;
@@ -316,7 +346,7 @@ let built_in_modules () =
       "sqrt",          eval_real Mode1r Big_real.sqrt
     ];
     builtin ["real"] "Trigonometry" [
-      "pi",            eval_real Modeconst (Big_real.pi ())
+      "pi",            eval_real Modeconst Big_real.pi
     ];
     builtin ["real"] "ExpLog" [
       "exp",           eval_real Mode1r Big_real.exp;
@@ -680,7 +710,7 @@ let get_and_register_variable ctx ?def ?loc id ity =
   let gens = [
     gen_model_variable ctx ?loc id ity;
     gen_default def;
-    gen_type_default ~really:(is_ignore_id id) ctx ity;
+    gen_type_default ~really:true (* (is_ignore_id id) *) ctx ity;
   ] in
   let value = get_value' ctx_desc oloc gens in
   register_used_value ctx.env oloc id value;
@@ -705,7 +735,7 @@ let get_and_register_param ctx id ity =
   let ctx_desc = asprintf "parameter `%a`" print_decoded id.id_string in
   let gens = [
     gen_model_variable ctx id ity;
-    gen_type_default ~really:(is_ignore_id id) ctx ity;
+    gen_type_default ~really:true (* (is_ignore_id id) *) ctx ity;
   ] in
   let value = get_value' ctx_desc id.id_loc gens in
   register_used_value ctx.env id.id_loc id value;
@@ -910,7 +940,7 @@ and exec_expr' ctx e =
       else
         let c = Constant.ConstReal r in
         let s = Format.asprintf "%a" Constant.print_def c in
-        Normal (value ty_real (Vfloat (Mlmpfr_wrapper.make_from_str s)))
+        Normal (value (ty_of_ity e.e_ity) (Vfloat (Mlmpfr_wrapper.make_from_str s)))
   | Econst (Constant.ConstStr s) -> Normal (value ty_str (Vstring s))
   | Eexec (ce, cty) -> begin
       (* TODO (When) do we have to check the contracts in cty? When ce <> Capp? *)
@@ -962,17 +992,26 @@ and exec_expr' ctx e =
          if ctx.do_rac then
            exec_call_abstract ?loc:e.e_loc ~attrs:e.e_attrs
              ~snapshot:cty.cty_oldies ctx cty [] e.e_ity
-         else (* We must check postconditions for abstract exec *)
-           incomplete "cannot evaluate any-value with RAC disabled"
+         else
+           Normal (undefined_value ctx.env e.e_ity)
       | Capp (rs, pvsl) when
           Opt.map is_prog_constant (Mid.find_opt rs.rs_name ctx.env.pmodule.Pmodule.mod_known)
           = Some true ->
+          Debug.dprintf debug_trace_exec "@[<h>%tEVAL EXPR: EXEC CAPP %a@]@." pp_indent print_rs rs;
           if ctx.do_rac then (
             let desc = asprintf "of `%a`" print_rs rs in
             let cntr_ctx = mk_cntr_ctx ctx ?loc:e.e_loc ~desc Vc.expl_pre in
             check_terms ctx.rac cntr_ctx cty.cty_pre );
           assert (cty.cty_args = [] && pvsl = []);
-          let v = Lazy.force (Mrs.find rs ctx.env.rsenv) in
+          let v =
+            match find_definition ctx.env rs with
+            | Builtin f ->
+                Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;
+                ( match f rs [] with
+                  | Some v -> v
+                  | None -> incomplete "cannot compute result of builtin `%a`"
+                              Ident.print_decoded rs.rs_name.id_string )
+            | _ -> Lazy.force (Mrs.find rs ctx.env.rsenv) in
           if ctx.do_rac then (
             let desc = asprintf "of `%a`" print_rs rs in
             let cntr_ctx = mk_cntr_ctx ctx ~desc Vc.expl_post in

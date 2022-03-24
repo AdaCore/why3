@@ -7,7 +7,7 @@ Instructions to build TryWhy3
         the `mode-why3.js` file into them:
 
             cd src/trywhy3
-            git clone git://github.com/ajaxorg/ace-builds.git
+            git clone git@github.com:ajaxorg/ace-builds.git
             cp mode-why3.js ace-builds/src-min-noconflict/
 
   * Install Alt-Ergo
@@ -16,7 +16,7 @@ Instructions to build TryWhy3
         compile the JavaScript worker:
 
             cd src/trywhy3
-            git clone git://github.com/OCamlPro/alt-ergo.git
+            git clone git@github.com:OCamlPro/alt-ergo.git
             cd alt-ergo
             opam exec make js-worker
             cp alt-ergo-worker.js ..
@@ -56,9 +56,8 @@ Customization
   * To change the look and feel of the rest of the application, edit
     the file `trywhy3_custom.css`.
 
-  * To add some predefined examples, put some `.mlw` files in the
-    `examples/` subdirectory and generate an index as follows:
+  * To change the default step limits, edit the `#why3-setting-dialog`
+    part of `trywhy3.html`.
 
-        cp some_file.mlw examples/
-        cd examples/
-        ../gen_index.sh *.mlw > index.txt
+  * To add some predefined examples, put the files in the `examples/`
+    subdirectory and modify `examples/config.json` accordingly.

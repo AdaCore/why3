@@ -44,11 +44,10 @@ type info = {
   info_printer : ident_printer;
   mutable info_model: S.t;
   info_vc_term: vc_term_info;
-  mutable info_in_goal: bool;
+  info_in_goal: bool;
   mutable list_projs: Ident.ident Mstr.t;
-  mutable list_field_def: Ident.ident Mstr.t;
+  list_field_def: Ident.ident Mstr.t;
   meta_model_projection: Sls.t;
-  meta_record_def : Sls.t;
   info_cntexample: bool
   }
 
@@ -79,7 +78,7 @@ let ident_printer () =
   create_ident_printer bls ~sanitizer:san
 
 let print_ident info fmt id =
-  fprintf fmt "%s" (id_unique info.info_printer id)
+  pp_print_string fmt (id_unique info.info_printer id)
 
 let print_attr fmt l = fprintf fmt "\"%s\"" l.attr_string
 
@@ -298,9 +297,9 @@ and print_fmla_node info fmt f = match f.t_node with
   | Tnot f ->
       fprintf fmt "(not %a)" (print_fmla info) f
   | Ttrue ->
-      fprintf fmt "true"
+      pp_print_string fmt "true"
   | Tfalse ->
-      fprintf fmt "false"
+      pp_print_string fmt "false"
   | Tif(t1,t2,t3) ->
      fprintf fmt "(if %a then %a else %a)"
        (print_fmla info) t1 (print_fmla info) t2 (print_fmla info) t3
@@ -425,7 +424,7 @@ let print_info_model info =
   else
     Mstr.empty
 
-let print_prop_decl vc_loc vc_attrs args info fmt k pr f =
+let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f =
   match k with
   | Paxiom ->
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n@\n"
@@ -436,24 +435,25 @@ let print_prop_decl vc_loc vc_attrs args info fmt k pr f =
       | Some loc -> fprintf fmt " @[(* %a *)@]@\n"
             Loc.gen_report_position loc);
       let model_list = print_info_model info in
-      args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
-                                vc_term_loc = vc_loc;
-                                vc_term_attrs = vc_attrs;
-                                queried_terms = model_list;
-                                list_projections = info.list_projs;
-                                list_fields = info.list_field_def;
-                                list_records = Mstr.empty;
-                                noarg_constructors = [];
-                                set_str = Mstr.empty};
+      printing_info := Some {
+        vc_term_loc = vc_loc;
+        vc_term_attrs = vc_attrs;
+        queried_terms = model_list;
+        list_projections = info.list_projs;
+        list_fields = info.list_field_def;
+        list_records = Mstr.empty;
+        noarg_constructors = [];
+        set_str = Mstr.empty;
+      };
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
         (print_ident info) pr.pr_name (print_fmla info) f
   | Plemma -> assert false
 
-let print_prop_decl vc_loc vc_attrs args info fmt k pr f =
+let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f =
   if Mid.mem pr.pr_name info.info_syn || Spr.mem pr info.info_axs
-    then () else (print_prop_decl vc_loc vc_attrs args info fmt k pr f; forget_tvs info)
+    then () else (print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f; forget_tvs info)
 
-let print_decl vc_loc vc_attrs args info fmt d = match d.d_node with
+let print_decl vc_loc vc_attrs printing_info info fmt d = match d.d_node with
   | Dtype ts ->
       print_ty_decl info fmt ts
   | Ddata dl ->
@@ -465,7 +465,7 @@ let print_decl vc_loc vc_attrs args info fmt d = match d.d_node with
       print_list nothing (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
       "alt-ergo: inductive definitions are not supported"
-  | Dprop (k,pr,f) -> print_prop_decl vc_loc vc_attrs args info fmt k pr f
+  | Dprop (k,pr,f) -> print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f
 
 let add_projection (csm,pjs,axs) = function
   | [Theory.MAls ls; Theory.MAls cs; Theory.MAint ind; Theory.MApr pr] ->
@@ -487,7 +487,7 @@ let print_task args ?old:_ fmt task =
   let inv_trig = Task.on_tagged_ls meta_invalid_trigger task in
   let show,cast = Task.on_meta meta_printer_option
     check_options (false,true) task in
-  let cntexample = Inlining.get_counterexmp task in
+  let cntexample = Driver.get_counterexmp task in
   let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
   let vc_attrs = (Task.task_goal_fmla task).t_attrs in
   let vc_info = {vc_inside = false; vc_loc = None; vc_func_name = None} in
@@ -507,7 +507,6 @@ let print_task args ?old:_ fmt task =
     list_projs = Mstr.empty;
     list_field_def = Mstr.empty;
     meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
-    meta_record_def = Task.on_tagged_ls Theory.meta_record task;
     info_cntexample = cntexample;
   } in
   print_prelude fmt args.prelude;
@@ -517,7 +516,7 @@ let print_task args ?old:_ fmt task =
         print_decls t.Task.task_prev;
         begin match t.Task.task_decl.Theory.td_node with
         | Theory.Decl d ->
-            begin try print_decl vc_loc vc_attrs args info fmt d
+            begin try print_decl vc_loc vc_attrs args.printing_info info fmt d
             with Unsupported s -> raise (UnsupportedDecl (d,s)) end
         | _ -> () end
     | None -> () in

@@ -1,0 +1,76 @@
+module NestedLoops
+use int.Int
+(*
+
+	The CFG has this form
+
+		  S
+		  |
+		  v
+	+-->1-----> 5
+	|   |
+	|   v
+	4<--2-->3
+		  ^		|
+		  |		|
+		  +---+
+
+	It corresponds to a program  along the lines of
+
+	while C {
+		while D {
+			// some code
+		}
+	}
+
+	The stackification algorithm should lead to an order along the lines
+	of S, 1, 2, 3, 4, 5
+	
+*)
+
+
+let cfg nested_loops (b : bool) : () = 
+{goto L1 }
+L1 {
+	switch (b) 
+	| True -> goto L2
+	| False -> goto L5
+	end
+}
+L2 {
+	invariant inner { true };
+	switch (not b)
+	| True -> goto L3
+	| False -> goto L4
+	end
+}
+L3 {
+	goto L2
+}
+L4 {
+	goto L1
+}
+L5 {
+	return ()
+}
+
+let cfg chain () : () =
+var x : int;
+{ x <- 0; goto L1 }
+L1 { x <- 5; goto L2 }
+L2 { x <- 10; return () }
+
+
+let cfg simple_loop () : int =
+var x : int;
+{ x <- 0; goto L0 }
+L0 { x<- 3; switch (x < 10)
+			| True -> goto R
+			| False -> goto L1
+			end
+}
+L1 { x <- 10; goto L0 }
+S { return x }
+R { x <- x + 1; goto S }
+
+end

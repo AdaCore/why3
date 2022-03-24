@@ -23,6 +23,7 @@ val list_binaries : unit -> string list
 
 module Prover_autodetection_data: sig
   type t
+  val from_file: string -> t
 end
 
 module Detected_binary: sig
@@ -63,6 +64,7 @@ val update_binaries_detected:
 
 val compute_builtin_prover:
   binaries ->
+  Whyconf.config ->
   Prover_autodetection_data.t ->
   Whyconf.config_prover Whyconf.Mprover.t
 (** Compute the builtin prover. Only print errors if {!is_config_command} is

@@ -11,6 +11,8 @@
 
 (**
 
+Parsing of command-line options.
+
 Short keys represent [-l] options. Long keys represent [--long] options.
 Some options can support both formats at once, e.g., [-l] and [--long].
 
@@ -63,22 +65,22 @@ val parse_one : opt list -> string array -> int -> int
 (** [parse_one opts args i] parses argument [args.(i)] using the option
     list [opts]. If the argument is not an option (or if it is option
     [--]), [i] is returned. Otherwise, the index of the next unparsed
-    argument is returned. The function raises [GetoptFailure] if the
+    argument is returned. The function raises {!GetoptFailure} if the
     argument is either an unrecognized option or its required value is
     missing. If the option list does not change depending on parsed
-    options, [parse_many] might be a better choice. *)
+    options, {!parse_many} might be a better choice. *)
 
 val parse_many : opt list -> string array -> int -> int
 (** [parse_many opts args i] parses arguments from [args] starting at
-    index [i], calling [parse_one] in turn. It returns the index of the
-    first argument that is not an option. When [GetoptFailure] is raised,
-    the function calls [handle_exn] to terminate the program. If the
-    option list is static, [parse_all] might be a better choice. *)
+    index [i], calling {!parse_one} in turn. It returns the index of the
+    first argument that is not an option. When {!GetoptFailure} is raised,
+    the function calls {!handle_exn} to terminate the program. If the
+    option list is static, {!parse_all} might be a better choice. *)
 
 val parse_all : ?i:int -> opt list -> (string -> unit) -> string array -> unit
 (** [parse_all ~i opts extra args] parses all the arguments from [args],
-    starting from index [i] (1 by default), calling [parse_one] in turn.
-    When [GetoptFailure] is raised, the function calls [handle_exn] to
+    starting from index [i] (1 by default), calling {!parse_one} in turn.
+    When {!GetoptFailure} is raised, the function calls {!handle_exn} to
     terminate the program. When an argument is not an option, it is passed
     to [extra]. If an argument is [--], all the remaining arguments are
     passed to [extra] in turn. *)
@@ -92,5 +94,5 @@ val format : ?margin:int -> opt list -> string
 
 val handle_exn : string -> unit
 (** [handle_exn args exn] terminates the program after printing the content
-    of the [GetoptFailure] exception. The content of [commands] is used as
+    of the {!GetoptFailure} exception. The content of [commands] is used as
     the program name for the error message. *)

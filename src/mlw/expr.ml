@@ -642,7 +642,7 @@ let rec post_of_expr res e = match e.e_node with
   | Epure t -> post_of_term res t
   | Eghost e | Eexn (_,e) -> post_of_expr res e
   | Eexec (_,c) ->
-      let conv q = open_post_with res q in
+      let conv q = open_post_with (term_of_fmla res) q in
       copy_attrs e (t_and_l (List.map conv c.cty_post))
   | Elet (LDvar (v,_d),e) when ity_equal v.pv_ity ity_unit ->
       copy_attrs e (t_subst_single v.pv_vs t_void (post_of_expr res e))
@@ -796,8 +796,8 @@ let c_pur s vl ityl ity =
   let cty = create_cty v_args [] [q] Mxs.empty Mpv.empty eff ity in
   mk_cexp (Cpur (s,vl)) cty
 
-let print_expr_hook = ref (fun fmt _e -> Format.fprintf fmt "Expr.print_expr_hook not set!")
-let print_rs_hook = ref (fun fmt _rs -> Format.fprintf fmt "Expr.print_rs_hook not set!")
+let print_expr_hook = ref (fun fmt _e -> Format.pp_print_string fmt "Expr.print_expr_hook not set!")
+let print_rs_hook = ref (fun fmt _rs -> Format.pp_print_string fmt "Expr.print_rs_hook not set!")
 
 let mk_proxy_decl ~ghost e =
 (*  Format.eprintf "[Expr.mk_proxy_decl] e = %a@." !print_expr_hook e; *)
@@ -1479,7 +1479,7 @@ and print_enode pri fmt e = match e.e_node with
   | Eraise (xs,e) ->
       fprintf fmt "raise (%a %a)" print_xs xs print_expr e
   | Eabsurd ->
-      fprintf fmt "absurd"
+      pp_print_string fmt "absurd"
   | Eassert (Assert,f) ->
       fprintf fmt "assert { %a }" print_term f
   | Eassert (Assume,f) ->

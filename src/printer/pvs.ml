@@ -119,7 +119,7 @@ let thprinter =
 
 let print_tv fmt tv =
   let n = id_unique iprinter tv.tv_name in
-  fprintf fmt "%s" n
+  pp_print_string fmt n
 
 let print_tv_binder fmt tv =
   tv_set := Sid.add tv.tv_name !tv_set;
@@ -140,18 +140,18 @@ let forget_tvs () =
 (* logic variables *)
 let print_vs fmt vs =
   let n = id_unique iprinter vs.vs_name in
-  fprintf fmt "%s" n
+  pp_print_string fmt n
 
 let forget_var vs = forget_id iprinter vs.vs_name
 
 let print_ts fmt ts =
-  fprintf fmt "%s" (id_unique iprinter ts.ts_name)
+  pp_print_string fmt (id_unique iprinter ts.ts_name)
 
 let print_ls fmt ls =
-  fprintf fmt "%s" (id_unique iprinter ls.ls_name)
+  pp_print_string fmt (id_unique iprinter ls.ls_name)
 
 let print_pr fmt pr =
-  fprintf fmt "%s" (id_unique iprinter pr.pr_name)
+  pp_print_string fmt (id_unique iprinter pr.pr_name)
 
 let print_name fmt id =
   fprintf fmt "%% Why3 %s@\n" (id_unique iprinter id)
@@ -169,8 +169,6 @@ type info = {
   realization : bool;
 }
 
-let print_path = print_list (constant_string ".") string
-
 let print_id fmt id = string fmt (id_unique iprinter id)
 
 let print_id_real info fmt id =
@@ -187,7 +185,6 @@ let print_id_real info fmt id =
 
 let print_ls_real info fmt ls = print_id_real info fmt ls.ls_name
 let print_ts_real info fmt ts = print_id_real info fmt ts.ts_name
-let print_pr_real info fmt pr = print_id_real info fmt pr.pr_name
 
 (** Types *)
 
@@ -195,7 +192,7 @@ let rec print_ty info fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
   | Tyapp (ts, tl) when is_ts_tuple ts ->
       begin match tl with
-        | []  -> fprintf fmt "[]"
+        | []  -> pp_print_string fmt "[]"
         | [ty] -> print_ty info fmt ty
         | _   -> fprintf fmt "[%a]" (print_list comma (print_ty info)) tl
       end
@@ -225,19 +222,11 @@ let unambig_fs fs =
 
 (** Patterns, terms, and formulas *)
 
-let lparen_l fmt () = fprintf fmt "@ ("
 let lparen_r fmt () = fprintf fmt "(@,"
-let print_paren_l fmt x =
-  print_list_delim ~start:lparen_l ~stop:rparen ~sep:comma fmt x
 let print_paren_r fmt x =
   print_list_delim ~start:lparen_r ~stop:rparen ~sep:comma fmt x
 
-let arrow fmt () = fprintf fmt "@ -> "
-let print_arrow_list fmt x = print_list arrow fmt x
-let print_space_list fmt x = print_list space fmt x
 let print_comma_list fmt x = print_list comma fmt x
-let print_or_list fmt x = print_list (fun fmt () -> fprintf fmt " OR@\n") fmt x
-let comma_newline fmt () = fprintf fmt ",@\n"
 
 let rec print_pat info fmt p = match p.pat_node with
   | Pvar v ->
@@ -259,9 +248,6 @@ let rec print_pat info fmt p = match p.pat_node with
 let print_vsty_nopar info fmt v =
   fprintf fmt "%a:%a" print_vs v (print_ty info) v.vs_ty
 
-let print_vsty info fmt v =
-  fprintf fmt "(%a)" (print_vsty_nopar info) v
-
 let is_tuple0_ty = function
   | Some { ty_node = Tyapp (ts, _) } -> ts_equal ts (ts_tuple 0)
   | Some _ | None -> false
@@ -271,14 +257,10 @@ let is_tuple_ty = function
   | Some _ | None -> false
 
 let print_binop fmt = function
-  | Tand -> fprintf fmt "AND"
-  | Tor -> fprintf fmt "OR"
-  | Timplies -> fprintf fmt "=>"
-  | Tiff -> fprintf fmt "<=>"
-
-(* TODO: labels are lost, but we could print them as "% label \n",
-   it would result in an ugly output, though *)
-let print_attr _fmt (_l,_) = () (*fprintf fmt "(*%s*)" l*)
+  | Tand -> pp_print_string fmt "AND"
+  | Tor -> pp_print_string fmt "OR"
+  | Timplies -> pp_print_string fmt "=>"
+  | Tiff -> pp_print_string fmt "<=>"
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
@@ -295,7 +277,6 @@ let number_format = {
     Number.frac_real_support =
       `Custom
         ((fun fmt i -> pp_print_string fmt i),
-         (fun fmt i n -> fprintf fmt "(%s * %s)" i n),
          (fun fmt i n -> fprintf fmt "(%s / %s)" i n));
   }
 
@@ -303,7 +284,6 @@ let rec print_term info fmt t = print_lrterm false false info fmt t
 and     print_fmla info fmt f = print_lrfmla false false info fmt f
 and print_opl_term info fmt t = print_lrterm true  false info fmt t
 and print_opl_fmla info fmt f = print_lrfmla true  false info fmt f
-and print_opr_term info fmt t = print_lrterm false true  info fmt t
 and print_opr_fmla info fmt f = print_lrfmla false true  info fmt f
 
 and print_lrterm opl opr info fmt t = match t.t_attrs with
@@ -342,9 +322,9 @@ and print_tnode opl opr info fmt t = match t.t_node with
         (print_vsty_nopar info) v (print_opl_fmla info) f;
       forget_var v
   | Tapp (fs, []) when is_fs_tuple fs ->
-      fprintf fmt "()"
+      pp_print_string fmt "()"
   | Tapp (fs, pl) when is_fs_tuple fs ->
-      fprintf fmt "%a" (print_paren_r (print_term info)) pl
+      print_paren_r (print_term info) fmt pl
   | Tapp (fs, tl) ->
     begin match query_syntax info.info_syn fs.ls_name with
       | Some s ->
@@ -353,7 +333,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
           let no_cast = unambig_fs fs in
           begin match tl with
             | [] when no_cast ->
-              fprintf fmt "%a" (print_ls_real info) fs
+                print_ls_real info fmt fs
             | [] ->
               fprintf fmt "(%a :: %a)"
                 (print_ls_real info) fs (print_ty info) (t_type t)
@@ -389,9 +369,9 @@ and print_fnode opl opr info fmt f = match f.t_node with
       aux fmt vl;
       List.iter forget_var vl
   | Ttrue ->
-      fprintf fmt "TRUE"
+      pp_print_string fmt "TRUE"
   | Tfalse ->
-      fprintf fmt "FALSE"
+      pp_print_string fmt "FALSE"
   | Tbinop (b, f1, f2) ->
       fprintf fmt (protect_on (opl || opr) "%a %a@ %a")
         (print_opr_fmla info) f1 print_binop b (print_opl_fmla info) f2
@@ -421,7 +401,7 @@ and print_fnode opl opr info fmt f = match f.t_node with
       | Some s ->
           syntax_arguments s (print_term info) fmt tl
       | None when tl = [] ->
-          fprintf fmt "%a" (print_ls_real info) ps
+          print_ls_real info fmt ps
       | None ->
           fprintf fmt "%a(%a)" (print_ls_real info) ps
             (print_comma_list (print_term info)) tl
@@ -444,12 +424,6 @@ and print_tuple_pat info t fmt p =
       (print_vsty_nopar info) vs (print_term info) t !i
   in
   print_comma_list print fmt l
-
-and print_branch print info fmt br =
-  let p,t = t_open_branch br in
-  fprintf fmt "@[<hov 4> %a:@ %a@]"
-    (print_pat info) p (print info) t;
-  Svs.iter forget_var p.pat_vars
 
 and print_branches ?(first=true) print info fmt = function
   | [] ->
@@ -589,7 +563,8 @@ let output_till_statement fmt script name =
 
 let print_contents_in_comment fmt c =
   let print fmt s =
-    if s = "" || s.[0] <> '%' then fprintf fmt "%% "; fprintf fmt "%s" s in
+    if s = "" || s.[0] <> '%' then fprintf fmt "%% ";
+    pp_print_string fmt s in
   print_list newline print fmt c
 
 let output_remaining fmt cl =
@@ -661,7 +636,7 @@ let print_data_decl info fmt d =
   end
 
 let print_ls_type info fmt = function
-  | None -> fprintf fmt "bool"
+  | None -> pp_print_string fmt "bool"
   | Some ty -> print_ty info fmt ty
 
 let create_argument ty = create_vsymbol (id_fresh "x") ty
@@ -675,7 +650,7 @@ let has_macro s =
   try let _ = Re.Str.search_forward re_macro s 0 in true with Not_found -> false
 let is_macro info fmt = function
   | Some (Edition (_, c)) when info.realization && List.exists has_macro c ->
-      fprintf fmt "MACRO "
+      pp_print_string fmt "MACRO "
   | _ -> ()
 
 let print_param_decl ~prev info fmt ls =
@@ -733,9 +708,6 @@ let print_recursive_decl info fmt d =
     forget_tvs ()
   end
 
-let print_ind info fmt (pr,f) =
-  fprintf fmt "@[%% %a:@\n(%a)@]" print_pr pr (print_fmla info) f
-
 let print_ind_decl info fmt (ps,al) =
   let _, _, all_ty_params = ls_ty_vars ps in
   let vl = List.map (create_vsymbol (id_fresh "z")) ps.ls_args in
@@ -752,16 +724,6 @@ let print_ind_decl info fmt d =
     print_ind_decl info fmt d;
     forget_tvs ()
   end
-
-let re_lemma = Re.Str.regexp "\\(\\bLEMMA\\b\\|\\bTHEOREM\\b\\)"
-let rec find_lemma = function
-  | [] -> "AXIOM"
-  | s :: sl ->
-      (try let _ = Re.Str.search_forward re_lemma s 0 in Re.Str.matched_group 1 s
-       with Not_found -> find_lemma sl)
-let axiom_or_lemma = function
-  | Some (Edition (_, c)) -> find_lemma c
-  | _ -> "AXIOM"
 
 let print_prop_decl ~prev info fmt (k,pr,f) =
   ignore (prev);
@@ -812,12 +774,6 @@ let print_decl ~old info fmt d =
 
 let print_decls ~old info fmt dl =
   fprintf fmt "@[<hov>%a@]" (print_list nothing (print_decl ~old info)) dl
-
-let init_printer th =
-  let isanitize = sanitizer char_to_alpha char_to_alnumus in
-  let pr = create_ident_printer black_list ~sanitizer:isanitize in
-  Sid.iter (fun id -> ignore (id_unique pr id)) th.Theory.th_local;
-  pr
 
 let print_task printer_args realize ?old fmt task =
   forget_all ();

@@ -53,12 +53,15 @@ depopts: [
   "ocamlgraph"
   "re"
   "sexplib"
+  "ppx_deriving" {build}
   "ppx_sexp_conv" {build}
+  "mlmpfr"
 ]
 
 conflicts: [
   "why3-base"
   "ocamlgraph" {< "1.8.2"}
+  "mlmpfr" {< "4.0.0"}
 ]
 
 synopsis: "Why3 environment for deductive program verification"

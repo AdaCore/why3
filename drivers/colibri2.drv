@@ -15,10 +15,9 @@ printer "smtv2.6par"
 transformation "monomorphise_goal"
 transformation "eliminate_builtin"
 transformation "compile_match"
-transformation "inline_trivial"
+(* transformation "inline_trivial" *)
 transformation "simplify_trivial_quantification"
 transformation "simplify_formula"
-transformation "eliminate_recursion"
 transformation "eliminate_inductive"
 transformation "eliminate_literal"
 transformation "eliminate_epsilon"
@@ -109,6 +108,11 @@ theory real.Real
   remove prop CompatOrderAdd
   remove prop CompatOrderMult
   remove prop ZeroLessOne
+
+end
+
+theory real.Square
+  syntax function sqrt "(colibri_sqrt %1)"
 
 end
 

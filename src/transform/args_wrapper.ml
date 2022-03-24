@@ -271,6 +271,13 @@ let type_ptree ~as_fmla t tables =
 
 exception Arg_parse_type_error of Loc.position * string * exn
 
+let () = Exn_printer.register (fun fmt e ->
+    match e with
+    | Arg_parse_type_error (loc, str, e) ->
+        Format.fprintf fmt "Error while parsing argument(s) %s at %a: %a"
+          str Pretty.print_loc loc Exn_printer.exn_printer e
+    | e -> raise e)
+
 let registered_lang_parsing_trans = Hashtbl.create 63
 
 exception Add_language_parser
@@ -519,10 +526,10 @@ let rec string_of_trans_typ : type a b. (a, b) trans_typ -> string =
 let rec print_type : type a b. Format.formatter -> (a, b) trans_typ -> unit =
   fun fmt t ->
     match t with
-    | Ttrans         -> Format.fprintf fmt "task"
-    | Ttrans_l       -> Format.fprintf fmt "list task"
-    | Tenvtrans      -> Format.fprintf fmt "env -> task"
-    | Tenvtrans_l    -> Format.fprintf fmt "env -> list task"
+    | Ttrans         -> Format.pp_print_string fmt "task"
+    | Ttrans_l       -> Format.pp_print_string fmt "list task"
+    | Tenvtrans      -> Format.pp_print_string fmt "env -> task"
+    | Tenvtrans_l    -> Format.pp_print_string fmt "env -> list task"
     | Tint t         -> Format.fprintf fmt "integer -> %a" print_type t
     | Tstring t      -> Format.fprintf fmt "string -> %a" print_type t
     | Tty t          -> Format.fprintf fmt "type -> %a" print_type t

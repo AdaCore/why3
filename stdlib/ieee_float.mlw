@@ -94,8 +94,10 @@ module GenericFloat
   function min       t t : t
   function max       t t : t
   (** Minimum and Maximum
-      Note that we have to follow IEEE-754 and SMTLIB here. Two things to
+
+     Note that we have to follow IEEE-754 and SMTLIB here. Two things to
      note in particular:
+
      1) min(-0, 0) is either 0 or -0, there is a choice
 
      2) if either argument is NaN then the other argument is returned

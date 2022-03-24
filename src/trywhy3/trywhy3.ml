@@ -19,16 +19,13 @@ module Dom = Js_of_ocaml.Dom
 module File = Js_of_ocaml.File
 module Worker = Js_of_ocaml.Worker
 module Dom_html = Js_of_ocaml.Dom_html
-module XmlHttpRequest = Js_of_ocaml.XmlHttpRequest
-
 
 let (!!) = Js.string
 
 let int_of_js_string = Js.parseInt
 let js_string_of_int n = (Js.number_of_float (float_of_int n)) ## toString
 
-module AsHtml =
-  struct
+module AsHtml = struct
     include Dom_html.CoerceTo
     let span e = element e
   end
@@ -60,7 +57,52 @@ let addMouseEventListener prevent o (e : Js.js_string Js.t) f =
                     inject cb;
                     inject Js._false |])
 
+module Session = struct
 
+  let localStorage =
+    check_def "localStorage" (Dom_html.window ##. localStorage)
+
+  let save_view_mode m =
+    localStorage ## setItem !!"why3-view-mode" m
+
+  let save_buffer lang name content =
+    localStorage ## setItem !!"why3-buffer-lang" lang;
+    localStorage ## setItem !!"why3-buffer-name" name;
+    localStorage ## setItem !!"why3-buffer-content" content
+
+  let get_item s def =
+    Js.Opt.get (localStorage ## getItem s) (fun () -> def)
+
+  let load_view_mode () =
+    get_item !!"why3-view-mode" !!"wide"
+
+  let load_buffer () =
+    let lang = get_item !!"why3-buffer-lang" !!"" in
+    let name = get_item !!"why3-buffer-name" !!"" in
+    let buffer = get_item !!"why3-buffer-content" !!"" in
+    (lang, name, buffer)
+
+  let to_save = ref []
+
+  let attach input store =
+    let default = input ##. value in
+    to_save := (input, store, default) :: !to_save;
+    let v = get_item store default in
+    input ##. value := v;
+    v
+
+  let save () =
+    List.iter (fun (input, store, default) ->
+        let v = input ##. value in
+        if Js.to_string v = Js.to_string default then
+          localStorage ## removeItem store
+        else
+          localStorage ## setItem store v;
+        (* some browsers remember values upon reload, thus corrupting default settings *)
+        input ##. value := default
+      ) !to_save
+
+end
 
 module Buttons = struct
 
@@ -88,9 +130,6 @@ module Buttons = struct
     b ##. disabled := Js._false;
     b ##. classList ## remove !!"why3-inactive"
 
-  let toggle b =
-    if Js.to_bool (b ##. disabled) then enable b else disable b
-
   let change b v =
     if v = Js.to_bool (b ##. disabled) then
       if v then enable b
@@ -100,8 +139,8 @@ end
 
 module Ace = Ace ()
 
-module Editor =
-  struct
+module Editor = struct
+
     let name = ref !!""
     let callback = ref (fun () -> ())
 
@@ -161,10 +200,6 @@ module Editor =
     let mk_range l1 c1 l2 c2 =
       new%js Ace.range l1 c1 l2 c2
 
-    let set_selection_range r =
-      let selection = editor ## getSelection in
-      selection ## setSelectionRange r Js._false
-
     let add_marker cls r =
       editor ## getSession ## addMarker r cls !!"text" Js._false
 
@@ -222,12 +257,6 @@ module Editor =
       end;
       error_marker := new_m
 
-    let has_focus () =
-      let ac = Dom_html.document ##. activeElement in
-      match Js.Opt.to_option ac with
-          | Some ac when Js.to_string (ac ##. id) = "why3-editor" -> assert false
-          | _ -> assert false
-
   end
 
 module Tabs = struct
@@ -239,11 +268,12 @@ module Tabs = struct
         List.iter (fun tab ->
             tab ##. onclick :=
               Dom.handler (fun _ev ->
-                  let () =
-                    if Js.to_bool (tab ##. classList ## contains !!"why3-inactive") then
+                  if Js.to_bool (tab ##. classList ## contains !!"why3-inactive") then begin
                       List.iter (fun t ->
-                          ignore (t ##. classList ## toggle !!"why3-inactive")
-                        ) labels in
+                          ignore (t ##. classList ## add !!"why3-inactive")
+                        ) labels;
+                      tab ##. classList ## remove !!"why3-inactive"
+                    end;
                   Js._false)
           ) labels)
       tab_groups
@@ -254,14 +284,57 @@ module Tabs = struct
 
 end
 
-module ContextMenu =
-  struct
+module Dialogs = struct
+
+  let dialog_panel = getElement AsHtml.div "why3-dialog-panel"
+  let setting_dialog = getElement AsHtml.div "why3-setting-dialog"
+  let about_dialog = getElement AsHtml.div "why3-about-dialog"
+  let button_close = getElement AsHtml.button "why3-close-dialog-button"
+  let input_num_threads = getElement AsHtml.input "why3-input-num-threads"
+  let input_num_steps = getElement AsHtml.input "why3-input-num-steps"
+  let input_min_steps = getElement AsHtml.input "why3-input-min-steps"
+  let radio_wide = getElement AsHtml.input "why3-radio-wide"
+  let radio_column = getElement AsHtml.input "why3-radio-column"
+
+  let input_context_steps =
+    let t = Array.make 3 input_num_steps in
+    for i = 0 to 2 do
+      let id = Printf.sprintf "why3-input-context-steps%d" (i+1) in
+      t.(i) <- getElement AsHtml.input id
+    done;
+    t
+
+
+  let all_dialogs = [ setting_dialog; about_dialog ]
+  let show diag () =
+    dialog_panel ##. style ##. display := !!"flex";
+    diag ##. style ##. display := !!"inline-block";
+    diag ## focus
+
+  let close () =
+    List.iter (fun d -> d ##. style ##. display := !!"none") all_dialogs;
+    dialog_panel ##. style ##. display := !!"none"
+
+  let set_onchange o f =
+    o ##. onchange := Dom.handler (fun _ -> f o; Js._false)
+end
+
+module ContextMenu = struct
+
     let task_menu = getElement AsHtml.div "why3-task-menu"
     let split_menu_entry = getElement AsHtml.li "why3-split-menu-entry"
     let prove_menu_entry = getElement AsHtml.li "why3-prove-menu-entry"
     let clean_menu_entry = getElement AsHtml.li "why3-clean-menu-entry"
     let enabled = ref true
-    let alt_ergo_context_steps = ref (Array.make 3 0)
+
+    let alt_ergo_context_steps =
+      let get i =
+        let v =
+          Session.attach Dialogs.input_context_steps.(i)
+            (Js.string (Printf.sprintf "why3-context-steps%d" i)) in
+        int_of_js_string v in
+      Array.init 3 get
+
     let prove_menu_entries =
       let t = Array.make 3 prove_menu_entry in
       for i = 0 to 2 do
@@ -296,14 +369,16 @@ module ContextMenu =
     let change_prove_context () =
       let span = "<span class='fas fa-magic why3-icon'></span>" in
       for i = 0 to 2 do
-        prove_menu_entries.(i) ##. innerHTML := !!(Printf.sprintf "%s Prove (%d steps)" span !alt_ergo_context_steps.(i))
+        prove_menu_entries.(i) ##. innerHTML :=
+          Js.string (Printf.sprintf "%s Prove (%d steps)" span alt_ergo_context_steps.(i))
       done
 
     let get_context_step i =
-      !alt_ergo_context_steps.(i)
+      alt_ergo_context_steps.(i)
 
-
-    let () = addMouseEventListener false task_menu !!"mouseleave" (fun _ -> hide())
+    let () =
+      change_prove_context ();
+      addMouseEventListener false task_menu !!"mouseleave" (fun _ -> hide())
 
   end
 
@@ -336,19 +411,16 @@ module FormatList = struct
 
   let handle _ =
     let i = select_format ##. selectedIndex in
-    if i > 0 then
-      begin
-        let name =
-          match List.nth_opt !formats (i - 1) with
-          | Some (name, ext :: _) ->
-              Editor.name := Js.string ("test." ^ ext);
-              name
-          | Some (name, []) -> name
-          | _ -> "" in
-        change_mode name;
-        selected_format := name;
-        change_url name
-      end
+    let name =
+      match List.nth_opt !formats i with
+      | Some (name, ext :: _) ->
+          Editor.name := Js.string ("test." ^ ext);
+          name
+      | Some (name, []) -> name
+      | _ -> "" in
+    change_mode name;
+    selected_format := name;
+    change_url name
 
   let add_format text =
     let option = Dom_html.createOption Dom_html.document in
@@ -363,11 +435,11 @@ module FormatList = struct
     change_url name
 
   let set_format name idx =
-    if idx = 0 then
+    if idx = -1 then
       match !formats with
       | (name, _) :: _ ->
-          if select_format ##. selectedIndex = 0 then
-            set_format name idx
+          if select_format ##. selectedIndex = -1 then
+            set_format name 0
       | [] -> ()
     else set_format name idx
 
@@ -381,8 +453,8 @@ module FormatList = struct
       | (name, exts) :: l ->
           if List.mem ext exts then (name, i)
           else aux (i + 1) l
-      | [] -> ("", 0) in
-    let (name, idx) = aux 1 !formats in
+      | [] -> ("", -1) in
+    let (name, idx) = aux 0 !formats in
     set_format name idx
 
   let set_format name =
@@ -390,8 +462,8 @@ module FormatList = struct
       | (n, _) :: l ->
           if n = name then (name, i)
           else aux (i + 1) l
-      | _ -> ("", 0) in
-    let (name, idx) = aux 1 !formats in
+      | _ -> ("", -1) in
+    let (name, idx) = aux 0 !formats in
     set_format name idx
 
   let add_formats l =
@@ -406,7 +478,7 @@ module FormatList = struct
         else
           set_format !selected_format
       else
-        let () = select_format ##. selectedIndex := 1 in
+        let () = select_format ##. selectedIndex := 0 in
         ignore (handle ())
 
   let enable () =
@@ -420,9 +492,8 @@ module FormatList = struct
 
 end
 
-module ExampleList =
-  struct
-    let has_been_updated = ref false
+module ExampleList = struct
+
     let select_example = getElement AsHtml.select "why3-select-example"
     let example_label = getElement AsHtml.span "why3-example-label"
     let set_loading_label b =
@@ -432,10 +503,12 @@ module ExampleList =
       else
         example_label ##. className := !!"fas fa-book why3-icon"
 
-    let selected_index = ref 0
+    let config = ref Json_base.Null
+
+    let selected_index = ref (-1)
     let unselect () =
-      selected_index := 0;
-      select_example ##. selectedIndex := 0
+      selected_index := -1;
+      select_example ##. selectedIndex := -1
 
     let handle () =
       let filename url =
@@ -452,7 +525,7 @@ module ExampleList =
         Editor.set_value s;
         Editor.name := name;
         Editor.editor ## focus in
-      begin match Js.Opt.to_option (sessionStorage ## getItem (url)) with
+      begin match Js.Opt.to_option (sessionStorage ## getItem url) with
       | Some s -> set_content s
       | None ->
           let upd mlw =
@@ -480,54 +553,25 @@ module ExampleList =
       option ##. innerHTML := text;
       Dom.appendChild select_example option
 
-    let reset_example () =
+    let update () =
       select_example ##. innerHTML := !!"";
-      add_example !!"" !!""
-
-    let update_example () =
-      let format = !FormatList.selected_format in
-      let upd content =
-        let actual_example_id = select_example ##. selectedIndex in
-        let actual_example = Js.Opt.get ((select_example ##. options) ## item actual_example_id) (fun () -> raise Not_found) in
-        let actual_example_url = Js.to_string (actual_example ##. value) in
-        let actual_example_text = Js.to_string (actual_example ##. innerHTML) in
-
-        if !has_been_updated then begin
-          select_example ##. innerHTML := !!""
-        end;
-        let len = String.length actual_example_url in
-        if len > 9 then begin
-          add_example !!actual_example_text !!actual_example_url;
-        end;
-        let examples = content ## split !!"\n" in
-        let examples = Js.to_array (Js.str_array examples) in
-        for i = 0 to ((Array.length examples) / 2) - 1 do
-          let url = (!!"examples/" ## concat (examples.(2*i+1))) in
-          if Js.to_string url <> actual_example_url then begin
-            add_example examples.(2*i) url
-          end
-        done;
-        set_loading_label false
-      in
-
-      let file =
-        match format with
-          | "micro-C" -> "index_c.txt"
-          | "python" -> "index_python.txt"
-          | _ -> "index_whyml.txt"
-      in
-
-      set_loading_label true;
-      Promise.catch
-        (Promise.bind_unit
-          (Promise.bind (Fetch.fetch !!(Printf.sprintf "examples/%s" file))
-              (fun r -> r ## text))
-          (fun s -> upd s))
-        (fun _ -> set_loading_label false)
+      let i = ref 0 in
+      begin match Json_base.get_field !config !FormatList.selected_format with
+      | Json_base.Record list ->
+          List.iter (fun (s, url) ->
+              let url = !!"examples/" ## concat (Js.string (Json_base.get_string url)) in
+              add_example (Js.string s) url;
+              incr i
+            ) list
+      | _ -> log "no example list"
+      | exception Not_found -> log "no example list"
+      end;
+      set_loading_label false;
+      select_example ##. disabled := Js.bool (!i = 0);
+      unselect ()
 
     let () =
-      Editor.callback := (fun () -> if not !has_been_updated then (has_been_updated := true; update_example ()));
-      select_example ##. onchange := Dom.handler (fun _ -> update_example (); handle ())
+      select_example ##. onchange := Dom.handler handle
 
     let enable () =
       select_example ##. disabled := Js._false
@@ -536,8 +580,7 @@ module ExampleList =
       select_example ##. disabled := Js._true
   end
 
-module TaskList =
-  struct
+module TaskList = struct
 
     let task_list = getElement AsHtml.div "why3-task-list"
     let theory_id_list = ref ([]: int list)
@@ -739,15 +782,14 @@ let handle_why3_message o =
   | Result sl ->
       TaskList.clear ();
       let ul = Dom_html.createUl doc in
+      ul ## setAttribute !!"id" !!"why3-exec-list";
       Dom.appendChild TaskList.task_list ul;
-      List.iter (fun (s : string) ->
-          let msg = ref s in
-          if (String.sub s ((String.length s) - 9) 8) = "globals:" then
-            msg := String.sub s 0 ((String.length s) - 10);
-
+      List.iter (fun s ->
+          let verb = Dom_html.createPre doc in
+          verb ##. innerText := Js.string s;
           let li = Dom_html.createLi doc in
-          li ##. innerHTML := (Js.string !msg);
-          Dom.appendChild ul li;) sl
+          Dom.appendChild li verb;
+          Dom.appendChild ul li) sl
 
   | Theory (th_id, th_name) ->
       TaskList.add_theory_id th_id;
@@ -767,7 +809,9 @@ let handle_why3_message o =
           TaskList.add_has_to_be_splitted id
       end
 
-  | Formats l -> FormatList.add_formats l
+  | Formats l ->
+      FormatList.add_formats l;
+      ExampleList.update ()
 
   | UpdateStatus(st, id) ->
       try
@@ -891,7 +935,7 @@ module ToolBar = struct
         FormatList.resolve_format name;
         Editor.name := name;
         Editor.set_value content;
-        ExampleList.update_example ();
+        ExampleList.update ();
         Js._true
 
   let open_ = getElement AsHtml.input "why3-open"
@@ -928,8 +972,8 @@ module ToolBar = struct
 
 end
 
-module Panel =
-  struct
+module Panel = struct
+
     let main_panel = getElement AsHtml.div "why3-main-panel"
     let editor_container = getElement AsHtml.div "why3-editor-container"
     let resize_bar = getElement AsHtml.div "why3-resize-bar"
@@ -972,42 +1016,7 @@ module Panel =
             else Js._true)
   end
 
-module Dialogs =
-  struct
-    let dialog_panel = getElement AsHtml.div "why3-dialog-panel"
-    let setting_dialog = getElement AsHtml.div "why3-setting-dialog"
-    let about_dialog = getElement AsHtml.div "why3-about-dialog"
-    let button_close = getElement AsHtml.button "why3-close-dialog-button"
-    let input_num_threads = getElement AsHtml.input "why3-input-num-threads"
-    let input_num_steps = getElement AsHtml.input "why3-input-num-steps"
-    let input_min_steps = getElement AsHtml.input "why3-input-min-steps"
-    let radio_wide = getElement AsHtml.input "why3-radio-wide"
-    let radio_column = getElement AsHtml.input "why3-radio-column"
-    let input_context_steps =
-      let t = Array.make 3 input_num_steps in
-      for i = 0 to 2 do
-        let id = Printf.sprintf "why3-input-context-steps%d" (i+1) in
-        t.(i) <- getElement AsHtml.input id
-      done;
-      t
-
-
-    let all_dialogs = [ setting_dialog; about_dialog ]
-    let show diag () =
-      dialog_panel ##. style ##. display := !!"flex";
-      diag ##. style ##. display := !!"inline-block";
-      diag ## focus
-
-    let close () =
-      List.iter (fun d -> d ##. style ##. display := !!"none") all_dialogs;
-      dialog_panel ##. style ##. display := !!"none"
-
-    let set_onchange o f =
-      o ##. onchange := Dom.handler (fun _ -> f o; Js._false)
-  end
-
-module KeyBinding =
-  struct
+module KeyBinding = struct
 
   let callbacks = Array.init 255 (fun _ -> Array.make 16 None)
   let bool_to_int b =
@@ -1038,95 +1047,25 @@ module KeyBinding =
 
 end
 
-module Session = struct
+module Controller = struct
 
-  let localStorage =
-    check_def "localStorage" (Dom_html.window ##. localStorage)
-
-  let save_num_threads i =
-    localStorage ## setItem !!"why3-num-threads" (js_string_of_int i)
-
-  let save_num_steps i =
-    localStorage ## setItem !!"why3-num-steps" (js_string_of_int i)
-
-  let save_min_steps i =
-    localStorage ## setItem !!"why3-min-steps" (js_string_of_int i)
-
-  let save_context_steps steps =
-    for i = 0 to 2 do
-      let id = !!(Printf.sprintf "why3-context-steps%d" i) in
-      localStorage ## setItem id (js_string_of_int steps.(i))
-    done
-
-  let save_view_mode m =
-    localStorage ## setItem !!"why3-view-mode" m
-
-  let save_buffer lang name content =
-    localStorage ## setItem !!"why3-buffer-lang" lang;
-    localStorage ## setItem !!"why3-buffer-name" name;
-    localStorage ## setItem !!"why3-buffer-content" content
-
-  let get_item s def =
-    Js.Opt.get (localStorage ## getItem s) (fun () -> def)
-
-  let load_num_threads () =
-    int_of_js_string (get_item !!"why3-num-threads" !!"4")
-
-  let load_num_steps () =
-    int_of_js_string (get_item !!"why3-num-steps" !!"100")
-
-  let load_min_steps () =
-    int_of_js_string (get_item !!"why3-min-steps" !!"10")
-
-  let load_context_steps () =
-    let res = Array.make 3 0 in
-    let default_steps =
-      let t = Array.make 3 0 in
-      t.(0) <- 100;
-      t.(1) <- 1000;
-      t.(2) <- 5000;
-      t
-    in
-
-    for i = 0 to 2 do
-      let id = !!(Printf.sprintf "why3-context-steps%d" i) in
-      let d_steps = !!(string_of_int default_steps.(i)) in
-      res.(i) <- int_of_js_string (get_item id d_steps)
-    done;
-    res
-
-  let load_view_mode () =
-    get_item !!"why3-view-mode" !!"wide"
-
-  let load_buffer () =
-    let lang= get_item !!"why3-buffer-lang" !!"" in
-    let name = get_item !!"why3-buffer-name" !!"" in
-    let buffer = get_item !!"why3-buffer-content" !!"" in
-    (lang, name, buffer)
-
-  let init () =
-    Dialogs.input_num_threads ##. value := !!(string_of_int (load_num_threads ()));
-    Dialogs.input_num_steps ##. value := !!(string_of_int (load_num_steps ()));
-    Dialogs.input_min_steps ##. value := !!(string_of_int (load_min_steps ()));
-    let t = load_context_steps () in
-    for i = 0 to 2 do
-      Dialogs.input_context_steps.(i) ##. value := !!(string_of_int (t.(i)))
-    done;
-    ContextMenu.alt_ergo_context_steps := load_context_steps ();
-    ContextMenu.change_prove_context ()
-
-end
-
-module Controller =
-  struct
     let task_queue  = Queue.create ()
 
     let first_task = ref true
     type 'a status = Free of 'a | Busy of 'a * Worker_proto.id | Absent
-    let num_workers = Session.load_num_threads ()
-    let alt_ergo_default_steps = ref (Session.load_num_steps ())
-    let alt_ergo_min_steps = ref (Session.load_min_steps ())
-    let alt_ergo_workers = ref (Array.make num_workers Absent)
+
+    let alt_ergo_default_steps =
+      let v = Session.attach Dialogs.input_num_steps !!"why3-num-steps" in
+      ref (int_of_js_string v)
+
+    let alt_ergo_min_steps =
+      let v = Session.attach Dialogs.input_min_steps !!"why3-min-steps" in
+      ref (int_of_js_string v)
+
+    let alt_ergo_workers =
+      let v = Session.attach Dialogs.input_num_threads !!"why3-num-threads" in
+      ref (Array.make (int_of_js_string v) Absent)
+
     let why3_busy = ref false
     let why3_worker = ref None
 
@@ -1197,7 +1136,7 @@ module Controller =
         Dom.handler (fun ev ->
             let lb = Lexing.from_string (Js.to_string (ev ##. data)) in
             let result = Json_parser.value (fun x -> Json_lexer.read x) lb in
-            let id = Json_base.(get_int (get_field result "worker_id")) in
+            let id = Json_base.get_int_field result "worker_id" in
             let result =
               match Json_base.get_field result "status" with
               | Json_base.Record ["Unsat", _] -> Valid
@@ -1259,8 +1198,7 @@ module Controller =
                   push_task id code steps
               | Idle ->
                   why3_busy := false;
-                  if is_idle () then ToolBar.enable_toolbar ();
-                  ExampleList.update_example ()
+                  if is_idle () then ToolBar.enable_toolbar ()
               | _ -> () in
             Js._false);
       worker
@@ -1307,12 +1245,6 @@ module Controller =
           TaskList.clear_task_selection ()
         end
 
-    let why3_prove_all () =
-      if is_idle () then begin
-          why3_busy := true;
-          (get_why3_worker()) ## postMessage (marshal ProveAll)
-        end
-
     let stop () =
       if not (alt_ergo_idle ()) then
         reset_workers ()
@@ -1334,8 +1266,6 @@ end
 (* Initialisation *)
 let () =
 
-  Session.init ();
-
   ToolBar.add_action Buttons.button_open ToolBar.open_;
   KeyBinding.add_global ~ctrl:Js._true 79 ToolBar.open_;
 
@@ -1354,73 +1284,75 @@ let () =
   ToolBar.add_action Buttons.button_execute Controller.why3_execute;
   KeyBinding.add_global ~alt:Js._true 69 Controller.why3_execute;
 
-  ToolBar.add_action Buttons.button_compile (fun () -> Controller.(why3_parse (!alt_ergo_min_steps)));
-  KeyBinding.add_global ~alt:Js._true 82 (fun () -> Controller.(why3_parse (!alt_ergo_min_steps)));
+  ToolBar.add_action Buttons.button_compile (fun () ->
+      Controller.(why3_parse !alt_ergo_min_steps));
+  KeyBinding.add_global ~alt:Js._true 82 (fun () ->
+      Controller.(why3_parse !alt_ergo_min_steps));
 
   ToolBar.add_action Buttons.button_stop Controller.stop;
   KeyBinding.add_global ~alt:Js._true 73 Controller.stop;
 
-  KeyBinding.add_global ~alt:Js._true 32 (fun () -> Controller.(why3_custom_transform (Split(!alt_ergo_min_steps))) ignore ());
+  KeyBinding.add_global ~alt:Js._true 32 (fun () ->
+      Controller.(why3_custom_transform (Split !alt_ergo_min_steps)) ignore ());
 
   ToolBar.add_action Buttons.button_settings Dialogs.(show setting_dialog);
-  ToolBar.add_action Buttons.button_help (
-    fun () ->
-      let link_html = match !FormatList.selected_format with
-               | "micro-C" -> "help_micro-c.html"
-               | "python"  -> "help_python.html"
-               | _         -> "help_whyml.html"
+  ToolBar.add_action Buttons.button_help (fun () ->
+      let link_html =
+        match !FormatList.selected_format with
+        | "micro-C" -> "help_micro-c.html"
+        | "python"  -> "help_python.html"
+        | _         -> "help_whyml.html"
       in
       Dom_html.window ## open_ !!link_html !!"_blank" Js.null
     );
 
   ToolBar.add_action Buttons.button_about Dialogs.(show about_dialog);
 
-  ContextMenu.(add_action split_menu_entry
-                 (fun () -> Controller.(why3_transform (Split(!alt_ergo_min_steps))) ignore ()));
-  ContextMenu.(add_action prove_menu_entry
-                 (fun () -> Controller.(why3_transform (Prove (!alt_ergo_default_steps))) ignore ()));
+  ContextMenu.(add_action split_menu_entry) (fun () ->
+      Controller.(why3_transform (Split !alt_ergo_min_steps)) ignore ());
+  ContextMenu.(add_action prove_menu_entry) (fun () ->
+      Controller.(why3_transform (Prove !alt_ergo_default_steps)) ignore ());
 
   for i = 0 to 2 do
-    ContextMenu.(add_action (prove_menu_entries.(i))
-                 (fun () -> Controller.(why3_transform (Prove (get_context_step i))) ignore ()));
+    ContextMenu.(add_action prove_menu_entries.(i)) (fun () ->
+        Controller.why3_transform (Prove (ContextMenu.get_context_step i)) ignore ());
   done;
 
-  ContextMenu.(add_action clean_menu_entry
-                 Controller.(why3_transform Clean TaskList.clean_task));
+  ContextMenu.(add_action clean_menu_entry)
+    (fun () -> Controller.why3_transform Clean TaskList.clean_task ());
 
-  Dialogs.(set_onchange input_num_threads (fun o ->
-               let open Controller in
-               let len = int_of_js_string (o ##. value) in
-               reset_workers ();
-               alt_ergo_workers := Array.make len Absent));
+  Dialogs.(set_onchange input_num_threads) (fun o ->
+      let open Controller in
+      let len = int_of_js_string (o ##. value) in
+      reset_workers ();
+      alt_ergo_workers := Array.make len Absent);
 
-  Dialogs.(set_onchange input_num_steps (fun o ->
-               let steps = int_of_js_string (o ##. value) in
-               Controller.alt_ergo_default_steps := steps;
-               Controller.reset_workers ()));
+  Dialogs.(set_onchange input_num_steps) (fun o ->
+      let steps = int_of_js_string (o ##. value) in
+      Controller.alt_ergo_default_steps := steps;
+      Controller.reset_workers ());
 
-  Dialogs.(set_onchange input_min_steps (fun o ->
-               let steps = int_of_js_string (o ##. value) in
-               Controller.alt_ergo_min_steps := steps;
-               Controller.reset_workers ()));
-
+  Dialogs.(set_onchange input_min_steps) (fun o ->
+      let steps = int_of_js_string (o ##. value) in
+      Controller.alt_ergo_min_steps := steps;
+      Controller.reset_workers ());
 
   for i = 0 to 2 do
-    Dialogs.(set_onchange input_context_steps.(i) (fun o ->
-               let steps = int_of_js_string (o ##. value) in
-               !ContextMenu.alt_ergo_context_steps.(i) <- steps;
-               ContextMenu.change_prove_context ();
-               Controller.reset_workers ()))
+    Dialogs.(set_onchange input_context_steps.(i)) (fun o ->
+        let steps = int_of_js_string (o ##. value) in
+        ContextMenu.alt_ergo_context_steps.(i) <- steps;
+        ContextMenu.change_prove_context ();
+        Controller.reset_workers ())
   done;
 
 
   ToolBar.add_action Dialogs.button_close Dialogs.close;
   (*KeyBinding.add_global Keycode.esc  Dialogs.close;*)
 
-  Dialogs.(set_onchange radio_wide (fun _ -> Panel.set_wide true));
-  Dialogs.(set_onchange radio_column (fun _ -> Panel.set_wide false));
+  Dialogs.(set_onchange radio_wide) (fun _ -> Panel.set_wide true);
+  Dialogs.(set_onchange radio_column) (fun _ -> Panel.set_wide false);
 
-  FormatList.(set_onchange select_format (fun () -> if not !ExampleList.has_been_updated then ExampleList.reset_example(); ExampleList.update_example ()))
+  FormatList.(set_onchange select_format) ExampleList.update
 
 let () =
   let url = new%js Url._URL (Dom_html.window ##. location ##. href) in
@@ -1462,41 +1394,27 @@ let () =
     Dom.handler (fun _ ->
         Session.save_buffer (Js.string !FormatList.selected_format)
           !Editor.name (Editor.get_value ());
-        Session.save_num_threads (Array.length !Controller.alt_ergo_workers);
-        Session.save_num_steps !Controller.alt_ergo_default_steps;
-        Session.save_min_steps !Controller.alt_ergo_min_steps;
-        Session.save_context_steps !ContextMenu.alt_ergo_context_steps;
         Session.save_view_mode (if Panel.is_wide () then !!"wide"
                                 else !!"column");
+        Session.save ();
         Js._true)
+
+let () =
+  let load_config s =
+    let lb = Lexing.from_string s in
+    ExampleList.config := Json_parser.value (fun x -> Json_lexer.read x) lb;
+    ExampleList.update ()
+  in
+
+  Promise.catch
+    (Promise.bind_unit
+      (Promise.bind (Fetch.fetch !!"examples/config.json")
+          (fun r -> r ## text))
+      (fun s -> load_config (Js.to_string s)))
+    (fun _ -> ());
 
 (*
 Local Variables:
 compile-command: "unset LANG; make -C ../.. trywhy3"
 End:
 *)
-
-let () =
-  let load_config s =
-    let lb = Lexing.from_string s in
-    let config = Json_parser.value (fun x -> Json_lexer.read x) lb in
-    let default_steps = Json_base.(get_int (get_field config "default_step_limit")) in
-    let min_steps = Json_base.(get_int (get_field config "first_attempt_step_limit")) in
-    Dialogs.input_num_steps ##. value := !!(string_of_int default_steps);
-    Dialogs.input_min_steps ##. value := !!(string_of_int min_steps);
-    Controller.alt_ergo_default_steps := default_steps;
-    Controller.alt_ergo_min_steps := min_steps;
-    for i = 0 to 2 do
-      let value = Json_base.(get_int (get_field config (Printf.sprintf "menu_step_limit%d" (i+1)))) in
-      ContextMenu.(!alt_ergo_context_steps.(i) <- value);
-      Dialogs.input_context_steps.(i) ##. value := !!(string_of_int value)
-    done;
-    ContextMenu.change_prove_context ()
-  in
-
-  Promise.catch
-    (Promise.bind_unit
-      (Promise.bind (Fetch.fetch !!("examples/config.json"))
-          (fun r -> r ## text))
-      (fun s -> load_config (Js.to_string s)))
-    (fun _ -> ());

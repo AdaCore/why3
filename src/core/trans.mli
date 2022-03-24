@@ -89,23 +89,20 @@ type diff_decl =
   | Prop(Goal,_) -> true | _ -> false] *)
 
 val decl_goal_l: (decl -> diff_decl list list) -> task -> task tlist
-(** FIXME:
-     * make this comment more comprehensible
-     * there should be no "disallowed cases": as soon as a goal is produced, no new decls should be added anymore in the resulting tasks
-
-
-    [decl_goal_l f t1 t2] does the same as decl_l except that it can
+(** [decl_goal_l f t1 t2] does the same as {!decl_l} except that it can
     differentiate a new axiom added to a task from a new goal added to a task.
     In case of a new axiom, everything works as in decl_l. When a new goal [ng]
     is generated, it is remembered so that it can replace the old_goal when the
     end of the task is encountered.
 
     Example of use of this feature in the code of [destruct]:
+    {[
     H1: p1 -> p2
     H2: p3
     H3: ...
     -------------
     Goal: True
+    ]}
 
     In [destruct H1], we know that we will add a new goal [p1] before we read
     through the entire task, so we need to be able to generate a new goal.
@@ -114,6 +111,9 @@ val decl_goal_l: (decl -> diff_decl list list) -> task -> task tlist
     - Creating a goal twice in the same branch
     - Creating a goal when analysing the goal of [t2]
 *)
+(* FIXME:
+     * make this comment more comprehensible
+     * there should be no "disallowed cases": as soon as a goal is produced, no new decls should be added anymore in the resulting tasks *)
 
 val tdecl   : (decl -> tdecl list     ) -> task -> task trans
 val tdecl_l : (decl -> tdecl list list) -> task -> task tlist
@@ -147,7 +147,7 @@ val on_cloned_theory : theory -> (symbol_map list -> 'a trans) -> 'a trans
     declarations found in the set before they are actually declared in the new task.
 
     For example, this will likely fail:
-      Trans.on_tagged_ls some_meta (fun s -> Trans.decl (fun d -> [d; s.choose]))
+      [Trans.on_tagged_ls some_meta (fun s -> Trans.decl (fun d -> [d; s.choose]))]
 *)
 val on_tagged_ty : meta -> (Sty.t -> 'a trans) -> 'a trans
 val on_tagged_ts : meta -> (Sts.t -> 'a trans) -> 'a trans
@@ -166,8 +166,8 @@ val on_flag : meta -> ('a,'b) flag_trans -> string -> 'a -> 'b trans
     a hash table [ft], a default flag value [def], and an argument [arg].
     Returns a transformation that is associated in [ft] to the value of [m]
     in a given task. If the meta [m] is not set in the task, returns the
-    transformation associated to [def]. Raises [UnknownFlagTrans] if [ft]
-    does not have a requested association. Raises [IllegalFlagTrans] if
+    transformation associated to [def]. Raises {!UnknownFlagTrans} if [ft]
+    does not have a requested association. Raises {!IllegalFlagTrans} if
     the type of [m] is not [[MTstring]]. *)
 
 val on_flag_t : meta -> ('a,'b) flag_trans -> ('a -> 'b trans) -> 'a -> 'b trans
@@ -210,7 +210,7 @@ val named : string -> 'a trans -> 'a trans
 (** {2 Transformations with arguments}
 
   These transformations take strings as arguments. For a more "typed" version,
-  see file [src/transform/args_wrapper.ml]
+  see module {!Args_wrapper}.
 
 *)
 
@@ -231,7 +231,7 @@ type naming_table = {
    coherent with the names that are printed, this why we also record
    the [printer].
 
-   See module [Args_wrapper] for the functions that builds objects of
+   See module {!Args_wrapper} for the functions that builds objects of
    type [naming_table] from given tasks, and types the arguments of
    transformations.  *)
 

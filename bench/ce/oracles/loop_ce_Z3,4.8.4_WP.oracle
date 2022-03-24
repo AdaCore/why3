@@ -64,9 +64,10 @@ File loop_ce.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents",
+            "value": {"type": "Integer", "val": "-7858"}}]}}
     result of call at line 22, characters 7-14 [@call_result:22:7:14:bench/ce/loop_ce.mlw]
-      [@introduced] [@model_trace:result] =
+      [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Boolean", "val": false}
   Line 23:
     a [@field:0:contents] [@introduced] [@mlw:reference_var]
@@ -74,13 +75,15 @@ File loop_ce.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents",
+            "value": {"type": "Integer", "val": "-7858"}}]}}
     a at X [@at:X] [@at:X:loc:bench/ce/loop_ce.mlw:23] [@field:0:contents]
       [@introduced] [@mlw:reference_var] [@model_trace:a] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
+          [{"field": "contents",
+            "value": {"type": "Integer", "val": "-7859"}}]}}
 
 File "bench/ce/loop_ce.mlw", line 20, characters 31-44:
 Sub-goal Postcondition of goal g'vc.
@@ -105,6 +108,6 @@ File loop_ce.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
   Line 22:
     result of call at line 22, characters 7-14 [@call_result:22:7:14:bench/ce/loop_ce.mlw]
-      [@introduced] [@model_trace:result] =
+      [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Boolean", "val": true}
 

@@ -94,7 +94,6 @@ let pat_match env nb_holes p t =
 
 type info = {
   info_env : Env.env;
-  info_symbols : Sid.t;
   info_ops_of_rel : (string * string * string) Mls.t;
   info_syn : syntax_map;
 }
@@ -130,12 +129,8 @@ let get_info env task =
     | _ -> assert false) Mls.empty task in
   (* sets of known symbols *)
   let syn = get_syntax_map task in
-  let symb = Mid.map (Util.const ()) syn in
-  let symb = Mls.fold (fun ls _ acc -> Sid.add ls.ls_name acc) ops symb in
-  let symb = Sid.add ps_equ.ls_name symb in
   {
     info_env = env;
-    info_symbols = symb;
     info_ops_of_rel = ops;
     info_syn = syn;
   }
@@ -153,7 +148,7 @@ let ident_printer =
   create_ident_printer bls ~sanitizer:san
 
 let print_ident fmt id =
-  fprintf fmt "%s" (id_unique ident_printer id)
+  pp_print_string fmt (id_unique ident_printer id)
 
 let number_format = {
     Number.long_int_support = `Default;
@@ -195,9 +190,9 @@ let rec print_term info defs fmt t =
     | Tapp ( { ls_name = id }, [] ) ->
        begin match query_syntax info.info_syn id with
        | Some s -> syntax_arguments s term fmt []
-       | None -> fprintf fmt "%s" (constant_value defs t)
+       | None -> pp_print_string fmt (constant_value defs t)
        end
-    | _ -> fprintf fmt "%s" (constant_value defs t)
+    | _ -> pp_print_string fmt (constant_value defs t)
   with Not_found ->
   match t.t_node with
   | Tconst _ -> assert false
@@ -298,9 +293,9 @@ let rec print_fmla info defs fmt f =
   | Tnot f ->
       fprintf fmt "not %a" fmla f
   | Ttrue ->
-      fprintf fmt "(0 in [0,0])"
+      pp_print_string fmt "(0 in [0,0])"
   | Tfalse ->
-      fprintf fmt "(1 in [0,0])"
+      pp_print_string fmt "(1 in [0,0])"
   | Tif (_f1, _f2, _f3) ->
       unsupportedTerm f
         "gappa: you must eliminate if in formula"
@@ -541,7 +536,7 @@ let print_task args ?old:_ fmt task =
         (print_list nothing (print_hyp info defs)) hyps
         (print_fmla info defs) (t_not_simp goal)
         (print_list_delim
-           ~start:(fun fmt () -> fprintf fmt "$ ")
+           ~start:(fun fmt () -> pp_print_string fmt "$ ")
            ~stop:(fun fmt () -> fprintf fmt ";@\n")
            ~sep:comma print_bool2) bools
   with Contradiction -> fprintf fmt "{ 0 in [0,0] }@\n"

@@ -113,7 +113,7 @@ let connect_external socket_name =
   Buffer.clear recv_buf;
   client_connect ~fail:true socket_name
 
-let connect_internal () =
+let connect_internal libdir =
   if is_connected () then raise AlreadyConnected;
   Buffer.clear recv_buf;
   let cwd = Unix.getcwd () in
@@ -159,8 +159,8 @@ let connect_internal () =
 let disconnect = client_disconnect
 
 (* TODO/FIXME: is this the right place to connect-on-demand? *)
-let send_request ~id ~timelimit ~memlimit ~use_stdin ~cmd =
-  if not (is_connected ()) then connect_internal ();
+let send_request ~libdir ~id ~timelimit ~memlimit ~use_stdin ~cmd =
+  if not (is_connected ()) then connect_internal libdir;
   Buffer.clear send_buf;
   let servercommand =
     if use_stdin <> None then "runstdin;" else "run;" in
@@ -184,8 +184,8 @@ let send_request ~id ~timelimit ~memlimit ~use_stdin ~cmd =
   let s = Buffer.contents send_buf in
   send_request_string s
 
-let send_interrupt ~id =
-  if not (is_connected ()) then connect_internal ();
+let send_interrupt ~libdir ~id =
+  if not (is_connected ()) then connect_internal libdir;
   Buffer.clear send_buf;
   Buffer.add_string send_buf "interrupt;";
   Buffer.add_string send_buf (string_of_int id);
@@ -252,9 +252,9 @@ let read_answers ~blocking =
 
 let () = Exn_printer.register (fun fmt exn -> match exn with
   | NotConnected ->
-      Format.fprintf fmt "Not connected to the proof server"
+      Format.pp_print_string fmt "Not connected to the proof server"
   | AlreadyConnected ->
-      Format.fprintf fmt "Already connected to the proof server"
+      Format.pp_print_string fmt "Already connected to the proof server"
   | InvalidAnswer s ->
       Format.fprintf fmt "Invalid server answer: %s" s
   | ConnectionError s ->

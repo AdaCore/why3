@@ -37,14 +37,17 @@ module DetectProvers = struct
     let config = load_config () in
     let datas = read_auto_detection_data config in
     let binaries = request_binaries_version config datas in
-    ignore (compute_builtin_prover binaries datas);
+    ignore (compute_builtin_prover binaries config datas);
     let config = set_binaries_detected binaries config in
+    let config =
+      Whyconf.User.set_dirs ~libdir:Config.libdir ~datadir:Config.datadir config
+    in
     Format.printf "Save config to %s@." (Whyconf.get_conf_file config);
     Whyconf.save_config config
 
   let cmd = {
       cmd_desc = "detect installed provers";
-      cmd_usage = "\nDetect installed provers.";
+      cmd_usage = "\nDetect installed provers and register them into the configuration file.";
       cmd_name = "detect";
       cmd_run = run;
       cmd_anon_fun = None;
@@ -71,7 +74,7 @@ module AddProver = struct
     let config = load_config () in
     let datas = read_auto_detection_data config in
     let binaries = request_manual_binaries_version datas [prover] in
-    let m = compute_builtin_prover binaries datas in
+    let m = compute_builtin_prover binaries config datas in
     if Whyconf.Mprover.is_empty m then exit 1;
     let config = Manual_binary.add config prover in
     let config = update_binaries_detected binaries config in
@@ -80,7 +83,7 @@ module AddProver = struct
 
   let cmd = {
       cmd_desc = "add prover";
-      cmd_usage = "<name> <path> [shortcut]\nDetect prover <name> at <path> and register it.";
+      cmd_usage = "<name> <path> [shortcut]\nDetect prover <name> at <path> and register it into the configuration file.";
       cmd_name = "add-prover";
       cmd_run = run;
       cmd_anon_fun = Some (fun s -> args := s :: !args);
@@ -98,8 +101,8 @@ module ListProvers = struct
       (get_provers config)
 
   let cmd = {
-      cmd_desc = "list all the detected provers";
-      cmd_usage = "\nList all the provers present in why3.conf.";
+      cmd_desc = "list all the registered provers";
+      cmd_usage = "\nList all the provers registered in the configuration file.";
       cmd_name = "list-provers";
       cmd_run = run;
       cmd_anon_fun = None;
@@ -132,7 +135,7 @@ module ShowConfig = struct
     Rc.to_channel stdout rc
 
   let cmd = {
-      cmd_desc = "show the full configution";
+      cmd_desc = "show the full configuration";
       cmd_usage = "\nShow the full configuration.";
       cmd_name = "show";
       cmd_run = run;

@@ -1,6 +1,17 @@
-open Pinterp_core
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (** {1 RAC implementation(s)} *)
+
+open Pinterp_core
 
 type oracle_quant_var = env -> Term.vsymbol -> Value.value option
 (** An oracle to get all-quantified variables during RAC. Used to progress
@@ -49,6 +60,7 @@ module Why : sig
     ?trans:Task.task Trans.tlist ->
     ?why_prover:why_prover ->
     ?oracle_quant_var:oracle_quant_var ->
+    config:Whyconf.config ->
     elim_eps:Task.task Trans.trans ->
     unit -> check_term
   (** Metas are applied to all tasks, the tasks are first reduce using [trans],

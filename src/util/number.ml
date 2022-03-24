@@ -197,12 +197,6 @@ let print_in_base radix digits fmt i =
 let to_small_integer i =
   BigInt.to_int i.il_int
 
-let any_to_dec radix s =
-  BigInt.to_string (parse_in_base radix s)
-
-let power2 n =
-  BigInt.to_string (BigInt.pow_int_pos 2 n)
-
 type default_format =
   Format.formatter -> string -> unit
 
@@ -212,11 +206,8 @@ type integer_format =
 type real_format =
   Format.formatter -> string -> string -> string option -> unit
 
-type two_strings_format =
-  Format.formatter -> string -> string -> unit
-
 type frac_real_format =
-  (Format.formatter -> string -> unit) * two_strings_format * two_strings_format
+  (Format.formatter -> string -> unit) * (Format.formatter -> string -> string -> unit)
 
 type delayed_format =
   Format.formatter -> (Format.formatter -> unit) -> unit
@@ -234,16 +225,16 @@ type number_support = {
   frac_real_support : [`Custom of frac_real_format|`Unsupported of default_format];
 }
 
-let check_support support default try_next =
+let check_support support do_it default try_next =
   match support with
-  | `Unsupported -> try_next
-  | `Default -> default
-  | `Custom f -> f
+  | `Unsupported -> try_next ()
+  | `Default -> do_it default
+  | `Custom f -> do_it f
 
-let force_support support default =
+let force_support support do_it default =
   match support with
-  | `Default -> default
-  | `Custom f -> f
+  | `Default -> do_it default
+  | `Custom f -> do_it f
 
 let force_support_nodef support do_it fallback =
   match support with
@@ -251,13 +242,6 @@ let force_support_nodef support do_it fallback =
   | `Custom f -> do_it f
 
 let simplify_max_int = BigInt.of_string "2147483646"
-
-let remove_minus e =
-  if e.[0] = '-' then begin
-    let e = Bytes.of_string e in
-    Bytes.set e 0 'm';
-    Bytes.unsafe_to_string e
-  end else e
 
 let print_dec_int support fmt i =
   match support.long_int_support with
@@ -269,63 +253,32 @@ let print_dec_int support fmt i =
       | `Custom f -> f fmt i
       | `Unsupported f -> f fmt (BigInt.to_string i)
 
-let print_hex_int support =
+let print_hex_int support fmt i =
   let default fmt i =
     assert (support.long_int_support = `Default);
     Format.fprintf fmt "0x%a" (print_in_base 16 None) i in
-  check_support support.hex_int_support default (print_dec_int support)
+  check_support support.hex_int_support
+    (fun f -> f fmt i)
+    default
+    (fun () -> print_dec_int support fmt i)
 
-let print_oct_int support =
+let print_oct_int support fmt i =
   let default fmt i =
     assert (support.long_int_support = `Default);
     Format.fprintf fmt "0o%a" (print_in_base 8 None) i in
-  check_support support.oct_int_support default (print_hex_int support)
+  check_support support.oct_int_support
+    (fun f -> f fmt i)
+    default
+    (fun () -> print_hex_int support fmt i)
 
-let print_bin_int support =
+let print_bin_int support fmt i =
   let default fmt i =
     assert (support.long_int_support = `Default);
     Format.fprintf fmt "0b%a" (print_in_base 2 None) i in
-  check_support support.oct_int_support default (print_hex_int support)
-
-let print_dec_real support =
-  let default fmt i f e =
-    let f = if f = "" then "0" else f in
-    match e with
-    | None -> Format.fprintf fmt "%s.%s" i f
-    | Some e -> Format.fprintf fmt "%s.%se%s" i f e in
-  let do_frac (exp_zero, exp_pos, exp_neg) fmt i f e =
-    let f = if f = "0" then "" else f in
-    let e = Opt.fold (fun _ -> int_of_string) 0 e in
-    let e = e - String.length f in
-    let n = if i = "0" && f <> "" then f else i ^ f in
-    if e = 0 then exp_zero fmt n
-    else if e > 0 then exp_pos fmt n ("1" ^ String.make e '0')
-    else exp_neg fmt n ("1" ^ String.make (-e) '0') in
-  let fallback k fmt i f e =
-    let e = match e with None -> "0" | Some e -> remove_minus e in
-    k fmt (Printf.sprintf "%s_%s_e%s" i f e) in
-  check_support support.dec_real_support default
-    (force_support_nodef support.frac_real_support do_frac fallback)
-
-let print_hex_real support =
-  let default fmt i f e =
-    let f = if f = "" then "0" else f in
-    let e = Opt.get_def "0" e in
-    Format.fprintf fmt "0x%s.%sp%s" i f e in
-  let do_frac (exp_zero, exp_pos, exp_neg) fmt i f e =
-    let f = if f = "0" then "" else f in
-    let n = any_to_dec 16 (i ^ f) in
-    let e = Opt.fold (fun _ -> int_of_string) 0 e in
-    let e = e - 4 * String.length f in
-    if e = 0 then exp_zero fmt n
-    else if e > 0 then exp_pos fmt n (power2 e)
-    else exp_neg fmt n (power2 (-e)) in
-  let fallback k fmt i f e =
-    let e = match e with None -> "0" | Some e -> remove_minus e in
-    k fmt (Printf.sprintf "0x%s_%s_p%s" i f e) in
-  check_support support.hex_real_support default
-  (* TODO: add support for decay to decimal floats *)
-    (force_support_nodef support.frac_real_support do_frac fallback)
+  check_support support.oct_int_support
+    (fun f -> f fmt i)
+    default
+    (fun () -> print_hex_int support fmt i)
 
 let print_int_literal support fmt k i =
   let p = match k with
@@ -337,8 +290,9 @@ let print_int_literal support fmt k i =
   if BigInt.lt i BigInt.zero then
     let default fmt f =
       Format.fprintf fmt "(- %t)" f in
-    force_support support.negative_int_support default fmt
-      (fun fmt -> p support fmt (BigInt.abs i))
+    force_support support.negative_int_support
+      (fun f -> f fmt (fun fmt -> p support fmt (BigInt.abs i)))
+      default
   else
     p support fmt i
 
@@ -346,49 +300,84 @@ let print_int_constant support fmt = function
   | { il_kind = k; il_int = i } ->
       print_int_literal support fmt k i
 
-let print_dec_constant support fmt k { rv_sig = i; rv_pow2 = p2; rv_pow5 = p5 } =
-  let e = BigInt.min (BigInt.min p2 p5) k in
-  let i = BigInt.mul i (BigInt.pow_int_pos_bigint 2 (BigInt.sub p2 e)) in
-  let i = BigInt.mul i (BigInt.pow_int_pos_bigint 5 (BigInt.sub p5 e)) in
-  let i = BigInt.to_string i in
-  let p = BigInt.to_int (BigInt.sub k e) in
-  let (i,n) =
-    let n = String.length i in
-    if n <= p then (String.make (p + 1 - n) '0' ^ i, p + 1) else (i, n) in
-  let (i,f) = String.sub i 0 (n - p), String.sub i (n - p) p in
-  let f = if f = "" then "0" else f in
-  let e =
-    if BigInt.eq k BigInt.zero then None
-    else Some (BigInt.to_string k) in
-  print_dec_real support fmt i f e
+let print_frac_real support fmt { rv_sig = i; rv_pow2 = p2; rv_pow5 = p5 } =
+  let num, den =
+    let fact = BigInt.pow_int_pos_bigint 2 (BigInt.abs p2) in
+    if BigInt.lt p2 BigInt.zero then
+      i, fact
+    else
+      BigInt.mul i fact, BigInt.one in
+  let num, den =
+    let fact = BigInt.pow_int_pos_bigint 5 (BigInt.abs p5) in
+    if BigInt.lt p5 BigInt.zero then
+      num, BigInt.mul den fact
+    else
+      BigInt.mul num fact, den in
+  let do_frac (no_den, with_den) =
+    if BigInt.eq den BigInt.one then
+      no_den fmt (BigInt.to_string num)
+    else
+      with_den fmt (BigInt.to_string num) (BigInt.to_string den) in
+  let fallback k =
+    k fmt (Printf.sprintf "%s_%s" (BigInt.to_string num) (BigInt.to_string den)) in
+  force_support_nodef support.frac_real_support do_frac fallback
 
-let print_hex_constant support fmt k { rv_sig = i; rv_pow2 = p2; rv_pow5 = p5 } =
-  let e =
-    if BigInt.lt p2 k then
-      BigInt.sub p2 (BigInt.euclidean_mod (BigInt.sub p2 k) (BigInt.of_int 4))
-    else k in
-  assert (BigInt.ge p5 BigInt.zero);
-  let i = BigInt.mul i (BigInt.pow_int_pos_bigint 2 (BigInt.sub p2 e)) in
-  let i = BigInt.mul i (BigInt.pow_int_pos_bigint 5 p5) in
-  let i = Format.asprintf "%a" (print_in_base 16 None) i in
-  let p = BigInt.to_int (BigInt.sub k e) in
-  assert (p mod 4 = 0);
-  let p = p / 4 in
-  let (i,n) =
-    let n = String.length i in
-    if n <= p then (String.make (p + 1 - n) '0' ^ i, p + 1) else (i, n) in
-  let (i,f) = String.sub i 0 (n - p), String.sub i (n - p) p in
-  let f = if f = "" then "0" else f in
-  let e =
-    if BigInt.eq k BigInt.zero then None
-    else Some (BigInt.to_string k) in
-  print_hex_real support fmt i f e
+let print_dec_real support fmt k ({ rv_sig = i; rv_pow2 = p2; rv_pow5 = p5 } as r) =
+  let do_it custom =
+    let e = BigInt.min (BigInt.min p2 p5) k in
+    let i = BigInt.mul i (BigInt.pow_int_pos_bigint 2 (BigInt.sub p2 e)) in
+    let i = BigInt.mul i (BigInt.pow_int_pos_bigint 5 (BigInt.sub p5 e)) in
+    let i = BigInt.to_string i in
+    let p = BigInt.to_int (BigInt.sub k e) in
+    let (i,n) =
+      let n = String.length i in
+      if n <= p then (String.make (p + 1 - n) '0' ^ i, p + 1) else (i, n) in
+    let (i,f) = String.sub i 0 (n - p), String.sub i (n - p) p in
+    let f = if f = "" then "0" else f in
+    let e =
+      if BigInt.eq k BigInt.zero then None
+      else Some (BigInt.to_string k) in
+    custom fmt i f e in
+  let default fmt i f e =
+    match e with
+    | None -> Format.fprintf fmt "%s.%s" i f
+    | Some e -> Format.fprintf fmt "%s.%se%s" i f e in
+  check_support support.dec_real_support do_it default
+    (fun () -> print_frac_real support fmt r)
+
+let print_hex_real support fmt k ({ rv_sig = i; rv_pow2 = p2; rv_pow5 = p5 } as r) =
+  let do_it custom =
+    let e =
+      if BigInt.lt p2 k then
+        BigInt.sub p2 (BigInt.euclidean_mod (BigInt.sub p2 k) (BigInt.of_int 4))
+      else k in
+    assert (BigInt.ge p5 BigInt.zero);
+    let i = BigInt.mul i (BigInt.pow_int_pos_bigint 2 (BigInt.sub p2 e)) in
+    let i = BigInt.mul i (BigInt.pow_int_pos_bigint 5 p5) in
+    let i = Format.asprintf "%a" (print_in_base 16 None) i in
+    let p = BigInt.to_int (BigInt.sub k e) in
+    assert (p mod 4 = 0);
+    let p = p / 4 in
+    let (i,n) =
+      let n = String.length i in
+      if n <= p then (String.make (p + 1 - n) '0' ^ i, p + 1) else (i, n) in
+    let (i,f) = String.sub i 0 (n - p), String.sub i (n - p) p in
+    let f = if f = "" then "0" else f in
+    let e =
+      if BigInt.eq k BigInt.zero then None
+      else Some (BigInt.to_string k) in
+    custom fmt i f e in
+  let default fmt i f e =
+    let e = Opt.get_def "0" e in
+    Format.fprintf fmt "0x%s.%sp%s" i f e in
+  check_support support.hex_real_support do_it default
+    (fun () -> print_dec_real support fmt (BigInt.min p2 p5) r)
 
 let print_real_constant support fmt
       { rl_kind = k; rl_real = { rv_pow2 = p2; rv_pow5 = p5 } as r } =
   match k with
-  | RLitDec e -> print_dec_constant support fmt (BigInt.of_int e) r
-  | RLitHex e -> print_hex_constant support fmt (BigInt.of_int e) r
+  | RLitDec e -> print_dec_real support fmt (BigInt.of_int e) r
+  | RLitHex e -> print_hex_real support fmt (BigInt.of_int e) r
   | RLitUnk ->
       let e = BigInt.min p2 p5 in
       let e =
@@ -396,15 +385,16 @@ let print_real_constant support fmt
           let ei = BigInt.to_int e in
           if 0 <= ei && ei <= 2 then BigInt.zero else e
         with _ -> e in
-      print_dec_constant support fmt e r
+      print_dec_real support fmt e r
 
 let print_real_constant support fmt r =
   if BigInt.lt r.rl_real.rv_sig BigInt.zero then
     let r = { r with rl_real = { r.rl_real with rv_sig = BigInt.minus r.rl_real.rv_sig } } in
     let default fmt f =
       Format.fprintf fmt "(- %t)" f in
-    force_support support.negative_real_support default fmt
-      (fun fmt -> print_real_constant support fmt r)
+    force_support support.negative_real_support
+      (fun f -> f fmt (fun fmt -> print_real_constant support fmt r))
+      default
   else
     print_real_constant support fmt r
 

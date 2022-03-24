@@ -463,7 +463,7 @@ let rec k_print fmt k = match k with
       "@[<hov 4>ASSERT %a@]" Pretty.print_term f
   | Kstop f -> Format.fprintf fmt
       "@[<hov 4>STOP %a@]" Pretty.print_term f
-  | Kcont 0 -> Format.fprintf fmt "SKIP"
+  | Kcont 0 -> Format.pp_print_string fmt "SKIP"
   | Kcont i -> Format.fprintf fmt "RAISE %d" i
   | Kaxiom k -> Format.fprintf fmt "@[<hov 4>AXIOM %a@]" k_print k
   | Ktag (WP, k) -> Format.fprintf fmt "@[<hov 4>WP %a@]" k_print k

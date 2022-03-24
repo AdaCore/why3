@@ -82,6 +82,9 @@ let () = printf "@[task 2 created:@\n%a@]@." Pretty.print_task task2
 let config : Whyconf.config = Whyconf.init_config None
 (* the [main] section of the config file *)
 let main : Whyconf.main = Whyconf.get_main config
+(* the library and data directories, from the config file *)
+let libdir = Whyconf.libdir main
+let datadir = Whyconf.datadir main
 (* all the provers detected, from the config file *)
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
@@ -106,12 +109,12 @@ let alt_ergo : Whyconf.config_prover =
 (* END{getanyaltergo} *)
 
 (* BEGIN{getaltergo200} *)
-(* Specific version 2.3.0 of Alt-Ergo in the config file *)
+(* Specific version 2.3.3 of Alt-Ergo in the config file *)
 let _ : Whyconf.config_prover =
-  let fp = Whyconf.parse_filter_prover "Alt-Ergo,2.3.0" in
+  let fp = Whyconf.parse_filter_prover "Alt-Ergo,2.3.3" in
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
-      eprintf "Prover Alt-Ergo 2.3.0 not installed or not configured, using version %s instead@."
+      eprintf "Prover Alt-Ergo 2.3.3 not installed or not configured, using version %s instead@."
         Whyconf.(alt_ergo.prover.prover_version) ;
     alt_ergo (* we don't want to fail this time *)
   end else
@@ -136,9 +139,13 @@ let alt_ergo_driver : Driver.driver =
 (* calls Alt-Ergo *)
 let result1 : Call_provers.prover_result =
   Call_provers.wait_on_call
-    (Driver.prove_task ~limit:Call_provers.empty_limit
-                       ~command:alt_ergo.Whyconf.command
-    alt_ergo_driver task1)
+    (Driver.prove_task
+       ~limit:Call_provers.empty_limit
+       ~libdir
+       ~datadir
+       ~command:alt_ergo.Whyconf.command
+       alt_ergo_driver
+       task1)
 
 (* prints Alt-Ergo answer *)
 let () = printf "@[On task 1, Alt-Ergo answers %a@."
@@ -148,9 +155,13 @@ let () = printf "@[On task 1, Alt-Ergo answers %a@."
 (* BEGIN{calltimelimit} *)
 let result2 : Call_provers.prover_result =
   Call_provers.wait_on_call
-    (Driver.prove_task ~command:alt_ergo.Whyconf.command
-    ~limit:{Call_provers.empty_limit with Call_provers.limit_time = 10}
-    alt_ergo_driver task2)
+    (Driver.prove_task
+       ~command:alt_ergo.Whyconf.command
+       ~libdir
+       ~datadir
+       ~limit:{Call_provers.empty_limit with Call_provers.limit_time = 10}
+       alt_ergo_driver
+       task2)
 
 let () = printf "@[On task 2, Alt-Ergo answers %a in %5.2f seconds@."
   Call_provers.print_prover_answer result1.Call_provers.pr_answer
@@ -193,9 +204,13 @@ let () = printf "@[task 3 created@]@."
 
 let result3 =
   Call_provers.wait_on_call
-    (Driver.prove_task ~limit:Call_provers.empty_limit
-                       ~command:alt_ergo.Whyconf.command
-    alt_ergo_driver task3)
+    (Driver.prove_task
+       ~limit:Call_provers.empty_limit
+       ~libdir
+       ~datadir
+       ~command:alt_ergo.Whyconf.command
+       alt_ergo_driver
+       task3)
 
 let () = printf "@[On task 3, Alt-Ergo answers %a@."
   (Call_provers.print_prover_result ?json:None) result3
@@ -231,9 +246,13 @@ let task4 = Task.add_prop_decl task4 Decl.Pgoal goal_id4 fmla4
 
 let result4 =
   Call_provers.wait_on_call
-    (Driver.prove_task ~limit:Call_provers.empty_limit
-                       ~command:alt_ergo.Whyconf.command
-    alt_ergo_driver task4)
+    (Driver.prove_task
+       ~limit:Call_provers.empty_limit
+       ~libdir
+       ~datadir
+       ~command:alt_ergo.Whyconf.command
+       alt_ergo_driver
+       task4)
 
 let () = printf "@[On task 4, Alt-Ergo answers %a@."
   (Call_provers.print_prover_result ?json:None) result4

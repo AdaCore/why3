@@ -1,0 +1,79 @@
+Strongest Postcondition
+File "bench/ce/record_nested_one_field.mlw", line 14, characters 14-51:
+Sub-goal Postcondition of goal test_post'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File record_nested_one_field.mlw:
+  Line 13:
+    x [@introduced] = {"type": "Integer", "val": "1"}
+    y [@field:0:cont_four_attr] [@field:1:contents] [@field:2:cont_two]
+      [@field:3:cont_one_attr] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "cont_four_attr",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "contents",
+                   "value":
+                    {"type": "Record",
+                     "val":
+                      {"Field":
+                        [{"field": "cont_two",
+                          "value":
+                           {"type": "Record",
+                            "val":
+                             {"Field":
+                               [{"field": "cont_one_attr",
+                                 "value": {"type": "Integer", "val": "0"}}]}}}]}}}]}}}]}}
+  Line 14:
+    x [@introduced] [@model_trace:x] = {"type": "Integer", "val": "1"}
+    y [@field:0:cont_four_attr] [@field:1:contents] [@field:2:cont_two]
+      [@field:3:cont_one_attr] [@introduced] [@model_trace:y] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "cont_four_attr",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "contents",
+                   "value":
+                    {"type": "Record",
+                     "val":
+                      {"Field":
+                        [{"field": "cont_two",
+                          "value":
+                           {"type": "Record",
+                            "val":
+                             {"Field":
+                               [{"field": "cont_one_attr",
+                                 "value": {"type": "Integer", "val": "0"}}]}}}]}}}]}}}]}}
+  Line 16:
+    y [@field:0:cont_four_attr] [@field:1:contents] [@field:2:cont_two]
+      [@field:3:cont_one_attr] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "cont_four_attr",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "contents",
+                   "value":
+                    {"type": "Record",
+                     "val":
+                      {"Field":
+                        [{"field": "cont_two",
+                          "value":
+                           {"type": "Record",
+                            "val":
+                             {"Field":
+                               [{"field": "cont_one_attr",
+                                 "value": {"type": "Integer", "val": "0"}}]}}}]}}}]}}}]}}
+

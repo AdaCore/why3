@@ -135,10 +135,6 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     | Qident id
     | Qdot (_, id) -> id
 
-  let rec str_of_qualid = function
-    | Qident id -> id.id_str
-    | Qdot (qid, id) -> str_of_qualid qid^"."^id.id_str
-
   let pp_arg pp fmt =
     fprintf fmt "{%a}" pp
 
@@ -171,9 +167,9 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
   let rec pp_pattern fmt p =
     match p.pat_desc with
     | Pwild ->
-        fprintf fmt "\\texttt{anything}"
+        pp_print_string fmt "\\texttt{anything}"
     | Pvar id ->
-        fprintf fmt "%a" (pp_var ~arity:0) id
+        pp_var ~arity:0 fmt id
     | Papp (qid, ps) ->
         let arity = List.length ps in
         fprintf fmt "%a%a" (pp_var ~arity) (id_of_qualid qid)
@@ -208,9 +204,9 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
   let rec pp_term fmt t =
     match t.term_desc with
     | Ttrue ->
-        fprintf fmt "\\top"
+        pp_print_string fmt "\\top"
     | Tfalse ->
-        fprintf fmt "\\bot"
+        pp_print_string fmt "\\bot"
     | Tconst n ->
         Constant.print_def fmt n
     | Tident qid ->
@@ -439,11 +435,12 @@ let parse_mlw_file filename =
     close_in c;
   mlw_file
 
-let pident fmt i = fprintf fmt "%s" i.Ptree.id_str
+let pident fmt i =
+  pp_print_string fmt i.Ptree.id_str
 
 let rec pqualid fmt q =
   Ptree.(match q with
-  | Qident id -> fprintf fmt "%a" pident id
+  | Qident id -> pident fmt id
   | Qdot(q,id) -> fprintf fmt "%a.%a" pqualid q pident id)
 
 let deps_use fmt filename (modname:string) (q:Ptree.qualid) =

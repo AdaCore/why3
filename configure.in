@@ -9,23 +9,7 @@
 #                                                                  #
 ####################################################################
 
-#
-# autoconf input for Objective Caml programs
-# Copyright (C) 2001 Jean-Christophe Filliâtre
-#   from a first script by Georges Mariano
-#
-# This library is free software; you can redistribute it and/or
-# modify it under the terms of the GNU Library General Public
-# License version 2, as published by the Free Software Foundation.
-#
-# This library is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-#
-# See the GNU Library General Public License version 2 for more details
-# (enclosed in the file LGPL).
-
-AC_INIT([Why3], [1.4.0+git])
+AC_INIT([Why3], [1.4.1+git])
 
 # verbosemake
 
@@ -95,7 +79,7 @@ AC_ARG_ENABLE(re,
 # pp_sexp
 
 AC_ARG_ENABLE(pp-sexp,
-    AS_HELP_STRING([--disable-pp-sexp], [disable S-expression output for why3pp (requires findlib and ppx_sexp_conv)]),,
+    AS_HELP_STRING([--disable-pp-sexp], [disable S-expression output for why3pp]),,
     enable_pp_sexp=yes)
 
 # IDE
@@ -126,11 +110,23 @@ AC_ARG_ENABLE(isabelle-libs,
     AS_HELP_STRING([--disable-isabelle-libs], [do not build Isabelle realizations]),,
     enable_isabelle_libs=yes)
 
+# MLMPFR
+
+AC_ARG_ENABLE(mpfr,
+    AS_HELP_STRING([--disable-mpfr], [disable support for MPFR]),,
+    enable_mpfr=yes)
+
 # hypothesis selection
 
 AC_ARG_ENABLE(hypothesis-selection,
     AS_HELP_STRING([--disable-hypothesis-selection], [do not support hypothesis selection]),,
     enable_hypothesis_selection=yes)
+
+# stackify
+
+AC_ARG_ENABLE(stackify,
+    AS_HELP_STRING([--disable-stackify], [disable structure reconstruction algorithm for MLCFG]),,
+    enable_stackify=yes)
 
 # documentation
 
@@ -165,6 +161,10 @@ AC_ARG_ENABLE(statmemprof,
 AC_ARG_ENABLE(emacs-compilation,
     AS_HELP_STRING([--disable-emacs-compilation], [do not compile why3.elc]),,
     enable_emacs_compilation=yes)
+
+# default editor
+
+AC_ARG_VAR(EDITOR, [default editor])
 
 # either relocation or local, not both
 if test "$enable_relocation" = yes ; then
@@ -517,7 +517,7 @@ if test "$enable_zip" = yes; then
    DIR=
    if test "$enable_ocamlfind" = yes; then
       DIR=$(ocamlfind query zip)
-      if test -n "DIR"; then
+      if test -n "$DIR"; then
          echo "ocamlfind found camlzip in $DIR"
          ZIPINCLUDE="-I $DIR"
       else
@@ -737,6 +737,39 @@ else
    OCAMLGRAPHLIB=
 fi
 
+if test "$enable_stackify" = yes; then
+   DIR=
+   if test "$enable_ocamlfind" = yes; then
+      DIR=$($OCAMLFIND query ocamlgraph)
+      if test -n "$DIR"; then
+         echo "ocamlfind found ocamlgraph in $DIR"
+         OCAMLGRAPHLIB="$DIR"
+      else
+         ocamlfind_ocamlgraph=no
+      fi
+   fi
+   if test -z "$DIR"; then
+      OCAMLGRAPHLIB="+ocamlgraph"
+      DIR="$OCAMLLIB/ocamlgraph"
+      AC_CHECK_FILE($DIR/graph.cma,,enable_stackify=no)
+   fi
+   AC_CHECK_FILE($DIR/graph.cmi,,enable_stackify=no)
+   if test "$enable_stackify" = no; then
+      reason_stackify=" (ocamlgraph not found)"
+      AC_MSG_WARN([Lib ocamlgraph not found, stackify disabled.])
+   elif test "$ocamlfind_ocamlgraph" = no; then
+      enable_ocamlfind=no
+      reason_ocamlfind=" (unable to find ocamlgraph)"
+   fi
+fi
+
+if test "$enable_stackify" = yes; then
+   META_OCAMLGRAPH="ocamlgraph"
+else
+   META_OCAMLGRAPH=
+   OCAMLGRAPHLIB=
+fi
+
 # checking for js_of_ocaml
 if test "$enable_js_of_ocaml" != yes; then
    reason_js_of_ocaml=" (disabled by user)"
@@ -766,42 +799,36 @@ elif test "$enable_js_of_ocaml" != yes; then
    reason_web_ide=" (Javascript support not available)"
 fi
 
-# Mlmpfr
-MLMPFR_LINK=
-if test "$enable_js_of_ocaml" != no; then
-   found_mlmpfr=no
-   reason_mlmpfr=" (Cannot allow mlmpfr with js_of_ocaml) "
+# MLMPFR
+if test "$enable_mpfr" != yes; then
+   reason_mpfr=" (disabled by user)"
+elif test "$enable_ocamlfind" != yes; then
+   enable_mpfr=no
+   reason_mpfr=" (ocamlfind not available)"
+elif test "$enable_js_of_ocaml" != no; then
+   enable_mpfr=no
+   reason_mpfr=" (incompatible with js_of_ocaml) "
 else
-   if test "$enable_ocamlfind" = yes; then
-      DIR=$($OCAMLFIND query mlmpfr)
-      if test -n "$DIR"; then
-         echo "ocamlfind found mlmpfr in $DIR"
-         # Test that mpfr version is higher than 4.0.0 (because of
-         # Faithful constructor incompatibility).
-         MPFR_VER=$(grep -q "4.0.0" $DIR/META 2> /dev/null)
-         EXIT_CODE=$?
-         if test $EXIT_CODE = 0; then
-            MLMPFRINCLUDE="-I $DIR"
-            MLMPFR=mlmpfr
-            found_mlmpfr=yes
-            MLMPFR_LINK="-cclib -lmpfr"
-            AC_CHECK_FILE($DIR/mlmpfr.cma,,found_mlmpfr=yes)
-         else
-            reason_mlmpfr=" (Version of mlmpfr is not 4.0.0) "
-            found_mlmpfr=no
-         fi
-      else
-         reason_mlmpfr=" (mlmpfr not found)"
-         found_mlmpfr=no
-      fi
+   DIR=$($OCAMLFIND query mlmpfr)
+   if test -n "$DIR"; then
+      echo "ocamlfind found mlmpfr in $DIR"
+      # Test that MPFR version is higher than 4.0.0 (because of
+      # Faithful constructor incompatibility).
+      MPFRVERSION=$($OCAMLFIND query -format "%v" mlmpfr)
+      AX_VERSION_GE([$MPFRVERSION], 4.0.0, [], [
+         enable_mpfr=no
+         reason_mpfr=" (mlmpfr >= 4.0.0 not found)"])
+      AC_CHECK_FILE($DIR/mlmpfr.cma,, [
+         enable_mpfr=no
+         reason_mpfr=" (mlmpfr not found)"])
    else
-      reason_mlmpfr=" (ocamlfind not available) "
-      found_mlmpfr=no
+      reason_mpfr=" (mlmpfr not found)"
+      enable_mpfr=no
    fi
 fi
-if test "$found_mlmpfr" = no; then
-   MLMPFRINCLUDE=
-   MLMPFR=
+
+if test "$enable_mpfr" = yes; then
+   MLMPFR=mlmpfr
 fi
 
 # checking for statmemprof
@@ -877,15 +904,19 @@ if test "$enable_coq_support" = yes; then
    case $COQVERSION in
       8.7*)
          coq_compat_version="COQ87"
+         enable_coq_fp_libs=no
          ;;
       8.8*)
          coq_compat_version="COQ88"
+         enable_coq_fp_libs=no
          ;;
       8.9*)
          coq_compat_version="COQ89"
+         enable_coq_fp_libs=no
          ;;
       8.10*)
          coq_compat_version="COQ810"
+         enable_coq_fp_libs=no
          ;;
       8.11*)
          coq_compat_version="COQ811"
@@ -899,12 +930,18 @@ if test "$enable_coq_support" = yes; then
       8.14*)
          coq_compat_version="COQ814"
          ;;
+      8.15*)
+         coq_compat_version="COQ815"
+         ;;
       *)
          enable_coq_support=no
          AC_MSG_WARN(You need Coq 8.7 or later; Coq discarded)
          reason_coq_support=" (need version >= 8.7)"
          ;;
    esac
+   if test "$enable_coq_fp_libs" = no; then
+      reason_coq_fp_libs= " (Coq < 8.11)"
+   fi
 fi
 
 if test "$enable_coq_support" = yes; then
@@ -918,20 +955,21 @@ fi
 
 if test "$enable_coq_support" = no; then
    enable_coq_libs=no
+   enable_coq_fp_libs=no
    COQVERSION=
 fi
 
-if test "$enable_coq_libs" = yes; then
+if test "$enable_coq_fp_libs" = yes; then
    AC_MSG_CHECKING([for Flocq])
    AS_IF(
      [ echo "Require Import Flocq.Version BinNat." \
-            "Goal (30100 <= Flocq_version)%N. easy. Qed." > conftest.v
+            "Goal (30400 <= Flocq_version)%N. easy. Qed." > conftest.v
        "$COQC" conftest.v > conftest.err ],
      [ AC_MSG_RESULT(yes) ],
      [ AC_MSG_RESULT(no)
        enable_coq_fp_libs=no
        AC_MSG_WARN(Cannot find Flocq.)
-       reason_coq_fp_libs=" (Flocq >= 3.1 not found)" ])
+       reason_coq_fp_libs=" (Flocq >= 3.4 not found)" ])
    rm -f conftest.v conftest.vo conftest.err
 fi
 
@@ -1058,6 +1096,22 @@ fi
 
 VERSION=$PACKAGE_VERSION
 
+# default editor
+
+if test -z "$EDITOR"; then
+   case `uname -s` in
+   Darwin)
+      EDITOR=open
+      ;;
+   MINGW*)
+      EDITOR="cmd.exe -c start"
+      ;;
+   *)
+      EDITOR=xdg-open
+      ;;
+   esac
+fi
+
 # substitutions to perform
 AC_SUBST(VERSION)
 
@@ -1103,10 +1157,8 @@ AC_SUBST(SEXPLIB)
 AC_SUBST(SEXPLIBPPX)
 
 AC_SUBST(NUMINCLUDE)
-AC_SUBST(MLMPFRINCLUDE)
 AC_SUBST(MLMPFR)
-AC_SUBST(MLMPFR_LINK)
-AC_SUBST(found_mlmpfr)
+AC_SUBST(enable_mpfr)
 
 AC_SUBST(enable_zarith)
 AC_SUBST(BIGINTINCLUDE)
@@ -1149,6 +1201,7 @@ AC_SUBST(ISABELLE)
 AC_SUBST(ISABELLEVERSION)
 
 AC_SUBST(enable_hypothesis_selection)
+AC_SUBST(enable_stackify)
 
 AC_SUBST(enable_doc)
 AC_SUBST(enable_pdf_doc)
@@ -1213,7 +1266,7 @@ echo "    Memory profiling        : $enable_statmemprof$reason_statmemprof"
 echo "    PPX                     : $enable_ppx$reason_ppx"
 echo "    S-expr for why3pp       : $enable_pp_sexp$reason_no_pp_sexp"
 echo "    Javascript support      : $enable_js_of_ocaml$reason_js_of_ocaml"
-echo "    Mpfr support            : $found_mlmpfr$reason_mlmpfr"
+echo "    MPFR support            : $enable_mpfr$reason_mpfr"
 echo "    Re support              : $enable_re$reason_re"
 echo "Components"
 echo "    Why3 library            : $enable_why3_lib"
@@ -1222,6 +1275,7 @@ echo "    Web IDE                 : $enable_web_ide$reason_web_ide"
 echo "    GMP arithmetic          : $enable_zarith$reason_zarith"
 echo "    Compressed sessions     : $enable_zip$reason_zip"
 echo "    Hypothesis selection    : $enable_hypothesis_selection$reason_hypothesis_selection"
+echo "    Stackify                : $enable_stackify$reason_stackify"
 echo "    Invariant inference(exp): $enable_infer$reason_infer"
 echo "    Frama-C support         : $enable_frama_c$reason_frama_c"
 if test "$enable_frama_c" = yes ; then

@@ -145,34 +145,34 @@
   <proof prover="0"><result status="valid" time="0.04" steps="16048"/></proof>
   </goal>
   <goal name="swap&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="19979"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="20009"/></proof>
   </goal>
   <goal name="swap&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="76"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="78"/></proof>
   </goal>
   <goal name="swap&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="20050"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="20080"/></proof>
   </goal>
   <goal name="swap&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="19951"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="19981"/></proof>
   </goal>
   <goal name="swap&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="20195"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="20225"/></proof>
   </goal>
   <goal name="swap&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="20409"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="20439"/></proof>
   </goal>
   <goal name="swap&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="20650"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="20680"/></proof>
   </goal>
   <goal name="swap&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="77"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="79"/></proof>
   </goal>
   <goal name="swap&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="20799"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="20829"/></proof>
   </goal>
   <goal name="swap&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="77"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="79"/></proof>
   </goal>
   <goal name="swap&#39;vc.14" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.07" steps="19960"/></proof>
@@ -225,7 +225,7 @@
      <goal name="swap&#39;vc.27.0.0.1" expl="VC for swap" proved="true">
      <transf name="split_vc" proved="true" >
       <goal name="swap&#39;vc.27.0.0.1.0" expl="VC for swap" proved="true">
-      <proof prover="4" memlimit="2000"><result status="valid" time="1.76" steps="338965"/></proof>
+      <proof prover="4" memlimit="2000"><result status="valid" time="0.12" steps="32541"/></proof>
       </goal>
      </transf>
      </goal>
@@ -234,6 +234,9 @@
    </transf>
    </goal>
    <goal name="swap&#39;vc.27.1" expl="postcondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.59" steps="105349"/></proof>
+   </goal>
+   <goal name="swap&#39;vc.27.2" expl="postcondition" proved="true">
    <proof prover="4" timelimit="1"><result status="valid" time="0.17" steps="35558"/></proof>
    </goal>
   </transf>
@@ -459,7 +462,11 @@
   </transf>
   </goal>
   <goal name="next&#39;vc.55" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="5"><result status="valid" time="2.49" steps="4309"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="next&#39;vc.55.0" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.09" steps="344421"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="next&#39;vc.56" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
@@ -469,10 +476,10 @@
   </transf>
   </goal>
   <goal name="next&#39;vc.57" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.16" steps="525"/></proof>
+  <proof prover="1"><result status="valid" time="0.09" steps="525"/></proof>
   </goal>
   <goal name="next&#39;vc.58" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="62"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="62"/></proof>
   </goal>
   <goal name="next&#39;vc.59" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.07" steps="20890"/></proof>
@@ -523,10 +530,10 @@
   <proof prover="0"><result status="valid" time="0.09" steps="25526"/></proof>
   </goal>
   <goal name="next&#39;vc.75" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.14" steps="839"/></proof>
+  <proof prover="1"><result status="valid" time="0.17" steps="839"/></proof>
   </goal>
   <goal name="next&#39;vc.76" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.09" steps="68"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="68"/></proof>
   </goal>
   <goal name="next&#39;vc.77" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.07" steps="21439"/></proof>
@@ -550,11 +557,7 @@
   <proof prover="1"><result status="valid" time="0.11" steps="591"/></proof>
   </goal>
   <goal name="next&#39;vc.84" expl="postcondition" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="next&#39;vc.84.0" expl="postcondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.09" steps="11767"/></proof>
-   </goal>
-  </transf>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.02" steps="70"/></proof>
   </goal>
   <goal name="next&#39;vc.85" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.04" steps="20181"/></proof>

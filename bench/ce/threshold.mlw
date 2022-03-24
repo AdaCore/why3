@@ -1,5 +1,6 @@
 
 module WithInt32
+
 use int.Int
 use mach.int.Int32
 
@@ -12,7 +13,11 @@ let f (n min max:int32) : int32
 
 end
 
+
+(** same version with (signed) bit-vectors *)
+
 module WithBV32
+
 use int.Int
 use bv.BV32
 use mach.bv.BVCheck32
@@ -22,7 +27,7 @@ let f (n min max:BV32.t) : BV32.t
    ensures { ule min result /\ ule result max }
    (* ensures { BV32.t'int min <= BV32.t'int result  <= BV32.t'int max } *)
 =
-  let _x = uadd_check min max in
-  if ult_check n min then min else if ugt_check n max then max else n
+  let _x = u_add min max in
+  if u_lt n min then min else if u_gt n max then max else n
 
 end

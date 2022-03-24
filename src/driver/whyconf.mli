@@ -17,11 +17,11 @@ open Wstdlib
 
 type config
 (** A configuration linked to an rc file. Whyconf gives access to
-    every sections of the rc file ({!Whyconf.get_section},
-    {!Whyconf.set_section}, {!Whyconf.get_family},
-    {!Whyconf.set_family}) but the section main and the family prover
+    every section of the rc file ({!Whyconf.User.get_section},
+    {!Whyconf.User.set_section}, {!Whyconf.User.get_family},
+    {!Whyconf.User.set_family}) but the section [main] and the family [prover]
     which are dealt by it ({!Whyconf.get_main}, {!Whyconf.set_main},
-    {!Whyconf.get_provers}, {!Whyconf.set_provers} *)
+    {!Whyconf.get_provers}, {!Whyconf.set_provers}) *)
 
 exception ConfigFailure of string (* filename *) * string
 exception DuplicateShortcut of string
@@ -29,26 +29,24 @@ exception DuplicateShortcut of string
 val read_config : string option -> config
 (** [read_config conf_file] :
     - If conf_file is given, then
-      - if it is an empty string, an empty config is loaded,
-      - if the file doesn't exist, Rc.CannotOpen is raised,
-      - otherwise the content of the file is parsed and returned.
-    - If conf_file is None and the WHY3CONFIG environment
+      {ul {- if it is an empty string, an empty config is loaded,}
+          {- if the file doesn't exist, {!Rc.CannotOpen} is raised,}
+          {- otherwise the content of the file is parsed and returned.}}
+    - If conf_file is None and the [WHY3CONFIG] environment
       variable exists, then the above steps are executed with
       the content of the variable (possibly empty).
-    - If neither conf_file nor WHY3CONFIG are present, the file
-      "$HOME/.why3.conf" (or "$USERPROFILE/.why3.conf" under
+    - If neither conf_file nor [WHY3CONFIG] are present, the file
+      [$HOME/.why3.conf] (or [$USERPROFILE/.why3.conf] under
       Windows) is checked for existence:
-      - if present, the content is parsed and returned,
-      - otherwise, we return the built-in default_config with a
-        default configuration filename.
+      {ul {- if present, the content is parsed and returned,}
+          {- otherwise, we return the built-in default_config with a
+             default configuration filename.}}
 
  *)
 
 val init_config : ?extra_config:string list -> string option -> config
 (** [init_config ?extra_config conf_file]
-
-    Add the automatically generated part of the configuration, and load plugins
-
+    adds the automatically generated part of the configuration, and loads plugins
 *)
 
 
@@ -57,7 +55,7 @@ val read_config_rc: string option -> string * Rc.t
    the parsed Rc file *)
 
 val add_extra_config : config -> string -> config
-(** [add_extra_config config filename] merge the content of [filename]
+(** [add_extra_config config filename] merges the content of [filename]
     into [config] *)
 
 val empty_rc : Rc.t
@@ -79,6 +77,7 @@ val get_conf_file : config -> string
 val rc_of_config : config -> Rc.t
 
 (** {2 Main section} *)
+
 type main
 
 val get_main : config -> main
@@ -130,6 +129,7 @@ val print_prover_parseable_format : Format.formatter -> prover -> unit
 val prover_parseable_format : prover -> string
 
 (** Printer for prover *)
+
 module Prover   : OrderedHashedType with type t = prover
 module Mprover  : Extmap.S with type key = prover
 module Sprover  : Extset.S with module M = Mprover
@@ -159,8 +159,8 @@ val get_provers : config -> config_prover Mprover.t
     keys are the unique ids of the prover (argument of the family) *)
 
 val get_prover_config: config -> prover -> config_prover
-(** [get_prover_config config prover] get the prover config as stored in
- the config. Raise Not_found if the prover does not exists in the config. *)
+(** [get_prover_config config prover] gets the prover config as stored in
+ the config. Raise [Not_found] if the prover does not exists in the config. *)
 
 val set_provers : config ->
   ?shortcuts:prover Mstr.t -> config_prover Mprover.t -> config
@@ -191,8 +191,8 @@ val get_editors : config -> config_editor Meditor.t
 (** returns the set of editors *)
 
 val editor_by_id : config -> string -> config_editor
-(** return the configuration of the editor if found, otherwise return
-    Not_found *)
+(** return the configuration of the editor if found, otherwise raise
+    [Not_found] *)
 
 (** prover upgrade policy *)
 
@@ -264,12 +264,12 @@ exception ProverAmbiguity of config * filter_prover * config_prover  Mprover.t
 exception ParseFilterProver of string
 
 val filter_one_prover : config -> filter_prover -> config_prover
-(** find the uniq prover that verify the filter. If it doesn't exists
-    raise ProverNotFound or raise ProverAmbiguity *)
+(** find the unique prover that verifies the filter. If it doesn't exist,
+    raise [ProverNotFound] or [ProverAmbiguity] *)
 
 val why3_regexp_of_string : string -> Re.Str.regexp
 
-(** {2 For accesing and modifying the user configuration } *)
+(** {2 For accessing and modifying the user configuration} *)
 
 module User: sig
 
@@ -280,6 +280,8 @@ module User: sig
   val set_default_editor : config -> string -> config
 
   val set_limits : time:int -> mem:int -> j:int -> config -> config
+
+  val set_dirs : libdir:string -> datadir:string -> config -> config
 
   val set_prover_upgrade_policy :
     config -> Mprover.key -> prover_upgrade_policy -> config
@@ -342,23 +344,23 @@ val load_driver_raw : main -> Env.env -> string -> string list -> Driver.driver
    [file] and with additional drivers in list [extras], in the context
    of the configuration [main] and environment [env].  This function
    is a wrapper to the lower level function
-   [Driver.load_driver_absolute] *)
+   {!Driver.load_driver_absolute}. *)
 
 val load_driver : main -> Env.env -> config_prover -> Driver.driver
 (** [load_driver main env p] loads the driver for prover [p],
    in the context of the configuration [main] and environment [env].
    This function is a wrapper to the lower level function
-   [load_driver_raw] *)
+   {!load_driver_raw}. *)
 
 val unknown_to_known_provers  :
   config_prover Mprover.t -> prover ->
   prover list * prover list * prover list
 (** return others, same name, same version *)
 
-(** */ *)
+(**/**)
 
 (** Internal, recursive functionality with Autodetection  *)
 
-val provers_from_detected_provers: (save_to:string -> Rc.t -> config) ref
+val provers_from_detected_provers: (config -> Rc.t -> config) ref
 
-(** */ *)
+(**/**)

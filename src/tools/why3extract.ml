@@ -78,7 +78,7 @@ let option_list =
     "<file|dir> destination of extracted code";
   ]
 
-let config, env =
+let _config, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let () =
@@ -350,11 +350,6 @@ let do_extract_module ?fname m =
     List.iter (fun d -> Mltree.iter_deps visit_id_deps d) m.Mltree.mod_decl;
   with Not_found -> () end;
   do_extract_module ?fname (Ident.Hid.mem visited_mod) m
-
-let find_pmod m mlw_file fname =
-  try Mstr.find m mlw_file with Not_found ->
-    eprintf "Module '%s' not found in the file '%s'.@." m fname;
-    exit 1
 
 let get_symbol ns find str_symbol =
   try let symbol = find ns [str_symbol] in Some symbol

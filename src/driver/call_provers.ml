@@ -145,14 +145,14 @@ type prover_result_parser = {
 }
 
 let print_prover_answer fmt = function
-  | Valid -> fprintf fmt "Valid"
-  | Invalid -> fprintf fmt "Invalid"
-  | Timeout -> fprintf fmt "Timeout"
+  | Valid -> pp_print_string fmt "Valid"
+  | Invalid -> pp_print_string fmt "Invalid"
+  | Timeout -> pp_print_string fmt "Timeout"
   | OutOfMemory -> fprintf fmt "Out@ of@ memory"
   | StepLimitExceeded -> fprintf fmt "Step@ limit@ exceeded"
   | Unknown s -> fprintf fmt "Unknown@ (%s)" s
   | Failure s -> fprintf fmt "Failure@ (%s)" s
-  | HighFailure -> fprintf fmt "High failure"
+  | HighFailure -> pp_print_string fmt "High failure"
 
 let print_prover_status fmt = function
   | Unix.WSTOPPED n -> fprintf fmt "stopped by signal %d" n
@@ -162,26 +162,26 @@ let print_prover_status fmt = function
 let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps" s
 
+let json_prover_result r =
+  let open Json_base in
+  let convert_model (a, m) =
+    if not (is_model_empty m) then
+      Record [
+          "model", json_model m;
+          "answer", String (asprintf "%a" print_prover_answer a)
+        ]
+    else Null in
+  Record [
+      "answer", String (asprintf "%a" print_prover_answer r.pr_answer);
+      "time", Float r.pr_time;
+      "step", Int r.pr_steps;
+      "ce-models", List (List.map convert_model r.pr_models);
+      "status", String (asprintf "%a" print_prover_status r.pr_status)
+    ]
+
 let print_prover_result ?(json=false) fmt r =
   if json then
-    let open Json_base in
-    let print_json_model fmt (a,m) =
-      fprintf fmt "@[@[<hv1>{%a;@ %a}@]}@]"
-        (print_json_field "model"
-           (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int)) m
-        (print_json_field "answer" print_prover_answer) a in
-    let print_model fmt (a,m) =
-      if not (is_model_empty m) then
-          print_json_model fmt (a,m)
-      else print_json fmt Null in
-    fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a;@ %a@]}@]"
-      (print_json_field "answer" print_json)
-      (String (asprintf "%a" print_prover_answer r.pr_answer))
-      (print_json_field "time" print_json) (Float r.pr_time)
-      (print_json_field "step" print_json) (Int r.pr_steps)
-      (* TODO not sure if models should be printed here *)
-      (print_json_field "ce-models" (list print_model)) r.pr_models
-      (print_json_field "status" print_json) (String (asprintf "%a" print_prover_status r.pr_status))
+    Json_base.print_json fmt (json_prover_result r)
   else
     let color = match r.pr_answer with | Valid -> "green" | Invalid -> "red" | _ -> "yellow" in
     fprintf fmt "@{<bold %s>%a@}@ (%.2fs%a)"
@@ -207,10 +207,10 @@ let rec grep out l = match l with
 let craft_efficient_re l =
   let s = Format.asprintf "%a"
     (Pp.print_list_delim
-       ~start:(fun fmt () -> Format.fprintf fmt "\\(")
-       ~stop:(fun fmt () -> Format.fprintf fmt "\\)")
-       ~sep:(fun fmt () -> Format.fprintf fmt "\\|")
-       (fun fmt (a, _b) -> Format.fprintf fmt "%s" a)) l
+       ~start:(fun fmt () -> Format.pp_print_string fmt "\\(")
+       ~stop:(fun fmt () -> Format.pp_print_string fmt "\\)")
+       ~sep:(fun fmt () -> Format.pp_print_string fmt "\\|")
+       (fun fmt (a, _b) -> Format.pp_print_string fmt a)) l
   in
   Re.Str.regexp s
 
@@ -220,7 +220,7 @@ let debug_print_model ~print_attrs model =
 
 type answer_or_model = Answer of prover_answer | Model of string
 
-let analyse_result exit_result res_parser printer_mapping out =
+let analyse_result exit_result res_parser get_counterexmp printing_info out =
   let list_re = res_parser.prp_regexps in
   let re = craft_efficient_re list_re in
   let list_re = List.map (fun (a, b) -> Re.Str.regexp a, b) list_re in
@@ -262,11 +262,13 @@ let analyse_result exit_result res_parser printer_mapping out =
         if res = Valid then
           (Valid, [])
         else
-          (* get model if possible *)
-          let m = res_parser.prp_model_parser printer_mapping model_str in
-          Debug.dprintf debug "Call_provers: model:@.";
-          debug_print_model ~print_attrs:false m;
-          analyse ((res, m) :: saved_models) (Some res) tl
+          if get_counterexmp then
+            let m = res_parser.prp_model_parser printing_info model_str in
+            Debug.dprintf debug "Call_provers: model:@.";
+            debug_print_model ~print_attrs:false m;
+            analyse ((res, m) :: saved_models) (Some res) tl
+          else
+            analyse saved_models (Some res) tl
     | Answer res :: tl ->
         if res = Valid then
           (Valid, [])
@@ -279,7 +281,7 @@ let analyse_result exit_result res_parser printer_mapping out =
 
 let backup_file f = f ^ ".save"
 
-let parse_prover_run res_parser signaled time out exitcode limit ~printer_mapping =
+let parse_prover_run res_parser signaled time out exitcode limit get_counterexmp printing_info =
   Debug.dprintf debug "Call_provers: exited with status %Ld@." exitcode;
   (* the following conversion is incorrect (but does not fail) on 32bit, but if
      the incoming exitcode was really outside the bounds of [int], its exact
@@ -291,7 +293,7 @@ let parse_prover_run res_parser signaled time out exitcode limit ~printer_mappin
       if signaled then [Answer HighFailure] else
       try [Answer (List.assoc int_exitcode res_parser.prp_exitcodes)]
       with Not_found -> []
-    in analyse_result exit_result res_parser printer_mapping out
+    in analyse_result exit_result res_parser get_counterexmp printing_info out
   in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
@@ -316,7 +318,7 @@ let parse_prover_run res_parser signaled time out exitcode limit ~printer_mappin
     pr_models = models;
   }
 
-let actualcommand command limit file =
+let actualcommand ~libdir ~datadir command limit file =
   let stime = string_of_int limit.limit_time in
   let smem = string_of_int limit.limit_mem in
   let arglist = Cmdline.cmdline_split command in
@@ -328,11 +330,8 @@ let actualcommand command limit file =
     | "f" -> use_stdin := false; file
     | "t" -> on_timelimit := true; stime
     | "m" -> smem
-    (* FIXME: libdir and datadir can be changed in the configuration file
-       Should we pass them as additional arguments? Or would it be better
-       to prepare the command line in a separate function? *)
-    | "l" -> Config.libdir
-    | "d" -> Config.datadir
+    | "l" -> libdir
+    | "d" -> datadir
     | "o" -> Config.libobjdir
     | "S" -> string_of_int limit.limit_steps
     | _ -> failwith "unknown specifier, use %%, %f, %t, %T, %U, %m, %l, %d or %S"
@@ -342,10 +341,10 @@ let actualcommand command limit file =
   in
   args, !use_stdin, !on_timelimit
 
-let actualcommand ~cleanup ~inplace command limit file =
+let actualcommand ~cleanup ~inplace ~libdir ~datadir command limit file =
   try
     let (cmd, _,_) as x =
-      actualcommand command limit file
+      actualcommand ~libdir ~datadir command limit file
     in
     Debug.dprintf debug "@[<hv 2>Call_provers: actual command is:@ @[%a@]@]@."
                   (Pp.print_list Pp.space pp_print_string) cmd;
@@ -378,11 +377,12 @@ let gen_id =
     !x
 
 type save_data = {
-  vc_file    : string;
-  inplace    : bool;
-  limit      : resource_limit;
-  res_parser : prover_result_parser;
-  printer_mapping : Printer.printer_mapping;
+  vc_file         : string;
+  inplace         : bool;
+  limit           : resource_limit;
+  res_parser      : prover_result_parser;
+  printing_info   : Printer.printing_info;
+  get_counterexmp : bool;
 }
 
 let saved_data : (int, save_data) Hashtbl.t = Hashtbl.create 17
@@ -411,9 +411,8 @@ let handle_answer answer =
       end;
       let out = read_and_delete_file out_file in
       let ret = exit_code in
-      let printer_mapping = save.printer_mapping in
       let ans = parse_prover_run save.res_parser timeout time out ret
-          save.limit ~printer_mapping in
+          save.limit save.get_counterexmp save.printing_info in
       id, Some ans
   | Started id ->
       id, None
@@ -428,16 +427,20 @@ type prover_call =
   | ServerCall of server_id
   | EditorCall of int
 
-let call_on_file ~command ~limit ~res_parser ~printer_mapping ?(inplace=false) fin =
+let call_on_file
+      ~libdir ~datadir ~command ~limit ~res_parser ~get_counterexmp
+      ~printing_info ?(inplace=false) fin =
   let id = gen_id () in
-  let cmd, use_stdin, _ =
-    actualcommand ~cleanup:true ~inplace command limit fin in
+  let cmd, use_stdin, on_timelimit =
+    actualcommand ~cleanup:true ~inplace ~libdir ~datadir command limit fin in
   let save = {
-    vc_file    = fin;
-    inplace    = inplace;
-    limit      = limit;
-    res_parser = res_parser;
-    printer_mapping = printer_mapping } in
+    vc_file         = fin;
+    inplace         = inplace;
+    limit           = limit;
+    res_parser      = res_parser;
+    get_counterexmp = get_counterexmp;
+    printing_info   = printing_info
+  } in
   Hashtbl.add saved_data id save;
   let use_stdin = if use_stdin then Some fin else None in
   Debug.dprintf
@@ -445,7 +448,7 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping ?(inplace=false) f
     "Request sent to prove_client:@ timelimit=%d@ memlimit=%d@ cmd=@[[%a]@]@."
     limit.limit_time limit.limit_mem
     (Pp.print_list Pp.comma Pp.string) cmd;
-  send_request ~use_stdin ~id
+  send_request ~libdir ~use_stdin ~id
                             ~timelimit:limit.limit_time
                             ~memlimit:limit.limit_mem
                             ~cmd;
@@ -502,9 +505,9 @@ let query_call = function
       if pid = 0 then NoUpdates else
       ProverFinished (editor_result ret)
 
-let interrupt_call = function
+let interrupt_call ~libdir = function
   | ServerCall id ->
-      Prove_client.send_interrupt ~id
+      Prove_client.send_interrupt ~id ~libdir
   | EditorCall pid ->
       (try Unix.kill pid Sys.sigkill with Unix.Unix_error _ -> ())
 
@@ -520,7 +523,7 @@ let rec wait_on_call = function
       let _, ret = Unix.waitpid [] pid in
       editor_result ret
 
-let call_on_buffer ~command ~limit ~res_parser ~filename ~printer_mapping
+let call_on_buffer ~command ~libdir ~datadir ~limit ~res_parser ~filename ~get_counterexmp ~printing_info
     ~gen_new_file ?(inplace=false) buffer =
   let fin,cin =
     if gen_new_file then
@@ -534,11 +537,13 @@ let call_on_buffer ~command ~limit ~res_parser ~filename ~printer_mapping
       end
   in
   Buffer.output_buffer cin buffer; close_out cin;
-  call_on_file ~command ~limit ~res_parser ~printer_mapping ~inplace fin
+  call_on_file ~command ~libdir ~datadir ~limit ~res_parser ~get_counterexmp ~printing_info ~inplace fin
 
-let call_editor ~command fin =
+let call_editor ~libdir ~datadir ~command fin =
   let command, use_stdin, _ =
-    actualcommand ~cleanup:false ~inplace:false command empty_limit fin in
+    actualcommand
+      ~cleanup:false ~inplace:false ~libdir ~datadir command empty_limit fin
+  in
   let exec = List.hd command in
   let argarray = Array.of_list command in
   let fd_in =

@@ -71,9 +71,9 @@ This extra layer commes into two flavors, a functional one, or say a
    monadic style, with an explicit state of declarations under
    constructions ; and an imperative style.  *)
 
+(** Extra helpers for creating declarations in top-down style,
+    functional interface *)
 module F : sig
-  (** extra helpers for creating declarations in top-down style,
-     functional interface *)
 
   type state
 
@@ -100,10 +100,10 @@ module F : sig
 
 end
 
+(** Extra helpers for creating declarations in top-down style,
+    imperative interface. Beware that these functions are not
+    thread-safe *)
 module I : sig
-  (** extra helpers for creating declarations in top-down style,
-     imperative interface. Beware that these functions are not
-     thread-safe *)
 
   val begin_module : ?loc:position -> string -> unit
   (** see [begin_module] above *)

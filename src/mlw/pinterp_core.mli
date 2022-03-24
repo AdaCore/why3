@@ -1,3 +1,13 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (** {1 Basic definitions for Pinterp and Rac}
 
@@ -16,7 +26,7 @@
 
 (** {3 Values} *)
 
-(** (Mutable) values used in [Pinterp] *)
+(** (Mutable) values used in {!Pinterp} *)
 module rec Value : sig
 
   type float_mode = Mlmpfr_wrapper.mpfr_rnd_t
@@ -90,7 +100,6 @@ val real_value : Big_real.real -> value
 val constr_value : Ity.ity -> Expr.rsymbol -> Expr.rsymbol list -> value list -> value
 val purefun_value : result_ity:Ity.ity -> arg_ity:Ity.ity -> value Mv.t -> value -> value
 val unit_value : value
-val undefined_value : Ity.ity -> value
 
 val range_value : Ity.ity -> BigInt.t -> value option
 (** Returns a range value, or [None] if the value is outside the range. *)
@@ -160,6 +169,7 @@ module Log : sig
   val get_log : log_uc -> exec_log (** Get the log *)
   val flush_log : log_uc -> exec_log (** Get the log and empty the log_uc *)
   val sort_log_by_loc : exec_log -> log_entry list Wstdlib.Mint.t Wstdlib.Mstr.t
+  val json_log : exec_log -> Json_base.json
   val print_log : ?verb_lvl:int -> json:bool -> exec_log Pp.pp
 end
 
@@ -216,7 +226,7 @@ val multibind_pvs : ?register:(Ident.ident -> value -> unit) ->
 (** {3 Exception for incomplete execution (and RAC)} *)
 
 exception Incomplete of string
-(** Raised when the execution in [Pinterp] is incomplete (not implemented or not
+(** Raised when the execution in {!Pinterp} is incomplete (not implemented or not
     possible), or when a check cannot be decided during the RAC. *)
 
 (** @raise Incomplete with the formatted string as reason *)
@@ -328,10 +338,10 @@ val report_cntr : (cntr_ctx * string * Term.term) Pp.pp
 (** {3 Exceptions for failures in RAC} *)
 
 exception Fail of cntr_ctx * Term.term
-(** Invalid assertions raise the exception [Fail] *)
+(** Caused by invalid assertions *)
 
 exception Stuck of cntr_ctx * Loc.position option * string
-(** Invalid assumptions raise the exception [Stuck] *)
+(** Caused by invalid assumptions *)
 
 val stuck : ?loc:Loc.position -> cntr_ctx ->
   ('a, Format.formatter, unit, 'b) format4 -> 'a
@@ -420,7 +430,7 @@ val check_variant : rac -> Ident.Sattr.elt -> Loc.position option ->
   (Term.term * Term.lsymbol option) list -> unit
 (** @raise Fail when the variant is invalid. *)
 
-(** {2 Auxilaries} *)
+(** {2 Auxiliaries} *)
 
 val t_undefined : Ty.ty -> Term.term
 
@@ -444,6 +454,8 @@ val debug_array_as_update_chains_not_epsilon : Debug.flag
     As an update chain, it is instead converted into a formula:
 
     [(make n undefined)[0 <- a[0]]... [n-1 <- a[n-1]]]. *)
+
+val undefined_value : env -> Ity.ity -> value
 
 (**/**)
 

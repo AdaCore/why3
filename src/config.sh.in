@@ -24,6 +24,7 @@ fi
 
 echo "
 let version   = \"@VERSION@\"
+let editor    = \"@EDITOR@\"
 
 let libdir    = $libdir
 let datadir   = $datadir
@@ -54,6 +55,7 @@ OCAMLBEST   = @OCAMLBEST@
 BIGINTLIB   = @BIGINTLIB@
 MPFRLIB     = @MLMPFR@
 INFERLIB    = @INFERLIB@
+STACKIFY    = @enable_stackify@
 INCLUDE     = @BIGINTINCLUDE@ -I $ocamllib
 INCLUDEALL  = @BIGINTINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ -I $ocamllib
 " > $makefileconfig

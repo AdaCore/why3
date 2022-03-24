@@ -1156,7 +1156,7 @@ File jlamp0.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Sub-goal Postcondition of goal p1'vc.
-Prover result is: Unknown (unknown + incomplete) (0.02s, 6752 steps).
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6752 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1501,7 +1501,7 @@ File jlamp0.mlw:
 
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Sub-goal Loop invariant init of goal p2'vc.
-Prover result is: Valid (0.02s, 1314 steps).
+Prover result is: Valid (0.01s, 1314 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
 <check-ce>Checking model:
@@ -1832,7 +1832,7 @@ Prover result is: Valid (0.02s, 1314 steps).
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 24, characters 16-18:
 Sub-goal Loop variant decrease of goal p2'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6972 steps).
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6972 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -1925,7 +1925,7 @@ Sorry, we don't have a good counterexample for you :(
 <rac-values>RHS evaluated for global `c` at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<check-ce>Result of checking model 0: BAD_CE
+<check-ce>Result of checking model 0: NC
             - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
@@ -2085,7 +2085,7 @@ Sorry, we don't have a good counterexample for you :(
 <rac-values>RHS evaluated for global `c` at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<check-ce>Result of checking model 1: BAD_CE
+<check-ce>Result of checking model 1: NC
             - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
@@ -2157,17 +2157,50 @@ Sorry, we don't have a good counterexample for you :(
                   Property failure at loop invariant init with:
                     c = {contents= 1}
 <check-ce-summary>Results:
-- Checked model 0: BAD_CE
+- Selected model 0: NC
   - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
-- Selected model 1: BAD_CE
+- Checked model 1: NC
   - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Sub-goal Loop invariant preservation of goal p2'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6933 steps).
-Sorry, we don't have a good counterexample for you :(
-
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6933 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File jlamp0.mlw:
+  Line 6:
+    a = {contents= 0}
+  Line 15:
+    Constant c initialization
+    (giant-step) execution of unimplemented function with args:
+    result = {contents= 0}
+    c = {contents= 0}
+Unknown location:
+    _ = ()
+File jlamp0.mlw:
+  Line 17:
+    _ = ()
+    Execution of main function `p2` with env:
+      a = {contents= 0}
+      c = {contents= 0}
+      _ = ()
+      zero = 0
+      one = 1
+  Line 20:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 0}
+      v = 1
+  Line 22:
+    Property failure at loop invariant init with:
+      c = {contents= 1}
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 23, characters 18-31)
 <check-ce>Checking model:
@@ -2510,7 +2543,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Sub-goal Loop invariant preservation of goal p2'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6999 steps).
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6999 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -2813,7 +2846,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 19, characters 15-28:
 Sub-goal Postcondition of goal p2'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6701 steps).
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6701 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

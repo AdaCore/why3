@@ -28,8 +28,6 @@ type vc_term_info = {
   (* true if the term that triggers VC is currently processed *)
   vc_loc : Loc.position option;
   (* the position of the term that triggers VC *)
-  vc_pre_or_post : bool;
-  (* true if VC was generated for precondition or postcondition *)
 }
 
 let is_model_vc_attr l =
@@ -46,7 +44,7 @@ let check_enter_vc_term t info vc_loc =
       vc_loc := t.t_loc;
       { vc_inside = true;
         vc_loc = t.t_loc;
-        vc_pre_or_post = Sattr.mem model_vc_post_attr t.t_attrs }
+      }
     end
   else
     info
@@ -93,7 +91,7 @@ let add_model_trace_attr name attrs =
     @param vc_loc is the location of the vc_attr (returned value)
     @param vc_map is a container for generated vc_constant id (used to avoid duplication)
     @param vc_var contains the variables we can safely use as CE (ie: we introduced these)
-    @param t: current subterm of the goal
+    @param t current subterm of the goal
     @return list of declarations added by do_intro
  *)
 let rec do_intro info vc_loc vc_map vc_var t =
@@ -180,7 +178,7 @@ let rec do_intro info vc_loc vc_map vc_var t =
         (do_intro f3)
   | Tcase (t, _) ->
     do_intro t
-    (* todo: handle the second argument of Tcase *)
+    (* FIXME: handle the second argument of Tcase *)
   | Tconst _ -> []
   | Ttrue -> []
   | Tfalse -> []
@@ -300,7 +298,6 @@ let intro_vc_vars_counterexmp2 task =
   let info = {
     vc_inside = false;
     vc_loc = None;
-    vc_pre_or_post = false;
   } in
   let vc_loc = ref None in
   (* Do introduction and find location of term triggering VC *)

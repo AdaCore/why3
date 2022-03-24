@@ -39,8 +39,6 @@ type value =
 and field = Fimmutable of value | Fmutable of value ref
 
 type info = {
-    env : Env.env;
-    mm  : Pmodule.pmodule Mstr.t;
     vars: value Mid.t;
     funs: decl Mrs.t;
     get_decl: rsymbol -> Mltree.decl;
@@ -75,11 +73,11 @@ let value_of_const c ty = match c with
 open Format
 
 let rec print_value fmt = function
-  | Vvoid -> fprintf fmt "()"
+  | Vvoid -> pp_print_string fmt "()"
   | Vbool b -> fprintf fmt "%b" b
   | Vstring s -> Constant.(print_string_def fmt s)
   | Vbigint i -> Constant.print_def fmt (Constant.int_const i)
-  | Vint i -> fprintf fmt "%d" i
+  | Vint i -> pp_print_int fmt i
   | Vtuple l -> fprintf fmt "@[<hov 2>(%a)@]"
                         (Pp.print_list Pp.comma print_value) l
   | Vconstr (rs, lf) -> fprintf fmt "@[<hov 2>(%a@ %a)@]"
@@ -91,7 +89,7 @@ let rec print_value fmt = function
   | Vref r -> fprintf fmt "Vref %a" print_value !r
 
 and print_field fmt = function
-  | Fimmutable v -> fprintf fmt "%a" print_value v
+  | Fimmutable v -> print_value fmt v
   | Fmutable vr -> fprintf fmt "Fmutable %a" print_value !vr
 and print_matrix fmt m =
   Array.iter (fun a -> fprintf fmt "[|%a|]\n"
@@ -544,7 +542,7 @@ let ts = ref 0. (* timestamp for current callstack *)
 
 let print_callstack cs time =
   Format.eprintf "%a %d@."
-    (Pp.print_list (fun fmt () -> Format.fprintf fmt ";") Expr.print_rs)
+    (Pp.print_list (fun fmt () -> Format.pp_print_string fmt ";") Expr.print_rs)
     (List.rev cs)
     (int_of_float (time *. 100000000.))
 
@@ -865,9 +863,7 @@ let rec term_of_value = function
   | Vmatrix _ -> raise CannotReduce
 
 let init_info env mm rs vars =
-  { env = env;
-    mm = mm;
-    funs = Mrs.empty;
+  { funs = Mrs.empty;
     vars = vars;
     get_decl = get_decl env mm;
     cur_rs = rs;

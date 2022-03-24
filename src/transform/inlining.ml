@@ -19,14 +19,6 @@ open Task
 let intro_attr = create_attribute "introduced"
 let inline_trivial_attr = create_attribute "inline:trivial"
 
-let meta_get_counterexmp =
-  Theory.register_meta_excl "get_counterexmp" [Theory.MTstring]
-  ~desc:"Set@ when@ counter-example@ should@ be@ get."
-
-let get_counterexmp task =
-  let ce_meta = Task.find_meta_tds task meta_get_counterexmp in
-  not (Theory.Stdecl.is_empty ce_meta.tds_set)
-
 let rec relocate loc t =
   t_map (relocate loc) (t_attr_set ?loc t.t_attrs t)
 
@@ -98,8 +90,8 @@ let inline_label = Ident.create_attribute "inline"
 let meta = Theory.register_meta "inline:no" [Theory.MTlsymbol]
   ~desc:"Disallow@ the@ inlining@ of@ the@ given@ function/predicate@ symbol."
 
-let t ?(use_meta=true) ?(in_goal=false) ?(only_top_in_goal=in_goal) ~notls ~notdef =
-  Trans.bind (Trans.store get_counterexmp) (fun for_counterexample ->
+let t ~use_meta ~in_goal ?(only_top_in_goal=in_goal) ~notls ~notdef =
+  Trans.bind (Trans.store Driver.get_counterexmp) (fun for_counterexample ->
     let trans notls =
       Trans.fold_map (fold in_goal only_top_in_goal notls notdef) Mls.empty None in
     if use_meta then

@@ -143,20 +143,13 @@ let pushed_attr_prefixes = ref ["expl:"; "hyp_name:"]
 let push_attributes_with_prefix s =
   pushed_attr_prefixes := s :: !pushed_attr_prefixes
 
-let pushed_attr a =
-  let exception Found of string in
-  let aux s = if Strings.has_prefix s a.attr_string then raise (Found s) in
-  try List.iter aux !pushed_attr_prefixes; None with Found s -> Some s
-
 let pushed_attrs f =
-  let aux a pushed =
-    match pushed_attr a with
+  let add_by_prefix a pushed =
+    let has_prefix s = Strings.has_prefix s a.attr_string in
+    match List.find_opt has_prefix !pushed_attr_prefixes with
     | Some s -> Mstr.add s a pushed
     | None -> pushed in
-  Sattr.fold aux f.t_attrs Mstr.empty
-
-let get_expls f =
-  Sattr.filter (fun a -> Strings.has_prefix "expl:" a.attr_string) f.t_attrs
+  Sattr.fold add_by_prefix f.t_attrs Mstr.empty
 
 (* Check if we already have a proposition with the same content.
    If we have a hash-consed one, and it is not yet used in the task,

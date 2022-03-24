@@ -33,7 +33,7 @@ let print_proofAttemptID fmt id =
 type theory = {
   theory_name                   : Ident.ident;
   mutable theory_goals          : proofNodeID list;
-  mutable theory_parent_name    : fileID;
+  theory_parent_name            : fileID;
   mutable theory_is_detached    : bool;
 }
 
@@ -411,11 +411,16 @@ let set_obsolete s paid b =
   pa.proof_obsolete <- b
  *)
 
-let check_if_already_exists s pid t args =
-    let sub_transfs = get_transformations s pid in
-    List.exists (fun tr_id ->
+let get_transformation s pid t args =
+  let sub_transfs = get_transformations s pid in
+  List.find (fun tr_id ->
       get_transf_name s tr_id = t && get_transf_args s tr_id = args &&
       not (is_detached s (ATn tr_id))) sub_transfs
+
+let check_if_already_exists s pid t args =
+  match get_transformation s pid t args with
+  | _ -> true
+  | exception Not_found -> false
 
 (* Iterations functions on the session tree *)
 
@@ -1578,7 +1583,7 @@ let () = Exn_printer.register
     (fun fmt e ->
       match e with
       | NoProgress ->
-          Format.fprintf fmt "The transformation made no progress.\n"
+          Format.pp_print_string fmt "The transformation made no progress.\n"
       | _ -> raise e)
 
 let apply_trans_to_goal ~allow_no_effect s env name args id =
@@ -1927,7 +1932,6 @@ open Format
 let save_string = Pp.html_string
 
 type save_ctxt = {
-  prover_ids : int PHprover.t;
   provers : (int * int * int * int) Mprover.t;
   ch_shapes : Compress.Compress_z.out_channel;
 }
@@ -2052,7 +2056,7 @@ let save_result fmt r =
 let save_status fmt s =
   match s with
   | Some result -> save_result fmt result
-  | None -> fprintf fmt "<undone/>"
+  | None -> pp_print_string fmt "<undone/>"
 
 let save_file_path fmt p =
   List.iter
@@ -2179,7 +2183,7 @@ let save fname shfname session =
       Termcode.Gshape.write_shape_to_file session.shapes.session_global_shapes chsh;
       Compress.Compress_z.output_string chsh "\n";
     end;
-  let ctxt = { prover_ids = prover_ids; provers = provers; ch_shapes = chsh } in
+  let ctxt = { provers = provers; ch_shapes = chsh } in
   Hfile.iter (save_file session ctxt fmt) session.session_files;
   fprintf fmt "@]@\n</why3session>";
   fprintf fmt "@.";

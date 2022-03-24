@@ -20,7 +20,7 @@ exception UnsupportedRole of string
 
 let () = Why3.Exn_printer.register (fun fmt exn -> match exn with
   | UnsupportedRole s -> Format.fprintf fmt "unsupported role %s" s
-  | Error -> Format.fprintf fmt "syntax error"
+  | Error -> Format.pp_print_string fmt "syntax error"
   | _ -> raise exn)
 %}
 

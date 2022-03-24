@@ -72,7 +72,7 @@ type info = {
 
 let print_tv info ~whytypes fmt tv =
   let n = id_unique iprinter tv.tv_name in
-  fprintf fmt "%s" n;
+  pp_print_string fmt n;
   if whytypes && not info.ssreflect then fprintf fmt " %s_WT" n
 
 let print_tv_binder info ~whytypes ~implicit fmt tv =
@@ -110,18 +110,18 @@ let forget_tvs () =
 (* logic variables *)
 let print_vs fmt vs =
   let n = id_unique iprinter vs.vs_name in
-  fprintf fmt "%s" n
+  pp_print_string fmt n
 
 let forget_var vs = forget_id iprinter vs.vs_name
 
 let print_ts fmt ts =
-  fprintf fmt "%s" (id_unique iprinter ts.ts_name)
+  pp_print_string fmt (id_unique iprinter ts.ts_name)
 
 let print_ls fmt ls =
-  fprintf fmt "%s" (id_unique iprinter ls.ls_name)
+  pp_print_string fmt (id_unique iprinter ls.ls_name)
 
 let print_pr fmt pr =
-  fprintf fmt "%s" (id_unique iprinter pr.pr_name)
+  pp_print_string fmt (id_unique iprinter pr.pr_name)
 
 let ls_ty_vars ls =
   let ty_vars_args = List.fold_left Ty.ty_freevars Stv.empty ls.ls_args in
@@ -153,7 +153,7 @@ let print_pr_real info fmt pr = print_id_real info fmt pr.pr_name
 
 let print_ts_tv info fmt ts =
   match ts.ts_args with
-  | [] -> fprintf fmt "%a" print_ts ts
+  | [] -> print_ts fmt ts
   | _ -> fprintf fmt "(%a %a)" print_ts ts
     (print_list space (print_tv info ~whytypes:false)) ts.ts_args
 
@@ -167,7 +167,7 @@ let rec print_type ?(opr=true) info ~prec fmt ty =
   | Tyvar v -> print_tv info ~whytypes:false fmt v
   | Tyapp (ts, tl) when is_ts_tuple ts ->
       begin match tl with
-      | [] -> fprintf fmt "Init.Datatypes.unit"
+      | [] -> pp_print_string fmt "Init.Datatypes.unit"
       | [ty] -> print_type ~opr info ~prec fmt ty
       | _ -> fprintf fmt "(%a)%%type" (print_list star (print_type info ~prec:40)) tl
       end
@@ -272,7 +272,6 @@ let number_format info = {
     Number.frac_real_support =
       `Custom
         ((fun fmt i -> fprintf fmt "%s%%R" i),
-         (fun fmt i n -> fprintf fmt "(%s * %s)%%R" i n),
          (fun fmt i n -> fprintf fmt "(%s / %s)%%R" i n));
   }
 
@@ -312,7 +311,7 @@ let rec print_term ?(boxed=false) ?(opr=true) info ~prec fmt t =
   | Tapp (fs,[]) when is_fs_tuple fs ->
       fprintf fmt "Init.Datatypes.tt"
   | Tapp (fs,pl) when is_fs_tuple fs ->
-      fprintf fmt "%a" (print_paren_r (print_term ~prec:250 info)) pl
+      print_paren_r (print_term ~prec:250 info) fmt pl
   | Tapp (fs,[l;r]) when ls_equal fs fs_func_app ->
       fprintf fmt (protect_on (prec < 10) "%a@ %a")
         (print_term info ~prec:10) l (print_term info ~prec:9) r
@@ -360,9 +359,9 @@ let rec print_term ?(boxed=false) ?(opr=true) info ~prec fmt t =
       fprintf fmt (protect_on (opr && prec < 200) "%a") aux vl;
       List.iter forget_var vl
   | Ttrue ->
-      fprintf fmt "True"
+      pp_print_string fmt "True"
   | Tfalse ->
-      fprintf fmt "False"
+      pp_print_string fmt "False"
   | Tbinop (b,f1,f2) ->
       begin match b with
       | Tand ->
@@ -600,11 +599,11 @@ let output_remaining fmt script =
 let rec intros_hyp n fmt f =
   match f.t_node with
     | Tbinop(Tand,f1,f2) ->
-      fprintf fmt "(";
+      pp_print_string fmt "(";
       let (m,vsl1) = intros_hyp n fmt f1 in
-      fprintf fmt ",";
+      pp_print_string fmt ",";
       let (k,vsl2) = intros_hyp m fmt f2 in
-      fprintf fmt ")";
+      pp_print_string fmt ")";
       (k,vsl1@vsl2)
     | Tquant(Texists,fq) ->
       let vsl,_trl,f = t_open_quant fq in
@@ -614,7 +613,7 @@ let rec intros_hyp n fmt f =
           | v::l ->
             fprintf fmt "(%a," print_vs v;
             let m = aux n l in
-            fprintf fmt ")";
+            pp_print_string fmt ")";
             m
       in
       aux n vsl
@@ -671,7 +670,7 @@ let print_previous_proof def info fmt previous =
         fprintf fmt "@[(* Why3 %a *)@]@\n" (fun fmt f -> intros fmt f) f
     | _ -> ()
     end;
-    fprintf fmt "%s" c
+    pp_print_string fmt c
   | Some (Query (_,Notation,_))
   | Some (Axiom _) | Some (Other _) | Some (Info _) ->
     assert false
@@ -762,7 +761,7 @@ let print_data_decls info fmt tl =
     end
 
 let print_ls_type info fmt = function
-  | None -> fprintf fmt "Prop"
+  | None -> pp_print_string fmt "Prop"
   | Some ty -> print_type ~opr:false info ~prec:100 fmt ty
 
 let print_param_decl ~prev info fmt ls =

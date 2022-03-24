@@ -11,83 +11,90 @@
 
 type t = int
 
+let compare x y = compare (x:int) y
+
 type set = int list list
 
 let empty = []
 
+let rec mem (e:int) = function
+  | [] -> false
+  | h::t -> h = e || mem e t
+
 let get_class t s =
   try
-    Some (List.find (List.mem t) s)
+    Some (List.find (mem t) s)
   with
   | Not_found -> None
+
+let change_class t t' s =
+  List.rev_map (fun k -> if k == t then t' else k) s
 
 let union a b c =
   let ca = get_class a c in
   let cb = get_class b c in
   match ca, cb with
   | None, Some l ->
-    let nl = a::l in
-    List.map (fun k ->
-        if k == l then
-          nl
-        else
-          k) c
+      change_class l (a :: l) c
   | Some l, None ->
-    let nl = b::l in
-    List.map (fun k ->
-        if k == l then
-          nl
-        else
-          k) c
+      change_class l (b :: l) c
   | None, None ->
-    if a = b then
-      [a]::c
-    else
-      [a; b] :: c
+      if a = b then [a] :: c
+      else if a < b then [a; b] :: c
+      else [b; a] :: c
   | Some l, Some l' when (l == l') ->
-    c
+      c
   | Some l, Some l_ ->
-    let nl = l @ l_ |> List.sort_uniq compare in
-    List.filter (fun k -> not (k == l_)) c
-    |> List.map (fun k ->
-        if k == l then
-          nl
-        else
-          k)
+      let nl = List.rev_append l l_ |> List.sort_uniq compare in
+      List.fold_left (fun acc k ->
+          if k == l_ || k == l then acc
+          else k :: acc
+        ) [nl] c
+
+let sort_uniq l =
+  let rec sorted a = function
+    | h :: t -> a < h && sorted h t
+    | [] -> true in
+  match l with
+  | [] -> []
+  | h :: t ->
+      if sorted h t then l
+      else List.sort_uniq compare l
 
 let intersect l1 l2 =
-  let l1 = List.sort_uniq compare l1 in
-  let l2 = List.sort_uniq compare l2 in
-  (* intersection of l2 and t'::l1 *)
-  let rec do_inter t' l1 = function
+  (* intersection of l2 and t'::l1, assuming they are sorted *)
+  let rec do_inter (t':int) l1 = function
     | [] -> []
-    | t::q -> if t = t' then t::(do_inter t l1 q)
-      else if t < t' then
-        do_inter t' l1 q
-      else
-        do_inter t q l1
-  in
+    | t::q ->
+        if t = t' then t :: (do_inter t l1 q)
+        else if t < t' then do_inter t' l1 q
+        else do_inter t q l1 in
   match l1 with
   | t::q -> do_inter t q l2
   | [] -> []
 
-
 (* join [[1;2;3];[4;5]] [[2];[4;5;6];[7]] = [[2];[4;5];[1];[3];[6];[7]] *)
 let join a b =
-  let c = List.fold_left (fun l k ->
-      List.fold_left (fun l k' ->
-          let i = intersect k k' in
-          if i <> [] then
-            i::l
-          else
-            l
-        ) l a
-    )  [] b
-  in
-  let all_elts = List.concat (a @ b) in
+  let a = List.rev_map sort_uniq a in
+  let c =
+    List.fold_left (fun l k ->
+        let k = sort_uniq k in
+        List.fold_left (fun l k' ->
+            let i = intersect k k' in
+            if i <> [] then i::l else l
+          ) l a
+      ) [] b in
+  let all_elts = List.concat (List.rev_append a b) in
   let known_elts = List.concat c in
-  let all_elts = List.filter (fun t -> not (List.mem t known_elts)) all_elts |> List.map (fun t -> [t]) in
-  c @ all_elts
+  List.fold_left (fun acc t ->
+      if mem t known_elts then acc
+      else [t] :: acc
+    ) c all_elts
+
+let intersect l1 l2 =
+  let l1 = sort_uniq l1 in
+  let l2 = sort_uniq l2 in
+  intersect l1 l2
 
 let print s =
   List.iter (fun k ->
@@ -105,7 +112,7 @@ let is_leq a b =
         List.fold_left (fun t ca ->
             t || begin
               let na = List.length ca in
-              (ca @ cb |> List.sort_uniq compare |> List.length) = na
+              (List.rev_append ca cb |> List.sort_uniq compare |> List.length) = na
             end) (match cb with [_] -> true | _ -> false) a) true b
   in
   b
@@ -126,11 +133,7 @@ let forget t s =
     | [] ->
       None, List.filter (fun k -> not (k == l)) s
     | t::_ ->
-      Some t, List.map (fun k ->
-          if k == l then
-            nl
-          else
-            k) s
+      Some t, change_class l nl s
 
 
 let fold_equal f acc (s:set) =
@@ -148,16 +151,18 @@ let fold_equal f acc (s:set) =
 let flat (s:set) =
   List.concat s
 
+let repr a s =
+  match get_class a s with
+  | None -> a
+  | Some s -> List.hd s
+
 let get_class a s =
   match get_class a s with
   | None -> [a]
   | Some s -> s
 
-let repr a s =
-  List.hd (get_class a s)
-
 let fold_class f a s =
-  let s = List.map (List.sort_uniq compare) s in
+  let s = List.rev_map sort_uniq s in
   let fold_single a = function
     | [] -> a
     | t::q ->

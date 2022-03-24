@@ -1,0 +1,6 @@
+
+use int.Int
+
+let f (x : int) : unit =
+  check { [@expl:e] (0 < x \/ x < 0) };
+  ()

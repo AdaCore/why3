@@ -463,16 +463,21 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
         | None -> Loc.error ~loc (RecordFieldMissing pj) in
       let cs, fl = parse_record ~loc ns km get_val fl in
       DTapp (cs, fl)
-  | Ptree.Tupdate (e1, fl) ->
+  | Ptree.Tupdate ({ term_loc = e1_loc } as e1, fl) ->
       let e1 = dterm ns km crcmap gvars at denv e1 in
       let re = is_reusable e1 in
-      let v = if re then e1 else mk_var crcmap "q " e1 in
+      let v = if re then e1 else mk_var crcmap "_q " e1 in
+      let used = ref false in
       let get_val _ pj = function
         | Some e -> dterm ns km crcmap gvars at denv e
-        | None -> Dterm.dterm crcmap ~loc (DTapp (pj,[v])) in
+        | None ->
+            used := true;
+            Dterm.dterm crcmap ~loc (DTapp (pj,[v])) in
       let cs, fl = parse_record ~loc ns km get_val fl in
+      if not !used then
+        Warning.emit ~loc:e1_loc "unused expression (every field is overwritten)";
       let d = DTapp (cs, fl) in
-      if re then d else mk_let crcmap ~loc "q " e1 d
+      if re then d else mk_let crcmap ~loc "_q " e1 d
   | Ptree.Tat (e1, ({id_str = l; id_loc = loc} as id)) ->
       Hstr.add at_uses l false;
       let id = { id with id_str = "" } in
@@ -997,18 +1002,22 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | Some e -> dexpr muc denv e in
       let cs,fl = parse_record ~loc muc get_val fl in
       expr_app loc (DEsym (RS cs)) fl
-  | Ptree.Eupdate (e1, fl) ->
+  | Ptree.Eupdate ({ expr_loc = e1_loc } as e1, fl) ->
       let e1 = dexpr muc denv e1 in
       let re = is_reusable e1 in
-      let v = if re then e1 else mk_var "q " e1 in
+      let v = if re then e1 else mk_var "_q " e1 in
+      let used = ref false in
       let get_val _ pj = function
         | None ->
+            used := true;
             let pj = Dexpr.dexpr ~loc (DEsym (RS pj)) in
             Dexpr.dexpr ~loc (DEapp (pj, v))
         | Some e -> dexpr muc denv e in
       let cs,fl = parse_record ~loc muc get_val fl in
+      if not !used then
+        Warning.emit ~loc:e1_loc "unused expression (every field is overwritten)";
       let d = expr_app loc (DEsym (RS cs)) fl in
-      if re then d else mk_let ~loc "q " e1 d
+      if re then d else mk_let ~loc "_q " e1 d
   | Ptree.Elet (id, gh, kind, e1, e2) ->
       let e1 = update_any kind e1 in
       let kind = local_kind kind in

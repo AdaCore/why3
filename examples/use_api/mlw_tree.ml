@@ -20,6 +20,8 @@ API calls
 open Why3
 let config : Whyconf.config = Whyconf.init_config None
 let main : Whyconf.main = Whyconf.get_main config
+let libdir = Whyconf.libdir main
+let datadir = Whyconf.datadir main
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 open Ptree
 open Ptree_helpers
@@ -346,10 +348,10 @@ let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
 
 let alt_ergo : Whyconf.config_prover =
-  let fp = Whyconf.parse_filter_prover "Alt-Ergo,2.3.0" in
+  let fp = Whyconf.parse_filter_prover "Alt-Ergo,2.3.3" in
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
-    eprintf "Prover Alt-Ergo 2.3.0 not installed or not configured@.";
+    eprintf "Prover Alt-Ergo 2.3.3 not installed or not configured@.";
     exit 1
   end else
     snd (Whyconf.Mprover.max_binding provers)
@@ -364,7 +366,9 @@ let alt_ergo_driver : Driver.driver =
 
 let () =
   List.iteri (fun i t ->
-      let call = Driver.prove_task ~limit:Call_provers.empty_limit
+      let call =
+        Driver.prove_task ~limit:Call_provers.empty_limit
+          ~libdir ~datadir
           ~command:alt_ergo.Whyconf.command alt_ergo_driver t in
       let r = Call_provers.wait_on_call call in
       printf "@[On task %d, alt-ergo answers %a@." (succ i)

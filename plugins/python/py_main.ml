@@ -35,16 +35,12 @@ let set_op ~loc   = Qident (mk_id ~loc (Ident.op_set ""))
 
 let mk_expr ~loc d =
   { expr_desc = d; expr_loc = loc }
-let mk_term ~loc d =
-  { term_desc = d; term_loc = loc }
 let mk_pat ~loc d =
   { pat_desc = d; pat_loc = loc }
 let mk_unit ~loc =
   mk_expr ~loc (Etuple [])
 let mk_var ~loc id =
   mk_expr ~loc (Eident (Qident id))
-let mk_tvar ~loc id =
-  mk_term ~loc (Tident (Qident id))
 let mk_ref ~loc e =
   mk_expr ~loc (Eidapp (Qident (mk_id ~loc "ref"), [e]))
 let array_set ~loc a i v =
@@ -84,12 +80,10 @@ let empty_spec = {
 
 type env = {
   vars: ident Mstr.t;
-  for_index: int;
 }
 
 let empty_env =
-  { vars = Mstr.empty;
-    for_index = 0; }
+  { vars = Mstr.empty }
 
 let is_const (e: Py_ast.expr list) =
   match List.nth e 2 with
@@ -98,7 +92,9 @@ let is_const (e: Py_ast.expr list) =
   | _ -> 0
 
 let add_var env id =
-  { env with vars = Mstr.add id.id_str id env.vars }
+  { vars = Mstr.add id.id_str id env.vars }
+let add_param env (id, _) =
+  add_var env id
 
 let for_vars ~loc x =
   let x = x.id_str in
@@ -232,7 +228,6 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
 
 let no_params ~loc = [loc, None, false, Some (PTtuple [])]
 
-
 let mk_for_params exps loc env =
 
   let mk_op1 op ub = mk_expr ~loc (Eidapp (infix ~loc op, [expr env ub; constant ~loc 1])) in
@@ -354,50 +349,46 @@ and block env ~loc = function
   | Dstmt ({ Py_ast.stmt_loc = loc } as s) :: sl ->
     let s = stmt env s in
     if sl = [] then s else mk_expr ~loc (Esequence (s, block env ~loc sl))
-  | Ddef (id, idl, sp, bl) :: sl ->
+  | Ddef (id, idl, ty, sp, bl) :: sl ->
     (* f(x1,...,xn): body ==>
       let f x1 ... xn =
         let x1 = ref x1 in ... let xn = ref xn in
         try body with Return x -> x *)
-    let env' = List.fold_left add_var empty_env idl in
+    let env' = List.fold_left add_param empty_env idl in
     let body = block env' ~loc:id.id_loc bl in
     let body =
       let loc = id.id_loc in
       let id = mk_id ~loc return_id in
       { body with expr_desc = Eoptexn (id, Ity.MaskVisible, body) } in
-    let local bl id =
+    let local bl (id, _) =
       let loc = id.id_loc in
       let ref = mk_ref ~loc (mk_var ~loc id) in
       mk_expr ~loc (Elet (set_ref id, false, Expr.RKnone, ref, bl)) in
     let body = List.fold_left local body idl in
-    let param id = id.id_loc, Some id, false, None in
+    let param (id, ty) =
+      id.id_loc, Some id, false, ty in
     let params = if idl = [] then no_params ~loc else List.map param idl in
     let s = block env ~loc sl in
     let p = mk_pat ~loc Pwild in
     let e = if block_has_call id bl then
-      Erec ([id, false, Expr.RKnone, params, None, p, Ity.MaskVisible, sp, body], s)
+      Erec ([id, false, Expr.RKnone, params, ty, p, Ity.MaskVisible, sp, body], s)
     else
-      let e = Efun (params, None, p, Ity.MaskVisible, sp, body) in
+      let e = Efun (params, ty, p, Ity.MaskVisible, sp, body) in
       Elet (id, false, Expr.RKnone, mk_expr ~loc e, s) in
     mk_expr ~loc e
   | (Py_ast.Dimport _ | Py_ast.Dlogic _) :: sl ->
     block env ~loc sl
 
-let fresh_type_var =
-  let r = ref 0 in
-  fun loc -> incr r;
-    PTtyvar { id_str = "a" ^ string_of_int !r; id_loc = loc; id_ats = [] }
-
-let logic_param id =
-  id.id_loc, Some id, false, fresh_type_var id.id_loc
+let logic_param (id, ty) =
+  id.id_loc, Some id, false, ty
 
 let logic = function
-  | Py_ast.Dlogic (func, id, idl) ->
+  | Py_ast.Dlogic (id, idl, ty, def) ->
     let d = { ld_loc = id.id_loc;
               ld_ident = id;
               ld_params = List.map logic_param idl;
-              ld_type = if func then Some (fresh_type_var id.id_loc) else None;
-              ld_def = None } in
+              ld_type = ty;
+              ld_def = def } in
     Typing.add_decl id.id_loc (Dlogic [d])
   | _ -> ()
 
@@ -449,12 +440,12 @@ open Pretty
 
 (* python print_binop *)
 let print_binop ~asym fmt = function
-  | Tand when asym -> fprintf fmt "&&"
-  | Tor when asym  -> fprintf fmt "||"
-  | Tand           -> fprintf fmt "and"
-  | Tor            -> fprintf fmt "or"
-  | Timplies       -> fprintf fmt "->"
-  | Tiff           -> fprintf fmt "<->"
+  | Tand when asym -> pp_print_string fmt "&&"
+  | Tor when asym  -> pp_print_string fmt "||"
+  | Tand           -> pp_print_string fmt "and"
+  | Tor            -> pp_print_string fmt "or"
+  | Timplies       -> pp_print_string fmt "->"
+  | Tiff           -> pp_print_string fmt "<->"
 
 (* Register the transformations functions *)
 let rec python_ext_printer print_any fmt a =

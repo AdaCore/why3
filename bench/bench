@@ -11,10 +11,15 @@ has_mpfr=`sed -n -e 's/MPFRLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
 
 has_infer=`sed -n -e 's/INFERLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
 
+has_stackify=`sed -n -e 's/STACKIFY *= *\(yes\)/\1/p' share/Makefile.config`
+
 shopt -s nullglob
 
 suffix=
-only=
+
+categories="badfiles drivers execution extraction goodfiles inferloop invalidgoals list mlwprinter rac realizations replay replay-without-shapes stdlib steplimit validgoals validsplitgoals stackify"
+
+enabled_categories=""
 
 while [ $# != 0 ]; do
     case "$1" in
@@ -22,24 +27,22 @@ while [ $# != 0 ]; do
             suffix="$2"
             shift 2
             ;;
-        "-only")
-            only="$2"
-            shift 2
-            ;;
         *)
-            echo "Usage: $0 [-suffix s] [-only category]"
-            echo "The suffix for calling bin/why3 and either '.opt' or '.byte' or ''."
-            echo "The category can be used to select only a specific bench test"
-            echo "and is one of the following:"
-            echo "  badfiles drivers execution extraction goodfiles invalidgoals list"
-            echo "  mlwprinter rac realizations replay replay-without-shapes stdlib"
-            echo "  steplimit validgoals validsplitgoals."
-            exit 1
+            if [[ ! " $categories " =~ " $1 " ]]; then
+                echo "Usage: $0 [-suffix s] [categories...]"
+                echo "The suffix for calling bin/why3 is either '.opt' or '.byte' or ''."
+                echo "Specific tests can be selected using some of the following categories:"
+                echo "  $categories"
+                exit 1
+            fi
+            enabled_categories="$enabled_categories $1"
+            shift 1
+            ;;
     esac
 done
 
 enabled () {
-    test -z "$only" -o "$only" = "$1"
+    [[ -z "$enabled_categories" || " $enabled_categories " =~ " $1 " ]]
 }
 
 simple_test() {
@@ -240,10 +243,8 @@ replay_without_shape () {
 
 execute () {
     pgm="bin/why3$suffix execute"
-    printf "  ${@:1}... "
-    # Run why3execute, discard warnings from the reduction engine
-    # Remove `[ $? -eq 2 ]` when value origins (default vs model) can be distinguished in RAC
-    if ($pgm "$@" || [ $? -eq 2 ] ) > /dev/null 2> >(grep -v '$warning: reduction of term'); then
+    printf "  $1... "
+    if $pgm "$@" > /dev/null; then
         echo "ok"
     else
         echo "failed!"
@@ -524,6 +525,7 @@ execute examples/euler001.mlw "bench ()" --use=Euler001
 execute examples/euler002.mlw "bench ()" --use=Solve
 execute examples/fibonacci.mlw "bench ()" --use=FibRecGhost
 execute examples/fibonacci.mlw "bench ()" --use=FibonacciLogarithmic
+execute examples/hello-world.mlw "main" --use=Test
 # fails: cannot execute Cany
 # execute examples/same_fringe.mlw SameFringe.bench
 # fails: cannot evaluate condition a=b (how to do it?)
@@ -637,6 +639,12 @@ replay examples/mlcfg --merging-only
 echo ""
 fi
 
+if enabled stackify && test -n "$has_stackify"; then
+    echo "=== Checking stackify ==="
+    replay examples/stackify --merging-only
+fi
+
+
 if enabled list; then
 echo "=== Checking lists ==="
 list_stuff show attributes
@@ -659,7 +667,7 @@ echo "=== Checking mlw_printer ==="
 test_mlw_printer
 fi
 
-if test -n "$has_infer"; then
+if enabled inferloop && test -n "$has_infer"; then
     echo "=== Checking loop invariant inference ==="
     bench/infer-bench bench/infer
 fi

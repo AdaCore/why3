@@ -10,13 +10,13 @@ File result.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
   Line 9:
     b [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "16"}}]}}
   Line 11:
     a [@field:0:contents] [@introduced] [@model_trace:a] =
       {"type": "Record",
@@ -63,7 +63,7 @@ File result.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-    result [@introduced] [@model_trace:result] =
+    result [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Integer", "val": "2"}
   Line 20:
     A [@field:0:contents] [@introduced] [@model] [@model_trace:A] =

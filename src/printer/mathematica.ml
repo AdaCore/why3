@@ -110,7 +110,7 @@ let ident_printer =
   create_ident_printer bls ~sanitizer:san
 
 let print_ident fmt id =
-  fprintf fmt "%s" (id_unique ident_printer id)
+  pp_print_string fmt (id_unique ident_printer id)
 
 let number_format = {
     Number.long_int_support = `Default;
@@ -125,7 +125,6 @@ let number_format = {
     Number.frac_real_support =
       `Custom
         ((fun fmt i -> pp_print_string fmt i),
-         (fun fmt i n -> fprintf fmt "(%s*%s)" i n),
          (fun fmt i n -> fprintf fmt "(%s/%s)" i n));
   }
 
@@ -170,9 +169,9 @@ let rec print_term info fmt t =
       | None -> print_ident fmt id
     end
   | Tapp ( { ls_name = id } ,[t] )
-      when try String.sub id.id_string 0 6 = "index_" with Invalid_argument _
-        -> false ->
-            fprintf fmt "%a" term t
+      when (try String.sub id.id_string 0 6 = "index_" with Invalid_argument _ -> false)
+    ->
+      term fmt t
   | Tapp (ls, tl) ->
       begin match query_syntax info.info_syn ls.ls_name with
         | Some s -> syntax_arguments s term fmt tl
@@ -180,7 +179,7 @@ let rec print_term info fmt t =
             unsupportedTerm t
               ("math: function '" ^ ls.ls_name.id_string ^ "' is not supported")*)
         | None -> begin match tl with
-            | [] -> fprintf fmt "%a" print_ident ls.ls_name
+            | [] -> print_ident fmt ls.ls_name
             | _ -> fprintf fmt "%a[%a]"
                 print_ident ls.ls_name (print_list comma term) tl
           end
@@ -254,7 +253,7 @@ let rec print_term info fmt t =
             (*unsupportedTerm f
               ("math: predicate '" ^ ls.ls_name.id_string ^ "' is not supported")*)
             begin match tl with
-              | [] -> fprintf fmt "%a" print_ident ls.ls_name
+              | [] -> print_ident fmt ls.ls_name
               | _ -> fprintf fmt "%a[%a]"
                 print_ident ls.ls_name (print_list comma (print_term info)) tl
             end
@@ -286,9 +285,9 @@ let rec print_term info fmt t =
   | Tnot f ->
       fprintf fmt "Not[%a]" fmla f
   | Ttrue ->
-      fprintf fmt "True"
+      pp_print_string fmt "True"
   | Tfalse ->
-      fprintf fmt "False"
+      pp_print_string fmt "False"
   | Tif (f1, f2, f3) ->
       fprintf fmt "If[%a,@ %a,@ %a]" fmla f1 fmla f2 fmla f3
   | Tlet _ -> unsupportedTerm f
@@ -453,7 +452,7 @@ let print_type_def _info fmt (ts,csl) =
   let alen = List.length csl in
   let print_def fmt () =
     if alen >= 1 then begin
-      fprintf fmt "x = 1";
+      pp_print_string fmt "x = 1";
       for i = 2 to alen do
         fprintf fmt " || x = %d" i
       done end
@@ -469,7 +468,7 @@ let print_type_def _info fmt (ts,csl) =
     if n > 1 then
       fprintf fmt "If[x == %d, v%d, %a]" n n print_case (n-1)
     else
-      fprintf fmt "If[x == 1, v1, 0]"
+      pp_print_string fmt "If[x == 1, v1, 0]"
   in
     fprintf fmt "Match%a[x_%a] := %a;@\n" print_ident ts.ts_name
       print_args () print_case alen
@@ -492,14 +491,7 @@ let print_dom _info fmt lsymbol =
   | _ -> ()
 
 let print_param _info fmt lsymbol =
-  fprintf fmt "%a" print_ident lsymbol.ls_name
-
-let print_var info fmt vsymbol =
-  (*fprintf fmt "%a" print_ident vsymbol.vs_name*)
-  begin match query_syntax info.info_syn vsymbol.vs_name with
-    | Some s -> syntax_arguments s (print_term info) fmt []
-    | None -> print_ident fmt vsymbol.vs_name
-  end
+  print_ident fmt lsymbol.ls_name
 
 let print_goal info fmt g =
   match g with

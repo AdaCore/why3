@@ -45,9 +45,6 @@ let why3_regexp_of_string s = (* define a regexp in why3 *)
 
 (* lib and shared dirs *)
 
-let default_loadpath =
-  [ Filename.concat Config.datadir "stdlib" ]
-
 let default_conf_file =
   match Config.localdir with
     | None -> Filename.concat (Rc.get_home_dir ()) ".why3.conf"
@@ -125,10 +122,10 @@ type prover_upgrade_policy =
 
 let print_prover_upgrade_policy fmt p =
   match p with
-  | CPU_keep -> Format.fprintf fmt "keep"
+  | CPU_keep -> Format.pp_print_string fmt "keep"
   | CPU_upgrade p -> Format.fprintf fmt "upgrade to %a" print_prover p
   | CPU_duplicate p -> Format.fprintf fmt "copy to %a" print_prover p
-  | CPU_remove -> Format.fprintf fmt "remove"
+  | CPU_remove -> Format.pp_print_string fmt "remove"
 
 
 
@@ -216,6 +213,9 @@ let datadir m =
     d
   with Not_found -> m.datadir
 
+let default_loadpath m =
+  [ Filename.concat m.datadir "stdlib" ]
+
 let loadpath m =
   try
     let d = Sys.getenv "WHY3LOADPATH" in
@@ -224,7 +224,7 @@ let loadpath m =
 *)
     Strings.split ':' d
   with Not_found ->
-    let stdlib = if m.stdlib then default_loadpath else [] in
+    let stdlib = if m.stdlib then default_loadpath m else [] in
     m.loadpath@stdlib
 
 let set_loadpath m l = { m with loadpath = l}
@@ -307,8 +307,7 @@ let empty_main =
     memlimit = 1000; (* 1 Mb *)
     running_provers_max = 2; (* two provers run in parallel *)
     plugins = [];
-    default_editor = (try Sys.getenv "EDITOR" ^ " %f"
-                      with Not_found -> "editor %f");
+    default_editor = Config.editor ^ " %f"
   }
 
 exception ConfigFailure of string (* filename *) * string
@@ -538,13 +537,15 @@ module RC_save = struct
   let set_default_editor default section =
     set_string section "default_editor" default
 
+  let set_dirs ~libdir ~datadir section =
+    let section = set_string section "libdir" libdir in
+    let section = set_string section "datadir" datadir in
+    section
+
   let set_main rc main =
     let section = empty_section in
     let section = set_int section "magic" magicnumber in
-    let section = set_string ~default:empty_main.libdir
-        section "libdir" main.libdir in
-    let section = set_string ~default:empty_main.datadir
-        section "datadir" main.datadir in
+    let section = set_dirs ~libdir:main.libdir ~datadir:main.datadir section in
     let section = set_bool ~default:empty_main.stdlib section "stdlib" main.stdlib in
     let section = set_bool ~default:empty_main.load_default_plugins
         section "load_default_plugins" main.load_default_plugins in
@@ -774,7 +775,7 @@ let filter_from_prover pr =
 
 let print_filter_prover fmt fp =
   match fp.filter_version, fp.filter_altern with
-  | None  , None -> fprintf fmt "%s" fp.filter_name.desc
+  | None  , None -> pp_print_string fmt fp.filter_name.desc
   | Some v, None -> fprintf fmt "%s,%s" fp.filter_name.desc v.desc
   | None  , Some a -> fprintf fmt "%s,,%s" fp.filter_name.desc a.desc
   | Some v, Some a -> fprintf fmt "%s,%s,%s" fp.filter_name.desc v.desc a.desc
@@ -947,6 +948,12 @@ module User = struct
       main = set_limits config.main time mem j;
     }
 
+  let set_dirs ~libdir ~datadir config =
+    { config with
+      user_rc = update_section config.user_rc "main"
+        @@ RC_save.set_dirs ~libdir ~datadir;
+      main = { config.main with libdir = libdir; datadir = datadir }
+    }
   let set_prover_upgrade_policy config prover target =
     (** kept simple because no auto upgrade policy *)
     let m = Mprover.add prover target config.provers_upgrade_policy in
@@ -1049,9 +1056,9 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | ConfigFailure (f, s) ->
       Format.fprintf fmt "error in config file %s: %s" f s
   | WrongMagicNumber ->
-      Format.fprintf fmt "outdated config file; rerun 'why3 config'"
+      Format.pp_print_string fmt "outdated config file; rerun 'why3 config'"
   | RC_save.NonUniqueId ->
-    Format.fprintf fmt "InternalError: two provers share the same id"
+    Format.pp_print_string fmt "InternalError: two provers share the same id"
   | ProverNotFound (config,fp) ->
     fprintf fmt "No prover in %s corresponds to \"%a\"@."
       (get_conf_file config) print_filter_prover fp
@@ -1070,19 +1077,20 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | _ -> raise e)
 
 let provers_from_detected_provers :
-  (save_to:string -> Rc.t -> config) ref =
-  ref (fun ~save_to:_ _ -> invalid_arg
+  (config -> Rc.t -> config) ref =
+  ref (fun _ _-> invalid_arg
           "provers_from_detected_provers: Must be filled by Autodetection")
 
 
-let add_builtin_provers config = !provers_from_detected_provers config
+let add_builtin_provers config rc =
+  !provers_from_detected_provers config rc
 
 let init_config ?(extra_config=[]) ofile =
   let save_to,rc = read_config_rc ofile in
-  (* Add the automatic provers, shortcuts, strategy, ... *)
-  let config = add_builtin_provers ~save_to rc in
   (* load the user configuration, priority over automatic values *)
-  let config = read_config_aux config save_to rc in
+  let config = read_config_aux (default_config save_to) save_to rc in
+  (* Add the automatic provers, shortcuts, strategy, ... *)
+  let config = add_builtin_provers config rc in
   (* Add extra-config *)
   let config = List.fold_left add_extra_config config extra_config in
   config

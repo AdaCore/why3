@@ -9,45 +9,10 @@
 (*                                                                  *)
 (********************************************************************)
 
-(* use the simple printer functions to quickly print some JSON *)
-
-val string : Format.formatter -> string -> unit
-(* print json string, that is add '"' to the front and back, and escape
-   characters escaped in JSON string *)
-val int : Format.formatter -> int -> unit
-(* print an integer *)
-val bool : Format.formatter -> bool -> unit
-(* print an boolean *)
-val float : Format.formatter -> float -> unit
-(* print a floating point number *)
-val standard_float : Format.formatter -> float -> unit
-(* print a float in a format that cannot be mistaken for an integer (this makes
-   communication with other tools easier).
-*)
-
 val list :
   (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a list -> unit
 (* provided a printer for elements, print a json list of these elements. In the
    case of the empty list, print the json empty list [] *)
-
-val map_bindings :
-  ('a -> string) ->
-  (Format.formatter -> 'b -> unit) ->
-  Format.formatter ->
-  ('a * 'b) list ->
-  unit
-(* arguments:
-   * a mapping from keys to strings;
-   * a printer of values
-   * the formatter
-   * a list of key,value pairs
-  action: print the list of key-value pairs as a json record, if the list is
-  empty, print the empty record *)
-
-val print_json_field :
-  string -> (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a -> unit
-(* given a field name, a value and a printer for the value, print a json
-   mapping (field assignment). Do not print anything else. *)
 
 (* for more complex applications it may be convenient to build a an
    explicit JSON object. Use this type for that and the print_json
@@ -68,6 +33,12 @@ val print_json : Format.formatter -> json -> unit
 
 (* Get json fields. Return Not_found if no fields or field missing *)
 val get_field: json -> string -> json
+
+val get_string_field : json -> string -> string
+val get_int_field : json -> string -> int
+val get_list_field : json -> string -> json list
+val get_float_field : json -> string -> float
+val get_bool_field : json -> string -> bool
 
 val get_string: json -> string
 val get_int: json -> int

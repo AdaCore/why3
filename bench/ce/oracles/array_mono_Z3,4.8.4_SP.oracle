@@ -14,19 +14,31 @@ File array_mono.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "elts",
+            "value":
+             {"type": "Array",
+              "val": [{"others": {"type": "Integer", "val": "1"}}]}},
+           {"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
   Line 35:
     a [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "elts",
+            "value":
+             {"type": "Array",
+              "val": [{"others": {"type": "Integer", "val": "1"}}]}},
+           {"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
   Line 36:
     a [@introduced] [@model_trace:a] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "elts",
+            "value":
+             {"type": "Array",
+              "val": [{"others": {"type": "Integer", "val": "1"}}]}},
+           {"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
 
 File "bench/ce/array_mono.mlw", line 41, characters 4-14:
 Sub-goal Index in array bounds of goal f2'vc.
@@ -39,14 +51,17 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File array_mono.mlw:
   Line 23:
-    a [@introduced] [@model_trace:a] =
+    a [@id:unused] [@introduced] [@model_trace:a] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "elts",
             "value":
              {"type": "Array",
-              "val": [{"others": {"type": "Integer", "val": "4"}}]}},
+              "val":
+               [{"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "42"}},
+                {"others": {"type": "Integer", "val": "3"}}]}},
            {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
   Line 25:
     a [@introduced] =
@@ -59,7 +74,9 @@ File array_mono.mlw:
               "val":
                [{"indice": {"type": "Integer", "val": "0"},
                  "value": {"type": "Integer", "val": "42"}},
-                {"others": {"type": "Integer", "val": "4"}}]}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "42"}},
+                {"others": {"type": "Integer", "val": "3"}}]}},
            {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
     old a [@at:'Old] [@at:'Old:loc:bench/ce/array_mono.mlw:25]
       [@at:'Old:loc:bench/ce/array_mono.mlw:26] [@introduced] =
@@ -69,7 +86,10 @@ File array_mono.mlw:
           [{"field": "elts",
             "value":
              {"type": "Array",
-              "val": [{"others": {"type": "Integer", "val": "4"}}]}},
+              "val":
+               [{"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "42"}},
+                {"others": {"type": "Integer", "val": "3"}}]}},
            {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
   Line 38:
     a [@at:'Old] [@at:'Old:loc:bench/ce/array_mono.mlw:25]
@@ -80,7 +100,10 @@ File array_mono.mlw:
           [{"field": "elts",
             "value":
              {"type": "Array",
-              "val": [{"others": {"type": "Integer", "val": "4"}}]}},
+              "val":
+               [{"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "42"}},
+                {"others": {"type": "Integer", "val": "3"}}]}},
            {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
   Line 40:
     a [@introduced] [@model_trace:a] =
@@ -93,7 +116,9 @@ File array_mono.mlw:
               "val":
                [{"indice": {"type": "Integer", "val": "0"},
                  "value": {"type": "Integer", "val": "42"}},
-                {"others": {"type": "Integer", "val": "4"}}]}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "42"}},
+                {"others": {"type": "Integer", "val": "3"}}]}},
            {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
   Line 41:
     a [@introduced] =
@@ -106,6 +131,8 @@ File array_mono.mlw:
               "val":
                [{"indice": {"type": "Integer", "val": "0"},
                  "value": {"type": "Integer", "val": "42"}},
-                {"others": {"type": "Integer", "val": "4"}}]}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "42"}},
+                {"others": {"type": "Integer", "val": "3"}}]}},
            {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
 

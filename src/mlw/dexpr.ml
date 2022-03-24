@@ -1002,9 +1002,9 @@ let effect_of_dspec dsp =
 (* TODO: add warnings for empty postconditions (anywhere)
     and empty exceptional postconditions (toplevel). *)
 let check_spec inr dsp ecty ({e_loc = loc} as e) =
+  let reg_submap wr1 wr2 = Mreg.submap (Util.const Spv.subset) wr1 wr2 in
   let bad_read  reff eff = not (Spv.subset reff.eff_reads  eff.eff_reads) in
-  let bad_write weff eff = not (Mreg.submap (fun _ s1 s2 -> Spv.subset s1 s2)
-                                           weff.eff_writes eff.eff_writes) in
+  let bad_write weff eff = not (reg_submap weff.eff_writes eff.eff_writes) in
   let bad_raise xeff eff = not (Sxs.subset xeff.eff_raises eff.eff_raises) in
   (* computed effect vs user effect *)
   let uwrl, ue = effect_of_dspec dsp in
@@ -1038,7 +1038,8 @@ let check_spec inr dsp ecty ({e_loc = loc} as e) =
       which@ is@ left@ out@ in@ the@ specification"
     Pretty.print_vs (Spv.choose (Spv.diff eeff.eff_reads ueff.eff_reads)).pv_vs;
   if check_rw && bad_write eeff ueff then
-    Loc.errorm ?loc:(e_locate_effect (fun eff -> bad_write eff ueff) e)
+    Loc.errorm ?loc:(e_locate_effect (fun eff -> not (reg_submap
+          (Mreg.set_inter eff.eff_writes eeff.eff_writes) ueff.eff_writes)) e)
       "this@ expression@ produces@ an@ unlisted@ write@ effect";
   if ecty.cty_args <> [] && bad_raise eeff ueff then Sxs.iter (fun xs ->
     Loc.errorm ?loc:(e_locate_effect (fun eff -> Sxs.mem xs eff.eff_raises) e)
@@ -1287,6 +1288,9 @@ let check_unused_vars_fun (bl: Ity.pvsymbol list) (dsp: dspec_final) eff_reads =
 
 (** Abstract values *)
 
+let attr_w_unmodified_var_no =
+  Ident.create_attribute "W:unmodified_variable:N"
+
 let cty_of_spec loc env bl mask dsp dity =
   let ity = ity_of_dity dity in
   let bl = binders env.ghs bl in
@@ -1304,12 +1308,14 @@ let cty_of_spec loc env bl mask dsp dity =
   check_unused_vars_fun bl dsp None;
   let cty = create_cty_defensive ~mask bl p q xq (get_oldies old) eff ity in
   (* Not useful in SPARK:
-   *  (\* check that oldies are affected by the writes *\)
-   * let check_affected _ pv =
-   *   if not (pv_affected cty.cty_effect.eff_writes pv) then Warning.emit ?loc
-   *     "variable %s is used under `old` but is not modified by the function"
-   *       pv.pv_vs.vs_name.id_string in
-   * Mpv.iter check_affected cty.cty_oldies; *)
+  (\* check that oldies are affected by the writes *\)
+  let check_affected _ pv =
+    if not (pv_affected cty.cty_effect.eff_writes pv) &&
+        not (Sattr.mem attr_w_unmodified_var_no pv.pv_vs.vs_name.id_attrs) then
+      Warning.emit ?loc
+      "variable %s is used under `old` but is not modified by the function"
+        pv.pv_vs.vs_name.id_string in
+  Mpv.iter check_affected cty.cty_oldies; *)
   ignore loc;
   cty
 

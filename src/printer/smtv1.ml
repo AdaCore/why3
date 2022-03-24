@@ -31,14 +31,14 @@ let ident_printer =
   create_ident_printer bls ~sanitizer:san
 
 let print_ident fmt id =
-  fprintf fmt "%s" (id_unique ident_printer id)
+  pp_print_string fmt (id_unique ident_printer id)
 
 let forget_var v = forget_id ident_printer v.vs_name
 
 let print_var fmt {vs_name = id} =
   let sanitize n = "?" ^ n in
   let n = id_unique ident_printer ~sanitizer:sanitize id in
-  fprintf fmt "%s" n
+  pp_print_string fmt n
 
 type info = {
   info_syn     : syntax_map;
@@ -55,7 +55,7 @@ let rec print_type info fmt ty = match ty.ty_node with
   | Tyapp (ts, l) ->
       begin match query_syntax info.info_syn ts.ts_name, l with
       | Some s, _ -> syntax_arguments s (print_type info) fmt l
-      | None, [] -> fprintf fmt "%a" print_ident ts.ts_name
+      | None, [] -> print_ident fmt ts.ts_name
       | None, _ ->
           begin match Mty.find_opt ty !(info.complex_type) with
           | Some ty -> print_type info fmt ty
@@ -85,7 +85,6 @@ let number_format = {
     Number.frac_real_support =
       `Custom
         ((fun fmt i -> fprintf fmt "%s.0" i),
-         (fun fmt i n -> fprintf fmt "(* %s.0 %s.0)" i n),
          (fun fmt i n -> fprintf fmt "(/ %s.0 %s.0)" i n));
   }
 
@@ -120,7 +119,7 @@ and print_fmla info fmt f = match f.t_node with
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
-          | [] -> fprintf fmt "%a" print_ident ls.ls_name
+          | [] -> print_ident fmt ls.ls_name
           | _ -> fprintf fmt "(%a@ %a)"
               print_ident ls.ls_name (print_list space (print_term info)) tl
         end end
@@ -149,9 +148,9 @@ and print_fmla info fmt f = match f.t_node with
   | Tnot f ->
       fprintf fmt "@[(not@ %a)@]" (print_fmla info) f
   | Ttrue ->
-      fprintf fmt "true"
+      pp_print_string fmt "true"
   | Tfalse ->
-      fprintf fmt "false"
+      pp_print_string fmt "false"
   | Tif (f1, f2, f3) ->
       fprintf fmt "@[(if_then_else %a@ %a@ %a)@]"
         (print_fmla info) f1 (print_fmla info) f2 (print_fmla info) f3

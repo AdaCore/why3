@@ -9,9 +9,9 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Format
-
 (** General functions for representations of numeric values *)
+
+open Format
 
 exception InvalidConstantLiteral of int * string
 
@@ -84,11 +84,8 @@ type integer_format =
 type real_format =
   Format.formatter -> string -> string -> string option -> unit
 
-type two_strings_format =
-  Format.formatter -> string -> string -> unit
-
 type frac_real_format =
-  (Format.formatter -> string -> unit) * two_strings_format * two_strings_format
+  (Format.formatter -> string -> unit) * (Format.formatter -> string -> string -> unit)
 
 type delayed_format =
   Format.formatter -> (Format.formatter -> unit) -> unit

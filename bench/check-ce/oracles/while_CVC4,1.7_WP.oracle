@@ -1,10 +1,10 @@
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.04s, 1286 steps).
+Prover result is: Valid (0.05s, 1286 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Sub-goal Loop variant decrease of goal f'vc.
-Prover result is: Valid (0.02s, 1670 steps).
+Prover result is: Valid (0.01s, 1670 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>Checking model:
@@ -77,12 +77,15 @@ Prover result is: Valid (0.02s, 1670 steps).
                                                                     0}
 <rac-values>Value from model for variable `x1` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
                                                                     (-2)}
-<rac-values>No value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161
+<rac-values>Type default value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+                                                                    0}
+<rac-values>Value from model for variable `i` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+                                                                    0}
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `z` at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<check-ce>Result of checking model 0: INCOMPLETE
+<check-ce>Result of checking model 0: SW
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -172,8 +175,67 @@ Prover result is: Valid (0.02s, 1670 steps).
                     _ = 2
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
-              
+            - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/while.mlw", line 10, characters 16-32)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File while.mlw:
+                Line 4:
+                  z = 0
+                  z = 0
+                  Execution of main function `f` with env:
+                    z = 0
+                    zero = 0
+                    one = 1
+                Line 5:
+                  Giant-step execution of function `ref` with args:
+                    contents = 0
+                  result of `ref` = {contents= 0}
+                Line 6:
+                  Giant-step execution of function `ref` with args:
+                    contents = 0
+                  result of `ref` = {contents= 0}
+                Line 7:
+                  Giant-step execution of function `ref` with args:
+                    contents = 0
+                  result of `ref` = {contents= 0}
+                Line 8:
+                  Giant-step iteration of loop
+                  x1 = {contents= (-2)}
+                  x2 = {contents= 0}
+                  i = {contents= 0}
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 0}
+                  Normal execution of function `(<)` with args:
+                    _ = 0
+                    _ = 2
+                  Normal iteration of loop
+                Line 11:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 0}
+                  Normal execution of function `(=)` with args:
+                    x = 0
+                    y = 0
+                Line 12:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= (-2)}
+                  Normal execution of function `(+)` with args:
+                    _ = (-2)
+                    _ = 1
+                Line 15:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 0}
+                  Normal execution of function `(+)` with args:
+                    _ = 0
+                    _ = 1
+                Line 10:
+                  Property failure at loop invariant preservation with:
+                    x1 = {contents= (-1)}
+                    i = {contents= 1}
 <check-ce>Check model 1 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>Checking model:
           File while.mlw:
@@ -245,12 +307,15 @@ Prover result is: Valid (0.02s, 1670 steps).
                                                                     0}
 <rac-values>Value from model for variable `x1` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
                                                                     (-2)}
-<rac-values>No value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161
+<rac-values>Type default value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+                                                                    0}
+<rac-values>Value from model for variable `i` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+                                                                    0}
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `z` at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<check-ce>Result of checking model 1: INCOMPLETE
+<check-ce>Result of checking model 1: SW
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -340,40 +405,143 @@ Prover result is: Valid (0.02s, 1670 steps).
                     _ = 2
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
-              
+            - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/while.mlw", line 10, characters 16-32)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File while.mlw:
+                Line 4:
+                  z = 0
+                  z = 0
+                  Execution of main function `f` with env:
+                    z = 0
+                    zero = 0
+                    one = 1
+                Line 5:
+                  Giant-step execution of function `ref` with args:
+                    contents = 0
+                  result of `ref` = {contents= 0}
+                Line 6:
+                  Giant-step execution of function `ref` with args:
+                    contents = 0
+                  result of `ref` = {contents= 0}
+                Line 7:
+                  Giant-step execution of function `ref` with args:
+                    contents = 0
+                  result of `ref` = {contents= 0}
+                Line 8:
+                  Giant-step iteration of loop
+                  x1 = {contents= (-2)}
+                  x2 = {contents= 0}
+                  i = {contents= 0}
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 0}
+                  Normal execution of function `(<)` with args:
+                    _ = 0
+                    _ = 2
+                  Normal iteration of loop
+                Line 11:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 0}
+                  Normal execution of function `(=)` with args:
+                    x = 0
+                    y = 0
+                Line 12:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= (-2)}
+                  Normal execution of function `(+)` with args:
+                    _ = (-2)
+                    _ = 1
+                Line 15:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 0}
+                  Normal execution of function `(+)` with args:
+                    _ = 0
+                    _ = 1
+                Line 10:
+                  Property failure at loop invariant preservation with:
+                    x1 = {contents= (-1)}
+                    i = {contents= 1}
 <check-ce-summary>Results:
-- Checked model 0: INCOMPLETE
+- Selected model 0: SW
   - Concrete RAC: NORMAL
-  - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
-- Selected model 1: INCOMPLETE
+  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/while.mlw", line 10, characters 16-32)
+- Checked model 1: SW
   - Concrete RAC: NORMAL
-  - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
+  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/while.mlw", line 10, characters 16-32)
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6748 steps).
-The following counterexample model could not be verified
-  (abstract RAC terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161):
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6748 steps).
+The contracts of some function or loop are too weak, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
 File while.mlw:
   Line 4:
     z = 0
+    z = 0
+    Execution of main function `f` with env:
+      z = 0
+      zero = 0
+      one = 1
+  Line 5:
+    Giant-step execution of function `ref` with args:
+      contents = 0
+    result of `ref` = {contents= 0}
+  Line 6:
+    Giant-step execution of function `ref` with args:
+      contents = 0
+    result of `ref` = {contents= 0}
+  Line 7:
+    Giant-step execution of function `ref` with args:
+      contents = 0
+    result of `ref` = {contents= 0}
   Line 8:
-    [before iteration] i = 0
-    [current iteration] i = 0
-    [before iteration] x1 = -2
-  Line 10:
-    [current iteration] i = 1
-    [current iteration] x1 = -1
+    Giant-step iteration of loop
+    x1 = {contents= (-2)}
+    x2 = {contents= 0}
+    i = {contents= 0}
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+    Normal execution of function `(<)` with args:
+      _ = 0
+      _ = 2
+    Normal iteration of loop
   Line 11:
-    result of call at line 11, characters 7-12 = true
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+    Normal execution of function `(=)` with args:
+      x = 0
+      y = 0
   Line 12:
-    [current iteration] x1 = -1
+    Normal execution of function `contents` with args:
+      arg = {contents= (-2)}
+    Normal execution of function `(+)` with args:
+      _ = (-2)
+      _ = 1
   Line 15:
-    [current iteration] i = 1
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = 1
+  Line 10:
+    Property failure at loop invariant preservation with:
+      x1 = {contents= (-1)}
+      i = {contents= 1}
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Sub-goal Loop variant decrease of goal f'vc.
-Prover result is: Valid (0.01s, 1713 steps).
+Prover result is: Valid (0.02s, 1713 steps).
 
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Sub-goal Loop invariant preservation of goal f'vc.

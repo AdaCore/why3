@@ -31,18 +31,18 @@ let pr_printer =
 
 let print_symbol fmt id =
   let san = Strings.uncapitalize in
-  fprintf fmt "%s" (id_unique ~sanitizer:san ident_printer id)
+  pp_print_string fmt (id_unique ~sanitizer:san ident_printer id)
 
 let print_tvar fmt {tv_name = id} =
   let san = Strings.capitalize in
-  fprintf fmt "%s" (id_unique ~sanitizer:san ident_printer id)
+  pp_print_string fmt (id_unique ~sanitizer:san ident_printer id)
 
 let print_var fmt {vs_name = id} =
   let san = Strings.capitalize in
-  fprintf fmt "%s" (id_unique ~sanitizer:san ident_printer id)
+  pp_print_string fmt (id_unique ~sanitizer:san ident_printer id)
 
 let print_pr fmt pr =
-  fprintf fmt "%s" (id_unique pr_printer pr.pr_name)
+  pp_print_string fmt (id_unique pr_printer pr.pr_name)
 
 let forget_var v = forget_id ident_printer v.vs_name
 let forget_tvar v = forget_id ident_printer v.tv_name
@@ -104,7 +104,6 @@ let number_format = {
     Number.frac_real_support =
       `Custom
         ((fun fmt i -> fprintf fmt "$to_real(%s)" i),
-         (fun fmt i n -> fprintf fmt "$product($to_real(%s),$to_real(%s))" i n),
          (fun fmt i n -> fprintf fmt "$quotient($to_real(%s),$to_real(%s))" i n));
 }
 
@@ -113,7 +112,6 @@ let number_format_metitarski = {
     Number.frac_real_support =
       `Custom
         ((fun fmt i -> pp_print_string fmt i),
-         (fun fmt i n -> fprintf fmt "(%s * %s)" i n),
          (fun fmt i n -> fprintf fmt "(%s / %s)" i n));
   }
 
@@ -170,14 +168,14 @@ and print_fmla info fmt f = match f.t_node with
   | Tnot f ->
       fprintf fmt "~@ %a" (print_fmla info) f
   | Ttrue ->
-      fprintf fmt "$true"
+      pp_print_string fmt "$true"
   | Tfalse ->
-      fprintf fmt "$false"
+      pp_print_string fmt "$false"
   | Tquant (q, fq) ->
       let q = match q with Tforall -> "!" | Texists -> "?" in
       let vl, _tl, f = t_open_quant fq in
       let print_vsty fmt vs =
-        if info.info_fmt = FOF then fprintf fmt "%a" print_var vs
+        if info.info_fmt = FOF then print_var fmt vs
         else fprintf fmt "%a:@,%a" print_var vs (print_type info) vs.vs_ty in
       fprintf fmt "%s[%a]:@ %a" q
         (print_list comma print_vsty) vl (print_fmla info) f;
@@ -211,9 +209,9 @@ let print_decl info fmt d = match d.d_node with
   | Dtype { ts_args = _::_ } when info.info_fmt = TFF0 -> ()
   | Dtype ts when query_syntax info.info_syn ts.ts_name <> None -> ()
   | Dtype ts ->
-      let print_arg fmt _ = fprintf fmt "$tType" in
+      let print_arg fmt _ = pp_print_string fmt "$tType" in
       let print_sig fmt ts = match ts.ts_args with
-        | [] -> fprintf fmt "$tType"
+        | [] -> pp_print_string fmt "$tType"
         | [_] -> fprintf fmt "$tType >@ $tType"
         | tl -> fprintf fmt "(%a) >@ $tType" (print_list star print_arg) tl
       in
@@ -409,9 +407,9 @@ let rec print_fmla info fmt f = match f.t_node with
   | Tnot f ->
       fprintf fmt "not(%a)" (print_fmla info) f
   | Ttrue ->
-      fprintf fmt "true"
+      pp_print_string fmt "true"
   | Tfalse ->
-      fprintf fmt "false"
+      pp_print_string fmt "false"
   | Tquant (q, fq) ->
       let q = match q with Tforall -> "forall" | Texists -> "exists" in
       let vl, _tl, f = t_open_quant fq in

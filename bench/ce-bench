@@ -2,6 +2,17 @@
 
 dir=`dirname $0`
 
+is_xfail() {
+    case "$1" in
+        # "jlamp0_mono")
+        #     return 0
+        #     ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
 updateoracle=false
 suffix=.opt
 files=""
@@ -33,6 +44,8 @@ done
 if test "$files" = "" ; then
     files="$dir/ce/*.mlw"
 fi
+
+failed=""
 
 colorize() {
     if command -v pygmentize &> /dev/null; then
@@ -68,7 +81,7 @@ run () {
     else
         prover="$1,counterexamples"
     fi
-    $dir/../bin/why3"$suffix" prove -a split_vc -P $prover --stepslimit=$steps  \
+    $dir/../bin/why3"$suffix" prove -a split_vc -P $prover --stepslimit=$steps --timelimit=0 \
             "${file_path}.mlw" --json-model-values --debug=print_model_attrs${wp_sp} | \
         sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" | \
         # This ad hoc sed removes any timing information from counterexamples output.
@@ -89,15 +102,20 @@ run () {
         if [ "$str_oracle" = "$str_out" ] ; then
             echo "ok"
         else
-            echo "FAILED!"
-            # echo "Oracle is ${str_oracle}"
-            # echo "Output is ${str_out}"
-	    echo "diff is the following:"
-	    echo "$f"
-	    echo diff -u "${oracle_file}" "$f.out"
-	    diff -u "${oracle_file}" "$f.out"|colorize
-	    success=false
-	fi
+            if is_xfail "$3"; then
+                echo "XFAILED."
+            else
+                echo "FAILED!"
+                # echo "Oracle is ${str_oracle}"
+                # echo "Output is ${str_out}"
+                echo "diff is the following:"
+                echo "$f"
+                echo diff -u "${oracle_file}" "$f.out"
+                diff -u "${oracle_file}" "$f.out"|colorize
+	              failed="$failed$f\n"
+                success=false
+            fi
+        fi
     fi
 }
 
@@ -105,13 +123,37 @@ for file in $files; do
     filedir=`dirname $file`
     filebase=`basename $file .mlw`
     printf "Running provers on $filedir/$filebase.mlw\n";
-    run CVC4,1.7 $filedir $filebase true  150000
-    run CVC4,1.7 $filedir $filebase false 150000
-    run Z3,4.8.4 $filedir $filebase true  7500000
-    run Z3,4.8.4 $filedir $filebase false 7500000
+    cvc4steps=150000
+    case "$filebase" in
+      "bv32")
+        z3steps=2500000
+        ;;
+      "int_overflow")
+        z3steps=400000
+        ;;
+      "floats")
+        z3steps=400000
+        ;;
+      "strings")
+        z3steps=3000
+        ;;
+      "threshold")
+        z3steps=2500000
+        ;;
+      *)
+        z3steps=7500000
+        ;;
+    esac
+    run CVC4,1.7 $filedir $filebase true  $cvc4steps
+    run CVC4,1.7 $filedir $filebase false $cvc4steps
+    run Z3,4.8.10 $filedir $filebase true  $z3steps
+    run Z3,4.8.10 $filedir $filebase false $z3steps
 done
-if $success; then
+
+if [ "$success" = true ]; then
+    echo "ce-bench: success"
     exit 0
 else
+    printf "\nce-bench: failed for the following files\n$failed\n"
     exit 1
 fi

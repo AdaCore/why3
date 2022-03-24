@@ -1,3 +1,14 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
+
 open Format
 open Ident
 open Ty
@@ -218,10 +229,15 @@ module Why = struct
     why_prover        : why_prover option;
     oracle_quant_var  : oracle_quant_var;
     elim_eps          : Task.task Trans.trans;
+    libdir            : string;
+    datadir           : string;
   }
 
-  let mk_config ?(metas=[]) ?trans ?why_prover ?(oracle_quant_var=oracle_quant_var_dummy) ~elim_eps () =
-    {metas; trans; why_prover; oracle_quant_var; elim_eps}
+  let mk_config ?(metas=[]) ?trans ?why_prover ?(oracle_quant_var=oracle_quant_var_dummy) ~elim_eps whyconfig =
+    let main = Whyconf.get_main whyconfig in
+    let libdir = Whyconf.libdir main in
+    let datadir = Whyconf.datadir main in
+    {metas; trans; why_prover; oracle_quant_var; elim_eps; libdir; datadir}
 
   let mk_meta_lit (meta, s) =
     let open Theory in
@@ -255,7 +271,7 @@ module Why = struct
         mk_why_prover ~command driver limit in
       Opt.map aux why_prover_lit in
     let elim_eps = Trans.lookup_transform "eliminate_epsilon" env in
-    mk_config ~metas ?trans ?why_prover ?oracle_quant_var ~elim_eps ()
+    mk_config ~metas ?trans ?why_prover ?oracle_quant_var ~elim_eps config
 
   (******************************************************************************)
   (*                                CHECK TERM                                  *)
@@ -348,9 +364,13 @@ module Why = struct
           None )
 
   (** Check the validiy of a term that has been encoded in a task by dispatching it to a prover *)
-  let check_term_dispatch {command; driver; limit} task =
+  let check_term_dispatch {command; driver; limit} cnf task =
     let open Call_provers in
-    let call = Driver.prove_task ~command ~limit driver task in
+    let call =
+      Driver.prove_task
+        ~command ~libdir:cnf.libdir ~datadir:cnf.datadir
+        ~limit driver task
+    in
     let res = wait_on_call call in
     Debug.dprintf debug_rac_check_sat "@[<h>Check term dispatch answer: %a@]@."
       print_prover_answer res.pr_answer;
@@ -367,12 +387,12 @@ module Why = struct
         add_prop_decl task Decl.Pgoal p (t_not t)
     | _ -> failwith "negate_goal"
 
-  let check_term_dispatch ~try_negate rp task =
-    match check_term_dispatch rp task with
+  let check_term_dispatch ~try_negate rp cnf task =
+    match check_term_dispatch rp cnf task with
     | None when try_negate ->
         Debug.dprintf debug_rac_check_sat "Try negation.@.";
         let task = negate_goal task in
-        let res = check_term_dispatch rp task in
+        let res = check_term_dispatch rp cnf task in
         Opt.map (fun b -> not b) res
     | r -> r
 
@@ -417,7 +437,8 @@ module Why = struct
       if res = None then (* ... then try solving using a prover *)
         Opt.map (fun b -> Debug.dprintf debug_rac_check_sat "Dispatched: %b.@." b; b)
           (Opt.bind cnf.why_prover
-             (fun rp -> check_term_dispatch ~try_negate:true rp task))
+             (fun rp ->
+               check_term_dispatch ~try_negate:true rp cnf task))
       else res in
     let task_filename = match Sys.getenv_opt "WHY3RACTASKDIR" with
       | Some temp_dir when Debug.test_flag debug_rac_check_term_result ->
@@ -444,8 +465,9 @@ module Why = struct
           report_cntr_head (ctx, msg, t) pp_task_filename;
         incomplete "%a" report_cntr_title (ctx, msg)
 
-  let mk_check_term ?metas ?trans ?why_prover ?oracle_quant_var ~elim_eps () =
-    check_term (mk_config ?metas ?trans ?why_prover ?oracle_quant_var ~elim_eps ())
+  let mk_check_term
+        ?metas ?trans ?why_prover ?oracle_quant_var ~config ~elim_eps () =
+    check_term (mk_config ?metas ?trans ?why_prover ?oracle_quant_var ~elim_eps config)
 
   let mk_check_term_lit cnf env ?metas ?(trans="compute_in_goal") ?why_prover ?oracle_quant_var () =
     check_term (mk_config_lit cnf env ?metas ~trans ?why_prover ?oracle_quant_var ())

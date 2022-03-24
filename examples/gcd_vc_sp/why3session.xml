@@ -4,11 +4,9 @@
 <why3session shape_version="6">
 <prover id="1" name="Coq" version="8.9.1" timelimit="0" steplimit="0" memlimit="0"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Spass" version="3.7" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="7" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="gcd_vc_sp.mlw"/>
 <theory name="EuclideanAlgorithm" proved="true">
@@ -82,7 +80,7 @@
   <proof prover="2"><result status="valid" time="0.04" steps="16842"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.04" steps="16708"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="16708"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.11" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="13494"/></proof>
@@ -91,7 +89,7 @@
   <proof prover="2"><result status="valid" time="0.02" steps="13515"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.13" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.06" steps="16830"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="16830"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.14" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.04" steps="16700"/></proof>
@@ -100,10 +98,10 @@
   <proof prover="2"><result status="valid" time="0.02" steps="13519"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.16" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.05" steps="16618"/></proof>
+  <proof prover="2"><result status="valid" time="0.06" steps="16618"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.17" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="16453"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="16453"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.18" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -111,35 +109,19 @@
    <proof prover="5"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="binary_gcd&#39;vc.18.1" expl="postcondition" proved="true">
-   <transf name="split_vc" proved="true" >
-    <goal name="binary_gcd&#39;vc.18.1.0" expl="postcondition" proved="true">
-    <proof prover="5"><result status="valid" time="0.01"/></proof>
-    </goal>
-    <goal name="binary_gcd&#39;vc.18.1.1" expl="postcondition" proved="true">
-    <transf name="split_vc" proved="true" >
-     <goal name="binary_gcd&#39;vc.18.1.1.0" expl="postcondition" proved="true">
-     <transf name="split_vc" proved="true" >
-      <goal name="binary_gcd&#39;vc.18.1.1.0.0" expl="postcondition" proved="true">
-      <proof prover="7"><result status="valid" time="0.08" steps="17913"/></proof>
-      </goal>
-      <goal name="binary_gcd&#39;vc.18.1.1.0.1" expl="postcondition" proved="true">
-      <proof prover="6"><result status="valid" time="0.03" steps="52391"/></proof>
-      </goal>
-     </transf>
-     </goal>
-     <goal name="binary_gcd&#39;vc.18.1.1.1" expl="postcondition" proved="true">
-     <transf name="split_vc" proved="true" >
-      <goal name="binary_gcd&#39;vc.18.1.1.1.0" expl="postcondition" proved="true">
-      <proof prover="3"><result status="valid" time="0.86"/></proof>
-      </goal>
-      <goal name="binary_gcd&#39;vc.18.1.1.1.1" expl="postcondition" proved="true">
-      <proof prover="5"><result status="valid" time="0.81"/></proof>
-      </goal>
-     </transf>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
+   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="binary_gcd&#39;vc.18.2" expl="postcondition" proved="true">
+   <proof prover="4" timelimit="5"><result status="valid" time="0.17" steps="100"/></proof>
+   </goal>
+   <goal name="binary_gcd&#39;vc.18.3" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.75"/></proof>
+   </goal>
+   <goal name="binary_gcd&#39;vc.18.4" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.77"/></proof>
+   </goal>
+   <goal name="binary_gcd&#39;vc.18.5" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.56"/></proof>
    </goal>
   </transf>
   </goal>

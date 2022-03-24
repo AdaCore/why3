@@ -1,118 +1,118 @@
 Weakest Precondition
-File "bench/ce/threshold.mlw", line 10, characters 11-20:
+File "bench/ce/threshold.mlw", line 11, characters 11-20:
 Sub-goal Integer overflow of goal f'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File threshold.mlw:
-  Line 7:
+  Line 8:
     max [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "2"}}
     min [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
-  Line 10:
+       "value": {"type": "Integer", "val": "2147483647"}}
+  Line 11:
     max [@introduced] [@model_trace:max] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "2"}}
     min [@introduced] [@model_trace:min] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "2147483647"}}
 
-File "bench/ce/threshold.mlw", line 8, characters 13-33:
+File "bench/ce/threshold.mlw", line 9, characters 13-33:
 Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File threshold.mlw:
-  Line 7:
+  Line 8:
     max [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "-165"}}
     min [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "1"}}
+       "value": {"type": "Integer", "val": "0"}}
     n [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
        "value": {"type": "Integer", "val": "0"}}
-  Line 8:
+  Line 9:
     max [@introduced] [@model_trace:max] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "-165"}}
     min [@introduced] [@model_trace:min] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "1"}}
+       "value": {"type": "Integer", "val": "0"}}
     result [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "1"}}
-  Line 10:
+       "value": {"type": "Integer", "val": "-165"}}
+  Line 11:
     _x [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "1"}}
-    result of call at line 10, characters 11-20 [@call_result:10:11:20:bench/ce/threshold.mlw]
-      [@introduced] [@model_trace:result] =
+       "value": {"type": "Integer", "val": "-165"}}
+    result of call at line 11, characters 11-20 [@call_result:11:11:20:bench/ce/threshold.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "1"}}
+       "value": {"type": "Integer", "val": "-165"}}
     result [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "1"}}
-  Line 11:
-    result of call at line 11, characters 5-12 [@call_result:11:5:12:bench/ce/threshold.mlw]
-      [@introduced] [@model_trace:result] =
-      {"type": "Boolean", "val": true}
+       "value": {"type": "Integer", "val": "-165"}}
+  Line 12:
+    result of call at line 12, characters 5-12 [@call_result:12:5:12:bench/ce/threshold.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": false}
 
-File "bench/ce/threshold.mlw", line 25, characters 11-29:
+File "bench/ce/threshold.mlw", line 30, characters 11-24:
 Sub-goal Arithmetic overflow of goal f'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File threshold.mlw:
-  Line 21:
-    max [@introduced] = {"type": "Integer", "val": "2952783303"}
-    min [@introduced] = {"type": "Integer", "val": "4260098813"}
-  Line 25:
+  Line 26:
+    max [@introduced] = {"type": "Integer", "val": "2147495941"}
+    min [@introduced] = {"type": "Integer", "val": "2147483651"}
+  Line 30:
     max [@introduced] [@model_trace:max] =
-      {"type": "Integer", "val": "2952783303"}
+      {"type": "Integer", "val": "2147495941"}
     min [@introduced] [@model_trace:min] =
-      {"type": "Integer", "val": "4260098813"}
+      {"type": "Integer", "val": "2147483651"}
 
-File "bench/ce/threshold.mlw", line 22, characters 13-45:
+File "bench/ce/threshold.mlw", line 27, characters 13-45:
 Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File threshold.mlw:
-  Line 21:
+  Line 26:
     max [@introduced] = {"type": "Integer", "val": "0"}
     min [@introduced] = {"type": "Integer", "val": "1439883"}
     n [@introduced] = {"type": "Integer", "val": "1"}
-  Line 22:
+  Line 27:
     max [@introduced] [@model_trace:max] = {"type": "Integer", "val": "0"}
     min [@introduced] [@model_trace:min] =
       {"type": "Integer", "val": "1439883"}
     result [@introduced] = {"type": "Integer", "val": "1439883"}
-  Line 25:
+  Line 30:
     _x [@introduced] = {"type": "Integer", "val": "1439883"}
-    result of call at line 25, characters 11-29 [@call_result:25:11:29:bench/ce/threshold.mlw]
-      [@introduced] [@model_trace:result] =
+    result of call at line 30, characters 11-24 [@call_result:30:11:24:bench/ce/threshold.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Integer", "val": "1439883"}
     result [@introduced] = {"type": "Integer", "val": "1439883"}
-  Line 26:
-    result of call at line 26, characters 5-20 [@call_result:26:5:20:bench/ce/threshold.mlw]
-      [@introduced] [@model_trace:result] =
+  Line 31:
+    result of call at line 31, characters 5-15 [@call_result:31:5:15:bench/ce/threshold.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Boolean", "val": true}
 

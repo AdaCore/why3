@@ -35,6 +35,15 @@ Definition contents {a:Type} {a_WT:WhyType a} (v:ref a) : a :=
   | ref'mk x => x
   end.
 
+Parameter if_term: Numbers.BinNums.Z -> Init.Datatypes.bool.
+
+Axiom if_term'def :
+  forall (o:Numbers.BinNums.Z),
+  ((o = 0%Z) -> ((if_term o) = Init.Datatypes.true)) /\
+  (~ (o = 0%Z) -> ((if_term o) = Init.Datatypes.false)).
+
+Require Import Lia.
+
 (* Why3 goal *)
 Theorem search_loop'vc :
   forall (l:Init.Datatypes.list Numbers.BinNums.Z),
@@ -59,6 +68,8 @@ Theorem search_loop'vc :
   forall (s1:Init.Datatypes.list Numbers.BinNums.Z), (s1 = o1) ->
   forall (j:Numbers.BinNums.Z), (0%Z <= j)%Z /\ (j < i1)%Z ->
   ~ ((list.Nth.nth j l) = (Init.Datatypes.Some 0%Z)).
+(* Why3 intros l s i (h1,(h2,(h3,h4))) h5 o h6 h7 i1 h8 o1 h9 s1 h10 j
+        (h11,h12). *)
 Proof.
 intros l s i (h1,(h2,(h3,h4))) h5 o h6 h7 i1 h8 o1 h9 s1 h10 j (h11,h12).
 subst.
@@ -66,10 +77,10 @@ destruct s.
 easy.
 injection h9. clear h9.
 intros ->.
-assert (h: (j < i \/ j= i)%Z) by omega; destruct h as [h| ->].
+assert (h: (j < i \/ j= i)%Z) by lia; destruct h as [h| ->].
 now apply h4.
 destruct h6 as [[_ [x [H5 [[_ H6]|[H6 _]]]]]|[H _]] ; try easy.
-specialize (h3 0%Z (Zle_refl 0)).
+specialize (h3 0%Z (Z.le_refl 0)).
 rewrite Zplus_0_r in h3.
 rewrite <- h3.
 simpl.

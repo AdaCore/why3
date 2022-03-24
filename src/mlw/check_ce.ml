@@ -71,11 +71,6 @@ type classification = verdict * Log.exec_log
 let print_classification_log_or_model ?verb_lvl ?json ~print_attrs
     fmt (model, (c, log)) =
   let open Json_base in
-  let print_model_field =
-    print_json_field "model"
-      (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int) in
-  let print_log_field =
-    print_json_field "log" (Log.print_log ?verb_lvl ~json:true) in
   match json with
   | None | Some `Values -> (
       match c with
@@ -91,10 +86,9 @@ let print_classification_log_or_model ?verb_lvl ?json ~print_attrs
   | Some `All -> (
       match c with
       | NC | SW | NC_SW ->
-          fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-            print_model_field model print_log_field log
+          print_json fmt (Record ["model", json_model model; "log", Log.json_log log])
       | INCOMPLETE _ ->
-          fprintf fmt "@[@[<hv1>{%a@]}@]" print_model_field model
+          print_json fmt (Record ["model", json_model model])
       | BAD_CE _ -> ()
     )
 
@@ -113,7 +107,7 @@ let string_of_rac_result_state = function
 type rac_result = rac_result_state * Log.exec_log
 
 let print_rac_result_state fmt = function
-  | Res_normal -> fprintf fmt "NORMAL"
+  | Res_normal -> pp_print_string fmt "NORMAL"
   | Res_fail (ctx, t) ->
       fprintf fmt "FAILURE (%a at %a)"
         Vc.print_expl ctx.attr
@@ -139,7 +133,9 @@ let is_vc_term ~vc_term_loc ~vc_term_attrs ctx t =
         | Tquant (_, tq) -> let _,_,t = t_open_quant tq in has_vc_term_loc t
         | Tlet (_, tb) -> let _,t = t_open_bound tb in has_vc_term_loc t
         | _ -> false in
-      Sattr.mem ctx.attr vc_term_attrs &&
+      (* FIXME: this check is too strong, because the user may have added their own
+         "expl:..." attribute *)
+      (Sattr.mem ctx.attr vc_term_attrs || true ) &&
       match ctx.loc with
       | Some loc -> Loc.equal loc vc_term_loc
       | None -> has_vc_term_loc t
@@ -194,7 +190,7 @@ let print_model_classification ?verb_lvl ?json ?check_ce fmt (m, c) =
        | NC | SW | NC_SW ->
            fprintf fmt ",@ for@ example@ during@ the@ following@ execution:"
        | INCOMPLETE _ ->
-           fprintf fmt ":"
+           pp_print_string fmt ":"
        | _ -> ());
   let print_attrs = Debug.test_flag Call_provers.debug_attrs in
   fprintf fmt "@ %a"
@@ -249,7 +245,7 @@ let rec import_model_value loc env check known th_known ity v =
   let def = Pdecl.find_its_defn known ts in
   let res = match v with
       | Const c -> import_model_const loc env ity c
-      | Var _ -> undefined_value ity
+      | Var _ -> undefined_value env ity
       | Record r ->
           let rs = match def.Pdecl.itd_constructors with [rs] -> rs | _ ->
             cannot_import "type with not exactly one constructors %a/%d"
@@ -260,8 +256,8 @@ let rec import_model_value loc env check known th_known ity v =
             match List.assoc field_name r with
             | v -> import_model_value loc env check known th_known field_ity v
             | exception Not_found ->
-                (* TODO Better create a default value? Requires an [Env.env]. *)
-                undefined_value field_ity in
+                (* TODO Better create a default value? *)
+                undefined_value env field_ity in
           let vs = List.map aux def.Pdecl.itd_fields in
           constr_value ity rs def.Pdecl.itd_fields vs
       | Apply (s, vs) ->
@@ -315,7 +311,7 @@ let rec import_model_value loc env check known th_known ity v =
               a.arr_others in
           purefun_value ~result_ity:ity ~arg_ity:key_ity mv v0
       | Unparsed s -> cannot_import "unparsed value %s" s
-      | Undefined -> undefined_value ity in
+      | Undefined -> undefined_value env ity in
   check ity res;
   res
 
