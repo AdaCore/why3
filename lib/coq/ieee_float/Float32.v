@@ -291,12 +291,11 @@ Proof.
 Defined.
 
 Lemma max_real_cst :
-  max_real 8 24 = (33554430 * 10141204801825835211973625643008)%R.
+  max_real 8 24 = 340282346638528859811704183484516925440%R.
 Proof.
-  change (33554430 * 10141204801825835211973625643008)%R
-    with (F2R (Float radix2 (16777215 * Zpower radix2 (104 - 103)) 103)).
-  rewrite <- F2R_change_exp by easy.
-  now rewrite <- max_real_is_F2R.
+  rewrite <- max_real_is_F2R.
+  change (F2R (Float radix2 _ _)) with (IZR 16777215 * IZR (Zpower 2 104))%R.
+  now rewrite <- mult_IZR.
 Qed.
 
 (* Why3 goal *)
@@ -307,16 +306,16 @@ Defined.
 
 (* Why3 goal *)
 Lemma max_real_int :
-  ((33554430 * 10141204801825835211973625643008)%R = (BuiltIn.IZR max_int)).
+  (340282346638528859811704183484516925440%R = (BuiltIn.IZR max_int)).
 Proof.
   unfold max_int.
-  now rewrite mult_IZR.
+  now apply IZR_eq.
 Qed.
 
 (* Why3 assumption *)
 Definition in_range (x:Reals.Rdefinitions.R) : Prop :=
-  ((-(33554430 * 10141204801825835211973625643008)%R)%R <= x)%R /\
-  (x <= (33554430 * 10141204801825835211973625643008)%R)%R.
+  ((-340282346638528859811704183484516925440%R)%R <= x)%R /\
+  (x <= 340282346638528859811704183484516925440%R)%R.
 
 (* Why3 assumption *)
 Definition in_int_range (i:Numbers.BinNums.Z) : Prop :=
@@ -635,20 +634,20 @@ Definition overflow_value (m:ieee_float.RoundingMode.mode) (x:t) : Prop :=
   | ieee_float.RoundingMode.RTN =>
       (is_positive x ->
        t'isFinite x /\
-       ((t'real x) = (33554430 * 10141204801825835211973625643008)%R)) /\
+       ((t'real x) = 340282346638528859811704183484516925440%R)) /\
       (~ is_positive x -> is_infinite x)
   | ieee_float.RoundingMode.RTP =>
       (is_positive x -> is_infinite x) /\
       (~ is_positive x ->
        t'isFinite x /\
-       ((t'real x) = (-(33554430 * 10141204801825835211973625643008)%R)%R))
+       ((t'real x) = (-340282346638528859811704183484516925440%R)%R))
   | ieee_float.RoundingMode.RTZ =>
       (is_positive x ->
        t'isFinite x /\
-       ((t'real x) = (33554430 * 10141204801825835211973625643008)%R)) /\
+       ((t'real x) = 340282346638528859811704183484516925440%R)) /\
       (~ is_positive x ->
        t'isFinite x /\
-       ((t'real x) = (-(33554430 * 10141204801825835211973625643008)%R)%R))
+       ((t'real x) = (-340282346638528859811704183484516925440%R)%R))
   | ieee_float.RoundingMode.RNA|ieee_float.RoundingMode.RNE => is_infinite x
   end.
 

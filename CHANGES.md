@@ -2,39 +2,52 @@
 
 Standard library
   * deeply revised library `mach.bv` for bitvectors operations in
-    programs with many renamings. Pre- and post-conditions are not
-    expressed both in terms of mathematical integers and in terms of
-    purely bit-vector formulas, thanks to conversion to 128 bits :x:
+    programs. Pre- and post-conditions are now expressed both in terms
+    of mathematical integers and in terms of purely bit-vector
+    formulas, thanks to conversion to 128 bits :x:
 
-API
-  * improved documentation of [Ptree]
+Core
+  * equality of numeric literals is now semantic, i.e., independent of the radix :x:
 
-Python front-end
-  * added break and continue
-  * added range with one, two or three argument(s)
-  * added slice (`list[i1:i2]`)
-  * added negative index (`list[n], with -len(list) ≤ n < len(list)`)
-  * added lists methods:
-    * `list.append(n)`
-    * `list.pop()`
-    * `list.clear()`
-    * `list.sort()`
-    * `list.reverse()`
+WhyML language
+  * generalized witness expressions for type invariants
+
+Python language
+  * added `break` and `continue`
+  * added range with one, two, or three arguments
+  * added slice, i.e., `list[i1:i2]`
+  * added negative index, i.e., `list[n]` with `-len(list) ≤ n < len(list)`
+  * added list methods:
+      - `list.append(n)`
+      - `list.pop()`
+      - `list.clear()`
+      - `list.sort()`
+      - `list.reverse()`
   * added `is_permutation(list1, list2)` predicate
   * added assignment operators `+=`, `-=`, `*=`, `//=`, `%=`
   * functions can now return `bool` and `list`
 
-TryWhy3
-  * graphical modifications
-  * the contextual menu steps are now configurable
-  * the prove button now splits the VCs if they are not proven with "first-attempt steps limit"
-  * added a split and a prove button next to each task
-  * added examples for python and micro-c
-  * added `index_{language}.txt` in `examples` directory in order to list all examples path for each languages
-  * added `config.json` in `examples` directory in order to configure the number of steps for each settings
+IDE
+  * strategies now support step limits, passed as the third integer argument to the `call` command
 
-Input Formats
-  * Witness expression for type invariant is generalized (#286,!428)
+Web interface TryWhy3
+  * step limits are now configurable in the HTML file
+  * "prove" now splits the VCs if they are not proven after "First-attempt limit" steps
+  * added some "split" and "prove" buttons next to each task
+  * moved the example list to `examples/config.json` and made it per-language
+  * added some examples for Python and Micro-C
+  * the Alt-Ergo worker is now the upstream one
+
+Tools
+  * options `why3 --list-*` have been moved to a dedicated tool `why3 show`,
+    e.g., `why3 show metas`
+  * added `why3 show attributes` to list all the known attributes
+  * `why3 prove` now supports transformations that require an argument
+  * `why3 execute` now supports `io.StdIO` and `debug.Debug`
+
+Coq realizations
+  * floating-point theories are now built on top of Flocq's `BinarySingleNaN`
+    formalization (requires Flocq >= 3.4 and Coq >= 8.11) :x:
 
 Provers
   * support for Coq 8.15.0 (released Jan 13, 2022)
@@ -52,7 +65,7 @@ Provers
 Version 1.4.0, March 13, 2021
 -----------------------------
 
-WhyML
+WhyML language
   * sub-namespaces are now allowed in `for each` loops; see Section 7.4.7 of the manual
   * function literals are now supported; see Sections 7.3.2 and 7.4.9 of the manual
 

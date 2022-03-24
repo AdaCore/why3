@@ -216,12 +216,6 @@ let number_format prty = {
         ((fun fmt i -> fprintf fmt "<num val=\"%s\"><type name=\"Real.real\"/></num>" i),
          (fun fmt i n -> fprintf fmt
                 "<app>\
-                   <const name=\"Groups.times_class.times\"/>\
-                   <num val=\"%s\"><type name=\"Real.real\"/></num>\
-                   <num val=\"%s\"/>\
-                 </app>" i n),
-         (fun fmt i n -> fprintf fmt
-                "<app>\
                    <const name=\"Why3_Real.why3_divide\"/>\
                    <num val=\"%s\"><type name=\"Real.real\"/></num>\
                    <num val=\"%s\"/>\

@@ -1,0 +1,65 @@
+File "bench/check-ce/ref1.mlw", line 5, characters 6-7:
+warning: unused variable x
+<check-ce>Check model 0 ("bench/check-ce/ref1.mlw", line 6, characters 11-16)
+<check-ce>Checking model:
+          
+<check-ce>Giant-step RAC
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/ref1.mlw", line 5, characters 10-15 at "bench/check-ce/ref1.mlw", line 5, characters 10-15: {contents=
+                                                                    1}
+<check-ce>Normal RAC
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 0: NC
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/ref1.mlw", line 6, characters 11-16)
+              Unknown location:
+                  _ = ()
+              File ref1.mlw:
+                Line 4:
+                  _ = ()
+                  Execution of main function `f` with env:
+                    _ = ()
+                Line 5:
+                  Normal execution of function `ref` with args:
+                    contents = 1
+                  Normal execution of function `ref'mk` with args:
+                    contents = 1
+                Line 6:
+                  Property failure at assertion with:
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/ref1.mlw", line 6, characters 11-16)
+              Unknown location:
+                  _ = ()
+              File ref1.mlw:
+                Line 4:
+                  _ = ()
+                  Execution of main function `f` with env:
+                    _ = ()
+                Line 5:
+                  Giant-step execution of function `ref` with args:
+                    contents = 1
+                  result of `ref` = {contents= 1}
+                Line 6:
+                  Property failure at assertion with:
+<check-ce-summary>Results:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/ref1.mlw", line 6, characters 11-16)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/ref1.mlw", line 6, characters 11-16)
+File "bench/check-ce/ref1.mlw", line 6, characters 11-16:
+Sub-goal Assertion of goal f'vc.
+Prover result is: Step limit exceeded (0.91s).
+The program does not comply to the verification goal, for example during the
+  following execution:
+Unknown location:
+    _ = ()
+File ref1.mlw:
+  Line 4:
+    _ = ()
+    Execution of main function `f` with env:
+      _ = ()
+  Line 5:
+    Normal execution of function `ref` with args:
+      contents = 1
+    Normal execution of function `ref'mk` with args:
+      contents = 1
+  Line 6:
+    Property failure at assertion with:
+

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title>Try Why3</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -8,15 +8,13 @@
     <link rel="stylesheet" type="text/css" href="trywhy3.css" />
     <link rel="stylesheet" type="text/css" href="trywhy3_custom.css"/>
 
-    <script defer="defer" src="ace-builds/src-min-noconflict/ace.js"
-            type="text/javascript" charset="utf-8"></script>
+    <script defer="defer" src="ace-builds/src-min-noconflict/ace.js"></script>
 
     <script type="text/javascript">
       var editor_theme = "ace/theme/chrome";
       var task_viewer_mode = "ace/mode/why3";
     </script>
-    <script defer="defer" type="text/javascript"
-            src="trywhy3.js"></script>
+    <script defer="defer" src="trywhy3.js"></script>
   </head>
   <body id="body">
     <div id="why3-main-container" class="why3-container">
@@ -56,7 +54,6 @@
 	  <span id="why3-format-label" class="fas fa-spin fa-spinner why3-icon"></span>
 	  <select  id="why3-select-format"
 		   title="Choose an input format">
-	    <option disabled="disabled" selected="selected">&nbsp;</option>
 	  </select>
 	</div>
 
@@ -66,7 +63,6 @@
 	  <span id="why3-example-label" class="fas fa-spin fa-spinner why3-icon"></span>
 	  <select  id="why3-select-example"
 		   title="Choose a predefined example">
-	    <option disabled="disabled" selected="selected">&nbsp;</option>
 	  </select>
 	</div>
 
@@ -165,30 +161,30 @@
 	      <label for="why3-radio-column">Split Horizontally</label>
             </li>
             <li>
-              <input id="why3-input-num-threads" type="number" style="width:4em;" min="1" max="8"
-                     value="4" /> Number of threads for Alt-Ergo
+              <input id="why3-input-num-threads" type="number" min="1" max="8" value="4" />
+              <label for="why3-input-num-threads">Number of threads for Alt-Ergo</label>
             </li>
             <li>
-              <input id="why3-input-min-steps" type="number" style="width:4em;" min="0" max="10000"
-                     value="10" /> First-attempt step limit
+              <input id="why3-input-min-steps" type="number" min="0" max="10000" value="10" />
+              <label for="why3-input-min-steps">First-attempt step limit</label>
             </li>
             <li>
-              <input id="why3-input-num-steps" type="number" style="width:4em;" min="1" max="10000"
-                     value="100" /> Default step limit
+              <input id="why3-input-num-steps" type="number" min="1" max="10000" value="100" />
+              <label for="why3-input-num-steps">Default step limit</label>
             </li>
             <li>
-              <input id="why3-input-context-steps1" type="number" style="width:4em;" min="1" max="10000"
-                     value="100" /> Right-click menu step limit 1
+              <input id="why3-input-context-steps1" type="number" min="1" max="10000" value="100" />
+              <label for="why3-input-context-steps1">Right-click menu step limit 1</label>
             </li>
             <li>
-              <input id="why3-input-context-steps2" type="number" style="width:4em;" min="1" max="10000"
-                     value="1000" /> Right-click menu step limit 2
+              <input id="why3-input-context-steps2" type="number" min="1" max="10000" value="1000" />
+              <label for="why3-input-context-steps2">Right-click menu step limit 2</label>
             </li>
             <li>
-              <input id="why3-input-context-steps3" type="number" style="width:4em;" min="1" max="10000"
-                     value="5000" /> Right-click menu step limit 3
+              <input id="why3-input-context-steps3" type="number" min="1" max="10000" value="5000" />
+              <label for="why3-input-context-steps3">Right-click menu step limit 3</label>
             </li>
-            
+
 	  </ul>
 	</div>
 	<div id="why3-about-dialog" class="why3-widget">

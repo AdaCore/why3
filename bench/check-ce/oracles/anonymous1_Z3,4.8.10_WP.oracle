@@ -1,0 +1,180 @@
+<check-ce>Check model 0 ("bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
+<check-ce>Checking model:
+          File anonymous1.mlw:
+            Line 4:
+              x = {"type": "Integer", "val": "0"}
+            Line 5:
+              result = {"type": "Integer", "val": "2"}
+              w = {"type": "Integer", "val": "2"}
+            Line 6:
+              w = {"type": "Integer", "val": "2"}
+              x = {"type": "Integer", "val": "0"}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
+<rac-values>Value from model for return value of call to h at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28 at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 2
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
+<check-ce>Result of checking model 0: NC
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File anonymous1.mlw:
+                Line 4:
+                  x = 0
+                  x = 0
+                  Execution of main function `f` with env:
+                    x = 0
+                    zero = 0
+                    one = 1
+                Line 5:
+                  Normal execution of function `h` with args:
+                    y = 0
+                  Normal execution of function `(+)` with args:
+                    _ = 0
+                    _ = 2
+                Line 6:
+                  Property failure at assertion with:
+                    x = 0
+                    w = 2
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File anonymous1.mlw:
+                Line 4:
+                  x = 0
+                  x = 0
+                  Execution of main function `f` with env:
+                    x = 0
+                    zero = 0
+                    one = 1
+                Line 5:
+                  Giant-step execution of function `h` with args:
+                    y = 0
+                  result of `h` = 2
+                Line 6:
+                  Property failure at assertion with:
+                    x = 0
+                    w = 2
+<check-ce>Check model 1 ("bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
+<check-ce>Checking model:
+          File anonymous1.mlw:
+            Line 4:
+              x = {"type": "Integer", "val": "0"}
+            Line 5:
+              result = {"type": "Integer", "val": "2"}
+              w = {"type": "Integer", "val": "2"}
+            Line 6:
+              w = {"type": "Integer", "val": "2"}
+              x = {"type": "Integer", "val": "0"}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
+<rac-values>Value from model for return value of call to h at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28 at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 2
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
+<check-ce>Result of checking model 1: NC
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File anonymous1.mlw:
+                Line 4:
+                  x = 0
+                  x = 0
+                  Execution of main function `f` with env:
+                    x = 0
+                    zero = 0
+                    one = 1
+                Line 5:
+                  Normal execution of function `h` with args:
+                    y = 0
+                  Normal execution of function `(+)` with args:
+                    _ = 0
+                    _ = 2
+                Line 6:
+                  Property failure at assertion with:
+                    x = 0
+                    w = 2
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File anonymous1.mlw:
+                Line 4:
+                  x = 0
+                  x = 0
+                  Execution of main function `f` with env:
+                    x = 0
+                    zero = 0
+                    one = 1
+                Line 5:
+                  Giant-step execution of function `h` with args:
+                    y = 0
+                  result of `h` = 2
+                Line 6:
+                  Property failure at assertion with:
+                    x = 0
+                    w = 2
+<check-ce-summary>Results:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
+File "bench/check-ce/anonymous1.mlw", line 6, characters 10-19:
+Sub-goal Assertion of goal f'vc.
+Prover result is: Unknown (sat) (0.03s, 830 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File anonymous1.mlw:
+  Line 4:
+    x = 0
+    x = 0
+    Execution of main function `f` with env:
+      x = 0
+      zero = 0
+      one = 1
+  Line 5:
+    Normal execution of function `h` with args:
+      y = 0
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = 2
+  Line 6:
+    Property failure at assertion with:
+      x = 0
+      w = 2
+

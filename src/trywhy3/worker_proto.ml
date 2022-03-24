@@ -20,16 +20,15 @@ type transform = Prove of int | Split of int | Clean
 type why3_command =
   | ParseBuffer of string * string * int
   | ExecuteBuffer of string * string
-  | ProveAll
   | Transform of transform * id
   | SetStatus of status * id
   | GetFormats
 
 type why3_output =
   | Error of string (* msg *)
-  | ErrorLoc of (loc * string) (* loc * msg *)
+  | ErrorLoc of loc * string (* loc * msg *)
   | Theory of id * string (* Theory (id, name) *)
-  | Task of (id * id * string * string * why3_loc list * string * int)
+  | Task of id * id * string * string * why3_loc list * string * int
   (* id, parent id, expl, code, location list, pretty, steps*)
   | Result of string list
   | UpdateStatus of status * id

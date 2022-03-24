@@ -15,3 +15,6 @@
 exception Not_Implemented
 
 include Mpfr
+
+let get_formatted_str ?rnd ?base ?size mpfr_float =
+  get_formatted_str ?rnd ?base ?size mpfr_float
