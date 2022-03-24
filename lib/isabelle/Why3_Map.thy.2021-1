@@ -97,7 +97,7 @@ lemma vimage_update:
 
 why3_vc occ_exchange
   using assms
-  by (simp add: occ_def vimage_update insert_Diff_if card_insert)
+  by (simp add: occ_def vimage_update insert_Diff_if card.insert_remove)
     (auto simp add: Diff_Int_distrib2 card_Diff_subset_Int)
 
 why3_vc occ_left_add
@@ -157,11 +157,11 @@ proof
     show "int (card ?S) \<le> 1"
     proof (rule ccontr)
       assume "\<not> int (card ?S) \<le> 1"
-      with card_le_Suc_iff [of ?S 1]
+      with card_le_Suc_iff [of 1 ?S]
       obtain x S where "?S = insert x S"
         "x \<notin> S" "1 \<le> card S" "finite S"
         by auto
-      with card_le_Suc_iff [of S 0]
+      with card_le_Suc_iff [of 0 S]
       obtain x' S' where "S = insert x' S'" by auto
       with `?S = insert x S` `x \<notin> S`
       have "m x = v" "m x' = v" "x \<noteq> x'" "0 \<le> x" "x < n" "0 \<le> x'" "x' < n"

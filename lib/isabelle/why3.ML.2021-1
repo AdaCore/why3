@@ -453,7 +453,7 @@ fun blocks prfx1 prfx2 xs f = fst (fold_map (fn x => fn prfx =>
 fun pretty_decl (p, f) ctxt (Lemma ((s, _), prems, concls)) =
       let
         val SOME (opt, _, _) = lookup_vc (Proof_Context.theory_of ctxt) s;
-        val ctxt' = fold Variable.auto_fixes (prems @ concls) ctxt;
+        val ctxt' = fold Proof_Context.augment (prems @ concls) ctxt;
         val (context, stmt) = mk_vc true prems concls
       in
         if p opt then
@@ -463,7 +463,7 @@ fun pretty_decl (p, f) ctxt (Lemma ((s, _), prems, concls)) =
         else NONE
       end
   | pretty_decl _ ctxt (Axiom ((s, _), ts)) =
-      let val ctxt' = fold Variable.auto_fixes ts ctxt
+      let val ctxt' = fold Proof_Context.augment ts ctxt
       in SOME (Pretty.block
         ([Pretty.str "axiomatization where", Pretty.brk 1,
           Pretty.str s, Pretty.str ":", Pretty.brk 1] @
@@ -483,7 +483,7 @@ fun pretty_decl (p, f) ctxt (Lemma ((s, _), prems, concls)) =
        Pretty.quote (Syntax.pretty_typ ctxt T)])
   | pretty_decl _ ctxt (Definition (_, eqn)) =
       let
-        val ctxt' = Variable.auto_fixes eqn ctxt;
+        val ctxt' = Proof_Context.augment eqn ctxt;
         val (s, T) = head_of_eqn eqn
       in SOME (Pretty.block [Pretty.str "definition ", Pretty.str s,
         Pretty.str " ::", Pretty.brk 1,
@@ -504,7 +504,7 @@ fun pretty_decl (p, f) ctxt (Lemma ((s, _), prems, concls)) =
                            Pretty.quote (Syntax.pretty_typ ctxt T)]) cargs))))
                constrs))))
   | pretty_decl _ ctxt (Inductive (coind, preds)) =
-      let val ctxt' = fold (fold (Variable.auto_fixes o snd) o #3) preds ctxt
+      let val ctxt' = fold (fold (Proof_Context.augment o snd) o #3) preds ctxt
       in
         SOME (Pretty.chunks
           (blocks ((coind ? prefix "co") "inductive") "and" preds
@@ -517,7 +517,7 @@ fun pretty_decl (p, f) ctxt (Lemma ((s, _), prems, concls)) =
               Pretty.brk 1, Pretty.quote (Syntax.pretty_term ctxt' t)])))
       end
   | pretty_decl _ ctxt (Function eqnss) =
-      let val ctxt' = fold (fold Variable.auto_fixes o snd) eqnss ctxt
+      let val ctxt' = fold (fold Proof_Context.augment o snd) eqnss ctxt
       in
         SOME (Pretty.chunks
           (blocks "fun" "and" eqnss (fn (_, t :: _) =>
@@ -746,6 +746,13 @@ fun get_dt_spec thy err s =
 
 val why3_records = Attrib.setup_config_bool @{binding "why3_records"} (K true);
 
+fun add_inductive_global flags cnames_syn pnames pre_intros monos thy =
+  thy |>
+  Named_Target.theory_init |>
+  Inductive.add_inductive flags cnames_syn pnames pre_intros monos |> snd |>
+  Local_Theory.exit |>
+  Proof_Context.theory_of;
+
 fun mk_decl _ (decl as Axiom ((s, id), ts)) thy =
       (case lookup_thm thy id of
          NONE =>
@@ -887,13 +894,13 @@ fun mk_decl _ (decl as Axiom ((s, id), ts)) thy =
   | mk_decl _ (decl as Inductive (coind, preds)) thy =
       (case lookup_list (snd o #1) (lookup_def thy) preds of
          NONE =>
-           (thy |> Inductive.add_inductive_global
+           (thy |> add_inductive_global
               {quiet_mode = true, verbose = false,
                alt_name = Binding.empty, coind = coind,
                no_elim = false, no_ind = false, skip_mono = false}
               (map (fn ((s, _), T, _) => ((Binding.name s, T), NoSyn)) preds) []
               (maps (map (apfst (rpair [] o Binding.name o fst)) o #3) preds) [] |>
-            snd |> fold (add_const o fst o #1) preds,
+            fold (add_const o fst o #1) preds,
             true)
        | SOME preds' =>
            let val cmap = map (fn (((s, id), _, _), th :: _) =>
@@ -1029,8 +1036,8 @@ fun process_decls consts types x path = elem "theory" (fn atts =>
 
 (**** commands ****)
 
-fun why3_open ((files, consts), types) thy =
-  let val ([{src_path, lines, ...}: Token.file], thy') = files thy;
+fun why3_open ((file, consts), types) thy =
+  let val ({src_path, lines, ...}: Token.file, thy') = file thy;
   in process_decls
     (map (apsnd (Sign.intern_const thy)) consts)
     (map (apsnd (Sign.intern_type thy)) types)
@@ -1051,7 +1058,7 @@ fun prove_vc vc_name lthy =
 val _ =
   Outer_Syntax.command @{command_keyword "why3_open"}
     "open a new Why3 environment and load a Why3-generated .xml file"
-    (Resources.provide_parse_files "why3_open" --
+    (Resources.provide_parse_file --
      Scan.optional (Parse.reserved "constants" |-- Parse.!!! (Scan.repeat1
        (Parse.name --| Args.$$$ "=" -- Parse.!!! Parse.name))) [] --
      Scan.optional (Parse.reserved "types" |-- (Scan.repeat1
