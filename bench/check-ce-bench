@@ -144,8 +144,8 @@ bench/check-ce/petiot2018/experiments.sh --prover CVC4,1.7 \
   --ce-prover CVC4,1.7,counterexamples --stepslimit 10000 --rac-prover CVC4,1.7 \
   $updatearg
 if [ $? = 1 ]; then exitvalue=1; fi
-bench/check-ce/petiot2018/experiments.sh --prover Z3,4.8.4 \
-  --ce-prover Z3,4.8.4,counterexamples --stepslimit 500000 --rac-prover Z3,4.8.4 \
+bench/check-ce/petiot2018/experiments.sh --prover Z3,4.8.10 \
+  --ce-prover Z3,4.8.10,counterexamples --stepslimit 500000 --rac-prover Z3,4.8.10 \
   $updatearg
 if [ $? = 1 ]; then exitvalue=1; fi
 

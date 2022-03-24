@@ -1,0 +1,1590 @@
+* Experiment binary_search
+** Original
+File "bench/check-ce/petiot2018/binary_search.mlw", line 12, characters 19-44:
+Sub-goal Loop invariant init of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 13, characters 45-54:
+Sub-goal Loop invariant init of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 14, characters 50-58:
+Sub-goal Loop invariant init of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 16, characters 12-31:
+Sub-goal Precondition of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 17, characters 7-11:
+Sub-goal Index in array bounds of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 15, characters 14-21:
+Sub-goal Loop variant decrease of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 12, characters 19-44:
+Sub-goal Loop invariant preservation of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 13, characters 45-54:
+Sub-goal Loop invariant preservation of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 14, characters 50-58:
+Sub-goal Loop invariant preservation of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 15, characters 14-21:
+Sub-goal Loop variant decrease of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 12, characters 19-44:
+Sub-goal Loop invariant preservation of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 13, characters 45-54:
+Sub-goal Loop invariant preservation of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 14, characters 50-58:
+Sub-goal Loop invariant preservation of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 6, characters 15-43:
+Sub-goal Postcondition of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 7, characters 45-54:
+Sub-goal Postcondition of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 8, characters 50-58:
+Sub-goal Postcondition of goal binary_search'vc.
+Prover result is: Valid.
+
+** binary_search-B1
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B1.mlw --apply-transform=split_vc --prover=Z3,4.8.4,counterexamples --timelimit=15 --check-ce --rac-prover=Z3,4.8.4 --sub-goal=:15@loop variant decrease --stepslimit=500000
+File "bench/check-ce/petiot2018/experiments/binary_search-B1.mlw", line 15, characters 10-23:
+Sub-goal Loop variant decrease of goal binary_search'vc.
+Prover result is: Unknown (unknown).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File binary_search-B1.mlw:
+  Line 3:
+    Execution of main function `binary_search` with env:
+      t = {length= 1; elts= [|(-52) -> 401; _ -> 401|]}
+      x = 400
+      zero = 0
+      one = 1
+  Line 9:
+    Normal execution of function `int_ref` with args:
+      i = (-1)
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = (-1)
+File binary_search-B1.mlw:
+  Line 10:
+    Normal execution of function `length` with args:
+      arg = {length= 1; elts= [|(-52) -> 401; _ -> 401|]}
+    Normal execution of function `(-)` with args:
+      x = 1
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = (-1)
+File binary_search-B1.mlw:
+  Line 10:
+    Normal execution of function `int_ref` with args:
+      i = 0
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 0
+File binary_search-B1.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 0}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+File binary_search-B1.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-1)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+File binary_search-B1.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = (-1)
+      _ = 0
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 0}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+File binary_search-B1.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-1)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+File binary_search-B1.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = (-1)
+      _ = 0
+    Normal execution of function `(+)` with args:
+      _ = (-1)
+      _ = 1
+    Normal execution of function `div` with args:
+      x = 0
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 1; elts= [|(-52) -> 401; _ -> 401|]}
+      i = 0
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 1; elts= [|(-52) -> 401; _ -> 401|]}
+    Normal execution of function `(@)` with args:
+      u = [|(-52) -> 401; _ -> 401|]
+      u = 0
+File binary_search-B1.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = 401
+      y = 400
+  Line 18:
+    Normal execution of function `(-)` with args:
+      x = 0
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = (-1)
+File binary_search-B1.mlw:
+  Line 18:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 0}
+      i = (-1)
+  Line 15:
+    Property failure at loop variant decrease with:
+      t = {length= 1; elts= [|(-52) -> 401; _ -> 401|]}
+      r = {contents= (-1)}
+      r = {contents= 0}
+      t = {length= 1; elts= [|(-52) -> 401; _ -> 401|]}
+
+File "bench/check-ce/petiot2018/experiments/binary_search-B1.mlw", line 15, characters 10-23:
+Sub-goal Loop variant decrease of goal binary_search'vc.
+Prover result is: Unknown (unknown).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File binary_search-B1.mlw:
+  Line 3:
+    Execution of main function `binary_search` with env:
+      t = {length= 1; elts= [|5 -> (-175); _ -> (-175)|]}
+      x = 0
+      zero = 0
+      one = 1
+  Line 9:
+    Normal execution of function `int_ref` with args:
+      i = (-1)
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = (-1)
+File binary_search-B1.mlw:
+  Line 10:
+    Normal execution of function `length` with args:
+      arg = {length= 1; elts= [|5 -> (-175); _ -> (-175)|]}
+    Normal execution of function `(-)` with args:
+      x = 1
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = (-1)
+File binary_search-B1.mlw:
+  Line 10:
+    Normal execution of function `int_ref` with args:
+      i = 0
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 0
+File binary_search-B1.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 0}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+File binary_search-B1.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-1)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+File binary_search-B1.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = (-1)
+      _ = 0
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 0}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+File binary_search-B1.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-1)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+File binary_search-B1.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = (-1)
+      _ = 0
+    Normal execution of function `(+)` with args:
+      _ = (-1)
+      _ = 1
+    Normal execution of function `div` with args:
+      x = 0
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 1; elts= [|5 -> (-175); _ -> (-175)|]}
+      i = 0
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 1; elts= [|5 -> (-175); _ -> (-175)|]}
+    Normal execution of function `(@)` with args:
+      u = [|5 -> (-175); _ -> (-175)|]
+      u = 0
+File binary_search-B1.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = (-175)
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= (-1)}
+      i = 0
+  Line 15:
+    Property failure at loop variant decrease with:
+      t = {length= 1; elts= [|5 -> (-175); _ -> (-175)|]}
+      r = {contents= 0}
+      r = {contents= 0}
+      t = {length= 1; elts= [|5 -> (-175); _ -> (-175)|]}
+
+** binary_search-B2
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B2.mlw --apply-transform=split_vc --prover=Z3,4.8.4,counterexamples --timelimit=15 --check-ce --rac-prover=Z3,4.8.4 --sub-goal=:15@loop variant decrease --stepslimit=500000
+File "bench/check-ce/petiot2018/experiments/binary_search-B2.mlw", line 15, characters 14-21:
+Sub-goal Loop variant decrease of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/experiments/binary_search-B2.mlw", line 15, characters 14-21:
+Sub-goal Loop variant decrease of goal binary_search'vc.
+Prover result is: Unknown (unknown).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File binary_search-B2.mlw:
+  Line 3:
+    Execution of main function `binary_search` with env:
+      t = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+      x = 0
+      zero = 0
+      one = 1
+  Line 9:
+    Normal execution of function `int_ref` with args:
+      i = (-1)
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = (-1)
+File binary_search-B2.mlw:
+  Line 10:
+    Normal execution of function `length` with args:
+      arg = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+    Normal execution of function `(-)` with args:
+      x = 8672
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 8672
+      _ = (-1)
+File binary_search-B2.mlw:
+  Line 10:
+    Normal execution of function `int_ref` with args:
+      i = 8671
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 8671
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-1)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = (-1)
+      _ = 8671
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-1)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = (-1)
+      _ = 8671
+    Normal execution of function `div` with args:
+      x = 8670
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+      i = 4335
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+    Normal execution of function `(@)` with args:
+      u = [|(-5682) -> (-53); _ -> (-53)|]
+      u = 4335
+File binary_search-B2.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = (-53)
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= (-1)}
+      i = 4335
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 4335}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 4335}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = 4335
+      _ = 8671
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 4335}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 4335}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = 4335
+      _ = 8671
+    Normal execution of function `div` with args:
+      x = 13006
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+      i = 6503
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+    Normal execution of function `(@)` with args:
+      u = [|(-5682) -> (-53); _ -> (-53)|]
+      u = 6503
+File binary_search-B2.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = (-53)
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 4335}
+      i = 6503
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 6503}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 6503}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = 6503
+      _ = 8671
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 6503}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 6503}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = 6503
+      _ = 8671
+    Normal execution of function `div` with args:
+      x = 15174
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+      i = 7587
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+    Normal execution of function `(@)` with args:
+      u = [|(-5682) -> (-53); _ -> (-53)|]
+      u = 7587
+File binary_search-B2.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = (-53)
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 6503}
+      i = 7587
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 7587}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 7587}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = 7587
+      _ = 8671
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 7587}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 7587}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = 7587
+      _ = 8671
+    Normal execution of function `div` with args:
+      x = 16258
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+      i = 8129
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+    Normal execution of function `(@)` with args:
+      u = [|(-5682) -> (-53); _ -> (-53)|]
+      u = 8129
+File binary_search-B2.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = (-53)
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 7587}
+      i = 8129
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8129}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8129}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = 8129
+      _ = 8671
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8129}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8129}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = 8129
+      _ = 8671
+    Normal execution of function `div` with args:
+      x = 16800
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+      i = 8400
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+    Normal execution of function `(@)` with args:
+      u = [|(-5682) -> (-53); _ -> (-53)|]
+      u = 8400
+File binary_search-B2.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = (-53)
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 8129}
+      i = 8400
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8400}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8400}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = 8400
+      _ = 8671
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8400}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8400}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = 8400
+      _ = 8671
+    Normal execution of function `div` with args:
+      x = 17071
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+      i = 8535
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+    Normal execution of function `(@)` with args:
+      u = [|(-5682) -> (-53); _ -> (-53)|]
+      u = 8535
+File binary_search-B2.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = (-53)
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 8400}
+      i = 8535
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8535}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8535}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = 8535
+      _ = 8671
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8535}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8535}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = 8535
+      _ = 8671
+    Normal execution of function `div` with args:
+      x = 17206
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+      i = 8603
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+    Normal execution of function `(@)` with args:
+      u = [|(-5682) -> (-53); _ -> (-53)|]
+      u = 8603
+File binary_search-B2.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = (-53)
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 8535}
+      i = 8603
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8603}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8603}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = 8603
+      _ = 8671
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8603}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8603}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = 8603
+      _ = 8671
+    Normal execution of function `div` with args:
+      x = 17274
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+      i = 8637
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+    Normal execution of function `(@)` with args:
+      u = [|(-5682) -> (-53); _ -> (-53)|]
+      u = 8637
+File binary_search-B2.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = (-53)
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 8603}
+      i = 8637
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8637}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8637}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = 8637
+      _ = 8671
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8637}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8637}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = 8637
+      _ = 8671
+    Normal execution of function `div` with args:
+      x = 17308
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+      i = 8654
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+    Normal execution of function `(@)` with args:
+      u = [|(-5682) -> (-53); _ -> (-53)|]
+      u = 8654
+File binary_search-B2.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = (-53)
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 8637}
+      i = 8654
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8654}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8654}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = 8654
+      _ = 8671
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8654}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8654}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = 8654
+      _ = 8671
+    Normal execution of function `div` with args:
+      x = 17325
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+      i = 8662
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+    Normal execution of function `(@)` with args:
+      u = [|(-5682) -> (-53); _ -> (-53)|]
+      u = 8662
+File binary_search-B2.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = (-53)
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 8654}
+      i = 8662
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8662}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8662}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = 8662
+      _ = 8671
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8662}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8662}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = 8662
+      _ = 8671
+    Normal execution of function `div` with args:
+      x = 17333
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+      i = 8666
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+    Normal execution of function `(@)` with args:
+      u = [|(-5682) -> (-53); _ -> (-53)|]
+      u = 8666
+File binary_search-B2.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = (-53)
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 8662}
+      i = 8666
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8666}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8666}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = 8666
+      _ = 8671
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8666}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8666}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = 8666
+      _ = 8671
+    Normal execution of function `div` with args:
+      x = 17337
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+      i = 8668
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+    Normal execution of function `(@)` with args:
+      u = [|(-5682) -> (-53); _ -> (-53)|]
+      u = 8668
+File binary_search-B2.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = (-53)
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 8666}
+      i = 8668
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8668}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8668}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = 8668
+      _ = 8671
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8668}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8668}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = 8668
+      _ = 8671
+    Normal execution of function `div` with args:
+      x = 17339
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+      i = 8669
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+    Normal execution of function `(@)` with args:
+      u = [|(-5682) -> (-53); _ -> (-53)|]
+      u = 8669
+File binary_search-B2.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = (-53)
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 8668}
+      i = 8669
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8669}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8669}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = 8669
+      _ = 8671
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8669}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8669}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = 8669
+      _ = 8671
+    Normal execution of function `div` with args:
+      x = 17340
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+      i = 8670
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+    Normal execution of function `(@)` with args:
+      u = [|(-5682) -> (-53); _ -> (-53)|]
+      u = 8670
+File binary_search-B2.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = (-53)
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 8669}
+      i = 8670
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8670}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8670}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = 8670
+      _ = 8671
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8671}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8671}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 8670}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 8670}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = 8670
+      _ = 8671
+    Normal execution of function `div` with args:
+      x = 17341
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+      i = 8670
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 8672; elts= [|(-5682) -> (-53); _ -> (-53)|]}
+    Normal execution of function `(@)` with args:
+      u = [|(-5682) -> (-53); _ -> (-53)|]
+      u = 8670
+File binary_search-B2.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = (-53)
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 8670}
+      i = 8670
+  Line 15:
+    Property failure at loop variant decrease with:
+      l = {contents= 8670}
+      r = {contents= 8671}
+      r = {contents= 8671}
+      l = {contents= 8670}
+
+** binary_search-B3
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B3.mlw --apply-transform=split_vc --prover=Z3,4.8.4,counterexamples --timelimit=15 --check-ce --rac-prover=Z3,4.8.4 --sub-goal=:14@loop invariant preservation --stepslimit=500000
+File "bench/check-ce/petiot2018/experiments/binary_search-B3.mlw", line 14, characters 50-58:
+Sub-goal Loop invariant preservation of goal binary_search'vc.
+Prover result is: Unknown (unknown).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File binary_search-B3.mlw:
+  Line 3:
+    Execution of main function `binary_search` with env:
+      t = {length= 176; elts= [|79 -> 0; _ -> 54|]}
+      x = 53
+      zero = 0
+      one = 1
+  Line 9:
+    Normal execution of function `int_ref` with args:
+      i = (-1)
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = (-1)
+File binary_search-B3.mlw:
+  Line 10:
+    Normal execution of function `length` with args:
+      arg = {length= 176; elts= [|79 -> 0; _ -> 54|]}
+    Normal execution of function `(-)` with args:
+      x = 176
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 176
+      _ = (-1)
+File binary_search-B3.mlw:
+  Line 10:
+    Normal execution of function `int_ref` with args:
+      i = 175
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 175
+File binary_search-B3.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 175}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 175}
+File binary_search-B3.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-1)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+File binary_search-B3.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = (-1)
+      _ = 175
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 175}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 175}
+File binary_search-B3.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-1)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+File binary_search-B3.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = (-1)
+      _ = 175
+    Normal execution of function `(+)` with args:
+      _ = 174
+      _ = 1
+    Normal execution of function `div` with args:
+      x = 175
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 176; elts= [|79 -> 0; _ -> 54|]}
+      i = 87
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 176; elts= [|79 -> 0; _ -> 54|]}
+    Normal execution of function `(@)` with args:
+      u = [|79 -> 0; _ -> 54|]
+      u = 87
+File binary_search-B3.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = 54
+      y = 53
+  Line 18:
+    Normal execution of function `(-)` with args:
+      x = 87
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 87
+      _ = (-1)
+File binary_search-B3.mlw:
+  Line 18:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 175}
+      i = 86
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 86}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 86}
+File binary_search-B3.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-1)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+File binary_search-B3.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = (-1)
+      _ = 86
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 86}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 86}
+File binary_search-B3.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-1)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+File binary_search-B3.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = (-1)
+      _ = 86
+    Normal execution of function `(+)` with args:
+      _ = 85
+      _ = 1
+    Normal execution of function `div` with args:
+      x = 86
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 176; elts= [|79 -> 0; _ -> 54|]}
+      i = 43
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 176; elts= [|79 -> 0; _ -> 54|]}
+    Normal execution of function `(@)` with args:
+      u = [|79 -> 0; _ -> 54|]
+      u = 43
+File binary_search-B3.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = 54
+      y = 53
+  Line 18:
+    Normal execution of function `(-)` with args:
+      x = 43
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 43
+      _ = (-1)
+File binary_search-B3.mlw:
+  Line 18:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 86}
+      i = 42
+  Line 14:
+    Property failure at loop invariant preservation with:
+      t = {length= 176; elts= [|79 -> 0; _ -> 54|]}
+      x = 53
+      r = {contents= 42}
+
+File "bench/check-ce/petiot2018/experiments/binary_search-B3.mlw", line 14, characters 50-58:
+Sub-goal Loop invariant preservation of goal binary_search'vc.
+Prover result is: Valid.
+
+** binary_search-B4
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B4.mlw --apply-transform=split_vc --prover=Z3,4.8.4,counterexamples --timelimit=15 --check-ce --rac-prover=Z3,4.8.4 --sub-goal=:8@postcondition --stepslimit=500000
+File "bench/check-ce/petiot2018/experiments/binary_search-B4.mlw", line 8, characters 50-58:
+Sub-goal Postcondition of goal binary_search'vc.
+Prover result is: Unknown (unknown).
+The contracts of some function or loop are too weak, for example during the
+  following execution:
+File binary_search-B4.mlw:
+  Line 3:
+    Execution of main function `binary_search` with env:
+      t = {length= 176; elts= [|; _ -> 5|]}
+      x = 0
+      zero = 0
+      one = 1
+  Line 9:
+    Giant-step execution of function `int_ref` with args:
+      i = (-1)
+    result of `int_ref` = {contents= (-1)}
+  Line 10:
+    Normal execution of function `length` with args:
+      arg = {length= 176; elts= [|; _ -> 5|]}
+    Giant-step execution of function `(-)` with args:
+      x = 176
+      y = 1
+    result of `(-)` = 175
+    Giant-step execution of function `int_ref` with args:
+      i = 175
+    result of `int_ref` = {contents= 175}
+  Line 11:
+    Giant-step iteration of loop
+    l = {contents= 81}
+    r = {contents= 81}
+    Giant-step execution of function `(!)` with args:
+      r = {contents= 81}
+    result of `(!)` = 81
+    Giant-step execution of function `(!)` with args:
+      r = {contents= 81}
+    result of `(!)` = 81
+    Normal execution of function `(<)` with args:
+      _ = 81
+      _ = 81
+  Line 21:
+    Giant-step execution of function `(!)` with args:
+      r = {contents= 81}
+    result of `(!)` = 81
+  Line 7:
+    Property failure at postcondition of `binary_search` with:
+      t = {length= 176; elts= [|; _ -> 5|]}
+      x = 0
+      result = 81
+
