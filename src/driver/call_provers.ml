@@ -263,10 +263,12 @@ let analyse_result exit_result res_parser get_counterexmp printing_info out =
           (Valid, [])
         else
           if get_counterexmp then
+            begin
             let m = res_parser.prp_model_parser printing_info model_str in
             Debug.dprintf debug "Call_provers: model:@.";
             debug_print_model ~print_attrs:false m;
             analyse ((res, m) :: saved_models) (Some res) tl
+            end
           else
             analyse saved_models (Some res) tl
     | Answer res :: tl ->
