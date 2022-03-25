@@ -178,7 +178,7 @@ one can type
    why3 config add-prover Alt-Ergo /home/me/bin/alt-ergo-trunk new-ae
 
 Manually added provers are stored in the configuration file under
-``[manual_binary]`` sections as well as ``[detected_binary]`` ones.
+``[partial_prover]`` sections with a field ``manual = true``.
 
 .. why3:tool:: config detect
 
@@ -189,7 +189,7 @@ This command automatically detects the installed provers that are
 supported by Why3. It also creates a configuration file if none exists.
 
 Automatically detected provers are stored in the configuration file under
-``[detected_binary]`` sections.
+``[partial_prover]`` sections.
 
 .. why3:tool:: config list-provers
 
@@ -213,7 +213,10 @@ command :why3:tool:`why3 config add-prover`.
 Command ``show``
 ~~~~~~~~~~~~~~~~
 
-This command shows the expanded version of the configuration file.
+This command shows the expanded version of the configuration file. In
+particular, all the ``[partial_prover]`` sections are expanded into
+complete ``[prover]`` sections. Automatically generated ``[strategy]``
+sections are also shown.
 
 .. why3:tool:: prove
 .. _sec.why3prove:
