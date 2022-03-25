@@ -26,44 +26,34 @@ module Prover_autodetection_data: sig
   val from_file: string -> t
 end
 
-module Detected_binary: sig
-  type t
-end
+module Partial: sig
 
-module Manual_binary: sig
   type t = {
-    same_as  : string;
-    binary : string; (* custom executable *)
-    shortcut: string option;
+    name : string;
+    path : string;
+    version : string;
+    shortcut : string option;
+    manual : bool;
   }
-
-  val add: Whyconf.config -> t -> Whyconf.config
-  (** Add the given manual binary to the user configuration and remove the previous one that had the same shortcut *)
 end
 
 val read_auto_detection_data: Whyconf.config -> Prover_autodetection_data.t
 
-type binaries
+val find_prover : Prover_autodetection_data.t -> string -> string -> string option
+(** [find_prover data name path] returns the prover version of [path], if any,
+    according to an entry about [name] in [data] *)
 
-(** Detect the provers *)
-val request_binaries_version :
-  Whyconf.config -> Prover_autodetection_data.t -> binaries
+val find_provers : Prover_autodetection_data.t -> (string * string) list
+(** Detect the provers and return their versions *)
 
-val request_manual_binaries_version :
-  Prover_autodetection_data.t -> Manual_binary.t list ->
-  binaries
+val remove_auto_provers: Whyconf.config -> Whyconf.config
+(** Remove all the non-manual provers from the configuration *)
 
-val set_binaries_detected:
-  binaries -> Whyconf.config -> Whyconf.config
-(** replace all the binaries detected by the given one in the configuration *)
-
-val update_binaries_detected:
-  binaries -> Whyconf.config -> Whyconf.config
-(** replace or add only the binaries detected by the given one in the
-    configuration *)
+val update_provers: Partial.t list -> Whyconf.config -> Whyconf.config
+(** Replace or add the given provers in the configuration *)
 
 val compute_builtin_prover:
-  binaries ->
+  Partial.t list ->
   Whyconf.config ->
   Prover_autodetection_data.t ->
   Whyconf.config_prover Whyconf.Mprover.t
