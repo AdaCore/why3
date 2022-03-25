@@ -1200,7 +1200,7 @@ match pa.proof_state with
     | None -> P.notify (Message (Error "Please select a node id"))
     | Some any ->
         let unproven_goals = unproven_goals_below_id d.cont any in
-        List.iter (fun id -> C.schedule_proof_attempt d.cont id
+        List.iter (fun id -> C.schedule_proof_attempt ?save_to:None d.cont id
             prover ~limit ~callback ~notification:(notify_change_proved d.cont))
           unproven_goals
 

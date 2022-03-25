@@ -296,7 +296,7 @@ let has_file (session: Session_itp.session) =
 (* Initialization of why3server *)
 let init () =
   if Gnat_config.stand_alone then begin
-    Prove_client.connect_internal ();
+    Prove_client.connect_internal Config.libdir;
     Unix.sleep 1
   end else
   Prove_client.connect_external Gnat_config.socket_name

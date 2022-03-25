@@ -212,6 +212,12 @@ val print_model_human :
 (** Same as print_model but is intended to be human readable.*)
 
 val print_model_json : Format.formatter -> model -> unit
+val print_model_json :
+  (model_element_name -> string) ->
+  (int -> string) ->
+  Format.formatter ->
+  model ->
+  unit
 (** Prints counter-example model to json format.
 
     The format is the following:

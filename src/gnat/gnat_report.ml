@@ -93,7 +93,7 @@ let print_cntexmp_model fmt = function
       let vc_line_trans _ =
         "vc_line" and me_name_trans = spark_counterexample_transform in
       let print_model =
-        Model_parser.print_model_json ~me_name_trans ~vc_line_trans in
+        Model_parser.print_model_json me_name_trans vc_line_trans in
       let json_result_state (state, _log) =
         let more = match state with
           | Check_ce.Res_fail (ctx, t) ->
@@ -155,7 +155,7 @@ let print_stats fmt (stats, stat_checker) =
     let get_name pr = pr.Whyconf.prover_name in
     Format.fprintf fmt ", ";
     print_json_field "stats"
-      (map_bindings get_name print_prover_stats) fmt kv_list
+      (map_bindings_gnat get_name print_prover_stats) fmt kv_list
 
 let sort_messages (l : (Gnat_expl.check * msg) list) =
   List.sort (fun x y -> compare (fst x).Gnat_expl.id (fst y).Gnat_expl.id) l
@@ -195,7 +195,7 @@ let print_timing_entry fmt t =
   let l = Hashtbl.fold (fun k v acc -> (k,v)::acc) t [] in
   let get_name s = s in
   Format.fprintf fmt ", ";
-  print_json_field "timings" (map_bindings get_name standard_float) fmt l
+  print_json_field "timings" (map_bindings_gnat get_name standard_float) fmt l
 
 let print_session_dir = print_json_field "session_dir" string
 

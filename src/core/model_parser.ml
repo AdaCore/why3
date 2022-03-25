@@ -844,6 +844,68 @@ let json_model model =
 let print_model_json fmt model =
   Json_base.print_json fmt (json_model model)
 
+let print_attrs_json (me : model_element_name) fmt =
+  Json_base.list
+    (fun fmt attr -> Json_base.string fmt attr.attr_string)
+    fmt
+    (List.sort cmp_attrs (Sattr.elements me.men_attrs))
+
+(*
+**  Quering the model - json
+*)
+let print_model_element_json me_name_to_str fmt me =
+  let print_value fmt = fprintf fmt "%a" print_model_value_sanit me.me_value in
+  let print_kind fmt =
+    (* We compute kinds using the attributes and locations *)
+    match me.me_name.men_kind with
+    | Result -> fprintf fmt "%a" Json_base.string "result"
+    | Call_result _ -> fprintf fmt "%a" Json_base.string "result"
+    | At l -> fprintf fmt "@%s" l
+    | Old -> fprintf fmt "%a" Json_base.string "old"
+    | Error_message -> fprintf fmt "%a" Json_base.string "error_message"
+    | Other -> fprintf fmt "%a" Json_base.string "other"
+    | Loop_before -> fprintf fmt "%a" Json_base.string "before_loop"
+    | Loop_previous_iteration ->
+        fprintf fmt "%a" Json_base.string "before_iteration"
+    | Loop_current_iteration ->
+        fprintf fmt "%a" Json_base.string "current_iteration" in
+  let print_name fmt = Json_base.string fmt (me_name_to_str me.me_name) in
+  let print_json_attrs fmt = print_attrs_json me.me_name fmt in
+  let print_value_or_kind_or_name fmt printer = printer fmt in
+  Json_base.map_bindings_gnat (fun s -> s) print_value_or_kind_or_name fmt
+    [ ("name", print_name); ("attrs", print_json_attrs);
+      ("value", print_value) ; ("kind", print_kind) ]
+
+let print_model_elements_json me_name_to_str fmt model_elements =
+  let model_elements = filter_duplicated model_elements in
+  Json_base.list (print_model_element_json me_name_to_str) fmt model_elements
+
+let print_model_elements_on_lines_json model me_name_to_str vc_line_trans fmt
+    (file_name, model_file) =
+  Json_base.map_bindings_gnat
+    (fun i ->
+      match model.vc_term_loc with
+      | None -> string_of_int i
+      | Some pos ->
+          let vc_file_name, line, _, _ = Loc.get pos in
+          if file_name = vc_file_name && i = line then vc_line_trans i
+          else string_of_int i)
+    (print_model_elements_json me_name_to_str)
+    fmt
+    (Mint.bindings model_file)
+
+let print_model_json me_name_trans vc_line_trans fmt model =
+  let model_files_bindings =
+    List.fold_left
+      (fun bindings (file_name, model_file) ->
+        List.append bindings [(file_name, (file_name, model_file))])
+      []
+      (Mstr.bindings model.model_files) in
+  Json_base.map_bindings_gnat
+    (fun s -> s)
+      (print_model_elements_on_lines_json model me_name_trans vc_line_trans)
+      fmt model_files_bindings
+
 (*
 ***************************************************************
 **  Get element kinds

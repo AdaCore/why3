@@ -565,7 +565,7 @@ let run_idle_handler () =
       S.timeout ~ms:default_delay_ms timeout_handler;
     end
 
-let schedule_proof_attempt c id pr ~limit ~callback ~notification =
+let schedule_proof_attempt c id pr ?save_to ~limit ~callback ~notification =
   let ses = c.controller_session in
   let callback panid s =
     begin
@@ -599,13 +599,16 @@ let schedule_proof_attempt c id pr ~limit ~callback ~notification =
       let a = get_proof_attempt_node ses pa in
       let old_res = a.proof_state in
       let script =
+        if save_to = None then
           Opt.map (fun s ->
               let s = Pp.sprintf "%a" Sysutil.print_file_path s in
               Debug.dprintf debug_sched "Script file = %s@." s;
               Filename.concat (get_dir ses) s) a.proof_script
+        else
+          save_to
       in
       old_res, script
-    with Not_found | Session_itp.BadID -> None,None
+    with Not_found | Session_itp.BadID -> None,save_to
   in
   let panid = graft_proof_attempt ~limit ses id pr in
   let spa =
@@ -827,7 +830,7 @@ let run_strategy_on_goal
                        limit_mem  = memlimit;
                        limit_steps = steplimit;
                      } in
-         schedule_proof_attempt c g p ~limit ~callback ~notification
+         schedule_proof_attempt c g p ?save_to:None ~limit ~callback ~notification
       | Itransform(trname,pcsuccess) ->
          let callback ntr =
            callback_tr trname [] ntr;
@@ -968,7 +971,7 @@ let rec copy_rec ~notification ~callback_pa ~callback_tr c from_any to_any =
  *)
     | APn from_pn, APn to_pn ->
       let from_pa_list = get_proof_attempts s from_pn in
-      List.iter (fun x -> schedule_pa_with_same_arguments c x to_pn
+      List.iter (fun x -> schedule_pa_with_same_arguments ?save_to:None c x to_pn
           ~callback:callback_pa ~notification) from_pa_list;
       let from_tr_list = get_transformations s from_pn in
       let callback x tr args st = callback_tr tr args st;
@@ -1065,7 +1068,7 @@ let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notificat
      try
        if pr' <> pr then callback id (UpgradeProver pr');
        let _ = get_task c.controller_session parid in
-       schedule_proof_attempt c parid pr' ~limit ~callback ~notification
+       schedule_proof_attempt ?save_to:None c parid pr' ~limit ~callback ~notification
      with Not_found ->
        callback id Detached
 
@@ -1287,7 +1290,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
                        (Call_provers.print_prover_result ~json:false) res
                   end
                 in
-                schedule_proof_attempt c pn prover ~limit ~callback ~notification
+                schedule_proof_attempt ?save_to:None c pn prover ~limit ~callback ~notification
              | _ -> assert false
           end
         in
@@ -1369,7 +1372,7 @@ later on. We do has if proof fails. *)
             in
             Debug.dprintf
               debug "[Bisect] running the prover on subtask@.";
-            schedule_proof_attempt c pn prover ~limit ~callback ~notification
+            schedule_proof_attempt ?save_to:None c pn prover ~limit ~callback ~notification
          | _ -> assert false
       end
     in
