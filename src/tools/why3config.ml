@@ -38,8 +38,8 @@ module DetectProvers = struct
     let data = read_auto_detection_data config in
     let provers = find_provers data in
     let provers =
-      List.fold_left (fun acc (path, version) ->
-          { Partial.name = path; path; version; shortcut = None; manual = false } :: acc
+      List.fold_left (fun acc (path, name, version) ->
+          { Partial.name; path; version; shortcut = None; manual = false } :: acc
         ) [] provers in
     ignore (compute_builtin_prover provers config data);
     let config = remove_auto_provers config in

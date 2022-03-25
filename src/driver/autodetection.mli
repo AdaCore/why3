@@ -43,8 +43,8 @@ val find_prover : Prover_autodetection_data.t -> string -> string -> string opti
 (** [find_prover data name path] returns the prover version of [path], if any,
     according to an entry about [name] in [data] *)
 
-val find_provers : Prover_autodetection_data.t -> (string * string) list
-(** Detect the provers and return their versions *)
+val find_provers : Prover_autodetection_data.t -> (string * string * string) list
+(** Detect the provers and return their path, name, and versions *)
 
 val remove_auto_provers: Whyconf.config -> Whyconf.config
 (** Remove all the non-manual provers from the configuration *)

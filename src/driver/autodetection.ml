@@ -679,6 +679,29 @@ let query_prover_version path version_switch version_regexp =
     Debug.dprintf debug "command '%s' failed@." cmd;
     None
 
+let locate_exe =
+  let binaries = Hstr.create 17 in
+  let paths = try Sys.getenv "PATH" with Not_found -> "/usr/bin" in
+  let sep = if Sys.win32 then ';' else ':' in
+  List.iter (fun path ->
+      if path <> "" then
+        Array.iter (fun f ->
+            if not (Hstr.mem binaries f) then
+              Hstr.add binaries f (Filename.concat path f)
+          ) (Sys.readdir path)
+    ) (String.split_on_char sep paths);
+  fun name ->
+  let ln = String.length name in
+  Hstr.fold (fun p fullpath acc ->
+      let lp = String.length p in
+      if lp >= ln &&
+         Strings.has_prefix name p &&
+         (lp = ln ||
+            (p.[ln] = '.' && lp = ln + 4 && Strings.(has_suffix "exe" p || has_suffix "bat" p)) ||
+            (p.[ln] = '-' && lp >= ln + 2 && '0' <= p.[ln + 1] && p.[ln + 1] <= '9')) then
+        fullpath :: acc
+      else acc) binaries []
+
 let find_prover data name path =
   let binaries = Hashtbl.create 10 in
   List.iter (fun (d:Prover_autodetection_data.data) ->
@@ -695,18 +718,20 @@ let find_provers data =
   let binaries = Hashtbl.create 10 in
   List.iter (fun (d:Prover_autodetection_data.data) ->
       List.iter (fun exec_name ->
-          Hashtbl.replace binaries (exec_name, d.version_switch, d.version_regexp) ()
+          Hashtbl.replace binaries (exec_name, d.version_switch, d.version_regexp) d.prover_name
         ) d.execs
     ) data.Prover_autodetection_data.skeletons;
   let provers =
-    Hashtbl.fold
-      (fun (exec_name, switch, regexp) () acc ->
-        if Mstr.mem exec_name acc then acc
-        else
-          let r = query_prover_version exec_name switch regexp in
-          Opt.fold (fun acc x -> Mstr.add exec_name x acc) acc r
+    Hashtbl.fold (fun (exec_name, switch, regexp) name acc ->
+        let binaries = locate_exe exec_name in
+        List.fold_left (fun acc exec_name ->
+            if Mstr.mem exec_name acc then acc
+            else
+              let r = query_prover_version exec_name switch regexp in
+              Opt.fold (fun acc x -> Mstr.add exec_name (name, x) acc) acc r
+          ) acc binaries
       ) binaries Mstr.empty in
-  Mstr.bindings provers
+  List.map (fun (path, (name, version)) -> (path, name, version)) (Mstr.bindings provers)
 
 let remove_auto_provers config =
   Partial.remove_auto config
