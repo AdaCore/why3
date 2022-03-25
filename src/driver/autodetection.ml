@@ -255,11 +255,9 @@ type env =
   {
     binaries: Partial.t list;
     (* prover_unknown_version:
-        exec_name -> | Some unknown_version
-                            unknown version (neither good or bad)
-                     | None
-                            there is a good version *)
-    prover_unknown_version : unknown_version option Hstr.t;
+       path -> Some (altern -> unknown_version): neither good or bad version
+             | None: there is already a good version *)
+    prover_unknown_version : (unknown_version Hstr.t) option Hstr.t;
     (* string -> priority * prover  *)
     prover_shortcuts : (int * prover) Hstr.t;
     mutable possible_prover_shortcuts : (filter_prover * string) list;
@@ -304,14 +302,20 @@ let sanitize_exec =
 
 let check_version version (_,schema) = Re.Str.string_match schema version 0
 
-let known_version env binary =
-  Hstr.replace env.prover_unknown_version binary None
+let known_version env path =
+  Hstr.replace env.prover_unknown_version path None
 
-let unknown_version env binary shortcut prover_config data priority =
-  if not (Hstr.mem env.prover_unknown_version binary)
-  then Hstr.replace env.prover_unknown_version binary
-    (Some {data;priority;shortcut;prover_config})
-
+let unknown_version env path altern shortcut prover_config data priority =
+  match Hstr.find_opt env.prover_unknown_version path with
+  | None ->
+      let h = Hstr.create 5 in
+      Hstr.add h altern {data; priority; shortcut; prover_config};
+      Hstr.add env.prover_unknown_version path (Some h)
+  | Some None ->
+      ()
+  | Some (Some h) ->
+      if not (Hstr.mem h altern) then
+        Hstr.add h altern {data; priority; shortcut; prover_config}
 
 let empty_alt s = if s = "" then "alt" else s
 
@@ -516,7 +520,7 @@ let expand_partial env main (data:Prover_autodetection_data.data) provers (p:Par
         if not (good || old) then begin
           (* Unknown, temporarily put the prover away *)
           let priority = next_priority () in
-          unknown_version env binary shortcut prover_config data priority;
+          unknown_version env binary data.prover_altern shortcut prover_config data priority;
           provers
         end
         else if data.support_library <> ""
@@ -569,12 +573,18 @@ let expand_unknown env main provers uv =
     let prover = find_prover_altern provers uv.prover_config.prover in
     let prover_config = { uv.prover_config with prover } in
     print_info
-      "@[<v>@[Prover %s version %s is not known to be supported.@]@ \
-       @[Known versions for this prover:@ %a.@]@ \
-       @[Known old versions for this prover:@ %a.@]@]@."
-      prover.Wc.prover_name ver
+      "@[<v 2>@[Prover %s%t version %s is not recognized.@]@,\
+       @[Known versions for this prover:@ %a.@]%t@]@."
+      prover.Wc.prover_name
+      (fun fmt ->
+        if prover.prover_altern <> "" then
+          Format.fprintf fmt " (alternative: %s)" prover.prover_altern)
+      ver
       pp_versions uv.data.versions_ok
-      pp_versions uv.data.versions_old;
+      (fun fmt ->
+        if uv.data.versions_old <> [] then
+          Format.fprintf fmt "@,@[Known old versions for this prover:@ %a.@]"
+            pp_versions uv.data.versions_old);
     add_prover_shortcuts env prover;
     add_id_prover_shortcut env uv.shortcut prover uv.priority;
     Mprover.add prover prover_config provers
@@ -588,8 +598,8 @@ let detect_unknown env main detected =
           acc
       | Some uv ->
           (* The version never appeared in any section,
-             so we take the first not bad section *)
-          expand_unknown env main acc uv
+             so we take the first not bad section per alternative *)
+          Hstr.fold (fun _ uv acc -> expand_unknown env main acc uv) uv acc
     ) env.prover_unknown_version detected
 
 let convert_shortcuts env =
