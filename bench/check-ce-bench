@@ -126,16 +126,27 @@ for file in $files; do
     run Z3,4.8.10 $filedir $filebase true  $z3steps
     run Z3,4.8.10 $filedir $filebase false $z3steps
 done
-
-# Check the reproduction of the experiments by Petion (2018). Use CVC4 because
-# counterexample generation is not reproducible with Z3 (Gitlab issue #584).
-bench/check-ce/petiot2018/experiments.sh --prover CVC4,1.7 \
-  --ce-prover CVC4,1.7,counterexamples --stepslimit 10000 --rac-prover CVC4,1.7
-
 if [ "$success" = true ]; then
-    echo "check-ce-bench: success"
-    exit 0
+    echo "Check-ce bench: success"
+    exitvalue=0
 else
-    printf "\ncheck-ce-bench: failed for the following files\n$failed\n"
-    exit 1
+    printf "\nCheck-ce bench: failed\n$failed\n"
+    exitvalue=1
 fi
+
+# Check the reproduction of the experiments by Petiot (2018).
+if $updateoracle; then
+  updatearg="--updateoracle"
+else
+  updatearg=""
+fi
+bench/check-ce/petiot2018/experiments.sh --prover CVC4,1.7 \
+  --ce-prover CVC4,1.7,counterexamples --stepslimit 10000 --rac-prover CVC4,1.7 \
+  $updatearg
+if [ $? = 1 ]; then exitvalue=1; fi
+bench/check-ce/petiot2018/experiments.sh --prover Z3,4.8.10 \
+  --ce-prover Z3,4.8.10,counterexamples --stepslimit 500000 --rac-prover Z3,4.8.10 \
+  $updatearg
+if [ $? = 1 ]; then exitvalue=1; fi
+
+exit $exitvalue
