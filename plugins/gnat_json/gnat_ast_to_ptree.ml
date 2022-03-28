@@ -130,18 +130,59 @@ let mk_idents_of_type (node: type_id) =
   else
     idents
 
-let mk_include_declaration (node : include_declaration_id) =
-  let Include_declaration r = node.desc in
-  let qid = mk_module_qident r.module_ in
-  match r.use_kind with
-  | Import ->
-      D.mk_useimport false [qid, None]
-  | Export ->
-      D.mk_useexport qid
-  | Clone_default ->
-      let Module m = r.module_.desc in
-      D.mk_useimport false
-        [qid, Some (mk_ident_of_symbol node.info.id ~notation:None [] m.name)]
+module Include_Decl = struct
+  (* The purpose of this model is to allow suppression of duplicate imports in
+     Why3 theories. This requires a canonical representation of typical
+     imports, and a compare function for this type, so that we can use OCaml
+     sets to remove duplicates.
+     *)
+  type t = Use_export of qualid | Use_import of qualid * ident option
+
+  let ident_compare a b = Stdlib.compare a.id_str b.id_str
+
+  let ident_opt_compare a b =
+      match a, b with
+      | None, Some _ -> -1
+      | Some _, None -> 1
+      | Some ia, Some ib -> ident_compare ia ib
+      | None, None -> 0
+
+  let rec qualid_compare a b =
+    match a, b with
+    | Qident _ , Qdot _ -> -1
+    | Qdot _ , Qident _ -> 1
+    | Qident ia, Qident ib -> ident_compare ia ib
+    | Qdot (qa, ia), Qdot (qb, ib) ->
+      let c = qualid_compare qa qb in
+      if c <> 0 then c else ident_compare ia ib
+
+  let compare a b =
+    match a, b with
+    | Use_export _ , Use_import _ -> -1
+    | Use_import _ , Use_export _ -> 1
+    | Use_export qa, Use_export qb -> qualid_compare qa qb
+    | Use_import (qa, ioa), Use_import (qb, iob) ->
+      let c = qualid_compare qa qb in
+      if c <> 0 then c else ident_opt_compare ioa iob
+
+  let mk_include_declaration d =
+    match d with
+    | Use_export qid -> D.mk_useexport qid
+    | Use_import (qid, oi) -> D.mk_useimport false [qid, oi]
+
+  let mk_include_variant (node : include_declaration_id) =
+    let Include_declaration r = node.desc in
+    let qid = mk_module_qident r.module_ in
+    match r.use_kind with
+    | Import -> Use_import (qid, None)
+    | Export -> Use_export qid
+    | Clone_default ->
+        let Module m = r.module_.desc in
+        Use_import (qid, Some (mk_ident_of_symbol node.info.id ~notation:None [] m.name))
+end
+
+module Include_type_set = Set.Make (Include_Decl)
+
 
 let mk_pty_of_type (node : type_id) =
   Ty.mk_idapp (mk_qualid (mk_idents_of_type node)) []
@@ -1266,9 +1307,15 @@ let mk_theory_declaration (node : theory_declaration_id) =
       let name =
         let curr_attrs = Opt.to_list (mk_comment_attr r.comment) in
         mk_ident_of_symbol node.info.id ~notation:None curr_attrs r.name in
-      let includes = List.map mk_include_declaration r.includes in
+      let include_vars = List.map Include_Decl.mk_include_variant r.includes in
+      let includes, _ =
+        List.fold_left (fun (l, seen) x ->
+          if Include_type_set.mem x seen then l, seen
+          else ((Include_Decl.mk_include_declaration x)::l, Include_type_set.add x seen))
+        ([],Include_type_set.empty)
+        include_vars in
       let declarations = List.concat (List.map mk_declaration r.declarations) in
-      [name, includes @ declarations]
+      [name, List.rev_append includes declarations]
 
 let mlw_file nodes =
   Modules (List.concat (List.map mk_theory_declaration nodes))
