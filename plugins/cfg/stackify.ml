@@ -30,7 +30,12 @@ type exp_tree
   | Block of labeled_block
 
 let rec print_exp_structure' exp = match exp with
-  | Scope (lbl, _, tgt, exp) -> Format.printf "Scope( %s = " lbl.id_str; print_exp_structure' tgt; Format.printf " in "; print_exp_structure' exp ; Format.printf ")"
+  | Scope (lbl, _, tgt, exp) ->
+     Format.printf "Scope( %s = " lbl.id_str;
+     print_exp_structure' tgt;
+     Format.printf " in ";
+     print_exp_structure' exp ;
+     Format.printf ")"
   | Loop (_, exp) -> Format.printf "Loop[  "; print_exp_structure' exp ; Format.printf "]"
   | Block (l, _) -> Format.printf "Block(%s)" l.id_str
 
@@ -60,7 +65,7 @@ module Sint = Extset.Make(struct
   let compare a b = String.compare (a.id_str) (b.id_str)
 end)
 
-let graph_is_reducible (g : G.t) (dom : G.V.t -> G.V.t -> bool) (entry : label) =
+let _graph_is_reducible (g : G.t) (dom : G.V.t -> G.V.t -> bool) (entry : label) =
   let visited = ref Sint.empty  in
   let to_visit = Stack.create () in
   Stack.push entry to_visit;
@@ -81,7 +86,7 @@ let graph_is_reducible (g : G.t) (dom : G.V.t -> G.V.t -> bool) (entry : label) 
   (* graph is connected *)
   let unreached = G.fold_vertex (fun v u -> if not (Sint.mem v !visited) then Sint.add v u else u)  g Sint.empty in
   if not (Sint.is_empty unreached) then
-    raise (NotConnected (Sint.elements unreached))
+    raise (NotConnected (Sint.elements unreached));
   ()
 
 
@@ -89,7 +94,7 @@ let rec entry e = match e with
 | Block b -> b
 | Loop (_, h) -> entry h
 | Scope (_, _, _, h) -> entry h
-| _ -> assert false
+(* unused | _ -> assert false *)
 
 let mk_scope label usage tgt body = Scope (label, usage, tgt, body)
 
@@ -105,6 +110,7 @@ let rec treeify_from_components pred dom (prev : exp_tree option) blocks (wto : 
     end
   ) prev wto)
 and treeify_component pred dom blocks (wto : label Graph.WeakTopological.element) : exp_tree =
+  let open Graph.WeakTopological in
   match wto with
   | Vertex b -> Block (List.find (fun (l,_) -> l.id_str = b.id_str) blocks)
   | Component (v, b) ->

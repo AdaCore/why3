@@ -8,14 +8,13 @@
 (*  on linking described in file LICENSE.                           *)
 (*                                                                  *)
 (********************************************************************)
+
 open Cfg_ast
 open Why3
-open Pmodule
-open Ptree
 
 val set_stackify :
   (cfg_fundef ->
-    (Cfg_ast.ident * bool * Why3.Expr.rs_kind * Why3.Ptree.binder list *
-         Why3.Ptree.pty option * Why3.Ptree.pattern * Why3.Ity.mask *
-         Why3.Ptree.spec * Why3.Ptree.expr)
-  ) -> unit
+   (Cfg_ast.ident * bool * Expr.rs_kind * Ptree.binder list *
+      Ptree.pty option * Ptree.pattern * Ity.mask *
+        Ptree.spec * Ptree.expr))
+  -> unit
