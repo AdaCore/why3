@@ -474,8 +474,10 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
             used := true;
             Dterm.dterm crcmap ~loc (DTapp (pj,[v])) in
       let cs, fl = parse_record ~loc ns km get_val fl in
+      (*
       if not !used then
         Warning.emit ~loc:e1_loc "unused expression (every field is overwritten)";
+      *)
       let d = DTapp (cs, fl) in
       if re then d else mk_let crcmap ~loc "_q " e1 d
   | Ptree.Tat (e1, ({id_str = l; id_loc = loc} as id)) ->
@@ -1014,8 +1016,10 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
             Dexpr.dexpr ~loc (DEapp (pj, v))
         | Some e -> dexpr muc denv e in
       let cs,fl = parse_record ~loc muc get_val fl in
+      (*
       if not !used then
         Warning.emit ~loc:e1_loc "unused expression (every field is overwritten)";
+      *)
       let d = expr_app loc (DEsym (RS cs)) fl in
       if re then d else mk_let ~loc "_q " e1 d
   | Ptree.Elet (id, gh, kind, e1, e2) ->
