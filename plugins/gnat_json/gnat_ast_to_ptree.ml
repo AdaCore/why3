@@ -968,15 +968,6 @@ and mk_term_of_pred (node : pred_id) : term =
   | Binding _ | Elsif _ | Epsilon _ | Conditional _ as desc ->
       mk_term_of_expr {node with desc}
 
-and mk_term_of_term (node : term_id) : term =
-  match node.desc with
- | Label _ | Loc_label _ | Identifier _ | Tagged _ | Call _ | Literal _
- | Binding _ | Elsif _ | Epsilon _ | Conditional _ | Integer_constant _
- | Range_constant  _ | Modular_constant _ | Fixed_constant _
- | Real_constant _ | Float_constant _ | Comment _ | Deref _
- | Record_access _ | Record_update _ | Record_aggregate _  as desc ->
-  mk_term_of_expr {node with desc}
-
 
 let mk_function_decl (node: function_decl_id) =
   let Function_decl r = node.desc in
@@ -1249,8 +1240,6 @@ let rec mk_declaration (node : declaration_id) =
             List.map mk_clone_substitution r.substitutions in
           [D.mk_cloneimport true qid as_name substs]
     end
-  | Include_declaration _ as desc ->
-      [mk_include_declaration {node with desc}]
   | Axiom r ->
       let id = mk_ident_of_symbol node.info.id ~notation:None [mk_str "useraxiom"] r.name in
       let body = mk_term_of_pred r.def in

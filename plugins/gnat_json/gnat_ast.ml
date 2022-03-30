@@ -136,10 +136,10 @@ type type_decl_tag = [`Type_decl]
 type global_ref_declaration_tag = [`Global_ref_declaration]
 type namespace_declaration_tag = [`Namespace_declaration]
 type exception_declaration_tag = [`Exception_declaration]
-type include_declaration_tag = [`Include_declaration]
 type meta_declaration_tag = [`Meta_declaration]
 type clone_declaration_tag = [`Clone_declaration]
 type clone_substitution_tag = [`Clone_substitution]
+type include_declaration_tag = [`Include_declaration]
 type theory_declaration_tag = [`Theory_declaration]
 type module_tag = [`Module]
 
@@ -268,7 +268,6 @@ type declaration_tag = [
  | `Global_ref_declaration
  | `Namespace_declaration
  | `Exception_declaration
- | `Include_declaration
  | `Meta_declaration
  | `Clone_declaration
 ]
@@ -328,10 +327,10 @@ type any_node_tag = [
  | `Global_ref_declaration
  | `Namespace_declaration
  | `Exception_declaration
- | `Include_declaration
  | `Meta_declaration
  | `Clone_declaration
  | `Clone_substitution
+ | `Include_declaration
  | `Theory_declaration
  | `Module
 ]
@@ -398,10 +397,10 @@ and 'a why_node_desc =
   | Global_ref_declaration : {name: identifier_id; ref_type: type_id; labels: symbol_set; location: source_ptr} -> [> global_ref_declaration_tag] why_node_desc
   | Namespace_declaration : {declarations: declaration_olist; name: symbol} -> [> namespace_declaration_tag] why_node_desc
   | Exception_declaration : {name: name_id; arg: type_oid} -> [> exception_declaration_tag] why_node_desc
-  | Include_declaration : {module_: module_id; kind: theory_type; use_kind: clone_type} -> [> include_declaration_tag] why_node_desc
   | Meta_declaration : {name: symbol; parameter: symbol} -> [> meta_declaration_tag] why_node_desc
   | Clone_declaration : {origin: module_id; as_name: symbol; clone_kind: clone_type; substitutions: clone_substitution_olist; theory_kind: theory_type} -> [> clone_declaration_tag] why_node_desc
   | Clone_substitution : {kind: subst_type; orig_name: name_id; image: name_id} -> [> clone_substitution_tag] why_node_desc
+  | Include_declaration : {module_: module_id; kind: theory_type; use_kind: clone_type} -> [> include_declaration_tag] why_node_desc
   | Theory_declaration : {declarations: declaration_olist; name: symbol; kind: theory_type; includes: include_declaration_olist; comment: symbol} -> [> theory_declaration_tag] why_node_desc
   | Module : {file: symbol; name: symbol} -> [> module_tag] why_node_desc
 
@@ -687,11 +686,6 @@ and exception_declaration_olist = exception_declaration_tag why_node_olist
 and exception_declaration_id = exception_declaration_tag why_node_id
 and exception_declaration_list = exception_declaration_tag why_node_list
 
-and include_declaration_oid = include_declaration_tag why_node_oid
-and include_declaration_olist = include_declaration_tag why_node_olist
-and include_declaration_id = include_declaration_tag why_node_id
-and include_declaration_list = include_declaration_tag why_node_list
-
 and meta_declaration_oid = meta_declaration_tag why_node_oid
 and meta_declaration_olist = meta_declaration_tag why_node_olist
 and meta_declaration_id = meta_declaration_tag why_node_id
@@ -706,6 +700,11 @@ and clone_substitution_oid = clone_substitution_tag why_node_oid
 and clone_substitution_olist = clone_substitution_tag why_node_olist
 and clone_substitution_id = clone_substitution_tag why_node_id
 and clone_substitution_list = clone_substitution_tag why_node_list
+
+and include_declaration_oid = include_declaration_tag why_node_oid
+and include_declaration_olist = include_declaration_tag why_node_olist
+and include_declaration_id = include_declaration_tag why_node_id
+and include_declaration_list = include_declaration_tag why_node_list
 
 and theory_declaration_oid = theory_declaration_tag why_node_oid
 and theory_declaration_olist = theory_declaration_tag why_node_olist
@@ -1032,11 +1031,6 @@ let exception_declaration_coercion (node : any_node_tag why_node) : exception_de
   | Exception_declaration _ as desc -> {info=node.info; desc}
   | _ -> invalid_arg "exception_declaration_coercion"
 
-let include_declaration_coercion (node : any_node_tag why_node) : include_declaration_tag why_node =
-  match node.desc with
-  | Include_declaration _ as desc -> {info=node.info; desc}
-  | _ -> invalid_arg "include_declaration_coercion"
-
 let meta_declaration_coercion (node : any_node_tag why_node) : meta_declaration_tag why_node =
   match node.desc with
   | Meta_declaration _ as desc -> {info=node.info; desc}
@@ -1051,6 +1045,11 @@ let clone_substitution_coercion (node : any_node_tag why_node) : clone_substitut
   match node.desc with
   | Clone_substitution _ as desc -> {info=node.info; desc}
   | _ -> invalid_arg "clone_substitution_coercion"
+
+let include_declaration_coercion (node : any_node_tag why_node) : include_declaration_tag why_node =
+  match node.desc with
+  | Include_declaration _ as desc -> {info=node.info; desc}
+  | _ -> invalid_arg "include_declaration_coercion"
 
 let theory_declaration_coercion (node : any_node_tag why_node) : theory_declaration_tag why_node =
   match node.desc with
@@ -1203,7 +1202,6 @@ let declaration_coercion (node : any_node_tag why_node) : declaration_tag why_no
   | Global_ref_declaration _ as desc -> {info=node.info; desc}
   | Namespace_declaration _ as desc -> {info=node.info; desc}
   | Exception_declaration _ as desc -> {info=node.info; desc}
-  | Include_declaration _ as desc -> {info=node.info; desc}
   | Meta_declaration _ as desc -> {info=node.info; desc}
   | Clone_declaration _ as desc -> {info=node.info; desc}
   | _ -> invalid_arg "declaration_coercion"
@@ -1266,10 +1264,10 @@ let any_node_coercion (node : any_node_tag why_node) : any_node_tag why_node =
   | Global_ref_declaration _ as desc -> {info=node.info; desc}
   | Namespace_declaration _ as desc -> {info=node.info; desc}
   | Exception_declaration _ as desc -> {info=node.info; desc}
-  | Include_declaration _ as desc -> {info=node.info; desc}
   | Meta_declaration _ as desc -> {info=node.info; desc}
   | Clone_declaration _ as desc -> {info=node.info; desc}
   | Clone_substitution _ as desc -> {info=node.info; desc}
+  | Include_declaration _ as desc -> {info=node.info; desc}
   | Theory_declaration _ as desc -> {info=node.info; desc}
   | Module _ as desc -> {info=node.info; desc}
   | _ -> invalid_arg "any_node_coercion"
@@ -2162,20 +2160,6 @@ module From_json = struct
         arg = type_opaque_oid_from_json arg;
       } in
       {info; desc}
-    | `List [`String "W_INCLUDE_DECLARATION"; id; node; domain; link; checked; module_; kind; use_kind] ->
-      let info = {
-        id = int_from_json id;
-        node = node_id_from_json node;
-        domain = domain_from_json domain;
-        link = why_node_set_from_json link;
-        checked = boolean_from_json checked;
-      } in
-      let desc = Include_declaration {
-        module_ = module_opaque_id_from_json module_;
-        kind = theory_type_from_json kind;
-        use_kind = clone_type_from_json use_kind;
-      } in
-      {info; desc}
     | `List [`String "W_META_DECLARATION"; id; node; domain; link; checked; name; parameter] ->
       let info = {
         id = int_from_json id;
@@ -2217,6 +2201,20 @@ module From_json = struct
         kind = subst_type_from_json kind;
         orig_name = name_opaque_id_from_json orig_name;
         image = name_opaque_id_from_json image;
+      } in
+      {info; desc}
+    | `List [`String "W_INCLUDE_DECLARATION"; id; node; domain; link; checked; module_; kind; use_kind] ->
+      let info = {
+        id = int_from_json id;
+        node = node_id_from_json node;
+        domain = domain_from_json domain;
+        link = why_node_set_from_json link;
+        checked = boolean_from_json checked;
+      } in
+      let desc = Include_declaration {
+        module_ = module_opaque_id_from_json module_;
+        kind = theory_type_from_json kind;
+        use_kind = clone_type_from_json use_kind;
       } in
       {info; desc}
     | `List [`String "W_THEORY_DECLARATION"; id; node; domain; link; checked; declarations; name; kind; includes; comment] ->
@@ -2563,11 +2561,6 @@ module From_json = struct
   and exception_declaration_opaque_id_from_json json =  why_node_id_from_json exception_declaration_coercion json
   and exception_declaration_opaque_list_from_json json =  why_node_list_from_json exception_declaration_coercion json
 
-  and include_declaration_opaque_oid_from_json json =  why_node_oid_from_json include_declaration_coercion json
-  and include_declaration_opaque_olist_from_json json =  why_node_olist_from_json include_declaration_coercion json
-  and include_declaration_opaque_id_from_json json =  why_node_id_from_json include_declaration_coercion json
-  and include_declaration_opaque_list_from_json json =  why_node_list_from_json include_declaration_coercion json
-
   and meta_declaration_opaque_oid_from_json json =  why_node_oid_from_json meta_declaration_coercion json
   and meta_declaration_opaque_olist_from_json json =  why_node_olist_from_json meta_declaration_coercion json
   and meta_declaration_opaque_id_from_json json =  why_node_id_from_json meta_declaration_coercion json
@@ -2582,6 +2575,11 @@ module From_json = struct
   and clone_substitution_opaque_olist_from_json json =  why_node_olist_from_json clone_substitution_coercion json
   and clone_substitution_opaque_id_from_json json =  why_node_id_from_json clone_substitution_coercion json
   and clone_substitution_opaque_list_from_json json =  why_node_list_from_json clone_substitution_coercion json
+
+  and include_declaration_opaque_oid_from_json json =  why_node_oid_from_json include_declaration_coercion json
+  and include_declaration_opaque_olist_from_json json =  why_node_olist_from_json include_declaration_coercion json
+  and include_declaration_opaque_id_from_json json =  why_node_id_from_json include_declaration_coercion json
+  and include_declaration_opaque_list_from_json json =  why_node_list_from_json include_declaration_coercion json
 
   and theory_declaration_opaque_oid_from_json json =  why_node_oid_from_json theory_declaration_coercion json
   and theory_declaration_opaque_olist_from_json json =  why_node_olist_from_json theory_declaration_coercion json
