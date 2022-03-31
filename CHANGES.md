@@ -50,6 +50,7 @@ Coq realizations
     formalization (requires Flocq >= 3.4 and Coq >= 8.11) :x:
 
 Provers
+  * support for Z3 versions from 4.8.11 to 4.8.15 (released Mar 20, 2022)
   * support for Coq 8.15.0 (released Jan 13, 2022)
   * dropped support for Coq 8.6
 
