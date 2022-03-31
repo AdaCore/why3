@@ -3,6 +3,8 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="11" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.4.1" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC3" version="2.4.1" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -389,117 +391,111 @@
   <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.4" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.5" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.6" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.00" steps="12"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.7" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="0"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.8" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.00" steps="15"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="39"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.10" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="31"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="80"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.11" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="41"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="76"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.12" expl="loop variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="31"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.13" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="31"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.14" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="43"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="84"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.15" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="54"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.16" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="62"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.17" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="30"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="56"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.18" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="30"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="56"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.19" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="126"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="422"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.20" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="natural_mergesort&#39;vc.20.0" expl="assertion" proved="true">
    <transf name="split_goal_right" proved="true" >
     <goal name="natural_mergesort&#39;vc.20.0.0" expl="VC for natural_mergesort" proved="true">
-    <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
+    <proof prover="2"><result status="valid" time="0.01" steps="52"/></proof>
     </goal>
     <goal name="natural_mergesort&#39;vc.20.0.1" expl="VC for natural_mergesort" proved="true">
-    <proof prover="4" timelimit="11"><result status="valid" time="0.10"/></proof>
+    <proof prover="1"><result status="valid" time="0.07" steps="38713"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="natural_mergesort&#39;vc.21" expl="loop variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="35"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="64"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.22" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="35"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="64"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.23" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="46"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="138"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.24" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="39"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="64"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.25" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="50"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="134"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.26" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="69"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="136"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.27" expl="loop variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="36"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="64"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.28" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="36"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="64"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.29" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="38"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="64"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.30" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="129"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="186"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.31" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="40"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="64"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.32" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="68"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="137"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.33" expl="loop variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="46"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.34" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
   <goal name="natural_mergesort&#39;vc.35" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="35"/></proof>
-  </goal>
-  <goal name="natural_mergesort&#39;vc.36" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
-  </goal>
-  <goal name="natural_mergesort&#39;vc.37" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="66"/></proof>
   </goal>
  </transf>
  </goal>
