@@ -14,7 +14,8 @@
 <prover id="9" name="Alt-Ergo" version="2.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="10" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="11" name="Spass" version="3.7" timelimit="1" steplimit="0" memlimit="1000"/>
-<file format="whyml">
+<prover id="12" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
 <path name=".."/><path name="lineardecision.mlw"/>
 <theory name="LinearEquationsCoeffs" proved="true">
  <goal name="neg_mul" proved="true">
@@ -1732,7 +1733,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="RationalCoeffs">
+<theory name="RationalCoeffs" proved="true">
  <goal name="prod_compat_eq&#39;vc" expl="VC for prod_compat_eq" proved="true">
  <proof prover="2"><result status="valid" time="0.03" steps="5799"/></proof>
  </goal>
@@ -1872,17 +1873,51 @@
   </goal>
  </transf>
  </goal>
- <goal name="radd&#39;vc" expl="VC for radd">
- <transf name="split_goal_right" >
+ <goal name="radd&#39;vc" expl="VC for radd" proved="true">
+ <transf name="split_vc" proved="true" >
   <goal name="radd&#39;vc.0" expl="exceptional postcondition" proved="true">
-  <transf name="split_goal_right" proved="true" >
+  <proof prover="11"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="radd&#39;vc.1" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="radd&#39;vc.1.0" expl="assertion" proved="true">
+   <proof prover="10" timelimit="5" memlimit="2000"><result status="valid" time="1.34"/></proof>
+   </goal>
+   <goal name="radd&#39;vc.1.1" expl="VC for radd" proved="true">
+   <transf name="unfold" proved="true" arg1="b">
+    <goal name="radd&#39;vc.1.1.0" expl="VC for radd" proved="true">
+    <transf name="unfold" proved="true" arg1="rinterp">
+     <goal name="radd&#39;vc.1.1.0.0" expl="VC for radd" proved="true">
+     <transf name="compute_in_goal" proved="true" >
+      <goal name="radd&#39;vc.1.1.0.0.0" expl="VC for radd" proved="true">
+      <transf name="replace" proved="true" arg1="(from_int a1 * from_int b1)" arg2="(from_int b1 * from_int a1)">
+       <goal name="radd&#39;vc.1.1.0.0.0.0" expl="VC for radd" proved="true">
+       <proof prover="10" timelimit="4"><result status="valid" time="0.46"/></proof>
+       </goal>
+       <goal name="radd&#39;vc.1.1.0.0.0.1" expl="equality hypothesis" proved="true">
+       <proof prover="12" timelimit="5"><result status="valid" time="0.01" steps="17"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="radd&#39;vc.1.2" expl="VC for radd" proved="true">
+   <proof prover="11"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="radd&#39;vc.1.3" expl="VC for radd" proved="true">
+   <proof prover="10"><result status="valid" time="0.76"/></proof>
+   </goal>
+   <goal name="radd&#39;vc.1.4" expl="VC for radd" proved="true">
+   <proof prover="12"><result status="valid" time="0.77" steps="4862"/></proof>
+   </goal>
   </transf>
   </goal>
-  <goal name="radd&#39;vc.1" expl="assertion">
-  <proof prover="2" timelimit="120"><result status="timeout" time="120.00" steps="305852802"/></proof>
-  </goal>
   <goal name="radd&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="36952"/></proof>
+  <proof prover="11"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
@@ -2957,7 +2992,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="EqPropMP">
+<theory name="EqPropMP" proved="true">
  <goal name="expr_bound&#39;&#39;vc" expl="VC for expr_bound&#39;" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="expr_bound&#39;&#39;vc.0" expl="variant decrease" proved="true">
@@ -3311,8 +3346,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="prop_ctx&#39;vc" expl="VC for prop_ctx">
- <transf name="split_goal_right" >
+ <goal name="prop_ctx&#39;vc" expl="VC for prop_ctx" proved="true">
+ <transf name="split_goal_right" proved="true" >
   <goal name="prop_ctx&#39;vc.0" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.04" steps="19"/></proof>
   </goal>
@@ -3554,8 +3589,39 @@
   <goal name="prop_ctx&#39;vc.74" expl="exceptional postcondition" proved="true">
   <proof prover="7"><result status="valid" time="0.08" steps="32"/></proof>
   </goal>
-  <goal name="prop_ctx&#39;vc.75" expl="assertion">
-  <proof prover="2" timelimit="120"><result status="outofmemory" time="42.92"/></proof>
+  <goal name="prop_ctx&#39;vc.75" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="prop_ctx&#39;vc.75.0" expl="VC for prop_ctx" proved="true">
+   <proof prover="12"><result status="valid" time="0.04" steps="68"/></proof>
+   </goal>
+   <goal name="prop_ctx&#39;vc.75.1" expl="VC for prop_ctx" proved="true">
+   <proof prover="12"><result status="valid" time="0.07" steps="207"/></proof>
+   </goal>
+   <goal name="prop_ctx&#39;vc.75.2" expl="VC for prop_ctx" proved="true">
+   <proof prover="12"><result status="valid" time="0.07" steps="231"/></proof>
+   </goal>
+   <goal name="prop_ctx&#39;vc.75.3" expl="VC for prop_ctx" proved="true">
+   <proof prover="12"><result status="valid" time="0.14" steps="749"/></proof>
+   </goal>
+   <goal name="prop_ctx&#39;vc.75.4" expl="VC for prop_ctx" proved="true">
+   <proof prover="12" timelimit="5"><result status="valid" time="1.90" steps="16251"/></proof>
+   </goal>
+   <goal name="prop_ctx&#39;vc.75.5" expl="VC for prop_ctx" proved="true">
+   <proof prover="12"><result status="valid" time="0.14" steps="737"/></proof>
+   </goal>
+   <goal name="prop_ctx&#39;vc.75.6" expl="VC for prop_ctx" proved="true">
+   <proof prover="8" timelimit="1"><result status="valid" time="0.43" steps="97912"/></proof>
+   </goal>
+   <goal name="prop_ctx&#39;vc.75.7" expl="VC for prop_ctx" proved="true">
+   <proof prover="8"><result status="valid" time="1.09" steps="213236"/></proof>
+   </goal>
+   <goal name="prop_ctx&#39;vc.75.8" expl="VC for prop_ctx" proved="true">
+   <proof prover="8" timelimit="1"><result status="valid" time="0.42" steps="97813"/></proof>
+   </goal>
+   <goal name="prop_ctx&#39;vc.75.9" expl="VC for prop_ctx" proved="true">
+   <proof prover="12"><result status="valid" time="0.05" steps="82"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="prop_ctx&#39;vc.76" expl="index in array bounds" proved="true">
   <proof prover="2"><result status="valid" time="0.14" steps="203403"/></proof>

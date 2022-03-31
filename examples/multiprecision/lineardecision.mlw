@@ -1860,8 +1860,14 @@ let prop_ctx (l:context') (g:equality') : (context', equality')
     in
     defensive_set seen i true;
     assert { numof seen false 0 (m+1) < numof (old seen) false 0 (m+1)
-             by forall j. 0 <= j < m+1 -> (old seen)[j] -> seen[j]
-             so not (old seen)[i] so seen[i] };
+             by ((old seen)[i] = False /\ seen[i] = True /\
+                 forall j. 0 <= j < m+1 -> (old seen)[j] -> seen[j])
+             so 
+                numof seen false 0 (i+1) = numof seen false 0 i
+                 <= numof (old seen) false 0 i = numof (old seen) false 0 (i+1) - 1
+             so numof seen false 0 (m+1) = numof seen false 0 (i+1) + numof seen false (i+1) (m+1) <
+                numof (old seen) false 0 (i+1) + numof (old seen)  false (i+1) (m+1) = numof (old seen) false 0 (m+1)
+             }; 
     match a[i] with
     | None -> ()
     | Some e -> a[i] <- Some (prop e)
