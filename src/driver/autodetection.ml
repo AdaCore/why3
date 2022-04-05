@@ -679,8 +679,7 @@ let generate_builtin_config env datas detected config =
       (generate_auto_strategies env)
   in
   let config = set_editors config datas.Prover_autodetection_data.editors in
-  let config = set_prover_shortcuts config shortcuts in
-  let config = set_provers config detected in
+  let config = add_provers config detected shortcuts in
   config
 
 let read_auto_detection_data config =

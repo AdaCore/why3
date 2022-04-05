@@ -45,6 +45,11 @@ Tools
   * `why3 prove` now supports transformations that require an argument
   * `why3 execute` now supports `io.StdIO` and `debug.Debug`
 
+Configuration
+  * the configuration file `why3.conf` can now contain additional
+    hand-written `[prover]` sections that are taken in addition with
+    the auto-detected provers
+
 Coq realizations
   * floating-point theories are now built on top of Flocq's `BinarySingleNaN`
     formalization (requires Flocq >= 3.4 and Coq >= 8.11) :x:
