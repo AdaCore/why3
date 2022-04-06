@@ -58,6 +58,7 @@ Provers
   * support for Z3 versions from 4.8.11 to 4.8.15 (released Mar 20, 2022)
   * support for Coq 8.15.0 (released Jan 13, 2022)
   * dropped support for Coq 8.6
+  * support for SMTLIB strings in CVC4 1.7 disabled, only CVC4 1.8 is supported
 
 Version 1.4.1, February 18, 2022
 --------------------------------
