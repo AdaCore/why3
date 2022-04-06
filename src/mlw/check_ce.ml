@@ -224,11 +224,15 @@ let import_model_const loc env ity = function
       else
         cannot_import "type %a instead of int or range type" print_ity ity
   | String s ->
-      ity_equal_check ity ity_str;
-      string_value s
+      if ity_equal ity ity_str then
+        string_value s
+      else
+        cannot_import "type %a instead of string" print_ity ity
   | Boolean b ->
-      ity_equal_check ity ity_bool;
-      bool_value b
+      if ity_equal ity ity_bool then
+        bool_value b
+      else
+        cannot_import "type %a instead of bool" print_ity ity
   | Decimal _ | Fraction _ | Float _ as v ->
       cannot_import "not implemented for value %a" print_model_const_human v
 
