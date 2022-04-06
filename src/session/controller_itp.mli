@@ -213,18 +213,23 @@ val interrupt : controller -> unit
     the ones already running *)
 
 val schedule_proof_attempt :
+  ?proof_script_filename:string ->
   controller ->
   proofNodeID ->
   Whyconf.prover ->
   limit:Call_provers.resource_limit ->
   callback:(proofAttemptID -> proof_attempt_status -> unit) ->
   notification:notifier -> unit
-(** [schedule_proof_attempt c id p ~timelimit ~callback ~notification] schedules a
+(** [schedule_proof_attempt ?proof_script_filename c id p ~timelimit
+   ~callback ~notification] schedules a
    proof attempt for a goal specified by [id] with the prover [p] with
    time limit [timelimit]; the function [callback] will be called each
    time the proof attempt status changes. Typically at Scheduled, then
    Running, then Done. If there is already a proof attempt with [p] it
    is updated.
+   [proof_script_filename] is used to give a location for the files
+   generated for the prover.
+   With debug flag keep_vcs, the files are saved at this location.
 *)
 
 val schedule_edition :
