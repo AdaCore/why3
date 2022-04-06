@@ -1,0 +1,37 @@
+Strongest Postcondition
+File "bench/ce/bv32.mlw", line 9, characters 14-29:
+Sub-goal Postcondition of goal dummy_update'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File bv32.mlw:
+  Line 7:
+    r [@field:0:contents] [@introduced] [@mlw:reference_var] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "34"}}]}}
+  Line 9:
+    r [@field:0:contents] [@introduced] [@mlw:reference_var]
+      [@model_trace:r] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "132"}}]}}
+  Line 10:
+    r [@field:0:contents] [@introduced] [@mlw:reference_var] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "66"}}]}}
+  Line 11:
+    r [@field:0:contents] [@introduced] [@mlw:reference_var] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "132"}}]}}
+
+File "bench/ce/bv32.mlw", line 15, characters 14-28:
+Sub-goal Postcondition of goal dummy_update_with_int'vc.
+Prover result is: Unknown or time/memory/step limit.
+

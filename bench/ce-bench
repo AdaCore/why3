@@ -76,7 +76,7 @@ run () {
         printf "Strongest Postcondition ${file_path} ($1)... "
     fi
     steps=$5
-    if [ "$3" = "strings" ] && [ "$1" = "CVC4,1.7" ] ; then
+    if [ "$3" = "strings" ] && [ "$1" = "CVC4,1.8" ] ; then
         prover="$1,strings+counterexamples"
     else
         prover="$1,counterexamples"
@@ -144,8 +144,8 @@ for file in $files; do
         z3steps=7500000
         ;;
     esac
-    run CVC4,1.7 $filedir $filebase true  $cvc4steps
-    run CVC4,1.7 $filedir $filebase false $cvc4steps
+    run CVC4,1.8 $filedir $filebase true  $cvc4steps
+    run CVC4,1.8 $filedir $filebase false $cvc4steps
     run Z3,4.8.10 $filedir $filebase true  $z3steps
     run Z3,4.8.10 $filedir $filebase false $z3steps
 done

@@ -1,0 +1,117 @@
+Weakest Precondition
+File "bench/ce/jlamp_projections.mlw", line 29, characters 8-18:
+Sub-goal Precondition of goal p3'vc.
+Prover result is: Valid.
+
+File "bench/ce/jlamp_projections.mlw", line 29, characters 2-18:
+Sub-goal Integer overflow of goal p3'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File jlamp_projections.mlw:
+  Line 18:
+    a [@introduced] =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "127"}}
+  Line 28:
+    a [@introduced] =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "127"}}
+  Line 29:
+    a [@introduced] [@model_trace:a] =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "127"}}
+    result of call at line 29, characters 8-18 [@call_result:29:8:18:bench/ce/jlamp_projections.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "1"}}
+
+File "bench/ce/jlamp_projections.mlw", line 42, characters 14-24:
+Sub-goal Precondition of goal p3'vc.
+Prover result is: Valid.
+
+File "bench/ce/jlamp_projections.mlw", line 42, characters 7-24:
+Sub-goal Integer overflow of goal p3'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File ref.mlw:
+  Line 18:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"proj_name": "to_int",
+              "type": "Proj",
+              "value": {"type": "Integer", "val": "127"}}}]}}
+File jlamp_projections.mlw:
+  Line 41:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"proj_name": "to_int",
+              "type": "Proj",
+              "value": {"type": "Integer", "val": "127"}}}]}}
+  Line 42:
+    a [@field:0:contents] [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"proj_name": "to_int",
+              "type": "Proj",
+              "value": {"type": "Integer", "val": "127"}}}]}}
+    result of call at line 42, characters 14-24 [@call_result:42:14:24:bench/ce/jlamp_projections.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "1"}}
+
+File "bench/ce/jlamp_projections.mlw", line 54, characters 29-39:
+Sub-goal Precondition of goal p4'vc.
+Prover result is: Valid.
+
+File "bench/ce/jlamp_projections.mlw", line 54, characters 21-39:
+Sub-goal Integer overflow of goal p4'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File jlamp_projections.mlw:
+  Line 53:
+    b [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "f",
+            "value":
+             {"proj_name": "to_int",
+              "type": "Proj",
+              "value": {"type": "Integer", "val": "127"}}},
+           {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
+  Line 54:
+    b [@introduced] [@model_trace:b] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "f",
+            "value":
+             {"proj_name": "to_int",
+              "type": "Proj",
+              "value": {"type": "Integer", "val": "127"}}},
+           {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
+    result of call at line 54, characters 29-39 [@call_result:54:29:39:bench/ce/jlamp_projections.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "1"}}
+
