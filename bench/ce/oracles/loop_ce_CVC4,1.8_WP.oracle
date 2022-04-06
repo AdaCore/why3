@@ -1,0 +1,110 @@
+Weakest Precondition
+File "bench/ce/loop_ce.mlw", line 13, characters 16-25:
+Sub-goal Loop invariant init of goal f'vc.
+Prover result is: Valid.
+
+File "bench/ce/loop_ce.mlw", line 12, characters 14-20:
+Sub-goal Loop variant decrease of goal f'vc.
+Prover result is: Valid.
+
+File "bench/ce/loop_ce.mlw", line 13, characters 16-25:
+Sub-goal Loop invariant preservation of goal f'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File loop_ce.mlw:
+  Line 9:
+    a [@field:0:contents] [@introduced] [@mlw:reference_var] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 10:
+    b [@field:0:contents] [@introduced] [@mlw:reference_var] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 11:
+    [before iteration] b [@field:0:contents] [@introduced]
+      [@loop:bench/ce/loop_ce.mlw:11:2:91] [@mlw:reference_var] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
+  Line 13:
+    [current iteration] a [@field:0:contents] [@introduced]
+      [@mlw:reference_var] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+    [current iteration] b [@field:0:contents] [@introduced]
+      [@mlw:reference_var] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "6"}}]}}
+  Line 14:
+    [current iteration] b [@field:0:contents] [@introduced]
+      [@mlw:reference_var] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "6"}}]}}
+
+File "bench/ce/loop_ce.mlw", line 23, characters 13-23:
+Sub-goal Assertion of goal g'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File loop_ce.mlw:
+  Line 22:
+    a [@field:0:contents] [@introduced] [@mlw:reference_var] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+    result of call at line 22, characters 7-14 [@call_result:22:7:14:bench/ce/loop_ce.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": false}
+  Line 23:
+    a [@field:0:contents] [@introduced] [@mlw:reference_var]
+      [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+    a at X [@at:X] [@at:X:loc:bench/ce/loop_ce.mlw:23] [@field:0:contents]
+      [@introduced] [@mlw:reference_var] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+
+File "bench/ce/loop_ce.mlw", line 20, characters 31-44:
+Sub-goal Postcondition of goal g'vc.
+Prover result is: Valid.
+
+File "bench/ce/loop_ce.mlw", line 23, characters 13-23:
+Sub-goal Assertion of goal g'vc.
+Prover result is: Valid.
+
+File "bench/ce/loop_ce.mlw", line 20, characters 31-44:
+Sub-goal Postcondition of goal g'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File loop_ce.mlw:
+  Line 20:
+    old a [@at:'Old:loc:bench/ce/loop_ce.mlw:20] [@field:0:contents]
+      [@introduced] [@mlw:reference_var] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
+  Line 22:
+    result of call at line 22, characters 7-14 [@call_result:22:7:14:bench/ce/loop_ce.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": true}
+

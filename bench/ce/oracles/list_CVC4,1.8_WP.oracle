@@ -1,0 +1,33 @@
+Weakest Precondition
+File "bench/ce/list.mlw", line 14, characters 26-39:
+Goal g1.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File list.mlw:
+  Line 14:
+    l [@introduced] = {"type": "Apply", "val": {"apply": "Nil", "list": []}}
+
+File "bench/ce/list.mlw", line 16, characters 26-39:
+Goal g2.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File list.mlw:
+  Line 16:
+    l [@introduced] =
+      {"type": "Apply",
+       "val":
+        {"apply": "Cons",
+         "list":
+          [{"type": "Integer", "val": "3"},
+           {"type": "Apply", "val": {"apply": "Nil", "list": []}}]}}
+
+File "bench/ce/list.mlw", line 25, characters 30-43:
+Goal g1.
+Prover result is: Unknown or time/memory/step limit.
+
+File "bench/ce/list.mlw", line 27, characters 30-43:
+Goal g2.
+Prover result is: Unknown or time/memory/step limit.
+

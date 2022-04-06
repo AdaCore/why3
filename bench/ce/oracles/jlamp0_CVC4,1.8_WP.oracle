@@ -1,0 +1,371 @@
+Weakest Precondition
+File "bench/ce/jlamp0.mlw", line 12, characters 13-26:
+Sub-goal Assertion of goal p1'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File jlamp0.mlw:
+  Line 6:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 8:
+    b [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+  Line 11:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+  Line 12:
+    a [@field:0:contents] [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+
+File "bench/ce/jlamp0.mlw", line 10, characters 15-29:
+Sub-goal Postcondition of goal p1'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File jlamp0.mlw:
+  Line 6:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "7"}}]}}
+  Line 8:
+    b [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+  Line 10:
+    a [@field:0:contents] [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
+  Line 11:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
+  Line 13:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
+
+File "bench/ce/jlamp0.mlw", line 10, characters 15-29:
+Sub-goal Postcondition of goal p1'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File jlamp0.mlw:
+  Line 6:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 8:
+    b [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+  Line 10:
+    a [@field:0:contents] [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
+  Line 11:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
+
+File "bench/ce/jlamp0.mlw", line 22, characters 18-31:
+Sub-goal Loop invariant init of goal p2'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File jlamp0.mlw:
+  Line 6:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 20:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 22:
+    c [@field:0:contents] [@introduced] [@model_trace:c] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+
+File "bench/ce/jlamp0.mlw", line 23, characters 18-31:
+Sub-goal Loop invariant init of goal p2'vc.
+Prover result is: Valid.
+
+File "bench/ce/jlamp0.mlw", line 24, characters 16-18:
+Sub-goal Loop variant decrease of goal p2'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File ref.mlw:
+  Line 18:
+    c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 20:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+File jlamp0.mlw:
+  Line 6:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 20:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 21:
+    [before iteration] a [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+    [before iteration] c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 24:
+    [current iteration] c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] [@model_trace:c] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 25:
+    [current iteration] a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
+  Line 26:
+    [current iteration] c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+
+File "bench/ce/jlamp0.mlw", line 22, characters 18-31:
+Sub-goal Loop invariant preservation of goal p2'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File ref.mlw:
+  Line 18:
+    c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
+  Line 20:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "12"}}]}}
+File jlamp0.mlw:
+  Line 6:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 20:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 21:
+    [before iteration] a [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+    [before iteration] c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
+  Line 22:
+    [current iteration] c [@field:0:contents] [@introduced]
+      [@model_trace:c] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "12"}}]}}
+  Line 25:
+    [current iteration] a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "13"}}]}}
+  Line 26:
+    [current iteration] c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "12"}}]}}
+
+File "bench/ce/jlamp0.mlw", line 23, characters 18-31:
+Sub-goal Loop invariant preservation of goal p2'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File ref.mlw:
+  Line 18:
+    c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 20:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+File jlamp0.mlw:
+  Line 6:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 20:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 21:
+    [before iteration] a [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
+    [before iteration] c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 23:
+    [current iteration] a [@field:0:contents] [@introduced]
+      [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
+  Line 25:
+    [current iteration] a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
+  Line 26:
+    [current iteration] c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+
+File "bench/ce/jlamp0.mlw", line 19, characters 15-28:
+Sub-goal Postcondition of goal p2'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File ref.mlw:
+  Line 18:
+    c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
+File jlamp0.mlw:
+  Line 6:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 19:
+    a [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+  Line 20:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 21:
+    a [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+    c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
+
