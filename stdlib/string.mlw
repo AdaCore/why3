@@ -363,7 +363,7 @@ module String
          0 <= i < length s && lt (s_at s i) "0"
              -> to_int s = -1 *)
 
-  (*** In SMT-Lib, but NOT in z3/cvc4 *)
+  (*** In SMT-Lib now *)
   predicate is_digit (s:string) = 0 <= to_int s <= 9 && length s = 1
   (** `is_digit s` returns `True` iff `s` is of length `1` and
       corresponds to a decimal digit, that is, to a code point in the
