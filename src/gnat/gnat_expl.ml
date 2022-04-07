@@ -40,6 +40,8 @@ type reason =
    | VC_Loop_Variant
    | VC_Subprogram_Variant
    | VC_Assert
+   | VC_Assert_Premise
+   | VC_Assert_Step
    | VC_Raise
    | VC_Inline_Check
    | VC_UC_No_Holes
@@ -99,6 +101,8 @@ let is_warning_reason r =
    | VC_Loop_Variant
    | VC_Subprogram_Variant
    | VC_Assert
+   | VC_Assert_Premise
+   | VC_Assert_Step
    | VC_Raise
    | VC_Inline_Check
    | VC_UC_No_Holes
@@ -207,6 +211,8 @@ let reason_from_string s =
    | "VC_LOOP_VARIANT"              -> VC_Loop_Variant
    | "VC_SUBPROGRAM_VARIANT"        -> VC_Subprogram_Variant
    | "VC_ASSERT"                    -> VC_Assert
+   | "VC_ASSERT_PREMISE"            -> VC_Assert_Premise
+   | "VC_ASSERT_STEP"               -> VC_Assert_Step
    | "VC_RAISE"                     -> VC_Raise
    | "VC_INLINE_CHECK"              -> VC_Inline_Check
    | "VC_UC_NO_HOLES"               -> VC_UC_No_Holes
@@ -271,6 +277,8 @@ let reason_to_ada reason =
    | VC_Loop_Variant              -> "VC_LOOP_VARIANT"
    | VC_Subprogram_Variant        -> "VC_SUBPROGRAM_VARIANT"
    | VC_Assert                    -> "VC_ASSERT"
+   | VC_Assert_Premise            -> "VC_ASSERT_PREMISE"
+   | VC_Assert_Step               -> "VC_ASSERT_STEP"
    | VC_Raise                     -> "VC_RAISE"
    | VC_Inline_Check              -> "VC_INLINE_CHECK"
    | VC_UC_No_Holes               -> "VC_UC_NO_HOLES"
@@ -330,6 +338,8 @@ let reason_to_string reason =
    | VC_Loop_Variant              -> "loop_variant"
    | VC_Subprogram_Variant        -> "subprogram_variant"
    | VC_Assert                    -> "assert"
+   | VC_Assert_Premise            -> "assert_premise"
+   | VC_Assert_Step               -> "assert_step"
    | VC_Raise                     -> "raise"
    | VC_Inline_Check              -> "inline_check"
    | VC_UC_No_Holes               -> "uc_no_holes"

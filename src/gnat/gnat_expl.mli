@@ -44,6 +44,8 @@ type reason =
    | VC_Loop_Variant
    | VC_Subprogram_Variant
    | VC_Assert
+   | VC_Assert_Premise
+   | VC_Assert_Step
    | VC_Raise
    | VC_Inline_Check
    | VC_UC_No_Holes
