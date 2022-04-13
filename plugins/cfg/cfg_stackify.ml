@@ -176,11 +176,14 @@ let translate_cfg block (blocks : (label * block) list) =
   e
 let e_ref = mk_expr ~loc:Loc.dummy_position Eref
 
-let declare_local (ghost,id,ty) body =
+let declare_local (ghost,id,ty, init) body =
   let loc = id.id_loc in
   Debug.dprintf debug "declaring local variable %a of type %a@." pp_id id pp_pty ty ;
-  let e = Eany([],Expr.RKnone,Some ty,pat_wild ~loc,Ity.MaskVisible,empty_spec) in
-  let e = mk_expr ~loc (Eapply(e_ref,mk_expr ~loc e)) in
+  let e : expr = match init with
+  | Some e -> e
+  | None -> mk_expr ~loc (Eany([],Expr.RKnone,Some ty,pat_wild ~loc,Ity.MaskVisible,empty_spec))
+  in
+  let e = mk_expr ~loc (Eapply(e_ref, e)) in
   let id = { id with id_ats = (ATstr Pmodule.ref_attr) :: id.id_ats } in
   mk_expr ~loc:id.id_loc (Elet(id,ghost,Expr.RKnone,e,body))
 

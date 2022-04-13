@@ -548,7 +548,7 @@ PLUG_TRANSFORM =
 PLUG_TPTP = tptp_parser tptp_typing tptp_lexer tptp_printer
 PLUG_PYTHON = py_parser py_lexer py_main
 PLUG_MICROC = mc_parser mc_lexer mc_printer mc_main
-PLUG_CFG = cfg_parser cfg_lexer cfg_paths cfg_main
+PLUG_CFG = cfg_parser cfg_lexer cfg_paths subregion_analysis cfg_main
 ifeq (@enable_stackify@,yes)
 PLUG_CFG += stackify cfg_stackify
 endif

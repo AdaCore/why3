@@ -54,7 +54,7 @@ type cfg_fundef =
     cf_pat: Ptree.pattern;
     cf_spec: Ptree.spec;
     cf_attrs: Ptree.attr list;
-    cf_locals: (bool * ident * Ptree.pty) list;
+    cf_locals: (bool * ident * Ptree.pty * Ptree.expr option) list;
     cf_block0: block;
     cf_blocks: (label * block) list;
   }

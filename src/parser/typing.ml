@@ -1735,6 +1735,15 @@ let type_mlw_file env path filename mlw_file =
   in
   file
 
+module Unsafe = struct
+  let dexpr = dexpr
+  let drec_defn = drec_defn
+
+  let create_user_id = create_user_id
+  let create_user_prog_id = create_user_prog_id
+  let add_decl = add_decl
+end
+
 (* incremental parsing *)
 
 type slice = {

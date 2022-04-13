@@ -64,9 +64,13 @@ vardecls:
 ;
 
 vardecl:
-  | g=ghost_opt VAR vl=attrs(lident_nq)* COLON t=ty SEMICOLON
-    { List.map (fun id -> (g,id,t)) vl }
+  | g=ghost_opt VAR vl=attrs(lident_nq)* COLON t=ty init=init_opt SEMICOLON
+    { List.map (fun id -> (g,id,t, init)) vl }
 ;
+
+init_opt:
+| /* epsilon */ { None }
+| EQUAL contract_expr { Some($2) }
 
 ghost_opt:
   | /* epsilon */ { false }
