@@ -85,7 +85,12 @@ let mk_loop_continue entry : Ptree.expr =
 
 let mk_loop_expr entry invariants (e : Ptree.expr) : Ptree.expr =
     let continue = mk_expr ~loc:Loc.dummy_position (Eoptexn (entry, Ity.MaskVisible, e)) in
-    let invariants = List.map snd invariants in
+    let invariants =
+      List.map (fun (id,t) ->
+          let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ id.id_str)) in
+          { term_loc = t.term_loc; term_desc = Tattr (attr, t) })
+        invariants
+    in
     let infinite_loop =
       mk_expr ~loc:entry.id_loc
         (Ewhile (mk_expr ~loc:Loc.dummy_position Etrue, invariants, [], continue))
