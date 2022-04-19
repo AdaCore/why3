@@ -81,19 +81,9 @@ let register check check_tree result =
     Gnat_expl.HCheck.add msg_set check msg
   end
 
-let spark_counterexample_transform me_name =
-  (* Just return the name of the model element. Transformation of model
-     element names to SPARK syntax is now handled in gnat2why.
-     See Flow_Error_Messages.Error_Msg_Proof.Do_Pretty_Cntexmp*)
-  me_name.Model_parser.men_name
-
-let print_cntexmp_model fmt = function
-  | None -> ()
+let get_cntexmp_model = function
+  | None -> []
   | Some (m, r) ->
-      let vc_line_trans _ =
-        "vc_line" and me_name_trans = spark_counterexample_transform in
-      let print_model =
-        Model_parser.print_model_json me_name_trans vc_line_trans in
       let json_result_state (state, _log) =
         let more = match state with
           | Check_ce.Res_fail (ctx, t) ->
@@ -120,90 +110,101 @@ let print_cntexmp_model fmt = function
         let state =
           ["state", String (Check_ce.string_of_rac_result_state state)] in
         Record (state @ more) in
-      Format.fprintf fmt ", %a" (print_json_field "cntexmp" print_model) m;
-      Opt.iter
-        (Format.fprintf fmt ", %a"
-           (print_json_field "giant_step_rac_result" print_json))
-        (Opt.map json_result_state r)
+      let rcd_only_cntexmp_model = [ "cntexmp", (Model_parser.json_model m) ] in
+      match r with
+      | None -> rcd_only_cntexmp_model
+      | Some (state, _log) ->
+          List.append
+            rcd_only_cntexmp_model
+            [ "giant_step_rac_result", (json_result_state (state, _log)) ]
 
-let print_manual_proof_info fmt info =
+let get_manual_proof_info info =
   match info with
-  | None -> ()
+  | None -> []
   | Some (fname, cmd) ->
-     Format.fprintf fmt ", %a, %a"
-     (print_json_field "vc_file" string)
-                   (Sys.getcwd () ^ Filename.dir_sep ^ fname)
-     (print_json_field "editor_cmd" string) cmd
+      [ "vc_file", String (Sys.getcwd () ^ Filename.dir_sep ^ fname);
+        "editor_cmd", String cmd
+      ]
 
-let print_prover_stats fmt stat =
-  Format.fprintf fmt "{ %a, %a, %a }"
-   (print_json_field "count" int) stat.count
-   (print_json_field "max_steps" int) stat.max_steps
-   (print_json_field "max_time" standard_float) stat.max_time
+let get_prover_stats stat =
+  Record [
+    "count", Int stat.count;
+    "max_steps", Int stat.max_steps;
+    "max_time", StandardFloat stat.max_time
+  ]
 
-let print_stats fmt (stats, stat_checker) =
-  (* Print the stats for goal solved by transformations as a fake prover. *)
+let get_stats (stats, stat_checker) =
+  (* Compute the stats for goal solved by transformations as a fake prover. *)
   let fake_prover_ch =
     Whyconf.{prover_name = "Checker"; prover_version = ""; prover_altern = ""}
   in
   match stats with
-  | None -> ()
+  | None -> []
   | Some s ->
     if stat_checker <> 0 then
-      Whyconf.Hprover.add s fake_prover_ch {count = stat_checker; max_steps = 0; max_time = 0.0};
+      Whyconf.Hprover.add s fake_prover_ch
+        {count = stat_checker; max_steps = 0; max_time = 0.0};
     let kv_list = Whyconf.Hprover.fold (fun k v acc -> (k,v)::acc) s [] in
     let get_name pr = pr.Whyconf.prover_name in
-    Format.fprintf fmt ", ";
-    print_json_field "stats"
-      (map_bindings_gnat get_name print_prover_stats) fmt kv_list
+    [ "stats",
+      Record (List.map (fun (k,v) -> get_name k, get_prover_stats v) kv_list) ]
 
+let opt_int i = Opt.get_def 0 i
+
+let get_extra_info i =
+  match i with
+  | { Gnat_expl.pretty_node = i; inlined = inline } ->
+      Record [
+        "node", Int (opt_int i);
+        "inline", Int (opt_int inline)
+      ]
+
+let get_msg (check, m) =
+  Record (
+    List.concat [
+      [ "id", Int check.Gnat_expl.id ;
+        "reason", String (Gnat_expl.reason_to_ada check.Gnat_expl.reason) ;
+        "result", Bool m.result ;
+        "check_tree", m.check_tree ;
+        "extra_info", get_extra_info m.extra_info
+      ] ;
+      get_stats (m.stats, m.stats_checker);
+      get_cntexmp_model m.cntexmp_model ;
+      get_manual_proof_info m.manual_proof
+    ]
+  )
+
+(* In case several models are returned by Why3, we sort them by id. *)
 let sort_messages (l : (Gnat_expl.check * msg) list) =
   List.sort (fun x y -> compare (fst x).Gnat_expl.id (fst y).Gnat_expl.id) l
 
-let opt_int fmt i = int fmt (Opt.get_def 0 i)
-
-let print_extra_info fmt i =
- let print_info fmt (i, inline) =
-  Format.fprintf fmt "{%a, %a}"
-    (print_json_field "node" opt_int) i
-    (print_json_field "inline" opt_int) inline
+let get_results () =
+  let msg_set =
+    Gnat_expl.HCheck.fold (fun k v acc -> (k,v) :: acc) msg_set []
   in
-  match i with
-  | { Gnat_expl.pretty_node = i; inlined = inline } ->
-    Format.fprintf fmt ", %a" (print_json_field "extra_info" print_info) (i, inline)
+  "results", List (List.map get_msg (sort_messages msg_set))
 
+let get_warnings () =
+  match !warning_list with
+  | [] -> []
+  | l -> [("warnings", List (List.map (fun elem -> String elem) l))]
 
-let print_json_msg fmt (check, m) =
-  Format.fprintf fmt "{%a, %a, %a, %a%a%a%a%a}"
-    (print_json_field "id" int) check.Gnat_expl.id
-    (print_json_field "reason" string)
-      (Gnat_expl.reason_to_ada check.Gnat_expl.reason)
-    (print_json_field "result" bool) m.result
-    (print_json_field "check_tree" Json_base.print_json) m.check_tree
-    print_extra_info m.extra_info
-    print_stats (m.stats, m.stats_checker)
-    print_cntexmp_model m.cntexmp_model
-    print_manual_proof_info m.manual_proof
-
-let print_warning_list fmt l =
-  match l with
-  | [] -> ()
-  | l ->
-    Format.fprintf fmt ", %a" (print_json_field "warnings" (list string)) l
-
-let print_timing_entry fmt t =
-  let l = Hashtbl.fold (fun k v acc -> (k,v)::acc) t [] in
+let get_timings () =
+  let l = Hashtbl.fold (fun k v acc -> (k,v)::acc) (Util.get_timings ()) [] in
   let get_name s = s in
-  Format.fprintf fmt ", ";
-  print_json_field "timings" (map_bindings_gnat get_name standard_float) fmt l
+  "timings", Record (List.map (fun (k,v) -> get_name k, StandardFloat v) l)
 
-let print_session_dir = print_json_field "session_dir" string
+let get_session_dir () =
+  "session_dir", String Gnat_config.session_dir
 
+(* The main function, where we build the final Record to be printed using
+Why3.Json_base.print_json function. *)
 let print_messages () =
-  let msg_set = Gnat_expl.HCheck.fold (fun k v acc -> (k,v) :: acc) msg_set []
-  in
-  Format.printf "{%a, %a%a%a}@."
-  print_session_dir Gnat_config.session_dir
-  (print_json_field "results" (list print_json_msg)) (sort_messages msg_set)
-  print_warning_list !warning_list
-  print_timing_entry (Util.get_timings ())
+  print_json Format.std_formatter (
+    Record (
+      List.concat [
+        [get_session_dir (); get_results (); get_timings ()];
+        get_warnings ()
+      ]
+    )
+  )

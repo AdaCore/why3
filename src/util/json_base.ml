@@ -29,11 +29,8 @@ let string fmt s =
 
 let int = pp_print_int
 let bool fmt b = fprintf fmt "%b" b
-let standard_float fmt f = fprintf fmt "%f" f
 let float fmt f = fprintf fmt "%g" f
-
-let print_json_field key value_pr fmt value =
-  fprintf fmt "@[<hv 1>%a:@ %a@]" string key value_pr value
+let standard_float fmt f = fprintf fmt "%f" f
 
 let rec seq pr fmt = function
   | [] -> ()
@@ -46,19 +43,13 @@ let rec seq pr fmt = function
 let list pr fmt l =
   fprintf fmt "@[<hv 1>[%a]@]" (seq pr) l
 
-let print_map_binding key_to_str value_pr fmt binding =
-  let (key, value) = binding in
-  print_json_field (key_to_str key) value_pr fmt value
-
-let map_bindings_gnat key_to_str value_pr fmt map_bindings =
-  fprintf fmt "@[<hv 1>{%a}@]" (seq (print_map_binding key_to_str value_pr)) map_bindings
-
 type json =
   | Record of (string * json) list
   | List of json list
   | String of string
   | Int of int
   | Float of float
+  | StandardFloat of float
   | Bool of bool
   | Null
 
@@ -72,6 +63,7 @@ let rec print_json fmt v =
   | String s -> string fmt s
   | Int i -> int fmt i
   | Float f -> float fmt f
+  | StandardFloat f -> standard_float fmt f
   | Bool b -> bool fmt b
   | Null -> pp_print_string fmt "null"
 and map_binding fmt binding =

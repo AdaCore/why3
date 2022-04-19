@@ -66,19 +66,28 @@ open Why3
          node prior to inlining
 
   The counter example information is stored in the cntexmp field. At the top
-  level, this is a mapping from file names to linesentry record.
+  level, this is a list of file names together with a modelentry record.
 
-     cntexmp_rec = { [filename : linesentry] }
+     cntexmp_rec  = list fileentry
 
-  A linesentry is a mapping from linenumbers to line information. A linenumber
-  is always a string. Usually the strings are integer values saved as strings,
-  but the special value "vc_line" is also used.
+     fileentry    = { "filename"  : string,
+                      "model"     : modelentry }
 
-     linesentry = { [ linenumber : list lineentry ] }
+  A modelentry is a list of lineentry records.
+  The field "loc" is the line number. The field "is_vc_line" indicates whether
+  the current line corresponds to the source code elements from which the VC
+  originates.
 
-     lineentry = { "kind"  : string,
-                   "name"  : string,
-                   "value" : string }
+     modelentry = list lineentry
+
+     lineentry  = { "loc" : string,
+                    "is_vc_line"  : bool,
+                    "model_elements"  : elemententry}
+
+     elemententry   = { "attrs" : string,
+                        "kind"  : string,
+                        "name"  : string,
+                        "value" : string }
 
   Possible values for "kind" are
    - "variable"

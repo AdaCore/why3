@@ -2,10 +2,10 @@ open Why3
 open Why3.Json_base
 
 let abort_with_message ~internal s =
-  Format.printf "{%a, %a, %a}"
-  (print_json_field "error" string) s
-  (print_json_field "internal" bool) internal
-  (print_json_field "results" (list int)) [];
+  print_json Format.std_formatter 
+    (Record [ "error", String s;
+              "internal", Bool internal;
+              "results", List []]);
   exit 1
 
 let () =

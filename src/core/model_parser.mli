@@ -184,6 +184,76 @@ val search_model_element_call_result :
 (** {2 Printing the model} *)
 
 val json_model : model -> Json_base.json
+(** Counter-example model for JSON format.
+
+    The format is the following:
+    - counterexample is JSON object with the following fields
+      {ul
+      {- "filename": name of the file}
+      {- "model": JSON list with elements corresponding to
+         counterexample_file}}
+    - counterexample_file is JSON object with the following fields
+      {ul
+      {- "loc": line number}
+      {- "is_vc_line": true if the current line corresponds to the source
+         code element from which the VC originates (this is useful for
+         use cases of Why3 as a library)}
+      {- "model_elements": JSON list with elements corresponding to
+         counterexample_line}}
+    - counterexample_line is JSON list with elements corresponding to
+      counterexample_element
+    - counterexample_element is JSON object with following fields
+      {ul
+      {- "name": name of counterexample element}
+      {- "value": value of counterexample element}
+      {- "attrs": attributes of counterexample element}
+      {- "kind": kind of counterexample element:
+        {ul
+        {- "result": Result of a function call (if the counter-example is
+           for postcondition)}
+        {- "old": Old value of function argument (if the counter-example is
+           for postcondition)}
+        {- "\@X": Value at label X}
+        {- "before_loop": Value before entering the loop}
+        {- "previous_iteration": Value in the previous loop iteration}
+        {- "current_iteration": Value in the current loop iteration}
+        {- "error_message": The model element represents error message,
+            not source-code element.
+            The error message is saved in the name of the model element}
+        {- "other"}}}}
+
+    Example:
+    [{"filename": "records.adb",
+      "model": [
+        { "loc": "84",,
+          "is_vc_line": false
+          "model_elements": [
+            {
+              "name": "A.A",
+              "value": "255",
+              "attrs": ["model_trace:A.A"]
+              "kind": "other"
+            },
+            {
+              "name": "B.B",
+              "value": "0",
+              "attrs": ["model_trace:B.B"]
+              "kind": "other"
+            }]
+        },
+        { "loc": "123",,
+          "is_vc_line": true
+          "model_elements": [
+            {
+              "name": "C.C",
+              "value": "1",
+              "attrs": ["model_trace:C.C"]
+              "kind": "result"
+            }]
+        }
+      ]
+    }]
+*)
 
 val print_model :
   ?filter_similar:bool ->
@@ -210,57 +280,6 @@ val print_model_human :
   print_attrs:bool ->
   unit
 (** Same as print_model but is intended to be human readable.*)
-
-val print_model_json : Format.formatter -> model -> unit
-val print_model_json :
-  (model_element_name -> string) ->
-  (int -> string) ->
-  Format.formatter ->
-  model ->
-  unit
-(** Prints counter-example model to json format.
-
-    The format is the following:
-    - counterexample is JSON object with fields indexed by names of files
-      storing values of counterexample_file
-    - counterexample_file is JSON object with fields indexed by line numbers
-      storing values of counterexample_line
-    - counterexample_line is JSON array (ordered list) with elements
-      corresponding to counterexample_element
-    - counterexample_element is JSON object with following fields
-      {ul
-      {- "name": name of counterexample element}
-      {- "value": value of counterexample element}
-      {- "kind": kind of counterexample element:
-        {ul
-        {- "result": Result of a function call (if the counter-example is for postcondition)}
-        {- "old": Old value of function argument (if the counter-example is for postcondition)}
-        {- "\@X": Value at label X}
-        {- "before_loop": Value before entering the loop}
-        {- "previous_iteration": Value in the previous loop iteration}
-        {- "current_iteration": Value in the current loop iteration}
-        {- "error_message": The model element represents error message, not source-code element.
-            The error message is saved in the name of the model element}
-        {- "other"}}}}
-
-    Example:
-    {[
-      "records.adb": {
-          "84": [
-            {
-              "name": "A.A",
-              "value": "255",
-              "kind": "other"
-            },
-            {
-              "name": "B.B",
-              "value": "0",
-              "kind": "other"
-            }
-          ]
-      }
-    ]}
-*)
 
 val interleave_with_source :
   print_attrs:bool ->
