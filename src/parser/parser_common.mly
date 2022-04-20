@@ -1087,7 +1087,11 @@ single_expr_:
       let ee = { $5 with expr_desc = Eapply (rf, $5) } in
       Elet ($4, ghost $2, Expr.RKnone, apply_partial $2 ee, $7) }
 | MATCH seq_expr WITH ext_match_cases END
-    { let bl, xl = $4 in Ematch ($2, bl, xl) }
+    { let bl, xl = $4 in
+      let bl = if bl = [] then
+        [mk_pat Pwild $startpos($3) $endpos($3),
+         mk_expr Eabsurd $startpos($3) $endpos($3)] else bl in
+      Ematch ($2, bl, xl) }
 | EXCEPTION attrs(uident) IN seq_expr
     { Eexn ($2, PTtuple [], Ity.MaskVisible, $4) }
 | EXCEPTION attrs(uident) return IN seq_expr
