@@ -73,11 +73,12 @@ module R
     diverges
     raises { BenchFailure -> false }
   =
-    let incr = 0.002 (*(1.0 / 10000.0)*) in
+    let incr = 0x1p-8 in
     let ref i : real = 0.0 in
     while (i * i <= 2.0) do
       i <- i + incr;
     done;
+    if i < 1.41 || i > 1.42 then raise BenchFailure;
     i
 
   let bench2 ()
