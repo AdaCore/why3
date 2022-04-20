@@ -13,7 +13,8 @@ fi
 
 section_start configure Configuration
 ./autogen.sh
-./configure --enable-local
+# disabling MPFR because an execution test triggers an out of memory failure
+./configure --enable-local --disable-mpfr
 section_stop configure
 
 section_start build Building
