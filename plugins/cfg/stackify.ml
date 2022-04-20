@@ -40,14 +40,14 @@ type exp_tree
   | Loop  of (ident * Ptree.term) list * exp_tree
   | Block of labeled_block
 
-let rec print_exp_structure' exp = match exp with
+let rec _print_exp_structure' exp = match exp with
   | Scope (lbl, _, tgt, exp) ->
      Format.printf "Scope( %s = " lbl.id_str;
-     print_exp_structure' tgt;
+     _print_exp_structure' tgt;
      Format.printf " in ";
-     print_exp_structure' exp ;
+     _print_exp_structure' exp ;
      Format.printf ")"
-  | Loop (_, exp) -> Format.printf "Loop[  "; print_exp_structure' exp ; Format.printf "]"
+  | Loop (_, exp) -> Format.printf "Loop[  "; _print_exp_structure' exp ; Format.printf "]"
   | Block (l, _) -> Format.printf "Block(%s)" l.id_str
 
 let graph_from_blocks (bl : (label * block) list) : G.t =
