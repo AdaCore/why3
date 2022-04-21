@@ -2,6 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -209,19 +210,19 @@
   <proof prover="3"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
   <goal name="list_from&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.13" steps="291"/></proof>
+  <proof prover="3"><result status="valid" time="0.13" steps="303"/></proof>
   </goal>
   <goal name="list_from&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.06" steps="204"/></proof>
+  <proof prover="3"><result status="valid" time="0.06" steps="212"/></proof>
   </goal>
   <goal name="list_from&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.18" steps="768"/></proof>
+  <proof prover="3"><result status="valid" time="0.18" steps="774"/></proof>
   </goal>
   <goal name="list_from&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.43" steps="1653"/></proof>
+  <proof prover="3"><result status="valid" time="0.43" steps="1587"/></proof>
   </goal>
   <goal name="list_from&#39;vc.9" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.06" steps="216"/></proof>
+  <proof prover="3"><result status="valid" time="0.06" steps="224"/></proof>
   </goal>
  </transf>
  </goal>
@@ -300,7 +301,7 @@
    <proof prover="3"><result status="valid" time="0.02" steps="22"/></proof>
    </goal>
    <goal name="sorted_lists&#39;vc.13.2" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.03" steps="44"/></proof>
+   <proof prover="3"><result status="valid" time="0.03" steps="42"/></proof>
    </goal>
   </transf>
   </goal>
@@ -315,10 +316,10 @@
    <goal name="sorted_lists&#39;vc.14.2" expl="postcondition" proved="true">
    <transf name="assert" proved="true" arg1="(occ x (elts s) (get1 (seq1 cutp) 0) (get1 (seq1 cutp) (length2 (seq1 cutp) - 1)) = occ x (elts s) (get1 (seq1 cutp) 0) (get1 (seq1 lseq) (length2 (seq1 lseq) - 1)) + occ x (elts s) (get1 (seq1 lseq) (length2 (seq1 lseq) - 1)) (get1 (seq1 cutp) (length2 (seq1 cutp) - 1)))">
     <goal name="sorted_lists&#39;vc.14.2.0" expl="asserted formula" proved="true">
-    <proof prover="3"><result status="valid" time="0.18" steps="416"/></proof>
+    <proof prover="3"><result status="valid" time="0.18" steps="386"/></proof>
     </goal>
     <goal name="sorted_lists&#39;vc.14.2.1" expl="postcondition" proved="true">
-    <proof prover="3"><result status="valid" time="1.02" steps="1226"/></proof>
+    <proof prover="0"><result status="valid" time="0.51" steps="4123"/></proof>
     </goal>
    </transf>
    </goal>
