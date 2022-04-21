@@ -51,11 +51,11 @@ let pv_is_unit v = ity_equal v.pv_ity ity_unit
 let pv_of_ity s ity = create_pvsymbol (id_fresh s) ity
 
 
-(*
-let print_pv_attr fmt v =
+(**)
+let _print_pv_attr fmt v =
   Format.fprintf fmt "@[%a@ %a@]" Ity.print_pv v
     Pretty.print_id_attrs v.pv_vs.vs_name
- *)
+(**)
 
 let model_trace_result_attribute = create_model_trace_attr "result"
 
@@ -448,7 +448,16 @@ let rec k_print fmt k = match k with
         "@[<hov 4>| %a ->@ %a@]" Pretty.print_pat p k_print k in
       Format.fprintf fmt "@[CASE %a\n@[%a@]@]"
         Ity.print_pv v (Pp.print_list Pp.newline branch) bl
-  | Khavoc _ -> Format.fprintf fmt "HAVOC" (* TODO *)
+  | Khavoc (m, _loc, _sattr) ->
+     Format.fprintf fmt "@[HAVOC @[<hov 2>{ ";
+     Mreg.iter (fun reg pvs ->
+         Format.fprintf fmt "%a -> @[<hov 2>{ " print_reg reg;
+         Mpv.iter (fun pv1 pv2 ->
+             Format.fprintf fmt "%a -> [%a];@ "print_pv pv1 (Pp.print_option print_pv) pv2)
+           pvs;
+         Format.fprintf fmt "}@]")
+       m;
+     Format.fprintf fmt "}@]@]"
   | Klet (v, t, {t_node = Ttrue}) -> Format.fprintf fmt
       "@[<hov 4>LET %a = %a@]" Ity.print_pv v Pretty.print_term t
   | Klet (v,t,f) -> Format.fprintf fmt

@@ -5,7 +5,6 @@
 <prover id="0" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.3.3" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Spass" version="3.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_2021_lexicographic_permutations_1.mlw"/>
@@ -205,39 +204,21 @@
   <proof prover="1"><result status="valid" time="0.03" steps="75"/></proof>
   </goal>
   <goal name="swap&#39;vc.24" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="81"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="39"/></proof>
   </goal>
   <goal name="swap&#39;vc.25" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="36"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="39"/></proof>
   </goal>
   <goal name="swap&#39;vc.26" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="46"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="37"/></proof>
   </goal>
   <goal name="swap&#39;vc.27" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="swap&#39;vc.27.0" expl="postcondition" proved="true">
-   <transf name="inline_goal" proved="true" >
-    <goal name="swap&#39;vc.27.0.0" expl="postcondition" proved="true">
-    <transf name="split_all_full" proved="true" >
-     <goal name="swap&#39;vc.27.0.0.0" expl="VC for swap" proved="true">
-     <proof prover="3"><result status="valid" time="0.05"/></proof>
-     </goal>
-     <goal name="swap&#39;vc.27.0.0.1" expl="VC for swap" proved="true">
-     <transf name="split_vc" proved="true" >
-      <goal name="swap&#39;vc.27.0.0.1.0" expl="VC for swap" proved="true">
-      <proof prover="4" memlimit="2000"><result status="valid" time="0.12" steps="32541"/></proof>
-      </goal>
-     </transf>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
+   <proof prover="4"><result status="valid" time="1.02" steps="156546"/></proof>
    </goal>
    <goal name="swap&#39;vc.27.1" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.59" steps="105349"/></proof>
-   </goal>
-   <goal name="swap&#39;vc.27.2" expl="postcondition" proved="true">
-   <proof prover="4" timelimit="1"><result status="valid" time="0.17" steps="35558"/></proof>
+   <proof prover="4" timelimit="1"><result status="valid" time="0.17" steps="35559"/></proof>
    </goal>
   </transf>
   </goal>
@@ -258,13 +239,13 @@
   <proof prover="0"><result status="valid" time="0.05" steps="19131"/></proof>
   </goal>
   <goal name="next&#39;vc.4" expl="loop variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="19403"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="19436"/></proof>
   </goal>
   <goal name="next&#39;vc.5" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="19386"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="19419"/></proof>
   </goal>
   <goal name="next&#39;vc.6" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.15" steps="42853"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="42886"/></proof>
   </goal>
   <goal name="next&#39;vc.7" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.05" steps="18841"/></proof>

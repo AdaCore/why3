@@ -167,22 +167,22 @@ for filebase in "${filebases[@]}"; do
   out_file="$outbase/${filebase}.out"
   str_oracle=$(tr -d ' \n' < "${oracle_file}")
   str_out=$(tr -d ' \n' < "${out_file}")
-  if $updateoracle; then
-    echo "Updating oracle for ${filebase}, prover ${prover}"
-    echo mv "${out_file}" "${oracle_file}"
-    mv "${out_file}" "${oracle_file}"
+  echo "Checking differences between output and oracle for ${filebase}"
+  if [ "$str_oracle" = "$str_out" ] ; then
+    echo "OK"
   else
-    echo "Checking differences between output and oracle for ${filebase}"
-    if [ "$str_oracle" = "$str_out" ] ; then
-      echo "OK"
+    echo "FAILED!"
+    if $updateoracle; then
+        echo "Updating oracle for ${filebase}, prover ${prover}"
+        echo mv "${out_file}" "${oracle_file}"
+        mv "${out_file}" "${oracle_file}"
     else
-      echo "FAILED!"
-      echo "diff is the following:"
-      echo "$outbase/${filebase}"
-      echo diff -u "${oracle_file}" "${out_file}"
-      (diff -u "${oracle_file}" "${out_file}" || [ $? -eq 1 ])|colorize
-	    failed="$failed$filebase\n"
-	    success=false
+        echo "diff is the following:"
+        echo "$outbase/${filebase}"
+        echo diff -u "${oracle_file}" "${out_file}"
+        (diff -u "${oracle_file}" "${out_file}" || [ $? -eq 1 ])|colorize
+        failed="$failed$filebase\n"
+        success=false
     fi
   fi
 done

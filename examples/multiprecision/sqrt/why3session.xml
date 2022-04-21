@@ -6,6 +6,7 @@
 <prover id="1" name="Coq" version="8.11.2" timelimit="0" steplimit="0" memlimit="0"/>
 <prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Eprover" version="1.9.1-001" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="4" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="8" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -144,13 +145,13 @@
   <goal name="sqrt1&#39;vc.23" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="sqrt1&#39;vc.23.0" expl="assertion" proved="true">
-   <proof prover="8"><result status="valid" time="0.07" steps="17894"/></proof>
+   <proof prover="8"><result status="valid" time="0.07" steps="17973"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.23.1" expl="assertion" proved="true">
    <proof prover="0" memlimit="2000"><result status="valid" time="0.17"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.23.2" expl="VC for sqrt1" proved="true">
-   <proof prover="8"><result status="valid" time="0.09" steps="18236"/></proof>
+   <proof prover="8"><result status="valid" time="0.09" steps="18362"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.23.3" expl="VC for sqrt1" proved="true">
    <proof prover="0" memlimit="2000"><result status="valid" time="0.10"/></proof>
@@ -159,12 +160,12 @@
    <proof prover="0" memlimit="2000"><result status="valid" time="0.14"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.23.5" expl="VC for sqrt1" proved="true">
-   <proof prover="7"><result status="valid" time="0.08" steps="166900"/></proof>
+   <proof prover="7"><result status="valid" time="0.08" steps="184747"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.23.6" expl="VC for sqrt1" proved="true">
    <transf name="use_th" proved="true" arg1="logical.Logical">
     <goal name="sqrt1&#39;vc.23.6.0" expl="VC for sqrt1" proved="true">
-    <proof prover="8"><result status="valid" time="0.12" steps="31427"/></proof>
+    <proof prover="8"><result status="valid" time="0.12" steps="31689"/></proof>
     </goal>
    </transf>
    </goal>
@@ -172,10 +173,10 @@
    <proof prover="3"><result status="valid" time="0.07"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.23.8" expl="VC for sqrt1" proved="true">
-   <proof prover="8"><result status="valid" time="0.13" steps="21982"/></proof>
+   <proof prover="8"><result status="valid" time="0.13" steps="22244"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.23.9" expl="VC for sqrt1" proved="true">
-   <proof prover="8"><result status="valid" time="0.14" steps="22042"/></proof>
+   <proof prover="8"><result status="valid" time="0.14" steps="22304"/></proof>
    </goal>
   </transf>
   </goal>
@@ -191,13 +192,13 @@
    <proof prover="0" memlimit="2000"><result status="valid" time="0.12"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.24.3" expl="VC for sqrt1" proved="true">
-   <proof prover="7"><result status="valid" time="0.09" steps="169547"/></proof>
+   <proof prover="7"><result status="valid" time="0.09" steps="188323"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.24.4" expl="VC for sqrt1" proved="true">
-   <proof prover="8"><result status="valid" time="0.04" steps="18015"/></proof>
+   <proof prover="8"><result status="valid" time="0.04" steps="18094"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.24.5" expl="VC for sqrt1" proved="true">
-   <proof prover="6"><result status="valid" time="0.84" steps="188"/></proof>
+   <proof prover="4"><result status="valid" time="0.26"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.24.6" expl="VC for sqrt1" proved="true">
    <proof prover="0" memlimit="2000"><result status="valid" time="0.14"/></proof>
@@ -210,22 +211,22 @@
    </transf>
    </goal>
    <goal name="sqrt1&#39;vc.24.9" expl="VC for sqrt1" proved="true">
-   <proof prover="8"><result status="valid" time="0.07" steps="21787"/></proof>
+   <proof prover="8"><result status="valid" time="0.07" steps="22049"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.24.10" expl="VC for sqrt1" proved="true">
    <transf name="apply" proved="true" arg1="trunc_lower_bound">
    </transf>
    </goal>
    <goal name="sqrt1&#39;vc.24.11" expl="VC for sqrt1" proved="true">
-   <proof prover="8"><result status="valid" time="0.08" steps="18117"/></proof>
+   <proof prover="8"><result status="valid" time="0.08" steps="18196"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.24.12" expl="VC for sqrt1" proved="true">
-   <proof prover="8"><result status="valid" time="0.04" steps="18140"/></proof>
+   <proof prover="8"><result status="valid" time="0.04" steps="18219"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.24.13" expl="VC for sqrt1" proved="true">
    <transf name="apply" proved="true" arg1="real_sqr_compat">
     <goal name="sqrt1&#39;vc.24.13.0" expl="apply premises" proved="true">
-    <proof prover="8"><result status="valid" time="0.23" steps="28688"/></proof>
+    <proof prover="8"><result status="valid" time="0.23" steps="28950"/></proof>
     </goal>
    </transf>
    </goal>
@@ -233,32 +234,32 @@
    <proof prover="0" memlimit="2000"><result status="valid" time="0.44"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.24.15" expl="VC for sqrt1" proved="true">
-   <proof prover="8"><result status="valid" time="0.04" steps="18207"/></proof>
+   <proof prover="8"><result status="valid" time="0.04" steps="18286"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.24.16" expl="VC for sqrt1" proved="true">
-   <proof prover="8"><result status="valid" time="0.04" steps="18205"/></proof>
+   <proof prover="8"><result status="valid" time="0.04" steps="18284"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.24.17" expl="VC for sqrt1" proved="true">
-   <proof prover="8"><result status="valid" time="0.08" steps="18203"/></proof>
+   <proof prover="8"><result status="valid" time="0.08" steps="18282"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.24.18" expl="VC for sqrt1" proved="true">
    <transf name="compute_in_goal" proved="true" >
     <goal name="sqrt1&#39;vc.24.18.0" expl="VC for sqrt1" proved="true">
-    <proof prover="7" timelimit="5" memlimit="2000"><result status="valid" time="0.02" steps="3542"/></proof>
-    <proof prover="8"><result status="valid" time="0.05" steps="18210"/></proof>
+    <proof prover="7" timelimit="5" memlimit="2000"><result status="valid" time="0.02" steps="3556"/></proof>
+    <proof prover="8"><result status="valid" time="0.05" steps="18289"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="sqrt1&#39;vc.24.19" expl="VC for sqrt1" proved="true">
-   <proof prover="8"><result status="valid" time="0.04" steps="18180"/></proof>
+   <proof prover="8"><result status="valid" time="0.04" steps="18259"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.24.20" expl="VC for sqrt1" proved="true">
-   <proof prover="8"><result status="valid" time="0.03" steps="18266"/></proof>
+   <proof prover="8"><result status="valid" time="0.03" steps="18345"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.24.21" expl="VC for sqrt1" proved="true">
    <transf name="compute_in_goal" proved="true" >
     <goal name="sqrt1&#39;vc.24.21.0" expl="VC for sqrt1" proved="true">
-    <proof prover="8"><result status="valid" time="0.08" steps="22345"/></proof>
+    <proof prover="8"><result status="valid" time="0.08" steps="22607"/></proof>
     </goal>
    </transf>
    </goal>
@@ -266,10 +267,10 @@
    <proof prover="3"><result status="valid" time="1.14"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.24.23" expl="VC for sqrt1" proved="true">
-   <proof prover="8"><result status="valid" time="0.04" steps="18321"/></proof>
+   <proof prover="8"><result status="valid" time="0.04" steps="18439"/></proof>
    </goal>
    <goal name="sqrt1&#39;vc.24.24" expl="VC for sqrt1" proved="true">
-   <proof prover="8"><result status="valid" time="0.07" steps="22487"/></proof>
+   <proof prover="8"><result status="valid" time="0.07" steps="22911"/></proof>
    </goal>
   </transf>
   </goal>

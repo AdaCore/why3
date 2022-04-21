@@ -7,9 +7,11 @@
 <prover id="2" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="5" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="7" name="Z3" version="4.8.6" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="8" name="Spass" version="3.7" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="9" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="mpz_sub.mlw"/>
 <theory name="Zsub" proved="true">
@@ -37,10 +39,10 @@
   <proof prover="3"><result status="valid" time="0.03" steps="137"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.7" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.15" steps="268"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.15" steps="268"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.06" steps="187"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.06" steps="187"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.9" expl="precondition" proved="true">
   <proof prover="4" timelimit="5"><result status="valid" time="0.09" steps="20687"/></proof>
@@ -52,7 +54,7 @@
   <proof prover="4"><result status="valid" time="0.12" steps="16412"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.12" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.26" steps="802"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.26" steps="802"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.13" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.14" steps="16588"/></proof>
@@ -73,7 +75,7 @@
   <proof prover="4"><result status="valid" time="0.06" steps="15286"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.19" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.04" steps="76"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="76"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.20" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.04" steps="14887"/></proof>
@@ -94,7 +96,7 @@
   <proof prover="4"><result status="valid" time="0.12" steps="17141"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.26" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.12" steps="507"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.12" steps="507"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.27" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.14" steps="16254"/></proof>
@@ -118,7 +120,7 @@
   <proof prover="4"><result status="valid" time="0.04" steps="14619"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.34" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="62"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.03" steps="62"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.35" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.06" steps="15098"/></proof>
@@ -166,7 +168,7 @@
   <proof prover="4"><result status="valid" time="0.09" steps="16757"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.50" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.52" steps="1091"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.52" steps="1091"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.51" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.16" steps="16792"/></proof>
@@ -193,7 +195,7 @@
   <proof prover="4"><result status="valid" time="0.05" steps="16887"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.59" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.25" steps="207"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.25" steps="207"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.60" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.20" steps="23750"/></proof>
@@ -273,7 +275,7 @@
   <proof prover="4"><result status="valid" time="0.09" steps="17182"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.81" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.96" steps="1410"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.96" steps="1410"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.82" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.10" steps="17232"/></proof>
@@ -312,7 +314,7 @@
   <proof prover="4"><result status="valid" time="0.21" steps="26210"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.94" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.04" steps="922"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.04" steps="922"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.95" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.32" steps="42866"/></proof>
@@ -334,7 +336,7 @@
   <proof prover="4"><result status="valid" time="0.13" steps="18638"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.99" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.95" steps="999"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.95" steps="999"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.100" expl="integer overflow" proved="true">
   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.18" steps="25033"/></proof>
@@ -361,7 +363,7 @@
    <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,value,identical,compare_int,sgn_value,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,extensionality5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,unchanged_transitive,H43,H42,H41,H40,H39,H38,H37,H36,Ensures44,H35,Ensures43,Ensures42,Ensures41,Assert4,Ensures40,Ensures39,H34,H32,H31,H30,H29,H28,H27,H26,H25,Ensures38,Ensures33,Ensures32,Ensures31,Ensures30,Ensures29,Ensures28,Ensures27,Ensures26,H22,Ensures25,Ensures24,Ensures22,Ensures21,Ensures20,Ensures19,Ensures18,H21,Ensures15,Ensures14,Ensures13,Ensures12,Ensures11,H20,Assert,Ensures10,Ensures9,H19,H18,H17,H16,H15,H14,H13,H12,H11,Ensures7,Ensures6,Ensures5,Ensures4,H10,H9,H8,Ensures3,Ensures2,Ensures1,H4,Ensures,Ensures35,Ensures34,H2">
     <goal name="wmpz_sub&#39;vc.101.5.0" expl="VC for wmpz_sub" proved="true">
     <proof prover="1" timelimit="1"><result status="valid" time="0.05"/></proof>
-    <proof prover="5" memlimit="1000"><result status="valid" time="0.76" steps="2264"/></proof>
+    <proof prover="5"><result status="valid" time="0.76" steps="2264"/></proof>
     </goal>
    </transf>
    </goal>
@@ -385,7 +387,7 @@
    <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,value,identical,compare_int,sgn_value,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,extensionality5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,unchanged_transitive,H43,H42,H41,H40,H39,H38,H37,H36,Ensures44,H35,Ensures43,Ensures42,Ensures41,Assert4,Ensures40,Ensures39,H34,H32,H31,H30,H29,H28,H27,H26,H25,Ensures38,Ensures33,Ensures32,Ensures31,Ensures30,Ensures29,Ensures28,Ensures27,Ensures26,H22,Ensures25,Ensures24,Ensures22,Ensures21,Ensures20,Ensures19,Ensures18,H21,Ensures15,Ensures14,Ensures13,Ensures12,Ensures11,H20,Assert,Ensures10,Ensures9,H19,H18,H17,H16,H15,H14,H13,H12,H11,Ensures7,Ensures6,Ensures5,Ensures4,H10,H9,H8,Ensures3,Ensures2,Ensures1,H4,Ensures,Ensures37,Ensures36,H2">
     <goal name="wmpz_sub&#39;vc.101.11.0" expl="VC for wmpz_sub" proved="true">
     <proof prover="1" timelimit="1"><result status="valid" time="0.06"/></proof>
-    <proof prover="5" memlimit="1000"><result status="valid" time="1.10" steps="2661"/></proof>
+    <proof prover="5"><result status="valid" time="1.10" steps="2661"/></proof>
     </goal>
    </transf>
    </goal>
@@ -432,7 +434,7 @@
   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,value,identical,compare_int,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,extensionality5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,unchanged_transitive,H39,H38,H37,H36,H35,H34,H33,H32,Ensures41,H31,Ensures40,Ensures39,Ensures38,Assert4,Ensures37,Ensures36,H30,H29,H27,H25,H24,H23,H22,H21,Ensures35,Ensures30,Ensures29,Ensures28,Ensures27,Ensures26,Ensures25,H18,Ensures24,Ensures23,Ensures21,Ensures20,Ensures19,Ensures18,Ensures17,H17,Ensures14,Ensures13,Ensures12,Ensures11,Ensures10,H16,Ensures9,Ensures8,H15,H14,H13,H12,H11,H10,H9,H8,H7,Ensures6,Ensures5,Ensures4,Ensures3,H6,H5,H4,H1,Ensures1,Ensures">
    <goal name="wmpz_sub&#39;vc.111.0" expl="assertion" proved="true">
    <proof prover="1" timelimit="1"><result status="valid" time="0.11"/></proof>
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.22" steps="1012"/></proof>
+   <proof prover="5"><result status="valid" time="0.22" steps="1012"/></proof>
    </goal>
   </transf>
   </goal>
@@ -479,13 +481,13 @@
   <proof prover="4"><result status="valid" time="0.09" steps="16833"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.126" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.39" steps="1014"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.39" steps="1014"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.127" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.12" steps="16867"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.128" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="1.72" steps="749"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.72" steps="749"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.129" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.18" steps="19711"/></proof>
@@ -496,7 +498,7 @@
    <goal name="wmpz_sub&#39;vc.130.0" expl="precondition" proved="true">
    <proof prover="1" timelimit="1"><result status="valid" time="0.01"/></proof>
    <proof prover="4" timelimit="5"><result status="valid" time="0.03" steps="4974"/></proof>
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.01" steps="55"/></proof>
+   <proof prover="5"><result status="valid" time="0.01" steps="55"/></proof>
    </goal>
   </transf>
   </goal>
@@ -504,7 +506,7 @@
   <proof prover="4"><result status="valid" time="0.11" steps="26815"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.132" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="1.04" steps="755"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.04" steps="755"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.133" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.12" steps="19827"/></proof>
@@ -526,7 +528,7 @@
   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,identical,compare_int,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,extensionality5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,unchanged_transitive,H54,H53,H52,H51,H50,H49,H48,H47,Ensures53,H46,Ensures52,Ensures51,Ensures50,Assert7,Ensures49,Ensures48,H43,H42,H41,H40,H39,H38,H37,H36,H35,Ensures47,Ensures42,Ensures41,Ensures40,Ensures39,Ensures37,H33,Ensures36,Ensures35,Ensures34,Ensures33,Ensures32,Ensures31,Ensures30,Ensures29,H32,Ensures28,Ensures26,Assert6,Assert4,Ensures25,Ensures24,Ensures23,Ensures22,H31,Ensures21,H26,H24,H23,Ensures19,Ensures18,Ensures16,Ensures15,Ensures14,Ensures13,Ensures12,Ensures11,H22,H21,H20,H19,H18,H17,H16,H15,H14,Ensures9,Ensures8,Ensures7,H13,H12,H11,H10,H9,H8,H6,Ensures5,Ensures4,Assert,H4,H3,H2,H1,H,Ensures2,Ensures1,Ensures">
    <goal name="wmpz_sub&#39;vc.138.0" expl="postcondition" proved="true">
    <proof prover="1" timelimit="1" memlimit="1000"><result status="valid" time="0.11"/></proof>
-   <proof prover="5" memlimit="1000"><result status="valid" time="3.83" steps="306"/></proof>
+   <proof prover="5"><result status="valid" time="3.83" steps="306"/></proof>
    <proof prover="7"><result status="valid" time="0.04" steps="107198"/></proof>
    </goal>
   </transf>
@@ -535,7 +537,7 @@
   <proof prover="4"><result status="valid" time="0.06" steps="17244"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.140" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.21" steps="232"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.21" steps="232"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.141" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.20" steps="26070"/></proof>
@@ -582,7 +584,7 @@
   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,value,identical,compare_int,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,extensionality5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,unchanged_transitive,H54,H53,H52,H51,H50,H49,H48,H47,Ensures52,H46,Ensures51,Ensures50,Ensures49,Assert7,Ensures48,Ensures47,H43,H42,H41,H40,H39,H38,H37,H36,H35,Ensures46,Ensures41,Ensures40,Ensures39,Ensures38,Ensures36,H33,Ensures35,Ensures34,Ensures33,Ensures32,Ensures31,Ensures30,Ensures29,Ensures28,H32,Ensures27,Ensures25,Assert6,Assert4,Ensures24,Ensures23,Ensures22,Ensures21,H31,Ensures20,H26,H24,H23,Ensures18,Ensures17,Ensures15,Ensures14,Ensures13,Ensures12,Ensures11,Ensures10,H22,H21,H20,H19,H18,H17,H16,H15,H14,Ensures8,Ensures7,Ensures6,H13,H12,H11,H10,H9,H8,H6,Ensures4,Ensures3,Assert,H4,H3,H2,H1,H,Ensures2,Ensures1,Ensures">
    <goal name="wmpz_sub&#39;vc.152.0" expl="postcondition" proved="true">
    <proof prover="1" timelimit="1"><result status="valid" time="0.06"/></proof>
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.13" steps="230"/></proof>
+   <proof prover="5"><result status="valid" time="0.13" steps="230"/></proof>
    <proof prover="7"><result status="valid" time="0.02" steps="57956"/></proof>
    </goal>
   </transf>
@@ -591,7 +593,7 @@
   <proof prover="4"><result status="valid" time="0.05" steps="17227"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.154" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.19" steps="231"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.19" steps="231"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.155" expl="postcondition" proved="true">
   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.20" steps="25988"/></proof>
@@ -619,7 +621,7 @@
   <proof prover="4"><result status="valid" time="0.11" steps="16837"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.161" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.47" steps="1051"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.47" steps="1051"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.162" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.12" steps="16871"/></proof>
@@ -656,7 +658,7 @@
   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,identical,compare_int,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,extensionality5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,unchanged_transitive,H54,H53,H52,H51,H50,H49,H48,H47,Ensures53,H46,Ensures52,Ensures51,Ensures50,Assert6,Ensures49,Ensures48,H43,H42,H41,H40,H39,H38,H37,H36,H35,Ensures47,Ensures42,Ensures41,Ensures40,Ensures39,Ensures37,H33,Ensures36,Ensures35,Ensures34,Ensures33,Ensures32,Ensures31,Ensures30,Ensures29,H32,Ensures28,Ensures26,Assert5,Assert3,Ensures25,Ensures24,Ensures23,Ensures22,H31,Ensures21,H26,H24,H23,Ensures19,Ensures18,Ensures16,Ensures15,Ensures14,Ensures13,Ensures12,Ensures11,H22,H21,H20,H19,H18,H17,H16,H15,H14,Ensures9,Ensures8,Ensures7,H13,H12,H11,H10,H9,H8,H6,Ensures5,Ensures4,H4,H3,H2,H1,H,Ensures2,Ensures1,Ensures">
    <goal name="wmpz_sub&#39;vc.172.0" expl="postcondition" proved="true">
    <proof prover="1" timelimit="1"><result status="valid" time="0.10"/></proof>
-   <proof prover="5" memlimit="1000"><result status="valid" time="2.25" steps="302"/></proof>
+   <proof prover="5"><result status="valid" time="2.25" steps="302"/></proof>
    <proof prover="7"><result status="valid" time="0.03" steps="112461"/></proof>
    </goal>
   </transf>
@@ -665,7 +667,7 @@
   <proof prover="4"><result status="valid" time="0.06" steps="17242"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.174" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.20" steps="232"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.20" steps="232"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.175" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.19" steps="26039"/></proof>
@@ -709,7 +711,7 @@
   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,value,identical,compare_int,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,extensionality5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,unchanged_transitive,H54,H53,H52,H51,H50,H49,H48,H47,Ensures52,H46,Ensures51,Ensures50,Ensures49,Assert6,Ensures48,Ensures47,H43,H42,H41,H40,H39,H38,H37,H36,H35,Ensures46,Ensures41,Ensures40,Ensures39,Ensures38,Ensures36,H33,Ensures35,Ensures34,Ensures33,Ensures32,Ensures31,Ensures30,Ensures29,Ensures28,H32,Ensures27,Ensures25,Assert5,Assert3,Ensures24,Ensures23,Ensures22,Ensures21,H31,Ensures20,H26,H24,H23,Ensures18,Ensures17,Ensures15,Ensures14,Ensures13,Ensures12,Ensures11,Ensures10,H22,H21,H20,H19,H18,H17,H16,H15,H14,Ensures8,Ensures7,Ensures6,H13,H12,H11,H10,H9,H8,H6,Ensures4,Ensures3,H4,H3,H2,H1,H,Ensures2,Ensures1,Ensures">
    <goal name="wmpz_sub&#39;vc.185.0" expl="postcondition" proved="true">
    <proof prover="1" timelimit="1"><result status="valid" time="0.06"/></proof>
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.13" steps="228"/></proof>
+   <proof prover="5"><result status="valid" time="0.13" steps="228"/></proof>
    <proof prover="7"><result status="valid" time="0.03" steps="62164"/></proof>
    </goal>
   </transf>
@@ -718,7 +720,7 @@
   <proof prover="4"><result status="valid" time="0.15" steps="17224"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.187" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.20" steps="229"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.20" steps="229"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.188" expl="postcondition" proved="true">
   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.20" steps="25956"/></proof>
@@ -761,7 +763,7 @@
   <proof prover="4"><result status="valid" time="0.13" steps="16867"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.199" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="1.72" steps="749"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.72" steps="749"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.200" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.08" steps="19693"/></proof>
@@ -773,7 +775,7 @@
   <proof prover="4"><result status="valid" time="0.11" steps="26807"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.203" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="1.04" steps="755"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.04" steps="755"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.204" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.11" steps="19821"/></proof>
@@ -795,7 +797,7 @@
   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,identical,compare_int,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,extensionality5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,unchanged_transitive,H55,H54,H53,H52,H51,H50,H49,H48,Ensures53,H47,Ensures52,Ensures51,Ensures50,Assert6,Ensures49,Ensures48,H44,H43,H42,H41,H40,H39,H38,H37,H35,Ensures47,Ensures42,Ensures41,Ensures40,Ensures39,Ensures38,H34,Ensures36,Ensures35,Ensures34,Ensures33,Ensures32,Ensures31,Ensures30,Ensures29,H33,Ensures28,Ensures26,Assert4,Assert3,Ensures25,Ensures24,Ensures23,Ensures22,H32,Ensures21,H26,H24,H23,Ensures19,Ensures18,Ensures16,Ensures15,Ensures14,Ensures13,Ensures12,Ensures11,H22,H21,H20,H19,H18,H17,H16,H15,H14,Ensures9,Ensures8,Ensures7,H13,H12,H11,H10,H9,H8,H6,Ensures5,Ensures4,Assert,H4,H3,H2,H1,H,Ensures2,Ensures1,Ensures">
    <goal name="wmpz_sub&#39;vc.209.0" expl="postcondition" proved="true">
    <proof prover="1" timelimit="1" memlimit="1000"><result status="valid" time="0.11"/></proof>
-   <proof prover="5" memlimit="1000"><result status="valid" time="1.98" steps="283"/></proof>
+   <proof prover="5"><result status="valid" time="1.98" steps="283"/></proof>
    <proof prover="7"><result status="valid" time="0.04" steps="106614"/></proof>
    </goal>
   </transf>
@@ -851,7 +853,7 @@
   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,value,identical,compare_int,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,extensionality5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,unchanged_transitive,H55,H54,H53,H52,H51,H50,H49,H48,Ensures52,H47,Ensures51,Ensures50,Ensures49,Assert6,Ensures48,Ensures47,H44,H43,H42,H41,H40,H39,H38,H37,H35,Ensures46,Ensures41,Ensures40,Ensures39,Ensures38,Ensures37,H34,Ensures35,Ensures34,Ensures33,Ensures32,Ensures31,Ensures30,Ensures29,Ensures28,H33,Ensures27,Ensures25,Assert4,Assert3,Ensures24,Ensures23,Ensures22,Ensures21,H32,Ensures20,H26,H24,H23,Ensures18,Ensures17,Ensures15,Ensures14,Ensures13,Ensures12,Ensures11,Ensures10,H22,H21,H20,H19,H18,H17,H16,H15,H14,Ensures8,Ensures7,Ensures6,H13,H12,H11,H10,H9,H8,H6,Ensures4,Ensures3,Assert,H4,H3,H2,H1,H,Ensures2,Ensures1,Ensures">
    <goal name="wmpz_sub&#39;vc.223.0" expl="postcondition" proved="true">
    <proof prover="1" timelimit="1"><result status="valid" time="0.05"/></proof>
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.14" steps="230"/></proof>
+   <proof prover="5"><result status="valid" time="0.14" steps="230"/></proof>
    <proof prover="7"><result status="valid" time="0.03" steps="64929"/></proof>
    </goal>
   </transf>
@@ -888,7 +890,7 @@
   <proof prover="4"><result status="valid" time="0.10" steps="16837"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.232" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.53" steps="1051"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.53" steps="1051"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.233" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.05" steps="16871"/></proof>
@@ -925,7 +927,7 @@
   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),get,set,([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,identical,compare_int,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,unchanged_transitive,H55,H54,H53,H52,H51,H50,H49,H48,Ensures53,H47,Ensures52,Ensures51,Ensures50,Assert5,Ensures49,Ensures48,H44,H43,H42,H41,H40,H39,H38,H37,H35,Ensures47,Ensures42,Ensures41,Ensures40,Ensures39,Ensures38,H34,Ensures36,Ensures35,Ensures34,Ensures33,Ensures32,Ensures31,Ensures30,Ensures29,H33,Ensures28,Ensures26,Assert3,Assert2,Ensures25,Ensures24,Ensures23,Ensures22,H32,Ensures21,H26,H24,H23,Ensures19,Ensures18,Ensures16,Ensures15,Ensures14,Ensures13,Ensures12,Ensures11,H22,H21,H20,H19,H18,H17,H16,H15,H14,Ensures9,Ensures8,Ensures7,H13,H12,H11,H10,H9,H8,H6,Ensures5,Ensures4,H4,H3,H2,H1,H,Ensures2,Ensures1,Ensures">
    <goal name="wmpz_sub&#39;vc.243.0" expl="postcondition" proved="true">
    <proof prover="1" timelimit="1"><result status="valid" time="0.11"/></proof>
-   <proof prover="5" memlimit="1000"><result status="valid" time="1.80" steps="652"/></proof>
+   <proof prover="5"><result status="valid" time="1.80" steps="652"/></proof>
    <proof prover="7"><result status="valid" time="0.04" steps="90914"/></proof>
    </goal>
   </transf>
@@ -978,7 +980,7 @@
   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,value,identical,compare_int,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,extensionality5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,unchanged_transitive,H55,H54,H53,H52,H51,H50,H49,H48,Ensures52,H47,Ensures51,Ensures50,Ensures49,Assert5,Ensures48,Ensures47,H44,H43,H42,H41,H40,H39,H38,H37,H35,Ensures46,Ensures41,Ensures40,Ensures39,Ensures38,Ensures37,H34,Ensures35,Ensures34,Ensures33,Ensures32,Ensures31,Ensures30,Ensures29,Ensures28,H33,Ensures27,Ensures25,Assert3,Assert2,Ensures24,Ensures23,Ensures22,Ensures21,H32,Ensures20,H26,H24,H23,Ensures18,Ensures17,Ensures15,Ensures14,Ensures13,Ensures12,Ensures11,Ensures10,H22,H21,H20,H19,H18,H17,H16,H15,H14,Ensures8,Ensures7,Ensures6,H13,H12,H11,H10,H9,H8,H6,Ensures4,Ensures3,H4,H3,H2,H1,H,Ensures2,Ensures1,Ensures">
    <goal name="wmpz_sub&#39;vc.256.0" expl="postcondition" proved="true">
    <proof prover="1" timelimit="1"><result status="valid" time="0.06"/></proof>
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.11" steps="228"/></proof>
+   <proof prover="5"><result status="valid" time="0.11" steps="228"/></proof>
    <proof prover="7"><result status="valid" time="0.03" steps="66063"/></proof>
    </goal>
   </transf>
@@ -1027,7 +1029,7 @@
   <proof prover="4"><result status="valid" time="0.09" steps="17258"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.269" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="2.35" steps="1645"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="2.35" steps="1645"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.270" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.12" steps="17307"/></proof>
@@ -1045,7 +1047,7 @@
   <proof prover="4"><result status="valid" time="0.25" steps="28606"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.275" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="1.72" steps="1009"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.72" steps="1009"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.276" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.11" steps="20646"/></proof>
@@ -1069,7 +1071,7 @@
   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.12" steps="19053"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.283" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.08" steps="250"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.08" steps="250"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.284" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.32" steps="54852"/></proof>
@@ -1079,7 +1081,7 @@
   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),get,set,const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,identical,compare_int,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,unchanged_transitive,H71,H70,H69,H68,H67,H66,H65,H64,Ensures65,H63,Ensures64,Ensures63,Ensures62,Assert6,Ensures61,Ensures60,H60,H59,H58,H57,H56,H55,H54,H53,Ensures59,Ensures54,Ensures53,Ensures52,Ensures51,Ensures50,Ensures49,H50,Ensures48,Ensures47,Ensures46,Ensures45,Ensures44,Ensures43,Ensures42,Ensures41,H49,Ensures40,Ensures39,Ensures38,Assert3,Ensures37,Ensures36,Ensures35,Ensures34,H48,Ensures33,H46,H42,H40,H39,Ensures31,Ensures30,Ensures28,Ensures27,Ensures26,Ensures25,Ensures24,H37,H35,H34,Ensures23,Ensures22,Ensures20,Ensures19,Ensures18,Ensures17,Ensures16,Ensures15,H33,H32,H31,H30,H29,H28,H27,H26,H25,H24,H23,H22,Ensures13,Ensures12,Ensures11,Ensures10,Ensures9,H21,H20,H19,H18,H17,H16,H15,H14,H13,H11,Ensures8,Ensures7,Ensures6,H9,H8,H7,H6,H5,Ensures4,Ensures3,H4,H3,H2,H1,H,Ensures2,Ensures1,Ensures">
    <goal name="wmpz_sub&#39;vc.285.0" expl="postcondition" proved="true">
    <proof prover="1" timelimit="1" memlimit="1000"><result status="valid" time="0.13"/></proof>
-   <proof prover="5" memlimit="1000"><result status="valid" time="1.71" steps="497"/></proof>
+   <proof prover="5"><result status="valid" time="1.71" steps="497"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1087,7 +1089,7 @@
   <proof prover="4"><result status="valid" time="0.25" steps="28749"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.287" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.10" steps="994"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.10" steps="994"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.288" expl="postcondition" proved="true">
   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.29" steps="53515"/></proof>
@@ -1146,7 +1148,7 @@
   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,value,identical,compare_int,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,extensionality5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,unchanged_transitive,H71,H70,H69,H68,H67,H66,H65,H64,Ensures64,H63,Ensures63,Ensures62,Ensures61,Assert6,Ensures60,Ensures59,H60,H59,H58,H57,H56,H55,H54,H53,Ensures58,Ensures53,Ensures52,Ensures51,Ensures50,Ensures49,Ensures48,H50,Ensures47,Ensures46,Ensures45,Ensures44,Ensures43,Ensures42,Ensures41,Ensures40,H49,Ensures39,Ensures38,Ensures37,Assert3,Ensures36,Ensures35,Ensures34,Ensures33,H48,Ensures32,H42,H40,H39,Ensures30,Ensures29,Ensures27,Ensures26,Ensures25,Ensures24,Ensures23,H37,H35,H34,Ensures22,Ensures21,Ensures19,Ensures18,Ensures17,Ensures16,Ensures15,Ensures14,H33,H32,H31,H30,H29,H28,H27,H26,H25,H24,H23,H22,Ensures12,Ensures11,Ensures10,Ensures9,Ensures8,H21,H20,H19,H18,H17,H16,H15,H14,H13,H11,Ensures6,Ensures5,Assert,H9,H8,H7,H6,H5,Ensures4,Ensures3,H4,H3,H2,H1,H,Ensures2,Ensures1,Ensures">
    <goal name="wmpz_sub&#39;vc.303.0" expl="postcondition" proved="true">
    <proof prover="1" timelimit="1"><result status="valid" time="0.07"/></proof>
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.19" steps="307"/></proof>
+   <proof prover="5"><result status="valid" time="0.19" steps="307"/></proof>
    <proof prover="7"><result status="valid" time="0.03" steps="74349"/></proof>
    </goal>
   </transf>
@@ -1155,7 +1157,7 @@
   <proof prover="4"><result status="valid" time="0.25" steps="28588"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.305" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.15" steps="992"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.15" steps="992"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.306" expl="postcondition" proved="true">
   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.27" steps="53123"/></proof>
@@ -1183,7 +1185,7 @@
   <proof prover="4"><result status="valid" time="0.09" steps="17262"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.312" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.96" steps="1349"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.96" steps="1349"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.313" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.11" steps="17311"/></proof>
@@ -1240,7 +1242,7 @@
   <proof prover="4"><result status="valid" time="0.26" steps="28713"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.329" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.15" steps="996"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.15" steps="996"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.330" expl="postcondition" proved="true">
   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.26" steps="52971"/></proof>
@@ -1296,7 +1298,7 @@
   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,value,identical,compare_int,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,extensionality5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,unchanged_transitive,H71,H70,H69,H68,H67,H66,H65,H64,Ensures64,H63,Ensures63,Ensures62,Ensures61,Assert5,Ensures60,Ensures59,H60,H59,H58,H57,H56,H55,H54,H53,Ensures58,Ensures53,Ensures52,Ensures51,Ensures50,Ensures49,Ensures48,H50,Ensures47,Ensures46,Ensures45,Ensures44,Ensures43,Ensures42,Ensures41,Ensures40,H49,Ensures39,Ensures38,Ensures37,Assert2,Ensures36,Ensures35,Ensures34,Ensures33,H48,Ensures32,H42,H40,H39,Ensures30,Ensures29,Ensures27,Ensures26,Ensures25,Ensures24,Ensures23,H37,H35,H34,Ensures22,Ensures21,Ensures19,Ensures18,Ensures17,Ensures16,Ensures15,Ensures14,H33,H32,H31,H30,H29,H28,H27,H26,H25,H24,H23,H22,Ensures12,Ensures11,Ensures10,Ensures9,Ensures8,H21,H20,H19,H18,H17,H16,H15,H14,H13,H11,Ensures6,Ensures5,H9,H8,H7,H6,H5,Ensures4,Ensures3,H4,H3,H2,H1,H,Ensures2,Ensures1,Ensures">
    <goal name="wmpz_sub&#39;vc.344.0" expl="postcondition" proved="true">
    <proof prover="1" timelimit="1"><result status="valid" time="0.07"/></proof>
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.16" steps="308"/></proof>
+   <proof prover="5"><result status="valid" time="0.16" steps="308"/></proof>
    <proof prover="7"><result status="valid" time="0.03" steps="70558"/></proof>
    </goal>
   </transf>
@@ -1305,7 +1307,7 @@
   <proof prover="4"><result status="valid" time="0.24" steps="28551"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.346" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.10" steps="991"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.10" steps="991"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.347" expl="postcondition" proved="true">
   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.26" steps="52576"/></proof>
@@ -1354,7 +1356,7 @@
   <proof prover="4"><result status="valid" time="0.10" steps="16884"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.360" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.22" steps="730"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.22" steps="730"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.361" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.10" steps="18834"/></proof>
@@ -1372,7 +1374,7 @@
   <proof prover="6"><result status="valid" time="0.05" steps="18469"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.366" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.24" steps="182"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.24" steps="182"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.367" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz2">
@@ -1440,7 +1442,7 @@
   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),get,set,const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,value,identical,compare_int,sgn_value,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,extensionality5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,unchanged_transitive,H23,H22,H21,H20,H19,H18,H17,H16,Ensures31,H15,Ensures30,Ensures29,Ensures28,Assert4,Ensures27,Ensures26,H14,H9,H8,H7,H6,H5,Ensures25,Ensures20,Ensures19,Ensures18,Ensures17,Ensures16,Ensures15,H2,Ensures14,Ensures13,Ensures11,Ensures10,Ensures9,Ensures8,Ensures7,H1,Ensures4,Ensures3,Ensures2,Ensures1,Ensures,H">
    <goal name="wmpz_sub&#39;vc.370.0" expl="assertion" proved="true">
    <proof prover="1" timelimit="1" memlimit="1000"><result status="valid" time="0.58"/></proof>
-   <proof prover="5" memlimit="1000"><result status="valid" time="3.83" steps="12999"/></proof>
+   <proof prover="5"><result status="valid" time="3.83" steps="12999"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1472,7 +1474,7 @@
   <proof prover="4"><result status="valid" time="0.07" steps="19827"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.380" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="1.34" steps="794"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.34" steps="794"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.381" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.12" steps="17554"/></proof>
@@ -1490,7 +1492,7 @@
   <proof prover="4"><result status="valid" time="0.16" steps="17832"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.386" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.35" steps="224"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.35" steps="224"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.387" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.09" steps="20313"/></proof>
@@ -1502,7 +1504,7 @@
   <proof prover="6"><result status="valid" time="0.10" steps="17926"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.390" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.25" steps="232"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.25" steps="232"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.391" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1545,7 +1547,7 @@
   <proof prover="4"><result status="valid" time="0.06" steps="17286"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.395" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.29" steps="233"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.29" steps="233"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.396" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.24" steps="26780"/></proof>
@@ -1612,7 +1614,7 @@
   <proof prover="4"><result status="valid" time="0.09" steps="17832"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.415" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.34" steps="224"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.34" steps="224"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.416" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.16" steps="20295"/></proof>
@@ -1621,10 +1623,10 @@
   <proof prover="3"><result status="valid" time="0.28" steps="228"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.418" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.08" steps="211"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.08" steps="211"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.419" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.26" steps="232"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.26" steps="232"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.420" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1749,7 +1751,7 @@
   <proof prover="4"><result status="valid" time="0.13" steps="18713"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.449" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.43" steps="276"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.43" steps="276"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.450" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.09" steps="21221"/></proof>
@@ -1758,11 +1760,11 @@
   <proof prover="3"><result status="valid" time="0.36" steps="280"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.452" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.18" steps="261"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.18" steps="261"/></proof>
   <proof prover="6"><result status="valid" time="0.12" steps="18807"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.453" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.34" steps="284"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.34" steps="284"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.454" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1805,7 +1807,7 @@
   <proof prover="4"><result status="valid" time="0.25" steps="29021"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.458" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="2.66" steps="1068"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="2.66" steps="1068"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.459" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.29" steps="53870"/></proof>
@@ -1847,7 +1849,7 @@
    <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.11" steps="16911"/></proof>
    </goal>
    <goal name="wmpz_sub&#39;vc.465.4" expl="VC for wmpz_sub" proved="true">
-   <proof prover="5" memlimit="1000"><result status="valid" time="3.25" steps="2780"/></proof>
+   <proof prover="5"><result status="valid" time="3.25" steps="2780"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1873,13 +1875,13 @@
   <proof prover="4"><result status="valid" time="0.26" steps="40355"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.473" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.04" steps="158"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="158"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.474" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.38" steps="44679"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.475" expl="assertion" proved="true">
-  <proof prover="5" memlimit="1000"><result status="valid" time="0.12" steps="211"/></proof>
+  <proof prover="5"><result status="valid" time="0.12" steps="211"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.476" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.10" steps="19019"/></proof>
@@ -1897,7 +1899,7 @@
   <proof prover="6"><result status="valid" time="0.06" steps="18647"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.481" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.15" steps="228"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.15" steps="228"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.482" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz2">
@@ -1963,7 +1965,7 @@
    <proof prover="4"><result status="valid" time="0.08" steps="16854"/></proof>
    </goal>
    <goal name="wmpz_sub&#39;vc.484.1" expl="VC for wmpz_sub" proved="true">
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.03" steps="144"/></proof>
+   <proof prover="5"><result status="valid" time="0.03" steps="144"/></proof>
    </goal>
    <goal name="wmpz_sub&#39;vc.484.2" expl="VC for wmpz_sub" proved="true">
    <proof prover="2"><result status="valid" time="0.77"/></proof>
@@ -2028,7 +2030,7 @@
   <proof prover="4"><result status="valid" time="0.13" steps="17014"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.494" expl="assertion" proved="true">
-  <proof prover="5" memlimit="1000"><result status="valid" time="0.10" steps="185"/></proof>
+  <proof prover="5"><result status="valid" time="0.10" steps="185"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.495" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.07" steps="18988"/></proof>
@@ -2046,7 +2048,7 @@
   <proof prover="6"><result status="valid" time="0.10" steps="18618"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.500" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.24" steps="199"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.24" steps="199"/></proof>
   </goal>
   <goal name="wmpz_sub&#39;vc.501" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz2">
@@ -2125,7 +2127,7 @@
   <proof prover="3"><result status="valid" time="0.02" steps="57"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.4" expl="assertion" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.16" steps="199"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.16" steps="199"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.5" expl="integer overflow" proved="true">
   <proof prover="4"><result status="valid" time="0.11" steps="20012"/></proof>
@@ -2155,7 +2157,7 @@
   <proof prover="4" timelimit="5"><result status="valid" time="0.10" steps="21203"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.14" expl="assertion" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.24" steps="442"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.24" steps="442"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.15" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.12" steps="16934"/></proof>
@@ -2171,26 +2173,26 @@
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.19" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.12" steps="94"/></proof>
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.02" steps="94"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="94"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.20" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.32" steps="389"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.32" steps="389"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.21" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz1">
    <goal name="wmpz_sub_ui&#39;vc.21.0" expl="apply premises" proved="true">
    <proof prover="4"><result status="valid" time="0.21" steps="23065"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.30" steps="397"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.30" steps="397"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.21.1" expl="apply premises" proved="true">
    <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz2">
     <goal name="wmpz_sub_ui&#39;vc.21.1.0" expl="apply premises" proved="true">
     <proof prover="4"><result status="valid" time="0.15" steps="17589"/></proof>
-    <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.08" steps="114"/></proof>
+    <proof prover="5" timelimit="1"><result status="valid" time="0.08" steps="114"/></proof>
     </goal>
     <goal name="wmpz_sub_ui&#39;vc.21.1.1" expl="apply premises" proved="true">
     <proof prover="4"><result status="valid" time="0.21" steps="23288"/></proof>
-    <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.18" steps="397"/></proof>
+    <proof prover="5" timelimit="1"><result status="valid" time="0.18" steps="397"/></proof>
     </goal>
    </transf>
    </goal>
@@ -2206,7 +2208,7 @@
   <proof prover="3"><result status="valid" time="0.04" steps="148"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.25" expl="integer overflow" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.06" steps="166"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.06" steps="166"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.26" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.04" steps="14321"/></proof>
@@ -2230,7 +2232,7 @@
   <proof prover="3"><result status="valid" time="0.12" steps="75"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.33" expl="postcondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.20" steps="329"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.20" steps="329"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.34" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.08" steps="15693"/></proof>
@@ -2272,7 +2274,7 @@
   <proof prover="3"><result status="valid" time="0.04" steps="117"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.47" expl="postcondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.27" steps="562"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.27" steps="562"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.48" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.16" steps="16328"/></proof>
@@ -2290,7 +2292,7 @@
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.51.1" expl="apply premises" proved="true">
    <proof prover="4"><result status="valid" time="0.14" steps="18300"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.13" steps="139"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.13" steps="139"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2301,7 +2303,7 @@
   <proof prover="4"><result status="valid" time="0.08" steps="15739"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.54" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.03" steps="110"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="110"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.55" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -2312,7 +2314,7 @@
    <proof prover="4" timelimit="5"><result status="valid" time="0.08" steps="17739"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.55.2" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="5"><result status="valid" time="0.28" steps="334"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.28" steps="334"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2323,10 +2325,10 @@
   <proof prover="4"><result status="valid" time="0.19" steps="22545"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.58" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.23" steps="126"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.23" steps="126"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.59" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.57" steps="668"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.57" steps="668"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.60" expl="assertion" proved="true">
   <proof prover="6"><result status="valid" time="0.07" steps="18177"/></proof>
@@ -2337,13 +2339,13 @@
    <proof prover="3"><result status="valid" time="0.42" steps="683"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.61.1" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.72" steps="1072"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.72" steps="1072"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.61.2" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.20" steps="135"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.20" steps="135"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.61.3" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.56" steps="388"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.56" steps="388"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.61.4" expl="assertion" proved="true">
    <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.18" steps="23314"/></proof>
@@ -2391,10 +2393,10 @@
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.74" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="139"/></proof>
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.08" steps="139"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.08" steps="139"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.75" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.32" steps="541"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.32" steps="541"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.76" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz2">
@@ -2414,7 +2416,7 @@
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.76.1" expl="apply premises" proved="true">
    <proof prover="4"><result status="valid" time="0.14" steps="18887"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.16" steps="161"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.16" steps="161"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2425,173 +2427,187 @@
   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.04" steps="77"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.79" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.90" steps="858"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="wmpz_sub_ui&#39;vc.79.0" expl="assertion" proved="true">
+   <proof prover="2"><result status="valid" time="1.73"/></proof>
+   </goal>
+   <goal name="wmpz_sub_ui&#39;vc.79.1" expl="assertion" proved="true">
+   <proof prover="8"><result status="valid" time="0.03"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.80" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="17619"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="17655"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.81" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.19" steps="25010"/></proof>
+  <proof prover="4"><result status="valid" time="0.19" steps="25075"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.82" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="17670"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="17706"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.83" expl="precondition" proved="true">
-  <proof prover="4" timelimit="5"><result status="valid" time="0.05" steps="15500"/></proof>
+  <proof prover="4" timelimit="5"><result status="valid" time="0.05" steps="15541"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.84" expl="assertion" proved="true">
-  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.27" steps="44673"/></proof>
+  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.27" steps="44714"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.85" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="17713"/></proof>
+  <proof prover="4"><result status="valid" time="0.18" steps="17711"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.86" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="25822"/></proof>
+  <proof prover="4"><result status="valid" time="0.15" steps="26019"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.87" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="22317"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="22389"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.88" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="17913"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="17957"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.89" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="15463"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="15504"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.90" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.05" steps="111"/></proof>
+  <proof prover="3"><result status="valid" time="0.05" steps="117"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.91" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="1.02" steps="882"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="wmpz_sub_ui&#39;vc.91.0" expl="assertion" proved="true">
+   <proof prover="9"><result status="valid" time="0.09" steps="1426"/></proof>
+   </goal>
+   <goal name="wmpz_sub_ui&#39;vc.91.1" expl="assertion" proved="true">
+   <proof prover="9"><result status="valid" time="0.48" steps="3193"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.92" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.27" steps="607"/></proof>
+  <proof prover="3"><result status="valid" time="0.27" steps="898"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.93" expl="assertion" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.22" steps="592"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.22" steps="604"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.94" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="30264"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="30317"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.95" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.19" steps="20861"/></proof>
+  <proof prover="4"><result status="valid" time="0.19" steps="20907"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.96" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="3126"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="3138"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.97" expl="assertion" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.29" steps="306"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.29" steps="304"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.98" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="17889"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="17928"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.99" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="25915"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="25962"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.100" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.06" steps="113"/></proof>
+  <proof prover="3"><result status="valid" time="0.06" steps="114"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.101" expl="assertion" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.07" steps="108"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.07" steps="108"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.102" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="23047"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="23112"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.103" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.13" steps="23039"/></proof>
+  <proof prover="4"><result status="valid" time="0.20" steps="23104"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.104" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="0.09" steps="268"/></proof>
+  <proof prover="3"><result status="valid" time="0.10" steps="268"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.105" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="2.10" steps="549"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="2.10" steps="540"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.106" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_sub_ui&#39;vc.106.0" expl="assertion" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.13" steps="19041"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.13" steps="19080"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.106.1" expl="assertion" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.19" steps="23632"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.14" steps="133"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.19" steps="23697"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.14" steps="134"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.106.2" expl="assertion" proved="true">
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.38" steps="589"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.38" steps="584"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.106.3" expl="assertion" proved="true">
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.43" steps="570"/></proof>
+   <proof prover="5"><result status="valid" time="0.43" steps="900"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.106.4" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.15" steps="134"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.15" steps="135"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.106.5" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.15" steps="134"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.15" steps="135"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.106.6" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.15" steps="19065"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.08" steps="128"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.15" steps="19104"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.08" steps="128"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.106.7" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.13" steps="18615"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.07" steps="128"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.13" steps="18654"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.07" steps="128"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.106.8" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.09" steps="16369"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.08" steps="128"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.09" steps="16410"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.08" steps="128"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.106.9" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.19" steps="23346"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.16" steps="138"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.19" steps="23411"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.16" steps="139"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.106.10" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.25" steps="31693"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.25" steps="31754"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.106.11" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.14" steps="18871"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.08" steps="134"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.14" steps="18931"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.08" steps="140"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.106.12" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.18" steps="23455"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.18" steps="135"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.18" steps="23520"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.18" steps="136"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.106.13" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="2"><result status="valid" time="0.65"/></proof>
+   <proof prover="2"><result status="valid" time="0.37"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.106.14" expl="VC for wmpz_sub_ui" proved="true">
    <proof prover="1"><result status="valid" time="0.21"/></proof>
    <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,value,identical,compare_int,sgn_value,mpz_unchanged,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,extensionality5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,unchanged_transitive,H25,H24,H23,H22,Requires,Ensures26,Ensures25,Ensures24,H21,Ensures23,Ensures22,Ensures21,H18,Ensures20,Ensures19,Ensures18,Ensures17,Ensures16,Ensures15,Ensures14,Ensures13,H17,Ensures12,Ensures11,Ensures10,Assert7,Assert6,H15,H16,Ensures9,Ensures8,H14,Assert5,Assert4,Assert3,H13,H12,H11,H10,H9,H8,Ensures7,H7,H6,Ensures6,Assert2,Assert1,Ensures5,Ensures4,Assert,Ensures3,Ensures2,Ensures1,H5,Ensures,H20,H19,H4,H2">
     <goal name="wmpz_sub_ui&#39;vc.106.14.0" expl="VC for wmpz_sub_ui" proved="true">
     <proof prover="1" timelimit="1"><result status="valid" time="0.03"/></proof>
-    <proof prover="5" memlimit="1000"><result status="valid" time="0.01" steps="50"/></proof>
+    <proof prover="5"><result status="valid" time="0.01" steps="50"/></proof>
     <proof prover="7"><result status="valid" time="0.02" steps="20072"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.106.15" expl="VC for wmpz_sub_ui" proved="true">
    <proof prover="2"><result status="valid" time="0.10"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.21" steps="135"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.21" steps="136"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.106.16" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.37" steps="633"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.37" steps="625"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.107" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="18767"/></proof>
+  <proof prover="4"><result status="valid" time="0.15" steps="18806"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.108" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.24" steps="24294"/></proof>
+  <proof prover="4"><result status="valid" time="0.24" steps="24362"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.109" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="16338"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="16379"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.110" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="18856"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="18895"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.111" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="15954"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="15995"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.112" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="15958"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="15999"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.113" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.12" steps="18746"/></proof>
@@ -2603,96 +2619,103 @@
   <proof prover="1"><result status="valid" time="0.31"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.116" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="21977"/></proof>
+  <proof prover="4"><result status="valid" time="0.18" steps="22013"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.117" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="22561"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="22611"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.118" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="18090"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="18126"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.119" expl="precondition" proved="true">
-  <proof prover="4" timelimit="5"><result status="valid" time="0.09" steps="15946"/></proof>
+  <proof prover="4" timelimit="5"><result status="valid" time="0.09" steps="15987"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.120" expl="assertion" proved="true">
-  <proof prover="4" timelimit="5"><result status="valid" time="0.67" steps="65933"/></proof>
+  <proof prover="4" timelimit="5"><result status="valid" time="0.67" steps="66004"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.121" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="15935"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="15976"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.122" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="21253"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="21293"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.123" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="16477"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="16518"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.124" expl="precondition" proved="true">
-  <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.07" steps="135"/></proof>
+  <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.07" steps="141"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.125" expl="postcondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.14" steps="149"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.14" steps="155"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.126" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="23119"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="23154"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.127" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.24" steps="298521"/></proof>
+  <proof prover="0"><result status="valid" time="0.24" steps="299024"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.128" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz2">
    <goal name="wmpz_sub_ui&#39;vc.128.0" expl="apply premises" proved="true">
-   <proof prover="4"><result status="valid" time="0.20" steps="37514"/></proof>
+   <proof prover="4"><result status="valid" time="0.20" steps="37579"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.128.1" expl="apply premises" proved="true">
-   <proof prover="4"><result status="valid" time="0.15" steps="18629"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.14" steps="157"/></proof>
+   <proof prover="4"><result status="valid" time="0.15" steps="18669"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.14" steps="163"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.129" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="22575"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="22615"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.130" expl="postcondition" proved="true">
-  <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.16" steps="157"/></proof>
+  <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.16" steps="163"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.131" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="1.23" steps="2127"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="wmpz_sub_ui&#39;vc.131.0" expl="assertion" proved="true">
+   <proof prover="9"><result status="valid" time="0.17" steps="2679"/></proof>
+   </goal>
+   <goal name="wmpz_sub_ui&#39;vc.131.1" expl="assertion" proved="true">
+   <proof prover="9" timelimit="5" memlimit="2000"><result status="valid" time="1.59" steps="33510"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.132" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="27857"/></proof>
+  <proof prover="4"><result status="valid" time="0.17" steps="28036"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.133" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="22514"/></proof>
+  <proof prover="4"><result status="valid" time="0.17" steps="22560"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.134" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="21465"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="21511"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.135" expl="precondition" proved="true">
-  <proof prover="4" timelimit="5"><result status="valid" time="0.05" steps="15905"/></proof>
+  <proof prover="4" timelimit="5"><result status="valid" time="0.05" steps="15946"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.136" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.137" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.58" steps="1359"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.77" steps="1764"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.138" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="22615"/></proof>
+  <proof prover="4"><result status="valid" time="0.20" steps="22661"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.139" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.06" steps="136"/></proof>
+  <proof prover="3"><result status="valid" time="0.06" steps="137"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.140" expl="assertion" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.06" steps="131"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.06" steps="131"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.141" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.20" steps="23920"/></proof>
+  <proof prover="4"><result status="valid" time="0.18" steps="23985"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.142" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.20" steps="24203"/></proof>
+  <proof prover="4"><result status="valid" time="0.13" steps="24268"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.143" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="0.23" steps="309"/></proof>
+  <proof prover="3"><result status="valid" time="0.09" steps="309"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.144" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="2.74"/></proof>
@@ -2700,50 +2723,50 @@
   <goal name="wmpz_sub_ui&#39;vc.145" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_sub_ui&#39;vc.145.0" expl="assertion" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.16" steps="19565"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.16" steps="19604"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.145.1" expl="assertion" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.21" steps="24652"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.19" steps="156"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.21" steps="24717"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.19" steps="157"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.145.2" expl="assertion" proved="true">
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.38" steps="679"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.38" steps="675"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.145.3" expl="assertion" proved="true">
    <proof prover="2"><result status="valid" time="0.34"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.145.4" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.20" steps="157"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.20" steps="158"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.145.5" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.22" steps="157"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.22" steps="158"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.145.6" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.17" steps="19521"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.10" steps="151"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.17" steps="19560"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.10" steps="151"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.145.7" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.16" steps="18975"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.10" steps="151"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.16" steps="19014"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.10" steps="151"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.145.8" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.12" steps="16771"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.10" steps="151"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.12" steps="16812"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.10" steps="151"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.145.9" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.23" steps="24519"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.11" steps="161"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.23" steps="24584"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.11" steps="162"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.145.10" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.18" steps="36276"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.18" steps="36336"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.145.11" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.18" steps="19141"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.10" steps="157"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.18" steps="19201"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.10" steps="163"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.145.12" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.23" steps="24664"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.14" steps="158"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.23" steps="24729"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.14" steps="159"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.145.13" expl="VC for wmpz_sub_ui" proved="true">
    <proof prover="2"><result status="valid" time="0.44"/></proof>
@@ -2753,57 +2776,57 @@
    <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,value,identical,compare_int,sgn_value,mpz_unchanged,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,extensionality5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,unchanged_transitive,H30,H29,H28,H27,Requires,Ensures34,Ensures33,Ensures32,H26,Ensures31,Ensures30,Ensures29,H23,Ensures28,Ensures27,Ensures26,Ensures25,Ensures24,Ensures23,Ensures22,Ensures21,H22,Ensures20,Ensures19,Ensures18,Assert5,Assert4,H20,H21,H19,H18,H17,H16,H15,Ensures17,Ensures16,Ensures15,Ensures14,Ensures13,Ensures12,Ensures11,Ensures10,Ensures9,Ensures8,H14,Assert3,H13,H12,H11,H10,H9,H8,Ensures7,Ensures6,H7,H6,Assert2,Assert1,Ensures5,Ensures4,Assert,Ensures3,Ensures2,Ensures1,H5,Ensures,H25,H24,H4,H2">
     <goal name="wmpz_sub_ui&#39;vc.145.14.0" expl="VC for wmpz_sub_ui" proved="true">
     <proof prover="1" timelimit="1"><result status="valid" time="0.03"/></proof>
-    <proof prover="5" memlimit="1000"><result status="valid" time="0.00" steps="50"/></proof>
+    <proof prover="5"><result status="valid" time="0.00" steps="50"/></proof>
     <proof prover="7"><result status="valid" time="0.02" steps="20072"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.145.15" expl="VC for wmpz_sub_ui" proved="true">
    <proof prover="2"><result status="valid" time="0.11"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.14" steps="158"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.14" steps="159"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.145.16" expl="VC for wmpz_sub_ui" proved="true">
-   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="2.81" steps="4068"/></proof>
+   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="3.44" steps="5231"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.146" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="16447"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="16488"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.147" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.20" steps="23607"/></proof>
+  <proof prover="4"><result status="valid" time="0.20" steps="23672"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.148" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="16989"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="17030"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.149" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.07" steps="141"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.150" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="19411"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="19450"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.151" expl="postcondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.47" steps="1020"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.47" steps="1021"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.152" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.10" steps="16951"/></proof>
+  <proof prover="6"><result status="valid" time="0.10" steps="16992"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.153" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz2">
    <goal name="wmpz_sub_ui&#39;vc.153.0" expl="apply premises" proved="true">
-   <proof prover="4"><result status="valid" time="0.28" steps="43673"/></proof>
+   <proof prover="4"><result status="valid" time="0.28" steps="43771"/></proof>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.153.1" expl="apply premises" proved="true">
-   <proof prover="4"><result status="valid" time="0.14" steps="19501"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.23" steps="168"/></proof>
+   <proof prover="4"><result status="valid" time="0.14" steps="19540"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.23" steps="169"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.154" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.20" steps="24306"/></proof>
+  <proof prover="4"><result status="valid" time="0.20" steps="24371"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.155" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.13" steps="24222"/></proof>
+  <proof prover="4"><result status="valid" time="0.13" steps="24287"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.156" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.08" steps="17128"/></proof>
@@ -2843,10 +2866,10 @@
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.168" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="108"/></proof>
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.03" steps="108"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="108"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.169" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.26" steps="700"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.26" steps="700"/></proof>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.170" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz2">
@@ -2854,22 +2877,22 @@
    <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz1">
     <goal name="wmpz_sub_ui&#39;vc.170.0.0" expl="apply premises" proved="true">
     <proof prover="4"><result status="valid" time="0.13" steps="25076"/></proof>
-    <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.60" steps="518"/></proof>
+    <proof prover="5" timelimit="1"><result status="valid" time="0.60" steps="518"/></proof>
     </goal>
     <goal name="wmpz_sub_ui&#39;vc.170.0.1" expl="apply premises" proved="true">
     <proof prover="4"><result status="valid" time="0.15" steps="18085"/></proof>
-    <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.11" steps="131"/></proof>
+    <proof prover="5" timelimit="1"><result status="valid" time="0.11" steps="131"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="wmpz_sub_ui&#39;vc.170.1" expl="apply premises" proved="true">
    <proof prover="4"><result status="valid" time="0.16" steps="18085"/></proof>
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.12" steps="131"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.12" steps="131"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_sub_ui&#39;vc.171" expl="postcondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.10" steps="136"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.10" steps="136"/></proof>
   </goal>
  </transf>
  </goal>
@@ -2908,7 +2931,7 @@
   <proof prover="3"><result status="valid" time="0.04" steps="79"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.9" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="83"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.03" steps="83"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.10" expl="integer overflow" proved="true">
   <proof prover="4"><result status="valid" time="0.08" steps="21311"/></proof>
@@ -2920,7 +2943,7 @@
   <proof prover="4"><result status="valid" time="0.14" steps="21857"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.13" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="1.15" steps="684"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.15" steps="684"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.14" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -2940,14 +2963,14 @@
    <proof prover="4"><result status="valid" time="0.09" steps="15924"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.14.5" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="1.06" steps="542"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="1.06" steps="542"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.14.6" expl="VC for wmpz_ui_sub" proved="true">
    <proof prover="1"><result status="valid" time="0.16"/></proof>
    <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,value,identical,compare_int,sgn_value,mpz_unchanged,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,extensionality5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,unchanged_transitive,H18,H17,H16,H15,Requires,H13,Ensures19,Ensures18,Ensures17,Ensures16,Ensures15,Ensures14,Ensures13,Ensures12,H12,Ensures11,Ensures9,H10,H9,H8,H7,H6,H5,H4,H3,Ensures7,Ensures6,Ensures5,Assert,Ensures4,Ensures3,Ensures2,H2,Ensures1,Ensures">
     <goal name="wmpz_ui_sub&#39;vc.14.6.0" expl="VC for wmpz_ui_sub" proved="true">
     <proof prover="1" timelimit="1"><result status="valid" time="0.02"/></proof>
-    <proof prover="5" memlimit="1000"><result status="valid" time="0.01" steps="66"/></proof>
+    <proof prover="5"><result status="valid" time="0.01" steps="66"/></proof>
     <proof prover="7"><result status="valid" time="0.02" steps="27940"/></proof>
     </goal>
    </transf>
@@ -2987,10 +3010,10 @@
    </transf>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.15.8" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.10" steps="112"/></proof>
+   <proof prover="5"><result status="valid" time="0.10" steps="112"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.15.9" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.36" steps="645"/></proof>
+   <proof prover="5"><result status="valid" time="0.36" steps="645"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.15.10" expl="VC for wmpz_ui_sub" proved="true">
    <proof prover="3"><result status="valid" time="0.07" steps="108"/></proof>
@@ -3002,7 +3025,7 @@
    <proof prover="4"><result status="valid" time="0.30" steps="35560"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.15.13" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.04" steps="102"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="102"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.15.14" expl="VC for wmpz_ui_sub" proved="true">
    <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="1.10" steps="598"/></proof>
@@ -3052,14 +3075,14 @@
   <proof prover="4"><result status="valid" time="0.16" steps="19107"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.28" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.06" steps="110"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.06" steps="110"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.29" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.16"/></proof>
   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),get,set,([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds5,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int4,in_bounds6,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length2,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,map_eq_sub_shift,l2i,p2i,value,identical,compare_int,mpz_unchanged,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds4,extensionality4,zero_unsigned_is_zero3,radix_def,to_int_in_bounds5,extensionality5,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,is_not_null&#39;spec,valid_itv_to_shift,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,mpz_memo&#39;invariant,unchanged_transitive,H26,H25,H24,H23,Requires,Ensures28,Ensures27,H22,H21,Ensures26,Ensures25,Ensures24,Ensures23,Ensures22,Ensures21,Ensures20,Ensures19,H20,Ensures18,Ensures17,Ensures16,H19,H18,H17,H16,H15,H14,H13,Ensures15,H12,H11,Ensures14,Assert1,Ensures13,Ensures12,Assert,Ensures11,Ensures10,Ensures9,H10,Ensures8,Ensures7,H8,H7,H6,H5,Ensures6,Ensures3,H3,H2,H,Ensures1,Ensures">
    <goal name="wmpz_ui_sub&#39;vc.29.0" expl="postcondition" proved="true">
    <proof prover="1" timelimit="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.01" steps="50"/></proof>
+   <proof prover="5"><result status="valid" time="0.01" steps="50"/></proof>
    <proof prover="7"><result status="valid" time="0.02" steps="24852"/></proof>
    </goal>
   </transf>
@@ -3088,10 +3111,10 @@
   <proof prover="4"><result status="valid" time="0.08" steps="16508"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.33" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.07" steps="68"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.07" steps="68"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.34" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.04" steps="96"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="96"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.35" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.13" steps="26125"/></proof>
@@ -3111,16 +3134,16 @@
    <proof prover="4"><result status="valid" time="0.36" steps="54230"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.39.1" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.04" steps="114"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="114"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.39.2" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.10" steps="118"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.10" steps="118"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.39.3" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.07" steps="118"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.07" steps="118"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.39.4" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.24" steps="318"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.24" steps="318"/></proof>
    </goal>
   </transf>
   </goal>
@@ -3140,7 +3163,7 @@
   <proof prover="4"><result status="valid" time="0.12" steps="22065"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.45" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.08" steps="128"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.08" steps="128"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.46" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.08" steps="132"/></proof>
@@ -3172,10 +3195,10 @@
    <proof prover="3"><result status="valid" time="0.13" steps="148"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.51.4" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.13" steps="148"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.13" steps="148"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.51.5" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="1.08" steps="642"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="1.08" steps="642"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.51.6" expl="VC for wmpz_ui_sub" proved="true">
    <proof prover="1"><result status="valid" time="0.14"/></proof>
@@ -3204,14 +3227,14 @@
    <proof prover="3"><result status="valid" time="0.41" steps="726"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.52.4" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.21" steps="161"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.21" steps="161"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.52.5" expl="VC for wmpz_ui_sub" proved="true">
    <proof prover="2"><result status="valid" time="0.06"/></proof>
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.06" steps="151"/></proof>
+   <proof prover="5"><result status="valid" time="0.06" steps="151"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.52.6" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.22" steps="161"/></proof>
+   <proof prover="5"><result status="valid" time="0.22" steps="161"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.52.7" expl="VC for wmpz_ui_sub" proved="true">
    <proof prover="1"><result status="valid" time="0.08"/></proof>
@@ -3223,13 +3246,13 @@
    </transf>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.52.8" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.20" steps="161"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.20" steps="161"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.52.9" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.41" steps="693"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.41" steps="693"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.52.10" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.14" steps="157"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.14" steps="157"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.52.11" expl="VC for wmpz_ui_sub" proved="true">
    <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.15" steps="19164"/></proof>
@@ -3238,13 +3261,13 @@
    <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.40" steps="41049"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.52.13" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.10" steps="151"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.10" steps="151"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.52.14" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.90" steps="893"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.90" steps="893"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.52.15" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.26" steps="171"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.26" steps="171"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.52.16" expl="VC for wmpz_ui_sub" proved="true">
    <proof prover="4" timelimit="5"><result status="valid" time="0.06" steps="19132"/></proof>
@@ -3288,7 +3311,7 @@
   <proof prover="4"><result status="valid" time="0.13" steps="20151"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.65" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.14" steps="160"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.14" steps="160"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.66" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.27"/></proof>
@@ -3359,10 +3382,10 @@
    <proof prover="2"><result status="valid" time="1.27"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.76.3" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.23" steps="282"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.23" steps="282"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.76.4" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.13" steps="261"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.13" steps="261"/></proof>
    </goal>
   </transf>
   </goal>
@@ -3404,10 +3427,10 @@
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.89" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.05" steps="106"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.05" steps="106"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.90" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.16" steps="325"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.16" steps="325"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.91" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz1">
@@ -3482,10 +3505,10 @@
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.110" expl="precondition" proved="true">
   <proof prover="4" timelimit="5"><result status="valid" time="0.06" steps="17151"/></proof>
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.05" steps="113"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.05" steps="113"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.111" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.05" steps="122"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.05" steps="122"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.112" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz1">
@@ -3526,7 +3549,7 @@
   <proof prover="4"><result status="valid" time="0.09" steps="15642"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.120" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.03" steps="109"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="109"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.121" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -3596,10 +3619,10 @@
   <proof prover="4"><result status="valid" time="0.12" steps="19151"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.138" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.10" steps="143"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.10" steps="143"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.139" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.22" steps="420"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.22" steps="420"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.140" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz1">
@@ -3686,10 +3709,10 @@
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.163" expl="precondition" proved="true">
   <proof prover="4" timelimit="5"><result status="valid" time="0.05" steps="17696"/></proof>
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.04" steps="150"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="150"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.164" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.18" steps="158"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.18" steps="158"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.165" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz1">
@@ -3718,7 +3741,7 @@
   <proof prover="4"><result status="valid" time="0.13" steps="16926"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.169" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.03" steps="67"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="67"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.170" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -3729,7 +3752,7 @@
    <proof prover="3"><result status="valid" time="0.10" steps="249"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.170.2" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.13" steps="388"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.13" steps="388"/></proof>
    </goal>
   </transf>
   </goal>
@@ -3770,10 +3793,10 @@
   <proof prover="4"><result status="valid" time="0.12" steps="18175"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.183" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.05" steps="96"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.05" steps="96"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.184" expl="postcondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.53" steps="823"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.53" steps="823"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.185" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz1">
@@ -3796,7 +3819,7 @@
   <proof prover="4"><result status="valid" time="0.12" steps="20630"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.187" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.05" steps="41"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.05" steps="41"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.188" expl="integer overflow" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="156"/></proof>
@@ -3817,7 +3840,7 @@
   <proof prover="4"><result status="valid" time="0.14" steps="16889"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.194" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="77"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.03" steps="77"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.195" expl="assertion" proved="true">
   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.14" steps="396"/></proof>
@@ -3840,13 +3863,13 @@
   <goal name="wmpz_ui_sub&#39;vc.201" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_ui_sub&#39;vc.201.0" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.33" steps="456"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.33" steps="456"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.201.1" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.08" steps="118"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.08" steps="118"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.201.2" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="1.56" steps="359"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="1.56" steps="359"/></proof>
    </goal>
   </transf>
   </goal>
@@ -3862,28 +3885,28 @@
    <proof prover="4" timelimit="5"><result status="valid" time="0.08" steps="18452"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.202.3" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.44" steps="381"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.44" steps="381"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.202.4" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.34" steps="595"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.34" steps="595"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.202.5" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.18" steps="138"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.18" steps="138"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.202.6" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.33" steps="520"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.33" steps="520"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.202.7" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.15" steps="140"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.15" steps="140"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.202.8" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.09" steps="123"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.09" steps="123"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.202.9" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.11" steps="125"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.11" steps="125"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.202.10" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.08" steps="125"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.08" steps="125"/></proof>
    </goal>
   </transf>
   </goal>
@@ -3924,10 +3947,10 @@
   <proof prover="4"><result status="valid" time="0.14" steps="19521"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.215" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.06" steps="137"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.06" steps="137"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.216" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.49" steps="414"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.49" steps="414"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.217" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz1">
@@ -3956,7 +3979,7 @@
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.221" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.05" steps="113"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.05" steps="113"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.222" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.20" steps="291"/></proof>
@@ -3968,10 +3991,10 @@
   <proof prover="4"><result status="valid" time="0.16" steps="17650"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.225" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="116"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.03" steps="116"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.226" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.07" steps="133"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.07" steps="133"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.227" expl="precondition" proved="true">
   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.08" steps="133"/></proof>
@@ -3994,7 +4017,7 @@
    <proof prover="2"><result status="valid" time="0.06"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.232.1" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.11" steps="155"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.11" steps="155"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.232.2" expl="assertion" proved="true">
    <proof prover="2"><result status="valid" time="2.38"/></proof>
@@ -4007,7 +4030,7 @@
    <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.18" steps="24516"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.233.1" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.17" steps="171"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.17" steps="171"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.233.2" expl="VC for wmpz_ui_sub" proved="true">
    <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -4016,16 +4039,16 @@
    <proof prover="0"><result status="valid" time="0.04" steps="101781"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.233.4" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.23" steps="173"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.23" steps="173"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.233.5" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.23" steps="175"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.23" steps="175"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.233.6" expl="VC for wmpz_ui_sub" proved="true">
    <proof prover="6"><result status="valid" time="0.14" steps="18712"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.233.7" expl="VC for wmpz_ui_sub" proved="true">
-   <proof prover="5"><result status="valid" time="0.24" steps="177"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.24" steps="177"/></proof>
    </goal>
    <goal name="wmpz_ui_sub&#39;vc.233.8" expl="VC for wmpz_ui_sub" proved="true">
    <proof prover="6"><result status="valid" time="0.14" steps="19559"/></proof>
@@ -4087,7 +4110,7 @@
   <proof prover="4"><result status="valid" time="0.09" steps="20585"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.250" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.04" steps="187"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="187"/></proof>
   </goal>
   <goal name="wmpz_ui_sub&#39;vc.251" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.14"/></proof>
@@ -4095,7 +4118,7 @@
    <goal name="wmpz_ui_sub&#39;vc.251.0" expl="postcondition" proved="true">
    <proof prover="1" timelimit="1"><result status="valid" time="0.02"/></proof>
    <proof prover="4" timelimit="5"><result status="valid" time="2.23" steps="452987"/></proof>
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.01" steps="54"/></proof>
+   <proof prover="5"><result status="valid" time="0.01" steps="54"/></proof>
    </goal>
   </transf>
   </goal>

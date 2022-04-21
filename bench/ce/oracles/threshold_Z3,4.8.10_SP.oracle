@@ -65,10 +65,22 @@ File threshold.mlw:
       {"proj_name": "int32'int",
        "type": "Proj",
        "value": {"type": "Integer", "val": "-1"}}
+    result of call at line 11, characters 11-20 [@call_result:11:11:20:bench/ce/threshold.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "-1"}}
     result [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
        "value": {"type": "Integer", "val": "0"}}
+  Line 12:
+    result of call at line 12, characters 30-37 [@call_result:12:30:37:bench/ce/threshold.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": false}
+    result of call at line 12, characters 5-12 [@call_result:12:5:12:bench/ce/threshold.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": true}
 
 File "bench/ce/threshold.mlw", line 30, characters 11-24:
 Sub-goal Arithmetic overflow of goal f'vc.
@@ -93,16 +105,25 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File threshold.mlw:
   Line 26:
-    max [@introduced] = {"type": "Integer", "val": "131072"}
-    min [@introduced] = {"type": "Integer", "val": "1341089699"}
-    n [@introduced] = {"type": "Integer", "val": "131073"}
+    max [@introduced] = {"type": "Integer", "val": "0"}
+    min [@introduced] = {"type": "Integer", "val": "268435459"}
+    n [@introduced] = {"type": "Integer", "val": "2"}
   Line 27:
-    max [@introduced] [@model_trace:max] =
-      {"type": "Integer", "val": "131072"}
+    max [@introduced] [@model_trace:max] = {"type": "Integer", "val": "0"}
     min [@introduced] [@model_trace:min] =
-      {"type": "Integer", "val": "1341089699"}
-    result [@introduced] = {"type": "Integer", "val": "1341089699"}
+      {"type": "Integer", "val": "268435459"}
+    result [@introduced] = {"type": "Integer", "val": "268435459"}
   Line 30:
-    _x [@introduced] = {"type": "Integer", "val": "1341220771"}
-    result [@introduced] = {"type": "Integer", "val": "1341089699"}
+    _x [@introduced] = {"type": "Integer", "val": "268435459"}
+    result of call at line 30, characters 11-24 [@call_result:30:11:24:bench/ce/threshold.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "268435459"}
+    result [@introduced] = {"type": "Integer", "val": "268435459"}
+  Line 31:
+    result of call at line 31, characters 33-43 [@call_result:31:33:43:bench/ce/threshold.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": false}
+    result of call at line 31, characters 5-15 [@call_result:31:5:15:bench/ce/threshold.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": true}
 
