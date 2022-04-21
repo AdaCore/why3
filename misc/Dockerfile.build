@@ -15,6 +15,9 @@ RUN wget --quiet https://github.com/ocaml/opam/releases/download/2.0.6/opam-2.0.
     chmod a+x /usr/local/bin/opam
 
 # install provers
+## CVC4 1.8
+RUN wget --quiet https://github.com/CVC4/CVC4/releases/download/1.8/cvc4-1.8-x86_64-linux-opt -O /usr/local/bin/cvc4-1.8 && \
+    chmod a+x /usr/local/bin/cvc4-1.8
 ## CVC4 1.7
 RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.7-x86_64-linux-opt -O /usr/local/bin/cvc4-1.7 && \
     chmod a+x /usr/local/bin/cvc4-1.7

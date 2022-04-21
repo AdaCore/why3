@@ -1,0 +1,67 @@
+Weakest Precondition
+File "bench/ce/attributes.mlw", line 11, characters 42-49:
+Sub-goal Assertion of goal f'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File attributes.mlw:
+  Line 7:
+    x [@field:0:contents] [@introduced] [@loop1]
+      [@loop:bench/ce/attributes.mlw:7:2:33] [@mlw:reference_var] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
+  Line 9:
+    x [@field:0:contents] [@introduced] [@loop2]
+      [@loop:bench/ce/attributes.mlw:9:2:34] [@mlw:reference_var] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "100"}}]}}
+  Line 11:
+    x [@field:0:contents] [@introduced] [@mlw:reference_var] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "200"}}]}}
+
+File "bench/ce/attributes.mlw", line 23, characters 11-18:
+Sub-goal Assertion of goal g'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File attributes.mlw:
+  Line 17:
+    old x [@at:'Old] [@at:'Old:loc:bench/ce/attributes.mlw:17] [@call1]
+      [@field:0:contents] [@introduced] [@mlw:reference_var] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+    x [@call2] [@field:0:contents] [@introduced] [@mlw:reference_var] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "200"}}]}}
+  Line 21:
+    x [@at:'Old] [@at:'Old:loc:bench/ce/attributes.mlw:17] [@call1]
+      [@field:0:contents] [@introduced] [@mlw:reference_var] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 22:
+    x [@call2] [@field:0:contents] [@introduced] [@mlw:reference_var] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "200"}}]}}
+  Line 23:
+    x [@call2] [@field:0:contents] [@introduced] [@mlw:reference_var]
+      [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "200"}}]}}
+

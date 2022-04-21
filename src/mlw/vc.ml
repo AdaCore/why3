@@ -918,7 +918,8 @@ let rec k_expr env lps e res xmap =
         let j = List.fold_right assert_inv iinv (Kstop init) in
         let k = List.fold_right assert_inv iinv (Kstop keep) in
         let k = Kseq (k_expr env lps e1 res xmap, 0, k) in
-        let k = var_or_proxy e0 (fun v -> Kif (v, k, k_unit res)) in
+        let k = if is_e_true e0 then k
+          else var_or_proxy e0 (fun v -> Kif (v, k, k_unit res)) in
         let k = Kseq (Kval ([], prev), 0, bind_oldies oldies k) in
         let k = List.fold_right assume_inv iinv k in
         let k = check_divergence k in

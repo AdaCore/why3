@@ -45,13 +45,20 @@ Tools
   * `why3 prove` now supports transformations that require an argument
   * `why3 execute` now supports `io.StdIO` and `debug.Debug`
 
+Configuration
+  * the configuration file `why3.conf` can now contain additional
+    hand-written `[prover]` sections that are taken in addition with
+    the auto-detected provers
+
 Coq realizations
   * floating-point theories are now built on top of Flocq's `BinarySingleNaN`
     formalization (requires Flocq >= 3.4 and Coq >= 8.11) :x:
 
 Provers
+  * support for Z3 versions from 4.8.11 to 4.8.15 (released Mar 20, 2022)
   * support for Coq 8.15.0 (released Jan 13, 2022)
   * dropped support for Coq 8.6
+  * support for SMTLIB strings in CVC4 1.7 disabled, only CVC4 1.8 is supported
 
 Version 1.4.1, February 18, 2022
 --------------------------------

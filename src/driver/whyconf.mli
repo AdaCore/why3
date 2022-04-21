@@ -167,6 +167,16 @@ val set_provers : config ->
 (** [set_provers config provers] replace all the family prover by the
     one given *)
 
+val add_provers : config -> config_prover Mprover.t -> prover Mstr.t -> config
+(** [add_provers config provers shortcuts] augments the prover family
+   of [config] by the one given in [provers], and with the given
+   shortcuts. In case a new prover has the same name, version and
+   alternative of an old one, the old one is kept. Similarly, if a new
+   shortcut is identical to an old one, the old one is kept.  *)
+
+
+
+
 val is_prover_known : config -> prover -> bool
 (** test if a prover is detected *)
 

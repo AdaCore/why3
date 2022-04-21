@@ -1,6 +1,6 @@
-(** Why3 driver for CVC4 1.7 *)
+(** Why3 driver for CVC4 1.8 with string support *)
 
-prelude ";; produced by cvc4_17_strings.drv ;;"
+prelude ";; produced by cvc4_18_strings.drv ;;"
 
 import "cvc4_17.drv"
 
@@ -21,19 +21,14 @@ theory string.String
   remove prop replaceall_empty1
   remove prop not_contains_replaceall
 
-  syntax predicate lt        "(str.< %1 %2)"
-  syntax predicate le        "(str.<= %1 %2)"
-
-  syntax function replaceall "(str.replaceall %1 %2 %3)"
-
 end
 
 theory string.RegExpr
 
   syntax type re             "RegLan"
 
-  syntax function to_re      "(str.to.re %1)"
-  syntax predicate in_re     "(str.in.re %1 %2)"
+  syntax function to_re      "(str.to_re %1)"
+  syntax predicate in_re     "(str.in_re %1 %2)"
 
   syntax function concat     "(re.++ %1 %2)"
   syntax function union      "(re.union %1 %2)"
@@ -41,12 +36,12 @@ theory string.RegExpr
   syntax function star       "(re.* %1)"
   syntax function plus       "(re.+ %1)"
 
-  syntax function none       "re.nostr"
+  syntax function none       "re.none"
   syntax function allchar    "re.allchar"
 
   syntax function opt        "(re.opt %1)"
   syntax function range      "(re.range %1 %2)"
-  syntax function power      "(re.loop %2 %1 %1)"
-  syntax function loop       "(re.loop %3 %1 %2)"
+  syntax function power      "((_ re.^ %1) %2)"
+  syntax function loop       "((_ re.loop %1 %2) %3)"
 
 end

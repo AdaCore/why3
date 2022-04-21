@@ -396,9 +396,9 @@ let file_name_of_task ?old ?inplace ?interactive drv task =
         false, fn
     | Some fn, _ when interactive <> Some true ->
         (* Example: cvc4. If a file is provided, it means it was passed to
-           schedule_proof_attempt via its save_to argument. So we ask to erase
-           and regenerate the file (the advantage is that we decide the location
-           of the file).
+           schedule_proof_attempt via its proof_script_filename argument.
+           So we ask to erase and regenerate the file (the advantage is that
+           we decide the location of the file).
         *)
         false, fn
     | Some _, _ ->
@@ -416,7 +416,7 @@ let file_name_of_task ?old ?inplace ?interactive drv task =
           ~theory_name:"T"
           ~goal_name:pr.pr_name.id_string
     | _ ->
-        (* Example: cvc4 without ?save_to argument
+        (* Example: cvc4 without ?proof_script_filename argument
            No file were provided. We have to generate a new one.
         *)
         let pr = Task.task_goal task in

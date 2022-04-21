@@ -20,15 +20,17 @@ open Constant
 
 let expl_prefixes = ref ["expl:";"infer:"]
 
+let add_extra_expl_prefix s = expl_prefixes := s :: !expl_prefixes
+
 let arg_extra_expl_prefix =
   ("--extra-expl-prefix",
-   Arg.String (fun s -> expl_prefixes := s :: !expl_prefixes),
+   Arg.String add_extra_expl_prefix,
    "<s> register s as an additional prefix for VC explanations")
 
 let opt_extra_expl_prefix =
   let open Getopt in
   KLong "extra-expl-prefix",
-  Hnd1 (AString, fun s -> expl_prefixes := s :: !expl_prefixes),
+  Hnd1 (AString, add_extra_expl_prefix),
   "<expl> register <expl> as an additional prefix\nfor VC explanations"
 
 let match_prefix prefix attr =

@@ -1,8 +1,7 @@
 theory Why3_BV
 imports
   Why3_Int
-  "HOL-Word.Word"
-  "HOL-Word.Bit_Comparison"
+  "HOL-Library.Word"
 begin
 
 abbreviation (input) pow2 :: "int \<Rightarrow> int"
@@ -104,73 +103,51 @@ next
     by (auto simp add: nth_append mod_Suc simp del: mod_less_divisor)
 qed
 
+lemma word_rotl_0: "word_rotl 0 w = w"
+  by transfer simp
+
+lemma word_rotr_0: "word_rotr 0 w = w"
+  by transfer simp
+
 lemma rotl_nth:
-  "word_rotl j w !! ((i + j) mod len_of TYPE('a)) = (w::'a::len word) !! (i mod len_of TYPE('a))"
-proof (induct j arbitrary: w i)
-  case 0
-  show ?case by simp
-next
-  case (Suc n)
-  from Suc [of "of_bl (rotate1 (to_bl w))" "Suc i"]
-    rotate1_nth [of "to_bl w" "len_of TYPE('a) - Suc (Suc i mod len_of TYPE('a))"]
-  show ?case
-    by (simp add: word_rotl_def rotate1_rotate_swap word_bl.Abs_inverse
-      rev_nth test_bit_bl word_size Suc_diff_Suc)
-      (simp add: mod_Suc)
-qed
-
-lemma rotater1_rotater_swap: "rotater1 (rotater n xs) = rotater n (rotater1 xs)"
-  by (simp add: rotater_def funpow_swap1)
-
-lemma length_rotater1 [simp]: "length (rotater1 xs) = length xs"
-  by (simp add: rotater1_def split: list.split)
-
-lemma rotater1_nth:
-  assumes "0 < length xs"
-  shows "rotater1 xs ! (Suc i mod length xs) = xs ! (i mod length xs)"
-proof (cases xs rule: rev_cases)
-  case Nil
-  with `0 < length xs` show ?thesis by simp
-next
-  case (snoc ys y)
-  with mod_less_divisor [of "Suc (length ys)" i]
-  show ?thesis
-    by (auto simp add: rotate1_rl' nth_append mod_Suc simp del: mod_less_divisor)
+  "bit (word_rotl j w) (((i + j) mod len_of TYPE('a))) = bit (w::'a::len word) (i mod len_of TYPE('a))"
+proof -
+  have "bit (word_rotl j w) (((i + j) mod len_of TYPE('a))) =
+    bit (word_roti (- int j) w) (((i + j) mod len_of TYPE('a)))"
+    by (simp add: word_rotl_0 word_rotr_0)
+  then show ?thesis
+    apply (simp only: bit_word_roti_iff)
+    apply (simp add: zmod_int mod_diff_left_eq)
+    apply (simp add: zmod_int [symmetric])
+    done
 qed
 
 lemma rotr_nth:
-  "word_rotr j w !! (i mod len_of TYPE('a)) = (w::'a::len word) !! ((i + j) mod len_of TYPE('a))"
-proof (induct j arbitrary: w)
-  case 0
-  show ?case by simp
-next
-  case (Suc n)
-  from Suc [of "of_bl (rotater1 (to_bl w))"]
-    rotater1_nth [of "to_bl w" "len_of TYPE('a) - Suc (Suc (i + n) mod len_of TYPE('a))", symmetric]
-  show ?case
-    by (simp add: word_rotr_def rotater1_rotater_swap word_bl.Abs_inverse
-      rev_nth test_bit_bl word_size Suc_diff_Suc)
-      (simp add: mod_Suc)
-qed
+  "bit (word_rotr j w) (i mod len_of TYPE('a)) = bit (w::'a::len word) ((i + j) mod len_of TYPE('a))"
+  by (simp add: bit_word_rotr_iff mod_add_left_eq)
 
 lemma uint_pow: "uint ((b::'a::len word) ^ n) = uint b ^ n mod 2 ^ len_of TYPE('a)"
-  by (induct n) (simp_all add: mod_pos_pos_trivial uint_word_ariths mod_mult_right_eq)
+  by (induct n) (simp_all add: uint_word_ariths mod_mult_right_eq)
 
+context
+  includes bit_operations_syntax
+begin
 
 lemma eq_sub_equiv_aux:
   "(\<forall>j. uint i \<le> j \<and> j < uint i + uint n \<longrightarrow>
-      (0 \<le> j \<and> a !! nat j) = (0 \<le> j \<and> b !! nat j)) =
-   (b AND (mask (unat n) << unat i) = a AND (mask (unat n) << unat i))"
-  apply (simp add: word_eq_iff word_ops_nth_size word_size nth_shiftl)
+      (0 \<le> j \<and> bit a (nat j)) = (0 \<le> j \<and> bit b (nat j))) =
+   ((b::('a::len) word) AND (push_bit (unat i) (mask (unat n))) = a AND (push_bit (unat i) (mask (unat n))))"
+  apply (simp add: bit_eq_iff bit_and_iff bit_push_bit_iff)
   apply (rule iffI)
   apply (rule allI)
   apply (drule_tac x="int na" in spec)
-  apply (auto simp add: uint_nat)[1]
+  apply (auto simp add: uint_nat bit_mask_iff simp del: of_nat_unat)[1]
   apply (rule allI)
   apply (drule_tac x="nat j" in spec)
-  apply (auto simp add: uint_nat test_bit_bin)
+  apply (auto simp add: uint_nat bit_mask_iff simp del: of_nat_unat dest: bit_imp_le_length)
   done
 
+end
 
 lemma int_minus_mod: "((i::int) - j) mod n = (i + (n - j mod n)) mod n"
 proof -
@@ -178,7 +155,7 @@ proof -
     by (simp only: mod_add_eq)
   also have "(n - j mod n) mod n = (n mod n - j mod n) mod n"
     by simp
-  finally show ?thesis by (simp add: pull_mods [symmetric])
+  finally show ?thesis by (simp add: mod_minus_eq mod_add_eq)
 qed
 
 lemma nat_minus_mod:
@@ -188,7 +165,7 @@ proof -
   have "((n - i mod n) + i) mod n = (i + (n - i mod n)) mod n"
     by (simp add: add_ac)
   also have "\<dots> = (i mod n + (n - i mod n)) mod n"
-    by (simp add: pull_mods [symmetric])
+    by (simp add: mod_add_left_eq)
   also from assms have "\<dots> = (n mod n + (i mod n - i mod n)) mod n"
     by (simp add: add_ac)
   finally show ?thesis by simp
@@ -201,51 +178,57 @@ proof -
   have "(i + (n - j mod n) + j) mod n = (i + ((n - j mod n) + j)) mod n"
     by (simp add: add_ac)
   also have "\<dots> = (i mod n + ((n - j mod n) + j) mod n) mod n"
-    by (simp add: pull_mods [symmetric])
+    by (simp add: mod_add_left_eq mod_add_right_eq)
   also note nat_minus_mod [OF assms]
   finally show ?thesis by simp
 qed
 
 
-definition bv_nth :: "'a::len0 word \<Rightarrow> int \<Rightarrow> bool"
-where "bv_nth bv i \<equiv> 0 \<le> i \<and> bv !! nat i"
+definition bv_nth :: "'a::len word \<Rightarrow> int \<Rightarrow> bool"
+where "bv_nth bv i \<equiv> 0 \<le> i \<and> bit bv (nat i)"
 
-abbreviation (input) nth_bv :: "'a::len0 word \<Rightarrow> 'a word \<Rightarrow> bool"
-where "nth_bv bv bv' \<equiv> bv !! unat bv'"
+abbreviation (input) nth_bv :: "'a::len word \<Rightarrow> 'a word \<Rightarrow> bool"
+where "nth_bv bv bv' \<equiv> bit bv (unat bv')"
 
-abbreviation (input) lsr :: "'a::len0 word \<Rightarrow> int \<Rightarrow> 'a word"
-where "lsr v i \<equiv> v >> nat i"
+abbreviation (input) lsr :: "'a::len word \<Rightarrow> int \<Rightarrow> 'a word"
+where "lsr v i \<equiv> drop_bit (nat i) v"
 
-abbreviation (input) lsr_bv :: "'a::len0 word \<Rightarrow> 'a word \<Rightarrow> 'a word"
-where "lsr_bv v n \<equiv> v >> unat n"
+abbreviation (input) lsr_bv :: "'a::len word \<Rightarrow> 'a word \<Rightarrow> 'a word"
+where "lsr_bv v n \<equiv> drop_bit (unat n) v"
 
 abbreviation (input) asr :: "'a::len word \<Rightarrow> int \<Rightarrow> 'a word"
-where "asr v i \<equiv> v >>> nat i"
+where "asr v i \<equiv> signed_drop_bit (nat i) v"
 
 abbreviation (input) asr_bv :: "'a::len word \<Rightarrow> 'a word \<Rightarrow> 'a word"
-where "asr_bv v n \<equiv> v >>> unat n"
+where "asr_bv v n \<equiv> signed_drop_bit (unat n) v"
 
-abbreviation (input) lsl :: "'a::len0 word \<Rightarrow> int \<Rightarrow> 'a word"
-where "lsl v i \<equiv> v << nat i"
+abbreviation (input) lsl :: "'a::len word \<Rightarrow> int \<Rightarrow> 'a word"
+where "lsl v i \<equiv> push_bit (nat i) v"
 
-abbreviation (input) lsl_bv :: "'a::len0 word \<Rightarrow> 'a word \<Rightarrow> 'a word"
-where "lsl_bv v n \<equiv> v << unat n"
+abbreviation (input) lsl_bv :: "'a::len word \<Rightarrow> 'a word \<Rightarrow> 'a word"
+where "lsl_bv v n \<equiv> push_bit (unat n) v"
 
-abbreviation (input) rotate_left :: "'a::len0 word \<Rightarrow> int \<Rightarrow> 'a word"
+abbreviation (input) rotate_left :: "'a::len word \<Rightarrow> int \<Rightarrow> 'a word"
 where "rotate_left v n \<equiv> word_rotl (nat n) v"
 
-abbreviation (input) rotate_right :: "'a::len0 word \<Rightarrow> int \<Rightarrow> 'a word"
+abbreviation (input) rotate_right :: "'a::len word \<Rightarrow> int \<Rightarrow> 'a word"
 where "rotate_right v n \<equiv> word_rotr (nat n) v"
 
-abbreviation (input) rotate_left_bv :: "'a::len0 word \<Rightarrow> 'a word \<Rightarrow> 'a word"
+abbreviation (input) rotate_left_bv :: "'a::len word \<Rightarrow> 'a word \<Rightarrow> 'a word"
 where "rotate_left_bv v n \<equiv> word_rotl (unat n) v"
 
-abbreviation (input) rotate_right_bv :: "'a::len0 word \<Rightarrow> 'a word \<Rightarrow> 'a word"
+abbreviation (input) rotate_right_bv :: "'a::len word \<Rightarrow> 'a word \<Rightarrow> 'a word"
 where "rotate_right_bv v n \<equiv> word_rotr (unat n) v"
+
+context
+  includes bit_operations_syntax
+begin
 
 definition eq_sub_bv :: "'a::len word \<Rightarrow> 'a word \<Rightarrow> 'a word \<Rightarrow> 'a word \<Rightarrow> bool" where
   eq_sub_bv_defn: "eq_sub_bv a b i n =
-    (b AND (mask (unat n) << unat i) = a AND (mask (unat n) << unat i))"
+    (b AND (push_bit (unat i) (mask (unat n))) = a AND (push_bit (unat i) (mask (unat n))))"
+
+end
 
 definition size_bv :: "'a::len word" where
   "size_bv = of_nat LENGTH('a)"
@@ -263,7 +246,7 @@ proof (cases "0 \<le> sint x")
     by (rule power_strict_increasing) simp_all
   finally have "sint x < 2 ^ LENGTH('a)" .
   with True show ?thesis
-    by (simp add: is_signed_positive_def uint_sint bintrunc_mod2p mod_pos_pos_trivial)
+    by (simp add: is_signed_positive_def uint_sint take_bit_eq_mod)
 next
   case False
   from sint_ge [of x]
@@ -274,7 +257,7 @@ next
   then have "- (2 ^ LENGTH('a)) < sint x" by simp
   moreover from False have "0 < - sint x" by simp
   ultimately have "- sint x = - sint x mod 2 ^ LENGTH('a)"
-    by (simp add: mod_pos_pos_trivial)
+    by simp
   also have "sint x mod 2 ^ LENGTH('a) \<noteq> 0"
   proof
     assume "sint x mod 2 ^ LENGTH('a) = 0"
@@ -289,19 +272,44 @@ next
   then have "- sint x mod 2 ^ LENGTH('a) = 2 ^ LENGTH('a) - sint x mod 2 ^ LENGTH('a)"
     by (simp add: zmod_zminus1_eq_if)
   finally show ?thesis using False
-    by (simp add: is_signed_positive_def uint_sint bintrunc_mod2p)
+    by (simp add: is_signed_positive_def uint_sint take_bit_eq_mod)
 qed
 
+lemma shiftr_div_2n: "uint (drop_bit n v) = uint v div 2 ^ n"
+  apply (auto simp add: uint_div_distrib uint_pow exp_mod_exp drop_bit_eq_div)
+  apply (rule div_pos_pos_trivial)
+  apply simp
+  apply (rule less_le_trans)
+  apply (rule uint_bounded)
+  apply simp
+  apply (rule div_pos_pos_trivial)
+  apply simp
+  apply (rule less_le_trans)
+  apply (rule uint_bounded)
+  apply (rule power_increasing)
+  apply simp_all
+  done
+
+lemma shiftl_aux: "uint (push_bit n (v::'a word)) = (uint v * 2 ^ n) mod 2 ^ LENGTH('a::len)"
+  by (auto simp add: uint_word_ariths uint_pow mod_mult_right_eq push_bit_eq_mult)
+    (simp add:
+       mod_mult_eq [of "uint v", symmetric]
+       power_mod [of 2 2 n, symmetric]
+       power_mult_distrib [symmetric])
+
 type_synonym word8 = "8 word"
+
+abbreviation (input) max_word :: "'a::len word"
+where "max_word \<equiv> - 1"
 
 why3_open "bv/BV8.xml"
   constants
     zeros=zero_class.zero
     ones=max_word
-    bw_and=bitAND
-    bw_or=bitOR
-    bw_xor=bitXOR
-    bw_not=bitNOT
+    bw_and="and"
+    bw_or=or
+    bw_xor=xor
+    bw_not=not
     add=plus
     sub=minus
     neg=uminus
@@ -331,7 +339,7 @@ why3_open "bv/BV8.xml"
 
 why3_vc nth_out_of_bound
   using assms
-  by (auto simp add: bv_nth_def test_bit_bin)
+  by (auto simp add: bv_nth_def dest: bit_imp_le_length)
 
 why3_vc Nth_zeros by (simp add: bv_nth_def)
 
@@ -341,79 +349,80 @@ why3_vc Nth_ones
 
 why3_vc Nth_bw_and
   using assms
-  by (simp add: bv_nth_def word_ops_nth_size word_size)
+  by (simp add: bv_nth_def bit_and_iff)
 
 why3_vc Nth_bw_or
   using assms
-  by (simp add: bv_nth_def word_ops_nth_size word_size)
+  by (simp add: bv_nth_def bit_or_iff)
 
 why3_vc Nth_bw_xor
   using assms
-  by (simp add: bv_nth_def word_ops_nth_size word_size)
+  by (simp add: bv_nth_def bit_xor_iff)
 
 why3_vc Nth_bw_not
   using assms
-  by (simp add: bv_nth_def word_ops_nth_size word_size)
+  by (simp add: bv_nth_def bit_not_iff nat_less_iff)
 
 why3_vc Lsr_nth_low
   using assms
-  by (simp add: bv_nth_def nth_shiftr nat_add_distrib)
+  by (simp add: bv_nth_def bit_drop_bit_eq nat_add_distrib add_ac)
 
 why3_vc Lsr_nth_high
   using assms
-  by (simp add: bv_nth_def nth_shiftr)
-    (simp add: test_bit_bin nat_add_distrib [symmetric] nat_less_iff)
+  by (simp add: bv_nth_def bit_drop_bit_eq)
+    (simp add: bit_word.rep_eq nat_add_distrib [symmetric] nat_less_iff)
 
 why3_vc lsr_zeros by simp
 
 why3_vc Asr_nth_low
   using assms
-  by (simp add: bv_nth_def nth_sshiftr word_size)
-    (simp add: nat_add_distrib [symmetric] le_nat_iff)
+  by (simp add: bv_nth_def bit_signed_drop_bit_iff)
+    (auto simp add: nat_add_distrib [symmetric] add_ac)
 
 why3_vc Asr_nth_high
   using assms
-  by (simp add: bv_nth_def nth_sshiftr word_size)
-    (simp add: nat_add_distrib [symmetric] le_nat_iff nat_less_iff)
+  by (simp add: bv_nth_def bit_signed_drop_bit_iff)
+    (auto simp add: nat_add_distrib [symmetric])
 
-why3_vc asr_zeros by (simp add: sshiftr_def)
+why3_vc asr_zeros by (simp add: bit_signed_drop_bit_iff)
 
 why3_vc Lsl_nth_high
   using assms
-  by (simp add: bv_nth_def nth_shiftl nat_diff_distrib nat_less_iff nat_le_eq_zle)
+  by (simp add: bv_nth_def bit_push_bit_iff nat_diff_distrib nat_less_iff nat_le_eq_zle)
 
 why3_vc Lsl_nth_low
   using assms
-  by (simp add: bv_nth_def nth_shiftl nat_le_eq_zle)
+  by (simp add: bv_nth_def bit_push_bit_iff nat_le_eq_zle)
 
 why3_vc lsl_zeros by simp
 
-why3_vc to_uint_extensionality using assms by simp
+why3_vc to_uint_extensionality using assms by (simp add: word_uint_eq_iff)
 
 why3_vc to_intqtdef by (simp add: to_int_eq)
 
-why3_vc to_int_extensionality using assms by simp
+why3_vc to_int_extensionality using assms by (simp add: signed_word_eqI)
 
 why3_vc positive_is_ge_zeros
   by (simp add: is_signed_positive_def sge_def)
 
 why3_vc to_uint_bounds
-  using uint_lt [of v]
+  using uint_ge_0 [of v] uint_bounded [of v]
   by simp_all
 
 why3_vc to_uint_of_int
   using assms
-  by (simp add: uint_in_range_def word_of_int uint_word_of_int mod_pos_pos_trivial)
+  by (simp add: uint_in_range_def uint_word_of_int)
 
 why3_vc nth_bv_def
-  by (simp add: word_eq_iff word_ops_nth_size word_size nth_shiftr)
+  by (simp add: bit_eq_iff bit_and_iff)
+    (simp add: bit_1_iff bit_drop_bit_eq del: bit_0)
 
 why3_vc Nth_bv_is_nth
-  by (simp add: bv_nth_def unat_def)
+  by (simp add: bv_nth_def)
 
 why3_vc Nth_bv_is_nth2
   using assms
-  by (simp add: bv_nth_def unat_def to_uint_of_int uint_in_range_def)
+  by (simp add: bv_nth_def unat_eq_nat_uint to_uint_of_int uint_in_range_def)
 
 why3_vc to_uint_size_bv by (simp add: size_bv_def)
 
@@ -421,35 +430,35 @@ why3_vc to_uint_zeros by simp
 
 why3_vc to_uint_one by simp
 
-why3_vc to_uint_ones by (simp add: max_word_eq)
+why3_vc to_uint_ones by (simp add: uint_word_ariths)
 
 why3_vc to_uint_add
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod emod_def)
 
 why3_vc to_uint_add_bounded
   using assms
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p mod_pos_pos_trivial)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod)
 
 why3_vc to_uint_sub
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod emod_def)
 
 why3_vc to_uint_sub_bounded
   using assms
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p mod_pos_pos_trivial)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod)
 
 why3_vc to_uint_neg
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod emod_def)
 
 why3_vc to_uint_mul
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod emod_def)
 
 why3_vc to_uint_mul_bounded
   using assms
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p mod_pos_pos_trivial)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod)
 
 why3_vc to_uint_udiv
   by (cases "uint v2 = 0")
-    (simp_all add: uint_div ediv_def order.strict_iff_order)
+    (auto simp add: uint_div ediv_def)
 
 why3_vc to_uint_urem
   by (simp add: uint_mod emod_def)
@@ -463,32 +472,31 @@ why3_vc Nth_rotate_right
   using assms rotr_nth [of "nat n" v "nat i"]
   by (simp add: emod_def bv_nth_def nat_mod_distrib nat_add_distrib)
 
-why3_vc rotate_left_bv_is_rotate_left by (simp add: unat_def)
+why3_vc rotate_left_bv_is_rotate_left by simp
 
-why3_vc rotate_right_bv_is_rotate_right by (simp add: unat_def)
+why3_vc rotate_right_bv_is_rotate_right by simp
 
-why3_vc lsr_bv_is_lsr by (simp add: unat_def)
+why3_vc lsr_bv_is_lsr by simp
 
 why3_vc to_uint_lsr
-  by (simp add: ediv_def shiftr_div_2n unat_def)
+  by (simp add: ediv_def shiftr_div_2n)
 
-why3_vc asr_bv_is_asr by (simp add: unat_def)
+why3_vc asr_bv_is_asr by simp
 
-why3_vc lsl_bv_is_lsl by (simp add: unat_def)
+why3_vc lsl_bv_is_lsl by simp
 
 why3_vc to_uint_lsl
-  by (simp add: emod_def shiftl_t2n unat_def
-    uint_word_ariths mult_ac uint_pow pull_mods [symmetric])
+  by (simp add: emod_def shiftl_aux)
 
 why3_vc Extensionality
   using assms
-  by (simp add: eq_sub_def bv_nth_def word_eq_iff all_nat)
+  by (simp add: eq_sub_def bv_nth_def bit_eq_iff all_nat)
 
 why3_vc eq_sub_equiv
   by (simp add: eq_sub_equiv_aux eq_sub_def eq_sub_bv_defn bv_nth_def)
 
 why3_vc eq_sub_bv_def
-  by (simp add: eq_sub_bv_defn mask_def)
+  by (simp add: eq_sub_bv_defn mask_eq_exp_minus_1)
 
 why3_end
 
@@ -499,10 +507,10 @@ why3_open "bv/BV16.xml"
   constants
     zeros=zero_class.zero
     ones=max_word
-    bw_and=bitAND
-    bw_or=bitOR
-    bw_xor=bitXOR
-    bw_not=bitNOT
+    bw_and="and"
+    bw_or=or
+    bw_xor=xor
+    bw_not=not
     add=plus
     sub=minus
     neg=uminus
@@ -532,7 +540,7 @@ why3_open "bv/BV16.xml"
 
 why3_vc nth_out_of_bound
   using assms
-  by (auto simp add: bv_nth_def test_bit_bin)
+  by (auto simp add: bv_nth_def dest: bit_imp_le_length)
 
 why3_vc Nth_zeros by (simp add: bv_nth_def)
 
@@ -542,79 +550,80 @@ why3_vc Nth_ones
 
 why3_vc Nth_bw_and
   using assms
-  by (simp add: bv_nth_def word_ops_nth_size word_size)
+  by (simp add: bv_nth_def bit_and_iff)
 
 why3_vc Nth_bw_or
   using assms
-  by (simp add: bv_nth_def word_ops_nth_size word_size)
+  by (simp add: bv_nth_def bit_or_iff)
 
 why3_vc Nth_bw_xor
   using assms
-  by (simp add: bv_nth_def word_ops_nth_size word_size)
+  by (simp add: bv_nth_def bit_xor_iff)
 
 why3_vc Nth_bw_not
   using assms
-  by (simp add: bv_nth_def word_ops_nth_size word_size)
+  by (simp add: bv_nth_def bit_not_iff nat_less_iff)
 
 why3_vc Lsr_nth_low
   using assms
-  by (simp add: bv_nth_def nth_shiftr nat_add_distrib)
+  by (simp add: bv_nth_def bit_drop_bit_eq nat_add_distrib add_ac)
 
 why3_vc Lsr_nth_high
   using assms
-  by (simp add: bv_nth_def nth_shiftr)
-    (simp add: test_bit_bin nat_add_distrib [symmetric] nat_less_iff)
+  by (simp add: bv_nth_def bit_drop_bit_eq)
+    (simp add: bit_word.rep_eq nat_add_distrib [symmetric] nat_less_iff)
 
 why3_vc lsr_zeros by simp
 
 why3_vc Asr_nth_low
   using assms
-  by (simp add: bv_nth_def nth_sshiftr word_size)
-    (simp add: nat_add_distrib [symmetric] le_nat_iff)
+  by (simp add: bv_nth_def bit_signed_drop_bit_iff)
+    (auto simp add: nat_add_distrib [symmetric] add_ac)
 
 why3_vc Asr_nth_high
   using assms
-  by (simp add: bv_nth_def nth_sshiftr word_size)
-    (simp add: nat_add_distrib [symmetric] le_nat_iff nat_less_iff)
+  by (simp add: bv_nth_def bit_signed_drop_bit_iff)
+    (auto simp add: nat_add_distrib [symmetric])
 
-why3_vc asr_zeros by (simp add: sshiftr_def)
+why3_vc asr_zeros by (simp add: bit_signed_drop_bit_iff)
 
 why3_vc Lsl_nth_high
   using assms
-  by (simp add: bv_nth_def nth_shiftl nat_diff_distrib nat_less_iff nat_le_eq_zle)
+  by (simp add: bv_nth_def bit_push_bit_iff nat_diff_distrib nat_less_iff nat_le_eq_zle)
 
 why3_vc Lsl_nth_low
   using assms
-  by (simp add: bv_nth_def nth_shiftl nat_le_eq_zle)
+  by (simp add: bv_nth_def bit_push_bit_iff nat_le_eq_zle)
 
 why3_vc lsl_zeros by simp
 
-why3_vc to_uint_extensionality using assms by simp
+why3_vc to_uint_extensionality using assms by (simp add: word_uint_eq_iff)
 
 why3_vc to_intqtdef by (simp add: to_int_eq)
 
-why3_vc to_int_extensionality using assms by simp
+why3_vc to_int_extensionality using assms by (simp add: signed_word_eqI)
 
 why3_vc positive_is_ge_zeros
   by (simp add: is_signed_positive_def sge_def)
 
 why3_vc to_uint_bounds
-  using uint_lt [of v]
+  using uint_ge_0 [of v] uint_bounded [of v]
   by simp_all
 
 why3_vc to_uint_of_int
   using assms
-  by (simp add: uint_in_range_def word_of_int uint_word_of_int mod_pos_pos_trivial)
+  by (simp add: uint_in_range_def uint_word_of_int)
 
 why3_vc nth_bv_def
-  by (simp add: word_eq_iff word_ops_nth_size word_size nth_shiftr)
+  by (simp add: bit_eq_iff bit_and_iff)
+    (simp add: bit_1_iff bit_drop_bit_eq del: bit_0)
 
 why3_vc Nth_bv_is_nth
-  by (simp add: bv_nth_def unat_def)
+  by (simp add: bv_nth_def)
 
 why3_vc Nth_bv_is_nth2
   using assms
-  by (simp add: bv_nth_def unat_def to_uint_of_int uint_in_range_def)
+  by (simp add: bv_nth_def unat_eq_nat_uint to_uint_of_int uint_in_range_def)
 
 why3_vc to_uint_size_bv by (simp add: size_bv_def)
 
@@ -622,35 +631,35 @@ why3_vc to_uint_zeros by simp
 
 why3_vc to_uint_one by simp
 
-why3_vc to_uint_ones by (simp add: max_word_eq)
+why3_vc to_uint_ones by (simp add: uint_word_ariths)
 
 why3_vc to_uint_add
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod emod_def)
 
 why3_vc to_uint_add_bounded
   using assms
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p mod_pos_pos_trivial)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod)
 
 why3_vc to_uint_sub
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod emod_def)
 
 why3_vc to_uint_sub_bounded
   using assms
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p mod_pos_pos_trivial)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod)
 
 why3_vc to_uint_neg
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod emod_def)
 
 why3_vc to_uint_mul
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod emod_def)
 
 why3_vc to_uint_mul_bounded
   using assms
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p mod_pos_pos_trivial)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod)
 
 why3_vc to_uint_udiv
   by (cases "uint v2 = 0")
-    (simp_all add: uint_div ediv_def order.strict_iff_order)
+    (auto simp add: uint_div ediv_def)
 
 why3_vc to_uint_urem
   by (simp add: uint_mod emod_def)
@@ -664,32 +673,31 @@ why3_vc Nth_rotate_right
   using assms rotr_nth [of "nat n" v "nat i"]
   by (simp add: emod_def bv_nth_def nat_mod_distrib nat_add_distrib)
 
-why3_vc rotate_left_bv_is_rotate_left by (simp add: unat_def)
+why3_vc rotate_left_bv_is_rotate_left by simp
 
-why3_vc rotate_right_bv_is_rotate_right by (simp add: unat_def)
+why3_vc rotate_right_bv_is_rotate_right by simp
 
-why3_vc lsr_bv_is_lsr by (simp add: unat_def)
+why3_vc lsr_bv_is_lsr by simp
 
 why3_vc to_uint_lsr
-  by (simp add: ediv_def shiftr_div_2n unat_def)
+  by (simp add: ediv_def shiftr_div_2n)
 
-why3_vc asr_bv_is_asr by (simp add: unat_def)
+why3_vc asr_bv_is_asr by simp
 
-why3_vc lsl_bv_is_lsl by (simp add: unat_def)
+why3_vc lsl_bv_is_lsl by simp
 
 why3_vc to_uint_lsl
-  by (simp add: emod_def shiftl_t2n unat_def
-    uint_word_ariths mult_ac uint_pow pull_mods [symmetric])
+  by (simp add: emod_def shiftl_aux)
 
 why3_vc Extensionality
   using assms
-  by (simp add: eq_sub_def bv_nth_def word_eq_iff all_nat)
+  by (simp add: eq_sub_def bv_nth_def bit_eq_iff all_nat)
 
 why3_vc eq_sub_equiv
   by (simp add: eq_sub_equiv_aux eq_sub_def eq_sub_bv_defn bv_nth_def)
 
 why3_vc eq_sub_bv_def
-  by (simp add: eq_sub_bv_defn mask_def)
+  by (simp add: eq_sub_bv_defn mask_eq_exp_minus_1)
 
 why3_end
 
@@ -700,10 +708,10 @@ why3_open "bv/BV32.xml"
   constants
     zeros=zero_class.zero
     ones=max_word
-    bw_and=bitAND
-    bw_or=bitOR
-    bw_xor=bitXOR
-    bw_not=bitNOT
+    bw_and="and"
+    bw_or=or
+    bw_xor=xor
+    bw_not=not
     add=plus
     sub=minus
     neg=uminus
@@ -733,7 +741,7 @@ why3_open "bv/BV32.xml"
 
 why3_vc nth_out_of_bound
   using assms
-  by (auto simp add: bv_nth_def test_bit_bin)
+  by (auto simp add: bv_nth_def dest: bit_imp_le_length)
 
 why3_vc Nth_zeros by (simp add: bv_nth_def)
 
@@ -743,79 +751,80 @@ why3_vc Nth_ones
 
 why3_vc Nth_bw_and
   using assms
-  by (simp add: bv_nth_def word_ops_nth_size word_size)
+  by (simp add: bv_nth_def bit_and_iff)
 
 why3_vc Nth_bw_or
   using assms
-  by (simp add: bv_nth_def word_ops_nth_size word_size)
+  by (simp add: bv_nth_def bit_or_iff)
 
 why3_vc Nth_bw_xor
   using assms
-  by (simp add: bv_nth_def word_ops_nth_size word_size)
+  by (simp add: bv_nth_def bit_xor_iff)
 
 why3_vc Nth_bw_not
   using assms
-  by (simp add: bv_nth_def word_ops_nth_size word_size)
+  by (simp add: bv_nth_def bit_not_iff nat_less_iff)
 
 why3_vc Lsr_nth_low
   using assms
-  by (simp add: bv_nth_def nth_shiftr nat_add_distrib)
+  by (simp add: bv_nth_def bit_drop_bit_eq nat_add_distrib add_ac)
 
 why3_vc Lsr_nth_high
   using assms
-  by (simp add: bv_nth_def nth_shiftr)
-    (simp add: test_bit_bin nat_add_distrib [symmetric] nat_less_iff)
+  by (simp add: bv_nth_def bit_drop_bit_eq)
+    (simp add: bit_word.rep_eq nat_add_distrib [symmetric] nat_less_iff)
 
 why3_vc lsr_zeros by simp
 
 why3_vc Asr_nth_low
   using assms
-  by (simp add: bv_nth_def nth_sshiftr word_size)
-    (simp add: nat_add_distrib [symmetric] le_nat_iff)
+  by (simp add: bv_nth_def bit_signed_drop_bit_iff)
+    (auto simp add: nat_add_distrib [symmetric] add_ac)
 
 why3_vc Asr_nth_high
   using assms
-  by (simp add: bv_nth_def nth_sshiftr word_size)
-    (simp add: nat_add_distrib [symmetric] le_nat_iff nat_less_iff)
+  by (simp add: bv_nth_def bit_signed_drop_bit_iff)
+    (auto simp add: nat_add_distrib [symmetric])
 
-why3_vc asr_zeros by (simp add: sshiftr_def)
+why3_vc asr_zeros by (simp add: bit_signed_drop_bit_iff)
 
 why3_vc Lsl_nth_high
   using assms
-  by (simp add: bv_nth_def nth_shiftl nat_diff_distrib nat_less_iff nat_le_eq_zle)
+  by (simp add: bv_nth_def bit_push_bit_iff nat_diff_distrib nat_less_iff nat_le_eq_zle)
 
 why3_vc Lsl_nth_low
   using assms
-  by (simp add: bv_nth_def nth_shiftl nat_le_eq_zle)
+  by (simp add: bv_nth_def bit_push_bit_iff nat_le_eq_zle)
 
 why3_vc lsl_zeros by simp
 
-why3_vc to_uint_extensionality using assms by simp
+why3_vc to_uint_extensionality using assms by (simp add: word_uint_eq_iff)
 
 why3_vc to_intqtdef by (simp add: to_int_eq)
 
-why3_vc to_int_extensionality using assms by simp
+why3_vc to_int_extensionality using assms by (simp add: signed_word_eqI)
 
 why3_vc positive_is_ge_zeros
   by (simp add: is_signed_positive_def sge_def)
 
 why3_vc to_uint_bounds
-  using uint_lt [of v]
+  using uint_ge_0 [of v] uint_bounded [of v]
   by simp_all
 
 why3_vc to_uint_of_int
   using assms
-  by (simp add: uint_in_range_def word_of_int uint_word_of_int mod_pos_pos_trivial)
+  by (simp add: uint_in_range_def uint_word_of_int)
 
 why3_vc nth_bv_def
-  by (simp add: word_eq_iff word_ops_nth_size word_size nth_shiftr)
+  by (simp add: bit_eq_iff bit_and_iff)
+    (simp add: bit_1_iff bit_drop_bit_eq del: bit_0)
 
 why3_vc Nth_bv_is_nth
-  by (simp add: bv_nth_def unat_def)
+  by (simp add: bv_nth_def)
 
 why3_vc Nth_bv_is_nth2
   using assms
-  by (simp add: bv_nth_def unat_def to_uint_of_int uint_in_range_def)
+  by (simp add: bv_nth_def unat_eq_nat_uint to_uint_of_int uint_in_range_def)
 
 why3_vc to_uint_size_bv by (simp add: size_bv_def)
 
@@ -823,35 +832,35 @@ why3_vc to_uint_zeros by simp
 
 why3_vc to_uint_one by simp
 
-why3_vc to_uint_ones by (simp add: max_word_eq)
+why3_vc to_uint_ones by (simp add: uint_word_ariths)
 
 why3_vc to_uint_add
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod emod_def)
 
 why3_vc to_uint_add_bounded
   using assms
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p mod_pos_pos_trivial)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod)
 
 why3_vc to_uint_sub
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod emod_def)
 
 why3_vc to_uint_sub_bounded
   using assms
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p mod_pos_pos_trivial)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod)
 
 why3_vc to_uint_neg
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod emod_def)
 
 why3_vc to_uint_mul
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod emod_def)
 
 why3_vc to_uint_mul_bounded
   using assms
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p mod_pos_pos_trivial)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod)
 
 why3_vc to_uint_udiv
   by (cases "uint v2 = 0")
-    (simp_all add: uint_div ediv_def order.strict_iff_order)
+    (auto simp add: uint_div ediv_def)
 
 why3_vc to_uint_urem
   by (simp add: uint_mod emod_def)
@@ -865,32 +874,31 @@ why3_vc Nth_rotate_right
   using assms rotr_nth [of "nat n" v "nat i"]
   by (simp add: emod_def bv_nth_def nat_mod_distrib nat_add_distrib)
 
-why3_vc rotate_left_bv_is_rotate_left by (simp add: unat_def)
+why3_vc rotate_left_bv_is_rotate_left by simp
 
-why3_vc rotate_right_bv_is_rotate_right by (simp add: unat_def)
+why3_vc rotate_right_bv_is_rotate_right by simp
 
-why3_vc lsr_bv_is_lsr by (simp add: unat_def)
+why3_vc lsr_bv_is_lsr by simp
 
 why3_vc to_uint_lsr
-  by (simp add: ediv_def shiftr_div_2n unat_def)
+  by (simp add: ediv_def shiftr_div_2n)
 
-why3_vc asr_bv_is_asr by (simp add: unat_def)
+why3_vc asr_bv_is_asr by simp
 
-why3_vc lsl_bv_is_lsl by (simp add: unat_def)
+why3_vc lsl_bv_is_lsl by simp
 
 why3_vc to_uint_lsl
-  by (simp add: emod_def shiftl_t2n unat_def
-    uint_word_ariths mult_ac uint_pow pull_mods [symmetric])
+  by (simp add: emod_def shiftl_aux)
 
 why3_vc Extensionality
   using assms
-  by (simp add: eq_sub_def bv_nth_def word_eq_iff all_nat)
+  by (simp add: eq_sub_def bv_nth_def bit_eq_iff all_nat)
 
 why3_vc eq_sub_equiv
   by (simp add: eq_sub_equiv_aux eq_sub_def eq_sub_bv_defn bv_nth_def)
 
 why3_vc eq_sub_bv_def
-  by (simp add: eq_sub_bv_defn mask_def)
+  by (simp add: eq_sub_bv_defn mask_eq_exp_minus_1)
 
 why3_end
 
@@ -901,10 +909,10 @@ why3_open "bv/BV64.xml"
   constants
     zeros=zero_class.zero
     ones=max_word
-    bw_and=bitAND
-    bw_or=bitOR
-    bw_xor=bitXOR
-    bw_not=bitNOT
+    bw_and="and"
+    bw_or=or
+    bw_xor=xor
+    bw_not=not
     add=plus
     sub=minus
     neg=uminus
@@ -934,7 +942,7 @@ why3_open "bv/BV64.xml"
 
 why3_vc nth_out_of_bound
   using assms
-  by (auto simp add: bv_nth_def test_bit_bin)
+  by (auto simp add: bv_nth_def dest: bit_imp_le_length)
 
 why3_vc Nth_zeros by (simp add: bv_nth_def)
 
@@ -944,79 +952,80 @@ why3_vc Nth_ones
 
 why3_vc Nth_bw_and
   using assms
-  by (simp add: bv_nth_def word_ops_nth_size word_size)
+  by (simp add: bv_nth_def bit_and_iff)
 
 why3_vc Nth_bw_or
   using assms
-  by (simp add: bv_nth_def word_ops_nth_size word_size)
+  by (simp add: bv_nth_def bit_or_iff)
 
 why3_vc Nth_bw_xor
   using assms
-  by (simp add: bv_nth_def word_ops_nth_size word_size)
+  by (simp add: bv_nth_def bit_xor_iff)
 
 why3_vc Nth_bw_not
   using assms
-  by (simp add: bv_nth_def word_ops_nth_size word_size)
+  by (simp add: bv_nth_def bit_not_iff nat_less_iff)
 
 why3_vc Lsr_nth_low
   using assms
-  by (simp add: bv_nth_def nth_shiftr nat_add_distrib)
+  by (simp add: bv_nth_def bit_drop_bit_eq nat_add_distrib add_ac)
 
 why3_vc Lsr_nth_high
   using assms
-  by (simp add: bv_nth_def nth_shiftr)
-    (simp add: test_bit_bin nat_add_distrib [symmetric] nat_less_iff)
+  by (simp add: bv_nth_def bit_drop_bit_eq)
+    (simp add: bit_word.rep_eq nat_add_distrib [symmetric] nat_less_iff)
 
 why3_vc lsr_zeros by simp
 
 why3_vc Asr_nth_low
   using assms
-  by (simp add: bv_nth_def nth_sshiftr word_size)
-    (simp add: nat_add_distrib [symmetric] le_nat_iff)
+  by (simp add: bv_nth_def bit_signed_drop_bit_iff)
+    (auto simp add: nat_add_distrib [symmetric] add_ac)
 
 why3_vc Asr_nth_high
   using assms
-  by (simp add: bv_nth_def nth_sshiftr word_size)
-    (simp add: nat_add_distrib [symmetric] le_nat_iff nat_less_iff)
+  by (simp add: bv_nth_def bit_signed_drop_bit_iff)
+    (auto simp add: nat_add_distrib [symmetric])
 
-why3_vc asr_zeros by (simp add: sshiftr_def)
+why3_vc asr_zeros by (simp add: bit_signed_drop_bit_iff)
 
 why3_vc Lsl_nth_high
   using assms
-  by (simp add: bv_nth_def nth_shiftl nat_diff_distrib nat_less_iff nat_le_eq_zle)
+  by (simp add: bv_nth_def bit_push_bit_iff nat_diff_distrib nat_less_iff nat_le_eq_zle)
 
 why3_vc Lsl_nth_low
   using assms
-  by (simp add: bv_nth_def nth_shiftl nat_le_eq_zle)
+  by (simp add: bv_nth_def bit_push_bit_iff nat_le_eq_zle)
 
 why3_vc lsl_zeros by simp
 
-why3_vc to_uint_extensionality using assms by simp
+why3_vc to_uint_extensionality using assms by (simp add: word_uint_eq_iff)
 
 why3_vc to_intqtdef by (simp add: to_int_eq)
 
-why3_vc to_int_extensionality using assms by simp
+why3_vc to_int_extensionality using assms by (simp add: signed_word_eqI)
 
 why3_vc positive_is_ge_zeros
   by (simp add: is_signed_positive_def sge_def)
 
 why3_vc to_uint_bounds
-  using uint_lt [of v]
+  using uint_ge_0 [of v] uint_bounded [of v]
   by simp_all
 
 why3_vc to_uint_of_int
   using assms
-  by (simp add: uint_in_range_def word_of_int uint_word_of_int mod_pos_pos_trivial)
+  by (simp add: uint_in_range_def uint_word_of_int)
 
 why3_vc nth_bv_def
-  by (simp add: word_eq_iff word_ops_nth_size word_size nth_shiftr)
+  by (simp add: bit_eq_iff bit_and_iff)
+    (simp add: bit_1_iff bit_drop_bit_eq del: bit_0)
 
 why3_vc Nth_bv_is_nth
-  by (simp add: bv_nth_def unat_def)
+  by (simp add: bv_nth_def)
 
 why3_vc Nth_bv_is_nth2
   using assms
-  by (simp add: bv_nth_def unat_def to_uint_of_int uint_in_range_def)
+  by (simp add: bv_nth_def unat_eq_nat_uint to_uint_of_int uint_in_range_def)
 
 why3_vc to_uint_size_bv by (simp add: size_bv_def)
 
@@ -1024,35 +1033,35 @@ why3_vc to_uint_zeros by simp
 
 why3_vc to_uint_one by simp
 
-why3_vc to_uint_ones by (simp add: max_word_eq)
+why3_vc to_uint_ones by (simp add: uint_word_ariths)
 
 why3_vc to_uint_add
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod emod_def)
 
 why3_vc to_uint_add_bounded
   using assms
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p mod_pos_pos_trivial)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod)
 
 why3_vc to_uint_sub
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod emod_def)
 
 why3_vc to_uint_sub_bounded
   using assms
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p mod_pos_pos_trivial)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod)
 
 why3_vc to_uint_neg
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod emod_def)
 
 why3_vc to_uint_mul
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod emod_def)
 
 why3_vc to_uint_mul_bounded
   using assms
-  by (simp add: uint_word_arith_bintrs bintrunc_mod2p mod_pos_pos_trivial)
+  by (simp add: uint_word_arith_bintrs take_bit_eq_mod)
 
 why3_vc to_uint_udiv
   by (cases "uint v2 = 0")
-    (simp_all add: uint_div ediv_def order.strict_iff_order)
+    (auto simp add: uint_div ediv_def)
 
 why3_vc to_uint_urem
   by (simp add: uint_mod emod_def)
@@ -1066,32 +1075,31 @@ why3_vc Nth_rotate_right
   using assms rotr_nth [of "nat n" v "nat i"]
   by (simp add: emod_def bv_nth_def nat_mod_distrib nat_add_distrib)
 
-why3_vc rotate_left_bv_is_rotate_left by (simp add: unat_def)
+why3_vc rotate_left_bv_is_rotate_left by simp
 
-why3_vc rotate_right_bv_is_rotate_right by (simp add: unat_def)
+why3_vc rotate_right_bv_is_rotate_right by simp
 
-why3_vc lsr_bv_is_lsr by (simp add: unat_def)
+why3_vc lsr_bv_is_lsr by simp
 
 why3_vc to_uint_lsr
-  by (simp add: ediv_def shiftr_div_2n unat_def)
+  by (simp add: ediv_def shiftr_div_2n)
 
-why3_vc asr_bv_is_asr by (simp add: unat_def)
+why3_vc asr_bv_is_asr by simp
 
-why3_vc lsl_bv_is_lsl by (simp add: unat_def)
+why3_vc lsl_bv_is_lsl by simp
 
 why3_vc to_uint_lsl
-  by (simp add: emod_def shiftl_t2n unat_def
-    uint_word_ariths mult_ac uint_pow pull_mods [symmetric])
+  by (simp add: emod_def shiftl_aux)
 
 why3_vc Extensionality
   using assms
-  by (simp add: eq_sub_def bv_nth_def word_eq_iff all_nat)
+  by (simp add: eq_sub_def bv_nth_def bit_eq_iff all_nat)
 
 why3_vc eq_sub_equiv
   by (simp add: eq_sub_equiv_aux eq_sub_def eq_sub_bv_defn bv_nth_def)
 
 why3_vc eq_sub_bv_def
-  by (simp add: eq_sub_bv_defn mask_def)
+  by (simp add: eq_sub_bv_defn mask_eq_exp_minus_1)
 
 why3_end
 
@@ -1103,7 +1111,7 @@ why3_open "bv/BVConverter_32_64.xml"
 
 why3_vc toSmall_to_uint
   using assms
-  by (simp add: BV64.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial)
+  by (simp add: BV64.ule_def ucast_eq uint_word_of_int del: of_int_uint)
 
 why3_vc toBig_to_uint
   by (simp add: uint_up_ucast is_up)
@@ -1118,7 +1126,7 @@ why3_open "bv/BVConverter_16_64.xml"
 
 why3_vc toSmall_to_uint
   using assms
-  by (simp add: BV64.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial)
+  by (simp add: BV64.ule_def ucast_eq uint_word_of_int del: of_int_uint)
 
 why3_vc toBig_to_uint
   by (simp add: uint_up_ucast is_up)
@@ -1133,7 +1141,7 @@ why3_open "bv/BVConverter_8_64.xml"
 
 why3_vc toSmall_to_uint
   using assms
-  by (simp add: BV64.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial)
+  by (simp add: BV64.ule_def ucast_eq uint_word_of_int del: of_int_uint)
 
 why3_vc toBig_to_uint
   by (simp add: uint_up_ucast is_up)
@@ -1148,7 +1156,7 @@ why3_open "bv/BVConverter_16_32.xml"
 
 why3_vc toSmall_to_uint
   using assms
-  by (simp add: BV32.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial)
+  by (simp add: BV32.ule_def ucast_eq uint_word_of_int del: of_int_uint)
 
 why3_vc toBig_to_uint
   by (simp add: uint_up_ucast is_up)
@@ -1163,7 +1171,7 @@ why3_open "bv/BVConverter_8_32.xml"
 
 why3_vc toSmall_to_uint
   using assms
-  by (simp add: BV32.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial)
+  by (simp add: BV32.ule_def ucast_eq uint_word_of_int del: of_int_uint)
 
 why3_vc toBig_to_uint
   by (simp add: uint_up_ucast is_up)
@@ -1178,7 +1186,7 @@ why3_open "bv/BVConverter_8_16.xml"
 
 why3_vc toSmall_to_uint
   using assms
-  by (simp add: BV16.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial)
+  by (simp add: BV16.ule_def ucast_eq uint_word_of_int del: of_int_uint)
 
 why3_vc toBig_to_uint
   by (simp add: uint_up_ucast is_up)

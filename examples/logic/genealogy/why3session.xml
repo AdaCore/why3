@@ -32,14 +32,14 @@
 <prover id="27" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="28" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="29" name="Z3" version="4.8.3" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="30" name="Isabelle" version="2018" timelimit="100" steplimit="0" memlimit="4000"/>
+<prover id="30" name="Isabelle" version="2021-1" timelimit="100" steplimit="0" memlimit="4000"/>
 <prover id="31" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="32" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="33" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="34" name="Z3" version="4.8.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="35" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="36" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="37" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="4000"/>
+<prover id="37" name="Z3" version="4.8.11" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="38" name="Z3" version="4.8.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="39" name="Alt-Ergo" version="2.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="40" name="Alt-Ergo" version="2.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -49,6 +49,11 @@
 <prover id="44" name="Z3" version="4.8.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="45" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="46" name="Alt-Ergo" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="47" name="Coq" version="8.11.2" timelimit="5" steplimit="0" memlimit="4000"/>
+<prover id="48" name="Z3" version="4.8.14" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="49" name="Z3" version="4.8.15" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="50" name="Z3" version="4.8.13" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="51" name="Z3" version="4.8.12" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="genealogy.why"/>
 <theory name="Genealogy" proved="true">
@@ -79,14 +84,14 @@
  <proof prover="27"><result status="valid" time="0.01"/></proof>
  <proof prover="28"><result status="valid" time="0.01"/></proof>
  <proof prover="29"><result status="valid" time="0.01" steps="1654"/></proof>
- <proof prover="30"><path name="genealogy_Genealogy_Child_is_son_or_daughter_1.xml"/><result status="valid" time="6.40"/></proof>
+ <proof prover="30"><path name="genealogy_Genealogy_Child_is_son_or_daughter_1.xml"/><result status="valid" time="26.20"/></proof>
  <proof prover="31"><result status="valid" time="0.00" steps="313"/></proof>
  <proof prover="32"><result status="valid" time="0.00" steps="5"/></proof>
  <proof prover="33"><result status="valid" time="0.02" steps="1631"/></proof>
  <proof prover="34"><result status="valid" time="0.02" steps="2071"/></proof>
  <proof prover="35"><result status="valid" time="0.02" steps="323"/></proof>
  <proof prover="36"><result status="valid" time="0.00" steps="9"/></proof>
- <proof prover="37"><path name="genealogy_Genealogy_Child_is_son_or_daughter_1.v"/><result status="valid" time="0.24"/></proof>
+ <proof prover="37"><result status="valid" time="0.01" steps="2091"/></proof>
  <proof prover="38"><result status="valid" time="0.03" steps="2071"/></proof>
  <proof prover="39"><result status="valid" time="0.00" steps="9"/></proof>
  <proof prover="40"><result status="valid" time="0.01" steps="5"/></proof>
@@ -96,6 +101,11 @@
  <proof prover="44"><result status="valid" time="0.01" steps="2091"/></proof>
  <proof prover="45"><result status="valid" time="0.02" steps="321"/></proof>
  <proof prover="46"><result status="valid" time="0.00" steps="5"/></proof>
+ <proof prover="47"><path name="genealogy_Genealogy_Child_is_son_or_daughter_1.v"/><result status="valid" time="0.24"/></proof>
+ <proof prover="48"><result status="valid" time="0.02" steps="1996"/></proof>
+ <proof prover="49"><result status="valid" time="0.01" steps="1996"/></proof>
+ <proof prover="50"><result status="valid" time="0.01" steps="1996"/></proof>
+ <proof prover="51"><result status="valid" time="0.01" steps="2091"/></proof>
  </goal>
  <goal name="Sibling_sym" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
@@ -122,7 +132,7 @@
  <proof prover="26"><result status="valid" time="0.02"/></proof>
  <proof prover="27"><result status="valid" time="0.00"/></proof>
  <proof prover="28"><result status="valid" time="0.00"/></proof>
- <proof prover="30"><path name="genealogy_Genealogy_Sibling_sym_1.xml"/><result status="valid" time="6.03"/></proof>
+ <proof prover="30"><path name="genealogy_Genealogy_Sibling_sym_1.xml"/><result status="valid" time="25.98"/></proof>
  <proof prover="31"><result status="valid" time="0.00" steps="295"/></proof>
  <proof prover="32"><result status="valid" time="0.00" steps="4"/></proof>
  <proof prover="33"><result status="valid" time="0.02" steps="1983"/></proof>
@@ -162,7 +172,7 @@
  <proof prover="26"><result status="valid" time="0.01"/></proof>
  <proof prover="27"><result status="valid" time="0.01"/></proof>
  <proof prover="28"><result status="valid" time="0.01"/></proof>
- <proof prover="30"><path name="genealogy_Genealogy_Sibling_is_brother_or_sister_1.xml"/><result status="valid" time="6.26"/></proof>
+ <proof prover="30"><path name="genealogy_Genealogy_Sibling_is_brother_or_sister_1.xml"/><result status="valid" time="25.75"/></proof>
  <proof prover="31"><result status="valid" time="0.00" steps="375"/></proof>
  <proof prover="32"><result status="valid" time="0.00" steps="5"/></proof>
  <proof prover="33"><result status="valid" time="0.02" steps="2763"/></proof>
@@ -202,7 +212,7 @@
  <proof prover="26"><result status="valid" time="0.02"/></proof>
  <proof prover="27"><result status="valid" time="0.01"/></proof>
  <proof prover="28"><result status="valid" time="0.01"/></proof>
- <proof prover="30"><path name="genealogy_Genealogy_Grandparent_is_grandfather_or_grandmother_1.xml"/><result status="valid" time="6.82"/></proof>
+ <proof prover="30"><path name="genealogy_Genealogy_Grandparent_is_grandfather_or_grandmother_1.xml"/><result status="valid" time="25.38"/></proof>
  <proof prover="31"><result status="valid" time="0.00" steps="314"/></proof>
  <proof prover="32"><result status="valid" time="0.00" steps="20"/></proof>
  <proof prover="33"><result status="valid" time="0.01" steps="4234"/></proof>
@@ -332,6 +342,7 @@
  <proof prover="34"><result status="valid" time="0.04" steps="4935"/></proof>
  <proof prover="35"><result status="valid" time="0.02" steps="484"/></proof>
  <proof prover="36"><result status="valid" time="0.00" steps="18"/></proof>
+ <proof prover="37"><result status="valid" time="0.01" steps="5182"/></proof>
  <proof prover="38"><result status="valid" time="0.02" steps="5145"/></proof>
  <proof prover="39"><result status="valid" time="0.00" steps="18"/></proof>
  <proof prover="40"><result status="valid" time="0.01" steps="18"/></proof>
@@ -341,6 +352,10 @@
  <proof prover="44"><result status="valid" time="0.01" steps="5180"/></proof>
  <proof prover="45"><result status="valid" time="0.02" steps="483"/></proof>
  <proof prover="46" timelimit="1"><result status="valid" time="0.00" steps="18"/></proof>
+ <proof prover="48"><result status="valid" time="0.02" steps="4921"/></proof>
+ <proof prover="49"><result status="valid" time="0.01" steps="4921"/></proof>
+ <proof prover="50"><result status="valid" time="0.02" steps="4921"/></proof>
+ <proof prover="51"><result status="valid" time="0.02" steps="5182"/></proof>
  </goal>
 </theory>
 </file>

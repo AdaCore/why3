@@ -841,7 +841,7 @@ end
 
 open Save_VCs
 
-let run_goal ?save_to ?limit ~callback c prover g =
+let run_goal ?proof_script_filename ?limit ~callback c prover g =
   (* spawn a prover and return immediately. The return value is a tuple of type
      Call_provers.prover_call * Session.goal. The next step of the program
      is now directly in the callback. *)
@@ -868,14 +868,16 @@ let run_goal ?save_to ?limit ~callback c prover g =
             (Gnat_manual.create_prover_file c g check prover) in
         let _paid, _file, _ores = C.prepare_edition c ~file:new_file
           g prover ~notification in
-        C.schedule_proof_attempt ?save_to ~limit:Call_provers.empty_limit
-          c g prover ~callback ~notification
+        C.schedule_proof_attempt
+          ?proof_script_filename:proof_script_filename
+          c g prover
+          ~limit:Call_provers.empty_limit ~callback ~notification
       | Some old_file ->
         let _paid, _file, _ores = C.prepare_edition c ~file:old_file
           g prover ~notification in
-        C.schedule_proof_attempt ?save_to:None
-          ~limit:Call_provers.empty_limit c g prover
-          ~callback ~notification
+        C.schedule_proof_attempt
+          c g prover
+          ~limit:Call_provers.empty_limit ~callback ~notification
     end
   else
     let check = get_objective g in
@@ -884,7 +886,10 @@ let run_goal ?save_to ?limit ~callback c prover g =
       match limit with
       | None -> Gnat_config.limit ~prover ~warning:warn
       | Some x -> x in
-    C.schedule_proof_attempt ?save_to ~limit ~callback ~notification c g prover
+    C.schedule_proof_attempt
+      ?proof_script_filename:proof_script_filename
+      c g prover
+      ~limit ~callback ~notification
 
 let goal_has_splits session (goal: goal_id) =
   let goal_transformations = Session_itp.get_transformations session goal in
@@ -893,13 +898,13 @@ let goal_has_splits session (goal: goal_id) =
 let schedule_goal_with_prover ~callback c g p =
 (* actually schedule the goal, i.e., call the prover. This function returns
    immediately. *)
-  let save_to =
+  let proof_script_filename =
     if Gnat_config.debug || Gnat_config.debug_save_vcs then
       Some (save_vc c g p)
     else
       None
   in
-  run_goal ?save_to ~callback c p g
+  run_goal ?proof_script_filename:proof_script_filename ~callback c p g
 
 let schedule_goal ~callback c g =
    (* actually schedule the goal, ie call the prover. This function returns
@@ -1136,7 +1141,8 @@ and replay_goal c goal =
             | Some pas when pas.Call_provers.pr_answer = Call_provers.Valid ->
                 compute_replay_limit_from_pas pas
             | _ -> assert false in
-          C.schedule_proof_attempt ?save_to:None c goal prover
+          C.schedule_proof_attempt
+            c goal prover
             ~limit ~callback:(fun _ _ -> ())
             ~notification:(fun _ -> ())) prover
 

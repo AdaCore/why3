@@ -121,9 +121,16 @@ and editors, are regenerated at each startup of a Why3. This
 configuration can be inspected with the command :why3:tool:`why3 config
 show`.
 
-If a supported prover is not automatically recognized by :why3:tool:`why3
-config detect`, the command :why3:tool:`why3 config add-prover` can be
-used to add it.
+If a supported prover is not automatically recognized by
+:why3:tool:`why3 config detect`, the command :why3:tool:`why3 config
+add-prover` can be used to add it. Advanced users may also manually
+insert extra `[prover]` sections in their configuration file. Notice
+that in such a case, if a detected prover has exactly the same name,
+version and alternative as a user-defined prover, then the
+user-defined prover is taken and the detected one is
+ignored. Similarly, if a user-defined shortcut clahes with a shortcut
+of a detected prover, then the shortcut is chsen to denote the
+user-defined prover and not the detect one.
 
 The available subcommands are as follows:
 
