@@ -21,7 +21,7 @@ open Model_parser
     checking, as described in the following article:
 
     {%html:<blockquote>%}
-      Benedikt Becker, Cl·udio Belo LourenÁo, Claude MarchÈ (2021):
+      Benedikt Becker, Cl√°udio Belo Louren√ßo, Claude March√© (2021):
       {e Explaining Proof Failures with Giant-Step Runtime Assertion Checking}.
     {%html:</blockquote>%}
 
