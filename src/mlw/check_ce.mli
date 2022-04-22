@@ -21,7 +21,7 @@ open Model_parser
     checking, as described in the following article:
 
     {%html:<blockquote>%}
-      Benedikt Becker, Cláudio Belo Lourenço, Claude Marché (2021):
+      Benedikt Becker, Clï¿½udio Belo Lourenï¿½o, Claude Marchï¿½ (2021):
       {e Explaining Proof Failures with Giant-Step Runtime Assertion Checking}.
     {%html:</blockquote>%}
 
@@ -49,7 +49,9 @@ type rac_result_state =
 val print_rac_result_state : rac_result_state Pp.pp
 (** Print a RAC result state *)
 
-type rac_result = rac_result_state * Log.exec_log
+type rac_result =
+  | Not_checked of string
+  | Checked of rac_result_state * Log.exec_log
 (** The result of a RAC execution is comprised of the final state and the
    execution log. *)
 
@@ -59,7 +61,7 @@ val string_of_rac_result_state : rac_result_state -> string
 val print_rac_result : ?verb_lvl:int -> rac_result Pp.pp
 (** Print the result state of a RAC execution with the execution log *)
 
-val rac_execute : Pinterp.ctx -> Expr.rsymbol -> rac_result
+val rac_execute : Pinterp.ctx -> Expr.rsymbol -> rac_result_state * Log.exec_log
 (** Execute a call to the program function given by the [rsymbol] using normal
     or giant-step RAC, using the given model as an oracle for program parameters
     (and during giant-steps). *)
@@ -123,7 +125,9 @@ val print_model_classification :
 (** Print the classification with the classification log or model. *)
 
 val classify : vc_term_loc:Loc.position option -> vc_term_attrs:Ident.Sattr.t ->
-  normal_result:rac_result -> giant_step_result:rac_result -> classification
+  normal_result:rac_result_state * Log.exec_log -> 
+  giant_step_result:rac_result_state * Log.exec_log -> 
+  classification
 (** Classify a counterexample based on the results of the normal and giant-step
     RAC executions. *)
 
@@ -156,6 +160,22 @@ val select_model_last_non_empty :
     This is a compatiblity function for the behaviour before 2020, and gives
     the same result as [select_model ~check_ce:false
     ~sort_models:prioritize_last_non_empty_model]. *)
+
+val select_model_from_verdict :
+  (int * Call_provers.prover_answer * model * rac_result * rac_result) list ->
+  (model * classification) option
+
+val select_model_from_giant_step_rac_results :
+  (int * Call_provers.prover_answer * model * rac_result * rac_result) list ->
+  (model * rac_result) option
+
+val get_rac_results :
+  ?timelimit:float -> ?steplimit:int -> ?verb_lvl:int ->
+  ?compute_term:compute_term ->
+  ?only_giant_step:bool ->
+  rac -> Env.env -> Pmodule.pmodule ->
+  (Call_provers.prover_answer * model) list ->
+  (int * Call_provers.prover_answer * model * rac_result * rac_result) list
 
 (**/**)
 
