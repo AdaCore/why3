@@ -1906,7 +1906,7 @@ doc/apidoc:
 	mkdir -p doc/apidoc
 
 apidoc: doc/apidoc $(FILESTODOC)
-	$(OCAMLDOC) -d doc/apidoc -html -t "Why3 API documentation" \
+	$(OCAMLDOC) -d doc/apidoc -charset utf-8 -html -t "Why3 API documentation" \
 		-keep-code $(INCLUDES) $(LIBINCLUDES) $(EXTINCLUDES) $(FILESTODOC)
 
 # could we include also the dependency graph ? -- someone
