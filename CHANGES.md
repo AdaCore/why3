@@ -26,6 +26,8 @@ Python language
   * added `is_permutation(list1, list2)` predicate
   * added assignment operators `+=`, `-=`, `*=`, `//=`, `%=`
   * functions can now return `bool` and `list`
+  * logical functions and predicates can be defined
+  * support for type annotations
 
 IDE
   * strategies now support step limits, passed as the third integer argument to the `call` command
@@ -56,9 +58,12 @@ Coq realizations
 
 Provers
   * support for Z3 versions from 4.8.11 to 4.8.15 (released Mar 20, 2022)
-  * support for Coq 8.15.0 (released Jan 13, 2022)
+  * support for Coq 8.14.0 (released Oct 14, 2021) and 8.15.0 (released Jan 13, 2022)
   * dropped support for Coq 8.6
   * support for SMTLIB strings in CVC4 1.7 disabled, only CVC4 1.8 is supported
+
+Plugins
+  * plugins are now compiled as .cma files instead of .cmo files :x:
 
 Version 1.4.1, February 18, 2022
 --------------------------------
