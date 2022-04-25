@@ -1251,6 +1251,13 @@ polymorphic lists:
 (This type is already part of Why3 standard library, in module
 `list.List <http://why3.lri.fr/stdlib/list.html>`_.)
 
+Mutually recursive type definitions are supported.
+
+.. code-block:: whyml
+
+    type tree   = Node elt forest
+    with forest = Empty | Cons tree forest
+
 When a field is common to all constructors, with the same type, it can
 be named:
 
@@ -1448,6 +1455,22 @@ in the ghost code and never translated into executable code ; or
 ``partial``, meaning that their execution can produce observable
 effects unaccounted by their specification, and thus they cannot be
 used in the ghost code.
+
+Recursive program functions must be defined using ``let rec``.
+
+.. code-block:: whyml
+
+    let rec size_tree (t: tree) : int =
+      variant { t }
+      match t with
+      | Node _ f -> 1 + size_forest f
+      end
+    with size_forest (f: forest) : int =
+      variant { f }
+      match f with
+      | Empty    -> 0
+      | Cons t f -> size_tree t + size_forest f
+      end
 
 .. index:: pair: keyword; clone
 .. index:: module cloning
