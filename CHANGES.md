@@ -11,6 +11,9 @@ Core
 
 WhyML language
   * generalized witness expressions for type invariants
+  * `absurd` is now implicitly inserted on the normal execution path of
+    `match foo with exception Bar -> ...`, which is thus no longer
+    parsed as `try foo with Bar -> ...` :x:
 
 Python language
   * added `break` and `continue`
@@ -26,8 +29,8 @@ Python language
   * added `is_permutation(list1, list2)` predicate
   * added assignment operators `+=`, `-=`, `*=`, `//=`, `%=`
   * functions can now return `bool` and `list`
-  * logical functions and predicates can be defined
-  * support for type annotations
+  * logical functions and predicates can now be defined
+  * added support for type annotations
 
 IDE
   * strategies now support step limits, passed as the third integer argument to the `call` command
@@ -46,11 +49,9 @@ Tools
   * added `why3 show attributes` to list all the known attributes
   * `why3 prove` now supports transformations that require an argument
   * `why3 execute` now supports `io.StdIO` and `debug.Debug`
-
-Configuration
-  * the configuration file `why3.conf` can now contain additional
-    hand-written `[prover]` sections that are taken in addition with
-    the auto-detected provers
+  * `why3 config detect` now also looks for provers with executable names `prover-[0-9].*`
+  * sections `[detected_binary]` and `[manual_binary]` in `why3.conf` have
+    been merged into a common section `[partial_prover]` :x:
 
 Coq realizations
   * floating-point theories are now built on top of Flocq's `BinarySingleNaN`
@@ -60,10 +61,10 @@ Provers
   * support for Z3 versions from 4.8.11 to 4.8.15 (released Mar 20, 2022)
   * support for Coq 8.14.0 (released Oct 14, 2021) and 8.15.0 (released Jan 13, 2022)
   * dropped support for Coq 8.6
-  * support for SMTLIB strings in CVC4 1.7 disabled, only CVC4 1.8 is supported
+  * disabled support for SMTLIB strings in CVC4 1.7; only CVC4 1.8 is supported
 
-Plugins
-  * plugins are now compiled as .cma files instead of .cmo files :x:
+Miscellaneous
+  * bytecode plugins are now compiled as `.cma` libraries instead of `.cmo` files :x:
 
 Version 1.4.1, February 18, 2022
 --------------------------------
@@ -330,7 +331,7 @@ Version 1.2.0, February 11, 2019
 --------------------------------
 
 Session
-  * file path stored in session files are now represented in a
+  * file paths stored in session files are now represented in a
     system-independent way
 
 Drivers
