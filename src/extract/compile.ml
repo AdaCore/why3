@@ -94,12 +94,18 @@ module Translate = struct
         let args = rs.rs_cty.cty_args in
         let mk acc pv pp = if not pv.pv_ghost then pat m pp :: acc else acc in
         let pat_pl = List.fold_left2 mk [] args pl in
-        ML.Papp (ls, List.rev pat_pl)
+        let no_ghost_mut = match rs.rs_cty.cty_result.ity_node with
+          | Ityreg {reg_its = s} | Ityapp (s,_,_) ->
+              ls.ls_constr = 1 && s.its_ofields <> [] &&
+              List.for_all (fun v -> v.pv_ghost) s.its_mfields
+          | _ -> assert false (* should never happen *) in
+        begin match pat_pl with
+        | [p] when no_ghost_mut -> p
+        | _ -> ML.Papp (ls, List.rev pat_pl) end
 
   (** programs *)
 
   let pv_name pv = pv.pv_vs.vs_name
-
 
   let for_direction = function
     | To -> ML.To
@@ -113,15 +119,7 @@ module Translate = struct
         List.exists is_constructor its
     | _ -> false
 
-  let is_singleton_immutable itd =
-    let not_g e = not (rs_ghost e) in
-    let pjl = itd.itd_fields in
-    let mfields = itd.itd_its.its_mfields in
-    let pv_equal_field rs = pv_equal (fd_of_rs rs) in
-    let get_mutable rs = List.exists (pv_equal_field rs) mfields in
-    match filter_ghost_params not_g get_mutable pjl with
-    | [is_mutable] -> not is_mutable
-    | _ -> false
+  let is_singleton = function [_] -> true | _ -> false
 
   let get_record_itd info rs =
     match Mid.find_opt rs.rs_name info.ML.from_km with
@@ -130,18 +128,20 @@ module Translate = struct
         let itd = match rs.rs_field with
           | Some _ -> List.find (fun itd -> f itd.itd_fields) itdl
           | None -> List.find (fun itd -> f itd.itd_constructors) itdl in
-        if itd.itd_fields = [] then None else Some itd
+        if is_singleton itd.itd_constructors then Some itd else None
     | _ -> None
 
-  let is_optimizable_record_itd itd =
-    not itd.itd_its.its_private && is_singleton_immutable itd
+  let is_optimizable_record_itd {itd_its = s; itd_constructors = cl} =
+    is_singleton cl &&
+    List.for_all (fun v -> v.pv_ghost) s.its_mfields &&
+    is_singleton (List.filter (fun v -> not v.pv_ghost) s.its_ofields)
 
   let is_optimizable_record_rs info rs =
     Opt.fold (fun _ -> is_optimizable_record_itd) false (get_record_itd info rs)
 
-  let is_empty_record_itd itd =
-    let is_ghost rs = rs_ghost rs in
-    List.for_all is_ghost itd.itd_fields
+  let is_empty_record_itd itd = match itd.itd_constructors with
+    | [cs] -> List.for_all (fun v -> v.pv_ghost) cs.rs_cty.cty_args
+    | _ -> false
 
   let is_empty_record info rs =
     Opt.fold (fun _ -> is_empty_record_itd) false (get_record_itd info rs)
@@ -541,39 +541,32 @@ module Translate = struct
       (List.exists (pv_equal (fd_of_rs rs)) s.its_mfields,
        rs.rs_name,
        mlty_of_ity cty.cty_mask cty.cty_result) in
-    let id = s.its_ts.ts_name in
-    let is_private = s.its_private in
-    let args = s.its_ts.ts_args in
-    begin match s.its_def, itd.itd_constructors, itd.itd_fields with
-      | NoDef, [], [] ->
-          ML.mk_its_defn id args is_private None
-      | NoDef, cl, [] ->
-          let cl = ddata_constructs cl in
-          ML.mk_its_defn id args is_private (Some (ML.Ddata cl))
-      | NoDef, _, pjl ->
+    let def = match s.its_def with
+      | NoDef when is_empty_record_itd itd ->
+          Some (ML.Dalias (ML.tunit))
+      | NoDef when is_optimizable_record_itd itd ->
+          let fld = List.find (fun v -> not v.pv_ghost) s.its_ofields in
+          Some (ML.Dalias (mlty_of_ity MaskVisible fld.pv_ity))
+      | NoDef when itd.itd_fields = [] (* no named fields *) ->
+          let cl = ddata_constructs itd.itd_constructors in
+          if cl = [] then None else Some (ML.Ddata cl)
+      | NoDef when itd.itd_constructors = [] ||
+           (is_singleton itd.itd_constructors &&
+            List.length (List.hd itd.itd_constructors).rs_cty.cty_args =
+            List.length itd.itd_fields (* non-private record *)) ->
           let p e = not (rs_ghost e) in
-          let pjl = filter_ghost_params p drecord_fields pjl in
-          begin match pjl with
-            | [] ->
-                let ty_def = if is_private then None
-                  else Some (ML.Dalias (ML.tunit)) in
-                ML.mk_its_defn id args is_private ty_def
-            | [_, _, ty_pj] when is_optimizable_record_itd itd ->
-                ML.mk_its_defn id args is_private (Some (ML.Dalias ty_pj))
-            | pjl ->
-                ML.mk_its_defn id args is_private (Some (ML.Drecord pjl)) end
-      | Alias t, _, _ ->
-          ML.mk_its_defn id args is_private (* FIXME ? is this a good mask ? *)
-            (Some (ML.Dalias (mlty_of_ity MaskVisible t)))
-      | Range r, [], [] ->
-          assert (args = []); (* a range type is not polymorphic *)
-          ML.mk_its_defn id [] is_private (Some (ML.Drange r))
-      | Float ff, [], [] ->
-          assert (args = []); (* a float type is not polymorphic *)
-          ML.mk_its_defn id [] is_private (Some (ML.Dfloat ff))
-      | (Range _ | Float _), _, _ ->
-          assert false (* cannot have constructors or fields *)
-    end
+          let pjl = filter_ghost_params p drecord_fields itd.itd_fields in
+          if pjl <> [] then Some (ML.Drecord pjl) else
+          if s.its_private then None else Some (ML.Dalias (ML.tunit))
+      | NoDef ->
+          (* TODO: algebraic non-record type where some fields are named *)
+          let loc = itd.itd_its.its_ts.ts_name.id_loc in
+          Loc.errorm ?loc "This type declaration cannot be extracted"
+      | Alias t -> Some (ML.Dalias (mlty_of_ity MaskVisible t))
+      | Range r -> Some (ML.Drange r)
+      | Float f -> Some (ML.Dfloat f)
+    in
+    ML.mk_its_defn s.its_ts.ts_name s.its_ts.ts_args s.its_private def
 
   let is_val = function
     | Eexec ({c_node = Cany}, _) -> true
