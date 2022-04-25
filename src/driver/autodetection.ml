@@ -690,16 +690,22 @@ let query_prover_version path version_switch version_regexp =
     None
 
 let locate_exe =
-  let binaries = Hstr.create 17 in
-  let paths = try Sys.getenv "PATH" with Not_found -> "/usr/bin" in
-  let sep = if Sys.win32 then ';' else ':' in
-  List.iter (fun path ->
-      if path <> "" then
-        Array.iter (fun f ->
-            if not (Hstr.mem binaries f) then
-              Hstr.add binaries f (Filename.concat path f)
-          ) (Sys.readdir path)
-    ) (String.split_on_char sep paths);
+  let binaries = lazy (
+    let binaries = Hstr.create 17 in
+    let paths = try Sys.getenv "PATH" with Not_found -> "/usr/bin" in
+    let sep = if Sys.win32 then ';' else ':' in
+    let paths = String.split_on_char sep paths in
+    List.iter (fun path ->
+        if path <> "" then
+          match Sys.readdir path with
+          | files ->
+              Array.iter (fun f ->
+                  if not (Hstr.mem binaries f) then
+                    Hstr.add binaries f (Filename.concat path f)
+                ) files
+          | exception _ -> ()
+      ) paths;
+    binaries) in
   fun name ->
   let ln = String.length name in
   Hstr.fold (fun p fullpath acc ->
@@ -710,7 +716,7 @@ let locate_exe =
             (p.[ln] = '.' && lp = ln + 4 && Strings.(has_suffix "exe" p || has_suffix "bat" p)) ||
             (p.[ln] = '-' && lp >= ln + 2 && '0' <= p.[ln + 1] && p.[ln + 1] <= '9')) then
         fullpath :: acc
-      else acc) binaries []
+      else acc) (Lazy.force binaries) []
 
 let find_prover data name path =
   let binaries = Hashtbl.create 10 in
