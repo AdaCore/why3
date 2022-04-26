@@ -792,7 +792,7 @@ gallery-subs:
 # XML DTD validation
 ########
 
-.PHONY: xml-validate
+.PHONY: xml-validate xml-validate-local
 
 xml-validate:
 	@for x in `find examples/ -name why3session.xml`; do \
@@ -801,7 +801,7 @@ xml-validate:
 
 xml-validate-local:
 	@for x in `find examples/ -path examples/in_progress -prune -o -name why3session.xml -print`; do \
-	  xmllint --noout --dtdvalid share/why3session.dtd $$x 2>&1 | head -1; \
+	  xmllint --nonet --noout --path share --valid $$x 2>&1 | sed -e '/I.O error/d' | head -1; \
 	done
 
 ###############
