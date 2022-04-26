@@ -426,13 +426,13 @@ globals:
 <rac-check-term-result>Assertion is ok at "examples/tests/rac.mlw", line 298, characters 13-29
 <rac-check-term-result>Assertion is ok at "examples/tests/rac.mlw", line 299, characters 13-28
 <rac-check-term-result>Assertion failed at "examples/tests/rac.mlw", line 300, characters 13-29
-                       - Term: (elts r @ 1) = False
+                       - Term: (r.elts @ 1) = False
                        - Variables: r -> {elts=
                                           (fun j -> if j = i then x
                                              else f j) with i = 3, x = false, f = (fun _ -> true);
                                           length= 5}
 Assertion failed at "examples/tests/rac.mlw", line 300, characters 13-29
-- Term: (elts r @ 1) = False
+- Term: (r.elts @ 1) = False
 - Variables: r -> {elts=
                    (fun j -> if j = i then x
                       else f j) with i = 3, x = false, f = (fun _ -> true);
@@ -673,10 +673,10 @@ Assertion failed at "examples/tests/rac.mlw", line 400, characters 13-22
 <rac-check-term-result>Postcondition of `make` is ok at "examples/tests/rac.mlw", line 406, characters 12-21
                        - Defined at "WHY3DATA/stdlib/array.mlw", line 62, characters 14-31
 <rac-check-term-result>Assertion failed at "examples/tests/rac.mlw", line 407, characters 13-26
-                       - Term: length a = 42
+                       - Term: a.length = 42
                        - Variables: a -> [11]
 Assertion failed at "examples/tests/rac.mlw", line 407, characters 13-26
-- Term: length a = 42
+- Term: a.length = 42
 - Variables: a -> [11]
 ** Arrays.test3 ()
 <rac-check-term-result>Postcondition of `Tuple0` is ok at "command line expression to execute", line 1, characters 6-8
@@ -684,10 +684,10 @@ Assertion failed at "examples/tests/rac.mlw", line 407, characters 13-26
 <rac-check-term-result>Postcondition of `empty` is ok at "examples/tests/rac.mlw", line 410, characters 12-34
                        - Defined at "WHY3DATA/stdlib/array.mlw", line 65, characters 14-31
 <rac-check-term-result>Assertion failed at "examples/tests/rac.mlw", line 411, characters 13-26
-                       - Term: length a = 42
+                       - Term: a.length = 42
                        - Variables: a -> []
 Assertion failed at "examples/tests/rac.mlw", line 411, characters 13-26
-- Term: length a = 42
+- Term: a.length = 42
 - Variables: a -> []
 
 * Variants

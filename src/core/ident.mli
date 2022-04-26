@@ -166,9 +166,17 @@ val id_unique_attr :
 (** Do the same as id_unique except that it tries first to use
     the "name:" attribute to generate the name instead of id.id_string *)
 
+
+(** {2 General purpose attributes} *)
+
 val proxy_attr: attribute
 val useraxiom_attr: attribute
 val funlit: attribute
+
+val is_field_id_attr: attribute
+  (** indicates that the related ident is a field name, and its applications
+      should be printed in dotted notation *)
+
 
 (** {2 Attributes for handling counterexamples} *)
 
