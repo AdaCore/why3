@@ -1276,6 +1276,8 @@ let type_wit muc nms fl dwit =
   let de = expr ~keep_loc:true ~ughost:false de in
   de
 
+let add_is_field_attr id =
+  { id with id_ats = ATstr Ident.is_field_id_attr :: id.id_ats }
 
 let add_types muc tdl =
   let add m ({td_ident = {id_str = x}; td_loc = loc} as d) =
@@ -1306,6 +1308,8 @@ let add_types muc tdl =
               let nms = Sstr.add_new exn nm nms in
               let ity = parse ~loc ~alias ~alg pty in
               let v = try Hstr.find hfd nm with Not_found ->
+                (* add proper attribute for later printing in dotted notation `t.id` *)
+                let id = add_is_field_attr id in
                 let v = create_pvsymbol (create_user_id id) ~ghost ity in
                 Hstr.add hfd nm v;
                 v in
@@ -1338,7 +1342,9 @@ let add_types muc tdl =
         let alg = Mstr.add x (id,args) alg in
         let get_fd nms fd =
           let {id_str = nm; id_loc = loc} = fd.f_ident in
-          let id = create_user_id fd.f_ident in
+          (* add proper attribute for later printing in dotted notation `t.id` *)
+          let id = add_is_field_attr fd.f_ident in
+          let id = create_user_id id in
           let ity = parse ~loc ~alias ~alg fd.f_pty in
           let ghost = d.td_vis = Abstract || fd.f_ghost in
           let pv = create_pvsymbol id ~ghost ity in
