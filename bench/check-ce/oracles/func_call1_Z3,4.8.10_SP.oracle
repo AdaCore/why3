@@ -2,7 +2,7 @@ File "bench/check-ce/func_call1.mlw", line 15, characters 6-7:
 warning: unused variable w
 File "bench/check-ce/func_call1.mlw", line 8, characters 12-21:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Valid (0.00s, 192 steps).
+Prover result is: Valid (0.01s, 192 steps).
 
 File "bench/check-ce/func_call1.mlw", line 9, characters 12-26:
 Sub-goal Postcondition of goal g'vc.
@@ -64,7 +64,7 @@ Prover result is: Valid (0.01s, 75 steps).
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call1.mlw", line 4, characters 8-9: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<check-ce>Result of checking model 0: SW
+<check-ce>Result of checking model 0:
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -171,7 +171,7 @@ Prover result is: Valid (0.01s, 75 steps).
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call1.mlw", line 4, characters 8-9: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<check-ce>Result of checking model 1: BAD_CE
+<check-ce>Result of checking model 1:
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -265,7 +265,7 @@ Prover result is: Valid (0.01s, 75 steps).
   - Abstract RAC: STUCK (failure in postcondition of `g` at "bench/check-ce/func_call1.mlw", line 8, characters 12-21)
 File "bench/check-ce/func_call1.mlw", line 16, characters 11-16:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Unknown (unknown) (0.38s, 3000057 steps).
+Prover result is: Unknown (unknown) (0.39s, 3000057 steps).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:

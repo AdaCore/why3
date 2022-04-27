@@ -4,7 +4,7 @@ Prover result is: Valid (0.02s, 75 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Sub-goal Loop variant decrease of goal f'vc.
-Prover result is: Valid (0.02s, 519 steps).
+Prover result is: Valid (0.01s, 519 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>Checking model:
@@ -85,7 +85,7 @@ Prover result is: Valid (0.02s, 519 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `z` at "bench/check-ce/while.mlw", line 4, characters 7-8: 2
-<check-ce>Result of checking model 0: SW
+<check-ce>Result of checking model 0:
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -259,7 +259,7 @@ Prover result is: Valid (0.02s, 519 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `z` at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<check-ce>Result of checking model 1: BAD_CE
+<check-ce>Result of checking model 1:
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -417,7 +417,7 @@ Prover result is: Valid (0.02s, 519 steps).
   - Abstract RAC: STUCK (when reaching the end of a loop iteration at "bench/check-ce/while.mlw", line 8, characters 2-161)
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Unknown (unknown) (0.33s, 3000118 steps).
+Prover result is: Unknown (unknown) (0.37s, 3000118 steps).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:

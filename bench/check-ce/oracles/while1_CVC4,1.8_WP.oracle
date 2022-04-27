@@ -1,14 +1,14 @@
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.04s, 1232 steps).
+Prover result is: Valid (0.04s, 1246 steps).
 
 File "bench/check-ce/while1.mlw", line 9, characters 16-21:
 Sub-goal Loop variant decrease of goal f'vc.
-Prover result is: Valid (0.02s, 1615 steps).
+Prover result is: Valid (0.02s, 1683 steps).
 
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.02s, 1508 steps).
+Prover result is: Valid (0.02s, 1561 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while1.mlw", line 5, characters 12-22)
 <check-ce>Checking model:
@@ -57,7 +57,7 @@ Prover result is: Valid (0.02s, 1508 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<check-ce>Result of checking model 0: SW
+<check-ce>Result of checking model 0:
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -221,7 +221,7 @@ Prover result is: Valid (0.02s, 1508 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<check-ce>Result of checking model 1: SW
+<check-ce>Result of checking model 1:
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -347,7 +347,7 @@ Prover result is: Valid (0.02s, 1508 steps).
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/while1.mlw", line 5, characters 12-22)
 File "bench/check-ce/while1.mlw", line 5, characters 12-22:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6527 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 6351 steps).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:

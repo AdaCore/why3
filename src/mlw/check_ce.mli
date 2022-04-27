@@ -21,7 +21,7 @@ open Model_parser
     checking, as described in the following article:
 
     {%html:<blockquote>%}
-      Benedikt Becker, Cl�udio Belo Louren�o, Claude March� (2021):
+      Benedikt Becker, Cláudio Belo Lourenço, Claude Marché (2021):
       {e Explaining Proof Failures with Giant-Step Runtime Assertion Checking}.
     {%html:</blockquote>%}
 
@@ -50,9 +50,15 @@ val print_rac_result_state : rac_result_state Pp.pp
 (** Print a RAC result state *)
 
 type rac_result =
-  | Not_checked of string
-  | Checked of rac_result_state * Log.exec_log
-(** The result of a RAC execution is comprised of the final state and the
+  | RAC_not_done of string
+(** RAC has not be done for the reason given as argument.
+    Possible reasons include:
+    - the VC has no identified source location,
+    - the identified source location cannot be associated to a program routine,
+    - a small-step RAC has not been executed because only the giant-step one
+      was requested. *)
+  | RAC_done of rac_result_state * Log.exec_log
+(** The result of a RAC execution includes the final state and the
    execution log. *)
 
 val string_of_rac_result_state : rac_result_state -> string
@@ -141,34 +147,6 @@ val classify : vc_term_loc:Loc.position option -> vc_term_attrs:Ident.Sattr.t ->
     counterexamples ({!recfield:Call_provers.prover_result.pr_models}). The
     following functions help selecting one counterexample. *)
 
-val select_model :
-  ?timelimit:float -> ?steplimit:int -> ?verb_lvl:int ->
-  ?compute_term:compute_term ->
-  check_ce:bool -> rac -> Env.env -> Pmodule.pmodule ->
-  (Call_provers.prover_answer * model) list -> (model * classification) option
-(** Select one of the given models. By default, counterexample classification
-    ([check_ce]) is disabled. When counterexample checking is enabled, the first
-    good model is selected (with verdict {!const:verdict.NC}, {!const:verdict.SW}, or
-    {!const:verdict.NC_SW}, if any), or the last non-empty model otherwise. The RAC
-    reduce configuration [rac] is used only when counterexample checking is
-    enabled. *)
-
-val select_model_last_non_empty :
-  (Call_provers.prover_answer * model) list -> model option
-(** Select the last, non-empty model in the incremental list of models.
-
-    This is a compatiblity function for the behaviour before 2020, and gives
-    the same result as [select_model ~check_ce:false
-    ~sort_models:prioritize_last_non_empty_model]. *)
-
-val select_model_from_verdict :
-  (int * Call_provers.prover_answer * model * rac_result * rac_result) list ->
-  (model * classification) option
-
-val select_model_from_giant_step_rac_results :
-  (int * Call_provers.prover_answer * model * rac_result * rac_result) list ->
-  (model * rac_result) option
-
 val get_rac_results :
   ?timelimit:float -> ?steplimit:int -> ?verb_lvl:int ->
   ?compute_term:compute_term ->
@@ -176,6 +154,46 @@ val get_rac_results :
   rac -> Env.env -> Pmodule.pmodule ->
   (Call_provers.prover_answer * model) list ->
   (int * Call_provers.prover_answer * model * rac_result * rac_result) list
+(** Given a list of models, return the list of these models together with the
+    results of the execution of normal and giant-step RAC.
+    When called with [~only_giant_step:true], executes only the giant-step RAC.*)
+
+val select_model_from_verdict :
+  (int * Call_provers.prover_answer * model * rac_result * rac_result) list ->
+  (model * classification) option
+(** Select a model based on the classification (itself based on the normal and
+    giant-step RAC executions).
+    The first good model is selected.*)
+
+val select_model_from_giant_step_rac_results :
+  (int * Call_provers.prover_answer * model * rac_result * rac_result) list ->
+  (model * rac_result) option
+(** Select a model based on the giant-step RAC execution results.
+    TODO implement a strategy other than last_non_empty *)
+
+val select_model :
+  ?timelimit:float -> ?steplimit:int -> ?verb_lvl:int ->
+  ?compute_term:compute_term ->
+  check_ce:bool ->
+  rac -> Env.env -> Pmodule.pmodule ->
+  (Call_provers.prover_answer * model) list -> (model * classification) option
+(** Select one of the given models.
+    When counterexample checking is enabled, the first good model is selected
+    (i.e. with verdict {!const:verdict.NC}, {!const:verdict.SW}, or
+    {!const:verdict.NC_SW}, if any).
+    When counterexample checking is disabled, the last non-empty model is selected.
+    The RAC reduce configuration [rac] is used only when counterexample checking is
+    enabled.
+
+    When counterexample checking is enabled, gives the same result as
+    [select_model_from_verdict] called with the result of [get_rac_results].*)
+
+val select_model_last_non_empty :
+  (Call_provers.prover_answer * model) list -> model option
+(** Select the last, non-empty model in the incremental list of models.
+
+    This is a compatiblity function for the behaviour before 2020, and gives
+    the same result as [select_model ~check_ce:false]. *)
 
 (**/**)
 

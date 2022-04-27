@@ -911,8 +911,9 @@ pmodule ``pm``:
    :start-after: BEGIN{check_ce}
    :end-before: END{check_ce}
 
-The API also permits running only one of the two RAC executions (giant-step, in
-this case):
+Optionally, the API also permits running only the giant-step RAC execution with
+the function ``Check_ce.get_rac_results`` and optional parameter ``only_giant_step``
+set to ``true``.
 
 .. literalinclude:: ../examples/use_api/counterexample.ml
    :language: ocaml

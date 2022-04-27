@@ -1,6 +1,6 @@
 File "bench/check-ce/func_call5.mlw", line 8, characters 12-24:
 Sub-goal Postcondition of goal g1'vc.
-Prover result is: Valid (0.00s, 65 steps).
+Prover result is: Valid (0.01s, 65 steps).
 
 File "bench/check-ce/func_call5.mlw", line 14, characters 10-14:
 Sub-goal Precondition of goal f1'vc.
@@ -43,7 +43,7 @@ Prover result is: Valid (0.00s, 93 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
-<check-ce>Result of checking model 0: INCOMPLETE
+<check-ce>Result of checking model 0:
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -83,7 +83,7 @@ Prover result is: Valid (0.00s, 93 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `x` at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 0
-<check-ce>Result of checking model 1: BAD_CE
+<check-ce>Result of checking model 1:
             - Concrete RAC: STUCK (failure in precondition of `f1` at "bench/check-ce/func_call5.mlw", line 11, characters 4-6)
               File int.mlw:
                 Line 13:
@@ -129,7 +129,7 @@ Prover result is: Valid (0.00s, 93 steps).
   - Abstract RAC: STUCK (failure in precondition of `f1` at "bench/check-ce/func_call5.mlw", line 11, characters 4-6)
 File "bench/check-ce/func_call5.mlw", line 15, characters 11-17:
 Sub-goal Assertion of goal f1'vc.
-Prover result is: Unknown (unknown) (0.39s, 3000043 steps).
+Prover result is: Unknown (unknown) (0.37s, 3000043 steps).
 The following counterexample model could not be verified
   (abstract RAC terminated because missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14):
 File func_call5.mlw:
@@ -161,7 +161,7 @@ File func_call5.mlw:
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 19, characters 8-9: 0
-<check-ce>Result of checking model 0: NC
+<check-ce>Result of checking model 0:
             - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
               File int.mlw:
                 Line 13:
@@ -230,7 +230,7 @@ File func_call5.mlw:
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `x` at "bench/check-ce/func_call5.mlw", line 19, characters 8-9: 0
-<check-ce>Result of checking model 1: NC
+<check-ce>Result of checking model 1:
             - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
               File int.mlw:
                 Line 13:
@@ -295,7 +295,7 @@ File func_call5.mlw:
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
 File "bench/check-ce/func_call5.mlw", line 21, characters 11-17:
 Sub-goal Assertion of goal f2'vc.
-Prover result is: Unknown (unknown) (0.39s, 3000036 steps).
+Prover result is: Unknown (unknown) (0.41s, 3000036 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
