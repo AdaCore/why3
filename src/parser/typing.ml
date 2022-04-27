@@ -1508,9 +1508,64 @@ let add_inductives muc s dl =
   | NonPositiveIndDecl (ls,pr,s) ->
       Loc.error ~loc:(loc_of_id pr.pr_name) (NonPositiveIndDecl (ls,pr,s))
 
+(* turn a lemma into a lemma function *)
+let create_val muc id f =
+  let id = id_derive (id.id_string ^ "'lemma") id in
+  let rec decompose_post pvl prel rvl postl f =
+    let stop = Sattr.mem stop_split f.t_attrs in
+    match f.t_node with
+    | Tquant (Texists, f) when not stop ->
+        let vlf,_,f = t_open_quant f in
+        decompose_post pvl prel (List.rev_append vlf rvl) postl f
+    | Tbinop (Tand, f1, f2) when not stop ->
+        decompose_post pvl prel rvl (f1 :: postl) f2
+    | _ ->
+        let f = List.fold_left (fun acc f -> t_and f acc) f postl in
+        let post = match List.rev rvl with
+          | [] ->
+              let res = create_vsymbol (id_fresh "result") ty_unit in
+              create_post res f
+          | [v] ->
+              create_post v f
+          | rvl ->
+              (* force the creation of the program type symbol for the
+                 corresponding tuple type before ty_tuple creates one
+                 for the logic type *)
+              ignore (its_tuple (List.length rvl));
+              let ty = ty_tuple (List.map (fun v -> v.vs_ty) rvl) in
+              let res = create_vsymbol (id_fresh "result") ty in
+              let pvl = List.map pat_var rvl in
+              let pat = pat_app (fs_tuple (List.length rvl)) pvl ty in
+              let f = t_case (t_var res) [t_close_branch pat f] in
+              create_post res f in
+        let ity = ity_of_ty (t_type post) in
+        create_cty pvl prel [post] Mxs.empty Mpv.empty eff_empty ity in
+  let rec decompose_pre vl prel f =
+    let stop = Sattr.mem stop_split f.t_attrs in
+    match f.t_node with
+    | Tquant (Tforall, f) when not stop ->
+        let vlf,_,f = t_open_quant f in
+        decompose_pre (List.rev_append vlf vl) prel f
+    | Tbinop (Timplies, f1, f2) when not stop ->
+        decompose_pre vl (f1 :: prel) f2
+    | _ ->
+        let pv_of_v sbs vs =
+          let pv = create_pvsymbol (id_clone vs.vs_name) (ity_of_ty vs.vs_ty) in
+          Mvs.add vs (t_var pv.pv_vs) sbs, pv in
+        let sbs, pvl = Lists.rev_map_fold_left pv_of_v Mvs.empty vl in
+        let prel = List.rev_map (t_subst sbs) prel in
+        decompose_post pvl prel [] [] (t_subst sbs f) in
+  match decompose_pre [] [] f with
+  | cty ->
+      let ld, _ = let_sym id ~ghost:true (c_any cty) in
+      add_pdecl ~vc:false muc (create_let_decl ld)
+  | exception UnboundTypeVar _ ->
+      muc
+
 let add_prop muc k s f =
   let pr = create_prsymbol (create_user_id s) in
   let f = type_fmla_pure muc Mstr.empty Dterm.denv_empty f in
+  let muc = if k = Pgoal then muc else create_val muc pr.pr_name f in
   add_decl muc (create_prop_decl k pr f)
 
 (* parse declarations *)
