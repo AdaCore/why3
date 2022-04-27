@@ -58,7 +58,7 @@ let pp_indent fmt =
 let is_prog_constant d =
   let open Pdecl in
   match d.pd_node with
-  | PDlet (LDsym (_, {c_cty= {cty_args= []}})) -> true
+  | PDlet (LDsym ({rs_logic = RLls _}, {c_cty={cty_args=[]}})) -> true
   | _ -> false
 
 (******************************************************************************)
