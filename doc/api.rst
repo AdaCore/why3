@@ -914,6 +914,10 @@ pmodule ``pm``:
 Optionally, the API also permits running only the giant-step RAC execution with
 the function ``Check_ce.get_rac_results`` and optional parameter ``only_giant_step``
 set to ``true``.
+By default, ``Check_ce.select_model_from_giant_step_rac_results`` selects the last
+non empty model. But another strategy can be given via the optional parameter
+``strategy``, like the predefined ``Check_ce.best_non_empty_giant_step_rac_result``
+or any other strategy implemented by the user.
 
 .. literalinclude:: ../examples/use_api/counterexample.ml
    :language: ocaml

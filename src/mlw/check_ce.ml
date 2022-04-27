@@ -489,6 +489,22 @@ let last_non_empty_model: strategy_from_rac = fun models ->
   List.filter (fun (_,_,m,_,_) -> not (is_model_empty m))
     (List.sort compare models)
 
+let best_non_empty_giant_step_rac_result: strategy_from_rac = fun models ->
+  let open Util in
+  let classification_index = function
+    | RAC_done (Res_fail _ , _) -> 0
+    | RAC_done (Res_normal, _) -> 1
+    | RAC_done (Res_stuck _ , _) -> 2
+    | RAC_done (Res_incomplete _ , _) -> 3
+    | RAC_not_done _ -> 4 in
+  let compare = cmp [
+      cmptr (fun (_,_,_,_,res) -> classification_index res) (-);
+      (* prefer simpler models *)
+      cmptr (fun (i,_,_,_,_) -> -i) (-);
+    ] in
+  let not_empty (_,_,m,_,_) = not (Model_parser.is_model_empty m) in
+  List.sort compare (List.filter not_empty models)
+
 let first_good_model: strategy_from_verdict = fun classified_models ->
   let open Util in
   let good_models, other_models =
@@ -545,10 +561,10 @@ let print_dbg_rac_result_model ~print_normal ~print_giant
         fprintf fmt "- @[<v>%t model %d - Abstract RAC: %a@]" mark_selected i
           print_rac_result_state giant_state
 
-(* TODO implement a strategy other than last_non_empty_model *)
-let select_model_from_giant_step_rac_results models =
+let select_model_from_giant_step_rac_results ?strategy models =
+  let strategy = Opt.get_def last_non_empty_model strategy in
   let selected, selected_ix =
-    match List.nth_opt (last_non_empty_model models) 0 with
+    match List.nth_opt (strategy models) 0 with
     | None -> None, None
     | Some (i,_,m,_,s) -> Some (m, s), Some i in
   if models <> [] then

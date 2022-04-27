@@ -193,7 +193,8 @@ let () =
     (Rac.Why.mk_check_term_lit config env ~why_prover:"alt-ergo" ()) in
   let rac_results = Check_ce.get_rac_results ~only_giant_step:true
     rac env pm models in
+  let strategy = Check_ce.best_non_empty_giant_step_rac_result in
   let _,res = Opt.get_exn (Failure "No good model found")
-    (Check_ce.select_model_from_giant_step_rac_results rac_results) in
+    (Check_ce.select_model_from_giant_step_rac_results ~strategy rac_results) in
   printf "%a@." (Check_ce.print_rac_result ?verb_lvl:None) res
 (* END{check_ce_giant_step} *)

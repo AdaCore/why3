@@ -147,6 +147,22 @@ val classify : vc_term_loc:Loc.position option -> vc_term_attrs:Ident.Sattr.t ->
     counterexamples ({!recfield:Call_provers.prover_result.pr_models}). The
     following functions help selecting one counterexample. *)
 
+type strategy_from_rac =
+  (int * Call_provers.prover_answer * model * rac_result * rac_result) list ->
+  (int * Call_provers.prover_answer * model * rac_result * rac_result) list
+(** Type of strategies to select a model from the RAC execution results.*)
+
+val best_non_empty_giant_step_rac_result : strategy_from_rac
+(** Select the best non empty model based on the result of the giant-step RAC
+    execution, with the following classification:
+    RAC_done (Res_fail _ , _) > RAC_done (Res_normal, _)
+                              > RAC_done (Res_stuck _ , _)
+                              > RAC_done (Res_incomplete _ , _)
+                              > RAC_not_done _
+    *)
+val last_non_empty_model : strategy_from_rac
+(** Select the last non empty model. *)
+
 val get_rac_results :
   ?timelimit:float -> ?steplimit:int -> ?verb_lvl:int ->
   ?compute_term:compute_term ->
@@ -166,10 +182,11 @@ val select_model_from_verdict :
     The first good model is selected.*)
 
 val select_model_from_giant_step_rac_results :
+  ?strategy:strategy_from_rac ->
   (int * Call_provers.prover_answer * model * rac_result * rac_result) list ->
   (model * rac_result) option
 (** Select a model based on the giant-step RAC execution results.
-    TODO implement a strategy other than last_non_empty *)
+    By default, the strategy is [last_non_empty_model]. *)
 
 val select_model :
   ?timelimit:float -> ?steplimit:int -> ?verb_lvl:int ->
