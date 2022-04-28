@@ -321,18 +321,7 @@ let () =
       Split_goal.split_goal_right
       (Trans.compose_l
         (Trans.singleton unfold_trans)
-          split_conj)
+          (Trans.compose_l (Trans.singleton Gnat_rewrite.elim_to_of_array) split_conj))
   in
   Trans.register_transform_l "split_goal_wp_conj" trans
     ~desc:"split goal followed by conjunction split"
-
-let () =
-  let trans =
-    Trans.compose_l
-      Introduction.split_vc
-      (Trans.compose_l
-        (Trans.singleton unfold_trans)
-          split_conj)
-  in
-  Trans.register_transform_l "split_vc_conj" trans
-    ~desc:"split vc followed by conjunction split"
