@@ -587,8 +587,8 @@ if test "$found_seq" = no; then
    DIR="$OCAMLLIB"
    SEQINCLUDE=
    SEQLIB=
-   found_seq=yes
-   AC_CHECK_FILE($DIR/stdlib__seq.cmi,,found_seq=no)
+   AC_CHECK_FILE($DIR/stdlib__seq.cmi,found_seq=yes,)
+   AC_CHECK_FILE($DIR/stdlib__Seq.cmi,found_seq=yes,)
 fi
 if test "$found_seq" = no; then
    AC_MSG_WARN([Library seq not found.])
