@@ -1,5 +1,8 @@
 :x: marks a potential source of incompatibility
 
+Version 1.5.0, April 29, 2022
+-----------------------------
+
 Standard library
   * deeply revised library `mach.bv` for bitvectors operations in
     programs. Pre- and post-conditions are now expressed both in terms

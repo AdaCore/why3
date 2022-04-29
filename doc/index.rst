@@ -8,7 +8,7 @@ The Why3 Platform
   Guillaume Melquiond,
   Andrei Paskevich
 
-:Version: |version|, February 2022
+:Version: |version|, April 2022
 :Copyright: 2010--2022 University Paris-Saclay, CNRS, Inria
 
 .. _U3CAT: http://frama-c.com/u3cat/
