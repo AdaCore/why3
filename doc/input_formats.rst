@@ -390,7 +390,7 @@ The extension of syntax is described by the following rules.
     : | "absurd"
     : | "goto" `:ident`
     : | "switch" "(" `:expr` ")" `switch_case`* "end"
-    switch_case: "|" `:pattern` "->" `:terminator`
+    switch_case: "|" `:pattern` "->" `terminator`
 
 
 
