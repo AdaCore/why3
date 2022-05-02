@@ -50,16 +50,16 @@
   <proof prover="6"><result status="valid" time="0.07" steps="22991"/></proof>
   </goal>
   <goal name="periodicity&#39;vc.9" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.14" steps="28328"/></proof>
+  <proof prover="6"><result status="valid" time="0.14" steps="28365"/></proof>
   </goal>
   <goal name="periodicity&#39;vc.10" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.77" steps="824"/></proof>
   </goal>
   <goal name="periodicity&#39;vc.11" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.37" steps="51370"/></proof>
+  <proof prover="6"><result status="valid" time="0.37" steps="51335"/></proof>
   </goal>
   <goal name="periodicity&#39;vc.12" expl="out of loop bounds" proved="true">
-  <proof prover="6"><result status="valid" time="0.05" steps="15420"/></proof>
+  <proof prover="6"><result status="valid" time="0.05" steps="15416"/></proof>
   </goal>
   <goal name="periodicity&#39;vc.13" expl="unreachable point" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="13472"/></proof>
@@ -78,7 +78,14 @@
   <proof prover="6" timelimit="5"><result status="valid" time="0.03" steps="9496"/></proof>
   </goal>
   <goal name="equality&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.03" steps="12791"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="equality&#39;vc.2.0" expl="postcondition" proved="true">
+   <proof prover="6" timelimit="5"><result status="valid" time="0.07" steps="17726"/></proof>
+   </goal>
+   <goal name="equality&#39;vc.2.1" expl="postcondition" proved="true">
+   <proof prover="6" timelimit="5"><result status="valid" time="0.03" steps="9894"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="equality&#39;vc.3" expl="variant decrease" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="9613"/></proof>
@@ -100,7 +107,14 @@
   </transf>
   </goal>
   <goal name="equality&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.06" steps="13619"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="equality&#39;vc.7.0" expl="postcondition" proved="true">
+   <proof prover="6" timelimit="5"><result status="valid" time="0.03" steps="9985"/></proof>
+   </goal>
+   <goal name="equality&#39;vc.7.1" expl="postcondition" proved="true">
+   <proof prover="6" timelimit="5"><result status="valid" time="0.10" steps="24728"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="equality&#39;vc.8" expl="precondition" proved="true">
   <proof prover="6" timelimit="5"><result status="valid" time="0.03" steps="10057"/></proof>

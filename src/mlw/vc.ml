@@ -223,14 +223,11 @@ let sp_and sp1 sp2 = match sp1.t_node, sp2.t_node with
   | _, Ttrue | Tfalse, _ -> sp1
   | _, _ -> t_and sp1 sp2
 
-(* sp_or adds "case_split", so we avoid using it here *)
 let sp_if c sp1 sp2 = match c.t_node, sp1.t_node, sp2.t_node with
   | Ttrue, _, _  | _, Ttrue,  Ttrue  -> sp1
   | Tfalse, _, _ | _, Tfalse, Tfalse -> sp2
   | _, _, Tfalse -> sp_and c sp1
   | _, Tfalse, _ -> sp_and (t_not_simp c) sp2
-  | _, Ttrue, _  -> t_or c sp2
-  | _, _, Ttrue  -> t_or (t_not_simp c) sp1
   | _, _, _ -> add_case (t_if c sp1 sp2)
 
 let sp_case t bl =
