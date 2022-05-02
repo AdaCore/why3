@@ -71,7 +71,14 @@
   <proof prover="5"><result status="valid" time="0.06" steps="14755"/></proof>
   </goal>
   <goal name="to_nat_of_one&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.16" steps="35783"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="to_nat_of_one&#39;vc.3.0" expl="postcondition" proved="true">
+   <proof prover="5" timelimit="5"><result status="valid" time="0.18" steps="34889"/></proof>
+   </goal>
+   <goal name="to_nat_of_one&#39;vc.3.1" expl="postcondition" proved="true">
+   <proof prover="5" timelimit="5"><result status="valid" time="0.18" steps="33552"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
@@ -182,7 +189,7 @@
  <proof prover="4" timelimit="30"><result status="valid" time="7.54" steps="2706"/></proof>
  </goal>
  <goal name="to_nat_0x00000003" proved="true">
- <proof prover="6" timelimit="120"><result status="valid" time="64.85"/></proof>
+ <proof prover="6" timelimit="120"><result status="valid" time="57.36"/></proof>
  </goal>
  <goal name="to_nat_0x00000007" proved="true">
  <proof prover="4" timelimit="30"><result status="valid" time="11.12" steps="2976"/></proof>
@@ -206,7 +213,7 @@
  <proof prover="4" timelimit="30"><result status="valid" time="5.92" steps="2187"/></proof>
  </goal>
  <goal name="to_nat_0x000003FF" proved="true">
- <proof prover="4" timelimit="30"><result status="valid" time="5.06" steps="2046"/></proof>
+ <proof prover="4" timelimit="30"><result status="valid" time="5.68" steps="2046"/></proof>
  </goal>
  <goal name="to_nat_0x000007FF" proved="true">
  <proof prover="4" timelimit="30"><result status="valid" time="4.67" steps="1914"/></proof>
