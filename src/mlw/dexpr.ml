@@ -1092,13 +1092,23 @@ let check_fun inr rsym dsp ce =
   check_spec inr dsp c e;
   check_aliases (rsym <> None) c
 
+(** Order-stable replacement of Hpv *)
+
+module MMpv = struct
+  type 'a t = 'a Mpv.t ref
+  let create _ = ref Mpv.empty
+  let find_opt m k = Mpv.find_opt k !m
+  let add m k v = m := Mpv.add k v !m
+  let fold f m a = Mpv.fold f !m a
+end
+
 (** Environment *)
 
 type env = {
   rsm : rsymbol Mstr.t;
   pvm : pvsymbol Mstr.t;
   xsm : xsymbol Mstr.t;
-  old : (pvsymbol Mstr.t * (let_defn * pvsymbol) Hpv.t) Mstr.t;
+  old : (pvsymbol Mstr.t * (let_defn * pvsymbol) MMpv.t) Mstr.t;
   idx : pvsymbol Mpv.t; (* external-to-internal loop indexes *)
   ghs : bool; (* we are under DEghost or in a ghost function *)
   lgh : bool; (* we are under let ghost c = <cexp> *)
@@ -1132,13 +1142,13 @@ let find_old pvm (ovm,old) v =
   let ov = Mstr.find_opt n ovm in
   let pv = Mstr.find_opt n pvm in
   if not (Opt.equal pv_equal ov pv) then v
-  else match Hpv.find_opt old v with
+  else match MMpv.find_opt old v with
     | Some (_,o) -> o
     | None ->
         let e = e_pure (t_var v.pv_vs) in
         let id = id_clone v.pv_vs.vs_name in
         let ld = let_var id ~ghost:true e in
-        Hpv.add old v ld; snd ld
+        MMpv.add old v ld; snd ld
 
 let register_old env l =
   let old = Mstr.find_exn (UnboundLabel l) l env.old in
@@ -1150,7 +1160,7 @@ let get_later env later =
   later pvm env.xsm (register_old env)
 
 let add_label ({pvm = pvm; old = old} as env) l =
-  let ht = Hpv.create 3 in
+  let ht = MMpv.create () in
   { env with old = Mstr.add l (pvm, ht) old }, ht
 
 let rebase_old {pvm = pvm} preold old fvs =
@@ -1159,7 +1169,7 @@ let rebase_old {pvm = pvm} preold old fvs =
       | Some preold ->
           Mvs.add o (t_var (find_old pvm preold v).pv_vs) sbs
       | None -> raise (UnboundLabel old_label) in
-  Hpv.fold rebase old Mvs.empty
+  MMpv.fold rebase old Mvs.empty
 
 let rebase_pre env preold old pl =
   let pl = List.map to_fmla pl in
@@ -1175,7 +1185,7 @@ let rebase_variant env preold old varl =
   List.map conv varl
 
 let get_oldies old =
-  Hpv.fold (fun v (_,o) sbs -> Mpv.add o v sbs) old Mpv.empty
+  MMpv.fold (fun v (_,o) sbs -> Mpv.add o v sbs) old Mpv.empty
 
 let add_rsymbol ({rsm = rsm; pvm = pvm} as env) rs =
   let n = rs.rs_name.id_string in
@@ -1339,12 +1349,12 @@ let get_xs env = function
 type header =
   | LS of let_defn
   | LX of xsymbol
-  | LL of (let_defn * pvsymbol) Hpv.t
+  | LL of (let_defn * pvsymbol) MMpv.t
 
 let put_header e = function
   | LS ld -> e_let_check e ld
   | LX xs -> e_exn xs e
-  | LL ol -> Hpv.fold (fun _ (ld,_) e -> e_let ld e) ol e
+  | LL ol -> MMpv.fold (fun _ (ld,_) e -> e_let ld e) ol e
 
 type let_prefix =
   | LD of header
@@ -1689,7 +1699,7 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
   | DElabel (id,de) ->
       let env, old = add_label env id.pre_name in
       let put _ (ld,_) e = e_let ld e in
-      Hpv.fold put old (expr uloc env de)
+      MMpv.fold put old (expr uloc env de)
   | DEcast _ | DEuloc _ | DEattr _ ->
       assert false (* already stripped *)
 
