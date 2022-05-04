@@ -1299,7 +1299,7 @@ let () =
   ToolBar.add_action Buttons.button_help (fun () ->
       let link_html =
         match !FormatList.selected_format with
-        | "micro-C" -> "help_micro-c.html"
+        | "micro-C" -> "help_micro-C.html"
         | "python"  -> "help_python.html"
         | _         -> "help_whyml.html"
       in
