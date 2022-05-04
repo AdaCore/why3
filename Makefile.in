@@ -405,8 +405,9 @@ endif
 ifeq (@enable_re@,no)
 src/util/re.ml: src/util/recompat.ml Makefile
 	$(CMP_CP)
-GENERATED += src/util/re.ml
+LIBGENERATED += src/util/re.ml
 endif
+GENERATED += src/util/re.ml
 
 # build targets
 
@@ -808,9 +809,10 @@ xml-validate-local:
 # IDE
 ###############
 
-ifeq (@enable_ide@,yes)
-
 IDEGENERATED = src/ide/gtkcompat.ml
+GENERATED += $(IDEGENERATED)
+
+ifeq (@enable_ide@,yes)
 
 IDE_FILES = gtkcompat
 
@@ -879,8 +881,6 @@ else
 src/ide/gtkcompat.ml: src/ide/gtkcompat3.ml Makefile
 	$(CMP_CP)
 endif
-
-GENERATED += $(IDEGENERATED)
 
 endif
 
