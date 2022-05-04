@@ -1,6 +1,6 @@
 # If you modify this file, make sure to update the BUILD_IMAGE variable in .gitlab-ci.yml.
 
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 
 USER root
 
@@ -8,11 +8,8 @@ USER root
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -yq && \
     apt-get upgrade -yq --with-new-pkgs --auto-remove && \
-    apt-get install -yq --no-install-recommends wget libgmp-dev xvfb unzip build-essential autoconf ocaml-nox ca-certificates git xauth graphviz menhir libmenhir-ocaml-dev libzip-ocaml-dev liblablgtksourceview3-ocaml-dev libzarith-ocaml-dev libmpfr-dev python3-sexpdata && \
+    apt-get install -yq --no-install-recommends autoconf build-essential ca-certificates git graphviz libgmp-dev liblablgtksourceview3-ocaml-dev libmenhir-ocaml-dev libmpfr-dev libnum-ocaml-dev libzarith-ocaml-dev libzip-ocaml-dev menhir ocaml-nox opam python3-sexpdata unzip wget xauth xvfb && \
     apt-get clean
-
-RUN wget --quiet https://github.com/ocaml/opam/releases/download/2.0.6/opam-2.0.6-x86_64-linux -O /usr/local/bin/opam && \
-    chmod a+x /usr/local/bin/opam
 
 # install provers
 ## CVC4 1.8
@@ -53,15 +50,15 @@ ENV HOME /home/why3
 WORKDIR /home/why3
 
 # install opam
-ENV OPAM_PACKAGES="num menhir mlmpfr.4.0.2 lablgtk3-sourceview3 zarith camlzip conf-autoconf"
+ENV OPAM_PACKAGES="num menhir mlmpfr.4.1.0+bugfix1 lablgtk3-sourceview3 zarith camlzip conf-autoconf"
 RUN opam init -y --no-setup -j4 --bare --disable-sandboxing && \
-    opam switch create latest ocaml-base-compiler.4.13.1 && \
+    opam switch create latest ocaml-base-compiler.4.14.0 && \
     opam switch create bench  ocaml-base-compiler.4.05.0 && \
     opam switch create full   ocaml-base-compiler.4.08.1 && \
     opam repository add coq-released https://coq.inria.fr/opam/released --all-switches && \
     opam install -y --switch=latest $OPAM_PACKAGES && \
     opam install -y --switch=bench  $OPAM_PACKAGES zenon.0.8.4 coq.8.7.2 && \
-    opam install -y --switch=full   $OPAM_PACKAGES re coq.8.15.0 coq-flocq.4.0.0 js_of_ocaml-ppx alt-ergo.2.3.3 sexplib ppx_deriving ppx_sexp_conv ocamlgraph && \
+    opam install -y --switch=full   $OPAM_PACKAGES re coq.8.15.1 coq-flocq.4.1.0 js_of_ocaml-ppx alt-ergo.2.3.3 sexplib ppx_deriving ppx_sexp_conv ocamlgraph && \
     opam clean -a -c -r -s --logs
 
 USER root
