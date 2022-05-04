@@ -892,14 +892,25 @@ let rec eff_dterm muc denv {term_desc = desc; term_loc = loc} =
   | Ptree.Tquant _ | Ptree.Trecord _ | Ptree.Tupdate _ ->
       Loc.errorm ~loc "unsupported effect expression")
 
+let tick_lemma id =
+  { id with id_str = id.id_str ^ "'lemma" }
+
+let tick_lemma = function
+  | Qident id -> Qident (tick_lemma id)
+  | Qdot (u, id) -> Qdot (u, tick_lemma id)
+
 let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   let expr_app loc e el =
     List.fold_left (fun e1 e2 ->
       DEapp (Dexpr.dexpr ~loc e1, e2)) e el
   in
+  let lsym_or_lemma q pure =
+    try DEls_pure (find_lsymbol muc.muc_theory q, pure)
+    with _ -> DEsym (find_prog_symbol muc (tick_lemma q))
+  in
   let qualid_app loc q el =
     let e = try DEsym (find_prog_symbol muc q) with
-      | _ -> DEls_pure (find_lsymbol muc.muc_theory q, false) in
+      | _ -> lsym_or_lemma q false in
     expr_app loc e el
   in
   let qualid_app loc q el = match q with
@@ -912,7 +923,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   let qualid_app_pure loc q el =
     let e = match find_global_pv muc q with
       | Some v -> DEpv_pure v
-      | None -> DEls_pure (find_lsymbol muc.muc_theory q, true) in
+      | None -> lsym_or_lemma q true in
     expr_app loc e el
   in
   let qualid_app_pure loc q el = match q with
