@@ -562,12 +562,16 @@ fi
 if test -z "$DIR"; then
    MENHIRINCLUDE="-I +menhirLib"
    DIR="$OCAMLLIB/menhirLib"
-   AC_CHECK_FILE($DIR/menhirLib.cmx,,found_menhirlib=no)
+   menhirlib_cmo=
+   AC_CHECK_FILE($DIR/menhirLib.cmo,menhirlib_cmo=yes,)
+   AC_CHECK_FILE($DIR/menhirLib.cma,menhirlib_cmo=no,)
+   if test -z "$menhirlib_cmo"; then found_menhirlib=no; fi
 fi
 AC_CHECK_FILE($DIR/menhirLib.cmi,,found_menhirlib=no)
 if test "$found_menhirlib" = no; then
    AC_MSG_ERROR([Library menhirLib not found.])
 fi
+AC_SUBST(menhirlib_cmo)
 
 # checking for seq
 # (ocamlfind cannot be trusted here, since the default installation path is $OCAMLLIB)
