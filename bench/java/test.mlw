@@ -1,0 +1,19 @@
+
+module A [@java_pkg:p.q]
+
+  use mach.int.Int32
+
+  let add1 (x: int32) : int32 = x + 42
+
+end
+
+module C [@java_pkg:p.q]
+  use mach.int.Int32
+
+  type t = { mutable a: int32; b: int32; }
+
+  let incr (self: t) = self.a <- self.a + 1
+
+  let f [@java:static] (t: t) : int32 = t.b
+
+end

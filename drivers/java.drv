@@ -1,0 +1,89 @@
+(** Java driver *)
+
+printer "java"
+
+module mach.int.Int32
+  syntax type int32  "int"
+  syntax literal int32 "%c"
+
+  syntax val (+)     "%1 + %2"   prec 4 4 3
+  syntax val (-)     "%1 - %2"   prec 4 4 3
+  syntax val (-_)    "-%1"       prec 2 1
+  syntax val ( * )   "%1 * %2"   prec 3 3 2
+  syntax val (/)     "%1 / %2"   prec 3 3 2
+  syntax val (%)     "%1 % %2"   prec 3 3 2
+  syntax val (=)     "%1 == %2"  prec 7 7 6
+  syntax val (<=)    "%1 <= %2"  prec 6 6 5
+  syntax val (<)     "%1 < %2"   prec 6 6 5
+  syntax val (>=)    "%1 >= %2"  prec 6 6 5
+  syntax val (>)     "%1 > %2"   prec 6 6 5
+
+  remove module
+end
+
+(* remove some modules from the standard library *)
+
+module array.Array
+  remove module
+end
+
+module bool.Bool
+  syntax type bool "boolean"
+  remove module
+end
+
+module map.Map
+  remove module
+end
+
+module map.Const
+  remove module
+end
+
+module number.Divisibility
+  remove module
+end
+
+module int.Int
+  remove module
+end
+
+module int.Abs
+  remove module
+end
+
+module int.ComputerDivision
+  remove module
+end
+
+module int.EuclideanDivision
+  remove module
+end
+
+module int.MinMax
+  remove module
+end
+
+module int.Power
+  remove module
+end
+
+module real.Real
+  remove module
+end
+
+module real.ExpLog
+  remove module
+end
+
+module real.RealInfix
+  remove module
+end
+
+module real.Square
+  remove module
+end
+
+module mach.int.Unsigned
+  remove module
+end
