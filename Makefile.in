@@ -151,8 +151,15 @@ CMP_CP = cmp -s $< $@ || cp $< $@
 
 # external libraries common to all binaries
 
+ifeq (@menhirlib_cmo@,yes)
 EXTOBJS = menhirLib
-EXTLIBS = @SEQLIB@ @RELIB@ unix nums dynlink @ZIPLIB@ @WHY3LIB@ @INFERLIB@
+EXTLIBS =
+else
+EXTOBJS =
+EXTLIBS = menhirLib
+endif
+
+EXTLIBS += @SEQLIB@ @RELIB@ unix nums dynlink @ZIPLIB@ @WHY3LIB@ @INFERLIB@
 EXTPKGS = menhirLib @SEQLIB@ @RELIB@ unix num dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
 
 EXTCMA	= $(addsuffix .cmo,$(EXTOBJS)) $(addsuffix .cma,$(EXTLIBS))
