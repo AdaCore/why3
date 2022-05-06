@@ -457,9 +457,11 @@ install-data::
 	$(MKDIR_P) $(DATADIR)/why3/stdlib
 	$(MKDIR_P) $(DATADIR)/why3/stdlib/mach
 	$(MKDIR_P) $(DATADIR)/why3/drivers
+	$(MKDIR_P) $(DATADIR)/why3/extraction_drivers
 	$(INSTALL_DATA) stdlib/*.mlw $(DATADIR)/why3/stdlib
 	$(INSTALL_DATA) stdlib/mach/*.mlw $(DATADIR)/why3/stdlib/mach
 	$(INSTALL_DATA) drivers/*.drv drivers/*.gen $(DATADIR)/why3/drivers
+	$(INSTALL_DATA) extraction_drivers/*.drv $(DATADIR)/why3/extraction_drivers
 	$(INSTALL_DATA) LICENSE $(DATADIR)/why3/
 	$(INSTALL_DATA) share/provers-detection-data.conf $(DATADIR)/why3/
 	$(INSTALL_DATA) share/why3session.dtd $(DATADIR)/why3
@@ -702,13 +704,10 @@ install_local:: bin/why3 $(TOOLS_BIN:%=bin/%.$(SHAREDBEST))
 bin/%:	bin/%.@OCAMLBEST@
 	ln -sf $(notdir $<) $@
 
-install_local:: share/drivers share/stdlib
+install_local:: share/drivers share/extraction_drivers share/stdlib
 
-share/drivers:
-	ln -snf ../drivers share/drivers
-
-share/stdlib:
-	ln -snf ../stdlib share/stdlib
+share/drivers share/extraction_drivers share/stdlib: share/%:
+	ln -snf ../$* $@
 
 MAKEINC += $(TOOLSDEP)
 
