@@ -1161,6 +1161,13 @@ let _ =
       | k when k = GdkKeysyms._Escape ->
         goals_view#misc#grab_focus ();
         true
+      | k when k = GdkKeysyms._Tab ->
+          begin match command_entry#selection with
+          | Some (_, e) ->
+              command_entry#set_position e;
+              true
+          | _ -> false
+          end
       | _ -> false
       )
 
@@ -2350,6 +2357,7 @@ let init_completion provers transformations strategies commands =
   command_entry_completion#add_attribute name_renderer "text" completion_desc;
 
   command_entry_completion#set_match_func match_function;
+  command_entry_completion#misc#set_property "inline_completion" (`BOOL true);
 
   command_entry#set_completion command_entry_completion
 
