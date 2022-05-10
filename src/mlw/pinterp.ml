@@ -122,6 +122,8 @@ type _ vtype =
   | VTstring : string vtype
   | VTunit : unit vtype
   | VTany : value vtype
+  | VTarray : value array vtype
+  | VTint : int vtype
   | VTfun : ('a vtype * 'b vtype) -> ('a -> 'b) vtype
 
 let get_arg : type t. t vtype -> _ -> _ -> t = fun t rs v ->
@@ -131,6 +133,8 @@ let get_arg : type t. t vtype -> _ -> _ -> t = fun t rs v ->
   | VTstring, Vstring x -> x
   | VTunit, _ -> ()
   | VTany, _ -> v
+  | VTarray, Varray v -> v
+  | VTint, Vnum x -> BigInt.to_int x
   | _, Vundefined ->
       incomplete "an undefined argument was passed to builtin %a"
         Ident.print_decoded rs.rs_name.id_string
@@ -143,6 +147,7 @@ let rec eval : type t. t vtype -> t -> _ -> _ list -> _ = fun t f rs l ->
   | VTstring -> string_value f
   | VTunit -> unit_value
   | VTany -> f
+  | VTint -> range_value rs.rs_cty.cty_result (BigInt.of_int f)
   | VTfun (i,o) ->
       begin match l with
       | x::l -> eval o (f (get_arg i rs x)) rs l
@@ -155,6 +160,8 @@ let eval t f rs l =
     eval t f rs l
   with
   | Division_by_zero -> incomplete "division by zero"
+  | Failure "int_of_big_int" -> incomplete "index is out of bounds"
+  | Invalid_argument "index out of bounds" -> incomplete "index is out of bounds"
 
 let (^->) a b = VTfun (a, b)
 
@@ -375,38 +382,17 @@ let built_in_modules () =
       "log",           eval_real Mode1r Big_real.log;
     ];
     builtin1t ["array"] "Array" ("array", dummy_type) (fun ts -> [
-      "make", (fun _ args -> match args with
-          | [{v_desc= Vnum n}; def] -> (
+      "make", eval (VTint ^-> VTany ^-> VTany) (fun n def ->
               try
-                let n = BigInt.to_int n in
                 let ty = ty_app ts [def.v_ty] in
                 value ty (Varray (Array.make n def))
-              with e -> incomplete "array could not be made: %a" Exn_printer.exn_printer e )
-          | _ -> assert false);
-      "empty", (fun _ args -> match args with
-          | [{v_desc= Vconstr(_, _, [])}] ->
-              (* we know by typing that the constructor
-                  will be the Tuple0 constructor *)
+              with e -> incomplete "array could not be made: %a" Exn_printer.exn_printer e);
+      "empty", eval (VTunit ^-> VTany) (fun () ->
               let ty = ty_app ts [ty_var (tv_of_string "a")] in
-              value ty (Varray [||])
-          | _ -> assert false);
-      "length", (fun _ args -> match args with
-          | [{v_desc= Varray a}] ->
-              value ty_int (Vnum (BigInt.of_int (Array.length a)))
-          | _ -> assert false) ;
-      op_get "", (fun _ args -> match args with
-          | [{v_desc= Varray a}; {v_desc= Vnum i}] -> (
-              try a.(BigInt.to_int i) with e ->
-                incomplete "array element could not be retrieved: %a" Exn_printer.exn_printer e )
-          | _ -> assert false);
-      op_set "", (fun _ args -> match args with
-          | [{v_desc= Varray a}; {v_desc= Vnum i}; v] -> (
-              try
-                a.(BigInt.to_int i) <- v;
-                unit_value
-              with e ->
-                incomplete "array element could not be set: %a" Exn_printer.exn_printer e )
-          | _ -> assert false) ;
+              value ty (Varray [||]));
+      "length", eval (VTarray ^-> VTint) (fun a -> Array.length a);
+      op_get "", eval (VTarray ^-> VTint ^-> VTany) (fun a i -> a.(i));
+      op_set "", eval (VTarray ^-> VTint ^-> VTany ^-> VTunit) (fun a i v -> a.(i) <- v);
         ]);
     float_module 32 ~prec:24 "Float32";
     float_module 64 ~prec:53 "Float64";
