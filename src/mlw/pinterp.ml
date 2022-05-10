@@ -118,6 +118,7 @@ let add_local_funs locals rdl ctx =
 
 type _ vtype =
   | VTnum : BigInt.t vtype
+  | VTfloat : big_float vtype
   | VTreal : Big_real.real vtype
   | VTbool : bool vtype
   | VTstring : string vtype
@@ -131,6 +132,7 @@ type _ vtype =
 let get_arg : type t. t vtype -> _ -> _ -> t = fun t rs v ->
   match t, v.v_desc with
   | VTnum, Vnum x -> x
+  | VTfloat, Vfloat x -> x
   | VTreal, Vreal x -> x
   | VTbool, Vbool x -> x
   | VTstring, Vstring x -> x
@@ -201,8 +203,6 @@ type 'a float_arity =
   | Mode3
       : (float_mode -> big_float -> big_float -> big_float -> big_float)
         float_arity (* ternary op *)
-  | Mode_rel : (big_float -> big_float -> bool) float_arity (* binary predicates *)
-  | Mode_rel1 : (big_float -> bool) float_arity
 
 let use_float_format (float_format : int) =
   match float_format with
@@ -226,10 +226,6 @@ let eval_float :
         float_value ity_result (subnormalize ~rnd:mode (op mode f1 f2))
     | Mode3, [Vfloat_mode mode; Vfloat f1; Vfloat f2; Vfloat f3] ->
         float_value ity_result (subnormalize ~rnd:mode (op mode f1 f2 f3))
-    | Mode_rel, [Vfloat f1; Vfloat f2] ->
-        bool_value (op f1 f2)
-    | Mode_rel1, [Vfloat f] ->
-        bool_value (op f)
     | _ -> incomplete "arity error in float operation"
   with Mlmpfr_wrapper.Not_Implemented ->
     incomplete "mlmpfr wrapper is not implemented"
@@ -305,14 +301,14 @@ let built_in_modules () =
     (* Intentionnally removed from programs
        "min",          eval_float_minmax min;
        "max",          eval_float_minmax max; *)
-    "le",              eval_float ts_bool tyb Mode_rel lessequal_p;
-    "lt",              eval_float ts_bool tyb Mode_rel less_p;
-    "eq",              eval_float ts_bool tyb Mode_rel equal_p;
-    "is_zero",         eval_float ts_bool tyb Mode_rel1 zero_p;
-    "is_infinite",     eval_float ts_bool tyb Mode_rel1 inf_p;
-    "is_nan",          eval_float ts_bool tyb Mode_rel1 nan_p;
-    "is_positive",     eval_float ts_bool tyb Mode_rel1 (fun s -> signbit s = Positive);
-    "is_negative",     eval_float ts_bool tyb Mode_rel1 (fun s -> signbit s = Negative);
+    "le",              eval (VTfloat ^-> VTfloat ^-> VTbool) lessequal_p;
+    "lt",              eval (VTfloat ^-> VTfloat ^-> VTbool) less_p;
+    "eq",              eval (VTfloat ^-> VTfloat ^-> VTbool) equal_p;
+    "is_zero",         eval (VTfloat ^-> VTbool) zero_p;
+    "is_infinite",     eval (VTfloat ^-> VTbool) inf_p;
+    "is_nan",          eval (VTfloat ^-> VTbool) nan_p;
+    "is_positive",     eval (VTfloat ^-> VTbool) (fun s -> signbit s = Positive);
+    "is_negative",     eval (VTfloat ^-> VTbool) (fun s -> signbit s = Negative);
   ]) in
   [
     builtin ["bool"] "Bool" [
