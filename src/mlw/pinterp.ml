@@ -119,12 +119,18 @@ let add_local_funs locals rdl ctx =
 type _ vtype =
   | VTnum : BigInt.t vtype
   | VTbool : bool vtype
+  | VTstring : string vtype
+  | VTunit : unit vtype
+  | VTany : value vtype
   | VTfun : ('a vtype * 'b vtype) -> ('a -> 'b) vtype
 
 let get_arg : type t. t vtype -> _ -> _ -> t = fun t rs v ->
   match t, v.v_desc with
   | VTnum, Vnum x -> x
   | VTbool, Vbool x -> x
+  | VTstring, Vstring x -> x
+  | VTunit, _ -> ()
+  | VTany, _ -> v
   | _, Vundefined ->
       incomplete "an undefined argument was passed to builtin %a"
         Ident.print_decoded rs.rs_name.id_string
@@ -134,6 +140,9 @@ let rec eval : type t. t vtype -> t -> _ -> _ list -> _ = fun t f rs l ->
   match t with
   | VTnum -> range_value rs.rs_cty.cty_result f
   | VTbool -> bool_value f
+  | VTstring -> string_value f
+  | VTunit -> unit_value
+  | VTany -> f
   | VTfun (i,o) ->
       begin match l with
       | x::l -> eval o (f (get_arg i rs x)) rs l
@@ -233,27 +242,17 @@ let eval_real : type a. a real_arity -> a -> rsymbol -> value list -> value =
   | Mlmpfr_wrapper.Not_Implemented ->
       incomplete "mlmpfr wrapper is not implemented"
 
-let io_print_newline _ _ =
-  print_newline ();
-  unit_value
+let io_print_newline =
+  eval (VTunit ^-> VTunit) print_newline
 
-let io_print_int _ = function
-  | [{ v_desc = Vnum n }] ->
-      print_string (BigInt.to_string n);
-      unit_value
-  | _ -> assert false
+let io_print_int =
+  eval (VTnum ^-> VTunit) (fun n -> print_string (BigInt.to_string n))
 
-let io_print_string _ = function
-  | [{ v_desc = Vstring s }] ->
-      print_string s;
-      unit_value
-  | _ -> assert false
+let io_print_string =
+  eval (VTstring ^-> VTunit) print_string
 
-let debug_print _ = function
-  | [v] ->
-      Format.eprintf "%a\n@?" print_value v;
-      unit_value
-  | _ -> assert false
+let debug_print =
+  eval (VTany ^-> VTunit) (fun v -> Format.eprintf "%a\n@?" print_value v)
 
 let builtin_progs = Hrs.create 17
 
