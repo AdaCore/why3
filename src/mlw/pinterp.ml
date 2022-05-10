@@ -119,6 +119,7 @@ let add_local_funs locals rdl ctx =
 type _ vtype =
   | VTnum : BigInt.t vtype
   | VTfloat : big_float vtype
+  | VTrnd : Mlmpfr_wrapper.mpfr_rnd_t vtype
   | VTreal : Big_real.real vtype
   | VTbool : bool vtype
   | VTstring : string vtype
@@ -133,6 +134,7 @@ let get_arg : type t. t vtype -> _ -> _ -> t = fun t rs v ->
   match t, v.v_desc with
   | VTnum, Vnum x -> x
   | VTfloat, Vfloat x -> x
+  | VTrnd, Vfloat_mode m -> m
   | VTreal, Vreal x -> x
   | VTbool, Vbool x -> x
   | VTstring, Vstring x -> x
@@ -148,6 +150,7 @@ let get_arg : type t. t vtype -> _ -> _ -> t = fun t rs v ->
 let rec eval : type t. t vtype -> t -> _ -> _ list -> _ = fun t f rs l ->
   match t with
   | VTnum -> range_value rs.rs_cty.cty_result f
+  | VTfloat -> value ty_unit (Vfloat f) (* dummy type *)
   | VTreal -> real_value f
   | VTbool -> bool_value f
   | VTstring -> string_value f
@@ -197,38 +200,20 @@ let initialize_float64 () =
   let open Mlmpfr_wrapper in
   set_default_prec 53 ; set_emin (-1073) ; set_emax 1024
 
-type 'a float_arity =
-  | Mode1 : (float_mode -> big_float -> big_float) float_arity (* Unary op *)
-  | Mode2 : (float_mode -> big_float -> big_float -> big_float) float_arity (* binary op *)
-  | Mode3
-      : (float_mode -> big_float -> big_float -> big_float -> big_float)
-        float_arity (* ternary op *)
-
 let use_float_format (float_format : int) =
   match float_format with
   | 32 -> initialize_float32 ()
   | 64 -> initialize_float64 ()
   | _ -> incomplete "float format is unknown: %d" float_format
 
-let eval_float :
-  type a. tysymbol -> int -> a float_arity -> a -> rsymbol -> value list -> value =
-  fun tys_result float_format arity op _ vs ->
-  (* Set the exponent depending on Float type that are used: 32 or 64 *)
+let eval_float tys_result float_format arity op rs l =
   let ity_result = ity_of_ty (ty_app tys_result []) in
   use_float_format float_format ;
-  try
-    let open Mlmpfr_wrapper in
-    match arity, List.map v_desc vs with
-    | Mode1, [Vfloat_mode mode; Vfloat f] ->
-        (* Subnormalize used to simulate IEEE behavior *)
-        float_value ity_result (subnormalize ~rnd:mode (op mode f))
-    | Mode2, [Vfloat_mode mode; Vfloat f1; Vfloat f2] ->
-        float_value ity_result (subnormalize ~rnd:mode (op mode f1 f2))
-    | Mode3, [Vfloat_mode mode; Vfloat f1; Vfloat f2; Vfloat f3] ->
-        float_value ity_result (subnormalize ~rnd:mode (op mode f1 f2 f3))
-    | _ -> incomplete "arity error in float operation"
-  with Mlmpfr_wrapper.Not_Implemented ->
-    incomplete "mlmpfr wrapper is not implemented"
+  let mode = ref Mlmpfr_wrapper.To_Nearest in
+  let f = eval (VTrnd ^-> arity) (fun m -> mode := m; op m) rs l in
+  match v_desc f with
+  | Vfloat f -> float_value ity_result (Mlmpfr_wrapper.subnormalize ~rnd:!mode f)
+  | _ -> assert false
 
 let io_print_newline =
   eval (VTunit ^-> VTunit) print_newline
@@ -289,15 +274,15 @@ let built_in_modules () =
   let open Mlmpfr_wrapper in
   let float_module tyb ~prec m = builtin1t ["ieee_float"] m ("t", dummy_type) (fun ts -> [
     "zeroF",           (fun _ _ -> value (ty_app ts []) (Vfloat (make_zero ~prec Positive)));
-    "add",             eval_float ts tyb Mode2 (fun rnd -> add ~rnd ~prec);
-    "sub",             eval_float ts tyb Mode2 (fun rnd -> sub ~rnd ~prec);
-    "mul",             eval_float ts tyb Mode2 (fun rnd -> mul ~rnd ~prec);
-    "div",             eval_float ts tyb Mode2 (fun rnd -> div ~rnd ~prec);
-    "abs",             eval_float ts tyb Mode1 (fun rnd -> abs ~rnd ~prec);
-    "neg",             eval_float ts tyb Mode1 (fun rnd -> neg ~rnd ~prec);
-    "fma",             eval_float ts tyb Mode3 (fun rnd -> fma ~rnd ~prec);
-    "sqrt",            eval_float ts tyb Mode1 (fun rnd -> sqrt ~rnd ~prec);
-    "roundToIntegral", eval_float ts tyb Mode1 (fun rnd -> rint ~rnd ~prec);
+    "add",             eval_float ts tyb (VTfloat ^-> VTfloat ^-> VTfloat) (fun rnd -> add ~rnd ~prec);
+    "sub",             eval_float ts tyb (VTfloat ^-> VTfloat ^-> VTfloat) (fun rnd -> sub ~rnd ~prec);
+    "mul",             eval_float ts tyb (VTfloat ^-> VTfloat ^-> VTfloat) (fun rnd -> mul ~rnd ~prec);
+    "div",             eval_float ts tyb (VTfloat ^-> VTfloat ^-> VTfloat) (fun rnd -> div ~rnd ~prec);
+    "abs",             eval_float ts tyb (VTfloat ^-> VTfloat) (fun rnd -> abs ~rnd ~prec);
+    "neg",             eval_float ts tyb (VTfloat ^-> VTfloat) (fun rnd -> neg ~rnd ~prec);
+    "fma",             eval_float ts tyb (VTfloat ^-> VTfloat ^-> VTfloat ^-> VTfloat) (fun rnd -> fma ~rnd ~prec);
+    "sqrt",            eval_float ts tyb (VTfloat ^-> VTfloat) (fun rnd -> sqrt ~rnd ~prec);
+    "roundToIntegral", eval_float ts tyb (VTfloat ^-> VTfloat) (fun rnd -> rint ~rnd ~prec);
     (* Intentionnally removed from programs
        "min",          eval_float_minmax min;
        "max",          eval_float_minmax max; *)
