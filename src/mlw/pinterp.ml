@@ -118,6 +118,7 @@ let add_local_funs locals rdl ctx =
 
 type _ vtype =
   | VTnum : BigInt.t vtype
+  | VTreal : Big_real.real vtype
   | VTbool : bool vtype
   | VTstring : string vtype
   | VTunit : unit vtype
@@ -125,10 +126,12 @@ type _ vtype =
   | VTarray : value array vtype
   | VTint : int vtype
   | VTfun : ('a vtype * 'b vtype) -> ('a -> 'b) vtype
+  | VTlazy : 'a vtype -> (unit -> 'a) vtype
 
 let get_arg : type t. t vtype -> _ -> _ -> t = fun t rs v ->
   match t, v.v_desc with
   | VTnum, Vnum x -> x
+  | VTreal, Vreal x -> x
   | VTbool, Vbool x -> x
   | VTstring, Vstring x -> x
   | VTunit, _ -> ()
@@ -143,6 +146,7 @@ let get_arg : type t. t vtype -> _ -> _ -> t = fun t rs v ->
 let rec eval : type t. t vtype -> t -> _ -> _ list -> _ = fun t f rs l ->
   match t with
   | VTnum -> range_value rs.rs_cty.cty_result f
+  | VTreal -> real_value f
   | VTbool -> bool_value f
   | VTstring -> string_value f
   | VTunit -> unit_value
@@ -153,6 +157,7 @@ let rec eval : type t. t vtype -> t -> _ -> _ list -> _ = fun t f rs l ->
       | x::l -> eval o (f (get_arg i rs x)) rs l
       | _ -> assert false
       end
+  | VTlazy o -> eval o (f ()) rs l
   | _ -> assert false
 
 let eval t f rs l =
@@ -162,6 +167,8 @@ let eval t f rs l =
   | Division_by_zero -> incomplete "division by zero"
   | Failure "int_of_big_int" -> incomplete "index is out of bounds"
   | Invalid_argument "index out of bounds" -> incomplete "index is out of bounds"
+  | Big_real.Undetermined -> incomplete "computation on real numbers is undetermined"
+  | Mlmpfr_wrapper.Not_Implemented -> incomplete "mlmpfr not available"
 
 let (^->) a b = VTfun (a, b)
 
@@ -226,28 +233,6 @@ let eval_float :
     | _ -> incomplete "arity error in float operation"
   with Mlmpfr_wrapper.Not_Implemented ->
     incomplete "mlmpfr wrapper is not implemented"
-
-type 'a real_arity =
-  | Modeconst : (unit -> Big_real.real) real_arity
-  | Mode1r : (Big_real.real -> Big_real.real) real_arity
-  | Mode2r : (Big_real.real -> Big_real.real -> Big_real.real) real_arity
-  | Mode_relr : (Big_real.real -> Big_real.real -> bool) real_arity
-
-let eval_real : type a. a real_arity -> a -> rsymbol -> value list -> value =
-  fun ty op _ l ->
-  try
-    match ty, List.map v_desc l with
-    | Mode1r, [Vreal r] -> real_value (op r)
-    | Mode2r, [Vreal r1; Vreal r2] -> real_value (op r1 r2)
-    | Mode_relr, [Vreal r1; Vreal r2] -> bool_value (op r1 r2)
-    | Modeconst, [] -> real_value (op ())
-    | _ -> incomplete "arity error in real operation"
-  with
-  | Big_real.Undetermined ->
-      (* Cannot decide interval comparison *)
-      incomplete "computation on reals is undetermined"
-  | Mlmpfr_wrapper.Not_Implemented ->
-      incomplete "mlmpfr wrapper is not implemented"
 
 let io_print_newline =
   eval (VTunit ^-> VTunit) print_newline
@@ -363,23 +348,23 @@ let built_in_modules () =
         "print_string", io_print_string;
       ];
     builtin ["real"] "Real" [
-      op_infix "=",    eval_real Mode_relr Big_real.eq;
-      op_infix "<",    eval_real Mode_relr Big_real.lt;
-      op_infix "<=",   eval_real Mode_relr Big_real.le;
-      op_prefix "-",   eval_real Mode1r Big_real.neg;
-      op_infix "+",    eval_real Mode2r Big_real.add;
-      op_infix "*",    eval_real Mode2r Big_real.mul;
-      op_infix "/",    eval_real Mode2r Big_real.div
+      op_infix "=",  eval (VTreal ^-> VTreal ^-> VTbool) Big_real.eq;
+      op_infix "<",  eval (VTreal ^-> VTreal ^-> VTbool) Big_real.lt;
+      op_infix "<=", eval (VTreal ^-> VTreal ^-> VTbool) Big_real.le;
+      op_prefix "-", eval (VTreal ^-> VTreal) Big_real.neg;
+      op_infix "+",  eval (VTreal ^-> VTreal ^-> VTreal) Big_real.add;
+      op_infix "*",  eval (VTreal ^-> VTreal ^-> VTreal) Big_real.mul;
+      op_infix "/",  eval (VTreal ^-> VTreal ^-> VTreal) Big_real.div
     ];
     builtin ["real"] "Square" [
-      "sqrt",          eval_real Mode1r Big_real.sqrt
+      "sqrt",        eval (VTreal ^-> VTreal) Big_real.sqrt
     ];
     builtin ["real"] "Trigonometry" [
-      "pi",            eval_real Modeconst Big_real.pi
+      "pi",          eval (VTlazy VTreal) Big_real.pi
     ];
     builtin ["real"] "ExpLog" [
-      "exp",           eval_real Mode1r Big_real.exp;
-      "log",           eval_real Mode1r Big_real.log;
+      "exp",         eval (VTreal ^-> VTreal) Big_real.exp;
+      "log",         eval (VTreal ^-> VTreal) Big_real.log;
     ];
     builtin1t ["array"] "Array" ("array", dummy_type) (fun ts -> [
       "make", eval (VTint ^-> VTany ^-> VTany) (fun n def ->
