@@ -116,27 +116,51 @@ let add_local_funs locals rdl ctx =
 (*                                BUILTINS                                    *)
 (******************************************************************************)
 
+type _ vtype =
+  | VTnum : BigInt.t vtype
+  | VTbool : bool vtype
+  | VTfun : ('a vtype * 'b vtype) -> ('a -> 'b) vtype
+
+let get_arg : type t. t vtype -> _ -> _ -> t = fun t rs v ->
+  match t, v.v_desc with
+  | VTnum, Vnum x -> x
+  | VTbool, Vbool x -> x
+  | _, Vundefined ->
+      incomplete "an undefined argument was passed to builtin %a"
+        Ident.print_decoded rs.rs_name.id_string
+  | _ -> assert false
+
+let rec eval : type t. t vtype -> t -> _ -> _ list -> _ = fun t f rs l ->
+  match t with
+  | VTnum -> range_value rs.rs_cty.cty_result f
+  | VTbool -> bool_value f
+  | VTfun (i,o) ->
+      begin match l with
+      | x::l -> eval o (f (get_arg i rs x)) rs l
+      | _ -> assert false
+      end
+  | _ -> assert false
+
+let eval t f rs l =
+  try
+    eval t f rs l
+  with
+  | Division_by_zero -> incomplete "division by zero"
+
+let (^->) a b = VTfun (a, b)
+
 let big_int_of_const i = i.Number.il_int
 let big_int_of_value v =
   match v_desc v with Vnum i -> i | _ -> raise NotNum
 
 let eval_int_op op ls l =
-  match List.map v_desc l with
-  | [Vnum i1; Vnum i2] -> (
-      match op i1 i2 with
-      | exception Division_by_zero -> incomplete "division by zero"
-      | v -> range_value ls.rs_cty.cty_result v)
-  | _ -> assert false
+  eval (VTnum ^-> VTnum ^-> VTnum) op ls l
 
 let eval_int_uop op ls l =
-  match List.map v_desc l with
-  | [Vnum i1] -> num_value ls.rs_cty.cty_result (op i1)
-  | _ -> assert false
+  eval (VTnum ^-> VTnum) op ls l
 
-let eval_int_rel op _ l =
-  match List.map v_desc l with
-    | [Vnum i1; Vnum i2] -> bool_value (op i1 i2)
-    | _ -> assert false
+let eval_int_rel op ls l =
+  eval (VTnum ^-> VTnum ^-> VTbool) op ls l
 
 (* This initialize Mpfr for float32 behavior *)
 let initialize_float32 () =
