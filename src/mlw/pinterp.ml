@@ -124,19 +124,18 @@ let eval_int_op op ls l =
   match List.map v_desc l with
   | [Vnum i1; Vnum i2] -> (
       match op i1 i2 with
-      | exception Division_by_zero -> None
+      | exception Division_by_zero -> incomplete "division by zero"
       | v -> range_value ls.rs_cty.cty_result v)
   | _ -> assert false
 
 let eval_int_uop op ls l =
   match List.map v_desc l with
-  | [Vnum i1] ->
-      Some (num_value ls.rs_cty.cty_result (op i1))
+  | [Vnum i1] -> num_value ls.rs_cty.cty_result (op i1)
   | _ -> assert false
 
 let eval_int_rel op _ l =
   match List.map v_desc l with
-    | [Vnum i1; Vnum i2] -> Some (bool_value (op i1 i2))
+    | [Vnum i1; Vnum i2] -> bool_value (op i1 i2)
     | _ -> assert false
 
 (* This initialize Mpfr for float32 behavior *)
@@ -165,7 +164,7 @@ let use_float_format (float_format : int) =
   | _ -> incomplete "float format is unknown: %d" float_format
 
 let eval_float :
-  type a. tysymbol -> int -> a float_arity -> a -> rsymbol -> value list -> value option =
+  type a. tysymbol -> int -> a float_arity -> a -> rsymbol -> value list -> value =
   fun tys_result float_format arity op _ vs ->
   (* Set the exponent depending on Float type that are used: 32 or 64 *)
   let ity_result = ity_of_ty (ty_app tys_result []) in
@@ -175,15 +174,15 @@ let eval_float :
     match arity, List.map v_desc vs with
     | Mode1, [Vfloat_mode mode; Vfloat f] ->
         (* Subnormalize used to simulate IEEE behavior *)
-        Some (float_value ity_result (subnormalize ~rnd:mode (op mode f)))
+        float_value ity_result (subnormalize ~rnd:mode (op mode f))
     | Mode2, [Vfloat_mode mode; Vfloat f1; Vfloat f2] ->
-        Some (float_value ity_result (subnormalize ~rnd:mode (op mode f1 f2)))
+        float_value ity_result (subnormalize ~rnd:mode (op mode f1 f2))
     | Mode3, [Vfloat_mode mode; Vfloat f1; Vfloat f2; Vfloat f3] ->
-        Some (float_value ity_result (subnormalize ~rnd:mode (op mode f1 f2 f3)))
+        float_value ity_result (subnormalize ~rnd:mode (op mode f1 f2 f3))
     | Mode_rel, [Vfloat f1; Vfloat f2] ->
-        Some (bool_value (op f1 f2))
+        bool_value (op f1 f2)
     | Mode_rel1, [Vfloat f] ->
-        Some (bool_value (op f))
+        bool_value (op f)
     | _ -> incomplete "arity error in float operation"
   with Mlmpfr_wrapper.Not_Implemented ->
     incomplete "mlmpfr wrapper is not implemented"
@@ -194,14 +193,14 @@ type 'a real_arity =
   | Mode2r : (Big_real.real -> Big_real.real -> Big_real.real) real_arity
   | Mode_relr : (Big_real.real -> Big_real.real -> bool) real_arity
 
-let eval_real : type a. a real_arity -> a -> rsymbol -> value list -> value option =
+let eval_real : type a. a real_arity -> a -> rsymbol -> value list -> value =
   fun ty op _ l ->
   try
     match ty, List.map v_desc l with
-    | Mode1r, [Vreal r] -> Some (real_value (op r))
-    | Mode2r, [Vreal r1; Vreal r2] -> Some (real_value (op r1 r2))
-    | Mode_relr, [Vreal r1; Vreal r2] -> Some (bool_value (op r1 r2))
-    | Modeconst, [] -> Some (real_value (op ()))
+    | Mode1r, [Vreal r] -> real_value (op r)
+    | Mode2r, [Vreal r1; Vreal r2] -> real_value (op r1 r2)
+    | Mode_relr, [Vreal r1; Vreal r2] -> bool_value (op r1 r2)
+    | Modeconst, [] -> real_value (op ())
     | _ -> incomplete "arity error in real operation"
   with
   | Big_real.Undetermined ->
@@ -212,24 +211,24 @@ let eval_real : type a. a real_arity -> a -> rsymbol -> value list -> value opti
 
 let io_print_newline _ _ =
   print_newline ();
-  Some unit_value
+  unit_value
 
 let io_print_int _ = function
   | [{ v_desc = Vnum n }] ->
       print_string (BigInt.to_string n);
-      Some unit_value
+      unit_value
   | _ -> assert false
 
 let io_print_string _ = function
   | [{ v_desc = Vstring s }] ->
       print_string s;
-      Some unit_value
+      unit_value
   | _ -> assert false
 
 let debug_print _ = function
   | [v] ->
       Format.eprintf "%a\n@?" print_value v;
-      Some unit_value
+      unit_value
   | _ -> assert false
 
 let builtin_progs = Hrs.create 17
@@ -238,7 +237,7 @@ type builtin = Builtin_module of {
   path: string list;
   name: string;
   types: (string * (Pdecl.known_map -> itysymbol -> unit)) list;
-  values: Pmodule.pmodule -> (string * (rsymbol -> value list -> value option)) list;
+  values: Pmodule.pmodule -> (string * (rsymbol -> value list -> value)) list;
 }
 
 let dummy_type (_:Pdecl.known_map) (_:itysymbol) = ()
@@ -278,7 +277,7 @@ let built_in_modules () =
   ] in
   let open Mlmpfr_wrapper in
   let float_module tyb ~prec m = builtin1t ["ieee_float"] m ("t", dummy_type) (fun ts -> [
-    "zeroF",           (fun _ _ -> Some (value (ty_app ts []) (Vfloat (make_zero ~prec Positive))));
+    "zeroF",           (fun _ _ -> value (ty_app ts []) (Vfloat (make_zero ~prec Positive)));
     "add",             eval_float ts tyb Mode2 (fun rnd -> add ~rnd ~prec);
     "sub",             eval_float ts tyb Mode2 (fun rnd -> sub ~rnd ~prec);
     "mul",             eval_float ts tyb Mode2 (fun rnd -> mul ~rnd ~prec);
@@ -302,8 +301,8 @@ let built_in_modules () =
   ]) in
   [
     builtin ["bool"] "Bool" [
-      "True",          (fun _ _ -> Some (bool_value true));
-      "False",         (fun _ _ -> Some (bool_value false));
+      "True",          (fun _ _ -> bool_value true);
+      "False",         (fun _ _ -> bool_value false);
     ];
     builtin ["debug"] "Debug" [
         "print", debug_print
@@ -322,11 +321,11 @@ let built_in_modules () =
       "mod",           eval_int_op BigInt.euclidean_mod
     ];
     builtin1t ["ieee_float"] "RoundingMode" ("mode", dummy_type) (fun ts -> [
-      "RNE",           (fun _ _ -> Some (value (ty_app ts []) (Vfloat_mode To_Nearest)));
-      "RNA",           (fun _ _ -> Some (value (ty_app ts []) (Vfloat_mode Away_From_Zero)));
-      "RTP",           (fun _ _ -> Some (value (ty_app ts []) (Vfloat_mode Toward_Plus_Infinity)));
-      "RTN",           (fun _ _ -> Some (value (ty_app ts []) (Vfloat_mode Toward_Minus_Infinity)));
-      "RTZ",           (fun _ _ -> Some (value (ty_app ts []) (Vfloat_mode Toward_Zero)));
+      "RNE",           (fun _ _ -> value (ty_app ts []) (Vfloat_mode To_Nearest));
+      "RNA",           (fun _ _ -> value (ty_app ts []) (Vfloat_mode Away_From_Zero));
+      "RTP",           (fun _ _ -> value (ty_app ts []) (Vfloat_mode Toward_Plus_Infinity));
+      "RTN",           (fun _ _ -> value (ty_app ts []) (Vfloat_mode Toward_Minus_Infinity));
+      "RTZ",           (fun _ _ -> value (ty_app ts []) (Vfloat_mode Toward_Zero));
     ]);
     builtin ["io"] "StdIO" [
         "print_int", io_print_int;
@@ -358,7 +357,7 @@ let built_in_modules () =
               try
                 let n = BigInt.to_int n in
                 let ty = ty_app ts [def.v_ty] in
-                Some (value ty (Varray (Array.make n def)))
+                value ty (Varray (Array.make n def))
               with e -> incomplete "array could not be made: %a" Exn_printer.exn_printer e )
           | _ -> assert false);
       "empty", (fun _ args -> match args with
@@ -366,22 +365,22 @@ let built_in_modules () =
               (* we know by typing that the constructor
                   will be the Tuple0 constructor *)
               let ty = ty_app ts [ty_var (tv_of_string "a")] in
-              Some (value ty (Varray [||]))
+              value ty (Varray [||])
           | _ -> assert false);
       "length", (fun _ args -> match args with
           | [{v_desc= Varray a}] ->
-              Some (value ty_int (Vnum (BigInt.of_int (Array.length a))))
+              value ty_int (Vnum (BigInt.of_int (Array.length a)))
           | _ -> assert false) ;
       op_get "", (fun _ args -> match args with
           | [{v_desc= Varray a}; {v_desc= Vnum i}] -> (
-              try Some a.(BigInt.to_int i) with e ->
+              try a.(BigInt.to_int i) with e ->
                 incomplete "array element could not be retrieved: %a" Exn_printer.exn_printer e )
           | _ -> assert false);
       op_set "", (fun _ args -> match args with
           | [{v_desc= Varray a}; {v_desc= Vnum i}; v] -> (
               try
                 a.(BigInt.to_int i) <- v;
-                Some unit_value
+                unit_value
               with e ->
                 incomplete "array element could not be set: %a" Exn_printer.exn_printer e )
           | _ -> assert false) ;
@@ -420,7 +419,7 @@ let get_builtin_progs env =
 (******************************************************************************)
 
 type routine_defn =
-  | Builtin of (rsymbol -> value list -> value option)
+  | Builtin of (rsymbol -> value list -> value)
   | LocalFunction of (rsymbol * cexp) list * (cexp * rec_defn list option)
   | Constructor of Pdecl.its_defn
   | Projection of Pdecl.its_defn
@@ -1007,10 +1006,7 @@ and exec_expr' ctx e =
             match find_definition ctx.env rs with
             | Builtin f ->
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;
-                ( match f rs [] with
-                  | Some v -> v
-                  | None -> incomplete "cannot compute result of builtin `%a`"
-                              Ident.print_decoded rs.rs_name.id_string )
+                f rs []
             | _ -> Lazy.force (Mrs.find rs ctx.env.rsenv) in
           if ctx.do_rac then (
             let desc = asprintf "of `%a`" print_rs rs in
@@ -1464,10 +1460,7 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
             | Builtin f ->
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;
                 check_pre_and_register_call Log.Exec_normal;
-                ( match f rs arg_vs with
-                  | Some v -> Normal v
-                  | None -> incomplete "cannot compute result of builtin `%a`"
-                              Ident.print_decoded rs.rs_name.id_string )
+                Normal (f rs arg_vs)
             | Constructor its_def ->
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: CONSTRUCTOR@]@." pp_indent print_rs rs;
                 check_pre_and_register_call Log.Exec_normal;

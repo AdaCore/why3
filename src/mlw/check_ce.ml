@@ -199,9 +199,7 @@ let print_model_classification ?verb_lvl ?json ?check_ce fmt (m, c) =
 (* Import values from solver counterexample model *)
 
 let cannot_import f =
-  kasprintf (fun reason ->
-      let reason = "cannot import value from model: "^reason in
-      raise (Incomplete reason)) f
+  incomplete ("cannot import value from model: " ^^ f)
 
 let trace_or_name id =
   match get_model_element_name ~attrs:id.id_attrs with
@@ -215,12 +213,12 @@ let get_or_stuck loc env ity desc = function
       let cntr_ctx = mk_cntr_ctx env ~desc ~giant_steps:None Vc.expl_pre in
       stuck ?loc cntr_ctx "%s" desc
 
-let import_model_const loc env ity = function
+let import_model_const ity = function
   | Integer {int_value= v} | Bitvector {bv_value= v} ->
       if ity_equal ity ity_int then
         int_value v
       else if is_range_ty (ty_of_ity ity) then
-        get_or_stuck loc env ity "range" (range_value ity v)
+        range_value ity v
       else
         cannot_import "type %a instead of int or range type" print_ity ity
   | String s ->
@@ -248,7 +246,7 @@ let rec import_model_value loc env check known th_known ity v =
   let subst = its_match_regs ts l1 l2 in
   let def = Pdecl.find_its_defn known ts in
   let res = match v with
-      | Const c -> import_model_const loc env ity c
+      | Const c -> import_model_const ity c
       | Var _ -> undefined_value env ity
       | Record r ->
           let rs = match def.Pdecl.itd_constructors with [rs] -> rs | _ ->
