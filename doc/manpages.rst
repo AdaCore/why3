@@ -939,10 +939,12 @@ non-exhaustive list (which is undergoing active development):
 
 -  Code containing type polymorphism is often a problem due to the bad
    interaction between monomorphisation techniques and counterexamples.
-   This is current an issue in particular for the Array module of the
+   This is current an issue in particular for the ``Array`` module of the
    standard library.
 
-.. -  [TODO: complete this list]
+.. todo::
+
+   complete this list
 
 More information on the implementation of counterexamples in Why3 can be
 found in :cite:`hauzar16sefm` and

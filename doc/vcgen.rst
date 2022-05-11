@@ -28,39 +28,45 @@ a new logic goal called ``f'VC`` is generated. Its shape is
 where :math:`\mathit{WP}(e,Q)` is a formula computed automatically using
 rules defined recursively on :math:`e`.
 
-TODO: Refer to `A Pragmatic Type System for Deductive Verification <https://hal.archives-ouvertes.fr/hal-01256434v3>`_
+.. todo::
 
+   Refer to `A Pragmatic Type System for Deductive Verification <https://hal.archives-ouvertes.fr/hal-01256434v3>`_
 
-Attributes: :why3:attribute:`[@vc:divergent]` disables generation of VC for termination
+   Attributes: :why3:attribute:`[@vc:divergent]` disables generation of VC for termination.
 
-Other attributes: :why3:attribute:`[@vc:annotation]`, :why3:attribute:`[@vc:sp]`, :why3:attribute:`[@vc:wp]`, :why3:attribute:`[@vc:white_box]`, :why3:attribute:`[@vc:keep_precondition]`
+   Other attributes: :why3:attribute:`[@vc:annotation]`, :why3:attribute:`[@vc:sp]`, :why3:attribute:`[@vc:wp]`, :why3:attribute:`[@vc:white_box]`, :why3:attribute:`[@vc:keep_precondition]`.
 
 
 
 Type Invariants
 ---------------
 
-How a VC is generated for proving that a type with invariant is
-inhabited. Explain also the use of the `by` keyword in this context.
+.. todo::
+
+   How a VC is generated for proving that a type with invariant is
+   inhabited. Explain also the use of the `by` keyword in this context.
 
 Lemma Functions
 ---------------
 
-How a VC for a program function marked as `lemma` is turned into an
-hypothesis for the remaining of the module.
+.. todo::
+
+   How a VC for a program function marked as `lemma` is turned into an
+   hypothesis for the remaining of the module.
 
 Using Strongest Post-conditions
 -------------------------------
 
-To avoid exponential explosion of WP computation, Why3 provides a
-mechanism similar to (TODO: cite papers here).
+.. todo::
 
-This can be activited locally on any program expression, by putting
-the :why3:attribute:`[@vc:sp]` attribute on that expression. Yet, the simplest usage
-is to pose this attribute on the whole body of a program function.
+   To avoid exponential explosion of WP computation, Why3 provides a
+   mechanism similar to (TODO: cite papers here).
 
-Show an example.
+   This can be activated locally on any program expression, by putting
+   the :why3:attribute:`[@vc:sp]` attribute on that expression. Yet, the simplest usage
+   is to pose this attribute on the whole body of a program function.
 
+   Show an example.
 
 .. _sec.runwithinferloop:
 
