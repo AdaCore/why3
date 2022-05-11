@@ -1542,6 +1542,28 @@ WhyML Attributes
 
 .. why3:attribute:: case_split
 
+.. why3:attribute:: extraction:inline
+
+   If the name of a function is labeled with this attribute, its body
+   will be inlined at every call site during extraction (see
+   :numref:`sec.extract`). This is especially useful for trivial
+   wrapper functions whose only purpose is to provide a slightly
+   different specification from the original function.
+
+.. why3:attribute:: extraction:likely
+
+   This attribute can be applied to a Boolean expression to indicate
+   whether it is likely to be true. This is used at extraction time
+   (see :numref:`sec.extract`), assuming the target language supports
+   it. For example, when extracting to C, the extracted expression
+   will be tagged with ``__builtin_expect``.
+
+.. why3:attribute:: extraction:unlikely
+
+   This attribute can be applied to a Boolean expression to indicate
+   whether it is likely to be false. This is the opposite of
+   :why3:attribute:`extraction:likely`.
+
 .. why3:attribute:: induction
 
 .. why3:attribute:: infer
