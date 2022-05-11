@@ -6,15 +6,14 @@ Executing WhyML Programs
 This chapter shows how WhyML code can be executed, either by being
 interpreted or compiled to some existing programming language.
 
-Let us consider the program of :numref:`sec.maxandsum` that computes the
-maximum and the sum of an array of integers.
-
-Let us assume it is contained in a file :file:`maxsum.mlw`.
-
 .. _sec.execute:
 
 Interpreting WhyML Code
 -----------------------
+
+Consider the program of :numref:`sec.maxandsum` that computes the
+maximum and the sum of an array of integers.
+Let us assume it is contained in a file :file:`maxsum.mlw`.
 
 To test function ``max_sum``, we can introduce a WhyML test function in
 module ``MaxAndSum``
@@ -88,7 +87,6 @@ We illustrate different ways of using the :why3:tool:`extract` command through
 some examples.
 
 Consider the program of :numref:`sec.aqueue`.
-
 If we are only interested in extracting function ``enqueue``, we can
 proceed as follows:
 
@@ -187,9 +185,9 @@ For the sake of simplicity, we omit here behavioral specification. Assuming the
 above example is contained in a file named :file:`bst.mlw`, one can
 readily extract it into OCaml, as follows:
 
-.. code-block:: console
+::
 
-    > why3 extract -D ocaml64 bst.mlw --modular -o .
+    why3 extract -D ocaml64 bst.mlw --modular -o .
 
 This produces the following functorial implementation:
 

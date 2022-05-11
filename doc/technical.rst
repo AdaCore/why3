@@ -116,12 +116,12 @@ First, we define a new theory in a file :file:`bvmisc.mlw`, containing
 
 .. code-block:: whyml
 
-  theory T
-  use bv.BV8
-  use bv.BV16
-  function lsb BV16.t : BV8.t (** least significant bits *)
-  function msb BV16.t : BV8.t (** most significant bits *)
-  end
+   theory T
+     use bv.BV8
+     use bv.BV16
+     function lsb BV16.t : BV8.t (** least significant bits *)
+     function msb BV16.t : BV8.t (** most significant bits *)
+   end
 
 For such a theory, it is a good idea to declare specific translation
 rules for provers that have a built-in bit-vector support, such as Z3
@@ -130,10 +130,10 @@ and CVC4 in this example. To do so, we write a extension driver file,
 
 .. code-block:: whyml
 
-  theory bvmisc.T
-  syntax function lsb "((_ extract 7 0) %1)"
-  syntax function msb "((_ extract 15 8) %1)"
-  end
+   theory bvmisc.T
+     syntax function lsb "((_ extract 7 0) %1)"
+     syntax function msb "((_ extract 15 8) %1)"
+   end
 
 Now to tell Why3 that we would like this driver extension when calling
 Z3 or CVC4, we write an extra configuration file, :file:`my.conf`,
@@ -152,7 +152,7 @@ containing
 Finally, to make the whole thing work, we have to call any Why3 command
 with the additional option :option:`why3 --extra-config`, such as
 
-.. code-block::
+::
 
   why3 --extra-config=my.conf prove myfile.mlw
 
@@ -1584,9 +1584,9 @@ WhyML Attributes
 
 .. why3:attribute:: vc:sp
 
-.. why3:attribute:: vc:wp
-
 .. why3:attribute:: vc:white_box
+
+.. why3:attribute:: vc:wp
 
 .. _sec.metas:
 
