@@ -30,6 +30,7 @@ sys.path.append(os.path.abspath('./ext'))
 extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.graphviz',
+    'sphinx.ext.todo',
     'sphinxcontrib.bibtex',
     'why3'
 ]

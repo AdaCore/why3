@@ -3,7 +3,7 @@ Release Notes
 
 .. _auto-dereference:
 
-Release Notes for version 1.2: new syntax for “auto-dereference”
+Release Notes for Version 1.2: New Syntax for “Auto-dereference”
 ----------------------------------------------------------------
 
 .. index:: auto-dereference
@@ -87,7 +87,7 @@ Operations ``(:=)`` and ``(!)`` require importing ``ref.Ref``.
 
 Operation ``(:=)`` is fully subsumed by direct assignment ``(<-)``.
 
-Release Notes for version 1.0: syntax changes w.r.t. 0.88
+Release Notes for Version 1.0: Syntax Changes w.r.t. 0.88
 ---------------------------------------------------------
 
 The syntax of WhyML programs changed in release 1.0.
@@ -182,7 +182,7 @@ Semantics of the ``any`` construct:
 
      val x:t ensures { P } in x
 
-Release Notes for version 0.80: syntax changes w.r.t. 0.73
+Release Notes for Version 0.80: Syntax Changes w.r.t. 0.73
 ----------------------------------------------------------
 
 The syntax of WhyML programs changed in release 0.80. The following table

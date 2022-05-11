@@ -1,7 +1,7 @@
 .. _chap.manpages:
 
-Reference Manuals for the Why3 Tools
-====================================
+The Why3 Tools
+==============
 
 .. program:: why3
 
@@ -85,9 +85,19 @@ particular, option :option:`--help` displays the usage and options.
    Set some specific debug flags. See also :numref:`sec.debug` for
    a description of some of those flags.
 
+.. option:: --print-datadir
+
+   Print the location of non-binary data (modules, etc).
+
+.. option:: --print-libdir
+
+   Print the location of binary components (plugins, etc).
+
 .. option:: --help
 
    Display the usage and the exact list of options for the given tool.
+
+The following environment variables are recognized.
 
 .. envvar:: WHY3CONFIG
 
@@ -939,10 +949,12 @@ non-exhaustive list (which is undergoing active development):
 
 -  Code containing type polymorphism is often a problem due to the bad
    interaction between monomorphisation techniques and counterexamples.
-   This is current an issue in particular for the Array module of the
+   This is current an issue in particular for the ``Array`` module of the
    standard library.
 
-.. -  [TODO: complete this list]
+.. todo::
+
+   complete this list
 
 More information on the implementation of counterexamples in Why3 can be
 found in :cite:`hauzar16sefm` and
