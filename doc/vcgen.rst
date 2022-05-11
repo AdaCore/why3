@@ -7,8 +7,8 @@ This chapter gives information about the various processes that generate
 the so-called verification conditions, VC for short, from WhyML code.
 
 
-VC generation for program functions
------------------------------------
+Program Functions
+-----------------
 
 For each program function of the form
 
@@ -37,19 +37,19 @@ Other attributes: :why3:attribute:`[@vc:annotation]`, :why3:attribute:`[@vc:sp]`
 
 
 
-VC generated for type invariants
---------------------------------
+Type Invariants
+---------------
 
 How a VC is generated for proving that a type with invariant is
 inhabited. Explain also the use of the `by` keyword in this context.
 
-VC generation and lemma functions
----------------------------------
+Lemma Functions
+---------------
 
 How a VC for a program function marked as `lemma` is turned into an
 hypothesis for the remaining of the module.
 
-Using strongest post-conditions
+Using Strongest Post-conditions
 -------------------------------
 
 To avoid exponential explosion of WP computation, Why3 provides a
@@ -64,7 +64,7 @@ Show an example.
 
 .. _sec.runwithinferloop:
 
-Automatic inference of loop invariants
+Automatic Inference of Loop Invariants
 --------------------------------------
 
 Why3 can be executed with support for inferring loop invariants

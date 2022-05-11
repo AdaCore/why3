@@ -143,7 +143,7 @@ This updates the contents of file :file:`aqueue.ml` as follows:
 This new version of the code is now accepted by the OCaml compiler
 (provided the ``ZArith`` library is available, as above).
 
-Extraction of Functors
+Extraction of functors
 ''''''''''''''''''''''
 
 WhyML and OCaml are both dialects of the ML-family, sharing many syntactic and
@@ -256,7 +256,7 @@ It is worth noting that extraction of functors only works for
 *modular* extraction (*i.e.* with command-line option :option:`--modular`).
 
 
-Custom Extraction Drivers
+Custom extraction drivers
 '''''''''''''''''''''''''
 
 Several OCaml drivers can be specified on the command line, using option

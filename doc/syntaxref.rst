@@ -154,7 +154,7 @@ and trailing spaces are ignored. A location consists of a file name in
 double quotes, a line number, and starting and ending character
 positions.
 
-Type expressions
+Type Expressions
 ----------------
 
 WhyML features an ML-style type system with polymorphic types, variants
@@ -197,7 +197,7 @@ that expects an argument of a mutable type will accept an argument of
 the corresponding snapshot type as long as it is not modified by the
 function.
 
-Logical expressions
+Logical Expressions
 -------------------
 
 A significant part of a typical WhyML source file is occupied by
@@ -206,7 +206,7 @@ function contracts, assertions, definitions of logical functions and
 predicates, axioms, lemmas, etc.
 
 
-Terms and Formulas
+Terms and formulas
 ^^^^^^^^^^^^^^^^^^
 
 Logical expressions are called *terms*. Boolean terms are called
@@ -576,7 +576,7 @@ Ghost patterns, ghost variables after ``as``, and ghost parameters in
 function definitions are only used in program code, and not allowed in
 logical terms.
 
-Program expressions
+Program Expressions
 -------------------
 
 The syntax of program expressions is given below. As before, the constructions

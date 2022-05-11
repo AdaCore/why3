@@ -1,7 +1,7 @@
 .. _chap.manpages:
 
-Reference Manuals for the Why3 Tools
-====================================
+The Why3 Tools
+==============
 
 .. program:: why3
 

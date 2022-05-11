@@ -815,7 +815,7 @@ functions that were already introduced before.
 
 .. _sec.ce_api:
 
-Generating counterexamples
+Generating Counterexamples
 --------------------------
 
 That feature is presented in details in :numref:`sec.idece`, which should

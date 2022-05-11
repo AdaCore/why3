@@ -50,14 +50,14 @@ integer (e.g., ``-555``), a boolean (``true``, ``false``), or a string
 are thus allowed to occur several times inside a given section. In that
 case, the relative order of these associations matters.
 
-Extra Configuration Files
+Extra configuration files
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In addition to the main configuration file, Why3 commands accept the
 option :option:`why3 --extra-config` to read one or more files
 containing additional configuration option. It allows the user to pass
 extra declarations in prover drivers, as illustrated in
-:numref:`sec.apiextradrivers`, including declarations for
+:numref:`sec.userdrivers`, including declarations for
 realizations, as illustrated in :numref:`sec.realizations`.
 
 
@@ -103,10 +103,10 @@ solvers, :numref:`fig.drv.tptp` for TPTP solvers, :numref:`fig.drv.coq`
 for Coq, :numref:`fig.drv.isabelle` for Isabelle/HOL,
 and :numref:`fig.drv.pvs` for PVS.
 
-.. _sec.apiextradrivers:
+.. _sec.userdrivers:
 
-Adding extra drivers for user theories
---------------------------------------
+Drivers for User Theories
+-------------------------
 
 It is possible for the users to augment the system drivers with extra
 information for their own declared theories. The processus is
@@ -1598,9 +1598,11 @@ Debug Flags
 
 .. why3:debug:: stack_trace
 
+Developer Documentation
+-----------------------
 
-Updating Syntax Error Messages
-------------------------------
+Updating messages for syntax errors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here is the developer's recipe to update a syntax error message. We do
 it on the following illustrative example.

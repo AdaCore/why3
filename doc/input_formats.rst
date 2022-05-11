@@ -304,8 +304,8 @@ Python lists are modeled as arrays, whose size cannot be modified.
 .. index:: CFG
 .. _format.CFG:
 
-MLCFG: function bodies in the style of control-flow graphs
-----------------------------------------------------------
+MLCFG
+-----
 
 The MLCFG language is an experimental extension of the regular WhyML
 language, in which the body of program functions can be
