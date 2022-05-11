@@ -85,9 +85,19 @@ particular, option :option:`--help` displays the usage and options.
    Set some specific debug flags. See also :numref:`sec.debug` for
    a description of some of those flags.
 
+.. option:: --print-datadir
+
+   Print the location of non-binary data (modules, etc).
+
+.. option:: --print-libdir
+
+   Print the location of binary components (plugins, etc).
+
 .. option:: --help
 
    Display the usage and the exact list of options for the given tool.
+
+The following environment variables are recognized.
 
 .. envvar:: WHY3CONFIG
 

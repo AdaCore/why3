@@ -3,6 +3,8 @@
 Compilation, Installation
 =========================
 
+.. program:: why3
+
 Installing Why3
 ---------------
 
@@ -243,7 +245,7 @@ used to specify names of prover executables:
 
     why3 config add-prover CVC4 /usr/local/bin/cvc4-dev cvc4-dev
 
-the first argument (here ``CVC4``) must be one of the known provers. The
+The first argument (here ``CVC4``) must be one of the known provers. The
 list of these names can be obtained
 using :why3:tool:`why3 config list-supported-provers`.
 They can also be found in the file :file:`provers-detection-data.conf`,
@@ -303,11 +305,7 @@ Editing WhyML Sources
 
 The Why3 distributions come with some configuration files for Emacs and for Vim.
 These files are typically installed in the shared data directory,
-which is given by
-
-::
-
-     why3 --print-datadir
+which is given by :option:`why3 --print-datadir`.
 
 Emacs
 ~~~~~
@@ -344,7 +342,7 @@ Shells Auto-completion for Why3
 -------------------------------
 
 Some configuration files for shells are distributed in the shared data directory,
-which is given by ``why3 --print-data-dir``.
+which is given by :option:`why3 --print-datadir`.
 
 There are configuration files for ``bash`` and ``zsh``.
 
