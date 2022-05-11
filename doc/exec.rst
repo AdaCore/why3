@@ -296,3 +296,88 @@ actual arguments. Here is the extraction command line and its output:
 When using such custom drivers, it is not possible to pass Why3 file
 names on the command line; one has to specify module names to be
 extracted, as done above.
+
+Compiling to Other Languages
+----------------------------
+
+The :why3:tool:`extract` command can produce code for languages other
+than just OCaml. This is a matter of choosing a suitable driver.
+
+Compiling to C
+''''''''''''''
+
+Consider the following example. It defines a function that returns the
+position of the maximum element in an array ``a`` of size ``n``.
+
+.. code-block:: whyml
+
+   use int.Int
+   use map.Map as Map
+   use mach.c.C
+   use mach.int.Int32
+   use mach.int.Int64
+
+   function ([]) (a: ptr 'a) (i: int): 'a = Map.get a.data.Array.elts (a.offset + i)
+
+   let locate_max (a: ptr int64) (n: int32): int32
+     requires { 0 < n }
+     requires { valid a n }
+     ensures  { 0 <= result < n }
+     ensures  { forall i. 0 <= i < n -> a[i] <= a[result] }
+   = let ref idx = 0 in
+     for j = 1 to n - 1 do
+       invariant { 0 <= idx < n }
+       invariant { forall i. 0 <= i < j -> a[i] <= a[idx] }
+       if get_ofs a idx < get_ofs a j then idx <- j
+     done;
+     idx
+
+There are a few differences with a standard WhyML program. The main
+one is that the array is described by a value of type ``ptr int64``,
+which models a C pointer of type ``int64_t *``.
+
+Among other things, the type ``ptr 'a`` has two fields: ``data`` and
+``offset``. The ``data`` field is of type ``array 'a``; its value
+represents the content of the memory block (as allocated by
+``malloc``) the pointer points into. The ``offset`` field indicates
+the actual position of the pointer into that block, as it might not
+point at the start of the block.
+
+The WhyML expression ``get_ofs a j`` in the example corresponds to the
+C expression ``a[j]``. The assignment ``a[j] = v`` could be expressed
+as ``set_ofs a j v``. To access just ``*a`` (i.e., ``a[0]``), one
+could use ``get a`` and ``set a v``.
+
+For the access ``a[j]`` to have a well-defined behavior, the memory
+block needs to have been allocated and not yet freed, and it needs to
+be large enough to accommodate the offset ``j``. This is expressed
+using the precondition ``valid a n``, which means that the block
+extends at least until ``a.offset + n``.
+
+The code can be extracted to C using the following command:
+
+::
+
+   why3 extract -D c locate_max.mlw
+
+This gives the following C code.
+
+.. code-block:: C
+
+   #include <stdint.h>
+
+   int32_t locate_max(int64_t * a, int32_t n) {
+     int32_t idx;
+     int32_t j, o;
+     idx = 0;
+     o = n - 1;
+     if (1 <= o) {
+       for (j = 1; ; ++j) {
+         if (a[idx] < a[j]) {
+           idx = j;
+         }
+         if (j == o) break;
+       }
+     }
+     return idx;
+   }
