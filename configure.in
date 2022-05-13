@@ -169,6 +169,13 @@ AC_ARG_ENABLE(emacs-compilation,
 
 AC_ARG_VAR(EDITOR, [default editor])
 
+# Java look-up
+AC_ARG_ENABLE(java,
+    AS_HELP_STRING([--disable-java], [do not use java in bench]),
+    [enable_java=${enableval}],
+    [enable_java=yes])
+
+
 # either relocation or local, not both
 if test "$enable_relocation" = yes -a "$enable_local" = yes ; then
    AC_MSG_ERROR([cannot use --enable-relocation and --enable-local at the same time.])
@@ -1151,6 +1158,23 @@ if test -z "$EDITOR"; then
    esac
 fi
 
+# Check presence of java and javac used by whyml2java bench
+if test "$enable_java" = yes; then
+   AC_CHECK_PROG(JAVAC,javac,javac,no)
+   if test "$JAVAC" = no ; then
+   AC_MSG_WARN([cannot find javac.])
+   fi
+
+   AC_CHECK_PROG(JAVA,java,java,no)
+   if test "$JAVA" = no ; then
+      AC_MSG_WARN([cannot find java.])
+   fi
+else  
+   AC_MSG_NOTICE([java disabled by user])
+   JAVAC=no
+   JAVA=no
+fi
+
 # substitutions to perform
 AC_SUBST(VERSION)
 
@@ -1266,6 +1290,9 @@ AC_SUBST(WHY3INCLUDE)
 
 AC_SUBST(enable_relocation)
 
+AC_SUBST(JAVAC)
+AC_SUBST(JAVA)
+
 # Finally create the Makefile from Makefile.in
 AC_CONFIG_FILES(Makefile)
 AC_CONFIG_FILES(src/config.sh)
@@ -1274,6 +1301,7 @@ AC_CONFIG_FILES(.merlin)
 AC_CONFIG_FILES(src/jessie/Makefile)
 AC_CONFIG_FILES(src/jessie/.merlin)
 AC_CONFIG_FILES(lib/coq/version lib/pvs/version)
+AC_CONFIG_FILES(bench/java/Makefile)
 AC_CONFIG_COMMANDS([chmod],
 chmod a-w Makefile src/jessie/Makefile;
 chmod a-w src/config.sh;

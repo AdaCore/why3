@@ -1,0 +1,31 @@
+module ClassA
+ [@java:package:some.dir]
+  type t = { a : bool; b : bool }
+
+  let some_a [@java:constructor] () : t = {a = true; b = false }
+end
+
+module SomeModule
+  [@java:package:some.other.dir]
+  use ClassA
+  
+  let function f () : ClassA.t = some_a ()
+
+  let function get_a (x : ClassA.t) = a x
+end
+
+module MissingUseClass
+  [@java:package:yet.another] 
+  [@java:class_kind:abstract]
+   use SomeModule
+   
+   type t
+
+   val g(self  [@W:unused_variable:N]: t) : unit
+
+   let method(self [@W:unused_variable:N] : t) : unit =
+     let x = SomeModule.f () in 
+    if get_a x then
+       g self
+
+end

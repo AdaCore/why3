@@ -1,0 +1,39 @@
+module MutRec
+  use int.Int
+  use int.EuclideanDivision
+  use mach.java.lang.ArithmeticException
+  use mach.java.lang.String
+  use mach.java.lang.Integer
+  use mach.java.util.Random
+  use mach.java.lang.Array
+
+  let rec even (number : integer) : bool        
+    ensures { result <-> mod number 2 = 0 }
+    variant { if number < 0 then -number else number  }
+  = 
+    if number = 0  then true
+    else if number < 0 then odd (number + 1)
+    else odd (number - 1)
+  with odd (number : integer) : bool  
+    ensures { result <-> mod number 2 = 1 }
+    variant { if number < 0 then -number else number  }
+  =       
+    if number = 0  then false    
+    else if number < 0 then even (number + 1)
+    else even (number - 1)
+   
+
+  let main (array string) : unit =        
+    try
+      let rnd = Random.create () in
+      for i = 0:integer to 100:integer do
+         let b = Random.next_bounded_int rnd 72 in
+         if (b % 2 = 0 && odd b) || (b % 2 = 1 && even b) then
+          raise ArithmeticException.E 
+      done
+    with
+    | IllegalArgumentException.E -> absurd
+    | ArithmeticException.E -> absurd
+    end
+end
+

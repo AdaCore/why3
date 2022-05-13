@@ -409,6 +409,48 @@ extract_and_test_c () {
     echo "ok"
 }
 
+extract_and_test_java () {
+    dir=$1
+    shift
+    make="make BENCH=yes -C $dir"
+    printf "  $dir... clean... "
+    if ! $make clean > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make clean
+        $make clean
+        exit 1
+    fi
+    printf "extract... "
+    if ! $make extract > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make extract
+        $make extract
+        exit 1
+    fi
+    printf "non-regression... "
+    if ! $make non-regression > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make non-regression
+        $make non-regression
+        exit 1
+    fi
+    printf "compile... "
+    if ! $make compile > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make compile
+        $make compile
+        exit 1
+    fi
+    printf "execute... "
+    if ! $make run > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make run
+        $make run
+        exit 1
+    fi
+    echo "ok"
+}
+
 list_stuff () {
     pgm="bin/why3$suffix"
     printf "  $*... "
@@ -460,6 +502,7 @@ if enabled stdlib; then
 echo "=== Checking stdlib ==="
 goods stdlib
 goods stdlib/mach
+goods stdlib/mach/java
 echo ""
 fi
 
@@ -678,6 +721,9 @@ extract_and_test_c examples/multiprecision
 extract_and_test_c examples/c_cursor
 extract_and_test_c bench/extraction/852_int16
 echo ""
+
+	echo "=== Checking extration to Java ==="
+	extract_and_test_java bench/java
 fi
 
 if enabled replay-without-shapes; then

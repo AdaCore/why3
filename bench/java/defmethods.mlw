@@ -1,0 +1,46 @@
+module ClassA
+	use int.Int
+	use mach.java.lang.Integer
+  	type t = {
+		mutable a : integer;
+		mutable b : bool;
+  	}
+end
+
+module DefaultMethods
+    use ClassA
+	use mach.java.lang.Integer
+	use mach.java.lang.Array
+
+  	type t = {
+		mutable a : integer;
+		mutable c : ClassA.t;
+		mutable b : array (array bool);
+		mutable d : string;
+		mutable z : bool;
+  	}
+end
+
+module HashCodeRedef 
+  use mach.java.lang.Integer
+
+  type t = {
+	mutable a : integer;
+	mutable b : bool;
+  }
+
+  let hash_code(self : t) : integer = 
+   7211 * self.a + (if self.b then 0 else 1)
+end
+
+module EqualsRedef
+  use mach.java.lang.Integer
+
+  type t = {
+	mutable a : integer;
+	mutable b : bool;
+  }
+
+  let equals(self obj: t) : bool = 
+   	self.a = obj.a && (if self.b then obj.b else not obj.b)
+end

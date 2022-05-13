@@ -1,0 +1,30 @@
+module Recursive
+  use int.Int
+  use seq.Seq
+  use mach.java.lang.IndexOutOfBoundsException
+  use mach.java.lang.Integer
+  use mach.java.util.List 
+
+  type t
+  
+  let rec count_true_rec (l : list bool) (i : integer) : integer
+    requires { length l < Integer.max_integer }
+    ensures { i <= length l -> result <= length l - i }
+    requires { 0 <= i }
+    variant { length l  - i }
+  =
+    let e_x = i+1 in 
+    try
+      if i >= size l then 0
+      else if get l i then 1 + count_true_rec l e_x
+      else count_true_rec l e_x
+    with
+     IndexOutOfBoundsException.E -> absurd
+    end
+    
+  let count_true (l : list bool) : integer
+    requires { length l < Integer.max_integer }
+  =
+    count_true_rec l 0
+
+end
