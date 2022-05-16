@@ -1,0 +1,105 @@
+module EnumType
+
+  type t = Left | Right
+
+end
+
+module Enum
+
+  type t = Left | Right
+
+  clone EnumType with type t
+
+end
+
+module RecordType
+
+  type t = { f : int; g : int }
+
+end
+
+module Record
+
+  type t = { f : int; g : int }
+
+  clone RecordType with type t
+
+end
+
+module RecursiveType
+
+  type t = Nil | Cons t
+
+end
+
+module Recursive
+
+  type t = Nil | Cons t
+
+  clone RecursiveType with type t
+
+end
+
+module MutuallyRecursiveType
+
+  type forest 'a = Nil | Cons (tree 'a) (forest 'a)
+  with tree 'a = Node 'a (forest 'a)
+
+  function map (f : 'a -> 'b) (ts : forest 'a) : forest 'b =
+    match ts with
+    | Nil -> Nil
+    | Cons t ts -> Cons (map_tree f t) (map f ts)
+    end
+  with map_tree (f : 'a -> 'b) (t : tree 'a) : tree 'b =
+    match t with
+    | Node x ts -> Node (f x) (map f ts)
+    end
+
+end
+
+module MutuallyRecursive
+
+  use int.Int
+
+  type forest 'a = Nil | Cons (tree 'a) (forest 'a)
+  with tree 'a = Node 'a (forest 'a)
+
+  function size (f : forest 'a) : int =
+    match f with
+    | Nil -> 0
+    | Cons t f -> size_tree t + size f
+    end
+  with size_tree (t : tree 'a) : int =
+    match t with
+    | Node _ f -> size f + 1
+    end
+
+  clone MutuallyRecursiveType with
+    type forest,
+    type tree
+
+  function map_size (f : forest 'a) : int =
+    size (map (fun _ -> 42) f)
+
+end
+
+module MutuallyRecursiveWithAliasType
+
+  use list.List
+
+  type forest 'a = list (tree 'a)
+  with tree 'a = Node 'a (forest 'a)
+
+end
+
+module MutuallyRecursiveWithAlias
+
+  use list.List
+
+  type forest 'a = list (tree 'a)
+  with tree 'a = Node 'a (forest 'a)
+
+  clone MutuallyRecursiveWithAliasType with
+    type tree
+
+end

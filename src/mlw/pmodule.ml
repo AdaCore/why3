@@ -1026,13 +1026,23 @@ let clone_type_record cl s d s' d' =
 let clone_type_decl inst cl tdl kn =
   let def =
     List.fold_left (fun m d -> Mits.add d.itd_its d m) Mits.empty tdl in
+  let cloned =
+    let cloned td =
+      let ts = td.itd_its.its_ts in
+      Mts.mem ts inst.mi_ts || Mts.mem ts inst.mi_ty in
+    match tdl with
+    | td :: tdl ->
+        let c = cloned td in
+        if List.exists (fun td -> cloned td <> c) tdl
+        then raise (CannotInstantiate td.itd_its.its_ts.ts_name);
+        c
+    | _ -> assert false in
   let htd = Hits.create 5 in
   let vcs = ref ([] : (itysymbol * term) list) in
   let rec visit alg ({its_ts = {ts_name = id} as ts} as s) d =
     if not (Hits.mem htd s) then
     let alg = Sits.add s alg in
     let id' = id_clone id in
-    let cloned = Mts.mem ts inst.mi_ts || Mts.mem ts inst.mi_ty in
     let conv_pj v = create_pvsymbol
       (id_clone v.pv_vs.vs_name) ~ghost:v.pv_ghost (conv_ity alg v.pv_ity) in
     let save_itd itd =
@@ -1085,23 +1095,53 @@ let clone_type_decl inst cl tdl kn =
     (* variant *)
     if not s.its_mutable && d.itd_constructors <> [] &&
                             d.itd_invariant = [] then begin
-      if cloned then raise (CannotInstantiate id);
-      let conv_fd m fd =
-        let v = fd_of_rs fd in Mpv.add v (conv_pj v) m in
-      let fldm = List.fold_left conv_fd Mpv.empty d.itd_fields in
-      let conv_pj pj = match Mpv.find_opt pj fldm with
-        | Some pj' -> true, pj' | None -> false, conv_pj pj in
-      let conv_cs cs =
-        id_clone cs.rs_name, List.map conv_pj cs.rs_cty.cty_args in
-      let csl = List.map conv_cs d.itd_constructors in
-      match Mts.find_opt ts cl.ts_table with
-      | Some s' ->
-          let itd = create_rec_variant_decl s' csl in
-          save_itd itd
-      | None ->
-          let itd = create_plain_variant_decl id' ts.ts_args csl in
-          cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
-          save_itd itd
+      if cloned then begin
+        match Mts.find_opt ts inst.mi_ts with
+        | Some s' ->
+            let d' = find_its_defn kn s' in
+            (* make sure that d' is also a variant *)
+            if d'.itd_its.its_mutable || d'.itd_constructors = []
+               || d'.itd_invariant <> []
+            then raise (CannotInstantiate id);
+            cl.ts_table <- Mts.add ts d'.itd_its cl.ts_table;
+            (try save_itd d' with
+             | Invalid_argument _ -> raise (CannotInstantiate id));
+            let eq_field f1 f2 =
+              let ity = conv_ity alg f1.pv_ity in
+              if not (ity_equal ity f2.pv_ity) || f1.pv_ghost <> f2.pv_ghost
+              then raise (CannotInstantiate id);
+              match Mpv.find_opt f1 cl.fd_table with
+              | Some v -> if not (pv_equal v f2)
+                          then raise (CannotInstantiate id)
+              | None -> () in
+            let eq_proj rs1 rs2 =
+              let f1 = Opt.get rs1.rs_field in
+              let f2 = Opt.get rs2.rs_field in
+              eq_field f1 f2 in
+            let eq_cons cs1 cs2 =
+              try List.iter2 eq_field cs1.rs_cty.cty_args cs2.rs_cty.cty_args with
+              | Invalid_argument _ -> raise (CannotInstantiate id) in
+            List.iter2 eq_proj d.itd_fields d'.itd_fields;
+            List.iter2 eq_cons d.itd_constructors d'.itd_constructors;
+            Hits.replace htd s None
+        | None -> raise (CannotInstantiate id)
+      end else
+        let conv_fd m fd =
+          let v = fd_of_rs fd in Mpv.add v (conv_pj v) m in
+        let fldm = List.fold_left conv_fd Mpv.empty d.itd_fields in
+        let conv_pj pj = match Mpv.find_opt pj fldm with
+          | Some pj' -> true, pj' | None -> false, conv_pj pj in
+        let conv_cs cs =
+          id_clone cs.rs_name, List.map conv_pj cs.rs_cty.cty_args in
+        let csl = List.map conv_cs d.itd_constructors in
+        match Mts.find_opt ts cl.ts_table with
+        | Some s' ->
+            let itd = create_rec_variant_decl s' csl in
+            save_itd itd
+        | None ->
+            let itd = create_plain_variant_decl id' ts.ts_args csl in
+            cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
+            save_itd itd
     end else begin
     (* flat record *)
       if cloned then raise (CannotInstantiate id);
