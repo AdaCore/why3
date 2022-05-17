@@ -83,7 +83,7 @@ run () {
        --prover="$prover" --stepslimit=$steps  --timelimit=0 \
        --check-ce --verbosity=5 \
        --library="$2" "${file_path}.mlw" \
-       --debug=check-ce,check-ce-summary,rac-values \
+       --debug=check-ce-rac-results,check-ce-categorization,rac-values \
        || [ $? -eq 2 ]) 2>&1 \
      | sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" \
      > "$f.out"

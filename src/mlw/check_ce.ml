@@ -19,11 +19,11 @@ open Model_parser
 open Pinterp_core
 open Pinterp
 
-let debug_check_ce = Debug.register_info_flag "check-ce"
-    ~desc:"Debug@ info@ for@ --check-ce"
+let debug_check_ce_rac_results = Debug.register_info_flag "check-ce-rac-results"
+    ~desc:"Debug@ info@ about@ RAC@ results@ for@ --check-ce"
 
-let debug_check_ce_summary = Debug.register_info_flag "check-ce-summary"
-    ~desc:"Debug@ summary@ for@ --check-ce"
+let debug_check_ce_categorization = Debug.register_info_flag "check-ce-categorization"
+    ~desc:"Debug@ info@ about@ categorization@ of@ RAC@ results@ for@ --check-ce"
 
 (** Result of checking solvers' counterexample models *)
 
@@ -439,7 +439,7 @@ let rac_execute ctx rs =
     failwith "rac_execute with RAC disabled";
   if (get_rac ctx).ignore_incomplete then
     failwith "incomplete checks ignored in RAC execute";
-  Debug.dprintf debug_check_ce "%s RAC@."
+  Debug.dprintf debug_check_ce_rac_results "%s RAC@."
     (if get_giant_steps ctx then "Giant-step" else "Normal");
   ignore (Log.flush_log (get_env ctx).log_uc);
   try
@@ -568,7 +568,7 @@ let select_model_from_giant_step_rac_results ?strategy models =
     | None -> None, None
     | Some (i,_,m,_,s) -> Some (m, s), Some i in
   if models <> [] then
-    Debug.dprintf debug_check_ce_summary "Results:@ %a@."
+    Debug.dprintf debug_check_ce_categorization "Results of selection of models:@ %a@."
       Pp.(print_list newline 
             (print_dbg_rac_result_model ~print_normal:false ~print_giant:true selected_ix))
         models;
@@ -594,7 +594,7 @@ let select_model_from_verdict models =
     | None -> None, None
     | Some (i,_,m,_,_,s) -> Some (m, s), Some i in
   if classified_models <> [] then
-    Debug.dprintf debug_check_ce_summary "Results:@ %a@."
+    Debug.dprintf debug_check_ce_categorization "Categorizations of models:@ %a@."
       Pp.(print_list newline (print_dbg_classified_model selected_ix)) classified_models;
   selected
   
@@ -621,7 +621,7 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
   let rac_not_done_failure reason =
     (RAC_not_done reason, RAC_not_done reason) in
   let add_rac_result (i,r,m) =
-    Debug.dprintf debug_check_ce "Check model %d (%a)@." i
+    Debug.dprintf debug_check_ce_rac_results "Check model %d (%a)@." i
       (Pp.print_option_or_default "NO LOC" Pretty.print_loc')
       (get_model_term_loc m);
     let normal_res, giant_res = match get_model_term_loc m with
@@ -641,7 +641,7 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
             | Some rs ->
                 let me_name_trans men = men.Model_parser.men_name in
                 let print_attrs = Debug.test_flag Call_provers.debug_attrs in
-                Debug.dprintf debug_check_ce
+                Debug.dprintf debug_check_ce_rac_results
                   "@[Checking model:@\n@[<hv2>%a@]@]@\n"
                   (print_model ~filter_similar:false ~me_name_trans ~print_attrs) m;
                 begin
@@ -659,7 +659,7 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
                   Pretty.print_loc' loc
           end
     in
-    Debug.dprintf debug_check_ce "@[<v2>Result of checking model %d:%a@]@." i
+    Debug.dprintf debug_check_ce_rac_results "@[<v2>Results of RAC executions for model %d:%a@]@." i
       (print_normal_and_giant_rac_results ?verb_lvl) (normal_res, giant_res);
     i,r,m,normal_res,giant_res in
   List.map add_rac_result models

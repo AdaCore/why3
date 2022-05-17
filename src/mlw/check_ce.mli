@@ -214,10 +214,11 @@ val select_model_last_non_empty :
 
 (**/**)
 
-val debug_check_ce : Debug.flag
-(** print information about the models returned by the solver and the
-   result of checking them by interpreting the program concretly and
-   abstractly using the values in the solver's model *)
+val debug_check_ce_rac_results : Debug.flag
+(** Print information about the models returned by the solver and the
+   results of checking them by interpreting the program concretly and
+   abstractly using the values in the solver's model. *)
 
-val debug_check_ce_summary : Debug.flag
-(** Print only a summary of checking the counterexample. *)
+val debug_check_ce_categorization : Debug.flag
+(** Print the result of the categorization computed from the results of
+    the concrete and abstract RAC executions. *)
