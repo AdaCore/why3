@@ -1,0 +1,21 @@
+
+
+
+use int.Int
+
+predicate f int
+
+axiom a1 : f 1
+
+axiom a2 : forall x [f x]. f x -> f (x+x)
+
+axiom a3 : forall x [f x]. f (x+x+x+1) -> f x
+
+
+(*goal g2 : f 2
+goal g3 : f 3
+goal g4 : f 4
+goal g5 : f 5
+goal g6 : f 6
+*)
+goal g7 : f 7

@@ -1,0 +1,28 @@
+
+
+
+type nat = Z | S nat
+
+function plus (x y:nat) : nat =
+  match x with
+  | Z -> y
+  | S z -> S (plus z y)
+  end
+  
+predicate f nat
+
+axiom a1 : f (S Z)
+
+axiom a2 : forall x [f x]. f x -> f (plus x x)
+
+axiom a3 : forall x [f x]. f (plus (plus x x) (plus x (S Z))) -> f x
+
+
+(*
+goal g2 : f (S (S Z))
+goal g3 : f (S (S (S Z)))
+goal g4 : f (S (S (S (S Z))))
+goal g5 : f (S (S (S (S (S Z)))))
+goal g6 : f (S (S (S (S (S (S Z))))))
+*)
+goal g7 : f (S (S (S (S (S (S (S Z)))))))
