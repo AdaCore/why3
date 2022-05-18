@@ -236,11 +236,11 @@ let analyse_result exit_result res_parser get_counterexmp printing_info out =
       exit_result
   in
 
-  let compare_answers opt_ans1 opt_ans2 = match (opt_ans1,opt_ans2) with
+  let merge_answers opt_ans1 opt_ans2 = match (opt_ans1,opt_ans2) with
   | None, Some _ -> opt_ans2
   | Some _, None -> opt_ans1
-  | Some OutOfMemory, Some HighFailure
-  | Some HighFailure, Some OutOfMemory -> Some OutOfMemory
+  (* prefer any answer over HighFailure *)
+  | Some HighFailure, Some _ -> opt_ans2
   | _ -> opt_ans1
   in
 
@@ -278,12 +278,12 @@ let analyse_result exit_result res_parser get_counterexmp printing_info out =
             analyse ((res, m) :: saved_models) (Some res) tl
             end
           else
-            analyse saved_models (compare_answers (Some res) saved_res) tl
+            analyse saved_models (merge_answers (Some res) saved_res) tl
     | Answer res :: tl ->
         if res = Valid then
           (Valid, [])
         else
-          analyse saved_models (compare_answers (Some res) saved_res) tl
+          analyse saved_models (merge_answers (Some res) saved_res) tl
     | Model _fail :: tl -> analyse saved_models saved_res tl
   in
 
