@@ -189,17 +189,12 @@ let () = print_endline "\n== RAC execute giant steps\n"
 
 (* BEGIN{check_ce_giant_step} *)
 let () =
-  let model = Opt.get_exn (Failure "No non-empty model")
-      (Check_ce.select_model_last_non_empty models) in
-  let loc = Opt.get_exn (Failure "No model term location")
-      (Model_parser.get_model_term_loc model) in
-  let rs = Opt.get_exn (Failure "No procedure symbol found")
-      (Check_ce.find_rs pm loc) in
   let rac = Pinterp.mk_rac ~ignore_incomplete:false
-      (Rac.Why.mk_check_term_lit config env ~why_prover:"alt-ergo" ()) in
-  let oracle = Check_ce.oracle_of_model pm model in
-  let env = Pinterp.mk_empty_env env pm in
-  let ctx = Pinterp.mk_ctx env ~do_rac:true ~rac ~giant_steps:true ~oracle () in
-  let res = Check_ce.rac_execute ctx rs in
+    (Rac.Why.mk_check_term_lit config env ~why_prover:"alt-ergo" ()) in
+  let rac_results = Check_ce.get_rac_results ~only_giant_step:true
+    rac env pm models in
+  let strategy = Check_ce.best_non_empty_giant_step_rac_result in
+  let _,res = Opt.get_exn (Failure "No good model found")
+    (Check_ce.select_model_from_giant_step_rac_results ~strategy rac_results) in
   printf "%a@." (Check_ce.print_rac_result ?verb_lvl:None) res
 (* END{check_ce_giant_step} *)
