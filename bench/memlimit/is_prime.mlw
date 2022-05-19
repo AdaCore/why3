@@ -32,4 +32,5 @@ module User_lemma__test
   let def (__void_param : unit) =
     assert { User_lemma__is_prime.is_prime 15487001 = True };
     assert { User_lemma__is_prime.is_prime 15487469 = True };
+    assert { User_lemma__is_prime.is_prime 239854447900000 = False };
 end

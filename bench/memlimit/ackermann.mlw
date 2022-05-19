@@ -1,6 +1,3 @@
-
-
-
 type nat = Z | S nat
 
 function ack (m n:nat) : nat =
@@ -13,12 +10,6 @@ function ack (m n:nat) : nat =
     end
   end
 
-(*
-goal a0 : ack Z Z = (S Z)
-goal a1 : ack (S Z) (S Z) = (S (S (S Z)))
-goal a2 : ack (S (S Z)) (S (S Z)) = (S (S (S (S (S (S (S Z)))))))
-*)
-
 predicate even (x:nat) =
   match x with
   | Z -> true
@@ -26,8 +17,4 @@ predicate even (x:nat) =
   | S (S z) -> even z
   end
 
-
-(*
-goal a3 : even (ack (S (S (S Z))) (S (S (S Z))))
-*)
 goal a4 : even (ack (S (S (S (S Z)))) (S (S (S (S Z)))))
