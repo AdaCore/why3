@@ -107,7 +107,7 @@ let opt_output = match opt_modu_flat, !opt_output with
 
 let driver_file s =
   if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
-  else Filename.concat Config.datadir (Filename.concat "drivers" (s ^ ".drv"))
+  else Filename.concat Config.datadir (Filename.concat "extraction_drivers" (s ^ ".drv"))
 
 let opt_driver =
   try match List.rev_map driver_file !opt_driver with
