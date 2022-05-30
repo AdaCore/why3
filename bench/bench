@@ -211,7 +211,7 @@ step_limit () {
 mem_limit () {
     pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
-    provers=`bin/why3$suffix config list-provers | grep 'Alt-Ergo 2\.[0-9]\|CVC4 1\.[6-8]\|Z3 4\.[6-8]' | tr ' ' ',' | tr -d '()'`
+    provers=`bin/why3$suffix config list-provers | grep 'Alt-Ergo 2\.[3-9]\\.[0-9]$\|CVC4 1\.[6-8]$\|Z3 4\.[6-8]\.[0-9]\+$' | tr ' ' ',' | tr -d '()'`
     for f in $1/*.mlw; do
         for p in $provers ; do
             if [[ "$p" =~ .*strings.* ]]; then
@@ -220,21 +220,22 @@ mem_limit () {
                 # to be investigated
                 echo "  $f (memory limit for $p)... skipped "
             else
-                # Testing that at least one run between --memlimit=40 and 
+                # Testing that at least one run between --memlimit=40 and
                 # --memlimit=30 replies Out of memory seems a reasonable
                 # heuristic
-                printf "  $f (memory limit for $p)... "
-                if $pgm --memlimit=40 --timelimit=30 -P $p $f | \
+                printf "  $f (memory limit 40 for $p)... "
+                if $pgm --memlimit=40 --timelimit=5 -P $p $f | \
                             grep -q "Prover result is: Out of memory"; then
-                    echo "ok"
+                    printf "ok\n"
                 else
-                    if $pgm --memlimit=30 --timelimit=30 -P $p $f | \
+                    printf "(retrying with memlimit=30) "
+                    if $pgm --memlimit=30 --timelimit=5 -P $p $f | \
                             grep -q "Prover result is: Out of memory"; then
-                        echo "ok"
+                        printf "ok\n"
                     else
-                        echo "failed!"
-                        echo $pgm --memlimit=30 --timelimit=30 -P $p $f
-                        $pgm --memlimit=30 --timelimit=30 -P $p $f
+                        printf "failed!\n"
+                        echo $pgm --memlimit=30 --timelimit=5 -P $p $f
+                        $pgm --memlimit=30 --timelimit=5 -P $p $f
                         exit 1
                     fi
                 fi
