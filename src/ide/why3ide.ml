@@ -314,7 +314,7 @@ let exit_function_unsafe () =
    - source_view is the graphical element inside a tab
    - label_of_tab is the mutable title of the tab
 *)
-let source_view_table : (int * GSourceView.source_view * GMisc.label) Hstr.t =
+let source_view_table : (int * GSourceView.source_view * GMisc.label * bool) Hstr.t =
   Hstr.create 14
 
 (* The corresponding file does not have a source view *)
@@ -328,8 +328,8 @@ let get_source_view_table (file:string) =
 (* Saving function for sources *)
 let save_sources () =
   Hstr.iter
-    (fun k (_n, (s: GSourceView.source_view), _l) ->
-      if s#source_buffer#modified then
+    (fun k (_n, (s: GSourceView.source_view), _l, read_only) ->
+      if not read_only && s#source_buffer#modified then
         let text_to_save = s#source_buffer#get_text () in
         send_request (Save_file_req (k, text_to_save))
     )
@@ -337,7 +337,8 @@ let save_sources () =
 
 (* True if there exist a file which needs saving *)
 let files_need_saving () =
-  Hstr.fold (fun _k (_, s, _) acc -> acc || s#source_buffer#modified) source_view_table false
+  Hstr.fold (fun _k (_, s, _, read_only ) acc ->
+      acc || (not read_only && s#source_buffer#modified)) source_view_table false
 
 (* Ask if the user wants to save session before exit. Exit is then delayed until
    the [Saved] notification is received *)
@@ -363,7 +364,7 @@ let exit_function_handler b =
 
 (* Erase colors in all source views *)
 let erase_loc_all_view () =
-  Hstr.iter (fun _ (_, v, _) -> erase_color_loc v) source_view_table
+  Hstr.iter (fun _ (_, v, _, _) -> erase_color_loc v) source_view_table
 
 (* Update name of the tab when the label changes so that it has a * as prefix *)
 let update_label_change (label: GMisc.label) =
@@ -380,9 +381,11 @@ let update_label_saved (label: GMisc.label) =
 
 let make_sources_editable b =
   Hstr.iter
-    (fun _ (_,source_view,_) ->
-      source_view#set_editable b;
-      source_view#set_auto_indent b)
+    (fun _ (_,source_view,_,read_only) ->
+      if not read_only then begin
+          source_view#set_editable b;
+          source_view#set_auto_indent b
+        end)
     source_view_table
 
 (**********************)
@@ -927,7 +930,7 @@ let create_eventbox ~read_only file =
               | exception Not_found ->
                   print_message ~kind:1 ~notif_kind:"ide_error"
                     "Error of the graphic interface: cannot find %s" file
-              | (page_number, _, _)  ->
+              | (page_number, _, _, _)  ->
                   notebook#remove_page page_number;
                   Hstr.remove source_view_table file) in
       right_click_label_menu#append close_item in
@@ -941,7 +944,7 @@ let create_eventbox ~read_only file =
       ) in
   eventbox
 
-let create_raw_source_view ~read_only f =
+let create_raw_source_view ~read_only f contents =
   let fl = Filename.basename f in
   let markup =
     if read_only then  "<span font-style=\"italic\">" ^ fl ^ "</span>"
@@ -973,7 +976,11 @@ let create_raw_source_view ~read_only f =
       ~packing:scrolled_source_view#add
       ()
   in
-  Hstr.add source_view_table f (source_page, source_view, label);
+  source_view#source_buffer#begin_not_undoable_action ();
+  source_view#source_buffer#set_text contents;
+  source_view#source_buffer#end_not_undoable_action ();
+  source_view#source_buffer#set_modified false;
+  Hstr.add source_view_table f (source_page, source_view, label, read_only);
   Gconfig.add_modifiable_mono_font_view source_view#misc;
   create_colors gconfig source_view;
   Gconfig.set_fonts ();
@@ -984,17 +991,13 @@ let create_raw_source_view ~read_only f =
 let create_source_view ~read_only f content f_format =
   if not (Hstr.mem source_view_table f) then
     begin
-      let source_page, source_view = create_raw_source_view ~read_only f in
-      source_view#source_buffer#begin_not_undoable_action ();
-      source_view#source_buffer#set_text content;
-      source_view#source_buffer#end_not_undoable_action ();
-      source_view#source_buffer#set_modified false;
+      let source_page, source_view = create_raw_source_view ~read_only f content in
       (* At initialization, file has not changed. When it changes, changes the
          name of the tab and update has_changed boolean. *)
       let (_: GtkSignal.id) = source_view#source_buffer#connect#modified_changed
           ~callback:(fun () ->
               try
-                let _source_page, source_view, label =
+                let _source_page, source_view, label, read_only =
                   Hstr.find source_view_table f in
                 if not read_only then
                   if source_view#source_buffer#modified then
@@ -1013,7 +1016,7 @@ let create_source_view ~read_only f content f_format =
 let get_source_view (file: string) : GSourceView.source_view =
   if file = "Task" then task_view else
   match Hstr.find source_view_table file with
-  | (_, v, _) -> v
+  | (_, v, _, _) -> v
   | exception Not_found -> raise (Nosourceview file)
 
 
@@ -1069,13 +1072,12 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
     let f, l, e, _ = Loc.get loc in
     let (n, v) =
       if f = "Task" then (0, task_view) else
-        try let (n, v, _) = get_source_view_table f in
+        try let (n, v, _, _) = get_source_view_table f in
             (n, v)
         with Nosourceview f ->
-          let (n,v) = create_raw_source_view ~read_only:true f in
-          change_lang v (Filename.extension f);
           let s = Sysutil.file_contents f in
-          v#source_buffer#set_text s;
+          let (n,v) = create_raw_source_view ~read_only:true f s in
+          change_lang v (Filename.extension f);
           (n,v)
 
     in
@@ -1104,7 +1106,7 @@ let find_current_file_view () =
   let n = notebook#current_page in
   if n = 0 then Some ("Task", task_view) else
     let acc = ref None in
-    Hstr.iter (fun k (x, v, _) -> if x = n then acc := Some (k, v)) source_view_table;
+    Hstr.iter (fun k (x, v, _, _) -> if x = n then acc := Some (k, v)) source_view_table;
     !acc
 
 (* Save the current location of the cursor to be reused after reload *)
@@ -1681,7 +1683,7 @@ let treat_message_notification msg = match msg with
   | File_Saved f                 ->
     begin
       try
-        let (_source_page, source_view, _) = Hstr.find source_view_table f in
+        let (_source_page, source_view, _, _) = Hstr.find source_view_table f in
         source_view#source_buffer#set_modified false;
         print_message ~kind:1 ~notif_kind:"File_Saved" "%s was saved" f
       with
@@ -2814,7 +2816,7 @@ let treat_notification n =
      let content = try_convert content in
      begin
        try
-         let (_, sc_view, _) = Hstr.find source_view_table file_name in
+         let (_, sc_view, _, _source_view_is_read_only) = Hstr.find source_view_table file_name in
          (* read_only means it was sent by ctrl+l not by reload. So, if the file
             already exists, we dont want to erase users changes. *)
          if not read_only then
@@ -2930,7 +2932,7 @@ let batch s =
           let cmd = Strings.join " " cmd in
           let v = Hstr.fold (fun _ x acc ->
               match acc, x with
-              | None, (sp, sv, _) when sp = 1 ->
+              | None, (sp, sv, _, _) when sp = 1 ->
                   Some sv
               | _ -> acc) source_view_table None
           in
