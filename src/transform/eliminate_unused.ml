@@ -18,19 +18,43 @@ let debug = Debug.register_info_flag "eliminate_unused"
   ~desc:"Print@ debugging@ messages@ of@ the@ \
     'eliminate_unused'@ transformation."
 
+let meta_depends =
+  Theory.(register_meta
+    ~desc:"declares an dependency between a proposition \
+           and a logic symbol. Used by the transformation `eliminate_unused`"
+    "depends"
+    [ MTprsymbol ; MTlsymbol ])
 
 type used_symbols = {
     keep_constants : bool;
     keep_other_logic_symbols : bool;
     used_ts : Sts.t;
     used_ls : Sls.t;
+    depends : Sls.t Mpr.t;
   }
 
 let initial bc bls  =
   { keep_constants = bc;
     keep_other_logic_symbols = bls;
     used_ts = Sts.add ts_int Sts.empty;
-    used_ls = Sls.add ps_equ Sls.empty }
+    used_ls = Sls.add ps_equ Sls.empty;
+    depends = Mpr.empty;
+  }
+
+let add_dependency usymb l =
+  match l with
+  | Theory.[ MApr pr ; MAls ls ] ->
+     let d =
+       Mpr.change
+         (function
+          | None -> Some (Sls.singleton ls)
+          | Some s -> Some (Sls.add ls s))
+         pr  usymb.depends
+     in
+     { usymb with depends = d }
+  | _ -> assert false (* wrongly typed meta, impossible *)
+
+
 
 let used_symbols_in_type =
   ty_s_fold
@@ -63,10 +87,19 @@ let rec eliminate_unused_decl acc task : Task.task =
         Task.add_tdecl ta td
      | Theory.Decl d ->
         match d.d_node with
-        | Dprop (_,_,t) ->
-           let acc = used_symbols_in_term acc t in
-           let ta = eliminate_unused_decl acc ta in
-           Task.add_decl ta d
+        | Dprop (_,pr,t) ->
+           begin
+             try
+               let s = Mpr.find pr acc.depends in
+               if Sls.is_empty (Sls.inter s acc.used_ls) then
+                 eliminate_unused_decl acc ta
+               else raise Not_found
+             with
+               Not_found ->
+                let acc = used_symbols_in_term acc t in
+                let ta = eliminate_unused_decl acc ta in
+                Task.add_decl ta d
+           end
         | Ddata ddl ->
            if List.exists
                 (fun (ts,cl) ->
@@ -165,12 +198,17 @@ let rec eliminate_unused_decl acc task : Task.task =
             eliminate_unused_decl acc ta
           end
 
-
 let eliminate_unused_types = Trans.store (eliminate_unused_decl (initial true true))
 
 let eliminate_unused_keep_constants = Trans.store (eliminate_unused_decl (initial true false))
 
 let eliminate_unused = Trans.store (eliminate_unused_decl (initial false false))
+
+let eliminate_unused_meta =
+  let o t =
+    eliminate_unused_decl
+      (Task.on_meta meta_depends add_dependency (initial false false) t) t in
+  Trans.store o
 
 let () =
   Trans.register_transform "eliminate_unused_types" eliminate_unused_types
@@ -182,4 +220,8 @@ let () =
 
 let () =
   Trans.register_transform "eliminate_unused" eliminate_unused
+    ~desc:"Eliminate@ unused@ type@ symbols@ and@ unused@ logic@ symbols"
+
+let () =
+  Trans.register_transform "eliminate_unused_dependencies" eliminate_unused_meta
     ~desc:"Eliminate@ unused@ type@ symbols@ and@ unused@ logic@ symbols"
