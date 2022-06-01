@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -306,6 +306,8 @@ val t_attr_set : ?loc:Loc.position -> Sattr.t -> term -> term
 val t_attr_add : attribute -> term -> term
 val t_attr_remove : attribute -> term -> term
 val t_attr_copy : term -> term -> term
+(** [t_attr_copy src dst] return the term [dst] with attributes and
+   locations augmented with those of term [src] *)
 
 (** Constructors with propositional simplification *)
 

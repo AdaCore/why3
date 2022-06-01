@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -300,8 +300,7 @@ let empty_main =
     memlimit = 1000; (* 1 Mb *)
     running_provers_max = 2; (* two provers run in parallel *)
     plugins = [];
-    default_editor = (try Sys.getenv "EDITOR" ^ " %f"
-                      with Not_found -> "editor %f");
+    default_editor = Config.editor ^ " %f"
   }
 
 exception ConfigFailure of string (* filename *) * string
@@ -984,6 +983,17 @@ let set_provers config ?shortcuts provers =
    prover_shortcuts = shortcuts;
   }
 
+let add_provers config provers shortcuts =
+  let provers =
+    (* we keep existing provers when already present, as said in the interface *)
+    Mprover.union (fun _key x _y -> Some x) config.provers provers
+  in
+  let prover_shortcuts =
+    (* we keep existing shortcuts when already present, as said in the interface *)
+    Mstr.union (fun _key x _y -> Some x) config.prover_shortcuts shortcuts
+  in
+  { config with provers; prover_shortcuts }
+
 let set_prover_shortcuts config shortcuts =
   {config with
     prover_shortcuts = shortcuts;
@@ -999,6 +1009,7 @@ let set_prover_upgrade_policy config prover target =
   {config with
     provers_upgrade_policy = m;
   }
+
 
 let set_policies config policies =
   { config with

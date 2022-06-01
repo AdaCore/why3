@@ -3,6 +3,8 @@
 Compilation, Installation
 =========================
 
+.. program:: why3
+
 Installing Why3
 ---------------
 
@@ -80,8 +82,8 @@ this can be turned into a shell script for easier use:
     exec docker --rm -p 8080:8080 --env WHY3IDE=web --user `id -u` --volume `pwd`:/data --workdir /data why3 "$@"
 
 
-Installation from Source Distribution
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Installation from sources
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In short, installation from sources proceeds as follows.
 
@@ -164,7 +166,7 @@ Installation can be tested as follows:
        > why3 replay same_fringe
         18/18 (replay OK)
 
-Local Use, Without Installation
+Local use, without installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Installing Why3 is not mandatory. It can be configured in a way such that
@@ -194,7 +196,7 @@ Beware that if your OCaml installation relies on Opam installed in your
 own user space, then ``make install-lib`` should *not* be run as
 super-user.
 
-Removing Installation
+Removing installation
 ^^^^^^^^^^^^^^^^^^^^^
 
 Removing installation can be done using
@@ -227,7 +229,7 @@ to run the following command:
 It scans your :envvar:`PATH` for provers and updates your configuration file
 (see :numref:`sec.why3config`) accordingly.
 
-Multiple Versions of the Same Prover
+Multiple versions of the same prover
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Why3 is able to use several versions of the same prover, e.g., it can use both
@@ -243,7 +245,7 @@ used to specify names of prover executables:
 
     why3 config add-prover CVC4 /usr/local/bin/cvc4-dev cvc4-dev
 
-the first argument (here ``CVC4``) must be one of the known provers. The
+The first argument (here ``CVC4``) must be one of the known provers. The
 list of these names can be obtained
 using :why3:tool:`why3 config list-supported-provers`.
 They can also be found in the file :file:`provers-detection-data.conf`,
@@ -252,7 +254,7 @@ typically located in :file:`/usr/local/share/why3` after installation. See
 
 .. _sec.uninstalledprovers:
 
-Session Update after Prover Upgrade
+Session update after prover upgrade
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you happen to upgrade a prover, e.g., installing CVC4 1.5 in place of CVC4
@@ -298,16 +300,12 @@ as detailed in :numref:`sec.why3session`.
 
 .. _sec.installeditormodes:
 
-Configure Editors for editing WhyML sources
--------------------------------------------
+Editing WhyML Sources
+---------------------
 
 The Why3 distributions come with some configuration files for Emacs and for Vim.
 These files are typically installed in the shared data directory,
-which is given by
-
-::
-
-     why3 --print-datadir
+which is given by :option:`why3 --print-datadir`.
 
 Emacs
 ~~~~~
@@ -340,11 +338,11 @@ Some configuration files are present in the share data directory, under sub-dire
 
 .. _sec.installshellmodes:
 
-Configure Shells for auto-completion of Why3 command arguments
---------------------------------------------------------------
+Shells Auto-completion for Why3
+-------------------------------
 
 Some configuration files for shells are distributed in the shared data directory,
-which is given by ``why3 --print-data-dir``.
+which is given by :option:`why3 --print-datadir`.
 
 There are configuration files for ``bash`` and ``zsh``.
 

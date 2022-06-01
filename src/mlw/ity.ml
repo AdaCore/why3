@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -579,10 +579,10 @@ let mk_flg ~frz ~exp ~lbl ~fxd ~vis = {
   its_frozen = frz; its_exposed = exp; its_liable = lbl;
   its_fixed  = fxd; its_visible = vis }
 
-let its_of_ts ts priv =
+let its_of_ts ts priv ofld =
   assert (ts.ts_def = NoDef);
   let flg = mk_flg ~frz:priv ~exp:true ~lbl:priv ~fxd:true ~vis:true in
-  mk_its ~ts ~nfr:priv ~priv ~mut:false ~frg:false ~mfld:[] ~ofld:[]
+  mk_its ~ts ~nfr:priv ~priv ~mut:false ~frg:false ~mfld:[] ~ofld
     ~regs:[] ~aflg:(List.map (fun _ -> flg) ts.ts_args) ~rflg:[] ~def:NoDef
 
 let create_rec_itysymbol id args =
@@ -766,11 +766,19 @@ let t_freepvs pvs t = pvs_of_vss pvs (t_vars t)
 
 (** builtin symbols *)
 
-let its_int  = its_of_ts ts_int  true
-let its_real = its_of_ts ts_real true
-let its_bool = its_of_ts ts_bool true
-let its_str  = its_of_ts ts_str  true
-let its_func = its_of_ts ts_func true
+let its_of_ts ts =
+  (* the only non-private types are bool and n-tuples *)
+  let priv = not (ts_equal ts ts_bool || is_ts_tuple ts) in
+  (* the only built-in types with fields are n-tuples *)
+  let mk_fld v = create_pvsymbol (id_fresh "a") (ity_var v) in
+  let ofld = if priv then [] else List.map mk_fld ts.ts_args in
+  its_of_ts ts priv ofld
+
+let its_int  = its_of_ts ts_int
+let its_real = its_of_ts ts_real
+let its_bool = its_of_ts ts_bool
+let its_str  = its_of_ts ts_str
+let its_func = its_of_ts ts_func
 
 let ity_int  = ity_app its_int  [] []
 let ity_real = ity_app its_real [] []
@@ -780,7 +788,7 @@ let ity_str  = ity_app its_str  [] []
 let ity_func a b = ity_app its_func [a;b] []
 let ity_pred a   = ity_app its_func [a;ity_bool] []
 
-let its_tuple = Hint.memo 17 (fun n -> its_of_ts (ts_tuple n) false)
+let its_tuple = Hint.memo 17 (fun n -> its_of_ts (ts_tuple n))
 
 let ity_tuple tl = ity_app (its_tuple (List.length tl)) tl []
 

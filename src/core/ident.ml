@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -342,6 +342,8 @@ let sanitizer' head rest last n =
 let sanitizer head rest n = sanitizer' head rest rest n
 
 (** {2 functions for working with counterexample attributes} *)
+
+let is_field_id_attr = create_attribute "is_field_id"
 
 let proxy_attr = create_attribute "mlw:proxy_symbol"
 

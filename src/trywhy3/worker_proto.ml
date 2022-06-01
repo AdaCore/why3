@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -20,16 +20,15 @@ type transform = Prove of int | Split of int | Clean
 type why3_command =
   | ParseBuffer of string * string * int
   | ExecuteBuffer of string * string
-  | ProveAll
   | Transform of transform * id
   | SetStatus of status * id
   | GetFormats
 
 type why3_output =
   | Error of string (* msg *)
-  | ErrorLoc of (loc * string) (* loc * msg *)
+  | ErrorLoc of loc * string (* loc * msg *)
   | Theory of id * string (* Theory (id, name) *)
-  | Task of (id * id * string * string * why3_loc list * string * int)
+  | Task of id * id * string * string * why3_loc list * string * int
   (* id, parent id, expl, code, location list, pretty, steps*)
   | Result of string list
   | UpdateStatus of status * id

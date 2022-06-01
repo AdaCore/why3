@@ -17,7 +17,7 @@ shopt -s nullglob
 
 suffix=
 
-categories="badfiles drivers execution extraction goodfiles inferloop invalidgoals list mlwprinter rac realizations replay replay-without-shapes stdlib steplimit validgoals validsplitgoals stackify"
+categories="badfiles drivers execution extraction goodfiles inferloop invalidgoals list mlwprinter rac realizations replay replay-without-shapes stdlib steplimit memlimit validgoals validsplitgoals stackify"
 
 enabled_categories=""
 
@@ -149,9 +149,6 @@ drivers () {
     pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
     for f in $1/*.drv; do
-        if [[ $f == drivers/ocaml*.drv ]]; then continue; fi
-        if [[ $f == drivers/c.drv ]]; then continue; fi
-        if [[ $f == drivers/cakeml.drv ]]; then continue; fi
         printf "  $f... "
         # running Why
         if ! echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver=$f - > /dev/null; then
@@ -206,6 +203,42 @@ step_limit () {
                 echo $pgm --stepslimit 10 -P $p $f
                 $pgm --stepslimit 10 -P $p $f
                 exit 1
+            fi
+        done
+    done
+}
+
+mem_limit () {
+    pgm="bin/why3$suffix prove"
+    test -d $1 || exit 1
+    provers=`bin/why3$suffix config list-provers | grep 'Alt-Ergo 2\.[3-9]\\.[0-9]$\|CVC4 1\.[6-8]$\|Z3 4\.[6-8]\.[0-9]\+$' | tr ' ' ',' | tr -d '()'`
+    for f in $1/*.mlw; do
+        for p in $provers ; do
+            if [[ "$p" =~ .*strings.* ]]; then
+                # FIXME: the behavior is different with the strings alternative
+                # (the prover replies Unknown and not Out of memory)
+                # to be investigated
+                echo "  $f (memory limit for $p)... skipped "
+            else
+                # Testing that at least one run between --memlimit=40 and
+                # --memlimit=30 replies Out of memory seems a reasonable
+                # heuristic
+                printf "  $f (memory limit 40 for $p)... "
+                if $pgm --memlimit=40 --timelimit=5 -P $p $f | \
+                            grep -q "Prover result is: Out of memory"; then
+                    printf "ok\n"
+                else
+                    printf "(retrying with memlimit=30) "
+                    if $pgm --memlimit=30 --timelimit=5 -P $p $f | \
+                            grep -q "Prover result is: Out of memory"; then
+                        printf "ok\n"
+                    else
+                        printf "failed!\n"
+                        echo $pgm --memlimit=30 --timelimit=5 -P $p $f
+                        $pgm --memlimit=30 --timelimit=5 -P $p $f
+                        exit 1
+                    fi
+                fi
             fi
         done
     done
@@ -479,6 +512,12 @@ fi
 if enabled steplimit; then
 echo "=== Checking step limits ==="
 step_limit bench/steplimit
+echo ""
+fi
+
+if enabled memlimit; then
+echo "=== Checking memory limits ==="
+mem_limit bench/memlimit
 echo ""
 fi
 

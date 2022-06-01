@@ -43,7 +43,15 @@
     git push
     git push --tags
     ```
-  - upload `distrib/why3-$RELEASE.tar.gz` to https://gforge.inria.fr/frs/?group_id=2990
+  - upload `distrib/why3-$RELEASE.tar.gz` to https://gitlab.inria.fr/why3/releases
+    ```
+    git clone git@gitlab.inria.fr:why3/releases.git why3-releases
+    cd why3-releases
+    cp .../distrib/why3-$RELEASE.tar.gz releases/
+    git add releases/why3-$RELEASE.tar.gz
+    git commit -m "Add release $RELEASE."
+    git push
+    ```
 
 * upload the documentation on the web page
   ```
@@ -60,7 +68,7 @@
   ln -s -n -f api-$VERSION $DEST/api
   ```
 
-* update the main HTML page (sources are in repository `why3-www`)
+* update the main HTML page; sources are in https://gitlab.inria.fr/why3/www
   - edit `index.html`, change at least all occurrences of the version, and
     update the url for download
   - `make` (to check validity)
@@ -69,7 +77,9 @@
     ```
     make trywhy3
     make trywhy3.tar.gz
+    rm -r $DEST/try
     tar xzf trywhy3.tar.gz -C $DEST/try/ --strip-components=1
+    ln -s trywhy3.html $DEST/try/index.html
     ```
 
 * prepare the OPAM package
@@ -105,7 +115,7 @@
 
 * produce the Why3 part of Toccata gallery
   - have `GALLERYDIR` set to the sub-directory `gallery/` of the git sources
-    of the Toccata web site, e.g.
+    of the Toccata web site, e.g.,
     `export GALLERYDIR=/users/vals/filliatr/toccata/web/gallery`
   - in Why3 sources, do `make gallery`; it exports to `$GALLERYDIR` all
     Why3 programs for which there is a session

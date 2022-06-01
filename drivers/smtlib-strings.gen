@@ -70,8 +70,14 @@ theory string.String
   syntax predicate suffixof  "(str.suffixof %1 %2)"
 
   (* syntax function is_digit  "(str.is_digit %1)" *)
-  syntax function to_int     "(str.to.int %1)"
-  syntax function from_int   "(int.to.str %1)"
+  syntax function to_int     "(str.to_int %1)"
+  syntax function from_int   "(str.from_int %1)"
+
+  syntax predicate lt        "(str.< %1 %2)"
+  syntax predicate le        "(str.<= %1 %2)"
+
+  syntax function replaceall "(str.replace_all %1 %2 %3)"
+
 
 end
 
@@ -90,7 +96,14 @@ theory string.StringRealization
   syntax predicate suffixof  "(str.suffixof %1 %2)"
 
   (* syntax function is_digit  "(str.is_digit %1)" *)
-  syntax function to_int     "(str.to.int %1)"
-  syntax function from_int   "(int.to.str %1)"
+  syntax function to_int     "(str.to_int %1)"
+  syntax function from_int   "(str.from_int %1)"
+
+  syntax predicate lt        "(str.< %1 %2)"
+  syntax predicate le        "(str.<= %1 %2)"
+
+  syntax function replaceall "(str.replace_all %1 %2 %3)"
+
+
 
 end

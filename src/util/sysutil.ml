@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -161,7 +161,25 @@ let system_dependent_absolute_path dir p =
   let rec aux dir l =
     match l with
     | [] -> dir
-    | ".." :: xs when is_regular_dir dir -> aux (Filename.dirname dir) xs
+    | ".." :: xs when is_regular_dir dir ->
+        let d = Filename.basename dir in
+        let dir' = Filename.dirname dir in
+        if dir' = dir then
+          if dir = Filename.current_dir_name then
+            (* dir = "." *)
+            aux Filename.parent_dir_name xs
+          else
+            (* dir = "/" *)
+            aux dir' xs
+        else if d = Filename.current_dir_name then
+          (* dir = "foo/." *)
+          aux dir' l
+        else if d = Filename.parent_dir_name then
+          (* dir = "foo/.." *)
+          aux (Filename.dirname dir') l
+        else
+          (* dir = "foo/bar" *)
+          aux dir' xs
     | x :: xs -> aux (Filename.concat dir x) xs
   in
   aux dir p

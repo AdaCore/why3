@@ -1,3 +1,14 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
+
 open Cfg_paths
 open Cfg_ast
 open Why3
@@ -9,19 +20,21 @@ let stackify = ref (fun _ -> failwith "stackify is not compiled")
 
 let set_stackify f = stackify := f; has_stackify := true
 
-let stackify_attr = ATstr (Ident.create_attribute "cfg:stackify")
+let stackify_attr = Ident.create_attribute "cfg:stackify"
 
 let translate_cfg_fundef (x : cfg_fundef) =
   let (id, _, _, _, _, _, _, _, _) = x in
-  if List.exists (function ATstr a -> a.attr_string = "cfg:stackify" | _ -> false) id.id_ats
+  if List.exists (function ATstr a -> Ident.attr_equal a stackify_attr | _ -> false) id.id_ats
   then !stackify x else Cfg_paths.translate_cfg_fundef x
 
 let translate_letcfg d =
   let loc = Loc.dummy_position in
   let (id, ghost, rk, args, retty, pat, mask, spec, body) = translate_cfg_fundef d in
 
-  let r = Dlet (id, ghost, rk, mk_expr ~loc (Efun (args, retty, pat, mask, spec, body))) in
-  Debug.dprintf debug "%a@." (Mlw_printer.pp_decl ~attr:true) r;
+  let r =
+    Dlet (id, ghost, rk, Ptree_helpers.expr ~loc (Efun (args, retty, pat, mask, spec, body)))
+  in
+  Debug.dprintf Cfg_paths.debug "%a@." (Mlw_printer.pp_decl ~attr:true) r;
   r
 
 let translate_reccfg ds =
@@ -49,4 +62,4 @@ let read_channel env _path file c =
 
 let () =
   Env.register_format mlw_language "mlcfg" ["mlcfg"; "stdout"] read_channel
-    ~desc:"whyml extending with functions implemented by control-flow-graphs"
+    ~desc:"whyml extended with functions implemented by control-flow-graphs"

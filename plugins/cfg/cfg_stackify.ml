@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -72,7 +72,7 @@ let rec pp_pty fmt t =
   | _ ->
      Format.pp_print_string fmt "<unknown pp_pty>"
 
-let divergent_attr = ATstr (Ident.create_attribute "vc:divergent")
+let divergent_attr = ATstr Vc.nt_attr
 
 exception CFGError of string
 
@@ -85,10 +85,23 @@ let mk_loop_continue entry : Ptree.expr =
 
 let mk_loop_expr entry invariants (e : Ptree.expr) : Ptree.expr =
     let continue = mk_expr ~loc:Loc.dummy_position (Eoptexn (entry, Ity.MaskVisible, e)) in
-    let invariants = List.map snd invariants in
-    mk_expr ~loc:entry.id_loc (Ewhile (mk_expr ~loc:Loc.dummy_position Etrue, invariants, [], continue))
+    let invariants =
+      List.map (fun (id,t) ->
+          let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ id.id_str)) in
+          { term_loc = t.term_loc; term_desc = Tattr (attr, t) })
+        invariants
+    in
+    let infinite_loop =
+      mk_expr ~loc:entry.id_loc
+        (Ewhile (mk_expr ~loc:Loc.dummy_position Etrue, invariants, [], continue))
+    in
+    (* adding a "absurd" after the infinite loop to avoid generation of
+       meaningless VCs *)
+    let absurd = mk_expr ~loc:Loc.dummy_position Eabsurd in
+    mk_expr ~loc:entry.id_loc (Esequence(infinite_loop,absurd))
 
-let mk_scope_break entry ?(loc=entry.id_loc)  =
+
+let mk_scope_break entry ?(loc=entry.id_loc) () =
   mk_expr ~loc (Eraise (Qident entry, None))
 
 let mk_scope_expr entry inner outer =
@@ -98,7 +111,7 @@ let mk_scope_expr entry inner outer =
 
 let translate_instr (i : Cfg_ast.cfg_instr) : Ptree.expr =
   match i.cfg_instr_desc with
-  | CFGinvariant inv ->
+  | CFGinvariant _inv ->
     mk_unit ~loc:Loc.dummy_position (* temporary *)
   | CFGexpr e -> e
 
@@ -107,12 +120,12 @@ let rec translate_term subst (t : Cfg_ast.cfg_term) : Ptree.expr =
   | CFGgoto l ->
     begin match List.find_opt (fun (l', _) -> l'.id_str = l.id_str) subst with
     | Some (_, e) -> e
-    | _ -> mk_scope_break l ~loc:t.cfg_term_loc
+    | _ -> mk_scope_break l ~loc:t.cfg_term_loc ()
     end
   | CFGreturn e -> mk_expr ~loc:t.cfg_term_loc (Eraise (Qident (mk_id ~loc:Loc.dummy_position "Return"), Some e))
   | CFGswitch(e, brs) ->
     (* TODO: why arent we using fall and can we remove it? *)
-    let mk_switch fall branches =
+    let mk_switch _fall branches =
       let branches = List.map (fun (pat, term) ->
           (pat, translate_term subst term)
       ) branches in

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -104,7 +104,6 @@ let number_format = {
     Number.frac_real_support =
       `Custom
         ((fun fmt i -> fprintf fmt "$to_real(%s)" i),
-         (fun fmt i n -> fprintf fmt "$product($to_real(%s),$to_real(%s))" i n),
          (fun fmt i n -> fprintf fmt "$quotient($to_real(%s),$to_real(%s))" i n));
 }
 
@@ -113,7 +112,6 @@ let number_format_metitarski = {
     Number.frac_real_support =
       `Custom
         ((fun fmt i -> pp_print_string fmt i),
-         (fun fmt i n -> fprintf fmt "(%s * %s)" i n),
          (fun fmt i n -> fprintf fmt "(%s / %s)" i n));
   }
 

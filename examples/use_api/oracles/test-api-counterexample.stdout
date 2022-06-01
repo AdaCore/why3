@@ -11,27 +11,35 @@ theory Task
 end
 
 On task 1, CVC4,1.7 answers Unknown (sat) (0.0xs, 84 steps)
-Model is {"myfile.my_ext":
-           {"28":
-             [{"attrs": ["model_trace:my_A"],
-               "kind": "other",
-               "name": "my_A",
-               "value": {"type": "Boolean", "val": true}}],
-            "42":
-             [{"attrs": ["model_trace:my_A"],
-               "kind": "other",
-               "name": "my_A",
-               "value": {"type": "Boolean", "val": true}},
-              {"attrs": ["model_trace:my_B"],
-               "kind": "other",
-               "name": "my_B",
-               "value": {"type": "Boolean", "val": false}}]},
-          "myfile.my_ext2":
-           {"101":
-             [{"attrs": ["model_trace:my_B"],
-               "kind": "other",
-               "name": "my_B",
-               "value": {"type": "Boolean", "val": false}}]}}
+Model is [{"filename": "myfile.my_ext",
+           "model":
+            [{"is_vc_line": false,
+              "loc": "28",
+              "model_elements":
+               [{"attrs": ["model_trace:my_A"],
+                 "kind": "other",
+                 "name": "my_A",
+                 "value": {"type": "Boolean", "val": true}}]},
+             {"is_vc_line": true,
+              "loc": "42",
+              "model_elements":
+               [{"attrs": ["model_trace:my_A"],
+                 "kind": "other",
+                 "name": "my_A",
+                 "value": {"type": "Boolean", "val": true}},
+                {"attrs": ["model_trace:my_B"],
+                 "kind": "other",
+                 "name": "my_B",
+                 "value": {"type": "Boolean", "val": false}}]}]},
+          {"filename": "myfile.my_ext2",
+           "model":
+            [{"is_vc_line": false,
+              "loc": "101",
+              "model_elements":
+               [{"attrs": ["model_trace:my_B"],
+                 "kind": "other",
+                 "name": "my_B",
+                 "value": {"type": "Boolean", "val": false}}]}]}]
 
 == Check CE
 

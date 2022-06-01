@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -236,10 +236,28 @@ let analyse_result exit_result res_parser get_counterexmp printing_info out =
       exit_result
   in
 
+  let merge_answers opt_ans1 opt_ans2 = match (opt_ans1,opt_ans2) with
+  | None, Some _ -> opt_ans2
+  | Some _, None -> opt_ans1
+  (* prefer any answer over HighFailure *)
+  | Some HighFailure, Some _ -> opt_ans2
+  | _ -> opt_ans1
+  in
+
   let rec analyse saved_models saved_res l =
     match l with
     | [] ->
         Opt.get_def HighFailure saved_res, List.rev saved_models
+    (** FIXME (see https://gitlab.inria.fr/why3/why3/-/issues/648)
+        The following case is a specific treatment for cases when Answer HighFailure
+        is appended at the end of result_list because signaled is true in the function
+        parse_prover_run.
+        Without this hack, if a regexp matches exactly the last line of the prover output
+        and if Answer HighFailure has been appended at the end, we might end up with two
+        consecutive answers in result_list that are ignored by the more general case
+        Answer res1 :: (Answer res2 :: tl as tl1). *)
+    | Answer res :: (Answer HighFailure :: []) ->
+        Opt.get_def HighFailure (merge_answers (Some res) saved_res), List.rev saved_models
     | Answer res1 :: (Answer res2 :: tl as tl1) ->
        Debug.dprintf debug "Call_provers: two consecutive answers: %a %a@."
           print_prover_answer res1 print_prover_answer res2;
@@ -263,17 +281,19 @@ let analyse_result exit_result res_parser get_counterexmp printing_info out =
           (Valid, [])
         else
           if get_counterexmp then
+            begin
             let m = res_parser.prp_model_parser printing_info model_str in
             Debug.dprintf debug "Call_provers: model:@.";
             debug_print_model ~print_attrs:false m;
             analyse ((res, m) :: saved_models) (Some res) tl
+            end
           else
-            analyse saved_models (Some res) tl
+            analyse saved_models (merge_answers (Some res) saved_res) tl
     | Answer res :: tl ->
         if res = Valid then
           (Valid, [])
         else
-          analyse saved_models (Some res) tl
+          analyse saved_models (merge_answers (Some res) saved_res) tl
     | Model _fail :: tl -> analyse saved_models saved_res tl
   in
 

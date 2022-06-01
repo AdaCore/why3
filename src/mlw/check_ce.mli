@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -21,7 +21,7 @@ open Model_parser
     checking, as described in the following article:
 
     {%html:<blockquote>%}
-      Benedikt Becker, Cl·udio Belo LourenÁo, Claude MarchÈ (2021):
+      Benedikt Becker, Cl√°udio Belo Louren√ßo, Claude March√© (2021):
       {e Explaining Proof Failures with Giant-Step Runtime Assertion Checking}.
     {%html:</blockquote>%}
 
@@ -49,8 +49,16 @@ type rac_result_state =
 val print_rac_result_state : rac_result_state Pp.pp
 (** Print a RAC result state *)
 
-type rac_result = rac_result_state * Log.exec_log
-(** The result of a RAC execution is comprised of the final state and the
+type rac_result =
+  | RAC_not_done of string
+(** RAC has not be done for the reason given as argument.
+    Possible reasons include:
+    - the VC has no identified source location,
+    - the identified source location cannot be associated to a program routine,
+    - a small-step RAC has not been executed because only the giant-step one
+      was requested. *)
+  | RAC_done of rac_result_state * Log.exec_log
+(** The result of a RAC execution includes the final state and the
    execution log. *)
 
 val string_of_rac_result_state : rac_result_state -> string
@@ -59,7 +67,7 @@ val string_of_rac_result_state : rac_result_state -> string
 val print_rac_result : ?verb_lvl:int -> rac_result Pp.pp
 (** Print the result state of a RAC execution with the execution log *)
 
-val rac_execute : Pinterp.ctx -> Expr.rsymbol -> rac_result
+val rac_execute : Pinterp.ctx -> Expr.rsymbol -> rac_result_state * Log.exec_log
 (** Execute a call to the program function given by the [rsymbol] using normal
     or giant-step RAC, using the given model as an oracle for program parameters
     (and during giant-steps). *)
@@ -123,7 +131,9 @@ val print_model_classification :
 (** Print the classification with the classification log or model. *)
 
 val classify : vc_term_loc:Loc.position option -> vc_term_attrs:Ident.Sattr.t ->
-  normal_result:rac_result -> giant_step_result:rac_result -> classification
+  normal_result:rac_result_state * Log.exec_log -> 
+  giant_step_result:rac_result_state * Log.exec_log -> 
+  classification
 (** Classify a counterexample based on the results of the normal and giant-step
     RAC executions. *)
 
@@ -137,32 +147,78 @@ val classify : vc_term_loc:Loc.position option -> vc_term_attrs:Ident.Sattr.t ->
     counterexamples ({!recfield:Call_provers.prover_result.pr_models}). The
     following functions help selecting one counterexample. *)
 
+type strategy_from_rac =
+  (int * Call_provers.prover_answer * model * rac_result * rac_result) list ->
+  (int * Call_provers.prover_answer * model * rac_result * rac_result) list
+(** Type of strategies to select a model from the RAC execution results.*)
+
+val best_non_empty_giant_step_rac_result : strategy_from_rac
+(** Select the best non empty model based on the result of the giant-step RAC
+    execution, with the following classification:
+    RAC_done (Res_fail _ , _) > RAC_done (Res_normal, _)
+                              > RAC_done (Res_stuck _ , _)
+                              > RAC_done (Res_incomplete _ , _)
+                              > RAC_not_done _
+    *)
+val last_non_empty_model : strategy_from_rac
+(** Select the last non empty model. *)
+
+val get_rac_results :
+  ?timelimit:float -> ?steplimit:int -> ?verb_lvl:int ->
+  ?compute_term:compute_term ->
+  ?only_giant_step:bool ->
+  rac -> Env.env -> Pmodule.pmodule ->
+  (Call_provers.prover_answer * model) list ->
+  (int * Call_provers.prover_answer * model * rac_result * rac_result) list
+(** Given a list of models, return the list of these models together with the
+    results of the execution of normal and giant-step RAC.
+    When called with [~only_giant_step:true], executes only the giant-step RAC.*)
+
+val select_model_from_verdict :
+  (int * Call_provers.prover_answer * model * rac_result * rac_result) list ->
+  (model * classification) option
+(** Select a model based on the classification (itself based on the normal and
+    giant-step RAC executions).
+    The first good model is selected.*)
+
+val select_model_from_giant_step_rac_results :
+  ?strategy:strategy_from_rac ->
+  (int * Call_provers.prover_answer * model * rac_result * rac_result) list ->
+  (model * rac_result) option
+(** Select a model based on the giant-step RAC execution results.
+    By default, the strategy is [last_non_empty_model]. *)
+
 val select_model :
   ?timelimit:float -> ?steplimit:int -> ?verb_lvl:int ->
   ?compute_term:compute_term ->
-  check_ce:bool -> rac -> Env.env -> Pmodule.pmodule ->
+  check_ce:bool ->
+  rac -> Env.env -> Pmodule.pmodule ->
   (Call_provers.prover_answer * model) list -> (model * classification) option
-(** Select one of the given models. By default, counterexample classification
-    ([check_ce]) is disabled. When counterexample checking is enabled, the first
-    good model is selected (with verdict {!const:verdict.NC}, {!const:verdict.SW}, or
-    {!const:verdict.NC_SW}, if any), or the last non-empty model otherwise. The RAC
-    reduce configuration [rac] is used only when counterexample checking is
-    enabled. *)
+(** Select one of the given models.
+    When counterexample checking is enabled, the first good model is selected
+    (i.e. with verdict {!const:verdict.NC}, {!const:verdict.SW}, or
+    {!const:verdict.NC_SW}, if any).
+    When counterexample checking is disabled, the last non-empty model is selected.
+    The RAC reduce configuration [rac] is used only when counterexample checking is
+    enabled.
+
+    When counterexample checking is enabled, gives the same result as
+    [select_model_from_verdict] called with the result of [get_rac_results].*)
 
 val select_model_last_non_empty :
   (Call_provers.prover_answer * model) list -> model option
 (** Select the last, non-empty model in the incremental list of models.
 
     This is a compatiblity function for the behaviour before 2020, and gives
-    the same result as [select_model ~check_ce:false
-    ~sort_models:prioritize_last_non_empty_model]. *)
+    the same result as [select_model ~check_ce:false]. *)
 
 (**/**)
 
-val debug_check_ce : Debug.flag
-(** print information about the models returned by the solver and the
-   result of checking them by interpreting the program concretly and
-   abstractly using the values in the solver's model *)
+val debug_check_ce_rac_results : Debug.flag
+(** Print information about the models returned by the solver and the
+   results of checking them by interpreting the program concretly and
+   abstractly using the values in the solver's model. *)
 
-val debug_check_ce_summary : Debug.flag
-(** Print only a summary of checking the counterexample. *)
+val debug_check_ce_categorization : Debug.flag
+(** Print the result of the categorization computed from the results of
+    the concrete and abstract RAC executions. *)

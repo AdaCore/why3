@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -197,7 +197,7 @@ let env, gconfig =
 (********************************)
 
 
-let (why_lang, why3py_lang, why3c_lang) =
+let get_extra_lang =
   let main = Whyconf.get_main gconfig.config in
   let load_path = Filename.concat (Whyconf.datadir main) "lang" in
   let languages_manager =
@@ -205,28 +205,19 @@ let (why_lang, why3py_lang, why3c_lang) =
   in
   languages_manager#set_search_path
     (load_path :: languages_manager#search_path);
-  let why_lang =
-    match languages_manager#language "why3" with
+  fun shortcut name ->
+    let ll = ref None in
+    fun () ->
+    match !ll with
+    | Some l -> l
     | None ->
-        eprintf "language file for 'why3' not found in directory %s@."
-          load_path;
-        exit 1
-    | Some _ as l -> l in
-  let why3py_lang =
-    match languages_manager#language "why3py" with
-    | None ->
-        eprintf "language file for 'Why3python' not found in directory %s@."
-          load_path;
-        exit 1
-    | Some _ as l -> l in
-  let why3c_lang =
-    match languages_manager#language "why3c" with
-    | None ->
-        eprintf "language file for 'Why3c' not found in directory %s@."
-          load_path;
-        exit 1
-    | Some _ as l -> l in
-  (why_lang, why3py_lang, why3c_lang)
+       match languages_manager#language shortcut with
+       | None ->
+          eprintf "language file for '%s' not found in directory %s@."
+            name load_path;
+          exit 1
+       | Some x as l -> ll := l; x
+
 
 (* Borrowed from Frama-C src/gui/source_manager.ml:
 Try to convert a source file either as UTF-8 or as locale. *)
@@ -323,7 +314,7 @@ let exit_function_unsafe () =
    - source_view is the graphical element inside a tab
    - label_of_tab is the mutable title of the tab
 *)
-let source_view_table : (int * GSourceView.source_view * GMisc.label) Hstr.t =
+let source_view_table : (int * GSourceView.source_view * GMisc.label * bool) Hstr.t =
   Hstr.create 14
 
 (* The corresponding file does not have a source view *)
@@ -337,8 +328,8 @@ let get_source_view_table (file:string) =
 (* Saving function for sources *)
 let save_sources () =
   Hstr.iter
-    (fun k (_n, (s: GSourceView.source_view), _l) ->
-      if s#source_buffer#modified then
+    (fun k (_n, (s: GSourceView.source_view), _l, read_only) ->
+      if not read_only && s#source_buffer#modified then
         let text_to_save = s#source_buffer#get_text () in
         send_request (Save_file_req (k, text_to_save))
     )
@@ -346,7 +337,8 @@ let save_sources () =
 
 (* True if there exist a file which needs saving *)
 let files_need_saving () =
-  Hstr.fold (fun _k (_, s, _) acc -> acc || s#source_buffer#modified) source_view_table false
+  Hstr.fold (fun _k (_, s, _, read_only ) acc ->
+      acc || (not read_only && s#source_buffer#modified)) source_view_table false
 
 (* Ask if the user wants to save session before exit. Exit is then delayed until
    the [Saved] notification is received *)
@@ -372,7 +364,7 @@ let exit_function_handler b =
 
 (* Erase colors in all source views *)
 let erase_loc_all_view () =
-  Hstr.iter (fun _ (_, v, _) -> erase_color_loc v) source_view_table
+  Hstr.iter (fun _ (_, v, _, _) -> erase_color_loc v) source_view_table
 
 (* Update name of the tab when the label changes so that it has a * as prefix *)
 let update_label_change (label: GMisc.label) =
@@ -389,9 +381,11 @@ let update_label_saved (label: GMisc.label) =
 
 let make_sources_editable b =
   Hstr.iter
-    (fun _ (_,source_view,_) ->
-      source_view#set_editable b;
-      source_view#set_auto_indent b)
+    (fun _ (_,source_view,_,read_only) ->
+      if not read_only then begin
+          source_view#set_editable b;
+          source_view#set_auto_indent b
+        end)
     source_view_table
 
 (**********************)
@@ -899,13 +893,28 @@ let task_view =
 
 let () = create_colors gconfig task_view
 
+let why_lang = get_extra_lang "why3" "Why3"
+let why3py_lang = get_extra_lang "why3py" "Why3python"
+let why3c_lang = get_extra_lang "why3c" "Why3c"
+let rust_lang = get_extra_lang "rust" "Rust"
+let ada_lang = get_extra_lang "ada" "Ada"
+let java_lang = get_extra_lang "java" "Java"
+let c_lang = get_extra_lang "c" "C"
+
 let change_lang view lang =
-  let lang =
-    match lang with
-    | "python" -> why3py_lang
-    | "micro-C" -> why3c_lang
-    | _ -> why_lang in
-  view#source_buffer#set_language lang
+  try
+    let lang =
+      match lang with
+      | "python" -> why3py_lang ()
+      | "micro-C" -> why3c_lang ()
+      | ".rs" -> rust_lang ()
+      | ".adb" -> ada_lang ()
+      | ".ads" -> ada_lang ()
+      | ".java" -> java_lang ()
+      | ".c" -> c_lang ()
+      | _ -> why_lang () in
+    view#source_buffer#set_language (Some lang)
+  with Exit -> ()
 
 (* Create an eventbox for the title label of the notebook tab *)
 let create_eventbox ~read_only file =
@@ -921,7 +930,7 @@ let create_eventbox ~read_only file =
               | exception Not_found ->
                   print_message ~kind:1 ~notif_kind:"ide_error"
                     "Error of the graphic interface: cannot find %s" file
-              | (page_number, _, _)  ->
+              | (page_number, _, _, _)  ->
                   notebook#remove_page page_number;
                   Hstr.remove source_view_table file) in
       right_click_label_menu#append close_item in
@@ -935,52 +944,60 @@ let create_eventbox ~read_only file =
       ) in
   eventbox
 
+let create_raw_source_view ~read_only f contents =
+  let fl = Filename.basename f in
+  let markup =
+    if read_only then  "<span font-style=\"italic\">" ^ fl ^ "</span>"
+    else fl
+  in
+  let eventbox = create_eventbox ~read_only f in
+  let label = GMisc.label ~packing:(fun w -> eventbox#add w) ~markup () in
+  label#misc#set_tooltip_markup f;
+  let scrolled_source_view =
+    GBin.scrolled_window
+      ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+      ~shadow_type:`ETCHED_OUT
+      (* ~packing:scrolled_source_view#add *)
+      ()
+  in
+  let source_page = notebook#append_page ~tab_label:eventbox#coerce
+                      scrolled_source_view#coerce
+  in
+  let editable = gconfig.allow_source_editing && (not read_only) in
+  let source_view =
+    GSourceView.source_view
+      ~auto_indent:editable
+      ~insert_spaces_instead_of_tabs:true
+      ~tab_width:2
+      ~show_line_numbers:true
+      (* ~right_margin_position:80 ~show_right_margin:true *)
+      (* ~smart_home_end:true *)
+      ~editable
+      ~packing:scrolled_source_view#add
+      ()
+  in
+  source_view#source_buffer#begin_not_undoable_action ();
+  source_view#source_buffer#set_text contents;
+  source_view#source_buffer#end_not_undoable_action ();
+  source_view#source_buffer#set_modified false;
+  Hstr.add source_view_table f (source_page, source_view, label, read_only);
+  Gconfig.add_modifiable_mono_font_view source_view#misc;
+  create_colors gconfig source_view;
+  Gconfig.set_fonts ();
+  source_page, source_view
+
 (* Create a page with tabname [f] and buffer equal to [content] in the
    notebook. Also add a corresponding page in source_view_table. *)
 let create_source_view ~read_only f content f_format =
-  let markup_read_only txt =
-    "<span font-style=\"italic\">" ^ txt ^
-    "</span> <span font-weight=\"bold\">(read-only)</span>" in
-
   if not (Hstr.mem source_view_table f) then
     begin
-      let fl = Filename.basename f in
-      let markup_fl = if read_only then markup_read_only fl else fl in
-      let eventbox = create_eventbox ~read_only f in
-      let label = GMisc.label ~packing:(fun w -> eventbox#add w)
-          ~markup:markup_fl () in
-      label#misc#set_tooltip_markup f;
-      (* let source_page = !n in*)
-      let scrolled_source_view =
-        GBin.scrolled_window
-          ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-          ~shadow_type:`ETCHED_OUT
-          (*    ~packing:scrolled_source_view#add*)
-          () in
-      let source_page = notebook#append_page ~tab_label:eventbox#coerce
-          scrolled_source_view#coerce in
-      let editable = gconfig.allow_source_editing && (not read_only) in
-      let source_view =
-        GSourceView.source_view
-          ~auto_indent:editable
-          ~insert_spaces_instead_of_tabs:true ~tab_width:2
-          ~show_line_numbers:true
-          (* ~right_margin_position:80 ~show_right_margin:true *)
-          (* ~smart_home_end:true *)
-          ~editable:editable
-          ~packing:scrolled_source_view#add
-          () in
-      Hstr.add source_view_table f (source_page, source_view, label);
-      source_view#source_buffer#begin_not_undoable_action ();
-      source_view#source_buffer#set_text content;
-      source_view#source_buffer#end_not_undoable_action ();
-      source_view#source_buffer#set_modified false;
+      let source_page, source_view = create_raw_source_view ~read_only f content in
       (* At initialization, file has not changed. When it changes, changes the
          name of the tab and update has_changed boolean. *)
       let (_: GtkSignal.id) = source_view#source_buffer#connect#modified_changed
           ~callback:(fun () ->
               try
-                let _source_page, source_view, label =
+                let _source_page, source_view, label, read_only =
                   Hstr.find source_view_table f in
                 if not read_only then
                   if source_view#source_buffer#modified then
@@ -988,12 +1005,9 @@ let create_source_view ~read_only f content f_format =
                   else
                     update_label_saved label
               with Not_found -> () ) in
-      Gconfig.add_modifiable_mono_font_view source_view#misc;
       change_lang source_view f_format;
       (* We have to create the tags for background colors for each view.
          They are not reusable from the other views.  *)
-      create_colors gconfig source_view;
-      Gconfig.set_fonts ();
       (* Focusing on the tabs that was just added *)
       notebook#goto_page source_page
     end
@@ -1002,7 +1016,7 @@ let create_source_view ~read_only f content f_format =
 let get_source_view (file: string) : GSourceView.source_view =
   if file = "Task" then task_view else
   match Hstr.find source_view_table file with
-  | (_, v, _) -> v
+  | (_, v, _, _) -> v
   | exception Not_found -> raise (Nosourceview file)
 
 
@@ -1056,20 +1070,25 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
   | None -> ()
   | Some loc ->
     let f, l, e, _ = Loc.get loc in
-    try
-      let (n, v) = if f = "Task" then (0, task_view) else
-          let (n, v, _) = get_source_view_table f in
-          (n, v) in
-      if force_tab_switch then
-        begin
-          Debug.dprintf debug "tab switch to page %d@." n;
-          notebook#goto_page n;
-        end;
-      when_idle (fun () ->
-          (* 0.5 to focus on the middle of the screen *)
-          move_to_line ~character:e ~yalign:0.5 v l)
-    with Nosourceview f ->
-      Debug.dprintf debug "scroll_to_loc: no source know for file %s@." f
+    let (n, v) =
+      if f = "Task" then (0, task_view) else
+        try let (n, v, _, _) = get_source_view_table f in
+            (n, v)
+        with Nosourceview f ->
+          let s = Sysutil.file_contents f in
+          let (n,v) = create_raw_source_view ~read_only:true f s in
+          change_lang v (Filename.extension f);
+          (n,v)
+
+    in
+    if force_tab_switch then
+      begin
+        Debug.dprintf debug "tab switch to page %d@." n;
+        notebook#goto_page n;
+      end;
+    when_idle (fun () ->
+        (* 0.5 to focus on the middle of the screen *)
+        move_to_line ~character:e ~yalign:0.5 v l)
 
 let scroll_to_loc_ce loc_of_goal =
   match loc_of_goal with
@@ -1087,7 +1106,7 @@ let find_current_file_view () =
   let n = notebook#current_page in
   if n = 0 then Some ("Task", task_view) else
     let acc = ref None in
-    Hstr.iter (fun k (x, v, _) -> if x = n then acc := Some (k, v)) source_view_table;
+    Hstr.iter (fun k (x, v, _, _) -> if x = n then acc := Some (k, v)) source_view_table;
     !acc
 
 (* Save the current location of the cursor to be reused after reload *)
@@ -1161,6 +1180,13 @@ let _ =
       | k when k = GdkKeysyms._Escape ->
         goals_view#misc#grab_focus ();
         true
+      | k when k = GdkKeysyms._Tab ->
+          begin match command_entry#selection with
+          | Some (_, e) ->
+              command_entry#set_position e;
+              true
+          | _ -> false
+          end
       | _ -> false
       )
 
@@ -1268,8 +1294,8 @@ let () =
   Gconfig.add_modifiable_mono_font_view counterexample_view#misc;
   Gconfig.add_modifiable_mono_font_view command_entry#misc;
   Gconfig.add_modifiable_mono_font_view message_zone#misc;
-  task_view#source_buffer#set_language why_lang;
-  counterexample_view#source_buffer#set_language why_lang;
+  task_view#source_buffer#set_language (Some (why_lang ()));
+  counterexample_view#source_buffer#set_language (Some (why_lang ()));
   Gconfig.set_fonts ()
 
 
@@ -1657,7 +1683,7 @@ let treat_message_notification msg = match msg with
   | File_Saved f                 ->
     begin
       try
-        let (_source_page, source_view, _) = Hstr.find source_view_table f in
+        let (_source_page, source_view, _, _) = Hstr.find source_view_table f in
         source_view#source_buffer#set_modified false;
         print_message ~kind:1 ~notif_kind:"File_Saved" "%s was saved" f
       with
@@ -2350,6 +2376,7 @@ let init_completion provers transformations strategies commands =
   command_entry_completion#add_attribute name_renderer "text" completion_desc;
 
   command_entry_completion#set_match_func match_function;
+  command_entry_completion#misc#set_property "inline_completion" (`BOOL true);
 
   command_entry#set_completion command_entry_completion
 
@@ -2789,7 +2816,7 @@ let treat_notification n =
      let content = try_convert content in
      begin
        try
-         let (_, sc_view, _) = Hstr.find source_view_table file_name in
+         let (_, sc_view, _, _source_view_is_read_only) = Hstr.find source_view_table file_name in
          (* read_only means it was sent by ctrl+l not by reload. So, if the file
             already exists, we dont want to erase users changes. *)
          if not read_only then
@@ -2905,7 +2932,7 @@ let batch s =
           let cmd = Strings.join " " cmd in
           let v = Hstr.fold (fun _ x acc ->
               match acc, x with
-              | None, (sp, sv, _) when sp = 1 ->
+              | None, (sp, sv, _, _) when sp = 1 ->
                   Some sv
               | _ -> acc) source_view_table None
           in

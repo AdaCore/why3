@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -113,10 +113,10 @@ Qed.
 (* Why3 goal *)
 Lemma Pow_half :
   forall (x:Reals.Rdefinitions.R), (0%R < x)%R ->
-  ((Reals.Rpower.Rpower x (5 / 10)%R) = (Reals.R_sqrt.sqrt x)).
+  ((Reals.Rpower.Rpower x (1 / 2)%R) = (Reals.R_sqrt.sqrt x)).
 Proof.
 intros x h1.
-replace (5 / 10)%R with (/ 2)%R by field.
+unfold Rdiv. rewrite Rmult_1_l.
 now apply Rpower_sqrt.
 Qed.
 

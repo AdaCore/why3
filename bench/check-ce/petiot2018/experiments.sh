@@ -12,9 +12,10 @@ why3="bin/why3"
 outbase="$(dirname $0)"
 libdir="$(dirname $0)"
 only=""
+updateoracle=false
 
 usage () {
-    echo "Usage: $0 [--help] [--prover PROVER] [--ce-prover CE_PROVER] [--stepslimit STEPS] [--rac-prover RAC_PROVER] [--only PROGRAM] [--outdir OUTDIR]"
+    echo "Usage: $0 [--help] [--prover PROVER] [--ce-prover CE_PROVER] [--stepslimit STEPS] [--rac-prover RAC_PROVER] [--only PROGRAM] [--outdir OUTDIR] [--updateoracle]"
     (echo "PROVER is used to prove the unmodified programs (default:"
      echo "$prover), CE_PROVER is used to generate counterexamples in the"
      echo "modified programs (default: $proverce). STEPS is used as option"
@@ -53,6 +54,10 @@ while [ "$#" != 0 ]; do
             outbase="$2"
             shift 2
             ;;
+        --updateoracle)
+            updateoracle=true
+            shift 1
+            ;;
         --help)
             usage
             exit 0
@@ -71,7 +76,8 @@ really () {
 
 # Clean experiment output
 clean () {
-    sed 's/ ([0-9.]\+s, [0-9]\+ steps)\././'
+    sed 's/ ([0-9.]\+s, [0-9]\+ steps)\././' | \
+    sed -r 's/Valid \(.*$/Valid/'
 }
 
 # Run why3 prove with CE checking on sub-goal $1 in file $2
@@ -93,6 +99,7 @@ why3provece () {
 # Run an experiment with name $1. The program modifications are read from stdin.
 # Stdout and stderr of the calls to why3 goes to stdout and will be piped to
 # outfiles in under $outbase/, progress goes to stderr.
+echo "Running experiments for prover $prover"
 experiment () {
     experiment=$1
     echo -n "Experiment $experiment:" >&2
@@ -143,4 +150,47 @@ R1	26	(* empty *)	:41@precondition
 R4	40	a[!i] <- a[!i] + 2;	:41@precondition
 EOF
 
-git diff --exit-code "*.out"
+colorize() {
+    if command -v pygmentize &> /dev/null; then
+        pygmentize -ldiff
+    else
+        cat
+    fi
+}
+
+success=true
+failed=""
+filebases=('binary_search' 'isqrt' 'rgf')
+
+for filebase in "${filebases[@]}"; do
+  oracle_file="$outbase/oracles/${filebase}_${prover}.oracle"
+  out_file="$outbase/${filebase}.out"
+  str_oracle=$(tr -d ' \n' < "${oracle_file}")
+  str_out=$(tr -d ' \n' < "${out_file}")
+  echo "Checking differences between output and oracle for ${filebase}"
+  if [ "$str_oracle" = "$str_out" ] ; then
+    echo "OK"
+  else
+    echo "FAILED!"
+    if $updateoracle; then
+        echo "Updating oracle for ${filebase}, prover ${prover}"
+        echo mv "${out_file}" "${oracle_file}"
+        mv "${out_file}" "${oracle_file}"
+    else
+        echo "diff is the following:"
+        echo "$outbase/${filebase}"
+        echo diff -u "${oracle_file}" "${out_file}"
+        (diff -u "${oracle_file}" "${out_file}" || [ $? -eq 1 ])|colorize
+        failed="$failed$filebase\n"
+        success=false
+    fi
+  fi
+done
+
+if [ "$success" = true ]; then
+    echo "Petiot (2018) experiments with prover $prover: success"
+    exit 0
+else
+    printf "\nPetiot (2018) experiments with prover $prover: failed\n$failed\n"
+    exit 1
+fi

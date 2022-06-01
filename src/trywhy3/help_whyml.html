@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Verify C Code using Why3</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="trywhy3_help.css" />
+  </head>
+  <body>
+
+    <h1>Online version of Why3</h1>
+
+    This version of Why3 is intended for teaching purposes.
+
+    <p>
+    The WhyML language is
+    described <a href="https://why3.lri.fr/doc/syntaxref.html">in the Why3
+    manual</a>.
+
+    <h2>Verifying a program</h2>
+
+    <p>
+    Click on the gears button to launch the verification.
+    Verification conditions (VCs) then appear in the right panel, in
+    the Task List tab, and
+    Alt-Ergo is run on each of them with a default time limit (that
+    can be set in the Settings menu).
+    </p>
+
+    <p>
+    When a VC is not proved, there are several options:
+    <ul>
+      <li> use the contextual menu to rerun Alt-Ergo with a larger
+      time limit (e.g. 1000 or 5000 steps instead of 100);
+      <li> use the contextual menu to split the VC and rerun Alt-Ergo
+      on each sub-VC (split and prove);
+      <li> use the Task View tab to investigate the problematic VC,
+      for wrong or missing elements of specification (precondition,
+      postcondition, invariant);
+      <li> add intermediate assertions in the code, using <tt>//@
+      assert ...;</tt>.
+    </ul>
+    </p>
+
+    <br>
+
+  </body>
+
+</html>

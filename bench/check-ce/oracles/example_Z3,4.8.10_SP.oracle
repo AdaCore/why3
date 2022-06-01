@@ -1,0 +1,181 @@
+<check-ce>Check model 0 ("bench/check-ce/example.mlw", line 7, characters 15-22)
+<check-ce>Validating model:
+          File example.mlw:
+            Line 4:
+              a = {"type": "Integer", "val": "42"}
+            Line 7:
+              the check fails with all inputs
+<check-ce>Interpreting concretly
+<rac-values>Missing value for parameter _, continue with default value ().
+<check-ce>Interpreting abstractly
+<rac-values>Missing value for parameter _, continue with default value ().
+<check-ce>Result of checking model 0:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
+              File example.mlw:
+                Line 4:
+                  a = 42
+                Line 6:
+                  _ = ()
+                  Execution of main function def's body with env:
+                    _ = ()
+                    zero = 0
+                    one = 1
+                    a = 42
+                Line 7:
+                  Property failure, Assertion with:
+                    a = 42
+            - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
+              File example.mlw:
+                Line 4:
+                  a = 42
+                Line 6:
+                  _ = ()
+                  Execution of main function def's body with env:
+                    _ = ()
+                    zero = 0
+                    one = 1
+                    a = 42
+                Line 7:
+                  Property failure, Assertion with:
+                    a = 42
+<check-ce>Check model 1 ("bench/check-ce/example.mlw", line 7, characters 15-22)
+<check-ce>Validating model:
+          File example.mlw:
+            Line 4:
+              a = {"type": "Integer", "val": "42"}
+            Line 7:
+              a = {"type": "Integer", "val": "42"}
+<check-ce>Interpreting concretly
+<rac-values>Missing value for parameter _, continue with default value ().
+<check-ce>Interpreting abstractly
+<rac-values>Missing value for parameter _, continue with default value ().
+<check-ce>Result of checking model 1:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
+              File example.mlw:
+                Line 4:
+                  a = 42
+                Line 6:
+                  _ = ()
+                  Execution of main function def's body with env:
+                    _ = ()
+                    zero = 0
+                    one = 1
+                    a = 42
+                Line 7:
+                  Property failure, Assertion with:
+                    a = 42
+            - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
+              File example.mlw:
+                Line 4:
+                  a = 42
+                Line 6:
+                  _ = ()
+                  Execution of main function def's body with env:
+                    _ = ()
+                    zero = 0
+                    one = 1
+                    a = 42
+                Line 7:
+                  Property failure, Assertion with:
+                    a = 42
+<check-ce>Check model 2 ("bench/check-ce/example.mlw", line 7, characters 15-22)
+<check-ce>Validating model:
+          File example.mlw:
+            Line 4:
+              a = {"type": "Integer", "val": "42"}
+            Line 7:
+              a = {"type": "Integer", "val": "42"}
+<check-ce>Interpreting concretly
+<rac-values>Missing value for parameter _, continue with default value ().
+<check-ce>Interpreting abstractly
+<rac-values>Missing value for parameter _, continue with default value ().
+<check-ce>Result of checking model 2:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
+              File example.mlw:
+                Line 4:
+                  a = 42
+                Line 6:
+                  _ = ()
+                  Execution of main function def's body with env:
+                    _ = ()
+                    zero = 0
+                    one = 1
+                    a = 42
+                Line 7:
+                  Property failure, Assertion with:
+                    a = 42
+            - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
+              File example.mlw:
+                Line 4:
+                  a = 42
+                Line 6:
+                  _ = ()
+                  Execution of main function def's body with env:
+                    _ = ()
+                    zero = 0
+                    one = 1
+                    a = 42
+                Line 7:
+                  Property failure, Assertion with:
+                    a = 42
+<check-ce>Models:
+- Selected model 0 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal
+- Checked model 1 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal
+- Checked model 2 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal
+File "bench/check-ce/example.mlw", line 7, characters 15-22:
+Goal Assertion from verification condition def'vc.
+Prover result is: unknown (sat) (0.01s, 684 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
+File example.mlw:
+  Line 4:
+    a = 42
+  Line 6:
+    _ = ()
+    Execution of main function def's body with env:
+      _ = ()
+      zero = 0
+      one = 1
+      a = 42
+  Line 7:
+    Property failure, Assertion with:
+      a = 42
+

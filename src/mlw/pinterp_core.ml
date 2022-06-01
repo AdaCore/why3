@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -194,18 +194,16 @@ let unit_value =
 (**********************************************************************)
 
 let range_value ity n =
-  let valid_range =
-    match ity_components ity with
-    | { its_def = Range r }, _, _ -> (
-        try
-          Number.(check_range { il_kind = ILitUnk; il_int = n } r);
-          true
-        with Number.OutOfRange _ -> false )
-    | _ -> true in
-  if valid_range then
-    Some (value (ty_of_ity ity) (Vnum n))
-  else
-    None
+  begin match ity_components ity with
+  | { its_def = Range r }, _, _ ->
+      begin try
+          Number.(check_range { il_kind = ILitUnk; il_int = n } r)
+        with Number.OutOfRange _ ->
+          raise (Incomplete "value out of range")
+      end
+  | _ -> ()
+  end;
+  value (ty_of_ity ity) (Vnum n)
 
 let proj_value ity ls v =
   let valid_range =
@@ -1062,7 +1060,7 @@ let rec term_of_value ?(ty_mt=Mtv.empty) (env: env) vsenv v : (vsymbol * term) l
       Opt.iter (ty_equal_check ty) t.t_ty;
       vsenv, t
   | Vreal _ | Vfloat _ | Vfloat_mode _ -> (* TODO *)
-      Format.kasprintf failwith "term_of_value: %a" print_value v
+      vsenv, t_undefined ty
   | Vproj (ls, x) ->
       (* TERM: epsilon v. rs v = x *)
       let vs = create_vsymbol (id_fresh "v") ty in
@@ -1189,7 +1187,7 @@ let rec default_value_of_type env ity : value =
         | {Pdecl.itd_its= {its_def= Range r}} ->
             let zero_in_range = BigInt.(le r.Number.ir_lower zero && le zero r.Number.ir_upper) in
             let n = if zero_in_range then BigInt.zero else r.Number.ir_lower in
-            Opt.get (range_value ity n)
+            range_value ity n
         | {Pdecl.itd_constructors= rs :: _; itd_fields= fs} ->
             let subst = its_match_regs its l1 l2 in
             let ityl = List.map (fun pv -> pv.pv_ity) rs.rs_cty.cty_args in

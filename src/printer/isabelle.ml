@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -214,12 +214,6 @@ let number_format prty = {
     Number.frac_real_support =
       `Custom
         ((fun fmt i -> fprintf fmt "<num val=\"%s\"><type name=\"Real.real\"/></num>" i),
-         (fun fmt i n -> fprintf fmt
-                "<app>\
-                   <const name=\"Groups.times_class.times\"/>\
-                   <num val=\"%s\"><type name=\"Real.real\"/></num>\
-                   <num val=\"%s\"/>\
-                 </app>" i n),
          (fun fmt i n -> fprintf fmt
                 "<app>\
                    <const name=\"Why3_Real.why3_divide\"/>\

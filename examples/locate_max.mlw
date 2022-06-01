@@ -1,0 +1,22 @@
+(** Simple example to illustrate the C memory model *)
+
+use int.Int
+use map.Map as Map
+use mach.c.C
+use mach.int.Int32
+use mach.int.Int64
+
+function ([]) (a: ptr 'a) (i: int): 'a = Map.get a.data.Array.elts (a.offset + i)
+
+let locate_max (a: ptr int64) (n: int32): int32
+  requires { 0 < n }
+  requires { valid a n }
+  ensures  { 0 <= result < n }
+  ensures  { forall i. 0 <= i < n -> a[i] <= a[result] }
+= let ref idx = 0 in
+  for j = 1 to n - 1 do
+    invariant { 0 <= idx < n }
+    invariant { forall i. 0 <= i < j -> a[i] <= a[idx] }
+    if get_ofs a idx < get_ofs a j then idx <- j
+  done;
+  idx

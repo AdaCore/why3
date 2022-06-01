@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  #
+#  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -103,7 +103,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-EXTINCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @MLMPFRINCLUDE@ @INFERINCLUDE@
+EXTINCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @INFERINCLUDE@
 
 # warnings are enabled and non fatal by default, except:
 # - disabled:
@@ -136,8 +136,8 @@ OLINKFLAGS += -linkpkg -linkall
 BLINKFLAGS += -linkpkg -linkall
 else
 FLAGS += $(EXTINCLUDES)
-OLINKFLAGS = -linkall @MLMPFR_LINK@ $(EXTCMXA)
-BLINKFLAGS = -linkall @MLMPFR_LINK@ $(EXTCMA)
+OLINKFLAGS = -linkall $(EXTCMXA)
+BLINKFLAGS = -linkall $(EXTCMA)
 endif
 
 ifeq (@enable_profiling@,yes)
@@ -151,9 +151,16 @@ CMP_CP = cmp -s $< $@ || cp $< $@
 
 # external libraries common to all binaries
 
+ifeq (@menhirlib_cmo@,yes)
 EXTOBJS = menhirLib
-EXTLIBS = @SEQLIB@ @RELIB@ unix nums dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERLIB@
-EXTPKGS = menhirLib @SEQLIB@ @RELIB@ unix num dynlink @ZIPLIB@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
+EXTLIBS =
+else
+EXTOBJS =
+EXTLIBS = menhirLib
+endif
+
+EXTLIBS += @SEQLIB@ @RELIB@ unix nums dynlink @ZIPLIB@ @WHY3LIB@ @INFERLIB@
+EXTPKGS = menhirLib @SEQLIB@ @RELIB@ unix num dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
 
 EXTCMA	= $(addsuffix .cmo,$(EXTOBJS)) $(addsuffix .cma,$(EXTLIBS))
 EXTCMXA = $(addsuffix .cmx,$(EXTOBJS)) $(addsuffix .cmxa,$(EXTLIBS))
@@ -202,6 +209,7 @@ endif
 .PHONY: pvs install-pvs uninstall-pvs clean-pvs
 .PHONY: install-isabelle
 .PHONY: plugins plugins.byte plugins.opt
+.PHONY: trywhy3 clean-trywhy3
 
 .SUFFIXES:
 
@@ -332,7 +340,7 @@ endif
 
 # Mlmpfr
 
-ifeq (@found_mlmpfr@,yes)
+ifeq (@enable_mpfr@,yes)
 src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_real.ml Makefile
 	$(CMP_CP)
 else
@@ -405,8 +413,9 @@ endif
 ifeq (@enable_re@,no)
 src/util/re.ml: src/util/recompat.ml Makefile
 	$(CMP_CP)
-GENERATED += src/util/re.ml
+LIBGENERATED += src/util/re.ml
 endif
+GENERATED += src/util/re.ml
 
 # build targets
 
@@ -449,9 +458,11 @@ install-data::
 	$(MKDIR_P) $(DATADIR)/why3/stdlib
 	$(MKDIR_P) $(DATADIR)/why3/stdlib/mach
 	$(MKDIR_P) $(DATADIR)/why3/drivers
+	$(MKDIR_P) $(DATADIR)/why3/extraction_drivers
 	$(INSTALL_DATA) stdlib/*.mlw $(DATADIR)/why3/stdlib
 	$(INSTALL_DATA) stdlib/mach/*.mlw $(DATADIR)/why3/stdlib/mach
 	$(INSTALL_DATA) drivers/*.drv drivers/*.gen $(DATADIR)/why3/drivers
+	$(INSTALL_DATA) extraction_drivers/*.drv $(DATADIR)/why3/extraction_drivers
 	$(INSTALL_DATA) LICENSE $(DATADIR)/why3/
 	$(INSTALL_DATA) share/provers-detection-data.conf $(DATADIR)/why3/
 	$(INSTALL_DATA) share/why3session.dtd $(DATADIR)/why3
@@ -694,13 +705,10 @@ install_local:: bin/why3 $(TOOLS_BIN:%=bin/%.$(SHAREDBEST))
 bin/%:	bin/%.@OCAMLBEST@
 	ln -sf $(notdir $<) $@
 
-install_local:: share/drivers share/stdlib
+install_local:: share/drivers share/extraction_drivers share/stdlib
 
-share/drivers:
-	ln -snf ../drivers share/drivers
-
-share/stdlib:
-	ln -snf ../stdlib share/stdlib
+share/drivers share/extraction_drivers share/stdlib: share/%:
+	ln -snf ../$* $@
 
 MAKEINC += $(TOOLSDEP)
 
@@ -792,7 +800,7 @@ gallery-subs:
 # XML DTD validation
 ########
 
-.PHONY: xml-validate
+.PHONY: xml-validate xml-validate-local
 
 xml-validate:
 	@for x in `find examples/ -name why3session.xml`; do \
@@ -801,16 +809,17 @@ xml-validate:
 
 xml-validate-local:
 	@for x in `find examples/ -path examples/in_progress -prune -o -name why3session.xml -print`; do \
-	  xmllint --noout --dtdvalid share/why3session.dtd $$x 2>&1 | head -1; \
+	  xmllint --nonet --noout --path share --valid $$x 2>&1 | sed -e '/I.O error/d' | head -1; \
 	done
 
 ###############
 # IDE
 ###############
 
-ifeq (@enable_ide@,yes)
-
 IDEGENERATED = src/ide/gtkcompat.ml
+GENERATED += $(IDEGENERATED)
+
+ifeq (@enable_ide@,yes)
 
 IDE_FILES = gtkcompat
 
@@ -879,8 +888,6 @@ else
 src/ide/gtkcompat.ml: src/ide/gtkcompat3.ml Makefile
 	$(CMP_CP)
 endif
-
-GENERATED += $(IDEGENERATED)
 
 endif
 
@@ -1301,7 +1308,7 @@ clean::
 #######################
 
 
-ISABELLEVERSIONSPECIFIC=why3.ML Why3_BV.thy Why3_Map.thy
+ISABELLEVERSIONSPECIFIC=ROOT why3.ML Why3_BV.thy Why3_Map.thy
 
 ISABELLEVERSIONSPECIFICTARGETS=$(addprefix lib/isabelle/, $(ISABELLEVERSIONSPECIFIC))
 
@@ -1487,8 +1494,11 @@ bin/isabelle_client.opt: lib/why3/why3.cmxa $(ISABELLECCMX)
 
 bin/isabelle_client.byte: lib/why3/why3.cma $(ISABELLECCMO)
 
-install_no_local::
+install-bin::
 	cp -f bin/isabelle_client.@OCAMLBEST@ $(BINDIR)/isabelle_client$(EXE)
+
+uninstall-bin::
+	rm -f $(BINDIR)/isabelle_client$(EXE)
 
 MAKEINC += $(ISABELLECDEP)
 
@@ -1612,8 +1622,6 @@ install_local:: bin/why3doc.$(SHAREDBEST)
 # trywhy3
 #########
 
-.PHONY: trywhy3
-
 ifeq ($(DEBUGJS),yes)
  JSOO_DEBUG=--pretty --debug-info --source-map
  JS_MAPS=trywhy3.map why3_worker.map
@@ -1628,14 +1636,16 @@ TRYWHY3MODULES = $(addprefix src/trywhy3/, $(TRYWHY3_FILES))
 
 TRYWHY3DEP = $(addsuffix .dep, $(TRYWHY3MODULES))
 TRYWHY3CMO = $(addsuffix .cmo, $(TRYWHY3MODULES))
+TRYWHY3CMI = $(addsuffix .cmi, $(TRYWHY3MODULES))
 
-$(TRYWHY3DEP) $(TRYWHY3CMO): INCLUDES += -I src/trywhy3
+$(TRYWHY3DEP) $(TRYWHY3CMO) $(TRYWHY3CMI): INCLUDES += -I src/trywhy3
 
 TRYWHY3_PACK = \
 	trywhy3.js trywhy3.html trywhy3.css \
+	help_whyml.html help_python.html help_micro-C.html \
 	why3_worker.js alt-ergo-worker.js \
 	README.md examples/ \
-	trywhy3_custom.css gen_index.sh \
+	trywhy3_custom.css \
 	ace-builds/src-min-noconflict/ace.js \
 	ace-builds/src-min-noconflict/mode-why3.js \
 	ace-builds/src-min-noconflict/mode-python.js \
@@ -1674,7 +1684,8 @@ $(addprefix src/trywhy3/, worker_proto.cmo why3_worker.cmo): BFLAGS += -package 
 
 $(addprefix src/trywhy3/, bindings.cmo trywhy3.cmo): BFLAGS += -package js_of_ocaml -package js_of_ocaml-ppx
 
-TRYWHY3JSON = $(addprefix src/trywhy3/, json_base.ml json_parser.ml json_lexer.ml)
+TRYWHY3JSON_FILES = json_base json_parser json_lexer
+TRYWHY3JSON = $(TRYWHY3JSON_FILES:%=src/trywhy3/%.ml) $(TRYWHY3JSON_FILES:%=src/trywhy3/%.mli)
 
 $(TRYWHY3JSON): src/trywhy3/%: src/util/%
 	cp $< $@
@@ -1685,10 +1696,12 @@ $(TRYWHY3DEP): $(TRYWHY3JSON)
 
 MAKEINC += $(TRYWHY3DEP)
 
-clean::
+clean-trywhy3:
 	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte \
 	  src/trywhy3/why3_worker.js src/trywhy3/why3_worker.byte \
 	  trywhy3.tar.gz
+
+clean:: clean-trywhy3
 
 CLEANDIRS += src/trywhy3
 
@@ -1901,7 +1914,7 @@ doc/apidoc:
 	mkdir -p doc/apidoc
 
 apidoc: doc/apidoc $(FILESTODOC)
-	$(OCAMLDOC) -d doc/apidoc -html -t "Why3 API documentation" \
+	$(OCAMLDOC) -d doc/apidoc -charset utf-8 -html -t "Why3 API documentation" \
 		-keep-code $(INCLUDES) $(LIBINCLUDES) $(EXTINCLUDES) $(FILESTODOC)
 
 # could we include also the dependency graph ? -- someone

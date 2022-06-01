@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -91,8 +91,9 @@ let rec dequant ht pos f =
   | Tnot f1 ->
       t_not (dequant (not pos) f1)
   | Tlet (t,fb) ->
-      let vs, f1 = t_open_bound fb in
-      t_let_close vs t (dequant pos f1)
+     let vs, f1 = t_open_bound fb in
+     Hvs.replace ht vs (t_peek_bound fb);
+     (if pos then t_implies else t_and) (t_equ (t_var vs) t) (dequant pos f1)
   | Tcase (t,bl) ->
       let branch bf =
         let pat, f1 = t_open_branch bf in

@@ -7,8 +7,8 @@ This chapter gives information about the various processes that generate
 the so-called verification conditions, VC for short, from WhyML code.
 
 
-VC generation for program functions
------------------------------------
+Program Functions
+-----------------
 
 For each program function of the form
 
@@ -28,43 +28,49 @@ a new logic goal called ``f'VC`` is generated. Its shape is
 where :math:`\mathit{WP}(e,Q)` is a formula computed automatically using
 rules defined recursively on :math:`e`.
 
-TODO: Refer to `A Pragmatic Type System for Deductive Verification <https://hal.archives-ouvertes.fr/hal-01256434v3>`_
+.. todo::
+
+   Refer to `A Pragmatic Type System for Deductive Verification <https://hal.archives-ouvertes.fr/hal-01256434v3>`_
+
+   Attributes: :why3:attribute:`[@vc:divergent]` disables generation of VC for termination.
+
+   Other attributes: :why3:attribute:`[@vc:annotation]`, :why3:attribute:`[@vc:sp]`, :why3:attribute:`[@vc:wp]`, :why3:attribute:`[@vc:white_box]`, :why3:attribute:`[@vc:keep_precondition]`.
 
 
-Attributes: :why3:attribute:`[@vc:divergent]` disables generation of VC for termination
 
-Other attributes: :why3:attribute:`[@vc:annotation]`, :why3:attribute:`[@vc:sp]`, :why3:attribute:`[@vc:wp]`, :why3:attribute:`[@vc:white_box]`, :why3:attribute:`[@vc:keep_precondition]`
+Type Invariants
+---------------
 
+.. todo::
 
+   How a VC is generated for proving that a type with invariant is
+   inhabited. Explain also the use of the `by` keyword in this context.
 
-VC generated for type invariants
---------------------------------
+Lemma Functions
+---------------
 
-How a VC is generated for proving that a type with invariant is
-inhabited. Explain also the use of the `by` keyword in this context.
+.. todo::
 
-VC generation and lemma functions
----------------------------------
+   How a VC for a program function marked as `lemma` is turned into an
+   hypothesis for the remaining of the module.
 
-How a VC for a program function marked as `lemma` is turned into an
-hypothesis for the remaining of the module.
-
-Using strongest post-conditions
+Using Strongest Post-conditions
 -------------------------------
 
-To avoid exponential explosion of WP computation, Why3 provides a
-mechanism similar to (TODO: cite papers here).
+.. todo::
 
-This can be activited locally on any program expression, by putting
-the :why3:attribute:`[@vc:sp]` attribute on that expression. Yet, the simplest usage
-is to pose this attribute on the whole body of a program function.
+   To avoid exponential explosion of WP computation, Why3 provides a
+   mechanism similar to (TODO: cite papers here).
 
-Show an example.
+   This can be activated locally on any program expression, by putting
+   the :why3:attribute:`[@vc:sp]` attribute on that expression. Yet, the simplest usage
+   is to pose this attribute on the whole body of a program function.
 
+   Show an example.
 
 .. _sec.runwithinferloop:
 
-Automatic inference of loop invariants
+Automatic Inference of Loop Invariants
 --------------------------------------
 
 Why3 can be executed with support for inferring loop invariants

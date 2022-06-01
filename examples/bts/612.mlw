@@ -1,0 +1,13 @@
+type option = None | Some int
+
+(* CE generation should not fail anymore because of
+   eliminate_algebraic not losing attributes anymore *)
+
+let f (a: option) : unit
+  ensures {
+    match a with
+    | None -> 1=2
+    | Some a -> 3=3
+    end
+  }
+  = ()

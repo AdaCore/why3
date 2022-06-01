@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -565,7 +565,7 @@ let run_idle_handler () =
       S.timeout ~ms:default_delay_ms timeout_handler;
     end
 
-let schedule_proof_attempt c id pr ~limit ~callback ~notification =
+let schedule_proof_attempt ?proof_script_filename c id pr ~limit ~callback ~notification =
   let ses = c.controller_session in
   let callback panid s =
     begin
@@ -603,13 +603,16 @@ let schedule_proof_attempt c id pr ~limit ~callback ~notification =
       let use_steps = Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
       let limit = adapt_limits ~interactive ~use_steps limit a in
       let script =
+        if proof_script_filename = None then
           Opt.map (fun s ->
               let s = Pp.sprintf "%a" Sysutil.print_file_path s in
               Debug.dprintf debug_sched "Script file = %s@." s;
               Filename.concat (get_dir ses) s) a.proof_script
+          else
+            proof_script_filename
       in
       limit, old_res, script
-    with Not_found | Session_itp.BadID -> limit,None,None
+    with Not_found | Session_itp.BadID -> limit,None,proof_script_filename
   in
   let panid = graft_proof_attempt ~limit ses id pr in
   let spa =

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -310,14 +310,26 @@ let get_model_string input =
   let res = Re.Str.search_backward nr input (String.length input) in
   String.sub input 0 (res + String.length (Re.Str.matched_string input))
 
+let fix_CVC18_bug_on_float_constants =
+  let r = Re.Str.regexp "\\((fp #b[01] #b[01]+ #b[01]+\\)" in
+  fun s -> Re.Str.global_replace r "\\1)" s
+
 let parse_sexps str =
+    (* Format.eprintf "parse_sexps: trying to parse the following model string:@\n%s@." (String.escaped str); *)
   let lexbuf = Lexing.from_string str in
   try
     Sexp.read_list lexbuf
   with Sexp.Error ->
     let msg = Format.sprintf "Cannot parse as S-expression at character %d"
-        (Lexing.lexeme_start lexbuf) in
-    raise (Smtv2_model_parsing_error msg)
+                (Lexing.lexeme_start lexbuf) in
+    (* workaround for CVC4 1.8 bug in printing float constants *)
+    let str = fix_CVC18_bug_on_float_constants str in
+    let lexbuf = Lexing.from_string str in
+    (* Format.eprintf "parse_sexps: fixed model string is:@\n%s@." (String.escaped str); *)
+    try
+      Sexp.read_list lexbuf
+    with Sexp.Error ->
+      raise (Smtv2_model_parsing_error msg)
 
 let model_of_sexps sexps =
   try
@@ -346,4 +358,4 @@ let parse pm input =
                 Model_parser.create_model_element ~name ~value ~attrs) mvs))
 
 let () = Model_parser.register_model_parser "smtv2" parse
-    ~desc:"Parser@ for@ the@ model@ of@ cv4@ and@ z3."
+    ~desc:"Parser@ for@ the@ model@ of@ SMT@ solvers."

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -19,15 +19,18 @@ type cfg_instr = {
     cfg_instr_desc : cfg_instr_desc;
     cfg_instr_loc  : Loc.position;
   }
+
 and cfg_term = {
     cfg_term_desc : cfg_term_desc;
     cfg_term_loc : Loc.position;
   }
+
 and cfg_instr_desc =
   | CFGinvariant of (ident * Ptree.term) list
   (** named invariants *)
   | CFGexpr of Ptree.expr
   (** any other regular WhyML expressions *)
+
 and cfg_term_desc =
   | CFGgoto of label
   (** goto a label "goto L" *)
@@ -37,6 +40,7 @@ and cfg_term_desc =
   (** return from a cfg *)
   | CFGabsurd
   (** unreachable *)
+
 and switch_branch = Ptree.pattern * cfg_term
 (** pattern -> regular WhyML expression ; goto ident *)
 
@@ -56,4 +60,3 @@ type cfg_decl =
 
 type cfg_file = (ident * cfg_decl list) list
   (** a list of modules containing lists of declarations *)
-

@@ -35,6 +35,15 @@ Definition contents {a:Type} {a_WT:WhyType a} (v:ref a) : a :=
   | ref'mk x => x
   end.
 
+Parameter if_term: Numbers.BinNums.Z -> Init.Datatypes.bool.
+
+Axiom if_term'def :
+  forall (o:Numbers.BinNums.Z),
+  ((o = 0%Z) -> ((if_term o) = Init.Datatypes.true)) /\
+  (~ (o = 0%Z) -> ((if_term o) = Init.Datatypes.false)).
+
+Require Import Lia.
+
 (* Why3 goal *)
 Theorem search_loop'vc :
   forall (l:Init.Datatypes.list Numbers.BinNums.Z),
@@ -56,6 +65,7 @@ Theorem search_loop'vc :
   ~ (o = Init.Datatypes.true) ->
   ((0%Z <= i)%Z /\ (i < (list.Length.length l))%Z) /\ zero_at l i \/
   (i = (list.Length.length l)) /\ no_zero l.
+(* Why3 intros l s i (h1,(h2,(h3,h4))) h5 o h6 h7. *)
 Proof.
 intros l s i (h1,(h2,(h3,h4))) _ o h6 h7.
 destruct s.
@@ -73,11 +83,11 @@ apply (conj h1).
 rewrite <- h2.
 change (Length.length (cons z s))%Z with (1 + Length.length s)%Z.
 generalize (Length.Length_nonnegative s).
-omega.
+lia.
 simpl in h6.
 split.
 intuition.
-generalize (h3 0%Z (Zle_refl 0)).
+generalize (h3 0%Z (Z.le_refl 0)).
 ring_simplify (i+0)%Z.
 intros <-.
 simpl.

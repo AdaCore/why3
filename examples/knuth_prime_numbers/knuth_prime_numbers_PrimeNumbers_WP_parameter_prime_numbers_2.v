@@ -84,17 +84,26 @@ Axiom mixfix_lblsmnrb'spec :
 Parameter make:
   forall {a:Type} {a_WT:WhyType a}, Numbers.BinNums.Z -> a -> array a.
 
-Axiom make'spec :
+Axiom make_spec :
   forall {a:Type} {a_WT:WhyType a},
   forall (n:Numbers.BinNums.Z) (v:a), (0%Z <= n)%Z ->
   (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
    ((mixfix_lbrb (make n v) i) = v)) /\
   ((length (make n v)) = n).
 
+Parameter if_term: Numbers.BinNums.Z -> Init.Datatypes.bool.
+
+Axiom if_term'def :
+  forall (o:Numbers.BinNums.Z),
+  ((o = 0%Z) -> ((if_term o) = Init.Datatypes.true)) /\
+  (~ (o = 0%Z) -> ((if_term o) = Init.Datatypes.false)).
+
+Require Import Lia.
+
 (* Why3 goal *)
 Theorem prime_numbers'vc :
   forall (m:Numbers.BinNums.Z), (2%Z <= m)%Z ->
-  let p := make m 0%Z in
+  forall (p:array Numbers.BinNums.Z),
   (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < m)%Z ->
    ((mixfix_lbrb p i) = 0%Z)) /\
   ((length p) = m) -> forall (p1:array Numbers.BinNums.Z),
@@ -125,6 +134,9 @@ Theorem prime_numbers'vc :
    ~ number.Divisibility.divides (mixfix_lbrb p4 i) n1) ->
   ((ZArith.BinInt.Z.rem n1 (mixfix_lbrb p4 k)) = 0%Z) ->
   ~ number.Prime.prime n1.
+(* Why3 intros m h1 p (h2,h3) p1 h4 (h5,h6) p2 h7 (h8,h9) o h10 n p3 h11 j
+        ((h12,h13),(h14,((h15,h16),(h17,h18)))) n1 p4 h19 k
+        ((h20,h21),(h22,((h23,h24),(h25,(h26,h27))))) h28. *)
 Proof.
 intros m h1 p (h2,h3) p1 h4 h5 p2 h6 h7 o h8 n p3 h9 j
 ((h10,h11),(h12,((h13,h14),(h15,h16)))) n1 p4 h17 k
@@ -135,16 +147,16 @@ red in h20. decompose [and] h20. clear h20.
 apply H0 with (elts p4 k).
 assert (2 < elts p4 k)%Z.
 rewrite <- H1.
-apply H3; omega.
-split. omega.
-assert (case: (k<j-1 \/ k=j-1)%Z) by omega. destruct case.
+apply H3; lia.
+split. lia.
+assert (case: (k<j-1 \/ k=j-1)%Z) by lia. destruct case.
 unfold mixfix_lbrb in *.
-apply Zlt_trans with (elts p4 (j-1))%Z; try omega.
-apply H3; omega.
+apply Z.lt_trans with (elts p4 (j-1))%Z; try lia.
+apply H3; lia.
 subst k; auto.
 apply Divisibility.mod_divides_computer; auto.
 assert (2 < elts p4 k)%Z.
 rewrite <- H1.
-apply H3; omega.
-omega.
+apply H3; lia.
+lia.
 Qed.

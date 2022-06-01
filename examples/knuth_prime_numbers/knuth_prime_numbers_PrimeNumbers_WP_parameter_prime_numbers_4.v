@@ -84,12 +84,19 @@ Axiom mixfix_lblsmnrb'spec :
 Parameter make:
   forall {a:Type} {a_WT:WhyType a}, Numbers.BinNums.Z -> a -> array a.
 
-Axiom make'spec :
+Axiom make_spec :
   forall {a:Type} {a_WT:WhyType a},
   forall (n:Numbers.BinNums.Z) (v:a), (0%Z <= n)%Z ->
   (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
    ((mixfix_lbrb (make n v) i) = v)) /\
   ((length (make n v)) = n).
+
+Parameter if_term: Numbers.BinNums.Z -> Init.Datatypes.bool.
+
+Axiom if_term'def :
+  forall (o:Numbers.BinNums.Z),
+  ((o = 0%Z) -> ((if_term o) = Init.Datatypes.true)) /\
+  (~ (o = 0%Z) -> ((if_term o) = Init.Datatypes.false)).
 
 Import Zquot.
 
@@ -99,14 +106,16 @@ intros x y Hx Hy H.
 apply Znot_ge_lt.
 intros H'.
 apply (Zlt_not_le _ _ H).
-apply Zge_le in H'.
+apply Z.ge_le in H'.
 now apply Zmult_le_compat.
 Qed.
+
+Require Import Lia.
 
 (* Why3 goal *)
 Theorem prime_numbers'vc :
   forall (m:Numbers.BinNums.Z), (2%Z <= m)%Z ->
-  let p := make m 0%Z in
+  forall (p:array Numbers.BinNums.Z),
   (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < m)%Z ->
    ((mixfix_lbrb p i) = 0%Z)) /\
   ((length p) = m) -> forall (p1:array Numbers.BinNums.Z),
@@ -138,51 +147,54 @@ Theorem prime_numbers'vc :
   ~ ((ZArith.BinInt.Z.rem n1 (mixfix_lbrb p4 k)) = 0%Z) ->
   ~ ((mixfix_lbrb p4 k) < (ZArith.BinInt.Z.quot n1 (mixfix_lbrb p4 k)))%Z ->
   number.Prime.prime n1.
+(* Why3 intros m h1 p (h2,h3) p1 h4 (h5,h6) p2 h7 (h8,h9) o h10 n p3 h11 j
+        ((h12,h13),(h14,((h15,h16),(h17,h18)))) n1 p4 h19 k
+        ((h20,h21),(h22,((h23,h24),(h25,(h26,h27))))) h28 h29. *)
 Proof.
 intros m h1 p (h2,h3) p1 h4 h5 p2 h6 h7 o h8 n p3 h9 j
 ((h10,h11),(h12,((h13,h14),(h15,h16)))) n1 p4 h17 k
 ((h18,h19),(h20,((h21,h22),(h23,(h24,h25))))) h26 h27.
 destruct h20 as (p0, (sorted, (only_primes, all_primes))).
 assert (H2: (2 < elts p4 k)%Z).
-rewrite <- p0. apply sorted; omega.
+rewrite <- p0. apply sorted; lia.
 apply Prime.small_divisors; auto.
-omega.
+lia.
 intros.
 generalize (Z_quot_rem_eq n1 (elts p4 k)). intro div.
-assert (ne1: (0 <= n1 /\ elts p4 k <> 0)%Z) by omega.
+assert (ne1: (0 <= n1 /\ elts p4 k <> 0)%Z) by lia.
 assert (mod1: (0 <= Z.rem n1 (elts p4 k))%Z).
 destruct (not_Zeq_inf _ _ (proj2 ne1)) as [Zm|Zm].
 now apply Zrem_lt_pos_neg.
 now apply Zrem_lt_pos_pos.
 assert (mod2: (Z.rem n1 (elts p4 k) < elts p4 k)%Z).
-apply Zrem_lt_pos_pos ; omega.
+apply Zrem_lt_pos_pos ; lia.
 assert (d <= elts p4 k)%Z.
-assert (d < elts p4 k + 1)%Z. 2: omega.
-apply Zle_sqrt; try omega.
+assert (d < elts p4 k + 1)%Z. 2: lia.
+apply Zle_sqrt; try lia.
 assert (2 < elts p4 k)%Z.
-rewrite <- p0. apply sorted; omega.
-apply Zle_lt_trans with n1; try omega.
+rewrite <- p0. apply sorted; lia.
+apply Z.le_lt_trans with n1; try lia.
 assert (elts p4 k * (Z.quot n1 (elts p4 k)) <= elts p4 k * elts p4 k)%Z.
 unfold mixfix_lbrb in h27.
-apply Zmult_le_compat_l; omega.
+apply Zmult_le_compat_l; lia.
 replace ((elts p4 k + 1) * (elts p4 k + 1))%Z with (elts p4 k * elts p4 k + 2 * elts p4 k + 1)%Z by ring.
-omega.
+lia.
 destruct (exists_prime (elts p4) (k+1))%Z with (4 := H0) as (i, (hi1, hi2)); auto.
-omega.
+lia.
 red; split; intros.
 auto.
 split; intros.
-apply sorted; omega.
+apply sorted; lia.
 split; intros.
-apply only_primes; omega.
-apply all_primes; omega.
+apply only_primes; lia.
+apply all_primes; lia.
 replace (k+1-1)%Z with k by ring.
 auto.
 subst d.
-assert (case: (i < k \/i = k)%Z) by omega. destruct case.
+assert (case: (i < k \/i = k)%Z) by lia. destruct case.
 red; intro. now apply h25 with i.
 subst i.
 intro. apply h26.
 unfold mixfix_lbrb.
-apply Divisibility.divides_mod_computer; auto; omega.
+apply Divisibility.divides_mod_computer; auto; lia.
 Qed.

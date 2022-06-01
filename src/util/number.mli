@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -84,11 +84,8 @@ type integer_format =
 type real_format =
   Format.formatter -> string -> string -> string option -> unit
 
-type two_strings_format =
-  Format.formatter -> string -> string -> unit
-
 type frac_real_format =
-  (Format.formatter -> string -> unit) * two_strings_format * two_strings_format
+  (Format.formatter -> string -> unit) * (Format.formatter -> string -> string -> unit)
 
 type delayed_format =
   Format.formatter -> (Format.formatter -> unit) -> unit

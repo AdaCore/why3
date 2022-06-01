@@ -5,151 +5,203 @@ Require BuiltIn.
 Require HighOrd.
 Require int.Int.
 Require int.MinMax.
+Require map.Map.
 Require list.List.
 Require list.Length.
 Require list.Mem.
-Require map.Map.
 Require list.Append.
-
-(* Why3 assumption *)
-Definition unit := unit.
 
 Axiom char : Type.
 Parameter char_WhyType : WhyType char.
 Existing Instance char_WhyType.
 
 (* Why3 assumption *)
-Definition word := (list char).
+Definition word := Init.Datatypes.list char.
 
 (* Why3 assumption *)
-Inductive dist: (list char) -> (list char) -> Z -> Prop :=
-  | dist_eps : (dist Init.Datatypes.nil Init.Datatypes.nil 0%Z)
-  | dist_add_left : forall (w1:(list char)) (w2:(list char)) (n:Z), (dist w1
-      w2 n) -> forall (a:char), (dist (Init.Datatypes.cons a w1) w2
-      (n + 1%Z)%Z)
-  | dist_add_right : forall (w1:(list char)) (w2:(list char)) (n:Z), (dist w1
-      w2 n) -> forall (a:char), (dist w1 (Init.Datatypes.cons a w2)
-      (n + 1%Z)%Z)
-  | dist_context : forall (w1:(list char)) (w2:(list char)) (n:Z), (dist w1
-      w2 n) -> forall (a:char), (dist (Init.Datatypes.cons a w1)
-      (Init.Datatypes.cons a w2) n).
+Inductive dist: Init.Datatypes.list char -> Init.Datatypes.list char ->
+  Numbers.BinNums.Z -> Prop :=
+  | dist_eps : dist Init.Datatypes.nil Init.Datatypes.nil 0%Z
+  | dist_add_left :
+      forall (w1:Init.Datatypes.list char) (w2:Init.Datatypes.list char)
+        (n:Numbers.BinNums.Z),
+      dist w1 w2 n -> forall (a:char),
+      dist (Init.Datatypes.cons a w1) w2 (n + 1%Z)%Z
+  | dist_add_right :
+      forall (w1:Init.Datatypes.list char) (w2:Init.Datatypes.list char)
+        (n:Numbers.BinNums.Z),
+      dist w1 w2 n -> forall (a:char),
+      dist w1 (Init.Datatypes.cons a w2) (n + 1%Z)%Z
+  | dist_context :
+      forall (w1:Init.Datatypes.list char) (w2:Init.Datatypes.list char)
+        (n:Numbers.BinNums.Z),
+      dist w1 w2 n -> forall (a:char),
+      dist (Init.Datatypes.cons a w1) (Init.Datatypes.cons a w2) n.
 
 (* Why3 assumption *)
-Definition min_dist (w1:(list char)) (w2:(list char)) (n:Z): Prop := (dist w1
-  w2 n) /\ forall (m:Z), (dist w1 w2 m) -> (n <= m)%Z.
+Definition min_dist (w1:Init.Datatypes.list char)
+    (w2:Init.Datatypes.list char) (n:Numbers.BinNums.Z) : Prop :=
+  dist w1 w2 n /\ (forall (m:Numbers.BinNums.Z), dist w1 w2 m -> (n <= m)%Z).
 
 (* Why3 assumption *)
-Fixpoint last_char (a:char) (u:(list char)) {struct u}: char :=
+Fixpoint last_char (a:char) (u:Init.Datatypes.list char) {struct u}: char :=
   match u with
   | Init.Datatypes.nil => a
-  | (Init.Datatypes.cons c u') => (last_char c u')
+  | Init.Datatypes.cons c u' => last_char c u'
   end.
 
 (* Why3 assumption *)
-Fixpoint but_last (a:char) (u:(list char)) {struct u}: (list char) :=
+Fixpoint but_last (a:char)
+  (u:Init.Datatypes.list char) {struct u}: Init.Datatypes.list char :=
   match u with
   | Init.Datatypes.nil => Init.Datatypes.nil
-  | (Init.Datatypes.cons c u') => (Init.Datatypes.cons a (but_last c u'))
+  | Init.Datatypes.cons c u' => Init.Datatypes.cons a (but_last c u')
   end.
 
-Axiom first_last_explicit : forall (u:(list char)) (a:char),
-  ((Init.Datatypes.app (but_last a u) (Init.Datatypes.cons (last_char a
-  u) Init.Datatypes.nil)) = (Init.Datatypes.cons a u)).
+Axiom first_last_explicit :
+  forall (u:Init.Datatypes.list char) (a:char),
+  ((Init.Datatypes.app (but_last a u)
+    (Init.Datatypes.cons (last_char a u) Init.Datatypes.nil))
+   = (Init.Datatypes.cons a u)).
 
-Axiom first_last : forall (a:char) (u:(list char)), exists v:(list char),
-  exists b:char,
-  ((Init.Datatypes.app v (Init.Datatypes.cons b Init.Datatypes.nil)) = (Init.Datatypes.cons a u)) /\
+Axiom first_last :
+  forall (a:char) (u:Init.Datatypes.list char),
+  exists v:Init.Datatypes.list char, exists b:char,
+  ((Init.Datatypes.app v (Init.Datatypes.cons b Init.Datatypes.nil)) =
+   (Init.Datatypes.cons a u)) /\
   ((list.Length.length v) = (list.Length.length u)).
 
-Axiom key_lemma_right : forall (w1:(list char)) (w'2:(list char)) (m:Z)
-  (a:char), (dist w1 w'2 m) -> forall (w2:(list char)),
-  (w'2 = (Init.Datatypes.cons a w2)) -> exists u1:(list char),
-  exists v1:(list char), exists k:Z, (w1 = (Init.Datatypes.app u1 v1)) /\
-  ((dist v1 w2 k) /\ ((k + (list.Length.length u1))%Z <= (m + 1%Z)%Z)%Z).
+Axiom key_lemma_right :
+  forall (w1:Init.Datatypes.list char) (w'2:Init.Datatypes.list char)
+    (m:Numbers.BinNums.Z) (a:char),
+  dist w1 w'2 m -> forall (w2:Init.Datatypes.list char),
+  (w'2 = (Init.Datatypes.cons a w2)) ->
+  exists u1:Init.Datatypes.list char, exists v1:Init.Datatypes.list char,
+  exists k:Numbers.BinNums.Z,
+  (w1 = (Init.Datatypes.app u1 v1)) /\
+  dist v1 w2 k /\ ((k + (list.Length.length u1))%Z <= (m + 1%Z)%Z)%Z.
 
-Axiom dist_symetry : forall (w1:(list char)) (w2:(list char)) (n:Z), (dist w1
-  w2 n) -> (dist w2 w1 n).
+Axiom dist_symetry :
+  forall (w1:Init.Datatypes.list char) (w2:Init.Datatypes.list char)
+    (n:Numbers.BinNums.Z),
+  dist w1 w2 n -> dist w2 w1 n.
 
-Axiom key_lemma_left : forall (w1:(list char)) (w2:(list char)) (m:Z)
-  (a:char), (dist (Init.Datatypes.cons a w1) w2 m) -> exists u2:(list char),
-  exists v2:(list char), exists k:Z, (w2 = (Init.Datatypes.app u2 v2)) /\
-  ((dist w1 v2 k) /\ ((k + (list.Length.length u2))%Z <= (m + 1%Z)%Z)%Z).
+Axiom key_lemma_left :
+  forall (w1:Init.Datatypes.list char) (w2:Init.Datatypes.list char)
+    (m:Numbers.BinNums.Z) (a:char),
+  dist (Init.Datatypes.cons a w1) w2 m ->
+  exists u2:Init.Datatypes.list char, exists v2:Init.Datatypes.list char,
+  exists k:Numbers.BinNums.Z,
+  (w2 = (Init.Datatypes.app u2 v2)) /\
+  dist w1 v2 k /\ ((k + (list.Length.length u2))%Z <= (m + 1%Z)%Z)%Z.
 
-Axiom dist_concat_left : forall (u:(list char)) (v:(list char))
-  (w:(list char)) (n:Z), (dist v w n) -> (dist (Init.Datatypes.app u v) w
-  ((list.Length.length u) + n)%Z).
+Axiom dist_concat_left :
+  forall (u:Init.Datatypes.list char) (v:Init.Datatypes.list char)
+    (w:Init.Datatypes.list char) (n:Numbers.BinNums.Z),
+  dist v w n ->
+  dist (Init.Datatypes.app u v) w ((list.Length.length u) + n)%Z.
 
-Axiom dist_concat_right : forall (u:(list char)) (v:(list char))
-  (w:(list char)) (n:Z), (dist v w n) -> (dist v (Init.Datatypes.app u w)
-  ((list.Length.length u) + n)%Z).
+Axiom dist_concat_right :
+  forall (u:Init.Datatypes.list char) (v:Init.Datatypes.list char)
+    (w:Init.Datatypes.list char) (n:Numbers.BinNums.Z),
+  dist v w n ->
+  dist v (Init.Datatypes.app u w) ((list.Length.length u) + n)%Z.
 
-Axiom min_dist_equal : forall (w1:(list char)) (w2:(list char)) (a:char)
-  (n:Z), (min_dist w1 w2 n) -> (min_dist (Init.Datatypes.cons a w1)
-  (Init.Datatypes.cons a w2) n).
+Axiom min_dist_equal :
+  forall (w1:Init.Datatypes.list char) (w2:Init.Datatypes.list char) 
+    (a:char) (n:Numbers.BinNums.Z),
+  min_dist w1 w2 n ->
+  min_dist (Init.Datatypes.cons a w1) (Init.Datatypes.cons a w2) n.
 
-Axiom min_dist_diff : forall (w1:(list char)) (w2:(list char)) (a:char)
-  (b:char) (m:Z) (p:Z), (~ (a = b)) -> ((min_dist (Init.Datatypes.cons a w1)
-  w2 p) -> ((min_dist w1 (Init.Datatypes.cons b w2) m) -> (min_dist
-  (Init.Datatypes.cons a w1) (Init.Datatypes.cons b w2)
-  ((ZArith.BinInt.Z.min m p) + 1%Z)%Z))).
+Axiom min_dist_diff :
+  forall (w1:Init.Datatypes.list char) (w2:Init.Datatypes.list char) 
+    (a:char) (b:char) (m:Numbers.BinNums.Z) (p:Numbers.BinNums.Z),
+  ~ (a = b) -> min_dist (Init.Datatypes.cons a w1) w2 p ->
+  min_dist w1 (Init.Datatypes.cons b w2) m ->
+  min_dist (Init.Datatypes.cons a w1) (Init.Datatypes.cons b w2)
+  ((ZArith.BinInt.Z.min m p) + 1%Z)%Z.
 
-Axiom min_dist_eps : forall (w:(list char)) (a:char) (n:Z), (min_dist w
-  Init.Datatypes.nil n) -> (min_dist (Init.Datatypes.cons a w)
-  Init.Datatypes.nil (n + 1%Z)%Z).
+Axiom min_dist_eps :
+  forall (w:Init.Datatypes.list char) (a:char) (n:Numbers.BinNums.Z),
+  min_dist w Init.Datatypes.nil n ->
+  min_dist (Init.Datatypes.cons a w) Init.Datatypes.nil (n + 1%Z)%Z.
 
-Axiom min_dist_eps_length : forall (w:(list char)), (min_dist
-  Init.Datatypes.nil w (list.Length.length w)).
+Axiom min_dist_eps_length :
+  forall (w:Init.Datatypes.list char),
+  min_dist Init.Datatypes.nil w (list.Length.length w).
 
 (* Why3 assumption *)
 Inductive ref (a:Type) :=
-  | mk_ref : a -> ref a.
+  | ref'mk : a -> ref a.
 Axiom ref_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (ref a).
 Existing Instance ref_WhyType.
-Implicit Arguments mk_ref [[a]].
+Arguments ref'mk {a}.
 
 (* Why3 assumption *)
-Definition contents {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
+Definition contents {a:Type} {a_WT:WhyType a} (v:ref a) : a :=
   match v with
-  | (mk_ref x) => x
+  | ref'mk x => x
   end.
 
 Axiom array : forall (a:Type), Type.
-Parameter array_WhyType : forall (a:Type) {a_WT:WhyType a},
-  WhyType (array a).
+Parameter array_WhyType :
+  forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 
-Parameter elts: forall {a:Type} {a_WT:WhyType a}, (array a) -> (Z -> a).
+Parameter elts:
+  forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a.
 
-Parameter length: forall {a:Type} {a_WT:WhyType a}, (array a) -> Z.
+Parameter length:
+  forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z.
 
-Axiom array'invariant : forall {a:Type} {a_WT:WhyType a}, forall (self:(array
-  a)), (0%Z <= (length self))%Z.
+Axiom array'invariant :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (self:array a), (0%Z <= (length self))%Z.
 
 (* Why3 assumption *)
-Definition mixfix_lbrb {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z): a :=
-  ((elts a1) i).
+Definition mixfix_lbrb {a:Type} {a_WT:WhyType a} (a1:array a)
+    (i:Numbers.BinNums.Z) : a :=
+  elts a1 i.
 
-Parameter mixfix_lblsmnrb: forall {a:Type} {a_WT:WhyType a}, (array a) ->
-  Z -> a -> (array a).
+Parameter mixfix_lblsmnrb:
+  forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a ->
+  array a.
 
-Axiom mixfix_lblsmnrb_spec : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(array a)) (i:Z) (v:a), ((length (mixfix_lblsmnrb a1 i
-  v)) = (length a1)) /\ ((elts (mixfix_lblsmnrb a1 i
-  v)) = (map.Map.set (elts a1) i v)).
+Axiom mixfix_lblsmnrb'spec :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
+  ((length (mixfix_lblsmnrb a1 i v)) = (length a1)) /\
+  ((elts (mixfix_lblsmnrb a1 i v)) = (map.Map.set (elts a1) i v)).
 
-Parameter suffix: (array char) -> Z -> (list char).
+Parameter make:
+  forall {a:Type} {a_WT:WhyType a}, Numbers.BinNums.Z -> a -> array a.
 
-Axiom suffix_nil : forall (a:(array char)), ((suffix a
-  (length a)) = Init.Datatypes.nil).
+Axiom make_spec :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (n:Numbers.BinNums.Z) (v:a), (0%Z <= n)%Z ->
+  (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
+   ((mixfix_lbrb (make n v) i) = v)) /\
+  ((length (make n v)) = n).
 
-Axiom suffix_cons : forall (a:(array char)) (i:Z), ((0%Z <= i)%Z /\
-  (i < (length a))%Z) -> ((suffix a i) = (Init.Datatypes.cons (mixfix_lbrb a
-  i) (suffix a (i + 1%Z)%Z))).
+Parameter suffix:
+  array char -> Numbers.BinNums.Z -> Init.Datatypes.list char.
+
+Axiom suffix_nil :
+  forall (a:array char), ((suffix a (length a)) = Init.Datatypes.nil).
+
+Axiom suffix_cons :
+  forall (a:array char) (i:Numbers.BinNums.Z),
+  (0%Z <= i)%Z /\ (i < (length a))%Z ->
+  ((suffix a i) =
+   (Init.Datatypes.cons (mixfix_lbrb a i) (suffix a (i + 1%Z)%Z))).
+
+Require Import Lia.
 
 (* Why3 goal *)
-Theorem suffix_length : forall (a:(array char)) (i:Z), ((0%Z <= i)%Z /\
-  (i <= (length a))%Z) -> ((list.Length.length (suffix a
-  i)) = ((length a) - i)%Z).
+Theorem suffix_length :
+  forall (a:array char) (i:Numbers.BinNums.Z),
+  (0%Z <= i)%Z /\ (i <= (length a))%Z ->
+  ((list.Length.length (suffix a i)) = ((length a) - i)%Z).
 (* Why3 intros a i (h1,h2). *)
 Proof.
 intro a.
@@ -162,19 +214,19 @@ pattern (n - i)%Z; apply natlike_ind.
 (* base case *)
 intros; replace (n - 0)%Z with n.
 rewrite suffix_nil; simpl.
-subst n; omega.
-omega.
+subst n; lia.
+lia.
 (* induction case *)
 intros.
 rewrite suffix_cons.
-2: subst n; omega.
+2: subst n; lia.
 unfold mixfix_lbrb.
 unfold Length.length; fold @Length.length.
-unfold Zsucc; ring_simplify.
+unfold Z.succ; ring_simplify.
 replace (n - (x + 1) + 1)%Z with (n - x)%Z; [ idtac | ring ].
-rewrite H0; subst n; omega.
-subst n; omega.
-subst n; omega.
-subst n; omega.
+rewrite H0; subst n; lia.
+subst n; lia.
+subst n; lia.
+subst n; lia.
 Qed.
 

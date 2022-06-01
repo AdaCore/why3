@@ -1,7 +1,7 @@
 .. _chap.manpages:
 
-Reference Manuals for the Why3 Tools
-====================================
+The Why3 Tools
+==============
 
 .. program:: why3
 
@@ -85,9 +85,19 @@ particular, option :option:`--help` displays the usage and options.
    Set some specific debug flags. See also :numref:`sec.debug` for
    a description of some of those flags.
 
+.. option:: --print-datadir
+
+   Print the location of non-binary data (modules, etc).
+
+.. option:: --print-libdir
+
+   Print the location of binary components (plugins, etc).
+
 .. option:: --help
 
    Display the usage and the exact list of options for the given tool.
+
+The following environment variables are recognized.
 
 .. envvar:: WHY3CONFIG
 
@@ -121,9 +131,16 @@ and editors, are regenerated at each startup of a Why3. This
 configuration can be inspected with the command :why3:tool:`why3 config
 show`.
 
-If a supported prover is not automatically recognized by :why3:tool:`why3
-config detect`, the command :why3:tool:`why3 config add-prover` can be
-used to add it.
+If a supported prover is not automatically recognized by
+:why3:tool:`why3 config detect`, the command :why3:tool:`why3 config
+add-prover` can be used to add it. Advanced users may also manually
+insert extra `[prover]` sections in their configuration file. Notice
+that in such a case, if a detected prover has exactly the same name,
+version and alternative as a user-defined prover, then the
+user-defined prover is taken and the detected one is
+ignored. Similarly, if a user-defined shortcut clahes with a shortcut
+of a detected prover, then the shortcut is chsen to denote the
+user-defined prover and not the detect one.
 
 The available subcommands are as follows:
 
@@ -131,10 +148,10 @@ The available subcommands are as follows:
    Manually register a prover.
 
 :why3:tool:`config detect`
-   Automatically detect installed provers.
+   Automatically detect installed provers and register them.
 
 :why3:tool:`config list-provers`
-   List the provers described in :file:`why3.conf`.
+   List the provers registered in :file:`why3.conf`.
 
 :why3:tool:`config list-supported-provers`
    List the names of all supported provers.
@@ -171,7 +188,7 @@ one can type
    why3 config add-prover Alt-Ergo /home/me/bin/alt-ergo-trunk new-ae
 
 Manually added provers are stored in the configuration file under
-``[manual_binary]`` sections as well as ``[detected_binary]`` ones.
+``[partial_prover]`` sections with a field ``manual = true``.
 
 .. why3:tool:: config detect
 
@@ -182,7 +199,7 @@ This command automatically detects the installed provers that are
 supported by Why3. It also creates a configuration file if none exists.
 
 Automatically detected provers are stored in the configuration file under
-``[detected_binary]`` sections.
+``[partial_prover]`` sections.
 
 .. why3:tool:: config list-provers
 
@@ -206,7 +223,10 @@ command :why3:tool:`why3 config add-prover`.
 Command ``show``
 ~~~~~~~~~~~~~~~~
 
-This command shows the expanded version of the configuration file.
+This command shows the expanded version of the configuration file. In
+particular, all the ``[partial_prover]`` sections are expanded into
+complete ``[prover]`` sections. Automatically generated ``[strategy]``
+sections are also shown.
 
 .. why3:tool:: prove
 .. _sec.why3prove:
@@ -929,10 +949,12 @@ non-exhaustive list (which is undergoing active development):
 
 -  Code containing type polymorphism is often a problem due to the bad
    interaction between monomorphisation techniques and counterexamples.
-   This is current an issue in particular for the Array module of the
+   This is current an issue in particular for the ``Array`` module of the
    standard library.
 
-.. -  [TODO: complete this list]
+.. todo::
+
+   complete this list
 
 More information on the implementation of counterexamples in Why3 can be
 found in :cite:`hauzar16sefm` and

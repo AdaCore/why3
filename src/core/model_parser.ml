@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -666,15 +666,6 @@ let why_name_trans men =
   | Loop_current_iteration -> "[current iteration] "^name
   | Loop_before | Error_message | Other -> name
 
-let json_name_trans men =
-  let name = get_model_trace_string ~name:men.men_name ~attrs:men.men_attrs in
-  let name = List.hd (Strings.bounded_split '@' name 2) in
-  match men.men_kind with
-  | Result -> "result"
-  | Old -> "old "^name
-  | Call_result _ -> "call-result"
-  | _ -> name
-
 let print_model ~filter_similar ~print_attrs ?(me_name_trans = why_name_trans)
     ~print_model_value fmt model =
   Pp.print_list Pp.newline (print_model_file ~filter_similar ~print_attrs ~print_model_value ~me_name_trans)
@@ -810,7 +801,7 @@ let json_model_element me =
     | Loop_previous_iteration ->"before_iteration"
     | Loop_current_iteration -> "current_iteration" in
   Record [
-      "name", String (json_name_trans me.me_name);
+      "name", String me.me_name.men_name;
       "attrs", json_attrs me.me_name;
       "value", convert_model_value me.me_value;
       "kind", String kind
@@ -823,27 +814,29 @@ let json_model_elements model_elements =
 let json_model_elements_on_lines model (file_name, model_file) =
   let l =
     List.map (fun (i, e) ->
-        let f =
+        let is_vc_line =
           match model.vc_term_loc with
-          | None -> string_of_int i
+          | None -> false
           | Some pos ->
               let vc_file_name, line, _, _ = Loc.get pos in
-              if file_name = vc_file_name && i = line then string_of_int i
-              else string_of_int i in
-        f, json_model_elements e)
+              file_name = vc_file_name && i = line in
+        Json_base.(Record [
+          "loc", String (string_of_int i);
+          "is_vc_line", Bool is_vc_line;
+          "model_elements", json_model_elements e
+        ]))
       (Mint.bindings model_file) in
-  Json_base.Record l
+  Json_base.List l
 
 let json_model model =
   let l =
     List.map (fun (file_name, model_file) ->
-        file_name,
-        json_model_elements_on_lines model (file_name, model_file))
+        Json_base.(Record [
+          "filename", String file_name;
+          "model", json_model_elements_on_lines model (file_name, model_file)
+        ]))
       (Mstr.bindings model.model_files) in
-  Json_base.Record l
-
-let print_model_json fmt model =
-  Json_base.print_json fmt (json_model model)
+  Json_base.List l
 
 (*
 ***************************************************************
