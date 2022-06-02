@@ -1075,7 +1075,14 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
         try let (n, v, _, _) = get_source_view_table f in
             (n, v)
         with Nosourceview f ->
-          let s = Sysutil.file_contents f in
+          let s =
+            try
+              Sysutil.file_contents f
+            with exn ->
+              Format.asprintf "Error with scroll_to_loc to loc='%a':@ %a"
+                Loc.gen_report_position loc
+                Exn_printer.exn_printer exn
+          in
           let (n,v) = create_raw_source_view ~read_only:true f s in
           change_lang v (Filename.extension f);
           (n,v)
