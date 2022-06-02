@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="test_elim.mlw"/>
+<theory name="UnusedAbs" proved="true">
+ <goal name="f&#39;vc" expl="VC for f" proved="true">
+ <transf name="eliminate_unused_keep_constants" proved="true" >
+  <goal name="f&#39;vc.0" expl="VC for f" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="195"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="UnusedBV" proved="true">
+ <goal name="f&#39;vc" expl="VC for f" proved="true">
+ <transf name="eliminate_unused_keep_constants" proved="true" >
+  <goal name="f&#39;vc.0" expl="VC for f" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="8410"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="MatchPair" proved="true">
+ <goal name="g" proved="true">
+ <transf name="eliminate_unused_keep_constants" proved="true" >
+  <goal name="g.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="226"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="DefMatchPair" proved="true">
+ <goal name="g" proved="true">
+ <transf name="eliminate_unused" proved="true" >
+  <goal name="g.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="325"/></proof>
+  <transf name="eliminate_match" proved="true" >
+   <goal name="g.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="197"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ <transf name="eliminate_unused_keep_constants" proved="true" >
+  <goal name="g.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="325"/></proof>
+  </goal>
+ </transf>
+ <transf name="eliminate_unused_types" proved="true" >
+  <goal name="g.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="325"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Ref" proved="true">
+ <goal name="f&#39;vc" expl="VC for f" proved="true">
+ <transf name="eliminate_unused" proved="true" >
+  <goal name="f&#39;vc.0" expl="VC for f" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="449"/></proof>
+  </goal>
+ </transf>
+ <transf name="eliminate_unused_keep_constants" proved="true" >
+  <goal name="f&#39;vc.0" expl="VC for f" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="449"/></proof>
+  </goal>
+ </transf>
+ <transf name="eliminate_unused_types" proved="true" >
+  <goal name="f&#39;vc.0" expl="VC for f" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="449"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

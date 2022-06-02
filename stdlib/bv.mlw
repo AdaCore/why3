@@ -165,36 +165,45 @@ module BV_Gen
   axiom Lsr_nth_low:
     forall b:t,n s:int. 0 <= s -> 0 <= n -> n+s < size ->
       nth (lsr b s) n = nth b (n+s)
+  meta "depends" axiom Lsr_nth_low, function lsr
 
   axiom Lsr_nth_high:
     forall b:t,n s:int. 0 <= s -> 0 <= n -> n+s >= size ->
       nth (lsr b s) n = False
+  meta "depends" axiom Lsr_nth_high, function lsr
 
   lemma lsr_zeros: forall x. lsr x 0 = x
+  meta "depends" lemma lsr_zeros, function lsr
 
   val function asr t int : t
 
   axiom Asr_nth_low:
     forall b:t,n s:int. 0 <= s -> 0 <= n < size -> n+s < size ->
       nth (asr b s) n = nth b (n+s)
+  meta "depends" axiom Asr_nth_low, function asr
 
   axiom Asr_nth_high:
     forall b:t,n s:int. 0 <= s -> 0 <= n < size -> n+s >= size ->
       nth (asr b s) n = nth b (size-1)
+  meta "depends" axiom Asr_nth_high, function asr
 
   lemma asr_zeros: forall x. asr x 0 = x
+  meta "depends" lemma asr_zeros, function asr
 
   val function lsl t int : t
 
   axiom Lsl_nth_high:
     forall b:t,n s:int. 0 <= s <= n < size ->
       nth (lsl b s) n = nth b (n-s)
+  meta "depends" axiom Lsl_nth_high, function lsl
 
   axiom Lsl_nth_low:
     forall b:t,n s:int. 0 <= n < s ->
       nth (lsl b s) n = False
+  meta "depends" axiom Lsl_nth_low, function lsl
 
   lemma lsl_zeros: forall x. lsl x 0 = x
+  meta "depends" lemma lsl_zeros, function lsl
 
   use int.EuclideanDivision
 (*  use int.ComputerDivision as CD*)
@@ -204,12 +213,14 @@ module BV_Gen
   axiom Nth_rotate_right :
     forall v n i. 0 <= i < size -> 0 <= n ->
       nth (rotate_right v n) i = nth v (mod (i + n) size)
+  meta "depends" axiom Nth_rotate_right, function rotate_right
 
   function rotate_left t int : t
 
   axiom Nth_rotate_left :
     forall v n i. 0 <= i < size -> 0 <= n ->
       nth (rotate_left v n) i = nth v (mod (i - n) size)
+  meta "depends" axiom Nth_rotate_left, function rotate_left
 
 
   (** Conversions from/to integers *)
@@ -240,9 +251,11 @@ module BV_Gen
 
   axiom to_uint_extensionality :
     forall v,v':t. to_uint v = to_uint v' -> v = v'
+  meta "depends" axiom to_uint_extensionality, function to_uint
 
   axiom to_int_extensionality:
     forall v,v':t. to_int v = to_int v' -> v = v'
+  meta "depends" axiom to_int_extensionality, function to_int
 
 (*  *)
   predicate uint_in_range (i : int) = (Int.(<=) 0 i) /\ (Int.(<=) i max_int)
@@ -253,9 +266,12 @@ module BV_Gen
     forall v:t. uint_in_range (to_uint v)
 *)
     forall v:t. 0 <= to_uint v < two_power_size
+  meta "depends" axiom to_uint_bounds, function to_uint
 
   axiom to_uint_of_int :
     forall i. 0 <= i < two_power_size -> to_uint (of_int i) = i
+  meta "depends" axiom to_uint_of_int, function to_uint
+  meta "depends" axiom to_uint_of_int, function of_int
 
 (* not yet realized
   axiom to_int_bounds :
@@ -314,10 +330,13 @@ module BV_Gen
   val function sub (v1 v2 : t) : t
   axiom to_uint_sub:
     forall v1 v2. to_uint (sub v1 v2) = mod (Int.(-) (to_uint v1) (to_uint v2)) two_power_size
+  meta depends axiom to_uint_sub  , function sub
   lemma to_uint_sub_bounded:
     forall v1 v2.
       0 <= to_uint v1 - to_uint v2 < two_power_size ->
       to_uint (sub v1 v2) = to_uint v1 - to_uint v2
+  meta depends lemma to_uint_sub_bounded, function sub
+
 
   val function neg (v1 : t) : t
   axiom to_uint_neg:
@@ -326,18 +345,22 @@ module BV_Gen
   val function mul (v1 v2 : t) : t
   axiom to_uint_mul:
     forall v1 v2. to_uint (mul v1 v2) = mod (Int.( * ) (to_uint v1) (to_uint v2)) two_power_size
+  meta "depends" axiom to_uint_mul, function mul
   lemma to_uint_mul_bounded:
     forall v1 v2.
       to_uint v1 * to_uint v2 < two_power_size ->
       to_uint (mul v1 v2) = to_uint v1 * to_uint v2
+  meta "depends" lemma to_uint_mul_bounded, function mul
 
   val function udiv (v1 v2 : t) : t
   axiom to_uint_udiv:
     forall v1 v2. to_uint (udiv v1 v2) = div (to_uint v1) (to_uint v2)
+  meta "depends" axiom to_uint_udiv, function udiv
 
   val function urem (v1 v2 : t) : t
   axiom to_uint_urem:
     forall v1 v2. to_uint (urem v1 v2) = mod (to_uint v1) (to_uint v2)
+  meta "depends" axiom to_uint_urem, function urem
 
   val function sdiv (v1 v2 : t) : t
 (* not yet realized
@@ -363,10 +386,12 @@ module BV_Gen
   axiom lsr_bv_is_lsr:
     forall x n.
       lsr_bv x n = lsr x (to_uint n)
+  meta "depends" axiom lsr_bv_is_lsr, function lsr_bv
 
   axiom to_uint_lsr:
     forall v n : t.
       to_uint (lsr_bv v n) = div (to_uint v) (pow2 ( to_uint n ))
+  meta "depends" axiom to_uint_lsr, function lsr_bv
 
   (** arithmetic shift right *)
   val function asr_bv t t : t
@@ -394,23 +419,32 @@ module BV_Gen
 
   axiom rotate_left_bv_is_rotate_left :
     forall v n. rotate_left_bv v n = rotate_left v (to_uint n)
+  meta "depends" axiom rotate_left_bv_is_rotate_left, function rotate_left_bv
+  meta "depends" axiom rotate_left_bv_is_rotate_left, function rotate_left
 
   axiom rotate_right_bv_is_rotate_right :
     forall v n. rotate_right_bv v n = rotate_right v (to_uint n)
+  meta "depends" axiom rotate_right_bv_is_rotate_right, function rotate_right_bv
+  meta "depends" axiom rotate_right_bv_is_rotate_right, function rotate_right
 
   val function nth_bv t t: bool
 
   axiom nth_bv_def:
     forall x i.
       nth_bv x i = not (bw_and (lsr_bv x i) one = zeros)
+  meta "depends" axiom nth_bv_def, function nth_bv
 
   axiom Nth_bv_is_nth:
     forall x i.
       nth x (to_uint i) = nth_bv x i
+  meta "depends" axiom Nth_bv_is_nth, function nth_bv
+  meta "depends" axiom Nth_bv_is_nth, function nth
 
   axiom Nth_bv_is_nth2:
     forall x i. 0 <= i < two_power_size ->
       nth_bv x (of_int i) = nth x i
+  meta "depends" axiom Nth_bv_is_nth2, function nth_bv
+  meta "depends" axiom Nth_bv_is_nth2, function nth
 
   (** equality axioms *)
 
@@ -419,6 +453,7 @@ module BV_Gen
   axiom eq_sub_bv_def: forall a b i n.
     let mask = lsl_bv (sub (lsl_bv one n) one) i in
       eq_sub_bv a b i n = (bw_and b mask = bw_and a mask)
+  meta depends axiom eq_sub_bv_def, predicate eq_sub_bv
 
   predicate eq_sub (a b:t) (i n:int) =
     forall j. i <= j < i + n -> nth a j = nth b j
@@ -426,12 +461,15 @@ module BV_Gen
   axiom eq_sub_equiv: forall a b i n:t.
       eq_sub    a b (to_uint i) (to_uint n)
   <-> eq_sub_bv a b i n
+  meta depends axiom eq_sub_equiv, predicate eq_sub_bv
+  meta depends axiom eq_sub_equiv, predicate eq_sub
 
   predicate (==) (v1 v2 : t) =
     eq_sub v1 v2 0 size
 
   axiom Extensionality [@W:non_conservative_extension:N] :
     forall x y : t [x == y]. x == y -> x = y
+  meta depends axiom Extensionality, predicate (==)
 
   val eq (v1 v2 : t) : bool
     ensures { result <-> v1 = v2 }
