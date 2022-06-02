@@ -77,6 +77,9 @@ let keep_ls acc ls =
    | _ -> acc.keep_other_logic_symbols)
   || Sls.mem ls acc.used_ls
 
+let keep_ts acc ts =
+  Sts.mem ts acc.used_ts
+
 let rec eliminate_unused_decl acc task : Task.task =
   match task with
   | None -> None
@@ -103,13 +106,13 @@ let rec eliminate_unused_decl acc task : Task.task =
         | Ddata ddl ->
            if List.exists
                 (fun (ts,cl) ->
-                  Sts.mem ts acc.used_ts ||
+                  keep_ts acc ts ||
                     List.exists
                       (fun (ls,pl) ->
-                        Sls.mem ls acc.used_ls ||
+                        keep_ls acc ls ||
                           List.exists
                             (function None -> false
-                                    | Some ls -> Sls.mem ls acc.used_ls)
+                                    | Some ls -> keep_ls acc ls)
                             pl)
                       cl)
                 ddl
@@ -134,7 +137,7 @@ let rec eliminate_unused_decl acc task : Task.task =
                eliminate_unused_decl acc ta
              end
      | Dlogic dl ->
-        if List.exists (fun (ls,_) -> Sls.mem ls acc.used_ls) dl
+        if List.exists (fun (ls,_) -> keep_ls acc ls) dl
         then
           let acc =
             List.fold_left

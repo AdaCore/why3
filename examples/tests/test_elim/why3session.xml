@@ -3,13 +3,15 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="test_elim.mlw"/>
 <theory name="UnusedAbs" proved="true">
  <goal name="f&#39;vc" expl="VC for f" proved="true">
  <transf name="eliminate_unused_keep_constants" proved="true" >
   <goal name="f&#39;vc.0" expl="VC for f" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="195"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="52"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="0"/></proof>
   </goal>
  </transf>
  </goal>
@@ -19,6 +21,7 @@
  <transf name="eliminate_unused_keep_constants" proved="true" >
   <goal name="f&#39;vc.0" expl="VC for f" proved="true">
   <proof prover="0"><result status="valid" time="0.04" steps="8410"/></proof>
+  <proof prover="1"><result status="valid" time="0.09" steps="1028"/></proof>
   </goal>
  </transf>
  </goal>
@@ -27,7 +30,8 @@
  <goal name="g" proved="true">
  <transf name="eliminate_unused_keep_constants" proved="true" >
   <goal name="g.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="226"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="83"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="0"/></proof>
   </goal>
  </transf>
  </goal>
@@ -36,22 +40,26 @@
  <goal name="g" proved="true">
  <transf name="eliminate_unused" proved="true" >
   <goal name="g.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="325"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="126"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
   <transf name="eliminate_match" proved="true" >
    <goal name="g.0.0" proved="true">
-   <proof prover="0"><result status="valid" time="0.02" steps="197"/></proof>
+   <proof prover="0"><result status="valid" time="0.02" steps="54"/></proof>
+   <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  <transf name="eliminate_unused_keep_constants" proved="true" >
   <goal name="g.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="325"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="126"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
  </transf>
  <transf name="eliminate_unused_types" proved="true" >
   <goal name="g.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="325"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="126"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
  </transf>
  </goal>
@@ -60,17 +68,20 @@
  <goal name="f&#39;vc" expl="VC for f" proved="true">
  <transf name="eliminate_unused" proved="true" >
   <goal name="f&#39;vc.0" expl="VC for f" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="449"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="306"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="0"/></proof>
   </goal>
  </transf>
  <transf name="eliminate_unused_keep_constants" proved="true" >
   <goal name="f&#39;vc.0" expl="VC for f" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="449"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="306"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="0"/></proof>
   </goal>
  </transf>
  <transf name="eliminate_unused_types" proved="true" >
   <goal name="f&#39;vc.0" expl="VC for f" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="449"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="306"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="0"/></proof>
   </goal>
  </transf>
  </goal>
