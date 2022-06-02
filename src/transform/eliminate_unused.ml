@@ -198,13 +198,19 @@ let rec eliminate_unused_decl acc task : Task.task =
             eliminate_unused_decl acc ta
           end
 
-let eliminate_unused_types = Trans.store (eliminate_unused_decl (initial true true))
+let eliminate_unused_types =
+  let o t =
+    eliminate_unused_decl
+      (Task.on_meta meta_depends add_dependency (initial true true) t) t in
+  Trans.store o
 
-let eliminate_unused_keep_constants = Trans.store (eliminate_unused_decl (initial true false))
+let eliminate_unused_keep_constants =
+  let o t =
+    eliminate_unused_decl
+      (Task.on_meta meta_depends add_dependency (initial true false) t) t in
+  Trans.store o
 
-let eliminate_unused = Trans.store (eliminate_unused_decl (initial false false))
-
-let eliminate_unused_meta =
+let eliminate_unused =
   let o t =
     eliminate_unused_decl
       (Task.on_meta meta_depends add_dependency (initial false false) t) t in
@@ -220,8 +226,4 @@ let () =
 
 let () =
   Trans.register_transform "eliminate_unused" eliminate_unused
-    ~desc:"Eliminate@ unused@ type@ symbols@ and@ unused@ logic@ symbols"
-
-let () =
-  Trans.register_transform "eliminate_unused_dependencies" eliminate_unused_meta
     ~desc:"Eliminate@ unused@ type@ symbols@ and@ unused@ logic@ symbols"

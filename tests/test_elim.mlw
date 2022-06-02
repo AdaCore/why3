@@ -1,4 +1,14 @@
 
+module Unused
+
+use int.Int
+use int.Abs
+
+let f (x:int) : int
+  ensures { result > x }
+  = x+1
+
+end
 
 module MatchPair
 
