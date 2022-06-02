@@ -183,7 +183,7 @@ let print_prover_result ?(json=false) fmt r =
   if json then
     Json_base.print_json fmt (json_prover_result r)
   else
-    let color = match r.pr_answer with | Valid -> "green" | Invalid -> "red" | _ -> "yellow" in
+    let color = match r.pr_answer with | Valid -> "green" | Invalid -> "red" | _ -> "cyan" in
     fprintf fmt "@{<bold %s>%a@}@ (%.2fs%a)"
       color print_prover_answer r.pr_answer r.pr_time print_steps r.pr_steps;
     if r.pr_answer == HighFailure then
