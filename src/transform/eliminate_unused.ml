@@ -30,7 +30,7 @@ type used_symbols = {
     keep_other_logic_symbols : bool;
     used_ts : Sts.t;
     used_ls : Sls.t;
-    depends : Sls.t Mpr.t;
+    depends : (Sls.t * Theory.tdecl list) Mpr.t;
   }
 
 let initial bc bls  =
@@ -40,20 +40,6 @@ let initial bc bls  =
     used_ls = Sls.add ps_equ Sls.empty;
     depends = Mpr.empty;
   }
-
-let add_dependency usymb l =
-  match l with
-  | Theory.[ MApr pr ; MAls ls ] ->
-     let d =
-       Mpr.change
-         (function
-          | None -> Some (Sls.singleton ls)
-          | Some s -> Some (Sls.add ls s))
-         pr  usymb.depends
-     in
-     { usymb with depends = d }
-  | _ -> assert false (* wrongly typed meta, impossible *)
-
 
 
 let used_symbols_in_type =
@@ -81,22 +67,37 @@ let keep_ts acc ts =
   Sts.mem ts acc.used_ts
 
 let rec eliminate_unused_decl acc task : Task.task =
+  let open Theory in
   match task with
   | None -> None
   | Some Task.{ task_decl = td ; task_prev = ta } ->
-     match td.Theory.td_node with
-     | Theory.Use _ | Theory.Clone _ | Theory.Meta _ ->
+     match td.td_node with
+     | Meta(mt,[MApr pr ; MAls ls]) when meta_equal mt meta_depends ->
+        let d =
+          Mpr.change
+            (function
+             | None -> Some (Sls.singleton ls,[td])
+             | Some (s,tds) -> Some (Sls.add ls s, td::tds))
+            pr acc.depends
+        in
+        let acc = { acc with depends = d } in
+        eliminate_unused_decl acc ta
+     | Use _ | Clone _ | Meta _ ->
         let ta = eliminate_unused_decl acc ta in
         Task.add_tdecl ta td
-     | Theory.Decl d ->
+     | Decl d ->
         match d.d_node with
         | Dprop (_,pr,t) ->
            begin
              try
-               let s = Mpr.find pr acc.depends in
+               let s,tds = Mpr.find pr acc.depends in
                if Sls.is_empty (Sls.inter s acc.used_ls) then
                  eliminate_unused_decl acc ta
-               else raise Not_found
+               else
+                let acc = used_symbols_in_term acc t in
+                let ta = eliminate_unused_decl acc ta in
+                let t = Task.add_decl ta d in
+                List.fold_left Task.add_tdecl t tds
              with
                Not_found ->
                 let acc = used_symbols_in_term acc t in
@@ -201,6 +202,8 @@ let rec eliminate_unused_decl acc task : Task.task =
             eliminate_unused_decl acc ta
           end
 
+            (*
+
 let eliminate_unused_types =
   let o t =
     eliminate_unused_decl
@@ -218,6 +221,17 @@ let eliminate_unused =
     eliminate_unused_decl
       (Task.on_meta meta_depends add_dependency (initial false false) t) t in
   Trans.store o
+             *)
+
+
+let eliminate_unused_types =
+  Trans.store (eliminate_unused_decl (initial true true))
+
+let eliminate_unused_keep_constants =
+  Trans.store (eliminate_unused_decl (initial true false))
+
+let eliminate_unused =
+  Trans.store (eliminate_unused_decl (initial false false))
 
 let () =
   Trans.register_transform "eliminate_unused_types" eliminate_unused_types

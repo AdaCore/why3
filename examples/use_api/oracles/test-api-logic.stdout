@@ -239,6 +239,8 @@ Task 1: theory Task
             forall x:int, y:int, z:int.
              x <= y -> zero <= z -> (x * z) <= (y * z)
           
+          (* meta depends prop CompatOrderMult, function ( * ) *)
+          
           (* clone algebra.OrderedUnitaryCommutativeRing with type t16 = int,
             predicate (<=') = (<=), constant one2 = one,
             function ( *'''') = ( * ), function (-''''_) = (-_),
@@ -452,6 +454,8 @@ Task 2: theory Task
           axiom CompatOrderMult :
             forall x:int, y:int, z:int.
              x <= y -> zero <= z -> (x * z) <= (y * z)
+          
+          (* meta depends prop CompatOrderMult, function ( * ) *)
           
           (* clone algebra.OrderedUnitaryCommutativeRing with type t16 = int,
             predicate (<=') = (<=), constant one2 = one,
