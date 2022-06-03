@@ -86,7 +86,7 @@ run () {
         sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" | \
         # This ad hoc sed removes any timing information from counterexamples output.
         # Counterexamples in JSON format cannot match this regexp.
-        sed 's/ *([0-9]\+\.[0-9]\+s, [0-9]\+ steps)//g' | \
+        sed 's/ *([0-9]\+\.[0-9]\+s\(, [0-9]\+ steps\)\?)//g' | \
         # This ad hoc sed removes diff between Timeout and Unknown (unknown)
         # when running from platform with different speed.
         sed 's/Prover result is: \(Timeout\.\|Unknown (\(unknown\|incomplete\|unknown + \(incomplete\|interrupted\)\))\.\|Out of memory.\|Step limit exceeded\.\|Step limit exceeded ([^)]*)\.\)$/Prover result is: Unknown or time\/memory\/step limit./' | \
@@ -123,7 +123,7 @@ for file in $files; do
     filedir=`dirname $file`
     filebase=`basename $file .mlw`
     printf "Running provers on $filedir/$filebase.mlw\n";
-    cvc4steps=150000
+    cvc5steps=150000
     case "$filebase" in
       "bv32")
         z3steps=2500000
@@ -144,8 +144,10 @@ for file in $files; do
         z3steps=7500000
         ;;
     esac
-    run CVC4,1.8 $filedir $filebase true  $cvc4steps
-    run CVC4,1.8 $filedir $filebase false $cvc4steps
+    run CVC4,1.8 $filedir $filebase true  $cvc5steps
+    run CVC4,1.8 $filedir $filebase false $cvc5steps
+    run CVC5,1.0.0 $filedir $filebase true  $cvc5steps
+    run CVC5,1.0.0 $filedir $filebase false $cvc5steps
     run Z3,4.8.10 $filedir $filebase true  $z3steps
     run Z3,4.8.10 $filedir $filebase false $z3steps
 done

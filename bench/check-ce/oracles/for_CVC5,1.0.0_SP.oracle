@@ -1,0 +1,363 @@
+File "bench/check-ce/for.mlw", line 8, characters 25-31:
+Sub-goal Loop invariant init of goal f'vc.
+Prover result is: Valid (0.04s, 1277 steps).
+
+<check-ce-rac-results>Check model 0 ("bench/check-ce/for.mlw", line 8, characters 25-31)
+<check-ce-rac-results>Checking model:
+                      File for.mlw:
+                        Line 7:
+                          i = {"type": "Integer", "val": "0"}
+                          x1 =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "-1"}}]}}
+                        Line 8:
+                          x1 =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "0"}}]}}
+                          x1 =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "0"}}]}}
+                        Line 9:
+                          result = {"type": "Boolean", "val": true}
+                        Line 10:
+                          x1 =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/for.mlw", line 5, characters 15-16 at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
+                                                                    0}
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/for.mlw", line 6, characters 15-16 at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
+                                                                    0}
+<rac-values>Value from model for variable `x1` at "bench/check-ce/for.mlw", line 7, characters 2-125 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
+                                                                    (-1)}
+<rac-values>Type default value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
+                                                                    0}
+<rac-values>Value from model for variable `i` at "bench/check-ce/for.mlw", line 7, characters 6-7: 0
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: NORMAL
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          Unknown location:
+                              _ = ()
+                          File for.mlw:
+                            Line 4:
+                              _ = ()
+                              Execution of main function `f` with env:
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 5:
+                              Normal execution of function `ref` with args:
+                                contents = 0
+                              Normal execution of function `ref'mk` with args:
+                                contents = 0
+                            Line 6:
+                              Normal execution of function `ref` with args:
+                                contents = 0
+                              Normal execution of function `ref'mk` with args:
+                                contents = 0
+                            Line 7:
+                              Normal iteration of loop
+                            Line 9:
+                              Normal execution of function `(=)` with args:
+                                x = 0
+                                y = 0
+                            Line 10:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 0}
+                              Normal execution of function `(+)` with args:
+                                _ = 0
+                                _ = 1
+                            Line 7:
+                              Normal iteration of loop
+                            Line 9:
+                              Normal execution of function `(=)` with args:
+                                x = 1
+                                y = 0
+                            Line 12:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 0}
+                              Normal execution of function `(+)` with args:
+                                _ = 0
+                                _ = 1
+                            Line 4:
+                              Execution of main function terminated normally
+                        - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/for.mlw", line 8, characters 16-31)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          Unknown location:
+                              _ = ()
+                          File for.mlw:
+                            Line 4:
+                              _ = ()
+                              Execution of main function `f` with env:
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 5:
+                              Giant-step execution of function `ref` with args:
+                                contents = 0
+                              result of `ref` = {contents= 0}
+                            Line 6:
+                              Giant-step execution of function `ref` with args:
+                                contents = 0
+                              result of `ref` = {contents= 0}
+                            Line 7:
+                              Giant-step iteration of loop
+                              x1 = {contents= (-1)}
+                              x2 = {contents= 0}
+                              i = 0
+                              Giant-step iteration of loop
+                            Line 9:
+                              Normal execution of function `(=)` with args:
+                                x = 0
+                                y = 0
+                            Line 10:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= (-1)}
+                              Normal execution of function `(+)` with args:
+                                _ = (-1)
+                                _ = 1
+                            Line 8:
+                              Property failure at loop invariant preservation with:
+                                x1 = {contents= 0}
+                                i = 1
+<check-ce-rac-results>Check model 1 ("bench/check-ce/for.mlw", line 8, characters 25-31)
+<check-ce-rac-results>Checking model:
+                      File for.mlw:
+                        Line 7:
+                          i = {"type": "Integer", "val": "0"}
+                          x1 =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "-1"}}]}}
+                        Line 8:
+                          x1 =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "0"}}]}}
+                          x1 =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "0"}}]}}
+                        Line 9:
+                          result = {"type": "Boolean", "val": true}
+                        Line 10:
+                          x1 =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/for.mlw", line 5, characters 15-16 at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
+                                                                    0}
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/for.mlw", line 6, characters 15-16 at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
+                                                                    0}
+<rac-values>Value from model for variable `x1` at "bench/check-ce/for.mlw", line 7, characters 2-125 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
+                                                                    (-1)}
+<rac-values>Type default value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
+                                                                    0}
+<rac-values>Value from model for variable `i` at "bench/check-ce/for.mlw", line 7, characters 6-7: 0
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: NORMAL
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          Unknown location:
+                              _ = ()
+                          File for.mlw:
+                            Line 4:
+                              _ = ()
+                              Execution of main function `f` with env:
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 5:
+                              Normal execution of function `ref` with args:
+                                contents = 0
+                              Normal execution of function `ref'mk` with args:
+                                contents = 0
+                            Line 6:
+                              Normal execution of function `ref` with args:
+                                contents = 0
+                              Normal execution of function `ref'mk` with args:
+                                contents = 0
+                            Line 7:
+                              Normal iteration of loop
+                            Line 9:
+                              Normal execution of function `(=)` with args:
+                                x = 0
+                                y = 0
+                            Line 10:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 0}
+                              Normal execution of function `(+)` with args:
+                                _ = 0
+                                _ = 1
+                            Line 7:
+                              Normal iteration of loop
+                            Line 9:
+                              Normal execution of function `(=)` with args:
+                                x = 1
+                                y = 0
+                            Line 12:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 0}
+                              Normal execution of function `(+)` with args:
+                                _ = 0
+                                _ = 1
+                            Line 4:
+                              Execution of main function terminated normally
+                        - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/for.mlw", line 8, characters 16-31)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          Unknown location:
+                              _ = ()
+                          File for.mlw:
+                            Line 4:
+                              _ = ()
+                              Execution of main function `f` with env:
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 5:
+                              Giant-step execution of function `ref` with args:
+                                contents = 0
+                              result of `ref` = {contents= 0}
+                            Line 6:
+                              Giant-step execution of function `ref` with args:
+                                contents = 0
+                              result of `ref` = {contents= 0}
+                            Line 7:
+                              Giant-step iteration of loop
+                              x1 = {contents= (-1)}
+                              x2 = {contents= 0}
+                              i = 0
+                              Giant-step iteration of loop
+                            Line 9:
+                              Normal execution of function `(=)` with args:
+                                x = 0
+                                y = 0
+                            Line 10:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= (-1)}
+                              Normal execution of function `(+)` with args:
+                                _ = (-1)
+                                _ = 1
+                            Line 8:
+                              Property failure at loop invariant preservation with:
+                                x1 = {contents= 0}
+                                i = 1
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: SW
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/for.mlw", line 8, characters 16-31)
+- Checked model 1: SW
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/for.mlw", line 8, characters 16-31)
+File "bench/check-ce/for.mlw", line 8, characters 25-31:
+Sub-goal Loop invariant preservation of goal f'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6476 steps).
+The contracts of some function or loop are too weak, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+Unknown location:
+    _ = ()
+File for.mlw:
+  Line 4:
+    _ = ()
+    Execution of main function `f` with env:
+      _ = ()
+      zero = 0
+      one = 1
+  Line 5:
+    Giant-step execution of function `ref` with args:
+      contents = 0
+    result of `ref` = {contents= 0}
+  Line 6:
+    Giant-step execution of function `ref` with args:
+      contents = 0
+    result of `ref` = {contents= 0}
+  Line 7:
+    Giant-step iteration of loop
+    x1 = {contents= (-1)}
+    x2 = {contents= 0}
+    i = 0
+    Giant-step iteration of loop
+  Line 9:
+    Normal execution of function `(=)` with args:
+      x = 0
+      y = 0
+  Line 10:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+    Normal execution of function `(+)` with args:
+      _ = (-1)
+      _ = 1
+  Line 8:
+    Property failure at loop invariant preservation with:
+      x1 = {contents= 0}
+      i = 1
+
+File "bench/check-ce/for.mlw", line 8, characters 25-31:
+Sub-goal Loop invariant preservation of goal f'vc.
+Prover result is: Valid (0.02s, 1534 steps).
+

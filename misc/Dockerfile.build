@@ -12,6 +12,9 @@ RUN apt-get update -yq && \
     apt-get clean
 
 # install provers
+## CVC5 1.0.0
+RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.0.0/cvc5-Linux -O /usr/local/bin/cvc5-1.0.0 && \
+    chmod a+x /usr/local/bin/cvc5-1.0.0
 ## CVC4 1.8
 RUN wget --quiet https://github.com/CVC4/CVC4/releases/download/1.8/cvc4-1.8-x86_64-linux-opt -O /usr/local/bin/cvc4-1.8 && \
     chmod a+x /usr/local/bin/cvc4-1.8

@@ -191,7 +191,7 @@ step_limit () {
     test -d $1 || exit 1
     # FIXME: no reproducible test for Z3 yet, since Z3 replies
     # "unknown" when step limit reached
-    provers=`bin/why3$suffix config list-provers | grep 'Alt-Ergo 2\.[0-9]\|CVC4 1\.[6-9]' | tr ' ' ',' | tr -d '()'`
+    provers=`bin/why3$suffix config list-provers | grep 'Alt-Ergo 2\.[0-9]\|CVC4 1\.[6-9]\|CVC5 1\.[0-9]' | tr ' ' ',' | tr -d '()'`
     for f in $1/*.mlw; do
         for p in $provers ; do
             printf "  $f (steps limit for $p)... "
@@ -211,7 +211,7 @@ step_limit () {
 mem_limit () {
     pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
-    provers=`bin/why3$suffix config list-provers | grep 'Alt-Ergo 2\.[3-9]\\.[0-9]$\|CVC4 1\.[6-8]$\|Z3 4\.[6-8]\.[0-9]\+$' | tr ' ' ',' | tr -d '()'`
+    provers=`bin/why3$suffix config list-provers | grep 'Alt-Ergo 2\.[3-9]\\.[0-9]$\|CVC4 1\.[6-8]$\|CVC5 1\.[0-9]\.[0-9]$\|Z3 4\.[6-8]\.[0-9]\+$' | tr ' ' ',' | tr -d '()'`
     for f in $1/*.mlw; do
         for p in $provers ; do
             if [[ "$p" =~ .*strings.* ]]; then
