@@ -137,6 +137,7 @@ let opt_task = ref None
 
 let opt_print_theory = ref false
 let opt_print_namespace = ref false
+let opt_color = ref false
 
 let option_list =
   let open Getopt in
@@ -194,6 +195,8 @@ let option_list =
     KLong "json-model-values", Hnd0 (fun () -> opt_json := Some `Values),
     " print values of prover model in JSON format (back-\n\
      wards compatiblity with --json)";
+    KLong "color", Hnd0 (fun () -> opt_color := true),
+    " print output with colors";
   ]
 
 let config, env =
@@ -513,7 +516,7 @@ let do_input env drv = function
 
 let () =
   try
-    if Util.terminal_has_color then (
+    if (Util.terminal_has_color && !opt_color) then (
       Format.set_formatter_tag_functions Util.ansi_color_tags;
       set_mark_tags true );
     let load (f,ef) = load_driver_raw (Whyconf.get_main config) env f ef in
