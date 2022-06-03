@@ -174,13 +174,6 @@ module FromSexp = struct
         ""
     | sexp -> error sexp "name"
 
-  let var_name = function
-    | Atom s | List [Atom "as"; Atom s; _] as sexp ->
-        if s = "" || is_name_start s.[0] then s else
-        if is_quoted s then get_quoted s else
-          error sexp "var"
-    | sexp -> error sexp "var"
-
   let ireturn_type sexp =
     try Some (name sexp) with _ ->
       None
@@ -189,24 +182,48 @@ module FromSexp = struct
     | List [n; iret] -> name n, ireturn_type iret
     | sexp -> error sexp "arg"
 
-  let prover_name name =
+  let get_type_from_var_name name =
+    (* we try to infer the type from [name], for example:
+       - infer the type int32 from the name @uc_int32_1
+       - infer the type ref int32 from the name |@uc_(ref int32)_0| *)
     if Strings.has_prefix "@" name then
-      let left = String.index name '_' + 1 in
-      let right = String.rindex name '_' in
-      let ty = String.sub name left (right - left) in
-      Some (try Strings.(remove_prefix "(" (remove_suffix ")" ty)) with _ -> ty)
+      try
+        let left = String.index name '_' + 1 in
+        let right = String.rindex name '_' in
+        let ty = String.sub name left (right - left) in
+        Some (try Strings.(remove_prefix "(" (remove_suffix ")" ty)) with _ -> ty)
+      with
+      | _ -> Some (Strings.(remove_prefix "@" name))
     else match String.split_on_char '!' name with
       | [ty;_;_] -> Some ty
       | _ -> None
 
-  let var name =
-    match prover_name name with
-    | Some ty -> Tprover_var (ty, name)
-    | None -> Tvar name
+  let var sexp =
+    let check_var_name s = 
+      if s = "" || is_name_start s.[0] then s else
+      if is_quoted s then get_quoted s else
+        error sexp "var_name"
+    in
+    match sexp with
+    | Atom s -> 
+        let s = check_var_name s in
+        begin match get_type_from_var_name s with
+        | Some ty -> Typed_var (ty, s)
+        | None -> Tvar s
+        end
+    | List [Atom "as"; Atom s1; Atom s2] ->
+        let s1 = check_var_name s1 in
+        Typed_var (s2, s1)
+    | List [Atom "as"; Atom s1; l] -> 
+        let s1 = check_var_name s1 in
+        let ty = string_of_sexp l in
+        let ty = try Strings.(remove_prefix "(" (remove_suffix ")" ty)) with _ -> ty in
+        Typed_var (ty, s1)
+    | sexp -> error sexp "var"
 
   let rec term sexp =
     try Tconst (value sexp) with _ ->
-    try var (var_name sexp) with _ ->
+    try var sexp with _ ->
     try Tarray (array sexp) with _ ->
     try ite sexp with _ ->
     try let_term sexp with _ ->

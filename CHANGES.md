@@ -1,5 +1,8 @@
 :x: marks a potential source of incompatibility
 
+Provers
+  * support for CVC5 1.0.0 (released April 6, 2022)
+
 Version 1.5.0, April 29, 2022
 -----------------------------
 

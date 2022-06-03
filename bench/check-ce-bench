@@ -119,10 +119,12 @@ for file in $files; do
     filedir=`dirname $file`
     filebase=`basename $file .mlw`
     printf "Running provers on $filedir/$filebase.mlw\n";
-    cvc4steps=150000
+    cvc5steps=150000
     z3steps=3000000
-    run CVC4,1.8 $filedir $filebase true   $cvc4steps
-    run CVC4,1.8 $filedir $filebase false  $cvc4steps
+    run CVC4,1.8 $filedir $filebase true   $cvc5steps
+    run CVC4,1.8 $filedir $filebase false  $cvc5steps
+    run CVC5,1.0.0 $filedir $filebase true   $cvc5steps
+    run CVC5,1.0.0 $filedir $filebase false  $cvc5steps
     run Z3,4.8.10 $filedir $filebase true  $z3steps
     run Z3,4.8.10 $filedir $filebase false $z3steps
 done
@@ -140,12 +142,16 @@ if $updateoracle; then
 else
   updatearg=""
 fi
+bench/check-ce/petiot2018/experiments.sh --prover Z3,4.8.10 \
+  --ce-prover Z3,4.8.10,counterexamples --stepslimit 500000 --rac-prover Z3,4.8.10 \
+  $updatearg
+if [ $? = 1 ]; then exitvalue=1; fi
 bench/check-ce/petiot2018/experiments.sh --prover CVC4,1.8 \
   --ce-prover CVC4,1.8,counterexamples --stepslimit 10000 --rac-prover CVC4,1.8 \
   $updatearg
 if [ $? = 1 ]; then exitvalue=1; fi
-bench/check-ce/petiot2018/experiments.sh --prover Z3,4.8.10 \
-  --ce-prover Z3,4.8.10,counterexamples --stepslimit 500000 --rac-prover Z3,4.8.10 \
+bench/check-ce/petiot2018/experiments.sh --prover CVC5,1.0.0 \
+  --ce-prover CVC5,1.0.0,counterexamples --stepslimit 10000 --rac-prover CVC5,1.0.0 \
   $updatearg
 if [ $? = 1 ]; then exitvalue=1; fi
 

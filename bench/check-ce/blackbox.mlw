@@ -1,0 +1,17 @@
+
+use int.Int
+
+function g int : bool
+
+val f (y:int) : bool ensures { result = g y }
+
+val ref t : int
+
+let main (x:int) =
+  t <- 0;
+  begin
+    ensures { true }
+    let b = f 1 in
+    assert { b }
+  end;
+  assert { x > 0 }
