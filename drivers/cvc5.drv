@@ -7,6 +7,7 @@ prelude "(set-logic ALL)"
 unknown "^(error \"Can't get-info :reason-unknown when the last result wasn't unknown!\")$" "(not unknown!)"
 
 outofmemory "cvc5 suffered a segfault"
+outofmemory "cvc5::internal::Minisat::OutOfMemoryException"
 
 steps "resource::resourceUnitsUsed = \\([0-9]+\\)" 1
 
