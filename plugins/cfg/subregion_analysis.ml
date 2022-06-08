@@ -124,57 +124,58 @@ let rec generate_equality known f v (k : term -> term) : term list =
 
 open Wstdlib
 
-module Ps = MakeMSHW (struct
-  type t = pvsymbol
-
-  let tag p = p.pv_vs.vs_name.id_tag
-end)
-
-module DomMap = Ps.M
-
 (* The domain maps symbols to their symbolic value *)
-type domain = domain_elt DomMap.t
-type var_map = pvsymbol DomMap.t
+type domain = domain_elt Mpv.t
 
-let find m k def = match DomMap.find_opt k m with Some v -> v | None -> def
+module FreshNames = struct
+  open Ity
+
+  type t = rsymbol Mrs.t * pvsymbol Mpv.t
+
+  let empty = (Mrs.empty, Mpv.empty)
+  let pv (_, m) k def = match Mpv.find_opt k m with Some v -> v | None -> def
+
+  let add_pv (m1, m2) k v = (m1, Mpv.add k v m2)
+  let rs (m, _) k def = match Mrs.find_opt k m with Some v -> v | None -> def
+  let merge_rs (m1, m2) (m1' : rsymbol Mrs.t) = (Mrs.set_union m1' m1, m2)
+  let add_rs (m1, m2) k v = (Mrs.add k v m1, m2)
+end
+
+let find m k def = match Mpv.find_opt k m with Some v -> v | None -> def
 
 let merge_domains known d1 d2 =
-  DomMap.merge
+  Mpv.merge
     (fun _ a b ->
       match (a, b) with Some a, Some b -> Some (merge known a b) | None, b -> b | a, None -> a)
     d1 d2
 
-let print_map m = DomMap.iter (fun k v -> Format.printf "%a ~~> %a \n" print_pv k print_elt v) m
+let print_map m = Mpv.iter (fun k v -> Format.printf "%a ~~> %a \n" print_pv k print_elt v) m
 
-let rec analyze muc (st : var_map) (regions : domain) (e : expr) : domain_elt * expr * domain =
+let rec analyze muc (st : FreshNames.t) (regions : domain) (e : expr) : domain_elt * expr * domain =
   let attrs = e.e_attrs in
   let d, e, r = inner muc st regions e in
   (d, e_attr_push attrs e, r)
 
 and inner muc st regions e =
   match e.e_node with
-  | Evar v -> (Variable (find st v v), e_var (find st v v), regions)
+  | Evar v -> (Variable (FreshNames.pv st v v), e_var (FreshNames.pv st v v), regions)
   | Econst _ -> (Bot, e, regions)
   | Elet (def, e) ->
-      let upds, def, regions = analyze_letdefn muc st regions def in
-      let st, regions = match upds with
-      | Some ((k, v), (nm, nm')) -> DomMap.add nm nm' st, DomMap.add k v regions
-      | None -> st, regions
-      in
+      let st, def, regions = analyze_letdefn muc st regions def in
       let dom, e, regions = analyze muc st regions e in
       (dom, e_let def e, regions)
   | Eexec (ce, _) ->
       let dom, e = analyze_cexp muc st regions ce in
       (dom, e_exec e, regions)
   | Eassign [ (v, f, t) ] ->
-      let t_val = find regions t (Variable (find st t t)) in
-      let v_val = find regions v (Variable (find st v v)) in
+      let t_val = find regions t (Variable (FreshNames.pv st t t)) in
+      let v_val = find regions v (Variable (FreshNames.pv st v v)) in
 
       let cty' = cty_apply f.rs_cty [ v ] [] t.pv_ity in
-      let e = e_assign [ (e_var (find st v v), f, e_var (find st t t)) ] in
+      let e = e_assign [ (e_var (FreshNames.pv st v v), f, e_var (FreshNames.pv st t t)) ] in
 
       let v_val' = update muc.muc_known v_val (fd_of_rs f) cty' t_val in
-      let regions = DomMap.add v v_val' regions in
+      let regions = Mpv.add v v_val' regions in
       (Bot, e, regions)
   | Eassign _ -> assert false
   | Eif (s, i, e) ->
@@ -208,7 +209,7 @@ and inner muc st regions e =
                 let dom' = merge muc.muc_known dom_acc dom in
                 let reg' = merge_domains muc.muc_known reg_acc reg in
                 (dom', reg'))
-              (Bot, DomMap.empty) dom_reg
+              (Bot, Mpv.empty) dom_reg
           in
 
           (Some (dom, regions), brs)
@@ -223,7 +224,7 @@ and inner muc st regions e =
                 let dom' = merge muc.muc_known dom_acc dom in
                 let reg' = merge_domains muc.muc_known regions reg_acc in
                 ((dom', reg'), ebr))
-              exn_brs (Bot, DomMap.empty)
+              exn_brs (Bot, Mpv.empty)
           in
           (Some (dom, reg), e_brs)
         else (None, exn_brs)
@@ -242,26 +243,27 @@ and inner muc st regions e =
   | Ewhile (cond, inv, var, body) ->
       let inv =
         List.map
-          (fun i -> t_v_map (fun v -> t_var (find st (restore_pv v) (restore_pv v)).pv_vs) i)
+          (fun i ->
+            t_v_map (fun v -> t_var (FreshNames.pv st (restore_pv v) (restore_pv v)).pv_vs) i)
           inv
       in
       let _, cond, regions = analyze muc st regions cond in
-      let _, body, body_regions = analyze muc st DomMap.empty body in
+      let _, body, body_regions = analyze muc st Mpv.empty body in
 
       (* Bind all the mutated variables *)
       let old_vals =
         List.map
           (fun k ->
-            let k = find st k k in
+            let k = FreshNames.pv st k k in
             let_var (Ident.id_clone k.pv_vs.vs_name) ~ghost:true (e_pure (t_var k.pv_vs)))
-          (DomMap.keys body_regions)
+          (Mpv.keys body_regions)
       in
       let lets, vars = List.split old_vals in
 
       let eqs =
         List.fold_right
           (fun (k, v) acc -> generate_equality muc.muc_known (Variable k) v (fun k -> k) @ acc)
-          (List.combine vars (DomMap.values body_regions))
+          (List.combine vars (Mpv.values body_regions))
           []
       in
 
@@ -291,31 +293,31 @@ and inner muc st regions e =
       (Bot, e_raise x e' e.e_ity, regions)
   | Eexn (x, expr) ->
       (* generate equations here as well *)
-      let dom, expr, regions = analyze muc st DomMap.empty expr in
+      let dom, expr, regions = analyze muc st Mpv.empty expr in
       let exn = e_exn x expr in
       (dom, exn, regions)
   | Eassert (k, t) ->
-      let t = t_v_map (fun v -> t_var (find st (restore_pv v) (restore_pv v)).pv_vs) t in
+      let t = t_v_map (fun v -> t_var (FreshNames.pv st (restore_pv v) (restore_pv v)).pv_vs) t in
       (Bot, e_assert k t, regions)
   | Eghost e ->
-    let dom, expr, regions = analyze muc st regions e in
-    (dom, e_ghostify true expr, regions)
+      let dom, expr, regions = analyze muc st regions e in
+      (dom, e_ghostify true expr, regions)
   | Epure t ->
-      let t = t_v_map (fun v -> t_var (find st (restore_pv v) (restore_pv v)).pv_vs) t in
+      let t = t_v_map (fun v -> t_var (FreshNames.pv st (restore_pv v) (restore_pv v)).pv_vs) t in
       (Bot, e_pure t, regions)
   | Eabsurd -> (Bot, e, regions)
 
-and analyze_letdefn muc st (regions : domain) (l : let_defn) :
-    ((pvsymbol * domain_elt) * (pvsymbol * pvsymbol)) option * let_defn * domain =
+and analyze_letdefn muc st (regions : domain) (l : let_defn) : FreshNames.t * let_defn * domain =
   match l with
   | LDvar (nm, exp) ->
       let dom, exp, regions = analyze muc st regions exp in
       let letdef, nm' = let_var (Ident.id_clone nm.pv_vs.vs_name) ~ghost:nm.pv_ghost exp in
-      Some ((nm, dom), (nm, nm')), letdef, regions
+
+      (FreshNames.add_pv st nm nm', letdef, Mpv.add nm dom regions)
   | LDsym (r, ce) -> (
       match ce.c_node with
       | Cfun e ->
-          let _, e, _ = analyze muc DomMap.empty DomMap.empty e in
+          let _, e, _ = analyze muc FreshNames.empty Mpv.empty e in
           let cty = ce.c_cty in
           let f = c_fun cty.cty_args cty.cty_pre cty.cty_post cty.cty_xpost cty.cty_oldies e in
           let def, sym =
@@ -324,25 +326,30 @@ and analyze_letdefn muc st (regions : domain) (l : let_defn) :
               ~ghost:(cty_ghost cty) ~kind:(rs_kind r) f
           in
 
-          None, def, regions
+          (FreshNames.add_rs st r sym, def, regions)
       | _ -> failwith "unexpected type in binding")
-  | LDrec defs ->
+  | LDrec rdl ->
       let defs =
         List.map
           (fun def ->
             let f =
               match def.rec_fun.c_node with
               | Cfun e ->
-                  let _, e, _ = analyze muc DomMap.empty DomMap.empty e in
+                  let _, e, _ = analyze muc FreshNames.empty Mpv.empty e in
                   let cty = def.rec_fun.c_cty in
                   c_fun cty.cty_args cty.cty_pre cty.cty_post cty.cty_xpost cty.cty_oldies e
               | _ -> failwith "unexpected type in binding"
             in
             (def.rec_rsym, f, def.rec_varl, rs_kind def.rec_sym))
-          defs
+          rdl
       in
-      let def, _ = let_rec defs in
-      None, def, regions
+      let def, rdl' = let_rec defs in
+
+      let subst =
+        List.fold_left2 (fun sm d d' -> Mrs.add d.rec_sym d'.rec_sym sm) Mrs.empty rdl rdl'
+      in
+
+      (FreshNames.merge_rs st subst, def, regions)
 
 and analyze_cexp _muc st regions (c : cexp) : domain_elt * cexp =
   match c.c_node with
@@ -352,7 +359,7 @@ and analyze_cexp _muc st regions (c : cexp) : domain_elt * cexp =
         | Some _ -> (
             match args with
             | [ a ] ->
-                let var = find regions a (Variable (find st a a)) in
+                let var = find regions a (Variable (FreshNames.pv st a a)) in
                 mk_proj c.c_cty.cty_result var r
             | _ -> failwith "projection applied to more than one arg")
         | None ->
@@ -360,14 +367,15 @@ and analyze_cexp _muc st regions (c : cexp) : domain_elt * cexp =
             if Strings.has_suffix "'mk" r.rs_name.id_string then
               Union
                 ( c.c_cty.cty_result,
-                  List.map (fun x -> find regions x (Variable (find st x x))) args )
+                  List.map (fun x -> find regions x (Variable (FreshNames.pv st x x))) args )
             else Bot
       in
-      let vl = List.map (fun v -> find st v v) args in
+      let vl = List.map (fun v -> FreshNames.pv st v v) args in
       let al = List.map (fun v -> v.pv_ity) c.c_cty.cty_args in
+      let r = FreshNames.rs st r r in
       (region, c_app r vl al c.c_cty.cty_result)
   | Cpur (l, args) ->
-      let vl = List.map (fun v -> find st v v) args in
+      let vl = List.map (fun v -> FreshNames.pv st v v) args in
       let al = List.map (fun v -> v.pv_ity) c.c_cty.cty_args in
       (Bot, c_pur l vl al c.c_cty.cty_result)
   | Cfun _ -> assert false
@@ -384,36 +392,5 @@ and analyze_e_br muc st regions (b : exn_branch) =
   (dom, (pat, e), reg)
 
 let transform_letdefn muc l =
-  match l with
-  | LDvar _ -> assert false
-  | LDsym (r, ce) -> (
-      match ce.c_node with
-      | Cfun e ->
-          let _, e, _ = analyze muc DomMap.empty DomMap.empty e in
-          let cty = ce.c_cty in
-          let f = c_fun cty.cty_args cty.cty_pre cty.cty_post cty.cty_xpost cty.cty_oldies e in
-          let def, _ =
-            let_sym
-              (Ident.id_clone ~attrs:r.rs_name.id_attrs r.rs_name)
-              ~ghost:(cty_ghost cty) ~kind:(rs_kind r) f
-          in
-
-          def
-      | _ -> l)
-  | LDrec defs ->
-      let defs =
-        List.map
-          (fun def ->
-            let f =
-              match def.rec_fun.c_node with
-              | Cfun e ->
-                  let _, e, _ = analyze muc DomMap.empty DomMap.empty e in
-                  let cty = def.rec_fun.c_cty in
-                  c_fun cty.cty_args cty.cty_pre cty.cty_post cty.cty_xpost cty.cty_oldies e
-              | _ -> assert false
-            in
-            (def.rec_rsym, f, def.rec_varl, rs_kind def.rec_sym))
-          defs
-      in
-      let def, _ = let_rec defs in
-      def
+  let _, def, _ = analyze_letdefn muc FreshNames.empty Mpv.empty l in
+  def
