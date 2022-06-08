@@ -134,7 +134,6 @@ module FreshNames = struct
 
   let empty = (Mrs.empty, Mpv.empty)
   let pv (_, m) k def = match Mpv.find_opt k m with Some v -> v | None -> def
-
   let add_pv (m1, m2) k v = (m1, Mpv.add k v m2)
   let rs (m, _) k def = match Mrs.find_opt k m with Some v -> v | None -> def
   let merge_rs (m1, m2) (m1' : rsymbol Mrs.t) = (Mrs.set_union m1' m1, m2)
@@ -335,7 +334,7 @@ and analyze_letdefn muc st (regions : domain) (l : let_defn) : FreshNames.t * le
             let f =
               match def.rec_fun.c_node with
               | Cfun e ->
-                  let _, e, _ = analyze muc FreshNames.empty Mpv.empty e in
+                  let _, e, _ = analyze muc st Mpv.empty e in
                   let cty = def.rec_fun.c_cty in
                   c_fun cty.cty_args cty.cty_pre cty.cty_post cty.cty_xpost cty.cty_oldies e
               | _ -> failwith "unexpected type in binding"

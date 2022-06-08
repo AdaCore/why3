@@ -32,11 +32,7 @@ let translate_letcfg d =
   let loc = Loc.dummy_position in
   let (id, ghost, rk, args, retty, pat, mask, spec, body) = translate_cfg_fundef d in
   let r =
-    Dlet
-      ( id,
-        ghost,
-        rk,
-        Ptree_helpers.expr ~loc (Efun (args, retty, pat, mask, spec, body)) )
+    Dlet (id, ghost, rk, Ptree_helpers.expr ~loc (Efun (args, retty, pat, mask, spec, body)))
   in
   Debug.dprintf Cfg_paths.debug "%a@." (Mlw_printer.pp_decl ~attr:true) r;
   r
@@ -74,9 +70,7 @@ module Typing = struct
     match d with
     | Ptree.Dlet (id, gh, kind, e) ->
         let e = update_any kind e in
-        let ld =
-          (create_user_prog_id id, gh, kind, dexpr muc Dexpr.denv_empty e)
-        in
+        let ld = (create_user_prog_id id, gh, kind, dexpr muc Dexpr.denv_empty e) in
         let ld = Dexpr.let_defn ~keep_loc:true ld in
         let ld = Subregion_analysis.transform_letdefn muc ld in
         add_pdecl ~vc muc (Pdecl.create_let_decl ld)
@@ -106,12 +100,9 @@ module Typing = struct
     let file =
       match mlw_file with
       | Ptree.Decls decls ->
-          type_module file env loc path
-            ({ id_str = ""; id_ats = []; id_loc = loc }, decls)
+          type_module file env loc path ({ id_str = ""; id_ats = []; id_loc = loc }, decls)
       | Ptree.Modules m_or_t ->
-          let type_module_env_loc_path file (id, dl) =
-            type_module file env loc path (id, dl)
-          in
+          let type_module_env_loc_path file (id, dl) = type_module file env loc path (id, dl) in
           List.fold_left type_module_env_loc_path file m_or_t
     in
     file
