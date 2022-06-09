@@ -1,0 +1,178 @@
+Weakest Precondition
+File "bench/ce/if_assign.mlw", line 10, characters 12-23:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File if_assign.mlw:
+  Line 10:
+    x [@field:0:contents] [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
+  Line 12:
+    result [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "42"}
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
+
+File "bench/ce/if_assign.mlw", line 16, characters 12-23:
+Sub-goal Postcondition of goal f2'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File if_assign.mlw:
+  Line 16:
+    x [@field:0:contents] [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
+  Line 18:
+    result [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "42"}
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
+
+File "bench/ce/if_assign.mlw", line 22, characters 12-23:
+Sub-goal Postcondition of goal f3'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File int.mlw:
+  Line 16:
+    a [@introduced] = {"type": "Integer", "val": "0"}
+File ref.mlw:
+  Line 18:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
+File if_assign.mlw:
+  Line 21:
+    a [@introduced] = {"type": "Integer", "val": "0"}
+  Line 22:
+    x [@field:0:contents] [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
+  Line 24:
+    result [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "42"}
+    result of call at line 24, characters 6-11 [@call_result:24:6:11:bench/ce/if_assign.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": true}
+  Line 25:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
+
+File "bench/ce/if_assign.mlw", line 22, characters 12-23:
+Sub-goal Postcondition of goal f3'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File int.mlw:
+  Line 16:
+    a [@introduced] = {"type": "Integer", "val": "-1"}
+File ref.mlw:
+  Line 18:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "18"}}]}}
+File if_assign.mlw:
+  Line 21:
+    a [@introduced] = {"type": "Integer", "val": "-1"}
+  Line 22:
+    x [@field:0:contents] [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "18"}}]}}
+  Line 24:
+    result [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "18"}
+    result of call at line 24, characters 6-11 [@call_result:24:6:11:bench/ce/if_assign.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": false}
+  Line 27:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "18"}}]}}
+
+File "bench/ce/if_assign.mlw", line 34, characters 31-38:
+Sub-goal Assertion of goal f4'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File int.mlw:
+  Line 16:
+    a [@introduced] = {"type": "Integer", "val": "0"}
+File if_assign.mlw:
+  Line 30:
+    a [@introduced] = {"type": "Integer", "val": "0"}
+  Line 33:
+    result of call at line 33, characters 6-11 [@call_result:33:6:11:bench/ce/if_assign.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": true}
+  Line 34:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
+
+File "bench/ce/if_assign.mlw", line 31, characters 12-23:
+Sub-goal Postcondition of goal f4'vc.
+Prover result is: Valid.
+
+File "bench/ce/if_assign.mlw", line 36, characters 23-30:
+Sub-goal Assertion of goal f4'vc.
+Prover result is: Valid.
+
+File "bench/ce/if_assign.mlw", line 31, characters 12-23:
+Sub-goal Postcondition of goal f4'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File int.mlw:
+  Line 16:
+    a [@introduced] = {"type": "Integer", "val": "-1"}
+File ref.mlw:
+  Line 20:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "18"}}]}}
+File if_assign.mlw:
+  Line 30:
+    a [@introduced] = {"type": "Integer", "val": "-1"}
+  Line 33:
+    result [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "17"}
+    result of call at line 33, characters 6-11 [@call_result:33:6:11:bench/ce/if_assign.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": false}
+  Line 36:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "18"}}]}}
+

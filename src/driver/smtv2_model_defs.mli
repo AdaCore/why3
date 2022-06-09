@@ -19,7 +19,7 @@ type typ = string
 type term =
   | Tconst of model_const
   | Tvar of ident
-  | Tprover_var of typ * ident
+  | Typed_var of typ * ident
   | Tapply of (string * term list)
   | Tarray of array
   | Tite of term * term * term

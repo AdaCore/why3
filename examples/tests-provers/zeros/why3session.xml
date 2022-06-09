@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.7.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.8.15" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC5" version="1.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="zeros.mlw"/>
+<theory name="Top" proved="true">
+ <goal name="set_zeros&#39;vc" expl="VC for set_zeros" proved="true">
+ <proof prover="0"><result status="valid" time="0.05" steps="7212"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="10045"/></proof>
+ <proof prover="2"><result status="valid" time="0.02" steps="13510"/></proof>
+ <proof prover="3"><result status="valid" time="0.04" steps="6957"/></proof>
+ <proof prover="4"><result status="valid" time="0.08" steps="8426"/></proof>
+ <proof prover="5"><result status="valid" time="0.01" steps="87"/></proof>
+ </goal>
+ <goal name="harness&#39;vc" expl="VC for harness" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="3508"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="8002"/></proof>
+ <proof prover="2"><result status="valid" time="0.01" steps="11312"/></proof>
+ <proof prover="3"><result status="valid" time="0.03" steps="3394"/></proof>
+ <proof prover="4"><result status="valid" time="0.04" steps="2462"/></proof>
+ <proof prover="5"><result status="valid" time="0.00" steps="14"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

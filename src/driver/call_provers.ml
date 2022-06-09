@@ -183,7 +183,7 @@ let print_prover_result ?(json=false) fmt r =
   if json then
     Json_base.print_json fmt (json_prover_result r)
   else
-    let color = match r.pr_answer with | Valid -> "green" | Invalid -> "red" | _ -> "yellow" in
+    let color = match r.pr_answer with | Valid -> "green" | Invalid -> "red" | _ -> "cyan" in
     fprintf fmt "@{<bold %s>%a@}@ (%.2fs%a)"
       color print_prover_answer r.pr_answer r.pr_time print_steps r.pr_steps;
     if r.pr_answer == HighFailure then
@@ -318,17 +318,27 @@ let parse_prover_run res_parser signaled time out exitcode limit get_counterexmp
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
   let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in
-  (* HighFailure or Unknown close to time limit are assumed to be timeouts *)
   let tlimit = float limit.limit_time in
-  let ans, time =
+  let stepslimit = limit.limit_steps in
+  let ans, time, steps =
+    (* HighFailure or Unknown close to time limit are assumed to be timeouts *)
     if tlimit > 0.0 && time >= 0.9 *. tlimit -. 0.1 then
     match ans with
     | HighFailure | Unknown _ | Timeout ->
        Debug.dprintf debug
-         "[Call_provers.parse_prover_run] answer after %f >= 0.9 timelimit - 0.1 -> Timeout@." time;
-       Timeout, tlimit
-    | _ -> ans,time
-    else ans, time
+         "[Call_provers.parse_prover_run] answer after %f >= 0.9 * timelimit - 0.1 -> Timeout@." time;
+       Timeout, tlimit, steps
+    | _ -> ans, time, steps
+    else
+      (* HighFailure or Unknown when steps >= stepslimit are assumed to be StepLimitExceeded *)
+      if stepslimit > 0 && steps >= stepslimit then
+      match ans with
+      | HighFailure | Unknown _ | StepLimitExceeded ->
+        Debug.dprintf debug
+          "[Call_provers.parse_prover_run] answer after %d steps >= stepslimit -> StepLimitExceeded@." steps;
+        StepLimitExceeded, time, steps
+      | _ -> ans, time, steps
+      else ans, time, steps
   in
   { pr_answer = ans;
     pr_status = if signaled then Unix.WSIGNALED int_exitcode else Unix.WEXITED int_exitcode;

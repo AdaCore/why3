@@ -2,9 +2,9 @@ theory T32
 
   use ieee_float.Float32
 
-  goal g1 : forall x:t. eq x (0.0:t)
+  goal g1 : forall x:t. t'isFinite x -> eq x (0.0:t)
 
-  goal g2 : forall x:t. eq x (1.25:t)
+  goal g2 : forall x:t. t'isFinite x -> eq x (1.25:t)
 
   goal g3 : forall x:t. not (eq x (0.0:t))
 
@@ -28,9 +28,9 @@ theory T64
 
   use ieee_float.Float64
 
-  goal g1 : forall x:t. eq x (0.0:t)
+  goal g1 : forall x:t. t'isFinite x -> eq x (0.0:t)
 
-  goal g2 : forall x:t. eq x (1.25:t)
+  goal g2 : forall x:t. t'isFinite x -> eq x (1.25:t)
 
   goal g3 : forall x:t. not (eq x (0.0:t))
 

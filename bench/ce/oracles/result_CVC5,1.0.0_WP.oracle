@@ -1,0 +1,74 @@
+Weakest Precondition
+File "bench/ce/result.mlw", line 11, characters 15-38:
+Sub-goal Postcondition of goal p1'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File result.mlw:
+  Line 7:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 9:
+    b [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+  Line 11:
+    a [@field:0:contents] [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+    result [@introduced] = {"type": "Integer", "val": "4"}
+  Line 12:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+    result [@introduced] = {"type": "Integer", "val": "4"}
+
+File "bench/ce/result.mlw", line 18, characters 12-36:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File result.mlw:
+  Line 16:
+    A [@at:'Old:loc:bench/ce/result.mlw:18] [@field:0:contents] [@introduced]
+      [@model] [@model_trace:A] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
+  Line 18:
+    old A [@at:'Old] [@at:'Old:loc:bench/ce/result.mlw:18]
+      [@field:0:contents] [@introduced] [@model] [@model_trace:A] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
+    A [@field:0:contents] [@introduced] [@model] [@model_trace:A] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 19:
+    A [@field:0:contents] [@introduced] [@model] [@model_trace:A] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    result [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "2"}
+  Line 20:
+    A [@field:0:contents] [@introduced] [@model] [@model_trace:A] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+

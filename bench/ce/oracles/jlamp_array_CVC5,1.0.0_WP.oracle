@@ -1,0 +1,92 @@
+Weakest Precondition
+File "bench/ce/jlamp_array.mlw", line 22, characters 4-16:
+Sub-goal Index in array bounds of goal f'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File jlamp_array.mlw:
+  Line 11:
+    two  =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "2"}}
+  Line 14:
+    three  =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "3"}}
+
+File "bench/ce/jlamp_array.mlw", line 21, characters 14-27:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File jlamp_array.mlw:
+  Line 11:
+    two  =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "2"}}
+  Line 14:
+    three  =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "3"}}
+  Line 21:
+    three [@model_trace:three] =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "3"}}
+
+File "bench/ce/jlamp_array.mlw", line 28, characters 4-16:
+Sub-goal Index in array bounds of goal g'vc.
+Prover result is: Valid.
+
+File "bench/ce/jlamp_array.mlw", line 27, characters 14-27:
+Sub-goal Postcondition of goal g'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File jlamp_array.mlw:
+  Line 11:
+    two  =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "2"}}
+  Line 14:
+    three  =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "3"}}
+  Line 27:
+    three [@model_trace:three] =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "3"}}
+
+File "bench/ce/jlamp_array.mlw", line 34, characters 4-16:
+Sub-goal Index in array bounds of goal h'vc.
+Prover result is: Valid.
+
+File "bench/ce/jlamp_array.mlw", line 33, characters 14-27:
+Sub-goal Postcondition of goal h'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File jlamp_array.mlw:
+  Line 11:
+    two  =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "2"}}
+  Line 14:
+    three  =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "3"}}
+  Line 33:
+    three [@model_trace:three] =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "3"}}
+

@@ -20,7 +20,7 @@ type typ = string
 type term =
   | Tconst of model_const
   | Tvar of ident
-  | Tprover_var of typ * ident
+  | Typed_var of typ * ident
   | Tapply of (string * term list)
   | Tarray of array
   | Tite of term * term * term
@@ -47,7 +47,7 @@ let add_element x (t: definition Mstr.t) =
 let rec subst var value = function
   | Tconst _ as t -> t
   | Tarray a -> Tarray (subst_array var value a)
-  | Tvar v | Tprover_var (_, v) as t -> if v = var then value else t
+  | Tvar v | Typed_var (_, v) as t -> if v = var then value else t
   | Tlet (bs, t') as t ->
       if List.exists (fun (s,_) -> s = var) bs then t
       else Tlet (List.map (fun (s,t) -> s, subst var value t) bs, subst var value t')
@@ -93,7 +93,7 @@ let rec print_term fmt = let open Format in function
         Pp.(print_list space print_term) lt
   | Tarray a -> fprintf fmt "@[<hv>(Array %a)@]" print_array a
   | Tvar v -> fprintf fmt "(Var %s)" v
-  | Tprover_var (ty,v) -> fprintf fmt "(Prover_var %s:%s)" v ty
+  | Typed_var (ty,v) -> fprintf fmt "(Prover_var %s:%s)" v ty
   | Tlet (bs, t) ->
       let print_binding fmt (s,t) = fprintf fmt "(%s %a)" s print_term t in
       fprintf fmt "(Let (%a) %a)" Pp.(print_list space print_binding) bs print_term t

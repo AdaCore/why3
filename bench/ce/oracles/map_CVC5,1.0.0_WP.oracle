@@ -1,0 +1,376 @@
+Weakest Precondition
+File "bench/ce/map.mlw", line 8, characters 14-28:
+Sub-goal Postcondition of goal test_map'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File map.mlw:
+  Line 7:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "3"}},
+                {"others": {"type": "Integer", "val": "0"}}]}}]}}
+  Line 8:
+    x [@field:0:contents] [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value": {"type": "Integer", "val": "3"}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "3"}},
+                {"others": {"type": "Integer", "val": "0"}}]}}]}}
+  Line 10:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value": {"type": "Integer", "val": "3"}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "3"}},
+                {"others": {"type": "Integer", "val": "0"}}]}}]}}
+
+File "bench/ce/map.mlw", line 14, characters 14-34:
+Sub-goal Postcondition of goal test_map_multidim1'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File map.mlw:
+  Line 13:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"others":
+                  {"type": "Array",
+                   "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}}
+  Line 14:
+    x [@field:0:contents] [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"others":
+                  {"type": "Array",
+                   "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}}
+  Line 16:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"others":
+                  {"type": "Array",
+                   "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}}
+
+File "bench/ce/map.mlw", line 19, characters 14-34:
+Sub-goal Postcondition of goal test_map_multidim2'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File ref.mlw:
+  Line 18:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "1"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "1"},
+                      "value": {"type": "Integer", "val": "3"}},
+                     {"others": {"type": "Integer", "val": "0"}}]}},
+                {"others":
+                  {"type": "Array",
+                   "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}}
+File map.mlw:
+  Line 18:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "1"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "1"},
+                      "value": {"type": "Integer", "val": "3"}},
+                     {"others": {"type": "Integer", "val": "0"}}]}},
+                {"others":
+                  {"type": "Array",
+                   "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}}
+  Line 19:
+    x [@field:0:contents] [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "0"},
+                      "value": {"type": "Integer", "val": "3"}},
+                     {"others": {"type": "Integer", "val": "0"}}]}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "1"},
+                      "value": {"type": "Integer", "val": "3"}},
+                     {"others": {"type": "Integer", "val": "0"}}]}},
+                {"others":
+                  {"type": "Array",
+                   "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}}
+  Line 21:
+    x0 [@introduced] =
+      {"type": "Array", "val": [{"others": {"type": "Integer", "val": "0"}}]}
+  Line 22:
+    x0 [@id:unused] [@introduced] [@model_trace:x0] =
+      {"type": "Array",
+       "val":
+        [{"indice": {"type": "Integer", "val": "0"},
+          "value": {"type": "Integer", "val": "3"}},
+         {"others": {"type": "Integer", "val": "0"}}]}
+  Line 23:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "0"},
+                      "value": {"type": "Integer", "val": "3"}},
+                     {"others": {"type": "Integer", "val": "0"}}]}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "1"},
+                      "value": {"type": "Integer", "val": "3"}},
+                     {"others": {"type": "Integer", "val": "0"}}]}},
+                {"others":
+                  {"type": "Array",
+                   "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}}
+
+File "bench/ce/map.mlw", line 26, characters 14-28:
+Sub-goal Postcondition of goal proj_map_test1'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File ref.mlw:
+  Line 18:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "3"}},
+                {"others": {"type": "Integer", "val": "0"}}]}}]}}
+  Line 20:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value": {"type": "Integer", "val": "3"}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "3"}},
+                {"others": {"type": "Integer", "val": "0"}}]}}]}}
+File map.mlw:
+  Line 25:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "3"}},
+                {"others": {"type": "Integer", "val": "0"}}]}}]}}
+  Line 26:
+    x [@field:0:contents] [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value": {"type": "Integer", "val": "3"}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "3"}},
+                {"others": {"type": "Integer", "val": "0"}}]}}]}}
+  Line 28:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value": {"type": "Integer", "val": "3"}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "3"}},
+                {"others": {"type": "Integer", "val": "0"}}]}}]}}
+
+File "bench/ce/map.mlw", line 31, characters 14-28:
+Sub-goal Postcondition of goal proj_map_test2'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File ref.mlw:
+  Line 18:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Boolean", "val": true}},
+                {"others": {"type": "Boolean", "val": false}}]}}]}}
+  Line 20:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value": {"type": "Boolean", "val": true}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Boolean", "val": true}},
+                {"others": {"type": "Boolean", "val": false}}]}}]}}
+File map.mlw:
+  Line 30:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Boolean", "val": true}},
+                {"others": {"type": "Boolean", "val": false}}]}}]}}
+  Line 31:
+    x [@field:0:contents] [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value": {"type": "Boolean", "val": true}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Boolean", "val": true}},
+                {"others": {"type": "Boolean", "val": false}}]}}]}}
+  Line 33:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value": {"type": "Boolean", "val": true}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Boolean", "val": true}},
+                {"others": {"type": "Boolean", "val": false}}]}}]}}
+
+File "bench/ce/map.mlw", line 42, characters 3-31:
+Goal t1.
+Prover result is: Unknown (sat)
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File map.mlw:
+  Line 41:
+    i [@introduced] = {"type": "Integer", "val": "0"}
+    t [@introduced] =
+      {"type": "Array",
+       "val":
+        [{"indice": {"type": "Integer", "val": "0"},
+          "value": {"type": "Integer", "val": "43"}},
+         {"others": {"type": "Integer", "val": "0"}}]}
+
+File "bench/ce/map.mlw", line 50, characters 36-64:
+Goal g.
+Prover result is: Unknown (sat)
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File map.mlw:
+  Line 50:
+    m [@introduced] =
+      {"type": "Array",
+       "val":
+        [{"indice": {"type": "Fraction", "val": "1/10"},
+          "value": {"type": "Integer", "val": "-1"}},
+         {"others": {"type": "Decimal", "val": "0.0"}}]}
+
