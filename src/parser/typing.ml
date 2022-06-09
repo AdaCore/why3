@@ -905,8 +905,8 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DEapp (Dexpr.dexpr ~loc e1, e2)) e el
   in
   let lsym_or_lemma q pure =
-    try DEls_pure (find_lsymbol muc.muc_theory q, pure)
-    with _ -> DEsym (find_prog_symbol muc (tick_lemma q))
+    try DEls_pure (find_lsymbol muc.muc_theory q, pure) with ex ->
+    try DEsym (find_prog_symbol muc (tick_lemma q)) with _ -> raise ex
   in
   let qualid_app loc q el =
     let e = try DEsym (find_prog_symbol muc q) with
