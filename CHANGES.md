@@ -1,5 +1,9 @@
 :x: marks a potential source of incompatibility
 
+Documentation
+  * add documentation for several options of `why3 prove` and `why3
+    execute` that were left undocumented so far
+
 Provers
   * support for CVC5 1.0.0 (released April 6, 2022)
 

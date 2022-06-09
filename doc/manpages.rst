@@ -63,6 +63,14 @@ particular, option :option:`--help` displays the usage and options.
 
    Add ``<dir>`` in the load path, to search for theories.
 
+.. option:: --no-stdlib
+
+   Do not add the standard library to the loadpath.
+
+.. option:: --no-load-default-plugins
+
+   Do not load the plugins from the standard path.
+
 .. option:: -C <file>, --config=<file>
 
    Read the configuration from the given file. See :numref:`sec.whyconffile`.
@@ -288,7 +296,7 @@ The :why3:tool:`prove` command executes the following steps:
 
 #. Derive a validated counterexample using runtime-assertion checking, if option
    :option:`--check-ce` is given and the selected prover generated a
-   counterexample, .
+   counterexample.
 
 Prover Results
 ~~~~~~~~~~~~~~
@@ -304,8 +312,18 @@ Unknown
 Timeout
     The prover has reached the time limit.
 
+OutOfMemory
+    The prover has reached the memory limit.
+
+StepLimitExceeded
+    The prover has reached the steps limit.
+
 Failure
-    An error has occurred.
+    The prover has reported a failure.
+
+HighFailure
+    An error occurred during the call to the prover,
+    or no other answer match the output of the prover.
 
 Invalid
     The prover knows the goal cannot be proved.
@@ -360,25 +378,91 @@ Options
    explanations. The option can be used several times to specify
    several prefixes.
 
+.. option:: --timelimit=<sec>
+
+   Set the prover's time limit.
+   By default, the limit is set to 10 seconds.
+   Setting this option to 0 second disables the time limit.
+
+.. option:: --stepslimit=<steps>
+
+   Set the prover's step limit.
+   By default, there is no limit.
+
+.. option:: --memlimit=<MiB>
+
+   Set the prover's memory limit.
+   By default, there is no limit.
+
+.. option:: --meta=<meta>[=<string>]
+
+   Add a meta to every task.
+
+.. option:: --print-theory
+
+   Print selected theories.
+
+.. option:: --print-namespace
+
+   Print namespaces of selected theories.
+
 .. option:: --check-ce
 
-   Validate the counterexample using runtime-assertion checking. Only applicable
-   when the prover selected by :option:`--prover` is configured to generate a
-   counterexample.
+   Validate and categorize the counterexample using runtime-assertion
+   checking, as proposed by Becker et al :cite:`becker21fide`. Only
+   applicable when the prover selected by :option:`--prover` is
+   configured to generate counterexamples.
 
 .. option:: --rac-prover=<p>
 
-   Use prover *p* for the runtime-assertion checking during the validation of
-   counterexamples, when term reduction is insufficient (which is always tried
-   first). The prover *p* is the name or shortcut of a prover, with optional,
-   comma-separated time limit and memory limit, e.g. ``cvc4,2,1000``.
+   Use prover *p* for the runtime-assertion checking (with
+   :option:`--check-ce`) during the validation of counterexamples, as
+   described for :why3:tool:`execute`.
+
+.. option:: --rac-timelimit=<sec>
+
+   Time limit in seconds for RAC prover (with :option:`--check-ce`).
+
+.. option:: --rac-steplimit=<steps>
+
+   Step limit for RAC prover (with :option:`--check-ce`).
 
 .. option:: --rac-try-negate
 
-   Try to decide the validity of an assertion by negating the assertion and the
-   prover answer (if any), when a prover is defined for RAC using
-   :option:`--rac-prover` but unable to decide the validity of the un-negated
-   assertion.
+   Same option as for :why3:tool:`execute` (with :option:`--check-ce`)
+
+.. option:: --parse-only
+
+   Stop after parsing (same as ``--debug=parse_only``).
+
+.. option:: --type-only
+
+   Stop after type checking (same as ``--debug=type_only``).
+
+.. option:: -v <lvl>, --verbosity=<lvl>
+
+   Verbosity level for interpretation log of counterexample model
+   returned by the prover.
+   By default, the level is set to 4.
+
+   - When level = 1, print only imported values.
+   - When level = 2, also print log information about execution of function calls.
+   - When level = 3, also print log information about execution of loops.
+   - When level = 4, also print log information about termination of executions.
+   - When level = 5, also print log information about initialization of global variables.
+
+.. option:: --json
+
+   Print output in JSON format.
+
+.. option:: --json-model-values
+
+   Print values of prover model in JSON format
+   (backwards compatibility with :option:`--json`).
+
+.. option:: --color
+
+   Print output with colors.
 
 Generating potential counterexamples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -389,8 +473,8 @@ counterexample. The potential counterexample associates source locations and
 variables to values. The generation and display of potential counterexamples is
 presented in details in :numref:`sec.idece`.
 
-Generating validated counterexamples
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Generating validated and categorized counterexamples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A validated counterexample can be requested using option :option:`--check-ce`.
 The validated counterexample is derived by executing the relevant function using
@@ -399,7 +483,7 @@ serves as an oracle for values that are not or cannot be computed in the RAC
 execution (e.g., arguments to the relevant function or ``any``-expressions).
 
 The validated counterexample is a trace of the RAC execution, with one of the
-following qualifications:
+following categorizations (see :cite:`becker21fide` for details):
 
 *The program does not comply to the verification goal:*
 
@@ -1572,19 +1656,42 @@ Options
 
    Add the definitions from `Mod` to the execution context.
 
+.. option:: --real=<emin>,<emax>,<prec>
+
+   The interpreter handles real numbers using interval arithmetic with
+   floating-point bounds.  This option sets the precision of those
+   bounds using three parameters, respectively the minimal and maximal
+   exponent, and the number of bits of mantissa. For example, the
+   standard single-precision binary representation (32 bits) is set by
+   parameters -148,128,24. The default is using long double-precision
+   (128-bits) with parameters -16493,16384,113.
+
 .. option:: --rac
 
    Check the validity of program annotations encountered during the execution.
 
 .. option:: --rac-prover=<p>
 
-   Same option as for :why3:tool:`prove`.
+   Use prover *p* for the checking formulas, when term reduction is
+   insufficient (which is always tried first). The prover *p* is the
+   name or shortcut of a prover, with optional, comma-separated time
+   limit and memory limit, e.g. ``cvc4,2,1000``.
+
+.. option:: --rac-timelimit=<sec>
+
+   Time limit in seconds for RAC prover.
+
+.. option:: --rac-steplimit=<steps>
+
+   Step limit for RAC prover.
 
 .. option:: --rac-try-negate
 
-   Same option as for :why3:tool:`prove`.
+   Try to decide the validity of a formula by negating the formula and
+   the prover answer (if any), when the RAC prover is unable to decide
+   the validity of the un-negated formula (see :cite:`becker21fide`).
 
-.. option:: --rac-fail-cannot-reduce
+.. option:: --rac-fail-cannot-check
 
    Instruct the RAC execution to fail when an annotation cannot be checked.
    Normally the execution continues normally when an annotation cannot be
