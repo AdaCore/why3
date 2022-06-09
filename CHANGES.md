@@ -1,5 +1,9 @@
 :x: marks a potential source of incompatibility
 
+Documentation
+  * add documentation for several options of `why3 prove` and `why3
+    execute` that were left undocumented so far
+
 Provers
   * support for Z3 4.9.0 and 4.9.1 (released July 6, 2022)
   * support for Z3 4.10.0, 4.10.1 and 4.10.2 (released July 30, 2022)
