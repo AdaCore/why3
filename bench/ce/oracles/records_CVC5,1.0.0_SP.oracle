@@ -1,7 +1,7 @@
 Strongest Postcondition
 File "bench/ce/records.mlw", line 15, characters 14-24:
 Sub-goal Postcondition of goal record_match_eval_test1'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File records.mlw:
@@ -23,7 +23,7 @@ Prover result is: Valid.
 
 File "bench/ce/records.mlw", line 23, characters 14-24:
 Sub-goal Postcondition of goal record_match_eval_test2'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File records.mlw:
@@ -62,7 +62,7 @@ File ref.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "-1"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 20:
     x [@field:0:contents] [@introduced] =
@@ -89,7 +89,7 @@ File records.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "-1"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 28:
     x [@field:0:contents] [@introduced] [@model_trace:x] =
@@ -109,7 +109,8 @@ File records.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "3"}},
+          [{"field": ".my_field_f",
+            "value": {"type": "Integer", "val": "-1"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -155,7 +156,7 @@ File records.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "-1"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 33:
     x [@field:0:contents] [@introduced] [@model_trace:x] =
@@ -175,7 +176,8 @@ File records.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "3"}},
+          [{"field": ".my_field_f",
+            "value": {"type": "Integer", "val": "-1"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     result [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Record",
@@ -213,7 +215,7 @@ File ref.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "-1"}},
                   {"field": "g", "value": {"type": "Boolean", "val": true}}]}}}]}}
   Line 20:
     x [@field:0:contents] [@introduced] =
@@ -240,7 +242,7 @@ File records.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "-1"}},
                   {"field": "g", "value": {"type": "Boolean", "val": true}}]}}}]}}
   Line 40:
     x [@field:0:contents] [@introduced] =
@@ -260,7 +262,8 @@ File records.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "3"}},
+          [{"field": ".my_field_f",
+            "value": {"type": "Integer", "val": "-1"}},
            {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
   Line 42:
     x [@field:0:contents] [@introduced] [@model_trace:x] =
@@ -311,7 +314,7 @@ File records.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "-1"}},
                   {"field": "g", "value": {"type": "Boolean", "val": true}}]}}}]}}
   Line 47:
     x [@field:0:contents] [@introduced] =
@@ -324,7 +327,7 @@ File records.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "-1"}},
                   {"field": "g", "value": {"type": "Boolean", "val": true}}]}}}]}}
   Line 48:
     re [@field:0:contents] [@introduced] [@model_trace:re] =
@@ -337,7 +340,7 @@ File records.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "-1"}},
                   {"field": "g", "value": {"type": "Boolean", "val": true}}]}}}]}}
     x [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type": "Record",
@@ -356,7 +359,8 @@ File records.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "3"}},
+          [{"field": ".my_field_f",
+            "value": {"type": "Integer", "val": "-1"}},
            {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
     result [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Record",
@@ -434,7 +438,7 @@ File records.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "3"}},
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 78:
     x [@introduced] [@model_trace:x] =
@@ -462,7 +466,7 @@ File records.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "3"}},
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 83:
     x [@introduced] [@model_trace:x] =
