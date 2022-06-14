@@ -653,7 +653,7 @@ let rec k_expr env lps e res xmap =
         (* [ VC(ce) (if ce is a lambda executed in-place)
            | STOP pre
            | HAVOC ; [ ASSUME post | ASSUME xpost ; RAISE ] ] *)
-       (* Format.eprintf "[Vc.term_of_post/Eexec] res = %a@." print_pv_attr res; *)
+       (* Format.eprintf "[Vc.term_of_post/Eexec] e = %a@." print_expr e; *)
         let p, (oldies, sbs) = match pre with
           (* for recursive calls, compute the 'variant decrease'
              precondition and rename the oldies to avoid clash *)
@@ -684,12 +684,17 @@ let rec k_expr env lps e res xmap =
                Klet (v, t_tag t, List.fold_right sp_and rinv sp)
             | None ->  Kval ([v], List.fold_right sp_and rinv sp) in
           let need_trace = match ce.c_node with
-            | (Capp ({rs_logic = RLls _ls}, _) (* `let function` or `val function` *)
-               | Cpur (_ls, _)) (* direct application of a logic symbol *)
+            | Capp ({rs_logic = RLls _ls}, _) (* `let function` or `val function` *)
+               -> true
+            | Cpur (_ls, _) (* direct application of a logic symbol *)
               ->
                ce.c_cty.cty_args <> [] (* unless not fully applied *)
-          | _ -> true
-            in
+            | Capp ({rs_logic = (RLnone|RLlemma|RLpv _)}, _)
+              -> true
+            | Cfun _ -> true
+            | Cany -> true
+          in
+          (* Format.eprintf "[Vc.term_of_post/Eexec] need_trace = %b@." need_trace; *)
           if env.keep_trace && need_trace then
             let vv = explicit_result loc e.e_attrs ce v.pv_ity in
             Kseq(k v,0,Klet(vv, t_var v.pv_vs, t_true))

@@ -4,13 +4,16 @@
                         Line 6:
                           y = {"type": "Integer", "val": "0"}
                         Line 8:
+                          result = {"type": "Integer", "val": "-175"}
+                          result = {"type": "Integer", "val": "-175"}
                           y = {"type": "Integer", "val": "0"}
                         Line 9:
-                          result = {"type": "Integer", "val": "2"}
+                          result = {"type": "Integer", "val": "-175"}
                           result =
                             {"type": "Array",
                              "val":
                               [{"others": {"type": "Integer", "val": "0"}}]}
+                          result = {"type": "Integer", "val": "-175"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -99,7 +102,7 @@
   - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to f at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5)
 File "bench/check-ce/anonymous4.mlw", line 8, characters 13-23:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Unknown (unknown) (1.15s, 3000024 steps).
+Prover result is: Step limit exceeded (1.79s, 3000028 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
