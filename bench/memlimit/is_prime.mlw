@@ -1,0 +1,36 @@
+module User_lemma__is_prime
+  use int.Int
+  use int.EuclideanDivision as EuclideanDivision
+
+  (* We express mod via Euclidean mod, as this is what is used in SMT *)
+   function mod (x y : int) : int =
+    let r = EuclideanDivision.mod x y in
+    if y >= 0 then r
+    else if r = 0 then 0
+    else r + y
+
+  val mod (x:int) (y:int) : int
+     ensures { result = mod x y }
+
+  function is_prime (n: int) : bool =
+    if (forall j : int. (((2 <= j) /\ (j <= (n - 1))) -> ((mod n j) <> 0)))
+    then True
+    else False
+
+  val is_prime (n: int) : bool
+    requires { true }
+    ensures {
+      (result = is_prime n) /\
+      (result = (forall j : int.
+        (((2 <= j) /\ (j <= (n - 1))) -> ((mod n j) <> 0)))) }
+end
+
+module User_lemma__test
+  use int.Int
+  use User_lemma__is_prime as User_lemma__is_prime
+
+  let def (__void_param : unit) =
+    assert { User_lemma__is_prime.is_prime 15487001 = True };
+    assert { User_lemma__is_prime.is_prime 15487469 = True };
+    assert { User_lemma__is_prime.is_prime 239854447900000 = False };
+end

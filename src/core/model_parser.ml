@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -819,21 +819,21 @@ let json_model_elements_on_lines model (file_name, model_file) =
           | Some pos ->
               let vc_file_name, line, _, _ = Loc.get pos in
               file_name = vc_file_name && i = line in
-        Json_base.Record [
+        Json_base.(Record [
           "loc", String (string_of_int i);
           "is_vc_line", Bool is_vc_line;
           "model_elements", json_model_elements e
-        ])
+        ]))
       (Mint.bindings model_file) in
   Json_base.List l
 
 let json_model model =
   let l =
     List.map (fun (file_name, model_file) ->
-        Json_base.Record [
+        Json_base.(Record [
           "filename", String file_name;
           "model", json_model_elements_on_lines model (file_name, model_file)
-        ])
+        ]))
       (Mstr.bindings model.model_files) in
   Json_base.List l
 

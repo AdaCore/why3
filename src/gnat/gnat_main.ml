@@ -164,7 +164,7 @@ let all_split_subp c subp =
 
 let maybe_giant_step_rac ctr parent model =
   if not Gnat_config.giant_step_rac then None else (
-    Debug.dprintf Check_ce.debug_check_ce_summary "Running giant-step RAC@.";
+    Debug.dprintf Check_ce.debug_check_ce_categorization "Running giant-step RAC@.";
     let Controller_itp.{controller_config= cnf; controller_env= env} = ctr in
     let pm =
       parent |> Session_itp.find_th ctr.Controller_itp.controller_session |>
@@ -190,8 +190,9 @@ let maybe_giant_step_rac ctr parent model =
             if Gnat_config.debug then Warning.emit "No procedure found for model@.";
             None
         | Some rs ->
-            let res = Check_ce.rac_execute ctx rs in
-            Debug.dprintf Check_ce.debug_check_ce "%a@."
+            let res_state,res_log = Check_ce.rac_execute ctx rs in
+            let res = Check_ce.RAC_done (res_state, res_log) in
+            Debug.dprintf Check_ce.debug_check_ce_rac_results "%a@."
               (Check_ce.print_rac_result ?verb_lvl:None) res;
             Some res )
 

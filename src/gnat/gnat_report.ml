@@ -113,7 +113,8 @@ let get_cntexmp_model = function
       let rcd_only_cntexmp_model = [ "cntexmp", (Model_parser.json_model m) ] in
       match r with
       | None -> rcd_only_cntexmp_model
-      | Some (state, _log) ->
+      | Some (Check_ce.RAC_not_done s) -> rcd_only_cntexmp_model
+      | Some (Check_ce.RAC_done (state, _log)) ->
           List.append
             rcd_only_cntexmp_model
             [ "giant_step_rac_result", (json_result_state (state, _log)) ]

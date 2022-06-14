@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -463,18 +463,36 @@ let get_locations (task: Task.task) =
   let session_dir =
     let d = get_server_data () in
     Session_itp.get_dir d.cont.controller_session in
+  (* [relativize f] takes the file name [f] which can be absolute or
+     relative.  It returns a file name [g] that is absolute for the
+     same file. If [f] is relative, it is assumed relative to the
+     session directory.  FIXME: why is this code so complicated ?
+     probably this code removes "." and ".." from the path, but why do
+     so?  *)
   let relativize f =
     try Hstr.find file_cache f
     with Not_found ->
+      let f = if Filename.is_relative f then
+                Filename.concat session_dir f
+              else f
+      in
+      (* Format.eprintf "relativize: f is `%s`@." f; *)
+      (* Format.eprintf "relativize: session_dir is `%s`@." session_dir; *)
       let path = Sysutil.relativize_filename session_dir f in
+      (* Format.eprintf "relativize: path is `%a`@." Sysutil.print_file_path path; *)
       (* FIXME: this an abusive use of Sysutil.system_dependent_absolute_path *)
       let g = Sysutil.system_dependent_absolute_path session_dir path in
+      (* Format.eprintf "relativize: g is `%s`@." g; *)
       Hstr.replace file_cache f g;
       g in
   let color_loc ~color ~loc =
     let (f,l,b,e) = Loc.get loc in
+    (* Format.eprintf "color_loc: former f is `%s`@." f; *)
     let loc = Loc.user_position (relativize f) l b e in
-    list := (loc, color) :: !list in
+    (* let (f',_,_,_) = Loc.get loc in *)
+    (* Format.eprintf "color_loc: latter f is `%s`@." f'; *)
+    list := (loc, color) :: !list
+  in
   let get_goal_loc ~loc pr_loc =
     (* We get the task loc in priority. If it is not there, we take the pr
        ident loc. No loc can happen in completely ghost function. *)

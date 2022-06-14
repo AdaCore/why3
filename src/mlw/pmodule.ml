@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -283,10 +283,6 @@ let use_export uc ({mod_theory = mth} as m) =
       muc_export = merge_ns true  m.mod_export e0 :: ste; }
   | _ -> assert false
 
-let add_meta uc m al = { uc with
-  muc_theory = Theory.add_meta uc.muc_theory m al;
-  muc_units  = Umeta (m,al) :: uc.muc_units; }
-
 let store_path, store_module, restore_path, restore_module_id =
   let id_to_path = Wid.create 17 in
   let id_to_pmod = Wid.create 17 in
@@ -448,25 +444,41 @@ let create_module env ?(path=[]) n =
   let m = use_export m unit_module in
   m
 
-let add_use uc d = Sid.fold (fun id uc ->
+let add_use uc syms = Sid.fold (fun id uc ->
   if id_equal id ts_func.ts_name then
     use_export uc highord_module
   else if id_equal id ts_ref.ts_name then
     use_export uc ref_module
   else match is_ts_tuple_id id with
   | Some n -> use_export uc (tuple_module n)
-  | None -> uc) (Mid.set_diff d.pd_syms uc.muc_known) uc
+  | None -> uc) (Mid.set_diff syms uc.muc_known) uc
 
 let mk_vc uc d = Vc.vc uc.muc_env uc.muc_known uc.muc_theory d
 
 let add_pdecl ?(warn=true) ~vc uc d =
-  let uc = add_use uc d in
+  let uc = add_use uc d.pd_syms in
   let dl = if vc then mk_vc uc d else [] in
   (* verification conditions must not add additional dependencies
      on built-in theories like TupleN or HighOrd. Also, we expect
      int.Int or any other library theory to be in the context:
      importing them automatically seems to be too invasive. *)
   add_pdecl_raw ~warn (List.fold_left (add_pdecl_raw ~warn) uc dl) d
+
+let syms_of_ts s ts = Sid.add ts.ts_name s
+let syms_of_ty s ty = ty_s_fold syms_of_ts s ty
+let syms_of_ls s ls = let s = Sid.add ls.ls_name s in
+                      let s = Opt.fold syms_of_ty s ls.ls_value in
+                      List.fold_left syms_of_ty s ls.ls_args
+
+let add_meta uc m al =
+  let add s = function
+    | MAts ts -> syms_of_ts s ts
+    | MAty ty -> syms_of_ty s ty
+    | MAls ls -> syms_of_ls s ls
+    | _ -> s in
+  let uc = add_use uc (List.fold_left add Sid.empty al) in
+  { uc with muc_theory = Theory.add_meta uc.muc_theory m al;
+            muc_units  = Umeta (m,al) :: uc.muc_units; }
 
 (** {2 Cloning} *)
 
@@ -1260,6 +1272,10 @@ let add_clone uc mi =
     sm_ts = Mts.map (fun s -> s.its_ts) mi.mi_ts;
     sm_ls = mi.mi_ls;
     sm_pr = mi.mi_pr } in
+  let uc = add_use uc (Sid.empty |>
+    Mts.fold (fun _ ts s -> syms_of_ts s ts) sm.sm_ts |>
+    Mts.fold (fun _ ty s -> syms_of_ty s ty) sm.sm_ty |>
+    Mls.fold (fun _ ls s -> syms_of_ls s ls) sm.sm_ls) in
   { uc with
       muc_theory = theory_add_clone uc.muc_theory mi.mi_mod.mod_theory sm;
       muc_units  = Uclone mi :: uc.muc_units }

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -418,7 +418,7 @@ let comp t (state,task) = match t.task_decl.td_node with
       let old_keep_t = state.keep_t in
       let state = match dl with
         | _ when state.keep_t -> state
-        | [ts, [_]]
+        | [ts, [_,_::_]]
           when state.keep_r && not (Sid.mem ts.ts_name (get_decl_syms d)) ->
             { state with keep_t = true }
         | [{ ts_args = [] }, csl]

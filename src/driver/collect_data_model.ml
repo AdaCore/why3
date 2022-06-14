@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -62,14 +62,18 @@ let rec eval ctx oty t =
       match Hstr.find ctx.consts v with
       | mv -> mv
       | exception Not_found -> eval_const ctx v )
-  | Tprover_var (ty, v) ->
-      if ctx.interprete_prover_vars then (
-        try Hstr.find ctx.prover_values v with Not_found ->
+  | Typed_var (ty, v) ->
+    if ctx.interprete_prover_vars then (
+      (* we use the identifier [v] and the sort [ty] as keys for storing [prover_values]
+         since typed variables in CVC5 models do not contain the type of the variable
+         inside the identifier of the variable (as was the case with e.g. CVC4) *)
+      try Hstr.find ctx.prover_values (v^":"^ty) with Not_found ->
+          Debug.dprintf debug_cntex "Eval Typed_var (%s,%s) Not found@." ty v;
           let res = eval_prover_var Mstr.empty ctx ty v in
           Debug.dprintf debug_cntex "Eval prover var %s: %a@." v
             Pp.(print_option_or_default "NO VALUE" print_model_value_human) res;
           let res = Opt.get_def (Var v) res in
-          Hstr.add ctx.prover_values v res;
+          Hstr.add ctx.prover_values (v^":"^ty) res;
           res )
       else
         Var v

@@ -77,7 +77,9 @@
     ```
     make trywhy3
     make trywhy3.tar.gz
+    rm -r $DEST/try
     tar xzf trywhy3.tar.gz -C $DEST/try/ --strip-components=1
+    ln -s trywhy3.html $DEST/try/index.html
     ```
 
 * prepare the OPAM package
@@ -113,7 +115,7 @@
 
 * produce the Why3 part of Toccata gallery
   - have `GALLERYDIR` set to the sub-directory `gallery/` of the git sources
-    of the Toccata web site, e.g.
+    of the Toccata web site, e.g.,
     `export GALLERYDIR=/users/vals/filliatr/toccata/web/gallery`
   - in Why3 sources, do `make gallery`; it exports to `$GALLERYDIR` all
     Why3 programs for which there is a session

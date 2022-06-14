@@ -1,0 +1,20 @@
+type nat = Z | S nat
+
+function ack (m n:nat) : nat =
+  match m with
+  | Z -> S n
+  | S m' ->
+    match n with
+    | Z -> ack m' (S Z)
+    | S n' -> ack m' (ack m n')
+    end
+  end
+
+predicate even (x:nat) =
+  match x with
+  | Z -> true
+  | S Z -> false
+  | S (S z) -> even z
+  end
+
+goal a4 : even (ack (S (S (S (S Z)))) (S (S (S (S Z)))))

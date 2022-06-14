@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -35,13 +35,16 @@ module DetectProvers = struct
   let run () =
     let open Autodetection in
     let config = load_config () in
-    let datas = read_auto_detection_data config in
-    let binaries = request_binaries_version config datas in
-    ignore (compute_builtin_prover binaries config datas);
-    let config = set_binaries_detected binaries config in
-    let config =
-      Whyconf.User.set_dirs ~libdir:Config.libdir ~datadir:Config.datadir config
-    in
+    let data = read_auto_detection_data config in
+    let provers = find_provers data in
+    let provers =
+      List.fold_left (fun acc (path, name, version) ->
+          { Partial.name; path; version; shortcut = None; manual = false } :: acc
+        ) [] provers in
+    ignore (compute_builtin_prover provers config data);
+    let config = remove_auto_provers config in
+    let config = update_provers provers config in
+    let config = Whyconf.User.set_dirs ~libdir:Config.libdir ~datadir:Config.datadir config in
     Format.printf "Save config to %s@." (Whyconf.get_conf_file config);
     Whyconf.save_config config
 
@@ -61,23 +64,26 @@ module AddProver = struct
 
   let run () =
     let open Autodetection in
-    let prover =
+    let (name, path, shortcut) =
       match !args with
-      | [shortcut; binary; name] ->
-          { Manual_binary.same_as = name; binary; shortcut = Some shortcut }
-      | [binary; name] ->
-          { Manual_binary.same_as = name; binary; shortcut = None }
+      | [shortcut; path; name] -> (name, path, Some shortcut)
+      | [path; name] -> (name, path, None)
       | _ ->
           Printf.eprintf "%s config add-prover: expected 2 or 3 arguments: <name> <path> [shortcut]\n%!"
             exec_name;
           exit 1 in
     let config = load_config () in
-    let datas = read_auto_detection_data config in
-    let binaries = request_manual_binaries_version datas [prover] in
-    let m = compute_builtin_prover binaries config datas in
+    let data = read_auto_detection_data config in
+    let version =
+      match find_prover data name path with
+      | Some v -> v
+      | None ->
+          Printf.eprintf "Executable %s does not match any prover named %s.\n%!" path name;
+          exit 1 in
+    let provers = [{ Partial.name; path; version; shortcut; manual = true }] in
+    let m = compute_builtin_prover provers config data in
     if Whyconf.Mprover.is_empty m then exit 1;
-    let config = Manual_binary.add config prover in
-    let config = update_binaries_detected binaries config in
+    let config = update_provers provers config in
     Format.printf "Save config to %s@." (Whyconf.get_conf_file config);
     Whyconf.save_config config
 

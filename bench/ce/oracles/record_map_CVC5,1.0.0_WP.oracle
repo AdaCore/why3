@@ -1,0 +1,141 @@
+Weakest Precondition
+File "bench/ce/record_map.mlw", line 42, characters 12-22:
+Sub-goal Postcondition of goal map_record_proj_test1'vc.
+Prover result is: Unknown (sat)
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File record_map.mlw:
+  Line 41:
+    map_rec [@introduced] [@model_projected] =
+      {"type": "Array",
+       "val":
+        [{"indice": {"type": "Boolean", "val": true},
+          "value":
+           {"type": "Record",
+            "val":
+             {"Field":
+               [{"field": ".field_f",
+                 "value": {"type": "Integer", "val": "-1"}},
+                {"field": "g", "value": {"type": "Boolean", "val": true}}]}}},
+         {"others":
+           {"type": "Record",
+            "val":
+             {"Field":
+               [{"field": ".field_f",
+                 "value": {"type": "Integer", "val": "0"}},
+                {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}
+  Line 42:
+    map_rec [@introduced] [@model_projected] [@model_trace:map_rec] =
+      {"type": "Array",
+       "val":
+        [{"indice": {"type": "Boolean", "val": true},
+          "value":
+           {"type": "Record",
+            "val":
+             {"Field":
+               [{"field": ".field_f",
+                 "value": {"type": "Integer", "val": "-1"}},
+                {"field": "g", "value": {"type": "Boolean", "val": true}}]}}},
+         {"others":
+           {"type": "Record",
+            "val":
+             {"Field":
+               [{"field": ".field_f",
+                 "value": {"type": "Integer", "val": "0"}},
+                {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}
+  Line 44:
+    result [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "-1"}
+
+File "bench/ce/record_map.mlw", line 47, characters 12-22:
+Sub-goal Postcondition of goal record_map_proj_test2'vc.
+Prover result is: Unknown (sat)
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File record_map.mlw:
+  Line 46:
+    rec_map [@introduced] [@model_projected] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "f_map",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Boolean", "val": true},
+                 "value": {"type": "Integer", "val": "-1"}},
+                {"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "g_bool", "value": {"type": "Boolean", "val": true}}]}}
+  Line 47:
+    rec_map [@introduced] [@model_projected] [@model_trace:rec_map] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "f_map",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Boolean", "val": true},
+                 "value": {"type": "Integer", "val": "-1"}},
+                {"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "g_bool", "value": {"type": "Boolean", "val": true}}]}}
+  Line 49:
+    result [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "-1"}
+
+File "bench/ce/record_map.mlw", line 54, characters 12-31:
+Sub-goal Postcondition of goal record_map_proj_test3'vc.
+Prover result is: Unknown (sat)
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File record_map.mlw:
+  Line 51:
+    re_rec_map [@introduced] [@model_projected] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "f_map",
+            "value":
+             {"type": "Array",
+              "val": [{"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "g_bool", "value": {"type": "Boolean", "val": true}}]}}
+  Line 53:
+    rec_map [@introduced] [@model_projected] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "f_map",
+            "value":
+             {"type": "Array",
+              "val": [{"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
+  Line 54:
+    re_rec_map [@introduced] [@model_projected] [@model_trace:re_rec_map] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "f_map",
+            "value":
+             {"type": "Array",
+              "val": [{"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "g_bool", "value": {"type": "Boolean", "val": true}}]}}
+    rec_map [@introduced] [@model_projected] [@model_trace:rec_map] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "f_map",
+            "value":
+             {"type": "Array",
+              "val": [{"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
+  Line 56:
+    result [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "f_map",
+            "value":
+             {"type": "Array",
+              "val": [{"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
+

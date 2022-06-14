@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -72,7 +72,7 @@ let option_list =
     KLong "rac-timelimit", Hnd1 (AInt, fun i -> opt_rac_timelimit := Some i),
     "<seconds> Time limit in seconds for RAC (with --rac)";
     KLong "rac-steplimit", Hnd1 (AInt, fun i -> opt_rac_steplimit := Some i),
-    "<seconds> Step limit for RAC (with --rac)";
+    "<steps> Step limit for RAC (with --rac)";
     KLong "rac-fail-cannot-check", Hnd0 (fun () -> opt_rac_ignore_incomplete := false),
     " Fail RAC as incomplete when a assertion cannot be checked";
     KLong "use", Hnd1 (AString, fun m -> use_modules := m :: !use_modules),

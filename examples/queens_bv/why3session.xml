@@ -156,7 +156,7 @@
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="t&#39;vc.12" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.68"/></proof>
+  <proof prover="3"><result status="valid" time="0.50"/></proof>
   </goal>
   <goal name="t&#39;vc.13" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.04" steps="81775"/></proof>
@@ -230,7 +230,7 @@
   <proof prover="3"><result status="valid" time="1.00"/></proof>
   </goal>
   <goal name="t&#39;vc.32" expl="precondition" proved="true">
-  <proof prover="3" timelimit="30"><result status="valid" time="6.86"/></proof>
+  <proof prover="3" timelimit="30"><result status="valid" time="5.89"/></proof>
   </goal>
   <goal name="t&#39;vc.33" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="1.13"/></proof>
@@ -243,19 +243,19 @@
    <goal name="t&#39;vc.35.0" expl="assertion" proved="true">
    <transf name="split_all_full" proved="true" >
     <goal name="t&#39;vc.35.0.0" expl="assertion" proved="true">
-    <transf name="split_vc" proved="true" >
-     <goal name="t&#39;vc.35.0.0.0" expl="assertion" proved="true">
-     <proof prover="11"><result status="valid" time="0.07" steps="24017"/></proof>
-     </goal>
-    </transf>
+    <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.07" steps="27112"/></proof>
     </goal>
     <goal name="t&#39;vc.35.0.1" expl="assertion" proved="true">
-    <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="8.51" steps="639320"/></proof>
+    <transf name="split_vc" proved="true" >
+     <goal name="t&#39;vc.35.0.1.0" expl="assertion" proved="true">
+     <proof prover="11"><result status="valid" time="3.77" steps="544517"/></proof>
+     </goal>
+    </transf>
     </goal>
    </transf>
    </goal>
    <goal name="t&#39;vc.35.1" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.50" steps="101860"/></proof>
+   <proof prover="4"><result status="valid" time="0.50" steps="101855"/></proof>
    </goal>
    <goal name="t&#39;vc.35.2" expl="assertion" proved="true">
    <proof prover="4"><result status="valid" time="0.10" steps="35528"/></proof>
@@ -312,7 +312,7 @@
    <proof prover="3" timelimit="1"><result status="valid" time="0.89"/></proof>
    </goal>
    <goal name="t&#39;vc.45.3" expl="loop invariant preservation" proved="true">
-   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="4.95"/></proof>
+   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="5.23"/></proof>
    </goal>
   </transf>
   </goal>

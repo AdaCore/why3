@@ -1,0 +1,18 @@
+
+(** Test for all provers: setting all the elements of an array to zero *)
+
+use int.Int
+use array.Array
+
+let set_zeros (a : array int) =
+  ensures { forall j: int. 0 <= j < a.length -> a[j] = 0 }
+  for i = 0 to a.length - 1 do
+    invariant { forall j: int. 0 <= j < i -> a[j] = 0 }
+    a[i] <- 0
+  done
+
+let harness () =
+  let a0 = make 42 1 in
+  set_zeros a0;
+  assert { length a0 = 42 };
+  assert { a0[12] = 0 }

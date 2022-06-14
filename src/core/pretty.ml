@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -386,12 +386,18 @@ and print_app pri ls fmt tl =
   | Ident.SNlcut s, [t1;t2] ->
       fprintf fmt (protect_on (pri > 7) "%a[..%a]%s")
         (print_lterm 7) t1 print_term t2 s
+  | Ident.SNword s, [t] when Sattr.mem is_field_id_attr ls.ls_name.id_attrs ->
+     fprintf fmt (protect_on (pri > 6) "@[%a.%s@]")
+       print_term t s
   | Ident.SNword s, tl ->
       fprintf fmt (protect_on (pri > 6) "@[%s@ %a@]")
         s (print_list space (print_lterm 7)) tl
-  | _, tl -> (* do not fail, just print the string *)
-      fprintf fmt (protect_on (pri > 6) "@[%s@ %a@]")
-        s (print_list space (print_lterm 7)) tl
+  | (Ident.SNtight s | SNprefix s | SNinfix s
+     | SNget s | SNupdate s | SNset s
+     | SNcut s | SNrcut s | SNlcut s), tl ->
+     (* do not fail, just print the string *)
+     fprintf fmt (protect_on (pri > 6) "@[(*Pretty.print_app: unexpected case*)%s@ %a@]")
+       s (print_list space (print_lterm 7)) tl
 
 and print_tnode ?(ext_printer=true) pri fmt t =
   if ext_printer then

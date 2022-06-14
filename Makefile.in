@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  #
+#  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -152,8 +152,15 @@ CMP_CP = cmp -s $< $@ || cp $< $@
 
 # external libraries common to all binaries
 
+ifeq (@menhirlib_cmo@,yes)
 EXTOBJS = menhirLib
-EXTLIBS = @SEQLIB@ @RELIB@ unix nums dynlink result easy_format biniou yojson @ZIPLIB@ @WHY3LIB@ @INFERLIB@
+EXTLIBS =
+else
+EXTOBJS =
+EXTLIBS = menhirLib
+endif
+
+EXTLIBS += @SEQLIB@ @RELIB@ unix nums dynlink result easy_format biniou yojson @ZIPLIB@ @WHY3LIB@ @INFERLIB@
 EXTPKGS = menhirLib @SEQLIB@ @RELIB@ unix num dynlink yojson @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
 
 EXTCMA	= $(addsuffix .cmo,$(EXTOBJS)) $(addsuffix .cma,$(EXTLIBS))
@@ -411,8 +418,9 @@ endif
 ifeq (@enable_re@,no)
 src/util/re.ml: src/util/recompat.ml Makefile
 	$(CMP_CP)
-GENERATED += src/util/re.ml
+LIBGENERATED += src/util/re.ml
 endif
+GENERATED += src/util/re.ml
 
 # build targets
 
@@ -455,9 +463,11 @@ install-data::
 	$(MKDIR_P) $(DATADIR)/why3/stdlib
 	$(MKDIR_P) $(DATADIR)/why3/stdlib/mach
 	$(MKDIR_P) $(DATADIR)/why3/drivers
+	$(MKDIR_P) $(DATADIR)/why3/extraction_drivers
 	$(INSTALL_DATA) stdlib/*.mlw $(DATADIR)/why3/stdlib
 	$(INSTALL_DATA) stdlib/mach/*.mlw $(DATADIR)/why3/stdlib/mach
 	$(INSTALL_DATA) drivers/*.drv drivers/*.gen $(DATADIR)/why3/drivers
+	$(INSTALL_DATA) extraction_drivers/*.drv $(DATADIR)/why3/extraction_drivers
 	$(INSTALL_DATA) LICENSE $(DATADIR)/why3/
 	$(INSTALL_DATA) share/provers-detection-data.conf $(DATADIR)/why3/
 	$(INSTALL_DATA) share/why3session.dtd $(DATADIR)/why3
@@ -716,13 +726,10 @@ install_local:: bin/why3 $(TOOLS_BIN:%=bin/%.$(SHAREDBEST))
 bin/%:	bin/%.@OCAMLBEST@
 	ln -sf $(notdir $<) $@
 
-install_local:: share/drivers share/stdlib
+install_local:: share/drivers share/extraction_drivers share/stdlib
 
-share/drivers:
-	ln -snf ../drivers share/drivers
-
-share/stdlib:
-	ln -snf ../stdlib share/stdlib
+share/drivers share/extraction_drivers share/stdlib: share/%:
+	ln -snf ../$* $@
 
 MAKEINC += $(TOOLSDEP)
 
@@ -909,7 +916,7 @@ gallery-subs:
 # XML DTD validation
 ########
 
-.PHONY: xml-validate
+.PHONY: xml-validate xml-validate-local
 
 xml-validate:
 	@for x in `find examples/ -name why3session.xml`; do \
@@ -918,16 +925,17 @@ xml-validate:
 
 xml-validate-local:
 	@for x in `find examples/ -path examples/in_progress -prune -o -name why3session.xml -print`; do \
-	  xmllint --noout --dtdvalid share/why3session.dtd $$x 2>&1 | head -1; \
+	  xmllint --nonet --noout --path share --valid $$x 2>&1 | sed -e '/I.O error/d' | head -1; \
 	done
 
 ###############
 # IDE
 ###############
 
-ifeq (@enable_ide@,yes)
-
 IDEGENERATED = src/ide/gtkcompat.ml
+GENERATED += $(IDEGENERATED)
+
+ifeq (@enable_ide@,yes)
 
 IDE_FILES = gtkcompat
 
@@ -996,8 +1004,6 @@ else
 src/ide/gtkcompat.ml: src/ide/gtkcompat3.ml Makefile
 	$(CMP_CP)
 endif
-
-GENERATED += $(IDEGENERATED)
 
 endif
 
@@ -1752,6 +1758,7 @@ $(TRYWHY3DEP) $(TRYWHY3CMO) $(TRYWHY3CMI): INCLUDES += -I src/trywhy3
 
 TRYWHY3_PACK = \
 	trywhy3.js trywhy3.html trywhy3.css \
+	help_whyml.html help_python.html help_micro-C.html \
 	why3_worker.js alt-ergo-worker.js \
 	README.md examples/ \
 	trywhy3_custom.css \
@@ -2023,7 +2030,7 @@ doc/apidoc:
 	mkdir -p doc/apidoc
 
 apidoc: doc/apidoc $(FILESTODOC)
-	$(OCAMLDOC) -d doc/apidoc -html -t "Why3 API documentation" \
+	$(OCAMLDOC) -d doc/apidoc -charset utf-8 -html -t "Why3 API documentation" \
 		-keep-code $(INCLUDES) $(LIBINCLUDES) $(EXTINCLUDES) $(FILESTODOC)
 
 # could we include also the dependency graph ? -- someone

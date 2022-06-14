@@ -1,0 +1,104 @@
+Strongest Postcondition
+File "bench/ce/threshold.mlw", line 11, characters 11-20:
+Sub-goal Integer overflow of goal f'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File threshold.mlw:
+  Line 8:
+    max [@introduced] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "-2147483648"}}
+    min [@introduced] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "-1"}}
+    n [@introduced] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "-1"}}
+  Line 11:
+    max [@introduced] [@model_trace:max] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "-2147483648"}}
+    min [@introduced] [@model_trace:min] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "-1"}}
+
+File "bench/ce/threshold.mlw", line 9, characters 13-33:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File threshold.mlw:
+  Line 8:
+    max [@introduced] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "2"}}
+    min [@introduced] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "3"}}
+    n [@introduced] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "4"}}
+  Line 9:
+    max [@introduced] [@model_trace:max] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "2"}}
+    min [@introduced] [@model_trace:min] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "3"}}
+    result [@introduced] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "2"}}
+  Line 11:
+    _x [@introduced] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "5"}}
+    result of call at line 11, characters 11-20 [@call_result:11:11:20:bench/ce/threshold.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "5"}}
+    result [@introduced] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "2"}}
+  Line 12:
+    result of call at line 12, characters 30-37 [@call_result:12:30:37:bench/ce/threshold.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": true}
+    result of call at line 12, characters 5-12 [@call_result:12:5:12:bench/ce/threshold.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": false}
+
+File "bench/ce/threshold.mlw", line 30, characters 11-24:
+Sub-goal Arithmetic overflow of goal f'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File threshold.mlw:
+  Line 26:
+    max [@introduced] = {"type": "Integer", "val": "4294967295"}
+    min [@introduced] = {"type": "Integer", "val": "4294967295"}
+    n [@introduced] = {"type": "Integer", "val": "0"}
+  Line 30:
+    max [@introduced] [@model_trace:max] =
+      {"type": "Integer", "val": "4294967295"}
+    min [@introduced] [@model_trace:min] =
+      {"type": "Integer", "val": "4294967295"}
+
+File "bench/ce/threshold.mlw", line 27, characters 13-45:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Unknown or time/memory/step limit.
+

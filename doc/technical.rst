@@ -50,14 +50,14 @@ integer (e.g., ``-555``), a boolean (``true``, ``false``), or a string
 are thus allowed to occur several times inside a given section. In that
 case, the relative order of these associations matters.
 
-Extra Configuration Files
+Extra configuration files
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In addition to the main configuration file, Why3 commands accept the
 option :option:`why3 --extra-config` to read one or more files
 containing additional configuration option. It allows the user to pass
 extra declarations in prover drivers, as illustrated in
-:numref:`sec.apiextradrivers`, including declarations for
+:numref:`sec.userdrivers`, including declarations for
 realizations, as illustrated in :numref:`sec.realizations`.
 
 
@@ -103,10 +103,10 @@ solvers, :numref:`fig.drv.tptp` for TPTP solvers, :numref:`fig.drv.coq`
 for Coq, :numref:`fig.drv.isabelle` for Isabelle/HOL,
 and :numref:`fig.drv.pvs` for PVS.
 
-.. _sec.apiextradrivers:
+.. _sec.userdrivers:
 
-Adding extra drivers for user theories
---------------------------------------
+Drivers for User Theories
+-------------------------
 
 It is possible for the users to augment the system drivers with extra
 information for their own declared theories. The processus is
@@ -116,12 +116,12 @@ First, we define a new theory in a file :file:`bvmisc.mlw`, containing
 
 .. code-block:: whyml
 
-  theory T
-  use bv.BV8
-  use bv.BV16
-  function lsb BV16.t : BV8.t (** least significant bits *)
-  function msb BV16.t : BV8.t (** most significant bits *)
-  end
+   theory T
+     use bv.BV8
+     use bv.BV16
+     function lsb BV16.t : BV8.t (** least significant bits *)
+     function msb BV16.t : BV8.t (** most significant bits *)
+   end
 
 For such a theory, it is a good idea to declare specific translation
 rules for provers that have a built-in bit-vector support, such as Z3
@@ -130,10 +130,10 @@ and CVC4 in this example. To do so, we write a extension driver file,
 
 .. code-block:: whyml
 
-  theory bvmisc.T
-  syntax function lsb "((_ extract 7 0) %1)"
-  syntax function msb "((_ extract 15 8) %1)"
-  end
+   theory bvmisc.T
+     syntax function lsb "((_ extract 7 0) %1)"
+     syntax function msb "((_ extract 15 8) %1)"
+   end
 
 Now to tell Why3 that we would like this driver extension when calling
 Z3 or CVC4, we write an extra configuration file, :file:`my.conf`,
@@ -152,7 +152,7 @@ containing
 Finally, to make the whole thing work, we have to call any Why3 command
 with the additional option :option:`why3 --extra-config`, such as
 
-.. code-block::
+::
 
   why3 --extra-config=my.conf prove myfile.mlw
 
@@ -1542,6 +1542,28 @@ WhyML Attributes
 
 .. why3:attribute:: case_split
 
+.. why3:attribute:: extraction:inline
+
+   If the name of a function is labeled with this attribute, its body
+   will be inlined at every call site during extraction (see
+   :numref:`sec.extract`). This is especially useful for trivial
+   wrapper functions whose only purpose is to provide a slightly
+   different specification from the original function.
+
+.. why3:attribute:: extraction:likely
+
+   This attribute can be applied to a Boolean expression to indicate
+   whether it is likely to be true. This is used at extraction time
+   (see :numref:`sec.extract`), assuming the target language supports
+   it. For example, when extracting to C, the extracted expression
+   will be tagged with ``__builtin_expect``.
+
+.. why3:attribute:: extraction:unlikely
+
+   This attribute can be applied to a Boolean expression to indicate
+   whether it is likely to be false. This is the opposite of
+   :why3:attribute:`extraction:likely`.
+
 .. why3:attribute:: induction
 
 .. why3:attribute:: infer
@@ -1562,9 +1584,9 @@ WhyML Attributes
 
 .. why3:attribute:: vc:sp
 
-.. why3:attribute:: vc:wp
-
 .. why3:attribute:: vc:white_box
+
+.. why3:attribute:: vc:wp
 
 .. _sec.metas:
 
@@ -1598,9 +1620,11 @@ Debug Flags
 
 .. why3:debug:: stack_trace
 
+Developer Documentation
+-----------------------
 
-Updating Syntax Error Messages
-------------------------------
+Updating messages for syntax errors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here is the developer's recipe to update a syntax error message. We do
 it on the following illustrative example.

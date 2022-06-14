@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -1299,7 +1299,7 @@ let () =
   ToolBar.add_action Buttons.button_help (fun () ->
       let link_html =
         match !FormatList.selected_format with
-        | "micro-C" -> "help_micro-c.html"
+        | "micro-C" -> "help_micro-C.html"
         | "python"  -> "help_python.html"
         | _         -> "help_whyml.html"
       in

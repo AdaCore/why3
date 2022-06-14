@@ -154,7 +154,7 @@ and trailing spaces are ignored. A location consists of a file name in
 double quotes, a line number, and starting and ending character
 positions.
 
-Type expressions
+Type Expressions
 ----------------
 
 WhyML features an ML-style type system with polymorphic types, variants
@@ -197,7 +197,7 @@ that expects an argument of a mutable type will accept an argument of
 the corresponding snapshot type as long as it is not modified by the
 function.
 
-Logical expressions
+Logical Expressions
 -------------------
 
 A significant part of a typical WhyML source file is occupied by
@@ -206,7 +206,7 @@ function contracts, assertions, definitions of logical functions and
 predicates, axioms, lemmas, etc.
 
 
-Terms and Formulas
+Terms and formulas
 ^^^^^^^^^^^^^^^^^^
 
 Logical expressions are called *terms*. Boolean terms are called
@@ -576,7 +576,7 @@ Ghost patterns, ghost variables after ``as``, and ghost parameters in
 function definitions are only used in program code, and not allowed in
 logical terms.
 
-Program expressions
+Program Expressions
 -------------------
 
 The syntax of program expressions is given below. As before, the constructions
@@ -1251,6 +1251,13 @@ polymorphic lists:
 (This type is already part of Why3 standard library, in module
 `list.List <http://why3.lri.fr/stdlib/list.html>`_.)
 
+Mutually recursive type definitions are supported.
+
+.. code-block:: whyml
+
+    type tree   = Node elt forest
+    with forest = Empty | Cons tree forest
+
 When a field is common to all constructors, with the same type, it can
 be named:
 
@@ -1448,6 +1455,22 @@ in the ghost code and never translated into executable code ; or
 ``partial``, meaning that their execution can produce observable
 effects unaccounted by their specification, and thus they cannot be
 used in the ghost code.
+
+Recursive program functions must be defined using ``let rec``.
+
+.. code-block:: whyml
+
+    let rec size_tree (t: tree) : int =
+      variant { t }
+      match t with
+      | Node _ f -> 1 + size_forest f
+      end
+    with size_forest (f: forest) : int =
+      variant { f }
+      match f with
+      | Empty    -> 0
+      | Cons t f -> size_tree t + size_forest f
+      end
 
 .. index:: pair: keyword; clone
 .. index:: module cloning
