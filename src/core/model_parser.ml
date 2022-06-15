@@ -486,12 +486,12 @@ type model_element = {
   me_name: model_element_name;
   me_value: model_value;
   me_location: Loc.position option;
-  me_term: Term.term option;
+  me_lsymbol_location: Loc.position option;
 }
 
 let create_model_element ~name ~value ~attrs =
   let me_name = {men_name= name; men_kind= Other; men_attrs= attrs} in
-  {me_name; me_value= value; me_location= None; me_term= None}
+  {me_name; me_value= value; me_location= None; me_lsymbol_location= None}
 
 let create_model_element_name name attrs kind =
   {men_name= name; men_kind= kind; men_attrs= attrs}
@@ -940,10 +940,8 @@ let add_to_model_if_loc ?kind me model =
 let recover_name pm fields_projs raw_name =
   let name, attrs =
     try
-      let t = Mstr.find raw_name pm.queried_terms in
-      match t.t_node with
-      | Tapp (ls, []) -> (ls.ls_name.id_string, t.t_attrs)
-      | _ -> ("", t.t_attrs)
+      let ls,loc,attrs = Mstr.find raw_name pm.queried_terms in
+      (ls.ls_name.id_string, attrs)
     with Not_found ->
       let id = Mstr.find raw_name fields_projs in
       (id.id_string, id.id_attrs) in
@@ -1007,12 +1005,6 @@ let read_one_fields ~attrs value =
       (* No model trace attribute present, same as general case *)
       attrs, List.fold_left add_record value field_names
 
-let internal_loc t =
-  match t.t_node with
-  | Tvar vs -> vs.vs_name.id_loc
-  | Tapp (ls, []) -> ls.ls_name.id_loc
-  | _ -> None
-
 let remove_field : (Sattr.t * model_value -> Sattr.t * model_value) ref = ref (fun x -> x)
 let register_remove_field f = remove_field := f
 
@@ -1025,18 +1017,14 @@ let build_model_rec pm (elts: model_element list) : model_files =
     | exception Not_found ->
         Debug.dprintf debug "No term for %s@." me.me_name.men_name;
         None
-    | t ->
+    | ls,loc,attrs ->
         (* model elements are preliminary so far: *)
-        assert (me.me_location = None && me.me_term = None);
-        let attrs = Sattr.union me.me_name.men_attrs t.t_attrs in
-        let name, attrs = match t.t_node with
-          | Tapp (ls, []) ->
-              (* Ident [ls] is recorded as [t_app ls] in [Printer.queried_terms] *)
-              ls.ls_name.id_string, Sattr.union attrs ls.ls_name.id_attrs
-          | _ -> "", attrs in
+        assert (me.me_location = None && me.me_lsymbol_location = None);
+        let name, attrs = ls.ls_name.id_string,
+          Sattr.union (Sattr.union me.me_name.men_attrs attrs) ls.ls_name.id_attrs in
         Debug.dprintf debug "@[<h>Term attrs for %s at %a@]@."
           (why_name_trans me.me_name)
-          (Pp.print_option_or_default "NO LOC" Pretty.print_loc') t.t_loc;
+          (Pp.print_option_or_default "NO LOC" Pretty.print_loc') loc;
         (* Replace projections with their real name *)
         let me_value = replace_projection
             (fun s -> recover_name pm fields_projs s)
@@ -1047,7 +1035,8 @@ let build_model_rec pm (elts: model_element list) : model_files =
         (* Transform value flattened by eval_match (one field record) back to records *)
         let attrs, me_value = read_one_fields ~attrs me_value in
         let me_name = create_model_element_name name attrs Other in
-        Some {me_name; me_value; me_location= t.t_loc; me_term= Some t} in
+        Some {me_name; me_value; me_location= loc;
+              me_lsymbol_location= ls.ls_name.id_loc} in
   let add_with_loc_set_kind me loc model =
     if loc = None then model else
       let kind = compute_kind vc_attrs loc me.me_name.men_attrs in
@@ -1056,7 +1045,7 @@ let build_model_rec pm (elts: model_element list) : model_files =
   let add_model_elt model me =
     let kind = compute_kind vc_attrs me.me_location me.me_name.men_attrs in
     let model = add_to_model_if_loc ~kind me model in
-    let oloc = internal_loc (Opt.get me.me_term) in
+    let oloc = me.me_lsymbol_location in
     let model = add_with_loc_set_kind me oloc model in
     let add_written_loc a =
       add_with_loc_set_kind me (get_written_loc a) in

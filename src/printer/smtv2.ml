@@ -251,10 +251,8 @@ let collect_model_ls info ls =
     info.list_field_def <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
         ls.ls_name info.list_field_def;
   if ls.ls_args = [] && (relevant_for_counterexample ls.ls_name) then
-    let t = t_app ls [] ls.ls_value in
     info.info_model <-
-      add_model_element
-      (t_attr_set ?loc:ls.ls_name.id_loc ls.ls_name.id_attrs t) info.info_model
+      add_model_element (ls, ls.ls_name.id_loc, ls.ls_name.id_attrs) info.info_model
 
 let number_format = {
     Number.long_int_support = `Default;
@@ -299,7 +297,11 @@ let rec print_term info fmt t =
   debug_print_term "Printing term: " t;
   if check_for_counterexample t
   then
-    info.info_model <- add_model_element t info.info_model;
+    begin match t.t_node with
+    | Tapp (ls,_) ->
+      info.info_model <- add_model_element (ls,t.t_loc,t.t_attrs) info.info_model
+    | _ -> assert false (* cannot happen because check_for_counterexample is true *)
+    end;
 
   check_enter_vc_term t info.info_in_goal info.info_vc_term;
 
@@ -405,7 +407,11 @@ and print_fmla info fmt f =
   debug_print_term "Printing formula: " f;
   if check_for_counterexample f
   then
-    info.info_model <- add_model_element f info.info_model;
+    begin match f.t_node with
+    | Tapp (ls,_) ->
+      info.info_model <- add_model_element (ls,f.t_loc,f.t_attrs) info.info_model
+    | _ -> assert false (* cannot happen because check_for_counterexample is true *)
+    end;
 
   check_enter_vc_term f info.info_in_goal info.info_vc_term;
 
@@ -643,16 +649,17 @@ let print_info_model info =
   if not (S.is_empty info_model) && info.info_cntexample then
     begin
       let model_map =
-	S.fold (fun f acc ->
-          let s = asprintf "%a" (print_fmla info) f in
-          Mstr.add s f acc)
-	info_model
-	Mstr.empty in
+        S.fold
+          (fun ((ls,_,_) as el) acc ->
+            let s = asprintf "%a" (print_ident info) ls.ls_name in
+            Mstr.add s el acc)
+          info_model
+          Mstr.empty in ();
 
-      (* Printing model has modification of info.info_model as undesirable
-	 side-effect. Revert it back. *)
-      info.info_model <- info_model;
-      model_map
+        (* Printing model has modification of info.info_model as undesirable
+        side-effect. Revert it back. *)
+        info.info_model <- info_model;
+        model_map
     end
   else
     Mstr.empty

@@ -127,14 +127,14 @@ type model_element_name = {
 (** Counter-example model elements. Each element represents
     a counter-example for a single source-code element.*)
 type model_element = {
-  me_name       : model_element_name;
+  me_name             : model_element_name;
     (** Information about the name of the model element  *)
-  me_value      : model_value;
+  me_value            : model_value;
     (** Counter-example value for the element. *)
-  me_location   : Loc.position option;
+  me_location         : Loc.position option;
     (** Source-code location of the element. *)
-  me_term       : Term.term option;
-    (** Why term corresponding to the element.  *)
+  me_lsymbol_location : Loc.position option;
+    (** Source-code location of the Why term corresponding to the element.  *)
 }
 
 val create_model_element :

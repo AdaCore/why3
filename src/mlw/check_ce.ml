@@ -720,7 +720,7 @@ let model_of_exec_log ~original_model log =
       | None -> Other in
     let me_name = { men_name; men_kind; men_attrs= id.id_attrs } in
     let me_value = model_value value in
-    {me_name; me_value; me_location= Some loc; me_term= None} in
+    {me_name; me_value; me_location= Some loc; me_lsymbol_location= None} in
   let aux e = match e.Log.log_loc with
     | Some loc when not Loc.(equal loc dummy_position) -> (
         match e.Log.log_desc with
