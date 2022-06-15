@@ -25,8 +25,8 @@ type vc_term_info = {
      is not generated for postcondition or precondition) *)
 }
 
-module TermCmp = struct
-  type t = term
+module Cmp = struct
+  type t = (lsymbol * Loc.position option * Ident.Sattr.t)
 
   let before loc1 loc2 =
   (* Return true if loc1 is strictly before loc2 *)
@@ -45,19 +45,19 @@ module TermCmp = struct
 	    if col1 < col2 then true
 	    else false
 
-  let compare a b =
-    if (a.t_loc = b.t_loc) && (a.t_attrs = b.t_attrs)
+  let compare (_,a_loc,a_attrs) (_,b_loc,b_attrs) =
+    if (a_loc = b_loc) && (a_attrs = b_attrs)
     then 0 else
       (* Order the terms accoridng to their source code locations  *)
-      if before a.t_loc b.t_loc then 1
+      if before a_loc b_loc then 1
       else -1
 
 end
 
-module S = Set.Make(TermCmp)
+module S = Set.Make(Cmp)
 
-let add_model_element (el: term) info_model =
- (* Add element el (term) to info_model.
+let add_model_element el info_model =
+ (* Add element el (Term.lsymbol * Loc.position option * Ident.Sattr.t) to info_model.
     If an element with the same hash (the same set of attributes + the same
     location) as the element el already exists in info_model, replace it with el.
 

@@ -39,7 +39,7 @@ type field_info = {
 type printing_info = {
   vc_term_loc        : Loc.position option;
   vc_term_attrs      : Sattr.t;
-  queried_terms      : Term.term Mstr.t;
+  queried_terms      : (Term.lsymbol * Loc.position option * Sattr.t) Mstr.t;
   list_projections   : Ident.ident Mstr.t;
   list_fields        : Ident.ident Mstr.t;
   list_records       : field_info list Mstr.t;

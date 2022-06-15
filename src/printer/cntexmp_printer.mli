@@ -24,17 +24,17 @@ type vc_term_info = {
      is not generated for postcondition or precondition) *)
 }
 
-module TermCmp : sig
-  type t = term
+module Cmp : sig
+  type t = (lsymbol * Loc.position option * Ident.Sattr.t)
 
   val before: Loc.position option -> Loc.position option -> bool
 
-  val compare: term -> term -> int
+  val compare: t -> t -> int
 end
 
-module S : Set.S with type elt = term and type t = Set.Make(TermCmp).t
+module S : Set.S with type elt = Cmp.t and type t = Set.Make(Cmp).t
 
-val add_model_element: Term.term -> S.t -> S.t
+val add_model_element: S.elt -> S.t -> S.t
 
 (*
 val model_trace_for_postcondition:
