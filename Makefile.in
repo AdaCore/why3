@@ -340,8 +340,15 @@ endif
 # Mlmpfr
 
 ifeq (@enable_mpfr@,yes)
+
+ifeq (@old_mpfr@,yes)
+src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_old.ml Makefile
+	$(CMP_CP)
+else ifeq (@enable_mpfr@,yes)
 src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_real.ml Makefile
 	$(CMP_CP)
+endif
+
 else
 src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_dummy.ml Makefile
 	$(CMP_CP)
