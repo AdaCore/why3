@@ -218,11 +218,11 @@ mem_limit () {
                 # to be investigated
                 echo "  $f (memory limit for $p)... skipped "
             else
-                # Testing that at least one run between --memlimit=40 and
+                # Testing that at least one run between --memlimit=50 and
                 # --memlimit=30 replies Out of memory seems a reasonable
                 # heuristic
-                printf "  $f (memory limit 40 for $p)... "
-                if $pgm --memlimit=40 --timelimit=5 -P $p $f | \
+                printf "  $f (memory limit 50 for $p)... "
+                if $pgm --memlimit=50 --timelimit=5 -P $p $f | \
                             grep -q "Prover result is: Out of memory"; then
                     printf "ok\n"
                 else
