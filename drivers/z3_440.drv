@@ -47,6 +47,9 @@ outofmemory "Failed to verify: pthread_create"
 outofmemory "std::bad_alloc"
 outofmemory "Resource temporarily unavailable"
 outofmemory "Cannot allocate memory"
+(* not convenient: is more a problem of fork
+outofmemory "error while loading shared libraries:.*failed to map segment from shared object"
+*)
 timeout "interrupted by timeout"
 steps ":rlimit-count +\\([0-9]+\\)" 1
 steplimitexceeded "Maximal allocation counts [0-9]+ have been exceeded"
