@@ -1,14 +1,14 @@
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.05s, 780 steps).
+Prover result is: Valid (0.02s, 780 steps).
 
 File "bench/check-ce/while1.mlw", line 9, characters 16-21:
 Sub-goal Loop variant decrease of goal f'vc.
-Prover result is: Valid (0.03s, 1276 steps).
+Prover result is: Valid (0.03s, 1222 steps).
 
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.02s, 1168 steps).
+Prover result is: Valid (0.03s, 1114 steps).
 
 <check-ce-rac-results>Check model 0 ("bench/check-ce/while1.mlw", line 5, characters 12-22)
 <check-ce-rac-results>Checking model:
@@ -36,15 +36,12 @@ Prover result is: Valid (0.02s, 1168 steps).
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "2"}}]}}
                           result = {"type": "Boolean", "val": false}
-                          result = {"type": "Integer", "val": "2"}
                           x =
                             {"type": "Record",
                              "val":
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "0"}}]}}
-                        Line 14:
-                          result = {"type": "Integer", "val": "0"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -204,15 +201,12 @@ Prover result is: Valid (0.02s, 1168 steps).
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "2"}}]}}
                           result = {"type": "Boolean", "val": false}
-                          result = {"type": "Integer", "val": "2"}
                           x =
                             {"type": "Record",
                              "val":
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "0"}}]}}
-                        Line 14:
-                          result = {"type": "Integer", "val": "0"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -355,7 +349,7 @@ Prover result is: Valid (0.02s, 1168 steps).
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/while1.mlw", line 5, characters 12-22)
 File "bench/check-ce/while1.mlw", line 5, characters 12-22:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.05s, 6576 steps).
+Prover result is: Unknown (unknown + incomplete) (0.06s, 6537 steps).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:

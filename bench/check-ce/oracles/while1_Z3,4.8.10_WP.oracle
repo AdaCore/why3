@@ -4,11 +4,11 @@ Prover result is: Valid (0.02s, 61 steps).
 
 File "bench/check-ce/while1.mlw", line 9, characters 16-21:
 Sub-goal Loop variant decrease of goal f'vc.
-Prover result is: Valid (0.00s, 3293 steps).
+Prover result is: Valid (0.02s, 3194 steps).
 
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.01s, 3252 steps).
+Prover result is: Valid (0.01s, 3153 steps).
 
 <check-ce-rac-results>Check model 0 ("bench/check-ce/while1.mlw", line 5, characters 12-22)
 <check-ce-rac-results>Checking model:
@@ -36,15 +36,12 @@ Prover result is: Valid (0.01s, 3252 steps).
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "2"}}]}}
                           result = {"type": "Boolean", "val": false}
-                          result = {"type": "Integer", "val": "2"}
                           x =
                             {"type": "Record",
                              "val":
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "1"}}]}}
-                        Line 14:
-                          result = {"type": "Integer", "val": "1"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -332,7 +329,7 @@ Prover result is: Valid (0.01s, 3252 steps).
   - Abstract RAC: STUCK (when reaching the end of a loop iteration at "bench/check-ce/while1.mlw", line 8, characters 4-113)
 File "bench/check-ce/while1.mlw", line 5, characters 12-22:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Step limit exceeded (0.52s, 3000081 steps).
+Prover result is: Step limit exceeded (0.50s, 3000075 steps).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:

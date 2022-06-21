@@ -30,7 +30,6 @@ Prover result is: Valid (0.02s, 69 steps).
                           result = {"type": "Boolean", "val": true}
                         Line 10:
                           result = {"type": "Integer", "val": "-175"}
-                          result = {"type": "Integer", "val": "-176"}
                           x1 =
                             {"type": "Record",
                              "val":
@@ -270,7 +269,7 @@ Prover result is: Valid (0.02s, 69 steps).
   - Abstract RAC: STUCK (failure in loop invariant preservation after last iteration at "bench/check-ce/for.mlw", line 8, characters 16-31)
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Step limit exceeded (0.52s, 3000102 steps).
+Prover result is: Step limit exceeded (0.48s, 3000099 steps).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:
@@ -320,5 +319,5 @@ File for.mlw:
 
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.01s, 2874 steps).
+Prover result is: Valid (0.00s, 2842 steps).
 

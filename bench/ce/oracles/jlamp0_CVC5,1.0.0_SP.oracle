@@ -23,6 +23,15 @@ File jlamp0.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+    result of call at line 11, characters 9-16 [@call_result:11:9:16:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "3"}
+    result of call at line 11, characters 9-11 [@call_result:11:9:11:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
+    result of call at line 11, characters 14-16 [@call_result:11:14:16:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "3"}
   Line 12:
     a [@field:0:contents] [@introduced] [@model_trace:a] =
       {"type": "Record",
@@ -41,13 +50,13 @@ File jlamp0.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "7"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 8:
     b [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
   Line 10:
     a [@field:0:contents] [@introduced] [@model_trace:a] =
       {"type": "Record",
@@ -60,12 +69,33 @@ File jlamp0.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
+    result of call at line 11, characters 9-16 [@call_result:11:9:16:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "10"}
+    result of call at line 11, characters 9-11 [@call_result:11:9:11:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
+    result of call at line 11, characters 14-16 [@call_result:11:14:16:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "10"}
   Line 13:
     a [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
+    result of call at line 13, characters 26-32 [@call_result:13:26:32:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "9"}
+    result of call at line 13, characters 26-28 [@call_result:13:26:28:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "10"}
+    result of call at line 13, characters 7-15 [@call_result:13:7:15:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": true}
+    result of call at line 13, characters 7-9 [@call_result:13:7:9:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "10"}
 
 File "bench/ce/jlamp0.mlw", line 22, characters 18-31:
 Sub-goal Loop invariant init of goal p2'vc.
@@ -143,6 +173,12 @@ File jlamp0.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+    result of call at line 21, characters 10-18 [@call_result:21:10:18:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": true}
+    result of call at line 21, characters 10-12 [@call_result:21:10:12:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "2"}
   Line 23:
     [current iteration] a [@field:0:contents] [@introduced]
       [@loop:bench/ce/jlamp0.mlw:21:4:157]
@@ -165,12 +201,27 @@ File jlamp0.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
+    result of call at line 25, characters 11-18 [@call_result:25:11:18:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "5"}
+    result of call at line 25, characters 11-13 [@call_result:25:11:13:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "3"}
+    result of call at line 25, characters 16-18 [@call_result:25:16:18:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "2"}
   Line 26:
     [current iteration] c [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+    result of call at line 26, characters 11-17 [@call_result:26:11:17:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "4"}
+    result of call at line 26, characters 11-13 [@call_result:26:11:13:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "2"}
 
 File "bench/ce/jlamp0.mlw", line 22, characters 18-31:
 Sub-goal Loop invariant preservation of goal p2'vc.
@@ -219,6 +270,12 @@ File jlamp0.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
+    result of call at line 21, characters 10-18 [@call_result:21:10:18:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": true}
+    result of call at line 21, characters 10-12 [@call_result:21:10:12:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "10"}
   Line 22:
     [current iteration] c [@field:0:contents] [@introduced]
       [@model_trace:c] =
@@ -240,12 +297,27 @@ File jlamp0.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "13"}}]}}
+    result of call at line 25, characters 11-18 [@call_result:25:11:18:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "13"}
+    result of call at line 25, characters 11-13 [@call_result:25:11:13:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "3"}
+    result of call at line 25, characters 16-18 [@call_result:25:16:18:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "10"}
   Line 26:
     [current iteration] c [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "12"}}]}}
+    result of call at line 26, characters 11-17 [@call_result:26:11:17:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "12"}
+    result of call at line 26, characters 11-13 [@call_result:26:11:13:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "10"}
 
 File "bench/ce/jlamp0.mlw", line 23, characters 18-31:
 Sub-goal Loop invariant preservation of goal p2'vc.
@@ -287,6 +359,12 @@ File jlamp0.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "8"}}]}}
+    result of call at line 21, characters 10-18 [@call_result:21:10:18:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": true}
+    result of call at line 21, characters 10-12 [@call_result:21:10:12:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "8"}
   Line 23:
     [current iteration] a [@field:0:contents] [@introduced]
       [@model_trace:a] =
@@ -300,12 +378,27 @@ File jlamp0.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
+    result of call at line 25, characters 11-18 [@call_result:25:11:18:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "11"}
+    result of call at line 25, characters 11-13 [@call_result:25:11:13:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "3"}
+    result of call at line 25, characters 16-18 [@call_result:25:16:18:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "8"}
   Line 26:
     [current iteration] c [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
+    result of call at line 26, characters 11-17 [@call_result:26:11:17:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "10"}
+    result of call at line 26, characters 11-13 [@call_result:26:11:13:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "8"}
 
 File "bench/ce/jlamp0.mlw", line 19, characters 15-28:
 Sub-goal Postcondition of goal p2'vc.
@@ -353,4 +446,10 @@ File jlamp0.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
+    result of call at line 21, characters 10-18 [@call_result:21:10:18:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": false}
+    result of call at line 21, characters 10-12 [@call_result:21:10:12:bench/ce/jlamp0.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "11"}
 

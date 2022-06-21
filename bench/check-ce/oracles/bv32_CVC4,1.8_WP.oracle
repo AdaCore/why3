@@ -36,8 +36,6 @@
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "132"}}]}}
                           result = {"type": "Integer", "val": "132"}
-                          result = {"type": "Integer", "val": "66"}
-                          result = {"type": "Integer", "val": "66"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -259,8 +257,6 @@
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "132"}}]}}
                           result = {"type": "Integer", "val": "132"}
-                          result = {"type": "Integer", "val": "66"}
-                          result = {"type": "Integer", "val": "66"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -453,7 +449,7 @@
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/bv32.mlw", line 9, characters 14-29)
 File "bench/check-ce/bv32.mlw", line 9, characters 14-29:
 Sub-goal Postcondition of goal dummy_update'vc.
-Prover result is: Unknown (unknown + incomplete) (0.14s, 25915 steps).
+Prover result is: Unknown (unknown + incomplete) (0.13s, 25873 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -699,5 +695,5 @@ File bv32.mlw:
   - Abstract RAC: STUCK (failure in precondition of `dummy_update_with_int` at "bench/check-ce/bv32.mlw", line 13, characters 5-26)
 File "bench/check-ce/bv32.mlw", line 15, characters 14-28:
 Sub-goal Postcondition of goal dummy_update_with_int'vc.
-Prover result is: Step limit exceeded (0.36s, 150189 steps).
+Prover result is: Step limit exceeded (0.35s, 150151 steps).
 

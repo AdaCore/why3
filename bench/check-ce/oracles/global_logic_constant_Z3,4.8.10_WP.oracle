@@ -4,10 +4,8 @@
                         Line 6:
                           v1 = {"type": "Integer", "val": "2"}
                         Line 9:
-                          result = {"type": "Integer", "val": "2"}
-                          result = {"type": "Integer", "val": "2"}
+                          v1 = {"type": "Integer", "val": "2"}
                         Line 10:
-                          result = {"type": "Integer", "val": "2"}
                           result = {"type": "Integer", "val": "2"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
@@ -74,10 +72,8 @@
                         Line 6:
                           v1 = {"type": "Integer", "val": "2"}
                         Line 9:
-                          result = {"type": "Integer", "val": "2"}
-                          result = {"type": "Integer", "val": "2"}
+                          v1 = {"type": "Integer", "val": "2"}
                         Line 10:
-                          result = {"type": "Integer", "val": "2"}
                           result = {"type": "Integer", "val": "2"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
@@ -147,7 +143,7 @@
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 9, characters 14-24)
 File "bench/check-ce/global_logic_constant.mlw", line 9, characters 14-24:
 Sub-goal Postcondition of goal f1'vc.
-Prover result is: Unknown (sat) (0.03s, 1873 steps).
+Prover result is: Unknown (sat) (0.01s, 1811 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -194,7 +190,6 @@ File global_logic_constant.mlw:
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "2"}}]}}
                         Line 16:
-                          result = {"type": "Integer", "val": "2"}
                           result = {"type": "Integer", "val": "2"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
@@ -380,7 +375,7 @@ File global_logic_constant.mlw:
   - Abstract RAC: NORMAL
 File "bench/check-ce/global_logic_constant.mlw", line 15, characters 14-24:
 Sub-goal Postcondition of goal f2'vc.
-Prover result is: Step limit exceeded (0.49s, 3000026 steps).
+Prover result is: Step limit exceeded (0.48s, 3000028 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
