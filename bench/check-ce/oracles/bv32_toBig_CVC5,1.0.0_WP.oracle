@@ -39,10 +39,142 @@
 <rac-values>Value from model for parameter `i` at "bench/check-ce/bv32_toBig.mlw", line 8, characters 8-9: 8
 <rac-values>Value from model for return value of call to toBig at "bench/check-ce/bv32_toBig.mlw", line 8, characters 29-40 at "bench/check-ce/bv32_toBig.mlw", line 8, characters 29-40: 8
 <check-ce-rac-results>Results of RAC executions for model 0:
-                        - Concrete RAC: INCOMPLETE (terminated because Postcondition of `toBig` cannot be evaluated)
-                          
-                        - Abstract RAC: INCOMPLETE (terminated because Postcondition of `toBig` cannot be evaluated)
-                          
+                        - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 8, characters 27-40)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 493:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              ones = 0
+                            Line 514:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              ones = 0
+                          File bv32_toBig.mlw:
+                            Line 8:
+                              i = 8
+                              i = 8
+                              Execution of main function `ok` with env:
+                                i = 8
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                              (giant-step) execution of unimplemented function `toBig`
+                                _ = 8
+                              result of `toBig` = 8
+                              (giant-step) execution of unimplemented function `u`
+                                i = 8
+                              Property failure at precondition of `u` with:
+                                i = 8
+                        - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 8, characters 27-40)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 493:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              ones = 0
+                            Line 514:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              ones = 0
+                          File bv32_toBig.mlw:
+                            Line 8:
+                              i = 8
+                              i = 8
+                              Execution of main function `ok` with env:
+                                i = 8
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                              Giant-step execution of function `toBig` with args:
+                                _ = 8
+                              result of `toBig` = 8
+                              Giant-step execution of function `u` with args:
+                                i = 8
+                              Property failure at precondition of `u` with:
+                                i = 8
 <check-ce-rac-results>Check model 1 ("bench/check-ce/bv32_toBig.mlw", line 8, characters 27-40)
 <check-ce-rac-results>Checking model:
                       File bv32_toBig.mlw:
@@ -84,26 +216,221 @@
 <rac-values>Value from model for parameter `i` at "bench/check-ce/bv32_toBig.mlw", line 8, characters 8-9: 8
 <rac-values>Value from model for return value of call to toBig at "bench/check-ce/bv32_toBig.mlw", line 8, characters 29-40 at "bench/check-ce/bv32_toBig.mlw", line 8, characters 29-40: 8
 <check-ce-rac-results>Results of RAC executions for model 1:
-                        - Concrete RAC: INCOMPLETE (terminated because Postcondition of `toBig` cannot be evaluated)
-                          
-                        - Abstract RAC: INCOMPLETE (terminated because Postcondition of `toBig` cannot be evaluated)
-                          
+                        - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 8, characters 27-40)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 493:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              ones = 0
+                            Line 514:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              ones = 0
+                          File bv32_toBig.mlw:
+                            Line 8:
+                              i = 8
+                              i = 8
+                              Execution of main function `ok` with env:
+                                i = 8
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                              (giant-step) execution of unimplemented function `toBig`
+                                _ = 8
+                              result of `toBig` = 8
+                              (giant-step) execution of unimplemented function `u`
+                                i = 8
+                              Property failure at precondition of `u` with:
+                                i = 8
+                        - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 8, characters 27-40)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 493:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              ones = 0
+                            Line 514:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              ones = 0
+                          File bv32_toBig.mlw:
+                            Line 8:
+                              i = 8
+                              i = 8
+                              Execution of main function `ok` with env:
+                                i = 8
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                              Giant-step execution of function `toBig` with args:
+                                _ = 8
+                              result of `toBig` = 8
+                              Giant-step execution of function `u` with args:
+                                i = 8
+                              Property failure at precondition of `u` with:
+                                i = 8
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `toBig` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `toBig` cannot be evaluated)
-- Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `toBig` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `toBig` cannot be evaluated)
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 8, characters 27-40)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 8, characters 27-40)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 8, characters 27-40)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 8, characters 27-40)
 File "bench/check-ce/bv32_toBig.mlw", line 8, characters 27-40:
 Sub-goal Precondition of goal ok'vc.
-Prover result is: Unknown (unknown + incomplete) (0.94s, 120834 steps).
-The following counterexample model could not be verified
-  (both RAC terminated because Postcondition of `toBig` cannot be evaluated):
+Prover result is: Unknown (unknown + incomplete) (0.95s, 120834 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File bv.mlw:
+  Line 493:
+    Constant zeros initialization
+  Line 120:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 493:
+    zeros = 0
+    Constant one initialization
+  Line 124:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 493:
+    one = 0
+    Constant ones initialization
+  Line 126:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 493:
+    ones = 0
+  Line 514:
+    Constant zeros initialization
+  Line 120:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 514:
+    zeros = 0
+    Constant one initialization
+  Line 124:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 514:
+    one = 0
+    Constant ones initialization
+  Line 126:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 514:
+    ones = 0
 File bv32_toBig.mlw:
   Line 8:
     i = 8
-    result of call at line 8, characters 29-40 = 8
+    i = 8
+    Execution of main function `ok` with env:
+      i = 8
+      zero = 0
+      one = 1
+      zeros = 0
+      one = 0
+      ones = 0
+      zeros = 0
+      one = 0
+      ones = 0
+    (giant-step) execution of unimplemented function `toBig`
+      _ = 8
+    result of `toBig` = 8
+    (giant-step) execution of unimplemented function `u`
+      i = 8
+    Property failure at precondition of `u` with:
+      i = 8
 
 <check-ce-rac-results>Check model 0 ("bench/check-ce/bv32_toBig.mlw", line 10, characters 27-41)
 <check-ce-rac-results>Checking model:
@@ -146,10 +473,142 @@ File bv32_toBig.mlw:
 <rac-values>Value from model for parameter `i` at "bench/check-ce/bv32_toBig.mlw", line 10, characters 8-9: 8
 <rac-values>Value from model for return value of call to stoBig at "bench/check-ce/bv32_toBig.mlw", line 10, characters 29-41 at "bench/check-ce/bv32_toBig.mlw", line 10, characters 29-41: 8
 <check-ce-rac-results>Results of RAC executions for model 0:
-                        - Concrete RAC: INCOMPLETE (terminated because Postcondition of `stoBig` cannot be evaluated)
-                          
-                        - Abstract RAC: INCOMPLETE (terminated because Postcondition of `stoBig` cannot be evaluated)
-                          
+                        - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 10, characters 27-41)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 493:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              ones = 0
+                            Line 514:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              ones = 0
+                          File bv32_toBig.mlw:
+                            Line 10:
+                              i = 8
+                              i = 8
+                              Execution of main function `ko` with env:
+                                i = 8
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                              (giant-step) execution of unimplemented function `stoBig`
+                                _ = 8
+                              result of `stoBig` = 8
+                              (giant-step) execution of unimplemented function `u`
+                                i = 8
+                              Property failure at precondition of `u` with:
+                                i = 8
+                        - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 10, characters 27-41)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 493:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              ones = 0
+                            Line 514:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              ones = 0
+                          File bv32_toBig.mlw:
+                            Line 10:
+                              i = 8
+                              i = 8
+                              Execution of main function `ko` with env:
+                                i = 8
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                              Giant-step execution of function `stoBig` with args:
+                                _ = 8
+                              result of `stoBig` = 8
+                              Giant-step execution of function `u` with args:
+                                i = 8
+                              Property failure at precondition of `u` with:
+                                i = 8
 <check-ce-rac-results>Check model 1 ("bench/check-ce/bv32_toBig.mlw", line 10, characters 27-41)
 <check-ce-rac-results>Checking model:
                       File bv32_toBig.mlw:
@@ -191,26 +650,221 @@ File bv32_toBig.mlw:
 <rac-values>Value from model for parameter `i` at "bench/check-ce/bv32_toBig.mlw", line 10, characters 8-9: 8
 <rac-values>Value from model for return value of call to stoBig at "bench/check-ce/bv32_toBig.mlw", line 10, characters 29-41 at "bench/check-ce/bv32_toBig.mlw", line 10, characters 29-41: 8
 <check-ce-rac-results>Results of RAC executions for model 1:
-                        - Concrete RAC: INCOMPLETE (terminated because Postcondition of `stoBig` cannot be evaluated)
-                          
-                        - Abstract RAC: INCOMPLETE (terminated because Postcondition of `stoBig` cannot be evaluated)
-                          
+                        - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 10, characters 27-41)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 493:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              ones = 0
+                            Line 514:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              ones = 0
+                          File bv32_toBig.mlw:
+                            Line 10:
+                              i = 8
+                              i = 8
+                              Execution of main function `ko` with env:
+                                i = 8
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                              (giant-step) execution of unimplemented function `stoBig`
+                                _ = 8
+                              result of `stoBig` = 8
+                              (giant-step) execution of unimplemented function `u`
+                                i = 8
+                              Property failure at precondition of `u` with:
+                                i = 8
+                        - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 10, characters 27-41)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 493:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              ones = 0
+                            Line 514:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              ones = 0
+                          File bv32_toBig.mlw:
+                            Line 10:
+                              i = 8
+                              i = 8
+                              Execution of main function `ko` with env:
+                                i = 8
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                              Giant-step execution of function `stoBig` with args:
+                                _ = 8
+                              result of `stoBig` = 8
+                              Giant-step execution of function `u` with args:
+                                i = 8
+                              Property failure at precondition of `u` with:
+                                i = 8
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `stoBig` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `stoBig` cannot be evaluated)
-- Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `stoBig` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `stoBig` cannot be evaluated)
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 10, characters 27-41)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 10, characters 27-41)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 10, characters 27-41)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 10, characters 27-41)
 File "bench/check-ce/bv32_toBig.mlw", line 10, characters 27-41:
 Sub-goal Precondition of goal ko'vc.
-Prover result is: Unknown (unknown + incomplete) (0.91s, 120821 steps).
-The following counterexample model could not be verified
-  (both RAC terminated because Postcondition of `stoBig` cannot be evaluated):
+Prover result is: Unknown (unknown + incomplete) (0.97s, 120821 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File bv.mlw:
+  Line 493:
+    Constant zeros initialization
+  Line 120:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 493:
+    zeros = 0
+    Constant one initialization
+  Line 124:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 493:
+    one = 0
+    Constant ones initialization
+  Line 126:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 493:
+    ones = 0
+  Line 514:
+    Constant zeros initialization
+  Line 120:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 514:
+    zeros = 0
+    Constant one initialization
+  Line 124:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 514:
+    one = 0
+    Constant ones initialization
+  Line 126:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 514:
+    ones = 0
 File bv32_toBig.mlw:
   Line 10:
     i = 8
-    result of call at line 10, characters 29-41 = 8
+    i = 8
+    Execution of main function `ko` with env:
+      i = 8
+      zero = 0
+      one = 1
+      zeros = 0
+      one = 0
+      ones = 0
+      zeros = 0
+      one = 0
+      ones = 0
+    (giant-step) execution of unimplemented function `stoBig`
+      _ = 8
+    result of `stoBig` = 8
+    (giant-step) execution of unimplemented function `u`
+      i = 8
+    Property failure at precondition of `u` with:
+      i = 8
 
 <check-ce-rac-results>Check model 0 ("bench/check-ce/bv32_toBig.mlw", line 13, characters 14-40)
 <check-ce-rac-results>Checking model:
@@ -262,10 +916,140 @@ File bv32_toBig.mlw:
 <rac-values>Value from model for parameter `i` at "bench/check-ce/bv32_toBig.mlw", line 12, characters 9-10: 2147483648
 <rac-values>Value from model for return value of call to stoBig at "bench/check-ce/bv32_toBig.mlw", line 13, characters 45-55 at "bench/check-ce/bv32_toBig.mlw", line 13, characters 45-55: 18446744071562067968
 <check-ce-rac-results>Results of RAC executions for model 0:
-                        - Concrete RAC: INCOMPLETE (terminated because Postcondition of `stoBig` cannot be evaluated)
-                          
-                        - Abstract RAC: INCOMPLETE (terminated because Postcondition of `stoBig` cannot be evaluated)
-                          
+                        - Concrete RAC: FAILURE (postcondition at "bench/check-ce/bv32_toBig.mlw", line 13, characters 14-40)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 493:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              ones = 0
+                            Line 514:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              ones = 0
+                          File bv32_toBig.mlw:
+                            Line 12:
+                              i = 2147483648
+                              i = 2147483648
+                              Execution of main function `ko2` with env:
+                                i = 2147483648
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                            Line 13:
+                              (giant-step) execution of unimplemented function `stoBig`
+                                _ = 2147483648
+                              result of `stoBig` = 18446744071562067968
+                              Property failure at postcondition of `ko2` with:
+                                result = 18446744071562067968
+                        - Abstract RAC: FAILURE (postcondition at "bench/check-ce/bv32_toBig.mlw", line 13, characters 14-40)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 493:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              ones = 0
+                            Line 514:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              ones = 0
+                          File bv32_toBig.mlw:
+                            Line 12:
+                              i = 2147483648
+                              i = 2147483648
+                              Execution of main function `ko2` with env:
+                                i = 2147483648
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                            Line 13:
+                              Giant-step execution of function `stoBig` with args:
+                                _ = 2147483648
+                              result of `stoBig` = 18446744071562067968
+                              Property failure at postcondition of `ko2` with:
+                                result = 18446744071562067968
 <check-ce-rac-results>Check model 1 ("bench/check-ce/bv32_toBig.mlw", line 13, characters 14-40)
 <check-ce-rac-results>Checking model:
                       File bv32_toBig.mlw:
@@ -316,27 +1100,216 @@ File bv32_toBig.mlw:
 <rac-values>Value from model for parameter `i` at "bench/check-ce/bv32_toBig.mlw", line 12, characters 9-10: 2147483648
 <rac-values>Value from model for return value of call to stoBig at "bench/check-ce/bv32_toBig.mlw", line 13, characters 45-55 at "bench/check-ce/bv32_toBig.mlw", line 13, characters 45-55: 18446744071562067968
 <check-ce-rac-results>Results of RAC executions for model 1:
-                        - Concrete RAC: INCOMPLETE (terminated because Postcondition of `stoBig` cannot be evaluated)
-                          
-                        - Abstract RAC: INCOMPLETE (terminated because Postcondition of `stoBig` cannot be evaluated)
-                          
+                        - Concrete RAC: FAILURE (postcondition at "bench/check-ce/bv32_toBig.mlw", line 13, characters 14-40)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 493:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              ones = 0
+                            Line 514:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              ones = 0
+                          File bv32_toBig.mlw:
+                            Line 12:
+                              i = 2147483648
+                              i = 2147483648
+                              Execution of main function `ko2` with env:
+                                i = 2147483648
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                            Line 13:
+                              (giant-step) execution of unimplemented function `stoBig`
+                                _ = 2147483648
+                              result of `stoBig` = 18446744071562067968
+                              Property failure at postcondition of `ko2` with:
+                                result = 18446744071562067968
+                        - Abstract RAC: FAILURE (postcondition at "bench/check-ce/bv32_toBig.mlw", line 13, characters 14-40)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 493:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 493:
+                              ones = 0
+                            Line 514:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              ones = 0
+                          File bv32_toBig.mlw:
+                            Line 12:
+                              i = 2147483648
+                              i = 2147483648
+                              Execution of main function `ko2` with env:
+                                i = 2147483648
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                            Line 13:
+                              Giant-step execution of function `stoBig` with args:
+                                _ = 2147483648
+                              result of `stoBig` = 18446744071562067968
+                              Property failure at postcondition of `ko2` with:
+                                result = 18446744071562067968
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `stoBig` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `stoBig` cannot be evaluated)
-- Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `stoBig` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `stoBig` cannot be evaluated)
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/bv32_toBig.mlw", line 13, characters 14-40)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/bv32_toBig.mlw", line 13, characters 14-40)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/bv32_toBig.mlw", line 13, characters 14-40)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/bv32_toBig.mlw", line 13, characters 14-40)
 File "bench/check-ce/bv32_toBig.mlw", line 13, characters 14-40:
 Sub-goal Postcondition of goal ko2'vc.
-Prover result is: Unknown (unknown + incomplete) (0.89s, 121022 steps).
-The following counterexample model could not be verified
-  (both RAC terminated because Postcondition of `stoBig` cannot be evaluated):
+Prover result is: Unknown (unknown + incomplete) (0.96s, 121022 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File bv.mlw:
+  Line 493:
+    Constant zeros initialization
+  Line 120:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 493:
+    zeros = 0
+    Constant one initialization
+  Line 124:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 493:
+    one = 0
+    Constant ones initialization
+  Line 126:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 493:
+    ones = 0
+  Line 514:
+    Constant zeros initialization
+  Line 120:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 514:
+    zeros = 0
+    Constant one initialization
+  Line 124:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 514:
+    one = 0
+    Constant ones initialization
+  Line 126:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 514:
+    ones = 0
 File bv32_toBig.mlw:
   Line 12:
-    i = 2147483648 (0X80000000)
+    i = 2147483648
+    i = 2147483648
+    Execution of main function `ko2` with env:
+      i = 2147483648
+      zero = 0
+      one = 1
+      zeros = 0
+      one = 0
+      ones = 0
+      zeros = 0
+      one = 0
+      ones = 0
   Line 13:
-    result of call at line 13, characters 45-55 =
-      18446744071562067968 (0XFFFFFFFF80000000)
-    result = 18446744071562067968 (0XFFFFFFFF80000000)
+    (giant-step) execution of unimplemented function `stoBig`
+      _ = 2147483648
+    result of `stoBig` = 18446744071562067968
+    Property failure at postcondition of `ko2` with:
+      result = 18446744071562067968
 

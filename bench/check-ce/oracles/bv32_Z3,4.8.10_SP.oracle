@@ -75,10 +75,152 @@
                                                                     34}
 <rac-values>Value from model for return value of call to add at "bench/check-ce/bv32.mlw", line 11, characters 9-16 at "bench/check-ce/bv32.mlw", line 11, characters 9-16: 132
 <check-ce-rac-results>Results of RAC executions for model 0:
-                        - Concrete RAC: INCOMPLETE (terminated because Postcondition of `add` cannot be evaluated)
-                          
-                        - Abstract RAC: INCOMPLETE (terminated because Postcondition of `add` cannot be evaluated)
-                          
+                        - Concrete RAC: FAILURE (postcondition at "bench/check-ce/bv32.mlw", line 9, characters 14-29)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 472:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 472:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 472:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 472:
+                              ones = 0
+                            Line 514:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              ones = 0
+                          File bv32.mlw:
+                            Line 7:
+                              r = {contents= 34}
+                              r = {contents= 34}
+                              Execution of main function `dummy_update` with env:
+                                r = {contents= 34}
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                            Line 11:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 66}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 66}
+                              (giant-step) execution of unimplemented function `add`
+                                v1 = 66
+                                v2 = 66
+                              result of `add` = 132
+                            Line 9:
+                              Property failure at postcondition of `dummy_update` with:
+                                r = {contents= 132}
+                        - Abstract RAC: FAILURE (postcondition at "bench/check-ce/bv32.mlw", line 9, characters 14-29)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 472:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 472:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 472:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 472:
+                              ones = 0
+                            Line 514:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              ones = 0
+                          File bv32.mlw:
+                            Line 7:
+                              r = {contents= 34}
+                              r = {contents= 34}
+                              Execution of main function `dummy_update` with env:
+                                r = {contents= 34}
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                            Line 11:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 66}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 66}
+                              Giant-step execution of function `add` with args:
+                                v1 = 66
+                                v2 = 66
+                              result of `add` = 132
+                            Line 9:
+                              Property failure at postcondition of `dummy_update` with:
+                                r = {contents= 132}
 <check-ce-rac-results>Check model 1 ("bench/check-ce/bv32.mlw", line 9, characters 14-29)
 <check-ce-rac-results>Checking model:
                       
@@ -244,29 +386,89 @@
                               Execution got stuck at precondition of `dummy_update` with:
                                 r = {contents= 0}
 <check-ce-categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `add` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `add` cannot be evaluated)
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/bv32.mlw", line 9, characters 14-29)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/bv32.mlw", line 9, characters 14-29)
 - Checked model 1: BAD_CE
   - Concrete RAC: STUCK (failure in precondition of `dummy_update` at "bench/check-ce/bv32.mlw", line 7, characters 6-18)
   - Abstract RAC: STUCK (failure in precondition of `dummy_update` at "bench/check-ce/bv32.mlw", line 7, characters 6-18)
 File "bench/check-ce/bv32.mlw", line 9, characters 14-29:
 Sub-goal Postcondition of goal dummy_update'vc.
-Prover result is: Step limit exceeded (3.26s, 3000055 steps).
-The following counterexample model could not be verified
-  (both RAC terminated because Postcondition of `add` cannot be evaluated):
+Prover result is: Step limit exceeded (2.82s, 3000055 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File bv.mlw:
+  Line 472:
+    Constant zeros initialization
+  Line 120:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 472:
+    zeros = 0
+    Constant one initialization
+  Line 124:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 472:
+    one = 0
+    Constant ones initialization
+  Line 126:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 472:
+    ones = 0
+  Line 514:
+    Constant zeros initialization
+  Line 120:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 514:
+    zeros = 0
+    Constant one initialization
+  Line 124:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 514:
+    one = 0
+    Constant ones initialization
+  Line 126:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 514:
+    ones = 0
 File bv32.mlw:
   Line 7:
-    r = 34 (0X22)
-  Line 9:
-    r = 132 (0X84)
-  Line 10:
-    r = 66 (0X42)
+    r = {contents= 34}
+    r = {contents= 34}
+    Execution of main function `dummy_update` with env:
+      r = {contents= 34}
+      zero = 0
+      one = 1
+      zeros = 0
+      one = 0
+      ones = 0
+      zeros = 0
+      one = 0
+      ones = 0
   Line 11:
-    r = 132 (0X84)
-    result of call at line 11, characters 9-16 = 132 (0X84)
-    result of call at line 11, characters 13-14 = 66 (0X42)
-    result of call at line 11, characters 15-16 = 66 (0X42)
+    Normal execution of function `contents` with args:
+      arg = {contents= 66}
+    Normal execution of function `contents` with args:
+      arg = {contents= 66}
+    (giant-step) execution of unimplemented function `add`
+      v1 = 66
+      v2 = 66
+    result of `add` = 132
+  Line 9:
+    Property failure at postcondition of `dummy_update` with:
+      r = {contents= 132}
 
 <check-ce-rac-results>Check model 0 ("bench/check-ce/bv32.mlw", line 15, characters 14-28)
 <check-ce-rac-results>Checking model:
@@ -325,6 +527,7 @@ File bv32.mlw:
 <rac-values>RHS evaluated for global `ones` at "WHY3DATA/stdlib/bv.mlw", line 514, characters 2-259: 0
 <rac-values>Value from model for parameter `r` at "bench/check-ce/bv32.mlw", line 13, characters 32-33: {contents=
                                                                     34}
+<rac-values>Value from model for return value of call to add at "bench/check-ce/bv32.mlw", line 17, characters 9-16 at "bench/check-ce/bv32.mlw", line 17, characters 9-16: 132
 <check-ce-rac-results>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -342,11 +545,154 @@ File bv32.mlw:
 <rac-values>RHS evaluated for global `ones` at "WHY3DATA/stdlib/bv.mlw", line 514, characters 2-259: 0
 <rac-values>Value from model for parameter `r` at "bench/check-ce/bv32.mlw", line 13, characters 32-33: {contents=
                                                                     34}
+<rac-values>Value from model for return value of call to add at "bench/check-ce/bv32.mlw", line 17, characters 9-16 at "bench/check-ce/bv32.mlw", line 17, characters 9-16: 132
 <check-ce-rac-results>Results of RAC executions for model 0:
-                        - Concrete RAC: INCOMPLETE (terminated because Precondition of `dummy_update_with_int` cannot be evaluated)
-                          
-                        - Abstract RAC: INCOMPLETE (terminated because Precondition of `dummy_update_with_int` cannot be evaluated)
-                          
+                        - Concrete RAC: FAILURE (postcondition at "bench/check-ce/bv32.mlw", line 15, characters 14-28)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 472:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 472:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 472:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 472:
+                              ones = 0
+                            Line 514:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              ones = 0
+                          File bv32.mlw:
+                            Line 13:
+                              r = {contents= 34}
+                              r = {contents= 34}
+                              Execution of main function `dummy_update_with_int` with env:
+                                r = {contents= 34}
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                            Line 17:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 66}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 66}
+                              (giant-step) execution of unimplemented function `add`
+                                v1 = 66
+                                v2 = 66
+                              result of `add` = 132
+                            Line 15:
+                              Property failure at postcondition of `dummy_update_with_int` with:
+                                r = {contents= 132}
+                        - Abstract RAC: FAILURE (postcondition at "bench/check-ce/bv32.mlw", line 15, characters 14-28)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 472:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 472:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 472:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 472:
+                              ones = 0
+                            Line 514:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              ones = 0
+                          File bv32.mlw:
+                            Line 13:
+                              r = {contents= 34}
+                              r = {contents= 34}
+                              Execution of main function `dummy_update_with_int` with env:
+                                r = {contents= 34}
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                            Line 17:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 66}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 66}
+                              Giant-step execution of function `add` with args:
+                                v1 = 66
+                                v2 = 66
+                              result of `add` = 132
+                            Line 15:
+                              Property failure at postcondition of `dummy_update_with_int` with:
+                                r = {contents= 132}
 <check-ce-rac-results>Check model 1 ("bench/check-ce/bv32.mlw", line 15, characters 14-28)
 <check-ce-rac-results>Checking model:
                       
@@ -385,32 +731,214 @@ File bv32.mlw:
 <rac-values>Type default value for parameter `r` at "bench/check-ce/bv32.mlw", line 13, characters 32-33: {contents=
                                                                     0}
 <check-ce-rac-results>Results of RAC executions for model 1:
-                        - Concrete RAC: INCOMPLETE (terminated because Precondition of `dummy_update_with_int` cannot be evaluated)
-                          
-                        - Abstract RAC: INCOMPLETE (terminated because Precondition of `dummy_update_with_int` cannot be evaluated)
-                          
+                        - Concrete RAC: STUCK (failure in precondition of `dummy_update_with_int` at "bench/check-ce/bv32.mlw", line 13, characters 5-26)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 472:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 472:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 472:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 472:
+                              ones = 0
+                            Line 514:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              ones = 0
+                          File bv32.mlw:
+                            Line 13:
+                              r = {contents= 0}
+                              r = {contents= 0}
+                              Execution of main function `dummy_update_with_int` with env:
+                                r = {contents= 0}
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                              Execution got stuck at precondition of `dummy_update_with_int` with:
+                                r = {contents= 0}
+                        - Abstract RAC: STUCK (failure in precondition of `dummy_update_with_int` at "bench/check-ce/bv32.mlw", line 13, characters 5-26)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 472:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 472:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 472:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 472:
+                              ones = 0
+                            Line 514:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 514:
+                              ones = 0
+                          File bv32.mlw:
+                            Line 13:
+                              r = {contents= 0}
+                              r = {contents= 0}
+                              Execution of main function `dummy_update_with_int` with env:
+                                r = {contents= 0}
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                              Execution got stuck at precondition of `dummy_update_with_int` with:
+                                r = {contents= 0}
 <check-ce-categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `dummy_update_with_int` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `dummy_update_with_int` cannot be evaluated)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `dummy_update_with_int` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `dummy_update_with_int` cannot be evaluated)
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/bv32.mlw", line 15, characters 14-28)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/bv32.mlw", line 15, characters 14-28)
+- Checked model 1: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `dummy_update_with_int` at "bench/check-ce/bv32.mlw", line 13, characters 5-26)
+  - Abstract RAC: STUCK (failure in precondition of `dummy_update_with_int` at "bench/check-ce/bv32.mlw", line 13, characters 5-26)
 File "bench/check-ce/bv32.mlw", line 15, characters 14-28:
 Sub-goal Postcondition of goal dummy_update_with_int'vc.
-Prover result is: Step limit exceeded (0.70s, 3000059 steps).
-The following counterexample model could not be verified
-  (both RAC terminated because Precondition of `dummy_update_with_int` cannot be evaluated):
+Prover result is: Step limit exceeded (0.65s, 3000059 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File bv.mlw:
+  Line 472:
+    Constant zeros initialization
+  Line 120:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 472:
+    zeros = 0
+    Constant one initialization
+  Line 124:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 472:
+    one = 0
+    Constant ones initialization
+  Line 126:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 472:
+    ones = 0
+  Line 514:
+    Constant zeros initialization
+  Line 120:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 514:
+    zeros = 0
+    Constant one initialization
+  Line 124:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 514:
+    one = 0
+    Constant ones initialization
+  Line 126:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 514:
+    ones = 0
 File bv32.mlw:
   Line 13:
-    r = 34 (0X22)
-  Line 15:
-    r = 132 (0X84)
-  Line 16:
-    r = 66 (0X42)
+    r = {contents= 34}
+    r = {contents= 34}
+    Execution of main function `dummy_update_with_int` with env:
+      r = {contents= 34}
+      zero = 0
+      one = 1
+      zeros = 0
+      one = 0
+      ones = 0
+      zeros = 0
+      one = 0
+      ones = 0
   Line 17:
-    r = 132 (0X84)
-    result of call at line 17, characters 9-16 = 132 (0X84)
-    result of call at line 17, characters 13-14 = 66 (0X42)
-    result of call at line 17, characters 15-16 = 66 (0X42)
+    Normal execution of function `contents` with args:
+      arg = {contents= 66}
+    Normal execution of function `contents` with args:
+      arg = {contents= 66}
+    (giant-step) execution of unimplemented function `add`
+      v1 = 66
+      v2 = 66
+    result of `add` = 132
+  Line 15:
+    Property failure at postcondition of `dummy_update_with_int` with:
+      r = {contents= 132}
 
