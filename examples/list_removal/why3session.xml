@@ -5,6 +5,7 @@
 <prover id="0" name="Eprover" version="2.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.8.6" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC5" version="1.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="list_removal.mlw"/>
@@ -22,25 +23,25 @@
  <goal name="list_concat&#39;vc" expl="VC for list_concat" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="list_concat&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="18"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
   <goal name="list_concat&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="18"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
   <goal name="list_concat&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="18"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
   <goal name="list_concat&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="1938"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="1965"/></proof>
   </goal>
   <goal name="list_concat&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="1204"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="1229"/></proof>
   </goal>
   <goal name="list_concat&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="1209"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="1234"/></proof>
   </goal>
   <goal name="list_concat&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.00" steps="35"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.00" steps="37"/></proof>
   </goal>
  </transf>
  </goal>
@@ -53,40 +54,40 @@
  <goal name="no_cycle_to_null&#39;vc" expl="VC for no_cycle_to_null" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="no_cycle_to_null&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="18"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
   <goal name="no_cycle_to_null&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="18"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
   <goal name="no_cycle_to_null&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="2408"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="2435"/></proof>
   </goal>
   <goal name="no_cycle_to_null&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="1679"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="1704"/></proof>
   </goal>
   <goal name="no_cycle_to_null&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="2637"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="2664"/></proof>
   </goal>
   <goal name="no_cycle_to_null&#39;vc.5" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
-  </goal>
-  <goal name="no_cycle_to_null&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="20"/></proof>
-  </goal>
-  <goal name="no_cycle_to_null&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="20"/></proof>
-  </goal>
-  <goal name="no_cycle_to_null&#39;vc.8" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="no_cycle_to_null&#39;vc.9" expl="precondition" proved="true">
+  <goal name="no_cycle_to_null&#39;vc.6" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="22"/></proof>
   </goal>
+  <goal name="no_cycle_to_null&#39;vc.7" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="22"/></proof>
+  </goal>
+  <goal name="no_cycle_to_null&#39;vc.8" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="24"/></proof>
+  </goal>
+  <goal name="no_cycle_to_null&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="24"/></proof>
+  </goal>
   <goal name="no_cycle_to_null&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="25"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="27"/></proof>
   </goal>
   <goal name="no_cycle_to_null&#39;vc.11" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="18"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
  </transf>
  </goal>
@@ -96,37 +97,37 @@
   <proof prover="4"><result status="valid" time="0.06" steps="2593"/></proof>
   </goal>
   <goal name="jump_over&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="1929"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="1954"/></proof>
   </goal>
   <goal name="jump_over&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="2136"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="2163"/></proof>
   </goal>
   <goal name="jump_over&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="3168"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="3195"/></proof>
   </goal>
   <goal name="jump_over&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="9617"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="9644"/></proof>
   </goal>
   <goal name="jump_over&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="1972"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="1997"/></proof>
   </goal>
   <goal name="jump_over&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="3391"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="3418"/></proof>
   </goal>
   <goal name="jump_over&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="3115"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="5606"/></proof>
   </goal>
   <goal name="jump_over&#39;vc.8" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="1885"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="1910"/></proof>
   </goal>
   <goal name="jump_over&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="1871"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="1896"/></proof>
   </goal>
   <goal name="jump_over&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="2728"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="2755"/></proof>
   </goal>
   <goal name="jump_over&#39;vc.11" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="15442"/></proof>
+  <proof prover="3"><result status="valid" time="0.18" steps="25597"/></proof>
   </goal>
   <goal name="jump_over&#39;vc.12" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="1814"/></proof>
