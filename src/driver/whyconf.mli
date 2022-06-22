@@ -93,7 +93,9 @@ val set_load_default_plugins: bool -> config -> config
 (** Set if the plugins in the default path should be loaded *)
 
 val libdir: main -> string
+val set_libdir : main -> string -> main
 val datadir: main -> string
+val set_datadir : main -> string -> main
 val loadpath: main -> string list
 val set_loadpath : main -> string list -> main
 val timelimit: main -> int
@@ -287,7 +289,9 @@ module User: sig
 
   val set_limits : time:int -> mem:int -> j:int -> config -> config
 
+(*
   val set_dirs : libdir:string -> datadir:string -> config -> config
+ *)
 
   val set_prover_upgrade_policy :
     config -> Mprover.key -> prover_upgrade_policy -> config
@@ -342,21 +346,6 @@ module Args : sig
   val common_options : Getopt.opt list
 
 end
-
-(** Loading drivers with relative names *)
-
-val load_driver_raw : main -> Env.env -> string -> string list -> Driver.driver
-(** [load_driver_raw main env file extras] loads the driver in file
-   [file] and with additional drivers in list [extras], in the context
-   of the configuration [main] and environment [env].  This function
-   is a wrapper to the lower level function
-   {!Driver.load_driver_absolute}. *)
-
-val load_driver : main -> Env.env -> config_prover -> Driver.driver
-(** [load_driver main env p] loads the driver for prover [p],
-   in the context of the configuration [main] and environment [env].
-   This function is a wrapper to the lower level function
-   {!load_driver_raw}. *)
 
 val unknown_to_known_provers  :
   config_prover Mprover.t -> prover ->

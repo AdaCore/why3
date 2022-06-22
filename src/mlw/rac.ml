@@ -229,15 +229,12 @@ module Why = struct
     why_prover        : why_prover option;
     oracle_quant_var  : oracle_quant_var;
     elim_eps          : Task.task Trans.trans;
-    libdir            : string;
-    datadir           : string;
+    main_config       : Whyconf.main;
   }
 
   let mk_config ?(metas=[]) ?trans ?why_prover ?(oracle_quant_var=oracle_quant_var_dummy) ~elim_eps whyconfig =
-    let main = Whyconf.get_main whyconfig in
-    let libdir = Whyconf.libdir main in
-    let datadir = Whyconf.datadir main in
-    {metas; trans; why_prover; oracle_quant_var; elim_eps; libdir; datadir}
+    let main_config = Whyconf.get_main whyconfig in
+    {metas; trans; why_prover; oracle_quant_var; elim_eps; main_config}
 
   let mk_meta_lit (meta, s) =
     let open Theory in
@@ -266,7 +263,7 @@ module Why = struct
           | _ -> failwith "RAC reduce prover config must have format <prover>[ <time limit>[ <mem limit>]]" in
         let pr = Whyconf.filter_one_prover config (Whyconf.parse_filter_prover name) in
         let command = String.concat " " (pr.Whyconf.command :: pr.Whyconf.extra_options) in
-        let driver = Whyconf.load_driver (Whyconf.get_main config) env pr in
+        let driver = Driver.load_driver (Whyconf.get_main config) env pr in
         let limit = Call_provers.{empty_limit with limit_time; limit_mem} in
         mk_why_prover ~command driver limit in
       Opt.map aux why_prover_lit in
@@ -368,7 +365,7 @@ module Why = struct
     let open Call_provers in
     let call =
       Driver.prove_task
-        ~command ~libdir:cnf.libdir ~datadir:cnf.datadir
+        ~command ~config:cnf.main_config
         ~limit driver task
     in
     let res = wait_on_call call in

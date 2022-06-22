@@ -124,8 +124,7 @@ val limit_max : resource_limit -> resource_limit -> resource_limit
 (* return the limit object whose components represent the maximum of the
    corresponding components of the arguments *)
 
-val call_editor :
-  libdir:string -> datadir:string -> command:string -> string -> prover_call
+val call_editor : config:Whyconf.main -> command:string -> string -> prover_call
 
 (* internal use only
 val call_on_file :
@@ -141,8 +140,7 @@ val call_on_file :
 
 val call_on_buffer :
   command         : string ->
-  libdir          : string ->
-  datadir         : string ->
+  config          : Whyconf.main ->
   limit           : resource_limit ->
   res_parser      : prover_result_parser ->
   filename        : string ->
@@ -170,9 +168,8 @@ val call_on_buffer :
     @param gen_new_file When set, this generates a new temp file to run the
     prover on. Otherwise it reuses the filename already given.
 
-    @param libdir should be the user-configurated libdir.
+    @param config the main configuration data for Why3 (see [Whyconf]).
 
-    @param datadir should be the user-configurated datadir.
 
 *)
 
@@ -190,7 +187,7 @@ val query_call : prover_call -> prover_update
 (** non-blocking function that reports any new updates
     from the server related to a given prover call. *)
 
-val interrupt_call : libdir:string -> prover_call -> unit
+val interrupt_call : config:Whyconf.main -> prover_call -> unit
 (** non-blocking function that asks for prover interruption *)
 
 val wait_on_call : prover_call -> prover_result

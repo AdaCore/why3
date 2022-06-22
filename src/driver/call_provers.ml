@@ -348,7 +348,7 @@ let parse_prover_run res_parser signaled time out exitcode limit get_counterexmp
     pr_models = models;
   }
 
-let actualcommand ~libdir ~datadir command limit file =
+let actualcommand ~config command limit file =
   let stime = string_of_int limit.limit_time in
   let smem = string_of_int limit.limit_mem in
   let arglist = Cmdline.cmdline_split command in
@@ -360,8 +360,8 @@ let actualcommand ~libdir ~datadir command limit file =
     | "f" -> use_stdin := false; file
     | "t" -> on_timelimit := true; stime
     | "m" -> smem
-    | "l" -> libdir
-    | "d" -> datadir
+    | "l" -> Whyconf.libdir config
+    | "d" -> Whyconf.datadir config
     | "S" -> string_of_int limit.limit_steps
     | _ -> failwith "unknown specifier, use %%, %f, %t, %m, %l, %d or %S"
   in
@@ -370,10 +370,10 @@ let actualcommand ~libdir ~datadir command limit file =
   in
   args, !use_stdin, !on_timelimit
 
-let actualcommand ~cleanup ~inplace ~libdir ~datadir command limit file =
+let actualcommand ~cleanup ~inplace ~config command limit file =
   try
     let (cmd, _,_) as x =
-      actualcommand ~libdir ~datadir command limit file
+      actualcommand ~config command limit file
     in
     Debug.dprintf debug "@[<hv 2>Call_provers: actual command is:@ @[%a@]@]@."
                   (Pp.print_list Pp.space pp_print_string) cmd;
@@ -456,11 +456,11 @@ type prover_call =
   | EditorCall of int
 
 let call_on_file
-      ~libdir ~datadir ~command ~limit ~res_parser ~get_counterexmp
+      ~config ~command ~limit ~res_parser ~get_counterexmp
       ~printing_info ?(inplace=false) fin =
   let id = gen_id () in
   let cmd, use_stdin, on_timelimit =
-    actualcommand ~cleanup:true ~inplace ~libdir ~datadir command limit fin in
+    actualcommand ~cleanup:true ~inplace ~config command limit fin in
   let save = {
     vc_file         = fin;
     inplace         = inplace;
@@ -477,6 +477,7 @@ let call_on_file
     "Request sent to prove_client:@ timelimit=%d@ memlimit=%d@ cmd=@[[%a]@]@."
     limit.limit_time limit.limit_mem
     (Pp.print_list Pp.comma Pp.string) cmd;
+  let libdir = Whyconf.libdir config in
   send_request ~libdir ~use_stdin ~id
                             ~timelimit:limit.limit_time
                             ~memlimit:limit.limit_mem
@@ -534,11 +535,12 @@ let query_call = function
       if pid = 0 then NoUpdates else
       ProverFinished (editor_result ret)
 
-let interrupt_call ~libdir = function
+let interrupt_call ~config = function
   | ServerCall id ->
-      Prove_client.send_interrupt ~id ~libdir
+     let libdir = Whyconf.libdir config in
+     Prove_client.send_interrupt ~id ~libdir
   | EditorCall pid ->
-      (try Unix.kill pid Sys.sigkill with Unix.Unix_error _ -> ())
+     (try Unix.kill pid Sys.sigkill with Unix.Unix_error _ -> ())
 
 let rec wait_on_call = function
   | ServerCall id as pc ->
@@ -552,7 +554,7 @@ let rec wait_on_call = function
       let _, ret = Unix.waitpid [] pid in
       editor_result ret
 
-let call_on_buffer ~command ~libdir ~datadir ~limit ~res_parser ~filename ~get_counterexmp ~printing_info
+let call_on_buffer ~command ~config ~limit ~res_parser ~filename ~get_counterexmp ~printing_info
     ~gen_new_file ?(inplace=false) buffer =
   let fin,cin =
     if gen_new_file then
@@ -566,12 +568,12 @@ let call_on_buffer ~command ~libdir ~datadir ~limit ~res_parser ~filename ~get_c
       end
   in
   Buffer.output_buffer cin buffer; close_out cin;
-  call_on_file ~command ~libdir ~datadir ~limit ~res_parser ~get_counterexmp ~printing_info ~inplace fin
+  call_on_file ~command ~config ~limit ~res_parser ~get_counterexmp ~printing_info ~inplace fin
 
-let call_editor ~libdir ~datadir ~command fin =
+let call_editor ~config ~command fin =
   let command, use_stdin, _ =
     actualcommand
-      ~cleanup:false ~inplace:false ~libdir ~datadir command empty_limit fin
+      ~cleanup:false ~inplace:false ~config command empty_limit fin
   in
   let exec = List.hd command in
   let argarray = Array.of_list command in

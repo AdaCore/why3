@@ -20,8 +20,6 @@ API calls
 open Why3
 let config : Whyconf.config = Whyconf.init_config None
 let main : Whyconf.main = Whyconf.get_main config
-let libdir = Whyconf.libdir main
-let datadir = Whyconf.datadir main
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 (* END{buildenv} *)
 
@@ -139,7 +137,7 @@ let alt_ergo : Whyconf.config_prover =
 
 let alt_ergo_driver : Driver.driver =
   try
-    Whyconf.load_driver main env alt_ergo
+    Driver.load_driver main env alt_ergo
   with e ->
     eprintf "Failed to load driver for alt-ergo: %a@."
       Exn_printer.exn_printer e;
@@ -153,8 +151,7 @@ let () =
          Call_provers.wait_on_call
            (Driver.prove_task
               ~limit:Call_provers.empty_limit
-              ~libdir
-              ~datadir
+              ~config:main
               ~command:alt_ergo.Whyconf.command
               alt_ergo_driver
               t)
