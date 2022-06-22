@@ -315,6 +315,11 @@ module Log = struct
 
   type exec_mode = Exec_giant_steps | Exec_normal
 
+  let pp_mode fmt m =
+    match m with
+    | Exec_giant_steps -> Format.pp_print_string fmt "Giant-step mode"
+    | Exec_normal -> Format.pp_print_string fmt "Small-step mode"
+
   type value_or_invalid = Value of value | Invalid
 
   type log_entry_desc =

@@ -2,16 +2,18 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.7.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Coq" version="8.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="CVC5" version="1.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="vacid_0_red_black_trees.mlw"/>
 <theory name="RedBlackTree" proved="true">
  <goal name="memt_color" proved="true">
- <proof prover="0" timelimit="5"><result status="valid" time="0.00" steps="21"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="21"/></proof>
  </goal>
  <goal name="lt_leaf" proved="true">
  <proof prover="4"><result status="valid" time="0.00" steps="696"/></proof>
@@ -101,51 +103,25 @@
  <proof prover="1"><result status="valid" time="0.60"/></proof>
  </goal>
  <goal name="rbalance&#39;vc" expl="VC for rbalance" proved="true">
- <transf name="split_goal_right" proved="true" >
+ <transf name="split_vc" proved="true" >
   <goal name="rbalance&#39;vc.0" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.50" steps="2233"/></proof>
-  </goal>
-  <goal name="rbalance&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="16725"/></proof>
-  </goal>
-  <goal name="rbalance&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.43" steps="1939"/></proof>
-  </goal>
-  <goal name="rbalance&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="17371"/></proof>
-  </goal>
-  <goal name="rbalance&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.36" steps="1662"/></proof>
-  </goal>
-  <goal name="rbalance&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="14902"/></proof>
-  </goal>
-  <goal name="rbalance&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.50" steps="2185"/></proof>
-  </goal>
-  <goal name="rbalance&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="17371"/></proof>
-  </goal>
-  <goal name="rbalance&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="18491"/></proof>
-  </goal>
-  <goal name="rbalance&#39;vc.9" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="15903"/></proof>
-  </goal>
-  <goal name="rbalance&#39;vc.10" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.40" steps="1853"/></proof>
-  </goal>
-  <goal name="rbalance&#39;vc.11" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="15052"/></proof>
-  </goal>
-  <goal name="rbalance&#39;vc.12" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="15898"/></proof>
-  </goal>
-  <goal name="rbalance&#39;vc.13" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="15682"/></proof>
-  </goal>
-  <goal name="rbalance&#39;vc.14" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="9486"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="rbalance&#39;vc.0.0" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.02" steps="52550"/></proof>
+   </goal>
+   <goal name="rbalance&#39;vc.0.1" expl="postcondition" proved="true">
+   <proof prover="6"><result status="valid" time="0.14" steps="21588"/></proof>
+   </goal>
+   <goal name="rbalance&#39;vc.0.2" expl="postcondition" proved="true">
+   <proof prover="6"><result status="valid" time="0.50" steps="65004"/></proof>
+   </goal>
+   <goal name="rbalance&#39;vc.0.3" expl="postcondition" proved="true">
+   <proof prover="6"><result status="valid" time="0.12" steps="13871"/></proof>
+   </goal>
+   <goal name="rbalance&#39;vc.0.4" expl="postcondition" proved="true">
+   <proof prover="6"><result status="valid" time="0.10" steps="11998"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
@@ -184,7 +160,7 @@
   <goal name="insert&#39;vc.10" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="insert&#39;vc.10.0" expl="VC for insert" proved="true">
-   <proof prover="4"><result status="valid" time="0.73" steps="118187"/></proof>
+   <proof prover="4"><result status="valid" time="0.94" steps="118187"/></proof>
    </goal>
    <goal name="insert&#39;vc.10.1" expl="VC for insert" proved="true">
    <proof prover="3"><result status="valid" time="0.02" steps="27154"/></proof>
@@ -196,13 +172,13 @@
    <proof prover="4"><result status="valid" time="0.05" steps="18201"/></proof>
    </goal>
    <goal name="insert&#39;vc.10.4" expl="VC for insert" proved="true">
-   <proof prover="1"><result status="valid" time="0.45"/></proof>
+   <proof prover="1"><result status="valid" time="0.62"/></proof>
    </goal>
    <goal name="insert&#39;vc.10.5" expl="VC for insert" proved="true">
    <proof prover="4"><result status="valid" time="0.28" steps="50727"/></proof>
    </goal>
    <goal name="insert&#39;vc.10.6" expl="VC for insert" proved="true">
-   <proof prover="0"><result status="valid" time="0.24" steps="795"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.24" steps="795"/></proof>
    </goal>
   </transf>
   </goal>

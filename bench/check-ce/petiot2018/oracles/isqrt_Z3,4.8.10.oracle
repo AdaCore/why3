@@ -203,130 +203,130 @@ The program does not comply to the verification goal, for example during the
 File isqrt-S4.mlw:
   Line 3:
     Execution of main function `isqrt` with env:
-      n = 3
+      n = 8
       zero = 0
       one = 1
   Line 6:
     Normal execution of function `int_ref` with args:
-      i = 3
+      i = 8
 File lib.mlw:
   Line 12:
     Normal execution of function `int_ref'mk` with args:
-      contents = 3
+      contents = 8
 File isqrt-S4.mlw:
   Line 7:
     Normal execution of function `( * )` with args:
-      _ = 3
-      _ = 3
+      _ = 8
+      _ = 8
     Normal execution of function `int_ref` with args:
-      i = 9
+      i = 64
 File lib.mlw:
   Line 12:
     Normal execution of function `int_ref'mk` with args:
-      contents = 9
+      contents = 64
 File isqrt-S4.mlw:
   Line 8:
     Normal execution of function `( * )` with args:
       _ = (-2)
-      _ = 3
+      _ = 8
     Normal execution of function `(+)` with args:
-      _ = (-6)
+      _ = (-16)
       _ = 1
     Normal execution of function `int_ref` with args:
-      i = (-5)
+      i = (-15)
 File lib.mlw:
   Line 12:
     Normal execution of function `int_ref'mk` with args:
-      contents = (-5)
+      contents = (-15)
 File isqrt-S4.mlw:
   Line 9:
     Normal execution of function `(!)` with args:
-      r = {contents= 9}
+      r = {contents= 64}
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 9}
+      arg = {contents= 64}
 File isqrt-S4.mlw:
   Line 9:
     Normal execution of function `(>)` with args:
-      x = 9
-      y = 3
+      x = 64
+      y = 8
     Normal iteration of loop
   Line 15:
     Normal execution of function `(!)` with args:
-      r = {contents= (-5)}
+      r = {contents= (-15)}
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= (-5)}
+      arg = {contents= (-15)}
 File isqrt-S4.mlw:
   Line 15:
     Normal execution of function `(!)` with args:
-      r = {contents= 9}
+      r = {contents= 64}
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 9}
+      arg = {contents= 64}
 File isqrt-S4.mlw:
   Line 15:
     Normal execution of function `(-)` with args:
-      x = 9
-      y = (-5)
+      x = 64
+      y = (-15)
 File int.mlw:
   Line 23:
     Normal execution of function `(-_)` with args:
-      _ = (-5)
+      _ = (-15)
     Normal execution of function `(+)` with args:
-      _ = 9
-      _ = 5
+      _ = 64
+      _ = 15
 File isqrt-S4.mlw:
   Line 15:
     Normal execution of function `(:=)` with args:
-      r = {contents= 9}
-      i = 14
+      r = {contents= 64}
+      i = 79
   Line 16:
     Normal execution of function `(!)` with args:
-      r = {contents= (-5)}
+      r = {contents= (-15)}
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= (-5)}
+      arg = {contents= (-15)}
 File isqrt-S4.mlw:
   Line 16:
     Normal execution of function `(+)` with args:
-      _ = (-5)
+      _ = (-15)
       _ = 2
     Normal execution of function `(:=)` with args:
-      r = {contents= (-5)}
-      i = (-3)
+      r = {contents= (-15)}
+      i = (-13)
   Line 17:
     Normal execution of function `(!)` with args:
-      r = {contents= 3}
+      r = {contents= 8}
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 3}
+      arg = {contents= 8}
 File isqrt-S4.mlw:
   Line 17:
     Normal execution of function `(-)` with args:
-      x = 3
+      x = 8
       y = 1
 File int.mlw:
   Line 23:
     Normal execution of function `(-_)` with args:
       _ = 1
     Normal execution of function `(+)` with args:
-      _ = 3
+      _ = 8
       _ = (-1)
 File isqrt-S4.mlw:
   Line 17:
     Normal execution of function `(:=)` with args:
-      r = {contents= 3}
-      i = 2
+      r = {contents= 8}
+      i = 7
   Line 11:
     Property failure at loop invariant preservation with:
-      r = {contents= 2}
-      y = {contents= 14}
+      r = {contents= 7}
+      y = {contents= 79}
 
 ** isqrt-S5
 bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/isqrt-S5.mlw --apply-transform=split_vc --prover=Z3,4.8.10,counterexamples --timelimit=15 --check-ce --rac-prover=Z3,4.8.10 --sub-goal=:11@loop invariant preservation --stepslimit=500000

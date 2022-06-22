@@ -4,9 +4,15 @@
                         Line 6:
                           y = {"type": "Integer", "val": "0"}
                         Line 7:
+                          result = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "0"}
                           y = {"type": "Integer", "val": "0"}
                         Line 8:
                           result = {"type": "Integer", "val": "0"}
+                          result =
+                            {"type": "Array",
+                             "val":
+                              [{"others": {"type": "Integer", "val": "0"}}]}
                           result =
                             {"type": "Array",
                              "val":
@@ -15,6 +21,7 @@
                                   "val":
                                    [{"others":
                                       {"type": "Integer", "val": "0"}}]}}]}
+                          result = {"type": "Integer", "val": "0"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -36,9 +43,15 @@
                         Line 6:
                           y = {"type": "Integer", "val": "0"}
                         Line 7:
+                          result = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "0"}
                           y = {"type": "Integer", "val": "0"}
                         Line 8:
                           result = {"type": "Integer", "val": "0"}
+                          result =
+                            {"type": "Array",
+                             "val":
+                              [{"others": {"type": "Integer", "val": "0"}}]}
                           result =
                             {"type": "Array",
                              "val":
@@ -47,6 +60,7 @@
                                   "val":
                                    [{"others":
                                       {"type": "Integer", "val": "0"}}]}}]}
+                          result = {"type": "Integer", "val": "0"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -71,15 +85,18 @@
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `f` cannot be evaluated)
 File "bench/check-ce/anonymous5.mlw", line 7, characters 12-22:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Unknown (unknown + incomplete) (0.06s, 5182 steps).
+Prover result is: Unknown (unknown + incomplete) (0.07s, 5245 steps).
 The following counterexample model could not be verified
   (concrete RAC terminated because many args for exec fun, abstract RAC terminated because Postcondition of `f` cannot be evaluated):
 File anonymous5.mlw:
   Line 6:
     y = 0
   Line 7:
+    result = 0
     y = 0
   Line 8:
-    result = 0
+    result of call at line 8, characters 2-9 = 0
+    result of call at line 8, characters 2-7 = (others => 0)
     result of call at line 8, characters 2-5 = (others => (others => 0))
+    result = 0
 

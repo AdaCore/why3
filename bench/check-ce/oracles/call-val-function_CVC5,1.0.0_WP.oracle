@@ -1,0 +1,792 @@
+<check-ce-rac-results>Check model 0 ("bench/check-ce/call-val-function.mlw", line 9, characters 12-24)
+<check-ce-rac-results>Checking model:
+                      File call-val-function.mlw:
+                        Line 6:
+                          y = {"type": "Integer", "val": "0"}
+                          z = {"type": "Integer", "val": "43"}
+                        Line 8:
+                          y = {"type": "Integer", "val": "0"}
+                        Line 9:
+                          result = {"type": "Integer", "val": "44"}
+                          result = {"type": "Integer", "val": "44"}
+                        Line 11:
+                          result = {"type": "Integer", "val": "43"}
+                          result = {"type": "Integer", "val": "44"}
+                          z = {"type": "Integer", "val": "43"}
+                        Line 12:
+                          result = {"type": "Integer", "val": "44"}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/call-val-function.mlw", line 8, characters 10-11: 0
+<rac-values>Value from model for return value of call to f at "bench/check-ce/call-val-function.mlw", line 11, characters 10-13 at "bench/check-ce/call-val-function.mlw", line 11, characters 10-13: 43
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/call-val-function.mlw", line 8, characters 10-11: 0
+<rac-values>Value from model for return value of call to f at "bench/check-ce/call-val-function.mlw", line 11, characters 10-13 at "bench/check-ce/call-val-function.mlw", line 11, characters 10-13: 43
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 9, characters 12-24)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File call-val-function.mlw:
+                            Line 8:
+                              y = 0
+                              y = 0
+                              Execution of main function `main` with env:
+                                y = 0
+                                zero = 0
+                                one = 1
+                            Line 11:
+                              (giant-step) execution of unimplemented function `f`
+                                x = 0
+                              result of `f` = 43
+                            Line 12:
+                              Normal execution of function `(+)` with args:
+                                _ = 43
+                                _ = 1
+                            Line 9:
+                              Property failure at postcondition of `main` with:
+                                result = 44
+                        - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 9, characters 12-24)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File call-val-function.mlw:
+                            Line 8:
+                              y = 0
+                              y = 0
+                              Execution of main function `main` with env:
+                                y = 0
+                                zero = 0
+                                one = 1
+                            Line 11:
+                              Giant-step execution of function `f` with args:
+                                x = 0
+                              result of `f` = 43
+                            Line 12:
+                              Normal execution of function `(+)` with args:
+                                _ = 43
+                                _ = 1
+                            Line 9:
+                              Property failure at postcondition of `main` with:
+                                result = 44
+<check-ce-rac-results>Check model 1 ("bench/check-ce/call-val-function.mlw", line 9, characters 12-24)
+<check-ce-rac-results>Checking model:
+                      File call-val-function.mlw:
+                        Line 6:
+                          y = {"type": "Integer", "val": "0"}
+                          z = {"type": "Integer", "val": "43"}
+                        Line 8:
+                          y = {"type": "Integer", "val": "0"}
+                        Line 9:
+                          result = {"type": "Integer", "val": "44"}
+                          result = {"type": "Integer", "val": "44"}
+                        Line 11:
+                          result = {"type": "Integer", "val": "43"}
+                          result = {"type": "Integer", "val": "44"}
+                          z = {"type": "Integer", "val": "43"}
+                        Line 12:
+                          result = {"type": "Integer", "val": "44"}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/call-val-function.mlw", line 8, characters 10-11: 0
+<rac-values>Value from model for return value of call to f at "bench/check-ce/call-val-function.mlw", line 11, characters 10-13 at "bench/check-ce/call-val-function.mlw", line 11, characters 10-13: 43
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/call-val-function.mlw", line 8, characters 10-11: 0
+<rac-values>Value from model for return value of call to f at "bench/check-ce/call-val-function.mlw", line 11, characters 10-13 at "bench/check-ce/call-val-function.mlw", line 11, characters 10-13: 43
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 9, characters 12-24)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File call-val-function.mlw:
+                            Line 8:
+                              y = 0
+                              y = 0
+                              Execution of main function `main` with env:
+                                y = 0
+                                zero = 0
+                                one = 1
+                            Line 11:
+                              (giant-step) execution of unimplemented function `f`
+                                x = 0
+                              result of `f` = 43
+                            Line 12:
+                              Normal execution of function `(+)` with args:
+                                _ = 43
+                                _ = 1
+                            Line 9:
+                              Property failure at postcondition of `main` with:
+                                result = 44
+                        - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 9, characters 12-24)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File call-val-function.mlw:
+                            Line 8:
+                              y = 0
+                              y = 0
+                              Execution of main function `main` with env:
+                                y = 0
+                                zero = 0
+                                one = 1
+                            Line 11:
+                              Giant-step execution of function `f` with args:
+                                x = 0
+                              result of `f` = 43
+                            Line 12:
+                              Normal execution of function `(+)` with args:
+                                _ = 43
+                                _ = 1
+                            Line 9:
+                              Property failure at postcondition of `main` with:
+                                result = 44
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 9, characters 12-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 9, characters 12-24)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 9, characters 12-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 9, characters 12-24)
+File "bench/check-ce/call-val-function.mlw", line 9, characters 12-24:
+Sub-goal Postcondition of goal main'vc.
+Prover result is: Unknown (sat) (0.07s, 5613 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File call-val-function.mlw:
+  Line 8:
+    y = 0
+    y = 0
+    Execution of main function `main` with env:
+      y = 0
+      zero = 0
+      one = 1
+  Line 11:
+    (giant-step) execution of unimplemented function `f`
+      x = 0
+    result of `f` = 43
+  Line 12:
+    Normal execution of function `(+)` with args:
+      _ = 43
+      _ = 1
+  Line 9:
+    Property failure at postcondition of `main` with:
+      result = 44
+
+<check-ce-rac-results>Check model 0 ("bench/check-ce/call-val-function.mlw", line 24, characters 12-24)
+<check-ce-rac-results>Checking model:
+                      File call-val-function.mlw:
+                        Line 21:
+                          y = {"type": "Integer", "val": "0"}
+                          z = {"type": "Integer", "val": "43"}
+                        Line 23:
+                          y = {"type": "Integer", "val": "0"}
+                        Line 24:
+                          result = {"type": "Integer", "val": "44"}
+                          result = {"type": "Integer", "val": "44"}
+                        Line 26:
+                          result = {"type": "Integer", "val": "43"}
+                          result = {"type": "Integer", "val": "44"}
+                          z = {"type": "Integer", "val": "43"}
+                        Line 27:
+                          result = {"type": "Integer", "val": "44"}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/call-val-function.mlw", line 23, characters 10-11: 0
+<rac-values>Value from model for return value of call to f1 at "bench/check-ce/call-val-function.mlw", line 26, characters 10-13 at "bench/check-ce/call-val-function.mlw", line 26, characters 10-13: 43
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/call-val-function.mlw", line 23, characters 10-11: 0
+<rac-values>Value from model for return value of call to f1 at "bench/check-ce/call-val-function.mlw", line 26, characters 10-13 at "bench/check-ce/call-val-function.mlw", line 26, characters 10-13: 43
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 24, characters 12-24)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File call-val-function.mlw:
+                            Line 23:
+                              y = 0
+                              y = 0
+                              Execution of main function `main` with env:
+                                y = 0
+                                zero = 0
+                                one = 1
+                            Line 26:
+                              (giant-step) execution of unimplemented function `f1`
+                                x = 0
+                              result of `f1` = 43
+                            Line 27:
+                              Normal execution of function `(+)` with args:
+                                _ = 43
+                                _ = 1
+                            Line 24:
+                              Property failure at postcondition of `main1` with:
+                                result = 44
+                        - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 24, characters 12-24)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File call-val-function.mlw:
+                            Line 23:
+                              y = 0
+                              y = 0
+                              Execution of main function `main` with env:
+                                y = 0
+                                zero = 0
+                                one = 1
+                            Line 26:
+                              Giant-step execution of function `f` with args:
+                                x = 0
+                              result of `f1` = 43
+                            Line 27:
+                              Normal execution of function `(+)` with args:
+                                _ = 43
+                                _ = 1
+                            Line 24:
+                              Property failure at postcondition of `main1` with:
+                                result = 44
+<check-ce-rac-results>Check model 1 ("bench/check-ce/call-val-function.mlw", line 24, characters 12-24)
+<check-ce-rac-results>Checking model:
+                      File call-val-function.mlw:
+                        Line 21:
+                          y = {"type": "Integer", "val": "0"}
+                          z = {"type": "Integer", "val": "43"}
+                        Line 23:
+                          y = {"type": "Integer", "val": "0"}
+                        Line 24:
+                          result = {"type": "Integer", "val": "44"}
+                          result = {"type": "Integer", "val": "44"}
+                        Line 26:
+                          result = {"type": "Integer", "val": "43"}
+                          result = {"type": "Integer", "val": "44"}
+                          z = {"type": "Integer", "val": "43"}
+                        Line 27:
+                          result = {"type": "Integer", "val": "44"}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/call-val-function.mlw", line 23, characters 10-11: 0
+<rac-values>Value from model for return value of call to f1 at "bench/check-ce/call-val-function.mlw", line 26, characters 10-13 at "bench/check-ce/call-val-function.mlw", line 26, characters 10-13: 43
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/call-val-function.mlw", line 23, characters 10-11: 0
+<rac-values>Value from model for return value of call to f1 at "bench/check-ce/call-val-function.mlw", line 26, characters 10-13 at "bench/check-ce/call-val-function.mlw", line 26, characters 10-13: 43
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 24, characters 12-24)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File call-val-function.mlw:
+                            Line 23:
+                              y = 0
+                              y = 0
+                              Execution of main function `main` with env:
+                                y = 0
+                                zero = 0
+                                one = 1
+                            Line 26:
+                              (giant-step) execution of unimplemented function `f1`
+                                x = 0
+                              result of `f1` = 43
+                            Line 27:
+                              Normal execution of function `(+)` with args:
+                                _ = 43
+                                _ = 1
+                            Line 24:
+                              Property failure at postcondition of `main1` with:
+                                result = 44
+                        - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 24, characters 12-24)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File call-val-function.mlw:
+                            Line 23:
+                              y = 0
+                              y = 0
+                              Execution of main function `main` with env:
+                                y = 0
+                                zero = 0
+                                one = 1
+                            Line 26:
+                              Giant-step execution of function `f` with args:
+                                x = 0
+                              result of `f1` = 43
+                            Line 27:
+                              Normal execution of function `(+)` with args:
+                                _ = 43
+                                _ = 1
+                            Line 24:
+                              Property failure at postcondition of `main1` with:
+                                result = 44
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 24, characters 12-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 24, characters 12-24)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 24, characters 12-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 24, characters 12-24)
+File "bench/check-ce/call-val-function.mlw", line 24, characters 12-24:
+Sub-goal Postcondition of goal main'vc.
+Prover result is: Unknown (sat) (0.05s, 5613 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File call-val-function.mlw:
+  Line 23:
+    y = 0
+    y = 0
+    Execution of main function `main` with env:
+      y = 0
+      zero = 0
+      one = 1
+  Line 26:
+    (giant-step) execution of unimplemented function `f1`
+      x = 0
+    result of `f1` = 43
+  Line 27:
+    Normal execution of function `(+)` with args:
+      _ = 43
+      _ = 1
+  Line 24:
+    Property failure at postcondition of `main1` with:
+      result = 44
+
+<check-ce-rac-results>Check model 0 ("bench/check-ce/call-val-function.mlw", line 43, characters 12-24)
+<check-ce-rac-results>Checking model:
+                      File call-val-function.mlw:
+                        Line 40:
+                          y = {"type": "Integer", "val": "0"}
+                        Line 42:
+                          y = {"type": "Integer", "val": "0"}
+                        Line 43:
+                          result = {"type": "Integer", "val": "44"}
+                          result = {"type": "Integer", "val": "44"}
+                        Line 45:
+                          result = {"type": "Integer", "val": "43"}
+                          result = {"type": "Integer", "val": "44"}
+                          z = {"type": "Integer", "val": "43"}
+                        Line 46:
+                          result = {"type": "Integer", "val": "44"}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/call-val-function.mlw", line 42, characters 10-11: 0
+<rac-values>Value from model for return value of call to f2 at "bench/check-ce/call-val-function.mlw", line 45, characters 10-13 at "bench/check-ce/call-val-function.mlw", line 45, characters 10-13: 43
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/call-val-function.mlw", line 42, characters 10-11: 0
+<rac-values>Value from model for return value of call to f2 at "bench/check-ce/call-val-function.mlw", line 45, characters 10-13 at "bench/check-ce/call-val-function.mlw", line 45, characters 10-13: 43
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: STUCK (failure in postcondition of `f2` at "bench/check-ce/call-val-function.mlw", line 40, characters 12-24)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File call-val-function.mlw:
+                            Line 42:
+                              y = 0
+                              y = 0
+                              Execution of main function `main` with env:
+                                y = 0
+                                zero = 0
+                                one = 1
+                            Line 45:
+                              (giant-step) execution of unimplemented function `f2`
+                                x = 0
+                              result of `f2` = 43
+                            Line 40:
+                              Execution got stuck at postcondition of `f2` with:
+                                x = 0
+                                result = 43
+                        - Abstract RAC: STUCK (failure in postcondition of `f2` at "bench/check-ce/call-val-function.mlw", line 40, characters 12-24)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File call-val-function.mlw:
+                            Line 42:
+                              y = 0
+                              y = 0
+                              Execution of main function `main` with env:
+                                y = 0
+                                zero = 0
+                                one = 1
+                            Line 45:
+                              Giant-step execution of function `f` with args:
+                                x = 0
+                              result of `f2` = 43
+                            Line 40:
+                              Execution got stuck at postcondition of `f2` with:
+                                x = 0
+                                result = 43
+<check-ce-rac-results>Check model 1 ("bench/check-ce/call-val-function.mlw", line 43, characters 12-24)
+<check-ce-rac-results>Checking model:
+                      File call-val-function.mlw:
+                        Line 40:
+                          y = {"type": "Integer", "val": "42"}
+                        Line 42:
+                          y = {"type": "Integer", "val": "42"}
+                        Line 43:
+                          result = {"type": "Integer", "val": "44"}
+                          result = {"type": "Integer", "val": "44"}
+                        Line 45:
+                          result = {"type": "Integer", "val": "43"}
+                          result = {"type": "Integer", "val": "44"}
+                          z = {"type": "Integer", "val": "43"}
+                        Line 46:
+                          result = {"type": "Integer", "val": "44"}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/call-val-function.mlw", line 42, characters 10-11: 42
+<rac-values>Value from model for return value of call to f2 at "bench/check-ce/call-val-function.mlw", line 45, characters 10-13 at "bench/check-ce/call-val-function.mlw", line 45, characters 10-13: 43
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/call-val-function.mlw", line 42, characters 10-11: 42
+<rac-values>Value from model for return value of call to f2 at "bench/check-ce/call-val-function.mlw", line 45, characters 10-13 at "bench/check-ce/call-val-function.mlw", line 45, characters 10-13: 43
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 43, characters 12-24)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File call-val-function.mlw:
+                            Line 42:
+                              y = 42
+                              y = 42
+                              Execution of main function `main` with env:
+                                y = 42
+                                zero = 0
+                                one = 1
+                            Line 45:
+                              (giant-step) execution of unimplemented function `f2`
+                                x = 42
+                              result of `f2` = 43
+                            Line 46:
+                              Normal execution of function `(+)` with args:
+                                _ = 43
+                                _ = 1
+                            Line 43:
+                              Property failure at postcondition of `main2` with:
+                                result = 44
+                        - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 43, characters 12-24)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File call-val-function.mlw:
+                            Line 42:
+                              y = 42
+                              y = 42
+                              Execution of main function `main` with env:
+                                y = 42
+                                zero = 0
+                                one = 1
+                            Line 45:
+                              Giant-step execution of function `f` with args:
+                                x = 42
+                              result of `f2` = 43
+                            Line 46:
+                              Normal execution of function `(+)` with args:
+                                _ = 43
+                                _ = 1
+                            Line 43:
+                              Property failure at postcondition of `main2` with:
+                                result = 44
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: STUCK (failure in postcondition of `f2` at "bench/check-ce/call-val-function.mlw", line 40, characters 12-24)
+  - Abstract RAC: STUCK (failure in postcondition of `f2` at "bench/check-ce/call-val-function.mlw", line 40, characters 12-24)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 43, characters 12-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 43, characters 12-24)
+File "bench/check-ce/call-val-function.mlw", line 43, characters 12-24:
+Sub-goal Postcondition of goal main'vc.
+Prover result is: Unknown (unknown + incomplete) (0.05s, 5790 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File call-val-function.mlw:
+  Line 42:
+    y = 42
+    y = 42
+    Execution of main function `main` with env:
+      y = 42
+      zero = 0
+      one = 1
+  Line 45:
+    (giant-step) execution of unimplemented function `f2`
+      x = 42
+    result of `f2` = 43
+  Line 46:
+    Normal execution of function `(+)` with args:
+      _ = 43
+      _ = 1
+  Line 43:
+    Property failure at postcondition of `main2` with:
+      result = 44
+
+<check-ce-rac-results>Check model 0 ("bench/check-ce/call-val-function.mlw", line 59, characters 12-24)
+<check-ce-rac-results>Checking model:
+                      File call-val-function.mlw:
+                        Line 58:
+                          y = {"type": "Integer", "val": "0"}
+                        Line 59:
+                          result = {"type": "Integer", "val": "44"}
+                          result = {"type": "Integer", "val": "44"}
+                        Line 61:
+                          result = {"type": "Integer", "val": "43"}
+                          result = {"type": "Integer", "val": "44"}
+                          z = {"type": "Integer", "val": "43"}
+                        Line 62:
+                          result = {"type": "Integer", "val": "44"}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/call-val-function.mlw", line 58, characters 10-11: 0
+<rac-values>Value from model for return value of call to f3 at "bench/check-ce/call-val-function.mlw", line 61, characters 10-13 at "bench/check-ce/call-val-function.mlw", line 61, characters 10-13: 43
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/call-val-function.mlw", line 58, characters 10-11: 0
+<rac-values>Value from model for return value of call to f3 at "bench/check-ce/call-val-function.mlw", line 61, characters 10-13 at "bench/check-ce/call-val-function.mlw", line 61, characters 10-13: 43
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: STUCK (failure in postcondition of `f3` at unknown location)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File call-val-function.mlw:
+                            Line 58:
+                              y = 0
+                              y = 0
+                              Execution of main function `main` with env:
+                                y = 0
+                                zero = 0
+                                one = 1
+                            Line 61:
+                              (giant-step) execution of unimplemented function `f3`
+                                x = 0
+                              result of `f3` = 43
+                          Unknown location:
+                              Execution got stuck at postcondition of `f3` with:
+                                x = 0
+                                result = 43
+                        - Abstract RAC: STUCK (failure in postcondition of `f3` at unknown location)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File call-val-function.mlw:
+                            Line 58:
+                              y = 0
+                              y = 0
+                              Execution of main function `main` with env:
+                                y = 0
+                                zero = 0
+                                one = 1
+                            Line 61:
+                              Giant-step execution of function `f` with args:
+                                x = 0
+                              result of `f3` = 43
+                          Unknown location:
+                              Execution got stuck at postcondition of `f3` with:
+                                x = 0
+                                result = 43
+<check-ce-rac-results>Check model 1 ("bench/check-ce/call-val-function.mlw", line 59, characters 12-24)
+<check-ce-rac-results>Checking model:
+                      File call-val-function.mlw:
+                        Line 58:
+                          y = {"type": "Integer", "val": "42"}
+                        Line 59:
+                          result = {"type": "Integer", "val": "44"}
+                          result = {"type": "Integer", "val": "44"}
+                        Line 61:
+                          result = {"type": "Integer", "val": "43"}
+                          result = {"type": "Integer", "val": "44"}
+                          z = {"type": "Integer", "val": "43"}
+                        Line 62:
+                          result = {"type": "Integer", "val": "44"}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/call-val-function.mlw", line 58, characters 10-11: 42
+<rac-values>Value from model for return value of call to f3 at "bench/check-ce/call-val-function.mlw", line 61, characters 10-13 at "bench/check-ce/call-val-function.mlw", line 61, characters 10-13: 43
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/call-val-function.mlw", line 58, characters 10-11: 42
+<rac-values>Value from model for return value of call to f3 at "bench/check-ce/call-val-function.mlw", line 61, characters 10-13 at "bench/check-ce/call-val-function.mlw", line 61, characters 10-13: 43
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 59, characters 12-24)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File call-val-function.mlw:
+                            Line 58:
+                              y = 42
+                              y = 42
+                              Execution of main function `main` with env:
+                                y = 42
+                                zero = 0
+                                one = 1
+                            Line 61:
+                              (giant-step) execution of unimplemented function `f3`
+                                x = 42
+                              result of `f3` = 43
+                            Line 62:
+                              Normal execution of function `(+)` with args:
+                                _ = 43
+                                _ = 1
+                            Line 59:
+                              Property failure at postcondition of `main3` with:
+                                result = 44
+                        - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 59, characters 12-24)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File call-val-function.mlw:
+                            Line 58:
+                              y = 42
+                              y = 42
+                              Execution of main function `main` with env:
+                                y = 42
+                                zero = 0
+                                one = 1
+                            Line 61:
+                              Giant-step execution of function `f` with args:
+                                x = 42
+                              result of `f3` = 43
+                            Line 62:
+                              Normal execution of function `(+)` with args:
+                                _ = 43
+                                _ = 1
+                            Line 59:
+                              Property failure at postcondition of `main3` with:
+                                result = 44
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: STUCK (failure in postcondition of `f3` at unknown location)
+  - Abstract RAC: STUCK (failure in postcondition of `f3` at unknown location)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 59, characters 12-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 59, characters 12-24)
+File "bench/check-ce/call-val-function.mlw", line 59, characters 12-24:
+Sub-goal Postcondition of goal main'vc.
+Prover result is: Unknown (unknown + incomplete) (0.05s, 5790 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File call-val-function.mlw:
+  Line 58:
+    y = 42
+    y = 42
+    Execution of main function `main` with env:
+      y = 42
+      zero = 0
+      one = 1
+  Line 61:
+    (giant-step) execution of unimplemented function `f3`
+      x = 42
+    result of `f3` = 43
+  Line 62:
+    Normal execution of function `(+)` with args:
+      _ = 43
+      _ = 1
+  Line 59:
+    Property failure at postcondition of `main3` with:
+      result = 44
+

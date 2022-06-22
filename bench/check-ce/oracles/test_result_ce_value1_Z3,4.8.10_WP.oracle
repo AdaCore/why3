@@ -7,11 +7,12 @@
                           x = {"type": "Integer", "val": "-1"}
                         Line 9:
                           a = {"type": "Integer", "val": "42"}
+                          result = {"type": "Integer", "val": "42"}
                           result = {"type": "Integer", "val": "41"}
                         Line 10:
                           result = {"type": "Integer", "val": "0"}
                         Line 12:
-                          result = {"type": "Integer", "val": "41"}
+                          a = {"type": "Integer", "val": "42"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -94,11 +95,12 @@
                           x = {"type": "Integer", "val": "-1"}
                         Line 9:
                           a = {"type": "Integer", "val": "42"}
+                          result = {"type": "Integer", "val": "42"}
                           result = {"type": "Integer", "val": "41"}
                         Line 10:
                           result = {"type": "Integer", "val": "0"}
                         Line 12:
-                          result = {"type": "Integer", "val": "41"}
+                          a = {"type": "Integer", "val": "42"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -181,7 +183,7 @@
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value1.mlw", line 12, characters 11-18)
 File "bench/check-ce/test_result_ce_value1.mlw", line 12, characters 11-18:
 Sub-goal Assertion of goal test1'vc.
-Prover result is: Unknown (sat) (0.01s, 2058 steps).
+Prover result is: Unknown (sat) (0.01s, 2091 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -223,10 +225,11 @@ File test_result_ce_value1.mlw:
                           x = {"type": "Integer", "val": "-1"}
                         Line 15:
                           a = {"type": "Integer", "val": "42"}
+                          result = {"type": "Integer", "val": "42"}
                           result = {"type": "Integer", "val": "41"}
                           result = {"type": "Integer", "val": "0"}
                         Line 16:
-                          result = {"type": "Integer", "val": "41"}
+                          a = {"type": "Integer", "val": "42"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -307,10 +310,11 @@ File test_result_ce_value1.mlw:
                           x = {"type": "Integer", "val": "-1"}
                         Line 15:
                           a = {"type": "Integer", "val": "42"}
+                          result = {"type": "Integer", "val": "42"}
                           result = {"type": "Integer", "val": "41"}
                           result = {"type": "Integer", "val": "0"}
                         Line 16:
-                          result = {"type": "Integer", "val": "41"}
+                          a = {"type": "Integer", "val": "42"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -391,7 +395,7 @@ File test_result_ce_value1.mlw:
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value1.mlw", line 16, characters 11-18)
 File "bench/check-ce/test_result_ce_value1.mlw", line 16, characters 11-18:
 Sub-goal Assertion of goal test1bis'vc.
-Prover result is: Unknown (sat) (0.01s, 2058 steps).
+Prover result is: Unknown (sat) (0.01s, 2091 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

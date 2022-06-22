@@ -2,18 +2,28 @@
 <check-ce-rac-results>Checking model:
                       File tuple.mlw:
                         Line 5:
-                          a = {"type": "Integer", "val": "-1"}
+                          a = {"type": "Integer", "val": "0"}
+                          a = {"type": "Integer", "val": "0"}
                           b = {"type": "Integer", "val": "0"}
-                          result = {"type": "Integer", "val": "0"}
+                          b = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "1"}
                         Line 6:
+                          a = {"type": "Integer", "val": "0"}
+                          b = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "1"}
+                        Line 7:
+                          result = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "1"}
+                          result = {"type": "Integer", "val": "0"}
                           result = {"type": "Integer", "val": "0"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `x` at "bench/check-ce/tuple.mlw", line 4, characters 10-11: (0,
                                                                     0)
-<rac-values>Value computed from postcondition for return value of call to (-) at "bench/check-ce/tuple.mlw", line 7, characters 14-23 at "bench/check-ce/tuple.mlw", line 7, characters 14-23: 0
-<rac-values>Value computed from postcondition for return value of call to (-) at "bench/check-ce/tuple.mlw", line 7, characters 3-12 at "bench/check-ce/tuple.mlw", line 7, characters 3-12: 0
+<rac-values>Value from model for return value of call to (-) at "bench/check-ce/tuple.mlw", line 7, characters 14-23 at "bench/check-ce/tuple.mlw", line 7, characters 14-23: 0
+<rac-values>Value from model for return value of call to (-) at "bench/check-ce/tuple.mlw", line 7, characters 3-12 at "bench/check-ce/tuple.mlw", line 7, characters 3-12: 0
 <check-ce-rac-results>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -122,18 +132,28 @@
 <check-ce-rac-results>Checking model:
                       File tuple.mlw:
                         Line 5:
-                          a = {"type": "Integer", "val": "-1"}
+                          a = {"type": "Integer", "val": "0"}
+                          a = {"type": "Integer", "val": "0"}
                           b = {"type": "Integer", "val": "0"}
-                          result = {"type": "Integer", "val": "0"}
+                          b = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "1"}
                         Line 6:
+                          a = {"type": "Integer", "val": "0"}
+                          b = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "1"}
+                        Line 7:
+                          result = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "1"}
+                          result = {"type": "Integer", "val": "0"}
                           result = {"type": "Integer", "val": "0"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `x` at "bench/check-ce/tuple.mlw", line 4, characters 10-11: (0,
                                                                     0)
-<rac-values>Value computed from postcondition for return value of call to (-) at "bench/check-ce/tuple.mlw", line 7, characters 14-23 at "bench/check-ce/tuple.mlw", line 7, characters 14-23: 0
-<rac-values>Value computed from postcondition for return value of call to (-) at "bench/check-ce/tuple.mlw", line 7, characters 3-12 at "bench/check-ce/tuple.mlw", line 7, characters 3-12: 0
+<rac-values>Value from model for return value of call to (-) at "bench/check-ce/tuple.mlw", line 7, characters 14-23 at "bench/check-ce/tuple.mlw", line 7, characters 14-23: 0
+<rac-values>Value from model for return value of call to (-) at "bench/check-ce/tuple.mlw", line 7, characters 3-12 at "bench/check-ce/tuple.mlw", line 7, characters 3-12: 0
 <check-ce-rac-results>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -247,7 +267,7 @@
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/tuple.mlw", line 5, characters 12-43)
 File "bench/check-ce/tuple.mlw", line 5, characters 38-43:
 Sub-goal Postcondition of goal swap'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6629 steps).
+Prover result is: Unknown (unknown + incomplete) (0.06s, 7173 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

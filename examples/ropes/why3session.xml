@@ -5,6 +5,7 @@
 <prover id="0" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.7.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.8.10" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="ropes.mlw"/>
@@ -82,66 +83,66 @@
   <proof prover="0"><result status="valid" time="0.00" steps="34"/></proof>
   </goal>
   <goal name="insert&#39;vc.3" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="36"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="38"/></proof>
   </goal>
   <goal name="insert&#39;vc.4" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="157"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="159"/></proof>
   </goal>
   <goal name="insert&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="187"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="189"/></proof>
   </goal>
   <goal name="insert&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="117"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="119"/></proof>
   </goal>
   <goal name="insert&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.06" steps="13155"/></proof>
+  <proof prover="1"><result status="valid" time="0.06" steps="13191"/></proof>
   </goal>
   <goal name="insert&#39;vc.8" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.00" steps="36"/></proof>
+  <proof prover="0"><result status="valid" time="0.00" steps="38"/></proof>
   </goal>
   <goal name="insert&#39;vc.9" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.33" steps="891922"/></proof>
+  <proof prover="7"><result status="valid" time="0.47" steps="893314"/></proof>
   </goal>
   <goal name="insert&#39;vc.10" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.76" steps="464"/></proof>
+  <proof prover="0"><result status="valid" time="0.94" steps="466"/></proof>
   </goal>
   <goal name="insert&#39;vc.11" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="46"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="48"/></proof>
   </goal>
   <goal name="insert&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="131"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="133"/></proof>
   </goal>
   <goal name="insert&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="50"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="52"/></proof>
   </goal>
   <goal name="insert&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="214"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="216"/></proof>
   </goal>
   <goal name="insert&#39;vc.15" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="192"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="194"/></proof>
   </goal>
   <goal name="insert&#39;vc.16" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="insert&#39;vc.16.0" expl="assertion" proved="true">
    <transf name="split_vc" proved="true" >
     <goal name="insert&#39;vc.16.0.0" expl="assertion" proved="true">
-    <proof prover="0"><result status="valid" time="0.83" steps="573"/></proof>
+    <proof prover="0"><result status="valid" time="1.04" steps="575"/></proof>
     </goal>
     <goal name="insert&#39;vc.16.0.1" expl="assertion" proved="true">
-    <proof prover="0"><result status="valid" time="4.20" steps="2479"/></proof>
+    <proof prover="3"><result status="valid" time="0.04" steps="77795"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="insert&#39;vc.17" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="58"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="60"/></proof>
   </goal>
   <goal name="insert&#39;vc.18" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="237"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="239"/></proof>
   </goal>
   <goal name="insert&#39;vc.19" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="234"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="236"/></proof>
   </goal>
  </transf>
  </goal>
