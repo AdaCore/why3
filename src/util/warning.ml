@@ -12,8 +12,9 @@
 open Format
 
 let default_hook ?loc s =
-  Opt.iter (Loc.report_position err_formatter) loc;
-  eprintf "warning: %s@." s
+  match loc with
+  | None -> eprintf "@[Warning:@ %s@]@." s
+  | Some l -> eprintf "@[Warning,@ file %a:@ %s@]@." Loc.pp_position l s
 
 let hook = ref default_hook
 let set_hook = (:=) hook

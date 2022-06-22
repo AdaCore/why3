@@ -59,8 +59,8 @@ end)
 let same_line_loc loc1 loc2 =
   match loc1, loc2 with
   | Some loc1, Some loc2 ->
-      let (f1, l1, _, _) = Loc.get loc1 in
-      let (f2, l2, _, _) = Loc.get loc2 in
+      let (f1, l1, _, _, _) = Loc.get loc1 in
+      let (f2, l2, _, _, _) = Loc.get loc2 in
       f1 = f2 && l1 = l2
   | _ -> false
 
@@ -310,8 +310,8 @@ let intro_vc_vars_counterexmp2 task =
   let pos_str = match !vc_loc with
     | None -> ""
     | Some loc ->
-      let (file, line, col1, col2) = Loc.get loc in
-      Printf.sprintf "%s:%d:%d:%d" file line col1 col2
+      let (file, line1, col1, line2, col2) = Loc.get loc in
+      Printf.sprintf "%s:%d:%d:%d:%d" file line1 col1 line2 col2
   in
   let task = Task.add_meta task vc_loc_meta [Theory.MAstr pos_str] in
   Task.add_tdecl task g
@@ -332,12 +332,13 @@ let get_location_of_vc task =
        even on windows that's not allowed. *)
     let split = Strings.rev_split ':' loc_str in
     let loc =  match split with
-      | col2 :: col1 :: line :: ((_ :: _) as rest) ->
-        let line = int_of_string line in
+      | col2 :: line2 :: col1 :: line1 :: ((_ :: _) as rest) ->
+        let line1 = int_of_string line1 in
         let col1 = int_of_string col1 in
+        let line2 = int_of_string line2 in
         let col2 = int_of_string col2 in
         let filename = Strings.join ":" (List.rev rest) in
-        Some (Loc.user_position filename line col1 col2)
+        Some (Loc.user_position filename line1 col1 line2 col2)
       | _ -> None in
     loc
   | _ -> None

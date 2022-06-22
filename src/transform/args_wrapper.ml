@@ -275,7 +275,7 @@ let () = Exn_printer.register (fun fmt e ->
     match e with
     | Arg_parse_type_error (loc, str, e) ->
         Format.fprintf fmt "Error while parsing argument(s) %s at %a: %a"
-          str Pretty.print_loc loc Exn_printer.exn_printer e
+          str Loc.pp_position loc Exn_printer.exn_printer e
     | e -> raise e)
 
 let registered_lang_parsing_trans = Hashtbl.create 63
@@ -426,7 +426,7 @@ let parse_list_ident ~lang s =
   | Loc.Located (loc, e) -> raise (Arg_parse_type_error (loc, s, e))
 
 let build_error s e =
-  let loc = Loc.user_position "" 0 0 (String.length s - 1) in
+  let loc = Loc.user_position "" 1 0 1 (String.length s - 1) in
   raise (Arg_parse_type_error (loc, s, e))
 
 let parse_int s =

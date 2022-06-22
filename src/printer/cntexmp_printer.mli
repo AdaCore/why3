@@ -27,8 +27,6 @@ type vc_term_info = {
 module Cmp : sig
   type t = (lsymbol * Loc.position option * Ident.Sattr.t)
 
-  val before: Loc.position option -> Loc.position option -> bool
-
   val compare: t -> t -> int
 end
 

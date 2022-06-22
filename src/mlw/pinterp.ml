@@ -667,18 +667,18 @@ let gen_eval_expr cnf exec_expr id oexp =
 let get_value' ctx_desc oloc gens =
   let desc, value = try get_value gens with Not_found ->
     Debug.dprintf debug_rac_values "@[<h>No value for %s at %a@]@." ctx_desc
-      (Pp.print_option_or_default "NO LOC" Pretty.print_loc') oloc;
+      (Pp.print_option_or_default "NO LOC" Loc.pp_position) oloc;
     incomplete "missing value for %s" ctx_desc
-      (Pp.print_option_or_default "NO LOC" Pretty.print_loc') oloc in
+      (Pp.print_option_or_default "NO LOC" Loc.pp_position) oloc in
   Debug.dprintf debug_rac_values "@[<h>%s for %s at %a: %a@]@."
     (String.capitalize_ascii desc) ctx_desc
-    (Pp.print_option_or_default "NO LOC" Pretty.print_loc') oloc print_value value;
+    (Pp.print_option_or_default "NO LOC" Loc.pp_position) oloc print_value value;
   value
 
 let get_and_register_variable ctx ?def ?loc id ity =
   let ctx_desc = asprintf "variable `%a`%t" print_decoded id.id_string
       (fun fmt -> match loc with
-         | Some loc -> fprintf fmt " at %a" Pretty.print_loc' loc
+         | Some loc -> fprintf fmt " at %a" Loc.pp_position loc
          | None -> ()) in
   let oloc = if loc <> None then loc else id.id_loc in
   let gens = [
@@ -693,7 +693,7 @@ let get_and_register_variable ctx ?def ?loc id ity =
 let get_and_register_result ?def ?rs ctx posts oid loc ity =
   let ctx_desc = asprintf "return value of call%t at %a%t"
       (fun fmt -> Opt.iter (fprintf fmt " to %a" print_rs) rs)
-      Pretty.print_loc' loc
+      Loc.pp_position loc
       (fun fmt -> Opt.iter (fprintf fmt " call id %d") oid) in
   let gens = [
     gen_model_result ctx oid loc ity;
@@ -759,7 +759,7 @@ let assign_written_vars ?(vars_map=Mpv.empty) wrt loc ctx vs =
   if pv_affected wrt pv then (
     Debug.dprintf debug_trace_exec "@[<h>%tVAR %a is written in loop/function call %a@]@."
       pp_indent print_pv pv
-      (Pp.print_option print_loc') pv.pv_vs.vs_name.id_loc;
+      (Pp.print_option Loc.pp_position) pv.pv_vs.vs_name.id_loc;
     let pv = Mpv.find_def pv pv vars_map in
     let value = get_and_register_variable ctx ~loc pv.pv_vs.vs_name pv.pv_ity in
     set_constr (get_vs ctx.env vs) value )
@@ -883,9 +883,9 @@ let add_post_premises cty res env =
 
 let rec exec_expr ctx e =
   check_limits ctx.limits;
-  let _,l,bc,ec = Loc.get (Opt.get_def Loc.dummy_position e.e_loc) in
-  Debug.dprintf debug_trace_exec "@[<h>%t%sEVAL EXPR %d %d-%d: %a@]@." pp_indent
-    (if ctx.giant_steps then "G-s. " else "") l bc ec
+  let _,bl,bc,el,ec = Loc.get (Opt.get_def Loc.dummy_position e.e_loc) in
+  Debug.dprintf debug_trace_exec "@[<h>%t%sEVAL EXPR %d,%d-%d,%d: %a@]@." pp_indent
+    (if ctx.giant_steps then "G-s. " else "") bl bc el ec
     (pp_limited print_expr) e;
   let res = exec_expr' ctx e in
   Debug.dprintf debug_trace_exec "@[<h>%t -> %a@]@." pp_indent (print_result) res;
@@ -958,7 +958,7 @@ and exec_expr' ctx e =
               let ty = ty_inst mt (ty_of_ity e.e_ity) in
               if cty.cty_pre <> [] then
                 incomplete "anonymous function with precondition not supported (%a)"
-                  Pp.(print_option_or_default "unknown location" Pretty.print_loc') e.e_loc;
+                  Pp.(print_option_or_default "unknown location" Loc.pp_position) e.e_loc;
               Normal (value ty (Vfun (cl, arg.pv_vs, e')))
           | _ -> incomplete "many args for exec fun" (* TODO *) )
       | Cany ->
@@ -991,7 +991,7 @@ and exec_expr' ctx e =
       | Capp (rs, pvsl) ->
           if ce.c_cty.cty_args <> [] then
             incomplete "no support for partial function applications (%a)"
-              (Pp.print_option_or_default "unknown location" Pretty.print_loc')
+              (Pp.print_option_or_default "unknown location" Loc.pp_position)
               e.e_loc;
           exec_call ?loc:e.e_loc ~attrs:e.e_attrs ctx rs pvsl e.e_ity
     end
@@ -1579,7 +1579,7 @@ let bind_globals ?rs_main ctx =
     | PDlet (LDvar (pv, e)) ->
         Debug.dprintf debug_trace_exec "EVAL GLOBAL VAR %a at %a@."
           print_decoded id.id_string
-          Pp.(print_option_or_default "NO LOC" print_loc') id.id_loc;
+          Pp.(print_option_or_default "NO LOC" Loc.pp_position) id.id_loc;
         let v = get_and_register_global (Sidpos.check locs) ctx exec_expr id
             (Some e) [] e.e_ity in
         {ctx with env= bind_vs pv.pv_vs (Lazy.force v) ctx.env}, (* TODO Don't force [v] until used *)
@@ -1587,7 +1587,7 @@ let bind_globals ?rs_main ctx =
     | PDlet (LDsym (rs, ce)) when is_prog_constant d -> (
         Debug.dprintf debug_trace_exec "EVAL GLOBAL SYM CONST %a at %a@."
           print_decoded id.id_string
-          Pp.(print_option_or_default "NO LOC" Pretty.print_loc') id.id_loc;
+          Pp.(print_option_or_default "NO LOC" Loc.pp_position) id.id_loc;
         assert (ce.c_cty.cty_args = []);
         let oexp = match ce.c_node with
           | Cany -> None | Cfun e -> Some e

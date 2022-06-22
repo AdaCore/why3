@@ -186,16 +186,14 @@ let print_msg fmt m =
   | Error s                                      -> pp_print_string fmt s
   | Open_File_Error s                            -> pp_print_string fmt s
 
-(* TODO ad hoc printing. Should reuse print_loc. *)
-let print_loc fmt (loc: Loc.position) =
-  let (f,l,b,e) = Loc.get loc in
-   fprintf fmt "File \"%s\", line %d, characters %d-%d" f l b e
-
+(*
+let print_loc = Loc.report_position
 let _print_list_loc fmt l =
   Pp.print_list
     (fun _fmt () -> ())
     (fun fmt (loc, _c) -> Format.fprintf fmt "(%a, color)" print_loc loc)
     fmt l
+ *)
 
 let print_notify fmt n =
   match n with
@@ -223,6 +221,6 @@ let print_notify fmt n =
   | Task (ni, _s, list_loc, g_loc, _lang) ->
       fprintf fmt "task for node_ID %d which contains a list of %d locations. Goal_location = %a"
         ni (List.length list_loc)
-        (Pp.print_option print_loc) g_loc (* print_list_loc list_loc *)
+        (Pp.print_option Loc.pp_position) g_loc (* print_list_loc list_loc *)
   | Ident_notif_loc loc               ->
-      fprintf fmt "ident notification %a" Pretty.print_loc loc
+      fprintf fmt "ident notification %a" Loc.pp_position loc

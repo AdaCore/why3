@@ -21,7 +21,7 @@ type def_use = Def | Use
 let glob = Hashtbl.create 16
 (* Hash [file -> Hash [(line, column) -> ident]] *)
 
-let key loc = let f, l, c, _ = Loc.get loc in f, (l, c)
+let key loc = let f, l, c, _, _ = Loc.get loc in f, (l, c)
 
 let add loc idk =
   let kf, k = key loc in

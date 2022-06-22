@@ -58,10 +58,10 @@ rule token = parse
       { Lexlib.update_loc lexbuf file (int_of_string line) (int_of_string char);
         token lexbuf }
   | "[#" space* "\"" ([^ '\010' '\013' '"' ]* as file) "\""
-    space* (dec+ as line) space* (dec+ as bchar) space*
-    (dec+ as echar) space* "]"
-      { POSITION (Loc.user_position file (int_of_string line)
-                 (int_of_string bchar) (int_of_string echar)) }
+    space* (dec+ as bline) space* (dec+ as bchar) space*
+    space* (dec+ as eline) space* (dec+ as echar) space* "]"
+      { POSITION (Loc.user_position file (int_of_string bline)
+                  (int_of_string bchar) (int_of_string eline) (int_of_string echar)) }
   | "[@" space* ([^ ' ' '\n' ']']+ (' '+ [^ ' ' '\n' ']']+)* as lbl) space* ']'
       { ATTRIBUTE lbl }
   | '\n'
