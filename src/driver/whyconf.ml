@@ -198,6 +198,8 @@ let libdir m =
     Sys.getenv "WHY3LIB"
   with Not_found -> m.libdir
 
+let set_libdir m d = { m with libdir = d}
+
 let datadir m =
   try
     let d = Sys.getenv "WHY3DATA" in
@@ -206,6 +208,8 @@ let datadir m =
 *)
     d
   with Not_found -> m.datadir
+
+let set_datadir m d = { m with datadir = d}
 
 let default_loadpath m =
   [ Filename.concat m.datadir "stdlib" ]
@@ -525,15 +529,20 @@ module RC_save = struct
   let set_default_editor default section =
     set_string section "default_editor" default
 
-  let set_dirs ~libdir ~datadir section =
-    let section = set_string section "libdir" libdir in
-    let section = set_string section "datadir" datadir in
-    section
-
   let set_main rc main =
     let section = empty_section in
     let section = set_int section "magic" magicnumber in
-    let section = set_dirs ~libdir:main.libdir ~datadir:main.datadir section in
+    (* FIXME is this needed or not?
+       what would be the effect of uncommmenting that code?
+       would it make the libdir and datadir saved in the why3.conf ?
+       if yes, then in fact we don't want it, cf
+       https://gitlab.inria.fr/why3/why3/-/merge_requests/692
+
+    let section = set_string ~default:empty_main.libdir
+        section "libdir" main.libdir in
+    let section = set_string ~default:empty_main.datadir
+        section "datadir" main.datadir in
+     *)
     let section = set_bool ~default:empty_main.stdlib section "stdlib" main.stdlib in
     let section = set_bool ~default:empty_main.load_default_plugins
         section "load_default_plugins" main.load_default_plugins in
@@ -934,12 +943,6 @@ module User = struct
       main = set_limits config.main time mem j;
     }
 
-  let set_dirs ~libdir ~datadir config =
-    { config with
-      user_rc = update_section config.user_rc "main"
-        @@ RC_save.set_dirs ~libdir ~datadir;
-      main = { config.main with libdir = libdir; datadir = datadir }
-    }
   let set_prover_upgrade_policy config prover target =
     (** kept simple because no auto upgrade policy *)
     let m = Mprover.add prover target config.provers_upgrade_policy in
@@ -1168,22 +1171,6 @@ module Args = struct
     exit exit_code
 end
 
-(** Loading drivers with relative names *)
-
-let absolute_driver_file main s =
-  if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
-  else Filename.concat main.datadir (Filename.concat "drivers" (s ^ ".drv"))
-
-let load_driver_raw main env file extras =
-  let file = absolute_driver_file main file in
-  try
-    Driver.load_driver_absolute env file extras
-  with e when not (Debug.test_flag Debug.stack_trace) ->
-    eprintf "Fatal error while loading driver file '%s': %a@."
-            file Exn_printer.exn_printer e;
-    exit 1
-
-let load_driver main env p = load_driver_raw main env p.driver p.extra_drivers
 
 let unknown_to_known_provers provers pu =
   Mprover.fold (fun pk _ (others,name,version) ->

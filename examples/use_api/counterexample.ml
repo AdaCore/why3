@@ -77,9 +77,6 @@ let () = printf "@[task 2 created:@\n%a@]@." Pretty.print_task task2
 let config = Whyconf.init_config None
 (* the [main] section of the config file *)
 let main : Whyconf.main = Whyconf.get_main config
-(* the library and data directories, from the config file *)
-let libdir = Whyconf.libdir main
-let datadir = Whyconf.datadir main
 (* all the provers detected, from the config file *)
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
@@ -103,7 +100,7 @@ let env : Env.env = Env.create_env (Whyconf.loadpath main)
 (* loading the CVC4 driver *)
 let cvc4_driver : Driver.driver =
   try
-    Whyconf.load_driver main env cvc4
+    Driver.load_driver main env cvc4
   with e ->
     eprintf "Failed to load driver for CVC4,1.7: %a@."
       Exn_printer.exn_printer e;
@@ -114,8 +111,7 @@ let result1 : Call_provers.prover_result =
   Call_provers.wait_on_call
     (Driver.prove_task
        ~limit:Call_provers.empty_limit
-       ~libdir
-       ~datadir
+       ~config:main
        ~command:(Whyconf.get_complete_command cvc4 ~with_steps:false)
     cvc4_driver task2)
 
@@ -168,8 +164,7 @@ let task =
 let {Call_provers.pr_models= models} =
   Call_provers.wait_on_call
     (Driver.prove_task ~limit:Call_provers.empty_limit
-       ~libdir
-       ~datadir
+       ~config:main
        ~command:(Whyconf.get_complete_command cvc4 ~with_steps:false)
        cvc4_driver task)
 

@@ -112,6 +112,35 @@ The following environment variables are recognized.
    Indicate where to find the :file:`why3.conf` file. Can be overwritten using
    the :option:`--config` option.
 
+.. envvar:: WHY3LIB
+
+   Indicate where to find the Why3 library, which contains the
+   dynamically loaded libraries and plugins for Why3. Setting this
+   environment variable overrides the default value, or any other
+   value set on the :file:`why3.conf` file (field `libdir` of section
+   `[main]`). The default value is set at the compilation time of Why3
+   (see :file:`src/config.sh.in` in Why3 sources), typically
+   :file:`/usr/local/lib/why3` on Unix operating systems, unless Why3
+   was compiled in relocatable mode (option `--enable-relocation` of
+   script `configure`) when in that case it will be the directory
+   where Why3 binary lies, concatenated with `lib/why3`. See also the
+   option :option:`--print-libdir`.
+
+.. envvar:: WHY3DATA
+
+   Indicate where to find the Why3 architecture-independent data,
+   which contains in particular the standard library. Setting this
+   environment variable overrides the default value, or any other
+   value set on the :file:`why3.conf` file (field `datadir` of section
+   `[main]`). The default value is set at the compilation time of Why3
+   (see :file:`src/config.sh.in` in Why3 sources), typically
+   :file:`/usr/local/share/why3` on Unix operating systems, unless
+   Why3 was compiled in relocatable mode (option `--enable-relocation`
+   of script `configure`) when in that case it will be the directory
+   where Why3 binary lies, concatenated with `share/why3`. See also the
+   option :option:`--print-datadir`.
+
+
 .. index:: configuration file
 .. why3:tool:: config
 .. _sec.why3config:

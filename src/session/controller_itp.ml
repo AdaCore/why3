@@ -117,7 +117,7 @@ let load_drivers c =
   let provers = Whyconf.get_provers config in
   let main = Whyconf.get_main config in
   Whyconf.Mprover.iter (fun _ p ->
-      let d = Whyconf.load_driver main env p in
+      let d = Driver.load_driver main env p in
       Whyconf.Hprover.add c.controller_provers p.Whyconf.prover (p,d))
     provers
 
@@ -418,11 +418,9 @@ let build_prover_call spa =
     let inplace = config_pr.Whyconf.in_place in
     let interactive = config_pr.Whyconf.interactive in
     let main = Whyconf.get_main c.controller_config in
-    let libdir = Whyconf.libdir main in
-    let datadir = Whyconf.datadir main in
     try
       let call = Driver.prove_task ?old:spa.spa_pr_scr ~inplace ~command
-          ~limit ~interactive ~libdir ~datadir driver task in
+          ~limit ~interactive ~config:main driver task in
       let pa =
         { tp_callback = spa.spa_callback;
           tp_started  = false;
@@ -529,11 +527,11 @@ let idle_handler () =
   !idle_handler_running
 
 let interrupt c =
-  let libdir = Whyconf.libdir (Whyconf.get_main c.controller_config) in
+  let config = Whyconf.get_main c.controller_config in
   (* Interrupt provers *)
   Hashtbl.iter
     (fun call e ->
-     Call_provers.interrupt_call ~libdir call;
+     Call_provers.interrupt_call ~config call;
      e.tp_callback Interrupted)
     prover_tasks_in_progress;
   Hashtbl.clear prover_tasks_in_progress;
@@ -745,9 +743,7 @@ let schedule_edition c id pr ~callback ~notification =
                 (Session_itp.get_proof_name session id).Ident.id_string
                 editor file;
   let main = Whyconf.get_main config in
-  let libdir = Whyconf.libdir main in
-  let datadir = Whyconf.datadir main in
-  let call = Call_provers.call_editor ~command:editor ~libdir ~datadir file in
+  let call = Call_provers.call_editor ~command:editor ~config:main file in
   callback panid Running;
   Queue.add (callback panid,call,old_res) prover_tasks_edited;
   run_idle_handler ()
