@@ -395,7 +395,7 @@ let file_name_of_task ?old ?inplace ?interactive drv task =
         *)
         let pr = Task.task_goal task in
         let fn = match pr.pr_name.id_loc with
-          | Some loc -> let fn,_,_,_ = Loc.get loc in Filename.basename fn
+          | Some loc -> let fn,_,_,_,_ = Loc.get loc in Filename.basename fn
           | None -> "" in
         let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
         true, get_filename drv
@@ -408,7 +408,7 @@ let file_name_of_task ?old ?inplace ?interactive drv task =
         *)
         let pr = Task.task_goal task in
         let fn = match pr.pr_name.id_loc with
-          | Some loc -> let fn,_,_,_ = Loc.get loc in Filename.basename fn
+          | Some loc -> let fn,_,_,_,_ = Loc.get loc in Filename.basename fn
           | None -> "" in
         let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
         true, get_filename drv

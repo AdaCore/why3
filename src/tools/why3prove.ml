@@ -290,7 +290,7 @@ let really_do_task (task: task) =
     match t.Term.t_loc with
     | None -> false
     | Some loc ->
-        let goal_f, goal_l, _, _ = Loc.get loc in
+        let goal_f, goal_l, _, _, _ = Loc.get loc in
         goal_f = f &&
         (match l with None -> true | Some l -> l = goal_l) &&
         (match e with None -> true | Some e ->
@@ -320,14 +320,15 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
     let open Json_base in
     let loc =
       match loc with
-      | None -> Record ["filename", String fname]
+      | None -> Record ["file-name", String fname]
       | Some loc ->
-          let f, l, b, e = Loc.get loc in
+          let f, bl, bc, el, ec = Loc.get loc in
           Record [
-              "filename", String f;
-              "line", Int l;
-              "start-char", Int b;
-              "end-char", Int e
+              "file-name", String f;
+              "start-line", Int bl;
+              "start-char", Int bc;
+              "end-line", Int el;
+              "end-char", Int ec
             ] in
     let term =
       Record [
@@ -343,7 +344,7 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
   | None | Some `Values as json ->
     ( match loc with
       | None -> fprintf fmt "File %s:@\n" fname
-      | Some loc -> Loc.report_position fmt loc );
+      | Some loc -> fprintf fmt "File %a:@\n" Loc.pp_position loc );
     ( if expls = [] then
         fprintf fmt "@[<hov>Goal@ @{<bold>%s@}.@]" goal_name
       else

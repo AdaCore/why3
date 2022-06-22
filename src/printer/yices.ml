@@ -264,7 +264,7 @@ let print_decl info fmt d = match d.d_node with
       fprintf fmt "@[(assert@\n";
       fprintf fmt "@[;; %a@]@\n" print_ident pr.pr_name;
       (match pr.pr_name.id_loc with
-        | Some loc -> fprintf fmt " @[;; %a@]@\n" Loc.gen_report_position loc
+        | Some loc -> fprintf fmt " @[;; File %a@]@\n" Loc.pp_position loc
         | None -> ());
       fprintf fmt "  @[(not %a)@])@]@\n(check)@\n" (print_fmla info) f
   | Dprop (Plemma, _, _) -> assert false

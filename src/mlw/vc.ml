@@ -570,9 +570,9 @@ let add_loc_attr label loc attrs =
   match loc with
   | None -> attrs
   | Some loc ->
-      let filename, line, bchar, echar = Loc.get loc in
+      let filename, bline, bchar, eline, echar = Loc.get loc in
       let attr = Format.kasprintf Ident.create_attribute
-          "%s:%s:%d:%d:%d" label filename line bchar echar in
+          "%s:%s:%d:%d:%d:%d" label filename bline bchar eline echar in
       Sattr.add attr attrs
 
 (* translate the expression [e] into a k-expression:

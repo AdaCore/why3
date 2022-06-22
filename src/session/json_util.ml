@@ -140,12 +140,13 @@ let convert_node_type nt =
   )
 
 let convert_loc (loc: Loc.position) : Json_base.json =
-  let (file, line, col1, col2) = Loc.get loc in
+  let (file, sline, scol, eline, ecol) = Loc.get loc in
   Record
-    ["file", Json_base.String file;
-     "line", Json_base.Int line;
-     "col1", Json_base.Int col1;
-     "col2", Json_base.Int col2]
+    ["file-name", Json_base.String file;
+     "start-line", Json_base.Int sline;
+     "start-col", Json_base.Int scol;
+     "end-line", Json_base.Int eline;
+     "end-col", Json_base.Int ecol]
 
 open Whyconf
 
@@ -327,11 +328,12 @@ exception Notposition
 
 let parse_loc (j: json) : Loc.position =
   try
-    let file = get_string_field j "file" in
-    let line = get_int_field j "line" in
-    let col1 = get_int_field j "col1" in
-    let col2 = get_int_field j "col2" in
-    Loc.user_position file line col1 col2
+    let file = get_string_field j "file-name" in
+    let sline = get_int_field j "start-line" in
+    let scol = get_int_field j "start-col" in
+    let eline = get_int_field j "end-line" in
+    let ecol = get_int_field j "end-col" in
+    Loc.user_position file sline scol eline ecol
   with
     Not_found -> raise Notposition
 

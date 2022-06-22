@@ -709,8 +709,7 @@ let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f = match k with
       fprintf fmt ";; Goal %s@\n" pr.pr_name.id_string;
       (match pr.pr_name.id_loc with
         | None -> ()
-        | Some loc -> fprintf fmt ";; %a@\n"
-            Loc.gen_report_position loc);
+        | Some loc -> fprintf fmt ";; File %a@\n" Loc.pp_position loc);
       info.info_in_goal <- true;
       fprintf fmt "@[(assert@\n";
       fprintf fmt "  @[(not@ %a))@]@\n@\n" (print_fmla info) f;

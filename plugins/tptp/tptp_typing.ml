@@ -373,7 +373,7 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
                 Mstr.add s (STVar tv) env, pol, tv::tvl, vl, true
             | Some true, Qforall  (* goals *)
             | Some false, Qexists (* premises *) ->
-                let _,ln,cn,_ = Loc.get loc in
+                let _,ln,cn,_,_ = Loc.get loc in
                 let sk = Format.sprintf "_%s_%d_%d" s ln cn in
                 let ts = create_tysymbol (id_user sk loc) tvl NoDef in
                 let tv = ty_app ts (List.map ty_var tvl) in

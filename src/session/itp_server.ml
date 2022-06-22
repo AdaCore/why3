@@ -486,9 +486,9 @@ let get_locations (task: Task.task) =
       Hstr.replace file_cache f g;
       g in
   let color_loc ~color ~loc =
-    let (f,l,b,e) = Loc.get loc in
+    let (f,bl,bc,el,ec) = Loc.get loc in
     (* Format.eprintf "color_loc: former f is `%s`@." f; *)
-    let loc = Loc.user_position (relativize f) l b e in
+    let loc = Loc.user_position (relativize f) bl bc el ec in
     (* let (f',_,_,_) = Loc.get loc in *)
     (* Format.eprintf "color_loc: latter f is `%s`@." f'; *)
     list := (loc, color) :: !list
@@ -499,8 +499,8 @@ let get_locations (task: Task.task) =
     let loc = Opt.fold (fun _ x -> Some x) pr_loc loc in
     match loc with
     | Some loc ->
-        let (f,l,b,e) = Loc.get loc in
-        let loc = Loc.user_position (relativize f) l b e in
+        let (f,bl,bc,el,ec) = Loc.get loc in
+        let loc = Loc.user_position (relativize f) bl bc el ec in
         goal_loc := Some loc
     | _ -> () in
   let rec color_locs ~color formula =
@@ -653,18 +653,18 @@ end
       P.notify (Message (Error s))
 
   let relativize_location s loc =
-    let f, l, b, e = Loc.get loc in
+    let f, bl, bc, el, ec = Loc.get loc in
     let path = Sysutil.relativize_filename (Session_itp.get_dir s) f in
     (* FIXME: this an abusive use of Sysutil.system_dependent_absolute_path *)
     let f = Sysutil.system_dependent_absolute_path "" path in
-    Loc.user_position f l b e
+    Loc.user_position f bl bc el ec
 
   let capture_parse_or_type_errors f cont =
     List.map
       (function
         | Loc.Located (loc, e) ->
            let rel_loc = relativize_location cont.controller_session loc in
-           let s = Format.asprintf "%a: %a" Loc.gen_report_position rel_loc
+           let s = Format.asprintf "File %a: %a" Loc.pp_position rel_loc
                                    Exn_printer.exn_printer e in
            (loc, rel_loc, s)
         | e when not (Debug.test_flag Debug.stack_trace) ->
@@ -1047,7 +1047,7 @@ match pa.proof_state with
       | AFile f ->
           let file_loc =
             let fp = Session_itp.system_path d.cont.controller_session f in
-            Loc.user_position fp 1 1 1 in
+            Loc.user_position fp 1 0 1 0 in
           P.notify (Task (nid, "File " ^ (Sysutil.basename (file_path f)), [], Some file_loc, lang))
       | ATn tid ->
           let name = get_transf_name d.cont.controller_session tid in
@@ -1562,7 +1562,7 @@ match pa.proof_state with
       location appear. (TODO: TBI only send the file if it is not in the
       session) *)
    let notify_loc loc =
-     let (f, _, _, _) = Loc.get loc in
+     let (f, _, _, _, _) = Loc.get loc in
      let s = Sysutil.file_contents f in
      let format = Env.get_format f in
      P.notify (File_contents (f, s, format, true));

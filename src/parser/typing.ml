@@ -236,11 +236,27 @@ let quant_var ns (loc, id, gh, ty) =
   if gh then Loc.errorm ~loc "ghost variables are only allowed in programs";
   Opt.map create_user_id id, dty_of_opt ns ty, Some loc
 
-let loc_cutoff loc13 loc23 loc2 =
-  let f,l,b,e = Loc.get loc13 in
-  let _,_,_,w = Loc.get loc23 in
-  let _,_,_,m = Loc.get loc2 in
-  Loc.user_position f l b (e - (w - m))
+(* [loc_cutoff loc13 loc23 loc2] computes a loc for the first part of
+   a chain of operators of the form
+
+     [e1 op e2 op e3]
+
+   - loc13 is the loc for the whole expression
+
+   - loc23 is the loc for [e2 op e3]
+
+   - loc2 is the loc of [e2]
+
+   we therefore produce the loc that starts at the start of the whole
+   expression and ends at the end of e2
+
+   loc23 appears to be used, since the changes of locations using multi-line location
+
+*)
+let loc_cutoff loc13 _loc23 loc2 =
+  let f,bl,bc,_,_ = Loc.get loc13 in
+  let _,_,_,el,ec = Loc.get loc2 in
+  Loc.user_position f bl bc el ec
 
 let is_reusable dt = match dt.dt_node with
   | DTvar _ | DTgvar _ | DTconst _ | DTtrue | DTfalse -> true
@@ -1753,7 +1769,7 @@ let type_module file env loc path (id,dl) =
 let type_mlw_file env path filename mlw_file =
   if Debug.test_flag Glob.flag then Glob.clear filename;
   let file = Mstr.empty in
-  let loc = Loc.user_position filename 0 0 0 in
+  let loc = Loc.user_position filename 1 0 1 0 in
   let file =
     match mlw_file with
     | Ptree.Decls decls -> type_module file env loc path ({id_str=""; id_ats=[]; id_loc=loc},decls)

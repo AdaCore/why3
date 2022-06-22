@@ -14,6 +14,9 @@ Configuration
     usage of environment variables WHY3LIB and WHY3DATA
 
 API
+  * source locations are now represented by both a start line number
+    and an end line number. The fourth number is thus now the column
+    number on the end line. :x:
   * function load_driver moved from Whyconf to Driver :x:
   * several functions from Call_prover and Driver now take as input a
     `Whyconf.main` configuration type instead of directly take libdir

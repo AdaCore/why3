@@ -35,12 +35,12 @@ let make_attribute (name: string) : Ident.attribute =
   Ident.create_attribute ("model_trace:" ^ name)
 let prop_var_A : Term.lsymbol =
   (* [user_position file line left_col right_col] *)
-  let loc = Loc.user_position "myfile.my_ext" 28 0 0  in
+  let loc = Loc.user_position "myfile.my_ext" 28 0 28 1  in
   let attrs = Ident.Sattr.singleton (make_attribute "my_A") in
   Term.create_psymbol (Ident.id_fresh ~attrs ~loc "A") []
 (* END{ce_declarepropvars} *)
 let prop_var_B : Term.lsymbol =
-  let loc = Loc.user_position "myfile.my_ext2" 101 0 0  in
+  let loc = Loc.user_position "myfile.my_ext2" 101 0 101 1  in
   let attrs = Ident.Sattr.singleton (make_attribute "my_B") in
   Term.create_psymbol (Ident.id_fresh ~attrs ~loc "B") []
 
@@ -52,7 +52,7 @@ let fmla2 : Term.term =
   Term.t_implies atom_A (Term.t_and atom_A atom_B)
 (* We add a location and attribute to indicate the start of a goal *)
 let fmla2 : Term.term =
-  let loc = Loc.user_position "myfile.my_ext" 42 28 91  in
+  let loc = Loc.user_position "myfile.my_ext" 42 28 42 91  in
   let attrs = Ident.Sattr.singleton Ity.annot_attr in
   (* Note that this remove any existing attribute/locations on fmla2 *)
   Term.t_attr_set ~loc attrs fmla2

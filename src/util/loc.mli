@@ -9,39 +9,84 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Source locations *)
+(** {1 Source locations} *)
+
 
 open Format
 
-(** {2 Lexing locations} *)
+(** {2 locations in files}
 
-val current_offset : int ref
-val reloc : Lexing.position -> Lexing.position
-val set_file : string -> Lexing.lexbuf -> unit
+In Why3, source locations represent a part of a file, denoted by a
+starting point and an end point. Both of these points are
+represented by a line number and a column number.
 
-val transfer_loc : Lexing.lexbuf -> Lexing.lexbuf -> unit
+So far, line numbers start with 1 and column number start with 0. [FIXME]
 
-(** {2 locations in files} *)
+*)
 
 type position
 [@@deriving sexp_of]
 
-val extract : Lexing.position * Lexing.position -> position
-val join : position -> position -> position
+val user_position : string -> int -> int -> int -> int -> position
+(** [user_position f bl bc el ec] builds the source position for file
+   [f], starting at line [bl] and character [bc] and ending and line
+   [el] and character [ec] *)
 
 val dummy_position : position
+(** a dummy source position *)
 
-val user_position : string -> int -> int -> int -> position
+val get : position -> string * int * int * int * int
+(** [get p] returns the file, the line and character numbers of the
+   beginning and the line and character numbers of the end of the
+   given position *)
 
-val get : position -> string * int * int * int
+val join : position -> position -> position
+(** [join p1 p2] attempts to join to positions [p1] and [p2],
+   returning a position that covers both of them. This function
+   assumes that the files are the same. *)
+
 
 val compare : position -> position -> int
 val equal : position -> position -> bool
 val hash : position -> int
 
-val gen_report_position : formatter -> position -> unit
+val pp_position : formatter -> position -> unit
+(** [pp_position fmt loc] formats the position [loc] in the given
+   formatter, in a human readable way, that is either :
 
-val report_position : formatter -> position -> unit
+        "filename", line l, characters bc--ec
+
+    if the position is on a single line or
+
+        "filename", line bl, character bc to line el, character ce
+
+    if the position is multi-line.
+
+    Does not print the file name part if it is empty.
+
+ *)
+
+val pp_position_no_file : formatter -> position -> unit
+(** similar to [pp_position] but do not show the file name *)
+
+(** {2 Helper functions about OCaml locations use in module [Lexing]} *)
+
+val extract : Lexing.position * Lexing.position -> position
+(** [extract p1 p2] build a source position from two OCaml lexing
+   positions *)
+
+val current_offset : int ref
+val reloc : Lexing.position -> Lexing.position
+(** [reloc l] returns the location with character num augmented by [!current_offset] *)
+
+val set_file : string -> Lexing.lexbuf -> unit
+(** [set_file f lb] sets the file name to [f] in [lb] *)
+
+val transfer_loc : Lexing.lexbuf -> Lexing.lexbuf -> unit
+(** [transfer_loc from to] sets the [lex_start_p] and [lex_curr_p]
+   fields of [to] to the ones of [from] *)
+
+
 
 (** {2 located exceptions} *)
 
@@ -74,10 +119,3 @@ exception Message of string
 val errorm: ?loc:position -> ('a, Format.formatter, unit, 'b) format4 -> 'a
 
 val with_location: (Lexing.lexbuf -> 'a) -> (Lexing.lexbuf -> 'a)
-
-val get_multiline : position -> string * (int * int) * (int * int)
-(** Returns [filename, (bline, bcol), (eline, ecol)] of a position.
-
-    Currently, this function re-reads the file to determine the line and column of the end
-    of multiline positions. Subsequent calls for positions in the same file will not require
-    re-reading the file. The function fails if the file does not exist. *)

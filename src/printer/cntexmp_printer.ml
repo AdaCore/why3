@@ -36,14 +36,9 @@ module Cmp = struct
       match loc2 with
       | None -> false
       | Some loc2 ->
-	let (_, line1, col1, _) = Loc.get loc1 in
-	  let (_, line2, col2, _) = Loc.get loc2 in
-	  if line1 <> line2 then
-	    if line1 < line2 then true
-	    else false
-	  else
-	    if col1 < col2 then true
-	    else false
+	let (_, line1, col1, _, _) = Loc.get loc1 in
+	let (_, line2, col2, _, _) = Loc.get loc2 in
+        (line1 < line2) || (line1 = line2 && col1 < col2)
 
   let compare (_,a_loc,a_attrs) (_,b_loc,b_attrs) =
     if (a_loc = b_loc) && (a_attrs = b_attrs)
@@ -112,7 +107,7 @@ let update_info_labels lsname cur_attrs t ls =
        "at:[label]:loc:filename:line" *)
     Sattr.fold (fun attr acc ->
         if Strings.has_prefix "at:" attr.attr_string then
-          let (f, l, _, _) =
+          let (f, l, _, _, _) =
             match t.t_loc with
             | None -> Loc.get (Opt.get_def Loc.dummy_position ls.ls_name.id_loc)
             | Some loc -> Loc.get loc

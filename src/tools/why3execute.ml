@@ -145,7 +145,7 @@ let do_input f =
       (* TODO Remove this case when value origins (default vs model) can be distinguished
          in RAC *)
       eprintf "RAC got stuck %s after %a@." reason
-        (Pp.print_option_or_default "unknown location" Pretty.print_loc') l;
+        (Pp.print_option_or_default "unknown location" Loc.pp_position) l;
       exit 2
   | Pinterp_core.Incomplete reason ->
       eprintf "Execution terminated because %s@." reason;

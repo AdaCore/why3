@@ -86,8 +86,7 @@ module type Printer = sig
 
     val print_attr : formatter -> attribute -> unit
     val print_attrs : formatter -> Sattr.t -> unit
-    val print_loc : formatter -> Loc.position -> unit
-    val print_loc' : formatter -> Loc.position -> unit
+    val print_loc_as_attribute : formatter -> Loc.position -> unit
     val print_pkind : formatter -> prop_kind -> unit
     val print_meta_arg : formatter -> meta_arg -> unit
     val print_meta_arg_type : formatter -> meta_arg_type -> unit
@@ -166,20 +165,16 @@ let print_attr fmt a =
 
 let print_attrs = print_iter1 Sattr.iter space print_attr
 
-let print_loc fmt l =
-  let (f,l,b,e) = Loc.get l in
-  fprintf fmt "#\"%s\" %d %d %d#" f l b e
-
-let print_loc' fmt l =
-  let (f,l,b,e) = Loc.get l in
-  fprintf fmt "%S, line %d, characters %d-%d" f l b e
+let print_loc_as_attribute fmt l =
+  let (f,bl,bc,el,ec) = Loc.get l in
+  fprintf fmt "#\"%s\" %d %d %d %d#" f bl bc el ec
 
 let print_id_attrs fmt id =
   if Debug.test_flag debug_print_attrs &&
       not (Sattr.is_empty id.id_attrs) then
     fprintf fmt "@ %a" print_attrs id.id_attrs;
   if Debug.test_flag debug_print_locs then
-    Opt.iter (fprintf fmt "@ %a" print_loc) id.id_loc
+    Opt.iter (fprintf fmt "@ %a" print_loc_as_attribute) id.id_loc
 
 (* type variables always start with a quote *)
 let print_tv fmt tv =
@@ -345,7 +340,7 @@ and print_lterm pri fmt t =
   let print_tloc pri fmt t =
     if Debug.test_flag debug_print_locs && t.t_loc <> None
     then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
-      (print_option print_loc) t.t_loc (print_tattr 0) t
+      (print_option print_loc_as_attribute) t.t_loc (print_tattr 0) t
     else print_tattr pri fmt t in
   let print_types pri fmt t =
     if Debug.test_flag debug_print_types && t.t_ty <> None
