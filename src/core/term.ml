@@ -278,7 +278,7 @@ let rec descend vml t = match t.t_node with
 let t_compare ~trigger ~attr ~loc ~const t1 t2 =
   let comp_raise c =
     if c < 0 then raise CompLT else if c > 0 then raise CompGT in
-  let perv_compare h1 h2 = comp_raise (Pervasives.compare h1 h2) in
+  let perv_compare h1 h2 = comp_raise (Stdlib.compare h1 h2) in
   let rec pat_compare (bnd,bv1,bv2 as state) p1 p2 =
     match p1.pat_node, p2.pat_node with
     | Pwild, Pwild ->

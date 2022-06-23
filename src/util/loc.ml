@@ -95,8 +95,8 @@ let join p1 p2 =
     pos_start = min p1.pos_start p2.pos_start;
     pos_end = max p1.pos_end p2.pos_end }
 
-let compare = Pervasives.compare
-let equal = Pervasives.(=)
+let compare = Stdlib.compare
+let equal = Stdlib.(=)
 let hash = Hashtbl.hash
 
 let pp_position_tail fmt bl bc el ec =

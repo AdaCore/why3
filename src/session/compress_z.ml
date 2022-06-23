@@ -41,7 +41,7 @@ val close_in: in_channel -> unit
 end
 
 
-module Compress_none = Pervasives
+module Compress_none = Stdlib
 
 module Compress_z = struct
 
