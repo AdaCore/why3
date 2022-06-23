@@ -518,7 +518,7 @@ let do_input config env drv = function
 let () =
   try
     if (Util.terminal_has_color && !opt_color) then (
-      Format.set_formatter_tag_functions Util.ansi_color_tags;
+      Format.set_formatter_stag_functions Util.ansi_color_tags;
       set_mark_tags true );
     let main = Whyconf.get_main config in
     let load (f,ef) = Driver.load_driver_file_and_extras main env f ef in
