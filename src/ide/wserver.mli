@@ -68,7 +68,5 @@ val extract_param : string -> char -> string list -> string
     request has been obtained by: [extract_param "GET /" ' '].
     Answers the empty string if the parameter is not found. *)
 
-val get_request_and_content : char Stream.t -> string list * string
-
 val string_of_sockaddr : Unix.sockaddr -> string
 val sockaddr_of_string : string -> Unix.sockaddr
