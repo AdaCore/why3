@@ -6,27 +6,36 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref_ex.mlw:
   Line 6:
-    x [@introduced] = {"type": "Integer", "val": "1"}
+    x [@introduced] = {"type": "Integer", "val": "0"}
     y [@at:'Old:loc:bench/ce/ref_ex.mlw:7] [@field:0:contents]
       [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 7:
-    x [@introduced] [@model_trace:x] = {"type": "Integer", "val": "1"}
+    x [@introduced] [@model_trace:x] = {"type": "Integer", "val": "0"}
     old y [@at:'Old] [@at:'Old:loc:bench/ce/ref_ex.mlw:7] [@field:0:contents]
       [@introduced] [@model_trace:y] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 9:
+    result of call at line 9, characters 11-21 [@call_result:9:11:9:21:bench/ce/ref_ex.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "-2"}
+    result of call at line 9, characters 11-16 [@call_result:9:11:9:16:bench/ce/ref_ex.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "-1"}
+    result of call at line 9, characters 19-21 [@call_result:9:19:9:21:bench/ce/ref_ex.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "-1"}
     y [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "-2"}}]}}
 
 File "bench/ce/ref_ex.mlw", line 13, characters 14-29:
 Sub-goal Postcondition of goal test_post2'vc.
@@ -41,7 +50,7 @@ File ref_ex.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "-42"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 13:
     x [@introduced] [@model_trace:x] = {"type": "Integer", "val": "43"}
     old y [@at:'Old] [@at:'Old:loc:bench/ce/ref_ex.mlw:13]
@@ -49,18 +58,27 @@ File ref_ex.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "-42"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
     y [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
   Line 15:
+    result of call at line 15, characters 11-21 [@call_result:15:11:15:21:bench/ce/ref_ex.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "42"}
+    result of call at line 15, characters 11-16 [@call_result:15:11:15:16:bench/ce/ref_ex.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "42"}
+    result of call at line 15, characters 19-21 [@call_result:15:19:15:21:bench/ce/ref_ex.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
     y [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
 
 File "bench/ce/ref_ex.mlw", line 24, characters 12-36:
 Sub-goal Postcondition of goal incr'vc.
@@ -73,13 +91,13 @@ File ref.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "400"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "175"}}]}}
   Line 20:
     x23 [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "401"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "176"}}]}}
 File ref_ex.mlw:
   Line 21:
     y [@at:'Old:loc:bench/ce/ref_ex.mlw:24] [@field:0:contents]
@@ -94,19 +112,19 @@ File ref_ex.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "399"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "174"}}]}}
   Line 24:
     old x23 [@at:'Old] [@at:'Old:loc:bench/ce/ref_ex.mlw:24]
       [@field:0:contents] [@introduced] [@model_trace:x23] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "399"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "174"}}]}}
     x23 [@field:0:contents] [@introduced] [@model_trace:x23] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "401"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "176"}}]}}
     old y [@at:'Old] [@at:'Old:loc:bench/ce/ref_ex.mlw:24]
       [@field:0:contents] [@introduced] [@model_trace:y] =
       {"type": "Record",
@@ -114,23 +132,41 @@ File ref_ex.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 27:
+    result of call at line 27, characters 7-13 [@call_result:27:7:27:13:bench/ce/ref_ex.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
+    result of call at line 27, characters 7-9 [@call_result:27:7:27:9:bench/ce/ref_ex.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "-1"}
     y [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 28:
+    result of call at line 28, characters 9-17 [@call_result:28:9:28:17:bench/ce/ref_ex.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "175"}
+    result of call at line 28, characters 9-13 [@call_result:28:9:28:13:bench/ce/ref_ex.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "174"}
     x23 [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "400"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "175"}}]}}
   Line 29:
+    result of call at line 29, characters 9-17 [@call_result:29:9:29:17:bench/ce/ref_ex.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "176"}
+    result of call at line 29, characters 9-13 [@call_result:29:9:29:13:bench/ce/ref_ex.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "175"}
     x23 [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "401"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "176"}}]}}
 
 File "bench/ce/ref_ex.mlw", line 38, characters 14-36:
 Sub-goal Loop invariant init of goal test_loop'vc.
@@ -193,8 +229,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
   Line 18:
-    x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_ex.mlw:37:2:96]
-      [@vc:written:37:2:96:bench/ce/ref_ex.mlw] =
+    x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_ex.mlw:37:2:41:6]
+      [@vc:written:37:2:41:6:bench/ce/ref_ex.mlw] =
       {"type": "Record",
        "val":
         {"Field":
@@ -232,9 +268,15 @@ File ref_ex.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 37:
+    result of call at line 37, characters 8-14 [@call_result:37:8:37:14:bench/ce/ref_ex.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": true}
+    result of call at line 37, characters 8-10 [@call_result:37:8:37:10:bench/ce/ref_ex.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "1"}
     [before iteration] x [@field:0:contents] [@introduced]
-      [@loop:bench/ce/ref_ex.mlw:37:2:96]
-      [@vc:written:37:2:96:bench/ce/ref_ex.mlw] =
+      [@loop:bench/ce/ref_ex.mlw:37:2:41:6]
+      [@vc:written:37:2:41:6:bench/ce/ref_ex.mlw] =
       {"type": "Record",
        "val":
         {"Field":
@@ -259,6 +301,12 @@ File ref_ex.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 40:
+    result of call at line 40, characters 9-15 [@call_result:40:9:40:15:bench/ce/ref_ex.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
+    result of call at line 40, characters 9-11 [@call_result:40:9:40:11:bench/ce/ref_ex.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "1"}
     [current iteration] x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
@@ -272,8 +320,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
   Line 18:
-    x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_ex.mlw:37:2:96]
-      [@vc:written:37:2:96:bench/ce/ref_ex.mlw] =
+    x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_ex.mlw:37:2:41:6]
+      [@vc:written:37:2:41:6:bench/ce/ref_ex.mlw] =
       {"type": "Record",
        "val":
         {"Field":
@@ -306,8 +354,8 @@ File ref_ex.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-    x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_ex.mlw:37:2:96]
-      [@model_trace:x] [@vc:written:37:2:96:bench/ce/ref_ex.mlw] =
+    x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_ex.mlw:37:2:41:6]
+      [@model_trace:x] [@vc:written:37:2:41:6:bench/ce/ref_ex.mlw] =
       {"type": "Record",
        "val":
         {"Field":
@@ -319,8 +367,14 @@ File ref_ex.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 37:
-    x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_ex.mlw:37:2:96]
-      [@model_trace:x] [@vc:written:37:2:96:bench/ce/ref_ex.mlw] =
+    result of call at line 37, characters 8-14 [@call_result:37:8:37:14:bench/ce/ref_ex.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": false}
+    result of call at line 37, characters 8-10 [@call_result:37:8:37:10:bench/ce/ref_ex.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
+    x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_ex.mlw:37:2:41:6]
+      [@model_trace:x] [@vc:written:37:2:41:6:bench/ce/ref_ex.mlw] =
       {"type": "Record",
        "val":
         {"Field":

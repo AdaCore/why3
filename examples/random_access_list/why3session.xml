@@ -32,10 +32,10 @@
  <goal name="nth_flatten&#39;vc" expl="VC for nth_flatten" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="nth_flatten&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="41"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="43"/></proof>
   </goal>
   <goal name="nth_flatten&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
   <goal name="nth_flatten&#39;vc.2" expl="postcondition" proved="true">
   <transf name="destruct_term_subst" proved="true" arg1="l">
@@ -68,12 +68,12 @@
           <goal name="nth_flatten&#39;vc.2.0.1.0.0.0.0.0.0" expl="false case (postcondition)" proved="true">
           <transf name="assert" proved="true" arg1="(match Some (x1, x) with None -&gt; false | Some (x0, x11) -&gt; Some x0 = nth (2 * (i - 1)) (flatten x2) /\ Some x11 = nth ((2 * (i - 1)) + 1) (flatten x2) end)">
            <goal name="nth_flatten&#39;vc.2.0.1.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
-           <proof prover="1"><result status="valid" time="0.01" steps="57"/></proof>
+           <proof prover="1"><result status="valid" time="0.01" steps="63"/></proof>
            </goal>
            <goal name="nth_flatten&#39;vc.2.0.1.0.0.0.0.0.0.1" expl="false case (postcondition)" proved="true">
            <transf name="unfold" proved="true" arg1="flatten">
             <goal name="nth_flatten&#39;vc.2.0.1.0.0.0.0.0.0.1.0" expl="false case (postcondition)" proved="true">
-            <proof prover="1"><result status="valid" time="0.02" steps="96"/></proof>
+            <proof prover="1"><result status="valid" time="0.02" steps="102"/></proof>
             </goal>
            </transf>
            </goal>
@@ -87,7 +87,7 @@
         </transf>
         </goal>
         <goal name="nth_flatten&#39;vc.2.0.1.0.0.0.1" expl="false case (postcondition)" proved="true">
-        <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
+        <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
         </goal>
        </transf>
        </goal>
@@ -99,7 +99,7 @@
      </transf>
      </goal>
      <goal name="nth_flatten&#39;vc.2.0.1.1" expl="equality hypothesis" proved="true">
-     <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
+     <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
      </goal>
     </transf>
     </goal>
@@ -253,7 +253,7 @@
   <goal name="lookup&#39;vc.7" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="lookup&#39;vc.7.0" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.01" steps="49"/></proof>
+   <proof prover="1"><result status="valid" time="0.01" steps="57"/></proof>
    </goal>
    <goal name="lookup&#39;vc.7.1" expl="postcondition" proved="true">
    <proof prover="1"><result status="valid" time="0.01" steps="141"/></proof>
@@ -294,10 +294,10 @@
   <goal name="fupdate&#39;vc.7" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="fupdate&#39;vc.7.0" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.03" steps="287"/></proof>
+   <proof prover="1"><result status="valid" time="0.03" steps="316"/></proof>
    </goal>
    <goal name="fupdate&#39;vc.7.1" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.03" steps="188"/></proof>
+   <proof prover="1"><result status="valid" time="0.03" steps="193"/></proof>
    </goal>
   </transf>
   </goal>

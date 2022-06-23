@@ -54,6 +54,12 @@ File record_nested_one_field.mlw:
                                [{"field": "cont_one_attr",
                                  "value": {"type": "Integer", "val": "0"}}]}}}]}}}]}}}]}}
   Line 16:
+    result of call at line 16, character 46 to line 17, character 38 [@call_result:16:46:17:38:bench/ce/record_nested_one_field.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
+    result of call at line 16, characters 46-51 [@call_result:16:46:16:51:bench/ce/record_nested_one_field.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
     y [@field:0:cont_four_attr] [@field:1:contents] [@field:2:cont_two]
       [@field:3:cont_one_attr] [@introduced] =
       {"type": "Record",
@@ -76,4 +82,20 @@ File record_nested_one_field.mlw:
                              {"Field":
                                [{"field": "cont_one_attr",
                                  "value": {"type": "Integer", "val": "0"}}]}}}]}}}]}}}]}}
+  Line 17:
+    result of call at line 17, characters 6-38 [@call_result:17:6:17:38:bench/ce/record_nested_one_field.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
+    result of call at line 17, characters 6-20 [@call_result:17:6:17:20:bench/ce/record_nested_one_field.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "cont_two",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "cont_one_attr",
+                   "value": {"type": "Integer", "val": "0"}}]}}}]}}
 

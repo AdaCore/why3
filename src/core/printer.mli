@@ -42,7 +42,7 @@ type printing_info = {
   (** The position of the term that triggers the VC *)
   vc_term_attrs : Sattr.t;
   (** The attributes of the term that triggers the VC *)
-  queried_terms : Term.term Mstr.t;
+  queried_terms : (Term.lsymbol * Loc.position option * Sattr.t)  Mstr.t;
   (** The list of terms that were queried for the counter-example
      by the printer *)
   list_projections: Ident.ident Mstr.t;

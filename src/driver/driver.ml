@@ -282,10 +282,10 @@ let file_of_theory drv input_file th =
   get_filename drv ~input_file ~theory_name:th.th_name.Ident.id_string ~goal_name:"null"
 
 let call_on_buffer
-      ~command ~libdir ~datadir ~limit ~gen_new_file ?inplace ~filename
+      ~command ~config ~limit ~gen_new_file ?inplace ~filename
     ~printing_info drv buffer =
   Call_provers.call_on_buffer
-    ~command ~libdir ~datadir ~limit ~gen_new_file
+    ~command ~config ~limit ~gen_new_file
     ~res_parser:drv.drv_res_parser
     ~filename ~printing_info ?inplace buffer
 
@@ -395,7 +395,7 @@ let file_name_of_task ?old ?inplace ?interactive drv task =
         *)
         let pr = Task.task_goal task in
         let fn = match pr.pr_name.id_loc with
-          | Some loc -> let fn,_,_,_ = Loc.get loc in Filename.basename fn
+          | Some loc -> let fn,_,_,_,_ = Loc.get loc in Filename.basename fn
           | None -> "" in
         let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
         true, get_filename drv
@@ -408,7 +408,7 @@ let file_name_of_task ?old ?inplace ?interactive drv task =
         *)
         let pr = Task.task_goal task in
         let fn = match pr.pr_name.id_loc with
-          | Some loc -> let fn,_,_,_ = Loc.get loc in Filename.basename fn
+          | Some loc -> let fn,_,_,_,_ = Loc.get loc in Filename.basename fn
           | None -> "" in
         let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
         true, get_filename drv
@@ -417,7 +417,7 @@ let file_name_of_task ?old ?inplace ?interactive drv task =
           ~goal_name:pr.pr_name.id_string
 
 let prove_task_prepared
-      ~command ~libdir ~datadir ~limit ?old ?inplace ?interactive drv task =
+      ~command ~config ~limit ?old ?inplace ?interactive drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
   let old_channel = Opt.map open_in old in
@@ -429,17 +429,17 @@ let prove_task_prepared
   let get_counterexmp = get_counterexmp task in
   let res =
     call_on_buffer
-      ~command ~libdir ~datadir ~limit ~gen_new_file ?inplace ~filename
+      ~command ~config ~limit ~gen_new_file ?inplace ~filename
       ~get_counterexmp ~printing_info drv buf
   in
   Buffer.reset buf;
   res
 
 let prove_task
-      ~command ~libdir ~datadir ~limit ?old ?inplace ?interactive drv task =
+      ~command ~config ~limit ?old ?inplace ?interactive drv task =
   let task = prepare_task drv task in
   prove_task_prepared
-    ~command ~libdir ~datadir ~limit ?interactive ?old ?inplace drv task
+    ~command ~config ~limit ?interactive ?old ?inplace drv task
 
 (* exception report *)
 
@@ -464,3 +464,21 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | PSymExpected ls -> Format.fprintf fmt
       "%a is not a predicate symbol" Pretty.print_ls ls
   | e -> raise e)
+
+
+(** Loading drivers with relative names *)
+
+let absolute_driver_file main s =
+  if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
+  else Filename.concat (Whyconf.datadir main) (Filename.concat "drivers" (s ^ ".drv"))
+
+let load_driver_raw main env file extras =
+  let file = absolute_driver_file main file in
+  try
+    load_driver_absolute env file extras
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    eprintf "Fatal error while loading driver file '%s': %a@."
+            file Exn_printer.exn_printer e;
+    exit 1
+
+let load_driver main env p = load_driver_raw main env p.Whyconf.driver p.Whyconf.extra_drivers

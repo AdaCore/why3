@@ -363,21 +363,22 @@ let is_written_attr a =
   Strings.has_prefix "vc:written:" a.attr_string
 
 let create_loc_attr prefix loc =
-  let f,l,b,e = Loc.get loc in
+  let f,bl,bc,el,ec = Loc.get loc in
   (* The file comes last to permit filenames that contain colons *)
-  let s = Format.sprintf "%s:%i:%i:%i:%s" prefix l b e f in
+  let s = Format.sprintf "%s:%i:%i:%i:%i:%s" prefix bl bc el ec f in
   create_attribute s
 
 let get_loc_attr prefix attr =
   match Strings.remove_prefix (prefix^":") attr.attr_string with
   | exception Not_found -> None
-  | str -> match Strings.bounded_split ':' str 4 with
-    | [line; col_st; col_end; file] ->
+  | str -> match Strings.bounded_split ':' str 5 with
+    | [stline; stcol; endline; endcol; file] ->
         begin try
-            let line = int_of_string line in
-            let col_st = int_of_string col_st in
-            let col_end = int_of_string col_end in
-            Some (Loc.user_position file line col_st col_end)
+            let stline = int_of_string stline in
+            let stcol = int_of_string stcol in
+            let endline = int_of_string endline in
+            let endcol = int_of_string endcol in
+            Some (Loc.user_position file stline stcol endline endcol)
           with _ -> None
         end
     | _ -> None

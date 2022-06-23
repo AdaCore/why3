@@ -25,27 +25,19 @@ File record_map.mlw:
                  "value": {"type": "Integer", "val": "0"}},
                 {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}
   Line 42:
-    map_rec [@introduced] [@model_projected] [@model_trace:map_rec] =
-      {"type": "Array",
-       "val":
-        [{"indice": {"type": "Boolean", "val": true},
-          "value":
-           {"type": "Record",
-            "val":
-             {"Field":
-               [{"field": ".field_f",
-                 "value": {"type": "Integer", "val": "-1"}},
-                {"field": "g", "value": {"type": "Boolean", "val": false}}]}}},
-         {"others":
-           {"type": "Record",
-            "val":
-             {"Field":
-               [{"field": ".field_f",
-                 "value": {"type": "Integer", "val": "0"}},
-                {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}
+    result [@introduced] = {"type": "Integer", "val": "-1"}
   Line 44:
-    result [@id:unused] [@introduced] [@model_trace:result] =
+    result of call at line 44, characters 2-17 [@call_result:44:2:44:17:bench/ce/record_map.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Integer", "val": "-1"}
+    result of call at line 44, characters 2-15 [@call_result:44:2:44:15:bench/ce/record_map.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".field_f", "value": {"type": "Integer", "val": "-1"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+    result [@introduced] = {"type": "Integer", "val": "-1"}
 
 File "bench/ce/record_map.mlw", line 47, characters 12-22:
 Sub-goal Postcondition of goal record_map_proj_test2'vc.
@@ -67,21 +59,19 @@ File record_map.mlw:
                 {"others": {"type": "Integer", "val": "0"}}]}},
            {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
   Line 47:
-    rec_map [@introduced] [@model_projected] [@model_trace:rec_map] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "f_map",
-            "value":
-             {"type": "Array",
-              "val":
-               [{"indice": {"type": "Boolean", "val": true},
-                 "value": {"type": "Integer", "val": "-1"}},
-                {"others": {"type": "Integer", "val": "0"}}]}},
-           {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
+    result [@introduced] = {"type": "Integer", "val": "-1"}
   Line 49:
-    result [@id:unused] [@introduced] [@model_trace:result] =
+    result of call at line 49, characters 2-21 [@call_result:49:2:49:21:bench/ce/record_map.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Integer", "val": "-1"}
+    result of call at line 49, characters 2-15 [@call_result:49:2:49:15:bench/ce/record_map.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Array",
+       "val":
+        [{"indice": {"type": "Boolean", "val": true},
+          "value": {"type": "Integer", "val": "-1"}},
+         {"others": {"type": "Integer", "val": "0"}}]}
+    result [@introduced] = {"type": "Integer", "val": "-1"}
 
 File "bench/ce/record_map.mlw", line 54, characters 12-31:
 Sub-goal Postcondition of goal record_map_proj_test3'vc.

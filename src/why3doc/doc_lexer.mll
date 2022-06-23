@@ -38,8 +38,8 @@
       let loc =
         let loc = get_loc lexbuf in
         if parentheses then
-          let (f,l,s,e) = Loc.get loc in
-          Loc.user_position f l (s + 1) (e - 1)
+          let (f,bl,bc,el,ec) = Loc.get loc in
+          Loc.user_position f bl (bc + 1) el (ec - 1)
         else loc in
       try
         (* note that Doc_def.pp_{anchor,locate} might raise Not_found,

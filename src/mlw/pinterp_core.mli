@@ -125,6 +125,8 @@ val snapshot_oldies :
 module Log : sig
   type exec_mode = Exec_giant_steps | Exec_normal
 
+  val pp_mode : Format.formatter -> exec_mode -> unit
+
   type value_or_invalid = Value of value | Invalid
 
   type log_entry_desc = private

@@ -9,9 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-(*
-type lexing_loc = Lexing.position * Lexing.position
-*)
 
 open Mysexplib.Std [@@warning "-33"]
 open Lexing
@@ -28,52 +25,71 @@ let transfer_loc lb_from lb_to =
   lb_to.lex_curr_p <- lb_from.lex_curr_p
 
 
-(*s Error locations. *)
-
-(* dead code
-let finally ff f x =
-  let y = try f x with e -> ff (); raise e in ff (); y
-*)
-
-open Format
-
-(*s Line number *)
-
+type position = string * int * int
 (*
-let report_line fmt l = fprintf fmt "%s:%d:" l.pos_fname l.pos_lnum
+
+To reduce memory consumption, a pair (line,col) is stored in a single
+   int using
+
+     (line << 12) | col
+
+   This will thus support column numbers up to 4095 and line numbers up
+   to 2^18 on 32-bit architecture.
+
 *)
 
-type position = string * int * int * int
+let user_position f bl bc el ec =
+  (f, (bl lsl 12) lor bc, (el lsl 12) lor ec)
+
+let get (f,b,e) =
+  (f, b lsr 12, b land 0x0FFF, e lsr 12, e land 0x0FFF)
+
+let sexp_of_expanded_position _ = assert false  [@@warning "-32"]
+(* default value if the line below does not produce anything, i.e.,
+   when ppx_sexp_conv is not installed *)
+
+type expanded_position = string * int * int * int * int
 [@@deriving sexp_of]
 
-let user_position fname lnum cnum1 cnum2 = (fname,lnum,cnum1,cnum2)
+let sexp_of_position loc =
+  let eloc = get loc in sexp_of_expanded_position eloc
 
-let get loc = loc
 
-let dummy_position = ("",0,0,0)
+let dummy_position = ("",0,0)
 
-let join (f1,l1,b1,e1) (f2,l2,_b2,e2) =
+let join (f1,b1,e1) (f2,b2,e2) =
   assert (f1 = f2);
-  if l1 = l2 then (f1,l1,b1,e2)
-  else
-    (* There is no way to get an always right join in this case *)
-    (f1, l1, b1, e1 + e2)
+  (f1, min b1 b2, max e1 e2)
 
 let extract (b,e) =
   let f = b.pos_fname in
-  let l = b.pos_lnum in
-  let fc = b.pos_cnum - b.pos_bol in
-  let lc = e.pos_cnum - b.pos_bol in
-  (f,l,fc,lc)
+  let bl = b.pos_lnum in
+  let bc = b.pos_cnum - b.pos_bol in
+  let el = e.pos_lnum in
+  let ec = e.pos_cnum - e.pos_bol in
+  user_position f bl bc el ec
 
 let compare = Pervasives.compare
 let equal = Pervasives.(=)
 let hash = Hashtbl.hash
 
-let gen_report_position fmt (f,l,b,e) =
-  fprintf fmt "File \"%s\", line %d, characters %d-%d" f l b e
+let pp_position_tail fmt bl bc el ec =
+  let open Format in
+  fprintf fmt "line %d, character" bl;
+  if bl=el then
+    fprintf fmt "s %d-%d" bc ec
+  else
+    fprintf fmt " %d to line %d, character %d" bc el ec
 
-let report_position fmt = fprintf fmt "%a:@\n" gen_report_position
+let pp_position fmt loc =
+  let open Format in
+  let (f,bl,bc,el,ec) = get loc in
+  if f <> "" then fprintf fmt "\"%s\", " f;
+  pp_position_tail fmt bl bc el ec
+
+let pp_position_no_file fmt loc =
+  let (_,bl,bc,el,ec) = get loc in
+  pp_position_tail fmt bl bc el ec
 
 (* located exceptions *)
 
@@ -119,54 +135,20 @@ let errorm ?loc f =
   Format.kasprintf (fun s -> error ?loc (Message s)) ("@[" ^^ f ^^ "@]")
 
 let () = Exn_printer.register
-  (fun fmt exn -> match exn with
+  (fun fmt exn ->
+    let open Format in
+    match exn with
     | Located (loc,e) ->
-        fprintf fmt "%a%a" report_position loc Exn_printer.exn_printer e
+        fprintf fmt "@[File %a:@ %a@]" pp_position loc Exn_printer.exn_printer e
     | Message s ->
         pp_print_string fmt s
     | _ ->
         raise exn)
 
-let loc lb = extract (Lexing.lexeme_start_p lb, Lexing.lexeme_end_p lb)
-
 let with_location f lb =
   if Debug.test_flag Debug.stack_trace then f lb else
     try f lb with
     | Located _ as e -> raise e
-    | e -> raise (Located (loc lb, e))
-
-let get_line_lengths f =
-  let lengths = ref [] in
-  let ch = open_in f in
-  ( try
-      while true do
-        let line = input_line ch in
-        lengths := String.length line :: !lengths;
-      done
-    with End_of_file -> () );
-  close_in ch;
-  Array.of_list (List.rev !lengths)
-
-let get_line_lengths =
-  let module Str = struct include String let hash = Hashtbl.hash end in
-  let module Hstr = Hashtbl.Make (Str) in
-  let cache = Hstr.create 5 in
-  fun f ->
-    try Hstr.find cache f
-    with Not_found ->
-      let l = get_line_lengths f in
-      Hstr.add cache f l;
-      l
-
-let get_multiline (f, bl, bc, ec) =
-  if Sys.file_exists f then
-    let ls = get_line_lengths f in
-    let el, ec = ref bl, ref ec in
-    assert (!el > 0); (* lines are 1-indexed *)
-    while !el < Array.length ls && !ec > ls.(!el-1) do
-      ec := !ec - ls.(!el-1) - 1; (* newlines are counted in multi-line locs *)
-      incr el
-    done;
-    f, (bl, bc), (!el, !ec)
-  else
-    failwith "Loc.get_multiline"
+    | e ->
+       let loc = extract (Lexing.lexeme_start_p lb, Lexing.lexeme_end_p lb) in
+       raise (Located (loc, e))

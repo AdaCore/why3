@@ -68,8 +68,7 @@ val print_theory :
 
 val prove_task :
   command      : string ->
-  libdir       : string ->
-  datadir      : string ->
+  config       : Whyconf.main ->
   limit        : Call_provers.resource_limit ->
   ?old         : string ->
   ?inplace     : bool ->
@@ -87,8 +86,7 @@ val print_task_prepared :
 
 val prove_task_prepared :
   command      : string ->
-  libdir       : string ->
-  datadir      : string ->
+  config       : Whyconf.main ->
   limit        : Call_provers.resource_limit ->
   ?old         : string ->
   ?inplace     : bool ->
@@ -108,3 +106,19 @@ val meta_get_counterexmp : Theory.meta
 val get_counterexmp : Task.task -> bool
 (** Returns true if counterexample should be get for the task (according to
     [meta_get_counterexmp]. *)
+
+
+(** Loading drivers with relative names *)
+
+val load_driver_raw : Whyconf.main -> Env.env -> string -> string list -> driver
+(** [load_driver_raw main env file extras] loads the driver in file
+   [file] and with additional drivers in list [extras], in the context
+   of the configuration [main] and environment [env].  This function
+   is a wrapper to the lower level function
+   {!Driver.load_driver_absolute}. *)
+
+val load_driver : Whyconf.main -> Env.env -> Whyconf.config_prover -> driver
+(** [load_driver main env p] loads the driver for prover [p],
+   in the context of the configuration [main] and environment [env].
+   This function is a wrapper to the lower level function
+   {!load_driver_raw}. *)

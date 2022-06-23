@@ -101,7 +101,7 @@ let read_channel env path filename cin =
     exit 1
   end;
   (* Create the theory *)
-  let th_uc_loc = Loc.user_position filename 1 0 0 in
+  let th_uc_loc = Loc.user_position filename 1 0 1 1 in
   let th_uc = create_theory ~path (id_user "EqLin" th_uc_loc) in
   let th_uc = Theory.use_export th_uc th_int in
   (* Read one line and add it to the theory *)
@@ -114,7 +114,7 @@ let read_channel env path filename cin =
         (* Scanf.sscanf s "%i %i %i" (fun nvar m k -> nvar,m,k) *)
         scanf s
     with _ -> Printf.eprintf "Error file %s line %i" filename !line;exit 1 in
-    let loc = Loc.user_position filename (!line+1) 0 (String.length s) in
+    let loc = Loc.user_position filename (!line+1) 0 (!line+1) (String.length s) in
     let goal_id = Decl.create_prsymbol
       (Ident.id_user (Printf.sprintf "goal%i" !line) loc) in
     let fmla = create_fmla nvar m k in

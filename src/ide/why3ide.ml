@@ -396,8 +396,10 @@ let initialization_complete = ref false
 let warnings = Queue.create ()
 
 let record_warning ?loc msg =
-  Format.eprintf "%awarning: %s@."
-    (Pp.print_option Loc.report_position) loc msg;
+  begin match loc with
+  | None -> Format.eprintf "Warning: %s@." msg;
+  | Some l -> Format.eprintf "Warning, file %a: %s@." Loc.pp_position l msg;
+  end;
   Queue.push (loc,msg) warnings
 
 let () =
@@ -840,7 +842,7 @@ let display_warnings fmt warnings =
         Format.fprintf fmt "%s@\n@\n" msg
       | Some l ->
         (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
-        Format.fprintf fmt "%a: %s@\n@\n" Loc.gen_report_position l msg
+        Format.fprintf fmt "File %a: %s@\n@\n" Loc.pp_position l msg
     ) warnings;
   with Exit -> ()
 
@@ -1069,7 +1071,7 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
   match loc_of_goal with
   | None -> ()
   | Some loc ->
-    let f, l, e, _ = Loc.get loc in
+    let f, l, e, _, _ = Loc.get loc in
     let (n, v) =
       if f = "Task" then (0, task_view) else
         try let (n, v, _, _) = get_source_view_table f in
@@ -1080,7 +1082,7 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
               Sysutil.file_contents f
             with exn ->
               Format.asprintf "Error with scroll_to_loc to loc='%a':@ %a"
-                Loc.gen_report_position loc
+                Loc.pp_position loc
                 Exn_printer.exn_printer exn
           in
           let (n,v) = create_raw_source_view ~read_only:true f s in
@@ -1101,7 +1103,7 @@ let scroll_to_loc_ce loc_of_goal =
   match loc_of_goal with
   | None -> ()
   | Some loc ->
-      let _, l, _, _= Loc.get loc in
+      let _, l, _, _, _ = Loc.get loc in
       (* 0.5 to focus on the middle of the screen *)
       when_idle (fun () -> move_to_line ~yalign:0.5 counterexample_view l)
 
@@ -1124,7 +1126,7 @@ let save_cursor_loc cursor_ref =
   | Some (cur_file, view) ->
     (* Get current line *)
     let line = (view#buffer#get_iter_at_mark `INSERT)#line + 1 in
-    cursor_ref := Some (Loc.user_position cur_file line 0 0)
+    cursor_ref := Some (Loc.user_position cur_file line 0 line 0)
 
 (******************)
 (* Reload actions *)
@@ -1222,7 +1224,7 @@ let color_line ~color loc =
     buf#apply_tag_by_name ~start ~stop color
   in
 
-  let f, l, _, _ = Loc.get loc in
+  let f, l, _, _, _ = Loc.get loc in
   try
     let v = get_source_view f in
     let color = convert_color color in
@@ -1239,20 +1241,21 @@ let color_loc ?(ce=false) ~color loc =
 
   (* This apply a background [color] on a location given by its file view [v] line
      [l] beginning char [b] and end char [e]. *)
-  let color_loc (v:GSourceView.source_view) ~color l b e =
+  let color_loc (v:GSourceView.source_view) ~color bl bc el ec =
     let buf = v#buffer in
     let top = buf#start_iter in
-    let start = top#forward_lines (l-1) in
-    let start = start#forward_chars b in
-    let stop = start#forward_chars (e-b) in
+    let start = top#forward_lines (bl-1) in
+    let start = start#forward_chars bc in
+    let stop = top#forward_lines (el-1) in
+    let stop = stop#forward_chars ec in
     buf#apply_tag_by_name ~start ~stop color
   in
 
-  let f, l, b, e = Loc.get loc in
+  let f, bl, bc, el, ec = Loc.get loc in
   try
     let v = if ce then counterexample_view else get_source_view f in
     let color = convert_color color in
-    color_loc ~color v l b e
+    color_loc ~color v bl bc el ec
   with
   | Nosourceview f ->
       (* If the file is not present do nothing *)
@@ -1652,12 +1655,13 @@ let treat_message_notification msg = match msg with
           (* remove all coloration in message_zone before coloring *)
           buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter;
           let color = "error_tag" in
-          let _, _, beg_char, end_char = Loc.get loc in
-          let start = buf#start_iter#forward_lines 3 in
-          buf#apply_tag_by_name
-            ~start:(start#forward_chars beg_char)
-            ~stop:(start#forward_chars end_char)
-            color
+          let _, bline, bchar, eline, echar = Loc.get loc in
+          (* FIXME: explain why do we add 3 *)
+          let start = buf#start_iter#forward_lines (3 + bline) in
+          let start = start#forward_chars bchar in
+          let stop = buf#start_iter#forward_lines (3 + eline) in
+          let stop = stop#forward_chars echar in
+          buf#apply_tag_by_name ~start ~stop color
         end
   | Strat_error (_id, s) ->
      print_message ~kind:1 ~notif_kind:"Strat_error" "%s" s
@@ -1683,7 +1687,7 @@ let treat_message_notification msg = match msg with
        end
      else
        begin
-         Format.eprintf "%a: %s@." Loc.gen_report_position loc s;
+         Format.eprintf "File %a: %s@." Loc.pp_position loc s;
          exit 1
        end
 
@@ -2076,15 +2080,17 @@ let uncolor ~color loc =
   match loc with
   | None -> ()
   | Some loc ->
-      let f, l, b, e = Loc.get loc in
+      let f, bl, bc, el, ec = Loc.get loc in
       try
         let v = get_source_view f in
         let color = convert_color color in
         let buf = v#buffer in
         let top = buf#start_iter in
-        let start = top#forward_lines (l-1) in
-        let start = start#forward_chars b in
-        let stop = start#forward_chars (e-b) in
+        (* removing 1 because first line number is 0 in Gtk source views *)
+        let start = top#forward_lines (bl-1) in
+        let start = start#forward_chars bc in
+        let stop = top#forward_lines (el-1) in
+        let stop = stop#forward_chars ec in
         buf#remove_tag_by_name ~start ~stop color;
       with
       | Nosourceview _ -> ()
@@ -2124,8 +2130,9 @@ let search_forward =
             | Some (iter_begin, iter_end) ->
                 let n1 = GtkText.Iter.get_line iter_begin in
                 let l1 = GtkText.Iter.get_line_index iter_begin in
+                let n2 = GtkText.Iter.get_line iter_end in
                 let l2 = GtkText.Iter.get_line_index iter_end in
-                let loc1 = Loc.user_position cur_file (n1 + 1) l1 l2 in
+                let loc1 = Loc.user_position cur_file (n1+1) l1 (n2+1) l2 in
                 color_loc ~color:Search_color loc1;
                 if not (Opt.equal Loc.equal !last_colored (Some loc1)) then
                   uncolor ~color:Search_color !last_colored;
@@ -2133,9 +2140,9 @@ let search_forward =
                 (* Get to the line after to be able to call Ctrl+F on the same
                    string right away *)
                 let loc2 = if forward then
-                    Loc.user_position cur_file (n1 + 1) l2 l2
+                    Loc.user_position cur_file n2 l2 n2 l2
                   else
-                    Loc.user_position cur_file (n1 + 1) l1 l1
+                    Loc.user_position cur_file n1 l1 n1 l1
                 in
                 scroll_to_loc ~force_tab_switch:false (Some loc2);
   in
@@ -2218,11 +2225,13 @@ let find_cursor_ident, get_back_loc =
             if text = "" then
               ()
             else
-              let l = start_iter#line + 1 in
-              let b = start_iter#line_offset in
-              let e = end_iter#line_offset in
+              (* adding 1 because first line number is 0 in Gtk source views *)
+              let bl = start_iter#line + 1 in
+              let bc = start_iter#line_offset in
+              let el = end_iter#line + 1 in
+              let ec = end_iter#line_offset in
               let f = file in
-              let loc = Loc.user_position f l b e in
+              let loc = Loc.user_position f bl bc el ec in
               send_request (Find_ident_req loc)
         with SearchLimit ->
           print_message ~notif_kind:"Ide_error" ~kind:1

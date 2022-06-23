@@ -72,7 +72,7 @@ let option_list =
     KLong "rac-timelimit", Hnd1 (AInt, fun i -> opt_rac_timelimit := Some i),
     "<seconds> Time limit in seconds for RAC (with --rac)";
     KLong "rac-steplimit", Hnd1 (AInt, fun i -> opt_rac_steplimit := Some i),
-    "<seconds> Step limit for RAC (with --rac)";
+    "<steps> Step limit for RAC (with --rac)";
     KLong "rac-fail-cannot-check", Hnd0 (fun () -> opt_rac_ignore_incomplete := false),
     " Fail RAC as incomplete when a assertion cannot be checked";
     KLong "use", Hnd1 (AString, fun m -> use_modules := m :: !use_modules),
@@ -145,7 +145,7 @@ let do_input f =
       (* TODO Remove this case when value origins (default vs model) can be distinguished
          in RAC *)
       eprintf "RAC got stuck %s after %a@." reason
-        (Pp.print_option_or_default "unknown location" Pretty.print_loc') l;
+        (Pp.print_option_or_default "unknown location" Loc.pp_position) l;
       exit 2
   | Pinterp_core.Incomplete reason ->
       eprintf "Execution terminated because %s@." reason;

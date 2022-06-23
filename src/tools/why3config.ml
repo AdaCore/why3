@@ -44,7 +44,7 @@ module DetectProvers = struct
     ignore (compute_builtin_prover provers config data);
     let config = remove_auto_provers config in
     let config = update_provers provers config in
-    let config = Whyconf.User.set_dirs ~libdir:Config.libdir ~datadir:Config.datadir config in
+    (* let config = Whyconf.User.set_dirs ~libdir:Config.libdir ~datadir:Config.datadir config in *)
     Format.printf "Save config to %s@." (Whyconf.get_conf_file config);
     Whyconf.save_config config
 

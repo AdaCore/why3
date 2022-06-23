@@ -206,9 +206,12 @@ module Editor = struct
     let remove_marker m =
       editor ## getSession ## removeMarker m
 
-    let get_char buffer i = int_of_float (buffer ## charCodeAt(i))
+    (* old code, left for reference
+      let get_char buffer i = int_of_float (buffer ## charCodeAt(i))
+     *)
     let why3_loc_to_range buffer loc =
-      let goto_line lstop =
+      (* old code, left for reference
+        let goto_line lstop =
         let rec loop lcur i =
           if lcur >= lstop then i
           else
@@ -228,6 +231,11 @@ module Editor = struct
       let i = goto_line l1 in
       let l2, c2 = convert_range l1 b (i+b) (e-b) in
       mk_range (l1-1) c1 (l2-1) c2
+       *)
+      ignore buffer;
+      let bl, bc, el, ec = loc in
+      mk_range (bl-1) bc (el-1) ec
+
 
       let editor_bg = getElement AsHtml.div "why3-editor-bg"
 

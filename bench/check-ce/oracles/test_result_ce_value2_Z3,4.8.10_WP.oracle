@@ -19,6 +19,7 @@
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "-1"}}]}}
+                          result = {"type": "Boolean", "val": true}
                           result = {"type": "Integer", "val": "0"}
                         Line 13:
                           a =
@@ -159,7 +160,7 @@
   - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9)
 File "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20:
 Sub-goal Assertion of goal test2'vc.
-Prover result is: Unknown (unknown) (0.40s, 3000050 steps).
+Prover result is: Step limit exceeded (0.52s, 3000059 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -220,6 +221,7 @@ File test_result_ce_value2.mlw:
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "42"}}]}}
+                          result = {"type": "Boolean", "val": false}
                           result = {"type": "Integer", "val": "43"}
                         Line 15:
                           a =
@@ -360,7 +362,7 @@ File test_result_ce_value2.mlw:
   - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9)
 File "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20:
 Sub-goal Assertion of goal test2'vc.
-Prover result is: Unknown (unknown) (0.33s, 3000052 steps).
+Prover result is: Step limit exceeded (0.50s, 3000061 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -440,7 +442,9 @@ File test_result_ce_value2.mlw:
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "41"}}]}}
+                          result = {"type": "Boolean", "val": true}
                           result = {"type": "Integer", "val": "51"}
+                          result = {"type": "Boolean", "val": true}
                           result = {"type": "Integer", "val": "0"}
                         Line 22:
                           a =
@@ -449,6 +453,7 @@ File test_result_ce_value2.mlw:
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "42"}}]}}
+                          result = {"type": "Integer", "val": "42"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -613,7 +618,7 @@ File test_result_ce_value2.mlw:
   - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
 File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
 Sub-goal Postcondition of goal test3'vc.
-Prover result is: Unknown (unknown) (0.33s, 3000084 steps).
+Prover result is: Step limit exceeded (0.47s, 3000107 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -706,7 +711,9 @@ File test_result_ce_value2.mlw:
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "40"}}]}}
+                          result = {"type": "Boolean", "val": false}
                           result = {"type": "Integer", "val": "41"}
+                          result = {"type": "Boolean", "val": true}
                           result = {"type": "Integer", "val": "0"}
                         Line 24:
                           a =
@@ -715,6 +722,7 @@ File test_result_ce_value2.mlw:
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "42"}}]}}
+                          result = {"type": "Integer", "val": "42"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -879,7 +887,7 @@ File test_result_ce_value2.mlw:
   - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
 File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
 Sub-goal Postcondition of goal test3'vc.
-Prover result is: Unknown (unknown) (0.33s, 3000086 steps).
+Prover result is: Step limit exceeded (0.47s, 3000109 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -934,7 +942,7 @@ File test_result_ce_value2.mlw:
 
 File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
 Sub-goal Postcondition of goal test3'vc.
-Prover result is: Valid (0.00s, 74 steps).
+Prover result is: Valid (0.01s, 84 steps).
 
 <check-ce-rac-results>Check model 0 ("bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
 <check-ce-rac-results>Checking model:
@@ -970,6 +978,7 @@ Prover result is: Valid (0.00s, 74 steps).
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "40"}}]}}
+                          result = {"type": "Boolean", "val": false}
                           result = {"type": "Integer", "val": "100"}
                         Line 24:
                           a =
@@ -978,6 +987,7 @@ Prover result is: Valid (0.00s, 74 steps).
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "42"}}]}}
+                          result = {"type": "Integer", "val": "42"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -1128,7 +1138,7 @@ Prover result is: Valid (0.00s, 74 steps).
   - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
 File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
 Sub-goal Postcondition of goal test3'vc.
-Prover result is: Unknown (unknown) (0.36s, 3000060 steps).
+Prover result is: Step limit exceeded (0.48s, 3000074 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

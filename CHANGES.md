@@ -1,7 +1,26 @@
 :x: marks a potential source of incompatibility
 
+Documentation
+  * add documentation for several options of `why3 prove` and `why3
+    execute` that were left undocumented so far
+  * added documentation for environment variables WHY3LIB and WHY3DATA
+
 Provers
   * support for CVC5 1.0.0 (released April 6, 2022)
+
+Configuration
+  * the libdir and datadir are not anymore stored in the Why3 config
+    file, but they can be manually set there if desired. See also the
+    usage of environment variables WHY3LIB and WHY3DATA
+
+API
+  * source locations are now represented by both a start line number
+    and an end line number. The fourth number is thus now the column
+    number on the end line. :x:
+  * function load_driver moved from Whyconf to Driver :x:
+  * several functions from Call_prover and Driver now take as input a
+    `Whyconf.main` configuration type instead of directly take libdir
+    and datadir. See the updated API examples for details. :x:
 
 Version 1.5.0, April 29, 2022
 -----------------------------

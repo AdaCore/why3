@@ -33,12 +33,15 @@ File loop_ce.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
   Line 11:
     [before iteration] b [@field:0:contents] [@introduced]
-      [@loop:bench/ce/loop_ce.mlw:11:2:91] [@mlw:reference_var]
-      [@vc:written:11:2:91:bench/ce/loop_ce.mlw] =
+      [@loop:bench/ce/loop_ce.mlw:11:2:15:6] [@mlw:reference_var]
+      [@vc:written:11:2:15:6:bench/ce/loop_ce.mlw] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
+    result of call at line 11, characters 8-14 [@call_result:11:8:11:14:bench/ce/loop_ce.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": true}
   Line 13:
     [current iteration] a [@field:0:contents] [@introduced]
       [@mlw:reference_var] [@model_trace:a] =
@@ -59,6 +62,9 @@ File loop_ce.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "6"}}]}}
+    result of call at line 14, characters 9-14 [@call_result:14:9:14:14:bench/ce/loop_ce.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "6"}
 
 File "bench/ce/loop_ce.mlw", line 23, characters 13-23:
 Sub-goal Assertion of goal g'vc.
@@ -72,7 +78,10 @@ File loop_ce.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-    result of call at line 22, characters 7-14 [@call_result:22:7:14:bench/ce/loop_ce.mlw]
+    result of call at line 22, characters 25-30 [@call_result:22:25:22:30:bench/ce/loop_ce.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
+    result of call at line 22, characters 7-14 [@call_result:22:7:22:14:bench/ce/loop_ce.mlw]
       [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Boolean", "val": false}
   Line 23:
@@ -115,7 +124,10 @@ File loop_ce.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
-    result of call at line 22, characters 7-14 [@call_result:22:7:14:bench/ce/loop_ce.mlw]
+    result of call at line 22, characters 25-30 [@call_result:22:25:22:30:bench/ce/loop_ce.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
+    result of call at line 22, characters 7-14 [@call_result:22:7:22:14:bench/ce/loop_ce.mlw]
       [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Boolean", "val": true}
 

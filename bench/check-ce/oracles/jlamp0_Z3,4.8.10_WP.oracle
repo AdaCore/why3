@@ -22,6 +22,9 @@
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "16"}}]}}
+                          result = {"type": "Integer", "val": "16"}
+                          result = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "16"}
                         Line 12:
                           a =
                             {"type": "Record",
@@ -36,8 +39,8 @@
                                                                     0}
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     16}
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 16
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 0
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 16
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 0
 <rac-values>Value from model for variable `a` at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: {contents=
                                                                     16}
 <rac-values>Type default value for return value of call to (:=) at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: ()
@@ -212,7 +215,7 @@
   - Abstract RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
 File "bench/check-ce/jlamp0.mlw", line 12, characters 13-26:
 Sub-goal Assertion of goal p1'vc.
-Prover result is: Unknown (unknown) (0.38s, 3000056 steps).
+Prover result is: Step limit exceeded (0.51s, 3000067 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -297,6 +300,9 @@ File jlamp0.mlw:
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "14"}}]}}
+                          result = {"type": "Integer", "val": "14"}
+                          result = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "14"}
                         Line 13:
                           a =
                             {"type": "Record",
@@ -304,6 +310,10 @@ File jlamp0.mlw:
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "13"}}]}}
+                          result = {"type": "Integer", "val": "13"}
+                          result = {"type": "Integer", "val": "14"}
+                          result = {"type": "Boolean", "val": true}
+                          result = {"type": "Integer", "val": "14"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -311,14 +321,14 @@ File jlamp0.mlw:
                                                                     0}
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     14}
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 14
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 0
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 14
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 0
 <rac-values>Value from model for variable `a` at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: {contents=
                                                                     14}
 <rac-values>Type default value for return value of call to (:=) at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: ()
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9 at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9: 14
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 26-28 at "bench/check-ce/jlamp0.mlw", line 13, characters 26-28: 14
-<rac-values>Value computed from postcondition for return value of call to (-) at "bench/check-ce/jlamp0.mlw", line 13, characters 26-32 at "bench/check-ce/jlamp0.mlw", line 13, characters 26-32: 13
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9 at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9: 14
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 26-28 at "bench/check-ce/jlamp0.mlw", line 13, characters 26-28: 14
+<rac-values>Value from model for return value of call to (-) at "bench/check-ce/jlamp0.mlw", line 13, characters 26-32 at "bench/check-ce/jlamp0.mlw", line 13, characters 26-32: 13
 <rac-values>Value from model for variable `a` at "bench/check-ce/jlamp0.mlw", line 13, characters 21-32 at "bench/check-ce/jlamp0.mlw", line 13, characters 21-32: {contents=
                                                                     13}
 <rac-values>Type default value for return value of call to (:=) at "bench/check-ce/jlamp0.mlw", line 13, characters 21-32 at "bench/check-ce/jlamp0.mlw", line 13, characters 21-32: ()
@@ -547,7 +557,7 @@ File jlamp0.mlw:
   - Abstract RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Sub-goal Postcondition of goal p1'vc.
-Prover result is: Unknown (unknown) (0.34s, 3000080 steps).
+Prover result is: Step limit exceeded (0.50s, 3000111 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -667,6 +677,12 @@ File jlamp0.mlw:
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "5"}}]}}
+                          result = {"type": "Integer", "val": "5"}
+                          result = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "5"}
+                        Line 13:
+                          result = {"type": "Boolean", "val": false}
+                          result = {"type": "Integer", "val": "5"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -674,12 +690,12 @@ File jlamp0.mlw:
                                                                     0}
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     5}
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 5
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 0
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 5
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 0
 <rac-values>Value from model for variable `a` at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: {contents=
                                                                     5}
 <rac-values>Type default value for return value of call to (:=) at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: ()
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9 at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9: 5
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9 at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9: 5
 <check-ce-rac-results>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -872,7 +888,7 @@ File jlamp0.mlw:
   - Abstract RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Sub-goal Postcondition of goal p1'vc.
-Prover result is: Unknown (unknown) (0.34s, 3000068 steps).
+Prover result is: Step limit exceeded (0.51s, 3000091 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1130,7 +1146,7 @@ File jlamp0.mlw:
   - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to (:=) at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Sub-goal Loop invariant init of goal p2'vc.
-Prover result is: Unknown (unknown) (0.34s, 3000043 steps).
+Prover result is: Step limit exceeded (0.53s, 3000043 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1169,7 +1185,7 @@ File jlamp0.mlw:
 
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Sub-goal Loop invariant init of goal p2'vc.
-Prover result is: Valid (0.00s, 179 steps).
+Prover result is: Valid (0.01s, 179 steps).
 
 <check-ce-rac-results>Check model 0 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
 <check-ce-rac-results>Checking model:
@@ -1216,6 +1232,8 @@ Prover result is: Valid (0.00s, 179 steps).
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "2"}}]}}
+                            result = {"type": "Boolean", "val": true}
+                            result = {"type": "Integer", "val": "2"}
                           Line 24:
                             c =
                               {"type": "Record",
@@ -1230,6 +1248,9 @@ Prover result is: Valid (0.00s, 179 steps).
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "5"}}]}}
+                            result = {"type": "Integer", "val": "5"}
+                            result = {"type": "Integer", "val": "3"}
+                            result = {"type": "Integer", "val": "2"}
                           Line 26:
                             c =
                               {"type": "Record",
@@ -1237,6 +1258,8 @@ Prover result is: Valid (0.00s, 179 steps).
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "4"}}]}}
+                            result = {"type": "Integer", "val": "4"}
+                            result = {"type": "Integer", "val": "2"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -1410,7 +1433,7 @@ Prover result is: Valid (0.00s, 179 steps).
   - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to (:=) at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
 File "bench/check-ce/jlamp0.mlw", line 24, characters 16-18:
 Sub-goal Loop variant decrease of goal p2'vc.
-Prover result is: Unknown (unknown) (0.33s, 3000100 steps).
+Prover result is: Step limit exceeded (0.50s, 3000131 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -1459,6 +1482,8 @@ Sorry, we don't have a good counterexample for you :(
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "10"}}]}}
+                            result = {"type": "Boolean", "val": true}
+                            result = {"type": "Integer", "val": "10"}
                           Line 22:
                             c =
                               {"type": "Record",
@@ -1473,6 +1498,9 @@ Sorry, we don't have a good counterexample for you :(
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "13"}}]}}
+                            result = {"type": "Integer", "val": "13"}
+                            result = {"type": "Integer", "val": "3"}
+                            result = {"type": "Integer", "val": "10"}
                           Line 26:
                             c =
                               {"type": "Record",
@@ -1480,6 +1508,8 @@ Sorry, we don't have a good counterexample for you :(
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "12"}}]}}
+                            result = {"type": "Integer", "val": "12"}
+                            result = {"type": "Integer", "val": "10"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -1653,7 +1683,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to (:=) at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Sub-goal Loop invariant preservation of goal p2'vc.
-Prover result is: Unknown (unknown) (0.34s, 3000093 steps).
+Prover result is: Step limit exceeded (0.48s, 3000124 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1735,6 +1765,8 @@ File jlamp0.mlw:
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "2"}}]}}
+                            result = {"type": "Boolean", "val": true}
+                            result = {"type": "Integer", "val": "2"}
                           Line 23:
                             a =
                               {"type": "Record",
@@ -1755,6 +1787,9 @@ File jlamp0.mlw:
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "11"}}]}}
+                            result = {"type": "Integer", "val": "11"}
+                            result = {"type": "Integer", "val": "9"}
+                            result = {"type": "Integer", "val": "2"}
                           Line 26:
                             c =
                               {"type": "Record",
@@ -1762,6 +1797,8 @@ File jlamp0.mlw:
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "4"}}]}}
+                            result = {"type": "Integer", "val": "4"}
+                            result = {"type": "Integer", "val": "2"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -1935,7 +1972,7 @@ File jlamp0.mlw:
   - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to (:=) at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Sub-goal Loop invariant preservation of goal p2'vc.
-Prover result is: Unknown (unknown) (0.33s, 3000100 steps).
+Prover result is: Step limit exceeded (0.48s, 3000131 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -1990,6 +2027,8 @@ Sorry, we don't have a good counterexample for you :(
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "11"}}]}}
+                            result = {"type": "Boolean", "val": false}
+                            result = {"type": "Integer", "val": "11"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -2163,7 +2202,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to (:=) at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
 File "bench/check-ce/jlamp0.mlw", line 19, characters 15-28:
 Sub-goal Postcondition of goal p2'vc.
-Prover result is: Unknown (unknown) (0.32s, 3000075 steps).
+Prover result is: Step limit exceeded (0.52s, 3000087 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

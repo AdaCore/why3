@@ -82,9 +82,6 @@ let () = printf "@[task 2 created:@\n%a@]@." Pretty.print_task task2
 let config : Whyconf.config = Whyconf.init_config None
 (* the [main] section of the config file *)
 let main : Whyconf.main = Whyconf.get_main config
-(* the library and data directories, from the config file *)
-let libdir = Whyconf.libdir main
-let datadir = Whyconf.datadir main
 (* all the provers detected, from the config file *)
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
@@ -128,7 +125,7 @@ let env : Env.env = Env.create_env (Whyconf.loadpath main)
 (* loading the Alt-Ergo driver *)
 let alt_ergo_driver : Driver.driver =
   try
-    Whyconf.load_driver main env alt_ergo
+    Driver.load_driver main env alt_ergo
   with e ->
     eprintf "Failed to load driver for alt-ergo: %a@."
       Exn_printer.exn_printer e;
@@ -141,8 +138,7 @@ let result1 : Call_provers.prover_result =
   Call_provers.wait_on_call
     (Driver.prove_task
        ~limit:Call_provers.empty_limit
-       ~libdir
-       ~datadir
+       ~config:main
        ~command:alt_ergo.Whyconf.command
        alt_ergo_driver
        task1)
@@ -157,8 +153,7 @@ let result2 : Call_provers.prover_result =
   Call_provers.wait_on_call
     (Driver.prove_task
        ~command:alt_ergo.Whyconf.command
-       ~libdir
-       ~datadir
+       ~config:main
        ~limit:{Call_provers.empty_limit with Call_provers.limit_time = 10}
        alt_ergo_driver
        task2)
@@ -206,8 +201,7 @@ let result3 =
   Call_provers.wait_on_call
     (Driver.prove_task
        ~limit:Call_provers.empty_limit
-       ~libdir
-       ~datadir
+       ~config:main
        ~command:alt_ergo.Whyconf.command
        alt_ergo_driver
        task3)
@@ -248,8 +242,7 @@ let result4 =
   Call_provers.wait_on_call
     (Driver.prove_task
        ~limit:Call_provers.empty_limit
-       ~libdir
-       ~datadir
+       ~config:main
        ~command:alt_ergo.Whyconf.command
        alt_ergo_driver
        task4)

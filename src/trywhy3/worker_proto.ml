@@ -13,7 +13,7 @@ module Js = Js_of_ocaml.Js
 
 type id = int
 type loc = int * int * int * int
-type why3_loc = string * (int * int * int) (* kind, line, column, length *)
+type why3_loc = string * (int * int * int * int)
 type status = StNew | StValid | StUnknown
 type transform = Prove of int | Split of int | Clean
 

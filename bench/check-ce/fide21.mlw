@@ -1,0 +1,24 @@
+
+use int.Int
+
+val ref x : int
+
+let set_x (n:int) : unit
+  ensures { x > n }
+  =
+  x <- n + 1
+
+let main () : unit
+  =
+  x <- 0;
+  set_x 2;
+  assert { x = 3 }
+
+
+let incr (x:int) : int
+  ensures { result > x }
+  = x+1
+
+let test () =
+  let y = incr 1 in
+  assert { y = 2 }
