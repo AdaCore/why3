@@ -25,48 +25,261 @@ a new logic goal called ``f'VC`` is generated. Its shape is
 
    \forall x_1,\dots,x_n,\quad \mathit{Pre} \Rightarrow \mathit{WP}(\mathit{body},\mathit{Post})
 
-where :math:`\mathit{WP}(e,Q)` is a formula computed automatically using
-rules defined recursively on :math:`e`.
+where :math:`\mathit{WP}(e,Q)` is a formula computed automatically
+using rules defined recursively on :math:`e`. The name
+:math:`\mathit{WP}` stands for Weakest Precondition, and its
+computation rules are directly inspired from the original Weakest
+Precondition Calculus of Dijkstra. Yet, due to the particular nature
+of the WhyML expression language, and the underlying concept of
+regions to identify side effects, the computation rules for
+:math:`\mathit{WP}` are specific to WhyML, and described in detail in
+a report by Filliâtre, Gondelman and Paskevich :cite:`gondelman16reg`.
 
-.. todo::
 
-   Refer to `A Pragmatic Type System for Deductive Verification <https://hal.archives-ouvertes.fr/hal-01256434v3>`_
 
-   Attributes: :why3:attribute:`[@vc:divergent]` disables generation of VC for termination.
+Controlling the VC generation
+-----------------------------
 
-   Other attributes: :why3:attribute:`[@vc:annotation]`, :why3:attribute:`[@vc:sp]`, :why3:attribute:`[@vc:wp]`, :why3:attribute:`[@vc:white_box]`, :why3:attribute:`[@vc:keep_precondition]`.
+The generation of VCs can be controlled using attributes put inside
+the WhyML source code. These attributes are
+:why3:attribute:`[@vc:divergent]`, :why3:attribute:`[@vc:annotation]`,
+:why3:attribute:`[@vc:sp]`, :why3:attribute:`[@vc:wp]`,
+:why3:attribute:`[@vc:white_box]` and
+:why3:attribute:`[@vc:keep_precondition]`. There effects are detailed
+below.
+
+Reducing size of VCs using Strongest Postconditions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is known that the original form of WP calculi can possibly generate
+formulas that are of exponential size in function of the size of the
+corresponding program. Yet, there are known techniques to avoid this
+exponential explosion :cite:`flanagan01popl`. Why3 implements its own
+specific variation, which can be invoked on a per-expression basis. In
+other words, this variant calculus can be activated locally on any
+program expression, by putting the :why3:attribute:`[@vc:sp]`
+attribute on that expression. Yet, the simplest usage is to pose this
+attribute on the whole body of a program function.
+
+The usage of the SP variant is in particular recommended in presence
+of sequence of if statements. As an example, consider the simple
+code below.
+
+.. code-block:: whyml
+
+  predicate p int
+
+  let f (x:int) (y:int) : int
+    ensures { p result }
+  = let ref r = 0 in
+    if 0 < x then r <- r + 1 else r <- r + 2;
+    if 0 < y then r <- r + 3 else r <- r + 4;
+    r
+
+With the default calculus, the VC for f is
+
+.. code-block:: whyml
+
+  forall x:int, y:int.
+     if 0 < x
+     then forall r:int.
+           r = (0 + 1) ->
+           (if 0 < y then forall r1:int. r1 = (r + 3) -> p r1
+            else forall r1:int. r1 = (r + 4) -> p r1)
+     else forall r:int.
+           r = (0 + 2) ->
+           (if 0 < y then forall r1:int. r1 = (r + 3) -> p r1
+            else forall r1:int. r1 = (r + 4) -> p r1)
+
+which contains 4 occurences of the post-condition :code:`p r1`. With
+the :why3:attribute:`[@vc:sp]` attribute just before the line
+:code:`let ref r = 0 in`, the VC is now
+
+.. code-block:: whyml
+
+  forall x:int, y:int.
+     forall r:int.
+      (if 0 < x then r = (0 + 1) else r = (0 + 2)) ->
+      (forall r1:int. (if 0 < y then r1 = (r + 3) else r1 = (r + 4)) -> p r1)
+
+which has only one occurence of the post-condition :code:`p r1`. The idea is
+that the strongest post-condition of each if statement was computed
+and used as an assumption for the rest of the VC.
+
+
+Ignoring checks for termination
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, Why3 generates VCs for ensuring the termination of loops
+and recursive calls. For example, on the program
+
+.. code-block:: whyml
+
+   let f1 (x:int) : int =
+     let ref r = 100 in
+     while r > 0 do r <- r - x done;
+     r
+
+Why3 issues a warning saying that the termination of the loop cannot
+be proved, and VC generated indeed contains the formula :code:`false`
+to prove. On the one hand, if the loop is effectively terminating, it
+is expected to have a :code:`variant` added n that loop. On the other
+hand, if a program like this is indeed intentionally not terminating,
+it is expected that its contract contains the clause :code:`diverges`
+that explicitates the non-termination. This exposition of potential
+non-termination is propagated to callers, e.g., if continuing the same
+example one writes
+
+.. code-block:: whyml
+
+   let f1 (x:int) : int diverges =
+     let ref r = 100 in
+     while r > 0 do r <- r - x done;
+     r
+
+   let g1 () = f 3
+
+then no warning is issued for :code:`f1`, and its VC does not contain
+:code:`false` to be proved, but the warning will be issued for
+:code:`g1`, and the VC for :code:`g1` contains :code:`false` to be
+proved. The :code:`diverges` clause must be added in the contract of
+:code:`g1` too.
+
+Notice that putting a :code:`diverges` clause in a contract of a
+function that contains no loop and no recursive call is an error,
+signaled by Why3. This behavior might be annoying when one generates
+WhyML code automatically, and doesn't know if the code is terminating
+or not. For such a purpose, the VC generator interprets the attribute
+:why3:attribute:`[@vc:divergent]` when it is given on the body of a
+function.  The effect is that the VC does not contain termination
+checks anymore. For these reason the code
+
+.. code-block:: whyml
+
+   let f2 (x:int) : int =
+     [@vc:divergent]
+     let ref r = 100 in
+     while r > 0 do r <- r - x done;
+     r
+
+is accepted without any warning, and the VC does not include any
+:code:`false` formula to prove. Notice however that the presence of
+the attribute it doesn't prevent Why3 to consider the function :code:`f2`
+potentially non-terminating. On the same example, adding the code
+
+.. code-block:: whyml
+
+   let g2 () = f2 7
+
+will again trigger the warning for non-termination of the call to
+:code:`f2`. The presence of the attribute thus somehow acts the same
+as the :code:`diverges` clause, except that it is not an error the put
+the attribute on a terminating program, for example on
+
+.. code-block:: whyml
+
+   let f2 (x:int) : int =
+     [@vc:divergent]
+     100 - x
+
+
+
+Keeping preconditions of calls in the logical context
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When calling a function :math:`f` in a WhyML expression, a VC is
+generated to check that the precondition of :math:`f` holds, for the
+given values of its parameters. Meanwhile, the VCs generated for the
+subsequent parts of the WhyML are not explicitly given the assumption
+that this precondition was valid. An example is as follows
+
+.. code-block:: whyml
+
+  let f (x:int) : int
+    requires { x > 7 }
+    = x-1
+
+  let g1 (y:int) =
+    let _ = f y in
+    assert { y > 0 }
+
+On this code, after splitting the VC for :code:`g1`, none of the two
+subgoals generated are provable: the pre-condition of the call to
+:code:`f` is naturally not provable, neither is the assertion. On the
+contrary, if one writes
+
+.. code-block:: whyml
+
+  let g2 (y:int) =
+    let _ = [@vc:keep_precondition] f y in
+    assert { y > 0 }
+
+then the pre-condition of the call to :code:`f` is known to hold after
+the call, making the assertion provable.
+
+Other attributes
+~~~~~~~~~~~~~~~~
+
+The attributes :why3:attribute:`[@vc:annotation]` and
+:why3:attribute:`[@vc:white_box]` are indeed generated by Why3 itself,
+and should not be added by the user.
+
+The attribute :why3:attribute:`[@vc:annotation]` is put by the VC
+generator, on the user input formulas which become goals to prove in
+the resulting VC.
+
+The attribute :why3:attribute:`[@vc:white_box]` is added by the Why3
+parser when a contract is added to an expression in WhyML code.
 
 
 
 Type Invariants
 ---------------
 
-.. todo::
+When a record type is given an invariant, that invariant must hold on
+any value of that type occuring in the considered program. It means
+that when a value of this type is a parameter of a function, its
+invariant is assumed to hold. When a value of this type is constructed
+in the program, then a check is inserted in the VC to check the
+validity of the invariant.
 
-   How a VC is generated for proving that a type with invariant is
-   inhabited. Explain also the use of the `by` keyword in this context.
+Additionally, a verification condition is generated from the type
+declaration itself, to ensure that the type is inhabited, that is to
+ensure that there exist values for the record fields for which the
+invariant hold. Proving the existence of such values might be a
+difficut task for an automated prover. To help the proof if this VC,
+the user cannot provide a witness for a possible inhabitant, using the
+:code:`by` keyword.
 
 Lemma Functions
 ---------------
 
-.. todo::
+A useful facility to state and prove logical statements is provided by
+the so-called lemma function mechanism. The principle is to add the
+keyword :code:`lemma` to a program function, under the following
+general shape.
 
-   How a VC for a program function marked as `lemma` is turned into an
-   hypothesis for the remaining of the module.
+.. parsed-literal::
 
-Using Strongest Post-conditions
--------------------------------
+   let lemma f (*x*:sub:`1`: *t*:sub:`1`) ... (*x*:sub:`n`: *t*:sub:`n`): unit
+     requires { *Pre* }
+     ensures  { *Post* }
+   = *body*
 
-.. todo::
+In that case, the VC generated for :code:`f` is inserted as known
+logical fact in the context of the remaining goals of the considered
+WhyML module.
 
-   To avoid exponential explosion of WP computation, Why3 provides a
-   mechanism similar to (TODO: cite papers here).
+For this to work, the function must have no side effects, be provably
+terminating, and return :code:`unit`. The generated fact is then
 
-   This can be activated locally on any program expression, by putting
-   the :why3:attribute:`[@vc:sp]` attribute on that expression. Yet, the simplest usage
-   is to pose this attribute on the whole body of a program function.
+.. math::
 
-   Show an example.
+   \forall x_1,\dots,x_n,\quad \mathit{Pre} \Rightarrow \mathit{Post}
+
+In particular, when the code of the function is recursive, it
+simulates a proof by induction.
+
 
 .. _sec.runwithinferloop:
 
@@ -143,7 +356,7 @@ loop expression, the domain at that point, and its translation into a
 Why3 term.
 
 Current limitations
-"""""""""""""""""""
+~~~~~~~~~~~~~~~~~~~
 
 1. Loop invariants can only be inferred for loops inside
    (non-recursive) ``let`` declarations.
