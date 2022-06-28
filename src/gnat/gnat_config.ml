@@ -25,6 +25,7 @@ let opt_memlimit : int option ref = ref None
 let opt_ce_timeout : int option ref = ref None
 let opt_warn_timeout : int ref = ref 1
 let opt_steps : int option ref = ref None
+let opt_ce_steps : int option ref = ref None
 let opt_debug = ref false
 let opt_debug_save_vcs = ref false
 let opt_debug_prover_errors = ref false
@@ -121,6 +122,9 @@ let set_warn_prover s =
 let set_steps t =
   if t > 0 then opt_steps := Some t
 
+let set_ce_steps t =
+  if t > 0 then opt_ce_steps := Some t
+
 let set_socket_name s =
   opt_socket_name := s
 
@@ -171,13 +175,13 @@ let options = Arg.align [
    "--memlimit", Arg.Int set_memlimit,
           " Set the memory limit in megabytes";
    "--ce-timeout", Arg.Int set_ce_timeout,
-          " Set the timeout for counter examples in seconds";
+          " Set the timeout for counterexamples in seconds";
    "--warn-timeout", Arg.Int set_warn_timeout,
           " Set the timeout for warnings in seconds (default is 1 second)";
    "--steps", Arg.Int set_steps,
-       " Set the steps (default: no steps). " ^
-         "This option is *not* passed to alt-ergo, " ^
-         "only used to compute the timeout";
+       " Set the steps (default: no steps)";
+   "--ce-steps", Arg.Int set_ce_steps,
+       " Set the steps for counterexamples (default: no steps)";
    "-j", Arg.Set_int opt_parallel,
           " Set the number of parallel processes (default is 1)";
    "-f", Arg.Set opt_force,
@@ -571,8 +575,11 @@ end = struct
 
   let convert_data =
     ["cvc4",    { add = 15000;  mult = 35  };
+     "cvc4_ce", { add = 15000;  mult = 35  };
      "cvc5",    { add = 15000;  mult = 35  };
+     "cvc5_ce", { add = 15000;  mult = 35  };
      "z3",      { add = 450000; mult = 800 };
+     "z3_ce",   { add = 450000; mult = 800 };
      "altergo", { add = 0;      mult = 1   };
      "colibri", { add = 2000;   mult = 1   };
     ]
@@ -616,7 +623,12 @@ let steps ~config_prover =
     Call_provers.empty_limit.Call_provers.limit_steps
   else
     let prover = config_prover.prover.prover_name in
-    match manual_prover, !opt_steps with
+    let raw_steps =
+      match prover_ce with
+      | Some p when prover = p.prover_name -> !opt_ce_steps
+      | _ -> !opt_steps
+    in
+    match manual_prover, raw_steps with
     | Some _, _ | _, None -> Call_provers.empty_limit.Call_provers.limit_steps
     | _, Some c -> Steps_conversion.convert ~prover c
 
