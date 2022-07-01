@@ -1068,9 +1068,7 @@ let clone_type_decl inst cl tdl kn =
             raise (BadInstance (BadI_ty_arity ts));
           let pd' = Mid.find s'.its_ts.ts_name kn in
           let d' = match pd'.pd_node with
-            | PDtype [d'] -> d'
-            (* FIXME? we could refine with mutual types *)
-            | PDtype _ -> raise (BadInstance (BadI_ty_rec ts))
+            | PDtype dl -> List.find (fun d -> its_equal d.itd_its s') dl
             | PDlet _ | PDexn _ | PDpure -> assert false in
           clone_type_record cl s d s' d'; (* clone record fields *)
           (* generate and add VC for type invariant implication *)
