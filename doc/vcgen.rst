@@ -43,7 +43,7 @@ Controlling the VC generation
 The generation of VCs can be controlled by the user, in particular using attributes put inside
 the WhyML source code. These attributes are
 :why3:attribute:`[@vc:divergent]`, :why3:attribute:`[@vc:sp]`, :why3:attribute:`[@vc:wp]` and
-:why3:attribute:`[@vc:keep_precondition]`. There effects are detailed
+:why3:attribute:`[@vc:keep_precondition]`. Their effects are detailed
 below.
 
 .. _sec.strongestpostconditions:
@@ -76,7 +76,7 @@ code below.
     if 0 < y then r <- r + 3 else r <- r + 4;
     r
 
-With the default calculus, the VC for f is
+With the default calculus, the VC for :code:`f` is
 
 .. code-block:: whyml
 
@@ -91,7 +91,7 @@ With the default calculus, the VC for f is
            (if 0 < y then forall r1:int. r1 = (r + 3) -> p r1
             else forall r1:int. r1 = (r + 4) -> p r1)
 
-which contains 4 occurences of the post-condition :code:`p r1`. With
+which contains 4 occurrences of the post-condition :code:`p r1`. With
 the :why3:attribute:`[@vc:sp]` attribute just before the line
 :code:`let ref r = 0 in`, the VC is now
 
@@ -102,13 +102,13 @@ the :why3:attribute:`[@vc:sp]` attribute just before the line
       (if 0 < x then r = (0 + 1) else r = (0 + 2)) ->
       (forall r1:int. (if 0 < y then r1 = (r + 3) else r1 = (r + 4)) -> p r1)
 
-which has only one occurence of the post-condition :code:`p r1`. The idea is
+which has only one occurrence of the post-condition :code:`p r1`. The idea is
 that the strongest post-condition of each if statement was computed
 and used as an assumption for the rest of the VC.
 
 Note that inside an expression annotated with
-:why3:attribute:`[@vc:sp]`, it possible to switch back to the default
-WP mode for a given sub-expression, but annotating it with the
+:why3:attribute:`[@vc:sp]`, it is possible to switch back to the default
+WP mode for a given sub-expression by annotating it with the
 attribute :why3:attribute:`[@vc:wp]`
 
 .. _sec.terminationvc:
@@ -127,12 +127,12 @@ and recursive calls. For example, on the program
      r
 
 Why3 issues a warning saying that the termination of the loop cannot
-be proved, and VC generated indeed contains the formula :code:`false`
+be proved, and the generated VC indeed contains the formula :code:`false`
 to prove. On the one hand, if the loop is effectively terminating, it
-is expected to have a :code:`variant` added n that loop. On the other
+is expected to have a :code:`variant`. On the other
 hand, if a program like this is indeed intentionally not terminating,
 it is expected that its contract contains the clause :code:`diverges`
-that explicitates the non-termination. This exposition of potential
+that makes the non-termination explicit. This exposition of potential
 non-termination is propagated to callers, e.g., if continuing the same
 example one writes
 
@@ -195,8 +195,8 @@ the attribute on a terminating program, for example on
 Keeping preconditions of calls in the logical context
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When calling a function :math:`f` in a WhyML expression, a VC is
-generated to check that the precondition of :math:`f` holds, for the
+When calling a function :code:`f` in a WhyML expression, a VC is
+generated to check that the precondition of :code:`f` holds, for the
 given values of its parameters. Meanwhile, the VCs generated for the
 subsequent parts of the WhyML are not explicitly given the assumption
 that this precondition was valid. An example is as follows
@@ -230,18 +230,18 @@ Type Invariants
 ---------------
 
 When a record type is given an invariant, that invariant must hold on
-any value of that type occuring in the considered program. It means
+any value of that type occurring in the considered program. It means
 that when a value of this type is a parameter of a function, its
 invariant is assumed to hold. When a value of this type is constructed
-in the program, then a check is inserted in the VC to check the
+in the program, a check is inserted in the VC to ensure the
 validity of the invariant.
 
 Additionally, a verification condition is generated from the type
 declaration itself, to ensure that the type is inhabited, that is to
 ensure that there exist values for the record fields for which the
-invariant hold. Proving the existence of such values might be a
-difficut task for an automated prover. To help the proof if this VC,
-the user cannot provide a witness for a possible inhabitant, using the
+invariant holds. Proving the existence of such values might be a
+difficult task for an automated prover. To help the proof of this VC,
+the user can provide a witness for a possible inhabitant, using the
 :code:`by` keyword.
 
 Lemma Functions

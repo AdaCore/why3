@@ -1578,7 +1578,7 @@ WhyML Attributes
 
 .. why3:attribute:: vc:annotation
 
-   This attribute is addedt by the VC generator, on the user input
+   This attribute is added by the VC generator, on the user input
    formulas which become goals to prove in the resulting VC. It should
    not be added manually.
 
@@ -1589,7 +1589,7 @@ WhyML Attributes
 
 .. why3:attribute:: vc:keep_precondition
 
-   This attribute indicates whether preconditions of calls should kept
+   This attribute indicates whether preconditions of calls should be kept
    as assumptions for the program after the call. See
    :numref:`sec.keeppreconditions` for details.
 
@@ -1604,7 +1604,7 @@ WhyML Attributes
 
    This attribute is added by the Why3 parser for contract attached to
    an expression in WhyML code. Such a contract is indeed encoded by a
-   local function which this attribute. It is for internal use only
+   local function with this attribute. It is for internal use only
    and should never be added manually.
 
 .. why3:attribute:: vc:wp
