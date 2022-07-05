@@ -212,7 +212,7 @@ let datadir m =
 let set_datadir m d = { m with datadir = d}
 
 let default_loadpath m =
-  [ Filename.concat m.datadir "stdlib" ]
+  [ Filename.concat (datadir m) "stdlib" ]
 
 let loadpath m =
   try
