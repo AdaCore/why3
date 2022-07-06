@@ -143,7 +143,7 @@ let mk_env ?(attrs=Sattr.empty)
   divergent = false;
   inferinvs = invs;
   keep_trace;
-}
+  }
 
 let acc env r t =
   let ps = env.ps_wf_acc in

@@ -180,21 +180,20 @@ let declare_local (ghost,id,ty) body =
   let id = { id with id_ats = (ATstr Pmodule.ref_attr) :: id.id_ats } in
   mk_expr ~loc:id.id_loc (Elet(id,ghost,Expr.RKnone,e,body))
 
-let translate_cfg_fundef (id,args,retty,pat,mask,spec,locals,block,blocks) =
-  Debug.dprintf debug "translating cfg function `%s`@." id.id_str;
-  Debug.dprintf debug "return type is `%a`@." pp_pty retty;
-  let body = translate_cfg block blocks in
+let translate_cfg_fundef cf =
+  Debug.dprintf debug "translating cfg function `%s`@." cf.cf_name.id_str;
+  Debug.dprintf debug "return type is `%a`@." pp_pty cf.cf_retty;
+  let body = translate_cfg cf.cf_block0 cf.cf_blocks in
   let loc = Loc.dummy_position in
   let body =
-    List.fold_right declare_local locals body
+    List.fold_right declare_local cf.cf_locals body
   in
   let body = mk_seq ~loc body (mk_expr ~loc Eabsurd) in
-  let body = mk_expr ~loc (Eoptexn(mk_id ~loc "Return", mask, body)) in
+  let body = mk_expr ~loc (Eoptexn(mk_id ~loc "Return", cf.cf_mask, body)) in
   (* ignore termination *)
-  let body =
-    mk_expr ~loc (Eattr(divergent_attr,body))
-  in
-  (id,false,Expr.RKnone, args, Some retty, pat, mask, spec, body)
+  let body = mk_expr ~loc (Eattr(divergent_attr,body)) in
+  let body = List.fold_right (fun a e -> mk_expr ~loc (Eattr(a, e))) cf.cf_attrs body in
+  (cf.cf_name, false, Expr.RKnone, cf.cf_args, Some cf.cf_retty, cf.cf_pat, cf.cf_mask, cf.cf_spec, body)
 
 open Cfg_main
 

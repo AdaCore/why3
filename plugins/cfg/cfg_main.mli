@@ -13,8 +13,4 @@ open Cfg_ast
 open Why3
 
 val set_stackify :
-  (cfg_fundef ->
-   (Cfg_ast.ident * bool * Expr.rs_kind * Ptree.binder list *
-      Ptree.pty option * Ptree.pattern * Ity.mask *
-        Ptree.spec * Ptree.expr))
-  -> unit
+  (cfg_fundef -> Ptree.fundef) -> unit

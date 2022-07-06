@@ -197,36 +197,21 @@ let build_path_function retty pat mask postconds (startlabel, preconds, body) : 
   (id,false,Expr.RKnone, [arg], Some retty, pat, mask, spec, body)
 
 
-let translate_cfg_fundef (id,args,retty,pat,mask,spec,locals,block,blocks) =
-  Debug.dprintf debug "translating cfg function `%s`@." id.id_str;
-  Debug.dprintf debug "return type is `%a`@." pp_pty retty;
-  let funs = translate_cfg spec.sp_pre block blocks in
+let translate_cfg_fundef cf =
+  Debug.dprintf debug "translating cfg function `%s`@." cf.cf_name.id_str;
+  Debug.dprintf debug "return type is `%a`@." pp_pty cf.cf_retty;
+  let funs = translate_cfg cf.cf_spec.sp_pre cf.cf_block0 cf.cf_blocks in
   let loc = Loc.dummy_position in
   let body =
     mk_expr ~loc (Eidapp(Qident (mk_id ~loc "_from_start"),[mk_unit ~loc]))
   in
   let defs =
-    List.map (build_path_function retty pat mask spec.sp_post) funs
+    List.map (build_path_function cf.cf_retty cf.cf_pat cf.cf_mask cf.cf_spec.sp_post) funs
   in
-  let body =
-    mk_expr ~loc (Erec(defs,body))
-  in
-  let body =
-    List.fold_right declare_local locals body
-  in
+  let body = mk_expr ~loc (Erec(defs,body)) in
+  let body = List.fold_right declare_local cf.cf_locals body in
   (* ignore termination *)
-  let body =
-    mk_expr ~loc (Eattr(divergent_attr,body))
-  in
-  (id,false,Expr.RKnone, args, Some retty, pat, mask, spec, body)
-
-let translate_letcfg d =
-  let loc = Loc.dummy_position in
-  let (id, ghost, rk, args, retty, pat, mask, spec, body) = translate_cfg_fundef d in
-
-  Dlet (id, ghost, rk, mk_expr ~loc (Efun (args, retty, pat, mask, spec, body)))
-
-let translate_reccfg ds =
-  let translated_fundefs = List.map translate_cfg_fundef ds in
-
-  Drec translated_fundefs
+  let body = mk_expr ~loc (Eattr(divergent_attr,body)) in
+  let body = List.fold_right (fun a e -> mk_expr ~loc (Eattr(a, e))) cf.cf_attrs body in
+  (cf.cf_name, false, Expr.RKnone, cf.cf_args, Some cf.cf_retty, cf.cf_pat,
+   cf.cf_mask, cf.cf_spec, body)
