@@ -22,6 +22,9 @@ API
     `Whyconf.main` configuration type instead of directly take libdir
     and datadir. See the updated API examples for details. :x:
 
+MLCFG input language
+  * attributes on the body of an MLCFG function are now supported
+
 Version 1.5.0, April 29, 2022
 -----------------------------
 
