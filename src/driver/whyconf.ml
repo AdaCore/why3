@@ -193,37 +193,32 @@ type main = {
   (* editor name used when no specific editor known for a prover *)
 }
 
-let libdir m =
-  try
-    Sys.getenv "WHY3LIB"
-  with Not_found -> m.libdir
+let libdir =
+  let env_libdir = try Some (Sys.getenv "WHY3LIB") with Not_found -> None in
+  fun m -> Opt.get_def m.libdir env_libdir
 
 let set_libdir m d = { m with libdir = d}
 
-let datadir m =
-  try
-    let d = Sys.getenv "WHY3DATA" in
-(*
-    eprintf "[Info] datadir set using WHY3DATA='%s'@." d;
-*)
-    d
-  with Not_found -> m.datadir
+let datadir =
+  let env_datadir = try Some (Sys.getenv "WHY3DATA") with Not_found -> None in
+  fun m -> Opt.get_def m.datadir env_datadir
 
 let set_datadir m d = { m with datadir = d}
 
 let default_loadpath m =
   [ Filename.concat (datadir m) "stdlib" ]
 
-let loadpath m =
-  try
-    let d = Sys.getenv "WHY3LOADPATH" in
-(*
-    eprintf "[Info] loadpath set using WHY3LOADPATH='%s'@." d;
-*)
-    Strings.split ':' d
-  with Not_found ->
-    let stdlib = if m.stdlib then default_loadpath m else [] in
-    m.loadpath@stdlib
+let loadpath =
+  let env_loadpath =
+    try Some (Strings.split ':' (Sys.getenv "WHY3LOADPATH"))
+    with Not_found -> None
+  in
+  fun m ->
+    match env_loadpath with
+    | Some l -> l
+    | None ->
+      let stdlib = if m.stdlib then default_loadpath m else [] in
+      m.loadpath@stdlib
 
 let set_loadpath m l = { m with loadpath = l}
 
