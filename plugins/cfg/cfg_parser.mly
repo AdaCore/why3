@@ -50,11 +50,12 @@ cfgdecl:
 ;
 
 recdefn:
-  | id=attrs(lident_rich) args=binders COLON ret=return_named sp=spec EQUAL
-      v=vardecls b=block bl=labelblock*
-    { let pat, ty, mask = ret in
-      let spec = apply_return pat sp in
-      (id, args, ty, pat, mask, spec, v, b, bl) }
+  | cf_name=attrs(lident_rich) cf_args=binders COLON ret=return_named sp=spec EQUAL
+      cf_attrs=attr* cf_locals=vardecls cf_block0=block cf_blocks=labelblock*
+    { let cf_pat, cf_retty, cf_mask = ret in
+      let cf_spec = apply_return cf_pat sp in
+      { cf_name; cf_args; cf_retty; cf_pat; cf_mask; cf_spec; cf_attrs;
+        cf_locals; cf_block0; cf_blocks } }
 ;
 
 vardecls:

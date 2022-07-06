@@ -22,15 +22,13 @@ let set_stackify f = stackify := f; has_stackify := true
 
 let stackify_attr = Ident.create_attribute "cfg:stackify"
 
-let translate_cfg_fundef (x : cfg_fundef) =
-  let (id, _, _, _, _, _, _, _, _) = x in
-  if List.exists (function ATstr a -> Ident.attr_equal a stackify_attr | _ -> false) id.id_ats
-  then !stackify x else Cfg_paths.translate_cfg_fundef x
+let translate_cfg_fundef (cf : cfg_fundef) =
+  if List.exists (function ATstr a -> Ident.attr_equal a stackify_attr | _ -> false) cf.cf_name.id_ats
+  then !stackify cf else Cfg_paths.translate_cfg_fundef cf
 
 let translate_letcfg d =
   let loc = Loc.dummy_position in
   let (id, ghost, rk, args, retty, pat, mask, spec, body) = translate_cfg_fundef d in
-
   let r =
     Dlet (id, ghost, rk, Ptree_helpers.expr ~loc (Efun (args, retty, pat, mask, spec, body)))
   in
@@ -39,7 +37,6 @@ let translate_letcfg d =
 
 let translate_reccfg ds =
   let translated_fundefs = List.map translate_cfg_fundef ds in
-
   Drec translated_fundefs
 
 let rec translate_decl d acc =
@@ -51,7 +48,6 @@ let rec translate_decl d acc =
 
 let translate (m,dl) =
   (m,List.fold_right translate_decl dl [])
-
 
 let read_channel env _path file c =
   let f : Cfg_ast.cfg_file = Cfg_lexer.parse_channel file c in
