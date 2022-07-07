@@ -66,7 +66,11 @@ File record_map.mlw:
       {"type": "Integer", "val": "2"}
     result of call at line 49, characters 2-15 [@call_result:49:2:49:15:bench/ce/record_map.mlw]
       [@id:unused] [@introduced] [@model_trace:result] =
-      {"type": "Array", "val": [{"others": {"type": "Integer", "val": "2"}}]}
+      {"type": "Array",
+       "val":
+        [{"indice": {"type": "Boolean", "val": true},
+          "value": {"type": "Integer", "val": "2"}},
+         {"others": {"type": "Integer", "val": "2"}}]}
     result [@introduced] = {"type": "Integer", "val": "2"}
 
 File "bench/ce/record_map.mlw", line 54, characters 12-31:
