@@ -14,15 +14,15 @@ open Ty
 open Term
 open Decl
 
-let debug = Debug.register_info_flag "eliminate_unused"
+let debug = Debug.register_info_flag "remove_unused"
   ~desc:"Print@ debugging@ messages@ of@ the@ \
-    'eliminate_unused'@ transformation."
+    'remove_unused'@ transformation."
 
 let meta_depends =
   Theory.(register_meta
     ~desc:"declares an dependency between a proposition \
-           and a logic symbol. Used by the transformation `eliminate_unused`"
-    "depends"
+           and a logic symbol. Used by the transformation `remove_unused`"
+    "remove_unused:dependency"
     [ MTprsymbol ; MTlsymbol ])
 
 type used_symbols = {
@@ -66,7 +66,7 @@ let keep_ls acc ls =
 let keep_ts acc ts =
   Sts.mem ts acc.used_ts
 
-let rec eliminate_unused_decl acc task : Task.task =
+let rec remove_unused_decl acc task : Task.task =
   let open Theory in
   match task with
   | None -> None
@@ -81,9 +81,9 @@ let rec eliminate_unused_decl acc task : Task.task =
             pr acc.depends
         in
         let acc = { acc with depends = d } in
-        eliminate_unused_decl acc ta
+        remove_unused_decl acc ta
      | Use _ | Clone _ | Meta _ ->
-        let ta = eliminate_unused_decl acc ta in
+        let ta = remove_unused_decl acc ta in
         Task.add_tdecl ta td
      | Decl d ->
         match d.d_node with
@@ -92,16 +92,16 @@ let rec eliminate_unused_decl acc task : Task.task =
              try
                let s,tds = Mpr.find pr acc.depends in
                if Sls.is_empty (Sls.inter s acc.used_ls) then
-                 eliminate_unused_decl acc ta
+                 remove_unused_decl acc ta
                else
                 let acc = used_symbols_in_term acc t in
-                let ta = eliminate_unused_decl acc ta in
+                let ta = remove_unused_decl acc ta in
                 let t = Task.add_decl ta d in
                 List.fold_left Task.add_tdecl t tds
              with
                Not_found ->
                 let acc = used_symbols_in_term acc t in
-                let ta = eliminate_unused_decl acc ta in
+                let ta = remove_unused_decl acc ta in
                 Task.add_decl ta d
            end
         | Ddata ddl ->
@@ -126,16 +126,16 @@ let rec eliminate_unused_decl acc task : Task.task =
                      acc cl)
                  acc ddl
              in
-             let ta = eliminate_unused_decl acc ta in
+             let ta = remove_unused_decl acc ta in
              Task.add_decl ta d
            else
              begin
                let l =
                  List.fold_left (fun acc (ts,_) -> ts::acc) [] ddl
                in
-               Debug.dprintf debug "[eliminate_unused] removing datatypes %a@."
+               Debug.dprintf debug "[remove_unused] removing datatypes %a@."
                  (Pp.print_list Pp.comma Pretty.print_ts) l;
-               eliminate_unused_decl acc ta
+               remove_unused_decl acc ta
              end
      | Dlogic dl ->
         if List.exists (fun (ls,_) -> keep_ls acc ls) dl
@@ -148,35 +148,35 @@ let rec eliminate_unused_decl acc task : Task.task =
                 used_symbols_in_term acc t)
               acc dl
           in
-          let ta = eliminate_unused_decl acc ta in
+          let ta = remove_unused_decl acc ta in
           Task.add_decl ta d
         else
           begin
             let l =
               List.fold_left (fun acc (ls,_) -> ls::acc) [] dl
             in
-            Debug.dprintf debug "[eliminate_unused] removing logic decls %a@."
+            Debug.dprintf debug "[remove_unused] removing logic decls %a@."
               (Pp.print_list Pp.comma Pretty.print_ls) l;
-            eliminate_unused_decl acc ta
+            remove_unused_decl acc ta
           end
      | Dtype tys ->
         if Sts.mem tys acc.used_ts then
-          let ta = eliminate_unused_decl acc ta in
+          let ta = remove_unused_decl acc ta in
           Task.add_decl ta d
         else
           begin
-            Debug.dprintf debug "[eliminate_unused] removing type decl '%a'@." Pretty.print_ts tys;
-            eliminate_unused_decl acc ta
+            Debug.dprintf debug "[remove_unused] removing type decl '%a'@." Pretty.print_ts tys;
+            remove_unused_decl acc ta
           end
      | Dparam ls ->
         if keep_ls acc ls then
           let acc = used_type_symbols_in_lsymbol acc ls in
-          let ta = eliminate_unused_decl acc ta in
+          let ta = remove_unused_decl acc ta in
           Task.add_decl ta d
         else
           begin
-            Debug.dprintf debug "[eliminate_unused] removing param decl '%a'@." Pretty.print_ls ls;
-            eliminate_unused_decl acc ta
+            Debug.dprintf debug "[remove_unused] removing param decl '%a'@." Pretty.print_ls ls;
+            remove_unused_decl acc ta
           end
      | Dind (_,il) ->
         if List.exists (fun (ls,_) -> keep_ls acc ls) il
@@ -190,57 +190,57 @@ let rec eliminate_unused_decl acc task : Task.task =
                   acc cl)
               acc il
           in
-          let ta = eliminate_unused_decl acc ta in
+          let ta = remove_unused_decl acc ta in
           Task.add_decl ta d
         else
           begin
             let l =
               List.fold_left (fun acc (ls,_) -> ls::acc) [] il
             in
-            Debug.dprintf debug "[eliminate_unused] removing inductive decls %a@."
+            Debug.dprintf debug "[remove_unused] removing inductive decls %a@."
               (Pp.print_list Pp.comma Pretty.print_ls) l;
-            eliminate_unused_decl acc ta
+            remove_unused_decl acc ta
           end
 
             (*
 
-let eliminate_unused_types =
+let remove_unused_types =
   let o t =
-    eliminate_unused_decl
+    remove_unused_decl
       (Task.on_meta meta_depends add_dependency (initial true true) t) t in
   Trans.store o
 
-let eliminate_unused_keep_constants =
+let remove_unused_keep_constants =
   let o t =
-    eliminate_unused_decl
+    remove_unused_decl
       (Task.on_meta meta_depends add_dependency (initial true false) t) t in
   Trans.store o
 
-let eliminate_unused =
+let remove_unused =
   let o t =
-    eliminate_unused_decl
+    remove_unused_decl
       (Task.on_meta meta_depends add_dependency (initial false false) t) t in
   Trans.store o
              *)
 
 
-let eliminate_unused_types =
-  Trans.store (eliminate_unused_decl (initial true true))
+let remove_unused_types =
+  Trans.store (remove_unused_decl (initial true true))
 
-let eliminate_unused_keep_constants =
-  Trans.store (eliminate_unused_decl (initial true false))
+let remove_unused_keep_constants =
+  Trans.store (remove_unused_decl (initial true false))
 
-let eliminate_unused =
-  Trans.store (eliminate_unused_decl (initial false false))
-
-let () =
-  Trans.register_transform "eliminate_unused_types" eliminate_unused_types
-    ~desc:"Eliminate@ unused@ type@ symbols"
+let remove_unused =
+  Trans.store (remove_unused_decl (initial false false))
 
 let () =
-  Trans.register_transform "eliminate_unused_keep_constants" eliminate_unused_keep_constants
-    ~desc:"Eliminate@ unused@ type@ symbols@ and@ unused@ non-constant@ logic@ symbols"
+  Trans.register_transform "remove_unused_types" remove_unused_types
+    ~desc:"Remove@ unused@ type@ symbols"
 
 let () =
-  Trans.register_transform "eliminate_unused" eliminate_unused
-    ~desc:"Eliminate@ unused@ type@ symbols@ and@ unused@ logic@ symbols"
+  Trans.register_transform "remove_unused_keep_constants" remove_unused_keep_constants
+    ~desc:"Remove@ unused@ type@ symbols@ and@ unused@ non-constant@ logic@ symbols"
+
+let () =
+  Trans.register_transform "remove_unused" remove_unused
+    ~desc:"Remove@ unused@ type@ symbols@ and@ unused@ logic@ symbols"
