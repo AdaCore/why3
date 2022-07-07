@@ -98,10 +98,24 @@ let rec update known l fld fld_ty v =
   | Variable _ -> update known (unfold known l) fld fld_ty v
   | _ -> assert false
 
+let rec is_projection elt =
+  match elt with
+  | Variable _ -> true
+  | Proj (_, _, p) -> is_projection p
+  | _ -> false
+
+(* requires the term to be a projection *)
+let rec to_term elt : term =
+  match elt with
+  | Variable v -> t_var v.pv_vs
+  | Proj (_, fld, p) -> (t_app_infer (ls_of_rs fld) [ to_term p ])
+  | _ -> assert false
+
 let rec generate_equality known f v (k : term -> term) : term list =
+  Format.printf "%a = %a\n" print_elt f print_elt v;
   match (f, v) with
-  (* symmetrical cases *)
-  | Variable f, Variable v -> [ ps_app ps_equ [ k (t_var f.pv_vs); k (t_var v.pv_vs) ] ]
+  | Variable f, v when is_projection v -> [ ps_app ps_equ [ k (t_var f.pv_vs); k (to_term v) ] ]
+  | f, Variable v when is_projection f -> [ ps_app ps_equ [ k (to_term f); k (t_var v.pv_vs) ] ]
   | Union (_, vls), Union (_, vls') ->
       let rec go vls vls' acc =
         match (vls, vls') with
@@ -118,9 +132,15 @@ let rec generate_equality known f v (k : term -> term) : term list =
   (* others *)
   | _, Bot -> []
   | Bot, _ -> []
-  | Variable _, _ -> generate_equality known (unfold known f) v k
+  | Union _, _ -> generate_equality known f (unfold known v) k
+  | _, Union _ -> generate_equality known (unfold known f) v k
+
+(*   | Variable _, _ -> generate_equality known (unfold known f) v k
   | Proj _, _ -> generate_equality known (unfold known f) v k
-  | _, _ -> assert false (* temporary *)
+  | _, Variable _ -> generate_equality known f (unfold known v) k
+  | _, Proj _ -> generate_equality known f (unfold known v) k
+ *)
+  | _, _ -> assert false (* unreachable *)
 
 open Wstdlib
 
