@@ -139,7 +139,7 @@ module OrderedUnitaryCommutativeRing
 
   axiom CompatOrderMult :
     forall x y z : t. x <= y -> zero <= z -> x * z <= y * z
-  meta depends axiom CompatOrderMult, function (*)
+  meta "remove_unused:dependency" axiom CompatOrderMult, function (*)
 
 end
 
