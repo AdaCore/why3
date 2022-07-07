@@ -402,7 +402,7 @@
     <goal name="isqrt64&#39;vc.27.0.0" expl="loop invariant preservation" proved="true">
     <transf name="rewrite" proved="true" arg1="sqr_add2">
      <goal name="isqrt64&#39;vc.27.0.0.0" expl="loop invariant preservation" proved="true">
-     <proof prover="3" timelimit="30"><result status="valid" time="7.08" steps="550027"/></proof>
+     <proof prover="3" timelimit="30"><result status="valid" time="5.94" steps="550027"/></proof>
      </goal>
     </transf>
     </goal>
@@ -420,7 +420,7 @@
   <proof prover="3"><result status="valid" time="0.70" steps="279152"/></proof>
   </goal>
   <goal name="isqrt64&#39;vc.30" expl="loop variant decrease" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="1.31" steps="395565"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="1.56" steps="395565"/></proof>
   </goal>
   <goal name="isqrt64&#39;vc.31" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.30" steps="234168"/></proof>
@@ -469,7 +469,7 @@
          <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.0" expl="asserted formula" proved="true">
          <transf name="assert" proved="true" arg1="(ult num b)">
           <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.0.0" expl="asserted formula" proved="true">
-          <proof prover="2"><result status="valid" time="0.01" steps="970"/></proof>
+          <proof prover="2"><result status="valid" time="0.01" steps="766"/></proof>
           </goal>
           <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.0.1" expl="asserted formula" proved="true">
           <transf name="assert" proved="true" arg1="(forall a b. mul a b = mul b a)">
@@ -488,7 +488,7 @@
           <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0" expl="VC for isqrt64" proved="true">
           <transf name="assert" proved="true" arg1="(ule (add res_g (pow2 m1)) (0x100000000:t))">
            <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.0" expl="asserted formula" proved="true">
-           <proof prover="2"><result status="valid" time="0.02" steps="9469"/></proof>
+           <proof prover="2"><result status="valid" time="0.02" steps="8486"/></proof>
            </goal>
            <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1" expl="VC for isqrt64" proved="true">
            <transf name="assert" proved="true" arg1="(ule (add res_g bits_g1) (0x100000000:t))">
@@ -509,7 +509,7 @@
                 <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.0" expl="true case" proved="true">
                 <transf name="unfold" proved="true" arg1="sqr" arg2="in" arg3="h">
                  <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.0.0" expl="true case" proved="true">
-                 <proof prover="3" timelimit="5"><result status="valid" time="2.26" steps="507692"/></proof>
+                 <proof prover="3" timelimit="5"><result status="valid" time="2.96" steps="507692"/></proof>
                  </goal>
                 </transf>
                 </goal>
@@ -529,14 +529,14 @@
                      <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.0.0" expl="false case" proved="true">
                      <transf name="assert" proved="true" arg1="(forall a b c. b &lt;= c -&gt; a + b &lt;= a + c)">
                       <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.0.0.0" expl="asserted formula" proved="true">
-                      <proof prover="2"><result status="valid" time="0.01" steps="1050"/></proof>
+                      <proof prover="2"><result status="valid" time="0.01" steps="846"/></proof>
                       </goal>
                       <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.0.0.1" expl="false case" proved="true">
                       <transf name="unfold" proved="true" arg1="ule" arg2="in" arg3="h6">
                        <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.0.0.1.0" expl="false case" proved="true">
                        <transf name="rewrite" proved="true" arg1="to_uint_sub_bounded" arg2="in" arg3="h6">
                         <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.0.0.1.0.0" expl="false case" proved="true">
-                        <proof prover="2"><result status="valid" time="0.01" steps="1076"/></proof>
+                        <proof prover="2"><result status="valid" time="0.01" steps="872"/></proof>
                         </goal>
                         <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.0.0.1.0.1" expl="rewrite premises" proved="true">
                         <transf name="split_all_right" proved="true" >
@@ -546,7 +546,7 @@
                           <proof prover="5"><result status="valid" time="0.06" steps="217"/></proof>
                           </goal>
                           <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.0.0.1.0.1.0.1" proved="true">
-                          <proof prover="0"><result status="valid" time="0.01" steps="5418"/></proof>
+                          <proof prover="0"><result status="valid" time="0.01" steps="5116"/></proof>
                           </goal>
                          </transf>
                          </goal>
@@ -574,7 +574,7 @@
                         <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.0.0" expl="rewrite premises" proved="true">
                         <transf name="assert" proved="true" arg1="(forall a b. a * a + b * ((2 * a) + b) = (a + b) * (a + b))">
                          <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.0.0.0" expl="asserted formula" proved="true">
-                         <proof prover="2"><result status="valid" time="0.02" steps="2424"/></proof>
+                         <proof prover="2"><result status="valid" time="0.02" steps="2002"/></proof>
                          </goal>
                          <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.0.0.1" expl="rewrite premises" proved="true">
                          <transf name="replace" proved="true" arg1="(t&#39;int (2:t))" arg2="2">
@@ -612,7 +612,7 @@
                        </transf>
                        </goal>
                        <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.1" expl="rewrite premises" proved="true">
-                       <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.73" steps="597672"/></proof>
+                       <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.32" steps="597672"/></proof>
                        </goal>
                       </transf>
                       </goal>
@@ -638,7 +638,7 @@
                               <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0.1.0.0.0.0.0" expl="asserted formula" proved="true">
                               <transf name="assert" proved="true" arg1="(forall a b. add a b = add b a)">
                                <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0.1.0.0.0.0.0.0" expl="asserted formula" proved="true">
-                               <proof prover="2"><result status="valid" time="0.01" steps="1070"/></proof>
+                               <proof prover="2"><result status="valid" time="0.01" steps="866"/></proof>
                                </goal>
                                <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0.1.0.0.0.0.0.1" expl="asserted formula" proved="true">
                                <transf name="rewrite" proved="true" arg1="h1">
@@ -651,7 +651,7 @@
                               </transf>
                               </goal>
                               <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0.1.0.0.0.0.1" expl="rewrite premises" proved="true">
-                              <proof prover="3" timelimit="5"><result status="valid" time="2.60" steps="597887"/></proof>
+                              <proof prover="3" timelimit="5"><result status="valid" time="3.04" steps="597887"/></proof>
                               </goal>
                              </transf>
                              </goal>

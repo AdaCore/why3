@@ -3,6 +3,7 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Z3" version="4.8.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.7.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -18,11 +19,11 @@
  </goal>
  <goal name="defensive_get&#39;vc" expl="VC for defensive_get" proved="true">
  <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
- <proof prover="7"><result status="valid" time="0.01" steps="2259"/></proof>
+ <proof prover="7"><result status="valid" time="0.01" steps="2019"/></proof>
  </goal>
  <goal name="defensive_set&#39;vc" expl="VC for defensive_set" proved="true">
  <proof prover="2"><result status="valid" time="0.02" steps="7"/></proof>
- <proof prover="7"><result status="valid" time="0.01" steps="2341"/></proof>
+ <proof prover="7"><result status="valid" time="0.01" steps="1621"/></proof>
  </goal>
  <goal name="copy&#39;vc" expl="VC for copy" proved="true">
  <proof prover="8"><result status="valid" time="0.05" steps="9231"/></proof>
@@ -31,21 +32,21 @@
  <proof prover="8"><result status="valid" time="0.08" steps="12777"/></proof>
  </goal>
  <goal name="fill&#39;vc" expl="VC for fill" proved="true">
- <proof prover="8"><result status="valid" time="0.08" steps="10168"/></proof>
+ <proof prover="8"><result status="valid" time="0.08" steps="9833"/></proof>
  </goal>
  <goal name="blit&#39;vc" expl="VC for blit" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="blit&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="8"><result status="valid" time="0.02" steps="2268"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="2004"/></proof>
   </goal>
   <goal name="blit&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="8"><result status="valid" time="0.02" steps="2353"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="2090"/></proof>
   </goal>
   <goal name="blit&#39;vc.2" expl="index in array bounds" proved="true">
-  <proof prover="8"><result status="valid" time="0.02" steps="2842"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="2520"/></proof>
   </goal>
   <goal name="blit&#39;vc.3" expl="index in array bounds" proved="true">
-  <proof prover="8"><result status="valid" time="0.02" steps="2847"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="2525"/></proof>
   </goal>
   <goal name="blit&#39;vc.4" expl="loop invariant preservation" proved="true">
   <proof prover="2" timelimit="1"><result status="valid" time="0.01" steps="69"/></proof>
@@ -54,21 +55,21 @@
   <proof prover="2" timelimit="1"><result status="valid" time="0.01" steps="55"/></proof>
   </goal>
   <goal name="blit&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="50529"/></proof>
+  <proof prover="1"><result status="valid" time="0.06" steps="96647"/></proof>
   </goal>
   <goal name="blit&#39;vc.7" expl="postcondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="blit&#39;vc.7.0" expl="postcondition" proved="true">
    <transf name="split_all_full" proved="true" >
     <goal name="blit&#39;vc.7.0.0" expl="postcondition" proved="true">
-    <proof prover="0" timelimit="1"><result status="valid" time="0.15" steps="290676"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.40" steps="1722448"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="blit&#39;vc.8" expl="out of loop bounds" proved="true">
-  <proof prover="8"><result status="valid" time="0.01" steps="2441"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="2178"/></proof>
   </goal>
  </transf>
  </goal>
@@ -95,9 +96,9 @@
  <proof prover="5"><path name="array_ArrayPermut_permut_sub_weakening_2.v"/><result status="valid" time="0.48"/></proof>
  </goal>
  <goal name="exchange_permut_all" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="26594"/></proof>
- <proof prover="2" timelimit="1"><result status="timeout" time="1.00"/></proof>
- <proof prover="7" timelimit="1"><result status="valid" time="0.06" steps="13919"/></proof>
+ <proof prover="0"><result status="valid" time="0.02" steps="25904"/></proof>
+ <proof prover="2" timelimit="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+ <proof prover="7" timelimit="1"><result status="valid" time="0.06" steps="13591"/></proof>
  </goal>
 </theory>
 <theory name="ArraySwap" proved="true">
