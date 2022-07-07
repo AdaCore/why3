@@ -1578,15 +1578,41 @@ WhyML Attributes
 
 .. why3:attribute:: vc:annotation
 
+   This attribute is added by the VC generator, on the user input
+   formulas which become goals to prove in the resulting VC. It should
+   not be added manually.
+
 .. why3:attribute:: vc:divergent
+
+   This attribute indicates whether VCs for termination should be
+   generated.  See :numref:`sec.terminationvc` for details.
 
 .. why3:attribute:: vc:keep_precondition
 
+   This attribute indicates whether preconditions of calls should be kept
+   as assumptions for the program after the call. See
+   :numref:`sec.keeppreconditions` for details.
+
+
 .. why3:attribute:: vc:sp
+
+   This attribute, put on a WhyML expression, locally switches the VC
+   generator to the SP mode, for that expression. See
+   :numref:`sec.strongestpostconditions` for details.
 
 .. why3:attribute:: vc:white_box
 
+   This attribute is added by the Why3 parser for contract attached to
+   an expression in WhyML code. Such a contract is indeed encoded by a
+   local function with this attribute. It is for internal use only
+   and should never be added manually.
+
 .. why3:attribute:: vc:wp
+
+   This attribute, put on a WhyML expression, locally switches the VC
+   generator to the WP mode, for that expression. See
+   :numref:`sec.strongestpostconditions` for details.
+
 
 .. _sec.metas:
 
