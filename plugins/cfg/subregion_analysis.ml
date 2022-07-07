@@ -50,6 +50,7 @@ let mk_proj ty elt f =
         | _, _ -> failwith "mk_proj: field not part of type"
       in
       go fld_nms flds
+  | Bot -> Bot
   | _ -> Proj (ty, f, elt)
 
 let unfold known v =
@@ -76,7 +77,7 @@ let rec merge known l r =
         Format.eprintf "cannot merge %a with %a\n" print_ity ty1 print_ity ty2;
         assert false)
   | Variable v1, Variable v2 -> if pv_equal v1 v2 then Variable v1 else Bot
-  | Proj (c, f1, p1), Proj (_, f2, p2) -> if f1 = f2 then Proj (c, f1, merge known p1 p2) else Bot
+  | Proj (c, f1, p1), Proj (_, f2, p2) -> if f1 = f2 then mk_proj c (merge known p1 p2) f1 else Bot
   | Variable _, _ -> Bot
   | _, Variable _ -> Bot
   | _, Bot -> Bot
@@ -154,6 +155,7 @@ module FreshNames = struct
 
   let empty = (Mrs.empty, Mpv.empty)
   let pv (_, m) k def = match Mpv.find_opt k m with Some v -> v | None -> def
+  let pv2 (_, m) k def = match Mpv.find_opt k m with Some v -> v | None -> def
   let add_pv (m1, m2) k v = (m1, Mpv.add k v m2)
   let rs (m, _) k def = match Mrs.find_opt k m with Some v -> v | None -> def
   let merge_rs (m1, m2) (m1' : rsymbol Mrs.t) = (Mrs.set_union m1' m1, m2)
@@ -177,21 +179,25 @@ let rec analyze muc (st : FreshNames.t) (regions : domain) (e : expr) : domain_e
 
 and inner muc st regions e =
   match e.e_node with
-  | Evar v -> (Variable (FreshNames.pv st v v), e_var (FreshNames.pv st v v), regions)
+  | Evar v -> (Bot, e_var (FreshNames.pv st v v), regions)
   | Econst _ -> (Bot, e, regions)
   | Elet (def, e) ->
-      let st, def, regions = analyze_letdefn muc st regions def in
+      let st, def', regions = analyze_letdefn muc st regions def in
       let dom, e, regions = analyze muc st regions e in
-      (dom, e_let def e, regions)
+      let regions = match def with
+      | LDvar (p, _) -> Mpv.remove p regions
+      | _ -> regions in
+      (dom, e_let def' e, regions)
   | Eexec (ce, _) ->
       let dom, e = analyze_cexp muc st regions ce in
       (dom, e_exec e, regions)
   | Eassign [ (v, f, t) ] ->
-      let t_val = find regions t (Variable (FreshNames.pv st t t)) in
-      let v_val = find regions v (Variable (FreshNames.pv st v v)) in
+      let t_val = find regions t (Variable (FreshNames.pv2 st t t)) in
+      let v_val = find regions v (Variable (FreshNames.pv2 st v v)) in
 
-      let cty' = cty_apply f.rs_cty [ v ] [] t.pv_ity in
-      let e = e_assign [ (e_var (FreshNames.pv st v v), f, e_var (FreshNames.pv st t t)) ] in
+
+      let cty' = cty_apply f.rs_cty [ FreshNames.pv2 st v v ] [] t.pv_ity in
+      let e = e_assign [ (e_var (FreshNames.pv2 st v v), f, e_var (FreshNames.pv2 st t t)) ] in
 
       let v_val' = update muc.muc_known v_val (fd_of_rs f) cty' t_val in
       let regions = Mpv.add v v_val' regions in
@@ -285,7 +291,6 @@ and inner muc st regions e =
           (List.combine vars (Mpv.values body_regions))
           []
       in
-
       let regions = merge_domains muc.muc_known regions body_regions in
 
       let body =
@@ -411,5 +416,6 @@ and analyze_e_br muc st regions (b : exn_branch) =
   (dom, (pat, e), reg)
 
 let transform_letdefn muc l =
+  Format.printf "%a" print_let_defn l;
   let _, def, _ = analyze_letdefn muc FreshNames.empty Mpv.empty l in
   def

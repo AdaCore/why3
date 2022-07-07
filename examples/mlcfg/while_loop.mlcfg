@@ -43,16 +43,32 @@ module Decrement_Test
     ensures { UInt32.to_int (x.fin) = 0 }
    =
   var _0 : ();
+  var x_1 : borrowed uint32 = x;
+  var _3 : bool;
   var _4 : uint32;
   {
+    goto BB0
+  }
+  BB0 {
     goto BB1
   }
   BB1 {
-    _4 <- 0;
-    switch (true)
-      | False ->  return _0
-      | _ -> goto BB1
+    invariant x { UInt32.to_int (x_1.cur) >= 0 };
+    _4 <-  x_1.cur;
+    _3 <- _4 > (0 : uint32);
+    switch (_3)
+      | False -> goto BB3
+      | _ -> goto BB2
       end
+  }
+  BB2 {
+    x_1 <- { x_1 with cur = ( x_1.cur - (1 : uint32)) };
+    goto BB1
+  }
+  BB3 {
+    assume { x_1.fin = x_1.cur };
+
+    return _0
   }
 
 end
