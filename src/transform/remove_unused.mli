@@ -13,7 +13,7 @@
 (**
 
    Empty interface, this module registers the transformations
-   [eliminate_unused_types], [eliminate_unused_keep_constants] and
-   [eliminate_unused]
+   [remove_unused_types], [remove_unused_keep_constants] and
+   [remove_unused]
 
  *)
