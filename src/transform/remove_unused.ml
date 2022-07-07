@@ -57,7 +57,8 @@ let add_dependency usymb l =
   | _ -> assert false (* wrongly typed meta, impossible *)
 
 
-(* The second step of the removal : transverse the task decls and keep only the one we want *)
+(* The second step of the removal : transverse the task decls and keep
+   only the ones we want *)
 let do_removal_unused_decl usymb (td:Theory.tdecl) : Theory.tdecl option =
   let open Ident in
   let open Decl in

@@ -6,7 +6,7 @@
 <prover id="1" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC5" version="1.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_2018_le_rouge_et_le_noir_2.mlw"/>
 <theory name="Top" proved="true">
@@ -72,7 +72,7 @@
    <goal name="main&#39;vc.6.1" expl="assertion" proved="true">
    <transf name="introduce_premises" proved="true" >
     <goal name="main&#39;vc.6.1.0" expl="assertion" proved="true">
-    <proof prover="2" timelimit="30" memlimit="4000"><result status="valid" time="8.49" steps="9350"/></proof>
+    <proof prover="2" timelimit="30" memlimit="4000"><result status="valid" time="10.60" steps="9350"/></proof>
     </goal>
    </transf>
    </goal>
@@ -85,15 +85,19 @@
   <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
   </goal>
   <goal name="main&#39;vc.9" expl="assertion" proved="true">
-  <proof prover="0" timelimit="5"><result status="valid" time="2.53" steps="6630"/></proof>
+  <proof prover="0" timelimit="5"><result status="valid" time="3.41" steps="6630"/></proof>
   </goal>
   <goal name="main&#39;vc.10" expl="loop invariant init" proved="true">
-  <transf name="split_vc" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="main&#39;vc.10.0" expl="loop invariant init" proved="true">
-   <proof prover="4"><result status="valid" time="1.36" steps="219787"/></proof>
+   <transf name="split_all_full" proved="true" >
+    <goal name="main&#39;vc.10.0.0" expl="loop invariant init" proved="true">
+    <proof prover="4"><result status="valid" time="0.19" steps="29580"/></proof>
+    </goal>
+   </transf>
    </goal>
    <goal name="main&#39;vc.10.1" expl="loop invariant init" proved="true">
-   <proof prover="4"><result status="valid" time="0.17" steps="42650"/></proof>
+   <proof prover="1"><result status="valid" time="0.15" steps="49624"/></proof>
    </goal>
   </transf>
   </goal>
@@ -109,10 +113,10 @@
    <proof prover="0"><result status="valid" time="0.03" steps="106"/></proof>
    </goal>
    <goal name="main&#39;vc.11.3" expl="VC for main" proved="true">
-   <proof prover="0"><result status="valid" time="0.44" steps="618"/></proof>
+   <proof prover="0"><result status="valid" time="0.62" steps="618"/></proof>
    </goal>
    <goal name="main&#39;vc.11.4" expl="VC for main" proved="true">
-   <proof prover="0"><result status="valid" time="0.46" steps="879"/></proof>
+   <proof prover="0"><result status="valid" time="0.62" steps="879"/></proof>
    </goal>
    <goal name="main&#39;vc.11.5" expl="VC for main" proved="true">
    <proof prover="0"><result status="valid" time="0.06" steps="308"/></proof>
@@ -238,7 +242,7 @@
   <proof prover="0"><result status="valid" time="0.05" steps="130"/></proof>
   </goal>
   <goal name="main&#39;vc.24" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="1.04" steps="1834"/></proof>
+  <proof prover="0"><result status="valid" time="1.32" steps="1834"/></proof>
   </goal>
   <goal name="main&#39;vc.25" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="42"/></proof>
