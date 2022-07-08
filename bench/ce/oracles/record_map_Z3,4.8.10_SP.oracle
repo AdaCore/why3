@@ -9,7 +9,15 @@ File record_map.mlw:
     map_rec [@introduced] [@model_projected] =
       {"type": "Array",
        "val":
-        [{"others":
+        [{"indice": {"type": "Boolean", "val": true},
+          "value":
+           {"type": "Record",
+            "val":
+             {"Field":
+               [{"field": ".field_f",
+                 "value": {"type": "Integer", "val": "2"}},
+                {"field": "g", "value": {"type": "Boolean", "val": false}}]}}},
+         {"others":
            {"type": "Record",
             "val":
              {"Field":
@@ -45,7 +53,10 @@ File record_map.mlw:
           [{"field": "f_map",
             "value":
              {"type": "Array",
-              "val": [{"others": {"type": "Integer", "val": "2"}}]}},
+              "val":
+               [{"indice": {"type": "Boolean", "val": true},
+                 "value": {"type": "Integer", "val": "2"}},
+                {"others": {"type": "Integer", "val": "2"}}]}},
            {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
   Line 47:
     result [@introduced] = {"type": "Integer", "val": "2"}
@@ -55,7 +66,11 @@ File record_map.mlw:
       {"type": "Integer", "val": "2"}
     result of call at line 49, characters 2-15 [@call_result:49:2:49:15:bench/ce/record_map.mlw]
       [@id:unused] [@introduced] [@model_trace:result] =
-      {"type": "Array", "val": [{"others": {"type": "Integer", "val": "2"}}]}
+      {"type": "Array",
+       "val":
+        [{"indice": {"type": "Boolean", "val": true},
+          "value": {"type": "Integer", "val": "2"}},
+         {"others": {"type": "Integer", "val": "2"}}]}
     result [@introduced] = {"type": "Integer", "val": "2"}
 
 File "bench/ce/record_map.mlw", line 54, characters 12-31:

@@ -1,0 +1,57 @@
+
+module UnusedAbs
+
+use int.Int
+use int.Abs
+
+let f (x:int) : int
+  ensures { result > x }
+  = x+1
+
+end
+
+module UnusedBV
+
+use bv.BV32
+
+let f (x:t) : t
+  requires { ugt (1000:t) x }
+  ensures { ugt result x }
+  = add x (1:t)
+
+end
+
+module MatchPair
+
+use int.Int
+
+goal g :
+  forall x:int.
+  match (x,x+1) with (a,b) -> a < b end
+
+
+end
+
+module DefMatchPair
+
+use int.Int
+
+predicate f (x:int) =
+  match (x,x+1) with (a,b) -> a < b end
+
+goal g :
+  forall x:int. f x
+
+end
+
+
+module Ref
+
+use int.Int
+use ref.Ref
+
+let f (x: ref int) : int
+  ensures { result > !x }
+  = !x+1
+
+end

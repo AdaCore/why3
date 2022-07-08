@@ -5,6 +5,7 @@
 <prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="mex.mlw"/>
 <theory name="MexArray" proved="true">
@@ -126,7 +127,7 @@
   <proof prover="1"><result status="valid" time="0.02" steps="7202"/></proof>
   </goal>
   <goal name="mex&#39;vc.7" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.03" steps="30437"/></proof>
+  <proof prover="3"><result status="valid" time="0.03" steps="25260"/></proof>
   </goal>
   <goal name="mex&#39;vc.8" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="7137"/></proof>
@@ -178,7 +179,7 @@
   <proof prover="1"><result status="valid" time="0.09" steps="15655"/></proof>
   </goal>
   <goal name="mex&#39;vc.23" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.14" steps="392705"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="439"/></proof>
   </goal>
   <goal name="mex&#39;vc.24" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="6778"/></proof>

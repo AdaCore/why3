@@ -41,8 +41,10 @@ module Abs
   let function abs (x:int) : int = if x >= 0 then x else -x
 
   lemma Abs_le: forall x y:int. abs x <= y <-> -y <= x <= y
+  meta "remove_unused:dependency" lemma Abs_le, function abs
 
   lemma Abs_pos: forall x:int. abs x >= 0
+  meta "remove_unused:dependency" lemma Abs_pos, function abs
 
 (***
   lemma Abs_zero: forall x:int. abs x = 0 -> x = 0

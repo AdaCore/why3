@@ -188,6 +188,9 @@ Task 1: theory Task
             forall x:int, y:int, z:int.
              x <= y -> zero <= z -> (x * z) <= (y * z)
           
+          (* meta remove_unused:dependency prop CompatOrderMult,
+            function ( * ) *)
+          
           (* clone algebra.OrderedUnitaryCommutativeRing with type t16 = int,
             predicate (<=') = (<=), constant one2 = one,
             function ( *'''') = ( * ), function (-''''_) = (-_),

@@ -36,7 +36,7 @@ Prover result is: Valid.
 
 File "bench/ce/jlamp_projections.mlw", line 42, characters 7-24:
 Sub-goal Integer overflow of goal p3'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
@@ -49,7 +49,7 @@ File ref.mlw:
             "value":
              {"proj_name": "to_int",
               "type": "Proj",
-              "value": {"type": "Integer", "val": "0"}}}]}}
+              "value": {"type": "Integer", "val": "127"}}}]}}
 File jlamp_projections.mlw:
   Line 41:
     a [@field:0:contents] [@introduced] =
@@ -60,7 +60,7 @@ File jlamp_projections.mlw:
             "value":
              {"proj_name": "to_int",
               "type": "Proj",
-              "value": {"type": "Integer", "val": "0"}}}]}}
+              "value": {"type": "Integer", "val": "127"}}}]}}
   Line 42:
     a [@field:0:contents] [@introduced] [@model_trace:a] =
       {"type": "Record",
@@ -70,12 +70,12 @@ File jlamp_projections.mlw:
             "value":
              {"proj_name": "to_int",
               "type": "Proj",
-              "value": {"type": "Integer", "val": "0"}}}]}}
+              "value": {"type": "Integer", "val": "127"}}}]}}
     result of call at line 42, characters 11-13 [@call_result:42:11:42:13:bench/ce/jlamp_projections.mlw]
       [@id:unused] [@introduced] [@model_trace:result] =
       {"proj_name": "to_int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "127"}}
     result of call at line 42, characters 14-24 [@call_result:42:14:42:24:bench/ce/jlamp_projections.mlw]
       [@id:unused] [@introduced] [@model_trace:result] =
       {"proj_name": "to_int",

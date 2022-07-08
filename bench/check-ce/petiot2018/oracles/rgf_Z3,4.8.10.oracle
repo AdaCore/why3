@@ -352,59 +352,18 @@ The program does not comply to the verification goal, for example during the
 File rgf-R4.mlw:
   Line 24:
     Execution of main function `f` with env:
-      a = {length= 3;
+      a = {length= 2;
            elts=
-           [|(-28888) -> 16368; (-3597) -> 27343; 0 -> 0; 1 -> 1;
-           2 -> 1; _ -> 41|]}
+           [|(-32410) -> 13471; (-32409) -> 0; (-15809) -> 1769;
+           (-8016) -> 7644; (-7099) -> 2336; 0 -> 0; 1 -> 0; _ -> 23|]}
       zero = 0
       one = 1
   Line 32:
     Normal execution of function `length` with args:
-      arg = {length= 3;
+      arg = {length= 2;
              elts=
-             [|(-28888) -> 16368; (-3597) -> 27343; 0 -> 0; 1 -> 1;
-             2 -> 1; _ -> 41|]}
-    Normal execution of function `(-)` with args:
-      x = 3
-      y = 1
-File int.mlw:
-  Line 23:
-    Normal execution of function `(-_)` with args:
-      _ = 1
-    Normal execution of function `(+)` with args:
-      _ = 3
-      _ = (-1)
-File rgf-R4.mlw:
-  Line 32:
-    Normal execution of function `int_ref` with args:
-      i = 2
-File lib.mlw:
-  Line 12:
-    Normal execution of function `int_ref'mk` with args:
-      contents = 2
-File rgf-R4.mlw:
-  Line 33:
-    Normal execution of function `(!)` with args:
-      r = {contents= 2}
-File lib.mlw:
-  Line 23:
-    Normal execution of function `contents` with args:
-      arg = {contents= 2}
-File rgf-R4.mlw:
-  Line 33:
-    Normal execution of function `(>=)` with args:
-      x = 2
-      y = 1
-    Normal iteration of loop
-  Line 36:
-    Normal execution of function `(!)` with args:
-      r = {contents= 2}
-File lib.mlw:
-  Line 23:
-    Normal execution of function `contents` with args:
-      arg = {contents= 2}
-File rgf-R4.mlw:
-  Line 36:
+             [|(-32410) -> 13471; (-32409) -> 0; (-15809) -> 1769;
+             (-8016) -> 7644; (-7099) -> 2336; 0 -> 0; 1 -> 0; _ -> 23|]}
     Normal execution of function `(-)` with args:
       x = 2
       y = 1
@@ -416,154 +375,201 @@ File int.mlw:
       _ = 2
       _ = (-1)
 File rgf-R4.mlw:
+  Line 32:
+    Normal execution of function `int_ref` with args:
+      i = 1
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 1
+File rgf-R4.mlw:
+  Line 33:
+    Normal execution of function `(!)` with args:
+      r = {contents= 1}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+File rgf-R4.mlw:
+  Line 33:
+    Normal execution of function `(>=)` with args:
+      x = 1
+      y = 1
+    Normal iteration of loop
+  Line 36:
+    Normal execution of function `(!)` with args:
+      r = {contents= 1}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+File rgf-R4.mlw:
+  Line 36:
+    Normal execution of function `(-)` with args:
+      x = 1
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = (-1)
+File rgf-R4.mlw:
   Line 36:
     Normal execution of function `([])` with args:
-      a = {length= 3;
+      a = {length= 2;
            elts=
-           [|(-28888) -> 16368; (-3597) -> 27343; 0 -> 0; 1 -> 1;
-           2 -> 1; _ -> 41|]}
+           [|(-32410) -> 13471; (-32409) -> 0; (-15809) -> 1769;
+           (-8016) -> 7644; (-7099) -> 2336; 0 -> 0; 1 -> 0; _ -> 23|]}
+      i = 0
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 2;
+             elts=
+             [|(-32410) -> 13471; (-32409) -> 0; (-15809) -> 1769;
+             (-8016) -> 7644; (-7099) -> 2336; 0 -> 0; 1 -> 0; _ -> 23|]}
+    Normal execution of function `(@)` with args:
+      u = [|(-32410) -> 13471; (-32409) -> 0; (-15809) -> 1769;
+          (-8016) -> 7644; (-7099) -> 2336; 0 -> 0; 1 -> 0; _ -> 23|]
+      u = 0
+File rgf-R4.mlw:
+  Line 36:
+    Normal execution of function `(!)` with args:
+      r = {contents= 1}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+File rgf-R4.mlw:
+  Line 36:
+    Normal execution of function `([])` with args:
+      a = {length= 2;
+           elts=
+           [|(-32410) -> 13471; (-32409) -> 0; (-15809) -> 1769;
+           (-8016) -> 7644; (-7099) -> 2336; 0 -> 0; 1 -> 0; _ -> 23|]}
       i = 1
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 3;
+      arg = {length= 2;
              elts=
-             [|(-28888) -> 16368; (-3597) -> 27343; 0 -> 0; 1 -> 1;
-             2 -> 1; _ -> 41|]}
+             [|(-32410) -> 13471; (-32409) -> 0; (-15809) -> 1769;
+             (-8016) -> 7644; (-7099) -> 2336; 0 -> 0; 1 -> 0; _ -> 23|]}
     Normal execution of function `(@)` with args:
-      u = [|(-28888) -> 16368; (-3597) -> 27343; 0 -> 0; 1 -> 1;
-          2 -> 1; _ -> 41|]
+      u = [|(-32410) -> 13471; (-32409) -> 0; (-15809) -> 1769;
+          (-8016) -> 7644; (-7099) -> 2336; 0 -> 0; 1 -> 0; _ -> 23|]
       u = 1
 File rgf-R4.mlw:
   Line 36:
-    Normal execution of function `(!)` with args:
-      r = {contents= 2}
-File lib.mlw:
-  Line 23:
-    Normal execution of function `contents` with args:
-      arg = {contents= 2}
-File rgf-R4.mlw:
-  Line 36:
-    Normal execution of function `([])` with args:
-      a = {length= 3;
-           elts=
-           [|(-28888) -> 16368; (-3597) -> 27343; 0 -> 0; 1 -> 1;
-           2 -> 1; _ -> 41|]}
-      i = 2
-File lib.mlw:
-  Line 43:
-    Normal execution of function `elts` with args:
-      arg = {length= 3;
-             elts=
-             [|(-28888) -> 16368; (-3597) -> 27343; 0 -> 0; 1 -> 1;
-             2 -> 1; _ -> 41|]}
-    Normal execution of function `(@)` with args:
-      u = [|(-28888) -> 16368; (-3597) -> 27343; 0 -> 0; 1 -> 1;
-          2 -> 1; _ -> 41|]
-      u = 2
-File rgf-R4.mlw:
-  Line 36:
     Normal execution of function `(<=)` with args:
-      x = 1
-      y = 1
+      x = 0
+      y = 0
     Normal execution of function `Tuple0` with args:
 Unknown location:
     Normal execution of function `Tuple0` with args:
 File rgf-R4.mlw:
   Line 39:
     Normal execution of function `(!)` with args:
-      r = {contents= 2}
+      r = {contents= 1}
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 2}
+      arg = {contents= 1}
 File rgf-R4.mlw:
   Line 39:
     Normal execution of function `(=)` with args:
-      x = 2
+      x = 1
       y = 0
     Normal execution of function `Tuple0` with args:
   Line 40:
     Normal execution of function `(!)` with args:
-      r = {contents= 2}
+      r = {contents= 1}
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 2}
+      arg = {contents= 1}
 File rgf-R4.mlw:
   Line 40:
     Normal execution of function `([])` with args:
-      a = {length= 3;
+      a = {length= 2;
            elts=
-           [|(-28888) -> 16368; (-3597) -> 27343; 0 -> 0; 1 -> 1;
-           2 -> 1; _ -> 41|]}
-      i = 2
+           [|(-32410) -> 13471; (-32409) -> 0; (-15809) -> 1769;
+           (-8016) -> 7644; (-7099) -> 2336; 0 -> 0; 1 -> 0; _ -> 23|]}
+      i = 1
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 3;
+      arg = {length= 2;
              elts=
-             [|(-28888) -> 16368; (-3597) -> 27343; 0 -> 0; 1 -> 1;
-             2 -> 1; _ -> 41|]}
+             [|(-32410) -> 13471; (-32409) -> 0; (-15809) -> 1769;
+             (-8016) -> 7644; (-7099) -> 2336; 0 -> 0; 1 -> 0; _ -> 23|]}
     Normal execution of function `(@)` with args:
-      u = [|(-28888) -> 16368; (-3597) -> 27343; 0 -> 0; 1 -> 1;
-          2 -> 1; _ -> 41|]
-      u = 2
+      u = [|(-32410) -> 13471; (-32409) -> 0; (-15809) -> 1769;
+          (-8016) -> 7644; (-7099) -> 2336; 0 -> 0; 1 -> 0; _ -> 23|]
+      u = 1
 File rgf-R4.mlw:
   Line 40:
     Normal execution of function `(+)` with args:
-      _ = 1
+      _ = 0
       _ = 2
     Normal execution of function `(!)` with args:
-      r = {contents= 2}
+      r = {contents= 1}
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 2}
+      arg = {contents= 1}
 File rgf-R4.mlw:
   Line 40:
     Normal execution of function `([]<-)` with args:
-      a = {length= 3;
+      a = {length= 2;
            elts=
-           [|(-28888) -> 16368; (-3597) -> 27343; 0 -> 0; 1 -> 1;
-           2 -> 1; _ -> 41|]}
-      i = 2
-      v = 3
+           [|(-32410) -> 13471; (-32409) -> 0; (-15809) -> 1769;
+           (-8016) -> 7644; (-7099) -> 2336; 0 -> 0; 1 -> 0; _ -> 23|]}
+      i = 1
+      v = 2
 File lib.mlw:
   Line 48:
     Normal execution of function `elts` with args:
-      arg = {length= 3;
+      arg = {length= 2;
              elts=
-             [|(-28888) -> 16368; (-3597) -> 27343; 0 -> 0; 1 -> 1;
-             2 -> 1; _ -> 41|]}
+             [|(-32410) -> 13471; (-32409) -> 0; (-15809) -> 1769;
+             (-8016) -> 7644; (-7099) -> 2336; 0 -> 0; 1 -> 0; _ -> 23|]}
 File rgf-R4.mlw:
   Line 41:
     Normal execution of function `(!)` with args:
-      r = {contents= 2}
+      r = {contents= 1}
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 2}
+      arg = {contents= 1}
 File rgf-R4.mlw:
   Line 41:
     Normal execution of function `g` with args:
-      a = {length= 3;
+      a = {length= 2;
            elts=
            (fun j -> if j = i then v
-              else elts1 j) with i = 2, v = 3, elts1 = [|(-28888) -> 16368;
-                                                       (-3597) -> 27343;
-                                                       0 -> 0; 1 -> 1;
-                                                       2 -> 1; _ -> 41|]}
-      i = 2
+              else elts1 j) with i = 1, v = 2, elts1 = [|(-32410) -> 13471;
+                                                       (-32409) -> 0;
+                                                       (-15809) -> 1769;
+                                                       (-8016) -> 7644;
+                                                       (-7099) -> 2336;
+                                                       0 -> 0;
+                                                       1 -> 0; _ -> 23|]}
+      i = 1
     Property failure at precondition of `g` with:
-      a = {length= 3;
+      a = {length= 2;
            elts=
            (fun j -> if j = i then v
-              else elts1 j) with i = 2, v = 3, elts1 = [|(-28888) -> 16368;
-                                                       (-3597) -> 27343;
-                                                       0 -> 0; 1 -> 1;
-                                                       2 -> 1; _ -> 41|]}
-      i = 2
+              else elts1 j) with i = 1, v = 2, elts1 = [|(-32410) -> 13471;
+                                                       (-32409) -> 0;
+                                                       (-15809) -> 1769;
+                                                       (-8016) -> 7644;
+                                                       (-7099) -> 2336;
+                                                       0 -> 0;
+                                                       1 -> 0; _ -> 23|]}
+      i = 1
 
 File "bench/check-ce/petiot2018/experiments/rgf-R4.mlw", line 41, characters 2-8:
 Sub-goal Precondition of goal f'vc.
