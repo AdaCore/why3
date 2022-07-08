@@ -952,7 +952,7 @@ Proof.
 Defined.
 
 (* Why3 goal *)
-Lemma max_int1 :
+Lemma max_int_spec :
   (max_int =
    ((bv.Pow2int.pow2 (bv.Pow2int.pow2 (eb - 1%Z)%Z)) -
     (bv.Pow2int.pow2 ((bv.Pow2int.pow2 (eb - 1%Z)%Z) - sb)%Z))%Z).

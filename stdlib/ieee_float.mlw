@@ -221,11 +221,11 @@ module GenericFloat
   function round mode real : real
 
   constant max_real : real (* defined when cloning *)
-  constant max_int  : int
+  constant max_int  : int  (* defined when cloning *)
 
   constant emax : int = pow2 (eb - 1)
 
-  axiom max_int : max_int = pow2 emax - pow2 (emax - sb)
+  axiom max_int_spec : max_int = pow2 emax - pow2 (emax - sb)
   axiom max_real_int: max_real = FromInt.from_int max_int
 
   predicate in_range (x:real) = -. max_real <=. x <=. max_real
@@ -857,20 +857,26 @@ module Float32
   type t = < float 8 24 >
 
   constant pow2sb : int = 16777216
+  constant max_int : int = 0xFFFF_FF00_0000_0000_0000_0000_0000_0000
   constant max_real : real = 0x1.FFFFFEp127
 
   clone export GenericFloat with
     type t = t,
     constant eb = t'eb,
     constant sb = t'sb,
+    constant max_int = max_int,
     constant max_real = max_real,
     constant pow2sb = pow2sb,
     function to_real = t'real,
     predicate is_finite = t'isFinite,
-    goal eb_gt_1,
-    goal sb_gt_1,
-    goal max_int,
-    goal pow2sb,
+    (* the following are lemmas and not goals, because we want to
+       prove them in the realizations. See also
+       [https://gitlab.inria.fr/why3/why3/-/issues/664] *)
+    lemma eb_gt_1,
+    lemma sb_gt_1,
+    lemma max_int_spec,
+    lemma max_real_int,
+    lemma pow2sb,
     axiom . (* TODO: "lemma"? "goal"? *)
 
   lemma round_bound_ne :
@@ -892,21 +898,27 @@ module Float64
 
   type t = < float 11 53 >
 
-  constant pow2sb : int = 9007199254740992
+  constant pow2sb : int = 9007199254740992  (* 242 *)
+  constant max_int : int = 0xFFFF_FFFF_FFFF_F800_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000
   constant max_real : real = 0x1.FFFFFFFFFFFFFp1023
 
   clone export GenericFloat with
     type t = t,
     constant eb = t'eb,
     constant sb = t'sb,
+    constant max_int = max_int,
     constant max_real = max_real,
     constant pow2sb = pow2sb,
     function to_real = t'real,
     predicate is_finite = t'isFinite,
-    goal eb_gt_1,
-    goal sb_gt_1,
-    goal max_int,
-    goal pow2sb,
+    (* the following are lemmas and not goals, because we want to
+       prove them in the realizations. See also
+       [https://gitlab.inria.fr/why3/why3/-/issues/664] *)
+    lemma eb_gt_1,
+    lemma sb_gt_1,
+    lemma max_int_spec,
+    lemma max_real_int,
+    lemma pow2sb,
     axiom . (* TODO: "lemma"? "goal"? *)
 
   lemma round_bound_ne :
