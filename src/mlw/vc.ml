@@ -815,7 +815,8 @@ let rec k_expr env lps e res xmap =
               let rec k_par = function
                 | [k] -> k | [] -> assert false
                 | k::kl -> Kpar (k, k_par kl) in
-              Kpar (k_havoc loc attrs eff (k_par (k_rec env lps rdl)), k)
+              let envs = List.map (fun _ -> env) rdl in
+              Kpar (k_havoc loc attrs eff (k_par (k_rec envs lps rdl)), k)
           | LDsym (_, {c_node = Cfun e; c_cty = cty}) ->
               Kpar (k_havoc loc attrs eff (k_fun env lps cty e), k)
           | _ -> k end
@@ -1024,8 +1025,8 @@ and k_fun env lps ?(oldies=Mpv.empty) ?(xmap=Mxs.empty) cty e =
   let p = List.fold_right sp_and pinv (sp_of_pre cty.cty_pre) in
   Kseq (Kval (cty.cty_args, p), 0, k)
 
-and k_rec env lps rdl =
-  let k_rd {rec_fun = c; rec_varl = varl} =
+and k_rec envs lps rdl =
+  let k_rd env {rec_fun = c; rec_varl = varl} =
     let e = match c.c_node with
       | Cfun e -> e | _ -> assert false in
     (* store in lps our variant at the entry point
@@ -1036,7 +1037,7 @@ and k_rec env lps rdl =
       let decr = Opt.get (ls_decr_of_rec_defn rd) in
       Mls.add decr (varl, List.map snd rd.rec_varl) lps in
     k_fun env (List.fold_left add lps rdl) ~oldies c.c_cty e in
-  List.map k_rd rdl
+  List.map2 k_rd envs rdl
 
 (* stage 2: push sub-expressions up as far as we can *)
 
@@ -1643,8 +1644,8 @@ let vc_kode env vc_wp k =
 let vc_fun env vc_wp cty e =
   vc_kode env vc_wp (k_fun env Mls.empty cty e)
 
-let vc_rec env vc_wp rdl =
-  List.map (vc_kode env vc_wp) (k_rec env Mls.empty rdl)
+let vc_rec envs vc_wp rdl =
+  List.map2 (fun env k -> vc_kode env vc_wp k) envs (k_rec envs Mls.empty rdl)
 
 let mk_vc_decl ({known_map = kn; keep_trace } as env) id f =
   let {id_string = nm; id_attrs = attrs; id_loc = loc} = id in
@@ -1702,11 +1703,15 @@ let vc env kn tuc d = match d.pd_node with
       let f = vc_fun env (Debug.test_noflag debug_sp) cty e in
       add_vc_decl env s.rs_name f []
   | PDlet (LDrec rdl) ->
-     (** FIXME : pass ~attrs:e.e_attrs *)
-      let env = mk_env env kn tuc [] in
-      let fl = vc_rec env (Debug.test_noflag debug_sp) rdl in
-      let add rd f vcl = add_vc_decl env rd.rec_sym.rs_name f vcl in
-      List.fold_right2 add rdl fl []
+      let envs =
+        List.map (fun f ->
+            match f.rec_fun.c_node with
+            | Cfun { e_attrs = attrs } -> mk_env ~attrs env kn tuc []
+            | _ -> assert false) rdl
+      in
+      let fl = vc_rec envs (Debug.test_noflag debug_sp) rdl in
+      let add env (rd, f) vcl = add_vc_decl env rd.rec_sym.rs_name f vcl in
+      List.fold_right2 add envs (List.combine rdl fl) []
   | PDtype tdl ->
       let env = lazy (mk_env env kn tuc []) in
       let add_witness d wit vcl =
