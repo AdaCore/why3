@@ -85,6 +85,18 @@ now apply bpow_le.
 Qed.
 
 (* Why3 goal *)
+Lemma eb_gt_1 : (1%Z < 8%Z)%Z.
+Proof.
+now simpl.
+Qed.
+
+(* Why3 goal *)
+Lemma sb_gt_1 : (1%Z < 24%Z)%Z.
+Proof.
+now simpl.
+Qed.
+
+(* Why3 goal *)
 Definition zeroF : t.
 Proof.
   apply zeroF.
@@ -290,26 +302,29 @@ Proof.
   apply (round 8 24).
 Defined.
 
+(* Why3 goal *)
+Lemma max_int_spec :
+  (340282346638528859811704183484516925440%Z =
+   ((bv.Pow2int.pow2 (bv.Pow2int.pow2 (8%Z - 1%Z)%Z)) -
+    (bv.Pow2int.pow2 ((bv.Pow2int.pow2 (8%Z - 1%Z)%Z) - 24%Z)%Z))%Z).
+Proof.
+now simpl.
+Qed.
+
+(* Why3 goal *)
+Lemma max_real_int :
+  (340282346638528859811704183484516925440%R =
+   (BuiltIn.IZR 340282346638528859811704183484516925440%Z)).
+Proof.
+now apply IZR_eq.
+Qed.
+
 Lemma max_real_cst :
   max_real 8 24 = 340282346638528859811704183484516925440%R.
 Proof.
   rewrite <- max_real_is_F2R.
   change (F2R (Float radix2 _ _)) with (IZR 16777215 * IZR (Zpower 2 104))%R.
   now rewrite <- mult_IZR.
-Qed.
-
-(* Why3 goal *)
-Definition max_int : Numbers.BinNums.Z.
-Proof.
-  exact (33554430 * 10141204801825835211973625643008)%Z.
-Defined.
-
-(* Why3 goal *)
-Lemma max_real_int :
-  (340282346638528859811704183484516925440%R = (BuiltIn.IZR max_int)).
-Proof.
-  unfold max_int.
-  now apply IZR_eq.
 Qed.
 
 (* Why3 assumption *)
@@ -319,7 +334,8 @@ Definition in_range (x:Reals.Rdefinitions.R) : Prop :=
 
 (* Why3 assumption *)
 Definition in_int_range (i:Numbers.BinNums.Z) : Prop :=
-  ((-max_int)%Z <= i)%Z /\ (i <= max_int)%Z.
+  ((-340282346638528859811704183484516925440%Z)%Z <= i)%Z /\
+  (i <= 340282346638528859811704183484516925440%Z)%Z.
 
 (* Why3 goal *)
 Lemma is_finite : forall (x:t), t'isFinite x -> in_range (t'real x).
@@ -403,6 +419,12 @@ Lemma Round_up_neg :
    (-(round ieee_float.RoundingMode.RTN x))%R).
 Proof.
   apply Round_up_neg.
+Qed.
+
+(* Why3 goal *)
+Lemma pow2sb1 : (16777216%Z = (bv.Pow2int.pow2 24%Z)).
+Proof.
+now simpl.
 Qed.
 
 (* Why3 assumption *)
