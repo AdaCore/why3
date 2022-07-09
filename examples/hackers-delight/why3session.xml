@@ -3,6 +3,7 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.7.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="9" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -76,7 +77,7 @@
   <proof prover="9"><result status="valid" time="0.04" steps="16656"/></proof>
   </goal>
   <goal name="hamming_spec&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="8"><result status="valid" time="0.03" steps="42735"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="51432"/></proof>
   </goal>
  </transf>
  </goal>

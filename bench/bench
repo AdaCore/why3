@@ -209,7 +209,7 @@ step_limit () {
 mem_limit () {
     pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
-    provers=`bin/why3$suffix config list-provers | grep 'Alt-Ergo 2\.[3-9]\\.[0-9]$\|CVC4 1\.[6-8]$\|CVC5 1\.[0-9]\.[0-9]$\|Z3 4\.[7-9]\.[0-9]\+$' | tr ' ' ',' | tr -d '()'`
+    provers=`bin/why3$suffix config list-provers | grep 'Alt-Ergo \(2\.3\.3\|2\.4\.1\)$\|CVC4 1\.[78]$\|CVC5 1\.[0-9]\.[0-9]$\|Z3 \(4\.8\.\(4\|10\)\|4\.9\.[0-9]\+\)$' | tr ' ' ',' | tr -d '()'`
     for f in $1/*.mlw; do
         for p in $provers ; do
             if [[ "$p" =~ .*strings.* ]]; then
@@ -232,10 +232,10 @@ mem_limit () {
                 highmemlimit=50
                 lowmemlimit=30
                 case $p in
-                    Alt-Ergo*) steps=5000; highmemlimit=35; lowmemlimit=30 ;;
-                    CVC4*) steps=80000; highmemlimit=50 ;;
+                    Alt-Ergo*) steps=5000; highmemlimit=35 ;;
+                    CVC4*) steps=100000 ;;
                     CVC5*) steps=100000 ;;
-                    Z3*) steps=3000000; lowmemlimit=45 ;;
+                    Z3*) steps=5000000; lowmemlimit=45 ;;
                 esac
                 printf "  $f (memlimit=$highmemlimit, stepslimit=$steps for $p)... "
                 if $pgm --memlimit="$highmemlimit" --timelimit=60 --stepslimit="$steps" -P $p $f | \
