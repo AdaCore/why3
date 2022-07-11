@@ -1023,7 +1023,16 @@ let clone_type_record cl s d s' d' =
   (* validate the refinement *)
   cl.ts_table <- Mts.add s.its_ts s' cl.ts_table
 
-let clone_type_decl inst cl tdl kn =
+let warn_constructors_mismatch loc d d' =
+  let warn_cons c c' =
+    if c.rs_name.id_string <> c'.rs_name.id_string
+    then Loc.warning ?loc
+        "trying to match constructor %a with %a, this is likely an error"
+        print_rs c print_rs c' in
+  if d.itd_its.its_ts.ts_name.id_string = d'.itd_its.its_ts.ts_name.id_string
+  then List.iter2 warn_cons d.itd_constructors d'.itd_constructors
+
+let clone_type_decl loc inst cl tdl kn =
   let def =
     List.fold_left (fun m d -> Mits.add d.itd_its d m) Mits.empty tdl in
   let cloned =
@@ -1121,6 +1130,7 @@ let clone_type_decl inst cl tdl kn =
               | Invalid_argument _ -> raise (CannotInstantiate id) in
             List.iter2 eq_proj d.itd_fields d'.itd_fields;
             List.iter2 eq_cons d.itd_constructors d'.itd_constructors;
+            warn_constructors_mismatch loc d d';
             Hits.replace htd s None
         | None -> raise (CannotInstantiate id)
       end else
@@ -1198,7 +1208,7 @@ let clone_pdecl loc inst cl uc d = match d.pd_node with
       let add_e spv e = Spv.union spv e.e_effect.eff_reads in
       let add_d spv d = Opt.fold add_e spv d.itd_witness in
       freeze_foreign cl (List.fold_left add_d Spv.empty tdl);
-      let ndl, vcl = clone_type_decl inst cl tdl uc.muc_known in
+      let ndl, vcl = clone_type_decl loc inst cl tdl uc.muc_known in
       let uc = List.fold_left add_vc uc vcl in
       let dl = if ndl <> [] then create_type_decl ndl else [] in
       let save_special_ls d d' = match d.d_node, d'.d_node with
