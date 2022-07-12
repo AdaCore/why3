@@ -1,0 +1,609 @@
+<check-ce-rac-results>Check model 0 ("bench/check-ce/result.mlw", line 11, characters 15-38)
+<check-ce-rac-results>Checking model:
+                      File result.mlw:
+                        Line 7:
+                          a =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "4"}}]}}
+                        Line 9:
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "17"}}]}}
+                        Line 11:
+                          a =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "21"}}]}}
+                          a =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "21"}}]}}
+                          result = {"type": "Integer", "val": "22"}
+                          result = {"type": "Integer", "val": "22"}
+                        Line 12:
+                          a =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "21"}}]}}
+                          result = {"type": "Integer", "val": "21"}
+                          result = {"type": "Integer", "val": "4"}
+                          result = {"type": "Integer", "val": "17"}
+                          result = {"type": "Integer", "val": "22"}
+                        Line 13:
+                          result = {"type": "Integer", "val": "22"}
+                          result = {"type": "Integer", "val": "21"}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `a` at "bench/check-ce/result.mlw", line 7, characters 6-7: {contents=
+                                                                    4}
+<rac-values>Value from model for parameter `b` at "bench/check-ce/result.mlw", line 9, characters 10-11: {contents=
+                                                                    17}
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/result.mlw", line 12, characters 14-16 at "bench/check-ce/result.mlw", line 12, characters 14-16: 17
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/result.mlw", line 12, characters 9-11 at "bench/check-ce/result.mlw", line 12, characters 9-11: 4
+<rac-values>Value from model for variable `a` at "bench/check-ce/result.mlw", line 12, characters 4-16 at "bench/check-ce/result.mlw", line 12, characters 4-16: {contents=
+                                                                    21}
+<rac-values>Type default value for return value of call to (:=) at "bench/check-ce/result.mlw", line 12, characters 4-16 at "bench/check-ce/result.mlw", line 12, characters 4-16: ()
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/result.mlw", line 13, characters 4-6 at "bench/check-ce/result.mlw", line 13, characters 4-6: 21
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `a` at "bench/check-ce/result.mlw", line 7, characters 6-7: {contents=
+                                                                    4}
+<rac-values>Value from model for parameter `b` at "bench/check-ce/result.mlw", line 9, characters 10-11: {contents=
+                                                                    17}
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: FAILURE (postcondition at "bench/check-ce/result.mlw", line 11, characters 15-38)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File result.mlw:
+                            Line 7:
+                              a = {contents= 4}
+                            Line 9:
+                              b = {contents= 17}
+                              b = {contents= 17}
+                              Execution of main function `p1` with env:
+                                a = {contents= 4}
+                                b = {contents= 17}
+                                zero = 0
+                                one = 1
+                            Line 12:
+                              Normal execution of function `(!)` with args:
+                                r = {contents= 17}
+                          File ref.mlw:
+                            Line 18:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 17}
+                          File result.mlw:
+                            Line 12:
+                              Normal execution of function `(!)` with args:
+                                r = {contents= 4}
+                          File ref.mlw:
+                            Line 18:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 4}
+                          File result.mlw:
+                            Line 12:
+                              Normal execution of function `(+)` with args:
+                                _ = 4
+                                _ = 17
+                              Normal execution of function `(:=)` with args:
+                                r = {contents= 4}
+                                v = 21
+                            Line 13:
+                              Normal execution of function `(!)` with args:
+                                r = {contents= 21}
+                          File ref.mlw:
+                            Line 18:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 21}
+                          File result.mlw:
+                            Line 13:
+                              Normal execution of function `(+)` with args:
+                                _ = 21
+                                _ = 1
+                            Line 11:
+                              Property failure at postcondition of `p1` with:
+                                a = {contents= 21}
+                                result = 22
+                        - Abstract RAC: FAILURE (postcondition at "bench/check-ce/result.mlw", line 11, characters 15-38)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File result.mlw:
+                            Line 7:
+                              a = {contents= 4}
+                            Line 9:
+                              b = {contents= 17}
+                              b = {contents= 17}
+                              Execution of main function `p1` with env:
+                                a = {contents= 4}
+                                b = {contents= 17}
+                                zero = 0
+                                one = 1
+                            Line 12:
+                              Giant-step execution of function `(!)` with args:
+                                r = {contents= 17}
+                              result of `(!)` = 17
+                              Giant-step execution of function `(!)` with args:
+                                r = {contents= 4}
+                              result of `(!)` = 4
+                              Normal execution of function `(+)` with args:
+                                _ = 4
+                                _ = 17
+                              Giant-step execution of function `(:=)` with args:
+                                r = {contents= 4}
+                                v = 21
+                              a = {contents= 21}
+                              result of `(:=)` = ()
+                            Line 13:
+                              Giant-step execution of function `(!)` with args:
+                                r = {contents= 21}
+                              result of `(!)` = 21
+                              Normal execution of function `(+)` with args:
+                                _ = 21
+                                _ = 1
+                            Line 11:
+                              Property failure at postcondition of `p1` with:
+                                a = {contents= 21}
+                                result = 22
+<check-ce-rac-results>Check model 1 ("bench/check-ce/result.mlw", line 11, characters 15-38)
+<check-ce-rac-results>Checking model:
+                      
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/result.mlw", line 7, characters 8-17 at "bench/check-ce/result.mlw", line 7, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/result.mlw", line 7, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `b` at "bench/check-ce/result.mlw", line 9, characters 10-11: {contents=
+                                                                    0}
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/result.mlw", line 7, characters 8-17 at "bench/check-ce/result.mlw", line 7, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/result.mlw", line 7, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `b` at "bench/check-ce/result.mlw", line 9, characters 10-11: {contents=
+                                                                    0}
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/result.mlw", line 9, characters 6-8)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File result.mlw:
+                            Line 7:
+                              Constant a initialization
+                              (giant-step) execution of unimplemented function with args:
+                              result = {contents= 0}
+                              a = {contents= 0}
+                            Line 9:
+                              b = {contents= 0}
+                              b = {contents= 0}
+                              Execution of main function `p1` with env:
+                                a = {contents= 0}
+                                b = {contents= 0}
+                                zero = 0
+                                one = 1
+                              Execution got stuck at precondition of `p1` with:
+                                a = {contents= 0}
+                                b = {contents= 0}
+                        - Abstract RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/result.mlw", line 9, characters 6-8)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File result.mlw:
+                            Line 7:
+                              Constant a initialization
+                              (giant-step) execution of unimplemented function with args:
+                              result = {contents= 0}
+                              a = {contents= 0}
+                            Line 9:
+                              b = {contents= 0}
+                              b = {contents= 0}
+                              Execution of main function `p1` with env:
+                                a = {contents= 0}
+                                b = {contents= 0}
+                                zero = 0
+                                one = 1
+                              Execution got stuck at precondition of `p1` with:
+                                a = {contents= 0}
+                                b = {contents= 0}
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/result.mlw", line 11, characters 15-38)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/result.mlw", line 11, characters 15-38)
+- Checked model 1: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/result.mlw", line 9, characters 6-8)
+  - Abstract RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/result.mlw", line 9, characters 6-8)
+File "bench/check-ce/result.mlw", line 11, characters 15-38:
+Sub-goal Postcondition of goal p1'vc.
+Prover result is: Step limit exceeded (0.36s, 3000073 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File result.mlw:
+  Line 7:
+    a = {contents= 4}
+  Line 9:
+    b = {contents= 17}
+    b = {contents= 17}
+    Execution of main function `p1` with env:
+      a = {contents= 4}
+      b = {contents= 17}
+      zero = 0
+      one = 1
+  Line 12:
+    Normal execution of function `(!)` with args:
+      r = {contents= 17}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= 17}
+File result.mlw:
+  Line 12:
+    Normal execution of function `(!)` with args:
+      r = {contents= 4}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= 4}
+File result.mlw:
+  Line 12:
+    Normal execution of function `(+)` with args:
+      _ = 4
+      _ = 17
+    Normal execution of function `(:=)` with args:
+      r = {contents= 4}
+      v = 21
+  Line 13:
+    Normal execution of function `(!)` with args:
+      r = {contents= 21}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= 21}
+File result.mlw:
+  Line 13:
+    Normal execution of function `(+)` with args:
+      _ = 21
+      _ = 1
+  Line 11:
+    Property failure at postcondition of `p1` with:
+      a = {contents= 21}
+      result = 22
+
+<check-ce-rac-results>Check model 0 ("bench/check-ce/result.mlw", line 18, characters 12-36)
+<check-ce-rac-results>Checking model:
+                      File result.mlw:
+                        Line 16:
+                          A =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "42"}}]}}
+                        Line 18:
+                          A =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "42"}}]}}
+                          A =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "1"}}]}}
+                          A =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "1"}}]}}
+                          result = {"type": "Integer", "val": "2"}
+                          result = {"type": "Integer", "val": "2"}
+                        Line 19:
+                          A =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "0"}}]}}
+                          result = {"type": "Integer", "val": "2"}
+                        Line 20:
+                          A =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "1"}}]}}
+                        Line 21:
+                          result = {"type": "Integer", "val": "2"}
+                          result = {"type": "Integer", "val": "1"}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/result.mlw", line 7, characters 8-17 at "bench/check-ce/result.mlw", line 7, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/result.mlw", line 7, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `a` at "bench/check-ce/result.mlw", line 16, characters 7-8: {contents=
+                                                                    42}
+<rac-values>Value from model for variable `a` at "bench/check-ce/result.mlw", line 19, characters 2-8 at "bench/check-ce/result.mlw", line 19, characters 2-8: {contents=
+                                                                    0}
+<rac-values>Type default value for return value of call to (:=) at "bench/check-ce/result.mlw", line 19, characters 2-8 at "bench/check-ce/result.mlw", line 19, characters 2-8: ()
+<rac-values>Value from model for variable `a` at "bench/check-ce/result.mlw", line 20, characters 2-8 at "bench/check-ce/result.mlw", line 20, characters 2-8: {contents=
+                                                                    1}
+<rac-values>Type default value for return value of call to (:=) at "bench/check-ce/result.mlw", line 20, characters 2-8 at "bench/check-ce/result.mlw", line 20, characters 2-8: ()
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/result.mlw", line 21, characters 2-4 at "bench/check-ce/result.mlw", line 21, characters 2-4: 1
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/result.mlw", line 7, characters 8-17 at "bench/check-ce/result.mlw", line 7, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/result.mlw", line 7, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `a` at "bench/check-ce/result.mlw", line 16, characters 7-8: {contents=
+                                                                    42}
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: FAILURE (postcondition at "bench/check-ce/result.mlw", line 18, characters 12-36)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File result.mlw:
+                            Line 7:
+                              Constant a initialization
+                              (giant-step) execution of unimplemented function with args:
+                              result = {contents= 0}
+                              a = {contents= 0}
+                            Line 16:
+                              a = {contents= 42}
+                              a = {contents= 42}
+                              Execution of main function `f` with env:
+                                a = {contents= 0}
+                                a = {contents= 42}
+                                zero = 0
+                                one = 1
+                            Line 19:
+                              Normal execution of function `(:=)` with args:
+                                r = {contents= 42}
+                                v = 0
+                            Line 20:
+                              Normal execution of function `(:=)` with args:
+                                r = {contents= 0}
+                                v = 1
+                            Line 21:
+                              Normal execution of function `(!)` with args:
+                                r = {contents= 1}
+                          File ref.mlw:
+                            Line 18:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                          File result.mlw:
+                            Line 21:
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 1
+                            Line 18:
+                              Property failure at postcondition of `f` with:
+                                a = {contents= 1}
+                                a = {contents= 42}
+                                result = 2
+                        - Abstract RAC: FAILURE (postcondition at "bench/check-ce/result.mlw", line 18, characters 12-36)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File result.mlw:
+                            Line 7:
+                              Constant a initialization
+                              (giant-step) execution of unimplemented function with args:
+                              result = {contents= 0}
+                              a = {contents= 0}
+                            Line 16:
+                              a = {contents= 42}
+                              a = {contents= 42}
+                              Execution of main function `f` with env:
+                                a = {contents= 0}
+                                a = {contents= 42}
+                                zero = 0
+                                one = 1
+                            Line 19:
+                              Giant-step execution of function `(:=)` with args:
+                                r = {contents= 42}
+                                v = 0
+                              a = {contents= 0}
+                              result of `(:=)` = ()
+                            Line 20:
+                              Giant-step execution of function `(:=)` with args:
+                                r = {contents= 0}
+                                v = 1
+                              a = {contents= 1}
+                              result of `(:=)` = ()
+                            Line 21:
+                              Giant-step execution of function `(!)` with args:
+                                r = {contents= 1}
+                              result of `(!)` = 1
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 1
+                            Line 18:
+                              Property failure at postcondition of `f` with:
+                                a = {contents= 1}
+                                a = {contents= 42}
+                                result = 2
+<check-ce-rac-results>Check model 1 ("bench/check-ce/result.mlw", line 18, characters 12-36)
+<check-ce-rac-results>Checking model:
+                      
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/result.mlw", line 7, characters 8-17 at "bench/check-ce/result.mlw", line 7, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/result.mlw", line 7, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `a` at "bench/check-ce/result.mlw", line 16, characters 7-8: {contents=
+                                                                    0}
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/result.mlw", line 7, characters 8-17 at "bench/check-ce/result.mlw", line 7, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/result.mlw", line 7, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `a` at "bench/check-ce/result.mlw", line 16, characters 7-8: {contents=
+                                                                    0}
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: STUCK (failure in precondition of `f` at "bench/check-ce/result.mlw", line 16, characters 4-5)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File result.mlw:
+                            Line 7:
+                              Constant a initialization
+                              (giant-step) execution of unimplemented function with args:
+                              result = {contents= 0}
+                              a = {contents= 0}
+                            Line 16:
+                              a = {contents= 0}
+                              a = {contents= 0}
+                              Execution of main function `f` with env:
+                                a = {contents= 0}
+                                a = {contents= 0}
+                                zero = 0
+                                one = 1
+                              Execution got stuck at precondition of `f` with:
+                                a = {contents= 0}
+                        - Abstract RAC: STUCK (failure in precondition of `f` at "bench/check-ce/result.mlw", line 16, characters 4-5)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File result.mlw:
+                            Line 7:
+                              Constant a initialization
+                              (giant-step) execution of unimplemented function with args:
+                              result = {contents= 0}
+                              a = {contents= 0}
+                            Line 16:
+                              a = {contents= 0}
+                              a = {contents= 0}
+                              Execution of main function `f` with env:
+                                a = {contents= 0}
+                                a = {contents= 0}
+                                zero = 0
+                                one = 1
+                              Execution got stuck at precondition of `f` with:
+                                a = {contents= 0}
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/result.mlw", line 18, characters 12-36)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/result.mlw", line 18, characters 12-36)
+- Checked model 1: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `f` at "bench/check-ce/result.mlw", line 16, characters 4-5)
+  - Abstract RAC: STUCK (failure in precondition of `f` at "bench/check-ce/result.mlw", line 16, characters 4-5)
+File "bench/check-ce/result.mlw", line 18, characters 12-36:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Step limit exceeded (0.36s, 3000055 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File result.mlw:
+  Line 7:
+    Constant a initialization
+    (giant-step) execution of unimplemented function with args:
+    result = {contents= 0}
+    a = {contents= 0}
+  Line 16:
+    a = {contents= 42}
+    a = {contents= 42}
+    Execution of main function `f` with env:
+      a = {contents= 0}
+      a = {contents= 42}
+      zero = 0
+      one = 1
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 42}
+      v = 0
+  Line 20:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 0}
+      v = 1
+  Line 21:
+    Normal execution of function `(!)` with args:
+      r = {contents= 1}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+File result.mlw:
+  Line 21:
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 1
+  Line 18:
+    Property failure at postcondition of `f` with:
+      a = {contents= 1}
+      a = {contents= 42}
+      result = 2
+
