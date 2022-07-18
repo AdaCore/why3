@@ -22,6 +22,9 @@
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "3"}}]}}
+                          result = {"type": "Integer", "val": "3"}
+                          result = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "3"}
                         Line 12:
                           a =
                             {"type": "Record",
@@ -36,8 +39,8 @@
                                                                     0}
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     3}
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 3
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 0
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 3
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 0
 <rac-values>Value from model for variable `a` at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: {contents=
                                                                     3}
 <rac-values>Type default value for return value of call to (:=) at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: ()
@@ -155,6 +158,9 @@
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "3"}}]}}
+                          result = {"type": "Integer", "val": "3"}
+                          result = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "3"}
                         Line 12:
                           a =
                             {"type": "Record",
@@ -169,8 +175,8 @@
                                                                     0}
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     3}
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 3
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 0
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 3
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 0
 <rac-values>Value from model for variable `a` at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: {contents=
                                                                     3}
 <rac-values>Type default value for return value of call to (:=) at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: ()
@@ -273,7 +279,7 @@
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
 File "bench/check-ce/jlamp0.mlw", line 12, characters 13-26:
 Sub-goal Assertion of goal p1'vc.
-Prover result is: Unknown (unknown + incomplete) (0.07s, 6479 steps).
+Prover result is: Unknown (unknown + incomplete) (0.09s, 6774 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -330,14 +336,14 @@ File jlamp0.mlw:
                              "val":
                               {"Field":
                                 [{"field": "contents",
-                                  "value": {"type": "Integer", "val": "7"}}]}}
+                                  "value": {"type": "Integer", "val": "0"}}]}}
                         Line 8:
                           b =
                             {"type": "Record",
                              "val":
                               {"Field":
                                 [{"field": "contents",
-                                  "value": {"type": "Integer", "val": "3"}}]}}
+                                  "value": {"type": "Integer", "val": "10"}}]}}
                         Line 10:
                           a =
                             {"type": "Record",
@@ -358,6 +364,9 @@ File jlamp0.mlw:
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "10"}}]}}
+                          result = {"type": "Integer", "val": "10"}
+                          result = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "10"}
                         Line 13:
                           a =
                             {"type": "Record",
@@ -365,21 +374,25 @@ File jlamp0.mlw:
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "9"}}]}}
+                          result = {"type": "Integer", "val": "9"}
+                          result = {"type": "Integer", "val": "10"}
+                          result = {"type": "Boolean", "val": true}
+                          result = {"type": "Integer", "val": "10"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for global `a` at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
-                                                                    7}
+                                                                    0}
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
-                                                                    3}
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 3
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 7
+                                                                    10}
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 10
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 0
 <rac-values>Value from model for variable `a` at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: {contents=
                                                                     10}
 <rac-values>Type default value for return value of call to (:=) at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: ()
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9 at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9: 10
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 26-28 at "bench/check-ce/jlamp0.mlw", line 13, characters 26-28: 10
-<rac-values>Value computed from postcondition for return value of call to (-) at "bench/check-ce/jlamp0.mlw", line 13, characters 26-32 at "bench/check-ce/jlamp0.mlw", line 13, characters 26-32: 9
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9 at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9: 10
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 26-28 at "bench/check-ce/jlamp0.mlw", line 13, characters 26-28: 10
+<rac-values>Value from model for return value of call to (-) at "bench/check-ce/jlamp0.mlw", line 13, characters 26-32 at "bench/check-ce/jlamp0.mlw", line 13, characters 26-32: 9
 <rac-values>Value from model for variable `a` at "bench/check-ce/jlamp0.mlw", line 13, characters 21-32 at "bench/check-ce/jlamp0.mlw", line 13, characters 21-32: {contents=
                                                                     9}
 <rac-values>Type default value for return value of call to (:=) at "bench/check-ce/jlamp0.mlw", line 13, characters 21-32 at "bench/check-ce/jlamp0.mlw", line 13, characters 21-32: ()
@@ -387,9 +400,9 @@ File jlamp0.mlw:
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for global `a` at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
-                                                                    7}
+                                                                    0}
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
-                                                                    3}
+                                                                    10}
 <check-ce-rac-results>Results of RAC executions for model 0:
                         - Concrete RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
                           File int.mlw:
@@ -401,37 +414,37 @@ File jlamp0.mlw:
                               one = 1
                           File jlamp0.mlw:
                             Line 6:
-                              a = {contents= 7}
+                              a = {contents= 0}
                             Line 8:
-                              b = {contents= 3}
-                              b = {contents= 3}
+                              b = {contents= 10}
+                              b = {contents= 10}
                               Execution of main function `p1` with env:
-                                a = {contents= 7}
-                                b = {contents= 3}
+                                a = {contents= 0}
+                                b = {contents= 10}
                                 zero = 0
                                 one = 1
                             Line 11:
                               Normal execution of function `(!)` with args:
-                                r = {contents= 3}
+                                r = {contents= 10}
                           File ref.mlw:
                             Line 18:
                               Normal execution of function `contents` with args:
-                                arg = {contents= 3}
+                                arg = {contents= 10}
                           File jlamp0.mlw:
                             Line 11:
                               Normal execution of function `(!)` with args:
-                                r = {contents= 7}
+                                r = {contents= 0}
                           File ref.mlw:
                             Line 18:
                               Normal execution of function `contents` with args:
-                                arg = {contents= 7}
+                                arg = {contents= 0}
                           File jlamp0.mlw:
                             Line 11:
                               Normal execution of function `(+)` with args:
-                                _ = 7
-                                _ = 3
+                                _ = 0
+                                _ = 10
                               Normal execution of function `(:=)` with args:
-                                r = {contents= 7}
+                                r = {contents= 0}
                                 v = 10
                             Line 13:
                               Normal execution of function `(!)` with args:
@@ -481,27 +494,27 @@ File jlamp0.mlw:
                               one = 1
                           File jlamp0.mlw:
                             Line 6:
-                              a = {contents= 7}
+                              a = {contents= 0}
                             Line 8:
-                              b = {contents= 3}
-                              b = {contents= 3}
+                              b = {contents= 10}
+                              b = {contents= 10}
                               Execution of main function `p1` with env:
-                                a = {contents= 7}
-                                b = {contents= 3}
+                                a = {contents= 0}
+                                b = {contents= 10}
                                 zero = 0
                                 one = 1
                             Line 11:
                               Giant-step execution of function `(!)` with args:
-                                r = {contents= 3}
-                              result of `(!)` = 3
+                                r = {contents= 10}
+                              result of `(!)` = 10
                               Giant-step execution of function `(!)` with args:
-                                r = {contents= 7}
-                              result of `(!)` = 7
+                                r = {contents= 0}
+                              result of `(!)` = 0
                               Normal execution of function `(+)` with args:
-                                _ = 7
-                                _ = 3
+                                _ = 0
+                                _ = 10
                               Giant-step execution of function `(:=)` with args:
-                                r = {contents= 7}
+                                r = {contents= 0}
                                 v = 10
                               a = {contents= 10}
                               result of `(:=)` = ()
@@ -536,14 +549,14 @@ File jlamp0.mlw:
                              "val":
                               {"Field":
                                 [{"field": "contents",
-                                  "value": {"type": "Integer", "val": "7"}}]}}
+                                  "value": {"type": "Integer", "val": "0"}}]}}
                         Line 8:
                           b =
                             {"type": "Record",
                              "val":
                               {"Field":
                                 [{"field": "contents",
-                                  "value": {"type": "Integer", "val": "3"}}]}}
+                                  "value": {"type": "Integer", "val": "10"}}]}}
                         Line 10:
                           a =
                             {"type": "Record",
@@ -564,6 +577,9 @@ File jlamp0.mlw:
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "10"}}]}}
+                          result = {"type": "Integer", "val": "10"}
+                          result = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "10"}
                         Line 13:
                           a =
                             {"type": "Record",
@@ -571,21 +587,25 @@ File jlamp0.mlw:
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "9"}}]}}
+                          result = {"type": "Integer", "val": "9"}
+                          result = {"type": "Integer", "val": "10"}
+                          result = {"type": "Boolean", "val": true}
+                          result = {"type": "Integer", "val": "10"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for global `a` at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
-                                                                    7}
+                                                                    0}
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
-                                                                    3}
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 3
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 7
+                                                                    10}
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 10
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 0
 <rac-values>Value from model for variable `a` at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: {contents=
                                                                     10}
 <rac-values>Type default value for return value of call to (:=) at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: ()
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9 at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9: 10
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 26-28 at "bench/check-ce/jlamp0.mlw", line 13, characters 26-28: 10
-<rac-values>Value computed from postcondition for return value of call to (-) at "bench/check-ce/jlamp0.mlw", line 13, characters 26-32 at "bench/check-ce/jlamp0.mlw", line 13, characters 26-32: 9
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9 at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9: 10
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 26-28 at "bench/check-ce/jlamp0.mlw", line 13, characters 26-28: 10
+<rac-values>Value from model for return value of call to (-) at "bench/check-ce/jlamp0.mlw", line 13, characters 26-32 at "bench/check-ce/jlamp0.mlw", line 13, characters 26-32: 9
 <rac-values>Value from model for variable `a` at "bench/check-ce/jlamp0.mlw", line 13, characters 21-32 at "bench/check-ce/jlamp0.mlw", line 13, characters 21-32: {contents=
                                                                     9}
 <rac-values>Type default value for return value of call to (:=) at "bench/check-ce/jlamp0.mlw", line 13, characters 21-32 at "bench/check-ce/jlamp0.mlw", line 13, characters 21-32: ()
@@ -593,9 +613,9 @@ File jlamp0.mlw:
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for global `a` at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
-                                                                    7}
+                                                                    0}
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
-                                                                    3}
+                                                                    10}
 <check-ce-rac-results>Results of RAC executions for model 1:
                         - Concrete RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
                           File int.mlw:
@@ -607,37 +627,37 @@ File jlamp0.mlw:
                               one = 1
                           File jlamp0.mlw:
                             Line 6:
-                              a = {contents= 7}
+                              a = {contents= 0}
                             Line 8:
-                              b = {contents= 3}
-                              b = {contents= 3}
+                              b = {contents= 10}
+                              b = {contents= 10}
                               Execution of main function `p1` with env:
-                                a = {contents= 7}
-                                b = {contents= 3}
+                                a = {contents= 0}
+                                b = {contents= 10}
                                 zero = 0
                                 one = 1
                             Line 11:
                               Normal execution of function `(!)` with args:
-                                r = {contents= 3}
+                                r = {contents= 10}
                           File ref.mlw:
                             Line 18:
                               Normal execution of function `contents` with args:
-                                arg = {contents= 3}
+                                arg = {contents= 10}
                           File jlamp0.mlw:
                             Line 11:
                               Normal execution of function `(!)` with args:
-                                r = {contents= 7}
+                                r = {contents= 0}
                           File ref.mlw:
                             Line 18:
                               Normal execution of function `contents` with args:
-                                arg = {contents= 7}
+                                arg = {contents= 0}
                           File jlamp0.mlw:
                             Line 11:
                               Normal execution of function `(+)` with args:
-                                _ = 7
-                                _ = 3
+                                _ = 0
+                                _ = 10
                               Normal execution of function `(:=)` with args:
-                                r = {contents= 7}
+                                r = {contents= 0}
                                 v = 10
                             Line 13:
                               Normal execution of function `(!)` with args:
@@ -687,27 +707,27 @@ File jlamp0.mlw:
                               one = 1
                           File jlamp0.mlw:
                             Line 6:
-                              a = {contents= 7}
+                              a = {contents= 0}
                             Line 8:
-                              b = {contents= 3}
-                              b = {contents= 3}
+                              b = {contents= 10}
+                              b = {contents= 10}
                               Execution of main function `p1` with env:
-                                a = {contents= 7}
-                                b = {contents= 3}
+                                a = {contents= 0}
+                                b = {contents= 10}
                                 zero = 0
                                 one = 1
                             Line 11:
                               Giant-step execution of function `(!)` with args:
-                                r = {contents= 3}
-                              result of `(!)` = 3
+                                r = {contents= 10}
+                              result of `(!)` = 10
                               Giant-step execution of function `(!)` with args:
-                                r = {contents= 7}
-                              result of `(!)` = 7
+                                r = {contents= 0}
+                              result of `(!)` = 0
                               Normal execution of function `(+)` with args:
-                                _ = 7
-                                _ = 3
+                                _ = 0
+                                _ = 10
                               Giant-step execution of function `(:=)` with args:
-                                r = {contents= 7}
+                                r = {contents= 0}
                                 v = 10
                               a = {contents= 10}
                               result of `(:=)` = ()
@@ -742,7 +762,7 @@ File jlamp0.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Sub-goal Postcondition of goal p1'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6665 steps).
+Prover result is: Unknown (unknown + incomplete) (0.06s, 7038 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -754,37 +774,37 @@ File int.mlw:
     one = 1
 File jlamp0.mlw:
   Line 6:
-    a = {contents= 7}
+    a = {contents= 0}
   Line 8:
-    b = {contents= 3}
-    b = {contents= 3}
+    b = {contents= 10}
+    b = {contents= 10}
     Execution of main function `p1` with env:
-      a = {contents= 7}
-      b = {contents= 3}
+      a = {contents= 0}
+      b = {contents= 10}
       zero = 0
       one = 1
   Line 11:
     Normal execution of function `(!)` with args:
-      r = {contents= 3}
+      r = {contents= 10}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 3}
+      arg = {contents= 10}
 File jlamp0.mlw:
   Line 11:
     Normal execution of function `(!)` with args:
-      r = {contents= 7}
+      r = {contents= 0}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 7}
+      arg = {contents= 0}
 File jlamp0.mlw:
   Line 11:
     Normal execution of function `(+)` with args:
-      _ = 7
-      _ = 3
+      _ = 0
+      _ = 10
     Normal execution of function `(:=)` with args:
-      r = {contents= 7}
+      r = {contents= 0}
       v = 10
   Line 13:
     Normal execution of function `(!)` with args:
@@ -834,14 +854,14 @@ File jlamp0.mlw:
                              "val":
                               {"Field":
                                 [{"field": "contents",
-                                  "value": {"type": "Integer", "val": "2"}}]}}
+                                  "value": {"type": "Integer", "val": "0"}}]}}
                         Line 8:
                           b =
                             {"type": "Record",
                              "val":
                               {"Field":
                                 [{"field": "contents",
-                                  "value": {"type": "Integer", "val": "3"}}]}}
+                                  "value": {"type": "Integer", "val": "5"}}]}}
                         Line 10:
                           a =
                             {"type": "Record",
@@ -862,26 +882,32 @@ File jlamp0.mlw:
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "5"}}]}}
+                          result = {"type": "Integer", "val": "5"}
+                          result = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "5"}
+                        Line 13:
+                          result = {"type": "Boolean", "val": false}
+                          result = {"type": "Integer", "val": "5"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for global `a` at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
-                                                                    2}
+                                                                    0}
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
-                                                                    3}
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 3
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 2
+                                                                    5}
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 5
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 0
 <rac-values>Value from model for variable `a` at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: {contents=
                                                                     5}
 <rac-values>Type default value for return value of call to (:=) at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: ()
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9 at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9: 5
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9 at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9: 5
 <check-ce-rac-results>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for global `a` at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
-                                                                    2}
+                                                                    0}
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
-                                                                    3}
+                                                                    5}
 <check-ce-rac-results>Results of RAC executions for model 0:
                         - Concrete RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
                           File int.mlw:
@@ -893,37 +919,37 @@ File jlamp0.mlw:
                               one = 1
                           File jlamp0.mlw:
                             Line 6:
-                              a = {contents= 2}
+                              a = {contents= 0}
                             Line 8:
-                              b = {contents= 3}
-                              b = {contents= 3}
+                              b = {contents= 5}
+                              b = {contents= 5}
                               Execution of main function `p1` with env:
-                                a = {contents= 2}
-                                b = {contents= 3}
+                                a = {contents= 0}
+                                b = {contents= 5}
                                 zero = 0
                                 one = 1
                             Line 11:
                               Normal execution of function `(!)` with args:
-                                r = {contents= 3}
+                                r = {contents= 5}
                           File ref.mlw:
                             Line 18:
                               Normal execution of function `contents` with args:
-                                arg = {contents= 3}
+                                arg = {contents= 5}
                           File jlamp0.mlw:
                             Line 11:
                               Normal execution of function `(!)` with args:
-                                r = {contents= 2}
+                                r = {contents= 0}
                           File ref.mlw:
                             Line 18:
                               Normal execution of function `contents` with args:
-                                arg = {contents= 2}
+                                arg = {contents= 0}
                           File jlamp0.mlw:
                             Line 11:
                               Normal execution of function `(+)` with args:
-                                _ = 2
-                                _ = 3
+                                _ = 0
+                                _ = 5
                               Normal execution of function `(:=)` with args:
-                                r = {contents= 2}
+                                r = {contents= 0}
                                 v = 5
                             Line 13:
                               Normal execution of function `(!)` with args:
@@ -951,27 +977,27 @@ File jlamp0.mlw:
                               one = 1
                           File jlamp0.mlw:
                             Line 6:
-                              a = {contents= 2}
+                              a = {contents= 0}
                             Line 8:
-                              b = {contents= 3}
-                              b = {contents= 3}
+                              b = {contents= 5}
+                              b = {contents= 5}
                               Execution of main function `p1` with env:
-                                a = {contents= 2}
-                                b = {contents= 3}
+                                a = {contents= 0}
+                                b = {contents= 5}
                                 zero = 0
                                 one = 1
                             Line 11:
                               Giant-step execution of function `(!)` with args:
-                                r = {contents= 3}
-                              result of `(!)` = 3
+                                r = {contents= 5}
+                              result of `(!)` = 5
                               Giant-step execution of function `(!)` with args:
-                                r = {contents= 2}
-                              result of `(!)` = 2
+                                r = {contents= 0}
+                              result of `(!)` = 0
                               Normal execution of function `(+)` with args:
-                                _ = 2
-                                _ = 3
+                                _ = 0
+                                _ = 5
                               Giant-step execution of function `(:=)` with args:
-                                r = {contents= 2}
+                                r = {contents= 0}
                                 v = 5
                               a = {contents= 5}
                               result of `(:=)` = ()
@@ -995,14 +1021,14 @@ File jlamp0.mlw:
                              "val":
                               {"Field":
                                 [{"field": "contents",
-                                  "value": {"type": "Integer", "val": "2"}}]}}
+                                  "value": {"type": "Integer", "val": "0"}}]}}
                         Line 8:
                           b =
                             {"type": "Record",
                              "val":
                               {"Field":
                                 [{"field": "contents",
-                                  "value": {"type": "Integer", "val": "3"}}]}}
+                                  "value": {"type": "Integer", "val": "5"}}]}}
                         Line 10:
                           a =
                             {"type": "Record",
@@ -1023,26 +1049,32 @@ File jlamp0.mlw:
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "5"}}]}}
+                          result = {"type": "Integer", "val": "5"}
+                          result = {"type": "Integer", "val": "0"}
+                          result = {"type": "Integer", "val": "5"}
+                        Line 13:
+                          result = {"type": "Boolean", "val": false}
+                          result = {"type": "Integer", "val": "5"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for global `a` at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
-                                                                    2}
+                                                                    0}
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
-                                                                    3}
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 3
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 2
+                                                                    5}
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 5
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 0
 <rac-values>Value from model for variable `a` at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: {contents=
                                                                     5}
 <rac-values>Type default value for return value of call to (:=) at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: ()
-<rac-values>Value computed from postcondition for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9 at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9: 5
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9 at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9: 5
 <check-ce-rac-results>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for global `a` at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
-                                                                    2}
+                                                                    0}
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
-                                                                    3}
+                                                                    5}
 <check-ce-rac-results>Results of RAC executions for model 1:
                         - Concrete RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
                           File int.mlw:
@@ -1054,37 +1086,37 @@ File jlamp0.mlw:
                               one = 1
                           File jlamp0.mlw:
                             Line 6:
-                              a = {contents= 2}
+                              a = {contents= 0}
                             Line 8:
-                              b = {contents= 3}
-                              b = {contents= 3}
+                              b = {contents= 5}
+                              b = {contents= 5}
                               Execution of main function `p1` with env:
-                                a = {contents= 2}
-                                b = {contents= 3}
+                                a = {contents= 0}
+                                b = {contents= 5}
                                 zero = 0
                                 one = 1
                             Line 11:
                               Normal execution of function `(!)` with args:
-                                r = {contents= 3}
+                                r = {contents= 5}
                           File ref.mlw:
                             Line 18:
                               Normal execution of function `contents` with args:
-                                arg = {contents= 3}
+                                arg = {contents= 5}
                           File jlamp0.mlw:
                             Line 11:
                               Normal execution of function `(!)` with args:
-                                r = {contents= 2}
+                                r = {contents= 0}
                           File ref.mlw:
                             Line 18:
                               Normal execution of function `contents` with args:
-                                arg = {contents= 2}
+                                arg = {contents= 0}
                           File jlamp0.mlw:
                             Line 11:
                               Normal execution of function `(+)` with args:
-                                _ = 2
-                                _ = 3
+                                _ = 0
+                                _ = 5
                               Normal execution of function `(:=)` with args:
-                                r = {contents= 2}
+                                r = {contents= 0}
                                 v = 5
                             Line 13:
                               Normal execution of function `(!)` with args:
@@ -1112,27 +1144,27 @@ File jlamp0.mlw:
                               one = 1
                           File jlamp0.mlw:
                             Line 6:
-                              a = {contents= 2}
+                              a = {contents= 0}
                             Line 8:
-                              b = {contents= 3}
-                              b = {contents= 3}
+                              b = {contents= 5}
+                              b = {contents= 5}
                               Execution of main function `p1` with env:
-                                a = {contents= 2}
-                                b = {contents= 3}
+                                a = {contents= 0}
+                                b = {contents= 5}
                                 zero = 0
                                 one = 1
                             Line 11:
                               Giant-step execution of function `(!)` with args:
-                                r = {contents= 3}
-                              result of `(!)` = 3
+                                r = {contents= 5}
+                              result of `(!)` = 5
                               Giant-step execution of function `(!)` with args:
-                                r = {contents= 2}
-                              result of `(!)` = 2
+                                r = {contents= 0}
+                              result of `(!)` = 0
                               Normal execution of function `(+)` with args:
-                                _ = 2
-                                _ = 3
+                                _ = 0
+                                _ = 5
                               Giant-step execution of function `(:=)` with args:
-                                r = {contents= 2}
+                                r = {contents= 0}
                                 v = 5
                               a = {contents= 5}
                               result of `(:=)` = ()
@@ -1156,7 +1188,7 @@ File jlamp0.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Sub-goal Postcondition of goal p1'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6589 steps).
+Prover result is: Unknown (unknown + incomplete) (0.07s, 6951 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1168,37 +1200,37 @@ File int.mlw:
     one = 1
 File jlamp0.mlw:
   Line 6:
-    a = {contents= 2}
+    a = {contents= 0}
   Line 8:
-    b = {contents= 3}
-    b = {contents= 3}
+    b = {contents= 5}
+    b = {contents= 5}
     Execution of main function `p1` with env:
-      a = {contents= 2}
-      b = {contents= 3}
+      a = {contents= 0}
+      b = {contents= 5}
       zero = 0
       one = 1
   Line 11:
     Normal execution of function `(!)` with args:
-      r = {contents= 3}
+      r = {contents= 5}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 3}
+      arg = {contents= 5}
 File jlamp0.mlw:
   Line 11:
     Normal execution of function `(!)` with args:
-      r = {contents= 2}
+      r = {contents= 0}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 2}
+      arg = {contents= 0}
 File jlamp0.mlw:
   Line 11:
     Normal execution of function `(+)` with args:
-      _ = 2
-      _ = 3
+      _ = 0
+      _ = 5
     Normal execution of function `(:=)` with args:
-      r = {contents= 2}
+      r = {contents= 0}
       v = 5
   Line 13:
     Normal execution of function `(!)` with args:
@@ -1462,7 +1494,7 @@ File jlamp0.mlw:
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Sub-goal Loop invariant init of goal p2'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6274 steps).
+Prover result is: Unknown (unknown + incomplete) (0.05s, 6461 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1501,7 +1533,7 @@ File jlamp0.mlw:
 
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Sub-goal Loop invariant init of goal p2'vc.
-Prover result is: Valid (0.02s, 1343 steps).
+Prover result is: Valid (0.02s, 850 steps).
 
 <check-ce-rac-results>Check model 0 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
 <check-ce-rac-results>Checking model:
@@ -1548,6 +1580,8 @@ Prover result is: Valid (0.02s, 1343 steps).
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "2"}}]}}
+                            result = {"type": "Boolean", "val": true}
+                            result = {"type": "Integer", "val": "2"}
                           Line 24:
                             c =
                               {"type": "Record",
@@ -1562,6 +1596,9 @@ Prover result is: Valid (0.02s, 1343 steps).
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "5"}}]}}
+                            result = {"type": "Integer", "val": "5"}
+                            result = {"type": "Integer", "val": "3"}
+                            result = {"type": "Integer", "val": "2"}
                           Line 26:
                             c =
                               {"type": "Record",
@@ -1569,6 +1606,8 @@ Prover result is: Valid (0.02s, 1343 steps).
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "4"}}]}}
+                            result = {"type": "Integer", "val": "4"}
+                            result = {"type": "Integer", "val": "2"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -1708,6 +1747,8 @@ Prover result is: Valid (0.02s, 1343 steps).
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "2"}}]}}
+                            result = {"type": "Boolean", "val": true}
+                            result = {"type": "Integer", "val": "2"}
                           Line 24:
                             c =
                               {"type": "Record",
@@ -1722,6 +1763,9 @@ Prover result is: Valid (0.02s, 1343 steps).
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "5"}}]}}
+                            result = {"type": "Integer", "val": "5"}
+                            result = {"type": "Integer", "val": "3"}
+                            result = {"type": "Integer", "val": "2"}
                           Line 26:
                             c =
                               {"type": "Record",
@@ -1729,6 +1773,8 @@ Prover result is: Valid (0.02s, 1343 steps).
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "4"}}]}}
+                            result = {"type": "Integer", "val": "4"}
+                            result = {"type": "Integer", "val": "2"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -1832,7 +1878,7 @@ Prover result is: Valid (0.02s, 1343 steps).
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 24, characters 16-18:
 Sub-goal Loop variant decrease of goal p2'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6809 steps).
+Prover result is: Unknown (unknown + incomplete) (0.08s, 7134 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -1881,6 +1927,8 @@ Sorry, we don't have a good counterexample for you :(
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "10"}}]}}
+                            result = {"type": "Boolean", "val": true}
+                            result = {"type": "Integer", "val": "10"}
                           Line 22:
                             c =
                               {"type": "Record",
@@ -1895,6 +1943,9 @@ Sorry, we don't have a good counterexample for you :(
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "13"}}]}}
+                            result = {"type": "Integer", "val": "13"}
+                            result = {"type": "Integer", "val": "3"}
+                            result = {"type": "Integer", "val": "10"}
                           Line 26:
                             c =
                               {"type": "Record",
@@ -1902,6 +1953,8 @@ Sorry, we don't have a good counterexample for you :(
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "12"}}]}}
+                            result = {"type": "Integer", "val": "12"}
+                            result = {"type": "Integer", "val": "10"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -2041,6 +2094,8 @@ Sorry, we don't have a good counterexample for you :(
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "10"}}]}}
+                            result = {"type": "Boolean", "val": true}
+                            result = {"type": "Integer", "val": "10"}
                           Line 22:
                             c =
                               {"type": "Record",
@@ -2055,6 +2110,9 @@ Sorry, we don't have a good counterexample for you :(
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "13"}}]}}
+                            result = {"type": "Integer", "val": "13"}
+                            result = {"type": "Integer", "val": "3"}
+                            result = {"type": "Integer", "val": "10"}
                           Line 26:
                             c =
                               {"type": "Record",
@@ -2062,6 +2120,8 @@ Sorry, we don't have a good counterexample for you :(
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "12"}}]}}
+                            result = {"type": "Integer", "val": "12"}
+                            result = {"type": "Integer", "val": "10"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -2165,7 +2225,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Sub-goal Loop invariant preservation of goal p2'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6761 steps).
+Prover result is: Unknown (unknown + incomplete) (0.07s, 7089 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -2211,14 +2271,14 @@ File jlamp0.mlw:
                              "val":
                               {"Field":
                                 [{"field": "contents",
-                                  "value": {"type": "Integer", "val": "2"}}]}}
+                                  "value": {"type": "Integer", "val": "8"}}]}}
                         Line 20:
                           c =
                             {"type": "Record",
                              "val":
                               {"Field":
                                 [{"field": "contents",
-                                  "value": {"type": "Integer", "val": "4"}}]}}
+                                  "value": {"type": "Integer", "val": "10"}}]}}
                         File jlamp0.mlw:
                           Line 6:
                             a =
@@ -2240,13 +2300,15 @@ File jlamp0.mlw:
                                "val":
                                 {"Field":
                                   [{"field": "contents",
-                                    "value": {"type": "Integer", "val": "9"}}]}}
+                                    "value": {"type": "Integer", "val": "3"}}]}}
                             c =
                               {"type": "Record",
                                "val":
                                 {"Field":
                                   [{"field": "contents",
-                                    "value": {"type": "Integer", "val": "2"}}]}}
+                                    "value": {"type": "Integer", "val": "8"}}]}}
+                            result = {"type": "Boolean", "val": true}
+                            result = {"type": "Integer", "val": "8"}
                           Line 23:
                             a =
                               {"type": "Record",
@@ -2267,13 +2329,18 @@ File jlamp0.mlw:
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "11"}}]}}
+                            result = {"type": "Integer", "val": "11"}
+                            result = {"type": "Integer", "val": "3"}
+                            result = {"type": "Integer", "val": "8"}
                           Line 26:
                             c =
                               {"type": "Record",
                                "val":
                                 {"Field":
                                   [{"field": "contents",
-                                    "value": {"type": "Integer", "val": "4"}}]}}
+                                    "value": {"type": "Integer", "val": "10"}}]}}
+                            result = {"type": "Integer", "val": "10"}
+                            result = {"type": "Integer", "val": "8"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -2377,14 +2444,14 @@ File jlamp0.mlw:
                              "val":
                               {"Field":
                                 [{"field": "contents",
-                                  "value": {"type": "Integer", "val": "2"}}]}}
+                                  "value": {"type": "Integer", "val": "8"}}]}}
                         Line 20:
                           c =
                             {"type": "Record",
                              "val":
                               {"Field":
                                 [{"field": "contents",
-                                  "value": {"type": "Integer", "val": "4"}}]}}
+                                  "value": {"type": "Integer", "val": "10"}}]}}
                         File jlamp0.mlw:
                           Line 6:
                             a =
@@ -2406,13 +2473,15 @@ File jlamp0.mlw:
                                "val":
                                 {"Field":
                                   [{"field": "contents",
-                                    "value": {"type": "Integer", "val": "9"}}]}}
+                                    "value": {"type": "Integer", "val": "3"}}]}}
                             c =
                               {"type": "Record",
                                "val":
                                 {"Field":
                                   [{"field": "contents",
-                                    "value": {"type": "Integer", "val": "2"}}]}}
+                                    "value": {"type": "Integer", "val": "8"}}]}}
+                            result = {"type": "Boolean", "val": true}
+                            result = {"type": "Integer", "val": "8"}
                           Line 23:
                             a =
                               {"type": "Record",
@@ -2433,13 +2502,18 @@ File jlamp0.mlw:
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "11"}}]}}
+                            result = {"type": "Integer", "val": "11"}
+                            result = {"type": "Integer", "val": "3"}
+                            result = {"type": "Integer", "val": "8"}
                           Line 26:
                             c =
                               {"type": "Record",
                                "val":
                                 {"Field":
                                   [{"field": "contents",
-                                    "value": {"type": "Integer", "val": "4"}}]}}
+                                    "value": {"type": "Integer", "val": "10"}}]}}
+                            result = {"type": "Integer", "val": "10"}
+                            result = {"type": "Integer", "val": "8"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -2543,7 +2617,7 @@ File jlamp0.mlw:
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Sub-goal Loop invariant preservation of goal p2'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6825 steps).
+Prover result is: Unknown (unknown + incomplete) (0.07s, 7161 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -2598,6 +2672,8 @@ Sorry, we don't have a good counterexample for you :(
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "11"}}]}}
+                            result = {"type": "Boolean", "val": false}
+                            result = {"type": "Integer", "val": "11"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -2743,6 +2819,8 @@ Sorry, we don't have a good counterexample for you :(
                                 {"Field":
                                   [{"field": "contents",
                                     "value": {"type": "Integer", "val": "11"}}]}}
+                            result = {"type": "Boolean", "val": false}
+                            result = {"type": "Integer", "val": "11"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -2846,7 +2924,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 19, characters 15-28:
 Sub-goal Postcondition of goal p2'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6517 steps).
+Prover result is: Unknown (unknown + incomplete) (0.06s, 6776 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

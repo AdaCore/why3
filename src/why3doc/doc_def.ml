@@ -76,7 +76,7 @@ let pp_anchor ~kind fmt id =
   match id.id_loc with
   | None -> raise Not_found
   | Some loc ->
-    let _, l, _, _ = Loc.get loc in (pp_tag ~kind) fmt id.id_string l
+    let _, l, _, _, _ = Loc.get loc in (pp_tag ~kind) fmt id.id_string l
 
 let pp_locate ~kind fmt id =
   match id.id_loc with

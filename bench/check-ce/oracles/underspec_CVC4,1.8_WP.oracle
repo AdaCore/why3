@@ -1,6 +1,6 @@
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.04s, 1277 steps).
+Prover result is: Valid (0.02s, 1277 steps).
 
 <check-ce-rac-results>Check model 0 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce-rac-results>Checking model:
@@ -29,6 +29,7 @@ Prover result is: Valid (0.04s, 1277 steps).
                         Line 18:
                           result = {"type": "Boolean", "val": true}
                         Line 19:
+                          result = {"type": "Integer", "val": "0"}
                           x1 =
                             {"type": "Record",
                              "val":
@@ -43,9 +44,9 @@ Prover result is: Valid (0.04s, 1277 steps).
                                                                     0}
 <rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/underspec.mlw", line 15, characters 17-18 at "bench/check-ce/underspec.mlw", line 15, characters 17-18: {contents=
                                                                     0}
-<rac-values>Value from model for variable `x1` at "bench/check-ce/underspec.mlw", line 16, characters 4-139 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: {contents=
+<rac-values>Value from model for variable `x1` at "bench/check-ce/underspec.mlw", line 16, character 4 to line 22, character 8 at "bench/check-ce/underspec.mlw", line 16, character 4 to line 22, character 8: {contents=
                                                                     (-1)}
-<rac-values>Type default value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: {contents=
+<rac-values>Type default value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, character 4 to line 22, character 8 at "bench/check-ce/underspec.mlw", line 16, character 4 to line 22, character 8: {contents=
                                                                     0}
 <rac-values>Value from model for variable `i` at "bench/check-ce/underspec.mlw", line 16, characters 8-9: 0
 <check-ce-rac-results>Normal RAC
@@ -178,6 +179,7 @@ Prover result is: Valid (0.04s, 1277 steps).
                         Line 18:
                           result = {"type": "Boolean", "val": true}
                         Line 19:
+                          result = {"type": "Integer", "val": "0"}
                           x1 =
                             {"type": "Record",
                              "val":
@@ -192,9 +194,9 @@ Prover result is: Valid (0.04s, 1277 steps).
                                                                     0}
 <rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/underspec.mlw", line 15, characters 17-18 at "bench/check-ce/underspec.mlw", line 15, characters 17-18: {contents=
                                                                     0}
-<rac-values>Value from model for variable `x1` at "bench/check-ce/underspec.mlw", line 16, characters 4-139 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: {contents=
+<rac-values>Value from model for variable `x1` at "bench/check-ce/underspec.mlw", line 16, character 4 to line 22, character 8 at "bench/check-ce/underspec.mlw", line 16, character 4 to line 22, character 8: {contents=
                                                                     (-1)}
-<rac-values>Type default value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: {contents=
+<rac-values>Type default value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, character 4 to line 22, character 8 at "bench/check-ce/underspec.mlw", line 16, character 4 to line 22, character 8: {contents=
                                                                     0}
 <rac-values>Value from model for variable `i` at "bench/check-ce/underspec.mlw", line 16, characters 8-9: 0
 <check-ce-rac-results>Normal RAC
@@ -309,7 +311,7 @@ Prover result is: Valid (0.04s, 1277 steps).
   - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/underspec.mlw", line 17, characters 18-33)
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6476 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 6509 steps).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:
@@ -359,11 +361,11 @@ File underspec.mlw:
 
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.01s, 1534 steps).
+Prover result is: Valid (0.02s, 1565 steps).
 
 File "bench/check-ce/underspec.mlw", line 41, characters 14-23:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Valid (0.01s, 1345 steps).
+Prover result is: Valid (0.02s, 1371 steps).
 
 <check-ce-rac-results>Check model 0 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce-rac-results>Checking model:
@@ -638,7 +640,7 @@ Prover result is: Valid (0.01s, 1345 steps).
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/underspec.mlw", line 47, characters 13-18)
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6283 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 6283 steps).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:

@@ -47,10 +47,17 @@ and switch_branch = Ptree.pattern * cfg_term
 and block = (cfg_instr list * cfg_term)
 
 type cfg_fundef =
-  ident * Ptree.binder list * Ptree.pty * Ptree.pattern * Ity.mask * Ptree.spec *
-    (bool * ident * Ptree.pty) list * block * (label * block) list
-(** function name, argument, return type, ?, contract,
-    (ghost) local variables, first block, other blocks *)
+  { cf_name: ident;
+    cf_args: Ptree.binder list;
+    cf_retty: Ptree.pty;
+    cf_mask: Ity.mask;
+    cf_pat: Ptree.pattern;
+    cf_spec: Ptree.spec;
+    cf_attrs: Ptree.attr list;
+    cf_locals: (bool * ident * Ptree.pty) list;
+    cf_block0: block;
+    cf_blocks: (label * block) list;
+  }
 
 type cfg_decl =
   | Dmlw_decl of Ptree.decl

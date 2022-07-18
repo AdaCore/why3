@@ -1,6 +1,6 @@
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.00s, 69 steps).
+Prover result is: Valid (0.01s, 69 steps).
 
 <check-ce-rac-results>Check model 0 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce-rac-results>Checking model:
@@ -12,29 +12,30 @@ Prover result is: Valid (0.00s, 69 steps).
                              "val":
                               {"Field":
                                 [{"field": "contents",
-                                  "value": {"type": "Integer", "val": "-401"}}]}}
+                                  "value": {"type": "Integer", "val": "-176"}}]}}
                         Line 8:
                           x1 =
                             {"type": "Record",
                              "val":
                               {"Field":
                                 [{"field": "contents",
-                                  "value": {"type": "Integer", "val": "-400"}}]}}
+                                  "value": {"type": "Integer", "val": "-175"}}]}}
                           x1 =
                             {"type": "Record",
                              "val":
                               {"Field":
                                 [{"field": "contents",
-                                  "value": {"type": "Integer", "val": "-400"}}]}}
+                                  "value": {"type": "Integer", "val": "-175"}}]}}
                         Line 9:
                           result = {"type": "Boolean", "val": true}
                         Line 10:
+                          result = {"type": "Integer", "val": "-175"}
                           x1 =
                             {"type": "Record",
                              "val":
                               {"Field":
                                 [{"field": "contents",
-                                  "value": {"type": "Integer", "val": "-400"}}]}}
+                                  "value": {"type": "Integer", "val": "-175"}}]}}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -43,9 +44,9 @@ Prover result is: Valid (0.00s, 69 steps).
                                                                     0}
 <rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/for.mlw", line 6, characters 15-16 at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value from model for variable `x1` at "bench/check-ce/for.mlw", line 7, characters 2-125 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
-                                                                    (-401)}
-<rac-values>Type default value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
+<rac-values>Value from model for variable `x1` at "bench/check-ce/for.mlw", line 7, character 2 to line 13, character 6 at "bench/check-ce/for.mlw", line 7, character 2 to line 13, character 6: {contents=
+                                                                    (-176)}
+<rac-values>Type default value for variable `x2` at "bench/check-ce/for.mlw", line 7, character 2 to line 13, character 6 at "bench/check-ce/for.mlw", line 7, character 2 to line 13, character 6: {contents=
                                                                     0}
 <rac-values>Value from model for variable `i` at "bench/check-ce/for.mlw", line 7, characters 6-7: 0
 <check-ce-rac-results>Normal RAC
@@ -133,7 +134,7 @@ Prover result is: Valid (0.00s, 69 steps).
                               result of `ref` = {contents= 0}
                             Line 7:
                               Giant-step iteration of loop
-                              x1 = {contents= (-401)}
+                              x1 = {contents= (-176)}
                               x2 = {contents= 0}
                               i = 0
                               Giant-step iteration of loop
@@ -143,13 +144,13 @@ Prover result is: Valid (0.00s, 69 steps).
                                 y = 0
                             Line 10:
                               Normal execution of function `contents` with args:
-                                arg = {contents= (-401)}
+                                arg = {contents= (-176)}
                               Normal execution of function `(+)` with args:
-                                _ = (-401)
+                                _ = (-176)
                                 _ = 1
                             Line 8:
                               Property failure at loop invariant preservation with:
-                                x1 = {contents= (-400)}
+                                x1 = {contents= (-175)}
                                 i = 1
 <check-ce-rac-results>Check model 1 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce-rac-results>Checking model:
@@ -162,9 +163,9 @@ Prover result is: Valid (0.00s, 69 steps).
                                                                     0}
 <rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/for.mlw", line 6, characters 15-16 at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
                                                                     0}
-<rac-values>Type default value for variable `x1` at "bench/check-ce/for.mlw", line 7, characters 2-125 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
+<rac-values>Type default value for variable `x1` at "bench/check-ce/for.mlw", line 7, character 2 to line 13, character 6 at "bench/check-ce/for.mlw", line 7, character 2 to line 13, character 6: {contents=
                                                                     0}
-<rac-values>Type default value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
+<rac-values>Type default value for variable `x2` at "bench/check-ce/for.mlw", line 7, character 2 to line 13, character 6 at "bench/check-ce/for.mlw", line 7, character 2 to line 13, character 6: {contents=
                                                                     0}
 <rac-values>Default value for variable `i` at "bench/check-ce/for.mlw", line 7, characters 6-7: 2
 <check-ce-rac-results>Normal RAC
@@ -268,7 +269,7 @@ Prover result is: Valid (0.00s, 69 steps).
   - Abstract RAC: STUCK (failure in loop invariant preservation after last iteration at "bench/check-ce/for.mlw", line 8, characters 16-31)
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Unknown (unknown) (0.34s, 3000094 steps).
+Prover result is: Step limit exceeded (0.59s, 3000099 steps).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:
@@ -297,7 +298,7 @@ File for.mlw:
     result of `ref` = {contents= 0}
   Line 7:
     Giant-step iteration of loop
-    x1 = {contents= (-401)}
+    x1 = {contents= (-176)}
     x2 = {contents= 0}
     i = 0
     Giant-step iteration of loop
@@ -307,16 +308,16 @@ File for.mlw:
       y = 0
   Line 10:
     Normal execution of function `contents` with args:
-      arg = {contents= (-401)}
+      arg = {contents= (-176)}
     Normal execution of function `(+)` with args:
-      _ = (-401)
+      _ = (-176)
       _ = 1
   Line 8:
     Property failure at loop invariant preservation with:
-      x1 = {contents= (-400)}
+      x1 = {contents= (-175)}
       i = 1
 
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.01s, 2768 steps).
+Prover result is: Valid (0.01s, 2842 steps).
 

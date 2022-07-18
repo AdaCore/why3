@@ -19,16 +19,16 @@ type 'a printers = { marked: 'a Pp.pp; closed: 'a Pp.pp }
 
 let marker = ref None
 
-let dummy_filename = "//id//"
+let dummy_filename = ""
 
 let id_loc_counter = ref 0
 
 let id_loc () =
   incr id_loc_counter;
-  Loc.user_position dummy_filename !id_loc_counter 0 0
+  Loc.user_position dummy_filename !id_loc_counter 0 !id_loc_counter 0
 
 let is_id_loc loc =
-  let f,_,_,_ = Loc.get loc in
+  let f,_,_,_,_ = Loc.get loc in
   f = dummy_filename
 
 let only_ids =
@@ -38,13 +38,13 @@ let only_ids =
   with Not_found | Failure _ -> None
 
 let print_only_id loc =
-  let f,l,_,_ = Loc.get loc in
+  let f,l,_,_,_ = Loc.get loc in
   f = dummy_filename && only_ids <> None && Wstdlib.Sint.mem l (Opt.get only_ids)
 
 let pp_loc_id fmt loc =
   if Debug.test_flag debug_print_ids || print_only_id loc then
-    let f,id,bc,ec = Loc.get loc in
-    if f = dummy_filename && bc = 0 && ec = 0 then fprintf fmt "(*%d*)" id
+    let f,bl,bc,_el,ec = Loc.get loc in
+    if f = dummy_filename && bc = 0 && ec = 0 then fprintf fmt "(*%d*)" bl
 
 let with_marker ?(msg="XXX") loc pp fmt x =
   marker := Some (msg, loc);
@@ -79,7 +79,7 @@ let next_pos =
   let counter = ref 0 in
   fun () ->
     incr counter;
-    Loc.user_position "" !counter 0 0
+    Loc.user_position "" !counter 0 !counter 0
 
 let todo fmt str =
   fprintf fmt "__TODO_MLW_PRINTER__ (* %s *)" str
@@ -159,8 +159,8 @@ let pp_attr fmt = function
      (* `%@` prints a single `@` *)
      fprintf fmt "[%@%s]" att.Ident.attr_string
   | ATpos loc ->
-      let filename, line, bchar, echar = Loc.get loc in
-      fprintf fmt "[#%S %d %d %d]%a" filename line bchar echar
+      let filename, bline, bchar, eline, echar = Loc.get loc in
+      fprintf fmt "[#%S %d %d %d %d]%a" filename bline bchar eline echar
         pp_maybe_marker loc
 
 let pp_id ~attr fmt (id: ident) =

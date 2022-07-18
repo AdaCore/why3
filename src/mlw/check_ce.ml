@@ -113,7 +113,7 @@ let print_rac_result_state fmt = function
   | Res_fail (ctx, t) ->
       fprintf fmt "FAILURE (%a at %a)"
         Vc.print_expl ctx.attr
-        (Pp.print_option_or_default "unknown location" Pretty.print_loc')
+        (Pp.print_option_or_default "unknown location" Loc.pp_position)
         (match ctx.loc with Some _ as loc -> loc | _ -> t.Term.t_loc)
   | Res_stuck reason -> fprintf fmt "STUCK (%s)" reason
   | Res_incomplete reason -> fprintf fmt "INCOMPLETE (%s)" reason
@@ -448,7 +448,7 @@ let rac_execute ctx rs =
       Res_fail (ctx, t), Log.flush_log ctx.cntr_env.log_uc
   | Stuck (ctx,l,reason) ->
       let print_oloc =
-        Pp.print_option_or_default "unknown location" Pretty.print_loc' in
+        Pp.print_option_or_default "unknown location" Loc.pp_position in
       let reason = asprintf "%s at %a" reason print_oloc l in
       Res_stuck reason, Log.flush_log ctx.cntr_env.log_uc
   | Incomplete reason ->
@@ -567,7 +567,7 @@ let select_model_from_giant_step_rac_results ?strategy models =
     | Some (i,_,m,_,s) -> Some (m, s), Some i in
   if models <> [] then
     Debug.dprintf debug_check_ce_categorization "Results of selection of models:@ %a@."
-      Pp.(print_list newline 
+      Pp.(print_list newline
             (print_dbg_rac_result_model ~print_normal:false ~print_giant:true selected_ix))
         models;
   selected
@@ -581,7 +581,7 @@ let select_model_from_verdict models =
       | RAC_done (normal_state,normal_log), RAC_done (giant_state,giant_log) ->
           let vc_term_loc = get_model_term_loc m in
           let vc_term_attrs = get_model_term_attrs m in
-          classify ~vc_term_loc ~vc_term_attrs 
+          classify ~vc_term_loc ~vc_term_attrs
             ~normal_result:(normal_state,normal_log)
             ~giant_step_result:(giant_state,giant_log)
       in
@@ -595,7 +595,7 @@ let select_model_from_verdict models =
     Debug.dprintf debug_check_ce_categorization "Categorizations of models:@ %a@."
       Pp.(print_list newline (print_dbg_classified_model selected_ix)) classified_models;
   selected
-  
+
 let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
     ?only_giant_step rac env pm models =
   if rac.ignore_incomplete then
@@ -619,8 +619,8 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
   let rac_not_done_failure reason =
     (RAC_not_done reason, RAC_not_done reason) in
   let add_rac_result (i,r,m) =
-    Debug.dprintf debug_check_ce_rac_results "Check model %d (%a)@." i
-      (Pp.print_option_or_default "NO LOC" Pretty.print_loc')
+    Debug.dprintf debug_check_ce_rac_results "@[Check model %d (@[%a@])@]@." i
+      (Pp.print_option_or_default "NO LOC" Loc.pp_position)
       (get_model_term_loc m);
     let normal_res, giant_res = match get_model_term_loc m with
     | None -> rac_not_done_failure "model term has no location"
@@ -654,7 +654,7 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
             | None ->
                 Format.kasprintf (fun s -> rac_not_done_failure s)
                   "no corresponding routine symbol found for %a"
-                  Pretty.print_loc' loc
+                  Loc.pp_position loc
           end
     in
     Debug.dprintf debug_check_ce_rac_results "@[<v2>Results of RAC executions for model %d:%a@]@." i
@@ -720,7 +720,7 @@ let model_of_exec_log ~original_model log =
       | None -> Other in
     let me_name = { men_name; men_kind; men_attrs= id.id_attrs } in
     let me_value = model_value value in
-    {me_name; me_value; me_location= Some loc; me_term= None} in
+    {me_name; me_value; me_location= Some loc; me_lsymbol_location= None} in
   let aux e = match e.Log.log_loc with
     | Some loc when not Loc.(equal loc dummy_position) -> (
         match e.Log.log_desc with

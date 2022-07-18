@@ -1085,17 +1085,7 @@ let load_ident elt =
            Ident.Sattr.add (Ident.create_attribute name) acc
          | _ -> acc
       ) Ident.Sattr.empty elt.Xml.elements in
-  let preid =
-    try
-      let load_exn attr g = List.assoc attr g.Xml.attributes in
-      let file = load_exn "locfile" elt in
-      let lnum =  int_of_string (load_exn "loclnum" elt) in
-      let cnumb = int_of_string (load_exn "loccnumb" elt) in
-      let cnume = int_of_string (load_exn "loccnume" elt) in
-      let pos = Loc.user_position file lnum cnumb cnume in
-      Ident.id_user ~attrs name pos
-    with Not_found | Invalid_argument _ ->
-      Ident.id_fresh ~attrs name in
+  let preid = Ident.id_fresh ~attrs name in
   Ident.id_register preid
 
 (* [load_goal s op p g id] loads the goal of parent [p] from the xml

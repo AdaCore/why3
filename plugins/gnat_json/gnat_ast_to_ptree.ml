@@ -73,7 +73,7 @@ let mk_label = function
 
 let mk_location = function
   | Source_ptr r ->
-      let loc = Loc.user_position r.filename r.line 0 0 in
+      let loc = Loc.user_position r.filename r.line 0 r.line 0 in
       Some (mk_pos loc)
   | No_location -> None
 

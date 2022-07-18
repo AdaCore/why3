@@ -247,3 +247,41 @@ in formal proofs of numerical programs},
   YEAR = 2021,
   MONTH = may
 }
+
+@TechReport{gondelman16reg,
+  topics = {team},
+  author =       {Jean-Christophe Filli\^atre and L\'eon
+            Gondelman and Andrei Paskevich},
+  title =        {A Pragmatic Type System for Deductive Verification},
+  type = {Research report},
+  institution =  {Universit\'e Paris Sud},
+  year =         2016,
+  abstract = { In the context of deductive verication, it is customary
+                  today to handle programs with pointers using either
+                  separation logic, dynamic frames, or explicit memory
+                  models. Yet we can observe that in numerous
+                  programs, a large amount of code ts within the scope
+                  of Hoare logic, provided we can statically control
+                  aliasing. When this is the case, the code
+                  correctness can be reduced to simpler verication
+                  conditions which do not require any explicit memory
+                  model. This makes verication conditions more
+                  amenable both to automated theorem proving and to
+                  manual inspection and debugging. In this paper, we
+                  devise a method of such static aliasing control for
+                  a programming language featuring nested data
+                  structures with mutable components. Our solution is
+                  based on a type system with singleton regions and
+                  eects, which we prove to be sound.},
+  url = {https://hal.archives-ouvertes.fr/hal-01256434v3}
+}
+
+
+@INPROCEEDINGS{flanagan01popl,
+    author = {Cormac Flanagan and James B. Saxe},
+    title = {Avoiding Exponential Explosion: Generating Compact Verification Conditions},
+    booktitle = {Principles Of Programming Languages},
+    year = 2001,
+    pages = {193--205},
+    publisher = {ACM}
+}

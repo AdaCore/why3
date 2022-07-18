@@ -31,8 +31,11 @@ let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, r
     l (snd delims) ()
 
 let pp_env pp_key pp_value fmt l =
-  let delims = Pp.nothing, Pp.nothing in
-  pp_bindings ~delims ~sep:Pp.comma pp_key pp_value fmt l
+  if l = []
+  then pp_print_string fmt "<none>"
+  else
+    let delims = Pp.nothing, Pp.nothing in
+    pp_bindings ~delims ~sep:Pp.comma pp_key pp_value fmt l
 
 exception Incomplete of string
 
@@ -315,6 +318,11 @@ module Log = struct
 
   type exec_mode = Exec_giant_steps | Exec_normal
 
+  let pp_mode fmt m =
+    match m with
+    | Exec_giant_steps -> Format.pp_print_string fmt "Giant-step mode"
+    | Exec_normal -> Format.pp_print_string fmt "Small-step mode"
+
   type value_or_invalid = Value of value | Invalid
 
   type log_entry_desc =
@@ -566,12 +574,13 @@ module Log = struct
         match e.log_loc with
         | None -> String "NOLOC"
         | Some loc ->
-            let f, l, b, e = Loc.get loc in
+            let f, bl, bc, el, ec = Loc.get loc in
             Record [
                 "filename", String f;
-                "line", Int l;
-                "start-char", Int b;
-                "end-char", Int e
+                "start-line", Int bl;
+                "start-char", Int bc;
+                "end-line", Int el;
+                "end-char", Int ec
               ] in
       Record [
           "loc", loc;
@@ -607,8 +616,8 @@ module Log = struct
                 Exec_main _ -> false | _ -> true) entry_log
         else entry_log in
       let entry_log =
-        let on_file e = Opt.map (fun (f,_,_,_) -> f) (Opt.map Loc.get e.log_loc) in
-        let on_line e = Opt.map (fun (_,l,_,_) -> l) (Opt.map Loc.get e.log_loc) in
+        let on_file e = Opt.map (fun (f,_,_,_,_) -> f) (Opt.map Loc.get e.log_loc) in
+        let on_line e = Opt.map (fun (_,l,_,_,_) -> l) (Opt.map Loc.get e.log_loc) in
         List.map (fun (f, es) -> f, consecutives on_line es)
           (consecutives on_file entry_log) in
       let pp_entries = Pp.(print_list newline print_log_entry_desc) in
@@ -632,7 +641,7 @@ module Log = struct
       Mstr.change insert_file f sofar in
     let aux entry sofar = match entry.log_loc with
       | Some loc when not (Loc.equal loc Loc.dummy_position) ->
-          let f, l, _, _ = Loc.get loc in
+          let f, l, _, _, _ = Loc.get loc in
           insert f l entry sofar
       | _ -> sofar in
     Mstr.map (Mint.map List.rev)
@@ -781,9 +790,9 @@ let report_cntr_head fmt (ctx, msg, term) =
     (fun fmt ->
        match ctx.loc, term.t_loc with
        | Some t1, Some t2 ->
-           fprintf fmt " at %a@,- Defined at %a" print_loc' t1 print_loc' t2
+           fprintf fmt " at %a@,- Defined at %a" Loc.pp_position t1 Loc.pp_position t2
        | Some t, None | None, Some t ->
-           fprintf fmt " at %a" print_loc' t
+           fprintf fmt " at %a" Loc.pp_position t
        | None, None -> () )
 
 let report_cntr_body fmt (ctx, term) =

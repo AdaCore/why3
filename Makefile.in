@@ -256,8 +256,8 @@ LIB_CORE = \
 	parser_tokens keywords \
 	task pretty dterm env trans printer model_parser
 
-LIB_DRIVER = prove_client call_provers driver_parser driver_lexer driver \
-		whyconf autodetection smtv2_model_defs collect_data_model sexp smtv2_model_parser
+LIB_DRIVER = prove_client whyconf call_provers driver_parser driver_lexer driver \
+		autodetection smtv2_model_defs collect_data_model sexp smtv2_model_parser
 
 LIB_MLW = ity expr pdecl eval_match typeinv vc pmodule dexpr big_real \
           pinterp_core rac pinterp check_ce
@@ -273,7 +273,8 @@ LIB_PARSER = ptree ptree_helpers glob typing \
 		parser_messages parser typing report lexer mlw_printer
 
 LIB_TRANSFORM = simplify_formula inlining split_goal \
-		args_wrapper detect_polymorphism reduction_engine compute \
+		args_wrapper reduction_engine compute \
+		remove_unused detect_polymorphism \
 		fold_defs eliminate_quantifiers \
 		eliminate_definition eliminate_algebraic \
 		abstract_quantifiers eliminate_unknown_types \

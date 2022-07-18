@@ -49,7 +49,7 @@ let env : Env.env = Env.create_env (Whyconf.loadpath main)
 let alt_ergo_driver : Driver.driver =
   try
     Printexc.record_backtrace true;
-    Whyconf.load_driver main env alt_ergo
+    Driver.load_driver main env alt_ergo
   with e ->
     let s = Printexc.get_backtrace () in
     eprintf "Failed to load driver for alt-ergo: %a@.%s@."
@@ -97,17 +97,17 @@ module Task =
       with
         Not_found -> None
 
-    let mk_loc (f, a,b,c) =
+    let mk_loc (f,a,b,c,d) =
       if f = temp_file_name then
-        Some (a,b,c)
+        Some (a,b,c,d)
       else None
 
 
     let warnings = ref []
     let clear_warnings () = warnings := []
     let () =
-      Warning.set_hook (fun ?(loc=(Loc.user_position "" 1 0 0)) msg ->
-                        let _, a,b,_ = Loc.get loc in
+      Warning.set_hook (fun ?(loc=(Loc.user_position "" 1 0 1 0)) msg ->
+                        let _, a, b,_, _ = Loc.get loc in
                         warnings := ((a-1,b), msg) :: !warnings)
 
 
@@ -364,11 +364,12 @@ let why3_run f format lang code =
     f theories
   with
   | Loc.Located(loc,e') ->
-     let _, l, b, e = Loc.get loc in
-     W.send (ErrorLoc ((l-1,b, l-1, e),
-		     Pp.sprintf
-		       "error line %d, columns %d-%d: %a" l b e
-		       Exn_printer.exn_printer e'))
+     let msg =
+       Pp.sprintf "error %a: %a" Loc.pp_position_no_file loc
+	 Exn_printer.exn_printer e'
+     in
+     let _, bl, bc, el, ec = Loc.get loc in
+     W.send (ErrorLoc ((bl-1, bc, el-1, ec),msg))
   | e ->
      W.send (Error (Pp.sprintf
 		      "unexpected exception: %a (%s)" Exn_printer.exn_printer e

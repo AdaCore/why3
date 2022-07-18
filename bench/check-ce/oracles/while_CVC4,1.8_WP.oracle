@@ -1,10 +1,10 @@
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.05s, 1317 steps).
+Prover result is: Valid (0.02s, 1317 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Sub-goal Loop variant decrease of goal f'vc.
-Prover result is: Valid (0.01s, 1748 steps).
+Prover result is: Valid (0.02s, 1840 steps).
 
 <check-ce-rac-results>Check model 0 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce-rac-results>Checking model:
@@ -24,6 +24,7 @@ Prover result is: Valid (0.01s, 1748 steps).
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "0"}}]}}
+                          result = {"type": "Boolean", "val": true}
                           x1 =
                             {"type": "Record",
                              "val":
@@ -52,6 +53,7 @@ Prover result is: Valid (0.01s, 1748 steps).
                         Line 11:
                           result = {"type": "Boolean", "val": true}
                         Line 12:
+                          result = {"type": "Integer", "val": "-1"}
                           x1 =
                             {"type": "Record",
                              "val":
@@ -65,6 +67,7 @@ Prover result is: Valid (0.01s, 1748 steps).
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "1"}}]}}
+                          result = {"type": "Integer", "val": "1"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -75,11 +78,11 @@ Prover result is: Valid (0.01s, 1748 steps).
                                                                     0}
 <rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/while.mlw", line 7, characters 14-15 at "bench/check-ce/while.mlw", line 7, characters 14-15: {contents=
                                                                     0}
-<rac-values>Value from model for variable `x1` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+<rac-values>Value from model for variable `x1` at "bench/check-ce/while.mlw", line 8, character 2 to line 16, character 6 at "bench/check-ce/while.mlw", line 8, character 2 to line 16, character 6: {contents=
                                                                     (-2)}
-<rac-values>Type default value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+<rac-values>Type default value for variable `x2` at "bench/check-ce/while.mlw", line 8, character 2 to line 16, character 6 at "bench/check-ce/while.mlw", line 8, character 2 to line 16, character 6: {contents=
                                                                     0}
-<rac-values>Value from model for variable `i` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+<rac-values>Value from model for variable `i` at "bench/check-ce/while.mlw", line 8, character 2 to line 16, character 6 at "bench/check-ce/while.mlw", line 8, character 2 to line 16, character 6: {contents=
                                                                     0}
 <check-ce-rac-results>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
@@ -254,6 +257,7 @@ Prover result is: Valid (0.01s, 1748 steps).
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "0"}}]}}
+                          result = {"type": "Boolean", "val": true}
                           x1 =
                             {"type": "Record",
                              "val":
@@ -282,6 +286,7 @@ Prover result is: Valid (0.01s, 1748 steps).
                         Line 11:
                           result = {"type": "Boolean", "val": true}
                         Line 12:
+                          result = {"type": "Integer", "val": "-1"}
                           x1 =
                             {"type": "Record",
                              "val":
@@ -295,6 +300,7 @@ Prover result is: Valid (0.01s, 1748 steps).
                               {"Field":
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "1"}}]}}
+                          result = {"type": "Integer", "val": "1"}
 <check-ce-rac-results>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -305,11 +311,11 @@ Prover result is: Valid (0.01s, 1748 steps).
                                                                     0}
 <rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/while.mlw", line 7, characters 14-15 at "bench/check-ce/while.mlw", line 7, characters 14-15: {contents=
                                                                     0}
-<rac-values>Value from model for variable `x1` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+<rac-values>Value from model for variable `x1` at "bench/check-ce/while.mlw", line 8, character 2 to line 16, character 6 at "bench/check-ce/while.mlw", line 8, character 2 to line 16, character 6: {contents=
                                                                     (-2)}
-<rac-values>Type default value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+<rac-values>Type default value for variable `x2` at "bench/check-ce/while.mlw", line 8, character 2 to line 16, character 6 at "bench/check-ce/while.mlw", line 8, character 2 to line 16, character 6: {contents=
                                                                     0}
-<rac-values>Value from model for variable `i` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+<rac-values>Value from model for variable `i` at "bench/check-ce/while.mlw", line 8, character 2 to line 16, character 6 at "bench/check-ce/while.mlw", line 8, character 2 to line 16, character 6: {contents=
                                                                     0}
 <check-ce-rac-results>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
@@ -475,7 +481,7 @@ Prover result is: Valid (0.01s, 1748 steps).
   - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/while.mlw", line 10, characters 16-32)
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6605 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 6705 steps).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:
@@ -541,9 +547,9 @@ File while.mlw:
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Sub-goal Loop variant decrease of goal f'vc.
-Prover result is: Valid (0.01s, 1786 steps).
+Prover result is: Valid (0.02s, 1881 steps).
 
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.02s, 1664 steps).
+Prover result is: Valid (0.02s, 1759 steps).
 

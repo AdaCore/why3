@@ -21,7 +21,7 @@ open Why3
 let display_warning ?loc msg =
   match loc with
     | None -> printf "%s@." msg
-    | Some l -> printf "%a: %s@." Loc.gen_report_position l msg
+    | Some l -> printf "File %a: %s@." Loc.pp_position l msg
 
 let () = Warning.set_hook display_warning
 

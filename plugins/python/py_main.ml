@@ -408,7 +408,7 @@ let read_channel env path file c =
   let name = Strings.capitalize file in
   Debug.dprintf debug "building module %s.@." name;
   Typing.open_file env path;
-  let loc = Loc.user_position file 0 0 0 in
+  let loc = Loc.user_position file 0 0 0 0 in
   Typing.open_module (mk_id ~loc name);
   let use_import (f, m) =
     let m = mk_id ~loc m in

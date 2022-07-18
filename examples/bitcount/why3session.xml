@@ -5,6 +5,7 @@
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="1" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.4.1" alternative="noBV" timelimit="5" steplimit="0" memlimit="4000"/>
+<prover id="3" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="5" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="6" steplimit="0" memlimit="4000"/>
@@ -85,7 +86,7 @@
   <transf name="split_goal_right" proved="true" >
    <goal name="step2&#39;vc.4.0" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.11"/></proof>
-   <proof prover="2"><result status="valid" time="0.47"/></proof>
+   <proof prover="2"><result status="valid" time="0.67"/></proof>
    <proof prover="4"><result status="valid" time="0.10"/></proof>
    <proof prover="6"><result status="valid" time="0.10" steps="104"/></proof>
    </goal>
@@ -180,9 +181,9 @@
    <goal name="count&#39;vc.0.0" expl="precondition" proved="true">
    <proof prover="0"><result status="valid" time="0.04"/></proof>
    <proof prover="2"><result status="valid" time="0.02"/></proof>
-   <proof prover="4"><result status="valid" time="0.07"/></proof>
-   <proof prover="5"><result status="valid" time="0.01"/></proof>
-   <proof prover="6"><result status="valid" time="0.04" steps="79"/></proof>
+   <proof prover="4"><result status="valid" time="0.06"/></proof>
+   <proof prover="5"><result status="valid" time="0.02"/></proof>
+   <proof prover="6"><result status="valid" time="0.05" steps="79"/></proof>
    </goal>
   </transf>
   </goal>
@@ -198,9 +199,9 @@
    <goal name="count&#39;vc.2.0" expl="precondition" proved="true">
    <proof prover="0"><result status="valid" time="0.04"/></proof>
    <proof prover="2"><result status="valid" time="0.02"/></proof>
-   <proof prover="4"><result status="valid" time="0.06"/></proof>
-   <proof prover="5"><result status="valid" time="0.02"/></proof>
-   <proof prover="6"><result status="valid" time="0.05" steps="79"/></proof>
+   <proof prover="4"><result status="valid" time="0.07"/></proof>
+   <proof prover="5"><result status="valid" time="0.01"/></proof>
+   <proof prover="6"><result status="valid" time="0.04" steps="79"/></proof>
    </goal>
   </transf>
   </goal>
@@ -301,7 +302,7 @@
    <proof prover="5"><result status="valid" time="0.12"/></proof>
    </goal>
    <goal name="proof1&#39;vc.6.2" expl="VC for proof1" proved="true">
-   <proof prover="4"><result status="valid" time="1.04"/></proof>
+   <proof prover="4"><result status="valid" time="1.29"/></proof>
    <proof prover="6"><result status="valid" time="0.04" steps="96"/></proof>
    </goal>
   </transf>
@@ -382,7 +383,7 @@
    </goal>
    <goal name="proof2&#39;vc.9.2" expl="VC for proof2" proved="true">
    <proof prover="4"><result status="valid" time="0.10"/></proof>
-   <proof prover="5"><result status="valid" time="0.44"/></proof>
+   <proof prover="5"><result status="valid" time="0.51"/></proof>
    <proof prover="6"><result status="valid" time="0.03" steps="97"/></proof>
    </goal>
   </transf>
@@ -468,7 +469,7 @@
   <transf name="split_goal_right" proved="true" >
    <goal name="proof3&#39;vc.11.0" expl="VC for proof3" proved="true">
    <proof prover="4"><result status="valid" time="0.10"/></proof>
-   <proof prover="5"><result status="valid" time="4.72"/></proof>
+   <proof prover="5"><result status="valid" time="3.56"/></proof>
    <proof prover="6"><result status="valid" time="0.04" steps="102"/></proof>
    </goal>
    <goal name="proof3&#39;vc.11.1" expl="VC for proof3" proved="true">
@@ -477,7 +478,7 @@
    </goal>
    <goal name="proof3&#39;vc.11.2" expl="VC for proof3" proved="true">
    <proof prover="4"><result status="valid" time="0.08"/></proof>
-   <proof prover="5"><result status="valid" time="3.27"/></proof>
+   <proof prover="5"><result status="valid" time="4.79"/></proof>
    <proof prover="6"><result status="valid" time="0.03" steps="101"/></proof>
    </goal>
   </transf>
@@ -634,7 +635,7 @@
   <proof prover="6"><result status="valid" time="4.58" steps="591"/></proof>
   </goal>
   <goal name="hammingD&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.19"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="6" timelimit="5"><result status="valid" time="1.12" steps="849"/></proof>
   </goal>
  </transf>
@@ -650,7 +651,7 @@
  <goal name="separation&#39;vc" expl="VC for separation" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="separation&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.72"/></proof>
+  <proof prover="3"><result status="valid" time="0.42" steps="3053"/></proof>
   </goal>
   <goal name="separation&#39;vc.1" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -671,7 +672,7 @@
  <proof prover="0"><result status="valid" time="0.34"/></proof>
  <proof prover="4"><result status="valid" time="0.39"/></proof>
  <proof prover="5"><result status="valid" time="0.06"/></proof>
- <proof prover="6" timelimit="5"><result status="valid" time="2.59" steps="2306"/></proof>
+ <proof prover="6" timelimit="5"><result status="valid" time="3.49" steps="2709"/></proof>
  </goal>
  <goal name="triangleInequalityInt&#39;vc" expl="VC for triangleInequalityInt" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -685,7 +686,7 @@
    <proof prover="6"><result status="valid" time="0.03" steps="85"/></proof>
    </goal>
    <goal name="triangleInequalityInt&#39;vc.0.1" expl="VC for triangleInequalityInt" proved="true">
-   <proof prover="0" timelimit="10"><result status="valid" time="6.28"/></proof>
+   <proof prover="0" timelimit="10"><result status="valid" time="7.20"/></proof>
    </goal>
   </transf>
   </goal>
@@ -738,12 +739,11 @@
  <goal name="bv_odd" proved="true">
  <proof prover="0"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.09"/></proof>
- <proof prover="5"><result status="valid" time="0.04"/></proof>
  <proof prover="6"><result status="valid" time="0.05" steps="122"/></proof>
  </goal>
  <goal name="numof_or&#39;vc" expl="VC for numof_or" proved="true">
  <proof prover="0"><result status="valid" time="0.31"/></proof>
- <proof prover="4"><result status="valid" time="0.44"/></proof>
+ <proof prover="4"><result status="valid" time="0.60"/></proof>
  <proof prover="5"><result status="valid" time="0.06"/></proof>
  </goal>
  <goal name="count_or&#39;vc" expl="VC for count_or" proved="true">
@@ -807,7 +807,7 @@
   </transf>
   </goal>
   <goal name="ascii&#39;vc.4" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.09" steps="23012"/></proof>
+  <proof prover="1"><result status="valid" time="0.09" steps="19392"/></proof>
   </goal>
   <goal name="ascii&#39;vc.5" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.11"/></proof>
@@ -837,7 +837,7 @@
   <proof prover="6"><result status="valid" time="0.02" steps="84"/></proof>
   </goal>
   <goal name="tmp&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.00"/></proof>
+  <proof prover="5"><result status="valid" time="0.95"/></proof>
   </goal>
  </transf>
  </goal>

@@ -143,7 +143,7 @@ let mk_env ?(attrs=Sattr.empty)
   divergent = false;
   inferinvs = invs;
   keep_trace;
-}
+  }
 
 let acc env r t =
   let ps = env.ps_wf_acc in
@@ -570,9 +570,9 @@ let add_loc_attr label loc attrs =
   match loc with
   | None -> attrs
   | Some loc ->
-      let filename, line, bchar, echar = Loc.get loc in
+      let filename, bline, bchar, eline, echar = Loc.get loc in
       let attr = Format.kasprintf Ident.create_attribute
-          "%s:%s:%d:%d:%d" label filename line bchar echar in
+          "%s:%s:%d:%d:%d:%d" label filename bline bchar eline echar in
       Sattr.add attr attrs
 
 (* translate the expression [e] into a k-expression:
@@ -653,7 +653,7 @@ let rec k_expr env lps e res xmap =
         (* [ VC(ce) (if ce is a lambda executed in-place)
            | STOP pre
            | HAVOC ; [ ASSUME post | ASSUME xpost ; RAISE ] ] *)
-       (* Format.eprintf "[Vc.term_of_post/Eexec] res = %a@." print_pv_attr res; *)
+       (* Format.eprintf "[Vc.term_of_post/Eexec] e = %a@." print_expr e; *)
         let p, (oldies, sbs) = match pre with
           (* for recursive calls, compute the 'variant decrease'
              precondition and rename the oldies to avoid clash *)
@@ -663,16 +663,32 @@ let rec k_expr env lps e res xmap =
               let d = decrease env loc attrs expl_variant ovl nvl in
               wp_and d (wp_of_pre loc attrs pl), renew_oldies oldies
           | pl -> wp_of_pre loc attrs pl, (oldies, Mvs.empty) in
+        let is_fully_applied = ce.c_cty.cty_args = [] in
+        let is_constructor_or_projection ls =
+          Typeinv.is_trusted_constructor env.known_map ls ||
+            Typeinv.is_trusted_projection env.known_map ls e.e_ity
+        in
         let trusted = match ce.c_node with
           | (Capp ({rs_logic = RLls ls}, _) | Cpur (ls, _))
-               when ce.c_cty.cty_args = [] (* fully applied *) ->
-              Typeinv.is_trusted_constructor env.known_map ls ||
-              Typeinv.is_trusted_projection env.known_map ls e.e_ity
+               when is_fully_applied -> is_constructor_or_projection ls
           | _ -> false in
         let rds = cty.cty_effect.eff_reads in
         let aff = pvs_affected cty.cty_effect.eff_covers rds in
         let pinv = if trusted then [] else inv_of_pvs env e.e_loc rds in
         let qinv = if trusted then [] else inv_of_pvs env e.e_loc aff in
+        let need_trace = match ce.c_node with
+          | Capp ({rs_logic = RLls ls}, args) (* `let function` or `val function` *)
+            | Cpur (ls, args) (* direct application of a logic symbol *)
+            ->
+             let is_a_constant = args = [] in
+             not is_fully_applied ||
+               not (is_a_constant || is_constructor_or_projection ls)
+          | Capp ({rs_logic = (RLnone|RLlemma|RLpv _)}, _)
+            -> true
+          | Cfun _ -> true
+          | Cany -> true
+        in
+        (* Format.eprintf "[Vc.term_of_post/Eexec] need_trace = %b@." need_trace; *)
         let k_of_post expl v ql =
           let k v =
             let sp = sp_of_post loc attrs expl v ql in
@@ -683,13 +699,6 @@ let rec k_expr env lps e res xmap =
             | Some (t, sp) ->
                Klet (v, t_tag t, List.fold_right sp_and rinv sp)
             | None ->  Kval ([v], List.fold_right sp_and rinv sp) in
-          let need_trace = match ce.c_node with
-            | (Capp ({rs_logic = RLls _ls}, _) (* `let function` or `val function` *)
-               | Cpur (_ls, _)) (* direct application of a logic symbol *)
-              ->
-               ce.c_cty.cty_args <> [] (* unless not fully applied *)
-          | _ -> true
-            in
           if env.keep_trace && need_trace then
             let vv = explicit_result loc e.e_attrs ce v.pv_ity in
             Kseq(k v,0,Klet(vv, t_var v.pv_vs, t_true))
@@ -806,7 +815,8 @@ let rec k_expr env lps e res xmap =
               let rec k_par = function
                 | [k] -> k | [] -> assert false
                 | k::kl -> Kpar (k, k_par kl) in
-              Kpar (k_havoc loc attrs eff (k_par (k_rec env lps rdl)), k)
+              let envs = List.map (fun _ -> env) rdl in
+              Kpar (k_havoc loc attrs eff (k_par (k_rec envs lps rdl)), k)
           | LDsym (_, {c_node = Cfun e; c_cty = cty}) ->
               Kpar (k_havoc loc attrs eff (k_fun env lps cty e), k)
           | _ -> k end
@@ -1015,8 +1025,8 @@ and k_fun env lps ?(oldies=Mpv.empty) ?(xmap=Mxs.empty) cty e =
   let p = List.fold_right sp_and pinv (sp_of_pre cty.cty_pre) in
   Kseq (Kval (cty.cty_args, p), 0, k)
 
-and k_rec env lps rdl =
-  let k_rd {rec_fun = c; rec_varl = varl} =
+and k_rec envs lps rdl =
+  let k_rd env {rec_fun = c; rec_varl = varl} =
     let e = match c.c_node with
       | Cfun e -> e | _ -> assert false in
     (* store in lps our variant at the entry point
@@ -1027,7 +1037,7 @@ and k_rec env lps rdl =
       let decr = Opt.get (ls_decr_of_rec_defn rd) in
       Mls.add decr (varl, List.map snd rd.rec_varl) lps in
     k_fun env (List.fold_left add lps rdl) ~oldies c.c_cty e in
-  List.map k_rd rdl
+  List.map2 k_rd envs rdl
 
 (* stage 2: push sub-expressions up as far as we can *)
 
@@ -1634,8 +1644,8 @@ let vc_kode env vc_wp k =
 let vc_fun env vc_wp cty e =
   vc_kode env vc_wp (k_fun env Mls.empty cty e)
 
-let vc_rec env vc_wp rdl =
-  List.map (vc_kode env vc_wp) (k_rec env Mls.empty rdl)
+let vc_rec envs vc_wp rdl =
+  List.map2 (fun env k -> vc_kode env vc_wp k) envs (k_rec envs Mls.empty rdl)
 
 let mk_vc_decl ({known_map = kn; keep_trace } as env) id f =
   let {id_string = nm; id_attrs = attrs; id_loc = loc} = id in
@@ -1693,11 +1703,15 @@ let vc env kn tuc d = match d.pd_node with
       let f = vc_fun env (Debug.test_noflag debug_sp) cty e in
       add_vc_decl env s.rs_name f []
   | PDlet (LDrec rdl) ->
-     (** FIXME : pass ~attrs:e.e_attrs *)
-      let env = mk_env env kn tuc [] in
-      let fl = vc_rec env (Debug.test_noflag debug_sp) rdl in
-      let add rd f vcl = add_vc_decl env rd.rec_sym.rs_name f vcl in
-      List.fold_right2 add rdl fl []
+      let envs =
+        List.map (fun f ->
+            match f.rec_fun.c_node with
+            | Cfun { e_attrs = attrs } -> mk_env ~attrs env kn tuc []
+            | _ -> assert false) rdl
+      in
+      let fl = vc_rec envs (Debug.test_noflag debug_sp) rdl in
+      let add env (rd, f) vcl = add_vc_decl env rd.rec_sym.rs_name f vcl in
+      List.fold_right2 add envs (List.combine rdl fl) []
   | PDtype tdl ->
       let env = lazy (mk_env env kn tuc []) in
       let add_witness d wit vcl =

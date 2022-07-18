@@ -209,7 +209,7 @@ step_limit () {
 mem_limit () {
     pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
-    provers=`bin/why3$suffix config list-provers | grep 'Alt-Ergo 2\.[3-9]\\.[0-9]$\|CVC4 1\.[6-8]$\|CVC5 1\.[0-9]\.[0-9]$\|Z3 4\.[6-8]\.[0-9]\+$' | tr ' ' ',' | tr -d '()'`
+    provers=`bin/why3$suffix config list-provers | grep 'Alt-Ergo \(2\.3\.3\|2\.4\.1\)$\|CVC4 1\.[78]$\|CVC5 1\.[0-9]\.[0-9]$\|Z3 \(4\.8\.\(4\|10\)\|4\.9\.[0-9]\+\)$' | tr ' ' ',' | tr -d '()'`
     for f in $1/*.mlw; do
         for p in $provers ; do
             if [[ "$p" =~ .*strings.* ]]; then
@@ -218,25 +218,47 @@ mem_limit () {
                 # to be investigated
                 echo "  $f (memory limit for $p)... skipped "
             else
-                # Testing that at least one run between --memlimit=40 and
+                case `basename "$f"` in
+                    is_prime.mlw|syracuse.mlw)
+                    # FIXME: these examples makes the gitlab CI fail too often
+                    # to be investigated
+                        echo "  $f (memory limit for $p)... skipped "
+                        ;;
+                    *)
+                # Testing that at least one run between --memlimit=50 and
                 # --memlimit=30 replies Out of memory seems a reasonable
                 # heuristic
-                printf "  $f (memory limit 40 for $p)... "
-                if $pgm --memlimit=40 --timelimit=5 -P $p $f | \
+                steps=1000
+                highmemlimit=50
+                lowmemlimit=30
+                case $p in
+                    Alt-Ergo*) steps=5000; highmemlimit=35 ;;
+                    CVC4*) steps=100000 ;;
+                    CVC5*) steps=100000 ;;
+                    Z3*) steps=5000000; lowmemlimit=45 ;;
+                esac
+                printf "  $f (memlimit=$highmemlimit, stepslimit=$steps for $p)... "
+                if $pgm --memlimit="$highmemlimit" --timelimit=60 --stepslimit="$steps" -P $p $f | \
                             grep -q "Prover result is: Out of memory"; then
                     printf "ok\n"
                 else
-                    printf "(retrying with memlimit=30) "
-                    if $pgm --memlimit=30 --timelimit=5 -P $p $f | \
-                            grep -q "Prover result is: Out of memory"; then
+                    steps="$steps"0
+                    printf "(retrying with memlimit=$lowmemlimit, stepslimit=$steps) "
+                    tmp="why3run.out"
+                    cmd="$pgm --memlimit=$lowmemlimit --timelimit=60 --stepslimit=$steps -P $p $f"
+                    $cmd > $tmp
+                    if grep -q "Prover result is: Out of memory" $tmp; then
                         printf "ok\n"
+                        rm $tmp
                     else
                         printf "failed!\n"
-                        echo $pgm --memlimit=30 --timelimit=5 -P $p $f
-                        $pgm --memlimit=30 --timelimit=5 -P $p $f
+                        printf "$cmd\n"
+                        cat $tmp
+                        rm $tmp
                         exit 1
                     fi
                 fi
+                esac
             fi
         done
     done

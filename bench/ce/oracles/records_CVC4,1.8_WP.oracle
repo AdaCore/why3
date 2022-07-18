@@ -1,7 +1,7 @@
 Weakest Precondition
 File "bench/ce/records.mlw", line 15, characters 14-24:
 Sub-goal Postcondition of goal record_match_eval_test1'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File records.mlw:
@@ -15,15 +15,18 @@ File records.mlw:
   Line 15:
     result [@introduced] = {"type": "Integer", "val": "0"}
   Line 17:
+    result of call at line 17, characters 5-8 [@call_result:17:5:17:8:bench/ce/records.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": true}
     result [@introduced] = {"type": "Integer", "val": "0"}
-
-File "bench/ce/records.mlw", line 15, characters 14-24:
-Sub-goal Postcondition of goal record_match_eval_test1'vc.
-Prover result is: Valid.
+  Line 18:
+    result of call at line 18, characters 4-7 [@call_result:18:4:18:7:bench/ce/records.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
 
 File "bench/ce/records.mlw", line 23, characters 14-24:
 Sub-goal Postcondition of goal record_match_eval_test2'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File records.mlw:
@@ -35,15 +38,12 @@ File records.mlw:
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 23:
-    x [@introduced] [@model_trace:x] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
-           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+    result [@introduced] = {"type": "Integer", "val": "0"}
   Line 25:
-    result [@id:unused] [@introduced] [@model_trace:result] =
+    result of call at line 25, characters 4-7 [@call_result:25:4:25:7:bench/ce/records.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Integer", "val": "0"}
+    result [@introduced] = {"type": "Integer", "val": "0"}
 
 File "bench/ce/records.mlw", line 28, characters 14-18:
 Sub-goal Postcondition of goal record_match_eval_test3'vc.
@@ -62,7 +62,7 @@ File ref.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "-1"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 20:
     x [@field:0:contents] [@introduced] =
@@ -89,7 +89,7 @@ File records.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "-1"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 28:
     x [@field:0:contents] [@introduced] [@model_trace:x] =
@@ -109,7 +109,23 @@ File records.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "3"}},
+          [{"field": ".my_field_f",
+            "value": {"type": "Integer", "val": "-1"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+    result of call at line 30, characters 9-25 [@call_result:30:9:30:25:bench/ce/records.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+    result of call at line 30, characters 11-13 [@call_result:30:11:30:13:bench/ce/records.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f",
+            "value": {"type": "Integer", "val": "-1"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -155,7 +171,7 @@ File records.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "-1"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 33:
     x [@field:0:contents] [@introduced] [@model_trace:x] =
@@ -175,13 +191,29 @@ File records.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "3"}},
+          [{"field": ".my_field_f",
+            "value": {"type": "Integer", "val": "-1"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     result [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+    result of call at line 35, characters 9-26 [@call_result:35:9:35:26:bench/ce/records.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+    result of call at line 35, characters 11-13 [@call_result:35:11:35:13:bench/ce/records.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f",
+            "value": {"type": "Integer", "val": "-1"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -195,6 +227,14 @@ File records.mlw:
                  [{"field": ".my_field_f",
                    "value": {"type": "Integer", "val": "6"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+  Line 36:
+    result of call at line 36, characters 4-6 [@call_result:36:4:36:6:bench/ce/records.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
 File "bench/ce/records.mlw", line 42, characters 13-22:
 Sub-goal Assertion of goal record_match_eval_test44'vc.
@@ -213,7 +253,7 @@ File ref.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "-1"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 20:
     x [@field:0:contents] [@introduced] =
@@ -240,7 +280,7 @@ File records.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "-1"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 40:
     x [@field:0:contents] [@introduced] =
@@ -260,7 +300,23 @@ File records.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "3"}},
+          [{"field": ".my_field_f",
+            "value": {"type": "Integer", "val": "-1"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+    result of call at line 41, characters 9-26 [@call_result:41:9:41:26:bench/ce/records.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+    result of call at line 41, characters 11-13 [@call_result:41:11:41:13:bench/ce/records.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f",
+            "value": {"type": "Integer", "val": "-1"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 42:
     x [@field:0:contents] [@introduced] [@model_trace:x] =
@@ -311,7 +367,7 @@ File records.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "-1"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 47:
     x [@field:0:contents] [@introduced] =
@@ -324,7 +380,7 @@ File records.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "-1"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 48:
     re [@field:0:contents] [@introduced] [@model_trace:re] =
@@ -337,7 +393,7 @@ File records.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "-1"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
     x [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type": "Record",
@@ -356,13 +412,29 @@ File records.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "3"}},
+          [{"field": ".my_field_f",
+            "value": {"type": "Integer", "val": "-1"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     result [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+    result of call at line 50, characters 9-26 [@call_result:50:9:50:26:bench/ce/records.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+    result of call at line 50, characters 11-13 [@call_result:50:11:50:13:bench/ce/records.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f",
+            "value": {"type": "Integer", "val": "-1"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -376,6 +448,14 @@ File records.mlw:
                  [{"field": ".my_field_f",
                    "value": {"type": "Integer", "val": "6"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+  Line 51:
+    result of call at line 51, characters 4-6 [@call_result:51:4:51:6:bench/ce/records.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
 File "bench/ce/records.mlw", line 65, characters 14-24:
 Sub-goal Postcondition of goal record_match_eval_test1'vc.
@@ -393,11 +473,14 @@ File records.mlw:
   Line 65:
     result [@introduced] = {"type": "Integer", "val": "0"}
   Line 67:
+    result of call at line 67, characters 7-10 [@call_result:67:7:67:10:bench/ce/records.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": true}
     result [@introduced] = {"type": "Integer", "val": "0"}
-
-File "bench/ce/records.mlw", line 65, characters 14-24:
-Sub-goal Postcondition of goal record_match_eval_test1'vc.
-Prover result is: Valid.
+  Line 68:
+    result of call at line 68, characters 6-9 [@call_result:68:6:68:9:bench/ce/records.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
 
 File "bench/ce/records.mlw", line 73, characters 14-24:
 Sub-goal Postcondition of goal record_match_eval_test2'vc.
@@ -413,15 +496,12 @@ File records.mlw:
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 73:
-    x [@introduced] [@model_trace:x] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
-           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+    result [@introduced] = {"type": "Integer", "val": "0"}
   Line 75:
-    result [@id:unused] [@introduced] [@model_trace:result] =
+    result of call at line 75, characters 4-7 [@call_result:75:4:75:7:bench/ce/records.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Integer", "val": "0"}
+    result [@introduced] = {"type": "Integer", "val": "0"}
 
 File "bench/ce/records.mlw", line 78, characters 14-17:
 Sub-goal Postcondition of goal record_match_eval_test3'vc.

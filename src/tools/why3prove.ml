@@ -290,7 +290,7 @@ let really_do_task (task: task) =
     match t.Term.t_loc with
     | None -> false
     | Some loc ->
-        let goal_f, goal_l, _, _ = Loc.get loc in
+        let goal_f, goal_l, _, _, _ = Loc.get loc in
         goal_f = f &&
         (match l with None -> true | Some l -> l = goal_l) &&
         (match e with None -> true | Some e ->
@@ -320,14 +320,15 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
     let open Json_base in
     let loc =
       match loc with
-      | None -> Record ["filename", String fname]
+      | None -> Record ["file-name", String fname]
       | Some loc ->
-          let f, l, b, e = Loc.get loc in
+          let f, bl, bc, el, ec = Loc.get loc in
           Record [
-              "filename", String f;
-              "line", Int l;
-              "start-char", Int b;
-              "end-char", Int e
+              "file-name", String f;
+              "start-line", Int bl;
+              "start-char", Int bc;
+              "end-line", Int el;
+              "end-char", Int ec
             ] in
     let term =
       Record [
@@ -343,7 +344,7 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
   | None | Some `Values as json ->
     ( match loc with
       | None -> fprintf fmt "File %s:@\n" fname
-      | Some loc -> Loc.report_position fmt loc );
+      | Some loc -> fprintf fmt "File %a:@\n" Loc.pp_position loc );
     ( if expls = [] then
         fprintf fmt "@[<hov>Goal@ @{<bold>%s@}.@]" goal_name
       else
@@ -391,19 +392,17 @@ let print_other_models (m, (c, log)) =
             (Check_ce.model_of_exec_log ~original_model:m log)
     | _ -> () )
 
-let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
+let do_task config env drv fname tname (th : Theory.theory) (task : Task.task) =
   if really_do_task task then
   let open Call_provers in
   let limit =
     { limit_time = timelimit;
       limit_mem = memlimit;
       limit_steps = stepslimit } in
-  let libdir = Config.libdir in
-  let datadir = Config.datadir in
   match !opt_output, !opt_command with
     | None, Some command ->
         let call =
-          Driver.prove_task ~command ~libdir ~datadir ~limit drv task
+          Driver.prove_task ~command ~config ~limit drv task
         in
         let res = wait_on_call call in
         let ce = select_ce env th res.pr_models in
@@ -418,7 +417,7 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
         Driver.print_task drv std_formatter task
     | Some dir, _ -> output_task drv fname tname th task dir
 
-let do_tasks env drv fname tname th task =
+let do_tasks config env drv fname tname th task =
   let table = Args_wrapper.build_naming_tables task in
   let rec apply tasks = function
     | [] -> tasks
@@ -431,9 +430,9 @@ let do_tasks env drv fname tname th task =
             Trans.apply_transform_args name env args table ffmt in
         apply (List.concat (List.map apply_trans tasks)) trans in
   let tasks = apply [task] !opt_trans in
-  List.iter (do_task env drv fname tname th) tasks
+  List.iter (do_task config env drv fname tname th) tasks
 
-let do_theory env drv fname tname th glist elist =
+let do_theory config env drv fname tname th glist elist =
   if !opt_print_theory then
     printf "%a@." Pretty.print_theory th
   else if !opt_print_namespace then
@@ -450,7 +449,7 @@ let do_theory env drv fname tname th glist elist =
     let prs = Queue.fold add Decl.Spr.empty glist in
     let sel = if Decl.Spr.is_empty prs then None else Some prs in
     let tasks = Task.split_theory th sel !opt_task in
-    List.iter (do_tasks env drv fname tname th) tasks;
+    List.iter (do_tasks config env drv fname tname th) tasks;
     let eval (x,l) =
       let ls = try ns_find_ls th.th_export l with Not_found ->
         eprintf "Declaration '%s' not found in theory '%s'.@." x tname;
@@ -474,23 +473,23 @@ let do_theory env drv fname tname th glist elist =
     Queue.iter eval elist
   end
 
-let do_global_theory env drv (tname,p,t,glist,elist) =
+let do_global_theory config env drv (tname,p,t,glist,elist) =
   let th = Env.read_theory env p t in
-  do_theory env drv "lib" tname th glist elist
+  do_theory config env drv "lib" tname th glist elist
 
-let do_local_theory env drv fname m (tname,_,t,glist,elist) =
+let do_local_theory config env drv fname m (tname,_,t,glist,elist) =
   let th = try Mstr.find t m with Not_found ->
     eprintf "Theory '%s' not found in file '%s'.@." tname fname;
     exit 1
   in
-  do_theory env drv fname tname th glist elist
+  do_theory config env drv fname tname th glist elist
 
-let do_input env drv = function
+let do_input config env drv = function
   | None, _ when Debug.test_flag Typing.debug_type_only ||
                  Debug.test_flag Typing.debug_parse_only ->
       ()
   | None, tlist ->
-      Queue.iter (do_global_theory env drv) tlist
+      Queue.iter (do_global_theory config env drv) tlist
   | Some f, tlist ->
       let format = !opt_parser in
       let fname, m = match f with
@@ -508,20 +507,21 @@ let do_input env drv = function
           let elist = Queue.create () in
           let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
           let do_th _ (t,th) =
-            do_theory env drv fname t th glist elist
+            do_theory config env drv fname t th glist elist
           in
           Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
         else
-          Queue.iter (do_local_theory env drv fname m) tlist
+          Queue.iter (do_local_theory config env drv fname m) tlist
 
 let () =
   try
     if (Util.terminal_has_color && !opt_color) then (
       Format.set_formatter_tag_functions Util.ansi_color_tags;
       set_mark_tags true );
-    let load (f,ef) = load_driver_raw (Whyconf.get_main config) env f ef in
+    let main = Whyconf.get_main config in
+    let load (f,ef) = Driver.load_driver_raw main env f ef in
     let drv = Opt.map load !opt_driver in
-    Queue.iter (do_input env drv) opt_queue;
+    Queue.iter (do_input main env drv) opt_queue;
     if !unproved then exit 2
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;

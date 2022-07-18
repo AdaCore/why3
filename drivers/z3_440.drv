@@ -14,15 +14,11 @@ import "z3_bv.gen"
 import "smt-libv2-floats.gen"
 import "discrimination.gen"
 
+(** transformation "remove_unused_keep_constants" *)
 transformation "inline_trivial"
 transformation "eliminate_builtin"
 transformation "detect_polymorphism"
-transformation "eliminate_definition"
-(* We could keep more definitions by using
-   transformation "eliminate_definition_conditionally"
-   instead, but some proofs are lost
-   (examples/logic/triangle_inequality.why)
-*)
+transformation "eliminate_definition_conditionally"
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic_if_poly"
 transformation "eliminate_literal"
@@ -47,6 +43,9 @@ outofmemory "Failed to verify: pthread_create"
 outofmemory "std::bad_alloc"
 outofmemory "Resource temporarily unavailable"
 outofmemory "Cannot allocate memory"
+(* not convenient: is more a problem of fork
+outofmemory "error while loading shared libraries:.*failed to map segment from shared object"
+*)
 timeout "interrupted by timeout"
 steps ":rlimit-count +\\([0-9]+\\)" 1
 steplimitexceeded "Maximal allocation counts [0-9]+ have been exceeded"

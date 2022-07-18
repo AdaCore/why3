@@ -13,7 +13,9 @@ open Js_of_ocaml
 
 type id = int
 type loc = int * int * int * int
-type why3_loc = string * (int * int * int)
+type why3_loc = string * (int * int * int * int)
+(** kind, start line, start char, end line, end char
+    line numbers starts from 1, cf [src/util/Loc.mli] *)
 type status = StNew | StValid | StUnknown
 type transform = Prove of int | Split of int | Clean
 

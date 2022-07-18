@@ -1,0 +1,24 @@
+use bv.BV32 as BV32
+use bv.BV64 as BV64
+use bv.BVConverter_32_64 as C
+
+val u (i : BV64.t) : ()
+    requires { BV64.sle (10:BV64.t) i }
+
+let ok (i : BV32.t) : () = u (C.toBig i)
+
+let ko (i : BV32.t) : () = u (C.stoBig i)
+
+let ko2 (i : BV32.t) : BV64.t
+    ensures { BV64.sle (0:BV64.t) result } = C.stoBig i
+
+(*
+
+This command:
+
+  why3 prove pb.mlw -P "CVC4,1.8,counterexamples" --check-ce --rac-prover cvc4
+
+finds counter-examples for ok, ko and ko2 but the RAC can only confirm
+that the one for ok is a valid cex.
+
+*)

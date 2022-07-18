@@ -10,7 +10,8 @@ let get_pos ?loc () = match loc with
       loc
   | None ->
       incr loc_counter;
-      Loc.user_position "<dummy>" !loc_counter 0 0
+      let line = !loc_counter in
+      Loc.user_position "<dummy>" line 0 line 0
 
 let mk_ident attrs s = {
   id_str = s;

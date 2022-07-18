@@ -2,6 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -9,6 +10,8 @@
 <prover id="5" name="Coq" version="8.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="3.2" timelimit="3" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="9" name="CVC5" version="1.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="10" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="triangle_inequality.why"/>
 <theory name="CauchySchwarzInequality" proved="true">
@@ -98,7 +101,27 @@
 </theory>
 <theory name="TriangleInequality" proved="true">
  <goal name="triangle_aux" proved="true">
- <proof prover="7"><result status="valid" time="0.01"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="triangle_aux.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="44"/></proof>
+  </goal>
+  <goal name="triangle_aux.1" proved="true">
+  <proof prover="9"><result status="valid" time="0.03" steps="3360"/></proof>
+  </goal>
+  <goal name="triangle_aux.2" proved="true">
+  <proof prover="9"><result status="valid" time="0.02" steps="3346"/></proof>
+  </goal>
+  <goal name="triangle_aux.3" proved="true">
+  <transf name="unfold" proved="true" arg1="norm">
+   <goal name="triangle_aux.3.0" proved="true">
+   <proof prover="10"><result status="valid" time="0.03" steps="204"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="triangle_aux.4" proved="true">
+  <proof prover="9"><result status="valid" time="0.04" steps="6849"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="sqr_sqrt_le" proved="true">
  <proof prover="1"><result status="valid" time="0.01"/></proof>

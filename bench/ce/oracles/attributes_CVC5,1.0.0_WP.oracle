@@ -6,20 +6,32 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File attributes.mlw:
   Line 7:
+    result of call at line 7, characters 8-14 [@call_result:7:8:7:14:bench/ce/attributes.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": false}
     x [@field:0:contents] [@introduced] [@loop1]
-      [@loop:bench/ce/attributes.mlw:7:2:33] [@mlw:reference_var] =
+      [@loop:bench/ce/attributes.mlw:7:2:7:33] [@mlw:reference_var] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
   Line 9:
+    result of call at line 9, characters 8-15 [@call_result:9:8:9:15:bench/ce/attributes.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": false}
     x [@field:0:contents] [@introduced] [@loop2]
-      [@loop:bench/ce/attributes.mlw:9:2:34] [@mlw:reference_var] =
+      [@loop:bench/ce/attributes.mlw:9:2:9:34] [@mlw:reference_var] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "100"}}]}}
   Line 11:
+    result of call at line 11, characters 25-31 [@call_result:11:25:11:31:bench/ce/attributes.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "200"}
+    result of call at line 11, characters 8-16 [@call_result:11:8:11:16:bench/ce/attributes.mlw]
+      [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Boolean", "val": true}
     x [@field:0:contents] [@introduced] [@mlw:reference_var] =
       {"type": "Record",
        "val":

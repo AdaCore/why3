@@ -1606,7 +1606,7 @@ prefix_op:
 
 %public attrs(X): X attr* { add_attr $1 $2 }
 
-attr:
+%public attr:
 | ATTRIBUTE { ATstr (Ident.create_attribute $1) }
 | POSITION  { ATpos $1 }
 

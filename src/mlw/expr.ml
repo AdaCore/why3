@@ -1375,7 +1375,7 @@ and print_lexpr pri fmt e =
   let print_eloc pri fmt e =
     if Debug.test_flag debug_print_locs && e.e_loc <> None
     then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
-      (Pp.print_option print_loc) e.e_loc (print_eattr 0) e
+      (Pp.print_option print_loc_as_attribute) e.e_loc (print_eattr 0) e
     else print_eattr pri fmt e in
   print_eloc pri fmt e
 

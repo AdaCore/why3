@@ -35,8 +35,8 @@ let add_warning ?loc s =
   let s =
     match loc with
     | Some loc ->
-        let file, line, col1, col2 = Loc.get loc in
-        Format.sprintf "%s:%d:%d-%d: %s" file line col1 col2 s
+        let file, line1, col1, line2, col2 = Loc.get loc in
+        Format.sprintf "%s:(%d:%d)-(%d:%d): %s" file line1 col1 line2 col2 s
     | None -> s
   in
   warning_list := s :: !warning_list

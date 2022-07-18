@@ -1,12 +1,12 @@
-File "bench/check-ce/func_call1.mlw", line 15, characters 6-7:
-warning: unused variable w
+Warning, file "bench/check-ce/func_call1.mlw", line 15, characters 6-7:
+unused variable w
 File "bench/check-ce/func_call1.mlw", line 8, characters 12-21:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Valid (0.04s, 1374 steps).
+Prover result is: Valid (0.04s, 1439 steps).
 
 File "bench/check-ce/func_call1.mlw", line 9, characters 12-26:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Valid (0.02s, 1305 steps).
+Prover result is: Valid (0.02s, 1399 steps).
 
 <check-ce-rac-results>Check model 0 ("bench/check-ce/func_call1.mlw", line 16, characters 11-16)
 <check-ce-rac-results>Checking model:
@@ -32,6 +32,7 @@ Prover result is: Valid (0.02s, 1305 steps).
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "0"}}]}}
                         Line 15:
+                          result = {"type": "Integer", "val": "6"}
                           result = {"type": "Integer", "val": "3"}
                           w = {"type": "Integer", "val": "6"}
                           z =
@@ -175,6 +176,7 @@ Prover result is: Valid (0.02s, 1305 steps).
                                 [{"field": "contents",
                                   "value": {"type": "Integer", "val": "0"}}]}}
                         Line 15:
+                          result = {"type": "Integer", "val": "6"}
                           result = {"type": "Integer", "val": "3"}
                           w = {"type": "Integer", "val": "6"}
                           z =
@@ -303,7 +305,7 @@ Prover result is: Valid (0.02s, 1305 steps).
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call1.mlw", line 16, characters 11-16)
 File "bench/check-ce/func_call1.mlw", line 16, characters 11-16:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6343 steps).
+Prover result is: Unknown (unknown + incomplete) (0.05s, 6364 steps).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:
