@@ -66,3 +66,6 @@ val report_on_last_call : unit -> engine_report
 
 val report : verbosity:int -> engine_report -> unit
 (** prints the report on standard output *)
+
+val register_hook : (engine_report -> unit) -> unit
+(** registers a function to be applied on the report *)

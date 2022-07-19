@@ -11,6 +11,8 @@ open Abstract
 
 let verbose = 1
 
+let debug_bddinfer = Debug.register_flag "bddinfer" ~desc:"BDD-infer"
+
 exception Error of string * string
 
 let translation_error fmt =
@@ -342,7 +344,7 @@ let rec mlw_expr_to_why1_expr env e =
   | Elet(LDrec _,_) ->
      unsupported "mlw_expr_to_why1_expr: execution of local rec"
   | Elet(LDvar(pv,e1),e2) ->
-     if is_type_int pv.pv_ity || is_type_bool pv.pv_ity then
+     if is_type_int pv.Ity.pv_ity || is_type_bool pv.Ity.pv_ity then
        let env, n = declare_why_var_for_pv env ~is_global:false pv in
         let env, e1 = mlw_expr_to_why1_expr env e1 in
         let env, e2 = mlw_expr_to_why1_expr env e2 in
@@ -355,7 +357,7 @@ let rec mlw_expr_to_why1_expr env e =
      else
        unsupported
          "mlw_expr_to_why1_expr: let on variable `%a` of type `%a`"
-         print_vs pv.pv_vs Ity.print_ity pv.pv_ity
+         print_vs pv.Ity.pv_vs Ity.print_ity pv.Ity.pv_ity
    | Eif(e1,e2,e3) ->
       if is_type_bool e2.e_ity && is_type_bool e3.e_ity then
         let env, e1 = mlw_expr_to_why1_expr env e1 in
@@ -398,6 +400,7 @@ let p_expr_bool_operator env op pv1 pv2 =
   env, atomic_cond (op v1 v2)
 
 let rec mlw_expr_to_why1_cond env e =
+  let open Expr in
   let env, c' =
   match e.e_node with
   | Evar    _ (* pvsymbol *) ->
@@ -407,17 +410,17 @@ let rec mlw_expr_to_why1_cond env e =
   | Eexec(cexp,_cty) ->
      begin match cexp.c_node with
      (* FIXME do not match on rs names *)
-     | Capp(rs, [pv1;pv2]) when rs.rs_name.id_string = "infix <=" ->
+     | Capp(rs, [pv1;pv2]) when rs.rs_name.Ident.id_string = "infix <=" ->
         p_expr_bool_operator env c_le pv1 pv2
-     | Capp(rs, [pv1;pv2]) when rs.rs_name.id_string = "infix <" ->
+     | Capp(rs, [pv1;pv2]) when rs.rs_name.Ident.id_string = "infix <" ->
         p_expr_bool_operator env c_lt pv1 pv2
-     | Capp(rs, [pv1;pv2]) when rs.rs_name.id_string = "infix >=" ->
+     | Capp(rs, [pv1;pv2]) when rs.rs_name.Ident.id_string = "infix >=" ->
         p_expr_bool_operator env c_ge pv1 pv2
-     | Capp(rs, [pv1;pv2]) when rs.rs_name.id_string = "infix >" ->
+     | Capp(rs, [pv1;pv2]) when rs.rs_name.Ident.id_string = "infix >" ->
         p_expr_bool_operator env c_gt pv1 pv2
-     | Capp(rs, []) when rs.rs_name.id_string = "True" ->
+     | Capp(rs, []) when rs.rs_name.Ident.id_string = "True" ->
         env, true_cond
-     | Capp(rs, []) when rs.rs_name.id_string = "False" ->
+     | Capp(rs, []) when rs.rs_name.Ident.id_string = "False" ->
         env, false_cond
      | Capp(rs,_args) ->
         unsupported "mlw_expr_to_why1_cond: execution of function `%a`" Expr.print_rs rs
@@ -435,13 +438,13 @@ let rec mlw_expr_to_why1_cond env e =
   | Elet(LDrec _,_) ->
      unsupported "mlw_expr_to_why1_cond: execution of local rec"
   | Elet(LDvar(pv,e1),e2) ->
-     if is_type_int pv.pv_ity || is_type_bool pv.pv_ity then
+     if is_type_int pv.Ity.pv_ity || is_type_bool pv.Ity.pv_ity then
        let env, n = declare_why_var_for_pv env ~is_global:false pv in
        let env, e = mlw_expr_to_why1_expr env e1 in
        let env, c = mlw_expr_to_why1_cond env e2 in
        env, e_let_in_condition n e c
      else
-       unsupported "mlw_expr_to_why1_cond: local let on type `%a`" Ity.print_ity pv.pv_ity
+       unsupported "mlw_expr_to_why1_cond: local let on type `%a`" Ity.print_ity pv.Ity.pv_ity
    | Eif(e1,e2,e3) ->
       if is_type_bool e2.e_ity && is_type_bool e3.e_ity then
         try
@@ -485,7 +488,7 @@ let rec mlw_expr_to_function_call acc env e1 (* : env, rs, args *)
      begin match cexp.c_node with
      (* FIXME do not match on rs names *)
      | Capp(_rs, []) -> raise NotAFunctionCall
-     | Capp(rs, _) when List.mem rs.rs_name.id_string
+     | Capp(rs, _) when List.mem rs.rs_name.Ident.id_string
                           [ "infix +" ; "infix -" ; "infix *" ;
                             "infix <"; "infix >" ; "infix <=" ; "infix >=" ;
                             "contents" ; Ident.op_prefix "!";
@@ -495,7 +498,7 @@ let rec mlw_expr_to_function_call acc env e1 (* : env, rs, args *)
      | Capp(rs,args) ->
         let acc =
           match args with
-          | [pv] when is_type_unit pv.pv_ity -> []
+          | [pv] when is_type_unit pv.Ity.pv_ity -> []
           | _ -> acc
                        (* FIXME: check that args is coherent with acc *)
         in
@@ -541,6 +544,7 @@ let rec mlw_expr_to_why1_stmt env vars e =
         with Not_found -> acc)
       e.e_attrs None)
   in
+  let open Expr in
   let env, vars, s =
     match e.e_node with
     | Evar    _ (* pvsymbol *) ->
@@ -550,13 +554,13 @@ let rec mlw_expr_to_why1_stmt env vars e =
     | Eexec(cexp,_cty) ->
      begin match cexp.c_node with
      (* FIXME do not match on rs names *)
-     | Capp(rs, [pv1;pv2]) when rs.rs_name.id_string = "infix :=" ->
-        let is_ref,ty = type_of pv1.pv_ity in
+     | Capp(rs, [pv1;pv2]) when rs.rs_name.Ident.id_string = "infix :=" ->
+        let is_ref,ty = type_of pv1.Ity.pv_ity in
         assert is_ref;
         let env, x = get_or_declare_why_var_for_pv env pv1 in
         let env, v2 = mlw_pv_to_why1_expr env pv2 in
         env, Ity.Spv.add pv1 vars, s_assign "" ty x v2
-     | Capp(rs,[]) when rs.rs_name.id_string = "Tuple0" ->
+     | Capp(rs,[]) when rs.rs_name.Ident.id_string = "Tuple0" ->
         env, vars, s_block "" []
      | Capp(rs,[]) ->
         unsupported
@@ -565,7 +569,7 @@ let rec mlw_expr_to_why1_stmt env vars e =
         let name = get_or_declare_function rs in
         let env,args =
           match args with
-          | [pv] when is_type_unit pv.pv_ity -> env,[]
+          | [pv] when is_type_unit pv.Ity.pv_ity -> env,[]
           | _ ->
              List.fold_right
                (fun pv (env, args) ->
@@ -583,7 +587,7 @@ let rec mlw_expr_to_why1_stmt env vars e =
      end
     | Eassign [(var,_f,value)] ->
        (* TODO: check that var as type ref int or ref bool, and that f is "contents" *)
-       let is_ref,ty = type_of var.pv_ity in
+       let is_ref,ty = type_of var.Ity.pv_ity in
        assert is_ref;
        let env, n = get_or_declare_why_var_for_pv env var in
        let env, value = mlw_pv_to_why1_expr env value in
@@ -591,8 +595,8 @@ let rec mlw_expr_to_why1_stmt env vars e =
     | Eassign _ (* assign list *) ->
         unsupported "mlw_expr_to_why1_stmt: Eassign (parallel)"
     | Elet(LDvar(pv,e1),e2) ->
-       if is_type_int pv.pv_ity || is_type_bool pv.pv_ity then
-         let is_ref,ty = type_of pv.pv_ity in
+       if is_type_int pv.Ity.pv_ity || is_type_bool pv.Ity.pv_ity then
+         let is_ref,ty = type_of pv.Ity.pv_ity in
          assert (not is_ref);
          let env, res_var = declare_why_var_for_pv env ~is_global:false pv in
          try
@@ -607,7 +611,7 @@ let rec mlw_expr_to_why1_stmt env vars e =
                  assert (not is_ref);
                  (* Format.printf "Going to declare var for pv = %a@," print_pv pv; *)
                  let env, n = declare_why_var_for_pv env ~is_global:false pv in
-                 let v = e_var n Here in
+                 let v = Ast.e_var n Here in
                  (env, v::args, (ty,n,e') :: args_defs))
                args (env, [], [])
            in
@@ -633,13 +637,13 @@ let rec mlw_expr_to_why1_stmt env vars e =
                let pb = s_block "" [pite; s] in
                env,vars,s_let_in "" ty res_var e_bwfalse pb
              end
-       else if is_type_unit pv.pv_ity then
+       else if is_type_unit pv.Ity.pv_ity then
          let env, vars, s1 = mlw_expr_to_why1_stmt env vars e1 in
          let env, vars, s2 = mlw_expr_to_why1_stmt env vars e2 in
          let s = s_sequence "" s1 s2 in
          env, vars, s
        else
-        unsupported "mlw_expr_to_why1_stmt: let on type `%a`" Ity.print_ity pv.pv_ity
+        unsupported "mlw_expr_to_why1_stmt: let on type `%a`" Ity.print_ity pv.Ity.pv_ity
     | Elet(LDsym _,_) ->
        unsupported "mlw_expr_to_why1_stmt: execution of local sym"
     | Elet(LDrec _,_) ->
@@ -695,10 +699,10 @@ let decl_global_vs vs d acc =
     | Tyapp(id,[]) when ts_equal id Ty.ts_int ->  Tint
     | Tyapp(id,[]) when ts_equal id Ty.ts_bool -> Tbool
     | Tyapp(id,[ty]) when
-           id.ts_name.id_string = "ref" && is_ty_int ty ->
+           id.ts_name.Ident.id_string = "ref" && is_ty_int ty ->
        Tint
     | Tyapp(id,[ty]) when
-           id.ts_name.id_string = "ref" && is_ty_bool ty ->
+           id.ts_name.Ident.id_string = "ref" && is_ty_bool ty ->
        Tbool
     | Tyapp(_id,_l) ->
        unsupported "decl_global_vs: type `%a`" Pretty.print_ty ty
@@ -713,8 +717,8 @@ let f_decl_rs tkn mkn env rs name acc : func list =
   (* Format.printf "f_decl : %a@." print_rs rs; *)
   let cty = rs.rs_cty in
   let env, args =
-    match cty.cty_args with
-    | [pv] when is_type_unit pv.pv_ity ->
+    match cty.Ity.cty_args with
+    | [pv] when is_type_unit pv.Ity.pv_ity ->
        env,[]
     | args ->
        List.fold_right (fun pv (env, args) ->
@@ -1158,9 +1162,6 @@ let infer_loop_invs_for_mlw_expr attrs env tkn mkn e cty =
        []
 
 
-let () = Vc.set_infer_invs  infer_loop_invs_for_mlw_expr
-
-
 let print_var_dom fmt (v,d) =
   Format.fprintf fmt "@[%a = %a@]"
     Pretty.print_vs v Abstract.print_domain d
@@ -1170,6 +1171,10 @@ let print_domains fmt m =
     Pp.(print_list semi print_var_dom) (Term.Mvs.bindings m)
 
 let report ~verbosity report =
+  match report.engine_error with
+  | Some(reason,expl) ->
+     Format.printf "BDD-infer failure: %s, %s@." reason expl
+  | None ->
   (* generated loop invariants *)
   Wstdlib.Mstr.iter
     (fun tag (inv,doms) ->
@@ -1182,3 +1187,18 @@ let report ~verbosity report =
     match report.engine_subreport with
     | Some r -> Infer.report ~verbosity r
     | None -> ()
+
+let default_hook r =
+  if Debug.test_flag debug_bddinfer then
+    report ~verbosity:2 r
+
+let hook_report = ref default_hook
+
+let infer_loop_invs attrs env tkn mkn e cty =
+  let l = infer_loop_invs_for_mlw_expr attrs env tkn mkn e cty in
+  !hook_report !last_report;
+  l
+
+let register_hook f = hook_report := f
+
+let () = Vc.set_infer_invs infer_loop_invs
