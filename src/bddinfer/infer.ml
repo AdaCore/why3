@@ -67,14 +67,14 @@ let rec interp_stmt (functions : func list) (state : Abstract.t) (stmt : stateme
   match stmt.stmt_node with
   | Sassign(x, e) ->
      let env = Abstract.why_env state in
-     begin
+     Abstract.begin
        match deref_var env x with
        | RefValue _ | BoolValue _ -> assert false
        | IntValue(v) ->
-          let old = Abstract.VarMap.empty in
-          let aenv = Abstract.apron_env state in
+          let old = VarMap.empty in
+          let aenv = apron_env state in
           let te = Interp_expression.to_expr ~old env aenv e in
-          Abstract.assign_texpr state v te
+          assign_texpr state v te
      end
   | Sassign_bool(x, extrav, e) ->
      let env = Abstract.why_env state in
@@ -294,7 +294,7 @@ let interp_prog (p : why1program) : interp_report =
 
 
 let report ~verbosity report =
-  if verbosity >= 1 then
+  if verbosity >= 2 then
     begin
       (* display generated loop invariants with domains, final
          states of annotated statements, and the final state of
@@ -304,7 +304,7 @@ let report ~verbosity report =
         Format.printf "@[<hov 2>%s:@ @[<hov 2>{ " msg;
         List.iter (fun c -> Format.printf "@[%a@] ;@ " Ast.print_condition c) cs;
         Format.printf "}@]@]@\n@.";
-        if verbosity >= 2 then
+        if verbosity >= 3 then
           Format.printf "@[%s as abstract state is@ %a@]@\n@." msg
             Abstract.print st;
         if domains_msg <> "" then

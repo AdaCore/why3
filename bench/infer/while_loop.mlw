@@ -1,0 +1,12 @@
+
+use int.Int
+
+val ref x : int
+
+let main [@infer] [@bddinfer] () diverges
+ =
+ x <- 0;
+ while x <= 100 do
+   x <- x + 1;
+ done;
+ [@bddinfer:check0] assert { x = 101 }

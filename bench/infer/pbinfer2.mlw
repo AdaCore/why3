@@ -14,11 +14,11 @@ val x1 : ref bool
 val x2 : ref bool
 val x3 : ref bool
 
-let pgmtest[@infer] () : unit = [@vc:divergent]
+let pgmtest [@infer] [@bddinfer] () : unit = [@vc:divergent]
     let a = ref false in
     let b = ref false in
     let c = ref false in
-   	let d = ref false in
+    let d = ref false in
     let e = ref false in
 	while (!x3 && not !x1 && not !x2) do
 

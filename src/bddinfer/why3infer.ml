@@ -595,55 +595,61 @@ let rec mlw_expr_to_why1_stmt env vars e =
     | Eassign _ (* assign list *) ->
         unsupported "mlw_expr_to_why1_stmt: Eassign (parallel)"
     | Elet(LDvar(pv,e1),e2) ->
-       if is_type_int pv.Ity.pv_ity || is_type_bool pv.Ity.pv_ity then
-         let is_ref,ty = type_of pv.Ity.pv_ity in
-         assert (not is_ref);
-         let env, res_var = declare_why_var_for_pv env ~is_global:false pv in
-         try
-           let env, rs, args = mlw_expr_to_function_call [] env e1 in
-           let env,vars,s = mlw_expr_to_why1_stmt env vars e2 in
-           let name = get_or_declare_function rs in
-           let env, args, args_defs =
-             List.fold_right
-               (fun (pv,e) (env, args, args_defs) ->
-                 let env, e' = mlw_expr_to_why1_expr env e in
-                 let is_ref,ty = type_of pv.Ity.pv_ity in
-                 assert (not is_ref);
-                 (* Format.printf "Going to declare var for pv = %a@," print_pv pv; *)
-                 let env, n = declare_why_var_for_pv env ~is_global:false pv in
-                 let v = Ast.e_var n Here in
-                 (env, v::args, (ty,n,e') :: args_defs))
-               args (env, [], [])
-           in
-           let call = s_call "" (Some(ty,res_var,s)) name args in
-           let pre_call =
-             List.fold_right
-               (fun (ty,v,e) acc -> s_let_in "" ty v e acc)
-               args_defs call
-           in
-           env,vars,pre_call
-         with NotAFunctionCall ->
-           try
-             let env, e = mlw_expr_to_why1_expr env e1 in
-             let env,vars,s = mlw_expr_to_why1_stmt env vars e2 in
-             env,vars,s_let_in "" ty res_var e s
-           with NotExpression ->
-             begin
-               let env, e = mlw_expr_to_why1_cond env e1 in
-               let env,vars,s = mlw_expr_to_why1_stmt env vars e2 in
-               let pb = s_block "" [] in
-               let pa = s_assign "" ty res_var e_bwtrue in
-               let pite = s_ite "" e pa pb in
-               let pb = s_block "" [pite; s] in
-               env,vars,s_let_in "" ty res_var e_bwfalse pb
-             end
-       else if is_type_unit pv.Ity.pv_ity then
+        if is_type_unit pv.Ity.pv_ity then
          let env, vars, s1 = mlw_expr_to_why1_stmt env vars e1 in
          let env, vars, s2 = mlw_expr_to_why1_stmt env vars e2 in
          let s = s_sequence "" s1 s2 in
          env, vars, s
-       else
-        unsupported "mlw_expr_to_why1_stmt: let on type `%a`" Ity.print_ity pv.Ity.pv_ity
+        else
+          begin
+         match type_of pv.Ity.pv_ity with
+         | exception _ ->
+            unsupported
+              "@[<hov 2>mlw_expr_to_why1_stmt:@ let on type@ @[`%a`@]@]"
+              Ity.print_ity pv.Ity.pv_ity
+         | (is_ref,ty) ->
+           let env, res_var = declare_why_var_for_pv env ~is_global:false pv in
+           begin
+             try
+             let env, rs, args = mlw_expr_to_function_call [] env e1 in
+             let env,vars,s = mlw_expr_to_why1_stmt env vars e2 in
+             let name = get_or_declare_function rs in
+             let env, args, args_defs =
+               List.fold_right
+                 (fun (pv,e) (env, args, args_defs) ->
+                   let env, e' = mlw_expr_to_why1_expr env e in
+                   let is_ref,ty = type_of pv.Ity.pv_ity in
+                   assert (not is_ref);
+                   (* Format.printf "Going to declare var for pv = %a@," print_pv pv; *)
+                   let env, n = declare_why_var_for_pv env ~is_global:false pv in
+                   let v = Ast.e_var n Here in
+                   (env, v::args, (ty,n,e') :: args_defs))
+                 args (env, [], [])
+             in
+             let call = s_call "" (Some(ty,res_var,s)) name args in
+             let pre_call =
+               List.fold_right
+                 (fun (ty,v,e) acc -> s_let_in "" ty v e acc)
+                 args_defs call
+             in
+             env,vars,pre_call
+           with NotAFunctionCall ->
+             try
+               let env, e = mlw_expr_to_why1_expr env e1 in
+               let env,vars,s = mlw_expr_to_why1_stmt env vars e2 in
+               env,vars,s_let_in "" ty res_var e s
+             with NotExpression ->
+               begin
+                 let env, e = mlw_expr_to_why1_cond env e1 in
+                 let env,vars,s = mlw_expr_to_why1_stmt env vars e2 in
+                 let pb = s_block "" [] in
+                 let pa = s_assign "" ty res_var e_bwtrue in
+                 let pite = s_ite "" e pa pb in
+                 let pb = s_block "" [pite; s] in
+                 env,vars,s_let_in "" ty res_var e_bwfalse pb
+               end
+           end
+           end
     | Elet(LDsym _,_) ->
        unsupported "mlw_expr_to_why1_stmt: execution of local sym"
     | Elet(LDrec _,_) ->
@@ -723,7 +729,7 @@ let f_decl_rs tkn mkn env rs name acc : func list =
     | args ->
        List.fold_right (fun pv (env, args) ->
            let env, n = declare_why_var_for_pv env ~is_global:false pv in
-           let (b,ty) = type_of pv.pv_ity in
+           let (b,ty) = type_of pv.Ity.pv_ity in
            env, (b, ty, n)::args
          ) args (env, [])
   in
@@ -781,10 +787,10 @@ let f_decl_rs tkn mkn env rs name acc : func list =
        writes
   in
   let writes =
-    Ity.Spv.fold add_write cty.cty_effect.eff_reads VarMap.empty
+    Ity.(Spv.fold add_write cty.cty_effect.eff_reads VarMap.empty)
   in
   let writes =
-    List.fold_right add_write cty.cty_args writes
+    List.fold_right add_write cty.Ity.cty_args writes
   in
   (*
   Format.eprintf
@@ -798,20 +804,20 @@ let f_decl_rs tkn mkn env rs name acc : func list =
         let env,_v =
           declare_why_var_for_pv env ~is_global:false ~is_old_for pv1 in
         env)
-    cty.cty_oldies env
+    cty.Ity.cty_oldies env
   in
   let env,result,post =
     List.fold_left
       (fun (env,result,acc) t ->
         let env, result, t' =
           match result, t.Term.t_node with
-          | None, Teps tb ->
+          | None, Term.Teps tb ->
              let v,t = Term.t_open_bound tb in
              (* Format.eprintf "result = %a@." print_vs v; *)
              let env,res = declare_why_var_for_vs ~is_global:false ~is_result:true env v in
              let (env, t) = mlw_term_to_why1_cond env t in
              let res =
-               try Some(type_of_ty v.vs_ty,res) with
+               try Some(type_of_ty v.Term.vs_ty,res) with
                  Invalid_argument _ -> result
              in
              (env, res, t)
@@ -1190,7 +1196,7 @@ let report ~verbosity report =
 
 let default_hook r =
   if Debug.test_flag debug_bddinfer then
-    report ~verbosity:2 r
+    report ~verbosity:1 r
 
 let hook_report = ref default_hook
 
