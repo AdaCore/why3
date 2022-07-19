@@ -413,7 +413,9 @@ let unit_module =
 
 let itd_ref =
   let tv = create_tvsymbol (id_fresh "a") in
-  let pj = create_pvsymbol (id_fresh "contents") (ity_var tv) in
+  let attrs = Sattr.singleton is_field_id_attr in
+  let id_contents = id_fresh ~attrs "contents" in
+  let pj = create_pvsymbol id_contents (ity_var tv) in
   create_plain_record_decl ~priv:false ~mut:true (id_fresh "ref")
                                             [tv] [true, pj] [] None
 
