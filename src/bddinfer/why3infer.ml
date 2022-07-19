@@ -258,13 +258,18 @@ let is_type_unit ity =
   | Ityapp(id,[],[]) when its_equal id Ity.its_unit -> true
   | _ -> false
 
-let type_of ity =
+let rec type_of ity =
   let open Ity in
   match ity.ity_node with
   | Ityapp(id,[],[]) when its_equal id Ity.its_int -> (false,Tint)
   | Ityapp(id,[],[]) when its_equal id Ity.its_bool -> (false,Tbool)
-  | Ityapp(_id,_l1,_l2) ->
-     unsupported "type_of: application type `%a`" Ity.print_ity ity
+  | Ityapp(id,[t1],[]) when id.Ity.its_ts.Ty.ts_name.Ident.id_string = "ref"->
+     let _, ty = type_of t1 in (true,ty)
+  | Ityapp(id,l1,l2) ->
+     unsupported "@[type_of:@ @[`Ityapp(%a,@[[%a]@],@[[%a]@])`@]@]"
+       Pretty.print_ts id.Ity.its_ts
+       Pp.(print_list semi Ity.print_ity) l1
+       Pp.(print_list semi Ity.print_ity) l2
   | Ityreg { reg_its; reg_args = [ty]; _ } when
          reg_its.its_ts.Ty.ts_name.Ident.id_string = "ref" && is_type_int ty ->
      (true,Tint)
@@ -272,9 +277,9 @@ let type_of ity =
          reg_its.its_ts.Ty.ts_name.Ident.id_string = "ref" && is_type_bool ty ->
      (true,Tbool)
   | Ityreg _r ->
-     unsupported "type_of: region type `%a`" Ity.print_ity ity
+     unsupported "@[type_of:@ region type @[`%a`@]@]" Ity.print_ity ity
   | Ityvar _ ->
-     unsupported "type_of: type variable `%a`" Ity.print_ity ity
+     unsupported "@[type_of:@ type variable @[`%a`@]@]" Ity.print_ity ity
 
 
 let p_expr_operator env op pv1 pv2 =
@@ -603,10 +608,10 @@ let rec mlw_expr_to_why1_stmt env vars e =
         else
           begin
          match type_of pv.Ity.pv_ity with
-         | exception _ ->
+         | exception (Error(msg,expl)) ->
             unsupported
-              "@[<hov 2>mlw_expr_to_why1_stmt:@ let on type@ @[`%a`@]@]"
-              Ity.print_ity pv.Ity.pv_ity
+              "@[<hov 2>mlw_expr_to_why1_stmt:@ let on type@ @[`%a`@] (%s)@]"
+              Ity.print_ity pv.Ity.pv_ity expl
          | (is_ref,ty) ->
            let env, res_var = declare_why_var_for_pv env ~is_global:false pv in
            begin

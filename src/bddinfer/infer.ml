@@ -67,7 +67,7 @@ let rec interp_stmt (functions : func list) (state : Abstract.t) (stmt : stateme
   match stmt.stmt_node with
   | Sassign(x, e) ->
      let env = Abstract.why_env state in
-     Abstract.begin
+     Abstract.(begin
        match deref_var env x with
        | RefValue _ | BoolValue _ -> assert false
        | IntValue(v) ->
@@ -75,20 +75,20 @@ let rec interp_stmt (functions : func list) (state : Abstract.t) (stmt : stateme
           let aenv = apron_env state in
           let te = Interp_expression.to_expr ~old env aenv e in
           assign_texpr state v te
-     end
+     end)
   | Sassign_bool(x, extrav, e) ->
      let env = Abstract.why_env state in
-     begin
+     Abstract.(begin
        match deref_var env x with
        | IntValue _ | RefValue _ -> assert false
        | BoolValue v ->
           (* Format.printf "@[State before assign bool =@ %a@]@." Abstract.print state; *)
            (* we have in state x -> v, we evaluate expression e as a BDD, which may use v *)
-          let b = Interp_expression.interp_bool_expr ~old:Abstract.VarMap.empty env e in
-          let state1 = Abstract.interp_bool_assign state v extrav b in
+          let b = Interp_expression.interp_bool_expr ~old:VarMap.empty env e in
+          let state1 = interp_bool_assign state v extrav b in
           (* Format.printf "@[State after assign bool =@ %a@]@." Abstract.print state1; *)
           state1
-     end
+     end)
 
   | Swhile(cond, user_invariants, body) ->
       let invariant = interp_loop functions 0 state cond body in
