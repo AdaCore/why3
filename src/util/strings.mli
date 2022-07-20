@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** {1 Additional Useful Functions on Character Strings} *)
+(** {1 Utility Functions on Character Strings} *)
 
 (** {2 Wrappers for deprecated string functions of OCaml stdlib} *)
 

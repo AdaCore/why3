@@ -1912,6 +1912,7 @@ MODULESTODOC = \
 	core/ident core/ty core/term core/decl core/coercion core/theory \
 	core/env core/task core/trans core/pretty core/printer \
 	core/model_parser \
+	parser/ptree.ml \
 	parser/ptree_helpers parser/typing parser/mlw_printer \
 	driver/whyconf driver/call_provers driver/driver \
 	transform/args_wrapper \
@@ -1920,9 +1921,13 @@ MODULESTODOC = \
 	session/session_itp session/controller_itp \
 	session/itp_communication session/itp_server
 
-MODULESMLTODOC = parser/ptree
+ifeq (@enable_bddinfer@,yes)
+	MODULESTODOC +=	bddinfer/why3infer
+endif
 
-FILESTODOC = $(MODULESTODOC:%=src/%.mli) $(MODULESMLTODOC:%=src/%.ml)
+MODULESTODOCFULL = $(MODULESTODOC:%=src/%.mli)
+
+FILESTODOC = $(MODULESTODOCFULL:%.ml.mli=%.ml)
 
 doc/apidoc:
 	mkdir -p doc/apidoc

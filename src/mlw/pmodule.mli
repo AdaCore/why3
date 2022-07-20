@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {1 WhyML program modules} *)
+
 open Wstdlib
 open Ident
 open Ty
@@ -18,8 +20,6 @@ open Theory
 open Ity
 open Expr
 open Pdecl
-
-(** *)
 
 type prog_symbol =
   | PV of pvsymbol

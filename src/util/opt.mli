@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Useful option combinators *)
+(** {1 Combinators on [option] type} *)
 
 val inhabited : 'a option -> bool
 

@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** {1 Basic definitions for Pinterp and Rac}
+(** {1 WhyML program interpreter: basic definitions}
 
 {[
           Pinterp_core
