@@ -1,13 +1,12 @@
 
 (**
 
-{1 Inference of loop invariants for WhyML code, using bddinfer subcomponent}
-
-TODO list:
-
-- do not identify library symbols using string names
+{1 Inference of loop invariants for WhyML code, using BDDinfer
+   subcomponent}
 
 *)
+
+(*open Why3*) (* to comment out when inside Why3 *)
 
 
 val infer_loop_invs_for_mlw_expr :

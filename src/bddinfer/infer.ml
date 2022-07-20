@@ -5,6 +5,8 @@
 
 *)
 
+(*open Why3*) (* to comment out when inside Why3 *)
+
 
 open Ast
 

@@ -5,6 +5,7 @@
 
 *)
 
+(*open Why3*) (* to comment out when inside Why3 *)
 
 open Apron
 
@@ -29,8 +30,6 @@ module VarMap = Map.Make(struct
                   type t = why_var
                   let compare = compare_var
                 end)
-
-module StrMap = Map.Make(String)
 
 type var_value = IntValue of Apron.Var.t | RefValue of why_var | BoolValue of Bdd.variable
 
@@ -500,8 +499,9 @@ let get_int x =
   | _ -> assert false
 
 let get_apron_interval i  =
-  if Interval.is_bottom i then raise Bottom;
-  if Interval.is_top i then
+  let open Interval in
+  if is_bottom i then raise Bottom;
+  if is_top i then
     { id_min = None; id_max = None }
   else
     let id_min =
@@ -564,7 +564,7 @@ let print fmt s =
                       @[<hv 2>domains:@ @[%a@];@]@ \
                       @[<hv 2>reduced_bdd:@ @[%a@];@] }@]"
     print_env s.map_state
-    (fun fmt -> Environment.print fmt) s.apron_state.env
+    (fun fmt -> Environment.print fmt) s.apron_state.Abstract1.env
     Abstract1.print s.apron_state
     B.print_compact s.bdd_state
     print_domains doms

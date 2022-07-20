@@ -9,8 +9,9 @@ TODO list:
 *)
 
 
-open Ast
 open Apron
+open Ast
+open Abstract
 
 let make_cst : string -> Texpr1.expr = fun c ->
     Texpr1.Cst (Coeff.s_of_mpq (Mpq.of_string c))
@@ -19,15 +20,15 @@ let make_binop : Texpr1.binop -> Texpr1.expr -> Texpr1.expr -> Texpr1.expr = fun
     Texpr1.Binop (op, e1, e2, Texpr1.Int, Texpr1.Zero)
 
 let rec get_var env v =
-  Abstract.(match VarMap.find v env with
+  (match VarMap.find v env with
   | RefValue x -> get_var env x
   | (IntValue _ | BoolValue _) as v -> v
   | exception Not_found ->
      Format.printf "[Interp_expression.get_var] v = %a env = %a@."
-       Abstract.print_var v Abstract.print_env env;
+       print_var v print_env env;
      assert false)
 
-let rec to_texpr ~old (env: Abstract.why_env) (e : expression) : Texpr1.expr =
+let rec to_texpr ~old (env: why_env) (e : expression) : Texpr1.expr =
     match e with
     | Evar (v, Here) ->
       begin
@@ -56,9 +57,9 @@ let rec to_texpr ~old (env: Abstract.why_env) (e : expression) : Texpr1.expr =
     | Ebwor _ ->
        assert false (* no Boolean expression here *)
 
-let atomic_condition_to_tcons ~old (a : Abstract.t) (c:atomic_condition) : Tcons1.t =
-    let whyenv = Abstract.why_env a in
-    let env = Abstract.apron_env a in
+let atomic_condition_to_tcons ~old (a : t) (c:atomic_condition) : Tcons1.t =
+    let whyenv = why_env a in
+    let env = apron_env a in
     match c with
     | Ceq (e1, e2) ->
         let e = to_texpr ~old whyenv (e_sub e1 e2) |> Texpr1.of_expr env in
@@ -87,57 +88,57 @@ let to_expr ~old whyenv apronenv e =
 
 (** interpretation of Boolean expressions *)
 
-let rec interp_bool_expr ~old env (e : expression) : Abstract.B.t =
+let rec interp_bool_expr ~old env (e : expression) : B.t =
   match e with
   | Evar (v, Here) ->
      begin match get_var env v with
-     | BoolValue v -> Abstract.B.mk_var v
+     | BoolValue v -> B.mk_var v
      | _ -> assert false
      end
   | Evar (v, Old) ->
      begin match get_var old v with
-     | BoolValue v -> Abstract.B.mk_var v
+     | BoolValue v -> B.mk_var v
      | _ -> assert false
      end
   | Ebwand(e1,e2) ->
-     Abstract.B.mk_and (interp_bool_expr ~old env e1) (interp_bool_expr ~old env e2)
+     B.mk_and (interp_bool_expr ~old env e1) (interp_bool_expr ~old env e2)
   | Ebwor(e1,e2) ->
-     Abstract.B.mk_or (interp_bool_expr ~old env e1) (interp_bool_expr ~old env e2)
+     B.mk_or (interp_bool_expr ~old env e1) (interp_bool_expr ~old env e2)
   | Ebwnot(e) ->
-     Abstract.B.mk_not (interp_bool_expr ~old env e)
-  | Ebwtrue -> Abstract.B.one
-  | Ebwfalse -> Abstract.B.zero
+     B.mk_not (interp_bool_expr ~old env e)
+  | Ebwtrue -> B.one
+  | Ebwfalse -> B.zero
   | Ecst _ | Eadd _ | Esub _ | Emul _ | Ediv _ | Emod _ -> assert false
 
-let meet_atomic_condition ~old (state : Abstract.t)  (c:atomic_condition) : Abstract.t =
+let meet_atomic_condition ~old (state : t)  (c:atomic_condition) : t =
     match c with
     | Cne_bool (e1, e2) ->
-        let env = Abstract.why_env state in
+        let env = why_env state in
         let b1 = interp_bool_expr ~old env e1 in
         let b2 = interp_bool_expr ~old env e2 in
-        let b = Abstract.B.(mk_iff b1 b2) in
-        Abstract.meet_with_bdd state (Abstract.B.mk_not b)
+        let b = B.(mk_iff b1 b2) in
+        meet_with_bdd state (B.mk_not b)
     | Ceq_bool(e1,e2) ->
-       let env = Abstract.why_env state in
+       let env = why_env state in
        let b1 = interp_bool_expr ~old env e1 in
        let b2 = interp_bool_expr ~old env e2 in
-       let b = Abstract.B.(mk_iff b1 b2) in
-       Abstract.meet_with_bdd state b
+       let b = B.(mk_iff b1 b2) in
+       meet_with_bdd state b
     | C_is_false e ->
-       let env = Abstract.why_env state in
+       let env = why_env state in
        let b = interp_bool_expr ~old env e in
-       let b = Abstract.B.(mk_not b) in
-       Abstract.meet_with_bdd state b
+       let b = B.(mk_not b) in
+       meet_with_bdd state b
     | C_is_true e ->
-       let env = Abstract.why_env state in
+       let env = why_env state in
        let b = interp_bool_expr ~old env e in
-       Abstract.meet_with_bdd state b
+       meet_with_bdd state b
     | _ ->
         let a = atomic_condition_to_tcons ~old state c in
-        let apron_env = Abstract.apron_env state in
+        let apron_env = apron_env state in
         let array_cond = Tcons1.array_make apron_env 1 in
         Tcons1.array_set array_cond 0 a;
-        Abstract.meet_with_tcons_array state apron_env array_cond
+        meet_with_tcons_array state apron_env array_cond
 
 
 
@@ -154,7 +155,7 @@ let lincons_to_expression m l =
     (fun e (v, c) ->
       match v with
       | Some(apron_var) ->
-         let why_v = Abstract.ApronVarMap.find apron_var m in
+         let why_v = ApronVarMap.find apron_var m in
          eadd (emul (e_var why_v Here) c) e
       | None ->
          eadd (e_cst (Z.to_string c)) e)
@@ -210,8 +211,8 @@ let rec formula_to_conditions env acc f =
      Ast.atomic_cond (Ast.c_is_true (formula_to_atomic_condition env f))::acc
 
 let abstract_state_to_conditions s =
-  let lincons = Abstract.get_lincons s in
-  let m = Abstract.invert_varmap_int s in
+  let lincons = get_lincons s in
+  let m = invert_varmap_int s in
   let integer_conditions =
     List.rev_map
       (fun c ->
@@ -224,9 +225,9 @@ let abstract_state_to_conditions s =
         c)
       (Array.to_list lincons)
   in
-  let b = Abstract.boolean_substate s in
-  let f = Abstract.B.as_compact_formula b in
-  let m = Abstract.invert_varmap_bool s in
+  let b = boolean_substate s in
+  let f = B.as_compact_formula b in
+  let m = invert_varmap_bool s in
 (*
   if !Common.verbose >= 2 then
     Format.printf "@[Converting to Boolean condition @ @[@]@]@.";
@@ -243,12 +244,12 @@ let abstract_state_to_conditions s =
 
 (** meet an abstract state and a condition *)
 
-let rec meet_condition ~old (state: Abstract.t) (c:condition) : Abstract.t =
+let rec meet_condition ~old (state: t) (c:condition) : t =
     match c with
     | BTrue -> state
-    | BFalse -> let env = Abstract.why_env state in Abstract.bottom env
-    | BAnd (c1, c2) -> Abstract.meet (meet_condition ~old state c1) (meet_condition ~old state c2)
-    | BOr (c1, c2) -> Abstract.join (meet_condition ~old state c1) (meet_condition ~old state c2)
+    | BFalse -> let env = why_env state in bottom env
+    | BAnd (c1, c2) -> meet (meet_condition ~old state c1) (meet_condition ~old state c2)
+    | BOr (c1, c2) -> join (meet_condition ~old state c1) (meet_condition ~old state c2)
     | BAtomic c ->
        meet_atomic_condition ~old state c
 
@@ -257,17 +258,17 @@ let meet_with_variable_equality state v1 v2 =
   let open Abstract in
   match v1, v2 with
   | BoolValue b1, BoolValue b2 ->
-     let b = Abstract.B.(mk_iff (mk_var b1) (mk_var b2)) in
-     Abstract.meet_with_bdd state b
+     let b = B.(mk_iff (mk_var b1) (mk_var b2)) in
+     meet_with_bdd state b
   | IntValue n1, IntValue n2 ->
      let v1 = Texpr1.Var n1 in
      let v2 = Texpr1.Var n2 in
      let e = make_binop Texpr1.Sub v1 v2 in
-     let env = Abstract.apron_env state in
+     let env = apron_env state in
      let e = Texpr1.of_expr env e in
      let a = Tcons1.make e Tcons1.EQ in
-     let apron_env = Abstract.apron_env state in
+     let apron_env = apron_env state in
      let array_cond = Tcons1.array_make apron_env 1 in
      Tcons1.array_set array_cond 0 a;
-     Abstract.meet_with_tcons_array state apron_env array_cond
+     meet_with_tcons_array state apron_env array_cond
   | _ -> assert false

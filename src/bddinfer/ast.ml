@@ -4,6 +4,8 @@
 
  *)
 
+(*open Why3*) (* to comment out when inside Why3 *)
+
 type var_type =
     | Tint
     | Tbool

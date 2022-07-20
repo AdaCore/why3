@@ -5,6 +5,9 @@
 
 *)
 
+(*open Why3*) (* to comment out when inside Why3 *)
+
+
 type interp_report = {
     final_state : Abstract.t;
     invariants : Abstract.t Wstdlib.Mstr.t;

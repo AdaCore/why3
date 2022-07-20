@@ -1,9 +1,18 @@
 
 (**
 
-{1 Inference of loop invariants for WhyML code, using bddinfer subcomponent}
+{1 Inference of loop invariants for WhyML code, using bddinfer
+   subcomponent}
+
+TODO list:
+
+- do not identify library symbols using string names. In other words,
+   get rid of all `when` clause using `id_string`
 
 *)
+
+(*open Why3*) (* to comment out when inside Why3 *)
+
 
 open Expr
 open Ast
@@ -520,11 +529,13 @@ let rec mlw_expr_to_function_call acc env e1
      | Capp(rs,args) ->
         let args =
           match args with
-          | [pv] when is_type_unit pv.Ity.pv_ity -> []
+          | [pv] when is_type_unit pv.Ity.pv_ity ->
+             (* call to `f ()` should be seen as a call to an empty
+                list of arguments *)
+             []
           | _ -> args
         in
         env, rs, acc, args
-     (* FIXME: should we reverse acc ? *)
      | Cpur _ (* lsymbol * pvsymbol list *) ->
         unsupported "mlw_expr_to_function_call: Cpur"
      | Cfun _ (* expr *) ->
@@ -533,7 +544,13 @@ let rec mlw_expr_to_function_call acc env e1
         unsupported "mlw_expr_to_function_call: Cany"
      end
   | Elet(LDvar(pv,e1),e2) ->
-     mlw_expr_to_function_call ((pv,e1)::acc) env e2
+     if is_type_unit pv.Ity.pv_ity then
+       (* workaround for the time we don't support the unit type as a value
+          useful for the shape `let o = () in f o`
+        *)
+       mlw_expr_to_function_call acc env e2
+     else
+       mlw_expr_to_function_call ((pv,e1)::acc) env e2
   | _ -> raise NotAFunctionCall
 
 
@@ -879,7 +896,8 @@ let builtin_symbols = Wstdlib.Hstr.create 17
 let add_int = Ident.op_infix "+"
 let sub_int = Ident.op_infix "-"
 let mul_int = Ident.op_infix "*"
-let div_int = Ident.op_infix "/"
+(* let div_int = Ident.op_infix "/" *)
+let minus_int = Ident.op_prefix "-"
 let ge_int = Ident.op_infix ">="
 let gt_int = Ident.op_infix ">"
 let le_int = Ident.op_infix "<="
@@ -897,12 +915,12 @@ let built_in_symbols =
     ];
     ["int"],"Int", [],
     [ add_int;
-      Ident.op_infix "-";
+      sub_int;
       mul_int;
-      Ident.op_prefix "-";
-      Ident.op_infix "<";
-      Ident.op_infix "<=";
-      Ident.op_infix ">";
+      minus_int;
+      lt_int;
+      le_int;
+      gt_int;
       ge_int;
     ] ;
     ["ref"],"Ref", [],
@@ -981,7 +999,8 @@ and expression_to_term rev_map e =
   | Eadd(e1,e2) -> binop_to_term rev_map add_int e1 e2
   | Esub(e1,e2) -> binop_to_term rev_map sub_int e1 e2
   | Emul(e1,e2) -> binop_to_term rev_map mul_int e1 e2
-  | Ediv(e1,e2) -> binop_to_term rev_map div_int e1 e2
+  | Ediv(_e1,_e2) -> (* binop_to_term rev_map div_int e1 e2 *)
+     translation_error "expression_to_term: Ediv"
   | Emod _ (* expression * expression *) ->
      translation_error "expression_to_term: Emod"
   | Ebwtrue -> t_bool_true
