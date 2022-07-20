@@ -365,6 +365,8 @@ let rec mlw_expr_to_why1_expr env e =
         env, e_bwtrue
      | Capp(rs, []) when rs.rs_name.Ident.id_string = "False" ->
         env, e_bwfalse
+     | Capp(rs, [_; _]) when rs.rs_name.Ident.id_string = "infix =" ->
+        raise NotExpression
      | Capp(rs, [_; _]) when rs.rs_name.Ident.id_string = "infix <=" ->
         raise NotExpression
      | Capp(rs, [_; _]) when rs.rs_name.Ident.id_string = "infix <" ->
