@@ -15,7 +15,7 @@ val y : ref int
 
 (* just the expression 'x=y' *)
 
-let test1 [@infer:Polyhedra:4] () : unit =
+let test1 [@infer:Polyhedra:4] [@bddinfer] () : unit =
   x := 0;
   y := 0;
   while (!x <= 10) do

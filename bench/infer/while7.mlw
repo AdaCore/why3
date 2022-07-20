@@ -4,7 +4,7 @@ module While7
 	use ref.Ref
 
 	exception Myexc int
-	let b[@infer](_:int) : int
+	let b[@infer] [@bddinfer] (_:int) : int
 	ensures { result = 102 }
 	=
 		let i = ref 0 in
@@ -16,7 +16,7 @@ module While7
 		done;
 		!i
 
-	let b2[@infer:oct](_:int) : int
+	let b2[@infer:oct] [@bddinfer] (_:int) : int
 	ensures { result = 102 }
 	=
 		let i = ref 0 in
@@ -28,7 +28,7 @@ module While7
 		done;
 		!i
 
-	let b3[@infer:box](_:int) : int
+	let b3[@infer:box] [@bddinfer] (_:int) : int
 	ensures { result = 102 }
 	=
 		let i = ref 0 in

@@ -5,7 +5,7 @@ module Test
 	use ref.Refint
 	use int.Int
 
-	let basic[@infer](x:int): unit
+	let basic [@bddinfer] [@infer](x:int): unit
 	=
 		let a = make x 2 in
 		while (true) do
@@ -14,7 +14,7 @@ module Test
 		()
 		done; ()
 
-	let basic1[@infer:oct](x:int): unit
+	let basic1 [@bddinfer] [@infer:oct](x:int): unit
 	=
 		let a = make x 2 in
 		while (true) do
@@ -23,7 +23,7 @@ module Test
 		()
 		done; ()
 
-	let basic2[@infer:box](x:int): unit
+	let basic2 [@bddinfer] [@infer:box](x:int): unit
 	=
 		let a = make x 2 in
 		while (true) do
@@ -204,7 +204,7 @@ module Test
 		incr k;
 		done; a
 
-	let instantiation[@infer](n: int): unit
+	let instantiation [@bddinfer] [@infer](n: int): unit
 		requires { n >= 0 }
 		=
 		let a = make n 10 in
@@ -216,7 +216,7 @@ module Test
 		done;
 		()
 
-	let instantiation2[@infer:oct](n: int): unit
+	let instantiation2 [@bddinfer] [@infer:oct](n: int): unit
 		requires { n >= 0 }
 		=
 		let a = make n 10 in
@@ -228,7 +228,7 @@ module Test
 		done;
 		()
 
-	let instantiation3[@infer:box](n: int): unit
+	let instantiation3 [@bddinfer] [@infer:box](n: int): unit
 		requires { n >= 0 }
 		=
 		let a = make n 10 in

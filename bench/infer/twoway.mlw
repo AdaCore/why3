@@ -35,7 +35,7 @@ module TwoWaySort
   predicate sorted (a: array bool) =
     forall i1 i2: int. 0 <= i1 <= i2 < a.length -> a[i1] << a[i2]
 
-  let two_way_sort[@infer](a: array bool) : unit
+  let two_way_sort [@bddinfer] [@infer](a: array bool) : unit
   requires { length a >= 0 }
     writes { a }
     ensures { sorted a }
@@ -57,7 +57,7 @@ module TwoWaySort
       end
     done
 
-  let two_way_sort3[@infer:box](a: array bool) : unit
+  let two_way_sort3 [@bddinfer] [@infer:box](a: array bool) : unit
   requires { length a >= 0 }
     writes { a }
     ensures { sorted a }

@@ -17,7 +17,7 @@ module BinarySearch
   val mydiv(x:int):int
   ensures { 2*result = x }
 
-  let binary_search[@infer](a : array int) (v : int)
+  let binary_search [@bddinfer] [@infer](a : array int) (v : int)
     requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
     ensures  { 0 <= result < length a /\ a[result] = v }
     raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
@@ -44,7 +44,7 @@ module BinarySearch
       i
     end
 
-  let binary_search2[@infer:oct](a : array int) (v : int)
+  let binary_search2 [@bddinfer] [@infer:oct](a : array int) (v : int)
     requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
     ensures  { 0 <= result < length a /\ a[result] = v }
     raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
@@ -71,7 +71,7 @@ module BinarySearch
       i
     end
 
-  let binary_search3[@infer:box](a : array int) (v : int)
+  let binary_search3 [@bddinfer] [@infer:box](a : array int) (v : int)
     requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
     ensures  { 0 <= result < length a /\ a[result] = v }
     raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }

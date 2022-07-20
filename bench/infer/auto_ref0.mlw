@@ -4,7 +4,7 @@ module Test
 	use ref.Ref
 	use int.Int
 
-	let b[@infer](_:unit): unit
+	let b [@bddinfer] [@infer](_:unit): unit
 	=
 		let k = ref 0 in
 		while (true) do
@@ -13,7 +13,7 @@ module Test
 		()
 		done; ()
 
-	let b2[@infer:oct](_:unit): unit
+	let b2 [@bddinfer] [@infer:oct](_:unit): unit
 	=
 		let k = ref 0 in
 		while (true) do
@@ -22,7 +22,7 @@ module Test
 		()
 		done; ()
 
-	let b3[@infer:box](_:unit): unit
+	let b3 [@bddinfer] [@infer:box](_:unit): unit
 	=
 		let k = ref 0 in
 		while (true) do

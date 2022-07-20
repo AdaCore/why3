@@ -264,6 +264,10 @@ ifeq (@enable_infer@,yes)
 LIB_INFER = o2oterm domain infer_why3 quant_domain union_find disjunctive_term_domain uf_domain infer_cfg infer_loop
 endif
 
+ifeq (@enable_bddinfer@,yes)
+LIB_BDDINFER = bdd abstract ast interp_expression infer why3infer
+endif
+
 LIB_EXTRACT = mltree compile mlinterp pdriver ml_printer \
               c ocaml cakeml
 
@@ -306,6 +310,7 @@ LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/driver/, $(LIB_DRIVER)) \
 	      $(addprefix src/mlw/, $(LIB_MLW)) \
 	      $(addprefix src/infer/, $(LIB_INFER)) \
+	      $(addprefix src/bddinfer/, $(LIB_BDDINFER)) \
 	      $(addprefix src/extract/, $(LIB_EXTRACT)) \
 	      $(addprefix src/parser/, $(LIB_PARSER)) \
 	      $(addprefix src/transform/, $(LIB_TRANSFORM)) \
@@ -316,6 +321,10 @@ LIBDIRS = util core driver mlw extract parser transform printer session
 
 ifeq (@enable_infer@,yes)
 	LIBDIRS += infer
+endif
+
+ifeq (@enable_bddinfer@,yes)
+	LIBDIRS += bddinfer
 endif
 
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
@@ -1761,10 +1770,15 @@ ifeq (@enable_infer@,yes)
 	APITESTS += mlw_tree_infer_invs
 endif
 
+ifeq (@enable_infer@,yes)
+	APITESTS += mlw_tree_bddinfer_invs
+endif
+
 bench-api: $(addprefix test-api-, $(APITESTS))
 
 clean::
 	rm -rf bench/infer/*.out
+	rm -rf bench/bddinfer/*.out
 	rm -rf bench/check-ce/*.out
 
 ###############

@@ -1,0 +1,15 @@
+CFG size: 45 nodes, 46 hyperedges
+Time elapsed 0.024223
+### Debug: inferred invariants ###
+((contents y = contents x /\ 0 <= contents x) /\ contents x <= 11) /\
+contents x = contents y
+###
+CFG size: 51 nodes, 52 hyperedges
+Time elapsed 0.035546
+### Debug: inferred invariants ###
+(((contents y = contents x /\ contents b = True) /\ 0 <= contents x) /\
+ contents x <= 11) /\
+contents x = contents y
+###
+bench/infer/ifbool.mlw Top test1'vc: Valid (0.00s, 12 steps)
+bench/infer/ifbool.mlw Top test2'vc: Valid (0.00s, 14 steps)

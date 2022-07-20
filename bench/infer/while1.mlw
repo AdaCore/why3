@@ -3,7 +3,7 @@ module While1
 	use int.Int
 	use ref.Ref
 
-	let b[@infer](_:int) : int
+	let b [@infer] [@bddinfer] (_:int) : int
 	ensures { result = 18 }
 	=
 		let i = ref 1 in
@@ -15,7 +15,7 @@ module While1
 		done;
 		!j
 
-	let b2[@infer:oct](_:int) : int
+	let b2 [@infer:oct] [@bddinfer] (_:int) : int
 	ensures { result = 18 }
 	=
 		let i = ref 1 in
@@ -27,7 +27,7 @@ module While1
 		done;
 		!j
 
-	let b3[@infer:box](_:int) : int
+	let b3 [@infer:box] [@bddinfer] (_:int) : int
 	ensures { result = 18 }
 	=
 		let i = ref 1 in

@@ -2,13 +2,14 @@
 
 use ref.Ref
 use int.Int
+use bool.Bool
 
 val random_bool () : bool
 
 val andb (x:bool) (y:bool) : bool
   ensures { result = True <-> x = True /\ y = True }
 
-let f [@infer] () : bool
+let f  [@bddinfer] [@infer] () : bool
  diverges
  =
     let x = ref True in

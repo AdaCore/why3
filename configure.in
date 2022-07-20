@@ -64,6 +64,13 @@ AC_ARG_ENABLE(zip,
 AC_ARG_ENABLE(infer,
     AS_HELP_STRING([--enable-infer], [use apron and fixpoint to infer loop invariants]),,
     enable_infer=no)
+
+# bddinfer
+
+AC_ARG_ENABLE(bddinfer,
+    AS_HELP_STRING([--enable-bddinfer], [use apron and BDDs to infer loop invariants]),,
+    enable_bddinfer=no)
+
 # js_of_ocaml
 
 AC_ARG_ENABLE(js_of_ocaml,
@@ -483,6 +490,25 @@ else
    BIGINTINCLUDE="$NUMINCLUDE"
 fi
 
+# checking for apron for bddinfer
+if test "$enable_bddinfer" = yes; then
+   if test "$enable_ocamlfind" = yes; then
+      # gmp is a dependency of apron
+      INFERINCLUDE=$($OCAMLFIND query -separator ' ' -i-format apron)
+   fi
+   if test -n "$INFERINCLUDE"; then
+      echo "ocamlfind found apron in $INFERINCLUDE"
+      INFERLIB="apron"
+      INFERPKG="zarith apron apron.polkaMPQ"
+   else
+      enable_bddinfer=no
+      reason_bddinfer=" (apron not found)"
+      AC_MSG_WARN([Lib apron not found, bddinfer will not be built.])
+   fi
+else
+  reason_bddinfer=" (disabled by default)"
+fi
+
 # checking for apron and fixpoint
 if test "$enable_infer" = yes; then
    if test "$enable_ocamlfind" = yes; then
@@ -510,6 +536,8 @@ if test "$enable_infer" = yes; then
 else
   reason_infer=" (disabled by default)"
 fi
+
+
 
 
 # checking for camlzip
@@ -1170,6 +1198,7 @@ AC_SUBST(BIGINTLIB)
 AC_SUBST(BIGINTPKG)
 
 AC_SUBST(enable_infer)
+AC_SUBST(enable_bddinfer)
 AC_SUBST(INFERINCLUDE)
 AC_SUBST(INFERLIB)
 AC_SUBST(INFERPKG)
@@ -1281,6 +1310,7 @@ echo "    Compressed sessions     : $enable_zip$reason_zip"
 echo "    Hypothesis selection    : $enable_hypothesis_selection$reason_hypothesis_selection"
 echo "    Stackify                : $enable_stackify$reason_stackify"
 echo "    Invariant inference(exp): $enable_infer$reason_infer"
+echo "    Inference with BDDs(exp): $enable_bddinfer$reason_bddinfer"
 echo "    Frama-C support         : $enable_frama_c$reason_frama_c"
 if test "$enable_frama_c" = yes ; then
    echo "        Version             : $FRAMAC_VERSION"

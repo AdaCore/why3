@@ -2,7 +2,7 @@ module Junjie
 	use ref.Ref
 	use int.Int
 
-	let b[@infer](_:int):int
+	let b [@bddinfer] [@infer](_:int):int
 	ensures { result = 102 }
 	=
 		let x = ref 0 in
