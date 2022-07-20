@@ -213,6 +213,14 @@ let rec mlw_term_to_why1_expr env t =
      let env, e1 = mlw_term_to_why1_expr env t1 in
      let env, e2 = mlw_term_to_why1_expr env t2 in
      env, e_add e1 e2
+  | Tapp(ls, [t1;t2]) when ls.ls_name.Ident.id_string = "infix -" ->
+     let env, e1 = mlw_term_to_why1_expr env t1 in
+     let env, e2 = mlw_term_to_why1_expr env t2 in
+     env, e_sub e1 e2
+  | Tapp(ls, [t1;t2]) when ls.ls_name.Ident.id_string = "infix *" ->
+     let env, e1 = mlw_term_to_why1_expr env t1 in
+     let env, e2 = mlw_term_to_why1_expr env t2 in
+     env, e_mul e1 e2
   | Tapp(ls, [t1;t2]) when ls.ls_name.Ident.id_string = "andb" ->
      let env, e1 = mlw_term_to_why1_expr env t1 in
      let env, e2 = mlw_term_to_why1_expr env t2 in

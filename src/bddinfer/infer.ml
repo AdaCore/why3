@@ -11,18 +11,17 @@
 
 open Ast
 
+let checked_annotations_counter = ref 0
 let checked_user_annotations = ref Wstdlib.Mstr.empty
 let generated_loop_invariants = ref Wstdlib.Mstr.empty
 let generated_entry_states = ref Wstdlib.Mstr.empty
 
-let add_checked_user_annotations =
-  let c = ref 0 in
-  fun tag is_inv orig cond is_valid ->
+let add_checked_user_annotations tag is_inv orig cond is_valid =
   let n =
     match tag with
     | "" ->
-       let n = "anonymous_stmt_" ^ string_of_int !c in
-       incr c;
+       let n = "anonymous_stmt_" ^ string_of_int !checked_annotations_counter in
+       incr checked_annotations_counter;
        n
     | n -> n
   in
@@ -283,8 +282,11 @@ type interp_report = {
   }
 
 let interp_prog (p : why1program) : interp_report =
+  checked_annotations_counter := 0;
+  checked_user_annotations := Wstdlib.Mstr.empty;
+  generated_loop_invariants := Wstdlib.Mstr.empty;
+  generated_entry_states := Wstdlib.Mstr.empty;
   let initial_state = Abstract.top p.vars in
-  (* Format.printf "[interp_prog] initial_state = %a@." Abstract.print initial_state; *)
   let final_state = interp_stmt p.functions initial_state p.statements in
   { final_state ;
     invariants = !generated_loop_invariants;
