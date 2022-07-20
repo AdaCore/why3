@@ -5,7 +5,7 @@ module Test
 	use ref.Refint
 	use int.Int
 
-	let b[@infer](x:int): unit
+	let b [@bddinfer] [@infer](x:int): unit
 	requires { x >= 1 }
 	=
 		let k = ref 0 in
@@ -16,7 +16,7 @@ module Test
 		()
 		done; ()
 
-	let b3[@infer:box](x:int): unit
+	let b3 [@bddinfer] [@infer:box](x:int): unit
 	requires { x >= 1 }
 	=
 		let k = ref 0 in
@@ -27,7 +27,7 @@ module Test
 		()
 		done; ()
 
-	let c[@infer](x:int): unit
+	let c [@bddinfer] [@infer](x:int): unit
 	requires { x >= 2 }
 	=
 		let k = ref 0 in
@@ -40,7 +40,7 @@ module Test
 		()
 		done; ()
 
-	let c2[@infer:oct](x:int): unit
+	let c2 [@bddinfer] [@infer:oct](x:int): unit
 	requires { x >= 2 }
 	=
 		let k = ref 0 in
@@ -53,7 +53,7 @@ module Test
 		()
 		done; ()
 
-	let c3[@infer:box](x:int): unit
+	let c3 [@bddinfer] [@infer:box](x:int): unit
 	requires { x >= 2 }
 	=
 		let k = ref 0 in

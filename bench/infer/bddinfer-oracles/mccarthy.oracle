@@ -1,14 +1,32 @@
+Invariant for loop [anonymous_loop_0] is
+  ((((e.contents * 10) + 91) <= n.contents /\ 0 <= e.contents) /\
+   e.contents <= 1) /\
+  ((e.contents * 10) + n0) = (n.contents + 10)
+Domains for loop [anonymous_loop_0] are
+  n0 = [101;+oo[; e = [0;1]; n = [91;+oo[
+The generated invariant implies { T }
+
+BDD-infer failure: other exception, anomaly: File "src/bddinfer/infer.ml", line 29, characters 2-8: Assertion failed
+
+BDD-infer failure: other exception, anomaly: File "src/bddinfer/infer.ml", line 29, characters 2-8: Assertion failed
+
+BDD-infer failure: other exception, anomaly: File "src/bddinfer/infer.ml", line 29, characters 2-8: Assertion failed
+
+BDD-infer failure: other exception, anomaly: File "src/bddinfer/infer.ml", line 29, characters 2-8: Assertion failed
+
+BDD-infer failure: other exception, anomaly: File "src/bddinfer/infer.ml", line 29, characters 2-8: Assertion failed
+
 File bench/infer/mccarthy.mlw:
 Goal f91'vc.
-Prover result is: Valid (0.00s, 64 steps).
+Prover result is: Valid (0.01s, 64 steps).
 
 File bench/infer/mccarthy.mlw:
 Goal f91_nonrec'vc.
-Prover result is: Unknown () (0.01s).
+Prover result is: Valid (0.01s, 57 steps).
 
 File bench/infer/mccarthy.mlw:
 Goal f91_nonrec_oct'vc.
-Prover result is: Unknown () (0.00s).
+Prover result is: Unknown () (0.01s).
 
 File bench/infer/mccarthy.mlw:
 Goal f91_nonrec_box'vc.
@@ -16,11 +34,11 @@ Prover result is: Unknown () (0.00s).
 
 File bench/infer/mccarthy.mlw:
 Goal f91_nonrec2'vc.
-Prover result is: Unknown () (0.00s).
+Prover result is: Unknown () (0.01s).
 
 File bench/infer/mccarthy.mlw:
 Goal f91_nonrec_hard'vc.
-Prover result is: Unknown () (0.00s).
+Prover result is: Unknown () (0.01s).
 
 File bench/infer/mccarthy.mlw:
 Goal f91_nonrec_hard_box'vc.

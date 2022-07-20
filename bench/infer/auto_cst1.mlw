@@ -4,7 +4,7 @@ module Test
 	use ref.Refint
 	use int.Int
 
-	let b[@infer](_:int): unit
+	let b [@bddinfer] [@infer](_:int): unit
 	=
 	 let y = 10 in
 	 while (true) do
@@ -13,7 +13,7 @@ module Test
 	()
 		done; ()
 
-	let b2[@infer:oct](_:int): unit
+	let b2 [@bddinfer] [@infer:oct](_:int): unit
 	=
 	 let y = 10 in
 	 while (true) do
@@ -22,7 +22,7 @@ module Test
 	()
 		done; ()
 
-	let b3[@infer:box](_:int): unit
+	let b3 [@bddinfer] [@infer:box](_:int): unit
 	=
 	 let y = 10 in
 	 while (true) do
@@ -31,7 +31,7 @@ module Test
 	()
 		done; ()
 
-	let c[@infer](_:int): unit
+	let c [@bddinfer] [@infer](_:int): unit
 	=
 	 let y = 10 in
 	 let k = 42 in
@@ -41,7 +41,7 @@ module Test
 	()
 		done; ()
 
-	let c2[@infer:oct](_:int): unit
+	let c2 [@bddinfer] [@infer:oct](_:int): unit
 	=
 	 let y = 10 in
 	 let k = 42 in
@@ -51,7 +51,7 @@ module Test
 	()
 		done; ()
 
-	let c3[@infer:box](_:int): unit
+	let c3 [@bddinfer] [@infer:box](_:int): unit
 	=
 	 let y = 10 in
 	 let k = 42 in

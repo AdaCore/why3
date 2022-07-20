@@ -3,7 +3,7 @@ module Mult1
 	use int.Int
 	use ref.Ref
 
-	let b[@infer](_:int) : int
+	let b [@bddinfer] [@infer](_:int) : int
 	ensures { result = 18 }
 	=
 		let i = ref 0 in
@@ -13,7 +13,7 @@ module Mult1
 		done;
 		!i
 
-	let b2[@infer:oct](_:int) : int
+	let b2 [@bddinfer] [@infer:oct](_:int) : int
 	ensures { result = 18 }
 	=
 		let i = ref 0 in
@@ -23,7 +23,7 @@ module Mult1
 		done;
 		!i
 
-	let b3[@infer:box](_:int) : int
+	let b3 [@bddinfer] [@infer:box](_:int) : int
 	ensures { result = 18 }
 	=
 		let i = ref 0 in

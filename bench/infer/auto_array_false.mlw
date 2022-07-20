@@ -15,7 +15,7 @@ module Test
 		()
 		done; ()
 
-	let c[@infer](x:int): unit
+	let c [@bddinfer] [@infer](x:int): unit
 	requires { x >= 2 }
 	=
 		while (true) do
@@ -24,7 +24,7 @@ module Test
 		()
 		done; ()
 
-	let c2[@infer:oct](x:int): unit
+	let c2 [@bddinfer] [@infer:oct](x:int): unit
 	requires { x >= 2 }
 	=
 		while (true) do
@@ -33,7 +33,7 @@ module Test
 		()
 		done; ()
 
-	let c3[@infer:box](x:int): unit
+	let c3 [@bddinfer] [@infer:box](x:int): unit
 	requires { x >= 2 }
 	=
 		while (true) do

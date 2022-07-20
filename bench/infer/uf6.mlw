@@ -19,7 +19,7 @@ module Uf1
 	let nil(_:unit) : list 'a
 	ensures { ll result = 0 } = Nil
 
-	let b[@infer](_:int): list int
+	let b [@bddinfer] [@infer](_:int): list int
 	ensures { ll result = 4 } =
 		let k = ref 0 in
 		let _ = nil () in
@@ -31,7 +31,7 @@ module Uf1
 		done;
 		Nil
 
-	let b2[@infer:oct](_:int): list int
+	let b2 [@bddinfer] [@infer:oct](_:int): list int
 	ensures { ll result = 4 } =
 		let k = ref 0 in
 		let _ = nil () in
@@ -43,7 +43,7 @@ module Uf1
 		done;
 		Nil
 
-	let b3[@infer:box](_:int): list int
+	let b3 [@bddinfer] [@infer:box](_:int): list int
 	ensures { ll result = 4 } =
 		let k = ref 0 in
 		let _ = nil () in

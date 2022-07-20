@@ -1,10 +1,23 @@
+Invariant for loop [anonymous_loop_0] is 0 <= k.contents
+Domains for loop [anonymous_loop_0] are x = ]-oo;+oo[; k = [0;+oo[
+The generated invariant implies { (k = 0 || (0 <= k && k <= x)) }
+
+BDD-infer failure: other exception, anomaly: File "src/bddinfer/infer.ml", line 29, characters 2-8: Assertion failed
+
+BDD-infer failure: unsupported feature, mlw_term_to_why1_expr: application of logic function `( * )`
+BDD-infer failure: other exception, anomaly: File "src/bddinfer/infer.ml", line 29, characters 2-8: Assertion failed
+
+BDD-infer failure: other exception, anomaly: File "src/bddinfer/infer.ml", line 29, characters 2-8: Assertion failed
+
+BDD-infer failure: other exception, anomaly: File "src/bddinfer/infer.ml", line 29, characters 2-8: Assertion failed
+
 File bench/infer/auto_ref3.mlw:
 Goal b'vc.
-Prover result is: Valid (0.00s, 13 steps).
+Prover result is: Valid (0.01s, 9 steps).
 
 File bench/infer/auto_ref3.mlw:
 Goal b3'vc.
-Prover result is: Valid (0.00s, 13 steps).
+Prover result is: Valid (0.01s, 13 steps).
 
 File bench/infer/auto_ref3.mlw:
 Goal c'vc.
@@ -12,7 +25,7 @@ Prover result is: Unknown () (0.01s).
 
 File bench/infer/auto_ref3.mlw:
 Goal e'vc.
-Prover result is: Unknown () (0.00s).
+Prover result is: Unknown () (0.01s).
 
 File bench/infer/auto_ref3.mlw:
 Goal e2'vc.
@@ -20,5 +33,5 @@ Prover result is: Unknown () (0.01s).
 
 File bench/infer/auto_ref3.mlw:
 Goal e3'vc.
-Prover result is: Unknown () (0.00s).
+Prover result is: Unknown () (0.01s).
 

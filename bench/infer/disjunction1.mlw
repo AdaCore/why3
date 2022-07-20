@@ -2,7 +2,7 @@ module Disjunction1
 	use ref.Ref
 	use int.Int
 
-	let a[@infer](x:int) : int
+	let a [@bddinfer] [@infer](x:int) : int
 	ensures { result <> 5 }
 	=
 		let i = ref 0 in
