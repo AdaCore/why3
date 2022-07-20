@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** {1 RAC implementation(s)} *)
+(** {1 Runtime Assertion Checkers for WhyML programs} *)
 
 open Pinterp_core
 

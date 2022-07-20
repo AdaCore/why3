@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Useful list combinators *)
+(** {1 Combinators on [list] type} *)
 
 val rev_filter: ('a -> bool) -> 'a list -> 'a list
 

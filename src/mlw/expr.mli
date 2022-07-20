@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {1 WhyML program expressions} *)
+
 open Wstdlib
 open Ident
 open Term

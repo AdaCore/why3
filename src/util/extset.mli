@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Sets over ordered types *)
+(** {1 Sets over ordered types} *)
 
 (** Input signature of the functor {!Extset.Make}. *)
 module type OrderedType = Set.OrderedType

@@ -9,7 +9,11 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** {1 Environments} *)
+(** {1 Why3 Environments}
+
+These give access to the standard library and other libraries
+
+*)
 
 open Wstdlib
 

@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** {1 Interpretation of Why3 programs} *)
+(** {1 WhyML Program Interpreter} *)
 
 open Term
 open Expr

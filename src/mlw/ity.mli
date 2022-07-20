@@ -9,6 +9,14 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {1 Types in WhyML programs}
+
+Individual types are first-order types without effects.
+
+Computation types are higher-order types with effects.
+
+*)
+
 open Ident
 open Ty
 open Term

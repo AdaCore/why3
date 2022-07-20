@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {1 WhyML program declarations} *)
+
 open Ident
 open Ty
 open Term

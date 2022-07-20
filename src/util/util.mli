@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Useful functions *)
+(** {1 Various Utility Functions} *)
 
 val const : 'a -> 'b -> 'a
 

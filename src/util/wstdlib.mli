@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Specific instances of Set, Map, Hashtbl on int, string, float, and tagged types *)
+(** {1 Specific instances of Set, Map, Hashtbl on int, string, float, and tagged types} *)
 
 module Mint : Extmap.S with type key = int
 module Sint : Extset.S with module M = Mint

@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {1 WhyML VC generators} *)
+
 open Pdecl
 
 val sp_attr : Ident.attribute (* switch to fast WP *)
