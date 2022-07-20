@@ -6,16 +6,17 @@
 
 *)
 
-(*open Why3*) (* to comment out when inside Why3 *)
+(* open Why3 *)
+(* to comment out when inside Why3 *)
 
 
-val infer_loop_invs_for_mlw_expr :
+val infer_loop_invs :
   Ident.Sattr.t ->
   Env.env ->
   Decl.known_map ->
   Pdecl.known_map ->
   Expr.expr -> Ity.cty -> (Expr.expr * Term.term) list
-(** [infer_loop_invs_for_mlw_expr attrs env tkn mkn e cty] infers loop
+(** [infer_loop_invs attrs env tkn mkn e cty] infers loop
    invariants for the given WhyML expression [e]. [e] is assumed to be
    the body of a WhyML function which attributes are [attrs] and
    computation type is [cty]. The other parameters [env], [tkn] and
@@ -60,8 +61,9 @@ type engine_report = {
     (* The low-level report of inference sub-engine *)
   }
 
-val report_on_last_call : unit -> engine_report
-(** provides info about the last call *)
+(*val report_on_last_call : unit -> engine_report*)
+(** provides info about the last call
+deprecated, use [register_hook] instead *)
 
 val report : verbosity:int -> engine_report -> unit
 (** prints the report on standard output *)

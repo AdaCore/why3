@@ -5,7 +5,8 @@
 
 *)
 
-(*open Why3*) (* to comment out when inside Why3 *)
+(* open Why3 *)
+(* to comment out when inside Why3 *)
 
 open Apron
 
@@ -31,6 +32,8 @@ module VarMap = Map.Make(struct
                   let compare = compare_var
                 end)
 
+module StrMap = Map.Make(String)
+
 type var_value = IntValue of Apron.Var.t | RefValue of why_var | BoolValue of Bdd.variable
 
 type why_env = var_value VarMap.t
@@ -46,11 +49,15 @@ module B = Bdd.Make(struct
              end)
 
 
-let fresh_bdd_var, bdd_stats =
-  let c = ref 0 in
-  (fun () -> incr c; !c),
-  (fun () -> !c, [||] (* B.stats () *) )
+let fresh_bdd_var_counter = ref 1 (* starts with 1 in [Bdd] module *)
 
+let fresh_bdd_var () =
+  let n = !fresh_bdd_var_counter in
+  incr fresh_bdd_var_counter;
+  n
+
+let  bdd_stats () =
+  !fresh_bdd_var_counter-1, [||] (* B.stats () *)
 
 (** state *)
 
@@ -240,11 +247,15 @@ let assign_texpr state x te =
   }
 
 
-let fresh_apron_var =
-  let c = ref 0 in
-  fun () ->
-  incr c;
-  let s = "V" ^ string_of_int !c in
+let fresh_apron_var_counter = ref 0
+
+let reset_fresh_var_generators () =
+  fresh_bdd_var_counter := 1;
+  fresh_apron_var_counter :=0
+
+let fresh_apron_var () =
+  let s = "V" ^ string_of_int !fresh_apron_var_counter in
+  incr fresh_apron_var_counter;
   Apron.Var.of_string s
 
 let rec get_value env x =
@@ -499,9 +510,8 @@ let get_int x =
   | _ -> assert false
 
 let get_apron_interval i  =
-  let open Interval in
-  if is_bottom i then raise Bottom;
-  if is_top i then
+  if Interval.is_bottom i then raise Bottom;
+  if Interval.is_top i then
     { id_min = None; id_max = None }
   else
     let id_min =
@@ -564,7 +574,7 @@ let print fmt s =
                       @[<hv 2>domains:@ @[%a@];@]@ \
                       @[<hv 2>reduced_bdd:@ @[%a@];@] }@]"
     print_env s.map_state
-    (fun fmt -> Environment.print fmt) s.apron_state.Abstract1.env
+    (fun fmt -> Environment.print fmt) s.apron_state.env
     Abstract1.print s.apron_state
     B.print_compact s.bdd_state
     print_domains doms

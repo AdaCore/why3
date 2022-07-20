@@ -235,6 +235,10 @@ val mk_program :
   main:statement ->
   why1program
 
+val reset_ast_generation : unit -> unit
+(** once [mk_program] has been called, it is not allowed anymore to
+   create new AST nodes. Calling this function will restore this
+   possibility, but any existing AST so far should be discarded *)
 
 (** {2 Printing} *)
 

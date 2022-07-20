@@ -11,7 +11,8 @@ TODO list:
 
 *)
 
-(*open Why3*) (* to comment out when inside Why3 *)
+(* open Why3 *)
+(* to comment out when inside Why3 *)
 
 
 open Expr
@@ -441,6 +442,12 @@ let rec mlw_expr_to_why1_cond env e =
   | Eexec(cexp,_cty) ->
      begin match cexp.c_node with
      (* FIXME do not match on rs names *)
+     | Capp(rs,[pv1;pv2]) when rs.rs_name.Ident.id_string = "infix =" ->
+        begin
+          match type_of pv1.Ity.pv_ity with
+          | _,Tint -> p_expr_bool_operator env c_eq_int pv1 pv2
+          | _,Tbool -> p_expr_bool_operator env c_eq_bool pv1 pv2
+        end
      | Capp(rs, [pv1;pv2]) when rs.rs_name.Ident.id_string = "infix <=" ->
         p_expr_bool_operator env c_le pv1 pv2
      | Capp(rs, [pv1;pv2]) when rs.rs_name.Ident.id_string = "infix <" ->
@@ -556,53 +563,52 @@ let rec mlw_expr_to_function_call acc env e1
 
 
 let loop_tags = ref Wstdlib.Mstr.empty
+let loop_tags_counter = ref 0
 
-let record_loop =
-  let c = ref 0 in
-  fun annot e ->
+let record_loop tag e =
   let n =
-    match !annot with
-    | None ->
-       let a = "anonymous_loop_" ^ string_of_int !c in
-       incr c;
-       annot := Some a;
+    match tag with
+    | "" ->
+       let a = "anonymous_loop_" ^ string_of_int !loop_tags_counter in
+       incr loop_tags_counter;
        a
-    | Some n -> n
+    | n -> n
   in
   loop_tags := Wstdlib.Mstr.add n e !loop_tags;
   n
 
 let rec mlw_expr_to_why1_stmt env vars e =
-  let annot = ref
-    (Ident.Sattr.fold
+  let tag =
+    Ident.Sattr.fold
       (fun a acc ->
         let s = a.Ident.attr_string in
-        try
-          Some (Strings.remove_prefix "bddinfer:" s)
+        try Strings.remove_prefix "bddinfer:" s
         with Not_found -> acc)
-      e.e_attrs None)
+      e.e_attrs ""
   in
   let open Expr in
-  let env, vars, s =
-    match e.e_node with
-    | Evar    _ (* pvsymbol *) ->
-       unsupported "mlw_expr_to_why1_stmt: Evar"
-    | Econst  _ (* Constant.constant *) ->
-       unsupported "mlw_expr_to_why1_stmt: Econst"
-    | Eexec(cexp,_cty) ->
+  match e.e_node with
+  | Evar    _ (* pvsymbol *) ->
+     unsupported "mlw_expr_to_why1_stmt: Evar"
+  | Econst  _ (* Constant.constant *) ->
+     unsupported "mlw_expr_to_why1_stmt: Econst"
+  | Eexec(cexp,_cty) ->
      begin match cexp.c_node with
      (* FIXME do not match on rs names *)
+     | Capp(rs,[]) when rs.rs_name.Ident.id_string = "Tuple0" ->
+        env, vars, s_block tag []
+     | Capp(rs,[]) ->
+        unsupported
+          "mlw_expr_to_why1_stmt: execution of nullary function `%a`" Expr.print_rs rs
+     | Capp(rs, [_pv]) when rs.rs_name.Ident.id_string = "prefix !" ->
+        (* FIXME: we assume it is the returned value, we just ignore it *)
+        env, vars, s_block tag []
      | Capp(rs, [pv1;pv2]) when rs.rs_name.Ident.id_string = "infix :=" ->
         let is_ref,ty = type_of pv1.Ity.pv_ity in
         assert is_ref;
         let env, x = get_or_declare_why_var_for_pv env pv1 in
         let env, v2 = mlw_pv_to_why1_expr env pv2 in
-        env, Ity.Spv.add pv1 vars, s_assign "" ty x v2
-     | Capp(rs,[]) when rs.rs_name.Ident.id_string = "Tuple0" ->
-        env, vars, s_block "" []
-     | Capp(rs,[]) ->
-        unsupported
-          "mlw_expr_to_why1_stmt: execution of nullary function `%a`" Expr.print_rs rs
+        env, Ity.Spv.add pv1 vars, s_assign tag ty x v2
      | Capp(rs,args) ->
         let name = get_or_declare_function rs in
         let env,args =
@@ -615,7 +621,7 @@ let rec mlw_expr_to_why1_stmt env vars e =
                  env, v :: args)
                args (env, [])
         in
-        env, vars, s_call "" None name args
+        env, vars, s_call tag None name args
      | Cpur _ (* lsymbol * pvsymbol list *) ->
         unsupported "mlw_expr_to_why1_stmt: Cpur"
      | Cfun _ (* expr *) ->
@@ -623,23 +629,23 @@ let rec mlw_expr_to_why1_stmt env vars e =
      | Cany ->
         unsupported "mlw_expr_to_why1_stmt: Cany"
      end
-    | Eassign [(var,_f,value)] ->
-       (* TODO: check that var as type ref int or ref bool, and that f is "contents" *)
-       let is_ref,ty = type_of var.Ity.pv_ity in
-       assert is_ref;
-       let env, n = get_or_declare_why_var_for_pv env var in
-       let env, value = mlw_pv_to_why1_expr env value in
-       env, Ity.Spv.add var vars, s_assign "" ty n value
-    | Eassign _ (* assign list *) ->
-        unsupported "mlw_expr_to_why1_stmt: Eassign (parallel)"
-    | Elet(LDvar(pv,e1),e2) ->
-        if is_type_unit pv.Ity.pv_ity then
-         let env, vars, s1 = mlw_expr_to_why1_stmt env vars e1 in
-         let env, vars, s2 = mlw_expr_to_why1_stmt env vars e2 in
-         let s = s_sequence "" s1 s2 in
-         env, vars, s
-        else
-          begin
+  | Eassign [(var,_f,value)] ->
+     (* TODO: check that var as type ref int or ref bool, and that f is "contents" *)
+     let is_ref,ty = type_of var.Ity.pv_ity in
+     assert is_ref;
+     let env, n = get_or_declare_why_var_for_pv env var in
+     let env, value = mlw_pv_to_why1_expr env value in
+     env, Ity.Spv.add var vars, s_assign tag ty n value
+  | Eassign _ (* assign list *) ->
+     unsupported "mlw_expr_to_why1_stmt: Eassign (parallel)"
+  | Elet(LDvar(pv,e1),e2) ->
+     if is_type_unit pv.Ity.pv_ity then
+       let env, vars, s1 = mlw_expr_to_why1_stmt env vars e1 in
+       let env, vars, s2 = mlw_expr_to_why1_stmt env vars e2 in
+       let s = s_sequence tag s1 s2 in
+       env, vars, s
+     else
+       begin
          match type_of pv.Ity.pv_ity with
          | exception (Error(_msg,expl)) ->
             unsupported
@@ -663,10 +669,10 @@ let rec mlw_expr_to_why1_stmt env vars e =
                  lets (env, [])
              in
              let args = List.map (fun pv -> snd (mlw_pv_to_why1_expr env pv)) args in
-             let call = s_call "" (Some(ty,res_var,s)) name args in
+             let call = s_call tag (Some(ty,res_var,s)) name args in
              let pre_call =
                List.fold_right
-                 (fun (ty,v,e) acc -> s_let_in "" ty v e acc)
+                 (fun (ty,v,e) acc -> s_let_in tag ty v e acc)
                  lets call
              in
              env,vars,pre_call
@@ -674,7 +680,7 @@ let rec mlw_expr_to_why1_stmt env vars e =
              try
                let env, e = mlw_expr_to_why1_expr env e1 in
                let env,vars,s = mlw_expr_to_why1_stmt env vars e2 in
-               env,vars,s_let_in "" ty res_var e s
+               env,vars,s_let_in tag ty res_var e s
              with NotExpression ->
                begin
                  let env, e = mlw_expr_to_why1_cond env e1 in
@@ -683,52 +689,52 @@ let rec mlw_expr_to_why1_stmt env vars e =
                  let pa = s_assign "" ty res_var e_bwtrue in
                  let pite = s_ite "" e pa pb in
                  let pb = s_block "" [pite; s] in
-                 env,vars,s_let_in "" ty res_var e_bwfalse pb
+                 env,vars,s_let_in tag ty res_var e_bwfalse pb
                end
            end
-           end
-    | Elet(LDsym _,_) ->
-       unsupported "mlw_expr_to_why1_stmt: execution of local sym"
-    | Elet(LDrec _,_) ->
-       unsupported "mlw_expr_to_why1_stmt: execution of local rec"
-    | Eif     _ (* expr * expr * expr *) ->
-       unsupported "mlw_expr_to_why1_stmt: Eif"
-    | Ematch  _ (* expr * reg_branch list * exn_branch Mxs.t *) ->
-       unsupported "mlw_expr_to_why1_stmt: Ematch"
-    | Ewhile(cond,invs,_vars,body) ->
-       let tag = record_loop annot e in
-       let env, c = mlw_expr_to_why1_cond env cond in
-       let env, i =
-         List.fold_right (fun inv (env, invs)  ->
-             let env, v = mlw_term_to_why1_cond env inv in
-             (* TODO get the name of the invariants from Why3? *)
-             (env, (None, v)::invs)) invs (env, [])
-       in
-       let env,vars,b = mlw_expr_to_why1_stmt env vars body in
-       env,vars,s_while tag c i b
-    | Efor    _ (* pvsymbol * for_bounds * pvsymbol * invariant list * expr *) ->
-       unsupported "mlw_expr_to_why1_stmt: Efor"
-    | Eraise  _ (* xsymbol * expr *) ->
-       unsupported "mlw_expr_to_why1_stmt: Eraise"
-    | Eexn    _ (* xsymbol * expr *) ->
-       unsupported "mlw_expr_to_why1_stmt: Eexn"
-    | Eassert(Assert,t) ->
-       let env, c = mlw_term_to_why1_cond env t in
-       env,vars,s_assert "" c
-    | Eassert(Assume,t) ->
-       let env, c = mlw_term_to_why1_cond env t in
-       env,vars,s_assume "" c
-    | Eassert(_,_t) ->
-       unsupported "mlw_expr_to_why1_stmt: Eassert"
-    | Eghost  _ (* expr *) ->
-       unsupported "mlw_expr_to_why1_stmt: Eghost"
-    | Epure   _ (* term *) ->
-       unsupported "mlw_expr_to_why1_stmt: Epure"
-    | Eabsurd ->
-       unsupported "mlw_expr_to_why1_stmt: Eabsurd"
-  in
-  let tag = match !annot with None -> "" | Some s -> s in
-  env,vars, mk_stmt tag s.stmt_node
+       end
+  | Elet(LDsym _,_) ->
+     unsupported "mlw_expr_to_why1_stmt: execution of local sym"
+  | Elet(LDrec _,_) ->
+     unsupported "mlw_expr_to_why1_stmt: execution of local rec"
+  | Eif(e1,e2,e3) ->
+     let env, c = mlw_expr_to_why1_cond env e1 in
+     let env,vars,s1 = mlw_expr_to_why1_stmt env vars e2 in
+     let env,vars,s2 = mlw_expr_to_why1_stmt env vars e3 in
+     env,vars,s_ite tag c s1 s2
+  | Ematch  _ (* expr * reg_branch list * exn_branch Mxs.t *) ->
+     unsupported "mlw_expr_to_why1_stmt: Ematch"
+  | Ewhile(cond,invs,_vars,body) ->
+     let tag = record_loop tag e in
+     let env, c = mlw_expr_to_why1_cond env cond in
+     let env, i =
+       List.fold_right (fun inv (env, invs)  ->
+           let env, v = mlw_term_to_why1_cond env inv in
+           (* TODO get the name of the invariants from Why3? *)
+           (env, (None, v)::invs)) invs (env, [])
+     in
+     let env,vars,b = mlw_expr_to_why1_stmt env vars body in
+     env,vars,s_while tag c i b
+  | Efor    _ (* pvsymbol * for_bounds * pvsymbol * invariant list * expr *) ->
+     unsupported "mlw_expr_to_why1_stmt: Efor"
+  | Eraise  _ (* xsymbol * expr *) ->
+     unsupported "mlw_expr_to_why1_stmt: Eraise"
+  | Eexn    _ (* xsymbol * expr *) ->
+     unsupported "mlw_expr_to_why1_stmt: Eexn"
+  | Eassert(Assert,t) ->
+     let env, c = mlw_term_to_why1_cond env t in
+     env,vars,s_assert tag c
+  | Eassert(Assume,t) ->
+     let env, c = mlw_term_to_why1_cond env t in
+     env,vars,s_assume tag c
+  | Eassert(_,_t) ->
+     unsupported "mlw_expr_to_why1_stmt: Eassert"
+  | Eghost  _ (* expr *) ->
+     unsupported "mlw_expr_to_why1_stmt: Eghost"
+  | Epure   _ (* term *) ->
+     unsupported "mlw_expr_to_why1_stmt: Epure"
+  | Eabsurd ->
+     unsupported "mlw_expr_to_why1_stmt: Eabsurd"
 
 
 
@@ -1102,17 +1108,8 @@ let empty_report = {
     engine_subreport = None;
   }
 
-let last_report = ref empty_report
-
-let report_on_last_call () = !last_report
-
-
-let infer_loop_invs_for_mlw_expr attrs env tkn mkn e cty =
-  last_report := empty_report;
-  if not (Ident.Sattr.exists (fun a -> Strings.has_prefix "bddinfer" a.Ident.attr_string) attrs)
-  then []
-  else
-    try
+let infer_loop_invs_for_mlw_expr last_report _attrs env tkn mkn e cty =
+  try
     begin
       if verbose >= 3 then
         Format.printf "@[You have triggered BDD loop inference on expression@ @[%a@]@]@."
@@ -1174,7 +1171,11 @@ let infer_loop_invs_for_mlw_expr attrs env tkn mkn e cty =
         Wstdlib.(
           Mstr.fold
             (fun key s (invsl,invs) ->
-              let e = Mstr.find key !loop_tags in
+              match Mstr.find key !loop_tags with
+              | exception Not_found ->
+                 (* translation_error "loop tag `%s` not found" key *)
+                 (invsl,invs)
+              | e ->
               if verbose >= 3 then
                 Format.printf "@[Converting state@ @[%a@]@]@." print s;
               let inv,dom = abstract_state_to_why3_term_and_dom vs_table s in
@@ -1190,7 +1191,7 @@ let infer_loop_invs_for_mlw_expr attrs env tkn mkn e cty =
       invs_list
 
     end
-    with
+  with
     | Error(expl,msg) ->
        last_report :=
          { !last_report with
@@ -1199,7 +1200,8 @@ let infer_loop_invs_for_mlw_expr attrs env tkn mkn e cty =
        []
     | exn ->
        let msg =
-         Format.asprintf "%a" Exn_printer.exn_printer exn
+         Format.asprintf "%a@\n%s" Exn_printer.exn_printer exn
+           (Printexc.get_backtrace ())
        in
        last_report :=
          { !last_report with
@@ -1241,9 +1243,18 @@ let default_hook r =
 let hook_report = ref default_hook
 
 let infer_loop_invs attrs env tkn mkn e cty =
-  let l = infer_loop_invs_for_mlw_expr attrs env tkn mkn e cty in
-  !hook_report !last_report;
-  l
+  if not (Ident.Sattr.exists (fun a -> Strings.has_prefix "bddinfer" a.Ident.attr_string) attrs)
+  then []
+  else
+    begin
+      let last_report = ref empty_report in
+      loop_tags_counter := 0;
+      loop_tags := Wstdlib.Mstr.empty;
+      Ast.reset_ast_generation ();
+      let l = infer_loop_invs_for_mlw_expr last_report attrs env tkn mkn e cty in
+      !hook_report !last_report;
+      l
+    end
 
 let register_hook f = hook_report := f
 

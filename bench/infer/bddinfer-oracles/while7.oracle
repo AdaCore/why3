@@ -1,9 +1,14 @@
-BDD-infer failure: unsupported feature, mlw_expr_to_why1_stmt: Eif
-BDD-infer failure: unsupported feature, mlw_expr_to_why1_stmt: Eif
-BDD-infer failure: unsupported feature, mlw_expr_to_why1_stmt: Eif
+Invariant for loop [anonymous_loop_0] is 0 <= i.contents /\ i.contents <= 102
+Domains for loop [anonymous_loop_0] are i = [0;102]
+Invariant for loop [anonymous_loop_0] is
+  0 <= i1.contents /\ i1.contents <= 102
+Domains for loop [anonymous_loop_0] are i1 = [0;102]
+Invariant for loop [anonymous_loop_0] is
+  0 <= i2.contents /\ i2.contents <= 102
+Domains for loop [anonymous_loop_0] are i2 = [0;102]
 File bench/infer/while7.mlw:
 Goal b'vc.
-Prover result is: Unknown () (0.01s).
+Prover result is: Unknown () (0.02s).
 
 File bench/infer/while7.mlw:
 Goal b2'vc.
@@ -11,5 +16,5 @@ Prover result is: Unknown () (0.01s).
 
 File bench/infer/while7.mlw:
 Goal b3'vc.
-Prover result is: Unknown () (0.01s).
+Prover result is: Unknown () (0.00s).
 

@@ -127,6 +127,8 @@ val fresh_apron_var : unit -> Apron.Var.t
 
 val fresh_bdd_var : unit -> Bdd.variable
 
+val reset_fresh_var_generators : unit -> unit
+
 module B : Bdd.BDD
 
 val meet_with_bdd : t -> B.t -> t

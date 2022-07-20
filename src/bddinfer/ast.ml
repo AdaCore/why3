@@ -4,7 +4,8 @@
 
  *)
 
-(*open Why3*) (* to comment out when inside Why3 *)
+(* open Why3 *)
+(* to comment out when inside Why3 *)
 
 type var_type =
     | Tint
@@ -385,6 +386,10 @@ let mk_program ~name ~variables ~functions ~main =
     functions;
     statements = main;
   }
+
+let reset_ast_generation () =
+  Abstract.reset_fresh_var_generators ();
+  calling_fresh_allowed := true
 
 
 (** {2 Printing} *)
