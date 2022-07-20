@@ -445,13 +445,20 @@ let rec mlw_expr_to_why1_cond env e =
   let open Expr in
   let env, c' =
   match e.e_node with
-  | Evar    _ (* pvsymbol *) ->
-      unsupported "mlw_expr_to_why1_cond: Evar"
+  | Evar pv ->
+     let env,v = mlw_pv_to_why1_expr env pv in
+     env, atomic_cond (c_is_true v)
   | Econst _ ->
       unsupported "mlw_expr_to_why1_cond: Econst"
   | Eexec(cexp,_cty) ->
      begin match cexp.c_node with
      (* FIXME do not match on rs names *)
+     | Capp(rs, [pv]) when rs.rs_name.Ident.id_string = "contents" ->
+        let env,v = mlw_pv_to_why1_expr env pv in
+        env, atomic_cond (c_is_true v)
+     | Capp(rs, [pv]) when rs.rs_name.Ident.id_string = "prefix !" ->
+        let env,v = mlw_pv_to_why1_expr env pv in
+        env, atomic_cond (c_is_true v)
      | Capp(rs,[pv1;pv2]) when rs.rs_name.Ident.id_string = "infix =" ->
         begin
           match type_of pv1.Ity.pv_ity with
