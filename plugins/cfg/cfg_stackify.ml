@@ -19,6 +19,7 @@ let debug = Debug.register_flag "cfg"
   ~desc:"CFG plugin debug flag"
 
 let unit_type = PTtuple []
+                  [@@warning "-32"]
 
 let mk_id ~loc name =
   { id_str = name; id_ats = []; id_loc = loc }
@@ -31,9 +32,11 @@ let mk_unit ~loc =
 
 let mk_check ~loc t =
   mk_expr ~loc (Eassert(Expr.Check,t))
+              [@@warning "-32"]
 
 let mk_assume ~loc t =
   mk_expr ~loc (Eassert(Expr.Assume,t))
+              [@@warning "-32"]
 
 let mk_seq ~loc e1 e2 = mk_expr ~loc (Esequence(e1,e2))
 
@@ -75,6 +78,7 @@ let rec pp_pty fmt t =
 let divergent_attr = ATstr Vc.nt_attr
 
 exception CFGError of string
+              [@@warning "-38"]
 
 let () = Exn_printer.register (fun fmt exn -> match exn with
   | CFGError msg -> Format.fprintf fmt "CFG translation error: %s" msg

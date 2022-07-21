@@ -17,6 +17,8 @@ open Format
 
 type 'a pp = formatter -> 'a -> unit
 
+let print_string = pp_print_string
+
 let print_option f fmt = function
   | None -> ()
   | Some x -> f fmt x

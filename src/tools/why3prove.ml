@@ -519,7 +519,7 @@ let () =
       Format.set_formatter_tag_functions Util.ansi_color_tags;
       set_mark_tags true );
     let main = Whyconf.get_main config in
-    let load (f,ef) = Driver.load_driver_raw main env f ef in
+    let load (f,ef) = Driver.load_driver_file_and_extras main env f ef in
     let drv = Opt.map load !opt_driver in
     Queue.iter (do_input main env drv) opt_queue;
     if !unproved then exit 2
