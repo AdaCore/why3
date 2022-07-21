@@ -96,7 +96,7 @@ exception AmbiguousResolve of string list
 exception FailedResolve of string list
 
 val resolve_from_paths : string list -> string -> string
-(** [resolve_from_paths \[p1;..;pn\] name] search for the an existing
+(** [resolve_from_paths \[p1;..;pn\] name] search for an existing
    file among [p1/name],..,[pn/name]. Raises [FailedResolve] if no
    such file is found, with the set of tried file names as
    argument. Raise [AmbiguousResolve] if several exist, with the set

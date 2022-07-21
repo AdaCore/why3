@@ -24,8 +24,6 @@ let transfer_loc lb_from lb_to =
   lb_to.lex_start_p <- lb_from.lex_start_p;
   lb_to.lex_curr_p <- lb_from.lex_curr_p
 
-
-type position = string * int * int
 (*
 
 To reduce memory consumption, a pair (line,col) is stored in a single
@@ -36,30 +34,84 @@ To reduce memory consumption, a pair (line,col) is stored in a single
    This will thus support column numbers up to 4095 and line numbers up
    to 2^18 on 32-bit architecture.
 
+The file names are also hashed to ensure an optimal sharing
 *)
 
-let user_position f bl bc el ec =
-  (f, (bl lsl 12) lor bc, (el lsl 12) lor ec)
+module FileTags = struct
 
-let get (f,b,e) =
+  open Wstdlib
+
+  let tag_counter = ref 0
+
+  let file_tags = Hstr.create 7
+  let tag_to_file = Hint.create 7
+
+  let get_file_tag file =
+    try
+      Hstr.find file_tags file
+    with Not_found ->
+      let n = !tag_counter in
+      Hstr.add file_tags file n;
+      Hint.add tag_to_file n file;
+      incr tag_counter;
+      n
+
+  let tag_to_file tag =
+    Hint.find tag_to_file tag
+
+end
+
+
+type position = {
+    pos_file_tag : int;
+    pos_start : int (* compressed line/col *);
+    pos_end : int (* compressed line/col *);
+  }
+
+let user_position f bl bc el ec =
+  if bl < 0 || bl >= 0x4_0000 then
+    failwith ("Loc.user_position: start line number `" ^
+                string_of_int bl ^ "` out of bounds");
+  if bc < 0 || bc >= 0x1000 then
+    failwith ("Loc.user_position: start char number `" ^
+                string_of_int bc ^ "` out of bounds");
+  if el < 0 || el >= 0x40000 then
+    failwith ("Loc.user_position: end line number `" ^
+                string_of_int el ^ "` out of bounds");
+  if ec < 0 || ec >= 0x1000 then
+    failwith ("Loc.user_position: end char number `" ^
+                string_of_int ec ^ "` out of bounds");
+  let tag = FileTags.get_file_tag f in
+  { pos_file_tag = tag;
+    pos_start = (bl lsl 12) lor bc;
+    pos_end = (el lsl 12) lor ec }
+
+let get p =
+  let f = FileTags.tag_to_file p.pos_file_tag in
+  let b = p.pos_start in
+  let e = p.pos_end in
   (f, b lsr 12, b land 0x0FFF, e lsr 12, e land 0x0FFF)
 
 let sexp_of_expanded_position _ = assert false  [@@warning "-32"]
 (* default value if the line below does not produce anything, i.e.,
    when ppx_sexp_conv is not installed *)
 
-type expanded_position = string * int * int * int * int
+type expanded_position = string * int * int * int * int  [@@warning "-34"]
 [@@deriving sexp_of]
 
 let sexp_of_position loc =
   let eloc = get loc in sexp_of_expanded_position eloc
 
 
-let dummy_position = ("",0,0)
+let dummy_position =
+  let tag = FileTags.get_file_tag "" in
+  { pos_file_tag = tag; pos_start = 0; pos_end = 0 }
 
-let join (f1,b1,e1) (f2,b2,e2) =
-  assert (f1 = f2);
-  (f1, min b1 b2, max e1 e2)
+let join p1 p2 =
+  assert (p1.pos_file_tag = p2.pos_file_tag);
+  { p1 with
+    pos_start = min p1.pos_start p2.pos_start;
+    pos_end = max p1.pos_end p2.pos_end }
 
 let extract (b,e) =
   let f = b.pos_fname in
