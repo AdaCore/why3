@@ -689,6 +689,31 @@ let clone_decl inst cl uc d = match d.d_node with
         Opt.get (ls_defn_of_axiom (clone_fmla cl (ls_defn_axiom ld))) in
       let d = create_logic_decl (List.map get_logic ldl) in
       add_pdecl ~warn:false ~vc:false uc (create_pure_decl d)
+  | Dind (s, ((ls, _) :: _ as idl)) when Mls.mem ls inst.mi_ls ->
+      List.iter (fun (ls, _) ->
+          (* When one logic definition is instantiated, they must all be *)
+          if not (Mls.mem ls inst.mi_ls)
+          then raise (CannotInstantiate ls.ls_name);
+          let ls' = Mls.find ls inst.mi_ls in
+          cl.ls_table <- Mls.add ls ls' cl.ls_table) idl;
+      let ls' = Mls.find ls inst.mi_ls in
+      let s', idl' =
+        match (Mid.find ls'.ls_name uc.muc_theory.uc_known).d_node with
+        | Dind (s, idl) -> s, idl
+        | Dlogic _ | Dparam _ | Ddata _ -> raise (CannotInstantiate ls.ls_name)
+        | Dtype _ | Dprop _ -> assert false in
+      if s' <> s then raise (CannotInstantiate ls.ls_name);
+      List.iter (fun (ls, la) ->
+          let ls' = Mls.find ls inst.mi_ls in
+          let la' = List.assq ls' idl' in
+          let handle_case (pr, f) (pr', f') =
+            cl.pr_table <- Mpr.add pr pr' cl.pr_table;
+            let f = clone_fmla cl f in
+            if not (t_equal f f')
+            then raise (CannotInstantiate ls.ls_name) in
+          try List.iter2 handle_case la la' with
+          | Invalid_argument _ -> raise (CannotInstantiate ls.ls_name)) idl;
+      uc
   | Dind (s, idl) ->
       let lls = List.map (fun (ls,_) ->
         if Mls.mem ls inst.mi_ls then raise (CannotInstantiate ls.ls_name);
