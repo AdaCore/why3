@@ -40,8 +40,9 @@ type printer_args = private {
   prec        : (int list) Ident.Mid.t;
 }
 
-val load_driver : Env.env -> string -> string list -> driver
+val load_driver : Whyconf.main -> Env.env -> string -> string list -> driver
   (** loads a driver from a file
+      @param main   main section of Why3 configuration
       @param env    environment to interpret theories and modules
       @param string driver file name
       @param string list additional drivers containing only theories/modules *)

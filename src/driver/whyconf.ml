@@ -174,17 +174,20 @@ let set_strategies rc strategies =
 (** Main record *)
 
 type main = {
-  libdir   : string;      (* "/usr/local/lib/why/" *)
-  datadir  : string;      (* "/usr/local/share/why/" *)
-  loadpath  : string list;  (* "/usr/local/lib/why/stdlib" *)
+  libdir   : string;
+  (* arch-dependent data, say "/usr/local/lib/why3/" *)
+  datadir  : string;
+  (* arch-independent data, say "/usr/local/share/why3/" *)
+  loadpath  : string list;
+  (* standard library, say "/usr/local/lib/why3/stdlib" *)
   stdlib  : bool;
   (* add the standard library in the loadpath (default true) *)
   load_default_plugins  : bool;
   (* autoload the plugins in libdir (default true) *)
   timelimit : int;
-  (* default prover time limit in seconds (0 unlimited) *)
+  (* default prover time limit in seconds (0 means unlimited) *)
   memlimit  : int;
-  (* default prover memory limit in megabytes (0 unlimited)*)
+  (* default prover memory limit in megabytes (0 means unlimited)*)
   running_provers_max : int;
   (* max number of running prover processes *)
   plugins : string list;
@@ -1165,7 +1168,6 @@ module Args = struct
     do_usage options usage extra_help;
     exit exit_code
 end
-
 
 let unknown_to_known_provers provers pu =
   Mprover.fold (fun pk _ (others,name,version) ->

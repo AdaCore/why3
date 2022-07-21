@@ -31,6 +31,7 @@ module C = struct
     | Tmutable of ty (* struct with a single mutable field *)
     | Tnosyntax (* types that do not have a syntax, can't be printed *)
     (* enum, const could be added *)
+    [@@warning "-37"]
 
   (* int x=2, *y ... *)
   and names = ty * (ident * expr) list
@@ -40,9 +41,10 @@ module C = struct
 
   and binop = Band | Bor | Beq | Bne | Bassign | Blt | Ble | Bgt | Bge
   (* += and co. maybe to add *)
+  [@@warning "-37"]
 
   and unop = Unot | Ustar | Uaddr | Upreincr | Upostincr | Upredecr | Upostdecr
-
+             [@@warning "-37"]
   and expr =
     | Enothing
     | Eunop of unop * expr
@@ -68,6 +70,7 @@ module C = struct
     | Cfloat of string
     | Cchar of string
     | Cstring of string
+                   [@@warning "-37"]
 
   type stmt =
     | Snop
@@ -81,6 +84,7 @@ module C = struct
     | Sreturn of expr
 
   and include_kind = Sys | Proj (* include <...> vs. include "..." *)
+                         [@@warning "-37"]
   and definition =
     | Dfun of ident * proto * body
     | Dinclude of ident * include_kind
@@ -90,6 +94,7 @@ module C = struct
     | Dstruct of struct_def
     | Dstruct_decl of string
     | Dtypedef of ty * ident
+    [@@warning "-37"]
 
   and body = definition list * stmt
 

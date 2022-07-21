@@ -150,10 +150,14 @@ drivers () {
     test -d $1 || exit 1
     for f in $1/*.drv; do
         printf "  $f... "
+        # using the basename only, otherwise there would be an
+        # ambiguity signaled, drivers/d.drv being both present in the
+        # current directory and in DATADIR/drivers (they are the same!)
+        b=`basename $f`
         # running Why
-        if ! echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver=$f - > /dev/null; then
+        if ! echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver=$b - > /dev/null; then
             echo "failed!"
-            echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver=$f -
+            echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver=$b -
             exit 1
         fi
         echo "ok"

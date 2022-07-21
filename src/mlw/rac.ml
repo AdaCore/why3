@@ -263,7 +263,7 @@ module Why = struct
           | _ -> failwith "RAC reduce prover config must have format <prover>[ <time limit>[ <mem limit>]]" in
         let pr = Whyconf.filter_one_prover config (Whyconf.parse_filter_prover name) in
         let command = String.concat " " (pr.Whyconf.command :: pr.Whyconf.extra_options) in
-        let driver = Driver.load_driver (Whyconf.get_main config) env pr in
+        let driver = Driver.load_driver_for_prover (Whyconf.get_main config) env pr in
         let limit = Call_provers.{empty_limit with limit_time; limit_mem} in
         mk_why_prover ~command driver limit in
       Opt.map aux why_prover_lit in

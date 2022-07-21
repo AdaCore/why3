@@ -15,6 +15,7 @@ open Format
 
 type 'a pp = formatter -> 'a -> unit
 
+val print_string : string pp
 val print_option : 'a pp -> 'a option pp
 val print_option_or_default : string -> 'a pp -> 'a option pp
 val print_list_pre : unit pp -> 'a pp -> 'a list pp

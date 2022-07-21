@@ -100,7 +100,7 @@ let env : Env.env = Env.create_env (Whyconf.loadpath main)
 (* loading the CVC4 driver *)
 let cvc4_driver : Driver.driver =
   try
-    Driver.load_driver main env cvc4
+    Driver.load_driver_for_prover main env cvc4
   with e ->
     eprintf "Failed to load driver for CVC4,1.7: %a@."
       Exn_printer.exn_printer e;
