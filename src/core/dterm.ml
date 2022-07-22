@@ -611,9 +611,9 @@ let rec term ~strict ~keep_loc uloc env prop dt =
     try_term strict keep_loc uloc env prop dt.dt_dty dt.dt_node in
   let t = t_attr_set tloc attrs t in
   match t.t_ty with
-  | Some _ when prop -> t_attr_set tloc Sattr.empty
+  | Some _ when prop -> t_attr_copy t
       (Loc.try2 ?loc:dt.dt_loc t_equ t t_bool_true)
-  | None when not prop -> t_attr_set tloc Sattr.empty
+  | None when not prop -> t_attr_copy t
       (t_if t t_bool_true t_bool_false)
   | _ -> t
 
