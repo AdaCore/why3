@@ -483,7 +483,7 @@ let warn_dubious_axiom uc k p syms =
           | Dtype { ts_def = NoDef } | Dparam _ -> raise Exit
           | _ -> ())
         syms;
-      Warning.emit ?loc:p.id_loc
+      Loc.warning ?loc:p.id_loc
         "@[axiom %s does not contain any local abstract symbol@ \
           (contains: @[%a@])@]" p.id_string
         (Pp.print_list Pp.comma print_id) (Sid.elements syms)
@@ -834,7 +834,7 @@ let warn_clone_not_abstract loc th =
         end
       | _ -> ()
     ) th.th_decls;
-    Warning.emit ~loc "cloned theory %a.%s does not contain \
+    Loc.warning ~loc "cloned theory %a.%s does not contain \
         any abstract symbol; it should be used instead"
       (Pp.print_list (Pp.constant_string ".") Pp.string) th.th_path
       th.th_name.id_string

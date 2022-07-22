@@ -106,9 +106,10 @@ module Task =
     let warnings = ref []
     let clear_warnings () = warnings := []
     let () =
-      Warning.set_hook (fun ?(loc=(Loc.user_position "" 1 0 1 0)) msg ->
-                        let _, a, b,_, _ = Loc.get loc in
-                        warnings := ((a-1,b), msg) :: !warnings)
+      Loc.set_warning_hook
+        (fun ?(loc=(Loc.user_position "" 1 0 1 0)) msg ->
+          let _, a, b,_, _ = Loc.get loc in
+          warnings := ((a-1,b), msg) :: !warnings)
 
 
     let premise_kind = function

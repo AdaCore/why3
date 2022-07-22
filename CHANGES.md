@@ -22,6 +22,7 @@ API
     and datadir. See the updated API examples for details. :x:
   * Use of [Whyconf.load_driver] must be replaced by
     [Driver.load_driver_for_prover] :x:
+  * Use of [Warning.emit] must be replaced by [Loc.warning] :x:
 
 MLCFG input language
   * attributes on the body of an MLCFG function are now supported

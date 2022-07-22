@@ -56,7 +56,7 @@ let collect_rules p env km prs t =
     (fun e (pr,t) ->
       try add_rule t e
       with NotARewriteRule msg ->
-        Warning.emit "proposition %a cannot be turned into a rewrite rule: %s"
+        Loc.warning "proposition %a cannot be turned into a rewrite rule: %s"
          Pretty.print_pr pr msg;
         e
     )
@@ -200,7 +200,7 @@ let simplify check_ls env : 'a Trans.trans =
       (fun e (pr,t) ->
         try add_rule t e
         with NotARewriteRule msg ->
-          Warning.emit "proposition %a cannot be turned into a rewrite rule: %s"
+          Loc.warning "proposition %a cannot be turned into a rewrite rule: %s"
             Pretty.print_pr pr msg;
           e
       )

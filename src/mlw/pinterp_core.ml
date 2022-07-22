@@ -846,12 +846,12 @@ let rac_dummy =
 let check_term rac ?vsenv cntr_ctx t =
   try rac.check_term ?vsenv cntr_ctx t
   with Incomplete reason when rac.ignore_incomplete ->
-    Warning.emit "%s.@." reason
+    Loc.warning "%s.@." reason
 
 let check_terms rac ctx ts =
   try List.iter (rac.check_term ctx) ts
   with Incomplete reason when rac.ignore_incomplete ->
-    Warning.emit "%s.@." reason
+    Loc.warning "%s.@." reason
 
 (* Check a post-condition [t] by binding the result variable to
    the term [vt] representing the result value.
@@ -863,12 +863,12 @@ let check_post rac ctx v post =
   let ctx = {ctx with cntr_env= {ctx.cntr_env with vsenv}} in
   try rac.check_term ctx t
   with Incomplete reason when rac.ignore_incomplete ->
-    Warning.emit "%s.@." reason
+    Loc.warning "%s.@." reason
 
 let check_posts rac ctx v posts =
   try List.iter (check_post rac ctx v) posts
   with Incomplete reason when rac.ignore_incomplete ->
-    Warning.emit "%s.@." reason
+    Loc.warning "%s.@." reason
 
 let check_type_invs rac ?loc ~giant_steps env ity v =
   let ts = match ity.ity_node with

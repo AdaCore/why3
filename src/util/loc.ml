@@ -68,24 +68,6 @@ type position = {
     pos_end : int (* compressed line/col *);
   }
 
-let user_position f bl bc el ec =
-  if bl < 0 || bl >= 0x4_0000 then
-    failwith ("Loc.user_position: start line number `" ^
-                string_of_int bl ^ "` out of bounds");
-  if bc < 0 || bc >= 0x1000 then
-    failwith ("Loc.user_position: start char number `" ^
-                string_of_int bc ^ "` out of bounds");
-  if el < 0 || el >= 0x40000 then
-    failwith ("Loc.user_position: end line number `" ^
-                string_of_int el ^ "` out of bounds");
-  if ec < 0 || ec >= 0x1000 then
-    failwith ("Loc.user_position: end char number `" ^
-                string_of_int ec ^ "` out of bounds");
-  let tag = FileTags.get_file_tag f in
-  { pos_file_tag = tag;
-    pos_start = (bl lsl 12) lor bc;
-    pos_end = (el lsl 12) lor ec }
-
 let get p =
   let f = FileTags.tag_to_file p.pos_file_tag in
   let b = p.pos_start in
@@ -101,7 +83,7 @@ type expanded_position = string * int * int * int * int  [@@warning "-34"]
 
 let sexp_of_position loc =
   let eloc = get loc in sexp_of_expanded_position eloc
-
+                          [@@warning "-32"]
 
 let dummy_position =
   let tag = FileTags.get_file_tag "" in
@@ -112,14 +94,6 @@ let join p1 p2 =
   { p1 with
     pos_start = min p1.pos_start p2.pos_start;
     pos_end = max p1.pos_end p2.pos_end }
-
-let extract (b,e) =
-  let f = b.pos_fname in
-  let bl = b.pos_lnum in
-  let bc = b.pos_cnum - b.pos_bol in
-  let el = e.pos_lnum in
-  let ec = e.pos_cnum - e.pos_bol in
-  user_position f bl bc el ec
 
 let compare = Pervasives.compare
 let equal = Pervasives.(=)
@@ -142,6 +116,68 @@ let pp_position fmt loc =
 let pp_position_no_file fmt loc =
   let (_,bl,bc,el,ec) = get loc in
   pp_position_tail fmt bl bc el ec
+
+(* warnings *)
+
+let default_hook ?loc s =
+  let open Format in
+  match loc with
+  | None -> eprintf "Warning: %s@." s
+  | Some l -> eprintf "Warning, file %a: %s@." pp_position l s
+
+let warning_hook = ref default_hook
+let set_warning_hook = (:=) warning_hook
+
+let warning ?loc p =
+  let open Format in
+  let b = Buffer.create 100 in
+  let fmt = formatter_of_buffer b in
+  pp_set_margin fmt 1000000000;
+  pp_open_box fmt 0;
+  let handle fmt =
+    pp_print_flush fmt (); !warning_hook ?loc (Buffer.contents b) in
+  kfprintf handle fmt p
+
+(* user positions *)
+
+let warning_emitted = ref false
+
+let user_position f bl bc el ec =
+  if bl < 0 || bl >= 0x4_0000 then
+    failwith ("Loc.user_position: start line number `" ^
+                string_of_int bl ^ "` out of bounds");
+  if bc < 0 then
+    failwith ("Loc.user_position: start char number `" ^
+                string_of_int bc ^ "` out of bounds");
+  if bc >= 0x1000 && not !warning_emitted then
+    begin
+      warning "Loc.user_position: start char number `%d` overflows on next line" bc;
+      warning_emitted := true;
+    end;
+  if el < 0 || el >= 0x40000 then
+    failwith ("Loc.user_position: end line number `" ^
+                string_of_int el ^ "` out of bounds");
+  if ec < 0 then
+    failwith ("Loc.user_position: end char number `" ^
+                string_of_int ec ^ "` out of bounds");
+  if ec >= 0x1000  && not !warning_emitted then
+    begin
+      warning "Loc.user_position: end char number `%d` overflows on next line" ec;
+      warning_emitted := true;
+    end;
+  let tag = FileTags.get_file_tag f in
+  { pos_file_tag = tag;
+    pos_start = (bl lsl 12) lor bc;
+    pos_end = (el lsl 12) lor ec }
+
+let extract (b,e) =
+  let f = b.pos_fname in
+  let bl = b.pos_lnum in
+  let bc = b.pos_cnum - b.pos_bol in
+  let el = e.pos_lnum in
+  let ec = e.pos_cnum - e.pos_bol in
+  user_position f bl bc el ec
+
 
 (* located exceptions *)
 

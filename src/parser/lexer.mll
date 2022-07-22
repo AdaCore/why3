@@ -21,7 +21,7 @@
       Sysutil.resolve_from_paths [Filename.dirname orig_file] file
     with
     | e ->
-       Warning.emit "bad source location: %a" Exn_printer.exn_printer e;
+       Loc.warning "inexistent file in source location: %a" Exn_printer.exn_printer e;
        file
 }
 

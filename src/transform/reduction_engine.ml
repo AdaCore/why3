@@ -1381,7 +1381,7 @@ let normalize ?step_limit ~limit engine sigma t0 =
       if n = limit then
         begin
           let t1 = reconstruct c in
-          (* Warning.emit "reduction of term %a takes more than %d steps, aborted at %a.@."
+          (* Loc.warning "reduction of term %a takes more than %d steps, aborted at %a.@."
            *   Pretty.print_term t0 limit Pretty.print_term t1; *)
           t1
         end

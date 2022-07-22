@@ -106,7 +106,7 @@ let infer_loops attrs env tkn mkn e cty =
     let dom, wid =
       let attr = attrs_get_infer attrs in
       try parse_attr attr.attr_string with Parse_error ->
-        Warning.emit ?loc:e.e_loc
+        Loc.warning ?loc:e.e_loc
           "invalid@ infer@ attribute@ (using@ default@ values)";
         def_domain, def_wid in
     infer_loops ~dom ~wid env tkn mkn e cty

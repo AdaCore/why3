@@ -1323,7 +1323,7 @@ and exec_match ctx t ebl =
   let rec iter ebl =
     match ebl with
     | [] ->
-        Warning.emit "[Exec] Pattern matching not exhaustive in evaluation@." ;
+        Loc.warning "[Exec] Pattern matching not exhaustive in evaluation@." ;
         assert false
     | (p, e) :: rem -> (
       try
