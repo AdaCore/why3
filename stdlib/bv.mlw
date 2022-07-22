@@ -290,25 +290,25 @@ module BV_Gen
 
   (** comparison operators *)
 
-  let predicate ult (x y : t) =
+  let predicate ult [@vc:trusted_wf] (x y : t) =
     Int.(<) (to_uint x) (to_uint y)
 
   let predicate ule (x y : t) =
     Int.(<=) (to_uint x) (to_uint y)
 
-  let predicate ugt (x y : t) =
+  let predicate ugt [@vc:trusted_wf] (x y : t) =
     Int.(>) (to_uint x) (to_uint y)
 
   let predicate uge (x y : t) =
     Int.(>=) (to_uint x) (to_uint y)
 
-  let predicate slt (v1 v2 : t) =
+  let predicate slt [@vc:trusted_wf] (v1 v2 : t) =
     Int.(<) (to_int v1) (to_int v2)
 
   let predicate sle (v1 v2 : t) =
     Int.(<=) (to_int v1) (to_int v2)
 
-  let predicate sgt (v1 v2 : t) =
+  let predicate sgt [@vc:trusted_wf] (v1 v2 : t) =
     Int.(>) (to_int v1) (to_int v2)
 
   let predicate sge (v1 v2 : t) =
