@@ -403,7 +403,7 @@ let record_warning ?loc msg =
   Queue.push (loc,msg) warnings
 
 let () =
-  Warning.set_hook record_warning;
+  Loc.set_warning_hook record_warning;
   let dir =
     try
       Server_utils.get_session_dir ~allow_mkdir:true files

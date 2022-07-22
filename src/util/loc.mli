@@ -69,7 +69,7 @@ val pp_position : formatter -> position -> unit
 val pp_position_no_file : formatter -> position -> unit
 (** similar to [pp_position] but do not show the file name *)
 
-(** {2 Helper functions about OCaml locations use in module [Lexing]} *)
+(** {2 Helper functions about OCaml locations used in module [Lexing]} *)
 
 val extract : Lexing.position * Lexing.position -> position
 (** [extract p1 p2] build a source position from two OCaml lexing
@@ -86,7 +86,16 @@ val transfer_loc : Lexing.lexbuf -> Lexing.lexbuf -> unit
 (** [transfer_loc from to] sets the [lex_start_p] and [lex_curr_p]
    fields of [to] to the ones of [from] *)
 
+(** {2 Located warnings} *)
 
+val warning:
+  ?loc:position -> ('b, Format.formatter, unit, unit) format4 -> 'b
+
+(* The default behavior is to emit warning on standard error,
+   with position on a first line (if any) and message on a second line.
+   This can be changed using the following function. *)
+
+val set_warning_hook: (?loc:position -> string -> unit) -> unit
 
 (** {2 located exceptions} *)
 

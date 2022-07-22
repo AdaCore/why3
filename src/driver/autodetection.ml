@@ -207,7 +207,7 @@ module Partial = struct
         | Some b -> b in
       { name; path; version; shortcut; manual } :: acc
     with MissingField s ->
-      Warning.emit "cannot load a %s section: missing field '%s'@." section_name s;
+      Loc.warning "cannot load a %s section: missing field '%s'@." section_name s;
       acc
 
   let load_rc rc =

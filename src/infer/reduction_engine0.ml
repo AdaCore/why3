@@ -943,7 +943,7 @@ let normalize ~limit engine t0 =
     | _ ->
       if n = limit then
         begin
-          Warning.emit "reduction of term %a takes more than %d steps, aborted.@."
+          Loc.warning "reduction of term %a takes more than %d steps, aborted.@."
             Pretty.print_term t0 limit;
           reconstruct c
         end

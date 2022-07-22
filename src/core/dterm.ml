@@ -583,13 +583,13 @@ let check_used_var t vs =
     begin
       let s = vs.vs_name.id_string in
       if (s = "" || s.[0] <> '_') && t_v_occurs vs t = 0 then
-        Warning.emit ?loc:vs.vs_name.id_loc "unused variable %s" s
+        Loc.warning ?loc:vs.vs_name.id_loc "unused variable %s" s
     end
 
 let check_exists_implies f = match f.t_node with
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,f,{ t_node = Ttrue }) },_)
     when Sattr.mem Term.asym_split f.t_attrs -> ()
-  | Tbinop (Timplies,_,_) -> Warning.emit ?loc:f.t_loc
+  | Tbinop (Timplies,_,_) -> Loc.warning ?loc:f.t_loc
       "form \"exists x. P -> Q\" is likely an error (use \"not P \\/ Q\" if not)"
   | _ -> ()
 

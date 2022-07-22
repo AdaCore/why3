@@ -177,7 +177,7 @@ use_clone:
     { let loc = floc $startpos $endpos in
       let exists_as = List.exists (fun (_, q) -> q <> None) m_as_list in
       let import = $2 in
-      if import && not exists_as then Warning.emit ~loc
+      if import && not exists_as then Loc.warning ~loc
         "the keyword `import' is redundant here and can be omitted";
       let decl = Ptree.Duseimport(loc,import,m_as_list) in
       Typing.add_decl loc decl
@@ -186,7 +186,7 @@ use_clone:
     { let loc = floc $startpos $endpos in
       let import = $2 in
       let as_opt = $4 in
-      if import && as_opt = None then Warning.emit ~loc
+      if import && as_opt = None then Loc.warning ~loc
         "the keyword `import' is redundant here and can be omitted";
       let decl = Ptree.Dcloneimport(loc,import,$3,as_opt,$5) in
       Typing.add_decl loc decl

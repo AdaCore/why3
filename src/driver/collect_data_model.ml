@@ -117,11 +117,11 @@ let rec eval ctx oty t =
 and eval_const ctx v =
   let res = match Mstr.find v ctx.function_defs with
     | exception Not_found ->
-        Warning.emit "const %s not defined" v;
+        Loc.warning "const %s not defined" v;
         None
     | def ->
         if def.args <> [] then (
-          Warning.emit "variable %s defined by non-nullary function" v;
+          Loc.warning "variable %s defined by non-nullary function" v;
           None )
         else
           Some (eval ctx def.res_type def.body) in

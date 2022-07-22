@@ -410,14 +410,14 @@ let find_rs pm loc =
          List.exists (find_in_term loc) td.itd_invariant ||
          Opt.exists in_e td.itd_witness in
        let find_td td = (* TODO *)
-         if in_tdef td then Warning.emit
+         if in_tdef td then Loc.warning
              "Can't check CE for VC from type definitions :(";
          None in
        find_in_list find_td ds
     | PDlet ld ->
        (match ld with
         | LDvar (_, e) -> (* TODO *)
-            if in_e e then Warning.emit
+            if in_e e then Loc.warning
                 "Can't check CE for VC from variable definitions :(";
            None
         | LDsym (rs, ce) -> maybe (in_cty rs.rs_cty || in_ce ce) rs
