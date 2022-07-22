@@ -34,11 +34,13 @@ type sort =
   | Ssimple of identifier
   | Smultiple of identifier * (sort list)
 
-type spec_constant =
-  | Cnumeral of string
-  | Cdecimal of string * string
-  | Chexadecimal of string
-  | Cbinary of string
+type constant =
+  | Cint of BigInt.t
+  | Cdecimal of (BigInt.t * BigInt.t)
+  | Cfraction of (BigInt.t * BigInt.t)
+  | Cbitvector of (BigInt.t * int)
+  (*| Cfloat of (BigInt.t * BigInt.t)*) (* TODO_WIP *)
+  | Cbool of bool
   | Cstring of string
 
 type qual_identifier =
@@ -46,7 +48,7 @@ type qual_identifier =
   | Qannotident of identifier * sort
 
 type term =
-  | Tconst of spec_constant
+  | Tconst of constant
   | Tapply of qual_identifier * (term list)
   | Tarray of array
   | Tite of term * term * term

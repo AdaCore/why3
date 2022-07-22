@@ -10,11 +10,27 @@
 (********************************************************************)
 
 open Wstdlib
+open Term
+open Smtv2_model_defs_new
+
+let debug = Debug.register_flag "model_parser_new"
+  ~desc:"Print@ debugging@ messages@ about@ parsing@ \
+         the@ SMTv2@ model@ for@ counterexamples."
 
 module FromSexp = struct
 
   open Sexp
-  open Smtv2_model_defs_new
+
+  let is_name_start = function
+    | '_' | 'a'..'z' | 'A'..'Z'
+    | '@' | '#' | '$' -> true
+    | _ -> false
+
+  let is_quoted s = String.length s > 2 && s.[0] = '|' && s.[String.length s-1] = '|'
+  let get_quoted s = String.sub s 1 (String.length s-2)
+
+  let is_string s = String.length s >= 2 && s.[0] = '"' && s.[String.length s-1] = '"'
+  let get_string s = String.sub s 1 (String.length s-2)
 
   let rec pp_sexp fmt = function
     | Atom s -> Format.pp_print_string fmt s
@@ -25,14 +41,142 @@ module FromSexp = struct
   exception E of sexp * string
 
   let error sexp s = raise (E (sexp, s))
+  let atom_error a s = raise (E (Atom a, s))
+
+  let atom f = function
+    | Atom s -> f s
+    | sexp -> error sexp "atom"
 
   let list f = function
     | List l -> List.map f l
     | Atom _ as sexp -> error sexp "list"
+
+  let string = function
+    | Atom s when is_string s -> get_string s
+    | sexp -> error sexp "string"
+
+  let bool = atom bool_of_string
+
+  let int = atom int_of_string
+
+  let bigint = atom BigInt.of_string
+
+  let constant_int = atom @@ fun s ->
+    try BigInt.of_string ("0b"^Strings.remove_prefix "#b" s) with _ ->
+    try BigInt.of_string ("0x"^Strings.remove_prefix "#x" s) with _ ->
+    try BigInt.of_string s with _ ->
+      atom_error s "constant_int"
+
+  let minus_constant_int = function
+    | List [Atom "-"; i] as sexp -> (
+        try
+          let i' = atom BigInt.of_string i in
+          BigInt.minus i'
+        with _ -> error sexp "minus_constant_int" )
+    | sexp -> error sexp "minus_constant_int"
+
+  let constant_int sexp =
+    try constant_int sexp with _ ->
+    try minus_constant_int sexp with _ ->
+      error sexp "constant_int"
+
+  let constant_dec = atom @@ fun s ->
+    try
+      Scanf.sscanf s "%[^.].%s"
+        (fun s1 s2 ->
+           let i1 = BigInt.of_string s1 and i2 = BigInt.of_string s2 in
+           (i1, i2))
+    with _ -> atom_error s "constant_dec"
+
+  let minus_constant_dec = function
+    | List [Atom "-"; d] ->
+        let d1, d2 = constant_dec d in
+        (BigInt.minus d1, d2)
+    | sexp -> error sexp "minus_constant_dec"
+
+  let constant_dec sexp =
+    try constant_dec sexp with _ ->
+    try minus_constant_dec sexp with _ ->
+      error sexp "constant_dec"
+
+  let constant_fraction = function
+    | List [Atom "/"; n1; n2] ->
+        let n1, n2 =
+          try
+            constant_int n1, constant_int n2
+          with _ ->
+            let d11, d12 = constant_dec n1 and d21, d22 = constant_dec n2 in
+            assert BigInt.(eq d12 zero && eq d22 zero);
+            d11, d21 in
+        (n1, n2)
+    | sexp -> error sexp "constant_fraction"
+
+  let bv_int = atom @@ fun s ->
+    try BigInt.of_string (Strings.remove_prefix "bv" s) with _ ->
+      atom_error s "bv_int"
+
+  let constant_bv_bin = function
+    | Atom s -> (
+        try
+          let s' = Strings.remove_prefix "#b" s in
+          let v = BigInt.of_string ("0b"^s') in
+          let l = String.length s' in
+          (v, l)
+        with _ -> atom_error s "constant_bv_bin" )
+    | sexp -> error sexp "constant_bv_bin"
+
+  let constant_bv_hex = function
+    | Atom s -> (
+        try
+          let s' = Strings.remove_prefix "#x" s in
+          let v = BigInt.of_string ("0x"^s') in
+          let l = String.length s' * 4 in
+          (v, l)
+        with _ -> atom_error s "constant_bv_hex" )
+    | sexp -> error sexp "constant_bv_hex"
+
+  let constant_bv_dec = function
+    | List [Atom "_"; n; l] ->
+        (bv_int n, int l)
+    | sexp -> error sexp "constant_bv_dec"
+
+  let constant_bv sexp =
+    try constant_bv_dec sexp with _ ->
+    try constant_bv_hex sexp with _ ->
+    try constant_bv_bin sexp with _ ->
+      error sexp "constant_bv"
+
+(*
+  let constant_float = function
+    | List [Atom "_"; Atom "+zero"; n1; n2] ->
+        ignore (bigint n1, bigint n2); Plus_zero
+    | List [Atom "_"; Atom "-zero"; n1; n2] ->
+        ignore (bigint n1, bigint n2); Minus_zero
+    | List [Atom "_"; Atom "+oo"; n1; n2] ->
+        ignore (bigint n1, bigint n2); Plus_infinity
+    | List [Atom "_"; Atom "-oo"; n1; n2] ->
+        ignore (bigint n1, bigint n2); Minus_infinity
+    | List [Atom "_"; Atom "NaN"; n1; n2] ->
+        ignore (bigint n1, bigint n2); Not_a_number
+    | List [Atom "fp"; sign; exp; mant] ->
+        let sign = constant_bv sign and exp = constant_bv exp and mant = constant_bv mant in
+        float_of_binary {sign; exp; mant}
+    | sexp -> error sexp "constant_float"
+  *)
+
+  let constant sexp : constant =
+    try Cint (constant_int sexp) with _ ->
+    try Cdecimal (constant_dec sexp) with _ ->
+    try Cfraction (constant_fraction sexp) with _ ->
+    try Cbitvector (constant_bv sexp) with _ ->
+    (*try Cfloat (constant_float sexp) with _ ->*) (* TODO_WIP *)
+    try Cbool (bool sexp) with _ ->
+    try Cstring (string sexp) with _ ->
+      error sexp "constant"
   
   let symbol sexp : symbol = string_of_sexp sexp (* TODO_WIP *)
 
-  let index sexp : index = Idxsymbol (string_of_sexp sexp) (* TODO_WIP *)
+  let index sexp : index = error sexp "index"
   
   let identifier sexp : identifier = match sexp with
     | Atom _ -> Isymbol (symbol sexp)
@@ -54,26 +198,8 @@ module FromSexp = struct
     | sexp -> error sexp "qualified_identifier"
 
   let arg = function
-    | List [n; iret] -> symbol n, sort iret
+    | List [n; s] -> symbol n, sort s
     | sexp -> error sexp "arg"
-
-  let numeral_constant s = Cnumeral s (* TODO_WIP *)
-  let decimal_constant s = Cdecimal (s, s) (* TODO_WIP *)
-  let hexadecimal_constant s = Chexadecimal s (* TODO_WIP *)
-  let binary_constant s = Cbinary s (* TODO_WIP *)
-  let string_constant s = Cstring s (* TODO_WIP *)
-
-  let constant sexp : spec_constant = match sexp with
-    | Atom s ->
-      begin
-        try numeral_constant s with _  ->
-        try decimal_constant s with _  ->
-        try hexadecimal_constant s with _  ->
-        try binary_constant s with _  ->
-        try string_constant s with _  ->
-          error sexp "constant"
-      end
-    | _ -> error sexp "constant"
 
   let rec term sexp =
     try Tconst (constant sexp) with _ ->
@@ -103,10 +229,10 @@ module FromSexp = struct
     | sexp -> error sexp "application"
 
   let decl = function
-    | List [Atom "define-fun"; Atom n; al; iret; t] ->
-        let iret = sort iret in
-        let al = list arg al and t = term t in
-        Some (n, Dfunction (al, iret, t))
+    | List [Atom "define-fun"; Atom n; args; res; body] ->
+        let res = sort res in
+        let args = list arg args and body = term body in
+        Some (n, Dfunction (args, res, body))
     | _ -> None
 
   let is_model_decl = function Atom "define-fun" -> true | _ -> false
@@ -150,6 +276,7 @@ let fix_CVC18_bug_on_float_constants =
   fun s -> Re.Str.global_replace r "\\1)" s
 
 let parse_sexps str =
+  Debug.dprintf debug "[parse_sexps] model_string = %s@." str;
   let lexbuf = Lexing.from_string str in
   try
     Sexp.read_list lexbuf
@@ -172,13 +299,66 @@ let model_of_sexps sexps =
         s FromSexp.pp_sexp sexp' in
     raise (Smtv2_model_parsing_error msg)
 
-let parse pm input =
+let smt_type_to_ty = function
+  | Sstring -> Ty.ty_str
+  | Sint -> Ty.ty_int
+  | Sreal -> Ty.ty_real
+  | Sbool -> Ty.ty_bool
+  | _ -> Ty.ty_str (* TODO_WIP *)
+
+let rec smt_term_to_term = function
+  | Tconst (Cint bigint) ->
+      t_const (Constant.int_const bigint) Ty.ty_int
+  | Tite (b,t1,t2) ->
+      t_if (smt_term_to_term b) (smt_term_to_term t1) (smt_term_to_term t2)
+  | _ -> t_bool_true
+
+let interpret_def_to_term ls oloc attrs def =
+  match def with
+  | Dfunction (args, res, body) ->
+      let vslist =
+        List.map
+          (fun (symbol, sort) ->
+            let name = Ident.id_fresh symbol in
+            create_vsymbol name (smt_type_to_ty sort))
+          args in
+      let t = smt_term_to_term body in
+      t_lambda vslist [] t
+  | _ -> t_bool_true
+
+let terms_of_defs (* TODO_WIP *)
+    (pinfo: Printer.printing_info)
+    (defs: Smtv2_model_defs_new.definition Mstr.t) =
+  let qterms = pinfo.queried_terms in
+  let _ = Mstr.iter
+    (fun key (ls,_,_) ->
+      Debug.dprintf debug "[queried_terms] key = %s, ls = %a@."
+        key Pretty.print_ls ls)
+    qterms in
+  let terms =
+    Mstr.fold
+      (fun n def acc ->
+        try
+          let (ls,oloc,attrs) = Mstr.find n qterms in
+          (ls, interpret_def_to_term ls oloc attrs def) :: acc
+        with Not_found -> acc)
+      defs
+      [] in
+  List.iter
+    (fun (ls,t) ->
+      Debug.dprintf debug "[terms_of_defs] ls = %a, t = %a@."
+        Pretty.print_ls ls Pretty.print_term t)
+    terms
+  (* Mls.of_list terms *)
+
+let parse pinfo input =
   match get_model_string input with
   | exception Not_found -> []
   | model_string ->
       let sexps = parse_sexps model_string in
       let defs = model_of_sexps sexps in
-      [] (* TODO_WIP *)
+      let _ = terms_of_defs pinfo defs in (* TODO_WIP *)
+      []
 
 let () = Model_parser.register_model_parser "smtv2new" parse (* TODO_WIP *)
     ~desc:"Parser@ for@ the@ model@ of@ SMT@ solvers."

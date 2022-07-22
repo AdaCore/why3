@@ -296,7 +296,7 @@ let collect_model_ls info ls =
   if Sls.mem ls info.meta_record_def then
     info.list_field_def <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
         ls.ls_name info.list_field_def;
-  if ls.ls_args = [] && (relevant_for_counterexample ls.ls_name) then
+  if (*ls.ls_args = [] &&*) (relevant_for_counterexample ls.ls_name) then
     info.info_model <-
       add_model_element (ls, ls.ls_name.id_loc, ls.ls_name.id_attrs) info.info_model
 
