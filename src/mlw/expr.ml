@@ -536,7 +536,7 @@ let term_of_fmla f = match f.t_node with
   | _ when f.t_ty <> None -> f
   | Tapp (ps, [t; {t_node = Tapp (fs,[])}])
     when ls_equal ps ps_equ && ls_equal fs fs_bool_true -> t
-  | _ -> t_attr_set ?loc:f.t_loc Sattr.empty
+  | _ -> t_attr_copy f
       (t_if_simp f t_bool_true t_bool_false)
 
 let fmla_of_term t = match t.t_node with
@@ -545,7 +545,7 @@ let fmla_of_term t = match t.t_node with
     when ls_equal fs1 fs_bool_true && ls_equal fs2 fs_bool_false -> f
   | Tapp (fs,[]) when ls_equal fs fs_bool_true -> t_attr_copy t t_true
   | Tapp (fs,[]) when ls_equal fs fs_bool_false -> t_attr_copy t t_false
-  | _ -> t_attr_set ?loc:t.t_loc Sattr.empty (t_equ_simp t t_bool_true)
+  | _ -> t_attr_copy t (t_equ_simp t t_bool_true)
 
 let rec pure_of_post prop v h = match h.t_node with
   | Tapp (ps, [{t_node = Tvar u}; t])

@@ -1,0 +1,21 @@
+module Pb_invariant_attribute
+
+use export ref.Ref
+use export bool.Bool
+
+val a : ref bool
+val b : ref bool
+val c : ref bool
+
+goal g : [@atr] forall x:bool. [@atr2] x
+
+let test ()
+diverges
+  =
+while (true)
+ do
+   invariant { [@expl:foo] (!a) }
+   invariant { [@expl:bar] (not (!b)) }
+   invariant { [@expl:bla] (not (not (!c))) }
+ done
+end
