@@ -1,0 +1,9 @@
+
+use bv.BV32
+
+let f () =
+  let ref b = (42 : BV32.t) in
+  while BV32.sgt b (0:BV32.t) do
+    variant { b with BV32.slt }
+    b <- BV32.sub b (1:BV32.t)
+  done

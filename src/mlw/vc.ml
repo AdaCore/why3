@@ -90,6 +90,7 @@ let wp_attr = Ident.create_attribute "vc:wp"
 let wb_attr = Ident.create_attribute "vc:white_box"
 let kp_attr = Ident.create_attribute "vc:keep_precondition"
 let nt_attr = Ident.create_attribute "vc:divergent"
+let trusted_wf_attr = Ident.create_attribute "vc:trusted_wf"
 
 let do_not_keep_trace_attr = Ident.create_attribute "vc:do_not_keep_trace"
 let do_not_keep_trace_flag = Debug.register_flag "vc:do_not_keep_trace"
@@ -145,7 +146,7 @@ let mk_env ?(attrs=Sattr.empty)
   keep_trace;
   }
 
-let acc env r t =
+let accessible env r t =
   let ps = env.ps_wf_acc in
   if not (Mid.mem ps.ls_name env.known_map) then
     Loc.errorm ?loc:t.t_loc "please import relations.WellFounded";
@@ -318,7 +319,10 @@ let decrease env loc attrs expl olds news =
   let rec decr olds news = match olds, news with
     | (old_t, Some old_r)::olds, (t, Some r)::news when ls_equal old_r r ->
         if t_equal old_t t then decr olds news else
-        let dt = t_and (ps_app r [t; old_t]) (acc env r old_t) in
+        let dt = ps_app r [t; old_t] in
+        let dt =
+          if Sattr.mem trusted_wf_attr r.ls_name.id_attrs then dt else
+            t_and dt (accessible env r old_t) in
         t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds news))
     | (old_t, None)::olds, (t, None)::news when oty_equal old_t.t_ty t.t_ty ->
         if t_equal old_t t then decr olds news else
