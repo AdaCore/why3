@@ -24,9 +24,9 @@ void os_kill(pproc p);
 void os_kill(pproc p) {
 #ifdef _WIN32
   // arbitrarily chosen exit code
-  TerminateProcess(p->handle, ERROR_REQUEST_ABORTED);
+  TerminateJobObject(p->job, ERROR_REQUEST_ABORTED);
 #else
-  kill(p->id, SIGKILL);
+  kill(-p->id, SIGKILL);
 #endif
 }
 
@@ -34,10 +34,11 @@ void init_process_list () {
   processes = init_list(parallel);
 }
 
-void kill_processes(char *id) {
+void kill_processes(int key, char *id) {
   for (int i = 0; i < processes->len; i++) {
-    if (!strcmp(((pproc)(processes->data[i]))->task_id, id)) {
-      os_kill((pproc)processes->data[i]);
+    pproc p = processes->data[i];
+    if (p->client_key == key && !strcmp(p->task_id, id)) {
+      os_kill(p);
     }
   }
 }

@@ -162,6 +162,13 @@ let print_prover_status fmt = function
 let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps" s
 
+let read_and_delete_file fn =
+  let cin = open_in fn in
+  let out = Sysutil.channel_contents cin in
+  close_in cin;
+  if Debug.test_noflag debug then Sys.remove fn;
+  out
+
 let json_prover_result r =
   let open Json_base in
   let convert_model (a, m) =
@@ -348,6 +355,18 @@ let parse_prover_run res_parser signaled time out exitcode limit get_counterexmp
     pr_models = models;
   }
 
+let parse_prover_run res_parser signaled time outfile exitcode limit get_counterexmp printing_info =
+  if outfile = "" then
+    { pr_answer = Failure "interrupted";
+      pr_status = Unix.WEXITED 1;
+      pr_output = "";
+      pr_time = time;
+      pr_steps = 0;
+      pr_models = [] }
+  else
+    let out = read_and_delete_file outfile in
+    parse_prover_run res_parser signaled time out exitcode limit get_counterexmp printing_info
+
 let actualcommand ~config command limit file =
   let stime = string_of_int limit.limit_time in
   let smem = string_of_int limit.limit_mem in
@@ -418,13 +437,6 @@ type save_data = {
 
 let saved_data : (int, save_data) Hashtbl.t = Hashtbl.create 17
 
-let read_and_delete_file fn =
-  let cin = open_in fn in
-  let out = Sysutil.channel_contents cin in
-  close_in cin;
-  if Debug.test_noflag debug then Sys.remove fn;
-  out
-
 open Prove_client
 
 let handle_answer answer =
@@ -440,9 +452,7 @@ let handle_answer answer =
         Sys.remove save.vc_file;
         if save.inplace then Sys.rename (backup_file save.vc_file) save.vc_file
       end;
-      let out = read_and_delete_file out_file in
-      let ret = exit_code in
-      let ans = parse_prover_run save.res_parser timeout time out ret
+      let ans = parse_prover_run save.res_parser timeout time out_file exit_code
           save.limit save.get_counterexmp save.printing_info in
       id, Some ans
   | Started id ->

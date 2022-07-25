@@ -64,7 +64,7 @@ prequest parse_request(char* str_req, int len, int key) {
   char* tmp;
   bool runstdin = false;
 
-  log_msg("received query %.*s",len,str_req);
+  log_msg("client %d: received query %.*s", key, len, str_req);
 
   semic = count_semicolons(str_req, len);
   if (semic == 0) {
@@ -172,12 +172,16 @@ void init_request_queue () {
   queue = init_queue(100);
 }
 
-void remove_from_queue(char *id) {
+void remove_from_queue(int key, char *id, void callback(prequest)) {
   // inefficient, but what else?
   pqueue tmp = init_queue(queue->capacity);
   while (!queue_is_empty(queue)) {
     prequest r = queue_pop(queue);
-    if (strcmp(r->id,id)) queue_push(tmp, r);
+    if (r->key != key || strcmp(r->id,id)) {
+      queue_push(tmp, r);
+    } else {
+      callback(r);
+    }
   }
   while (!queue_is_empty(tmp)) {
     prequest r = queue_pop(tmp);
