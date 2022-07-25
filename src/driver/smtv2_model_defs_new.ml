@@ -16,7 +16,7 @@ open Model_parser
 type symbol = string
 
 type index =
-  | Idxnumeral of string
+  | Idxnumeral of BigInt.t
   | Idxsymbol of string
 
 type identifier =
@@ -30,17 +30,28 @@ type sort =
   | Sreal
   | Sroundingmode
   | Sbool
-  | Sbitvec
-  | Sarray
+  | Sbitvec of int
+  | Sfloatingpoint of int * int
+  | Sarray of sort * sort
   | Ssimple of identifier
   | Smultiple of identifier * (sort list)
 
-  type constant =
+type constant_bv = BigInt.t * int
+type constant_float =
+  | Fplusinfinity | Fminusinfinity
+  | Fpluszero | Fminuszero
+  | Fnan
+  | Fnumber of {
+      sign: constant_bv;
+      exp: constant_bv;
+      mant:constant_bv }
+
+type constant =
   | Cint of BigInt.t
   | Cdecimal of (BigInt.t * BigInt.t)
   | Cfraction of (BigInt.t * BigInt.t)
-  | Cbitvector of (BigInt.t * int)
-  (*| Cfloat of (BigInt.t * BigInt.t)*) (* TODO_WIP *)
+  | Cbitvector of constant_bv
+  | Cfloat of constant_float
   | Cbool of bool
   | Cstring of string
 

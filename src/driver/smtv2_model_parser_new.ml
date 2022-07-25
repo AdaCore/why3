@@ -146,37 +146,45 @@ module FromSexp = struct
     try constant_bv_bin sexp with _ ->
       error sexp "constant_bv"
 
-(*
   let constant_float = function
     | List [Atom "_"; Atom "+zero"; n1; n2] ->
-        ignore (bigint n1, bigint n2); Plus_zero
+        ignore (bigint n1, bigint n2); Fpluszero
     | List [Atom "_"; Atom "-zero"; n1; n2] ->
-        ignore (bigint n1, bigint n2); Minus_zero
+        ignore (bigint n1, bigint n2); Fminuszero
     | List [Atom "_"; Atom "+oo"; n1; n2] ->
-        ignore (bigint n1, bigint n2); Plus_infinity
+        ignore (bigint n1, bigint n2); Fplusinfinity
     | List [Atom "_"; Atom "-oo"; n1; n2] ->
-        ignore (bigint n1, bigint n2); Minus_infinity
+        ignore (bigint n1, bigint n2); Fminusinfinity
     | List [Atom "_"; Atom "NaN"; n1; n2] ->
-        ignore (bigint n1, bigint n2); Not_a_number
+        ignore (bigint n1, bigint n2); Fnan
     | List [Atom "fp"; sign; exp; mant] ->
-        let sign = constant_bv sign and exp = constant_bv exp and mant = constant_bv mant in
-        float_of_binary {sign; exp; mant}
+        let sign = constant_bv sign
+        and exp = constant_bv exp
+        and mant = constant_bv mant in
+        Fnumber {sign; exp; mant}
     | sexp -> error sexp "constant_float"
-  *)
 
-  let constant sexp : constant =
-    try Cint (constant_int sexp) with _ ->
-    try Cdecimal (constant_dec sexp) with _ ->
-    try Cfraction (constant_fraction sexp) with _ ->
-    try Cbitvector (constant_bv sexp) with _ ->
-    (*try Cfloat (constant_float sexp) with _ ->*) (* TODO_WIP *)
-    try Cbool (bool sexp) with _ ->
-    try Cstring (string sexp) with _ ->
-      error sexp "constant"
+  let constant sexp : term =
+    let cst =
+      try Cint (constant_int sexp) with _ ->
+      try Cdecimal (constant_dec sexp) with _ ->
+      try Cfraction (constant_fraction sexp) with _ ->
+      try Cbitvector (constant_bv sexp) with _ ->
+      try Cfloat (constant_float sexp) with _ ->
+      try Cbool (bool sexp) with _ ->
+      try Cstring (string sexp) with _ ->
+        error sexp "constant" in
+    Tconst cst
+
+  let symbol : sexp -> symbol = function
+    | Atom s when s = "" || is_name_start s.[0] -> s
+    | Atom s when is_quoted s -> get_quoted s
+    | sexp -> error sexp "symbol"
   
-  let symbol sexp : symbol = string_of_sexp sexp (* TODO_WIP *)
-
-  let index sexp : index = error sexp "index"
+  let index sexp : index =
+    try Idxnumeral (bigint sexp) with _ ->
+    try Idxsymbol (symbol sexp) with _ ->
+      error sexp "index"
   
   let identifier sexp : identifier = match sexp with
     | Atom _ -> Isymbol (symbol sexp)
@@ -184,11 +192,29 @@ module FromSexp = struct
         Iindexedsymbol (symbol s, List.map index idx)
     | sexp -> error sexp "identifier"
 
-  let sort : sexp -> sort = function (* TODO_WIP *)
+  let rec sort : sexp -> sort = function
+  (* TODO_WIP Ssimple and Smultiple useful ? *)
     | Atom "String" -> Sstring
+    | Atom "RegLan" -> Sreglan
     | Atom "Int" -> Sint
     | Atom "Real" -> Sreal
+    | Atom "RoundingMode" -> Sroundingmode
     | Atom "Bool" -> Sbool
+    | List [Atom "_"; Atom "BitVec"; Atom n] as sexp ->
+      begin
+        try Sbitvec (int_of_string n)
+        with _ -> error sexp "bitvector sort"
+      end
+    | Atom "Float16" -> Sfloatingpoint (5,11)
+    | Atom "Float32" -> Sfloatingpoint (8,24)
+    | Atom "Float64" -> Sfloatingpoint (11,53)
+    | Atom "Float128" -> Sfloatingpoint (15,113)
+    | List [Atom "_"; Atom "FloatingPoint"; Atom eb; Atom sb] as sexp ->
+      begin
+        try Sfloatingpoint (int_of_string eb, int_of_string sb)
+        with _ -> error sexp "floatingpoint sort"
+      end
+    | List [Atom "Array"; s1; s2] -> Sarray (sort s1, sort s2)
     | sexp -> error sexp "sort"
   
   let qualified_identifier sexp : qual_identifier = match sexp with
@@ -202,7 +228,7 @@ module FromSexp = struct
     | sexp -> error sexp "arg"
 
   let rec term sexp =
-    try Tconst (constant sexp) with _ ->
+    try constant sexp with _ ->
     try application sexp with _ ->
     (*try Tarray (array sexp) with _ ->*) (* TODO_WIP *)
     try ite sexp with _ ->
