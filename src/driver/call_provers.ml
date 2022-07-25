@@ -162,6 +162,13 @@ let print_prover_status fmt = function
 let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps" s
 
+let read_and_delete_file fn =
+  let cin = open_in fn in
+  let out = Sysutil.channel_contents cin in
+  close_in cin;
+  if Debug.test_noflag debug then Sys.remove fn;
+  out
+
 let json_prover_result r =
   let open Json_base in
   let convert_model (a, m) =
@@ -301,52 +308,62 @@ let analyse_result exit_result res_parser get_counterexmp printing_info out =
 
 let backup_file f = f ^ ".save"
 
-let parse_prover_run res_parser signaled time out exitcode limit get_counterexmp printing_info =
+let parse_prover_run res_parser signaled time outfile exitcode limit get_counterexmp printing_info =
   Debug.dprintf debug "Call_provers: exited with status %Ld@." exitcode;
   (* the following conversion is incorrect (but does not fail) on 32bit, but if
      the incoming exitcode was really outside the bounds of [int], its exact
      value is meaningless for Why3 anyway (e.g. some windows status codes). If
      it becomes meaningful, we might want to change the conversion here *)
   let int_exitcode = Int64.to_int exitcode in
-  let ans, models =
-    let exit_result =
-      if signaled then [Answer HighFailure] else
-      try [Answer (List.assoc int_exitcode res_parser.prp_exitcodes)]
-      with Not_found -> []
-    in analyse_result exit_result res_parser get_counterexmp printing_info out
-  in
-  Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
-  let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
-  let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in
-  let tlimit = float limit.limit_time in
-  let stepslimit = limit.limit_steps in
-  let ans, time, steps =
-    (* HighFailure or Unknown close to time limit are assumed to be timeouts *)
-    if tlimit > 0.0 && time >= 0.9 *. tlimit -. 0.1 then
-    match ans with
-    | HighFailure | Unknown _ | Timeout ->
-       Debug.dprintf debug
-         "[Call_provers.parse_prover_run] answer after %f >= 0.9 * timelimit - 0.1 -> Timeout@." time;
-       Timeout, tlimit, steps
-    | _ -> ans, time, steps
-    else
-      (* HighFailure or Unknown when steps >= stepslimit are assumed to be StepLimitExceeded *)
-      if stepslimit > 0 && steps >= stepslimit then
+  if outfile = "" then
+    { pr_answer = Failure "interrupted";
+      pr_status = Unix.WEXITED int_exitcode;
+      pr_output = "";
+      pr_time = time;
+      pr_steps = 0;
+      pr_models = [] }
+  else begin
+    let out = read_and_delete_file outfile in
+    let ans, models =
+      let exit_result =
+        if signaled then [Answer HighFailure] else
+        try [Answer (List.assoc int_exitcode res_parser.prp_exitcodes)]
+        with Not_found -> []
+      in analyse_result exit_result res_parser get_counterexmp printing_info out
+    in
+    Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
+    let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
+    let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in
+    let tlimit = float limit.limit_time in
+    let stepslimit = limit.limit_steps in
+    let ans, time, steps =
+      (* HighFailure or Unknown close to time limit are assumed to be timeouts *)
+      if tlimit > 0.0 && time >= 0.9 *. tlimit -. 0.1 then
       match ans with
-      | HighFailure | Unknown _ | StepLimitExceeded ->
-        Debug.dprintf debug
-          "[Call_provers.parse_prover_run] answer after %d steps >= stepslimit -> StepLimitExceeded@." steps;
-        StepLimitExceeded, time, steps
+      | HighFailure | Unknown _ | Timeout ->
+         Debug.dprintf debug
+           "[Call_provers.parse_prover_run] answer after %f >= 0.9 * timelimit - 0.1 -> Timeout@." time;
+         Timeout, tlimit, steps
       | _ -> ans, time, steps
-      else ans, time, steps
-  in
-  { pr_answer = ans;
-    pr_status = if signaled then Unix.WSIGNALED int_exitcode else Unix.WEXITED int_exitcode;
-    pr_output = out;
-    pr_time   = time;
-    pr_steps  = steps;
-    pr_models = models;
-  }
+      else
+        (* HighFailure or Unknown when steps >= stepslimit are assumed to be StepLimitExceeded *)
+        if stepslimit > 0 && steps >= stepslimit then
+        match ans with
+        | HighFailure | Unknown _ | StepLimitExceeded ->
+          Debug.dprintf debug
+            "[Call_provers.parse_prover_run] answer after %d steps >= stepslimit -> StepLimitExceeded@." steps;
+          StepLimitExceeded, time, steps
+        | _ -> ans, time, steps
+        else ans, time, steps
+    in
+    { pr_answer = ans;
+      pr_status = if signaled then Unix.WSIGNALED int_exitcode else Unix.WEXITED int_exitcode;
+      pr_output = out;
+      pr_time   = time;
+      pr_steps  = steps;
+      pr_models = models;
+    }
+  end
 
 let actualcommand ~config command limit file =
   let stime = string_of_int limit.limit_time in
@@ -417,13 +434,6 @@ type save_data = {
 
 let saved_data : (int, save_data) Hashtbl.t = Hashtbl.create 17
 
-let read_and_delete_file fn =
-  let cin = open_in fn in
-  let out = Sysutil.channel_contents cin in
-  close_in cin;
-  if Debug.test_noflag debug then Sys.remove fn;
-  out
-
 open Prove_client
 
 let handle_answer answer =
@@ -439,9 +449,7 @@ let handle_answer answer =
         Sys.remove save.vc_file;
         if save.inplace then Sys.rename (backup_file save.vc_file) save.vc_file
       end;
-      let out = read_and_delete_file out_file in
-      let ret = exit_code in
-      let ans = parse_prover_run save.res_parser timeout time out ret
+      let ans = parse_prover_run save.res_parser timeout time out_file exit_code
           save.limit save.get_counterexmp save.printing_info in
       id, Some ans
   | Started id ->

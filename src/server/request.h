@@ -46,7 +46,8 @@ extern pqueue queue;
 // initialize the global request queue
 void init_request_queue();
 
-// remove the entries from the queue whose id field is equal to <id>
-void remove_from_queue(char *id);
+// remove the entries from the queue whose key field is equal to <key> and id
+// field is equal to <id>. Call the callback for the removed entries.
+void remove_from_queue(int key, char *id, void callback(prequest));
 
 #endif
