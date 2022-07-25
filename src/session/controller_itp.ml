@@ -408,7 +408,7 @@ let build_prover_call spa =
   let limit = spa.spa_limit in
   let (config_pr,driver) = Hprover.find c.controller_provers spa.spa_pr in
   let with_steps =
-    Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
+    Call_provers.(limit.limit_steps > empty_limit.limit_steps) in
   let command =
     Whyconf.get_complete_command config_pr ~with_steps in
   try
