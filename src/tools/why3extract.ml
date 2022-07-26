@@ -92,11 +92,7 @@ let opt_output = match opt_modu_flat, !opt_output with
   | Modular, None ->
       eprintf "Output directory (-o) is required for modular extraction.@.";
       exit 1
-  | Modular, Some s when not (Sys.file_exists s) ->
-      eprintf
-        "Option '-o' should be given an existing directory as argument.@.";
-      exit 1
-  | Modular, Some s when not (Sys.is_directory s) ->
+  | Modular, Some s when Sys.file_exists s && not (Sys.is_directory s) ->
       eprintf "Option '-o' should be given a directory as argument.@.";
       exit 1
   | Flat, Some s when Sys.file_exists s && Sys.is_directory s ->
@@ -123,6 +119,8 @@ let get_cout_old ?fname fg m = match opt_output with
       stdout, None
   | Some f ->
       let file = Filename.concat f (fg ?fname m) in
+      Debug.dprintf Pdriver.debug "extract module to file %s@." file ;
+      Sysutil.deep_mkdir (Filename.dirname file);
       let tname = m.mod_theory.th_name.Ident.id_string in
       Debug.dprintf Pdriver.debug "extract module %s to file %s@." tname file;
       let old = if Sys.file_exists file then begin
