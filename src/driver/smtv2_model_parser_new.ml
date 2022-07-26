@@ -215,6 +215,9 @@ module FromSexp = struct
         with _ -> error sexp "floatingpoint sort"
       end
     | List [Atom "Array"; s1; s2] -> Sarray (sort s1, sort s2)
+    | Atom _ as sexp -> Ssimple (identifier sexp)
+    | List (Atom n :: l) ->
+      Smultiple (identifier (Atom n), List.map sort l)
     | sexp -> error sexp "sort"
   
   let qualified_identifier sexp : qual_identifier = match sexp with
@@ -229,8 +232,9 @@ module FromSexp = struct
 
   let rec term sexp =
     try constant sexp with _ ->
+    try Tvar (qualified_identifier sexp) with _ ->
     try application sexp with _ ->
-    (*try Tarray (array sexp) with _ ->*) (* TODO_WIP *)
+    try Tarray (array sexp) with _ ->
     try ite sexp with _ ->
     try let_term sexp with _ ->
       Tunparsed (string_of_sexp sexp)
@@ -253,6 +257,16 @@ module FromSexp = struct
     | List (qual_id :: ts) ->
         Tapply (qualified_identifier qual_id, List.map term ts)
     | sexp -> error sexp "application"
+
+  and array = function
+    | List [List [Atom "as"; Atom "const"; array_type]; t] ->
+        Aconst (sort array_type, term t)
+    | List [Atom "_"; Atom "as-array"; n] ->
+        Avar (symbol n)
+    | List [Atom "store"; x; t1; t2] ->
+        let a = try array x with _ -> Avar (symbol x) in
+        Astore (a, term t1, term t2)
+    | sexp -> error sexp "array"
 
   let decl = function
     | List [Atom "define-fun"; Atom n; args; res; body] ->

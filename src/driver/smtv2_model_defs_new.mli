@@ -60,18 +60,18 @@ type qual_identifier =
 
 type term =
   | Tconst of constant
+  | Tvar of qual_identifier
   | Tapply of qual_identifier * (term list)
-  | Tarray of array
   | Tite of term * term * term
   | Tlet of (var_binding list) * term
-  | Tto_array of term (* TODO_WIP ??? *)
+  | Tarray of array
   | Tunparsed of string
 
 and var_binding = symbol * term
 
 and array =
-  | Avar of string
-  | Aconst of term
+  | Avar of symbol
+  | Aconst of sort * term
   | Astore of array * term * term
 
 type definition =
