@@ -79,7 +79,7 @@ let remove_list ~is_rec (name_list: symbol list) =
                         Task.add_param_decl t ls) task_uc il in
                   (removed_ids, task_uc)
             | _ when is_rec && not (Ident.Sid.is_empty
-                          (Ident.Sid.inter (get_decl_syms d) removed_ids)) ->
+                          (Ident.Sid.inter (get_used_syms_decl d) removed_ids)) ->
                 (* The task create an element we want to add but it uses deleted
                    elements *)
                 (Ident.Sid.union removed_ids d.d_news, task_uc)

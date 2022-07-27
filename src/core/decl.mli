@@ -136,7 +136,13 @@ val create_prop_decl : prop_kind -> prsymbol -> term -> decl
 
 (** {2 Used symbols} *)
 
-val get_decl_syms : decl -> Sid.t
+val get_used_syms_ty : ty -> Sid.t
+(** [get_used_syms_ty ty] returns the set of identifiers used (i.e.,
+   assumed to be defined before) in [ty] *)
+
+val get_used_syms_decl : decl -> Sid.t
+(** [get_used_syms_decl d] returns the set of identifiers used (i.e.,
+   assumed to be defined before) in [d] *)
 
 (** {2 Exceptions} *)
 

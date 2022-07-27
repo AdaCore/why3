@@ -66,7 +66,7 @@ let fold in_goal only_top_in_goal notls notdef d (env, task) =
   in
   match d.d_node with
     | Dlogic [ls,ld]
-      when not (Sid.mem ls.ls_name (get_decl_syms d) || notls ls) ->
+      when not (Sid.mem ls.ls_name (get_used_syms_decl d) || notls ls) ->
         let vl,e = open_ls_defn ld in
         let attrs = Sattr.union e.t_attrs ls.ls_name.id_attrs in
         let e_ls_attrs = t_attr_set ?loc:e.t_loc attrs e in
