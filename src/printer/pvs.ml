@@ -757,7 +757,7 @@ let print_decl ~old info fmt d =
       print_list nothing (print_data_decl info) fmt tl
   | Dparam ls ->
       print_param_decl ~prev info fmt ls
-  | Dlogic [s, _ as ld] when not (Sid.mem s.ls_name (get_decl_syms d)) ->
+  | Dlogic [s, _ as ld] when not (Sid.mem s.ls_name (get_used_syms_decl d)) ->
       print_logic_decl ~prev info fmt ld
   | Dlogic [d] ->
       print_recursive_decl info fmt d

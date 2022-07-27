@@ -823,7 +823,7 @@ let print_decl vc_loc vc_attrs printing_info info fmt d =
       | V26Par -> begin
           match dl with
           | ([(s,_) as dl])
-            when not (Sid.mem s.ls_name (get_decl_syms d)) ->
+            when not (Sid.mem s.ls_name (get_used_syms_decl d)) ->
               print_logic_decl info fmt dl
           | dl ->
               print_rec_logic_decl info fmt dl
