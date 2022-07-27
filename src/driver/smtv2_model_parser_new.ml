@@ -193,7 +193,6 @@ module FromSexp = struct
     | sexp -> error sexp "identifier"
 
   let rec sort : sexp -> sort = function
-  (* TODO_WIP Ssimple and Smultiple useful ? *)
     | Atom "String" -> Sstring
     | Atom "RegLan" -> Sreglan
     | Atom "Int" -> Sint
@@ -254,6 +253,7 @@ module FromSexp = struct
     | sexp -> error sexp "var_binding"
 
   and application = function
+      (* TODO_WIP special case for boolean operators ? *)
     | List (qual_id :: ts) ->
         Tapply (qualified_identifier qual_id, List.map term ts)
     | sexp -> error sexp "application"
@@ -339,32 +339,88 @@ let model_of_sexps sexps =
         s FromSexp.pp_sexp sexp' in
     raise (Smtv2_model_parsing_error msg)
 
-let smt_type_to_ty = function
+exception E of string
+let error s = raise (E s)
+
+let smt_sort_to_ty = function
   | Sstring -> Ty.ty_str
   | Sint -> Ty.ty_int
   | Sreal -> Ty.ty_real
   | Sbool -> Ty.ty_bool
-  | _ -> Ty.ty_str (* TODO_WIP *)
+  | Ssimple (Isymbol n) -> Ty.ty_var (Ty.tv_of_string n)
+  | _ -> error "TODO_WIP smt_sort_to_ty"
 
-let rec smt_term_to_term = function
-  | Tconst (Cint bigint) ->
-      t_const (Constant.int_const bigint) Ty.ty_int
+let qual_id_to_vsymbol qid =
+  match qid with
+  | Qannotident (Isymbol n, s) ->
+      let name = Ident.id_fresh n in
+      create_vsymbol name (smt_sort_to_ty s)
+  | _ -> error "TODO_WIP_qual_id_to_vsymbol"
+
+let qual_id_to_lsymbol qid =
+  match qid with
+  | Qannotident (Isymbol n, s') ->
+      let name = Ident.id_fresh n in
+      create_lsymbol name [] (Some (smt_sort_to_ty s')) (* TODO_WIP type of args *)
+  | _ -> error "TODO_WIP_qual_id_to_lsymbol"
+
+let constant_to_term c =
+  match c with
+  | Cint bigint -> t_const (Constant.int_const bigint) Ty.ty_int
+  | Cbool b -> if b then t_true else t_false
+  | Cstring str -> t_const (Constant.string_const str) Ty.ty_str
+  | _ -> error "TODO_WIP constant_to_term"
+
+let rec term_to_term t =
+  match t with
+  | Tconst c -> constant_to_term c
+  | Tvar qid -> t_var (qual_id_to_vsymbol qid)
+  | Tapply (qid, ts) ->
+      let ls = qual_id_to_lsymbol qid in
+      t_app ls (List.map term_to_term ts) ls.ls_value
   | Tite (b,t1,t2) ->
-      t_if (smt_term_to_term b) (smt_term_to_term t1) (smt_term_to_term t2)
-  | _ -> t_bool_true
+      t_if
+        (term_to_term b)
+        (term_to_term t1)
+        (term_to_term t2)
+  | Tlet (vs, t) -> error "TODO_WIP Tlet"
+  | Tarray a -> error "TODO_WIP Tarray"
+  | Tunparsed s -> error "TODO_WIP Tunparesd"
+
+let smt_term_to_term t s =
+  let t' = term_to_term t in
+  if (t'.t_ty != None && Ty.ty_equal (smt_sort_to_ty s) (Opt.get t'.t_ty)) then
+    t'
+  else
+    error "TODO_WIP type error"
 
 let interpret_def_to_term ls oloc attrs def =
   match def with
+  | Dfunction ([], res, body) ->
+    if ls.ls_args = [] then
+      smt_term_to_term body res
+    else
+      error "TODO_WIP args mismatch"
   | Dfunction (args, res, body) ->
+    let res_ty = smt_sort_to_ty res in
+    let args_ty_list = List.map (fun (_,s) -> smt_sort_to_ty s) args in
+    if
+      (ls.ls_value != None && Ty.ty_equal (Opt.get ls.ls_value) res_ty)
+      &&
+      (List.fold_left2
+        (fun acc ty1 ty2 -> acc && Ty.ty_equal ty1 ty2)
+        true args_ty_list ls.ls_args)
+    then
       let vslist =
         List.map
           (fun (symbol, sort) ->
             let name = Ident.id_fresh symbol in
-            create_vsymbol name (smt_type_to_ty sort))
+            create_vsymbol name (smt_sort_to_ty sort))
           args in
-      let t = smt_term_to_term body in
-      t_lambda vslist [] t
-  | _ -> t_bool_true
+      t_lambda vslist [] (smt_term_to_term body res)
+    else
+      error "TODO_WIP type mismatch"
+  | _ -> t_bool_true (* TODO_WIP *)
 
 let terms_of_defs (* TODO_WIP *)
     (pinfo: Printer.printing_info)
@@ -386,8 +442,12 @@ let terms_of_defs (* TODO_WIP *)
       [] in
   List.iter
     (fun (ls,t) ->
-      Debug.dprintf debug "[terms_of_defs] ls = %a, t = %a@."
-        Pretty.print_ls ls Pretty.print_term t)
+      Debug.dprintf debug "[terms_of_defs] ls = %a@.t = %a@.t.t_ty = %a@.t.t_attrs = %a@.t.t_loc = %a@."
+        Pretty.print_ls ls
+        Pretty.print_term t
+        (Pp.print_option Pretty.print_ty) t.t_ty
+        Pretty.print_attrs t.t_attrs
+        (Pp.print_option Pretty.print_loc_as_attribute) t.t_loc)
     terms
   (* Mls.of_list terms *)
 
