@@ -126,6 +126,9 @@ for file in $files; do
       "657")
         z3steps=500000
         ;;
+      "668_projection")
+        z3steps=500000
+        ;;
     esac
     run CVC4,1.8 $filedir $filebase true   $cvc4steps
     run CVC4,1.8 $filedir $filebase false  $cvc4steps
