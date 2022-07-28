@@ -600,7 +600,9 @@ let create_prop_decl k p f =
   let news = news_id Sid.empty p.pr_name in
   mk_decl (Dprop (k,p,check_fvs f)) news
 
-let get_decl_syms d =
+let get_used_syms_ty ty = syms_ty Sid.empty ty
+
+let get_used_syms_decl d =
   match d.d_node with
   | Dtype ts -> syms_ty_decl ts
   | Ddata dl -> syms_data_decl dl
@@ -695,7 +697,7 @@ let known_add_decl kn0 decl =
     else raise (RedeclaredIdent id)
   in
   let kn = Mid.union check kn0 kn in
-  let unk = Mid.set_diff (get_decl_syms decl) kn in
+  let unk = Mid.set_diff (get_used_syms_decl decl) kn in
   if Sid.is_empty unk then kn
   else raise (UnknownIdent (Sid.choose unk))
 
