@@ -238,10 +238,20 @@ let print_mdecls ?fname m mdecls alldeps =
     end
     else false
 
-let find_module_path mm path m = match path with
-  | [] -> Mstr.find m mm
-  | path -> let mm = Env.read_library Pmodule.mlw_language env path in
-      mod_impl env (Mstr.find m mm)
+exception UnknownModule of string
+
+let () = Exn_printer.register (fun fmt e -> match e with
+      | UnknownModule s -> fprintf fmt "unknown module: %s" s
+      | _ -> raise e)
+
+let find_module_path mm path m =
+  try
+    match path with
+    | [] -> Mstr.find m mm
+    | path -> let mm = Env.read_library Pmodule.mlw_language env path in
+              mod_impl env (Mstr.find m mm)
+  with
+    Not_found -> raise (UnknownModule m)
 
 let find_module_id mm id =
   let (path, m, _) = Pmodule.restore_path id in find_module_path mm path m
