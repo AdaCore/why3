@@ -1,0 +1,18 @@
+module Int32
+
+  type t = < range -0x8000_0000 0x7fff_ffff >
+
+end
+
+module Main_module
+
+  use Int32
+  use bv.BV64
+
+  let rec f (n : Int32.t) (min : Int32.t) : Int32.t
+    ensures { Int32.t'int min = Int32.t'int result } = n
+
+  let rec g (n : Int32.t) (min : Int32.t) : Int32.t
+    ensures { min = result } = n
+
+end

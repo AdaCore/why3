@@ -274,21 +274,22 @@ let rec import_model_value loc env check known th_known ity v =
       | Proj (p, x) ->
           (* {p : ity -> ty_res => x: ty_res} : ITY *)
           let search (id, decl) = match decl.Decl.d_node with
-            | Decl.Dparam ls when String.equal (trace_or_name id) p -> Some ls
+            | Decl.Dparam ls when String.equal (trace_or_name id) p ->
+              begin match ls.ls_value with
+              | None -> None
+              | Some ty_res ->
+                begin match ls.ls_args with
+                | [] | _ :: _ :: _ -> None
+                | [ty_arg] ->
+                  if (Ty.ty_equal ty_arg (ty_of_ity ity)) then Some (ls, ty_res)
+                  else None
+                end
+              end
             | _ -> None in
-          let ls =
+          let ls, ty_res =
             let iter f = Mid.iter (fun id x -> f (id, x)) th_known in
             try Util.iter_first iter search with Not_found ->
               cannot_import "Projection %s not found" p in
-          let ty_res = match ls.ls_value with Some ty -> ty | None ->
-            cannot_import "projection %a is predicate" Pretty.print_ls ls in
-          let ty_arg = match ls.ls_args with [ty] -> ty | _ ->
-            cannot_import "projection %a is no unary function"
-              Pretty.print_ls ls in
-          if not (Ty.ty_equal ty_arg (ty_of_ity ity)) then
-            cannot_import "Cannot import projection %a, argument type %a is not \
-                           value type %a"
-              Pretty.print_ls ls Pretty.print_ty ty_arg print_ity ity;
           let x =
             import_model_value loc env check known th_known (ity_of_ty ty_res) x
           in
