@@ -279,6 +279,7 @@ val t_or : term -> term -> term
 val t_implies : term -> term -> term
 val t_iff : term -> term -> term
 val t_not : term -> term
+val t_bool_not : term -> term (* TODO_WIP ??? *)
 val t_true : term
 val t_false : term
 

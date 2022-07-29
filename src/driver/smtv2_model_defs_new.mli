@@ -78,3 +78,13 @@ type definition =
   | Dfunction of (symbol * sort) list * sort * term
   | Dterm of term (* corresponding value of a term *) (* TODO_WIP unused ?*)
   | Dnoelement (* TODO_WIP unused ?*)
+
+val print_index: Format.formatter -> index -> unit
+val print_identifier: Format.formatter -> identifier -> unit
+val print_sort: Format.formatter -> sort -> unit
+val print_constant: Format.formatter -> constant -> unit
+val print_qualified_identifier: Format.formatter -> qual_identifier -> unit
+val print_term: Format.formatter -> term -> unit
+val print_var_binding: Format.formatter -> var_binding -> unit
+val print_array: Format.formatter -> array -> unit
+val print_definition: Format.formatter -> definition -> unit

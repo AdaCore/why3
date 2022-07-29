@@ -637,6 +637,7 @@ let t_eps bf ty     = mk_term (Teps bf) ty
 let t_quant q qf    = mk_term (Tquant (q, qf)) None
 let t_binary op f g = mk_term (Tbinop (op, f, g)) None
 let t_not f         = mk_term (Tnot f) None
+let t_bool_not f         = mk_term (Tnot f) (Some ty_bool)
 let t_true          = mk_term (Ttrue) None
 let t_false         = mk_term (Tfalse) None
 

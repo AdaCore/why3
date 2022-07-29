@@ -256,9 +256,10 @@ module FromSexpToDef = struct
   let rec term sexp =
     try constant sexp with _ ->
     try Tvar (qualified_identifier sexp) with _ ->
-    try application sexp with _ ->
-    try Tarray (array sexp) with _ ->
+    try ite sexp with _ ->
     try let_term sexp with _ ->
+    try Tarray (array sexp) with _ ->
+    try application sexp with _ ->
       Tunparsed (string_of_sexp sexp)
 
   and ite = function
@@ -276,7 +277,6 @@ module FromSexpToDef = struct
     | sexp -> error sexp "var_binding"
 
   and application = function
-      (* TODO_WIP special case for boolean operators ? *)
     | List (qual_id :: ts) ->
         Tapply (qualified_identifier qual_id, List.map term ts)
     | sexp -> error sexp "application"
@@ -319,7 +319,14 @@ module FromDefToTerm = struct
 
   exception E of string
   let error s = raise (E s)
+
+  type env = { vs: vsymbol list }
+  let empty_env = { vs = [] }
   
+  let get_opt_type oty = match oty with
+  | None -> Ty.ty_bool
+  | Some ty -> ty
+
   let smt_sort_to_ty = function
     | Sstring -> Ty.ty_str
     | Sint -> Ty.ty_int
@@ -328,63 +335,78 @@ module FromDefToTerm = struct
     | Ssimple (Isymbol n) -> Ty.ty_var (Ty.tv_of_string n)
     | _ -> error "TODO_WIP smt_sort_to_ty"
   
-  let qual_id_to_vsymbol qid =
+  let qual_id_to_vsymbol vslist qid =
+    Debug.dprintf debug "[qual_id_to_vsymbol] qid = %a@."
+      print_qualified_identifier qid;
     match qid with
     | Qident (Isymbol n) ->
-      let name = Ident.id_fresh n in
-      create_vsymbol name Ty.ty_bool (* TODO_WIP type of args *)
+      begin try List.find (fun vs -> String.equal n vs.vs_name.id_string) vslist
+      with Not_found -> error "TODO_WIP cannot infer the type of the variable if not found in env"
+      end
     | Qannotident (Isymbol n, s) ->
-        let name = Ident.id_fresh n in
-        create_vsymbol name (smt_sort_to_ty s)
+      begin
+        try 
+          let vs = List.find (fun vs -> String.equal n vs.vs_name.id_string) vslist in
+          if Ty.ty_equal vs.vs_ty (smt_sort_to_ty s) then
+            vs
+          else
+            error "TODO_WIP type mismatch"
+        with Not_found -> 
+          create_vsymbol (Ident.id_fresh n) (smt_sort_to_ty s)
+      end
     | _ -> error "TODO_WIP_qual_id_to_vsymbol"
   
-  let qual_id_to_lsymbol qid =
-    match qid with
-    | Qident (Isymbol n) ->
-      let name = Ident.id_fresh n in
-      create_lsymbol name [] None (* TODO_WIP type of args *)
-    | Qannotident (Isymbol n, s') ->
-        let name = Ident.id_fresh n in
-        create_lsymbol name [] (Some (smt_sort_to_ty s')) (* TODO_WIP type of args *)
-    | _ -> error "TODO_WIP_qual_id_to_lsymbol"
-  
   let constant_to_term c =
+    Debug.dprintf debug "[constant_to_term] c = %a@." print_constant c;
     match c with
     | Cint bigint -> t_const (Constant.int_const bigint) Ty.ty_int
-    | Cbool b -> if b then t_true else t_false
+    | Cbool b -> if b then t_bool_true else t_bool_false
     | Cstring str -> t_const (Constant.string_const str) Ty.ty_str
     | _ -> error "TODO_WIP constant_to_term"
   
-  let rec term_to_term t =
+  let rec term_to_term env t =
+    Debug.dprintf debug "[term_to_term] t = %a@." print_term t;
     match t with
     | Tconst c -> constant_to_term c
-    | Tvar qid -> t_var (qual_id_to_vsymbol qid)
-    | Tapply (qid, ts) ->
-        let ls = qual_id_to_lsymbol qid in
-        t_app ls (List.map term_to_term ts) ls.ls_value
+    | Tvar qid -> t_var (qual_id_to_vsymbol env.vs qid)
     | Tite (b,t1,t2) ->
         t_if
-          (term_to_term b)
-          (term_to_term t1)
-          (term_to_term t2)
+          (term_to_term env b)
+          (term_to_term env t1)
+          (term_to_term env t2)
+    | Tapply (qid, ts) -> apply_to_term env qid ts
     | Tlet (vs, t) -> error "TODO_WIP Tlet"
     | Tarray a -> error "TODO_WIP Tarray"
     | Tunparsed s -> error "TODO_WIP Tunparsed"
   
-  let smt_term_to_term t s =
-    let t' = term_to_term t in
-    if (t'.t_ty != None && Ty.ty_equal (smt_sort_to_ty s) (Opt.get t'.t_ty)) then
-      t'
-    else
-      error "TODO_WIP type error"
+  and apply_to_term env qid ts =
+    Debug.dprintf debug "[apply_to_term] qid = %a@ ts = %a@."
+      print_qualified_identifier qid
+      Pp.(print_list space print_term) ts;
+    match qid, ts with
+    | Qident (Isymbol "="), [t1; t2] ->
+      t_equ (term_to_term env t1) (term_to_term env t2)
+    | Qident (Isymbol "not"), [t] ->
+      t_bool_not (term_to_term env t)
+    | Qannotident (Isymbol n, s), ts ->
+      let ts' = List.map (term_to_term env) ts in
+      let ts'_ty =
+        try List.map (fun t -> Opt.get t.t_ty) ts'
+        with _ -> error "TODO_WIP apply_to_term error with types of arguments" in
+      let ls = create_lsymbol (Ident.id_fresh n) ts'_ty (Some (smt_sort_to_ty s)) in
+      t_app ls ts' ls.ls_value
+    | _ -> error "TODO_WIP apply_to_term"
+
+  let smt_term_to_term env t s =
+    let t' = term_to_term env t in
+    if (Ty.ty_equal (smt_sort_to_ty s) (get_opt_type t'.t_ty)) then t'
+    else error "TODO_WIP type error"
   
   let interpret_def_to_term ls oloc attrs def =
     match def with
-    | Dfunction ([], res, body) ->
-      if ls.ls_args = [] then
-        smt_term_to_term body res
-      else
-        error "TODO_WIP args mismatch"
+    | Dfunction ([], res, body) when ls.ls_args = [] ->
+      smt_term_to_term empty_env body res
+    | Dfunction ([], _, _) -> error "TODO_WIP arity mismatch"
     | Dfunction (args, res, body) ->
       let res_ty = smt_sort_to_ty res in
       let args_ty_list = List.map (fun (_,s) -> smt_sort_to_ty s) args in
@@ -401,7 +423,8 @@ module FromDefToTerm = struct
               let name = Ident.id_fresh symbol in
               create_vsymbol name (smt_sort_to_ty sort))
             args in
-        t_lambda vslist [] (smt_term_to_term body res)
+        let env = { vs = vslist } in
+        t_lambda vslist [] (smt_term_to_term env body res)
       else
         error "TODO_WIP type mismatch"
     | _ -> t_bool_true (* TODO_WIP *)
