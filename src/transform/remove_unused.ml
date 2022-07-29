@@ -76,6 +76,16 @@ let do_removal_unused_decl usymb (td : Theory.tdecl) : Theory.tdecl option =
           if Sid.is_empty (Sid.inter d.d_news usymb.used_ids) then None
           else Some td)
 
+let metas_remove =
+  let open Theory in
+  List.fold_left
+    (fun acc mt -> Smeta.add mt acc)
+    Smeta.empty
+    [meta_depends ;
+     Printer.meta_remove_prop;
+     Printer.meta_remove_logic;
+     Printer.meta_remove_type]
+
 (* The first step of the removal : compute the used identifiers *)
 let rec compute_used_ids usymb task : used_symbols =
   let open Theory in
@@ -86,8 +96,25 @@ let rec compute_used_ids usymb task : used_symbols =
       let open Decl in
       let usymb =
         match td.td_node with
-        | Use _ | Clone _ | Meta _ -> usymb
-        | Decl d -> (
+        | Use _ | Clone _ -> usymb
+        | Meta (mt, _) when Smeta.mem mt metas_remove -> usymb
+        | Meta (_, margs) ->
+            let used_ids =
+              List.fold_left
+                (fun acc arg ->
+                   match arg with
+                   | MApr pr -> Sid.add pr.pr_name acc
+                   | MAty ty ->
+                       let s = Decl.get_used_syms_ty ty in
+                       Sid.union s acc
+                   | MAts ts -> Sid.add ts.Ty.ts_name acc
+                   | MAls ls -> Sid.add ls.Term.ls_name acc
+                   | MAstr _ | MAint _ | MAid _ -> acc)
+                usymb.used_ids margs
+            in
+            { usymb with used_ids }
+        | Decl d ->
+            begin
             match d.d_node with
             | Dprop (_, pr, _t) -> (
                 try
@@ -118,7 +145,9 @@ let rec compute_used_ids usymb task : used_symbols =
                     usymb with
                     used_ids = Sid.union usymb.used_ids (Sid.union ids d.d_news);
                   }
-                else usymb)
+                else
+                  usymb
+          end
       in
       compute_used_ids usymb ta
 
