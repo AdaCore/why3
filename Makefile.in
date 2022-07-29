@@ -1927,7 +1927,7 @@ endif
 
 FILESTODOC = $(subst .ml.mli,.ml,$(MODULESTODOC:%=src/%.mli))
 
-DOCFLAGS = $(INCLUDES) $(LIBINCLUDES)
+DOCFLAGS = -sort $(INCLUDES) $(LIBINCLUDES)
 
 ifeq (@enable_ocamlfind@,yes)
 	DOCFLAGS += $(addprefix -package ,$(EXTPKGS))
