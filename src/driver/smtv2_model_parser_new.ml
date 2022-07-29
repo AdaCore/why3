@@ -17,9 +17,37 @@ let debug = Debug.register_flag "model_parser_new"
   ~desc:"Print@ debugging@ messages@ about@ parsing@ \
          the@ SMTv2@ model@ for@ counterexamples."
 
-module FromSexp = struct
 
+module FromStringToSexp = struct
+  exception E of string
+  
+  let fix_CVC18_bug_on_float_constants =
+    let r = Re.Str.regexp "\\((fp #b[01] #b[01]+ #b[01]+\\)" in
+    fun s -> Re.Str.global_replace r "\\1)" s
+  
+  let parse_string str =
+    Debug.dprintf debug "[parse_string] model_string = %s@." str;
+    let lexbuf = Lexing.from_string str in
+    try
+      Sexp.read_list lexbuf
+    with Sexp.Error ->
+      let msg = Format.sprintf "Cannot parse as S-expression at character %d"
+                  (Lexing.lexeme_start lexbuf) in
+      (* workaround for CVC4 1.8 bug in printing float constants *)
+      let str = fix_CVC18_bug_on_float_constants str in
+      let lexbuf = Lexing.from_string str in
+      try
+        Sexp.read_list lexbuf
+      with Sexp.Error ->
+        raise (E msg)
+end
+
+module FromSexpToDef = struct
   open Sexp
+
+  exception E of sexp * string
+  let error sexp s = raise (E (sexp, s))
+  let atom_error a s = raise (E (Atom a, s))
 
   let is_name_start = function
     | '_' | 'a'..'z' | 'A'..'Z'
@@ -37,11 +65,6 @@ module FromSexp = struct
     | List l -> Format.fprintf fmt "@[@[<hv2>(%a@])@]" Pp.(print_list space pp_sexp) l
 
   let string_of_sexp = Format.asprintf "%a" pp_sexp
-
-  exception E of sexp * string
-
-  let error sexp s = raise (E (sexp, s))
-  let atom_error a s = raise (E (Atom a, s))
 
   let atom f = function
     | Atom s -> f s
@@ -187,6 +210,7 @@ module FromSexp = struct
       error sexp "index"
   
   let identifier sexp : identifier = match sexp with
+    | Atom "=" -> Isymbol ("=")
     | Atom _ -> Isymbol (symbol sexp)
     | List [Atom "_"; s; List idx] ->
         Iindexedsymbol (symbol s, List.map index idx)
@@ -234,7 +258,6 @@ module FromSexp = struct
     try Tvar (qualified_identifier sexp) with _ ->
     try application sexp with _ ->
     try Tarray (array sexp) with _ ->
-    try ite sexp with _ ->
     try let_term sexp with _ ->
       Tunparsed (string_of_sexp sexp)
 
@@ -277,8 +300,8 @@ module FromSexp = struct
 
   let is_model_decl = function Atom "define-fun" -> true | _ -> false
 
-  let model sexp =
-    if sexp = [] then None else
+  let parse_sexps sexp =
+    if sexp = [] then Mstr.empty else
     let decls, rest = match sexp with
       | List (Atom "model" :: decls) :: rest -> decls, rest
       | List decls :: rest when List.exists (Sexp.exists is_model_decl) decls ->
@@ -288,7 +311,130 @@ module FromSexp = struct
       failwith
         "Cannot read S-expression as model: next model not separated \
          (missing separator in driver?)";
-    Some (Mstr.of_list (Lists.map_filter decl decls))
+    Mstr.of_list (Lists.map_filter decl decls)
+
+end
+
+module FromDefToTerm = struct
+
+  exception E of string
+  let error s = raise (E s)
+  
+  let smt_sort_to_ty = function
+    | Sstring -> Ty.ty_str
+    | Sint -> Ty.ty_int
+    | Sreal -> Ty.ty_real
+    | Sbool -> Ty.ty_bool
+    | Ssimple (Isymbol n) -> Ty.ty_var (Ty.tv_of_string n)
+    | _ -> error "TODO_WIP smt_sort_to_ty"
+  
+  let qual_id_to_vsymbol qid =
+    match qid with
+    | Qident (Isymbol n) ->
+      let name = Ident.id_fresh n in
+      create_vsymbol name Ty.ty_bool (* TODO_WIP type of args *)
+    | Qannotident (Isymbol n, s) ->
+        let name = Ident.id_fresh n in
+        create_vsymbol name (smt_sort_to_ty s)
+    | _ -> error "TODO_WIP_qual_id_to_vsymbol"
+  
+  let qual_id_to_lsymbol qid =
+    match qid with
+    | Qident (Isymbol n) ->
+      let name = Ident.id_fresh n in
+      create_lsymbol name [] None (* TODO_WIP type of args *)
+    | Qannotident (Isymbol n, s') ->
+        let name = Ident.id_fresh n in
+        create_lsymbol name [] (Some (smt_sort_to_ty s')) (* TODO_WIP type of args *)
+    | _ -> error "TODO_WIP_qual_id_to_lsymbol"
+  
+  let constant_to_term c =
+    match c with
+    | Cint bigint -> t_const (Constant.int_const bigint) Ty.ty_int
+    | Cbool b -> if b then t_true else t_false
+    | Cstring str -> t_const (Constant.string_const str) Ty.ty_str
+    | _ -> error "TODO_WIP constant_to_term"
+  
+  let rec term_to_term t =
+    match t with
+    | Tconst c -> constant_to_term c
+    | Tvar qid -> t_var (qual_id_to_vsymbol qid)
+    | Tapply (qid, ts) ->
+        let ls = qual_id_to_lsymbol qid in
+        t_app ls (List.map term_to_term ts) ls.ls_value
+    | Tite (b,t1,t2) ->
+        t_if
+          (term_to_term b)
+          (term_to_term t1)
+          (term_to_term t2)
+    | Tlet (vs, t) -> error "TODO_WIP Tlet"
+    | Tarray a -> error "TODO_WIP Tarray"
+    | Tunparsed s -> error "TODO_WIP Tunparsed"
+  
+  let smt_term_to_term t s =
+    let t' = term_to_term t in
+    if (t'.t_ty != None && Ty.ty_equal (smt_sort_to_ty s) (Opt.get t'.t_ty)) then
+      t'
+    else
+      error "TODO_WIP type error"
+  
+  let interpret_def_to_term ls oloc attrs def =
+    match def with
+    | Dfunction ([], res, body) ->
+      if ls.ls_args = [] then
+        smt_term_to_term body res
+      else
+        error "TODO_WIP args mismatch"
+    | Dfunction (args, res, body) ->
+      let res_ty = smt_sort_to_ty res in
+      let args_ty_list = List.map (fun (_,s) -> smt_sort_to_ty s) args in
+      if
+        (ls.ls_value != None && Ty.ty_equal (Opt.get ls.ls_value) res_ty)
+        &&
+        (List.fold_left2
+          (fun acc ty1 ty2 -> acc && Ty.ty_equal ty1 ty2)
+          true args_ty_list ls.ls_args)
+      then
+        let vslist =
+          List.map
+            (fun (symbol, sort) ->
+              let name = Ident.id_fresh symbol in
+              create_vsymbol name (smt_sort_to_ty sort))
+            args in
+        t_lambda vslist [] (smt_term_to_term body res)
+      else
+        error "TODO_WIP type mismatch"
+    | _ -> t_bool_true (* TODO_WIP *)
+  
+  let parse_defs (* TODO_WIP *)
+      (pinfo: Printer.printing_info)
+      (defs: Smtv2_model_defs_new.definition Mstr.t) =
+    let qterms = pinfo.queried_terms in
+    let _ = Mstr.iter
+      (fun key (ls,_,_) ->
+        Debug.dprintf debug "[queried_terms] key = %s, ls = %a@."
+          key Pretty.print_ls ls)
+      qterms in
+    let terms =
+      Mstr.fold
+        (fun n def acc ->
+          try
+            let (ls,oloc,attrs) = Mstr.find n qterms in
+            (ls, interpret_def_to_term ls oloc attrs def) :: acc
+          with Not_found -> acc)
+        defs
+        [] in
+    List.iter
+      (fun (ls,t) ->
+        Debug.dprintf debug "[parse_defs] ls = %a@.t = %a@.t.t_ty = %a@.t.t_attrs = %a@.t.t_loc = %a@."
+          Pretty.print_ls ls
+          Pretty.print_term t
+          (Pp.print_option Pretty.print_ty) t.t_ty
+          Pretty.print_attrs t.t_attrs
+          (Pp.print_option Pretty.print_loc_as_attribute) t.t_loc)
+      terms
+    (* Mls.of_list terms *)
+
 end
 
 (*
@@ -297,13 +443,20 @@ end
 ****************************************************************
 *)
 
-exception Smtv2_model_parsing_error of string
-
 let () =
-  Exn_printer.register
+  Exn_printer.register (* TODO_WIP more info in messages *)
     (fun fmt exn -> match exn with
-        | Smtv2_model_parsing_error msg ->
-            Format.fprintf fmt "Error@ while@ reading@ SMT@ model:@ %s" msg
+        | FromStringToSexp.E msg ->
+            Format.fprintf fmt "Error@ while@ parsing@ SMT@ model@ from@ \
+              string@ to@ S-expression:@ %s" msg
+        | FromSexpToDef.E (sexp, s) ->
+            Format.fprintf fmt "Error@ while@ parsing@ SMT@ model@ from@ \
+              S-expression@ to@ model@ definition:@ cannot@ read@ the@ \
+              following@ S-expression@ as@ %s:@ %a"
+              s FromSexpToDef.pp_sexp sexp
+        | FromDefToTerm.E msg ->
+            Format.fprintf fmt "Error@ while@ parsing@ SMT@ model@ from@ \
+              model@ definition@ to@ term:@ %s" msg
         | _ -> raise exn)
 
 let get_model_string input =
@@ -311,153 +464,13 @@ let get_model_string input =
   let res = Re.Str.search_backward nr input (String.length input) in
   String.sub input 0 (res + String.length (Re.Str.matched_string input))
 
-let fix_CVC18_bug_on_float_constants =
-  let r = Re.Str.regexp "\\((fp #b[01] #b[01]+ #b[01]+\\)" in
-  fun s -> Re.Str.global_replace r "\\1)" s
-
-let parse_sexps str =
-  Debug.dprintf debug "[parse_sexps] model_string = %s@." str;
-  let lexbuf = Lexing.from_string str in
-  try
-    Sexp.read_list lexbuf
-  with Sexp.Error ->
-    let msg = Format.sprintf "Cannot parse as S-expression at character %d"
-                (Lexing.lexeme_start lexbuf) in
-    (* workaround for CVC4 1.8 bug in printing float constants *)
-    let str = fix_CVC18_bug_on_float_constants str in
-    let lexbuf = Lexing.from_string str in
-    try
-      Sexp.read_list lexbuf
-    with Sexp.Error ->
-      raise (Smtv2_model_parsing_error msg)
-
-let model_of_sexps sexps =
-  try
-    Opt.get_def Mstr.empty (FromSexp.model sexps)
-  with FromSexp.E (sexp', s) ->
-    let msg = Format.asprintf "Cannot read the following S-expression as %s: %a"
-        s FromSexp.pp_sexp sexp' in
-    raise (Smtv2_model_parsing_error msg)
-
-exception E of string
-let error s = raise (E s)
-
-let smt_sort_to_ty = function
-  | Sstring -> Ty.ty_str
-  | Sint -> Ty.ty_int
-  | Sreal -> Ty.ty_real
-  | Sbool -> Ty.ty_bool
-  | Ssimple (Isymbol n) -> Ty.ty_var (Ty.tv_of_string n)
-  | _ -> error "TODO_WIP smt_sort_to_ty"
-
-let qual_id_to_vsymbol qid =
-  match qid with
-  | Qannotident (Isymbol n, s) ->
-      let name = Ident.id_fresh n in
-      create_vsymbol name (smt_sort_to_ty s)
-  | _ -> error "TODO_WIP_qual_id_to_vsymbol"
-
-let qual_id_to_lsymbol qid =
-  match qid with
-  | Qannotident (Isymbol n, s') ->
-      let name = Ident.id_fresh n in
-      create_lsymbol name [] (Some (smt_sort_to_ty s')) (* TODO_WIP type of args *)
-  | _ -> error "TODO_WIP_qual_id_to_lsymbol"
-
-let constant_to_term c =
-  match c with
-  | Cint bigint -> t_const (Constant.int_const bigint) Ty.ty_int
-  | Cbool b -> if b then t_true else t_false
-  | Cstring str -> t_const (Constant.string_const str) Ty.ty_str
-  | _ -> error "TODO_WIP constant_to_term"
-
-let rec term_to_term t =
-  match t with
-  | Tconst c -> constant_to_term c
-  | Tvar qid -> t_var (qual_id_to_vsymbol qid)
-  | Tapply (qid, ts) ->
-      let ls = qual_id_to_lsymbol qid in
-      t_app ls (List.map term_to_term ts) ls.ls_value
-  | Tite (b,t1,t2) ->
-      t_if
-        (term_to_term b)
-        (term_to_term t1)
-        (term_to_term t2)
-  | Tlet (vs, t) -> error "TODO_WIP Tlet"
-  | Tarray a -> error "TODO_WIP Tarray"
-  | Tunparsed s -> error "TODO_WIP Tunparesd"
-
-let smt_term_to_term t s =
-  let t' = term_to_term t in
-  if (t'.t_ty != None && Ty.ty_equal (smt_sort_to_ty s) (Opt.get t'.t_ty)) then
-    t'
-  else
-    error "TODO_WIP type error"
-
-let interpret_def_to_term ls oloc attrs def =
-  match def with
-  | Dfunction ([], res, body) ->
-    if ls.ls_args = [] then
-      smt_term_to_term body res
-    else
-      error "TODO_WIP args mismatch"
-  | Dfunction (args, res, body) ->
-    let res_ty = smt_sort_to_ty res in
-    let args_ty_list = List.map (fun (_,s) -> smt_sort_to_ty s) args in
-    if
-      (ls.ls_value != None && Ty.ty_equal (Opt.get ls.ls_value) res_ty)
-      &&
-      (List.fold_left2
-        (fun acc ty1 ty2 -> acc && Ty.ty_equal ty1 ty2)
-        true args_ty_list ls.ls_args)
-    then
-      let vslist =
-        List.map
-          (fun (symbol, sort) ->
-            let name = Ident.id_fresh symbol in
-            create_vsymbol name (smt_sort_to_ty sort))
-          args in
-      t_lambda vslist [] (smt_term_to_term body res)
-    else
-      error "TODO_WIP type mismatch"
-  | _ -> t_bool_true (* TODO_WIP *)
-
-let terms_of_defs (* TODO_WIP *)
-    (pinfo: Printer.printing_info)
-    (defs: Smtv2_model_defs_new.definition Mstr.t) =
-  let qterms = pinfo.queried_terms in
-  let _ = Mstr.iter
-    (fun key (ls,_,_) ->
-      Debug.dprintf debug "[queried_terms] key = %s, ls = %a@."
-        key Pretty.print_ls ls)
-    qterms in
-  let terms =
-    Mstr.fold
-      (fun n def acc ->
-        try
-          let (ls,oloc,attrs) = Mstr.find n qterms in
-          (ls, interpret_def_to_term ls oloc attrs def) :: acc
-        with Not_found -> acc)
-      defs
-      [] in
-  List.iter
-    (fun (ls,t) ->
-      Debug.dprintf debug "[terms_of_defs] ls = %a@.t = %a@.t.t_ty = %a@.t.t_attrs = %a@.t.t_loc = %a@."
-        Pretty.print_ls ls
-        Pretty.print_term t
-        (Pp.print_option Pretty.print_ty) t.t_ty
-        Pretty.print_attrs t.t_attrs
-        (Pp.print_option Pretty.print_loc_as_attribute) t.t_loc)
-    terms
-  (* Mls.of_list terms *)
-
 let parse pinfo input =
   match get_model_string input with
   | exception Not_found -> []
   | model_string ->
-      let sexps = parse_sexps model_string in
-      let defs = model_of_sexps sexps in
-      let _ = terms_of_defs pinfo defs in (* TODO_WIP *)
+      let sexps = FromStringToSexp.parse_string model_string in
+      let defs = FromSexpToDef.parse_sexps sexps in
+      let _ = FromDefToTerm.parse_defs pinfo defs in (* TODO_WIP *)
       []
 
 let () = Model_parser.register_model_parser "smtv2new" parse (* TODO_WIP *)
