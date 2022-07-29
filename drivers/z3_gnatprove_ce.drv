@@ -22,6 +22,7 @@ printer "smtv2"
 (* Counterexamples: set model parser *)
 model_parser "smtv2"
 
+transformation "remove_unused_keep_constants"
 transformation "inline_trivial"
 transformation "eliminate_builtin"
 transformation "detect_polymorphism"

@@ -1,6 +1,8 @@
 import "alt_ergo_fp.drv"
 filename "%f-%t-%g.ae"
 
+transformation "remove_unused_keep_constants"
+
 theory ieee_float.GenericFloat
  remove prop abs_special
  remove prop le_special

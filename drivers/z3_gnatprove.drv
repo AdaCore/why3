@@ -20,6 +20,7 @@ printer "smtv2"
 (* Counterexamples: set model parser *)
 model_parser "smtv2"
 
+transformation "remove_unused_keep_constants"
 transformation "inline_trivial"
 transformation "eliminate_builtin"
 transformation "detect_polymorphism"
@@ -30,7 +31,6 @@ transformation "eliminate_epsilon"
 
 (* remove pointless quantifiers from the goal *)
 transformation "introduce_premises"
-transformation "eliminate_unused"
 
 transformation "simplify_formula"
 (*transformation "simplify_trivial_quantification"*)
