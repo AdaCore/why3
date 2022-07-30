@@ -53,7 +53,8 @@ module FibonacciTailRecList
   =
     match l with
     | Nil -> 0
-    | Cons x r -> assert {x >= 0 };
+    | Cons x r -> assert { mem x l };
+                  assert { forall n. mem n r -> mem n l };
                   power 2 x + sum_pow r
     end
 
