@@ -1057,7 +1057,13 @@ let warn_constructors_mismatch loc d d' =
   if d.itd_its.its_ts.ts_name.id_string = d'.itd_its.its_ts.ts_name.id_string
   then List.iter2 warn_cons d.itd_constructors d'.itd_constructors
 
-let clone_type_decl loc inst cl tdl kn =
+let save_special_ls cl d d' = match d.d_node, d'.d_node with
+  | Dparam ls, Dparam ls' | Dlogic [ls,_], Dlogic [ls',_] ->
+      cl.ls_table <- Mls.add ls ls' cl.ls_table;
+  | Dtype _, Dtype _ -> ()
+  | _ -> assert false
+
+let clone_type_decl loc inst cl tdl decl kn =
   let def =
     List.fold_left (fun m d -> Mits.add d.itd_its d m) Mits.empty tdl in
   let cloned =
@@ -1085,14 +1091,29 @@ let clone_type_decl loc inst cl tdl kn =
       Hits.add htd s (Some itd) in
     (* alias *)
     if s.its_def <> NoDef then begin
-      if cloned then raise (CannotInstantiate id);
-      let itd = match s.its_def with
-        | Alias ty -> create_alias_decl id' ts.ts_args (conv_ity alg ty)
-        | Range ir -> create_range_decl id' ir
-        | Float ff -> create_float_decl id' ff
-        | NoDef -> assert false (* never *) in
-      cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
-      save_itd itd
+      if cloned then
+        let s' = match s.its_def, Mts.find_opt ts inst.mi_ts with
+          | Range ir, Some ({ its_def = Range ir'; _ } as s') ->
+              if not (Number.int_range_equal ir ir')
+              then raise (CannotInstantiate id);
+              s'
+          | Float ff, Some ({ its_def = Float ff'; _ } as s') ->
+              if not (Number.float_format_equal ff ff')
+              then raise (CannotInstantiate id);
+              s'
+          | _ -> raise (CannotInstantiate id) in
+        cl.ts_table <- Mts.add ts s' cl.ts_table;
+        let decl' = Mid.find s'.its_ts.ts_name kn in
+        List.iter2 (save_special_ls cl) decl.pd_pure decl'.pd_pure;
+        Hits.add htd s None
+      else
+        let itd = match s.its_def with
+          | Alias ty -> create_alias_decl id' ts.ts_args (conv_ity alg ty)
+          | Range ir -> create_range_decl id' ir
+          | Float ff -> create_float_decl id' ff
+          | NoDef -> assert false (* never *) in
+        cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
+        save_itd itd
     end else
     (* abstract *)
     if s.its_private && cloned then begin
@@ -1233,17 +1254,12 @@ let clone_pdecl loc inst cl uc d = match d.pd_node with
       let add_e spv e = Spv.union spv e.e_effect.eff_reads in
       let add_d spv d = Opt.fold add_e spv d.itd_witness in
       freeze_foreign cl (List.fold_left add_d Spv.empty tdl);
-      let ndl, vcl = clone_type_decl loc inst cl tdl uc.muc_known in
+      let ndl, vcl = clone_type_decl loc inst cl tdl d uc.muc_known in
       let uc = List.fold_left add_vc uc vcl in
       let dl = if ndl <> [] then create_type_decl ndl else [] in
-      let save_special_ls d d' = match d.d_node, d'.d_node with
-        | Dparam ls, Dparam ls' | Dlogic [ls,_], Dlogic [ls',_] ->
-            cl.ls_table <- Mls.add ls ls' cl.ls_table;
-        | Dtype _, Dtype _ -> ()
-        | _ -> assert false in
       begin match tdl, dl with
       | [{itd_its = {its_def = (Range _|Float _)}}], [d'] ->
-          List.iter2 save_special_ls d.pd_pure d'.pd_pure
+          List.iter2 (save_special_ls cl) d.pd_pure d'.pd_pure
       | _ -> () end;
       let add uc d = add_pdecl ~warn:false ~vc:false uc d in
       List.fold_left add uc dl
