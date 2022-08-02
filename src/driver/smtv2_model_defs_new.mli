@@ -74,10 +74,8 @@ and array =
   | Aconst of sort * term
   | Astore of array * term * term
 
-type definition =
-  | Dfunction of (symbol * sort) list * sort * term
-  | Dterm of term (* corresponding value of a term *) (* TODO_WIP unused ?*)
-  | Dnoelement (* TODO_WIP unused ?*)
+type function_def = (symbol * sort) list * sort * term
+type datatype_decl = (sort * symbol list)
 
 val print_index: Format.formatter -> index -> unit
 val print_identifier: Format.formatter -> identifier -> unit
@@ -87,4 +85,5 @@ val print_qualified_identifier: Format.formatter -> qual_identifier -> unit
 val print_term: Format.formatter -> term -> unit
 val print_var_binding: Format.formatter -> var_binding -> unit
 val print_array: Format.formatter -> array -> unit
-val print_definition: Format.formatter -> definition -> unit
+val print_function_def: Format.formatter -> function_def -> unit
+val print_datatype_decl: Format.formatter -> datatype_decl -> unit

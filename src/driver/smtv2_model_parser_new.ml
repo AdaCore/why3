@@ -290,28 +290,51 @@ module FromSexpToDef = struct
         let a = try array x with _ -> Avar (symbol x) in
         Astore (a, term t1, term t2)
     | sexp -> error sexp "array"
+  
+  let rec dt_symbols = function
+  | [] -> []
+  | List ((Atom n)::_) :: tl -> n :: dt_symbols tl
+  | _ :: tl -> dt_symbols tl (* TODO_WIP print warning *)
+  
+  let dt_decl : sexp -> datatype_decl option = function
+    | List [Atom "declare-datatypes";
+            List [List [Atom n1; Atom _]];
+            List [List [List ((Atom n2)::_)]]] ->
+      Some (sort (Atom n1), [n2])
+    | List [Atom "declare-datatypes";
+            List [List [Atom n1; Atom _]];
+            List [List symbols]] ->
+      Some (sort (Atom n1), dt_symbols symbols)
+    | _ -> None
 
-  let decl = function
+  let fun_def : sexp -> (string * function_def) option = function
     | List [Atom "define-fun"; Atom n; args; res; body] ->
-        let res = sort res in
-        let args = list arg args and body = term body in
-        Some (n, Dfunction (args, res, body))
+      let res = sort res in
+      let args = list arg args and body = term body in
+      Some (n, (args, res, body))
     | _ -> None
 
   let is_model_decl = function Atom "define-fun" -> true | _ -> false
 
-  let parse_sexps sexp =
-    if sexp = [] then Mstr.empty else
-    let decls, rest = match sexp with
-      | List (Atom "model" :: decls) :: rest -> decls, rest
-      | List decls :: rest when List.exists (Sexp.exists is_model_decl) decls ->
-          decls, rest
+  let get_and_check_model sexps =
+    if sexps = [] then [] else
+    let model, rest = match sexps with
+      | List (Atom "model" :: model) :: rest -> model, rest
+      | List model :: rest when List.exists (Sexp.exists is_model_decl) model ->
+          model, rest
       | _ -> failwith "Cannot read S-expression as model: model not first" in
     if List.exists (Sexp.exists is_model_decl) rest then
       failwith
         "Cannot read S-expression as model: next model not separated \
-         (missing separator in driver?)";
-    Mstr.of_list (Lists.map_filter decl decls)
+         (missing separator in driver?)"
+    else model
+
+  let get_fun_defs model =
+    let fun_defs = Lists.map_filter fun_def model in
+    Mstr.of_list fun_defs
+
+  let get_dt_decls model =
+    Lists.map_filter dt_decl model
 
 end
 
@@ -320,33 +343,51 @@ module FromDefToTerm = struct
   exception E of string
   let error s = raise (E s)
 
-  type env = { vs: vsymbol list }
-  let empty_env = { vs = [] }
+  type env = { vs: vsymbol list; dt: datatype_decl list }
+  let mk_env vslist dt_decls =
+    { vs = vslist;
+      dt = dt_decls }
   
   let get_opt_type oty = match oty with
   | None -> Ty.ty_bool
   | Some ty -> ty
 
-  let smt_sort_to_ty = function
+  let rec smt_sort_to_ty s =
+    Debug.dprintf debug "[smt_sort_to_ty] s = %a@." print_sort s;
+    match s with
     | Sstring -> Ty.ty_str
     | Sint -> Ty.ty_int
     | Sreal -> Ty.ty_real
     | Sbool -> Ty.ty_bool
+    | Sarray (s1,s2) ->
+      Ty.ty_app Ty.ts_func [smt_sort_to_ty s1; smt_sort_to_ty s2]
     | Ssimple (Isymbol n) -> Ty.ty_var (Ty.tv_of_string n)
     | _ -> error "TODO_WIP smt_sort_to_ty"
   
-  let qual_id_to_vsymbol vslist qid =
+  let qual_id_to_vsymbol env s qid =
     Debug.dprintf debug "[qual_id_to_vsymbol] qid = %a@."
       print_qualified_identifier qid;
     match qid with
     | Qident (Isymbol n) ->
-      begin try List.find (fun vs -> String.equal n vs.vs_name.id_string) vslist
-      with Not_found -> error "TODO_WIP cannot infer the type of the variable if not found in env"
+      begin try List.find (fun vs -> String.equal n vs.vs_name.id_string) env.vs
+      with Not_found ->
+        if s != None then
+          create_vsymbol (Ident.id_fresh n) (smt_sort_to_ty (Opt.get s))
+        else
+          let search_datatype (s, symbols) =
+            match List.find_opt (fun n' -> String.equal n n') symbols with
+            | None -> None
+            | Some n' -> Some (smt_sort_to_ty s)
+          in
+          let vs_ty = match List.filter_map search_datatype env.dt with
+            | [ty] -> ty
+            | _ -> error "TODO_WIP cannot infer the type of the variable" in
+          create_vsymbol (Ident.id_fresh n) vs_ty
       end
     | Qannotident (Isymbol n, s) ->
       begin
         try 
-          let vs = List.find (fun vs -> String.equal n vs.vs_name.id_string) vslist in
+          let vs = List.find (fun vs -> String.equal n vs.vs_name.id_string) env.vs in
           if Ty.ty_equal vs.vs_ty (smt_sort_to_ty s) then
             vs
           else
@@ -364,16 +405,16 @@ module FromDefToTerm = struct
     | Cstring str -> t_const (Constant.string_const str) Ty.ty_str
     | _ -> error "TODO_WIP constant_to_term"
   
-  let rec term_to_term env t =
+  let rec term_to_term env s t =
     Debug.dprintf debug "[term_to_term] t = %a@." print_term t;
     match t with
     | Tconst c -> constant_to_term c
-    | Tvar qid -> t_var (qual_id_to_vsymbol env.vs qid)
+    | Tvar qid -> t_var (qual_id_to_vsymbol env s qid)
     | Tite (b,t1,t2) ->
         t_if
-          (term_to_term env b)
-          (term_to_term env t1)
-          (term_to_term env t2)
+          (term_to_term env (Some Sbool) b)
+          (term_to_term env s t1)
+          (term_to_term env s t2)
     | Tapply (qid, ts) -> apply_to_term env qid ts
     | Tlet (vs, t) -> error "TODO_WIP Tlet"
     | Tarray a -> error "TODO_WIP Tarray"
@@ -385,11 +426,26 @@ module FromDefToTerm = struct
       Pp.(print_list space print_term) ts;
     match qid, ts with
     | Qident (Isymbol "="), [t1; t2] ->
-      t_equ (term_to_term env t1) (term_to_term env t2)
+      t_equ (term_to_term env None t1) (term_to_term env None t2)
     | Qident (Isymbol "not"), [t] ->
-      t_bool_not (term_to_term env t)
+      t_bool_not (term_to_term env (Some Sbool) t)
+    | Qident (Isymbol n), ts ->
+      let ts' = List.map (term_to_term env None) ts in
+      let ts'_ty =
+        try List.map (fun t -> Opt.get t.t_ty) ts'
+        with _ -> error "TODO_WIP apply_to_term error with types of arguments" in
+      let search_datatype (s, symbols) =
+        match List.find_opt (fun n' -> String.equal n n') symbols with
+        | None -> None
+        | Some n' -> Some (smt_sort_to_ty s)
+      in
+      let ls_ty = match List.filter_map search_datatype env.dt with
+        | [ty] -> Some ty
+        | _ -> error "TODO_WIP error with ls_ty" in
+      let ls = create_lsymbol (Ident.id_fresh n) ts'_ty ls_ty in
+      t_app ls ts' ls.ls_value
     | Qannotident (Isymbol n, s), ts ->
-      let ts' = List.map (term_to_term env) ts in
+      let ts' = List.map (term_to_term env None) ts in
       let ts'_ty =
         try List.map (fun t -> Opt.get t.t_ty) ts'
         with _ -> error "TODO_WIP apply_to_term error with types of arguments" in
@@ -398,40 +454,69 @@ module FromDefToTerm = struct
     | _ -> error "TODO_WIP apply_to_term"
 
   let smt_term_to_term env t s =
-    let t' = term_to_term env t in
+    let t' = term_to_term env (Some s) t in
+    Debug.dprintf debug "[smt_term_to_term] type of s = %a, type of t' = %a@."
+      Pretty.print_ty (smt_sort_to_ty s)
+      (Pp.print_option Pretty.print_ty) t'.t_ty;
     if (Ty.ty_equal (smt_sort_to_ty s) (get_opt_type t'.t_ty)) then t'
     else error "TODO_WIP type error"
   
-  let interpret_def_to_term ls oloc attrs def =
-    match def with
-    | Dfunction ([], res, body) when ls.ls_args = [] ->
-      smt_term_to_term empty_env body res
-    | Dfunction ([], _, _) -> error "TODO_WIP arity mismatch"
-    | Dfunction (args, res, body) ->
-      let res_ty = smt_sort_to_ty res in
-      let args_ty_list = List.map (fun (_,s) -> smt_sort_to_ty s) args in
-      if
-        (ls.ls_value != None && Ty.ty_equal (Opt.get ls.ls_value) res_ty)
-        &&
-        (List.fold_left2
-          (fun acc ty1 ty2 -> acc && Ty.ty_equal ty1 ty2)
-          true args_ty_list ls.ls_args)
-      then
-        let vslist =
-          List.map
-            (fun (symbol, sort) ->
-              let name = Ident.id_fresh symbol in
-              create_vsymbol name (smt_sort_to_ty sort))
-            args in
-        let env = { vs = vslist } in
-        t_lambda vslist [] (smt_term_to_term env body res)
-      else
-        error "TODO_WIP type mismatch"
-    | _ -> t_bool_true (* TODO_WIP *)
+  let interpret_fun_def_to_term ls oloc attrs dt_decls fun_def =
+    Debug.dprintf debug "-----------------------------@.";
+    Debug.dprintf debug "[interpret_fun_def_to_term] fun_def = %a@."
+      print_function_def fun_def;
+    Debug.dprintf debug "[interpret_fun_def_to_term] ls = %a@."
+      Pretty.print_ls ls;
+    Debug.dprintf debug "[interpret_fun_def_to_term] ls.ls_value = %a@."
+      (Pp.print_option Pretty.print_ty) ls.ls_value;
+    List.iter
+      (Debug.dprintf debug "[interpret_fun_def_to_term] ls.ls_args = %a@."
+        Pretty.print_ty)
+      ls.ls_args;
+    let t =
+      match fun_def with
+      | ([], res, body) when ls.ls_args = [] ->
+        smt_term_to_term (mk_env [] dt_decls) body res
+      | ([], _, _) -> error "TODO_WIP arity mismatch"
+      | (args, res, body) ->
+        let res_ty = smt_sort_to_ty res in
+        let args_ty_list = List.map (fun (_,s) -> smt_sort_to_ty s) args in
+        Debug.dprintf debug "[interpret_fun_def_to_term] res_ty = %a@."
+          Pretty.print_ty res_ty;
+        List.iter
+          (Debug.dprintf debug "[interpret_fun_def_to_term] args_ty_list = %a@."
+            Pretty.print_ty)
+          args_ty_list;
+        if
+          (ls.ls_value != None && Ty.ty_equal (Opt.get ls.ls_value) res_ty)
+          (* TODO_WIP *)
+          (*&&
+          (List.fold_left2
+            (fun acc ty1 ty2 -> acc && Ty.ty_equal ty1 ty2)
+            true args_ty_list ls.ls_args)*)
+        then
+          let vslist =
+            List.map
+              (fun (symbol, sort) ->
+                let name = Ident.id_fresh symbol in
+                create_vsymbol name (smt_sort_to_ty sort))
+              args in
+          let env = mk_env vslist dt_decls in
+          t_lambda vslist [] (smt_term_to_term env body res)
+        else
+          error "TODO_WIP type mismatch" in
+    Debug.dprintf debug "[interpret_fun_def_to_term] t = %a@."
+      Pretty.print_term t;
+    Debug.dprintf debug "-----------------------------@.";
+    t
   
   let parse_defs (* TODO_WIP *)
       (pinfo: Printer.printing_info)
-      (defs: Smtv2_model_defs_new.definition Mstr.t) =
+      (dt_decls: datatype_decl list)
+      (fun_defs: Smtv2_model_defs_new.function_def Mstr.t) =
+    let _ = List.iter
+      (Debug.dprintf debug "[dt_decls] %a@." print_datatype_decl)
+      dt_decls in
     let qterms = pinfo.queried_terms in
     let _ = Mstr.iter
       (fun key (ls,_,_) ->
@@ -443,9 +528,9 @@ module FromDefToTerm = struct
         (fun n def acc ->
           try
             let (ls,oloc,attrs) = Mstr.find n qterms in
-            (ls, interpret_def_to_term ls oloc attrs def) :: acc
+            (ls, interpret_fun_def_to_term ls oloc attrs dt_decls def) :: acc
           with Not_found -> acc)
-        defs
+        fun_defs
         [] in
     List.iter
       (fun (ls,t) ->
@@ -492,8 +577,10 @@ let parse pinfo input =
   | exception Not_found -> []
   | model_string ->
       let sexps = FromStringToSexp.parse_string model_string in
-      let defs = FromSexpToDef.parse_sexps sexps in
-      let _ = FromDefToTerm.parse_defs pinfo defs in (* TODO_WIP *)
+      let sexps = FromSexpToDef.get_and_check_model sexps in
+      let fun_defs = FromSexpToDef.get_fun_defs sexps in
+      let dt_decls = FromSexpToDef.get_dt_decls sexps in
+      let _ = FromDefToTerm.parse_defs pinfo dt_decls fun_defs in (* TODO_WIP *)
       []
 
 let () = Model_parser.register_model_parser "smtv2new" parse (* TODO_WIP *)

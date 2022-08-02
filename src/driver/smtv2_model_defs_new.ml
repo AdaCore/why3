@@ -75,10 +75,8 @@ and array =
   | Aconst of sort * term
   | Astore of array * term * term
 
-type definition =
-  | Dfunction of (symbol * sort) list * sort * term
-  | Dterm of term (* corresponding value of a term *) (* TODO_WIP unused ?*)
-  | Dnoelement (* TODO_WIP unused ?*)
+type function_def = (symbol * sort) list * sort * term
+type datatype_decl = (sort * symbol list)
 
 open Format
 
@@ -166,11 +164,14 @@ and print_array fmt = function
 
 let print_function_arg fmt (n,s) =
   fprintf fmt "(%s %a)" n print_sort s
-let print_definition fmt = function
-  | Dfunction (args, res, body) ->
-      fprintf fmt "@[<hv2>(Function (%a)@ %a@ %a)@]"
-        Pp.(print_list space print_function_arg) args 
-        print_sort res
-        print_term body
-  | Dterm t -> fprintf fmt "@[<hv2>(Term %a)@]" print_term t
-  | Dnoelement -> pp_print_string fmt "Noelement"
+
+let print_function_def fmt (args, res, body) =
+  fprintf fmt "@[<hv2>(Function (%a)@ %a@ %a)@]"
+    Pp.(print_list space print_function_arg) args 
+    print_sort res
+    print_term body
+
+let print_datatype_decl fmt (dt_sort, dt_symbols) =
+  fprintf fmt "@[<hv2>(Datatype %a: %a)@]"
+    print_sort dt_sort
+    (Pp.print_list Pp.space Pp.string) dt_symbols
