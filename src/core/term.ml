@@ -1089,8 +1089,8 @@ let rec t_gen_map fnT fnL m t =
         let u = Mvs.find_def v v m in
         ty_equal_check (fnT v.vs_ty) u.vs_ty;
         t_var u
-    | Tconst _ ->
-        t
+    | Tconst c ->
+        t_const c (fnT (Opt.get t.t_ty))
     | Tapp (fs, tl) ->
         t_app (fnL fs) (List.map fn tl) (Opt.map fnT t.t_ty)
     | Tif (f, t1, t2) ->
