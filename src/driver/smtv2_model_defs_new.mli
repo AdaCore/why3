@@ -13,14 +13,8 @@ open Wstdlib
 open Model_parser
 
 type symbol = string
-
-type index =
-  | Idxnumeral of BigInt.t
-  | Idxsymbol of string
-
-type identifier =
-  | Isymbol of symbol
-  | Iindexedsymbol of symbol * (index list)
+type index = Idxnumeral of BigInt.t | Idxsymbol of string
+type identifier = Isymbol of symbol | Iindexedsymbol of symbol * index list
 
 type sort =
   | Sstring
@@ -33,17 +27,17 @@ type sort =
   | Sfloatingpoint of int * int
   | Sarray of sort * sort
   | Ssimple of identifier
-  | Smultiple of identifier * (sort list)
+  | Smultiple of identifier * sort list
 
 type constant_bv = BigInt.t * int
+
 type constant_float =
-  | Fplusinfinity | Fminusinfinity
-  | Fpluszero | Fminuszero
+  | Fplusinfinity
+  | Fminusinfinity
+  | Fpluszero
+  | Fminuszero
   | Fnan
-  | Fnumber of {
-      sign: constant_bv;
-      exp: constant_bv;
-      mant:constant_bv }
+  | Fnumber of { sign : constant_bv; exp : constant_bv; mant : constant_bv }
 
 type constant =
   | Cint of BigInt.t
@@ -54,16 +48,14 @@ type constant =
   | Cbool of bool
   | Cstring of string
 
-type qual_identifier =
-  | Qident of identifier
-  | Qannotident of identifier * sort
+type qual_identifier = Qident of identifier | Qannotident of identifier * sort
 
 type term =
   | Tconst of constant
   | Tvar of qual_identifier
-  | Tapply of qual_identifier * (term list)
+  | Tapply of qual_identifier * term list
   | Tite of term * term * term
-  | Tlet of (var_binding list) * term
+  | Tlet of var_binding list * term
   | Tarray of array
   | Tunparsed of string
 
@@ -75,15 +67,15 @@ and array =
   | Astore of array * term * term
 
 type function_def = (symbol * sort) list * sort * term
-type datatype_decl = (sort * symbol list)
+type datatype_decl = sort * symbol list
 
-val print_index: Format.formatter -> index -> unit
-val print_identifier: Format.formatter -> identifier -> unit
-val print_sort: Format.formatter -> sort -> unit
-val print_constant: Format.formatter -> constant -> unit
-val print_qualified_identifier: Format.formatter -> qual_identifier -> unit
-val print_term: Format.formatter -> term -> unit
-val print_var_binding: Format.formatter -> var_binding -> unit
-val print_array: Format.formatter -> array -> unit
-val print_function_def: Format.formatter -> function_def -> unit
-val print_datatype_decl: Format.formatter -> datatype_decl -> unit
+val print_index : Format.formatter -> index -> unit
+val print_identifier : Format.formatter -> identifier -> unit
+val print_sort : Format.formatter -> sort -> unit
+val print_constant : Format.formatter -> constant -> unit
+val print_qualified_identifier : Format.formatter -> qual_identifier -> unit
+val print_term : Format.formatter -> term -> unit
+val print_var_binding : Format.formatter -> var_binding -> unit
+val print_array : Format.formatter -> array -> unit
+val print_function_def : Format.formatter -> function_def -> unit
+val print_datatype_decl : Format.formatter -> datatype_decl -> unit
