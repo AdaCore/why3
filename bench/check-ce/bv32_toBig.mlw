@@ -13,6 +13,7 @@ let ko2 (i : BV32.t) : BV64.t
     ensures { BV64.sle (0:BV64.t) result } = C.stoBig i
 
 (*
+See https://gitlab.inria.fr/why3/why3/-/issues/657
 
 This command:
 
@@ -21,4 +22,5 @@ This command:
 finds counter-examples for ok, ko and ko2 but the RAC can only confirm
 that the one for ok is a valid cex.
 
+Fixed by https://gitlab.inria.fr/why3/why3/-/merge_requests/696
 *)
