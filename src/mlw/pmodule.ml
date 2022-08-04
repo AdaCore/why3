@@ -1156,12 +1156,17 @@ let clone_type_decl loc inst cl tdl decl kn =
             if d'.itd_its.its_mutable || d'.itd_constructors = []
                || d'.itd_invariant <> []
             then raise (CannotInstantiate id);
+            (* with ity_match, used to check if the two types are equal modulo
+             * alpha-equivalence of type variables *)
+            let isb = its_match_args s (List.map ity_var s'.its_ts.ts_args) in
             cl.ts_table <- Mts.add ts d'.itd_its cl.ts_table;
             (try save_itd d' with
              | Invalid_argument _ -> raise (CannotInstantiate id));
             let eq_field f1 f2 =
               let ity = conv_ity alg f1.pv_ity in
-              if not (ity_equal ity f2.pv_ity) || f1.pv_ghost <> f2.pv_ghost
+              let s = ity_match isb ity f2.pv_ity in
+              if s.isb_reg <> Mreg.empty then assert false; (* ? *)
+              if f1.pv_ghost <> f2.pv_ghost
               then raise (CannotInstantiate id);
               match Mpv.find_opt f1 cl.fd_table with
               | Some v -> if not (pv_equal v f2)

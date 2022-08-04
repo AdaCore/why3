@@ -1,0 +1,17 @@
+module M
+
+  use list.List
+
+  type t 'a = C (list 'a)
+
+end
+
+module N
+
+  use list.List
+
+  type t 'b = C (list 'b)
+
+  clone M with type t
+
+end
