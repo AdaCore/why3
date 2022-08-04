@@ -56,15 +56,15 @@ type term =
   | Tapply of qual_identifier * term list
   | Tite of term * term * term
   | Tlet of var_binding list * term
-  | Tarray of array
+  | Tarray of sort * sort * array_elements
   | Tunparsed of string
 
 and var_binding = symbol * term
 
-and array =
-  | Avar of symbol
-  | Aconst of sort * term
-  | Astore of array * term * term
+and array_elements = {
+  array_indices : (term * term) list;
+  array_others : term;
+}
 
 type function_def = (symbol * sort) list * sort * term
 type datatype_decl = sort * symbol list
@@ -76,6 +76,6 @@ val print_constant : Format.formatter -> constant -> unit
 val print_qualified_identifier : Format.formatter -> qual_identifier -> unit
 val print_term : Format.formatter -> term -> unit
 val print_var_binding : Format.formatter -> var_binding -> unit
-val print_array : Format.formatter -> array -> unit
+val print_array : Format.formatter -> array_elements -> unit
 val print_function_def : Format.formatter -> function_def -> unit
 val print_datatype_decl : Format.formatter -> datatype_decl -> unit

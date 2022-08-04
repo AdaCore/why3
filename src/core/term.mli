@@ -375,6 +375,8 @@ val ps_equ : lsymbol
 val t_equ : term -> term -> term
 val t_neq : term -> term -> term
 
+val t_bool_equ : term -> term -> term
+
 val t_equ_simp : term -> term -> term
 val t_neq_simp : term -> term -> term
 

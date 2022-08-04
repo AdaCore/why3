@@ -269,7 +269,7 @@ module FromSexpToModel = struct
         with _ -> (
           try let_term sexp
           with _ -> (
-            try Tarray (array sexp)
+            try array sexp
             with _ -> (
               try application sexp with _ -> Tunparsed (string_of_sexp sexp))))))
 
@@ -290,14 +290,25 @@ module FromSexpToModel = struct
         Tapply (qualified_identifier qual_id, List.map term ts)
     | sexp -> error sexp "application"
 
-  and array = function
-    | List [ List [ Atom "as"; Atom "const"; array_type ]; t ] ->
-        Aconst (sort array_type, term t)
-    | List [ Atom "_"; Atom "as-array"; n ] -> Avar (symbol n)
+  and array sexp = match sexp with
+    | List [ List [ Atom "as"; Atom "const"; List [ Atom "Array"; s1; s2] ]; t ] ->
+        Tarray (sort s1, sort s2, {
+          array_indices = [];
+          array_others = term t;
+        })
+    (* TODO_WIP *)
+    (*| List [ Atom "_"; Atom "as-array"; n ] ->
+        Tvar (Qannotident (identifier n, Sarray))*)
     | List [ Atom "store"; x; t1; t2 ] ->
-        let a = try array x with _ -> Avar (symbol x) in
-        Astore (a, term t1, term t2)
-    | sexp -> error sexp "array"
+        let a = try array x with _ -> error sexp "array" (*Tvar (Qannotident (identifier x, Sarray))*) in
+        begin match a with
+        | Tarray (s1, s2, elts) -> Tarray (s1, s2, {
+          array_indices = (term t1, term t2) :: elts.array_indices;
+          array_others = elts.array_others
+        })
+        | _ -> error sexp "array"
+        end
+    | _ -> error sexp "array"
 
   let rec dt_symbols = function
     | [] -> []
@@ -354,9 +365,13 @@ module FromModelToTerm = struct
 
   let error s = raise (E s)
 
-  type env = { vs : vsymbol list; dt : datatype_decl list; tys : Ty.tysymbol list }
+  type env = {
+    vs : vsymbol list;
+    dt : datatype_decl list;
+    tys : Ty.tysymbol list;
+  }
 
-  let mk_env vslist dt_decls tys = { vs = vslist; dt = dt_decls; tys = tys }
+  let mk_env vslist dt_decls tys = { vs = vslist; dt = dt_decls; tys }
   let get_opt_type oty = match oty with None -> Ty.ty_bool | Some ty -> ty
 
   let rec smt_sort_to_ty tys s =
@@ -369,7 +384,13 @@ module FromModelToTerm = struct
     | Sarray (s1, s2) ->
         Ty.ty_app Ty.ts_func [ smt_sort_to_ty tys s1; smt_sort_to_ty tys s2 ]
     | Ssimple (Isymbol n) ->
-        Ty.ty_app (List.find (fun x -> String.equal n x.Ty.ts_name.id_string) tys) []
+        Ty.ty_app
+          (List.find (fun x -> String.equal n x.Ty.ts_name.id_string) tys)
+          []
+    | Smultiple (Isymbol n, sorts) ->
+        Ty.ty_app
+          (List.find (fun x -> String.equal n x.Ty.ts_name.id_string) tys)
+          (List.map (smt_sort_to_ty tys) sorts)
     | _ -> error "TODO_WIP smt_sort_to_ty"
 
   let get_type_from_var_name name =
@@ -381,11 +402,12 @@ module FromModelToTerm = struct
         let left = String.index name '_' + 1 in
         let right = String.rindex name '_' in
         let ty = String.sub name left (right - left) in
-        Some (try Strings.(remove_prefix "(" (remove_suffix ")" ty)) with _ -> ty)
-      with
-      | _ -> Some (Strings.(remove_prefix "@" name))
-    else match String.split_on_char '!' name with
-      | [ty;_;_] -> Some ty
+        Some
+          (try Strings.(remove_prefix "(" (remove_suffix ")" ty)) with _ -> ty)
+      with _ -> Some Strings.(remove_prefix "@" name)
+    else
+      match String.split_on_char '!' name with
+      | [ ty; _; _ ] -> Some ty
       | _ -> None
 
   let qual_id_to_vsymbol env qid =
@@ -404,9 +426,11 @@ module FromModelToTerm = struct
             match List.filter_map search_datatype env.dt with
             | [ ty ] -> ty
             | _ -> (
-              match get_type_from_var_name n with
-              | Some ty_str -> smt_sort_to_ty env.tys (Ssimple (Isymbol ty_str))
-              | None -> error "TODO_WIP cannot infer the type of the variable")
+                match get_type_from_var_name n with
+                | Some ty_str ->
+                    smt_sort_to_ty env.tys (Ssimple (Isymbol ty_str))
+                | None -> error "TODO_WIP cannot infer the type of the variable"
+                )
           in
           create_vsymbol (Ident.id_fresh n) vs_ty)
     | Qannotident (Isymbol n, s) -> (
@@ -416,7 +440,8 @@ module FromModelToTerm = struct
           in
           if Ty.ty_equal vs.vs_ty (smt_sort_to_ty env.tys s) then vs
           else error "TODO_WIP type mismatch"
-        with Not_found -> create_vsymbol (Ident.id_fresh n) (smt_sort_to_ty env.tys s))
+        with Not_found ->
+          create_vsymbol (Ident.id_fresh n) (smt_sort_to_ty env.tys s))
     | _ -> error "TODO_WIP_qual_id_to_vsymbol"
 
   let constant_to_term c =
@@ -431,12 +456,15 @@ module FromModelToTerm = struct
     Debug.dprintf debug "[term_to_term] t = %a@." print_term t;
     match t with
     | Tconst c -> constant_to_term c
-    | Tvar qid -> t_var (qual_id_to_vsymbol env qid)
+    | Tvar qid ->
+        Debug.dprintf debug "[term_to_term] vs.vs_ty = %a@."
+          Pretty.print_ty (qual_id_to_vsymbol env qid).vs_ty;
+        t_var (qual_id_to_vsymbol env qid)
     | Tite (b, t1, t2) ->
         t_if (term_to_term env b) (term_to_term env t1) (term_to_term env t2)
     | Tapply (qid, ts) -> apply_to_term env qid ts
     | Tlet (vs, t) -> error "TODO_WIP Tlet"
-    | Tarray a -> error "TODO_WIP Tarray"
+    | Tarray (s1, s2, a) -> array_to_term env s1 s2 a
     | Tunparsed s -> error "TODO_WIP Tunparsed"
 
   and apply_to_term env qid ts =
@@ -446,7 +474,12 @@ module FromModelToTerm = struct
       ts;
     match (qid, ts) with
     | Qident (Isymbol "="), [ t1; t2 ] ->
-        t_equ (term_to_term env t1) (term_to_term env t2)
+        let t' =
+          t_bool_equ (term_to_term env t1) (term_to_term env t2)
+        in
+        Debug.dprintf debug "[apply_to_term] t'.t_ty = %a@."
+          (Pp.print_option Pretty.print_ty) t'.t_ty;
+        t'
     | Qident (Isymbol "not"), [ t ] -> t_bool_not (term_to_term env t)
     | Qident (Isymbol n), ts ->
         let ts' = List.map (term_to_term env) ts in
@@ -475,10 +508,28 @@ module FromModelToTerm = struct
             error "TODO_WIP apply_to_term error with types of arguments"
         in
         let ls =
-          create_lsymbol (Ident.id_fresh n) ts'_ty (Some (smt_sort_to_ty env.tys s))
+          create_lsymbol (Ident.id_fresh n) ts'_ty
+            (Some (smt_sort_to_ty env.tys s))
         in
         t_app ls ts' ls.ls_value
     | _ -> error "TODO_WIP apply_to_term"
+
+  and array_to_term env s1 s2 elts =
+    Debug.dprintf debug "[array_to_term] a = %a@." print_array elts;
+    let vs_arg =
+      create_vsymbol (Ident.id_fresh "x") (smt_sort_to_ty env.tys s1)
+    in
+    let mk_case key value t =
+      let key = term_to_term env key in
+      let value = term_to_term env value in
+      t_if (t_equ (t_var vs_arg) key) value t
+    in
+    let a = List.fold_left
+      (fun t (key,value) -> mk_case key value t)
+      (term_to_term env elts.array_others)
+      elts.array_indices
+    in
+    t_lambda [ vs_arg ] [] a
 
   let smt_term_to_term env t s =
     let t' = term_to_term env t in
@@ -503,16 +554,18 @@ module FromModelToTerm = struct
          Pretty.print_ty)
       ls.ls_args;
     let tys =
-      let types_in_ls = match ls.ls_value with
-      | None -> ls.ls_args
-      | Some ty -> ty :: ls.ls_args in
+      let types_in_ls =
+        match ls.ls_value with
+        | None -> ls.ls_args
+        | Some ty -> ty :: ls.ls_args
+      in
       List.fold_left
         (fun acc ty ->
           let f acc' sym = sym :: acc' in
           let symbols_in_ty = Ty.ty_s_fold f [] ty in
-          List.concat [acc ; symbols_in_ty])
-        []
-        types_in_ls in
+          List.concat [ acc; symbols_in_ty ])
+        [] types_in_ls
+    in
     let t =
       match fun_def with
       | [], res, body when ls.ls_args = [] ->
@@ -535,8 +588,7 @@ module FromModelToTerm = struct
                "[interpret_fun_def_to_term] args_ty_list = %a@." Pretty.print_ty)
             args_ty_list;
           if
-            ls.ls_value != None
-            && Ty.ty_equal (Opt.get ls.ls_value) res_ty
+            Ty.ty_equal (get_opt_type ls.ls_value) res_ty
             && List.fold_left2
                  (fun acc ty1 ty2 -> acc && Ty.ty_equal ty1 ty2)
                  true args_ty_list ls.ls_args

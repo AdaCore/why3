@@ -56,15 +56,15 @@ type term =
   | Tapply of qual_identifier * term list
   | Tite of term * term * term
   | Tlet of var_binding list * term
-  | Tarray of array
+  | Tarray of sort * sort * array_elements
   | Tunparsed of string
 
 and var_binding = symbol * term
 
-and array =
-  | Avar of symbol
-  | Aconst of sort * term
-  | Astore of array * term * term
+and array_elements = {
+  array_indices : (term * term) list;
+  array_others : term;
+}
 
 type function_def = (symbol * sort) list * sort * term
 type datatype_decl = sort * symbol list
@@ -107,7 +107,8 @@ let rec print_sort fmt = function
   | Sbool -> fprintf fmt "(Sbool)"
   | Sbitvec i -> fprintf fmt "(Sbitvec %d)" i
   | Sfloatingpoint (i1, i2) -> fprintf fmt "(Sfloatingpoint %d,%d)" i1 i2
-  | Sarray (s1, s2) -> fprintf fmt "(Sarray %a %a)" print_sort s1 print_sort s2
+  | Sarray (s1, s2) ->
+      fprintf fmt "(Sarray %a %a)" print_sort s1 print_sort s2
   | Ssimple id -> fprintf fmt "(Ssimple %a)" print_identifier id
   | Smultiple (id, sorts) ->
       fprintf fmt "(Smultiple %a %a)" print_identifier id
@@ -140,18 +141,21 @@ let rec print_term fmt = function
       fprintf fmt "(Let (%a) %a)"
         Pp.(print_list space print_var_binding)
         bs print_term t
-  | Tarray a -> fprintf fmt "@[<hv>(Array %a)@]" print_array a
+  | Tarray (s1, s2, elts) ->
+      fprintf fmt "@[<hv>(Array (%a -> %a) %a)@]"
+        print_sort s1 print_sort s2
+        print_array elts
   | Tunparsed s -> fprintf fmt "(UNPARSED %s)" s
 
 and print_var_binding fmt (s, t) = fprintf fmt "(%s %a)" s print_term t
 
-and print_array fmt = function
-  | Avar v -> fprintf fmt "@[<hv2>(Avar %s)@]" v
-  | Aconst (s, t) ->
-      fprintf fmt "@[<hv2>(Aconst %a %a)@]" print_sort s print_term t
-  | Astore (a, t1, t2) ->
-      fprintf fmt "@[<hv2>(Astore %a %a %a)@]" print_array a print_term t1
-        print_term t2
+and print_array_elem fmt (t1,t2) =
+  fprintf fmt "@[<hv>(%a -> %a)@]" print_term t1 print_term t2
+
+and print_array fmt a =
+  fprintf fmt "@[<hv2>(array_indices = (%a);@ array_others = %a)@]"
+    (Pp.print_list Pp.space print_array_elem) a.array_indices
+    print_term a.array_others
 
 let print_function_arg fmt (n, s) = fprintf fmt "(%s %a)" n print_sort s
 

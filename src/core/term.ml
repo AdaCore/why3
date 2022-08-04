@@ -565,12 +565,16 @@ let t_type t = match t.t_ty with
   | Some ty -> ty
   | None -> raise (TermExpected t)
 
-let t_prop f =
-  if f.t_ty = None then f else raise (FmlaExpected f)
+let t_prop f = match f.t_ty with
+  | Some ty when ty_equal ty ty_bool -> f
+  | None -> f
+  | _ -> raise (FmlaExpected f)
 
 let t_ty_check t ty = match ty, t.t_ty with
   | Some l, Some r -> ty_equal_check l r
+  | Some l, None when ty_equal l ty_bool -> ()
   | Some _, None -> raise (TermExpected t)
+  | None, Some r when ty_equal r ty_bool -> ()
   | None, Some _ -> raise (FmlaExpected t)
   | None, None -> ()
 
@@ -875,6 +879,7 @@ let ls_arg_inst ls tl =
 let ls_app_inst ls tl ty =
   let s = ls_arg_inst ls tl in
   match ls.ls_value, ty with
+    | Some ty, None when ty_equal ty ty_bool -> s
     | Some _, None -> raise (PredicateSymbolExpected ls)
     | None, Some _ -> raise (FunctionSymbolExpected ls)
     | Some vty, Some ty -> ty_match s vty ty
@@ -1011,6 +1016,17 @@ let ps_equ =
 
 let t_equ t1 t2 = ps_app ps_equ [t1; t2]
 let t_neq t1 t2 = t_not (ps_app ps_equ [t1; t2])
+
+let t_bool_equ t1 t2 =
+  let ps_equ =
+    let v = ty_var (create_tvsymbol (id_fresh "a")) in
+    let create_psymbol nm al =
+      create_lsymbol ~constr:0 nm al (Some ty_bool)
+    in
+    create_psymbol (id_fresh (op_infix "=")) [v; v]
+  in
+  ps_app ps_equ [t1; t2]
+
 
 let fs_bool_true  = create_fsymbol ~constr:2 (id_fresh "True")  [] ty_bool
 let fs_bool_false = create_fsymbol ~constr:2 (id_fresh "False") [] ty_bool
