@@ -354,9 +354,9 @@ module FromModelToTerm = struct
 
   let error s = raise (E s)
 
-  type env = { vs : vsymbol list; dt : datatype_decl list }
+  type env = { vs : vsymbol list; dt : datatype_decl list; tys : Ty.tysymbol list }
 
-  let mk_env vslist dt_decls = { vs = vslist; dt = dt_decls }
+  let mk_env vslist dt_decls tys = { vs = vslist; dt = dt_decls; tys = tys }
   let get_opt_type oty = match oty with None -> Ty.ty_bool | Some ty -> ty
 
   let rec smt_sort_to_ty tys s =
@@ -372,6 +372,22 @@ module FromModelToTerm = struct
         Ty.ty_app (List.find (fun x -> String.equal n x.Ty.ts_name.id_string) tys) []
     | _ -> error "TODO_WIP smt_sort_to_ty"
 
+  let get_type_from_var_name name =
+    (* we try to infer the type from [name], for example:
+        - infer the type int32 from the name @uc_int32_1
+        - infer the type ref int32 from the name |@uc_(ref int32)_0| *)
+    if Strings.has_prefix "@" name then
+      try
+        let left = String.index name '_' + 1 in
+        let right = String.rindex name '_' in
+        let ty = String.sub name left (right - left) in
+        Some (try Strings.(remove_prefix "(" (remove_suffix ")" ty)) with _ -> ty)
+      with
+      | _ -> Some (Strings.(remove_prefix "@" name))
+    else match String.split_on_char '!' name with
+      | [ty;_;_] -> Some ty
+      | _ -> None
+
   let qual_id_to_vsymbol env qid =
     Debug.dprintf debug "[qual_id_to_vsymbol] qid = %a@."
       print_qualified_identifier qid;
@@ -382,12 +398,15 @@ module FromModelToTerm = struct
           let search_datatype (s, symbols) =
             match List.find_opt (fun n' -> String.equal n n') symbols with
             | None -> None
-            | Some n' -> Some (smt_sort_to_ty [] s)
+            | Some n' -> Some (smt_sort_to_ty env.tys s)
           in
           let vs_ty =
             match List.filter_map search_datatype env.dt with
             | [ ty ] -> ty
-            | _ -> error "TODO_WIP cannot infer the type of the variable"
+            | _ -> (
+              match get_type_from_var_name n with
+              | Some ty_str -> smt_sort_to_ty env.tys (Ssimple (Isymbol ty_str))
+              | None -> error "TODO_WIP cannot infer the type of the variable")
           in
           create_vsymbol (Ident.id_fresh n) vs_ty)
     | Qannotident (Isymbol n, s) -> (
@@ -395,9 +414,9 @@ module FromModelToTerm = struct
           let vs =
             List.find (fun vs -> String.equal n vs.vs_name.id_string) env.vs
           in
-          if Ty.ty_equal vs.vs_ty (smt_sort_to_ty [] s) then vs
+          if Ty.ty_equal vs.vs_ty (smt_sort_to_ty env.tys s) then vs
           else error "TODO_WIP type mismatch"
-        with Not_found -> create_vsymbol (Ident.id_fresh n) (smt_sort_to_ty [] s))
+        with Not_found -> create_vsymbol (Ident.id_fresh n) (smt_sort_to_ty env.tys s))
     | _ -> error "TODO_WIP_qual_id_to_vsymbol"
 
   let constant_to_term c =
@@ -439,7 +458,7 @@ module FromModelToTerm = struct
         let search_datatype (s, symbols) =
           match List.find_opt (fun n' -> String.equal n n') symbols with
           | None -> None
-          | Some n' -> Some (smt_sort_to_ty [] s)
+          | Some n' -> Some (smt_sort_to_ty env.tys s)
         in
         let ls_ty =
           match List.filter_map search_datatype env.dt with
@@ -456,7 +475,7 @@ module FromModelToTerm = struct
             error "TODO_WIP apply_to_term error with types of arguments"
         in
         let ls =
-          create_lsymbol (Ident.id_fresh n) ts'_ty (Some (smt_sort_to_ty [] s))
+          create_lsymbol (Ident.id_fresh n) ts'_ty (Some (smt_sort_to_ty env.tys s))
         in
         t_app ls ts' ls.ls_value
     | _ -> error "TODO_WIP apply_to_term"
@@ -464,10 +483,10 @@ module FromModelToTerm = struct
   let smt_term_to_term env t s =
     let t' = term_to_term env t in
     Debug.dprintf debug "[smt_term_to_term] type of s = %a, type of t' = %a@."
-      Pretty.print_ty (smt_sort_to_ty [] s)
+      Pretty.print_ty (smt_sort_to_ty env.tys s)
       (Pp.print_option Pretty.print_ty)
       t'.t_ty;
-    if Ty.ty_equal (smt_sort_to_ty [] s) (get_opt_type t'.t_ty) then t'
+    if Ty.ty_equal (smt_sort_to_ty env.tys s) (get_opt_type t'.t_ty) then t'
     else error "TODO_WIP type error"
 
   let interpret_fun_def_to_term ls oloc attrs dt_decls fun_def =
@@ -479,28 +498,10 @@ module FromModelToTerm = struct
     Debug.dprintf debug "[interpret_fun_def_to_term] ls.ls_value = %a@."
       (Pp.print_option Pretty.print_ty)
       ls.ls_value;
-    (match ls.ls_value with
-    | None -> ()
-    | Some ty -> (
-        match ty.ty_node with
-        | Tyvar n ->
-            Debug.dprintf debug
-              "[interpret_fun_def_to_term] ls.ls_value = Tyvar %s@."
-              n.tv_name.id_string
-        | Tyapp (n, l) ->
-            Debug.dprintf debug
-              "[interpret_fun_def_to_term] ls.ls_value = Tyapp %s@."
-              n.ts_name.id_string));
     List.iter
       (Debug.dprintf debug "[interpret_fun_def_to_term] ls.ls_args = %a@."
          Pretty.print_ty)
       ls.ls_args;
-    (*let tys =
-      match ls.ls_value with
-      | None -> []
-      | Some ty -> (
-          match ty.ty_node with Tyvar n -> [] | Tyapp (n, l) -> [ n ])
-    in*)
     let tys =
       let types_in_ls = match ls.ls_value with
       | None -> ls.ls_args
@@ -519,7 +520,7 @@ module FromModelToTerm = struct
           Debug.dprintf debug "[interpret_fun_def_to_term] res_ty = %a@."
             Pretty.print_ty res_ty;
           if ls.ls_value != None && Ty.ty_equal (Opt.get ls.ls_value) res_ty
-          then smt_term_to_term (mk_env [] dt_decls) body res
+          then smt_term_to_term (mk_env [] dt_decls tys) body res
           else error "TODO_WIP type mismatch"
       | [], _, _ -> error "TODO_WIP function arity mismatch"
       | args, res, body ->
@@ -547,7 +548,7 @@ module FromModelToTerm = struct
                   create_vsymbol name (smt_sort_to_ty tys sort))
                 args
             in
-            let env = mk_env vslist dt_decls in
+            let env = mk_env vslist dt_decls tys in
             t_lambda vslist [] (smt_term_to_term env body res)
           else error "TODO_WIP type mismatch"
     in
