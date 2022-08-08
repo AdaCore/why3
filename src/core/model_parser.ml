@@ -448,6 +448,7 @@ and print_model_value_human fmt (v : model_value) =
   | Undefined -> pp_print_string fmt "UNDEFINED"
   | Unparsed s -> pp_print_string fmt s
 
+
 (*
 ***************************************************************
 **  Model elements
@@ -484,14 +485,14 @@ type model_element_name = {
 
 type model_element = {
   me_name: model_element_name;
-  me_value: model_value;
+  me_value: term;
   me_location: Loc.position option;
-  me_lsymbol_location: Loc.position option;
+  me_lsymbol: lsymbol;
 }
 
-let create_model_element ~name ~value ~attrs =
+let create_model_element ~name ~value ~oloc ~lsymbol ~attrs =
   let me_name = {men_name= name; men_kind= Other; men_attrs= attrs} in
-  {me_name; me_value= value; me_location= None; me_lsymbol_location= None}
+  {me_name; me_value= value; me_location= oloc; me_lsymbol= lsymbol}
 
 let create_model_element_name name attrs kind =
   {men_name= name; men_kind= kind; men_attrs= attrs}
@@ -673,10 +674,10 @@ let print_model ~filter_similar ~print_attrs ?(me_name_trans = why_name_trans)
     fmt (Mstr.bindings model.model_files)
 
 let print_model_human ?(filter_similar = true) ?(me_name_trans = why_name_trans) fmt model =
-  print_model ~filter_similar ~me_name_trans ~print_model_value:print_model_value_human fmt model
+  print_model ~filter_similar ~me_name_trans ~print_model_value:(Pretty.print_term) fmt model
 
 let print_model ?(filter_similar = true) ?(me_name_trans = why_name_trans) ~print_attrs fmt model =
-  print_model ~filter_similar ~print_attrs ~me_name_trans ~print_model_value fmt model
+  print_model ~filter_similar ~print_attrs ~me_name_trans ~print_model_value:(Pretty.print_term) fmt model
 
 let get_model_file model filename =
   Mstr.find_def empty_model_file filename model
@@ -727,7 +728,7 @@ let interleave_line ~filename:_ ~print_attrs start_comment end_comment
     let cntexmp_line =
       asprintf "@[<h 0>%s%s%a%s@]" (get_padding line) start_comment
         (print_model_elements ~filter_similar:true ~sep:Pp.semi
-           ~print_attrs ~print_model_value:print_model_value_human ~me_name_trans)
+           ~print_attrs ~print_model_value:(Pretty.print_term) ~me_name_trans)
         model_elements end_comment in
     (* We need to know how many lines will be taken by the counterexample. This
        is ad hoc as we don't really know how the lines are split in IDE. *)
@@ -804,7 +805,7 @@ let json_model_element me =
   Record [
       "name", String me.me_name.men_name;
       "attrs", json_attrs me.me_name;
-      "value", convert_model_value me.me_value;
+      "value", String "me.me_value"; (* TODO_WIP *)
       "kind", String kind
     ]
 
@@ -952,6 +953,9 @@ let recover_name pm fields_projs raw_name =
 (** [replace_projection const_function mv] replaces record names, projections, and application callees
    in [mv] using [const_function] *)
 let rec replace_projection (const_function : string -> string) =
+  function v -> v
+  (* TODO_WIP *)
+  (*
   let const_function s = try const_function s with Not_found -> s in
   function
   | Const _ as v -> v
@@ -964,18 +968,26 @@ let rec replace_projection (const_function : string -> string) =
   | Apply (s, l) ->
       Apply (const_function s, List.map (replace_projection const_function) l)
   | Var _ | Undefined | Unparsed _ as v -> v
+  *)
 
 and replace_projection_array const_function a =
+  function a -> a
+  (* TODO_WIP *)
+  (*
   let for_index a =
     let arr_index_value = replace_projection const_function a.arr_index_value in
     {a with arr_index_value} in
-  {arr_others= replace_projection const_function a.arr_others;
-   arr_indices= List.map for_index a.arr_indices}
+  { arr_others= replace_projection const_function a.arr_others;
+    arr_indices= List.map for_index a.arr_indices }
+  *)
 
 (* Elements that are of record with only one field in the source code, are
    simplified by eval_match in wp generation. So, this allows to reconstruct
    their value (using the "field" attribute that were added). *)
 let read_one_fields ~attrs value =
+  attrs, value
+  (* TODO_WIP *)
+  (*
   let field_names =
     let fields = List.filter_map Ident.extract_field (Sattr.elements attrs) in
     List.sort (fun (d1, _) (d2, _) -> d2 - d1) fields in
@@ -1005,8 +1017,9 @@ let read_one_fields ~attrs value =
   | exception Not_found ->
       (* No model trace attribute present, same as general case *)
       attrs, List.fold_left add_record value field_names
+    *)
 
-let remove_field : (Sattr.t * model_value -> Sattr.t * model_value) ref = ref (fun x -> x)
+let remove_field : (Sattr.t * term -> Sattr.t * term) ref = ref (fun x -> x)
 let register_remove_field f = remove_field := f
 
 (** Build the model by replacing projections and restore single field records in the model
@@ -1014,30 +1027,31 @@ let register_remove_field f = remove_field := f
 let build_model_rec pm (elts: model_element list) : model_files =
   let fields_projs = fields_projs pm and vc_attrs = pm.Printer.vc_term_attrs in
   let process_me me =
-    match Mstr.find me.me_name.men_name pm.queried_terms with
-    | exception Not_found ->
-        Debug.dprintf debug "No term for %s@." me.me_name.men_name;
-        None
-    | ls,loc,attrs ->
-        (* model elements are preliminary so far: *)
-        assert (me.me_location = None && me.me_lsymbol_location = None);
-        let name, attrs = ls.ls_name.id_string,
-          Sattr.union (Sattr.union me.me_name.men_attrs attrs) ls.ls_name.id_attrs in
-        Debug.dprintf debug "@[<h>Term attrs for %s at %a@]@."
-          (why_name_trans me.me_name)
-          (Pp.print_option_or_default "NO LOC" Loc.pp_position) loc;
-        (* Replace projections with their real name *)
-        let me_value = replace_projection
-            (fun s -> recover_name pm fields_projs s)
-            me.me_value in
-        (* Remove some specific record field related to the front-end language.
-           This function is registered. *)
-        let attrs, me_value = !remove_field (attrs, me_value) in
-        (* Transform value flattened by eval_match (one field record) back to records *)
-        let attrs, me_value = read_one_fields ~attrs me_value in
-        let me_name = create_model_element_name name attrs Other in
-        Some {me_name; me_value; me_location= loc;
-              me_lsymbol_location= ls.ls_name.id_loc} in
+    let attrs =
+      Sattr.union me.me_name.men_attrs me.me_lsymbol.ls_name.id_attrs
+    in
+    Debug.dprintf debug "@[<h>Term attrs for %s at %a:@ %a@]@."
+      (why_name_trans me.me_name)
+      (Pp.print_option_or_default "NO LOC" Loc.pp_position) me.me_location
+      Pretty.print_attrs attrs;
+(*
+    (* Replace projections with their real name *)
+    let me_value = replace_projection
+        (fun s -> recover_name pm fields_projs s)
+        me.me_value in
+    (* Remove some specific record field related to the front-end language.
+        This function is registered. *)
+    let attrs, me_value = !remove_field (attrs, me_value) in
+    (* Transform value flattened by eval_match (one field record) back to records *)
+    let attrs, me_value = read_one_fields ~attrs me_value in
+*)
+    let me_name = create_model_element_name me.me_name.men_name attrs Other in
+    Some {
+      me_name;
+      me_value= me.me_value;
+      me_location= me.me_location;
+      me_lsymbol= me.me_lsymbol
+    } in
   let add_with_loc_set_kind me loc model =
     if loc = None then model else
       let kind = compute_kind vc_attrs loc me.me_name.men_attrs in
@@ -1046,7 +1060,7 @@ let build_model_rec pm (elts: model_element list) : model_files =
   let add_model_elt model me =
     let kind = compute_kind vc_attrs me.me_location me.me_name.men_attrs in
     let model = add_to_model_if_loc ~kind me model in
-    let oloc = me.me_lsymbol_location in
+    let oloc = me.me_lsymbol.ls_name.id_loc in
     let model = add_with_loc_set_kind me oloc model in
     let add_written_loc a =
       add_with_loc_set_kind me (get_written_loc a) in
@@ -1056,85 +1070,11 @@ let build_model_rec pm (elts: model_element list) : model_files =
 
 (*
 ***************************************************************
-** Model cleaning
-***************************************************************
-*)
-
-let opt_bind_any os f =
-  f (List.filter_map (fun x -> x) os)
-
-let opt_bind_all os f =
-  if List.for_all Opt.inhabited os then
-    f (List.map Opt.get os)
-  else None
-
-class clean = object (self)
-  method model m =
-    {m with model_files= map_filter_model_files self#element m.model_files}
-  method element me =
-    let me =
-      let name = me.me_name.men_name in
-      let attrs = me.me_name.men_attrs in
-      let name = get_model_trace_string ~name ~attrs in
-      let name = List.hd (Strings.bounded_split '@' name 2) in
-      {me with me_name = {me.me_name with men_name = name}} in
-    if me.me_name.men_kind = Error_message then
-      Some me (* Keep unparsed values for error messages *)
-    else
-      Opt.bind (self#value me.me_value) @@ fun me_value ->
-      Some {me with me_value}
-  method value v = match v with
-    | Const c -> self#const c
-    | Unparsed s    -> self#unparsed s
-    | Proj (p, v)   -> self#proj p v   | Apply (s, vs) -> self#apply s vs
-    | Array a       -> self#array a    | Record fs     -> self#record fs
-    | Undefined     -> self#undefined  | Var v         -> self#var v
-  method const c = match c with
-    | String v      -> self#string v  | Integer v     -> self#integer v
-    | Decimal v     -> self#decimal v | Fraction v    -> self#fraction v
-    | Float v       -> self#float v   | Boolean v     -> self#boolean v
-    | Bitvector v   -> self#bitvector v
-  method string v = Some (Const (String v))
-  method integer v = Some (Const (Integer v))
-  method decimal v = Some (Const (Decimal v))
-  method fraction v = Some (Const (Fraction v))
-  method float v = Some (Const (Float v))
-  method boolean v = Some (Const (Boolean v))
-  method bitvector v = Some (Const (Bitvector v))
-  method var _ = None
-  method proj p v =
-    Opt.bind (self#value v) @@ fun v ->
-    Some (Proj (p, v))
-  method apply s vs =
-    opt_bind_all (List.map self#value vs) @@ fun vs ->
-    Some (Apply (s, vs))
-  method array a =
-    let clean_arr_index ix =
-      Opt.bind (self#value ix.arr_index_key) @@ fun key ->
-      Opt.bind (self#value ix.arr_index_value) @@ fun value ->
-      Some {arr_index_key= key; arr_index_value= value} in
-    Opt.bind (self#value a.arr_others) @@ fun others ->
-    opt_bind_any (List.map clean_arr_index a.arr_indices) @@ fun indices ->
-    Some (Array {arr_others= others; arr_indices= indices})
-  method record fs =
-    let clean_field (f, v) =
-      Opt.bind (self#value v) @@ fun v ->
-      Some (f, v) in
-    opt_bind_all (List.map clean_field fs) @@ fun fs ->
-    Some (Record fs)
-  method unparsed _ = None
-  method undefined = Some Undefined
-end
-
-let clean = ref (new clean)
-
-let customize_clean c = clean := (c :> clean)
-
-(*
-***************************************************************
 **  Filtering the model
 ***************************************************************
 *)
+
+(* TODO_WIP not used ? *)
 
 let add_loc orig_model new_model position =
   (* Add a given location from orig_model to new_model *)
@@ -1183,14 +1123,14 @@ type raw_model_parser = printing_info -> string -> model_element list
 let debug_elements elts =
   let me_name_trans men = men.men_name in
   let print_elements = print_model_elements ~sep:Pp.semi ~print_attrs:true
-      ~me_name_trans ~filter_similar:false ~print_model_value in
+      ~me_name_trans ~filter_similar:false ~print_model_value:(Pretty.print_term) in
   Debug.dprintf debug "@[<v>Elements:@ %a@]@." print_elements elts;
   elts
 
 let debug_files desc files =
   let me_name_trans men = men.men_name in
   let print_file = print_model_file ~filter_similar:false ~print_attrs:true
-      ~print_model_value ~me_name_trans in
+      ~print_model_value:(Pretty.print_term) ~me_name_trans in
    Debug.dprintf debug "@[<v>Files %s:@ %a@]@." desc
      (Pp.print_list Pp.newline print_file) (Mstr.bindings files);
    files
@@ -1199,7 +1139,7 @@ let model_parser (raw: raw_model_parser) : model_parser =
   fun ({Printer.vc_term_loc; vc_term_attrs} as pm) str ->
   raw pm str |> debug_elements |> (* Eg for "smtv2": Smtv2_model_parser.parse *)
   build_model_rec pm |> debug_files "before" |>
-  map_filter_model_files !clean#element |> debug_files "after" |>
+  (*map_filter_model_files !clean#element |> debug_files "after" |>*)
   fun model_files -> { model_files; vc_term_loc; vc_term_attrs }
 
 exception KnownModelParser of string

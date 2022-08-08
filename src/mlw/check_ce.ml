@@ -323,7 +323,7 @@ let oracle_of_model pm model =
     let loc = if loc <> None then loc else
         match oid with Some id -> id.id_loc | None -> None in
     import_model_value loc env check pm.Pmodule.mod_known
-      pm.Pmodule.mod_theory.Theory.th_known ity me.me_value in
+      pm.Pmodule.mod_theory.Theory.th_known ity Model_parser.Undefined in
   let for_variable env ?(check=fun _ _ -> ()) ~loc id ity =
     Opt.map (import check (Some id) loc env ity)
       (search_model_element_for_id model ?loc id) in
@@ -763,8 +763,10 @@ let model_of_exec_log ~original_model log =
       | Some me -> me.me_name.men_kind
       | None -> Other in
     let me_name = { men_name; men_kind; men_attrs= id.id_attrs } in
-    let me_value = model_value value in
-    {me_name; me_value; me_location= Some loc; me_lsymbol_location= None} in
+    (*let me_value = model_value value in*) (* TODO_WIP *)
+    let me_value = Term.t_bool_true in
+    let me_lsymbol = Term.create_lsymbol (Ident.id_fresh "dummytrue") [] None in
+    {me_name; me_value; me_location= Some loc; me_lsymbol} in
   let aux e = match e.Log.log_loc with
     | Some loc when not Loc.(equal loc dummy_position) -> (
         match e.Log.log_desc with

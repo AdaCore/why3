@@ -368,11 +368,14 @@ let parse pm input =
       let sexps = parse_sexps model_string in
       let defs = model_of_sexps sexps in
       let mvs = Collect_data_model.create_list pm defs in
+      []
+      (*
       List.rev
         (Mstr.values
            (Mstr.mapi (fun name value ->
                 let attrs = Mstr.find_def Ident.Sattr.empty name pm.Printer.set_str in
                 Model_parser.create_model_element ~name ~value ~attrs) mvs))
+      *)
 
 let () = Model_parser.register_model_parser "smtv2" parse
     ~desc:"Parser@ for@ the@ model@ of@ SMT@ solvers."

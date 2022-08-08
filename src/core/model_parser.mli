@@ -86,6 +86,7 @@ val print_model_const_human : Format.formatter -> model_const -> unit
 val debug_force_binary_floats : Debug.flag
 (** Print all floats using bitvectors in JSON output for models *)
 
+
 (*
 ***************************************************************
 **  Model elements
@@ -129,17 +130,19 @@ type model_element_name = {
 type model_element = {
   me_name             : model_element_name;
     (** Information about the name of the model element  *)
-  me_value            : model_value;
+  me_value            : Term.term;
     (** Counter-example value for the element. *)
   me_location         : Loc.position option;
     (** Source-code location of the element. *)
-  me_lsymbol_location : Loc.position option;
-    (** Source-code location of the Why term corresponding to the element.  *)
+  me_lsymbol          : Term.lsymbol;
+    (** Logical symbol corresponding to the element.  *)
 }
 
 val create_model_element :
   name      : string ->
-  value     : model_value ->
+  value     : Term.term ->
+  oloc      : Loc.position option ->
+  lsymbol   : Term.lsymbol ->
   attrs     : Ident.Sattr.t ->
   model_element
 (** Creates a counter-example model element.
@@ -147,9 +150,9 @@ val create_model_element :
 
     @param value counter-example value for the element
 
-    @param location source-code location of the element
+    @param lsymbol logical symbol corresponding to the element
 
-    @param term why term corresponding to the element
+    @param attrs attributes of the element
 *)
 
   (** {2 Model definitions} *)
@@ -332,38 +335,6 @@ val model_for_positions_and_decls : model ->
 
 (*
 ***************************************************************
-**  Cleaning the model
-***************************************************************
-*)
-
-(** Method clean#model cleans a model from unparsed values and handles
-   contradictory VCs ("the check fails with all inputs"). *)
-class clean : object
-  method model : model -> model
-  method element : model_element -> model_element option
-  method value : model_value -> model_value option
-  method const : model_const -> model_value option
-  method integer : model_int -> model_value option
-  method string : string -> model_value option
-  method decimal : model_dec -> model_value option
-  method fraction : model_frac -> model_value option
-  method float : model_float -> model_value option
-  method boolean : bool -> model_value option
-  method bitvector : model_bv -> model_value option
-  method var : string -> model_value option
-  method proj : string -> model_value -> model_value option
-  method apply : string -> model_value list -> model_value option
-  method array : model_array -> model_value option
-  method record : model_record -> model_value option
-  method undefined : model_value option
-  method unparsed : string -> model_value option
-end
-
-val customize_clean : #clean -> unit
-(** Customize the class used to clean the values in the model. *)
-
-(*
-***************************************************************
 ** Registering model parser
 ***************************************************************
 *)
@@ -376,7 +347,7 @@ type model_parser = Printer.printing_info -> string -> model
 type raw_model_parser = Printer.printing_info -> string -> model_element list
 
 val register_remove_field:
-  (Ident.Sattr.t * model_value -> Ident.Sattr.t * model_value) -> unit
+  (Ident.Sattr.t * Term.term -> Ident.Sattr.t * Term.term) -> unit
 
 val register_model_parser : desc:Pp.formatted -> string -> raw_model_parser -> unit
 

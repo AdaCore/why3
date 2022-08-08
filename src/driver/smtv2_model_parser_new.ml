@@ -622,26 +622,29 @@ module FromModelToTerm = struct
           Pretty.print_ls ls)
       qterms;
     let terms =
-      Mstr.fold
-        (fun n def acc ->
+      Mstr.mapi_filter
+        (fun n def ->
           try
             let ls, oloc, attrs = Mstr.find n qterms in
-            (ls, interpret_fun_def_to_term ls oloc attrs dt_decls def) :: acc
-          with Not_found -> acc)
-        fun_defs []
+            Some ((ls,oloc,attrs), interpret_fun_def_to_term ls oloc attrs dt_decls def)
+          with Not_found ->
+            Debug.dprintf debug "No term for %s@." n;
+            None)
+        fun_defs
     in
-    List.iter
-      (fun (ls, t) ->
+    Mstr.iter
+      (fun n ((ls,_,_), t) ->
         Debug.dprintf debug
-          "[get_terms] ls = %a@.t = %a@.t.t_ty = %a@.t.t_attrs = %a@.t.t_loc = \
+          "[get_terms] n = %s, ls = %a, t = %a@.t.t_ty = %a@.t.t_attrs = %a@.t.t_loc = \
            %a@."
+          n
           Pretty.print_ls ls Pretty.print_term t
           (Pp.print_option Pretty.print_ty)
           t.t_ty Pretty.print_attrs t.t_attrs
           (Pp.print_option Pretty.print_loc_as_attribute)
           t.t_loc)
       terms;
-    Mls.of_list terms
+    terms
 end
 
 (*
@@ -685,7 +688,13 @@ let parse pinfo input =
       let fun_defs = FromSexpToModel.get_fun_defs sexps in
       let dt_decls = FromSexpToModel.get_dt_decls sexps in
       let terms = FromModelToTerm.get_terms pinfo dt_decls fun_defs in
-      [] (* TODO_WIP *)
+      List.rev
+        (Mstr.values
+          (Mstr.mapi
+            (fun n ((ls,oloc,attrs),t) ->
+              let attrs = Mstr.find_def Ident.Sattr.empty n pinfo.Printer.set_str in
+              Model_parser.create_model_element ~name:n ~value:t ~oloc ~lsymbol:ls ~attrs)
+            terms))
 
 let () =
   Model_parser.register_model_parser "smtv2new" parse
