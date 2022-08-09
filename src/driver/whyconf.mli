@@ -319,7 +319,6 @@ module User: sig
       must not be prover *)
 
 end
-(** Common command line options *)
 
 module Args : sig
 
@@ -340,8 +339,7 @@ module Args : sig
   val complete_initialization : unit -> config * Env.env
 
   val exit_with_usage :
-    ?exit_code:int -> ?extra_help:string ->
-    Getopt.opt list -> string -> 'a
+    ?extra_help:string -> string -> 'a
 
   val common_options : Getopt.opt list
 

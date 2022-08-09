@@ -82,9 +82,8 @@ let config, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let () =
-  if Queue.is_empty opt_queue then begin
-    Whyconf.Args.exit_with_usage option_list usage_msg
-  end
+  if Queue.is_empty opt_queue then
+    Whyconf.Args.exit_with_usage usage_msg
 
 let opt_modu_flat  = !opt_modu_flat
 let opt_rec_single = !opt_rec_single

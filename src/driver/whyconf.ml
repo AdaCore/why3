@@ -1122,23 +1122,22 @@ module Args = struct
       Debug.Args.desc_debug_list;
     ]
 
-  let do_usage options header footer =
-    Printf.printf "Usage:";
-    List.iter (Printf.printf " %s") !Getopt.commands;
-    Printf.printf " [options]";
-    if header = "" then Printf.printf "\n\n"
-    else if header.[String.length header - 1] <> '\n' then
-      Printf.printf " %s\n\n" header
-    else Printf.printf " %s\n" header;
-    Printf.printf "%s" (Getopt.format options);
-    if footer <> "" then Printf.printf "\n%s" footer;
-    Printf.printf "%!"
+  let do_usage fmt options header footer =
+    Printf.fprintf fmt "Usage:";
+    List.iter (Printf.fprintf fmt " %s") !Getopt.commands;
+    Printf.fprintf fmt " [options]";
+    if header <> "" then Printf.fprintf fmt " %s" header;
+    if header = "" || header.[String.length header - 1] <> '\n' then
+      Printf.fprintf fmt "\n";
+    if options <> [] then Printf.fprintf fmt "\n%s" (Getopt.format options);
+    if footer <> "" then Printf.fprintf fmt "\n%s" footer;
+    Printf.fprintf fmt "%!"
 
   let all_options options header footer =
     let options = ref (common_options @ options) in
     let help =
       let open Getopt in
-      (Key ('h', "help"), Hnd0 (fun () -> do_usage !options header footer; exit 0),
+      (Key ('h', "help"), Hnd0 (fun () -> do_usage stdout !options header footer; exit 0),
        " display this help and exit") in
     options := help :: !options;
     !options
@@ -1163,10 +1162,9 @@ module Args = struct
     Getopt.parse_all ~i:!first_arg options default Sys.argv;
     complete_initialization ()
 
-  let exit_with_usage ?(exit_code=1) ?(extra_help="") options usage =
-    let options = all_options options usage extra_help in
-    do_usage options usage extra_help;
-    exit exit_code
+  let exit_with_usage ?(extra_help="") usage =
+    do_usage stderr [] usage extra_help;
+    exit 1
 end
 
 let unknown_to_known_provers provers pu =

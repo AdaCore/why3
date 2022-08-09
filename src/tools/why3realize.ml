@@ -58,7 +58,7 @@ let config, env =
 
 let () =
   if Queue.is_empty opt_queue then
-    Whyconf.Args.exit_with_usage option_list usage_msg
+    Whyconf.Args.exit_with_usage usage_msg
 
 let opt_output =
   match !opt_output with

@@ -208,7 +208,7 @@ let opt_driver = ref (match !opt_driver with
 
 let () = try
   if Queue.is_empty opt_queue then
-    Whyconf.Args.exit_with_usage option_list usage_msg;
+    Whyconf.Args.exit_with_usage usage_msg;
 
   if !opt_prover <> None && !opt_driver <> None then begin
     eprintf "Options '-P'/'--prover' and \
