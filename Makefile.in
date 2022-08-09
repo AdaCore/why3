@@ -832,12 +832,12 @@ xml-validate-local:
 # IDE
 ###############
 
-IDEGENERATED = src/ide/gtkcompat.ml
+IDEGENERATED =
 GENERATED += $(IDEGENERATED)
 
 ifeq (@enable_ide@,yes)
 
-IDE_FILES = gtkcompat
+IDE_FILES =
 
 ifeq (@enable_statmemprof@,yes)
 IDE_FILES += statmemprof
@@ -896,14 +896,6 @@ install-ide:
 install:: install-ide
 
 install_local:: bin/why3ide.$(SHAREDBEST)
-
-ifeq (@GTKVERSION@,2)
-src/ide/gtkcompat.ml: src/ide/gtkcompat2.ml Makefile
-	$(CMP_CP)
-else
-src/ide/gtkcompat.ml: src/ide/gtkcompat3.ml Makefile
-	$(CMP_CP)
-endif
 
 endif
 

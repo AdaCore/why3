@@ -40,11 +40,8 @@ depends: [
   "ocaml" {>= "4.05.0"}
   "ocamlfind" {build}
   "why3" {= version}
-  (("lablgtk3" & "lablgtk3-sourceview3") | ("lablgtk" & "conf-gtksourceview"))
-]
-
-conflicts: [
-  "lablgtk" {< "2.14.2"}
+  "lablgtk3"
+  "lablgtk3-sourceview3"
 ]
 
 synopsis: "Why3 environment for deductive program verification"
