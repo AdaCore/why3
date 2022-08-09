@@ -1,0 +1,257 @@
+<check-ce-rac-results>Check model 0 ("bench/check-ce/640_no_loc_failure.mlw", line 5, characters 39-65)
+<check-ce-rac-results>Checking model:
+                      File 640_no_loc_failure.mlw:
+                        Line 5:
+                          x = {"type": "Integer", "val": "42"}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "WHY3DATA/stdlib/bv.mlw", line 120, characters 21-24 at "WHY3DATA/stdlib/bv.mlw", line 120, characters 21-24: 0
+<rac-values>RHS evaluated for global `zeros` at "WHY3DATA/stdlib/bv.mlw", line 531, character 2 to line 540, character 11: 0
+<rac-values>Type default value for return value of call at "WHY3DATA/stdlib/bv.mlw", line 124, characters 19-22 at "WHY3DATA/stdlib/bv.mlw", line 124, characters 19-22: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/bv.mlw", line 531, character 2 to line 540, character 11: 0
+<rac-values>Type default value for return value of call at "WHY3DATA/stdlib/bv.mlw", line 126, characters 20-23 at "WHY3DATA/stdlib/bv.mlw", line 126, characters 20-23: 0
+<rac-values>RHS evaluated for global `ones` at "WHY3DATA/stdlib/bv.mlw", line 531, character 2 to line 540, character 11: 0
+<rac-values>Value from model for parameter `x` at "bench/check-ce/640_no_loc_failure.mlw", line 5, characters 27-28: 42
+<rac-values>Type default value for return value of call to wrong'lemma at "bench/check-ce/640_no_loc_failure.mlw", line 4, characters 8-13 at "bench/check-ce/640_no_loc_failure.mlw", line 4, characters 8-13: ()
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "WHY3DATA/stdlib/bv.mlw", line 120, characters 21-24 at "WHY3DATA/stdlib/bv.mlw", line 120, characters 21-24: 0
+<rac-values>RHS evaluated for global `zeros` at "WHY3DATA/stdlib/bv.mlw", line 531, character 2 to line 540, character 11: 0
+<rac-values>Type default value for return value of call at "WHY3DATA/stdlib/bv.mlw", line 124, characters 19-22 at "WHY3DATA/stdlib/bv.mlw", line 124, characters 19-22: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/bv.mlw", line 531, character 2 to line 540, character 11: 0
+<rac-values>Type default value for return value of call at "WHY3DATA/stdlib/bv.mlw", line 126, characters 20-23 at "WHY3DATA/stdlib/bv.mlw", line 126, characters 20-23: 0
+<rac-values>RHS evaluated for global `ones` at "WHY3DATA/stdlib/bv.mlw", line 531, character 2 to line 540, character 11: 0
+<rac-values>Value from model for parameter `x` at "bench/check-ce/640_no_loc_failure.mlw", line 5, characters 27-28: 42
+<rac-values>Type default value for return value of call to wrong'lemma at "bench/check-ce/640_no_loc_failure.mlw", line 4, characters 8-13 at "bench/check-ce/640_no_loc_failure.mlw", line 4, characters 8-13: ()
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: NORMAL
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 531:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 531:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 531:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 531:
+                              ones = 0
+                          File 640_no_loc_failure.mlw:
+                            Line 5:
+                              x = 42
+                            Line 4:
+                              x = 42
+                              Execution of main function `wrong'lemma` with env:
+                                x = 42
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                              result of `wrong'lemma` = ()
+                              Execution of main function terminated normally
+                        - Abstract RAC: NORMAL
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 531:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 531:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 531:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 531:
+                              ones = 0
+                          File 640_no_loc_failure.mlw:
+                            Line 5:
+                              x = 42
+                            Line 4:
+                              x = 42
+                              Execution of main function `wrong'lemma` with env:
+                                x = 42
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                              result of `wrong'lemma` = ()
+                              Execution of main function terminated normally
+<check-ce-rac-results>Check model 1 ("bench/check-ce/640_no_loc_failure.mlw", line 5, characters 39-65)
+<check-ce-rac-results>Checking model:
+                      File 640_no_loc_failure.mlw:
+                        Line 5:
+                          x = {"type": "Integer", "val": "42"}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "WHY3DATA/stdlib/bv.mlw", line 120, characters 21-24 at "WHY3DATA/stdlib/bv.mlw", line 120, characters 21-24: 0
+<rac-values>RHS evaluated for global `zeros` at "WHY3DATA/stdlib/bv.mlw", line 531, character 2 to line 540, character 11: 0
+<rac-values>Type default value for return value of call at "WHY3DATA/stdlib/bv.mlw", line 124, characters 19-22 at "WHY3DATA/stdlib/bv.mlw", line 124, characters 19-22: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/bv.mlw", line 531, character 2 to line 540, character 11: 0
+<rac-values>Type default value for return value of call at "WHY3DATA/stdlib/bv.mlw", line 126, characters 20-23 at "WHY3DATA/stdlib/bv.mlw", line 126, characters 20-23: 0
+<rac-values>RHS evaluated for global `ones` at "WHY3DATA/stdlib/bv.mlw", line 531, character 2 to line 540, character 11: 0
+<rac-values>Value from model for parameter `x` at "bench/check-ce/640_no_loc_failure.mlw", line 5, characters 27-28: 42
+<rac-values>Type default value for return value of call to wrong'lemma at "bench/check-ce/640_no_loc_failure.mlw", line 4, characters 8-13 at "bench/check-ce/640_no_loc_failure.mlw", line 4, characters 8-13: ()
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "WHY3DATA/stdlib/bv.mlw", line 120, characters 21-24 at "WHY3DATA/stdlib/bv.mlw", line 120, characters 21-24: 0
+<rac-values>RHS evaluated for global `zeros` at "WHY3DATA/stdlib/bv.mlw", line 531, character 2 to line 540, character 11: 0
+<rac-values>Type default value for return value of call at "WHY3DATA/stdlib/bv.mlw", line 124, characters 19-22 at "WHY3DATA/stdlib/bv.mlw", line 124, characters 19-22: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/bv.mlw", line 531, character 2 to line 540, character 11: 0
+<rac-values>Type default value for return value of call at "WHY3DATA/stdlib/bv.mlw", line 126, characters 20-23 at "WHY3DATA/stdlib/bv.mlw", line 126, characters 20-23: 0
+<rac-values>RHS evaluated for global `ones` at "WHY3DATA/stdlib/bv.mlw", line 531, character 2 to line 540, character 11: 0
+<rac-values>Value from model for parameter `x` at "bench/check-ce/640_no_loc_failure.mlw", line 5, characters 27-28: 42
+<rac-values>Type default value for return value of call to wrong'lemma at "bench/check-ce/640_no_loc_failure.mlw", line 4, characters 8-13 at "bench/check-ce/640_no_loc_failure.mlw", line 4, characters 8-13: ()
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: NORMAL
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 531:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 531:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 531:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 531:
+                              ones = 0
+                          File 640_no_loc_failure.mlw:
+                            Line 5:
+                              x = 42
+                            Line 4:
+                              x = 42
+                              Execution of main function `wrong'lemma` with env:
+                                x = 42
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                              result of `wrong'lemma` = ()
+                              Execution of main function terminated normally
+                        - Abstract RAC: NORMAL
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File bv.mlw:
+                            Line 531:
+                              Constant zeros initialization
+                            Line 120:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 531:
+                              zeros = 0
+                              Constant one initialization
+                            Line 124:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 531:
+                              one = 0
+                              Constant ones initialization
+                            Line 126:
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                            Line 531:
+                              ones = 0
+                          File 640_no_loc_failure.mlw:
+                            Line 5:
+                              x = 42
+                            Line 4:
+                              x = 42
+                              Execution of main function `wrong'lemma` with env:
+                                x = 42
+                                zero = 0
+                                one = 1
+                                zeros = 0
+                                one = 0
+                                ones = 0
+                              result of `wrong'lemma` = ()
+                              Execution of main function terminated normally
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/640_no_loc_failure.mlw", line 5, characters 39-65:
+Goal wrong.
+Prover result is: Unknown (unknown + incomplete) (0.86s, 120452 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check-ce-rac-results>Check model 0 (NO LOC)
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: RAC not done (no location annotation found in the term triggering the VC)
+                        - Abstract RAC: RAC not done (no location annotation found in the term triggering the VC)
+<check-ce-rac-results>Check model 1 (NO LOC)
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: RAC not done (no location annotation found in the term triggering the VC)
+                        - Abstract RAC: RAC not done (no location annotation found in the term triggering the VC)
+<check-ce-categorization>Categorizations of models:
+RAC not done: no location annotation found in the term triggering the VC
+RAC not done: no location annotation found in the term triggering the VC
+File "bench/check-ce/640_no_loc_failure.mlw", line 12, characters 22-48:
+Goal wrong.
+Prover result is: Unknown (unknown + incomplete) (0.81s, 120452 steps).
+The following counterexample model could not be verified
+  (no location annotation found in the term triggering the VC):
+File 640_no_loc_failure.mlw:
+  Line 12:
+    x = 42 (0X2A)
+

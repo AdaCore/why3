@@ -624,10 +624,11 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
       (Pp.print_option_or_default "NO LOC" Loc.pp_position)
       (get_model_term_loc m);
     let normal_res, giant_res = match get_model_term_loc m with
-    | None -> rac_not_done_failure "model term has no location"
+    | None ->
+        rac_not_done_failure "no location annotation found in the term triggering the VC"
     | Some loc ->
         if Loc.equal loc Loc.dummy_position then
-          rac_not_done_failure "the term of the CE model has a dummy location"
+          rac_not_done_failure "the term triggering the VC has a dummy location annotation"
         else
           let rac_execute ~giant_steps rs model =
             let ctx = Pinterp.mk_ctx env ~do_rac:true ~giant_steps ~rac
@@ -654,7 +655,7 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
                 end
             | None ->
                 Format.kasprintf (fun s -> rac_not_done_failure s)
-                  "no corresponding routine symbol found for %a"
+                  "there is no program function to execute at %a"
                   Loc.pp_position loc
           end
     in
