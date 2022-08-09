@@ -9,9 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Wstdlib
-open Model_parser
-
 type symbol = string
 type index = Idxnumeral of BigInt.t | Idxsymbol of string
 type identifier = Isymbol of symbol | Iindexedsymbol of symbol * index list
