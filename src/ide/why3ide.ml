@@ -183,7 +183,7 @@ let env, gconfig =
       Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
     in
     if Queue.is_empty files then
-      Whyconf.Args.exit_with_usage spec usage_str;
+      Whyconf.Args.exit_with_usage usage_str;
     Gconfig.load_config config;
     env, Gconfig.config ()
   with e when not (Debug.test_flag Debug.stack_trace) ->
@@ -409,7 +409,7 @@ let () =
       Server_utils.get_session_dir ~allow_mkdir:true files
     with Invalid_argument s ->
       Format.eprintf "Error: %s@." s;
-      Whyconf.Args.exit_with_usage spec usage_str
+      Whyconf.Args.exit_with_usage usage_str
   in
   Server.init_server gconfig.config env dir;
   Queue.iter (fun f ->

@@ -140,16 +140,18 @@ let usage_str =
   "[<file.why>|<project directory>]...\n\
    Launch a web server that provides a graphical interface for Why3."
 
+let config, env =
+  Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
+
 let () =
-    let config, env =
-      Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
-    in
-    let dir =
+  if Queue.is_empty files then
+    Whyconf.Args.exit_with_usage usage_str;
+  let dir =
       try
         Server_utils.get_session_dir ~allow_mkdir:true files
       with Invalid_argument s ->
         Format.eprintf "Error: %s@." s;
-        Whyconf.Args.exit_with_usage spec usage_str
+        Whyconf.Args.exit_with_usage usage_str
     in
     S.init_server config env dir;
     Queue.iter (fun f -> P.push_request (Add_file_req f)) files;

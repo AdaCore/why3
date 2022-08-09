@@ -363,15 +363,17 @@ let run_as_bench env_session =
 
 
 let () =
+  if Queue.is_empty files then
+    Whyconf.Args.exit_with_usage usage_msg;
   let dir =
     try
       Server_utils.get_session_dir ~allow_mkdir:false files
     with Invalid_argument s ->
       Format.eprintf "Error: %s@." s;
-      Whyconf.Args.exit_with_usage option_list usage_msg
+      Whyconf.Args.exit_with_usage usage_msg
   in
   if not (Queue.is_empty files) then
-    Whyconf.Args.exit_with_usage option_list usage_msg;
+    Whyconf.Args.exit_with_usage usage_msg;
   try
     Debug.dprintf debug "Opening session '%s'...@?" dir;
     let ses = S.load_session dir in

@@ -83,7 +83,8 @@ let config, env =
   Whyconf.Args.initialize option_list add_opt usage_msg
 
 let () =
-  if !opt_file = None then Whyconf.Args.exit_with_usage option_list usage_msg
+  if !opt_file = None || !opt_exec = "" then
+    Whyconf.Args.exit_with_usage usage_msg
 
 let find_module env file q =
   match List.rev q with

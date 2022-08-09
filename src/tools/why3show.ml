@@ -153,7 +153,7 @@ let () =
   let options = Whyconf.Args.all_options [] usage_msg extra_help in
   let i = Getopt.parse_many options Sys.argv !Whyconf.Args.first_arg in
   if i = Array.length Sys.argv then
-    Whyconf.Args.exit_with_usage ~extra_help [] usage_msg;
+    Whyconf.Args.exit_with_usage ~extra_help usage_msg;
   let cmd_name = Sys.argv.(i) in
   let cmd =
     match List.find (fun e -> e.cmd_name = cmd_name) cmds with
