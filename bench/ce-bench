@@ -76,7 +76,7 @@ run () {
         printf "Strongest Postcondition ${file_path} ($1)... "
     fi
     steps=$5
-    if [ "$3" = "strings" ] && [ "$1" = "CVC4,1.8" ] ; then
+    if [ "$3" = "strings" ] && ([ "$1" = "CVC4,1.8" ] || [ "$1" = "CVC5,1.0.0" ]) ; then
         prover="$1,strings+counterexamples"
     else
         prover="$1,counterexamples"
