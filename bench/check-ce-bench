@@ -127,7 +127,14 @@ for file in $files; do
         z3steps=500000
         ;;
       "668_projection")
+        ;;
         z3steps=500000
+      "bv32")
+        ;;
+        z3steps=2500000
+        ;;
+      "threshold")
+        z3steps=2500000
         ;;
     esac
     run CVC4,1.8 $filedir $filebase true   $cvc4steps

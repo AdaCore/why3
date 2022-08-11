@@ -125,9 +125,6 @@ for file in $files; do
     printf "Running provers on $filedir/$filebase.mlw\n";
     cvc5steps=150000
     case "$filebase" in
-      "bv32")
-        z3steps=2500000
-        ;;
       "int_overflow")
         z3steps=400000
         ;;
@@ -136,9 +133,6 @@ for file in $files; do
         ;;
       "strings")
         z3steps=3000
-        ;;
-      "threshold")
-        z3steps=1000000
         ;;
       *)
         z3steps=7500000
