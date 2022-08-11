@@ -1,0 +1,929 @@
+<check-ce-rac-results>Check model 0 ("bench/check-ce/records_label.mlw", line 12, characters 14-35)
+<check-ce-rac-results>Checking model:
+                      File records_label.mlw:
+                        Line 9:
+                          y =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "0"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          y =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "0"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                        Line 11:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "-175"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "-175"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                        Line 12:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "6"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "-175"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "6"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          y =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "0"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                        Line 14:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "6"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `y` at "bench/check-ce/records_label.mlw", line 9, characters 6-7: {f=
+                                                                    0;
+                                                                    g= false}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/records_label.mlw", line 11, characters 24-25: {f=
+                                                                    (-175);
+                                                                    g= false}
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `y` at "bench/check-ce/records_label.mlw", line 9, characters 6-7: {f=
+                                                                    0;
+                                                                    g= false}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/records_label.mlw", line 11, characters 24-25: {f=
+                                                                    (-175);
+                                                                    g= false}
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_label.mlw", line 12, characters 14-35)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File records_label.mlw:
+                            Line 9:
+                              y = {f= 0; g= false}
+                            Line 11:
+                              x = {f= (-175); g= false}
+                              x = {f= (-175); g= false}
+                              Execution of main function `record_old_test1` with env:
+                                y = {f= 0; g= false}
+                                x = {f= (-175); g= false}
+                                zero = 0
+                                one = 1
+                            Line 12:
+                              Property failure at postcondition of `record_old_test1` with:
+                                x = {f= 6; g= false}
+                                x = {f= (-175); g= false}
+                                y = {f= 0; g= false}
+                        - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_label.mlw", line 12, characters 14-35)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File records_label.mlw:
+                            Line 9:
+                              y = {f= 0; g= false}
+                            Line 11:
+                              x = {f= (-175); g= false}
+                              x = {f= (-175); g= false}
+                              Execution of main function `record_old_test1` with env:
+                                y = {f= 0; g= false}
+                                x = {f= (-175); g= false}
+                                zero = 0
+                                one = 1
+                            Line 12:
+                              Property failure at postcondition of `record_old_test1` with:
+                                x = {f= 6; g= false}
+                                x = {f= (-175); g= false}
+                                y = {f= 0; g= false}
+<check-ce-rac-results>Check model 1 ("bench/check-ce/records_label.mlw", line 12, characters 14-35)
+<check-ce-rac-results>Checking model:
+                      File records_label.mlw:
+                        Line 9:
+                          y =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "0"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          y =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "0"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                        Line 11:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "-175"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "-175"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                        Line 12:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "6"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "-175"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "6"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          y =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "0"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                        Line 14:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "6"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `y` at "bench/check-ce/records_label.mlw", line 9, characters 6-7: {f=
+                                                                    0;
+                                                                    g= false}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/records_label.mlw", line 11, characters 24-25: {f=
+                                                                    (-175);
+                                                                    g= false}
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `y` at "bench/check-ce/records_label.mlw", line 9, characters 6-7: {f=
+                                                                    0;
+                                                                    g= false}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/records_label.mlw", line 11, characters 24-25: {f=
+                                                                    (-175);
+                                                                    g= false}
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_label.mlw", line 12, characters 14-35)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File records_label.mlw:
+                            Line 9:
+                              y = {f= 0; g= false}
+                            Line 11:
+                              x = {f= (-175); g= false}
+                              x = {f= (-175); g= false}
+                              Execution of main function `record_old_test1` with env:
+                                y = {f= 0; g= false}
+                                x = {f= (-175); g= false}
+                                zero = 0
+                                one = 1
+                            Line 12:
+                              Property failure at postcondition of `record_old_test1` with:
+                                x = {f= 6; g= false}
+                                x = {f= (-175); g= false}
+                                y = {f= 0; g= false}
+                        - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_label.mlw", line 12, characters 14-35)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File records_label.mlw:
+                            Line 9:
+                              y = {f= 0; g= false}
+                            Line 11:
+                              x = {f= (-175); g= false}
+                              x = {f= (-175); g= false}
+                              Execution of main function `record_old_test1` with env:
+                                y = {f= 0; g= false}
+                                x = {f= (-175); g= false}
+                                zero = 0
+                                one = 1
+                            Line 12:
+                              Property failure at postcondition of `record_old_test1` with:
+                                x = {f= 6; g= false}
+                                x = {f= (-175); g= false}
+                                y = {f= 0; g= false}
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_label.mlw", line 12, characters 14-35)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_label.mlw", line 12, characters 14-35)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_label.mlw", line 12, characters 14-35)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_label.mlw", line 12, characters 14-35)
+File "bench/check-ce/records_label.mlw", line 12, characters 14-35:
+Sub-goal Postcondition of goal record_old_test1'vc.
+Prover result is: Unknown (sat) (0.02s, 577 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File records_label.mlw:
+  Line 9:
+    y = {f= 0; g= false}
+  Line 11:
+    x = {f= (-175); g= false}
+    x = {f= (-175); g= false}
+    Execution of main function `record_old_test1` with env:
+      y = {f= 0; g= false}
+      x = {f= (-175); g= false}
+      zero = 0
+      one = 1
+  Line 12:
+    Property failure at postcondition of `record_old_test1` with:
+      x = {f= 6; g= false}
+      x = {f= (-175); g= false}
+      y = {f= 0; g= false}
+
+<check-ce-rac-results>Check model 0 ("bench/check-ce/records_label.mlw", line 22, characters 13-58)
+<check-ce-rac-results>Checking model:
+                      File records_label.mlw:
+                        Line 9:
+                          y =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "0"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                        Line 16:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "6"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "-175"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                        Line 19:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "6"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                        Line 21:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "12"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                        Line 22:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "12"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "-175"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "6"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          y =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "0"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `y` at "bench/check-ce/records_label.mlw", line 9, characters 6-7: {f=
+                                                                    0;
+                                                                    g= false}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/records_label.mlw", line 16, characters 23-24: {f=
+                                                                    (-175);
+                                                                    g= false}
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `y` at "bench/check-ce/records_label.mlw", line 9, characters 6-7: {f=
+                                                                    0;
+                                                                    g= false}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/records_label.mlw", line 16, characters 23-24: {f=
+                                                                    (-175);
+                                                                    g= false}
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: FAILURE (assertion at "bench/check-ce/records_label.mlw", line 22, characters 13-58)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File records_label.mlw:
+                            Line 9:
+                              y = {f= 0; g= false}
+                            Line 16:
+                              x = {f= (-175); g= false}
+                              x = {f= (-175); g= false}
+                              Execution of main function `record_at_test2` with env:
+                                y = {f= 0; g= false}
+                                x = {f= (-175); g= false}
+                                zero = 0
+                                one = 1
+                            Line 22:
+                              Property failure at assertion with:
+                                y = {f= 0; g= false}
+                                x = {f= 12; g= false}
+                                x = r'mk (- 175) False
+                                x = r'mk 6 False
+                        - Abstract RAC: FAILURE (assertion at "bench/check-ce/records_label.mlw", line 22, characters 13-58)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File records_label.mlw:
+                            Line 9:
+                              y = {f= 0; g= false}
+                            Line 16:
+                              x = {f= (-175); g= false}
+                              x = {f= (-175); g= false}
+                              Execution of main function `record_at_test2` with env:
+                                y = {f= 0; g= false}
+                                x = {f= (-175); g= false}
+                                zero = 0
+                                one = 1
+                            Line 22:
+                              Property failure at assertion with:
+                                y = {f= 0; g= false}
+                                x = {f= 12; g= false}
+                                x = r'mk (- 175) False
+                                x = r'mk 6 False
+<check-ce-rac-results>Check model 1 ("bench/check-ce/records_label.mlw", line 22, characters 13-58)
+<check-ce-rac-results>Checking model:
+                      File records_label.mlw:
+                        Line 9:
+                          y =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "0"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                        Line 16:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "6"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "-175"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                        Line 19:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "6"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                        Line 21:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "12"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                        Line 22:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "12"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "-175"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "6"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          y =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "0"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `y` at "bench/check-ce/records_label.mlw", line 9, characters 6-7: {f=
+                                                                    0;
+                                                                    g= false}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/records_label.mlw", line 16, characters 23-24: {f=
+                                                                    (-175);
+                                                                    g= false}
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `y` at "bench/check-ce/records_label.mlw", line 9, characters 6-7: {f=
+                                                                    0;
+                                                                    g= false}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/records_label.mlw", line 16, characters 23-24: {f=
+                                                                    (-175);
+                                                                    g= false}
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: FAILURE (assertion at "bench/check-ce/records_label.mlw", line 22, characters 13-58)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File records_label.mlw:
+                            Line 9:
+                              y = {f= 0; g= false}
+                            Line 16:
+                              x = {f= (-175); g= false}
+                              x = {f= (-175); g= false}
+                              Execution of main function `record_at_test2` with env:
+                                y = {f= 0; g= false}
+                                x = {f= (-175); g= false}
+                                zero = 0
+                                one = 1
+                            Line 22:
+                              Property failure at assertion with:
+                                y = {f= 0; g= false}
+                                x = {f= 12; g= false}
+                                x = r'mk (- 175) False
+                                x = r'mk 6 False
+                        - Abstract RAC: FAILURE (assertion at "bench/check-ce/records_label.mlw", line 22, characters 13-58)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File records_label.mlw:
+                            Line 9:
+                              y = {f= 0; g= false}
+                            Line 16:
+                              x = {f= (-175); g= false}
+                              x = {f= (-175); g= false}
+                              Execution of main function `record_at_test2` with env:
+                                y = {f= 0; g= false}
+                                x = {f= (-175); g= false}
+                                zero = 0
+                                one = 1
+                            Line 22:
+                              Property failure at assertion with:
+                                y = {f= 0; g= false}
+                                x = {f= 12; g= false}
+                                x = r'mk (- 175) False
+                                x = r'mk 6 False
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/records_label.mlw", line 22, characters 13-58)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/records_label.mlw", line 22, characters 13-58)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/records_label.mlw", line 22, characters 13-58)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/records_label.mlw", line 22, characters 13-58)
+File "bench/check-ce/records_label.mlw", line 22, characters 13-58:
+Sub-goal Assertion of goal record_at_test2'vc.
+Prover result is: Unknown (sat) (0.01s, 739 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File records_label.mlw:
+  Line 9:
+    y = {f= 0; g= false}
+  Line 16:
+    x = {f= (-175); g= false}
+    x = {f= (-175); g= false}
+    Execution of main function `record_at_test2` with env:
+      y = {f= 0; g= false}
+      x = {f= (-175); g= false}
+      zero = 0
+      one = 1
+  Line 22:
+    Property failure at assertion with:
+      y = {f= 0; g= false}
+      x = {f= 12; g= false}
+      x = r'mk (- 175) False
+      x = r'mk 6 False
+
+<check-ce-rac-results>Check model 0 ("bench/check-ce/records_label.mlw", line 30, characters 13-37)
+<check-ce-rac-results>Checking model:
+                      File records_label.mlw:
+                        Line 24:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "1"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "1"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                        Line 30:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "1"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "1"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/records_label.mlw", line 9, characters 8-11 at "bench/check-ce/records_label.mlw", line 9, characters 8-11: {f=
+                                                                    0;
+                                                                    g= false}
+<rac-values>RHS evaluated for global `y` at "bench/check-ce/records_label.mlw", line 9, characters 6-7: {f=
+                                                                    0;
+                                                                    g= false}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/records_label.mlw", line 24, characters 20-21: {f=
+                                                                    1;
+                                                                    g= false}
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/records_label.mlw", line 9, characters 8-11 at "bench/check-ce/records_label.mlw", line 9, characters 8-11: {f=
+                                                                    0;
+                                                                    g= false}
+<rac-values>RHS evaluated for global `y` at "bench/check-ce/records_label.mlw", line 9, characters 6-7: {f=
+                                                                    0;
+                                                                    g= false}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/records_label.mlw", line 24, characters 20-21: {f=
+                                                                    1;
+                                                                    g= false}
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: FAILURE (assertion at "bench/check-ce/records_label.mlw", line 30, characters 13-37)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File records_label.mlw:
+                            Line 9:
+                              Constant y initialization
+                              (giant-step) execution of unimplemented function with args:
+                              result = {f= 0; g= false}
+                              y = {f= 0; g= false}
+                            Line 24:
+                              x = {f= 1; g= false}
+                              x = {f= 1; g= false}
+                              Execution of main function `several_hats` with env:
+                                y = {f= 0; g= false}
+                                x = {f= 1; g= false}
+                                zero = 0
+                                one = 1
+                            Line 30:
+                              Property failure at assertion with:
+                                x = r'mk 1 False
+                                x = r'mk 1 False
+                        - Abstract RAC: FAILURE (assertion at "bench/check-ce/records_label.mlw", line 30, characters 13-37)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File records_label.mlw:
+                            Line 9:
+                              Constant y initialization
+                              (giant-step) execution of unimplemented function with args:
+                              result = {f= 0; g= false}
+                              y = {f= 0; g= false}
+                            Line 24:
+                              x = {f= 1; g= false}
+                              x = {f= 1; g= false}
+                              Execution of main function `several_hats` with env:
+                                y = {f= 0; g= false}
+                                x = {f= 1; g= false}
+                                zero = 0
+                                one = 1
+                            Line 30:
+                              Property failure at assertion with:
+                                x = r'mk 1 False
+                                x = r'mk 1 False
+<check-ce-rac-results>Check model 1 ("bench/check-ce/records_label.mlw", line 30, characters 13-37)
+<check-ce-rac-results>Checking model:
+                      File records_label.mlw:
+                        Line 24:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "1"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "1"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                        Line 30:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "1"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value": {"type": "Integer", "val": "1"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/records_label.mlw", line 9, characters 8-11 at "bench/check-ce/records_label.mlw", line 9, characters 8-11: {f=
+                                                                    0;
+                                                                    g= false}
+<rac-values>RHS evaluated for global `y` at "bench/check-ce/records_label.mlw", line 9, characters 6-7: {f=
+                                                                    0;
+                                                                    g= false}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/records_label.mlw", line 24, characters 20-21: {f=
+                                                                    1;
+                                                                    g= false}
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/records_label.mlw", line 9, characters 8-11 at "bench/check-ce/records_label.mlw", line 9, characters 8-11: {f=
+                                                                    0;
+                                                                    g= false}
+<rac-values>RHS evaluated for global `y` at "bench/check-ce/records_label.mlw", line 9, characters 6-7: {f=
+                                                                    0;
+                                                                    g= false}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/records_label.mlw", line 24, characters 20-21: {f=
+                                                                    1;
+                                                                    g= false}
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: FAILURE (assertion at "bench/check-ce/records_label.mlw", line 30, characters 13-37)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File records_label.mlw:
+                            Line 9:
+                              Constant y initialization
+                              (giant-step) execution of unimplemented function with args:
+                              result = {f= 0; g= false}
+                              y = {f= 0; g= false}
+                            Line 24:
+                              x = {f= 1; g= false}
+                              x = {f= 1; g= false}
+                              Execution of main function `several_hats` with env:
+                                y = {f= 0; g= false}
+                                x = {f= 1; g= false}
+                                zero = 0
+                                one = 1
+                            Line 30:
+                              Property failure at assertion with:
+                                x = r'mk 1 False
+                                x = r'mk 1 False
+                        - Abstract RAC: FAILURE (assertion at "bench/check-ce/records_label.mlw", line 30, characters 13-37)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File records_label.mlw:
+                            Line 9:
+                              Constant y initialization
+                              (giant-step) execution of unimplemented function with args:
+                              result = {f= 0; g= false}
+                              y = {f= 0; g= false}
+                            Line 24:
+                              x = {f= 1; g= false}
+                              x = {f= 1; g= false}
+                              Execution of main function `several_hats` with env:
+                                y = {f= 0; g= false}
+                                x = {f= 1; g= false}
+                                zero = 0
+                                one = 1
+                            Line 30:
+                              Property failure at assertion with:
+                                x = r'mk 1 False
+                                x = r'mk 1 False
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/records_label.mlw", line 30, characters 13-37)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/records_label.mlw", line 30, characters 13-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/records_label.mlw", line 30, characters 13-37)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/records_label.mlw", line 30, characters 13-37)
+File "bench/check-ce/records_label.mlw", line 30, characters 13-37:
+Sub-goal Assertion of goal several_hats'vc.
+Prover result is: Unknown (sat) (0.01s, 164 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File records_label.mlw:
+  Line 9:
+    Constant y initialization
+    (giant-step) execution of unimplemented function with args:
+    result = {f= 0; g= false}
+    y = {f= 0; g= false}
+  Line 24:
+    x = {f= 1; g= false}
+    x = {f= 1; g= false}
+    Execution of main function `several_hats` with env:
+      y = {f= 0; g= false}
+      x = {f= 1; g= false}
+      zero = 0
+      one = 1
+  Line 30:
+    Property failure at assertion with:
+      x = r'mk 1 False
+      x = r'mk 1 False
+
