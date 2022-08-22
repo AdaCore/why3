@@ -1,6 +1,6 @@
 File bench/check-ce/records_inv.mlw:
 Goal r'vc.
-Prover result is: Valid (0.04s, 59 steps).
+Prover result is: Valid (0.05s, 267 steps).
 
 <check-ce-rac-results>Check model 0 ("bench/check-ce/records_inv.mlw", line 16, characters 14-24)
 <check-ce-rac-results>Checking model:
@@ -177,7 +177,7 @@ Prover result is: Valid (0.04s, 59 steps).
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 16, characters 14-24)
 File "bench/check-ce/records_inv.mlw", line 16, characters 14-24:
 Sub-goal Postcondition of goal record_match_eval_test1'vc.
-Prover result is: Unknown (unknown + incomplete) (0.02s, 326 steps).
+Prover result is: Unknown (unknown + incomplete) (0.03s, 5087 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -214,7 +214,9 @@ File records_inv.mlw:
                              "val":
                               {"Field":
                                 [{"field": ".my_field_f",
-                                  "value": {"type": "Integer", "val": "0"}}]}}
+                                  "value": {"type": "Integer", "val": "0"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
                         Line 24:
                           result = {"type": "Integer", "val": "0"}
                           result = {"type": "Integer", "val": "0"}
@@ -226,15 +228,13 @@ File records_inv.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/records_inv.mlw", line 23, characters 31-32: {f=
                                                                     0;
-                                                                    g=
-                                                                    UNDEFINED}
+                                                                    g= false}
 <check-ce-rac-results>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/records_inv.mlw", line 23, characters 31-32: {f=
                                                                     0;
-                                                                    g=
-                                                                    UNDEFINED}
+                                                                    g= false}
 <check-ce-rac-results>Results of RAC executions for model 0:
                         - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 24, characters 14-24)
                           File int.mlw:
@@ -246,15 +246,15 @@ File records_inv.mlw:
                               one = 1
                           File records_inv.mlw:
                             Line 23:
-                              x = {f= 0; g= UNDEFINED}
-                              x = {f= 0; g= UNDEFINED}
+                              x = {f= 0; g= false}
+                              x = {f= 0; g= false}
                               Execution of main function `record_match_eval_test2` with env:
-                                x = {f= 0; g= UNDEFINED}
+                                x = {f= 0; g= false}
                                 zero = 0
                                 one = 1
                             Line 26:
                               Normal execution of function `f` with args:
-                                arg = {f= 0; g= UNDEFINED}
+                                arg = {f= 0; g= false}
                             Line 24:
                               Property failure at postcondition of `record_match_eval_test2` with:
                                 result = 0
@@ -268,15 +268,15 @@ File records_inv.mlw:
                               one = 1
                           File records_inv.mlw:
                             Line 23:
-                              x = {f= 0; g= UNDEFINED}
-                              x = {f= 0; g= UNDEFINED}
+                              x = {f= 0; g= false}
+                              x = {f= 0; g= false}
                               Execution of main function `record_match_eval_test2` with env:
-                                x = {f= 0; g= UNDEFINED}
+                                x = {f= 0; g= false}
                                 zero = 0
                                 one = 1
                             Line 26:
                               Normal execution of function `f` with args:
-                                arg = {f= 0; g= UNDEFINED}
+                                arg = {f= 0; g= false}
                             Line 24:
                               Property failure at postcondition of `record_match_eval_test2` with:
                                 result = 0
@@ -289,7 +289,9 @@ File records_inv.mlw:
                              "val":
                               {"Field":
                                 [{"field": ".my_field_f",
-                                  "value": {"type": "Integer", "val": "0"}}]}}
+                                  "value": {"type": "Integer", "val": "0"}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": false}}]}}
                         Line 24:
                           result = {"type": "Integer", "val": "0"}
                           result = {"type": "Integer", "val": "0"}
@@ -301,15 +303,13 @@ File records_inv.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/records_inv.mlw", line 23, characters 31-32: {f=
                                                                     0;
-                                                                    g=
-                                                                    UNDEFINED}
+                                                                    g= false}
 <check-ce-rac-results>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/records_inv.mlw", line 23, characters 31-32: {f=
                                                                     0;
-                                                                    g=
-                                                                    UNDEFINED}
+                                                                    g= false}
 <check-ce-rac-results>Results of RAC executions for model 1:
                         - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 24, characters 14-24)
                           File int.mlw:
@@ -321,15 +321,15 @@ File records_inv.mlw:
                               one = 1
                           File records_inv.mlw:
                             Line 23:
-                              x = {f= 0; g= UNDEFINED}
-                              x = {f= 0; g= UNDEFINED}
+                              x = {f= 0; g= false}
+                              x = {f= 0; g= false}
                               Execution of main function `record_match_eval_test2` with env:
-                                x = {f= 0; g= UNDEFINED}
+                                x = {f= 0; g= false}
                                 zero = 0
                                 one = 1
                             Line 26:
                               Normal execution of function `f` with args:
-                                arg = {f= 0; g= UNDEFINED}
+                                arg = {f= 0; g= false}
                             Line 24:
                               Property failure at postcondition of `record_match_eval_test2` with:
                                 result = 0
@@ -343,15 +343,15 @@ File records_inv.mlw:
                               one = 1
                           File records_inv.mlw:
                             Line 23:
-                              x = {f= 0; g= UNDEFINED}
-                              x = {f= 0; g= UNDEFINED}
+                              x = {f= 0; g= false}
+                              x = {f= 0; g= false}
                               Execution of main function `record_match_eval_test2` with env:
-                                x = {f= 0; g= UNDEFINED}
+                                x = {f= 0; g= false}
                                 zero = 0
                                 one = 1
                             Line 26:
                               Normal execution of function `f` with args:
-                                arg = {f= 0; g= UNDEFINED}
+                                arg = {f= 0; g= false}
                             Line 24:
                               Property failure at postcondition of `record_match_eval_test2` with:
                                 result = 0
@@ -364,7 +364,7 @@ File records_inv.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 24, characters 14-24)
 File "bench/check-ce/records_inv.mlw", line 24, characters 14-24:
 Sub-goal Postcondition of goal record_match_eval_test2'vc.
-Prover result is: Unknown (unknown + incomplete) (0.01s, 241 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 4913 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -376,15 +376,15 @@ File int.mlw:
     one = 1
 File records_inv.mlw:
   Line 23:
-    x = {f= 0; g= UNDEFINED}
-    x = {f= 0; g= UNDEFINED}
+    x = {f= 0; g= false}
+    x = {f= 0; g= false}
     Execution of main function `record_match_eval_test2` with env:
-      x = {f= 0; g= UNDEFINED}
+      x = {f= 0; g= false}
       zero = 0
       one = 1
   Line 26:
     Normal execution of function `f` with args:
-      arg = {f= 0; g= UNDEFINED}
+      arg = {f= 0; g= false}
   Line 24:
     Property failure at postcondition of `record_match_eval_test2` with:
       result = 0
@@ -660,7 +660,7 @@ File records_inv.mlw:
   - Abstract RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 31, characters 9-25)
 File "bench/check-ce/records_inv.mlw", line 31, characters 9-25:
 Sub-goal Precondition of goal record_match_eval_test3'vc.
-Prover result is: Unknown (unknown + incomplete) (0.01s, 224 steps).
+Prover result is: Unknown (unknown + incomplete) (0.03s, 4823 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -697,7 +697,7 @@ File records_inv.mlw:
 
 File "bench/check-ce/records_inv.mlw", line 29, characters 14-18:
 Sub-goal Postcondition of goal record_match_eval_test3'vc.
-Prover result is: Valid (0.01s, 1465 steps).
+Prover result is: Valid (0.02s, 1673 steps).
 
 <check-ce-rac-results>Check model 0 ("bench/check-ce/records_inv.mlw", line 36, characters 9-26)
 <check-ce-rac-results>Checking model:
@@ -970,7 +970,7 @@ Prover result is: Valid (0.01s, 1465 steps).
   - Abstract RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 36, characters 9-26)
 File "bench/check-ce/records_inv.mlw", line 36, characters 9-26:
 Sub-goal Precondition of goal record_match_eval_test4'vc.
-Prover result is: Unknown (unknown + incomplete) (0.01s, 224 steps).
+Prover result is: Unknown (unknown + incomplete) (0.02s, 4823 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1007,7 +1007,7 @@ File records_inv.mlw:
 
 File "bench/check-ce/records_inv.mlw", line 34, characters 14-22:
 Sub-goal Postcondition of goal record_match_eval_test4'vc.
-Prover result is: Valid (0.02s, 1515 steps).
+Prover result is: Valid (0.01s, 1723 steps).
 
 <check-ce-rac-results>Check model 0 ("bench/check-ce/records_inv.mlw", line 42, characters 9-26)
 <check-ce-rac-results>Checking model:
@@ -1280,7 +1280,7 @@ Prover result is: Valid (0.02s, 1515 steps).
   - Abstract RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 42, characters 9-26)
 File "bench/check-ce/records_inv.mlw", line 42, characters 9-26:
 Sub-goal Precondition of goal record_match_eval_test44'vc.
-Prover result is: Unknown (unknown + incomplete) (0.02s, 224 steps).
+Prover result is: Unknown (unknown + incomplete) (0.03s, 4823 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1317,11 +1317,11 @@ File records_inv.mlw:
 
 File "bench/check-ce/records_inv.mlw", line 43, characters 13-22:
 Sub-goal Assertion of goal record_match_eval_test44'vc.
-Prover result is: Valid (0.02s, 1486 steps).
+Prover result is: Valid (0.02s, 1688 steps).
 
 File "bench/check-ce/records_inv.mlw", line 40, characters 14-22:
 Sub-goal Postcondition of goal record_match_eval_test44'vc.
-Prover result is: Valid (0.01s, 1325 steps).
+Prover result is: Valid (0.02s, 1524 steps).
 
 <check-ce-rac-results>Check model 0 ("bench/check-ce/records_inv.mlw", line 51, characters 9-26)
 <check-ce-rac-results>Checking model:
@@ -1650,7 +1650,7 @@ Prover result is: Valid (0.01s, 1325 steps).
   - Abstract RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 51, characters 9-26)
 File "bench/check-ce/records_inv.mlw", line 51, characters 9-26:
 Sub-goal Precondition of goal test_record_match_eval_test5'vc.
-Prover result is: Unknown (unknown + incomplete) (0.01s, 227 steps).
+Prover result is: Unknown (unknown + incomplete) (0.02s, 4826 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1690,7 +1690,7 @@ File records_inv.mlw:
 
 File "bench/check-ce/records_inv.mlw", line 49, characters 14-26:
 Sub-goal Postcondition of goal test_record_match_eval_test5'vc.
-Prover result is: Valid (0.02s, 1572 steps).
+Prover result is: Valid (0.02s, 1774 steps).
 
 <check-ce-rac-results>Check model 0 ("bench/check-ce/records_inv.mlw", line 66, characters 14-24)
 <check-ce-rac-results>Checking model:
@@ -1867,7 +1867,7 @@ Prover result is: Valid (0.02s, 1572 steps).
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 66, characters 14-24)
 File "bench/check-ce/records_inv.mlw", line 66, characters 14-24:
 Sub-goal Postcondition of goal record_match_eval_test1'vc.
-Prover result is: Unknown (sat) (0.01s, 276 steps).
+Prover result is: Unknown (sat) (0.03s, 4973 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -2054,7 +2054,7 @@ File records_inv.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 74, characters 14-24)
 File "bench/check-ce/records_inv.mlw", line 74, characters 14-24:
 Sub-goal Postcondition of goal record_match_eval_test2'vc.
-Prover result is: Unknown (sat) (0.01s, 220 steps).
+Prover result is: Unknown (sat) (0.03s, 4880 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -2270,7 +2270,7 @@ File records_inv.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 79, characters 14-17)
 File "bench/check-ce/records_inv.mlw", line 79, characters 14-17:
 Sub-goal Postcondition of goal record_match_eval_test3'vc.
-Prover result is: Unknown (sat) (0.01s, 268 steps).
+Prover result is: Unknown (sat) (0.03s, 4910 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -2484,7 +2484,7 @@ File records_inv.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 84, characters 14-22)
 File "bench/check-ce/records_inv.mlw", line 84, characters 14-22:
 Sub-goal Postcondition of goal record_match_eval_test4'vc.
-Prover result is: Unknown (sat) (0.01s, 293 steps).
+Prover result is: Unknown (sat) (0.02s, 4935 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
