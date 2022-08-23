@@ -1,0 +1,12 @@
+
+module Range_float
+
+  use real.Real
+
+  type t = < float 8 24 >
+
+  let f (x: t)
+  =
+    assert {t'real x < 10.}
+
+end
