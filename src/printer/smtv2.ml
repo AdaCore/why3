@@ -200,6 +200,7 @@ type info = {
   info_vc_term : vc_term_info;
   info_printer : ident_printer;
   mutable list_projs : Ident.ident Mstr.t;
+  mutable type_coercions : Sls.t Mty.t;
   mutable list_field_def: Ident.ident Mstr.t;
   info_version : version;
   meta_model_projection : Sls.t;
@@ -290,9 +291,15 @@ let print_typed_var_list info fmt vsl =
   print_list space (print_typed_var info) fmt vsl
 
 let collect_model_ls info ls =
-  if Sls.mem ls info.meta_model_projection then
+  if Sls.mem ls info.meta_model_projection then (
+    begin match ls.ls_args with
+    | [ty] ->
+      let coercions = Sls.add ls (Mty.find_def Sls.empty ty info.type_coercions) in
+      info.type_coercions <- Mty.add ty coercions info.type_coercions
+    | _ -> () (* TODO_WIP *)
+    end;
     info.list_projs <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
-        ls.ls_name info.list_projs;
+        ls.ls_name info.list_projs);
   if Sls.mem ls info.meta_record_def then
     info.list_field_def <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
         ls.ls_name info.list_field_def;
@@ -787,6 +794,7 @@ let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f = match k with
         vc_term_loc = vc_loc;
         vc_term_attrs = vc_attrs;
         queried_terms = model_list;
+        type_coercions = info.type_coercions;
         list_projections = info.list_projs;
         list_fields = info.list_field_def;
         Printer.list_records = info.list_records;
@@ -951,6 +959,7 @@ let print_task version args ?old:_ fmt task =
     info_vc_term = vc_info;
     info_printer = ident_printer ();
     list_projs = Mstr.empty;
+    type_coercions = Mty.empty;
     list_field_def = Mstr.empty;
     info_version = version;
     meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;

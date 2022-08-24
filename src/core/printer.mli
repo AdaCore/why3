@@ -51,6 +51,8 @@ type printing_info = {
   queried_terms : (Term.lsymbol * Loc.position option * Sattr.t)  Mstr.t;
   (** The list of terms that were queried for the counter-example
      by the printer *)
+  type_coercions : Sls.t Mty.t;
+  (** For each type, the set of lsymbols defining a coercion to this type. *)
   list_projections: Ident.ident Mstr.t;
   (** List of projections as printed in the model. They corresponds to an ident
      which is kept so that we can approximate its used name in task. *)

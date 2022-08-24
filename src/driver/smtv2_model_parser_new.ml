@@ -609,7 +609,74 @@ module FromModelToTerm = struct
     Debug.dprintf debug "-----------------------------@.";
     t
 
-  let get_terms (* TODO_WIP *) (pinfo : Printer.printing_info)
+  let rec eval vs t = match t.t_node with
+    (* TODO_WIP *)
+    | _ -> t
+
+  let apply_coercions (pinfo : Printer.printing_info) terms =
+    let ty_coercions =
+      Ty.Mty.map (* for each set [sls] of lsymbols associated to a type *)
+        (fun sls ->
+          (* we construct a list of elements [(str,(ls,t))] retrieved
+             from [terms] such that [ls] is in [sls]:
+             for a given type [ty], it corresponds to all type coercions
+             that can be applied to an object of type [ty] *)
+          List.concat (List.map
+            (fun ls -> Mstr.bindings (
+              Mstr.mapi_filter
+                (fun str ((ls',_,_), t) ->
+                  if ls_equal ls ls' then Some (ls,t) else None)
+                terms))
+            (Sls.elements sls))
+        )
+      pinfo.type_coercions in
+    Ty.Mty.iter
+      (fun key elt ->
+        List.iter
+          (fun (str,(ls,t)) ->
+            Debug.dprintf debug "[ty_coercions] ty = %a, str=%s, ls = %a, t=%a@."
+              Pretty.print_ty key
+              str
+              Pretty.print_ls ls
+              Pretty.print_term t)
+          elt)
+      ty_coercions;
+    Mstr.mapi (* for each element in [terms], we try to evaluate [t]:
+       - by applying type coercions for variables, when possible *)
+      (fun str ((ls,oloc,attrs),t) ->
+        match t.t_node, t.t_ty with
+        | Tvar vs, Some ty -> (
+          (* first search if there exists some type coercions for [ty] *)
+          match Ty.Mty.find_def [] ty ty_coercions with
+          | [] -> ((ls,oloc,attrs),t)
+          | (str',(ls',t'))::_ ->
+            (* TODO_WIP handle multiple type coercions for a given [ty]
+               by creating a conjunction formula *)
+            let vs_list, _, t' = t_open_lambda t' in
+            let vs = match vs_list with
+              | [vs] -> vs
+              | _ ->
+                  error "TODO_WIP type coercion with not exactly one argument"
+            in
+            (* create a fresh vsymbol for the variable bound by the epsilon term *)
+            let x = create_vsymbol (Ident.id_fresh "x") ty in
+            (* substitute [vs] by this new variable in the body [t'] of the function
+               defining the type coercion *)
+            let t' = t_subst_single vs (t_var x) t' in
+            (* construct the formula to be used in the epsilon term *)
+            let f =
+              t_equ
+                (t_app ls' [t_var x] ls'.ls_value)
+                (eval x t')
+            in
+            (* replace [t] by [eps x. f] *)
+            ((ls,oloc,attrs), t_eps_close x f))
+        | _ -> ((ls,oloc,attrs),t)
+      )
+      terms
+
+
+  let get_terms (pinfo : Printer.printing_info)
       (dt_decls : datatype_decl list)
       (fun_defs : Smtv2_model_defs_new.function_def Mstr.t) =
     List.iter
@@ -644,7 +711,7 @@ module FromModelToTerm = struct
           (Pp.print_option Pretty.print_loc_as_attribute)
           t.t_loc)
       terms;
-    terms
+    apply_coercions pinfo terms
 end
 
 (*

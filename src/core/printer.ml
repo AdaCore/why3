@@ -40,6 +40,7 @@ type printing_info = {
   vc_term_loc        : Loc.position option;
   vc_term_attrs      : Sattr.t;
   queried_terms      : (Term.lsymbol * Loc.position option * Sattr.t) Mstr.t;
+  type_coercions     : Sls.t Mty.t;
   list_projections   : Ident.ident Mstr.t;
   list_fields        : Ident.ident Mstr.t;
   list_records       : field_info list Mstr.t;
@@ -69,6 +70,7 @@ let default_printing_info = {
   vc_term_loc = None;
   vc_term_attrs = Sattr.empty;
   queried_terms = Mstr.empty;
+  type_coercions = Mty.empty;
   list_projections = Mstr.empty;
   list_fields = Mstr.empty;
   list_records = Mstr.empty;
