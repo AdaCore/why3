@@ -381,15 +381,17 @@ module FromModelToTerm = struct
   let error s = raise (E s)
 
   type env = {
-    vs : vsymbol list;
+    (* Bound variables in the body of a function definiton. *)
+    mutable vs : vsymbol list;
+    (* Datatype declarations. *)
     dt : datatype_decl list;
-    tys : Ty.tysymbol list;
+    (* Known type symbols. *)
+    mutable tys : Ty.tysymbol list;
   }
 
-  let mk_env vslist dt_decls tys = { vs = vslist; dt = dt_decls; tys }
   let get_opt_type oty = match oty with None -> Ty.ty_bool | Some ty -> ty
 
-  let rec smt_sort_to_ty tys s =
+  let rec smt_sort_to_ty env s =
     Debug.dprintf debug "[smt_sort_to_ty] s = %a@." print_sort s;
     match s with
     | Sstring -> Ty.ty_str
@@ -397,15 +399,21 @@ module FromModelToTerm = struct
     | Sreal -> Ty.ty_real
     | Sbool -> Ty.ty_bool
     | Sarray (s1, s2) ->
-        Ty.ty_app Ty.ts_func [ smt_sort_to_ty tys s1; smt_sort_to_ty tys s2 ]
+        Ty.ty_app Ty.ts_func [ smt_sort_to_ty env s1; smt_sort_to_ty env s2 ]
     | Ssimple (Isymbol n) ->
+      begin try
         Ty.ty_app
-          (List.find (fun x -> String.equal n x.Ty.ts_name.id_string) tys)
+          (List.find (fun x -> String.equal n x.Ty.ts_name.id_string) env.tys)
           []
+      with Not_found -> error "TODO_WIP smt_sort_to_ty unknown Ssimple symbol"
+      end
     | Smultiple (Isymbol n, sorts) ->
+      begin try
         Ty.ty_app
-          (List.find (fun x -> String.equal n x.Ty.ts_name.id_string) tys)
-          (List.map (smt_sort_to_ty tys) sorts)
+          (List.find (fun x -> String.equal n x.Ty.ts_name.id_string) env.tys)
+          (List.map (smt_sort_to_ty env) sorts)
+      with Not_found -> error "TODO_WIP smt_sort_to_ty unknown Smultiple symbol"
+      end
     | _ -> error "TODO_WIP smt_sort_to_ty"
 
   let get_type_from_var_name name =
@@ -435,7 +443,7 @@ module FromModelToTerm = struct
           let search_datatype (s, symbols) =
             match List.find_opt (fun n' -> String.equal n n') symbols with
             | None -> None
-            | Some n' -> Some (smt_sort_to_ty env.tys s)
+            | Some n' -> Some (smt_sort_to_ty env s)
           in
           let vs_ty =
             match List.filter_map search_datatype env.dt with
@@ -443,7 +451,7 @@ module FromModelToTerm = struct
             | _ -> (
                 match get_type_from_var_name n with
                 | Some ty_str ->
-                    smt_sort_to_ty env.tys (Ssimple (Isymbol ty_str))
+                    smt_sort_to_ty env (Ssimple (Isymbol ty_str))
                 | None -> error "TODO_WIP cannot infer the type of the variable"
                 )
           in
@@ -453,10 +461,10 @@ module FromModelToTerm = struct
           let vs =
             List.find (fun vs -> String.equal n vs.vs_name.id_string) env.vs
           in
-          if Ty.ty_equal vs.vs_ty (smt_sort_to_ty env.tys s) then vs
+          if Ty.ty_equal vs.vs_ty (smt_sort_to_ty env s) then vs
           else error "TODO_WIP type mismatch"
         with Not_found ->
-          create_vsymbol (Ident.id_fresh n) (smt_sort_to_ty env.tys s))
+          create_vsymbol (Ident.id_fresh n) (smt_sort_to_ty env s))
     | _ -> error "TODO_WIP_qual_id_to_vsymbol"
 
   let constant_to_term c =
@@ -506,7 +514,7 @@ module FromModelToTerm = struct
         let search_datatype (s, symbols) =
           match List.find_opt (fun n' -> String.equal n n') symbols with
           | None -> None
-          | Some n' -> Some (smt_sort_to_ty env.tys s)
+          | Some n' -> Some (smt_sort_to_ty env s)
         in
         let ls_ty =
           match List.filter_map search_datatype env.dt with
@@ -524,7 +532,7 @@ module FromModelToTerm = struct
         in
         let ls =
           create_lsymbol (Ident.id_fresh n) ts'_ty
-            (Some (smt_sort_to_ty env.tys s))
+            (Some (smt_sort_to_ty env s))
         in
         t_app ls ts' ls.ls_value
     | _ -> error "TODO_WIP apply_to_term"
@@ -532,7 +540,7 @@ module FromModelToTerm = struct
   and array_to_term env s1 s2 elts =
     Debug.dprintf debug "[array_to_term] a = %a@." print_array elts;
     let vs_arg =
-      create_vsymbol (Ident.id_fresh "x") (smt_sort_to_ty env.tys s1)
+      create_vsymbol (Ident.id_fresh "x") (smt_sort_to_ty env s1)
     in
     let mk_case key value t =
       let key = term_to_term env key in
@@ -549,13 +557,13 @@ module FromModelToTerm = struct
   let smt_term_to_term env t s =
     let t' = term_to_term env t in
     Debug.dprintf debug "[smt_term_to_term] type of s = %a, type of t' = %a@."
-      Pretty.print_ty (smt_sort_to_ty env.tys s)
+      Pretty.print_ty (smt_sort_to_ty env s)
       (Pp.print_option Pretty.print_ty)
       t'.t_ty;
-    if Ty.ty_equal (smt_sort_to_ty env.tys s) (get_opt_type t'.t_ty) then t'
+    if Ty.ty_equal (smt_sort_to_ty env s) (get_opt_type t'.t_ty) then t'
     else error "TODO_WIP type error"
 
-  let interpret_fun_def_to_term ls oloc attrs dt_decls fun_def =
+  let interpret_fun_def_to_term env ls oloc attrs fun_def =
     Debug.dprintf debug "-----------------------------@.";
     Debug.dprintf debug "[interpret_fun_def_to_term] fun_def = %a@."
       print_function_def fun_def;
@@ -568,6 +576,7 @@ module FromModelToTerm = struct
       (Debug.dprintf debug "[interpret_fun_def_to_term] ls.ls_args = %a@."
          Pretty.print_ty)
       ls.ls_args;
+    (* Compute known type symbol variables from [ls] *)
     let tys =
       let types_in_ls =
         match ls.ls_value with
@@ -581,20 +590,27 @@ module FromModelToTerm = struct
           List.concat [ acc; symbols_in_ty ])
         [] types_in_ls
     in
+    (* Update the environment with [tys] while avoiding duplicates *)
+    env.tys <- List.fold_left
+      (fun acc tys ->
+        match List.find_opt (fun tys' -> Ty.ts_equal tys tys') acc with
+        | None -> tys::acc
+        | Some _ -> acc)
+      env.tys tys;
     let t =
       match fun_def with
       | [], res, body when ls.ls_args = [] ->
-          let res_ty = smt_sort_to_ty tys res in
+          let res_ty = smt_sort_to_ty env res in
           Debug.dprintf debug "[interpret_fun_def_to_term] res_ty = %a@."
             Pretty.print_ty res_ty;
           if ls.ls_value != None && Ty.ty_equal (Opt.get ls.ls_value) res_ty
-          then smt_term_to_term (mk_env [] dt_decls tys) body res
+          then smt_term_to_term env body res
           else error "TODO_WIP type mismatch"
       | [], _, _ -> error "TODO_WIP function arity mismatch"
       | args, res, body ->
-          let res_ty = smt_sort_to_ty tys res in
+          let res_ty = smt_sort_to_ty env res in
           let args_ty_list =
-            List.map (fun (_, s) -> smt_sort_to_ty tys s) args
+            List.map (fun (_, s) -> smt_sort_to_ty env s) args
           in
           Debug.dprintf debug "[interpret_fun_def_to_term] res_ty = %a@."
             Pretty.print_ty res_ty;
@@ -602,7 +618,7 @@ module FromModelToTerm = struct
             (Debug.dprintf debug
                "[interpret_fun_def_to_term] args_ty_list = %a@." Pretty.print_ty)
             args_ty_list;
-          if
+          if (* check if type of lsymbol matches type parsed from SMT model *)
             Ty.ty_equal (get_opt_type ls.ls_value) res_ty
             && List.fold_left2
                  (fun acc ty1 ty2 -> acc && Ty.ty_equal ty1 ty2)
@@ -612,10 +628,10 @@ module FromModelToTerm = struct
               List.map
                 (fun (symbol, sort) ->
                   let name = Ident.id_fresh symbol in
-                  create_vsymbol name (smt_sort_to_ty tys sort))
+                  create_vsymbol name (smt_sort_to_ty env sort))
                 args
             in
-            let env = mk_env vslist dt_decls tys in
+            env.vs <- vslist;
             t_lambda vslist [] (smt_term_to_term env body res)
           else error "TODO_WIP type mismatch"
     in
@@ -624,11 +640,51 @@ module FromModelToTerm = struct
     Debug.dprintf debug "-----------------------------@.";
     t
 
-  let rec eval vs t = match t.t_node with
+  let rec eval_term ty_coercions t = match t.t_node with
     (* TODO_WIP *)
+    | Tvar vs -> (
+        match t.t_ty with
+        | Some ty -> (
+          (* first search if there exists some type coercions for [ty] *)
+          match Ty.Mty.find_def [] ty ty_coercions with
+          | [] -> t
+          | (str',(ls',t'))::_ ->
+            (* TODO_WIP handle multiple type coercions for a given [ty]
+               by creating a conjunction formula *)
+            let vs_list, _, t' = t_open_lambda t' in
+            let vs = match vs_list with
+              | [vs] -> vs
+              | _ ->
+                  error "TODO_WIP type coercion with not exactly one argument"
+            in
+            (* create a fresh vsymbol for the variable bound by the epsilon term *)
+            let x = create_vsymbol (Ident.id_fresh "x") ty in
+            (* substitute [vs] by this new variable in the body [t'] of the function
+               defining the type coercion *)
+            let t' = t_subst_single vs (t_var x) t' in
+            (* construct the formula to be used in the epsilon term *)
+            let f =
+              t_equ
+                (t_app ls' [t_var x] ls'.ls_value)
+                (eval_term ty_coercions t')
+            in
+            (* replace [t] by [eps x. f] *)
+            t_eps_close x f)
+        | _ -> t
+    )
+    | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
+      if t_equal (eval_term ty_coercions t1) (eval_term ty_coercions t2) then
+        t_bool_true
+      else
+        t_bool_false
+    | Tif (b,t1,t2) -> (
+      match (eval_term ty_coercions b).t_node with
+      | Ttrue -> eval_term ty_coercions t1
+      | _ -> eval_term ty_coercions t2
+    )
     | _ -> t
 
-  let apply_coercions (pinfo : Printer.printing_info) terms =
+  let eval (pinfo : Printer.printing_info) terms =
     let ty_coercions =
       Ty.Mty.map (* for each set [sls] of lsymbols associated to a type *)
         (fun sls ->
@@ -658,36 +714,7 @@ module FromModelToTerm = struct
       ty_coercions;
     Mstr.mapi (* for each element in [terms], we try to evaluate [t]:
        - by applying type coercions for variables, when possible *)
-      (fun str ((ls,oloc,attrs),t) ->
-        match t.t_node, t.t_ty with
-        | Tvar vs, Some ty -> (
-          (* first search if there exists some type coercions for [ty] *)
-          match Ty.Mty.find_def [] ty ty_coercions with
-          | [] -> ((ls,oloc,attrs),t)
-          | (str',(ls',t'))::_ ->
-            (* TODO_WIP handle multiple type coercions for a given [ty]
-               by creating a conjunction formula *)
-            let vs_list, _, t' = t_open_lambda t' in
-            let vs = match vs_list with
-              | [vs] -> vs
-              | _ ->
-                  error "TODO_WIP type coercion with not exactly one argument"
-            in
-            (* create a fresh vsymbol for the variable bound by the epsilon term *)
-            let x = create_vsymbol (Ident.id_fresh "x") ty in
-            (* substitute [vs] by this new variable in the body [t'] of the function
-               defining the type coercion *)
-            let t' = t_subst_single vs (t_var x) t' in
-            (* construct the formula to be used in the epsilon term *)
-            let f =
-              t_equ
-                (t_app ls' [t_var x] ls'.ls_value)
-                (eval x t')
-            in
-            (* replace [t] by [eps x. f] *)
-            ((ls,oloc,attrs), t_eps_close x f))
-        | _ -> ((ls,oloc,attrs),t)
-      )
+      (fun str ((ls,oloc,attrs),t) -> ((ls,oloc,attrs), eval_term ty_coercions t))
       terms
 
 
@@ -703,15 +730,15 @@ module FromModelToTerm = struct
         Debug.dprintf debug "[queried_terms] key = %s, ls = %a@." key
           Pretty.print_ls ls)
       qterms;
+    let env = { vs = []; dt = dt_decls; tys = [] } in
     let terms =
       Mstr.mapi_filter
         (fun n def ->
-          try
-            let ls, oloc, attrs = Mstr.find n qterms in
-            Some ((ls,oloc,attrs), interpret_fun_def_to_term ls oloc attrs dt_decls def)
-          with Not_found ->
-            Debug.dprintf debug "No term for %s@." n;
-            None)
+          match Mstr.find n qterms with
+          | (ls, oloc, attrs) ->
+            Some ((ls,oloc,attrs), interpret_fun_def_to_term env ls oloc attrs def)
+          | exception Not_found -> (
+            Debug.dprintf debug "No term for %s@." n; None))
         fun_defs
     in
     Mstr.iter
@@ -726,7 +753,7 @@ module FromModelToTerm = struct
           (Pp.print_option Pretty.print_loc_as_attribute)
           t.t_loc)
       terms;
-    apply_coercions pinfo terms
+    eval pinfo terms
 end
 
 (*
@@ -775,7 +802,12 @@ let parse pinfo input =
           (Mstr.mapi
             (fun n ((ls,oloc,attrs),t) ->
               let attrs = Mstr.find_def Ident.Sattr.empty n pinfo.Printer.set_str in
-              Model_parser.create_model_element ~name:n ~value:t ~oloc ~lsymbol:ls ~attrs)
+              let name = ls.ls_name.id_string in
+              (* TODO_WIP parameter [name] because already
+                 available with [lsymbol]?
+                 Or the name should be something else? *)
+              Model_parser.create_model_element
+                ~name ~value:t ~oloc ~lsymbol:ls ~attrs)
             terms))
 
 let () =
