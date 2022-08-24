@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+(* TODO_WIP remove this file *)
+(*
 open Wstdlib
 open Printer
 open Smtv2_model_defs
@@ -275,3 +277,4 @@ let create_list info (defs: definition Mstr.t) =
     Pp.(print_list_pre newline print_mv) (Mstr.bindings res);
 
   res
+*)
