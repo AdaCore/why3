@@ -198,6 +198,9 @@ let purefun_value ~result_ity ~arg_ity mv v =
 let unit_value =
   value (ty_tuple []) (Vconstr (Expr.rs_void, [], []))
 
+let term_value ty t =
+  value (ty_of_ity ty) (Vterm t)
+
 (**********************************************************************)
 
 let range_value ity n =

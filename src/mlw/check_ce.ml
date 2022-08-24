@@ -241,11 +241,19 @@ let import_model_const ity = function
     type is cloned with different types as instantiations of the abstract type.
 
     @raise CannotImportModelValue when the value cannot be imported *)
-let rec import_model_value loc env check known th_known ity v =
+let rec import_model_value loc env check known th_known ity t =
+  (*
   let ts, l1, l2 = ity_components ity in
   let subst = its_match_regs ts l1 l2 in
   let def = Pdecl.find_its_defn known ts in
-  let res = match v with
+  *)
+  let res = match t.t_node with
+  | Tvar _ -> undefined_value env ity
+  | _ -> term_value ity t
+  in
+  check ity res;
+  res
+  (*
       | Const c -> import_model_const ity c
       | Var _ -> undefined_value env ity
       | Record r ->
@@ -317,13 +325,14 @@ let rec import_model_value loc env check known th_known ity v =
       | Undefined -> undefined_value env ity in
   check ity res;
   res
+  *)
 
 let oracle_of_model pm model =
   let import check oid loc env ity me =
     let loc = if loc <> None then loc else
         match oid with Some id -> id.id_loc | None -> None in
     import_model_value loc env check pm.Pmodule.mod_known
-      pm.Pmodule.mod_theory.Theory.th_known ity Model_parser.Undefined in
+      pm.Pmodule.mod_theory.Theory.th_known ity me.me_value in
   let for_variable env ?(check=fun _ _ -> ()) ~loc id ity =
     Opt.map (import check (Some id) loc env ity)
       (search_model_element_for_id model ?loc id) in

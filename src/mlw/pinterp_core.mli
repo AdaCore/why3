@@ -108,6 +108,8 @@ val proj_value : Ity.ity -> Term.lsymbol -> value -> value option
 (** Returns a range value, or [None] if the type is a range, the value is
    outside. *)
 
+val term_value : Ity.ity -> Term.term -> value
+
 (** {4 Snapshots}
 
     Values are mutable, the following functions make deep-copies. *)
