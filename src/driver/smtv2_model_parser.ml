@@ -446,7 +446,7 @@ module FromModelToTerm = struct
             | Some n' -> Some (smt_sort_to_ty env s)
           in
           let vs_ty =
-            match List.filter_map search_datatype env.dt with
+            match Lists.map_filter search_datatype env.dt with
             | [ ty ] -> ty
             | _ -> (
                 match get_type_from_var_name n with
@@ -517,7 +517,7 @@ module FromModelToTerm = struct
           | Some n' -> Some (smt_sort_to_ty env s)
         in
         let ls_ty =
-          match List.filter_map search_datatype env.dt with
+          match Lists.map_filter search_datatype env.dt with
           | [ ty ] -> Some ty
           | _ -> error "TODO_WIP error with ls_ty"
         in
