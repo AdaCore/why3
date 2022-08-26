@@ -1,0 +1,795 @@
+File "bench/check-ce/jlamp_projections.mlw", line 29, characters 8-18:
+Sub-goal Precondition of goal p3'vc.
+Prover result is: Valid (0.04s, 122 steps).
+
+<check-ce-rac-results>Check model 0 ("bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18)
+<check-ce-rac-results>Checking model:
+                      File jlamp_projections.mlw:
+                        Line 18:
+                          a =
+                            {"proj_name": "to_int",
+                             "type": "Proj",
+                             "value": {"type": "Integer", "val": "-130"}}
+                        Line 28:
+                          a =
+                            {"proj_name": "to_int",
+                             "type": "Proj",
+                             "value": {"type": "Integer", "val": "-130"}}
+                        Line 29:
+                          a =
+                            {"proj_name": "to_int",
+                             "type": "Proj",
+                             "value": {"type": "Integer", "val": "-130"}}
+                          result =
+                            {"proj_name": "to_int",
+                             "type": "Proj",
+                             "value": {"type": "Integer", "val": "1"}}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `a` at "bench/check-ce/jlamp_projections.mlw", line 28, characters 8-9: {to_int => (-130)}
+<rac-values>Value from model for return value of call to of_int at "bench/check-ce/jlamp_projections.mlw", line 29, characters 8-18 at "bench/check-ce/jlamp_projections.mlw", line 29, characters 8-18: {to_int => 1}
+<rac-values>Type default value for return value of call to add at "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18 at "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18: UNDEFINED
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `a` at "bench/check-ce/jlamp_projections.mlw", line 28, characters 8-9: {to_int => (-130)}
+<rac-values>Value from model for return value of call to of_int at "bench/check-ce/jlamp_projections.mlw", line 29, characters 8-18 at "bench/check-ce/jlamp_projections.mlw", line 29, characters 8-18: {to_int => 1}
+<rac-values>Type default value for return value of call to add at "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18 at "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18: UNDEFINED
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: NORMAL
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File jlamp_projections.mlw:
+                            Line 28:
+                              a = {to_int => (-130)}
+                              a = {to_int => (-130)}
+                              Execution of main function `p3` with env:
+                                a = {to_int => (-130)}
+                                zero = 0
+                                one = 1
+                            Line 29:
+                              (giant-step) execution of unimplemented function `of_int`
+                                x = 1
+                              result of `of_int` = {to_int => 1}
+                              (giant-step) execution of unimplemented function `add`
+                                x = {to_int => (-130)}
+                                y = {to_int => 1}
+                              result of `add` = UNDEFINED
+                            Line 28:
+                              Execution of main function terminated normally
+                        - Abstract RAC: NORMAL
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File jlamp_projections.mlw:
+                            Line 28:
+                              a = {to_int => (-130)}
+                              a = {to_int => (-130)}
+                              Execution of main function `p3` with env:
+                                a = {to_int => (-130)}
+                                zero = 0
+                                one = 1
+                            Line 29:
+                              Giant-step execution of function `of_int` with args:
+                                x = 1
+                              result of `of_int` = {to_int => 1}
+                              Giant-step execution of function `add` with args:
+                                x = {to_int => (-130)}
+                                y = {to_int => 1}
+                              result of `add` = UNDEFINED
+                            Line 28:
+                              Execution of main function terminated normally
+<check-ce-rac-results>Check model 1 ("bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18)
+<check-ce-rac-results>Checking model:
+                      File jlamp_projections.mlw:
+                        Line 18:
+                          a =
+                            {"proj_name": "to_int",
+                             "type": "Proj",
+                             "value": {"type": "Integer", "val": "127"}}
+                        Line 28:
+                          a =
+                            {"proj_name": "to_int",
+                             "type": "Proj",
+                             "value": {"type": "Integer", "val": "127"}}
+                        Line 29:
+                          a =
+                            {"proj_name": "to_int",
+                             "type": "Proj",
+                             "value": {"type": "Integer", "val": "127"}}
+                          result =
+                            {"proj_name": "to_int",
+                             "type": "Proj",
+                             "value": {"type": "Integer", "val": "1"}}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `a` at "bench/check-ce/jlamp_projections.mlw", line 28, characters 8-9: {to_int => 127}
+<rac-values>Value from model for return value of call to of_int at "bench/check-ce/jlamp_projections.mlw", line 29, characters 8-18 at "bench/check-ce/jlamp_projections.mlw", line 29, characters 8-18: {to_int => 1}
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `a` at "bench/check-ce/jlamp_projections.mlw", line 28, characters 8-9: {to_int => 127}
+<rac-values>Value from model for return value of call to of_int at "bench/check-ce/jlamp_projections.mlw", line 29, characters 8-18 at "bench/check-ce/jlamp_projections.mlw", line 29, characters 8-18: {to_int => 1}
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File jlamp_projections.mlw:
+                            Line 28:
+                              a = {to_int => 127}
+                              a = {to_int => 127}
+                              Execution of main function `p3` with env:
+                                a = {to_int => 127}
+                                zero = 0
+                                one = 1
+                            Line 29:
+                              (giant-step) execution of unimplemented function `of_int`
+                                x = 1
+                              result of `of_int` = {to_int => 1}
+                              (giant-step) execution of unimplemented function `add`
+                                x = {to_int => 127}
+                                y = {to_int => 1}
+                              Property failure at precondition of `add` with:
+                                x = {to_int => 127}
+                                y = {to_int => 1}
+                        - Abstract RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File jlamp_projections.mlw:
+                            Line 28:
+                              a = {to_int => 127}
+                              a = {to_int => 127}
+                              Execution of main function `p3` with env:
+                                a = {to_int => 127}
+                                zero = 0
+                                one = 1
+                            Line 29:
+                              Giant-step execution of function `of_int` with args:
+                                x = 1
+                              result of `of_int` = {to_int => 1}
+                              Giant-step execution of function `add` with args:
+                                x = {to_int => 127}
+                                y = {to_int => 1}
+                              Property failure at precondition of `add` with:
+                                x = {to_int => 127}
+                                y = {to_int => 1}
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18)
+File "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18:
+Sub-goal Integer overflow of goal p3'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 405 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File jlamp_projections.mlw:
+  Line 28:
+    a = {to_int => 127}
+    a = {to_int => 127}
+    Execution of main function `p3` with env:
+      a = {to_int => 127}
+      zero = 0
+      one = 1
+  Line 29:
+    (giant-step) execution of unimplemented function `of_int`
+      x = 1
+    result of `of_int` = {to_int => 1}
+    (giant-step) execution of unimplemented function `add`
+      x = {to_int => 127}
+      y = {to_int => 1}
+    Property failure at precondition of `add` with:
+      x = {to_int => 127}
+      y = {to_int => 1}
+
+File "bench/check-ce/jlamp_projections.mlw", line 42, characters 14-24:
+Sub-goal Precondition of goal p3'vc.
+Prover result is: Valid (0.01s, 122 steps).
+
+<check-ce-rac-results>Check model 0 ("bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24)
+<check-ce-rac-results>Checking model:
+                      File ref.mlw:
+                        Line 18:
+                          a =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value":
+                                   {"proj_name": "to_int",
+                                    "type": "Proj",
+                                    "value":
+                                     {"type": "Integer", "val": "-130"}}}]}}
+                        File jlamp_projections.mlw:
+                          Line 41:
+                            a =
+                              {"type": "Record",
+                               "val":
+                                {"Field":
+                                  [{"field": "contents",
+                                    "value":
+                                     {"proj_name": "to_int",
+                                      "type": "Proj",
+                                      "value":
+                                       {"type": "Integer", "val": "-130"}}}]}}
+                          Line 42:
+                            a =
+                              {"type": "Record",
+                               "val":
+                                {"Field":
+                                  [{"field": "contents",
+                                    "value":
+                                     {"proj_name": "to_int",
+                                      "type": "Proj",
+                                      "value":
+                                       {"type": "Integer", "val": "-130"}}}]}}
+                            result =
+                              {"proj_name": "to_int",
+                               "type": "Proj",
+                               "value": {"type": "Integer", "val": "-130"}}
+                            result =
+                              {"proj_name": "to_int",
+                               "type": "Proj",
+                               "value": {"type": "Integer", "val": "1"}}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `a` at "bench/check-ce/jlamp_projections.mlw", line 41, characters 8-9: {contents=
+                                                                    {to_int => (-130)}}
+<rac-values>Value from model for return value of call to of_int at "bench/check-ce/jlamp_projections.mlw", line 42, characters 14-24 at "bench/check-ce/jlamp_projections.mlw", line 42, characters 14-24: {to_int => 1}
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp_projections.mlw", line 42, characters 11-13 at "bench/check-ce/jlamp_projections.mlw", line 42, characters 11-13: {to_int => (-130)}
+<rac-values>Type default value for return value of call to add at "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24 at "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24: UNDEFINED
+<rac-values>Type default value for variable `a` at "bench/check-ce/jlamp_projections.mlw", line 42, characters 2-24 at "bench/check-ce/jlamp_projections.mlw", line 42, characters 2-24: {contents=
+                                                                    UNDEFINED}
+<rac-values>Type default value for return value of call to (:=) at "bench/check-ce/jlamp_projections.mlw", line 42, characters 2-24 at "bench/check-ce/jlamp_projections.mlw", line 42, characters 2-24: ()
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `a` at "bench/check-ce/jlamp_projections.mlw", line 41, characters 8-9: {contents=
+                                                                    {to_int => (-130)}}
+<rac-values>Value from model for return value of call to of_int at "bench/check-ce/jlamp_projections.mlw", line 42, characters 14-24 at "bench/check-ce/jlamp_projections.mlw", line 42, characters 14-24: {to_int => 1}
+<rac-values>Type default value for return value of call to add at "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24 at "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24: UNDEFINED
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: NORMAL
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File jlamp_projections.mlw:
+                            Line 41:
+                              a = {contents= {to_int => (-130)}}
+                              a = {contents= {to_int => (-130)}}
+                              Execution of main function `p3` with env:
+                                a = {contents= {to_int => (-130)}}
+                                zero = 0
+                                one = 1
+                            Line 42:
+                              (giant-step) execution of unimplemented function `of_int`
+                                x = 1
+                              result of `of_int` = {to_int => 1}
+                              Normal execution of function `(!)` with args:
+                                r = {contents= {to_int => (-130)}}
+                          File ref.mlw:
+                            Line 18:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= {to_int => (-130)}}
+                          File jlamp_projections.mlw:
+                            Line 42:
+                              (giant-step) execution of unimplemented function `add`
+                                x = {to_int => (-130)}
+                                y = {to_int => 1}
+                              result of `add` = UNDEFINED
+                              Normal execution of function `(:=)` with args:
+                                r = {contents= {to_int => (-130)}}
+                                v = UNDEFINED
+                            Line 41:
+                              Execution of main function terminated normally
+                        - Abstract RAC: NORMAL
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File jlamp_projections.mlw:
+                            Line 41:
+                              a = {contents= {to_int => (-130)}}
+                              a = {contents= {to_int => (-130)}}
+                              Execution of main function `p3` with env:
+                                a = {contents= {to_int => (-130)}}
+                                zero = 0
+                                one = 1
+                            Line 42:
+                              Giant-step execution of function `of_int` with args:
+                                x = 1
+                              result of `of_int` = {to_int => 1}
+                              Giant-step execution of function `(!)` with args:
+                                r = {contents= {to_int => (-130)}}
+                              result of `(!)` = {to_int => (-130)}
+                              Giant-step execution of function `add` with args:
+                                x = {to_int => (-130)}
+                                y = {to_int => 1}
+                              result of `add` = UNDEFINED
+                              Giant-step execution of function `(:=)` with args:
+                                r = {contents= {to_int => (-130)}}
+                                v = UNDEFINED
+                              a = {contents= UNDEFINED}
+                              result of `(:=)` = ()
+                            Line 41:
+                              Execution of main function terminated normally
+<check-ce-rac-results>Check model 1 ("bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24)
+<check-ce-rac-results>Checking model:
+                      File ref.mlw:
+                        Line 18:
+                          a =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value":
+                                   {"proj_name": "to_int",
+                                    "type": "Proj",
+                                    "value":
+                                     {"type": "Integer", "val": "127"}}}]}}
+                        File jlamp_projections.mlw:
+                          Line 41:
+                            a =
+                              {"type": "Record",
+                               "val":
+                                {"Field":
+                                  [{"field": "contents",
+                                    "value":
+                                     {"proj_name": "to_int",
+                                      "type": "Proj",
+                                      "value":
+                                       {"type": "Integer", "val": "127"}}}]}}
+                          Line 42:
+                            a =
+                              {"type": "Record",
+                               "val":
+                                {"Field":
+                                  [{"field": "contents",
+                                    "value":
+                                     {"proj_name": "to_int",
+                                      "type": "Proj",
+                                      "value":
+                                       {"type": "Integer", "val": "127"}}}]}}
+                            result =
+                              {"proj_name": "to_int",
+                               "type": "Proj",
+                               "value": {"type": "Integer", "val": "127"}}
+                            result =
+                              {"proj_name": "to_int",
+                               "type": "Proj",
+                               "value": {"type": "Integer", "val": "1"}}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `a` at "bench/check-ce/jlamp_projections.mlw", line 41, characters 8-9: {contents=
+                                                                    {to_int => 127}}
+<rac-values>Value from model for return value of call to of_int at "bench/check-ce/jlamp_projections.mlw", line 42, characters 14-24 at "bench/check-ce/jlamp_projections.mlw", line 42, characters 14-24: {to_int => 1}
+<rac-values>Value from model for return value of call to (!) at "bench/check-ce/jlamp_projections.mlw", line 42, characters 11-13 at "bench/check-ce/jlamp_projections.mlw", line 42, characters 11-13: {to_int => 127}
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `a` at "bench/check-ce/jlamp_projections.mlw", line 41, characters 8-9: {contents=
+                                                                    {to_int => 127}}
+<rac-values>Value from model for return value of call to of_int at "bench/check-ce/jlamp_projections.mlw", line 42, characters 14-24 at "bench/check-ce/jlamp_projections.mlw", line 42, characters 14-24: {to_int => 1}
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File jlamp_projections.mlw:
+                            Line 41:
+                              a = {contents= {to_int => 127}}
+                              a = {contents= {to_int => 127}}
+                              Execution of main function `p3` with env:
+                                a = {contents= {to_int => 127}}
+                                zero = 0
+                                one = 1
+                            Line 42:
+                              (giant-step) execution of unimplemented function `of_int`
+                                x = 1
+                              result of `of_int` = {to_int => 1}
+                              Normal execution of function `(!)` with args:
+                                r = {contents= {to_int => 127}}
+                          File ref.mlw:
+                            Line 18:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= {to_int => 127}}
+                          File jlamp_projections.mlw:
+                            Line 42:
+                              (giant-step) execution of unimplemented function `add`
+                                x = {to_int => 127}
+                                y = {to_int => 1}
+                              Property failure at precondition of `add` with:
+                                x = {to_int => 127}
+                                y = {to_int => 1}
+                        - Abstract RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File jlamp_projections.mlw:
+                            Line 41:
+                              a = {contents= {to_int => 127}}
+                              a = {contents= {to_int => 127}}
+                              Execution of main function `p3` with env:
+                                a = {contents= {to_int => 127}}
+                                zero = 0
+                                one = 1
+                            Line 42:
+                              Giant-step execution of function `of_int` with args:
+                                x = 1
+                              result of `of_int` = {to_int => 1}
+                              Giant-step execution of function `(!)` with args:
+                                r = {contents= {to_int => 127}}
+                              result of `(!)` = {to_int => 127}
+                              Giant-step execution of function `add` with args:
+                                x = {to_int => 127}
+                                y = {to_int => 1}
+                              Property failure at precondition of `add` with:
+                                x = {to_int => 127}
+                                y = {to_int => 1}
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24)
+File "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24:
+Sub-goal Integer overflow of goal p3'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 423 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File jlamp_projections.mlw:
+  Line 41:
+    a = {contents= {to_int => 127}}
+    a = {contents= {to_int => 127}}
+    Execution of main function `p3` with env:
+      a = {contents= {to_int => 127}}
+      zero = 0
+      one = 1
+  Line 42:
+    (giant-step) execution of unimplemented function `of_int`
+      x = 1
+    result of `of_int` = {to_int => 1}
+    Normal execution of function `(!)` with args:
+      r = {contents= {to_int => 127}}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= {to_int => 127}}
+File jlamp_projections.mlw:
+  Line 42:
+    (giant-step) execution of unimplemented function `add`
+      x = {to_int => 127}
+      y = {to_int => 1}
+    Property failure at precondition of `add` with:
+      x = {to_int => 127}
+      y = {to_int => 1}
+
+File "bench/check-ce/jlamp_projections.mlw", line 54, characters 29-39:
+Sub-goal Precondition of goal p4'vc.
+Prover result is: Valid (0.01s, 132 steps).
+
+<check-ce-rac-results>Check model 0 ("bench/check-ce/jlamp_projections.mlw", line 54, characters 21-39)
+<check-ce-rac-results>Checking model:
+                      File jlamp_projections.mlw:
+                        Line 53:
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value":
+                                   {"proj_name": "to_int",
+                                    "type": "Proj",
+                                    "value":
+                                     {"type": "Integer", "val": "-130"}}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": true}}]}}
+                        Line 54:
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value":
+                                   {"proj_name": "to_int",
+                                    "type": "Proj",
+                                    "value":
+                                     {"type": "Integer", "val": "-130"}}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": true}}]}}
+                          result =
+                            {"proj_name": "to_int",
+                             "type": "Proj",
+                             "value": {"type": "Integer", "val": "-130"}}
+                          result =
+                            {"proj_name": "to_int",
+                             "type": "Proj",
+                             "value": {"type": "Integer", "val": "1"}}
+                          result = {"type": "Boolean", "val": true}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp_projections.mlw", line 53, characters 8-9: {f=
+                                                                    {to_int => (-130)};
+                                                                    g= true}
+<rac-values>Value from model for return value of call to of_int at "bench/check-ce/jlamp_projections.mlw", line 54, characters 29-39 at "bench/check-ce/jlamp_projections.mlw", line 54, characters 29-39: {to_int => 1}
+<rac-values>Type default value for return value of call to add at "bench/check-ce/jlamp_projections.mlw", line 54, characters 21-39 at "bench/check-ce/jlamp_projections.mlw", line 54, characters 21-39: UNDEFINED
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp_projections.mlw", line 53, characters 8-9: {f=
+                                                                    {to_int => (-130)};
+                                                                    g= true}
+<rac-values>Value from model for return value of call to of_int at "bench/check-ce/jlamp_projections.mlw", line 54, characters 29-39 at "bench/check-ce/jlamp_projections.mlw", line 54, characters 29-39: {to_int => 1}
+<rac-values>Type default value for return value of call to add at "bench/check-ce/jlamp_projections.mlw", line 54, characters 21-39 at "bench/check-ce/jlamp_projections.mlw", line 54, characters 21-39: UNDEFINED
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: NORMAL
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File jlamp_projections.mlw:
+                            Line 53:
+                              b = {f= {to_int => (-130)}; g= true}
+                              b = {f= {to_int => (-130)}; g= true}
+                              Execution of main function `p4` with env:
+                                b = {f= {to_int => (-130)}; g= true}
+                                zero = 0
+                                one = 1
+                            Line 54:
+                              Normal execution of function `g` with args:
+                                arg = {f= {to_int => (-130)}; g= true}
+                              (giant-step) execution of unimplemented function `of_int`
+                                x = 1
+                              result of `of_int` = {to_int => 1}
+                              Normal execution of function `f` with args:
+                                arg = {f= {to_int => (-130)}; g= true}
+                              (giant-step) execution of unimplemented function `add`
+                                x = {to_int => (-130)}
+                                y = {to_int => 1}
+                              result of `add` = UNDEFINED
+                            Line 53:
+                              Execution of main function terminated normally
+                        - Abstract RAC: NORMAL
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File jlamp_projections.mlw:
+                            Line 53:
+                              b = {f= {to_int => (-130)}; g= true}
+                              b = {f= {to_int => (-130)}; g= true}
+                              Execution of main function `p4` with env:
+                                b = {f= {to_int => (-130)}; g= true}
+                                zero = 0
+                                one = 1
+                            Line 54:
+                              Normal execution of function `g` with args:
+                                arg = {f= {to_int => (-130)}; g= true}
+                              Giant-step execution of function `of_int` with args:
+                                x = 1
+                              result of `of_int` = {to_int => 1}
+                              Normal execution of function `f` with args:
+                                arg = {f= {to_int => (-130)}; g= true}
+                              Giant-step execution of function `add` with args:
+                                x = {to_int => (-130)}
+                                y = {to_int => 1}
+                              result of `add` = UNDEFINED
+                            Line 53:
+                              Execution of main function terminated normally
+<check-ce-rac-results>Check model 1 ("bench/check-ce/jlamp_projections.mlw", line 54, characters 21-39)
+<check-ce-rac-results>Checking model:
+                      File jlamp_projections.mlw:
+                        Line 53:
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value":
+                                   {"proj_name": "to_int",
+                                    "type": "Proj",
+                                    "value":
+                                     {"type": "Integer", "val": "127"}}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": true}}]}}
+                        Line 54:
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "f",
+                                  "value":
+                                   {"proj_name": "to_int",
+                                    "type": "Proj",
+                                    "value":
+                                     {"type": "Integer", "val": "127"}}},
+                                 {"field": "g",
+                                  "value": {"type": "Boolean", "val": true}}]}}
+                          result =
+                            {"proj_name": "to_int",
+                             "type": "Proj",
+                             "value": {"type": "Integer", "val": "127"}}
+                          result =
+                            {"proj_name": "to_int",
+                             "type": "Proj",
+                             "value": {"type": "Integer", "val": "1"}}
+                          result = {"type": "Boolean", "val": true}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp_projections.mlw", line 53, characters 8-9: {f=
+                                                                    {to_int => 127};
+                                                                    g= true}
+<rac-values>Value from model for return value of call to of_int at "bench/check-ce/jlamp_projections.mlw", line 54, characters 29-39 at "bench/check-ce/jlamp_projections.mlw", line 54, characters 29-39: {to_int => 1}
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp_projections.mlw", line 53, characters 8-9: {f=
+                                                                    {to_int => 127};
+                                                                    g= true}
+<rac-values>Value from model for return value of call to of_int at "bench/check-ce/jlamp_projections.mlw", line 54, characters 29-39 at "bench/check-ce/jlamp_projections.mlw", line 54, characters 29-39: {to_int => 1}
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 54, characters 21-39)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File jlamp_projections.mlw:
+                            Line 53:
+                              b = {f= {to_int => 127}; g= true}
+                              b = {f= {to_int => 127}; g= true}
+                              Execution of main function `p4` with env:
+                                b = {f= {to_int => 127}; g= true}
+                                zero = 0
+                                one = 1
+                            Line 54:
+                              Normal execution of function `g` with args:
+                                arg = {f= {to_int => 127}; g= true}
+                              (giant-step) execution of unimplemented function `of_int`
+                                x = 1
+                              result of `of_int` = {to_int => 1}
+                              Normal execution of function `f` with args:
+                                arg = {f= {to_int => 127}; g= true}
+                              (giant-step) execution of unimplemented function `add`
+                                x = {to_int => 127}
+                                y = {to_int => 1}
+                              Property failure at precondition of `add` with:
+                                x = {to_int => 127}
+                                y = {to_int => 1}
+                        - Abstract RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 54, characters 21-39)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File jlamp_projections.mlw:
+                            Line 53:
+                              b = {f= {to_int => 127}; g= true}
+                              b = {f= {to_int => 127}; g= true}
+                              Execution of main function `p4` with env:
+                                b = {f= {to_int => 127}; g= true}
+                                zero = 0
+                                one = 1
+                            Line 54:
+                              Normal execution of function `g` with args:
+                                arg = {f= {to_int => 127}; g= true}
+                              Giant-step execution of function `of_int` with args:
+                                x = 1
+                              result of `of_int` = {to_int => 1}
+                              Normal execution of function `f` with args:
+                                arg = {f= {to_int => 127}; g= true}
+                              Giant-step execution of function `add` with args:
+                                x = {to_int => 127}
+                                y = {to_int => 1}
+                              Property failure at precondition of `add` with:
+                                x = {to_int => 127}
+                                y = {to_int => 1}
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 54, characters 21-39)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 54, characters 21-39)
+File "bench/check-ce/jlamp_projections.mlw", line 54, characters 21-39:
+Sub-goal Integer overflow of goal p4'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 593 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File jlamp_projections.mlw:
+  Line 53:
+    b = {f= {to_int => 127}; g= true}
+    b = {f= {to_int => 127}; g= true}
+    Execution of main function `p4` with env:
+      b = {f= {to_int => 127}; g= true}
+      zero = 0
+      one = 1
+  Line 54:
+    Normal execution of function `g` with args:
+      arg = {f= {to_int => 127}; g= true}
+    (giant-step) execution of unimplemented function `of_int`
+      x = 1
+    result of `of_int` = {to_int => 1}
+    Normal execution of function `f` with args:
+      arg = {f= {to_int => 127}; g= true}
+    (giant-step) execution of unimplemented function `add`
+      x = {to_int => 127}
+      y = {to_int => 1}
+    Property failure at precondition of `add` with:
+      x = {to_int => 127}
+      y = {to_int => 1}
+

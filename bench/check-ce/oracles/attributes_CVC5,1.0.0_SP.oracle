@@ -1,0 +1,1527 @@
+<check-ce-rac-results>Check model 0 ("bench/check-ce/attributes.mlw", line 11, characters 42-49)
+<check-ce-rac-results>Checking model:
+                      File attributes.mlw:
+                        Line 7:
+                          result = {"type": "Boolean", "val": false}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "10"}}]}}
+                        Line 9:
+                          result = {"type": "Boolean", "val": false}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "100"}}]}}
+                        Line 11:
+                          result = {"type": "Integer", "val": "200"}
+                          result = {"type": "Boolean", "val": true}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "190"}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "200"}}]}}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/attributes.mlw", line 5, characters 14-15 at "bench/check-ce/attributes.mlw", line 5, characters 14-15: {contents=
+                                                                    0}
+<rac-values>Value from model for variable `x` at "bench/check-ce/attributes.mlw", line 7, characters 2-33 at "bench/check-ce/attributes.mlw", line 7, characters 2-33: {contents=
+                                                                    10}
+<rac-values>Value from model for variable `x` at "bench/check-ce/attributes.mlw", line 9, characters 2-34 at "bench/check-ce/attributes.mlw", line 9, characters 2-34: {contents=
+                                                                    100}
+<rac-values>Value from model for variable `x` at "bench/check-ce/attributes.mlw", line 11, characters 2-56 at "bench/check-ce/attributes.mlw", line 11, characters 2-56: {contents=
+                                                                    190}
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: FAILURE (assertion at "bench/check-ce/attributes.mlw", line 11, characters 42-49)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          Unknown location:
+                              _ = ()
+                          File attributes.mlw:
+                            Line 4:
+                              _ = ()
+                              Execution of main function `f` with env:
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 5:
+                              Normal execution of function `ref` with args:
+                                contents = 0
+                              Normal execution of function `ref'mk` with args:
+                                contents = 0
+                            Line 7:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 0}
+                              Normal execution of function `(<)` with args:
+                                _ = 0
+                                _ = 10
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 0}
+                              Normal execution of function `(+)` with args:
+                                _ = 0
+                                _ = 3
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 3}
+                              Normal execution of function `(<)` with args:
+                                _ = 3
+                                _ = 10
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 3}
+                              Normal execution of function `(+)` with args:
+                                _ = 3
+                                _ = 3
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 6}
+                              Normal execution of function `(<)` with args:
+                                _ = 6
+                                _ = 10
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 6}
+                              Normal execution of function `(+)` with args:
+                                _ = 6
+                                _ = 3
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 9}
+                              Normal execution of function `(<)` with args:
+                                _ = 9
+                                _ = 10
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 9}
+                              Normal execution of function `(+)` with args:
+                                _ = 9
+                                _ = 3
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 12}
+                              Normal execution of function `(<)` with args:
+                                _ = 12
+                                _ = 10
+                            Line 9:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 12}
+                              Normal execution of function `(<)` with args:
+                                _ = 12
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 12}
+                              Normal execution of function `(+)` with args:
+                                _ = 12
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 19}
+                              Normal execution of function `(<)` with args:
+                                _ = 19
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 19}
+                              Normal execution of function `(+)` with args:
+                                _ = 19
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 26}
+                              Normal execution of function `(<)` with args:
+                                _ = 26
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 26}
+                              Normal execution of function `(+)` with args:
+                                _ = 26
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 33}
+                              Normal execution of function `(<)` with args:
+                                _ = 33
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 33}
+                              Normal execution of function `(+)` with args:
+                                _ = 33
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 40}
+                              Normal execution of function `(<)` with args:
+                                _ = 40
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 40}
+                              Normal execution of function `(+)` with args:
+                                _ = 40
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 47}
+                              Normal execution of function `(<)` with args:
+                                _ = 47
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 47}
+                              Normal execution of function `(+)` with args:
+                                _ = 47
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 54}
+                              Normal execution of function `(<)` with args:
+                                _ = 54
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 54}
+                              Normal execution of function `(+)` with args:
+                                _ = 54
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 61}
+                              Normal execution of function `(<)` with args:
+                                _ = 61
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 61}
+                              Normal execution of function `(+)` with args:
+                                _ = 61
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 68}
+                              Normal execution of function `(<)` with args:
+                                _ = 68
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 68}
+                              Normal execution of function `(+)` with args:
+                                _ = 68
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 75}
+                              Normal execution of function `(<)` with args:
+                                _ = 75
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 75}
+                              Normal execution of function `(+)` with args:
+                                _ = 75
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 82}
+                              Normal execution of function `(<)` with args:
+                                _ = 82
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 82}
+                              Normal execution of function `(+)` with args:
+                                _ = 82
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 89}
+                              Normal execution of function `(<)` with args:
+                                _ = 89
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 89}
+                              Normal execution of function `(+)` with args:
+                                _ = 89
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 96}
+                              Normal execution of function `(<)` with args:
+                                _ = 96
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 96}
+                              Normal execution of function `(+)` with args:
+                                _ = 96
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 103}
+                              Normal execution of function `(<)` with args:
+                                _ = 103
+                                _ = 100
+                            Line 11:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 103}
+                              Normal execution of function `(<)` with args:
+                                _ = 103
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 103}
+                              Normal execution of function `(+)` with args:
+                                _ = 103
+                                _ = 10
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 113}
+                              Normal execution of function `(<)` with args:
+                                _ = 113
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 113}
+                              Normal execution of function `(+)` with args:
+                                _ = 113
+                                _ = 10
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 123}
+                              Normal execution of function `(<)` with args:
+                                _ = 123
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 123}
+                              Normal execution of function `(+)` with args:
+                                _ = 123
+                                _ = 10
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 133}
+                              Normal execution of function `(<)` with args:
+                                _ = 133
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 133}
+                              Normal execution of function `(+)` with args:
+                                _ = 133
+                                _ = 10
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 143}
+                              Normal execution of function `(<)` with args:
+                                _ = 143
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 143}
+                              Normal execution of function `(+)` with args:
+                                _ = 143
+                                _ = 10
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 153}
+                              Normal execution of function `(<)` with args:
+                                _ = 153
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 153}
+                              Normal execution of function `(+)` with args:
+                                _ = 153
+                                _ = 10
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 163}
+                              Normal execution of function `(<)` with args:
+                                _ = 163
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 163}
+                              Normal execution of function `(+)` with args:
+                                _ = 163
+                                _ = 10
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 173}
+                              Normal execution of function `(<)` with args:
+                                _ = 173
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 173}
+                              Normal execution of function `(+)` with args:
+                                _ = 173
+                                _ = 10
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 183}
+                              Normal execution of function `(<)` with args:
+                                _ = 183
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 183}
+                              Normal execution of function `(+)` with args:
+                                _ = 183
+                                _ = 10
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 193}
+                              Normal execution of function `(<)` with args:
+                                _ = 193
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 193}
+                              Normal execution of function `(+)` with args:
+                                _ = 193
+                                _ = 10
+                              Property failure at assertion with:
+                                x = {contents= 203}
+                        - Abstract RAC: FAILURE (assertion at "bench/check-ce/attributes.mlw", line 11, characters 42-49)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          Unknown location:
+                              _ = ()
+                          File attributes.mlw:
+                            Line 4:
+                              _ = ()
+                              Execution of main function `f` with env:
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 5:
+                              Giant-step execution of function `ref` with args:
+                                contents = 0
+                              result of `ref` = {contents= 0}
+                            Line 7:
+                              Giant-step iteration of loop
+                              x = {contents= 10}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 10}
+                              Normal execution of function `(<)` with args:
+                                _ = 10
+                                _ = 10
+                            Line 9:
+                              Giant-step iteration of loop
+                              x = {contents= 100}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 100}
+                              Normal execution of function `(<)` with args:
+                                _ = 100
+                                _ = 100
+                            Line 11:
+                              Giant-step iteration of loop
+                              x = {contents= 190}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 190}
+                              Normal execution of function `(<)` with args:
+                                _ = 190
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 190}
+                              Normal execution of function `(+)` with args:
+                                _ = 190
+                                _ = 10
+                              Property failure at assertion with:
+                                x = {contents= 200}
+<check-ce-rac-results>Check model 1 ("bench/check-ce/attributes.mlw", line 11, characters 42-49)
+<check-ce-rac-results>Checking model:
+                      File attributes.mlw:
+                        Line 7:
+                          result = {"type": "Boolean", "val": false}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "10"}}]}}
+                        Line 9:
+                          result = {"type": "Boolean", "val": false}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "100"}}]}}
+                        Line 11:
+                          result = {"type": "Integer", "val": "200"}
+                          result = {"type": "Boolean", "val": true}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "190"}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "200"}}]}}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/attributes.mlw", line 5, characters 14-15 at "bench/check-ce/attributes.mlw", line 5, characters 14-15: {contents=
+                                                                    0}
+<rac-values>Value from model for variable `x` at "bench/check-ce/attributes.mlw", line 7, characters 2-33 at "bench/check-ce/attributes.mlw", line 7, characters 2-33: {contents=
+                                                                    10}
+<rac-values>Value from model for variable `x` at "bench/check-ce/attributes.mlw", line 9, characters 2-34 at "bench/check-ce/attributes.mlw", line 9, characters 2-34: {contents=
+                                                                    100}
+<rac-values>Value from model for variable `x` at "bench/check-ce/attributes.mlw", line 11, characters 2-56 at "bench/check-ce/attributes.mlw", line 11, characters 2-56: {contents=
+                                                                    190}
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: FAILURE (assertion at "bench/check-ce/attributes.mlw", line 11, characters 42-49)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          Unknown location:
+                              _ = ()
+                          File attributes.mlw:
+                            Line 4:
+                              _ = ()
+                              Execution of main function `f` with env:
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 5:
+                              Normal execution of function `ref` with args:
+                                contents = 0
+                              Normal execution of function `ref'mk` with args:
+                                contents = 0
+                            Line 7:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 0}
+                              Normal execution of function `(<)` with args:
+                                _ = 0
+                                _ = 10
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 0}
+                              Normal execution of function `(+)` with args:
+                                _ = 0
+                                _ = 3
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 3}
+                              Normal execution of function `(<)` with args:
+                                _ = 3
+                                _ = 10
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 3}
+                              Normal execution of function `(+)` with args:
+                                _ = 3
+                                _ = 3
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 6}
+                              Normal execution of function `(<)` with args:
+                                _ = 6
+                                _ = 10
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 6}
+                              Normal execution of function `(+)` with args:
+                                _ = 6
+                                _ = 3
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 9}
+                              Normal execution of function `(<)` with args:
+                                _ = 9
+                                _ = 10
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 9}
+                              Normal execution of function `(+)` with args:
+                                _ = 9
+                                _ = 3
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 12}
+                              Normal execution of function `(<)` with args:
+                                _ = 12
+                                _ = 10
+                            Line 9:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 12}
+                              Normal execution of function `(<)` with args:
+                                _ = 12
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 12}
+                              Normal execution of function `(+)` with args:
+                                _ = 12
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 19}
+                              Normal execution of function `(<)` with args:
+                                _ = 19
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 19}
+                              Normal execution of function `(+)` with args:
+                                _ = 19
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 26}
+                              Normal execution of function `(<)` with args:
+                                _ = 26
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 26}
+                              Normal execution of function `(+)` with args:
+                                _ = 26
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 33}
+                              Normal execution of function `(<)` with args:
+                                _ = 33
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 33}
+                              Normal execution of function `(+)` with args:
+                                _ = 33
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 40}
+                              Normal execution of function `(<)` with args:
+                                _ = 40
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 40}
+                              Normal execution of function `(+)` with args:
+                                _ = 40
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 47}
+                              Normal execution of function `(<)` with args:
+                                _ = 47
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 47}
+                              Normal execution of function `(+)` with args:
+                                _ = 47
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 54}
+                              Normal execution of function `(<)` with args:
+                                _ = 54
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 54}
+                              Normal execution of function `(+)` with args:
+                                _ = 54
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 61}
+                              Normal execution of function `(<)` with args:
+                                _ = 61
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 61}
+                              Normal execution of function `(+)` with args:
+                                _ = 61
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 68}
+                              Normal execution of function `(<)` with args:
+                                _ = 68
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 68}
+                              Normal execution of function `(+)` with args:
+                                _ = 68
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 75}
+                              Normal execution of function `(<)` with args:
+                                _ = 75
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 75}
+                              Normal execution of function `(+)` with args:
+                                _ = 75
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 82}
+                              Normal execution of function `(<)` with args:
+                                _ = 82
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 82}
+                              Normal execution of function `(+)` with args:
+                                _ = 82
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 89}
+                              Normal execution of function `(<)` with args:
+                                _ = 89
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 89}
+                              Normal execution of function `(+)` with args:
+                                _ = 89
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 96}
+                              Normal execution of function `(<)` with args:
+                                _ = 96
+                                _ = 100
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 96}
+                              Normal execution of function `(+)` with args:
+                                _ = 96
+                                _ = 7
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 103}
+                              Normal execution of function `(<)` with args:
+                                _ = 103
+                                _ = 100
+                            Line 11:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 103}
+                              Normal execution of function `(<)` with args:
+                                _ = 103
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 103}
+                              Normal execution of function `(+)` with args:
+                                _ = 103
+                                _ = 10
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 113}
+                              Normal execution of function `(<)` with args:
+                                _ = 113
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 113}
+                              Normal execution of function `(+)` with args:
+                                _ = 113
+                                _ = 10
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 123}
+                              Normal execution of function `(<)` with args:
+                                _ = 123
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 123}
+                              Normal execution of function `(+)` with args:
+                                _ = 123
+                                _ = 10
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 133}
+                              Normal execution of function `(<)` with args:
+                                _ = 133
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 133}
+                              Normal execution of function `(+)` with args:
+                                _ = 133
+                                _ = 10
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 143}
+                              Normal execution of function `(<)` with args:
+                                _ = 143
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 143}
+                              Normal execution of function `(+)` with args:
+                                _ = 143
+                                _ = 10
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 153}
+                              Normal execution of function `(<)` with args:
+                                _ = 153
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 153}
+                              Normal execution of function `(+)` with args:
+                                _ = 153
+                                _ = 10
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 163}
+                              Normal execution of function `(<)` with args:
+                                _ = 163
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 163}
+                              Normal execution of function `(+)` with args:
+                                _ = 163
+                                _ = 10
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 173}
+                              Normal execution of function `(<)` with args:
+                                _ = 173
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 173}
+                              Normal execution of function `(+)` with args:
+                                _ = 173
+                                _ = 10
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 183}
+                              Normal execution of function `(<)` with args:
+                                _ = 183
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 183}
+                              Normal execution of function `(+)` with args:
+                                _ = 183
+                                _ = 10
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 193}
+                              Normal execution of function `(<)` with args:
+                                _ = 193
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 193}
+                              Normal execution of function `(+)` with args:
+                                _ = 193
+                                _ = 10
+                              Property failure at assertion with:
+                                x = {contents= 203}
+                        - Abstract RAC: FAILURE (assertion at "bench/check-ce/attributes.mlw", line 11, characters 42-49)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          Unknown location:
+                              _ = ()
+                          File attributes.mlw:
+                            Line 4:
+                              _ = ()
+                              Execution of main function `f` with env:
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 5:
+                              Giant-step execution of function `ref` with args:
+                                contents = 0
+                              result of `ref` = {contents= 0}
+                            Line 7:
+                              Giant-step iteration of loop
+                              x = {contents= 10}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 10}
+                              Normal execution of function `(<)` with args:
+                                _ = 10
+                                _ = 10
+                            Line 9:
+                              Giant-step iteration of loop
+                              x = {contents= 100}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 100}
+                              Normal execution of function `(<)` with args:
+                                _ = 100
+                                _ = 100
+                            Line 11:
+                              Giant-step iteration of loop
+                              x = {contents= 190}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 190}
+                              Normal execution of function `(<)` with args:
+                                _ = 190
+                                _ = 1000
+                              Normal iteration of loop
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 190}
+                              Normal execution of function `(+)` with args:
+                                _ = 190
+                                _ = 10
+                              Property failure at assertion with:
+                                x = {contents= 200}
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/attributes.mlw", line 11, characters 42-49)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/attributes.mlw", line 11, characters 42-49)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/attributes.mlw", line 11, characters 42-49)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/attributes.mlw", line 11, characters 42-49)
+File "bench/check-ce/attributes.mlw", line 11, characters 42-49:
+Sub-goal Assertion of goal f'vc.
+Prover result is: Unknown (unknown + incomplete) (0.04s, 963 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+Unknown location:
+    _ = ()
+File attributes.mlw:
+  Line 4:
+    _ = ()
+    Execution of main function `f` with env:
+      _ = ()
+      zero = 0
+      one = 1
+  Line 5:
+    Normal execution of function `ref` with args:
+      contents = 0
+    Normal execution of function `ref'mk` with args:
+      contents = 0
+  Line 7:
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+    Normal execution of function `(<)` with args:
+      _ = 0
+      _ = 10
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = 3
+    Normal execution of function `contents` with args:
+      arg = {contents= 3}
+    Normal execution of function `(<)` with args:
+      _ = 3
+      _ = 10
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 3}
+    Normal execution of function `(+)` with args:
+      _ = 3
+      _ = 3
+    Normal execution of function `contents` with args:
+      arg = {contents= 6}
+    Normal execution of function `(<)` with args:
+      _ = 6
+      _ = 10
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 6}
+    Normal execution of function `(+)` with args:
+      _ = 6
+      _ = 3
+    Normal execution of function `contents` with args:
+      arg = {contents= 9}
+    Normal execution of function `(<)` with args:
+      _ = 9
+      _ = 10
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 9}
+    Normal execution of function `(+)` with args:
+      _ = 9
+      _ = 3
+    Normal execution of function `contents` with args:
+      arg = {contents= 12}
+    Normal execution of function `(<)` with args:
+      _ = 12
+      _ = 10
+  Line 9:
+    Normal execution of function `contents` with args:
+      arg = {contents= 12}
+    Normal execution of function `(<)` with args:
+      _ = 12
+      _ = 100
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 12}
+    Normal execution of function `(+)` with args:
+      _ = 12
+      _ = 7
+    Normal execution of function `contents` with args:
+      arg = {contents= 19}
+    Normal execution of function `(<)` with args:
+      _ = 19
+      _ = 100
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 19}
+    Normal execution of function `(+)` with args:
+      _ = 19
+      _ = 7
+    Normal execution of function `contents` with args:
+      arg = {contents= 26}
+    Normal execution of function `(<)` with args:
+      _ = 26
+      _ = 100
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 26}
+    Normal execution of function `(+)` with args:
+      _ = 26
+      _ = 7
+    Normal execution of function `contents` with args:
+      arg = {contents= 33}
+    Normal execution of function `(<)` with args:
+      _ = 33
+      _ = 100
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 33}
+    Normal execution of function `(+)` with args:
+      _ = 33
+      _ = 7
+    Normal execution of function `contents` with args:
+      arg = {contents= 40}
+    Normal execution of function `(<)` with args:
+      _ = 40
+      _ = 100
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 40}
+    Normal execution of function `(+)` with args:
+      _ = 40
+      _ = 7
+    Normal execution of function `contents` with args:
+      arg = {contents= 47}
+    Normal execution of function `(<)` with args:
+      _ = 47
+      _ = 100
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 47}
+    Normal execution of function `(+)` with args:
+      _ = 47
+      _ = 7
+    Normal execution of function `contents` with args:
+      arg = {contents= 54}
+    Normal execution of function `(<)` with args:
+      _ = 54
+      _ = 100
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 54}
+    Normal execution of function `(+)` with args:
+      _ = 54
+      _ = 7
+    Normal execution of function `contents` with args:
+      arg = {contents= 61}
+    Normal execution of function `(<)` with args:
+      _ = 61
+      _ = 100
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 61}
+    Normal execution of function `(+)` with args:
+      _ = 61
+      _ = 7
+    Normal execution of function `contents` with args:
+      arg = {contents= 68}
+    Normal execution of function `(<)` with args:
+      _ = 68
+      _ = 100
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 68}
+    Normal execution of function `(+)` with args:
+      _ = 68
+      _ = 7
+    Normal execution of function `contents` with args:
+      arg = {contents= 75}
+    Normal execution of function `(<)` with args:
+      _ = 75
+      _ = 100
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 75}
+    Normal execution of function `(+)` with args:
+      _ = 75
+      _ = 7
+    Normal execution of function `contents` with args:
+      arg = {contents= 82}
+    Normal execution of function `(<)` with args:
+      _ = 82
+      _ = 100
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 82}
+    Normal execution of function `(+)` with args:
+      _ = 82
+      _ = 7
+    Normal execution of function `contents` with args:
+      arg = {contents= 89}
+    Normal execution of function `(<)` with args:
+      _ = 89
+      _ = 100
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 89}
+    Normal execution of function `(+)` with args:
+      _ = 89
+      _ = 7
+    Normal execution of function `contents` with args:
+      arg = {contents= 96}
+    Normal execution of function `(<)` with args:
+      _ = 96
+      _ = 100
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 96}
+    Normal execution of function `(+)` with args:
+      _ = 96
+      _ = 7
+    Normal execution of function `contents` with args:
+      arg = {contents= 103}
+    Normal execution of function `(<)` with args:
+      _ = 103
+      _ = 100
+  Line 11:
+    Normal execution of function `contents` with args:
+      arg = {contents= 103}
+    Normal execution of function `(<)` with args:
+      _ = 103
+      _ = 1000
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 103}
+    Normal execution of function `(+)` with args:
+      _ = 103
+      _ = 10
+    Normal execution of function `contents` with args:
+      arg = {contents= 113}
+    Normal execution of function `(<)` with args:
+      _ = 113
+      _ = 1000
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 113}
+    Normal execution of function `(+)` with args:
+      _ = 113
+      _ = 10
+    Normal execution of function `contents` with args:
+      arg = {contents= 123}
+    Normal execution of function `(<)` with args:
+      _ = 123
+      _ = 1000
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 123}
+    Normal execution of function `(+)` with args:
+      _ = 123
+      _ = 10
+    Normal execution of function `contents` with args:
+      arg = {contents= 133}
+    Normal execution of function `(<)` with args:
+      _ = 133
+      _ = 1000
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 133}
+    Normal execution of function `(+)` with args:
+      _ = 133
+      _ = 10
+    Normal execution of function `contents` with args:
+      arg = {contents= 143}
+    Normal execution of function `(<)` with args:
+      _ = 143
+      _ = 1000
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 143}
+    Normal execution of function `(+)` with args:
+      _ = 143
+      _ = 10
+    Normal execution of function `contents` with args:
+      arg = {contents= 153}
+    Normal execution of function `(<)` with args:
+      _ = 153
+      _ = 1000
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 153}
+    Normal execution of function `(+)` with args:
+      _ = 153
+      _ = 10
+    Normal execution of function `contents` with args:
+      arg = {contents= 163}
+    Normal execution of function `(<)` with args:
+      _ = 163
+      _ = 1000
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 163}
+    Normal execution of function `(+)` with args:
+      _ = 163
+      _ = 10
+    Normal execution of function `contents` with args:
+      arg = {contents= 173}
+    Normal execution of function `(<)` with args:
+      _ = 173
+      _ = 1000
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 173}
+    Normal execution of function `(+)` with args:
+      _ = 173
+      _ = 10
+    Normal execution of function `contents` with args:
+      arg = {contents= 183}
+    Normal execution of function `(<)` with args:
+      _ = 183
+      _ = 1000
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 183}
+    Normal execution of function `(+)` with args:
+      _ = 183
+      _ = 10
+    Normal execution of function `contents` with args:
+      arg = {contents= 193}
+    Normal execution of function `(<)` with args:
+      _ = 193
+      _ = 1000
+    Normal iteration of loop
+    Normal execution of function `contents` with args:
+      arg = {contents= 193}
+    Normal execution of function `(+)` with args:
+      _ = 193
+      _ = 10
+    Property failure at assertion with:
+      x = {contents= 203}
+
+<check-ce-rac-results>Check model 0 ("bench/check-ce/attributes.mlw", line 23, characters 11-18)
+<check-ce-rac-results>Checking model:
+                      File attributes.mlw:
+                        Line 17:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "1"}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "200"}}]}}
+                        Line 21:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "1"}}]}}
+                        Line 22:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "200"}}]}}
+                        Line 23:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "200"}}]}}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/attributes.mlw", line 20, characters 14-15 at "bench/check-ce/attributes.mlw", line 20, characters 14-15: {contents=
+                                                                    0}
+<rac-values>Value from model for variable `x` at "bench/check-ce/attributes.mlw", line 21, characters 2-14 at "bench/check-ce/attributes.mlw", line 21, characters 2-14: {contents=
+                                                                    1}
+<rac-values>Type default value for return value of call to h at "bench/check-ce/attributes.mlw", line 21, characters 2-14 at "bench/check-ce/attributes.mlw", line 21, characters 2-14: ()
+<rac-values>Value from model for variable `x` at "bench/check-ce/attributes.mlw", line 22, characters 2-14 at "bench/check-ce/attributes.mlw", line 22, characters 2-14: {contents=
+                                                                    200}
+<rac-values>Type default value for return value of call to h at "bench/check-ce/attributes.mlw", line 22, characters 2-14 at "bench/check-ce/attributes.mlw", line 22, characters 2-14: ()
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value from model for variable `x` at "bench/check-ce/attributes.mlw", line 21, characters 2-14 at "bench/check-ce/attributes.mlw", line 21, characters 2-14: {contents=
+                                                                    1}
+<rac-values>Type default value for return value of call to h at "bench/check-ce/attributes.mlw", line 21, characters 2-14 at "bench/check-ce/attributes.mlw", line 21, characters 2-14: ()
+<rac-values>Value from model for variable `x` at "bench/check-ce/attributes.mlw", line 22, characters 2-14 at "bench/check-ce/attributes.mlw", line 22, characters 2-14: {contents=
+                                                                    200}
+<rac-values>Type default value for return value of call to h at "bench/check-ce/attributes.mlw", line 22, characters 2-14 at "bench/check-ce/attributes.mlw", line 22, characters 2-14: ()
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: FAILURE (assertion at "bench/check-ce/attributes.mlw", line 23, characters 11-18)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          Unknown location:
+                              _ = ()
+                          File attributes.mlw:
+                            Line 19:
+                              _ = ()
+                              Execution of main function `g` with env:
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 20:
+                              Normal execution of function `ref` with args:
+                                contents = 0
+                              Normal execution of function `ref'mk` with args:
+                                contents = 0
+                            Line 21:
+                              (giant-step) execution of unimplemented function `h`
+                                y = {contents= 0}
+                              x = {contents= 1}
+                              result of `h` = ()
+                            Line 22:
+                              (giant-step) execution of unimplemented function `h`
+                                y = {contents= 1}
+                              x = {contents= 200}
+                              result of `h` = ()
+                            Line 23:
+                              Property failure at assertion with:
+                                x = {contents= 200}
+                        - Abstract RAC: FAILURE (assertion at "bench/check-ce/attributes.mlw", line 23, characters 11-18)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          Unknown location:
+                              _ = ()
+                          File attributes.mlw:
+                            Line 19:
+                              _ = ()
+                              Execution of main function `g` with env:
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 20:
+                              Giant-step execution of function `ref` with args:
+                                contents = 0
+                              result of `ref` = {contents= 0}
+                            Line 21:
+                              Giant-step execution of function `h` with args:
+                                y = {contents= 0}
+                              x = {contents= 1}
+                              result of `h` = ()
+                            Line 22:
+                              Giant-step execution of function `h` with args:
+                                y = {contents= 1}
+                              x = {contents= 200}
+                              result of `h` = ()
+                            Line 23:
+                              Property failure at assertion with:
+                                x = {contents= 200}
+<check-ce-rac-results>Check model 1 ("bench/check-ce/attributes.mlw", line 23, characters 11-18)
+<check-ce-rac-results>Checking model:
+                      File attributes.mlw:
+                        Line 17:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "1"}}]}}
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "200"}}]}}
+                        Line 21:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "1"}}]}}
+                        Line 22:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "200"}}]}}
+                        Line 23:
+                          x =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "200"}}]}}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/attributes.mlw", line 20, characters 14-15 at "bench/check-ce/attributes.mlw", line 20, characters 14-15: {contents=
+                                                                    0}
+<rac-values>Value from model for variable `x` at "bench/check-ce/attributes.mlw", line 21, characters 2-14 at "bench/check-ce/attributes.mlw", line 21, characters 2-14: {contents=
+                                                                    1}
+<rac-values>Type default value for return value of call to h at "bench/check-ce/attributes.mlw", line 21, characters 2-14 at "bench/check-ce/attributes.mlw", line 21, characters 2-14: ()
+<rac-values>Value from model for variable `x` at "bench/check-ce/attributes.mlw", line 22, characters 2-14 at "bench/check-ce/attributes.mlw", line 22, characters 2-14: {contents=
+                                                                    200}
+<rac-values>Type default value for return value of call to h at "bench/check-ce/attributes.mlw", line 22, characters 2-14 at "bench/check-ce/attributes.mlw", line 22, characters 2-14: ()
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value from model for variable `x` at "bench/check-ce/attributes.mlw", line 21, characters 2-14 at "bench/check-ce/attributes.mlw", line 21, characters 2-14: {contents=
+                                                                    1}
+<rac-values>Type default value for return value of call to h at "bench/check-ce/attributes.mlw", line 21, characters 2-14 at "bench/check-ce/attributes.mlw", line 21, characters 2-14: ()
+<rac-values>Value from model for variable `x` at "bench/check-ce/attributes.mlw", line 22, characters 2-14 at "bench/check-ce/attributes.mlw", line 22, characters 2-14: {contents=
+                                                                    200}
+<rac-values>Type default value for return value of call to h at "bench/check-ce/attributes.mlw", line 22, characters 2-14 at "bench/check-ce/attributes.mlw", line 22, characters 2-14: ()
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: FAILURE (assertion at "bench/check-ce/attributes.mlw", line 23, characters 11-18)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          Unknown location:
+                              _ = ()
+                          File attributes.mlw:
+                            Line 19:
+                              _ = ()
+                              Execution of main function `g` with env:
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 20:
+                              Normal execution of function `ref` with args:
+                                contents = 0
+                              Normal execution of function `ref'mk` with args:
+                                contents = 0
+                            Line 21:
+                              (giant-step) execution of unimplemented function `h`
+                                y = {contents= 0}
+                              x = {contents= 1}
+                              result of `h` = ()
+                            Line 22:
+                              (giant-step) execution of unimplemented function `h`
+                                y = {contents= 1}
+                              x = {contents= 200}
+                              result of `h` = ()
+                            Line 23:
+                              Property failure at assertion with:
+                                x = {contents= 200}
+                        - Abstract RAC: FAILURE (assertion at "bench/check-ce/attributes.mlw", line 23, characters 11-18)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          Unknown location:
+                              _ = ()
+                          File attributes.mlw:
+                            Line 19:
+                              _ = ()
+                              Execution of main function `g` with env:
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 20:
+                              Giant-step execution of function `ref` with args:
+                                contents = 0
+                              result of `ref` = {contents= 0}
+                            Line 21:
+                              Giant-step execution of function `h` with args:
+                                y = {contents= 0}
+                              x = {contents= 1}
+                              result of `h` = ()
+                            Line 22:
+                              Giant-step execution of function `h` with args:
+                                y = {contents= 1}
+                              x = {contents= 200}
+                              result of `h` = ()
+                            Line 23:
+                              Property failure at assertion with:
+                                x = {contents= 200}
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/attributes.mlw", line 23, characters 11-18)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/attributes.mlw", line 23, characters 11-18)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/attributes.mlw", line 23, characters 11-18)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/attributes.mlw", line 23, characters 11-18)
+File "bench/check-ce/attributes.mlw", line 23, characters 11-18:
+Sub-goal Assertion of goal g'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 619 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+Unknown location:
+    _ = ()
+File attributes.mlw:
+  Line 19:
+    _ = ()
+    Execution of main function `g` with env:
+      _ = ()
+      zero = 0
+      one = 1
+  Line 20:
+    Normal execution of function `ref` with args:
+      contents = 0
+    Normal execution of function `ref'mk` with args:
+      contents = 0
+  Line 21:
+    (giant-step) execution of unimplemented function `h`
+      y = {contents= 0}
+    x = {contents= 1}
+    result of `h` = ()
+  Line 22:
+    (giant-step) execution of unimplemented function `h`
+      y = {contents= 1}
+    x = {contents= 200}
+    result of `h` = ()
+  Line 23:
+    Property failure at assertion with:
+      x = {contents= 200}
+

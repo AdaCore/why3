@@ -1,0 +1,22 @@
+
+module R
+
+use real.Real
+
+val ref a : real
+
+val ref b : real
+
+let f () : real
+  diverges
+  ensures { result < a }
+  =
+  a <- 1.0;
+  b <- 2.0;
+  while b < 10.0 do
+    invariant { b < a + 5.0 }
+    b <- a + b
+  done;
+  b
+
+end

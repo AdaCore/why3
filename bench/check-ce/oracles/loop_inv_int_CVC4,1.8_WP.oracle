@@ -1,0 +1,1095 @@
+File "bench/check-ce/loop_inv_int.mlw", line 13, characters 16-25:
+Sub-goal Loop invariant init of goal f'vc.
+Prover result is: Valid (0.03s, 815 steps).
+
+<check-ce-rac-results>Check model 0 ("bench/check-ce/loop_inv_int.mlw", line 13, characters 16-25)
+<check-ce-rac-results>Checking model:
+                      File loop_inv_int.mlw:
+                        Line 10:
+                          a =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "1"}}]}}
+                        Line 12:
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "5"}}]}}
+                          result = {"type": "Boolean", "val": true}
+                        Line 13:
+                          a =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "1"}}]}}
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "6"}}]}}
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "6"}}]}}
+                        Line 14:
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "6"}}]}}
+                          result = {"type": "Integer", "val": "6"}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/loop_inv_int.mlw", line 9, characters 14-15 at "bench/check-ce/loop_inv_int.mlw", line 9, characters 14-15: {contents=
+                                                                    0}
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/loop_inv_int.mlw", line 11, characters 14-15 at "bench/check-ce/loop_inv_int.mlw", line 11, characters 14-15: {contents=
+                                                                    2}
+<rac-values>Value from model for variable `b` at "bench/check-ce/loop_inv_int.mlw", line 12, character 2 to line 15, character 6 at "bench/check-ce/loop_inv_int.mlw", line 12, character 2 to line 15, character 6: {contents=
+                                                                    5}
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int.mlw", line 13, characters 16-25)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          Unknown location:
+                              _ = ()
+                          File loop_inv_int.mlw:
+                            Line 6:
+                              _ = ()
+                              Execution of main function `f` with env:
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 9:
+                              Normal execution of function `ref` with args:
+                                contents = 0
+                              Normal execution of function `ref'mk` with args:
+                                contents = 0
+                            Line 11:
+                              Normal execution of function `ref` with args:
+                                contents = 2
+                              Normal execution of function `ref'mk` with args:
+                                contents = 2
+                            Line 12:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 2}
+                              Normal execution of function `(<)` with args:
+                                _ = 2
+                                _ = 10
+                              Normal iteration of loop
+                            Line 14:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 2}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 2
+                            Line 12:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 3}
+                              Normal execution of function `(<)` with args:
+                                _ = 3
+                                _ = 10
+                              Normal iteration of loop
+                            Line 14:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 3}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 3
+                            Line 12:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 4}
+                              Normal execution of function `(<)` with args:
+                                _ = 4
+                                _ = 10
+                              Normal iteration of loop
+                            Line 14:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 4}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 4
+                            Line 12:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 5}
+                              Normal execution of function `(<)` with args:
+                                _ = 5
+                                _ = 10
+                              Normal iteration of loop
+                            Line 14:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 5}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 5
+                            Line 13:
+                              Property failure at loop invariant preservation with:
+                                a = {contents= 1}
+                                b = {contents= 6}
+                        - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int.mlw", line 13, characters 16-25)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          Unknown location:
+                              _ = ()
+                          File loop_inv_int.mlw:
+                            Line 6:
+                              _ = ()
+                              Execution of main function `f` with env:
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 9:
+                              Giant-step execution of function `ref` with args:
+                                contents = 0
+                              result of `ref` = {contents= 0}
+                            Line 11:
+                              Giant-step execution of function `ref` with args:
+                                contents = 2
+                              result of `ref` = {contents= 2}
+                            Line 12:
+                              Giant-step iteration of loop
+                              b = {contents= 5}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 5}
+                              Normal execution of function `(<)` with args:
+                                _ = 5
+                                _ = 10
+                              Normal iteration of loop
+                            Line 14:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 5}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 5
+                            Line 13:
+                              Property failure at loop invariant preservation with:
+                                a = {contents= 1}
+                                b = {contents= 6}
+<check-ce-rac-results>Check model 1 ("bench/check-ce/loop_inv_int.mlw", line 13, characters 16-25)
+<check-ce-rac-results>Checking model:
+                      File loop_inv_int.mlw:
+                        Line 10:
+                          a =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "1"}}]}}
+                        Line 12:
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "5"}}]}}
+                          result = {"type": "Boolean", "val": true}
+                        Line 13:
+                          a =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "1"}}]}}
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "6"}}]}}
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "6"}}]}}
+                        Line 14:
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "6"}}]}}
+                          result = {"type": "Integer", "val": "6"}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/loop_inv_int.mlw", line 9, characters 14-15 at "bench/check-ce/loop_inv_int.mlw", line 9, characters 14-15: {contents=
+                                                                    0}
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/loop_inv_int.mlw", line 11, characters 14-15 at "bench/check-ce/loop_inv_int.mlw", line 11, characters 14-15: {contents=
+                                                                    2}
+<rac-values>Value from model for variable `b` at "bench/check-ce/loop_inv_int.mlw", line 12, character 2 to line 15, character 6 at "bench/check-ce/loop_inv_int.mlw", line 12, character 2 to line 15, character 6: {contents=
+                                                                    5}
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int.mlw", line 13, characters 16-25)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          Unknown location:
+                              _ = ()
+                          File loop_inv_int.mlw:
+                            Line 6:
+                              _ = ()
+                              Execution of main function `f` with env:
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 9:
+                              Normal execution of function `ref` with args:
+                                contents = 0
+                              Normal execution of function `ref'mk` with args:
+                                contents = 0
+                            Line 11:
+                              Normal execution of function `ref` with args:
+                                contents = 2
+                              Normal execution of function `ref'mk` with args:
+                                contents = 2
+                            Line 12:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 2}
+                              Normal execution of function `(<)` with args:
+                                _ = 2
+                                _ = 10
+                              Normal iteration of loop
+                            Line 14:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 2}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 2
+                            Line 12:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 3}
+                              Normal execution of function `(<)` with args:
+                                _ = 3
+                                _ = 10
+                              Normal iteration of loop
+                            Line 14:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 3}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 3
+                            Line 12:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 4}
+                              Normal execution of function `(<)` with args:
+                                _ = 4
+                                _ = 10
+                              Normal iteration of loop
+                            Line 14:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 4}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 4
+                            Line 12:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 5}
+                              Normal execution of function `(<)` with args:
+                                _ = 5
+                                _ = 10
+                              Normal iteration of loop
+                            Line 14:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 5}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 5
+                            Line 13:
+                              Property failure at loop invariant preservation with:
+                                a = {contents= 1}
+                                b = {contents= 6}
+                        - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int.mlw", line 13, characters 16-25)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          Unknown location:
+                              _ = ()
+                          File loop_inv_int.mlw:
+                            Line 6:
+                              _ = ()
+                              Execution of main function `f` with env:
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 9:
+                              Giant-step execution of function `ref` with args:
+                                contents = 0
+                              result of `ref` = {contents= 0}
+                            Line 11:
+                              Giant-step execution of function `ref` with args:
+                                contents = 2
+                              result of `ref` = {contents= 2}
+                            Line 12:
+                              Giant-step iteration of loop
+                              b = {contents= 5}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 5}
+                              Normal execution of function `(<)` with args:
+                                _ = 5
+                                _ = 10
+                              Normal iteration of loop
+                            Line 14:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 5}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 5
+                            Line 13:
+                              Property failure at loop invariant preservation with:
+                                a = {contents= 1}
+                                b = {contents= 6}
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int.mlw", line 13, characters 16-25)
+  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int.mlw", line 13, characters 16-25)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int.mlw", line 13, characters 16-25)
+  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int.mlw", line 13, characters 16-25)
+File "bench/check-ce/loop_inv_int.mlw", line 13, characters 16-25:
+Sub-goal Loop invariant preservation of goal f'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 1791 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+Unknown location:
+    _ = ()
+File loop_inv_int.mlw:
+  Line 6:
+    _ = ()
+    Execution of main function `f` with env:
+      _ = ()
+      zero = 0
+      one = 1
+  Line 9:
+    Normal execution of function `ref` with args:
+      contents = 0
+    Normal execution of function `ref'mk` with args:
+      contents = 0
+  Line 11:
+    Normal execution of function `ref` with args:
+      contents = 2
+    Normal execution of function `ref'mk` with args:
+      contents = 2
+  Line 12:
+    Normal execution of function `contents` with args:
+      arg = {contents= 2}
+    Normal execution of function `(<)` with args:
+      _ = 2
+      _ = 10
+    Normal iteration of loop
+  Line 14:
+    Normal execution of function `contents` with args:
+      arg = {contents= 2}
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 2
+  Line 12:
+    Normal execution of function `contents` with args:
+      arg = {contents= 3}
+    Normal execution of function `(<)` with args:
+      _ = 3
+      _ = 10
+    Normal iteration of loop
+  Line 14:
+    Normal execution of function `contents` with args:
+      arg = {contents= 3}
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 3
+  Line 12:
+    Normal execution of function `contents` with args:
+      arg = {contents= 4}
+    Normal execution of function `(<)` with args:
+      _ = 4
+      _ = 10
+    Normal iteration of loop
+  Line 14:
+    Normal execution of function `contents` with args:
+      arg = {contents= 4}
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 4
+  Line 12:
+    Normal execution of function `contents` with args:
+      arg = {contents= 5}
+    Normal execution of function `(<)` with args:
+      _ = 5
+      _ = 10
+    Normal iteration of loop
+  Line 14:
+    Normal execution of function `contents` with args:
+      arg = {contents= 5}
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 5
+  Line 13:
+    Property failure at loop invariant preservation with:
+      a = {contents= 1}
+      b = {contents= 6}
+
+File "bench/check-ce/loop_inv_int.mlw", line 34, characters 16-25:
+Sub-goal Loop invariant init of goal f'vc.
+Prover result is: Valid (0.01s, 814 steps).
+
+<check-ce-rac-results>Check model 0 ("bench/check-ce/loop_inv_int.mlw", line 34, characters 16-25)
+<check-ce-rac-results>Checking model:
+                      File loop_inv_int.mlw:
+                        Line 31:
+                          a =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "1"}}]}}
+                        Line 32:
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "2"}}]}}
+                        Line 33:
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "5"}}]}}
+                          result = {"type": "Boolean", "val": true}
+                        Line 34:
+                          a =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "1"}}]}}
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "6"}}]}}
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "6"}}]}}
+                        Line 35:
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "6"}}]}}
+                          result = {"type": "Integer", "val": "6"}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/loop_inv_int.mlw", line 23, characters 10-15 at "bench/check-ce/loop_inv_int.mlw", line 23, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/loop_inv_int.mlw", line 23, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for return value of call at "bench/check-ce/loop_inv_int.mlw", line 25, characters 10-15 at "bench/check-ce/loop_inv_int.mlw", line 25, characters 10-15: 0
+<rac-values>RHS evaluated for global `b` at "bench/check-ce/loop_inv_int.mlw", line 25, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value from model for variable `b` at "bench/check-ce/loop_inv_int.mlw", line 33, character 2 to line 36, character 6 at "bench/check-ce/loop_inv_int.mlw", line 33, character 2 to line 36, character 6: {contents=
+                                                                    5}
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/loop_inv_int.mlw", line 23, characters 10-15 at "bench/check-ce/loop_inv_int.mlw", line 23, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/loop_inv_int.mlw", line 23, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for return value of call at "bench/check-ce/loop_inv_int.mlw", line 25, characters 10-15 at "bench/check-ce/loop_inv_int.mlw", line 25, characters 10-15: 0
+<rac-values>RHS evaluated for global `b` at "bench/check-ce/loop_inv_int.mlw", line 25, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce-rac-results>Results of RAC executions for model 0:
+                        - Concrete RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int.mlw", line 34, characters 16-25)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File loop_inv_int.mlw:
+                            Line 23:
+                              Constant a initialization
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                              Normal execution of function `ref` with args:
+                                contents = 0
+                              Normal execution of function `ref'mk` with args:
+                                contents = 0
+                              a = {contents= 0}
+                            Line 25:
+                              Constant b initialization
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                              Normal execution of function `ref` with args:
+                                contents = 0
+                              Normal execution of function `ref'mk` with args:
+                                contents = 0
+                              b = {contents= 0}
+                          Unknown location:
+                              _ = ()
+                          File loop_inv_int.mlw:
+                            Line 27:
+                              _ = ()
+                              Execution of main function `f` with env:
+                                a = {contents= 0}
+                                b = {contents= 0}
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 33:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 2}
+                              Normal execution of function `(<)` with args:
+                                _ = 2
+                                _ = 10
+                              Normal iteration of loop
+                            Line 35:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 2}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 2
+                            Line 33:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 3}
+                              Normal execution of function `(<)` with args:
+                                _ = 3
+                                _ = 10
+                              Normal iteration of loop
+                            Line 35:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 3}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 3
+                            Line 33:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 4}
+                              Normal execution of function `(<)` with args:
+                                _ = 4
+                                _ = 10
+                              Normal iteration of loop
+                            Line 35:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 4}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 4
+                            Line 33:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 5}
+                              Normal execution of function `(<)` with args:
+                                _ = 5
+                                _ = 10
+                              Normal iteration of loop
+                            Line 35:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 5}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 5
+                            Line 34:
+                              Property failure at loop invariant preservation with:
+                                a = {contents= 1}
+                                b = {contents= 6}
+                        - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int.mlw", line 34, characters 16-25)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File loop_inv_int.mlw:
+                            Line 23:
+                              Constant a initialization
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                              Normal execution of function `ref` with args:
+                                contents = 0
+                              Normal execution of function `ref'mk` with args:
+                                contents = 0
+                              a = {contents= 0}
+                            Line 25:
+                              Constant b initialization
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                              Normal execution of function `ref` with args:
+                                contents = 0
+                              Normal execution of function `ref'mk` with args:
+                                contents = 0
+                              b = {contents= 0}
+                          Unknown location:
+                              _ = ()
+                          File loop_inv_int.mlw:
+                            Line 27:
+                              _ = ()
+                              Execution of main function `f` with env:
+                                a = {contents= 0}
+                                b = {contents= 0}
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 33:
+                              Giant-step iteration of loop
+                              b = {contents= 5}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 5}
+                              Normal execution of function `(<)` with args:
+                                _ = 5
+                                _ = 10
+                              Normal iteration of loop
+                            Line 35:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 5}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 5
+                            Line 34:
+                              Property failure at loop invariant preservation with:
+                                a = {contents= 1}
+                                b = {contents= 6}
+<check-ce-rac-results>Check model 1 ("bench/check-ce/loop_inv_int.mlw", line 34, characters 16-25)
+<check-ce-rac-results>Checking model:
+                      File loop_inv_int.mlw:
+                        Line 31:
+                          a =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "1"}}]}}
+                        Line 32:
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "2"}}]}}
+                        Line 33:
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "5"}}]}}
+                          result = {"type": "Boolean", "val": true}
+                        Line 34:
+                          a =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "1"}}]}}
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "6"}}]}}
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "6"}}]}}
+                        Line 35:
+                          b =
+                            {"type": "Record",
+                             "val":
+                              {"Field":
+                                [{"field": "contents",
+                                  "value": {"type": "Integer", "val": "6"}}]}}
+                          result = {"type": "Integer", "val": "6"}
+<check-ce-rac-results>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/loop_inv_int.mlw", line 23, characters 10-15 at "bench/check-ce/loop_inv_int.mlw", line 23, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/loop_inv_int.mlw", line 23, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for return value of call at "bench/check-ce/loop_inv_int.mlw", line 25, characters 10-15 at "bench/check-ce/loop_inv_int.mlw", line 25, characters 10-15: 0
+<rac-values>RHS evaluated for global `b` at "bench/check-ce/loop_inv_int.mlw", line 25, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value from model for variable `b` at "bench/check-ce/loop_inv_int.mlw", line 33, character 2 to line 36, character 6 at "bench/check-ce/loop_inv_int.mlw", line 33, character 2 to line 36, character 6: {contents=
+                                                                    5}
+<check-ce-rac-results>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/loop_inv_int.mlw", line 23, characters 10-15 at "bench/check-ce/loop_inv_int.mlw", line 23, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/loop_inv_int.mlw", line 23, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for return value of call at "bench/check-ce/loop_inv_int.mlw", line 25, characters 10-15 at "bench/check-ce/loop_inv_int.mlw", line 25, characters 10-15: 0
+<rac-values>RHS evaluated for global `b` at "bench/check-ce/loop_inv_int.mlw", line 25, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce-rac-results>Results of RAC executions for model 1:
+                        - Concrete RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int.mlw", line 34, characters 16-25)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File loop_inv_int.mlw:
+                            Line 23:
+                              Constant a initialization
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                              Normal execution of function `ref` with args:
+                                contents = 0
+                              Normal execution of function `ref'mk` with args:
+                                contents = 0
+                              a = {contents= 0}
+                            Line 25:
+                              Constant b initialization
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                              Normal execution of function `ref` with args:
+                                contents = 0
+                              Normal execution of function `ref'mk` with args:
+                                contents = 0
+                              b = {contents= 0}
+                          Unknown location:
+                              _ = ()
+                          File loop_inv_int.mlw:
+                            Line 27:
+                              _ = ()
+                              Execution of main function `f` with env:
+                                a = {contents= 0}
+                                b = {contents= 0}
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 33:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 2}
+                              Normal execution of function `(<)` with args:
+                                _ = 2
+                                _ = 10
+                              Normal iteration of loop
+                            Line 35:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 2}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 2
+                            Line 33:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 3}
+                              Normal execution of function `(<)` with args:
+                                _ = 3
+                                _ = 10
+                              Normal iteration of loop
+                            Line 35:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 3}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 3
+                            Line 33:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 4}
+                              Normal execution of function `(<)` with args:
+                                _ = 4
+                                _ = 10
+                              Normal iteration of loop
+                            Line 35:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 4}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 4
+                            Line 33:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 5}
+                              Normal execution of function `(<)` with args:
+                                _ = 5
+                                _ = 10
+                              Normal iteration of loop
+                            Line 35:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 5}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 5
+                            Line 34:
+                              Property failure at loop invariant preservation with:
+                                a = {contents= 1}
+                                b = {contents= 6}
+                        - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int.mlw", line 34, characters 16-25)
+                          File int.mlw:
+                            Line 13:
+                              Constant zero initialization
+                              zero = 0
+                            Line 14:
+                              Constant one initialization
+                              one = 1
+                          File loop_inv_int.mlw:
+                            Line 23:
+                              Constant a initialization
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                              Normal execution of function `ref` with args:
+                                contents = 0
+                              Normal execution of function `ref'mk` with args:
+                                contents = 0
+                              a = {contents= 0}
+                            Line 25:
+                              Constant b initialization
+                              (giant-step) execution of unimplemented function with args:
+                              result = 0
+                              Normal execution of function `ref` with args:
+                                contents = 0
+                              Normal execution of function `ref'mk` with args:
+                                contents = 0
+                              b = {contents= 0}
+                          Unknown location:
+                              _ = ()
+                          File loop_inv_int.mlw:
+                            Line 27:
+                              _ = ()
+                              Execution of main function `f` with env:
+                                a = {contents= 0}
+                                b = {contents= 0}
+                                _ = ()
+                                zero = 0
+                                one = 1
+                            Line 33:
+                              Giant-step iteration of loop
+                              b = {contents= 5}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 5}
+                              Normal execution of function `(<)` with args:
+                                _ = 5
+                                _ = 10
+                              Normal iteration of loop
+                            Line 35:
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 5}
+                              Normal execution of function `contents` with args:
+                                arg = {contents= 1}
+                              Normal execution of function `(+)` with args:
+                                _ = 1
+                                _ = 5
+                            Line 34:
+                              Property failure at loop invariant preservation with:
+                                a = {contents= 1}
+                                b = {contents= 6}
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int.mlw", line 34, characters 16-25)
+  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int.mlw", line 34, characters 16-25)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int.mlw", line 34, characters 16-25)
+  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int.mlw", line 34, characters 16-25)
+File "bench/check-ce/loop_inv_int.mlw", line 34, characters 16-25:
+Sub-goal Loop invariant preservation of goal f'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 1739 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File loop_inv_int.mlw:
+  Line 23:
+    Constant a initialization
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+    Normal execution of function `ref` with args:
+      contents = 0
+    Normal execution of function `ref'mk` with args:
+      contents = 0
+    a = {contents= 0}
+  Line 25:
+    Constant b initialization
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+    Normal execution of function `ref` with args:
+      contents = 0
+    Normal execution of function `ref'mk` with args:
+      contents = 0
+    b = {contents= 0}
+Unknown location:
+    _ = ()
+File loop_inv_int.mlw:
+  Line 27:
+    _ = ()
+    Execution of main function `f` with env:
+      a = {contents= 0}
+      b = {contents= 0}
+      _ = ()
+      zero = 0
+      one = 1
+  Line 33:
+    Normal execution of function `contents` with args:
+      arg = {contents= 2}
+    Normal execution of function `(<)` with args:
+      _ = 2
+      _ = 10
+    Normal iteration of loop
+  Line 35:
+    Normal execution of function `contents` with args:
+      arg = {contents= 2}
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 2
+  Line 33:
+    Normal execution of function `contents` with args:
+      arg = {contents= 3}
+    Normal execution of function `(<)` with args:
+      _ = 3
+      _ = 10
+    Normal iteration of loop
+  Line 35:
+    Normal execution of function `contents` with args:
+      arg = {contents= 3}
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 3
+  Line 33:
+    Normal execution of function `contents` with args:
+      arg = {contents= 4}
+    Normal execution of function `(<)` with args:
+      _ = 4
+      _ = 10
+    Normal iteration of loop
+  Line 35:
+    Normal execution of function `contents` with args:
+      arg = {contents= 4}
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 4
+  Line 33:
+    Normal execution of function `contents` with args:
+      arg = {contents= 5}
+    Normal execution of function `(<)` with args:
+      _ = 5
+      _ = 10
+    Normal iteration of loop
+  Line 35:
+    Normal execution of function `contents` with args:
+      arg = {contents= 5}
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 5
+  Line 34:
+    Property failure at loop invariant preservation with:
+      a = {contents= 1}
+      b = {contents= 6}
+
+File "bench/check-ce/loop_inv_int.mlw", line 29, characters 12-22:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Valid (0.01s, 1306 steps).
+
