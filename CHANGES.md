@@ -7,6 +7,9 @@ Documentation
 
 Provers
   * support for CVC5 1.0.0 (released April 6, 2022)
+  * support for Z3 4.9.0 and 4.9.1 (released July 6, 2022)
+  * support for Z3 4.10.0, 4.10.1 and 4.10.2 (released July 30, 2022)
+  * support for Z3 4.11.0 (released August 18, 2022)
 
 Configuration
   * the libdir and datadir are not anymore stored in the Why3 config
