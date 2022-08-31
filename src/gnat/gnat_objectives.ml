@@ -189,18 +189,11 @@ let next objective =
    (* this lookup should always succeed, otherwise it would mean we have a
       corrupt database *)
    let obj_rec = Gnat_expl.HCheck.find explmap objective in
-   let rec build acc n =
-     if n = 0 then acc
-     else try
-        (* the [choose] can fail however, in that case we want to return
-           the goals found up to now *)
-        let goal = GoalSet.choose obj_rec.to_be_scheduled in
-        GoalSet.remove obj_rec.to_be_scheduled goal;
-        build (goal :: acc) (n-1)
-     with Not_found ->
-        acc
-   in
-   build [] Gnat_config.parallel
+   try
+     let goal = GoalSet.choose obj_rec.to_be_scheduled in
+     GoalSet.remove obj_rec.to_be_scheduled goal;
+     [goal]
+   with Not_found -> []
 
 let ce_transform = "introduce_premises"
 
@@ -535,7 +528,7 @@ let register_result c goal result : 'a * 'b =
        else begin try
          (* the goal was not proved. *)
          (* We first check whether another prover may apply *)
-         if Gnat_config.manual_prover = None &&
+         if Gnat_config.parallel = 1 && Gnat_config.manual_prover = None &&
            not (all_provers_tried c.Controller_itp.controller_session goal) then begin
              (* put the goal back to be scheduled and proved *)
              GoalSet.add obj_rec.to_be_scheduled goal;
@@ -686,16 +679,27 @@ module Save_VCs = struct
   exception Found of Whyconf.prover *  Call_provers.prover_result
 
   let find_successful_proof s goal =
+    let check_map_result prover paid =
+      (* paid is a value of the map of proof attempt ids. If it represents a
+         valid proof attempt, we raise the Found exception, otherwise we do
+         nothing. *)
+      let pa = Session_itp.get_proof_attempt_node s paid in
+      match pa.Session_itp.proof_obsolete, pa.Session_itp.proof_state with
+      | false, Some pr when pr.Call_provers.pr_answer = Call_provers.Valid ->
+        raise (Found (prover, pr))
+      | _ -> ()
+    in
   (* given a goal, find a successful proof attempt for exactly this goal (not
-     counting transformations *)
+     counting transformations. Raise Exit if not found. *)
+    let proof_map = Session_itp.get_proof_attempt_ids s goal in
+    (* let's first try a successful proof attempt with the provided provers, in
+    the specified order *)
     try
-      Whyconf.Hprover.iter (fun prover paid ->
-          let pa = Session_itp.get_proof_attempt_node s paid in
-          match pa.Session_itp.proof_obsolete, pa.Session_itp.proof_state with
-          | false, Some pr when pr.Call_provers.pr_answer = Call_provers.Valid ->
-            raise (Found (prover, pr))
-          | _ -> ()) (Session_itp.get_proof_attempt_ids s goal);
-      raise Exit
+      List.iter (fun p ->
+        try check_map_result p (Whyconf.Hprover.find proof_map p)
+        with Not_found -> ()) Gnat_config.provers;
+      Whyconf.Hprover.iter check_map_result proof_map;
+      raise Exit;
     with Found (prover, pr) -> prover, pr
 
   let add_to_prover_stat pr stat =
@@ -910,10 +914,35 @@ let schedule_goal ~callback c g =
    (* actually schedule the goal, ie call the prover. This function returns
       immediately. *)
   let check = get_objective g in
+  let s = c.Controller_itp.controller_session in
   let warn = Gnat_expl.is_warning_reason (Gnat_expl.get_reason check) in
-  let p = if warn then Opt.get (Gnat_config.prover_warn)
-    else find_best_untried_prover c.Controller_itp.controller_session g in
-  schedule_goal_with_prover ~callback c g p
+  if Gnat_config.parallel > 1 then begin
+    let provers =
+      if warn then [Opt.get (Gnat_config.prover_warn)] else Gnat_config.provers
+    in
+    let remaining = ref (List.length provers) in
+    let callback pa pas =
+      if !remaining = 0 then ()
+      else match pas with
+        | Controller_itp.Done pr ->
+          remaining := !remaining - 1;
+          begin match pr.Call_provers.pr_answer with
+          | Call_provers.Valid ->
+            C.interrupt_proof_attempts_for_goal c g;
+            remaining := 0;
+            callback pa pas
+          | _ ->
+            if !remaining = 0 then callback pa pas
+          end
+        | _ -> ()
+    in
+    List.iter (fun p ->
+    schedule_goal_with_prover ~callback c g p) Gnat_config.provers
+  end else begin
+    let p = if warn then Opt.get (Gnat_config.prover_warn)
+      else find_best_untried_prover c.Controller_itp.controller_session g in
+    schedule_goal_with_prover ~callback c g p
+  end
 
 let all_split_leaf_goals () =
   assert false (* TODO *)
@@ -1155,7 +1184,7 @@ let replay session =
   iter (replay_obj session)
 
 (* This register an observer that can monitor the number of provers
-   scheduled/running/finished *)
+   waiting/scheduled/running *)
 let (_: unit) = C.register_observer (fun x y z ->
   if x = 0 && y = 0 && z = 0 then
     raise Exit)
