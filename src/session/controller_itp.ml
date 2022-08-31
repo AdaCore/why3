@@ -304,6 +304,7 @@ let scheduled_proof_attempts : sched_pa_rec Queue.t = Queue.create ()
 (* type for prover tasks in progress *)
 type tasks_prog_rec =
   {
+    tp_id       : proofNodeID;
     tp_callback : (proof_attempt_status -> unit);
     tp_started  : bool;
     tp_call     : Call_provers.prover_call;
@@ -422,7 +423,8 @@ let build_prover_call spa =
       let call = Driver.prove_task ?old:spa.spa_pr_scr ~inplace ~command
           ~limit ~interactive ~config:main driver task in
       let pa =
-        { tp_callback = spa.spa_callback;
+        { tp_id       = spa.spa_id;
+          tp_callback = spa.spa_callback;
           tp_started  = false;
           tp_call     = call;
           tp_ores     = spa.spa_ores } in
@@ -534,7 +536,6 @@ let interrupt c =
      Call_provers.interrupt_call ~config call;
      e.tp_callback Interrupted)
     prover_tasks_in_progress;
-  Hashtbl.clear prover_tasks_in_progress;
   (* Do not interrupt editors
   while not (Queue.is_empty prover_tasks_edited) do
     let (_ses,_id,_pr,callback,_started,_call,_ores) =
@@ -548,6 +549,24 @@ let interrupt c =
     spa.spa_callback Interrupted
   done;
   !observer 0 0 0
+
+let interrupt_proof_attempts_for_goal c id =
+  let config = Whyconf.get_main c.controller_config in
+  (* First kill running proof attempts. *)
+  Hashtbl.iter (fun call e ->
+    if e.tp_id = id then Call_provers.interrupt_call ~config call
+    ) prover_tasks_in_progress;
+  (* Remove relevant proof attempts from the queue. This requires rebuilding
+  the queue as the Stdlib doesn't allow modifying the queue other than via
+  push/pop and clear.  *)
+  let l = Queue.fold (fun acc x ->
+    if x.spa_id <> id then x :: acc
+    else begin
+      x.spa_callback Interrupted;
+      acc
+    end) [] scheduled_proof_attempts in
+  Queue.clear scheduled_proof_attempts;
+  List.iter (fun x -> Queue.add x scheduled_proof_attempts) (List.rev l)
 
 let run_idle_handler () =
   if not !idle_handler_running then

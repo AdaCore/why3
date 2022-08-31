@@ -122,7 +122,8 @@ void shutdown_with_msg(char* msg) {
   logging_shutdown(msg);
 }
 
-void send_msg_to_client(pclient client,
+void send_msg_to_client(int key,
+                        pclient client,
                         char* id,
                         DWORD exitcode,
                         double cpu_time,
@@ -130,7 +131,7 @@ void send_msg_to_client(pclient client,
                         char* outfile);
 //send msg to [client] about the result of VC [id]
 //
-void send_started_msg_to_client(pclient client, char* id);
+void send_started_msg_to_client(int key, pclient client, char* id);
 //send msg to [client] that the VC [id] has been started
 
 void add_to_completion_port(HANDLE h, ULONG_PTR key) {
@@ -386,7 +387,7 @@ void run_request (prequest r) {
      }
 
      if (!SetInformationJobObject(ghJob, JobObjectExtendedLimitInformation,
- 				 &limits, sizeof(limits))) {
+                                  &limits, sizeof(limits))) {
        shutdown_with_msg("error in SetInformationJobObject");
      }
    }
@@ -405,7 +406,8 @@ void run_request (prequest r) {
        log_msg("%s",cmd);
        CloseHandle(outfilehandle);
        CloseHandle(ghJob);
-       send_msg_to_client(client,
+       send_msg_to_client(r->key,
+                          client,
                           r->id,
                           0,
                           0,
@@ -424,7 +426,7 @@ void run_request (prequest r) {
    proc->outfile    = outfile;
    key              = keygen();
    list_append(processes, key, (void*) proc);
-   send_started_msg_to_client(client, r->id);
+   send_started_msg_to_client(r->key, client, r->id);
    portassoc.CompletionKey = (void*) to_ms_key(key, PROCESS);
    portassoc.CompletionPort = completion_port;
    if (!SetInformationJobObject
@@ -442,6 +444,18 @@ void run_request (prequest r) {
    CloseHandle(pi.hThread);
 }
 
+void handle_queue_remove(prequest r) {
+  pclient client = (pclient) list_lookup(clients, r->key);
+  send_msg_to_client(r->key,
+                     client,
+                     r->id,
+                     0,
+                     0.0,
+                     false,
+                     "");
+  free(r);
+}
+
 void handle_msg(pclient client, int key) {
    prequest r;
    //the read buffer also contains the newline, skip it
@@ -457,8 +471,9 @@ void handle_msg(pclient client, int key) {
        }
         break;
       case REQ_INTERRUPT:
-        remove_from_queue(r->id);
-        kill_processes(r->id);
+        log_msg ("client %d: requested removing id %s from queue", key, r->id);
+        remove_from_queue(key, r->id, handle_queue_remove);
+        kill_processes(key, r->id);
         // no need to clean up the list of processes and free the memory for
         // processes, this will be done when we get notified of the end of the
         // child process
@@ -491,11 +506,13 @@ void accept_client(int key, int socket_num) {
    free(server_socket[socket_num]);
    create_server_socket(socket_num);
    list_append(clients, key, (void*)client);
+   log_msg("accepted client %d", key);
    do_read(client);
 }
 
-void send_started_msg_to_client(pclient client,
-				char* id) {
+void send_started_msg_to_client(int key,
+                                pclient client,
+                                char* id) {
    char* msgbuf;
    size_t len = 0;
    int used;
@@ -511,12 +528,14 @@ void send_started_msg_to_client(pclient client,
    if (used != len - 1) {
       shutdown_with_msg("message for client too long");
    }
+   log_msg("client %d: sending reply %s", key, msgbuf);
    push_write_data(client->writebuf, msgbuf);
    try_write(client);
 }
 
 
-void send_msg_to_client(pclient client,
+void send_msg_to_client(int key,
+                        pclient client,
                         char* id,
                         DWORD exitcode,
                         double cpu_time,
@@ -541,6 +560,7 @@ void send_msg_to_client(pclient client,
    if (used >= len) {
       shutdown_with_msg("message for client too long");
    }
+   log_msg("client %d: sending reply %s", key, msgbuf);
    push_write_data(client->writebuf, msgbuf);
    try_write(client);
 }
@@ -554,6 +574,7 @@ void close_client(pclient client, int key) {
   CloseHandle(client->handle);
   free_readbuf(client->readbuf);
   free_writebuf(client->writebuf);
+  log_msg("client %d disconnected", key);
   free(client);
   if (single_client && list_is_empty(clients)) {
     shutdown_server();
@@ -575,9 +596,8 @@ void handle_child_event(pproc child, pclient client, int proc_key, DWORD event) 
    ULARGE_INTEGER ull_system, ull_user;
    double cpu_time;
    switch (event) {
-      //the first two events can be safely ignored
+      //creation of a new process can be ignored
       case JOB_OBJECT_MSG_NEW_PROCESS:
-      case JOB_OBJECT_MSG_ACTIVE_PROCESS_ZERO:
          return;
 
       //violation of some limit
@@ -588,6 +608,7 @@ void handle_child_event(pproc child, pclient client, int proc_key, DWORD event) 
       //some error
       case JOB_OBJECT_MSG_ABNORMAL_EXIT_PROCESS:
       //normal exit
+      case JOB_OBJECT_MSG_ACTIVE_PROCESS_ZERO:
       case JOB_OBJECT_MSG_EXIT_PROCESS:
          // This wait is necessary to be sure that the handles of the child
          // process have been closed. In measurements, the wait takes a couple
@@ -604,7 +625,8 @@ void handle_child_event(pproc child, pclient client, int proc_key, DWORD event) 
            ((ull_system.QuadPart + ull_user.QuadPart + 0.0) / 10000000.);
          timeout = (exitcode == ERROR_NOT_ENOUGH_QUOTA) ||
                    (exitcode == STATUS_QUOTA_EXCEEDED);
-         send_msg_to_client(client,
+         send_msg_to_client(child->client_key,
+                            client,
                             child->task_id,
                             exitcode,
                             cpu_time,
