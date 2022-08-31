@@ -207,10 +207,13 @@ val register_notifier : (any -> unit) -> unit
 (** records a hook that will be called each time a node change status *)
  *)
 
-
 val interrupt : controller -> unit
 (** discards all scheduled proof attempts or transformations, including
     the ones already running *)
+
+val interrupt_proof_attempts_for_goal : controller -> proofNodeID -> unit
+(** discards all scheduled proof attempts for the given goal, including the ones
+    that are already running *)
 
 val schedule_proof_attempt :
   ?proof_script_filename:string ->
