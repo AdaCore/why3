@@ -464,10 +464,12 @@ install-data::
 	$(MKDIR_P) $(DATADIR)/why3/lang
 	$(MKDIR_P) $(DATADIR)/why3/stdlib
 	$(MKDIR_P) $(DATADIR)/why3/stdlib/mach
+	$(MKDIR_P) $(DATADIR)/why3/stdlib/mach/java
 	$(MKDIR_P) $(DATADIR)/why3/drivers
 	$(MKDIR_P) $(DATADIR)/why3/extraction_drivers
 	$(INSTALL_DATA) stdlib/*.mlw $(DATADIR)/why3/stdlib
 	$(INSTALL_DATA) stdlib/mach/*.mlw $(DATADIR)/why3/stdlib/mach
+	$(INSTALL_DATA) stdlib/mach/java/*.mlw $(DATADIR)/why3/stdlib/mach/java
 	$(INSTALL_DATA) drivers/*.drv drivers/*.gen $(DATADIR)/why3/drivers
 	$(INSTALL_DATA) extraction_drivers/*.drv $(DATADIR)/why3/extraction_drivers
 	$(INSTALL_DATA) LICENSE $(DATADIR)/why3/
@@ -2014,7 +2016,8 @@ install:: install-bash
 .PHONY: stdlibdoc
 
 STDMACHLIBS = \
-	array bv c float fxp int matrix onetime peano tagset
+	array bv c float fxp int matrix onetime peano tagset \
+        java/lang java/util
 
 STDLIBS = \
 	algebra array \

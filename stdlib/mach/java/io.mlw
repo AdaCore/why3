@@ -1,0 +1,11 @@
+module PrintStream
+
+  type print_stream = private mutable { }
+
+  val print (stream : print_stream) (v : 'a) : unit 
+    writes { stream }
+
+  val println (stream : print_stream) (v : 'a) : unit 
+    writes { stream }
+
+end
