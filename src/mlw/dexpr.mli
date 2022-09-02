@@ -202,7 +202,7 @@ type pre_fun_defn = preid * ghost * rs_kind * dbinder list *
 val drec_defn : denv -> pre_fun_defn list -> denv * drec_defn
 
 val undereference : dexpr -> dexpr
-  (* raises Not_found if the argument is not auto-dereferenced *)
+(** @raise Not_found if the argument is not auto-dereferenced. *)
 
 (** Final stage *)
 
