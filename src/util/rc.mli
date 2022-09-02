@@ -31,22 +31,31 @@ exception MissingParameters of string
     parameters *)
 
 (* exception UnknownSection of string *)
+
 exception UnknownField of string
 (** [UnknownField key] The key [key] appeared in a section but is not
     expected there *)
+
 (* exception MissingSection of string *)
+
 exception MissingField of string
 (** [MissingField key] The field [key] is required but not given *)
+
 exception DuplicateSection of string
 (** [DuplicateSection name] section [name] appears more than once *)
+
 exception DuplicateField of string * rc_value * rc_value
 (** [DuplicateField key] key [key] appears more than once *)
+
 exception StringExpected of string * rc_value
 (** [StringExpected key value] string expected *)
+
 (* exception IdentExpected of string * rc_value *)
 (* (\** [IdentExpected key value] string expected *\) *)
+
 exception IntExpected of string * rc_value
 (** [IntExpected key value] int expected *)
+
 exception BoolExpected of string * rc_value
 (** [BoolExpected key value] bool expected *)
 
@@ -54,13 +63,23 @@ exception BoolExpected of string * rc_value
 (** {2 RC API} *)
 
 
-type t (** Rc parsed file *)
-type section (** Section in rc file *)
-type family = (string * section) list (** A family in rc files *)
-type simple_family = section list (** A family w/o arguments in rc files*)
+type t
+(** Rc parsed file *)
 
-val empty : t (** An empty Rc *)
-val empty_section : section (** An empty section *)
+type section
+(** Section in rc file *)
+
+type family = (string * section) list
+(** A family in rc files *)
+
+type simple_family = section list
+(** A family w/o arguments in rc files *)
+
+val empty : t
+(** An empty Rc *)
+
+val empty_section : section
+(** An empty section *)
 
 val get_section : t -> string -> section option
 (** [get_section rc name]

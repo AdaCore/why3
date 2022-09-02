@@ -168,8 +168,13 @@ module Log : sig
   val log_exec_ended : log_uc -> Loc.position option -> unit
   val empty_log_uc : unit -> log_uc
   val empty_log : exec_log
-  val get_log : log_uc -> exec_log (** Get the log *)
-  val flush_log : log_uc -> exec_log (** Get the log and empty the log_uc *)
+
+  val get_log : log_uc -> exec_log
+  (** Get the log *)
+
+  val flush_log : log_uc -> exec_log
+  (** Get the log and empty the log_uc *)
+
   val sort_log_by_loc : exec_log -> log_entry list Wstdlib.Mint.t Wstdlib.Mstr.t
   val json_log : exec_log -> Json_base.json
   val print_log : ?verb_lvl:int -> json:bool -> exec_log Pp.pp
