@@ -1926,9 +1926,7 @@ ifeq (@enable_bddinfer@,yes)
 	MODULESTODOC +=	bddinfer/why3infer
 endif
 
-MODULESTODOCFULL = $(MODULESTODOC:%=src/%.mli)
-
-FILESTODOC = $(MODULESTODOCFULL:%.ml.mli=%.ml)
+FILESTODOC = $(subst .ml.mli,.ml,$(MODULESTODOC:%=src/%.mli))
 
 doc/apidoc:
 	mkdir -p doc/apidoc
