@@ -375,9 +375,11 @@ let select_ce env th models =
     | exception Not_found -> None
   else None
 
+let debug_print_model_attrs = Debug.lookup_flag "print_model_attrs"
+
 let print_other_models (m, (c, log)) =
   let print_model fmt m =
-    let print_attrs = Debug.(test_flag (lookup_flag "print_model_attrs"))  in
+    let print_attrs = Debug.test_flag debug_print_model_attrs in
     if !opt_json = None then Model_parser.print_model_human fmt m ~print_attrs
     else Model_parser.print_model (* json values *) fmt m ~print_attrs in
   ( match c with

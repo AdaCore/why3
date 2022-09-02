@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** General functions for representations of numeric values *)
+(** {1 General functions for representations of numeric values} *)
 
 open Format
 
@@ -51,29 +51,34 @@ val neg_real : real_constant -> real_constant
 val abs_real : real_constant -> real_constant
 
 val compare_real : ?structural:bool -> real_value -> real_value -> int
-(** structural comparison; two ordered values might compare differently *)
+(** Compare two real values.
+    By default, the comparison is structural,
+    that is, two ordered values might compare differently.
+*)
 
 val int_literal : int_literal_kind -> neg:bool -> string -> int_constant
 
 val real_literal : radix:int -> neg:bool -> int:string -> frac:string -> exp:string option -> real_constant
 (** [real_literal ~radix ~neg ~int ~frac ~exp] builds the real value
    given by the mantissa [int.frac] and exponent [exp]. The [radix]
-   must be 10 or 16 only. If [radix] is 16, then [int] and [frac] are
+   must be either 10 or 16. If [radix] is 16, then [int] and [frac] are
    interpreted in hexadecimal (but not [exp] which is always in
    decimal) and the base of the exponent is 2 instead of 10. The
    resulting number is negative when [neg] is true.
 
-   For example, [real_literal ~radix:10 ~neg:false ~int:"12"
-   ~frac:"34" ~exp:(Some "-5")] denotes the number [12.34 * 10 ^ (-5)],
-   [real_literal ~radix:10 ~neg:true ~int:"67" ~frac:"" ~exp:None]
-   denotes [-67.] and [real_literal ~radix:16 ~neg:false ~int:"9A" ~frac:"B" ~exp:(Some "5")] denotes
-   [0x9A.B * 2 ^ 5] that is [(9 * 16 + 10 + 11/16) * 2 ^ 42 = 4950]
+   Examples:
+   - [real_literal ~radix:10 ~neg:false ~int:"12" ~frac:"34" ~exp:(Some "-5")]
+     denotes the number [12.34e-5],
+   - [real_literal ~radix:10 ~neg:true ~int:"67" ~frac:"" ~exp:None]
+     denotes [-67],
+   - [real_literal ~radix:16 ~neg:false ~int:"9A" ~frac:"B" ~exp:(Some "5")]
+     denotes [0x9A.Bp5], i.e., [4950].
+*)
 
- *)
 val real_value : ?pow2:BigInt.t -> ?pow5:BigInt.t -> BigInt.t -> real_value
-(** [real_value ~pow2 ~pow5 n] builds the value [n * 2 ^ pow2 * 5 ^ pow5] *)
+(** [real_value ~pow2 ~pow5 n] builds the value [n * 2 ^ pow2 * 5 ^ pow5]. *)
 
-(** Pretty-printing with conversion *)
+(** {2 Pretty-printing with conversion} *)
 
 type default_format =
   Format.formatter -> string -> unit
@@ -109,12 +114,11 @@ val print_int_constant : number_support -> formatter -> int_constant -> unit
 val print_real_constant : number_support -> formatter -> real_constant -> unit
 
 val print_in_base : int -> int option -> formatter -> BigInt.t -> unit
-(** [print_in_base radix digits fmt i] prints the value of [i] in base
-    [radix]. If digits is not [None] adds leading 0s to have [digits]
-    characters.
-    REQUIRES [i] non-negative *)
+(** [print_in_base radix digits fmt i] prints the value of non-negative [i]
+    in base [radix]. If digits is not [None], it adds leading 0s to have [digits]
+    characters. *)
 
-(** Range checking *)
+(** {2 Range checking} *)
 
 val to_small_integer : int_constant -> int
 (* may raise invalid_argument *)
@@ -130,11 +134,11 @@ val create_range : BigInt.t -> BigInt.t -> int_range
 exception OutOfRange of int_constant
 
 val check_range : int_constant -> int_range -> unit
-(** [check_range c ir] checks that [c] is in the range described
-    by [ir], and raises [OutOfRange c] if not. *)
+(** [check_range c ir] checks that [c] is in the range described by [ir].
+    @raise OutOfRange if out of range. *)
 
 
-(** Float checking *)
+(** {2 Float checking} *)
 
 type float_format = {
   fp_exponent_digits    : int;
@@ -146,10 +150,11 @@ exception NonRepresentableFloat of real_constant
 
 val compute_float : real_constant -> float_format -> bool * BigInt.t * BigInt.t
 (** [compute_float c fp] checks that [c] is a float literal
-    representable in the format [fp]. Returns a triple [s,e,m] with
-    [s] the sign (true if negative, false if positive)
+    representable in the format [fp].
+    @return a triple [s,e,m] with [s] the sign (true if negative, false if positive),
     [m] the significand (without the hidden bit), and [e] the biased
-    exponent. Raises [NonRepresentableFloat c] exception otherwise. *)
+    exponent.
+    @raise NonRepresentableFloat if not representable. *)
 
 val check_float : real_constant -> float_format -> unit
 (** [check_float c fp] is the same as [compute_float c fp]

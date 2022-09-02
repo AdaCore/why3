@@ -324,19 +324,19 @@ exception NoPrinter
 
 let update_task = let ht = Hint.create 5 in fun drv ->
     let update task0 =
-      (** add requested theorie *)
+      (* add requested theorie *)
       let task0 = Mid.fold (fun _ (th,th') task ->
           let tdcs = (Task.find_clone_tds task0 th).tds_set in
           Stdecl.fold (fun tdc task -> match tdc.td_node with
               | Use _ -> Task.use_export task th'
               | Clone (_,_) ->
-                  (** We do nothing in case of clone *)
+                  (* We do nothing in case of clone *)
                   task
               | _ -> assert false
             ) tdcs task
         ) drv.drv_thuse task0
       in
-      (** apply metas *)
+      (* apply metas *)
       let task0 = Mid.fold (fun _ (th,tdms) task ->
           let tdcs = (Task.find_clone_tds task0 th).tds_set in
           Stdecl.fold (fun tdc task ->

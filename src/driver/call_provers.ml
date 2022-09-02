@@ -255,7 +255,7 @@ let analyse_result exit_result res_parser get_counterexmp printing_info out =
     match l with
     | [] ->
         Opt.get_def HighFailure saved_res, List.rev saved_models
-    (** FIXME (see https://gitlab.inria.fr/why3/why3/-/issues/648)
+    (* FIXME (see https://gitlab.inria.fr/why3/why3/-/issues/648)
         The following case is a specific treatment for cases when Answer HighFailure
         is appended at the end of result_list because signaled is true in the function
         parse_prover_run.

@@ -134,7 +134,6 @@ let let_map ~keep_trace fn env t1 tb =
   let t2 = fn (Mvs.add x t1 env) t2 in
   (* TODO/FIXME? convert (let x = if f then True else False in h)
      into (forall x. (x = True <-> f) -> h) ? *)
-  (**)
   let keep = keep_trace && relevant_for_counterexample x.vs_name in
   t_let_simp_keep_var ~keep t1 (close x t2)
 

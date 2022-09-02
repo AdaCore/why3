@@ -194,7 +194,7 @@ let load_ide section =
     ide_iconset =
       get_string section ~default:default_ide.ide_iconset
         "iconset";
-    ide_hidden_provers = get_stringl ~default:default_ide.ide_hidden_provers section "hidden_prover";
+    ide_hidden_provers = get_stringl section "hidden_prover";
   }
 
 
