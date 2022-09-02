@@ -245,8 +245,3 @@ val to_channel : out_channel -> t -> unit
 
 val to_file : string -> t -> unit
   (** [to_file filename rc] writes the Rc [rc] to the file [filename] *)
-
-val get_home_dir : unit -> string
-  (** [get_home_dir ()] returns the home dir of the user *)
-
-

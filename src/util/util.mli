@@ -118,5 +118,10 @@ val ansi_color_tags : Format.formatter_tag_functions
    ["@{<on green>text on green background@}"], or ["@{<bold red on green>unreadable@}"].
    *)
 
+(** {3 Miscellaneous} *)
+
 (** Check if a non-empty string contains only characters [a-zA-Z0-9_-] *)
 val is_sexp_simple_token : string -> bool
+
+val get_home_dir : unit -> string
+(** Return the home directory of the user. *)

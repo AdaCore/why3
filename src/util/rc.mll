@@ -14,13 +14,6 @@ open Lexing
 open Format
 open Wstdlib
 
-let get_home_dir () =
-  try Sys.getenv "HOME"
-  with Not_found ->
-    (* try windows env var *)
-    try Sys.getenv "USERPROFILE"
-    with Not_found -> ""
-
 type rc_value =
   | RCint of int
   | RCbool of bool

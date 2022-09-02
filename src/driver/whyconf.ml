@@ -47,8 +47,8 @@ let why3_regexp_of_string s = (* define a regexp in why3 *)
 
 let default_conf_file =
   match Config.localdir with
-    | None -> Filename.concat (Rc.get_home_dir ()) ".why3.conf"
-    | Some d -> Filename.concat d "why3.conf"
+  | None -> Filename.concat (Util.get_home_dir ()) ".why3.conf"
+  | Some d -> Filename.concat d "why3.conf"
 
 (* Prover *)
 
