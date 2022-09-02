@@ -942,7 +942,7 @@ module User = struct
     }
 
   let set_prover_upgrade_policy config prover target =
-    (** kept simple because no auto upgrade policy *)
+    (* kept simple because no auto upgrade policy *)
     let m = Mprover.add prover target config.provers_upgrade_policy in
     {config with
      user_rc = RC_save.set_policies config.user_rc m;
@@ -950,7 +950,7 @@ module User = struct
     }
 
   let remove_user_policy config prover =
-    (** kept simple because no auto upgrade policy *)
+    (* kept simple because no auto upgrade policy *)
     let m = Mprover.remove prover config.provers_upgrade_policy in
     {config with
      user_rc = RC_save.set_policies config.user_rc m;

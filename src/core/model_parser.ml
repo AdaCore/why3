@@ -1042,7 +1042,7 @@ let build_model_rec pm (elts: model_element list) : model_files =
     if loc = None then model else
       let kind = compute_kind vc_attrs loc me.me_name.men_attrs in
       add_to_model_if_loc ~kind {me with me_location= loc} model in
-  (** Add a model element at the relevant locations *)
+  (* Add a model element at the relevant locations *)
   let add_model_elt model me =
     let kind = compute_kind vc_attrs me.me_location me.me_name.men_attrs in
     let model = add_to_model_if_loc ~kind me model in

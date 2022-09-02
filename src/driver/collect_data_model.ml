@@ -40,7 +40,7 @@ type context = {
       in projection and field functions *)
   interprete_prover_vars: bool;
 
-  (** Other info fields *)
+  (* Other info fields *)
   fields_projs: Ident.ident Mstr.t;
   info : printing_info;
   list_records: string list Mstr.t;
