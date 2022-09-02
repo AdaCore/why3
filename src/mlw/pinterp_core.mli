@@ -464,6 +464,9 @@ val debug_array_as_update_chains_not_epsilon : Debug.flag
 
 val undefined_value : env -> Ity.ity -> value
 
+val debug_trace_exec : Debug.flag
+(** Print debug information during the interpretation of an expression. *)
+
 (**/**)
 
 val pp_bindings :

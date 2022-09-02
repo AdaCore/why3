@@ -23,11 +23,6 @@ let debug_rac_values =
   Debug.register_info_flag "rac-values"
     ~desc:"print values that are taken into account during interpretation"
 
-let debug_trace_exec =
-  Debug.register_info_flag "trace_exec"
-    ~desc:"trace execution of code given by --exec or --eval"
-(* print debug information during the interpretation of an expression *)
-
 let debug_disable_builtin_mach =
   Debug.register_flag "execute-no-builtin-mach"
     ~desc:"don't register builtins for modules under stdlib/mach"
