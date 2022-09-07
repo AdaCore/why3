@@ -24,6 +24,8 @@ type binop =
 
 type typ = Ptree.pty
 
+type is_function = bool
+
 type expr = {
   expr_desc: expr_desc;
   expr_loc : Loc.position;
@@ -36,10 +38,12 @@ and expr_desc =
   | Estring of string
   | Eident of ident
   | Ebinop of binop * expr * expr
+  | Econd of expr * expr * expr (* e1 if e2 else e3 *)
   | Eunop of unop * expr
   | Ecall of ident * expr list
   | Edot of expr * ident * expr list
   | Elist of expr list   (* [e1, e2, ..., en] *)
+  | Etuple of expr list   (* e1, e2, ..., en *)
   | Emake of expr * expr (* [e1] * e2 *)
   | Eget of expr * expr  (* e1[e2] *)
 
@@ -52,12 +56,14 @@ and stmt_desc =
   | Sblock of block
   | Sif of expr * block * block
   | Sreturn of expr
-  | Sassign of ident * expr
+  | Spass of typ option * Ptree.spec
+  | Sassign of expr * expr
   | Swhile of expr * Ptree.invariant * Ptree.variant * block
   | Sfor of ident * expr * Ptree.invariant * block
   | Seval of expr
   | Sset of expr * expr * expr (* e1[e2] = e3 *)
   | Sassert of Expr.assertion_kind * Ptree.term
+  | Scall_lemma of ident * Ptree.term list
   | Sbreak
   | Scontinue
   | Slabel of ident
@@ -66,8 +72,12 @@ and block = decl list
 
 and decl =
   | Dimport of ident * ident list
-  | Ddef  of ident * (ident * typ option) list * typ option * Ptree.spec * block
+  | Ddef of ident * (ident * typ option) list * typ option * Ptree.spec
+             * block * is_function
+  | Dconst of ident * expr
   | Dstmt of stmt
   | Dlogic of ident * (ident * typ) list * typ option * Ptree.term option
+              * Ptree.term option
+  | Dprop of Decl.prop_kind * ident * Ptree.term
 
 type file = block
