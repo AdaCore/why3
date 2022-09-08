@@ -469,43 +469,56 @@ and block env ~loc = function
       let f x1 ... xn =
         let x1 = ref x1 in ... let xn = ref xn in
         try body with Return x -> x *)
-    let env' = List.fold_left add_param env idl in
-    let body = block env' ~loc:id.id_loc bl in
-    let body =
-      let loc = id.id_loc in
-      let id = mk_id ~loc return_id in
-      { body with expr_desc = Eoptexn (id, Ity.MaskVisible, body) } in
-    let local bl (id, _) =
-      let loc = id.id_loc in
-      let ref = mk_ref ~loc (mk_var ~loc id) in
-      mk_expr ~loc (Elet (set_ref id, false, Expr.RKnone, ref, bl)) in
-    let body = List.fold_left local body idl in
-    let param (id, ty) =
-      id.id_loc, Some id, false, ty in
+    let param (id, ty) = id.id_loc, Some id, false, ty in
     let params = if idl = [] then no_params ~loc else List.map param idl in
     let p = mk_pat ~loc Pwild in
     let is_rec = block_has_call id bl in
     let s = block env ~loc sl in
-    let kind = if fct then Expr.RKfunc else Expr.RKnone in
-    let e =
-      if is_rec then
-        Erec ([id,false,kind,params,ty,p,Ity.MaskVisible,sp,body], s)
-      else
-        let e = Efun (params, ty, p, Ity.MaskVisible, sp, body) in
-        Elet (id, false, kind, mk_expr ~loc e, s)
-    in
-    mk_expr ~loc e
+    (match bl with
+       | [Py_ast.Dstmt {stmt_desc=Py_ast.Sreturn e}] when fct ->
+           let env' = List.fold_left add_param empty_env idl in
+           let e = expr env' e in
+           let d =
+             if is_rec then
+               Drec ([id,false,Expr.RKfunc,params,ty,p,Ity.MaskVisible,sp,e])
+             else
+               let e = Efun (params, ty, p, Ity.MaskVisible, sp, e) in
+               Dlet (id, false, Expr.RKfunc, mk_expr ~loc e) in
+           Typing.add_decl id.id_loc d;
+           s
+       | _ ->
+           let env' = List.fold_left add_param env idl in
+           let body = block env' ~loc:id.id_loc bl in
+           let body =
+             let loc = id.id_loc in
+             let id = mk_id ~loc return_id in
+             { body with expr_desc = Eoptexn (id, Ity.MaskVisible, body) } in
+           let local bl (id, _) =
+             let loc = id.id_loc in
+             let ref = mk_ref ~loc (mk_var ~loc id) in
+             mk_expr ~loc (Elet (set_ref id, false, Expr.RKnone, ref, bl)) in
+           let body = List.fold_left local body idl in
+           let kind = if fct then Expr.RKlocal else Expr.RKnone in
+           let e =
+             if is_rec then
+               Erec ([id, false, kind, params, ty, p, Ity.MaskVisible, sp, body], s)
+             else
+               let e = Efun (params, ty, p, Ity.MaskVisible, sp, body) in
+               Elet (id, false, kind, mk_expr ~loc e, s)
+           in
+           mk_expr ~loc e)
   | (Py_ast.Dimport _ | Py_ast.Dlogic _) :: sl ->
-     block env ~loc sl
-  | Py_ast.Dconst (id,e) :: sl ->
-     let d = Dlet (id, false, Expr.RKfunc, expr env e) in
-     let _ = Typing.add_decl id.id_loc d in
-     let e = Elet (id, false, Expr.RKnone, expr env e,
-                   block ~loc (add_var env id) sl) in
-     mk_expr ~loc e
+    block env ~loc sl
+  | Py_ast.Dconst (id, e) :: sl ->
+    let e = expr env e in
+    let d = Dlet (id, false, Expr.RKfunc, e) in
+    Typing.add_decl id.id_loc d;
+    let e = Elet (id, false, Expr.RKnone, e,
+                  block ~loc (add_var env id) sl) in
+    mk_expr ~loc e
   | Py_ast.Dprop (pk, id, t) :: sl ->
-     Typing.add_decl id.id_loc (Dprop (pk, id, t));
-     block env ~loc sl
+    Typing.add_decl id.id_loc (Dprop (pk, id, t));
+    block env ~loc sl
 
 let logic_param (id, ty) =
   id.id_loc, Some id, false, ty
