@@ -30,6 +30,17 @@ API
 MLCFG input language
   * attributes on the body of an MLCFG function are now supported
 
+Python language
+  * added `e1 if e2 else e3`
+  * tuples
+  * multiple assignments
+  * `#@ axiom` and `#@ lemma`
+  * a Python global variable can be annotated with `#@ constant`
+    to be available in the logic
+  * a Python pure function (i.e. limited to `return e`)
+    can be annotated with `#@ function` to be available in the logic
+  * logical functions can be given a variant (with syntax `variant {term}`)
+  (contribution by Jean-Paul Bodeveix)
 
 Version 1.5.0, April 29, 2022
 -----------------------------
