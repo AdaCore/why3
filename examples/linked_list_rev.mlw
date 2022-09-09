@@ -398,6 +398,96 @@ module InPlaceRevSeq
 
 end
 
+(** This time with a fully automated proof.
+
+    The key to a fully automated proof is to introduce an array of
+    cells, called `cell` below, and then to resort to arithmetic and
+    universal quantifiers to define lists (predicates `listLR` and
+    `listRL` below).
+
+    This proof requires no lemma function and no transformation.
+    A single call to Z3 completes the proof in no time (0.04 s).
+*)
+
+module YetAnotherInPlaceRev
+
+  use int.Int
+  use map.Map
+
+  type loc
+
+  val eq_loc (l1 l2: loc) : bool
+    ensures { result <-> l1 = l2 }
+
+  val constant null : loc
+
+  type mem = { mutable next: loc -> loc }
+
+  val cdr (ghost m: mem) (p: loc) : loc
+    requires { p <> null }
+    ensures  { result = m.next p }
+
+  val set_cdr (ghost m: mem) (p: loc) (v: loc) : unit
+    requires { p <> null }
+    writes   { m.next }
+    ensures  { m.next = (old m.next)[p <- v] }
+
+  (* The `n` cells composing the list. They are non null and distinct. *)
+
+  constant cell: int -> loc
+
+  constant n: int
+
+  axiom n_nonneg: n >= 0
+
+  axiom cells_not_null:
+    forall i. 0 <= i < n -> cell i <> null
+
+  axiom cells_distinct:
+    forall i j. 0 <= i < n -> 0 <= j < n -> i <> j -> cell i <> cell j
+
+  (* null-terminated left-to-right list from `lo` included to `hi` excluded *)
+  predicate listLR (m: mem) (l: loc) (lo hi: int) =
+    0 <= lo <= hi <= n &&
+    (lo = hi && l = null ||
+     lo < hi && l = cell lo && m.next (cell (hi-1)) = null &&
+     forall k. lo <= k < hi-1 -> m.next (cell k) = cell (k+1))
+
+  (* null-terminated right-to-left list from `hi` excluded to `lo` included *)
+  predicate listRL (m: mem) (l: loc) (lo hi: int) =
+    0 <= lo <= hi <= n &&
+    (lo = hi && l = null ||
+     lo < hi && m.next (cell lo) = null && l = cell (hi-1) &&
+     forall k. lo < k < hi -> m.next (cell k) = cell (k-1))
+
+  let list_reversal (ghost m: mem) (l: loc) : (r: loc)
+    requires { listLR m l 0 n }
+    writes   { m }
+    ensures  { listRL m r 0 n }
+  = let ref l = l in
+    let ref p = null in
+    let ghost ref i = 0 in
+    (* [ ]<-...<-[ ]<-[ ]  [ ]->[ ]->...->[ ]
+                       ^    ^
+                       p    l                *)
+    while not (eq_loc l null) do
+      invariant { if n = 0 then l = p = null else
+                  p = null && i = 0 && l = cell 0
+               || l = null && i = n && p = cell (n-1)
+               || 0 < i < n && p = cell (i-1) && l = cell i }
+      invariant { listLR m l i n }
+      invariant { listRL m p 0 i }
+      variant   { n - i }
+      let tmp = l in
+      l <- cdr m l;
+      set_cdr m tmp p;
+      p <- tmp;
+      i <- i + 1
+    done;
+    return p
+
+end
+
 (*
 Local Variables:
 compile-command: "why3 ide linked_list_rev.mlw"
