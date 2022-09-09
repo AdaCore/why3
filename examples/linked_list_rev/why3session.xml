@@ -3,6 +3,7 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.8.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -501,6 +502,11 @@
   <proof prover="3"><result status="valid" time="0.08" steps="515"/></proof>
   </goal>
  </transf>
+ </goal>
+</theory>
+<theory name="YetAnotherInPlaceRev" proved="true">
+ <goal name="list_reversal&#39;vc" expl="VC for list_reversal" proved="true">
+ <proof prover="1"><result status="valid" time="0.04" steps="53763"/></proof>
  </goal>
 </theory>
 </file>
