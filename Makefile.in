@@ -350,8 +350,15 @@ endif
 # Mlmpfr
 
 ifeq (@enable_mpfr@,yes)
+
+ifeq (@old_mpfr@,yes)
+src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_old.ml Makefile
+	$(CMP_CP)
+else ifeq (@enable_mpfr@,yes)
 src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_real.ml Makefile
 	$(CMP_CP)
+endif
+
 else
 src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_dummy.ml Makefile
 	$(CMP_CP)
@@ -2178,7 +2185,7 @@ dist: $(MORE_DIST)
 	rm -f distrib/$(NAME).tar.gz
 	mkdir -p distrib/
 	git archive --format=tar --prefix=$(NAME)/ -o distrib/$(NAME).tar HEAD
-	tar rf distrib/$(NAME).tar --transform="s,^,$(NAME)/," --mtime="`git show -s --format=%ci`" $(MORE_DIST)
+	tar rf distrib/$(NAME).tar --transform="s,^,$(NAME)/," --mtime="`git show -s --format=%ci`" --owner=0 --group=0 $(MORE_DIST)
 	gzip -n -f --best distrib/$(NAME).tar
 
 
