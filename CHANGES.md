@@ -1,5 +1,8 @@
 :x: marks a potential source of incompatibility
 
+Version 1.5.1, September 12, 2022
+---------------------------------
+
 Documentation
   * documented most options of `why3 prove` and `why3 execute`
 
