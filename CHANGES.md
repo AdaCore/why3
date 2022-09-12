@@ -1,25 +1,22 @@
 :x: marks a potential source of incompatibility
 
 Documentation
-  * add documentation for several options of `why3 prove` and `why3
-    execute` that were left undocumented so far
+  * documented most options of `why3 prove` and `why3 execute`
+
+Python language
+  * added construct `e1 if e2 else e3`
+  * added support for tuples and multiple assignments
+  * added `#@ axiom` and `#@ lemma`
+  * global variables annotated with `#@ constant` are available in the logic
+  * pure functions (i.e., limited to `return e`) annotated with `#@ function`
+    are available in the logic
+  * logical functions can be given a variant with `variant {term}`
+  (contribution by Jean-Paul Bodeveix)
 
 Provers
   * support for Z3 4.9.0 and 4.9.1 (released July 6, 2022)
   * support for Z3 4.10.0, 4.10.1 and 4.10.2 (released July 30, 2022)
   * support for Z3 4.11.0 (released August 18, 2022)
-
-Python language
-  * added `e1 if e2 else e3`
-  * tuples
-  * multiple assignments
-  * `#@ axiom` and `#@ lemma`
-  * a Python global variable can be annotated with `#@ constant`
-    to be available in the logic
-  * a Python pure function (i.e. limited to `return e`)
-    can be annotated with `#@ function` to be available in the logic
-  * logical functions can be given a variant (with syntax `variant {term}`)
-  (contribution by Jean-Paul Bodeveix)
 
 Version 1.5.0, April 29, 2022
 -----------------------------
