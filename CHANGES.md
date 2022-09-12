@@ -17,6 +17,7 @@ Provers
   * support for Z3 4.9.0 and 4.9.1 (released July 6, 2022)
   * support for Z3 4.10.0, 4.10.1 and 4.10.2 (released July 30, 2022)
   * support for Z3 4.11.0 (released August 18, 2022)
+  * support for Coq 8.16.0 (release September 5, 2022)
 
 Version 1.5.0, April 29, 2022
 -----------------------------
