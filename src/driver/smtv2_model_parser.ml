@@ -640,9 +640,15 @@ module FromModelToTerm = struct
     Debug.dprintf debug "-----------------------------@.";
     t
 
-  let rec eval_term ty_coercions t = match t.t_node with
+  (* [eval_var] is false if variables should not be evaluated *)
+  let rec eval_term eval_var ty_coercions t =
+    Debug.dprintf debug "[eval_term] eval_var = %b, t = %a@."
+      eval_var
+      Pretty.print_term t;
+    match t.t_node with
     (* TODO_WIP *)
     | Tvar vs -> (
+      if eval_var then (
         match t.t_ty with
         | Some ty -> (
           (* first search if there exists some type coercions for [ty] *)
@@ -666,21 +672,26 @@ module FromModelToTerm = struct
             let f =
               t_equ
                 (t_app ls' [t_var x] ls'.ls_value)
-                (eval_term ty_coercions t')
+                (eval_term false ty_coercions t')
             in
             (* replace [t] by [eps x. f] *)
             t_eps_close x f)
-        | _ -> t
+        | _ -> t)
+      else
+        t
     )
     | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
-      if t_equal (eval_term ty_coercions t1) (eval_term ty_coercions t2) then
+      if t_equal (eval_term eval_var ty_coercions t1) (eval_term eval_var ty_coercions t2) then
         t_bool_true
       else
         t_bool_false
+    | Tapp (ls, ts) ->
+      let ts = List.map (eval_term eval_var ty_coercions) ts in
+      t_app ls ts ls.ls_value
     | Tif (b,t1,t2) -> (
-      match (eval_term ty_coercions b).t_node with
-      | Ttrue -> eval_term ty_coercions t1
-      | _ -> eval_term ty_coercions t2
+      match (eval_term eval_var ty_coercions b).t_node with
+      | Ttrue -> eval_term eval_var ty_coercions t1
+      | _ -> eval_term eval_var ty_coercions t2
     )
     | _ -> t
 
@@ -714,7 +725,7 @@ module FromModelToTerm = struct
       ty_coercions;
     Mstr.mapi (* for each element in [terms], we try to evaluate [t]:
        - by applying type coercions for variables, when possible *)
-      (fun str ((ls,oloc,attrs),t) -> ((ls,oloc,attrs), eval_term ty_coercions t))
+      (fun str ((ls,oloc,attrs),t) -> ((ls,oloc,attrs), eval_term true ty_coercions t))
       terms
 
 
@@ -730,6 +741,27 @@ module FromModelToTerm = struct
         Debug.dprintf debug "[queried_terms] key = %s, ls = %a@." key
           Pretty.print_ls ls)
       qterms;
+    let records = pinfo.list_records in
+    Mstr.iter
+      (fun key l ->
+        List.iter
+          (fun finfo ->
+            Debug.dprintf debug "[list_records] key = %s, field_info = %s@."
+              key finfo.Printer.field_name)
+          l)
+      records;
+    let fields = pinfo.list_fields in
+    Mstr.iter
+      (fun key f ->
+        Debug.dprintf debug "[list_fields] key = %s, field = %s@."
+          key f.Ident.id_string)
+      fields;
+    let projections = pinfo.list_projections in
+    Mstr.iter
+      (fun key f ->
+        Debug.dprintf debug "[list_projections] key = %s, field = %s@."
+          key f.Ident.id_string)
+      projections;
     let env = { vs = []; dt = dt_decls; tys = [] } in
     let terms =
       Mstr.mapi_filter
