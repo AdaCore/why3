@@ -159,6 +159,28 @@ void server_accept_client() {
   add_to_poll_list(fd, POLLIN);
 }
 
+// Handling of termination
+void sigterm_handler(int sig) {
+  kill_all_processes();
+  shutdown_with_msg("");
+}
+
+void set_sigterm_handler() {
+  struct sigaction sa;
+  sigemptyset (&sa.sa_mask);
+  sa.sa_handler = &sigterm_handler;
+  sa.sa_flags = 0;
+  if (sigaction(SIGTERM, &sa, NULL) == -1) {
+    shutdown_with_msg("error installing signal handler");
+  }
+  if (sigaction(SIGHUP, &sa, NULL) == -1) {
+    shutdown_with_msg("error installing signal handler");
+  }
+  if (sigaction(SIGINT, &sa, NULL) == -1) {
+    shutdown_with_msg("error installing signal handler");
+  }
+}
+
 // The next two functions implement the "self pipe trick". A pipe is used as
 // boolean information whether child processes have terminated. The code is
 // "data to read on the pipe" = "child processes have terminated"
@@ -275,6 +297,7 @@ void server_init_listening(char* socketname, int parallel) {
   add_to_poll_list(server_sock, POLLIN);
   init_process_list();
   setup_child_pipe();
+  set_sigterm_handler();
 }
 
 void queue_write(pclient client, char* msgbuf) {
