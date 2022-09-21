@@ -184,43 +184,71 @@ module ComputerDivision
 
   axiom Div_mod:
     forall x y:int. y <> 0 -> x = y * div x y + mod x y
+  meta "remove_unused:dependency" axiom Div_mod, function div
+  meta "remove_unused:dependency" axiom Div_mod, function mod
 
   axiom Div_bound:
     forall x y:int. x >= 0 /\ y > 0 -> 0 <= div x y <= x
+  meta "remove_unused:dependency" axiom Div_bound, function div
+  meta "remove_unused:dependency" axiom Div_bound, function mod
 
   axiom Mod_bound:
     forall x y:int. y <> 0 -> - abs y < mod x y < abs y
+  meta "remove_unused:dependency" axiom Mod_bound, function div
+  meta "remove_unused:dependency" axiom Mod_bound, function mod
 
   axiom Div_sign_pos:
     forall x y:int. x >= 0 /\ y > 0 -> div x y >= 0
+  meta "remove_unused:dependency" axiom Div_sign_pos, function div
+  meta "remove_unused:dependency" axiom Div_sign_pos, function mod
 
   axiom Div_sign_neg:
     forall x y:int. x <= 0 /\ y > 0 -> div x y <= 0
+  meta "remove_unused:dependency" axiom Div_sign_neg, function div
+  meta "remove_unused:dependency" axiom Div_sign_neg, function mod
 
   axiom Mod_sign_pos:
     forall x y:int. x >= 0 /\ y <> 0 -> mod x y >= 0
+  meta "remove_unused:dependency" axiom Mod_sign_pos, function div
+  meta "remove_unused:dependency" axiom Mod_sign_pos, function mod
 
   axiom Mod_sign_neg:
     forall x y:int. x <= 0 /\ y <> 0 -> mod x y <= 0
+  meta "remove_unused:dependency" axiom Mod_sign_neg, function div
+  meta "remove_unused:dependency" axiom Mod_sign_neg, function mod
 
   lemma Rounds_toward_zero:
     forall x y:int. y <> 0 -> abs (div x y * y) <= abs x
+  meta "remove_unused:dependency" lemma Rounds_toward_zero, function div
+  meta "remove_unused:dependency" lemma Rounds_toward_zero, function mod
 
   lemma Div_1: forall x:int. div x 1 = x
+  meta "remove_unused:dependency" lemma Div_1, function div
+  meta "remove_unused:dependency" lemma Div_1, function mod
 
   lemma Mod_1: forall x:int. mod x 1 = 0
+  meta "remove_unused:dependency" lemma Mod_1, function div
+  meta "remove_unused:dependency" lemma Mod_1, function mod
 
   lemma Div_inf: forall x y:int. 0 <= x < y -> div x y = 0
+  meta "remove_unused:dependency" lemma Div_inf, function div
+  meta "remove_unused:dependency" lemma Div_inf, function mod
 
   lemma Mod_inf: forall x y:int. 0 <= x < y -> mod x y = x
+  meta "remove_unused:dependency" lemma Mod_inf, function div
+  meta "remove_unused:dependency" lemma Mod_inf, function mod
 
   lemma Div_mult: forall x y z:int [div (x * y + z) x].
           x > 0 /\ y >= 0 /\ z >= 0 ->
           div (x * y + z) x = y + div z x
+  meta "remove_unused:dependency" lemma Div_mult, function div
+  meta "remove_unused:dependency" lemma Div_mult, function mod
 
   lemma Mod_mult: forall x y z:int [mod (x * y + z) x].
           x > 0 /\ y >= 0 /\ z >= 0 ->
           mod (x * y + z) x = mod z x
+  meta "remove_unused:dependency" lemma Mod_mult, function div
+  meta "remove_unused:dependency" lemma Mod_mult, function mod
 
   val div (x y:int) : int
     requires { y <> 0 }

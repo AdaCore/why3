@@ -3,6 +3,7 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Z3" version="4.6.0" timelimit="11" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="11" steplimit="0" memlimit="1000"/>
@@ -14,7 +15,7 @@
  <proof prover="3" timelimit="5"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
  <goal name="sqr_increasing" proved="true">
- <proof prover="0"><result status="valid" time="0.01" steps="1434"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="1370"/></proof>
  </goal>
  <goal name="sqr_sum" proved="true">
  <proof prover="3"><result status="valid" time="0.00" steps="2"/></proof>
@@ -67,7 +68,7 @@
    <proof prover="4"><result status="valid" time="0.01" steps="8099"/></proof>
    </goal>
    <goal name="sqrt&#39;vc.10.1" expl="VC for sqrt" proved="true">
-   <proof prover="2"><result status="valid" time="0.09" steps="12703"/></proof>
+   <proof prover="1"><result status="valid" time="0.03" steps="317"/></proof>
    </goal>
    <goal name="sqrt&#39;vc.10.2" expl="VC for sqrt" proved="true">
    <proof prover="3"><result status="valid" time="0.04" steps="30"/></proof>
@@ -114,7 +115,7 @@
   <proof prover="3"><result status="valid" time="0.02" steps="61"/></proof>
   </goal>
   <goal name="sqrt&#39;vc.18" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.06" steps="5839"/></proof>
+  <proof prover="2"><result status="valid" time="0.06" steps="5840"/></proof>
   </goal>
  </transf>
  </goal>

@@ -106,7 +106,8 @@ experiment () {
     echo "* Experiment $experiment"
     echo "** Original"
     prove_opts=(--apply-transform=split_vc --prover="$prover" --library="$libdir")
-    $why3 prove "${prove_opts[@]}" "$libdir/$experiment.mlw"
+    $why3 prove "${prove_opts[@]}" "$libdir/$experiment.mlw" ||
+	echo "FAILED (retcode=$?): $why3 prove ${prove_opts[@]} $libdir/$experiment.mlw" >&2
     mkdir -p "$outbase/experiments"
     while IFS=$'\t' read -r id lines mod goal; do
         echo -n " $id" >&2
