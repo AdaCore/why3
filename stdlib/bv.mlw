@@ -9,15 +9,20 @@ module Pow2int
   function pow2 (i:int) : int
 
   axiom Power_0 : pow2 0 = 1
+  meta "remove_unused:dependency" axiom Power_0, function pow2
 
   axiom Power_s : forall n: int. n >= 0 -> pow2 (n+1) = 2 * pow2 n
+  meta "remove_unused:dependency" axiom Power_s, function pow2
 
   lemma Power_1 : pow2 1 = 2
+  meta "remove_unused:dependency" lemma Power_1, function pow2
 
   lemma Power_sum :
     forall n m: int. n >= 0 /\ m >= 0 -> pow2 (n+m) = pow2 n * pow2 m
+  meta "remove_unused:dependency" lemma Power_sum, function pow2
 
   lemma pow2pos: forall i:int. i >= 0 -> pow2 i > 0
+  meta "remove_unused:dependency" lemma pow2pos, function pow2
 
   lemma pow2_0: pow2 0   =                  0x1
   lemma pow2_1: pow2 1   =                  0x2
@@ -85,6 +90,73 @@ module Pow2int
   lemma pow2_63: pow2 63 =   0x8000000000000000
   lemma pow2_64: pow2 64 =  0x10000000000000000
 
+  meta "remove_unused:dependency" lemma pow2_0, function pow2
+  meta "remove_unused:dependency" lemma pow2_1, function pow2
+  meta "remove_unused:dependency" lemma pow2_2, function pow2
+  meta "remove_unused:dependency" lemma pow2_3, function pow2
+  meta "remove_unused:dependency" lemma pow2_4, function pow2
+  meta "remove_unused:dependency" lemma pow2_5, function pow2
+  meta "remove_unused:dependency" lemma pow2_6, function pow2
+  meta "remove_unused:dependency" lemma pow2_7, function pow2
+  meta "remove_unused:dependency" lemma pow2_8, function pow2
+  meta "remove_unused:dependency" lemma pow2_9, function pow2
+  meta "remove_unused:dependency" lemma pow2_10, function pow2
+  meta "remove_unused:dependency" lemma pow2_11, function pow2
+  meta "remove_unused:dependency" lemma pow2_12, function pow2
+  meta "remove_unused:dependency" lemma pow2_13, function pow2
+  meta "remove_unused:dependency" lemma pow2_14, function pow2
+  meta "remove_unused:dependency" lemma pow2_15, function pow2
+  meta "remove_unused:dependency" lemma pow2_16, function pow2
+  meta "remove_unused:dependency" lemma pow2_17, function pow2
+  meta "remove_unused:dependency" lemma pow2_18, function pow2
+  meta "remove_unused:dependency" lemma pow2_19, function pow2
+  meta "remove_unused:dependency" lemma pow2_20, function pow2
+  meta "remove_unused:dependency" lemma pow2_21, function pow2
+  meta "remove_unused:dependency" lemma pow2_22, function pow2
+  meta "remove_unused:dependency" lemma pow2_23, function pow2
+  meta "remove_unused:dependency" lemma pow2_24, function pow2
+  meta "remove_unused:dependency" lemma pow2_25, function pow2
+  meta "remove_unused:dependency" lemma pow2_26, function pow2
+  meta "remove_unused:dependency" lemma pow2_27, function pow2
+  meta "remove_unused:dependency" lemma pow2_28, function pow2
+  meta "remove_unused:dependency" lemma pow2_29, function pow2
+  meta "remove_unused:dependency" lemma pow2_30, function pow2
+  meta "remove_unused:dependency" lemma pow2_31, function pow2
+  meta "remove_unused:dependency" lemma pow2_32, function pow2
+  meta "remove_unused:dependency" lemma pow2_33, function pow2
+  meta "remove_unused:dependency" lemma pow2_34, function pow2
+  meta "remove_unused:dependency" lemma pow2_35, function pow2
+  meta "remove_unused:dependency" lemma pow2_36, function pow2
+  meta "remove_unused:dependency" lemma pow2_37, function pow2
+  meta "remove_unused:dependency" lemma pow2_38, function pow2
+  meta "remove_unused:dependency" lemma pow2_39, function pow2
+  meta "remove_unused:dependency" lemma pow2_40, function pow2
+  meta "remove_unused:dependency" lemma pow2_41, function pow2
+  meta "remove_unused:dependency" lemma pow2_42, function pow2
+  meta "remove_unused:dependency" lemma pow2_43, function pow2
+  meta "remove_unused:dependency" lemma pow2_44, function pow2
+  meta "remove_unused:dependency" lemma pow2_45, function pow2
+  meta "remove_unused:dependency" lemma pow2_46, function pow2
+  meta "remove_unused:dependency" lemma pow2_47, function pow2
+  meta "remove_unused:dependency" lemma pow2_48, function pow2
+  meta "remove_unused:dependency" lemma pow2_49, function pow2
+  meta "remove_unused:dependency" lemma pow2_50, function pow2
+  meta "remove_unused:dependency" lemma pow2_51, function pow2
+  meta "remove_unused:dependency" lemma pow2_52, function pow2
+  meta "remove_unused:dependency" lemma pow2_53, function pow2
+  meta "remove_unused:dependency" lemma pow2_54, function pow2
+  meta "remove_unused:dependency" lemma pow2_55, function pow2
+  meta "remove_unused:dependency" lemma pow2_56, function pow2
+  meta "remove_unused:dependency" lemma pow2_57, function pow2
+  meta "remove_unused:dependency" lemma pow2_58, function pow2
+  meta "remove_unused:dependency" lemma pow2_59, function pow2
+  meta "remove_unused:dependency" lemma pow2_60, function pow2
+  meta "remove_unused:dependency" lemma pow2_61, function pow2
+  meta "remove_unused:dependency" lemma pow2_62, function pow2
+  meta "remove_unused:dependency" lemma pow2_63, function pow2
+  meta "remove_unused:dependency" lemma pow2_64, function pow2
+
+
   (*** use int.EuclideanDivision
 
    lemma Div_pow: forall x i:int.
@@ -120,12 +192,14 @@ module BV_Gen
   val constant zeros : t
   axiom Nth_zeros:
     forall n:int. nth zeros n = False
+  meta "remove_unused:dependency" axiom Nth_zeros, function zeros
 
   val constant one : t
 
   val constant ones : t
   axiom Nth_ones:
     forall n. 0 <= n < size -> nth ones n = True
+  meta "remove_unused:dependency" axiom Nth_ones, function ones
 
   (** Bitwise operators *)
 
@@ -135,21 +209,25 @@ module BV_Gen
   axiom Nth_bw_and:
     forall v1 v2:t, n:int. 0 <= n < size ->
       nth (bw_and v1 v2) n = andb (nth v1 n) (nth v2 n)
+  meta "remove_unused:dependency" axiom Nth_bw_and, function bw_and
 
   val function bw_or (v1 v2 : t) : t
   axiom Nth_bw_or:
     forall v1 v2:t, n:int. 0 <= n < size ->
       nth (bw_or v1 v2) n = orb (nth v1 n) (nth v2 n)
+  meta "remove_unused:dependency" axiom Nth_bw_or, function bw_or
 
   val function bw_xor (v1 v2 : t) : t
   axiom Nth_bw_xor:
     forall v1 v2:t, n:int. 0 <= n < size ->
       nth (bw_xor v1 v2) n = xorb (nth v1 n) (nth v2 n)
+  meta "remove_unused:dependency" axiom Nth_bw_xor, function bw_xor
 
   val function bw_not (v : t) : t
   axiom Nth_bw_not:
     forall v:t, n:int. 0 <= n < size ->
       nth (bw_not v) n = notb (nth v n)
+  meta "remove_unused:dependency" axiom Nth_bw_not, function bw_not
 
   (** Shift operators *)
 
@@ -315,17 +393,21 @@ module BV_Gen
     Int.(>=) (to_int v1) (to_int v2)
 
   axiom positive_is_ge_zeros:
-    forall x. is_signed_positive x = sge x zeros
+    forall x. is_signed_positive x <-> sge x zeros
+  meta "remove_unused:dependency" axiom positive_is_ge_zeros, predicate sge
+  meta "remove_unused:dependency" axiom positive_is_ge_zeros, predicate is_signed_positive
 
   (** Arithmetic operators *)
 
   val function add (v1 v2 : t) : t
   axiom to_uint_add:
     forall v1 v2. to_uint (add v1 v2) =  mod (Int.(+) (to_uint v1) (to_uint v2)) two_power_size
+  meta "remove_unused:dependency" axiom to_uint_add, function add
   lemma to_uint_add_bounded:
     forall v1 v2.
       to_uint v1 + to_uint v2 < two_power_size ->
       to_uint (add v1 v2) = to_uint v1 + to_uint v2
+  meta "remove_unused:dependency" lemma to_uint_add_bounded, function add
 
   val function sub (v1 v2 : t) : t
   axiom to_uint_sub:
@@ -341,6 +423,7 @@ module BV_Gen
   val function neg (v1 : t) : t
   axiom to_uint_neg:
     forall v. to_uint (neg v) = mod (Int.(-_) (to_uint v)) two_power_size
+  meta "remove_unused:dependency" axiom to_uint_neg, function neg
 
   val function mul (v1 v2 : t) : t
   axiom to_uint_mul:
@@ -399,6 +482,7 @@ module BV_Gen
   axiom asr_bv_is_asr:
     forall x n.
       asr_bv x n = asr x (to_uint n)
+  meta "remove_unused:dependency" axiom asr_bv_is_asr, function asr_bv
 
   (** logical shift left *)
   val function lsl_bv t t : t
@@ -406,10 +490,12 @@ module BV_Gen
   axiom lsl_bv_is_lsl:
     forall x n.
       lsl_bv x n = lsl x (to_uint n)
+  meta "remove_unused:dependency" axiom lsl_bv_is_lsl, function lsl_bv
 
   axiom to_uint_lsl:
     forall v n : t.
          to_uint (lsl_bv v n) = mod (Int.( * ) (to_uint v) (pow2 (to_uint n))) two_power_size
+  meta "remove_unused:dependency" axiom to_uint_lsl, function lsl_bv
 
   (** rotations *)
 
