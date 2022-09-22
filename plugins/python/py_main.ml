@@ -560,12 +560,12 @@ let translate ~loc dl =
 let read_channel env path file c =
   let f : Py_ast.file = Py_lexer.parse file c in
   Debug.dprintf debug "%s parsed successfully.@." file;
+  let loc = Loc.user_position file 0 0 0 0 in
   let file = Filename.basename file in
   let file = Filename.chop_extension file in
   let name = Strings.capitalize file in
   Debug.dprintf debug "building module %s.@." name;
   Typing.open_file env path;
-  let loc = Loc.user_position file 0 0 0 0 in
   Typing.open_module (mk_id ~loc name);
   let use_import (f, m) =
     let m = mk_id ~loc m in
