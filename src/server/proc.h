@@ -44,5 +44,4 @@ void kill_processes(int key, char *id);
 // initialize global list of processes
 void init_process_list();
 
-void kill_all_processes();
 #endif
