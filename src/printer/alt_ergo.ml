@@ -492,7 +492,7 @@ let print_task args ?old:_ fmt task =
   let cntexample = Driver.get_counterexmp task in
   let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
   let vc_attrs = (Task.task_goal_fmla task).t_attrs in
-  let vc_info = {vc_inside = false; vc_loc = None; vc_func_name = None} in
+  let vc_info = {vc_inside = false; vc_loc; vc_func_name = None} in
   let info = {
     info_syn = Discriminate.get_syntax_map task;
     info_ac  = Task.on_tagged_ls meta_ac task;

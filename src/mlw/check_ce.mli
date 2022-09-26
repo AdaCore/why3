@@ -72,18 +72,6 @@ val rac_execute : Pinterp.ctx -> Expr.rsymbol -> rac_result_state * Log.exec_log
     or giant-step RAC, using the given model as an oracle for program parameters
     (and during giant-steps). *)
 
-(* (\** [check_goal config env pm model ls] checks the validity of the goal [ls]
- *     with the variable bindings from [model]. *\)
- * val check_goal : rac_config -> Env.env -> pmodule -> model ->
- *   Term.lsymbol -> bool option *)
-
-val find_rs : pmodule -> Loc.position -> Expr.rsymbol option
-(** Auxiliary function that returns the rsymbol of the procedure to which the VC
-    term of the model belongs.
-
-    The function fails (with exception [Failure]) when the VC term location of
-    the model is empty or dummy, and the search cannot succeed. *)
-
 (** {2 Conversions with models }*)
 
 val oracle_of_model : Pmodule.pmodule -> Model_parser.model -> Pinterp_core.oracle

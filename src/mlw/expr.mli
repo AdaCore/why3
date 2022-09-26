@@ -202,6 +202,10 @@ val c_fun : ?mask:mask -> pvsymbol list ->
   pre list -> post list -> post list Mxs.t -> pvsymbol Mpv.t -> expr -> cexp
 
 val c_any : cty -> cexp
+val create_cexp : Term.term -> cexp
+(* [create_cexp f] creates an "any" expression whose parameters are
+   quantified variables of [f], preconditions are the premises of [f]
+   and postconditions are the conclusions of [f] *)
 
 (** {2 Expression constructors} *)
 
