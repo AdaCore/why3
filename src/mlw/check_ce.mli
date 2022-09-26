@@ -12,7 +12,6 @@
 (** {1 Validation of candidate counterexamples and classification of proof
     failures using runtime-assertion checking} *)
 
-open Pmodule
 open Pinterp_core
 open Model_parser
 
@@ -119,8 +118,8 @@ val print_model_classification :
 (** Print the classification with the classification log or model. *)
 
 val classify : vc_term_loc:Loc.position option -> vc_term_attrs:Ident.Sattr.t ->
-  normal_result:rac_result_state * Log.exec_log -> 
-  giant_step_result:rac_result_state * Log.exec_log -> 
+  normal_result:rac_result_state * Log.exec_log ->
+  giant_step_result:rac_result_state * Log.exec_log ->
   classification
 (** Classify a counterexample based on the results of the normal and giant-step
     RAC executions. *)

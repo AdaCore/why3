@@ -768,7 +768,7 @@ let e_exec c =
 
 let c_any c = mk_cexp Cany c
 
-let create_cexp f =
+let cty_from_formula f =
   let rec decompose_post pvl prel rvl postl f =
     let stop = Sattr.mem stop_split f.t_attrs in
     match f.t_node with
@@ -813,7 +813,7 @@ let create_cexp f =
         let sbs, pvl = Lists.rev_map_fold_left pv_of_v Mvs.empty vl in
         let prel = List.rev_map (t_subst sbs) prel in
         decompose_post pvl prel [] [] (t_subst sbs f) in
-  c_any (decompose_pre [] [] f)
+  decompose_pre [] [] f
 
 let c_fun ?(mask=MaskVisible) args p q xq old e =
   let mask = mask_union mask e.e_mask in

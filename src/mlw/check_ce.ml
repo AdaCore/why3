@@ -363,7 +363,8 @@ let rec find_in_term loc t =
  *     | _ -> None in
  *   find_in_list in_tdecl th.Theory.th_decls *)
 
-type rs_or_term = RTrsymbol of rsymbol | RTterm of term
+type rs_or_term = RTrsymbol of rsymbol | RTterm of (Decl.prsymbol * term)
+
 (** Identifies the rsymbol of the definition that contains the given
    position. *)
 let find_rs pm loc =
@@ -429,22 +430,24 @@ let find_rs pm loc =
     | PDexn _
     | PDpure -> None
   and find_decl d =
-    let maybe b t = if b then Some (RTterm t) else None in
-    match d.Decl.d_node with
+    let maybe b pr t = if b then Some (RTterm(pr, t)) else None in
+    Decl.(match d.d_node with
     | Dtype _ | Ddata _ | Dparam _ | Dlogic _ | Dind _ -> None
     | Dprop (_,pr,t) ->
-        if Opt.equal Loc.equal (Some loc) pr.pr_name.id_loc then Some (RTterm t) else
-          maybe (find_in_term loc t) t
+        if Opt.equal Loc.equal (Some loc) pr.pr_name.id_loc then Some (RTterm (pr,t)) else
+          maybe (find_in_term loc t) pr t)
   and find_mod_unit = function
     | Uuse _ | Uclone _ | Umeta _ -> None
     | Uscope (_, us) -> find_in_list find_mod_unit us
     | Udecl pd -> find_pdecl pd
-  and find_mod_theory td = match td.Theory.td_node with
+  and find_mod_theory td =
+    Theory.(match td.td_node with
     | Use _ | Clone _ | Meta _ -> None
-    | Decl d -> find_decl d in
+    | Decl d -> find_decl d)
+  in
   match find_in_list find_mod_unit pm.mod_units with
   | Some rs -> Some rs
-  | None -> find_in_list find_mod_theory pm.mod_theory.th_decls
+  | None -> find_in_list find_mod_theory pm.mod_theory.Theory.th_decls
 
 let rac_execute ctx rs =
   if not (get_do_rac ctx) then
@@ -666,10 +669,14 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
                 | Some true ->
                     RAC_not_done "only_giant_step", RAC_done (giant_state,giant_log)
                 end
-            | Some (RTterm t) ->
-                let cexp = Expr.create_cexp t in
-                let rs = Expr.create_rsymbol (Ident.id_fresh "goal" ~loc) cexp.c_cty in
-                let env = { env with funenv = Mrs.add rs (cexp,None) env.funenv } in
+            | Some (RTterm(pr,t)) ->
+                let cty = Expr.cty_from_formula t in
+                let name = pr.Decl.pr_name.id_string ^ "'goal" in
+                let rs = Expr.create_rsymbol (Ident.id_derive name pr.Decl.pr_name) cty in
+                let body =
+                  c_fun cty.cty_args cty.cty_pre cty.cty_post cty.cty_xpost cty.cty_oldies e_void
+                in
+                let env = { env with funenv = Mrs.add rs (body,None) env.funenv } in
                 let rac_execute ~giant_steps rs model =
                   let ctx = Pinterp.mk_ctx env ~do_rac:true ~giant_steps ~rac
                         ~oracle:(oracle_of_model env.pmodule model) ~compute_term
@@ -682,7 +689,7 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
                   "@[Checking model:@\n@[<hv2>%a@]@]@\n"
                   (print_model ~filter_similar:false ~me_name_trans ~print_attrs) m;
                 begin
-                let state,log = rac_execute ~giant_steps:true rs m in
+                let state,log = rac_execute ~giant_steps:false rs m in
                 RAC_done (state,log), RAC_done (state,log)
                 end
             | None ->

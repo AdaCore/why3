@@ -291,9 +291,11 @@ let do_intro_vc_vars_counterexmp info pr t =
 
 let intro_vc_vars_counterexmp2 task =
   let g,_ = Task.task_separate_goal task in
-  let vc_loc = match g.td_node with
-  | Decl { d_node = Dprop (_,pr,_) } -> pr.pr_name.id_loc
-  | _ -> None in
+  let vc_loc =
+    Theory.(match g.td_node with
+        | Decl { d_node = Dprop (_,_,t) } -> t.t_loc
+        | _ -> None)
+  in
   let info = {
     vc_inside = false;
     vc_loc;

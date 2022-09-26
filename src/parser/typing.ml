@@ -1538,7 +1538,7 @@ let add_inductives muc s dl =
 (* turn a lemma into a lemma function *)
 let create_val muc id f =
   let id = id_derive (id.id_string ^ "'lemma") id in
-  match Expr.create_cexp f with
+  match c_any (Expr.cty_from_formula f) with
   | cexp ->
       let ld, _ = let_sym id ~ghost:true cexp in
       add_pdecl ~vc:false muc (create_let_decl ld)
