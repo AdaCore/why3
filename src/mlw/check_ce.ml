@@ -668,7 +668,7 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
                 end
             | Some (RTterm t) ->
                 let cexp = Expr.create_cexp t in
-                let rs = Expr.create_rsymbol (Ident.id_fresh "goal") cexp.c_cty in
+                let rs = Expr.create_rsymbol (Ident.id_fresh "goal" ~loc) cexp.c_cty in
                 let env = { env with funenv = Mrs.add rs (cexp,None) env.funenv } in
                 let rac_execute ~giant_steps rs model =
                   let ctx = Pinterp.mk_ctx env ~do_rac:true ~giant_steps ~rac
