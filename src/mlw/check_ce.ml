@@ -432,7 +432,9 @@ let find_rs pm loc =
     let maybe b t = if b then Some (RTterm t) else None in
     match d.Decl.d_node with
     | Dtype _ | Ddata _ | Dparam _ | Dlogic _ | Dind _ -> None
-    | Dprop (_,pr,t) -> maybe (find_in_term loc t) t
+    | Dprop (_,pr,t) ->
+        if Opt.equal Loc.equal (Some loc) pr.pr_name.id_loc then Some (RTterm t) else
+          maybe (find_in_term loc t) t
   and find_mod_unit = function
     | Uuse _ | Uclone _ | Umeta _ -> None
     | Uscope (_, us) -> find_in_list find_mod_unit us
