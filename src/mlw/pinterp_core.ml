@@ -594,7 +594,7 @@ module Log = struct
         ] in
     List (List.map entry entry_log)
 
-  (** verbosity level:
+  (** CE log verbosity level:
      1 : just imported values
      2 : + execution of function calls
      3 : + execution of loops

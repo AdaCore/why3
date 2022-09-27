@@ -81,9 +81,9 @@ run () {
     # Call why3 prove to create CE (and accept return value of 2 for unproven goals)
     ($dir/../bin/why3"$suffix" prove --apply-transform=split_vc \
        --prover="$prover" --stepslimit="$steps" --timelimit=10 \
-       --check-ce --rac-prover="$1" --verbosity=5 \
+       --check-ce --rac-prover="$1" --ce-log-verbosity=5 \
        --library="$2" "${file_path}.mlw" \
-       --debug=check-ce-rac-results,check-ce-categorization,rac-values \
+       --debug=check-ce-categorization \
        || [ $? -eq 2 ]) 2>&1 \
      | sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" \
      > "$f.out"
