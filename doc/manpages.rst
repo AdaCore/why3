@@ -473,7 +473,7 @@ Options
 
    Stop after type checking (same as ``--debug=type_only``).
 
-.. option:: -v <lvl>, --verbosity=<lvl>
+.. option:: --ce-log-verbosity=<lvl>
 
    Verbosity level for interpretation log of counterexample model
    returned by the prover.
