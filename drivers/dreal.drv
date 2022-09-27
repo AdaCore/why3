@@ -2,9 +2,13 @@
 
 prelude ";; produced by dreal.drv ;;"
 
-printer "gappa"
+printer "dreal"
+
 filename "%f-%t-%g.smt2"
+unknown "^\\(unknown\\|sat\\|Fail\\)$" "\\1"
+unknown "^(:reason-unknown \\([^)]*\\))$" "\\1"
 time "why3cpulimit time : %s s"
+valid "^unsat$"
 
 transformation "inline_trivial"
 transformation "eliminate_builtin"
@@ -27,123 +31,81 @@ transformation "abstract_unknown_lsymbols"
 prelude "(set-logic QF_NRA)"
 
 theory BuiltIn
-  syntax type int   "int"
-  syntax type real  "real"
-  syntax predicate (=)  "dummy"
-  meta "eliminate_algebraic" "keep_enums"
+  syntax type int   "Int"
+  syntax type real  "Real"
+  syntax predicate (=)  "(= %1 %2)"
+
+  meta "encoding:kept" type int
+  meta "encoding:ignore_polymorphism_ls" predicate (=)
 end
 
 theory int.Int
+  prelude ";;; dreal: integer arithmetic"
+
   syntax function zero "0"
   syntax function one  "1"
 
-  syntax function (+)  "(%1 + %2)"
-  syntax function (-)  "(%1 - %2)"
-  syntax function (*)  "(%1 * %2)"
-  syntax function (-_) "(-%1)"
+  syntax function (+)  "(+ %1 %2)"
+  syntax function (-)  "(- %1 %2)"
+  syntax function (*)  "(* %1 %2)"
+  syntax function (-_) "(- %1)"
 
-  syntax predicate (<=) "dummy"
-  syntax predicate (>=) "dummy"
-  syntax predicate (<)  "dummy"
-  syntax predicate (>)  "dummy"
+  syntax predicate (<=) "(<= %1 %2)"
+  syntax predicate (<)  "(< %1 %2)"
+  syntax predicate (>=) "(>= %1 %2)"
+  syntax predicate (>)  "(> %1 %2)"
 
-  meta "gappa arith" predicate (<=), "", "<=", ">="
-  meta "gappa arith" predicate (>=), "", ">=", "<="
-  meta "gappa arith" predicate (<), "not ", ">=", "<="
-  meta "gappa arith" predicate (>), "not ", "<=", ">="
-
-  meta "inline:no" function (-)
-  meta "inline:no" predicate (<=)
-  meta "inline:no" predicate (>=)
-  meta "inline:no" predicate (>)
-
-  remove prop NonTrivialRing
-  remove prop ZeroLessOne
-end
-
-theory int.Abs
-  syntax function abs  "| %1 |"
-end
-
-theory int.ComputerDivision
-  syntax function div "int<zr>(%1 / %2)"
-  syntax function mod "(%1 - int<zr>(%1 / %2) * %2)"
+  remove allprops
 end
 
 theory real.Real
-
-  prelude "# this is a prelude for Gappa real arithmetic"
+  prelude ";;; dreal: real arithmetic"
 
   syntax function zero "0.0"
   syntax function one  "1.0"
 
-  syntax function (+)  "(%1 + %2)"
-  syntax function (-)  "(%1 - %2)"
-  syntax function (*)  "(%1 * %2)"
-  syntax function (/)  "(%1 / %2)"
-  syntax function (-_) "(-%1)"
-  syntax function inv  "(1.0 / %1)"
+  syntax function (+)  "(+ %1 %2)"
+  syntax function (-)  "(- %1 %2)"
+  syntax function (*)  "(* %1 %2)"
+  syntax function (/)  "(/ %1 %2)"
+  syntax function (-_) "(- %1)"
+  syntax function inv  "(/ 1.0 %1)"
 
-  syntax predicate (<=) "dummy"
-  syntax predicate (>=) "dummy"
-  syntax predicate (<)  "dummy"
-  syntax predicate (>)  "dummy"
+  syntax predicate (<=) "(<= %1 %2)"
+  syntax predicate (<)  "(< %1 %2)"
+  syntax predicate (>=) "(>= %1 %2)"
+  syntax predicate (>)  "(> %1 %2)"
 
-  meta "gappa arith" predicate (<=), "", "<=", ">="
-  meta "gappa arith" predicate (>=), "", ">=", "<="
-  meta "gappa arith" predicate (<), "not ", ">=", "<="
-  meta "gappa arith" predicate (>), "not ", "<=", ">="
+  remove allprops
 
-  meta "inline:no" function (-)
-  meta "inline:no" predicate (<=)
-  meta "inline:no" predicate (>=)
-  meta "inline:no" predicate (>)
-
-  remove prop NonTrivialRing
-  remove prop ZeroLessOne
-
+  meta "encoding:kept" type real
 end
 
 theory real.Abs
+  syntax function abs "(ite (>= %1 0.0) %1 (- %1))"
 
-  syntax function abs  "| %1 |"
-
+  remove allprops
 end
 
-theory real.Square
-
-  syntax function sqrt  "sqrt(%1)"
-
-end
-
-theory real.Truncate
-
-  syntax function truncate "int<zr>(%1)"
-  syntax function floor    "int<dn>(%1)"
-  syntax function ceil     "int<up>(%1)"
-
+theory real.MinMax
+  remove allprops
 end
 
 theory real.FromInt
-
-  syntax function from_int "%1"
-
-  remove prop Zero
-  remove prop One
-
+  remove allprops
 end
 
-theory floating_point.Rounding
-
-  syntax function NearestTiesToEven "ne"
-  syntax function ToZero "zr"
-  syntax function Up "up"
-  syntax function Down "dn"
-  syntax function NearestTiesToAway "na"
-
+theory real.Truncate
+  syntax function truncate "(ite (>= %1 0.0) \
+                                 (to_int %1) \
+                                 (- (to_int (- %1))))"
+  syntax function floor "(to_int %1)"
+  syntax function ceil "(- (to_int (- %1)))"
+  remove allprops
 end
 
 theory real.ExpLog
-  syntax function exp   "exp"
-  syntax function log  "log"
+  syntax function exp "(exp %1)"
+  syntax function log "(log %1)"
+  remove allprops
 end
