@@ -51,3 +51,9 @@ void free_process(pproc proc) {
    free(proc->task_id);
    free(proc);
 }
+
+void kill_all_processes() {
+  for (int i = 0; i < processes->len; i++) {
+    os_kill((pproc)processes->data[i]);
+  }
+}
