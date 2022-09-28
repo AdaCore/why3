@@ -14,13 +14,6 @@ open Lexing
 open Format
 open Wstdlib
 
-let get_home_dir () =
-  try Sys.getenv "HOME"
-  with Not_found ->
-    (* try windows env var *)
-    try Sys.getenv "USERPROFILE"
-    with Not_found -> ""
-
 type rc_value =
   | RCint of int
   | RCbool of bool
@@ -205,19 +198,16 @@ let get_value read ?default section key =
       | None -> raise (MissingField key)
       | Some v -> v
 
-let get_valueo read ?default section key =
+let get_valueo read section key =
   try
     Some (get_value read section key)
-  with MissingField _ -> default
+  with MissingField _ -> None
 
-let get_valuel read ?default section key =
+let get_valuel read section key =
   try
     let l = Mstr.find key section in
     List.map (read key) l
-  with Not_found ->
-    match default with
-      | None -> raise (MissingField key)
-      | Some v -> v
+  with Not_found -> []
 
 let set_value write ?default section key value =
   let actually_write = match default with
@@ -227,25 +217,14 @@ let set_value write ?default section key value =
   then Mstr.add key [write value] section
   else section
 
-let set_valuel write ?default section key valuel =
-  if valuel = [] then Mstr.remove key section else
-    let actually_write = match default with
-      | None -> true
-      | Some default -> default <> valuel in
-    if actually_write
-    then Mstr.add key (List.map write valuel) section
-    else Mstr.remove key section
+let set_valuel write section key valuel =
+  if valuel = [] then Mstr.remove key section
+  else Mstr.add key (List.map write valuel) section
 
-let set_valueo write ?default section key valueo =
+let set_valueo write section key valueo =
   match valueo with
   | None -> Mstr.remove key section
-  | Some value ->
-    let actually_write = match default with
-      | None -> true
-      | Some default -> default <> value in
-    if actually_write
-    then Mstr.add key [write value] section
-    else Mstr.remove key section
+  | Some value -> Mstr.add key [write value] section
 
 let rint k = function
   | RCint n -> n
@@ -284,8 +263,8 @@ let get_string = get_value rstring
 let get_stringl = get_valuel rstring
 let get_stringo = get_valueo rstring
 let set_string ?escape_eol ?default s = set_value (wstring ?escape_eol) ?default s
-let set_stringl ?escape_eol ?default s = set_valuel (wstring ?escape_eol) ?default s
-let set_stringo ?escape_eol ?default s = set_valueo (wstring ?escape_eol) ?default s
+let set_stringl ?escape_eol s = set_valuel (wstring ?escape_eol) s
+let set_stringo ?escape_eol s = set_valueo (wstring ?escape_eol) s
 
 let check_exhaustive section keyl =
   let test k _ = if Sstr.mem k keyl then ()

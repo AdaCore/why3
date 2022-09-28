@@ -78,6 +78,7 @@
     make trywhy3
     make trywhy3.tar.gz
     rm -r $DEST/try
+    mkdir $DEST/try
     tar xzf trywhy3.tar.gz -C $DEST/try/ --strip-components=1
     ln -s trywhy3.html $DEST/try/index.html
     ```

@@ -1140,9 +1140,10 @@ Prover result is: Valid.
 
 ** binary_search-B4
 bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B4.mlw --apply-transform=split_vc --prover=Z3,4.8.10,counterexamples --timelimit=15 --check-ce --rac-prover=Z3,4.8.10 --sub-goal=:8@postcondition --stepslimit=500000
+Warning: const x!0 not defined
 File "bench/check-ce/petiot2018/experiments/binary_search-B4.mlw", line 8, characters 50-58:
 Sub-goal Postcondition of goal binary_search'vc.
-Prover result is: Step limit exceeded.
+Prover result is: Unknown (sat).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File binary_search-B4.mlw:

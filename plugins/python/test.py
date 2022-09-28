@@ -59,12 +59,30 @@ foo = [1,2,3]
 
 #@ assert at(sum, L) == 0
 
+#@ constant
+N = 42
 
+#@ lemma L: N == 42
+
+x, y = 1, 2
+#@ assert x == 1 and y == 2
+x, y = y, x
+#@ assert x == 2 and y == 1
+
+#
 # Python's division is neither Euclidean division, nor computer division
 #@ assert  4 //  3 ==  1 and  4 %  3 ==  1
 #@ assert -4 //  3 == -2 and -4 %  3 ==  2
 #@ assert  4 // -3 == -2 and  4 % -3 == -2
 #@ assert -4 // -3 ==  1 and -4 % -3 == -1
+
+#@ function
+def mfact(n) -> int:
+    #@ variant n
+    return 1 if n <= 0 else n*mfact(n-1)
+
+n = len([0] + [1])
+#@ assert n == 2
 
 # Local Variables:
 # compile-command: "make -C ../.. && why3 prove -P alt-ergo test.py"

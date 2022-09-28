@@ -37,10 +37,12 @@ extern plist processes;
 // free memory and resources associated with the process p
 void free_process(pproc p);
 
-// kill all processes whose task_id is equal to id
-void kill_processes(char *id);
+// kill all processes whose client_key is equal to key, and whose task_id is
+// equal to id
+void kill_processes(int key, char *id);
 
 // initialize global list of processes
 void init_process_list();
 
+void kill_all_processes();
 #endif

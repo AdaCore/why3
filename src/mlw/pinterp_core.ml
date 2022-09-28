@@ -22,6 +22,10 @@ let debug_array_as_update_chains_not_epsilon =
   Debug.register_flag "rac-array-as-update-chains"
     ~desc:"represent arrays in terms for RAC as chains of updates, not epsilons"
 
+let debug_trace_exec =
+  Debug.register_info_flag "trace_exec"
+    ~desc:"trace execution of code given by --exec or --eval"
+
 let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, rbrace))
     pp_key pp_value fmt l =
   let pp_binding fmt (k, v) =
@@ -41,7 +45,7 @@ exception Incomplete of string
 
 let incomplete f =
   kasprintf (fun reason ->
-      Debug.dprintf (Debug.lookup_flag "trace_exec") "Incomplete: %s@." reason;
+      Debug.dprintf debug_trace_exec "Incomplete: %s@." reason;
       raise (Incomplete reason)) f
 
 let ity_components ity = match ity.ity_node with
@@ -235,8 +239,10 @@ let mode_to_string m =
   | Toward_Zero -> "RTZ"
   | Faithful -> assert false
 
+let debug_print_types = Debug.lookup_flag "print_types"
+
 let rec print_value fmt v =
-  if Debug.test_flag (Debug.lookup_flag "print_types") then
+  if Debug.test_flag debug_print_types then
     fprintf fmt "(%a: %a)" print_value' v print_ty (v_ty v)
   else
     print_value' fmt v
@@ -588,7 +594,7 @@ module Log = struct
         ] in
     List (List.map entry entry_log)
 
-  (** verbosity level:
+  (** CE log verbosity level:
      1 : just imported values
      2 : + execution of function calls
      3 : + execution of loops
@@ -821,7 +827,7 @@ exception Stuck of cntr_ctx * Loc.position option * string
 
 let stuck ?loc ctx f =
   kasprintf (fun reason ->
-      Debug.dprintf (Debug.lookup_flag "trace_exec") "Stuck: %s@." reason;
+      Debug.dprintf debug_trace_exec "Stuck: %s@." reason;
       raise (Stuck (ctx, loc, reason))) f
 
 type check_term =

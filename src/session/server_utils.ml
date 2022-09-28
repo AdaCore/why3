@@ -266,7 +266,7 @@ let help_on_queries fmt commands =
   | name, version, altern *)
 let return_prover name config =
   let fp = Whyconf.parse_filter_prover name in
-  (** all provers that have the name/version/altern name *)
+  (* all provers that have the name/version/altern name *)
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
     Debug.dprintf debug "Prover corresponding to %s has not been found@." name;

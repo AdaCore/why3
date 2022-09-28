@@ -6,6 +6,7 @@
 <prover id="1" name="Z3" version="4.8.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="binary_search.mlw"/>
 <theory name="BinarySearch" proved="true">
@@ -41,7 +42,7 @@
  <proof prover="3"><result status="valid" time="0.06" steps="104"/></proof>
  </goal>
  <goal name="upper_bound" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="49855"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="42751"/></proof>
  </goal>
  <goal name="binary_search&#39;vc" expl="VC for binary_search" proved="true">
  <transf name="split_vc" proved="true" >
@@ -74,7 +75,7 @@
   <proof prover="3"><result status="valid" time="0.01" steps="68"/></proof>
   </goal>
   <goal name="binary_search&#39;vc.8" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.03" steps="32462"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="484"/></proof>
   </goal>
   <goal name="binary_search&#39;vc.9" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="30"/></proof>
@@ -86,7 +87,7 @@
   <proof prover="3"><result status="valid" time="0.01" steps="39"/></proof>
   </goal>
   <goal name="binary_search&#39;vc.12" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.10" steps="7209"/></proof>
+  <proof prover="2"><result status="valid" time="0.10" steps="7210"/></proof>
   </goal>
   <goal name="binary_search&#39;vc.13" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.05" steps="104"/></proof>

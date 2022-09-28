@@ -47,8 +47,8 @@ let why3_regexp_of_string s = (* define a regexp in why3 *)
 
 let default_conf_file =
   match Config.localdir with
-    | None -> Filename.concat (Rc.get_home_dir ()) ".why3.conf"
-    | Some d -> Filename.concat d "why3.conf"
+  | None -> Filename.concat (Util.get_home_dir ()) ".why3.conf"
+  | Some d -> Filename.concat d "why3.conf"
 
 (* Prover *)
 
@@ -349,7 +349,10 @@ module RC_load = struct
         | Some info ->
           { prover  = prover;
             command = get_string ~default:info.command section "command";
-            command_steps = get_stringo ?default:info.command_steps section "command_steps";
+            command_steps =
+              begin match get_stringo section "command_steps" with
+              | None -> info.command_steps
+              | c -> c end;
             driver  = get_string ~default:info.driver section "driver";
             in_place = get_bool ~default:info.in_place section "in_place";
             editor  = get_string ~default:info.editor section "editor";
@@ -359,7 +362,7 @@ module RC_load = struct
           }
       in
       let provers = Mprover.add prover info provers in
-      let lshort = get_stringl section ~default:[] "shortcut" in
+      let lshort = get_stringl section "shortcut" in
       let shortcuts = add_prover_shortcuts shortcuts prover lshort in
       provers,shortcuts
     with MissingField s ->
@@ -464,17 +467,19 @@ module RC_load = struct
     { libdir    = get_string ~default:old.libdir section "libdir";
       datadir   = get_string ~default:old.datadir section "datadir";
       loadpath  =
-        begin match List.map (Sysutil.concat dirname)
-                (get_stringl ~default:[] section "loadpath") with
+        begin match get_stringl section "loadpath" with
         | [] -> old.loadpath
-        | l -> l end;
+        | l -> List.map (Sysutil.concat dirname) l end;
       stdlib = get_bool ~default:old.stdlib section "stdlib";
       load_default_plugins = get_bool ~default:old.load_default_plugins section "load_default_plugins";
       timelimit = get_int ~default:old.timelimit section "timelimit";
       memlimit  = get_int ~default:old.memlimit section "memlimit";
       running_provers_max = get_int ~default:old.running_provers_max
           section "running_provers_max";
-      plugins = get_stringl ~default:old.plugins section "plugin";
+      plugins =
+        begin match get_stringl section "plugin" with
+        | [] -> old.plugins
+        | l -> l end;
       default_editor = get_string ~default:old.default_editor section "default_editor";
     }
 
@@ -829,9 +834,9 @@ let add_extra_config config filename =
     | None -> config.main
     | Some rc ->
       let loadpath = (List.map (Sysutil.concat dirname)
-        (get_stringl ~default:[] rc "loadpath")) @ config.main.loadpath in
+        (get_stringl rc "loadpath")) @ config.main.loadpath in
       let plugins =
-        (get_stringl ~default:[] rc "plugin") @ config.main.plugins in
+        (get_stringl rc "plugin") @ config.main.plugins in
       { config.main with loadpath = loadpath; plugins = plugins } in
   (* get more strategies *)
   let more_strategies = get_strategies rc in
@@ -861,8 +866,8 @@ let add_extra_config config filename =
         else
           begin
             Debug.dprintf debug "prover modifiers found for %a@." print_prover p;
-            let opt = get_stringl ~default:[] section "option" in
-            let drv = get_stringl ~default:[] section "driver" in
+            let opt = get_stringl section "option" in
+            let drv = get_stringl section "driver" in
             { c with
             extra_options = opt @ c.extra_options;
             extra_drivers = drv @ c.extra_drivers }
@@ -879,7 +884,7 @@ let add_extra_config config filename =
       Meditor.change (function
       | None -> None
       | Some c ->
-        let opt = get_stringl ~default:[] section "option" in
+        let opt = get_stringl section "option" in
         Some { c with editor_options = opt @ c.editor_options }) id  editors
     ) config.editors editor_modifiers in
   (* add editors *)
@@ -942,7 +947,7 @@ module User = struct
     }
 
   let set_prover_upgrade_policy config prover target =
-    (** kept simple because no auto upgrade policy *)
+    (* kept simple because no auto upgrade policy *)
     let m = Mprover.add prover target config.provers_upgrade_policy in
     {config with
      user_rc = RC_save.set_policies config.user_rc m;
@@ -950,7 +955,7 @@ module User = struct
     }
 
   let remove_user_policy config prover =
-    (** kept simple because no auto upgrade policy *)
+    (* kept simple because no auto upgrade policy *)
     let m = Mprover.remove prover config.provers_upgrade_policy in
     {config with
      user_rc = RC_save.set_policies config.user_rc m;

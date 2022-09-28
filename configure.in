@@ -9,7 +9,7 @@
 #                                                                  #
 ####################################################################
 
-AC_INIT([Why3], [1.5.0+git])
+AC_INIT([Why3], [1.5.1+git])
 
 # verbosemake
 
@@ -843,6 +843,7 @@ elif test "$enable_js_of_ocaml" != no; then
 else
    DIR=$($OCAMLFIND query mlmpfr)
    if test -n "$DIR"; then
+      old_mpfr=no
       echo "ocamlfind found mlmpfr in $DIR"
       # Test that MPFR version is higher than 4.0.0 (because of
       # Faithful constructor incompatibility).
@@ -850,6 +851,7 @@ else
       AX_VERSION_GE([$MPFRVERSION], 4.0.0, [], [
          enable_mpfr=no
          reason_mpfr=" (mlmpfr >= 4.0.0 not found)"])
+      AC_CHECK_FILE($DIR/mpfr.cmi, [old_mpfr=yes], )
       AC_CHECK_FILE($DIR/mlmpfr.cma,, [
          enable_mpfr=no
          reason_mpfr=" (mlmpfr not found)"])
@@ -964,6 +966,9 @@ if test "$enable_coq_support" = yes; then
          ;;
       8.15*)
          coq_compat_version="COQ815"
+         ;;
+      8.16*)
+         coq_compat_version="COQ816"
          ;;
       *)
          enable_coq_support=no
@@ -1191,6 +1196,7 @@ AC_SUBST(SEXPLIBPPX)
 AC_SUBST(NUMINCLUDE)
 AC_SUBST(MLMPFR)
 AC_SUBST(enable_mpfr)
+AC_SUBST(old_mpfr)
 
 AC_SUBST(enable_zarith)
 AC_SUBST(BIGINTINCLUDE)

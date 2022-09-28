@@ -1,0 +1,11 @@
+module Range_int
+
+  use int.Int
+
+  type int32 = < range -0x8000_0000 0x7fff_ffff >
+
+  let f (x: int32)
+  =
+    assert {int32'int x < 5}
+
+end

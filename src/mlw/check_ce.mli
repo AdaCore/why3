@@ -147,6 +147,7 @@ val best_non_empty_giant_step_rac_result : strategy_from_rac
                               > RAC_done (Res_incomplete _ , _)
                               > RAC_not_done _
     *)
+
 val last_non_empty_model : strategy_from_rac
 (** Select the last non empty model. *)
 

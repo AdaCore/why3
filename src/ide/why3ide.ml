@@ -19,7 +19,6 @@ open Itp_communication
 open Gtkcompat
 
 let debug = Debug.lookup_flag "ide_info"
-let debug_stack_trace = Debug.lookup_flag "stack_trace"
 
 let () =
   (* Allow global locations to be saved for Find_ident_req *)
@@ -120,7 +119,7 @@ let send_request r = Protocol_why3ide.send_request r
 let backtrace_and_exit f () =
   try f () with
   | e ->
-     if Debug.test_flag debug_stack_trace then
+     if Debug.test_flag Debug.stack_trace then
        begin
          Printexc.print_backtrace stderr;
          Format.eprintf "exception '%a' was raised in a LablGtk callback.@."

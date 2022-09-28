@@ -9,49 +9,46 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Debug flag handling *)
+(** {1 Debug flag handling} *)
 
 type flag
 
 val register_flag : desc:Pp.formatted -> string -> flag
-(** register a new flag. It is allowed to register twice the same flag *)
+(** Return the corresponding flag, after registering it if needed. *)
 
 val register_info_flag : desc:Pp.formatted -> string -> flag
-(** register a new info flag. It is allowed to register twice the same flag.
-    Info flags are set by --debug-all and must not change the behaviour. *)
+(** Return the corresponding flag, after registering it if needed.
+    Info flags are set by [--debug-all] and must not change the behavior. *)
 
 val list_flags : unit -> (string * flag * bool * Pp.formatted) list
-(** list the known flags *)
+(** List the known flags. The boolean component indicates an info flag. *)
 
 val lookup_flag : string -> flag
-(** get the flag *)
+(** Return the corresponding flag.
+    @raise UnknownFlag if unknown. *)
 
-val is_info_flag : string -> bool
-(** test if the flag is an info flag *)
+(** Modify the state of a flag. *)
 
-val flag_desc : string -> Pp.formatted
-(** get the description of the flag *)
-
-(** Modify the state of a flag *)
 val set_flag : flag -> unit
 val unset_flag : flag -> unit
 val toggle_flag : flag -> unit
 
-(** Return the state of the flag *)
+(** Return the state of a flag. *)
+
 val test_flag : flag -> bool
 val test_noflag : flag -> bool
 
 val set_debug_formatter : Format.formatter -> unit
-(** Set the formatter used when printing debug material *)
+(** Set the formatter used when printing debug material. *)
 
 val get_debug_formatter : unit -> Format.formatter
-(** Get the formatter used when printing debug material *)
+(** Get the formatter used when printing debug material. *)
 
 val dprintf : flag -> ('a, Format.formatter, unit) format -> 'a
-(** Print only if the flag is set *)
+(** Print only if the flag is set. *)
 
 val stack_trace : flag
-(** stack_trace flag *)
+(** "stack_trace" flag. *)
 
 
 
@@ -60,20 +57,20 @@ module Args : sig
   type spec = Getopt.opt
 
   val desc_debug_list : spec
-  (** Option for printing the list of debug flags *)
+  (** Option for printing the list of debug flags. *)
 
   val option_list : unit -> bool
   (** Print the list of flags if requested (in this case return [true]).
       You should run this function after the plugins have been loaded. *)
 
   val desc_debug_all : spec
-  (** Option for setting all info flags *)
+  (** Option for setting all info flags. *)
 
   val desc_debug : spec
-  (** Option for specifying a debug flag to set *)
+  (** Option for specifying a debug flag to set. *)
 
   val desc_shortcut : string -> Getopt.key -> Getopt.doc -> spec
-  (** Option for setting a specific flag *)
+  (** Option for setting a specific flag. *)
 
   val set_flags_selected : ?silent:bool -> unit -> unit
   (** Set the flags selected by debug_all, debug or a shortcut.

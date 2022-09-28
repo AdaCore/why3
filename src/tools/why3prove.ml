@@ -32,7 +32,7 @@ let opt_check_ce_model = ref false
 let opt_rac_prover = ref None
 let opt_rac_timelimit = ref None
 let opt_rac_steplimit = ref None
-let opt_ce_check_verbosity = ref None
+let opt_ce_log_verbosity = ref None
 let opt_sub_goals = ref []
 
 let debug_print_original_model = Debug.register_info_flag "print-original-model"
@@ -187,9 +187,9 @@ let option_list =
     "<seconds> Time limit in seconds for RAC (with --check-ce)";
     KLong "rac-steplimit", Hnd1 (AInt, fun i -> opt_rac_steplimit := Some i),
     "<steps> Step limit for RAC (with --check-ce)";
-    Key ('v',"verbosity"), Hnd1(AInt, fun i -> opt_ce_check_verbosity := Some i),
-    "<lvl> verbosity level for interpretation log of counterexam-\n\
-     ple solver model";
+    KLong "ce-log-verbosity", Hnd1(AInt, fun i -> opt_ce_log_verbosity := Some i),
+    "<lvl> verbosity level for interpretation log of\n\
+    counterexample solver model";
     KLong "json", Hnd0 (fun () -> opt_json := Some `All),
     " print output in JSON format";
     KLong "json-model-values", Hnd0 (fun () -> opt_json := Some `Values),
@@ -356,7 +356,7 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
       (Call_provers.print_prover_result ~json:false) res;
     Opt.iter
       (Check_ce.print_model_classification ?json
-         ?verb_lvl:!opt_ce_check_verbosity ~check_ce:!opt_check_ce_model fmt)
+         ?verb_lvl:!opt_ce_log_verbosity ~check_ce:!opt_check_ce_model fmt)
       ce;
     fprintf fmt "@\n"
 
@@ -370,14 +370,16 @@ let select_ce env th models =
             (Rac.Why.mk_check_term_lit config env ?why_prover:!opt_rac_prover ()) in
         let timelimit = Opt.map float_of_int !opt_rac_timelimit in
         Check_ce.select_model
-          ?timelimit ?steplimit:!opt_rac_steplimit ?verb_lvl:!opt_ce_check_verbosity
+          ?timelimit ?steplimit:!opt_rac_steplimit ?verb_lvl:!opt_ce_log_verbosity
           ~check_ce:!opt_check_ce_model rac env pm models
     | exception Not_found -> None
   else None
 
+let debug_print_model_attrs = Debug.lookup_flag "print_model_attrs"
+
 let print_other_models (m, (c, log)) =
   let print_model fmt m =
-    let print_attrs = Debug.(test_flag (lookup_flag "print_model_attrs"))  in
+    let print_attrs = Debug.test_flag debug_print_model_attrs in
     if !opt_json = None then Model_parser.print_model_human fmt m ~print_attrs
     else Model_parser.print_model (* json values *) fmt m ~print_attrs in
   ( match c with

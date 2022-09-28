@@ -23,24 +23,24 @@ type func_def = {
 }
 
 type context = {
-  (** Binding for function parameters and let variables *)
   values: Model_parser.model_value Mstr.t;
+  (** Binding for function parameters and let variables *)
 
-  (** Lazy bindings for top-level constants, initially all [None] *)
   consts: Model_parser.model_value Hstr.t;
+  (** Lazy bindings for top-level constants, initially all [None] *)
 
+  prover_values: Model_parser.model_value Hstr.t;
   (** Lazy bindings for prover variables, mutable to cache values during
       evaluation *)
-  prover_values: Model_parser.model_value Hstr.t;
 
-  (** Top-level function definitions *)
   function_defs: func_def Mstr.t;
+  (** Top-level function definitions *)
 
+  interprete_prover_vars: bool;
   (** Interprete prover vars, which is disabled when making the case analysis
       in projection and field functions *)
-  interprete_prover_vars: bool;
 
-  (** Other info fields *)
+  (* Other info fields *)
   fields_projs: Ident.ident Mstr.t;
   info : printing_info;
   list_records: string list Mstr.t;

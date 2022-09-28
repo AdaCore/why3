@@ -229,7 +229,7 @@ let rec print_term info fmt t =
       fprintf fmt "(let %a =@ %a@ : %a in@ %a)"
         (print_ident info) v.vs_name
         (print_term info) t1
-         (** some version of alt-ergo have an inefficient typing of let *)
+         (* some version of alt-ergo have an inefficient typing of let *)
         (print_type info) v.vs_ty
         (print_term info) t2;
       forget_var info v
@@ -313,7 +313,7 @@ and print_fmla_node info fmt f = match f.t_node with
       fprintf fmt "(let %a =@ %a@ : %a in@ %a)"
         (print_ident info) v.vs_name
         (print_term info) t1
-         (** some version of alt-ergo have an inefficient typing of let *)
+         (* some version of alt-ergo have an inefficient typing of let *)
         (print_type info) v.vs_ty
         (print_fmla info) f2;
       forget_var info v

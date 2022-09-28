@@ -1,12 +1,7 @@
 :x: marks a potential source of incompatibility
 
 Documentation
-  * add documentation for several options of `why3 prove` and `why3
-    execute` that were left undocumented so far
   * added documentation for environment variables WHY3LIB and WHY3DATA
-
-Provers
-  * support for CVC5 1.0.0 (released April 6, 2022)
 
 Configuration
   * the libdir and datadir are not anymore stored in the Why3 config
@@ -27,6 +22,31 @@ API
 MLCFG input language
   * attributes on the body of an MLCFG function are now supported
 
+Provers
+  * support for CVC5 1.0.0 (released April 6, 2022)
+
+Version 1.5.1, September 12, 2022
+---------------------------------
+
+Documentation
+  * documented most options of `why3 prove` and `why3 execute`
+
+Python language
+  * added construct `e1 if e2 else e3`
+  * added support for tuples and multiple assignments
+  * added `#@ axiom` and `#@ lemma`
+  * global variables annotated with `#@ constant` are available in the logic
+  * pure functions (i.e., limited to `return e`) annotated with `#@ function`
+    are available in the logic
+  * logical functions can be given a variant with `variant {term}`
+  (contribution by Jean-Paul Bodeveix)
+
+Provers
+  * support for Z3 4.9.0 and 4.9.1 (released July 6, 2022)
+  * support for Z3 4.10.0, 4.10.1 and 4.10.2 (released July 30, 2022)
+  * support for Z3 4.11.0 (released August 18, 2022)
+  * support for Coq 8.16.0 (release September 5, 2022)
+  * support for Gappa 1.4.0 (released April 16, 2022)
 
 Version 1.5.0, April 29, 2022
 -----------------------------

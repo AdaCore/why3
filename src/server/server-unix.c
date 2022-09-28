@@ -155,7 +155,30 @@ void server_accept_client() {
   client->readbuf = init_readbuf(READ_ONCE);
   client->writebuf = init_writebuf(parallel);
   list_append(clients, fd, (void*)client);
+  log_msg("accepted client %d", fd);
   add_to_poll_list(fd, POLLIN);
+}
+
+// Handling of termination
+void sigterm_handler(int sig) {
+  kill_all_processes();
+  shutdown_with_msg("");
+}
+
+void set_sigterm_handler() {
+  struct sigaction sa;
+  sigemptyset (&sa.sa_mask);
+  sa.sa_handler = &sigterm_handler;
+  sa.sa_flags = 0;
+  if (sigaction(SIGTERM, &sa, NULL) == -1) {
+    shutdown_with_msg("error installing signal handler");
+  }
+  if (sigaction(SIGHUP, &sa, NULL) == -1) {
+    shutdown_with_msg("error installing signal handler");
+  }
+  if (sigaction(SIGINT, &sa, NULL) == -1) {
+    shutdown_with_msg("error installing signal handler");
+  }
 }
 
 // The next two functions implement the "self pipe trick". A pipe is used as
@@ -274,10 +297,12 @@ void server_init_listening(char* socketname, int parallel) {
   add_to_poll_list(server_sock, POLLIN);
   init_process_list();
   setup_child_pipe();
+  set_sigterm_handler();
 }
 
 void queue_write(pclient client, char* msgbuf) {
   struct pollfd* entry;
+  log_msg("client %d: sending reply %s", client->fd, msgbuf);
   push_write_data(client->writebuf, msgbuf);
   entry = poll_list_lookup(client->fd);
   if (entry != NULL) {
@@ -318,9 +343,19 @@ pid_t create_process(char* cmd,
     return pid;
   }
 
-  // we are now in the child, we set the ressource limits and execute the
-  // process
+  // we are now in the child process
 
+  // we create a new process group so that possible (grand)children of the
+  // child process can be killed as well
+
+  if (setpgid(0, 0) == -1) {
+    fprintf(stdout, "%s: creation of process group failed (%s)\n",
+            unix_argv[0], strerror(errno));
+
+    exit(1);
+  }
+
+  // we set the resource limits
   if (timelimit > 0) {
     /* set the CPU time limit */
     getrlimit(RLIMIT_CPU,&res);
@@ -498,6 +533,17 @@ void run_request (prequest r) {
   send_started_msg_to_client(client, r->id);
 }
 
+void handle_queue_remove(prequest r) {
+  pclient client = (pclient) list_lookup(clients, r->key);
+  send_msg_to_client(client,
+                     r->id,
+                     0,
+                     0,
+                     false,
+                     "");
+  free(r);
+}
+
 void handle_msg(pclient client, int key) {
   prequest r;
   char* buf;
@@ -528,9 +574,9 @@ void handle_msg(pclient client, int key) {
         break;
       case REQ_INTERRUPT:
         // removes all occurrences of r->id from the queue
-        log_msg("Why3 server: removing id '%s' from queue",r->id);
-        remove_from_queue(r->id);
-        kill_processes(r->id);
+        log_msg("client %d: requested removing id '%s' from queue",client->fd, r->id);
+        remove_from_queue(key, r->id, handle_queue_remove);
+        kill_processes(key, r->id);
         free_request(r);
         break;
       }
@@ -555,6 +601,7 @@ void close_client(pclient client) {
   free_readbuf(client->readbuf);
   free_writebuf(client->writebuf);
   close(client->fd);
+  log_msg("client %d disconnected", client->fd);
   free(client);
   if (single_client && list_is_empty(clients)) {
     shutdown_server();

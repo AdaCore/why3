@@ -109,9 +109,9 @@ module Prover_autodetection_data = struct
                    execs = get_stringl section "exec";
                    version_switch = get_string section ~default:"" "version_switch";
                    version_regexp = get_string section ~default:"" "version_regexp";
-                   versions_ok = reg_map (get_stringl section ~default:[] "version_ok");
-                   versions_old = reg_map (get_stringl section ~default:[] "version_old");
-                   versions_bad = reg_map (get_stringl section ~default:[] "version_bad");
+                   versions_ok = reg_map (get_stringl section "version_ok");
+                   versions_old = reg_map (get_stringl section "version_old");
+                   versions_bad = reg_map (get_stringl section "version_bad");
                    prover_command = get_stringo section "command";
                    prover_command_steps = get_stringo section "command_steps";
                    prover_driver = get_string section ~default:""  "driver";
@@ -201,10 +201,7 @@ module Partial = struct
       let path = get_string section "path" in
       let version = get_string section "version" in
       let shortcut = get_stringo section "shortcut" in
-      let manual =
-        match get_boolo section "manual" with
-        | None -> false
-        | Some b -> b in
+      let manual = get_bool ~default:false section "manual" in
       { name; path; version; shortcut; manual } :: acc
     with MissingField s ->
       Loc.warning "cannot load a %s section: missing field '%s'@." section_name s;
@@ -220,7 +217,7 @@ module Partial = struct
 
   let set_one prover =
     let section = empty_section in
-    let section = set_boolo section "manual" (Some prover.manual) ~default:false in
+    let section = set_bool section "manual" prover.manual ~default:false in
     let section = set_stringo section "shortcut" prover.shortcut in
     let section = set_string section "version" prover.version in
     let section = set_string section "path" prover.path in

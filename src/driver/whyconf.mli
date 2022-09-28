@@ -104,7 +104,8 @@ val running_provers_max: main -> int
 val set_limits: main -> int -> int -> int -> main
 
 val default_editor: main -> string
-(** editor name used when no specific editor known for a prover *)
+(** Editor name used when no specific editor is known for a prover *)
+
 val set_default_editor: main -> string -> main
 
 val plugins : main -> string list
@@ -301,9 +302,11 @@ module User: sig
   val get_section : config -> string -> Rc.section option
   (** [get_section config name] Same as {!Rc.get_section} except name
       must not be "main" *)
+
   val get_simple_family  : config -> string -> Rc.section list
   (** [get_family config name] Same as {!Rc.get_simple_family} except name
       must not be prover *)
+
   val get_family  : config -> string -> Rc.family
   (** [get_family config name] Same as {!Rc.get_family} except name
       must not be prover *)
@@ -311,9 +314,11 @@ module User: sig
   val set_section : config -> string -> Rc.section -> config
   (** [set_section config name] Same as {!Rc.set_section} except name
       must not be "main" *)
+
   val set_simple_family  : config -> string -> Rc.section list  -> config
   (** [set_simple_family config name] Same as {!Rc.set_simple_family} except name
       must not be prover *)
+
   val set_family  : config -> string -> Rc.family  -> config
   (** [set_family config name] Same as {!Rc.set_family} except name
       must not be prover *)

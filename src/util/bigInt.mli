@@ -9,20 +9,20 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Wrapper for big nums, implemented either with OCaml's [Nums] or [ZArith] *)
+(** {1 Wrapper for big nums, implemented either with OCaml's [Nums] or [ZArith]} *)
 
 type t
 [@@deriving sexp_of]
 
 val compare : t -> t -> int
 
-(** constants *)
+(** {2 Constants} *)
 
 val zero : t
 val one : t
 val of_int : int -> t
 
-(** basic operations *)
+(** {2 Basic operations} *)
 
 val succ : t -> t
 val pred : t -> t
@@ -34,7 +34,7 @@ val mul : t -> t -> t
 val minus : t -> t
 val sign : t -> int
 
-(** comparisons *)
+(** {2 Comparisons} *)
 
 val eq : t -> t -> bool
 val lt : t -> t -> bool
@@ -42,10 +42,12 @@ val gt : t -> t -> bool
 val le : t -> t -> bool
 val ge : t -> t -> bool
 
-(** Division and modulo operators with the convention
-that modulo is always non-negative.
+(** {2 Division and modulo operators}
 
-It implies that division rounds down when divisor is positive, and
+{3 Euclidean division}
+
+By convention, the modulo is always non-negative.
+This implies that division rounds down when divisor is positive, and
 rounds up when divisor is negative.
 *)
 
@@ -53,30 +55,33 @@ val euclidean_div_mod : t -> t -> t * t
 val euclidean_div : t -> t -> t
 val euclidean_mod : t -> t -> t
 
-(** "computer" division, i.e division rounds towards zero, and thus [mod
-    x y] has the same sign as x
+(** {3 "Computer" division}
+
+Division rounds toward zero, and thus [mod x y] has the same sign as [x].
 *)
 
 val computer_div_mod : t -> t -> t * t
 val computer_div : t -> t -> t
 val computer_mod : t -> t -> t
 
-(** min, max, abs *)
+(** {2 min, max, abs} *)
 
 val min : t -> t -> t
 val max : t -> t -> t
 val abs : t -> t
 
-(** number of digits *)
+(** {2 Number of digits} *)
 
 val num_digits : t -> int
 
-(** power of small integers. Second arg must be non-negative *)
+(** {2 Power of small integers}
+
+Second argument must be non-negative. *)
 
 val pow_int_pos : int -> int -> t
 val pow_int_pos_bigint : int -> t -> t
 
-(** conversions *)
+(** {2 Conversions} *)
 
 val of_string : string -> t
 val to_string : t -> string
