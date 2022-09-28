@@ -7,7 +7,7 @@
   - Abstract RAC: STUCK (when reaching the end of a loop iteration at "bench/check-ce/attributes.mlw", line 7, characters 2-33)
 File "bench/check-ce/attributes.mlw", line 11, characters 42-49:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Step limit exceeded (0.34s, 3000113 steps).
+Prover result is: Step limit exceeded (0.35s, 3000113 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -348,12 +348,12 @@ File attributes.mlw:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (assertion at "bench/check-ce/attributes.mlw", line 23, characters 11-18)
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/attributes.mlw", line 23, characters 11-18)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to h at "bench/check-ce/attributes.mlw", line 21, characters 2-14)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to h at "bench/check-ce/attributes.mlw", line 21, characters 2-14)
+- Checked model 1: BAD_CE
+  - Concrete RAC: STUCK (failure in postcondition of `h` at "bench/check-ce/attributes.mlw", line 17, characters 12-21)
+  - Abstract RAC: STUCK (failure in postcondition of `h` at "bench/check-ce/attributes.mlw", line 17, characters 12-21)
 File "bench/check-ce/attributes.mlw", line 23, characters 11-18:
 Sub-goal Assertion of goal g'vc.
-Prover result is: Step limit exceeded (0.35s, 3000064 steps).
+Prover result is: Step limit exceeded (0.37s, 3000064 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
