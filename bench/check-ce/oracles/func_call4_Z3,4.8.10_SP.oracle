@@ -2,12 +2,12 @@
 - Selected model 0: NC
   - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call4.mlw", line 11, characters 25-30)
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call4.mlw", line 11, characters 25-30)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to g at "bench/check-ce/func_call4.mlw", line 11, characters 10-14)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to g at "bench/check-ce/func_call4.mlw", line 11, characters 10-14)
+- Checked model 1: BAD_CE
+  - Concrete RAC: STUCK (failure in postcondition of `g` at "bench/check-ce/func_call4.mlw", line 8, characters 12-21)
+  - Abstract RAC: STUCK (failure in postcondition of `g` at "bench/check-ce/func_call4.mlw", line 8, characters 12-21)
 File "bench/check-ce/func_call4.mlw", line 11, characters 25-30:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Step limit exceeded (0.38s, 3000042 steps).
+Prover result is: Step limit exceeded (0.39s, 3000042 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

@@ -6,12 +6,12 @@ Prover result is: Valid (0.01s, 191 steps).
 - Selected model 0: SW
   - Concrete RAC: NORMAL
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call.mlw", line 14, characters 11-16)
-- Checked model 1: INCOMPLETE
+- Checked model 1: BAD_CE
   - Concrete RAC: NORMAL
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to g at "bench/check-ce/func_call.mlw", line 13, characters 2-6)
+  - Abstract RAC: STUCK (failure in postcondition of `g` at "bench/check-ce/func_call.mlw", line 8, characters 12-21)
 File "bench/check-ce/func_call.mlw", line 14, characters 11-16:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Step limit exceeded (0.37s, 3000045 steps).
+Prover result is: Step limit exceeded (0.40s, 3000045 steps).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:
