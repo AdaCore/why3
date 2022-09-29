@@ -224,7 +224,12 @@ let get_decls_and_assertions (decls, assertions) d =
     | Contradiction -> (decls, t_false :: assertions)
     | Formula f -> (decls, f :: assertions)
     | _ -> (decls, assertions))
-  | Dprop (Pgoal, _, f) -> (decls, t_not f :: assertions)
+  | Dprop (Pgoal, _, f) -> (
+    match get_fmla f with
+    | Unsupported -> unsupportedDecl d "dreal: This types of goals are not supported"
+    | Contradiction -> (decls, t_true :: assertions)
+    | Tautology -> (decls, t_false :: assertions)
+    | Formula f -> (decls, t_not f :: assertions))
   | Dprop (Plemma, _, _) -> unsupportedDecl d "dreal: lemmas are not supported"
 
 let print_task args ?old:_ fmt task =
