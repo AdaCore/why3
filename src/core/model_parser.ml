@@ -22,435 +22,6 @@ let debug = Debug.register_info_flag "model_parser"
 
 (*
 ***************************************************************
-**  Counter-example model values
-****************************************************************
-*)
-
-type model_int = { int_value: BigInt.t; int_verbatim: string }
-type model_dec = { dec_int: BigInt.t; dec_frac: BigInt.t; dec_verbatim: string }
-type model_frac = { frac_nom: BigInt.t; frac_den: BigInt.t; frac_verbatim: string }
-type model_bv = { bv_value: BigInt.t; bv_length: int; bv_verbatim: string }
-type model_float_binary = { sign: model_bv; exp: model_bv; mant: model_bv }
-type model_float =
-  | Plus_infinity | Minus_infinity | Plus_zero | Minus_zero | Not_a_number
-  | Float_number of {hex: string option; binary: model_float_binary}
-
-type model_const =
-  | Boolean of bool
-  | String of string
-  | Integer of model_int
-  | Float of model_float
-  | Bitvector of model_bv
-  | Decimal of model_dec
-  | Fraction of model_frac
-
-type model_value =
-  | Const of model_const
-  | Array of model_array
-  | Record of model_record
-  | Proj of model_proj
-  | Apply of string * model_value list
-  | Var of string
-  | Undefined
-  | Unparsed of string
-
-and arr_index = {arr_index_key: model_value; arr_index_value: model_value}
-
-and model_array = {arr_others: model_value; arr_indices: arr_index list}
-
-and model_record = (field_name * model_value) list
-
-and model_proj = proj_name * model_value
-
-and proj_name = string
-
-and field_name = string
-
-let bv_compare v1 v2 = BigInt.compare v1.bv_value v2.bv_value
-
-let float_compare f1 f2 = match f1, f2 with
-  | Float_number {binary= b1}, Float_number {binary= b2} -> (
-      match bv_compare b1.sign b2.sign with
-      | 0 -> (
-          match bv_compare b1.exp b2.exp with
-          | 0 -> bv_compare b1.mant b2.mant
-          | n -> n )
-      | n -> n )
-  | Float_number _, _ -> -1
-  | _, Float_number _ -> 1
-  | f1, f2 -> compare f1 f2
-
-let compare_model_const c1 c2 = match c1, c2 with
-  | Boolean b1, Boolean b2 -> compare b1 b2
-  | Boolean _, _ -> -1 | _, Boolean _ -> 1
-  | String s1, String s2 -> String.compare s1 s2
-  | String _, _ -> -1 | _, String _ -> 1
-  | Integer i1, Integer i2 -> BigInt.compare i1.int_value i2.int_value
-  | Integer _, _ -> -1 | _, Integer _ -> 1
-  | Float f1, Float f2 -> float_compare f1 f2
-  | Float _, _ -> -1 | _, Float _ -> 1
-  | Bitvector v1, Bitvector v2 -> bv_compare v1 v2
-  | Bitvector _, _ -> -1 | _, Bitvector _ -> 1
-  | Decimal d1, Decimal d2 -> (match BigInt.compare d1.dec_int d2.dec_int with 0 -> BigInt.compare d1.dec_frac d2.dec_frac | n -> n)
-  | Decimal _, _ -> -1 | _, Decimal _ -> 1
-  | Fraction f1, Fraction f2 -> (match BigInt.compare f1.frac_nom f2.frac_nom with 0 -> BigInt.compare f1.frac_den f2.frac_den | n -> n)
-
-let rec compare_model_value v1 v2 =
-  match v1, v2 with
-  | Const c1, Const c2 -> compare_model_const c1 c2
-  | Const _, _ -> -1 | _, Const _ -> 1
-  | Array a1, Array a2 ->
-    let c =
-      Lists.compare
-        (fun ai1 ai2 ->
-          let c = compare_model_value ai1.arr_index_key ai2.arr_index_key in
-          if c = 0 then
-            compare_model_value ai1.arr_index_value ai2.arr_index_value
-          else
-            c)
-        a1.arr_indices a2.arr_indices
-    in
-    if c = 0 then
-      compare_model_value a1.arr_others a2.arr_others
-    else
-      c
-  | Array _, _ -> -1 | _, Array _ -> 1
-  | Record r1, Record r2 ->
-    Lists.compare
-      (fun (f1, v1) (f2, v2) ->
-        let c = String.compare f1 f2 in
-        if c = 0 then
-          compare_model_value v1 v2
-        else
-          c)
-      r1 r2
-  | Record _, _ -> -1 | _, Record _ -> 1
-  | Proj (p1, v1), Proj (p2, v2) ->
-    let c = String.compare p1 p2 in
-    if c = 0 then
-      compare_model_value v1 v2
-    else
-      c
-  | Proj _, _ -> -1 | _, Proj _ -> 1
-  | Apply (s1, lv1), Apply (s2, lv2) ->
-    let c = String.compare s1 s2 in
-    if c = 0 then
-      Lists.compare compare_model_value lv1 lv2
-    else
-      c
-  | Apply _, _ -> -1 | _, Apply _ -> 1
-  | Var v1, Var v2 -> String.compare v1 v2
-  | Var _, _ -> -1 | _, Var _ -> 1
-  | Undefined, Undefined -> 0
-  | Undefined, _ -> -1 | _, Undefined -> 1
-  | Unparsed s1, Unparsed s2 -> String.compare s1 s2
-
-let array_create_constant ~value = {arr_others= value; arr_indices= []}
-
-let array_add_element ~array ~index ~value =
-  (*
-     Adds the element value to the array on specified index.
-  *)
-  let arr_index = {arr_index_key= index; arr_index_value= value} in
-  {arr_others= array.arr_others; arr_indices= arr_index :: array.arr_indices}
-
-let pad_with_zeros width s =
-  let filled =
-    let len = width - String.length s in
-    if len <= 0 then "" else String.make len '0' in
-  filled ^ s
-
-(* (-) integer . fractional e (-) exponent *)
-(* ?%d+.%d*E-?%d+ *)
-(* 0X-?%x+.%x*P-?%d+ *)
-
-let float_of_binary binary =
-  try
-    let open BigInt in
-    let {sign; mant; exp} = binary in
-    let exp_bias = pred (pow_int_pos 2 (exp.bv_length - 1)) in
-    let exp_max = pred (pow_int_pos 2 exp.bv_length) in
-    let frac_len = (* Length of the hexadecimal representation (after the ".") *)
-      if mant.bv_length mod 4 = 0
-      then mant.bv_length / 4
-      else (mant.bv_length / 4) + 1 in
-    let is_neg = match to_int sign.bv_value with 0 -> false | 1 -> true | _ -> raise Exit in
-    (* Compute exponent (int) and frac (string of hexa) *)
-    let frac =
-      (* The hex value is used after the decimal point. So we need to adjust
-         it to the number of binary elements there are.
-         Example in 32bits: significand is 23 bits, and the hexadecimal
-         representation will have a multiple of 4 bits (ie 24). So, we need to
-         multiply by two to account the difference. *)
-      if Strings.has_prefix "#b" mant.bv_verbatim then
-        let adjust = 4 - (mant.bv_length mod 4) in
-        if adjust = 4 then
-          mant.bv_value (* No adjustment needed *)
-        else
-          mul (pow_int_pos 2 adjust) mant.bv_value
-      else
-        mant.bv_value in
-    let frac = pad_with_zeros frac_len (Format.sprintf "%x" (to_int frac)) in
-    if eq exp.bv_value zero then (* subnormals and zero *)
-      (* Case for zero *)
-      if eq mant.bv_value zero then
-        if is_neg then Minus_zero else Plus_zero
-      else
-        (* Subnormals *)
-        let hex = Format.asprintf "%t0x0.%sp-%s"
-            (fun fmt -> if is_neg then Pp.string fmt "-")
-            frac (to_string (pred exp_bias)) in
-        Float_number {hex= Some hex; binary}
-    else if eq exp.bv_value exp_max (* infinities and NaN *) then
-      if eq mant.bv_value zero then
-        if is_neg then Minus_infinity else Plus_infinity
-      else Not_a_number
-    else
-      let exp = sub exp.bv_value exp_bias in
-      let hex = Format.asprintf "%t0x1.%sp%s"
-          (fun fmt -> if is_neg then Pp.string fmt "-")
-          frac (to_string exp) in
-      Float_number {hex= Some hex; binary}
-  with Exit ->
-    Float_number {hex= None; binary}
-
-let binary_of_bigint d =
-  let open BigInt in
-  if lt d zero then invalid_arg "bin_of_int";
-  if eq d zero then "0" else
-    let rec loop acc d =
-      if eq d zero then acc else
-        let d, m = computer_div_mod d (of_int 2) in
-        loop (BigInt.to_string m :: acc) d in
-    String.concat "" (loop [] d)
-
-let binary_of_bv bv =
-  let b = binary_of_bigint bv.bv_value in
-  let p = String.make (bv.bv_length-String.length b) '0' in
-  Printf.sprintf "#b%s%s" p b
-
-let debug_force_binary_floats = Debug.register_flag "model_force_binary_floats"
-    ~desc:"Print all floats using bitvectors in JSON output for models"
-
-let convert_float_value f =
-  match f with
-  | Plus_infinity ->
-      Json_base.Record ["cons", Json_base.String "Plus_infinity"]
-  | Minus_infinity ->
-      Json_base.Record ["cons", Json_base.String "Minus_infinity"]
-  | Plus_zero ->
-      Json_base.Record ["cons", Json_base.String "Plus_zero"]
-  | Minus_zero ->
-      Json_base.Record ["cons", Json_base.String "Minus_zero"]
-  | Not_a_number ->
-      Json_base.Record ["cons", Json_base.String "Not_a_number"]
-  | Float_number {binary= {sign; exp; mant}} when Debug.test_flag debug_force_binary_floats ->
-      let m = ("cons", Json_base.String "Float_value") :: [] in
-      let m = ("sign", Json_base.String (binary_of_bv sign)) :: m in
-      let m = ("exponent", Json_base.String (binary_of_bv exp)) :: m in
-      let m = ("significand", Json_base.String (binary_of_bv mant)) :: m in
-      Json_base.Record m
-  | Float_number {hex= Some hex} ->
-      let m = ("cons", Json_base.String "Float_hexa") :: [] in
-      let m = ("str_hexa", Json_base.String hex) :: m in
-      let m = ("value", Json_base.Float (float_of_string hex)) :: m in
-      Json_base.Record m
-  | Float_number {binary= {sign; exp; mant}} ->
-      let m = ("cons", Json_base.String "Float_value") :: [] in
-      let m = ("sign", Json_base.String sign.bv_verbatim) :: m in
-      let m = ("exponent", Json_base.String exp.bv_verbatim) :: m in
-      let m = ("significand", Json_base.String mant.bv_verbatim) :: m in
-      Json_base.Record m
-
-let convert_model_const = function
-  | String s ->
-      let m = ("type", Json_base.String "String") :: [] in
-      let m = ("val", Json_base.String s) :: m in
-      Json_base.Record m
-  | Integer r ->
-      let m = ("type", Json_base.String "Integer") :: [] in
-      let m = ("val", Json_base.String (BigInt.to_string r.int_value)) :: m in
-      Json_base.Record m
-  | Float f ->
-      let m = ("type", Json_base.String "Float") :: [] in
-      let m = ("val", convert_float_value f) :: m in
-      Json_base.Record m
-  | Decimal d ->
-      let m = ("type", Json_base.String "Decimal") :: [] in
-      let m = ("val", Json_base.String (Format.sprintf "%s.%s" (BigInt.to_string d.dec_int) (BigInt.to_string d.dec_frac))) :: m in
-      Json_base.Record m
-  | Fraction f ->
-      let m = ("type", Json_base.String "Fraction") :: [] in
-      let m = ("val", Json_base.String (Format.sprintf "%s/%s" (BigInt.to_string f.frac_nom) (BigInt.to_string f.frac_den))) :: m in
-      Json_base.Record m
-  | Bitvector bv ->
-      let m = ("type", Json_base.String "Integer") :: [] in
-      let m = ("val", Json_base.String (BigInt.to_string bv.bv_value)) :: m in
-      Json_base.Record m
-  | Boolean b ->
-      let m = ("type", Json_base.String "Boolean") :: [] in
-      let m = ("val", Json_base.Bool b) :: m in
-      Json_base.Record m
-
-let rec convert_model_value value : Json_base.json =
-  match value with
-  | Const c -> convert_model_const c
-  | Unparsed s ->
-      let m = ("type", Json_base.String "Unparsed") :: [] in
-      let m = ("val", Json_base.String s) :: m in
-      Json_base.Record m
-  | Array a ->
-      let l = convert_array a in
-      let m = ("type", Json_base.String "Array") :: [] in
-      let m = ("val", Json_base.List l) :: m in
-      Json_base.Record m
-  | Apply (s, lt) ->
-      let lt = List.map convert_model_value lt in
-      let slt =
-        let m = ("list", Json_base.List lt) :: [] in
-        let m = ("apply", Json_base.String s) :: m in
-        Json_base.Record m in
-      let m = ("type", Json_base.String "Apply") :: [] in
-      let m = ("val", slt) :: m in
-      Json_base.Record m
-  | Var v ->
-      Json_base.Record [
-        "type", Json_base.String "Var";
-        "val", Json_base.String v
-      ]
-  | Record r -> convert_record r
-  | Proj p -> convert_proj p
-  | Undefined ->
-      let m = ["type", Json_base.String "Undefined"] in
-      Json_base.Record m
-
-and convert_array a =
-  let m_others = ["others", convert_model_value a.arr_others] in
-  let cmp_ix i1 i2 = compare_model_value i1.arr_index_key i2.arr_index_key in
-  convert_indices (List.sort cmp_ix a.arr_indices) @ [Json_base.Record m_others]
-
-and convert_indices indices =
-  match indices with
-  | [] -> []
-  | index :: tail ->
-      let m = ("indice", convert_model_value index.arr_index_key) :: [] in
-      let m = ("value", convert_model_value index.arr_index_value) :: m in
-      Json_base.Record m :: convert_indices tail
-
-and convert_record r =
-  let m = ["type", Json_base.String "Record"] in
-  let m_field = ["Field", convert_fields r] in
-  let m = ("val", Json_base.Record m_field) :: m in
-  Json_base.Record m
-
-and convert_proj p =
-  let proj_name, value = p in
-  let m = ("type", Json_base.String "Proj") :: [] in
-  let m = ("proj_name", Json_base.String proj_name) :: m in
-  let m = ("value", convert_model_value value) :: m in
-  Json_base.Record m
-
-and convert_fields fields =
-  Json_base.List
-    (List.map
-       (fun (f, v) ->
-         let m = ("field", Json_base.String f) :: [] in
-         let m = ("value", convert_model_value v) :: m in
-         Json_base.Record m)
-       fields)
-
-let print_model_value_sanit fmt v =
-  let v = convert_model_value v in
-  Json_base.print_json fmt v
-
-let print_model_value = print_model_value_sanit
-
-(********************************************)
-(* Print values (as to be displayed in IDE) *)
-(********************************************)
-let print_float_human fmt f =
-  match f with
-  | Plus_infinity -> pp_print_string fmt "+∞"
-  | Minus_infinity -> pp_print_string fmt "-∞"
-  | Plus_zero -> pp_print_string fmt "+0"
-  | Minus_zero -> pp_print_string fmt "-0"
-  | Not_a_number -> pp_print_string fmt "NaN"
-  | Float_number {hex= Some hex} ->
-      fprintf fmt "%s (%g)" hex (float_of_string hex)
-  | Float_number {binary= {sign; exp; mant}} ->
-      fprintf fmt "float_bits(%s,%s,%s)" sign.bv_verbatim exp.bv_verbatim mant.bv_verbatim
-
-let print_integer fmt (i: BigInt.t) =
-  pp_print_string fmt (BigInt.to_string i);
-  if BigInt.(gt (abs i) (of_int 9)) then
-    (* Print hex representation only when it isn't redundant *)
-    fprintf fmt " (%t0X%a)"
-      (fun fmt -> if BigInt.sign i < 0 then pp_print_string fmt "-")
-      (Number.print_in_base 16 None) (BigInt.abs i)
-
-let print_bv fmt (bv : model_bv) =
-  (* TODO Not implemented yet. Ideally, fix the differentiation made in the
-     parser between Bv_int and Bv_sharp -> convert Bv_int to Bitvector not
-     Integer. And print Bv_int exactly like Bv_sharp.
-  *)
-  pp_print_string fmt bv.bv_verbatim
-
-let print_model_const_human fmt = function
-  | String s -> Constant.print_string_def fmt s
-  | Integer i -> print_integer fmt i.int_value
-  | Decimal d -> fprintf fmt "%s.%s" (BigInt.to_string d.dec_int) (BigInt.to_string d.dec_frac)
-  | Fraction f -> fprintf fmt "%s/%s" (BigInt.to_string f.frac_nom) (BigInt.to_string f.frac_den)
-  | Float f -> print_float_human fmt f
-  | Boolean b -> fprintf fmt "%b" b
-  | Bitvector s -> print_bv fmt s
-
-let rec print_array_human fmt (arr : model_array) =
-  let print_others fmt v =
-    fprintf fmt "@[others =>@ %a@]" print_model_value_human v in
-  let print_key_val fmt arr =
-    let {arr_index_key= key; arr_index_value= v} = arr in
-    fprintf fmt "@[%a =>@ %a@]" print_model_value_human key
-      print_model_value_human v in
-  let sort_ix i1 i2 = compare_model_value i1.arr_index_key i2.arr_index_key in
-  fprintf fmt "@[(%a%a)@]"
-    (Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.comma ~sep:Pp.comma
-       print_key_val)
-    (List.sort sort_ix arr.arr_indices) print_others arr.arr_others
-
-and print_record_human fmt r =
-  match r with
-  | [(_, value)] ->
-      (* Special pretty printing for record with only one element *)
-      print_model_value_human fmt value
-  | _ ->
-      fprintf fmt "@[<hv1>%a@]"
-        (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi
-           (fun fmt (f, v) ->
-             fprintf fmt "@[%s =@ %a@]" f print_model_value_human v))
-        r
-
-and print_proj_human fmt p =
-  let s, v = p in
-  fprintf fmt "@[{%s =>@ %a}@]" s print_model_value_human v
-
-and print_model_value_human fmt (v : model_value) =
-  match v with
-  | Const c -> print_model_const_human fmt c
-  | Apply (s, []) -> pp_print_string fmt s
-  | Apply (s, lt) ->
-      fprintf fmt "@[(%s@ %a)@]" s
-        (Pp.print_list Pp.space print_model_value_human)
-        lt
-  | Array arr -> print_array_human fmt arr
-  | Record r -> print_record_human fmt r
-  | Proj p -> print_proj_human fmt p
-  | Var v -> pp_print_string fmt v
-  | Undefined -> pp_print_string fmt "UNDEFINED"
-  | Unparsed s -> pp_print_string fmt s
-
-
-(*
-***************************************************************
 **  Model elements
 ***************************************************************
 *)
@@ -596,11 +167,11 @@ let search_model_element_call_result model call_id loc =
 let cmp_attrs a1 a2 =
   String.compare a1.attr_string a2.attr_string
 
-let print_model_element ?(print_locs=false) ~print_attrs ~print_model_value ~me_name_trans fmt m_element =
+let print_model_element ?(print_locs=false) ~print_attrs ~me_name_trans fmt m_element =
   match m_element.me_name.men_kind with
   | Error_message -> pp_print_string fmt m_element.me_name.men_name
   | _ ->
-      fprintf fmt "@[<hv2>@[<hov2>%s%t =@]@ %a@]" (me_name_trans m_element.me_name)
+      fprintf fmt "@[<hv2>@[<hov2>%s%t :@]@ %a = %a@]" (me_name_trans m_element.me_name)
         (fun fmt ->
            if print_attrs then
              fprintf fmt " %a" Pp.(print_list space Pretty.print_attr)
@@ -609,7 +180,8 @@ let print_model_element ?(print_locs=false) ~print_attrs ~print_model_value ~me_
              fprintf fmt " (%a)"
                (Pp.print_option_or_default "NO LOC" Pretty.print_loc_as_attribute)
                m_element.me_location)
-        print_model_value m_element.me_value
+        (Pp.print_option (Pretty.print_ty)) m_element.me_value.t_ty
+        (Pretty.print_term) m_element.me_value
 
 let find_call_id = Ident.search_attribute_value Ident.get_call_id_value
 
@@ -631,16 +203,16 @@ let rec filter_duplicated l =
   | me :: l -> me :: filter_duplicated l
 
 let print_model_elements ~filter_similar ~print_attrs ?(sep = Pp.newline)
-    ~print_model_value ~me_name_trans fmt m_elements =
+    ~me_name_trans fmt m_elements =
   let m_elements =
     if filter_similar then filter_duplicated m_elements else m_elements in
   fprintf fmt "@[%a@]"
     (Pp.print_list sep
-       (print_model_element ?print_locs:None ~print_attrs ~print_model_value
+       (print_model_element ?print_locs:None ~print_attrs
           ~me_name_trans))
     m_elements
 
-let print_model_file ~filter_similar ~print_attrs ~print_model_value ~me_name_trans fmt (filename, model_file) =
+let print_model_file ~filter_similar ~print_attrs ~me_name_trans fmt (filename, model_file) =
   (* Relativize does not work on nighly bench: using basename instead. It
      hides the local paths. *)
   let filename = Filename.basename filename in
@@ -651,7 +223,7 @@ let print_model_file ~filter_similar ~print_attrs ~print_model_value ~me_name_tr
     let m_elements = List.sort cmp m_elements in
     fprintf fmt "  @[<v 2>Line %d:@ %a@]" line
       (print_model_elements ~filter_similar ?sep:None ~print_attrs
-         ~print_model_value ~me_name_trans) m_elements in
+         ~me_name_trans) m_elements in
   fprintf fmt "@[<v 0>File %s:@ %a@]" filename
     Pp.(print_list space pp) (Mint.bindings model_file)
 
@@ -669,15 +241,15 @@ let why_name_trans men =
   | Loop_before | Error_message | Other -> name
 
 let print_model ~filter_similar ~print_attrs ?(me_name_trans = why_name_trans)
-    ~print_model_value fmt model =
-  Pp.print_list Pp.newline (print_model_file ~filter_similar ~print_attrs ~print_model_value ~me_name_trans)
+    fmt model =
+  Pp.print_list Pp.newline (print_model_file ~filter_similar ~print_attrs ~me_name_trans)
     fmt (Mstr.bindings model.model_files)
 
 let print_model_human ?(filter_similar = true) ?(me_name_trans = why_name_trans) fmt model =
-  print_model ~filter_similar ~me_name_trans ~print_model_value:(Pretty.print_term) fmt model
+  print_model ~filter_similar ~me_name_trans fmt model
 
 let print_model ?(filter_similar = true) ?(me_name_trans = why_name_trans) ~print_attrs fmt model =
-  print_model ~filter_similar ~print_attrs ~me_name_trans ~print_model_value:(Pretty.print_term) fmt model
+  print_model ~filter_similar ~print_attrs ~me_name_trans fmt model
 
 let get_model_file model filename =
   Mstr.find_def empty_model_file filename model
@@ -728,7 +300,7 @@ let interleave_line ~filename:_ ~print_attrs start_comment end_comment
     let cntexmp_line =
       asprintf "@[<h 0>%s%s%a%s@]" (get_padding line) start_comment
         (print_model_elements ~filter_similar:true ~sep:Pp.semi
-           ~print_attrs ~print_model_value:(Pretty.print_term) ~me_name_trans)
+           ~print_attrs ~me_name_trans)
         model_elements end_comment in
     (* We need to know how many lines will be taken by the counterexample. This
        is ad hoc as we don't really know how the lines are split in IDE. *)
@@ -1123,14 +695,14 @@ type raw_model_parser = printing_info -> string -> model_element list
 let debug_elements elts =
   let me_name_trans men = men.men_name in
   let print_elements = print_model_elements ~sep:Pp.semi ~print_attrs:true
-      ~me_name_trans ~filter_similar:false ~print_model_value:(Pretty.print_term) in
+      ~me_name_trans ~filter_similar:false in
   Debug.dprintf debug "@[<v>Elements:@ %a@]@." print_elements elts;
   elts
 
 let debug_files desc files =
   let me_name_trans men = men.men_name in
   let print_file = print_model_file ~filter_similar:false ~print_attrs:true
-      ~print_model_value:(Pretty.print_term) ~me_name_trans in
+      ~me_name_trans in
    Debug.dprintf debug "@[<v>Files %s:@ %a@]@." desc
      (Pp.print_list Pp.newline print_file) (Mstr.bindings files);
    files

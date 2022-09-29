@@ -213,27 +213,6 @@ let get_or_stuck loc env ity desc = function
       let cntr_ctx = mk_cntr_ctx env ~desc ~giant_steps:None Vc.expl_pre in
       stuck ?loc cntr_ctx "%s" desc
 
-let import_model_const ity = function
-  | Integer {int_value= v} | Bitvector {bv_value= v} ->
-      if ity_equal ity ity_int then
-        int_value v
-      else if is_range_ty (ty_of_ity ity) then
-        range_value ity v
-      else
-        cannot_import "type %a instead of int or range type" print_ity ity
-  | String s ->
-      if ity_equal ity ity_str then
-        string_value s
-      else
-        cannot_import "type %a instead of string" print_ity ity
-  | Boolean b ->
-      if ity_equal ity ity_bool then
-        bool_value b
-      else
-        cannot_import "type %a instead of bool" print_ity ity
-  | Decimal _ | Fraction _ | Float _ as v ->
-      cannot_import "not implemented for value %a" print_model_const_human v
-
 (** Import a value from the prover model to an interpreter value.
 
     @raise Exit when the type [ity] and the shape of the the value [v] do not
@@ -729,6 +708,7 @@ let select_model ?timelimit ?steplimit ?verb_lvl ?compute_term ~check_ce
 
 (** Transformations interpretation log and prover models *)
 
+(* TODO_WIP
 let rec model_value v =
   let open Value in
   let id_name {id_string= name; id_attrs= attrs} =
@@ -761,6 +741,7 @@ let rec model_value v =
   | Vreal _ | Vfloat _ | Vfloat_mode _
   | Vfun _ | Vpurefun _ | Vterm _ | Vundefined ->
       failwith "Cannot convert interpreter value to model value"
+*)
 
 (** Transform an interpretation log into a prover model.
     TODO fail if the log doesn't fail at the location of the original model *)
