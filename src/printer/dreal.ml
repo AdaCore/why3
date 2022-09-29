@@ -102,7 +102,7 @@ let rec print_term fmt t =
   | Tapp ({ ls_name = id; ls_value = Some ty }, [])
     when Ty.ty_equal ty Ty.ty_int || Ty.ty_equal ty Ty.ty_real ->
     fprintf fmt "%a" print_ident id
-  | Tapp (ls, []) -> () (* We can ignore *)
+  | Tapp ({ ls_name = id }, []) -> fprintf fmt "%a" print_ident id
   | Tapp (ls, tl) -> (
     match query_syntax !info.info_syn ls.ls_name with
     | Some s -> syntax_arguments s print_term fmt tl
@@ -192,9 +192,18 @@ let rec get_fmla f =
     | Contradiction -> Tautology
     | Formula f -> Formula (t_not f))
   | Tapp (ls, [ t1; t2 ]) -> (
-    match query_syntax !info.info_syn ls.ls_name with
-    | Some s -> Formula f
-    | None -> Unsupported)
+    if ls_equal ls ps_equ then
+      match t1.t_ty with
+      | Some ty ->
+        if not (Ty.ty_equal ty Ty.ty_int || Ty.ty_equal ty Ty.ty_real) then
+          Unsupported
+        else
+          Formula f
+      | None -> Formula f
+    else
+      match query_syntax !info.info_syn ls.ls_name with
+      | Some s -> Formula f
+      | None -> Unsupported)
   | _ -> Unsupported
 
 let get_decls_and_assertions (decls, assertions) d =
