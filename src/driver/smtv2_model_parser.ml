@@ -837,11 +837,7 @@ let parse pinfo input =
         (Mstr.values
           (Mstr.mapi
             (fun n ((ls,oloc,attrs),t) ->
-              let attrs = Mstr.find_def Ident.Sattr.empty n pinfo.Printer.set_str in
-              let name = ls.ls_name.id_string in
-              (* TODO_WIP parameter [name] because already
-                 available with [lsymbol]?
-                 Or the name should be something else? *)
+              let name = Ident.get_model_trace_string ~name:(ls.ls_name.id_string) ~attrs in
               Model_parser.create_model_element
                 ~name ~value:t ~oloc ~lsymbol:ls ~attrs)
             terms))
