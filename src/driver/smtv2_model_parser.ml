@@ -691,7 +691,11 @@ module FromModelToTerm = struct
     | Tif (b,t1,t2) -> (
       match (eval_term eval_var ty_coercions b).t_node with
       | Ttrue -> eval_term eval_var ty_coercions t1
-      | _ -> eval_term eval_var ty_coercions t2
+      | Tfalse -> eval_term eval_var ty_coercions t2
+      | _ ->
+        let t1 = eval_term eval_var ty_coercions t1 in
+        let t2 = eval_term eval_var ty_coercions t2 in
+        t_if b t1 t2
     )
     | _ -> t
 
