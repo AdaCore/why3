@@ -310,9 +310,14 @@ module FromSexpToModel = struct
         end
     | _ -> error sexp "array"
 
+  let rec dt_selectors = function
+    | [] -> []
+    | List [ s1; s2] :: tl -> (symbol s1, sort s2) :: dt_selectors tl
+    | _ :: tl -> dt_selectors tl (* TODO_WIP print warning *)
+
   let rec dt_symbols = function
     | [] -> []
-    | List (Atom n :: _) :: tl -> n :: dt_symbols tl
+    | List (Atom n :: selectors) :: tl -> (n, dt_selectors selectors) :: dt_symbols tl
     | _ :: tl -> dt_symbols tl (* TODO_WIP print warning *)
 
   let dt_decl : sexp -> datatype_decl option = function
@@ -440,8 +445,8 @@ module FromModelToTerm = struct
     | Qident (Isymbol n) -> (
         try List.find (fun vs -> String.equal n vs.vs_name.id_string) env.vs
         with Not_found ->
-          let search_datatype (s, symbols) =
-            match List.find_opt (fun n' -> String.equal n n') symbols with
+          let search_datatype (s, constructors) =
+            match List.find_opt (fun (n',_) -> String.equal n n') constructors with
             | None -> None
             | Some n' -> Some (smt_sort_to_ty env s)
           in
@@ -511,8 +516,8 @@ module FromModelToTerm = struct
           with _ ->
             error "TODO_WIP apply_to_term error with types of arguments"
         in
-        let search_datatype (s, symbols) =
-          match List.find_opt (fun n' -> String.equal n n') symbols with
+        let search_datatype (s, constructors) =
+          match List.find_opt (fun (n',_) -> String.equal n n') constructors with
           | None -> None
           | Some n' -> Some (smt_sort_to_ty env s)
         in

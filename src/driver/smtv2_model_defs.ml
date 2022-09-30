@@ -64,7 +64,9 @@ and array_elements = {
 }
 
 type function_def = (symbol * sort) list * sort * term
-type datatype_decl = sort * symbol list
+type selector_decl = symbol * sort
+type constructor_decl = symbol * selector_decl list
+type datatype_decl = sort * constructor_decl list
 
 open Format
 
@@ -161,7 +163,15 @@ let print_function_def fmt (args, res, body) =
     Pp.(print_list space print_function_arg)
     args print_sort res print_term body
 
-let print_datatype_decl fmt (dt_sort, dt_symbols) =
-  fprintf fmt "@[<hv2>(Datatype %a: %a)@]" print_sort dt_sort
-    (Pp.print_list Pp.space Pp.string)
-    dt_symbols
+let print_selector_decl fmt (symbol, sort) =
+  fprintf fmt "@[<hv2>(%s %a)@]" symbol print_sort sort
+
+let print_constructor_decl fmt (symbol, list_of_selectors) =
+  fprintf fmt "@[<hv2>(%s : %a)@]" symbol
+    Pp.(print_list space print_selector_decl)
+    list_of_selectors
+
+let print_datatype_decl fmt (sort, list_of_constructors) =
+  fprintf fmt "@[<hv2>(Datatype %a: %a)@]" print_sort sort
+    (Pp.print_list Pp.space print_constructor_decl)
+    list_of_constructors
