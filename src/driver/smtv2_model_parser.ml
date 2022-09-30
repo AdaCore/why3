@@ -581,6 +581,9 @@ module FromModelToTerm = struct
       (Debug.dprintf debug "[interpret_fun_def_to_term] ls.ls_args = %a@."
          Pretty.print_ty)
       ls.ls_args;
+    Debug.dprintf debug "[interpret_fun_def_to_term] attrs = %a@."
+      Pretty.print_attrs
+      attrs;
     (* Compute known type symbol variables from [ls] *)
     let tys =
       let types_in_ls =
@@ -746,17 +749,23 @@ module FromModelToTerm = struct
       dt_decls;
     let qterms = pinfo.queried_terms in
     Mstr.iter
-      (fun key (ls, _, _) ->
-        Debug.dprintf debug "[queried_terms] key = %s, ls = %a@." key
-          Pretty.print_ls ls)
+      (fun key (ls, _, attrs) ->
+        Debug.dprintf debug "[queried_terms] key = %s, ls = %a, ls.ls_value = %a@." key
+          Pretty.print_ls ls
+          (Pp.print_option Pretty.print_ty) ls.ls_value;
+        Debug.dprintf debug "[queried_terms] key = %s, attr = %a@." key
+          Pretty.print_attrs attrs)
       qterms;
     let records = pinfo.list_records in
     Mstr.iter
       (fun key l ->
         List.iter
           (fun finfo ->
-            Debug.dprintf debug "[list_records] key = %s, field_info = %s@."
-              key finfo.Printer.field_name)
+            Debug.dprintf debug "[list_records] key = %s, field_info_name = %s, field_info_trace = %s, field_info_ident = %a@."
+              key
+              finfo.Printer.field_name
+              finfo.Printer.field_trace
+              (Pp.print_option Pretty.print_id_attrs) finfo.Printer.field_ident)
           l)
       records;
     let fields = pinfo.list_fields in
@@ -771,6 +780,10 @@ module FromModelToTerm = struct
         Debug.dprintf debug "[list_projections] key = %s, field = %s@."
           key f.Ident.id_string)
       projections;
+    let noarg_constructors = pinfo.noarg_constructors in
+    List.iter
+      (Debug.dprintf debug "[noarg_constructors] s = %s@.")
+      noarg_constructors;
     let env = { vs = []; dt = dt_decls; tys = [] } in
     let terms =
       Mstr.mapi_filter
