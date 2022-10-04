@@ -140,6 +140,35 @@ let get_arg : type t. t vtype -> _ -> _ -> t = fun t rs v ->
   | _, Vundefined ->
       incomplete "an undefined argument was passed to builtin %a"
         Ident.print_decoded rs.rs_name.id_string
+  | VTint, Vterm vt when (Opt.equal Ty.ty_equal vt.t_ty (Some Ty.ty_int)) ->
+      begin match vt.t_node with
+      | Tconst (Constant.ConstInt c) -> BigInt.to_int c.il_int
+      | _ -> assert false
+      end
+  | VTnum, Vterm vt when (Opt.equal Ty.ty_equal vt.t_ty (Some Ty.ty_int)) ->
+      begin match vt.t_node with
+      | Tconst (Constant.ConstInt c) -> c.il_int
+      | _ -> assert false
+      end
+  (* TODO_WIP *)
+  (*
+  | VTreal, Vterm vt when (Opt.equal Ty.ty_equal vt.t_ty (Some Ty.ty_real)) ->
+      begin match vt.t_node with
+      | Tconst (Constant.ConstReal c) -> ???
+      | _ -> assert false
+      end
+  *)
+  | VTbool, Vterm vt when (Opt.equal Ty.ty_equal vt.t_ty (Some Ty.ty_bool)) ->
+      begin match vt.t_node with
+      | Ttrue -> true
+      | Tfalse -> false
+      | _ -> assert false
+      end
+  | VTstring, Vterm vt when (Opt.equal Ty.ty_equal vt.t_ty (Some Ty.ty_str)) ->
+      begin match vt.t_node with
+      | Tconst (Constant.ConstStr s) -> s
+      | _ -> assert false
+      end
   | _ -> assert false
 
 let rec eval : type t. t vtype -> t -> _ -> _ list -> _ = fun t f rs l ->
@@ -1609,6 +1638,7 @@ let exec_global_fundef ctx locals rdl e =
 let exec_rs ctx rs =
   get_builtin_progs ctx.env.why_env ;
   with_limits @@ fun () ->
+  Debug.dprintf debug_rac_values "exec_rs with rs = %a@." print_rs rs;
   let get_value env pv = get_and_register_param env pv.pv_vs.vs_name pv.pv_ity in
   let ctx = bind_globals ~rs_main:rs ctx in
   let ctx =

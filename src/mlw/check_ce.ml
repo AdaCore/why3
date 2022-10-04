@@ -221,15 +221,32 @@ let get_or_stuck loc env ity desc = function
 
     @raise CannotImportModelValue when the value cannot be imported *)
 let rec import_model_value loc env check known th_known ity t =
-  (*
-  let ts, l1, l2 = ity_components ity in
-  let subst = its_match_regs ts l1 l2 in
-  let def = Pdecl.find_its_defn known ts in
-  *)
+  Debug.dprintf debug_check_ce_rac_results "[import_model_value] ity = %a@."
+    Ity.print_ity ity;
+  Debug.dprintf debug_check_ce_rac_results "[import_model_value] t = %a, t.t_ty = %a@."
+    Pretty.print_term t
+    (Pp.print_option Pretty.print_ty) t.t_ty;
+  Debug.dprintf debug_check_ce_rac_results "[import_model_value] t.t_attrs = %a@."
+    Pretty.print_attrs t.t_attrs;
   let res = match t.t_node with
   | Tvar _ -> undefined_value env ity
-  | _ -> term_value ity t
-  in
+  | _ when Opt.equal Ty.ty_equal (Some (ty_of_ity ity)) t.t_ty -> term_value ity t
+  | _ ->
+    (* [ity] and the type of [t] may not match for the following reason:
+       - [t] is actually the content of a reference (i.e. a record with a single field) *)
+    let ts, l1, l2 = ity_components ity in
+    let subst = its_match_regs ts l1 l2 in
+    let def = Pdecl.find_its_defn known ts in
+    match def.Pdecl.itd_constructors, def.Pdecl.itd_fields with
+      | [rs], [field_rs] ->
+        let field_ity = ity_full_inst subst (fd_of_rs field_rs).pv_ity in
+        constr_value ity rs [field_rs] [term_value field_ity t]
+      | _ ->
+        cannot_import "type with not exactly one constructor and one field: %a/%d, %a/%d"
+          print_its ts (List.length def.Pdecl.itd_constructors)
+          print_its ts (List.length def.Pdecl.itd_fields) in
+  Debug.dprintf debug_check_ce_rac_results "[import_model_value] res = %a@."
+    Pinterp_core.print_value res;
   check ity res;
   res
   (*
