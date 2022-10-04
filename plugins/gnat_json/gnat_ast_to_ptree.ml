@@ -1284,7 +1284,21 @@ let rec mk_declaration (node : declaration_id) =
   | Axiom r ->
       let id = mk_ident_of_symbol node.info.id ~notation:None [mk_str "useraxiom"] r.name in
       let body = mk_term_of_pred r.def in
-      [D.mk_prop Decl.Paxiom id body]
+      let meta =
+        match r.dep with
+        | None -> []
+        | Some x ->
+          let Axiom_dep axr = x.desc in
+          let dep_id = mk_qualid (mk_idents_of_identifier ~notation:None [] axr.name) in
+          let meta_id = mk_ident [] "remove_unused:dependency" in
+          let meta_arg = 
+            match axr.kind with
+            | Axdep_func -> Why3.Ptree.Mfs dep_id
+            | Axdep_pred -> Why3.Ptree.Mps dep_id in
+          [ D.mk_meta meta_id
+            [Why3.Ptree.Max (mk_qualid [id]); meta_arg ] ]
+      in
+      D.mk_prop Decl.Paxiom id body :: meta
   | Goal r ->
       let id = mk_ident_of_symbol node.info.id ~notation:None [] r.name in
       let body = mk_term_of_pred r.def in

@@ -75,6 +75,10 @@ type assert_kind =
   | Check
   | Assume
 
+type axiom_dep_kind =
+  | Axdep_func
+  | Axdep_pred
+
 type 'a nonempty = { elt0: 'a; elts: 'a list }
 
 let list_of_nonempty n = n.elt0 :: n.elts
@@ -91,6 +95,7 @@ type record_definition_tag = [`Record_definition]
 type range_type_definition_tag = [`Range_type_definition]
 type triggers_tag = [`Triggers]
 type trigger_tag = [`Trigger]
+type axiom_dep_tag = [`Axiom_dep]
 type handler_tag = [`Handler]
 type field_association_tag = [`Field_association]
 type variant_tag = [`Variant]
@@ -282,6 +287,7 @@ type any_node_tag = [
  | `Range_type_definition
  | `Triggers
  | `Trigger
+ | `Axiom_dep
  | `Handler
  | `Field_association
  | `Variant
@@ -352,6 +358,7 @@ and 'a why_node_desc =
   | Range_type_definition : {first: uint; last: uint} -> [> range_type_definition_tag] why_node_desc
   | Triggers : {triggers: trigger_list} -> [> triggers_tag] why_node_desc
   | Trigger : {terms: expr_list} -> [> trigger_tag] why_node_desc
+  | Axiom_dep : {name: identifier_id; kind: axiom_dep_kind} -> [> axiom_dep_tag] why_node_desc
   | Handler : {name: name_id; arg: prog_oid; def: prog_id} -> [> handler_tag] why_node_desc
   | Field_association : {field: identifier_id; value: expr_id} -> [> field_association_tag] why_node_desc
   | Variant : {cmp_op: identifier_id; labels: symbol_set; expr: term_id} -> [> variant_tag] why_node_desc
@@ -391,7 +398,7 @@ and 'a why_node_desc =
   | Raise : {name: name_id; exn_type: type_oid; typ: type_oid} -> [> raise_tag] why_node_desc
   | Try_block : {prog: prog_id; handler: handler_list; typ: type_oid} -> [> try_block_tag] why_node_desc
   | Function_decl : {name: identifier_id; binders: binder_olist; effects: effects_oid; pre: pred_oid; post: pred_oid; return_type: type_oid; def: expr_oid; labels: symbol_set; location: source_ptr} -> [> function_decl_tag] why_node_desc
-  | Axiom : {name: symbol; def: pred_id} -> [> axiom_tag] why_node_desc
+  | Axiom : {name: symbol; def: pred_id; dep: axiom_dep_oid} -> [> axiom_tag] why_node_desc
   | Goal : {name: symbol; def: pred_id} -> [> goal_tag] why_node_desc
   | Type_decl : {args: identifier_olist; name: name_id; labels: symbol_set; definition: type_definition_oid} -> [> type_decl_tag] why_node_desc
   | Global_ref_declaration : {name: identifier_id; ref_type: type_id; labels: symbol_set; location: source_ptr} -> [> global_ref_declaration_tag] why_node_desc
@@ -460,6 +467,11 @@ and trigger_oid = trigger_tag why_node_oid
 and trigger_olist = trigger_tag why_node_olist
 and trigger_id = trigger_tag why_node_id
 and trigger_list = trigger_tag why_node_list
+
+and axiom_dep_oid = axiom_dep_tag why_node_oid
+and axiom_dep_olist = axiom_dep_tag why_node_olist
+and axiom_dep_id = axiom_dep_tag why_node_id
+and axiom_dep_list = axiom_dep_tag why_node_list
 
 and handler_oid = handler_tag why_node_oid
 and handler_olist = handler_tag why_node_olist
@@ -805,6 +817,11 @@ let trigger_coercion (node : any_node_tag why_node) : trigger_tag why_node =
   match node.desc with
   | Trigger _ as desc -> {info=node.info; desc}
   | _ -> invalid_arg "trigger_coercion"
+
+let axiom_dep_coercion (node : any_node_tag why_node) : axiom_dep_tag why_node =
+  match node.desc with
+  | Axiom_dep _ as desc -> {info=node.info; desc}
+  | _ -> invalid_arg "axiom_dep_coercion"
 
 let handler_coercion (node : any_node_tag why_node) : handler_tag why_node =
   match node.desc with
@@ -1219,6 +1236,7 @@ let any_node_coercion (node : any_node_tag why_node) : any_node_tag why_node =
   | Range_type_definition _ as desc -> {info=node.info; desc}
   | Triggers _ as desc -> {info=node.info; desc}
   | Trigger _ as desc -> {info=node.info; desc}
+  | Axiom_dep _ as desc -> {info=node.info; desc}
   | Handler _ as desc -> {info=node.info; desc}
   | Field_association _ as desc -> {info=node.info; desc}
   | Variant _ as desc -> {info=node.info; desc}
@@ -1401,6 +1419,11 @@ module From_json = struct
     | `Int 2 -> Assume
     | json -> unexpected_json "assert_kind" json
 
+  let axiom_dep_kind_from_json : axiom_dep_kind from_json = function
+    | `Int 0 -> Axdep_func
+    | `Int 1 -> Axdep_pred
+    | json -> unexpected_json "axiom_dep_kind" json
+
   let rec why_node_from_json : 'a why_node from_json = function
     | `List [`String "W_TYPE"; id; node; domain; link; checked; type_kind; name; is_mutable; relaxed_init] ->
       let info = {
@@ -1533,6 +1556,19 @@ module From_json = struct
       } in
       let desc = Trigger {
         terms = expr_opaque_list_from_json terms;
+      } in
+      {info; desc}
+    | `List [`String "W_AXIOM_DEP"; id; node; domain; link; checked; name; kind] ->
+      let info = {
+        id = int_from_json id;
+        node = node_id_from_json node;
+        domain = domain_from_json domain;
+        link = why_node_set_from_json link;
+        checked = boolean_from_json checked;
+      } in
+      let desc = Axiom_dep {
+        name = identifier_opaque_id_from_json name;
+        kind = axiom_dep_kind_from_json kind;
       } in
       {info; desc}
     | `List [`String "W_HANDLER"; id; node; domain; link; checked; name; arg; def] ->
@@ -2078,7 +2114,7 @@ module From_json = struct
         location = source_ptr_from_json location;
       } in
       {info; desc}
-    | `List [`String "W_AXIOM"; id; node; domain; link; checked; name; def] ->
+    | `List [`String "W_AXIOM"; id; node; domain; link; checked; name; def; dep] ->
       let info = {
         id = int_from_json id;
         node = node_id_from_json node;
@@ -2089,6 +2125,7 @@ module From_json = struct
       let desc = Axiom {
         name = symbol_from_json name;
         def = pred_opaque_id_from_json def;
+        dep = axiom_dep_opaque_oid_from_json dep;
       } in
       {info; desc}
     | `List [`String "W_GOAL"; id; node; domain; link; checked; name; def] ->
@@ -2335,6 +2372,11 @@ module From_json = struct
   and trigger_opaque_olist_from_json json =  why_node_olist_from_json trigger_coercion json
   and trigger_opaque_id_from_json json =  why_node_id_from_json trigger_coercion json
   and trigger_opaque_list_from_json json =  why_node_list_from_json trigger_coercion json
+
+  and axiom_dep_opaque_oid_from_json json =  why_node_oid_from_json axiom_dep_coercion json
+  and axiom_dep_opaque_olist_from_json json =  why_node_olist_from_json axiom_dep_coercion json
+  and axiom_dep_opaque_id_from_json json =  why_node_id_from_json axiom_dep_coercion json
+  and axiom_dep_opaque_list_from_json json =  why_node_list_from_json axiom_dep_coercion json
 
   and handler_opaque_oid_from_json json =  why_node_oid_from_json handler_coercion json
   and handler_opaque_olist_from_json json =  why_node_olist_from_json handler_coercion json

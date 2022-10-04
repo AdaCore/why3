@@ -65,6 +65,11 @@ let pp_assert_kind fmt (k : Gnat_ast.assert_kind) =
   | Check -> Format.fprintf fmt "check"
   | Assume -> Format.fprintf fmt "assume"
 
+let pp_axiom_dep_kind fmt (k : Gnat_ast.axiom_dep_kind) =
+  match k with
+  | Axdep_func -> Format.fprintf fmt "function"
+  | Axdep_pred -> Format.fprintf fmt "predicate"
+
 let get_infix name args =
   match name.desc with
   | Identifier { name = { desc = Name { infix = true }}} ->
@@ -91,6 +96,7 @@ let rec pp_why_node : type a . Format.formatter -> a why_node -> unit =
   | { desc = Range_type_definition _ } as n -> pp_range_type_definition fmt n
   | { desc = Triggers _ } as n -> pp_triggers fmt n
   | { desc = Trigger _ } as n -> pp_trigger fmt n
+  | { desc = Axiom_dep _ } as n -> pp_axiom_dep fmt n
   | { desc = Handler _ } as n -> pp_handler fmt n
   | { desc = Field_association _ } as n -> pp_field_association fmt n
   | { desc = Variant _ } as n -> pp_variant fmt n
@@ -197,10 +203,18 @@ and pp_module fmt (n : module_id) =
     if r.file = No_symbol then Format.fprintf fmt "%a" pp_symbol r.name
     else Format.fprintf fmt "%a.%a" pp_symbol r.file pp_symbol r.name
 
+and pp_axiom_dep fmt (n : axiom_dep_id) =
+  match n.desc with
+  | Axiom_dep r ->
+    Format.fprintf fmt "%a %a" pp_axiom_dep_kind r.kind pp_why_node r.name
+
 and pp_axiom fmt (n : axiom_id) =
   match n.desc with
   | Axiom r ->
-    Format.fprintf fmt "axiom %a : @[<hov 2>%a@]" pp_symbol r.name pp_why_node r.def
+    Format.fprintf fmt "axiom %a (%a) : @[<hov 2>%a@]"
+      pp_symbol r.name
+      pp_why_node_option r.dep
+      pp_why_node r.def
 
 and pp_goal fmt (n : goal_id) =
   match n.desc with
