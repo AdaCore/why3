@@ -67,9 +67,6 @@ and array_elements = {
 }
 
 type function_def = (symbol * sort) list * sort * term
-type selector_decl = symbol * sort
-type constructor_decl = symbol * selector_decl list
-type datatype_decl = sort * constructor_decl list
 
 val print_index : Format.formatter -> index -> unit
 val print_identifier : Format.formatter -> identifier -> unit
@@ -80,4 +77,3 @@ val print_term : Format.formatter -> term -> unit
 val print_var_binding : Format.formatter -> var_binding -> unit
 val print_array : Format.formatter -> array_elements -> unit
 val print_function_def : Format.formatter -> function_def -> unit
-val print_datatype_decl : Format.formatter -> datatype_decl -> unit

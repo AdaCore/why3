@@ -210,6 +210,7 @@ type info = {
   (* For algebraic type counterexamples: constructors with no arguments can be
      misunderstood for variables *)
   mutable noarg_constructors: string list;
+  mutable constructors: Sls.t;
   info_cntexample_need_push : bool;
   info_cntexample: bool;
   info_incremental: bool;
@@ -799,11 +800,13 @@ let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f = match k with
         list_fields = info.list_field_def;
         Printer.list_records = info.list_records;
         noarg_constructors = info.noarg_constructors;
+        constructors = info.constructors;
         set_str = info.info_labels;
       }
   | Plemma -> assert false
 
 let print_constructor_decl info is_record fmt (ls,args) =
+  info.constructors <- Sls.add ls info.constructors;
   let field_names =
     (match args with
     | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name;
@@ -967,6 +970,7 @@ let print_task version args ?old:_ fmt task =
     list_records = Mstr.empty;
     constr_proj_id = Mls.empty;
     noarg_constructors = [];
+    constructors = Sls.empty;
     info_cntexample_need_push = need_push;
     info_cntexample = cntexample;
     info_incremental = incremental;

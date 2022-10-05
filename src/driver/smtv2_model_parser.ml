@@ -310,28 +310,6 @@ module FromSexpToModel = struct
         end
     | _ -> error sexp "array"
 
-  let rec dt_selectors = function
-    | [] -> []
-    | List [ s1; s2] :: tl -> (symbol s1, sort s2) :: dt_selectors tl
-    | _ :: tl -> dt_selectors tl (* TODO_WIP print warning *)
-
-  let rec dt_symbols = function
-    | [] -> []
-    | List (Atom n :: selectors) :: tl -> (n, dt_selectors selectors) :: dt_symbols tl
-    | _ :: tl -> dt_symbols tl (* TODO_WIP print warning *)
-
-  let dt_decl : sexp -> datatype_decl option = function
-    | List [ Atom "declare-datatype"; Atom n; List [ List symbols ] ] ->
-        Some (sort (Atom n), dt_symbols symbols)
-    | List
-        [
-          Atom "declare-datatypes";
-          List [ List [ Atom n; Atom _ ] ];
-          List [ List symbols ];
-        ] ->
-        Some (sort (Atom n), dt_symbols symbols)
-    | _ -> None
-
   let fun_def : sexp -> (string * function_def) option = function
     | List [ Atom "define-fun"; Atom n; args; res; body ] ->
         let res = sort res in
@@ -341,20 +319,6 @@ module FromSexpToModel = struct
 
   let is_model_decl = function Atom "define-fun" -> true | _ -> false
 
-<<<<<<< HEAD
-  let model sexp =
-    if sexp = [] then None else
-    let decls, rest = match sexp with
-      | List (Atom "model" :: decls) :: rest -> decls, rest
-      | List decls :: rest when List.exists (Sexp.exists is_model_decl) decls ->
-          decls, rest
-      | _ -> failwith "Cannot read S-expression as model: model not first" in
-    if List.exists (Sexp.exists is_model_decl) rest then
-      failwith
-        "Cannot read S-expression as model: next model not separated \
-         (missing separator in driver?)";
-    Some (Mstr.of_list (List.filter_map decl decls))
-=======
   let get_and_check_model sexps =
     if sexps = [] then []
     else
@@ -373,28 +337,37 @@ module FromSexpToModel = struct
       else model
 
   let get_fun_defs model =
-    let fun_defs = Lists.map_filter fun_def model in
+    let fun_defs = List.filter_map fun_def model in
     Mstr.of_list fun_defs
-
-  let get_dt_decls model = Lists.map_filter dt_decl model
->>>>>>> Cleanup
 end
 
 module FromModelToTerm = struct
   exception E of string
+  exception NoArgConstructor
 
   let error s = raise (E s)
 
   type env = {
     (* Bound variables in the body of a function definiton. *)
-    mutable vs : vsymbol list;
-    (* Datatype declarations. *)
-    dt : datatype_decl list;
-    (* Known type symbols. *)
-    mutable tys : Ty.tysymbol list;
+    mutable bound_vars : vsymbol list;
+    (* Constructors from datatype declarations. *)
+    mutable constructors : lsymbol list;
+    (* Known types from lsymbols in [pinfo.queried_terms]. *)
+    mutable known_types : Ty.ty list;
   }
 
   let get_opt_type oty = match oty with None -> Ty.ty_bool | Some ty -> ty
+  let is_type_matching_string ty n =
+    match ty.Ty.ty_node with
+    | Ty.Tyvar tv -> String.equal n tv.Ty.tv_name.id_string
+    | Ty.Tyapp (ts,_) -> String.equal n ts.Ty.ts_name.id_string
+  let is_no_arg_constructor n list_lsymbols =
+    let aux ls =
+      (String.equal n ls.ls_name.id_string) && (ls.ls_args == [])
+    in
+    match List.find_opt aux list_lsymbols with
+    | Some _ -> true
+    | None -> false
 
   let rec smt_sort_to_ty env s =
     Debug.dprintf debug "[smt_sort_to_ty] s = %a@." print_sort s;
@@ -407,16 +380,12 @@ module FromModelToTerm = struct
         Ty.ty_app Ty.ts_func [ smt_sort_to_ty env s1; smt_sort_to_ty env s2 ]
     | Ssimple (Isymbol n) ->
       begin try
-        Ty.ty_app
-          (List.find (fun x -> String.equal n x.Ty.ts_name.id_string) env.tys)
-          []
+        List.find (fun x -> is_type_matching_string x n) env.known_types
       with Not_found -> error "TODO_WIP smt_sort_to_ty unknown Ssimple symbol"
       end
     | Smultiple (Isymbol n, sorts) ->
       begin try
-        Ty.ty_app
-          (List.find (fun x -> String.equal n x.Ty.ts_name.id_string) env.tys)
-          (List.map (smt_sort_to_ty env) sorts)
+        List.find (fun x -> is_type_matching_string x n) env.known_types
       with Not_found -> error "TODO_WIP smt_sort_to_ty unknown Smultiple symbol"
       end
     | _ -> error "TODO_WIP smt_sort_to_ty"
@@ -442,34 +411,31 @@ module FromModelToTerm = struct
     Debug.dprintf debug "[qual_id_to_vsymbol] qid = %a@."
       print_qualified_identifier qid;
     match qid with
-    | Qident (Isymbol n) -> (
-        try List.find (fun vs -> String.equal n vs.vs_name.id_string) env.vs
-        with Not_found ->
-          let search_datatype (s, constructors) =
-            match List.find_opt (fun (n',_) -> String.equal n n') constructors with
-            | None -> None
-            | Some n' -> Some (smt_sort_to_ty env s)
-          in
-          let vs_ty =
-            match Lists.map_filter search_datatype env.dt with
-            | [ ty ] -> ty
-            | _ -> (
-                match get_type_from_var_name n with
-                | Some ty_str ->
-                    smt_sort_to_ty env (Ssimple (Isymbol ty_str))
-                | None -> error "TODO_WIP cannot infer the type of the variable"
-                )
-          in
-          create_vsymbol (Ident.id_fresh n) vs_ty)
-    | Qannotident (Isymbol n, s) -> (
-        try
-          let vs =
-            List.find (fun vs -> String.equal n vs.vs_name.id_string) env.vs
-          in
-          if Ty.ty_equal vs.vs_ty (smt_sort_to_ty env s) then vs
-          else error "TODO_WIP type mismatch"
-        with Not_found ->
-          create_vsymbol (Ident.id_fresh n) (smt_sort_to_ty env s))
+    | Qident (Isymbol n) ->
+        if is_no_arg_constructor n env.constructors then
+          raise NoArgConstructor
+        else (
+          try List.find (fun vs -> String.equal n vs.vs_name.id_string) env.bound_vars
+          with Not_found -> (
+            let vs_ty =
+              match get_type_from_var_name n with
+              | Some ty_str ->
+                  smt_sort_to_ty env (Ssimple (Isymbol ty_str))
+              | None -> error "TODO_WIP cannot infer the type of the variable"
+            in
+            create_vsymbol (Ident.id_fresh n) vs_ty))
+    | Qannotident (Isymbol n, s) ->
+        if is_no_arg_constructor n env.constructors then
+          raise NoArgConstructor
+        else (
+          try
+            let vs =
+              List.find (fun vs -> String.equal n vs.vs_name.id_string) env.bound_vars
+            in
+            if Ty.ty_equal vs.vs_ty (smt_sort_to_ty env s) then vs
+            else error "TODO_WIP type mismatch"
+          with Not_found ->
+            create_vsymbol (Ident.id_fresh n) (smt_sort_to_ty env s))
     | _ -> error "TODO_WIP_qual_id_to_vsymbol"
 
   let constant_to_term c =
@@ -485,9 +451,13 @@ module FromModelToTerm = struct
     match t with
     | Tconst c -> constant_to_term c
     | Tvar qid ->
-        Debug.dprintf debug "[term_to_term] vs.vs_ty = %a@."
-          Pretty.print_ty (qual_id_to_vsymbol env qid).vs_ty;
-        t_var (qual_id_to_vsymbol env qid)
+        begin try
+          Debug.dprintf debug "[term_to_term] vs.vs_ty = %a@."
+            Pretty.print_ty (qual_id_to_vsymbol env qid).vs_ty;
+          t_var (qual_id_to_vsymbol env qid)
+        with
+        | NoArgConstructor -> apply_to_term env qid []
+        end
     | Tite (b, t1, t2) ->
         t_if (term_to_term env b) (term_to_term env t1) (term_to_term env t2)
     | Tapply (qid, ts) -> apply_to_term env qid ts
@@ -516,18 +486,12 @@ module FromModelToTerm = struct
           with _ ->
             error "TODO_WIP apply_to_term error with types of arguments"
         in
-        let search_datatype (s, constructors) =
-          match List.find_opt (fun (n',_) -> String.equal n n') constructors with
-          | None -> None
-          | Some n' -> Some (smt_sort_to_ty env s)
+        let ls =
+          try List.find (fun ls -> String.equal n ls.ls_name.id_string) env.constructors
+          with Not_found -> error "TODO_WIP unknown lsymbol"
         in
-        let ls_ty =
-          match Lists.map_filter search_datatype env.dt with
-          | [ ty ] -> Some ty
-          | _ -> error "TODO_WIP error with ls_ty"
-        in
-        let ls = create_lsymbol (Ident.id_fresh n) ts'_ty ls_ty in
         t_app ls ts' ls.ls_value
+        (* TODO_WIP check that types are consistent *)
     | Qannotident (Isymbol n, s), ts ->
         let ts' = List.map (term_to_term env) ts in
         let ts'_ty =
@@ -540,6 +504,7 @@ module FromModelToTerm = struct
             (Some (smt_sort_to_ty env s))
         in
         t_app ls ts' ls.ls_value
+        (* TODO_WIP check that types are consistent *)
     | _ -> error "TODO_WIP apply_to_term"
 
   and array_to_term env s1 s2 elts =
@@ -572,8 +537,8 @@ module FromModelToTerm = struct
     Debug.dprintf debug "-----------------------------@.";
     Debug.dprintf debug "[interpret_fun_def_to_term] fun_def = %a@."
       print_function_def fun_def;
-    Debug.dprintf debug "[interpret_fun_def_to_term] ls = %a@." Pretty.print_ls
-      ls;
+    Debug.dprintf debug "[interpret_fun_def_to_term] ls = %a@."
+      Pretty.print_ls ls;
     Debug.dprintf debug "[interpret_fun_def_to_term] ls.ls_value = %a@."
       (Pp.print_option Pretty.print_ty)
       ls.ls_value;
@@ -584,27 +549,6 @@ module FromModelToTerm = struct
     Debug.dprintf debug "[interpret_fun_def_to_term] attrs = %a@."
       Pretty.print_attrs
       attrs;
-    (* Compute known type symbol variables from [ls] *)
-    let tys =
-      let types_in_ls =
-        match ls.ls_value with
-        | None -> ls.ls_args
-        | Some ty -> ty :: ls.ls_args
-      in
-      List.fold_left
-        (fun acc ty ->
-          let f acc' sym = sym :: acc' in
-          let symbols_in_ty = Ty.ty_s_fold f [] ty in
-          List.concat [ acc; symbols_in_ty ])
-        [] types_in_ls
-    in
-    (* Update the environment with [tys] while avoiding duplicates *)
-    env.tys <- List.fold_left
-      (fun acc tys ->
-        match List.find_opt (fun tys' -> Ty.ts_equal tys tys') acc with
-        | None -> tys::acc
-        | Some _ -> acc)
-      env.tys tys;
     let t =
       match fun_def with
       | [], res, body when ls.ls_args = [] ->
@@ -639,7 +583,7 @@ module FromModelToTerm = struct
                   create_vsymbol name (smt_sort_to_ty env sort))
                 args
             in
-            env.vs <- vslist;
+            env.bound_vars <- vslist;
             t_lambda vslist [] (smt_term_to_term env body res)
           else error "TODO_WIP type mismatch"
     in
@@ -742,11 +686,7 @@ module FromModelToTerm = struct
 
 
   let get_terms (pinfo : Printer.printing_info)
-      (dt_decls : datatype_decl list)
       (fun_defs : Smtv2_model_defs.function_def Mstr.t) =
-    List.iter
-      (Debug.dprintf debug "[dt_decls] %a@." print_datatype_decl)
-      dt_decls;
     let qterms = pinfo.queried_terms in
     Mstr.iter
       (fun key (ls, _, attrs) ->
@@ -780,11 +720,36 @@ module FromModelToTerm = struct
         Debug.dprintf debug "[list_projections] key = %s, field = %s@."
           key f.Ident.id_string)
       projections;
-    let noarg_constructors = pinfo.noarg_constructors in
-    List.iter
-      (Debug.dprintf debug "[noarg_constructors] s = %s@.")
-      noarg_constructors;
-    let env = { vs = []; dt = dt_decls; tys = [] } in
+    let constructors = pinfo.constructors in
+    Sls.iter
+      (fun ls ->
+        Debug.dprintf debug "[constructors] ls = %a/%d@."
+          Pretty.print_ls ls
+          (List.length ls.ls_args))
+      constructors;
+    let env = {
+      bound_vars = [];
+      constructors = Sls.elements constructors;
+      known_types = []
+    } in
+    (* Compute known types from lsymbols in [qterms] *)
+    let types_from_qterms =
+      List.flatten (
+        List.map
+          (fun (ls,_,_) ->
+            match ls.ls_value with
+            | None -> ls.ls_args
+            | Some ty -> ty :: ls.ls_args)
+          (Mstr.values qterms))
+    in
+    (* Initialize the environment with [types_from_qterms] while avoiding duplicates *)
+    env.known_types <-
+      List.fold_left
+        (fun acc ty ->
+          match List.find_opt (fun ty' -> Ty.ty_equal ty ty') acc with
+          | None -> ty::acc
+          | Some _ -> acc)
+        [] types_from_qterms;
     let terms =
       Mstr.mapi_filter
         (fun n def ->
@@ -849,8 +814,7 @@ let parse pinfo input =
       let sexps = FromStringToSexp.parse_string model_string in
       let sexps = FromSexpToModel.get_and_check_model sexps in
       let fun_defs = FromSexpToModel.get_fun_defs sexps in
-      let dt_decls = FromSexpToModel.get_dt_decls sexps in
-      let terms = FromModelToTerm.get_terms pinfo dt_decls fun_defs in
+      let terms = FromModelToTerm.get_terms pinfo fun_defs in
       List.rev
         (Mstr.values
           (Mstr.mapi

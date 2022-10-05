@@ -65,6 +65,7 @@ type printing_info = {
   noarg_constructors: string list;
   (** List of constructors with no arguments that can be confused for variables
      during parsing. *)
+  constructors: Sls.t;
   set_str: Sattr.t Mstr.t
   (** List of attributes corresponding to a printed constants (that was on the
      immediate term, not inside the ident) *)
