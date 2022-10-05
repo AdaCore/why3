@@ -360,7 +360,9 @@ module FromModelToTerm = struct
   let is_type_matching_string ty n =
     match ty.Ty.ty_node with
     | Ty.Tyvar tv -> String.equal n tv.Ty.tv_name.id_string
-    | Ty.Tyapp (ts,_) -> String.equal n ts.Ty.ts_name.id_string
+    | Ty.Tyapp (ts,ts_args) ->
+        (* TODO_WIP also check ts_args *)
+        String.equal n ts.Ty.ts_name.id_string
   let is_no_arg_constructor n list_lsymbols =
     let aux ls =
       (String.equal n ls.ls_name.id_string) && (ls.ls_args == [])
@@ -419,6 +421,8 @@ module FromModelToTerm = struct
           with Not_found -> (
             let vs_ty =
               match get_type_from_var_name n with
+              (* TODO_WIP this should be moved earlier because we should have
+                 a Qannotident if we can infer a type from the name variable *)
               | Some ty_str ->
                   smt_sort_to_ty env (Ssimple (Isymbol ty_str))
               | None -> error "TODO_WIP cannot infer the type of the variable"
