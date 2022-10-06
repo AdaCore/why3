@@ -1,5 +1,8 @@
 :x: marks a potential source of incompatibility
 
+Bug fixes
+  * fixed soundness bug in introduce_premises transformation (#694)
+
 Documentation
   * added documentation for environment variables WHY3LIB and WHY3DATA
 
