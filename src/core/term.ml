@@ -641,9 +641,11 @@ let t_eps bf ty     = mk_term (Teps bf) ty
 let t_quant q qf    = mk_term (Tquant (q, qf)) None
 let t_binary op f g = mk_term (Tbinop (op, f, g)) None
 let t_not f         = mk_term (Tnot f) None
-let t_bool_not f         = mk_term (Tnot f) (Some ty_bool)
+let t_bool_not f    = mk_term (Tnot f) (Some ty_bool)
 let t_true          = mk_term (Ttrue) None
 let t_false         = mk_term (Tfalse) None
+let t_true_bool     = mk_term (Ttrue) (Some ty_bool)
+let t_false_bool    = mk_term (Tfalse) (Some ty_bool)
 
 let t_attr_set ?loc l t = { t with t_attrs = l; t_loc = loc }
 

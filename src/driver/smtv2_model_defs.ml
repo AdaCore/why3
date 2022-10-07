@@ -9,8 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
-type symbol = string
-type index = Idxnumeral of BigInt.t | Idxsymbol of string
+type symbol = S of string | Sprover of string
+type index = Idxnumeral of BigInt.t | Idxsymbol of symbol
 type identifier = Isymbol of symbol | Iindexedsymbol of symbol * index list
 
 type sort =
@@ -90,9 +90,12 @@ let print_constant fmt = function
   | Cbool b -> fprintf fmt "(Cbool %b)" b
   | Cstring s -> fprintf fmt "(Cstring %s)" s
 
+let print_symbol fmt = function
+  | S str | Sprover str -> fprintf fmt "%s" str
+
 let print_index fmt = function
   | Idxnumeral bigint -> fprintf fmt "(Idx %d)" (BigInt.to_int bigint)
-  | Idxsymbol s -> fprintf fmt "(Idx %s)" s
+  | Idxsymbol s -> fprintf fmt "(Idx %a)" print_symbol s
 
 let rec print_sort fmt = function
   | Sstring -> fprintf fmt "(Sstring)"
@@ -112,9 +115,9 @@ let rec print_sort fmt = function
         sorts
 
 and print_identifier fmt = function
-  | Isymbol n -> fprintf fmt "(Isymbol %s)" n
+  | Isymbol n -> fprintf fmt "(Isymbol %a)" print_symbol n
   | Iindexedsymbol (n, idx) ->
-      fprintf fmt "(Iindexedsymbol %s %a)" n
+      fprintf fmt "(Iindexedsymbol %a %a)" print_symbol n
         Pp.(print_list space print_index)
         idx
 
@@ -143,7 +146,8 @@ let rec print_term fmt = function
         print_array elts
   | Tunparsed s -> fprintf fmt "(UNPARSED %s)" s
 
-and print_var_binding fmt (s, t) = fprintf fmt "(%s %a)" s print_term t
+and print_var_binding fmt (s, t) =
+  fprintf fmt "(%a %a)" print_symbol s print_term t
 
 and print_array_elem fmt (t1,t2) =
   fprintf fmt "@[<hv>(%a -> %a)@]" print_term t1 print_term t2
@@ -153,7 +157,8 @@ and print_array fmt a =
     (Pp.print_list Pp.space print_array_elem) a.array_indices
     print_term a.array_others
 
-let print_function_arg fmt (n, s) = fprintf fmt "(%s %a)" n print_sort s
+let print_function_arg fmt (n, s) =
+  fprintf fmt "(%a %a)" print_symbol n print_sort s
 
 let print_function_def fmt (args, res, body) =
   fprintf fmt "@[<hv2>(Function (%a)@ %a@ %a)@]"

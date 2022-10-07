@@ -49,9 +49,13 @@ module FromSexpToModel = struct
   let error sexp s = raise (E (sexp, s))
   let atom_error a s = raise (E (Atom a, s))
 
-  let is_name_start = function
-    | '_' | 'a' .. 'z' | 'A' .. 'Z' | '@' | '#' | '$' -> true
-    | _ -> false
+  let is_simple_symbol str =
+    String.length str > 0 && (match str.[0] with
+    | '_' | 'a' .. 'z' | 'A' .. 'Z' | '#' | '$' -> true
+    | _ -> false)
+
+  let is_prover_symbol str =
+    String.length str > 0 && (str.[0] == '@' || str.[0] == '.')
 
   let is_quoted s =
     String.length s > 2 && s.[0] = '|' && s.[String.length s - 1] = '|'
@@ -213,17 +217,23 @@ module FromSexpToModel = struct
     Tconst cst
 
   let symbol : sexp -> symbol = function
-    | Atom s when s = "" || is_name_start s.[0] -> s
-    | Atom s when is_quoted s -> get_quoted s
+    | Atom s when is_prover_symbol s -> Sprover s
+    | Atom s when is_simple_symbol s -> S s
+    | Atom s when is_quoted s ->
+        let s' = get_quoted s in
+        if is_prover_symbol s' then
+          Sprover s'
+        else
+          S s'
     | sexp -> error sexp "symbol"
 
   let index sexp : index =
     try Idxnumeral (bigint sexp)
-    with _ -> ( try Idxsymbol (symbol sexp) with _ -> error sexp "index")
+    with _ -> (try Idxsymbol (symbol sexp) with _ -> error sexp "index")
 
   let identifier sexp : identifier =
     match sexp with
-    | Atom "=" -> Isymbol "="
+    | Atom "=" -> Isymbol (S "=")
     | Atom _ -> Isymbol (symbol sexp)
     | List [ Atom "_"; s; List idx ] ->
         Iindexedsymbol (symbol s, List.map index idx)
@@ -348,9 +358,11 @@ module FromModelToTerm = struct
   let error s = raise (E s)
 
   type env = {
+    (* Prover variables. *)
+    mutable prover_vars : vsymbol list;
     (* Bound variables in the body of a function definiton. *)
     mutable bound_vars : vsymbol list;
-    (* Constructors from datatype declarations. *)
+    (* Constructors from [pinfo.constructors]. *)
     mutable constructors : lsymbol list;
     (* Known types from lsymbols in [pinfo.queried_terms]. *)
     mutable known_types : Ty.ty list;
@@ -358,11 +370,13 @@ module FromModelToTerm = struct
 
   let get_opt_type oty = match oty with None -> Ty.ty_bool | Some ty -> ty
   let is_type_matching_string ty n =
-    match ty.Ty.ty_node with
-    | Ty.Tyvar tv -> String.equal n tv.Ty.tv_name.id_string
-    | Ty.Tyapp (ts,ts_args) ->
-        (* TODO_WIP also check ts_args *)
-        String.equal n ts.Ty.ts_name.id_string
+    match n with
+    | S str | Sprover str -> (
+      match ty.Ty.ty_node with
+      | Ty.Tyvar tv -> String.equal str tv.Ty.tv_name.id_string
+      | Ty.Tyapp (ts,ts_args) ->
+          (* TODO_WIP also check ts_args *)
+          String.equal str ts.Ty.ts_name.id_string)
   let is_no_arg_constructor n list_lsymbols =
     let aux ls =
       (String.equal n ls.ls_name.id_string) && (ls.ls_args == [])
@@ -409,44 +423,84 @@ module FromModelToTerm = struct
       | [ ty; _; _ ] -> Some ty
       | _ -> None
 
-  let qual_id_to_vsymbol env qid =
-    Debug.dprintf debug "[qual_id_to_vsymbol] qid = %a@."
+  (* TODO_WIP refactoring *)
+  let qual_id_to_term env qid =
+    Debug.dprintf debug "[qual_id_to_term] qid = %a@."
       print_qualified_identifier qid;
     match qid with
-    | Qident (Isymbol n) ->
+    | Qident (Isymbol (S n)) ->
         if is_no_arg_constructor n env.constructors then
           raise NoArgConstructor
-        else (
-          try List.find (fun vs -> String.equal n vs.vs_name.id_string) env.bound_vars
+        else
+          let vs =
+            try List.find (fun vs -> String.equal n vs.vs_name.id_string) env.bound_vars
+            with Not_found -> (
+              let vs_ty =
+                match get_type_from_var_name n with
+                (* TODO_WIP this should be moved earlier because we should have
+                  a Qannotident if we can infer a type from the name variable *)
+                | Some ty_str ->
+                    smt_sort_to_ty env (Ssimple (Isymbol (S ty_str)))
+                | None -> error "TODO_WIP cannot infer the type of the variable"
+              in
+              create_vsymbol (Ident.id_fresh n) vs_ty)
+          in
+          t_var vs
+    | Qident (Isymbol (Sprover n)) ->
+        let vs =
+          try List.find (fun vs -> String.equal n vs.vs_name.id_string) env.prover_vars
           with Not_found -> (
+            Debug.dprintf debug "NOT FOUND@.";
             let vs_ty =
               match get_type_from_var_name n with
               (* TODO_WIP this should be moved earlier because we should have
-                 a Qannotident if we can infer a type from the name variable *)
+                  a Qannotident if we can infer a type from the name variable *)
               | Some ty_str ->
-                  smt_sort_to_ty env (Ssimple (Isymbol ty_str))
-              | None -> error "TODO_WIP cannot infer the type of the variable"
+                  smt_sort_to_ty env (Ssimple (Isymbol (Sprover ty_str)))
+              | None -> error "TODO_WIP cannot infer the type of the prover variable"
             in
-            create_vsymbol (Ident.id_fresh n) vs_ty))
-    | Qannotident (Isymbol n, s) ->
+            let vs = create_vsymbol (Ident.id_fresh n) vs_ty in
+            env.prover_vars <- vs :: env.prover_vars;
+            vs)
+        in
+        t_var vs
+    | Qannotident (Isymbol (S n), s) ->
         if is_no_arg_constructor n env.constructors then
           raise NoArgConstructor
-        else (
+        else
+          let vs =
+            try
+              let vs =
+                List.find (fun vs -> String.equal n vs.vs_name.id_string) env.bound_vars
+              in
+              if Ty.ty_equal vs.vs_ty (smt_sort_to_ty env s) then vs
+              else error "TODO_WIP type mismatch"
+            with Not_found ->
+              create_vsymbol (Ident.id_fresh n) (smt_sort_to_ty env s)
+          in
+          t_var vs
+    | Qannotident (Isymbol (Sprover n), s) ->
+        let vs_ty = smt_sort_to_ty env s in
+        let vs =
           try
-            let vs =
-              List.find (fun vs -> String.equal n vs.vs_name.id_string) env.bound_vars
-            in
-            if Ty.ty_equal vs.vs_ty (smt_sort_to_ty env s) then vs
-            else error "TODO_WIP type mismatch"
-          with Not_found ->
-            create_vsymbol (Ident.id_fresh n) (smt_sort_to_ty env s))
+            List.find
+              (fun vs ->
+                String.equal n vs.vs_name.id_string
+                  && Ty.ty_equal vs.vs_ty vs_ty)
+              env.prover_vars
+          with Not_found -> (
+            let vs = create_vsymbol (Ident.id_fresh n) vs_ty in
+            env.prover_vars <- vs :: env.prover_vars;
+            vs)
+        in
+        t_var vs
     | _ -> error "TODO_WIP_qual_id_to_vsymbol"
 
   let constant_to_term c =
     Debug.dprintf debug "[constant_to_term] c = %a@." print_constant c;
     match c with
     | Cint bigint -> t_const (Constant.int_const bigint) Ty.ty_int
-    | Cbool b -> if b then t_bool_true else t_bool_false
+    | Cbool b -> if b then t_true_bool else t_true_bool
     | Cstring str -> t_const (Constant.string_const str) Ty.ty_str
     | _ -> error "TODO_WIP constant_to_term"
 
@@ -456,9 +510,7 @@ module FromModelToTerm = struct
     | Tconst c -> constant_to_term c
     | Tvar qid ->
         begin try
-          Debug.dprintf debug "[term_to_term] vs.vs_ty = %a@."
-            Pretty.print_ty (qual_id_to_vsymbol env qid).vs_ty;
-          t_var (qual_id_to_vsymbol env qid)
+          qual_id_to_term env qid
         with
         | NoArgConstructor -> apply_to_term env qid []
         end
@@ -469,21 +521,28 @@ module FromModelToTerm = struct
     | Tarray (s1, s2, a) -> array_to_term env s1 s2 a
     | Tunparsed s -> error "TODO_WIP Tunparsed"
 
+  (* TODO_WIP refactoring *)
   and apply_to_term env qid ts =
     Debug.dprintf debug "[apply_to_term] qid = %a@ ts = %a@."
       print_qualified_identifier qid
       Pp.(print_list space print_term)
       ts;
     match (qid, ts) with
-    | Qident (Isymbol "="), [ t1; t2 ] ->
-        let t' =
-          t_bool_equ (term_to_term env t1) (term_to_term env t2)
+    | Qident (Isymbol (S "=")), [ t1; t2 ] ->
+        let t1' = term_to_term env t1 in
+        let t2' = term_to_term env t2 in
+        let t' = (* TODO_WIP to be fixed *)
+          t_app
+            (create_lsymbol
+              (Ident.id_fresh "=")
+              [get_opt_type t1'.t_ty; get_opt_type t2'.t_ty]
+              (Some Ty.ty_bool))
+            [t1'; t2']
+            (Some Ty.ty_bool)
         in
-        Debug.dprintf debug "[apply_to_term] t'.t_ty = %a@."
-          (Pp.print_option Pretty.print_ty) t'.t_ty;
         t'
-    | Qident (Isymbol "not"), [ t ] -> t_bool_not (term_to_term env t)
-    | Qident (Isymbol n), ts ->
+    | Qident (Isymbol (S "not")), [ t ] -> t_bool_not (term_to_term env t)
+    | Qident (Isymbol (S n)), ts | Qident (Isymbol (Sprover n)), ts ->
         let ts' = List.map (term_to_term env) ts in
         let ts'_ty =
           try List.map (fun t -> Opt.get t.t_ty) ts'
@@ -496,7 +555,7 @@ module FromModelToTerm = struct
         in
         t_app ls ts' ls.ls_value
         (* TODO_WIP check that types are consistent *)
-    | Qannotident (Isymbol n, s), ts ->
+    | Qannotident (Isymbol (S n), s), ts | Qannotident (Isymbol (Sprover n), s), ts ->
         let ts' = List.map (term_to_term env) ts in
         let ts'_ty =
           try List.map (fun t -> Opt.get t.t_ty) ts'
@@ -530,11 +589,12 @@ module FromModelToTerm = struct
 
   let smt_term_to_term env t s =
     let t' = term_to_term env t in
-    Debug.dprintf debug "[smt_term_to_term] type of s = %a, type of t' = %a@."
-      Pretty.print_ty (smt_sort_to_ty env s)
-      (Pp.print_option Pretty.print_ty)
-      t'.t_ty;
-    if Ty.ty_equal (smt_sort_to_ty env s) (get_opt_type t'.t_ty) then t'
+    let s' = smt_sort_to_ty env s in
+    Debug.dprintf debug "[smt_term_to_term] s' = %a, t' = %a, t'.t_ty = %a@."
+      Pretty.print_ty s'
+      Pretty.print_term t'
+      (Pp.print_option Pretty.print_ty) t'.t_ty;
+    if Ty.ty_equal s' (get_opt_type t'.t_ty) then t'
     else error "TODO_WIP type error"
 
   let interpret_fun_def_to_term env ls oloc attrs fun_def =
@@ -583,7 +643,8 @@ module FromModelToTerm = struct
             let vslist =
               List.map
                 (fun (symbol, sort) ->
-                  let name = Ident.id_fresh symbol in
+                  let name = match symbol with
+                    | S str | Sprover str -> Ident.id_fresh str in
                   create_vsymbol name (smt_sort_to_ty env sort))
                 args
             in
@@ -597,14 +658,12 @@ module FromModelToTerm = struct
     t
 
   (* [eval_var] is false if variables should not be evaluated *)
-  let rec eval_term eval_var ty_coercions t =
+  let rec eval_term env eval_var ty_coercions t =
     Debug.dprintf debug "[eval_term] eval_var = %b, t = %a@."
       eval_var
       Pretty.print_term t;
     match t.t_node with
-    (* TODO_WIP *)
-    | Tvar vs -> (
-      if eval_var then (
+    | Tvar vs when eval_var && (List.mem vs env.prover_vars) -> (
         match t.t_ty with
         | Some ty -> (
           (* first search if there exists some type coercions for [ty] *)
@@ -612,50 +671,54 @@ module FromModelToTerm = struct
           | [] -> t
           | (str',(ls',t'))::_ ->
             (* TODO_WIP handle multiple type coercions for a given [ty]
-               by creating a conjunction formula *)
-            let vs_list, _, t' = t_open_lambda t' in
-            let vs = match vs_list with
-              | [vs] -> vs
+                by creating a conjunction formula *)
+            let vs_list', _, t' = t_open_lambda t' in
+            let vs' = match vs_list' with
+              | [vs'] -> vs'
               | _ ->
                   error "TODO_WIP type coercion with not exactly one argument"
             in
+            (* TODO_WIP if t' is again a prover variable, we should recurse on that *)
+            let t' = eval_term env false ty_coercions (t_subst_single vs' (t_var vs) t') in
             (* create a fresh vsymbol for the variable bound by the epsilon term *)
             let x = create_vsymbol (Ident.id_fresh "x") ty in
             (* substitute [vs] by this new variable in the body [t'] of the function
-               defining the type coercion *)
-            let t' = t_subst_single vs (t_var x) t' in
+                defining the type coercion *)
+            let t' = t_subst_single vs' (t_var x) t' in
             (* construct the formula to be used in the epsilon term *)
-            let f =
-              t_equ
-                (t_app ls' [t_var x] ls'.ls_value)
-                (eval_term false ty_coercions t')
-            in
+            let f = t_equ (t_app ls' [t_var x] ls'.ls_value) t' in
             (* replace [t] by [eps x. f] *)
             t_eps_close x f)
         | _ -> t)
+    | Tapp (ls, [t1;t2]) when (ls.ls_name.id_string.[0] == '=') ->
+      if
+        t_equal
+          (eval_term env eval_var ty_coercions t1)
+          (eval_term env eval_var ty_coercions t2)
+      then
+        t_true_bool
       else
-        t
-    )
-    | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
-      if t_equal (eval_term eval_var ty_coercions t1) (eval_term eval_var ty_coercions t2) then
-        t_bool_true
-      else
-        t_bool_false
+        (* TODO_WIP to be fixed because it is correct to reduce to Tfalse
+           only in specific cases (e.g. two distinct prover variables) *)
+        t_false_bool
     | Tapp (ls, ts) ->
-      let ts = List.map (eval_term eval_var ty_coercions) ts in
+      let ts = List.map (eval_term env eval_var ty_coercions) ts in
       t_app ls ts ls.ls_value
     | Tif (b,t1,t2) -> (
-      match (eval_term eval_var ty_coercions b).t_node with
-      | Ttrue -> eval_term eval_var ty_coercions t1
-      | Tfalse -> eval_term eval_var ty_coercions t2
+      match (eval_term env eval_var ty_coercions b).t_node with
+      | Ttrue -> eval_term env eval_var ty_coercions t1
+      | Tfalse -> eval_term env eval_var ty_coercions t2
       | _ ->
-        let t1 = eval_term eval_var ty_coercions t1 in
-        let t2 = eval_term eval_var ty_coercions t2 in
+        let t1 = eval_term env eval_var ty_coercions t1 in
+        let t2 = eval_term env eval_var ty_coercions t2 in
         t_if b t1 t2
     )
     | _ -> t
 
-  let eval (pinfo : Printer.printing_info) terms =
+  let eval (pinfo : Printer.printing_info) env terms =
+    List.iter
+      (Debug.dprintf debug "[eval] prover_var = %a@." Pretty.print_vs)
+      env.prover_vars;
     let ty_coercions =
       Ty.Mty.map (* for each set [sls] of lsymbols associated to a type *)
         (fun sls ->
@@ -685,7 +748,7 @@ module FromModelToTerm = struct
       ty_coercions;
     Mstr.mapi (* for each element in [terms], we try to evaluate [t]:
        - by applying type coercions for variables, when possible *)
-      (fun str ((ls,oloc,attrs),t) -> ((ls,oloc,attrs), eval_term true ty_coercions t))
+      (fun str ((ls,oloc,attrs),t) -> ((ls,oloc,attrs), eval_term env true ty_coercions t))
       terms
 
 
@@ -732,6 +795,7 @@ module FromModelToTerm = struct
           (List.length ls.ls_args))
       constructors;
     let env = {
+      prover_vars = [];
       bound_vars = [];
       constructors = Sls.elements constructors;
       known_types = []
@@ -776,7 +840,7 @@ module FromModelToTerm = struct
           (Pp.print_option Pretty.print_loc_as_attribute)
           t.t_loc)
       terms;
-    eval pinfo terms
+    eval pinfo env terms
 end
 
 (*
