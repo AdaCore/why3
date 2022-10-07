@@ -13,8 +13,8 @@
 <prover id="8" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Alt-Ergo" version="2.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="10" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="11" name="Spass" version="3.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="12" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="13" name="Spass" version="3.9" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="lineardecision.mlw"/>
 <theory name="LinearEquationsCoeffs" proved="true">
@@ -1613,7 +1613,7 @@
   <proof prover="2"><result status="valid" time="0.01" steps="3434"/></proof>
   </goal>
   <goal name="simp&#39;vc.7" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.16" steps="101610"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="101610"/></proof>
   </goal>
   <goal name="simp&#39;vc.8" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.05" steps="106355"/></proof>
@@ -1876,7 +1876,7 @@
  <goal name="radd&#39;vc" expl="VC for radd" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="radd&#39;vc.0" expl="exceptional postcondition" proved="true">
-  <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="13"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="radd&#39;vc.1" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1906,7 +1906,7 @@
    </transf>
    </goal>
    <goal name="radd&#39;vc.1.2" expl="VC for radd" proved="true">
-   <proof prover="11"><result status="valid" time="0.02"/></proof>
+   <proof prover="13"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="radd&#39;vc.1.3" expl="VC for radd" proved="true">
    <proof prover="10"><result status="valid" time="0.76"/></proof>
@@ -1917,7 +1917,7 @@
   </transf>
   </goal>
   <goal name="radd&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <proof prover="13"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
@@ -2636,10 +2636,10 @@
   <goal name="madd&#39;vc.2" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="madd&#39;vc.2.0" expl="assertion" proved="true">
-   <proof prover="11"><result status="valid" time="0.05"/></proof>
+   <proof prover="13"><result status="valid" time="0.05"/></proof>
    </goal>
    <goal name="madd&#39;vc.2.1" expl="assertion" proved="true">
-   <proof prover="11"><result status="valid" time="0.05"/></proof>
+   <proof prover="13"><result status="valid" time="0.05"/></proof>
    </goal>
    <goal name="madd&#39;vc.2.2" expl="assertion" proved="true">
    <proof prover="8" timelimit="1"><result status="valid" time="0.05" steps="14826"/></proof>
@@ -2676,16 +2676,16 @@
   <goal name="mmul&#39;vc.1" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="mmul&#39;vc.1.0" expl="assertion" proved="true">
-   <proof prover="11"><result status="valid" time="0.04"/></proof>
+   <proof prover="13"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="mmul&#39;vc.1.1" expl="VC for mmul" proved="true">
    <proof prover="9" timelimit="1"><result status="valid" time="0.03" steps="164"/></proof>
    </goal>
    <goal name="mmul&#39;vc.1.2" expl="VC for mmul" proved="true">
-   <proof prover="11"><result status="valid" time="0.05"/></proof>
+   <proof prover="13"><result status="valid" time="0.05"/></proof>
    </goal>
    <goal name="mmul&#39;vc.1.3" expl="VC for mmul" proved="true">
-   <proof prover="11"><result status="valid" time="0.04"/></proof>
+   <proof prover="13"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="mmul&#39;vc.1.4" expl="VC for mmul" proved="true">
    <proof prover="9" timelimit="1"><result status="valid" time="0.02" steps="27"/></proof>
@@ -2936,7 +2936,7 @@
    <proof prover="12" timelimit="5"><result status="valid" time="0.08" steps="460"/></proof>
    </goal>
    <goal name="m&#39;vc.0.2" expl="postcondition" proved="true">
-   <proof prover="12" timelimit="5"><result status="valid" time="0.12" steps="1034"/></proof>
+   <proof prover="12" timelimit="5"><result status="valid" time="0.12" steps="1033"/></proof>
    </goal>
   </transf>
   </goal>

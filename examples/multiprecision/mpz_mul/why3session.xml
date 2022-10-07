@@ -9,9 +9,9 @@
 <prover id="4" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="5" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="7" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="8" name="Z3" version="4.8.15" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="10" name="Spass" version="3.9" timelimit="5" steplimit="0" memlimit="2000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="mpz_mul.mlw"/>
 <theory name="Zmul" proved="true">
@@ -450,7 +450,7 @@
   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.20" steps="26001"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.108" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.26" steps="34230"/></proof>
+  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.26" steps="34292"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.109" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.07" steps="23724"/></proof>
@@ -819,7 +819,7 @@
   <proof prover="3"><result status="valid" time="0.20"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.161" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.36"/></proof>
+  <proof prover="4"><result status="valid" time="0.21"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.162" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -827,7 +827,7 @@
    <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.65" steps="340"/></proof>
    </goal>
    <goal name="wmpz_mul&#39;vc.162.1" expl="VC for wmpz_mul" proved="true">
-   <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="1.11" steps="342"/></proof>
+   <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.87" steps="342"/></proof>
    </goal>
    <goal name="wmpz_mul&#39;vc.162.2" expl="VC for wmpz_mul" proved="true">
    <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="1.02" steps="344"/></proof>
@@ -939,7 +939,7 @@
   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.06" steps="26346"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.183" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.42" steps="66697"/></proof>
+  <proof prover="2"><result status="valid" time="0.42" steps="66696"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.184" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.20" steps="28204"/></proof>
@@ -1672,7 +1672,7 @@
   <proof prover="2"><result status="valid" time="0.16" steps="22106"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.340" expl="precondition" proved="true">
-  <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="1.56" steps="1615382"/></proof>
+  <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="1.30" steps="1615382"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.341" expl="precondition" proved="true">
   <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.22" steps="180"/></proof>
@@ -1730,7 +1730,7 @@
   <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.14" steps="197"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.357" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="2.68" steps="1621"/></proof>
+  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="2.21" steps="1621"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.358" expl="precondition" proved="true">
   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.11" steps="24310"/></proof>
@@ -1863,7 +1863,7 @@
   <proof prover="0"><result status="valid" time="0.04" steps="116581"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.378" expl="precondition" proved="true">
-  <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="1.88" steps="1511695"/></proof>
+  <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="1.37" steps="1511695"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.379" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.13" steps="25073"/></proof>
@@ -1954,7 +1954,7 @@
    <proof prover="3"><result status="valid" time="0.66"/></proof>
    </goal>
    <goal name="wmpz_mul&#39;vc.391.10" expl="VC for wmpz_mul" proved="true">
-   <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.42" steps="392"/></proof>
+   <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.28" steps="392"/></proof>
    </goal>
    <goal name="wmpz_mul&#39;vc.391.11" expl="VC for wmpz_mul" proved="true">
    <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.32" steps="397"/></proof>
@@ -1985,7 +1985,7 @@
    <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.07" steps="26054"/></proof>
    </goal>
    <goal name="wmpz_mul&#39;vc.397.1" expl="precondition" proved="true">
-   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.24" steps="30434"/></proof>
+   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.11" steps="30434"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2672,7 +2672,7 @@
    <goal name="wmpz_mul&#39;vc.540.1" expl="false case (assertion)" proved="true">
    <transf name="case" proved="true" arg1="(x=v)">
     <goal name="wmpz_mul&#39;vc.540.1.0" expl="false case (true case. assertion)" proved="true">
-    <proof prover="9"><result status="valid" time="0.57" steps="7754"/></proof>
+    <proof prover="9"><result status="valid" time="0.40" steps="7754"/></proof>
     </goal>
     <goal name="wmpz_mul&#39;vc.540.1.1" expl="false case (assertion)" proved="true">
     <transf name="case" proved="true" arg1="(x=v&#39;)">
@@ -3105,7 +3105,7 @@
   <proof prover="3"><result status="valid" time="2.15"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.579" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="3.70"/></proof>
+  <proof prover="3"><result status="valid" time="2.55"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.580" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.16" steps="25366"/></proof>
@@ -3188,10 +3188,10 @@
    </transf>
    </goal>
    <goal name="wmpz_mul&#39;vc.592.4" expl="VC for wmpz_mul" proved="true">
-   <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.41" steps="384"/></proof>
+   <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.25" steps="384"/></proof>
    </goal>
    <goal name="wmpz_mul&#39;vc.592.5" expl="VC for wmpz_mul" proved="true">
-   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.25" steps="31760"/></proof>
+   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.12" steps="31760"/></proof>
    </goal>
    <goal name="wmpz_mul&#39;vc.592.6" expl="VC for wmpz_mul" proved="true">
    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.14" steps="26398"/></proof>
@@ -3741,7 +3741,7 @@
   <proof prover="3"><result status="valid" time="1.82"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.712" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="2.06"/></proof>
+  <proof prover="3"><result status="valid" time="1.66"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.713" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.12" steps="27961"/></proof>
@@ -3781,7 +3781,7 @@
   <goal name="wmpz_mul&#39;vc.720" expl="precondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz1">
    <goal name="wmpz_mul&#39;vc.720.0" expl="apply premises" proved="true">
-   <proof prover="2"><result status="valid" time="1.07" steps="67651"/></proof>
+   <proof prover="2"><result status="valid" time="0.80" steps="67651"/></proof>
    </goal>
    <goal name="wmpz_mul&#39;vc.720.1" expl="apply premises" proved="true">
    <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz2">
@@ -4092,7 +4092,7 @@
       <goal name="wmpz_mul&#39;vc.740.0.0.0.1" expl="apply premises" proved="true">
       <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.12" steps="293137"/></proof>
       <proof prover="3"><result status="valid" time="0.33"/></proof>
-      <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="2.06" steps="578"/></proof>
+      <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="1.73" steps="578"/></proof>
       </goal>
      </transf>
      </goal>
@@ -4278,7 +4278,7 @@
   </transf>
   </goal>
   <goal name="wmpz_mul&#39;vc.742" expl="postcondition" proved="true">
-  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="2.53" steps="580"/></proof>
+  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="2.17" steps="580"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.743" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.21" steps="37251"/></proof>
@@ -4431,9 +4431,9 @@
                <goal name="wmpz_mul&#39;vc.752.1.1.1.0.0.0.0.0.0.0.0.0.0" expl="apply premises" proved="true">
                <proof prover="4"><result status="valid" time="0.05"/></proof>
                <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.15" steps="30331"/></proof>
-               <proof prover="7"><result status="valid" time="0.14"/></proof>
                <proof prover="8" memlimit="2000"><result status="valid" time="0.07" steps="7930"/></proof>
                <proof prover="9" timelimit="5" memlimit="2000"><result status="valid" time="0.33" steps="7115"/></proof>
+               <proof prover="10"><result status="valid" time="0.14"/></proof>
                </goal>
                <goal name="wmpz_mul&#39;vc.752.1.1.1.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
                <proof prover="6"><result status="valid" time="0.08" steps="30331"/></proof>
@@ -4787,7 +4787,7 @@
   </transf>
   </goal>
   <goal name="wmpz_mul&#39;vc.806" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="2.63"/></proof>
+  <proof prover="3"><result status="valid" time="2.20"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.807" expl="precondition" proved="true">
   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.12" steps="192058"/></proof>
@@ -5428,7 +5428,7 @@
   <goal name="wmpz_mul&#39;vc.970" expl="assertion" proved="true">
   <transf name="case" proved="true" arg1="(x = u \/ x = v)">
    <goal name="wmpz_mul&#39;vc.970.0" expl="true case (assertion)" proved="true">
-   <proof prover="9"><result status="valid" time="0.51" steps="7003"/></proof>
+   <proof prover="9"><result status="valid" time="0.35" steps="7003"/></proof>
    </goal>
    <goal name="wmpz_mul&#39;vc.970.1" expl="false case (assertion)" proved="true">
    <transf name="case" proved="true" arg1="(x=v&#39;)">
@@ -5855,7 +5855,7 @@
   <proof prover="3"><result status="valid" time="0.21"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.1010" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="2.87"/></proof>
+  <proof prover="4"><result status="valid" time="2.17"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.1011" expl="integer overflow" proved="true">
   <proof prover="2"><result status="valid" time="0.15" steps="31825"/></proof>
@@ -5994,7 +5994,7 @@
   </goal>
   <goal name="wmpz_mul&#39;vc.1037" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.15" steps="23003"/></proof>
-  <proof prover="5"><result status="valid" time="0.30" steps="272"/></proof>
+  <proof prover="5"><result status="valid" time="0.16" steps="272"/></proof>
   </goal>
   <goal name="wmpz_mul&#39;vc.1038" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.17" steps="24449"/></proof>
@@ -6990,7 +6990,7 @@
   </transf>
   </goal>
   <goal name="wmpz_mul_ui&#39;vc.20" expl="integer overflow" proved="true">
-  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="2.69" steps="659"/></proof>
+  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="2.02" steps="659"/></proof>
   </goal>
   <goal name="wmpz_mul_ui&#39;vc.21" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.48"/></proof>

@@ -4,11 +4,11 @@
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Spass" version="3.9" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Coq" version="8.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC5" version="1.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="7" name="Spass" version="3.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="vacid_0_red_black_trees.mlw"/>
@@ -29,22 +29,22 @@
  <proof prover="4"><result status="valid" time="0.01" steps="1981"/></proof>
  </goal>
  <goal name="lt_node_lt" proved="true">
- <proof prover="7"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="gt_node_gt" proved="true">
- <proof prover="7"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="lt_left" proved="true">
- <proof prover="3"><result status="valid" time="0.01" steps="4025"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="4206"/></proof>
  </goal>
  <goal name="lt_right" proved="true">
- <proof prover="3"><result status="valid" time="0.01" steps="4432"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="4613"/></proof>
  </goal>
  <goal name="gt_left" proved="true">
- <proof prover="3"><result status="valid" time="0.00" steps="4823"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="5004"/></proof>
  </goal>
  <goal name="gt_right" proved="true">
- <proof prover="3"><result status="valid" time="0.01" steps="5199"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="5380"/></proof>
  </goal>
  <goal name="lt_tree_not_in" proved="true">
  <proof prover="4"><result status="valid" time="0.01" steps="3128"/></proof>
@@ -74,7 +74,7 @@
  <proof prover="8"><result status="valid" time="0.02" steps="160"/></proof>
  </goal>
  <goal name="rotate_right" proved="true">
- <proof prover="8"><result status="valid" time="0.02" steps="165"/></proof>
+ <proof prover="8"><result status="valid" time="0.02" steps="164"/></proof>
  </goal>
  <goal name="rbtree_Leaf" proved="true">
  <proof prover="4"><result status="valid" time="0.02" steps="5285"/></proof>
@@ -110,63 +110,63 @@
    <goal name="rbalance&#39;vc.0.0" expl="postcondition" proved="true">
    <transf name="split_vc" proved="true" >
     <goal name="rbalance&#39;vc.0.0.0" expl="postcondition" proved="true">
-    <proof prover="7"><result status="valid" time="0.89"/></proof>
+    <proof prover="2"><result status="valid" time="0.31"/></proof>
     </goal>
     <goal name="rbalance&#39;vc.0.0.1" expl="postcondition" proved="true">
-    <proof prover="7"><result status="valid" time="0.16"/></proof>
+    <proof prover="2"><result status="valid" time="0.35"/></proof>
     </goal>
     <goal name="rbalance&#39;vc.0.0.2" expl="postcondition" proved="true">
-    <proof prover="7"><result status="valid" time="0.59"/></proof>
+    <proof prover="2"><result status="valid" time="1.13"/></proof>
     </goal>
     <goal name="rbalance&#39;vc.0.0.3" expl="postcondition" proved="true">
-    <proof prover="7"><result status="valid" time="0.16"/></proof>
+    <proof prover="2"><result status="valid" time="0.35"/></proof>
     </goal>
     <goal name="rbalance&#39;vc.0.0.4" expl="postcondition" proved="true">
-    <proof prover="7"><result status="valid" time="0.13"/></proof>
+    <proof prover="2"><result status="valid" time="0.13"/></proof>
     </goal>
     <goal name="rbalance&#39;vc.0.0.5" expl="postcondition" proved="true">
-    <proof prover="7"><result status="valid" time="0.10"/></proof>
+    <proof prover="2"><result status="valid" time="0.30"/></proof>
     </goal>
     <goal name="rbalance&#39;vc.0.0.6" expl="postcondition" proved="true">
-    <proof prover="7"><result status="valid" time="0.88"/></proof>
+    <proof prover="2"><result status="valid" time="0.30"/></proof>
     </goal>
     <goal name="rbalance&#39;vc.0.0.7" expl="postcondition" proved="true">
-    <proof prover="7"><result status="valid" time="0.16"/></proof>
+    <proof prover="2"><result status="valid" time="0.35"/></proof>
     </goal>
     <goal name="rbalance&#39;vc.0.0.8" expl="postcondition" proved="true">
-    <proof prover="7"><result status="valid" time="0.15"/></proof>
+    <proof prover="2"><result status="valid" time="0.32"/></proof>
     </goal>
     <goal name="rbalance&#39;vc.0.0.9" expl="postcondition" proved="true">
-    <proof prover="7"><result status="valid" time="0.10"/></proof>
+    <proof prover="2"><result status="valid" time="0.28"/></proof>
     </goal>
     <goal name="rbalance&#39;vc.0.0.10" expl="postcondition" proved="true">
-    <proof prover="7"><result status="valid" time="0.14"/></proof>
+    <proof prover="2"><result status="valid" time="0.14"/></proof>
     </goal>
     <goal name="rbalance&#39;vc.0.0.11" expl="postcondition" proved="true">
-    <proof prover="7"><result status="valid" time="0.12"/></proof>
+    <proof prover="2"><result status="valid" time="0.27"/></proof>
     </goal>
     <goal name="rbalance&#39;vc.0.0.12" expl="postcondition" proved="true">
-    <proof prover="7"><result status="valid" time="0.11"/></proof>
+    <proof prover="2"><result status="valid" time="0.27"/></proof>
     </goal>
     <goal name="rbalance&#39;vc.0.0.13" expl="postcondition" proved="true">
-    <proof prover="7"><result status="valid" time="0.14"/></proof>
+    <proof prover="2"><result status="valid" time="0.30"/></proof>
     </goal>
     <goal name="rbalance&#39;vc.0.0.14" expl="postcondition" proved="true">
-    <proof prover="7"><result status="valid" time="0.18"/></proof>
+    <proof prover="2"><result status="valid" time="0.50"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="rbalance&#39;vc.0.1" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.14" steps="20439"/></proof>
+   <proof prover="6"><result status="valid" time="0.14" steps="28235"/></proof>
    </goal>
    <goal name="rbalance&#39;vc.0.2" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.50" steps="51723"/></proof>
+   <proof prover="6"><result status="valid" time="0.67" steps="88323"/></proof>
    </goal>
    <goal name="rbalance&#39;vc.0.3" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.12" steps="12803"/></proof>
+   <proof prover="6"><result status="valid" time="0.12" steps="18742"/></proof>
    </goal>
    <goal name="rbalance&#39;vc.0.4" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.10" steps="11079"/></proof>
+   <proof prover="6"><result status="valid" time="0.10" steps="14817"/></proof>
    </goal>
   </transf>
   </goal>
@@ -210,7 +210,7 @@
    <proof prover="4"><result status="valid" time="0.94" steps="118187"/></proof>
    </goal>
    <goal name="insert&#39;vc.10.1" expl="VC for insert" proved="true">
-   <proof prover="8"><result status="valid" time="0.99" steps="9874"/></proof>
+   <proof prover="8"><result status="valid" time="0.99" steps="9880"/></proof>
    </goal>
    <goal name="insert&#39;vc.10.2" expl="VC for insert" proved="true">
    <proof prover="4"><result status="valid" time="0.30" steps="77791"/></proof>
