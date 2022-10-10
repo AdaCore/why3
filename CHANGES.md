@@ -10,6 +10,8 @@ Configuration
   * the libdir and datadir are not anymore stored in the Why3 config
     file, but they can be manually set there if desired. See also the
     usage of environment variables WHY3LIB and WHY3DATA
+  * the option --enable-profiling does not exist anymore, see
+    CONTRIBUTING.md for details
 
 API
   * source locations are now represented by both a start line number
