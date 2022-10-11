@@ -230,6 +230,22 @@ let rec import_model_value loc env check known th_known ity t =
     Pretty.print_attrs t.t_attrs;
   let res = match t.t_node with
   | Tvar _ -> undefined_value env ity
+  | Ttrue -> bool_value true
+  | Tfalse -> bool_value false
+  | Tapp (ls, args) -> (
+      let ts, l1, l2 = ity_components ity in
+      let subst = its_match_regs ts l1 l2 in
+      let def = Pdecl.find_its_defn known ts in
+      let matching_name rs = String.equal rs.rs_name.id_string ls.ls_name.id_string in
+      match List.find matching_name def.Pdecl.itd_constructors with
+      | rs -> (
+        let itys = List.map (fun pv -> ity_full_inst subst pv.pv_ity)
+            rs.rs_cty.cty_args in
+        let args =
+          List.map2 (import_model_value loc env check known th_known) itys args
+        in
+        constr_value ity rs def.Pdecl.itd_fields args)
+      | exception Not_found -> term_value ity t)
   | _ when Opt.equal Ty.ty_equal (Some (ty_of_ity ity)) t.t_ty -> term_value ity t
   | _ ->
     (* [ity] and the type of [t] may not match for the following reason:
