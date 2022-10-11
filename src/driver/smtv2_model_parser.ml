@@ -62,6 +62,28 @@ module FromSexpToModel = struct
 
   let get_quoted s = String.sub s 1 (String.length s - 2)
 
+  let get_type_from_var_name name =
+    (* we try to infer the type from [name], for example:
+        - infer the type int32 from the name @uc_int32_1
+        - infer the type ref int32 from the name |@uc_(ref int32)_0| *)
+    let name = if is_quoted name then get_quoted name else name in
+    if Strings.has_prefix "@" name then
+      try
+        let left = String.index name '_' + 1 in
+        let right = String.rindex name '_' in
+        let ty = String.sub name left (right - left) in
+        let ty =
+          (try Strings.(remove_prefix "(" (remove_suffix ")" ty)) with _ -> ty)
+        in (
+          match String.split_on_char ' ' ty with
+          | [ty] -> Some (Atom ty)
+          | l -> Some (List (List.map (fun s -> Atom s) l)))
+      with _ -> Some (Atom Strings.(remove_prefix "@" name))
+    else
+      match String.split_on_char '!' name with
+      | [ ty; _; _ ] -> Some (Atom ty)
+      | _ -> None
+
   let is_string s =
     String.length s >= 2 && s.[0] = '"' && s.[String.length s - 1] = '"'
 
@@ -262,7 +284,10 @@ module FromSexpToModel = struct
 
   let qualified_identifier sexp : qual_identifier =
     match sexp with
-    | Atom _ -> Qident (identifier sexp)
+    | Atom n -> (
+        match get_type_from_var_name n with
+        | None -> Qident (identifier sexp)
+        | Some s -> Qannotident (identifier sexp, sort s))
     | List [ Atom "as"; id; s ] -> Qannotident (identifier id, sort s)
     | sexp -> error sexp "qualified_identifier"
 
@@ -403,23 +428,6 @@ module FromModelToTerm = struct
       end
     | _ -> error "TODO_WIP smt_sort_to_ty"
 
-  let get_type_from_var_name name =
-    (* we try to infer the type from [name], for example:
-        - infer the type int32 from the name @uc_int32_1
-        - infer the type ref int32 from the name |@uc_(ref int32)_0| *)
-    if Strings.has_prefix "@" name then
-      try
-        let left = String.index name '_' + 1 in
-        let right = String.rindex name '_' in
-        let ty = String.sub name left (right - left) in
-        Some
-          (try Strings.(remove_prefix "(" (remove_suffix ")" ty)) with _ -> ty)
-      with _ -> Some Strings.(remove_prefix "@" name)
-    else
-      match String.split_on_char '!' name with
-      | [ ty; _; _ ] -> Some ty
-      | _ -> None
-
   (* TODO_WIP refactoring *)
   let qual_id_to_term env qid =
     Debug.dprintf debug "[qual_id_to_term] qid = %a@."
@@ -431,34 +439,13 @@ module FromModelToTerm = struct
         else
           let vs =
             try Mstr.find n env.bound_vars
-            with Not_found -> (
-              let vs_ty =
-                match get_type_from_var_name n with
-                (* TODO_WIP this should be moved earlier because we should have
-                  a Qannotident if we can infer a type from the name variable *)
-                | Some ty_str ->
-                    smt_sort_to_ty env (Ssimple (Isymbol (S ty_str)))
-                | None -> error "TODO_WIP cannot infer the type of the variable"
-              in
-              create_vsymbol (Ident.id_fresh n) vs_ty)
+            with Not_found -> error "TODO_WIP cannot infer the type of the variable"
           in
           t_var vs
     | Qident (Isymbol (Sprover n)) ->
         let vs =
           try List.find (fun vs -> String.equal n vs.vs_name.id_string) env.prover_vars
-          with Not_found -> (
-            Debug.dprintf debug "NOT FOUND@.";
-            let vs_ty =
-              match get_type_from_var_name n with
-              (* TODO_WIP this should be moved earlier because we should have
-                  a Qannotident if we can infer a type from the name variable *)
-              | Some ty_str ->
-                  smt_sort_to_ty env (Ssimple (Isymbol (Sprover ty_str)))
-              | None -> error "TODO_WIP cannot infer the type of the prover variable"
-            in
-            let vs = create_vsymbol (Ident.id_fresh n) vs_ty in
-            env.prover_vars <- vs :: env.prover_vars;
-            vs)
+          with Not_found -> error "TODO_WIP cannot infer the type of the prover variable"
         in
         t_var vs
     | Qannotident (Isymbol (S n), s) ->
