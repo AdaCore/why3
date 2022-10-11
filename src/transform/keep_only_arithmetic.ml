@@ -13,7 +13,6 @@ open Term
 open Decl
 open Ty
 open Theory
-open Ident
 
 type fmla =
   | Unsupported
@@ -25,7 +24,7 @@ type fmla =
    int/reals *)
 (* Also performs some simplifications *)
 let rec get_fmla symbols f =
-  let rec get = get_fmla symbols in
+  let get = get_fmla symbols in
   match f.t_node with
   | Tbinop (Tand, f1, f2) -> (
     match get f1 with
@@ -71,7 +70,7 @@ let rec get_fmla symbols f =
     | Tautology -> Contradiction
     | Contradiction -> Tautology
     | Formula f -> Formula (t_not f))
-  | Tapp (ls, [ t1; t2 ]) ->
+  | Tapp (ls, [ t1; _ ]) ->
     if ls_equal ls ps_equ then
       match t1.t_ty with
       | Some ty ->
@@ -88,10 +87,13 @@ let rec get_fmla symbols f =
 
 let filter_non_arith symbols d =
   match d.d_node with
-  | Dtype ts when ts_equal ts ts_int || ts_equal ts ts_real -> [ d ]
-  | Dparam { ls_args = []; ls_value = Some ty }
+  | Dtype _ -> [ d ]
+  (* | Dtype ts when ts_equal ts ts_int || ts_equal ts ts_real || ts_equal ts ts_bool -> [ d ] *)
+  (* | Dparam { ls_args = []; ls_value = Some ty } *)
+  | Dparam { ls_value = Some ty }
     when ty_equal ty ty_int || ty_equal ty ty_real ->
     [ d ]
+  | Dparam ls when List.exists (fun _ls -> ls_equal ls _ls) symbols || ls_equal ls ps_equ -> [ d ]
   | Dprop (Paxiom, pr, f) -> (
     match get_fmla symbols f with
     | Contradiction -> [ create_prop_decl Paxiom pr t_false ]
@@ -101,9 +103,9 @@ let filter_non_arith symbols d =
     match get_fmla symbols f with
     | Unsupported
     | Contradiction ->
-      [ create_prop_decl Paxiom pr t_true ]
-    | Tautology -> [ create_prop_decl Pgoal pr t_false ]
-    | Formula f -> [ create_prop_decl Pgoal pr (t_not f) ])
+      [ create_prop_decl Pgoal pr t_false ]
+    | Tautology -> [ create_prop_decl Pgoal pr t_true ]
+    | Formula f -> [ create_prop_decl Pgoal pr f ])
   | _ -> []
 
 let keep_only_arithmetic env =

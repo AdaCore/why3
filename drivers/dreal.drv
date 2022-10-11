@@ -2,7 +2,7 @@
 
 prelude ";; produced by dreal.drv ;;"
 
-printer "dreal"
+printer "smtv2"
 
 filename "%f-%t-%g.smt2"
 unknown "delta-sat with delta = .*" ""
@@ -23,6 +23,9 @@ transformation "simplify_computations"
 transformation "introduce_premises"
 transformation "instantiate_predicate"
 transformation "abstract_unknown_lsymbols"
+transformation "eliminate_unknown_lsymbols"
+transformation "keep_only_arithmetic"
+transformation "eliminate_unknown_types"
 
 prelude "(set-logic QF_NRA)"
 
@@ -36,8 +39,6 @@ theory BuiltIn
 end
 
 theory int.Int
-  prelude ";;; dreal: integer arithmetic"
-
   syntax function zero "0"
   syntax function one  "1"
 
@@ -62,8 +63,6 @@ end
 
 
 theory real.Real
-  prelude ";;; dreal: real arithmetic"
-
   syntax function zero "0.0"
   syntax function one  "1.0"
 
