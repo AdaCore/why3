@@ -274,6 +274,7 @@ val t_quant : quant -> term_quant -> term
 val t_forall : term_quant -> term
 val t_exists : term_quant -> term
 val t_binary : binop -> term -> term -> term
+val t_binary_bool : binop -> term -> term -> term
 val t_and : term -> term -> term
 val t_or : term -> term -> term
 val t_implies : term -> term -> term

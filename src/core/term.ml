@@ -640,6 +640,7 @@ let t_case t1 bl ty = mk_term (Tcase (t1, bl)) ty
 let t_eps bf ty     = mk_term (Teps bf) ty
 let t_quant q qf    = mk_term (Tquant (q, qf)) None
 let t_binary op f g = mk_term (Tbinop (op, f, g)) None
+let t_binary_bool op f g = mk_term (Tbinop (op, f, g)) (Some ty_bool) (* TODO_WIP *)
 let t_not f         = mk_term (Tnot f) None
 let t_bool_not f    = mk_term (Tnot f) (Some ty_bool)
 let t_true          = mk_term (Ttrue) None

@@ -45,7 +45,7 @@ type printing_info = {
   list_fields        : Ident.ident Mstr.t;
   list_records       : field_info list Mstr.t;
   noarg_constructors : string list;
-  constructors       : Sls.t;
+  constructors       : Term.lsymbol Mstr.t;
   set_str            : Sattr.t Mstr.t
 }
 
@@ -76,7 +76,7 @@ let default_printing_info = {
   list_fields = Mstr.empty;
   list_records = Mstr.empty;
   noarg_constructors = [];
-  constructors = Sls.empty;
+  constructors = Mstr.empty;
   set_str = Mstr.empty
 }
 

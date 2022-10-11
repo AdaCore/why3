@@ -210,7 +210,7 @@ type info = {
   (* For algebraic type counterexamples: constructors with no arguments can be
      misunderstood for variables *)
   mutable noarg_constructors: string list;
-  mutable constructors: Sls.t;
+  mutable constructors: lsymbol Mstr.t;
   info_cntexample_need_push : bool;
   info_cntexample: bool;
   info_incremental: bool;
@@ -806,11 +806,11 @@ let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f = match k with
   | Plemma -> assert false
 
 let print_constructor_decl info is_record fmt (ls,args) =
-  info.constructors <- Sls.add ls info.constructors;
+  let cons_name = sprintf "%a" (print_ident info) ls.ls_name in
+  info.constructors <- Mstr.add cons_name ls info.constructors;
   let field_names =
     (match args with
     | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name;
-        let cons_name = sprintf "%a" (print_ident info) ls.ls_name in
         info.noarg_constructors <- cons_name :: info.noarg_constructors;
         []
     | _ ->
@@ -853,7 +853,7 @@ let print_constructor_decl info is_record fmt (ls,args) =
     Mls.add ls (List.map (fun x -> x.field_name) field_names) info.constr_proj_id;
   if Strings.has_suffix "'mk" ls.ls_name.id_string then
     begin
-      info.list_records <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name) field_names info.list_records;
+      info.list_records <- Mstr.add cons_name field_names info.list_records;
     end
 
 let print_data_decl info fmt (ts,cl) =
@@ -970,7 +970,7 @@ let print_task version args ?old:_ fmt task =
     list_records = Mstr.empty;
     constr_proj_id = Mls.empty;
     noarg_constructors = [];
-    constructors = Sls.empty;
+    constructors = Mstr.empty;
     info_cntexample_need_push = need_push;
     info_cntexample = cntexample;
     info_incremental = incremental;

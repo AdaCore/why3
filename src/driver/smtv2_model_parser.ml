@@ -361,9 +361,9 @@ module FromModelToTerm = struct
     (* Prover variables. *)
     mutable prover_vars : vsymbol list;
     (* Bound variables in the body of a function definiton. *)
-    mutable bound_vars : vsymbol list;
+    mutable bound_vars : vsymbol Mstr.t;
     (* Constructors from [pinfo.constructors]. *)
-    mutable constructors : lsymbol list;
+    mutable constructors : lsymbol Mstr.t;
     (* Known types from lsymbols in [pinfo.queried_terms]. *)
     mutable known_types : Ty.ty list;
   }
@@ -377,12 +377,9 @@ module FromModelToTerm = struct
       | Ty.Tyapp (ts,ts_args) ->
           (* TODO_WIP also check ts_args *)
           String.equal str ts.Ty.ts_name.id_string)
-  let is_no_arg_constructor n list_lsymbols =
-    let aux ls =
-      (String.equal n ls.ls_name.id_string) && (ls.ls_args == [])
-    in
-    match List.find_opt aux list_lsymbols with
-    | Some _ -> true
+  let is_no_arg_constructor n constructors =
+    match Mstr.find_opt n constructors with
+    | Some ls -> ls.ls_args == []
     | None -> false
 
   let rec smt_sort_to_ty env s =
@@ -433,7 +430,7 @@ module FromModelToTerm = struct
           raise NoArgConstructor
         else
           let vs =
-            try List.find (fun vs -> String.equal n vs.vs_name.id_string) env.bound_vars
+            try Mstr.find n env.bound_vars
             with Not_found -> (
               let vs_ty =
                 match get_type_from_var_name n with
@@ -471,7 +468,7 @@ module FromModelToTerm = struct
           let vs =
             try
               let vs =
-                List.find (fun vs -> String.equal n vs.vs_name.id_string) env.bound_vars
+                Mstr.find n env.bound_vars
               in
               if Ty.ty_equal vs.vs_ty (smt_sort_to_ty env s) then vs
               else error "TODO_WIP type mismatch"
@@ -541,6 +538,16 @@ module FromModelToTerm = struct
             (Some Ty.ty_bool)
         in
         t'
+    | Qident (Isymbol (S "or")), hd::tl ->
+        List.fold_left
+          (fun t t' -> t_binary_bool Term.Tor t (term_to_term env t'))
+          (term_to_term env hd)
+          tl
+    | Qident (Isymbol (S "and")), hd::tl ->
+        List.fold_left
+          (fun t t' -> t_binary_bool Term.Tand t (term_to_term env t'))
+          (term_to_term env hd)
+          tl
     | Qident (Isymbol (S "not")), [ t ] -> t_bool_not (term_to_term env t)
     | Qident (Isymbol (S n)), ts | Qident (Isymbol (Sprover n)), ts ->
         let ts' = List.map (term_to_term env) ts in
@@ -550,7 +557,7 @@ module FromModelToTerm = struct
             error "TODO_WIP apply_to_term error with types of arguments"
         in
         let ls =
-          try List.find (fun ls -> String.equal n ls.ls_name.id_string) env.constructors
+          try Mstr.find n env.constructors
           with Not_found -> error "TODO_WIP unknown lsymbol"
         in
         t_app ls ts' ls.ls_value
@@ -639,17 +646,21 @@ module FromModelToTerm = struct
             && List.fold_left2
                  (fun acc ty1 ty2 -> acc && Ty.ty_equal ty1 ty2)
                  true args_ty_list ls.ls_args
-          then
-            let vslist =
-              List.map
-                (fun (symbol, sort) ->
-                  let name = match symbol with
-                    | S str | Sprover str -> Ident.id_fresh str in
-                  create_vsymbol name (smt_sort_to_ty env sort))
-                args
-            in
-            env.bound_vars <- vslist;
-            t_lambda vslist [] (smt_term_to_term env body res)
+          then (
+            List.iter
+              (fun (symbol, sort) ->
+                match symbol with
+                  | S str | Sprover str ->
+                    let fresh_str = Ident.id_fresh str in
+                    let vs = create_vsymbol fresh_str (smt_sort_to_ty env sort) in
+                    env.bound_vars <- Mstr.add str vs env.bound_vars)
+              args;
+            Mstr.iter
+              (fun key vs ->
+                Debug.dprintf debug "[interpret_fun_def_to_term] bound_var = (%s, %a)@."
+                  key Pretty.print_vs vs)
+              env.bound_vars;
+            t_lambda (Mstr.values env.bound_vars) [] (smt_term_to_term env body res))
           else error "TODO_WIP type mismatch"
     in
     Debug.dprintf debug "[interpret_fun_def_to_term] t = %a@." Pretty.print_term
@@ -775,6 +786,21 @@ module FromModelToTerm = struct
               (Pp.print_option Pretty.print_id_attrs) finfo.Printer.field_ident)
           l)
       records;
+    let records =
+      let select finfo =
+        if finfo.Printer.field_trace <> "" then finfo.Printer.field_trace else
+          match finfo.Printer.field_ident with
+          | Some id -> id.Ident.id_string
+          | None -> finfo.Printer.field_name in
+      Mstr.mapi (fun _ -> List.map select) pinfo.list_records in
+    Mstr.iter
+      (fun key l ->
+        List.iter
+          (fun elem ->
+            Debug.dprintf debug "[list_records] key = %s, field = %s@."
+              key elem)
+          l)
+      records;
     let fields = pinfo.list_fields in
     Mstr.iter
       (fun key f ->
@@ -788,16 +814,17 @@ module FromModelToTerm = struct
           key f.Ident.id_string)
       projections;
     let constructors = pinfo.constructors in
-    Sls.iter
-      (fun ls ->
-        Debug.dprintf debug "[constructors] ls = %a/%d@."
+    Mstr.iter
+      (fun key ls ->
+        Debug.dprintf debug "[constructors] key = %s, ls = %a/%d@."
+          key
           Pretty.print_ls ls
           (List.length ls.ls_args))
       constructors;
     let env = {
       prover_vars = [];
-      bound_vars = [];
-      constructors = Sls.elements constructors;
+      bound_vars = Mstr.empty;
+      constructors = constructors;
       known_types = []
     } in
     (* Compute known types from lsymbols in [qterms] *)

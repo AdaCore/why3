@@ -459,7 +459,7 @@ let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f =
         list_fields = info.list_field_def;
         list_records = Mstr.empty;
         noarg_constructors = [];
-        constructors = Sls.empty;
+        constructors = Mstr.empty;
         set_str = Mstr.empty;
       };
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
