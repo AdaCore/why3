@@ -83,17 +83,19 @@ let rec get_fmla symbols f =
       Formula f
     else
       Unsupported
+  | Tquant (Tforall, t) -> let (vs,trigger,t) = t_open_quant t in (match get t with Formula f -> Formula (t_forall_close_simp vs trigger f) | _ -> Unsupported)
   | _ -> Unsupported
 
 let filter_non_arith symbols d =
   match d.d_node with
   | Dtype _ -> [ d ]
-  (* | Dtype ts when ts_equal ts ts_int || ts_equal ts ts_real || ts_equal ts ts_bool -> [ d ] *)
-  (* | Dparam { ls_args = []; ls_value = Some ty } *)
-  | Dparam { ls_value = Some ty }
-    when ty_equal ty ty_int || ty_equal ty ty_real ->
-    [ d ]
-  | Dparam ls when List.exists (fun _ls -> ls_equal ls _ls) symbols || ls_equal ls ps_equ -> [ d ]
+  | Dlogic _ -> [ d ]
+  | Dind _ -> [ d ]
+  | Dparam _ -> [ d ]
+  (* | Dparam { ls_value = Some ty } *)
+  (*   when ty_equal ty ty_int || ty_equal ty ty_real -> *)
+  (*   [ d ] *)
+  (* | Dparam ls when List.exists (fun _ls -> ls_equal ls _ls) symbols || ls_equal ls ps_equ -> [ d ] *)
   | Dprop (Paxiom, pr, f) -> (
     match get_fmla symbols f with
     | Contradiction -> [ create_prop_decl Paxiom pr t_false ]
@@ -101,7 +103,7 @@ let filter_non_arith symbols d =
     | _ -> [])
   | Dprop (Pgoal, pr, f) -> (
     match get_fmla symbols f with
-    | Unsupported
+    | Unsupported -> failwith "Unsupported goal"
     | Contradiction ->
       [ create_prop_decl Pgoal pr t_false ]
     | Tautology -> [ create_prop_decl Pgoal pr t_true ]
