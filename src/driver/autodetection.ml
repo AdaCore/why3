@@ -376,6 +376,18 @@ let generate_auto_strategies env =
       strategy_shortcut = "s";
       strategy_code = code }
   in
+  fprintf str_formatter "t inline_trivial step1@\n";
+  fprintf str_formatter "step1:@\n";
+  fprintf str_formatter "t eliminate_algebraic step2@\n";
+  fprintf str_formatter "step2:@\n";
+  fprintf str_formatter "t keep_only_arithmetic exit";
+  let code = flush_str_formatter () in
+  let numeric = {
+      strategy_name = "numeric";
+      strategy_desc = "For@ numeric@ goals";
+      strategy_shortcut = "n";
+      strategy_code = code }
+  in
   (* Auto level 0 and 1 and 2 *)
   let provers_level1 =
     Hprover.fold
@@ -438,7 +450,7 @@ let generate_auto_strategies env =
       strategy_shortcut = "3";
       strategy_code = code }
   in
-  [split ; auto0 ; auto1 ; auto2 ; auto3]
+  [split ; numeric ; auto0 ; auto1 ; auto2 ; auto3]
 
 let check_support_library main (data:Prover_autodetection_data.data) ver =
   let cmd_regexp = Re.Str.regexp "%\\(.\\)" in
