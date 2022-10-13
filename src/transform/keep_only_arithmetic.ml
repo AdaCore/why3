@@ -14,15 +14,16 @@ open Decl
 open Ty
 open Theory
 
+(* TODO: Add a truths table like in the Gappa printer for testing left side of implications. We should then perform 2 passes, 1 to get all the truths, the other one to instantiate the implications. 
+  We could still throw away quantified assertions that could be used on implications if instanciated, but its probably too costly to use them.
+ *)
+
 type fmla =
   | Unsupported
   | Tautology
   | Contradiction
   | Formula of term
 
-(* Filter all the formulas that are not inequalities or equalities about
-   int/reals *)
-(* Also performs some simplifications *)
 let rec get_fmla symbols f =
   let get = get_fmla symbols in
   match f.t_node with
@@ -83,32 +84,34 @@ let rec get_fmla symbols f =
       Formula f
     else
       Unsupported
-  | Tquant (Tforall, t) -> let (vs,trigger,t) = t_open_quant t in (match get t with Formula f -> Formula (t_forall_close_simp vs trigger f) | _ -> Unsupported)
+  | Tquant (Tforall, t) ->
+    let (vs,trigger,t) = t_open_quant t in
+    (match get t with
+      | Formula f -> Formula (t_forall_close_simp vs trigger f) 
+      | _ -> Unsupported)
   | _ -> Unsupported
 
 let filter_non_arith symbols d =
   match d.d_node with
-  | Dtype _ -> [ d ]
-  | Dlogic _ -> [ d ]
-  | Dind _ -> [ d ]
-  | Dparam _ -> [ d ]
-  (* | Dparam { ls_value = Some ty } *)
-  (*   when ty_equal ty ty_int || ty_equal ty ty_real -> *)
-  (*   [ d ] *)
-  (* | Dparam ls when List.exists (fun _ls -> ls_equal ls _ls) symbols || ls_equal ls ps_equ -> [ d ] *)
   | Dprop (Paxiom, pr, f) -> (
+    match get_fmla symbols f with
+    | Contradiction -> [ create_prop_decl Paxiom pr t_false ]
+    | Formula f -> [ create_prop_decl Paxiom pr f ]
+    | _ -> [])
+  (* TODO: Check if this is correct *)
+  | Dprop (Plemma, pr, f) -> (
     match get_fmla symbols f with
     | Contradiction -> [ create_prop_decl Paxiom pr t_false ]
     | Formula f -> [ create_prop_decl Paxiom pr f ]
     | _ -> [])
   | Dprop (Pgoal, pr, f) -> (
     match get_fmla symbols f with
-    | Unsupported -> failwith "Unsupported goal"
+    | Unsupported -> failwith "Unsupported goal type"
     | Contradiction ->
       [ create_prop_decl Pgoal pr t_false ]
     | Tautology -> [ create_prop_decl Pgoal pr t_true ]
     | Formula f -> [ create_prop_decl Pgoal pr f ])
-  | _ -> []
+  | _ -> [ d ]
 
 let keep_only_arithmetic env =
   let symbol_names =
