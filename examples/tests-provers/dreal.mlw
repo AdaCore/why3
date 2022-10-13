@@ -1,0 +1,61 @@
+use real.RealInfix
+use real.Abs
+use real.ExpLog
+use int.Int
+
+(* Exp and log estimates, proved by dReal but not the other provers *)
+goal exp_limit : forall x : real. abs x <=. 25. -> exp x <=. 72004899338.
+lemma log_limit : forall x : real.
+      -. log (1. -. 0x1p-39) +. abs(log (1. -. 0x1p-39) *. 0x1p-36) <=. 0x1p-38
+
+let function exp_limit_fun (x:real)
+  requires { abs x <=. 25. }
+  ensures { exp x <=. 72004899338. }
+= ()
+
+
+(* FromInt is not supported *)
+use real.FromInt
+use int.Abs as AbsInt
+goal exp_limit_from_int : forall x : int. AbsInt.abs x <= 25 -> exp (from_int x) <=. 72004899338.
+
+(* This works because this reduces to true at the printer level *)
+goal a : from_int 3 <=. 4.
+
+
+(* Min Max *)
+use real.MinMax
+
+goal min_max_test : min 3. 4. >. max 1. 2.
+
+
+(* Square *)
+use real.Square
+(* Unfotunately not proved by dReal *)
+goal sqr_sqrt : forall x. 0. <=. x -> sqr (sqrt x) = x
+goal sqr_sqrt_no_forall : sqr (sqrt 3.) = 3.
+
+(* Easily proved by all provers *)
+goal sqrt2_estimate : 1.41421356237 <=. sqrt 2. <=. 1.41421356238
+
+
+(* Power *)
+use real.PowerReal
+(* This is proved by dReal but not by the other solvers *)
+goal power : forall x. pow x 2. <=. 9. -> abs x <=. 3.
+
+(* This is not proved by dReal nor by any other prover *)
+goal sqr_sqrt2 : forall x. 0. <=. x -> pow (sqrt x) 2. = x
+
+(* This works because this reduces to true at the printer level *)
+goal huge_power : pow 5. 100. <=. 7.8886091e69
+
+
+(* Trigonometry *)
+use real.Trigonometry
+(* Basic axioms/lemmas, proved by dReal *)
+goal Pythagorean_identity : forall x:real. sqr (cos x) +. sqr (sin x) = 1.0
+goal Cos_le_one: forall x:real. abs (cos x) <=. 1.0
+goal Sin_le_one: forall x:real. abs (sin x) <=. 1.0
+goal Cos_sum: forall x y:real. cos (x+.y) = cos x *. cos y -. sin x *. sin y
+goal Sin_sum: forall x y:real. sin (x+.y) = sin x *. cos y +. cos x *. sin y
