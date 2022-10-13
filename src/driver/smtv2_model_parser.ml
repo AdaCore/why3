@@ -656,7 +656,7 @@ module FromModelToTerm = struct
     t
 
   (* [eval_var] is false if variables should not be evaluated *)
-  let rec eval_term env eval_var ty_coercions t =
+  let rec eval_term env eval_var ty_coercions ty_fields t =
     Debug.dprintf debug "[eval_term] eval_var = %b, t = %a@."
       eval_var
       Pretty.print_term t;
@@ -666,7 +666,6 @@ module FromModelToTerm = struct
         | Some ty -> (
           (* first search if there exists some type coercions for [ty] *)
           match Ty.Mty.find_def [] ty ty_coercions with
-          | [] -> t
           | (str',(ls',t'))::_ ->
             (* TODO_WIP handle multiple type coercions for a given [ty]
                 by creating a conjunction formula *)
@@ -677,7 +676,7 @@ module FromModelToTerm = struct
                   error "TODO_WIP type coercion with not exactly one argument"
             in
             (* TODO_WIP if t' is again a prover variable, we should recurse on that *)
-            let t' = eval_term env false ty_coercions (t_subst_single vs' (t_var vs) t') in
+            let t' = eval_term env false ty_coercions ty_fields (t_subst_single vs' (t_var vs) t') in
             (* create a fresh vsymbol for the variable bound by the epsilon term *)
             let x = create_vsymbol (Ident.id_fresh "x") ty in
             (* substitute [vs] by this new variable in the body [t'] of the function
@@ -686,13 +685,18 @@ module FromModelToTerm = struct
             (* construct the formula to be used in the epsilon term *)
             let f = t_equ (t_app ls' [t_var x] ls'.ls_value) t' in
             (* replace [t] by [eps x. f] *)
-            t_eps_close x f)
+            t_eps_close x f
+          | [] -> (
+              (* then search if [ty] is associated to some fields *)
+              match Ty.Mty.find_def [] ty ty_fields with
+              | [] -> t
+              | _ -> t (* TODO_WIP *)))
         | _ -> t)
     | Tapp (ls, [t1;t2]) when (ls.ls_name.id_string.[0] == '=') ->
       if
         t_equal
-          (eval_term env eval_var ty_coercions t1)
-          (eval_term env eval_var ty_coercions t2)
+          (eval_term env eval_var ty_coercions ty_fields t1)
+          (eval_term env eval_var ty_coercions ty_fields t2)
       then
         t_true_bool
       else
@@ -700,15 +704,15 @@ module FromModelToTerm = struct
            only in specific cases (e.g. two distinct prover variables) *)
         t_false_bool
     | Tapp (ls, ts) ->
-      let ts = List.map (eval_term env eval_var ty_coercions) ts in
+      let ts = List.map (eval_term env eval_var ty_coercions ty_fields) ts in
       t_app ls ts ls.ls_value
     | Tif (b,t1,t2) -> (
-      match (eval_term env eval_var ty_coercions b).t_node with
-      | Ttrue -> eval_term env eval_var ty_coercions t1
-      | Tfalse -> eval_term env eval_var ty_coercions t2
+      match (eval_term env eval_var ty_coercions ty_fields b).t_node with
+      | Ttrue -> eval_term env eval_var ty_coercions ty_fields t1
+      | Tfalse -> eval_term env eval_var ty_coercions ty_fields t2
       | _ ->
-        let t1 = eval_term env eval_var ty_coercions t1 in
-        let t2 = eval_term env eval_var ty_coercions t2 in
+        let t1 = eval_term env eval_var ty_coercions ty_fields t1 in
+        let t2 = eval_term env eval_var ty_coercions ty_fields t2 in
         t_if b t1 t2
     )
     | _ -> t
@@ -744,9 +748,37 @@ module FromModelToTerm = struct
               Pretty.print_term t)
           elt)
       ty_coercions;
+    let ty_fields =
+      Ty.Mty.map (* for each set [sls] of lsymbols associated to a type *)
+        (fun sls ->
+          (* we construct a list of elements [(str,(ls,t))] retrieved
+              from [terms] such that [ls] is in [sls]:
+              for a given type [ty], it corresponds to all fields
+              that should be used to construct a record object
+              from an object of type [ty] *)
+          List.concat (List.map
+            (fun ls -> Mstr.bindings (
+              Mstr.mapi_filter
+                (fun str ((ls',_,_), t) ->
+                  if ls_equal ls ls' then Some (ls,t) else None)
+                terms))
+            (Sls.elements sls))
+        )
+      pinfo.type_fields in
+    Ty.Mty.iter
+      (fun key elt ->
+        List.iter
+          (fun (str,(ls,t)) ->
+            Debug.dprintf debug "[ty_fields] ty = %a, str=%s, ls = %a, t=%a@."
+              Pretty.print_ty key
+              str
+              Pretty.print_ls ls
+              Pretty.print_term t)
+          elt)
+      ty_fields;
     Mstr.mapi (* for each element in [terms], we try to evaluate [t]:
        - by applying type coercions for variables, when possible *)
-      (fun str ((ls,oloc,attrs),t) -> ((ls,oloc,attrs), eval_term env true ty_coercions t))
+      (fun str ((ls,oloc,attrs),t) -> ((ls,oloc,attrs), eval_term env true ty_coercions ty_fields t))
       terms
 
 

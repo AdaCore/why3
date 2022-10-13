@@ -53,6 +53,8 @@ type printing_info = {
      by the printer *)
   type_coercions : Sls.t Mty.t;
   (** For each type, the set of lsymbols defining a coercion to this type. *)
+  type_fields : Sls.t Mty.t;
+  (** For each type, the set of lsymbols defining a field for this type. *)
   list_projections: Ident.ident Mstr.t;
   (** List of projections as printed in the model. They corresponds to an ident
      which is kept so that we can approximate its used name in task. *)
