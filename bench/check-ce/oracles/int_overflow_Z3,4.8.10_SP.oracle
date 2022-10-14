@@ -1,6 +1,6 @@
 File "bench/check-ce/int_overflow.mlw", line 6, characters 27-42:
 Goal test0.
-Prover result is: Valid (0.01s, 368 steps).
+Prover result is: Valid.
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -11,7 +11,7 @@ Prover result is: Valid (0.01s, 368 steps).
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 9, characters 27-44)
 File "bench/check-ce/int_overflow.mlw", line 9, characters 27-44:
 Goal test1.
-Prover result is: Unknown (sat) (0.02s, 1772 steps).
+Prover result is: Unknown (sat).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -45,7 +45,7 @@ File int_overflow.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `test2'goal1` cannot be evaluated)
 File "bench/check-ce/int_overflow.mlw", line 14, characters 27-38:
 Goal test2.
-Prover result is: Step limit exceeded (4.84s, 3000021 steps).
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `test2'goal` cannot be evaluated):
 File int_overflow.mlw:
@@ -54,7 +54,7 @@ File int_overflow.mlw:
 
 File "bench/check-ce/int_overflow.mlw", line 19, characters 43-53:
 Goal test_overflow.
-Prover result is: Valid (0.01s, 2887 steps).
+Prover result is: Valid.
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: BAD_CE
@@ -65,7 +65,7 @@ Prover result is: Valid (0.01s, 2887 steps).
   - Abstract RAC: NORMAL
 File "bench/check-ce/int_overflow.mlw", line 19, characters 48-62:
 Goal test_overflow.
-Prover result is: Step limit exceeded (2.31s, 3000021 steps).
+Prover result is: Unknown or time/memory/step limit.
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -78,7 +78,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: NORMAL
 File "bench/check-ce/int_overflow.mlw", line 24, characters 45-56:
 Goal test_overflow2.
-Prover result is: Step limit exceeded (3.97s, 3000025 steps).
+Prover result is: Unknown or time/memory/step limit.
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -91,7 +91,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: NORMAL
 File "bench/check-ce/int_overflow.mlw", line 24, characters 51-65:
 Goal test_overflow2.
-Prover result is: Timeout (10.00s, 3000025 steps).
+Prover result is: Unknown or time/memory/step limit.
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -104,7 +104,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: NORMAL
 File "bench/check-ce/int_overflow.mlw", line 31, characters 33-49:
 Goal test_overflow_int16.
-Prover result is: Step limit exceeded (2.08s, 3000047 steps).
+Prover result is: Unknown or time/memory/step limit.
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -143,7 +143,7 @@ File int_overflow.mlw:
   - Abstract RAC: NORMAL
 File "bench/check-ce/int_overflow.mlw", line 36, characters 54-67:
 Goal test_overflow_int16_alt.
-Prover result is: Step limit exceeded (2.13s, 3000025 steps).
+Prover result is: Unknown or time/memory/step limit.
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -156,7 +156,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: NORMAL
 File "bench/check-ce/int_overflow.mlw", line 36, characters 64-76:
 Goal test_overflow_int16_alt.
-Prover result is: Step limit exceeded (2.21s, 3000025 steps).
+Prover result is: Unknown or time/memory/step limit.
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -164,9 +164,12 @@ Sorry, we don't have a good counterexample for you :(
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 42, characters 29-45)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 42, characters 29-45)
+- Checked model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
 File "bench/check-ce/int_overflow.mlw", line 42, characters 29-45:
 Goal test_overflow_int16_bis.
-Prover result is: Timeout (10.00s).
+Prover result is: Unknown or time/memory/step limit.
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -205,7 +208,7 @@ File int_overflow.mlw:
   - Abstract RAC: NORMAL
 File "bench/check-ce/int_overflow.mlw", line 49, characters 33-49:
 Goal test_overflow_int32.
-Prover result is: Step limit exceeded (2.16s, 3000047 steps).
+Prover result is: Unknown or time/memory/step limit.
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -239,9 +242,12 @@ File int_overflow.mlw:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 54, characters 48-64)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 54, characters 48-64)
+- Checked model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
 File "bench/check-ce/int_overflow.mlw", line 54, characters 48-64:
 Goal test_overflow_int32_bis.
-Prover result is: Timeout (10.00s).
+Prover result is: Unknown or time/memory/step limit.
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -273,15 +279,18 @@ File int_overflow.mlw:
 
 File "bench/check-ce/int_overflow.mlw", line 59, characters 88-108:
 Goal test_overflow_int32_bis_inline.
-Prover result is: Valid (0.01s, 2975 steps).
+Prover result is: Valid.
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: BAD_CE
   - Concrete RAC: FAILURE (postcondition at unknown location)
   - Abstract RAC: FAILURE (postcondition at unknown location)
+- Checked model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
 File "bench/check-ce/int_overflow.mlw", line 59, characters 103-122:
 Goal test_overflow_int32_bis_inline.
-Prover result is: Timeout (10.00s).
+Prover result is: Unknown or time/memory/step limit.
 Sorry, we don't have a good counterexample for you :(
 
 

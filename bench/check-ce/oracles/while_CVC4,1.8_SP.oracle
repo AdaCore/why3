@@ -1,10 +1,10 @@
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.05s, 1281 steps).
+Prover result is: Valid.
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Sub-goal Loop variant decrease of goal f'vc.
-Prover result is: Valid (0.02s, 1804 steps).
+Prover result is: Valid.
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: SW
@@ -15,7 +15,7 @@ Prover result is: Valid (0.02s, 1804 steps).
   - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/while.mlw", line 10, characters 16-32)
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6663 steps).
+Prover result is: Unknown or time/memory/step limit.
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:
@@ -78,12 +78,4 @@ File while.mlw:
     Property failure at loop invariant preservation with:
       x1 = {contents= (-1)}
       i = {contents= 1}
-
-File "bench/check-ce/while.mlw", line 9, characters 14-19:
-Sub-goal Loop variant decrease of goal f'vc.
-Prover result is: Valid (0.01s, 1845 steps).
-
-File "bench/check-ce/while.mlw", line 10, characters 25-32:
-Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.01s, 1723 steps).
 

@@ -7,7 +7,7 @@
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `g1'goal` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 5, characters 40-52:
 Goal g1.
-Prover result is: Step limit exceeded (2.93s, 3000054 steps).
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because cannot import value from model: not implemented for value -0x1.000002p-126 (-1.17549e-38)):
 File floats.mlw:
@@ -23,7 +23,7 @@ File floats.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `g2'goal` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 7, characters 40-53:
 Goal g2.
-Prover result is: Step limit exceeded (2.89s, 3000054 steps).
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because cannot import value from model: not implemented for value -0x0.000002p-127 (-7.00649e-46)):
 File floats.mlw:
@@ -39,7 +39,7 @@ File floats.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g3'goal` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 9, characters 24-42:
 Goal g3.
-Prover result is: Step limit exceeded (5.45s, 3000039 steps).
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because cannot import value from model: not implemented for value -0):
 File floats.mlw:
@@ -68,7 +68,7 @@ File floats.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g5'goal` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 13, characters 24-43:
 Goal g5.
-Prover result is: Step limit exceeded (1.56s, 3000039 steps).
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because cannot import value from model: not implemented for value 0x1.500020p3 (10.5)):
 File floats.mlw:
@@ -84,7 +84,7 @@ File floats.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g6'goal` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 15, characters 24-30:
 Goal g6.
-Prover result is: Step limit exceeded (1.60s, 3000035 steps).
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because cannot import value from model: not implemented for value NaN):
 File floats.mlw:
@@ -100,7 +100,7 @@ File floats.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `g7'goal` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 17, characters 40-64:
 Goal g7.
-Prover result is: Step limit exceeded (7.91s, 3000056 steps).
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because cannot import value from model: not implemented for value -0x1.000000p64 (-1.84467e+19)):
 File floats.mlw:
@@ -121,20 +121,12 @@ File floats.mlw:
     x = +∞
 
 <check-ce-categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value 0x0.000002p-127 (7.00649e-46))
-  - Abstract RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value 0x0.000002p-127 (7.00649e-46))
-- Checked model 1: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `g9'goal` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `g9'goal` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 21, characters 40-70:
 Goal g9.
-Prover result is: Step limit exceeded (1.88s, 3000046 steps).
-The following counterexample model could not be verified
-  (both RAC terminated because cannot import value from model: not implemented for value 0x0.000002p-127 (7.00649e-46)):
-File floats.mlw:
-  Line 21:
-    x = 0x0.000002p-127 (7.00649e-46)
+Prover result is: Unknown or time/memory/step limit.
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -145,7 +137,7 @@ File floats.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g10'goal` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 23, characters 24-98:
 Goal g10.
-Prover result is: Step limit exceeded (8.25s, 3000049 steps).
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because cannot import value from model: not implemented for value 0x1.99999cp-4 (0.1)):
 File floats.mlw:
@@ -153,15 +145,15 @@ File floats.mlw:
     x = 0x1.99999cp-4 (0.1)
 
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
+- Selected model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value -0x1.0000000000001p-1022 (-2.22507e-308))
   - Abstract RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value -0x1.0000000000001p-1022 (-2.22507e-308))
-- Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value -0x1.0000000000001p-1022 (-2.22507e-308))
-  - Abstract RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value -0x1.0000000000001p-1022 (-2.22507e-308))
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `g1'goal1` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `g1'goal1` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 31, characters 40-52:
 Goal g1.
-Prover result is: Unknown (sat) (0.83s, 490453 steps).
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because cannot import value from model: not implemented for value -0x1.0000000000001p-1022 (-2.22507e-308)):
 File floats.mlw:
@@ -169,15 +161,15 @@ File floats.mlw:
     x = -0x1.0000000000001p-1022 (-2.22507e-308)
 
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
+- Selected model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value -0x0.0000000000001p-1023 (-0))
   - Abstract RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value -0x0.0000000000001p-1023 (-0))
-- Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value -0x0.0000000000001p-1023 (-0))
-  - Abstract RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value -0x0.0000000000001p-1023 (-0))
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `g2'goal1` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `g2'goal1` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 33, characters 40-53:
 Goal g2.
-Prover result is: Unknown (sat) (0.85s, 490475 steps).
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because cannot import value from model: not implemented for value -0x0.0000000000001p-1023 (-0)):
 File floats.mlw:
@@ -193,7 +185,7 @@ File floats.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g3'goal1` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 35, characters 24-42:
 Goal g3.
-Prover result is: Step limit exceeded (1.53s, 3000039 steps).
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because cannot import value from model: not implemented for value -0):
 File floats.mlw:
@@ -235,7 +227,7 @@ File floats.mlw:
   - Abstract RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value NaN)
 File "bench/check-ce/floats.mlw", line 41, characters 24-30:
 Goal g6.
-Prover result is: Timeout (10.00s, 286024 steps).
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because cannot import value from model: not implemented for value NaN):
 File floats.mlw:
@@ -248,7 +240,7 @@ File floats.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `g7'goal1` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 43, characters 40-64:
 Goal g7.
-Prover result is: Step limit exceeded (0.63s, 3000056 steps).
+Prover result is: Unknown or time/memory/step limit.
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -269,7 +261,7 @@ File floats.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `g9'goal1` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 47, characters 40-70:
 Goal g9.
-Prover result is: Step limit exceeded (0.77s, 3000046 steps).
+Prover result is: Unknown or time/memory/step limit.
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -280,7 +272,7 @@ Prover result is: Step limit exceeded (0.77s, 3000046 steps).
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g10'goal1` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 49, characters 24-98:
 Goal g10.
-Prover result is: Step limit exceeded (8.10s, 3000049 steps).
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because cannot import value from model: not implemented for value 0x1.999999999999bp-4 (0.1)):
 File floats.mlw:
