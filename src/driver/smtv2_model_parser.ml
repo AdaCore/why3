@@ -607,6 +607,7 @@ module FromModelToTerm = struct
     Debug.dprintf debug "[interpret_fun_def_to_term] attrs = %a@."
       Pretty.print_attrs
       attrs;
+    env.bound_vars <- Mstr.empty;
     let t =
       match fun_def with
       | [], res, body when ls.ls_args = [] ->
