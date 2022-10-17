@@ -1,0 +1,37 @@
+
+module M1
+
+use int.Int
+
+function f int : int
+
+lemma l : forall x:int. f x > 0
+
+axiom a : forall x:int. f x < 1
+meta "remove_unused:dependency" axiom a, function f
+
+goal g : 1 <= 0
+
+end
+
+
+
+module M2
+
+use int.Int
+
+function g int : int
+
+axiom b : forall x. g x < 0
+meta "remove_unused:dependency" axiom b, function g
+
+function f int : int
+
+lemma l : forall x:int. f x >= 0
+
+axiom a : forall x:int. f x <= g x
+meta "remove_unused:dependency" axiom a, function f
+
+goal go : 1 <= 0
+
+end
