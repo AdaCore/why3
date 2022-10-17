@@ -180,10 +180,8 @@ let locate_library env path =
   let file = List.fold_left Filename.concat "" path in
   let add_ext ext = file ^ "." ^ ext in
   let fl = List.map add_ext (Mstr.keys !extension_table) in
-  if fl = [] then failwith "Env.locate_library (no formats)";
   let add_dir dir = List.map (Filename.concat dir) fl in
   let fl = List.concat (List.map add_dir (get_loadpath env)) in
-  if fl = [] then failwith "Env.locate_library (empty loadpath)";
   match List.filter Sys.file_exists fl with
   | [] -> raise (LibraryNotFound path)
   | [file] -> file
