@@ -15,98 +15,12 @@ open Ty
 open Theory
 open Task
 
-(* TODO: Remove all that is not an equality/inequality or quantified stuff. Also
-   remove Timplies, Tiff, Tand. Also rem We could still throw away quantified
-   assertions that could be used on implications if instanciated, but its
-   probably too costly to use them. *)
+(* TODO Remove Tor ? *)
+(* Remove all that is not an equality/inequality or quantified stuff. Also
+   remove Timplies, Tiff, Tand. We could still throw away quantified assertions
+   that could be used on implications if instanciated, but its probably too
+   costly to use them. *)
 
-(* type fmla = *)
-(*   | Unsupported *)
-(*   | Tautology *)
-(*   | Contradiction *)
-(*   | Formula of term *)
-
-(* let rec check_impl_instanciation truths passed_impls impls = *)
-(*   match impls with *)
-(*   | impl :: tl -> ( *)
-(*     match impl with *)
-(*     | Tbinop (Timplies, t1, t2) -> ( *)
-(*       match Mterm.find t1 truths with *)
-(* | _ -> let truths = Mterm.add t2 () truths in let truths =
-   check_impl_instanciation truths passed_impls *)
-(* | Not_found -> check_impl_instanciation truths (passed_impls :: impl) tl) *)
-(*     | _ -> assert false) *)
-(*   | [] -> truths *)
-
-(* let rec get_fmla symbols f = *)
-(*   let get = get_fmla symbols in *)
-(*   match f.t_node with *)
-(*   | Tbinop (Tand, f1, f2) -> ( *)
-(*     match get f1 with *)
-(*     | Unsupported *)
-(*     | Tautology -> *)
-(*       get f2 *)
-(*     | Contradiction -> Contradiction *)
-(*     | Formula f1 -> ( *)
-(*       match get f2 with *)
-(*       | Unsupported *)
-(*       | Tautology -> *)
-(*         Formula f1 *)
-(*       | Contradiction -> Contradiction *)
-(*       | Formula f2 -> Formula (t_and f1 f2))) *)
-(*   | Tbinop (Tor, f1, f2) -> ( *)
-(*     match get f1 with *)
-(*     | Unsupported -> Unsupported *)
-(*     | Tautology -> Tautology *)
-(*     | Contradiction -> get f2 *)
-(*     | Formula f1 -> ( *)
-(*       match get f2 with *)
-(*       | Unsupported -> Unsupported *)
-(*       | Tautology -> Tautology *)
-(*       | Contradiction -> Formula f1 *)
-(*       | Formula f2 -> Formula (t_or f1 f2))) *)
-(*   | Tbinop (Timplies, f1, f2) -> ( *)
-(*     match get f1 with *)
-(*     | Unsupported *)
-(*     | Contradiction -> *)
-(*       Unsupported *)
-(*     | Tautology -> get f2 *)
-(*     | Formula f1 -> ( *)
-(*       match get f2 with *)
-(*       | Unsupported -> Unsupported *)
-(*       | Tautology -> Tautology *)
-(*       | Contradiction -> Formula (t_implies f1 t_false) *)
-(*       | Formula f2 -> Formula (t_implies f1 f2))) *)
-(*   (* TODO: Tbinop tiff ? *) *)
-(*   | Ttrue -> Tautology *)
-(*   | Tfalse -> Contradiction *)
-(*   | Tnot f1 -> ( *)
-(*     match get f1 with *)
-(*     | Unsupported -> Unsupported *)
-(*     | Tautology -> Contradiction *)
-(*     | Contradiction -> Tautology *)
-(*     | Formula f -> Formula (t_not f)) *)
-(*   | Tapp (ls, [ t1; _ ]) -> *)
-(*     if ls_equal ls ps_equ then *)
-(*       match t1.t_ty with *)
-(*       | Some ty -> *)
-(*         if ty_equal ty ty_int || ty_equal ty ty_real then *)
-(*           Formula f *)
-(*         else *)
-(*           Unsupported *)
-(*       | None -> Formula f *)
-(*     else if List.exists (fun _ls -> ls_equal ls _ls) symbols then *)
-(*       Formula f *)
-(*     else *)
-(*       Unsupported *)
-(*   | Tquant (Tforall, t) -> ( *)
-(*     let vs, trigger, t = t_open_quant t in *)
-(*     match get t with *)
-(*     | Formula f -> Formula (t_forall_close_simp vs trigger f) *)
-(*     | _ -> Unsupported) *)
-(*   | _ -> Unsupported *)
-
-(* TODO: Forall instanciation *)
 let rec get_fmlas f =
   match f.t_node with
   | Tbinop (Tand, f1, f2) -> (
@@ -132,9 +46,15 @@ let rec get_fmlas f =
 
 let rec check_truth (truths, impls) truth =
   try
-    let f = Mterm.find truth impls in
+    let f =
+      match (Mterm.find truth impls).t_node with
+      | Tbinop (Timplies, f1, f2) -> f2
+      | _ -> assert false
+    in
+    let truths = Mterm.add f () truths in
     let impls = Mterm.remove truth impls in
     let new_truths, new_impls = get_fmlas f in
+    let new_truths = [ f ] @ new_truths in
     let truths =
       List.fold_left (fun truths t -> Mterm.add t () truths) truths new_truths
     in
@@ -156,8 +76,10 @@ and check_impl (truths, impls) impl =
   | Tbinop (Timplies, f1, f2) -> (
     try
       let () = Mterm.find f1 truths in
+      let truths = Mterm.add f2 () truths in
       let impls = Mterm.remove f1 impls in
       let new_truths, new_impls = get_fmlas f2 in
+      let new_truths = [ f2 ] @ new_truths in
       let truths =
         List.fold_left (fun truths t -> Mterm.add t () truths) truths new_truths
       in
@@ -177,10 +99,11 @@ and check_impl (truths, impls) impl =
     | Not_found -> (truths, impls))
   | _ -> assert false
 
-let get_truths_and_impls (truths, impls) d =
+let get_truths_and_impls d (truths, impls) =
   match d.d_node with
   | Dprop (Paxiom, pr, f)
   | Dprop (Plemma, pr, f) ->
+    let truths = Mterm.add f () truths in
     let new_truths, new_impls = get_fmlas f in
     let truths =
       List.fold_left (fun truths t -> Mterm.add t () truths) truths new_truths
@@ -195,6 +118,104 @@ let get_truths_and_impls (truths, impls) d =
     in
     (truths, impls)
   | _ -> (truths, impls)
+
+type fmla =
+  | Unsupported
+  | Tautology
+  | Contradiction
+  | Formula of term
+
+let rec get_fmla symbols f =
+  let get = get_fmla symbols in
+  match f.t_node with
+  | Tbinop (Tor, f1, f2) -> (
+    match get f1 with
+    | Unsupported -> Unsupported
+    | Tautology -> Tautology
+    | Contradiction -> get f2
+    | Formula f1 -> (
+      match get f2 with
+      | Unsupported -> Unsupported
+      | Tautology -> Tautology
+      | Contradiction -> Formula f1
+      | Formula f2 -> Formula (t_or f1 f2)))
+  | Ttrue -> Tautology
+  | Tfalse -> Contradiction
+  | Tnot f1 -> (
+    match get f1 with
+    | Unsupported -> Unsupported
+    | Tautology -> Contradiction
+    | Contradiction -> Tautology
+    | Formula f -> Formula (t_not f))
+  | Tapp (ls, [ t1; _ ]) ->
+    if ls_equal ls ps_equ then
+      match t1.t_ty with
+      | Some ty ->
+        if ty_equal ty ty_int || ty_equal ty ty_real then
+          Formula f
+        else
+          Unsupported
+      | None -> Formula f
+    else if List.exists (fun _ls -> ls_equal ls _ls) symbols then
+      Formula f
+    else
+      Unsupported
+  | Tquant (Tforall, t) -> (
+    let vs, trigger, t = t_open_quant t in
+    match get t with
+    | Formula f -> Formula (t_forall_close_simp vs trigger f)
+    | _ -> Unsupported)
+  | _ -> Unsupported
+
+let rec task_fold_left fn = function
+  | Some task ->
+    let prev = task_fold_left fn task.task_prev in
+    fn prev task.task_decl
+  | None -> None
+
+let filter_non_arith symbols truths acc t =
+  match t.td_node with
+  | Decl d -> (
+    match d.d_node with
+    | Dtype _
+    | Ddata _
+    | Dparam _
+    | Dlogic _
+    | Dind _ ->
+      Task.add_decl acc d
+    | Dprop (Pgoal, _, _) ->
+      let get_fmla = get_fmla symbols in
+      let acc =
+        Mterm.fold_left
+          (fun _acc t _ ->
+            match get_fmla t with
+            | Formula _
+            | Contradiction ->
+              Task.add_decl _acc
+                (create_prop_decl Paxiom
+                   (create_prsymbol (Ident.id_fresh "dummy"))
+                   t)
+            | _ -> _acc)
+          acc truths
+      in
+      Task.add_decl acc d
+    | _ -> acc)
+  | _ -> Task.add_tdecl acc t
+
+let remove_unused_decls symbols truths task =
+  let filter_non_arith = filter_non_arith symbols truths in
+  task_fold_left filter_non_arith task
+
+let remove_unused_decls_ symbols (truths, impls) =
+  let truths, _ =
+    Mterm.fold_left (fun arg t () -> check_truth arg t) (truths, impls) truths
+  in
+  Trans.store (remove_unused_decls symbols truths)
+
+let remove_non_arith symbols =
+  Trans.bind
+    (Trans.fold_decl get_truths_and_impls (Mterm.empty, Mterm.empty))
+    (remove_unused_decls_ symbols)
 
 let keep_only_arithmetic env =
   let symbol_names =
@@ -214,20 +235,9 @@ let keep_only_arithmetic env =
     List.map (fun name -> ns_find_ls real.th_export [ name ]) symbol_names
   in
   let symbols = int_symbols @ real_symbols in
-  Trans.bind Trans.identity (fun task ->
-      let _, task = task_separate_goal task in
-      let goal_fmla = task_goal_fmla task in
-      match goal_fmla.t_node with
-      | Tapp (ls, [ t1; t2 ]) ->
-        if List.exists (fun _ls -> ls_equal ls _ls) (symbols @ [ ps_equ ]) then
-          let decls = task_decls task in
-          let truths, impls =
-            List.fold_left get_truths_and_impls (Mterm.empty, Mterm.empty) decls
-          in
-          assert false
-        else
-          failwith "Unsupported goal"
-      | _ -> failwith "Unsupported goal")
+  Trans.compose
+    (Trans.lookup_transform "inline_trivial" env)
+    (remove_non_arith symbols)
 
 let () =
   Trans.register_env_transform "keep_only_arithmetic" keep_only_arithmetic
