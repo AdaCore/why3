@@ -685,30 +685,9 @@ if test "$enable_ide" = yes; then
    if test "$enable_ide" = yes; then
       GTKVERSION=3
       PKGS_SOURCEVIEW="lablgtk3-sourceview3 lablgtk3.sourceview3 lablgtksourceview3"
-      reason_ide=" (gtk3)"
    else
-      AC_MSG_WARN([Lib lablgtk3 not found, trying lablgtk2.])
-      enable_ide=retry
-   fi
-fi
-
-# checking for lablgtk2
-if test "$enable_ide" = retry; then
-   enable_ide=yes
-   DIR=$($OCAMLFIND query lablgtk2)
-   if test -n "$DIR"; then
-      echo "ocamlfind found lablgtk2 in $DIR"
-      AC_CHECK_FILE($DIR/gtkButton.cmi,,enable_ide=no)
-   else
-      enable_ide=no
-   fi
-   if test "$enable_ide" = yes; then
-      GTKVERSION=2
-      PKGS_SOURCEVIEW="lablgtk2.sourceview2 lablgtksourceview2"
-      reason_ide=" (gtk2)"
-   else
-      AC_MSG_WARN([Lib lablgtk2 not found, IDE disabled.])
-      reason_ide=" (lablgtk2/3 not found)"
+      AC_MSG_WARN([Library lablgtk3 not found, IDE disabled.])
+      reason_ide=" (lablgtk3 not found)"
    fi
 fi
 

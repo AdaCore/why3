@@ -16,7 +16,8 @@ open Wstdlib
 open Ide_utils
 open History
 open Itp_communication
-open Gtkcompat
+
+module GSourceView = GSourceView3
 
 let debug = Debug.lookup_flag "ide_info"
 
