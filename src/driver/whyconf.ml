@@ -366,7 +366,7 @@ module RC_load = struct
       let shortcuts = add_prover_shortcuts shortcuts prover lshort in
       provers,shortcuts
     with MissingField s ->
-      Loc.warning "[Warning] cannot load a prover: missing field '%s'@." s;
+      Loc.warning "Missing field '%s' in [prover] section@." s;
       provers,shortcuts
 
   let load_shortcut acc section =
@@ -380,7 +380,7 @@ module RC_load = struct
                      prover_altern = altern} in
       add_prover_shortcuts acc prover shortcuts
     with MissingField s ->
-      Loc.warning "[Warning] cannot load shortcut: missing field '%s'@." s;
+      Loc.warning "Missing field '%s' in [shortcut] section@." s;
       acc
 
   let load_editor editors (id, section) =
@@ -399,7 +399,7 @@ module RC_load = struct
       in
       Meditor.add id info editors
     with MissingField s ->
-      Loc.warning "[Warning] cannot load an editor: missing field '%s'@." s;
+      Loc.warning "Missing field '%s' in [editor] section@." s;
       editors
 
   let load_policy acc (_,section) =
@@ -432,7 +432,7 @@ module RC_load = struct
         | _ -> raise Not_found
       with Not_found -> acc
     with MissingField s ->
-      Loc.warning "[Warning] cannot load a policy: missing field '%s'@." s;
+      Loc.warning "Missing field '%s' in [uninstalled_prover] section@." s;
       acc
 
   let load_strategy strategies section =
@@ -441,7 +441,7 @@ module RC_load = struct
       let name =
         try
           let (_:int) = String.index name ' ' in
-          Loc.warning "[Warning] found a space character in strategy name '%s': replaced by '_'@." name;
+          Loc.warning "Found a space character in strategy name '%s', replaced by '_'@." name;
           String.map (function ' ' -> '_' | c -> c) name
         with Not_found -> name
       in
@@ -458,7 +458,7 @@ module RC_load = struct
         strategies
     with
       MissingField s ->
-        Loc.warning "[Warning] cannot load a strategy: missing field '%s'@." s;
+        Loc.warning "Missing field '%s' in [strategy] section@." s;
         strategies
 
   let load_main old dirname section =
@@ -589,7 +589,7 @@ module RC_save = struct
       | s::l -> begin
           match RC_load.load_prover_id s with
           | exception MissingField field ->
-              Loc.warning "[Warning] missing field '%s' in user configuration@." field;
+              Loc.warning "Missing field '%s' in [prover] section@." field;
               aux (s::acc) l
           | p when Prover.equal p prover ->
               let s = update_section s in
@@ -851,7 +851,7 @@ let add_extra_config config filename =
       let altern = get_stringo section "alternative" in
       mk_filter_prover ?version ?altern name
     with MissingField s ->
-      Loc.warning "[Warning] sec prover_modifiers is missing a '%s' field@." s;
+      Loc.warning "Missing field '%s' in [prover_modifiers] section@." s;
       mk_filter_prover "none"
   in
   let prover_modifiers = get_simple_family rc "prover_modifiers" in
