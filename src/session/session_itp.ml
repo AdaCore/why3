@@ -1041,8 +1041,7 @@ let load_result a (path,acc) r =
        | "steplimitexceeded" -> Call_provers.StepLimitExceeded
        | "stepslimitexceeded" -> Call_provers.StepLimitExceeded
        | s ->
-          Loc.warning
-            "[Warning] Session.load_result: unexpected status '%s'@." s;
+          Loc.warning "Session.load_result: unexpected status '%s'@." s;
           Call_provers.HighFailure
      in
      let time =
@@ -1067,8 +1066,7 @@ let load_result a (path,acc) r =
      let fn = string_attribute "name" r in
      (Sysutil.add_to_path path fn,acc)
   | s ->
-    Loc.warning "[Warning] Session.load_result: unexpected element '%s'@."
-      s;
+    Loc.warning "Session.load_result: unexpected element '%s'@." s;
     (path,acc)
 
 let load_option attr g =
@@ -1110,7 +1108,7 @@ let rec load_goal session old_provers parent g id =
     List.iter (load_proof_or_transf session old_provers id) g.Xml.elements;
   | "label" -> ()
   | s ->
-      Loc.warning "[Warning] Session.load_goal: unexpected element '%s'@." s
+      Loc.warning "Session.load_goal: unexpected element '%s'@." s
 
 (* [load_proof_or_transf s op pid a] load either a proof attempt or a
    transformation of parent id [pid] from the xml [a] into the session
@@ -1201,8 +1199,7 @@ let load_theory session parent_name old_provers (path,acc) th =
      let fn = string_attribute "name" th in
      (Sysutil.add_to_path path fn,acc)
   | s ->
-    Loc.warning "[Warning] Session.load_theory: unexpected element '%s'@."
-      s;
+    Loc.warning "Session.load_theory: unexpected element '%s'@." s;
     (path,acc)
 
 let load_file session old_provers f =
@@ -1256,11 +1253,11 @@ let load_file session old_provers f =
                  prover_altern = altern} in
         Mint.add id (p,timelimit,steplimit,memlimit) old_provers
       with Failure _ ->
-        Loc.warning "[Warning] Session.load_file: unexpected non-numeric prover id '%s'@." id;
+        Loc.warning "Session.load_file: unexpected non-numeric prover id '%s'@." id;
         old_provers
     end
   | s ->
-    Loc.warning "[Warning] Session.load_file: unexpected element '%s'@." s;
+    Loc.warning "Session.load_file: unexpected element '%s'@." s;
     old_provers
 
 
@@ -1273,8 +1270,7 @@ let get_version (xml: Xml.t) =
     let shape_version = int_attribute_def "shape_version" xml.Xml.content 1 in
     shape_version
   | s ->
-    Loc.warning "[Warning] Session.load_session: unexpected element '%s'@."
-                 s;
+    Loc.warning "Session.load_session: unexpected element '%s'@." s;
     Termcode.current_shape_version
  *)
 
@@ -1400,7 +1396,7 @@ let read_file_session_and_shapes gs dir xml_filename =
       RS.read_xml_and_shapes gs xml_filename compressed_shape_filename
     else
       let () =
-        Loc.warning "[Warning] could not read goal shapes because \
+        Loc.warning "Could not read goal shapes because \
                       Why3 was not compiled with compress support@." in
       Xml.from_file xml_filename, None
   else
@@ -1409,7 +1405,7 @@ let read_file_session_and_shapes gs dir xml_filename =
       let module RS = ReadShapes(Compress.Compress_none) in
       RS.read_xml_and_shapes gs xml_filename shape_filename
     else
-      let () = Loc.warning "[Warning] could not find goal shapes file@." in
+      let () = Loc.warning "Could not find goal shapes file@." in
       Xml.from_file xml_filename, None
 
 let build_session ?sum_shape_version (s : session) xml : unit =
@@ -1436,8 +1432,7 @@ let build_session ?sum_shape_version (s : session) xml : unit =
       old_provers;
     Debug.dprintf debug "[Info] load_session: done@\n"
   | s ->
-    Loc.warning "[Warning] Session.load_session: unexpected element '%s'@."
-      s
+    Loc.warning "Session.load_session: unexpected element '%s'@." s
 
 let load_session (dir : string) =
   let file = Filename.concat dir db_filename in
