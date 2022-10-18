@@ -691,7 +691,25 @@ module FromModelToTerm = struct
               (* then search if [ty] is associated to some fields *)
               match Ty.Mty.find_def [] ty ty_fields with
               | [] -> t
-              | _ -> t (* TODO_WIP *)))
+              | fields ->
+                  let term_of_field (_, (ls',t')) =
+                    let vs_list', _, t' = t_open_lambda t' in
+                    let vs' = match vs_list' with
+                      | [vs'] -> vs'
+                      | _ -> error "TODO_WIP field with not exactly one argument" in
+                    (* TODO_WIP if t' is again a prover variable, we should recurse on that *)
+                    eval_term env false ty_fields ty_fields (t_subst_single vs' (t_var vs) t') in
+                  let ty_of_field (_, (ls',t')) =
+                    let vs_list', _, t' = t_open_lambda t' in
+                    match vs_list' with
+                    | [vs'] -> Opt.get t'.t_ty
+                    | _ -> error "TODO_WIP field with not exactly one argument" in
+                  let ls_array = (* TODO_WIP temporary lsymbol when no constructor *)
+                    create_lsymbol
+                      (Ident.id_fresh "arraymk")
+                      (List.map ty_of_field fields)
+                      (Some ty) in
+                  t_app ls_array (List.map term_of_field fields) (Some ty)))
         | _ -> t)
     | Tapp (ls, [t1;t2]) when (ls.ls_name.id_string.[0] == '=') ->
       if
@@ -750,10 +768,10 @@ module FromModelToTerm = struct
           elt)
       ty_coercions;
     let ty_fields =
-      Ty.Mty.map (* for each set [sls] of lsymbols associated to a type *)
-        (fun sls ->
+      Ty.Mty.map (* for each list of lsymbols associated to a type *)
+        (fun lls ->
           (* we construct a list of elements [(str,(ls,t))] retrieved
-              from [terms] such that [ls] is in [sls]:
+              from [terms] such that [ls] is in [lls]:
               for a given type [ty], it corresponds to all fields
               that should be used to construct a record object
               from an object of type [ty] *)
@@ -763,7 +781,7 @@ module FromModelToTerm = struct
                 (fun str ((ls',_,_), t) ->
                   if ls_equal ls ls' then Some (ls,t) else None)
                 terms))
-            (Sls.elements sls))
+            lls)
         )
       pinfo.type_fields in
     Ty.Mty.iter

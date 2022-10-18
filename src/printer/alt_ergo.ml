@@ -47,7 +47,7 @@ type info = {
   info_in_goal: bool;
   mutable list_projs: Ident.ident Mstr.t;
   mutable type_coercions : Sls.t Mty.t;
-  mutable type_fields : Sls.t Mty.t;
+  mutable type_fields : (lsymbol list) Mty.t;
   list_field_def: Ident.ident Mstr.t;
   meta_model_projection: Sls.t;
   info_cntexample: bool
@@ -109,7 +109,7 @@ let collect_model_ls info ls =
   if Sls.mem ls info.meta_record_def then (
     begin match ls.ls_args with
     | [ty] ->
-      let fields = Sls.add ls (Mty.find_def Sls.empty ty info.type_fields) in
+      let fields = ls :: (Mty.find_def [] ty info.type_fields) in
       info.type_fields <- Mty.add ty fields info.type_fields
     | _ -> () (* TODO_WIP *)
     end;

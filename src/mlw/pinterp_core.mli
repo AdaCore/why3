@@ -39,7 +39,7 @@ module rec Value : sig
   }
   and field
   and value_desc =
-    | Vconstr of Expr.rsymbol * Expr.rsymbol list * field list
+    | Vconstr of Expr.rsymbol option * Expr.rsymbol list * field list
     (** A record or variant *)
     | Vnum of BigInt.t
     (** Any integer number *)
@@ -97,7 +97,7 @@ val num_value : Ity.ity -> BigInt.t -> value
 val float_value : Ity.ity -> big_float -> value
 val real_value : Big_real.real -> value
 
-val constr_value : Ity.ity -> Expr.rsymbol -> Expr.rsymbol list -> value list -> value
+val constr_value : Ity.ity -> Expr.rsymbol option -> Expr.rsymbol list -> value list -> value
 val purefun_value : result_ity:Ity.ity -> arg_ity:Ity.ity -> value Mv.t -> value -> value
 val unit_value : value
 

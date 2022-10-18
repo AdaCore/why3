@@ -489,7 +489,7 @@ let rec matching env (v : value) p =
   | Pas (p, vs) -> matching (bind_vs vs v env) v p
   | Papp (ls, pl) -> (
       match v.v_desc with
-      | Vconstr ({rs_logic= RLls ls2}, _, tl) ->
+      | Vconstr (Some {rs_logic= RLls ls2}, _, tl) ->
           if ls_equal ls ls2 then
             List.fold_left2 matching env (List.map field_get tl) pl
           else if ls2.ls_constr > 0 then
@@ -505,14 +505,14 @@ let rec matching env (v : value) p =
 let is_true v = match v.v_desc with
   | Vbool true | Vterm {t_node= Ttrue} -> true
   | Vterm t when t_equal t t_bool_true -> true
-  | Vconstr (rs, [], []) when rs_equal rs rs_true -> true
+  | Vconstr (Some rs, [], []) when rs_equal rs rs_true -> true
   | _ -> false
 
 (* ...and no *)
 let is_false v = match v.v_desc with
   | Vbool false | Vterm {t_node= Tfalse} -> true
   | Vterm t when t_equal t t_bool_false -> true
-  | Vconstr (rs, [], []) when rs_equal rs rs_false -> true
+  | Vconstr (Some rs, [], []) when rs_equal rs rs_false -> true
   | _ -> false
 
 let fix_boolean_term t =
@@ -592,7 +592,7 @@ let value_of_term ctx t =
               defn.Pdecl.itd_fields
           | _ -> raise Exit in
         let vs = List.map aux ts in
-        let res = value ty (Vconstr (rs, fs, List.map field vs)) in
+        let res = value ty (Vconstr (Some rs, fs, List.map field vs)) in
         if ctx.do_rac then
           check_type_invs ctx.rac ~giant_steps:ctx.giant_steps ctx.env
             (ity_of_ty ty) res;
@@ -768,7 +768,7 @@ let get_and_register_global check_model_variable ctx exec_expr id oexp post ity 
 let rec set_fields fs1 fs2 =
   let set_field f1 f2 =
     match (field_get f1).v_desc, (field_get f2).v_desc with
-    | Vconstr (rs1, _, fs1), Vconstr (rs2, _, fs2) ->
+    | Vconstr (Some rs1, _, fs1), Vconstr (Some rs2, _, fs2) ->
         assert (rs_equal rs1 rs2);
         set_fields fs1 fs2
     | _ -> field_set f1 (field_get f2) in
@@ -776,9 +776,11 @@ let rec set_fields fs1 fs2 =
 
 let set_constr v1 v2 =
   match v1.v_desc, v2.v_desc with
-   | Vconstr (rs1, _, fs1), Vconstr (rs2, _, fs2) ->
-       assert (rs_equal rs1 rs2);
-       set_fields fs1 fs2;
+  | Vconstr (Some rs1, _, fs1), Vconstr (Some rs2, _, fs2) ->
+      assert (rs_equal rs1 rs2);
+      set_fields fs1 fs2;
+  | Vconstr (None, _, fs1), Vconstr (None, _, fs2) ->
+      set_fields fs1 fs2;
    | _ -> failwith "set_constr"
 
 let assign_written_vars ?(vars_map=Mpv.empty) wrt loc ctx vs =
@@ -1472,7 +1474,7 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
                   List.fold_left2 aux Mtv.empty rs.rs_cty.cty_args arg_vs in
                 let ty = ty_inst mt (ty_of_ity ity_result) in
                 let vs = List.map field arg_vs in
-                let v = value ty (Vconstr (rs, its_def.Pdecl.itd_fields, vs)) in
+                let v = value ty (Vconstr (Some rs, its_def.Pdecl.itd_fields, vs)) in
                 if ctx.do_rac then
                   check_type_invs ctx.rac ?loc ~giant_steps:ctx.giant_steps
                     ctx.env ity_result v;
@@ -1481,7 +1483,7 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: PROJECTION@]@." pp_indent print_rs rs;
                 check_pre_and_register_call Log.Exec_normal;
                 match rs.rs_field, arg_vs with
-                | Some pv, [{v_desc= Vconstr (cstr, _, args)} as v] ->
+                | Some pv, [{v_desc= Vconstr (Some cstr, _, args)} as v] ->
                     let rec search constr_args args =
                       match constr_args, args with
                       | pv2 :: pvl, v :: vl ->

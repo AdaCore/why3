@@ -41,7 +41,7 @@ type printing_info = {
   vc_term_attrs      : Sattr.t;
   queried_terms      : (Term.lsymbol * Loc.position option * Sattr.t) Mstr.t;
   type_coercions     : Sls.t Mty.t;
-  type_fields        : Sls.t Mty.t;
+  type_fields        : (lsymbol list) Mty.t;
   list_projections   : Ident.ident Mstr.t;
   list_fields        : Ident.ident Mstr.t;
   list_records       : field_info list Mstr.t;

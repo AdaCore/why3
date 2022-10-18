@@ -232,6 +232,23 @@ let rec import_model_value loc env check known th_known ity t =
   | Tvar _ -> undefined_value env ity
   | Ttrue -> bool_value true
   | Tfalse -> bool_value false
+  | Tapp (ls, args) when Strings.has_prefix "arraymk" ls.ls_name.id_string ->
+      begin try
+        let ts, l1, l2 = ity_components ity in
+        let subst = its_match_regs ts l1 l2 in
+        let def = Pdecl.find_its_defn known ts in
+        let itys =
+          List.map
+            (fun arg -> ity_full_inst subst (ity_of_ty (Opt.get arg.t_ty)))
+            args in
+        let args =
+          List.map2 (import_model_value loc env check known th_known) itys args
+        in
+        Debug.dprintf debug_check_ce_rac_results "[import_model_value] itd_fields = %a@."
+          (Pp.print_list Pp.space print_rs) def.Pdecl.itd_fields;
+        constr_value ity None (List.rev def.Pdecl.itd_fields) args
+      with Invalid_argument _ -> term_value ity t
+      end
   | Tapp (ls, args) -> (
       let ts, l1, l2 = ity_components ity in
       let subst = its_match_regs ts l1 l2 in
@@ -244,7 +261,7 @@ let rec import_model_value loc env check known th_known ity t =
         let args =
           List.map2 (import_model_value loc env check known th_known) itys args
         in
-        constr_value ity rs def.Pdecl.itd_fields args)
+        constr_value ity (Some rs) def.Pdecl.itd_fields args)
       | exception Not_found -> term_value ity t)
   | _ when Opt.equal Ty.ty_equal (Some (ty_of_ity ity)) t.t_ty -> term_value ity t
   | _ ->
@@ -256,7 +273,7 @@ let rec import_model_value loc env check known th_known ity t =
     match def.Pdecl.itd_constructors, def.Pdecl.itd_fields with
       | [rs], [field_rs] ->
         let field_ity = ity_full_inst subst (fd_of_rs field_rs).pv_ity in
-        constr_value ity rs [field_rs] [term_value field_ity t]
+        constr_value ity (Some rs) [field_rs] [term_value field_ity t]
       | _ ->
         cannot_import "type with not exactly one constructor and one field: %a/%d, %a/%d"
           print_its ts (List.length def.Pdecl.itd_constructors)
