@@ -109,19 +109,14 @@ module FromSexpToModel = struct
   let int = atom int_of_string
   let bigint = atom BigInt.of_string
 
-  let constant_int =
-    atom @@ fun s ->
-    try BigInt.of_string ("0b" ^ Strings.remove_prefix "#b" s)
-    with _ -> (
-      try BigInt.of_string ("0x" ^ Strings.remove_prefix "#x" s)
-      with _ -> (
-        try BigInt.of_string s with _ -> atom_error s "constant_int"))
+  let constant_int = function
+    | Atom s -> (
+        try BigInt.of_string s with _ -> atom_error s "constant_int")
+    | sexp -> error sexp "constant_int"
 
   let minus_constant_int = function
     | List [ Atom "-"; i ] as sexp -> (
-        try
-          let i' = atom BigInt.of_string i in
-          BigInt.minus i'
+        try BigInt.minus (atom BigInt.of_string i)
         with _ -> error sexp "minus_constant_int")
     | sexp -> error sexp "minus_constant_int"
 
@@ -161,11 +156,6 @@ module FromSexpToModel = struct
         (n1, n2)
     | sexp -> error sexp "constant_fraction"
 
-  let bv_int =
-    atom @@ fun s ->
-    try BigInt.of_string (Strings.remove_prefix "bv" s)
-    with _ -> atom_error s "bv_int"
-
   let constant_bv_bin = function
     | Atom s -> (
         try
@@ -187,7 +177,9 @@ module FromSexpToModel = struct
     | sexp -> error sexp "constant_bv_hex"
 
   let constant_bv_dec = function
-    | List [ Atom "_"; n; l ] -> (bv_int n, int l)
+    | List [ Atom "_"; Atom n; l ] as sexp -> (
+        try (BigInt.of_string (Strings.remove_prefix "bv" n), int l)
+        with _ -> error sexp "constant_bv_dec")
     | sexp -> error sexp "constant_bv_dec"
 
   let constant_bv sexp =
@@ -234,7 +226,8 @@ module FromSexpToModel = struct
               with _ -> (
                 try Cbool (bool sexp)
                 with _ -> (
-                  try Cstring (string sexp) with _ -> error sexp "constant"))))))
+                  try Cstring (string sexp)
+                  with _ -> error sexp "constant"))))))
     in
     Tconst cst
 
@@ -379,6 +372,7 @@ end
 module FromModelToTerm = struct
   exception E of string
   exception NoArgConstructor
+  exception UnknownType
 
   let error s = raise (E s)
 
@@ -391,6 +385,10 @@ module FromModelToTerm = struct
     mutable constructors : lsymbol Mstr.t;
     (* Known types from lsymbols in [pinfo.queried_terms]. *)
     mutable known_types : Ty.ty list;
+    (* Known types from lsymbols in [pinfo.queried_terms]. *)
+    mutable inferred_types : (sort * Ty.ty) list;
+    (* Queried terms [pinfo.queried_terms]. *)
+    queried_terms : lsymbol Mstr.t;
   }
 
   let get_opt_type oty = match oty with None -> Ty.ty_bool | Some ty -> ty
@@ -480,10 +478,20 @@ module FromModelToTerm = struct
         t_var vs
     | _ -> error "TODO_WIP_qual_id_to_vsymbol"
 
-  let constant_to_term c =
+  let constant_to_term env c =
     Debug.dprintf debug "[constant_to_term] c = %a@." print_constant c;
     match c with
     | Cint bigint -> t_const (Constant.int_const bigint) Ty.ty_int
+    | Cbitvector (bigint, n) ->
+      begin try
+        let _,ty =
+          List.find
+            (function | (Sbitvec n',_) when n=n' -> true | _ -> false)
+            env.inferred_types
+        in
+        t_const (Constant.int_const bigint) ty
+      with Not_found -> error "TODO_WIP Cbitvector"
+      end
     | Cbool b -> if b then t_true_bool else t_true_bool
     | Cstring str -> t_const (Constant.string_const str) Ty.ty_str
     | _ -> error "TODO_WIP constant_to_term"
@@ -491,7 +499,7 @@ module FromModelToTerm = struct
   let rec term_to_term env t =
     Debug.dprintf debug "[term_to_term] t = %a@." print_term t;
     match t with
-    | Tconst c -> constant_to_term c
+    | Tconst c -> constant_to_term env c
     | Tvar qid ->
         begin try
           qual_id_to_term env qid
@@ -582,6 +590,8 @@ module FromModelToTerm = struct
     t_lambda [ vs_arg ] [] a
 
   let smt_term_to_term env t s =
+    Debug.dprintf debug "[smt_term_to_term] s = %a, t = %a@."
+      print_sort s print_term t;
     let t' = term_to_term env t in
     let s' = smt_sort_to_ty env s in
     Debug.dprintf debug "[smt_term_to_term] s' = %a, t' = %a, t'.t_ty = %a@."
@@ -591,10 +601,10 @@ module FromModelToTerm = struct
     if Ty.ty_equal s' (get_opt_type t'.t_ty) then t'
     else error "TODO_WIP type error"
 
-  let interpret_fun_def_to_term env ls oloc attrs fun_def =
+  let interpret_fun_def_to_term env ls oloc attrs (args,res,body) =
     Debug.dprintf debug "-----------------------------@.";
     Debug.dprintf debug "[interpret_fun_def_to_term] fun_def = %a@."
-      print_function_def fun_def;
+      print_function_def (args,res,body);
     Debug.dprintf debug "[interpret_fun_def_to_term] ls = %a@."
       Pretty.print_ls ls;
     Debug.dprintf debug "[interpret_fun_def_to_term] ls.ls_value = %a@."
@@ -608,48 +618,42 @@ module FromModelToTerm = struct
       Pretty.print_attrs
       attrs;
     env.bound_vars <- Mstr.empty;
+    let check_sort_type s ty =
+      match smt_sort_to_ty env s with
+      | s_ty ->
+        Debug.dprintf debug "[check_sort_type] s = %a, ty = %a, s_ty = %a@."
+          print_sort s
+          Pretty.print_ty ty
+          Pretty.print_ty s_ty;
+        Ty.ty_equal ty s_ty
+      | exception UnknownType ->
+        env.inferred_types <- (s,ty) :: env.inferred_types;
+        true
+    in
     let t =
-      match fun_def with
-      | [], res, body when ls.ls_args = [] ->
-          let res_ty = smt_sort_to_ty env res in
-          Debug.dprintf debug "[interpret_fun_def_to_term] res_ty = %a@."
-            Pretty.print_ty res_ty;
-          if ls.ls_value != None && Ty.ty_equal (Opt.get ls.ls_value) res_ty
-          then smt_term_to_term env body res
-          else error "TODO_WIP type mismatch"
-      | [], _, _ -> error "TODO_WIP function arity mismatch"
-      | args, res, body ->
-          let res_ty = smt_sort_to_ty env res in
-          let args_ty_list =
-            List.map (fun (_, s) -> smt_sort_to_ty env s) args
-          in
-          Debug.dprintf debug "[interpret_fun_def_to_term] res_ty = %a@."
-            Pretty.print_ty res_ty;
+      try
+        if
+          check_sort_type res (get_opt_type ls.ls_value) &&
+            List.fold_left2
+              (fun acc (_,arg) ls_arg -> check_sort_type arg ls_arg)
+              true args ls.ls_args
+        then  (
           List.iter
-            (Debug.dprintf debug
-               "[interpret_fun_def_to_term] args_ty_list = %a@." Pretty.print_ty)
-            args_ty_list;
-          if (* check if type of lsymbol matches type parsed from SMT model *)
-            Ty.ty_equal (get_opt_type ls.ls_value) res_ty
-            && List.fold_left2
-                 (fun acc ty1 ty2 -> acc && Ty.ty_equal ty1 ty2)
-                 true args_ty_list ls.ls_args
-          then (
-            List.iter
-              (fun (symbol, sort) ->
-                match symbol with
-                  | S str | Sprover str ->
-                    let fresh_str = Ident.id_fresh str in
-                    let vs = create_vsymbol fresh_str (smt_sort_to_ty env sort) in
-                    env.bound_vars <- Mstr.add str vs env.bound_vars)
-              args;
-            Mstr.iter
-              (fun key vs ->
-                Debug.dprintf debug "[interpret_fun_def_to_term] bound_var = (%s, %a)@."
-                  key Pretty.print_vs vs)
-              env.bound_vars;
-            t_lambda (Mstr.values env.bound_vars) [] (smt_term_to_term env body res))
-          else error "TODO_WIP type mismatch"
+            (fun (symbol, sort) ->
+              match symbol with
+                | S str | Sprover str ->
+                  let fresh_str = Ident.id_fresh str in
+                  let vs = create_vsymbol fresh_str (smt_sort_to_ty env sort) in
+                  env.bound_vars <- Mstr.add str vs env.bound_vars)
+            args;
+          Mstr.iter
+            (fun key vs ->
+              Debug.dprintf debug "[interpret_fun_def_to_term] bound_var = (%s, %a)@."
+                key Pretty.print_vs vs)
+            env.bound_vars;
+          t_lambda (Mstr.values env.bound_vars) [] (smt_term_to_term env body res))
+        else error "TODO_WIP type mismatch"
+      with Invalid_argument _ -> error "TODO_WIP function arity mismatch"
     in
     Debug.dprintf debug "[interpret_fun_def_to_term] t = %a@." Pretty.print_term
       t;
@@ -863,7 +867,9 @@ module FromModelToTerm = struct
       prover_vars = [];
       bound_vars = Mstr.empty;
       constructors = constructors;
-      known_types = []
+      known_types = [];
+      inferred_types = [];
+      queried_terms = Mstr.map (fun (ls,_,_) -> ls) qterms;
     } in
     (* Compute known types from lsymbols in [qterms] *)
     let types_from_qterms =
@@ -883,6 +889,8 @@ module FromModelToTerm = struct
           | None -> ty::acc
           | Some _ -> acc)
         [] types_from_qterms;
+    Debug.dprintf debug "[known_types] ty = %a"
+      (Pp.print_list Pp.comma Pretty.print_ty) env.known_types;
     let terms =
       Mstr.mapi_filter
         (fun n def ->
