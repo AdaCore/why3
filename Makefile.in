@@ -1927,12 +1927,20 @@ endif
 
 FILESTODOC = $(subst .ml.mli,.ml,$(MODULESTODOC:%=src/%.mli))
 
+DOCFLAGS = $(INCLUDES) $(LIBINCLUDES)
+
+ifeq (@enable_ocamlfind@,yes)
+	DOCFLAGS += $(addprefix -package ,$(EXTPKGS))
+else
+	DOCFLAGS += $(EXTINCLUDES)
+endif
+
 doc/apidoc:
 	mkdir -p doc/apidoc
 
 apidoc: doc/apidoc $(FILESTODOC)
-	$(OCAMLDOC) -d doc/apidoc -charset utf-8 -html -t "Why3 API documentation" \
-		-keep-code $(INCLUDES) $(LIBINCLUDES) $(EXTINCLUDES) $(FILESTODOC)
+	$(OCAMLDOC) $(DOCFLAGS) -d doc/apidoc -charset utf-8 -html \
+		-t "Why3 API documentation" -keep-code $(FILESTODOC)
 
 # could we include also the dependency graph ? -- someone
 # At least we can give a way to create it -- francois
@@ -1941,8 +1949,7 @@ apidot: doc/apidoc/dg.svg doc/apidoc/dg.png
 
 #The sed remove configuration for dot that gives bad result
 doc/apidoc/dg.dot: doc/apidoc $(FILESTODOC)
-	$(OCAMLDOC) -o doc/apidoc/dg.dot.tmp -dot $(INCLUDES) \
-		$(LIBINCLUDES) -I lib/why3 $(FILESTODOC)
+	$(OCAMLDOC) $(DOCFLAGS) -o doc/apidoc/dg.dot.tmp -dot $(FILESTODOC)
 	sed -e "s/  \(size\|ratio\|rotate\|fontsize\).*$$//" doc/apidoc/dg.dot.tmp \
 	  | tred > doc/apidoc/dg.dot
 	rm -f doc/apidoc/dg.dot.tmp
@@ -1954,8 +1961,7 @@ doc/apidoc/dg.png: doc/apidoc/dg.dot
 	dot -T png $< > $@
 
 doc/apidoc.tex: $(FILESTODOC)
-	$(OCAMLDOC) -o doc/apidoc.tex -latex -noheader -notrailer $(INCLUDES) \
-		$(LIBINCLUDES) $(EXTINCLUDES) $(FILESTODOC)
+	$(OCAMLDOC) $(DOCFLAGS) -o doc/apidoc.tex -latex -noheader -notrailer $(FILESTODOC)
 
 clean::
 	rm -f doc/apidoc/*
