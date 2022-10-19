@@ -97,9 +97,12 @@ let command cur =
   Whyconf.Args.add_command sscmd;
   try
     Dynlink.allow_unsafe_modules true;
-    Dynlink_wrapper.loadfile cmd;
+    Dynlink.loadfile cmd;
     exit 0
-  with Dynlink.Error e ->
+  with
+  | Dynlink.Error (Dynlink.Library's_module_initializers_failed e) ->
+      Printexc.raise_with_backtrace e (Printexc.get_raw_backtrace ())
+  | Dynlink.Error e ->
     Printf.eprintf "Failed to load %s: %s\n%!" cmd (Dynlink.error_message e);
     exit 1
 
