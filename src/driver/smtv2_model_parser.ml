@@ -412,6 +412,16 @@ module FromModelToTerm = struct
     | Sint -> Ty.ty_int
     | Sreal -> Ty.ty_real
     | Sbool -> Ty.ty_bool
+    | Sbitvec n ->
+      begin try
+        let s,ty =
+          List.find
+            (function | (Sbitvec n',_) when n=n' -> true | _ -> false)
+            env.inferred_types
+        in
+        ty
+      with Not_found -> raise UnknownType
+      end
     | Sarray (s1, s2) ->
         Ty.ty_app Ty.ts_func [ smt_sort_to_ty env s1; smt_sort_to_ty env s2 ]
     | Ssimple (Isymbol n) ->
