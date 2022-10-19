@@ -1,0 +1,26 @@
+use int.Int
+
+predicate foo (x:int)
+predicate bar (x:int)
+predicate baz (x:int)
+constant x:int
+axiom d: bar x -> x >= 3
+axiom c : baz x -> bar x
+axiom a : foo x
+axiom b: foo x -> baz x
+goal g: x * x >= 9
+
+predicate foo1
+predicate bar1
+predicate baz1
+axiom aa : not ((foo1 /\ bar1) /\ (baz1 /\ foo1))
+axiom bb: foo1 /\ bar1
+goal gg: not baz1
+
+constant y:int
+predicate ge_1 (x:int) = x >= 1
+axiom aaa : ge_1 y
+goal ggg : forall x. x > 0 -> x * y >= x
+function f (x:int) : int
+axiom f_spec : forall x. x >= 0 -> f x <= 0
+goal gggg : f (y * 3) <= 0

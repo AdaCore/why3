@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.4.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="dreal" version="4.21.06.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="test_keep_only_arithmetic.mlw"/>
+<theory name="Top" proved="true">
+ <goal name="g" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
+ <transf name="eliminate_implications" proved="true" >
+  <goal name="g.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
+  </goal>
+ </transf>
+ <transf name="keep_only_arithmetic" proved="true" >
+  <goal name="g.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+ </transf>
+ <transf name="simplify_fmla_form" proved="true" >
+  <goal name="g.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="gg" proved="true">
+ <transf name="eliminate_implications" proved="true" >
+  <goal name="gg.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="16"/></proof>
+  <proof prover="1" obsolete="true"><result status="unknown" time="0.01"/></proof>
+  </goal>
+ </transf>
+ <transf name="keep_only_arithmetic" >
+  <goal name="gg.0">
+  <proof prover="0" obsolete="true"><result status="unknown" time="0.03"/></proof>
+  <proof prover="2" obsolete="true"><result status="unknown" time="0.03" steps="5950"/></proof>
+  </goal>
+ </transf>
+ <transf name="simplify_fmla_form" proved="true" >
+  <goal name="gg.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="16"/></proof>
+  <proof prover="1" obsolete="true"><result status="unknown" time="0.00"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="ggg" proved="true">
+ <proof prover="0"><result status="unknown" time="0.01"/></proof>
+ <transf name="keep_only_arithmetic" proved="true" >
+  <goal name="ggg.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="348"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="gggg" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="18"/></proof>
+ <transf name="keep_only_arithmetic" proved="true" >
+  <goal name="gggg.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
