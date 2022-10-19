@@ -28,6 +28,9 @@ MLCFG input language
 Provers
   * support for CVC5 1.0.0 (released April 6, 2022)
 
+Miscellaneous
+  * OCaml >= 4.08 is now required
+
 Version 1.5.1, September 12, 2022
 ---------------------------------
 
