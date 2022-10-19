@@ -103,7 +103,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-EXTINCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @INFERINCLUDE@
+EXTINCLUDES = @WHY3INCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @INFERINCLUDE@
 
 # warnings are enabled and non fatal by default, except:
 # - disabled:
@@ -159,8 +159,8 @@ EXTOBJS =
 EXTLIBS = menhirLib
 endif
 
-EXTLIBS += @SEQLIB@ @RELIB@ unix nums dynlink @ZIPLIB@ @WHY3LIB@ @INFERLIB@
-EXTPKGS = menhirLib @SEQLIB@ @RELIB@ unix num dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
+EXTLIBS += @RELIB@ unix nums dynlink @ZIPLIB@ @WHY3LIB@ @INFERLIB@
+EXTPKGS = menhirLib @RELIB@ unix num dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
 
 EXTCMA	= $(addsuffix .cmo,$(EXTOBJS)) $(addsuffix .cma,$(EXTLIBS))
 EXTCMXA = $(addsuffix .cmx,$(EXTOBJS)) $(addsuffix .cmxa,$(EXTLIBS))

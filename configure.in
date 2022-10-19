@@ -598,35 +598,6 @@ if test "$found_menhirlib" = no; then
 fi
 AC_SUBST(menhirlib_cmo)
 
-# checking for seq
-# (ocamlfind cannot be trusted here, since the default installation path is $OCAMLLIB)
-found_seq=no
-if test "$enable_ocamlfind" = yes; then
-   DIR=$($OCAMLFIND query seq)
-   if test -n "$DIR"; then
-      echo "ocamlfind found seq in $DIR"
-      SEQINCLUDE="-I $DIR"
-      SEQLIB=seq
-      found_seq=yes
-      AC_CHECK_FILE($DIR/seq.cma,,found_seq=no)
-      AC_CHECK_FILE($DIR/seq.cmi,,found_seq=no)
-   fi
-fi
-if test "$found_seq" = no; then
-   DIR="$OCAMLLIB"
-   SEQINCLUDE=
-   SEQLIB=
-   AC_CHECK_FILE($DIR/stdlib__seq.cmi,found_seq=yes,)
-   AC_CHECK_FILE($DIR/stdlib__Seq.cmi,found_seq=yes,)
-fi
-if test "$found_seq" = no; then
-   AC_MSG_WARN([Library seq not found.])
-   if test "$enable_re" = yes; then
-      enable_re=no
-      reason_re=" (seq not found)"
-   fi
-fi
-
 # checking for re
 if test "$enable_re" = yes; then
    found_re=yes
@@ -1190,9 +1161,6 @@ AC_SUBST(ZIPINCLUDE)
 AC_SUBST(ZIPLIB)
 
 AC_SUBST(MENHIRINCLUDE)
-
-AC_SUBST(SEQINCLUDE)
-AC_SUBST(SEQLIB)
 
 AC_SUBST(enable_re)
 AC_SUBST(REINCLUDE)
