@@ -1482,18 +1482,28 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
             | Projection _d -> (
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: PROJECTION@]@." pp_indent print_rs rs;
                 check_pre_and_register_call Log.Exec_normal;
+                let rec search pv opt_constr_args args v' =
+                  match opt_constr_args, args with
+                  | Some pv2 :: pvl, v :: vl ->
+                      if pv_equal pv pv2 then
+                        Normal (field_get v)
+                      else search pv pvl vl v'
+                  | _ -> kasprintf failwith "Cannot project %a by %a"
+                           print_value v' print_rs rs
+                in
                 match rs.rs_field, arg_vs with
                 | Some pv, [{v_desc= Vconstr (Some cstr, _, args)} as v] ->
-                    let rec search constr_args args =
-                      match constr_args, args with
-                      | pv2 :: pvl, v :: vl ->
-                          if pv_equal pv pv2 then
-                            Normal (field_get v)
-                          else search pvl vl
-                      | _ -> kasprintf failwith "Cannot project %a by %a"
-                               print_value v print_rs rs
-                    in
-                    search cstr.rs_cty.cty_args args
+                    let opt_constr_args = List.map (fun f -> Some f) cstr.rs_cty.cty_args in
+                    search pv opt_constr_args args v
+                | Some pv, [{v_desc= Vconstr (None, field_rss, args)} as v] ->
+                    begin try
+                      let opt_constr_args = List.map (fun rs -> rs.rs_field) field_rss in
+                      search pv opt_constr_args args v
+                    with _ ->
+                      kasprintf failwith "Cannot project values %a by %a"
+                        Pp.(print_list comma print_value) arg_vs
+                        print_rs rs
+                    end
                 | _, [{v_desc= Vundefined}] ->
                     incomplete "cannot project undefined by %a" print_rs rs
                 | _ -> kasprintf failwith "Cannot project values %a by %a"

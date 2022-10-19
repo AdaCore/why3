@@ -228,56 +228,61 @@ let rec import_model_value loc env check known th_known ity t =
     (Pp.print_option Pretty.print_ty) t.t_ty;
   Debug.dprintf debug_check_ce_rac_results "[import_model_value] t.t_attrs = %a@."
     Pretty.print_attrs t.t_attrs;
-  let res = match t.t_node with
-  | Tvar _ -> undefined_value env ity
-  | Ttrue -> bool_value true
-  | Tfalse -> bool_value false
-  | Tapp (ls, args) when Strings.has_prefix "arraymk" ls.ls_name.id_string ->
-      begin try
-        let ts, l1, l2 = ity_components ity in
-        let subst = its_match_regs ts l1 l2 in
-        let def = Pdecl.find_its_defn known ts in
-        let itys =
-          List.map
-            (fun arg -> ity_full_inst subst (ity_of_ty (Opt.get arg.t_ty)))
-            args in
-        let args =
-          List.map2 (import_model_value loc env check known th_known) itys args
-        in
-        Debug.dprintf debug_check_ce_rac_results "[import_model_value] itd_fields = %a@."
-          (Pp.print_list Pp.space print_rs) def.Pdecl.itd_fields;
-        constr_value ity None (List.rev def.Pdecl.itd_fields) args
-      with Invalid_argument _ -> term_value ity t
-      end
-  | Tapp (ls, args) -> (
+  let res =
+    if Opt.equal Ty.ty_equal (Some (ty_of_ity ity)) t.t_ty then
+      match t.t_node with
+      | Tvar _ -> undefined_value env ity
+      | Ttrue -> bool_value true
+      | Tfalse -> bool_value false
+      | Tapp (ls, args) when Strings.has_prefix "arraymk" ls.ls_name.id_string ->
+          (* TODO_WIP to be improved *)
+          begin try
+            let ts, l1, l2 = ity_components ity in
+            let subst = its_match_regs ts l1 l2 in
+            let def = Pdecl.find_its_defn known ts in
+            let itys =
+              List.map
+                (fun arg -> ity_full_inst subst (ity_of_ty (Opt.get arg.t_ty)))
+                args in
+            let args =
+              List.map2 (import_model_value loc env check known th_known) itys args
+            in
+            Debug.dprintf debug_check_ce_rac_results "[import_model_value] itd_fields = %a@."
+              (Pp.print_list Pp.space print_rs) def.Pdecl.itd_fields;
+            constr_value ity None (List.rev def.Pdecl.itd_fields) args (* TODO_WIP List.rev ??? *)
+          with Invalid_argument _ -> term_value ity t
+          end
+      | Tapp (ls, args) -> (
+          let ts, l1, l2 = ity_components ity in
+          let subst = its_match_regs ts l1 l2 in
+          let def = Pdecl.find_its_defn known ts in
+          let matching_name rs = String.equal rs.rs_name.id_string ls.ls_name.id_string in
+          match List.find matching_name def.Pdecl.itd_constructors with
+          | rs -> (
+            let itys = List.map (fun pv -> ity_full_inst subst pv.pv_ity)
+                rs.rs_cty.cty_args in
+            let args =
+              List.map2 (import_model_value loc env check known th_known) itys args
+            in
+            constr_value ity (Some rs) def.Pdecl.itd_fields args)
+          | exception Not_found -> term_value ity t)
+      | _ -> term_value ity t
+    else
+      (* [ity] and the type of [t] may not match for the following reason:
+        - [t] is actually the content of a reference (i.e. a record with a single field) *)
       let ts, l1, l2 = ity_components ity in
       let subst = its_match_regs ts l1 l2 in
       let def = Pdecl.find_its_defn known ts in
-      let matching_name rs = String.equal rs.rs_name.id_string ls.ls_name.id_string in
-      match List.find matching_name def.Pdecl.itd_constructors with
-      | rs -> (
-        let itys = List.map (fun pv -> ity_full_inst subst pv.pv_ity)
-            rs.rs_cty.cty_args in
-        let args =
-          List.map2 (import_model_value loc env check known th_known) itys args
-        in
-        constr_value ity (Some rs) def.Pdecl.itd_fields args)
-      | exception Not_found -> term_value ity t)
-  | _ when Opt.equal Ty.ty_equal (Some (ty_of_ity ity)) t.t_ty -> term_value ity t
-  | _ ->
-    (* [ity] and the type of [t] may not match for the following reason:
-       - [t] is actually the content of a reference (i.e. a record with a single field) *)
-    let ts, l1, l2 = ity_components ity in
-    let subst = its_match_regs ts l1 l2 in
-    let def = Pdecl.find_its_defn known ts in
-    match def.Pdecl.itd_constructors, def.Pdecl.itd_fields with
-      | [rs], [field_rs] ->
-        let field_ity = ity_full_inst subst (fd_of_rs field_rs).pv_ity in
-        constr_value ity (Some rs) [field_rs] [term_value field_ity t]
-      | _ ->
-        cannot_import "type with not exactly one constructor and one field: %a/%d, %a/%d"
-          print_its ts (List.length def.Pdecl.itd_constructors)
-          print_its ts (List.length def.Pdecl.itd_fields) in
+      match def.Pdecl.itd_constructors, def.Pdecl.itd_fields with
+        | [rs], [field_rs] ->
+          let field_ity = ity_full_inst subst (fd_of_rs field_rs).pv_ity in
+          constr_value ity (Some rs) [field_rs]
+            [import_model_value loc env check known th_known field_ity t]
+        | _ ->
+          cannot_import "type with not exactly one constructor and one field: %a/%d, %a/%d"
+            print_its ts (List.length def.Pdecl.itd_constructors)
+            print_its ts (List.length def.Pdecl.itd_fields)
+  in
   Debug.dprintf debug_check_ce_rac_results "[import_model_value] res = %a@."
     Pinterp_core.print_value res;
   check ity res;
