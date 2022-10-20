@@ -572,7 +572,7 @@ let print_param_decl info fmt ls =
      *)
     | _  ->
         let tvs = Term.ls_ty_freevars ls in
-        fprintf fmt ";; %s@\n@[<v2>(declare-fun %a %a)@]@\n@\n"
+        fprintf fmt ";; %S@\n@[<v2>(declare-fun %a %a)@]@\n@\n"
           ls.ls_name.id_string (print_ident info) ls.ls_name
           (print_par info
              (fun fmt -> Format.fprintf fmt "(%a) %a"
@@ -589,7 +589,7 @@ let print_logic_decl_aux flag info fmt (ls,def) =
     collect_model_ls info ls;
     let vsl,expr = Decl.open_ls_defn def in
     if info.info_incremental && has_quantification expr then begin
-      fprintf fmt ";; %s@\n@[<hov2>(declare-fun %a (%a) %a)@]@\n@\n"
+      fprintf fmt ";; %S@\n@[<hov2>(declare-fun %a (%a) %a)@]@\n@\n"
         ls.ls_name.id_string
         (print_ident info) ls.ls_name
         (print_list space (print_type info)) (List.map (fun vs -> vs.vs_ty) vsl)
@@ -597,7 +597,7 @@ let print_logic_decl_aux flag info fmt (ls,def) =
       info.incr_list_ldecls <- (ls, vsl, expr) :: info.incr_list_ldecls
     end else
       let tvs = Term.ls_ty_freevars ls in
-      fprintf fmt ";; %s@\n@[<v2>(define-fun%s %a %a)@]@\n@\n"
+      fprintf fmt ";; %S@\n@[<v2>(define-fun%s %a %a)@]@\n@\n"
         ls.ls_name.id_string flag
         (print_ident info) ls.ls_name
         (print_par info
@@ -668,7 +668,7 @@ let print_info_model info =
 (* TODO factor out print_prop ? *)
 let print_prop info fmt (pr, f) =
   let tvs = Term.t_ty_freevars Ty.Stv.empty f in
-  fprintf fmt ";; %s@\n@[<hov 2>(assert@ %a)@]@\n@\n"
+  fprintf fmt ";; %S@\n@[<hov 2>(assert@ %a)@]@\n@\n"
     pr.pr_name.id_string (* FIXME? collisions *)
     (print_par info (fun fmt -> print_fmla info fmt f)) tvs
 
@@ -682,7 +682,7 @@ let add_check_sat info fmt =
     fprintf fmt "@[(get-model)@]@\n@\n"
 
 let print_ldecl_axiom info fmt (ls, vls, t) =
-  fprintf fmt ";; %s@\n" ls.ls_name.id_string;
+  fprintf fmt ";; %S@\n" ls.ls_name.id_string;
   fprintf fmt
     "@[<hv2>(assert@ @[<hv2>(forall @[(%a)@]@ @[<hv2>(= @[<h>(%a %a)@]@ %a)@])@])@]@\n@\n"
     (print_typed_var_list info) vls
@@ -706,7 +706,7 @@ let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f = match k with
   | Pgoal ->
       let tvs = Term.t_ty_freevars Ty.Stv.empty f in
       if not (Ty.Stv.is_empty tvs) then unsupported "smt: monomorphise goal must be applied";
-      fprintf fmt ";; Goal %s@\n" pr.pr_name.id_string;
+      fprintf fmt ";; Goal %S@\n" pr.pr_name.id_string;
       (match pr.pr_name.id_loc with
         | None -> ()
         | Some loc -> fprintf fmt ";; File %a@\n" Loc.pp_position loc);
