@@ -188,13 +188,13 @@ let filter_non_arith truths acc t =
       Task.add_decl acc d
     | Dprop (Pgoal, _, _) ->
       let acc =
-        Mterm.fold_left
-          (fun _acc t (pr, _) ->
+        Mterm.fold
+          (fun t (pr, _) _acc ->
             if not (get_rid_of_fmla t) then
               Task.add_decl _acc (create_prop_decl Paxiom pr t)
             else
               _acc)
-          acc truths
+          truths acc
       in
       Task.add_decl acc d
     | _ -> acc)
