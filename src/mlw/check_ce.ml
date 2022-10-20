@@ -363,6 +363,8 @@ let rec find_in_term loc t =
  *     | _ -> None in
  *   find_in_list in_tdecl th.Theory.th_decls *)
 
+type rs_or_term = RTrsymbol of rsymbol | RTterm of (Decl.prsymbol * term)
+
 (** Identifies the rsymbol of the definition that contains the given
    position. *)
 let find_rs pm loc =
@@ -404,7 +406,7 @@ let find_rs pm loc =
     | Capp (rs, _) -> in_cty rs.rs_cty
     | Cpur _ | Cany -> false in
   let rec find_pdecl pd =
-    let maybe b r = if b then Some r else None in
+    let maybe b r = if b then Some (RTrsymbol r) else None in
     match pd.pd_node with
     | PDtype ds ->
        let in_tdef td =
@@ -427,11 +429,25 @@ let find_rs pm loc =
            find_in_list (fun d -> maybe (in_def d) d.rec_sym) defs)
     | PDexn _
     | PDpure -> None
+  and find_decl d =
+    let maybe b pr t = if b then Some (RTterm(pr, t)) else None in
+    Decl.(match d.d_node with
+    | Dtype _ | Ddata _ | Dparam _ | Dlogic _ | Dind _ -> None
+    | Dprop (_,pr,t) ->
+        if Opt.equal Loc.equal (Some loc) pr.pr_name.id_loc then Some (RTterm (pr,t)) else
+          maybe (find_in_term loc t) pr t)
   and find_mod_unit = function
     | Uuse _ | Uclone _ | Umeta _ -> None
     | Uscope (_, us) -> find_in_list find_mod_unit us
-    | Udecl pd -> find_pdecl pd in
-  find_in_list find_mod_unit pm.mod_units
+    | Udecl pd -> find_pdecl pd
+  and find_mod_theory td =
+    Theory.(match td.td_node with
+    | Use _ | Clone _ | Meta _ -> None
+    | Decl d -> find_decl d)
+  in
+  match find_in_list find_mod_unit pm.mod_units with
+  | Some rs -> Some rs
+  | None -> find_in_list find_mod_theory pm.mod_theory.Theory.th_decls
 
 let rac_execute ctx rs =
   if not (get_do_rac ctx) then
@@ -624,20 +640,21 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
       (Pp.print_option_or_default "NO LOC" Loc.pp_position)
       (get_model_term_loc m);
     let normal_res, giant_res = match get_model_term_loc m with
-    | None -> rac_not_done_failure "model term has no location"
+    | None ->
+        rac_not_done_failure "no location annotation found in the term triggering the VC"
     | Some loc ->
         if Loc.equal loc Loc.dummy_position then
-          rac_not_done_failure "the term of the CE model has a dummy location"
+          rac_not_done_failure "the term triggering the VC has a dummy location annotation"
         else
-          let rac_execute ~giant_steps rs model =
-            let ctx = Pinterp.mk_ctx env ~do_rac:true ~giant_steps ~rac
-                  ~oracle:(oracle_of_model env.pmodule model) ~compute_term
-                  ?timelimit ?steplimit () in
-            rac_execute ctx rs
-          in
           begin
             match find_rs env.pmodule loc with
-            | Some rs ->
+            | Some (RTrsymbol rs) ->
+                let rac_execute ~giant_steps rs model =
+                  let ctx = Pinterp.mk_ctx env ~do_rac:true ~giant_steps ~rac
+                        ~oracle:(oracle_of_model env.pmodule model) ~compute_term
+                        ?timelimit ?steplimit () in
+                  rac_execute ctx rs
+                in
                 let me_name_trans men = men.Model_parser.men_name in
                 let print_attrs = Debug.test_flag Call_provers.debug_attrs in
                 Debug.dprintf debug_check_ce_rac_results
@@ -652,9 +669,32 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
                 | Some true ->
                     RAC_not_done "only_giant_step", RAC_done (giant_state,giant_log)
                 end
+            | Some (RTterm(pr,t)) ->
+                let cty = Expr.cty_from_formula t in
+                let name = pr.Decl.pr_name.id_string ^ "'goal" in
+                let rs = Expr.create_rsymbol (Ident.id_derive name pr.Decl.pr_name) cty in
+                let body =
+                  c_fun cty.cty_args cty.cty_pre cty.cty_post cty.cty_xpost cty.cty_oldies e_void
+                in
+                let env = { env with funenv = Mrs.add rs (body,None) env.funenv } in
+                let rac_execute ~giant_steps rs model =
+                  let ctx = Pinterp.mk_ctx env ~do_rac:true ~giant_steps ~rac
+                        ~oracle:(oracle_of_model env.pmodule model) ~compute_term
+                        ?timelimit ?steplimit () in
+                  rac_execute ctx rs
+                in
+                let me_name_trans men = men.Model_parser.men_name in
+                let print_attrs = Debug.test_flag Call_provers.debug_attrs in
+                Debug.dprintf debug_check_ce_rac_results
+                  "@[Checking model:@\n@[<hv2>%a@]@]@\n"
+                  (print_model ~filter_similar:false ~me_name_trans ~print_attrs) m;
+                begin
+                let state,log = rac_execute ~giant_steps:false rs m in
+                RAC_done (state,log), RAC_done (state,log)
+                end
             | None ->
                 Format.kasprintf (fun s -> rac_not_done_failure s)
-                  "no corresponding routine symbol found for %a"
+                  "there is no program function to execute at %a"
                   Loc.pp_position loc
           end
     in

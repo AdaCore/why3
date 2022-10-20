@@ -3,9 +3,11 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC5" version="1.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.8.10" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="vstte12_combinators.mlw"/>
 <theory name="Combinators" proved="true">
@@ -61,7 +63,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="89"/></proof>
   </goal>
   <goal name="reduction&#39;vc.12" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.90"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="473"/></proof>
   </goal>
   <goal name="reduction&#39;vc.13" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="73"/></proof>
@@ -70,7 +72,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
   <goal name="reduction&#39;vc.15" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.20"/></proof>
+  <proof prover="5"><result status="valid" time="0.05" steps="580"/></proof>
   </goal>
   <goal name="reduction&#39;vc.16" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
@@ -96,21 +98,21 @@
    <goal name="value_in_context&#39;vc.1.0" expl="precondition" proved="true">
    <transf name="destruct_term_subst" proved="true" arg1="x2">
     <goal name="value_in_context&#39;vc.1.0.0" expl="precondition" proved="true">
-    <proof prover="3"><result status="valid" time="0.04" steps="4987"/></proof>
+    <proof prover="3"><result status="valid" time="0.04" steps="5365"/></proof>
     </goal>
     <goal name="value_in_context&#39;vc.1.0.1" expl="precondition" proved="true">
-    <proof prover="3"><result status="valid" time="0.03" steps="4885"/></proof>
+    <proof prover="3"><result status="valid" time="0.03" steps="5263"/></proof>
     </goal>
     <goal name="value_in_context&#39;vc.1.0.2" expl="precondition" proved="true">
-    <proof prover="3"><result status="valid" time="0.04" steps="4895"/></proof>
+    <proof prover="3"><result status="valid" time="0.04" steps="5273"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="value_in_context&#39;vc.1.1" expl="precondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.02" steps="4470"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="4824"/></proof>
    </goal>
    <goal name="value_in_context&#39;vc.1.2" expl="precondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.03" steps="4484"/></proof>
+   <proof prover="3"><result status="valid" time="0.03" steps="4838"/></proof>
    </goal>
   </transf>
   </goal>
@@ -124,29 +126,29 @@
     <goal name="value_in_context&#39;vc.3.0.0" expl="precondition" proved="true">
     <transf name="destruct_term_subst" proved="true" arg1="x4">
      <goal name="value_in_context&#39;vc.3.0.0.0" expl="precondition" proved="true">
-     <proof prover="3"><result status="valid" time="0.04" steps="5108"/></proof>
+     <proof prover="3"><result status="valid" time="0.04" steps="5486"/></proof>
      </goal>
      <goal name="value_in_context&#39;vc.3.0.0.1" expl="precondition" proved="true">
-     <proof prover="3"><result status="valid" time="0.04" steps="5000"/></proof>
+     <proof prover="3"><result status="valid" time="0.04" steps="5378"/></proof>
      </goal>
      <goal name="value_in_context&#39;vc.3.0.0.2" expl="precondition" proved="true">
-     <proof prover="3"><result status="valid" time="0.03" steps="5008"/></proof>
+     <proof prover="3"><result status="valid" time="0.03" steps="5386"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="value_in_context&#39;vc.3.0.1" expl="precondition" proved="true">
-    <proof prover="3"><result status="valid" time="0.03" steps="4863"/></proof>
+    <proof prover="3"><result status="valid" time="0.03" steps="5241"/></proof>
     </goal>
     <goal name="value_in_context&#39;vc.3.0.2" expl="precondition" proved="true">
-    <proof prover="3"><result status="valid" time="0.03" steps="4863"/></proof>
+    <proof prover="3"><result status="valid" time="0.03" steps="5241"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="value_in_context&#39;vc.3.1" expl="precondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.02" steps="4470"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="4824"/></proof>
    </goal>
    <goal name="value_in_context&#39;vc.3.2" expl="precondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.03" steps="4484"/></proof>
+   <proof prover="3"><result status="valid" time="0.03" steps="4838"/></proof>
    </goal>
   </transf>
   </goal>
@@ -200,7 +202,7 @@
    <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
    </goal>
    <goal name="reduction2&#39;vc.8.1" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.42"/></proof>
+   <proof prover="5"><result status="valid" time="0.30" steps="5042"/></proof>
    </goal>
   </transf>
   </goal>
@@ -221,7 +223,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
   </goal>
   <goal name="reduction3&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="57076"/></proof>
   </goal>
   <goal name="reduction3&#39;vc.4" expl="unreachable point" proved="true">
   <proof prover="0"><result status="valid" time="0.07" steps="603"/></proof>
@@ -233,7 +235,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
   <goal name="reduction3&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="3.51"/></proof>
+  <proof prover="1"><result status="valid" time="0.12" steps="18325"/></proof>
   </goal>
   <goal name="reduction3&#39;vc.8" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.11" steps="612"/></proof>
@@ -242,7 +244,7 @@
   <proof prover="0"><result status="valid" time="0.06" steps="344"/></proof>
   </goal>
   <goal name="reduction3&#39;vc.10" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="70130"/></proof>
   </goal>
  </transf>
  </goal>

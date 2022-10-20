@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Spass" version="3.9" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Spass" version="3.7" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Vampire" version="0.6" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -12,7 +12,7 @@
 <path name=".."/><path name="verifythis_2015_parallel_gcd.mlw"/>
 <theory name="ParallelGCD" proved="true">
  <goal name="gcd_sub" proved="true">
- <proof prover="2"><result status="valid" time="0.05"/></proof>
+ <proof prover="0"><result status="valid" time="0.05"/></proof>
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="parallel_gcd&#39;vc" expl="VC for parallel_gcd" proved="true">
@@ -69,7 +69,7 @@
   <proof prover="6"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
   <goal name="step&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.03" steps="62892"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.03" steps="63577"/></proof>
   </goal>
   <goal name="step&#39;vc.4" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.01" steps="18"/></proof>

@@ -11,25 +11,25 @@
 <path name=".."/><path name="bvsum.mlw"/>
 <theory name="PureBV" proved="true">
  <goal name="add_bv" proved="true">
- <proof prover="4"><result status="valid" time="0.05" steps="13172"/></proof>
+ <proof prover="4"><result status="valid" time="0.05" steps="13433"/></proof>
  </goal>
  <goal name="g" proved="true">
- <proof prover="4"><result status="valid" time="0.08" steps="30310"/></proof>
+ <proof prover="4"><result status="valid" time="0.08" steps="30571"/></proof>
  </goal>
 </theory>
 <theory name="Mixed">
  <goal name="add_bv" proved="true">
- <proof prover="4"><result status="valid" time="0.03" steps="13172"/></proof>
+ <proof prover="4"><result status="valid" time="0.03" steps="13433"/></proof>
  </goal>
  <goal name="add_bv_int">
- <proof prover="1"><result status="timeout" time="1.00" steps="241842"/></proof>
- <proof prover="2"><result status="timeout" time="1.00" steps="4537075"/></proof>
+ <proof prover="1"><result status="timeout" time="1.00" steps="241531"/></proof>
+ <proof prover="2"><result status="timeout" time="1.00" steps="11511601"/></proof>
  <proof prover="3" timelimit="1" memlimit="1000"><result status="timeout" time="1.00"/></proof>
  <transf name="split_vc" >
   <goal name="add_bv_int.0">
-  <proof prover="0"><result status="timeout" time="10.00" steps="43171114"/></proof>
+  <proof prover="0"><result status="timeout" time="10.00" steps="32559604"/></proof>
   <proof prover="3"><result status="timeout" time="10.00"/></proof>
-  <proof prover="4" timelimit="10" memlimit="4000"><result status="timeout" time="10.00" steps="3250317"/></proof>
+  <proof prover="4" timelimit="10" memlimit="4000"><result status="timeout" time="10.00" steps="3380819"/></proof>
   </goal>
  </transf>
  </goal>

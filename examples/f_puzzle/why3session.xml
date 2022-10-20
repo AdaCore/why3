@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Spass" version="3.9" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="4" name="Z3" version="4.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Vampire" version="0.6" timelimit="5" steplimit="0" memlimit="4000"/>
@@ -14,9 +14,9 @@
 <path name=".."/><path name="f_puzzle.mlw"/>
 <theory name="Step1" proved="true">
  <goal name="I1.base" proved="true">
+ <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
- <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
@@ -30,7 +30,7 @@
 </theory>
 <theory name="Solution" proved="true">
  <goal name="L3" proved="true">
- <proof prover="3"><result status="valid" time="0.06"/></proof>
+ <proof prover="0"><result status="valid" time="0.88"/></proof>
  <proof prover="7"><result status="valid" time="0.02"/></proof>
  <proof prover="8"><result status="valid" time="0.00"/></proof>
  </goal>
@@ -41,8 +41,8 @@
  <proof prover="9"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="I2.base" proved="true">
+ <proof prover="0" memlimit="1000"><result status="valid" time="0.30"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
- <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="7" memlimit="1000"><result status="valid" time="0.01"/></proof>
@@ -53,7 +53,7 @@
  <proof prover="9" timelimit="10" memlimit="1000"><result status="valid" time="1.10" steps="97"/></proof>
  </goal>
  <goal name="L5" proved="true">
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="7"><result status="valid" time="0.04"/></proof>
  <proof prover="8"><result status="valid" time="0.48"/></proof>
  </goal>

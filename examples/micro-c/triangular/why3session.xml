@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.4.1" timelimit="30" steplimit="0" memlimit="4000"/>
 <file format="micro-C" proved="true">
 <path name=".."/><path name="triangular.c"/>
 <theory name="Triangular" proved="true">
@@ -22,7 +22,7 @@
   <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
   <goal name="triangular&#39;vc.4" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="13958"/></proof>
+  <proof prover="2"><result status="valid" time="11.94" steps="144207"/></proof>
   </goal>
   <goal name="triangular&#39;vc.5" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>

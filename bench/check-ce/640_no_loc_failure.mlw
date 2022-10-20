@@ -1,0 +1,20 @@
+module WrongLocationFound
+  use bv.BV64 as BV64
+
+  goal wrong :
+		([@vc:annotation] forall x : BV64.t. BV64.sle x (0x29 : BV64.t))
+end
+
+module WrongLocationFoundBis
+  use bv.BV64 as BV64
+
+  lemma wrong :
+		([@model_vc_post] forall x : BV64.t. BV64.sle x (0x29 : BV64.t))
+end
+
+module WrongLocationNotFound
+  use bv.BV64 as BV64
+
+  lemma wrong :
+		(forall x : BV64.t. BV64.sle x (0x29 : BV64.t))
+end

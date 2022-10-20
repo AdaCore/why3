@@ -25,13 +25,27 @@ let meta_depends =
 type used_symbols = {
   keep_constants : bool;
   depends : Ident.Sid.t Decl.Mpr.t;
+  closure : Ident.Sid.t Ident.Mid.t;
   used_ids : Ident.Sid.t;
 }
+
+let rec add_used_ids used_symbols ids =
+  let uids = Ident.Sid.union used_symbols.used_ids ids in
+  let new_ids, closure =
+    Ident.Sid.fold (fun x ((new_ids, closure) as acc) ->
+      try
+        let new_ids = Ident.Sid.union new_ids (Ident.Mid.find x closure) in
+        new_ids, Ident.Mid.remove x closure
+      with Not_found -> acc) ids (Ident.Sid.empty, used_symbols.closure)
+  in
+  let r = { used_symbols with used_ids = uids ; closure } in
+  if Ident.Sid.is_empty new_ids then r
+  else add_used_ids r new_ids
 
 let initial keep_constants =
   let builtins = [ Term.(ps_equ.ls_name); Ty.(ts_int.ts_name) ] in
   let used_ids = List.fold_right Ident.Sid.add builtins Ident.Sid.empty in
-  { keep_constants; depends = Decl.Mpr.empty; used_ids }
+  { keep_constants; depends = Decl.Mpr.empty; closure = Ident.Mid.empty; used_ids }
 
 let add_dependency usymb l =
   match l with
@@ -75,7 +89,7 @@ let do_removal_unused_decl usymb (td : Theory.tdecl) : Theory.tdecl option =
       | Ddata _ | Dlogic _ | Dtype _ | Dparam _ | Dind _ ->
           if Sid.is_empty (Sid.inter d.d_news usymb.used_ids) then None
           else Some td)
-
+(*
 let metas_remove =
   let open Theory in
   List.fold_left
@@ -85,7 +99,7 @@ let metas_remove =
      Printer.meta_remove_prop;
      Printer.meta_remove_logic;
      Printer.meta_remove_type]
-
+*)
 (* The first step of the removal : compute the used identifiers *)
 let rec compute_used_ids usymb task : used_symbols =
   let open Theory in
@@ -96,7 +110,8 @@ let rec compute_used_ids usymb task : used_symbols =
       let open Decl in
       let usymb =
         match td.td_node with
-        | Use _ | Clone _ -> usymb
+        | Use _ | Clone _ | Meta _ -> usymb
+          (*
         | Meta (mt, _) when Smeta.mem mt metas_remove -> usymb
         | Meta (_, margs) ->
             let used_ids =
@@ -113,19 +128,23 @@ let rec compute_used_ids usymb task : used_symbols =
                 usymb.used_ids margs
             in
             { usymb with used_ids }
+*)
         | Decl d ->
             begin
             match d.d_node with
             | Dprop (_, pr, _t) -> (
                 try
                   let s = Mpr.find pr usymb.depends in
-                  if Sid.is_empty (Sid.inter s usymb.used_ids) then usymb
+                  if Sid.is_empty (Sid.inter s usymb.used_ids) then
+                  let ids = Sid.add pr.pr_name (Decl.get_used_syms_decl d) in
+                  { usymb with closure = Sid.fold (fun x acc -> Mid.add x ids acc) s usymb.closure }
                   else raise Not_found
                 with Not_found ->
                   let ids = Decl.get_used_syms_decl d in
+                  let usymb = add_used_ids usymb ids in
                   {
                     usymb with
-                    used_ids = Sid.add pr.pr_name (Sid.union usymb.used_ids ids);
+                    used_ids = Sid.add pr.pr_name usymb.used_ids;
                   })
             | Ddata _ | Dlogic _ | Dtype _ | Dparam _ | Dind _ ->
                 let declares_a_constant =
@@ -141,10 +160,7 @@ let rec compute_used_ids usymb task : used_symbols =
                 in
                 if is_needed then
                   let ids = Decl.get_used_syms_decl d in
-                  {
-                    usymb with
-                    used_ids = Sid.union usymb.used_ids (Sid.union ids d.d_news);
-                  }
+                  add_used_ids usymb (Sid.union ids d.d_news)
                 else
                   usymb
           end

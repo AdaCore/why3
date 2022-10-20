@@ -621,8 +621,11 @@ let gen_model_result ({giant_steps} as ctx) oid loc ity : value_gen =
     res
 
 (** Generator for a default value *)
-let gen_default def : value_gen =
-  "default value", fun () -> def
+let gen_default ity def : value_gen =
+  "default value", fun () ->
+    if ity_equal ity ity_unit
+    then Some unit_value
+    else def
 
 (** Generate a value by computing the postcondition *)
 let gen_from_post env posts : value_gen =
@@ -678,7 +681,7 @@ let get_and_register_variable ctx ?def ?loc id ity =
   let oloc = if loc <> None then loc else id.id_loc in
   let gens = [
     gen_model_variable ctx ?loc id ity;
-    gen_default def;
+    gen_default ity def;
     gen_type_default ~really:true (* (is_ignore_id id) *) ctx ity;
   ] in
   let value = get_value' ctx_desc oloc gens in
@@ -692,7 +695,7 @@ let get_and_register_result ?def ?rs ctx posts oid loc ity =
       (fun fmt -> Opt.iter (fprintf fmt " call id %d") oid) in
   let gens = [
     gen_model_result ctx oid loc ity;
-    gen_default def;
+    gen_default ity def;
     gen_from_post ctx posts;
     gen_type_default ~really:true ~posts ctx ity;
   ] in

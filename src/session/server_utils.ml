@@ -322,12 +322,15 @@ let parse_prover_name config name args : command_prover =
    implemented as a hardcoded automaton:
 *)
 let split_args s =
+  (* Format.eprintf "split_args: s = `%S`@." s; *)
   let args = ref [] in
   let par_depth = ref 0 in
   let b = Buffer.create 17 in
   let push_arg () =
     let x = Buffer.contents b in
-    if String.length x > 0 then (args := x :: !args; Buffer.clear b)
+    if String.length x > 0 then (
+        (* Format.eprintf "split_args: x = `%S`@." x; *)
+        args := x :: !args; Buffer.clear b)
   in
   let push_char c = Buffer.add_char b c in
   let state = ref 0 in
@@ -341,14 +344,12 @@ let split_args s =
     match !state, c with
     | 0,' ' -> if !par_depth > 0 then push_char c else push_arg ()
     | 0,',' -> push_char c; if !par_depth > 0 then () else state := 2
-    | 0,'(' -> incr par_depth; push_char c
-    | 0,')' -> decr par_depth; push_char c
-    | 0,'"' -> state := 1; if !par_depth > 0 then push_char c
-    | 0,_   -> push_char c
+    | (0|2),'(' -> incr par_depth; push_char c
+    | (0|2),')' -> decr par_depth; push_char c
+    | (0|2),'"' -> state := 1; if !par_depth > 0 then push_char c
+    | (0|2),_   -> push_char c; state := 0
     | 1,'"' -> state := 0; if !par_depth > 0 then push_char c
     | 1,_   -> push_char c
-    | 2,' ' -> push_char c
-    | 2,_   -> push_char c; state := 0
     | _     -> assert false
   done;
   push_arg ();

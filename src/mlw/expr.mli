@@ -201,6 +201,11 @@ val c_pur : lsymbol -> pvsymbol list -> ity list -> ity -> cexp
 val c_fun : ?mask:mask -> pvsymbol list ->
   pre list -> post list -> post list Mxs.t -> pvsymbol Mpv.t -> expr -> cexp
 
+val cty_from_formula : Term.term -> cty
+(* [cty_from_formula f] creates a computation type whose parameters are
+   quantified variables of [f], preconditions are the premises of [f]
+   and postconditions are the conclusions of [f] *)
+
 val c_any : cty -> cexp
 
 (** {2 Expression constructors} *)

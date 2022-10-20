@@ -266,13 +266,7 @@ let load_driver_raw =
   }
 
 
-let load_driver_file_and_extras main env file extras =
-  try
-    load_driver_raw main env file extras
-  with e when not (Debug.test_flag Debug.stack_trace) ->
-    eprintf "Fatal error while loading driver file '%s': %a@."
-            file Exn_printer.exn_printer e;
-    exit 1
+let load_driver_file_and_extras = load_driver_raw
 
 let load_driver_for_prover main env p =
   load_driver_raw main env p.Whyconf.driver p.Whyconf.extra_drivers
