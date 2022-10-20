@@ -2,21 +2,20 @@
 
 # Helper script to compute statistics about checking counterexamples.
 
+from datetime import date
 import os
 import pandas as pd
 import re
 
-directories = [
-    "./bench/check-ce/oracles",
-]
+dir = "./bench/check-ce/oracles"
 export_file_raw = "./data_raw.csv"
 export_file = "./data.csv"
 export_file_incomplete_small_step = "./data_incomplete_small_step.csv"
 export_file_incomplete_giant_step = "./data_incomplete_giant_step.csv"
 
 rx_model = re.compile(r"Selected model [0|1]: (?P<v>[A-Z_]*)\n")
-rx_concrete_RAC = re.compile(r"Concrete RAC: (?P<c>[A-Z_]*) (?P<cr>\(.*\))\n")
-rx_abstract_RAC = re.compile(r"Abstract RAC: (?P<a>[A-Z_]*) (?P<ar>\(.*\))\n")
+rx_concrete_RAC = re.compile(r"Concrete RAC: (?P<c>[A-Z_]*)(?P<cr>.*)\n")
+rx_abstract_RAC = re.compile(r"Abstract RAC: (?P<a>[A-Z_]*)(?P<ar>.*)\n")
 
 rx_dict_incomplete = {
     "cannot decide": re.compile(r"(.*)cannot be evaluated(.*)"),
@@ -58,7 +57,7 @@ def _add_reason(res, reason, rx_dict):
         return res
 
 
-def parse_file(filepath, data, dir):
+def parse_file(filepath, data, date):
     with open(filepath, "r") as file_object:
         filepath = _parse_line(filepath,rx_filepath)
         if filepath is not None:
@@ -87,7 +86,7 @@ def parse_file(filepath, data, dir):
                         print("WARNING! Unknown verdict: " + verdict)
                     data.append(
                         {
-                            "date": dir,
+                            "date": date,
                             "file": file,
                             "prover": prover,
                             "verdict": verdict,
@@ -98,13 +97,13 @@ def parse_file(filepath, data, dir):
             line = file_object.readline()
 
 data = []
-for dir in directories:
-    print(dir)
-    for filename in os.listdir(dir):
-        f = os.path.join(dir, filename)
-        if os.path.isfile(f):
-            if f.endswith(".oracle"):
-                parse_file(f, data, dir)
+date = date.today()
+print(date)
+for filename in os.listdir(dir):
+    f = os.path.join(dir, filename)
+    if os.path.isfile(f):
+        if f.endswith(".oracle"):
+            parse_file(f, data, date.strftime("%Y%m%d"))
 data = pd.DataFrame(data)
 data.to_csv(export_file_raw, mode="w", header=True)
 
