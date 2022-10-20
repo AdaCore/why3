@@ -123,7 +123,11 @@ for file in $files; do
   printf "Running provers on $filedir/$filebase.mlw\n";
   cvc4steps=150000
   cvc5steps=150000
+<<<<<<< HEAD
   z3steps=3000000
+=======
+  z3steps=7500000
+>>>>>>> Trying more steps for check-ce/maps to fix the CI
   case "$filebase" in
     "640_no_loc_failure")
       z3steps=500000
@@ -146,11 +150,16 @@ for file in $files; do
     "int_overflow")
       z3steps=400000
       ;;
+    "maps")
+      cvc5steps=300000
+      ;;
     "strings")
       z3steps=3000
       ;;
     "threshold")
       z3steps=2500000
+      ;;
+    *)
       ;;
   esac
   run CVC4,1.8    $filedir $filebase true  $cvc4steps
