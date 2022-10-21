@@ -109,7 +109,7 @@ else
 fi
 
 # run regression bench for counterexamples
-bench/ce-bench &> $OUT
+bench/check-ce-bench &> $OUT
 if test "$?" != "0" ; then
     echo "Counterexample regression tests FAILED" >> $REPORT
     cat $OUT >> $REPORT
