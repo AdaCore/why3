@@ -144,6 +144,9 @@ and term_quant
 
 and trigger = term list list
 
+val term_size : term -> int
+val term_branch_size : term_branch -> int
+
 (** {2 Generic term equality} *)
 
 (**   flags enable comparison of the respective feature:

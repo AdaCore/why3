@@ -108,7 +108,7 @@ val add_rule : Term.term -> engine -> engine
 *)
 
 
-val normalize : ?step_limit:int -> limit:int -> engine -> Term.term Term.Mvs.t -> Term.term -> Term.term
+val normalize : ?max_growth:int -> ?step_limit:int -> limit:int -> engine -> Term.term Term.Mvs.t -> Term.term -> Term.term
 (** [normalize e sigma t] normalizes the term [t] with respect to the engine
     [e] with an initial variable environment [sigma].
 
