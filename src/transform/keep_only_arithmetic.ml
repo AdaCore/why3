@@ -47,8 +47,6 @@ type fmla =
 let rec get_fmla symbols f =
   let get = get_fmla symbols in
   match f.t_node with
-  (* We got rid of these formula forms in the eliminate_implications
-     transformation *)
   | Tbinop (Tand, f1, f2) -> (
     match get f1 with
     | Unsupported
@@ -81,6 +79,19 @@ let rec get_fmla symbols f =
       | Contradiction -> Formula (t_implies_simp f1 t_false)
       | _ -> Unsupported)
     | Tautology -> get f2
+    | _ -> Unsupported)
+  | Tbinop (Tiff, f1, f2) -> (
+    match get f1 with
+    | Formula f1 -> (
+      match get f2 with
+      | Formula f2 -> Formula (t_iff_simp f1 f2)
+      | Contradiction -> Formula (t_implies_simp f1 t_false)
+      | _ -> Unsupported)
+    | Tautology -> get f2
+    | Contradiction -> (
+      match get f2 with
+      | Formula _ -> Formula (t_implies_simp f2 t_false)
+      | _ -> Unsupported)
     | _ -> Unsupported)
   | Ttrue -> Tautology
   | Tfalse -> Contradiction
@@ -122,15 +133,8 @@ let remove_non_arith symbols d =
 
 let keep_only_arithmetic env =
   let symbols = get_arith_symbols env in
-  (* let notls ~for_counterexample ls = *)
-  (*   List.exists (fun _ls -> ls_equal ls _ls) symbols *)
-  (* in *)
-  (* let notdef _ = false in *)
   Trans.compose
-    (Trans.compose
-       (Trans.lookup_transform "inline_trivial" env)
-       (* (Inlining.t ~use_meta:true ~in_goal:false ~notls ~notdef) *)
-       (Trans.lookup_transform "eliminate_implications" env))
+    (Trans.lookup_transform "inline_trivial" env)
     (Trans.decl (remove_non_arith symbols) None)
 
 let () =
