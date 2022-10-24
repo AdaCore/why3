@@ -2,92 +2,116 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="dreal" version="4.21.06.2" timelimit="10" steplimit="0" memlimit="1000"/>
+<prover id="0" name="dreal" version="4.21.06.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Coq" version="8.13.2" timelimit="0" steplimit="0" memlimit="0"/>
 <file format="whyml">
 <path name=".."/><path name="dreal.mlw"/>
-<theory name="A">
- <goal name="exp_limit">
- <proof prover="0"><result status="unknown" time="0.01"/></proof>
- </goal>
- <goal name="log_limit">
- <proof prover="0"><result status="unknown" time="0.01"/></proof>
- </goal>
- <goal name="exp_limit_fun&#39;vc" expl="VC for exp_limit_fun">
- <proof prover="0"><result status="unknown" time="0.01"/></proof>
- </goal>
- <goal name="exp_limit_from_int">
- <proof prover="0"><result status="unknown" time="0.01"/></proof>
- </goal>
- <goal name="a">
- <proof prover="0"><result status="unknown" time="0.01"/></proof>
- </goal>
- <goal name="min_max_test">
- <proof prover="0"><result status="unknown" time="0.01"/></proof>
- </goal>
- <goal name="sqr_sqrt">
- <proof prover="0"><result status="unknown" time="0.01"/></proof>
- </goal>
- <goal name="sqr_sqrt_no_forall">
- <proof prover="0"><result status="unknown" time="0.01"/></proof>
- </goal>
- <goal name="sqrt2_estimate">
- <proof prover="0"><result status="unknown" time="0.01"/></proof>
- </goal>
- <goal name="power">
- <proof prover="0"><result status="unknown" time="0.00"/></proof>
- </goal>
- <goal name="sqr_sqrt2">
- <proof prover="0"><result status="unknown" time="0.01"/></proof>
- </goal>
- <goal name="huge_power">
- <proof prover="0"><result status="unknown" time="0.01"/></proof>
- </goal>
- <goal name="Pythagorean_identity" proved="true">
+<theory name="Misc">
+ <goal name="exp_limit" proved="true">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="Cos_le_one" proved="true">
+ <goal name="log_limit" proved="true">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="Sin_le_one" proved="true">
+ <goal name="exp_limit_fun&#39;vc" expl="VC for exp_limit_fun" proved="true">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="Cos_sum" proved="true">
+ <goal name="exp_limit_from_int_KO">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.02"/></proof>
+ </goal>
+ <goal name="from_int" proved="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
+ <goal name="min_max_test" proved="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="sqr_sqrt_KO">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.01"/></proof>
+ </goal>
+ <goal name="sqr_sqrt_no_forall_KO">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.01"/></proof>
+ </goal>
+ <goal name="sqrt2_estimate" proved="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="power" proved="true">
+ <proof prover="0"><result status="valid" time="0.06"/></proof>
+ </goal>
+ <goal name="power2" proved="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="sqr_sqrt2_KO">
+ <proof prover="0" obsolete="true"><path name="dreal-Misc-sqr_sqrt2_KO_1.smt2"/><result status="unknown" time="0.04"/></proof>
+ </goal>
+ <goal name="huge_power" proved="true">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="Pythagorean_identity" proved="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="Cos_le_one" proved="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="Sin_le_one" proved="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="Cos_sum" proved="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ </goal>
  <goal name="Sin_sum" proved="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+</theory>
+<theory name="Quantifiers" proved="true">
+ <goal name="g2" proved="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="g3" proved="true">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="P">
- <goal name="x_mul_x_pos">
+<theory name="P" proved="true">
+ <goal name="x_mul_x_pos" proved="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="sqr_pos">
- </goal>
-</theory>
-<theory name="P2">
- <goal name="sqr_pos">
+ <goal name="sqr_pos" proved="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="P3">
- <goal name="cos_bound">
+<theory name="P2" proved="true">
+ <goal name="sqr_pos" proved="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="cos_bound_harder">
+</theory>
+<theory name="P3" proved="true">
+ <goal name="cos_bound" proved="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="MethodErrorOK">
+ <goal name="cos_bound_harder" proved="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="MethodErrorWrong">
+ <goal name="MethodErrorOK" proved="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="MethodErrorWrong" proved="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
 <theory name="Power">
- <goal name="G">
+ <goal name="G_KO">
+ <proof prover="0"><result status="unknown" time="0.01"/></proof>
  </goal>
- <goal name="G1">
+ <goal name="G1_KO">
+ <proof prover="0"><result status="unknown" time="0.01"/></proof>
  </goal>
- <goal name="G2">
+ <goal name="G2_KO">
+ <proof prover="0"><result status="unknown" time="0.00"/></proof>
  </goal>
 </theory>
 <theory name="PolyPaverExamples">
- <goal name="g1">
+ <goal name="g1_KO">
+ <proof prover="0"><path name="dreal-PolyPaverExamples-g1_1.smt2"/><result status="unknown" time="0.01"/></proof>
+ <proof prover="1" obsolete="true"><path name="dreal_PolyPaverExamples_g1_1.v"/><result status="failure" time="0.00"/></proof>
  </goal>
 </theory>
 </file>
