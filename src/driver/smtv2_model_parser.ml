@@ -492,6 +492,8 @@ module FromModelToTerm = struct
     Debug.dprintf debug "[constant_to_term] c = %a@." print_constant c;
     match c with
     | Cint bigint -> t_const (Constant.int_const bigint) Ty.ty_int
+    | Cdecimal (d1,d2) -> error "TODO_WIP Cdecimal"
+    | Cfraction _ -> error "TODO_WIP Cfraction"
     | Cbitvector (bigint, n) ->
       begin try
         let _,ty =
@@ -502,9 +504,9 @@ module FromModelToTerm = struct
         t_const (Constant.int_const bigint) ty
       with Not_found -> error "TODO_WIP Cbitvector"
       end
+    | Cfloat _ -> error "TODO_WIP Cfloat"
     | Cbool b -> if b then t_true_bool else t_true_bool
     | Cstring str -> t_const (Constant.string_const str) Ty.ty_str
-    | _ -> error "TODO_WIP constant_to_term"
 
   let rec term_to_term env t =
     Debug.dprintf debug "[term_to_term] t = %a@." print_term t;
