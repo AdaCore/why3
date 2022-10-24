@@ -438,6 +438,23 @@ type engine =
 
 type substitution = term Mvs.t
 
+(* Each term stored in the [cont] structure is associated
+   to its size (i.e. [Term.term_size]).
+   The size of an element of type [cont] is then defined by:
+   1 (for the constructor) + the size of each term (this
+   includes terms on [term_branch] list and in substitutions).
+*)
+(*
+   In the [config] type, we keep the following invariant
+   for the continuation stack:
+   the head (c,t,n) of the list is such that [n] is equal to
+   the size of the term [t] + the size of [c] + the size of
+   the tail of the list.
+   This is used in the [normalize] function, in order to stop
+   the reduction if the term size is blowing up (i.e. the term
+   is growing more than [max_growth]).
+*)
+
 type cont =
 | Kapp of lsymbol * Ty.ty option
 | Kif of term * int * term * int * substitution
