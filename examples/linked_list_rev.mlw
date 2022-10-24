@@ -280,7 +280,7 @@ module InPlaceRevSeq
     requires { list_seg next p l1 q }
     requires { length l1 > 0 }
     variant  { length l1 }
-    ensures  { list_seg next (Map.get next p)l1[1..] q }
+    ensures  { list_seg next (Map.get next p) l1[1..] q }
   = if length l1 > 1 then
       list_seg_tail next l1[1..] (Map.get next p) q
 
@@ -416,8 +416,7 @@ module YetAnotherInPlaceRev
 
   type loc
 
-  val (=) (l1 l2: loc) : bool
-    ensures { result <-> l1 = l2 }
+  val (=) (l1 l2: loc) : bool ensures { result <-> l1 = l2 }
 
   val constant null : loc
 
@@ -427,62 +426,51 @@ module YetAnotherInPlaceRev
 
   let cdr (p: loc) : loc
     requires { p <> null }
-    reads    { mem }
     ensures  { result = mem.next p }
   = mem.next p
 
   let set_cdr (p: loc) (v: loc) : unit
     requires { p <> null }
-    writes   { mem.next }
     ensures  { mem.next = (old mem.next)[p <- v] }
   = let m = mem.next in
     mem.next <- fun x -> if x = p then v else m x
 
-  (* the `n` cells composing the list are non null and distinct *)
-  predicate valid_cells (c: int -> loc) (n: int) =
-    (forall i. 0 <= i < n -> c i <> null) &&
-    (forall i j. 0 <= i < n -> 0 <= j < n -> i <> j -> c i <> c j)
+  predicate valid_cells (s: int -> loc) (n: int) =
+    (forall i. 0 <= i < n -> s i <> null) &&
+    (forall i j. 0 <= i < n -> 0 <= j < n -> i <> j -> s i <> s j)
 
-  (* null-terminated left-to-right list from `lo` included to `hi` excluded *)
-  predicate listLR (m: mem) (c: int -> loc) (l: loc) (lo hi: int) =
+  predicate listLR (m: mem) (s: int -> loc) (l: loc) (lo hi: int) =
     0 <= lo <= hi &&
-    valid_cells c hi &&
-    (lo = hi && l = null ||
-     lo < hi && l = c lo && m.next (c (hi-1)) = null &&
-     forall k. lo <= k < hi-1 -> m.next (c k) = c (k+1))
+    if lo = hi then l = null else
+      l = s lo && m.next (s (hi-1)) = null &&
+      forall k. lo <= k < hi-1 -> m.next (s k) = s (k+1)
 
-  (* null-terminated right-to-left list from `hi` excluded to `lo` included *)
-  predicate listRL (m: mem) (c: int -> loc) (l: loc) (lo hi: int) =
+  predicate listRL (m: mem) (s: int -> loc) (l: loc) (lo hi: int) =
     0 <= lo <= hi &&
-    valid_cells c hi &&
-    (lo = hi && l = null ||
-     lo < hi && m.next (c lo) = null && l = c (hi-1) &&
-     forall k. lo < k < hi -> m.next (c k) = c (k-1))
+    if lo = hi then l = null else
+      m.next (s lo) = null && l = s (hi-1) &&
+      forall k. lo < k < hi -> m.next (s k) = s (k-1)
 
-  (* we do not change the memory outside of `cell[0..n[` *)
-  predicate frame (m1 m2: mem) (c: int -> loc) (n: int) =
-    forall p. (forall i. 0 <= i < n -> p <> c i) ->
+  predicate frame (m1 m2: mem) (s: int -> loc) (n: int) =
+    forall p. (forall i. 0 <= i < n -> p <> s i) ->
       m1.next p = m2.next p
 
-  let list_reversal (ghost c: int -> loc) (ghost n: int) (l: loc) : (r: loc)
-    requires { listLR mem c l 0 n }
-    writes   { mem }
-    ensures  { listRL mem c r 0 n }
-    ensures  { frame mem (old mem) c n }
+  let list_reversal (ghost s: int -> loc) (ghost n: int) (l: loc) : (r: loc)
+    requires { valid_cells s n }
+    requires { listLR mem s l 0 n }
+    ensures  { listRL mem s r 0 n }
+    ensures  { frame mem (old mem) s n }
   = let ref l = l in
     let ref p = null in
     let ghost ref i = 0 in
-    (* [ ]<-...<-[ ]<-[ ]  [ ]->[ ]->...->[ ]
-                       ^    ^
-                       p    l                *)
     while l <> null do
       invariant { if n = 0 then l = p = null else
-                  i = 0     && p = null    && l = c 0
-               || i = n     && p = c (n-1) && l = null
-               || 0 < i < n && p = c (i-1) && l = c i }
-      invariant { listRL mem c p 0 i }
-      invariant { listLR mem c l i n }
-      invariant { frame mem (old mem) c n }
+                  i = 0     && p = null    && l = s 0
+               || i = n     && p = s (n-1) && l = null
+               || 0 < i < n && p = s (i-1) && l = s i }
+      invariant { listRL mem s p 0 i }
+      invariant { listLR mem s l i n }
+      invariant { frame mem (old mem) s n }
       variant   { n - i }
       let tmp = l in
       l <- cdr l;
@@ -492,27 +480,37 @@ module YetAnotherInPlaceRev
     done;
     return p
 
-  let rec predicate is_list (m: mem) (l: loc) (n: int)
+  let rec ghost predicate is_list (m: mem) (l: loc) (s: int -> loc) (n: int)
     requires { n >= 0 }
     variant  { n }
-  = if n = 0 then l = null
-    else l <> null && is_list m (m.next l) (n - 1)
+  = if n = 0 then l = null else
+      l = s 0 <> null && is_list m (m.next l) (fun i -> s (i+1)) (n - 1)
 
-  let rec ghost cells_of_list (l: loc) (n: int) : (c: int -> loc)
+  let rec lemma cells_of_list (l: loc) (s: int -> loc) (n: int)
     requires { n >= 0 }
-    requires { is_list mem l n }
+    requires { is_list mem l s n }
     variant  { n }
-    ensures  { listLR mem c l 0 n }
-  = if l = null then
-      (fun _ -> null)
-    else
-      let c = cells_of_list (cdr l) (n - 1) in
-      (fun i -> if i = 0 then l else c (i - 1))
+    ensures  { valid_cells s n }
+    ensures  { listLR mem s l 0 n }
+  = if n <> 0 then cells_of_list (cdr l) (fun i -> s (i+1)) (n - 1)
+
+  let rec lemma list_of_cells (r: loc) (s: int -> loc) (n: int)
+    requires { n >= 0 }
+    requires { valid_cells s n }
+    requires { listRL mem s r 0 n }
+    variant  { n }
+    ensures  { is_list mem r (fun i -> s (n-1-i)) n }
+  = if n <> 0 then list_of_cells (cdr r) s (n - 1)
+
+  let list_reversal_final (ghost s) (ghost n: int) (l: loc) : (r: loc)
+    requires { n >= 0 }
+    requires { is_list mem l s n }
+    ensures  { is_list mem r (fun i -> s (n-1-i)) n }
+    ensures  { frame mem (old mem) s n }
+  = cells_of_list l s n;
+    let r = list_reversal s n l in
+    list_of_cells r s n;
+    r
 
 end
 
-(*
-Local Variables:
-compile-command: "why3 ide linked_list_rev.mlw"
-End:
-*)
