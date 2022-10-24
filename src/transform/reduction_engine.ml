@@ -460,6 +460,9 @@ let cont_size cont =
   | [] -> 0
   | (_, _, n)::_ -> n
 
+let subst_size sigma =
+  Mvs.fold (fun vs t acc -> acc + Term.term_size t) sigma 0
+
 (* This global variable is used to approximate a count of the elementary
    simplifications that are done during normalization. This is used for
    transformation step. *)
@@ -773,12 +776,13 @@ let reduce_bounded_quant ls_lt limit t nt sigma st rem =
             rem
           else
             let t_i = t_const (Constant.int_const i) Ty.ty_int in
+            let n_i = Term.term_size t_i in
             let n_orig = Term.term_size orig in
             let n_true = Term.term_size t_true in
             let rem = (* conjunction for all i > a *)
               if BigInt.gt i a then
                 let n1 = n - n_orig + n_true in
-                let n2 = n1 + 1 + nt + n_true in
+                let n2 = n1 + n_i + 1 + nt + n_true in
                 (Keval (t, nt, Mvs.add vs t_i sigma), t_true, n2) ::
                   (Kbinop binop, t_true, n1) :: rem
               else
@@ -832,7 +836,8 @@ let rec reduce engine c =
   | t1 :: st, (Klet(v,t2,n2,sigma), orig, n) :: rem ->
     incr(rec_step_limit);
     let t1 = term_of_value t1 in
-    let n' = n - Term.term_size orig + n2 in
+    let n1 = Term.term_size t1 in
+    let n' = n - Term.term_size orig + n2 + n1 in
     { value_stack = st;
       cont_stack =
         (Keval(t2, n2, Mvs.add v t1 sigma), t_attr_copy orig t2, n') :: rem;
@@ -904,8 +909,10 @@ and reduce_match st u ~orig tbl sigma cont =
         Format.eprintf "@]@.";
 *)
         incr(rec_step_limit);
+        let n_sigma = subst_size sigma in
+        let n_mv'' = subst_size mv'' in
         let n_t = Term.term_size t in
-        let n' = cont_size cont + n_t + n_t + 1 in
+        let n' = cont_size cont + n_t + n_mv'' - n_sigma + n_t + 1 in
         { value_stack = st;
           cont_stack = (Keval(t,n_t,mv''), t_attr_copy orig t, n') :: cont;
         }
@@ -1120,6 +1127,7 @@ and reduce_func_app ~orig _ty rem_st t1 t2 rem_cont =
             | vh::vl -> (vh,vl)
             in
             let t2 = term_of_value t2 in
+            let n2 = Term.term_size t2 in
             begin
             match vl with
             | [] -> elim body vh t2
@@ -1128,7 +1136,7 @@ and reduce_func_app ~orig _ty rem_st t1 t2 rem_cont =
               let tq = t_quant Tforall (t_close_quant vl trig eq) in
               let body = t_attr_copy t (t_eps_close fc2 tq) in
               let n_body = Term.term_size body in
-              let n = n_body + 1 + n_body + cont_size rem_cont in
+              let n = n_body + n2 + 1 + n_body + cont_size rem_cont in
               { value_stack = rem_st;
                 cont_stack =
                   (Keval(body,n_body,Mvs.add vh t2 Mvs.empty),
@@ -1142,14 +1150,16 @@ and reduce_func_app ~orig _ty rem_st t1 t2 rem_cont =
         match t.t_node with
           | Tapp (ls1,[lhs;body]) when ls_equal ls1 ps_equ ->
             let equ lhs body = t_attr_copy t (t_app ps_equ [lhs;body] None) in
-            let n_body = Term.term_size body in
-            let n = n_body + 1 + n_body + cont_size rem_cont in
-            let elim body vh t2 = {
-              value_stack = rem_st;
-              cont_stack =
-                (Keval(body,n_body,Mvs.add vh t2 Mvs.empty),
-                 t_attr_copy orig body,n) :: rem_cont;
-            } in
+            let elim body vh t2 =
+              let n2 = Term.term_size t2 in
+              let n_body = Term.term_size body in
+              let n = n_body + n2 + 1 + n_body + cont_size rem_cont in
+              {
+                value_stack = rem_st;
+                cont_stack =
+                  (Keval(body,n_body,Mvs.add vh t2 Mvs.empty),
+                  t_attr_copy orig body,n) :: rem_cont;
+              } in
             process lhs body equ elim
           | Tbinop (Tiff,
             ({t_node=Tapp (ls1,[lhs;tr])} as teq),
@@ -1159,9 +1169,10 @@ and reduce_func_app ~orig _ty rem_st t1 t2 rem_cont =
               let lhs = t_attr_copy teq (t_app ps_equ [lhs;tr] None) in
               t_attr_copy t (t_binary Tiff lhs body) in
             let elim body vh t2 =
+              let n2 = Term.term_size t2 in
               let body = t_if body t_bool_true t_bool_false in
               let n_body = Term.term_size body in
-              let n = n_body + 1 + n_body + cont_size rem_cont in
+              let n = n_body + n2 + 1 + n_body + cont_size rem_cont in
               { value_stack = rem_st;
                 cont_stack =
                 (Keval(body,n_body,Mvs.add vh t2 Mvs.empty),
@@ -1233,7 +1244,8 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
 *)
           let mv,rhs = t_subst_types mt mv rhs in
           let n_rhs = Term.term_size rhs in
-          let n = Term.term_size orig + n_rhs + 1 + cont_size rem_cont in
+          let n_mv = subst_size mv in
+          let n = Term.term_size orig + n_rhs + n_mv + 1 + cont_size rem_cont in
           incr(rec_step_limit);
           { value_stack = rem_st;
             cont_stack = (Keval(rhs,n_rhs,mv),orig,n) :: rem_cont;
@@ -1258,8 +1270,9 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
           let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vl args in
           let mt = Ty.oty_match mt e.t_ty ty in
           let mv,e = t_subst_types mt mv e in
+          let n_mv = subst_size mv in
           let n_e = Term.term_size e in
-          let n = Term.term_size orig + n_e + 1 + cont_size rem_cont in
+          let n = Term.term_size orig + n_e + n_mv + 1 + cont_size rem_cont in
           { value_stack = rem_st;
             cont_stack = (Keval(e,n_e,mv),orig,n) :: rem_cont;
           }
@@ -1394,8 +1407,9 @@ and reduce_term_equ ~orig st t1 t2 cont =
         aux Mvs.empty t_true ls1.ls_args tl1 tl2
       in
       let () = incr(rec_step_limit) in
+      let n_sigma = subst_size sigma in
       let n_t = Term.term_size t in
-      let n = n_t + 1 + Term.term_size orig + cont_size cont in
+      let n = n_t + n_sigma + 1 + Term.term_size orig + cont_size cont in
       { value_stack = st;
         cont_stack = (Keval(t,n_t,sigma),orig,n) :: cont;
       }
@@ -1454,7 +1468,7 @@ let rec reconstruct c =
 
 (** iterated reductions *)
 
-let normalize ?(max_growth=10) ?step_limit ~limit engine sigma t0 =
+let normalize ?(max_growth=1000) ?step_limit ~limit engine sigma t0 =
   let max_growth = Int.to_float max_growth in
   rec_step_limit := 0;
   let rec many_steps c n init_size =
@@ -1462,28 +1476,23 @@ let normalize ?(max_growth=10) ?step_limit ~limit engine sigma t0 =
     | [Term t], [] -> t
     | _, [] -> assert false
     | _ ->
-      if n = limit then
-        begin
-          let t1 = reconstruct c in
-          (* Loc.warning "reduction of term %a takes more than %d steps, aborted at %a.@."
-           *   Pretty.print_term t0 limit Pretty.print_term t1; *)
-          t1
-        end
+      if n = limit then reconstruct c
       else begin
-        let reduce_within_max_growth c n init_size =
+        let reduce_within_max_growth c n init_size max_growth =
           let c' = reduce engine c in
           let g = Int.to_float (cont_size c'.cont_stack) /. init_size in
           if g > max_growth then
+            let _ = Loc.warning "term reduction aborted (term size is blowing up).@." in
             reconstruct c
           else
             many_steps c' (n+1) init_size
         in
         match step_limit with
-        | None -> reduce_within_max_growth c n init_size
+        | None -> reduce_within_max_growth c n init_size max_growth
         | Some step_limit ->
             if !rec_step_limit >= step_limit then
               reconstruct c
-            else reduce_within_max_growth c n init_size
+            else reduce_within_max_growth c n init_size max_growth
       end
   in
   let n0 = Term.term_size t0 in
@@ -1491,8 +1500,7 @@ let normalize ?(max_growth=10) ?step_limit ~limit engine sigma t0 =
             cont_stack = [Keval(t0,n0,sigma),t0,n0+1] ;
           }
   in
-  let res = many_steps c 0 (Int.to_float (n0+1)) in
-  res
+  many_steps c 0 (Int.to_float (n0+1))
 
 (* the rewrite engine *)
 
