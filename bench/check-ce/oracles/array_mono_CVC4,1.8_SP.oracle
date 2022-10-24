@@ -1,0 +1,57 @@
+File bench/check-ce/array_mono.mlw:
+Goal array'vc.
+Prover result is: Valid.
+
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because cannot import value from model: type with not exactly one constructors array/0)
+  - Abstract RAC: INCOMPLETE (terminated because cannot import value from model: type with not exactly one constructors array/0)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because cannot import value from model: type with not exactly one constructors array/0)
+  - Abstract RAC: INCOMPLETE (terminated because cannot import value from model: type with not exactly one constructors array/0)
+File "bench/check-ce/array_mono.mlw", line 36, characters 4-8:
+Sub-goal Index in array bounds of goal f1'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model could not be verified
+  (both RAC terminated because cannot import value from model: type with not exactly one constructors array/0):
+File array_mono.mlw:
+  Line 16:
+    a = {elts = (others => 0); length = 0}
+  Line 35:
+    a = {elts = (others => 0); length = 0}
+  Line 36:
+    a = {elts = (others => 0); length = 0}
+
+File "bench/check-ce/array_mono.mlw", line 41, characters 4-14:
+Sub-goal Index in array bounds of goal f2'vc.
+Prover result is: Valid.
+
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because cannot import value from model: type with not exactly one constructors array/0)
+  - Abstract RAC: INCOMPLETE (terminated because cannot import value from model: type with not exactly one constructors array/0)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because cannot import value from model: type with not exactly one constructors array/0)
+  - Abstract RAC: INCOMPLETE (terminated because cannot import value from model: type with not exactly one constructors array/0)
+- Checked model 2: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `f2` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `f2` cannot be evaluated)
+File "bench/check-ce/array_mono.mlw", line 40, characters 14-26:
+Sub-goal Postcondition of goal f2'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model could not be verified
+  (both RAC terminated because cannot import value from model: type with not exactly one constructors array/0):
+File array_mono.mlw:
+  Line 23:
+    a = {elts = (0 => 42 (0X2A), 1 => 42 (0X2A), others => 0); length = 2}
+  Line 25:
+    a = {elts = (0 => 42 (0X2A), 1 => 42 (0X2A), others => 0); length = 2}
+    old a =
+      {elts = (0 => 42 (0X2A), 1 => 42 (0X2A), others => 0); length = 2}
+  Line 38:
+    a = {elts = (0 => 42 (0X2A), 1 => 42 (0X2A), others => 0); length = 2}
+  Line 40:
+    a = {elts = (0 => 42 (0X2A), 1 => 42 (0X2A), others => 0); length = 2}
+  Line 41:
+    a = {elts = (0 => 42 (0X2A), 1 => 42 (0X2A), others => 0); length = 2}
+
