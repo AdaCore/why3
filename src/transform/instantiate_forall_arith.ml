@@ -20,23 +20,23 @@ type arith_terms = {
   real_terms : unit Mterm.t;
 }
 
-let rec instanciate f terms =
+let rec instantiate f terms =
   match f.t_node with
-  | Tbinop (Tand, f1, f2) -> instanciate f1 terms @ instanciate f2 terms
+  | Tbinop (Tand, f1, f2) -> instantiate f1 terms @ instantiate f2 terms
   | Tbinop (Tor, _, _) ->
     [] (* This can be huge, do we want to instanciate here ? *)
   | Tbinop (Timplies, f1, f2) ->
-    let fmlas = instanciate f2 terms in
+    let fmlas = instantiate f2 terms in
     List.map (fun f -> t_implies_simp f1 f) fmlas
   | Tbinop (Tiff, f1, f2) ->
-    instanciate (t_implies_simp f1 f2) terms
-    @ instanciate (t_implies_simp f2 f1) terms
+    instantiate (t_implies_simp f1 f2) terms
+    @ instantiate (t_implies_simp f2 f1) terms
   | Tnot f1 ->
-    let fmlas = instanciate f1 terms in
+    let fmlas = instantiate f1 terms in
     List.map (fun f -> t_not_simp f) fmlas
   | Tquant (Tforall, t) ->
     let vs, _, t = t_open_quant t in
-    let fmlas = t :: instanciate t terms in
+    let fmlas = t :: instantiate t terms in
     List.fold_left
       (fun acc vs ->
         List.fold_left
@@ -63,13 +63,12 @@ let instantiate_fmlas arith_terms =
           (fun task d ->
             match d.d_node with
             | Dprop (kind, pr, f) ->
-              let fmlas = instanciate f arith_terms in
+              let fmlas = instantiate f arith_terms in
               List.fold_left
                 (fun task fmla ->
                   add_prop_decl task kind
                     (create_prsymbol
-                       (Ident.id_derive
-                          "generated_by_instanciate_universal_quantified_fmlas"
+                       (Ident.id_derive "generated_by_instantiate_forall_arith"
                           pr.pr_name))
                     fmla)
                 task fmlas
