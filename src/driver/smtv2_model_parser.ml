@@ -737,9 +737,8 @@ module FromModelToTerm = struct
       then
         t_true_bool
       else
-        (* TODO_WIP to be fixed because it is correct to reduce to Tfalse
-           only in specific cases (e.g. two distinct prover variables) *)
-        t_false_bool
+        let ts = List.map (eval_term env eval_var ty_coercions ty_fields) [t1;t2] in
+        t_app ls ts ls.ls_value
     | Tapp (ls, ts) ->
       let ts = List.map (eval_term env eval_var ty_coercions ty_fields) ts in
       t_app ls ts ls.ls_value
