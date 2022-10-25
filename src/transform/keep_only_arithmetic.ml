@@ -14,10 +14,8 @@ open Decl
 open Ty
 open Theory
 
-(* Remove all that is not an equality/inequality or quantified stuff. Also
-   remove Timplies, Tiff, Tand. We could still throw away quantified assertions
-   that could be used on implications if instanciated, but its probably too
-   costly to use them. *)
+(* Performs some basic simplifications and remove all goals assertions that are
+   not equalites/inequalities *)
 
 let get_arith_symbols env =
   let symbol_names =
