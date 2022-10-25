@@ -62,28 +62,6 @@ module FromSexpToModel = struct
 
   let get_quoted s = String.sub s 1 (String.length s - 2)
 
-  let get_type_from_var_name name =
-    (* we try to infer the type from [name], for example:
-        - infer the type int32 from the name @uc_int32_1
-        - infer the type ref int32 from the name |@uc_(ref int32)_0| *)
-    let name = if is_quoted name then get_quoted name else name in
-    if Strings.has_prefix "@" name then
-      try
-        let left = String.index name '_' + 1 in
-        let right = String.rindex name '_' in
-        let ty = String.sub name left (right - left) in
-        let ty =
-          (try Strings.(remove_prefix "(" (remove_suffix ")" ty)) with _ -> ty)
-        in (
-          match String.split_on_char ' ' ty with
-          | [ty] -> Some (Atom ty)
-          | l -> Some (List (List.map (fun s -> Atom s) l)))
-      with _ -> Some (Atom Strings.(remove_prefix "@" name))
-    else
-      match String.split_on_char '!' name with
-      | [ ty; _; _ ] -> Some (Atom ty)
-      | _ -> None
-
   let is_string s =
     String.length s >= 2 && s.[0] = '"' && s.[String.length s - 1] = '"'
 
@@ -275,12 +253,31 @@ module FromSexpToModel = struct
     | List (Atom n :: l) -> Smultiple (identifier (Atom n), List.map sort l)
     | sexp -> error sexp "sort"
 
+  let get_type_from_var_name name =
+    (* we try to infer the type from [name], for example:
+        - infer the type int32 from the name @uc_int32_1
+        - infer the type ref int32 from the name |@uc_(ref int32)_0| *)
+    let name = if is_quoted name then get_quoted name else name in
+    if Strings.has_prefix "@" name then
+        begin
+          try
+            let left = String.index name '_' + 1 in
+            let right = String.rindex name '_' in
+            let name = String.sub name left (right - left) in
+            match FromStringToSexp.parse_string name with
+            | [] -> None
+            | [sexp] -> Some sexp
+            | sexps -> Some (List sexps)
+          with _ -> None
+        end
+    else None
+
   let qualified_identifier sexp : qual_identifier =
     match sexp with
     | Atom n -> (
         match get_type_from_var_name n with
         | None -> Qident (identifier sexp)
-        | Some s -> Qannotident (identifier sexp, sort s))
+        | Some ty_sexp -> Qannotident (identifier sexp, sort ty_sexp))
     | List [ Atom "as"; id; s ] -> Qannotident (identifier id, sort s)
     | sexp -> error sexp "qualified_identifier"
 
