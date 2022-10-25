@@ -9,6 +9,8 @@ unknown "delta-sat with delta = .*" ""
 time "why3cpulimit time : %s s"
 valid "^unsat$"
 
+transformation "inline_trivial"
+transformation "eliminate_definition"
 transformation "eliminate_builtin"
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic"
@@ -16,11 +18,12 @@ transformation "eliminate_literal"
 transformation "eliminate_epsilon"
 transformation "simplify_formula"
 transformation "simplify_trivial_quantification"
+transformation "encoding_smt"
 transformation "simplify_computations"
 transformation "introduce_premises"
 transformation "instantiate_predicate"
 transformation "keep_only_arithmetic"
-transformation "instantiate_forall_arith"
+transformation "abstract_unknown_lsymbols"
 transformation "eliminate_unknown_lsymbols"
 transformation "eliminate_unknown_types"
 
@@ -151,6 +154,11 @@ theory ieee_float.GenericFloat
 end
 
 theory ieee_float.Float64
- remove prop max_int_def
- remove prop max_real_def
+  remove prop max_int_def
+  remove prop max_real_def
+end
+
+theory bv.Pow2int
+  remove allprops
+  remove allprops
 end
