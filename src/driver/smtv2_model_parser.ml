@@ -380,7 +380,7 @@ module FromModelToTerm = struct
 
   type env = {
     (* Prover variables. *)
-    mutable prover_vars : vsymbol list;
+    mutable prover_vars : vsymbol Mstr.t;
     (* Bound variables in the body of a function definiton. *)
     mutable bound_vars : vsymbol Mstr.t;
     (* Constructors from [pinfo.constructors]. *)
@@ -454,7 +454,7 @@ module FromModelToTerm = struct
           t_var vs
     | Qident (Isymbol (Sprover n)) ->
         let vs =
-          try List.find (fun vs -> String.equal n vs.vs_name.id_string) env.prover_vars
+          try Mstr.find n env.prover_vars
           with Not_found -> error "TODO_WIP cannot infer the type of the prover variable"
         in
         t_var vs
@@ -464,9 +464,7 @@ module FromModelToTerm = struct
         else
           let vs =
             try
-              let vs =
-                Mstr.find n env.bound_vars
-              in
+              let vs = Mstr.find n env.bound_vars in
               if Ty.ty_equal vs.vs_ty (smt_sort_to_ty env s) then vs
               else error "TODO_WIP type mismatch"
             with Not_found ->
@@ -477,14 +475,12 @@ module FromModelToTerm = struct
         let vs_ty = smt_sort_to_ty env s in
         let vs =
           try
-            List.find
-              (fun vs ->
-                String.equal n vs.vs_name.id_string
-                  && Ty.ty_equal vs.vs_ty vs_ty)
-              env.prover_vars
+            let vs = Mstr.find n env.prover_vars in
+            if Ty.ty_equal vs.vs_ty vs_ty then vs
+            else error "TODO_WIP type mismatch for prover variable"
           with Not_found -> (
             let vs = create_vsymbol (Ident.id_fresh n) vs_ty in
-            env.prover_vars <- vs :: env.prover_vars;
+            env.prover_vars <- Mstr.add n vs env.prover_vars;
             vs)
         in
         t_var vs
@@ -680,7 +676,7 @@ module FromModelToTerm = struct
       eval_var
       Pretty.print_term t;
     match t.t_node with
-    | Tvar vs when eval_var && (List.mem vs env.prover_vars) -> (
+    | Tvar vs when eval_var && (List.mem vs (Mstr.values env.prover_vars)) -> (
         match t.t_ty with
         | Some ty -> (
           (* first search if there exists some type coercions for [ty] *)
@@ -730,16 +726,23 @@ module FromModelToTerm = struct
             (* replace [t] by [eps x. f] *)
             t_eps_close x f)
         | _ -> t)
-    | Tapp (ls, [t1;t2]) when (ls.ls_name.id_string.[0] == '=') ->
+    | Tapp (ls, [t1;t2]) when (ls.ls_name.id_string.[0] == '=') -> (* TODO_WIP fix builtin lsymbol for equality *)
       if
         t_equal
           (eval_term env eval_var ty_coercions ty_fields t1)
           (eval_term env eval_var ty_coercions ty_fields t2)
       then
         t_true_bool
-      else
-        let ts = List.map (eval_term env eval_var ty_coercions ty_fields) [t1;t2] in
-        t_app ls ts ls.ls_value
+      else (
+        match t1.t_node,t2.t_node with
+        | Tvar v1, Tvar v2
+            when List.mem v1 (Mstr.values env.prover_vars) &&
+                 List.mem v2 (Mstr.values env.prover_vars) ->
+          (* Distinct prover variables are not equal *)
+          if vs_equal v1 v2 then t_true_bool else t_false_bool
+        | _ ->
+          let ts = List.map (eval_term env eval_var ty_coercions ty_fields) [t1;t2] in
+          t_app ls ts ls.ls_value)
     | Tapp (ls, ts) ->
       let ts = List.map (eval_term env eval_var ty_coercions ty_fields) ts in
       t_app ls ts ls.ls_value
@@ -752,11 +755,31 @@ module FromModelToTerm = struct
         let t2 = eval_term env eval_var ty_coercions ty_fields t2 in
         t_if b t1 t2
     )
+    | Tlet _ -> t
+    | Tcase _ -> t
+    | Teps tb ->
+      let vs,t = Term.t_open_bound tb in
+      t_eps_close vs (eval_term env eval_var ty_coercions ty_fields t)
+    | Tquant (q,tq) ->
+      let vsl,trig,t' = t_open_quant tq in
+      let t' = eval_term env eval_var ty_coercions ty_fields t' in
+      t_quant q (t_close_quant vsl trig t')
+    | Tbinop (op,t1,t2) ->
+      let t1 = eval_term env eval_var ty_coercions ty_fields t1 in
+      let t2 = eval_term env eval_var ty_coercions ty_fields t2 in
+      t_binary_bool op t1 t2
+    | Tnot t' -> (
+      let t' = eval_term env eval_var ty_coercions ty_fields t' in
+      match t'.t_node with (* TODO_WIP is it really the place to do such simplifications? *)
+      | Ttrue -> t_bool_false
+      | Tfalse -> t_bool_true
+      | _ -> t_bool_not t')
     | _ -> t
 
   let eval (pinfo : Printer.printing_info) env terms =
-    List.iter
-      (Debug.dprintf debug "[eval] prover_var = %a@." Pretty.print_vs)
+    Mstr.iter
+      (fun key value -> Debug.dprintf debug "[eval] prover_var = %s, vs = %a@."
+        key Pretty.print_vs value)
       env.prover_vars;
     let ty_coercions =
       Ty.Mty.map (* for each set [sls] of lsymbols associated to a type *)
@@ -878,7 +901,7 @@ module FromModelToTerm = struct
           (List.length ls.ls_args))
       constructors;
     let env = {
-      prover_vars = [];
+      prover_vars = Mstr.empty;
       bound_vars = Mstr.empty;
       constructors = constructors;
       known_types = [];
