@@ -100,7 +100,7 @@ let collect_model_ls info ls =
     | [ty] ->
       let coercions = Sls.add ls (Mty.find_def Sls.empty ty info.type_coercions) in
       info.type_coercions <- Mty.add ty coercions info.type_coercions
-    | _ -> () (* TODO_WIP *)
+    | _ -> ()
     end;
     info.list_projs <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
         ls.ls_name info.list_projs);
@@ -111,12 +111,12 @@ let collect_model_ls info ls =
     | [ty] ->
       let fields = ls :: (Mty.find_def [] ty info.type_fields) in
       info.type_fields <- Mty.add ty fields info.type_fields
-    | _ -> () (* TODO_WIP *)
+    | _ -> ()
     end;
     info.list_field_def <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
         ls.ls_name info.list_field_def);
   *)
-  if (*ls.ls_args = [] &&*) (relevant_for_counterexample ls.ls_name) then
+  if relevant_for_counterexample ls.ls_name then
     info.info_model <-
       add_model_element (ls, ls.ls_name.id_loc, ls.ls_name.id_attrs) info.info_model
 

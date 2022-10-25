@@ -685,28 +685,8 @@ module FromModelToTerm = struct
         | Some ty -> (
           (* first search if there exists some type coercions for [ty] *)
           match Ty.Mty.find_def [] ty ty_coercions with
-          | (str',(ls',t'))::_ ->
-            (* TODO_WIP handle multiple type coercions for a given [ty]
-                by creating a conjunction formula *)
-            let vs_list', _, t' = t_open_lambda t' in
-            let vs' = match vs_list' with
-              | [vs'] -> vs'
-              | _ ->
-                  error "TODO_WIP type coercion with not exactly one argument"
-            in
-            (* TODO_WIP if t' is again a prover variable, we should recurse on that *)
-            let t' = eval_term env false ty_coercions ty_fields (t_subst_single vs' (t_var vs) t') in
-            (* create a fresh vsymbol for the variable bound by the epsilon term *)
-            let x = create_vsymbol (Ident.id_fresh "x") ty in
-            (* substitute [vs] by this new variable in the body [t'] of the function
-                defining the type coercion *)
-            let t' = t_subst_single vs' (t_var x) t' in
-            (* construct the formula to be used in the epsilon term *)
-            let f = t_equ (t_app ls' [t_var x] ls'.ls_value) t' in
-            (* replace [t] by [eps x. f] *)
-            t_eps_close x f
           | [] -> (
-              (* then search if [ty] is associated to some fields *)
+              (* if no coercions, search if [ty] is associated to some fields *)
               match Ty.Mty.find_def [] ty ty_fields with
               | [] -> t
               | fields ->
@@ -727,7 +707,28 @@ module FromModelToTerm = struct
                       (Ident.id_fresh "arraymk")
                       (List.map ty_of_field fields)
                       (Some ty) in
-                  t_app ls_array (List.map term_of_field fields) (Some ty)))
+                  t_app ls_array (List.map term_of_field fields) (Some ty))
+          | coercions ->
+            (* create a fresh vsymbol for the variable bound by the epsilon term *)
+            let x = create_vsymbol (Ident.id_fresh "x") ty in
+            let term_of_coercion (str',(ls',t')) =
+              let vs_list', _, t' = t_open_lambda t' in
+              let vs' = match vs_list' with
+                | [vs'] -> vs'
+                | _ ->
+                    error "TODO_WIP type coercion with not exactly one argument"
+              in
+              (* TODO_WIP if t' is again a prover variable, we should recurse on that *)
+              let t' = eval_term env false ty_coercions ty_fields (t_subst_single vs' (t_var vs) t') in
+              (* substitute [vs] by this new variable in the body [t'] of the function
+                  defining the type coercion *)
+              let t' = t_subst_single vs' (t_var x) t' in
+              (* construct the formula to be used in the epsilon term *)
+              t_equ (t_app ls' [t_var x] ls'.ls_value) t'
+            in
+            let f = t_and_l (List.map term_of_coercion coercions) in
+            (* replace [t] by [eps x. f] *)
+            t_eps_close x f)
         | _ -> t)
     | Tapp (ls, [t1;t2]) when (ls.ls_name.id_string.[0] == '=') ->
       if
