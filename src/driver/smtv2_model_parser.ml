@@ -256,21 +256,26 @@ module FromSexpToModel = struct
   let get_type_from_var_name name =
     (* we try to infer the type from [name], for example:
         - infer the type int32 from the name @uc_int32_1
-        - infer the type ref int32 from the name |@uc_(ref int32)_0| *)
+        - infer the type ref int32 from the name |@uc_(ref int32)_0|ref!val!1
+        - infer the type ref from the name ref!val!0 *)
     let name = if is_quoted name then get_quoted name else name in
-    if Strings.has_prefix "@" name then
-        begin
-          try
-            let left = String.index name '_' + 1 in
-            let right = String.rindex name '_' in
-            let name = String.sub name left (right - left) in
-            match FromStringToSexp.parse_string name with
-            | [] -> None
-            | [sexp] -> Some sexp
-            | sexps -> Some (List sexps)
-          with _ -> None
+    let opt_name =
+      if Strings.has_prefix "@" name then
+        try
+          let left = String.index name '_' + 1 in
+          let right = String.rindex name '_' in
+          Some (String.sub name left (right - left))
+        with _ -> None
+      else
+        begin match String.split_on_char '!' name with
+        | [ty;_;_] -> Some ty
+        | _ -> None
         end
-    else None
+    in
+    match FromStringToSexp.parse_string (Opt.get_def  "" opt_name) with
+    | [] -> None
+    | [sexp] -> Some sexp
+    | sexps -> Some (List sexps)
 
   let qualified_identifier sexp : qual_identifier =
     match sexp with
