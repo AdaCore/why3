@@ -1430,6 +1430,9 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
           | [{v_desc= Vpurefun (_, bindings, default)}; value] ->
               let v = try Mv.find value bindings with Not_found -> default in
               Normal v
+          | [{v_desc= Vundefined }; value] ->
+              incomplete "an undefined argument was passed to %a"
+                Ident.print_decoded rs.rs_name.id_string
           | _ -> assert false
           end
         else

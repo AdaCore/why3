@@ -743,9 +743,9 @@ module FromModelToTerm = struct
     )
     | Tlet _ -> t
     | Tcase _ -> t
-    | Teps tb ->
-      let vs,t = Term.t_open_bound tb in
-      t_eps_close vs (eval_term env eval_var ty_coercions ty_fields t)
+    | Teps _ ->
+      let vsl,trig,t' = Term.t_open_lambda t in
+      t_lambda vsl trig (eval_term env eval_var ty_coercions ty_fields t')
     | Tquant (q,tq) ->
       let vsl,trig,t' = t_open_quant tq in
       let t' = eval_term env eval_var ty_coercions ty_fields t' in

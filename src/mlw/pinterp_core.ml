@@ -892,6 +892,9 @@ let check_type_invs rac ?loc ~giant_steps env ity v =
     let fs_vs = match v.v_desc with
       | Vconstr (_, fs, vs) ->
           List.fold_right2 Mrs.add fs (List.map field_get vs) Mrs.empty
+      | Vundefined ->
+          incomplete "type invariant for undefined value of type %a cannot be checked"
+            print_ty v.v_ty;
       | _ -> failwith "check_type_invs: value is not record" in
     let bind_field env rs =
       bind_pvs (Opt.get rs.rs_field) (Mrs.find rs fs_vs) env in
