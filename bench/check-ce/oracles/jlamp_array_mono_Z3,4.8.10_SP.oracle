@@ -1,0 +1,186 @@
+File bench/check-ce/jlamp_array_mono.mlw:
+Goal array'vc.
+Prover result is: Valid.
+
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because cannot import value from model: type with not exactly one constructors array/0)
+  - Abstract RAC: INCOMPLETE (terminated because cannot import value from model: type with not exactly one constructors array/0)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
+File "bench/check-ce/jlamp_array_mono.mlw", line 48, characters 4-16:
+Sub-goal Index in array bounds of goal f'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model could not be verified
+  (both RAC terminated because cannot import value from model: type with not exactly one constructors array/0):
+File jlamp_array_mono.mlw:
+  Line 11:
+    two = {to_int => 2}
+  Line 14:
+    three = {to_int => 3}
+  Line 33:
+    a =
+      {elts = (42 (0X2A) => {to_int => 3}, others => {to_int => 3});
+       length = 0}
+  Line 44:
+    a =
+      {elts = (42 (0X2A) => {to_int => 3}, others => {to_int => 3});
+       length = 0}
+  Line 48:
+    a =
+      {elts = (42 (0X2A) => {to_int => 3}, others => {to_int => 3});
+       length = 0}
+
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because cannot import value from model: type with not exactly one constructors array/0)
+  - Abstract RAC: INCOMPLETE (terminated because cannot import value from model: type with not exactly one constructors array/0)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
+File "bench/check-ce/jlamp_array_mono.mlw", line 47, characters 14-27:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model could not be verified
+  (both RAC terminated because cannot import value from model: type with not exactly one constructors array/0):
+File jlamp_array_mono.mlw:
+  Line 11:
+    two = {to_int => 2}
+  Line 14:
+    three = {to_int => 3}
+  Line 32:
+    a =
+      {elts = (42 (0X2A) => {to_int => 3}, others => {to_int => 2});
+       length = 4}
+  Line 34:
+    a =
+      {elts = (42 (0X2A) => {to_int => 2}, others => {to_int => 2});
+       length = 4}
+    old a =
+      {elts = (42 (0X2A) => {to_int => 3}, others => {to_int => 2});
+       length = 4}
+  Line 44:
+    a =
+      {elts = (42 (0X2A) => {to_int => 3}, others => {to_int => 2});
+       length = 4}
+  Line 47:
+    a =
+      {elts = (42 (0X2A) => {to_int => 2}, others => {to_int => 2});
+       length = 4}
+    three = {to_int => 3}
+  Line 48:
+    a =
+      {elts = (42 (0X2A) => {to_int => 2}, others => {to_int => 2});
+       length = 4}
+
+File "bench/check-ce/jlamp_array_mono.mlw", line 54, characters 4-16:
+Sub-goal Index in array bounds of goal g'vc.
+Prover result is: Valid.
+
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because cannot import value from model: type with not exactly one constructors array/0)
+  - Abstract RAC: INCOMPLETE (terminated because cannot import value from model: type with not exactly one constructors array/0)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `g` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `g` cannot be evaluated)
+File "bench/check-ce/jlamp_array_mono.mlw", line 53, characters 14-27:
+Sub-goal Postcondition of goal g'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model could not be verified
+  (both RAC terminated because cannot import value from model: type with not exactly one constructors array/0):
+File jlamp_array_mono.mlw:
+  Line 11:
+    two = {to_int => 2}
+  Line 14:
+    three = {to_int => 3}
+  Line 32:
+    a =
+      {elts = (17 (0X11) => {to_int => 3}, others => {to_int => 2});
+       length = 43 (0X2B)}
+  Line 34:
+    a =
+      {elts =
+       (17 (0X11) => {to_int => 3}, 42 (0X2A) => {to_int => 2},
+       others => {to_int => 2});
+       length = 43 (0X2B)}
+    old a =
+      {elts = (17 (0X11) => {to_int => 3}, others => {to_int => 2});
+       length = 43 (0X2B)}
+  Line 50:
+    a =
+      {elts = (17 (0X11) => {to_int => 3}, others => {to_int => 2});
+       length = 43 (0X2B)}
+  Line 53:
+    a =
+      {elts =
+       (17 (0X11) => {to_int => 3}, 42 (0X2A) => {to_int => 2},
+       others => {to_int => 2});
+       length = 43 (0X2B)}
+    three = {to_int => 3}
+  Line 54:
+    a =
+      {elts =
+       (17 (0X11) => {to_int => 3}, 42 (0X2A) => {to_int => 2},
+       others => {to_int => 2});
+       length = 43 (0X2B)}
+
+File "bench/check-ce/jlamp_array_mono.mlw", line 60, characters 4-16:
+Sub-goal Index in array bounds of goal h'vc.
+Prover result is: Valid.
+
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because cannot import value from model: type with not exactly one constructors array/0)
+  - Abstract RAC: INCOMPLETE (terminated because cannot import value from model: type with not exactly one constructors array/0)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `h` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `h` cannot be evaluated)
+File "bench/check-ce/jlamp_array_mono.mlw", line 59, characters 14-27:
+Sub-goal Postcondition of goal h'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model could not be verified
+  (both RAC terminated because cannot import value from model: type with not exactly one constructors array/0):
+File jlamp_array_mono.mlw:
+  Line 11:
+    two = {to_int => 2}
+  Line 14:
+    three = {to_int => 3}
+  Line 32:
+    a =
+      {elts =
+       (17 (0X11) => {to_int => 3}, 42 (0X2A) => {to_int => 2},
+       others => {to_int => 2});
+       length = 43 (0X2B)}
+  Line 34:
+    a =
+      {elts =
+       (17 (0X11) => {to_int => 2}, 42 (0X2A) => {to_int => 2},
+       others => {to_int => 2});
+       length = 43 (0X2B)}
+    old a =
+      {elts =
+       (17 (0X11) => {to_int => 3}, 42 (0X2A) => {to_int => 2},
+       others => {to_int => 2});
+       length = 43 (0X2B)}
+  Line 56:
+    a =
+      {elts =
+       (17 (0X11) => {to_int => 3}, 42 (0X2A) => {to_int => 2},
+       others => {to_int => 2});
+       length = 43 (0X2B)}
+  Line 59:
+    a =
+      {elts =
+       (17 (0X11) => {to_int => 2}, 42 (0X2A) => {to_int => 2},
+       others => {to_int => 2});
+       length = 43 (0X2B)}
+    three = {to_int => 3}
+  Line 60:
+    a =
+      {elts =
+       (17 (0X11) => {to_int => 2}, 42 (0X2A) => {to_int => 2},
+       others => {to_int => 2});
+       length = 43 (0X2B)}
+

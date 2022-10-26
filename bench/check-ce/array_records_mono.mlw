@@ -1,0 +1,55 @@
+module ArrayRecords
+
+    use int.Int
+    use map.Map
+
+    type value = int
+    type index = int
+
+    function to_rep value: int
+    meta "model_projection" function to_rep
+
+    type basic_record = {
+        flag [@model_trace:flag] : bool;
+        first_value [@model_trace:first_val] : value;
+        second_value [@model_trace:sec_val] : value;
+    }
+
+    type array_of_records = private {
+        mutable ghost elts : int -> basic_record;
+        length : int
+    } invariant { 0 <= length }
+
+    function ([]) (a: array_of_records) (i: int) : basic_record = a.elts i
+
+    val ([]) (a: array_of_records) (i: int) : basic_record
+        requires { [@expl:index in array bounds] 0 <= i < length a }
+        ensures  { result = a[i] }
+
+    val ghost function ([<-]) (a: array_of_records) (i: int) (v: basic_record): array_of_records
+        ensures { result.length = a.length }
+        ensures { result.elts = Map.set a.elts i v }
+
+    val ([]<-) (a: array_of_records) (i: int) (v: basic_record) : unit writes {a}
+        requires { [@expl:index in array bounds] 0 <= i < length a }
+        ensures  { a.elts = Map.set (old a).elts i v }
+        ensures  { a = (old a)[i <- v] }
+
+end
+
+module Test
+
+   use int.Int
+   use ArrayRecords
+
+   let var_overwrite (a: array_of_records) (i: int) : unit
+     requires { a[i] = {flag = true; first_value = 3; second_value = 5}}
+     ensures { a[i].first_value = 42 }
+   =
+     a[i] <- {flag = a[i].flag; first_value= a[i].first_value; second_value = 69};
+     a[i] <- {flag = a[i].flag; first_value= 42; second_value = a[i].second_value};     
+     a[i] <- {flag = a[i].flag; first_value= 23; second_value = a[i].second_value};     
+     a[i] <- {flag = false; first_value= a[i].first_value; second_value = a[i].second_value};     
+     assert {a[i].second_value = 69};
+
+end
