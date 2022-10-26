@@ -305,13 +305,13 @@ Defined.
 (* Why3 goal *)
 Definition max_real : Reals.Rdefinitions.R.
 Proof.
-
+  apply 340282346638528859811704183484516925440%R.
 Defined.
 
 (* Why3 goal *)
 Definition max_int : Numbers.BinNums.Z.
 Proof.
-
+  apply 340282346638528859811704183484516925440%Z.
 Defined.
 
 (* Why3 goal *)
@@ -330,9 +330,9 @@ now apply IZR_eq.
 Qed.
 
 Lemma max_real_cst :
-  max_real 8 24 = 340282346638528859811704183484516925440%R.
+  GenericFloat.max_real 8 24 = max_real%R.
 Proof.
-  rewrite <- max_real_is_F2R.
+    rewrite <- max_real_is_F2R.
   change (F2R (Float radix2 _ _)) with (IZR 16777215 * IZR (Zpower 2 104))%R.
   now rewrite <- mult_IZR.
 Qed.
@@ -1467,14 +1467,14 @@ Qed.
 (* Why3 goal *)
 Lemma max_int_def : (max_int = 340282346638528859811704183484516925440%Z).
 Proof.
-
+  trivial.
 
 Qed.
 
 (* Why3 goal *)
 Lemma max_real_def : (max_real = 340282346638528859811704183484516925440%R).
 Proof.
-
+  trivial.
 
 Qed.
 
