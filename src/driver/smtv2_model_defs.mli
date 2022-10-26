@@ -68,6 +68,8 @@ and array_elements = {
 
 type function_def = (symbol * sort) list * sort * term
 
+val sort_equal : sort -> sort -> bool
+
 val print_index : Format.formatter -> index -> unit
 val print_identifier : Format.formatter -> identifier -> unit
 val print_sort : Format.formatter -> sort -> unit

@@ -384,61 +384,46 @@ module FromModelToTerm = struct
     (* Bound variables in the body of a function definiton. *)
     mutable bound_vars : vsymbol Mstr.t;
     (* Constructors from [pinfo.constructors]. *)
-    mutable constructors : lsymbol Mstr.t;
-    (* Known types from lsymbols in [pinfo.queried_terms]. *)
-    mutable known_types : Ty.ty list;
-    (* Known types from lsymbols in [pinfo.queried_terms]. *)
+    constructors : lsymbol Mstr.t;
+    (* Inferred types from lsymbols in [pinfo.queried_terms]. *)
     mutable inferred_types : (sort * Ty.ty) list;
     (* Queried terms [pinfo.queried_terms]. *)
     queried_terms : lsymbol Mstr.t;
   }
 
   let get_opt_type oty = match oty with None -> Ty.ty_bool | Some ty -> ty
-  let is_type_matching_string ty n =
-    match n with
-    | S str | Sprover str -> (
-      match ty.Ty.ty_node with
-      | Ty.Tyvar tv -> String.equal str tv.Ty.tv_name.id_string
-      | Ty.Tyapp (ts,ts_args) ->
-          (* TODO_WIP also check ts_args *)
-          String.equal str ts.Ty.ts_name.id_string)
+
   let is_no_arg_constructor n constructors =
     match Mstr.find_opt n constructors with
     | Some ls -> ls.ls_args == []
     | None -> false
 
-  let rec smt_sort_to_ty env s =
-    Debug.dprintf debug "[smt_sort_to_ty] s = %a@." print_sort s;
+  let rec smt_sort_to_ty ?(update=false) env s =
+    Debug.dprintf debug "[smt_sort_to_ty] update = %b / s = %a@." update print_sort s;
+    let matching_sort f =
+      match List.find_all (fun (s',ty') -> f s') env.inferred_types with
+      | [] ->
+        if update then raise UnknownType
+        else error "TODO_WIP sort does not match any known type"
+      | [(_,ty)] -> ty
+      | l -> error "TODO_WIP sort matches multiple types"
+    in
     match s with
     | Sstring -> Ty.ty_str
     | Sint -> Ty.ty_int
     | Sreal -> Ty.ty_real
     | Sbool -> Ty.ty_bool
-    | Sbitvec n ->
-      begin try
-        let s,ty =
-          List.find
-            (function | (Sbitvec n',_) when n=n' -> true | _ -> false)
-            env.inferred_types
-        in
-        ty
-      with Not_found -> raise UnknownType
-      end
     | Sarray (s1, s2) ->
-        Ty.ty_app Ty.ts_func [ smt_sort_to_ty env s1; smt_sort_to_ty env s2 ]
-    | Ssimple (Isymbol n) ->
-      begin try
-        List.find (fun x -> is_type_matching_string x n) env.known_types
-      with Not_found -> error "TODO_WIP smt_sort_to_ty unknown Ssimple symbol"
+      begin match List.find_all (fun (s',ty') -> sort_equal s s') env.inferred_types with
+      | [] ->
+        if update then raise UnknownType
+        else Ty.ty_app Ty.ts_func [ smt_sort_to_ty env s1; smt_sort_to_ty env s2 ]
+      | [(_,ty)] -> ty
+      | l -> error "TODO_WIP array sort matches multiple types"
       end
-    | Smultiple (Isymbol n, sorts) ->
-      begin try
-        List.find (fun x -> is_type_matching_string x n) env.known_types
-      with Not_found -> error "TODO_WIP smt_sort_to_ty unknown Smultiple symbol"
-      end
+    | Sbitvec _ | Ssimple _ | Smultiple _ -> matching_sort (sort_equal s)
     | _ -> error "TODO_WIP smt_sort_to_ty"
 
-  (* TODO_WIP refactoring *)
   let qual_id_to_term env qid =
     Debug.dprintf debug "[qual_id_to_term] qid = %a@."
       print_qualified_identifier qid;
@@ -462,26 +447,31 @@ module FromModelToTerm = struct
         if is_no_arg_constructor n env.constructors then
           raise NoArgConstructor
         else
+          let vs_ty = smt_sort_to_ty env s in
           let vs =
             try
               let vs = Mstr.find n env.bound_vars in
-              if Ty.ty_equal vs.vs_ty (smt_sort_to_ty env s) then vs
+              if Ty.ty_equal vs.vs_ty vs_ty then vs
               else error "TODO_WIP type mismatch"
             with Not_found ->
-              create_vsymbol (Ident.id_fresh n) (smt_sort_to_ty env s)
+              create_vsymbol (Ident.id_fresh n) vs_ty
           in
           t_var vs
     | Qannotident (Isymbol (Sprover n), s) ->
         let vs_ty = smt_sort_to_ty env s in
+        let get_and_update_prover_vars n vs_ty env =
+          let vs = create_vsymbol (Ident.id_fresh n) vs_ty in
+          Debug.dprintf debug "[updating prover_vars] vs.vs_ty = %a / vs_ty = %a@."
+            Pretty.print_ty vs.vs_ty Pretty.print_ty vs_ty;
+          env.prover_vars <- Mstr.add n vs env.prover_vars;
+          vs
+        in
         let vs =
           try
             let vs = Mstr.find n env.prover_vars in
             if Ty.ty_equal vs.vs_ty vs_ty then vs
-            else error "TODO_WIP type mismatch for prover variable"
-          with Not_found -> (
-            let vs = create_vsymbol (Ident.id_fresh n) vs_ty in
-            env.prover_vars <- Mstr.add n vs env.prover_vars;
-            vs)
+            else get_and_update_prover_vars n vs_ty env
+          with Not_found -> get_and_update_prover_vars n vs_ty env
         in
         t_var vs
     | _ -> error "TODO_WIP_qual_id_to_vsymbol"
@@ -556,17 +546,14 @@ module FromModelToTerm = struct
     | Qident (Isymbol (S "not")), [ t ] -> t_bool_not (term_to_term env t)
     | Qident (Isymbol (S n)), ts | Qident (Isymbol (Sprover n)), ts ->
         let ts' = List.map (term_to_term env) ts in
-        let ts'_ty =
-          try List.map (fun t -> Opt.get t.t_ty) ts'
-          with _ ->
-            error "TODO_WIP apply_to_term error with types of arguments"
-        in
         let ls =
           try Mstr.find n env.constructors
           with Not_found -> error "TODO_WIP unknown lsymbol"
         in
-        t_app ls ts' ls.ls_value
-        (* TODO_WIP check that types are consistent *)
+        begin
+          try t_app ls ts' ls.ls_value
+          with _ -> error "TODO_WIP BadArity or TypeMismatch"
+        end
     | Qannotident (Isymbol (S n), s), ts | Qannotident (Isymbol (Sprover n), s), ts ->
         let ts' = List.map (term_to_term env) ts in
         let ts'_ty =
@@ -578,8 +565,10 @@ module FromModelToTerm = struct
           create_lsymbol (Ident.id_fresh n) ts'_ty
             (Some (smt_sort_to_ty env s))
         in
-        t_app ls ts' ls.ls_value
-        (* TODO_WIP check that types are consistent *)
+        begin
+          try t_app ls ts' ls.ls_value
+          with _ -> error "TODO_WIP BadArity or TypeMismatch"
+        end
     | _ -> error "TODO_WIP apply_to_term"
 
   and array_to_term env s1 s2 elts =
@@ -628,24 +617,21 @@ module FromModelToTerm = struct
       Pretty.print_attrs
       attrs;
     env.bound_vars <- Mstr.empty;
-    let check_sort_type s ty =
-      match smt_sort_to_ty env s with
-      | s_ty ->
-        Debug.dprintf debug "[check_sort_type] s = %a, ty = %a, s_ty = %a@."
+    let check_or_update_inferred_types s ty =
+      try Ty.ty_equal ty (smt_sort_to_ty ~update:true env s)
+      with UnknownType -> (
+        Debug.dprintf debug "[updating inferred_types] s = %a, ty = %a@."
           print_sort s
-          Pretty.print_ty ty
-          Pretty.print_ty s_ty;
-        Ty.ty_equal ty s_ty
-      | exception UnknownType ->
+          Pretty.print_ty ty;
         env.inferred_types <- (s,ty) :: env.inferred_types;
-        true
+        true)
     in
     let t =
       try
         if
-          check_sort_type res (get_opt_type ls.ls_value) &&
+          check_or_update_inferred_types res (get_opt_type ls.ls_value) &&
             List.fold_left2
-              (fun acc (_,arg) ls_arg -> check_sort_type arg ls_arg)
+              (fun acc (_,arg) ls_arg -> check_or_update_inferred_types arg ls_arg)
               true args ls.ls_args
         then  (
           List.iter
@@ -900,14 +886,6 @@ module FromModelToTerm = struct
           Pretty.print_ls ls
           (List.length ls.ls_args))
       constructors;
-    let env = {
-      prover_vars = Mstr.empty;
-      bound_vars = Mstr.empty;
-      constructors = constructors;
-      known_types = [];
-      inferred_types = [];
-      queried_terms = Mstr.map (fun (ls,_,_) -> ls) qterms;
-    } in
     (* Compute known types from lsymbols in [qterms] *)
     let types_from_qterms =
       List.flatten (
@@ -918,16 +896,13 @@ module FromModelToTerm = struct
             | Some ty -> ty :: ls.ls_args)
           (Mstr.values qterms))
     in
-    (* Initialize the environment with [types_from_qterms] while avoiding duplicates *)
-    env.known_types <-
-      List.fold_left
-        (fun acc ty ->
-          match List.find_opt (fun ty' -> Ty.ty_equal ty ty') acc with
-          | None -> ty::acc
-          | Some _ -> acc)
-        [] types_from_qterms;
-    Debug.dprintf debug "[known_types] ty = %a"
-      (Pp.print_list Pp.comma Pretty.print_ty) env.known_types;
+    let env = {
+      prover_vars = Mstr.empty;
+      bound_vars = Mstr.empty;
+      constructors = constructors;
+      inferred_types = [];
+      queried_terms = Mstr.map (fun (ls,_,_) -> ls) qterms;
+    } in
     let terms =
       Mstr.mapi_filter
         (fun n def ->

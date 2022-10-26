@@ -65,19 +65,57 @@ and array_elements = {
 
 type function_def = (symbol * sort) list * sort * term
 
+let rec sort_equal s s' = match s,s' with
+  | Sstring, Sstring
+  | Sreglan, Sreglan
+  | Sint, Sint
+  | Sreal, Sreal
+  | Sroundingmode, Sroundingmode
+  | Sbool, Sbool -> true
+  | Sbitvec n, Sbitvec n' -> n = n'
+  | Sfloatingpoint (n1,n2), Sfloatingpoint (n1',n2') -> n1 = n1' && n2 = n2'
+  | Sarray (s1,s2), Sarray (s1',s2') -> sort_equal s1 s1' && sort_equal s2 s2'
+  | Ssimple id, Ssimple id' -> id_equal id id'
+  | Smultiple (id,sorts), Smultiple (id',sorts') ->
+    begin try
+      id_equal id id' &&
+        List.fold_left2 (fun acc x x' -> acc && sort_equal x x') true sorts sorts'
+    with _ -> false
+    end
+  | _ -> false
+and id_equal id id' = match id,id' with
+  | Isymbol (S s), Isymbol (S s')
+  | Isymbol (Sprover s), Isymbol (Sprover s') -> String.equal s s'
+  | Iindexedsymbol (S s, idx), Iindexedsymbol (S s', idx')
+  | Iindexedsymbol (Sprover s, idx), Iindexedsymbol (Sprover s', idx') ->
+    begin try
+      String.equal s s' &&
+        List.fold_left2 (fun acc x x' -> acc && idx_equal x x') true idx idx'
+    with _ -> false
+    end
+  | _ -> false
+and idx_equal idx idx' = match idx,idx' with
+  | Idxnumeral i, Idxnumeral i' -> BigInt.eq i i'
+  | Idxsymbol (S s), Idxsymbol (S s')
+  | Idxsymbol (Sprover s), Idxsymbol (Sprover s') -> String.equal s s'
+  | _ -> false
+
 open Format
 
+let print_bigint fmt bigint =
+  fprintf fmt "%s" (BigInt.to_string bigint)
+
 let print_bv fmt (bigint, i) =
-  fprintf fmt "(Cbitvector (%d) %d)" i (BigInt.to_int bigint)
+  fprintf fmt "(Cbitvector (%d) %a)" i print_bigint bigint
 
 let print_constant fmt = function
-  | Cint bigint -> fprintf fmt "(Cint %d)" (BigInt.to_int bigint)
+  | Cint bigint -> fprintf fmt "(Cint %a)" print_bigint bigint
   | Cdecimal (bigint1, bigint2) ->
-      fprintf fmt "(Cdecimal %d , %d)" (BigInt.to_int bigint1)
-        (BigInt.to_int bigint2)
+      fprintf fmt "(Cdecimal %a , %a)" print_bigint bigint1
+        print_bigint bigint2
   | Cfraction (bigint1, bigint2) ->
-      fprintf fmt "(Cfraction %d / %d)" (BigInt.to_int bigint1)
-        (BigInt.to_int bigint2)
+      fprintf fmt "(Cfraction %a / %a)" print_bigint bigint1
+        print_bigint bigint2
   | Cbitvector (bigint, i) -> print_bv fmt (bigint, i)
   | Cfloat Fplusinfinity -> fprintf fmt "(Cfloat Fplusinfinity)"
   | Cfloat Fminusinfinity -> fprintf fmt "(Cfloat Fminusinfinity)"
@@ -94,7 +132,7 @@ let print_symbol fmt = function
   | S str | Sprover str -> fprintf fmt "%s" str
 
 let print_index fmt = function
-  | Idxnumeral bigint -> fprintf fmt "(Idx %d)" (BigInt.to_int bigint)
+  | Idxnumeral bigint -> fprintf fmt "(Idx %a)" print_bigint bigint
   | Idxsymbol s -> fprintf fmt "(Idx %a)" print_symbol s
 
 let rec print_sort fmt = function
