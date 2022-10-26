@@ -303,8 +303,20 @@ Proof.
 Defined.
 
 (* Why3 goal *)
+Definition max_real : Reals.Rdefinitions.R.
+Proof.
+
+Defined.
+
+(* Why3 goal *)
+Definition max_int : Numbers.BinNums.Z.
+Proof.
+
+Defined.
+
+(* Why3 goal *)
 Lemma max_int_spec :
-  (340282346638528859811704183484516925440%Z =
+  (max_int =
    ((bv.Pow2int.pow2 (bv.Pow2int.pow2 (8%Z - 1%Z)%Z)) -
     (bv.Pow2int.pow2 ((bv.Pow2int.pow2 (8%Z - 1%Z)%Z) - 24%Z)%Z))%Z).
 Proof.
@@ -312,9 +324,7 @@ now simpl.
 Qed.
 
 (* Why3 goal *)
-Lemma max_real_int :
-  (340282346638528859811704183484516925440%R =
-   (BuiltIn.IZR 340282346638528859811704183484516925440%Z)).
+Lemma max_real_int : (max_real = (BuiltIn.IZR max_int)).
 Proof.
 now apply IZR_eq.
 Qed.
@@ -329,13 +339,11 @@ Qed.
 
 (* Why3 assumption *)
 Definition in_range (x:Reals.Rdefinitions.R) : Prop :=
-  ((-340282346638528859811704183484516925440%R)%R <= x)%R /\
-  (x <= 340282346638528859811704183484516925440%R)%R.
+  ((-max_real)%R <= x)%R /\ (x <= max_real)%R.
 
 (* Why3 assumption *)
 Definition in_int_range (i:Numbers.BinNums.Z) : Prop :=
-  ((-340282346638528859811704183484516925440%Z)%Z <= i)%Z /\
-  (i <= 340282346638528859811704183484516925440%Z)%Z.
+  ((-max_int)%Z <= i)%Z /\ (i <= max_int)%Z.
 
 (* Why3 goal *)
 Lemma is_finite : forall (x:t), t'isFinite x -> in_range (t'real x).
@@ -654,22 +662,14 @@ Definition product_sign (z:t) (x:t) (y:t) : Prop :=
 Definition overflow_value (m:ieee_float.RoundingMode.mode) (x:t) : Prop :=
   match m with
   | ieee_float.RoundingMode.RTN =>
-      (is_positive x ->
-       t'isFinite x /\
-       ((t'real x) = 340282346638528859811704183484516925440%R)) /\
+      (is_positive x -> t'isFinite x /\ ((t'real x) = max_real)) /\
       (~ is_positive x -> is_infinite x)
   | ieee_float.RoundingMode.RTP =>
       (is_positive x -> is_infinite x) /\
-      (~ is_positive x ->
-       t'isFinite x /\
-       ((t'real x) = (-340282346638528859811704183484516925440%R)%R))
+      (~ is_positive x -> t'isFinite x /\ ((t'real x) = (-max_real)%R))
   | ieee_float.RoundingMode.RTZ =>
-      (is_positive x ->
-       t'isFinite x /\
-       ((t'real x) = 340282346638528859811704183484516925440%R)) /\
-      (~ is_positive x ->
-       t'isFinite x /\
-       ((t'real x) = (-340282346638528859811704183484516925440%R)%R))
+      (is_positive x -> t'isFinite x /\ ((t'real x) = max_real)) /\
+      (~ is_positive x -> t'isFinite x /\ ((t'real x) = (-max_real)%R))
   | ieee_float.RoundingMode.RNA|ieee_float.RoundingMode.RNE => is_infinite x
   end.
 
@@ -1462,6 +1462,20 @@ Lemma roundToIntegral_is_finite :
   t'isFinite (roundToIntegral m x).
 Proof.
   now apply roundToIntegral_is_finite.
+Qed.
+
+(* Why3 goal *)
+Lemma max_int_def : (max_int = 340282346638528859811704183484516925440%Z).
+Proof.
+
+
+Qed.
+
+(* Why3 goal *)
+Lemma max_real_def : (max_real = 340282346638528859811704183484516925440%R).
+Proof.
+
+
 Qed.
 
 (* Why3 goal *)
