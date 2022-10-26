@@ -656,13 +656,10 @@ module FromModelToTerm = struct
     Debug.dprintf debug "-----------------------------@.";
     t
 
-  (* [eval_var] is false if variables should not be evaluated *)
-  let rec eval_term env eval_var ty_coercions ty_fields t =
-    Debug.dprintf debug "[eval_term] eval_var = %b, t = %a@."
-      eval_var
-      Pretty.print_term t;
+  let rec eval_term env seen_prover_vars ty_coercions ty_fields t =
     match t.t_node with
-    | Tvar vs when eval_var && (List.mem vs (Mstr.values env.prover_vars)) -> (
+    | Tvar vs when not (List.mem vs seen_prover_vars) && (List.mem vs (Mstr.values env.prover_vars)) -> (
+        let seen_prover_vars = vs :: seen_prover_vars in
         match t.t_ty with
         | Some ty -> (
           (* first search if there exists some type coercions for [ty] *)
@@ -677,8 +674,7 @@ module FromModelToTerm = struct
                     let vs' = match vs_list' with
                       | [vs'] -> vs'
                       | _ -> error "TODO_WIP field with not exactly one argument" in
-                    (* TODO_WIP if t' is again a prover variable, we should recurse on that *)
-                    eval_term env false ty_fields ty_fields (t_subst_single vs' (t_var vs) t') in
+                    eval_term env seen_prover_vars ty_fields ty_fields (t_subst_single vs' (t_var vs) t') in
                   let ty_of_field (_, (ls',t')) =
                     let vs_list', _, t' = t_open_lambda t' in
                     match vs_list' with
@@ -700,8 +696,7 @@ module FromModelToTerm = struct
                 | _ ->
                     error "TODO_WIP type coercion with not exactly one argument"
               in
-              (* TODO_WIP if t' is again a prover variable, we should recurse on that *)
-              let t' = eval_term env false ty_coercions ty_fields (t_subst_single vs' (t_var vs) t') in
+              let t' = eval_term env seen_prover_vars ty_coercions ty_fields (t_subst_single vs' (t_var vs) t') in
               (* substitute [vs] by this new variable in the body [t'] of the function
                   defining the type coercion *)
               let t' = t_subst_single vs' (t_var x) t' in
@@ -715,8 +710,8 @@ module FromModelToTerm = struct
     | Tapp (ls, [t1;t2]) when (ls.ls_name.id_string.[0] == '=') -> (* TODO_WIP fix builtin lsymbol for equality *)
       if
         t_equal
-          (eval_term env eval_var ty_coercions ty_fields t1)
-          (eval_term env eval_var ty_coercions ty_fields t2)
+          (eval_term env seen_prover_vars ty_coercions ty_fields t1)
+          (eval_term env seen_prover_vars ty_coercions ty_fields t2)
       then
         t_true_bool
       else (
@@ -727,35 +722,35 @@ module FromModelToTerm = struct
           (* Distinct prover variables are not equal *)
           if vs_equal v1 v2 then t_true_bool else t_false_bool
         | _ ->
-          let ts = List.map (eval_term env eval_var ty_coercions ty_fields) [t1;t2] in
+          let ts = List.map (eval_term env seen_prover_vars ty_coercions ty_fields) [t1;t2] in
           t_app ls ts ls.ls_value)
     | Tapp (ls, ts) ->
-      let ts = List.map (eval_term env eval_var ty_coercions ty_fields) ts in
+      let ts = List.map (eval_term env seen_prover_vars ty_coercions ty_fields) ts in
       t_app ls ts ls.ls_value
     | Tif (b,t1,t2) -> (
-      match (eval_term env eval_var ty_coercions ty_fields b).t_node with
-      | Ttrue -> eval_term env eval_var ty_coercions ty_fields t1
-      | Tfalse -> eval_term env eval_var ty_coercions ty_fields t2
+      match (eval_term env seen_prover_vars ty_coercions ty_fields b).t_node with
+      | Ttrue -> eval_term env seen_prover_vars ty_coercions ty_fields t1
+      | Tfalse -> eval_term env seen_prover_vars ty_coercions ty_fields t2
       | _ ->
-        let t1 = eval_term env eval_var ty_coercions ty_fields t1 in
-        let t2 = eval_term env eval_var ty_coercions ty_fields t2 in
+        let t1 = eval_term env seen_prover_vars ty_coercions ty_fields t1 in
+        let t2 = eval_term env seen_prover_vars ty_coercions ty_fields t2 in
         t_if b t1 t2
     )
     | Tlet _ -> t
     | Tcase _ -> t
     | Teps _ ->
       let vsl,trig,t' = Term.t_open_lambda t in
-      t_lambda vsl trig (eval_term env eval_var ty_coercions ty_fields t')
+      t_lambda vsl trig (eval_term env seen_prover_vars ty_coercions ty_fields t')
     | Tquant (q,tq) ->
       let vsl,trig,t' = t_open_quant tq in
-      let t' = eval_term env eval_var ty_coercions ty_fields t' in
+      let t' = eval_term env seen_prover_vars ty_coercions ty_fields t' in
       t_quant q (t_close_quant vsl trig t')
     | Tbinop (op,t1,t2) ->
-      let t1 = eval_term env eval_var ty_coercions ty_fields t1 in
-      let t2 = eval_term env eval_var ty_coercions ty_fields t2 in
+      let t1 = eval_term env seen_prover_vars ty_coercions ty_fields t1 in
+      let t2 = eval_term env seen_prover_vars ty_coercions ty_fields t2 in
       t_binary_bool op t1 t2
     | Tnot t' -> (
-      let t' = eval_term env eval_var ty_coercions ty_fields t' in
+      let t' = eval_term env seen_prover_vars ty_coercions ty_fields t' in
       match t'.t_node with (* TODO_WIP is it really the place to do such simplifications? *)
       | Ttrue -> t_bool_false
       | Tfalse -> t_bool_true
@@ -824,7 +819,10 @@ module FromModelToTerm = struct
       ty_fields;
     Mstr.mapi (* for each element in [terms], we try to evaluate [t]:
        - by applying type coercions for variables, when possible *)
-      (fun str ((ls,oloc,attrs),t) -> ((ls,oloc,attrs), eval_term env true ty_coercions ty_fields t))
+      (fun str ((ls,oloc,attrs),t) ->
+        let t' = eval_term env [] ty_coercions ty_fields t in
+        Debug.dprintf debug "[eval_term] t = %a / t' = %a@." Pretty.print_term t Pretty.print_term t';
+        ((ls,oloc,attrs), t'))
       terms
 
 
