@@ -660,6 +660,25 @@ module FromModelToTerm = struct
     match t.t_node with
     | Tvar vs when not (List.mem vs seen_prover_vars) && (List.mem vs (Mstr.values env.prover_vars)) -> (
         let seen_prover_vars = vs :: seen_prover_vars in
+        let create_epsilon_term ty l =
+          (* create a fresh vsymbol for the variable bound by the epsilon term *)
+          let x = create_vsymbol (Ident.id_fresh "x") ty in
+          let aux (_, (ls',t')) =
+            let vs_list', _, t' = t_open_lambda t' in
+            let vs' = match vs_list' with
+              | [vs'] -> vs'
+              | _ -> error "TODO_WIP field with not exactly one argument" in
+            let t' =  eval_term env seen_prover_vars ty_fields ty_fields (t_subst_single vs' (t_var vs) t') in
+            (* substitute [vs] by this new variable in the body [t'] of the function
+                defining the type coercion *)
+            let t' = t_subst_single vs' (t_var x) t' in
+            (* construct the formula to be used in the epsilon term *)
+            t_equ (t_app ls' [t_var x] ls'.ls_value) t'
+          in
+          let f = t_and_l (List.map aux l) in
+          (* replace [t] by [eps x. f] *)
+          t_eps_close x f
+        in
         match t.t_ty with
         | Some ty -> (
           (* first search if there exists some type coercions for [ty] *)
@@ -668,44 +687,8 @@ module FromModelToTerm = struct
               (* if no coercions, search if [ty] is associated to some fields *)
               match Ty.Mty.find_def [] ty ty_fields with
               | [] -> t
-              | fields ->
-                  let term_of_field (_, (ls',t')) =
-                    let vs_list', _, t' = t_open_lambda t' in
-                    let vs' = match vs_list' with
-                      | [vs'] -> vs'
-                      | _ -> error "TODO_WIP field with not exactly one argument" in
-                    eval_term env seen_prover_vars ty_fields ty_fields (t_subst_single vs' (t_var vs) t') in
-                  let ty_of_field (_, (ls',t')) =
-                    let vs_list', _, t' = t_open_lambda t' in
-                    match vs_list' with
-                    | [vs'] -> Opt.get t'.t_ty
-                    | _ -> error "TODO_WIP field with not exactly one argument" in
-                  let ls_array = (* TODO_WIP temporary lsymbol when no constructor *)
-                    create_lsymbol
-                      (Ident.id_fresh "arraymk")
-                      (List.map ty_of_field fields)
-                      (Some ty) in
-                  t_app ls_array (List.map term_of_field fields) (Some ty))
-          | coercions ->
-            (* create a fresh vsymbol for the variable bound by the epsilon term *)
-            let x = create_vsymbol (Ident.id_fresh "x") ty in
-            let term_of_coercion (str',(ls',t')) =
-              let vs_list', _, t' = t_open_lambda t' in
-              let vs' = match vs_list' with
-                | [vs'] -> vs'
-                | _ ->
-                    error "TODO_WIP type coercion with not exactly one argument"
-              in
-              let t' = eval_term env seen_prover_vars ty_coercions ty_fields (t_subst_single vs' (t_var vs) t') in
-              (* substitute [vs] by this new variable in the body [t'] of the function
-                  defining the type coercion *)
-              let t' = t_subst_single vs' (t_var x) t' in
-              (* construct the formula to be used in the epsilon term *)
-              t_equ (t_app ls' [t_var x] ls'.ls_value) t'
-            in
-            let f = t_and_l (List.map term_of_coercion coercions) in
-            (* replace [t] by [eps x. f] *)
-            t_eps_close x f)
+              | fields -> create_epsilon_term ty fields)
+          | coercions -> create_epsilon_term ty coercions)
         | _ -> t)
     | Tapp (ls, [t1;t2]) when (ls.ls_name.id_string.[0] == '=') -> (* TODO_WIP fix builtin lsymbol for equality *)
       if
@@ -719,7 +702,7 @@ module FromModelToTerm = struct
         | Tvar v1, Tvar v2
             when List.mem v1 (Mstr.values env.prover_vars) &&
                  List.mem v2 (Mstr.values env.prover_vars) ->
-          (* Distinct prover variables are not equal *)
+          (* distinct prover variables are not equal *)
           if vs_equal v1 v2 then t_true_bool else t_false_bool
         | _ ->
           let ts = List.map (eval_term env seen_prover_vars ty_coercions ty_fields) [t1;t2] in
@@ -739,7 +722,7 @@ module FromModelToTerm = struct
     | Tlet _ -> t
     | Tcase _ -> t
     | Teps _ ->
-      let vsl,trig,t' = Term.t_open_lambda t in
+      let vsl,trig,t' = Term.t_open_lambda t in (* TODO_WIP t_open_bound instead? *)
       t_lambda vsl trig (eval_term env seen_prover_vars ty_coercions ty_fields t')
     | Tquant (q,tq) ->
       let vsl,trig,t' = t_open_quant tq in

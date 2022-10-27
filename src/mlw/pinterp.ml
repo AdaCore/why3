@@ -779,9 +779,9 @@ let set_constr v1 v2 =
   | Vconstr (Some rs1, _, fs1), Vconstr (Some rs2, _, fs2) ->
       assert (rs_equal rs1 rs2);
       set_fields fs1 fs2;
-  | Vconstr (None, _, fs1), Vconstr (None, _, fs2) ->
+  | Vconstr (_, _, fs1), Vconstr (_, _, fs2) ->
       set_fields fs1 fs2;
-   | _ -> failwith "set_constr"
+  | _ -> failwith "set_constr"
 
 let assign_written_vars ?(vars_map=Mpv.empty) wrt loc ctx vs =
   let pv = restore_pv vs in

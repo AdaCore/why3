@@ -213,6 +213,8 @@ let get_or_stuck loc env ity desc = function
       let cntr_ctx = mk_cntr_ctx env ~desc ~giant_steps:None Vc.expl_pre in
       stuck ?loc cntr_ctx "%s" desc
 
+exception Unexpected_Pattern
+
 (** Import a value from the prover model to an interpreter value.
 
     @raise Exit when the type [ity] and the shape of the the value [v] do not
@@ -234,24 +236,6 @@ let rec import_model_value loc env check known th_known ity t =
       | Tvar _ -> undefined_value env ity
       | Ttrue -> bool_value true
       | Tfalse -> bool_value false
-      | Tapp (ls, args) when Strings.has_prefix "arraymk" ls.ls_name.id_string ->
-          (* TODO_WIP to be improved *)
-          begin try
-            let ts, l1, l2 = ity_components ity in
-            let subst = its_match_regs ts l1 l2 in
-            let def = Pdecl.find_its_defn known ts in
-            let itys =
-              List.map
-                (fun arg -> ity_full_inst subst (ity_of_ty (Opt.get arg.t_ty)))
-                args in
-            let args =
-              List.map2 (import_model_value loc env check known th_known) itys args
-            in
-            Debug.dprintf debug_check_ce_rac_results "[import_model_value] itd_fields = %a@."
-              (Pp.print_list Pp.space print_rs) def.Pdecl.itd_fields;
-            constr_value ity None (List.rev def.Pdecl.itd_fields) args (* TODO_WIP List.rev ??? *)
-          with Invalid_argument _ -> term_value ity t
-          end
       | Tapp (ls, args) -> (
           let ts, l1, l2 = ity_components ity in
           let subst = its_match_regs ts l1 l2 in
@@ -266,7 +250,56 @@ let rec import_model_value loc env check known th_known ity t =
             in
             constr_value ity (Some rs) def.Pdecl.itd_fields args)
           | exception Not_found -> term_value ity t)
-      | _ -> term_value ity t
+      | Teps tb -> (
+          (* check if t is of the form epsilon x:t. x.f1 = v1 /\ ... /\ x.fn = vn
+          with f1,...,fn the fields associated to type ity *)
+          let ts, l1, l2 = ity_components ity in
+          let subst = its_match_regs ts l1 l2 in
+          let def = Pdecl.find_its_defn known ts in
+          let x_eps, t' = t_open_bound tb in
+          let rec get_conjuncts t' = match t'.t_node with
+            | Tbinop (Tand, t1, t2) -> t1 :: (get_conjuncts t2)
+            | _ -> [t']
+          in
+          try
+            let list_of_fields_values =
+              List.fold_left
+                (fun acc c ->
+                  match c.t_node with
+                  | Tapp (ls, [proj;term_value]) when ls_equal ls ps_equ -> (
+                    match proj.t_node with
+                    | Tapp (ls, [x]) when t_equal x (t_var x_eps) ->
+                      (ls,term_value) :: acc
+                    | _ -> raise Unexpected_Pattern
+                  )
+                  | _ -> raise Unexpected_Pattern
+                )
+                []
+                (get_conjuncts t')
+            in
+            let field_values =
+              List.map
+                (fun field_rs ->
+                  let field_ity = ity_full_inst subst (fd_of_rs field_rs).pv_ity in
+                  let matching_field_name rs (ls,_) =
+                    String.equal ls.ls_name.id_string rs.rs_name.id_string in
+                  match List.find_all (matching_field_name field_rs) list_of_fields_values with
+                  | [(ls,term_value)] ->
+                    import_model_value loc env check known th_known field_ity term_value
+                  | [] ->
+                    (* if the epsilon term does not define a value for field_rs,
+                      use undefined value *)
+                    undefined_value env field_ity
+                  | _ -> raise Unexpected_Pattern
+                  )
+                def.Pdecl.itd_fields
+            in
+            constr_value ity None def.Pdecl.itd_fields field_values
+          with
+            (* do not try to build a constructor value if the pattern of the epsilon
+               term is not the expected one *)
+          |  Unexpected_Pattern -> term_value ity t)
+        | _ -> term_value ity t
     else
       (* [ity] and the type of [t] may not match for the following reason:
         - [t] is actually the content of a reference (i.e. a record with a single field) *)
