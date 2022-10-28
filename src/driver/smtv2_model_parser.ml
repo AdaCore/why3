@@ -284,7 +284,7 @@ module FromSexpToModel = struct
 
   let qualified_identifier sexp : qual_identifier =
     match sexp with
-    | Atom n -> (
+    | Atom _ -> (
       let id = identifier sexp in
       match id with
       | Isymbol (Sprover n') | Iindexedsymbol (Sprover n', _) ->
@@ -392,11 +392,11 @@ module FromModelToTerm = struct
     mutable prover_vars : vsymbol Mstr.t;
     (* Bound variables in the body of a function definiton. *)
     mutable bound_vars : vsymbol Mstr.t;
-    (* Constructors from [pinfo.constructors]. *)
+    (* Constructors from [pinfo.Printer.constructors]. *)
     constructors : lsymbol Mstr.t;
-    (* Inferred types from lsymbols in [pinfo.queried_terms]. *)
+    (* Inferred types from lsymbols in [pinfo.Printer.queried_terms]. *)
     mutable inferred_types : (sort * Ty.ty) list;
-    (* Queried terms [pinfo.queried_terms]. *)
+    (* Queried terms [pinfo.Printer.queried_terms]. *)
     queried_terms : lsymbol Mstr.t;
   }
 
@@ -410,12 +410,12 @@ module FromModelToTerm = struct
   let rec smt_sort_to_ty ?(update=false) env s =
     Debug.dprintf debug "[smt_sort_to_ty] update = %b / s = %a@." update print_sort s;
     let matching_sort f =
-      match List.find_all (fun (s',ty') -> f s') env.inferred_types with
+      match List.find_all (fun (s',_) -> f s') env.inferred_types with
       | [] ->
         if update then raise UnknownType
         else error "TODO_WIP sort does not match any known type"
       | [(_,ty)] -> ty
-      | l -> error "TODO_WIP sort matches multiple types"
+      | _ -> error "TODO_WIP sort matches multiple types"
     in
     match s with
     | Sstring -> Ty.ty_str
@@ -423,12 +423,12 @@ module FromModelToTerm = struct
     | Sreal -> Ty.ty_real
     | Sbool -> Ty.ty_bool
     | Sarray (s1, s2) ->
-      begin match List.find_all (fun (s',ty') -> sort_equal s s') env.inferred_types with
+      begin match List.find_all (fun (s',_) -> sort_equal s s') env.inferred_types with
       | [] ->
         if update then raise UnknownType
         else Ty.ty_app Ty.ts_func [ smt_sort_to_ty env s1; smt_sort_to_ty env s2 ]
       | [(_,ty)] -> ty
-      | l -> error "TODO_WIP array sort matches multiple types"
+      | _ -> error "TODO_WIP array sort matches multiple types"
       end
     | Sbitvec _ | Ssimple _ | Smultiple _ -> matching_sort (sort_equal s)
     | _ -> error "TODO_WIP smt_sort_to_ty"
@@ -489,7 +489,7 @@ module FromModelToTerm = struct
     Debug.dprintf debug "[constant_to_term] c = %a@." print_constant c;
     match c with
     | Cint bigint -> t_const (Constant.int_const bigint) Ty.ty_int
-    | Cdecimal (d1,d2) -> error "TODO_WIP Cdecimal"
+    | Cdecimal _ -> error "TODO_WIP Cdecimal"
     | Cfraction _ -> error "TODO_WIP Cfraction"
     | Cbitvector (bigint, n) ->
       begin try
@@ -518,9 +518,9 @@ module FromModelToTerm = struct
     | Tite (b, t1, t2) ->
         t_if (term_to_term env b) (term_to_term env t1) (term_to_term env t2)
     | Tapply (qid, ts) -> apply_to_term env qid ts
-    | Tlet (vs, t) -> error "TODO_WIP Tlet"
+    | Tlet _ -> error "TODO_WIP Tlet"
     | Tarray (s1, s2, a) -> array_to_term env s1 s2 a
-    | Tunparsed s -> error "TODO_WIP Tunparsed"
+    | Tunparsed _ -> error "TODO_WIP Tunparsed"
 
   (* TODO_WIP refactoring *)
   and apply_to_term env qid ts =
@@ -581,6 +581,7 @@ module FromModelToTerm = struct
     | _ -> error "TODO_WIP apply_to_term"
 
   and array_to_term env s1 s2 elts =
+    (* TODO_WIP check type consistency *)
     Debug.dprintf debug "[array_to_term] a = %a@." print_array elts;
     let vs_arg =
       create_vsymbol (Ident.id_fresh "x") (smt_sort_to_ty env s1)
@@ -609,7 +610,7 @@ module FromModelToTerm = struct
     if Ty.ty_equal s' (get_opt_type t'.t_ty) then t'
     else error "TODO_WIP type error"
 
-  let interpret_fun_def_to_term env ls oloc attrs (args,res,body) =
+  let interpret_fun_def_to_term env ls (args,res,body) =
     Debug.dprintf debug "-----------------------------@.";
     Debug.dprintf debug "[interpret_fun_def_to_term] fun_def = %a@."
       print_function_def (args,res,body);
@@ -622,9 +623,6 @@ module FromModelToTerm = struct
       (Debug.dprintf debug "[interpret_fun_def_to_term] ls.ls_args = %a@."
          Pretty.print_ty)
       ls.ls_args;
-    Debug.dprintf debug "[interpret_fun_def_to_term] attrs = %a@."
-      Pretty.print_attrs
-      attrs;
     env.bound_vars <- Mstr.empty;
     let check_or_update_inferred_types s ty =
       try Ty.ty_equal ty (smt_sort_to_ty ~update:true env s)
@@ -640,7 +638,8 @@ module FromModelToTerm = struct
         if
           check_or_update_inferred_types res (get_opt_type ls.ls_value) &&
             List.fold_left2
-              (fun acc (_,arg) ls_arg -> check_or_update_inferred_types arg ls_arg)
+              (fun acc (_,arg) ls_arg ->
+                acc && check_or_update_inferred_types arg ls_arg)
               true args ls.ls_args
         then  (
           List.iter
@@ -667,7 +666,7 @@ module FromModelToTerm = struct
 
   let rec eval_term env seen_prover_vars ty_coercions ty_fields t =
     match t.t_node with
-    | Tvar vs when not (List.mem vs seen_prover_vars) && (List.mem vs (Mstr.values env.prover_vars)) -> (
+    | Term.Tvar vs when not (List.mem vs seen_prover_vars) && (List.mem vs (Mstr.values env.prover_vars)) -> (
         let seen_prover_vars = vs :: seen_prover_vars in
         let create_epsilon_term ty l =
           (* create a fresh vsymbol for the variable bound by the epsilon term *)
@@ -699,7 +698,7 @@ module FromModelToTerm = struct
               | fields -> create_epsilon_term ty fields)
           | coercions -> create_epsilon_term ty coercions)
         | _ -> t)
-    | Tapp (ls, [t1;t2]) when (ls.ls_name.id_string.[0] == '=') -> (* TODO_WIP fix builtin lsymbol for equality *)
+    | Term.Tapp (ls, [t1;t2]) when (ls.ls_name.Ident.id_string.[0] == '=') -> (* TODO_WIP fix builtin lsymbol for equality *)
       if
         t_equal
           (eval_term env seen_prover_vars ty_coercions ty_fields t1)
@@ -708,7 +707,7 @@ module FromModelToTerm = struct
         t_true_bool
       else (
         match t1.t_node,t2.t_node with
-        | Tvar v1, Tvar v2
+        | Term.Tvar v1, Term.Tvar v2
             when List.mem v1 (Mstr.values env.prover_vars) &&
                  List.mem v2 (Mstr.values env.prover_vars) ->
           (* distinct prover variables are not equal *)
@@ -716,36 +715,36 @@ module FromModelToTerm = struct
         | _ ->
           let ts = List.map (eval_term env seen_prover_vars ty_coercions ty_fields) [t1;t2] in
           t_app ls ts ls.ls_value)
-    | Tapp (ls, ts) ->
+    | Term.Tapp (ls, ts) ->
       let ts = List.map (eval_term env seen_prover_vars ty_coercions ty_fields) ts in
       t_app ls ts ls.ls_value
-    | Tif (b,t1,t2) -> (
+    | Term.Tif (b,t1,t2) -> (
       match (eval_term env seen_prover_vars ty_coercions ty_fields b).t_node with
-      | Ttrue -> eval_term env seen_prover_vars ty_coercions ty_fields t1
-      | Tfalse -> eval_term env seen_prover_vars ty_coercions ty_fields t2
+      | Term.Ttrue -> eval_term env seen_prover_vars ty_coercions ty_fields t1
+      | Term.Tfalse -> eval_term env seen_prover_vars ty_coercions ty_fields t2
       | _ ->
         let t1 = eval_term env seen_prover_vars ty_coercions ty_fields t1 in
         let t2 = eval_term env seen_prover_vars ty_coercions ty_fields t2 in
         t_if b t1 t2
     )
-    | Tlet _ -> t
-    | Tcase _ -> t
-    | Teps _ ->
+    | Term.Tlet _ -> t
+    | Term.Tcase _ -> t
+    | Term.Teps _ ->
       let vsl,trig,t' = Term.t_open_lambda t in (* TODO_WIP t_open_bound instead? *)
       t_lambda vsl trig (eval_term env seen_prover_vars ty_coercions ty_fields t')
-    | Tquant (q,tq) ->
+    | Term.Tquant (q,tq) ->
       let vsl,trig,t' = t_open_quant tq in
       let t' = eval_term env seen_prover_vars ty_coercions ty_fields t' in
       t_quant q (t_close_quant vsl trig t')
-    | Tbinop (op,t1,t2) ->
+    | Term.Tbinop (op,t1,t2) ->
       let t1 = eval_term env seen_prover_vars ty_coercions ty_fields t1 in
       let t2 = eval_term env seen_prover_vars ty_coercions ty_fields t2 in
       t_binary_bool op t1 t2
-    | Tnot t' -> (
+    | Term.Tnot t' -> (
       let t' = eval_term env seen_prover_vars ty_coercions ty_fields t' in
       match t'.t_node with (* TODO_WIP is it really the place to do such simplifications? *)
-      | Ttrue -> t_bool_false
-      | Tfalse -> t_bool_true
+      | Term.Ttrue -> t_bool_false
+      | Term.Tfalse -> t_bool_true
       | _ -> t_bool_not t')
     | _ -> t
 
@@ -764,12 +763,12 @@ module FromModelToTerm = struct
           List.concat (List.map
             (fun ls -> Mstr.bindings (
               Mstr.mapi_filter
-                (fun str ((ls',_,_), t) ->
+                (fun _ ((ls',_,_), t) ->
                   if ls_equal ls ls' then Some (ls,t) else None)
                 terms))
             (Sls.elements sls))
         )
-      pinfo.type_coercions in
+      pinfo.Printer.type_coercions in
     Ty.Mty.iter
       (fun key elt ->
         List.iter
@@ -792,12 +791,12 @@ module FromModelToTerm = struct
           List.concat (List.map
             (fun ls -> Mstr.bindings (
               Mstr.mapi_filter
-                (fun str ((ls',_,_), t) ->
+                (fun _ ((ls',_,_), t) ->
                   if ls_equal ls ls' then Some (ls,t) else None)
                 terms))
             lls)
         )
-      pinfo.type_fields in
+      pinfo.Printer.type_fields in
     Ty.Mty.iter
       (fun key elt ->
         List.iter
@@ -811,7 +810,7 @@ module FromModelToTerm = struct
       ty_fields;
     Mstr.mapi (* for each element in [terms], we try to evaluate [t]:
        - by applying type coercions for variables, when possible *)
-      (fun str ((ls,oloc,attrs),t) ->
+      (fun _ ((ls,oloc,attrs),t) ->
         let t' = eval_term env [] ty_coercions ty_fields t in
         Debug.dprintf debug "[eval_term] t = %a / t' = %a@." Pretty.print_term t Pretty.print_term t';
         ((ls,oloc,attrs), t'))
@@ -820,7 +819,7 @@ module FromModelToTerm = struct
 
   let get_terms (pinfo : Printer.printing_info)
       (fun_defs : Smtv2_model_defs.function_def Mstr.t) =
-    let qterms = pinfo.queried_terms in
+    let qterms = pinfo.Printer.queried_terms in
     Mstr.iter
       (fun key (ls, _, attrs) ->
         Debug.dprintf debug "[queried_terms] key = %s, ls = %a, ls.ls_value = %a@." key
@@ -829,7 +828,7 @@ module FromModelToTerm = struct
         Debug.dprintf debug "[queried_terms] key = %s, attr = %a@." key
           Pretty.print_attrs attrs)
       qterms;
-    let records = pinfo.list_records in
+    let records = pinfo.Printer.list_records in
     Mstr.iter
       (fun key l ->
         List.iter
@@ -847,7 +846,7 @@ module FromModelToTerm = struct
           match finfo.Printer.field_ident with
           | Some id -> id.Ident.id_string
           | None -> finfo.Printer.field_name in
-      Mstr.mapi (fun _ -> List.map select) pinfo.list_records in
+      Mstr.mapi (fun _ -> List.map select) pinfo.Printer.list_records in
     Mstr.iter
       (fun key l ->
         List.iter
@@ -856,19 +855,19 @@ module FromModelToTerm = struct
               key elem)
           l)
       records;
-    let fields = pinfo.list_fields in
+    let fields = pinfo.Printer.list_fields in
     Mstr.iter
       (fun key f ->
         Debug.dprintf debug "[list_fields] key = %s, field = %s@."
           key f.Ident.id_string)
       fields;
-    let projections = pinfo.list_projections in
+    let projections = pinfo.Printer.list_projections in
     Mstr.iter
       (fun key f ->
         Debug.dprintf debug "[list_projections] key = %s, field = %s@."
           key f.Ident.id_string)
       projections;
-    let constructors = pinfo.constructors in
+    let constructors = pinfo.Printer.constructors in
     Mstr.iter
       (fun key ls ->
         Debug.dprintf debug "[constructors] key = %s, ls = %a/%d@."
@@ -876,16 +875,6 @@ module FromModelToTerm = struct
           Pretty.print_ls ls
           (List.length ls.ls_args))
       constructors;
-    (* Compute known types from lsymbols in [qterms] *)
-    let types_from_qterms =
-      List.flatten (
-        List.map
-          (fun (ls,_,_) ->
-            match ls.ls_value with
-            | None -> ls.ls_args
-            | Some ty -> ty :: ls.ls_args)
-          (Mstr.values qterms))
-    in
     let env = {
       prover_vars = Mstr.empty;
       bound_vars = Mstr.empty;
@@ -898,7 +887,7 @@ module FromModelToTerm = struct
         (fun n def ->
           match Mstr.find n qterms with
           | (ls, oloc, attrs) ->
-            Some ((ls,oloc,attrs), interpret_fun_def_to_term env ls oloc attrs def)
+            Some ((ls,oloc,attrs), interpret_fun_def_to_term env ls def)
           | exception Not_found -> (
             Debug.dprintf debug "No term for %s@." n; None))
         fun_defs
@@ -906,14 +895,10 @@ module FromModelToTerm = struct
     Mstr.iter
       (fun n ((ls,_,_), t) ->
         Debug.dprintf debug
-          "[get_terms] n = %s, ls = %a, t = %a@.t.t_ty = %a@.t.t_attrs = %a@.t.t_loc = \
-           %a@."
+          "[get_terms] n = %s, ls = %a, t = %a@.t.t_ty = %a@."
           n
           Pretty.print_ls ls Pretty.print_term t
-          (Pp.print_option Pretty.print_ty)
-          t.t_ty Pretty.print_attrs t.t_attrs
-          (Pp.print_option Pretty.print_loc_as_attribute)
-          t.t_loc)
+          (Pp.print_option Pretty.print_ty) t.t_ty )
       terms;
     eval pinfo env terms
 end
@@ -961,8 +946,8 @@ let parse pinfo input =
       List.rev
         (Mstr.values
           (Mstr.mapi
-            (fun n ((ls,oloc,attrs),t) ->
-              let name = Ident.get_model_trace_string ~name:(ls.ls_name.id_string) ~attrs in
+            (fun _ ((ls,oloc,attrs),t) ->
+              let name = Ident.get_model_trace_string ~name:(ls.ls_name.Ident.id_string) ~attrs in
               Model_parser.create_model_element
                 ~name ~value:t ~oloc ~lsymbol:ls ~attrs)
             terms))
