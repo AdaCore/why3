@@ -458,6 +458,20 @@ let prove_task_prepared
   Buffer.reset buf;
   res
 
+let prove_buffer_prepared
+    ~command ~config ~limit
+    ?(input_file="f")
+    ?(theory_name="T")
+    ?(goal_name="vc")
+    drv buffer =
+  let filename = get_filename drv ~input_file ~theory_name ~goal_name in
+  call_on_buffer
+    ~command ~config ~limit
+    ~gen_new_file:true ~filename
+    ~get_counterexmp:false
+    ~printing_info:default_printing_info
+    drv buffer
+
 let prove_task
       ~command ~config ~limit ?old ?inplace ?interactive drv task =
   let task = prepare_task drv task in
