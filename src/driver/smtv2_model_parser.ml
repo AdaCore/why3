@@ -55,7 +55,13 @@ module FromSexpToModel = struct
     | _ -> false)
 
   let is_prover_symbol str =
-    String.length str > 0 && (str.[0] == '@' || str.[0] == '.')
+    (* as defined in SMT-LIB Standard *)
+    ( String.length str > 0 && (str.[0] == '@' || str.[0] == '.') )
+    ||
+    (* special cases with Z3 prover *)
+    ( match String.split_on_char '!' str with
+      | [_;"val";_] -> true
+      | _ -> false )
 
   let is_quoted s =
     String.length s > 2 && s.[0] = '|' && s.[String.length s - 1] = '|'
@@ -253,14 +259,13 @@ module FromSexpToModel = struct
     | List (Atom n :: l) -> Smultiple (identifier (Atom n), List.map sort l)
     | sexp -> error sexp "sort"
 
-  let get_type_from_var_name name =
+  let get_type_from_prover_variable name =
     (* we try to infer the type from [name], for example:
         - infer the type int32 from the name @uc_int32_1
-        - infer the type ref int32 from the name |@uc_(ref int32)_0|ref!val!1
+        - infer the type ref int32 from the name @uc_(ref int32)_0
         - infer the type ref from the name ref!val!0 *)
-    let name = if is_quoted name then get_quoted name else name in
     let opt_name =
-      if Strings.has_prefix "@" name then
+      if Strings.has_prefix "@" name || Strings.has_prefix "." name then
         try
           let left = String.index name '_' + 1 in
           let right = String.rindex name '_' in
@@ -273,16 +278,20 @@ module FromSexpToModel = struct
         end
     in
     match FromStringToSexp.parse_string (Opt.get_def  "" opt_name) with
-    | [] -> None
-    | [sexp] -> Some sexp
-    | sexps -> Some (List sexps)
+    | [] -> atom_error name "get_type_from_prover_variable"
+    | [sexp] -> sexp
+    | sexps -> List sexps
 
   let qualified_identifier sexp : qual_identifier =
     match sexp with
     | Atom n -> (
-        match get_type_from_var_name n with
-        | None -> Qident (identifier sexp)
-        | Some ty_sexp -> Qannotident (identifier sexp, sort ty_sexp))
+      let id = identifier sexp in
+      match id with
+      | Isymbol (Sprover n') | Iindexedsymbol (Sprover n', _) ->
+        let ty_sexp = get_type_from_prover_variable n' in
+        Qannotident (id, sort ty_sexp)
+      | Isymbol _ | Iindexedsymbol _ -> Qident (id)
+    )
     | List [ Atom "as"; id; s ] -> Qannotident (identifier id, sort s)
     | sexp -> error sexp "qualified_identifier"
 

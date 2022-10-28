@@ -129,7 +129,8 @@ let print_constant fmt = function
   | Cstring s -> fprintf fmt "(Cstring %s)" s
 
 let print_symbol fmt = function
-  | S str | Sprover str -> fprintf fmt "%s" str
+  | S str -> fprintf fmt "%s" str
+  | Sprover str -> fprintf fmt "(Sprover %s)" str
 
 let print_index fmt = function
   | Idxnumeral bigint -> fprintf fmt "(Idx %a)" print_bigint bigint
