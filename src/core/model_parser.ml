@@ -83,18 +83,6 @@ type model = {
   vc_term_attrs: Sattr.t;
 }
 
-let map_filter_model_files f =
-  let f_list elts =
-    match List.filter_map f elts with
-    | [] -> None | l -> Some l in
-  let f_files mf =
-    let mf = Mint.map_filter f_list mf in
-    if Mint.is_empty mf then None else Some mf in
-  Mstr.map_filter f_files
-
-let map_filter_model_elements f m =
-  {m with model_files= map_filter_model_files f m.model_files}
-
 let empty_model_file = Mint.empty
 let empty_model_files = Mstr.empty
 let is_model_empty m = Mstr.is_empty m.model_files
@@ -699,19 +687,18 @@ let debug_elements elts =
   Debug.dprintf debug "@[<v>Elements:@ %a@]@." print_elements elts;
   elts
 
-let debug_files desc files =
+let debug_files files =
   let me_name_trans men = men.men_name in
   let print_file = print_model_file ~filter_similar:false ~print_attrs:true
       ~me_name_trans in
-   Debug.dprintf debug "@[<v>Files %s:@ %a@]@." desc
+   Debug.dprintf debug "@[<v>Files:@ %a@]@."
      (Pp.print_list Pp.newline print_file) (Mstr.bindings files);
    files
 
 let model_parser (raw: raw_model_parser) : model_parser =
   fun ({Printer.vc_term_loc; vc_term_attrs} as pm) str ->
-  raw pm str |> debug_elements |> (* Eg for "smtv2": Smtv2_model_parser.parse *)
-  build_model_rec pm |> debug_files "before" |>
-  (*map_filter_model_files !clean#element |> debug_files "after" |>*)
+  raw pm str |> debug_elements |>
+  build_model_rec pm |> debug_files |>
   fun model_files -> { model_files; vc_term_loc; vc_term_attrs }
 
 exception KnownModelParser of string

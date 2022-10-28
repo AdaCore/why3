@@ -320,79 +320,6 @@ let rec import_model_value loc env check known th_known ity t =
     Pinterp_core.print_value res;
   check ity res;
   res
-  (*
-      | Const c -> import_model_const ity c
-      | Var _ -> undefined_value env ity
-      | Record r ->
-          let rs = match def.Pdecl.itd_constructors with [rs] -> rs | _ ->
-            cannot_import "type with not exactly one constructors %a/%d"
-              print_its ts (List.length def.Pdecl.itd_constructors) in
-          let aux field_rs =
-            let field_name = trace_or_name field_rs.rs_name in
-            let field_ity = ity_full_inst subst (fd_of_rs field_rs).pv_ity in
-            match List.assoc field_name r with
-            | v -> import_model_value loc env check known th_known field_ity v
-            | exception Not_found ->
-                (* TODO Better create a default value? *)
-                undefined_value env field_ity in
-          let vs = List.map aux def.Pdecl.itd_fields in
-          constr_value ity rs def.Pdecl.itd_fields vs
-      | Apply (s, vs) ->
-          let matching_name rs = String.equal rs.rs_name.id_string s in
-          let rs = List.find matching_name def.Pdecl.itd_constructors in
-          let itys = List.map (fun pv -> ity_full_inst subst pv.pv_ity)
-              rs.rs_cty.cty_args in
-          let vs =
-            List.map2 (import_model_value loc env check known th_known) itys vs
-          in
-          constr_value ity rs [] vs
-      | Proj (p, x) ->
-          (* {p : ity -> ty_res => x: ty_res} : ITY *)
-          let search (id, decl) = match decl.Decl.d_node with
-            | Decl.Dparam ls when String.equal (trace_or_name id) p ->
-              begin match ls.ls_value with
-              | None -> None
-              | Some ty_res ->
-                begin match ls.ls_args with
-                | [] | _ :: _ :: _ -> None
-                | [ty_arg] ->
-                  if (Ty.ty_equal ty_arg (ty_of_ity ity)) then Some (ls, ty_res)
-                  else None
-                end
-              end
-            | _ -> None in
-          let ls, ty_res =
-            let iter f = Mid.iter (fun id x -> f (id, x)) th_known in
-            try Util.iter_first iter search with Not_found ->
-              cannot_import "Projection %s not found" p in
-          let x =
-            import_model_value loc env check known th_known (ity_of_ty ty_res) x
-          in
-          get_or_stuck loc env ity "range projection" (proj_value ity ls x)
-      | Array a ->
-          let open Ty in
-          if not (its_equal def.Pdecl.itd_its its_func) then
-            cannot_import "Cannot import array as %a" print_its def.Pdecl.itd_its;
-          let key_ity, value_ity = match def.Pdecl.itd_its.its_ts.ts_args with
-            | [ts1; ts2] -> Mtv.find ts1 subst.isb_var, Mtv.find ts2 subst.isb_var
-            | _ -> assert false in
-          let key_value ix = ix.arr_index_key, ix.arr_index_value in
-          let keys, values = List.split (List.map key_value a.arr_indices) in
-          let keys =
-            List.map (import_model_value loc env check known th_known key_ity)
-              keys in
-          let values =
-            List.map (import_model_value loc env check known th_known value_ity)
-              values in
-          let mv = Mv.of_list (List.combine keys values) in
-          let v0 = import_model_value loc env check known th_known value_ity
-              a.arr_others in
-          purefun_value ~result_ity:ity ~arg_ity:key_ity mv v0
-      | Unparsed s -> cannot_import "unparsed value %s" s
-      | Undefined -> undefined_value env ity in
-  check ity res;
-  res
-  *)
 
 let oracle_of_model pm model =
   let import check oid loc env ity me =
@@ -795,41 +722,6 @@ let select_model ?timelimit ?steplimit ?verb_lvl ?compute_term ~check_ce
     | Some m -> Some (m, (INCOMPLETE "not checking CE model", Pinterp_core.Log.empty_log))
 
 (** Transformations interpretation log and prover models *)
-
-(* TODO_WIP
-let rec model_value v =
-  let open Value in
-  let id_name {id_string= name; id_attrs= attrs} =
-    Ident.get_model_trace_string ~name ~attrs in
-  match v_desc v with
-  | Vnum i -> Const (Integer { int_value= i; int_verbatim= BigInt.to_string i })
-  | Vstring s -> Const (String s)
-  | Vbool b -> Const (Boolean b)
-  | Vproj (ls, v) -> Proj (ls.ls_name.id_string, model_value v)
-  | Varray a ->
-      let aux i v = {
-        arr_index_key= Const (Integer {
-            int_value= BigInt.of_int i;
-            int_verbatim= string_of_int i
-          });
-        arr_index_value= model_value v
-      } in
-      Array {
-        arr_indices= List.mapi aux (Array.to_list a);
-        arr_others= Undefined;
-      }
-  | Vconstr (rs, frs, fs) -> (
-      let vs = List.map (fun f -> model_value (field_get f)) fs in
-      if Strings.has_suffix "'mk" rs.rs_name.id_string then
-        (* same test for record-ness as in smtv2.ml *)
-        let ns = List.map (fun rs -> rs.rs_name.id_string) frs in
-        Record (List.combine ns vs)
-      else
-        Apply (id_name rs.rs_name, vs) )
-  | Vreal _ | Vfloat _ | Vfloat_mode _
-  | Vfun _ | Vpurefun _ | Vterm _ | Vundefined ->
-      failwith "Cannot convert interpreter value to model value"
-*)
 
 (** Transform an interpretation log into a prover model.
     TODO fail if the log doesn't fail at the location of the original model *)
