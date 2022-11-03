@@ -875,8 +875,8 @@ module Float32
     lemma pow2sb,
     axiom . (* TODO: "lemma"? "goal"? *)
 
-  axiom max_int_def : max_int = 0xFFFF_FF00_0000_0000_0000_0000_0000_0000
-  axiom max_real_def : max_real = 0x1.FFFFFEp127
+  lemma max_int_def : max_int = 0xFFFF_FF00_0000_0000_0000_0000_0000_0000
+  lemma max_real_def : max_real = 0x1.FFFFFEp127
 
   lemma round_bound_ne :
     forall x:real [round RNE x].
@@ -916,8 +916,8 @@ module Float64
     lemma pow2sb,
     axiom . (* TODO: "lemma"? "goal"? *)
 
-    axiom max_int_def : max_int = 0xFFFF_FFFF_FFFF_F800_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000
-    axiom max_real_def : max_real = 0x1.FFFFFFFFFFFFFp1023
+  lemma max_int_def : max_int = 0xFFFF_FFFF_FFFF_F800_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000
+  lemma max_real_def : max_real = 0x1.FFFFFFFFFFFFFp1023
 
   lemma round_bound_ne :
     forall x:real [round RNE x].
