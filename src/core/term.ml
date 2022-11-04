@@ -247,22 +247,6 @@ and bind_info = {
   bv_subst : term Mvs.t   (* deferred substitution *)
 }
 
-let term_size t =
-  let rec aux acc t = match t.t_node with
-  | Tvar _ | Tconst _ | Ttrue | Tfalse -> acc
-  | Tapp (_, l) -> List.fold_left aux (acc + 1) l
-  | Tif (b,t1,t2) -> aux (aux (aux (acc + 1) t2) t1) b
-  | Tlet (t, (_,_,tb)) -> aux (aux (acc + 1) tb) t
-  | Tcase (t, l) -> aux (List.fold_left aux_term_branch (acc + 1) l) t
-  | Teps (_,_,t) -> aux (acc + 1) t
-  | Tquant (_, (_,_,_,t)) -> aux (acc + 1) t
-  | Tbinop (_,t1,t2) -> aux (aux (acc + 1) t2) t1
-  | Tnot t -> aux (acc + 1) t
-  and aux_term_branch acc t_branch = match t_branch with
-  | (_,_,t) -> aux (acc + 1) t
-  in aux 0 t
-let term_branch_size (_,_,t) = term_size t
-
 (* term equality modulo alpha-equivalence and location *)
 
 exception CompLT
@@ -1800,3 +1784,11 @@ module TermTF = struct
   let tr_fold fnT fnF = tr_fold (t_selecti fnT fnF)
   let tr_map_fold fnT fnF = tr_map_fold (t_selecti fnT fnF)
 end
+
+
+let term_size t =
+  let rec aux acc t =
+    t_fold_unsafe aux (acc+1) t
+  in aux 0 t
+
+let term_branch_size (_,_,t) = term_size t

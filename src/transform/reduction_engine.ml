@@ -478,7 +478,7 @@ let cont_size cont =
   | (_, _, n)::_ -> n
 
 let subst_size sigma =
-  Mvs.fold (fun vs t acc -> acc + Term.term_size t) sigma 0
+  Mvs.fold (fun _ t acc -> acc + Term.term_size t) sigma 0
 
 (* This global variable is used to approximate a count of the elementary
    simplifications that are done during normalization. This is used for
@@ -1499,8 +1499,11 @@ let normalize ?(max_growth=1000) ?step_limit ~limit engine sigma t0 =
           let c' = reduce engine c in
           let g = Int.to_float (cont_size c'.cont_stack) /. init_size in
           if g > max_growth then
-            let _ = Loc.warning "term reduction aborted (term size is blowing up).@." in
-            reconstruct c
+            begin
+              Loc.warning "term reduction aborted (term size blows up from %.0f to %d, after %d steps  from term `%a`).@."
+                init_size (cont_size c'.cont_stack) n Pretty.print_term t0;
+              reconstruct c
+            end
           else
             many_steps c' (n+1) init_size
         in
