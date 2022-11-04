@@ -6,6 +6,8 @@
 <prover id="1" name="Z3" version="4.8.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC5" version="1.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -513,13 +515,58 @@
  <proof prover="2"><result status="valid" time="0.09" steps="813"/></proof>
  </goal>
  <goal name="list_reversal&#39;vc" expl="VC for list_reversal" proved="true">
- <proof prover="1"><result status="valid" time="0.49" steps="780144"/></proof>
+ <proof prover="1"><result status="valid" time="0.18" steps="70261"/></proof>
  </goal>
  <goal name="is_list&#39;vc" expl="VC for is_list" proved="true">
- <proof prover="2"><result status="valid" time="0.07" steps="464"/></proof>
+ <proof prover="2"><result status="valid" time="0.07" steps="632"/></proof>
  </goal>
  <goal name="cells_of_list&#39;vc" expl="VC for cells_of_list" proved="true">
- <proof prover="2"><result status="valid" time="0.72" steps="66944"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="cells_of_list&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="1019"/></proof>
+  </goal>
+  <goal name="cells_of_list&#39;vc.1" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="412"/></proof>
+  </goal>
+  <goal name="cells_of_list&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="529"/></proof>
+  </goal>
+  <goal name="cells_of_list&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.58" steps="68548"/></proof>
+  </goal>
+  <goal name="cells_of_list&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.73" steps="6979"/></proof>
+  </goal>
+  <goal name="cells_of_list&#39;vc.5" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.06" steps="463"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="list_of_cells&#39;vc" expl="VC for list_of_cells" proved="true">
+ <proof prover="1"><result status="valid" time="0.37" steps="619805"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="list_of_cells&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="2672"/></proof>
+  </goal>
+  <goal name="list_of_cells&#39;vc.1" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="1433"/></proof>
+  </goal>
+  <goal name="list_of_cells&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="1558"/></proof>
+  </goal>
+  <goal name="list_of_cells&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="4307"/></proof>
+  </goal>
+  <goal name="list_of_cells&#39;vc.4" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.10" steps="4660"/></proof>
+  </goal>
+  <goal name="list_of_cells&#39;vc.5" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.23" steps="28431"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="list_reversal_final&#39;vc" expl="VC for list_reversal_final" proved="true">
+ <proof prover="5"><result status="valid" time="0.34" steps="48422"/></proof>
  </goal>
 </theory>
 </file>

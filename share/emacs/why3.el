@@ -161,6 +161,9 @@
     ("\\((\\)\\*\\()\\)" (1 "()") (2 ")("))
   ))
 
+(defvar compilation-first-column)
+(defvar compilation-error-screen-columns)
+
 ;; setting the mode
 (define-derived-mode why3-mode
   prog-mode "Why3"
@@ -172,6 +175,9 @@
   (setq-local font-lock-multiline t)
   ; indentation
   ;(setq-local indent-line-function 'why3-indent-line)
+  ; error locations
+  (setq-local compilation-first-column 0)
+  (setq-local compilation-error-screen-columns nil)
   ; OCaml style comments for comment-region, comment-dwim, etc.
   (setq-local comment-start "(*")
   (setq-local comment-end   "*)")
