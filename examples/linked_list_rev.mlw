@@ -514,3 +514,122 @@ module YetAnotherInPlaceRev
 
 end
 
+(** On a null-terminated list, `list_reversal` terminates. We have shown it
+    already e.g. in the previous module.
+
+    But `list_reversal` actually terminates on *any* list, even when it
+    contains a loop. Indeed, the code will reach the loop while reversing
+    the initial segment, will reverse the loop, and then will restore the
+    initial segment. So we end up with a list where only the loop has been
+    reversed.
+
+      before          +---o<--o<--+
+                      v           |
+          o-->o-->o-->o-->o-->o-->o
+
+      after           +-->o-->o---+
+                      |           V
+          o-->o-->o-->o<--o<--o<--o
+
+    In the module below, we show that `list_reversal` always terminates.
+    This requires ruling out inifitely-long lists i.e. assuming a finite
+    amount of memory.
+*)
+module Termination
+
+  use int.Int
+  use int.NumOf
+  use map.Map
+
+  type loc
+
+  val (=) (l1 l2: loc) : bool ensures { result <-> l1 = l2 }
+
+  val constant null : loc
+
+  type mem = { mutable next: loc -> loc }
+
+  val mem: mem
+
+  let cdr (p: loc) : loc
+    requires { p <> null }
+    ensures  { result = mem.next p }
+  = mem.next p
+
+  let set_cdr (p: loc) (v: loc) : unit
+    requires { p <> null }
+    ensures  { mem.next = (old mem.next)[p <- v] }
+  = let m = mem.next in
+    mem.next <- fun x -> if x = p then v else m x
+
+  (* Finite memory hypothesis: the list is entirely contained in a finite
+     set `s` of `n` cells *)
+
+  predicate valid_cells (s: int -> loc) (n: int) =
+    (forall i. 0 <= i < n -> s i <> null) &&
+    (forall i j. 0 <= i < n -> 0 <= j < n -> i <> j -> s i <> s j)
+
+  predicate inside_memory (s: int -> loc) (n: int) (l: loc) =
+    l = null || exists i. 0 <= i < n && l = s[i]
+
+  predicate finite_memory (m: mem) (s: int -> loc) (n: int) =
+    forall i. 0 <= i < n -> inside_memory s n (m.next s[i])
+
+  (* The variant is lexicographic, as follows:
+
+     - as long as we still discover new cells, we mark them with
+       increasing numbers (with function `idx` below) and the number
+       of unmarked cells decreases;
+
+     - once we reach a marked cell, this means we are back in the initial
+       segment and then the mark decreases.
+  *)
+
+  function seen (s: int -> loc) (idx: loc -> int) (lo hi: int) : int =
+    numof (fun i -> idx s[i] > 0) lo hi
+
+  let ghost set_idx (s: int -> loc) (n: int) (idx: loc -> int) (l: loc) (k: int)
+    requires { valid_cells s n }
+    requires { inside_memory s n l }
+    requires { l <> null }
+    requires { idx l = -1 }
+    requires { k = seen s idx 0 n >= 0 }
+    ensures  { seen s idx[l <- k+1] 0 n = 1 + seen s idx 0 n }
+  = assert { seen s idx[l <- k+1] 0 n = 1 + seen s idx 0 n by
+             exists il. 0 <= il < n && l = s[il] so
+               seen s idx 0 n = seen s idx 0 il + seen s idx (il+1) n &&
+               seen s idx[l <- k+1] 0 n =
+                 seen s idx[l <- k+1] 0 il + 1 + seen s idx[l <- k+1] (il+1) n }
+
+  let list_reversal (ghost s: int -> loc) (ghost n: int) (l: loc) : (r: loc)
+    requires { n >= 0 }
+    requires { valid_cells s n }
+    requires { finite_memory mem s n }
+    requires { inside_memory s n l }
+  = let ref l = l in
+    let ref r = null in
+    (* marking function: -1 for unmarked / 0 for null / >0 for marked *)
+    let ghost ref idx = fun p -> if p = null then 0 else -1 in
+    let ghost ref k = 0 in (* last mark *)
+    while l <> null do
+      invariant { inside_memory s n l }
+      invariant { inside_memory s n r }
+      invariant { finite_memory mem s n }
+      invariant { k = seen s idx 0 n >= 0 }
+      invariant { forall i. 0 <= i < n -> -1 <= idx s[i] <= k }
+      invariant { forall p. idx p = 0 <-> p = null }
+      invariant { if idx l = -1 then
+                    idx r = k && forall i. 0 <= i < n ->
+                    0 < idx s[i] -> idx (mem.next s[i]) = idx s[i] - 1
+                  else forall i. 0 <= i < n ->
+                    0 < idx s[i] <= idx l -> idx (mem.next s[i]) = idx s[i] - 1 }
+      variant { n - k, 1 + idx l }
+      if idx l = -1 then (set_idx s n idx l k; k <- k + 1; idx <- idx[l <- k]);
+      let tmp = l in
+      l <- cdr l;
+      set_cdr tmp r;
+      r <- tmp;
+    done;
+    return r
+
+end
