@@ -1,0 +1,81 @@
+module MapIntInt
+
+  type mapintint = int -> int
+
+  let function get (f: mapintint) (x: int) : int = f x
+
+  let ghost function set (f: mapintint) (x: int) (v: int) : mapintint =
+    fun y -> if pure {y = x} then v else f y
+
+end
+
+module MapIntBool
+
+  type mapintbool = int -> bool
+
+  let function get (f: mapintbool) (x: int) : bool = f x
+
+  let ghost function set (f: mapintbool) (x: int) (v: bool) : mapintbool =
+    fun y -> if pure {y = x} then v else f y
+
+end
+
+module MapMulti
+
+  use MapIntInt
+
+  type mapmulti = int -> mapintint
+
+  let function get (f: mapmulti) (x: int) : mapintint = f x
+
+  let ghost function set (f: mapmulti) (x: int) (v: mapintint) : mapmulti =
+    fun y -> if pure {y = x} then v else f y
+
+end
+
+module M
+
+  use int.Int
+  use ref.Ref
+  use MapIntInt
+  use MapIntBool
+  use MapMulti
+
+  let ghost test_map (ghost x : ref mapintint) : unit
+    ensures { MapIntInt.get !x 0 <> MapIntInt.get !x 1 }
+  =
+    x := MapIntInt.set !x 0 3
+
+  (* Multi-dimensional maps *)
+  let ghost test_map_multidim1 (ghost x : ref mapmulti) : unit
+    ensures { MapIntInt.get (MapMulti.get !x 0) 0 <> MapIntInt.get (MapMulti.get !x 1) 1 }
+  =
+    x := MapMulti.set !x 0 (MapMulti.get !x 1)
+
+  let ghost test_map_multidim2 (ghost x : ref mapmulti) : unit
+    ensures { MapIntInt.get (MapMulti.get !x 0) 0 <> MapIntInt.get (MapMulti.get !x 1) 1 }
+  =
+    let x0 = MapMulti.get !x 0 in
+    let x0 = MapIntInt.set x0 0 3 in
+    x := MapMulti.set !x 0 x0
+
+  let ghost proj_map_test1 (ghost x : ref mapintint) : unit
+    ensures { MapIntInt.get !x 0 <> MapIntInt.get !x 1 }
+  =
+    x := MapIntInt.set !x 0 3
+
+  let ghost proj_map_test2 (ghost x : ref mapintbool) : unit
+    ensures { MapIntBool.get !x 0 <> MapIntBool.get !x 1 }
+  =
+    x := MapIntBool.set !x 0 true
+
+end
+
+theory ModelMap
+
+use MapIntInt
+
+goal t1 : forall t:mapintint, i : int.
+   get (set t 0 42) i = get t i
+
+end
