@@ -37,6 +37,7 @@ type field_info = {
 }
 
 type printing_info = {
+  why3_env           : Env.env;
   vc_term_loc        : Loc.position option;
   vc_term_attrs      : Sattr.t;
   queried_terms      : (Term.lsymbol * Loc.position option * Sattr.t) Mstr.t;
@@ -68,7 +69,8 @@ let printers : (Pp.formatted * printer) Hstr.t = Hstr.create 17
 exception KnownPrinter of string
 exception UnknownPrinter of string
 
-let default_printing_info = {
+let default_printing_info env = {
+  why3_env = env;
   vc_term_loc = None;
   vc_term_attrs = Sattr.empty;
   queried_terms = Mstr.empty;

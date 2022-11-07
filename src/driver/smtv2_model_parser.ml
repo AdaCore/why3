@@ -109,35 +109,21 @@ module FromSexpToModel = struct
     with _ -> (
       try minus_constant_int sexp with _ -> error sexp "constant_int")
 
-  let constant_dec =
-    atom @@ fun s ->
-    try
-      Scanf.sscanf s "%[^.].%s" (fun s1 s2 ->
-          let i1 = BigInt.of_string s1 and i2 = BigInt.of_string s2 in
-          (i1, i2))
-    with _ -> atom_error s "constant_dec"
+  let constant_dec s =
+    try Scanf.sscanf s "%[^.].%s" (fun s1 s2 -> (s1,s2))
+    with _ -> (s,"0")
 
-  let minus_constant_dec = function
-    | List [ Atom "-"; d ] ->
-        let d1, d2 = constant_dec d in
-        (BigInt.minus d1, d2)
-    | sexp -> error sexp "minus_constant_dec"
-
-  let constant_dec sexp =
-    try constant_dec sexp
-    with _ -> (
-      try minus_constant_dec sexp with _ -> error sexp "constant_dec")
+  let constant_dec = function
+    | Atom s ->
+      let s1,s2 = constant_dec s in
+      (false, s1, s2)
+    | List [ Atom "-"; Atom s] ->
+      let s1,s2 = constant_dec s in
+      (true, s1, s2)
+    | sexp -> error sexp "constant_dec"
 
   let constant_fraction = function
-    | List [ Atom "/"; n1; n2 ] ->
-        let n1, n2 =
-          try (constant_int n1, constant_int n2)
-          with _ ->
-            let d11, d12 = constant_dec n1 and d21, d22 = constant_dec n2 in
-            assert (BigInt.(eq d12 zero && eq d22 zero));
-            (d11, d21)
-        in
-        (n1, n2)
+    | List [ Atom "/"; n1; n2 ] -> Cfraction (constant_dec n1, constant_dec n2)
     | sexp -> error sexp "constant_fraction"
 
   let constant_bv_bin = function
@@ -202,7 +188,7 @@ module FromSexpToModel = struct
       with _ -> (
         try Cdecimal (constant_dec sexp)
         with _ -> (
-          try Cfraction (constant_fraction sexp)
+          try constant_fraction sexp
           with _ -> (
             try Cbitvector (constant_bv sexp)
             with _ -> (
@@ -388,6 +374,8 @@ module FromModelToTerm = struct
   let error s = raise (E s)
 
   type env = {
+    (* Why3 environment, used to retrieve builtin lsymbols *)
+    why3_env : Env.env;
     (* Prover variables. *)
     mutable prover_vars : vsymbol Mstr.t;
     (* Bound variables in the body of a function definiton. *)
@@ -489,8 +477,17 @@ module FromModelToTerm = struct
     Debug.dprintf debug "[constant_to_term] c = %a@." print_constant c;
     match c with
     | Cint bigint -> t_const (Constant.int_const bigint) Ty.ty_int
-    | Cdecimal _ -> error "TODO_WIP Cdecimal"
-    | Cfraction _ -> error "TODO_WIP Cfraction"
+    | Cdecimal (neg,s1,s2) ->
+      t_const (Constant.real_const_from_string ~neg:neg s1 s2) Ty.ty_real
+    | Cfraction ((neg,s1,s2),(neg',s1',s2')) ->
+      begin try
+        let t = t_const (Constant.real_const_from_string ~neg:neg s1 s2) Ty.ty_real in
+        let t' = t_const (Constant.real_const_from_string ~neg:neg' s1' s2') Ty.ty_real in
+        let th = Env.read_theory env.why3_env ["real"] "Real" in
+        let div_ls = Theory.ns_find_ls th.Theory.th_export [Ident.op_infix "/"] in
+        t_app div_ls [t;t'] div_ls.ls_value
+      with _ -> error "TODO_WIP Cfraction"
+      end
     | Cbitvector (bigint, n) ->
       begin try
         let _,ty =
@@ -876,6 +873,7 @@ module FromModelToTerm = struct
           (List.length ls.ls_args))
       constructors;
     let env = {
+      why3_env = pinfo.Printer.why3_env;
       prover_vars = Mstr.empty;
       bound_vars = Mstr.empty;
       constructors = constructors;

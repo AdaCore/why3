@@ -44,6 +44,9 @@ type field_info = {
 (** The printing info is collected while printing a task to trace back elements
     in the output of the printer to elements in the task and the AST. *)
 type printing_info = {
+  why3_env : Env.env;
+  (** The Why3 environment, retrieved from [printer_args], useful for builtin
+      lsymbols *)
   vc_term_loc   : Loc.position option;
   (** The position of the term that triggers the VC *)
   vc_term_attrs : Sattr.t;
@@ -73,7 +76,7 @@ type printing_info = {
      immediate term, not inside the ident) *)
 }
 
-val default_printing_info : printing_info
+val default_printing_info : Env.env -> printing_info
 (** Empty mapping *)
 
 (** Return the union of projections and fields of a printing_info *)

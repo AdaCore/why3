@@ -28,6 +28,9 @@ type sort =
 
 type constant_bv = BigInt.t * int
 
+(* the first parameter is [true] if the constant is negative *)
+ type constant_real = bool * string * string
+
 type constant_float =
   | Fplusinfinity
   | Fminusinfinity
@@ -38,8 +41,8 @@ type constant_float =
 
 type constant =
   | Cint of BigInt.t
-  | Cdecimal of (BigInt.t * BigInt.t)
-  | Cfraction of (BigInt.t * BigInt.t)
+  | Cdecimal of constant_real
+  | Cfraction of constant_real * constant_real
   | Cbitvector of constant_bv
   | Cfloat of constant_float
   | Cbool of bool

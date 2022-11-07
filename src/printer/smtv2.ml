@@ -773,7 +773,7 @@ let print_incremental_axiom info fmt =
   List.iter (print_ldecl_axiom info fmt) info.incr_list_ldecls;
   add_check_sat info fmt
 
-let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f = match k with
+let print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f = match k with
   | Paxiom ->
       if info.info_incremental && has_quantification f then
         info.incr_list_axioms <- (pr, f) :: info.incr_list_axioms
@@ -799,6 +799,7 @@ let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f = match k with
       let model_list = print_info_model info in
 
       printing_info := Some {
+        why3_env = env;
         vc_term_loc = vc_loc;
         vc_term_attrs = vc_attrs;
         queried_terms = model_list;
@@ -886,7 +887,7 @@ let print_sort_decl info fmt (ts,_) =
     (print_ident info) ts.ts_name
     (List.length ts.ts_args)
 
-let print_decl vc_loc vc_attrs printing_info info fmt d =
+let print_decl vc_loc vc_attrs env printing_info info fmt d =
   match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
@@ -921,7 +922,7 @@ let print_decl vc_loc vc_attrs printing_info info fmt d =
       "smtv2: inductive definitions are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
-      print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f
+      print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f
 
 let set_produce_models fmt info =
   if info.info_cntexample then
@@ -1002,7 +1003,7 @@ let print_task version args ?old:_ fmt task =
         print_decls t.Task.task_prev;
         begin match t.Task.task_decl.Theory.td_node with
         | Theory.Decl d ->
-            begin try print_decl vc_loc vc_attrs args.printing_info info fmt d
+            begin try print_decl vc_loc vc_attrs args.env args.printing_info info fmt d
             with Unsupported s -> raise (UnsupportedDecl (d,s)) end
         | _ -> () end
     | None -> () in

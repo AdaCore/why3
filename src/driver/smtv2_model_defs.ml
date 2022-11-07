@@ -28,6 +28,9 @@ type sort =
 
 type constant_bv = BigInt.t * int
 
+(* the first parameter is [true] if the constant is negative *)
+type constant_real = bool * string * string
+
 type constant_float =
   | Fplusinfinity
   | Fminusinfinity
@@ -38,8 +41,8 @@ type constant_float =
 
 type constant =
   | Cint of BigInt.t
-  | Cdecimal of (BigInt.t * BigInt.t)
-  | Cfraction of (BigInt.t * BigInt.t)
+  | Cdecimal of constant_real
+  | Cfraction of constant_real * constant_real
   | Cbitvector of constant_bv
   | Cfloat of constant_float
   | Cbool of bool
@@ -108,14 +111,16 @@ let print_bigint fmt bigint =
 let print_bv fmt (bigint, i) =
   fprintf fmt "(Cbitvector (%d) %a)" i print_bigint bigint
 
+let print_real fmt (sign, s1, s2) =
+  let sign = if sign then "+" else "-" in
+  fprintf fmt "(%s %s.%s)" sign s1 s2
+
 let print_constant fmt = function
   | Cint bigint -> fprintf fmt "(Cint %a)" print_bigint bigint
-  | Cdecimal (bigint1, bigint2) ->
-      fprintf fmt "(Cdecimal %a , %a)" print_bigint bigint1
-        print_bigint bigint2
-  | Cfraction (bigint1, bigint2) ->
-      fprintf fmt "(Cfraction %a / %a)" print_bigint bigint1
-        print_bigint bigint2
+  | Cdecimal r -> fprintf fmt "(Cdecimal %a)" print_real r
+  | Cfraction (r1,r2) ->
+      fprintf fmt "(Cfraction %a / %a)" print_real r1
+        print_real r2
   | Cbitvector (bigint, i) -> print_bv fmt (bigint, i)
   | Cfloat Fplusinfinity -> fprintf fmt "(Cfloat Fplusinfinity)"
   | Cfloat Fminusinfinity -> fprintf fmt "(Cfloat Fminusinfinity)"

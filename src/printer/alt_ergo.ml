@@ -450,7 +450,7 @@ let print_info_model info =
   else
     Mstr.empty
 
-let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f =
+let print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f =
   match k with
   | Paxiom ->
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n@\n"
@@ -458,6 +458,7 @@ let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f =
   | Pgoal ->
       let model_list = print_info_model info in
       printing_info := Some {
+        why3_env = env;
         vc_term_loc = vc_loc;
         vc_term_attrs = vc_attrs;
         queried_terms = model_list;
@@ -474,11 +475,11 @@ let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f =
         (print_ident info) pr.pr_name (print_fmla info) f
   | Plemma -> assert false
 
-let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f =
+let print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f =
   if Mid.mem pr.pr_name info.info_syn || Spr.mem pr info.info_axs
-    then () else (print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f; forget_tvs info)
+    then () else (print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f; forget_tvs info)
 
-let print_decl vc_loc vc_attrs printing_info info fmt d = match d.d_node with
+let print_decl vc_loc vc_attrs env printing_info info fmt d = match d.d_node with
   | Dtype ts ->
       print_ty_decl info fmt ts
   | Ddata dl ->
@@ -490,7 +491,7 @@ let print_decl vc_loc vc_attrs printing_info info fmt d = match d.d_node with
       print_list nothing (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
       "alt-ergo: inductive definitions are not supported"
-  | Dprop (k,pr,f) -> print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f
+  | Dprop (k,pr,f) -> print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f
 
 let add_projection (csm,pjs,axs) = function
   | [Theory.MAls ls; Theory.MAls cs; Theory.MAint ind; Theory.MApr pr] ->
@@ -543,7 +544,7 @@ let print_task args ?old:_ fmt task =
         print_decls t.Task.task_prev;
         begin match t.Task.task_decl.Theory.td_node with
         | Theory.Decl d ->
-            begin try print_decl vc_loc vc_attrs args.printing_info info fmt d
+            begin try print_decl vc_loc vc_attrs args.env args.printing_info info fmt d
             with Unsupported s -> raise (UnsupportedDecl (d,s)) end
         | _ -> () end
     | None -> () in

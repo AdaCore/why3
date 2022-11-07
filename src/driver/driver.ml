@@ -387,7 +387,7 @@ let print_task_prepared ?old drv fmt task =
       printing_info = ref None;
     } in
   fprintf fmt "@[%a@]@?" (lookup_printer p ?old printer_args) task;
-  Opt.get_def default_printing_info !(printer_args.printing_info)
+  Opt.get_def (default_printing_info printer_args.env) !(printer_args.printing_info)
 
 let print_task ?old drv fmt task =
   let task = prepare_task drv task in
