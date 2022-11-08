@@ -813,7 +813,7 @@ let reduce_bounded_quant ls_lt limit t nt sigma st rem =
 let rec reduce engine c =
   match c.value_stack, c.cont_stack with
   | _, [] -> assert false
-  | st, (Keval (t,nt,sigma),orig,n) :: rem -> (
+  | st, (Keval (t,nt,sigma),orig,_) :: rem -> (
       let limit = engine.params.compute_max_quantifier_domain in
       try reduce_bounded_quant engine.ls_lt limit t nt sigma st rem with Exit ->
         reduce_eval engine st t ~orig sigma rem)
@@ -861,7 +861,7 @@ let rec reduce engine c =
     }
   | [], (Kcase _, _, _) :: _ -> assert false
   | (Int _ | Real _) :: _, (Kcase _, _, _) :: _ -> assert false
-  | (Term t1) :: st, (Kcase(tbl,sigma), orig, n) :: rem ->
+  | (Term t1) :: st, (Kcase(tbl,sigma), orig, _) :: rem ->
     reduce_match st t1 ~orig tbl sigma rem
   | ([] | [_] | (Int _ | Real _) :: _ | Term _ :: (Int _ | Real _) :: _),
     (Kbinop _, _, _) :: _ -> assert false
@@ -877,7 +877,7 @@ let rec reduce engine c =
     { value_stack = Term (t_attr_copy orig (t_not_simp t)) :: st;
       cont_stack = rem;
     }
-  | st, (Kapp(ls,ty), orig, n) :: rem ->
+  | st, (Kapp(ls,ty), orig, _) :: rem ->
     reduce_app engine st ~orig ls ty rem
   | [], (Keps _, _, _) :: _ -> assert false
   | (Int _ | Real _) :: _ , (Keps _, _, _) :: _ -> assert false
@@ -896,7 +896,7 @@ and reduce_match st u ~orig tbl sigma cont =
   let rec iter tbl =
     match tbl with
     | [] -> assert false (* pattern matching not exhaustive *)
-    | (b,nb)::rem ->
+    | (b,_)::rem ->
       let p,t = t_open_branch b in
       try
         let (mt',mv') = matching (Ty.Mtv.empty,sigma) u p in
