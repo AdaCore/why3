@@ -1486,41 +1486,47 @@ let rec reconstruct c =
 (** iterated reductions *)
 
 let normalize ?(max_growth=1000) ?step_limit ~limit engine sigma t0 =
-  let max_growth = Int.to_float max_growth in
+  let n0 = Term.term_size t0 in
+  let cont_size_init = n0+1 in
+  let c = { value_stack = [] ;
+            cont_stack = [Keval(t0,n0,sigma),t0,cont_size_init] ;
+          }
+  in
+  let cont_size_max = (Int.to_float max_growth) *. (Int.to_float cont_size_init) in
   rec_step_limit := 0;
-  let rec many_steps c n init_size =
+  let rec many_steps c n =
     match c.value_stack, c.cont_stack with
     | [Term t], [] -> t
     | _, [] -> assert false
     | _ ->
-      if n = limit then reconstruct c
+      if n = limit then
+        begin
+          let t1 = reconstruct c in
+          Loc.warning "term reduction aborted (takes more than %d steps).@."
+            limit;
+          t1
+        end
       else begin
-        let reduce_within_max_growth c n init_size max_growth =
+        let reduce_until_size_max c n =
           let c' = reduce engine c in
-          let g = Int.to_float (cont_size c'.cont_stack) /. init_size in
-          if g > max_growth then
+          if Int.to_float (cont_size c'.cont_stack) > cont_size_max then
             begin
-              Loc.warning "term reduction aborted (term size blows up from %.0f to %d, after %d steps  from term `%a`).@."
-                init_size (cont_size c'.cont_stack) n Pretty.print_term t0;
+              Loc.warning "term reduction aborted (term size blows up from %d to %d, after %d steps).@."
+                cont_size_init (cont_size c'.cont_stack) n;
               reconstruct c
             end
           else
-            many_steps c' (n+1) init_size
+            many_steps c' (n+1)
         in
         match step_limit with
-        | None -> reduce_within_max_growth c n init_size max_growth
+        | None -> reduce_until_size_max c n
         | Some step_limit ->
             if !rec_step_limit >= step_limit then
               reconstruct c
-            else reduce_within_max_growth c n init_size max_growth
+            else reduce_until_size_max c n
       end
   in
-  let n0 = Term.term_size t0 in
-  let c = { value_stack = [];
-            cont_stack = [Keval(t0,n0,sigma),t0,n0+1] ;
-          }
-  in
-  many_steps c 0 (Int.to_float (n0+1))
+  many_steps c 0
 
 (* the rewrite engine *)
 
