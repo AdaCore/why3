@@ -31,6 +31,7 @@ Provers
 
 Miscellaneous
   * OCaml >= 4.08 is now required
+  * LablGtk2 is no longer supported
 
 Version 1.5.1, September 12, 2022
 ---------------------------------

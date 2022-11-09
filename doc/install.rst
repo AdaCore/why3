@@ -117,16 +117,16 @@ hold. Compilation requires:
 
 For some of the Why3 tools, additional OCaml libraries are needed:
 
--  For the graphical interface, the Lablgtk2 library is needed. It
-   provides OCaml bindings of the gtk2 graphical library. For
+-  For the graphical interface, the LablGtk3 library is needed. It
+   provides OCaml bindings of the GTK3 graphical library. For
    Debian-based Linux distributions, you can install the packages
 
    ::
 
-       liblablgtk2-ocaml-dev liblablgtksourceview2-ocaml-dev
+       liblablgtk3-ocaml-dev liblablgtksourceview3-ocaml-dev
 
    It is also installable from sources, available from the site
-   http://wwwfun.kurims.kyoto-u.ac.jp/soft/olabl/lablgtk.html
+   https://garrigue.github.io/lablgtk/
 
 If you want to use the Coq realizations (:numref:`sec.realizations`),
 then Coq has to be installed before Why3. Look at the summary printed at
