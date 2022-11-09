@@ -682,7 +682,7 @@ let monitor =
 
 let command_entry =
   GEdit.entry
-    ~text:"type commands here"
+    ~placeholder_text:"type commands here"
     ~packing:hbox22221#add ()
 
 (* Part 2.2.2.2.2 contains messages returned by the IDE/server *)
@@ -1480,15 +1480,6 @@ let (_ : GtkSignal.id) =
         interp cmd
       end in
   command_entry#connect#activate ~callback
-
-(* remove the helper text from the command entry the first time it gets the focus *)
-let () =
-  let id = ref None in
-  let callback _ =
-    clear_command_entry ();
-    GtkSignal.disconnect command_entry#as_entry (Opt.get !id);
-    false in
-  id := Some (command_entry#event#connect#focus_in ~callback)
 
 let on_selected_row r =
   try
