@@ -1105,7 +1105,7 @@ module Pairing (Old: S)(New: S) = struct
     let allgoals = Hashtbl.fold add old_checksums newgoals in
     Hashtbl.clear old_checksums;
     (* phase 2: pair goals according to shapes *)
-    let compare e1 e2 = Pervasives.compare e1.shape e2.shape in
+    let compare e1 e2 = Stdlib.compare e1.shape e2.shape in
     let allgoals = List.sort compare allgoals in
     build_list allgoals;
     if allgoals <> [] then begin

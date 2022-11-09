@@ -107,7 +107,7 @@ val terminal_has_color : bool
    ["TERM"] environment variables is set, and not to ["dump"], and that standard output is
    a terminal. *)
 
-val ansi_color_tags : Format.formatter_tag_functions
+val ansi_color_tags : Format.formatter_stag_functions
 (** Functions to interpret tags as ANSI terminal color codes. The format of the tag is
    [[bold] [<color>] [on <bg-color>]].
 

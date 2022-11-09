@@ -89,6 +89,7 @@ let terminal_has_color =
   term <> "" && term <> "dumb" && Unix.isatty Unix.stdout
 
 let esc_seq_of_tag str =
+  let str = match str with Format.String_tag str -> str | _ -> assert false in
   let tokens = String.split_on_char ' ' (String.lowercase_ascii str) in
   let bold, tokens = match tokens with
     | "bold" :: tokens -> true, tokens
@@ -109,10 +110,10 @@ let esc_seq_of_tag str =
   String.concat ";" (aux 30 fg @ aux 40 bg @ bold)
 
 let ansi_color_tags = Format.{
-  mark_open_tag= (fun tag -> sprintf "\027[%sm" (esc_seq_of_tag tag));
-  mark_close_tag= (fun _ -> "\027[0m");
-  print_open_tag= ignore;
-  print_close_tag= ignore;
+  mark_open_stag   = (fun tag -> sprintf "\027[%sm" (esc_seq_of_tag tag));
+  mark_close_stag  = (fun _ -> "\027[0m");
+  print_open_stag  = ignore;
+  print_close_stag = ignore;
 }
 
 let is_sexp_simple_token s =

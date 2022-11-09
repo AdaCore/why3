@@ -22,7 +22,7 @@ open Task
 
 module Int_Dft = struct
   type t = int
-  let compare = Pervasives.compare
+  let compare = Stdlib.compare
   let default = max_int
 end
 

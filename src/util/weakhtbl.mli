@@ -47,14 +47,6 @@ module type S = sig
   val remove : 'a t -> key -> unit
     (* remove the value *)
 
-  val iter : (key -> 'a -> unit) -> 'a t -> unit
-
-  val fold : (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
-
-  val iterk : (key -> unit) -> 'a t -> unit
-
-  val foldk : (key -> 'b -> 'b) -> 'a t -> 'b -> 'b
-
   val length : 'a t -> int
 
   val memoize : int -> (key -> 'a) -> (key -> 'a)
