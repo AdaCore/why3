@@ -26,7 +26,11 @@ type sort =
   | Ssimple of identifier
   | Smultiple of identifier * sort list
 
-type constant_bv = BigInt.t * int
+  type constant_bv = {
+    bv_value : BigInt.t ;
+    bv_length : int ;
+    bv_verbatim : string
+  }
 
 (* the first parameter is [true] if the constant is negative *)
 type constant_real = bool * string * string
@@ -108,7 +112,7 @@ open Format
 let print_bigint fmt bigint =
   fprintf fmt "%s" (BigInt.to_string bigint)
 
-let print_bv fmt (bigint, i) =
+let print_bv fmt { bv_value=bigint; bv_length=i; _} =
   fprintf fmt "(Cbitvector (%d) %a)" i print_bigint bigint
 
 let print_real fmt (sign, s1, s2) =
@@ -121,7 +125,7 @@ let print_constant fmt = function
   | Cfraction (r1,r2) ->
       fprintf fmt "(Cfraction %a / %a)" print_real r1
         print_real r2
-  | Cbitvector (bigint, i) -> print_bv fmt (bigint, i)
+  | Cbitvector bv -> print_bv fmt bv
   | Cfloat Fplusinfinity -> fprintf fmt "(Cfloat Fplusinfinity)"
   | Cfloat Fminusinfinity -> fprintf fmt "(Cfloat Fminusinfinity)"
   | Cfloat Fpluszero -> fprintf fmt "(Cfloat Fpluszero)"

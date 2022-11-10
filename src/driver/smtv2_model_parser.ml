@@ -111,7 +111,7 @@ module FromSexpToModel = struct
 
   let constant_dec s =
     try Scanf.sscanf s "%[^.].%s" (fun s1 s2 -> (s1,s2))
-    with _ -> (s,"0")
+    with _ -> atom_error s "constant_dec"
 
   let constant_dec = function
     | Atom s ->
@@ -130,9 +130,9 @@ module FromSexpToModel = struct
     | Atom s -> (
         try
           let s' = Strings.remove_prefix "#b" s in
-          let v = BigInt.of_string ("0b" ^ s') in
-          let l = String.length s' in
-          (v, l)
+          let bv_value = BigInt.of_string ("0b" ^ s') in
+          let bv_length = String.length s' in
+          { bv_value; bv_length; bv_verbatim = s }
         with _ -> atom_error s "constant_bv_bin")
     | sexp -> error sexp "constant_bv_bin"
 
@@ -140,15 +140,18 @@ module FromSexpToModel = struct
     | Atom s -> (
         try
           let s' = Strings.remove_prefix "#x" s in
-          let v = BigInt.of_string ("0x" ^ s') in
-          let l = String.length s' * 4 in
-          (v, l)
+          let bv_value = BigInt.of_string ("0x" ^ s') in
+          let bv_length = String.length s' * 4 in
+          { bv_value; bv_length; bv_verbatim = s }
         with _ -> atom_error s "constant_bv_hex")
     | sexp -> error sexp "constant_bv_hex"
 
   let constant_bv_dec = function
     | List [ Atom "_"; Atom n; l ] as sexp -> (
-        try (BigInt.of_string (Strings.remove_prefix "bv" n), int l)
+        try
+          let bv_value = BigInt.of_string (Strings.remove_prefix "bv" n) in
+          let bv_length = int l in
+          { bv_value; bv_length; bv_verbatim = string_of_sexp sexp }
         with _ -> error sexp "constant_bv_dec")
     | sexp -> error sexp "constant_bv_dec"
 
@@ -418,6 +421,7 @@ module FromModelToTerm = struct
       | [(_,ty)] -> ty
       | _ -> error "TODO_WIP array sort matches multiple types"
       end
+    | Sroundingmode | Sfloatingpoint _
     | Sbitvec _ | Ssimple _ | Smultiple _ -> matching_sort (sort_equal s)
     | _ -> error "TODO_WIP smt_sort_to_ty"
 
@@ -473,22 +477,91 @@ module FromModelToTerm = struct
         t_var vs
     | _ -> error "TODO_WIP_qual_id_to_vsymbol"
 
+  exception Float_MinusZero
+  exception Float_PlusZero
+  exception Float_NaN
+  exception Float_Infinity
+  exception Float_Error
+
+  let pad_with_zeros width s =
+    let filled =
+      let len = width - String.length s in
+      if len <= 0 then "" else String.make len '0' in
+    filled ^ s
+    
+  let float_of_binary fp =
+    (* (false,"0","0") *)
+    match fp with
+    | Fplusinfinity | Fminusinfinity -> raise Float_Infinity
+    | Fpluszero -> raise Float_PlusZero
+    | Fminuszero -> raise Float_MinusZero
+    | Fnan -> raise Float_NaN
+    | Fnumber {sign; exp; mant} ->
+      let exp_bias = BigInt.pred (BigInt.pow_int_pos 2 (exp.bv_length - 1)) in
+      let exp_max = BigInt.pred (BigInt.pow_int_pos 2 exp.bv_length) in
+      let frac_len = (* Length of the hexadecimal representation (after the ".") *)
+        if mant.bv_length mod 4 = 0
+        then mant.bv_length / 4
+        else (mant.bv_length / 4) + 1 in
+      let is_neg =
+        match BigInt.to_int sign.bv_value with
+        | 0 -> false
+        | 1 -> true
+        | _ -> raise Float_Error
+      in
+      (* Compute exponent (int) and frac (string of hexa) *)
+      let frac =
+        (* The hex value is used after the decimal point. So we need to adjust
+            it to the number of binary elements there are.
+            Example in 32bits: significand is 23 bits, and the hexadecimal
+            representation will have a multiple of 4 bits (ie 24). So, we need to
+            multiply by two to account the difference. *)
+        if Strings.has_prefix "#b" mant.bv_verbatim then
+          let adjust = 4 - (mant.bv_length mod 4) in
+          if adjust = 4 then
+            mant.bv_value (* No adjustment needed *)
+          else
+            BigInt.mul (BigInt.pow_int_pos 2 adjust) mant.bv_value
+        else
+          mant.bv_value in
+      let frac = pad_with_zeros frac_len (Format.sprintf "%x" (BigInt.to_int frac)) in
+      if BigInt.eq exp.bv_value BigInt.zero then (* subnormals and zero *)
+        (* Case for zero *)
+        if BigInt.eq mant.bv_value BigInt.zero then
+          if is_neg then raise Float_MinusZero else raise Float_PlusZero
+        else
+          (* Subnormals *)
+          let hex = Format.asprintf "%t0x0.%sp-%s"
+              (fun fmt -> if is_neg then Pp.string fmt "-")
+              frac (BigInt.to_string exp_bias) in
+          (is_neg, "0", frac, Some (String.concat "" ["-";BigInt.to_string exp_bias]))
+      else if BigInt.eq exp.bv_value exp_max (* infinities and NaN *) then
+        if BigInt.eq mant.bv_value BigInt.zero then
+          raise Float_Infinity
+        else raise Float_NaN
+      else
+        let exp = BigInt.sub exp.bv_value exp_bias in
+        let hex = Format.asprintf "%t0x1.%sp%s"
+            (fun fmt -> if is_neg then Pp.string fmt "-")
+            frac (BigInt.to_string exp) in
+        (is_neg, "1", frac, Some (BigInt.to_string exp))
+
   let constant_to_term env c =
     Debug.dprintf debug "[constant_to_term] c = %a@." print_constant c;
     match c with
     | Cint bigint -> t_const (Constant.int_const bigint) Ty.ty_int
     | Cdecimal (neg,s1,s2) ->
-      t_const (Constant.real_const_from_string ~neg:neg s1 s2) Ty.ty_real
+      t_const (Constant.real_const_from_string ~radix:10 ~neg:neg ~int:s1 ~frac:s2 ~exp:None) Ty.ty_real
     | Cfraction ((neg,s1,s2),(neg',s1',s2')) ->
       begin try
-        let t = t_const (Constant.real_const_from_string ~neg:neg s1 s2) Ty.ty_real in
-        let t' = t_const (Constant.real_const_from_string ~neg:neg' s1' s2') Ty.ty_real in
+        let t = t_const (Constant.real_const_from_string ~radix:10 ~neg:neg ~int:s1 ~frac:s2 ~exp:None) Ty.ty_real in
+        let t' = t_const (Constant.real_const_from_string ~radix:10 ~neg:neg' ~int:s1' ~frac:s2' ~exp:None) Ty.ty_real in
         let th = Env.read_theory env.why3_env ["real"] "Real" in
         let div_ls = Theory.ns_find_ls th.Theory.th_export [Ident.op_infix "/"] in
         t_app div_ls [t;t'] div_ls.ls_value
       with _ -> error "TODO_WIP Cfraction"
       end
-    | Cbitvector (bigint, n) ->
+    | Cbitvector { bv_value=bigint; bv_length=n; _ } ->
       begin try
         let _,ty =
           List.find
@@ -498,7 +571,49 @@ module FromModelToTerm = struct
         t_const (Constant.int_const bigint) ty
       with Not_found -> error "TODO_WIP Cbitvector"
       end
-    | Cfloat _ -> error "TODO_WIP Cfloat"
+    | Cfloat fp ->
+      begin try
+        let sort,ty =
+          List.find
+            (function | (Sfloatingpoint _,_) -> true | _ -> false)
+            env.inferred_types
+        in
+        let float_lib = match sort with
+        | Sfloatingpoint (a,b) -> "Float" ^ (string_of_int (a+b))
+        | _ -> assert false
+        in
+        begin try
+          let (neg,s1,s2,exp) = float_of_binary fp in
+          t_const (Constant.real_const_from_string ~radix:16 ~neg ~int:s1 ~frac:s2 ~exp) ty
+        with
+          | Float_MinusZero ->
+            t_const (Constant.real_const_from_string ~radix:10 ~neg:true ~int:"0" ~frac:"0" ~exp:None) ty
+          | Float_PlusZero ->
+            t_const (Constant.real_const_from_string ~radix:10 ~neg:false ~int:"0" ~frac:"0" ~exp:None) ty
+          | Float_NaN ->
+            let is_nan_ls =
+              try
+                let th = Env.read_theory env.why3_env ["ieee_float"] float_lib in
+                Theory.ns_find_ls th.Theory.th_export ["is_nan"]
+              with _ -> error "TODO_WIP is_nan_ls not found"
+            in
+            let x = create_vsymbol (Ident.id_fresh "x") ty in
+            let f = t_app is_nan_ls [t_var x] None in
+            t_eps_close x f
+          | Float_Infinity ->
+            let is_infinite_ls =
+              try
+                let th = Env.read_theory env.why3_env ["ieee_float"] float_lib in
+                Theory.ns_find_ls th.Theory.th_export ["is_infinite"]
+              with _ -> error "TODO_WIP is_infinite_ls not found"
+            in
+            let x = create_vsymbol (Ident.id_fresh "x") ty in
+            let f = t_app is_infinite_ls [t_var x] None in
+            t_eps_close x f
+          | Float_Error -> error "TODO_WIP Float_Error"
+        end
+      with Not_found -> error "TODO_WIP Cfloat"
+      end
     | Cbool b -> if b then t_true_bool else t_true_bool
     | Cstring str -> t_const (Constant.string_const str) Ty.ty_str
 
@@ -726,9 +841,14 @@ module FromModelToTerm = struct
     )
     | Term.Tlet _ -> t
     | Term.Tcase _ -> t
-    | Term.Teps _ ->
-      let vsl,trig,t' = Term.t_open_lambda t in (* TODO_WIP t_open_bound instead? *)
-      t_lambda vsl trig (eval_term env seen_prover_vars ty_coercions ty_fields t')
+    | Term.Teps tb ->
+      begin match Term.t_open_lambda t with
+      | ([], _, _) ->
+        let vs, t' = Term.t_open_bound tb in
+        t_eps_close vs (eval_term env seen_prover_vars ty_coercions ty_fields t')
+      | (vsl, trig, t') ->
+        t_lambda vsl trig (eval_term env seen_prover_vars ty_coercions ty_fields t')
+      end
     | Term.Tquant (q,tq) ->
       let vsl,trig,t' = t_open_quant tq in
       let t' = eval_term env seen_prover_vars ty_coercions ty_fields t' in

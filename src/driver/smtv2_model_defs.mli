@@ -26,7 +26,11 @@ type sort =
   | Ssimple of identifier
   | Smultiple of identifier * sort list
 
-type constant_bv = BigInt.t * int
+type constant_bv = {
+  bv_value : BigInt.t ;
+  bv_length : int ;
+  bv_verbatim : string
+}
 
 (* the first parameter is [true] if the constant is negative *)
  type constant_real = bool * string * string
