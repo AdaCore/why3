@@ -75,7 +75,8 @@ rule token = parse
         POSITION (Loc.user_position file (int_of_string bline)
                     (int_of_string bchar) (int_of_string eline) (int_of_string echar)) }
   | "[@" space* ([^ ' ' '\n' ']']+ (' '+ [^ ' ' '\n' ']']+)* as lbl) space* ']'
-      { ATTRIBUTE lbl }
+      { Lexlib.adjust_pos_utf8 lexbuf lbl;
+        ATTRIBUTE lbl }
   | '\n'
       { Lexing.new_line lexbuf; token lexbuf }
   | space+
