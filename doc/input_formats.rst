@@ -277,7 +277,7 @@ Yet, they can be axiomatized, using toplevel ``assume`` statements.
        : | "old" "(" `term` ")"
        : | "at" "(" `term` "," identifier ")"
        : | "-" `term`
-       : | `term` ( "->" | "<->" | "or" | "and" ) `term`
+       : | `term` ( "->" | "<->" | "or" | "and" | "by" | "so" ) `term`
        : | `term` ( "==" | "!=" | "<" | "<=" | ">" | ">=" ) `term`
        : | `term` ( "+" | "-" | "*" | "//" | "%" ) `term`
        : | "if" `term` "then" `term` "else `term`
