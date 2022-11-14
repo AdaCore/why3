@@ -128,7 +128,7 @@ module Python
     ensures  { l[len (old l)] = v }
     ensures  { forall i. 0 <= i < len (old l) -> l[i] = (old l)[i] }
 
-  val add_list (a1: list 'a) (a2: list 'a) : list 'a
+  val function add_list (a1: list 'a) (a2: list 'a) : list 'a
     ensures { len result = len a1 + len a2 }
     ensures { forall i. 0 <= i < len a1 -> result[i] = a1[i] }
     ensures { forall i. len a1 <= i < len result -> result[i] = a2[i-len a1] }
