@@ -1,6 +1,8 @@
 
 from random import randint
 
+#@ lemma G: (1==1  so 2==2) and (2==2 by 1==1)
+
 def f(x):
   #@ ensures result > x
   return x+1
@@ -85,6 +87,6 @@ n = len([0] + [1])
 #@ assert n == 2
 
 # Local Variables:
-# compile-command: "make -C ../.. && why3 prove -P alt-ergo test.py"
+# compile-command: "make -C .. -j2 && why3 prove -P alt-ergo test.py"
 # End:
 

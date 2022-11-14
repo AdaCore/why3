@@ -25,6 +25,9 @@ API
 MLCFG input language
   * attributes on the body of an MLCFG function are now supported
 
+Python language
+  * added `by` and `so` connectives in predicates
+
 Provers
   * support for CVC5 1.0.0 (released April 6, 2022)
   * support for Alt-Ergo 2.4.2 (released August 1, 2022)

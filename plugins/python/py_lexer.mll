@@ -32,6 +32,7 @@
        (* annotations *)
        "forall", FORALL; "exists", EXISTS; "then", THEN; "let", LET;
        "old", OLD; "at", AT; "variant", VARIANT; "call", CALL;
+       "by", BY; "so", SO;
       ];
    fun s -> try Hashtbl.find h s with Not_found -> IDENT s
 
