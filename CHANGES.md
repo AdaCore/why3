@@ -28,6 +28,7 @@ MLCFG input language
 Python language
   * added `by` and `so` connectives in predicates
   * fixed overloading of `+` in Python code
+  * list concatenation in logic with `add_list`
 
 Provers
   * support for CVC5 1.0.0 (released April 6, 2022)
