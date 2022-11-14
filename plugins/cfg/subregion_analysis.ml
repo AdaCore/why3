@@ -177,6 +177,17 @@ let rec analyze muc (st : FreshNames.t) (regions : domain) (e : expr) : domain_e
   let d, e, r = inner muc st regions e in
   (d, e_attr_push attrs e, r)
 
+and analyze_assign muc st regions (v, f, t) : domain * (_ * _ * _) =
+  let t_val = find regions t (Variable (FreshNames.pv2 st t t)) in
+  let v_val = find regions v (Variable (FreshNames.pv2 st v v)) in
+
+
+  let cty' = cty_apply f.rs_cty [ FreshNames.pv2 st v v ] [] t.pv_ity in
+  let e = (e_var (FreshNames.pv2 st v v), f, e_var (FreshNames.pv2 st t t)) in
+  let v_val' = update muc.muc_known v_val (fd_of_rs f) cty' t_val in
+  let regions = Mpv.add v v_val' regions in
+  regions, e
+
 and inner muc st regions e =
   match e.e_node with
   | Evar v -> (Bot, e_var (FreshNames.pv st v v), regions)
@@ -191,18 +202,10 @@ and inner muc st regions e =
   | Eexec (ce, _) ->
       let dom, e = analyze_cexp muc st regions ce in
       (dom, e_exec e, regions)
-  | Eassign [ (v, f, t) ] ->
-      let t_val = find regions t (Variable (FreshNames.pv2 st t t)) in
-      let v_val = find regions v (Variable (FreshNames.pv2 st v v)) in
+  | Eassign es ->
+    let (regions), es = List.fold_left_map (fun regions asgn -> analyze_assign muc st regions asgn) regions es in
 
-
-      let cty' = cty_apply f.rs_cty [ FreshNames.pv2 st v v ] [] t.pv_ity in
-      let e = e_assign [ (e_var (FreshNames.pv2 st v v), f, e_var (FreshNames.pv2 st t t)) ] in
-
-      let v_val' = update muc.muc_known v_val (fd_of_rs f) cty' t_val in
-      let regions = Mpv.add v v_val' regions in
-      (Bot, e, regions)
-  | Eassign _ -> assert false
+    Bot, e_assign es, regions
   | Eif (s, i, e) ->
       let _, s, regions = analyze muc st regions s in
 
@@ -311,7 +314,55 @@ and inner muc st regions e =
       let loop = List.fold_left (fun loop ld -> e_let ld loop) loop lets in
 
       (Bot, loop, regions)
-  | Efor _ -> assert false
+  | Efor (ix, (l, dir, u), iix, invs, body) ->
+      let invs =
+        List.map
+          (fun i ->
+            t_v_map (fun v -> t_var (FreshNames.pv st (restore_pv v) (restore_pv v)).pv_vs) i)
+          invs
+      in
+      let _, body, body_regions = analyze muc st Mpv.empty body in
+
+      (* Bind all the mutated variables *)
+      let old_vals =
+        List.map
+          (fun k ->
+            let k = FreshNames.pv st k k in
+            let_var (Ident.id_clone k.pv_vs.vs_name) ~ghost:true (e_pure (t_var k.pv_vs)))
+          (Mpv.keys body_regions)
+      in
+      let lets, vars = List.split old_vals in
+
+      let eqs =
+        List.fold_right
+          (fun (k, v) acc -> generate_equality muc.muc_known (Variable k) v (fun k -> k) @ acc)
+          (List.combine vars (Mpv.values body_regions))
+          []
+      in
+      let regions = merge_domains muc.muc_known regions body_regions in
+
+      let body =
+        List.fold_left
+          (fun body eq ->
+            let ld, _ = let_var (Ident.id_fresh "_") (e_assert Assume eq) in
+            e_let ld body)
+          body eqs
+      in
+
+      let loop = e_for ix (e_var (FreshNames.pv st l l)) dir (e_var (FreshNames.pv st u u)) iix invs body in
+
+      let loop =
+        List.fold_left
+          (fun loop eq ->
+            let ld, _ = let_var (Ident.id_fresh "_") loop in
+            e_let ld (e_assert Assume eq))
+          loop eqs
+      in
+      let loop = List.fold_left (fun loop ld -> e_let ld loop) loop lets in
+
+
+
+      (Bot, loop, regions)
   | Eraise (x, inner) ->
       let _, e', regions = analyze muc st regions inner in
       (Bot, e_raise x e' e.e_ity, regions)
