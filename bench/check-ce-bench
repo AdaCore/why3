@@ -85,6 +85,7 @@ run () {
   fi
   ($dir/../bin/why3"$suffix" prove -a split_vc -P $prover\
       --stepslimit=$steps --timelimit=10 \
+      --rac-steplimit=$steps --rac-timelimit=10 \
       --check-ce --rac-prover="$1" --ce-log-verbosity=5 \
       --library="$2" "${file_path}.mlw" \
       --debug=check-ce-categorization${debug_vc_sp} \
