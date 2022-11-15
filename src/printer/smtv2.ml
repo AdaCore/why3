@@ -28,17 +28,19 @@ let debug = Debug.register_info_flag "smtv2_printer"
 let debug_incremental = Debug.register_info_flag "force_incremental"
     ~desc:"Force@ incremental@ mode@ for@ smtv2@ provers"
 
-(** SMTLIB tokens taken from CVC4: src/parser/smt2/{Smt2.g,smt2.cpp} *)
+(** SMTLIB tokens taken from CVC4/CVC5: src/parser/smt2/{Smt2.g,smt2.cpp} *)
 let ident_printer () =
   let bls =
     [(* Base SMT-LIB commands, see page 43 *)
-      "assert"; "check-sat"; "check-sat-assuming"; "declare-const";
+      "assert"; "check-sat"; "check-sat-assuming";
+      "declare-const"; "define-const";
       "declare-datatype"; "declare-datatypes"; "declare-fun"; "declare-sort";
       "define-fun"; "define-fun-rec"; "define-funs-rec"; "define-sort";
       "echo"; "exit";
-      "get-assignment"; "get-assertions";
+      "get-assignment"; "get-assertions"; "get-difficulty";
       "get-info"; "get-model"; "get-option"; "get-proof";
       "get-unsat-assumptions"; "get-unsat-core"; "get-value";
+      "get-learned-literals";
       "pop"; "push";
       "reset"; "reset-assertions";
       "set-info"; "set-logic";  "set-option";
@@ -51,7 +53,13 @@ let ident_printer () =
       "assert-rewrite";
       "assert-reduction"; "assert-propagation"; "declare-sorts";
       "declare-funs"; "declare-preds"; "define";
-      "simplify";
+      "simplify"; "include";
+      "declare-codatatype"; "declare-codatatypes";
+      "block-model"; "block-model-values";
+      "get-qe"; "get-qe-disjunct";
+      "get-abduct"; "get-abduct-next";
+      "get-interpolant"; "get-interpolant-next";
+      "declare-heap"; "declare-pool";
 
       (* operators, including theory symbols *)
       "="; "=>";
@@ -65,13 +73,29 @@ let ident_printer () =
       "concat"; "bvnot"; "bvand"; "bvor"; "bvneg"; "bvadd"; "bvmul"; "bvudiv";
       "bvurem"; "bvshl"; "bvlshr"; "bvult"; "bvnand"; "bvnor"; "bvxor"; "bvxnor";
       "bvcomp"; "bvsub"; "bvsdiv"; "bvsrem"; "bvsmod"; "bvashr"; "bvule";
-      "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge"; "rotate_left";
-      "rotate_right"; "bvredor"; "bvredand";
-      "bv2nat";
+      "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge";
+      "rotate_left"; "rotate_right";
+      "bvredor"; "bvredand";
+      "bvuaddo"; "bvsaddo";
+      "bvumulo"; "bvsmulo";
+      "bvusubo"; "bvssubo";
+      "bvsdivo";
+      "zero_extend"; "sign_extend";
 
       "sqrt"; "sin"; "cos"; "tan"; "asin"; "acos"; "atan"; "pi";
       "exp"; "csc"; "sec"; "cot";
       "arcsin"; "arccos"; "arctan"; "arccsc"; "arcsec"; "arccot";
+
+      (* tuple operators *)
+      "tuple";
+      "tuple.select"; "tuple.update"; "tuple.project";
+
+      (* bags *)
+      "bag";
+      "table.project"; "table.aggr"; "table.join"; "table.group";
+
+      (* sets *)
+      "rel.group"; "rel.aggr"; "rel.project";
 
      (* the new floating point theory - updated to the 2014-05-27 standard *)
       "FloatingPoint"; "fp";
@@ -91,6 +115,7 @@ let ident_printer () =
       "fp.isNegative"; "fp.isPositive";
       "to_fp"; "to_fp_unsigned";
       "fp.to_ubv"; "fp.to_sbv"; "fp.to_real";
+      "to_fp_bv"; "to_fp_fp"; "to_fp_real"; "to_fp_signed";
 
      (* the new proposed string theory *)
       "String"; "str.<"; "str.<=";
@@ -99,18 +124,38 @@ let ident_printer () =
       "str.to.int"; "u16.to.str"; "str.to.u16"; "u32.to.str"; "str.to.u32";
       "str.in.re"; "str.to.re";
       "str.replace"; "str.tolower"; "str.toupper"; "str.rev";
+      "str.to_lower"; "str.to_upper";
       "str.from_code"; "str.is_digit"; "str.from_int"; "str.to_int";
-      "str.in_re"; "str.to_code"; "str.replace_all";
+      "str.in_re"; "str.to_re"; "str.to_code"; "str.replace_all";
+      "str.replace_re"; "str.replace_re_all";
+      "str.indexof_re"; "str.update";
       "int.to.str"; "str.to.int"; "str.code"; "str.replaceall";
 
+      (* sequences *)
+      "seq.++";
+      "seq.len";
+      "seq.extract";
+      "seq.update";
+      "seq.at";
+      "seq.contains";
+      "seq.indexof";
+      "seq.replace";
+      "seq.prefixof";
+      "seq.suffixof";
+      "seq.rev";
+      "seq.replace_all";
+      "seq.unit";
+      "seq.nth";
+
       "re.++"; "re.union"; "re.inter";
-      "re.*"; "re.+"; "re.opt"; "re.range"; "re.loop";
+      "re.*"; "re.+"; "re.opt"; "re.^"; "re.range"; "re.loop";
       "re.comp"; "re.diff";
 
      (* the new proposed set theory *)
       "union"; "intersection"; "setminus"; "subset"; "member";
       "singleton"; "insert"; "card"; "complement"; "join";
       "product"; "transpose"; "tclosure";
+      "set.comprehension";
 
      (* built-in sorts *)
       "Bool"; "Int"; "Real"; "BitVec"; "Array";
@@ -120,14 +165,14 @@ let ident_printer () =
       "true"; "false";
       "const";
       "abs";
-      "BitVec"; "extract"; "bv2nat"; "nat2bv";
+      "BitVec"; "extract"; "repeat"; "bv2nat"; "nat2bv";
 
      (* From Z3 *)
       "map"; "bv"; "default";
       "difference";
 
-     (* From CVC4 *)
-      "char"; "choose";
+     (* From CVC4 / CVC5 *)
+      "char"; "choose"; "is"; "update";
 
      (* Counterexamples specific keywords *)
       "lambda"; "LAMBDA"; "model";
