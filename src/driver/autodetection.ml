@@ -744,7 +744,11 @@ let find_provers data =
               Opt.fold (fun acc x -> Mstr.add exec_name (name, x) acc) acc r
           ) acc binaries
       ) binaries Mstr.empty in
-  List.map (fun (path, (name, version)) -> (path, name, version)) (Mstr.bindings provers)
+  let provers = Mstr.bindings provers in
+  let provers = List.map (fun (path, (name, version)) -> (path, name, version)) provers in
+  List.sort (fun (_, n1, v1) (_, n2, v2) ->
+      Stdlib.compare (n1, Util.split_version v1) (n2, Util.split_version v2))
+    provers
 
 let remove_auto_provers config =
   Partial.remove_auto config

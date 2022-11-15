@@ -44,7 +44,8 @@ val find_prover : Prover_autodetection_data.t -> string -> string -> string opti
     according to an entry about [name] in [data] *)
 
 val find_provers : Prover_autodetection_data.t -> (string * string * string) list
-(** Detect the provers and return their path, name, and versions *)
+(** Detect the provers and return their path, name, and versions.
+    The resulting list is sorted by names and versions. *)
 
 val remove_auto_provers: Whyconf.config -> Whyconf.config
 (** Remove all the non-manual provers from the configuration *)
