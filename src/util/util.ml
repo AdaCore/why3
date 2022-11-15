@@ -137,3 +137,20 @@ let get_home_dir () =
     (* try windows env var *)
     try Sys.getenv "USERPROFILE"
     with Not_found -> ""
+
+let split_version s =
+  let l = String.length s in
+  let rec aux_num i t v =
+    if i >= l then [t, v]
+    else
+      match s.[i] with
+      | '0' .. '9' as c -> aux_num (i + 1) t (v * 10 + Char.code c - Char.code '0')
+      | _ -> (t, v) :: aux_str (i + 1) i
+  and aux_str i j =
+    if i >= l then [String.sub s j (i - j), 0]
+    else
+      match s.[i] with
+      | '0' .. '9' as c ->
+          aux_num (i + 1) (String.sub s j (i - j)) (Char.code c - Char.code '0')
+      | _ -> aux_str (i + 1) j in
+  aux_str 0 0
