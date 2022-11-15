@@ -85,6 +85,7 @@ run () {
   fi
   ($dir/../bin/why3"$suffix" prove -a split_vc -P $prover\
       --stepslimit=$steps --timelimit=10 \
+      --rac-steplimit=$steps --rac-timelimit=10 \
       --check-ce --rac-prover="$1" --ce-log-verbosity=5 \
       --library="$2" "${file_path}.mlw" \
       --debug=check-ce-categorization${debug_vc_sp} \
@@ -120,50 +121,54 @@ start=$(date +%s)
 for file in $files; do
   filedir=`dirname $file`
   filebase=`basename $file .mlw`
-  printf "Running provers on $filedir/$filebase.mlw\n";
-  cvc4steps=150000
-  cvc5steps=150000
-  z3steps=3000000
-  case "$filebase" in
-    "640_no_loc_failure")
-      z3steps=500000
-      ;;
-    "657")
-      z3steps=500000
-      ;;
-    "668_projection")
-      z3steps=500000
-      ;;
-    "bv32")
-      z3steps=2500000
-      ;;
-    "bv32_toBig")
-      z3steps=100000
-      ;;
-    "floats")
-      z3steps=400000
-      ;;
-    "int_overflow")
-      z3steps=400000
-      ;;
-    "maps_poly")
-      cvc5steps=300000
-      ;;
-    "strings")
-      z3steps=3000
-      ;;
-    "threshold")
-      z3steps=500000
-      ;;
-    *)
-      ;;
-  esac
-  run CVC4,1.8    $filedir $filebase true  $cvc4steps
-  run CVC4,1.8    $filedir $filebase false $cvc4steps
-  run CVC5,1.0.0  $filedir $filebase true  $cvc5steps
-  run CVC5,1.0.0  $filedir $filebase false $cvc5steps
-  run Z3,4.8.10   $filedir $filebase true  $z3steps
-  run Z3,4.8.10   $filedir $filebase false $z3steps
+  if [ "$filebase" == "maps_poly" ] ; then
+    echo "Skipping tests on $filedir/$filebase.mlw";
+  else
+    printf "Running provers on $filedir/$filebase.mlw\n";
+    cvc4steps=150000
+    cvc5steps=150000
+    z3steps=3000000
+    case "$filebase" in
+      "640_no_loc_failure")
+        z3steps=500000
+        ;;
+      "657")
+        z3steps=500000
+        ;;
+      "668_projection")
+        z3steps=500000
+        ;;
+      "bv32")
+        z3steps=2500000
+        ;;
+      "bv32_toBig")
+        z3steps=100000
+        ;;
+      "floats")
+        z3steps=400000
+        ;;
+      "int_overflow")
+        z3steps=400000
+        ;;
+      "maps_poly")
+        cvc5steps=300000
+        ;;
+      "strings")
+        z3steps=3000
+        ;;
+      "threshold")
+        z3steps=500000
+        ;;
+      *)
+        ;;
+    esac
+    run CVC4,1.8    $filedir $filebase true  $cvc4steps
+    run CVC4,1.8    $filedir $filebase false $cvc4steps
+    run CVC5,1.0.0  $filedir $filebase true  $cvc5steps
+    run CVC5,1.0.0  $filedir $filebase false $cvc5steps
+    run Z3,4.8.10   $filedir $filebase true  $z3steps
+    run Z3,4.8.10   $filedir $filebase false $z3steps
+  fi
 done
 end=$(date +%s)
 
