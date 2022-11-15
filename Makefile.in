@@ -140,9 +140,6 @@ OLINKFLAGS = -linkall $(EXTCMXA)
 BLINKFLAGS = -linkall $(EXTCMA)
 endif
 
-ifeq (@enable_profiling@,yes)
-OFLAGS += -g -p
-endif
 
 # see http://caml.inria.fr/mantis/view.php?id=4991
 CMIHACK = -intf-suffix .cmi
