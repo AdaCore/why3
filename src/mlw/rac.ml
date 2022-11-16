@@ -357,7 +357,7 @@ module Why = struct
           Some false
         else (
           List.iter (Debug.dprintf debug_rac_check_sat "- %a@." print_tdecl)
-            (Lists.map_filter (Opt.map (fun t -> t.Task.task_decl)) tasks);
+            (List.filter_map (Opt.map (fun t -> t.Task.task_decl)) tasks);
           None )
 
   (** Check the validiy of a term that has been encoded in a task by dispatching it to a prover *)
