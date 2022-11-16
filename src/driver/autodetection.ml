@@ -195,25 +195,23 @@ module Partial = struct
 
   let section_name = "partial_prover"
 
-  let load_one acc section =
+  let load_one section =
     try
       let name = get_string section "name" in
       let path = get_string section "path" in
       let version = get_string section "version" in
       let shortcut = get_stringo section "shortcut" in
       let manual = get_bool ~default:false section "manual" in
-      { name; path; version; shortcut; manual } :: acc
+      Some { name; path; version; shortcut; manual }
     with MissingField s ->
       Loc.warning "cannot load a %s section: missing field '%s'@." section_name s;
-      acc
+      None
 
   let load_rc rc =
-    List.fold_left load_one
-      [] (get_simple_family rc section_name)
+    List.filter_map load_one (get_simple_family rc section_name)
 
   let load rc =
-    List.fold_left load_one
-      [] (Whyconf.User.get_simple_family rc section_name)
+    List.filter_map load_one (Whyconf.User.get_simple_family rc section_name)
 
   let set_one prover =
     let section = empty_section in
@@ -230,10 +228,13 @@ module Partial = struct
 
   let add rc m =
     let l =
-      List.map (fun x ->
-          if x.shortcut = m.shortcut then {x with shortcut = None} else x
-        ) (load rc) in
-    set rc (m::l)
+      List.fold_right (fun x acc ->
+          let x =
+            if x.shortcut = m.shortcut then { x with shortcut = None }
+            else x in
+          x :: acc
+        ) (load rc) [m] in
+    set rc l
 
     let remove_auto rc =
       let l = List.filter (fun x -> x.manual) (load rc) in
@@ -747,8 +748,10 @@ let find_provers data =
   let provers = Mstr.bindings provers in
   let provers = List.map (fun (path, (name, version)) -> (path, name, version)) provers in
   List.sort (fun (_, n1, v1) (_, n2, v2) ->
-      Stdlib.compare (n1, Util.split_version v1) (n2, Util.split_version v2))
-    provers
+      let c = String.compare n1 n2 in
+      if c <> 0 then c else
+      Stdlib.compare (Util.split_version v2) (Util.split_version v1)
+    ) provers
 
 let remove_auto_provers config =
   Partial.remove_auto config
