@@ -277,7 +277,7 @@ let mk_closure crcmap loc ls =
   let mk_v i _ =
     Some (id_user ("y" ^ string_of_int i) loc), dty_fresh (), None in
   let mk_t (id, dty, _) = mk (DTvar ((Opt.get id).pre_name, dty)) in
-  let vl = Lists.mapi mk_v ls.ls_args in
+  let vl = List.mapi mk_v ls.ls_args in
   DTquant (DTlambda, vl, [], mk (DTapp (ls, List.map mk_t vl)))
 
 (* handle auto-dereference in logical terms *)

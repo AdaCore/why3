@@ -111,20 +111,6 @@ let rec drop_while p = function
   | a::l when p a -> drop_while p l
   | l -> l
 
-let iteri f l =
-  let rec iter i = function
-    | [] -> ()
-    | x :: l -> f i x; iter (i + 1) l
-  in
-  iter 0 l
-
-let mapi f l =
-  let rec map i = function
-    | [] -> []
-    | x :: l -> let v = f i x in v :: map (i + 1) l
-  in
-  map 0 l
-
 let fold_lefti f acc l =
   let rec fold_left acc i = function
     | [] -> acc
