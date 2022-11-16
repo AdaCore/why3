@@ -962,22 +962,22 @@ module User = struct
      provers_upgrade_policy = m;
     }
 
-  let get_section config name = assert (name <> "main");
+  let get_section config name =
     get_section config.user_rc name
 
-  let get_simple_family config name = assert (name <> "prover");
+  let get_simple_family config name =
     get_simple_family config.user_rc name
 
-  let get_family config name = assert (name <> "prover");
+  let get_family config name =
     get_family config.user_rc name
 
-  let set_section config name section = assert (name <> "main");
+  let set_section config name section =
     {config with user_rc = set_section config.user_rc name section}
 
   let set_simple_family config name section =
     {config with user_rc = set_simple_family config.user_rc name section}
 
-  let set_family config name section = assert (name <> "prover");
+  let set_family config name section =
     {config with user_rc = set_family config.user_rc name section}
 
 end
