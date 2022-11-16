@@ -1632,7 +1632,7 @@ and merge_trans env old_s new_s new_goal_id old_tr_id =
     | e when not (Debug.test_flag Debug.stack_trace) ->
         (* Non fatal exception are silently ignored *)
         if is_fatal e then
-        Warning.emit "FATAL unexpected exception during application of %s: %a@."
+        Warning.emit "unexpected exception during application of %s: %a@. Please run gnatprove with option --clean.@."
           old_tr.transf_name Exn_printer.exn_printer e;
         (* Notify the user but still allow her to load why3 *)
         None
