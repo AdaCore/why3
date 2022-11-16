@@ -1548,7 +1548,7 @@ let rec sp_expr env k rdm dst = match k with
   | Kval (vl, f) ->
       let rd = Mint.find 0 rdm in
       let lost v = if Spv.mem v rd then None else Some v.pv_vs in
-      let sp = sp_exists (Lists.map_filter lost vl) f in
+      let sp = sp_exists (List.filter_map lost vl) f in
       let rd = List.fold_right Spv.remove vl (t_freepvs rd sp) in
       t_true, Mint.singleton 0 (sp, Mpv.empty), rd
   | Kcut f ->

@@ -1120,7 +1120,7 @@ let clone_type_decl inst cl tdl kn =
     clone_ity cl ity in
 
   Mits.iter (visit Sits.empty) def;
-  Lists.map_filter (fun d -> Hits.find htd d.itd_its) tdl,
+  List.filter_map (fun d -> Hits.find htd d.itd_its) tdl,
   !vcs
 
 let add_vc uc (its, f) =
