@@ -1,0 +1,164 @@
+(** Why3 driver for dreal 21.4.06.2* *)
+
+prelude ";; produced by dreal.drv ;;"
+
+printer "smtv2"
+
+filename "%f-%t-%g.smt2"
+unknown "delta-sat with delta = .*" ""
+time "why3cpulimit time : %s s"
+valid "^unsat$"
+
+transformation "inline_trivial"
+transformation "eliminate_definition"
+transformation "eliminate_builtin"
+transformation "eliminate_inductive"
+transformation "eliminate_algebraic"
+transformation "eliminate_literal"
+transformation "eliminate_epsilon"
+transformation "simplify_formula"
+transformation "simplify_trivial_quantification"
+transformation "encoding_smt"
+transformation "simplify_computations"
+transformation "introduce_premises"
+transformation "instantiate_predicate"
+transformation "keep_only_arithmetic"
+transformation "abstract_unknown_lsymbols"
+transformation "eliminate_unknown_lsymbols"
+transformation "eliminate_unknown_types"
+
+prelude "(set-logic QF_NRA)"
+
+theory BuiltIn
+  syntax type int   "Int"
+  syntax type real  "Real"
+  syntax predicate (=)  "(= %1 %2)"
+
+  meta "encoding:kept" type int
+  meta "encoding:ignore_polymorphism_ls" predicate (=)
+end
+
+theory int.Int
+  syntax function zero "0"
+  syntax function one  "1"
+
+  syntax function (+)  "(+ %1 %2)"
+  syntax function (-)  "(- %1 %2)"
+  syntax function (*)  "(* %1 %2)"
+  syntax function (-_) "(- %1)"
+
+  syntax predicate (<=) "(<= %1 %2)"
+  syntax predicate (<)  "(< %1 %2)"
+  syntax predicate (>=) "(>= %1 %2)"
+  syntax predicate (>)  "(> %1 %2)"
+
+  remove allprops
+end
+
+theory int.Abs
+  syntax function abs "(ite (>= %1 0.0) %1 (- %1))"
+
+  remove allprops
+end
+
+
+theory real.Real
+  syntax function zero "0.0"
+  syntax function one  "1.0"
+
+  syntax function (+)  "(+ %1 %2)"
+  syntax function (-)  "(- %1 %2)"
+  syntax function (*)  "(* %1 %2)"
+  syntax function (/)  "(/ %1 %2)"
+  syntax function (-_) "(- %1)"
+  syntax function inv  "(/ 1.0 %1)"
+
+  syntax predicate (<=) "(<= %1 %2)"
+  syntax predicate (<)  "(< %1 %2)"
+  syntax predicate (>=) "(>= %1 %2)"
+  syntax predicate (>)  "(> %1 %2)"
+
+  remove allprops
+
+  meta "encoding:kept" type real
+end
+
+theory real.Abs
+  syntax function abs "(ite (>= %1 0.0) %1 (- %1))"
+
+  remove allprops
+end
+
+theory real.MinMax
+  syntax function min "(min %1 %2)"
+  syntax function max "(max %1 %2)"
+  remove allprops
+end
+
+theory real.FromInt
+  remove allprops
+end
+
+theory real.Truncate
+  syntax function truncate "(ite (>= %1 0.0) \
+                                 (to_int %1) \
+                                 (- (to_int (- %1))))"
+  syntax function floor "(to_int %1)"
+  syntax function ceil "(- (to_int (- %1)))"
+  remove allprops
+end
+
+theory real.Square
+  syntax function sqrt "(sqrt %1)"
+  syntax function sqr "(pow %1 2)"
+  remove allprops
+end
+
+theory real.ExpLog
+  syntax function exp "(exp %1)"
+  syntax function log "(log %1)"
+  remove allprops
+end
+
+theory real.PowerReal
+  syntax function pow "(^ %1 %2)"
+  remove allprops
+end
+
+theory real.Trigonometry
+  syntax function cos "(cos %1)"
+  syntax function sin "(sin %1)"
+  syntax function tan "(tan %1)"
+  syntax function atan "(atan %1)"
+
+  remove prop Pythagorean_identity
+  remove prop Cos_le_one
+  remove prop Sin_le_one
+  remove prop Cos_0
+  remove prop Sin_0
+  remove prop Cos_neg
+  remove prop Sin_neg
+  remove prop Cos_sum
+  remove prop Sin_sum
+  remove prop Tan_atan
+end
+
+theory real.Hyperbolic
+  syntax function cosh "(cosh %1)"
+  syntax function sinh "(sinh %1)"
+  syntax function tanh "(tanh %1)"
+end
+
+theory ieee_float.GenericFloat
+  remove allprops
+end
+
+theory ieee_float.Float64
+  remove prop max_int_def
+  remove prop max_real_def
+end
+
+theory bv.Pow2int
+  remove allprops
+  remove allprops
+end
