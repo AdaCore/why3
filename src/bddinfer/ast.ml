@@ -214,6 +214,7 @@ type statement_node =
     | Sassume of condition
     | Shavoc of Abstract.why_env * condition
     | Sletin of Abstract.why_var * Abstract.var_value * expression * statement
+    | Sbreak
 
 and statement = {
     stmt_tag : string;
@@ -286,6 +287,8 @@ let s_let_in tag ty v e s =
   let av = fresh_var ty in
   mk_stmt tag (Sletin(v,av,e,s))
 
+let s_break tag  =
+  mk_stmt tag Sbreak
 
 
 type fun_kind =
@@ -477,6 +480,7 @@ let rec print_statement_node fmt s =
   | Sletin(v,_,e,s) ->
      fprintf fmt "@[<hv 0>let @[<hv 0>%a =@ @[%a@]@]@ in@ @[%a@]@ endlet@]"
        Abstract.print_var v print_expression e print_statement s
+  | Sbreak -> fprintf fmt "break"
 
 and print_statement fmt s =
   match s.stmt_tag with

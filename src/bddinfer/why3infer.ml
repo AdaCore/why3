@@ -444,21 +444,20 @@ let p_expr_bool_operator env op pv1 pv2 =
 let rec mlw_expr_to_why1_cond env e =
   let open Expr in
   let env, c' =
-  match e.e_node with
-  | Evar pv ->
-     let env,v = mlw_pv_to_why1_expr env pv in
-     env, atomic_cond (c_is_true v)
-  | Econst _ ->
+    try
+      if is_type_bool e.e_ity then
+        let env, t = mlw_expr_to_why1_expr env e in
+        env, atomic_cond (c_is_true t)
+      else raise NotExpression
+    with NotExpression ->
+    match e.e_node with
+    | Evar _pv ->
+      unsupported "mlw_expr_to_why1_cond: Evar"
+    | Econst _ ->
       unsupported "mlw_expr_to_why1_cond: Econst"
-  | Eexec(cexp,_cty) ->
+    | Eexec(cexp,_cty) ->
      begin match cexp.c_node with
      (* FIXME do not match on rs names *)
-     | Capp(rs, [pv]) when rs.rs_name.Ident.id_string = "contents" ->
-        let env,v = mlw_pv_to_why1_expr env pv in
-        env, atomic_cond (c_is_true v)
-     | Capp(rs, [pv]) when rs.rs_name.Ident.id_string = "prefix !" ->
-        let env,v = mlw_pv_to_why1_expr env pv in
-        env, atomic_cond (c_is_true v)
      | Capp(rs,[pv1;pv2]) when rs.rs_name.Ident.id_string = "infix =" ->
         begin
           match type_of pv1.Ity.pv_ity with
@@ -501,13 +500,8 @@ let rec mlw_expr_to_why1_cond env e =
      else
        unsupported "mlw_expr_to_why1_cond: local let on type `%a`" Ity.print_ity pv.Ity.pv_ity
    | Eif(e1,e2,e3) ->
-      if is_type_bool e2.e_ity && is_type_bool e3.e_ity then
-        try
-            let env, c = mlw_expr_to_why1_expr env e
-        in
-        env, atomic_cond (c_is_true c)
-        with NotExpression ->
-          let env, e1 = mlw_expr_to_why1_cond env e1 in
+     if is_type_bool e2.e_ity && is_type_bool e3.e_ity then
+     let env, e1 = mlw_expr_to_why1_cond env e1 in
           let env, e2 = mlw_expr_to_why1_cond env e2 in
           let env, e3 = mlw_expr_to_why1_cond env e3 in
           env, ternary_condition e1 e2 e3
@@ -620,6 +614,9 @@ let rec mlw_expr_to_why1_stmt env vars e =
      | Capp(rs, [_pv]) when rs.rs_name.Ident.id_string = "prefix !" ->
         (* FIXME: we assume it is the returned value, we just ignore it *)
         env, vars, s_block tag []
+     | Capp(rs, [_pv]) when rs.rs_name.Ident.id_string = "contents" ->
+        (* FIXME: we assume it is the returned value, we just ignore it *)
+        env, vars, s_block tag []
      | Capp(rs, [pv1;pv2]) when rs.rs_name.Ident.id_string = "infix :=" ->
         let is_ref,ty = type_of pv1.Ity.pv_ity in
         assert is_ref;
@@ -719,8 +716,6 @@ let rec mlw_expr_to_why1_stmt env vars e =
      let env,vars,s1 = mlw_expr_to_why1_stmt env vars e2 in
      let env,vars,s2 = mlw_expr_to_why1_stmt env vars e3 in
      env,vars,s_ite tag c s1 s2
-  | Ematch  _ (* expr * reg_branch list * exn_branch Mxs.t *) ->
-     unsupported "mlw_expr_to_why1_stmt: Ematch"
   | Ewhile(cond,invs,_vars,body) ->
      let tag = record_loop tag e in
      let env, c = mlw_expr_to_why1_cond env cond in
@@ -734,10 +729,6 @@ let rec mlw_expr_to_why1_stmt env vars e =
      env,vars,s_while tag c i b
   | Efor    _ (* pvsymbol * for_bounds * pvsymbol * invariant list * expr *) ->
      unsupported "mlw_expr_to_why1_stmt: Efor"
-  | Eraise  _ (* xsymbol * expr *) ->
-     unsupported "mlw_expr_to_why1_stmt: Eraise"
-  | Eexn    _ (* xsymbol * expr *) ->
-     unsupported "mlw_expr_to_why1_stmt: Eexn"
   | Eassert(Assert,t) ->
      let env, c = mlw_term_to_why1_cond env t in
      env,vars,s_assert tag c
@@ -745,7 +736,32 @@ let rec mlw_expr_to_why1_stmt env vars e =
      let env, c = mlw_term_to_why1_cond env t in
      env,vars,s_assume tag c
   | Eassert(_,_t) ->
-     unsupported "mlw_expr_to_why1_stmt: Eassert"
+    unsupported "mlw_expr_to_why1_stmt: Eassert"
+  (* ad-hoc support for "break" *)
+  | Eraise(xs, _e1) when xs.xs_name.id_string = "'Break" ->
+     env, vars, s_break tag
+  | Eexn(xs, e1) when xs.xs_name.id_string = "'Break" ->
+    let open Ity in
+    begin
+      match e1.e_node with
+      | Ematch(e2,[],excs) ->
+        begin
+          match Mxs.bindings excs with
+          | [xss,_] when xs_equal xss xs ->
+            mlw_expr_to_why1_stmt env vars e2
+          | _ ->
+            unsupported "mlw_expr_to_why1_stmt: Eexn (1)"
+        end
+      | _ ->
+        unsupported "mlw_expr_to_why1_stmt: Eexn (2)"
+    end
+  (* end of ad-hoc support for break *)
+  | Eraise  _ (* xsymbol * expr *) ->
+     unsupported "mlw_expr_to_why1_stmt: Eraise"
+  | Eexn    _ (* xsymbol * expr *) ->
+     unsupported "mlw_expr_to_why1_stmt: Eexn"
+  | Ematch  _ (* expr * reg_branch list * exn_branch Mxs.t *) ->
+     unsupported "mlw_expr_to_why1_stmt: Ematch"
   | Eghost  _ (* expr *) ->
      unsupported "mlw_expr_to_why1_stmt: Eghost"
   | Epure   _ (* term *) ->
@@ -789,7 +805,15 @@ let f_decl_rs tkn mkn env rs name acc : func list =
     | args ->
        List.fold_right (fun pv (env, args) ->
            let env, n = declare_why_var_for_pv env ~is_global:false ~is_mutable:false pv in
-           let (b,ty) = type_of pv.Ity.pv_ity in
+           let (b,ty) =
+             try type_of pv.Ity.pv_ity
+             with Error(_msg,expl) ->
+               unsupported
+                 "@[<hov 2>f_decl_rs: rs=%a@ arg %a of type@ @[`%a`@] (%s)@]"
+                 print_rs rs print_pv pv
+                 Ity.print_ity pv.Ity.pv_ity expl
+
+           in
            env, (b, ty, n)::args
          ) args (env, [])
   in
@@ -1210,6 +1234,10 @@ let infer_loop_invs_for_mlw_expr last_report _attrs env tkn mkn e cty =
     end
   with
     | Error(expl,msg) ->
+       let msg =
+         Format.asprintf "%s: %s@\n%s" expl msg
+           (Printexc.get_backtrace ())
+       in
        last_report :=
          { !last_report with
            engine_error = Some (expl,msg);

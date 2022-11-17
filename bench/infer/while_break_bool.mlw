@@ -1,0 +1,17 @@
+
+use bool.Bool
+
+val randomb () : bool
+
+val ref x : bool
+
+let f [@infer] [@bddinfer] () : bool
+  diverges
+  ensures { notb result }
+  = x <- True;
+   while true do
+     assert { x };
+     x <- randomb();
+     if notb x then break;
+  done;
+  x
