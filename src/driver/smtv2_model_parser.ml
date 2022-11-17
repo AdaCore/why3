@@ -256,8 +256,9 @@ module FromSexpToModel = struct
     with _ -> (try Idxsymbol (symbol sexp) with _ -> error sexp "index")
 
   let identifier sexp : identifier =
+    let builtins = [ "="; "*"; "+"; "<="; ">="; "<"; ">"; ] in
     match sexp with
-    | Atom "=" -> Isymbol (S "=")
+    | Atom s when List.mem s builtins -> Isymbol (S s)
     | Atom _ -> Isymbol (symbol sexp)
     | List [ Atom "_"; s; List idx ] ->
         Iindexedsymbol (symbol s, List.map index idx)
@@ -653,6 +654,47 @@ module FromModelToTerm = struct
     | Cbool b -> if b then t_true_bool else t_true_bool
     | Cstring str -> t_const (Constant.string_const str) Ty.ty_str
 
+  let find_builtin_lsymbol env n ts =
+    let (path, theory, ident) =
+      match ts with
+      | [t1;t2] ->
+        begin match t1.t_ty, t2.t_ty with
+        | Some ty1, Some ty2
+            when Ty.ty_equal ty1 Ty.ty_int && Ty.ty_equal ty2 Ty.ty_int ->
+          begin match n with
+          | "=" -> ("int", "Int", Ident.op_infix "=")
+          | "+" -> ("int", "Int", Ident.op_infix "+")
+          | "-" -> ("int", "Int", Ident.op_infix "-")
+          | "*" -> ("int", "Int", Ident.op_infix "*")
+          | "<" -> ("int", "Int", Ident.op_infix "<")
+          | ">" -> ("int", "Int", Ident.op_infix ">")
+          | "<=" -> ("int", "Int", Ident.op_infix "<=")
+          | ">=" -> ("int", "Int", Ident.op_infix ">=")
+          | _ -> error "TODO_WIP find_builtin_lsymbol"
+          end
+        | Some ty1, Some ty2
+            when Ty.ty_equal ty1 Ty.ty_real && Ty.ty_equal ty2 Ty.ty_real ->
+          begin match n with
+          | "=" -> ("real", "Real", Ident.op_infix "=")
+          | "+" -> ("real", "Real", Ident.op_infix "+")
+          | "-" -> ("real", "Real", Ident.op_infix "-")
+          | "*" -> ("real", "Real", Ident.op_infix "*")
+          | "/" -> ("real", "Real", Ident.op_infix "/")
+          | "<" -> ("real", "Real", Ident.op_infix "<")
+          | ">" -> ("real", "Real", Ident.op_infix ">")
+          | "<=" -> ("real", "Real", Ident.op_infix "<=")
+          | ">=" -> ("real", "Real", Ident.op_infix ">=")
+          | _ -> error "TODO_WIP find_builtin_lsymbol"
+          end
+        | _ -> error "TODO_WIP find_builtin_lsymbol"
+        end
+      | _ -> error "TODO_WIP find_builtin_lsymbol"
+    in
+    let th = Env.read_theory env.why3_env [path] theory in
+    let ls = Theory.ns_find_ls th.Theory.th_export [ident] in
+    Debug.dprintf debug "ls = %a@." Pretty.print_ls ls;
+    ls
+
   let rec term_to_term env t =
     Debug.dprintf debug "[term_to_term] t = %a@." print_term t;
     match t with
@@ -680,16 +722,11 @@ module FromModelToTerm = struct
     | Qident (Isymbol (S "=")), [ t1; t2 ] ->
         let t1' = term_to_term env t1 in
         let t2' = term_to_term env t2 in
-        let t' = (* TODO_WIP to be fixed *)
-          t_app
-            (create_lsymbol
-              (Ident.id_fresh "=")
-              [get_opt_type t1'.t_ty; get_opt_type t2'.t_ty]
-              (Some Ty.ty_bool))
-            [t1'; t2']
-            (Some Ty.ty_bool)
-        in
-        t'
+        begin try
+          let ls = find_builtin_lsymbol env "=" [t1'; t2'] in
+          t_app ls [t1'; t2'] ls.ls_value
+        with _ -> t_bool_equ t1' t2'
+        end
     | Qident (Isymbol (S "or")), hd::tl ->
         List.fold_left
           (fun t t' -> t_binary_bool Term.Tor t (term_to_term env t'))
@@ -705,7 +742,10 @@ module FromModelToTerm = struct
         let ts' = List.map (term_to_term env) ts in
         let ls =
           try Mstr.find n env.constructors
-          with Not_found -> error "TODO_WIP unknown lsymbol"
+          with _ -> (
+            try find_builtin_lsymbol env n ts'
+            with _ -> error "TODO_WIP unknown lsymbol"
+          )
         in
         begin
           try t_app ls ts' ls.ls_value
@@ -846,7 +886,9 @@ module FromModelToTerm = struct
               | fields -> create_epsilon_term ty fields)
           | coercions -> create_epsilon_term ty coercions)
         | _ -> t)
-    | Term.Tapp (ls, [t1;t2]) when (ls.ls_name.Ident.id_string.[0] == '=') -> (* TODO_WIP fix builtin lsymbol for equality *)
+    | Term.Tapp (ls, [t1;t2])
+        when String.equal ls.ls_name.Ident.id_string (Ident.op_infix "=") ->
+      (* TODO_WIP fix builtin lsymbol for equality *)
       if
         t_equal
           (eval_term env seen_prover_vars ty_coercions ty_fields t1)
