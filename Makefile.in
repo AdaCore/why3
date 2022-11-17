@@ -1790,10 +1790,10 @@ test-api-%.opt: examples/use_api/%.ml lib/why3/why3.cmxa
 test-api-%: test-api-%.@OCAMLBEST@
 	$(HIDE)mkdir -p examples/use_api/results
 	$(HIDE)(./$< | sed -e 's/^\(Versions of Alt-Ergo found: \).*$$/\1<hidden>/' \
-		  	   -e 's/0\.0[0-9]/0.0x/' \
+			   -e 's/0\.0[0-9]/0.0x/g;s/[0-9][0-9]* steps/xx steps/' \
 			    > examples/use_api/results/$@.stdout ) \
 		|| (printf "Execution failed for API test $<. Please fix it.\n"; exit 2)
-	$(HIDE)(diff examples/use_api/oracles/$@.stdout examples/use_api/results/$@.stdout) \
+	$(HIDE)(diff -u examples/use_api/oracles/$@.stdout examples/use_api/results/$@.stdout) \
 		|| (printf "Oracle failed for API test $<. Please fix it.\n"; exit 2)
 	$(HIDE)rm -f $< why3session.xml why3shapes why3shapes.gz
 
