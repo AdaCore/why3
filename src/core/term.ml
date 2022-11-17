@@ -1627,6 +1627,7 @@ let small t = match t.t_node with
 
 let v_copy_unused v =
   let id = v.vs_name in
+  if Sattr.mem Ident.unused_attr id.id_attrs then v else
   let attrs = Sattr.singleton Ident.unused_attr in
   let attrs =
     try
