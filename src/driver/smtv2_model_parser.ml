@@ -93,21 +93,22 @@ module FromSexpToModel = struct
   let int = atom int_of_string
   let bigint = atom BigInt.of_string
 
-  let constant_int = function
+  let positive_constant_int = function
     | Atom s -> (
         try BigInt.of_string s with _ -> atom_error s "constant_int")
-    | sexp -> error sexp "constant_int"
+    | sexp -> error sexp "positive_constant_int"
 
-  let minus_constant_int = function
+  let negative_constant_int = function
     | List [ Atom "-"; i ] as sexp -> (
         try BigInt.minus (atom BigInt.of_string i)
-        with _ -> error sexp "minus_constant_int")
-    | sexp -> error sexp "minus_constant_int"
+        with _ -> error sexp "negative_constant_int")
+    | sexp -> error sexp "negative_constant_int"
 
   let constant_int sexp =
-    try constant_int sexp
+    try positive_constant_int sexp
     with _ -> (
-      try minus_constant_int sexp with _ -> error sexp "constant_int")
+      try negative_constant_int sexp
+      with _ -> error sexp "constant_int")
 
   let constant_dec s =
     try Scanf.sscanf s "%[^.].%s" (fun s1 s2 -> (s1,s2))
@@ -122,9 +123,44 @@ module FromSexpToModel = struct
       (true, s1, s2)
     | sexp -> error sexp "constant_dec"
 
-  let constant_fraction = function
-    | List [ Atom "/"; n1; n2 ] -> Cfraction (constant_dec n1, constant_dec n2)
-    | sexp -> error sexp "constant_fraction"
+  let constant_fraction ~neg sexp =
+    let positive_constant_int_fraction = function
+      | Atom s -> (
+          try (false, BigInt.of_string s) with _ -> atom_error s "constant_int")
+      | sexp -> error sexp "positive_constant_int_fraction"
+    in
+    let negative_constant_int_fraction = function
+      | List [ Atom "-"; i ] as sexp -> (
+          try (true, atom BigInt.of_string i)
+          with _ -> error sexp "negative_constant_int_fraction")
+      | sexp -> error sexp "negative_constant_int_fraction"
+    in
+    let constant_int_fraction sexp =
+      let zero = "0" in
+      let (neg,c) =
+        try positive_constant_int_fraction sexp
+        with _ -> (
+          try negative_constant_int_fraction sexp
+          with _ -> error sexp "constant_int_fraction")
+      in (neg, BigInt.to_string c, zero)
+    in
+    let constant_int_or_dec_fraction n =
+      try constant_int_fraction n
+      with _ -> constant_dec n
+    in
+    let neg_constant_real (neg,s1,s2) = (not neg, s1, s2) in
+    match sexp with
+    | List [ Atom "/"; n1; n2 ] ->
+      let r1 = constant_int_or_dec_fraction n1 in
+      let r2 = constant_int_or_dec_fraction n2 in
+      if neg then Cfraction (neg_constant_real r1, r2)
+      else Cfraction (r1, r2)
+    | _ -> error sexp "constant_fraction"
+
+  let constant_fraction sexp =
+    match sexp with
+    | List [ Atom "-"; frac ] -> constant_fraction ~neg:true frac
+    | _ -> constant_fraction ~neg:false sexp
 
   let constant_bv_bin = function
     | Atom s -> (
