@@ -410,8 +410,10 @@ module FromModelToTerm = struct
   exception E of string
   exception NoArgConstructor
   exception UnknownType
+  exception NoBuiltinSymbol
 
-  let error s = raise (E s)
+  let error fmt =
+    Format.kasprintf (fun msg -> raise (E (msg))) fmt
 
   type env = {
     (* Why3 environment, used to retrieve builtin lsymbols *)
@@ -441,9 +443,9 @@ module FromModelToTerm = struct
       match List.find_all (fun (s',_) -> f s') env.inferred_types with
       | [] ->
         if update then raise UnknownType
-        else error "TODO_WIP sort does not match any known type"
+        else error "No match in inferred_types for sort %a@." print_sort s
       | [(_,ty)] -> ty
-      | _ -> error "TODO_WIP sort matches multiple types"
+      | _ -> error "Multiple matched in inferred_types for sort %a@." print_sort s
     in
     match s with
     | Sstring -> Ty.ty_str
@@ -456,11 +458,11 @@ module FromModelToTerm = struct
         if update then raise UnknownType
         else Ty.ty_app Ty.ts_func [ smt_sort_to_ty env s1; smt_sort_to_ty env s2 ]
       | [(_,ty)] -> ty
-      | _ -> error "TODO_WIP array sort matches multiple types"
+      | _ -> error "No match in inferred_types for array sort %a@." print_sort s
       end
     | Sroundingmode | Sfloatingpoint _
     | Sbitvec _ | Ssimple _ | Smultiple _ -> matching_sort (sort_equal s)
-    | _ -> error "TODO_WIP smt_sort_to_ty"
+    | _ -> error "Multiple matched in inferred_types for array sort %a@." print_sort s
 
   let qual_id_to_term env qid =
     Debug.dprintf debug "[qual_id_to_term] qid = %a@."
@@ -472,13 +474,17 @@ module FromModelToTerm = struct
         else
           let vs =
             try Mstr.find n env.bound_vars
-            with Not_found -> error "TODO_WIP cannot infer the type of the variable"
+            with Not_found ->
+              error "No variable in bound_vars matching qualified identifier %a@."
+                print_qualified_identifier qid
           in
           t_var vs
     | Qident (Isymbol (Sprover n)) ->
         let vs =
           try Mstr.find n env.prover_vars
-          with Not_found -> error "TODO_WIP cannot infer the type of the prover variable"
+          with Not_found ->
+            error "No variable in prover_vars matching qualified identifier %a@."
+              print_qualified_identifier qid
         in
         t_var vs
     | Qannotident (Isymbol (S n), s) ->
@@ -490,7 +496,11 @@ module FromModelToTerm = struct
             try
               let vs = Mstr.find n env.bound_vars in
               if Ty.ty_equal vs.vs_ty vs_ty then vs
-              else error "TODO_WIP type mismatch"
+              else
+                error "Type %a of variable %a does not match sort %a@."
+                  Pretty.print_ty vs.vs_ty
+                  Pretty.print_vs vs
+                  print_sort s
             with Not_found ->
               create_vsymbol (Ident.id_fresh n) vs_ty
           in
@@ -512,7 +522,9 @@ module FromModelToTerm = struct
           with Not_found -> get_and_update_prover_vars n vs_ty env
         in
         t_var vs
-    | _ -> error "TODO_WIP_qual_id_to_vsymbol"
+    | _ ->
+      error "Could not interpret qualified identifier %a@."
+        print_qualified_identifier qid
 
   exception Float_MinusZero
   exception Float_PlusZero
@@ -596,7 +608,8 @@ module FromModelToTerm = struct
         let th = Env.read_theory env.why3_env ["real"] "Real" in
         let div_ls = Theory.ns_find_ls th.Theory.th_export [Ident.op_infix "/"] in
         t_app div_ls [t;t'] div_ls.ls_value
-      with _ -> error "TODO_WIP Cfraction"
+      with _ ->
+        error "Could not interpret constant %a as a fraction@." print_constant c
       end
     | Cbitvector { bv_value=bigint; bv_length=n; _ } ->
       begin try
@@ -606,7 +619,9 @@ module FromModelToTerm = struct
             env.inferred_types
         in
         t_const (Constant.int_const bigint) ty
-      with Not_found -> error "TODO_WIP Cbitvector"
+      with Not_found ->
+        error "No matching type found in inferred_type for bitvector constant %a@."
+          print_constant c
       end
     | Cfloat fp ->
       begin try
@@ -632,7 +647,7 @@ module FromModelToTerm = struct
               try
                 let th = Env.read_theory env.why3_env ["ieee_float"] float_lib in
                 Theory.ns_find_ls th.Theory.th_export ["is_nan"]
-              with _ -> error "TODO_WIP is_nan_ls not found"
+              with _ -> error "No lsymbol found in theory for is_nan@."
             in
             let x = create_vsymbol (Ident.id_fresh "x") ty in
             let f = t_app is_nan_ls [t_var x] None in
@@ -642,14 +657,18 @@ module FromModelToTerm = struct
               try
                 let th = Env.read_theory env.why3_env ["ieee_float"] float_lib in
                 Theory.ns_find_ls th.Theory.th_export ["is_infinite"]
-              with _ -> error "TODO_WIP is_infinite_ls not found"
+              with _ -> error "No lsymbol found in theory for is_infinite@."
             in
             let x = create_vsymbol (Ident.id_fresh "x") ty in
             let f = t_app is_infinite_ls [t_var x] None in
             t_eps_close x f
-          | Float_Error -> error "TODO_WIP Float_Error"
+          | Float_Error ->
+            error "Error while interpreting float constant %a@."
+              print_constant c
         end
-      with Not_found -> error "TODO_WIP Cfloat"
+      with Not_found ->
+        error "No matching type found in inferred_type for float constant %a@."
+          print_constant c
       end
     | Cbool b -> if b then t_true_bool else t_true_bool
     | Cstring str -> t_const (Constant.string_const str) Ty.ty_str
@@ -670,7 +689,7 @@ module FromModelToTerm = struct
           | ">" -> ("int", "Int", Ident.op_infix ">")
           | "<=" -> ("int", "Int", Ident.op_infix "<=")
           | ">=" -> ("int", "Int", Ident.op_infix ">=")
-          | _ -> error "TODO_WIP find_builtin_lsymbol"
+          | _ -> raise NoBuiltinSymbol
           end
         | Some ty1, Some ty2
             when Ty.ty_equal ty1 Ty.ty_real && Ty.ty_equal ty2 Ty.ty_real ->
@@ -684,11 +703,11 @@ module FromModelToTerm = struct
           | ">" -> ("real", "Real", Ident.op_infix ">")
           | "<=" -> ("real", "Real", Ident.op_infix "<=")
           | ">=" -> ("real", "Real", Ident.op_infix ">=")
-          | _ -> error "TODO_WIP find_builtin_lsymbol"
+          | _ -> raise NoBuiltinSymbol
           end
-        | _ -> error "TODO_WIP find_builtin_lsymbol"
+        | _ -> raise NoBuiltinSymbol
         end
-      | _ -> error "TODO_WIP find_builtin_lsymbol"
+      | _ -> raise NoBuiltinSymbol
     in
     let th = Env.read_theory env.why3_env [path] theory in
     let ls = Theory.ns_find_ls th.Theory.th_export [ident] in
@@ -708,9 +727,8 @@ module FromModelToTerm = struct
     | Tite (b, t1, t2) ->
         t_if (term_to_term env b) (term_to_term env t1) (term_to_term env t2)
     | Tapply (qid, ts) -> apply_to_term env qid ts
-    | Tlet _ -> error "TODO_WIP Tlet"
     | Tarray (s1, s2, a) -> array_to_term env s1 s2 a
-    | Tunparsed _ -> error "TODO_WIP Tunparsed"
+    | _ -> error "Could not interpret term %a@." print_term t
 
   (* TODO_WIP refactoring *)
   and apply_to_term env qid ts =
@@ -725,7 +743,7 @@ module FromModelToTerm = struct
         begin try
           let ls = find_builtin_lsymbol env "=" [t1'; t2'] in
           t_app ls [t1'; t2'] ls.ls_value
-        with _ -> t_bool_equ t1' t2'
+        with NoBuiltinSymbol -> t_bool_equ t1' t2'
         end
     | Qident (Isymbol (S "or")), hd::tl ->
         List.fold_left
@@ -744,19 +762,24 @@ module FromModelToTerm = struct
           try Mstr.find n env.constructors
           with _ -> (
             try find_builtin_lsymbol env n ts'
-            with _ -> error "TODO_WIP unknown lsymbol"
+            with NoBuiltinSymbol ->
+              error "No lsymbol found for qualified identifier %a@."
+                print_qualified_identifier qid
           )
         in
         begin
           try t_app ls ts' ls.ls_value
-          with _ -> error "TODO_WIP BadArity or TypeMismatch"
+          with _ ->
+            error "Cannot apply lsymbol %a to terms (%a)@."
+              Pretty.print_ls ls
+              (Pp.print_list Pp.comma Pretty.print_term) ts'
         end
     | Qannotident (Isymbol (S n), s), ts | Qannotident (Isymbol (Sprover n), s), ts ->
         let ts' = List.map (term_to_term env) ts in
         let ts'_ty =
           try List.map (fun t -> Opt.get t.t_ty) ts'
           with _ ->
-            error "TODO_WIP apply_to_term error with types of arguments"
+            error "Arguments of %a should have a type@." print_qualified_identifier qid
         in
         let ls =
           create_lsymbol (Ident.id_fresh n) ts'_ty
@@ -764,9 +787,12 @@ module FromModelToTerm = struct
         in
         begin
           try t_app ls ts' ls.ls_value
-          with _ -> error "TODO_WIP BadArity or TypeMismatch"
+          with _ ->
+            error "Cannot apply lsymbol %a to terms (%a)@."
+              Pretty.print_ls ls
+              (Pp.print_list Pp.comma Pretty.print_term) ts'
         end
-    | _ -> error "TODO_WIP apply_to_term"
+    | _ -> error "Could not interpret %a@." print_qualified_identifier qid
 
   and array_to_term env s1 s2 elts =
     (* TODO_WIP check type consistency *)
@@ -796,7 +822,10 @@ module FromModelToTerm = struct
       Pretty.print_term t'
       (Pp.print_option Pretty.print_ty) t'.t_ty;
     if Ty.ty_equal s' (get_opt_type t'.t_ty) then t'
-    else error "TODO_WIP type error"
+    else
+      error "Type %a for sort %a and type %a for term %a do not match@."
+        Pretty.print_ty s' print_sort s
+        Pretty.print_ty (get_opt_type t'.t_ty) print_term t
 
   let interpret_fun_def_to_term env ls (args,res,body) =
     Debug.dprintf debug "-----------------------------@.";
@@ -844,8 +873,14 @@ module FromModelToTerm = struct
                 key Pretty.print_vs vs)
             env.bound_vars;
           t_lambda (Mstr.values env.bound_vars) [] (smt_term_to_term env body res))
-        else error "TODO_WIP type mismatch"
-      with Invalid_argument _ -> error "TODO_WIP function arity mismatch"
+        else
+          error "Type mismatch when interpreting %a with lsymbol %a@."
+            print_function_def (args,res,body)
+            Pretty.print_ls ls
+      with Invalid_argument _ ->
+        error "Function arity mismatch when interpreting %a with lsymbol %a@."
+          print_function_def (args,res,body)
+          Pretty.print_ls ls
     in
     Debug.dprintf debug "[interpret_fun_def_to_term] t = %a@." Pretty.print_term
       t;
@@ -863,7 +898,9 @@ module FromModelToTerm = struct
             let vs_list', _, t' = t_open_lambda t' in
             let vs' = match vs_list' with
               | [vs'] -> vs'
-              | _ -> error "TODO_WIP field with not exactly one argument" in
+              | _ ->
+                error "Only one variable expected when opening lambda-term %a"
+                  Pretty.print_term t' in
             let t' =  eval_term env seen_prover_vars ty_fields ty_fields (t_subst_single vs' (t_var vs) t') in
             (* substitute [vs] by this new variable in the body [t'] of the function
                 defining the type coercion *)
@@ -1083,7 +1120,16 @@ module FromModelToTerm = struct
         (fun n def ->
           match Mstr.find n qterms with
           | (ls, oloc, attrs) ->
-            Some ((ls,oloc,attrs), interpret_fun_def_to_term env ls def)
+            begin try
+              Some ((ls,oloc,attrs), interpret_fun_def_to_term env ls def)
+            with
+            | E str ->
+              Debug.dprintf debug "Error while interpreting %s: %s@." n str;
+              None
+            | _ ->
+              Debug.dprintf debug "Error while interpreting %s@." n;
+              None
+            end
           | exception Not_found -> (
             Debug.dprintf debug "No term for %s@." n; None))
         fun_defs

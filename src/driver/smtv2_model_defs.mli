@@ -33,7 +33,7 @@ type constant_bv = {
 }
 
 (* the first parameter is [true] if the constant is negative *)
- type constant_real = bool * string * string
+type constant_real = bool * string * string
 
 type constant_float =
   | Fplusinfinity
