@@ -1,0 +1,14 @@
+
+use int.Int
+
+val ref x : int
+
+let f [@infer] [@bddinfer] () : int
+    ensures { result = 100 }
+  = x <- 0;
+    while true do
+       variant { 100 - x }
+       if x >= 100 then break;
+       x <- x + 1;
+    done;
+    x

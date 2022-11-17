@@ -23,7 +23,7 @@ val infer_loop_invs :
    [mkn] are respectively the environment, the theory known map and
    the module known map of that function.
 
-  The set [attrs] is checked for the presence of the \[\@bddinfer\]
+  The set [attrs] is checked for the presence of the [[@bddinfer]]
    attribute. Without it, the empty list is immediately returned.
 
   The environment [env] is needed to access the builtin functions such
@@ -42,7 +42,7 @@ val infer_loop_invs :
   The inference does not support the full WhyML language. If any
    unsupported feature is met, this function will just return the
    empty list. The reason should be queried using function
-   [register_hook] below.
+   [report_on_last_call] below.
 
  *)
 
@@ -61,9 +61,12 @@ type engine_report = {
     (* The low-level report of inference sub-engine *)
   }
 
+(*val report_on_last_call : unit -> engine_report*)
+(** provides info about the last call
+deprecated, use [register_hook] instead *)
+
 val report : verbosity:int -> engine_report -> unit
 (** prints the report on standard output *)
 
 val register_hook : (engine_report -> unit) -> unit
-(** registers a function that will be called after each call to
-   [infer_loop_invs]. It will be given a report as argument. *)
+(** registers a function to be applied on the report *)
