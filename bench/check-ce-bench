@@ -121,7 +121,7 @@ start=$(date +%s)
 for file in $files; do
   filedir=`dirname $file`
   filebase=`basename $file .mlw`
-  if [ "$filebase" == "maps_poly" ] ; then
+  if [ "$filebase" = "maps_poly" -o "$filebase" = "maps_mono" ] ; then
     echo "Skipping tests on $filedir/$filebase.mlw";
   else
     printf "Running provers on $filedir/$filebase.mlw\n";
