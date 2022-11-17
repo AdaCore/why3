@@ -1219,7 +1219,8 @@ let rec default_value_of_type env ity : value =
   match ity.ity_node with
   | Ityvar _ -> failwith "default_value_of_type: type variable"
   | Ityapp (ts, _, _) when its_equal ts its_int -> value ty (Vnum BigInt.zero)
-  | Ityapp (ts, _, _) when its_equal ts its_real -> assert false (* TODO *)
+  | Ityapp (ts, _, _) when its_equal ts its_real ->
+      value ty (Vreal (Big_real.real_from_str "0"))
   | Ityapp (ts, _, _) when its_equal ts its_bool -> value ty (Vbool false)
   | Ityapp (ts, _, _) when its_equal ts its_str -> value ty (Vstring "")
   | Ityapp (ts,ityl1,_) when is_ts_tuple ts.its_ts ->
