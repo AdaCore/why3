@@ -418,6 +418,8 @@ module FromModelToTerm = struct
   type env = {
     (* Why3 environment, used to retrieve builtin lsymbols *)
     why3_env : Env.env;
+    (* Variables, useful for evaluation. *)
+    mutable vars : string Mvs.t;
     (* Prover variables. *)
     mutable prover_vars : vsymbol Mstr.t;
     (* Bound variables in the body of a function definiton. *)
@@ -428,6 +430,8 @@ module FromModelToTerm = struct
     mutable inferred_types : (sort * Ty.ty) list;
     (* Queried terms [pinfo.Printer.queried_terms]. *)
     queried_terms : lsymbol Mstr.t;
+    mutable cached_prover_vars : Term.term Mvs.t;
+    mutable cached_consts : Term.term Mvs.t;
   }
 
   let get_opt_type oty = match oty with None -> Ty.ty_bool | Some ty -> ty
@@ -502,7 +506,9 @@ module FromModelToTerm = struct
                   Pretty.print_vs vs
                   print_sort s
             with Not_found ->
-              create_vsymbol (Ident.id_fresh n) vs_ty
+              let vs = create_vsymbol (Ident.id_fresh n) vs_ty in
+              env.vars <- Mvs.add vs n env.vars;
+              vs
           in
           t_var vs
     | Qannotident (Isymbol (Sprover n), s) ->
@@ -887,49 +893,83 @@ module FromModelToTerm = struct
     Debug.dprintf debug "-----------------------------@.";
     t
 
-  let rec eval_term env seen_prover_vars ty_coercions ty_fields t =
+  let rec eval_term env seen_prover_vars ty_coercions ty_fields terms t =
     match t.t_node with
-    | Term.Tvar vs when not (List.mem vs seen_prover_vars) && (List.mem vs (Mstr.values env.prover_vars)) -> (
-        let seen_prover_vars = vs :: seen_prover_vars in
-        let create_epsilon_term ty l =
-          (* create a fresh vsymbol for the variable bound by the epsilon term *)
-          let x = create_vsymbol (Ident.id_fresh "x") ty in
-          let aux (_, (ls',t')) =
-            let vs_list', _, t' = t_open_lambda t' in
-            let vs' = match vs_list' with
-              | [vs'] -> vs'
-              | _ ->
-                error "Only one variable expected when opening lambda-term %a"
-                  Pretty.print_term t' in
-            let t' =  eval_term env seen_prover_vars ty_fields ty_fields (t_subst_single vs' (t_var vs) t') in
-            (* substitute [vs] by this new variable in the body [t'] of the function
-                defining the type coercion *)
-            let t' = t_subst_single vs' (t_var x) t' in
-            (* construct the formula to be used in the epsilon term *)
-            t_equ (t_app ls' [t_var x] ls'.ls_value) t'
+    | Term.Tvar vs when List.mem vs seen_prover_vars ->
+      Debug.dprintf debug "[eval_term] vs = %a in seen_prover_vars@."
+        Pretty.print_vs vs;
+      begin match Mvs.find_opt vs env.cached_prover_vars with
+      | Some t_vs -> t_vs
+      | None -> t
+      end
+    | Term.Tvar vs ->
+      begin match Mvs.find_opt vs env.vars with
+      | Some n ->
+        Debug.dprintf debug "[eval_term] vs = %a in env.vars@."
+          Pretty.print_vs vs;
+        begin match Mvs.find_opt vs env.cached_consts with
+        | Some t_vs -> t_vs
+        | None ->
+          begin match Mstr.find_opt n terms with
+          | Some (_,t_vs) ->
+            if Ty.ty_equal vs.vs_ty (get_opt_type t_vs.t_ty) then (
+              env.cached_consts <- Mvs.add vs t_vs env.cached_consts;
+              t_vs)
+            else
+              eval_term env seen_prover_vars ty_coercions ty_fields terms t_vs
+          | None -> t
+          end
+        end
+      | None ->
+        if List.mem vs (Mstr.values env.prover_vars) then (
+          Debug.dprintf debug "[eval_term] vs = %a in env.prover_vars@."
+            Pretty.print_vs vs;
+          let seen_prover_vars = vs :: seen_prover_vars in
+          let create_epsilon_term ty l =
+            (* create a fresh vsymbol for the variable bound by the epsilon term *)
+            let x = create_vsymbol (Ident.id_fresh "x") ty in
+            let aux (_, (ls',t')) =
+              let vs_list', _, t' = t_open_lambda t' in
+              let vs' = match vs_list' with
+                | [vs'] -> vs'
+                | _ ->
+                  error "Only one variable expected when opening lambda-term %a"
+                    Pretty.print_term t' in
+              let t' =  eval_term env seen_prover_vars ty_fields ty_coercions terms (t_subst_single vs' (t_var vs) t') in
+              (* substitute [vs] by this new variable in the body [t'] of the function
+                  defining the type coercion *)
+              let t' = t_subst_single vs' (t_var x) t' in
+              (* construct the formula to be used in the epsilon term *)
+              t_equ (t_app ls' [t_var x] ls'.ls_value) t'
+            in
+            let f = t_and_l (List.map aux l) in
+            (* replace [t] by [eps x. f] *)
+            t_eps_close x f
           in
-          let f = t_and_l (List.map aux l) in
-          (* replace [t] by [eps x. f] *)
-          t_eps_close x f
-        in
-        match t.t_ty with
-        | Some ty -> (
-          (* first search if there exists some type coercions for [ty] *)
-          match Ty.Mty.find_def [] ty ty_coercions with
-          | [] -> (
-              (* if no coercions, search if [ty] is associated to some fields *)
-              match Ty.Mty.find_def [] ty ty_fields with
-              | [] -> t
-              | fields -> create_epsilon_term ty fields)
-          | coercions -> create_epsilon_term ty coercions)
-        | _ -> t)
+          let res =
+            match t.t_ty with
+            | Some ty -> (
+              (* first search if there exists some type coercions for [ty] *)
+              match Ty.Mty.find_def [] ty ty_coercions with
+              | [] -> (
+                  (* if no coercions, search if [ty] is associated to some fields *)
+                  match Ty.Mty.find_def [] ty ty_fields with
+                  | [] -> t
+                  | fields -> create_epsilon_term ty fields)
+              | coercions -> create_epsilon_term ty coercions)
+            | _ -> t
+          in
+          env.cached_prover_vars <- Mvs.add vs res env.cached_prover_vars;
+          res)
+        else t
+      end
     | Term.Tapp (ls, [t1;t2])
         when String.equal ls.ls_name.Ident.id_string (Ident.op_infix "=") ->
       (* TODO_WIP fix builtin lsymbol for equality *)
       if
         t_equal
-          (eval_term env seen_prover_vars ty_coercions ty_fields t1)
-          (eval_term env seen_prover_vars ty_coercions ty_fields t2)
+          (eval_term env seen_prover_vars ty_coercions ty_fields terms t1)
+          (eval_term env seen_prover_vars ty_coercions ty_fields terms t2)
       then
         t_true_bool
       else (
@@ -940,18 +980,18 @@ module FromModelToTerm = struct
           (* distinct prover variables are not equal *)
           if vs_equal v1 v2 then t_true_bool else t_false_bool
         | _ ->
-          let ts = List.map (eval_term env seen_prover_vars ty_coercions ty_fields) [t1;t2] in
+          let ts = List.map (eval_term env seen_prover_vars ty_coercions ty_fields terms) [t1;t2] in
           t_app ls ts ls.ls_value)
     | Term.Tapp (ls, ts) ->
-      let ts = List.map (eval_term env seen_prover_vars ty_coercions ty_fields) ts in
+      let ts = List.map (eval_term env seen_prover_vars ty_coercions ty_fields terms) ts in
       t_app ls ts ls.ls_value
     | Term.Tif (b,t1,t2) -> (
-      match (eval_term env seen_prover_vars ty_coercions ty_fields b).t_node with
-      | Term.Ttrue -> eval_term env seen_prover_vars ty_coercions ty_fields t1
-      | Term.Tfalse -> eval_term env seen_prover_vars ty_coercions ty_fields t2
+      match (eval_term env seen_prover_vars ty_coercions ty_fields terms b).t_node with
+      | Term.Ttrue -> eval_term env seen_prover_vars ty_coercions ty_fields terms t1
+      | Term.Tfalse -> eval_term env seen_prover_vars ty_coercions ty_fields terms t2
       | _ ->
-        let t1 = eval_term env seen_prover_vars ty_coercions ty_fields t1 in
-        let t2 = eval_term env seen_prover_vars ty_coercions ty_fields t2 in
+        let t1 = eval_term env seen_prover_vars ty_coercions ty_fields terms t1 in
+        let t2 = eval_term env seen_prover_vars ty_coercions ty_fields terms t2 in
         t_if b t1 t2
     )
     | Term.Tlet _ -> t
@@ -960,20 +1000,20 @@ module FromModelToTerm = struct
       begin match Term.t_open_lambda t with
       | ([], _, _) ->
         let vs, t' = Term.t_open_bound tb in
-        t_eps_close vs (eval_term env seen_prover_vars ty_coercions ty_fields t')
+        t_eps_close vs (eval_term env seen_prover_vars ty_coercions ty_fields terms t')
       | (vsl, trig, t') ->
-        t_lambda vsl trig (eval_term env seen_prover_vars ty_coercions ty_fields t')
+        t_lambda vsl trig (eval_term env seen_prover_vars ty_coercions ty_fields terms t')
       end
     | Term.Tquant (q,tq) ->
       let vsl,trig,t' = t_open_quant tq in
-      let t' = eval_term env seen_prover_vars ty_coercions ty_fields t' in
+      let t' = eval_term env seen_prover_vars ty_coercions ty_fields terms t' in
       t_quant q (t_close_quant vsl trig t')
     | Term.Tbinop (op,t1,t2) ->
-      let t1 = eval_term env seen_prover_vars ty_coercions ty_fields t1 in
-      let t2 = eval_term env seen_prover_vars ty_coercions ty_fields t2 in
+      let t1 = eval_term env seen_prover_vars ty_coercions ty_fields terms t1 in
+      let t2 = eval_term env seen_prover_vars ty_coercions ty_fields terms t2 in
       t_binary_bool op t1 t2
     | Term.Tnot t' -> (
-      let t' = eval_term env seen_prover_vars ty_coercions ty_fields t' in
+      let t' = eval_term env seen_prover_vars ty_coercions ty_fields terms t' in
       match t'.t_node with (* TODO_WIP is it really the place to do such simplifications? *)
       | Term.Ttrue -> t_bool_false
       | Term.Tfalse -> t_bool_true
@@ -1043,11 +1083,24 @@ module FromModelToTerm = struct
     Mstr.mapi (* for each element in [terms], we try to evaluate [t]:
        - by applying type coercions for variables, when possible *)
       (fun _ ((ls,oloc,attrs),t) ->
-        let t' = eval_term env [] ty_coercions ty_fields t in
+        let t' = eval_term env [] ty_coercions ty_fields terms t in
         Debug.dprintf debug "[eval_term] t = %a / t' = %a@." Pretty.print_term t Pretty.print_term t';
         ((ls,oloc,attrs), t'))
       terms
 
+  let clean env terms =
+    let pvars = Mstr.values env.prover_vars in
+    Mstr.map_filter
+      (fun ((ls,oloc,attr), t) ->
+        Debug.dprintf debug "[clean] t = %a@." Pretty.print_term t;
+        if Term.t_v_any
+            (fun vs ->
+              Debug.dprintf debug "[t_v_any] vs = %a@." Pretty.print_vs vs;
+              List.mem vs pvars)
+            t
+        then None
+        else Some ((ls,oloc,attr),t))
+      terms
 
   let get_terms (pinfo : Printer.printing_info)
       (fun_defs : Smtv2_model_defs.function_def Mstr.t) =
@@ -1109,11 +1162,14 @@ module FromModelToTerm = struct
       constructors;
     let env = {
       why3_env = pinfo.Printer.why3_env;
+      vars = Mvs.empty;
       prover_vars = Mstr.empty;
       bound_vars = Mstr.empty;
       constructors = constructors;
       inferred_types = [];
       queried_terms = Mstr.map (fun (ls,_,_) -> ls) qterms;
+      cached_prover_vars = Mvs.empty;
+      cached_consts = Mvs.empty;
     } in
     let terms =
       Mstr.mapi_filter
@@ -1142,7 +1198,8 @@ module FromModelToTerm = struct
           Pretty.print_ls ls Pretty.print_term t
           (Pp.print_option Pretty.print_ty) t.t_ty )
       terms;
-    eval pinfo env terms
+    let terms = eval pinfo env terms in
+    clean env terms
 end
 
 (*
