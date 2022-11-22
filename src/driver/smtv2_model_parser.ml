@@ -420,8 +420,8 @@ module FromModelToTerm = struct
     why3_env : Env.env;
     (* Variables, useful for evaluation. *)
     mutable vars : string Mvs.t;
-    (* Prover variables. *)
-    mutable prover_vars : vsymbol Mstr.t;
+    (* Prover variables, may have the same name if the sort is different. *)
+    mutable prover_vars : (vsymbol Ty.Mty.t) Mstr.t;
     (* Bound variables in the body of a function definiton. *)
     mutable bound_vars : vsymbol Mstr.t;
     (* Constructors from [pinfo.Printer.constructors]. *)
@@ -484,13 +484,15 @@ module FromModelToTerm = struct
           in
           t_var vs
     | Qident (Isymbol (Sprover n)) ->
-        let vs =
-          try Mstr.find n env.prover_vars
-          with Not_found ->
-            error "No variable in prover_vars matching qualified identifier %a@."
-              print_qualified_identifier qid
-        in
-        t_var vs
+        begin match Ty.Mty.values (Mstr.find n env.prover_vars) with
+        | [] | exception Not_found ->
+          error "No variable in prover_vars matching qualified identifier %a@."
+            print_qualified_identifier qid
+        | [vs] -> t_var vs
+        | _::_::_ ->
+          error "Multiple variables in prover_vars matching qualified identifier %a@."
+            print_qualified_identifier qid
+        end
     | Qannotident (Isymbol (S n), s) ->
         if is_no_arg_constructor n env.constructors then
           raise NoArgConstructor
@@ -513,21 +515,24 @@ module FromModelToTerm = struct
           t_var vs
     | Qannotident (Isymbol (Sprover n), s) ->
         let vs_ty = smt_sort_to_ty env s in
-        let get_and_update_prover_vars n vs_ty env =
-          let vs = create_vsymbol (Ident.id_fresh n) vs_ty in
-          Debug.dprintf debug "[updating prover_vars] vs.vs_ty = %a / vs_ty = %a@."
-            Pretty.print_ty vs.vs_ty Pretty.print_ty vs_ty;
-          env.prover_vars <- Mstr.add n vs env.prover_vars;
-          vs
-        in
-        let vs =
-          try
-            let vs = Mstr.find n env.prover_vars in
-            if Ty.ty_equal vs.vs_ty vs_ty then vs
-            else get_and_update_prover_vars n vs_ty env
-          with Not_found -> get_and_update_prover_vars n vs_ty env
-        in
-        t_var vs
+        let new_vs = create_vsymbol (Ident.id_fresh n) vs_ty in
+        begin try
+          let mvs = Mstr.find n env.prover_vars in
+          begin
+            match Ty.Mty.find vs_ty mvs with
+            | vs -> t_var vs
+            | exception Not_found ->
+              Debug.dprintf debug "[updating prover_vars] new_vs = %a / vs_ty = %a@."
+                Pretty.print_vs new_vs Pretty.print_ty vs_ty;
+              env.prover_vars <- Mstr.add n (Ty.Mty.add vs_ty new_vs mvs) env.prover_vars;
+              t_var new_vs
+          end
+        with Not_found ->
+          Debug.dprintf debug "[updating prover_vars] new_vs = %a / vs_ty = %a@."
+            Pretty.print_vs new_vs Pretty.print_ty vs_ty;
+          env.prover_vars <- Mstr.add n (Ty.Mty.add vs_ty new_vs Ty.Mty.empty) env.prover_vars;
+          t_var new_vs
+        end
     | _ ->
       error "Could not interpret qualified identifier %a@."
         print_qualified_identifier qid
@@ -893,6 +898,21 @@ module FromModelToTerm = struct
     Debug.dprintf debug "-----------------------------@.";
     t
 
+  let is_vs_in_prover_vars vs prover_vars =
+    match
+      List.find_all
+        (fun mvs ->
+          Ty.Mty.exists
+            (fun ty vs' -> Ty.ty_equal ty vs.vs_ty && Term.vs_equal vs' vs) mvs)
+        (Mstr.values prover_vars)
+    with
+    | [] -> false
+    | [_] -> true
+    | _ ->
+      error "More than one matching vsymbol in prover_vars for %a@."
+        Pretty.print_vs vs
+
+
   let rec eval_term env seen_prover_vars ty_coercions ty_fields terms t =
     match t.t_node with
     | Term.Tvar vs when List.mem vs seen_prover_vars ->
@@ -921,7 +941,8 @@ module FromModelToTerm = struct
           end
         end
       | None ->
-        if List.mem vs (Mstr.values env.prover_vars) then (
+        if is_vs_in_prover_vars vs env.prover_vars
+        then (
           Debug.dprintf debug "[eval_term] vs = %a in env.prover_vars@."
             Pretty.print_vs vs;
           let seen_prover_vars = vs :: seen_prover_vars in
@@ -975,8 +996,8 @@ module FromModelToTerm = struct
       else (
         match t1.t_node,t2.t_node with
         | Term.Tvar v1, Term.Tvar v2
-            when List.mem v1 (Mstr.values env.prover_vars) &&
-                 List.mem v2 (Mstr.values env.prover_vars) ->
+            when is_vs_in_prover_vars v1 env.prover_vars &&
+            is_vs_in_prover_vars v2 env.prover_vars ->
           (* distinct prover variables are not equal *)
           if vs_equal v1 v2 then t_true_bool else t_false_bool
         | _ ->
@@ -1023,7 +1044,7 @@ module FromModelToTerm = struct
   let eval (pinfo : Printer.printing_info) env terms =
     Mstr.iter
       (fun key value -> Debug.dprintf debug "[eval] prover_var = %s, vs = %a@."
-        key Pretty.print_vs value)
+        key (Pp.print_list Pp.space Pretty.print_vs) (Ty.Mty.values value))
       env.prover_vars;
     let ty_coercions =
       Ty.Mty.map (* for each set [sls] of lsymbols associated to a type *)
@@ -1089,14 +1110,13 @@ module FromModelToTerm = struct
       terms
 
   let clean env terms =
-    let pvars = Mstr.values env.prover_vars in
     Mstr.map_filter
       (fun ((ls,oloc,attr), t) ->
         Debug.dprintf debug "[clean] t = %a@." Pretty.print_term t;
         if Term.t_v_any
             (fun vs ->
               Debug.dprintf debug "[t_v_any] vs = %a@." Pretty.print_vs vs;
-              List.mem vs pvars)
+              is_vs_in_prover_vars vs env.prover_vars)
             t
         then None
         else Some ((ls,oloc,attr),t))
