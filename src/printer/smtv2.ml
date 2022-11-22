@@ -445,6 +445,10 @@ let rec print_term info fmt t =
      print_tcase info t print_term fmt bl
   | Teps _ -> unsupportedTerm t
       "smtv2: you must eliminate epsilon"
+  | Ttrue when Opt.equal Ty.ty_equal t.t_ty (Some Ty.ty_bool) ->
+    pp_print_string fmt "true"
+  | Tfalse when Opt.equal Ty.ty_equal t.t_ty (Some Ty.ty_bool) ->
+    pp_print_string fmt "false"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
   in
 
