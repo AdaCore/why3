@@ -195,11 +195,13 @@ let restrict_environment state (map : var_value VarMap.t) =
     VarMap.fold
       (fun x _ (acc, l1, l2) ->
         (* apron var associated to x *)
-        let v = VarMap.find x state.map_state in
-        match v with
-        | IntValue w -> (VarMap.add x v acc, w::l1, l2)
-        | BoolValue w -> (VarMap.add x v acc, l1, w::l2)
-        | RefValue _ -> (VarMap.add x v acc, l1, l2)
+         try
+           let v = VarMap.find x state.map_state in
+           match v with
+           | IntValue w -> (VarMap.add x v acc, w::l1, l2)
+           | BoolValue w -> (VarMap.add x v acc, l1, w::l2)
+           | RefValue _ -> (VarMap.add x v acc, l1, l2)
+         with Not_found -> (acc,l1,l2) (* may happen because of drop *)
         )
       map (VarMap.empty, [], [])
   in

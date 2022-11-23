@@ -334,6 +334,7 @@ type simple_expr_node =
   | SEassign of Expr.assign list
   | SEseq of simple_expr * simple_expr
   | SElet of Ity.pvsymbol * simple_expr * simple_expr
+  | SEdrop of Ity.pvsymbol * simple_expr
   | SEif of simple_expr * simple_expr * simple_expr
   | SEwhile of simple_expr * Expr.invariant list * Expr.variant list * simple_expr
   | SEassert of assertion_kind * Term.term
@@ -359,6 +360,8 @@ let rec print_simple_expr fmt e =
     fprintf fmt "@[%a ;@ %a@]" print_simple_expr e1 print_simple_expr e2
   | SElet(pv,e1,e2) ->
     fprintf fmt "@[let %a = %a in@ %a@]" Ity.print_pv pv print_simple_expr e1 print_simple_expr e2
+  | SEdrop(pv,e2) ->
+    fprintf fmt "@[drop %a in@ %a@]" Ity.print_pv pv print_simple_expr e2
   | SEif(e1,e2,e3) ->
     fprintf fmt "@[if %a then@ %a else@ %a" print_simple_expr e1 print_simple_expr e2 print_simple_expr e3
   | SEwhile(c,_invs,_vars,b) ->
@@ -431,16 +434,19 @@ let rec simple_expr_to_why1_expr env e =
      end
   | SEassign _ (* assign list *) ->
      unsupported "simple_expr_to_why1_expr: execution of parallel assignments"
-  | SElet(x,({simple_expr_node = SElet(y,e1,e2); _} as t),e3) ->
+  | SElet(x,{simple_expr_node = SElet(y,e1,e2); _},e3) ->
     (* we interpret
        let x = (let y = e1 in e2) in e3
        as
-       let y = e1 in let x = e2 in e3
+       let y = e1 in let x = e2 in (drop y in e3)
     *)
     simple_expr_to_why1_expr env
-      { t with
+      { simple_expr_tag = "";
         simple_expr_node =
-          SElet(y,e1,{ e with simple_expr_node = SElet(x,e2,e3)})}
+          SElet(y,e1,{ simple_expr_tag = "";
+                       simple_expr_node =
+                         SElet(x,e2, { simple_expr_tag = "";
+                                       simple_expr_node = SEdrop(y,e3)})})}
   | SElet(pv,e1,e2) ->
      if is_type_int pv.Ity.pv_ity || is_type_bool pv.Ity.pv_ity then
        let env, n = declare_why_var_for_pv env ~is_global:false ~is_mutable:false pv in
@@ -451,6 +457,8 @@ let rec simple_expr_to_why1_expr env e =
        unsupported
          "simple_expr_to_why1_expr: let on variable `%a` of type `%a`"
          print_vs pv.Ity.pv_vs Ity.print_ity pv.Ity.pv_ity
+  | SEdrop (_,e) ->
+    simple_expr_to_why1_expr env e
   | SEif(e1,e2,e3) ->
 (*
 if is_type_bool e2.e_ity && is_type_bool e3.e_ity then
@@ -531,16 +539,19 @@ let rec simple_expr_to_why1_cond env e =
      end
   | SEassign _ (* assign list *) ->
      unsupported "simple_expr_to_why1_cond: parallel assignments"
-  | SElet(x,({simple_expr_node = SElet(y,e1,e2); _} as t),e3) ->
+  | SElet(x,{simple_expr_node = SElet(y,e1,e2); _},e3) ->
     (* we interpret
        let x = (let y = e1 in e2) in e3
        as
-       let y = e1 in let x = e2 in e3
+       let y = e1 in let x = e2 in (drop y in e3)
     *)
     simple_expr_to_why1_cond env
-      { t with
+      { simple_expr_tag = "";
         simple_expr_node =
-          SElet(y,e1,{ e with simple_expr_node = SElet(x,e2,e3)})}
+          SElet(y,e1,{ simple_expr_tag = "";
+                       simple_expr_node =
+                         SElet(x,e2, { simple_expr_tag = "";
+                                       simple_expr_node = SEdrop(y,e3)})})}
   | SElet(pv,e1,e2) ->
     (*     if is_type_int pv.Ity.pv_ity || is_type_bool pv.Ity.pv_ity then *)
        let env, n = declare_why_var_for_pv env ~is_global:false ~is_mutable:false pv in
@@ -551,7 +562,9 @@ let rec simple_expr_to_why1_cond env e =
      else
        unsupported "simple_expr_to_why1_cond: local let on type `%a`" Ity.print_ity pv.Ity.pv_ity
 *)
-   | SEif(e1,e2,e3) ->
+  | SEdrop(_,e) ->
+    simple_expr_to_why1_cond env e
+  | SEif(e1,e2,e3) ->
      (*     if is_type_bool e2.e_ity && is_type_bool e3.e_ity then *)
      let env, e1 = simple_expr_to_why1_cond env e1 in
           let env, e2 = simple_expr_to_why1_cond env e2 in
@@ -677,16 +690,19 @@ let rec simple_expr_to_why1_stmt env vars i =
     let env, vars, s2 = simple_expr_to_why1_stmt env vars i2 in
     let s = s_sequence tag s1 s2 in
     env, vars, s
-  | SElet(x,({simple_expr_node = SElet(y,e1,e2); _} as t),e3) ->
+  | SElet(x,{simple_expr_node = SElet(y,e1,e2); _},e3) ->
     (* we interpret
-       let x = (let y = e1 in e2) in e3
+       [tag] let x = (let y = e1 in e2) in e3
        as
-       let y = e1 in let x = e2 in e3
+       [tag] let y = e1 in let x = e2 in (drop y in e3)
     *)
     simple_expr_to_why1_stmt env vars
-      { t with
+      { simple_expr_tag = tag;
         simple_expr_node =
-          SElet(y,e1,{ i with simple_expr_node = SElet(x,e2,e3)})}
+          SElet(y,e1,{ simple_expr_tag = "";
+                       simple_expr_node =
+                         SElet(x,e2, { simple_expr_tag = "";
+                                       simple_expr_node = SEdrop(y,e3)})})}
   | SElet(pv,e,i) ->
     begin
       match type_of pv.Ity.pv_ity with
@@ -716,7 +732,12 @@ let rec simple_expr_to_why1_stmt env vars i =
                     let env,a = mlw_pv_to_why1_expr env pv in
                     env,a::args) args (env,[])
              in
-             let call = s_call tag (Some(ty,res_var,s)) name args in
+             let post_call =
+               List.fold_right
+                 (fun (_ty,v,_e) acc -> s_drop tag v acc)
+                 lets s
+             in
+             let call = s_call tag (Some(ty,res_var,post_call)) name args in
              let pre_call =
                List.fold_right
                  (fun (ty,v,e) acc -> s_let_in tag ty v e acc)
@@ -740,6 +761,10 @@ let rec simple_expr_to_why1_stmt env vars i =
                end
          end
     end
+  | SEdrop(v,e1) ->
+    let env, n = get_or_declare_why_var_for_pv env v in
+    let env,vars,s = simple_expr_to_why1_stmt env vars e1 in
+    env, vars, s_drop tag n s
   | SEif(e1,e2,e3) ->
      let env, c = simple_expr_to_why1_cond env e1 in
      let env,vars,s1 = simple_expr_to_why1_stmt env vars e2 in
