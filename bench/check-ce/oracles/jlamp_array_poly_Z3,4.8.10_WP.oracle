@@ -12,9 +12,9 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_poly.mlw:
   Line 11:
-    two = {to_int => 2}
+    two : t = epsilon x:t. to_int x = 2
   Line 14:
-    three = {to_int => 3}
+    three : t = epsilon x:t. to_int x = 3
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -30,11 +30,11 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_poly.mlw:
   Line 11:
-    two = {to_int => 2}
+    two : t = epsilon x:t. to_int x = 2
   Line 14:
-    three = {to_int => 3}
+    three : t = epsilon x:t. to_int x = 3
   Line 21:
-    three = {to_int => 3}
+    three : t = epsilon x:t. to_int x = 3
 
 File "bench/check-ce/jlamp_array_poly.mlw", line 28, characters 4-16:
 Sub-goal Index in array bounds of goal g'vc.

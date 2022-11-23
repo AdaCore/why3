@@ -1,20 +1,24 @@
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `f` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `f` cannot be evaluated)
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
 - Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `f` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `f` cannot be evaluated)
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
 File "bench/check-ce/double_projection.mlw", line 19, characters 15-22:
 Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown (sat).
 The following counterexample model could not be verified
-  (both RAC terminated because Postcondition of `f` cannot be evaluated):
+  (both RAC terminated because Precondition of `f` cannot be evaluated):
 File double_projection.mlw:
+  Line 8:
+    d : t -> int = fun (_arg_1:t) -> 0
+  Line 12:
+    c : t -> int = fun (_arg_1:t) -> 1
   Line 17:
-    x = {c => 1}
+    x : t = epsilon x:t. d x = 0 /\ c x = 1
   Line 19:
-    x = {c => 1}
+    x : t = epsilon x:t. d x = 0 /\ c x = 1
   Line 21:
-    _t = {c => 1}
+    _t : t = epsilon x:t. d x = 0 /\ c x = 1
 
