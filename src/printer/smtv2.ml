@@ -427,21 +427,7 @@ let rec print_term info fmt t =
       fprintf fmt "@[<hv2>(ite %a@ %a@ %a)@]"
         (print_fmla info) f1 (print_term info) t1 (print_term info) t2
   | Tcase(t, bl) ->
-    let ty = t_type t in
-    begin
-      match ty.ty_node with
-      | Tyapp (ts,_) when ts_equal ts ts_bool ->
-        print_boolean_branches info t print_term fmt bl
-      | _ ->
-        match t.t_node with
-        | Tvar v -> print_branches info v print_term fmt bl
-        | _ ->
-          let subject = create_vsymbol (id_fresh "subject") (t_type t) in
-          fprintf fmt "@[<hv2>(let ((%a @[%a@]))@ %a)@]"
-            (print_var info) subject (print_term info) t
-            (print_branches info subject print_term) bl;
-          forget_var info subject
-    end
+     print_tcase info t print_term fmt bl
   | Teps _ -> unsupportedTerm t
       "smtv2: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
@@ -515,24 +501,51 @@ and print_fmla info fmt f =
         (print_term info) t1 (print_fmla info) f2;
       forget_var info v
   | Tcase(t, bl) ->
-    let ty = t_type t in
-    begin
-      match ty.ty_node with
-      | Tyapp (ts,_) when ts_equal ts ts_bool ->
-        print_boolean_branches info t print_fmla fmt bl
-      | _ ->
-        match t.t_node with
-        | Tvar v -> print_branches info v print_fmla fmt bl
-        | _ ->
-          let subject = create_vsymbol (id_fresh "subject") (t_type t) in
-          fprintf fmt "@[<hv2>(let ((%a @[%a@]))@ %a)@]"
-            (print_var info) subject (print_term info) t
-            (print_branches info subject print_fmla) bl;
-          forget_var info subject
-    end
+     print_tcase info t print_fmla fmt bl
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f) in
 
   check_exit_vc_term f info.info_in_goal info.info_vc_term
+
+and print_tcase info t pr fmt bl =
+     let ty = t_type t in
+     match ty.ty_node with
+     | Tyapp (ts,_) when ts_equal ts ts_bool ->
+        print_boolean_branches info t pr fmt bl
+     | _ ->
+        match info.info_version with
+        | V20 | V26Par -> begin
+            (* Use a chain of if-then-else constructs. *)
+            match t.t_node with
+            | Tvar v -> print_branches info v pr fmt bl
+            | _ ->
+               let subject = create_vsymbol (id_fresh "subject") (t_type t) in
+               fprintf fmt "@[<hv2>(let ((%a @[%a@]))@ %a)@]"
+                 (print_var info) subject (print_term info) t
+                 (print_branches info subject pr) bl;
+               forget_var info subject
+          end
+        | V26 ->
+           fprintf fmt "@[<hv2>(match %a (@[<hv0>%a@]))@]"
+             (print_term info) t
+             (print_list space (print_match_branch info ty pr)) bl
+
+and print_match_branch info ty pr fmt b =
+  let (p,t) = t_open_branch b in
+  let error () = unsupportedPattern p
+    "smtv2: you must compile nested pattern-matching" in
+  match p.pat_node with
+  | Pwild ->
+     let wild = create_vsymbol (id_fresh "wildcard") ty in
+     fprintf fmt "@[<hv2>(%a %a)@]" (print_var info) wild (pr info) t
+  | Papp(cs,[]) ->
+     fprintf fmt "@[<hv2>(%a %a)@]" (print_ident info) cs.ls_name (pr info) t;
+  | Papp(cs,args) ->
+     let args = List.map (function
+       | {pat_node = Pvar v} -> v | _ -> error ()) args in
+     fprintf fmt "@[<hv2>(@[<hv2>(%a %a)@] %a)@]"
+       (print_ident info) cs.ls_name (print_list space (print_var info)) args
+       (pr info) t
+  | _ -> error ()
 
 and print_boolean_branches info subject pr fmt bl =
   let error () = unsupportedTerm subject
@@ -545,10 +558,9 @@ and print_boolean_branches info subject pr fmt bl =
     begin
       match p1.pat_node with
       | Papp(cs,_) ->
-        let csname = if ls_equal cs fs_bool_true then "true" else "false" in
-        fprintf fmt "@[<hv2>(ite (= %a %s) %a %a)@]"
+        let t1, t2 = if ls_equal cs fs_bool_true then t1, t2 else t2, t1 in
+        fprintf fmt "@[<hv2>(ite %a %a %a)@]"
           (print_term info) subject
-          csname
           (pr info) t1
           (pr info) t2
       | _ -> error ()
@@ -568,12 +580,7 @@ and print_branches info subject pr fmt bl = match bl with
             | {pat_node = Pvar v} -> v | _ -> error ()) args in
           if bl = [] then print_branch info subject pr fmt (cs,args,t)
           else
-            begin match info.info_version with
-              | V20 | V26 (* It should be the same than V26Par but it was different *) ->
-                  fprintf fmt "@[<hv2>(ite (is-%a %a) %a %a)@]"
-              | V26Par ->
-                  fprintf fmt "@[<hv2>(ite ((_ is %a) %a) %a %a)@]"
-            end
+            fprintf fmt "@[<hv2>(ite (is-%a %a) %a %a)@]"
               (print_ident info) cs.ls_name (print_var info) subject
               (print_branch info subject pr) (cs,args,t)
               (print_branches info subject pr) bl
