@@ -284,7 +284,7 @@ let rec import_model_value loc env check known th_known ity t =
                   let matching_field_name rs (ls,_) =
                     String.equal ls.ls_name.id_string rs.rs_name.id_string in
                   match List.find_all (matching_field_name field_rs) list_of_fields_values with
-                  | [(ls,term_value)] ->
+                  | [(_ls,term_value)] ->
                     import_model_value loc env check known th_known field_ity term_value
                   | [] ->
                     (* if the epsilon term does not define a value for field_rs,

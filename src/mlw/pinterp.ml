@@ -142,12 +142,12 @@ let get_arg : type t. t vtype -> _ -> _ -> t = fun t rs v ->
         Ident.print_decoded rs.rs_name.id_string
   | VTint, Vterm vt when (Opt.equal Ty.ty_equal vt.t_ty (Some Ty.ty_int)) ->
       begin match vt.t_node with
-      | Tconst (Constant.ConstInt c) -> BigInt.to_int c.il_int
+      | Tconst (Constant.ConstInt c) -> BigInt.to_int c.Number.il_int
       | _ -> assert false
       end
   | VTnum, Vterm vt when (Opt.equal Ty.ty_equal vt.t_ty (Some Ty.ty_int)) ->
       begin match vt.t_node with
-      | Tconst (Constant.ConstInt c) -> c.il_int
+      | Tconst (Constant.ConstInt c) -> c.Number.il_int
       | _ -> assert false
       end
   | VTbool, Vterm vt when (Opt.equal Ty.ty_equal vt.t_ty (Some Ty.ty_bool)) ->
@@ -1422,7 +1422,7 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
           | [{v_desc= Vpurefun (_, bindings, default)}; value] ->
               let v = try Mv.find value bindings with Not_found -> default in
               Normal v
-          | [{v_desc= Vundefined }; value] ->
+          | [{v_desc= Vundefined }; _] ->
               incomplete "an undefined argument was passed to %a"
                 Ident.print_decoded rs.rs_name.id_string
           | _ -> assert false

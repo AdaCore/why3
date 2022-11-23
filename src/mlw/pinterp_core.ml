@@ -1098,7 +1098,7 @@ let rec term_of_value ?(ty_mt=Mtv.empty) (env: env) vsenv v : (vsymbol * term) l
       let t = t_equ (fs_app ls [t_var vs] ty_x) t_x in
       vsenv, t_eps (t_close_bound vs t)
   | Vconstr (ors, field_rss, fs) ->
-      let t_app_from_constr rs field_rss fs =
+      let t_app_from_constr rs fs =
         let match_field mt pv f =
           ty_match mt pv.pv_vs.vs_ty (ty_inst mt (v_ty (field_get f))) in
         let ty_mt = List.fold_left2 match_field ty_mt rs.rs_cty.cty_args fs in
@@ -1123,7 +1123,7 @@ let rec term_of_value ?(ty_mt=Mtv.empty) (env: env) vsenv v : (vsymbol * term) l
         | Some rs ->
             begin
               match rs_kind rs with
-              | RKfunc -> t_app_from_constr rs field_rss fs
+              | RKfunc -> t_app_from_constr rs fs
               | RKnone when Strings.has_suffix "'mk" rs.rs_name.id_string ->
                   t_eps_from_constr field_rss fs
               | _ -> kasprintf failwith "Cannot construct term for constructor \
