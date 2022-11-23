@@ -150,14 +150,6 @@ let get_arg : type t. t vtype -> _ -> _ -> t = fun t rs v ->
       | Tconst (Constant.ConstInt c) -> c.il_int
       | _ -> assert false
       end
-  (* TODO_WIP *)
-  (*
-  | VTreal, Vterm vt when (Opt.equal Ty.ty_equal vt.t_ty (Some Ty.ty_real)) ->
-      begin match vt.t_node with
-      | Tconst (Constant.ConstReal c) -> ???
-      | _ -> assert false
-      end
-  *)
   | VTbool, Vterm vt when (Opt.equal Ty.ty_equal vt.t_ty (Some Ty.ty_bool)) ->
       begin match vt.t_node with
       | Ttrue -> true

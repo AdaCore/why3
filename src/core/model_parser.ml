@@ -365,7 +365,9 @@ let json_model_element me =
   Record [
       "name", String me.me_name.men_name;
       "attrs", json_attrs me.me_name;
-      "value", String "me.me_value"; (* TODO_WIP *)
+      "value", String "me.me_value";
+      (* TODO_WIP *)
+      (* String (Format.asprintf "%a" Pretty.print_term me.me_value); *)
       "kind", String kind
     ]
 
@@ -633,8 +635,6 @@ let build_model_rec pm (elts: model_element list) : model_files =
 **  Filtering the model
 ***************************************************************
 *)
-
-(* TODO_WIP not used ? *)
 
 let add_loc orig_model new_model position =
   (* Add a given location from orig_model to new_model *)

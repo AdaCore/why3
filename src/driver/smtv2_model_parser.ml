@@ -356,16 +356,14 @@ module FromSexpToModel = struct
     | sexp -> error sexp "application"
 
   and array sexp = match sexp with
+      (* "_ as-array" not supported because not associated to sorts for indices/values*)
     | List [ List [ Atom "as"; Atom "const"; List [ Atom "Array"; s1; s2] ]; t ] ->
         Tarray (sort s1, sort s2, {
           array_indices = [];
           array_others = term t;
         })
-    (* TODO_WIP *)
-    (*| List [ Atom "_"; Atom "as-array"; n ] ->
-        Tvar (Qannotident (identifier n, Sarray))*)
     | List [ Atom "store"; x; t1; t2 ] ->
-        let a = try array x with _ -> error sexp "array" (*Tvar (Qannotident (identifier x, Sarray))*) in
+        let a = try array x with _ -> error sexp "array" in
         begin match a with
         | Tarray (s1, s2, elts) -> Tarray (s1, s2, {
           array_indices = (term t1, term t2) :: elts.array_indices;
@@ -741,7 +739,6 @@ module FromModelToTerm = struct
     | Tarray (s1, s2, a) -> array_to_term env s1 s2 a
     | _ -> error "Could not interpret term %a@." print_term t
 
-  (* TODO_WIP refactoring *)
   and apply_to_term env qid ts =
     Debug.dprintf debug "[apply_to_term] qid = %a@ ts = %a@."
       print_qualified_identifier qid
@@ -766,7 +763,7 @@ module FromModelToTerm = struct
           (fun t t' -> t_binary_bool Term.Tand t (term_to_term env t'))
           (term_to_term env hd)
           tl
-    | Qident (Isymbol (S "not")), [ t ] -> t_bool_not (term_to_term env t)
+    | Qident (Isymbol (S "not")), [ t ] -> t_not_bool (term_to_term env t)
     | Qident (Isymbol (S n)), ts | Qident (Isymbol (Sprover n)), ts ->
         let ts' = List.map (term_to_term env) ts in
         let ls =
@@ -806,7 +803,6 @@ module FromModelToTerm = struct
     | _ -> error "Could not interpret %a@." print_qualified_identifier qid
 
   and array_to_term env s1 s2 elts =
-    (* TODO_WIP check type consistency *)
     Debug.dprintf debug "[array_to_term] a = %a@." print_array elts;
     let vs_arg =
       create_vsymbol (Ident.id_fresh "x") (smt_sort_to_ty env s1)
@@ -1035,10 +1031,10 @@ module FromModelToTerm = struct
       t_binary_bool op t1 t2
     | Term.Tnot t' -> (
       let t' = eval_term env seen_prover_vars ty_coercions ty_fields terms t' in
-      match t'.t_node with (* TODO_WIP is it really the place to do such simplifications? *)
+      match t'.t_node with
       | Term.Ttrue -> t_bool_false
       | Term.Tfalse -> t_bool_true
-      | _ -> t_bool_not t')
+      | _ -> t_not_bool t')
     | _ -> t
 
   let eval (pinfo : Printer.printing_info) env terms =
@@ -1229,7 +1225,7 @@ end
 *)
 
 let () =
-  Exn_printer.register (* TODO_WIP more info in messages *) (fun fmt exn ->
+  Exn_printer.register (fun fmt exn ->
       match exn with
       | FromStringToSexp.E msg ->
           Format.fprintf fmt
