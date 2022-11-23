@@ -1,11 +1,16 @@
 Invariant for loop [anonymous_loop_0] is
-  orb
-  (andb (a.contents) (andb (z.contents) (andb (y.contents) (x.contents))))
-  (andb (notb (a.contents))
-   (andb (notb (z.contents)) (orb (notb (y.contents)) (notb (x.contents))))) =
-  True
-Domains for loop [anonymous_loop_0] are x = top; y = top; z = top; a = top
+  (((orb
+     (andb (a.contents) (andb (z.contents) (andb (y.contents) (x.contents))))
+     (andb (notb (a.contents))
+      (andb (notb (z.contents)) (orb (notb (y.contents)) (notb (x.contents))))) =
+     True /\ o = True) /\
+    o1 = True) /\
+   o2 = True) /\
+  o3 = True
+Domains for loop [anonymous_loop_0] are
+  o3 = true; x = top; o2 = true; y = top; o1 = true; z = top; o = true;
+    a = top
 File bench/infer/bool_ops.mlw:
 Goal f'vc.
-Prover result is: Valid (0.09s, 1804 steps).
+Prover result is: Valid (0.09s, 1881 steps).
 
