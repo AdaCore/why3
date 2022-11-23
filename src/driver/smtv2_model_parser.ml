@@ -804,13 +804,19 @@ module FromModelToTerm = struct
 
   and array_to_term env s1 s2 elts =
     Debug.dprintf debug "[array_to_term] a = %a@." print_array elts;
-    let vs_arg =
-      create_vsymbol (Ident.id_fresh "x") (smt_sort_to_ty env s1)
-    in
+    let ty1 = smt_sort_to_ty env s1 in
+    let ty2 = smt_sort_to_ty env s2 in
+    let vs_arg = create_vsymbol (Ident.id_fresh "x") ty1 in
     let mk_case key value t =
       let key = term_to_term env key in
       let value = term_to_term env value in
-      t_if (t_equ (t_var vs_arg) key) value t
+      if Ty.oty_equal key.t_ty (Some ty1) && Ty.oty_equal value.t_ty (Some ty2)
+      then
+        t_if (t_equ (t_var vs_arg) key) value t
+      else
+        error "Type %a for sort %a of array keys and/or type %a for sort %a of array values do not match@."
+          (Pp.print_option Pretty.print_ty) key.t_ty print_sort s1
+          (Pp.print_option Pretty.print_ty) value.t_ty print_sort s2
     in
     let a = List.fold_left
       (fun t (key,value) -> mk_case key value t)
@@ -1165,7 +1171,7 @@ module FromModelToTerm = struct
     let projections = pinfo.Printer.list_projections in
     Mstr.iter
       (fun key f ->
-        Debug.dprintf debug "[list_projections] key = %s, field = %s@."
+        Debug.dprintf debug "[list_projections] key = %s, projection = %s@."
           key f.Ident.id_string)
       projections;
     let constructors = pinfo.Printer.constructors in
