@@ -104,7 +104,6 @@ let collect_model_ls info ls =
     end;
     info.list_projs <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
         ls.ls_name info.list_projs);
-  (* TODO_WIP the following code is used in smtv2.ml but not in alt_ergo ? *)
   (*
   if Sls.mem ls info.meta_record_def then (
     begin match ls.ls_args with
