@@ -245,7 +245,12 @@ let rec interp_stmt (functions : func list) (state : Abstract.t) (stmt : stateme
      result, Abstract.bottom env
 
   | Sletin(x, v, e, stmt) ->
-     interp_let_in functions state x v e stmt
+    interp_let_in functions state x v e stmt
+  | Sdrop(v,stmt) ->
+    let map = Abstract.why_env state in
+    let map = Abstract.VarMap.remove v map in
+    let s = Abstract.restrict_environment state map in
+    interp_stmt functions s stmt
   | Sbreak ->
      let env = Abstract.why_env state in
      Abstract.bottom env, state

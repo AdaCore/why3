@@ -53,12 +53,13 @@ val apron_env : t -> Apron.Environment.t
 val add_in_environment : t -> why_env -> t
 (** [add_in_environment s env] returns a state equivalent to [s] with
    extra variables from [env] added. Raises a failure if some
-   variables of [env] are alsready present in [s].  *)
+   variables of [env] are already present in [s].  *)
 
 val restrict_environment : t -> why_env -> t
 (** [restrict_environment s env] reduces the state [s] to the
    variables that are present in the domain of [env]. Note that the
-   codomain of [env] is not taken into account. *)
+   codomain of [env] is not taken into account. A variable in [env]
+   that is not in the environnement of [s] is also ignored. *)
 
 
 (** Handling of an havoc statement, that modifies a set of variables
