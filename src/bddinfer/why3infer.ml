@@ -19,7 +19,7 @@ open Expr
 open Ast
 open Abstract
 
-let verbose = 1
+let verbose_level = ref 0 (* see .mli for details *)
 
 let debug_bddinfer = Debug.register_flag "bddinfer" ~desc:"BDD-infer"
 
@@ -327,17 +327,62 @@ let p_expr_operator env op pv1 pv2 =
 
 exception NotExpression
 
-let rec mlw_expr_to_why1_expr env e =
+type simple_expr_node =
+  | SEvar of Ity.pvsymbol
+  | SEconst of Constant.constant
+  | SEexec of Expr.cexp * Ity.cty
+  | SEassign of Expr.assign list
+  | SEseq of simple_expr * simple_expr
+  | SElet of Ity.pvsymbol * simple_expr * simple_expr
+  | SEif of simple_expr * simple_expr * simple_expr
+  | SEwhile of simple_expr * Expr.invariant list * Expr.variant list * simple_expr
+  | SEassert of assertion_kind * Term.term
+  | SEbreak
+
+and simple_expr =
+  { simple_expr_tag : string;
+    simple_expr_node : simple_expr_node;
+  }
+
+let rec print_simple_expr fmt e =
+  let open Format in
   let open Expr in
+  match e.simple_expr_node with
+  | SEvar pv -> fprintf fmt "%a" Ity.print_pv pv
+  | SEconst c -> fprintf fmt "%a" Constant.print_def c
+  | SEexec(cexp,_cty) -> fprintf fmt "%a" (print_cexp true 0) cexp
+  | SEassign l ->
+    fprintf fmt "@[%a@]"
+      (Pp.print_list Pp.comma (fun fmt (pv1,_,pv2) ->
+          fprintf fmt "%a <- %a" Ity.print_pv pv1 Ity.print_pv pv2)) l
+  | SEseq(e1,e2) ->
+    fprintf fmt "@[%a ;@ %a@]" print_simple_expr e1 print_simple_expr e2
+  | SElet(pv,e1,e2) ->
+    fprintf fmt "@[let %a = %a in@ %a@]" Ity.print_pv pv print_simple_expr e1 print_simple_expr e2
+  | SEif(e1,e2,e3) ->
+    fprintf fmt "@[if %a then@ %a else@ %a" print_simple_expr e1 print_simple_expr e2 print_simple_expr e3
+  | SEwhile(c,_invs,_vars,b) ->
+    fprintf fmt "@[while %a <invs> <vars> do@ %a@ done@]" print_simple_expr c print_simple_expr b
+  | SEassert(Assert,t) ->
+    fprintf fmt "@[assert %a@]" Pretty.print_term t
+  | SEassert(Assume,t) ->
+    fprintf fmt "@[assume %a@]" Pretty.print_term t
+  | SEassert(Check,t) ->
+    fprintf fmt "@[check %a@]" Pretty.print_term t
+  | SEbreak ->
+    fprintf fmt "break;"
+
+
+let rec simple_expr_to_why1_expr env e =
   let env, e' =
-  match e.e_node with
-  | Evar pv -> mlw_pv_to_why1_expr env pv
-  | Econst (Constant.ConstInt c) -> env, e_cst (BigInt.to_string c.Number.il_int)
-  | Econst (Constant.ConstReal _) (* Constant.constant *) ->
-     unsupported "mlw_expr_to_why1_expr: real literals"
-  | Econst (Constant.ConstStr _) (* Constant.constant *) ->
-     unsupported "mlw_expr_to_why1_expr: string literals"
-  | Eexec(cexp,_cty) ->
+  match e.simple_expr_node with
+  | SEvar pv -> mlw_pv_to_why1_expr env pv
+  | SEconst (Constant.ConstInt c) -> env, e_cst (BigInt.to_string c.Number.il_int)
+  | SEconst (Constant.ConstReal _) (* Constant.constant *) ->
+     unsupported "simple_expr_to_why1_expr: real literals"
+  | SEconst (Constant.ConstStr _) (* Constant.constant *) ->
+     unsupported "simple_expr_to_why1_expr: string literals"
+  | SEexec(cexp,_cty) ->
      begin match cexp.c_node with
      (* FIXME do not match on rs names *)
      | Capp(rs, [pv]) when rs.rs_name.Ident.id_string = "ref" ->
@@ -376,64 +421,64 @@ let rec mlw_expr_to_why1_expr env e =
      | Capp(rs, [_; _]) when rs.rs_name.Ident.id_string = "infix >" ->
         raise NotExpression
      | Capp(rs,_args) ->
-        unsupported "mlw_expr_to_why1_expr: execution of call to function `%a`" Expr.print_rs rs
+        unsupported "simple_expr_to_why1_expr: execution of call to function `%a`" Expr.print_rs rs
      | Cpur(ls,_l) ->
-        unsupported "mlw_expr_to_why1_expr: execution of call to pure function `%a`" Pretty.print_ls ls
+        unsupported "simple_expr_to_why1_expr: execution of call to pure function `%a`" Pretty.print_ls ls
      | Cfun e ->
-        unsupported "mlw_expr_to_why1_expr: execution of call to expression `%a`" Expr.print_expr e
+        unsupported "simple_expr_to_why1_expr: execution of call to expression `%a`" Expr.print_expr e
      | Cany ->
-        unsupported "mlw_expr_to_why1_expr: execution of call to `any`"
+        unsupported "simple_expr_to_why1_expr: execution of call to `any`"
      end
-  | Eassign _ (* assign list *) ->
-     unsupported "mlw_expr_to_why1_expr: execution of parallel assignments"
-  | Elet(LDsym _,_) ->
-     unsupported "mlw_expr_to_why1_expr: execution of local sym"
-  | Elet(LDrec _,_) ->
-     unsupported "mlw_expr_to_why1_expr: execution of local rec"
-  | Elet(LDvar(pv,e1),e2) ->
+  | SEassign _ (* assign list *) ->
+     unsupported "simple_expr_to_why1_expr: execution of parallel assignments"
+  | SElet(x,({simple_expr_node = SElet(y,e1,e2); _} as t),e3) ->
+    (* we interpret
+       let x = (let y = e1 in e2) in e3
+       as
+       let y = e1 in let x = e2 in e3
+    *)
+    simple_expr_to_why1_expr env
+      { t with
+        simple_expr_node =
+          SElet(y,e1,{ e with simple_expr_node = SElet(x,e2,e3)})}
+  | SElet(pv,e1,e2) ->
      if is_type_int pv.Ity.pv_ity || is_type_bool pv.Ity.pv_ity then
        let env, n = declare_why_var_for_pv env ~is_global:false ~is_mutable:false pv in
-        let env, e1 = mlw_expr_to_why1_expr env e1 in
-        let env, e2 = mlw_expr_to_why1_expr env e2 in
+        let env, e1 = simple_expr_to_why1_expr env e1 in
+        let env, e2 = simple_expr_to_why1_expr env e2 in
         env, e_let_in_expression n e1 e2
      else
        unsupported
-         "mlw_expr_to_why1_expr: let on variable `%a` of type `%a`"
+         "simple_expr_to_why1_expr: let on variable `%a` of type `%a`"
          print_vs pv.Ity.pv_vs Ity.print_ity pv.Ity.pv_ity
-   | Eif(e1,e2,e3) ->
-      if is_type_bool e2.e_ity && is_type_bool e3.e_ity then
-        let env, e1 = mlw_expr_to_why1_expr env e1 in
-        let env, e2 = mlw_expr_to_why1_expr env e2 in
-        let env, e3 = mlw_expr_to_why1_expr env e3 in
-        (* `if e1 then e2 else e3` is equivalent to
+  | SEif(e1,e2,e3) ->
+(*
+if is_type_bool e2.e_ity && is_type_bool e3.e_ity then
+*)
+    let env, e1 = simple_expr_to_why1_expr env e1 in
+    let env, e2 = simple_expr_to_why1_expr env e2 in
+    let env, e3 = simple_expr_to_why1_expr env e3 in
+    (* `if e1 then e2 else e3` is equivalent to
            `(e1 /\ e2) \/ (not e1 /\ e3)` *)
-           let c =
-            bwor_simp
-            (bwand_simp e1 e2)
-            (bwand_simp (bwnot_simp e1) e3)
-        in env, c
-      else
-        unsupported
-          "mlw_expr_to_why1_expr: if statement on type `%a`"
-          Ity.print_ity e1.e_ity
-  | Ematch  _ (* expr * reg_branch list * exn_branch Mxs.t *) ->
-      unsupported "mlw_expr_to_why1_expr: Ematch"
-  | Ewhile  _ (* expr * invariant list * variant list * expr *) ->
-      unsupported "mlw_expr_to_why1_expr: Ewhile"
-  | Efor    _ (* pvsymbol * for_bounds * pvsymbol * invariant list * expr *) ->
-      unsupported "mlw_expr_to_why1_expr: Efor"
-  | Eraise  _ (* xsymbol * expr *) ->
-      unsupported "mlw_expr_to_why1_expr: Eraise"
-  | Eexn    _ (* xsymbol * expr *) ->
-      unsupported "mlw_expr_to_why1_expr: Eexn"
-  | Eassert _ (* assertion_kind * term *) ->
-      unsupported "mlw_expr_to_why1_expr: Eassert"
-  | Eghost  _ (* expr *) ->
-      unsupported "mlw_expr_to_why1_expr: Eghost"
-  | Epure t ->
-     mlw_term_to_why1_expr env t
-  | Eabsurd ->
-      unsupported "mlw_expr_to_why1_expr: Eabsurd"
+    let c =
+      bwor_simp
+        (bwand_simp e1 e2)
+        (bwand_simp (bwnot_simp e1) e3)
+    in env, c
+(*
+else
+      unsupported
+        "simple_expr_to_why1_expr: if statement on type `%a`"
+        Ity.print_ity e1.e_ity
+*)
+  | SEwhile  _ (* expr * invariant list * variant list * expr *) ->
+      unsupported "simple_expr_to_why1_expr: SEwhile"
+  | SEassert _ (* assertion_kind * term *) ->
+      unsupported "simple_expr_to_why1_expr: SEassert"
+  | SEbreak ->
+      unsupported "simple_expr_to_why1_expr: SEbreak"
+  | SEseq _ ->
+      unsupported "simple_expr_to_why1_expr: SEseq"
   in env, e'
 
 let p_expr_bool_operator env op pv1 pv2 =
@@ -441,21 +486,20 @@ let p_expr_bool_operator env op pv1 pv2 =
   let env, v2 = mlw_pv_to_why1_expr env pv2 in
   env, atomic_cond (op v1 v2)
 
-let rec mlw_expr_to_why1_cond env e =
-  let open Expr in
+let rec simple_expr_to_why1_cond env e =
   let env, c' =
     try
-      if is_type_bool e.e_ity then
-        let env, t = mlw_expr_to_why1_expr env e in
-        env, atomic_cond (c_is_true t)
-      else raise NotExpression
+      (*      if is_type_bool e.e_ity then *)
+      let env, t = simple_expr_to_why1_expr env e in
+      env, atomic_cond (c_is_true t)
+    (*      else raise NotExpression *)
     with NotExpression ->
-    match e.e_node with
-    | Evar _pv ->
-      unsupported "mlw_expr_to_why1_cond: Evar"
-    | Econst _ ->
-      unsupported "mlw_expr_to_why1_cond: Econst"
-    | Eexec(cexp,_cty) ->
+    match e.simple_expr_node with
+    | SEvar _pv ->
+      unsupported "simple_expr_to_why1_cond: Evar"
+    | SEconst _ ->
+      unsupported "simple_expr_to_why1_cond: Econst"
+    | SEexec(cexp,_cty) ->
      begin match cexp.c_node with
      (* FIXME do not match on rs names *)
      | Capp(rs,[pv1;pv2]) when rs.rs_name.Ident.id_string = "infix =" ->
@@ -477,63 +521,63 @@ let rec mlw_expr_to_why1_cond env e =
      | Capp(rs, []) when rs.rs_name.Ident.id_string = "False" ->
         env, false_cond
      | Capp(rs,_args) ->
-        unsupported "mlw_expr_to_why1_cond: execution of function `%a`" Expr.print_rs rs
+        unsupported "simple_expr_to_why1_cond: execution of function `%a`" Expr.print_rs rs
      | Cpur(ls,_l) (* lsymbol * pvsymbol list *) ->
-        unsupported "mlw_expr_to_why1_cond: execution of pure function `%a`" Pretty.print_ls ls
-     | Cfun _ (* expr *) ->
-        unsupported "mlw_expr_to_why1_cond: execution of expression `%a`" Expr.print_expr e
+        unsupported "simple_expr_to_why1_cond: execution of pure function `%a`" Pretty.print_ls ls
+     | Cfun e (* expr *) ->
+        unsupported "simple_expr_to_why1_cond: execution of expression `Cfun %a`" Expr.print_expr e
      | Cany ->
-        unsupported "mlw_expr_to_why1_cond: execution of `any`"
+        unsupported "simple_expr_to_why1_cond: execution of `any`"
      end
-  | Eassign _ (* assign list *) ->
-     unsupported "mlw_expr_to_why1_cond: parallel assignments"
-  | Elet(LDsym _,_) ->
-     unsupported "mlw_expr_to_why1_cond: execution of local sym"
-  | Elet(LDrec _,_) ->
-     unsupported "mlw_expr_to_why1_cond: execution of local rec"
-  | Elet(LDvar(pv,e1),e2) ->
-     if is_type_int pv.Ity.pv_ity || is_type_bool pv.Ity.pv_ity then
+  | SEassign _ (* assign list *) ->
+     unsupported "simple_expr_to_why1_cond: parallel assignments"
+  | SElet(x,({simple_expr_node = SElet(y,e1,e2); _} as t),e3) ->
+    (* we interpret
+       let x = (let y = e1 in e2) in e3
+       as
+       let y = e1 in let x = e2 in e3
+    *)
+    simple_expr_to_why1_cond env
+      { t with
+        simple_expr_node =
+          SElet(y,e1,{ e with simple_expr_node = SElet(x,e2,e3)})}
+  | SElet(pv,e1,e2) ->
+    (*     if is_type_int pv.Ity.pv_ity || is_type_bool pv.Ity.pv_ity then *)
        let env, n = declare_why_var_for_pv env ~is_global:false ~is_mutable:false pv in
-       let env, e = mlw_expr_to_why1_expr env e1 in
-       let env, c = mlw_expr_to_why1_cond env e2 in
+       let env, e = simple_expr_to_why1_expr env e1 in
+       let env, c = simple_expr_to_why1_cond env e2 in
        env, e_let_in_condition n e c
+(*
      else
-       unsupported "mlw_expr_to_why1_cond: local let on type `%a`" Ity.print_ity pv.Ity.pv_ity
-   | Eif(e1,e2,e3) ->
-     if is_type_bool e2.e_ity && is_type_bool e3.e_ity then
-     let env, e1 = mlw_expr_to_why1_cond env e1 in
-          let env, e2 = mlw_expr_to_why1_cond env e2 in
-          let env, e3 = mlw_expr_to_why1_cond env e3 in
+       unsupported "simple_expr_to_why1_cond: local let on type `%a`" Ity.print_ity pv.Ity.pv_ity
+*)
+   | SEif(e1,e2,e3) ->
+     (*     if is_type_bool e2.e_ity && is_type_bool e3.e_ity then *)
+     let env, e1 = simple_expr_to_why1_cond env e1 in
+          let env, e2 = simple_expr_to_why1_cond env e2 in
+          let env, e3 = simple_expr_to_why1_cond env e3 in
           env, ternary_condition e1 e2 e3
-      else
-        unsupported "mlw_expr_to_why1_cond: if expression on type `%a`"
-          Ity.print_ity e2.e_ity
-  | Ematch  _ (* expr * reg_branch list * exn_branch Mxs.t *) ->
-     unsupported "mlw_expr_to_why1_cond: Ematch"
-  | Ewhile  _ (* expr * invariant list * variant list * expr *) ->
-     unsupported "mlw_expr_to_why1_cond: Ewhile"
-  | Efor    _ (* pvsymbol * for_bounds * pvsymbol * invariant list * expr *) ->
-     unsupported "mlw_expr_to_why1_cond: Efor"
-  | Eraise  _ (* xsymbol * expr *) ->
-     unsupported "mlw_expr_to_why1_cond: Eraise"
-  | Eexn    _ (* xsymbol * expr *) ->
-     unsupported "mlw_expr_to_why1_cond: Eexn"
-  | Eassert _ (* assertion_kind * term *) ->
-     unsupported "mlw_expr_to_why1_cond: Eassert"
-  | Eghost  _ (* expr *) ->
-     unsupported "mlw_expr_to_why1_cond: Eghost"
-  | Epure   _ (* term *) ->
-     unsupported "mlw_expr_to_why1_cond: Epure"
-  | Eabsurd ->
-     unsupported "mlw_expr_to_why1_cond: Eabsurd"
+(*      else
+        unsupported "simple_expr_to_why1_cond: if expression on type `%a`"
+          Ity.print_ity e2.e_ity *)
+  | SEwhile  _ (* expr * invariant list * variant list * expr *) ->
+     unsupported "simple_expr_to_why1_cond: SEwhile"
+  | SEassert _ (* assertion_kind * term *) ->
+     unsupported "simple_expr_to_why1_cond: SEassert"
+  | SEbreak ->
+     unsupported "simple_expr_to_why1_cond: SEbreak"
+  | SEseq _ ->
+     unsupported "simple_expr_to_why1_cond: SEseq"
   in env, c'
+
+
 
 exception NotAFunctionCall
 
-let rec mlw_expr_to_function_call acc env e1
+let rec simple_expr_to_function_call acc env i
   =
-  match e1.e_node with
-  | Eexec(cexp,_cty) ->
+  match i.simple_expr_node with
+  | SEexec(cexp,_cty) ->
      begin match cexp.c_node with
      (* FIXME do not match on rs names *)
      | Capp(_rs, []) -> raise NotAFunctionCall
@@ -561,15 +605,165 @@ let rec mlw_expr_to_function_call acc env e1
      | Cany ->
         unsupported "mlw_expr_to_function_call: Cany"
      end
-  | Elet(LDvar(pv,e1),e2) ->
-     if is_type_unit pv.Ity.pv_ity then
-       (* workaround for the time we don't support the unit type as a value
+  | SEseq(_,e2) ->
+    (* workaround for the time we don't support the unit type as a value
           useful for the shape `let o = () in f o`
-        *)
-       mlw_expr_to_function_call acc env e2
-     else
-       mlw_expr_to_function_call ((pv,e1)::acc) env e2
+    *)
+    simple_expr_to_function_call acc env e2
+  | SElet(pv,e1,e2) ->
+       simple_expr_to_function_call ((pv,e1)::acc) env e2
   | _ -> raise NotAFunctionCall
+
+
+
+let rec simple_expr_to_why1_stmt env vars i =
+  let tag = i.simple_expr_tag in
+  match i.simple_expr_node with
+  | SEvar _ ->
+    unsupported "simple_expr_to_why1_stmt: SEvar"
+  | SEconst _ ->
+    unsupported "simple_expr_to_why1_stmt: SEconst"
+  | SEexec(cexp,_cty) ->
+     begin match cexp.c_node with
+     (* FIXME do not match on rs names *)
+     | Capp(rs,[]) when rs.rs_name.Ident.id_string = "Tuple0" ->
+        env, vars, s_block tag []
+     | Capp(rs,[]) ->
+        unsupported
+          "simple_expr_to_why1_stmt: execution of nullary function `%a`" Expr.print_rs rs
+     | Capp(rs, [_pv]) when rs.rs_name.Ident.id_string = "prefix !" ->
+        (* FIXME: we assume it is the returned value, we just ignore it *)
+        env, vars, s_block tag []
+     | Capp(rs, [_pv]) when rs.rs_name.Ident.id_string = "contents" ->
+        (* FIXME: we assume it is the returned value, we just ignore it *)
+        env, vars, s_block tag []
+     | Capp(rs, [pv1;pv2]) when rs.rs_name.Ident.id_string = "infix :=" ->
+        let is_ref,ty = type_of pv1.Ity.pv_ity in
+        assert is_ref;
+        let env, x = get_or_declare_why_var_for_pv env pv1 in
+        let env, v2 = mlw_pv_to_why1_expr env pv2 in
+        env, Ity.Spv.(add pv1 (add pv2 vars)), s_assign tag ty x v2
+     | Capp(rs,args) ->
+        let name = get_or_declare_function rs in
+        let env,args =
+          match args with
+          | [pv] when is_type_unit pv.Ity.pv_ity -> env,[]
+          | _ ->
+             List.fold_right
+               (fun pv (env, args) ->
+                 let env, v = mlw_pv_to_why1_expr env pv in
+                 env, v :: args)
+               args (env, [])
+        in
+        env, vars, s_call tag None name args
+     | Cpur _ (* lsymbol * pvsymbol list *) ->
+        unsupported "simple_expr_to_why1_stmt: Cpur"
+     | Cfun _ (* expr *) ->
+        unsupported "simple_expr_to_why1_stmt: Cfun"
+     | Cany ->
+        unsupported "simple_expr_to_why1_stmt: Cany"
+     end
+  | SEassign [(var,_f,value)] ->
+     (* TODO: check that var as type ref int or ref bool, and that f is "contents" *)
+     let is_ref,ty = type_of var.Ity.pv_ity in
+     assert is_ref;
+     let env, n = get_or_declare_why_var_for_pv env var in
+     let env, value' = mlw_pv_to_why1_expr env value in
+     env, Ity.Spv.(add var (add value vars)), s_assign tag ty n value'
+  | SEassign _ (* assign list *) ->
+    unsupported "simple_expr_to_why1_stmt: SEassign (parallel)"
+  | SEseq(i1,i2) ->
+    let env, vars, s1 = simple_expr_to_why1_stmt env vars i1 in
+    let env, vars, s2 = simple_expr_to_why1_stmt env vars i2 in
+    let s = s_sequence tag s1 s2 in
+    env, vars, s
+  | SElet(x,({simple_expr_node = SElet(y,e1,e2); _} as t),e3) ->
+    (* we interpret
+       let x = (let y = e1 in e2) in e3
+       as
+       let y = e1 in let x = e2 in e3
+    *)
+    simple_expr_to_why1_stmt env vars
+      { t with
+        simple_expr_node =
+          SElet(y,e1,{ i with simple_expr_node = SElet(x,e2,e3)})}
+  | SElet(pv,e,i) ->
+    begin
+      match type_of pv.Ity.pv_ity with
+      | exception (Error(_msg,expl)) ->
+        unsupported
+          "@[<hov 2>simple_expr_to_why1_stmt:@ let on type@ @[`%a`@] (%s)@]"
+          Ity.print_ity pv.Ity.pv_ity expl
+      | (is_mutable,ty) ->
+        let env, res_var = declare_why_var_for_pv env ~is_global:false ~is_mutable pv in
+        begin
+          try
+            let env, rs, lets, args = simple_expr_to_function_call [] env e in
+            let env,vars,s = simple_expr_to_why1_stmt env vars i in
+            let name = get_or_declare_function rs in
+            let env, lets =
+              List.fold_right
+                (fun (pv,e) (env, lets) ->
+                   let env, e' = simple_expr_to_why1_expr env e in
+                   let is_mutable,ty = type_of pv.Ity.pv_ity in
+                   let env, n = declare_why_var_for_pv env ~is_global:false ~is_mutable pv in
+                   (env, (ty,n,e') :: lets))
+                 lets (env, [])
+             in
+             let env,args =
+               List.fold_right
+                 (fun pv (env,args) ->
+                    let env,a = mlw_pv_to_why1_expr env pv in
+                    env,a::args) args (env,[])
+             in
+             let call = s_call tag (Some(ty,res_var,s)) name args in
+             let pre_call =
+               List.fold_right
+                 (fun (ty,v,e) acc -> s_let_in tag ty v e acc)
+                 lets call
+             in
+             env,vars,pre_call
+           with NotAFunctionCall ->
+             try
+               let env, e = simple_expr_to_why1_expr env e in
+               let env,vars,s = simple_expr_to_why1_stmt env vars i in
+               env,vars,s_let_in tag ty res_var e s
+             with NotExpression ->
+               begin
+                 let env, e = simple_expr_to_why1_cond env e in
+                 let env,vars,s = simple_expr_to_why1_stmt env vars i in
+                 let pb = s_block "" [] in
+                 let pa = s_assign "" ty res_var e_bwtrue in
+                 let pite = s_ite "" e pa pb in
+                 let pb = s_block "" [pite; s] in
+                 env,vars,s_let_in tag ty res_var e_bwfalse pb
+               end
+         end
+    end
+  | SEif(e1,e2,e3) ->
+     let env, c = simple_expr_to_why1_cond env e1 in
+     let env,vars,s1 = simple_expr_to_why1_stmt env vars e2 in
+     let env,vars,s2 = simple_expr_to_why1_stmt env vars e3 in
+     env,vars,s_ite tag c s1 s2
+  | SEwhile(cond,invs,_vars,body) ->
+    let env, c = simple_expr_to_why1_cond env cond in
+    let env, i =
+      List.fold_right (fun inv (env, invs)  ->
+          let env, v = mlw_term_to_why1_cond env inv in
+          (* TODO get the name of the invariants from Why3? *)
+          (env, (None, v)::invs)) invs (env, [])
+    in
+    let env,vars,b = simple_expr_to_why1_stmt env vars body in
+    env,vars,s_while tag c i b
+  | SEassert(Assert,t) ->
+    let env, c = mlw_term_to_why1_cond env t in
+    env,vars,s_assert tag c
+  | SEassert(Assume,t) ->
+    let env, c = mlw_term_to_why1_cond env t in
+    env,vars,s_assume tag c
+  | SEassert(_,_t) ->
+    unsupported "simple_expr_to_why1_stmt: SEassert"
+  | SEbreak -> env, vars, s_break tag
 
 
 
@@ -588,7 +782,10 @@ let record_loop tag e =
   loop_tags := Wstdlib.Mstr.add n e !loop_tags;
   n
 
-let rec mlw_expr_to_why1_stmt env vars e =
+let mk_instr tag i = { simple_expr_tag = tag ; simple_expr_node = i }
+
+
+let rec mlw_expr_to_simple_expr (* env vars *)e =
   let tag =
     Ident.Sattr.fold
       (fun a acc ->
@@ -599,147 +796,39 @@ let rec mlw_expr_to_why1_stmt env vars e =
   in
   let open Expr in
   match e.e_node with
-  | Evar    _ (* pvsymbol *) ->
-     unsupported "mlw_expr_to_why1_stmt: Evar"
-  | Econst  _ (* Constant.constant *) ->
-     unsupported "mlw_expr_to_why1_stmt: Econst"
-  | Eexec(cexp,_cty) ->
-     begin match cexp.c_node with
-     (* FIXME do not match on rs names *)
-     | Capp(rs,[]) when rs.rs_name.Ident.id_string = "Tuple0" ->
-        env, vars, s_block tag []
-     | Capp(rs,[]) ->
-        unsupported
-          "mlw_expr_to_why1_stmt: execution of nullary function `%a`" Expr.print_rs rs
-     | Capp(rs, [_pv]) when rs.rs_name.Ident.id_string = "prefix !" ->
-        (* FIXME: we assume it is the returned value, we just ignore it *)
-        env, vars, s_block tag []
-     | Capp(rs, [_pv]) when rs.rs_name.Ident.id_string = "contents" ->
-        (* FIXME: we assume it is the returned value, we just ignore it *)
-        env, vars, s_block tag []
-     | Capp(rs, [pv1;pv2]) when rs.rs_name.Ident.id_string = "infix :=" ->
-        let is_ref,ty = type_of pv1.Ity.pv_ity in
-        assert is_ref;
-        let env, x = get_or_declare_why_var_for_pv env pv1 in
-        let env, v2 = mlw_pv_to_why1_expr env pv2 in
-        env, Ity.Spv.add pv1 vars, s_assign tag ty x v2
-     | Capp(rs,args) ->
-        let name = get_or_declare_function rs in
-        let env,args =
-          match args with
-          | [pv] when is_type_unit pv.Ity.pv_ity -> env,[]
-          | _ ->
-             List.fold_right
-               (fun pv (env, args) ->
-                 let env, v = mlw_pv_to_why1_expr env pv in
-                 env, v :: args)
-               args (env, [])
-        in
-        env, vars, s_call tag None name args
-     | Cpur _ (* lsymbol * pvsymbol list *) ->
-        unsupported "mlw_expr_to_why1_stmt: Cpur"
-     | Cfun _ (* expr *) ->
-        unsupported "mlw_expr_to_why1_stmt: Cfun"
-     | Cany ->
-        unsupported "mlw_expr_to_why1_stmt: Cany"
-     end
-  | Eassign [(var,_f,value)] ->
-     (* TODO: check that var as type ref int or ref bool, and that f is "contents" *)
-     let is_ref,ty = type_of var.Ity.pv_ity in
-     assert is_ref;
-     let env, n = get_or_declare_why_var_for_pv env var in
-     let env, value = mlw_pv_to_why1_expr env value in
-     env, Ity.Spv.add var vars, s_assign tag ty n value
-  | Eassign _ (* assign list *) ->
-     unsupported "mlw_expr_to_why1_stmt: Eassign (parallel)"
+  | Evar pv -> mk_instr tag (SEvar pv)
+  | Econst c -> mk_instr tag (SEconst c)
+  | Eexec(cexp,cty) -> mk_instr tag (SEexec(cexp,cty))
+  | Eassign l -> mk_instr tag (SEassign l)
   | Elet(LDvar(pv,e1),e2) ->
      if is_type_unit pv.Ity.pv_ity then
-       let env, vars, s1 = mlw_expr_to_why1_stmt env vars e1 in
-       let env, vars, s2 = mlw_expr_to_why1_stmt env vars e2 in
-       let s = s_sequence tag s1 s2 in
-       env, vars, s
+       let s1 = mlw_expr_to_simple_expr e1 in
+       let s2 = mlw_expr_to_simple_expr e2 in
+       mk_instr tag (SEseq(s1,s2))
      else
-       begin
-         match type_of pv.Ity.pv_ity with
-         | exception (Error(_msg,expl)) ->
-            unsupported
-              "@[<hov 2>mlw_expr_to_why1_stmt:@ let on type@ @[`%a`@] (%s)@]"
-              Ity.print_ity pv.Ity.pv_ity expl
-         | (is_mutable,ty) ->
-           let env, res_var = declare_why_var_for_pv env ~is_global:false ~is_mutable pv in
-           begin
-             try
-             let env, rs, lets, args = mlw_expr_to_function_call [] env e1 in
-             let env,vars,s = mlw_expr_to_why1_stmt env vars e2 in
-             let name = get_or_declare_function rs in
-             let env, lets =
-               List.fold_right
-                 (fun (pv,e) (env, lets) ->
-                   let env, e' = mlw_expr_to_why1_expr env e in
-                   let is_mutable,ty = type_of pv.Ity.pv_ity in
-                   (* Format.printf "Going to declare var for pv = %a@," print_pv pv; *)
-                   let env, n = declare_why_var_for_pv env ~is_global:false ~is_mutable pv in
-                   (env, (ty,n,e') :: lets))
-                 lets (env, [])
-             in
-             let args = List.map (fun pv -> snd (mlw_pv_to_why1_expr env pv)) args in
-             let call = s_call tag (Some(ty,res_var,s)) name args in
-             let pre_call =
-               List.fold_right
-                 (fun (ty,v,e) acc -> s_let_in tag ty v e acc)
-                 lets call
-             in
-             env,vars,pre_call
-           with NotAFunctionCall ->
-             try
-               let env, e = mlw_expr_to_why1_expr env e1 in
-               let env,vars,s = mlw_expr_to_why1_stmt env vars e2 in
-               env,vars,s_let_in tag ty res_var e s
-             with NotExpression ->
-               begin
-                 let env, e = mlw_expr_to_why1_cond env e1 in
-                 let env,vars,s = mlw_expr_to_why1_stmt env vars e2 in
-                 let pb = s_block "" [] in
-                 let pa = s_assign "" ty res_var e_bwtrue in
-                 let pite = s_ite "" e pa pb in
-                 let pb = s_block "" [pite; s] in
-                 env,vars,s_let_in tag ty res_var e_bwfalse pb
-               end
-           end
-       end
+       let s1 = mlw_expr_to_simple_expr e1 in
+       let s2 = mlw_expr_to_simple_expr e2 in
+       mk_instr tag (SElet(pv,s1,s2))
   | Elet(LDsym _,_) ->
-     unsupported "mlw_expr_to_why1_stmt: execution of local sym"
+     unsupported "mlw_expr_to_simple_expr: execution of local sym"
   | Elet(LDrec _,_) ->
-     unsupported "mlw_expr_to_why1_stmt: execution of local rec"
+     unsupported "mlw_expr_to_simple_expr: execution of local rec"
   | Eif(e1,e2,e3) ->
-     let env, c = mlw_expr_to_why1_cond env e1 in
-     let env,vars,s1 = mlw_expr_to_why1_stmt env vars e2 in
-     let env,vars,s2 = mlw_expr_to_why1_stmt env vars e3 in
-     env,vars,s_ite tag c s1 s2
-  | Ewhile(cond,invs,_vars,body) ->
+     let s1 = mlw_expr_to_simple_expr e1 in
+     let s2 = mlw_expr_to_simple_expr e2 in
+     let s3 = mlw_expr_to_simple_expr e3 in
+     mk_instr tag (SEif(s1,s2,s3))
+  | Ewhile(cond,invs,vars,body) ->
      let tag = record_loop tag e in
-     let env, c = mlw_expr_to_why1_cond env cond in
-     let env, i =
-       List.fold_right (fun inv (env, invs)  ->
-           let env, v = mlw_term_to_why1_cond env inv in
-           (* TODO get the name of the invariants from Why3? *)
-           (env, (None, v)::invs)) invs (env, [])
-     in
-     let env,vars,b = mlw_expr_to_why1_stmt env vars body in
-     env,vars,s_while tag c i b
+     let c = mlw_expr_to_simple_expr cond in
+     let b = mlw_expr_to_simple_expr body in
+     mk_instr tag (SEwhile(c,invs,vars,b))
   | Efor    _ (* pvsymbol * for_bounds * pvsymbol * invariant list * expr *) ->
-     unsupported "mlw_expr_to_why1_stmt: Efor"
-  | Eassert(Assert,t) ->
-     let env, c = mlw_term_to_why1_cond env t in
-     env,vars,s_assert tag c
-  | Eassert(Assume,t) ->
-     let env, c = mlw_term_to_why1_cond env t in
-     env,vars,s_assume tag c
-  | Eassert(_,_t) ->
-    unsupported "mlw_expr_to_why1_stmt: Eassert"
+     unsupported "mlw_expr_to_simple_expr: Efor"
+  | Eassert(k,t) -> mk_instr tag (SEassert(k,t))
   (* ad-hoc support for "break" *)
   | Eraise(xs, _e1) when xs.xs_name.id_string = "'Break" ->
-     env, vars, s_break tag
+     mk_instr tag SEbreak
   | Eexn(xs, e1) when xs.xs_name.id_string = "'Break" ->
     let open Ity in
     begin
@@ -748,27 +837,26 @@ let rec mlw_expr_to_why1_stmt env vars e =
         begin
           match Mxs.bindings excs with
           | [xss,_] when xs_equal xss xs ->
-            mlw_expr_to_why1_stmt env vars e2
+            mlw_expr_to_simple_expr e2
           | _ ->
-            unsupported "mlw_expr_to_why1_stmt: Eexn (1)"
+            unsupported "mlw_expr_to_simple_expr: Eexn (1)"
         end
       | _ ->
-        unsupported "mlw_expr_to_why1_stmt: Eexn (2)"
+        unsupported "mlw_expr_to_simple_expr: Eexn (2)"
     end
   (* end of ad-hoc support for break *)
   | Eraise  _ (* xsymbol * expr *) ->
-     unsupported "mlw_expr_to_why1_stmt: Eraise"
+     unsupported "mlw_expr_to_simple_expr: Eraise"
   | Eexn    _ (* xsymbol * expr *) ->
-     unsupported "mlw_expr_to_why1_stmt: Eexn"
+     unsupported "mlw_expr_to_simple_expr: Eexn"
   | Ematch  _ (* expr * reg_branch list * exn_branch Mxs.t *) ->
-     unsupported "mlw_expr_to_why1_stmt: Ematch"
+     unsupported "mlw_expr_to_simple_expr: Ematch"
   | Eghost  _ (* expr *) ->
-     unsupported "mlw_expr_to_why1_stmt: Eghost"
+     unsupported "mlw_expr_to_simple_expr: Eghost"
   | Epure   _ (* term *) ->
-     unsupported "mlw_expr_to_why1_stmt: Epure"
+     unsupported "mlw_expr_to_simple_expr: Epure"
   | Eabsurd ->
-     unsupported "mlw_expr_to_why1_stmt: Eabsurd"
-
+     unsupported "mlw_expr_to_simple_expr: Eabsurd"
 
 
 let decl_global_vs vs d acc =
@@ -1087,7 +1175,7 @@ and atomic_condition_to_term rev_map c =
 
 let rec condition_to_term rev_map c =
   let open Term in
-  if verbose >= 3 then
+  if !verbose_level >= 4 then
     Format.eprintf "condition_to_term, condition = %a@." print_condition c;
   match c with
   | BAtomic c -> atomic_condition_to_term rev_map c
@@ -1111,9 +1199,9 @@ let abstract_state_to_why3_term_and_dom env s =
   let f =
     List.fold_left
       (fun acc c ->
-        if verbose >= 3 then Format.eprintf "Here1, condition = %a@." print_condition c;
+        if !verbose_level >= 4 then Format.eprintf "Here1, condition = %a@." print_condition c;
         let f = Term.t_and_simp acc (condition_to_term rev_map c) in
-        if verbose >= 3 then Format.eprintf "Here2@.";
+        if !verbose_level >= 4 then Format.eprintf "Here2@.";
         f
       )
       Term.t_true
@@ -1152,11 +1240,16 @@ let empty_report = {
 let infer_loop_invs_for_mlw_expr last_report _attrs env tkn mkn e cty =
   try
     begin
-      if verbose >= 3 then
-        Format.printf "@[You have triggered BDD loop inference on expression@ @[%a@]@]@."
+      if !verbose_level >= 3 then
+        Format.printf "@[You have triggered BDD-infer loop inference on expression@ @[%a@]@]@."
           Expr.print_expr e;
-      let vs_table, vars, p_ast = mlw_expr_to_why1_stmt Term.Mvs.empty Ity.Spv.empty e in
-      if verbose >= 3 then
+      let instr = mlw_expr_to_simple_expr e in
+      if !verbose_level >= 4 then
+        Format.printf "@[Here is the simplified expression@ @[%a@]@]@."
+          print_simple_expr instr;
+      let vs_table, _vars, p_ast = simple_expr_to_why1_stmt Term.Mvs.empty Ity.Spv.empty instr in
+(*
+      if !verbose_level >= 3 then
         begin
           Format.printf "@[Here are the global variables :@ @[[%a]@]@]@."
             (Pp.print_list Pp.semi
@@ -1164,6 +1257,7 @@ let infer_loop_invs_for_mlw_expr last_report _attrs env tkn mkn e cty =
                  Format.fprintf fmt "%a@ " print_pv pv))
             (Ity.Spv.elements vars);
         end;
+*)
       let vs_table, p_ast =
         List.fold_left
           (fun (vst,a) pre ->
@@ -1172,7 +1266,7 @@ let infer_loop_invs_for_mlw_expr last_report _attrs env tkn mkn e cty =
             (vst,a))
           (vs_table,p_ast) cty.Ity.cty_pre
       in
-      if verbose >= 3 then
+      if !verbose_level >= 4 then
         begin
           Format.printf "@[Here are the variables in the vs_table:@ @[[%a]@]@]@."
             (Pp.print_list Pp.semi
@@ -1186,7 +1280,7 @@ let infer_loop_invs_for_mlw_expr last_report _attrs env tkn mkn e cty =
       let functions = f_decl in
       let main = p_ast in
       let prog = Ast.mk_program ~name:"" ~variables ~functions ~main in
-      if verbose >= 2 then
+      if !verbose_level >= 3 then
         Format.printf "%a@." Ast.print_program prog;
       (* interpretation *)
       let ai_init_time = Unix.times () in
@@ -1217,10 +1311,10 @@ let infer_loop_invs_for_mlw_expr last_report _attrs env tkn mkn e cty =
                  (* translation_error "loop tag `%s` not found" key *)
                  (invsl,invs)
               | e ->
-              if verbose >= 3 then
+              if !verbose_level >= 4 then
                 Format.printf "@[Converting state@ @[%a@]@]@." print s;
               let inv,dom = abstract_state_to_why3_term_and_dom vs_table s in
-              if verbose >= 3 then
+              if !verbose_level >= 4 then
                 Format.printf "@[State converted to@ @[%a@]@]@." Pretty.print_term inv;
               ((e,inv)::invsl,Mstr.add key (inv,dom) invs))
             report.Infer.invariants ([],Mstr.empty))
@@ -1233,26 +1327,26 @@ let infer_loop_invs_for_mlw_expr last_report _attrs env tkn mkn e cty =
 
     end
   with
-    | Error(expl,msg) ->
-       let msg =
-         Format.asprintf "%s: %s@\n%s" expl msg
-           (Printexc.get_backtrace ())
-       in
-       last_report :=
-         { !last_report with
-           engine_error = Some (expl,msg);
-         };
-       []
-    | exn ->
-       let msg =
-         Format.asprintf "%a@\n%s" Exn_printer.exn_printer exn
-           (Printexc.get_backtrace ())
-       in
-       last_report :=
-         { !last_report with
-           engine_error = Some ("other exception", msg) ;
-         };
-       []
+  | Error(expl,msg) ->
+    let msg =
+      Format.asprintf "%s: %s@\n%s" expl msg
+        (Printexc.get_backtrace ())
+    in
+    last_report :=
+      { !last_report with
+        engine_error = Some (expl,msg);
+      };
+    []
+  | exn ->
+    let msg =
+      Format.asprintf "%a@\n%s" Exn_printer.exn_printer exn
+        (Printexc.get_backtrace ())
+    in
+    last_report :=
+      { !last_report with
+        engine_error = Some ("other exception", msg) ;
+      };
+    []
 
 
 let print_var_dom fmt (v,d) =

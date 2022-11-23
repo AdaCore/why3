@@ -1,17 +1,4 @@
-Invariant for loop [anonymous_loop_0] is
-  ((orb
-    (andb (b.contents)
-     (andb (a.contents)
-      (andb (x3.contents)
-       (andb (notb (x1.contents)) (andb (notb (x2.contents)) (x0.contents))))))
-    (andb (notb (b.contents)) (notb (a.contents))) = True /\
-    e.contents = False) /\
-   d.contents = False) /\
-  c.contents = False
-Domains for loop [anonymous_loop_0] are
-  x0 = top; x1 = top; x2 = top; x3 = top; a = top; b = top; c = false;
-    d = false; e = false
-Check: assertion [Assert] is valid
+BDD-infer failure: unsupported feature, unsupported feature: mlw_expr_to_simple_expr: Epure
 
 File bench/infer/pbinfer2.mlw:
 Goal to_true'vc.
@@ -19,5 +6,5 @@ Prover result is: Valid (0.00s, 2 steps).
 
 File bench/infer/pbinfer2.mlw:
 Goal pgmtest'vc.
-Prover result is: Valid (0.07s, 1293 steps).
+Prover result is: Valid (0.00s, 14 steps).
 
