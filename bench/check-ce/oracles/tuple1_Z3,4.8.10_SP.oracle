@@ -12,7 +12,10 @@ The following counterexample model could not be verified
   (both RAC terminated because missing value for return value of call at "WHY3DATA/stdlib/mach/int.mlw", line 432, character 22 to line 433, character 45):
 File int.mlw:
   Line 54:
-    in_bounds : int -> bool = fun (x!0:int) -> if x!0 = 0 then true else true
+    in_bounds :
+      int
+      ->
+      bool = fun (x!0:int) -> if x!0 = 0 then false else false
   Line 432:
     max_int : int63 = epsilon x:int63. int63'int x = 4611686018427387903
   Line 434:
