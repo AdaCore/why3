@@ -251,54 +251,88 @@ let rec import_model_value loc env check known th_known ity t =
             constr_value ity (Some rs) def.Pdecl.itd_fields args)
           | exception Not_found -> term_value ity t)
       | Teps tb -> (
-          (* check if t is of the form epsilon x:t. x.f1 = v1 /\ ... /\ x.fn = vn
-          with f1,...,fn the fields associated to type ity *)
-          let ts, l1, l2 = ity_components ity in
-          let subst = its_match_regs ts l1 l2 in
-          let def = Pdecl.find_its_defn known ts in
+          (* first check if t is of the form epsilon x:t. proj x = v
+            with proj in [th_known] *)
           let x_eps, t' = t_open_bound tb in
-          let rec get_conjuncts t' = match t'.t_node with
-            | Tbinop (Tand, t1, t2) -> t1 :: (get_conjuncts t2)
-            | _ -> [t']
-          in
           try
-            let list_of_fields_values =
-              List.fold_left
-                (fun acc c ->
-                  match c.t_node with
-                  | Tapp (ls, [proj;term_value]) when ls_equal ls ps_equ -> (
-                    match proj.t_node with
-                    | Tapp (ls, [x]) when t_equal x (t_var x_eps) ->
-                      (ls,term_value) :: acc
+            let (proj_ls, proj_v) =
+              match t'.t_node with
+              | Tapp (ls, [proj;term_value]) when ls_equal ls ps_equ -> (
+                match proj.t_node with
+                | Tapp (ls, [x]) when t_equal x (t_var x_eps) -> (ls,term_value)
+                | _ -> raise Unexpected_Pattern
+              )
+              | _ -> raise Unexpected_Pattern
+            in
+            let search (id, decl) = match decl.Decl.d_node with
+              | Decl.Dparam ls when String.equal (trace_or_name id) proj_ls.ls_name.id_string ->
+                begin match ls.ls_value with
+                | None -> None
+                | Some ty_res ->
+                  begin match ls.ls_args with
+                  | [] | _ :: _ :: _ -> None
+                  | [ty_arg] ->
+                    if (Ty.ty_equal ty_arg (ty_of_ity ity)) then Some (ls, ty_res)
+                    else None
+                  end
+                end
+              | _ -> None in
+            let ls, ty_res =
+              let iter f = Mid.iter (fun id x -> f (id, x)) th_known in
+              try Util.iter_first iter search
+              with Not_found -> raise Unexpected_Pattern
+            in
+            let x =
+              import_model_value loc env check known th_known (ity_of_ty ty_res) proj_v
+            in
+            get_or_stuck loc env ity "projection" (proj_value ity ls x)
+          with
+          | Unexpected_Pattern ->
+            (* check if t is of the form epsilon x:t. x.f1 = v1 /\ ... /\ x.fn = vn
+            with f1,...,fn the fields associated to type ity *)
+            let ts, l1, l2 = ity_components ity in
+            let subst = its_match_regs ts l1 l2 in
+            let def = Pdecl.find_its_defn known ts in
+            let rec get_conjuncts t' = match t'.t_node with
+              | Tbinop (Tand, t1, t2) -> t1 :: (get_conjuncts t2)
+              | _ -> [t']
+            in
+            try
+              let list_of_fields_values =
+                List.fold_left
+                  (fun acc c ->
+                    match c.t_node with
+                    | Tapp (ls, [proj;term_value]) when ls_equal ls ps_equ -> (
+                      match proj.t_node with
+                      | Tapp (ls, [x]) when t_equal x (t_var x_eps) ->
+                        (ls,term_value) :: acc
+                      | _ -> raise Unexpected_Pattern
+                    )
                     | _ -> raise Unexpected_Pattern
                   )
-                  | _ -> raise Unexpected_Pattern
-                )
-                []
-                (get_conjuncts t')
-            in
-            let field_values =
-              List.map
-                (fun field_rs ->
-                  let field_ity = ity_full_inst subst (fd_of_rs field_rs).pv_ity in
-                  let matching_field_name rs (ls,_) =
-                    String.equal ls.ls_name.id_string rs.rs_name.id_string in
-                  match List.find_all (matching_field_name field_rs) list_of_fields_values with
-                  | [(_ls,term_value)] ->
-                    import_model_value loc env check known th_known field_ity term_value
-                  | [] ->
-                    (* if the epsilon term does not define a value for field_rs,
-                      use undefined value *)
-                    undefined_value env field_ity
-                  | _ -> raise Unexpected_Pattern
-                  )
-                def.Pdecl.itd_fields
-            in
-            constr_value ity None def.Pdecl.itd_fields field_values
-          with
-            (* do not try to build a constructor value if the pattern of the epsilon
-               term is not the expected one *)
-          |  Unexpected_Pattern -> term_value ity t)
+                  []
+                  (get_conjuncts t')
+              in
+              let field_values =
+                List.map
+                  (fun field_rs ->
+                    let field_ity = ity_full_inst subst (fd_of_rs field_rs).pv_ity in
+                    let matching_field_name rs (ls,_) =
+                      String.equal ls.ls_name.id_string rs.rs_name.id_string in
+                    match List.find_all (matching_field_name field_rs) list_of_fields_values with
+                    | [(_ls,term_value)] ->
+                      import_model_value loc env check known th_known field_ity term_value
+                    | [] ->
+                      (* if the epsilon term does not define a value for field_rs,
+                        use undefined value *)
+                      undefined_value env field_ity
+                    | _ -> raise Unexpected_Pattern
+                    )
+                  def.Pdecl.itd_fields
+              in
+              constr_value ity None def.Pdecl.itd_fields field_values
+              with
+              | Unexpected_Pattern -> term_value ity t)
         | _ -> term_value ity t
     else
       (* [ity] and the type of [t] may not match for the following reason:
