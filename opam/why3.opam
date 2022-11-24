@@ -29,6 +29,8 @@ build: [
    "--disable-frama-c"
    "--disable-coq-libs"
    "--disable-js-of-ocaml"
+   "--disable-zarith" {!zarith:installed}
+   "--enable-zarith" {zarith:installed}
    "--disable-ide"]
   [make "-j%{jobs}%" "all" "opt" "byte"]
   [make "doc" "stdlibdoc" "apidoc"] {with-doc}

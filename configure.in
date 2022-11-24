@@ -45,7 +45,7 @@ AC_ARG_ENABLE(why3-lib,
 
 AC_ARG_ENABLE(zarith,
     AS_HELP_STRING([--disable-zarith], [use Nums instead of Zarith for computations]),,
-    enable_zarith=yes)
+    enable_zarith=check)
 
 # ocamlfind
 
@@ -441,26 +441,34 @@ if test "$found_num" = no; then
 fi
 
 # checking for Zarith
-if test "$enable_zarith" = yes; then
-   AC_MSG_CHECKING([for zarith])
+if test "$enable_zarith" = no; then
+   reason_zarith=" (disabled by user)"
+else
    DIR=
    if test "$enable_ocamlfind" = yes; then
-      DIR=$(ocamlfind query zarith)
+      AC_MSG_CHECKING([for zarith using ocamlfind])
+      DIR=$($OCAMLFIND query zarith)
       if test -n "$DIR"; then
-         echo "ocamlfind found zarith in $DIR"
+         AC_MSG_RESULT([yes])
          BIGINTINCLUDE="-I $DIR"
       else
+         AC_MSG_RESULT([no])
          ocamlfind_zarith=no
       fi
    fi
+   found_zarith=yes
    if test -z "$DIR"; then
       BIGINTINCLUDE="-I +zarith"
       DIR="$OCAMLLIB/zarith"
-      AC_CHECK_FILE($DIR/zarith.cma,,enable_zarith=no)
+      AC_CHECK_FILE($DIR/zarith.cma,,found_zarith=no)
    fi
-   AC_CHECK_FILE($DIR/z.cmi,,enable_zarith=no)
-   if test "$enable_zarith" = no; then
+   AC_CHECK_FILE($DIR/z.cmi,,found_zarith=no)
+   if test "$found_zarith" = no; then
+      if test "$enable_zarith" = yes; then
+         AC_MSG_ERROR([cannot find library zarith.])
+      fi
       AC_MSG_WARN([cannot find library zarith, using Nums instead.])
+      enable_zarith=no
       reason_zarith=" (zarith not found)"
    elif test "$ocamlfind_zarith" = no; then
       enable_ocamlfind=no
@@ -468,9 +476,10 @@ if test "$enable_zarith" = yes; then
    fi
 fi
 
-if test "$enable_zarith" = yes; then
+if test "$enable_zarith" != no; then
    BIGINTLIB=zarith
    BIGINTPKG=zarith
+   enable_zarith=yes
 else
    BIGINTLIB=nums
    BIGINTPKG=num
