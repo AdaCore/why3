@@ -195,7 +195,10 @@ let (^->) a b = VTfun (a, b)
 
 let big_int_of_const i = i.Number.il_int
 let big_int_of_value v =
-  match v_desc v with Vnum i -> i | _ -> raise NotNum
+  match v_desc v with
+  | Vnum i -> i
+  | Vterm {t_node = Tconst (ConstInt i)} -> big_int_of_const i
+  | _ -> raise NotNum
 
 let eval_int_op op ls l =
   eval (VTnum ^-> VTnum ^-> VTnum) op ls l
