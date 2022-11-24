@@ -170,29 +170,25 @@ AC_ARG_ENABLE(emacs-compilation,
 AC_ARG_VAR(EDITOR, [default editor])
 
 # either relocation or local, not both
-if test "$enable_relocation" = yes ; then
-if test "$enable_local" = yes ; then
-    AC_MSG_ERROR(cannot use --enable-relocation and --enable-local at the same time.)
-fi
+if test "$enable_relocation" = yes -a "$enable_local" = yes ; then
+   AC_MSG_ERROR([cannot use --enable-relocation and --enable-local at the same time.])
 fi
 
 # Check for arch/OS
 
-AC_MSG_CHECKING(executable suffix)
+AC_MSG_CHECKING([executable suffix])
 if uname -s | grep -q CYGWIN ; then
   EXE=.exe
   STRIP='echo "no strip "'
-  AC_MSG_RESULT(.exe <Cygwin>)
-else
-if uname -s | grep -q MINGW ; then
+  AC_MSG_RESULT([.exe <Cygwin>])
+elif uname -s | grep -q MINGW ; then
   EXE=.exe
   STRIP=strip
-  AC_MSG_RESULT(.exe <MinGW>)
+  AC_MSG_RESULT([.exe <MinGW>])
 else
   EXE=
   STRIP=strip
-  AC_MSG_RESULT(<none>)
-fi
+  AC_MSG_RESULT([<none>])
 fi
 
 AC_PROG_CC
@@ -206,20 +202,20 @@ AC_DEFUN([AX_VERSION_GE], [AS_VERSION_COMPARE([$1],[$2],[$4],[$3],[$3])])
 # we first look for ocamlc in the path; if not present, we fail
 AC_CHECK_PROG(OCAMLC,ocamlc,ocamlc,no)
 if test "$OCAMLC" = no ; then
-	AC_MSG_ERROR(Cannot find ocamlc.)
+   AC_MSG_ERROR([cannot find ocamlc.])
 fi
 
 # we extract Ocaml version number
 OCAMLVERSION=`$OCAMLC -v | sed -n -e 's|.*version *\(.*\)$|\1|p'`
-echo "ocaml version is $OCAMLVERSION"
+AC_MSG_NOTICE([ocaml version is $OCAMLVERSION])
 
 AX_VERSION_GE([$OCAMLVERSION], 4.08.0, [],
-  [AC_MSG_ERROR(You need Objective Caml 4.08.0 or higher.)])
+  [AC_MSG_ERROR([You need Objective Caml 4.08.0 or higher.])])
 
 # Ocaml library path
 # old way: OCAMLLIB=`$OCAMLC -v | tail -1 | cut -f 4 -d ' ' | tr -d '\\r'`
 OCAMLLIB=`$OCAMLC -where | tr -d '\\r'`
-echo "ocaml library path is $OCAMLLIB"
+AC_MSG_NOTICE([ocaml library path is $OCAMLLIB])
 
 # then we look for ocamlopt; if not present, we issue a warning
 # if the version is not the same, we also discard it
@@ -227,12 +223,12 @@ echo "ocaml library path is $OCAMLLIB"
 AC_CHECK_PROG(OCAMLOPT,ocamlopt,ocamlopt,no)
 OCAMLBEST=byte
 if test "$OCAMLOPT" = no ; then
-	AC_MSG_WARN(Cannot find ocamlopt; bytecode compilation only.)
+   AC_MSG_WARN([cannot find ocamlopt; bytecode compilation only.])
 else
-	AC_MSG_CHECKING(ocamlopt version)
+        AC_MSG_CHECKING([ocamlopt version])
 	TMPVERSION=`$OCAMLOPT -v | sed -n -e 's|.*version *\(.*\)$|\1|p'`
 	if test "$TMPVERSION" != "$OCAMLVERSION" ; then
-	    AC_MSG_RESULT(differs from ocamlc; ocamlopt discarded.)
+	    AC_MSG_RESULT([differs from ocamlc; ocamlopt discarded.])
 	    OCAMLOPT=no
 	else
 	    AC_MSG_RESULT(ok)
@@ -250,10 +246,10 @@ fi
 # checking for ocamlc.opt
 AC_CHECK_PROG(OCAMLCDOTOPT,ocamlc.opt,ocamlc.opt,no)
 if test "$OCAMLCDOTOPT" != no ; then
-	AC_MSG_CHECKING(ocamlc.opt version)
+   AC_MSG_CHECKING([ocamlc.opt version])
 	TMPVERSION=`$OCAMLCDOTOPT -v | sed -n -e 's|.*version *\(.*\)$|\1|p'`
 	if test "$TMPVERSION" != "$OCAMLVERSION" ; then
-	    AC_MSG_RESULT(differs from ocamlc; ocamlc.opt discarded.)
+	    AC_MSG_RESULT([differs from ocamlc; ocamlc.opt discarded.])
 	else
 	    AC_MSG_RESULT(ok)
 	    OCAMLC=$OCAMLCDOTOPT
@@ -264,10 +260,10 @@ fi
 if test "$OCAMLOPT" != no ; then
     AC_CHECK_PROG(OCAMLOPTDOTOPT,ocamlopt.opt,ocamlopt.opt,no)
     if test "$OCAMLOPTDOTOPT" != no ; then
-	AC_MSG_CHECKING(ocamlc.opt version)
+	AC_MSG_CHECKING([ocamlc.opt version])
 	TMPVER=`$OCAMLOPTDOTOPT -v | sed -n -e 's|.*version *\(.*\)$|\1|p'`
 	if test "$TMPVER" != "$OCAMLVERSION" ; then
-	    AC_MSG_RESULT(differs from ocamlc; ocamlopt.opt discarded.)
+	    AC_MSG_RESULT([differs from ocamlc; ocamlopt.opt discarded.])
 	else
 	    AC_MSG_RESULT(ok)
 	    OCAMLOPT=$OCAMLOPTDOTOPT
@@ -278,7 +274,7 @@ fi
 # ocamldep, ocamllex and ocamlyacc should also be present in the path
 AC_CHECK_PROG(OCAMLDEP,ocamldep,ocamldep,no)
 if test "$OCAMLDEP" = no ; then
-   AC_MSG_ERROR(Cannot find ocamldep.)
+   AC_MSG_ERROR([cannot find ocamldep.])
 else
    AC_CHECK_PROG(OCAMLDEPDOTOPT,ocamldep.opt,ocamldep.opt,no)
    if test "$OCAMLDEPDOTOPT" != no ; then
@@ -288,7 +284,7 @@ fi
 
 AC_CHECK_PROG(OCAMLLEX,ocamllex,ocamllex,no)
 if test "$OCAMLLEX" = no ; then
-	AC_MSG_ERROR(Cannot find ocamllex.)
+   AC_MSG_ERROR([cannot find ocamllex.])
 else
     AC_CHECK_PROG(OCAMLLEXDOTOPT,ocamllex.opt,ocamllex.opt,no)
     if test "$OCAMLLEXDOTOPT" != no ; then
@@ -298,13 +294,11 @@ fi
 
 AC_CHECK_PROG(OCAMLYACC,ocamlyacc,ocamlyacc,no)
 if test "$OCAMLYACC" = no ; then
-	AC_MSG_ERROR(Cannot find ocamlyacc.)
+   AC_MSG_ERROR([cannot find ocamlyacc.])
 fi
 
 AC_CHECK_PROG(OCAMLDOC,ocamldoc,ocamldoc,true)
-if test "$OCAMLDOC" = true ; then
-    AC_MSG_WARN(Cannot find ocamldoc)
-else
+if test "$OCAMLDOC" != true ; then
     AC_CHECK_PROG(OCAMLDOCOPT,ocamldoc.opt,ocamldoc.opt,no)
     if test "$OCAMLDOCOPT" != no ; then
 	OCAMLDOC=$OCAMLDOCOPT
@@ -313,12 +307,12 @@ fi
 
 AC_CHECK_PROG(MENHIR,menhir,menhir,no)
 if test "$MENHIR" = no ; then
-	AC_MSG_ERROR(Cannot find menhir.)
+   AC_MSG_ERROR([cannot find menhir.])
 fi
 
 MENHIRVERSION=`$MENHIR --version | sed -n -e 's,.*version *\(.*\)$,\1,p'`
 AX_VERSION_GE([$MENHIRVERSION], 20170418, [],
-  [AC_MSG_ERROR(You need Menhir 20170418 or higher.)])
+  [AC_MSG_ERROR([You need Menhir 20170418 or higher.])])
 
 if test "$enable_ocamlfind" != yes; then
    OCAMLFIND=no
@@ -349,19 +343,18 @@ fi
 if test "$enable_why3_lib" = yes ; then
    WHY3LIB=
 else
-   AC_MSG_CHECKING([For Why3])
    if test "$enable_ocamlfind" = no; then
-      AC_MSG_RESULT([no])
-      AC_MSG_ERROR([Cannot use --disable-why3-lib without ocamlfind.])
+      AC_MSG_ERROR([cannot use --disable-why3-lib without ocamlfind.])
    fi
    WHY3LIB=why3
+   AC_MSG_CHECKING([for Why3 using ocamlfind])
    DIR=$($OCAMLFIND query why3)
    if test -n "$DIR"; then
-      AC_MSG_RESULT([$DIR])
+      AC_MSG_RESULT([yes])
       WHY3INCLUDE="-I $DIR"
    else
       AC_MSG_RESULT([no])
-      AC_MSG_ERROR([Cannot use --disable-why3-lib without an installed Why3.])
+      AC_MSG_ERROR([cannot use --disable-why3-lib without an installed Why3.])
    fi
 fi
 
@@ -373,11 +366,13 @@ fi
 
 # ppx
 if test "$enable_ocamlfind" = yes; then
+  AC_MSG_CHECKING([for compiler-libs using ocamlfind])
   COMPILERLIBS=$($OCAMLFIND query compiler-libs)
   if test -n "$COMPILERLIBS"; then
-    echo "ocamlfind found compiler-libs in $COMPILERLIBS"
+    AC_MSG_RESULT([yes])
     enable_ppx=yes
   else
+    AC_MSG_RESULT([no])
     enable_ppx=no
     reason_ppx=" (compiler-libs not found)"
   fi
@@ -392,7 +387,7 @@ if test "$enable_doc" = yes; then
       enable_doc=no
       enable_pdf_doc=no
       reason_doc=" (sphinx-build not found)"
-      AC_MSG_WARN([Cannot find sphinx-build, Documentation disabled.])
+      AC_MSG_WARN([cannot find sphinx-build, documentation disabled.])
    fi
 else
    enable_pdf_doc=no
@@ -404,7 +399,7 @@ if test "$enable_pdf_doc" = yes; then
    if test "$LATEX" = no; then
       enable_pdf_doc=no
       reason_pdf_doc=" ((rubber|latexmk|pdflatex) not found)"
-      AC_MSG_WARN([Cannot find any latex compiler, PDF documentation disabled.])
+      AC_MSG_WARN([cannot find any latex compiler, PDF documentation disabled.])
    fi
 fi
 
@@ -413,7 +408,7 @@ if test "$enable_emacs_compilation" = yes ; then
    AC_CHECK_PROG(EMACS,emacs,emacs,no)
    if test "$EMACS" = no ; then
       enable_emacs_compilation=no
-      AC_MSG_WARN([Cannot find emacs, compilation of why3.elc disabled.])
+      AC_MSG_WARN([cannot find emacs, compilation of why3.elc disabled.])
    fi
 fi
 
@@ -442,11 +437,12 @@ if test "$found_num" = no; then
    AC_CHECK_FILE($DIR/num.cmi,,found_num=no)
 fi
 if test "$found_num" = no; then
-   AC_MSG_ERROR([Library Num not found.])
+   AC_MSG_ERROR([cannot find library Num.])
 fi
 
 # checking for Zarith
 if test "$enable_zarith" = yes; then
+   AC_MSG_CHECKING([for zarith])
    DIR=
    if test "$enable_ocamlfind" = yes; then
       DIR=$(ocamlfind query zarith)
@@ -464,7 +460,7 @@ if test "$enable_zarith" = yes; then
    fi
    AC_CHECK_FILE($DIR/z.cmi,,enable_zarith=no)
    if test "$enable_zarith" = no; then
-      AC_MSG_WARN([Lib Zarith not found, using Nums instead.])
+      AC_MSG_WARN([cannot find library zarith, using Nums instead.])
       reason_zarith=" (zarith not found)"
    elif test "$ocamlfind_zarith" = no; then
       enable_ocamlfind=no
@@ -533,6 +529,7 @@ fi
 
 # checking for camlzip
 if test "$enable_zip" = yes; then
+   AC_MSG_CHECKING([for camlzip])
    DIR=
    if test "$enable_ocamlfind" = yes; then
       DIR=$(ocamlfind query zip)
@@ -594,6 +591,7 @@ AC_SUBST(menhirlib_cmo)
 
 # checking for re
 if test "$enable_re" = yes; then
+   AC_MSG_CHECKING([for re])
    found_re=yes
    DIR=
    if test "$enable_ocamlfind" = yes; then
@@ -865,7 +863,6 @@ if test "$enable_coq_support" = yes; then
    AC_CHECK_PROG(COQC,coqc,coqc,no)
    if test "$COQC" = no ; then
       enable_coq_support=no
-      AC_MSG_WARN(Cannot find coqc.)
       reason_coq_support=" (coqc not found)"
    fi
 fi
@@ -913,7 +910,7 @@ if test "$enable_coq_support" = yes; then
          ;;
       *)
          enable_coq_support=no
-         AC_MSG_WARN(You need Coq 8.7 or later; Coq discarded)
+         AC_MSG_WARN([You need Coq 8.7 or later; Coq discarded.])
          reason_coq_support=" (need version >= 8.7)"
          ;;
    esac
@@ -926,7 +923,6 @@ if test "$enable_coq_support" = yes; then
    AC_CHECK_PROG(COQDEP,coqdep,coqdep,no)
    if test "$COQDEP" = no; then
       enable_coq_support=no
-      AC_MSG_WARN(Cannot find coqdep.)
       reason_coq_support=" (coqdep not found)"
    fi
 fi
@@ -946,7 +942,6 @@ if test "$enable_coq_fp_libs" = yes; then
      [ AC_MSG_RESULT(yes) ],
      [ AC_MSG_RESULT(no)
        enable_coq_fp_libs=no
-       AC_MSG_WARN(Cannot find Flocq.)
        reason_coq_fp_libs=" (Flocq >= 3.4 not found)" ])
    rm -f conftest.v conftest.vo conftest.err
 fi
@@ -960,7 +955,6 @@ else
     AC_CHECK_PROG(PVS,pvs,pvs,no)
     if test "$PVS" = no ; then
         enable_pvs_support=no
-        AC_MSG_WARN(Cannot find pvs.)
         reason_pvs_support=" (pvs not found)"
     else
         PVSLIB=`$PVS -where`
@@ -975,7 +969,7 @@ else
           *)
                 AC_MSG_RESULT($PVSVERSION)
                 enable_pvs_support=no
-	        AC_MSG_WARN(You need PVS 6.0 or higher; PVS discarded)
+	        AC_MSG_WARN([You need PVS 6.0 or higher; PVS discarded.])
                 reason_pvs_support=" (need version 6.0 or higher)"
                 ;;
         esac
@@ -1000,27 +994,23 @@ else
     AC_CHECK_PROG(ISABELLE,isabelle,isabelle,no)
     if test "$ISABELLE" = no ; then
        enable_isabelle_support=no
-       AC_MSG_WARN(Cannot find isabelle.)
        reason_isabelle_support=" (isabelle not found)"
     else
         AC_MSG_CHECKING(Isabelle version)
         ISABELLEDETECTEDVERSION=[`$ISABELLE version | sed -n -e 's|Isabelle\([^:]*\).*$|\1|p'`]
-
+        AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
         case $ISABELLEDETECTEDVERSION in
           2019*)
 	        enable_isabelle_support=yes
                 ISABELLEVERSION=2019
-                AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 ;;
           2021-1*)
 	        enable_isabelle_support=yes
                 ISABELLEVERSION=2021-1
-                AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 ;;
           *)
-                AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 enable_isabelle_support=no
-	        AC_MSG_WARN(You need Isabelle 2019 or later; Isabelle discarded)
+	        AC_MSG_WARN([You need Isabelle 2019 or later; Isabelle discarded.])
                 reason_isabelle_support=" (need version >= 2019)"
                 ;;
         esac
@@ -1049,7 +1039,6 @@ FRAMAC_SUPPORTED=Sulfur
 if test "$enable_frama_c" = yes ; then
    AC_CHECK_PROG(FRAMAC,frama-c,frama-c,no)
    if test "$FRAMAC" = no ; then
-        AC_MSG_WARN(Cannot find Frama-C.)
         enable_frama_c="no"
         reason_frama_c=" (frama-c not found)"
    else
