@@ -679,7 +679,7 @@ module FromModelToTerm = struct
         error "No matching type found in inferred_type for float constant %a@."
           print_constant c
       end
-    | Cbool b -> if b then t_true_bool else t_true_bool
+    | Cbool b -> if b then t_true_bool else t_false_bool
     | Cstring str -> t_const (Constant.string_const str) Ty.ty_str
 
   let find_builtin_lsymbol env n ts =

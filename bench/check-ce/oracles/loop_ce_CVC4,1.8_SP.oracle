@@ -137,31 +137,31 @@ File int.mlw:
     one = 1
 File loop_ce.mlw:
   Line 20:
-    a = {contents= 0}
-    a = {contents= 0}
+    a = {contents= (- 1)}
+    a = {contents= (- 1)}
     Execution of main function `g` with env:
-      a = {contents= 0}
+      a = {contents= (- 1)}
       zero = 0
       one = 1
   Line 22:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
+      arg = {contents= (- 1)}
     Normal execution of function `(=)` with args:
-      x = 0
+      x = (- 1)
       y = 10
 Unknown location:
     Normal execution of function `True` with args:
 File loop_ce.mlw:
   Line 22:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
+      arg = {contents= (- 1)}
     Normal execution of function `(+)` with args:
-      _ = 0
+      _ = (- 1)
       _ = 1
   Line 23:
     Property failure at assertion with:
-      a = {contents= 1}
-      a = ref'mk 0
+      a = {contents= 0}
+      a = ref'mk (- 1)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
