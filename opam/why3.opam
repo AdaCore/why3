@@ -31,6 +31,8 @@ build: [
    "--disable-js-of-ocaml"
    "--disable-zarith" {!zarith:installed}
    "--enable-zarith" {zarith:installed}
+   "--disable-zip" {!camlzip:installed}
+   "--enable-zip" {camlzip:installed}
    "--disable-ide"]
   [make "-j%{jobs}%" "all" "opt" "byte"]
   [make "doc" "stdlibdoc" "apidoc"] {with-doc}
