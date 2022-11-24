@@ -177,6 +177,8 @@ val e_absurd : ity -> Ity.mask -> ty -> Ity.effect -> Ident.Sattr.t -> expr
 
 val e_seq : expr -> expr -> ity -> Ity.mask -> ty -> Ity.effect -> Ident.Sattr.t -> expr
 
+val e_coerce : expr -> ity -> Ity.mask -> ty -> Ity.effect -> Ident.Sattr.t -> expr
+
 val var_list_of_pv_list : Ity.pvsymbol list -> ty list -> expr list
 
 val ld_map : (expr -> expr) -> let_def -> let_def

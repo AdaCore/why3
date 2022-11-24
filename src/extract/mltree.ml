@@ -307,6 +307,8 @@ let t_fun params res =
 
 let enope = Eblock []
 
+let e_coerce t = mk_expr (Eblock [t])
+
 let mk_var id ty ghost = (id, ty, ghost)
 
 let mk_var_unit =

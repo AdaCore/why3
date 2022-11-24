@@ -408,13 +408,14 @@ module Translate = struct
           let fun_ty = ML.t_fun params ml_app.ML.e_mlty in
           ML.e_fun params ml_app ity cty.cty_mask fun_ty
             eff_empty attrs in
+        let mlty = mlty_of_ity mask e.e_ity in
         begin match pvl with
-          | [pv_expr] when is_optimizable_record_rs info rs -> pv_expr
+          | [pv_expr] when is_optimizable_record_rs info rs ->
+              ML.e_coerce pv_expr (ML.I e.e_ity) mask mlty eff attrs
           | []        when is_optimizable_record_rs info rs ->
               eta_exp_pj true
           | [] when rs.rs_field <> None -> eta_exp_pj false
           | _ ->
-             let mlty = mlty_of_ity mask e.e_ity in
              ML.e_app rs pvl (rem <> []) (ML.I e.e_ity) mask mlty eff attrs end
     | Eexec ({c_node = Cfun e; c_cty = {cty_args = []}}, _) ->
         (* abstract block *)
