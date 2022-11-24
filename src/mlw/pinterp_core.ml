@@ -190,11 +190,7 @@ let string_value s = value ty_str (Vstring s)
 let bool_value b = value ty_bool (Vbool b)
 
 let constr_value ity rs fs vl =
-  if List.length fs <> List.length vl then
-    raise (Incomplete "constructor value with different lengths\
-      for list of fields symbols and list of fields values")
-  else
-    value (ty_of_ity ity) (Vconstr (rs, fs, List.map field vl))
+  value (ty_of_ity ity) (Vconstr (rs, fs, List.map field vl))
 
 let purefun_value ~result_ity ~arg_ity mv v =
   value (ty_of_ity result_ity) (Vpurefun (ty_of_ity arg_ity, mv, v))
