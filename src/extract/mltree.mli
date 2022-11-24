@@ -15,6 +15,8 @@ type ty =
   | Tarrow of ty * ty
   | Ttuple of ty list
 
+val pp_ty : ty Pp.pp
+
 type is_ghost = bool
 
 type var = Ident.ident * ty * is_ghost

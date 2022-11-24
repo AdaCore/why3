@@ -21,6 +21,15 @@ type ty =
   | Tarrow of ty * ty
   | Ttuple of ty list
 
+let rec pp_ty fmt : ty -> unit = function
+  | Tvar ty -> Pretty.print_tv fmt ty
+  | Tapp (ps,l) -> Format.fprintf fmt "%s(%a)"
+                        ps.Ident.id_string
+                        Pp.(print_list comma
+                              pp_ty) l
+  | Tarrow _ -> Format.fprintf fmt "arrow"
+  | Ttuple _ -> Format.fprintf fmt "tuple"
+
 type is_ghost = bool
 
 type var = ident * ty * is_ghost
