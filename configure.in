@@ -51,7 +51,7 @@ AC_ARG_ENABLE(zarith,
 
 AC_ARG_ENABLE(ocamlfind,
     AS_HELP_STRING([--disable-ocamlfind], [do not use Ocamlfind]),,
-    enable_ocamlfind=yes)
+    enable_ocamlfind=check)
 
 # camlzip
 
@@ -314,30 +314,38 @@ MENHIRVERSION=`$MENHIR --version | sed -n -e 's,.*version *\(.*\)$,\1,p'`
 AX_VERSION_GE([$MENHIRVERSION], 20170418, [],
   [AC_MSG_ERROR([You need Menhir 20170418 or higher.])])
 
-if test "$enable_ocamlfind" != yes; then
-   OCAMLFIND=no
-else
+found_ocamlfind=no
+if test "$enable_ocamlfind" != no; then
    AC_CHECK_PROG(OCAMLFIND,ocamlfind,ocamlfind,no)
    if test "$OCAMLFIND" = no; then
-      enable_ocamlfind=no
       reason_ocamlfind=" (not found)"
    else
       OCAMLFINDLIB=$(ocamlfind printconf stdlib)
       if test "$OCAMLFINDLIB" != "$OCAMLLIB"; then
-         OCAMLFIND=no
-         enable_ocamlfind=no
+         found_ocamlfind=no
          reason_ocamlfind=" (incompatible with OCaml)"
          echo "but your ocamlfind is not compatible with your ocamlc:"
          echo "ocamlfind: $OCAMLFINDLIB, ocamlc: $OCAMLLIB"
+      else
+         found_ocamlfind=yes
       fi
    fi
 fi
 
-#if ocamlfind is used it gives the install path for ocaml library
-if test "$enable_ocamlfind" = yes; then
+if test "$found_ocamlfind" = no; then
+   if test "$enable_ocamlfind" = yes; then
+      AC_MSG_ERROR([cannot use ocamlfind.])
+   fi
+   enable_ocamlfind=no
+fi
+
+if test "$enable_ocamlfind" != no; then
+   #if ocamlfind is used it gives the install path for ocaml library
    OCAMLINSTALLLIB=$($OCAMLFIND printconf destdir)
+   enable_ocamlfind=yes
 else
    OCAMLINSTALLLIB=$OCAMLLIB
+   OCAMLFIND=no
 fi
 
 if test "$enable_why3_lib" = yes ; then
@@ -416,18 +424,18 @@ fi
 # (ocamlfind cannot be trusted here, since the default installation path is $OCAMLLIB)
 found_num=no
 if test "$enable_ocamlfind" = yes; then
+   AC_MSG_CHECKING([for num using ocamlfind])
    DIR=$($OCAMLFIND query num)
-   if test -n "$DIR"; then
-      echo "ocamlfind found num in $DIR"
-      NUMPKG=num
-      NUMINCLUDE="-I $DIR"
-      found_num=yes
-      AC_CHECK_FILE($DIR/nums.cma,,found_num=no)
-      AC_CHECK_FILE($DIR/num.cmi,,found_num=no)
-   else
-      enable_ocamlfind=no
-      reason_ocamlfind=" (unable to find num)"
+   if test -z "$DIR"; then
+      AC_MSG_RESULT([no])
+      AC_MSG_ERROR([cannot find library Num using ocamlfind.])
    fi
+   AC_MSG_RESULT([yes])
+   NUMPKG=num
+   NUMINCLUDE="-I $DIR"
+   found_num=yes
+   AC_CHECK_FILE($DIR/nums.cma,,found_num=no)
+   AC_CHECK_FILE($DIR/num.cmi,,found_num=no)
 fi
 if test "$found_num" = no; then
    DIR="$OCAMLLIB"
@@ -445,6 +453,7 @@ if test "$enable_zarith" = no; then
    reason_zarith=" (disabled by user)"
 else
    DIR=
+   found_zarith=yes
    if test "$enable_ocamlfind" = yes; then
       AC_MSG_CHECKING([for zarith using ocamlfind])
       DIR=$($OCAMLFIND query zarith)
@@ -453,11 +462,9 @@ else
          BIGINTINCLUDE="-I $DIR"
       else
          AC_MSG_RESULT([no])
-         ocamlfind_zarith=no
+         found_zarith=no
       fi
-   fi
-   found_zarith=yes
-   if test -z "$DIR"; then
+   else
       BIGINTINCLUDE="-I +zarith"
       DIR="$OCAMLLIB/zarith"
       AC_CHECK_FILE($DIR/zarith.cma,,found_zarith=no)
@@ -470,9 +477,6 @@ else
       AC_MSG_WARN([cannot find library zarith, using Nums instead.])
       enable_zarith=no
       reason_zarith=" (zarith not found)"
-   elif test "$ocamlfind_zarith" = no; then
-      enable_ocamlfind=no
-      reason_ocamlfind=" (unable to find zarith)"
    fi
 fi
 
@@ -537,20 +541,19 @@ fi
 if test "$enable_zip" = no; then
    reason_zip=" (disabled by user)"
 else
-   AC_MSG_CHECKING([for camlzip])
    DIR=
-   found_zip=no
+   found_zip=yes
    if test "$enable_ocamlfind" = yes; then
-      DIR=$(ocamlfind query zip)
+      AC_MSG_CHECKING([for camlzip using ocamlfind])
+      DIR=$($OCAMLFIND query zip)
       if test -n "$DIR"; then
-         echo "ocamlfind found camlzip in $DIR"
+         AC_MSG_RESULT([yes])
          ZIPINCLUDE="-I $DIR"
-         found_zip=yes
       else
-         ocamlfind_zip=no
+         AC_MSG_RESULT([no])
+         found_zip=no
       fi
-   fi
-   if test -z "$DIR"; then
+   else
       ZIPINCLUDE="-I +zip"
       DIR="$OCAMLLIB/zip"
       AC_CHECK_FILE($DIR/zip.cma,,found_zip=no)
@@ -563,9 +566,6 @@ else
       AC_MSG_WARN([cannot find library camlzip; sessions files will not be compressed.])
       enable_zip=no
       reason_zip=" (camlzip not found)"
-   elif test "$ocamlfind_zip" = no; then
-      enable_ocamlfind=no
-      reason_ocamlfind=" (unable to find camlzip)"
    fi
 fi
 
@@ -581,16 +581,16 @@ fi
 found_menhirlib=yes
 DIR=
 if test "$enable_ocamlfind" = yes; then
+   AC_MSG_CHECKING([for menhirLib using ocamlfind])
    DIR=$($OCAMLFIND query menhirLib)
    if test -n "$DIR"; then
-      echo "ocamlfind found menhirLib in $DIR"
+      AC_MSG_RESULT([yes])
       MENHIRINCLUDE="-I $DIR"
    else
-      enable_ocamlfind=no
-      reason_ocamlfind=" (unable to find menhirLib)"
+      AC_MSG_RESULT([no])
+      found_menhirlib=no
    fi
-fi
-if test -z "$DIR"; then
+else
    MENHIRINCLUDE="-I +menhirLib"
    DIR="$OCAMLLIB/menhirLib"
    menhirlib_cmo=
@@ -600,7 +600,7 @@ if test -z "$DIR"; then
 fi
 AC_CHECK_FILE($DIR/menhirLib.cmi,,found_menhirlib=no)
 if test "$found_menhirlib" = no; then
-   AC_MSG_ERROR([Library menhirLib not found.])
+   AC_MSG_ERROR([cannot find library menhirLib.])
 fi
 AC_SUBST(menhirlib_cmo)
 
@@ -610,26 +610,23 @@ if test "$enable_re" = yes; then
    found_re=yes
    DIR=
    if test "$enable_ocamlfind" = yes; then
-      DIR=$(ocamlfind query re)
+      DIR=$($OCAMLFIND query re)
       if test -n "$DIR"; then
-         echo "ocamlfind found re in $DIR"
+         AC_MSG_RESULT([yes])
          REINCLUDE="-I $DIR"
       else
-         ocamlfind_re=no
+         AC_MSG_RESULT([no])
+         found_re=no
       fi
-   fi
-   if test -z "$DIR"; then
+   else
       REINCLUDE="-I +re"
       DIR="$OCAMLLIB/re"
       AC_CHECK_FILE($DIR/re.cmx,,found_re=no)
    fi
    AC_CHECK_FILE($DIR/re.cmi,,found_re=no)
    if test "$found_re" = no; then
-      AC_MSG_WARN([Library re not found.])
+      AC_MSG_WARN([cannot find library re.])
       enable_re=no
-   elif test "$ocamlfind_re" = no; then
-      enable_ocamlfind=no
-      reason_ocamlfind=" (unable to find re)"
    fi
 fi
 
@@ -644,7 +641,7 @@ fi
 if test "$enable_ide" = no ; then
    reason_ide=" (disabled by user)"
 fi
-if test "$enable_ide" != no -a "$enable_ocamlfind" != yes; then
+if test "$enable_ide" != no -a "$enable_ocamlfind" = no; then
    if test "$enable_ide" = yes; then
       AC_MSG_ERROR([cannot build IDE without ocamlfind.])
    fi
@@ -712,30 +709,31 @@ if test "$enable_ide" != no; then
    LABLGTKPKG="lablgtk$GTKVERSION $PKG_SOURCEVIEW"
 fi
 
-if test "$enable_hypothesis_selection" = yes; then
+if test "$enable_hypothesis_selection" != no -o "$enable_stackify" != no; then
+   found_ocamlgraph=yes
    DIR=
    if test "$enable_ocamlfind" = yes; then
+      AC_MSG_CHECKING([for ocamlgraph using ocamlfind])
       DIR=$($OCAMLFIND query ocamlgraph)
       if test -n "$DIR"; then
-         echo "ocamlfind found ocamlgraph in $DIR"
+         AC_MSG_RESULT([yes])
          OCAMLGRAPHLIB="$DIR"
       else
-         ocamlfind_ocamlgraph=no
+         AC_MSG_RESULT([no])
+         found_ocamlgraph=no
       fi
-   fi
-   if test -z "$DIR"; then
+   else
       OCAMLGRAPHLIB="+ocamlgraph"
       DIR="$OCAMLLIB/ocamlgraph"
-      AC_CHECK_FILE($DIR/graph.cma,,enable_hypothesis_selection=no)
+      AC_CHECK_FILE($DIR/graph.cma,,found_ocamlgraph=no)
    fi
-   AC_CHECK_FILE($DIR/graph.cmi,,enable_hypothesis_selection=no)
-   if test "$enable_hypothesis_selection" = no; then
-      reason_hypothesis_selection=" (ocamlgraph not found)"
-      AC_MSG_WARN([Lib ocamlgraph not found, hypothesis selection disabled.])
-   elif test "$ocamlfind_ocamlgraph" = no; then
-      enable_ocamlfind=no
-      reason_ocamlfind=" (unable to find ocamlgraph)"
-   fi
+   AC_CHECK_FILE($DIR/graph.cmi,,found_ocamlgraph=no)
+fi
+
+if test "$enable_hypothesis_selection" = yes -a "$found_ocamlgraph" = no; then
+   enable_hypothesis_selection=no
+   reason_hypothesis_selection=" (ocamlgraph not found)"
+   AC_MSG_WARN([cannot find library ocamlgraph, hypothesis selection disabled.])
 fi
 
 if test "$enable_hypothesis_selection" = yes; then
@@ -745,30 +743,10 @@ else
    OCAMLGRAPHLIB=
 fi
 
-if test "$enable_stackify" = yes; then
-   DIR=
-   if test "$enable_ocamlfind" = yes; then
-      DIR=$($OCAMLFIND query ocamlgraph)
-      if test -n "$DIR"; then
-         echo "ocamlfind found ocamlgraph in $DIR"
-         OCAMLGRAPHLIB="$DIR"
-      else
-         ocamlfind_ocamlgraph=no
-      fi
-   fi
-   if test -z "$DIR"; then
-      OCAMLGRAPHLIB="+ocamlgraph"
-      DIR="$OCAMLLIB/ocamlgraph"
-      AC_CHECK_FILE($DIR/graph.cma,,enable_stackify=no)
-   fi
-   AC_CHECK_FILE($DIR/graph.cmi,,enable_stackify=no)
-   if test "$enable_stackify" = no; then
-      reason_stackify=" (ocamlgraph not found)"
-      AC_MSG_WARN([Lib ocamlgraph not found, stackify disabled.])
-   elif test "$ocamlfind_ocamlgraph" = no; then
-      enable_ocamlfind=no
-      reason_ocamlfind=" (unable to find ocamlgraph)"
-   fi
+if test "$enable_stackify" = yes -a "$found_ocamlgraph" = no; then
+   enable_stackify=no
+   reason_stackify=" (ocamlgraph not found)"
+   AC_MSG_WARN([cannot find library ocamlgraph, stackify disabled.])
 fi
 
 if test "$enable_stackify" = yes; then
