@@ -1114,8 +1114,6 @@ AC_SUBST(MENHIR)
 AC_SUBST(enable_ocamlfind)
 AC_SUBST(OCAMLFIND)
 
-AC_SUBST(enable_profiling)
-
 AC_SUBST(enable_statmemprof)
 AC_SUBST(STATMEMPROFPKG)
 
@@ -1238,7 +1236,6 @@ echo "    Version                 : $OCAMLVERSION"
 echo "    Library path            : $OCAMLLIB"
 echo "    Ocamlfind               : $enable_ocamlfind$reason_ocamlfind"
 echo "    Native compilation      : $enable_native_code"
-echo "    Profiling               : $enable_profiling"
 echo "    Memory profiling        : $enable_statmemprof$reason_statmemprof"
 echo "    PPX                     : $enable_ppx$reason_ppx"
 echo "    S-expr for why3pp       : $enable_pp_sexp$reason_no_pp_sexp"
