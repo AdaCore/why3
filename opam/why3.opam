@@ -35,6 +35,8 @@ build: [
    "--enable-zarith" {zarith:installed}
    "--disable-zip" {!camlzip:installed}
    "--enable-zip" {camlzip:installed}
+   "--disable-hypothesis-selection" {!ocamlgraph:installed}
+   "--enable-hypothesis-selection" {ocamlgraph:installed}
    "--disable-ide"]
   [make "-j%{jobs}%" "all" "opt" "byte"]
   [make "doc" "stdlibdoc" "apidoc"] {with-doc}
