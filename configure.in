@@ -93,7 +93,7 @@ AC_ARG_ENABLE(pp-sexp,
 
 AC_ARG_ENABLE(ide,
     AS_HELP_STRING([--disable-ide], [do not build Why3 IDE]),,
-    enable_ide=yes)
+    enable_ide=check)
 
 AC_ARG_ENABLE(web_ide,
     AS_HELP_STRING([--disable-web-ide], [do not build Why3 Web IDE]),,
@@ -641,33 +641,38 @@ else
 fi
 
 # checking for lablgtk3
-if test "$enable_ide" != yes ; then
+if test "$enable_ide" = no ; then
    reason_ide=" (disabled by user)"
 fi
-if test "$enable_ocamlfind" != yes; then
+if test "$enable_ide" != no -a "$enable_ocamlfind" != yes; then
+   if test "$enable_ide" = yes; then
+      AC_MSG_ERROR([cannot build IDE without ocamlfind.])
+   fi
    enable_ide=no
    reason_ide=" (ocamlfind not available)"
 fi
 
-if test "$enable_ide" = yes; then
+found_lablgtk=no
+if test "$enable_ide" != no; then
+   AC_MSG_CHECKING([for lablgtk3 using ocamlfind])
    DIR=$($OCAMLFIND query lablgtk3)
    if test -n "$DIR"; then
-      echo "ocamlfind found lablgtk3 in $DIR"
-      AC_CHECK_FILE($DIR/gtkButton.cmi,,enable_ide=no)
+      AC_MSG_RESULT([yes])
+      found_lablgtk=yes
+      AC_CHECK_FILE($DIR/gtkButton.cmi,,found_lablgtk=no)
    else
-      enable_ide=no
+      AC_MSG_RESULT([no])
+      found_lablgtk=no
    fi
-   if test "$enable_ide" = yes; then
+   if test "$found_lablgtk" = yes; then
       GTKVERSION=3
       PKGS_SOURCEVIEW="lablgtk3-sourceview3 lablgtk3.sourceview3 lablgtksourceview3"
-   else
-      AC_MSG_WARN([Library lablgtk3 not found, IDE disabled.])
-      reason_ide=" (lablgtk3 not found)"
    fi
 fi
 
 # checking for lablgtksourceview
-if test "$enable_ide" = yes; then
+found_lablgtksourceview=no
+if test "$found_lablgtk" = yes; then
    for p in $PKGS_SOURCEVIEW; do
       DIR=$($OCAMLFIND query $p)
       if test -n "$DIR"; then
@@ -679,14 +684,31 @@ if test "$enable_ide" = yes; then
          fi
       fi
    done
-   if test -z "$PKG_SOURCEVIEW"; then
-      enable_ide=no
-      AC_MSG_WARN([Lib lablgtksourceview not found, IDE disabled.])
-      reason_ide=" (lablgtksourceview not found)"
+   if test -n "$PKG_SOURCEVIEW"; then
+      found_lablgtksourceview=yes
    fi
 fi
 
-if test "$enable_ide" = yes ; then
+if test "$enable_ide" != no -a "$found_lablgtk" = no; then
+   if test "$enable_ide" = yes; then
+      AC_MSG_ERROR([cannot build IDE without lablgtk3.])
+   fi
+   AC_MSG_WARN([cannot find library lablgtk3, IDE disabled.])
+   enable_ide=no
+   reason_ide=" (lablgtk3 not found)"
+fi
+
+if test "$enable_ide" != no -a "$found_lablgtksourceview" = no; then
+   if test "$enable_ide" = yes; then
+      AC_MSG_ERROR([cannot build IDE without lablgtksourceview.])
+   fi
+   AC_MSG_WARN([cannot find library lablgtksourceview, IDE disabled.])
+   enable_ide=no
+   reason_ide=" (lablgtksourceview not found)"
+fi
+
+if test "$enable_ide" != no; then
+   enable_ide=yes
    LABLGTKPKG="lablgtk$GTKVERSION $PKG_SOURCEVIEW"
 fi
 
