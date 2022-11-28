@@ -588,13 +588,14 @@ module FromModelToTerm = struct
           if is_neg then raise Float_MinusZero else raise Float_PlusZero
         else
           (* Subnormals *)
+          let exp = (BigInt.pred exp_bias) in
           let hex = Format.asprintf "%t0x0.%sp-%s"
               (fun fmt -> if is_neg then Pp.string fmt "-")
-              frac (BigInt.to_string exp_bias) in
+              frac (BigInt.to_string exp) in
           Debug.dprintf debug "[float_of_binary] %a --> %s@."
             print_constant (Cfloat fp)
             hex;
-          (is_neg, "0", frac, Some (String.concat "" ["-";BigInt.to_string exp_bias]))
+          (is_neg, "0", frac, Some (String.concat "" ["-";BigInt.to_string exp]))
       else if BigInt.eq exp.bv_value exp_max (* infinities and NaN *) then
         if BigInt.eq mant.bv_value BigInt.zero then
           raise Float_Infinity
