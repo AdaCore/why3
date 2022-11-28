@@ -75,7 +75,7 @@ AC_ARG_ENABLE(bddinfer,
 
 AC_ARG_ENABLE(js_of_ocaml,
     AS_HELP_STRING([--disable-js-of-ocaml], [do not use js-of-ocaml]),,
-    enable_js_of_ocaml=yes)
+    enable_js_of_ocaml=check)
 
 # re
 
@@ -789,29 +789,40 @@ else
 fi
 
 # checking for js_of_ocaml
-if test "$enable_js_of_ocaml" != yes; then
+found_js_of_ocaml=no
+if test "$enable_js_of_ocaml" = no; then
    reason_js_of_ocaml=" (disabled by user)"
 elif test "$enable_ocamlfind" != yes; then
-   enable_js_of_ocaml=no
    reason_js_of_ocaml=" (ocamlfind not available)"
 else
+   found_js_of_ocaml=yes
    for p in js_of_ocaml js_of_ocaml-ppx; do
       AC_MSG_CHECKING([for $p])
       DIR=$($OCAMLFIND query $p 2> /dev/null)
       if test -z "$DIR"; then
          AC_MSG_RESULT([no])
-         enable_js_of_ocaml=no
+         found_js_of_ocaml=no
          reason_js_of_ocaml=" ($p not found)"
          break
       else
          AC_MSG_RESULT([yes])
       fi
    done
-   if test "$enable_js_of_ocaml" = yes; then
-      JSOFOCAMLPKG="js_of_ocaml js_of_ocaml-ppx"
-   fi
 fi
 
+if test "$enable_js_of_ocaml" != no -a "$found_js_of_ocaml" = no; then
+   if test "$enable_js_of_ocaml" = yes; then
+      AC_MSG_ERROR([cannot enable Javascript support without ocamlfind.])
+   fi
+   enable_js_of_ocaml=no
+fi
+
+if test "$enable_js_of_ocaml" != no; then
+   enable_js_of_ocaml=yes
+   JSOFOCAMLPKG="js_of_ocaml js_of_ocaml-ppx"
+fi
+
+# Web IDE
 if test "$enable_web_ide" = no; then
    reason_web_ide=" (disabled by user)"
 elif test "$enable_js_of_ocaml" != yes; then
