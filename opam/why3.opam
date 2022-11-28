@@ -33,6 +33,8 @@ build: [
    "--enable-ocamlfind"
    "--disable-zarith" {!zarith:installed}
    "--enable-zarith" {zarith:installed}
+   "--disable-mpfr" {!mlmpfr:installed}
+   "--enable-mpfr" {mlmpfr:installed}
    "--disable-zip" {!camlzip:installed}
    "--enable-zip" {camlzip:installed}
    "--disable-hypothesis-selection" {!ocamlgraph:installed}
