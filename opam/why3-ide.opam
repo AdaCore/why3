@@ -29,7 +29,10 @@ build: [
    "--disable-why3-lib"
    "--disable-frama-c"
    "--disable-coq-libs"
-   "--disable-js-of-ocaml"]
+   "--disable-js-of-ocaml"
+   "--disable-re"
+   "--enable-ocamlfind"
+   "--enable-ide"]
   [make "-j%{jobs}%" "ide"]
 ]
 
