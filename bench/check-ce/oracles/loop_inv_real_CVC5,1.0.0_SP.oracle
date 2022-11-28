@@ -1,0 +1,35 @@
+File "bench/check-ce/loop_inv_real.mlw", line 17, characters 16-27:
+Sub-goal Loop invariant init of goal f'vc.
+Prover result is: Valid.
+
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
+File "bench/check-ce/loop_inv_real.mlw", line 17, characters 16-27:
+Sub-goal Loop invariant preservation of goal f'vc.
+Prover result is: Unknown or time/memory/step limit.
+The following counterexample model could not be verified
+  (both RAC terminated with uncaught exception):
+File loop_inv_real.mlw:
+  Line 14:
+    a = 1.0
+  Line 15:
+    b = 2.0
+  Line 16:
+    [before iteration] b = 5.0
+    result of call at line 16, characters 8-16 = true
+  Line 17:
+    [current iteration] a = 1.0
+    [current iteration] b = 6.0
+  Line 18:
+    [current iteration] b = 6.0
+    result of call at line 18, characters 9-14 = 6.0
+
+File "bench/check-ce/loop_inv_real.mlw", line 12, characters 12-22:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Valid.
+
