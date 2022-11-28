@@ -264,8 +264,9 @@ let rec import_model_value loc env check known th_known ity t =
               )
               | _ -> raise Unexpected_Pattern
             in
-            let search (id, decl) = match decl.Decl.d_node with
-              | Decl.Dparam ls when String.equal (trace_or_name id) proj_ls.ls_name.id_string ->
+            let search (id, decl) =
+              match decl.Decl.d_node with
+              | Decl.Dparam ls when String.equal id.id_string proj_ls.ls_name.id_string ->
                 begin match ls.ls_value with
                 | None -> None
                 | Some ty_res ->
@@ -285,7 +286,7 @@ let rec import_model_value loc env check known th_known ity t =
             let x =
               import_model_value loc env check known th_known (ity_of_ty ty_res) proj_v
             in
-            get_or_stuck loc env ity "projection" (proj_value ity ls x)
+            get_or_stuck loc env ity "range projection" (proj_value ity ls x)
           with
           | Unexpected_Pattern ->
             (* check if t is of the form epsilon x:t. x.f1 = v1 /\ ... /\ x.fn = vn

@@ -548,7 +548,6 @@ module FromModelToTerm = struct
     filled ^ s
     
   let float_of_binary fp =
-    (* (false,"0","0") *)
     match fp with
     | Fplusinfinity | Fminusinfinity -> raise Float_Infinity
     | Fpluszero -> raise Float_PlusZero
@@ -592,6 +591,9 @@ module FromModelToTerm = struct
           let hex = Format.asprintf "%t0x0.%sp-%s"
               (fun fmt -> if is_neg then Pp.string fmt "-")
               frac (BigInt.to_string exp_bias) in
+          Debug.dprintf debug "[float_of_binary] %a --> %s@."
+            print_constant (Cfloat fp)
+            hex;
           (is_neg, "0", frac, Some (String.concat "" ["-";BigInt.to_string exp_bias]))
       else if BigInt.eq exp.bv_value exp_max (* infinities and NaN *) then
         if BigInt.eq mant.bv_value BigInt.zero then
@@ -602,6 +604,9 @@ module FromModelToTerm = struct
         let hex = Format.asprintf "%t0x1.%sp%s"
             (fun fmt -> if is_neg then Pp.string fmt "-")
             frac (BigInt.to_string exp) in
+        Debug.dprintf debug "[float_of_binary] %a --> %s@."
+          print_constant (Cfloat fp)
+          hex;
         (is_neg, "1", frac, Some (BigInt.to_string exp))
 
   let constant_to_term env c =
@@ -1213,15 +1218,38 @@ module FromModelToTerm = struct
         fun_defs
     in
     Mstr.iter
-      (fun n ((ls,_,_), t) ->
+      (fun n ((ls,oloc,_), t) ->
         Debug.dprintf debug
-          "[get_terms] n = %s, ls = %a, t = %a@.t.t_ty = %a@."
+          "[TERMS FROM SMT MODEL] n = %s, ls = %a, oloc = %a, t = %a@.t.t_ty = %a@."
           n
-          Pretty.print_ls ls Pretty.print_term t
+          Pretty.print_ls ls
+          (Pp.print_option Pretty.print_loc_as_attribute) oloc
+          Pretty.print_term t
           (Pp.print_option Pretty.print_ty) t.t_ty )
       terms;
     let terms = eval pinfo env terms in
-    clean env terms
+    Mstr.iter
+      (fun n ((ls,oloc,_), t) ->
+        Debug.dprintf debug
+          "[TERMS AFTER EVALUATION] n = %s, ls = %a, oloc = %a, t = %a@.t.t_ty = %a@."
+          n
+          Pretty.print_ls ls
+          (Pp.print_option Pretty.print_loc_as_attribute) oloc
+          Pretty.print_term t
+          (Pp.print_option Pretty.print_ty) t.t_ty )
+      terms;
+    let terms = clean env terms in
+    Mstr.iter
+      (fun n ((ls,oloc,_), t) ->
+        Debug.dprintf debug
+          "[TERMS AFTER CLEANUP] n = %s, ls = %a, oloc = %a, t = %a@.t.t_ty = %a@."
+          n
+          Pretty.print_ls ls
+          (Pp.print_option Pretty.print_loc_as_attribute) oloc
+          Pretty.print_term t
+          (Pp.print_option Pretty.print_ty) t.t_ty )
+      terms;
+    terms
 end
 
 (*

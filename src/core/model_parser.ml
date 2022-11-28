@@ -596,7 +596,6 @@ let build_model_rec pm (elts: model_element list) : model_files =
       (why_name_trans me.me_name)
       (Pp.print_option_or_default "NO LOC" Loc.pp_position) me.me_location
       Pretty.print_attrs attrs;
-(*
     (* Replace projections with their real name *)
     let me_value = replace_projection
         (fun s -> recover_name pm fields_projs s)
@@ -604,13 +603,10 @@ let build_model_rec pm (elts: model_element list) : model_files =
     (* Remove some specific record field related to the front-end language.
         This function is registered. *)
     let attrs, me_value = !remove_field (attrs, me_value) in
-    (* Transform value flattened by eval_match (one field record) back to records *)
-    let attrs, me_value = read_one_fields ~attrs me_value in
-*)
     let me_name = create_model_element_name me.me_name.men_name attrs Other in
     Some {
       me_name;
-      me_value= me.me_value;
+      me_value;
       me_location= me.me_location;
       me_lsymbol= me.me_lsymbol
     } in
