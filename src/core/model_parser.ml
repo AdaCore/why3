@@ -199,7 +199,7 @@ let float_of_binary binary =
         (* Subnormals *)
         let hex = Format.asprintf "%t0x0.%sp-%s"
             (fun fmt -> if is_neg then Pp.string fmt "-")
-            frac (to_string exp_bias) in
+            frac (to_string (pred exp_bias)) in
         Float_number {hex= Some hex; binary}
     else if eq exp.bv_value exp_max (* infinities and NaN *) then
       if eq mant.bv_value zero then
