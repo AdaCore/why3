@@ -696,7 +696,6 @@ module FromModelToTerm = struct
         | Some ty1, Some ty2
             when Ty.ty_equal ty1 Ty.ty_int && Ty.ty_equal ty2 Ty.ty_int ->
           begin match n with
-          | "=" -> ("int", "Int", Ident.op_infix "=")
           | "+" -> ("int", "Int", Ident.op_infix "+")
           | "-" -> ("int", "Int", Ident.op_infix "-")
           | "*" -> ("int", "Int", Ident.op_infix "*")
@@ -709,7 +708,6 @@ module FromModelToTerm = struct
         | Some ty1, Some ty2
             when Ty.ty_equal ty1 Ty.ty_real && Ty.ty_equal ty2 Ty.ty_real ->
           begin match n with
-          | "=" -> ("real", "Real", Ident.op_infix "=")
           | "+" -> ("real", "Real", Ident.op_infix "+")
           | "-" -> ("real", "Real", Ident.op_infix "-")
           | "*" -> ("real", "Real", Ident.op_infix "*")
@@ -754,11 +752,7 @@ module FromModelToTerm = struct
     | Qident (Isymbol (S "=")), [ t1; t2 ] ->
         let t1' = term_to_term env t1 in
         let t2' = term_to_term env t2 in
-        begin try
-          let ls = find_builtin_lsymbol env "=" [t1'; t2'] in
-          t_app ls [t1'; t2'] ls.ls_value
-        with NoBuiltinSymbol -> t_bool_equ t1' t2'
-        end
+        t_equ t1' t2'
     | Qident (Isymbol (S "or")), hd::tl ->
         List.fold_left
           (fun t t' -> t_binary_bool Term.Tor t (term_to_term env t'))
