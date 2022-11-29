@@ -40,13 +40,16 @@ module Cmp = struct
 	let (_, line2, col2, _, _) = Loc.get loc2 in
         (line1 < line2) || (line1 = line2 && col1 < col2)
 
-  let compare (_,a_loc,a_attrs) (_,b_loc,b_attrs) =
-    if (a_loc = b_loc) && (a_attrs = b_attrs)
-    then 0 else
-      (* Order the terms accoridng to their source code locations  *)
-      if before a_loc b_loc then 1
-      else -1
-
+  let compare (a_ls,a_loc,a_attrs) (b_ls,b_loc,b_attrs) =
+    let c = Term.ls_compare a_ls b_ls in
+    if c = 0 then
+      if (a_loc = b_loc) && (a_attrs = b_attrs)
+        then 0
+        else
+          (* Order the terms according to their source code locations  *)
+          if before a_loc b_loc then 1
+          else -1
+    else c
 end
 
 module S = Set.Make(Cmp)
