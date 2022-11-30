@@ -16,11 +16,27 @@ File int.mlw:
       int
       ->
       bool = fun (bOUND_VARIABLE_455:int) ->
-              if bOUND_VARIABLE_455 = (- 4611686018427387902) then true
-              else if bOUND_VARIABLE_455 = (- 4611686018427387904) then true
+              if bOUND_VARIABLE_455 = (- 4611686018427387902) then True
+              else if bOUND_VARIABLE_455 = (- 4611686018427387904) then True
                    else if bOUND_VARIABLE_455 = (- 4611686018427387903)
-                        then true
+                        then True
                         else bOUND_VARIABLE_455 = 4611686018427387903
+  Line 416:
+    int63'int :
+      int63
+      ->
+      int = fun (bOUND_VARIABLE_442:int63) ->
+             if (epsilon x:int63. int63'int x = (- 4611686018427387903)) =
+                bOUND_VARIABLE_442
+             then (- 4611686018427387903)
+             else if (epsilon x:int63.
+                     int63'int x = (- 4611686018427387904)) =
+                     bOUND_VARIABLE_442
+                  then (- 4611686018427387904)
+                  else if (epsilon x:int63.
+                          int63'int x = 4611686018427387903) =
+                          bOUND_VARIABLE_442
+                       then 4611686018427387903 else (- 4611686018427387902)
   Line 432:
     max_int : int63 = epsilon x:int63. int63'int x = 4611686018427387903
   Line 434:

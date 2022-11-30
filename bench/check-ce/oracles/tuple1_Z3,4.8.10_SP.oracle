@@ -15,7 +15,20 @@ File int.mlw:
     in_bounds :
       int
       ->
-      bool = fun (x!0:int) -> if x!0 = 0 then false else false
+      bool = fun (x!0:int) -> if x!0 = 0 then False else False
+  Line 416:
+    int63'int :
+      int63
+      ->
+      int = fun (x!0:int63) ->
+             if x!0 = (epsilon x:int63. int63'int x = 4611686018427387903)
+             then 4611686018427387903
+             else if x!0 = (epsilon x:int63.
+                     int63'int x = (- 4611686018427387904))
+                  then (- 4611686018427387904)
+                  else if x!0 = (epsilon x:int63. int63'int x = 0) then 0
+                       else if x!0 = (epsilon x:int63. int63'int x = 0)
+                            then 0 else 0
   Line 432:
     max_int : int63 = epsilon x:int63. int63'int x = 4611686018427387903
   Line 434:

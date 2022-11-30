@@ -914,6 +914,14 @@ module FromModelToTerm = struct
       error "More than one matching vsymbol in prover_vars for %a@."
         Pretty.print_vs vs
 
+  let is_true t =
+    match t.t_node with
+    | Ttrue -> true
+    | _ -> t_equal t t_bool_true
+  let is_false t =
+    match t.t_node with
+    | Tfalse -> true
+    | _ -> t_equal t t_bool_false
 
   let rec eval_term env seen_prover_vars ty_coercions ty_fields terms t =
     match t.t_node with
@@ -986,9 +994,7 @@ module FromModelToTerm = struct
           res)
         else t
       end
-    | Term.Tapp (ls, [t1;t2])
-        when String.equal ls.ls_name.Ident.id_string (Ident.op_infix "=") ->
-      (* TODO_WIP fix builtin lsymbol for equality *)
+    | Term.Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
       if
         t_equal
           (eval_term env seen_prover_vars ty_coercions ty_fields terms t1)
@@ -1009,10 +1015,12 @@ module FromModelToTerm = struct
       let ts = List.map (eval_term env seen_prover_vars ty_coercions ty_fields terms) ts in
       t_app ls ts ls.ls_value
     | Term.Tif (b,t1,t2) -> (
-      match (eval_term env seen_prover_vars ty_coercions ty_fields terms b).t_node with
-      | Term.Ttrue -> eval_term env seen_prover_vars ty_coercions ty_fields terms t1
-      | Term.Tfalse -> eval_term env seen_prover_vars ty_coercions ty_fields terms t2
-      | _ ->
+      let b = eval_term env seen_prover_vars ty_coercions ty_fields terms b in
+      if is_true b then
+        eval_term env seen_prover_vars ty_coercions ty_fields terms t1
+      else if is_false b then
+        eval_term env seen_prover_vars ty_coercions ty_fields terms t2
+      else
         let t1 = eval_term env seen_prover_vars ty_coercions ty_fields terms t1 in
         let t2 = eval_term env seen_prover_vars ty_coercions ty_fields terms t2 in
         t_if b t1 t2
@@ -1037,10 +1045,9 @@ module FromModelToTerm = struct
       t_binary_bool op t1 t2
     | Term.Tnot t' -> (
       let t' = eval_term env seen_prover_vars ty_coercions ty_fields terms t' in
-      match t'.t_node with
-      | Term.Ttrue -> t_bool_false
-      | Term.Tfalse -> t_bool_true
-      | _ -> t_not_bool t')
+      if is_true t' then t_bool_false
+      else if is_false t' then t_bool_true
+      else t_not_bool t')
     | _ -> t
 
   let eval (pinfo : Printer.printing_info) env terms =

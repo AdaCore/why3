@@ -20,6 +20,20 @@ File int.mlw:
                 _arg_1 = (- 4611686018427387904)) \/
                _arg_1 = (- 2305843009213693952)) \/
               _arg_1 = (- 2305843009213693953)
+  Line 416:
+    int63'int :
+      int63
+      ->
+      int = fun (_arg_1:int63) ->
+             if (epsilon x:int63. int63'int x = 4611686018427387903) = _arg_1
+             then 4611686018427387903
+             else if (epsilon x:int63.
+                     int63'int x = (- 4611686018427387904)) = _arg_1
+                  then (- 4611686018427387904)
+                  else if (epsilon x:int63.
+                          int63'int x = (- 2305843009213693953)) = _arg_1
+                       then (- 2305843009213693953)
+                       else (- 2305843009213693952)
   Line 432:
     max_int : int63 = epsilon x:int63. int63'int x = 4611686018427387903
   Line 434:
