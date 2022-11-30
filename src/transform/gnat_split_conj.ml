@@ -174,7 +174,7 @@ let rec unfold_right n env f =
       t_attr_copy f (t_forall (close vsl trl (unfold_right n env f1)))
   | Tapp (ls, tl) ->
     let tl = List.map (unfold_right n env) tl in
-    if should_unfold ls then
+    if Mls.mem ls env then
       let f = t_attr_copy f (t_unfold f.t_loc env ls tl f.t_ty) in
       unfold_right (n-1) env f
     else
@@ -192,12 +192,10 @@ and unfold_case n env forig t bl =
   t_attr_copy forig (t_case t bl)
 
 
-let is_all_vars tl =
-  List.for_all (fun t ->
-    match t.t_node with
-    | Tvar _ -> true
-    | _ -> false
-    ) tl
+let all_vars tl =
+  let exception Notallvars in
+  try Some (List.map (fun t -> match t.t_node with | Tvar x -> x | _ -> raise Notallvars) tl)
+  with Notallvars -> None
 
 let rec has_pretty_labels t =
   let is_pretty_label s = Strings.has_prefix "GP_Pretty_Ada" s in
@@ -216,11 +214,13 @@ and branch_has_pretty_labels b =
   let _, f = t_open_branch b in
   has_pretty_labels f
 
-let extract_def env vs lhs rhs =
+let extract_def env lhs rhs =
   match lhs.t_node with
-  | Tapp (ls, tl) when is_all_vars tl && should_unfold ls ->
-      let r = has_pretty_labels rhs in
-      if r then Mls.add ls (vs, rhs) env else env
+  | Tapp (ls, tl) when should_unfold ls && has_pretty_labels rhs ->
+      begin match all_vars tl with
+      | Some vs -> Mls.add ls (vs, rhs) env
+      | None -> env
+      end
   | _ -> env
 
 (* function to open all universal quantifiers on top of a term. *)
@@ -246,7 +246,7 @@ let rec match_forall f =
 
 let extract_def_from_axiom env t =
   match match_forall t with
-  | Some (vs, t) ->
+  | Some (_, t) ->
     begin
       match t.t_node with
       | Tbinop (Tiff, lhs, rhs) ->
@@ -255,16 +255,16 @@ let extract_def_from_axiom env t =
         | Tapp (ls, [a; b]) ->
           if ls_equal ls ps_equ then begin
             if is_true b then begin
-              extract_def env vs a (t_if rhs t_bool_true t_bool_false)
-            end else extract_def env vs lhs rhs
-          end else extract_def env vs lhs rhs
+              extract_def env a (t_if rhs t_bool_true t_bool_false)
+            end else extract_def env lhs rhs
+          end else extract_def env lhs rhs
         | _ ->
           let rhs = t_attr_add inlined_attr rhs in
-          extract_def env vs lhs rhs
+          extract_def env lhs rhs
         end
       | Tapp (ls, [lhs; rhs]) when ls_equal ls ps_equ ->
         let rhs = t_attr_add inlined_attr rhs in
-        extract_def env vs lhs rhs
+        extract_def env lhs rhs
       | _ -> env
     end
   | _ -> env
@@ -300,12 +300,8 @@ let unfold_trans = Trans.store (fun task ->
       | Decl d ->
         begin match d.d_node with
         | Dprop (Pgoal,sym,t) ->
-          begin try
             let g = (unfold_right 1 env t) in
             add_tdecl task (create_decl (create_prop_decl Pgoal sym g))
-          with _ ->
-            add_tdecl task goal
-          end
         | _ -> assert false
         end
       | _ -> assert false)
