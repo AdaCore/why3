@@ -439,32 +439,56 @@ module FromModelToTerm = struct
     | Some ls -> ls.ls_args == []
     | None -> false
 
-  let rec smt_sort_to_ty ?(update=false) env s =
-    Debug.dprintf debug "[smt_sort_to_ty] update = %b / s = %a@." update print_sort s;
-    let matching_sort f =
-      match List.find_all (fun (s',_) -> f s') env.inferred_types with
-      | [] ->
-        if update then raise UnknownType
-        else error "No match in inferred_types for sort %a@." print_sort s
-      | [(_,ty)] -> ty
-      | _ -> error "Multiple matched in inferred_types for sort %a@." print_sort s
-    in
-    match s with
-    | Sstring -> Ty.ty_str
-    | Sint -> Ty.ty_int
-    | Sreal -> Ty.ty_real
-    | Sbool -> Ty.ty_bool
-    | Sarray (s1, s2) ->
-      begin match List.find_all (fun (s',_) -> sort_equal s s') env.inferred_types with
-      | [] ->
-        if update then raise UnknownType
-        else Ty.ty_app Ty.ts_func [ smt_sort_to_ty env s1; smt_sort_to_ty env s2 ]
-      | [(_,ty)] -> ty
-      | _ -> error "No match in inferred_types for array sort %a@." print_sort s
+  let ty_unfold ty =
+    match ty.Ty.ty_node with
+    | Ty.Tyapp (ts, tys) when Ty.ts_equal ts Ty.ts_func -> tys
+    | _ -> [ty]
+
+  let rec smt_sort_to_ty ?(update_ty=None) env s =
+    Debug.dprintf debug "[smt_sort_to_ty] update_ty = %a / s = %a@."
+      (Pp.print_option Pretty.print_ty) update_ty
+      print_sort s;
+    try
+      begin match s with
+      | Sstring -> Ty.ty_str
+      | Sint -> Ty.ty_int
+      | Sreal -> Ty.ty_real
+      | Sbool -> Ty.ty_bool
+      | Sarray (s1, s2) ->
+        begin match update_ty with
+        | None ->
+          Ty.ty_app Ty.ts_func [ smt_sort_to_ty env s1; smt_sort_to_ty env s2 ]
+        | Some ty ->
+          begin match ty_unfold ty with
+          | [ty1;ty2] ->
+            Ty.ty_app Ty.ts_func [
+              smt_sort_to_ty ~update_ty:(Some ty1) env s1;
+              smt_sort_to_ty ~update_ty:(Some ty2) env s2 ]
+          | _ ->
+            error "Inconsistent shapes for type %a and sort %a"
+              Pretty.print_ty ty
+              print_sort s
+          end
+        end
+      | Sroundingmode | Sfloatingpoint _
+      | Sbitvec _ | Ssimple _ | Smultiple _ ->
+        begin
+          match List.find_all (fun (s',_) -> sort_equal s s') env.inferred_types with
+          | [] -> raise UnknownType
+          | [(_,ty)] -> ty
+          | _ -> error "Multiple matches in inferred_types for sort %a@." print_sort s
+        end
+      | _ -> raise UnknownType
       end
-    | Sroundingmode | Sfloatingpoint _
-    | Sbitvec _ | Ssimple _ | Smultiple _ -> matching_sort (sort_equal s)
-    | _ -> error "Multiple matched in inferred_types for array sort %a@." print_sort s
+    with UnknownType -> (
+      match update_ty with
+      | None -> error "Cannot infer type from sort %a@." print_sort s
+      | Some ty ->
+        Debug.dprintf debug "[updating inferred_types] s = %a, ty = %a@."
+          print_sort s
+          Pretty.print_ty ty;
+        env.inferred_types <- (s,ty) :: env.inferred_types;
+        ty)
 
   let qual_id_to_term env qid =
     Debug.dprintf debug "[qual_id_to_term] qid = %a@."
@@ -855,13 +879,7 @@ module FromModelToTerm = struct
       ls.ls_args;
     env.bound_vars <- Mstr.empty;
     let check_or_update_inferred_types s ty =
-      try Ty.ty_equal ty (smt_sort_to_ty ~update:true env s)
-      with UnknownType -> (
-        Debug.dprintf debug "[updating inferred_types] s = %a, ty = %a@."
-          print_sort s
-          Pretty.print_ty ty;
-        env.inferred_types <- (s,ty) :: env.inferred_types;
-        true)
+      Ty.ty_equal ty (smt_sort_to_ty ~update_ty:(Some ty) env s)
     in
     let t =
       try
