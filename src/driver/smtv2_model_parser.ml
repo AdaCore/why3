@@ -685,7 +685,7 @@ module FromModelToTerm = struct
         error "No matching type found in inferred_type for float constant %a@."
           print_constant c
       end
-    | Cbool b -> if b then t_true_bool else t_false_bool
+    | Cbool b -> if b then t_bool_true else t_bool_false
     | Cstring str -> t_const (Constant.string_const str) Ty.ty_str
 
   let find_builtin_lsymbol env n ts =
@@ -994,14 +994,14 @@ module FromModelToTerm = struct
           (eval_term env seen_prover_vars ty_coercions ty_fields terms t1)
           (eval_term env seen_prover_vars ty_coercions ty_fields terms t2)
       then
-        t_true_bool
+        t_bool_true
       else (
         match t1.t_node,t2.t_node with
         | Term.Tvar v1, Term.Tvar v2
             when is_vs_in_prover_vars v1 env.prover_vars &&
             is_vs_in_prover_vars v2 env.prover_vars ->
           (* distinct prover variables are not equal *)
-          if vs_equal v1 v2 then t_true_bool else t_false_bool
+          if vs_equal v1 v2 then t_bool_true else t_bool_false
         | _ ->
           let ts = List.map (eval_term env seen_prover_vars ty_coercions ty_fields terms) [t1;t2] in
           t_app ls ts ls.ls_value)
