@@ -15,6 +15,13 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_mono.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = fun (bOUND_VARIABLE_406:t) ->
+             if (epsilon x:t. to_int x = 3) = bOUND_VARIABLE_406 then 3
+             else 2
   Line 11:
     two : t = epsilon x:t. to_int x = 2
   Line 14:
@@ -87,10 +94,32 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_mono.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = fun (bOUND_VARIABLE_495:t) ->
+             if (epsilon x:t. to_int x = 3) = bOUND_VARIABLE_495 then 3
+             else 2
   Line 11:
     two : t = epsilon x:t. to_int x = 2
   Line 14:
     three : t = epsilon x:t. to_int x = 3
+  Line 18:
+    elts :
+      array
+      ->
+      int
+      ->
+      t = fun (bOUND_VARIABLE_510:array) ->
+           if (epsilon x:array.
+              x.length = 0 /\
+              x.elts = (fun (x1:int) -> epsilon x2:t. to_int x2 = 3)) =
+              bOUND_VARIABLE_510
+           then fun (x:int) -> epsilon x1:t. to_int x1 = 3
+           else fun (x:int) ->
+                 if x = 42 then epsilon x1:t. to_int x1 = 2 else epsilon x1:
+                 t. to_int x1 = 3
   Line 19:
     length : array -> int = fun (bOUND_VARIABLE_519:array) -> 0
   Line 28:
@@ -163,6 +192,13 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `g` cannot be evaluated):
 File jlamp_array_mono.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = fun (bOUND_VARIABLE_479:t) ->
+             if (epsilon x:t. to_int x = 3) = bOUND_VARIABLE_479 then 3
+             else 2
   Line 11:
     two : t = epsilon x:t. to_int x = 2
   Line 14:
@@ -258,10 +294,39 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `h` cannot be evaluated):
 File jlamp_array_mono.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = fun (bOUND_VARIABLE_519:t) ->
+             if (epsilon x:t. to_int x = 3) = bOUND_VARIABLE_519 then 3
+             else 2
   Line 11:
     two : t = epsilon x:t. to_int x = 2
   Line 14:
     three : t = epsilon x:t. to_int x = 3
+  Line 18:
+    elts :
+      array
+      ->
+      int
+      ->
+      t = fun (bOUND_VARIABLE_534:array) ->
+           if (epsilon x:array.
+              x.length = 43 /\
+              x.elts =
+              (fun (x1:int) ->
+                if x1 = 17 then epsilon x2:t. to_int x2 = 3
+                else if x1 = 42 then epsilon x2:t. to_int x2 = 2
+                     else epsilon x2:t. to_int x2 = 2)) =
+              bOUND_VARIABLE_534
+           then fun (x:int) ->
+                 if x = 17 then epsilon x1:t. to_int x1 = 3
+                 else if x = 42 then epsilon x1:t. to_int x1 = 2
+                      else epsilon x1:t. to_int x1 = 2
+           else fun (x:int) ->
+                 if x = 42 then epsilon x1:t. to_int x1 = 2 else epsilon x1:
+                 t. to_int x1 = 2
   Line 19:
     length : array -> int = fun (bOUND_VARIABLE_543:array) -> 43
   Line 28:

@@ -22,6 +22,12 @@ File array.mlw:
       ->
       t = fun (_arg_1:array t) (_arg_2:int) -> epsilon x:t. to_int x = 3
 File jlamp_array_poly.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = fun (_arg_1:t) ->
+             if (epsilon x:t. to_int x = 3) = _arg_1 then 3 else 2
   Line 11:
     two : t = epsilon x:t. to_int x = 2
   Line 14:
@@ -43,6 +49,12 @@ File array.mlw:
   Line 17:
     length : array t -> int = fun (_arg_1:array t) -> 0
 File jlamp_array_poly.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = fun (_arg_1:t) ->
+             if (epsilon x:t. to_int x = 3) = _arg_1 then 3 else 2
   Line 11:
     two : t = epsilon x:t. to_int x = 2
   Line 14:

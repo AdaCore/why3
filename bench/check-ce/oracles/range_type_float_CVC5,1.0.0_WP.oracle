@@ -12,11 +12,11 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File range_type_float.mlw:
   Line 8:
-    x = {t'real => 10.0}
-    x = {t'real => 10.0}
+    x = epsilon x:t. t'real x = 10.0
+    x = epsilon x:t. t'real x = 10.0
     Execution of main function `f` with env:
-      x = {t'real => 10.0}
+      x = epsilon x:t. t'real x = 10.0
   Line 10:
     Property failure at assertion with:
-      x = {t'real => 10.0}
+      x = epsilon x:t. t'real x = 10.0
 

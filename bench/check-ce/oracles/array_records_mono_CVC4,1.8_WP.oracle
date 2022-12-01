@@ -25,21 +25,21 @@ File array_records_mono.mlw:
   Line 45:
     a = {elts=
          fun (x:int) ->
-          if x = (- 1) then basic_record'mk true 3 5
-          else basic_record'mk false 0 0;
+          if x = (- 1) then basic_record'mk True 3 5
+          else basic_record'mk False 0 0;
          length= 0}
     i = (- 1)
     a = {elts=
          fun (x:int) ->
-          if x = (- 1) then basic_record'mk true 3 5
-          else basic_record'mk false 0 0;
+          if x = (- 1) then basic_record'mk True 3 5
+          else basic_record'mk False 0 0;
          length= 0}
     i = (- 1)
     Execution of main function `var_overwrite` with env:
       a = {elts=
            fun (x:int) ->
-            if x = (- 1) then basic_record'mk true 3 5
-            else basic_record'mk false 0 0;
+            if x = (- 1) then basic_record'mk True 3 5
+            else basic_record'mk False 0 0;
            length= 0}
       i = (- 1)
       zero = 0
@@ -48,15 +48,15 @@ File array_records_mono.mlw:
     (giant-step) execution of unimplemented function `([])`
       a = {elts=
            fun (x:int) ->
-            if x = (- 1) then basic_record'mk true 3 5
-            else basic_record'mk false 0 0;
+            if x = (- 1) then basic_record'mk True 3 5
+            else basic_record'mk False 0 0;
            length= 0}
       i = (- 1)
     Property failure at precondition of `([])` with:
       a = {elts=
            fun (x:int) ->
-            if x = (- 1) then basic_record'mk true 3 5
-            else basic_record'mk false 0 0;
+            if x = (- 1) then basic_record'mk True 3 5
+            else basic_record'mk False 0 0;
            length= 0}
       i = (- 1)
 

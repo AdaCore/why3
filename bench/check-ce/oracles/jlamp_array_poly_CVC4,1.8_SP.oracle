@@ -23,6 +23,13 @@ File array.mlw:
       t = fun (bOUND_VARIABLE_589:array t) (bOUND_VARIABLE_590:int) ->
            epsilon x:t. to_int x = 3
 File jlamp_array_poly.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = fun (bOUND_VARIABLE_698:t) ->
+             if (epsilon x:t. to_int x = 3) = bOUND_VARIABLE_698 then 3
+             else 2
   Line 11:
     two : t = epsilon x:t. to_int x = 2
   Line 14:
@@ -44,6 +51,13 @@ File array.mlw:
   Line 17:
     length : array t -> int = fun (bOUND_VARIABLE_628:array t) -> 0
 File jlamp_array_poly.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = fun (bOUND_VARIABLE_773:t) ->
+             if (epsilon x:t. to_int x = 3) = bOUND_VARIABLE_773 then 3
+             else 2
   Line 11:
     two : t = epsilon x:t. to_int x = 2
   Line 14:

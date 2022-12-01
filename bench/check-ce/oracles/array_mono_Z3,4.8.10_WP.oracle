@@ -54,6 +54,26 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `([]<-)` cannot be evaluated):
 File array_mono.mlw:
+  Line 10:
+    length :
+      array
+      ->
+      int = fun (x!0:array) ->
+             if x!0 = (epsilon x:array. x.length = 2) then 2
+             else if x!0 = (epsilon x:array. x.length = 2) then 2 else 2
+  Line 19:
+    mixfix [<-] :
+      array
+      ->
+      int
+      ->
+      int
+      ->
+      array = fun (x!0:array) (x!1:int) (x!2:int) ->
+               if (x!0 = (epsilon x:array. x.length = 2) /\ x!1 = 0) /\
+                  x!2 = 42
+               then epsilon x:array. x.length = 2 else epsilon x:array.
+               x.length = 2
   Line 23:
     a : array = epsilon x:array. x.length = 2
   Line 25:

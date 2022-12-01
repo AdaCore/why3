@@ -11,6 +11,13 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_poly.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = fun (x!0:t) ->
+             if x!0 = (epsilon x:t. to_int x = 2) then 2
+             else if x!0 = (epsilon x:t. to_int x = 3) then 3 else 2
   Line 11:
     two : t = epsilon x:t. to_int x = 2
   Line 14:
@@ -32,6 +39,13 @@ File array.mlw:
   Line 17:
     length : ty -> uni -> int = fun (x!0:ty) (x!1:uni) -> 0
 File jlamp_array_poly.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = fun (x!0:t) ->
+             if x!0 = (epsilon x:t. to_int x = 2) then 2
+             else if x!0 = (epsilon x:t. to_int x = 3) then 3 else 2
   Line 11:
     two : t = epsilon x:t. to_int x = 2
   Line 14:

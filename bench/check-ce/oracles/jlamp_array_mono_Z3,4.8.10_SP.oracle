@@ -15,10 +15,23 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_mono.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = fun (x!0:t) ->
+             if x!0 = (epsilon x:t. to_int x = 2) then 2
+             else if x!0 = (epsilon x:t. to_int x = 3) then 3 else 2
   Line 11:
     two : t = epsilon x:t. to_int x = 2
   Line 14:
     three : t = epsilon x:t. to_int x = 3
+  Line 19:
+    length :
+      array
+      ->
+      int = fun (x!0:array) ->
+             if x!0 = (epsilon x:array. x.length = 0) then 0 else 0
   Line 22:
     mixfix [] :
       array
@@ -56,10 +69,37 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_mono.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = fun (x!0:t) ->
+             if x!0 = (epsilon x:t. to_int x = 2) then 2
+             else if x!0 = (epsilon x:t. to_int x = 3) then 3 else 2
   Line 11:
     two : t = epsilon x:t. to_int x = 2
   Line 14:
     three : t = epsilon x:t. to_int x = 3
+  Line 19:
+    length :
+      array
+      ->
+      int = fun (x!0:array) ->
+             if x!0 = (epsilon x:array. x.length = 4) then 4
+             else if x!0 = (epsilon x:array. x.length = 4) then 4 else 4
+  Line 28:
+    mixfix [<-] :
+      array
+      ->
+      int
+      ->
+      t
+      ->
+      array = fun (x!0:array) (x!1:int) (x!2:t) ->
+               if (x!0 = (epsilon x:array. x.length = 4) /\ x!1 = 42) /\
+                  x!2 = (epsilon x:t. to_int x = 2)
+               then epsilon x:array. x.length = 4 else epsilon x:array.
+               x.length = 4
   Line 32:
     a : array = epsilon x:array. x.length = 4
   Line 34:
@@ -89,10 +129,37 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `g` cannot be evaluated):
 File jlamp_array_mono.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = fun (x!0:t) ->
+             if x!0 = (epsilon x:t. to_int x = 2) then 2
+             else if x!0 = (epsilon x:t. to_int x = 3) then 3 else 2
   Line 11:
     two : t = epsilon x:t. to_int x = 2
   Line 14:
     three : t = epsilon x:t. to_int x = 3
+  Line 19:
+    length :
+      array
+      ->
+      int = fun (x!0:array) ->
+             if x!0 = (epsilon x:array. x.length = 43) then 43
+             else if x!0 = (epsilon x:array. x.length = 43) then 43 else 43
+  Line 28:
+    mixfix [<-] :
+      array
+      ->
+      int
+      ->
+      t
+      ->
+      array = fun (x!0:array) (x!1:int) (x!2:t) ->
+               if (x!0 = (epsilon x:array. x.length = 43) /\ x!1 = 42) /\
+                  x!2 = (epsilon x:t. to_int x = 2)
+               then epsilon x:array. x.length = 43 else epsilon x:array.
+               x.length = 43
   Line 32:
     a : array = epsilon x:array. x.length = 43
   Line 34:
@@ -122,10 +189,37 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `h` cannot be evaluated):
 File jlamp_array_mono.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = fun (x!0:t) ->
+             if x!0 = (epsilon x:t. to_int x = 2) then 2
+             else if x!0 = (epsilon x:t. to_int x = 3) then 3 else 2
   Line 11:
     two : t = epsilon x:t. to_int x = 2
   Line 14:
     three : t = epsilon x:t. to_int x = 3
+  Line 19:
+    length :
+      array
+      ->
+      int = fun (x!0:array) ->
+             if x!0 = (epsilon x:array. x.length = 43) then 43
+             else if x!0 = (epsilon x:array. x.length = 43) then 43 else 43
+  Line 28:
+    mixfix [<-] :
+      array
+      ->
+      int
+      ->
+      t
+      ->
+      array = fun (x!0:array) (x!1:int) (x!2:t) ->
+               if (x!0 = (epsilon x:array. x.length = 43) /\ x!1 = 17) /\
+                  x!2 = (epsilon x:t. to_int x = 2)
+               then epsilon x:array. x.length = 43 else epsilon x:array.
+               x.length = 43
   Line 32:
     a : array = epsilon x:array. x.length = 43
   Line 34:

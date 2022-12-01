@@ -30,10 +30,10 @@ File int.mlw:
     max_int32 = 2147483647
 File int32.mlw:
   Line 5:
-    r = {contents= {int32'int => 22}}
-    r = {contents= {int32'int => 22}}
+    r = {contents= epsilon x:int32. int32'int x = 22}
+    r = {contents= epsilon x:int32. int32'int x = 22}
     Execution of main function `dummy_update` with env:
-      r = {contents= {int32'int => 22}}
+      r = {contents= epsilon x:int32. int32'int x = 22}
       zero = 0
       one = 1
       min_int32 = (-2147483648)
@@ -46,8 +46,8 @@ File int32.mlw:
     (giant-step) execution of unimplemented function `(+)`
       a = 42
       b = 42
-    result of `(+)` = {int32'int => 84}
+    result of `(+)` = epsilon x:int32. int32'int x = 84
   Line 7:
     Property failure at postcondition of `dummy_update` with:
-      r = {contents= {int32'int => 84}}
+      r = {contents= epsilon x:int32. int32'int x = 84}
 
