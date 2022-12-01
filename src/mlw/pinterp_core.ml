@@ -897,7 +897,9 @@ let check_type_invs rac ?loc ~giant_steps env ity v =
             print_ty v.v_ty;
       | _ -> failwith "check_type_invs: value is not record" in
     let bind_field env rs =
-      bind_pvs (Opt.get rs.rs_field) (Mrs.find rs fs_vs) env in
+      try bind_pvs (Opt.get rs.rs_field) (Mrs.find rs fs_vs) env
+      with Not_found -> env
+    in
     let env = List.fold_left bind_field env def.Pdecl.itd_fields in
     let desc = asprintf "of type %a" print_ity ity in
     let ctx = mk_cntr_ctx env ?loc:loc ~desc ~giant_steps:(Some giant_steps) Vc.expl_type_inv in

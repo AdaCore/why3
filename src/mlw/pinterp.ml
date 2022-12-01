@@ -1416,19 +1416,44 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
   | Log.Exec_normal ->
       let res =
         if rs_equal rs rs_func_app then begin
-          check_pre_and_register_call Log.Exec_normal;
-          match arg_vs with
-          | [{v_desc= Vfun (cl, arg, e)}; value] ->
-              let vsenv = Mvs.union (fun _ _ v -> Some v) ctx.env.vsenv cl in
-              let ctx = {ctx with env= bind_vs arg value {ctx.env with vsenv}} in
-              exec_expr ctx e
-          | [{v_desc= Vpurefun (_, bindings, default)}; value] ->
-              let v = try Mv.find value bindings with Not_found -> default in
-              Normal v
-          | [{v_desc= Vundefined }; _] ->
-              incomplete "an undefined argument was passed to %a"
-                Ident.print_decoded rs.rs_name.id_string
-          | _ -> assert false
+          let exception UnexpectedArgs in
+          try
+            check_pre_and_register_call Log.Exec_normal;
+            begin match arg_vs with
+            | [{v_desc= Vfun (cl, arg, e)}; value] ->
+                let vsenv = Mvs.union (fun _ _ v -> Some v) ctx.env.vsenv cl in
+                let ctx = {ctx with env= bind_vs arg value {ctx.env with vsenv}} in
+                exec_expr ctx e
+            | [{v_desc= Vpurefun (_, bindings, default)}; value] ->
+                let v = try Mv.find value bindings with Not_found -> default in
+                Normal v
+            | [{v_desc= Vterm t}; value ] ->
+                (* special case when [t] is a function defining the mapping of elements
+                for an array or a map, for example:
+                t = fun (x:bool) -> if x = True then -1 else 0 *)
+                begin match t_open_lambda t with
+                | ([vs],_,t') ->
+                  begin match t'.t_node with
+                  | Tif (t1,t2,t3) ->
+                    let ctx = {ctx with env= bind_vs vs value ctx.env} in
+                    begin match (ctx.compute_term ctx.env t1).t_node with
+                    | Ttrue -> exec_expr ctx (e_pure (ctx.compute_term ctx.env t2))
+                    | Tfalse ->  exec_expr ctx (e_pure (ctx.compute_term ctx.env t3))
+                    | _ -> incomplete "could not reduce %a" print_term t'
+                    end
+                  | _ -> raise UnexpectedArgs
+                  end
+                | _ -> raise UnexpectedArgs
+                end
+            | [{v_desc= Vundefined }; _] ->
+                incomplete "an undefined argument was passed to %a"
+                  Ident.print_decoded rs.rs_name.id_string
+            | _ -> raise UnexpectedArgs
+            end
+          with
+          | UnexpectedArgs ->
+            incomplete "unexpected arguments passed to %a"
+              Ident.print_decoded rs.rs_name.id_string
           end
         else
           match rs, arg_vs with
