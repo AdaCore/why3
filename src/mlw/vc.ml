@@ -62,9 +62,9 @@ let model_trace_result_attribute = create_model_trace_attr "result"
 let explicit_result loc attrs ce ity =
   let name = match ce.c_node with
     | Capp (rs, _) ->
-       Format.asprintf "%a'result" Ident.print_decoded rs.rs_name.id_string
+       Format.asprintf "%s'result" rs.rs_name.id_string
     | Cpur (ls, _) ->
-       Format.asprintf "%a'result" Ident.print_decoded ls.ls_name.id_string
+       Format.asprintf "%s'result" ls.ls_name.id_string
     | Cfun _ -> "anonymous'result"
     | Cany -> "any'result"
   in
