@@ -237,6 +237,7 @@ void server_init_listening(char* socketname, int parallel) {
   int cur_dir;
   char *socketname_copy1, *socketname_copy2, *dirn, *filen;
 
+  init_logging();
   // Initialize current_dir pointer. Do that here because we switch the
   // directory temporarily below.
   current_dir = get_cur_dir();
@@ -259,7 +260,6 @@ void server_init_listening(char* socketname, int parallel) {
     shutdown_with_msg("error when switching to socket directory");
   }
 
-  init_logging();
   init_request_queue();
   clients = init_list(parallel);
   addr.sun_family = AF_UNIX;
