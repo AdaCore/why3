@@ -216,21 +216,7 @@ let range_value ity n =
   value (ty_of_ity ity) (Vnum n)
 
 let proj_value ity ls v =
-  let valid_range =
-    match ity_components ity, v with
-      | ({ its_def = Range r; its_ts= ts }, _, _), {v_desc= Vnum n}
-        when ls.ls_name.id_string = ts.ts_name.id_string ^ "'int"
-          && Opt.equal ty_equal ls.ls_value (Some ty_int) -> (
-          try
-            Number.(check_range { il_kind = ILitUnk; il_int = n } r);
-            true
-          with Number.OutOfRange _ ->
-            false )
-      | _ -> true in
-  if valid_range then
-    Some (value (ty_of_ity ity) (Vproj (ls, v)))
-  else
-    None
+  value (ty_of_ity ity) (Vproj (ls, v))
 
 let mode_to_string m =
   let open Mlmpfr_wrapper in

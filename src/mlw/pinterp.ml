@@ -1502,7 +1502,9 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
                   check_type_invs ctx.rac ?loc ~giant_steps:ctx.giant_steps
                     ctx.env ity_result v;
                 Normal v
-            | Projection _d -> (
+            | Projection proj_def -> (
+              let exception CannotProject in
+              try
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: PROJECTION@]@." pp_indent print_rs rs;
                 check_pre_and_register_call Log.Exec_normal;
                 let rec search pv opt_constr_args args v' =
@@ -1511,10 +1513,9 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
                       if pv_equal pv pv2 then
                         Normal (field_get v)
                       else search pv pvl vl v'
-                  | _ -> kasprintf failwith "Cannot project %a by %a"
-                           print_value v' print_rs rs
+                  | _ -> raise CannotProject
                 in
-                match rs.rs_field, arg_vs with
+                begin match rs.rs_field, arg_vs with
                 | Some pv, [{v_desc= Vconstr (Some cstr, _, args)} as v] ->
                     let opt_constr_args = List.map (fun f -> Some f) cstr.rs_cty.cty_args in
                     search pv opt_constr_args args v
@@ -1522,16 +1523,27 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
                     begin try
                       let opt_constr_args = List.map (fun rs -> rs.rs_field) field_rss in
                       search pv opt_constr_args args v
-                    with _ ->
-                      kasprintf failwith "Cannot project values %a by %a"
-                        Pp.(print_list comma print_value) arg_vs
-                        print_rs rs
+                    with _ -> raise CannotProject
                     end
+                | Some pv, [{v_desc= Vterm {t_node = Tapp (ls,args)}} as v] ->
+                  let matching_name rs =
+                    String.equal rs.rs_name.id_string ls.ls_name.id_string in
+                  begin
+                    match List.find matching_name proj_def.Pdecl.itd_constructors with
+                    | rs ->
+                      let opt_constr_args = List.map (fun f -> Some f) rs.rs_cty.cty_args in
+                      let fields = List.map (fun f -> field (term_value (ity_of_ty (Opt.get f.t_ty)) f)) args in
+                      search pv opt_constr_args fields v
+                    | exception Not_found -> raise CannotProject
+                  end
                 | _, [{v_desc= Vundefined}] ->
                     incomplete "cannot project undefined by %a" print_rs rs
-                | _ -> kasprintf failwith "Cannot project values %a by %a"
-                         Pp.(print_list comma print_value) arg_vs
-                         print_rs rs )
+                | _ -> raise CannotProject
+                end
+              with CannotProject ->
+                kasprintf failwith "Cannot project values %a by %a"
+                  Pp.(print_list comma print_value) arg_vs
+                  print_rs rs )
             | exception Not_found ->
                 incomplete "definition of routine %s could not be found"
                   rs.rs_name.id_string in

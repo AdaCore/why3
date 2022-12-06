@@ -201,28 +201,12 @@ let print_model_classification ?verb_lvl ?json ?check_ce fmt (m, c) =
 let cannot_import f =
   incomplete ("cannot import value from model: " ^^ f)
 
-let trace_or_name id =
-  match get_model_element_name ~attrs:id.id_attrs with
-  | name -> if name = "" then id.id_string else name
-  | exception Not_found -> id.id_string
-
-let get_or_stuck loc env ity desc = function
-  | Some v -> v
-  | None ->
-      let desc = asprintf "for %s %a" desc print_ity ity in
-      let cntr_ctx = mk_cntr_ctx env ~desc ~giant_steps:None Vc.expl_pre in
-      stuck ?loc cntr_ctx "%s" desc
-
-exception Unexpected_Pattern
-
 (** Import a value from the prover model to an interpreter value.
 
     @raise Exit when the type [ity] and the shape of the the value [v] do not
     match. This may happen when a module that contains a value with an abstract
-    type is cloned with different types as instantiations of the abstract type.
-
-    @raise CannotImportModelValue when the value cannot be imported *)
-let rec import_model_value loc env check known th_known ity t =
+    type is cloned with different types as instantiations of the abstract type. *)
+let rec import_model_value loc env check known ity t =
   Debug.dprintf debug_check_ce_rac_results "[import_model_value] ity = %a@."
     Ity.print_ity ity;
   Debug.dprintf debug_check_ce_rac_results "[import_model_value] t = %a, t.t_ty = %a@."
@@ -246,13 +230,46 @@ let rec import_model_value loc env check known th_known ity t =
             let itys = List.map (fun pv -> ity_full_inst subst pv.pv_ity)
                 rs.rs_cty.cty_args in
             let args =
-              List.map2 (import_model_value loc env check known th_known) itys args
+              List.map2 (import_model_value loc env check known) itys args
             in
             constr_value ity (Some rs) def.Pdecl.itd_fields args)
           | exception Not_found -> term_value ity t)
       | Teps tb ->
         begin
+          let exception UnexpectedPattern in
           let x_eps, t' = t_open_bound tb in
+          (* special case for range types:
+             first check if t is of the form epsilon x:t. t'int x = v *)
+          try
+            let (proj_ls, proj_t) =
+              match t'.t_node with
+              | Tapp (ls, [proj;term_value]) when ls_equal ls ps_equ -> (
+                match proj.t_node with
+                | Tapp (ls, [x]) when t_equal x (t_var x_eps) -> (ls,term_value)
+                | _ -> raise UnexpectedPattern
+              )
+              | _ -> raise UnexpectedPattern
+            in
+            let proj_v =
+              import_model_value loc env check known Ity.ity_int proj_t in
+            let valid_range =
+              match ity_components ity, proj_v with
+              | ({ its_def = Range r; its_ts= ts }, _, _),
+                { v_desc= Vterm {t_node= Tconst (ConstInt c)} }
+                when proj_ls.ls_name.id_string = ts.ts_name.id_string ^ "'int"
+                  && Opt.equal Ty.ty_equal proj_ls.ls_value (Some Ty.ty_int) -> (
+                  try Number.(check_range c r); true
+                  with Number.OutOfRange _ -> false )
+              | _ -> true
+            in
+            if valid_range then
+              proj_value ity proj_ls proj_v
+            else
+              let desc = asprintf "for range projection %a" print_ity ity in
+              let cntr_ctx = mk_cntr_ctx env ~desc ~giant_steps:None Vc.expl_pre in
+              stuck ?loc cntr_ctx "%s" desc
+          with
+          | UnexpectedPattern ->
           (* check if t is of the form epsilon x:t. x.f1 = v1 /\ ... /\ x.fn = vn
           with f1,...,fn the fields associated to type ity *)
           let ts, l1, l2 = ity_components ity in
@@ -271,9 +288,9 @@ let rec import_model_value loc env check known th_known ity t =
                     match proj.t_node with
                     | Tapp (ls, [x]) when t_equal x (t_var x_eps) ->
                       (ls,term_value) :: acc
-                    | _ -> raise Unexpected_Pattern
+                    | _ -> raise UnexpectedPattern
                   )
-                  | _ -> raise Unexpected_Pattern
+                  | _ -> raise UnexpectedPattern
                 )
                 []
                 (get_conjuncts t')
@@ -286,20 +303,20 @@ let rec import_model_value loc env check known th_known ity t =
                     String.equal ls.ls_name.id_string rs.rs_name.id_string in
                   match List.find_all (matching_field_name field_rs) list_of_fields_values with
                   | [(_ls,term_value)] ->
-                    import_model_value loc env check known th_known field_ity term_value
+                    import_model_value loc env check known field_ity term_value
                   | [] ->
                     (* if the epsilon term does not define a value for field_rs,
                       use undefined value *)
                     undefined_value env field_ity
-                  | _ -> raise Unexpected_Pattern
+                  | _ -> raise UnexpectedPattern
                   )
                 def.Pdecl.itd_fields
             in
             if (List.length field_values > 0) then
               constr_value ity None def.Pdecl.itd_fields field_values
-            else raise Unexpected_Pattern
+            else raise UnexpectedPattern
           with
-          | Unexpected_Pattern -> term_value ity t
+          | UnexpectedPattern -> term_value ity t
         end
         | _ -> term_value ity t
     else
@@ -312,7 +329,7 @@ let rec import_model_value loc env check known th_known ity t =
         | [rs], [field_rs] ->
           let field_ity = ity_full_inst subst (fd_of_rs field_rs).pv_ity in
           constr_value ity (Some rs) [field_rs]
-            [import_model_value loc env check known th_known field_ity t]
+            [import_model_value loc env check known field_ity t]
         | _ ->
           cannot_import "type with not exactly one constructor and one field: %a/%d, %a/%d"
             print_its ts (List.length def.Pdecl.itd_constructors)
@@ -327,8 +344,7 @@ let oracle_of_model pm model =
   let import check oid loc env ity me =
     let loc = if loc <> None then loc else
         match oid with Some id -> id.id_loc | None -> None in
-    import_model_value loc env check pm.Pmodule.mod_known
-      pm.Pmodule.mod_theory.Theory.th_known ity me.me_value in
+    import_model_value loc env check pm.Pmodule.mod_known ity me.me_value in
   let for_variable env ?(check=fun _ _ -> ()) ~loc id ity =
     Opt.map (import check (Some id) loc env ity)
       (search_model_element_for_id model ?loc id) in
