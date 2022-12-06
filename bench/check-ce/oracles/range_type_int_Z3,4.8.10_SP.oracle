@@ -19,13 +19,13 @@ File int.mlw:
     one = 1
 File range_type_int.mlw:
   Line 7:
-    x = {int32'int => 5}
-    x = {int32'int => 5}
+    x = epsilon x:int32. int32'int x = 5
+    x = epsilon x:int32. int32'int x = 5
     Execution of main function `f` with env:
-      x = {int32'int => 5}
+      x = epsilon x:int32. int32'int x = 5
       zero = 0
       one = 1
   Line 9:
     Property failure at assertion with:
-      x = {int32'int => 5}
+      x = epsilon x:int32. int32'int x = 5
 

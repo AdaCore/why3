@@ -215,9 +215,6 @@ let range_value ity n =
   end;
   value (ty_of_ity ity) (Vnum n)
 
-let proj_value ity ls v =
-  value (ty_of_ity ity) (Vproj (ls, v))
-
 let mode_to_string m =
   let open Mlmpfr_wrapper in
   match m with

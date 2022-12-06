@@ -65,30 +65,30 @@ File int.mlw:
     one = 1
 File jlamp_projections.mlw:
   Line 41:
-    a = {contents= {to_int => 127}}
-    a = {contents= {to_int => 127}}
+    a = {contents= epsilon x:byte. to_int x = 127}
+    a = {contents= epsilon x:byte. to_int x = 127}
     Execution of main function `p3` with env:
-      a = {contents= {to_int => 127}}
+      a = {contents= epsilon x:byte. to_int x = 127}
       zero = 0
       one = 1
   Line 42:
     (giant-step) execution of unimplemented function `of_int`
       x = 1
-    result of `of_int` = {to_int => 1}
+    result of `of_int` = epsilon x:byte. to_int x = 1
     Normal execution of function `(!)` with args:
-      r = {contents= {to_int => 127}}
+      r = {contents= epsilon x:byte. to_int x = 127}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= {to_int => 127}}
+      arg = {contents= epsilon x:byte. to_int x = 127}
 File jlamp_projections.mlw:
   Line 42:
     (giant-step) execution of unimplemented function `add`
-      x = {to_int => 127}
-      y = {to_int => 1}
+      x = epsilon x:byte. to_int x = 127
+      y = epsilon x:byte. to_int x = 1
     Property failure at precondition of `add` with:
-      x = {to_int => 127}
-      y = {to_int => 1}
+      x = epsilon x:byte. to_int x = 127
+      y = epsilon x:byte. to_int x = 1
 
 File "bench/check-ce/jlamp_projections.mlw", line 54, characters 29-39:
 Sub-goal Precondition of goal p4'vc.

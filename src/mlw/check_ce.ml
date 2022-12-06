@@ -239,9 +239,10 @@ let rec import_model_value loc env check known ity t =
           let exception UnexpectedPattern in
           let x_eps, t' = t_open_bound tb in
           (* special case for range types:
-             first check if t is of the form epsilon x:t. t'int x = v *)
+             if t is of the form epsilon x:ty. ty'int x = v, check that v is in the
+             range of values defined by type ty *)
           try
-            let (proj_ls, proj_t) =
+            let (proj_ls, proj_v) =
               match t'.t_node with
               | Tapp (ls, [proj;term_value]) when ls_equal ls ps_equ -> (
                 match proj.t_node with
@@ -250,27 +251,25 @@ let rec import_model_value loc env check known ity t =
               )
               | _ -> raise UnexpectedPattern
             in
-            let proj_v =
-              import_model_value loc env check known Ity.ity_int proj_t in
             let valid_range =
               match ity_components ity, proj_v with
               | ({ its_def = Range r; its_ts= ts }, _, _),
-                { v_desc= Vterm {t_node= Tconst (ConstInt c)} }
+                { t_node= Tconst (ConstInt c) }
                 when proj_ls.ls_name.id_string = ts.ts_name.id_string ^ "'int"
                   && Opt.equal Ty.ty_equal proj_ls.ls_value (Some Ty.ty_int) -> (
                   try Number.(check_range c r); true
                   with Number.OutOfRange _ -> false )
-              | _ -> true
+              | _ -> raise UnexpectedPattern
             in
             if valid_range then
-              proj_value ity proj_ls proj_v
+              term_value ity t
             else
               let desc = asprintf "for range projection %a" print_ity ity in
               let cntr_ctx = mk_cntr_ctx env ~desc ~giant_steps:None Vc.expl_pre in
               stuck ?loc cntr_ctx "%s" desc
           with
           | UnexpectedPattern ->
-          (* check if t is of the form epsilon x:t. x.f1 = v1 /\ ... /\ x.fn = vn
+          (* check if t is of the form epsilon x:ty. x.f1 = v1 /\ ... /\ x.fn = vn
           with f1,...,fn the fields associated to type ity *)
           let ts, l1, l2 = ity_components ity in
           let subst = its_match_regs ts l1 l2 in

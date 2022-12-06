@@ -104,10 +104,6 @@ val unit_value : value
 val range_value : Ity.ity -> BigInt.t -> value
 (** Returns a range value, or raises [Incomplete] if the value is outside the range. *)
 
-val proj_value : Ity.ity -> Term.lsymbol -> value -> value option
-(** Returns a range value, or [None] if the type is a range, the value is
-   outside. *)
-
 val term_value : Ity.ity -> Term.term -> value
 
 (** {4 Snapshots}

@@ -26,27 +26,27 @@ File int.mlw:
     max_int32 = 2147483647
 File threshold.mlw:
   Line 8:
-    n = {int32'int => (- 1)}
-    min = {int32'int => (- 1)}
-    max = {int32'int => (- 2147483648)}
-    n = {int32'int => (- 1)}
-    min = {int32'int => (- 1)}
-    max = {int32'int => (- 2147483648)}
+    n = epsilon x:int32. int32'int x = (- 1)
+    min = epsilon x:int32. int32'int x = (- 1)
+    max = epsilon x:int32. int32'int x = (- 2147483648)
+    n = epsilon x:int32. int32'int x = (- 1)
+    min = epsilon x:int32. int32'int x = (- 1)
+    max = epsilon x:int32. int32'int x = (- 2147483648)
     Execution of main function `f` with env:
-      n = {int32'int => (- 1)}
-      min = {int32'int => (- 1)}
-      max = {int32'int => (- 2147483648)}
+      n = epsilon x:int32. int32'int x = (- 1)
+      min = epsilon x:int32. int32'int x = (- 1)
+      max = epsilon x:int32. int32'int x = (- 2147483648)
       zero = 0
       one = 1
       min_int32 = (-2147483648)
       max_int32 = 2147483647
   Line 11:
     (giant-step) execution of unimplemented function `(+)`
-      a = {int32'int => (- 1)}
-      b = {int32'int => (- 2147483648)}
+      a = epsilon x:int32. int32'int x = (- 1)
+      b = epsilon x:int32. int32'int x = (- 2147483648)
     Property failure at precondition of `(+)` with:
-      a = {int32'int => (- 1)}
-      b = {int32'int => (- 2147483648)}
+      a = epsilon x:int32. int32'int x = (- 1)
+      b = epsilon x:int32. int32'int x = (- 2147483648)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -76,39 +76,39 @@ File int.mlw:
     max_int32 = 2147483647
 File threshold.mlw:
   Line 8:
-    n = {int32'int => 1}
-    min = {int32'int => 1}
-    max = {int32'int => 0}
-    n = {int32'int => 1}
-    min = {int32'int => 1}
-    max = {int32'int => 0}
+    n = epsilon x:int32. int32'int x = 1
+    min = epsilon x:int32. int32'int x = 1
+    max = epsilon x:int32. int32'int x = 0
+    n = epsilon x:int32. int32'int x = 1
+    min = epsilon x:int32. int32'int x = 1
+    max = epsilon x:int32. int32'int x = 0
     Execution of main function `f` with env:
-      n = {int32'int => 1}
-      min = {int32'int => 1}
-      max = {int32'int => 0}
+      n = epsilon x:int32. int32'int x = 1
+      min = epsilon x:int32. int32'int x = 1
+      max = epsilon x:int32. int32'int x = 0
       zero = 0
       one = 1
       min_int32 = (-2147483648)
       max_int32 = 2147483647
   Line 11:
     (giant-step) execution of unimplemented function `(+)`
-      a = {int32'int => 1}
-      b = {int32'int => 0}
-    result of `(+)` = {int32'int => 1}
+      a = epsilon x:int32. int32'int x = 1
+      b = epsilon x:int32. int32'int x = 0
+    result of `(+)` = epsilon x:int32. int32'int x = 1
   Line 12:
     (giant-step) execution of unimplemented function `(<)`
-      a = {int32'int => 1}
-      b = {int32'int => 1}
+      a = epsilon x:int32. int32'int x = 1
+      b = epsilon x:int32. int32'int x = 1
     result of `(<)` = False
     (giant-step) execution of unimplemented function `(>)`
-      a = {int32'int => 1}
-      b = {int32'int => 0}
+      a = epsilon x:int32. int32'int x = 1
+      b = epsilon x:int32. int32'int x = 0
     result of `(>)` = True
   Line 9:
     Property failure at postcondition of `f` with:
-      min = {int32'int => 1}
-      max = {int32'int => 0}
-      result = {int32'int => 0}
+      min = epsilon x:int32. int32'int x = 1
+      max = epsilon x:int32. int32'int x = 0
+      result = epsilon x:int32. int32'int x = 0
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
