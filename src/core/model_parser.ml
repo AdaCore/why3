@@ -181,6 +181,7 @@ let similar_model_element_names n1 n2 =
   Strings.has_suffix unused_suffix n1.men_name =
   Strings.has_suffix unused_suffix n2.men_name
 
+(* TODO_WIP *)
 (* TODO optimize *)
 let rec filter_duplicated l =
   let exist_similar a l = List.exists (fun x ->
@@ -489,15 +490,8 @@ let add_to_model_if_loc ?kind me model =
       let model_file = get_model_file model filename in
       let me = match kind with None -> me | Some men_kind ->
         {me with me_name= {me.me_name with men_kind}} in
-      let elements = get_elements model_file line_number in
-      (* This removes elements that are duplicated *)
-      let found_elements =
-        List.exists (fun x ->
-            similar_model_element_names x.me_name me.me_name
-            && pos = Opt.get_def Loc.dummy_position x.me_location)
-          elements in
-      let elements = if found_elements then elements
-                     else me :: elements in
+      let elements = me :: get_elements model_file line_number in
+      let elements = elements in
       let model_file = Mint.add line_number elements model_file in
       Mstr.add filename model_file model
 

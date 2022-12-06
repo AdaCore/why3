@@ -55,6 +55,7 @@ end
 module S = Set.Make(Cmp)
 
 let add_model_element el info_model =
+  (* TODO_WIP update comment *)
  (* Add element el (Term.lsymbol * Loc.position option * Ident.Sattr.t) to info_model.
     If an element with the same hash (the same set of attributes + the same
     location) as the element el already exists in info_model, replace it with el.
@@ -73,7 +74,7 @@ let add_model_element el info_model =
     and it is the one that comes after the former one (and that is why we always keep the
     last term).
 *)
-  let info_model = S.remove el info_model in
+  let info_model = S.remove el info_model in (* TODO_WIP do not remove? *)
   S.add el info_model
 
 let check_enter_vc_term t in_goal vc_term_info =
