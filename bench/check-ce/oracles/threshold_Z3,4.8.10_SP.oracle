@@ -26,27 +26,27 @@ File int.mlw:
     max_int32 = 2147483647
 File threshold.mlw:
   Line 8:
-    n = {int32'int => 1}
-    min = {int32'int => 2147483647}
-    max = {int32'int => 1}
-    n = {int32'int => 1}
-    min = {int32'int => 2147483647}
-    max = {int32'int => 1}
+    n = epsilon x:int32. int32'int x = 1
+    min = epsilon x:int32. int32'int x = 2147483647
+    max = epsilon x:int32. int32'int x = 1
+    n = epsilon x:int32. int32'int x = 1
+    min = epsilon x:int32. int32'int x = 2147483647
+    max = epsilon x:int32. int32'int x = 1
     Execution of main function `f` with env:
-      n = {int32'int => 1}
-      min = {int32'int => 2147483647}
-      max = {int32'int => 1}
+      n = epsilon x:int32. int32'int x = 1
+      min = epsilon x:int32. int32'int x = 2147483647
+      max = epsilon x:int32. int32'int x = 1
       zero = 0
       one = 1
       min_int32 = (-2147483648)
       max_int32 = 2147483647
   Line 11:
     (giant-step) execution of unimplemented function `(+)`
-      a = {int32'int => 2147483647}
-      b = {int32'int => 1}
+      a = epsilon x:int32. int32'int x = 2147483647
+      b = epsilon x:int32. int32'int x = 1
     Property failure at precondition of `(+)` with:
-      a = {int32'int => 2147483647}
-      b = {int32'int => 1}
+      a = epsilon x:int32. int32'int x = 2147483647
+      b = epsilon x:int32. int32'int x = 1
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC

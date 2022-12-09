@@ -23,22 +23,22 @@ File int.mlw:
     one = 1
 File jlamp_projections.mlw:
   Line 28:
-    a = {to_int => 127}
-    a = {to_int => 127}
+    a = epsilon x:byte. to_int x = 127
+    a = epsilon x:byte. to_int x = 127
     Execution of main function `p3` with env:
-      a = {to_int => 127}
+      a = epsilon x:byte. to_int x = 127
       zero = 0
       one = 1
   Line 29:
     (giant-step) execution of unimplemented function `of_int`
       x = 1
-    result of `of_int` = {to_int => 1}
+    result of `of_int` = epsilon x:byte. to_int x = 1
     (giant-step) execution of unimplemented function `add`
-      x = {to_int => 127}
-      y = {to_int => 1}
+      x = epsilon x:byte. to_int x = 127
+      y = epsilon x:byte. to_int x = 1
     Property failure at precondition of `add` with:
-      x = {to_int => 127}
-      y = {to_int => 1}
+      x = epsilon x:byte. to_int x = 127
+      y = epsilon x:byte. to_int x = 1
 
 File "bench/check-ce/jlamp_projections.mlw", line 42, characters 14-24:
 Sub-goal Precondition of goal p3'vc.
@@ -115,24 +115,24 @@ File int.mlw:
     one = 1
 File jlamp_projections.mlw:
   Line 53:
-    b = {f= {to_int => 127}; g= true}
-    b = {f= {to_int => 127}; g= true}
+    b = {f= epsilon x:byte. to_int x = 127; g= True}
+    b = {f= epsilon x:byte. to_int x = 127; g= True}
     Execution of main function `p4` with env:
-      b = {f= {to_int => 127}; g= true}
+      b = {f= epsilon x:byte. to_int x = 127; g= True}
       zero = 0
       one = 1
   Line 54:
     Normal execution of function `g` with args:
-      arg = {f= {to_int => 127}; g= true}
+      arg = {f= epsilon x:byte. to_int x = 127; g= True}
     (giant-step) execution of unimplemented function `of_int`
       x = 1
-    result of `of_int` = {to_int => 1}
+    result of `of_int` = epsilon x:byte. to_int x = 1
     Normal execution of function `f` with args:
-      arg = {f= {to_int => 127}; g= true}
+      arg = {f= epsilon x:byte. to_int x = 127; g= True}
     (giant-step) execution of unimplemented function `add`
-      x = {to_int => 127}
-      y = {to_int => 1}
+      x = epsilon x:byte. to_int x = 127
+      y = epsilon x:byte. to_int x = 1
     Property failure at precondition of `add` with:
-      x = {to_int => 127}
-      y = {to_int => 1}
+      x = epsilon x:byte. to_int x = 127
+      y = epsilon x:byte. to_int x = 1
 
