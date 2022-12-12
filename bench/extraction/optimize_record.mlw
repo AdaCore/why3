@@ -1,0 +1,12 @@
+module T
+       use int.Int
+
+       type t = { x : int }
+       invariant { 0 < x }
+       by { x = 1 }
+
+
+       let f b =
+           if b then let y = { x = 1 } in y
+           else { x = 2 }
+end
