@@ -1,42 +1,36 @@
 :x: marks a potential source of incompatibility
 
-Bug fixes
-  * fixed soundness bug in introduce_premises transformation (#694)
+Tools
+  * `libdir` and `datadir` are not stored anymore in the configuration
+    file, but they can be manually set there if desired; see also the
+    environment variables `WHY3LIB` and `WHY3DATA`
 
-Documentation
-  * added documentation for environment variables WHY3LIB and WHY3DATA
-
-Configuration
-  * the libdir and datadir are not anymore stored in the Why3 config
-    file, but they can be manually set there if desired. See also the
-    usage of environment variables WHY3LIB and WHY3DATA
-  * the option --enable-profiling does not exist anymore, see
-    CONTRIBUTING.md for details
-
-API
-  * source locations are now represented by both a start line number
-    and an end line number. The fourth number is thus now the column
-    number on the end line. :x:
-  * several functions from Call_prover and Driver now take as input a
-    `Whyconf.main` configuration type instead of directly take libdir
-    and datadir. See the updated API examples for details. :x:
-  * Use of [Whyconf.load_driver] must be replaced by
-    [Driver.load_driver_for_prover] :x:
-  * Use of [Warning.emit] must be replaced by [Loc.warning] :x:
-
-MLCFG input language
+MLCFG language
   * attributes on the body of an MLCFG function are now supported
 
 Python language
   * added `by` and `so` connectives in predicates
   * fixed overloading of `+` in Python code
-  * list concatenation in logic with `add_list`
+  * added `add_list` for list concatenation in logic
+
+API
+  * source locations are now represented by both a start line number
+    and an end line number; the fourth number is thus now the column
+    number on the end line :x:
+  * several functions from `Call_prover` and `Driver` now take as input a
+    `Whyconf.main` configuration type instead of directly taking `libdir`
+    and `datadir` :x:
+  * `Whyconf.load_driver` has been replaced by `Driver.load_driver_for_prover` :x:
+  * `Warning.emit` has been replaced by `Loc.warning` :x:
 
 Provers
   * support for CVC5 1.0.0 (released April 6, 2022)
   * support for Alt-Ergo 2.4.2 (released August 1, 2022)
 
 Miscellaneous
+  * fixed soundness bug with existential quantifiers in `introduce_premises`
+  * configuration option `--enable-profiling` has been removed
+  * configuration now fails for explicit yet unsuccessful `--enable-foo` options
   * OCaml >= 4.08 is now required
   * LablGtk2 is no longer supported
 
@@ -180,7 +174,7 @@ IDE
   * `why3 ide` in the Docker image can now be used through a web browser
     instead of an X server; see Section 5.1.2 of the manual
 
-Input Formats
+Input formats
   * a new front-end named MLCFG was added; it supports unstructured program codes,
     including `goto` statements; see Section 9.3 of the manual
   * translation of `<>` and `not` have been fixed for micro-C and Python
