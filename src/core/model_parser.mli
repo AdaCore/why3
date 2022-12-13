@@ -38,44 +38,38 @@ type model_element_kind =
 
 val print_model_kind : Format.formatter -> model_element_kind -> unit
 
-(** Information about the name of the model element *)
-type model_element_name = {
-  men_name   : string;
-    (** The name of the source-code element.  *)
-  men_kind   : model_element_kind;
-    (** The kind of model element. *)
-  men_attrs : Ident.Sattr.t;
-}
-
 (** Counter-example model elements. Each element represents
     a counter-example for a single source-code element.*)
 type model_element = {
-  me_name             : model_element_name;
-    (** Information about the name of the model element  *)
+  me_kind             : model_element_kind;
+    (** The kind of model element. *)
   me_value            : Term.term;
     (** Counter-example value for the element. *)
   me_location         : Loc.position option;
     (** Source-code location of the element. *)
+  me_attrs            : Ident.Sattr.t;
+    (** Attributes of the element. *)
   me_lsymbol          : Term.lsymbol;
     (** Logical symbol corresponding to the element.  *)
 }
 
 val create_model_element :
-  name      : string ->
   value     : Term.term ->
   oloc      : Loc.position option ->
-  lsymbol   : Term.lsymbol ->
   attrs     : Ident.Sattr.t ->
+  lsymbol   : Term.lsymbol ->
   model_element
 (** Creates a counter-example model element.
-    @param name the name of the source-code element
-
     @param value counter-example value for the element
 
-    @param lsymbol logical symbol corresponding to the element
+    @param attrs location of the element
 
     @param attrs attributes of the element
+
+    @param lsymbol logical symbol corresponding to the element
 *)
+
+val get_name : model_element -> string
 
   (** {2 Model definitions} *)
 
@@ -179,7 +173,7 @@ val json_model : model -> Json_base.json
 
 val print_model :
   ?filter_similar:bool ->
-  ?me_name_trans:(model_element_name -> string) ->
+  ?me_name_trans:(model_element -> string) ->
   print_attrs:bool ->
   Format.formatter ->
   model ->
@@ -196,7 +190,7 @@ val print_model :
 
 val print_model_human :
   ?filter_similar:bool ->
-  ?me_name_trans:(model_element_name -> string) ->
+  ?me_name_trans:(model_element -> string) ->
   Format.formatter ->
   model ->
   print_attrs:bool ->
@@ -207,7 +201,7 @@ val interleave_with_source :
   print_attrs:bool ->
   ?start_comment:string ->
   ?end_comment:string ->
-  ?me_name_trans:(model_element_name -> string) ->
+  ?me_name_trans:(model_element -> string) ->
   model ->
   rel_filename:string ->
   source_code:string ->

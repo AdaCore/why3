@@ -1435,9 +1435,7 @@ let parse pinfo input =
         (Mstr.values
           (Mstr.mapi
             (fun _ ((ls,oloc,attrs),t) ->
-              let name = Ident.get_model_trace_string ~name:(ls.ls_name.Ident.id_string) ~attrs in
-              Model_parser.create_model_element
-                ~name ~value:t ~oloc ~lsymbol:ls ~attrs)
+              Model_parser.create_model_element ~value:t ~oloc ~attrs ~lsymbol:ls)
             terms))
 
 let () =

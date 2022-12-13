@@ -678,7 +678,7 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
                         ?timelimit ?steplimit () in
                   rac_execute ctx rs
                 in
-                let me_name_trans men = men.Model_parser.men_name in
+                let me_name_trans me = Model_parser.get_name me in
                 let print_attrs = Debug.test_flag Call_provers.debug_attrs in
                 Debug.dprintf debug_check_ce_rac_results
                   "@[Checking model:@\n@[<hv2>%a@]@]@\n"
@@ -706,7 +706,7 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
                         ?timelimit ?steplimit () in
                   rac_execute ctx rs
                 in
-                let me_name_trans men = men.Model_parser.men_name in
+                let me_name_trans me = Model_parser.get_name me in
                 let print_attrs = Debug.test_flag Call_provers.debug_attrs in
                 Debug.dprintf debug_check_ce_rac_results
                   "@[Checking model:@\n@[<hv2>%a@]@]@\n"
@@ -744,16 +744,13 @@ let select_model ?timelimit ?steplimit ?verb_lvl ?compute_term ~check_ce
     TODO fail if the log doesn't fail at the location of the original model *)
 let model_of_exec_log ~original_model log =
   let me loc id value =
-    let name = asprintf "%a" print_decoded id.id_string in
-    let men_name = get_model_trace_string ~name ~attrs:id.id_attrs in
-    let men_kind = match search_model_element_for_id original_model id with
-      | Some me -> me.me_name.men_kind
+    let me_kind = match search_model_element_for_id original_model id with
+      | Some me -> me.me_kind
       | None -> Other in
-    let me_name = { men_name; men_kind; men_attrs= id.id_attrs } in
     (*let me_value = model_value value in*) (* TODO_WIP *)
     let me_value = Term.t_bool_true in
     let me_lsymbol = Term.create_lsymbol (Ident.id_fresh "dummytrue") [] None in
-    {me_name; me_value; me_location= Some loc; me_lsymbol} in
+    {me_kind; me_value; me_location= Some loc; me_attrs= id.id_attrs; me_lsymbol} in
   let aux e = match e.Log.log_loc with
     | Some loc when not Loc.(equal loc dummy_position) -> (
         match e.Log.log_desc with
