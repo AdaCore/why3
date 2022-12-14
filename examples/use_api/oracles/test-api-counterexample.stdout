@@ -18,19 +18,28 @@ Model is [{"filename": "myfile.my_ext",
               "model_elements":
                [{"attrs": ["model_trace:my_A"],
                  "kind": "other",
-                 "name": "my_A",
-                 "value": {"type": "Boolean", "val": true}}]},
+                 "location": "#\"myfile.my_ext\" 28 0 28 1#",
+                 "lsymbol": "A",
+                 "value":
+                  {"node": {"Tapp": {"ls_app": "True", "ls_args": []}},
+                   "type": "bool"}}]},
              {"is_vc_line": true,
               "loc": "42",
               "model_elements":
                [{"attrs": ["model_trace:my_A"],
                  "kind": "other",
-                 "name": "my_A",
-                 "value": {"type": "Boolean", "val": true}},
+                 "location": "#\"myfile.my_ext\" 42 28 42 91#",
+                 "lsymbol": "A_vc_constant",
+                 "value":
+                  {"node": {"Tapp": {"ls_app": "True", "ls_args": []}},
+                   "type": "bool"}},
                 {"attrs": ["model_trace:my_B"],
                  "kind": "other",
-                 "name": "my_B",
-                 "value": {"type": "Boolean", "val": false}}]}]},
+                 "location": "#\"myfile.my_ext\" 42 28 42 91#",
+                 "lsymbol": "B_vc_constant",
+                 "value":
+                  {"node": {"Tapp": {"ls_app": "False", "ls_args": []}},
+                   "type": "bool"}}]}]},
           {"filename": "myfile.my_ext2",
            "model":
             [{"is_vc_line": false,
@@ -38,8 +47,11 @@ Model is [{"filename": "myfile.my_ext",
               "model_elements":
                [{"attrs": ["model_trace:my_B"],
                  "kind": "other",
-                 "name": "my_B",
-                 "value": {"type": "Boolean", "val": false}}]}]}]
+                 "location": "#\"myfile.my_ext2\" 101 0 101 1#",
+                 "lsymbol": "B",
+                 "value":
+                  {"node": {"Tapp": {"ls_app": "False", "ls_args": []}},
+                   "type": "bool"}}]}]}]
 
 == Check CE
 
