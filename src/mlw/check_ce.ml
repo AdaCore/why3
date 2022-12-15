@@ -207,13 +207,11 @@ let cannot_import f =
     match. This may happen when a module that contains a value with an abstract
     type is cloned with different types as instantiations of the abstract type. *)
 let rec import_model_value loc env check known ity t =
-  Debug.dprintf debug_check_ce_rac_results "[import_model_value] ity = %a@."
-    Ity.print_ity ity;
-  Debug.dprintf debug_check_ce_rac_results "[import_model_value] t = %a, t.t_ty = %a@."
+  Debug.dprintf debug_check_ce_rac_results "[import_model_value] importing term %a with type %a@."
     Pretty.print_term t
     (Pp.print_option Pretty.print_ty) t.t_ty;
-  Debug.dprintf debug_check_ce_rac_results "[import_model_value] t.t_attrs = %a@."
-    Pretty.print_attrs t.t_attrs;
+  Debug.dprintf debug_check_ce_rac_results "[import_model_value] expected type = %a@."
+    Ity.print_ity ity;
   let res =
     if Opt.equal Ty.ty_equal (Some (ty_of_ity ity)) t.t_ty then
       match t.t_node with
@@ -330,9 +328,10 @@ let rec import_model_value loc env check known ity t =
           constr_value ity (Some rs) [field_rs]
             [import_model_value loc env check known field_ity t]
         | _ ->
-          cannot_import "type with not exactly one constructor and one field: %a/%d, %a/%d"
-            print_its ts (List.length def.Pdecl.itd_constructors)
-            print_its ts (List.length def.Pdecl.itd_fields)
+          cannot_import "type %a with %d constructor(s) and %d field(s) while expecting a single field record"
+            print_its ts
+            (List.length def.Pdecl.itd_constructors)
+            (List.length def.Pdecl.itd_fields)
   in
   Debug.dprintf debug_check_ce_rac_results "[import_model_value] res = %a@."
     Pinterp_core.print_value res;

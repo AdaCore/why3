@@ -1685,7 +1685,6 @@ let exec_global_fundef ctx locals rdl e =
 let exec_rs ctx rs =
   get_builtin_progs ctx.env.why_env ;
   with_limits @@ fun () ->
-  Debug.dprintf debug_rac_values "exec_rs with rs = %a@." print_rs rs;
   let get_value env pv = get_and_register_param env pv.pv_vs.vs_name pv.pv_ity in
   let ctx = bind_globals ~rs_main:rs ctx in
   let ctx =

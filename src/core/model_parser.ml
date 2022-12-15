@@ -160,7 +160,6 @@ let similar_model_element_names n1 n2 =
   Strings.has_suffix unused_suffix name1 =
   Strings.has_suffix unused_suffix name2
 
-(* TODO_WIP *)
 (* TODO optimize *)
 let rec filter_duplicated l =
   let exist_similar a l = List.exists (fun x ->
@@ -643,55 +642,8 @@ let add_to_model_if_loc ?kind me model =
       let model_file = Mint.add line_number elements model_file in
       Mstr.add filename model_file model
 
-let recover_name pm fields_projs raw_name =
-  let name, attrs =
-    try
-      let ls,_loc,attrs = Mstr.find raw_name pm.queried_terms in
-      (ls.ls_name.id_string, attrs)
-    with Not_found ->
-      let id = Mstr.find raw_name fields_projs in
-      (id.id_string, id.id_attrs) in
-  get_model_trace_string ~name ~attrs
-
-
-(** [replace_projection const_function mv] replaces record names, projections, and application callees
-   in [mv] using [const_function] *)
-let rec replace_projection (const_function : string -> string) =
-  function v -> v
-  (* TODO_WIP *)
-  (*
-  let const_function s = try const_function s with Not_found -> s in
-  function
-  | Const _ as v -> v
-  | Record fs ->
-      let aux (f, mv) = const_function f, replace_projection const_function mv in
-      Record (List.map aux fs)
-  | Proj (f, mv) ->
-      Proj (const_function f, replace_projection const_function mv)
-  | Array a -> Array (replace_projection_array const_function a)
-  | Apply (s, l) ->
-      Apply (const_function s, List.map (replace_projection const_function) l)
-  | Var _ | Undefined | Unparsed _ as v -> v
-  *)
-
-and replace_projection_array const_function a =
-  function a -> a
-  (* TODO_WIP *)
-  (*
-  let for_index a =
-    let arr_index_value = replace_projection const_function a.arr_index_value in
-    {a with arr_index_value} in
-  { arr_others= replace_projection const_function a.arr_others;
-    arr_indices= List.map for_index a.arr_indices }
-  *)
-
-(* Elements that are of record with only one field in the source code, are
-   simplified by eval_match in wp generation. So, this allows to reconstruct
-   their value (using the "field" attribute that were added). *)
-let read_one_fields ~attrs value =
-  attrs, value
-  (* TODO_WIP *)
-  (*
+(*
+let read_one_fields ~attrs value = attrs, value
   let field_names =
     let fields = List.filter_map Ident.extract_field (Sattr.elements attrs) in
     List.sort (fun (d1, _) (d2, _) -> d2 - d1) fields in
@@ -721,28 +673,23 @@ let read_one_fields ~attrs value =
   | exception Not_found ->
       (* No model trace attribute present, same as general case *)
       attrs, List.fold_left add_record value field_names
-    *)
+*)
 
 let remove_field : (Sattr.t * term -> Sattr.t * term) ref = ref (fun x -> x)
 let register_remove_field f = remove_field := f
 
-(** Build the model by replacing projections and restore single field records in the model
-   elements, and adding the element at all relevant locations *)
+(** Build the model by adding the element at all relevant locations *)
 let build_model_rec pm (elts: model_element list) : model_files =
-  let fields_projs = fields_projs pm and vc_attrs = pm.Printer.vc_term_attrs in
+  let vc_attrs = pm.Printer.vc_term_attrs in
   let process_me me =
     let attrs = Sattr.union me.me_attrs me.me_lsymbol.ls_name.id_attrs in
     Debug.dprintf debug "@[<h>Term attrs for %s at %a:@ %a@]@."
       (why_name_trans me)
       (Pp.print_option_or_default "NO LOC" Loc.pp_position) me.me_location
       Pretty.print_attrs attrs;
-    (* Replace projections with their real name *)
-    let me_value = replace_projection
-        (fun s -> recover_name pm fields_projs s)
-        me.me_value in
     (* Remove some specific record field related to the front-end language.
         This function is registered. *)
-    let attrs, me_value = !remove_field (attrs, me_value) in
+    let attrs, me_value = !remove_field (attrs, me.me_value) in
     Some {
       me_kind= Other;
       me_value;

@@ -283,8 +283,6 @@ val t_not : term -> term
 val t_not_bool : term -> term
 val t_true : term
 val t_false : term
-val t_true_bool : term
-val t_false_bool : term
 
 val t_nat_const : int -> term
 (** [t_nat_const n] builds the constant integer term [n],

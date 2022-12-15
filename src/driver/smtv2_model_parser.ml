@@ -129,10 +129,10 @@ module FromSexpToModel = struct
   let constant_dec = function
     | Atom s ->
       let s1,s2 = positive_constant_dec s in
-      (false, s1, s2)
+      {real_neg=false; real_int=s1; real_frac=s2}
     | List [ Atom "-"; Atom s] ->
       let s1,s2 = positive_constant_dec s in
-      (true, s1, s2)
+      {real_neg=true; real_int=s1; real_frac=s2}
     | sexp -> error sexp "constant_dec"
 
   let constant_fraction ~neg sexp =
@@ -154,13 +154,14 @@ module FromSexpToModel = struct
         with _ -> (
           try negative_constant_int_fraction sexp
           with _ -> error sexp "constant_int_fraction")
-      in (neg, BigInt.to_string c, zero)
+      in { real_neg=neg; real_int=BigInt.to_string c; real_frac=zero }
     in
     let constant_int_or_dec_fraction n =
       try constant_int_fraction n
       with _ -> constant_dec n
     in
-    let neg_constant_real (neg,s1,s2) = (not neg, s1, s2) in
+    let neg_constant_real { real_neg=neg; real_int=s1; real_frac=s2 } =
+      { real_neg=not neg; real_int=s1; real_frac=s2 } in
     match sexp with
     | List [ Atom "/"; n1; n2 ] ->
       let r1 = constant_int_or_dec_fraction n1 in
@@ -646,9 +647,9 @@ module FromModelToTerm = struct
   let constant_to_term env c =
     match c with
     | Cint bigint -> t_const (Constant.int_const bigint) Ty.ty_int
-    | Cdecimal (neg,s1,s2) ->
+    | Cdecimal { real_neg=neg; real_int=s1; real_frac=s2 } ->
       t_const (Constant.real_const_from_string ~radix:10 ~neg:neg ~int:s1 ~frac:s2 ~exp:None) Ty.ty_real
-    | Cfraction ((neg,s1,s2),(neg',s1',s2')) ->
+    | Cfraction ({ real_neg=neg; real_int=s1; real_frac=s2 },{ real_neg=neg'; real_int=s1'; real_frac=s2' }) ->
       begin try
         let t = t_const (Constant.real_const_from_string ~radix:10 ~neg:neg ~int:s1 ~frac:s2 ~exp:None) Ty.ty_real in
         let t' = t_const (Constant.real_const_from_string ~radix:10 ~neg:neg' ~int:s1' ~frac:s2' ~exp:None) Ty.ty_real in

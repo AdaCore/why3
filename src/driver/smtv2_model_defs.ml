@@ -32,8 +32,11 @@ type sort =
     bv_verbatim : string
   }
 
-(* the first parameter is [true] if the constant is negative *)
-type constant_real = bool * string * string
+  type constant_real = {
+    real_neg : bool ; (* true for negative real numbers *)
+    real_int : string ;
+    real_frac : string
+  }
 
 type constant_float =
   | Fplusinfinity
@@ -115,7 +118,7 @@ let print_bigint fmt bigint =
 let print_bv fmt { bv_value=bigint; bv_length=i; _} =
   fprintf fmt "(Cbitvector (%d) %a)" i print_bigint bigint
 
-let print_real fmt (sign, s1, s2) =
+let print_real fmt { real_neg=sign; real_int=s1; real_frac=s2 } =
   let sign = if sign then "+" else "-" in
   fprintf fmt "(%s %s.%s)" sign s1 s2
 

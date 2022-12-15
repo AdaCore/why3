@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+(* Based on SMT-LIB Standard: Version 2.6 *)
+
 type symbol = S of string | Sprover of string
 type index = Idxnumeral of BigInt.t | Idxsymbol of symbol
 type identifier = Isymbol of symbol | Iindexedsymbol of symbol * index list
@@ -32,8 +34,11 @@ type constant_bv = {
   bv_verbatim : string
 }
 
-(* the first parameter is [true] if the constant is negative *)
-type constant_real = bool * string * string
+type constant_real = {
+  real_neg : bool ; (* true for negative real numbers *)
+  real_int : string ;
+  real_frac : string
+}
 
 type constant_float =
   | Fplusinfinity
