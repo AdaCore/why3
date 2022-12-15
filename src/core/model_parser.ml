@@ -218,9 +218,9 @@ let rec json_of_term t =
   ]
   | Tconst c ->
     let const_type = match c with
-    | ConstInt _ -> "ConstInt"
-    | ConstReal _ -> "ConstReal"
-    | ConstStr _ -> "ConstStr"
+    | Constant.ConstInt _ -> "ConstInt"
+    | Constant.ConstReal _ -> "ConstReal"
+    | Constant.ConstStr _ -> "ConstStr"
     in
     Record [
       "Tconst", Record [ const_type, String (Format.asprintf "%a" Constant.print_def c) ]

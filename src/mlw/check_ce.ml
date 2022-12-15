@@ -251,9 +251,9 @@ let rec import_model_value loc env check known ity t =
             in
             let valid_range =
               match ity_components ity, proj_v with
-              | ({ its_def = Range r; its_ts= ts }, _, _),
-                { t_node= Tconst (ConstInt c) }
-                when proj_ls.ls_name.id_string = ts.ts_name.id_string ^ "'int"
+              | ({ its_def = Ty.Range r; its_ts= ts }, _, _),
+                { t_node= Tconst (Constant.ConstInt c) }
+                when proj_ls.ls_name.id_string = ts.Ty.ts_name.id_string ^ "'int"
                   && Opt.equal Ty.ty_equal proj_ls.ls_value (Some Ty.ty_int) -> (
                   try Number.(check_range c r); true
                   with Number.OutOfRange _ -> false )

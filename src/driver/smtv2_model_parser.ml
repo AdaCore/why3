@@ -475,7 +475,7 @@ module FromModelToTerm = struct
           Ty.ty_app Ty.ts_func [ smt_sort_to_ty env s1; smt_sort_to_ty env s2 ]
         | Some ty ->
           begin match ty.Ty.ty_node with
-          | Tyapp (ts, [ty1;ty2]) when Ty.ts_equal ts Ty.ts_func ->
+          | Ty.Tyapp (ts, [ty1;ty2]) when Ty.ts_equal ts Ty.ts_func ->
             Ty.ty_app Ty.ts_func [
               smt_sort_to_ty ~update_ty:(Some ty1) env s1;
               smt_sort_to_ty ~update_ty:(Some ty2) env s2 ]
@@ -1214,7 +1214,7 @@ module FromModelToTerm = struct
         Debug.dprintf debug "[fun_defs] name = %s@." key)
       fun_defs;
     Mstr.iter
-      (fun key (ls, _, attrs) ->
+      (fun key (ls, _, _) ->
         Debug.dprintf debug "[queried_terms] name = %s, ls = %a@." key
           Pretty.print_ls ls)
       qterms;
@@ -1237,13 +1237,13 @@ module FromModelToTerm = struct
     } in
     let queried_fun_defs, prover_fun_defs =
       Mstr.partition
-        (fun n def -> Mstr.mem n qterms)
+        (fun n _ -> Mstr.mem n qterms)
         fun_defs in
     let queried_fun_defs =
       Mstr.mapi_filter
         (fun n def ->
           match Mstr.find n qterms with
-          | (ls, oloc, attrs) ->
+          | (ls, _, _) ->
             begin try
               check_fun_def_type env ls def; Some def
             with
@@ -1259,7 +1259,7 @@ module FromModelToTerm = struct
     Mstr.iter
       (fun n def ->
         match Mstr.find n qterms with
-        | (ls, oloc, attrs) -> ()
+        | (_,_,_) -> ()
         | exception Not_found ->
           begin try
             Debug.dprintf debug "No term for %s, adding term to env.prover_fun_defs@." n;
