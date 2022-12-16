@@ -26,17 +26,17 @@ type sort =
   | Ssimple of identifier
   | Smultiple of identifier * sort list
 
-  type constant_bv = {
-    bv_value : BigInt.t ;
-    bv_length : int ;
-    bv_verbatim : string
-  }
+type constant_bv = {
+  bv_value : BigInt.t;
+  bv_length : int;
+  bv_verbatim : string;
+}
 
-  type constant_real = {
-    real_neg : bool ; (* true for negative real numbers *)
-    real_int : string ;
-    real_frac : string
-  }
+type constant_real = {
+  real_neg : bool; (* true for negative real numbers *)
+  real_int : string;
+  real_frac : string;
+}
 
 type constant_float =
   | Fplusinfinity
@@ -67,67 +67,68 @@ type term =
   | Tunparsed of string
 
 and var_binding = symbol * term
-
-and array_elements = {
-  array_indices : (term * term) list;
-  array_others : term;
-}
+and array_elements = { array_indices : (term * term) list; array_others : term }
 
 type function_def = (symbol * sort) list * sort * term
 
-let rec sort_equal s s' = match s,s' with
+let rec sort_equal s s' =
+  match (s, s') with
   | Sstring, Sstring
   | Sreglan, Sreglan
   | Sint, Sint
   | Sreal, Sreal
   | Sroundingmode, Sroundingmode
-  | Sbool, Sbool -> true
+  | Sbool, Sbool ->
+      true
   | Sbitvec n, Sbitvec n' -> n = n'
-  | Sfloatingpoint (n1,n2), Sfloatingpoint (n1',n2') -> n1 = n1' && n2 = n2'
-  | Sarray (s1,s2), Sarray (s1',s2') -> sort_equal s1 s1' && sort_equal s2 s2'
+  | Sfloatingpoint (n1, n2), Sfloatingpoint (n1', n2') -> n1 = n1' && n2 = n2'
+  | Sarray (s1, s2), Sarray (s1', s2') -> sort_equal s1 s1' && sort_equal s2 s2'
   | Ssimple id, Ssimple id' -> id_equal id id'
-  | Smultiple (id,sorts), Smultiple (id',sorts') ->
-    begin try
-      id_equal id id' &&
-        List.fold_left2 (fun acc x x' -> acc && sort_equal x x') true sorts sorts'
-    with _ -> false
-    end
+  | Smultiple (id, sorts), Smultiple (id', sorts') -> (
+      try
+        id_equal id id'
+        && List.fold_left2
+             (fun acc x x' -> acc && sort_equal x x')
+             true sorts sorts'
+      with _ -> false)
   | _ -> false
-and id_equal id id' = match id,id' with
-  | Isymbol (S s), Isymbol (S s')
-  | Isymbol (Sprover s), Isymbol (Sprover s') -> String.equal s s'
+
+and id_equal id id' =
+  match (id, id') with
+  | Isymbol (S s), Isymbol (S s') | Isymbol (Sprover s), Isymbol (Sprover s') ->
+      String.equal s s'
   | Iindexedsymbol (S s, idx), Iindexedsymbol (S s', idx')
-  | Iindexedsymbol (Sprover s, idx), Iindexedsymbol (Sprover s', idx') ->
-    begin try
-      String.equal s s' &&
-        List.fold_left2 (fun acc x x' -> acc && idx_equal x x') true idx idx'
-    with _ -> false
-    end
+  | Iindexedsymbol (Sprover s, idx), Iindexedsymbol (Sprover s', idx') -> (
+      try
+        String.equal s s'
+        && List.fold_left2 (fun acc x x' -> acc && idx_equal x x') true idx idx'
+      with _ -> false)
   | _ -> false
-and idx_equal idx idx' = match idx,idx' with
+
+and idx_equal idx idx' =
+  match (idx, idx') with
   | Idxnumeral i, Idxnumeral i' -> BigInt.eq i i'
   | Idxsymbol (S s), Idxsymbol (S s')
-  | Idxsymbol (Sprover s), Idxsymbol (Sprover s') -> String.equal s s'
+  | Idxsymbol (Sprover s), Idxsymbol (Sprover s') ->
+      String.equal s s'
   | _ -> false
 
 open Format
 
-let print_bigint fmt bigint =
-  fprintf fmt "%s" (BigInt.to_string bigint)
+let print_bigint fmt bigint = fprintf fmt "%s" (BigInt.to_string bigint)
 
-let print_bv fmt { bv_value=bigint; bv_length=i; _} =
+let print_bv fmt { bv_value = bigint; bv_length = i; _ } =
   fprintf fmt "(Cbitvector (%d) %a)" i print_bigint bigint
 
-let print_real fmt { real_neg=sign; real_int=s1; real_frac=s2 } =
+let print_real fmt { real_neg = sign; real_int = s1; real_frac = s2 } =
   let sign = if sign then "+" else "-" in
   fprintf fmt "(%s %s.%s)" sign s1 s2
 
 let print_constant fmt = function
   | Cint bigint -> fprintf fmt "(Cint %a)" print_bigint bigint
   | Cdecimal r -> fprintf fmt "(Cdecimal %a)" print_real r
-  | Cfraction (r1,r2) ->
-      fprintf fmt "(Cfraction %a / %a)" print_real r1
-        print_real r2
+  | Cfraction (r1, r2) ->
+      fprintf fmt "(Cfraction %a / %a)" print_real r1 print_real r2
   | Cbitvector bv -> print_bv fmt bv
   | Cfloat Fplusinfinity -> fprintf fmt "(Cfloat Fplusinfinity)"
   | Cfloat Fminusinfinity -> fprintf fmt "(Cfloat Fminusinfinity)"
@@ -157,8 +158,7 @@ let rec print_sort fmt = function
   | Sbool -> fprintf fmt "(Sbool)"
   | Sbitvec i -> fprintf fmt "(Sbitvec %d)" i
   | Sfloatingpoint (i1, i2) -> fprintf fmt "(Sfloatingpoint %d,%d)" i1 i2
-  | Sarray (s1, s2) ->
-      fprintf fmt "(Sarray %a %a)" print_sort s1 print_sort s2
+  | Sarray (s1, s2) -> fprintf fmt "(Sarray %a %a)" print_sort s1 print_sort s2
   | Ssimple id -> fprintf fmt "(Ssimple %a)" print_identifier id
   | Smultiple (id, sorts) ->
       fprintf fmt "(Smultiple %a %a)" print_identifier id
@@ -192,21 +192,20 @@ let rec print_term fmt = function
         Pp.(print_list space print_var_binding)
         bs print_term t
   | Tarray (s1, s2, elts) ->
-      fprintf fmt "@[<hv>(Array (%a -> %a) %a)@]"
-        print_sort s1 print_sort s2
+      fprintf fmt "@[<hv>(Array (%a -> %a) %a)@]" print_sort s1 print_sort s2
         print_array elts
   | Tunparsed s -> fprintf fmt "(UNPARSED %s)" s
 
 and print_var_binding fmt (s, t) =
   fprintf fmt "(%a %a)" print_symbol s print_term t
 
-and print_array_elem fmt (t1,t2) =
+and print_array_elem fmt (t1, t2) =
   fprintf fmt "@[<hv>(%a -> %a)@]" print_term t1 print_term t2
 
 and print_array fmt a =
   fprintf fmt "@[<hv2>(array_indices = (%a);@ array_others = %a)@]"
-    (Pp.print_list Pp.space print_array_elem) a.array_indices
-    print_term a.array_others
+    (Pp.print_list Pp.space print_array_elem)
+    a.array_indices print_term a.array_others
 
 let print_function_arg fmt (n, s) =
   fprintf fmt "(%a %a)" print_symbol n print_sort s

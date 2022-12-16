@@ -29,15 +29,15 @@ type sort =
   | Smultiple of identifier * sort list
 
 type constant_bv = {
-  bv_value : BigInt.t ;
-  bv_length : int ;
-  bv_verbatim : string
+  bv_value : BigInt.t;
+  bv_length : int;
+  bv_verbatim : string;
 }
 
 type constant_real = {
-  real_neg : bool ; (* true for negative real numbers *)
-  real_int : string ;
-  real_frac : string
+  real_neg : bool; (* true for negative real numbers *)
+  real_int : string;
+  real_frac : string;
 }
 
 type constant_float =
@@ -69,16 +69,11 @@ type term =
   | Tunparsed of string
 
 and var_binding = symbol * term
-
-and array_elements = {
-  array_indices : (term * term) list;
-  array_others : term;
-}
+and array_elements = { array_indices : (term * term) list; array_others : term }
 
 type function_def = (symbol * sort) list * sort * term
 
 val sort_equal : sort -> sort -> bool
-
 val print_index : Format.formatter -> index -> unit
 val print_identifier : Format.formatter -> identifier -> unit
 val print_sort : Format.formatter -> sort -> unit
