@@ -722,7 +722,12 @@ module FromModelToTerm = struct
           error "Error while interpreting float constant %a@."
             print_constant c
       end
-    | Cbool b -> if b then t_bool_true else t_bool_false
+    | Cbool b ->
+      (* boolean constants from SMT model are interpreted by default to Why3 terms
+         (with type Some ty_bool) and not to formulas: later on in the functions
+         apply_to_term and smt_term_to_term we convert Why3 terms to formulas using
+         Term.to_prop when needed *)
+      if b then t_bool_true else t_bool_false
     | Cstring str -> t_const (Constant.string_const str) Ty.ty_str
 
   let find_builtin_lsymbol env n ts =
@@ -783,15 +788,15 @@ module FromModelToTerm = struct
         t_equ t1' t2'
     | Qident (Isymbol (S "or")), hd::tl ->
         List.fold_left
-          (fun t t' -> t_binary_bool Term.Tor t (term_to_term env t'))
-          (term_to_term env hd)
+          (fun t t' -> t_binary Term.Tor t (Term.to_prop (term_to_term env t')))
+          (Term.to_prop (term_to_term env hd))
           tl
     | Qident (Isymbol (S "and")), hd::tl ->
         List.fold_left
-          (fun t t' -> t_binary_bool Term.Tand t (term_to_term env t'))
-          (term_to_term env hd)
+          (fun t t' -> t_binary Term.Tand t (Term.to_prop (term_to_term env t')))
+          (Term.to_prop (term_to_term env hd))
           tl
-    | Qident (Isymbol (S "not")), [ t ] -> t_not_bool (term_to_term env t)
+    | Qident (Isymbol (S "not")), [ t ] -> t_not (Term.to_prop (term_to_term env t))
     | Qident (Isymbol (S n)), ts | Qident (Isymbol (Sprover n)), ts ->
         let ts' = List.map (term_to_term env) ts in
         begin try
@@ -869,8 +874,8 @@ module FromModelToTerm = struct
         t_if (t_equ (t_var vs_arg) key) value t
       else
         error "Type %a for sort %a of array keys and/or type %a for sort %a of array values do not match@."
-          (Pp.print_option Pretty.print_ty) key.t_ty print_sort s1
-          (Pp.print_option Pretty.print_ty) value.t_ty print_sort s2
+          (Pp.print_option_or_default "None" Pretty.print_ty) key.t_ty print_sort s1
+          (Pp.print_option_or_default "None" Pretty.print_ty) value.t_ty print_sort s2
     in
     let a = List.fold_left
       (fun t (key,value) -> mk_case key value t)
@@ -879,23 +884,31 @@ module FromModelToTerm = struct
     in
     t_lambda [ vs_arg ] [] a
 
-  let smt_term_to_term env t s =
-    Debug.dprintf debug "[smt_term_to_term] s = %a@."
-      print_sort s;
+  let smt_term_to_term ~fmla env t s =
     Debug.dprintf debug "[smt_term_to_term] t = %a@."
       print_term t;
+    let ty_s = smt_sort_to_ty env s in
+    let ty_s =
+      if Ty.ty_equal ty_s Ty.ty_bool then
+        if fmla then None else Some Ty.ty_bool
+      else
+        Some ty_s
+    in
+    Debug.dprintf debug "[smt_term_to_term] interpreted type for sort %a is %a (fmla=%b)@."
+      print_sort s
+      (Pp.print_option_or_default "None" Pretty.print_ty) ty_s
+      fmla;
     let t' = term_to_term env t in
-    let s' = smt_sort_to_ty env s in
-    Debug.dprintf debug "[smt_term_to_term] s' = %a@."
-      Pretty.print_ty s';
-    Debug.dprintf debug "[smt_term_to_term] t' = %a, t'.t_ty = %a@."
-      Pretty.print_term t'
-      (Pp.print_option Pretty.print_ty) t'.t_ty;
-    if Opt.equal Ty.ty_equal (Some s') t'.t_ty then t'
+    let t' = if fmla then Term.to_prop t' else t' in
+    if Opt.equal Ty.ty_equal ty_s t'.t_ty then (
+      Debug.dprintf debug "[smt_term_to_term] t' = %a, t'.t_ty = %a@."
+        Pretty.print_term t'
+        (Pp.print_option_or_default "None" Pretty.print_ty) t'.t_ty;
+      t')
     else
       error "Type %a for sort %a and type %a for term %a do not match@."
-        Pretty.print_ty s' print_sort s
-        (Pp.print_option Pretty.print_ty) t'.t_ty print_term t
+        (Pp.print_option_or_default "None" Pretty.print_ty) ty_s print_sort s
+        (Pp.print_option_or_default "None" Pretty.print_ty) t'.t_ty print_term t
 
   (* Check that the definiton of a function in the SMT model matches the type
      of the corresponding lsymbol in [env.queried_terms]. *)
@@ -906,7 +919,7 @@ module FromModelToTerm = struct
     Debug.dprintf debug "[check_fun_def_type] ls = %a@."
       Pretty.print_ls ls;
     Debug.dprintf debug "[check_fun_def_type] ls.ls_value = %a@."
-      (Pp.print_option Pretty.print_ty)
+      (Pp.print_option_or_default "None" Pretty.print_ty)
       ls.ls_value;
     List.iter
       (Debug.dprintf debug "[check_fun_def_type] ls.ls_args = %a@."
@@ -937,7 +950,7 @@ module FromModelToTerm = struct
         Pretty.print_ls ls
 
   (* Interpretation of function definitons in the model to terms. *)
-  let interpret_fun_def_to_term env (args,res,body) =
+  let interpret_fun_def_to_term ~fmla env (args,res,body) =
     Debug.dprintf debug "-----------------------------@.";
     Debug.dprintf debug "[interpret_fun_def_to_term] fun_def = %a@."
       print_function_def (args,res,body);
@@ -955,7 +968,7 @@ module FromModelToTerm = struct
         Debug.dprintf debug "[interpret_fun_def_to_term] bound_var = (%s, %a)@."
           key Pretty.print_vs vs)
       env.bound_vars;
-    let t = t_lambda (Mstr.values env.bound_vars) [] (smt_term_to_term env body res) in
+    let t = t_lambda (Mstr.values env.bound_vars) [] (smt_term_to_term ~fmla env body res) in
     Debug.dprintf debug "[interpret_fun_def_to_term] t = %a@." Pretty.print_term
       t;
     Debug.dprintf debug "-----------------------------@.";
@@ -1024,12 +1037,12 @@ module FromModelToTerm = struct
           when is_vs_in_prover_vars v1 env.prover_vars &&
           is_vs_in_prover_vars v2 env.prover_vars ->
         (* distinct prover variables are not equal *)
-        if vs_equal v1 v2 then t_bool_true else t_bool_false
+        if vs_equal v1 v2 then t_true else t_false
       | _ -> (* general case *)
         let t1' = eval_term env ~eval_prover_var seen_prover_vars terms t1 in
         let t2' = eval_term env ~eval_prover_var seen_prover_vars terms t2 in
         if t_equal t1' t2'
-        then t_bool_true
+        then t_true
         else t_app ls [t1';t2'] ls.ls_value
       end
     | Term.Tapp (ls, ts) ->
@@ -1065,26 +1078,26 @@ module FromModelToTerm = struct
     | Term.Tbinop (Term.Tor,t1,t2) ->
       let t1 = eval_term env ~eval_prover_var seen_prover_vars terms t1 in
       let t2 = eval_term env ~eval_prover_var seen_prover_vars terms t2 in
-      if is_true env t1 || is_true env t2 then t_bool_true
-      else if is_false env t1 || is_false env t2 then t_bool_false
-      else t_binary_bool Term.Tor t1 t2
+      if is_true env t1 || is_true env t2 then t_true
+      else if is_false env t1 || is_false env t2 then t_false
+      else t_binary Term.Tor t1 t2
     | Term.Tbinop (Term.Tand,t1,t2) ->
       let t1 = eval_term env ~eval_prover_var seen_prover_vars terms t1 in
       let t2 = eval_term env ~eval_prover_var seen_prover_vars terms t2 in
-      if is_true env t1 && is_true env t2 then t_bool_true
-      else if is_false env t1 && is_false env t2 then t_bool_true
-      else if is_true env t1 && is_false env t2 then t_bool_false
-      else if is_false env t1 && is_true env t2 then t_bool_false
-      else t_binary_bool Term.Tand t1 t2
+      if is_true env t1 && is_true env t2 then t_true
+      else if is_false env t1 && is_false env t2 then t_true
+      else if is_true env t1 && is_false env t2 then t_false
+      else if is_false env t1 && is_true env t2 then t_false
+      else t_binary Term.Tand t1 t2
     | Term.Tbinop (op,t1,t2) ->
       let t1 = eval_term env ~eval_prover_var seen_prover_vars terms t1 in
       let t2 = eval_term env ~eval_prover_var seen_prover_vars terms t2 in
-      t_binary_bool op t1 t2
+      t_binary op t1 t2
     | Term.Tnot t' -> (
       let t' = eval_term env ~eval_prover_var seen_prover_vars terms t' in
-      if is_true env t' then t_bool_false
-      else if is_false env t' then t_bool_true
-      else t_not_bool t')
+      if is_true env t' then t_false
+      else if is_false env t' then t_true
+      else t_not t')
     | _ -> t
 
   let eval (pinfo : Printer.printing_info) env terms =
@@ -1263,7 +1276,7 @@ module FromModelToTerm = struct
         | exception Not_found ->
           begin try
             Debug.dprintf debug "No term for %s, adding term to env.prover_fun_defs@." n;
-            let t = interpret_fun_def_to_term env def in
+            let t = interpret_fun_def_to_term ~fmla:false env def in
             env.prover_fun_defs <- Mstr.add n t env.prover_fun_defs
           with
           | E str ->
@@ -1278,7 +1291,10 @@ module FromModelToTerm = struct
           match Mstr.find n qterms with
           | (ls, oloc, attrs) ->
             begin try
-              Some ((ls,oloc,attrs), interpret_fun_def_to_term env def)
+              (* fmla = true if the interpreted term should be a formula (with type = None)
+                 and not a term (with type = Some ty) *)
+              let fmla = not (Opt.inhabited ls.ls_value) in
+              Some ((ls,oloc,attrs), interpret_fun_def_to_term ~fmla env def)
             with
             | E str ->
               Debug.dprintf debug "Error while interpreting %s: %s@." n str;

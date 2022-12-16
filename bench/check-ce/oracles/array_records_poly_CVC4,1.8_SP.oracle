@@ -524,31 +524,6 @@ File array.mlw:
       ->
       int = fun (bOUND_VARIABLE_917:array basic_record) -> 0
 File array_records_poly.mlw:
-  Line 14:
-    basic_record'mk :
-      bool
-      ->
-      int
-      ->
-      int
-      ->
-      basic_record = fun (bOUND_VARIABLE_1091:bool) (bOUND_VARIABLE_1092:int)
-                      (bOUND_VARIABLE_1093:int) ->
-                      if bOUND_VARIABLE_1091
-                      then if bOUND_VARIABLE_1092 = 3
-                           then if bOUND_VARIABLE_1093 = 5 then epsilon x:
-                                basic_record.
-                                x.flag = True /\
-                                x.first_value = 3 /\ x.second_value = 5
-                                else epsilon x:basic_record.
-                                x.flag = True /\
-                                x.first_value = 3 /\ x.second_value = 69
-                           else epsilon x:basic_record.
-                           x.flag = True /\
-                           x.first_value = 3 /\ x.second_value = 69
-                      else epsilon x:basic_record.
-                      x.flag = True /\
-                      x.first_value = 3 /\ x.second_value = 69
   Line 16:
     flag :
       basic_record
@@ -626,31 +601,6 @@ File array.mlw:
       ->
       int = fun (bOUND_VARIABLE_931:array basic_record) -> 0
 File array_records_poly.mlw:
-  Line 14:
-    basic_record'mk :
-      bool
-      ->
-      int
-      ->
-      int
-      ->
-      basic_record = fun (bOUND_VARIABLE_1105:bool) (bOUND_VARIABLE_1106:int)
-                      (bOUND_VARIABLE_1107:int) ->
-                      if bOUND_VARIABLE_1105
-                      then if bOUND_VARIABLE_1106 = 3
-                           then if bOUND_VARIABLE_1107 = 5 then epsilon x:
-                                basic_record.
-                                x.flag = True /\
-                                x.first_value = 3 /\ x.second_value = 5
-                                else epsilon x:basic_record.
-                                x.flag = True /\
-                                x.first_value = 3 /\ x.second_value = 69
-                           else epsilon x:basic_record.
-                           x.flag = True /\
-                           x.first_value = 3 /\ x.second_value = 69
-                      else epsilon x:basic_record.
-                      x.flag = True /\
-                      x.first_value = 3 /\ x.second_value = 69
   Line 16:
     flag :
       basic_record
@@ -748,38 +698,6 @@ File array.mlw:
       ->
       int = fun (bOUND_VARIABLE_973:array basic_record) -> 0
 File array_records_poly.mlw:
-  Line 14:
-    basic_record'mk :
-      bool
-      ->
-      int
-      ->
-      int
-      ->
-      basic_record = fun (_arg_1:bool) (_arg_2:int) (_arg_3:int) ->
-                      if _arg_1 then epsilon x:basic_record.
-                      x.flag = False /\
-                      x.first_value = 2 /\ x.second_value = (- 2)
-                      else if _arg_2 = 2
-                           then if _arg_3 = 69 then epsilon x:basic_record.
-                                x.flag = False /\
-                                x.first_value = 2 /\ x.second_value = (- 2)
-                                else epsilon x:basic_record.
-                                x.flag = False /\
-                                x.first_value = 2 /\ x.second_value = (- 2)
-                           else if _arg_2 = 42
-                                then if _arg_3 = (- 2) then epsilon x:
-                                     basic_record.
-                                     x.flag = False /\
-                                     x.first_value = 2 /\
-                                     x.second_value = (- 2) else epsilon x:
-                                     basic_record.
-                                     x.flag = False /\
-                                     x.first_value = 2 /\
-                                     x.second_value = (- 2)
-                                else epsilon x:basic_record.
-                                x.flag = False /\
-                                x.first_value = 2 /\ x.second_value = (- 2)
   Line 16:
     flag :
       basic_record
@@ -867,42 +785,6 @@ File array.mlw:
       ->
       int = fun (bOUND_VARIABLE_1050:array basic_record) -> 0
 File array_records_poly.mlw:
-  Line 14:
-    basic_record'mk :
-      bool
-      ->
-      int
-      ->
-      int
-      ->
-      basic_record = fun (_arg_1:bool) (_arg_2:int) (_arg_3:int) ->
-                      if _arg_1
-                      then if _arg_2 = 3
-                           then if _arg_3 = 5 then epsilon x:basic_record.
-                                x.first_value = 3 /\ x.second_value = 5
-                                else if _arg_3 = 69 then epsilon x:
-                                     basic_record.
-                                     x.first_value = 3 /\ x.second_value = 69
-                                     else epsilon x:basic_record.
-                                     x.first_value = 23 /\
-                                     x.second_value = 69
-                           else if _arg_2 = 42
-                                then if _arg_3 = 69 then epsilon x:
-                                     basic_record.
-                                     x.first_value = 42 /\
-                                     x.second_value = 69 else epsilon x:
-                                     basic_record.
-                                     x.first_value = 23 /\
-                                     x.second_value = 69
-                                else epsilon x:basic_record.
-                                x.first_value = 23 /\ x.second_value = 69
-                      else if _arg_2 = 23
-                           then if _arg_3 = 69 then epsilon x:basic_record.
-                                x.first_value = 23 /\ x.second_value = 69
-                                else epsilon x:basic_record.
-                                x.first_value = 23 /\ x.second_value = 69
-                           else epsilon x:basic_record.
-                           x.first_value = 23 /\ x.second_value = 69
   Line 17:
     first_val :
       basic_record
@@ -1012,42 +894,6 @@ File array.mlw:
       ->
       int = fun (bOUND_VARIABLE_1064:array basic_record) -> 0
 File array_records_poly.mlw:
-  Line 14:
-    basic_record'mk :
-      bool
-      ->
-      int
-      ->
-      int
-      ->
-      basic_record = fun (_arg_1:bool) (_arg_2:int) (_arg_3:int) ->
-                      if _arg_1
-                      then if _arg_2 = 3
-                           then if _arg_3 = 5 then epsilon x:basic_record.
-                                x.first_value = 3 /\ x.second_value = 5
-                                else if _arg_3 = 69 then epsilon x:
-                                     basic_record.
-                                     x.first_value = 3 /\ x.second_value = 69
-                                     else epsilon x:basic_record.
-                                     x.first_value = 23 /\
-                                     x.second_value = 69
-                           else if _arg_2 = 42
-                                then if _arg_3 = 69 then epsilon x:
-                                     basic_record.
-                                     x.first_value = 42 /\
-                                     x.second_value = 69 else epsilon x:
-                                     basic_record.
-                                     x.first_value = 23 /\
-                                     x.second_value = 69
-                                else epsilon x:basic_record.
-                                x.first_value = 23 /\ x.second_value = 69
-                      else if _arg_2 = 23
-                           then if _arg_3 = 69 then epsilon x:basic_record.
-                                x.first_value = 23 /\ x.second_value = 69
-                                else epsilon x:basic_record.
-                                x.first_value = 23 /\ x.second_value = 69
-                           else epsilon x:basic_record.
-                           x.first_value = 23 /\ x.second_value = 69
   Line 17:
     first_val :
       basic_record
@@ -1162,42 +1008,6 @@ File array.mlw:
       ->
       int = fun (bOUND_VARIABLE_1083:array basic_record) -> 0
 File array_records_poly.mlw:
-  Line 14:
-    basic_record'mk :
-      bool
-      ->
-      int
-      ->
-      int
-      ->
-      basic_record = fun (_arg_1:bool) (_arg_2:int) (_arg_3:int) ->
-                      if _arg_1
-                      then if _arg_2 = 3
-                           then if _arg_3 = 5 then epsilon x:basic_record.
-                                x.first_value = 3 /\ x.second_value = 5
-                                else if _arg_3 = 69 then epsilon x:
-                                     basic_record.
-                                     x.first_value = 3 /\ x.second_value = 69
-                                     else epsilon x:basic_record.
-                                     x.first_value = 23 /\
-                                     x.second_value = 69
-                           else if _arg_2 = 42
-                                then if _arg_3 = 69 then epsilon x:
-                                     basic_record.
-                                     x.first_value = 42 /\
-                                     x.second_value = 69 else epsilon x:
-                                     basic_record.
-                                     x.first_value = 23 /\
-                                     x.second_value = 69
-                                else epsilon x:basic_record.
-                                x.first_value = 23 /\ x.second_value = 69
-                      else if _arg_2 = 23
-                           then if _arg_3 = 69 then epsilon x:basic_record.
-                                x.first_value = 23 /\ x.second_value = 69
-                                else epsilon x:basic_record.
-                                x.first_value = 23 /\ x.second_value = 69
-                           else epsilon x:basic_record.
-                           x.first_value = 23 /\ x.second_value = 69
   Line 17:
     first_val :
       basic_record
@@ -1322,45 +1132,6 @@ File array.mlw:
       ->
       int = fun (bOUND_VARIABLE_1210:array basic_record) -> 0
 File array_records_poly.mlw:
-  Line 14:
-    basic_record'mk :
-      bool
-      ->
-      int
-      ->
-      int
-      ->
-      basic_record = fun (_arg_1:bool) (_arg_2:int) (_arg_3:int) ->
-                      if _arg_1
-                      then if _arg_2 = 3
-                           then if _arg_3 = 5 then epsilon x:basic_record.
-                                x.first_value = 3 /\ x.second_value = 5
-                                else epsilon x:basic_record.
-                                x.first_value = 3 /\ x.second_value = 69
-                           else if _arg_2 = 42
-                                then if _arg_3 = 69 then epsilon x:
-                                     basic_record.
-                                     x.first_value = 42 /\
-                                     x.second_value = 69 else epsilon x:
-                                     basic_record.
-                                     x.first_value = 3 /\ x.second_value = 69
-                                else if _arg_2 = 23
-                                     then if _arg_3 = 69 then epsilon x:
-                                          basic_record.
-                                          x.first_value = 23 /\
-                                          x.second_value = 69 else epsilon x:
-                                          basic_record.
-                                          x.first_value = 3 /\
-                                          x.second_value = 69
-                                     else epsilon x:basic_record.
-                                     x.first_value = 3 /\ x.second_value = 69
-                      else if _arg_2 = 23
-                           then if _arg_3 = 69 then epsilon x:basic_record.
-                                x.first_value = 23 /\ x.second_value = 69
-                                else epsilon x:basic_record.
-                                x.first_value = 3 /\ x.second_value = 69
-                           else epsilon x:basic_record.
-                           x.first_value = 3 /\ x.second_value = 69
   Line 17:
     first_val :
       basic_record

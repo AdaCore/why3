@@ -274,13 +274,11 @@ val t_quant : quant -> term_quant -> term
 val t_forall : term_quant -> term
 val t_exists : term_quant -> term
 val t_binary : binop -> term -> term -> term
-val t_binary_bool : binop -> term -> term -> term
 val t_and : term -> term -> term
 val t_or : term -> term -> term
 val t_implies : term -> term -> term
 val t_iff : term -> term -> term
 val t_not : term -> term
-val t_not_bool : term -> term
 val t_true : term
 val t_false : term
 
@@ -376,8 +374,6 @@ val ps_equ : lsymbol
 val t_equ : term -> term -> term
 val t_neq : term -> term -> term
 
-val t_bool_equ : term -> term -> term
-
 val t_equ_simp : term -> term -> term
 val t_neq_simp : term -> term -> term
 
@@ -400,6 +396,8 @@ val t_pred_app : term -> term -> term  (* prop-typed application *)
 
 val t_func_app_l : term -> term list -> term  (* value-typed application *)
 val t_pred_app_l : term -> term list -> term  (* prop-typed application *)
+
+val to_prop : term -> term
 
 (** {2 Lambda-term manipulation} *)
 
