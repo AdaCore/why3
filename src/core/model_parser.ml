@@ -51,13 +51,20 @@ let print_model_kind fmt = function
 type model_element = {
   me_kind: model_element_kind;
   me_value: term;
+  me_info: string;
   me_location: Loc.position option;
   me_attrs: Sattr.t;
   me_lsymbol: lsymbol;
 }
 
-let create_model_element ~value ~oloc ~attrs ~lsymbol =
-  {me_kind= Other; me_value= value; me_location= oloc; me_attrs= attrs; me_lsymbol= lsymbol}
+let create_model_element ~value ~info ~oloc ~attrs ~lsymbol = {
+  me_kind= Other;
+  me_value= value;
+  me_info= info;
+  me_location= oloc;
+  me_attrs= attrs;
+  me_lsymbol= lsymbol
+}
 
 let get_name me =
   Ident.get_model_trace_string
@@ -75,16 +82,21 @@ type model = {
   model_files: model_files;
   vc_term_loc: Loc.position option;
   vc_term_attrs: Sattr.t;
+  model_json: Json_base.json;
 }
 
 let empty_model_file = Mint.empty
 let empty_model_files = Mstr.empty
+let empty_model_json = Json_base.Null
 let is_model_empty m = Mstr.is_empty m.model_files
 
 let empty_model =
-  {vc_term_loc=None; vc_term_attrs=Sattr.empty; model_files=empty_model_files}
+  { vc_term_loc= None;
+    vc_term_attrs= Sattr.empty;
+    model_files= empty_model_files;
+    model_json= empty_model_json; }
 
-let set_model_files model model_files =
+let set_model_files model model_files = (* TODO_WIP also update model_json *)
   { model with model_files }
 
 let get_model_elements m =
@@ -169,52 +181,72 @@ let rec filter_duplicated l =
   | me :: l when exist_similar me l -> filter_duplicated l
   | me :: l -> me :: filter_duplicated l
 
-let json_type oty =
+let json_attrs attrs =
   let open Json_base in
-  let rec type_to_string ty =
-    let open Ty in
-    let open Pretty in
-    match ty.ty_node with
-    | Tyvar v -> Format.asprintf "%a" print_tv v
-    | Tyapp (ts, [t1;t2]) when ts_equal ts ts_func ->
-      Format.asprintf "%s -> %s" (type_to_string t1) (type_to_string t2)
-    | Tyapp (ts, []) when is_ts_tuple ts -> "unit"
-    | Tyapp (ts, tl) when is_ts_tuple ts ->
-      Format.asprintf "(%a)"
-        Pp.(print_list comma print_string) (List.map type_to_string tl)
-    | Tyapp (ts, []) -> Format.asprintf "%a" print_ts ts
-    | Tyapp (ts, tl) ->
-      Format.asprintf "%a %a"
-        print_ts ts
-        Pp.(print_list comma print_string) (List.map type_to_string tl)
-  in
+  List (List.map
+  (fun attr -> String attr.attr_string)
+  (List.sort cmp_attrs (Sattr.elements attrs)))
+
+let json_loc oloc =
+  let open Json_base in
+  match oloc with
+  | None -> String "NO_LOC"
+  | Some loc ->
+    let f,sl,sc,el,ec = Loc.get loc in
+  Record [
+    "end-char", Int ec;
+    "end-line", Int el;
+    "file-name", String f;
+    "start-char", Int sc;
+    "start-line", Int sl
+  ]
+
+let rec json_type ty =
+  let open Json_base in
+  let open Ty in
+  let open Pretty in
+  match ty.ty_node with
+  | Tyvar v ->
+    Record [ "Tyvar", String (Format.asprintf "%a" print_tv_qualified v) ]
+  | Tyapp (ts, tl) ->
+    Record [
+      "Tyapp", Record [
+        "ty_symbol", String (Format.asprintf "%a" print_ts_qualified ts);
+        "ty_args", List (List.map json_type tl)
+      ]
+    ]
+
+let json_otype oty =
+  let open Json_base in
   match oty with
   | None -> String "bool"
-  | Some ty -> String (type_to_string ty)
+  | Some ty -> json_type ty
 
 let json_lsymbol ls =
-  Json_base.String ls.ls_name.id_string
+  let open Json_base in
+  let open Pretty in
+  let ls_name = Format.asprintf "%a" print_ls_qualified ls in
+  Record [
+    "name", String ls_name;
+    "attrs", json_attrs ls.ls_name.id_attrs;
+    "loc", json_loc ls.ls_name.id_loc;
+  ]
 
-let json_vsymbol ?(with_ty=false) vs =
+let json_vsymbol vs =
   let open Pretty in
   let open Json_base in
-  let vs_string = Format.asprintf "%a" print_vs vs in
-  if with_ty then
-    Record [
-      "vs", String vs_string;
-      "ty", json_type (Some vs.vs_ty)
-    ]
-  else
-    Record [
-      "vs", String vs_string;
-      "ty", json_type (Some vs.vs_ty)
-    ]
+  let vs_name = Format.asprintf "%a" print_vs_qualified vs in
+  Record [
+    "vs_name", String vs_name;
+    "vs_type", json_type vs.vs_ty
+  ]
 
-let rec json_of_term t =
+let rec json_of_term info t =
   let open Json_base in
+  let open Pretty in
   match t.t_node with
   | Tvar vs -> Record [
-    "Tvar", Record [ "vs", json_vsymbol vs ]
+    "Tvar", json_vsymbol vs
   ]
   | Tconst c ->
     let const_type = match c with
@@ -223,30 +255,32 @@ let rec json_of_term t =
     | Constant.ConstStr _ -> "ConstStr"
     in
     Record [
-      "Tconst", Record [ const_type, String (Format.asprintf "%a" Constant.print_def c) ]
+      "Tconst", Record [
+        "const_type", String const_type;
+        "const_value", String (Format.asprintf "%a" Constant.print_def c) ]
     ]
   | Tapp (ls,ts) ->
     Record [
     "Tapp",
     Record [
-      "ls_app", json_lsymbol ls;
-      "ls_args", List (List.map json_of_term ts) ]
+      "app_ls", String (Format.asprintf "%a" print_ls_qualified ls) ;
+      "app_args", List (List.map (json_of_term info) ts) ]
   ]
   | Tif (t1,t2,t3) -> Record [
     "Tif",
     Record [
-      "if", json_of_term t1;
-      "then", json_of_term t2;
-      "else", json_of_term t3 ]
+      "if", json_of_term info t1;
+      "then", json_of_term info t2;
+      "else", json_of_term info t3 ]
   ]
   | Tlet (t,tb) ->
     let vs,t' = t_open_bound tb in
       Record [
     "Tlet",
     Record [
-      "vs_let", json_vsymbol vs;
-      "t_let", json_of_term t;
-      "tbound_let", json_of_term t'
+      "let_vs", json_vsymbol vs;
+      "let_t", json_of_term info t;
+      "let_tbound", json_of_term info t'
     ]
   ]
   | Tcase _ -> Record [ "Tcase", String "UNSUPPORTED" ]
@@ -257,15 +291,15 @@ let rec json_of_term t =
       Record [
       "Teps",
       Record [
-        "vs_eps", json_vsymbol vs;
-        "t_eps", json_of_term t' ]
+        "eps_vs", json_vsymbol vs;
+        "eps_t", json_of_term info t' ]
       ]
     else
       Record [
       "Tfun",
       Record [
-        "args", List (List.map (fun vs -> json_vsymbol ~with_ty:true vs) vs);
-        "body", json_of_term t' ]
+        "fun_args", List (List.map json_vsymbol vs);
+        "fun_body", json_of_term info t' ]
       ]
   | Tquant (q,tq) ->
     let quant = match q with Tforall -> "Tforall" | Texists -> "Texists" in
@@ -274,8 +308,8 @@ let rec json_of_term t =
     "Tquant",
     Record [
       "quant", String quant;
-      "vslist", List (List.map (fun vs -> json_vsymbol vs) vsl);
-      "t_quant", json_of_term t' ]
+      "quant_vs", List (List.map (fun vs -> json_vsymbol vs) vsl);
+      "quant_t", json_of_term info t' ]
   ]
   | Tbinop (op,t1,t2) ->
     let binop = match op with
@@ -288,12 +322,12 @@ let rec json_of_term t =
     "Tbinop",
     Record [
       "binop", String binop;
-      "t1", json_of_term t1;
-      "t2", json_of_term t2
+      "t1", json_of_term info t1;
+      "t2", json_of_term info t2
     ]
   ]
   | Tnot t' -> Record [
-    "Tnot", json_of_term t'
+    "Tnot", json_of_term info t'
   ]
   | Ttrue -> String "Ttrue"
   | Tfalse -> String "Tfalse"
@@ -311,19 +345,13 @@ let json_model_element me =
     | Loop_before -> "before_loop"
     | Loop_previous_iteration ->"before_iteration"
     | Loop_current_iteration -> "current_iteration" in
-  let loc = Format.asprintf "%a"
-    (Pp.print_option_or_default "NO LOC" Pretty.print_loc_as_attribute) me.me_location
-  in
   Record [
-      "location", String loc;
-      "attrs",
-        List (List.map
-          (fun attr -> String attr.attr_string)
-          (List.sort cmp_attrs (Sattr.elements me.me_attrs)));
+      "location", json_loc me.me_location;
+      "attrs", json_attrs me.me_attrs;
       "value",
         Record [
-          "type", json_type me.me_value.t_ty;
-          "node", json_of_term me.me_value ];
+          "value_type", json_otype me.me_value.t_ty;
+          "value_term", json_of_term me.me_info me.me_value ];
       "lsymbol", json_lsymbol me.me_lsymbol;
       "kind", String kind
     ]
@@ -332,32 +360,37 @@ let json_model_elements model_elements =
   let model_elements = filter_duplicated model_elements in
   Json_base.List (List.map json_model_element model_elements)
 
-let json_model_elements_on_lines model (file_name, model_file) =
+let json_model_elements_on_lines vc_term_loc (file_name, model_file) =
   let l =
     List.map (fun (i, e) ->
         let is_vc_line =
-          match model.vc_term_loc with
+          match vc_term_loc with
           | None -> false
           | Some pos ->
               let vc_file_name, line, _, _, _ = Loc.get pos in
               file_name = vc_file_name && i = line in
         Json_base.(Record [
-          "loc", String (string_of_int i);
+          "line", String (string_of_int i);
           "is_vc_line", Bool is_vc_line;
           "model_elements", json_model_elements e
         ]))
       (Mint.bindings model_file) in
   Json_base.List l
 
-let json_model model =
+let json_model_files vc_term_loc model_files =
+  Pretty.forget_all ();
   let l =
     List.map (fun (file_name, model_file) ->
         Json_base.(Record [
           "filename", String file_name;
-          "model", json_model_elements_on_lines model (file_name, model_file)
+          "model",
+          json_model_elements_on_lines vc_term_loc (file_name, model_file)
         ]))
-      (Mstr.bindings model.model_files) in
+      (Mstr.bindings model_files) in
+  Pretty.forget_all ();
   Json_base.List l
+
+let json_model model = model.model_json
 
 (*
 ***************************************************************
@@ -385,8 +418,9 @@ let print_model_element ?(print_locs=false) ~print_attrs ~me_name_trans fmt m_el
   | Error_message ->
     pp_print_string fmt (get_name m_element)
   | _ ->
-      (* let json_value = json_of_term m_element.me_value in *) (* TODO_WIP *)
-      fprintf fmt "@[<hv2>@[<hov2>%s%t :@]@ %a = %a@]" (me_name_trans m_element)
+      fprintf fmt "@[<hv2>@[<hov2>(info=%s) %s%t :@]@ %a = %a@]"
+        m_element.me_info
+        (me_name_trans m_element)
         (fun fmt ->
            if print_attrs then
              fprintf fmt " %a" Pp.(print_list space Pretty.print_attr)
@@ -397,7 +431,6 @@ let print_model_element ?(print_locs=false) ~print_attrs ~me_name_trans fmt m_el
                m_element.me_location)
         (Pp.print_option (Pretty.print_ty)) m_element.me_value.t_ty
         (Pretty.print_term) m_element.me_value
-        (* print_json_as_term json_value *) (* TODO_WIP *)
 
 let print_model_elements ~filter_similar ~print_attrs ?(sep = Pp.newline)
     ~me_name_trans fmt m_elements =
@@ -693,6 +726,7 @@ let build_model_rec pm (elts: model_element list) : model_files =
     Some {
       me_kind= Other;
       me_value;
+      me_info= me.me_info;
       me_location= me.me_location;
       me_attrs= attrs;
       me_lsymbol= me.me_lsymbol
@@ -782,7 +816,9 @@ let model_parser (raw: raw_model_parser) : model_parser =
   fun ({Printer.vc_term_loc; vc_term_attrs} as pm) str ->
   raw pm str |> debug_elements |>
   build_model_rec pm |> debug_files |>
-  fun model_files -> { model_files; vc_term_loc; vc_term_attrs }
+  fun model_files ->
+    let model_json = json_model_files vc_term_loc model_files in
+    { model_files; vc_term_loc; vc_term_attrs; model_json }
 
 exception KnownModelParser of string
 exception UnknownModelParser of string

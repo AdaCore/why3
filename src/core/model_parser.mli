@@ -45,6 +45,7 @@ type model_element = {
     (** The kind of model element. *)
   me_value            : Term.term;
     (** Counter-example value for the element. *)
+  me_info             : string;
   me_location         : Loc.position option;
     (** Source-code location of the element. *)
   me_attrs            : Ident.Sattr.t;
@@ -55,6 +56,7 @@ type model_element = {
 
 val create_model_element :
   value     : Term.term ->
+  info      : string ->
   oloc      : Loc.position option ->
   attrs     : Ident.Sattr.t ->
   lsymbol   : Term.lsymbol ->
