@@ -554,10 +554,10 @@ File ieee_float.mlw:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 41:
-    x = ((- 0x1.0000000000001p-1022):t1)
-    x = ((- 0x1.0000000000001p-1022):t1)
+    x = ((- 0x1.0000000000001p-1022):t)
+    x = ((- 0x1.0000000000001p-1022):t)
     Execution of main function `g1'goal` with env:
-      x = ((- 0x1.0000000000001p-1022):t1)
+      x = ((- 0x1.0000000000001p-1022):t)
       zero = 0
       one = 1
       zeroF = UNDEFINED
@@ -565,8 +565,8 @@ Unknown location:
     Normal execution of function `Tuple0` with args:
 File floats.mlw:
   Line 41:
-    Property failure at postcondition of `g1'goal2` with:
-      x = ((- 0x1.0000000000001p-1022):t1)
+    Property failure at postcondition of `g1'goal` with:
+      x = ((- 0x1.0000000000001p-1022):t)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -597,10 +597,10 @@ File ieee_float.mlw:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 43:
-    x = ((- 0x0.0000000000001p-1022):t1)
-    x = ((- 0x0.0000000000001p-1022):t1)
+    x = ((- 0x0.0000000000001p-1022):t)
+    x = ((- 0x0.0000000000001p-1022):t)
     Execution of main function `g2'goal` with env:
-      x = ((- 0x0.0000000000001p-1022):t1)
+      x = ((- 0x0.0000000000001p-1022):t)
       zero = 0
       one = 1
       zeroF = UNDEFINED
@@ -608,16 +608,16 @@ Unknown location:
     Normal execution of function `Tuple0` with args:
 File floats.mlw:
   Line 43:
-    Property failure at postcondition of `g2'goal2` with:
-      x = ((- 0x0.0000000000001p-1022):t1)
+    Property failure at postcondition of `g2'goal` with:
+      x = ((- 0x0.0000000000001p-1022):t)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 45, characters 24-42)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 45, characters 24-42)
 - Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g3'goal3` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g3'goal3` cannot be evaluated)
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g3'goal1` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g3'goal1` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 45, characters 24-42:
 Goal g3.
 Prover result is: Unknown or time/memory/step limit.
@@ -640,10 +640,10 @@ File ieee_float.mlw:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 45:
-    x = (0.0:t1)
-    x = (0.0:t1)
+    x = (0.0:t)
+    x = (0.0:t)
     Execution of main function `g3'goal` with env:
-      x = (0.0:t1)
+      x = (0.0:t)
       zero = 0
       one = 1
       zeroF = UNDEFINED
@@ -651,8 +651,8 @@ Unknown location:
     Normal execution of function `Tuple0` with args:
 File floats.mlw:
   Line 45:
-    Property failure at postcondition of `g3'goal2` with:
-      x = (0.0:t1)
+    Property failure at postcondition of `g3'goal` with:
+      x = (0.0:t)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -683,10 +683,10 @@ File ieee_float.mlw:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 47:
-    x = (0x1.4p0:t1)
-    x = (0x1.4p0:t1)
+    x = (0x1.4p0:t)
+    x = (0x1.4p0:t)
     Execution of main function `g4'goal` with env:
-      x = (0x1.4p0:t1)
+      x = (0x1.4p0:t)
       zero = 0
       one = 1
       zeroF = UNDEFINED
@@ -694,8 +694,8 @@ Unknown location:
     Normal execution of function `Tuple0` with args:
 File floats.mlw:
   Line 47:
-    Property failure at postcondition of `g4'goal2` with:
-      x = (0x1.4p0:t1)
+    Property failure at postcondition of `g4'goal` with:
+      x = (0x1.4p0:t)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -726,10 +726,10 @@ File ieee_float.mlw:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 49:
-    x = (0x1.3000000000002p3:t1)
-    x = (0x1.3000000000002p3:t1)
+    x = (0x1.3000000000002p3:t)
+    x = (0x1.3000000000002p3:t)
     Execution of main function `g5'goal` with env:
-      x = (0x1.3000000000002p3:t1)
+      x = (0x1.3000000000002p3:t)
       zero = 0
       one = 1
       zeroF = UNDEFINED
@@ -737,16 +737,16 @@ Unknown location:
     Normal execution of function `Tuple0` with args:
 File floats.mlw:
   Line 49:
-    Property failure at postcondition of `g5'goal2` with:
-      x = (0x1.3000000000002p3:t1)
+    Property failure at postcondition of `g5'goal` with:
+      x = (0x1.3000000000002p3:t)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 51, characters 24-30)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 51, characters 24-30)
 - Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g6'goal3` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g6'goal3` cannot be evaluated)
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g6'goal1` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g6'goal1` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 51, characters 24-30:
 Goal g6.
 Prover result is: Unknown or time/memory/step limit.
@@ -769,10 +769,10 @@ File ieee_float.mlw:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 51:
-    x = epsilon x:t1. is_nan1 x
-    x = epsilon x:t1. is_nan1 x
+    x = epsilon x:t. is_nan x
+    x = epsilon x:t. is_nan x
     Execution of main function `g6'goal` with env:
-      x = epsilon x:t1. is_nan1 x
+      x = epsilon x:t. is_nan x
       zero = 0
       one = 1
       zeroF = UNDEFINED
@@ -780,29 +780,29 @@ Unknown location:
     Normal execution of function `Tuple0` with args:
 File floats.mlw:
   Line 51:
-    Property failure at postcondition of `g6'goal2` with:
-      x = epsilon x:t1. is_nan1 x
+    Property failure at postcondition of `g6'goal` with:
+      x = epsilon x:t. is_nan x
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `g7'goal2` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `g7'goal2` cannot be evaluated)
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `g7'goal` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `g7'goal` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 53, characters 40-64:
 Goal g7.
 Prover result is: Unknown or time/memory/step limit.
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g8'goal2` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g8'goal2` cannot be evaluated)
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g8'goal` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g8'goal` cannot be evaluated)
 - Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g8'goal3` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g8'goal3` cannot be evaluated)
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g8'goal1` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g8'goal1` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 55, characters 24-60:
 Goal g8.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
-  (both RAC terminated because Postcondition of `g8'goal3` cannot be evaluated):
+  (both RAC terminated because Postcondition of `g8'goal1` cannot be evaluated):
 File bv.mlw:
   Line 9:
     pow2 : int -> int = fun (x!0:int) -> 0
@@ -813,7 +813,7 @@ File ieee_float.mlw:
       ->
       int
       ->
-      t1 = fun (x!0:mode) (x!1:int) -> epsilon x:t1. is_nan1 x
+      t = fun (x!0:mode) (x!1:int) -> epsilon x:t. is_nan x
   Line 223:
     max_real : real = 0.0
   Line 224:
@@ -833,12 +833,12 @@ File real.mlw:
     sqrt : real -> real = fun (x!0:real) -> 0.0
 File floats.mlw:
   Line 55:
-    x : t1 = epsilon x:t1. is_infinite1 x
+    x : t = epsilon x:t. is_infinite x
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `g9'goal1` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `g9'goal1` cannot be evaluated)
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `g9'goal` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `g9'goal` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 57, characters 40-70:
 Goal g9.
 Prover result is: Unknown or time/memory/step limit.
@@ -848,8 +848,8 @@ Prover result is: Unknown or time/memory/step limit.
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 60, characters 24-98)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 60, characters 24-98)
 - Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g10'goal3` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g10'goal3` cannot be evaluated)
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g10'goal1` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g10'goal1` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 60, characters 24-98:
 Goal g10.
 Prover result is: Unknown or time/memory/step limit.
@@ -872,10 +872,10 @@ File ieee_float.mlw:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 60:
-    x = (0x1.999999999999Bp-4:t1)
-    x = (0x1.999999999999Bp-4:t1)
+    x = (0x1.999999999999Bp-4:t)
+    x = (0x1.999999999999Bp-4:t)
     Execution of main function `g10'goal` with env:
-      x = (0x1.999999999999Bp-4:t1)
+      x = (0x1.999999999999Bp-4:t)
       zero = 0
       one = 1
       zeroF = UNDEFINED
@@ -883,10 +883,10 @@ Unknown location:
     Normal execution of function `Tuple0` with args:
 File floats.mlw:
   Line 60:
-    Property failure at postcondition of `g10'goal2` with:
+    Property failure at postcondition of `g10'goal` with:
       RNE = UNDEFINED
       RTZ = UNDEFINED
-      x = (0x1.999999999999Bp-4:t1)
+      x = (0x1.999999999999Bp-4:t)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -917,10 +917,10 @@ File ieee_float.mlw:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 62:
-    x = (0x1.0p-1022:t1)
-    x = (0x1.0p-1022:t1)
+    x = (0x1.0p-1022:t)
+    x = (0x1.0p-1022:t)
     Execution of main function `g11'goal` with env:
-      x = (0x1.0p-1022:t1)
+      x = (0x1.0p-1022:t)
       zero = 0
       one = 1
       zeroF = UNDEFINED
@@ -928,8 +928,8 @@ Unknown location:
     Normal execution of function `Tuple0` with args:
 File floats.mlw:
   Line 62:
-    Property failure at postcondition of `g11'goal2` with:
-      x = (0x1.0p-1022:t1)
+    Property failure at postcondition of `g11'goal` with:
+      x = (0x1.0p-1022:t)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -960,10 +960,10 @@ File ieee_float.mlw:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 65:
-    x = (0x0.FFFFFFFFFFFFFp-1022:t1)
-    x = (0x0.FFFFFFFFFFFFFp-1022:t1)
+    x = (0x0.FFFFFFFFFFFFFp-1022:t)
+    x = (0x0.FFFFFFFFFFFFFp-1022:t)
     Execution of main function `g12'goal` with env:
-      x = (0x0.FFFFFFFFFFFFFp-1022:t1)
+      x = (0x0.FFFFFFFFFFFFFp-1022:t)
       zero = 0
       one = 1
       zeroF = UNDEFINED
@@ -971,8 +971,8 @@ Unknown location:
     Normal execution of function `Tuple0` with args:
 File floats.mlw:
   Line 65:
-    Property failure at postcondition of `g12'goal2` with:
-      x = (0x0.FFFFFFFFFFFFFp-1022:t1)
+    Property failure at postcondition of `g12'goal` with:
+      x = (0x0.FFFFFFFFFFFFFp-1022:t)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -1003,10 +1003,10 @@ File ieee_float.mlw:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 68:
-    x = (0x0.8p-1022:t1)
-    x = (0x0.8p-1022:t1)
+    x = (0x0.8p-1022:t)
+    x = (0x0.8p-1022:t)
     Execution of main function `g13'goal` with env:
-      x = (0x0.8p-1022:t1)
+      x = (0x0.8p-1022:t)
       zero = 0
       one = 1
       zeroF = UNDEFINED
@@ -1014,6 +1014,6 @@ Unknown location:
     Normal execution of function `Tuple0` with args:
 File floats.mlw:
   Line 68:
-    Property failure at postcondition of `g13'goal2` with:
-      x = (0x0.8p-1022:t1)
+    Property failure at postcondition of `g13'goal` with:
+      x = (0x0.8p-1022:t)
 
