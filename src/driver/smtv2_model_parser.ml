@@ -12,6 +12,7 @@
 open Wstdlib
 open Term
 open Smtv2_model_defs
+open Model_parser
 
 let debug =
   Debug.register_flag "smtv2_parser"
@@ -455,7 +456,7 @@ module FromModelToTerm = struct
        in [pinfo.Printer.queried_terms]. *)
     mutable inferred_types : (sort * Ty.ty) list;
     (* Evaluation of prover variables (using type coercions and fields). *)
-    mutable eval_prover_vars : (string * Term.term) Mvs.t;
+    mutable eval_prover_vars : (model_element_info * Term.term) Mvs.t;
   }
 
   (* Convert a SMT sort [s] to a Why3 type.
@@ -939,20 +940,27 @@ module FromModelToTerm = struct
       print_sort s
       (Pp.print_option_or_default "None" Pretty.print_ty_qualified)
       ty_s fmla;
-    let t_info = match t with
-      | Tarray _ -> "array"
+    let rec get_t_info t = match t with
+      | Tarray _ -> me_info_array
+      | Tite (_, t1, t2) ->
+        let t1_info = get_t_info t1 in
+        let t2_info = get_t_info t2 in
+        if t1_info = t2_info then t1_info
+        else me_info_default
+      | Tlet (_, t') -> get_t_info t'
       | Tapply (Qident (Isymbol (S n)), _)
       | Tapply (Qident (Isymbol (Sprover n)), _)
       | Tapply ((Qannotident (Isymbol (S n), _)), _)
       | Tapply ((Qannotident (Isymbol (Sprover n), _)), _)
-          when Mstr.mem n env.records_fields -> "record"
-      | _ -> "misc"
+          when Mstr.mem n env.records_fields -> me_info_record
+      | _ -> me_info_default
     in
+    let t_info = get_t_info t in
     let t' = term_to_term env t in
     let t' = if fmla then Term.to_prop t' else t' in
     if Opt.equal Ty.ty_equal ty_s t'.t_ty then (
-      Debug.dprintf debug "[smt_term_to_term] t_info = %s, t' = %a, t'.t_ty = %a@."
-        t_info
+      Debug.dprintf debug "[smt_term_to_term] t_info = %a, t' = %a, t'.t_ty = %a@."
+        print_me_info t_info
         Pretty.print_term t'
         (Pp.print_option_or_default "None" Pretty.print_ty_qualified)
         t'.t_ty;
@@ -1025,8 +1033,8 @@ module FromModelToTerm = struct
         []
         t_body
     in
-    Debug.dprintf debug "[interpret_fun_def_to_term] t_info = %s, t = %a@."
-      t_info
+    Debug.dprintf debug "[interpret_fun_def_to_term] t_info = %a, t = %a@."
+      print_me_info t_info
       Pretty.print_term t;
     Debug.dprintf debug "-----------------------------@.";
     (t_info,t)
@@ -1076,95 +1084,92 @@ module FromModelToTerm = struct
      may contain other prover variables)
      [seen_prover_vars] records already seen prover variables when evaluating
      a term to avoid unbounded recursion *)
-  let rec eval_term env ?(eval_prover_var = true) seen_prover_vars terms ref_t_info t =
+  let rec eval_term env ?(eval_prover_var = true) seen_prover_vars terms t_info t =
     match t.t_node with
     | Term.Tvar vs -> (
         match Mvs.find_opt vs env.eval_prover_vars with
         | Some (t_info_vs,t_vs) ->
             (* vs is a prover variable *)
             if eval_prover_var then
-              if List.mem vs seen_prover_vars then (
-                ref_t_info := t_info_vs;
-                t_vs )
-              else (
-                ref_t_info := t_info_vs;
+              if List.mem vs seen_prover_vars then (t_info_vs, t_vs)
+              else
                 eval_term env ~eval_prover_var (vs :: seen_prover_vars) terms
-                  ref_t_info t_vs )
-            else t
-        | None -> t (* vs is not a prover variable *))
+                  t_info_vs t_vs
+            else (t_info_vs, t)
+        | None -> (t_info, t) (* vs is not a prover variable *))
     | Term.Tapp (ls, [ t1; t2 ]) when ls_equal ls ps_equ -> (
         match (t1.t_node, t2.t_node) with
         | Term.Tvar v1, Term.Tvar v2
           when is_vs_in_prover_vars v1 env.prover_vars
                && is_vs_in_prover_vars v2 env.prover_vars ->
             (* distinct prover variables are not equal *)
-            if vs_equal v1 v2 then t_true else t_false
+            if vs_equal v1 v2 then (t_info, t_true) else (t_info, t_false)
         | _ ->
             (* general case *)
-            let t1' =
-              eval_term env ~eval_prover_var seen_prover_vars terms ref_t_info t1
+            let _, t1' =
+              eval_term env ~eval_prover_var seen_prover_vars terms me_info_default t1
             in
-            let t2' =
-              eval_term env ~eval_prover_var seen_prover_vars terms ref_t_info t2
+            let _, t2' =
+              eval_term env ~eval_prover_var seen_prover_vars terms me_info_default t2
             in
-            if t_equal t1' t2' then t_true
-            else t_app ls [ t1'; t2' ] ls.ls_value)
+            if t_equal t1' t2' then (t_info, t_true)
+            else (t_info, t_app ls [ t1'; t2' ] ls.ls_value))
     | Term.Tapp (ls, ts) ->
         let ts =
-          List.map (eval_term env ~eval_prover_var seen_prover_vars terms ref_t_info) ts
+          List.map (fun x -> snd (eval_term env ~eval_prover_var seen_prover_vars terms me_info_default x)) ts
         in
-        t_app ls ts ls.ls_value
+        (t_info, t_app ls ts ls.ls_value)
     | Term.Tif (b, t1, t2) ->
-        let b' = eval_term env ~eval_prover_var seen_prover_vars terms ref_t_info b in
+        let _, b' = eval_term env ~eval_prover_var seen_prover_vars terms me_info_default b in
         if is_true env b' then
-          let t1' = eval_term env ~eval_prover_var seen_prover_vars terms ref_t_info t1 in
-          t1'
+          let _, t1' = eval_term env ~eval_prover_var seen_prover_vars terms me_info_default t1 in
+          (t_info, t1')
         else if is_false env b' then
-          let t2' = eval_term env ~eval_prover_var seen_prover_vars terms ref_t_info t2 in
-          t2'
+          let _, t2' = eval_term env ~eval_prover_var seen_prover_vars terms me_info_default t2 in
+          (t_info, t2')
         else
-          let t1' = eval_term env ~eval_prover_var seen_prover_vars terms ref_t_info t1 in
-          let t2' = eval_term env ~eval_prover_var seen_prover_vars terms ref_t_info t2 in
-          t_if b' t1' t2'
-    | Term.Tlet _ -> t
-    | Term.Tcase _ -> t
+          let _, t1' = eval_term env ~eval_prover_var seen_prover_vars terms me_info_default t1 in
+          let _, t2' = eval_term env ~eval_prover_var seen_prover_vars terms me_info_default t2 in
+          (t_info, t_if b' t1' t2')
+    | Term.Tlet _ -> (t_info, t)
+    | Term.Tcase _ -> (t_info, t)
     | Term.Teps tb -> (
         match Term.t_open_lambda t with
         | [], _, _ ->
             let vs, t' = Term.t_open_bound tb in
-            t_eps_close vs
-              (eval_term env ~eval_prover_var seen_prover_vars terms ref_t_info t')
+            let _, t'_eval = eval_term env ~eval_prover_var seen_prover_vars terms t_info t' in
+            (t_info, t_eps_close vs t'_eval)
         | vsl, trig, t' ->
-            t_lambda vsl trig
-              (eval_term env ~eval_prover_var seen_prover_vars terms ref_t_info t'))
+            let _, t'_eval = eval_term env ~eval_prover_var seen_prover_vars terms t_info t' in
+            (t_info, t_lambda vsl trig t'_eval))
     | Term.Tquant (q, tq) ->
         let vsl, trig, t' = t_open_quant tq in
-        let t' = eval_term env ~eval_prover_var seen_prover_vars terms ref_t_info t' in
-        t_quant q (t_close_quant vsl trig t')
+        let _, t' = eval_term env ~eval_prover_var seen_prover_vars terms me_info_default t' in
+        (t_info, t_quant q (t_close_quant vsl trig t'))
     | Term.Tbinop (Term.Tor, t1, t2) ->
-        let t1 = eval_term env ~eval_prover_var seen_prover_vars terms ref_t_info t1 in
-        let t2 = eval_term env ~eval_prover_var seen_prover_vars terms ref_t_info t2 in
-        if is_true env t1 || is_true env t2 then t_true
-        else if is_false env t1 || is_false env t2 then t_false
-        else t_binary Term.Tor t1 t2
+        let _, t1 = eval_term env ~eval_prover_var seen_prover_vars terms me_info_default t1 in
+        let _, t2 = eval_term env ~eval_prover_var seen_prover_vars terms me_info_default t2 in
+        if is_true env t1 || is_true env t2 then (t_info, t_true)
+        else if is_false env t1 || is_false env t2 then (t_info, t_false)
+        else (t_info, t_binary Term.Tor t1 t2)
     | Term.Tbinop (Term.Tand, t1, t2) ->
-        let t1 = eval_term env ~eval_prover_var seen_prover_vars terms ref_t_info t1 in
-        let t2 = eval_term env ~eval_prover_var seen_prover_vars terms ref_t_info t2 in
-        if is_true env t1 && is_true env t2 then t_true
-        else if is_false env t1 && is_false env t2 then t_true
-        else if is_true env t1 && is_false env t2 then t_false
-        else if is_false env t1 && is_true env t2 then t_false
-        else t_binary Term.Tand t1 t2
+        let _, t1 = eval_term env ~eval_prover_var seen_prover_vars terms me_info_default t1 in
+        let _, t2 = eval_term env ~eval_prover_var seen_prover_vars terms me_info_default t2 in
+        if is_true env t1 && is_true env t2 then (t_info, t_true)
+        else if is_false env t1 && is_false env t2 then (t_info, t_true)
+        else if is_true env t1 && is_false env t2 then (t_info, t_false)
+        else if is_false env t1 && is_true env t2 then (t_info, t_false)
+        else (t_info, t_binary Term.Tand t1 t2)
     | Term.Tbinop (op, t1, t2) ->
-        let t1 = eval_term env ~eval_prover_var seen_prover_vars terms ref_t_info t1 in
-        let t2 = eval_term env ~eval_prover_var seen_prover_vars terms ref_t_info t2 in
-        t_binary op t1 t2
+        let _, t1 = eval_term env ~eval_prover_var seen_prover_vars terms me_info_default t1 in
+        let _, t2 = eval_term env ~eval_prover_var seen_prover_vars terms me_info_default t2 in
+        (t_info, t_binary op t1 t2)
     | Term.Tnot t' ->
-        let t' = eval_term env ~eval_prover_var seen_prover_vars terms ref_t_info t' in
-        if is_true env t' then t_false
-        else if is_false env t' then t_true
-        else t_not t'
-    | _ -> t
+        let _, t' = eval_term env ~eval_prover_var seen_prover_vars terms me_info_default t' in
+        if is_true env t' then (t_info, t_false)
+        else if is_false env t' then (t_info, t_true)
+        else (t_info, t_not t')
+    | _ -> (t_info, t)
 
   let eval (pinfo : Printer.printing_info) env terms =
     let ty_coercions =
@@ -1179,8 +1184,8 @@ module FromModelToTerm = struct
                (fun ls ->
                  Mstr.bindings
                    (Mstr.mapi_filter
-                      (fun _ ((ls', _, _), _, t) ->
-                        if ls_equal ls ls' then Some (ls, t) else None)
+                      (fun _ ((ls', _, _), t_info, t) ->
+                        if ls_equal ls ls' then Some (ls, t_info, t) else None)
                       terms))
                (Sls.elements sls)))
         pinfo.Printer.type_coercions
@@ -1188,10 +1193,10 @@ module FromModelToTerm = struct
     Ty.Mty.iter
       (fun key elt ->
         List.iter
-          (fun (str, (ls, t)) ->
+          (fun (str, (ls, t_info, t)) ->
             Debug.dprintf debug
-              "[ty_coercions] ty = %a, str=%s, ls = %a, t=%a@." Pretty.print_ty
-              key str Pretty.print_ls ls Pretty.print_term t)
+              "[ty_coercions] ty = %a, str=%s, ls = %a, t_info = %a, t=%a@." Pretty.print_ty
+              key str Pretty.print_ls ls print_me_info t_info Pretty.print_term t)
           elt)
       ty_coercions;
     let ty_fields =
@@ -1207,8 +1212,8 @@ module FromModelToTerm = struct
                (fun ls ->
                  Mstr.bindings
                    (Mstr.mapi_filter
-                      (fun _ ((ls', _, _), _, t) ->
-                        if ls_equal ls ls' then Some (ls, t) else None)
+                      (fun _ ((ls', _, _), t_info, t) ->
+                        if ls_equal ls ls' then Some (ls, t_info, t) else None)
                       terms))
                lls))
         pinfo.Printer.type_fields
@@ -1216,9 +1221,9 @@ module FromModelToTerm = struct
     Ty.Mty.iter
       (fun key elt ->
         List.iter
-          (fun (str, (ls, t)) ->
-            Debug.dprintf debug "[ty_fields] ty = %a, str=%s, ls = %a, t=%a@."
-              Pretty.print_ty key str Pretty.print_ls ls Pretty.print_term t)
+          (fun (str, (ls, t_info, t)) ->
+            Debug.dprintf debug "[ty_fields] ty = %a, str=%s, ls = %a, t_info = %a, t=%a@."
+              Pretty.print_ty key str Pretty.print_ls ls print_me_info t_info Pretty.print_term t)
           elt)
       ty_fields;
     (* for each prover variable, we create an epsilon term using type coercions
@@ -1230,7 +1235,9 @@ module FromModelToTerm = struct
             let create_epsilon_term ty l =
               (* create a fresh vsymbol for the variable bound by the epsilon term *)
               let x = create_vsymbol (Ident.id_fresh "x") ty in
-              let aux (_, (ls', t')) =
+              let ref_is_array = ref false in
+              let aux (_, (ls', t_info', t')) =
+                if t_info' = me_info_array then ref_is_array := true;
                 let vs_list', _, t' = t_open_lambda t' in
                 let vs' =
                   match vs_list' with
@@ -1240,9 +1247,9 @@ module FromModelToTerm = struct
                         "Only one variable expected when opening lambda-term %a"
                         Pretty.print_term t'
                 in
-                let t' =
+                let _, t' =
                   eval_term env ~eval_prover_var:false [] terms
-                    (ref "misc") (t_subst_single vs' (t_var vs) t')
+                    t_info' (t_subst_single vs' (t_var vs) t')
                 in
                 (* substitute [vs] by this new variable in the body [t'] of the function
                     defining the type coercion *)
@@ -1252,7 +1259,7 @@ module FromModelToTerm = struct
               in
               let f = t_and_l (List.map aux l) in
               (* replace [t] by [eps x. f] *)
-              t_eps_close x f
+              (!ref_is_array, t_eps_close x f)
             in
             let (eval_var_info, eval_var) =
               (* first search if [ty] is associated to some fields *)
@@ -1260,15 +1267,20 @@ module FromModelToTerm = struct
               | [] -> (
                   (* if no fields, search if there exists some type coercions for [ty] *)
                   match Ty.Mty.find_def [] ty ty_coercions with
-                  | [] -> ("misc", t_var vs)
-                  | coercions -> ("coercion", create_epsilon_term ty coercions))
-              | fields -> ("record", create_epsilon_term ty fields)
+                  | [] -> (me_info_default, t_var vs)
+                  | coercions ->
+                    let _, t_eps = create_epsilon_term ty coercions in
+                    (me_info_default, t_eps))
+              | fields ->
+                let is_array, t_eps = create_epsilon_term ty fields in
+                if is_array then (me_info_record_array, t_eps)
+                else (me_info_record, t_eps)
             in
             Debug.dprintf debug
-              "[eval] prover_var = %s, vs = %a, eval_var_info = %s, eval_var = %a@."
+              "[eval] prover_var = %s, vs = %a, eval_var_info = %a, eval_var = %a@."
               key
               Pretty.print_term (t_var vs)
-              eval_var_info
+              print_me_info eval_var_info
               Pretty.print_term eval_var;
             env.eval_prover_vars <-
               Mvs.add vs (eval_var_info, eval_var) env.eval_prover_vars)
@@ -1276,11 +1288,10 @@ module FromModelToTerm = struct
       env.prover_vars;
     Mstr.mapi
       (fun _ ((ls, oloc, attrs), t_info, t) ->
-        let ref_t_info = ref t_info in
-        let t' = eval_term env [] terms ref_t_info t in
+        let t_info', t' = eval_term env [] terms t_info t in
         Debug.dprintf debug "[eval] t = %a ==> t' = %a@." Pretty.print_term t
           Pretty.print_term t';
-        ((ls, oloc, attrs), !ref_t_info, t'))
+        ((ls, oloc, attrs), t_info', t'))
       terms
 
   (* If some prover variables remain after evaluation, we remove the terms
@@ -1383,10 +1394,10 @@ module FromModelToTerm = struct
       Mstr.iter
         (fun n ((ls, oloc, _), t_info, t) ->
           Debug.dprintf debug
-            "[TERMS %s] name = %s, ls = %a, oloc = %a, t_info = %s, t = %a@." desc n
+            "[TERMS %s] name = %s, ls = %a, oloc = %a, t_info = %a, t = %a@." desc n
             Pretty.print_ls ls
             (Pp.print_option Pretty.print_loc_as_attribute) oloc
-            t_info
+            print_me_info t_info
             Pretty.print_term t)
         terms
     in
@@ -1442,10 +1453,10 @@ let parse pinfo input =
         (Mstr.values
            (Mstr.mapi
               (fun _ ((ls, oloc, attrs), t_info, t) ->
-                Model_parser.create_model_element ~value:t ~info:t_info
+                create_model_element ~value:t ~info:t_info
                   ~oloc ~attrs ~lsymbol:ls)
               terms))
 
 let () =
-  Model_parser.register_model_parser "smtv2" parse
+  register_model_parser "smtv2" parse
     ~desc:"Parser@ for@ the@ model@ of@ SMT@ solvers."

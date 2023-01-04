@@ -48,10 +48,26 @@ let print_model_kind fmt = function
   | Loop_current_iteration -> pp_print_string fmt "Loop_current_iteration"
   | Other -> pp_print_string fmt "Other"
 
+type model_element_info =
+  { fun_as_array : bool;
+    eps_as_record : bool }
+
+let me_info_default = { fun_as_array = false; eps_as_record = false }
+let me_info_record = { fun_as_array = false; eps_as_record = true }
+let me_info_array = { fun_as_array = true; eps_as_record = false }
+let me_info_record_array = { fun_as_array = true; eps_as_record = true }
+
+let print_me_info fmt me_info =
+  match me_info.fun_as_array, me_info.eps_as_record with
+  | false, true -> pp_print_string fmt "Record"
+  | true, false -> pp_print_string fmt "Array"
+  | true, true -> pp_print_string fmt "Record,Array"
+  | false, false -> pp_print_string fmt "Default"
+
 type model_element = {
   me_kind: model_element_kind;
   me_value: term;
-  me_info: string;
+  me_info: model_element_info;
   me_location: Loc.position option;
   me_attrs: Sattr.t;
   me_lsymbol: lsymbol;
@@ -241,6 +257,47 @@ let json_vsymbol vs =
     "vs_type", json_type vs.vs_ty
   ]
 
+exception UnexpectedPattern
+
+let list_of_fields_values vs t =
+  let rec get_conjuncts t = match t.t_node with
+    | Tbinop (Tand, t1, t2) -> t1 :: (get_conjuncts t2)
+    | _ -> [t]
+  in
+  List.fold_left
+    (fun acc c ->
+      match c.t_node with
+      | Tapp (ls, [proj;term_value]) when ls_equal ls ps_equ -> (
+        match proj.t_node with
+        | Tapp (ls, [x]) when t_equal x (t_var vs) ->
+          (ls,term_value) :: acc
+        | _ -> raise UnexpectedPattern
+      )
+      | _ -> raise UnexpectedPattern
+    )
+    []
+    (get_conjuncts t)
+
+let list_of_indices_values vs t =
+  let rec get_branches t = match t.t_node with
+    | Tif (b, t1, t2) ->
+      let elts, others = get_branches t2 in
+      (b,t1)::elts, others
+    | _ -> [], t
+  in
+  let elts, others = get_branches t in
+  let elts = List.fold_left
+    (fun acc (cond, c) ->
+      match cond.t_node with
+      | Tapp (ls, [x;value]) when ls_equal ls ps_equ && t_equal x (t_var vs) ->
+        (value, c) :: acc
+      | _ -> raise UnexpectedPattern
+    )
+    []
+    elts
+  in
+  elts, others
+
 let rec json_of_term info t =
   let open Json_base in
   let open Pretty in
@@ -288,19 +345,57 @@ let rec json_of_term info t =
     let vs,_,t' = t_open_lambda t in
     if vs = [] then
       let vs,t' = t_open_bound tb in
-      Record [
-      "Teps",
-      Record [
-        "eps_vs", json_vsymbol vs;
-        "eps_t", json_of_term info t' ]
-      ]
+      begin try
+        if info.eps_as_record then
+          let values = list_of_fields_values vs t' in
+          let json_field_value (field_ls, value_t) =
+            Record [
+              "field", String (Format.asprintf "%a" print_ls_qualified field_ls) ;
+              "value", json_of_term info value_t
+            ]
+          in
+          Record [
+            "Trecord",
+            List (List.map (json_field_value) values)
+          ]
+        else raise UnexpectedPattern
+      with UnexpectedPattern ->
+        Record [
+        "Teps",
+        Record [
+          "eps_vs", json_vsymbol vs;
+          "eps_t", json_of_term info t' ]
+        ]
+      end
     else
-      Record [
-      "Tfun",
-      Record [
-        "fun_args", List (List.map json_vsymbol vs);
-        "fun_body", json_of_term info t' ]
-      ]
+      begin try
+        if info.fun_as_array then
+          begin match vs with
+          | [vs] ->
+            let elts, others = list_of_indices_values vs t' in
+            let json_indice_value (indice, value) =
+              Record [
+                "indice", json_of_term info indice ;
+                "value", json_of_term info value
+              ]
+            in
+            Record [
+            "Tarray",
+            Record [
+              "array_elts", List (List.map json_indice_value elts);
+              "array_others", json_of_term info others ]
+            ]
+          | _ -> raise UnexpectedPattern
+          end
+        else raise UnexpectedPattern
+      with UnexpectedPattern ->
+        Record [
+        "Tfun",
+        Record [
+          "fun_args", List (List.map json_vsymbol vs);
+          "fun_body", json_of_term info t' ]
+        ]
+      end
   | Tquant (q,tq) ->
     let quant = match q with Tforall -> "Tforall" | Texists -> "Texists" in
     let vsl,_,t' = t_open_quant tq in
@@ -418,8 +513,7 @@ let print_model_element ?(print_locs=false) ~print_attrs ~me_name_trans fmt m_el
   | Error_message ->
     pp_print_string fmt (get_name m_element)
   | _ ->
-      fprintf fmt "@[<hv2>@[<hov2>(info=%s) %s%t :@]@ %a = %a@]"
-        m_element.me_info
+      fprintf fmt "@[<hv2>@[<hov2>%s%t :@]@ %a = %a@]"
         (me_name_trans m_element)
         (fun fmt ->
            if print_attrs then
