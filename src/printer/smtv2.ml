@@ -205,6 +205,7 @@ type info = {
   meta_model_projection : Sls.t;
   meta_record_def : Sls.t;
   mutable list_records : field_info list Mstr.t;
+  mutable constr_proj_id : string list Mls.t;
   (* For algebraic type counterexamples: constructors with no arguments can be
      misunderstood for variables *)
   mutable noarg_constructors: string list;
@@ -582,12 +583,11 @@ and print_branch info subject pr fmt (cs,vars,t) =
   if vars = [] then pr info fmt t else
   let tvs = t_freevars Mvs.empty t in
   if List.for_all (fun v -> not (Mvs.mem v tvs)) vars then pr info fmt t else
-  let i = ref 0 in
-  let pr_proj fmt v = incr i;
-    if Mvs.mem v tvs then fprintf fmt "(%a (%a_proj_%d %a))"
-      (print_var info) v (print_ident info) cs.ls_name
-      !i (print_var info) subject in
-  fprintf fmt "@[<hv2>(let (%a) %a)@]" (print_list space pr_proj) vars (pr info) t
+  let pr_proj fmt (v, p) =
+    if Mvs.mem v tvs then fprintf fmt "(%a (%s %a))"
+      (print_var info) v p (print_var info) subject in
+  let l = List.combine vars (Mls.find cs info.constr_proj_id) in
+  fprintf fmt "@[<hv2>(let (%a) %a)@]" (print_list space pr_proj) l (pr info) t
 
 and print_expr info fmt =
   TermTF.t_select (print_term info fmt) (print_fmla info fmt)
@@ -779,7 +779,7 @@ let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f = match k with
       }
   | Plemma -> assert false
 
-let print_constructor_decl info fmt (ls,args) =
+let print_constructor_decl info is_record fmt (ls,args) =
   let field_names =
     (match args with
     | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name;
@@ -794,6 +794,8 @@ let print_constructor_decl info fmt (ls,args) =
             let field_name =
               match pr with
               | Some pr ->
+                  if not is_record then
+                    unsupported "smtv2: sum types should not have projections";
                   let field_name = sprintf "%a" (print_ident info) pr.ls_name in
                   fprintf fmt "(%s" field_name;
                   let field_trace =
@@ -807,7 +809,9 @@ let print_constructor_decl info fmt (ls,args) =
                   in
                   {field_name; field_trace; field_ident= Some pr.ls_name}
               | None ->
-                  let field_name = sprintf "%a_proj_%d" (print_ident info) ls.ls_name i in (* FIXME: is it possible to generate 2 same value with _proj_ inside it ? Need sanitizing and uniquifying ? *)
+                  let field_name = id_fresh (ls.ls_name.id_string^"_proj") in
+                  let field_name = create_vsymbol field_name ty(*dummy*) in
+                  let field_name = sprintf "%a" (print_var info) field_name in
                   fprintf fmt "(%s" field_name;
                   {field_name; field_trace= ""; field_ident= None}
             in
@@ -818,25 +822,29 @@ let print_constructor_decl info fmt (ls,args) =
         List.rev field_names)
   in
 
+  info.constr_proj_id <-
+    Mls.add ls (List.map (fun x -> x.field_name) field_names) info.constr_proj_id;
   if Strings.has_suffix "'mk" ls.ls_name.id_string then
     begin
       info.list_records <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name) field_names info.list_records;
     end
 
 let print_data_decl info fmt (ts,cl) =
+  let is_record = match cl with [_] -> true | _ -> false in
   fprintf fmt "@[(%a@ %a)@]"
     (print_ident info) ts.ts_name
-    (print_list space (print_constructor_decl info)) cl
+    (print_list space (print_constructor_decl info is_record)) cl
 
 let print_data_def info fmt (ts,cl) =
+  let is_record = match cl with [_] -> true | _ -> false in
   if ts.ts_args <> [] then
     let args = List.map (fun arg -> arg.tv_name) ts.ts_args in
     fprintf fmt "@[(par (%a) (%a))@]"
       (print_list space (print_ident info)) args
-      (print_list space (print_constructor_decl info)) cl
+      (print_list space (print_constructor_decl info is_record)) cl
   else
     fprintf fmt "@[(%a)@]"
-      (print_list space (print_constructor_decl info)) cl
+      (print_list space (print_constructor_decl info is_record)) cl
 
 let print_sort_decl info fmt (ts,_) =
   fprintf fmt "@[(%a %d)@]"
@@ -932,6 +940,7 @@ let print_task version args ?old:_ fmt task =
     meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
     meta_record_def = Task.on_tagged_ls Theory.meta_record task;
     list_records = Mstr.empty;
+    constr_proj_id = Mls.empty;
     noarg_constructors = [];
     info_cntexample_need_push = need_push;
     info_cntexample = cntexample;
