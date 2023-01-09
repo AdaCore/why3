@@ -748,9 +748,9 @@ let model_of_exec_log ~original_model log =
       | None -> Other in
     (*let me_value = model_value value in*) (* TODO_WIP *)
     let me_value = Term.t_bool_true in
-    let me_info = me_info_default in (* TODO_WIP *)
+    let me_concrete_value = Term.t_bool_true in
     let me_lsymbol = Term.create_lsymbol (Ident.id_fresh "dummytrue") [] None in
-    {me_kind; me_value; me_info; me_location= Some loc; me_attrs= id.id_attrs; me_lsymbol} in
+    {me_kind; me_value; me_concrete_value; me_location= Some loc; me_attrs= id.id_attrs; me_lsymbol} in
   let aux e = match e.Log.log_loc with
     | Some loc when not Loc.(equal loc dummy_position) -> (
         match e.Log.log_desc with

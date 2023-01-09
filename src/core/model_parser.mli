@@ -38,16 +38,7 @@ type model_element_kind =
 
 val print_model_kind : Format.formatter -> model_element_kind -> unit
 
-type model_element_info =
-  { fun_as_array : bool;
-    eps_as_record : bool }
-
-val me_info_default : model_element_info
-val me_info_record : model_element_info
-val me_info_array : model_element_info
-val me_info_record_array : model_element_info
-
-val print_me_info : Format.formatter -> model_element_info -> unit
+type concrete_syntax_term = Term.term
 
 (** Counter-example model elements. Each element represents
     a counter-example for a single source-code element.*)
@@ -56,7 +47,7 @@ type model_element = {
     (** The kind of model element. *)
   me_value            : Term.term;
     (** Counter-example value for the element. *)
-  me_info             : model_element_info;
+  me_concrete_value: concrete_syntax_term;
   me_location         : Loc.position option;
     (** Source-code location of the element. *)
   me_attrs            : Ident.Sattr.t;
@@ -66,11 +57,11 @@ type model_element = {
 }
 
 val create_model_element :
-  value     : Term.term ->
-  info      : model_element_info ->
-  oloc      : Loc.position option ->
-  attrs     : Ident.Sattr.t ->
-  lsymbol   : Term.lsymbol ->
+  value           : Term.term ->
+  concrete_value  : concrete_syntax_term ->
+  oloc            : Loc.position option ->
+  attrs           : Ident.Sattr.t ->
+  lsymbol         : Term.lsymbol ->
   model_element
 (** Creates a counter-example model element.
     @param value counter-example value for the element

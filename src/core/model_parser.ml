@@ -48,35 +48,21 @@ let print_model_kind fmt = function
   | Loop_current_iteration -> pp_print_string fmt "Loop_current_iteration"
   | Other -> pp_print_string fmt "Other"
 
-type model_element_info =
-  { fun_as_array : bool;
-    eps_as_record : bool }
-
-let me_info_default = { fun_as_array = false; eps_as_record = false }
-let me_info_record = { fun_as_array = false; eps_as_record = true }
-let me_info_array = { fun_as_array = true; eps_as_record = false }
-let me_info_record_array = { fun_as_array = true; eps_as_record = true }
-
-let print_me_info fmt me_info =
-  match me_info.fun_as_array, me_info.eps_as_record with
-  | false, true -> pp_print_string fmt "Record"
-  | true, false -> pp_print_string fmt "Array"
-  | true, true -> pp_print_string fmt "Record,Array"
-  | false, false -> pp_print_string fmt "Default"
+type concrete_syntax_term = term (* TODO_WIP *)
 
 type model_element = {
   me_kind: model_element_kind;
   me_value: term;
-  me_info: model_element_info;
+  me_concrete_value: concrete_syntax_term;
   me_location: Loc.position option;
   me_attrs: Sattr.t;
   me_lsymbol: lsymbol;
 }
 
-let create_model_element ~value ~info ~oloc ~attrs ~lsymbol = {
+let create_model_element ~value ~concrete_value ~oloc ~attrs ~lsymbol = {
   me_kind= Other;
   me_value= value;
-  me_info= info;
+  me_concrete_value= concrete_value;
   me_location= oloc;
   me_attrs= attrs;
   me_lsymbol= lsymbol
@@ -98,21 +84,19 @@ type model = {
   model_files: model_files;
   vc_term_loc: Loc.position option;
   vc_term_attrs: Sattr.t;
-  model_json: Json_base.json;
 }
 
 let empty_model_file = Mint.empty
 let empty_model_files = Mstr.empty
-let empty_model_json = Json_base.Null
 let is_model_empty m = Mstr.is_empty m.model_files
 
-let empty_model =
-  { vc_term_loc= None;
-    vc_term_attrs= Sattr.empty;
-    model_files= empty_model_files;
-    model_json= empty_model_json; }
+let empty_model = {
+  vc_term_loc= None;
+  vc_term_attrs= Sattr.empty;
+  model_files= empty_model_files;
+}
 
-let set_model_files model model_files = (* TODO_WIP also update model_json *)
+let set_model_files model model_files =
   { model with model_files }
 
 let get_model_elements m =
@@ -257,48 +241,7 @@ let json_vsymbol vs =
     "vs_type", json_type vs.vs_ty
   ]
 
-exception UnexpectedPattern
-
-let list_of_fields_values vs t =
-  let rec get_conjuncts t = match t.t_node with
-    | Tbinop (Tand, t1, t2) -> t1 :: (get_conjuncts t2)
-    | _ -> [t]
-  in
-  List.fold_left
-    (fun acc c ->
-      match c.t_node with
-      | Tapp (ls, [proj;term_value]) when ls_equal ls ps_equ -> (
-        match proj.t_node with
-        | Tapp (ls, [x]) when t_equal x (t_var vs) ->
-          (ls,term_value) :: acc
-        | _ -> raise UnexpectedPattern
-      )
-      | _ -> raise UnexpectedPattern
-    )
-    []
-    (get_conjuncts t)
-
-let list_of_indices_values vs t =
-  let rec get_branches t = match t.t_node with
-    | Tif (b, t1, t2) ->
-      let elts, others = get_branches t2 in
-      (b,t1)::elts, others
-    | _ -> [], t
-  in
-  let elts, others = get_branches t in
-  let elts = List.fold_left
-    (fun acc (cond, c) ->
-      match cond.t_node with
-      | Tapp (ls, [x;value]) when ls_equal ls ps_equ && t_equal x (t_var vs) ->
-        (value, c) :: acc
-      | _ -> raise UnexpectedPattern
-    )
-    []
-    elts
-  in
-  elts, others
-
-let rec json_of_term info t =
+let rec json_of_term t =
   let open Json_base in
   let open Pretty in
   match t.t_node with
@@ -321,14 +264,14 @@ let rec json_of_term info t =
     "Tapp",
     Record [
       "app_ls", String (Format.asprintf "%a" print_ls_qualified ls) ;
-      "app_args", List (List.map (json_of_term info) ts) ]
+      "app_args", List (List.map json_of_term ts) ]
   ]
   | Tif (t1,t2,t3) -> Record [
     "Tif",
     Record [
-      "if", json_of_term info t1;
-      "then", json_of_term info t2;
-      "else", json_of_term info t3 ]
+      "if", json_of_term t1;
+      "then", json_of_term t2;
+      "else", json_of_term t3 ]
   ]
   | Tlet (t,tb) ->
     let vs,t' = t_open_bound tb in
@@ -336,8 +279,8 @@ let rec json_of_term info t =
     "Tlet",
     Record [
       "let_vs", json_vsymbol vs;
-      "let_t", json_of_term info t;
-      "let_tbound", json_of_term info t'
+      "let_t", json_of_term t;
+      "let_tbound", json_of_term t'
     ]
   ]
   | Tcase _ -> Record [ "Tcase", String "UNSUPPORTED" ]
@@ -345,57 +288,19 @@ let rec json_of_term info t =
     let vs,_,t' = t_open_lambda t in
     if vs = [] then
       let vs,t' = t_open_bound tb in
-      begin try
-        if info.eps_as_record then
-          let values = list_of_fields_values vs t' in
-          let json_field_value (field_ls, value_t) =
-            Record [
-              "field", String (Format.asprintf "%a" print_ls_qualified field_ls) ;
-              "value", json_of_term info value_t
-            ]
-          in
-          Record [
-            "Trecord",
-            List (List.map (json_field_value) values)
-          ]
-        else raise UnexpectedPattern
-      with UnexpectedPattern ->
-        Record [
-        "Teps",
-        Record [
-          "eps_vs", json_vsymbol vs;
-          "eps_t", json_of_term info t' ]
-        ]
-      end
+      Record [
+      "Teps",
+      Record [
+        "eps_vs", json_vsymbol vs;
+        "eps_t", json_of_term t' ]
+      ]
     else
-      begin try
-        if info.fun_as_array then
-          begin match vs with
-          | [vs] ->
-            let elts, others = list_of_indices_values vs t' in
-            let json_indice_value (indice, value) =
-              Record [
-                "indice", json_of_term info indice ;
-                "value", json_of_term info value
-              ]
-            in
-            Record [
-            "Tarray",
-            Record [
-              "array_elts", List (List.map json_indice_value elts);
-              "array_others", json_of_term info others ]
-            ]
-          | _ -> raise UnexpectedPattern
-          end
-        else raise UnexpectedPattern
-      with UnexpectedPattern ->
-        Record [
-        "Tfun",
-        Record [
-          "fun_args", List (List.map json_vsymbol vs);
-          "fun_body", json_of_term info t' ]
-        ]
-      end
+      Record [
+      "Tfun",
+      Record [
+        "fun_args", List (List.map json_vsymbol vs);
+        "fun_body", json_of_term t' ]
+      ]
   | Tquant (q,tq) ->
     let quant = match q with Tforall -> "Tforall" | Texists -> "Texists" in
     let vsl,_,t' = t_open_quant tq in
@@ -404,7 +309,7 @@ let rec json_of_term info t =
     Record [
       "quant", String quant;
       "quant_vs", List (List.map (fun vs -> json_vsymbol vs) vsl);
-      "quant_t", json_of_term info t' ]
+      "quant_t", json_of_term t' ]
   ]
   | Tbinop (op,t1,t2) ->
     let binop = match op with
@@ -417,12 +322,12 @@ let rec json_of_term info t =
     "Tbinop",
     Record [
       "binop", String binop;
-      "t1", json_of_term info t1;
-      "t2", json_of_term info t2
+      "binop_t1", json_of_term t1;
+      "binop_t2", json_of_term t2
     ]
   ]
   | Tnot t' -> Record [
-    "Tnot", json_of_term info t'
+    "Tnot", json_of_term t'
   ]
   | Ttrue -> String "Ttrue"
   | Tfalse -> String "Tfalse"
@@ -446,7 +351,8 @@ let json_model_element me =
       "value",
         Record [
           "value_type", json_otype me.me_value.t_ty;
-          "value_term", json_of_term me.me_info me.me_value ];
+          "value_term", json_of_term me.me_value;
+          "value_concrete_term", String "concrete_term" ];
       "lsymbol", json_lsymbol me.me_lsymbol;
       "kind", String kind
     ]
@@ -485,28 +391,111 @@ let json_model_files vc_term_loc model_files =
   Pretty.forget_all ();
   Json_base.List l
 
-let json_model model = model.model_json
+let json_model model = json_model_files model.vc_term_loc model.model_files
 
 (*
 ***************************************************************
 **  Quering the model
 ***************************************************************
 *)
+open Json_base
 
-(* TODO_WIP print_json_as_term *)
-(* let rec print_json_as_term fmt json_value =
-  let open Json_base in
+let print_raw_json fmt json =
+  fprintf fmt "%a" print_json json
+
+let rec print_json_type fmt json_type =
+  match json_type with
+  | Record [ "Tyvar", String ty_var ] -> fprintf fmt "%s" ty_var
+  | Record [ "Tyapp", Record [ "ty_symbol", String ty_symbol; "ty_args", List ty_args ] ] ->
+    fprintf fmt "%s %a"
+      ty_symbol
+      (Pp.print_list Pp.comma print_json_type) ty_args
+  | _ -> print_raw_json fmt json_type
+
+let print_json_quant fmt json_quant =
+  match json_quant with
+  | String "Tforall" -> fprintf fmt "forall"
+  | String "Texists" -> fprintf fmt "exists"
+  | _ -> print_raw_json fmt json_quant
+
+let print_json_binop fmt json_binop =
+  match json_binop with
+  | String "Tand" -> fprintf fmt "/\\"
+  | String "Tor" -> fprintf fmt "||"
+  | String "Timplies" -> fprintf fmt "=>"
+  | String "Tiff" -> fprintf fmt "<=>"
+  | _ -> print_raw_json fmt json_binop
+
+let print_json_vs ~print_type fmt json_vs =
+  match json_vs with
+  | Record [ "vs_name", String vs_name; "vs_type", vs_type ] ->
+    if print_type then
+      fprintf fmt "(%s:%a)" vs_name print_json_type vs_type
+    else
+      fprintf fmt "%s" vs_name
+  | _ -> print_raw_json fmt json_vs
+
+let rec print_json_as_term fmt json_value =
   match json_value with
-  | Record [ "Tvar", String vs ] -> fprintf fmt "%s" vs
-  | Record [ "Tconst", Record [ _, String c ] ] -> fprintf fmt "%s" c
-  | Record [ "Tapp", Record [ "ls_app", String ls; "ls_args", List args ] ] ->
-    fprintf fmt "%s(%a)" ls
-      (Pp.print_list Pp.comma print_json_as_term) args
+  | Record [ "Tvar", vs ] -> fprintf fmt "%a" (print_json_vs ~print_type:false) vs
+  | Record [ "Tconst", Record [ "const_type", _; "const_value", String const_value ] ] ->
+    fprintf fmt "%s" const_value
+  | Record [ "Tapp", Record [ "app_ls", String app_ls; "app_args", List app_args ] ] ->
+    fprintf fmt "%s(%a)" app_ls
+      (Pp.print_list Pp.comma print_json_as_term) app_args
+  | Record [ "Tif", Record [ "if", t_if; "then", t_then; "else", t_else ] ] ->
+    fprintf fmt "if %a then %a else %a"
+      print_json_as_term t_if
+      print_json_as_term t_then
+      print_json_as_term t_else
+  | Record [ "Tlet", Record [ "let_vs", let_vs; "let_t", let_t; "let_tbound", let_tbound ] ] ->
+    fprintf fmt "let %a = %a in %a"
+      (print_json_vs ~print_type:false) let_vs
+      print_json_as_term let_t
+      print_json_as_term let_tbound
+  | Record [ "Teps", Record [ "eps_vs", eps_vs; "eps_t", eps_t ] ] ->
+    fprintf fmt "epsilon %a. %a"
+      (print_json_vs ~print_type:true) eps_vs
+      print_json_as_term eps_t
+  | Record [ "Tfun", Record [ "fun_args", List fun_args; "fun_body", fun_body ] ] ->
+    fprintf fmt "fun %a -> %a"
+      (Pp.print_list Pp.space (print_json_vs ~print_type:true)) fun_args
+      print_json_as_term fun_body
+  | Record [ "Tquant", Record [ "quant", quant; "quant_vs", List quant_vs; "quant_t", quant_t ] ] ->
+    fprintf fmt "%a %a. %a"
+      print_json_quant quant
+      (Pp.print_list Pp.comma (print_json_vs ~print_type:true)) quant_vs
+      print_json_as_term quant_t
+  | Record [ "Tbinop", Record [ "binop", binop; "binop_t1", binop_t1; "binop_t2", binop_t2 ] ] ->
+    fprintf fmt "%a %a %a"
+      print_json_as_term binop_t1
+      print_json_binop binop
+      print_json_as_term binop_t2
+  | Record [ "Tarray", Record [ "array_elts", List elts; "array_others", others ]] ->
+    fprintf fmt "%a, others => %a"
+      (Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.comma ~sep:Pp.comma print_json_indice_value) elts
+      print_json_as_term others
+  | Record [ "Trecord", List list_field_value ] ->
+    fprintf fmt "%a"
+      (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi print_json_field_value) list_field_value
   | Record [ "Tnot", t ] ->
-    fprintf fmt "not(%a)" print_json_as_term t
-  | String "True" -> fprintf fmt "true"
-  | String "False" -> fprintf fmt "false"
-  | _ -> fprintf fmt "" *)
+    fprintf fmt "not %a" print_json_as_term t
+  | String "Ttrue" -> fprintf fmt "true"
+  | String "Tfalse" -> fprintf fmt "false"
+  | Record [ "Tcase", _ ] -> fprintf fmt "UNSUPPORTED"
+  | _ -> print_raw_json fmt json_value
+
+and print_json_field_value fmt json_field_value =
+  match json_field_value with
+  | Record [ "field", String field; "value", value ] ->
+    fprintf fmt "%s = %a" field print_json_as_term value
+  | _ -> print_raw_json fmt json_field_value
+
+and print_json_indice_value fmt json_indice_value =
+  match json_indice_value with
+  | Record [ "indice", indice; "value", value ] ->
+    fprintf fmt "%a => %a" print_json_as_term indice print_json_as_term value
+  | _ -> print_raw_json fmt json_indice_value
 
 let print_model_element ?(print_locs=false) ~print_attrs ~me_name_trans fmt m_element =
   match m_element.me_kind with
@@ -524,7 +513,8 @@ let print_model_element ?(print_locs=false) ~print_attrs ~me_name_trans fmt m_el
                (Pp.print_option_or_default "NO LOC" Pretty.print_loc_as_attribute)
                m_element.me_location)
         (Pp.print_option (Pretty.print_ty)) m_element.me_value.t_ty
-        (Pretty.print_term) m_element.me_value
+        Pretty.print_term m_element.me_value
+        (* print_json_as_term (json_of_term m_element.me_value) *)
 
 let print_model_elements ~filter_similar ~print_attrs ?(sep = Pp.newline)
     ~me_name_trans fmt m_elements =
@@ -820,7 +810,7 @@ let build_model_rec pm (elts: model_element list) : model_files =
     Some {
       me_kind= Other;
       me_value;
-      me_info= me.me_info;
+      me_concrete_value= me.me_concrete_value; (* TODO_WIP *)
       me_location= me.me_location;
       me_attrs= attrs;
       me_lsymbol= me.me_lsymbol
@@ -880,7 +870,7 @@ let model_for_positions_and_decls model ~positions =
      This corresponds to function declarations *)
   let model_filtered =
     Mstr.fold add_first_model_line model.model_files model_filtered in
-  {model with model_files= model_filtered}
+  set_model_files model model_filtered
 
 (*
 ***************************************************************
@@ -910,9 +900,7 @@ let model_parser (raw: raw_model_parser) : model_parser =
   fun ({Printer.vc_term_loc; vc_term_attrs} as pm) str ->
   raw pm str |> debug_elements |>
   build_model_rec pm |> debug_files |>
-  fun model_files ->
-    let model_json = json_model_files vc_term_loc model_files in
-    { model_files; vc_term_loc; vc_term_attrs; model_json }
+  fun model_files -> { model_files; vc_term_loc; vc_term_attrs }
 
 exception KnownModelParser of string
 exception UnknownModelParser of string
