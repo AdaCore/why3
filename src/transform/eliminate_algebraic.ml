@@ -488,11 +488,14 @@ let eliminate_algebraic = Trans.compose compile_match
 
 (** Eliminate user-supplied projection functions *)
 
-let elim d = match d.d_node with
+let elim_proj keep_rec d = match d.d_node with
   | Ddata dl ->
       (* add type declarations *)
       let conv (cs,pjl) = cs, List.map (fun _ -> None) pjl in
-      let conv (ts,csl) = ts, List.map conv csl in
+      let conv (ts,csl) = match csl with
+        | [_] when keep_rec -> ts,csl
+        | _ -> ts,List.map conv csl
+      in
       let td = create_data_decl (List.map conv dl) in
       (* add projection definitions *)
       let add vs csl acc pj =
@@ -511,17 +514,20 @@ let elim d = match d.d_node with
         create_logic_decl [def] :: acc
       in
       let add acc (_,csl) =
-        let (cs,pjl) = List.hd csl in
-        let ty = Opt.get cs.ls_value in
-        let vs = create_vsymbol (id_fresh "v") ty in
-        let get l = function Some p -> p::l | _ -> l in
-        let pjl = List.fold_left get [] pjl in
-        List.fold_left (add vs csl) acc pjl
+        match csl with
+        | [_] when keep_rec -> acc
+        | _ ->
+           let (cs,pjl) = List.hd csl in
+           let ty = Opt.get cs.ls_value in
+           let vs = create_vsymbol (id_fresh "v") ty in
+           let get l = function Some p -> p::l | _ -> l in
+           let pjl = List.fold_left get [] pjl in
+           List.fold_left (add vs csl) acc pjl
       in
       td :: List.rev (List.fold_left add [] dl)
   | _ -> [d]
 
-let eliminate_projections = Trans.decl elim None
+let eliminate_projections = Trans.decl (elim_proj false) None
 
 let () =
   Trans.register_transform "compile_match" compile_match
@@ -541,7 +547,7 @@ let eliminate_algebraic_if_poly =
   Trans.on_meta Detect_polymorphism.meta_monomorphic_types_only
     (function
     | [] -> eliminate_algebraic
-    | _ -> compile_match)
+    | _ -> Trans.compose compile_match (Trans.decl (elim_proj true) None))
 
 let () =
   Trans.register_transform "eliminate_algebraic_if_poly"
