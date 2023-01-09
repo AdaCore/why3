@@ -207,11 +207,11 @@ let rec json_type ty =
   let open Pretty in
   match ty.ty_node with
   | Tyvar v ->
-    Record [ "Tyvar", String (Format.asprintf "%a" print_tv_qualified v) ]
+    Record [ "Tyvar", String (Format.asprintf "@[<h>%a@]" print_tv_qualified v) ]
   | Tyapp (ts, tl) ->
     Record [
       "Tyapp", Record [
-        "ty_symbol", String (Format.asprintf "%a" print_ts_qualified ts);
+        "ty_symbol", String (Format.asprintf "@[<h>%a@]" print_ts_qualified ts);
         "ty_args", List (List.map json_type tl)
       ]
     ]
@@ -225,7 +225,7 @@ let json_otype oty =
 let json_lsymbol ls =
   let open Json_base in
   let open Pretty in
-  let ls_name = Format.asprintf "%a" print_ls_qualified ls in
+  let ls_name = Format.asprintf "@[<h>%a@]" print_ls_qualified ls in
   Record [
     "name", String ls_name;
     "attrs", json_attrs ls.ls_name.id_attrs;
@@ -235,7 +235,7 @@ let json_lsymbol ls =
 let json_vsymbol vs =
   let open Pretty in
   let open Json_base in
-  let vs_name = Format.asprintf "%a" print_vs_qualified vs in
+  let vs_name = Format.asprintf "@[<h>%a@]" print_vs_qualified vs in
   Record [
     "vs_name", String vs_name;
     "vs_type", json_type vs.vs_ty
@@ -257,13 +257,13 @@ let rec json_of_term t =
     Record [
       "Tconst", Record [
         "const_type", String const_type;
-        "const_value", String (Format.asprintf "%a" Constant.print_def c) ]
+        "const_value", String (Format.asprintf "@[<h>%a@]" Constant.print_def c) ]
     ]
   | Tapp (ls,ts) ->
     Record [
     "Tapp",
     Record [
-      "app_ls", String (Format.asprintf "%a" print_ls_qualified ls) ;
+      "app_ls", String (Format.asprintf "@[<h>%a@]" print_ls_qualified ls) ;
       "app_args", List (List.map json_of_term ts) ]
   ]
   | Tif (t1,t2,t3) -> Record [
