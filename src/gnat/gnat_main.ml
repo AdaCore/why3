@@ -162,7 +162,7 @@ let all_split_subp c subp =
    C.all_split_leaf_goals ();
    Gnat_objectives.clear ()
 
-let maybe_giant_step_rac ctr parent model =
+let maybe_giant_step_rac ctr parent models =
   if not Gnat_config.giant_step_rac then None else (
     Debug.dprintf Check_ce.debug_check_ce_categorization "Running giant-step RAC@.";
     let Controller_itp.{controller_config= cnf; controller_env= env} = ctr in
@@ -174,27 +174,25 @@ let maybe_giant_step_rac ctr parent model =
         ?why_prover:Gnat_config.rac_prover () in
     let compute_term = Rac.Why.mk_compute_term_lit env () in
     let rac = Pinterp.mk_rac check_term in
-    let oracle = Check_ce.oracle_of_model pm model in
-    let env = Pinterp.mk_empty_env env pm in
     let timelimit = Opt.map float_of_int Gnat_config.rac_timelimit in
-    let ctx = Pinterp.mk_ctx env ?timelimit ~giant_steps:true ~do_rac:true ~rac
-        ~oracle ~compute_term () in
-    match Model_parser.get_model_term_loc model with
-    | None ->
-        if Gnat_config.debug then Warning.emit "Model without location@.";
-        None
-    | Some loc ->
-        match Check_ce.find_rs pm loc with
-        | exception Failure str -> Warning.emit "%s@." str; None
-        | None ->
-            if Gnat_config.debug then Warning.emit "No procedure found for model@.";
-            None
-        | Some rs ->
-            let res_state,res_log = Check_ce.rac_execute ctx rs in
-            let res = Check_ce.RAC_done (res_state, res_log) in
-            Debug.dprintf Check_ce.debug_check_ce_rac_results "%a@."
-              (Check_ce.print_rac_result ?verb_lvl:None) res;
-            Some res )
+    let rac_results = Check_ce.get_rac_results ?timelimit ~compute_term
+        ~only_giant_step:true rac env pm models in
+    let strategy = Check_ce.best_non_empty_giant_step_rac_result in
+    let model = Check_ce.select_model_from_giant_step_rac_results ~strategy rac_results in
+    match model with
+    | None -> None
+    | Some (m, _) when not Gnat_config.giant_step_rac ->
+        Some (Gnat_counterexamples.post_clean#model m, None)
+    | Some (m, Check_ce.RAC_not_done reason) -> (
+        if Gnat_config.debug then Warning.emit "%s@." reason;
+        Some (Gnat_counterexamples.post_clean#model m, None)
+      )
+    | Some (m, Check_ce.RAC_done (res_state, res_log)) -> (
+        let res = Check_ce.RAC_done (res_state, res_log) in
+        Debug.dprintf Check_ce.debug_check_ce_rac_results "%a@."
+          (Check_ce.print_rac_result ?verb_lvl:None) res;
+        Some (Gnat_counterexamples.post_clean#model m, Some res))
+  )
 
 let report_messages c obj =
   let s = c.Controller_itp.controller_session in
@@ -214,13 +212,7 @@ let report_messages c obj =
           | Some pr ->
             let not_step_limit (pa,_) = pa <> Call_provers.StepLimitExceeded in
             let models = List.filter not_step_limit pr.Call_provers.pr_models in
-            let model = Check_ce.select_model_last_non_empty models in
-            match model with
-            | None -> None
-            | Some m ->
-              Some
-                (Gnat_counterexamples.post_clean#model m,
-                 maybe_giant_step_rac c ce_pan.Session_itp.parent m)
+            maybe_giant_step_rac c ce_pan.Session_itp.parent models
       in
       let unproved_pa = C.session_find_unproved_pa c obj in
       let manual_info = Opt.bind unproved_pa (Gnat_manual.manual_proof_info s) in
