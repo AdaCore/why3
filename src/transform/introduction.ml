@@ -91,9 +91,9 @@ let rec dequant ht pos f =
   | Tnot f1 ->
       t_not (dequant (not pos) f1)
   | Tlet (t,fb) ->
-     let vs, f1 = t_open_bound fb in
-     Hvs.replace ht vs (t_peek_bound fb);
-     (if pos then t_implies else t_and) (t_equ (t_var vs) t) (dequant pos f1)
+      let vs, f1 = t_open_bound fb in
+      Hvs.replace ht vs (t_peek_bound fb);
+      (if pos then t_implies else t_and) (t_equ (t_var vs) t) (dequant pos f1)
   | Tcase (t,bl) ->
       let branch bf =
         let pat, f1 = t_open_branch bf in
@@ -122,22 +122,33 @@ let compat ls vs =
 (* Memoize the correspondence between bound variables
    and introduced lsymbols to increase sharing *)
 
-let ls_of_vs = let wt = Wid.create 7 in fun vs id ols ->
-  try Wid.find wt id with Not_found ->
-  let ls = match ols with Some ls -> ls | None ->
-    let id = id_clone ~attrs:intro_attrs vs.vs_name in
-    create_fsymbol id [] vs.vs_ty in
-  Wid.set wt id ls; ls
+let ls_of_vs = let wt = Wid.create 7 in fun knl vs id ols ->
+  let q = try Wid.find wt id with Not_found ->
+    let q = Queue.create () in Wid.set wt id q; q in
+  let exception Found of lsymbol in
+  try
+    Queue.iter (fun ls ->
+      if not (Mid.mem ls.ls_name knl) then raise (Found ls)) q;
+    let ls = match ols with Some ls -> ls | None ->
+      let id = id_clone ~attrs:intro_attrs vs.vs_name in
+      create_fsymbol id [] vs.vs_ty in
+    Queue.add ls q;
+    ls
+  with Found ls -> ls
 
-let ls_of_vs mal vs id = match mal with
+let ls_of_vs knl mal vs id = match mal with
   | Theory.MAls ls :: mal when compat ls vs ->
-         ls_of_vs vs id (Some ls), mal
-  | _ -> ls_of_vs vs id None, mal
+         ls_of_vs knl vs id (Some ls), mal
+  | _ -> ls_of_vs knl vs id None, mal
 
-let intro_var (subst, mal) (vs, id) =
-  let ls, mal = ls_of_vs mal vs id in
+let clash_exn =
+  Failure "Introduction.intro_var: anomaly, please report"
+
+let intro_var (knl, subst, mal) (vs, id) =
+  let ls, mal = ls_of_vs knl mal vs id in
   let subst = Mvs.add vs (fs_app ls [] vs.vs_ty) subst in
-  (subst, mal), create_param_decl ls
+  let d = create_param_decl ls in
+  (Mid.add_new clash_exn ls.ls_name d knl, subst, mal), d
 
 let pushed_attr_prefixes = ref ["expl:"; "hyp_name:"]
 
@@ -157,18 +168,25 @@ let pushed_attrs f =
    then use it. If it is already in the task, then check if we have
    a similar proposition saved in a weak hash-table, that is not yet
    used in the task. If none is found, use the newly created decl. *)
-let find_fresh_axiom = let wt = Wdecl.create 7 in fun axs d ->
-  let o = Hsdecl.hashcons d in if not (Sdecl.mem o axs) then o else
-  let spares = try Wdecl.find wt o with Not_found -> Sdecl.empty in
-  try Sdecl.min_elt (Sdecl.diff spares axs) with Not_found ->
-  Wdecl.set wt o (Sdecl.add d spares); d
+let find_fresh_axiom = let wt = Wdecl.create 7 in fun knl d ->
+  let o = Hsdecl.hashcons d in (* o.d_news is the prsymbol *)
+  if not (Mid.set_submap o.d_news knl) then o else
+  let q = try Wdecl.find wt o with Not_found ->
+    let q = Queue.create () in Wdecl.set wt o q; q in
+  let exception Found of decl in
+  try
+    Queue.iter (fun d ->
+      if not (Mid.set_submap d.d_news knl) then raise (Found d)) q;
+    Queue.add d q;
+    d
+  with Found d -> d
 
 let pr_of_premise f =
   let nm = Ident.get_hyp_name ~attrs:f.t_attrs in
   let nm = Opt.get_def "H" nm in
   create_prsymbol (id_fresh nm ~attrs:intro_attrs)
 
-let rec intros kn pr axs mal old_pushed f =
+let rec intros kn knl pr mal old_pushed f =
   let pushed = Mstr.union (fun _ _ a -> Some a) old_pushed (pushed_attrs f) in
   let move_attrs f = Mstr.fold (fun _ -> t_attr_add) pushed f in
   match f.t_node with
@@ -184,38 +202,41 @@ let rec intros kn pr axs mal old_pushed f =
       let f1 = dequant ht false f1 in
       let fl = Split_goal.split_intro_right ?known_map:kn f1 in
       (* construct new premises, reusing lsymbols and propositions *)
-      let add (subst,axs,dl) f =
+      let add (knl,subst,dl) f =
         let svs = Mvs.set_diff (t_freevars Mvs.empty f) subst in
-        let subst, dl = Mvs.fold (fun vs _ (subst,dl) ->
-          let (subst,_), d = intro_var (subst, []) (vs, Hvs.find ht vs) in
-          subst, d::dl) svs (subst, dl) in
+        let knl, subst, dl = Mvs.fold (fun vs _ (knl,subst,dl) ->
+          let (knl,subst,_), d = intro_var (knl, subst, []) (vs, Hvs.find ht vs) in
+          knl, subst, d::dl) svs (knl, subst, dl) in
         (* only reuse the name when fl is a singleton *)
         let prx = match mal, fl with
           | Theory.MApr pr :: _, [_] -> pr
           | _, _ -> pr_of_premise f in
         let d = create_prop_decl Paxiom prx (t_subst subst f) in
-        let d = find_fresh_axiom axs d in
-        subst, Sdecl.add d axs, d::dl in
+        let d = find_fresh_axiom knl d in
+        let add id knl = Mid.add_new clash_exn id d knl in
+        let knl = Sid.fold add d.d_news knl in
+        knl, subst, d::dl in
       (* consume the topmost name *)
       let mal = match mal with
         | Theory.MApr _ :: mal -> mal
         | _ -> mal in
-      let _,axs,dl = List.fold_left add (Mvs.empty,axs,[]) fl in
-      List.rev_append dl (intros kn pr axs mal pushed f2)
+      let knl,_,dl = List.fold_left add (knl,Mvs.empty,[]) fl in
+      List.rev_append dl (intros kn knl pr mal pushed f2)
   | Tquant (Tforall,fq) ->
       let vsl,_trl,f_t = t_open_quant fq in
       let vsl = List.combine vsl (t_peek_quant fq) in
-      let (subst, mal), dl =
-        Lists.map_fold_left intro_var (Mvs.empty, mal) vsl in
+      let (knl, subst, mal), dl =
+        Lists.map_fold_left intro_var (knl, Mvs.empty, mal) vsl in
       (* preserve attributes and location of f  *)
       let f = t_attr_copy f (t_subst subst f_t) in
-      dl @ intros kn pr axs mal pushed f
+      dl @ intros kn knl pr mal pushed f
   | Tlet (t,fb) ->
       let vs, f = t_open_bound fb in
-      let ls, mal = ls_of_vs mal vs (t_peek_bound fb) in
+      let ls, mal = ls_of_vs knl mal vs (t_peek_bound fb) in
       let f = t_subst_single vs (fs_app ls [] vs.vs_ty) f in
       let d = create_logic_decl [make_ls_defn ls [] t] in
-      d :: intros kn pr axs mal pushed f
+      let knl = Mid.add_new clash_exn ls.ls_name d knl in
+      d :: intros kn knl pr mal pushed f
   | _ -> [create_prop_decl Pgoal pr (move_attrs f)]
 
 let intros kn mal pr f =
@@ -225,7 +246,8 @@ let intros kn mal pr f =
   let decls = Mtv.map create_ty_decl tvm in
   let subst = Mtv.map (fun ts -> ty_app ts []) tvm in
   let f = t_ty_subst subst Mvs.empty f in
-  let dl = intros kn pr Sdecl.empty mal Mstr.empty f in
+  let knl = Opt.get_def Mid.empty kn in
+  let dl = intros kn knl pr mal Mstr.empty f in
   Mtv.values decls @ dl
 
 let rec introduce hd =

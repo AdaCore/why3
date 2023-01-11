@@ -1224,7 +1224,7 @@ let check_used_gen ~check_present pv =
 let check_used_pv e pv =
   let check_present pv = Spv.mem pv e.e_effect.eff_reads in
   try check_used_gen ~check_present pv with
-  | Unused (loc, msg) -> Warning.emit ?loc "%s" msg
+  | Unused (loc, msg) -> Loc.warning ?loc "%s" msg
 
 (* Return warnings if unused variables are found in functions spec/body:
    [bl] is the list of arguments,
@@ -1274,7 +1274,7 @@ let check_unused_vars_fun (bl: Ity.pvsymbol list) (dsp: dspec_final) eff_reads =
     let check_present pv = Mvs.mem pv.pv_vs fvars_uc in
     let check_used pv =
       try check_used_gen ~check_present pv with
-      | Unused (loc, msg) -> Warning.emit ?loc "%s" msg
+      | Unused (loc, msg) -> Loc.warning ?loc "%s" msg
     in
     (* Check the usage of normal arguments *)
     List.iter check_used bl;
@@ -1291,7 +1291,7 @@ let check_unused_vars_fun (bl: Ity.pvsymbol list) (dsp: dspec_final) eff_reads =
       in
       match unused with
       | Some (loc, msg) when loc <> None
-         (* loc = None not supported for results *) -> Warning.emit ?loc "%s" msg
+         (* loc = None not supported for results *) -> Loc.warning ?loc "%s" msg
       | _ -> ()
     with Exit -> ()
   end
@@ -1322,7 +1322,7 @@ let cty_of_spec loc env bl mask dsp dity =
   let check_affected _ pv =
     if not (pv_affected cty.cty_effect.eff_writes pv) &&
         not (Sattr.mem attr_w_unmodified_var_no pv.pv_vs.vs_name.id_attrs) then
-      Warning.emit ?loc
+      Loc.warning ?loc
       "variable %s is used under `old` but is not modified by the function"
         pv.pv_vs.vs_name.id_string in
   Mpv.iter check_affected cty.cty_oldies; *)
@@ -1391,7 +1391,7 @@ let rec expr uloc env ({de_loc = loc} as de) =
 
 and cexp uloc env ({de_loc = loc} as de) lpl =
   let uloc, attrs, de = strip uloc Sattr.empty de in
-  if not (Sattr.is_empty attrs) then Warning.emit ?loc
+  if not (Sattr.is_empty attrs) then Loc.warning ?loc
     "Ignoring attributes over a higher-order expression";
   Loc.try4 ?loc try_cexp uloc env de lpl
 
@@ -1622,7 +1622,7 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
         let pl = List.rev_map (fun (p,_) -> [p.pp_pat]) bl in
         Pattern.is_exhaustive [t_var v] pl in
       let bl = if exhaustive then bl else begin
-        if List.length bl > 1 then Warning.emit ?loc:de0.de_loc
+        if List.length bl > 1 then Loc.warning ?loc:de0.de_loc
           "Non-exhaustive pattern matching, asserting `absurd'";
         let _,pp = create_prog_pattern PPwild e1.e_ity mask in
         (pp, e_absurd (ity_of_dity res)) :: bl end in

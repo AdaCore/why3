@@ -10,7 +10,8 @@
 (********************************************************************)
 
 val parse_file:
+  Whyconf.main ->
   (string -> Lexing.lexbuf) -> Lexing.lexbuf -> Driver_ast.file
 val parse_file_extract:
+  Whyconf.main ->
   (string -> Lexing.lexbuf) -> Lexing.lexbuf -> Driver_ast.file_extract
-

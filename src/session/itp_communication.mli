@@ -9,6 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {1 Communication protocol for the ITP server} *)
 
 (* Name and description *)
 type transformation = (string * string)

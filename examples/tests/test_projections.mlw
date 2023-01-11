@@ -1,0 +1,9 @@
+type t =
+| A (x : unit) (y : int)
+| B (y : int) (x : unit)
+goal g: forall x:t. x = x /\ (x.y = 0 || x.y <> 0)
+
+
+type u = { a : bool; b : int }
+predicate f (x : u) = match x with { a = a } -> a = True end /\ x.a = True
+lemma L: f { a = True; b = 12 }

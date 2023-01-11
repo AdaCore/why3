@@ -181,7 +181,7 @@ Logical annotations are inserted in special comments starting with ``#@``.
 
 .. productionlist:: microPython
    file: `decl`*
-   decl: `py_import` | `py_function` | `stmt` | `logic_declaration`
+   decl: `py_import` | `py_constant` | `py_function` | `stmt` | `logic_declaration`
    py_import: "from" identifier "import" identifier ("," identifier)* NEWLINE
 
 Directives ``import`` are ignored during the translation to
@@ -189,10 +189,15 @@ Why3. They are allowed anyway, such that a Python source code using
 functions such as ``randint`` is accepted by a Python
 interpreter (see below).
 
+..  rubric:: Constant definition
+
+.. productionlist:: microPython
+    py_constant: "#@" "constant" NEWLINE identifier "=" `expr` NEWLINE
+
 ..  rubric:: Function definition
 
 .. productionlist:: microPython
-    py_function: "def" identifier "(" `params`? ")" `return_type`? ":" NEWLINE INDENT `spec`* `stmt`* DEDENT
+    py_function: `logic_def`? "def" identifier "(" `params`? ")" `return_type`? ":" NEWLINE INDENT `spec`* `stmt`* DEDENT
     params: `param` ("," `param`)*
     param: identifier (":" `py_type`)?
     return_type: "->" `py_type`
@@ -202,6 +207,7 @@ interpreter (see below).
 .. rubric:: Function specification
 
 .. productionlist:: microPython
+   logic_def: "#@" "function" NEWLINE
    spec: "#@" "requires" `term` NEWLINE
         : | "#@" "ensures"  `term` NEWLINE
         : | "#@" "variant"  `term` ("," `term`)* NEWLINE
@@ -215,7 +221,9 @@ interpreter (see below).
        : | "-" `expr` | "not" `expr`
        : | `expr` ( "+" | "-" | "*" | "//" | "%" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "and" | "or" ) `expr`
        : | identifier "(" (`expr` ("," `expr`)*)? ")"
+       : | `expr` ("," `expr`)+
        : | "[" (`expr` ("," `expr`)*)? "]"
+       : | `expr` "if" `expr` "else" `expr`
        : | "(" `expr` ")"
 
 .. rubric:: Python statement
@@ -245,8 +253,10 @@ interpreter (see below).
 .. rubric:: Logic declaration
 
 .. productionlist:: microPython
-   logic_declaration: "#@" "function" identifier "(" `params` ")" `return_type`? ("=" `term`)? NEWLINE
+   logic_declaration: "#@" "function" identifier "(" `params` ")" `return_type`? ("variant" "{" `term` "}")? ("=" `term`)? NEWLINE
                  : | "#@" "predicate" identifier "(" `params` ")" ("=" `term`)? NEWLINE
+                 : | "#@" "axiom" identifier ":" `term` NEWLINE
+                 : | "#@" "lemma" identifier ":" `term` NEWLINE
 
 Note that logic functions and predicates cannot be given definitions.
 Yet, they can be axiomatized, using toplevel ``assume`` statements.
@@ -267,7 +277,7 @@ Yet, they can be axiomatized, using toplevel ``assume`` statements.
        : | "old" "(" `term` ")"
        : | "at" "(" `term` "," identifier ")"
        : | "-" `term`
-       : | `term` ( "->" | "<->" | "or" | "and" ) `term`
+       : | `term` ( "->" | "<->" | "or" | "and" | "by" | "so" ) `term`
        : | `term` ( "==" | "!=" | "<" | "<=" | ">" | ">=" ) `term`
        : | `term` ( "+" | "-" | "*" | "//" | "%" ) `term`
        : | "if" `term` "then" `term` "else `term`

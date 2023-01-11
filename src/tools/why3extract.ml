@@ -82,9 +82,8 @@ let config, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let () =
-  if Queue.is_empty opt_queue then begin
-    Whyconf.Args.exit_with_usage option_list usage_msg
-  end
+  if Queue.is_empty opt_queue then
+    Whyconf.Args.exit_with_usage usage_msg
 
 let opt_modu_flat  = !opt_modu_flat
 let opt_rec_single = !opt_rec_single
@@ -105,22 +104,13 @@ let opt_output = match opt_modu_flat, !opt_output with
       exit 1
   | Modular, Some _ | Flat, None | Flat, Some _ -> !opt_output
 
-let driver_file s =
-  if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
-  else begin
-      let main = Whyconf.get_main config in
-      Filename.concat
-        (Whyconf.datadir main)
-        (Filename.concat "extraction_drivers" (s ^ ".drv"))
-    end
-
 let opt_driver =
-  try match List.rev_map driver_file !opt_driver with
+  try match List.rev !opt_driver with
     | [] ->
         eprintf "Extraction driver (-D) is required.@.";
         exit 1
     | f::ef ->
-        Pdriver.load_driver env f ef
+        Pdriver.load_driver (Whyconf.get_main config) env f ef
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

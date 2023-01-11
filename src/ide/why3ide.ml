@@ -16,10 +16,10 @@ open Wstdlib
 open Ide_utils
 open History
 open Itp_communication
-open Gtkcompat
+
+module GSourceView = GSourceView3
 
 let debug = Debug.lookup_flag "ide_info"
-let debug_stack_trace = Debug.lookup_flag "stack_trace"
 
 let () =
   (* Allow global locations to be saved for Find_ident_req *)
@@ -120,7 +120,7 @@ let send_request r = Protocol_why3ide.send_request r
 let backtrace_and_exit f () =
   try f () with
   | e ->
-     if Debug.test_flag debug_stack_trace then
+     if Debug.test_flag Debug.stack_trace then
        begin
          Printexc.print_backtrace stderr;
          Format.eprintf "exception '%a' was raised in a LablGtk callback.@."
@@ -183,7 +183,7 @@ let env, gconfig =
       Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
     in
     if Queue.is_empty files then
-      Whyconf.Args.exit_with_usage spec usage_str;
+      Whyconf.Args.exit_with_usage usage_str;
     Gconfig.load_config config;
     env, Gconfig.config ()
   with e when not (Debug.test_flag Debug.stack_trace) ->
@@ -403,13 +403,13 @@ let record_warning ?loc msg =
   Queue.push (loc,msg) warnings
 
 let () =
-  Warning.set_hook record_warning;
+  Loc.set_warning_hook record_warning;
   let dir =
     try
       Server_utils.get_session_dir ~allow_mkdir:true files
     with Invalid_argument s ->
       Format.eprintf "Error: %s@." s;
-      Whyconf.Args.exit_with_usage spec usage_str
+      Whyconf.Args.exit_with_usage usage_str
   in
   Server.init_server gconfig.config env dir;
   Queue.iter (fun f ->
@@ -682,7 +682,7 @@ let monitor =
 
 let command_entry =
   GEdit.entry
-    ~text:"type commands here"
+    ~placeholder_text:"type commands here"
     ~packing:hbox22221#add ()
 
 (* Part 2.2.2.2.2 contains messages returned by the IDE/server *)
@@ -1480,15 +1480,6 @@ let (_ : GtkSignal.id) =
         interp cmd
       end in
   command_entry#connect#activate ~callback
-
-(* remove the helper text from the command entry the first time it gets the focus *)
-let () =
-  let id = ref None in
-  let callback _ =
-    clear_command_entry ();
-    GtkSignal.disconnect command_entry#as_entry (Opt.get !id);
-    false in
-  id := Some (command_entry#event#connect#focus_in ~callback)
 
 let on_selected_row r =
   try

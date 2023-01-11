@@ -278,7 +278,7 @@ let rec descend vml t = match t.t_node with
 let t_compare ~trigger ~attr ~loc ~const t1 t2 =
   let comp_raise c =
     if c < 0 then raise CompLT else if c > 0 then raise CompGT in
-  let perv_compare h1 h2 = comp_raise (Pervasives.compare h1 h2) in
+  let perv_compare h1 h2 = comp_raise (Stdlib.compare h1 h2) in
   let rec pat_compare (bnd,bv1,bv2 as state) p1 p2 =
     match p1.pat_node, p2.pat_node with
     | Pwild, Pwild ->
@@ -1500,7 +1500,7 @@ let t_open_lambda_cb t =
 
 let t_closure ls tyl ty =
   let mk_v i ty = create_vsymbol (id_fresh ("y" ^ string_of_int i)) ty in
-  let vl = Lists.mapi mk_v tyl in
+  let vl = List.mapi mk_v tyl in
   let t = t_app ls (List.map t_var vl) ty in
   t_lambda vl [] t
 
@@ -1627,6 +1627,7 @@ let small t = match t.t_node with
 
 let v_copy_unused v =
   let id = v.vs_name in
+  if Sattr.mem Ident.unused_attr id.id_attrs then v else
   let attrs = Sattr.singleton Ident.unused_attr in
   let attrs =
     try

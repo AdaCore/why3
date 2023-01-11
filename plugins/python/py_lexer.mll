@@ -24,14 +24,15 @@
     let h = Hashtbl.create 32 in
     List.iter (fun (s, tok) -> Hashtbl.add h s tok)
       ["def", DEF; "if", IF; "else", ELSE; "elif", ELIF;
-       "return", RETURN; "while", WHILE;
+       "return", RETURN; "while", WHILE; "pass", PASS;
        "for", FOR; "in", IN;
        "and", AND; "or", OR; "not", NOT;
        "True", TRUE; "False", FALSE; "None", NONE;
        "from", FROM; "import", IMPORT; "break", BREAK; "continue", CONTINUE;
        (* annotations *)
        "forall", FORALL; "exists", EXISTS; "then", THEN; "let", LET;
-       "old", OLD; "at", AT;
+       "old", OLD; "at", AT; "variant", VARIANT; "call", CALL;
+       "by", BY; "so", SO;
       ];
    fun s -> try Hashtbl.find h s with Not_found -> IDENT s
 
@@ -41,6 +42,7 @@
       ["invariant", INVARIANT; "variant", VARIANT;
        "assert", ASSERT; "assume", ASSUME; "check", CHECK;
        "requires", REQUIRES; "ensures", ENSURES;
+       "axiom", AXIOM; "lemma", LEMMA; "call", CALL; "constant", CONSTANT;
        "label", LABEL; "function", FUNCTION; "predicate", PREDICATE;
       ];
     fun s -> try Hashtbl.find h s with Not_found ->
@@ -109,6 +111,8 @@ rule next_tokens = parse
   | ')'     { [RIGHTPAR] }
   | '['     { [LEFTSQ] }
   | ']'     { [RIGHTSQ] }
+  | '{'     { [LEFTBR] }
+  | '}'     { [RIGHTBR] }
   | ','     { [COMMA] }
   | ':'     { [COLON] }
   (* logic symbols *)

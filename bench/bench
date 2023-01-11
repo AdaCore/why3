@@ -17,7 +17,7 @@ shopt -s nullglob
 
 suffix=
 
-categories="badfiles drivers execution extraction goodfiles inferloop invalidgoals list mlwprinter rac realizations replay replay-without-shapes stdlib steplimit memlimit validgoals validsplitgoals stackify"
+categories="badfiles bddinfer drivers execution extraction goodfiles inferloop invalidgoals list mlwprinter rac realizations replay replay-without-shapes stdlib steplimit memlimit validgoals validsplitgoals stackify"
 
 enabled_categories=""
 
@@ -150,10 +150,14 @@ drivers () {
     test -d $1 || exit 1
     for f in $1/*.drv; do
         printf "  $f... "
+        # using the basename only, otherwise there would be an
+        # ambiguity signaled, drivers/d.drv being both present in the
+        # current directory and in DATADIR/drivers (they are the same!)
+        b=`basename $f`
         # running Why
-        if ! echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver=$f - > /dev/null; then
+        if ! echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver=$b - > /dev/null; then
             echo "failed!"
-            echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver=$f -
+            echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver=$b -
             exit 1
         fi
         echo "ok"
@@ -484,7 +488,7 @@ goods bench/typing/good
 goods bench/typing/x-good --parse-only
 bads bench/typing/x-good --type-only
 goods bench/programs/good
-goods bench/ce
+goods bench/check-ce "-L bench/check-ce"
 goods src/trywhy3/examples/whyml "--debug=ignore_missing_diverges"
 goods src/trywhy3/examples/python "--debug=ignore_missing_diverges"
 goods src/trywhy3/examples/micro-c "--debug=ignore_missing_diverges"
@@ -727,6 +731,11 @@ test_mlw_printer
 fi
 
 if enabled inferloop && test -n "$has_infer"; then
-    echo "=== Checking loop invariant inference ==="
+    echo "=== Checking loop invariant inference with inferloop component ==="
     bench/infer-bench bench/infer
+fi
+
+if enabled bddinfer && test -n "$has_infer"; then
+    echo "=== Checking loop invariant inference with bddinfer component ==="
+    bench/bddinfer-bench bench/infer
 fi

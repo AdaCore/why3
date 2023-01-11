@@ -1,0 +1,12 @@
+Invariant for loop [anonymous_loop_0] is
+  (0 <= j.contents /\ j.contents <= 18) /\
+  (i.contents * 2) = (j.contents + 2)
+Domains for loop [anonymous_loop_0] are i = [1;10]; j = [0;18]
+Invariant for loop [anonymous_loop_1] is
+  (0 <= j.contents /\ j.contents <= 18) /\
+  (i.contents * 2) = (j.contents + 2)
+Domains for loop [anonymous_loop_1] are i = [1;10]; j = [0;18]
+File bench/infer/while3.mlw:
+Goal b'vc.
+Prover result is: Valid (0.01s, 51 steps).
+

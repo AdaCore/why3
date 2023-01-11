@@ -1,0 +1,29 @@
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/simple_array.mlw", line 6, characters 3-31)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/simple_array.mlw", line 6, characters 3-31)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/simple_array.mlw", line 6, characters 3-31)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/simple_array.mlw", line 6, characters 3-31)
+File "bench/check-ce/simple_array.mlw", line 6, characters 3-31:
+Goal t1.
+Prover result is: Unknown (sat).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File simple_array.mlw:
+  Line 5:
+    t = [|0 -> 3; _ -> 2|]
+    i = 0
+    t = [|0 -> 3; _ -> 2|]
+    i = 0
+    Execution of main function `t1'goal` with env:
+      i = 0
+      t = [|0 -> 3; _ -> 2|]
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File simple_array.mlw:
+  Line 6:
+    Property failure at postcondition of `t1'goal` with:
+      i = 0
+      t = [|0 -> 3; _ -> 2|]
+

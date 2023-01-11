@@ -1,0 +1,138 @@
+File "bench/check-ce/jlamp_projections.mlw", line 29, characters 8-18:
+Sub-goal Precondition of goal p3'vc.
+Prover result is: Valid.
+
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18)
+File "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18:
+Sub-goal Integer overflow of goal p3'vc.
+Prover result is: Unknown (sat).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File jlamp_projections.mlw:
+  Line 28:
+    a = {to_int => 127}
+    a = {to_int => 127}
+    Execution of main function `p3` with env:
+      a = {to_int => 127}
+      zero = 0
+      one = 1
+  Line 29:
+    (giant-step) execution of unimplemented function `of_int`
+      x = 1
+    result of `of_int` = {to_int => 1}
+    (giant-step) execution of unimplemented function `add`
+      x = {to_int => 127}
+      y = {to_int => 1}
+    Property failure at precondition of `add` with:
+      x = {to_int => 127}
+      y = {to_int => 1}
+
+File "bench/check-ce/jlamp_projections.mlw", line 42, characters 14-24:
+Sub-goal Precondition of goal p3'vc.
+Prover result is: Valid.
+
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24)
+File "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24:
+Sub-goal Integer overflow of goal p3'vc.
+Prover result is: Unknown (sat).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File jlamp_projections.mlw:
+  Line 41:
+    a = {contents= {to_int => 127}}
+    a = {contents= {to_int => 127}}
+    Execution of main function `p3` with env:
+      a = {contents= {to_int => 127}}
+      zero = 0
+      one = 1
+  Line 42:
+    (giant-step) execution of unimplemented function `of_int`
+      x = 1
+    result of `of_int` = {to_int => 1}
+    Normal execution of function `(!)` with args:
+      r = {contents= {to_int => 127}}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= {to_int => 127}}
+File jlamp_projections.mlw:
+  Line 42:
+    (giant-step) execution of unimplemented function `add`
+      x = {to_int => 127}
+      y = {to_int => 1}
+    Property failure at precondition of `add` with:
+      x = {to_int => 127}
+      y = {to_int => 1}
+
+File "bench/check-ce/jlamp_projections.mlw", line 54, characters 29-39:
+Sub-goal Precondition of goal p4'vc.
+Prover result is: Valid.
+
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 54, characters 21-39)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 54, characters 21-39)
+File "bench/check-ce/jlamp_projections.mlw", line 54, characters 21-39:
+Sub-goal Integer overflow of goal p4'vc.
+Prover result is: Unknown (sat).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File jlamp_projections.mlw:
+  Line 53:
+    b = {f= {to_int => 127}; g= true}
+    b = {f= {to_int => 127}; g= true}
+    Execution of main function `p4` with env:
+      b = {f= {to_int => 127}; g= true}
+      zero = 0
+      one = 1
+  Line 54:
+    Normal execution of function `g` with args:
+      arg = {f= {to_int => 127}; g= true}
+    (giant-step) execution of unimplemented function `of_int`
+      x = 1
+    result of `of_int` = {to_int => 1}
+    Normal execution of function `f` with args:
+      arg = {f= {to_int => 127}; g= true}
+    (giant-step) execution of unimplemented function `add`
+      x = {to_int => 127}
+      y = {to_int => 1}
+    Property failure at precondition of `add` with:
+      x = {to_int => 127}
+      y = {to_int => 1}
+

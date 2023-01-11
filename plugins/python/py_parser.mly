@@ -24,6 +24,7 @@
   let mk_term d s e = { term_desc = d; term_loc = floc s e }
   let mk_expr loc d = { expr_desc = d; expr_loc = loc }
   let mk_stmt loc d = Dstmt { stmt_desc = d; stmt_loc = loc }
+  let mk_var id = mk_expr id.id_loc (Eident id)
 
   let variant_union v1 v2 = match v1, v2 with
     | _, [] -> v1
@@ -71,22 +72,24 @@
 %token <string> STRING
 %token <Py_ast.binop> CMP
 %token <string> IDENT QIDENT TVAR
-%token DEF IF ELSE ELIF RETURN WHILE FOR IN AND OR NOT NONE TRUE FALSE
+%token DEF IF ELSE ELIF RETURN WHILE FOR IN AND OR NOT NONE TRUE FALSE PASS
 %token FROM IMPORT BREAK CONTINUE
 %token EOF
-%token LEFTPAR RIGHTPAR LEFTSQ RIGHTSQ COMMA EQUAL COLON BEGIN END NEWLINE 
+%token LEFTPAR RIGHTPAR LEFTSQ RIGHTSQ COMMA EQUAL COLON BEGIN END NEWLINE
        PLUSEQUAL MINUSEQUAL TIMESEQUAL DIVEQUAL MODEQUAL
+       LEFTBR RIGHTBR
 %token PLUS MINUS TIMES DIV MOD
 (* annotations *)
 %token INVARIANT VARIANT ASSUME ASSERT CHECK REQUIRES ENSURES LABEL
-%token FUNCTION PREDICATE
-%token ARROW LARROW LRARROW FORALL EXISTS DOT THEN LET OLD AT
+%token FUNCTION PREDICATE AXIOM LEMMA CONSTANT CALL
+%token ARROW LARROW LRARROW FORALL EXISTS DOT THEN LET OLD AT BY SO
 
 (* precedences *)
 
 %nonassoc IN
 %nonassoc DOT ELSE
-%right ARROW LRARROW
+%right ARROW LRARROW BY SO
+%nonassoc IF
 %right OR
 %right AND
 %nonassoc NOT
@@ -119,20 +122,37 @@ decl:
 | def    { $1 }
 | stmt   { $1 }
 | func   { $1 }
+| prop   { $1 }
+| const  { $1 }
 
 import:
 | FROM m=ident IMPORT l=separated_list(COMMA, ident) NEWLINE
   { Dimport (m, l) }
 
+const:
+| CONSTANT NEWLINE id = ident EQUAL e = expr NEWLINE
+  { Dconst (id,e) }
+
+prop:
+| LEMMA id=ident COLON t=term NEWLINE
+  { Dprop (Decl.Plemma, id, t) }
+| AXIOM id=ident COLON t=term NEWLINE
+  { Dprop (Decl.Paxiom, id, t) }
+
 func:
 | FUNCTION id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR
-  ty=option(function_type) def=option(logic_body) NEWLINE
+  ty=option(function_type) var = option(fp_variant) def=option(logic_body)
+  NEWLINE
   { let loc = floc $startpos $endpos in
-    Dlogic (id, List.map (logic_param loc) l, Some (logic_type loc ty), def) }
+    Dlogic (id, List.map (logic_param loc) l, Some (logic_type loc ty),
+            var, def) }
 | PREDICATE id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR
-  def=option(logic_body) NEWLINE
+  var=option(fp_variant) def=option(logic_body) NEWLINE
   { let loc = floc $startpos $endpos in
-    Dlogic (id, List.map (logic_param loc) l, None, def) }
+    Dlogic (id, List.map (logic_param loc) l, None, var, def) }
+
+fp_variant:
+| LEFTBR VARIANT v=term RIGHTBR { v }
 
 logic_body:
 | EQUAL t=term
@@ -160,18 +180,35 @@ typ:
     then PTtyapp (Qident id, [fresh_type_var (floc $startpos $endpos)])
     else PTtyapp (Qident id, []) }
 | id=ident LEFTSQ tyl=separated_nonempty_list(COMMA, typ) RIGHTSQ
-  { PTtyapp (Qident id, tyl) }
+    {
+      if id.id_str = "Tuple" then PTtuple tyl else PTtyapp (Qident id, tyl)
+    }
 
 def:
-| DEF f = ident LEFTPAR x = separated_list(COMMA, param) RIGHTPAR
-  ty=option(function_type) COLON NEWLINE BEGIN s=spec l=nonempty_list(stmt) END
+| fct = as_funct
+  DEF f = ident LEFTPAR x = separated_list(COMMA, param) RIGHTPAR
+  ty=option(function_type) COLON NEWLINE BEGIN s=spec l=body END
     {
       if f.id_str = "range" then
         let loc = floc $startpos $endpos in
         Loc.errorm ~loc "micro Python does not allow shadowing 'range'"
-      else Ddef (f, x, ty, s, l)
+      else if fct && ty = None then
+        let loc = floc $startpos $endpos in
+        Loc.errorm ~loc "a logical function should not return a unit type"
+      else Ddef (f, x, ty, s, l ty s, fct)
     }
 ;
+
+as_funct:
+| FUNCTION NEWLINE { true  }
+| (* epsilon *)    { false }
+;
+
+body:
+| nonempty_list(stmt)
+  { fun _ _ -> $1 }
+| PASS NEWLINE
+  { fun ty s -> [mk_stmt (floc $startpos $endpos) (Spass (ty, s))] }
 
 spec:
 | (* epsilon *)     { empty_spec }
@@ -208,7 +245,24 @@ expr:
    { mk_expr (floc $startpos $endpos) d }
 ;
 
+/*
 expr_desc:
+  e = expr_nt { e.expr_desc }
+| e1 = expr_nt COMMA el = separated_list(COMMA, expr_nt)
+    { Etuple (e1::el) }
+;
+*/
+expr_desc:
+  e = expr_nt_desc { e }
+| e = expr_nt COMMA el = separated_list(COMMA, expr_nt) { Etuple (e::el) }
+;
+
+expr_nt:
+| d = expr_nt_desc
+   { mk_expr (floc $startpos $endpos) d }
+;
+
+expr_nt_desc:
 | NONE
     { Enone }
 | TRUE
@@ -219,10 +273,9 @@ expr_desc:
     { Eint c }
 | s = STRING
     { Estring s }
-| e1 = expr LEFTSQ e2 = expr RIGHTSQ
+| e1 = expr_nt LEFTSQ e2 = expr_nt RIGHTSQ
     { Eget (e1, e2) }
-
-| e1 = expr LEFTSQ e2=option(expr) COLON e3=option(expr) RIGHTSQ
+| e1 = expr_nt LEFTSQ e2=option(expr_nt) COLON e3=option(expr_nt) RIGHTSQ
     {
       let f = mk_id "slice" $startpos $endpos in
       let none = mk_expr (floc $startpos $endpos) Enone in
@@ -234,18 +287,17 @@ expr_desc:
       in
       Ecall(f,[e1;e2;e3])
     }
-
-| MINUS e1 = expr %prec unary_minus
+| MINUS e1 = expr_nt %prec unary_minus
     { Eunop (Uneg, e1) }
-| NOT e1 = expr
+| NOT e1 = expr_nt
     { Eunop (Unot, e1) }
-| e1 = expr o = binop e2 = expr
+| e1 = expr_nt o = binop e2 = expr_nt
     { Ebinop (o, e1, e2) }
-| e1 = expr TIMES e2 = expr
+| e1 = expr_nt TIMES e2 = expr_nt
     { match e1.expr_desc with
       | Elist [e1] -> Emake (e1, e2)
       | _ -> Ebinop (Bmul, e1, e2) }
-| e=expr_dot DOT f=ident LEFTPAR el=separated_list(COMMA, expr) RIGHTPAR
+| e=expr_dot DOT f=ident LEFTPAR el=separated_list(COMMA, expr_nt) RIGHTPAR
     {
       match f.id_str with
       | "pop" | "append" | "reverse" | "clear" | "copy" | "sort" ->
@@ -253,10 +305,12 @@ expr_desc:
       | m -> let loc = floc $startpos $endpos in
              Loc.errorm ~loc "The method '%s' is not implemented" m
     }
-| f = ident LEFTPAR e = separated_list(COMMA, expr) RIGHTPAR
+| f = ident LEFTPAR e = separated_list(COMMA, expr_nt) RIGHTPAR
     { Ecall (f, e) }
-| LEFTSQ l = separated_list(COMMA, expr) RIGHTSQ
+| LEFTSQ l = separated_list(COMMA, expr_nt) RIGHTSQ
     { Elist l }
+| e1=expr_nt IF c=expr_nt ELSE e2=expr_nt
+    { Econd(c,e1,e2) }
 | e=expr_dot_
     { e }
 ;
@@ -287,9 +341,9 @@ stmt:
 | s = simple_stmt NEWLINE { s }
 
 stmt_desc:
-| IF c = expr COLON s1 = suite s2=else_branch
+| IF c = expr_nt COLON s1 = suite s2=else_branch
     { Sif (c, s1, s2) }
-| WHILE e = expr COLON b=loop_body
+| WHILE e = expr_nt COLON b=loop_body
     { let i, v, l = b in Swhile (e, i, v, l) }
 | FOR x = ident IN e = expr COLON b=loop_body
     { let i, _, l = b in Sfor (x, e, i, l) }
@@ -300,7 +354,7 @@ else_branch:
     { [] }
 | ELSE COLON s2=suite
     { s2 }
-| ELIF c=expr COLON s1=suite s2=else_branch
+| ELIF c=expr_nt COLON s1=suite s2=else_branch
     { [mk_stmt (floc $startpos $endpos) (Sif (c, s1, s2))] }
 
 
@@ -329,34 +383,36 @@ simple_stmt: located(simple_stmt_desc) { $1 };
 simple_stmt_desc:
 | RETURN e = expr
     { Sreturn e }
-| id = ident EQUAL e = expr
-    { Sassign (id, e) }
-| id=ident o=binop_equal e=expr
-    { Sassign (id, mk_expr (floc $startpos $endpos) (Ebinop (o, mk_expr (floc $startpos $endpos) (Eident id), e))) }
-| e1 = expr LEFTSQ e2 = expr RIGHTSQ EQUAL e3 = expr
-    { Sset (e1, e2, e3) }
-| e0 = expr LEFTSQ e1 = expr RIGHTSQ o=binop_equal e2 = expr
+| lhs = expr EQUAL rhs = expr { Sassign (lhs, rhs) }
+| id=ident o=binop_equal e=expr_nt
+    { let loc = floc $startpos $endpos in
+      Sassign (mk_var id,
+               mk_expr loc (Ebinop (o, mk_expr loc (Eident id), e))) }
+| e0 = expr_nt LEFTSQ e1 = expr_nt RIGHTSQ o=binop_equal e2 = expr
     {
       let loc = floc $startpos $endpos in
       let mk_expr_floc = mk_expr loc in
-
       let id = mk_id "'i" $startpos $endpos in
       let expr_id = mk_expr_floc (Eident id) in
-
       let a = mk_id "'a" $startpos $endpos in
       let expr_a = mk_expr_floc (Eident a) in
-
-      let operation = mk_expr_floc (Ebinop (o, mk_expr_floc (Eget(expr_a, expr_id)), e2)) in
-
-      let s1 = Dstmt ({ stmt_desc = Sassign (a, e0); stmt_loc = loc }) in
-      let s2 = Dstmt ({ stmt_desc = Sassign (id, e1); stmt_loc = loc }) in
-      let s3 = Dstmt ({ stmt_desc = Sset (expr_a, expr_id, operation); stmt_loc = loc }) in
-      Sblock [s1;s2;s3]
+      let operation =
+        mk_expr_floc (Ebinop (o, mk_expr_floc (Eget(expr_a, expr_id)), e2)) in
+      let s1 =
+        Dstmt ({ stmt_desc = Sassign (mk_var a, e0); stmt_loc = loc }) in
+      let s2 =
+        Dstmt ({ stmt_desc = Sassign (mk_var id, e1); stmt_loc = loc }) in
+      let s3 =
+        Dstmt ({ stmt_desc = Sset (expr_a, expr_id, operation);
+                 stmt_loc = loc }) in
+      Sblock [s1; s2; s3]
     }
 | k=assertion_kind t = term
     { Sassert (k, t) }
 | e = expr
     { Seval e }
+| CALL f = ident LEFTPAR e = separated_list(COMMA, term) RIGHTPAR
+    { Scall_lemma (f, e) }
 | BREAK
     { Sbreak }
 | CONTINUE
@@ -379,18 +435,25 @@ assertion_kind:
 | CHECK   { Expr.Check }
 
 ident:
-  id = IDENT { mk_id id $startpos $endpos }
+| id = IDENT { mk_id id $startpos $endpos }
 ;
 quote_ident:
-  id = QIDENT { mk_id id $startpos $endpos }
+| id = QIDENT { mk_id id $startpos $endpos }
 ;
 type_var:
-  id = TVAR { mk_id id $startpos $endpos }
+| id = TVAR { mk_id id $startpos $endpos }
 ;
 
 /* logic */
 
 mk_term(X): d = X { mk_term d $startpos $endpos }
+
+term_tuple: t = mk_term(term_tuple_) { t }
+
+term_tuple_:
+| t = term ; COMMA; lt=separated_list(COMMA, term)
+    { Ttuple (t::lt) }
+| t = term_ { t }
 
 term: t = mk_term(term_) { t }
 
@@ -440,17 +503,35 @@ term_arg_:
 | term_sub_                 { $1 }
 
 term_sub_:
-| LEFTPAR term RIGHTPAR                             { $2.term_desc }
+| LEFTPAR term_tuple RIGHTPAR                             { $2.term_desc }
 | term_arg LEFTSQ term RIGHTSQ
     { Tidapp (get_op $startpos($2) $endpos($2), [$1;$3]) }
 | term_arg LEFTSQ term LARROW term RIGHTSQ
     { Tidapp (upd_op $startpos($2) $endpos($2), [$1;$3;$5]) }
+| e1 = term_arg LEFTSQ e2=option(term) COLON e3=option(term) RIGHTSQ
+    {
+      let slice = mk_id "slice" $startpos $endpos in
+      let len = mk_id "len" $startpos $endpos in
+      let z = Tconst (Constant.int_const_of_int 0) in
+      let l = Tidapp(Qident len, [e1]) in
+      let z = mk_term z $startpos $endpos in
+      let l = mk_term l $startpos $endpos in
+      let e2, e3 = match e2, e3 with
+        | None, None -> z, l
+        | Some e, None -> e, l
+        | None, Some e -> z, e
+        | Some e, Some e' -> e, e'
+      in
+      Tidapp(Qident slice,[e1;e2;e3])
+    }
 
 %inline bin_op:
 | ARROW   { Dterm.DTimplies }
 | LRARROW { Dterm.DTiff }
 | OR      { Dterm.DTor }
 | AND     { Dterm.DTand }
+| BY      { Dterm.DTby }
+| SO      { Dterm.DTso }
 
 %inline infix_op_1:
 | c=CMP  { let op = match c with

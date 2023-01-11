@@ -41,7 +41,7 @@ let add_warning ?loc s =
   in
   warning_list := s :: !warning_list
 
-let () = Warning.set_hook add_warning
+let () = Loc.set_warning_hook add_warning
 
 let adapt_stats statsopt =
   match statsopt with

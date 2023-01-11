@@ -5,7 +5,7 @@ module Incr
 	use ref.Ref
 	use ref.Refint
 
-	let incr1[@infer](x:int) : int
+	let incr1 [@infer] [@bddinfer] (x:int) : int
 	  ensures { result = max x 0 }
 	= let i = ref 0 in
 	  while !i < x do
@@ -14,7 +14,7 @@ module Incr
 	  done;
 	  !i
 
-	let incr3[@infer:box](x:int) : int
+	let incr3 [@infer:box] [@bddinfer] (x:int) : int
 	  ensures { result = max x 0 }
 	= let i = ref 0 in
 	  while !i < x do

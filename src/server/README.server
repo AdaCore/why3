@@ -9,7 +9,8 @@ This is a VC server for Why3. It implements the following functionalities:
   in a queue od processes to be spawned. Process are spawned in
   parallel up to some maximal number.
 
-* when a process is spawned, server sends a message to the client of the form 'S;id' to inform it that process 'id' has started.
+* when a process is spawned, server sends a message to the client of the form
+  'S;id' to inform it that process 'id' has started.
 
 * when the process is terminated, either normally or by a ressource
   limit reached, server sends back a detailed message containing the
@@ -103,7 +104,8 @@ decrease this number. There is no server answer to this command.
 
   interrupt;id
 
-  will stop the process of the given id, killing it if it was already running
+will stop the process of the given id, killing it if it was already running.
+The client is notified of the interruption via the normal "F" message.
 
 == notes ==
 

@@ -1,0 +1,62 @@
+module Array
+
+  use int.Int
+  use map.Map
+
+  type t
+
+  function to_int  t : int
+  meta "model_projection" function to_int
+
+  val function two : t
+  axiom two_def : to_int two = 2
+
+  val function three : t
+  axiom three_def : to_int three = 3
+
+  type array = private {
+    mutable ghost elts : int -> t;
+                length : int
+  } invariant { 0 <= length }
+
+  function ([]) (a: array) (i: int) : t = a.elts i
+
+  val ([]) (a: array) (i: int) : t
+    requires { [@expl:index in array bounds] 0 <= i < length a }
+    ensures  { result = a[i] }
+
+  val ghost function ([<-]) (a: array) (i: int) (v: t): array
+    ensures { result.length = a.length }
+    ensures { result.elts = Map.set a.elts i v }
+
+  val ([]<-) (a: array) (i: int) (v: t) : unit writes {a}
+    requires { [@expl:index in array bounds] 0 <= i < length a }
+    ensures  { a.elts = Map.set (old a).elts i v }
+    ensures  { a = (old a)[i <- v] }
+
+end
+
+module Test
+
+  use int.Int
+  use Array
+
+  let f (a : array) : unit
+    requires { a[42] = three }
+    writes { a }
+    ensures { a[42] = three }
+  = a[42] <- two
+
+  let g (a : array) : unit
+    requires { a.length >= 43 /\ a[17] = three }
+    writes { a }
+    ensures { a[42] = three }
+  = a[42] <- two
+
+  let h (a : array) : unit
+    requires { a.length >= 43 /\ a[17] = three }
+    writes { a }
+    ensures { a[42] = three }
+  = a[17] <- two
+
+end

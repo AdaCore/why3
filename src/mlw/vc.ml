@@ -62,9 +62,9 @@ let model_trace_result_attribute = create_model_trace_attr "result"
 let explicit_result loc attrs ce ity =
   let name = match ce.c_node with
     | Capp (rs, _) ->
-       Format.asprintf "%a'result" Ident.print_decoded rs.rs_name.id_string
+       Format.asprintf "%s'result" rs.rs_name.id_string
     | Cpur (ls, _) ->
-       Format.asprintf "%a'result" Ident.print_decoded ls.ls_name.id_string
+       Format.asprintf "%s'result" ls.ls_name.id_string
     | Cfun _ -> "anonymous'result"
     | Cany -> "any'result"
   in
@@ -90,6 +90,7 @@ let wp_attr = Ident.create_attribute "vc:wp"
 let wb_attr = Ident.create_attribute "vc:white_box"
 let kp_attr = Ident.create_attribute "vc:keep_precondition"
 let nt_attr = Ident.create_attribute "vc:divergent"
+let trusted_wf_attr = Ident.create_attribute "vc:trusted_wf"
 
 let do_not_keep_trace_attr = Ident.create_attribute "vc:do_not_keep_trace"
 let do_not_keep_trace_flag = Debug.register_flag "vc:do_not_keep_trace"
@@ -145,7 +146,7 @@ let mk_env ?(attrs=Sattr.empty)
   keep_trace;
   }
 
-let acc env r t =
+let accessible env r t =
   let ps = env.ps_wf_acc in
   if not (Mid.mem ps.ls_name env.known_map) then
     Loc.errorm ?loc:t.t_loc "please import relations.WellFounded";
@@ -318,7 +319,10 @@ let decrease env loc attrs expl olds news =
   let rec decr olds news = match olds, news with
     | (old_t, Some old_r)::olds, (t, Some r)::news when ls_equal old_r r ->
         if t_equal old_t t then decr olds news else
-        let dt = t_and (ps_app r [t; old_t]) (acc env r old_t) in
+        let dt = ps_app r [t; old_t] in
+        let dt =
+          if Sattr.mem trusted_wf_attr r.ls_name.id_attrs then dt else
+            t_and dt (accessible env r old_t) in
         t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds news))
     | (old_t, None)::olds, (t, None)::news when oty_equal old_t.t_ty t.t_ty ->
         if t_equal old_t t then decr olds news else
@@ -595,7 +599,7 @@ let rec k_expr env lps e res xmap =
   let check_divergence k =
     if diverges eff.eff_oneway && not env.divergent then begin
       if Debug.test_noflag debug_ignore_diverges then
-      Warning.emit ?loc "termination@ of@ this@ expression@ \
+      Loc.warning ?loc "termination@ of@ this@ expression@ \
         cannot@ be@ proved,@ but@ there@ is@ no@ `diverges'@ \
         clause@ in@ the@ outer@ specification";
       Kpar (Kstop (vc_expl loc attrs expl_divergent t_false), k)
@@ -1544,7 +1548,7 @@ let rec sp_expr env k rdm dst = match k with
   | Kval (vl, f) ->
       let rd = Mint.find 0 rdm in
       let lost v = if Spv.mem v rd then None else Some v.pv_vs in
-      let sp = sp_exists (Lists.map_filter lost vl) f in
+      let sp = sp_exists (List.filter_map lost vl) f in
       let rd = List.fold_right Spv.remove vl (t_freepvs rd sp) in
       t_true, Mint.singleton 0 (sp, Mpv.empty), rd
   | Kcut f ->

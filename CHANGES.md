@@ -1,29 +1,61 @@
 :x: marks a potential source of incompatibility
 
-Documentation
-  * add documentation for several options of `why3 prove` and `why3
-    execute` that were left undocumented so far
-  * added documentation for environment variables WHY3LIB and WHY3DATA
+Tools
+  * `libdir` and `datadir` are not stored anymore in the configuration
+    file, but they can be manually set there if desired; see also the
+    environment variables `WHY3LIB` and `WHY3DATA`
 
-Provers
-  * support for CVC5 1.0.0 (released April 6, 2022)
+MLCFG language
+  * attributes on the body of an MLCFG function are now supported
 
-Configuration
-  * the libdir and datadir are not anymore stored in the Why3 config
-    file, but they can be manually set there if desired. See also the
-    usage of environment variables WHY3LIB and WHY3DATA
+Python language
+  * added `by` and `so` connectives in predicates
+  * fixed overloading of `+` in Python code
+  * added `add_list` for list concatenation in logic
 
 API
   * source locations are now represented by both a start line number
-    and an end line number. The fourth number is thus now the column
-    number on the end line. :x:
-  * function load_driver moved from Whyconf to Driver :x:
-  * several functions from Call_prover and Driver now take as input a
-    `Whyconf.main` configuration type instead of directly take libdir
-    and datadir. See the updated API examples for details. :x:
+    and an end line number; the fourth number is thus now the column
+    number on the end line :x:
+  * several functions from `Call_prover` and `Driver` now take as input a
+    `Whyconf.main` configuration type instead of directly taking `libdir`
+    and `datadir` :x:
+  * `Whyconf.load_driver` has been replaced by `Driver.load_driver_for_prover` :x:
+  * `Warning.emit` has been replaced by `Loc.warning` :x:
 
-MLCFG input language
-  * attributes on the body of an MLCFG function are now supported
+Provers
+  * support for CVC5 1.0.0 (released April 6, 2022)
+  * support for Alt-Ergo 2.4.2 (released August 1, 2022)
+
+Miscellaneous
+  * fixed soundness bug with existential quantifiers in `introduce_premises`
+  * configuration option `--enable-profiling` has been removed
+  * configuration now fails for explicit yet unsuccessful `--enable-foo` options
+  * OCaml >= 4.08 is now required
+  * LablGtk2 is no longer supported
+
+Version 1.5.1, September 12, 2022
+---------------------------------
+
+Documentation
+  * documented most options of `why3 prove` and `why3 execute`
+
+Python language
+  * added construct `e1 if e2 else e3`
+  * added support for tuples and multiple assignments
+  * added `#@ axiom` and `#@ lemma`
+  * global variables annotated with `#@ constant` are available in the logic
+  * pure functions (i.e., limited to `return e`) annotated with `#@ function`
+    are available in the logic
+  * logical functions can be given a variant with `variant {term}`
+  (contribution by Jean-Paul Bodeveix)
+
+Provers
+  * support for Z3 4.9.0 and 4.9.1 (released July 6, 2022)
+  * support for Z3 4.10.0, 4.10.1 and 4.10.2 (released July 30, 2022)
+  * support for Z3 4.11.0 (released August 18, 2022)
+  * support for Coq 8.16.0 (release September 5, 2022)
+  * support for Gappa 1.4.0 (released April 16, 2022)
 
 Version 1.5.0, April 29, 2022
 -----------------------------
@@ -142,7 +174,7 @@ IDE
   * `why3 ide` in the Docker image can now be used through a web browser
     instead of an X server; see Section 5.1.2 of the manual
 
-Input Formats
+Input formats
   * a new front-end named MLCFG was added; it supports unstructured program codes,
     including `goto` statements; see Section 9.3 of the manual
   * translation of `<>` and `not` have been fixed for micro-C and Python

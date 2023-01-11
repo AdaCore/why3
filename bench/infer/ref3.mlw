@@ -5,7 +5,7 @@ module Test
 	use ref.Refint
 	use int.Int
 
-	let b[@infer](x:int): unit
+	let b [@bddinfer] [@infer](x:int): unit
 	=
 		let k = ref 0 in
 		while (!k < x) do
@@ -15,7 +15,7 @@ module Test
 		()
 		done; ()
 
-	let b3[@infer:box](x:int): unit
+	let b3 [@bddinfer] [@infer:box](x:int): unit
 	=
 		let k = ref 0 in
 		while (!k < x) do

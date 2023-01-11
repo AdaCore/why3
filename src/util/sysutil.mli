@@ -89,3 +89,20 @@ val uniquify : string -> string
 (** find filename that doesn't exist based on the given filename.
     Be careful the file can be taken after the return of this function.
 *)
+
+
+exception AmbiguousResolve of string list
+exception FailedResolve of string list
+
+val resolve_from_paths : string list -> string -> string
+(** [resolve_from_paths \[p1;..;pn\] name] search for an existing
+   file among [p1/name],..,[pn/name]. Raises [FailedResolve] if no
+   such file is found, with the set of tried file names as
+   argument. Raise [AmbiguousResolve] if several exist, with the set
+   of resolved names as argument.
+
+  If [name] is already an absolute file name, this function returns
+   [name] if the file exists, raises [FailedResolve] otherwise, with
+   name as argument.
+
+ *)

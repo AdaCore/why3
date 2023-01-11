@@ -1,0 +1,15 @@
+module A
+  use int.Int
+
+  type pos = abstract { x : int }
+  invariant { x >= 0 }
+end
+
+module B
+  use int.Int
+
+  type pos = { x : int }
+  invariant { x >= 0 }
+
+  clone export A with type pos
+end

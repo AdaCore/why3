@@ -48,7 +48,8 @@ type printer_args = {
   prec        : (int list) Mid.t;
 }
 
-let load_file file =
+let load_file whyconf_main file =
+  let file = Driver.resolve_driver_name whyconf_main "extraction_drivers" file in
   let c = open_in file in
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
@@ -61,7 +62,7 @@ let load_file file =
     Loc.set_file filename lb;
     lb
   in
-  let f = Driver_lexer.parse_file_extract input_lexer lb in
+  let f = Driver_lexer.parse_file_extract whyconf_main input_lexer lb in
   Stack.iter close_in to_close;
   f
 
@@ -74,7 +75,7 @@ exception UnknownExn   of (string list * string list)
 exception FSymExpected of lsymbol
 exception PSymExpected of lsymbol
 
-let load_driver env file extra_files =
+let load_driver whyconf_main env file extra_files =
   let prelude   = ref [] in
   let printer   = ref None in
   let blacklist = Queue.create () in
@@ -89,7 +90,7 @@ let load_driver env file extra_files =
     | EPrinter s -> set_or_raise loc printer s "printer"
     | EBlacklist sl -> List.iter (fun s -> Queue.add s blacklist) sl
   in
-  let f = load_file file in
+  let f = load_file whyconf_main file in
   List.iter add_global f.fe_global;
 
   let thprelude = ref Mid.empty in
@@ -231,7 +232,7 @@ let load_driver env file extra_files =
   List.iter add_theory f.fe_th_rules;
   List.iter add_module f.fe_mo_rules;
   List.iter (fun f ->
-    let fe = load_file f in
+    let fe = load_file whyconf_main f in
     List.iter add_theory fe.fe_th_rules;
     List.iter add_module fe.fe_mo_rules;
     List.iter add_global fe.fe_global)

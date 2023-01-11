@@ -42,7 +42,7 @@ let for_field clean (f, v) =
           match clean#value v with
           | Some v -> Some (f, v)
           | None -> None in
-        Lists.map_filter for_field fs
+        List.filter_map for_field fs
     | _ -> (
         match clean#value v with
         | None -> []
@@ -104,7 +104,7 @@ let clean = object (self)
         else
           Opt.bind (self#value v) @@ fun v ->
           Some (f, v) in
-      match Lists.map_filter for_field fs with
+      match List.filter_map for_field fs with
       | [] -> None
       | fs -> Some (Record fs)
 end

@@ -23,11 +23,6 @@ let debug_rac_values =
   Debug.register_info_flag "rac-values"
     ~desc:"print values that are taken into account during interpretation"
 
-let debug_trace_exec =
-  Debug.register_info_flag "trace_exec"
-    ~desc:"trace execution of code given by --exec or --eval"
-(* print debug information during the interpretation of an expression *)
-
 let debug_disable_builtin_mach =
   Debug.register_flag "execute-no-builtin-mach"
     ~desc:"don't register builtins for modules under stdlib/mach"
@@ -626,8 +621,11 @@ let gen_model_result ({giant_steps} as ctx) oid loc ity : value_gen =
     res
 
 (** Generator for a default value *)
-let gen_default def : value_gen =
-  "default value", fun () -> def
+let gen_default ity def : value_gen =
+  "default value", fun () ->
+    if ity_equal ity ity_unit
+    then Some unit_value
+    else def
 
 (** Generate a value by computing the postcondition *)
 let gen_from_post env posts : value_gen =
@@ -683,7 +681,7 @@ let get_and_register_variable ctx ?def ?loc id ity =
   let oloc = if loc <> None then loc else id.id_loc in
   let gens = [
     gen_model_variable ctx ?loc id ity;
-    gen_default def;
+    gen_default ity def;
     gen_type_default ~really:true (* (is_ignore_id id) *) ctx ity;
   ] in
   let value = get_value' ctx_desc oloc gens in
@@ -697,7 +695,7 @@ let get_and_register_result ?def ?rs ctx posts oid loc ity =
       (fun fmt -> Opt.iter (fprintf fmt " call id %d") oid) in
   let gens = [
     gen_model_result ctx oid loc ity;
-    gen_default def;
+    gen_default ity def;
     gen_from_post ctx posts;
     gen_type_default ~really:true ~posts ctx ity;
   ] in
@@ -1323,7 +1321,7 @@ and exec_match ctx t ebl =
   let rec iter ebl =
     match ebl with
     | [] ->
-        Warning.emit "[Exec] Pattern matching not exhaustive in evaluation@." ;
+        Loc.warning "[Exec] Pattern matching not exhaustive in evaluation@." ;
         assert false
     | (p, e) :: rem -> (
       try

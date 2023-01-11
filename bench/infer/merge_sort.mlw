@@ -160,7 +160,7 @@ module NaturalMergesort
   use int.MinMax
 
   (* returns the maximal hi such that a[lo..hi[ is sorted *)
-  let find_run[@infer] (a: array elt) (lo: int) : int
+  let find_run [@bddinfer] [@infer] (a: array elt) (lo: int) : int
     requires { 0 <= lo < length a }
     ensures  { lo < result <= length a }
     ensures  { sorted_sub a lo result }
@@ -173,7 +173,7 @@ module NaturalMergesort
     done;
     !i
 
-  let find_run2[@infer:box] (a: array elt) (lo: int) : int
+  let find_run2 [@bddinfer] [@infer:box] (a: array elt) (lo: int) : int
     requires { 0 <= lo < length a }
     ensures  { lo < result <= length a }
     ensures  { sorted_sub a lo result }
@@ -189,7 +189,7 @@ module NaturalMergesort
   exception Break
   exception Return
 
-  let natural_mergesort[@infer](a: array elt) : unit
+  let natural_mergesort [@bddinfer] [@infer](a: array elt) : unit
     ensures { sorted a }
     ensures { permut_all (old a) a }
   = let n = length a in

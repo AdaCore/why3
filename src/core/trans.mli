@@ -127,6 +127,7 @@ val tgoal_l : (prsymbol -> term -> tdecl list list) -> task tlist
 val rewrite : (term -> term) -> task -> task trans
 (** [rewrite f t1 t2] appends to task [t1] the declarations in [t2]
     in which each top level formula [t] is replaced by [f t] **)
+
 val rewriteTF : (term -> term) -> (term -> term) -> task -> task trans
 
 val add_decls  : decl list -> task trans
@@ -149,6 +150,7 @@ val on_cloned_theory : theory -> (symbol_map list -> 'a trans) -> 'a trans
     For example, this will likely fail:
       [Trans.on_tagged_ls some_meta (fun s -> Trans.decl (fun d -> [d; s.choose]))]
 *)
+
 val on_tagged_ty : meta -> (Sty.t -> 'a trans) -> 'a trans
 val on_tagged_ts : meta -> (Sts.t -> 'a trans) -> 'a trans
 val on_tagged_ls : meta -> (Sls.t -> 'a trans) -> 'a trans

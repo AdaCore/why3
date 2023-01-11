@@ -29,7 +29,10 @@ build: [
    "--disable-why3-lib"
    "--disable-frama-c"
    "--disable-coq-libs"
-   "--disable-js-of-ocaml"]
+   "--disable-js-of-ocaml"
+   "--disable-re"
+   "--enable-ocamlfind"
+   "--enable-ide"]
   [make "-j%{jobs}%" "ide"]
 ]
 
@@ -37,14 +40,11 @@ install: [make "install-ide"]
 
 depends: [
   "conf-autoconf" {build & dev}
-  "ocaml" {>= "4.05.0"}
+  "ocaml" {>= "4.08.0"}
   "ocamlfind" {build}
   "why3" {= version}
-  (("lablgtk" & "conf-gtksourceview") | ("lablgtk3" & "lablgtk3-sourceview3"))
-]
-
-conflicts: [
-  "lablgtk" {< "2.14.2"}
+  "lablgtk3"
+  "lablgtk3-sourceview3"
 ]
 
 synopsis: "Why3 environment for deductive program verification"

@@ -229,3 +229,29 @@ let uniquify file =
   done;
   let file = name ^ "_" ^ (string_of_int !i) ^ ext in
   file
+
+
+exception AmbiguousResolve of string list
+exception FailedResolve of string list
+
+let is_file f = Sys.file_exists f && not (Sys.is_directory f)
+
+let resolve_from_paths paths name =
+  let fl =
+    if Filename.is_relative name then
+      List.map (fun p -> Filename.concat p name) paths
+    else [name]
+  in
+    match List.filter is_file fl with
+    | [] -> raise (FailedResolve fl)
+    | [f] -> f
+    | fl -> raise (AmbiguousResolve fl)
+
+let () = Exn_printer.register (fun fmt exn -> match exn with
+  | FailedResolve fl ->
+     Format.fprintf fmt
+       "No resolved file among [%a]" Pp.(print_list semi print_string) fl
+  | AmbiguousResolve fl ->
+     Format.fprintf fmt
+       "Ambiguous file name found in [%a]" Pp.(print_list semi print_string) fl
+  | e -> raise e)

@@ -5,9 +5,10 @@
 <prover id="0" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.8.15" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Z3" version="4.8.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Z3" version="4.11.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Alt-Ergo" version="2.4.0" timelimit="20" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -73,7 +74,7 @@
   <proof prover="1" timelimit="5"><result status="valid" time="0.02" steps="39"/></proof>
   </goal>
   <goal name="mult_ijk&#39;vc.12" expl="loop invariant preservation" proved="true">
-  <proof prover="1" timelimit="5"><result status="valid" time="1.30" steps="491"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="1.83" steps="491"/></proof>
   </goal>
   <goal name="mult_ijk&#39;vc.13" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="33"/></proof>
@@ -149,7 +150,7 @@
   <proof prover="1" timelimit="10"><result status="valid" time="0.02" steps="39"/></proof>
   </goal>
   <goal name="mult_ikj&#39;vc.12" expl="loop invariant preservation" proved="true">
-  <proof prover="1" timelimit="5"><result status="valid" time="1.61" steps="442"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="2.40" steps="442"/></proof>
   </goal>
   <goal name="mult_ikj&#39;vc.13" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.04" steps="29"/></proof>
@@ -213,13 +214,13 @@
   <proof prover="1"><result status="valid" time="0.04" steps="24"/></proof>
   </goal>
   <goal name="padding&#39;vc.5" expl="assertion" proved="true">
-  <proof prover="1" timelimit="10"><result status="valid" time="6.81" steps="3080"/></proof>
+  <proof prover="1" timelimit="10"><result status="valid" time="10.70" steps="3080"/></proof>
   </goal>
   <goal name="padding&#39;vc.6" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.48" steps="792292"/></proof>
+  <proof prover="3"><result status="valid" time="1.12" steps="1230786"/></proof>
   </goal>
   <goal name="padding&#39;vc.7" expl="assertion" proved="true">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.68" steps="919"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.94" steps="919"/></proof>
   </goal>
   <goal name="padding&#39;vc.8" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="61"/></proof>
@@ -349,7 +350,7 @@
   <proof prover="1"><result status="valid" time="0.02" steps="51"/></proof>
   </goal>
   <goal name="strassen&#39;vc.36" expl="assertion" proved="true">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.62" steps="1351"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.85" steps="1351"/></proof>
   </goal>
   <goal name="strassen&#39;vc.37" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.66" steps="1068"/></proof>
@@ -361,7 +362,7 @@
   <proof prover="1"><result status="valid" time="0.02" steps="68"/></proof>
   </goal>
   <goal name="strassen&#39;vc.40" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="10"><result status="valid" time="2.88" steps="2037"/></proof>
+  <proof prover="1" timelimit="10"><result status="valid" time="3.64" steps="2037"/></proof>
   </goal>
   <goal name="strassen&#39;vc.41" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.04" steps="50"/></proof>
@@ -574,10 +575,10 @@
   <proof prover="1"><result status="valid" time="0.07" steps="117"/></proof>
   </goal>
   <goal name="strassen&#39;vc.111" expl="assertion" proved="true">
-  <proof prover="1" timelimit="10"><result status="valid" time="2.70" steps="3247"/></proof>
+  <proof prover="1" timelimit="10"><result status="valid" time="3.10" steps="3247"/></proof>
   </goal>
   <goal name="strassen&#39;vc.112" expl="assertion" proved="true">
-  <proof prover="1" timelimit="10"><result status="valid" time="3.04" steps="3794"/></proof>
+  <proof prover="1" timelimit="10"><result status="valid" time="3.93" steps="3794"/></proof>
   </goal>
   <goal name="strassen&#39;vc.113" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
@@ -912,7 +913,7 @@
   <proof prover="1"><result status="valid" time="0.09" steps="170"/></proof>
   </goal>
   <goal name="strassen&#39;vc.163" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.17" steps="421746"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="420798"/></proof>
   </goal>
   <goal name="strassen&#39;vc.164" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.17" steps="297"/></proof>
@@ -958,7 +959,7 @@
   <proof prover="1"><result status="valid" time="0.07" steps="176"/></proof>
   </goal>
   <goal name="strassen&#39;vc.168" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.13" steps="445086"/></proof>
+  <proof prover="0"><result status="valid" time="0.13" steps="444099"/></proof>
   </goal>
   <goal name="strassen&#39;vc.169" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.18" steps="311"/></proof>
@@ -1027,7 +1028,7 @@
   <proof prover="1"><result status="valid" time="0.09" steps="190"/></proof>
   </goal>
   <goal name="strassen&#39;vc.179" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.26" steps="496372"/></proof>
+  <proof prover="0"><result status="valid" time="0.26" steps="495226"/></proof>
   </goal>
   <goal name="strassen&#39;vc.180" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.35" steps="982"/></proof>
@@ -1042,7 +1043,7 @@
     <goal name="strassen&#39;vc.182.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
      <goal name="strassen&#39;vc.182.0.0.0" expl="precondition" proved="true">
-     <proof prover="1" timelimit="5"><result status="valid" time="0.56" steps="370"/></proof>
+     <proof prover="1" timelimit="5"><result status="valid" time="0.74" steps="370"/></proof>
      </goal>
     </transf>
     </goal>
@@ -1060,7 +1061,7 @@
     <goal name="strassen&#39;vc.184.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
      <goal name="strassen&#39;vc.184.0.0.0" expl="precondition" proved="true">
-     <proof prover="1" timelimit="5"><result status="valid" time="0.59" steps="377"/></proof>
+     <proof prover="1" timelimit="5"><result status="valid" time="0.78" steps="377"/></proof>
      </goal>
     </transf>
     </goal>
@@ -1072,7 +1073,7 @@
   <proof prover="1"><result status="valid" time="0.10" steps="199"/></proof>
   </goal>
   <goal name="strassen&#39;vc.186" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.28" steps="578267"/></proof>
+  <proof prover="0"><result status="valid" time="0.28" steps="577013"/></proof>
   </goal>
   <goal name="strassen&#39;vc.187" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.38" steps="1051"/></proof>
@@ -1086,7 +1087,7 @@
    <proof prover="5"><result status="valid" time="0.04" steps="60"/></proof>
    </goal>
    <goal name="strassen&#39;vc.188.2" expl="precondition" proved="true">
-   <proof prover="1" timelimit="5"><result status="valid" time="2.36" steps="2834"/></proof>
+   <proof prover="1" timelimit="5"><result status="valid" time="2.89" steps="2834"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1102,21 +1103,21 @@
   <goal name="strassen&#39;vc.192" expl="precondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="strassen&#39;vc.192.0" expl="precondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.06" steps="26"/></proof>
-   </goal>
-   <goal name="strassen&#39;vc.192.1" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
-    <goal name="strassen&#39;vc.192.1.0" expl="precondition" proved="true">
+    <goal name="strassen&#39;vc.192.0.0" expl="precondition" proved="true">
     <transf name="introduce_premises" proved="true" >
-     <goal name="strassen&#39;vc.192.1.0.0" expl="precondition" proved="true">
-     <proof prover="1" timelimit="5"><result status="valid" time="0.08" steps="31"/></proof>
+     <goal name="strassen&#39;vc.192.0.0.0" expl="precondition" proved="true">
+     <proof prover="1" timelimit="5"><result status="valid" time="0.08" steps="30"/></proof>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
+   <goal name="strassen&#39;vc.192.1" expl="precondition" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="0.03" steps="28"/></proof>
+   </goal>
    <goal name="strassen&#39;vc.192.2" expl="precondition" proved="true">
-   <proof prover="1" timelimit="5"><result status="valid" time="4.20" steps="3873"/></proof>
+   <proof prover="6"><result status="valid" time="0.16" steps="433284"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1140,7 +1141,7 @@
    </transf>
    </goal>
    <goal name="strassen&#39;vc.194.2" expl="precondition" proved="true">
-   <proof prover="1" timelimit="5"><result status="valid" time="2.82" steps="3012"/></proof>
+   <proof prover="1" timelimit="5"><result status="valid" time="3.20" steps="3012"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1150,13 +1151,13 @@
   <goal name="strassen&#39;vc.196" expl="precondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="strassen&#39;vc.196.0" expl="precondition" proved="true">
-   <proof prover="1" timelimit="5"><result status="valid" time="0.04" steps="26"/></proof>
+   <proof prover="1" timelimit="5"><result status="valid" time="0.03" steps="26"/></proof>
    </goal>
    <goal name="strassen&#39;vc.196.1" expl="precondition" proved="true">
    <proof prover="1" timelimit="5"><result status="valid" time="0.03" steps="28"/></proof>
    </goal>
    <goal name="strassen&#39;vc.196.2" expl="precondition" proved="true">
-   <proof prover="1" timelimit="5"><result status="valid" time="2.83" steps="3072"/></proof>
+   <proof prover="1" timelimit="5"><result status="valid" time="3.27" steps="3072"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1172,21 +1173,21 @@
   <goal name="strassen&#39;vc.200" expl="precondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="strassen&#39;vc.200.0" expl="precondition" proved="true">
-   <proof prover="8"><result status="valid" time="0.04" steps="175806"/></proof>
-   </goal>
-   <goal name="strassen&#39;vc.200.1" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
-    <goal name="strassen&#39;vc.200.1.0" expl="precondition" proved="true">
+    <goal name="strassen&#39;vc.200.0.0" expl="precondition" proved="true">
     <transf name="introduce_premises" proved="true" >
-     <goal name="strassen&#39;vc.200.1.0.0" expl="precondition" proved="true">
-     <proof prover="1" timelimit="5"><result status="valid" time="0.07" steps="31"/></proof>
+     <goal name="strassen&#39;vc.200.0.0.0" expl="precondition" proved="true">
+     <proof prover="1" timelimit="5"><result status="valid" time="0.07" steps="30"/></proof>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
+   <goal name="strassen&#39;vc.200.1" expl="precondition" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="91679"/></proof>
+   </goal>
    <goal name="strassen&#39;vc.200.2" expl="precondition" proved="true">
-   <proof prover="0" timelimit="5"><result status="valid" time="0.31" steps="678409"/></proof>
+   <proof prover="8"><result status="valid" time="0.40" steps="904779"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1202,7 +1203,7 @@
    <proof prover="4"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="strassen&#39;vc.202.2" expl="precondition" proved="true">
-   <proof prover="0" timelimit="5"><result status="valid" time="0.32" steps="694496"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="0.36" steps="694730"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1278,7 +1279,7 @@
   <goal name="strassen&#39;vc.223" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="strassen&#39;vc.223.0" expl="VC for strassen" proved="true">
-   <proof prover="1" timelimit="60"><result status="valid" time="11.70" steps="6145"/></proof>
+   <proof prover="1" timelimit="60"><result status="valid" time="14.31" steps="6145"/></proof>
    </goal>
    <goal name="strassen&#39;vc.223.1" expl="VC for strassen" proved="true">
    <proof prover="1"><result status="valid" time="0.52" steps="727"/></proof>
@@ -1290,7 +1291,7 @@
    <proof prover="1"><result status="valid" time="0.48" steps="763"/></proof>
    </goal>
    <goal name="strassen&#39;vc.223.4" expl="VC for strassen" proved="true">
-   <proof prover="7"><result status="valid" time="3.71" steps="14395"/></proof>
+   <proof prover="7"><result status="valid" time="5.15" steps="14445"/></proof>
    </goal>
    <goal name="strassen&#39;vc.223.5" expl="VC for strassen" proved="true">
    <proof prover="1"><result status="valid" time="0.14" steps="455"/></proof>

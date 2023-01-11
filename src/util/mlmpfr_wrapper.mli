@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {1 Wrapper module for computation on extended floating-point numbers} *)
+
 (* TODO This wrapper should eventually be removed !
    For documentation refer to the mlmpfr documentation.
 *)

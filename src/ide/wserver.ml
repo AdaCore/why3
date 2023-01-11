@@ -193,6 +193,25 @@ let rec extract_param name stop_char =
       else extract_param name stop_char l
   | [] -> ""
 
+module Stream = struct
+
+type 'a t = { mutable current : 'a option option; next : unit -> 'a option }
+
+let peek t =
+  match t.current with
+  | None ->
+      let v = t.next () in
+      t.current <- Some v;
+      v
+  | Some v -> v
+
+let junk t =
+  t.current <- None
+
+let from f = { current = None; next = f }
+
+end
+
 let get_request strm =
   let buff = Buffer.create 80 in
   let rec loop (strm__ : _ Stream.t) =

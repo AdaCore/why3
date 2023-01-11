@@ -3,7 +3,7 @@ module Aliasing1
 	use int.Int
 	use ref.Ref
 
-	let b[@infer](_:int) : int
+	let b [@bddinfer] [@infer](_:int) : int
 	  ensures { result = 10 }
 	=
 		let i = ref 0 in
@@ -14,7 +14,7 @@ module Aliasing1
 		done;
 		!j
 
-	let c[@infer:oct](_:int) : int
+	let c [@bddinfer] [@infer:oct](_:int) : int
 	  ensures { result = 10 }
 	=
 		let i = ref 0 in
@@ -25,7 +25,7 @@ module Aliasing1
 		done;
 		!j
 
-	let d[@infer:box](_:int) : int
+	let d [@bddinfer] [@infer:box](_:int) : int
 	  ensures { result = 10 }
 	=
 		let i = ref 0 in

@@ -21,6 +21,15 @@ type ty =
   | Tarrow of ty * ty
   | Ttuple of ty list
 
+let rec pp_ty fmt : ty -> unit = function
+  | Tvar ty -> Pretty.print_tv fmt ty
+  | Tapp (ps,l) -> Format.fprintf fmt "%s(%a)"
+                        ps.Ident.id_string
+                        Pp.(print_list comma
+                              pp_ty) l
+  | Tarrow _ -> Format.fprintf fmt "arrow"
+  | Ttuple _ -> Format.fprintf fmt "tuple"
+
 type is_ghost = bool
 
 type var = ident * ty * is_ghost
@@ -297,6 +306,8 @@ let t_fun params res =
   List.fold_right (fun (_, targ, _) ty -> t_arrow targ ty) params res
 
 let enope = Eblock []
+
+let e_coerce t = mk_expr (Eblock [t])
 
 let mk_var id ty ghost = (id, ty, ghost)
 

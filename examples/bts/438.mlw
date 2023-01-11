@@ -1,0 +1,8 @@
+use int.Int
+use real.FromInt
+use real.RealInfix
+use real.Abs
+
+goal g1 : from_int 100 = 100.
+goal g2: forall x. -5 <= x <= 5 -> abs (from_int x) <=. 5.
+goal g3: forall x. x <= 5 -> 10. *. from_int x <=. 50.

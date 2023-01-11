@@ -24,8 +24,6 @@ let transfer_loc lb_from lb_to =
   lb_to.lex_start_p <- lb_from.lex_start_p;
   lb_to.lex_curr_p <- lb_from.lex_curr_p
 
-
-type position = string * int * int
 (*
 
 To reduce memory consumption, a pair (line,col) is stored in a single
@@ -36,41 +34,69 @@ To reduce memory consumption, a pair (line,col) is stored in a single
    This will thus support column numbers up to 4095 and line numbers up
    to 2^18 on 32-bit architecture.
 
+The file names are also hashed to ensure an optimal sharing
 *)
 
-let user_position f bl bc el ec =
-  (f, (bl lsl 12) lor bc, (el lsl 12) lor ec)
+module FileTags = struct
 
-let get (f,b,e) =
+  open Wstdlib
+
+  let tag_counter = ref 0
+
+  let file_tags = Hstr.create 7
+  let tag_to_file = Hint.create 7
+
+  let get_file_tag file =
+    try
+      Hstr.find file_tags file
+    with Not_found ->
+      let n = !tag_counter in
+      Hstr.add file_tags file n;
+      Hint.add tag_to_file n file;
+      incr tag_counter;
+      n
+
+  let tag_to_file tag =
+    Hint.find tag_to_file tag
+
+end
+
+
+type position = {
+    pos_file_tag : int;
+    pos_start : int (* compressed line/col *);
+    pos_end : int (* compressed line/col *);
+  }
+
+let get p =
+  let f = FileTags.tag_to_file p.pos_file_tag in
+  let b = p.pos_start in
+  let e = p.pos_end in
   (f, b lsr 12, b land 0x0FFF, e lsr 12, e land 0x0FFF)
 
 let sexp_of_expanded_position _ = assert false  [@@warning "-32"]
 (* default value if the line below does not produce anything, i.e.,
    when ppx_sexp_conv is not installed *)
 
-type expanded_position = string * int * int * int * int
+type expanded_position = string * int * int * int * int  [@@warning "-34"]
 [@@deriving sexp_of]
 
 let sexp_of_position loc =
   let eloc = get loc in sexp_of_expanded_position eloc
+                          [@@warning "-32"]
 
+let dummy_position =
+  let tag = FileTags.get_file_tag "" in
+  { pos_file_tag = tag; pos_start = 0; pos_end = 0 }
 
-let dummy_position = ("",0,0)
+let join p1 p2 =
+  assert (p1.pos_file_tag = p2.pos_file_tag);
+  { p1 with
+    pos_start = min p1.pos_start p2.pos_start;
+    pos_end = max p1.pos_end p2.pos_end }
 
-let join (f1,b1,e1) (f2,b2,e2) =
-  assert (f1 = f2);
-  (f1, min b1 b2, max e1 e2)
-
-let extract (b,e) =
-  let f = b.pos_fname in
-  let bl = b.pos_lnum in
-  let bc = b.pos_cnum - b.pos_bol in
-  let el = e.pos_lnum in
-  let ec = e.pos_cnum - e.pos_bol in
-  user_position f bl bc el ec
-
-let compare = Pervasives.compare
-let equal = Pervasives.(=)
+let compare = Stdlib.compare
+let equal = Stdlib.(=)
 let hash = Hashtbl.hash
 
 let pp_position_tail fmt bl bc el ec =
@@ -90,6 +116,73 @@ let pp_position fmt loc =
 let pp_position_no_file fmt loc =
   let (_,bl,bc,el,ec) = get loc in
   pp_position_tail fmt bl bc el ec
+
+(* warnings *)
+
+let default_hook ?loc s =
+  let open Format in
+  match loc with
+  | None -> eprintf "Warning: %s@." s
+  | Some l -> eprintf "Warning, file %a: %s@." pp_position l s
+
+let warning_hook = ref default_hook
+let set_warning_hook = (:=) warning_hook
+
+let warning ?loc p =
+  let open Format in
+  let b = Buffer.create 100 in
+  let fmt = formatter_of_buffer b in
+  pp_set_margin fmt 1000000000;
+  pp_open_box fmt 0;
+  let handle fmt =
+    pp_print_flush fmt (); !warning_hook ?loc (Buffer.contents b) in
+  kfprintf handle fmt p
+
+(* user positions *)
+
+let warning_emitted = ref false
+
+let user_position f bl bc el ec =
+  let not_64_bits = Sys.int_size < 63 in
+  (* Do not fail for 64-bits architectures *)
+  if bl < 0 || (not_64_bits && bl >= 0x4_0000) then
+    failwith ("Loc.user_position: start line number `" ^
+                string_of_int bl ^ "` out of bounds");
+  if bc < 0 then
+    failwith ("Loc.user_position: start char number `" ^
+                string_of_int bc ^ "` out of bounds");
+  (* bc >= 0x1000 may happen with SPARK, but we do not want to display it *)
+  (* if bc >= 0x1000 && not !warning_emitted then
+    begin
+      warning "Loc.user_position: start char number `%d` overflows on next line" bc;
+      warning_emitted := true;
+    end; *)
+  if el < 0 || (not_64_bits && el >= 0x40000) then
+    failwith ("Loc.user_position: end line number `" ^
+                string_of_int el ^ "` out of bounds");
+  if ec < 0 then
+    failwith ("Loc.user_position: end char number `" ^
+                string_of_int ec ^ "` out of bounds");
+  (* ec >= 0x1000 may happen with SPARK, but we do not want to display it *)
+  (* if ec >= 0x1000  && not !warning_emitted then
+    begin
+      warning "Loc.user_position: end char number `%d` overflows on next line" ec;
+      warning_emitted := true;
+    end; *)
+  let tag = FileTags.get_file_tag f in
+  { pos_file_tag = tag;
+    pos_start = (bl lsl 12) lor bc;
+    pos_end = (el lsl 12) lor ec }
+
+
+let extract (b,e) =
+  let f = b.pos_fname in
+  let bl = b.pos_lnum in
+  let bc = b.pos_cnum - b.pos_bol in
+  let el = e.pos_lnum in
+  let ec = e.pos_cnum - e.pos_bol in
+  user_position f bl bc el ec
+
 
 (* located exceptions *)
 

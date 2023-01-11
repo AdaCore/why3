@@ -413,7 +413,9 @@ let unit_module =
 
 let itd_ref =
   let tv = create_tvsymbol (id_fresh "a") in
-  let pj = create_pvsymbol (id_fresh "contents") (ity_var tv) in
+  let attrs = Sattr.singleton is_field_id_attr in
+  let id_contents = id_fresh ~attrs "contents" in
+  let pj = create_pvsymbol id_contents (ity_var tv) in
   create_plain_record_decl ~priv:false ~mut:true (id_fresh "ref")
                                             [tv] [true, pj] [] None
 
@@ -1118,13 +1120,13 @@ let clone_type_decl inst cl tdl kn =
     clone_ity cl ity in
 
   Mits.iter (visit Sits.empty) def;
-  Lists.map_filter (fun d -> Hits.find htd d.itd_its) tdl,
+  List.filter_map (fun d -> Hits.find htd d.itd_its) tdl,
   !vcs
 
 let add_vc uc (its, f) =
   let {id_string = nm; id_loc = loc} = its.its_ts.ts_name in
   let attrs = Sattr.singleton (Ident.create_attribute ("expl:VC for " ^ nm)) in
-  let pr = create_prsymbol (id_fresh ~attrs ?loc (nm ^ "'vc")) in
+  let pr = create_prsymbol (id_fresh ~attrs ?loc (nm ^ "'refn'vc")) in
   let d = create_pure_decl (create_prop_decl Pgoal pr f) in
   add_pdecl ~warn:false ~vc:false uc d
 

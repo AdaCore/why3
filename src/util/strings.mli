@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** {1 Additional Useful Functions on Character Strings} *)
+(** {1 Utility Functions on Character Strings} *)
 
 (** {2 Wrappers for deprecated string functions of OCaml stdlib} *)
 
@@ -33,28 +33,28 @@ val split : char -> string -> string list
 val bounded_split : char -> string -> int -> string list
 (** [bounded_split c s n] do the same as [split c s] but splits into
     [n] substring at most.
-    The concatenation of returned substrings is equal to the string s.*)
+    The concatenation of returned substrings is equal to the string [s].*)
 
 val join : string -> string list -> string
 (** [join sep l] joins all the strings in [l] together, in the same
-    order, separating them by [sep] *)
+    order, separating them by [sep]. *)
 
 val pad_right : char -> string -> int -> string
-(** chop or pad the given string on the right up to the given length *)
+(** Chop or pad the given string on the right up to the given length. *)
 
 val has_prefix : string -> string -> bool
-(** [has_prefix pref s] returns true if s [s] starts with prefix [pref] *)
+(** [has_prefix pref s] returns true if [s] starts with prefix [pref]. *)
 
 val remove_prefix : string -> string -> string
 (** [remove_prefix pref s] removes the prefix [pref] from [s].
-    Raises [Not_found] if [s] does not start with [pref] *)
+    @raise Not_found if [s] does not start with [pref]. *)
 
 val has_suffix : string -> string -> bool
-(** [has_suffix suff s] returns true if s [s] ends with suffix [suff] *)
+(** [has_suffix suff s] returns true if [s] ends with suffix [suff]. *)
 
 val remove_suffix : string -> string -> string
 (** [remove_suffix suff s] removes the suffix [suff] from [s].
-    Raises [Not_found] if [s] does not end with [suff] *)
+    @raise Not_found if [s] does not end with [suff]. *)
 
 val ends_with : string -> string -> bool
-(** test if a string ends with another *)
+(** Test if a string ends with another. *)

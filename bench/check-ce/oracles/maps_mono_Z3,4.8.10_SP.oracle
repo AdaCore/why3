@@ -1,0 +1,646 @@
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: STUCK (failure in postcondition of `set` at unknown location)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 45, characters 14-54)
+  - Abstract RAC: STUCK (failure in postcondition of `set` at unknown location)
+File "bench/check-ce/maps_mono.mlw", line 45, characters 14-54:
+Sub-goal Postcondition of goal test_map'vc.
+Prover result is: Unknown or time/memory/step limit.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File maps_mono.mlw:
+  Line 44:
+    x = {contents=
+         [|0 -> 12; 1 -> 3; 13 -> 15; 16 -> 18; 19 -> 20; 22 -> 24; 34 -> 35;
+         36 -> 38; 45 -> 46; 58 -> 60; _ -> 2|]}
+    x = {contents=
+         [|0 -> 12; 1 -> 3; 13 -> 15; 16 -> 18; 19 -> 20; 22 -> 24; 34 -> 35;
+         36 -> 38; 45 -> 46; 58 -> 60; _ -> 2|]}
+    Execution of main function `test_map` with env:
+      x = {contents=
+           [|0 -> 12; 1 -> 3; 13 -> 15; 16 -> 18; 19 -> 20; 22 -> 24;
+           34 -> 35; 36 -> 38; 45 -> 46; 58 -> 60; _ -> 2|]}
+      zero = 0
+      one = 1
+  Line 47:
+    Normal execution of function `(!)` with args:
+      r = {contents=
+           [|0 -> 12; 1 -> 3; 13 -> 15; 16 -> 18; 19 -> 20; 22 -> 24;
+           34 -> 35; 36 -> 38; 45 -> 46; 58 -> 60; _ -> 2|]}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents=
+             [|0 -> 12; 1 -> 3; 13 -> 15; 16 -> 18; 19 -> 20; 22 -> 24;
+             34 -> 35; 36 -> 38; 45 -> 46; 58 -> 60; _ -> 2|]}
+File maps_mono.mlw:
+  Line 47:
+    Normal execution of function `set` with args:
+      f = [|0 -> 12; 1 -> 3; 13 -> 15; 16 -> 18; 19 -> 20; 22 -> 24;
+          34 -> 35; 36 -> 38; 45 -> 46; 58 -> 60; _ -> 2|]
+      x = 0
+      v = 3
+    Normal execution of function `(:=)` with args:
+      r = {contents=
+           [|0 -> 12; 1 -> 3; 13 -> 15; 16 -> 18; 19 -> 20; 22 -> 24;
+           34 -> 35; 36 -> 38; 45 -> 46; 58 -> 60; _ -> 2|]}
+      v = (fun y -> if pure { if y = x then True else False } then v
+             else f y) with f = [|0 -> 12; 1 -> 3; 13 -> 15; 16 -> 18;
+                                19 -> 20; 22 -> 24; 34 -> 35; 36 -> 38;
+                                45 -> 46; 58 -> 60; _ -> 2|], x = 0, v = 3
+  Line 45:
+    Property failure at postcondition of `test_map` with:
+      x = {contents=
+           (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = [|0 -> 12; 1 -> 3; 13 -> 15; 16 -> 18;
+                                 19 -> 20; 22 -> 24; 34 -> 35; 36 -> 38;
+                                 45 -> 46; 58 -> 60; _ -> 2|], x = 0, v = 3}
+
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 51, characters 14-88)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `set1` cannot be evaluated)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 51, characters 14-88)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `set1` cannot be evaluated)
+File "bench/check-ce/maps_mono.mlw", line 51, characters 14-88:
+Sub-goal Postcondition of goal test_map_multidim1'vc.
+Prover result is: Unknown or time/memory/step limit.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File maps_mono.mlw:
+  Line 50:
+    x = {contents=
+         [|1 -> [|; _ -> 2|];
+         3 -> [|4 -> 5; _ -> 5|]; _ -> [|4 -> 5; _ -> 5|]|]}
+    x = {contents=
+         [|1 -> [|; _ -> 2|];
+         3 -> [|4 -> 5; _ -> 5|]; _ -> [|4 -> 5; _ -> 5|]|]}
+    Execution of main function `test_map_multidim1` with env:
+      x = {contents=
+           [|1 -> [|; _ -> 2|];
+           3 -> [|4 -> 5; _ -> 5|]; _ -> [|4 -> 5; _ -> 5|]|]}
+      zero = 0
+      one = 1
+  Line 53:
+    Normal execution of function `(!)` with args:
+      r = {contents=
+           [|1 -> [|; _ -> 2|];
+           3 -> [|4 -> 5; _ -> 5|]; _ -> [|4 -> 5; _ -> 5|]|]}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents=
+             [|1 -> [|; _ -> 2|];
+             3 -> [|4 -> 5; _ -> 5|]; _ -> [|4 -> 5; _ -> 5|]|]}
+File maps_mono.mlw:
+  Line 53:
+    Normal execution of function `get` with args:
+      f = [|1 -> [|; _ -> 2|];
+          3 -> [|4 -> 5; _ -> 5|]; _ -> [|4 -> 5; _ -> 5|]|]
+      x = 1
+  Line 29:
+    Normal execution of function `(@)` with args:
+      u = [|1 -> [|; _ -> 2|];
+          3 -> [|4 -> 5; _ -> 5|]; _ -> [|4 -> 5; _ -> 5|]|]
+      u = 1
+  Line 53:
+    Normal execution of function `(!)` with args:
+      r = {contents=
+           [|1 -> [|; _ -> 2|];
+           3 -> [|4 -> 5; _ -> 5|]; _ -> [|4 -> 5; _ -> 5|]|]}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents=
+             [|1 -> [|; _ -> 2|];
+             3 -> [|4 -> 5; _ -> 5|]; _ -> [|4 -> 5; _ -> 5|]|]}
+File maps_mono.mlw:
+  Line 53:
+    Normal execution of function `set` with args:
+      f = [|1 -> [|; _ -> 2|];
+          3 -> [|4 -> 5; _ -> 5|]; _ -> [|4 -> 5; _ -> 5|]|]
+      x = 0
+      v = [|; _ -> 2|]
+    Normal execution of function `(:=)` with args:
+      r = {contents=
+           [|1 -> [|; _ -> 2|];
+           3 -> [|4 -> 5; _ -> 5|]; _ -> [|4 -> 5; _ -> 5|]|]}
+      v = (fun y1 -> if pure { if y1 = x1 then True else False } then v1
+             else f1 y1) with f1 = [|1 -> [|; _ -> 2|];
+                                   3 -> [|4 -> 5; _ -> 5|]; _ -> [|4 -> 5; _ -> 5|]|], x1 = 0, v1 = [|; _ -> 2|]
+  Line 51:
+    Property failure at postcondition of `test_map_multidim1` with:
+      x = {contents=
+           (fun y1 -> if pure { if y1 = x1 then True else False } then v1
+              else f1 y1) with f1 = [|1 -> [|; _ -> 2|];
+                                    3 -> [|4 -> 5; _ -> 5|]; _ -> [|4 -> 5; _ -> 5|]|], x1 = 0, v1 = [|; _ -> 2|]}
+
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: STUCK (failure in postcondition of `set` at unknown location)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 56, characters 14-88)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `set` cannot be evaluated)
+File "bench/check-ce/maps_mono.mlw", line 56, characters 14-88:
+Sub-goal Postcondition of goal test_map_multidim2'vc.
+Prover result is: Unknown or time/memory/step limit.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File maps_mono.mlw:
+  Line 55:
+    x = {contents=
+         [|0 -> [|0 -> 184; 9 -> 176; 26 -> 175; 45 -> 171; 57 -> 174;
+                97 -> 180; 143 -> 172; 146 -> 182; 148 -> 173; 157 -> 183;
+                165 -> 177; 168 -> 179; 181 -> 141; _ -> 185|];
+         1 -> [|1 -> 3; _ -> 170|]; 193 -> [|137 -> 136; _ -> 138|];
+         196 -> [|128 -> 127; _ -> 129|]; 198 -> [|118 -> 120; _ -> 121|];
+         201 -> [|0 -> 103; 7 -> 94; 28 -> 95; 63 -> 98; 91 -> 90; 93 -> 92;
+                97 -> 96; 100 -> 99; 102 -> 101; _ -> 104|];
+         204 -> [|76 -> 75; _ -> 77|];
+         206 -> [|13 -> 66; 22 -> 55; 57 -> 56; 59 -> 58; 61 -> 60; 63 -> 62;
+                65 -> 64; 68 -> 67; _ -> 69|];
+         208 -> [|48 -> 50; _ -> 51|];
+         210 -> [|17 -> 35; 22 -> 21; 24 -> 23; 26 -> 25; 28 -> 27; 30 -> 29;
+                32 -> 31; 34 -> 33; _ -> 36|];
+         211 -> [|7 -> 2; 9 -> 8; 11 -> 10; 13 -> 12; 15 -> 14; 17 -> 16;
+                19 -> 18; _ -> 20|]; _ -> [|; _ -> 186|]|]}
+    x = {contents=
+         [|0 -> [|0 -> 184; 9 -> 176; 26 -> 175; 45 -> 171; 57 -> 174;
+                97 -> 180; 143 -> 172; 146 -> 182; 148 -> 173; 157 -> 183;
+                165 -> 177; 168 -> 179; 181 -> 141; _ -> 185|];
+         1 -> [|1 -> 3; _ -> 170|]; 193 -> [|137 -> 136; _ -> 138|];
+         196 -> [|128 -> 127; _ -> 129|]; 198 -> [|118 -> 120; _ -> 121|];
+         201 -> [|0 -> 103; 7 -> 94; 28 -> 95; 63 -> 98; 91 -> 90; 93 -> 92;
+                97 -> 96; 100 -> 99; 102 -> 101; _ -> 104|];
+         204 -> [|76 -> 75; _ -> 77|];
+         206 -> [|13 -> 66; 22 -> 55; 57 -> 56; 59 -> 58; 61 -> 60; 63 -> 62;
+                65 -> 64; 68 -> 67; _ -> 69|];
+         208 -> [|48 -> 50; _ -> 51|];
+         210 -> [|17 -> 35; 22 -> 21; 24 -> 23; 26 -> 25; 28 -> 27; 30 -> 29;
+                32 -> 31; 34 -> 33; _ -> 36|];
+         211 -> [|7 -> 2; 9 -> 8; 11 -> 10; 13 -> 12; 15 -> 14; 17 -> 16;
+                19 -> 18; _ -> 20|]; _ -> [|; _ -> 186|]|]}
+    Execution of main function `test_map_multidim2` with env:
+      x = {contents=
+           [|0 -> [|0 -> 184; 9 -> 176; 26 -> 175; 45 -> 171; 57 -> 174;
+                  97 -> 180; 143 -> 172; 146 -> 182; 148 -> 173; 157 -> 183;
+                  165 -> 177; 168 -> 179; 181 -> 141; _ -> 185|];
+           1 -> [|1 -> 3; _ -> 170|]; 193 -> [|137 -> 136; _ -> 138|];
+           196 -> [|128 -> 127; _ -> 129|]; 198 -> [|118 -> 120; _ -> 121|];
+           201 -> [|0 -> 103; 7 -> 94; 28 -> 95; 63 -> 98; 91 -> 90;
+                  93 -> 92; 97 -> 96; 100 -> 99; 102 -> 101; _ -> 104|];
+           204 -> [|76 -> 75; _ -> 77|];
+           206 -> [|13 -> 66; 22 -> 55; 57 -> 56; 59 -> 58; 61 -> 60;
+                  63 -> 62; 65 -> 64; 68 -> 67; _ -> 69|];
+           208 -> [|48 -> 50; _ -> 51|];
+           210 -> [|17 -> 35; 22 -> 21; 24 -> 23; 26 -> 25; 28 -> 27;
+                  30 -> 29; 32 -> 31; 34 -> 33; _ -> 36|];
+           211 -> [|7 -> 2; 9 -> 8; 11 -> 10; 13 -> 12; 15 -> 14; 17 -> 16;
+                  19 -> 18; _ -> 20|]; _ -> [|; _ -> 186|]|]}
+      zero = 0
+      one = 1
+  Line 58:
+    Normal execution of function `(!)` with args:
+      r = {contents=
+           [|0 -> [|0 -> 184; 9 -> 176; 26 -> 175; 45 -> 171; 57 -> 174;
+                  97 -> 180; 143 -> 172; 146 -> 182; 148 -> 173; 157 -> 183;
+                  165 -> 177; 168 -> 179; 181 -> 141; _ -> 185|];
+           1 -> [|1 -> 3; _ -> 170|]; 193 -> [|137 -> 136; _ -> 138|];
+           196 -> [|128 -> 127; _ -> 129|]; 198 -> [|118 -> 120; _ -> 121|];
+           201 -> [|0 -> 103; 7 -> 94; 28 -> 95; 63 -> 98; 91 -> 90;
+                  93 -> 92; 97 -> 96; 100 -> 99; 102 -> 101; _ -> 104|];
+           204 -> [|76 -> 75; _ -> 77|];
+           206 -> [|13 -> 66; 22 -> 55; 57 -> 56; 59 -> 58; 61 -> 60;
+                  63 -> 62; 65 -> 64; 68 -> 67; _ -> 69|];
+           208 -> [|48 -> 50; _ -> 51|];
+           210 -> [|17 -> 35; 22 -> 21; 24 -> 23; 26 -> 25; 28 -> 27;
+                  30 -> 29; 32 -> 31; 34 -> 33; _ -> 36|];
+           211 -> [|7 -> 2; 9 -> 8; 11 -> 10; 13 -> 12; 15 -> 14; 17 -> 16;
+                  19 -> 18; _ -> 20|]; _ -> [|; _ -> 186|]|]}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents=
+             [|0 -> [|0 -> 184; 9 -> 176; 26 -> 175; 45 -> 171; 57 -> 174;
+                    97 -> 180; 143 -> 172; 146 -> 182; 148 -> 173;
+                    157 -> 183; 165 -> 177; 168 -> 179;
+                    181 -> 141; _ -> 185|];
+             1 -> [|1 -> 3; _ -> 170|]; 193 -> [|137 -> 136; _ -> 138|];
+             196 -> [|128 -> 127; _ -> 129|];
+             198 -> [|118 -> 120; _ -> 121|];
+             201 -> [|0 -> 103; 7 -> 94; 28 -> 95; 63 -> 98; 91 -> 90;
+                    93 -> 92; 97 -> 96; 100 -> 99; 102 -> 101; _ -> 104|];
+             204 -> [|76 -> 75; _ -> 77|];
+             206 -> [|13 -> 66; 22 -> 55; 57 -> 56; 59 -> 58; 61 -> 60;
+                    63 -> 62; 65 -> 64; 68 -> 67; _ -> 69|];
+             208 -> [|48 -> 50; _ -> 51|];
+             210 -> [|17 -> 35; 22 -> 21; 24 -> 23; 26 -> 25; 28 -> 27;
+                    30 -> 29; 32 -> 31; 34 -> 33; _ -> 36|];
+             211 -> [|7 -> 2; 9 -> 8; 11 -> 10; 13 -> 12; 15 -> 14; 17 -> 16;
+                    19 -> 18; _ -> 20|]; _ -> [|; _ -> 186|]|]}
+File maps_mono.mlw:
+  Line 58:
+    Normal execution of function `get` with args:
+      f = [|0 -> [|0 -> 184; 9 -> 176; 26 -> 175; 45 -> 171; 57 -> 174;
+                 97 -> 180; 143 -> 172; 146 -> 182; 148 -> 173; 157 -> 183;
+                 165 -> 177; 168 -> 179; 181 -> 141; _ -> 185|];
+          1 -> [|1 -> 3; _ -> 170|]; 193 -> [|137 -> 136; _ -> 138|];
+          196 -> [|128 -> 127; _ -> 129|]; 198 -> [|118 -> 120; _ -> 121|];
+          201 -> [|0 -> 103; 7 -> 94; 28 -> 95; 63 -> 98; 91 -> 90; 93 -> 92;
+                 97 -> 96; 100 -> 99; 102 -> 101; _ -> 104|];
+          204 -> [|76 -> 75; _ -> 77|];
+          206 -> [|13 -> 66; 22 -> 55; 57 -> 56; 59 -> 58; 61 -> 60;
+                 63 -> 62; 65 -> 64; 68 -> 67; _ -> 69|];
+          208 -> [|48 -> 50; _ -> 51|];
+          210 -> [|17 -> 35; 22 -> 21; 24 -> 23; 26 -> 25; 28 -> 27;
+                 30 -> 29; 32 -> 31; 34 -> 33; _ -> 36|];
+          211 -> [|7 -> 2; 9 -> 8; 11 -> 10; 13 -> 12; 15 -> 14; 17 -> 16;
+                 19 -> 18; _ -> 20|]; _ -> [|; _ -> 186|]|]
+      x = 0
+  Line 29:
+    Normal execution of function `(@)` with args:
+      u = [|0 -> [|0 -> 184; 9 -> 176; 26 -> 175; 45 -> 171; 57 -> 174;
+                 97 -> 180; 143 -> 172; 146 -> 182; 148 -> 173; 157 -> 183;
+                 165 -> 177; 168 -> 179; 181 -> 141; _ -> 185|];
+          1 -> [|1 -> 3; _ -> 170|]; 193 -> [|137 -> 136; _ -> 138|];
+          196 -> [|128 -> 127; _ -> 129|]; 198 -> [|118 -> 120; _ -> 121|];
+          201 -> [|0 -> 103; 7 -> 94; 28 -> 95; 63 -> 98; 91 -> 90; 93 -> 92;
+                 97 -> 96; 100 -> 99; 102 -> 101; _ -> 104|];
+          204 -> [|76 -> 75; _ -> 77|];
+          206 -> [|13 -> 66; 22 -> 55; 57 -> 56; 59 -> 58; 61 -> 60;
+                 63 -> 62; 65 -> 64; 68 -> 67; _ -> 69|];
+          208 -> [|48 -> 50; _ -> 51|];
+          210 -> [|17 -> 35; 22 -> 21; 24 -> 23; 26 -> 25; 28 -> 27;
+                 30 -> 29; 32 -> 31; 34 -> 33; _ -> 36|];
+          211 -> [|7 -> 2; 9 -> 8; 11 -> 10; 13 -> 12; 15 -> 14; 17 -> 16;
+                 19 -> 18; _ -> 20|]; _ -> [|; _ -> 186|]|]
+      u = 0
+  Line 59:
+    Normal execution of function `set` with args:
+      f = [|0 -> 184; 9 -> 176; 26 -> 175; 45 -> 171; 57 -> 174; 97 -> 180;
+          143 -> 172; 146 -> 182; 148 -> 173; 157 -> 183; 165 -> 177;
+          168 -> 179; 181 -> 141; _ -> 185|]
+      x = 0
+      v = 3
+  Line 60:
+    Normal execution of function `(!)` with args:
+      r = {contents=
+           [|0 -> [|0 -> 184; 9 -> 176; 26 -> 175; 45 -> 171; 57 -> 174;
+                  97 -> 180; 143 -> 172; 146 -> 182; 148 -> 173; 157 -> 183;
+                  165 -> 177; 168 -> 179; 181 -> 141; _ -> 185|];
+           1 -> [|1 -> 3; _ -> 170|]; 193 -> [|137 -> 136; _ -> 138|];
+           196 -> [|128 -> 127; _ -> 129|]; 198 -> [|118 -> 120; _ -> 121|];
+           201 -> [|0 -> 103; 7 -> 94; 28 -> 95; 63 -> 98; 91 -> 90;
+                  93 -> 92; 97 -> 96; 100 -> 99; 102 -> 101; _ -> 104|];
+           204 -> [|76 -> 75; _ -> 77|];
+           206 -> [|13 -> 66; 22 -> 55; 57 -> 56; 59 -> 58; 61 -> 60;
+                  63 -> 62; 65 -> 64; 68 -> 67; _ -> 69|];
+           208 -> [|48 -> 50; _ -> 51|];
+           210 -> [|17 -> 35; 22 -> 21; 24 -> 23; 26 -> 25; 28 -> 27;
+                  30 -> 29; 32 -> 31; 34 -> 33; _ -> 36|];
+           211 -> [|7 -> 2; 9 -> 8; 11 -> 10; 13 -> 12; 15 -> 14; 17 -> 16;
+                  19 -> 18; _ -> 20|]; _ -> [|; _ -> 186|]|]}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents=
+             [|0 -> [|0 -> 184; 9 -> 176; 26 -> 175; 45 -> 171; 57 -> 174;
+                    97 -> 180; 143 -> 172; 146 -> 182; 148 -> 173;
+                    157 -> 183; 165 -> 177; 168 -> 179;
+                    181 -> 141; _ -> 185|];
+             1 -> [|1 -> 3; _ -> 170|]; 193 -> [|137 -> 136; _ -> 138|];
+             196 -> [|128 -> 127; _ -> 129|];
+             198 -> [|118 -> 120; _ -> 121|];
+             201 -> [|0 -> 103; 7 -> 94; 28 -> 95; 63 -> 98; 91 -> 90;
+                    93 -> 92; 97 -> 96; 100 -> 99; 102 -> 101; _ -> 104|];
+             204 -> [|76 -> 75; _ -> 77|];
+             206 -> [|13 -> 66; 22 -> 55; 57 -> 56; 59 -> 58; 61 -> 60;
+                    63 -> 62; 65 -> 64; 68 -> 67; _ -> 69|];
+             208 -> [|48 -> 50; _ -> 51|];
+             210 -> [|17 -> 35; 22 -> 21; 24 -> 23; 26 -> 25; 28 -> 27;
+                    30 -> 29; 32 -> 31; 34 -> 33; _ -> 36|];
+             211 -> [|7 -> 2; 9 -> 8; 11 -> 10; 13 -> 12; 15 -> 14; 17 -> 16;
+                    19 -> 18; _ -> 20|]; _ -> [|; _ -> 186|]|]}
+File maps_mono.mlw:
+  Line 60:
+    Normal execution of function `set` with args:
+      f = [|0 -> [|0 -> 184; 9 -> 176; 26 -> 175; 45 -> 171; 57 -> 174;
+                 97 -> 180; 143 -> 172; 146 -> 182; 148 -> 173; 157 -> 183;
+                 165 -> 177; 168 -> 179; 181 -> 141; _ -> 185|];
+          1 -> [|1 -> 3; _ -> 170|]; 193 -> [|137 -> 136; _ -> 138|];
+          196 -> [|128 -> 127; _ -> 129|]; 198 -> [|118 -> 120; _ -> 121|];
+          201 -> [|0 -> 103; 7 -> 94; 28 -> 95; 63 -> 98; 91 -> 90; 93 -> 92;
+                 97 -> 96; 100 -> 99; 102 -> 101; _ -> 104|];
+          204 -> [|76 -> 75; _ -> 77|];
+          206 -> [|13 -> 66; 22 -> 55; 57 -> 56; 59 -> 58; 61 -> 60;
+                 63 -> 62; 65 -> 64; 68 -> 67; _ -> 69|];
+          208 -> [|48 -> 50; _ -> 51|];
+          210 -> [|17 -> 35; 22 -> 21; 24 -> 23; 26 -> 25; 28 -> 27;
+                 30 -> 29; 32 -> 31; 34 -> 33; _ -> 36|];
+          211 -> [|7 -> 2; 9 -> 8; 11 -> 10; 13 -> 12; 15 -> 14; 17 -> 16;
+                 19 -> 18; _ -> 20|]; _ -> [|; _ -> 186|]|]
+      x = 0
+      v = (fun y -> if pure { if y = x then True else False } then v
+             else f y) with f = [|0 -> 184; 9 -> 176; 26 -> 175; 45 -> 171;
+                                57 -> 174; 97 -> 180; 143 -> 172; 146 -> 182;
+                                148 -> 173; 157 -> 183; 165 -> 177;
+                                168 -> 179; 181 -> 141; _ -> 185|], x = 0, v = 3
+    Normal execution of function `(:=)` with args:
+      r = {contents=
+           [|0 -> [|0 -> 184; 9 -> 176; 26 -> 175; 45 -> 171; 57 -> 174;
+                  97 -> 180; 143 -> 172; 146 -> 182; 148 -> 173; 157 -> 183;
+                  165 -> 177; 168 -> 179; 181 -> 141; _ -> 185|];
+           1 -> [|1 -> 3; _ -> 170|]; 193 -> [|137 -> 136; _ -> 138|];
+           196 -> [|128 -> 127; _ -> 129|]; 198 -> [|118 -> 120; _ -> 121|];
+           201 -> [|0 -> 103; 7 -> 94; 28 -> 95; 63 -> 98; 91 -> 90;
+                  93 -> 92; 97 -> 96; 100 -> 99; 102 -> 101; _ -> 104|];
+           204 -> [|76 -> 75; _ -> 77|];
+           206 -> [|13 -> 66; 22 -> 55; 57 -> 56; 59 -> 58; 61 -> 60;
+                  63 -> 62; 65 -> 64; 68 -> 67; _ -> 69|];
+           208 -> [|48 -> 50; _ -> 51|];
+           210 -> [|17 -> 35; 22 -> 21; 24 -> 23; 26 -> 25; 28 -> 27;
+                  30 -> 29; 32 -> 31; 34 -> 33; _ -> 36|];
+           211 -> [|7 -> 2; 9 -> 8; 11 -> 10; 13 -> 12; 15 -> 14; 17 -> 16;
+                  19 -> 18; _ -> 20|]; _ -> [|; _ -> 186|]|]}
+      v = (fun y1 -> if pure { if y1 = x1 then True else False } then v1
+             else f1 y1) with f1 = [|0 -> [|0 -> 184; 9 -> 176; 26 -> 175;
+                                          45 -> 171; 57 -> 174; 97 -> 180;
+                                          143 -> 172; 146 -> 182; 148 -> 173;
+                                          157 -> 183; 165 -> 177; 168 -> 179;
+                                          181 -> 141; _ -> 185|];
+                                   1 -> [|1 -> 3; _ -> 170|];
+                                   193 -> [|137 -> 136; _ -> 138|];
+                                   196 -> [|128 -> 127; _ -> 129|];
+                                   198 -> [|118 -> 120; _ -> 121|];
+                                   201 -> [|0 -> 103; 7 -> 94; 28 -> 95;
+                                          63 -> 98; 91 -> 90; 93 -> 92;
+                                          97 -> 96; 100 -> 99;
+                                          102 -> 101; _ -> 104|];
+                                   204 -> [|76 -> 75; _ -> 77|];
+                                   206 -> [|13 -> 66; 22 -> 55; 57 -> 56;
+                                          59 -> 58; 61 -> 60; 63 -> 62;
+                                          65 -> 64; 68 -> 67; _ -> 69|];
+                                   208 -> [|48 -> 50; _ -> 51|];
+                                   210 -> [|17 -> 35; 22 -> 21; 24 -> 23;
+                                          26 -> 25; 28 -> 27; 30 -> 29;
+                                          32 -> 31; 34 -> 33; _ -> 36|];
+                                   211 -> [|7 -> 2; 9 -> 8; 11 -> 10;
+                                          13 -> 12; 15 -> 14; 17 -> 16;
+                                          19 -> 18; _ -> 20|]; _ -> [|; _ -> 186|]|], x1 = 0, v1 = (fun y -> if pure { 
+                                                                    if 
+                                                                    y = x
+                                                                    then True
+                                                                    else False } then v
+                                                                    else f y) with f = [|
+                                                                    0 -> 184;
+                                                                    9 -> 176;
+                                                                    26 -> 175;
+                                                                    45 -> 171;
+                                                                    57 -> 174;
+                                                                    97 -> 180;
+                                                                    143 -> 172;
+                                                                    146 -> 182;
+                                                                    148 -> 173;
+                                                                    157 -> 183;
+                                                                    165 -> 177;
+                                                                    168 -> 179;
+                                                                    181 -> 141; _ -> 185|], x = 0, v = 3
+  Line 56:
+    Property failure at postcondition of `test_map_multidim2` with:
+      x = {contents=
+           (fun y1 -> if pure { if y1 = x1 then True else False } then v1
+              else f1 y1) with f1 = [|0 -> [|0 -> 184; 9 -> 176; 26 -> 175;
+                                           45 -> 171; 57 -> 174; 97 -> 180;
+                                           143 -> 172; 146 -> 182;
+                                           148 -> 173; 157 -> 183;
+                                           165 -> 177; 168 -> 179;
+                                           181 -> 141; _ -> 185|];
+                                    1 -> [|1 -> 3; _ -> 170|];
+                                    193 -> [|137 -> 136; _ -> 138|];
+                                    196 -> [|128 -> 127; _ -> 129|];
+                                    198 -> [|118 -> 120; _ -> 121|];
+                                    201 -> [|0 -> 103; 7 -> 94; 28 -> 95;
+                                           63 -> 98; 91 -> 90; 93 -> 92;
+                                           97 -> 96; 100 -> 99;
+                                           102 -> 101; _ -> 104|];
+                                    204 -> [|76 -> 75; _ -> 77|];
+                                    206 -> [|13 -> 66; 22 -> 55; 57 -> 56;
+                                           59 -> 58; 61 -> 60; 63 -> 62;
+                                           65 -> 64; 68 -> 67; _ -> 69|];
+                                    208 -> [|48 -> 50; _ -> 51|];
+                                    210 -> [|17 -> 35; 22 -> 21; 24 -> 23;
+                                           26 -> 25; 28 -> 27; 30 -> 29;
+                                           32 -> 31; 34 -> 33; _ -> 36|];
+                                    211 -> [|7 -> 2; 9 -> 8; 11 -> 10;
+                                           13 -> 12; 15 -> 14; 17 -> 16;
+                                           19 -> 18; _ -> 20|]; _ -> 
+                                    [|; _ -> 186|]|], x1 = 0, v1 = (fun y -> if pure { 
+                                                                    if 
+                                                                    y = x
+                                                                    then True
+                                                                    else False } then v
+                                                                    else 
+                                                                    f y) with f = [|
+                                                                    0 -> 184;
+                                                                    9 -> 176;
+                                                                    26 -> 175;
+                                                                    45 -> 171;
+                                                                    57 -> 174;
+                                                                    97 -> 180;
+                                                                    143 -> 172;
+                                                                    146 -> 182;
+                                                                    148 -> 173;
+                                                                    157 -> 183;
+                                                                    165 -> 177;
+                                                                    168 -> 179;
+                                                                    181 -> 141; _ -> 185|], x = 0, v = 3}
+
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: STUCK (failure in postcondition of `set` at unknown location)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 63, characters 14-54)
+  - Abstract RAC: STUCK (failure in postcondition of `set` at unknown location)
+File "bench/check-ce/maps_mono.mlw", line 63, characters 14-54:
+Sub-goal Postcondition of goal proj_map_test1'vc.
+Prover result is: Unknown or time/memory/step limit.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File maps_mono.mlw:
+  Line 62:
+    x = {contents=
+         [|0 -> 12; 1 -> 3; 13 -> 15; 16 -> 18; 19 -> 20; 22 -> 24; 34 -> 35;
+         36 -> 38; 45 -> 46; 58 -> 60; _ -> 2|]}
+    x = {contents=
+         [|0 -> 12; 1 -> 3; 13 -> 15; 16 -> 18; 19 -> 20; 22 -> 24; 34 -> 35;
+         36 -> 38; 45 -> 46; 58 -> 60; _ -> 2|]}
+    Execution of main function `proj_map_test1` with env:
+      x = {contents=
+           [|0 -> 12; 1 -> 3; 13 -> 15; 16 -> 18; 19 -> 20; 22 -> 24;
+           34 -> 35; 36 -> 38; 45 -> 46; 58 -> 60; _ -> 2|]}
+      zero = 0
+      one = 1
+  Line 65:
+    Normal execution of function `(!)` with args:
+      r = {contents=
+           [|0 -> 12; 1 -> 3; 13 -> 15; 16 -> 18; 19 -> 20; 22 -> 24;
+           34 -> 35; 36 -> 38; 45 -> 46; 58 -> 60; _ -> 2|]}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents=
+             [|0 -> 12; 1 -> 3; 13 -> 15; 16 -> 18; 19 -> 20; 22 -> 24;
+             34 -> 35; 36 -> 38; 45 -> 46; 58 -> 60; _ -> 2|]}
+File maps_mono.mlw:
+  Line 65:
+    Normal execution of function `set` with args:
+      f = [|0 -> 12; 1 -> 3; 13 -> 15; 16 -> 18; 19 -> 20; 22 -> 24;
+          34 -> 35; 36 -> 38; 45 -> 46; 58 -> 60; _ -> 2|]
+      x = 0
+      v = 3
+    Normal execution of function `(:=)` with args:
+      r = {contents=
+           [|0 -> 12; 1 -> 3; 13 -> 15; 16 -> 18; 19 -> 20; 22 -> 24;
+           34 -> 35; 36 -> 38; 45 -> 46; 58 -> 60; _ -> 2|]}
+      v = (fun y -> if pure { if y = x then True else False } then v
+             else f y) with f = [|0 -> 12; 1 -> 3; 13 -> 15; 16 -> 18;
+                                19 -> 20; 22 -> 24; 34 -> 35; 36 -> 38;
+                                45 -> 46; 58 -> 60; _ -> 2|], x = 0, v = 3
+  Line 63:
+    Property failure at postcondition of `proj_map_test1` with:
+      x = {contents=
+           (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = [|0 -> 12; 1 -> 3; 13 -> 15; 16 -> 18;
+                                 19 -> 20; 22 -> 24; 34 -> 35; 36 -> 38;
+                                 45 -> 46; 58 -> 60; _ -> 2|], x = 0, v = 3}
+
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: STUCK (failure in postcondition of `set2` at unknown location)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 68, characters 14-56)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `set2` cannot be evaluated)
+File "bench/check-ce/maps_mono.mlw", line 68, characters 14-56:
+Sub-goal Postcondition of goal proj_map_test2'vc.
+Prover result is: Unknown or time/memory/step limit.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File maps_mono.mlw:
+  Line 67:
+    x = {contents=
+         [|0 -> false; 1 -> true; 2 -> true; 3 -> false; 5 -> false;
+         6 -> true; 7 -> true; _ -> false|]}
+    x = {contents=
+         [|0 -> false; 1 -> true; 2 -> true; 3 -> false; 5 -> false;
+         6 -> true; 7 -> true; _ -> false|]}
+    Execution of main function `proj_map_test2` with env:
+      x = {contents=
+           [|0 -> false; 1 -> true; 2 -> true; 3 -> false; 5 -> false;
+           6 -> true; 7 -> true; _ -> false|]}
+      zero = 0
+      one = 1
+  Line 70:
+    Normal execution of function `True` with args:
+    Normal execution of function `(!)` with args:
+      r = {contents=
+           [|0 -> false; 1 -> true; 2 -> true; 3 -> false; 5 -> false;
+           6 -> true; 7 -> true; _ -> false|]}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents=
+             [|0 -> false; 1 -> true; 2 -> true; 3 -> false; 5 -> false;
+             6 -> true; 7 -> true; _ -> false|]}
+File maps_mono.mlw:
+  Line 70:
+    Normal execution of function `set` with args:
+      f = [|0 -> false; 1 -> true; 2 -> true; 3 -> false; 5 -> false;
+          6 -> true; 7 -> true; _ -> false|]
+      x = 0
+      v = true
+    Normal execution of function `(:=)` with args:
+      r = {contents=
+           [|0 -> false; 1 -> true; 2 -> true; 3 -> false; 5 -> false;
+           6 -> true; 7 -> true; _ -> false|]}
+      v = (fun y2 -> if pure { if y2 = x2 then True else False } then v2
+             else f2 y2) with f2 = [|0 -> false; 1 -> true; 2 -> true;
+                                   3 -> false; 5 -> false; 6 -> true;
+                                   7 -> true; _ -> false|], x2 = 0, v2 = true
+  Line 68:
+    Property failure at postcondition of `proj_map_test2` with:
+      x = {contents=
+           (fun y2 -> if pure { if y2 = x2 then True else False } then v2
+              else f2 y2) with f2 = [|0 -> false; 1 -> true; 2 -> true;
+                                    3 -> false; 5 -> false; 6 -> true;
+                                    7 -> true; _ -> false|], x2 = 0, v2 = true}
+
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 79, characters 3-31)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 79, characters 3-31)
+File "bench/check-ce/maps_mono.mlw", line 79, characters 3-31:
+Goal t1.
+Prover result is: Unknown or time/memory/step limit.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File maps_mono.mlw:
+  Line 78:
+    t = [|0 -> 2; 4 -> 5; _ -> 2|]
+    i = 0
+    t = [|0 -> 2; 4 -> 5; _ -> 2|]
+    i = 0
+    Execution of main function `t1'goal` with env:
+      i = 0
+      t = [|0 -> 2; 4 -> 5; _ -> 2|]
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File maps_mono.mlw:
+  Line 79:
+    Property failure at postcondition of `t1'goal1` with:
+      i = 0
+      t = [|0 -> 2; 4 -> 5; _ -> 2|]
+

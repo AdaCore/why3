@@ -9,6 +9,14 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {1 Types in WhyML programs}
+
+Individual types are first-order types without effects.
+
+Computation types are higher-order types with effects.
+
+*)
+
 open Ident
 open Ty
 open Term
@@ -237,7 +245,9 @@ val ity_frz_regs : Sreg.t -> ity -> Sreg.t
 
 (** {2 Built-in types} *)
 
-val ts_unit : tysymbol (** the same as [Ty.ts_tuple 0] *)
+val ts_unit : tysymbol
+(** Same as [Ty.ts_tuple 0]. *)
+
 val ty_unit : ty
 
 val its_int  : itysymbol
@@ -428,8 +438,8 @@ val pvs_affected : 'a Mreg.t -> Spv.t -> Spv.t
 
 (** {2 Computation types (higher-order types with effects)} *)
 
-type pre = term   (** precondition: pre_fmla *)
-type post = term  (** postcondition: eps result . post_fmla *)
+type pre = term   (* precondition: pre_fmla *)
+type post = term  (* postcondition: eps result . post_fmla *)
 
 val open_post : post -> vsymbol * term
 val open_post_with : term -> post -> term

@@ -1,0 +1,20 @@
+
+use int.Int
+use bool.Bool
+
+val ref x : int
+val ref a : bool
+val ref b : bool
+
+let main [@bddinfer] () diverges
+ =
+ x <- 0;
+ a <- True;
+ b <- True;
+ while x <= 100 do
+   x <- x + 1;
+   a <- notb a;
+   b <- notb b;
+ done;
+ [@bddinfer:A1] assert { x = 101 };
+ [@bddinfer:A2] assert { a = b }

@@ -9,7 +9,17 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** {1 Parse trees} *)
+(** {1 Parse trees}
+
+The module provides datatypes for WhyML parse trees.
+
+These datatypes are produced by the WhyML parser module [Parser].
+
+They can be alternatively produced via OCaml code, and processed later
+   on by typing module [Typing]. See also Section 4.9. "ML Programs"
+   of the documentation.
+
+*)
 
 open Mysexplib.Std [@@warning "-33"]
 
@@ -42,15 +52,17 @@ type pty =
   | PTtyvar of ident
   (** type variable *)
   | PTtyapp of qualid * pty list
-  (** type constructor, possibly with arguments, e.g. [int], [list bool], etc. *)
+  (** type constructor, possibly with arguments, e.g., [int], [list bool], etc. *)
   | PTtuple of pty list
-  (** tuples, e.g. [(int,bool)] *)
+  (** tuples, e.g., [(int,bool)] *)
   | PTref   of pty list
-  (** reference type, e.g. [ref (int,bool)] *)
+  (** reference type, e.g., [ref int], as used by the "auto-dereference"
+     mechanism (See manual Section 13.1. "Release Notes for version
+     1.2: new syntax for auto-dereference") *)
   | PTarrow of pty * pty
-  (** arrow type, e.g. [int -> bool] *)
+  (** arrow type, e.g., [int -> bool] *)
   | PTscope of qualid * pty
-  (** opening scope locally, e.g. [M.((list t,u))] *)
+  (** opening scope locally, e.g., [M.((list t,u))] *)
   | PTparen of pty
   (** parenthesised type *)
   | PTpure  of pty
@@ -60,6 +72,7 @@ type pty =
 
 (** {2 Patterns} *)
 
+(** "ghost" modifier *)
 type ghost = bool
 [@@deriving sexp_of]
 
@@ -71,17 +84,17 @@ type pattern = {
 
 and pat_desc =
   | Pwild
-  (** wildcard, that is [_] *)
+  (** wildcard, that is "_" *)
   | Pvar of ident
   (** variable as a pattern *)
   | Papp of qualid * pattern list
-  (** constructor pattern, e.g [Cons(x,y)] *)
+  (** constructor pattern, e.g., [Cons(x,y)] *)
   | Prec of (qualid * pattern) list
   (** record pattern *)
   | Ptuple of pattern list
   (** tuple pattern *)
   | Pas of pattern * ident * ghost
-  (** as-pattern, e.g. [Cons(x,y) as z] *)
+  (** as-pattern, e.g., [Cons(x,y) as z] *)
   | Por of pattern * pattern
   (** or-pattern [p1 | p2] *)
   | Pcast of pattern * pty
@@ -97,9 +110,13 @@ and pat_desc =
 
 (** {2 Logical terms and formulas} *)
 
+(** binder as 4-uple [(loc,id,ghost,type)] to represent "ghost? id? :
+   type?". [id] and [type] cannot be [None] at the same time *)
 type binder = Loc.position * ident option * ghost * pty option
 [@@deriving sexp_of]
 
+(** parameter as 4-uple [(loc,id,ghost,type)] to represent
+   "ghost? id? : type". *)
 type param  = Loc.position * ident option * ghost * pty
 [@@deriving sexp_of]
 
@@ -119,14 +136,16 @@ and term_desc =
   | Tident of qualid
   (** identifiers *)
   | Tasref of qualid
-  (** identifier as reference, e.g. [&x] *)
+  (** identifier as reference, e.g., [&x] (See manual Section
+     13.1. "Release Notes for version 1.2: new syntax for
+     auto-dereference") *)
   | Tidapp of qualid * term list
   (** (first-order) application of a logic identifier to a list of terms *)
   | Tapply of term * term
-  (** curryied application, of a term to a term *)
+  (** curried application, of a term to a term *)
   | Tinfix of term * ident * term
-  (** application of a binary operation in an infix fashion, allowing chaining
-      of such. For example, [Tinfix(t1,"<=",Tinfix(t2,"<",t3))] denotes
+  (** application of a binary operation in an infix fashion, allowing chaining.
+      For example, [Tinfix(t1,"<=",Tinfix(t2,"<",t3))] denotes
       [t1 <= t2 /\ t2 < t3] *)
   | Tinnfix of term * ident * term
   (** application of a binary operation in an infix style, but without chaining *)
@@ -143,7 +162,7 @@ and term_desc =
   | Tquant of Dterm.dquant * binder list * term list list * term
   (** quantified formulas. The third argument is a list of triggers. *)
   | Tattr of attr * term
-  (** term with an attribute *)
+  (** term annotated with an attribute *)
   | Tlet of ident * term * term
   (** let-expression *)
   | Tcase of term * (pattern * term) list
@@ -155,12 +174,13 @@ and term_desc =
   | Trecord of (qualid * term) list
   (** record expressions *)
   | Tupdate of term * (qualid * term) list
-  (** update-expression *)
+  (** record update expression *)
   | Teps of (ident * pty) * term
   | Tscope of qualid * term
   (** local scope *)
   | Tat of term * ident
-  (** at modifier *)
+  (** "at" modifier. The "old" modifier is a particular case with
+     the identifier [Dexpr.old_label]  *)
 [@@deriving sexp_of]
 
 (** {2 Program expressions} *)
@@ -169,7 +189,8 @@ and term_desc =
 type invariant = term list
 [@@deriving sexp_of]
 
-(** Variant for both loops and recursive functions *)
+(** Variant for both loops and recursive functions. The option
+   identifier is an optional ordering predicate *)
 type variant = (term * qualid option) list
 [@@deriving sexp_of]
 
@@ -177,11 +198,11 @@ type variant = (term * qualid option) list
 type pre = term
 [@@deriving sexp_of]
 
-(** Normal postcondition *)
+(** Normal postconditions *)
 type post = Loc.position * (pattern * term) list
 [@@deriving sexp_of]
 
-(** Exceptional postcondition *)
+(** Exceptional postconditions *)
 type xpost = Loc.position * (qualid * (pattern * term) option) list
 [@@deriving sexp_of]
 
@@ -190,9 +211,9 @@ type spec = {
     sp_pre     : pre list; (** preconditions *)
     sp_post    : post list; (** normal postconditions *)
     sp_xpost   : xpost list; (** exceptional postconditions *)
-    sp_reads   : qualid list; (** [reads] clause *)
-    sp_writes  : term list;   (** [writes] clause *)
-    sp_alias   : (term * term) list; (** [alias] clause *)
+    sp_reads   : qualid list; (** "reads" clause *)
+    sp_writes  : term list;   (** "writes" clause *)
+    sp_alias   : (term * term) list; (** "alias" clause *)
     sp_variant : variant; (** variant for recursive functions *)
     sp_checkrw : bool; (** should the reads and writes clauses be checked against the given body? *)
     sp_diverge : bool; (** may the function diverge? *)
@@ -209,7 +230,9 @@ type expr = {
 (** Expression kinds *)
 and expr_desc =
   | Eref
-  (** built-in operator [ref] for “auto-dereference” syntax *)
+  (** built-in operator [ref] for auto-dereference syntax. (See manual Section
+     13.1. "Release Notes for version 1.2: new syntax for
+     auto-dereference")  *)
   | Etrue
   (** Boolean literal [True] *)
   | Efalse
@@ -219,15 +242,17 @@ and expr_desc =
   | Eident of qualid
   (** Variable identifier *)
   | Easref of qualid
-  (** identifier as reference, e.g. [&x] *)
+  (** identifier as reference, e.g., [&x]  (See manual Section
+     13.1. "Release Notes for version 1.2: new syntax for
+     auto-dereference")  *)
   | Eidapp of qualid * expr list
   (** Uncurried application of a function identifier to a list of arguments *)
   | Eapply of expr * expr
   (** Curried application *)
   | Einfix of expr * ident * expr
   (** application of a binary function identifier, in an infix fashion, allowing
-     chaining, e.g. [Einfix(e1,"<=",Einfix(e2,"<",e3))] denotes
-     [e1 <= e2 && e2 < e3]  *)
+     chaining, e.g., [Einfix(e1,"<=",Einfix(e2,"<",e3))] denotes
+     [e1 <= e2 && e2 < e3] *)
   | Einnfix of expr * ident * expr
   (** application of a binary function, but without chaining *)
   | Elet of ident * ghost * Expr.rs_kind * expr * expr
@@ -237,21 +262,21 @@ and expr_desc =
   | Efun of binder list * pty option * pattern * Ity.mask * spec * expr
   (** Anonymous function *)
   | Eany of param list * Expr.rs_kind * pty option * pattern * Ity.mask * spec
-  (** [any]: abstract expression with a specification,
+  (** "any params : ty <spec>": abstract expression with a specification,
        generating a VC for existence *)
   | Etuple of expr list
   (** Tuple of expressions *)
   | Erecord of (qualid * expr) list
-  (** Record expressions, e.g. [{f=e1; g=e2; ...}] *)
+  (** Record expression, e.g., [{f=e1; g=e2; ...}] *)
   | Eupdate of expr * (qualid * expr) list
-  (** Record update, e.g. [{e with f=e1; ...}] *)
+  (** Record update, e.g., [{e with f=e1; ...}] *)
   | Eassign of (expr * qualid option * expr) list
-  (** assignment, of a mutable variable (no qualid given) or of a record field (qualid
-      given). assignment are possibly in parallel, e.g [x.f, y.g, z <- e1, e2, e3] *)
+  (** Assignment, of a mutable variable (no qualid given) or of a record field (qualid
+      given). Assignments are possibly in parallel, e.g., [x.f, y.g, z <- e1, e2, e3] *)
   | Esequence of expr * expr
-  (** Sequence of two expressions *)
+  (** Sequence of two expressions, the first one being supposed of type unit *)
   | Eif of expr * expr * expr
-  (** [if .. then .. else ..] expression *)
+  (** [if e1 then e2 else e3] expression *)
   | Ewhile of expr * invariant * variant * expr
   (** [while] loop with annotations *)
   | Eand of expr * expr
@@ -259,35 +284,35 @@ and expr_desc =
   | Eor of expr * expr
   (** lazy disjunction *)
   | Enot of expr
-  (** negation *)
+  (** Boolean negation *)
   | Ematch of expr * reg_branch list * exn_branch list
   (** match expression, including both regular patterns and exception
      patterns (those lists cannot be both empty) *)
   | Eabsurd
   (** [absurd] statement to mark unreachable branches *)
   | Epure of term
-  (** turns a logical term into a pure expression, e.g [pure { t }] *)
+  (** turns a logical term into a pure expression, e.g., [pure { t }] *)
   | Eidpur of qualid
-  (** promotes a logic symbol in programs, e.g [{f}] or [M.{f}] *)
+  (** promotes a logic symbol in programs, e.g., [{f}] or [M.{f}] *)
   | Eraise of qualid * expr option
   (** raise an exception, possibly with an argument *)
   | Eexn of ident * pty * Ity.mask * expr
-  (** local declaration of an exception *)
+  (** local declaration of an exception, e.g., [let exception E in e] *)
   | Eoptexn of ident * Ity.mask * expr
   (** local declaration of an exception, implicitly captured. Used by Why3 for handling
-     [return], [break] and [continue] *)
+      [return], [break], and [continue] *)
   | Efor of ident * expr * Expr.for_direction * expr * invariant * expr
-  (** [for] loops *)
+  (** "for" loops *)
   | Eassert of Expr.assertion_kind * term
-  (** [assert], [assume] or [check] expressions *)
+  (** [assert], [assume], and [check] expressions *)
   | Escope of qualid * expr
-  (** open scope locally, e.g. [M.(e)] *)
+  (** open scope locally, e.g., [M.(e)] *)
   | Elabel of ident * expr
-  (** introduction of a label, e.g. [label L in e] *)
+  (** introduction of a label, e.g., [label L in e] *)
   | Ecast of expr * pty
-  (** cast an expression to a given type, e.g. [(e:ty)] *)
+  (** cast an expression to a given type, e.g., [(e:ty)] *)
   | Eghost of expr
-  (** forces an expression to be ghost, e..g [ghost e] *)
+  (** forces an expression to be ghost, e.g., [ghost e] *)
   | Eattr of attr * expr
   (** attach an attribute to an expression *)
 
@@ -364,7 +389,7 @@ type ind_decl = {
 }
 [@@deriving sexp_of]
 
-(** Arguments of [meta] declarations *)
+(** Arguments of "meta" declarations *)
 type metarg =
   | Mty  of pty
   | Mfs  of qualid
@@ -377,7 +402,7 @@ type metarg =
   | Mint of int
 [@@deriving sexp_of]
 
-(** The possible [clone] substitution elements *)
+(** The possible "clone" substitution elements *)
 type clone_subst =
   | CStsym  of qualid * ident list * pty
   | CSfsym  of qualid * qualid
@@ -395,11 +420,11 @@ type decl =
   | Dtype of type_decl list
   (** Type declaration *)
   | Dlogic of logic_decl list
-  (** Collection of [function]s and [predicate]s, mutually recursively declared *)
+  (** Collection of "function"s and "predicate"s, mutually recursively declared *)
   | Dind of Decl.ind_sign * ind_decl list
   (** An inductive or co-inductive predicate *)
   | Dprop of Decl.prop_kind * ident * term
-  (** Propositions: [lemma] or [goal] or [axiom] *)
+  (** Propositions: "lemma" or "goal" or "axiom" *)
   | Dlet of ident * ghost * Expr.rs_kind * expr
   (** Global program variable *)
   | Drec of fundef list
@@ -407,19 +432,19 @@ type decl =
   | Dexn of ident * pty * Ity.mask
   (** Declaration of global exceptions *)
   | Dmeta of ident * metarg list
-  (** Declaration of a [meta] *)
+  (** Declaration of a "meta" *)
   | Dcloneexport of Loc.position * qualid * clone_subst list
-  (** [clone export] *)
+  (** "clone export" *)
   | Duseexport of qualid
-  (** [use export] *)
+  (** "use export" *)
   | Dcloneimport of Loc.position * bool * qualid * ident option * clone_subst list
-  (** [clone import ... as ...] *)
+  (** "clone import ... as ..." *)
   | Duseimport of Loc.position * bool * (qualid * ident option) list
-  (** [use import ... as ...] *)
+  (** "use import ... as ..." *)
   | Dimport of qualid
-  (** [import] *)
+  (** "import" *)
   | Dscope of Loc.position * bool * ident * decl list
-  (** [scope] *)
+  (** "scope" *)
 [@@deriving sexp_of]
 
 type mlw_file =

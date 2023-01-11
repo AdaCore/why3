@@ -49,7 +49,7 @@ let env : Env.env = Env.create_env (Whyconf.loadpath main)
 let alt_ergo_driver : Driver.driver =
   try
     Printexc.record_backtrace true;
-    Driver.load_driver main env alt_ergo
+    Driver.load_driver_for_prover main env alt_ergo
   with e ->
     let s = Printexc.get_backtrace () in
     eprintf "Failed to load driver for alt-ergo: %a@.%s@."
@@ -106,9 +106,10 @@ module Task =
     let warnings = ref []
     let clear_warnings () = warnings := []
     let () =
-      Warning.set_hook (fun ?(loc=(Loc.user_position "" 1 0 1 0)) msg ->
-                        let _, a, b,_, _ = Loc.get loc in
-                        warnings := ((a-1,b), msg) :: !warnings)
+      Loc.set_warning_hook
+        (fun ?(loc=(Loc.user_position "" 1 0 1 0)) msg ->
+          let _, a, b,_, _ = Loc.get loc in
+          warnings := ((a-1,b), msg) :: !warnings)
 
 
     let premise_kind = function

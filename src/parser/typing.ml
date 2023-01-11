@@ -277,7 +277,7 @@ let mk_closure crcmap loc ls =
   let mk_v i _ =
     Some (id_user ("y" ^ string_of_int i) loc), dty_fresh (), None in
   let mk_t (id, dty, _) = mk (DTvar ((Opt.get id).pre_name, dty)) in
-  let vl = Lists.mapi mk_v ls.ls_args in
+  let vl = List.mapi mk_v ls.ls_args in
   DTquant (DTlambda, vl, [], mk (DTapp (ls, List.map mk_t vl)))
 
 (* handle auto-dereference in logical terms *)
@@ -492,7 +492,7 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       let cs, fl = parse_record ~loc ns km get_val fl in
       (*
       if not !used then
-        Warning.emit ~loc:e1_loc "unused expression (every field is overwritten)";
+        Loc.warning ~loc:e1_loc "unused expression (every field is overwritten)";
       *)
       let d = DTapp (cs, fl) in
       if re then d else mk_let crcmap ~loc "_q " e1 d
@@ -503,7 +503,7 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       ignore (Loc.try2 ~loc gvars (Some l) (Qident id));
       let e1 = dterm ns km crcmap gvars (Some l) denv e1 in
       if not (Hstr.find at_uses l) && Debug.test_noflag debug_ignore_useless_at then
-        Warning.emit ~loc "this `at'/`old' operator is never used";
+        Loc.warning ~loc "this `at'/`old' operator is never used";
       Hstr.remove at_uses l;
       DTattr (e1, Sattr.empty)
   | Ptree.Tscope (q, e1) ->
@@ -1045,7 +1045,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let cs,fl = parse_record ~loc muc get_val fl in
       (*
       if not !used then
-        Warning.emit ~loc:e1_loc "unused expression (every field is overwritten)";
+        Loc.warning ~loc:e1_loc "unused expression (every field is overwritten)";
       *)
       let d = expr_app loc (DEsym (RS cs)) fl in
       if re then d else mk_let ~loc "_q " e1 d
@@ -1548,53 +1548,9 @@ let add_inductives muc s dl =
 (* turn a lemma into a lemma function *)
 let create_val muc id f =
   let id = id_derive (id.id_string ^ "'lemma") id in
-  let rec decompose_post pvl prel rvl postl f =
-    let stop = Sattr.mem stop_split f.t_attrs in
-    match f.t_node with
-    | Tquant (Texists, f) when not stop ->
-        let vlf,_,f = t_open_quant f in
-        decompose_post pvl prel (List.rev_append vlf rvl) postl f
-    | Tbinop (Tand, f1, f2) when not stop ->
-        decompose_post pvl prel rvl (f1 :: postl) f2
-    | _ ->
-        let f = List.fold_left (fun acc f -> t_and f acc) f postl in
-        let post = match List.rev rvl with
-          | [] ->
-              let res = create_vsymbol (id_fresh "result") ty_unit in
-              create_post res f
-          | [v] ->
-              create_post v f
-          | rvl ->
-              (* force the creation of the program type symbol for the
-                 corresponding tuple type before ty_tuple creates one
-                 for the logic type *)
-              ignore (its_tuple (List.length rvl));
-              let ty = ty_tuple (List.map (fun v -> v.vs_ty) rvl) in
-              let res = create_vsymbol (id_fresh "result") ty in
-              let pvl = List.map pat_var rvl in
-              let pat = pat_app (fs_tuple (List.length rvl)) pvl ty in
-              let f = t_case (t_var res) [t_close_branch pat f] in
-              create_post res f in
-        let ity = ity_of_ty (t_type post) in
-        create_cty pvl prel [post] Mxs.empty Mpv.empty eff_empty ity in
-  let rec decompose_pre vl prel f =
-    let stop = Sattr.mem stop_split f.t_attrs in
-    match f.t_node with
-    | Tquant (Tforall, f) when not stop ->
-        let vlf,_,f = t_open_quant f in
-        decompose_pre (List.rev_append vlf vl) prel f
-    | Tbinop (Timplies, f1, f2) when not stop ->
-        decompose_pre vl (f1 :: prel) f2
-    | _ ->
-        let pv_of_v sbs vs =
-          let pv = create_pvsymbol (id_clone vs.vs_name) (ity_of_ty vs.vs_ty) in
-          Mvs.add vs (t_var pv.pv_vs) sbs, pv in
-        let sbs, pvl = Lists.rev_map_fold_left pv_of_v Mvs.empty vl in
-        let prel = List.rev_map (t_subst sbs) prel in
-        decompose_post pvl prel [] [] (t_subst sbs f) in
-  match decompose_pre [] [] f with
-  | cty ->
-      let ld, _ = let_sym id ~ghost:true (c_any cty) in
+  match c_any (Expr.cty_from_formula f) with
+  | cexp ->
+      let ld, _ = let_sym id ~ghost:true cexp in
       add_pdecl ~vc:false muc (create_let_decl ld)
   | exception UnboundTypeVar _ ->
       muc

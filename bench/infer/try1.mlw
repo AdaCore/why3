@@ -4,7 +4,7 @@ module Try1
 	use ref.Ref
 
 	exception Myexc int
-	let b[@infer](_:int) : int
+	let b [@bddinfer] [@infer](_:int) : int
 	ensures { result = 12 }
 	=
 		let i = ref 0 in
@@ -20,7 +20,7 @@ module Try1
 		done;
 		!i
 
-	let b2[@infer:oct](_:int) : int
+	let b2 [@bddinfer] [@infer:oct](_:int) : int
 	ensures { result = 12 }
 	=
 		let i = ref 0 in

@@ -1,0 +1,55 @@
+(** I Can't Believe It Can Sort
+
+    https://arxiv.org/pdf/2110.01111.pdf
+
+    Author: Paul Patault (Université Paris-Saclay)
+*)
+
+use int.Int
+use array.Array
+use array.ArraySwap
+use array.ArrayPermut
+
+type elt
+
+val predicate le elt elt
+
+val lt (x y: elt) : bool
+  ensures { result <-> le x y /\ x <> y }
+
+clone relations.TotalPreOrder with
+  type t = elt, predicate rel = le, axiom .
+
+clone export array.Sorted with type
+  elt = elt, predicate le = le, axiom .
+
+predicate max_array (a: array elt) (lo hi i: int) =
+  forall j. lo <= j < hi -> le a[j] a[i]
+
+(*
+  The invariant for the outer loop is as follows:
+
+     0              i-1                n
+    +-------------+-----+-------------+
+    |   sorted    | max |     ???     |
+    +-------------+-----+-------------+
+*)
+
+let i_cant_believe_it_can_sort (a: array elt) : unit
+  ensures { permut_all (old a) a }
+  ensures { sorted a }
+= let n = length a in
+  for i = 0 to n - 1 do
+    invariant { permut_all (old a) a }
+    invariant { sorted_sub a 0 (i-1) }
+    invariant { i = 0 || max_array a 0 n (i-1) }
+    for j = 0 to n - 1 do
+      invariant { permut_all (old a) a }
+      invariant { max_array a 0 j i }
+      invariant { i = 0 || if j < i then max_array a 0 n (i-1)
+                                    else max_array a 0 n i }
+      invariant { if j < i then sorted_sub a 0 (i-1)
+                           else sorted_sub a 0 i }
+      if lt a[i] a[j] then swap a i j
+    done
+  done

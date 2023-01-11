@@ -171,13 +171,19 @@ val denv_add_for_index : denv -> preid -> dvty -> denv
 
 val denv_add_exn : denv -> preid -> dity -> denv
 
-val denv_get : denv -> string -> dexpr_node (** raises UnboundVar *)
+val denv_get : denv -> string -> dexpr_node
+(** @raise UnboundVar *)
+
 val denv_get_opt : denv -> string -> dexpr_node option
 
-val denv_get_pure : denv -> string -> dexpr_node (** raises UnboundVar *)
+val denv_get_pure : denv -> string -> dexpr_node
+(** @raise UnboundVar *)
+
 val denv_get_pure_opt : denv -> string -> dexpr_node option
 
-val denv_get_exn : denv -> string -> dxsymbol (** raises Not_found *)
+val denv_get_exn : denv -> string -> dxsymbol
+(** @raise Not_found *)
+
 val denv_get_exn_opt : denv -> string -> dxsymbol option
 
 val denv_names : denv -> Sstr.t
@@ -196,7 +202,7 @@ type pre_fun_defn = preid * ghost * rs_kind * dbinder list *
 val drec_defn : denv -> pre_fun_defn list -> denv * drec_defn
 
 val undereference : dexpr -> dexpr
-  (* raises Not_found if the argument is not auto-dereferenced *)
+(** @raise Not_found if the argument is not auto-dereferenced. *)
 
 (** Final stage *)
 

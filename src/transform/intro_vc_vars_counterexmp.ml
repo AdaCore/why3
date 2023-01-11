@@ -24,16 +24,16 @@ let meta_vc_location =
 
 (* Information about the term that triggers VC.  *)
 type vc_term_info = {
-  vc_inside : bool;
+  mutable vc_inside : bool;
   (* true if the term that triggers VC is currently processed *)
-  vc_loc : Loc.position option;
+  mutable vc_loc : Loc.position option;
   (* the position of the term that triggers VC *)
 }
 
 let is_model_vc_attr l =
   attr_equal l Ity.annot_attr || attr_equal l model_vc_post_attr
 
-let check_enter_vc_term t info vc_loc =
+let check_enter_vc_term t info =
   (* Check whether the term that triggers VC is entered.
      If it is entered, extract the location of the term and if the VC is
      postcondition or precondition of a function, extract the name of
@@ -41,13 +41,9 @@ let check_enter_vc_term t info vc_loc =
   *)
   if Sattr.exists is_model_vc_attr t.t_attrs then
     begin
-      vc_loc := t.t_loc;
-      { vc_inside = true;
-        vc_loc = t.t_loc;
-      }
+      info.vc_inside <- true;
+      info.vc_loc <- t.t_loc;
     end
-  else
-    info
 
 (* Preid table necessary to avoid duplication of *_vc_constant *)
 module Hprid = Exthtbl.Make (struct
@@ -94,9 +90,9 @@ let add_model_trace_attr name attrs =
     @param t current subterm of the goal
     @return list of declarations added by do_intro
  *)
-let rec do_intro info vc_loc vc_map vc_var t =
-  let info = check_enter_vc_term t info vc_loc in
-  let do_intro = do_intro info vc_loc vc_map vc_var in
+let rec do_intro info vc_map vc_var t =
+  check_enter_vc_term t info;
+  let do_intro = do_intro info vc_map vc_var in
 
   (* Do the necessary machinery to add a printable counterexample when encountered
      (variable or function without arguments) *)
@@ -226,19 +222,18 @@ let rec remove_positive_foralls vc_var f =
     and removed split optimizations.
 
     @param info used to know if the current term is under a vc_attr
-    @param vc_loc is the location of the vc_attr (returned value)
     @param vc_map is a container for generated vc_constant id
     (used to avoid duplication)
     @param vc_var current set of variables we introduced
     @param f current goal
     @return pair of the declarations introduced and the modified goal. *)
-let rec intros info vc_loc vc_map vc_var f =
-  let info = check_enter_vc_term f info vc_loc in
-  let intros = intros info vc_loc vc_map vc_var in
+let rec intros info vc_map vc_var f =
+  check_enter_vc_term f info;
+  let intros = intros info vc_map vc_var in
   match f.t_node with
   | Tbinop (Timplies,f1,f2) ->
       let f2 = t_attr_copy f f2 in
-      let l = if info.vc_inside then do_intro info vc_loc vc_map vc_var f1 else [] in
+      let l = if info.vc_inside then do_intro info vc_map vc_var f1 else [] in
       let id = create_prsymbol (id_fresh "H") in
       let d = create_prop_decl Paxiom id f1 in
       let decl, goal = intros f2 in
@@ -268,19 +263,19 @@ let rec intros info vc_loc vc_map vc_var f =
          otherwise we might want it *)
       let decl, goal = intros f in
       if info.vc_inside then
-        let l = do_intro info vc_loc vc_map vc_var t in
+        let l = do_intro info vc_map vc_var t in
         (d :: l @ decl, goal)
       else
         (d :: decl, goal)
   | _ ->
       let (dl, goal) = remove_positive_foralls vc_var f in
       if info.vc_inside then
-        let l = do_intro info vc_loc vc_map vc_var f in
+        let l = do_intro info vc_map vc_var f in
         (l @ dl, goal)
       else
         (dl,goal)
 
-let do_intro_vc_vars_counterexmp info vc_loc pr t =
+let do_intro_vc_vars_counterexmp info pr t =
   (* TODO initial guess on number of counter-examples to print *)
   let vc_map = Hprid.create 100 in
   let vc_var = Hvs.create 100 in
@@ -290,24 +285,29 @@ let do_intro_vc_vars_counterexmp info vc_loc pr t =
   let decls = Mtv.map create_ty_decl tvm in
   let subst = Mtv.map (fun ts -> ty_app ts []) tvm in
   let (defs_intros, t) =
-    intros info vc_loc vc_map vc_var (t_ty_subst subst Mvs.empty t) in
-  let defs_do_intro = do_intro info vc_loc vc_map vc_var t in
+    intros info vc_map vc_var (t_ty_subst subst Mvs.empty t) in
+  let defs_do_intro = do_intro info vc_map vc_var t in
   Mtv.values decls @ defs_intros @ defs_do_intro @ [(create_prop_decl Pgoal pr t)]
 
 let intro_vc_vars_counterexmp2 task =
+  let g,_ = Task.task_separate_goal task in
+  let vc_loc =
+    Theory.(match g.td_node with
+        | Decl { d_node = Dprop (_,_,t) } -> t.t_loc
+        | _ -> None)
+  in
   let info = {
     vc_inside = false;
-    vc_loc = None;
+    vc_loc;
   } in
-  let vc_loc = ref None in
   (* Do introduction and find location of term triggering VC *)
-  let do_intro_trans = Trans.goal (do_intro_vc_vars_counterexmp info vc_loc) in
+  let do_intro_trans = Trans.goal (do_intro_vc_vars_counterexmp info) in
   let task = (Trans.apply do_intro_trans) task in
 
   (* Pass meta with location of the term triggering VC to printer  *)
   let vc_loc_meta = Theory.lookup_meta "vc_location" in
   let g,task = Task.task_separate_goal task in
-  let pos_str = match !vc_loc with
+  let pos_str = match info.vc_loc with
     | None -> ""
     | Some loc ->
       let (file, line1, col1, line2, col2) = Loc.get loc in

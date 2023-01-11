@@ -15,16 +15,24 @@
 
 type driver
 
-val load_driver_absolute :  Env.env -> string -> string list -> driver
-(** [load_driver_absolute env f extras] loads the driver from a file
-   [f], completed with extra files from list [extras], in the context
-   of the environment [env]
+(** Loading drivers *)
 
-    @param env environment to interpret theories
-    @param string driver file name (absolute path name)
-    @param string list additional driver files containing only theories
+val load_driver_file_and_extras :
+  Whyconf.main -> Env.env -> string -> string list -> driver
+(** [load_driver_file_and_extras main env file extras] loads the
+   driver in file [file] and with additional drivers in list [extras],
+   in the context of the configuration [main] and environment
+   [env]. *)
 
- *)
+val load_driver_for_prover :
+  Whyconf.main -> Env.env -> Whyconf.config_prover -> driver
+(** [load_driver main env p] loads the driver for prover [p], in the
+   context of the configuration [main] and environment [env].*)
+
+val resolve_driver_name : Whyconf.main -> string -> string -> string
+(** [resolve_driver_name main dir name] resolves the driver name
+   [name] into a file name. [dir] is the name of the subdirectory of
+   DATADIR where driver files are expected to be.  *)
 
 (** {2 Use a driver} *)
 
@@ -100,7 +108,7 @@ val prove_task_prepared :
 
 val syntax_map: driver -> Printer.syntax_map
 
-(** Information on conuterexample generation *)
+(** Information on counterexample generation *)
 
 val meta_get_counterexmp : Theory.meta
 (** Set in drivers that generate counterexamples *)
@@ -108,19 +116,3 @@ val meta_get_counterexmp : Theory.meta
 val get_counterexmp : Task.task -> bool
 (** Returns true if counterexample should be get for the task (according to
     [meta_get_counterexmp]. *)
-
-
-(** Loading drivers with relative names *)
-
-val load_driver_raw : Whyconf.main -> Env.env -> string -> string list -> driver
-(** [load_driver_raw main env file extras] loads the driver in file
-   [file] and with additional drivers in list [extras], in the context
-   of the configuration [main] and environment [env].  This function
-   is a wrapper to the lower level function
-   {!Driver.load_driver_absolute}. *)
-
-val load_driver : Whyconf.main -> Env.env -> Whyconf.config_prover -> driver
-(** [load_driver main env p] loads the driver for prover [p],
-   in the context of the configuration [main] and environment [env].
-   This function is a wrapper to the lower level function
-   {!load_driver_raw}. *)

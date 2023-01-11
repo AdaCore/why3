@@ -19,8 +19,6 @@ type flag = { flag_name : string;
 let flag_table = Hashtbl.create 17
 
 let fst3 (flag,_,_) = flag
-let snd3 (_,info,_) = info
-let thd3 (_,_,desc) = desc
 
 let enabled_flags =
   Wstdlib.Sstr.of_list
@@ -41,16 +39,10 @@ let register_info_flag ~desc s = gen_register_flag desc s true
 let register_flag      ~desc s = gen_register_flag desc s false
 
 let list_flags () =
-  Hashtbl.fold (fun s (v,_,desc) acc -> (s,v,v.flag_value,desc)::acc) flag_table []
+  Hashtbl.fold (fun s (v,info,desc) acc -> (s,v,info,desc)::acc) flag_table []
 
 let lookup_flag s =
   try fst3 (Hashtbl.find flag_table s) with Not_found -> raise (UnknownFlag s)
-
-let is_info_flag s =
-  try snd3 (Hashtbl.find flag_table s) with Not_found -> raise (UnknownFlag s)
-
-let flag_desc s =
-  try thd3 (Hashtbl.find flag_table s) with Not_found -> raise (UnknownFlag s)
 
 let test_flag s = s.flag_value
 let test_noflag s = not s.flag_value
@@ -118,7 +110,7 @@ module Args = struct
         in
         Format.printf "@[<v>%a@]@."
           (Pp.print_list Pp.newline print)
-          (List.sort Pervasives.compare list);
+          (List.sort Stdlib.compare list);
       end;
       !opt_list_flags in
     desc,list
@@ -143,9 +135,7 @@ module Args = struct
 
   let set_flags_selected ?(silent=false) () =
     if !opt_debug_all then
-      List.iter
-        (fun (s,f,_,_) -> if is_info_flag s then set_flag f)
-        (list_flags ());
+      List.iter (fun (_,f,info,_) -> if info then set_flag f) (list_flags ());
     let check flag =
       match lookup_flag flag with
       | f -> set_flag f

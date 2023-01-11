@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {1 Helpers for constructing program with the parse tree API} *)
+
 open Loc
 open Ptree
 

@@ -250,15 +250,15 @@ let find_symbol q tables =
             | Not_found -> raise (Arg_qid_not_found q)
 
 let find_pr_list pr_list tables =
-  Lists.map_filter (fun id ->
+  List.filter_map (fun id ->
     try Some (find_pr id tables) with
-    | Not_found -> Warning.emit "Symbol '%a' not found, ignored"
+    | Not_found -> Loc.warning "Symbol '%a' not found, ignored"
        Typing.print_qualid id; None) pr_list
 
 let find_symbol_list pr_list tables =
-  Lists.map_filter (fun id ->
+  List.filter_map (fun id ->
     try Some (find_symbol id tables) with Arg_qid_not_found _ ->
-      Warning.emit "Symbol '%a' not found, ignored"
+      Loc.warning "Symbol '%a' not found, ignored"
         Typing.print_qualid id; None) pr_list
 
 let type_ptree ~as_fmla t tables =

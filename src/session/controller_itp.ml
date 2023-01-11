@@ -117,7 +117,7 @@ let load_drivers c =
   let provers = Whyconf.get_provers config in
   let main = Whyconf.get_main config in
   Whyconf.Mprover.iter (fun _ p ->
-      let d = Driver.load_driver main env p in
+      let d = Driver.load_driver_for_prover main env p in
       Whyconf.Hprover.add c.controller_provers p.Whyconf.prover (p,d))
     provers
 
@@ -409,7 +409,7 @@ let build_prover_call spa =
   let limit = spa.spa_limit in
   let (config_pr,driver) = Hprover.find c.controller_provers spa.spa_pr in
   let with_steps =
-    Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
+    Call_provers.(limit.limit_steps > empty_limit.limit_steps) in
   let command =
     Whyconf.get_complete_command config_pr ~with_steps in
   try

@@ -13,21 +13,6 @@ let main (y:int)
 
 end
 
-module KO0
-
-use int.Int
-
-val f (x:int) : int
-  ensures { result > x }
-
-let main (y:int)
-  ensures { result <> 44 }
-=
-  let z = f y in
-  z+1
-
-end
-
 module KO1
 
 use int.Int

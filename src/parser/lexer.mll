@@ -15,6 +15,14 @@
   let keywords = Hashtbl.create 97
   let () =
     List.iter (fun (x,y) -> Hashtbl.add keywords x y) Keywords.keyword_tokens
+
+  let resolve_file orig_file file =
+    try
+      Sysutil.resolve_from_paths [Filename.dirname orig_file] file
+    with
+    | e ->
+       Loc.warning "inexistent file in source location: %a" Exn_printer.exn_printer e;
+       file
 }
 
 let space = [' ' '\t' '\r']
@@ -55,15 +63,20 @@ let op_char_pref = ['!' '?']
 rule token = parse
   | "[##" space* ("\"" ([^ '\010' '\013' '"' ]* as file) "\"")?
     space* (dec+ as line) space* (dec+ as char) space* "]"
-      { Lexlib.update_loc lexbuf file (int_of_string line) (int_of_string char);
+      { let file =
+          Opt.map (resolve_file Lexing.(lexbuf.lex_curr_p.pos_fname)) file
+        in
+        Lexlib.update_loc lexbuf file (int_of_string line) (int_of_string char);
         token lexbuf }
   | "[#" space* "\"" ([^ '\010' '\013' '"' ]* as file) "\""
     space* (dec+ as bline) space* (dec+ as bchar) space*
     space* (dec+ as eline) space* (dec+ as echar) space* "]"
-      { POSITION (Loc.user_position file (int_of_string bline)
-                  (int_of_string bchar) (int_of_string eline) (int_of_string echar)) }
+      { let file = resolve_file Lexing.(lexbuf.lex_curr_p.pos_fname) file in
+        POSITION (Loc.user_position file (int_of_string bline)
+                    (int_of_string bchar) (int_of_string eline) (int_of_string echar)) }
   | "[@" space* ([^ ' ' '\n' ']']+ (' '+ [^ ' ' '\n' ']']+)* as lbl) space* ']'
-      { ATTRIBUTE lbl }
+      { Lexlib.adjust_pos_utf8 lexbuf lbl;
+        ATTRIBUTE lbl }
   | '\n'
       { Lexing.new_line lexbuf; token lexbuf }
   | space+

@@ -1,0 +1,296 @@
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: STUCK (for range projection int32 at "bench/check-ce/threshold.mlw", line 8, characters 13-16)
+  - Abstract RAC: STUCK (for range projection int32 at "bench/check-ce/threshold.mlw", line 8, characters 13-16)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/threshold.mlw", line 11, characters 11-20)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/threshold.mlw", line 11, characters 11-20)
+File "bench/check-ce/threshold.mlw", line 11, characters 11-20:
+Sub-goal Integer overflow of goal f'vc.
+Prover result is: Unknown or time/memory/step limit.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File int.mlw:
+  Line 258:
+    Constant min_int32 initialization
+    min_int32 = (-2147483648)
+  Line 259:
+    Constant max_int32 initialization
+    max_int32 = 2147483647
+File threshold.mlw:
+  Line 8:
+    n = {int32'int => (-1)}
+    min = {int32'int => (-1)}
+    max = {int32'int => (-2147483648)}
+    n = {int32'int => (-1)}
+    min = {int32'int => (-1)}
+    max = {int32'int => (-2147483648)}
+    Execution of main function `f` with env:
+      n = {int32'int => (-1)}
+      min = {int32'int => (-1)}
+      max = {int32'int => (-2147483648)}
+      zero = 0
+      one = 1
+      min_int32 = (-2147483648)
+      max_int32 = 2147483647
+  Line 11:
+    (giant-step) execution of unimplemented function `(+)`
+      a = {int32'int => (-1)}
+      b = {int32'int => (-2147483648)}
+    Property failure at precondition of `(+)` with:
+      a = {int32'int => (-1)}
+      b = {int32'int => (-2147483648)}
+
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/threshold.mlw", line 9, characters 13-33)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/threshold.mlw", line 9, characters 13-33)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/threshold.mlw", line 9, characters 13-33)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/threshold.mlw", line 9, characters 13-33)
+File "bench/check-ce/threshold.mlw", line 9, characters 13-33:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Unknown or time/memory/step limit.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File int.mlw:
+  Line 258:
+    Constant min_int32 initialization
+    min_int32 = (-2147483648)
+  Line 259:
+    Constant max_int32 initialization
+    max_int32 = 2147483647
+File threshold.mlw:
+  Line 8:
+    n = {int32'int => 1}
+    min = {int32'int => 1}
+    max = {int32'int => 0}
+    n = {int32'int => 1}
+    min = {int32'int => 1}
+    max = {int32'int => 0}
+    Execution of main function `f` with env:
+      n = {int32'int => 1}
+      min = {int32'int => 1}
+      max = {int32'int => 0}
+      zero = 0
+      one = 1
+      min_int32 = (-2147483648)
+      max_int32 = 2147483647
+  Line 11:
+    (giant-step) execution of unimplemented function `(+)`
+      a = {int32'int => 1}
+      b = {int32'int => 0}
+    result of `(+)` = {int32'int => 1}
+  Line 12:
+    (giant-step) execution of unimplemented function `(<)`
+      a = {int32'int => 1}
+      b = {int32'int => 1}
+    result of `(<)` = false
+    (giant-step) execution of unimplemented function `(>)`
+      a = {int32'int => 1}
+      b = {int32'int => 0}
+    result of `(>)` = true
+  Line 9:
+    Property failure at postcondition of `f` with:
+      min = {int32'int => 1}
+      max = {int32'int => 0}
+      result = {int32'int => 0}
+
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/threshold.mlw", line 30, characters 11-24)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/threshold.mlw", line 30, characters 11-24)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/threshold.mlw", line 30, characters 11-24)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/threshold.mlw", line 30, characters 11-24)
+File "bench/check-ce/threshold.mlw", line 30, characters 11-24:
+Sub-goal Arithmetic overflow of goal f'vc.
+Prover result is: Unknown or time/memory/step limit.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File bv.mlw:
+  Line 596:
+    Constant zeros initialization
+  Line 192:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 596:
+    zeros = 0
+    Constant one initialization
+  Line 197:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 596:
+    one = 0
+    Constant ones initialization
+  Line 199:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 596:
+    ones = 0
+  Line 638:
+    Constant zeros initialization
+  Line 192:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 638:
+    zeros = 0
+    Constant one initialization
+  Line 197:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 638:
+    one = 0
+    Constant ones initialization
+  Line 199:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 638:
+    ones = 0
+File threshold.mlw:
+  Line 26:
+    n = 0
+    min = 4294967295
+    max = 4294967295
+    n = 0
+    min = 4294967295
+    max = 4294967295
+    Execution of main function `f` with env:
+      n = 0
+      min = 4294967295
+      max = 4294967295
+      zero = 0
+      one = 1
+      zeros = 0
+      one = 0
+      ones = 0
+      zeros = 0
+      one = 0
+      ones = 0
+  Line 30:
+    (giant-step) execution of unimplemented function `u_add`
+      a = 4294967295
+      b = 4294967295
+    Property failure at precondition of `u_add` with:
+      a = 4294967295
+      b = 4294967295
+
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/threshold.mlw", line 27, characters 13-45)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/threshold.mlw", line 27, characters 13-45)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/threshold.mlw", line 27, characters 13-45)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/threshold.mlw", line 27, characters 13-45)
+File "bench/check-ce/threshold.mlw", line 27, characters 13-45:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Unknown or time/memory/step limit.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File bv.mlw:
+  Line 596:
+    Constant zeros initialization
+  Line 192:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 596:
+    zeros = 0
+    Constant one initialization
+  Line 197:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 596:
+    one = 0
+    Constant ones initialization
+  Line 199:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 596:
+    ones = 0
+  Line 638:
+    Constant zeros initialization
+  Line 192:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 638:
+    zeros = 0
+    Constant one initialization
+  Line 197:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 638:
+    one = 0
+    Constant ones initialization
+  Line 199:
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+  Line 638:
+    ones = 0
+File threshold.mlw:
+  Line 26:
+    n = 4294967295
+    min = 2147483648
+    max = 2147483647
+    n = 4294967295
+    min = 2147483648
+    max = 2147483647
+    Execution of main function `f` with env:
+      n = 4294967295
+      min = 2147483648
+      max = 2147483647
+      zero = 0
+      one = 1
+      zeros = 0
+      one = 0
+      ones = 0
+      zeros = 0
+      one = 0
+      ones = 0
+  Line 30:
+    (giant-step) execution of unimplemented function `u_add`
+      a = 2147483648
+      b = 2147483647
+    result of `u_add` = 4294967295
+  Line 31:
+    (giant-step) execution of unimplemented function `u_lt`
+      a = 4294967295
+      b = 2147483648
+    result of `u_lt` = false
+    (giant-step) execution of unimplemented function `u_gt`
+      a = 4294967295
+      b = 2147483647
+    result of `u_gt` = true
+  Line 27:
+    Property failure at postcondition of `f1` with:
+      min = 2147483648
+      max = 2147483647
+      result = 2147483647
+

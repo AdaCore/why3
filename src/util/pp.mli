@@ -15,6 +15,7 @@ open Format
 
 type 'a pp = formatter -> 'a -> unit
 
+val print_string : string pp
 val print_option : 'a pp -> 'a option pp
 val print_option_or_default : string -> 'a pp -> 'a option pp
 val print_list_pre : unit pp -> 'a pp -> 'a list pp
@@ -29,6 +30,7 @@ val print_list_delim :
 val print_pair_delim :
   unit pp -> unit pp -> unit pp -> 'a pp -> 'b pp -> ('a * 'b) pp
 (** [print_pair_delim left_delim middle_delim right_delim] *)
+
 val print_pair : 'a pp -> 'b pp -> ('a * 'b) pp
 
 val print_iter1 :
@@ -119,10 +121,10 @@ val string_of_wnl : 'a pp -> 'a -> string
 val wnl : formatter -> unit
 
 val sprintf :
-  ('b,  formatter, unit, string) Pervasives.format4 -> 'b
+  ('b,  formatter, unit, string) Stdlib.format4 -> 'b
 
 val sprintf_wnl :
-  ('b,  formatter, unit, string) Pervasives.format4 -> 'b
+  ('b,  formatter, unit, string) Stdlib.format4 -> 'b
 
 val html_char : char pp
 val html_string : string pp

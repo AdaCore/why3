@@ -9,6 +9,12 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {1 Task printing}
+
+Utility functions for implementing printers for various provers
+
+ *)
+
 open Wstdlib
 open Ident
 open Ty

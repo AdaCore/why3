@@ -14,7 +14,7 @@
 
 open Format
 
-(** {2 locations in files}
+(** {2 Locations in files}
 
 In Why3, source locations represent a part of a file, denoted by a
 starting point and an end point. Both of these points are
@@ -29,21 +29,21 @@ type position
 
 val user_position : string -> int -> int -> int -> int -> position
 (** [user_position f bl bc el ec] builds the source position for file
-   [f], starting at line [bl] and character [bc] and ending and line
-   [el] and character [ec] *)
+    [f], starting at line [bl] and character [bc] and ending at line
+    [el] and character [ec]. *)
 
 val dummy_position : position
-(** a dummy source position *)
+(** Dummy source position. *)
 
 val get : position -> string * int * int * int * int
 (** [get p] returns the file, the line and character numbers of the
-   beginning and the line and character numbers of the end of the
-   given position *)
+    beginning and the line and character numbers of the end of the
+    given position. *)
 
 val join : position -> position -> position
-(** [join p1 p2] attempts to join to positions [p1] and [p2],
-   returning a position that covers both of them. This function
-   assumes that the files are the same. *)
+(** [join p1 p2] attempts to join positions [p1] and [p2],
+    returning a position that covers both of them. This function
+    assumes that the files are the same. *)
 
 
 val compare : position -> position -> int
@@ -52,24 +52,16 @@ val hash : position -> int
 
 val pp_position : formatter -> position -> unit
 (** [pp_position fmt loc] formats the position [loc] in the given
-   formatter, in a human readable way, that is either :
+    formatter, in a human readable way, that is:
+    - either ["filename", line l, characters bc--ec] if the position is on a single line,
+    - or ["filename", line bl, character bc to line el, character ce] if the position is multi-line.
 
-        "filename", line l, characters bc--ec
-
-    if the position is on a single line or
-
-        "filename", line bl, character bc to line el, character ce
-
-    if the position is multi-line.
-
-    Does not print the file name part if it is empty.
-
- *)
+    The file name is not printed if empty. *)
 
 val pp_position_no_file : formatter -> position -> unit
-(** similar to [pp_position] but do not show the file name *)
+(** Similar to [pp_position] but do not show the file name. *)
 
-(** {2 Helper functions about OCaml locations use in module [Lexing]} *)
+(** {2 Helper functions about OCaml locations used in module [Lexing]} *)
 
 val extract : Lexing.position * Lexing.position -> position
 (** [extract p1 p2] build a source position from two OCaml lexing
@@ -77,18 +69,27 @@ val extract : Lexing.position * Lexing.position -> position
 
 val current_offset : int ref
 val reloc : Lexing.position -> Lexing.position
-(** [reloc l] returns the location with character num augmented by [!current_offset] *)
+(** [reloc l] returns the location with character num augmented by [!current_offset]. *)
 
 val set_file : string -> Lexing.lexbuf -> unit
-(** [set_file f lb] sets the file name to [f] in [lb] *)
+(** [set_file f lb] sets the file name to [f] in [lb]. *)
 
 val transfer_loc : Lexing.lexbuf -> Lexing.lexbuf -> unit
 (** [transfer_loc from to] sets the [lex_start_p] and [lex_curr_p]
-   fields of [to] to the ones of [from] *)
+   fields of [to] to the ones of [from]. *)
 
+(** {2 Located warnings} *)
 
+val warning:
+  ?loc:position -> ('b, Format.formatter, unit, unit) format4 -> 'b
 
-(** {2 located exceptions} *)
+(** The default behavior is to emit warning on standard error,
+   with position on a first line (if any) and message on a second line.
+   This can be changed using the following function. *)
+
+val set_warning_hook: (?loc:position -> string -> unit) -> unit
+
+(** {2 Located exceptions} *)
 
 exception Located of position * exn
 
@@ -112,7 +113,7 @@ val try7: ?loc:position ->
 
 val error: ?loc:position -> exn -> 'a
 
-(** {2 located error messages} *)
+(** {2 Located error messages} *)
 
 exception Message of string
 

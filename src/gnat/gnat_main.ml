@@ -184,7 +184,7 @@ let maybe_giant_step_rac ctr parent models =
     | Some (m, _) when not Gnat_config.giant_step_rac ->
         Some (Gnat_counterexamples.post_clean#model m, None)
     | Some (m, Check_ce.RAC_not_done reason) -> (
-        if Gnat_config.debug then Warning.emit "%s@." reason;
+        if Gnat_config.debug then Loc.warning "%s@." reason;
         Some (Gnat_counterexamples.post_clean#model m, None)
       )
     | Some (m, Check_ce.RAC_done (res_state, res_log)) -> (
@@ -297,7 +297,7 @@ let _ =
       let fmt = Format.formatter_of_out_channel out in
       Debug.set_debug_formatter fmt;
       Format.fprintf fmt "@.@.===== %s@." Gnat_config.filename;
-      Warning.set_hook (fun ?loc:_ line -> Format.fprintf fmt "%s@." line)
+      Loc.set_warning_hook (fun ?loc:_ line -> Format.fprintf fmt "%s@." line)
     with Not_found -> () );
   Util.init_timing ();
   try

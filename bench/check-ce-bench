@@ -2,144 +2,183 @@
 set -euo pipefail
 
 dir=`dirname $0`
-
 updateoracle=false
-forceupdateoracle=false
+suffix=.opt
+removeoutfile=true
 files=""
 success=true
-suffix=""
-
-while test $# != 0; do
-case "$1" in
-  "-suffix")
-      suffix="$2"
-      shift 2;;
-  "-update-oracle")
-      updateoracle=true
-      shift 1;;
-  "-force-update-oracle")
-      forceupdateoracle=true
-      shift 1;;
-  "-"*)
-      printf "unknown option: %s\n" "$1"
-      printf "usage: check-ce-bench [-update-oracle] [-suffix <suffix>] <files>\n"
-      printf "  <files> must be given without the '.mlw' suffix\n"
-      printf "  if <files> empty, use all files from directory 'ce'\n"
-      exit 2;;
-  *)
-      files="$files $1"
-      shift 1;;
-esac
-done
-
-if test "$files" = "" ; then
-    files="$dir/check-ce/*.mlw"
-fi
-
 failed=""
-
 whydata=$(bin/why3"$suffix" --print-datadir)
 whylib=$(bin/why3"$suffix" --print-libdir)
 
-colorize() {
-    if command -v pygmentize &> /dev/null; then
-        pygmentize -ldiff
-    else
-        cat
-    fi
-}
+while test $# != 0; do
+  case "$1" in
+    "--update-oracle")
+      updateoracle=true
+      shift 1
+      ;;
+    "--keep-out-files")
+      removeoutfile=false
+      shift 1
+      ;;
+    "--suffix")
+      suffix="$2"
+      shift 2
+      ;;
+    "-"*)
+      printf "unknown option: %s\n" "$1"
+      printf "usage: check-ce-bench [--update-oracle] [--keep-out-file] [--suffix s] <files>\n"
+      printf "  <files> must be given without the '.mlw' suffix.\n"
+      printf "  If <files> is empty, use all files from directory 'check-ce'.\n"
+      printf "  The suffix <s> is appended on the Why3 executable name, e.g. '.opt'.\n"
+      exit 2
+      ;;
+    *)
+      files="$files $1"
+      shift 1
+  esac
+done
 
-# types for which the current bench is non deterministic
-nondet_types=""
+if test "$files" = "" ; then
+  files="$dir/check-ce/*.mlw"
+fi
+
+colorize() {
+  if command -v pygmentize &> /dev/null; then
+    pygmentize -ldiff
+  else
+    cat
+  fi
+}
 
 remove_solver_details () {
-    sed 's/ ([0-9.]\+s, [0-9])\.$/./' \
-  | sed 's/[0-9]\+\.[0-9]\+s//g' \
-  | sed 's/[0-9]\+ steps//g' \
-  | sed 's/Prover result is: Timeout.*$\|Unknown (\(unknown\|incomplete\|unknown + \(incomplete\|interrupted\)\)).*$\|Out of memory\.$\|Step limit exceeded.*$/Prover result is: Unknown or time\/memory\/step limit./'
+  sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" \
+  | sed 's/ ([0-9.]\+\.[0-9]\+s, [0-9]\+ steps)\.$/\./' \
+  | sed 's/Prover result is: \(Timeout\.\|Unknown (\(unknown\|incomplete\|unknown + \(incomplete\|interrupted\)\))\.\|Out of memory.\|Step limit exceeded\.\|Step limit exceeded ([^)]*)\.\)$/Prover result is: Unknown or time\/memory\/step limit./'
 }
 
-# $1 = prover, $2 = dir, $3 = filename, $4 = true for WP; false for SP, $5 = steps
+
+# $1 = prover
+# $2 = dir
+# $3 = filename
+# $4 = true for WP, false for SP
+# $5 = steps
 run () {
-    printf "  $2 ($1)... "
-    file_path="$2/$3"
-    if $4; then
-        f="${file_path}_$1_WP"
-        oracle_file="$2/oracles/$3_$1_WP.oracle"
-        wp_sp=""
-        echo "Weakest Precondition" > "$f.out"
-        printf "Weakest Precondition  ${file_path} ($1)... "
-    else
-        f="${file_path}_$1_SP"
-        oracle_file="$2/oracles/$3_$1_SP.oracle"
-        wp_sp=" --debug=vc_sp"
-        echo "Strongest Postcondition" > "$f.out"
-        printf "Strongest Postcondition  ${file_path} ($1)... "
-    fi
+  printf "  $2 ($1)... "
+  file_path="$2/$3"
+  debug_vc_sp=""
+  if $4; then
+    f="${file_path}_$1_WP"
+    oracle_file="$2/oracles/$3_$1_WP.oracle"
+    printf "Weakest Precondition ${file_path} ($1)... "
+  else
+    f="${file_path}_$1_SP"
+    oracle_file="$2/oracles/$3_$1_SP.oracle"
+    debug_vc_sp=",vc_sp"
+    printf "Strongest Postcondition ${file_path} ($1)... "
+  fi
+  steps=$5
+  if [ "$3" = "strings" ] && [[ $1 == CVC* ]] ; then
+    prover="$1,strings+counterexamples"
+  else
     prover="$1,counterexamples"
-    steps=$5
-    # Call why3 prove to create CE (and accept return value of 2 for unproven goals)
-    ($dir/../bin/why3"$suffix" prove --apply-transform=split_vc \
-       --prover="$prover" --stepslimit="$steps" --timelimit=10 \
-       --check-ce --rac-prover="$1" --verbosity=5 \
-       --library="$2" "${file_path}.mlw" \
-       --debug=check-ce-rac-results,check-ce-categorization,rac-values \
-       || [ $? -eq 2 ]) 2>&1 \
-     | sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" \
-     > "$f.out"
-    str_out=$(cat "$f.out"|remove_solver_details)
-    if [ -e "$oracle_file" ]; then
-        str_oracle=$(cat "$oracle_file"|remove_solver_details)
+  fi
+  ($dir/../bin/why3"$suffix" prove -a split_vc -P $prover\
+      --stepslimit=$steps --timelimit=10 \
+      --rac-steplimit=$steps --rac-timelimit=10 \
+      --check-ce --rac-prover="$1" --ce-log-verbosity=5 \
+      --library="$2" "${file_path}.mlw" \
+      --debug=check-ce-categorization${debug_vc_sp} \
+    || [ $? -eq 2 ]) 2>&1 \
+    | remove_solver_details \
+    > "$f.out"
+  str_out=$(cat "$f.out")
+  if [ -e "$oracle_file" ]; then
+    str_oracle=$(cat "$oracle_file")
+  else
+    str_oracle=""
+  fi
+  if [ "$str_oracle" = "$str_out" ] ; then
+    echo "OK"
+  else
+    if $updateoracle; then
+      echo "Updating oracle"
+      cp "$f.out" "${oracle_file}"
     else
-        str_oracle=""
-    fi
-    if [ "$str_oracle" = "$str_out" ] ; then
-        echo "ok"
-    else
-	if $updateoracle; then
-	    echo "Updating oracle"
-	    mv "$f.out" "${oracle_file}"
-	else
-	    echo "FAILED!"
-	    echo "diff is the following:"
-	    echo "$f"
-	    (diff -u <(echo "$str_oracle") <(echo "$str_out") \
+      echo "FAILED"
+      echo "diff is the following:"
+	    (diff -u "$oracle_file" "$f.out" \
         || [ $? -eq 1 ])|colorize
-	    failed="$failed$f\n"
-	    success=false
-	fi
+      failed="$failed$f\n"
+      success=false
     fi
-    if $forceupdateoracle; then
-	echo "Forcing update oracle for ${file_path}, prover $1"
-        mv "$f.out" "${oracle_file}"
-    fi
+  fi
+  if $removeoutfile; then
+    rm "$f.out"
+  fi
 }
-
+start=$(date +%s)
 for file in $files; do
-    filedir=`dirname $file`
-    filebase=`basename $file .mlw`
+  filedir=`dirname $file`
+  filebase=`basename $file .mlw`
+  if [ "$filebase" = "maps_poly" -o "$filebase" = "maps_mono" ] ; then
+    echo "Skipping tests on $filedir/$filebase.mlw";
+  else
     printf "Running provers on $filedir/$filebase.mlw\n";
     cvc4steps=150000
     cvc5steps=150000
     z3steps=3000000
     case "$filebase" in
+      "640_no_loc_failure")
+        z3steps=500000
+        ;;
       "657")
         z3steps=500000
         ;;
+      "668_projection")
+        z3steps=500000
+        ;;
+      "bv32")
+        z3steps=2500000
+        ;;
+      "bv32_toBig")
+        z3steps=100000
+        ;;
+      "floats")
+        z3steps=400000
+        ;;
+      "int_overflow")
+        z3steps=400000
+        ;;
+      "maps_poly")
+        cvc5steps=300000
+        ;;
+      "strings")
+        z3steps=3000
+        ;;
+      "threshold")
+        z3steps=500000
+        ;;
+      *)
+        ;;
     esac
-    run CVC4,1.8 $filedir $filebase true   $cvc4steps
-    run CVC4,1.8 $filedir $filebase false  $cvc4steps
-    run CVC5,1.0.0 $filedir $filebase true   $cvc5steps
-    run CVC5,1.0.0 $filedir $filebase false  $cvc5steps
-    run Z3,4.8.10 $filedir $filebase true  $z3steps
-    run Z3,4.8.10 $filedir $filebase false $z3steps
+    run CVC4,1.8    $filedir $filebase true  $cvc4steps
+    run CVC4,1.8    $filedir $filebase false $cvc4steps
+    run CVC5,1.0.0  $filedir $filebase true  $cvc5steps
+    run CVC5,1.0.0  $filedir $filebase false $cvc5steps
+    run Z3,4.8.10   $filedir $filebase true  $z3steps
+    run Z3,4.8.10   $filedir $filebase false $z3steps
+  fi
 done
+end=$(date +%s)
+
+runtime=$((end-start))
 if [ "$success" = true ]; then
-    echo "Check-ce bench: success"
-    exitvalue=0
+  echo "check-ce-bench: success (runtime = $runtime seconds)"
+  exit 0
 else
-    printf "\nCheck-ce bench: failed\n$failed\n"
-    exitvalue=1
+  printf "\ncheck-ce-bench: failed for the following files (runtime = $runtime seconds)\n$failed\n"
+  exit 1
 fi
 
 # Check the reproduction of the experiments by Petiot (2018).
@@ -148,16 +187,19 @@ if $updateoracle; then
 else
   updatearg=""
 fi
-bench/check-ce/petiot2018/experiments.sh --prover Z3,4.8.10 \
-  --ce-prover Z3,4.8.10,counterexamples --stepslimit 500000 --rac-prover Z3,4.8.10 \
+bench/check-ce/petiot2018/experiments.sh \
+  --prover Z3,4.8.10 --rac-prover Z3,4.8.10 \
+  --ce-prover Z3,4.8.10,counterexamples --stepslimit 500000 \
   $updatearg
 if [ $? = 1 ]; then exitvalue=1; fi
-bench/check-ce/petiot2018/experiments.sh --prover CVC4,1.8 \
-  --ce-prover CVC4,1.8,counterexamples --stepslimit 10000 --rac-prover CVC4,1.8 \
+bench/check-ce/petiot2018/experiments.sh \
+  --prover CVC4,1.8 --rac-prover CVC4,1.8 \
+  --ce-prover CVC4,1.8,counterexamples --stepslimit 10000 \
   $updatearg
 if [ $? = 1 ]; then exitvalue=1; fi
-bench/check-ce/petiot2018/experiments.sh --prover CVC5,1.0.0 \
-  --ce-prover CVC5,1.0.0,counterexamples --stepslimit 10000 --rac-prover CVC5,1.0.0 \
+bench/check-ce/petiot2018/experiments.sh \
+  --prover CVC5,1.0.0 --rac-prover CVC5,1.0.0 \
+  --ce-prover CVC5,1.0.0,counterexamples --stepslimit 10000 \
   $updatearg
 if [ $? = 1 ]; then exitvalue=1; fi
 

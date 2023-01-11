@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {1 Support for coercions in the logic language} *)
+
 open Ty
 open Term
 

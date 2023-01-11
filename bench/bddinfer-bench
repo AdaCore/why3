@@ -1,0 +1,107 @@
+#!/bin/bash
+
+has_infer=`sed -n -e 's/INFERLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
+
+if test -z "$has_infer"; then
+    echo "Inference of loop invariants not enabled!"
+    exit 3
+fi
+
+updateoracle=false
+forceupdateoracle=false
+files=""
+dirs=""
+success=true
+why3prove="bin/why3 prove"
+why3libs=""
+
+if test $# = 0; then
+  printf "no files provided\n"
+  exit 2
+fi
+
+while test $# != 0; do
+  case "$1" in
+    "-update-oracle")
+        updateoracle=true;;
+    "-force-update-oracle")
+        forceupdateoracle=true;;
+    -L=?*)
+        why3libs="$why3libs ${1#*=}";;
+    "-"*)
+        printf "unknown option: %s\n" "$1"
+        printf "usage: bddinfer-bench [-update-oracle] <file>\n"
+        printf "  if <file> is a directory, it runs on all the *.mlw files\n"
+        exit 2;;
+    *)
+      if [ -d "$1" ]; then
+        dirs="$dirs $1"
+      else
+        if [ -f "$1" ]; then
+          files="$files $1"
+        else
+          echo "File not found: $1"
+          exit 2
+        fi
+      fi
+  esac
+  shift
+done
+
+if test -n "$why3libs"; then
+   why3libs="-L $why3libs"
+fi
+
+for d in $dirs; do
+  d=$(echo $d | sed 's:/*$::') #remove trailling slashs
+  mlw="$(ls $d/*.mlw 2> /dev/null)"
+  files="$files $mlw"
+done
+
+failed=""
+
+# $1 = file
+run () {
+  printf "running for $1"
+  file_base="$(basename $1)"
+  file_dir="$(dirname $1)"
+  out_file="$file_dir/${file_base%.*}.bddout"
+  oracle_file="$file_dir/bddinfer-oracles/${file_base%.*}.oracle"
+  $why3prove $1 -t 1 -P alt-ergo --debug=bddinfer $why3libs > "$out_file" 2>&1
+  str_out=$(sed 's/[0-9]\+\.[0-9]\+s//g' $out_file | sed 's/[0-9]\+ steps//g')
+  str_oracle=$(sed 's/[0-9]\+\.[0-9]\+s//g' $oracle_file | sed 's/[0-9]\+ steps//g')
+  if [ "$str_oracle" = "$str_out" ] ; then
+    printf " - ok\n"
+  else
+    printf "\n"
+    if $updateoracle; then
+      echo "Updating oracle for $file_base"
+      cp "$out_file" "$oracle_file"
+    else
+      echo "FAILED!"
+      echo "diff is the following:"
+      echo "$f"
+      diff <(echo "$str_oracle") <(echo "$str_out")
+      failed="$failed\n$1"
+      success=false
+    fi
+  fi
+  if $forceupdateoracle; then
+    echo "Forcing update oracle for $file_base"
+    cp "$out_file" "$oracle_file"
+  fi
+  rm "$out_file"
+}
+
+for file in $files; do
+    run $file
+done
+
+if $success; then
+    echo "BDD-infer bench: success"
+    exit 0
+else
+    echo "BDD-infer bench: failed"
+    printf "$failed\n"
+    exit 1
+fi

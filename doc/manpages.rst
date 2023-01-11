@@ -398,8 +398,13 @@ Options
 
 .. option:: -D <driver>, --driver=<driver>
 
-   Output the tasks obtained by applying the given driver to the goals.
-   This option conflicts with :option:`--prover`.
+   Output the tasks obtained by applying the given driver to the
+   goals. <driver> should be either a file path with extension
+   :file:`.drv` or a single name :file:`d` without extension. Names
+   without extensions are meant to denote the file :file:`d.drv` from
+   the driver directory of Why3. File names with extension are search
+   both from the current directory and in the driver directory of
+   Why3.  This option conflicts with :option:`--prover`.
 
 .. option:: --extra-expl-prefix=<s>
 
@@ -468,7 +473,7 @@ Options
 
    Stop after type checking (same as ``--debug=type_only``).
 
-.. option:: -v <lvl>, --verbosity=<lvl>
+.. option:: --ce-log-verbosity=<lvl>
 
    Verbosity level for interpretation log of counterexample model
    returned by the prover.

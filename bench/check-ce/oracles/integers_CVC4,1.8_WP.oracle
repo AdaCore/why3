@@ -1,0 +1,148 @@
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/integers.mlw", line 5, characters 50-61)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/integers.mlw", line 5, characters 50-61)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/integers.mlw", line 5, characters 50-61)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/integers.mlw", line 5, characters 50-61)
+File "bench/check-ce/integers.mlw", line 5, characters 50-61:
+Goal g_lab.
+Prover result is: Unknown (sat).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File integers.mlw:
+  Line 5:
+    x = 48
+    x = 48
+    Execution of main function `g_lab'goal` with env:
+      x = 48
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File integers.mlw:
+  Line 5:
+    Property failure at postcondition of `g_lab'goal` with:
+      x = 48
+
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/integers.mlw", line 7, characters 43-54)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/integers.mlw", line 7, characters 43-54)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/integers.mlw", line 7, characters 43-54)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/integers.mlw", line 7, characters 43-54)
+File "bench/check-ce/integers.mlw", line 7, characters 43-54:
+Goal g_no_lab.
+Prover result is: Unknown (sat).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File integers.mlw:
+  Line 7:
+    x = 48
+    x = 48
+    Execution of main function `g_no_lab'goal` with env:
+      x = 48
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File integers.mlw:
+  Line 7:
+    Property failure at postcondition of `g_no_lab'goal` with:
+      x = 48
+
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g2_lab'goal` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g2_lab'goal` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g2_lab'goal1` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g2_lab'goal1` cannot be evaluated)
+File "bench/check-ce/integers.mlw", line 11, characters 30-38:
+Goal g2_lab.
+Prover result is: Unknown (sat).
+The following counterexample model could not be verified
+  (both RAC terminated because Postcondition of `g2_lab'goal1` cannot be evaluated):
+File integers.mlw:
+  Line 9:
+    g = -1
+  Line 11:
+    x = 0
+
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/integers.mlw", line 22, characters 2-45)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/integers.mlw", line 22, characters 2-45)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/integers.mlw", line 22, characters 2-45)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/integers.mlw", line 22, characters 2-45)
+File "bench/check-ce/integers.mlw", line 22, characters 2-45:
+Goal newgoal.
+Prover result is: Unknown (sat).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File integers.mlw:
+  Line 13:
+    x1 = 1
+    x2 = 1
+    x3 = 1
+    x4 = 1
+    x5 = 1
+    x6 = 1
+    x7 = 1
+    x8 = 1
+    x1 = 1
+    x2 = 1
+    x3 = 1
+    x4 = 1
+    x5 = 1
+    x6 = 1
+    x7 = 1
+    x8 = 1
+    Execution of main function `newgoal'goal` with env:
+      x8 = 1
+      x7 = 1
+      x6 = 1
+      x5 = 1
+      x4 = 1
+      x3 = 1
+      x2 = 1
+      x1 = 1
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File integers.mlw:
+  Line 22:
+    Property failure at postcondition of `newgoal'goal` with:
+      x8 = 1
+      x7 = 1
+      x6 = 1
+      x5 = 1
+      x4 = 1
+      x3 = 1
+      x2 = 1
+      x1 = 1
+

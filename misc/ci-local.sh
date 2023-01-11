@@ -10,10 +10,13 @@ if test "$COMPILER" != "system"; then
     opam switch $COMPILER
     eval `opam env`
 fi
+if test "$COMPILER" = "full"; then
+    JS="--enable-js-of-ocaml"
+fi
 
 section_start configure Configuration
 ./autogen.sh
-./configure --enable-local
+./configure --enable-local $JS
 section_stop configure
 
 section_start build Building
@@ -43,7 +46,6 @@ do
             ;;
         ce-bench)
             bin/why3 config detect
-            bench/ce-bench
             bench/check-ce-bench
             ;;
         nightly-bench-reduced)

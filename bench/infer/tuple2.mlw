@@ -6,7 +6,7 @@ module Tuple2
 	val c(_:int) : (int, int)
 	ensures { result = (1, 2) }
 
-	let b[@infer](_:int) : int
+	let b [@bddinfer] [@infer](_:int) : int
 	ensures { result = 20 }
 	=
 	let _ = () in
@@ -23,7 +23,7 @@ module Tuple2
 		done;
 		!j
 
-	let b2[@infer:oct](_:int) : int
+	let b2 [@bddinfer] [@infer:oct](_:int) : int
 	ensures { result = 20 }
 	=
 	let _ = () in
@@ -40,7 +40,7 @@ module Tuple2
 		done;
 		!j
 
-	let b3[@infer:box](_:int) : int
+	let b3 [@bddinfer] [@infer:box](_:int) : int
 	ensures { result = 20 }
 	=
 	let _ = () in
@@ -58,5 +58,3 @@ module Tuple2
 		!j
 
 end
-
-

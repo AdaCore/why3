@@ -1587,6 +1587,11 @@ WhyML Attributes
    This attribute indicates whether VCs for termination should be
    generated.  See :numref:`sec.terminationvc` for details.
 
+.. why3:attribute:: vc:trusted_wf
+
+   This attribute indicates that a binary relation must be assumed
+   well-founded.  See :numref:`sec.trusted_wf` for details.
+
 .. why3:attribute:: vc:keep_precondition
 
    This attribute indicates whether preconditions of calls should be kept

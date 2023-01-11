@@ -5,7 +5,7 @@ module Example1
   use int.Int
   use bool.Bool
 
-  let f[@infer](x: int) : bool =
+  let f [@bddinfer] [@infer](x: int) : bool =
     requires {x <= 0}
     ensures  { result = true }
     let x = ref x in
@@ -17,7 +17,7 @@ module Example1
     done;
     !y
 
-  let f2[@infer:oct](x: int) : bool =
+  let f2 [@bddinfer] [@infer:oct](x: int) : bool =
     requires {x <= 0}
     ensures  { result = true }
     let x = ref x in
@@ -29,7 +29,7 @@ module Example1
     done;
     !y
 
-  let f3[@infer:box](x: int) : bool =
+  let f3 [@bddinfer] [@infer:box](x: int) : bool =
     requires {x <= 0}
     ensures  { result = true }
     let x = ref x in

@@ -169,13 +169,14 @@ module Euler001
 
   (** Small test. Run it with
 
-     why3 examples/euler001.mlw --exec Euler001.run
+      `why3 execute examples/euler001.mlw --use=Euler001 "run ()"`
 
+      Should return 233168.
   *)
   let run () = solve 1000
-    (* should return 233168 *)
 
   (** for the Why3 bench *)
+
   exception BenchFailure
 
   let bench () raises { BenchFailure -> true } =

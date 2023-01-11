@@ -1,0 +1,188 @@
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 6, characters 32-67)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 6, characters 32-67)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 6, characters 32-67)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 6, characters 32-67)
+File "bench/check-ce/algebraic_types_mono.mlw", line 6, characters 58-63:
+Goal G.
+Prover result is: Unknown (sat).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 10, characters 21-26)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 10, characters 21-26)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 10, characters 21-26)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 10, characters 21-26)
+File "bench/check-ce/algebraic_types_mono.mlw", line 10, characters 21-26:
+Goal g2.
+Prover result is: Unknown (sat).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File algebraic_types_mono.mlw:
+  Line 10:
+    x = (B 0)
+    x = (B 0)
+    Execution of main function `g2'goal` with env:
+      x = (B 0)
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File algebraic_types_mono.mlw:
+  Line 10:
+    Property failure at postcondition of `g2'goal` with:
+      A = UNDEFINED
+      x = (B 0)
+
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 12, characters 21-28)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 12, characters 21-28)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 12, characters 21-28)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 12, characters 21-28)
+File "bench/check-ce/algebraic_types_mono.mlw", line 12, characters 21-28:
+Goal g4.
+Prover result is: Unknown (sat).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File algebraic_types_mono.mlw:
+  Line 12:
+    x = A
+    x = A
+    Execution of main function `g4'goal` with env:
+      x = A
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File algebraic_types_mono.mlw:
+  Line 12:
+    Property failure at postcondition of `g4'goal` with:
+      x = A
+
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 16, characters 21-31)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 16, characters 21-31)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 16, characters 21-31)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 16, characters 21-31)
+File "bench/check-ce/algebraic_types_mono.mlw", line 16, characters 21-31:
+Goal g5.
+Prover result is: Unknown (sat).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File algebraic_types_mono.mlw:
+  Line 16:
+    x = (Au 0 1)
+    x = (Au 0 1)
+    Execution of main function `g5'goal` with env:
+      x = (Au 0 1)
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File algebraic_types_mono.mlw:
+  Line 16:
+    Property failure at postcondition of `g5'goal` with:
+      x = (Au 0 1)
+
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 25, characters 29-38)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 25, characters 29-38)
+- Checked model 2: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/algebraic_types_mono.mlw", line 25, characters 29-38:
+Goal g1.
+Prover result is: Unknown or time/memory/step limit.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File algebraic_types_mono.mlw:
+  Line 25:
+    l = (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 (Cons 21 (Cons 22 (Cons 23 (Cons 24 (Cons 25 (Cons 26 (Cons 27 (Cons 28 (Cons 29 (Cons 30 (Cons 31 (Cons 32 (Cons 33 (Cons 34 (Cons 35 (Cons 36 (Cons 37 (Cons 38 (Cons 39 (Cons 40 (Cons 41 (Cons 42 (Cons 43 (Cons 44 (Cons 45 (Cons 46 (Cons 47 (Cons 48 (Cons 49 (Cons 50 (Cons 51 (Cons 52 (Cons 53 (Cons 54 (Cons 55 (Cons 56 (Cons 57 (Cons 58 (Cons 59 (Cons 60 (Cons 61 (Cons 62 (Cons 63 (Cons 64 (Cons 65 (Cons 66 (Cons 67 (Cons 68 (Cons 69 (Cons 70 (Cons 71 (Cons 72 (Cons 73 (Cons 74 (Cons 75 (Cons 76 (Cons 77 (Cons 78 (Cons 79 (Cons 80 (Cons 81 (Cons 82 (Cons 83 (Cons 84 (Cons 85 (Cons 86 (Cons 87 (Cons 88 (Cons 89 (Cons 90 (Cons 91 (Cons 92 (Cons 93 (Cons 94 (Cons 95 (Cons 96 (Cons 97 (Cons 98 (Cons 99 (Cons 100 (Cons 101 (Cons 102 (Cons 103 (Cons 104 (Cons 105 (Cons 106 (Cons 107 (Cons 108 (Cons 109 (Cons 110 (Cons 111 (Cons 112 (Cons 113 (Cons 114 (Cons 115 (Cons 116 (Cons 117 (Cons 118 (Cons 119 (Cons 120 (Cons 121 (Cons 122 (Cons 123 (Cons 124 (Cons 125 (Cons 126 (Cons 127 (Cons 128 (Cons 129 (Cons 130 (Cons 131 (Cons 132 (Cons 133 (Cons 134 (Cons 135 (Cons 136 (Cons 137 (Cons 138 (Cons 139 (Cons 140 (Cons 141 (Cons 142 (Cons 143 (Cons 144 (Cons 145 (Cons 146 (Cons 147 (Cons 148 (Cons 149 (Cons 150 (Cons 151 (Cons 152 (Cons 153 (Cons 154 (Cons 155 (Cons 156 (Cons 157 (Cons 158 (Cons 159 (Cons 160 (Cons 161 (Cons 162 (Cons 163 (Cons 0 Nil))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+    l = (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 (Cons 21 (Cons 22 (Cons 23 (Cons 24 (Cons 25 (Cons 26 (Cons 27 (Cons 28 (Cons 29 (Cons 30 (Cons 31 (Cons 32 (Cons 33 (Cons 34 (Cons 35 (Cons 36 (Cons 37 (Cons 38 (Cons 39 (Cons 40 (Cons 41 (Cons 42 (Cons 43 (Cons 44 (Cons 45 (Cons 46 (Cons 47 (Cons 48 (Cons 49 (Cons 50 (Cons 51 (Cons 52 (Cons 53 (Cons 54 (Cons 55 (Cons 56 (Cons 57 (Cons 58 (Cons 59 (Cons 60 (Cons 61 (Cons 62 (Cons 63 (Cons 64 (Cons 65 (Cons 66 (Cons 67 (Cons 68 (Cons 69 (Cons 70 (Cons 71 (Cons 72 (Cons 73 (Cons 74 (Cons 75 (Cons 76 (Cons 77 (Cons 78 (Cons 79 (Cons 80 (Cons 81 (Cons 82 (Cons 83 (Cons 84 (Cons 85 (Cons 86 (Cons 87 (Cons 88 (Cons 89 (Cons 90 (Cons 91 (Cons 92 (Cons 93 (Cons 94 (Cons 95 (Cons 96 (Cons 97 (Cons 98 (Cons 99 (Cons 100 (Cons 101 (Cons 102 (Cons 103 (Cons 104 (Cons 105 (Cons 106 (Cons 107 (Cons 108 (Cons 109 (Cons 110 (Cons 111 (Cons 112 (Cons 113 (Cons 114 (Cons 115 (Cons 116 (Cons 117 (Cons 118 (Cons 119 (Cons 120 (Cons 121 (Cons 122 (Cons 123 (Cons 124 (Cons 125 (Cons 126 (Cons 127 (Cons 128 (Cons 129 (Cons 130 (Cons 131 (Cons 132 (Cons 133 (Cons 134 (Cons 135 (Cons 136 (Cons 137 (Cons 138 (Cons 139 (Cons 140 (Cons 141 (Cons 142 (Cons 143 (Cons 144 (Cons 145 (Cons 146 (Cons 147 (Cons 148 (Cons 149 (Cons 150 (Cons 151 (Cons 152 (Cons 153 (Cons 154 (Cons 155 (Cons 156 (Cons 157 (Cons 158 (Cons 159 (Cons 160 (Cons 161 (Cons 162 (Cons 163 (Cons 0 Nil))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+    Execution of main function `g1'goal` with env:
+      l = (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 (Cons 21 (Cons 22 (Cons 23 (Cons 24 (Cons 25 (Cons 26 (Cons 27 (Cons 28 (Cons 29 (Cons 30 (Cons 31 (Cons 32 (Cons 33 (Cons 34 (Cons 35 (Cons 36 (Cons 37 (Cons 38 (Cons 39 (Cons 40 (Cons 41 (Cons 42 (Cons 43 (Cons 44 (Cons 45 (Cons 46 (Cons 47 (Cons 48 (Cons 49 (Cons 50 (Cons 51 (Cons 52 (Cons 53 (Cons 54 (Cons 55 (Cons 56 (Cons 57 (Cons 58 (Cons 59 (Cons 60 (Cons 61 (Cons 62 (Cons 63 (Cons 64 (Cons 65 (Cons 66 (Cons 67 (Cons 68 (Cons 69 (Cons 70 (Cons 71 (Cons 72 (Cons 73 (Cons 74 (Cons 75 (Cons 76 (Cons 77 (Cons 78 (Cons 79 (Cons 80 (Cons 81 (Cons 82 (Cons 83 (Cons 84 (Cons 85 (Cons 86 (Cons 87 (Cons 88 (Cons 89 (Cons 90 (Cons 91 (Cons 92 (Cons 93 (Cons 94 (Cons 95 (Cons 96 (Cons 97 (Cons 98 (Cons 99 (Cons 100 (Cons 101 (Cons 102 (Cons 103 (Cons 104 (Cons 105 (Cons 106 (Cons 107 (Cons 108 (Cons 109 (Cons 110 (Cons 111 (Cons 112 (Cons 113 (Cons 114 (Cons 115 (Cons 116 (Cons 117 (Cons 118 (Cons 119 (Cons 120 (Cons 121 (Cons 122 (Cons 123 (Cons 124 (Cons 125 (Cons 126 (Cons 127 (Cons 128 (Cons 129 (Cons 130 (Cons 131 (Cons 132 (Cons 133 (Cons 134 (Cons 135 (Cons 136 (Cons 137 (Cons 138 (Cons 139 (Cons 140 (Cons 141 (Cons 142 (Cons 143 (Cons 144 (Cons 145 (Cons 146 (Cons 147 (Cons 148 (Cons 149 (Cons 150 (Cons 151 (Cons 152 (Cons 153 (Cons 154 (Cons 155 (Cons 156 (Cons 157 (Cons 158 (Cons 159 (Cons 160 (Cons 161 (Cons 162 (Cons 163 (Cons 0 Nil))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File algebraic_types_mono.mlw:
+  Line 25:
+    Property failure at postcondition of `g1'goal1` with:
+      l = (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 (Cons 21 (Cons 22 (Cons 23 (Cons 24 (Cons 25 (Cons 26 (Cons 27 (Cons 28 (Cons 29 (Cons 30 (Cons 31 (Cons 32 (Cons 33 (Cons 34 (Cons 35 (Cons 36 (Cons 37 (Cons 38 (Cons 39 (Cons 40 (Cons 41 (Cons 42 (Cons 43 (Cons 44 (Cons 45 (Cons 46 (Cons 47 (Cons 48 (Cons 49 (Cons 50 (Cons 51 (Cons 52 (Cons 53 (Cons 54 (Cons 55 (Cons 56 (Cons 57 (Cons 58 (Cons 59 (Cons 60 (Cons 61 (Cons 62 (Cons 63 (Cons 64 (Cons 65 (Cons 66 (Cons 67 (Cons 68 (Cons 69 (Cons 70 (Cons 71 (Cons 72 (Cons 73 (Cons 74 (Cons 75 (Cons 76 (Cons 77 (Cons 78 (Cons 79 (Cons 80 (Cons 81 (Cons 82 (Cons 83 (Cons 84 (Cons 85 (Cons 86 (Cons 87 (Cons 88 (Cons 89 (Cons 90 (Cons 91 (Cons 92 (Cons 93 (Cons 94 (Cons 95 (Cons 96 (Cons 97 (Cons 98 (Cons 99 (Cons 100 (Cons 101 (Cons 102 (Cons 103 (Cons 104 (Cons 105 (Cons 106 (Cons 107 (Cons 108 (Cons 109 (Cons 110 (Cons 111 (Cons 112 (Cons 113 (Cons 114 (Cons 115 (Cons 116 (Cons 117 (Cons 118 (Cons 119 (Cons 120 (Cons 121 (Cons 122 (Cons 123 (Cons 124 (Cons 125 (Cons 126 (Cons 127 (Cons 128 (Cons 129 (Cons 130 (Cons 131 (Cons 132 (Cons 133 (Cons 134 (Cons 135 (Cons 136 (Cons 137 (Cons 138 (Cons 139 (Cons 140 (Cons 141 (Cons 142 (Cons 143 (Cons 144 (Cons 145 (Cons 146 (Cons 147 (Cons 148 (Cons 149 (Cons 150 (Cons 151 (Cons 152 (Cons 153 (Cons 154 (Cons 155 (Cons 156 (Cons 157 (Cons 158 (Cons 159 (Cons 160 (Cons 161 (Cons 162 (Cons 163 (Cons 0 Nil))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 27, characters 29-36)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 27, characters 29-36)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 27, characters 29-36)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 27, characters 29-36)
+File "bench/check-ce/algebraic_types_mono.mlw", line 27, characters 29-36:
+Goal g7.
+Prover result is: Unknown (sat).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File algebraic_types_mono.mlw:
+  Line 27:
+    l = (Cons 0 Nil)
+    l = (Cons 0 Nil)
+    Execution of main function `g7'goal` with env:
+      l = (Cons 0 Nil)
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File algebraic_types_mono.mlw:
+  Line 27:
+    Property failure at postcondition of `g7'goal` with:
+      Nil = UNDEFINED
+      l = (Cons 0 Nil)
+

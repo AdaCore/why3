@@ -198,7 +198,7 @@ let float_of_binary binary =
         (* Subnormals *)
         let hex = Format.asprintf "%t0x0.%sp-%s"
             (fun fmt -> if is_neg then Pp.string fmt "-")
-            frac (to_string exp_bias) in
+            frac (to_string (pred exp_bias)) in
         Float_number {hex= Some hex; binary}
     else if eq exp.bv_value exp_max (* infinities and NaN *) then
       if eq mant.bv_value zero then
@@ -512,7 +512,7 @@ type model = {
 
 let map_filter_model_files f =
   let f_list elts =
-    match Lists.map_filter f elts with
+    match List.filter_map f elts with
     | [] -> None | l -> Some l in
   let f_files mf =
     let mf = Mint.map_filter f_list mf in
@@ -976,7 +976,7 @@ and replace_projection_array const_function a =
    their value (using the "field" attribute that were added). *)
 let read_one_fields ~attrs value =
   let field_names =
-    let fields = Lists.map_filter Ident.extract_field (Sattr.elements attrs) in
+    let fields = List.filter_map Ident.extract_field (Sattr.elements attrs) in
     List.sort (fun (d1, _) (d2, _) -> d2 - d1) fields in
   let add_record v (_, f) = Record [f, v] in
   match Ident.get_model_trace_attr ~attrs with
@@ -1041,7 +1041,7 @@ let build_model_rec pm (elts: model_element list) : model_files =
     if loc = None then model else
       let kind = compute_kind vc_attrs loc me.me_name.men_attrs in
       add_to_model_if_loc ~kind {me with me_location= loc} model in
-  (** Add a model element at the relevant locations *)
+  (* Add a model element at the relevant locations *)
   let add_model_elt model me =
     let kind = compute_kind vc_attrs me.me_location me.me_name.men_attrs in
     let model = add_to_model_if_loc ~kind me model in
@@ -1050,7 +1050,7 @@ let build_model_rec pm (elts: model_element list) : model_files =
     let add_written_loc a =
       add_with_loc_set_kind me (get_written_loc a) in
     Sattr.fold add_written_loc me.me_name.men_attrs model in
-  List.fold_left add_model_elt Mstr.empty (Lists.map_filter process_me elts)
+  List.fold_left add_model_elt Mstr.empty (List.filter_map process_me elts)
 
 
 (*
@@ -1060,7 +1060,7 @@ let build_model_rec pm (elts: model_element list) : model_files =
 *)
 
 let opt_bind_any os f =
-  f (Lists.map_filter (fun x -> x) os)
+  f (List.filter_map (fun x -> x) os)
 
 let opt_bind_all os f =
   if List.for_all Opt.inhabited os then

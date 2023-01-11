@@ -56,7 +56,21 @@ let load_plugin dir (byte,nat) =
   let file = Filename.concat dir file in
   Dynlink.loadfile_private file
 
-let load_file file =
+let resolve_driver_name whyconf_main drivers_subdir name =
+  let drivers_path = Filename.concat (Whyconf.datadir whyconf_main) drivers_subdir in
+  if Filename.check_suffix name ".drv" then
+    (* driver file with extension .drv are searched in the current
+         directory or the drivers path of Why3 *)
+    let paths = [ Filename.current_dir_name ; drivers_path ] in
+    Sysutil.resolve_from_paths paths name
+  else
+    (* driver names without extension are searched, with extension
+       .drv, in the driver path of Why3 *)
+    let paths = [ drivers_path ] in
+    Sysutil.resolve_from_paths paths (name ^ ".drv")
+
+let load_file whyconf_main file =
+  let file = resolve_driver_name whyconf_main "drivers" file in
   let c = open_in file in
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
@@ -69,7 +83,7 @@ let load_file file =
     Loc.set_file filename lb;
     lb
   in
-  let f = Driver_lexer.parse_file input_lexer lb in
+  let f = Driver_lexer.parse_file whyconf_main input_lexer lb in
   Stack.iter close_in to_close;
   f
 
@@ -80,7 +94,9 @@ exception UnknownProp  of (string list * string list)
 exception FSymExpected of lsymbol
 exception PSymExpected of lsymbol
 
-let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files ->
+let load_driver_raw =
+  let driver_tag = ref (-1) in
+  fun whyconf_main env file extra_files ->
   let prelude   = ref [] in
   let regexps   = ref [] in
   let exitcodes = ref [] in
@@ -124,7 +140,7 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
     | Plugin files -> load_plugin (Filename.dirname file) files
     | Blacklist sl -> List.iter (fun s -> Queue.add s blacklist) sl
   in
-  let f = load_file file in
+  let f = load_file whyconf_main file in
   List.iter add_global f.f_global;
 
   let thprelude     = ref Mid.empty in
@@ -226,7 +242,7 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
       thuse := Mid.add th.th_name (th, Theory.close_theory th_uc') !thuse
   in
   List.iter add_theory f.f_rules;
-  List.iter (fun f -> List.iter add_theory (load_file f).f_rules) extra_files;
+  List.iter (fun f -> List.iter add_theory (load_file whyconf_main f).f_rules) extra_files;
   incr driver_tag;
   {
     drv_env         = env;
@@ -248,6 +264,13 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
     drv_tag         = !driver_tag;
     drv_thuse       = !thuse;
   }
+
+
+let load_driver_file_and_extras = load_driver_raw
+
+let load_driver_for_prover main env p =
+  load_driver_raw main env p.Whyconf.driver p.Whyconf.extra_drivers
+
 
 let syntax_map drv =
   let addth _ (_,tds) acc = Stdecl.fold Printer.add_syntax_map tds acc in
@@ -305,19 +328,19 @@ exception NoPrinter
 
 let update_task = let ht = Hint.create 5 in fun drv ->
     let update task0 =
-      (** add requested theorie *)
+      (* add requested theorie *)
       let task0 = Mid.fold (fun _ (th,th') task ->
           let tdcs = (Task.find_clone_tds task0 th).tds_set in
           Stdecl.fold (fun tdc task -> match tdc.td_node with
               | Use _ -> Task.use_export task th'
               | Clone (_,_) ->
-                  (** We do nothing in case of clone *)
+                  (* We do nothing in case of clone *)
                   task
               | _ -> assert false
             ) tdcs task
         ) drv.drv_thuse task0
       in
-      (** apply metas *)
+      (* apply metas *)
       let task0 = Mid.fold (fun _ (th,tdms) task ->
           let tdcs = (Task.find_clone_tds task0 th).tds_set in
           Stdecl.fold (fun tdc task ->
@@ -482,21 +505,3 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | PSymExpected ls -> Format.fprintf fmt
       "%a is not a predicate symbol" Pretty.print_ls ls
   | e -> raise e)
-
-
-(** Loading drivers with relative names *)
-
-let absolute_driver_file main s =
-  if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
-  else Filename.concat (Whyconf.datadir main) (Filename.concat "drivers" (s ^ ".drv"))
-
-let load_driver_raw main env file extras =
-  let file = absolute_driver_file main file in
-  try
-    load_driver_absolute env file extras
-  with e when not (Debug.test_flag Debug.stack_trace) ->
-    eprintf "Fatal error while loading driver file '%s': %a@."
-            file Exn_printer.exn_printer e;
-    exit 1
-
-let load_driver main env p = load_driver_raw main env p.Whyconf.driver p.Whyconf.extra_drivers

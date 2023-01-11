@@ -61,7 +61,7 @@ let config, env =
 
 let () =
   if Queue.is_empty opt_queue then
-    Whyconf.Args.exit_with_usage option_list usage_msg
+    Whyconf.Args.exit_with_usage usage_msg
 
 let opt_output =
   match !opt_output with
@@ -76,7 +76,7 @@ let opt_driver =
     eprintf "Realization driver (-D) is required.@.";
     exit 1
   | f::ef ->
-    Driver.load_driver_raw (Whyconf.get_main config) env f ef
+    Driver.load_driver_file_and_extras (Whyconf.get_main config) env f ef
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

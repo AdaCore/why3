@@ -536,7 +536,7 @@ let term_of_fmla f = match f.t_node with
   | _ when f.t_ty <> None -> f
   | Tapp (ps, [t; {t_node = Tapp (fs,[])}])
     when ls_equal ps ps_equ && ls_equal fs fs_bool_true -> t
-  | _ -> t_attr_set ?loc:f.t_loc Sattr.empty
+  | _ -> t_attr_copy f
       (t_if_simp f t_bool_true t_bool_false)
 
 let fmla_of_term t = match t.t_node with
@@ -545,7 +545,7 @@ let fmla_of_term t = match t.t_node with
     when ls_equal fs1 fs_bool_true && ls_equal fs2 fs_bool_false -> f
   | Tapp (fs,[]) when ls_equal fs fs_bool_true -> t_attr_copy t t_true
   | Tapp (fs,[]) when ls_equal fs fs_bool_false -> t_attr_copy t t_false
-  | _ -> t_attr_set ?loc:t.t_loc Sattr.empty (t_equ_simp t t_bool_true)
+  | _ -> t_attr_copy t (t_equ_simp t t_bool_true)
 
 let rec pure_of_post prop v h = match h.t_node with
   | Tapp (ps, [{t_node = Tvar u}; t])
@@ -767,6 +767,53 @@ let e_exec c =
   mk_expr (Eexec (c, cty)) cty.cty_result cty.cty_mask eff
 
 let c_any c = mk_cexp Cany c
+
+let cty_from_formula f =
+  let rec decompose_post pvl prel rvl postl f =
+    let stop = Sattr.mem stop_split f.t_attrs in
+    match f.t_node with
+    | Tquant (Texists, f) when not stop ->
+        let vlf,_,f = t_open_quant f in
+        decompose_post pvl prel (List.rev_append vlf rvl) postl f
+    | Tbinop (Tand, f1, f2) when not stop ->
+        decompose_post pvl prel rvl (f1 :: postl) f2
+    | _ ->
+        let f = List.fold_left (fun acc f -> t_and f acc) f postl in
+        let post = match List.rev rvl with
+          | [] ->
+              let res = create_vsymbol (id_fresh "result") ty_unit in
+              create_post res f
+          | [v] ->
+              create_post v f
+          | rvl ->
+              (* force the creation of the program type symbol for the
+                 corresponding tuple type before ty_tuple creates one
+                 for the logic type *)
+              ignore (its_tuple (List.length rvl));
+              let ty = ty_tuple (List.map (fun v -> v.vs_ty) rvl) in
+              let res = create_vsymbol (id_fresh "result") ty in
+              let pvl = List.map pat_var rvl in
+              let pat = pat_app (fs_tuple (List.length rvl)) pvl ty in
+              let f = t_case (t_var res) [t_close_branch pat f] in
+              create_post res f in
+        let ity = ity_of_ty (t_type post) in
+        create_cty pvl prel [post] Mxs.empty Mpv.empty eff_empty ity in
+  let rec decompose_pre vl prel f =
+    let stop = Sattr.mem stop_split f.t_attrs in
+    match f.t_node with
+    | Tquant (Tforall, f) when not stop ->
+        let vlf,_,f = t_open_quant f in
+        decompose_pre (List.rev_append vlf vl) prel f
+    | Tbinop (Timplies, f1, f2) when not stop ->
+        decompose_pre vl (f1 :: prel) f2
+    | _ ->
+        let pv_of_v sbs vs =
+          let pv = create_pvsymbol (id_clone vs.vs_name) (ity_of_ty vs.vs_ty) in
+          Mvs.add vs (t_var pv.pv_vs) sbs, pv in
+        let sbs, pvl = Lists.rev_map_fold_left pv_of_v Mvs.empty vl in
+        let prel = List.rev_map (t_subst sbs) prel in
+        decompose_post pvl prel [] [] (t_subst sbs f) in
+  decompose_pre [] [] f
 
 let c_fun ?(mask=MaskVisible) args p q xq old e =
   let mask = mask_union mask e.e_mask in

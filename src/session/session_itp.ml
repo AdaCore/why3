@@ -836,7 +836,7 @@ let update_theory_node notification s th =
       try let p = theory_parent s th in
           update_file_node notification s p
       with Not_found when not (Debug.test_flag Debug.stack_trace) ->
-        Warning.emit "[Fatal] Session_itp.update_theory_node: parent missing@.";
+        Loc.warning "[Fatal] Session_itp.update_theory_node: parent missing@.";
         assert false
     end
 
@@ -864,7 +864,7 @@ let rec update_goal_node notification s id =
       | Trans trans_id -> update_trans_node notification s trans_id
       | Theory th -> update_theory_node notification s th
       | exception Not_found when not (Debug.test_flag Debug.stack_trace) ->
-                  Warning.emit "Session_itp.update_goal_node: parent missing@.";
+                  Loc.warning "Session_itp.update_goal_node: parent missing@.";
                   Printexc.print_backtrace stderr;
                   assert false
     end
@@ -1004,7 +1004,7 @@ let string_attribute field r =
   try
     List.assoc field r.Xml.attributes
   with Not_found ->
-    Warning.emit "[Error] missing required attribute '%s' from element '%s'@."
+    Loc.warning "[Error] missing required attribute '%s' from element '%s'@."
       field r.Xml.name;
     assert false
 
@@ -1024,7 +1024,7 @@ let load_result a (path,acc) r =
      begin
        match acc with
        | Some _ ->
-          Warning.emit "[Error] Too many result elements@.";
+          Loc.warning "[Error] Too many result elements@.";
           raise (LoadError (a,"too many result elements"))
        | None -> ()
      end;
@@ -1041,8 +1041,7 @@ let load_result a (path,acc) r =
        | "steplimitexceeded" -> Call_provers.StepLimitExceeded
        | "stepslimitexceeded" -> Call_provers.StepLimitExceeded
        | s ->
-          Warning.emit
-            "[Warning] Session.load_result: unexpected status '%s'@." s;
+          Loc.warning "Session.load_result: unexpected status '%s'@." s;
           Call_provers.HighFailure
      in
      let time =
@@ -1067,8 +1066,7 @@ let load_result a (path,acc) r =
      let fn = string_attribute "name" r in
      (Sysutil.add_to_path path fn,acc)
   | s ->
-    Warning.emit "[Warning] Session.load_result: unexpected element '%s'@."
-      s;
+    Loc.warning "Session.load_result: unexpected element '%s'@." s;
     (path,acc)
 
 let load_option attr g =
@@ -1110,7 +1108,7 @@ let rec load_goal session old_provers parent g id =
     List.iter (load_proof_or_transf session old_provers id) g.Xml.elements;
   | "label" -> ()
   | s ->
-      Warning.emit "[Warning] Session.load_goal: unexpected element '%s'@." s
+      Loc.warning "Session.load_goal: unexpected element '%s'@." s
 
 (* [load_proof_or_transf s op pid a] load either a proof attempt or a
    transformation of parent id [pid] from the xml [a] into the session
@@ -1148,7 +1146,7 @@ and load_proof_or_transf session old_provers pid a =
           in
           ignore(add_proof_attempt session p limit (Some res) ~obsolete edit pid)
         with Failure _ | Not_found ->
-          Warning.emit "[Error] prover id not listed in header '%s'@." prover;
+          Loc.warning "[Error] prover id not listed in header '%s'@." prover;
           raise (LoadError (a,"prover not listing in header"))
       end
     | "transf" ->
@@ -1175,7 +1173,7 @@ and load_proof_or_transf session old_provers pid a =
     | "metas" -> ()
     | "label" -> ()
     | s ->
-      Warning.emit
+      Loc.warning
         "[Warning] Session.load_proof_or_transf: unexpected element '%s'@."
         s
 
@@ -1201,8 +1199,7 @@ let load_theory session parent_name old_provers (path,acc) th =
      let fn = string_attribute "name" th in
      (Sysutil.add_to_path path fn,acc)
   | s ->
-    Warning.emit "[Warning] Session.load_theory: unexpected element '%s'@."
-      s;
+    Loc.warning "Session.load_theory: unexpected element '%s'@." s;
     (path,acc)
 
 let load_file session old_provers f =
@@ -1256,11 +1253,11 @@ let load_file session old_provers f =
                  prover_altern = altern} in
         Mint.add id (p,timelimit,steplimit,memlimit) old_provers
       with Failure _ ->
-        Warning.emit "[Warning] Session.load_file: unexpected non-numeric prover id '%s'@." id;
+        Loc.warning "Session.load_file: unexpected non-numeric prover id '%s'@." id;
         old_provers
     end
   | s ->
-    Warning.emit "[Warning] Session.load_file: unexpected element '%s'@." s;
+    Loc.warning "Session.load_file: unexpected element '%s'@." s;
     old_provers
 
 
@@ -1273,8 +1270,7 @@ let get_version (xml: Xml.t) =
     let shape_version = int_attribute_def "shape_version" xml.Xml.content 1 in
     shape_version
   | s ->
-    Warning.emit "[Warning] Session.load_session: unexpected element '%s'@."
-                 s;
+    Loc.warning "Session.load_session: unexpected element '%s'@." s;
     Termcode.current_shape_version
  *)
 
@@ -1343,17 +1339,17 @@ let rec read_global_buffer gs ch =
                  try
                    read_global_buffer gs ch
                  with ShapesFileError msg ->
-                   Warning.emit "Error while reading shape file: %s. Continuing without shapes" msg;
+                   Loc.warning "Error while reading shape file: %s. Continuing without shapes" msg;
                    sum_shape_version := None
                end;
              attrs
            with
            | Termcode.InvalidShape ->
-              Warning.emit "Session file indicates an invalid shape version `%s`" sv;
+              Loc.warning "Session file indicates an invalid shape version `%s`" sv;
               attrs
          with
          | Not_found ->
-            Warning.emit "Session file does not indicate any shape version";
+            Loc.warning "Session file does not indicate any shape version";
             attrs
        end
     | "goal" when !sum_shape_version <> None ->
@@ -1365,7 +1361,7 @@ let rec read_global_buffer gs ch =
                let old_sum = List.assoc "sum" attrs in
                if sum <> old_sum then
                  begin
-                   Warning.emit "old sum = %s ; new sum = %s@." old_sum sum;
+                   Loc.warning "old sum = %s ; new sum = %s@." old_sum sum;
                    raise
                      (ShapesFileError
                         "shapes files corrupted (sums do not correspond)")
@@ -1375,7 +1371,7 @@ let rec read_global_buffer gs ch =
            in
            ("shape",shape) :: attrs
          with ShapesFileError msg ->
-           Warning.emit "Error while reading shape file: %s. Continuing without shapes." msg;
+           Loc.warning "Error while reading shape file: %s. Continuing without shapes." msg;
            sum_shape_version := None; attrs
        end
     | _ -> attrs
@@ -1432,8 +1428,7 @@ let build_session ?sum_shape_version (s : session) xml : unit =
       old_provers;
     Debug.dprintf debug "[Info] load_session: done@\n"
   | s ->
-    Warning.emit "[Warning] Session.load_session: unexpected element '%s'@."
-      s
+    Loc.warning "Session.load_session: unexpected element '%s'@." s
 
 let load_session (dir : string) =
   let file = Filename.concat dir db_filename in
@@ -1450,7 +1445,7 @@ let load_session (dir : string) =
        (* xml does not exist yet *)
        raise (SessionFileError msg)
     | Xml.Parse_error s ->
-       Warning.emit "XML database corrupted, ignored (%s)@." s;
+       Loc.warning "XML database corrupted, ignored (%s)@." s;
        raise (SessionFileError "XML corrupted")
   else empty_session dir
 
@@ -1600,7 +1595,7 @@ let add_registered_transformation s env old_tr goal_id =
                                         old_tr.transf_args)
         goal.proofn_transformations in
     Printexc.print_backtrace stderr;
-    Warning.emit "[add_registered_transformation] FATAL transformation already present@.";
+    Loc.warning "[add_registered_transformation] FATAL transformation already present@.";
     exit 2
   with Not_found ->
     let subgoals =
@@ -1632,7 +1627,7 @@ and merge_trans env old_s new_s new_goal_id old_tr_id =
     | e when not (Debug.test_flag Debug.stack_trace) ->
         (* Non fatal exception are silently ignored *)
         if is_fatal e then
-        Warning.emit "unexpected exception during application of %s: %a@. Please run gnatprove with option --clean.@."
+        Loc.warning "FATAL unexpected exception during application of %s: %a@. Please run gnatprove with option --clean.@."
           old_tr.transf_name Exn_printer.exn_printer e;
         (* Notify the user but still allow her to load why3 *)
         None
@@ -1676,7 +1671,7 @@ and merge_trans env old_s new_s new_goal_id old_tr_id =
      found_detached := true
   with e when not (Debug.test_flag Debug.stack_trace) ->
     (* Printexc.print_backtrace stderr; (* Will appear with stack_trace *) *)
-    Warning.emit "[Session_itp.merge_trans] FATAL unexpected exception: %a@." Exn_printer.exn_printer e;
+    Loc.warning "[Session_itp.merge_trans] FATAL unexpected exception: %a@." Exn_printer.exn_printer e;
     exit 2
 
 
@@ -1779,7 +1774,7 @@ let add_file_section (s:session) (fn:string) ~file_is_detached
   if Hfile.mem s.session_files fn then
     begin
       Printexc.print_backtrace stderr;
-      Warning.emit "[session] FATAL: file %s already in database@." fn;
+      Loc.warning "[session] FATAL: file %s already in database@." fn;
       exit 2
     end
   else

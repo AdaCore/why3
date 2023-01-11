@@ -9,9 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Rc file management *)
-
-(** {2 Exception} *)
+(** {1 Configuration file management} *)
 
 type rc_value =
   | RCint of int
@@ -20,160 +18,174 @@ type rc_value =
   | RCstring of string * bool (** escape eol *)
   | RCident of string
 
+(** {2 Exceptions} *)
+
 (* exception SyntaxError *)
 exception ExtraParameters of string
-(** [ExtraParameters name] One section of name [name] has two many
-    parameters : more than one if [name] is a family, more than none
-    if [name] is a section *)
+(** [ExtraParameters name] is raised when a section named [name] has a
+    parameter or when a family named [name] has more than one
+    parameter. *)
 
 exception MissingParameters of string
-(** [MissingParameters name] One section of a family [name] has no
-    parameters *)
+(** [MissingParameters name] is raised if a family named [name] has no
+    parameters. *)
 
 (* exception UnknownSection of string *)
+
 exception UnknownField of string
-(** [UnknownField key] The key [key] appeared in a section but is not
-    expected there *)
+(** [UnknownField key] is raised when an unexpected field [key]
+    appears in a section. *)
+
 (* exception MissingSection of string *)
+
 exception MissingField of string
-(** [MissingField key] The field [key] is required but not given *)
+(** [MissingField key] is raised if the field [key] is required but
+    not given. *)
+
 exception DuplicateSection of string
-(** [DuplicateSection name] section [name] appears more than once *)
+(** [DuplicateSection name] is raised if there are more than one section named [name]. *)
+
 exception DuplicateField of string * rc_value * rc_value
-(** [DuplicateField key] key [key] appears more than once *)
+(** [DuplicateField key] is raised if the field [key] appears more than once. *)
+
 exception StringExpected of string * rc_value
-(** [StringExpected key value] string expected *)
+(** [StringExpected key value] is raised if a string was expected. *)
+
 (* exception IdentExpected of string * rc_value *)
 (* (\** [IdentExpected key value] string expected *\) *)
+
 exception IntExpected of string * rc_value
-(** [IntExpected key value] int expected *)
+(** [IntExpected key value] is raised if an integer was expected. *)
+
 exception BoolExpected of string * rc_value
-(** [BoolExpected key value] bool expected *)
+(** [BoolExpected key value] is raised if a boolean was expected. *)
 
 
 (** {2 RC API} *)
 
 
-type t (** Rc parsed file *)
-type section (** Section in rc file *)
-type family = (string * section) list (** A family in rc files *)
-type simple_family = section list (** A family w/o arguments in rc files*)
+type t
+(** A parsed configuration file. *)
 
-val empty : t (** An empty Rc *)
-val empty_section : section (** An empty section *)
+type section
+(** A section in a configuration file. *)
+
+type family = (string * section) list
+(** A family of parameterized sections in a configuration file. *)
+
+type simple_family = section list
+(** A family of sections without parameters. *)
+
+val empty : t
+(** An empty configuration. *)
+
+val empty_section : section
+(** An empty section. *)
 
 val get_section : t -> string -> section option
 (** [get_section rc name]
-    @return None if the section is not in the rc file
-    @raise DuplicateSection if multiple section has the name [name]
-    @raise ExtraParameters if [name] is a family in [rc] instead of a section
+    @return None if the section is not in the rc file.
+    @raise DuplicateSection if multiple sections have the name [name].
+    @raise ExtraParameters if [name] is a family in [rc] instead of a section.
 *)
 
 val get_family : t -> string -> family
-(** [get_family rc name] return all the sections of the family [name] in [rc]
-    @raise MissingParameters if [name] also corresponds to a section in [rc]
+(** [get_family rc name] returns all the sections of the family [name] in [rc].
+    @raise MissingParameters if [name] also corresponds to a section in [rc].
 *)
 
 val get_simple_family : t -> string -> simple_family
-(** [get_simple_family rc name] return all the sections of the simple
-    family [name] in [rc]. [] if none are present.
-    @raise ExtraParameters if [name] also corresponds to family in [rc]
+(** [get_simple_family rc name] returns all the sections of the simple
+    family [name] in [rc].
+    @return [[]] if none are present.
+    @raise ExtraParameters if [name] also corresponds to family in [rc].
 *)
 
 val set_section : t -> string -> section -> t
-(** [set_section rc name section] add a section [section] with name [name]
-    in [rc]. Remove former section [name] if present in [rc]
-*)
+(** [set_section rc name section] adds a section [section] with name [name]
+    in [rc]. It overwrites any former section named [name]. *)
 
 val set_family : t -> string -> family -> t
-(** [set_family rc name family] add all the section in [family] using
+(** [set_family rc name family] adds all the sections in [family] using
     the associated [string] as argument of the family [name] in [rc].
-    Remove all the former sections of family [name] if present in [rc].
-*)
+    It overwrites any former section of family [name]. *)
 
 val set_simple_family : t -> string -> simple_family -> t
-(** [set_simple_family rc name family] add all the section in [family]
+(** [set_simple_family rc name family] adds all the section in [family]
     using the associated [string] as argument of the family [name] in [rc].
-    Remove all the former sections of family [name] if present in [rc].
-*)
+    It overwrites any former section of family [name]. *)
 
 val get_int : ?default:int -> section -> string -> int
-(** [get_int ~default section key] one key to one value
+(** [get_int ?default section key] returns the integer value associated to key [key].
 
-    @raise Bad_value_type if the value associated to [key] is not of type [int]
+    @raise Bad_value_type if the value associated to [key] is not an integer.
 
-    @raise Key_not_found if default is not given and no value is
-    associated to [key]
+    @raise Key_not_found if [default] is not given and no value is
+    associated to [key].
 
     @raise Multiple_value if the key appears multiple time.
 *)
 
-val get_into : ?default:int -> section -> string -> int option
+val get_into : section -> string -> int option
+(** [get_into section key] returns the integer value associated to key
+    [key] if present, and [None] if missing. *)
 
-val get_intl : ?default:int list -> section -> string -> int list
-(** [get_intl ~default section key] one key to many value
+val get_intl : section -> string -> int list
+(** [get_intl section key] returns all the integer values associated to key [key].
 
-    @raise Bad_value_type if the value associated to [key] is not of type [int]
-
-    @raise MissingField if default is not given and no values are
-    associated to [key]
+    @raise Bad_value_type if any value associated to [key] is not an integer.
 *)
 
 val set_int : ?default:int -> section -> string -> int -> section
-(** [set_int ?default section key value] add the association [key] to [value]
-    in the section if value is not default.
-    Remove all former associations with this [key]
-*)
+(** [set_int ?default section key value] associates [value] to [key]
+    in the section, unless [value] is equal to [default].
+    It removes all the former associations to this [key]. *)
 
-val set_intl : ?default:int list -> section -> string -> int list -> section
-(** [set_intl ?default section key lvalue] add the associations [key] to all the
-    [lvalue] in the section if the value is not default.
-    Remove all former associations with this [key]
-*)
+val set_intl : section -> string -> int list -> section
+(** [set_intl section key lvalue] associates to [key] all the values
+    of [lvalue]. It removes all the former associations to this [key]. *)
 
-val set_into : ?default:int -> section -> string -> int option -> section
-(** [set_int ?default section key value] add the associations [key] to
-    [value] in the section if value is not default or None.
-    Remove all former associations with this [key]
-*)
+val set_into : section -> string -> int option -> section
+(** [set_int section key value] associates [value] to [key]
+    in the section if it is not [None]. It removes all the former
+    associations to this [key]. *)
 
 val get_bool : ?default:bool -> section -> string -> bool
-(** Same as {!get_int} but on bool *)
+(** Same as {!get_int} but on bool. *)
 
-val get_booll : ?default:bool list -> section -> string -> bool list
-(** Same as {!get_intl} but on bool *)
+val get_booll : section -> string -> bool list
+(** Same as {!get_intl} but on bool. *)
 
-val get_boolo : ?default:bool -> section -> string -> bool option
+val get_boolo : section -> string -> bool option
+(** Same as {!get_into} but on bool. *)
 
 val set_bool : ?default:bool -> section -> string -> bool -> section
-(** Same as {!set_int} but on bool *)
+(** Same as {!set_int} but on bool. *)
 
-val set_booll : ?default:bool list -> section -> string -> bool list -> section
-(** Same as {!set_intl} but on bool *)
+val set_booll : section -> string -> bool list -> section
+(** Same as {!set_intl} but on bool. *)
 
-val set_boolo : ?default:bool -> section -> string -> bool option -> section
-(** Same as {!set_into} but on bool *)
+val set_boolo : section -> string -> bool option -> section
+(** Same as {!set_into} but on bool. *)
 
 
 val get_string : ?default:string -> section -> string -> string
-(** Same as {!get_int} but on string *)
+(** Same as {!get_int} but on string. *)
 
-val get_stringl : ?default:string list -> section -> string -> string list
-(** Same as {!get_intl} but on string *)
+val get_stringl : section -> string -> string list
+(** Same as {!get_intl} but on string. *)
 
-val get_stringo : ?default:string -> section -> string -> string option
+val get_stringo : section -> string -> string option
+(** Same as {!get_into} but on string. *)
 
 val set_string : ?escape_eol:bool -> ?default:string -> section -> string -> string -> section
 (** Same as {!set_int} but on string. [escape_eol] indicates if special
-   character should be escaped *)
+    characters should be escaped. *)
 
-val set_stringl : ?escape_eol:bool -> ?default:string list ->
-  section -> string -> string list -> section
+val set_stringl : ?escape_eol:bool -> section -> string -> string list -> section
+(** Same as {!set_intl} but on string. *)
 
-val set_stringo : ?escape_eol:bool -> ?default:string ->
-  section -> string -> string option -> section
-
-(** Same as {!set_intl} but on string *)
+val set_stringo : ?escape_eol:bool -> section -> string -> string option -> section
 
 (* val ident  : ?default:string      -> section -> string -> string *)
 (*   (\** raise Bad_value_type *)
@@ -196,38 +208,33 @@ val set_stringo : ?escape_eol:bool -> ?default:string ->
 (*   *\) *)
 
 val check_exhaustive : section -> Wstdlib.Sstr.t -> unit
-(** [check_exhaustive section keys] check that only the keys in [keys]
-    appear inside the section [section]
+(** [check_exhaustive section keys] checks that only the keys in [keys]
+    appear inside the section [section].
 
-    @raise UnknownField if it is not the case
+    @raise UnknownField if it is not the case.
 *)
 
 exception CannotOpen of string * string
 exception SyntaxErrorFile of string * string
 
 val from_channel : in_channel -> t
-(** [from_channel cin] returns the Rc of the input channel [cin]
-    @raise SyntaxErrorFile in case of incorrect syntax
-    @raise ExtraParameters if a section header has more than one argument
+(** [from_channel cin] returns the Rc of the input channel [cin].
+    @raise SyntaxErrorFile in case of incorrect syntax.
+    @raise ExtraParameters if a section header has more than one argument.
 *)
 
 val from_file : string -> t
-(** [from_file filename] returns the Rc of the file [filename]
-    @raise CannotOpen if [filename] does not exist
-    @raise SyntaxErrorFile in case of incorrect syntax
-    @raise ExtraParameters if a section header has more than one argument
+(** [from_file filename] returns the Rc of the file [filename].
+    @raise CannotOpen if [filename] does not exist.
+    @raise SyntaxErrorFile in case of incorrect syntax.
+    @raise ExtraParameters if a section header has more than one argument.
 *)
 
 val to_formatter : Format.formatter -> t -> unit
-  (** [to_formatter fmt rc] writes the Rc [rc] to the formatter [fmt] *)
+(** [to_formatter fmt rc] writes the Rc [rc] to the formatter [fmt]. *)
 
 val to_channel : out_channel -> t -> unit
-  (** [to_channel cout rc] writes the Rc [rc] to the output channel [out] *)
+(** [to_channel cout rc] writes the Rc [rc] to the output channel [out]. *)
 
 val to_file : string -> t -> unit
-  (** [to_file filename rc] writes the Rc [rc] to the file [filename] *)
-
-val get_home_dir : unit -> string
-  (** [get_home_dir ()] returns the home dir of the user *)
-
-
+(** [to_file filename rc] writes the Rc [rc] to the file [filename]. *)

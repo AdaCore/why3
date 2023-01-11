@@ -28,17 +28,19 @@ let debug = Debug.register_info_flag "smtv2_printer"
 let debug_incremental = Debug.register_info_flag "force_incremental"
     ~desc:"Force@ incremental@ mode@ for@ smtv2@ provers"
 
-(** SMTLIB tokens taken from CVC4: src/parser/smt2/{Smt2.g,smt2.cpp} *)
+(** SMTLIB tokens taken from CVC4/CVC5: src/parser/smt2/{Smt2.g,smt2.cpp} *)
 let ident_printer () =
   let bls =
     [(* Base SMT-LIB commands, see page 43 *)
-      "assert"; "check-sat"; "check-sat-assuming"; "declare-const";
+      "assert"; "check-sat"; "check-sat-assuming";
+      "declare-const"; "define-const";
       "declare-datatype"; "declare-datatypes"; "declare-fun"; "declare-sort";
       "define-fun"; "define-fun-rec"; "define-funs-rec"; "define-sort";
       "echo"; "exit";
-      "get-assignment"; "get-assertions";
+      "get-assignment"; "get-assertions"; "get-difficulty";
       "get-info"; "get-model"; "get-option"; "get-proof";
       "get-unsat-assumptions"; "get-unsat-core"; "get-value";
+      "get-learned-literals";
       "pop"; "push";
       "reset"; "reset-assertions";
       "set-info"; "set-logic";  "set-option";
@@ -51,7 +53,13 @@ let ident_printer () =
       "assert-rewrite";
       "assert-reduction"; "assert-propagation"; "declare-sorts";
       "declare-funs"; "declare-preds"; "define";
-      "simplify";
+      "simplify"; "include";
+      "declare-codatatype"; "declare-codatatypes";
+      "block-model"; "block-model-values";
+      "get-qe"; "get-qe-disjunct";
+      "get-abduct"; "get-abduct-next";
+      "get-interpolant"; "get-interpolant-next";
+      "declare-heap"; "declare-pool";
 
       (* operators, including theory symbols *)
       "="; "=>";
@@ -65,14 +73,30 @@ let ident_printer () =
       "concat"; "bvnot"; "bvand"; "bvor"; "bvneg"; "bvadd"; "bvmul"; "bvudiv";
       "bvurem"; "bvshl"; "bvlshr"; "bvult"; "bvnand"; "bvnor"; "bvxor"; "bvxnor";
       "bvcomp"; "bvsub"; "bvsdiv"; "bvsrem"; "bvsmod"; "bvashr"; "bvule";
-      "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge"; "rotate_left";
-      "rotate_right"; "bvredor"; "bvredand";
-      "bv2nat";
+      "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge";
+      "rotate_left"; "rotate_right";
+      "bvredor"; "bvredand";
+      "bvuaddo"; "bvsaddo";
+      "bvumulo"; "bvsmulo";
+      "bvusubo"; "bvssubo";
+      "bvsdivo";
+      "zero_extend"; "sign_extend";
 
       "^";
       "sqrt"; "sin"; "cos"; "tan"; "asin"; "acos"; "atan"; "pi";
       "exp"; "csc"; "sec"; "cot";
       "arcsin"; "arccos"; "arctan"; "arccsc"; "arcsec"; "arccot";
+
+      (* tuple operators *)
+      "tuple";
+      "tuple.select"; "tuple.update"; "tuple.project";
+
+      (* bags *)
+      "bag";
+      "table.project"; "table.aggr"; "table.join"; "table.group";
+
+      (* sets *)
+      "rel.group"; "rel.aggr"; "rel.project";
 
      (* the new floating point theory - updated to the 2014-05-27 standard *)
       "FloatingPoint"; "fp";
@@ -92,6 +116,7 @@ let ident_printer () =
       "fp.isNegative"; "fp.isPositive";
       "to_fp"; "to_fp_unsigned";
       "fp.to_ubv"; "fp.to_sbv"; "fp.to_real";
+      "to_fp_bv"; "to_fp_fp"; "to_fp_real"; "to_fp_signed";
 
      (* the new proposed string theory *)
       "String"; "str.<"; "str.<=";
@@ -100,12 +125,32 @@ let ident_printer () =
       "str.to.int"; "u16.to.str"; "str.to.u16"; "u32.to.str"; "str.to.u32";
       "str.in.re"; "str.to.re";
       "str.replace"; "str.tolower"; "str.toupper"; "str.rev";
+      "str.to_lower"; "str.to_upper";
       "str.from_code"; "str.is_digit"; "str.from_int"; "str.to_int";
-      "str.in_re"; "str.to_code"; "str.replace_all";
+      "str.in_re"; "str.to_re"; "str.to_code"; "str.replace_all";
+      "str.replace_re"; "str.replace_re_all";
+      "str.indexof_re"; "str.update";
       "int.to.str"; "str.to.int"; "str.code"; "str.replaceall";
       "str.from-int"; "str.to-int"; "str.in-re"; "str.to-re";
+
+      (* sequences *)
+      "seq.++";
+      "seq.len";
+      "seq.extract";
+      "seq.update";
+      "seq.at";
+      "seq.contains";
+      "seq.indexof";
+      "seq.replace";
+      "seq.prefixof";
+      "seq.suffixof";
+      "seq.rev";
+      "seq.replace_all";
+      "seq.unit";
+      "seq.nth";
+
       "re.++"; "re.union"; "re.inter";
-      "re.*"; "re.+"; "re.opt"; "re.range"; "re.loop";
+      "re.*"; "re.+"; "re.opt"; "re.^"; "re.range"; "re.loop";
       "re.comp"; "re.diff";
 
      (* separation logic theory *)
@@ -115,6 +160,7 @@ let ident_printer () =
       "union"; "intersection"; "setminus"; "subset"; "member";
       "singleton"; "insert"; "card"; "complement"; "join";
       "product"; "transpose"; "tclosure";
+      "set.comprehension";
 
      (* built-in sorts *)
       "Bool"; "Int"; "Real"; "BitVec"; "Array";
@@ -125,14 +171,14 @@ let ident_printer () =
       "true"; "false";
       "const";
       "abs";
-      "BitVec"; "extract"; "bv2nat"; "nat2bv";
+      "BitVec"; "extract"; "repeat"; "bv2nat"; "nat2bv";
 
      (* From Z3 *)
       "map"; "bv"; "default";
       "difference";
 
-     (* From CVC4 *)
-      "char"; "choose";
+     (* From CVC4 / CVC5 *)
+      "char"; "choose"; "is"; "update";
 
      (* Counterexamples specific keywords *)
       "lambda"; "LAMBDA"; "model";
@@ -165,6 +211,7 @@ type info = {
   meta_model_projection : Sls.t;
   meta_record_def : Sls.t;
   mutable list_records : field_info list Mstr.t;
+  mutable constr_proj_id : string list Mls.t;
   (* For algebraic type counterexamples: constructors with no arguments can be
      misunderstood for variables *)
   mutable noarg_constructors: string list;
@@ -386,21 +433,7 @@ let rec print_term info fmt t =
       fprintf fmt "@[<hv2>(ite %a@ %a@ %a)@]"
         (print_fmla info) f1 (print_term info) t1 (print_term info) t2
   | Tcase(t, bl) ->
-    let ty = t_type t in
-    begin
-      match ty.ty_node with
-      | Tyapp (ts,_) when ts_equal ts ts_bool ->
-        print_boolean_branches info t print_term fmt bl
-      | _ ->
-        match t.t_node with
-        | Tvar v -> print_branches info v print_term fmt bl
-        | _ ->
-          let subject = create_vsymbol (id_fresh "subject") (t_type t) in
-          fprintf fmt "@[<hv2>(let ((%a @[%a@]))@ %a)@]"
-            (print_var info) subject (print_term info) t
-            (print_branches info subject print_term) bl;
-          forget_var info subject
-    end
+     print_tcase info t print_term fmt bl
   | Teps _ -> unsupportedTerm t
       "smtv2: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
@@ -474,24 +507,51 @@ and print_fmla info fmt f =
         (print_term info) t1 (print_fmla info) f2;
       forget_var info v
   | Tcase(t, bl) ->
-    let ty = t_type t in
-    begin
-      match ty.ty_node with
-      | Tyapp (ts,_) when ts_equal ts ts_bool ->
-        print_boolean_branches info t print_fmla fmt bl
-      | _ ->
-        match t.t_node with
-        | Tvar v -> print_branches info v print_fmla fmt bl
-        | _ ->
-          let subject = create_vsymbol (id_fresh "subject") (t_type t) in
-          fprintf fmt "@[<hv2>(let ((%a @[%a@]))@ %a)@]"
-            (print_var info) subject (print_term info) t
-            (print_branches info subject print_fmla) bl;
-          forget_var info subject
-    end
+     print_tcase info t print_fmla fmt bl
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f) in
 
   check_exit_vc_term f info.info_in_goal info.info_vc_term
+
+and print_tcase info t pr fmt bl =
+     let ty = t_type t in
+     match ty.ty_node with
+     | Tyapp (ts,_) when ts_equal ts ts_bool ->
+        print_boolean_branches info t pr fmt bl
+     | _ ->
+        match info.info_version with
+        | V20 | V26Par -> begin
+            (* Use a chain of if-then-else constructs. *)
+            match t.t_node with
+            | Tvar v -> print_branches info v pr fmt bl
+            | _ ->
+               let subject = create_vsymbol (id_fresh "subject") (t_type t) in
+               fprintf fmt "@[<hv2>(let ((%a @[%a@]))@ %a)@]"
+                 (print_var info) subject (print_term info) t
+                 (print_branches info subject pr) bl;
+               forget_var info subject
+          end
+        | V26 ->
+           fprintf fmt "@[<hv2>(match %a (@[<hv0>%a@]))@]"
+             (print_term info) t
+             (print_list space (print_match_branch info ty pr)) bl
+
+and print_match_branch info ty pr fmt b =
+  let (p,t) = t_open_branch b in
+  let error () = unsupportedPattern p
+    "smtv2: you must compile nested pattern-matching" in
+  match p.pat_node with
+  | Pwild ->
+     let wild = create_vsymbol (id_fresh "wildcard") ty in
+     fprintf fmt "@[<hv2>(%a %a)@]" (print_var info) wild (pr info) t
+  | Papp(cs,[]) ->
+     fprintf fmt "@[<hv2>(%a %a)@]" (print_ident info) cs.ls_name (pr info) t;
+  | Papp(cs,args) ->
+     let args = List.map (function
+       | {pat_node = Pvar v} -> v | _ -> error ()) args in
+     fprintf fmt "@[<hv2>(@[<hv2>(%a %a)@] %a)@]"
+       (print_ident info) cs.ls_name (print_list space (print_var info)) args
+       (pr info) t
+  | _ -> error ()
 
 and print_boolean_branches info subject pr fmt bl =
   let error () = unsupportedTerm subject
@@ -504,10 +564,9 @@ and print_boolean_branches info subject pr fmt bl =
     begin
       match p1.pat_node with
       | Papp(cs,_) ->
-        let csname = if ls_equal cs fs_bool_true then "true" else "false" in
-        fprintf fmt "@[<hv2>(ite (= %a %s) %a %a)@]"
+        let t1, t2 = if ls_equal cs fs_bool_true then t1, t2 else t2, t1 in
+        fprintf fmt "@[<hv2>(ite %a %a %a)@]"
           (print_term info) subject
-          csname
           (pr info) t1
           (pr info) t2
       | _ -> error ()
@@ -527,12 +586,7 @@ and print_branches info subject pr fmt bl = match bl with
             | {pat_node = Pvar v} -> v | _ -> error ()) args in
           if bl = [] then print_branch info subject pr fmt (cs,args,t)
           else
-            begin match info.info_version with
-              | V20 | V26 (* It should be the same than V26Par but it was different *) ->
-                  fprintf fmt "@[<hv2>(ite (is-%a %a) %a %a)@]"
-              | V26Par ->
-                  fprintf fmt "@[<hv2>(ite ((_ is %a) %a) %a %a)@]"
-            end
+            fprintf fmt "@[<hv2>(ite (is-%a %a) %a %a)@]"
               (print_ident info) cs.ls_name (print_var info) subject
               (print_branch info subject pr) (cs,args,t)
               (print_branches info subject pr) bl
@@ -542,12 +596,11 @@ and print_branch info subject pr fmt (cs,vars,t) =
   if vars = [] then pr info fmt t else
   let tvs = t_freevars Mvs.empty t in
   if List.for_all (fun v -> not (Mvs.mem v tvs)) vars then pr info fmt t else
-  let i = ref 0 in
-  let pr_proj fmt v = incr i;
-    if Mvs.mem v tvs then fprintf fmt "(%a (%a_proj_%d %a))"
-      (print_var info) v (print_ident info) cs.ls_name
-      !i (print_var info) subject in
-  fprintf fmt "@[<hv2>(let (%a) %a)@]" (print_list space pr_proj) vars (pr info) t
+  let pr_proj fmt (v, p) =
+    if Mvs.mem v tvs then fprintf fmt "(%a (%s %a))"
+      (print_var info) v p (print_var info) subject in
+  let l = List.combine vars (Mls.find cs info.constr_proj_id) in
+  fprintf fmt "@[<hv2>(let (%a) %a)@]" (print_list space pr_proj) l (pr info) t
 
 and print_expr info fmt =
   TermTF.t_select (print_term info fmt) (print_fmla info fmt)
@@ -574,7 +627,7 @@ let print_param_decl info fmt ls =
               (print_type_value info) ls.ls_value
     | _  ->
         let tvs = Term.ls_ty_freevars ls in
-        fprintf fmt ";; %s@\n@[<v2>(declare-fun %a %a)@]@\n@\n"
+        fprintf fmt ";; %S@\n@[<v2>(declare-fun %a %a)@]@\n@\n"
           ls.ls_name.id_string (print_ident info) ls.ls_name
           (print_par info
              (fun fmt -> Format.fprintf fmt "(%a) %a"
@@ -591,7 +644,7 @@ let print_logic_decl_aux flag info fmt (ls,def) =
     collect_model_ls info ls;
     let vsl,expr = Decl.open_ls_defn def in
     if info.info_incremental && has_quantification expr then begin
-      fprintf fmt ";; %s@\n@[<hov2>(declare-fun %a (%a) %a)@]@\n@\n"
+      fprintf fmt ";; %S@\n@[<hov2>(declare-fun %a (%a) %a)@]@\n@\n"
         ls.ls_name.id_string
         (print_ident info) ls.ls_name
         (print_list space (print_type info)) (List.map (fun vs -> vs.vs_ty) vsl)
@@ -599,7 +652,7 @@ let print_logic_decl_aux flag info fmt (ls,def) =
       info.incr_list_ldecls <- (ls, vsl, expr) :: info.incr_list_ldecls
     end else
       let tvs = Term.ls_ty_freevars ls in
-      fprintf fmt ";; %s@\n@[<v2>(define-fun%s %a %a)@]@\n@\n"
+      fprintf fmt ";; %S@\n@[<v2>(define-fun%s %a %a)@]@\n@\n"
         ls.ls_name.id_string flag
         (print_ident info) ls.ls_name
         (print_par info
@@ -682,7 +735,7 @@ let print_info_model info =
 (* TODO factor out print_prop ? *)
 let print_prop info fmt (pr, f) =
   let tvs = Term.t_ty_freevars Ty.Stv.empty f in
-  fprintf fmt ";; %s@\n@[<hov 2>(assert@ %a)@]@\n@\n"
+  fprintf fmt ";; %S@\n@[<hov 2>(assert@ %a)@]@\n@\n"
     pr.pr_name.id_string (* FIXME? collisions *)
     (print_par info (fun fmt -> print_fmla info fmt f)) tvs
 
@@ -696,7 +749,7 @@ let add_check_sat info fmt =
     fprintf fmt "@[(get-model)@]@\n@\n"
 
 let print_ldecl_axiom info fmt (ls, vls, t) =
-  fprintf fmt ";; %s@\n" ls.ls_name.id_string;
+  fprintf fmt ";; %S@\n" ls.ls_name.id_string;
   fprintf fmt
     "@[<hv2>(assert@ @[<hv2>(forall @[(%a)@]@ @[<hv2>(= @[<h>(%a %a)@]@ %a)@])@])@]@\n@\n"
     (print_typed_var_list info) vls
@@ -720,7 +773,7 @@ let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f = match k with
   | Pgoal ->
       let tvs = Term.t_ty_freevars Ty.Stv.empty f in
       if not (Ty.Stv.is_empty tvs) then unsupported "smt: monomorphise goal must be applied";
-      fprintf fmt ";; Goal %s@\n" pr.pr_name.id_string;
+      fprintf fmt ";; Goal %S@\n" pr.pr_name.id_string;
       (match pr.pr_name.id_loc with
         | None -> ()
         | Some loc -> fprintf fmt ";; File %a@\n" Loc.pp_position loc);
@@ -748,7 +801,7 @@ let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f = match k with
       }
   | Plemma -> assert false
 
-let print_constructor_decl info fmt (ls,args) =
+let print_constructor_decl info is_record fmt (ls,args) =
   let field_names =
     (match args with
     | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name;
@@ -763,6 +816,8 @@ let print_constructor_decl info fmt (ls,args) =
             let field_name =
               match pr with
               | Some pr ->
+                  if not is_record then
+                    unsupported "smtv2: sum types should not have projections";
                   let field_name = sprintf "%a" (print_ident info) pr.ls_name in
                   fprintf fmt "(%s" field_name;
                   let field_trace =
@@ -776,7 +831,9 @@ let print_constructor_decl info fmt (ls,args) =
                   in
                   {field_name; field_trace; field_ident= Some pr.ls_name}
               | None ->
-                  let field_name = sprintf "%a_proj_%d" (print_ident info) ls.ls_name i in (* FIXME: is it possible to generate 2 same value with _proj_ inside it ? Need sanitizing and uniquifying ? *)
+                  let field_name = id_fresh (ls.ls_name.id_string^"_proj") in
+                  let field_name = create_vsymbol field_name ty(*dummy*) in
+                  let field_name = sprintf "%a" (print_var info) field_name in
                   fprintf fmt "(%s" field_name;
                   {field_name; field_trace= ""; field_ident= None}
             in
@@ -787,25 +844,29 @@ let print_constructor_decl info fmt (ls,args) =
         List.rev field_names)
   in
 
+  info.constr_proj_id <-
+    Mls.add ls (List.map (fun x -> x.field_name) field_names) info.constr_proj_id;
   if Strings.has_suffix "'mk" ls.ls_name.id_string then
     begin
       info.list_records <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name) field_names info.list_records;
     end
 
 let print_data_decl info fmt (ts,cl) =
+  let is_record = match cl with [_] -> true | _ -> false in
   fprintf fmt "@[(%a@ %a)@]"
     (print_ident info) ts.ts_name
-    (print_list space (print_constructor_decl info)) cl
+    (print_list space (print_constructor_decl info is_record)) cl
 
 let print_data_def info fmt (ts,cl) =
+  let is_record = match cl with [_] -> true | _ -> false in
   if ts.ts_args <> [] then
     let args = List.map (fun arg -> arg.tv_name) ts.ts_args in
     fprintf fmt "@[(par (%a) (%a))@]"
       (print_list space (print_ident info)) args
-      (print_list space (print_constructor_decl info)) cl
+      (print_list space (print_constructor_decl info is_record)) cl
   else
     fprintf fmt "@[(%a)@]"
-      (print_list space (print_constructor_decl info)) cl
+      (print_list space (print_constructor_decl info is_record)) cl
 
 let print_sort_decl info fmt (ts,_) =
   fprintf fmt "@[(%a %d)@]"
@@ -887,7 +948,7 @@ let print_task version args ?old:_ fmt task =
   in
   let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
   let vc_attrs = (Task.task_goal_fmla task).t_attrs in
-  let vc_info = {vc_inside = false; vc_loc = None; vc_func_name = None} in
+  let vc_info = {vc_inside = false; vc_loc; vc_func_name = None} in
   let info = {
     info_syn = Discriminate.get_syntax_map task;
     info_rliteral = Printer.get_rliteral_map task;
@@ -901,6 +962,7 @@ let print_task version args ?old:_ fmt task =
     meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
     meta_record_def = Task.on_tagged_ls Theory.meta_record task;
     list_records = Mstr.empty;
+    constr_proj_id = Mls.empty;
     noarg_constructors = [];
     info_cntexample_need_push = need_push;
     info_cntexample = cntexample;

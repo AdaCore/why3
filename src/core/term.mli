@@ -278,7 +278,8 @@ val t_false : term
 
 val t_nat_const : int -> term
 (** [t_nat_const n] builds the constant integer term [n],
-    n must be non-negative *)
+    [n] must be non-negative *)
+
 val t_int_const : BigInt.t -> term
 val t_real_const : ?pow2:BigInt.t -> ?pow5:BigInt.t -> BigInt.t -> term
 val t_string_const : string -> term
@@ -306,7 +307,7 @@ val t_attr_set : ?loc:Loc.position -> Sattr.t -> term -> term
 val t_attr_add : attribute -> term -> term
 val t_attr_remove : attribute -> term -> term
 val t_attr_copy : term -> term -> term
-(** [t_attr_copy src dst] return the term [dst] with attributes and
+(** [t_attr_copy src dst] returns the term [dst] with attributes and
    locations augmented with those of term [src] *)
 
 (** Constructors with propositional simplification *)
@@ -326,8 +327,10 @@ val t_let_close_simp_keep_var : keep:bool -> vsymbol -> term -> term -> term
 val t_if_simp : term -> term -> term -> term
 val t_let_simp : term -> term_bound -> term
 (** similar to [t_let_close_simp] but on a [term_bound] *)
+
 val t_let_simp_keep_var : keep:bool -> term -> term_bound -> term
 (** similar to [t_let_close_simp_keep_var] but on a [term_bound] *)
+
 val t_case_simp : term -> term_branch list -> term
 val t_quant_simp : quant -> term_quant -> term
 val t_forall_simp : term_quant -> term

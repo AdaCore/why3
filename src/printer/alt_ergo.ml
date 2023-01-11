@@ -229,7 +229,7 @@ let rec print_term info fmt t =
       fprintf fmt "(let %a =@ %a@ : %a in@ %a)"
         (print_ident info) v.vs_name
         (print_term info) t1
-         (** some version of alt-ergo have an inefficient typing of let *)
+         (* some version of alt-ergo have an inefficient typing of let *)
         (print_type info) v.vs_ty
         (print_term info) t2;
       forget_var info v
@@ -313,7 +313,7 @@ and print_fmla_node info fmt f = match f.t_node with
       fprintf fmt "(let %a =@ %a@ : %a in@ %a)"
         (print_ident info) v.vs_name
         (print_term info) t1
-         (** some version of alt-ergo have an inefficient typing of let *)
+         (* some version of alt-ergo have an inefficient typing of let *)
         (print_type info) v.vs_ty
         (print_fmla info) f2;
       forget_var info v
@@ -496,7 +496,7 @@ let print_task args ?old:_ fmt task =
   let cntexample = Driver.get_counterexmp task in
   let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
   let vc_attrs = (Task.task_goal_fmla task).t_attrs in
-  let vc_info = {vc_inside = false; vc_loc = None; vc_func_name = None} in
+  let vc_info = {vc_inside = false; vc_loc; vc_func_name = None} in
   let info = {
     info_syn = Discriminate.get_syntax_map task;
     info_ac  = Task.on_tagged_ls meta_ac task;

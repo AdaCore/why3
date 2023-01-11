@@ -836,7 +836,7 @@ let warn_clone_not_abstract loc th =
         end
       | _ -> ()
     ) th.th_decls;
-    Warning.emit ~loc "cloned theory %a.%s does not contain \
+    Loc.warning ~loc "cloned theory %a.%s does not contain \
         any abstract symbol; it should be used instead"
       (Pp.print_list (Pp.constant_string ".") Pp.string) th.th_path
       th.th_name.id_string

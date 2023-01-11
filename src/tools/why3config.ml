@@ -38,9 +38,9 @@ module DetectProvers = struct
     let data = read_auto_detection_data config in
     let provers = find_provers data in
     let provers =
-      List.fold_left (fun acc (path, name, version) ->
-          { Partial.name; path; version; shortcut = None; manual = false } :: acc
-        ) [] provers in
+      List.map (fun (path, name, version) ->
+          { Partial.name; path; version; shortcut = None; manual = false }
+        ) provers in
     ignore (compute_builtin_prover provers config data);
     let config = remove_auto_provers config in
     let config = update_provers provers config in
@@ -175,7 +175,7 @@ let () =
   let options = Whyconf.Args.all_options [] usage_msg extra_help in
   let i = Getopt.parse_many options Sys.argv !Whyconf.Args.first_arg in
   if i = Array.length Sys.argv then
-    Whyconf.Args.exit_with_usage ~extra_help [] usage_msg;
+    Whyconf.Args.exit_with_usage ~extra_help usage_msg;
   let cmd_name = Sys.argv.(i) in
   let cmd =
     match List.find (fun e -> e.cmd_name = cmd_name) cmds with

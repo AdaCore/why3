@@ -47,8 +47,8 @@ let why3_regexp_of_string s = (* define a regexp in why3 *)
 
 let default_conf_file =
   match Config.localdir with
-    | None -> Filename.concat (Rc.get_home_dir ()) ".why3.conf"
-    | Some d -> Filename.concat d "why3.conf"
+  | None -> Filename.concat (Util.get_home_dir ()) ".why3.conf"
+  | Some d -> Filename.concat d "why3.conf"
 
 (* Prover *)
 
@@ -176,18 +176,21 @@ let set_strategies rc strategies =
 (** Main record *)
 
 type main = {
-  libdir   : string;      (* "/usr/local/lib/why/" *)
-  datadir  : string;      (* "/usr/local/share/why/" *)
+  libdir   : string;
+  (* arch-dependent data, say "/usr/local/lib/why3/" *)
+  datadir  : string;
+  (* arch-independent data, say "/usr/local/share/why3/" *)
   libobjdir : string;
-  loadpath  : string list;  (* "/usr/local/lib/why/theories" *)
+  loadpath  : string list;
+  (* standard library, say "/usr/local/lib/why3/stdlib" *)
   stdlib  : bool;
   (* add the standard library in the loadpath (default true) *)
   load_default_plugins  : bool;
   (* autoload the plugins in libdir (default true) *)
   timelimit : int;
-  (* default prover time limit in seconds (0 unlimited) *)
+  (* default prover time limit in seconds (0 means unlimited) *)
   memlimit  : int;
-  (* default prover memory limit in megabytes (0 unlimited)*)
+  (* default prover memory limit in megabytes (0 means unlimited)*)
   running_provers_max : int;
   (* max number of running prover processes *)
   plugins : string list;
@@ -350,12 +353,15 @@ module RC_load = struct
             extra_options = [];
             extra_drivers = [];
             configure_build = get_string ~default:"" section "configure_build";
-            build_commands = get_stringl ~default:[] section "build_commands";
+            build_commands = get_stringl section "build_commands";
           }
         | Some info ->
           { prover  = prover;
             command = get_string ~default:info.command section "command";
-            command_steps = get_stringo ?default:info.command_steps section "command_steps";
+            command_steps =
+              begin match get_stringo section "command_steps" with
+              | None -> info.command_steps
+              | c -> c end;
             driver  = get_string ~default:info.driver section "driver";
             in_place = get_bool ~default:info.in_place section "in_place";
             editor  = get_string ~default:info.editor section "editor";
@@ -363,15 +369,15 @@ module RC_load = struct
             extra_options = info.extra_options;
             extra_drivers = info.extra_drivers;
             configure_build = get_string ~default:"" section "configure_build";
-            build_commands = get_stringl ~default:[] section "build_commands";
+            build_commands = get_stringl section "build_commands";
           }
       in
       let provers = Mprover.add prover info provers in
-      let lshort = get_stringl section ~default:[] "shortcut" in
+      let lshort = get_stringl section "shortcut" in
       let shortcuts = add_prover_shortcuts shortcuts prover lshort in
       provers,shortcuts
     with MissingField s ->
-      Warning.emit "[Warning] cannot load a prover: missing field '%s'@." s;
+      Loc.warning "Missing field '%s' in [prover] section@." s;
       provers,shortcuts
 
   let load_shortcut acc section =
@@ -385,7 +391,7 @@ module RC_load = struct
                      prover_altern = altern} in
       add_prover_shortcuts acc prover shortcuts
     with MissingField s ->
-      Warning.emit "[Warning] cannot load shortcut: missing field '%s'@." s;
+      Loc.warning "Missing field '%s' in [shortcut] section@." s;
       acc
 
   let load_editor editors (id, section) =
@@ -404,7 +410,7 @@ module RC_load = struct
       in
       Meditor.add id info editors
     with MissingField s ->
-      Warning.emit "[Warning] cannot load an editor: missing field '%s'@." s;
+      Loc.warning "Missing field '%s' in [editor] section@." s;
       editors
 
   let load_policy acc (_,section) =
@@ -437,7 +443,7 @@ module RC_load = struct
         | _ -> raise Not_found
       with Not_found -> acc
     with MissingField s ->
-      Warning.emit "[Warning] cannot load a policy: missing field '%s'@." s;
+      Loc.warning "Missing field '%s' in [uninstalled_prover] section@." s;
       acc
 
   let load_strategy strategies section =
@@ -446,7 +452,7 @@ module RC_load = struct
       let name =
         try
           let (_:int) = String.index name ' ' in
-          Warning.emit "[Warning] found a space character in strategy name '%s': replaced by '_'@." name;
+          Loc.warning "Found a space character in strategy name '%s', replaced by '_'@." name;
           String.map (function ' ' -> '_' | c -> c) name
         with Not_found -> name
       in
@@ -463,7 +469,7 @@ module RC_load = struct
         strategies
     with
       MissingField s ->
-        Warning.emit "[Warning] cannot load a strategy: missing field '%s'@." s;
+        Loc.warning "Missing field '%s' in [strategy] section@." s;
         strategies
 
   let load_main old dirname section =
@@ -473,17 +479,19 @@ module RC_load = struct
       datadir   = get_string ~default:old.datadir section "datadir";
       libobjdir = Config.libobjdir;
       loadpath  =
-        begin match List.map (Sysutil.concat dirname)
-                (get_stringl ~default:[] section "loadpath") with
+        begin match get_stringl section "loadpath" with
         | [] -> old.loadpath
-        | l -> l end;
+        | l -> List.map (Sysutil.concat dirname) l end;
       stdlib = get_bool ~default:old.stdlib section "stdlib";
       load_default_plugins = get_bool ~default:old.load_default_plugins section "load_default_plugins";
       timelimit = get_int ~default:old.timelimit section "timelimit";
       memlimit  = get_int ~default:old.memlimit section "memlimit";
       running_provers_max = get_int ~default:old.running_provers_max
           section "running_provers_max";
-      plugins = get_stringl ~default:old.plugins section "plugin";
+      plugins =
+        begin match get_stringl section "plugin" with
+        | [] -> old.plugins
+        | l -> l end;
       default_editor = get_string ~default:old.default_editor section "default_editor";
     }
 
@@ -593,7 +601,7 @@ module RC_save = struct
       | s::l -> begin
           match RC_load.load_prover_id s with
           | exception MissingField field ->
-              Warning.emit "[Warning] missing field '%s' in user configuration@." field;
+              Loc.warning "Missing field '%s' in [prover] section@." field;
               aux (s::acc) l
           | p when Prover.equal p prover ->
               let s = update_section s in
@@ -838,9 +846,9 @@ let add_extra_config config filename =
     | None -> config.main
     | Some rc ->
       let loadpath = (List.map (Sysutil.concat dirname)
-        (get_stringl ~default:[] rc "loadpath")) @ config.main.loadpath in
+        (get_stringl rc "loadpath")) @ config.main.loadpath in
       let plugins =
-        (get_stringl ~default:[] rc "plugin") @ config.main.plugins in
+        (get_stringl rc "plugin") @ config.main.plugins in
       { config.main with loadpath = loadpath; plugins = plugins } in
   (* get more strategies *)
   let more_strategies = get_strategies rc in
@@ -855,7 +863,7 @@ let add_extra_config config filename =
       let altern = get_stringo section "alternative" in
       mk_filter_prover ?version ?altern name
     with MissingField s ->
-      Warning.emit "[Warning] sec prover_modifiers is missing a '%s' field@." s;
+      Loc.warning "Missing field '%s' in [prover_modifiers] section@." s;
       mk_filter_prover "none"
   in
   let prover_modifiers = get_simple_family rc "prover_modifiers" in
@@ -870,9 +878,9 @@ let add_extra_config config filename =
         else
           begin
             Debug.dprintf debug "prover modifiers found for %a@." print_prover p;
-          let opt = get_stringl ~default:[] section "option" in
-          let drv = get_stringl ~default:[] section "driver" in
-          let bcmd = get_stringl ~default:[] section "build_command" in
+          let opt = get_stringl section "option" in
+          let drv = get_stringl section "driver" in
+          let bcmd = get_stringl section "build_command" in
           { c with
             extra_options = opt @ c.extra_options;
             extra_drivers = drv @ c.extra_drivers;
@@ -890,7 +898,7 @@ let add_extra_config config filename =
       Meditor.change (function
       | None -> None
       | Some c ->
-        let opt = get_stringl ~default:[] section "option" in
+        let opt = get_stringl section "option" in
         Some { c with editor_options = opt @ c.editor_options }) id  editors
     ) config.editors editor_modifiers in
   (* add editors *)
@@ -953,7 +961,7 @@ module User = struct
     }
 
   let set_prover_upgrade_policy config prover target =
-    (** kept simple because no auto upgrade policy *)
+    (* kept simple because no auto upgrade policy *)
     let m = Mprover.add prover target config.provers_upgrade_policy in
     {config with
      user_rc = RC_save.set_policies config.user_rc m;
@@ -961,29 +969,29 @@ module User = struct
     }
 
   let remove_user_policy config prover =
-    (** kept simple because no auto upgrade policy *)
+    (* kept simple because no auto upgrade policy *)
     let m = Mprover.remove prover config.provers_upgrade_policy in
     {config with
      user_rc = RC_save.set_policies config.user_rc m;
      provers_upgrade_policy = m;
     }
 
-  let get_section config name = assert (name <> "main");
+  let get_section config name =
     get_section config.user_rc name
 
-  let get_simple_family config name = assert (name <> "prover");
+  let get_simple_family config name =
     get_simple_family config.user_rc name
 
-  let get_family config name = assert (name <> "prover");
+  let get_family config name =
     get_family config.user_rc name
 
-  let set_section config name section = assert (name <> "main");
+  let set_section config name section =
     {config with user_rc = set_section config.user_rc name section}
 
   let set_simple_family config name section =
     {config with user_rc = set_simple_family config.user_rc name section}
 
-  let set_family config name section = assert (name <> "prover");
+  let set_family config name section =
     {config with user_rc = set_family config.user_rc name section}
 
 end
@@ -1133,23 +1141,22 @@ module Args = struct
       Debug.Args.desc_debug_list;
     ]
 
-  let do_usage options header footer =
-    Printf.printf "Usage:";
-    List.iter (Printf.printf " %s") !Getopt.commands;
-    Printf.printf " [options]";
-    if header = "" then Printf.printf "\n\n"
-    else if header.[String.length header - 1] <> '\n' then
-      Printf.printf " %s\n\n" header
-    else Printf.printf " %s\n" header;
-    Printf.printf "%s" (Getopt.format options);
-    if footer <> "" then Printf.printf "\n%s" footer;
-    Printf.printf "%!"
+  let do_usage fmt options header footer =
+    Printf.fprintf fmt "Usage:";
+    List.iter (Printf.fprintf fmt " %s") !Getopt.commands;
+    Printf.fprintf fmt " [options]";
+    if header <> "" then Printf.fprintf fmt " %s" header;
+    if header = "" || header.[String.length header - 1] <> '\n' then
+      Printf.fprintf fmt "\n";
+    if options <> [] then Printf.fprintf fmt "\n%s" (Getopt.format options);
+    if footer <> "" then Printf.fprintf fmt "\n%s" footer;
+    Printf.fprintf fmt "%!"
 
   let all_options options header footer =
     let options = ref (common_options @ options) in
     let help =
       let open Getopt in
-      (Key ('h', "help"), Hnd0 (fun () -> do_usage !options header footer; exit 0),
+      (Key ('h', "help"), Hnd0 (fun () -> do_usage stdout !options header footer; exit 0),
        " display this help and exit") in
     options := help :: !options;
     !options
@@ -1174,12 +1181,10 @@ module Args = struct
     Getopt.parse_all ~i:!first_arg options default Sys.argv;
     complete_initialization ()
 
-  let exit_with_usage ?(exit_code=1) ?(extra_help="") options usage =
-    let options = all_options options usage extra_help in
-    do_usage options usage extra_help;
-    exit exit_code
+  let exit_with_usage ?(extra_help="") usage =
+    do_usage stderr [] usage extra_help;
+    exit 1
 end
-
 
 let unknown_to_known_provers provers pu =
   Mprover.fold (fun pk _ (others,name,version) ->

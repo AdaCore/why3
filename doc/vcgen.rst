@@ -40,9 +40,11 @@ a report by Filliâtre, Gondelman and Paskevich :cite:`gondelman16reg`.
 Controlling the VC generation
 -----------------------------
 
-The generation of VCs can be controlled by the user, in particular using attributes put inside
-the WhyML source code. These attributes are
-:why3:attribute:`[@vc:divergent]`, :why3:attribute:`[@vc:sp]`, :why3:attribute:`[@vc:wp]` and
+The generation of VCs can be controlled by the user, in particular
+using attributes put inside the WhyML source code. These attributes
+are :why3:attribute:`[@vc:divergent]`,
+:why3:attribute:`[@vc:trusted_wf]`, :why3:attribute:`[@vc:sp]`,
+:why3:attribute:`[@vc:wp]` and
 :why3:attribute:`[@vc:keep_precondition]`. Their effects are detailed
 below.
 
@@ -189,8 +191,42 @@ the attribute on a terminating program, for example on
      100 - x
 
 
-.. _sec.keeppreconditions:
+.. _sec.trusted_wf:
 
+Using a custom well-founded relation for termination
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Variants for termination can be associated to a specific ordering
+relation, thanks to the keyword :code:`with`. The following example
+illustrates this feature on a loop on bitvectors.
+
+.. code-block:: whyml
+
+  use bv.BV32
+
+  let f () =
+    let ref b = (42 : BV32.t) in
+    while BV32.sgt b (0:BV32.t) do
+      variant { b with BV32.slt }
+      b <- BV32.sub b (1:BV32.t)
+    done
+
+For the termination proof to be complete, the given ordering :math:`r`
+must be proved well-founded. In fact, it suffices to prove that,
+whenever proving :math:`r~x~y`, the term :math:`y` is accessible by
+:math:`r`. The VC generator introduces a proof obligation for that.
+
+Alternatively, the attribute :why3:attribute:`[@vc:trusted_wf]` can be
+attached to the declaration of a binary relation. It declares that the
+relation is trusted to be well-founded, and consequently the VC
+generator does not introduce any accessibility obligation whenever
+this relation is used in a variant clause. The default orderings used
+in variant clause (on integers, range types, or algebraic types) are
+known to be well-founded by Why3, and so are the strict ordering
+relations on bitvectors, as in the example above.
+
+
+.. _sec.keeppreconditions:
 
 Keeping preconditions of calls in the logical context
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

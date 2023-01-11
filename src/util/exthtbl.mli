@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Association tables over hashable types *)
+(** {1 Association tables over hashable types} *)
 
 val hash : 'a -> int
   (** the same as [Hashtbl.hash] *)

@@ -115,7 +115,7 @@ rule token = parse
       { Lexlib.illegal_character c lexbuf }
 
 {
-  let parse_file_gen parse input_lexbuf lexbuf =
+  let parse_file_gen whyconf_main parse input_lexbuf lexbuf =
     let s = Stack.create () in
     Stack.push lexbuf s;
     let rec multifile lex_dumb =
@@ -123,18 +123,24 @@ rule token = parse
       let tok = token lexbuf in
       Loc.transfer_loc lexbuf lex_dumb;
       match tok with
-        | INPUT filename ->
-          let dirname = Filename.dirname lexbuf.lex_curr_p.pos_fname in
-          let filename = Sysutil.concat dirname filename in
-          Stack.push (input_lexbuf filename) s;
-          multifile lex_dumb
-        | EOF -> ignore (Stack.pop s);
-          if Stack.is_empty s then EOF else multifile lex_dumb
-        | _ -> tok in
+      | INPUT filename ->
+         let current_dirname = Filename.dirname lexbuf.lex_curr_p.pos_fname in
+         let drivers_path = Filename.concat (Whyconf.datadir whyconf_main) "drivers" in
+         let paths =
+           if current_dirname = drivers_path then [drivers_path] else
+             [ current_dirname ; drivers_path ]
+         in
+         let filename = Sysutil.resolve_from_paths paths filename in
+         Stack.push (input_lexbuf filename) s;
+         multifile lex_dumb
+      | EOF ->
+         ignore (Stack.pop s);
+         if Stack.is_empty s then EOF else multifile lex_dumb
+      | _ -> tok in
     let lex_dumb = Lexing.from_function (fun _ _ -> assert false) in
     Loc.transfer_loc lexbuf lex_dumb;
     Loc.with_location (parse multifile) lex_dumb
 
-  let parse_file = parse_file_gen Driver_parser.file
-  let parse_file_extract = parse_file_gen Driver_parser.file_extract
+  let parse_file whyconf_main = parse_file_gen whyconf_main Driver_parser.file
+  let parse_file_extract whyconf_main = parse_file_gen whyconf_main Driver_parser.file_extract
 }

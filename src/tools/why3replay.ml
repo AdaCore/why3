@@ -20,10 +20,10 @@ open Why3
 
 let display_warning ?loc msg =
   match loc with
-    | None -> printf "%s@." msg
-    | Some l -> printf "File %a: %s@." Loc.pp_position l msg
+    | None -> printf "Warning: %s@." msg
+    | Some l -> printf "Warning, file %a: %s@." Loc.pp_position l msg
 
-let () = Warning.set_hook display_warning
+let () = Loc.set_warning_hook display_warning
 
 let debug = Debug.register_info_flag
     ~desc:"of@ the@ progression@ of@ a@ replay"
@@ -363,15 +363,17 @@ let run_as_bench env_session =
 
 
 let () =
+  if Queue.is_empty files then
+    Whyconf.Args.exit_with_usage usage_msg;
   let dir =
     try
       Server_utils.get_session_dir ~allow_mkdir:false files
     with Invalid_argument s ->
       Format.eprintf "Error: %s@." s;
-      Whyconf.Args.exit_with_usage option_list usage_msg
+      Whyconf.Args.exit_with_usage usage_msg
   in
   if not (Queue.is_empty files) then
-    Whyconf.Args.exit_with_usage option_list usage_msg;
+    Whyconf.Args.exit_with_usage usage_msg;
   try
     Debug.dprintf debug "Opening session '%s'...@?" dir;
     let ses = S.load_session dir in

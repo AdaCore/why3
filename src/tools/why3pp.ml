@@ -473,7 +473,7 @@ let deps_file fmt header filename f =
     Ptree.(match f with
   | Modules ml ->
      List.iter (fun (n,dl) -> deps_module fmt filename (filename ^ "." ^ n.id_str) dl) ml
-    (** a list of modules containing lists of declarations *)
+    (* a list of modules containing lists of declarations *)
   | Decls dl -> deps_module fmt filename (filename ^ ".Top") dl)
   end;
   if header then fprintf fmt "}@."

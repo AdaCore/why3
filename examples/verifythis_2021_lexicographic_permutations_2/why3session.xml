@@ -6,111 +6,112 @@
 <prover id="1" name="Alt-Ergo" version="2.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.8.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_2021_lexicographic_permutations_2.mlw"/>
 <theory name="ArrayListConversions" proved="true">
  <goal name="to_list_from&#39;vc" expl="VC for to_list_from" proved="true">
- <proof prover="0" timelimit="1"><result status="valid" time="0.15" steps="15266"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.15" steps="15873"/></proof>
  </goal>
  <goal name="to_list&#39;vc" expl="VC for to_list" proved="true">
- <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="4828"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="5353"/></proof>
  </goal>
  <goal name="to_list_array_eq&#39;vc" expl="VC for to_list_array_eq" proved="true">
- <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="10820"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="11293"/></proof>
  </goal>
  <goal name="of_list&#39;vc" expl="VC for of_list" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="of_list&#39;vc.0" expl="array creation size" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="4995"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="5769"/></proof>
   </goal>
   <goal name="of_list&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="6940"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="7497"/></proof>
   </goal>
   <goal name="of_list&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="6373"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="6780"/></proof>
   </goal>
   <goal name="of_list&#39;vc.3" expl="index in array bounds" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="7199"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="8102"/></proof>
   </goal>
   <goal name="of_list&#39;vc.4" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="of_list&#39;vc.4.0" expl="assertion" proved="true">
-   <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="7606"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="8160"/></proof>
    </goal>
    <goal name="of_list&#39;vc.4.1" expl="VC for of_list" proved="true">
-   <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="7648"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="8201"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="of_list&#39;vc.5" expl="variant decrease" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="7958"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="8508"/></proof>
   </goal>
   <goal name="of_list&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.03" steps="6945"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.03" steps="7482"/></proof>
   </goal>
   <goal name="of_list&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.03" steps="7541"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.03" steps="8095"/></proof>
   </goal>
   <goal name="of_list&#39;vc.8" expl="precondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.08" steps="873"/></proof>
   </goal>
   <goal name="of_list&#39;vc.9" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.08" steps="9630"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.08" steps="10195"/></proof>
   </goal>
   <goal name="of_list&#39;vc.10" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.08" steps="9058"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.08" steps="9625"/></proof>
   </goal>
   <goal name="of_list&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.03" steps="5310"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.03" steps="5716"/></proof>
   </goal>
   <goal name="of_list&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.03" steps="5328"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.03" steps="5734"/></proof>
   </goal>
   <goal name="of_list&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="5606"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="6012"/></proof>
   </goal>
   <goal name="of_list&#39;vc.14" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="6307"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="6845"/></proof>
   </goal>
   <goal name="of_list&#39;vc.15" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="6887"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="7766"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="eq_nth&#39;vc" expl="VC for eq_nth" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="eq_nth&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.04" steps="793"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.04" steps="806"/></proof>
   </goal>
   <goal name="eq_nth&#39;vc.1" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="eq_nth&#39;vc.1.0" expl="assertion" proved="true">
-   <proof prover="0" timelimit="1"><result status="valid" time="0.03" steps="7204"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.03" steps="8173"/></proof>
    </goal>
    <goal name="eq_nth&#39;vc.1.1" expl="VC for eq_nth" proved="true">
-   <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="7203"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="8202"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="eq_nth&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="5985"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="6391"/></proof>
   </goal>
   <goal name="eq_nth&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="7119"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="8092"/></proof>
   </goal>
   <goal name="eq_nth&#39;vc.4" expl="assertion" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.03" steps="6593"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.03" steps="7154"/></proof>
   </goal>
   <goal name="eq_nth&#39;vc.5" expl="assertion" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.03" steps="6631"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.03" steps="7192"/></proof>
   </goal>
   <goal name="eq_nth&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="1"><result status="valid" time="0.24" steps="1435137"/></proof>
+  <proof prover="2" timelimit="1"><result status="valid" time="0.24" steps="1616046"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="of_to_list" proved="true">
- <proof prover="1" timelimit="1"><result status="valid" time="0.45" steps="6104"/></proof>
+ <proof prover="1" timelimit="1"><result status="valid" time="0.45" steps="5938"/></proof>
  </goal>
  <goal name="to_of_list" proved="true">
  <proof prover="1" timelimit="1"><result status="valid" time="0.01" steps="89"/></proof>
@@ -118,13 +119,13 @@
 </theory>
 <theory name="BoxedIntArrays" proved="true">
  <goal name="boxed_permut" proved="true">
- <proof prover="0"><result status="valid" time="0.22" steps="48531"/></proof>
+ <proof prover="0"><result status="valid" time="0.22" steps="49096"/></proof>
  </goal>
  <goal name="greater&#39;vc" expl="VC for greater" proved="true">
- <proof prover="0"><result status="valid" time="0.06" steps="18941"/></proof>
+ <proof prover="0"><result status="valid" time="0.06" steps="18942"/></proof>
  </goal>
  <goal name="boxed_greater" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="10270"/></proof>
+ <proof prover="0"><result status="valid" time="0.04" steps="10648"/></proof>
  </goal>
  <goal name="maxi&#39;vc" expl="VC for maxi" proved="true">
  <proof prover="3"><result status="valid" time="0.00" steps="0"/></proof>
@@ -138,312 +139,312 @@
  <proof prover="1"><result status="valid" time="0.05" steps="342"/></proof>
  </goal>
  <goal name="find_le&#39;vc" expl="VC for find_le" proved="true">
- <proof prover="0"><result status="valid" time="0.15" steps="29379"/></proof>
+ <proof prover="0"><result status="valid" time="0.15" steps="29599"/></proof>
  </goal>
  <goal name="eq_le_compat" proved="true">
- <proof prover="0"><result status="valid" time="0.21" steps="44971"/></proof>
+ <proof prover="0"><result status="valid" time="0.21" steps="45550"/></proof>
  </goal>
  <goal name="eq_lt_compat" proved="true">
- <proof prover="0"><result status="valid" time="0.13" steps="23253"/></proof>
+ <proof prover="0"><result status="valid" time="0.13" steps="23744"/></proof>
  </goal>
  <goal name="le_or_lt" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="le_or_lt.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="15733"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="16185"/></proof>
   </goal>
   <goal name="le_or_lt.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="15806"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="16284"/></proof>
   </goal>
   <goal name="le_or_lt.2" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="15934"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="16457"/></proof>
   </goal>
   <goal name="le_or_lt.3" proved="true">
-  <proof prover="0"><result status="valid" time="0.16" steps="37386"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="36458"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="lt_not_le" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="lt_not_le.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.15" steps="15692"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="16127"/></proof>
   </goal>
   <goal name="lt_not_le.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="12398"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="12844"/></proof>
   </goal>
   <goal name="lt_not_le.2" proved="true">
-  <proof prover="0"><result status="valid" time="0.16" steps="15806"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="16291"/></proof>
   </goal>
   <goal name="lt_not_le.3" proved="true">
-  <proof prover="0"><result status="valid" time="0.19" steps="24902"/></proof>
+  <proof prover="0"><result status="valid" time="0.19" steps="25498"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="eq_sub_permut&#39;vc" expl="VC for eq_sub_permut" proved="true">
- <proof prover="1"><result status="valid" time="0.55" steps="5449"/></proof>
+ <proof prover="1"><result status="valid" time="0.55" steps="4534"/></proof>
  </goal>
  <goal name="le_permut_sorted" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="le_permut_sorted.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.11" steps="17069"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="17528"/></proof>
   </goal>
   <goal name="le_permut_sorted.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.25" steps="46350"/></proof>
+  <proof prover="0"><result status="valid" time="0.25" steps="46594"/></proof>
   </goal>
   <goal name="le_permut_sorted.2" proved="true">
-  <proof prover="2"><result status="valid" time="0.04" steps="85037"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="92307"/></proof>
   </goal>
   <goal name="le_permut_sorted.3" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="18657"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="18863"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="le_permut_decr_sorted" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="le_permut_decr_sorted.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.11" steps="18443"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="18919"/></proof>
   </goal>
   <goal name="le_permut_decr_sorted.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.32" steps="57896"/></proof>
+  <proof prover="0"><result status="valid" time="0.32" steps="58134"/></proof>
   </goal>
   <goal name="le_permut_decr_sorted.2" proved="true">
   <proof prover="1"><result status="valid" time="0.05" steps="252"/></proof>
   </goal>
   <goal name="le_permut_decr_sorted.3" proved="true">
-  <proof prover="0"><result status="valid" time="0.12" steps="20873"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="21083"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="next&#39;vc" expl="VC for next" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="next&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="11847"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="11990"/></proof>
   </goal>
   <goal name="next&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="13394"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="13777"/></proof>
   </goal>
   <goal name="next&#39;vc.2" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="12451"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="12651"/></proof>
   </goal>
   <goal name="next&#39;vc.3" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="12458"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="12658"/></proof>
   </goal>
   <goal name="next&#39;vc.4" expl="loop variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="12731"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="12931"/></proof>
   </goal>
   <goal name="next&#39;vc.5" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="12675"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="12875"/></proof>
   </goal>
   <goal name="next&#39;vc.6" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.10" steps="15447"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="16061"/></proof>
   </goal>
   <goal name="next&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="14294"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="14722"/></proof>
   </goal>
   <goal name="next&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.20" steps="451137"/></proof>
+  <proof prover="2"><result status="valid" time="0.20" steps="260221"/></proof>
   </goal>
   <goal name="next&#39;vc.9" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="12248"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="12391"/></proof>
   </goal>
   <goal name="next&#39;vc.10" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="12102"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="12245"/></proof>
   </goal>
   <goal name="next&#39;vc.11" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="12188"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="12331"/></proof>
   </goal>
   <goal name="next&#39;vc.12" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="13035"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="13235"/></proof>
   </goal>
   <goal name="next&#39;vc.13" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="13057"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="13257"/></proof>
   </goal>
   <goal name="next&#39;vc.14" expl="loop variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="13292"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="13492"/></proof>
   </goal>
   <goal name="next&#39;vc.15" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="13363"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="13564"/></proof>
   </goal>
   <goal name="next&#39;vc.16" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="14610"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="14813"/></proof>
   </goal>
   <goal name="next&#39;vc.17" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="12330"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="12473"/></proof>
   </goal>
   <goal name="next&#39;vc.18" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.10" steps="17679"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="17162"/></proof>
   </goal>
   <goal name="next&#39;vc.19" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="13340"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="13540"/></proof>
   </goal>
   <goal name="next&#39;vc.20" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="13383"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="13583"/></proof>
   </goal>
   <goal name="next&#39;vc.21" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="13340"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="13540"/></proof>
   </goal>
   <goal name="next&#39;vc.22" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="16459"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="16659"/></proof>
   </goal>
   <goal name="next&#39;vc.23" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.13" steps="19561"/></proof>
+  <proof prover="0"><result status="valid" time="0.13" steps="19689"/></proof>
   </goal>
   <goal name="next&#39;vc.24" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="16757"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="16957"/></proof>
   </goal>
   <goal name="next&#39;vc.25" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="16760"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="16960"/></proof>
   </goal>
   <goal name="next&#39;vc.26" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="19383"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="19714"/></proof>
   </goal>
   <goal name="next&#39;vc.27" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="19588"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="19924"/></proof>
   </goal>
   <goal name="next&#39;vc.28" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="17143"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="17343"/></proof>
   </goal>
   <goal name="next&#39;vc.29" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.10" steps="336165"/></proof>
+  <proof prover="2"><result status="valid" time="0.10" steps="304709"/></proof>
   </goal>
   <goal name="next&#39;vc.30" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="17848"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="18048"/></proof>
   </goal>
   <goal name="next&#39;vc.31" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="16188"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="16331"/></proof>
   </goal>
   <goal name="next&#39;vc.32" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="18303"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="18503"/></proof>
   </goal>
   <goal name="next&#39;vc.33" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="16500"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="16643"/></proof>
   </goal>
   <goal name="next&#39;vc.34" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="18154"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="18354"/></proof>
   </goal>
   <goal name="next&#39;vc.35" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="18175"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="18375"/></proof>
   </goal>
   <goal name="next&#39;vc.36" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="18175"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="18375"/></proof>
   </goal>
   <goal name="next&#39;vc.37" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="18340"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="18540"/></proof>
   </goal>
   <goal name="next&#39;vc.38" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.16" steps="24978"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="25058"/></proof>
   </goal>
   <goal name="next&#39;vc.39" expl="loop variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="18948"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="19148"/></proof>
   </goal>
   <goal name="next&#39;vc.40" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="19034"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="19234"/></proof>
   </goal>
   <goal name="next&#39;vc.41" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="19153"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="19353"/></proof>
   </goal>
   <goal name="next&#39;vc.42" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.11" steps="25289"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="25865"/></proof>
   </goal>
   <goal name="next&#39;vc.43" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.14" steps="32199"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="33276"/></proof>
   </goal>
   <goal name="next&#39;vc.44" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="2.10" steps="4450546"/></proof>
+  <proof prover="4"><result status="valid" time="0.35" steps="2517"/></proof>
   </goal>
   <goal name="next&#39;vc.45" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="127879"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="128882"/></proof>
   </goal>
   <goal name="next&#39;vc.46" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.59" steps="4782"/></proof>
+  <proof prover="1"><result status="valid" time="0.59" steps="4728"/></proof>
   </goal>
   <goal name="next&#39;vc.47" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.25" steps="2307"/></proof>
+  <proof prover="1"><result status="valid" time="0.25" steps="2315"/></proof>
   </goal>
   <goal name="next&#39;vc.48" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.08" steps="185581"/></proof>
+  <proof prover="2"><result status="valid" time="0.08" steps="184895"/></proof>
   </goal>
   <goal name="next&#39;vc.49" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="2.09" steps="3095964"/></proof>
+  <proof prover="2"><result status="valid" time="0.54" steps="1073711"/></proof>
   </goal>
   <goal name="next&#39;vc.50" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.38" steps="2462"/></proof>
+  <proof prover="1"><result status="valid" time="0.38" steps="2482"/></proof>
   </goal>
   <goal name="next&#39;vc.51" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="next&#39;vc.51.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.18" steps="33730"/></proof>
+   <proof prover="0"><result status="valid" time="0.18" steps="32883"/></proof>
    </goal>
    <goal name="next&#39;vc.51.1" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.12" steps="21075"/></proof>
+   <proof prover="0"><result status="valid" time="0.12" steps="21302"/></proof>
    </goal>
    <goal name="next&#39;vc.51.2" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.33" steps="58558"/></proof>
+   <proof prover="0"><result status="valid" time="0.33" steps="58070"/></proof>
    </goal>
    <goal name="next&#39;vc.51.3" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.22" steps="35413"/></proof>
+   <proof prover="0"><result status="valid" time="0.22" steps="35614"/></proof>
    </goal>
    <goal name="next&#39;vc.51.4" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.06" steps="18394"/></proof>
+   <proof prover="0"><result status="valid" time="0.06" steps="18594"/></proof>
    </goal>
    <goal name="next&#39;vc.51.5" expl="VC for next" proved="true">
-   <proof prover="0"><result status="valid" time="0.06" steps="18184"/></proof>
+   <proof prover="0"><result status="valid" time="0.06" steps="18386"/></proof>
    </goal>
    <goal name="next&#39;vc.51.6" expl="VC for next" proved="true">
-   <proof prover="0"><result status="valid" time="1.60" steps="248684"/></proof>
+   <proof prover="0"><result status="valid" time="4.82" steps="468948"/></proof>
    </goal>
    <goal name="next&#39;vc.51.7" expl="VC for next" proved="true">
-   <proof prover="2"><result status="valid" time="0.05" steps="145808"/></proof>
+   <proof prover="2"><result status="valid" time="0.05" steps="146873"/></proof>
    </goal>
    <goal name="next&#39;vc.51.8" expl="VC for next" proved="true">
-   <proof prover="0"><result status="valid" time="0.10" steps="21217"/></proof>
+   <proof prover="0"><result status="valid" time="0.10" steps="21418"/></proof>
    </goal>
    <goal name="next&#39;vc.51.9" expl="VC for next" proved="true">
-   <proof prover="0"><result status="valid" time="0.32" steps="62169"/></proof>
+   <proof prover="0"><result status="valid" time="0.32" steps="61139"/></proof>
    </goal>
    <goal name="next&#39;vc.51.10" expl="VC for next" proved="true">
-   <proof prover="0"><result status="valid" time="0.21" steps="34205"/></proof>
+   <proof prover="0"><result status="valid" time="0.21" steps="36493"/></proof>
    </goal>
    <goal name="next&#39;vc.51.11" expl="VC for next" proved="true">
-   <proof prover="2"><result status="valid" time="0.10" steps="262215"/></proof>
+   <proof prover="2"><result status="valid" time="0.10" steps="288113"/></proof>
    </goal>
    <goal name="next&#39;vc.51.12" expl="VC for next" proved="true">
-   <proof prover="0"><result status="valid" time="0.87" steps="112114"/></proof>
+   <proof prover="0"><result status="valid" time="0.60" steps="98959"/></proof>
    </goal>
    <goal name="next&#39;vc.51.13" expl="VC for next" proved="true">
-   <proof prover="0"><result status="valid" time="0.13" steps="39245"/></proof>
+   <proof prover="0"><result status="valid" time="0.13" steps="39287"/></proof>
    </goal>
    <goal name="next&#39;vc.51.14" expl="VC for next" proved="true">
-   <proof prover="0"><result status="valid" time="0.18" steps="43165"/></proof>
+   <proof prover="0"><result status="valid" time="0.18" steps="42977"/></proof>
    </goal>
    <goal name="next&#39;vc.51.15" expl="VC for next" proved="true">
-   <proof prover="0"><result status="valid" time="0.09" steps="21669"/></proof>
+   <proof prover="0"><result status="valid" time="0.09" steps="21873"/></proof>
    </goal>
    <goal name="next&#39;vc.51.16" expl="VC for next" proved="true">
-   <proof prover="0"><result status="valid" time="0.07" steps="18605"/></proof>
+   <proof prover="0"><result status="valid" time="0.07" steps="18805"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="next&#39;vc.52" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.10" steps="23066"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="23284"/></proof>
   </goal>
   <goal name="next&#39;vc.53" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="16980"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="17123"/></proof>
   </goal>
   <goal name="next&#39;vc.54" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.29" steps="53159"/></proof>
+  <proof prover="0"><result status="valid" time="0.29" steps="59046"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="as_num&#39;vc" expl="VC for as_num" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="as_num&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="20078"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="20121"/></proof>
   </goal>
   <goal name="as_num&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="20026"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="20069"/></proof>
   </goal>
   <goal name="as_num&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.10" steps="20973"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="21017"/></proof>
   </goal>
   <goal name="as_num&#39;vc.3" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -454,24 +455,24 @@
    <proof prover="1"><result status="valid" time="0.02" steps="34"/></proof>
    </goal>
    <goal name="as_num&#39;vc.3.2" expl="VC for as_num" proved="true">
-   <proof prover="0"><result status="valid" time="0.10" steps="20282"/></proof>
+   <proof prover="0"><result status="valid" time="0.10" steps="20325"/></proof>
    </goal>
    <goal name="as_num&#39;vc.3.3" expl="VC for as_num" proved="true">
    <proof prover="1"><result status="valid" time="0.10" steps="429"/></proof>
    </goal>
    <goal name="as_num&#39;vc.3.4" expl="VC for as_num" proved="true">
-   <proof prover="0"><result status="valid" time="0.07" steps="20342"/></proof>
+   <proof prover="0"><result status="valid" time="0.07" steps="20385"/></proof>
    </goal>
    <goal name="as_num&#39;vc.3.5" expl="VC for as_num" proved="true">
    <proof prover="1"><result status="valid" time="1.47" steps="9763"/></proof>
    </goal>
    <goal name="as_num&#39;vc.3.6" expl="VC for as_num" proved="true">
-   <proof prover="0"><result status="valid" time="0.10" steps="23251"/></proof>
+   <proof prover="0"><result status="valid" time="0.10" steps="23295"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="as_num&#39;vc.4" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="21198"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="21242"/></proof>
   </goal>
   <goal name="as_num&#39;vc.5" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="936"/></proof>
@@ -479,33 +480,33 @@
  </transf>
  </goal>
  <goal name="as_number&#39;vc" expl="VC for as_number" proved="true">
- <proof prover="0"><result status="valid" time="0.11" steps="23617"/></proof>
+ <proof prover="0"><result status="valid" time="0.11" steps="23661"/></proof>
  </goal>
  <goal name="as_number_ind&#39;vc" expl="VC for as_number_ind" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="as_number_ind&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.21" steps="32708"/></proof>
+  <proof prover="0"><result status="valid" time="0.21" steps="32752"/></proof>
   </goal>
   <goal name="as_number_ind&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="20664"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="20707"/></proof>
   </goal>
   <goal name="as_number_ind&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.11" steps="21560"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="21604"/></proof>
   </goal>
   <goal name="as_number_ind&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="20658"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="20701"/></proof>
   </goal>
   <goal name="as_number_ind&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="20661"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="20704"/></proof>
   </goal>
   <goal name="as_number_ind&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="20664"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="20707"/></proof>
   </goal>
   <goal name="as_number_ind&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="20682"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="20725"/></proof>
   </goal>
   <goal name="as_number_ind&#39;vc.7" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="1.86" steps="15356"/></proof>
+  <proof prover="1"><result status="valid" time="1.56" steps="13582"/></proof>
   </goal>
   <goal name="as_number_ind&#39;vc.8" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.04" steps="315"/></proof>
@@ -513,55 +514,55 @@
  </transf>
  </goal>
  <goal name="as_number_strict&#39;vc" expl="VC for as_number_strict" proved="true">
- <proof prover="0"><result status="valid" time="4.70" steps="347008"/></proof>
+ <proof prover="0"><result status="valid" time="4.70" steps="347052"/></proof>
  </goal>
  <goal name="seq_snoc_mem" proved="true">
- <proof prover="2"><result status="valid" time="0.13" steps="185092"/></proof>
+ <proof prover="2"><result status="valid" time="0.13" steps="185219"/></proof>
  </goal>
  <goal name="permut&#39;vc" expl="VC for permut" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="permut&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.18" steps="29446"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="29447"/></proof>
   </goal>
   <goal name="permut&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.13" steps="33162"/></proof>
+  <proof prover="0"><result status="valid" time="0.13" steps="33163"/></proof>
   </goal>
   <goal name="permut&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.12" steps="30717"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="30718"/></proof>
   </goal>
   <goal name="permut&#39;vc.3" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="permut&#39;vc.3.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.23" steps="36922"/></proof>
+   <proof prover="0"><result status="valid" time="0.23" steps="36923"/></proof>
    </goal>
    <goal name="permut&#39;vc.3.1" expl="VC for permut" proved="true">
-   <proof prover="0"><result status="valid" time="0.14" steps="27845"/></proof>
+   <proof prover="0"><result status="valid" time="0.14" steps="27846"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="permut&#39;vc.4" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.09" steps="24632"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="24633"/></proof>
   </goal>
   <goal name="permut&#39;vc.5" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.86" steps="106755"/></proof>
+  <proof prover="0"><result status="valid" time="0.86" steps="106756"/></proof>
   </goal>
   <goal name="permut&#39;vc.6" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="24644"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="24645"/></proof>
   </goal>
   <goal name="permut&#39;vc.7" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.11" steps="26256"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="26257"/></proof>
   </goal>
   <goal name="permut&#39;vc.8" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="25202"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="25203"/></proof>
   </goal>
   <goal name="permut&#39;vc.9" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="49"/></proof>
   </goal>
   <goal name="permut&#39;vc.10" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.09" steps="25171"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="25172"/></proof>
   </goal>
   <goal name="permut&#39;vc.11" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.12" steps="30365"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="30366"/></proof>
   </goal>
   <goal name="permut&#39;vc.12" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -569,7 +570,7 @@
    <proof prover="3"><result status="valid" time="0.02" steps="50"/></proof>
    </goal>
    <goal name="permut&#39;vc.12.1" expl="VC for permut" proved="true">
-   <proof prover="0" timelimit="1"><result status="valid" time="0.45" steps="64322"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.45" steps="64323"/></proof>
    </goal>
    <goal name="permut&#39;vc.12.2" expl="VC for permut" proved="true">
    <proof prover="3"><result status="valid" time="0.22" steps="737"/></proof>
@@ -577,10 +578,10 @@
   </transf>
   </goal>
   <goal name="permut&#39;vc.13" expl="assertion" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.14" steps="40773"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.14" steps="40774"/></proof>
   </goal>
   <goal name="permut&#39;vc.14" expl="assertion" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.43" steps="58220"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.43" steps="58221"/></proof>
   </goal>
   <goal name="permut&#39;vc.15" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -666,10 +667,10 @@
   <proof prover="3"><result status="valid" time="0.02" steps="61"/></proof>
   </goal>
   <goal name="permut&#39;vc.36" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.19" steps="33328"/></proof>
+  <proof prover="0"><result status="valid" time="0.19" steps="33329"/></proof>
   </goal>
   <goal name="permut&#39;vc.37" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.19" steps="50417"/></proof>
+  <proof prover="0"><result status="valid" time="0.19" steps="50418"/></proof>
   </goal>
  </transf>
  </goal>

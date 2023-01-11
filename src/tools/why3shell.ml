@@ -378,15 +378,12 @@ let usage_str =
   "[<file.xml>|<f1.why> <f2.mlw> ...]\n\
    Launch a command-line interface for Why3."
 
-(* Parse files *)
 let config, env =
-  let config, env =
-    Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str in
-  if Queue.is_empty files then
-    Whyconf.Args.exit_with_usage spec usage_str;
-  (config, env)
+  Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
 
 let () =
+  if Queue.is_empty files then
+    Whyconf.Args.exit_with_usage usage_str;
   let fmt = if !quiet then str_formatter else std_formatter in
   fprintf fmt "Welcome to Why3 shell. Type 'help' for help.@.";
   let dir =
@@ -394,7 +391,7 @@ let () =
       Server_utils.get_session_dir ~allow_mkdir:true files
     with Invalid_argument s ->
       eprintf "Error: %s@." s;
-      Whyconf.Args.exit_with_usage spec usage_str
+      Whyconf.Args.exit_with_usage usage_str
   in
   Server.init_server config env dir;
   Unix_scheduler.timeout ~ms:100
