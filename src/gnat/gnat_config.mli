@@ -118,3 +118,5 @@ val replay : bool
 
 val logging : bool
 (* Whether logging is enabled or not *)
+val entity : int
+(* The subp entity for which this gnatwhy3 was run *)

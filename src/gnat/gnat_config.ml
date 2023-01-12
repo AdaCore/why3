@@ -20,6 +20,7 @@ let is_builtin_prover =
 
 let () = Gnat_util.set_debug_flags_gnatprove ()
 
+let opt_entity : int option ref = ref None
 let opt_timeout : int option ref = ref None
 let opt_memlimit : int option ref = ref None
 let opt_ce_timeout : int option ref = ref None
@@ -129,6 +130,9 @@ let set_ce_steps t =
 let set_socket_name s =
   opt_socket_name := s
 
+let set_entity x =
+  opt_entity := Some x
+
 let set_proof_dir s = opt_proof_dir := Some  s
 
 let set_limit_line s = opt_limit_line := Some (Gnat_expl.parse_line_spec s)
@@ -177,6 +181,8 @@ let options = Arg.align [
           " Set the memory limit in megabytes";
    "--ce-timeout", Arg.Int set_ce_timeout,
           " Set the timeout for counterexamples in seconds";
+   "--entity", Arg.Int set_entity,
+          " Set the entity for gnatwhy3";
    "--warn-timeout", Arg.Int set_warn_timeout,
           " Set the timeout for warnings in seconds (default is 1 second)";
    "--steps", Arg.Int set_steps,
@@ -737,3 +743,9 @@ let session_dir =
 let session_file = Filename.concat session_dir "why3ession.xml"
 
 let logging = !opt_logging
+let entity =
+  match !opt_entity with
+  | None ->
+    Gnat_util.abort_with_message ~internal:true
+       "option --entity was not given"
+  | Some x -> x

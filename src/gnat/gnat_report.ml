@@ -198,13 +198,16 @@ let get_timings () =
 let get_session_dir () =
   "session_dir", String Gnat_config.session_dir
 
+let get_entity () =
+  "entity", Int Gnat_config.entity
+
 (* The main function, where we build the final Record to be printed using
 Why3.Json_base.print_json function. *)
 let print_messages () =
   print_json Format.std_formatter (
     Record (
       List.concat [
-        [get_session_dir (); get_results (); get_timings ()];
+        [get_session_dir (); get_results (); get_timings (); get_entity ()];
         get_warnings ()
       ]
     )
