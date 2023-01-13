@@ -64,7 +64,6 @@ type term =
   | Tvar of qual_identifier
   | Tapply of qual_identifier * term list
   | Tite of term * term * term
-  | Tlet of var_binding list * term
   | Tarray of sort * sort * array_elements
   | Tunparsed of string
 

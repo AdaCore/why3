@@ -38,8 +38,49 @@ type model_element_kind =
 
 val print_model_kind : Format.formatter -> model_element_kind -> unit
 
-type concrete_syntax_term = Term.term
+type concrete_syntax_bv = string
 
+type concrete_syntax_float =
+  | Infinity
+  | Plus_zero | Minus_zero
+  | NaN
+  | Float_number of concrete_syntax_bv * concrete_syntax_bv * concrete_syntax_bv
+
+type concrete_syntax_constant =
+  | Boolean of bool
+  | String of string
+  | Integer of string
+  | Real of string
+  | Float of concrete_syntax_float
+  | BitVector of concrete_syntax_bv
+  | Fraction of string * string
+
+type concrete_syntax_quant = Forall | Exists
+type concrete_syntax_binop = And | Or | Implies | Iff
+
+type concrete_syntax_term =
+  | Var of string
+  | Const of concrete_syntax_constant
+  | Apply of string * concrete_syntax_term list
+  | If of concrete_syntax_term * concrete_syntax_term * concrete_syntax_term
+  | Epsilon of string * concrete_syntax_term
+  | Quant of concrete_syntax_quant * concrete_syntax_term list * concrete_syntax_term
+  | Binop of concrete_syntax_binop * concrete_syntax_term * concrete_syntax_term
+  | Not of concrete_syntax_term
+  | Function of bool * string list * concrete_syntax_term
+  | Record of (string * concrete_syntax_term) list
+
+val print_concrete_term : Format.formatter -> concrete_syntax_term -> unit
+
+val concrete_var_from_vs : Term.vsymbol -> concrete_syntax_term
+val concrete_const_bool : bool -> concrete_syntax_term
+val concrete_apply_from_ls : Term.lsymbol -> concrete_syntax_term list -> concrete_syntax_term
+val concrete_equ : string
+val concrete_apply_equ : concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term
+val subst_concrete_term :
+  concrete_syntax_term Wstdlib.Mstr.t -> concrete_syntax_term -> concrete_syntax_term
+val t_and_l_concrete : concrete_syntax_term list -> concrete_syntax_term
+  
 (** Counter-example model elements. Each element represents
     a counter-example for a single source-code element.*)
 type model_element = {

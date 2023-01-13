@@ -62,7 +62,6 @@ type term =
   | Tvar of qual_identifier
   | Tapply of qual_identifier * term list
   | Tite of term * term * term
-  | Tlet of var_binding list * term
   | Tarray of sort * sort * array_elements
   | Tunparsed of string
 
@@ -187,10 +186,6 @@ let rec print_term fmt = function
   | Tite (b, t1, t2) ->
       fprintf fmt "@[<hv2>(Ite@ %a@ %a@ %a)@]" print_term b print_term t1
         print_term t2
-  | Tlet (bs, t) ->
-      fprintf fmt "(Let (%a) %a)"
-        Pp.(print_list space print_var_binding)
-        bs print_term t
   | Tarray (s1, s2, elts) ->
       fprintf fmt "@[<hv>(Array (%a -> %a) %a)@]" print_sort s1 print_sort s2
         print_array elts

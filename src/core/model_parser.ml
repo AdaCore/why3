@@ -48,7 +48,148 @@ let print_model_kind fmt = function
   | Loop_current_iteration -> pp_print_string fmt "Loop_current_iteration"
   | Other -> pp_print_string fmt "Other"
 
-type concrete_syntax_term = term (* TODO_WIP *)
+type concrete_syntax_bv = string
+
+type concrete_syntax_float =
+  | Infinity
+  | Plus_zero | Minus_zero
+  | NaN
+  | Float_number of concrete_syntax_bv * concrete_syntax_bv * concrete_syntax_bv
+
+type concrete_syntax_constant =
+  | Boolean of bool
+  | String of string
+  | Integer of string
+  | Real of string
+  | Float of concrete_syntax_float
+  | BitVector of concrete_syntax_bv
+  | Fraction of string * string
+
+type concrete_syntax_quant = Forall | Exists
+type concrete_syntax_binop = And | Or | Implies | Iff
+
+type concrete_syntax_term =
+  | Var of string
+  | Const of concrete_syntax_constant
+  | Apply of string * concrete_syntax_term list
+  | If of concrete_syntax_term * concrete_syntax_term * concrete_syntax_term
+  | Epsilon of string * concrete_syntax_term
+  | Quant of concrete_syntax_quant * concrete_syntax_term list * concrete_syntax_term
+  | Binop of concrete_syntax_binop * concrete_syntax_term * concrete_syntax_term
+  | Not of concrete_syntax_term
+  | Function of bool * string list * concrete_syntax_term
+  | Record of (string * concrete_syntax_term) list
+
+let rec get_elts_others x body =
+  match body with
+  | If (Apply (concrete_equ, [Var x'; ct0]), ct1, ct2) when x=x' ->
+    let (elts, others) = get_elts_others x ct2 in
+    ((ct0,ct1)::elts, others)
+  | _ -> ([], body)
+
+let rec print_concrete_term fmt ct =
+  let open Format in
+  match ct with
+  | Var v -> fprintf fmt "%s" v
+  | Const (Boolean b) -> fprintf fmt "%b" b
+  | Const (String s) -> fprintf fmt "%s" s
+  | Const (Integer i) -> fprintf fmt "%s" i
+  | Const (Real d) -> fprintf fmt "%s" d
+  | Const (Float Infinity) -> fprintf fmt "∞"
+  | Const (Float Plus_zero) -> fprintf fmt "+0"
+  | Const (Float Minus_zero) -> fprintf fmt "-0"
+  | Const (Float NaN) -> fprintf fmt "NaN"
+  | Const (Float (Float_number (exp,sign,mant))) ->
+    fprintf fmt "{exp=%s, sign=%s, mant=%s" exp sign mant
+  | Const (BitVector bv) -> fprintf fmt "%s" bv
+  | Const (Fraction (f1,f2)) -> fprintf fmt "%s/%s" f1 f2
+  | Apply ("=",[t1;t2]) ->
+    fprintf fmt "%a = %a"
+      print_concrete_term t1
+      print_concrete_term t2
+  | Apply (f,ctl) ->
+    fprintf fmt "%s %a" f (Pp.print_list Pp.space print_concrete_term) ctl
+  | If (b,t1,t2) ->
+    fprintf fmt "if %a then %a else %a"
+      print_concrete_term b
+      print_concrete_term t1
+      print_concrete_term t2
+  | Epsilon (eps_vs,eps_t) ->
+    fprintf fmt "eps %s. %a" eps_vs print_concrete_term eps_t
+  | Quant (quant,quant_vs,quant_t) ->
+    let quant_string = match quant with Forall -> "Forall" | Exists -> "Exists" in
+    fprintf fmt "%s %a. %a" quant_string
+      (Pp.print_list Pp.comma print_concrete_term) quant_vs
+      print_concrete_term quant_t
+  | Binop (op,t1,t2) ->
+    let op_string = match op with
+      | And -> "/\\"
+      | Or -> "\\/"
+      | Implies -> "=>"
+      | Iff -> "<=>"
+    in
+    fprintf fmt "(%a) %s (%a)"
+      print_concrete_term t1
+      op_string
+      print_concrete_term t2
+  | Not ct' -> fprintf fmt "not (%a)" print_concrete_term ct'
+  | Function (true,[x],t) ->
+    let print_indice_value fmt (indice,value) =
+      fprintf fmt "%a => %a"
+        print_concrete_term indice
+        print_concrete_term value
+    in
+    let (elts,others) = get_elts_others x t in
+    fprintf fmt "[|%a; _ => %a|]"
+      (Pp.print_list Pp.comma print_indice_value) elts
+      print_concrete_term others
+  | Function (true,_,_) -> fprintf fmt "ERROR TODO_WIP"
+  | Function (false,args,body) ->
+    fprintf fmt "fun (%a) -> %a"
+      (Pp.print_list Pp.comma Pp.print_string) args
+      print_concrete_term body
+  | Record fields_values ->
+    let print_field_value fmt (field,value) =
+      fprintf fmt "%s = %a" field
+        print_concrete_term value
+    in
+    fprintf fmt "{%a}"
+      (Pp.print_list Pp.comma print_field_value) fields_values
+
+let concrete_var_from_vs vs =
+  Var (Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs)
+let concrete_const_bool b = Const (Boolean b)
+let concrete_apply_from_ls ls ts =
+  let ls_name = Format.asprintf "@[<h>%a@]" Pretty.print_ls_qualified ls in
+  Apply (ls_name, ts)
+let concrete_equ = "="
+let concrete_apply_equ t1 t2 = Apply (concrete_equ, [t1;t2])
+let rec subst_concrete_term subst t =
+  match t with
+  | Var v -> (try Mstr.find v subst with _ -> t)
+  | Const _ -> t
+  | Apply (f, ctl) -> Apply (f, List.map (subst_concrete_term subst) ctl)
+  | If (cb,ct1,ct2) ->
+    If (subst_concrete_term subst cb,
+        subst_concrete_term subst ct1,
+        subst_concrete_term subst ct2)
+  | Epsilon (cx,ct) -> Epsilon (cx, subst_concrete_term subst ct)
+  | Quant (cq,ctl,ct) ->
+    Quant (cq, ctl, subst_concrete_term subst ct)
+  | Binop (op,ct1,ct2) ->
+    Binop (op, subst_concrete_term subst ct1, subst_concrete_term subst ct2)
+  | Not ct -> Not (subst_concrete_term subst ct)
+  | Function (is_array,args,ct) -> Function (is_array,args, subst_concrete_term subst ct)
+  | Record fields_values ->
+    Record (
+      List.map
+        (fun (field,value) -> (field, subst_concrete_term subst value))
+        fields_values
+    )
+let rec t_and_l_concrete = function
+  | [] -> concrete_const_bool true
+  | [f] -> f
+  | f::fl -> Binop (And, f, (t_and_l_concrete fl))
 
 type model_element = {
   me_kind: model_element_kind;
@@ -71,6 +212,7 @@ let create_model_element ~value ~concrete_value ~oloc ~attrs ~lsymbol = {
 let get_name me =
   Ident.get_model_trace_string
     ~name:(me.me_lsymbol.ls_name.Ident.id_string) ~attrs:(me.me_attrs)
+
 (*
 ***************************************************************
 **  Model definitions
@@ -273,17 +415,6 @@ let rec json_of_term t =
       "then", json_of_term t2;
       "else", json_of_term t3 ]
   ]
-  | Tlet (t,tb) ->
-    let vs,t' = t_open_bound tb in
-      Record [
-    "Tlet",
-    Record [
-      "let_vs", json_vsymbol vs;
-      "let_t", json_of_term t;
-      "let_tbound", json_of_term t'
-    ]
-  ]
-  | Tcase _ -> Record [ "Tcase", String "UNSUPPORTED" ]
   | Teps tb ->
     let vs,_,t' = t_open_lambda t in
     if vs = [] then
@@ -331,6 +462,125 @@ let rec json_of_term t =
   ]
   | Ttrue -> String "Ttrue"
   | Tfalse -> String "Tfalse"
+  | Tlet _ -> Record [ "Tlet", String "UNSUPPORTED" ]
+  | Tcase _ -> Record [ "Tcase", String "UNSUPPORTED" ]
+
+let rec json_of_concrete_term ct =
+  let open Json_base in
+  match ct with
+  | Var v -> Record [ "Var", String v ]
+
+  | Const (Boolean b) -> Record [ "Const", Record [ "Boolean", Bool b ] ]
+  | Const (String s) -> Record [ "Const", Record [ "String", String s ] ]
+  | Const (Integer i) -> Record [ "Const", Record [ "Integer", String i ] ]
+  | Const (Real d) -> Record [ "Const", Record [ "Real", String d ] ]
+  | Const (BitVector bv) -> Record [ "Const", Record [ "BitVector", String bv ] ]
+  | Const (Fraction (f1,f2)) ->
+    Record [ "Const", Record [ "Fraction", String (String.concat "" [f1;"/";f2]) ] ]
+
+  | Const (Float Infinity) ->
+    Record [ "Const", Record [ "Float", String "Infinity" ] ]
+  | Const (Float Plus_zero) ->
+    Record [ "Const", Record [ "Float", String "Plus_zero" ] ]
+  | Const (Float Minus_zero) ->
+    Record [ "Const", Record [ "Float", String "Minus_zero" ] ]
+  | Const (Float NaN) ->
+    Record [ "Const", Record [ "Float", String "NaN" ] ]
+  | Const (Float (Float_number (sign,exp,mant))) ->
+    let float = Format.asprintf "@[<h>{sign=%s, exp=%s, mant=%s}@]" sign exp mant in
+    Record [ "Const", Record [ "Float", String float ] ]
+
+  | Apply (ls, args) ->
+    Record [
+      "Apply",
+      Record [
+        "app_ls", String ls;
+        "app_args", List (List.map json_of_concrete_term args)
+      ]
+    ]
+  | If (b,t1,t2) ->
+    Record [
+      "If",
+      Record [
+        "if", json_of_concrete_term b;
+        "then", json_of_concrete_term t1;
+        "else", json_of_concrete_term t2
+      ]
+    ]
+  | Epsilon (eps_vs,eps_t) ->
+    Record [
+      "Epsilon",
+      Record [
+        "eps_vs", String eps_vs;
+        "eps_t", json_of_concrete_term eps_t
+      ]
+    ]
+  | Quant (quant,quant_vs,quant_t) ->
+    let quant_string = match quant with Forall -> "Forall" | Exists -> "Exists" in
+    Record [
+      "Quant",
+      Record [
+        "quant", String quant_string;
+        "quant_vs", List (List.map json_of_concrete_term quant_vs);
+        "quant_t", json_of_concrete_term quant_t
+      ]
+    ]
+  | Binop (op,t1,t2) ->
+    let op_string = match op with
+      | And -> "And"
+      | Or -> "Or"
+      | Implies -> "Implies"
+      | Iff -> "Iff"
+    in
+    Record [
+      "Binop",
+      Record [
+        "binop", String op_string;
+        "binop_t1", json_of_concrete_term t1;
+        "binop_t2", json_of_concrete_term t2
+      ]
+    ]
+  | Not t' -> Record [ "Not", json_of_concrete_term t' ]
+  | Function (true,[x],body) ->
+    let (elts,others) = get_elts_others x body in
+    Record [
+      "Array",
+      Record [
+        "array_elts",
+          List (
+            List.map
+              (fun (indice,value) ->
+                Record [
+                  "indice", json_of_concrete_term indice;
+                  "value", json_of_concrete_term value
+                ])
+              elts
+          );
+        "array_others", json_of_concrete_term others
+      ]
+    ]
+  | Function (true,_,_) -> String "TODO_WIP"
+  | Function (false,args,body) ->
+    Record [
+      "Function",
+      Record [
+        "fun_args", List (List.map (fun s -> String s) args);
+        "fun_body", json_of_concrete_term body
+      ]
+    ]
+  | Record fields_values ->
+    Record [
+      "Record",
+      List (
+        List.map
+          (fun (field,value) ->
+            Record [
+              "field", String field;
+              "value", json_of_concrete_term value
+            ])
+          fields_values
+      )
+    ]
 
 let json_model_element me =
   let open Json_base in
@@ -352,7 +602,7 @@ let json_model_element me =
         Record [
           "value_type", json_otype me.me_value.t_ty;
           "value_term", json_of_term me.me_value;
-          "value_concrete_term", String "concrete_term" ];
+          "value_concrete_term", json_of_concrete_term me.me_concrete_value ];
       "lsymbol", json_lsymbol me.me_lsymbol;
       "kind", String kind
     ]
@@ -379,7 +629,6 @@ let json_model_elements_on_lines vc_term_loc (file_name, model_file) =
   Json_base.List l
 
 let json_model_files vc_term_loc model_files =
-  Pretty.forget_all ();
   let l =
     List.map (fun (file_name, model_file) ->
         Json_base.(Record [
@@ -388,7 +637,6 @@ let json_model_files vc_term_loc model_files =
           json_model_elements_on_lines vc_term_loc (file_name, model_file)
         ]))
       (Mstr.bindings model_files) in
-  Pretty.forget_all ();
   Json_base.List l
 
 let json_model model = json_model_files model.vc_term_loc model.model_files
@@ -398,104 +646,6 @@ let json_model model = json_model_files model.vc_term_loc model.model_files
 **  Quering the model
 ***************************************************************
 *)
-open Json_base
-
-let print_raw_json fmt json =
-  fprintf fmt "%a" print_json json
-
-let rec print_json_type fmt json_type =
-  match json_type with
-  | Record [ "Tyvar", String ty_var ] -> fprintf fmt "%s" ty_var
-  | Record [ "Tyapp", Record [ "ty_symbol", String ty_symbol; "ty_args", List ty_args ] ] ->
-    fprintf fmt "%s %a"
-      ty_symbol
-      (Pp.print_list Pp.comma print_json_type) ty_args
-  | _ -> print_raw_json fmt json_type
-
-let print_json_quant fmt json_quant =
-  match json_quant with
-  | String "Tforall" -> fprintf fmt "forall"
-  | String "Texists" -> fprintf fmt "exists"
-  | _ -> print_raw_json fmt json_quant
-
-let print_json_binop fmt json_binop =
-  match json_binop with
-  | String "Tand" -> fprintf fmt "/\\"
-  | String "Tor" -> fprintf fmt "||"
-  | String "Timplies" -> fprintf fmt "=>"
-  | String "Tiff" -> fprintf fmt "<=>"
-  | _ -> print_raw_json fmt json_binop
-
-let print_json_vs ~print_type fmt json_vs =
-  match json_vs with
-  | Record [ "vs_name", String vs_name; "vs_type", vs_type ] ->
-    if print_type then
-      fprintf fmt "(%s:%a)" vs_name print_json_type vs_type
-    else
-      fprintf fmt "%s" vs_name
-  | _ -> print_raw_json fmt json_vs
-
-let rec print_json_as_term fmt json_value =
-  match json_value with
-  | Record [ "Tvar", vs ] -> fprintf fmt "%a" (print_json_vs ~print_type:false) vs
-  | Record [ "Tconst", Record [ "const_type", _; "const_value", String const_value ] ] ->
-    fprintf fmt "%s" const_value
-  | Record [ "Tapp", Record [ "app_ls", String app_ls; "app_args", List app_args ] ] ->
-    fprintf fmt "%s(%a)" app_ls
-      (Pp.print_list Pp.comma print_json_as_term) app_args
-  | Record [ "Tif", Record [ "if", t_if; "then", t_then; "else", t_else ] ] ->
-    fprintf fmt "if %a then %a else %a"
-      print_json_as_term t_if
-      print_json_as_term t_then
-      print_json_as_term t_else
-  | Record [ "Tlet", Record [ "let_vs", let_vs; "let_t", let_t; "let_tbound", let_tbound ] ] ->
-    fprintf fmt "let %a = %a in %a"
-      (print_json_vs ~print_type:false) let_vs
-      print_json_as_term let_t
-      print_json_as_term let_tbound
-  | Record [ "Teps", Record [ "eps_vs", eps_vs; "eps_t", eps_t ] ] ->
-    fprintf fmt "epsilon %a. %a"
-      (print_json_vs ~print_type:true) eps_vs
-      print_json_as_term eps_t
-  | Record [ "Tfun", Record [ "fun_args", List fun_args; "fun_body", fun_body ] ] ->
-    fprintf fmt "fun %a -> %a"
-      (Pp.print_list Pp.space (print_json_vs ~print_type:true)) fun_args
-      print_json_as_term fun_body
-  | Record [ "Tquant", Record [ "quant", quant; "quant_vs", List quant_vs; "quant_t", quant_t ] ] ->
-    fprintf fmt "%a %a. %a"
-      print_json_quant quant
-      (Pp.print_list Pp.comma (print_json_vs ~print_type:true)) quant_vs
-      print_json_as_term quant_t
-  | Record [ "Tbinop", Record [ "binop", binop; "binop_t1", binop_t1; "binop_t2", binop_t2 ] ] ->
-    fprintf fmt "%a %a %a"
-      print_json_as_term binop_t1
-      print_json_binop binop
-      print_json_as_term binop_t2
-  | Record [ "Tarray", Record [ "array_elts", List elts; "array_others", others ]] ->
-    fprintf fmt "%a, others => %a"
-      (Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.comma ~sep:Pp.comma print_json_indice_value) elts
-      print_json_as_term others
-  | Record [ "Trecord", List list_field_value ] ->
-    fprintf fmt "%a"
-      (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi print_json_field_value) list_field_value
-  | Record [ "Tnot", t ] ->
-    fprintf fmt "not %a" print_json_as_term t
-  | String "Ttrue" -> fprintf fmt "true"
-  | String "Tfalse" -> fprintf fmt "false"
-  | Record [ "Tcase", _ ] -> fprintf fmt "UNSUPPORTED"
-  | _ -> print_raw_json fmt json_value
-
-and print_json_field_value fmt json_field_value =
-  match json_field_value with
-  | Record [ "field", String field; "value", value ] ->
-    fprintf fmt "%s = %a" field print_json_as_term value
-  | _ -> print_raw_json fmt json_field_value
-
-and print_json_indice_value fmt json_indice_value =
-  match json_indice_value with
-  | Record [ "indice", indice; "value", value ] ->
-    fprintf fmt "%a => %a" print_json_as_term indice print_json_as_term value
-  | _ -> print_raw_json fmt json_indice_value
 
 let print_model_element ?(print_locs=false) ~print_attrs ~me_name_trans fmt m_element =
   match m_element.me_kind with
@@ -513,8 +663,7 @@ let print_model_element ?(print_locs=false) ~print_attrs ~me_name_trans fmt m_el
                (Pp.print_option_or_default "NO LOC" Pretty.print_loc_as_attribute)
                m_element.me_location)
         (Pp.print_option (Pretty.print_ty)) m_element.me_value.t_ty
-        Pretty.print_term m_element.me_value
-        (* print_json_as_term (json_of_term m_element.me_value) *)
+        print_concrete_term m_element.me_concrete_value
 
 let print_model_elements ~filter_similar ~print_attrs ?(sep = Pp.newline)
     ~me_name_trans fmt m_elements =

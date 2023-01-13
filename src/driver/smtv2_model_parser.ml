@@ -344,19 +344,13 @@ module FromSexpToModel = struct
       with _ -> (
         try ite sexp
         with _ -> (
-          try let_term sexp
+          try array sexp
           with _ -> (
-            try array sexp
-            with _ -> (
-              try application sexp with _ -> Tunparsed (string_of_sexp sexp))))))
+            try application sexp with _ -> Tunparsed (string_of_sexp sexp)))))
 
   and ite = function
     | List [ Atom "ite"; t1; t2; t3 ] -> Tite (term t1, term t2, term t3)
     | sexp -> error sexp "ite"
-
-  and let_term = function
-    | List [ Atom "let"; List bs; t ] -> Tlet (List.map var_binding bs, term t)
-    | sexp -> error sexp "let_term"
 
   and var_binding = function
     | List [ Atom s; t ] -> (symbol (Atom s), term t)
@@ -443,11 +437,11 @@ module FromModelToTerm = struct
     why3_env : Env.env;
     (* Constructors from [pinfo.Printer.constructors]. *)
     constructors : lsymbol Mstr.t;
-    records_fields : Printer.field_info list Wstdlib.Mstr.t;
+    type_fields : Term.lsymbol list Ty.Mty.t;
     (* Queried terms from [pinfo.Printer.queried_terms]. *)
     queried_terms : lsymbol Mstr.t;
     (* Function definiions that are not in [pinfo.Printer.queried_terms]. *)
-    mutable prover_fun_defs : Term.term Mstr.t;
+    mutable prover_fun_defs : (Term.term * concrete_syntax_term) Mstr.t;
     (* Prover variables, may have the same name if the sort is different. *)
     mutable prover_vars : vsymbol Ty.Mty.t Mstr.t;
     (* Bound variables in the body of a function or in a let construction. *)
@@ -456,7 +450,7 @@ module FromModelToTerm = struct
        in [pinfo.Printer.queried_terms]. *)
     mutable inferred_types : (sort * Ty.ty) list;
     (* Evaluation of prover variables (using type coercions and fields). *)
-    mutable eval_prover_vars : Term.term Mvs.t;
+    mutable eval_prover_vars : (Term.term * concrete_syntax_term) Mvs.t;
   }
 
   (* Convert a SMT sort [s] to a Why3 type.
@@ -513,81 +507,82 @@ module FromModelToTerm = struct
       | Some ls -> List.length ls.ls_args = 0
       | None -> false
     in
-    match qid with
-    (* For Qident, no sort is associated to the identifier, so we cannot infer
-       the type of the variable. So we raise an error if we do not find [n] in
-       [env.bound_vars] or in [env.prover_vars]. *)
-    | Qident (Isymbol (S n)) ->
-        if is_no_arg_constructor n env.constructors then raise NoArgConstructor
-        else
-          let vs =
-            try Mstr.find n env.bound_vars
+    let vs =
+      match qid with
+      (* For Qident, no sort is associated to the identifier, so we cannot infer
+        the type of the variable. So we raise an error if we do not find [n] in
+        [env.bound_vars] or in [env.prover_vars]. *)
+      | Qident (Isymbol (S n)) ->
+          if is_no_arg_constructor n env.constructors then raise NoArgConstructor
+          else
+            begin try Mstr.find n env.bound_vars
             with Not_found ->
               error
                 "No variable in bound_vars matching qualified identifier %a@."
                 print_qualified_identifier qid
-          in
-          t_var vs
-    | Qident (Isymbol (Sprover n)) -> (
-        match Ty.Mty.values (Mstr.find n env.prover_vars) with
-        | [] | (exception Not_found) ->
-            error
-              "No variable in prover_vars matching qualified identifier %a@."
-              print_qualified_identifier qid
-        | [ vs ] -> t_var vs
-        | _ :: _ :: _ ->
-            error
-              "Multiple variables in prover_vars matching qualified identifier \
-               %a@."
-              print_qualified_identifier qid)
-    (* For Qannotident, there is a sort associated to the identifier, so we can infer
-        the type of the variable. *)
-    | Qannotident (Isymbol (S n), s) ->
-        if is_no_arg_constructor n env.constructors then raise NoArgConstructor
-        else
+            end
+      | Qident (Isymbol (Sprover n)) -> (
+          match Ty.Mty.values (Mstr.find n env.prover_vars) with
+          | [] | (exception Not_found) ->
+              error
+                "No variable in prover_vars matching qualified identifier %a@."
+                print_qualified_identifier qid
+          | [ vs ] -> vs
+          | _ :: _ :: _ ->
+              error
+                "Multiple variables in prover_vars matching qualified identifier \
+                %a@."
+                print_qualified_identifier qid)
+      (* For Qannotident, there is a sort associated to the identifier, so we can infer
+          the type of the variable. *)
+      | Qannotident (Isymbol (S n), s) ->
+          if is_no_arg_constructor n env.constructors then raise NoArgConstructor
+          else
+            let vs_ty = smt_sort_to_ty env s in
+            let vs =
+              try
+                let vs = Mstr.find n env.bound_vars in
+                if Ty.ty_equal vs.vs_ty vs_ty then vs
+                else
+                  error "Type %a of variable %a does not match sort %a@."
+                    Pretty.print_ty vs.vs_ty Pretty.print_vs vs print_sort s
+              with Not_found ->
+                (* Create a fresh vsymbol if not found in [env.bound_vars]. *)
+                create_vsymbol (Ident.id_fresh n) vs_ty
+            in
+            vs
+      | Qannotident (Isymbol (Sprover n), s) -> (
           let vs_ty = smt_sort_to_ty env s in
-          let vs =
-            try
-              let vs = Mstr.find n env.bound_vars in
-              if Ty.ty_equal vs.vs_ty vs_ty then vs
-              else
-                error "Type %a of variable %a does not match sort %a@."
-                  Pretty.print_ty vs.vs_ty Pretty.print_vs vs print_sort s
-            with Not_found ->
-              (* Create a fresh vsymbol if not found in [env.bound_vars]. *)
-              create_vsymbol (Ident.id_fresh n) vs_ty
-          in
-          t_var vs
-    | Qannotident (Isymbol (Sprover n), s) -> (
-        let vs_ty = smt_sort_to_ty env s in
-        let new_vs = create_vsymbol (Ident.id_fresh n) vs_ty in
-        (* Update [env.prover_vars] either if the prover variable [n]
-            is not yet stored in [env.prover_vars], or if there already
-            exists a mapping for [n] but not for the current sort [s].
-            (Because prover variables can have the same name if with different
-            sorts). *)
-        try
-          let mvs = Mstr.find n env.prover_vars in
-          match Ty.Mty.find vs_ty mvs with
-          | vs -> t_var vs
-          | exception Not_found ->
-              Debug.dprintf debug
-                "[qual_id_to_term] updating prover_vars with vs = %a / vs_ty = \
-                 %a@."
-                Pretty.print_vs new_vs Pretty.print_ty vs_ty;
-              env.prover_vars <-
-                Mstr.add n (Ty.Mty.add vs_ty new_vs mvs) env.prover_vars;
-              t_var new_vs
-        with Not_found ->
-          Debug.dprintf debug
-            "[qual_id_to_term] updating prover_vars with vs = %a / vs_ty = %a@."
-            Pretty.print_vs new_vs Pretty.print_ty vs_ty;
-          env.prover_vars <-
-            Mstr.add n (Ty.Mty.add vs_ty new_vs Ty.Mty.empty) env.prover_vars;
-          t_var new_vs)
-    | _ ->
-        error "Could not interpret qualified identifier %a@."
-          print_qualified_identifier qid
+          let new_vs = create_vsymbol (Ident.id_fresh n) vs_ty in
+          (* Update [env.prover_vars] either if the prover variable [n]
+              is not yet stored in [env.prover_vars], or if there already
+              exists a mapping for [n] but not for the current sort [s].
+              (Because prover variables can have the same name if with different
+              sorts). *)
+          try
+            let mvs = Mstr.find n env.prover_vars in
+            match Ty.Mty.find vs_ty mvs with
+            | vs -> vs
+            | exception Not_found ->
+                Debug.dprintf debug
+                  "[qual_id_to_term] updating prover_vars with vs = %a / vs_ty = \
+                  %a@."
+                  Pretty.print_vs new_vs Pretty.print_ty vs_ty;
+                env.prover_vars <-
+                  Mstr.add n (Ty.Mty.add vs_ty new_vs mvs) env.prover_vars;
+                new_vs
+          with Not_found ->
+            Debug.dprintf debug
+              "[qual_id_to_term] updating prover_vars with vs = %a / vs_ty = %a@."
+              Pretty.print_vs new_vs Pretty.print_ty vs_ty;
+            env.prover_vars <-
+              Mstr.add n (Ty.Mty.add vs_ty new_vs Ty.Mty.empty) env.prover_vars;
+            new_vs)
+      | _ ->
+          error "Could not interpret qualified identifier %a@."
+            print_qualified_identifier qid
+    in
+    (t_var vs, concrete_var_from_vs vs)
 
   let pad_with_zeros width s =
     let filled =
@@ -603,6 +598,7 @@ module FromModelToTerm = struct
     | Fminuszero -> raise Float_MinusZero
     | Fnan -> raise Float_NaN
     | Fnumber { sign; exp; mant } ->
+        let fp_str = (sign.bv_verbatim, exp.bv_verbatim, mant.bv_verbatim) in
         let exp_bias = BigInt.pred (BigInt.pow_int_pos 2 (exp.bv_length - 1)) in
         let exp_max = BigInt.pred (BigInt.pow_int_pos 2 exp.bv_length) in
         let frac_len =
@@ -643,22 +639,34 @@ module FromModelToTerm = struct
             ( is_neg,
               "0",
               frac,
-              Some (String.concat "" [ "-"; BigInt.to_string exp ]) )
+              Some (String.concat "" [ "-"; BigInt.to_string exp ]),
+              fp_str )
         else if BigInt.eq exp.bv_value exp_max (* infinities and NaN *) then
           if BigInt.eq mant.bv_value BigInt.zero then raise Float_Infinity
           else raise Float_NaN
         else
           let exp = BigInt.sub exp.bv_value exp_bias in
-          (is_neg, "1", frac, Some (BigInt.to_string exp))
+          (is_neg, "1", frac, Some (BigInt.to_string exp), fp_str)
 
   let constant_to_term env c =
+    let decimal_string neg s1 s2 =
+      if neg then String.concat "" [s1;".";s2]
+      else String.concat "" ["-";s1;".";s2]
+    in
     match c with
-    | Cint bigint -> t_const (Constant.int_const bigint) Ty.ty_int
+    | Cint bigint ->
+      let t = t_const (Constant.int_const bigint) Ty.ty_int in
+      let t_concrete = Const (Integer (BigInt.to_string bigint)) in
+      (t, t_concrete)
     | Cdecimal { real_neg = neg; real_int = s1; real_frac = s2 } ->
+      let t =
         t_const
           (Constant.real_const_from_string ~radix:10 ~neg ~int:s1 ~frac:s2
              ~exp:None)
           Ty.ty_real
+      in
+      let t_concrete = Const (Real (decimal_string neg s1 s2)) in
+      (t, t_concrete)
     | Cfraction
         ( { real_neg = neg; real_int = s1; real_frac = s2 },
           { real_neg = neg'; real_int = s1'; real_frac = s2' } ) -> (
@@ -679,7 +687,10 @@ module FromModelToTerm = struct
           let div_ls =
             Theory.ns_find_ls th.Theory.th_export [ Ident.op_infix "/" ]
           in
-          t_app div_ls [ t; t' ] div_ls.ls_value
+          let t_concrete =
+            Const (Fraction (decimal_string neg s1 s2, decimal_string neg' s1' s2'))
+          in
+          (t_app div_ls [ t; t' ] div_ls.ls_value, t_concrete)
         with _ ->
           error "Could not interpret constant %a as a fraction@." print_constant
             c)
@@ -690,7 +701,8 @@ module FromModelToTerm = struct
               (function Sbitvec n', _ when n = n' -> true | _ -> false)
               env.inferred_types
           in
-          t_const (Constant.int_const bigint) ty
+          let t_concrete = Const (Integer (BigInt.to_string bigint)) in
+          (t_const (Constant.int_const bigint) ty, t_concrete)
         with Not_found ->
           error
             "No matching type found in inferred_type for bitvector constant \
@@ -724,23 +736,33 @@ module FromModelToTerm = struct
         in
         try
           (* general case *)
-          let neg, s1, s2, exp = float_of_binary fp in
-          t_const
-            (Constant.real_const_from_string ~radix:16 ~neg ~int:s1 ~frac:s2
-               ~exp)
-            ty
+          let neg, s1, s2, exp, (sign_str,exp_str,mant_str) = float_of_binary fp in
+          let t =
+            t_const
+              (Constant.real_const_from_string ~radix:16 ~neg ~int:s1 ~frac:s2
+                ~exp)
+              ty
+          in
+          let t_concrete = Const (Float (Float_number (sign_str,exp_str,mant_str))) in
+          (t, t_concrete)
         with
         (* cases for special float values *)
         | Float_MinusZero ->
+          let t =
             t_const
               (Constant.real_const_from_string ~radix:10 ~neg:true ~int:"0"
                  ~frac:"0" ~exp:None)
               ty
+          in
+          (t, Const (Float Minus_zero))
         | Float_PlusZero ->
+          let t =
             t_const
               (Constant.real_const_from_string ~radix:10 ~neg:false ~int:"0"
                  ~frac:"0" ~exp:None)
               ty
+          in
+          (t, Const (Float Plus_zero))
         | Float_NaN ->
             let is_nan_ls =
               try
@@ -752,7 +774,7 @@ module FromModelToTerm = struct
             in
             let x = create_vsymbol (Ident.id_fresh "x") ty in
             let f = t_app is_nan_ls [ t_var x ] None in
-            t_eps_close x f
+            (t_eps_close x f, Const (Float NaN))
         | Float_Infinity ->
             let is_infinite_ls =
               try
@@ -764,7 +786,7 @@ module FromModelToTerm = struct
             in
             let x = create_vsymbol (Ident.id_fresh "x") ty in
             let f = t_app is_infinite_ls [ t_var x ] None in
-            t_eps_close x f
+            (t_eps_close x f, Const (Float Infinity))
         | Float_Error ->
             error "Error while interpreting float constant %a@." print_constant
               c)
@@ -773,8 +795,12 @@ module FromModelToTerm = struct
            (with type Some ty_bool) and not to formulas: later on in the functions
            apply_to_term and smt_term_to_term we convert Why3 terms to formulas using
            Term.to_prop when needed *)
-        if b then t_bool_true else t_bool_false
-    | Cstring str -> t_const (Constant.string_const str) Ty.ty_str
+        if b then (t_bool_true, concrete_const_bool true)
+        else (t_bool_false, concrete_const_bool false)
+    | Cstring str ->
+      let t = t_const (Constant.string_const str) Ty.ty_str in
+      let t_concrete = Const (String str) in
+      (t, t_concrete)
 
   let find_builtin_lsymbol env n ts =
     let path, theory, ident =
@@ -817,39 +843,58 @@ module FromModelToTerm = struct
         try qual_id_to_term env qid
         with NoArgConstructor -> apply_to_term env qid [])
     | Tite (b, t1, t2) ->
-        t_if (term_to_term env b) (term_to_term env t1) (term_to_term env t2)
+        let b', b'_concrete = term_to_term env b in
+        let t1', t1'_concrete = term_to_term env t1 in
+        let t2', t2'_concrete = term_to_term env t2 in
+        (t_if b' t1' t2', If (b'_concrete, t1'_concrete, t2'_concrete))
     | Tapply (qid, ts) -> apply_to_term env qid ts
     | Tarray (s1, s2, a) -> array_to_term env s1 s2 a
-    | _ -> error "Could not interpret term %a@." print_term t
+    | Tunparsed _ -> error "Could not interpret term %a@." print_term t
 
   and apply_to_term env qid ts =
     match (qid, ts) with
     | Qident (Isymbol (S "=")), [ t1; t2 ] ->
-        let t1' = term_to_term env t1 in
-        let t2' = term_to_term env t2 in
-        t_equ t1' t2'
+        let t1', t1'_concrete = term_to_term env t1 in
+        let t2', t2'_concrete = term_to_term env t2 in
+        (t_equ t1' t2', concrete_apply_equ t1'_concrete t2'_concrete)
     | Qident (Isymbol (S "or")), hd :: tl ->
+        let (hd,hd_concrete) = term_to_term env hd in
         List.fold_left
-          (fun t t' -> t_binary Term.Tor t (Term.to_prop (term_to_term env t')))
-          (Term.to_prop (term_to_term env hd))
+          (fun (t,t_concrete) t' ->
+            let (t',t'_concrete) = term_to_term env t' in
+            ( t_binary Term.Tor t (Term.to_prop t'),
+              Binop (Or, t_concrete, t'_concrete) ))
+          (Term.to_prop hd, hd_concrete)
           tl
     | Qident (Isymbol (S "and")), hd :: tl ->
+        let (hd,hd_concrete) = term_to_term env hd in
         List.fold_left
-          (fun t t' ->
-            t_binary Term.Tand t (Term.to_prop (term_to_term env t')))
-          (Term.to_prop (term_to_term env hd))
+          (fun (t,t_concrete) t' ->
+            let (t',t'_concrete) = term_to_term env t' in
+            ( t_binary Term.Tand t (Term.to_prop t'),
+              Binop (And, t_concrete, t'_concrete) ))
+          (Term.to_prop hd, hd_concrete)
           tl
     | Qident (Isymbol (S "not")), [ t ] ->
-        t_not (Term.to_prop (term_to_term env t))
+        let (t,t_concrete) = term_to_term env t in
+        (t_not (Term.to_prop t), Not t_concrete)
     | Qident (Isymbol (S n)), ts | Qident (Isymbol (Sprover n)), ts -> (
-        let ts' = List.map (term_to_term env) ts in
+        let ts', ts'_concrete = List.split (List.map (term_to_term env) ts) in
         try
           (* we first search if [n] is the name of a function defined
              elsewhere in the SMT model *)
-          let t = Mstr.find n env.prover_fun_defs in
+          let t, t_concrete = Mstr.find n env.prover_fun_defs in
           let vs_args, _, t' = t_open_lambda t in
           let subst = Mvs.of_list (List.combine vs_args ts') in
-          t_subst subst t'
+          begin match t_concrete with
+          | Function (_, args_concrete, t'_concrete) ->
+            let subst_concrete = Mstr.of_list (List.combine args_concrete ts'_concrete) in
+            (t_subst subst t', subst_concrete_term subst_concrete t'_concrete)
+          | _ -> 
+            Debug.dprintf debug "t_concrete = %a@."
+              print_concrete_term t_concrete;
+            error "TODO_WIP (apply_to_term #1)"
+          end
         with _ -> (
           (* if it fails, we search for [n] in constructors and in builtin symbols *)
           let ls =
@@ -862,21 +907,29 @@ module FromModelToTerm = struct
                 error "No lsymbol found for qualified identifier %a@."
                   print_qualified_identifier qid)
           in
-          try t_app ls ts' ls.ls_value
+          try (t_app ls ts' ls.ls_value,  concrete_apply_from_ls ls ts'_concrete)
           with _ ->
             error "Cannot apply lsymbol %a to terms (%a)@." Pretty.print_ls ls
               (Pp.print_list Pp.comma Pretty.print_term)
               ts'))
     | Qannotident (Isymbol (S n), s), ts
     | Qannotident (Isymbol (Sprover n), s), ts -> (
-        let ts' = List.map (term_to_term env) ts in
+        let ts', ts'_concrete = List.split (List.map (term_to_term env) ts) in
         try
           (* we first search if [n] is the name of a function defined
              elsewhere in the SMT model *)
-          let t = Mstr.find n env.prover_fun_defs in
+          let t, t_concrete = Mstr.find n env.prover_fun_defs in
           let vs_args, _, t' = t_open_lambda t in
           let subst = Mvs.of_list (List.combine vs_args ts') in
-          t_subst subst t'
+          begin match t_concrete with
+          | Function (_, args_concrete, t'_concrete) ->
+            let subst_concrete = Mstr.of_list (List.combine args_concrete ts'_concrete) in
+            (t_subst subst t', subst_concrete_term subst_concrete t'_concrete)
+          | _ ->
+            Debug.dprintf debug "t_concrete = %a@."
+              print_concrete_term t_concrete;
+            error "TODO_WIP (apply_to_term #2)"
+          end
         with _ -> (
           (* if it fails, we search for [n] in constructors and in builtin symbols *)
           let ls =
@@ -894,7 +947,7 @@ module FromModelToTerm = struct
                 create_lsymbol (Ident.id_fresh n) ts'_ty
                   (Some (smt_sort_to_ty env s)))
           in
-          try t_app ls ts' ls.ls_value
+          try (t_app ls ts' ls.ls_value, concrete_apply_from_ls ls ts'_concrete)
           with _ ->
             error "Cannot apply lsymbol %a to terms (%a)@." Pretty.print_ls ls
               (Pp.print_list Pp.comma Pretty.print_term)
@@ -906,11 +959,14 @@ module FromModelToTerm = struct
     let ty1 = smt_sort_to_ty env s1 in
     let ty2 = smt_sort_to_ty env s2 in
     let vs_arg = create_vsymbol (Ident.id_fresh "x") ty1 in
-    let mk_case key value t =
-      let key = term_to_term env key in
-      let value = term_to_term env value in
+    let vs_name = Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs_arg in
+    let mk_case key value (t, t_concrete) =
+      let key,key_concrete = term_to_term env key in
+      let value,value_concrete = term_to_term env value in
       if Ty.oty_equal key.t_ty (Some ty1) && Ty.oty_equal value.t_ty (Some ty2)
-      then t_if (t_equ (t_var vs_arg) key) value t
+      then
+        ( t_if (t_equ (t_var vs_arg) key) value t,
+          If ((concrete_apply_equ (Var vs_name) key_concrete), value_concrete, t_concrete) )
       else
         error
           "Type %a for sort %a of array keys and/or type %a for sort %a of \
@@ -920,13 +976,14 @@ module FromModelToTerm = struct
           (Pp.print_option_or_default "None" Pretty.print_ty)
           value.t_ty print_sort s2
     in
-    let a =
+    let t_others, others_concrete = term_to_term env elts.array_others in
+    let a, a_concrete =
       List.fold_left
-        (fun t (key, value) -> mk_case key value t)
-        (term_to_term env elts.array_others)
+        (fun acc (key, value) -> mk_case key value acc)
+        (t_others, others_concrete)
         elts.array_indices
     in
-    t_lambda [ vs_arg ] [] a
+    (t_lambda [ vs_arg ] [] a, Function (true, [vs_name], a_concrete))
 
   let smt_term_to_term ~fmla env t s =
     Debug.dprintf debug "[smt_term_to_term] t = %a@." print_term t;
@@ -940,14 +997,15 @@ module FromModelToTerm = struct
       print_sort s
       (Pp.print_option_or_default "None" Pretty.print_ty_qualified)
       ty_s fmla;
-    let t' = term_to_term env t in
+    let (t', t'_concrete) = term_to_term env t in
     let t' = if fmla then Term.to_prop t' else t' in
     if Opt.equal Ty.ty_equal ty_s t'.t_ty then (
-      Debug.dprintf debug "[smt_term_to_term] t' = %a, t'.t_ty = %a@."
+      Debug.dprintf debug "[smt_term_to_term] t' = %a, t'.t_ty = %a, t'_concrete = %a@."
         Pretty.print_term t'
         (Pp.print_option_or_default "None" Pretty.print_ty_qualified)
-        t'.t_ty;
-      t')
+        t'.t_ty
+        print_concrete_term t'_concrete;
+      (t', t'_concrete))
     else
       error "Type %a for sort %a and type %a for term %a do not match@."
         (Pp.print_option_or_default "None" Pretty.print_ty)
@@ -1009,17 +1067,30 @@ module FromModelToTerm = struct
         Debug.dprintf debug "[interpret_fun_def_to_term] bound_var = (%s, %a)@."
           key Pretty.print_vs vs)
       env.bound_vars;
-    let t_body = smt_term_to_term ~fmla env body res in
+    let (t_body, t_body_concrete) = smt_term_to_term ~fmla env body res in
     let t =
       t_lambda
         (Mstr.values env.bound_vars)
         []
         t_body
     in
+    let t_concrete =
+      if List.length (Mstr.values env.bound_vars) = 0 then
+        t_body_concrete
+      else
+        let args =
+          List.map
+            (fun vs -> Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs)
+            (Mstr.values env.bound_vars)
+        in
+        Function (false,args,t_body_concrete) (* TODO_WIP *)
+    in
     Debug.dprintf debug "[interpret_fun_def_to_term] t = %a@."
       Pretty.print_term t;
+    Debug.dprintf debug "[interpret_fun_def_to_term] t_concrete = %a@."
+      print_concrete_term t_concrete;
     Debug.dprintf debug "-----------------------------@.";
-    t
+    t, t_concrete
 
   let is_vs_in_prover_vars vs prover_vars =
     List.exists
@@ -1066,9 +1137,9 @@ module FromModelToTerm = struct
      may contain other prover variables)
      [seen_prover_vars] records already seen prover variables when evaluating
      a term to avoid unbounded recursion *)
-  let rec eval_term env ?(eval_prover_var = true) seen_prover_vars terms t =
-    match t.t_node with
-    | Term.Tvar vs -> (
+  let rec eval_term env ?(eval_prover_var = true) seen_prover_vars terms (t, t_concrete) =
+    match t.t_node, t_concrete with
+    | Term.Tvar vs, _ -> (
         match Mvs.find_opt vs env.eval_prover_vars with
         | Some t_vs ->
             (* vs is a prover variable *)
@@ -1076,81 +1147,123 @@ module FromModelToTerm = struct
               if List.mem vs seen_prover_vars then t_vs
               else
                 eval_term env ~eval_prover_var (vs :: seen_prover_vars) terms t_vs
-            else t
-        | None -> t (* vs is not a prover variable *))
-    | Term.Tapp (ls, [ t1; t2 ]) when ls_equal ls ps_equ -> (
+            else (t, t_concrete)
+        | None -> (t, t_concrete) (* vs is not a prover variable *))
+    | Term.Tapp (ls, [ t1; t2 ]), Apply (concrete_equ, [t1_concrete; t2_concrete])
+          when ls_equal ls ps_equ -> (
         match (t1.t_node, t2.t_node) with
         | Term.Tvar v1, Term.Tvar v2
           when is_vs_in_prover_vars v1 env.prover_vars
                && is_vs_in_prover_vars v2 env.prover_vars ->
             (* distinct prover variables are not equal *)
-            if vs_equal v1 v2 then t_true else t_false
+            if vs_equal v1 v2 then (t_true, concrete_const_bool true)
+            else (t_false, concrete_const_bool false)
         | _ ->
             (* general case *)
-            let t1' =
-              eval_term env ~eval_prover_var seen_prover_vars terms t1
+            let (t1', t1'_concrete) =
+              eval_term env ~eval_prover_var seen_prover_vars terms (t1, t1_concrete)
             in
-            let t2' =
-              eval_term env ~eval_prover_var seen_prover_vars terms t2
+            let (t2', t2'_concrete) =
+              eval_term env ~eval_prover_var seen_prover_vars terms (t2, t2_concrete)
             in
-            if t_equal t1' t2' then t_true
-            else t_app ls [ t1'; t2' ] ls.ls_value)
-    | Term.Tapp (ls, ts) ->
-        let ts =
-          List.map (fun x -> eval_term env ~eval_prover_var seen_prover_vars terms x) ts
-        in
-        t_app ls ts ls.ls_value
-    | Term.Tif (b, t1, t2) ->
-        let b' = eval_term env ~eval_prover_var seen_prover_vars terms b in
+            if t_equal t1' t2' then (t_true, concrete_const_bool true)
+            else
+              ( t_app ls [ t1'; t2' ] ls.ls_value),
+                concrete_apply_equ t1'_concrete t2'_concrete )
+    | Term.Tapp (ls, ts), Apply (ls_name, ts_concrete) ->
+        begin try
+          let ts' = List.combine ts ts_concrete in
+          let ts, ts_concrete = List.split (
+            List.map
+              (fun x -> eval_term env ~eval_prover_var seen_prover_vars terms x) ts')
+          in
+          (t_app ls ts ls.ls_value, Apply (ls_name, ts_concrete))
+        with _ -> error "TODO_WIP (eval_term Tapp)"
+        end
+    | Term.Tif (b, t1, t2), If (b_concrete, t1_concrete, t2_concrete) ->
+        let b', b'_concrete =
+          eval_term env ~eval_prover_var seen_prover_vars terms (b,b_concrete) in
         if is_true env b' then
-          let t1' = eval_term env ~eval_prover_var seen_prover_vars terms t1 in
-          t1'
+          eval_term env ~eval_prover_var seen_prover_vars terms (t1,t1_concrete)
         else if is_false env b' then
-          let t2' = eval_term env ~eval_prover_var seen_prover_vars terms t2 in
-          t2'
+          eval_term env ~eval_prover_var seen_prover_vars terms (t2,t2_concrete)
         else
-          let t1' = eval_term env ~eval_prover_var seen_prover_vars terms t1 in
-          let t2' = eval_term env ~eval_prover_var seen_prover_vars terms t2 in
-          t_if b' t1' t2'
-    | Term.Tlet _ -> t
-    | Term.Tcase _ -> t
-    | Term.Teps tb -> (
+          let t1',t1'_concrete =
+            eval_term env ~eval_prover_var seen_prover_vars terms (t1,t1_concrete) in
+          let t2',t2'_concrete =
+            eval_term env ~eval_prover_var seen_prover_vars terms (t2,t2_concrete) in
+          (t_if b' t1' t2', If (b'_concrete, t1'_concrete, t2'_concrete))
+    | Term.Teps tb, _ -> (
         match Term.t_open_lambda t with
         | [], _, _ ->
+          begin match t_concrete with
+          | Epsilon (eps_x, eps_term) ->
             let vs, t' = Term.t_open_bound tb in
-            let t'_eval = eval_term env ~eval_prover_var seen_prover_vars terms t' in
-            t_eps_close vs t'_eval
+            let t'_eval, t'_eval_concrete =
+              eval_term env ~eval_prover_var seen_prover_vars terms (t',eps_term) in
+            (t_eps_close vs t'_eval, Epsilon (eps_x, t'_eval_concrete))
+          | Const (Float _) -> (t,t_concrete)
+          | _ ->
+            Debug.dprintf debug "t_concrete = %a@."
+              print_concrete_term t_concrete;
+            error "TODO_WIP (eval_term Teps Epsilon)"
+          end
         | vsl, trig, t' ->
-            let t'_eval = eval_term env ~eval_prover_var seen_prover_vars terms t' in
-            t_lambda vsl trig t'_eval)
-    | Term.Tquant (q, tq) ->
+            let is_array, vsl_concrete, t'_concrete = match t_concrete with
+              | Function (is_array, args, body) -> is_array, args, body
+              | _ ->
+                Debug.dprintf debug "t_concrete = %a@."
+                  print_concrete_term t_concrete;
+                error "TODO_WIP (eval_term Teps Function)"
+            in
+            let t'_eval, t'_eval_concrete =
+              eval_term env ~eval_prover_var seen_prover_vars terms (t',t'_concrete) in
+            (t_lambda vsl trig t'_eval, Function (is_array, vsl_concrete, t'_eval_concrete)))
+    | Term.Tquant (q, tq), Quant (q_concrete, vars_concrete, t_concrete) ->
         let vsl, trig, t' = t_open_quant tq in
-        let t' = eval_term env ~eval_prover_var seen_prover_vars terms t' in
-        t_quant q (t_close_quant vsl trig t')
-    | Term.Tbinop (Term.Tor, t1, t2) ->
-        let t1 = eval_term env ~eval_prover_var seen_prover_vars terms t1 in
-        let t2 = eval_term env ~eval_prover_var seen_prover_vars terms t2 in
-        if is_true env t1 || is_true env t2 then t_true
-        else if is_false env t1 || is_false env t2 then t_false
-        else t_binary Term.Tor t1 t2
-    | Term.Tbinop (Term.Tand, t1, t2) ->
-        let t1 = eval_term env ~eval_prover_var seen_prover_vars terms t1 in
-        let t2 = eval_term env ~eval_prover_var seen_prover_vars terms t2 in
-        if is_true env t1 && is_true env t2 then t_true
-        else if is_false env t1 && is_false env t2 then t_true
-        else if is_true env t1 && is_false env t2 then t_false
-        else if is_false env t1 && is_true env t2 then t_false
-        else t_binary Term.Tand t1 t2
-    | Term.Tbinop (op, t1, t2) ->
-        let t1 = eval_term env ~eval_prover_var seen_prover_vars terms t1 in
-        let t2 = eval_term env ~eval_prover_var seen_prover_vars terms t2 in
-        t_binary op t1 t2
-    | Term.Tnot t' ->
-        let t' = eval_term env ~eval_prover_var seen_prover_vars terms t' in
-        if is_true env t' then t_false
-        else if is_false env t' then t_true
-        else t_not t'
-    | _ -> t
+        let t',t'_concrete =
+          eval_term env ~eval_prover_var seen_prover_vars terms (t',t_concrete) in
+        ( t_quant q (t_close_quant vsl trig t'),
+          Quant (q_concrete, vars_concrete, t'_concrete) )
+    | Term.Tbinop (Term.Tor, t1, t2), Binop (Or, t1_concrete, t2_concrete) ->
+        let t1,t1_concrete =
+          eval_term env ~eval_prover_var seen_prover_vars terms (t1,t1_concrete) in
+        let t2,t2_concrete =
+          eval_term env ~eval_prover_var seen_prover_vars terms (t2,t2_concrete) in
+        if is_true env t1 || is_true env t2 then
+          (t_true, concrete_const_bool true)
+        else if is_false env t1 || is_false env t2 then
+          (t_false, concrete_const_bool false)
+        else
+          (t_binary Term.Tor t1 t2, Binop (Or, t1_concrete, t2_concrete))
+    | Term.Tbinop (Term.Tand, t1, t2), Binop (And, t1_concrete, t2_concrete) ->
+        let t1,t1_concrete =
+          eval_term env ~eval_prover_var seen_prover_vars terms (t1,t1_concrete) in
+        let t2,t2_concrete =
+          eval_term env ~eval_prover_var seen_prover_vars terms (t2,t2_concrete) in
+        if is_true env t1 && is_true env t2 then
+          (t_true, concrete_const_bool true)
+        else if is_false env t1 && is_false env t2 then
+          (t_true, concrete_const_bool true)
+        else if is_true env t1 && is_false env t2 then
+          (t_false, concrete_const_bool false)
+        else if is_false env t1 && is_true env t2 then
+          (t_false, concrete_const_bool false)
+        else
+          (t_binary Term.Tand t1 t2, Binop (And, t1_concrete, t2_concrete))
+    | Term.Tbinop (op, t1, t2), Binop (op_concrete, t1_concrete, t2_concrete) ->
+        let t1,t1_concrete =
+          eval_term env ~eval_prover_var seen_prover_vars terms (t1,t1_concrete) in
+        let t2,t2_concrete =
+          eval_term env ~eval_prover_var seen_prover_vars terms (t2,t2_concrete) in
+        (t_binary op t1 t2, Binop (op_concrete, t1_concrete, t2_concrete))
+    | Term.Tnot t', Not t'_concrete ->
+        let t',t'_concrete =
+          eval_term env ~eval_prover_var seen_prover_vars terms (t',t'_concrete) in
+        if is_true env t' then (t_false, concrete_const_bool false)
+        else if is_false env t' then (t_true, concrete_const_bool true)
+        else (t_not t', Not t'_concrete)
+    | _ -> (t, t_concrete)
 
   let eval (pinfo : Printer.printing_info) env terms =
     let ty_coercions =
@@ -1165,8 +1278,8 @@ module FromModelToTerm = struct
                (fun ls ->
                  Mstr.bindings
                    (Mstr.mapi_filter
-                      (fun _ ((ls', _, _), t) ->
-                        if ls_equal ls ls' then Some (ls, t) else None)
+                      (fun _ ((ls', _, _), (t, t_concrete)) ->
+                        if ls_equal ls ls' then Some (ls, t, t_concrete) else None)
                       terms))
                (Sls.elements sls)))
         pinfo.Printer.type_coercions
@@ -1174,10 +1287,10 @@ module FromModelToTerm = struct
     Ty.Mty.iter
       (fun key elt ->
         List.iter
-          (fun (str, (ls, t)) ->
+          (fun (str, (ls, t, t_concrete)) ->
             Debug.dprintf debug
-              "[ty_coercions] ty = %a, str=%s, ls = %a, t=%a@." Pretty.print_ty
-              key str Pretty.print_ls ls Pretty.print_term t)
+              "[ty_coercions] ty = %a, str=%s, ls = %a, t=%a, t_concrete=%a@." Pretty.print_ty
+              key str Pretty.print_ls ls Pretty.print_term t print_concrete_term t_concrete)
           elt)
       ty_coercions;
     let ty_fields =
@@ -1193,8 +1306,8 @@ module FromModelToTerm = struct
                (fun ls ->
                  Mstr.bindings
                    (Mstr.mapi_filter
-                      (fun _ ((ls', _, _), t) ->
-                        if ls_equal ls ls' then Some (ls, t) else None)
+                      (fun _ ((ls', _, _), (t, t_concrete)) ->
+                        if ls_equal ls ls' then Some (ls, t, t_concrete) else None)
                       terms))
                lls))
         pinfo.Printer.type_fields
@@ -1202,9 +1315,9 @@ module FromModelToTerm = struct
     Ty.Mty.iter
       (fun key elt ->
         List.iter
-          (fun (str, (ls, t)) ->
-            Debug.dprintf debug "[ty_fields] ty = %a, str=%s, ls = %a, t=%a@."
-              Pretty.print_ty key str Pretty.print_ls ls Pretty.print_term t)
+          (fun (str, (ls, t, t_concrete)) ->
+            Debug.dprintf debug "[ty_fields] ty = %a, str=%s, ls = %a, t=%a, t_concrete=%a@."
+              Pretty.print_ty key str Pretty.print_ls ls Pretty.print_term t print_concrete_term t_concrete)
           elt)
       ty_fields;
     (* for each prover variable, we create an epsilon term using type coercions
@@ -1213,68 +1326,226 @@ module FromModelToTerm = struct
       (fun key value ->
         Ty.Mty.iter
           (fun ty vs ->
+            let vs_name = Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs in
             let create_epsilon_term ty l =
               (* create a fresh vsymbol for the variable bound by the epsilon term *)
               let x = create_vsymbol (Ident.id_fresh "x") ty in
-              let aux (_, (ls', t')) =
+              let x_name = Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified x in
+              let aux (_, (ls', t', t'_concrete)) =
                 let vs_list', _, t' = t_open_lambda t' in
-                let vs' =
-                  match vs_list' with
-                  | [ vs' ] -> vs'
-                  | _ ->
-                      error
-                        "Only one variable expected when opening lambda-term %a"
-                        Pretty.print_term t'
-                in
-                let t' =
-                  eval_term env ~eval_prover_var:false [] terms
-                    (t_subst_single vs' (t_var vs) t')
-                in
-                (* substitute [vs] by this new variable in the body [t'] of the function
-                    defining the type coercion *)
-                let t' = t_subst_single vs' (t_var x) t' in
-                (* construct the formula to be used in the epsilon term *)
-                t_equ (t_app ls' [ t_var x ] ls'.ls_value) t'
+                match t'_concrete with
+                | Function (_, args_concrete, t'_concrete) ->
+                  let vs', vs'_concrete_name =
+                    match vs_list', args_concrete with
+                    | [ vs' ], [ vs_name ] -> vs', vs_name
+                    | _ ->
+                        error
+                          "Only one variable expected when opening lambda-term %a"
+                          Pretty.print_term t'
+                  in
+                  let (t', t'_concrete) =
+                    eval_term env ~eval_prover_var:false [] terms
+                      ( (t_subst_single vs' (t_var vs) t'),
+                        (subst_concrete_term (Mstr.of_list [(vs'_concrete_name, Var vs_name)]) t'_concrete) )
+                  in
+                  (* substitute [vs] by this new variable in the body [t'] of the function
+                      defining the type coercion *)
+                  let t' = t_subst_single vs' (t_var x) t' in
+                  let t'_concrete = subst_concrete_term (Mstr.of_list [(vs'_concrete_name, Var x_name)]) t'_concrete in
+                  let ls'_name = Format.asprintf "@[<h>%a@]" Pretty.print_ls_qualified ls' in
+                  (* construct the formula to be used in the epsilon term *)
+                  ( t_equ (t_app ls' [ t_var x ] ls'.ls_value) t',
+                    concrete_apply_equ (Apply (ls'_name, [ Var x_name ])) t'_concrete )
+                | _ ->
+                  Debug.dprintf debug "t'_concrete = %a@."
+                    print_concrete_term t'_concrete;
+                  error "TODO_WIP (eval)"
               in
-              let f = t_and_l (List.map aux l) in
+              let l', l'_concrete = List.split (List.map aux l) in
+              let f = t_and_l l' in
+              let f_concrete = t_and_l_concrete l'_concrete in
               (* replace [t] by [eps x. f] *)
-              t_eps_close x f
+              (t_eps_close x f, Epsilon (x_name, f_concrete))
             in
-            let eval_var =
+            let (eval_var, eval_var_concrete) =
               (* first search if [ty] is associated to some fields *)
               match Ty.Mty.find_def [] ty ty_fields with
               | [] -> (
                   (* if no fields, search if there exists some type coercions for [ty] *)
                   match Ty.Mty.find_def [] ty ty_coercions with
-                  | [] -> t_var vs
+                  | [] ->
+                    (t_var vs, Var vs_name)
                   | coercions -> create_epsilon_term ty coercions)
               | fields -> create_epsilon_term ty fields
             in
             Debug.dprintf debug
-              "[eval] prover_var = %s, vs = %a, eval_var = %a@."
+              "[eval] prover_var = %s, vs = %a, eval_var = %a, eval_var_concrete = %a@."
               key
               Pretty.print_term (t_var vs)
-              Pretty.print_term eval_var;
+              Pretty.print_term eval_var
+              print_concrete_term eval_var_concrete;
             env.eval_prover_vars <-
-              Mvs.add vs eval_var env.eval_prover_vars)
+              Mvs.add vs (eval_var, eval_var_concrete) env.eval_prover_vars)
           value)
       env.prover_vars;
     Mstr.mapi
-      (fun _ ((ls, oloc, attrs), t) ->
-        let t' = eval_term env [] terms t in
+      (fun _ ((ls, oloc, attrs), (t, t_concrete)) ->
+        let (t', t'_concrete) = eval_term env [] terms (t, t_concrete) in
         Debug.dprintf debug "[eval] t = %a ==> t' = %a@." Pretty.print_term t
           Pretty.print_term t';
-        ((ls, oloc, attrs), t'))
+        ((ls, oloc, attrs), (t', t'_concrete)))
       terms
+
+  let rec maybe_convert_epsilon_terms env (t, t_concrete) =
+    match t.t_node, t_concrete with
+    | Term.Tapp (ls, ts), Apply (ls_name, ts_concrete) ->
+        begin try
+          let ts' = List.combine ts ts_concrete in
+          let ts, ts_concrete =
+            List.split (List.map (maybe_convert_epsilon_terms env ) ts')
+          in
+          (t_app ls ts ls.ls_value, Apply (ls_name, ts_concrete))
+        with _ -> error "TODO_WIP (maybe_convert_epsilon_terms Tapp)"
+        end
+    | Term.Tif (b, t1, t2), If (b_concrete, t1_concrete, t2_concrete) ->
+        let b', b'_concrete = maybe_convert_epsilon_terms env (b,b_concrete) in
+        let t1',t1'_concrete = maybe_convert_epsilon_terms env (t1,t1_concrete) in
+        let t2',t2'_concrete = maybe_convert_epsilon_terms env (t2,t2_concrete) in
+        (t_if b' t1' t2', If (b'_concrete, t1'_concrete, t2'_concrete))
+    | Term.Teps tb, _ -> (
+        match Term.t_open_lambda t with
+        | [], _, _ ->
+            begin match t_concrete with
+            | Epsilon (eps_x, eps_term) ->
+              let vs, t' = Term.t_open_bound tb in
+              begin match get_opt_record env (vs,eps_x) (t',eps_term) with
+              | None ->
+                begin match get_opt_int_range (vs,eps_x) (t',eps_term) with
+                | None ->
+                  let t', t'_concrete = maybe_convert_epsilon_terms env (t',eps_term) in
+                  (t_eps_close vs t', Epsilon (eps_x, t'_concrete))
+                | Some int_proj ->
+                  (t_eps_close vs t', Const (Integer int_proj))
+                end
+              | Some fields_values -> (t_eps_close vs t', Record fields_values)
+              end
+            | Const (Float _) -> (t,t_concrete)
+            | _ ->
+              Debug.dprintf debug "t_concrete = %a@."
+                print_concrete_term t_concrete;
+              error "TODO_WIP (maybe_convert_epsilon_terms Teps Epsilon)"
+            end
+        | vsl, trig, t' ->
+            let is_array, vsl_concrete, t'_concrete = match t_concrete with
+              | Function (is_array, args, body) -> is_array, args, body
+              | _ ->
+                Debug.dprintf debug "t_concrete = %a@."
+                  print_concrete_term t_concrete;
+                error "TODO_WIP (maybe_convert_epsilon_terms Teps Function)"
+            in
+            let t', t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in
+            (t_lambda vsl trig t', Function (is_array, vsl_concrete, t'_concrete)))
+    | Term.Tquant (q, tq), Quant (q_concrete, vars_concrete, t_concrete) ->
+        let vsl, trig, t' = t_open_quant tq in
+        let t',t'_concrete = maybe_convert_epsilon_terms env (t',t_concrete) in
+        ( t_quant q (t_close_quant vsl trig t'),
+          Quant (q_concrete, vars_concrete, t'_concrete) )
+    | Term.Tbinop (op, t1, t2), Binop (op_concrete, t1_concrete, t2_concrete) ->
+        let t1,t1_concrete =
+          maybe_convert_epsilon_terms env (t1,t1_concrete) in
+        let t2,t2_concrete =
+          maybe_convert_epsilon_terms env (t2,t2_concrete) in
+        (t_binary op t1 t2, Binop (op_concrete, t1_concrete, t2_concrete))
+    | Term.Tnot t', Not t'_concrete ->
+        let t',t'_concrete =
+          maybe_convert_epsilon_terms env (t',t'_concrete) in
+        (t_not t', Not t'_concrete)
+    | _ -> (t, t_concrete)
+
+  and get_opt_record env (vs,vs_name) (t',t'_concrete) =
+    (* check if t is of the form epsilon x:ty. x.f1 = v1 /\ ... /\ x.fn = vn
+    with f1,...,fn the fields associated to type ity *)
+    let exception UnexpectedPattern in
+    let rec get_conjuncts (t',t'_concrete) =
+      match t'.t_node, t'_concrete with
+      | Tbinop (Tand, t1, t2), Binop (And, ct1, ct2) ->
+        (t1,ct1) :: (get_conjuncts (t2,ct2))
+      | _ -> [(t',t'_concrete)]
+    in
+    try
+      let expected_fields =
+        try Ty.Mty.find (vs.vs_ty) env.type_fields
+        with _ -> raise UnexpectedPattern
+      in
+      let list_of_fields_values =
+        List.fold_left
+          (fun acc (t,ct) ->
+            match t.t_node, ct with
+            | Tapp (ls, [proj;term_value]), Apply (concrete_equ, [cproj;cterm_value])
+                when ls_equal ls ps_equ -> (
+              match proj.t_node, cproj with
+              | Tapp (ls, [x]), Apply (ls_name, [Var vs_name]) when t_equal x (t_var vs) ->
+                if List.mem ls expected_fields then
+                  let term_value', cterm_value' =
+                    maybe_convert_epsilon_terms env (term_value,cterm_value) in
+                  ((ls,ls_name),(term_value',cterm_value')) :: acc
+                else raise UnexpectedPattern
+              | _ -> raise UnexpectedPattern
+            )
+            | _ -> raise UnexpectedPattern
+          )
+          []
+          (get_conjuncts (t',t'_concrete))
+      in
+      if List.length expected_fields = List.length list_of_fields_values then
+        Some (List.map
+          (fun ((ls,ls_name),(t,ct)) -> (ls_name,ct))
+          list_of_fields_values)
+      else
+        raise UnexpectedPattern
+    with UnexpectedPattern -> None
+  
+  and get_opt_int_range (vs,vs_name) (t',t'_concrete) =
+  (* special case for range types:
+     if t is of the form epsilon x:ty. ty'int x = v, check that v is in the
+     range of values defined by type ty *)
+    let exception UnexpectedPattern in
+    try
+      let ((proj_ls,proj_ls_name), (proj_v,c_proj_v)) =
+        match t'.t_node, t'_concrete with
+        | Tapp (ls, [proj;term_value]), Apply (concrete_equ, [cproj;cterm_value])
+            when ls_equal ls ps_equ -> (
+          match proj.t_node, cproj with
+          | Tapp (ls, [x]), Apply (ls_name, [Var vs_name]) when t_equal x (t_var vs) ->
+            ((ls,ls_name),(term_value,cterm_value))
+          | _ -> raise UnexpectedPattern
+        )
+        | _ -> raise UnexpectedPattern
+      in
+      Debug.dprintf debug "[get_opt_int_range] vs.vs_ty = %a@."
+        Pretty.print_ty vs.vs_ty;
+      match vs.vs_ty.ty_node with
+      | Tyapp (ts,_) ->
+        begin match ts.ts_def, proj_v.t_node with
+        | Ty.Range r, Tconst (Constant.ConstInt c)
+          (* when proj_ls.ls_name.id_string = ts.Ty.ts_name.id_string ^ "'int"
+            && Opt.equal Ty.ty_equal proj_ls.ls_value (Some Ty.ty_int) *) ->
+          Some (BigInt.to_string c.il_int)
+        | _ -> raise UnexpectedPattern
+        end
+      | _ -> raise UnexpectedPattern
+    with UnexpectedPattern -> None
 
   (* If some prover variables remain after evaluation, we remove the terms
      containing those prover variables. *)
   let clean env terms =
     Mstr.map_filter
-      (fun ((ls, oloc, attr), t) ->
+      (fun ((ls, oloc, attr), (t, t_concrete)) ->
         if Term.t_v_any (fun vs -> is_vs_in_prover_vars vs env.prover_vars) t
         then None
-        else Some ((ls, oloc, attr), t))
+        else
+          let (t, t_concrete) = maybe_convert_epsilon_terms env (t, t_concrete) in
+          Some ((ls, oloc, attr), (t, t_concrete)))
       terms
 
   let get_terms (pinfo : Printer.printing_info)
@@ -1299,7 +1570,7 @@ module FromModelToTerm = struct
         prover_vars = Mstr.empty;
         bound_vars = Mstr.empty;
         constructors = pinfo.Printer.constructors;
-        records_fields = pinfo.Printer.list_records;
+        type_fields = pinfo.Printer.type_fields;
         inferred_types = [];
         queried_terms = Mstr.map (fun (ls, _, _) -> ls) qterms;
         eval_prover_vars = Mvs.empty;
@@ -1335,8 +1606,8 @@ module FromModelToTerm = struct
             try
               Debug.dprintf debug
                 "No term for %s, adding term to env.prover_fun_defs@." n;
-              let t = interpret_fun_def_to_term ~fmla:false env def in
-              env.prover_fun_defs <- Mstr.add n t env.prover_fun_defs
+              let (t,t_concrete) = interpret_fun_def_to_term ~fmla:false env def in
+              env.prover_fun_defs <- Mstr.add n (t,t_concrete) env.prover_fun_defs
             with
             | E str ->
                 Debug.dprintf debug "Error while interpreting %s: %s@." n str
@@ -1351,8 +1622,8 @@ module FromModelToTerm = struct
                 (* fmla = true if the interpreted term should be a formula (with type = None)
                    and not a term (with type = Some ty) *)
                 let fmla = not (Opt.inhabited ls.ls_value) in
-                let t = interpret_fun_def_to_term ~fmla env def in
-                Some ((ls, oloc, attrs), t)
+                let (t, t_concrete) = interpret_fun_def_to_term ~fmla env def in
+                Some ((ls, oloc, attrs), (t, t_concrete))
               with
               | E str ->
                   Debug.dprintf debug "Error while interpreting %s: %s@." n str;
@@ -1365,12 +1636,13 @@ module FromModelToTerm = struct
     in
     let debug_terms desc terms =
       Mstr.iter
-        (fun n ((ls, oloc, _), t) ->
+        (fun n ((ls, oloc, _), (t, t_concrete)) ->
           Debug.dprintf debug
-            "[TERMS %s] name = %s, ls = %a, oloc = %a, t = %a@." desc n
+            "[TERMS %s] name = %s, ls = %a, oloc = %a, t = %a, t_concrete = %a@." desc n
             Pretty.print_ls ls
             (Pp.print_option Pretty.print_loc_as_attribute) oloc
-            Pretty.print_term t)
+            Pretty.print_term t
+            print_concrete_term t_concrete)
         terms
     in
     debug_terms "FROM SMT MODEL" terms;
@@ -1424,8 +1696,8 @@ let parse pinfo input =
       List.rev
         (Mstr.values
            (Mstr.mapi
-              (fun _ ((ls, oloc, attrs), t) ->
-                create_model_element ~value:t ~concrete_value:t
+              (fun _ ((ls, oloc, attrs), (t, t_concrete)) ->
+                create_model_element ~value:t ~concrete_value:t_concrete
                   ~oloc ~attrs ~lsymbol:ls)
               terms))
 
