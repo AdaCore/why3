@@ -53,9 +53,9 @@ ENV HOME /home/why3
 WORKDIR /home/why3
 
 # install opam
-ENV OPAM_PACKAGES="num menhir mlmpfr.4.1.0+bugfix1 lablgtk3-sourceview3 zarith camlzip conf-autoconf"
+ENV OPAM_PACKAGES="num menhir mlmpfr.4.1.0+bugfix2 lablgtk3-sourceview3 zarith camlzip conf-autoconf"
 RUN opam init -y --no-setup -j4 --bare --disable-sandboxing && \
-    opam switch create latest ocaml-base-compiler.4.14.0 && \
+    opam switch create latest ocaml-base-compiler.5.0.0 && \
     opam switch create bench  ocaml-base-compiler.4.08.1 && \
     opam switch create full   ocaml-base-compiler.4.13.1 && \
     opam repository add coq-released https://coq.inria.fr/opam/released --all-switches && \
