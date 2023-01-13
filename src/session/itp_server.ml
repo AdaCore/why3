@@ -251,6 +251,8 @@ let bypass_pretty s id =
         id.Ident.id_string
   | Decl.NoTerminationProof ls ->
       fprintf fmt "Cannot prove the termination of %a" P.print_ls ls
+  | Decl.UnexpectedProjOrConstr ls ->
+      fprintf fmt "Unexpected projection or constructor symbol %a" P.print_ls ls
   | _ -> Format.fprintf fmt "Uncaught: %a" Exn_printer.exn_printer exn
   end
 

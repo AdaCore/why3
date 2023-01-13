@@ -68,11 +68,12 @@ let compile_match = Trans.decl (fun d -> [decl_map rewriteT d]) None
 
 type state = {
   mt_map : lsymbol Mts.t;       (* from type symbols to selector functions *)
-  pj_map : lsymbol list Mls.t;  (* from constructors to projections *)
+  cc_map : lsymbol Mls.t;       (* from old constructors to new constructors *)
+  cp_map : lsymbol list Mls.t;  (* from old constructors to new projections *)
+  pp_map : lsymbol Mls.t;       (* from old projections to new projections *)
   tp_map : (decl*theory) Mid.t; (* skipped tuple symbols *)
   inf_ts : Sts.t;               (* infinite types *)
   ma_map : bool list Mts.t;     (* material type arguments *)
-  keep_t : bool;                (* keep algebraic type definitions *)
   keep_e : bool;                (* keep monomorphic enumeration types *)
   keep_r : bool;                (* keep non-recursive records *)
   no_ind : bool;                (* do not generate indexing functions *)
@@ -82,11 +83,12 @@ type state = {
 
 let empty_state = {
   mt_map = Mts.empty;
-  pj_map = Mls.empty;
+  cc_map = Mls.empty;
+  cp_map = Mls.empty;
+  pp_map = Mls.empty;
   tp_map = Mid.empty;
   inf_ts = Sts.add ts_real (Sts.singleton ts_int);
   ma_map = Mts.empty;
-  keep_t = false;
   keep_e = false;
   keep_r = false;
   no_ind = false;
@@ -108,7 +110,7 @@ let rec rewriteT kn state t = match t.t_node with
               | Pvar v -> t_let_close_simp v (fs_app pj [t1] v.vs_ty) e
               | _ -> Printer.unsupportedTerm t uncompiled
             in
-            let pjl = Mls.find cs state.pj_map in
+            let pjl = Mls.find cs state.cp_map in
             let e = List.fold_left2 add_var e pl pjl in
             w, Mls.add cs e m
         | { pat_node = Pwild } ->
@@ -129,6 +131,12 @@ let rec rewriteT kn state t = match t.t_node with
       in
       (* Preserve attributes and location of t *)
       t_attr_copy t res
+  | Tapp (ls, args) when ls.ls_constr > 0->
+      let args = List.map (rewriteT kn state) args in
+      t_attr_copy t (t_app (Mls.find ls state.cc_map) args t.t_ty)
+  | Tapp (ls, [arg]) when ls.ls_proj ->
+      let arg = rewriteT kn state arg in
+      t_attr_copy t (t_app (Mls.find ls state.pp_map) [arg] t.t_ty)
   | _ ->
       TermTF.t_map (rewriteT kn state) (rewriteF kn state Svs.empty true) t
 
@@ -156,9 +164,9 @@ and rewriteF kn state av sign f =
         let vl,e = try Mls.find cs m with Not_found ->
           let var = create_vsymbol (id_fresh "w") in
           let get_var pj = var (t_type (t_app_infer pj [t1])) in
-          List.map get_var (Mls.find cs state.pj_map), Opt.get w
+          List.map get_var (Mls.find cs state.cp_map), Opt.get w
         in
-        let hd = t_app cs (List.map t_var vl) t1.t_ty in
+        let hd = t_app (Mls.find cs state.cc_map) (List.map t_var vl) t1.t_ty in
         match t1.t_node with
         | Tvar v when Svs.mem v av ->
             let hd = t_let_close_simp v hd e in if sign
@@ -203,7 +211,7 @@ let add_selector (state,task) ts ty csl =
   let mt_ty = ty_var (create_tvsymbol (id_fresh "a")) in
   let mt_al = ty :: List.rev_map (fun _ -> mt_ty) csl in
   let mt_ls = create_fsymbol mt_id mt_al mt_ty in
-  let mtmap = Mts.add ts mt_ls state.mt_map in
+  let mt_map = Mts.add ts mt_ls state.mt_map in
   let task  = add_param_decl task mt_ls in
   (* define the selector function *)
   let mt_vs _ = create_vsymbol (id_fresh "z") mt_ty in
@@ -213,14 +221,15 @@ let add_selector (state,task) ts ty csl =
     let id = mt_ls.ls_name.id_string ^ "_" ^ cs.ls_name.id_string in
     let pr = create_prsymbol (id_derive id cs.ls_name) in
     let vl = List.rev_map (create_vsymbol (id_fresh "u")) cs.ls_args in
-    let hd = fs_app cs (List.rev_map t_var vl) (Opt.get cs.ls_value) in
+    let newcs = Mls.find cs state.cc_map in
+    let hd = fs_app newcs (List.rev_map t_var vl) (Opt.get cs.ls_value) in
     let hd = fs_app mt_ls (hd::mt_tl) mt_ty in
     let vl = List.rev_append mt_vl (List.rev vl) in
     let ax = t_forall_close vl [] (t_equ hd t) in
     add_prop_decl tsk Paxiom pr ax
   in
   let task = List.fold_left2 mt_add task csl mt_tl in
-  { state with mt_map = mtmap }, task
+  { state with mt_map }, task
 
 let add_selector acc ts ty = function
   | [_] -> acc
@@ -238,7 +247,8 @@ let add_indexer (state,task) ts ty csl =
     let id = mt_ls.ls_name.id_string ^ "_" ^ cs.ls_name.id_string in
     let pr = create_prsymbol (id_derive id cs.ls_name) in
     let vl = List.rev_map (create_vsymbol (id_fresh "u")) cs.ls_args in
-    let hd = fs_app cs (List.rev_map t_var vl) (Opt.get cs.ls_value) in
+    let newcs = Mls.find cs state.cc_map in
+    let hd = fs_app newcs (List.rev_map t_var vl) (Opt.get cs.ls_value) in
     let ax = t_equ (fs_app mt_ls [hd] ty_int) (t_nat_const !index) in
     let ax = t_forall_close (List.rev vl) [[hd]] ax in
     add_prop_decl tsk Paxiom pr ax
@@ -252,8 +262,10 @@ let add_discriminator (state,task) ts ty csl =
     let pr = create_prsymbol (id_derive id ts.ts_name) in
     let ul = List.rev_map (create_vsymbol (id_fresh "u")) c1.ls_args in
     let vl = List.rev_map (create_vsymbol (id_fresh "v")) c2.ls_args in
-    let t1 = fs_app c1 (List.rev_map t_var ul) ty in
-    let t2 = fs_app c2 (List.rev_map t_var vl) ty in
+    let newc1 = Mls.find c1 state.cc_map in
+    let newc2 = Mls.find c2 state.cc_map in
+    let t1 = fs_app newc1 (List.rev_map t_var ul) ty in
+    let t2 = fs_app newc2 (List.rev_map t_var vl) ty in
     let ax = t_neq t1 t2 in
     let ax = t_forall_close (List.rev vl) [[t2]] ax in
     let ax = t_forall_close (List.rev ul) [[t1]] ax in
@@ -267,17 +279,9 @@ let add_discriminator (state,task) ts ty csl =
 
 let add_indexer acc ts ty = function
   | [_] -> acc
-  | _ when (fst acc).keep_t -> acc
-  | csl when not ((fst acc).no_ind) -> add_indexer acc ts ty csl
+  | csl when not (fst acc).no_ind -> add_indexer acc ts ty csl
   | csl when List.length csl <= 16 -> add_discriminator acc ts ty csl
   | _ -> acc
-
-let meta_proj =
-  (* projection symbol, constructor symbol, position, defining axiom *)
-  register_meta "algtype projection" [MTlsymbol;MTlsymbol;MTint;MTprsymbol]
-    ~desc:"Specify@ which@ projection@ symbol@ is@ used@ for@ the@ \
-           given@ constructor@ at@ the@ specified@ position.@ \
-           For@ internal@ use."
 
 (* Adding meta so that counterexamples consider this new projection as a
    counterexample projection. This allow counterexamples to appear for
@@ -288,64 +292,72 @@ let add_meta_cnt tsk ls =
 
 let add_projections (state,task) _ts _ty csl =
   (* declare and define the projection functions *)
-  let pj_add (m,tsk) (cs,pl) =
-    let id = cs.ls_name.id_string ^ "_proj_" in
-    let vl = List.rev_map (create_vsymbol (id_fresh "u")) cs.ls_args in
-    let tl = List.rev_map t_var vl in
-    let hd = fs_app cs tl (Opt.get cs.ls_value) in
-    let c = ref 0 in
-    let add (pjl,tsk) t pj =
-      let ls = incr c; match pj with
-        | Some pj -> pj
-        | None ->
-            let cn = string_of_int !c in
-            let id = id_derive (id ^ cn) cs.ls_name in
-            create_lsymbol id [Opt.get cs.ls_value] t.t_ty
+  let pj_add (cp_map,pp_map,tsk) (cs,pl) =
+    let vl = List.map (create_vsymbol (id_fresh "u")) cs.ls_args in
+    let tl = List.map t_var vl in
+    let hd = fs_app (Mls.find cs state.cc_map) tl (Opt.get cs.ls_value) in
+    let add (pjl,pp_map,tsk) t pj =
+      let pj = Opt.get pj in
+      let ls,pp_map =
+        match Mls.find pj pp_map with
+        | pj -> pj,pp_map
+        | exception Not_found ->
+          let id = id_clone pj.ls_name in
+          let ls = create_lsymbol id pj.ls_args pj.ls_value in
+          ls,Mls.add pj ls pp_map
       in
       let tsk = add_param_decl tsk ls in
       let id = id_derive (ls.ls_name.id_string ^ "'def") ls.ls_name in
       let pr = create_prsymbol id in
       let hh = t_app ls [hd] t.t_ty in
-      let ax = t_forall_close (List.rev vl) [] (t_equ hh t) in
-      let mal = [MAls ls; MAls cs; MAint (!c - 1); MApr pr] in
+      let ax = t_forall_close vl [] (t_equ hh t) in
       let tsk = add_prop_decl tsk Paxiom pr ax in
       let tsk = add_meta_cnt tsk ls in
-      let tsk = if state.keep_t then add_meta tsk meta_proj mal else tsk in
-      ls::pjl, tsk
+      ls::pjl,pp_map,tsk
     in
-    let pjl,tsk = List.fold_left2 add ([],tsk) tl pl in
-    Mls.add cs (List.rev pjl) m, tsk
+    let pjl,pp_map,tsk = List.fold_left2 add ([],pp_map,tsk) tl pl in
+    Mls.add cs (List.rev pjl) cp_map, pp_map, tsk
   in
-  let pjmap, task = List.fold_left pj_add (state.pj_map, task) csl in
-  { state with pj_map = pjmap }, task
+  let cp_map, pp_map, task =
+    List.fold_left pj_add (state.cp_map, state.pp_map, task) csl
+  in
+  { state with cp_map; pp_map }, task
 
 let add_inversion (state,task) ts ty csl =
-  if state.keep_t || state.no_inv then state, task else
+  if state.no_inv then state, task else
   (* add the inversion axiom *)
   let ax_id = ts.ts_name.id_string ^ "_inversion" in
   let ax_pr = create_prsymbol (id_derive ax_id ts.ts_name) in
   let ax_vs = create_vsymbol (id_fresh "u") ty in
   let ax_hd = t_var ax_vs in
   let mk_cs (cs,_) =
-    let pjl = Mls.find cs state.pj_map in
+    let pjl = Mls.find cs state.cp_map in
     let app pj = t_app_infer pj [ax_hd] in
+    let cs = Mls.find cs state.cc_map in
     t_equ ax_hd (fs_app cs (List.map app pjl) ty) in
   let ax_f = Lists.map_join_left mk_cs t_or csl in
   let ax_f = t_forall_close [ax_vs] [] ax_f in
   state, add_prop_decl task Paxiom ax_pr ax_f
 
-let add_type (state,task) (ts,csl) =
-  (* declare constructors as abstract functions *)
-  let cs_add tsk (cs,_) = add_param_decl tsk cs in
-  let task =
-    if state.keep_t then task else List.fold_left cs_add task csl in
-  (* add selector, projections, and inversion axiom *)
+let add_enc_type (state,task) (ts,csl) =
   let ty = ty_app ts (List.map ty_var ts.ts_args) in
+  (* declare constructors as abstract functions *)
+  let cs_add (state,tsk) (cs,_) =
+    let id = id_clone cs.ls_name in
+    let ls = create_lsymbol id cs.ls_args cs.ls_value in
+    { state with cc_map = Mls.add cs ls state.cc_map },add_param_decl tsk ls
+  in
+  let state,task = List.fold_left cs_add (state,task) csl in
+  (* add selector, projections, and inversion axiom *)
   let state,task = add_selector (state,task) ts ty csl in
   let state,task = add_indexer (state,task) ts ty csl in
   let state,task = add_projections (state,task) ts ty csl in
   let state,task = add_inversion (state,task) ts ty csl in
   state, task
+
+let add_kept_type (state,task) (ts,csl) =
+  let ty = ty_app ts (List.map ty_var ts.ts_args) in
+  add_selector (state,task) ts ty csl
 
 let add_tags mts (state,task) (ts,csl) =
   let rec mat_ts sts ts csl =
@@ -374,17 +386,55 @@ let add_tags mts (state,task) (ts,csl) =
     let state = { state with inf_ts = Sts.add ts state.inf_ts } in
     state, add_meta task meta_infinite [MAts ts]
 
+let keep_ty state syms = function
+  | ts, [_,_::_] when state.keep_r && not (Sid.mem ts.ts_name syms) ->
+    true
+  | { ts_args = [] }, csl
+       when state.keep_e && List.for_all (fun (_,l) -> l = []) csl ->
+     true
+  | _ -> false
+
 let comp t (state,task) = match t.task_decl.td_node with
-  | Decl { d_node = Ddata dl } ->
+  | Decl ({ d_node = Ddata dl } as d) ->
       (* add type declarations *)
-      let conv (cs,pjl) = cs, List.map (fun _ -> None) pjl in
-      let conv (ts,csl) = ts, List.map conv csl in
-      let task = if state.keep_t
-        then add_data_decl task (List.map conv dl)
-        else List.fold_left (fun t (ts,_) -> add_ty_decl t ts) task dl
+      let conv_c (c, pjl) =
+        let conv_p i = function
+          | (None, ty) ->
+            let id = Printf.sprintf "%s_proj_%d" c.ls_name.id_string (i+1) in
+            let id = id_derive id c.ls_name in
+            Some (create_fsymbol ~proj:true id [Opt.get c.ls_value] ty)
+          | (pj, _) -> pj
+        in
+        (c, List.mapi conv_p (List.combine pjl c.ls_args))
+      in
+      let conv_t (ts, csl) = (ts, List.map conv_c csl) in
+      let dl = List.map conv_t dl in
+      let concrete_dl, abstract_dl =
+        List.partition (keep_ty state (get_used_syms_decl d)) dl
+      in
+      let task =
+        List.fold_left (fun t (ts,_) -> add_ty_decl t ts) task abstract_dl
+      in
+      let task =
+        if concrete_dl = [] then task else add_data_decl task concrete_dl
+      in
+      let state =
+        let fold_pjs pp_map = function
+          | None -> pp_map
+          | Some pj -> Mls.add pj pj pp_map
+        in
+        let fold_c state (c, pjs) =
+          let cc_map = Mls.add c c state.cc_map in
+          let cp_map = Mls.add c (List.map Opt.get pjs) state.cp_map in
+          let pp_map = List.fold_left fold_pjs state.pp_map pjs  in
+          { state with cc_map; cp_map; pp_map }
+        in
+        let fold_d state (_, csl) = List.fold_left fold_c state csl in
+        List.fold_left fold_d state concrete_dl
       in
       (* add needed functions and axioms *)
-      let state, task = List.fold_left add_type (state,task) dl in
+      let state, task = List.fold_left add_enc_type (state,task) abstract_dl in
+      let state, task = List.fold_left add_kept_type (state,task) concrete_dl in
       (* add the tags for infitite types and material arguments *)
       let mts = List.fold_right (fun (t,l) -> Mts.add t l) dl Mts.empty in
       let state, task = List.fold_left (add_tags mts) (state,task) dl in
@@ -403,27 +453,15 @@ let comp t (state,task) = match t.task_decl.td_node with
       let ml = Array.set ma i true; Array.to_list ma in
       let state = { state with ma_map = Mts.add ts ml state.ma_map } in
       state, add_tdecl task t.task_decl
+  | Meta (m, args) ->
+      let conv = function
+        | MAls p when p.ls_proj -> MAls (Mls.find p state.pp_map)
+        | MAls c when c.ls_constr > 0 -> MAls (Mls.find c state.cc_map)
+        | m -> m
+      in
+      state, add_meta task m (List.map conv args)
   | _ ->
       state, add_tdecl task t.task_decl
-
-let comp t (state,task) = match t.task_decl.td_node with
-  | Decl ({ d_node = Ddata dl } as d) ->
-      (* are we going to keep this type? *)
-      let old_keep_t = state.keep_t in
-      let state = match dl with
-        | _ when state.keep_t -> state
-        | [ts, [_,_::_]]
-          when state.keep_r && not (Sid.mem ts.ts_name (get_used_syms_decl d)) ->
-            { state with keep_t = true }
-        | [{ ts_args = [] }, csl]
-          when state.keep_e && List.for_all (fun (_,l) -> l = []) csl ->
-            { state with keep_t = true }
-        | _ -> state
-      in
-      let state,task = comp t (state,task) in
-      { state with keep_t = old_keep_t }, task
-  | _ ->
-      comp t (state,task)
 
 let comp t (state,task) = match t.task_decl.td_node with
   | Use {th_decls = [{td_node = Decl ({d_node = Ddata [ts,_]})}]}
@@ -457,7 +495,6 @@ let eliminate_match =
 
 let meta_elim = register_meta "eliminate_algebraic" [MTstring]
   ~desc:"@[<hov 2>Configure the 'eliminate_algebraic' transformation:@\n\
-    - keep_types:   @[keep algebraic type definitions@]@\n\
     - keep_enums:   @[keep monomorphic enumeration types@]@\n\
     - keep_recs:    @[keep non-recursive records@]@\n\
     - no_index:     @[do not generate indexing functions@]@\n\
@@ -468,7 +505,6 @@ let eliminate_algebraic = Trans.compose compile_match
   (Trans.on_meta meta_elim (fun ml ->
     let st = empty_state in
     let check st = function
-      | [MAstr "keep_types"] -> { st with keep_t = true }
       | [MAstr "keep_enums"] -> { st with keep_e = true }
       | [MAstr "keep_recs"]  -> { st with keep_r = true }
       | [MAstr "no_index"]   -> { st with no_ind = true }
@@ -489,46 +525,60 @@ let eliminate_algebraic = Trans.compose compile_match
 
 (** Eliminate user-supplied projection functions *)
 
-let elim_proj keep_rec d = match d.d_node with
-  | Ddata dl ->
-      (* add type declarations *)
-      let conv (cs,pjl) = cs, List.map (fun _ -> None) pjl in
-      let conv (ts,csl) = match csl with
-        | [_] when keep_rec -> ts,csl
-        | _ -> ts,List.map conv csl
-      in
-      let td = create_data_decl (List.map conv dl) in
-      (* add projection definitions *)
-      let add vs csl acc pj =
-        let mk_b (cs,pjl) =
-          let mk_v = create_vsymbol (id_fresh "x") in
-          let vl = List.map mk_v cs.ls_args in
-          let p = pat_app cs (List.map pat_var vl) vs.vs_ty in
-          let find acc v = function
-            | Some ls when ls_equal ls pj -> t_var v
-            | _ -> acc in
-          let t = List.fold_left2 find t_true vl pjl in
-          t_close_branch p t in
-        let bl = List.map mk_b csl in
-        let f = t_case (t_var vs) bl in
-        let def = make_ls_defn pj [vs] f in
-        create_logic_decl [def] :: acc
-      in
-      let add acc (_,csl) =
-        match csl with
-        | [_] when keep_rec -> acc
-        | _ ->
-           let (cs,pjl) = List.hd csl in
-           let ty = Opt.get cs.ls_value in
-           let vs = create_vsymbol (id_fresh "v") ty in
-           let get l = function Some p -> p::l | _ -> l in
-           let pjl = List.fold_left get [] pjl in
-           List.fold_left (add vs csl) acc pjl
-      in
-      td :: List.rev (List.fold_left add [] dl)
-  | _ -> [d]
+let rec rewrite map t = match t.t_node with
+  | Tapp (ls, [arg]) when ls.ls_proj ->
+      let arg = rewrite map arg in
+      t_attr_copy t (t_app (Mls.find_def ls ls map) [arg] t.t_ty)
+  | _ -> t_map (rewrite map) t
 
-let eliminate_projections = Trans.decl (elim_proj false) None
+let elim_proj keep_rec t (map,task) = match t.task_decl.td_node with
+  | Decl { d_node = Ddata dl } ->
+    (* add type declarations *)
+    let conv (cs,pjl) = cs, List.map (fun _ -> None) pjl in
+    let conv (ts,csl) = match csl with
+      | [_] when keep_rec -> ts,csl
+      | _ -> ts,List.map conv csl
+    in
+    let task = add_data_decl task (List.map conv dl) in
+    (* add projection definitions *)
+    let add vs csl (map,task) pj =
+      let mk_b (cs,pjl) =
+        let mk_v = create_vsymbol (id_fresh "x") in
+        let vl = List.map mk_v cs.ls_args in
+        let p = pat_app cs (List.map pat_var vl) vs.vs_ty in
+        let find acc v = function
+          | Some ls when ls_equal ls pj -> t_var v
+          | _ -> acc in
+        let t = List.fold_left2 find t_true(*dummy*) vl pjl in
+        t_close_branch p t in
+      let bl = List.map mk_b csl in
+      let f = t_case (t_var vs) bl in
+      let id = id_clone pj.ls_name in
+      let pj_new = create_lsymbol id pj.ls_args pj.ls_value in
+      let def = make_ls_defn pj_new [vs] f in
+      Mls.add pj pj_new map,add_logic_decl task [def]
+    in
+    let add (map,task) (_,csl) =
+      match csl with
+      | [_] when keep_rec -> (map,task)
+      | _ ->
+         let (cs,pjl) = List.hd csl in
+         let ty = Opt.get cs.ls_value in
+         let vs = create_vsymbol (id_fresh "v") ty in
+         let pjl = List.filter_map Fun.id pjl in
+         List.fold_left (add vs csl) (map,task) pjl
+    in
+    List.fold_left add (map,task) dl
+  | Decl d -> map, add_decl task (Decl.decl_map (rewrite map) d)
+  | Meta (m, args) ->
+     let conv = function
+       | MAls p when p.ls_proj -> MAls (Mls.find_def p p map)
+       | m -> m
+     in
+     map, add_meta task m (List.map conv args)
+  | _ -> map, add_tdecl task t.task_decl
+
+let eliminate_projections = Trans.fold_map (elim_proj false) Mls.empty None
 
 let () =
   Trans.register_transform "compile_match" compile_match
@@ -541,14 +591,13 @@ let () =
   Trans.register_transform "eliminate_projections" eliminate_projections
     ~desc:"Define@ algebraic@ projection@ symbols@ separately."
 
-
 (** conditional transformations, only applied when polymorphic types occur *)
 
 let eliminate_algebraic_if_poly =
   Trans.on_meta Detect_polymorphism.meta_monomorphic_types_only
     (function
     | [] -> eliminate_algebraic
-    | _ -> Trans.compose compile_match (Trans.decl (elim_proj true) None))
+    | _ -> Trans.compose compile_match (Trans.fold_map (elim_proj true) Mls.empty None))
 
 let () =
   Trans.register_transform "eliminate_algebraic_if_poly"

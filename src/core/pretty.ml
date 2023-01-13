@@ -928,6 +928,8 @@ let () = Exn_printer.register
         Ident.print_decoded s
   | Decl.NoTerminationProof ls ->
       fprintf fmt "Cannot prove termination for %a" print_ls ls
+  | Decl.UnexpectedProjOrConstr ls ->
+      fprintf fmt "Unexpected projection or constructor symbol %a" print_ls ls
   | NonLocal id -> Format.fprintf fmt
       "Non-local symbol: %a" print_id id
   | CannotInstantiate id -> Format.fprintf fmt

@@ -11,9 +11,6 @@
 
 val compile_match : Task.task Trans.trans
 
-val meta_proj : Theory.meta (* [MTlsymbol; MTlsymbol; MTint; MTprsymbol] *)
-(* projection symbol, constructor symbol, position, defining axiom *)
-
 (* a type constructor generates an infinite type if either it is tagged by
    meta_infinite or one of its "material" arguments is an infinite type *)
 
