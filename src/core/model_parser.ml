@@ -77,7 +77,7 @@ type concrete_syntax_term =
   | Quant of concrete_syntax_quant * concrete_syntax_term list * concrete_syntax_term
   | Binop of concrete_syntax_binop * concrete_syntax_term * concrete_syntax_term
   | Not of concrete_syntax_term
-  | Function of bool * string list * concrete_syntax_term
+  | Function of { is_array: bool; args: string list ; body: concrete_syntax_term }
   | Record of (string * concrete_syntax_term) list
 
 let rec get_elts_others x body =
@@ -133,7 +133,7 @@ let rec print_concrete_term fmt ct =
       op_string
       print_concrete_term t2
   | Not ct' -> fprintf fmt "not (%a)" print_concrete_term ct'
-  | Function (true,[x],t) ->
+  | Function {is_array=true; args=[x]; body=t} ->
     let print_indice_value fmt (indice,value) =
       fprintf fmt "%a => %a"
         print_concrete_term indice
@@ -143,8 +143,7 @@ let rec print_concrete_term fmt ct =
     fprintf fmt "[|%a; _ => %a|]"
       (Pp.print_list Pp.comma print_indice_value) elts
       print_concrete_term others
-  | Function (true,_,_) -> fprintf fmt "ERROR TODO_WIP"
-  | Function (false,args,body) ->
+  | Function {args; body} ->
     fprintf fmt "fun (%a) -> %a"
       (Pp.print_list Pp.comma Pp.print_string) args
       print_concrete_term body
@@ -179,7 +178,7 @@ let rec subst_concrete_term subst t =
   | Binop (op,ct1,ct2) ->
     Binop (op, subst_concrete_term subst ct1, subst_concrete_term subst ct2)
   | Not ct -> Not (subst_concrete_term subst ct)
-  | Function (is_array,args,ct) -> Function (is_array,args, subst_concrete_term subst ct)
+  | Function {is_array; args; body} -> Function {is_array; args; body= subst_concrete_term subst body}
   | Record fields_values ->
     Record (
       List.map
@@ -541,7 +540,7 @@ let rec json_of_concrete_term ct =
       ]
     ]
   | Not t' -> Record [ "Not", json_of_concrete_term t' ]
-  | Function (true,[x],body) ->
+  | Function {is_array=true; args=[x]; body} ->
     let (elts,others) = get_elts_others x body in
     Record [
       "Array",
@@ -559,8 +558,7 @@ let rec json_of_concrete_term ct =
         "array_others", json_of_concrete_term others
       ]
     ]
-  | Function (true,_,_) -> String "TODO_WIP"
-  | Function (false,args,body) ->
+  | Function {args; body} ->
     Record [
       "Function",
       Record [
@@ -941,7 +939,10 @@ let read_one_fields ~attrs value = attrs, value
       attrs, List.fold_left add_record value field_names
 *)
 
-let remove_field : (Sattr.t * term -> Sattr.t * term) ref = ref (fun x -> x)
+let remove_field :
+    ( Sattr.t * term * concrete_syntax_term ->
+      Sattr.t * term * concrete_syntax_term ) ref =
+  ref (fun x -> x)
 let register_remove_field f = remove_field := f
 
 (** Build the model by adding the element at all relevant locations *)
@@ -955,11 +956,12 @@ let build_model_rec pm (elts: model_element list) : model_files =
       Pretty.print_attrs attrs;
     (* Remove some specific record field related to the front-end language.
         This function is registered. *)
-    let attrs, me_value = !remove_field (attrs, me.me_value) in
+    let attrs, me_value, me_concrete_value =
+      !remove_field (attrs, me.me_value, me.me_concrete_value) in
     Some {
       me_kind= Other;
       me_value;
-      me_concrete_value= me.me_concrete_value; (* TODO_WIP *)
+      me_concrete_value;
       me_location= me.me_location;
       me_attrs= attrs;
       me_lsymbol= me.me_lsymbol

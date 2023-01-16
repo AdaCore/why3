@@ -38,6 +38,9 @@ type model_element_kind =
 
 val print_model_kind : Format.formatter -> model_element_kind -> unit
 
+(* Concrete syntax for model element values
+   (used for pretty printing and JSON printing) *)
+
 type concrete_syntax_bv = string
 
 type concrete_syntax_float =
@@ -67,7 +70,7 @@ type concrete_syntax_term =
   | Quant of concrete_syntax_quant * concrete_syntax_term list * concrete_syntax_term
   | Binop of concrete_syntax_binop * concrete_syntax_term * concrete_syntax_term
   | Not of concrete_syntax_term
-  | Function of bool * string list * concrete_syntax_term
+  | Function of { is_array: bool; args: string list ; body: concrete_syntax_term }
   | Record of (string * concrete_syntax_term) list
 
 val print_concrete_term : Format.formatter -> concrete_syntax_term -> unit
@@ -305,7 +308,9 @@ type model_parser = Printer.printing_info -> string -> model
 type raw_model_parser = Printer.printing_info -> string -> model_element list
 
 val register_remove_field:
-  (Ident.Sattr.t * Term.term -> Ident.Sattr.t * Term.term) -> unit
+  ( Ident.Sattr.t * Term.term * concrete_syntax_term ->
+    Ident.Sattr.t * Term.term * concrete_syntax_term ) ->
+  unit
 
 val register_model_parser : desc:Pp.formatted -> string -> raw_model_parser -> unit
 

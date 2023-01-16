@@ -420,7 +420,9 @@ end
 *)
 
 module FromModelToTerm = struct
-  exception E of string
+  exception E_parsing of string
+  exception E_concrete_syntax of string
+
   exception NoArgConstructor
   exception UnknownType
   exception NoBuiltinSymbol
@@ -430,7 +432,8 @@ module FromModelToTerm = struct
   exception Float_Infinity
   exception Float_Error
 
-  let error fmt = Format.kasprintf (fun msg -> raise (E msg)) fmt
+  let error fmt = Format.kasprintf (fun msg -> raise (E_parsing msg)) fmt
+  let error_concrete_syntax fmt = Format.kasprintf (fun msg -> raise (E_parsing msg)) fmt
 
   type env = {
     (* Why3 environment, used to retrieve builtin theories. *)
@@ -887,13 +890,10 @@ module FromModelToTerm = struct
           let vs_args, _, t' = t_open_lambda t in
           let subst = Mvs.of_list (List.combine vs_args ts') in
           begin match t_concrete with
-          | Function (_, args_concrete, t'_concrete) ->
+          | Function {args=args_concrete; body=t'_concrete} ->
             let subst_concrete = Mstr.of_list (List.combine args_concrete ts'_concrete) in
             (t_subst subst t', subst_concrete_term subst_concrete t'_concrete)
-          | _ -> 
-            Debug.dprintf debug "t_concrete = %a@."
-              print_concrete_term t_concrete;
-            error "TODO_WIP (apply_to_term #1)"
+          | _ -> error_concrete_syntax "TODO_WIP"
           end
         with _ -> (
           (* if it fails, we search for [n] in constructors and in builtin symbols *)
@@ -922,13 +922,10 @@ module FromModelToTerm = struct
           let vs_args, _, t' = t_open_lambda t in
           let subst = Mvs.of_list (List.combine vs_args ts') in
           begin match t_concrete with
-          | Function (_, args_concrete, t'_concrete) ->
+          | Function {args=args_concrete; body=t'_concrete}->
             let subst_concrete = Mstr.of_list (List.combine args_concrete ts'_concrete) in
             (t_subst subst t', subst_concrete_term subst_concrete t'_concrete)
-          | _ ->
-            Debug.dprintf debug "t_concrete = %a@."
-              print_concrete_term t_concrete;
-            error "TODO_WIP (apply_to_term #2)"
+          | _ -> error_concrete_syntax "TODO_WIP"
           end
         with _ -> (
           (* if it fails, we search for [n] in constructors and in builtin symbols *)
@@ -983,7 +980,7 @@ module FromModelToTerm = struct
         (t_others, others_concrete)
         elts.array_indices
     in
-    (t_lambda [ vs_arg ] [] a, Function (true, [vs_name], a_concrete))
+    (t_lambda [ vs_arg ] [] a, Function {is_array=true; args=[vs_name]; body=a_concrete})
 
   let smt_term_to_term ~fmla env t s =
     Debug.dprintf debug "[smt_term_to_term] t = %a@." print_term t;
@@ -1083,7 +1080,7 @@ module FromModelToTerm = struct
             (fun vs -> Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs)
             (Mstr.values env.bound_vars)
         in
-        Function (false,args,t_body_concrete) (* TODO_WIP *)
+        Function {is_array=false; args; body=t_body_concrete}
     in
     Debug.dprintf debug "[interpret_fun_def_to_term] t = %a@."
       Pretty.print_term t;
@@ -1178,7 +1175,11 @@ module FromModelToTerm = struct
               (fun x -> eval_term env ~eval_prover_var seen_prover_vars terms x) ts')
           in
           (t_app ls ts ls.ls_value, Apply (ls_name, ts_concrete))
-        with _ -> error "TODO_WIP (eval_term Tapp)"
+        with _ ->
+          error_concrete_syntax "Mismatch between term %a and concrete term %a:@\
+            arity of application function is not the same"
+            Pretty.print_term t
+            print_concrete_term t_concrete
         end
     | Term.Tif (b, t1, t2), If (b_concrete, t1_concrete, t2_concrete) ->
         let b', b'_concrete =
@@ -1204,21 +1205,21 @@ module FromModelToTerm = struct
             (t_eps_close vs t'_eval, Epsilon (eps_x, t'_eval_concrete))
           | Const (Float _) -> (t,t_concrete)
           | _ ->
-            Debug.dprintf debug "t_concrete = %a@."
-              print_concrete_term t_concrete;
-            error "TODO_WIP (eval_term Teps Epsilon)"
+            error_concrete_syntax "Unexpected concrete term %a for epsilon term %a"
+              print_concrete_term t_concrete
+              Pretty.print_term t
           end
         | vsl, trig, t' ->
             let is_array, vsl_concrete, t'_concrete = match t_concrete with
-              | Function (is_array, args, body) -> is_array, args, body
+              | Function {is_array; args; body} -> is_array, args, body
               | _ ->
-                Debug.dprintf debug "t_concrete = %a@."
-                  print_concrete_term t_concrete;
-                error "TODO_WIP (eval_term Teps Function)"
+                error_concrete_syntax "Unexpected concrete term %a for lambda term %a"
+                  print_concrete_term t_concrete
+                  Pretty.print_term t
             in
             let t'_eval, t'_eval_concrete =
               eval_term env ~eval_prover_var seen_prover_vars terms (t',t'_concrete) in
-            (t_lambda vsl trig t'_eval, Function (is_array, vsl_concrete, t'_eval_concrete)))
+            (t_lambda vsl trig t'_eval, Function {is_array; args=vsl_concrete; body=t'_eval_concrete}))
     | Term.Tquant (q, tq), Quant (q_concrete, vars_concrete, t_concrete) ->
         let vsl, trig, t' = t_open_quant tq in
         let t',t'_concrete =
@@ -1334,7 +1335,7 @@ module FromModelToTerm = struct
               let aux (_, (ls', t', t'_concrete)) =
                 let vs_list', _, t' = t_open_lambda t' in
                 match t'_concrete with
-                | Function (_, args_concrete, t'_concrete) ->
+                | Function {args=args_concrete; body=t'_concrete} ->
                   let vs', vs'_concrete_name =
                     match vs_list', args_concrete with
                     | [ vs' ], [ vs_name ] -> vs', vs_name
@@ -1357,9 +1358,9 @@ module FromModelToTerm = struct
                   ( t_equ (t_app ls' [ t_var x ] ls'.ls_value) t',
                     concrete_apply_equ (Apply (ls'_name, [ Var x_name ])) t'_concrete )
                 | _ ->
-                  Debug.dprintf debug "t'_concrete = %a@."
-                    print_concrete_term t'_concrete;
-                  error "TODO_WIP (eval)"
+                  error_concrete_syntax "Function expected instead of concrete term %a for term %a"
+                    print_concrete_term t'_concrete
+                    Pretty.print_term t'
               in
               let l', l'_concrete = List.split (List.map aux l) in
               let f = t_and_l l' in
@@ -1405,7 +1406,11 @@ module FromModelToTerm = struct
             List.split (List.map (maybe_convert_epsilon_terms env ) ts')
           in
           (t_app ls ts ls.ls_value, Apply (ls_name, ts_concrete))
-        with _ -> error "TODO_WIP (maybe_convert_epsilon_terms Tapp)"
+        with _ ->
+          error_concrete_syntax "Mismatch between term %a and concrete term %a:@\
+            arity of application function is not the same"
+            Pretty.print_term t
+            print_concrete_term t_concrete
         end
     | Term.Tif (b, t1, t2), If (b_concrete, t1_concrete, t2_concrete) ->
         let b', b'_concrete = maybe_convert_epsilon_terms env (b,b_concrete) in
@@ -1431,20 +1436,20 @@ module FromModelToTerm = struct
               end
             | Const (Float _) -> (t,t_concrete)
             | _ ->
-              Debug.dprintf debug "t_concrete = %a@."
-                print_concrete_term t_concrete;
-              error "TODO_WIP (maybe_convert_epsilon_terms Teps Epsilon)"
+              error_concrete_syntax "Unexpected concrete term %a for epsilon term %a"
+                print_concrete_term t_concrete
+                Pretty.print_term t
             end
         | vsl, trig, t' ->
             let is_array, vsl_concrete, t'_concrete = match t_concrete with
-              | Function (is_array, args, body) -> is_array, args, body
+              | Function {is_array; args; body} -> is_array, args, body
               | _ ->
-                Debug.dprintf debug "t_concrete = %a@."
-                  print_concrete_term t_concrete;
-                error "TODO_WIP (maybe_convert_epsilon_terms Teps Function)"
+                error_concrete_syntax "Unexpected concrete term %a for lambda term %a"
+                  print_concrete_term t_concrete
+                  Pretty.print_term t
             in
             let t', t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in
-            (t_lambda vsl trig t', Function (is_array, vsl_concrete, t'_concrete)))
+            (t_lambda vsl trig t', Function {is_array; args=vsl_concrete; body=t'_concrete}))
     | Term.Tquant (q, tq), Quant (q_concrete, vars_concrete, t_concrete) ->
         let vsl, trig, t' = t_open_quant tq in
         let t',t'_concrete = maybe_convert_epsilon_terms env (t',t_concrete) in
@@ -1589,7 +1594,7 @@ module FromModelToTerm = struct
                 check_fun_def_type env ls def;
                 Some def
               with
-              | E str ->
+              | E_parsing str | E_concrete_syntax str ->
                   Debug.dprintf debug "Error while interpreting %s: %s@." n str;
                   None
               | _ ->
@@ -1609,7 +1614,7 @@ module FromModelToTerm = struct
               let (t,t_concrete) = interpret_fun_def_to_term ~fmla:false env def in
               env.prover_fun_defs <- Mstr.add n (t,t_concrete) env.prover_fun_defs
             with
-            | E str ->
+            | E_parsing str | E_concrete_syntax str ->
                 Debug.dprintf debug "Error while interpreting %s: %s@." n str
             | _ -> Debug.dprintf debug "Error while interpreting %s@." n))
       prover_fun_defs;
@@ -1625,7 +1630,7 @@ module FromModelToTerm = struct
                 let (t, t_concrete) = interpret_fun_def_to_term ~fmla env def in
                 Some ((ls, oloc, attrs), (t, t_concrete))
               with
-              | E str ->
+              | E_parsing str | E_concrete_syntax str ->
                   Debug.dprintf debug "Error while interpreting %s: %s@." n str;
                   None
               | _ ->
@@ -1673,10 +1678,14 @@ let () =
              definition:@ cannot@ read@ the@ following@ S-expression@ as@ %s:@ \
              %a"
             s FromSexpToModel.pp_sexp sexp
-      | FromModelToTerm.E msg ->
+      | FromModelToTerm.E_parsing msg ->
           Format.fprintf fmt
             "Error@ while@ parsing@ SMT@ model@ from@ model@ definition@ to@ \
              term:@ %s"
+            msg
+      | FromModelToTerm.E_concrete_syntax msg ->
+          Format.fprintf fmt
+            "Mismatch@ error@ between@ term@ and@ concrete@ syntax:@ %s"
             msg
       | _ -> raise exn)
 
