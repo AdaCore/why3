@@ -373,7 +373,7 @@ let json_lsymbol ls =
     "loc", json_loc ls.ls_name.id_loc;
   ]
 
-let json_vsymbol vs =
+let json_vsymbol ?(forget=true) vs =
   let open Pretty in
   let open Json_base in
   let vs_name = Format.asprintf "@[<h>%a@]" print_vs_qualified vs in
@@ -387,7 +387,7 @@ let rec json_of_term t =
   let open Pretty in
   match t.t_node with
   | Tvar vs -> Record [
-    "Tvar", json_vsymbol vs
+    "Tvar", json_vsymbol ~forget:false vs
   ]
   | Tconst c ->
     let const_type = match c with
@@ -440,7 +440,7 @@ let rec json_of_term t =
       "quant", String quant;
       "quant_vs", List (List.map (fun vs -> json_vsymbol vs) vsl);
       "quant_t", json_of_term t' ]
-  ]
+    ]
   | Tbinop (op,t1,t2) ->
     let binop = match op with
     | Tand -> "Tand"

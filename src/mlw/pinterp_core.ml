@@ -256,7 +256,8 @@ and print_value' fmt v =
         Pp.(let start = constant_formatted "@ with " in
             print_list_delim ~start ~sep:comma ~stop:nothing
               (print_pair_delim nothing equal nothing print_vs print_value))
-        (Mvs.bindings mvs)
+        (Mvs.bindings mvs);
+      forget_var vs
   | Vproj (ls, v) ->
       fprintf fmt "{%a => %a}" print_ls ls print_value v
   | Vconstr (Some rs, fs, vs) ->

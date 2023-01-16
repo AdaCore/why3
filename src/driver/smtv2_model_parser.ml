@@ -957,6 +957,7 @@ module FromModelToTerm = struct
     let ty2 = smt_sort_to_ty env s2 in
     let vs_arg = create_vsymbol (Ident.id_fresh "x") ty1 in
     let vs_name = Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs_arg in
+    Pretty.forget_var vs_arg;
     let mk_case key value (t, t_concrete) =
       let key,key_concrete = term_to_term env key in
       let value,value_concrete = term_to_term env value in
@@ -1082,6 +1083,9 @@ module FromModelToTerm = struct
         in
         Function {is_array=false; args; body=t_body_concrete}
     in
+    List.iter
+      Pretty.forget_var
+      (Mstr.values env.bound_vars);
     Debug.dprintf debug "[interpret_fun_def_to_term] t = %a@."
       Pretty.print_term t;
     Debug.dprintf debug "[interpret_fun_def_to_term] t_concrete = %a@."
@@ -1328,10 +1332,12 @@ module FromModelToTerm = struct
         Ty.Mty.iter
           (fun ty vs ->
             let vs_name = Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs in
+            Pretty.forget_var vs;
             let create_epsilon_term ty l =
               (* create a fresh vsymbol for the variable bound by the epsilon term *)
               let x = create_vsymbol (Ident.id_fresh "x") ty in
               let x_name = Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified x in
+              Pretty.forget_var x;
               let aux (_, (ls', t', t'_concrete)) =
                 let vs_list', _, t' = t_open_lambda t' in
                 match t'_concrete with
