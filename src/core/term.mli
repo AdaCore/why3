@@ -580,6 +580,11 @@ val t_app_map :
 val t_app_fold :
   ('a -> lsymbol -> ty list -> ty option -> 'a) -> 'a -> term -> 'a
 
+(** Fold over pattern matching (Requires pattern matching to be compiled) *)
+
+val t_case_fold :
+  ('a -> tysymbol -> ty list -> ty option -> 'a) -> 'a -> term -> 'a
+
 (** {2 Subterm occurrence check and replacement} *)
 
 val t_occurs  : term -> term -> bool

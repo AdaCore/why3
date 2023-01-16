@@ -1202,6 +1202,24 @@ let rec t_app_fold fn acc t =
     | Tapp (ls,tl) -> fn acc ls (List.map t_type tl) t.t_ty
     | _ -> acc
 
+(* Fold over pattern matching *)
+
+let rec t_case_fold fn acc t =
+  let acc = t_fold_unsafe (t_case_fold fn) acc t in
+  match t.t_node with
+    | Tcase({ t_ty = Some({ty_node = Tyapp (tys, tyl)})}, bl) ->
+       let error () = failwith "t_case_fold: compiled pattern matching required." in
+       let check_branch = function
+         | ({pat_node = Pwild}, _, _) -> ()
+         | ({pat_node = Papp (_, args)}, _, _) ->
+            List.iter (function {pat_node = Pvar _} -> () | _ -> error ()) args
+         | _ -> error ()
+       in
+       List.iter check_branch bl;
+       fn acc tys tyl t.t_ty
+    | Tcase(_, _) -> assert false
+    | _ -> acc
+
 (* Type- and binding-safe traversal *)
 
 let t_map fn t = match t.t_node with

@@ -63,8 +63,15 @@ let deco_term kept tvar =
 let deco_decl kept d = match d.d_node with
   | Dtype { ts_def = Alias _ } -> []
   | Dtype ts -> [d; lsdecl_of_ts ts]
-  | Ddata _ -> Printer.unsupportedDecl d
-      "Algebraic types are not supported, run eliminate_algebraic"
+  | Ddata dl ->
+     let kept_d (_, csl) =
+       Sty.mem (Opt.get ((fst (List.hd csl)).ls_value)) kept
+     in
+     if List.for_all kept_d dl then
+       d :: List.map (fun (ts, _) -> lsdecl_of_ts ts) dl
+     else
+       Printer.unsupportedDecl d
+         "Non-kept algebraic types are not supported, run eliminate_algebraic"
   | Dparam _ -> [d]
   | Dlogic [ls,ld] when not (Sid.mem ls.ls_name (get_used_syms_decl d)) ->
       let f = t_type_close (deco_term kept) (ls_defn_axiom ld) in

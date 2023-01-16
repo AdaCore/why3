@@ -271,8 +271,15 @@ end
 let decl kept d = match d.d_node with
   | Dtype { ts_def = Alias _ } -> []
   | Dtype ts -> d :: Lib.lsdecl_of_ts_select ts
-  | Ddata _ -> Printer.unsupportedDecl d
-      "Algebraic types are not supported, run eliminate_algebraic"
+  | Ddata dl ->
+     let kept_d (_, csl) =
+       Sty.mem (Opt.get ((fst (List.hd csl)).ls_value)) kept
+     in
+     if List.for_all kept_d dl then
+       d :: List.concat (List.map (fun (ts, _) -> Lib.lsdecl_of_ts_select ts) dl)
+     else
+       Printer.unsupportedDecl d
+         "Non-kept algebraic types are not supported, run eliminate_algebraic"
   | Dparam ls -> Transform.param_transform kept ls
   | Dlogic ldl -> Transform.logic_transform kept d ldl
   | Dind (s, idl) -> Transform.ind_transform kept s idl

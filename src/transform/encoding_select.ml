@@ -45,11 +45,17 @@ let is_local = function
 module Kept = struct
   (* we ignore the type of the result as we are
      only interested in application arguments *)
-  let add_kept sty _ls tyl _tyv =
+  let add_kept_app sty _ls tyl _tyv =
     let add sty ty = if ty_closed ty then Sty.add ty sty else sty in
     List.fold_left add sty tyl
 
-  let add_kept = t_app_fold add_kept
+  let add_kept_case sty ts tyl _ =
+    let ty = ty_app ts tyl in
+    if ty_closed ty then Sty.add ty sty else sty
+
+  let add_kept sty t =
+    let sty = t_app_fold add_kept_app sty t in
+    t_case_fold add_kept_case sty t
 
   let local_kept task sty = match task.task_decl.td_node with
     | Decl d when is_local d -> decl_fold add_kept sty d

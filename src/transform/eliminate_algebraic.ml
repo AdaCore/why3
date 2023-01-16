@@ -27,6 +27,9 @@ let meta_material = register_meta "material_type_arg" [MTtysymbol;MTint]
   ~desc:"If@ the@ given@ type@ argument@ is@ instantiated@ by@ an@ infinite@ \
          type@ then@ the@ associated@ type@ constructor@ is@ infinite"
 
+let meta_alg_kept = register_meta "algebraic:kept" [MTty]
+  ~desc:"Keep@ primitive@ operations@ over@ this@ algebraic@ types."
+
 let get_material_args matl =
   let add_arg acc = function
     | [MAts ts; MAint i] ->
@@ -71,11 +74,13 @@ type state = {
   cc_map : lsymbol Mls.t;       (* from old constructors to new constructors *)
   cp_map : lsymbol list Mls.t;  (* from old constructors to new projections *)
   pp_map : lsymbol Mls.t;       (* from old projections to new projections *)
+  kept_m : Sty.t Mts.t;         (* should we keep constructors/projections/Tcase for this type? *)
   tp_map : (decl*theory) Mid.t; (* skipped tuple symbols *)
   inf_ts : Sts.t;               (* infinite types *)
   ma_map : bool list Mts.t;     (* material type arguments *)
   keep_e : bool;                (* keep monomorphic enumeration types *)
   keep_r : bool;                (* keep non-recursive records *)
+  keep_m : bool;                (* keep monomorphic data types *)
   no_ind : bool;                (* do not generate indexing functions *)
   no_inv : bool;                (* do not generate inversion axioms *)
   no_sel : bool;                (* do not generate selector *)
@@ -86,20 +91,27 @@ let empty_state = {
   cc_map = Mls.empty;
   cp_map = Mls.empty;
   pp_map = Mls.empty;
+  kept_m = Mts.empty;
   tp_map = Mid.empty;
   inf_ts = Sts.add ts_real (Sts.singleton ts_int);
   ma_map = Mts.empty;
   keep_e = false;
   keep_r = false;
+  keep_m = false;
   no_ind = false;
   no_inv = false;
   no_sel = false;
 }
 
+let enc_ty state = function
+  | Some({ ty_node = Tyapp (ts,_) } as ty) ->
+    not (Sty.mem ty (Mts.find_def Sty.empty ts state.kept_m))
+  | _ -> assert false
+
 let uncompiled = "eliminate_algebraic: compile_match required"
 
 let rec rewriteT kn state t = match t.t_node with
-  | Tcase (t1,bl) ->
+  | Tcase (t1,bl) when enc_ty state t1.t_ty ->
       let t1 = rewriteT kn state t1 in
       let mk_br (w,m) br =
         let (p,e) = t_open_branch br in
@@ -131,10 +143,10 @@ let rec rewriteT kn state t = match t.t_node with
       in
       (* Preserve attributes and location of t *)
       t_attr_copy t res
-  | Tapp (ls, args) when ls.ls_constr > 0->
+  | Tapp (ls, args) when ls.ls_constr > 0 && enc_ty state t.t_ty ->
       let args = List.map (rewriteT kn state) args in
       t_attr_copy t (t_app (Mls.find ls state.cc_map) args t.t_ty)
-  | Tapp (ls, [arg]) when ls.ls_proj ->
+  | Tapp (ls, [arg]) when ls.ls_proj && enc_ty state arg.t_ty ->
       let arg = rewriteT kn state arg in
       t_attr_copy t (t_app (Mls.find ls state.pp_map) [arg] t.t_ty)
   | _ ->
@@ -142,7 +154,7 @@ let rec rewriteT kn state t = match t.t_node with
 
 and rewriteF kn state av sign f =
   match f.t_node with
-  | Tcase (t1,bl) ->
+  | Tcase (t1,bl) when enc_ty state t1.t_ty ->
       let t1 = rewriteT kn state t1 in
       let av' = Mvs.set_diff av (t_vars t1) in
       let mk_br (w,m) br =
@@ -283,6 +295,19 @@ let add_indexer acc ts ty = function
   | csl when List.length csl <= 16 -> add_discriminator acc ts ty csl
   | _ -> acc
 
+let complete_projections csl =
+  let conv_c (c, pjl) =
+    let conv_p i = function
+      | (None, ty) ->
+         let id = Printf.sprintf "%s_proj_%d" c.ls_name.id_string (i+1) in
+         let id = id_derive id c.ls_name in
+         Some (create_fsymbol ~proj:true id [Opt.get c.ls_value] ty)
+      | (pj, _) -> pj
+    in
+    (c, List.mapi conv_p (List.combine pjl c.ls_args))
+  in
+  List.map conv_c csl
+
 (* Adding meta so that counterexamples consider this new projection as a
    counterexample projection. This allow counterexamples to appear for
    these values.
@@ -318,6 +343,7 @@ let add_projections (state,task) _ts _ty csl =
     let pjl,pp_map,tsk = List.fold_left2 add ([],pp_map,tsk) tl pl in
     Mls.add cs (List.rev pjl) cp_map, pp_map, tsk
   in
+  let csl = complete_projections csl in
   let cp_map, pp_map, task =
     List.fold_left pj_add (state.cp_map, state.pp_map, task) csl
   in
@@ -339,25 +365,45 @@ let add_inversion (state,task) ts ty csl =
   let ax_f = t_forall_close [ax_vs] [] ax_f in
   state, add_prop_decl task Paxiom ax_pr ax_f
 
-let add_enc_type (state,task) (ts,csl) =
-  let ty = ty_app ts (List.map ty_var ts.ts_args) in
-  (* declare constructors as abstract functions *)
-  let cs_add (state,tsk) (cs,_) =
-    let id = id_clone cs.ls_name in
-    let ls = create_lsymbol id cs.ls_args cs.ls_value in
-    { state with cc_map = Mls.add cs ls state.cc_map },add_param_decl tsk ls
-  in
-  let state,task = List.fold_left cs_add (state,task) csl in
-  (* add selector, projections, and inversion axiom *)
-  let state,task = add_selector (state,task) ts ty csl in
-  let state,task = add_indexer (state,task) ts ty csl in
-  let state,task = add_projections (state,task) ts ty csl in
-  let state,task = add_inversion (state,task) ts ty csl in
-  state, task
+let kept_no_case used state = function
+  | ts, [_,_::_] -> state.keep_r && not (Sid.mem ts.ts_name used)
+  | { ts_args = [] } as ts, csl ->
+     state.keep_e && List.for_all (fun (_,l) -> l = []) csl &&
+       not (Mts.mem ts state.kept_m)
+  | _ -> false
 
-let add_kept_type (state,task) (ts,csl) =
+let add_axioms used (state,task) ((ts,csl) as d) =
   let ty = ty_app ts (List.map ty_var ts.ts_args) in
-  add_selector (state,task) ts ty csl
+  if kept_no_case used state d then
+    (* for kept enums and rec, we still use the selector function, but always
+       use the non-encoded projections and constructors *)
+    let state =
+      let fold_c state (c, pjs) =
+        let pjs = List.map Opt.get pjs in
+        let cc_map = Mls.add c c state.cc_map in
+        let cp_map = Mls.add c pjs state.cp_map in
+        let fold_pj pp_map pj = Mls.add pj pj pp_map in
+        let pp_map = List.fold_left fold_pj state.pp_map pjs in
+        { state with cc_map; cp_map; pp_map }
+      in
+      List.fold_left fold_c state csl
+    in
+    add_selector (state, task) ts ty csl
+  else if ts.ts_args <> [] || not (Mts.mem ts state.kept_m) then
+    (* declare constructors as abstract functions *)
+    let cs_add (state,task) (cs,_) =
+      let id = id_clone cs.ls_name in
+      let ls = create_lsymbol id cs.ls_args cs.ls_value in
+      { state with cc_map = Mls.add cs ls state.cc_map },add_param_decl task ls
+    in
+    let state,task = List.fold_left cs_add (state,task) csl in
+    (* add selector, projections, and inversion axiom *)
+    let state,task = add_selector (state,task) ts ty csl in
+    let state,task = add_indexer (state,task) ts ty csl in
+    let state,task = add_projections (state,task) ts ty csl in
+    let state,task = add_inversion (state,task) ts ty csl in
+    state, task
+  else state,task
 
 let add_tags mts (state,task) (ts,csl) =
   let rec mat_ts sts ts csl =
@@ -386,56 +432,30 @@ let add_tags mts (state,task) (ts,csl) =
     let state = { state with inf_ts = Sts.add ts state.inf_ts } in
     state, add_meta task meta_infinite [MAts ts]
 
-let keep_ty state syms = function
-  | ts, [_,_::_] when state.keep_r && not (Sid.mem ts.ts_name syms) ->
-    true
-  | { ts_args = [] }, csl
-       when state.keep_e && List.for_all (fun (_,l) -> l = []) csl ->
-     true
-  | _ -> false
-
 let comp t (state,task) = match t.task_decl.td_node with
   | Decl ({ d_node = Ddata dl } as d) ->
-      (* add type declarations *)
-      let conv_c (c, pjl) =
-        let conv_p i = function
-          | (None, ty) ->
-            let id = Printf.sprintf "%s_proj_%d" c.ls_name.id_string (i+1) in
-            let id = id_derive id c.ls_name in
-            Some (create_fsymbol ~proj:true id [Opt.get c.ls_value] ty)
-          | (pj, _) -> pj
-        in
-        (c, List.mapi conv_p (List.combine pjl c.ls_args))
+      let used = get_used_syms_decl d in
+      let fold_keep_m state = function
+        | {ts_args = []} as ts, _ as d when state.keep_m && not (kept_no_case used state d) ->
+          { state with kept_m = Mts.add ts (Sty.singleton (ty_app ts [])) state.kept_m }
+        | _ -> state
       in
-      let conv_t (ts, csl) = (ts, List.map conv_c csl) in
+      let state = List.fold_left fold_keep_m state dl in
+      (* add projections to records with keep_recs *)
+      let conv_t ((ts, csl) as d) =
+        (* complete_projections can only be called on records or enums, so it
+           won't introduced ill-formed projections *)
+        if kept_no_case used state d then (ts, complete_projections csl) else d
+      in
       let dl = List.map conv_t dl in
-      let concrete_dl, abstract_dl =
-        List.partition (keep_ty state (get_used_syms_decl d)) dl
-      in
-      let task =
-        List.fold_left (fun t (ts,_) -> add_ty_decl t ts) task abstract_dl
-      in
-      let task =
-        if concrete_dl = [] then task else add_data_decl task concrete_dl
-      in
-      let state =
-        let fold_pjs pp_map = function
-          | None -> pp_map
-          | Some pj -> Mls.add pj pj pp_map
-        in
-        let fold_c state (c, pjs) =
-          let cc_map = Mls.add c c state.cc_map in
-          let cp_map = Mls.add c (List.map Opt.get pjs) state.cp_map in
-          let pp_map = List.fold_left fold_pjs state.pp_map pjs  in
-          { state with cc_map; cp_map; pp_map }
-        in
-        let fold_d state (_, csl) = List.fold_left fold_c state csl in
-        List.fold_left fold_d state concrete_dl
-      in
+      (* add type declarations *)
+      let concrete d = Mts.mem (fst d) state.kept_m || kept_no_case used state d in
+      let dl_concr, dl_abs = List.partition concrete dl in
+      let task = List.fold_left (fun t (ts,_) -> add_ty_decl t ts) task dl_abs in
+      let task = if dl_concr = [] then task else add_data_decl task dl_concr in
       (* add needed functions and axioms *)
-      let state, task = List.fold_left add_enc_type (state,task) abstract_dl in
-      let state, task = List.fold_left add_kept_type (state,task) concrete_dl in
-      (* add the tags for infitite types and material arguments *)
+      let state, task = List.fold_left (add_axioms used) (state,task) dl in
+      (* add the tags for infinite types and material arguments *)
       let mts = List.fold_right (fun (t,l) -> Mts.add t l) dl Mts.empty in
       let state, task = List.fold_left (add_tags mts) (state,task) dl in
       (* return the updated state and task *)
@@ -453,13 +473,6 @@ let comp t (state,task) = match t.task_decl.td_node with
       let ml = Array.set ma i true; Array.to_list ma in
       let state = { state with ma_map = Mts.add ts ml state.ma_map } in
       state, add_tdecl task t.task_decl
-  | Meta (m, args) ->
-      let conv = function
-        | MAls p when p.ls_proj -> MAls (Mls.find p state.pp_map)
-        | MAls c when c.ls_constr > 0 -> MAls (Mls.find c state.cc_map)
-        | m -> m
-      in
-      state, add_meta task m (List.map conv args)
   | _ ->
       state, add_tdecl task t.task_decl
 
@@ -497,16 +510,19 @@ let meta_elim = register_meta "eliminate_algebraic" [MTstring]
   ~desc:"@[<hov 2>Configure the 'eliminate_algebraic' transformation:@\n\
     - keep_enums:   @[keep monomorphic enumeration types@]@\n\
     - keep_recs:    @[keep non-recursive records@]@\n\
+    - keep_mono:    @[keep monomorphic algebraic datatypes@]@\n\
     - no_index:     @[do not generate indexing functions@]@\n\
     - no_inversion: @[do not generate inversion axioms@]@\n\
     - no_selector:  @[do not generate selector@]@]"
 
 let eliminate_algebraic = Trans.compose compile_match
   (Trans.on_meta meta_elim (fun ml ->
+   Trans.on_tagged_ty meta_alg_kept (fun kept ->
     let st = empty_state in
     let check st = function
       | [MAstr "keep_enums"] -> { st with keep_e = true }
       | [MAstr "keep_recs"]  -> { st with keep_r = true }
+      | [MAstr "keep_mono"]  -> { st with keep_m = true }
       | [MAstr "no_index"]   -> { st with no_ind = true }
       | [MAstr "no_inversion"] -> { st with no_inv = true }
       | [MAstr "no_selector"]  -> { st with no_sel = true }
@@ -521,7 +537,18 @@ let eliminate_algebraic = Trans.compose compile_match
                    string_of_int (List.length l) ^ ""))
     in
     let st = List.fold_left check st ml in
-    Trans.fold_map comp st init_task))
+    let kept_fold ty m =
+      match ty with
+      | { ty_node=Tyapp(ts, _) } as ty ->
+         let s = Mts.find_def Sty.empty ts m in
+         Mts.add ts (Sty.add ty s) m
+      | _ -> m
+    in
+    let st = { st with kept_m = Sty.fold kept_fold kept Mts.empty } in
+    let add ty decls = create_meta Libencoding.meta_kept [MAty ty] :: decls in
+    let meta_decls = Sty.fold add kept [] in
+    Trans.compose (Trans.fold_map comp st init_task)
+                  (Trans.add_tdecls meta_decls))))
 
 (** Eliminate user-supplied projection functions *)
 
@@ -580,6 +607,8 @@ let elim_proj keep_rec t (map,task) = match t.task_decl.td_node with
 
 let eliminate_projections = Trans.fold_map (elim_proj false) Mls.empty None
 
+let eliminate_projections_sums = Trans.fold_map (elim_proj true) Mls.empty None
+
 let () =
   Trans.register_transform "compile_match" compile_match
     ~desc:"Transform@ pattern-matching@ with@ nested@ patterns@ \
@@ -589,7 +618,10 @@ let () =
   Trans.register_transform "eliminate_algebraic" eliminate_algebraic
     ~desc:"Replace@ algebraic@ data@ types@ by@ first-order@ definitions.";
   Trans.register_transform "eliminate_projections" eliminate_projections
-    ~desc:"Define@ algebraic@ projection@ symbols@ separately."
+    ~desc:"Define@ algebraic@ projection@ symbols@ separately.";
+  Trans.register_transform "eliminate_projections_sums" eliminate_projections_sums
+    ~desc:"Like@ eliminate@_projections,@ but@ only@ projections@ on@ types@ \
+      with@ more@ than@ one@ constructor."
 
 (** conditional transformations, only applied when polymorphic types occur *)
 
@@ -597,7 +629,7 @@ let eliminate_algebraic_if_poly =
   Trans.on_meta Detect_polymorphism.meta_monomorphic_types_only
     (function
     | [] -> eliminate_algebraic
-    | _ -> Trans.compose compile_match (Trans.fold_map (elim_proj true) Mls.empty None))
+    | _ -> Trans.compose compile_match eliminate_projections_sums)
 
 let () =
   Trans.register_transform "eliminate_algebraic_if_poly"

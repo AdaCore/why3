@@ -152,8 +152,12 @@ let t_monomorph ty_base kept lsmap consts vmap t =
         let v = vs_monomorph ty_base kept u in
         let t2 = t_mono (Mvs.add u (t_var v) vmap) t2 in
         t_let (t_mono vmap t1) (close v t2)
-    | Tcase _ ->
-        Printer.unsupportedTerm t "no match expressions at this point"
+    | Tcase (t, bl) ->
+        let conv_b b =
+          let p,t,close = t_open_branch_cb b in
+          close p (t_mono vmap t)
+        in
+        t_case (t_mono vmap t) (List.map conv_b bl)
     | Teps b ->
         let u,f,close = t_open_bound_cb b in
         let v = vs_monomorph ty_base kept u in
@@ -181,8 +185,14 @@ let d_monomorph ty_base kept lsmap d =
     | Dtype ts when not (Sty.exists (ty_s_any (ts_equal ts)) kept) -> []
     | Dtype ts ->
         [create_ty_decl ts]
-    | Ddata _ ->
-        Printer.unsupportedDecl d "no algebraic types at this point"
+    | Ddata dl ->
+       let kept_d (_, csl) =
+         Sty.mem (Opt.get ((fst (List.hd csl)).ls_value)) kept
+       in
+       if List.for_all kept_d dl then [d]
+       else
+         Printer.unsupportedDecl d
+           "Non-kept algebraic types are not supported, run eliminate_algebraic"
     | Dparam ls ->
         let ls = if ls_equal ls ps_equ then ls else lsmap ls in
         [create_param_decl ls]

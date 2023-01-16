@@ -99,9 +99,14 @@ let rec rewrite tenv t = match t.t_node with
 
 let decl tenv d = match d.d_node with
   | Dtype _ | Dparam _ -> [d]
-  | Ddata _ -> Printer.unsupportedDecl d
-      "Algebraic and recursively-defined types are \
-            not supported, run eliminate_algebraic"
+  | Ddata dl ->
+     let kept_d (_, csl) =
+       Mty.mem (Opt.get ((fst (List.hd csl)).ls_value)) tenv
+     in
+     if List.for_all kept_d dl then [d]
+     else
+       Printer.unsupportedDecl d
+         "Non-kept algebraic types are not supported, run eliminate_algebraic"
   | Dlogic [ls,ld] when not (Sid.mem ls.ls_name (get_used_syms_decl d)) ->
       let f = rewrite tenv (ls_defn_axiom ld) in
       Libencoding.defn_or_axiom ls f
