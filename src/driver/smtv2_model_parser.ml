@@ -601,7 +601,7 @@ module FromModelToTerm = struct
     | Fminuszero -> raise Float_MinusZero
     | Fnan -> raise Float_NaN
     | Fnumber { sign; exp; mant } ->
-        let fp_str = (sign.bv_verbatim, exp.bv_verbatim, mant.bv_verbatim) in
+        let fp_binary = (sign.bv_verbatim, exp.bv_verbatim, mant.bv_verbatim) in
         let exp_bias = BigInt.pred (BigInt.pow_int_pos 2 (exp.bv_length - 1)) in
         let exp_max = BigInt.pred (BigInt.pow_int_pos 2 exp.bv_length) in
         let frac_len =
@@ -639,22 +639,32 @@ module FromModelToTerm = struct
           else
             (* Subnormals *)
             let exp = BigInt.pred exp_bias in
+            let fp_hex = Format.asprintf "%t0x0.%sp-%s"
+                (fun fmt -> if is_neg then Pp.string fmt "-")
+                frac (BigInt.to_string exp) in
             ( is_neg,
               "0",
               frac,
               Some (String.concat "" [ "-"; BigInt.to_string exp ]),
-              fp_str )
+              fp_binary,
+              fp_hex )
         else if BigInt.eq exp.bv_value exp_max (* infinities and NaN *) then
           if BigInt.eq mant.bv_value BigInt.zero then raise Float_Infinity
           else raise Float_NaN
         else
           let exp = BigInt.sub exp.bv_value exp_bias in
-          (is_neg, "1", frac, Some (BigInt.to_string exp), fp_str)
+          let fp_hex = Format.asprintf "%t0x1.%sp%s"
+              (fun fmt -> if is_neg then Pp.string fmt "-")
+              frac (BigInt.to_string exp) in
+          (is_neg, "1", frac, Some (BigInt.to_string exp), fp_binary, fp_hex)
 
   let constant_to_term env c =
     let decimal_string neg s1 s2 =
       if neg then String.concat "" [s1;".";s2]
       else String.concat "" ["-";s1;".";s2]
+    in
+    let constant_bv bv_binary bv_int =
+      Const (BitVector { bv_binary; bv_int })
     in
     match c with
     | Cint bigint ->
@@ -697,14 +707,14 @@ module FromModelToTerm = struct
         with _ ->
           error "Could not interpret constant %a as a fraction@." print_constant
             c)
-    | Cbitvector { bv_value = bigint; bv_length = n; _ } -> (
+    | Cbitvector { bv_value = bigint; bv_length = n; bv_verbatim } -> (
         try
           let _, ty =
             List.find
               (function Sbitvec n', _ when n = n' -> true | _ -> false)
               env.inferred_types
           in
-          let t_concrete = Const (Integer (BigInt.to_string bigint)) in
+          let t_concrete = constant_bv bv_verbatim (BigInt.to_string bigint) in
           (t_const (Constant.int_const bigint) ty, t_concrete)
         with Not_found ->
           error
@@ -739,14 +749,21 @@ module FromModelToTerm = struct
         in
         try
           (* general case *)
-          let neg, s1, s2, exp, (sign_str,exp_str,mant_str) = float_of_binary fp in
+          let neg, s1, s2, exp, (binary_sign,binary_exp,binary_mant), hex = float_of_binary fp in
           let t =
             t_const
               (Constant.real_const_from_string ~radix:16 ~neg ~int:s1 ~frac:s2
                 ~exp)
               ty
           in
-          let t_concrete = Const (Float (Float_number (sign_str,exp_str,mant_str))) in
+          let t_concrete =
+            Const (Float (Float_number {
+              sign= binary_sign;
+              exp= binary_exp;
+              mant= binary_mant;
+              hex
+            }))
+          in
           (t, t_concrete)
         with
         (* cases for special float values *)

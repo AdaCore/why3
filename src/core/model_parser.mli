@@ -41,13 +41,19 @@ val print_model_kind : Format.formatter -> model_element_kind -> unit
 (* Concrete syntax for model element values
    (used for pretty printing and JSON printing) *)
 
-type concrete_syntax_bv = string
+type concrete_syntax_bv = { bv_binary: string; bv_int : string }
 
 type concrete_syntax_float =
   | Infinity
   | Plus_zero | Minus_zero
   | NaN
-  | Float_number of concrete_syntax_bv * concrete_syntax_bv * concrete_syntax_bv
+  | Float_number of
+    {
+      sign : string;
+      exp : string;
+      mant : string;
+      hex : string
+    }
 
 type concrete_syntax_constant =
   | Boolean of bool

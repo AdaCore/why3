@@ -48,13 +48,19 @@ let print_model_kind fmt = function
   | Loop_current_iteration -> pp_print_string fmt "Loop_current_iteration"
   | Other -> pp_print_string fmt "Other"
 
-type concrete_syntax_bv = string
+type concrete_syntax_bv = { bv_binary: string; bv_int : string }
 
 type concrete_syntax_float =
   | Infinity
   | Plus_zero | Minus_zero
   | NaN
-  | Float_number of concrete_syntax_bv * concrete_syntax_bv * concrete_syntax_bv
+  | Float_number of
+    {
+      sign : string;
+      exp : string;
+      mant : string;
+      hex : string
+    }
 
 type concrete_syntax_constant =
   | Boolean of bool
@@ -87,6 +93,9 @@ let rec get_elts_others x body =
     ((ct0,ct1)::elts, others)
   | _ -> ([], body)
 
+let print_concrete_bv fmt { bv_binary; bv_int } =
+  fprintf fmt "%s (%s)" bv_int bv_binary
+
 let rec print_concrete_term fmt ct =
   let open Format in
   match ct with
@@ -99,9 +108,9 @@ let rec print_concrete_term fmt ct =
   | Const (Float Plus_zero) -> fprintf fmt "+0"
   | Const (Float Minus_zero) -> fprintf fmt "-0"
   | Const (Float NaN) -> fprintf fmt "NaN"
-  | Const (Float (Float_number (exp,sign,mant))) ->
-    fprintf fmt "{exp=%s, sign=%s, mant=%s" exp sign mant
-  | Const (BitVector bv) -> fprintf fmt "%s" bv
+  | Const (Float (Float_number {exp;sign;mant;hex})) ->
+    fprintf fmt "{exp=%s, sign=%s, mant=%s (%s)" exp sign mant hex
+  | Const (BitVector bv) -> fprintf fmt "%a" print_concrete_bv bv
   | Const (Fraction (f1,f2)) -> fprintf fmt "%s/%s" f1 f2
   | Apply ("=",[t1;t2]) ->
     fprintf fmt "%a = %a"
@@ -373,7 +382,7 @@ let json_lsymbol ls =
     "loc", json_loc ls.ls_name.id_loc;
   ]
 
-let json_vsymbol ?(forget=true) vs =
+let json_vsymbol ~forget vs =
   let open Pretty in
   let open Json_base in
   let vs_name = Format.asprintf "@[<h>%a@]" print_vs_qualified vs in
@@ -421,14 +430,14 @@ let rec json_of_term t =
       Record [
       "Teps",
       Record [
-        "eps_vs", json_vsymbol vs;
+        "eps_vs", json_vsymbol ~forget:true vs;
         "eps_t", json_of_term t' ]
       ]
     else
       Record [
       "Tfun",
       Record [
-        "fun_args", List (List.map json_vsymbol vs);
+        "fun_args", List (List.map (json_vsymbol ~forget:true) vs);
         "fun_body", json_of_term t' ]
       ]
   | Tquant (q,tq) ->
@@ -438,7 +447,7 @@ let rec json_of_term t =
     "Tquant",
     Record [
       "quant", String quant;
-      "quant_vs", List (List.map (fun vs -> json_vsymbol vs) vsl);
+      "quant_vs", List (List.map (fun vs -> (json_vsymbol ~forget:true) vs) vsl);
       "quant_t", json_of_term t' ]
     ]
   | Tbinop (op,t1,t2) ->
@@ -464,6 +473,13 @@ let rec json_of_term t =
   | Tlet _ -> Record [ "Tlet", String "UNSUPPORTED" ]
   | Tcase _ -> Record [ "Tcase", String "UNSUPPORTED" ]
 
+let json_of_concrete_bv { bv_binary; bv_int } =
+  let open Json_base in
+  Record [
+    "bv_binary", String bv_binary;
+    "bv_int", String bv_int
+  ]
+
 let rec json_of_concrete_term ct =
   let open Json_base in
   match ct with
@@ -473,7 +489,7 @@ let rec json_of_concrete_term ct =
   | Const (String s) -> Record [ "Const", Record [ "String", String s ] ]
   | Const (Integer i) -> Record [ "Const", Record [ "Integer", String i ] ]
   | Const (Real d) -> Record [ "Const", Record [ "Real", String d ] ]
-  | Const (BitVector bv) -> Record [ "Const", Record [ "BitVector", String bv ] ]
+  | Const (BitVector bv) -> Record [ "Const", Record [ "BitVector", json_of_concrete_bv bv ] ]
   | Const (Fraction (f1,f2)) ->
     Record [ "Const", Record [ "Fraction", String (String.concat "" [f1;"/";f2]) ] ]
 
@@ -485,9 +501,16 @@ let rec json_of_concrete_term ct =
     Record [ "Const", Record [ "Float", String "Minus_zero" ] ]
   | Const (Float NaN) ->
     Record [ "Const", Record [ "Float", String "NaN" ] ]
-  | Const (Float (Float_number (sign,exp,mant))) ->
-    let float = Format.asprintf "@[<h>{sign=%s, exp=%s, mant=%s}@]" sign exp mant in
-    Record [ "Const", Record [ "Float", String float ] ]
+  | Const (Float (Float_number {sign;exp;mant;hex})) ->
+    Record [ "Const", Record [
+      "Float",
+      Record [
+        "sign", String sign;
+        "exp", String exp;
+        "mant", String mant;
+        "hex", String hex
+      ]
+    ] ]
 
   | Apply (ls, args) ->
     Record [
