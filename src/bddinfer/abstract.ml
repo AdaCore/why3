@@ -11,6 +11,8 @@
 open Apron
 
 let man = Polka.manager_alloc_strict ()
+(* let man = Box.manager_alloc () *)
+(* let man = Oct.manager_alloc () *)
 
 type why_var = {
     var_name : string;
@@ -62,6 +64,8 @@ let  bdd_stats () =
 type t = {
     map_state : var_value VarMap.t;
     apron_state : Polka.strict Polka.t Abstract1.t;
+    (* apron_state : Box.t Abstract1.t; *)
+    (* apron_state : Oct.t Abstract1.t; *)
     bdd_state : B.t;
   }
 
