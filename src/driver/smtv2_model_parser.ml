@@ -660,8 +660,8 @@ module FromModelToTerm = struct
 
   let constant_to_term env c =
     let decimal_string neg s1 s2 =
-      if neg then String.concat "" [s1;".";s2]
-      else String.concat "" ["-";s1;".";s2]
+      if neg then String.concat "" ["-";s1;".";s2]
+      else String.concat "" [s1;".";s2]
     in
     let constant_bv bv_binary bv_int =
       Const (BitVector { bv_binary; bv_int })
@@ -1555,9 +1555,7 @@ module FromModelToTerm = struct
       match vs.vs_ty.ty_node with
       | Tyapp (ts,_) ->
         begin match ts.ts_def, proj_v.t_node with
-        | Ty.Range r, Tconst (Constant.ConstInt c)
-          (* when proj_ls.ls_name.id_string = ts.Ty.ts_name.id_string ^ "'int"
-            && Opt.equal Ty.ty_equal proj_ls.ls_value (Some Ty.ty_int) *) ->
+        | Ty.Range r, Tconst (Constant.ConstInt c) ->
           Some (BigInt.to_string c.il_int)
         | _ -> raise UnexpectedPattern
         end

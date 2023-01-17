@@ -99,70 +99,74 @@ let print_concrete_bv fmt { bv_binary; bv_int } =
 let rec print_concrete_term fmt ct =
   let open Format in
   match ct with
-  | Var v -> fprintf fmt "%s" v
-  | Const (Boolean b) -> fprintf fmt "%b" b
-  | Const (String s) -> fprintf fmt "%s" s
-  | Const (Integer i) -> fprintf fmt "%s" i
-  | Const (Real d) -> fprintf fmt "%s" d
-  | Const (Float Infinity) -> fprintf fmt "∞"
-  | Const (Float Plus_zero) -> fprintf fmt "+0"
-  | Const (Float Minus_zero) -> fprintf fmt "-0"
-  | Const (Float NaN) -> fprintf fmt "NaN"
+  | Var v -> pp_print_string fmt v
+  | Const (Boolean b) -> pp_print_bool fmt b
+  | Const (String s) -> Constant.print_string_def fmt s
+  | Const (Integer i) -> pp_print_string fmt i
+  | Const (Real d) -> pp_print_string fmt d
+  | Const (Float Infinity) -> pp_print_string fmt "∞"
+  | Const (Float Plus_zero) -> pp_print_string fmt "+0"
+  | Const (Float Minus_zero) -> pp_print_string fmt "-0"
+  | Const (Float NaN) -> pp_print_string fmt "NaN"
   | Const (Float (Float_number {exp;sign;mant;hex})) ->
-    fprintf fmt "{exp=%s, sign=%s, mant=%s (%s)" exp sign mant hex
+    fprintf fmt "float{exp=%s, sign=%s, mant=%s} (%s)" exp sign mant hex
   | Const (BitVector bv) -> fprintf fmt "%a" print_concrete_bv bv
   | Const (Fraction (f1,f2)) -> fprintf fmt "%s/%s" f1 f2
   | Apply ("=",[t1;t2]) ->
     fprintf fmt "%a = %a"
       print_concrete_term t1
       print_concrete_term t2
+  | Apply (f,[]) -> pp_print_string fmt f
   | Apply (f,ctl) ->
-    fprintf fmt "%s %a" f (Pp.print_list Pp.space print_concrete_term) ctl
+    fprintf fmt "@[(%s@ %a)@]" f (Pp.print_list Pp.space print_concrete_term) ctl
   | If (b,t1,t2) ->
-    fprintf fmt "if %a then %a else %a"
+    fprintf fmt "@[if %a@ then %a@ else %a@]"
       print_concrete_term b
       print_concrete_term t1
       print_concrete_term t2
   | Epsilon (eps_vs,eps_t) ->
-    fprintf fmt "eps %s. %a" eps_vs print_concrete_term eps_t
+    fprintf fmt "epsilon %s.@ %a" eps_vs print_concrete_term eps_t
   | Quant (quant,quant_vs,quant_t) ->
     let quant_string = match quant with Forall -> "Forall" | Exists -> "Exists" in
-    fprintf fmt "%s %a. %a" quant_string
+    fprintf fmt "@[<hov 1>%s %a.@ %a@]" quant_string
       (Pp.print_list Pp.comma print_concrete_term) quant_vs
       print_concrete_term quant_t
   | Binop (op,t1,t2) ->
     let op_string = match op with
       | And -> "/\\"
       | Or -> "\\/"
-      | Implies -> "=>"
-      | Iff -> "<=>"
+      | Implies -> "->"
+      | Iff -> "<->"
     in
-    fprintf fmt "(%a) %s (%a)"
+    fprintf fmt "@[%a %s@ %a@]"
       print_concrete_term t1
       op_string
       print_concrete_term t2
-  | Not ct' -> fprintf fmt "not (%a)" print_concrete_term ct'
+  | Not ct' -> fprintf fmt "not %a" print_concrete_term ct'
   | Function {is_array=true; args=[x]; body=t} ->
+    let print_others fmt others =
+      fprintf fmt "@[others =>@ %a@]"
+        print_concrete_term others
+    in
     let print_indice_value fmt (indice,value) =
-      fprintf fmt "%a => %a"
+      fprintf fmt "@[%a =>@ %a@]"
         print_concrete_term indice
         print_concrete_term value
     in
     let (elts,others) = get_elts_others x t in
-    fprintf fmt "[|%a; _ => %a|]"
-      (Pp.print_list Pp.comma print_indice_value) elts
-      print_concrete_term others
+    fprintf fmt "@[[|%a%a|]@]"
+      (Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.semi ~sep:Pp.semi print_indice_value) elts
+      print_others others
   | Function {args; body} ->
-    fprintf fmt "fun (%a) -> %a"
-      (Pp.print_list Pp.comma Pp.print_string) args
+    fprintf fmt "@[<hov 1>fun %a ->@ %a@]"
+      (Pp.print_list Pp.space Pp.print_string) args
       print_concrete_term body
   | Record fields_values ->
     let print_field_value fmt (field,value) =
-      fprintf fmt "%s = %a" field
-        print_concrete_term value
+      fprintf fmt "@[%s =@ %a@]" field print_concrete_term value
     in
-    fprintf fmt "{%a}"
-      (Pp.print_list Pp.comma print_field_value) fields_values
+    fprintf fmt "@[<hv1>%a@]"
+      (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi print_field_value) fields_values
 
 let concrete_var_from_vs vs =
   Var (Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs)
