@@ -34,9 +34,9 @@ Model is [{"filename": "myfile.my_ext",
                      "start-line": 28},
                    "name": "A"},
                  "value":
-                  {"value_term": {"Tapp": {"app_args": [], "app_ls": "True"}},
-                   "value_type":
-                    {"Tyapp": {"ty_args": [], "ty_symbol": "bool"}}}}]},
+                  {"value_concrete_term": {"Const": {"Boolean": true}},
+                   "value_term": "Ttrue",
+                   "value_type": "bool"}}]},
              {"is_vc_line": true,
               "line": "42",
               "model_elements":
@@ -58,9 +58,9 @@ Model is [{"filename": "myfile.my_ext",
                      "start-line": 42},
                    "name": "A_vc_constant"},
                  "value":
-                  {"value_term": {"Tapp": {"app_args": [], "app_ls": "True"}},
-                   "value_type":
-                    {"Tyapp": {"ty_args": [], "ty_symbol": "bool"}}}},
+                  {"value_concrete_term": {"Const": {"Boolean": true}},
+                   "value_term": "Ttrue",
+                   "value_type": "bool"}},
                 {"attrs": ["model_trace:my_B"],
                  "kind": "other",
                  "location":
@@ -79,10 +79,9 @@ Model is [{"filename": "myfile.my_ext",
                      "start-line": 42},
                    "name": "B_vc_constant"},
                  "value":
-                  {"value_term":
-                    {"Tapp": {"app_args": [], "app_ls": "False"}},
-                   "value_type":
-                    {"Tyapp": {"ty_args": [], "ty_symbol": "bool"}}}}]}]},
+                  {"value_concrete_term": {"Const": {"Boolean": false}},
+                   "value_term": "Tfalse",
+                   "value_type": "bool"}}]}]},
           {"filename": "myfile.my_ext2",
            "model":
             [{"is_vc_line": false,
@@ -106,10 +105,9 @@ Model is [{"filename": "myfile.my_ext",
                      "start-line": 101},
                    "name": "B"},
                  "value":
-                  {"value_term":
-                    {"Tapp": {"app_args": [], "app_ls": "False"}},
-                   "value_type":
-                    {"Tyapp": {"ty_args": [], "ty_symbol": "bool"}}}}]}]}]
+                  {"value_concrete_term": {"Const": {"Boolean": false}},
+                   "value_term": "Tfalse",
+                   "value_type": "bool"}}]}]}]
 
 == Check CE
 

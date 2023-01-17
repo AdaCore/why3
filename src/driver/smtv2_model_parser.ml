@@ -1083,22 +1083,21 @@ module FromModelToTerm = struct
           key Pretty.print_vs vs)
       env.bound_vars;
     let (t_body, t_body_concrete) = smt_term_to_term ~fmla env body res in
-    let t =
-      t_lambda
-        (Mstr.values env.bound_vars)
-        []
-        t_body
-    in
-    let t_concrete =
+    let (t,t_concrete) =
       if List.length (Mstr.values env.bound_vars) = 0 then
-        t_body_concrete
+        (t_body, t_body_concrete)
       else
         let args =
           List.map
             (fun vs -> Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs)
             (Mstr.values env.bound_vars)
         in
-        Function {is_array=false; args; body=t_body_concrete}
+        ( t_lambda
+            (Mstr.values env.bound_vars)
+            []
+            t_body,
+          Function {is_array=false; args; body=t_body_concrete}
+        )
     in
     List.iter
       Pretty.forget_var
