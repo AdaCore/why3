@@ -73,14 +73,17 @@ type concrete_syntax_term =
   | Apply of string * concrete_syntax_term list
   | If of concrete_syntax_term * concrete_syntax_term * concrete_syntax_term
   | Epsilon of string * concrete_syntax_term
-  | Quant of concrete_syntax_quant * concrete_syntax_term list * concrete_syntax_term
+  | Quant of concrete_syntax_quant * string list * concrete_syntax_term
+  (* Quant (q,vars,t) *)
   | Binop of concrete_syntax_binop * concrete_syntax_term * concrete_syntax_term
   | Not of concrete_syntax_term
   | Function of { is_array: bool; args: string list ; body: concrete_syntax_term }
   | Record of (string * concrete_syntax_term) list
+  (* list of (field_name,field_value) elements *)
 
 val print_concrete_term : Format.formatter -> concrete_syntax_term -> unit
 
+(* Helper functions to create concrete terms *)
 val concrete_var_from_vs : Term.vsymbol -> concrete_syntax_term
 val concrete_const_bool : bool -> concrete_syntax_term
 val concrete_apply_from_ls : Term.lsymbol -> concrete_syntax_term list -> concrete_syntax_term

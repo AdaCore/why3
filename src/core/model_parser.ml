@@ -80,12 +80,20 @@ type concrete_syntax_term =
   | Apply of string * concrete_syntax_term list
   | If of concrete_syntax_term * concrete_syntax_term * concrete_syntax_term
   | Epsilon of string * concrete_syntax_term
-  | Quant of concrete_syntax_quant * concrete_syntax_term list * concrete_syntax_term
+  | Quant of concrete_syntax_quant * string list * concrete_syntax_term
   | Binop of concrete_syntax_binop * concrete_syntax_term * concrete_syntax_term
   | Not of concrete_syntax_term
   | Function of { is_array: bool; args: string list ; body: concrete_syntax_term }
   | Record of (string * concrete_syntax_term) list
 
+
+(* Pretty printing of concrete terms *)
+
+(* Unfold a concrete term of the form:
+   if x = ct0 then ct1 else if x = ct0' then ct1' else ... else ct2
+   to the following result:
+   elts = [(ct0,ct1),(ct0',ct1')...]
+   others = ct2 *)
 let rec get_elts_others x body =
   match body with
   | If (Apply (concrete_equ, [Var x'; ct0]), ct1, ct2) when x=x' ->
@@ -126,10 +134,10 @@ let rec print_concrete_term fmt ct =
       print_concrete_term t2
   | Epsilon (eps_vs,eps_t) ->
     fprintf fmt "epsilon %s.@ %a" eps_vs print_concrete_term eps_t
-  | Quant (quant,quant_vs,quant_t) ->
+  | Quant (quant,quant_vars,quant_t) ->
     let quant_string = match quant with Forall -> "Forall" | Exists -> "Exists" in
     fprintf fmt "@[<hov 1>%s %a.@ %a@]" quant_string
-      (Pp.print_list Pp.comma print_concrete_term) quant_vs
+      (Pp.print_list Pp.comma Pp.print_string) quant_vars
       print_concrete_term quant_t
   | Binop (op,t1,t2) ->
     let op_string = match op with
@@ -167,6 +175,8 @@ let rec print_concrete_term fmt ct =
     in
     fprintf fmt "@[<hv1>%a@]"
       (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi print_field_value) fields_values
+
+(* Helper functions for concrete terms *)
 
 let concrete_var_from_vs vs =
   Var (Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs)
@@ -541,13 +551,13 @@ let rec json_of_concrete_term ct =
         "eps_t", json_of_concrete_term eps_t
       ]
     ]
-  | Quant (quant,quant_vs,quant_t) ->
+  | Quant (quant,quant_vars,quant_t) ->
     let quant_string = match quant with Forall -> "Forall" | Exists -> "Exists" in
     Record [
       "Quant",
       Record [
         "quant", String quant_string;
-        "quant_vs", List (List.map json_of_concrete_term quant_vs);
+        "quant_vars", List (List.map (fun var -> String var) quant_vars);
         "quant_t", json_of_concrete_term quant_t
       ]
     ]
