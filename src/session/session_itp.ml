@@ -27,6 +27,8 @@ type fileID = int
 let print_proofNodeID fmt id =
   Format.fprintf fmt "proofNodeID<%d>" id
 
+let proofNodeID_tostring id = string_of_int id
+
 let print_proofAttemptID fmt id =
   Format.fprintf fmt "proofAttemptID<%d>" id
 

@@ -72,6 +72,28 @@ and map_binding fmt binding =
 and map_bindings fmt map_bindings =
   fprintf fmt "@[<hv 1>{%a}@]" (seq map_binding) map_bindings
 
+let rec print_json_single_line fmt v =
+  match v with
+  | Record r -> map_bindings fmt r
+  | List l -> list print_json_single_line fmt l
+  | String s -> string fmt s
+  | Int i -> int fmt i
+  | Float f -> float fmt f
+  | StandardFloat f -> standard_float fmt f
+  | Bool b -> bool fmt b
+  | Null -> pp_print_string fmt "null"
+and map_binding fmt (key, value) =
+  fprintf fmt "%a: %a" string key print_json_single_line value
+and map_bindings fmt l =
+  fprintf fmt "{ ";
+  begin match l with
+  | [] -> ()
+  | [x] -> map_binding fmt x
+  | x :: xs ->
+      List.iter (fun elt -> map_binding fmt elt; fprintf fmt ", ") xs;
+      map_binding fmt x
+  end;
+  fprintf fmt " }"
 
 (* Get json fields. Return Not_found if no fields or field missing *)
 let get_field j s =

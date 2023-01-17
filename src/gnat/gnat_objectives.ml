@@ -27,6 +27,98 @@ end
 
 module GoalMap = Session_itp.Hpn
 
+module Logging : sig
+  (* Log proof attempts in a file "unit.why3log", with the following structure.
+     Each log entry is on its own line, in JSON format:
+       { ... }
+       { ... }
+     That is, the full file is *not* a JSON file, but needs to be read line by
+     line. This is to permit reading the file while gnatwhy3 is running.
+     Each line is of the following format:
+       line =
+         { "timestamp" : float,
+           "goal_id"   : str,
+           "prover"    : str,
+           "pas"       : proof_attempt_status }
+     The timestamp is a float in Unix date, with subsecond resolution.
+       proof_attempt_status =
+         { "kind" : str,
+           "answer" : str,
+           "time" : float
+         }
+     The kind is one of undone, scheduled, running, done, interrupted, detached,
+     internalfailure, uninstalled, upgradeprover and removed. If the kind is
+     not "done", the other two fields are absent. If present, answer is one of
+     valid, invalid, timeout, outofmemory, steplimitexceeded, unknown, failure,
+     and highfailure.
+  *)
+
+  val init : unit -> unit
+  val log : goal_id -> string -> Controller_itp.proof_attempt_status -> unit
+  val close : unit -> unit
+end =
+struct
+
+  let outc = ref stdout
+
+  let init () =
+    outc := open_out (Gnat_config.unit_name ^ ".why3log")
+
+  let close () = close_out !outc
+
+  let pas_to_json pas =
+    let open Why3 in
+    let open Why3.Json_base in
+    let kind =
+      let open Controller_itp in
+      match pas with
+      | Undone -> "undone"
+      | Scheduled -> "scheduled"
+      | Running -> "running"
+      | Done _ -> "done"
+      | Interrupted -> "interrupted"
+      | Detached -> "detached"
+      | InternalFailure _ -> "internalfailure"
+      | Uninstalled _ -> "uninstalled"
+      | UpgradeProver _ -> "upgradeprover"
+      | Removed _ -> "removed"
+    in
+    let results =
+      match pas with
+      | Controller_itp.Done pr ->
+          let time = pr.Call_provers.pr_time in
+          let answer =
+            let open Call_provers in
+            match pr.Call_provers.pr_answer with
+            | Valid -> "valid"
+            | Invalid -> "invalid"
+            | Timeout -> "timeout"
+            | OutOfMemory -> "outofmemory"
+            | StepLimitExceeded -> "steplimitexceeded"
+            | Unknown _ -> "unknown"
+            | Failure _ -> "failure"
+            | HighFailure -> "highfailure"
+          in
+          [("answer", String answer); ("time", StandardFloat time)]
+      | _ -> []
+    in
+    let data = ("kind", String kind)::results in
+    Record data
+
+  let log g p pas =
+    let open Why3 in
+    let open Why3.Json_base in
+    print_json_single_line (Format.formatter_of_out_channel !outc) (
+      Record ([("timestamp", StandardFloat (Unix.gettimeofday ()));
+               ("goal_id", String (Session_itp.proofNodeID_tostring g));
+               ("prover", String p);
+               ("pas", pas_to_json pas)])
+    );
+    output_string !outc "\n";
+    flush !outc
+
+end
+
 module GoalSet =
 struct
    (* We use an ordered set instead of a hashed set here so that we have
@@ -324,6 +416,7 @@ let init_cont () =
 
   (* Init why3server *)
   init ();
+  if Gnat_config.logging then Logging.init ();
   if is_new_session then c
   else
     begin
@@ -922,6 +1015,10 @@ let schedule_goal ~callback c g =
     in
     let remaining = ref (List.length provers) in
     let callback pa pas =
+      let prover =
+        (Session_itp.get_proof_attempt_node s pa).Session_itp.prover.Whyconf.prover_name
+      in
+      if Gnat_config.logging then Logging.log g prover pas;
       if !remaining = 0 then ()
       else match pas with
         | Controller_itp.Done pr ->
@@ -932,7 +1029,7 @@ let schedule_goal ~callback c g =
             remaining := 0;
             callback pa pas
           | _ ->
-            if !remaining = 0 then callback pa pas
+            if !remaining = 0 then callback pa pas else ()
           end
         | _ -> ()
     in
