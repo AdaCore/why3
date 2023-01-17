@@ -50,7 +50,11 @@ The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `test2'goal` cannot be evaluated):
 File int.mlw:
   Line 41:
-    abs : int -> int = fun (x!0:int) -> if 0 <= x!0 then x!0 else (- 1) * x!0
+    abs :
+      int
+      ->
+      int = fun x!0 ->
+             if (int.Int.(<=) 0 x!0) then x!0 else (int.Int.( * ) -1 x!0)
 File int_overflow.mlw:
   Line 14:
     x : int = 0

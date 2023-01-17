@@ -19,25 +19,24 @@ File jlamp_array_mono.mlw:
     to_int :
       t
       ->
-      int = fun (bOUND_VARIABLE_406:t) ->
-             if (epsilon x:t. to_int x = 3) = bOUND_VARIABLE_406 then 3
+      int = fun bOUND_VARIABLE_406 ->
+             if epsilon x. (Array.to_int x) = 3 = bOUND_VARIABLE_406 then 3
              else 2
   Line 11:
-    two : t = epsilon x:t. to_int x = 2
+    two : t = epsilon x. (Array.to_int x) = 2
   Line 14:
-    three : t = epsilon x:t. to_int x = 3
+    three : t = epsilon x. (Array.to_int x) = 3
   Line 18:
     elts :
       array
       ->
       int
       ->
-      t = fun (bOUND_VARIABLE_417:array) ->
-           fun (x:int) ->
-            if x = 42 then epsilon x1:t. to_int x1 = 3 else epsilon x1:t.
-            to_int x1 = 2
+      t = fun bOUND_VARIABLE_417 ->
+           [|42 => epsilon x. (Array.to_int x) = 3;
+           others => epsilon x. (Array.to_int x) = 2|]
   Line 19:
-    length : array -> int = fun (bOUND_VARIABLE_422:array) -> 0
+    length : array -> int = fun bOUND_VARIABLE_422 -> 0
   Line 28:
     mixfix [<-] :
       array
@@ -46,40 +45,29 @@ File jlamp_array_mono.mlw:
       ->
       t
       ->
-      array = fun (bOUND_VARIABLE_440:array) (bOUND_VARIABLE_441:int)
-               (bOUND_VARIABLE_442:t) -> epsilon x:array.
-               x.length = 0 /\
-               x.elts =
-               (fun (x1:int) ->
-                 if x1 = 42 then epsilon x2:t. to_int x2 = 3 else epsilon x2:
-                 t. to_int x2 = 2)
+      array = fun bOUND_VARIABLE_440 bOUND_VARIABLE_441 bOUND_VARIABLE_442 ->
+               {Array.elts =
+                [|42 => epsilon x. (Array.to_int x) = 3;
+                others => epsilon x. (Array.to_int x) = 2|];
+                Array.length = 0}
   Line 33:
     a :
-      array = epsilon x:
-      array.
-      x.length = 0 /\
-      x.elts =
-      (fun (x1:int) ->
-        if x1 = 42 then epsilon x2:t. to_int x2 = 3 else epsilon x2:t.
-        to_int x2 = 2)
+      array = {Array.elts =
+               [|42 => epsilon x. (Array.to_int x) = 3;
+               others => epsilon x. (Array.to_int x) = 2|];
+               Array.length = 0}
   Line 44:
     a :
-      array = epsilon x:
-      array.
-      x.length = 0 /\
-      x.elts =
-      (fun (x1:int) ->
-        if x1 = 42 then epsilon x2:t. to_int x2 = 3 else epsilon x2:t.
-        to_int x2 = 2)
+      array = {Array.elts =
+               [|42 => epsilon x. (Array.to_int x) = 3;
+               others => epsilon x. (Array.to_int x) = 2|];
+               Array.length = 0}
   Line 48:
     a :
-      array = epsilon x:
-      array.
-      x.length = 0 /\
-      x.elts =
-      (fun (x1:int) ->
-        if x1 = 42 then epsilon x2:t. to_int x2 = 3 else epsilon x2:t.
-        to_int x2 = 2)
+      array = {Array.elts =
+               [|42 => epsilon x. (Array.to_int x) = 3;
+               others => epsilon x. (Array.to_int x) = 2|];
+               Array.length = 0}
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -98,30 +86,27 @@ File jlamp_array_mono.mlw:
     to_int :
       t
       ->
-      int = fun (bOUND_VARIABLE_495:t) ->
-             if (epsilon x:t. to_int x = 3) = bOUND_VARIABLE_495 then 3
+      int = fun bOUND_VARIABLE_495 ->
+             if epsilon x. (Array.to_int x) = 3 = bOUND_VARIABLE_495 then 3
              else 2
   Line 11:
-    two : t = epsilon x:t. to_int x = 2
+    two : t = epsilon x. (Array.to_int x) = 2
   Line 14:
-    three : t = epsilon x:t. to_int x = 3
+    three : t = epsilon x. (Array.to_int x) = 3
   Line 18:
     elts :
       array
       ->
       int
       ->
-      t = fun (bOUND_VARIABLE_510:array) ->
-           if (epsilon x:array.
-              x.length = 0 /\
-              x.elts = (fun (x1:int) -> epsilon x2:t. to_int x2 = 3)) =
-              bOUND_VARIABLE_510
-           then fun (x:int) -> epsilon x1:t. to_int x1 = 3
-           else fun (x:int) ->
-                 if x = 42 then epsilon x1:t. to_int x1 = 2 else epsilon x1:
-                 t. to_int x1 = 3
+      t = fun bOUND_VARIABLE_510 ->
+           if {Array.elts = [|others => epsilon x. (Array.to_int x) = 3|];
+               Array.length = 0} = bOUND_VARIABLE_510
+           then [|others => epsilon x. (Array.to_int x) = 3|]
+           else [|42 => epsilon x. (Array.to_int x) = 2;
+                others => epsilon x. (Array.to_int x) = 3|]
   Line 19:
-    length : array -> int = fun (bOUND_VARIABLE_519:array) -> 0
+    length : array -> int = fun bOUND_VARIABLE_519 -> 0
   Line 28:
     mixfix [<-] :
       array
@@ -130,47 +115,36 @@ File jlamp_array_mono.mlw:
       ->
       t
       ->
-      array = fun (bOUND_VARIABLE_532:array) (bOUND_VARIABLE_533:int)
-               (bOUND_VARIABLE_534:t) -> epsilon x:array.
-               x.length = 0 /\
-               x.elts =
-               (fun (x1:int) ->
-                 if x1 = 42 then epsilon x2:t. to_int x2 = 2 else epsilon x2:
-                 t. to_int x2 = 3)
+      array = fun bOUND_VARIABLE_532 bOUND_VARIABLE_533 bOUND_VARIABLE_534 ->
+               {Array.elts =
+                [|42 => epsilon x. (Array.to_int x) = 2;
+                others => epsilon x. (Array.to_int x) = 3|];
+                Array.length = 0}
   Line 32:
     a :
-      array = epsilon x:
-      array.
-      x.length = 0 /\ x.elts = (fun (x1:int) -> epsilon x2:t. to_int x2 = 3)
+      array = {Array.elts = [|others => epsilon x. (Array.to_int x) = 3|];
+               Array.length = 0}
   Line 34:
     a :
-      array = epsilon x:
-      array.
-      x.length = 0 /\ x.elts = (fun (x1:int) -> epsilon x2:t. to_int x2 = 3)
+      array = {Array.elts = [|others => epsilon x. (Array.to_int x) = 3|];
+               Array.length = 0}
   Line 44:
     a :
-      array = epsilon x:
-      array.
-      x.length = 0 /\ x.elts = (fun (x1:int) -> epsilon x2:t. to_int x2 = 3)
+      array = {Array.elts = [|others => epsilon x. (Array.to_int x) = 3|];
+               Array.length = 0}
   Line 47:
     a :
-      array = epsilon x:
-      array.
-      x.length = 0 /\
-      x.elts =
-      (fun (x1:int) ->
-        if x1 = 42 then epsilon x2:t. to_int x2 = 2 else epsilon x2:t.
-        to_int x2 = 3)
-    three : t = epsilon x:t. to_int x = 3
+      array = {Array.elts =
+               [|42 => epsilon x. (Array.to_int x) = 2;
+               others => epsilon x. (Array.to_int x) = 3|];
+               Array.length = 0}
+    three : t = epsilon x. (Array.to_int x) = 3
   Line 48:
     a :
-      array = epsilon x:
-      array.
-      x.length = 0 /\
-      x.elts =
-      (fun (x1:int) ->
-        if x1 = 42 then epsilon x2:t. to_int x2 = 2 else epsilon x2:t.
-        to_int x2 = 3)
+      array = {Array.elts =
+               [|42 => epsilon x. (Array.to_int x) = 2;
+               others => epsilon x. (Array.to_int x) = 3|];
+               Array.length = 0}
 
 File "bench/check-ce/jlamp_array_mono.mlw", line 54, characters 4-16:
 Sub-goal Index in array bounds of goal g'vc.
@@ -196,25 +170,24 @@ File jlamp_array_mono.mlw:
     to_int :
       t
       ->
-      int = fun (bOUND_VARIABLE_479:t) ->
-             if (epsilon x:t. to_int x = 3) = bOUND_VARIABLE_479 then 3
+      int = fun bOUND_VARIABLE_479 ->
+             if epsilon x. (Array.to_int x) = 3 = bOUND_VARIABLE_479 then 3
              else 2
   Line 11:
-    two : t = epsilon x:t. to_int x = 2
+    two : t = epsilon x. (Array.to_int x) = 2
   Line 14:
-    three : t = epsilon x:t. to_int x = 3
+    three : t = epsilon x. (Array.to_int x) = 3
   Line 18:
     elts :
       array
       ->
       int
       ->
-      t = fun (bOUND_VARIABLE_490:array) ->
-           fun (x:int) ->
-            if x = 17 then epsilon x1:t. to_int x1 = 3 else epsilon x1:t.
-            to_int x1 = 2
+      t = fun bOUND_VARIABLE_490 ->
+           [|17 => epsilon x. (Array.to_int x) = 3;
+           others => epsilon x. (Array.to_int x) = 2|]
   Line 19:
-    length : array -> int = fun (bOUND_VARIABLE_495:array) -> 43
+    length : array -> int = fun bOUND_VARIABLE_495 -> 43
   Line 28:
     mixfix [<-] :
       array
@@ -223,59 +196,42 @@ File jlamp_array_mono.mlw:
       ->
       t
       ->
-      array = fun (bOUND_VARIABLE_508:array) (bOUND_VARIABLE_509:int)
-               (bOUND_VARIABLE_510:t) -> epsilon x:array.
-               x.length = 43 /\
-               x.elts =
-               (fun (x1:int) ->
-                 if x1 = 17 then epsilon x2:t. to_int x2 = 3 else epsilon x2:
-                 t. to_int x2 = 2)
+      array = fun bOUND_VARIABLE_508 bOUND_VARIABLE_509 bOUND_VARIABLE_510 ->
+               {Array.elts =
+                [|17 => epsilon x. (Array.to_int x) = 3;
+                others => epsilon x. (Array.to_int x) = 2|];
+                Array.length = 43}
   Line 32:
     a :
-      array = epsilon x:
-      array.
-      x.length = 43 /\
-      x.elts =
-      (fun (x1:int) ->
-        if x1 = 17 then epsilon x2:t. to_int x2 = 3 else epsilon x2:t.
-        to_int x2 = 2)
+      array = {Array.elts =
+               [|17 => epsilon x. (Array.to_int x) = 3;
+               others => epsilon x. (Array.to_int x) = 2|];
+               Array.length = 43}
   Line 34:
     a :
-      array = epsilon x:
-      array.
-      x.length = 43 /\
-      x.elts =
-      (fun (x1:int) ->
-        if x1 = 17 then epsilon x2:t. to_int x2 = 3 else epsilon x2:t.
-        to_int x2 = 2)
+      array = {Array.elts =
+               [|17 => epsilon x. (Array.to_int x) = 3;
+               others => epsilon x. (Array.to_int x) = 2|];
+               Array.length = 43}
   Line 50:
     a :
-      array = epsilon x:
-      array.
-      x.length = 43 /\
-      x.elts =
-      (fun (x1:int) ->
-        if x1 = 17 then epsilon x2:t. to_int x2 = 3 else epsilon x2:t.
-        to_int x2 = 2)
+      array = {Array.elts =
+               [|17 => epsilon x. (Array.to_int x) = 3;
+               others => epsilon x. (Array.to_int x) = 2|];
+               Array.length = 43}
   Line 53:
     a :
-      array = epsilon x:
-      array.
-      x.length = 43 /\
-      x.elts =
-      (fun (x1:int) ->
-        if x1 = 17 then epsilon x2:t. to_int x2 = 3 else epsilon x2:t.
-        to_int x2 = 2)
-    three : t = epsilon x:t. to_int x = 3
+      array = {Array.elts =
+               [|17 => epsilon x. (Array.to_int x) = 3;
+               others => epsilon x. (Array.to_int x) = 2|];
+               Array.length = 43}
+    three : t = epsilon x. (Array.to_int x) = 3
   Line 54:
     a :
-      array = epsilon x:
-      array.
-      x.length = 43 /\
-      x.elts =
-      (fun (x1:int) ->
-        if x1 = 17 then epsilon x2:t. to_int x2 = 3 else epsilon x2:t.
-        to_int x2 = 2)
+      array = {Array.elts =
+               [|17 => epsilon x. (Array.to_int x) = 3;
+               others => epsilon x. (Array.to_int x) = 2|];
+               Array.length = 43}
 
 File "bench/check-ce/jlamp_array_mono.mlw", line 60, characters 4-16:
 Sub-goal Index in array bounds of goal h'vc.
@@ -298,37 +254,32 @@ File jlamp_array_mono.mlw:
     to_int :
       t
       ->
-      int = fun (bOUND_VARIABLE_519:t) ->
-             if (epsilon x:t. to_int x = 3) = bOUND_VARIABLE_519 then 3
+      int = fun bOUND_VARIABLE_519 ->
+             if epsilon x. (Array.to_int x) = 3 = bOUND_VARIABLE_519 then 3
              else 2
   Line 11:
-    two : t = epsilon x:t. to_int x = 2
+    two : t = epsilon x. (Array.to_int x) = 2
   Line 14:
-    three : t = epsilon x:t. to_int x = 3
+    three : t = epsilon x. (Array.to_int x) = 3
   Line 18:
     elts :
       array
       ->
       int
       ->
-      t = fun (bOUND_VARIABLE_534:array) ->
-           if (epsilon x:array.
-              x.length = 43 /\
-              x.elts =
-              (fun (x1:int) ->
-                if x1 = 17 then epsilon x2:t. to_int x2 = 3
-                else if x1 = 42 then epsilon x2:t. to_int x2 = 2
-                     else epsilon x2:t. to_int x2 = 2)) =
-              bOUND_VARIABLE_534
-           then fun (x:int) ->
-                 if x = 17 then epsilon x1:t. to_int x1 = 3
-                 else if x = 42 then epsilon x1:t. to_int x1 = 2
-                      else epsilon x1:t. to_int x1 = 2
-           else fun (x:int) ->
-                 if x = 42 then epsilon x1:t. to_int x1 = 2 else epsilon x1:
-                 t. to_int x1 = 2
+      t = fun bOUND_VARIABLE_534 ->
+           if {Array.elts =
+               [|17 => epsilon x. (Array.to_int x) = 3;
+               42 => epsilon x. (Array.to_int x) = 2;
+               others => epsilon x. (Array.to_int x) = 2|];
+               Array.length = 43} = bOUND_VARIABLE_534
+           then [|17 => epsilon x. (Array.to_int x) = 3;
+                42 => epsilon x. (Array.to_int x) = 2;
+                others => epsilon x. (Array.to_int x) = 2|]
+           else [|42 => epsilon x. (Array.to_int x) = 2;
+                others => epsilon x. (Array.to_int x) = 2|]
   Line 19:
-    length : array -> int = fun (bOUND_VARIABLE_543:array) -> 43
+    length : array -> int = fun bOUND_VARIABLE_543 -> 43
   Line 28:
     mixfix [<-] :
       array
@@ -337,60 +288,43 @@ File jlamp_array_mono.mlw:
       ->
       t
       ->
-      array = fun (bOUND_VARIABLE_556:array) (bOUND_VARIABLE_557:int)
-               (bOUND_VARIABLE_558:t) -> epsilon x:array.
-               x.length = 43 /\
-               x.elts =
-               (fun (x1:int) ->
-                 if x1 = 42 then epsilon x2:t. to_int x2 = 2 else epsilon x2:
-                 t. to_int x2 = 2)
+      array = fun bOUND_VARIABLE_556 bOUND_VARIABLE_557 bOUND_VARIABLE_558 ->
+               {Array.elts =
+                [|42 => epsilon x. (Array.to_int x) = 2;
+                others => epsilon x. (Array.to_int x) = 2|];
+                Array.length = 43}
   Line 32:
     a :
-      array = epsilon x:
-      array.
-      x.length = 43 /\
-      x.elts =
-      (fun (x1:int) ->
-        if x1 = 17 then epsilon x2:t. to_int x2 = 3
-        else if x1 = 42 then epsilon x2:t. to_int x2 = 2 else epsilon x2:t.
-             to_int x2 = 2)
+      array = {Array.elts =
+               [|17 => epsilon x. (Array.to_int x) = 3;
+               42 => epsilon x. (Array.to_int x) = 2;
+               others => epsilon x. (Array.to_int x) = 2|];
+               Array.length = 43}
   Line 34:
     a :
-      array = epsilon x:
-      array.
-      x.length = 43 /\
-      x.elts =
-      (fun (x1:int) ->
-        if x1 = 17 then epsilon x2:t. to_int x2 = 3
-        else if x1 = 42 then epsilon x2:t. to_int x2 = 2 else epsilon x2:t.
-             to_int x2 = 2)
+      array = {Array.elts =
+               [|17 => epsilon x. (Array.to_int x) = 3;
+               42 => epsilon x. (Array.to_int x) = 2;
+               others => epsilon x. (Array.to_int x) = 2|];
+               Array.length = 43}
   Line 56:
     a :
-      array = epsilon x:
-      array.
-      x.length = 43 /\
-      x.elts =
-      (fun (x1:int) ->
-        if x1 = 17 then epsilon x2:t. to_int x2 = 3
-        else if x1 = 42 then epsilon x2:t. to_int x2 = 2 else epsilon x2:t.
-             to_int x2 = 2)
+      array = {Array.elts =
+               [|17 => epsilon x. (Array.to_int x) = 3;
+               42 => epsilon x. (Array.to_int x) = 2;
+               others => epsilon x. (Array.to_int x) = 2|];
+               Array.length = 43}
   Line 59:
     a :
-      array = epsilon x:
-      array.
-      x.length = 43 /\
-      x.elts =
-      (fun (x1:int) ->
-        if x1 = 42 then epsilon x2:t. to_int x2 = 2 else epsilon x2:t.
-        to_int x2 = 2)
-    three : t = epsilon x:t. to_int x = 3
+      array = {Array.elts =
+               [|42 => epsilon x. (Array.to_int x) = 2;
+               others => epsilon x. (Array.to_int x) = 2|];
+               Array.length = 43}
+    three : t = epsilon x. (Array.to_int x) = 3
   Line 60:
     a :
-      array = epsilon x:
-      array.
-      x.length = 43 /\
-      x.elts =
-      (fun (x1:int) ->
-        if x1 = 42 then epsilon x2:t. to_int x2 = 2 else epsilon x2:t.
-        to_int x2 = 2)
+      array = {Array.elts =
+               [|42 => epsilon x. (Array.to_int x) = 2;
+               others => epsilon x. (Array.to_int x) = 2|];
+               Array.length = 43}
 

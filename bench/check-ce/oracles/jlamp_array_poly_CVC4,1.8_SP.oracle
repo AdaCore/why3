@@ -12,7 +12,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array t -> int = fun (bOUND_VARIABLE_561:array t) -> 0
+    length : array t -> int = fun bOUND_VARIABLE_561 -> 0
   Line 20:
     mixfix [] :
       array
@@ -20,20 +20,20 @@ File array.mlw:
       ->
       int
       ->
-      t = fun (bOUND_VARIABLE_589:array t) (bOUND_VARIABLE_590:int) ->
-           epsilon x:t. to_int x = 3
+      t = fun bOUND_VARIABLE_589 bOUND_VARIABLE_590 -> epsilon x.
+           (Array.to_int x) = 3
 File jlamp_array_poly.mlw:
   Line 8:
     to_int :
       t
       ->
-      int = fun (bOUND_VARIABLE_698:t) ->
-             if (epsilon x:t. to_int x = 3) = bOUND_VARIABLE_698 then 3
+      int = fun bOUND_VARIABLE_698 ->
+             if epsilon x. (Array.to_int x) = 3 = bOUND_VARIABLE_698 then 3
              else 2
   Line 11:
-    two : t = epsilon x:t. to_int x = 2
+    two : t = epsilon x. (Array.to_int x) = 2
   Line 14:
-    three : t = epsilon x:t. to_int x = 3
+    three : t = epsilon x. (Array.to_int x) = 3
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -49,21 +49,21 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array t -> int = fun (bOUND_VARIABLE_628:array t) -> 0
+    length : array t -> int = fun bOUND_VARIABLE_628 -> 0
 File jlamp_array_poly.mlw:
   Line 8:
     to_int :
       t
       ->
-      int = fun (bOUND_VARIABLE_773:t) ->
-             if (epsilon x:t. to_int x = 3) = bOUND_VARIABLE_773 then 3
+      int = fun bOUND_VARIABLE_773 ->
+             if epsilon x. (Array.to_int x) = 3 = bOUND_VARIABLE_773 then 3
              else 2
   Line 11:
-    two : t = epsilon x:t. to_int x = 2
+    two : t = epsilon x. (Array.to_int x) = 2
   Line 14:
-    three : t = epsilon x:t. to_int x = 3
+    three : t = epsilon x. (Array.to_int x) = 3
   Line 21:
-    three : t = epsilon x:t. to_int x = 3
+    three : t = epsilon x. (Array.to_int x) = 3
 
 File "bench/check-ce/jlamp_array_poly.mlw", line 28, characters 4-16:
 Sub-goal Index in array bounds of goal g'vc.

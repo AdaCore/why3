@@ -60,10 +60,9 @@ File array_mono.mlw:
       ->
       int
       ->
-      int = fun (_arg_1:array) ->
-             fun (x:int) -> if x = 0 then 42 else if x = 1 then 42 else 0
+      int = fun _arg_1 -> [|0 => 42; 1 => 42; others => 0|]
   Line 10:
-    length : array -> int = fun (_arg_1:array) -> 2
+    length : array -> int = fun _arg_1 -> 2
   Line 19:
     mixfix [<-] :
       array
@@ -72,45 +71,27 @@ File array_mono.mlw:
       ->
       int
       ->
-      array = fun (_arg_1:array) (_arg_2:int) (_arg_3:int) -> epsilon x:
-               array.
-               x.length = 2 /\
-               x.elts =
-               (fun (x1:int) ->
-                 if x1 = 0 then 42 else if x1 = 1 then 42 else 0)
+      array = fun _arg_1 _arg_2 _arg_3 ->
+               {Array.elts = [|0 => 42; 1 => 42; others => 0|];
+                Array.length = 2}
   Line 23:
     a :
-      array = epsilon x:
-      array.
-      x.length = 2 /\
-      x.elts =
-      (fun (x1:int) -> if x1 = 0 then 42 else if x1 = 1 then 42 else 0)
+      array = {Array.elts = [|0 => 42; 1 => 42; others => 0|];
+               Array.length = 2}
   Line 25:
     a :
-      array = epsilon x:
-      array.
-      x.length = 2 /\
-      x.elts =
-      (fun (x1:int) -> if x1 = 0 then 42 else if x1 = 1 then 42 else 0)
+      array = {Array.elts = [|0 => 42; 1 => 42; others => 0|];
+               Array.length = 2}
   Line 38:
     a :
-      array = epsilon x:
-      array.
-      x.length = 2 /\
-      x.elts =
-      (fun (x1:int) -> if x1 = 0 then 42 else if x1 = 1 then 42 else 0)
+      array = {Array.elts = [|0 => 42; 1 => 42; others => 0|];
+               Array.length = 2}
   Line 40:
     a :
-      array = epsilon x:
-      array.
-      x.length = 2 /\
-      x.elts =
-      (fun (x1:int) -> if x1 = 0 then 42 else if x1 = 1 then 42 else 0)
+      array = {Array.elts = [|0 => 42; 1 => 42; others => 0|];
+               Array.length = 2}
   Line 41:
     a :
-      array = epsilon x:
-      array.
-      x.length = 2 /\
-      x.elts =
-      (fun (x1:int) -> if x1 = 0 then 42 else if x1 = 1 then 42 else 0)
+      array = {Array.elts = [|0 => 42; 1 => 42; others => 0|];
+               Array.length = 2}
 

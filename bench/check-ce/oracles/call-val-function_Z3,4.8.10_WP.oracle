@@ -39,8 +39,8 @@ File call-val-function.mlw:
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: BAD_CE
-  - Concrete RAC: STUCK (failure in postcondition of `f` at "bench/check-ce/call-val-function.mlw", line 25, characters 12-24)
-  - Abstract RAC: STUCK (failure in postcondition of `f` at "bench/check-ce/call-val-function.mlw", line 25, characters 12-24)
+  - Concrete RAC: STUCK (failure in postcondition of `f1` at "bench/check-ce/call-val-function.mlw", line 25, characters 12-24)
+  - Abstract RAC: STUCK (failure in postcondition of `f1` at "bench/check-ce/call-val-function.mlw", line 25, characters 12-24)
 - Selected model 1: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 28, characters 12-24)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 28, characters 12-24)
@@ -65,21 +65,21 @@ File call-val-function.mlw:
       zero = 0
       one = 1
   Line 30:
-    (giant-step) execution of unimplemented function `f`
+    (giant-step) execution of unimplemented function `f1`
       x = 42
-    result of `f` = 43
+    result of `f1` = 43
   Line 31:
     Normal execution of function `(+)` with args:
       _ = 43
       _ = 1
   Line 28:
-    Property failure at postcondition of `main` with:
+    Property failure at postcondition of `main1` with:
       result = 44
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: BAD_CE
-  - Concrete RAC: STUCK (failure in postcondition of `f` at unknown location)
-  - Abstract RAC: STUCK (failure in postcondition of `f` at unknown location)
+  - Concrete RAC: STUCK (failure in postcondition of `f2` at unknown location)
+  - Abstract RAC: STUCK (failure in postcondition of `f2` at unknown location)
 - Selected model 1: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 44, characters 12-24)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 44, characters 12-24)
@@ -104,14 +104,14 @@ File call-val-function.mlw:
       zero = 0
       one = 1
   Line 46:
-    (giant-step) execution of unimplemented function `f`
+    (giant-step) execution of unimplemented function `f2`
       x = 42
-    result of `f` = 43
+    result of `f2` = 43
   Line 47:
     Normal execution of function `(+)` with args:
       _ = 43
       _ = 1
   Line 44:
-    Property failure at postcondition of `main` with:
+    Property failure at postcondition of `main2` with:
       result = 44
 
