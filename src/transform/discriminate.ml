@@ -176,33 +176,20 @@ let ty_quant env t =
   in
   t_app_fold add_vs (Ssubst.singleton (Mtv.empty)) t
 
-let ts_of_ls env ls decls =
-  if ls_equal ls ps_equ then decls else
-  let add_ts sts ts = Sts.add ts sts in
-  let add_ty sts ty = ty_s_fold add_ts sts ty in
-  let add_tyl tyl _ sts = List.fold_left add_ty sts tyl in
-  let insts = Mls.find_def Mtyl.empty ls env in
-  let sts = Mtyl.fold add_tyl insts Sts.empty in
-  let add_ts ts dl = create_ty_decl ts :: dl in
-  Sts.fold add_ts sts decls
-
 (* The Core of the transformation *)
-let map metas_rewrite_pr env d =
+let translate metas_rewrite_pr env d =
   let decls,metas =
     match d.d_node with
-    | Dtype _ -> [d],[]
-    | Ddata _ -> Printer.unsupportedDecl d
-      "Algebraic and recursively-defined types are \
-            not supported, run eliminate_algebraic"
+    | Dtype _ | Ddata _ -> [d],[]
     | Dparam ls ->
       let lls = Mtyl.values (Mls.find_def Mtyl.empty ls env) in
       let lds = List.map create_param_decl lls in
-      ts_of_ls env ls (d::lds),[]
+      d::lds,[]
     | Dlogic [ls,ld] when not (Sid.mem ls.ls_name (get_used_syms_decl d)) ->
       let f = ls_defn_axiom ld in
       let substs = ty_quant env f in
-      let conv_f tvar (defns,axioms) =
-        let f = t_ty_subst tvar Mvs.empty f in
+      let conv_f subst (defns,axioms) =
+        let f = t_ty_subst subst Mvs.empty f in
         let f = t_app_map (find_logic env) f in
         match ls_defn_of_axiom f with
           | Some ld ->
@@ -213,7 +200,7 @@ let map metas_rewrite_pr env d =
               defns, create_prop_decl Paxiom pr f :: axioms
       in
       let defns,axioms = Ssubst.fold conv_f substs ([],[]) in
-      ts_of_ls env ls (List.rev_append defns axioms),[]
+      List.rev_append defns axioms,[]
     | Dlogic _ -> Printer.unsupportedDecl d
       "Recursively-defined symbols are not supported, run eliminate_recursion"
     | Dind _ -> Printer.unsupportedDecl d
@@ -221,8 +208,8 @@ let map metas_rewrite_pr env d =
     | Dprop (k,pr,f) ->
       let substs = ty_quant env f in
       let substs_len = Ssubst.cardinal substs in
-      let conv_f tvar (task,metas) =
-        let f = t_ty_subst tvar Mvs.empty f in
+      let conv_f subst (task, metas)=
+        let f = t_ty_subst subst Mvs.empty f in
         let f = t_app_map (find_logic env) f in
         if substs_len = 1 then
           create_prop_decl k pr f :: task, metas
@@ -236,7 +223,6 @@ let map metas_rewrite_pr env d =
       Ssubst.fold conv_f substs ([],[])
   in
   List.rev_append (List.rev_map create_decl decls) metas
-
 
 let ft_select_inst =
   ((Hstr.create 17) : (Env.env,Sty.t) Trans.flag_trans)
@@ -336,12 +322,23 @@ let lsymbol_distinction =
       let env = Lsmap.of_metas metas in
       (* Format.eprintf "instantiate %a@." print_env env; *)
       Trans.on_tagged_pr Compute.meta_rewrite (fun rewrite_pr ->
-        Trans.tdecl (map rewrite_pr env) None))
+        Trans.tdecl (translate rewrite_pr env) None))
+
+let move_typedecl_top =
+  let fold t (type_decls,other_decls) =
+    match t.task_decl.td_node with
+    | Decl {d_node = Ddata _ | Dtype _} -> t.task_decl::type_decls, other_decls
+    | _ -> type_decls,t.task_decl::other_decls
+  in
+  Trans.bind (Trans.fold fold ([],[])) (fun (type_decls,other_decls) ->
+    let decls = List.rev_append type_decls (List.rev other_decls) in
+    Trans.return (List.fold_left add_tdecl None decls))
 
 let discriminate env = Trans.seq [
   Libencoding.monomorphise_goal;
   select_lsinst env;
   Trans.print_meta Libencoding.debug meta_lsinst;
+  move_typedecl_top;
   lsymbol_distinction;
 ]
 

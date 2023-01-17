@@ -449,6 +449,7 @@ let comp t (state,task) = match t.task_decl.td_node with
 let init_task =
   let init = Task.add_meta None meta_infinite [MAts ts_int] in
   let init = Task.add_meta init meta_infinite [MAts ts_real] in
+  let init = Task.add_param_decl init ps_equ in
   init
 
 let eliminate_match =
