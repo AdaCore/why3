@@ -547,7 +547,7 @@ let rec json_of_concrete_term ct =
     Record [
       "Epsilon",
       Record [
-        "eps_vs", String eps_vs;
+        "eps_var", String eps_vs;
         "eps_t", json_of_concrete_term eps_t
       ]
     ]
