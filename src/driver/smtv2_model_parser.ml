@@ -1515,7 +1515,7 @@ module FromModelToTerm = struct
 
   and get_opt_record env (vs,vs_name) (t',t'_concrete) =
     (* check if t is of the form epsilon x:ty. x.f1 = v1 /\ ... /\ x.fn = vn
-    with f1,...,fn the fields associated to type ity *)
+    with f1,...,fn the fields associated to type ty *)
     let exception UnexpectedPattern in
     let rec get_conjuncts (t',t'_concrete) =
       match t'.t_node, t'_concrete with
@@ -1557,9 +1557,9 @@ module FromModelToTerm = struct
     with UnexpectedPattern -> None
   
   and get_opt_int_range (vs,vs_name) (t',t'_concrete) =
-  (* special case for range types:
-     if t is of the form epsilon x:ty. ty'int x = v, check that v is in the
-     range of values defined by type ty *)
+  (* special case for int range types:
+     if t is of the form epsilon x:ty. ty'int x = v, use a integer constant
+     as concrete term *)
     let exception UnexpectedPattern in
     try
       let ((proj_ls,proj_ls_name), (proj_v,c_proj_v)) =
@@ -1585,14 +1585,18 @@ module FromModelToTerm = struct
       | _ -> raise UnexpectedPattern
     with UnexpectedPattern -> None
 
-  (* If some prover variables remain after evaluation, we remove the terms
-     containing those prover variables. *)
+
   let clean env terms =
     Mstr.map_filter
       (fun ((ls, oloc, attr), (t, t_concrete)) ->
+        (* if some prover variables remain after evaluation, remove the terms
+        containing those prover variables *)
         if Term.t_v_any (fun vs -> is_vs_in_prover_vars vs env.prover_vars) t
         then None
         else
+          (* convert some concrete epsilon terms:
+             - when it represents a record,
+             - when it represents the int projection of a range value *)
           let (t, t_concrete) = maybe_convert_epsilon_terms env (t, t_concrete) in
           Some ((ls, oloc, attr), (t, t_concrete)))
       terms
@@ -1716,7 +1720,9 @@ module FromModelToTerm = struct
        fields for record types *)
     let terms = eval pinfo env terms in
     debug_terms "AFTER EVALUATION" terms;
-    (* 3rd pass = cleanup *)
+    (* 3rd pass = cleanup (remove not evaluated prover variables,
+       convert concrete epsilon terms to records / integers for
+       projections of integer range types) *)
     let terms = clean env terms in
     debug_terms "AFTER CLEANUP" terms;
     terms

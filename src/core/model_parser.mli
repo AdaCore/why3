@@ -78,6 +78,7 @@ type concrete_syntax_term =
   | Binop of concrete_syntax_binop * concrete_syntax_term * concrete_syntax_term
   | Not of concrete_syntax_term
   | Function of { is_array: bool; args: string list ; body: concrete_syntax_term }
+  (* the boolean [is_array] is used for pretty and JSON printing *)
   | Record of (string * concrete_syntax_term) list
   (* list of (field_name,field_value) elements *)
 
