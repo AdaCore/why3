@@ -383,7 +383,7 @@ let rec json_type ty =
 let json_otype oty =
   let open Json_base in
   match oty with
-  | None -> String "bool"
+  | None -> Null
   | Some ty -> json_type ty
 
 let json_lsymbol ls =

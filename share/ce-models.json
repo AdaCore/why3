@@ -1,0 +1,717 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "CE models",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "prover-result": {
+                "type": "object",
+                "properties": {
+                    "answer": {
+                        "type": "string"
+                    },
+                    "ce-models": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "answer": {
+                                    "type": "string"
+                                },
+                                "model": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "filename": {
+                                                "type": "string"
+                                            },
+                                            "model": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "is_vc_line": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "line": {
+                                                            "type": "string"
+                                                        },
+                                                        "model_elements": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "attrs": {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "kind": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "loc": {
+                                                                        "$ref": "#/$defs/location"
+                                                                    },
+                                                                    "lsymbol": {
+                                                                        "type": "object",
+                                                                        "properties": {
+                                                                            "name": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "attrs": {
+                                                                                "type": "array",
+                                                                                "items": {
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "loc": {
+                                                                                "$ref": "#/$defs/location"
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "value": {
+                                                                        "type": "object",
+                                                                        "properties": {
+                                                                            "value_concrete_term": {
+                                                                                "$ref": "#/$defs/concrete_term"
+                                                                            },
+                                                                            "value_term": {
+                                                                                "$ref": "#/$defs/term"
+                                                                            },
+                                                                            "value_type": {
+                                                                                "$ref": "#/$defs/type"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "step": {
+                        "type": "number"
+                    },
+                    "time": {
+                        "type": "number"
+                    }
+                }
+            },
+            "term": {
+                "type": "object",
+                "properties": {
+                    "explanations": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "goal_name": {
+                        "type": "string"
+                    },
+                    "loc": {
+                        "$ref": "#/$defs/location"
+                    }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "location": {
+            "oneOf": [
+                {
+                    "type": "string",
+                    "pattern": "^NO_LOC$"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "file-name": {
+                            "type": "string"
+                        },
+                        "start-line": {
+                            "type": "number"
+                        },
+                        "start-char": {
+                            "type": "number"
+                        },
+                        "end-line": {
+                            "type": "number"
+                        },
+                        "end-char": {
+                            "type": "number"
+                        }
+                    }
+                }
+            ]
+        },
+        "type": {
+            "oneOf": [
+                {
+                    "type": "null"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tyvar": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["Tyvar"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tyapp": {
+                            "type": "object",
+                            "properties": {
+                                "ty_symbol": {
+                                    "type": "string"
+                                },
+                                "ty_args": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#"
+                                    }
+                                }
+                            },
+                            "required": ["ty_symbol","ty_args"]
+                        }
+                    },
+                    "required": ["Tyapp"]
+                }
+            ]
+        },
+        "vsymbol": {
+            "type": "object",
+            "properties": {
+                "vs_name": {
+                    "type": "string"
+                },
+                "vs_type": {
+                    "$ref": "#/$defs/type"
+                }
+            },
+            "required": ["vs_name","vs_type"]
+        },
+        "term": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tvar": {
+                            "$ref": "#/$defs/vsymbol"
+                        }
+                    },
+                    "required": ["Tvar"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tconst": {
+                            "type": "object",
+                            "properties": {
+                                "const_type": {
+                                    "type": "string"
+                                },
+                                "const_value": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["const_type","const_value"]
+                        }
+                    },
+                    "required": ["Tconst"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tapp": {
+                            "type": "object",
+                            "properties": {
+                                "app_ls": {
+                                    "type": "string"
+                                },
+                                "app_args": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#"
+                                    }
+                                }
+                            },
+                            "required": ["app_ls","app_args"]
+                        }
+                    },
+                    "required": ["Tapp"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tif": {
+                            "type": "object",
+                            "properties": {
+                                "if": {
+                                    "$ref": "#"
+                                },
+                                "then": {
+                                    "$ref": "#"
+                                },
+                                "else": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["if","then","else"]
+                        }
+                    },
+                    "required": ["Tif"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Teps": {
+                            "type": "object",
+                            "properties": {
+                                "eps_vs": {
+                                    "$ref": "#/$defs/vsymbol"
+                                },
+                                "eps_t": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["eps_vs","eps_t"]
+                        }
+                    },
+                    "required": ["Teps"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tfun": {
+                            "type": "object",
+                            "properties": {
+                                "fun_args": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/$defs/vsymbol"
+                                    }
+                                },
+                                "fun_body": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["fun_args","fun_body"]
+                        }
+                    },
+                    "required": ["Tfan"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tquant": {
+                            "type": "object",
+                            "properties": {
+                                "quant": {
+                                    "type": "string"
+                                },
+                                "quant_vs": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/$defs/vsymbol"
+                                    }
+                                },
+                                "quant_t": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["quant","quant_vs","quant_t"]
+                        }
+                    },
+                    "required": ["Tquant"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tbinop": {
+                            "type": "object",
+                            "properties": {
+                                "binop": {
+                                    "type": "string"
+                                },
+                                "binop_t1": {
+                                    "$ref": "#"
+                                },
+                                "binop_t2": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["binop","binop_t1","binop_t2"]
+                        }
+                    },
+                    "required": ["Tbinop"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tnot": {
+                            "$ref": "#"
+                        }
+                    },
+                    "required": ["Tnot"]
+                },
+                {
+                    "type": "string",
+                    "pattern": "^Ttrue$"
+                },
+                {
+                    "type": "string",
+                    "pattern": "^Tfalse$"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tlet": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["Tlet"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tcase": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["Tcase"]
+                }
+            ]
+        },
+        "concrete_term": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "Var": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["Var"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Const": {
+                            "oneOf": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "Boolean": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": ["Boolean"]
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "String": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": ["String"]
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "Integer": {
+                                            "type": "number"
+                                        }
+                                    },
+                                    "required": ["Integer"]
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "Real": {
+                                            "type": "number"
+                                        }
+                                    },
+                                    "required": ["Real"]
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "BitVector": {
+                                            "type": "object",
+                                            "properties": {
+                                                "bv_binary": {
+                                                    "type": "string"
+                                                },
+                                                "bv_int": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "required": ["BitVector"]
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "Fraction": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": ["Fraction"]
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "Float": {
+                                            "oneOf": [
+                                                {
+                                                    "type": "string",
+                                                    "pattern": "^Infinity$"
+                                                },
+                                                {
+                                                    "type": "string",
+                                                    "pattern": "^Plus_zero$"
+                                                },
+                                                {
+                                                    "type": "string",
+                                                    "pattern": "^Minus_zero$"
+                                                },
+                                                {
+                                                    "type": "string",
+                                                    "pattern": "^NaN$"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "sign": {
+                                                            "type": "string"
+                                                        },
+                                                        "exp": {
+                                                            "type": "string"
+                                                        },
+                                                        "mant": {
+                                                            "type": "string"
+                                                        },
+                                                        "hex": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": ["sign","exp","mant","hex"]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": ["Float"]
+                                }
+                            ]
+                        }
+                    },
+                    "required": ["Const"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Apply": {
+                            "type": "object",
+                            "properties": {
+                                "app_ls": {
+                                    "type": "string"
+                                },
+                                "app_args": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#"
+                                    }
+                                }
+                            },
+                            "required": ["app_ls","app_args"]
+                        }
+                    },
+                    "required": ["Apply"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "If": {
+                            "type": "object",
+                            "properties": {
+                                "if": {
+                                    "$ref": "#"
+                                },
+                                "then": {
+                                    "$ref": "#"
+                                },
+                                "else": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["if","then","else"]
+                        }
+                    },
+                    "required": ["If"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Epsilon": {
+                            "type": "object",
+                            "properties": {
+                                "eps_var": {
+                                    "type": "string"
+                                },
+                                "eps_t": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["eps_var","eps_t"]
+                        }
+                    },
+                    "required": ["Epsilon"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Function": {
+                            "type": "object",
+                            "properties": {
+                                "fun_args": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "fun_body": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["fun_args","fun_body"]
+                        }
+                    },
+                    "required": ["Function"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Quant": {
+                            "type": "object",
+                            "properties": {
+                                "quant": {
+                                    "type": "string"
+                                },
+                                "quant_vars": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "quant_t": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["quant","quant_vars","quant_t"]
+                        }
+                    },
+                    "required": ["Quant"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Binop": {
+                            "type": "object",
+                            "properties": {
+                                "binop": {
+                                    "type": "string"
+                                },
+                                "binop_t1": {
+                                    "$ref": "#"
+                                },
+                                "binop_t2": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["binop","binop_t1","binop_t2"]
+                        }
+                    },
+                    "required": ["Binop"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Not": {
+                            "$ref": "#"
+                        }
+                    },
+                    "required": ["Not"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Array": {
+                            "type": "object",
+                            "properties": {
+                                "array_elts": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "indice": {
+                                                "$ref": "#"
+                                            },
+                                            "value": {
+                                                "$ref": "#"
+                                            }
+                                        },
+                                        "required": ["indice","value"]
+                                    }
+                                },
+                                "array_others": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["array_elts","array_others"]
+                        }
+                    },
+                    "required": ["Array"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Record": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "field": {
+                                        "type": "string"
+                                    },
+                                    "value":{
+                                        "$ref": "#"
+                                    }
+                                },
+                                "required": ["field","value"]
+                            }
+                        }
+                    },
+                    "required": ["Record"]
+                }
+            ]
+        }
+    }
+}
