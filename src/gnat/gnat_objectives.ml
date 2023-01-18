@@ -936,8 +936,7 @@ let schedule_goal ~callback c g =
           end
         | _ -> ()
     in
-    List.iter (fun p ->
-    schedule_goal_with_prover ~callback c g p) Gnat_config.provers
+    List.iter (fun p -> schedule_goal_with_prover ~callback c g p) provers
   end else begin
     let p = if warn then Opt.get (Gnat_config.prover_warn)
       else find_best_untried_prover c.Controller_itp.controller_session g in
