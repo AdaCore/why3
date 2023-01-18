@@ -196,16 +196,11 @@ let print_model_classification ?verb_lvl ?json ?check_ce fmt (m, c) =
   fprintf fmt "@ %a"
     (print_classification_log_or_model ?verb_lvl ~print_attrs ?json) (m, c)
 
-(* Import values from solver counterexample model *)
+(** Import values from SMT solver models to interpreter values. *)
 
 let cannot_import f =
   incomplete ("cannot import value from model: " ^^ f)
 
-(** Import a value from the prover model to an interpreter value.
-
-    @raise Exit when the type [ity] and the shape of the the value [v] do not
-    match. This may happen when a module that contains a value with an abstract
-    type is cloned with different types as instantiations of the abstract type. *)
 let rec import_model_value loc env check known ity t =
   Debug.dprintf debug_check_ce_rac_results "[import_model_value] importing term %a with type %a@."
     Pretty.print_term t

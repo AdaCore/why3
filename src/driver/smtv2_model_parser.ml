@@ -9,6 +9,15 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** This file is organized in 3 main modules:
+    - FromStringToSexp, which parses the prover output (as string) to
+    S-expressions
+    - FromSexpToModel, which converts S-expressions to
+    Smtv2_model_defs.fun_def
+    - FromModelToTerm, which converts Smtv2_model_defs.fun_def to
+    (Term.term, Model_parser.concrete_syntax_term) in order to create
+    a list of Model_parser.model_element values *)
+
 open Wstdlib
 open Term
 open Smtv2_model_defs
@@ -363,7 +372,7 @@ module FromSexpToModel = struct
 
   and array sexp =
     match sexp with
-    (* "_ as-array" not supported because not associated to sorts for indices/values*)
+    (* "_ as-array" not supported because not associated to sorts for indices/values *)
     | List
         [ List [ Atom "as"; Atom "const"; List [ Atom "Array"; s1; s2 ] ]; t ]
       ->
@@ -415,7 +424,8 @@ end
 
 (*
 **********************************************************************
-**  Converting Smtv2_model_defs.fun_def to Term.term
+**  Converting Smtv2_model_defs.fun_def to (Term.term,
+**  Model_parser.concrete_syntax_term)
 **********************************************************************
 *)
 
@@ -587,13 +597,7 @@ module FromModelToTerm = struct
     in
     (t_var vs, concrete_var_from_vs vs)
 
-  let pad_with_zeros width s =
-    let filled =
-      let len = width - String.length s in
-      if len <= 0 then "" else String.make len '0'
-    in
-    filled ^ s
-
+  (* Be careful when modifying this code! *)
   let float_of_binary fp =
     match fp with
     | Fplusinfinity | Fminusinfinity -> raise Float_Infinity
@@ -627,6 +631,13 @@ module FromModelToTerm = struct
             if adjust = 4 then mant.bv_value (* No adjustment needed *)
             else BigInt.mul (BigInt.pow_int_pos 2 adjust) mant.bv_value
           else mant.bv_value
+        in
+        let pad_with_zeros width s =
+          let filled =
+            let len = width - String.length s in
+            if len <= 0 then "" else String.make len '0'
+          in
+          filled ^ s
         in
         let frac =
           pad_with_zeros frac_len (Format.sprintf "%x" (BigInt.to_int frac))
@@ -872,6 +883,58 @@ module FromModelToTerm = struct
     | Tunparsed _ -> error "Could not interpret term %a@." print_term t
 
   and apply_to_term env qid ts =
+    let maybe_prover_fun_def env n (ts',ts'_concrete) =
+      try
+        (* search if [n] is the name of a prover function definition *)
+        let t, t_concrete = Mstr.find n env.prover_fun_defs in
+        let vs_args, _, t' = t_open_lambda t in
+        begin match vs_args, ts' with
+        (* special case for constants, we just substitute by the prover constant *)
+        | [],[] -> Some (t,t_concrete)
+        (* general case *)
+        | vs_args,ts' ->
+          let subst = Mvs.of_list (List.combine vs_args ts') in
+          begin match t_concrete with
+          | Function {args=args_concrete; body=t'_concrete} ->
+            let subst_concrete = Mstr.of_list (List.combine args_concrete ts'_concrete) in
+            Some (t_subst subst t', subst_concrete_term subst_concrete t'_concrete)
+          | _ -> None
+          end
+        end
+      with _ -> None
+    in
+    let maybe_known_ls_or_new ~opt_sort env n (ts',ts'_concrete) =
+      (* search for [n] in constructors and in builtin symbols *)
+      let ls =
+        try Mstr.find n env.constructors
+        with _ ->
+          begin try find_builtin_lsymbol env n ts'
+          with NoBuiltinSymbol ->
+            begin match opt_sort with
+            | None ->
+              (* no sort is associated to Qident, so we cannot infer the type of the
+                  lsymbol to create and fails instead *)
+              error "No lsymbol found for qualified identifier %a@."
+                print_qualified_identifier qid
+            | Some s ->
+              let ts'_ty =
+                try List.map (fun t -> Opt.get t.t_ty) ts'
+                with _ ->
+                  error "Arguments of %a should have a type@."
+                    print_qualified_identifier qid
+              in
+              (* for Qannotident, we can infer the type and create a fresh lsymbol *)
+              create_lsymbol (Ident.id_fresh n) ts'_ty
+                (Some (smt_sort_to_ty env s))
+            end
+          end
+      in
+      try (t_app ls ts' ls.ls_value,  concrete_apply_from_ls ls ts'_concrete)
+      with _ ->
+        error "Cannot apply lsymbol %a to terms (%a)@." Pretty.print_ls ls
+          (Pp.print_list Pp.comma Pretty.print_term)
+          ts'
+    in
     match (qid, ts) with
     | Qident (Isymbol (S "=")), [ t1; t2 ] ->
         let t1', t1'_concrete = term_to_term env t1 in
@@ -898,74 +961,24 @@ module FromModelToTerm = struct
     | Qident (Isymbol (S "not")), [ t ] ->
         let (t,t_concrete) = term_to_term env t in
         (t_not (Term.to_prop t), Not t_concrete)
-    | Qident (Isymbol (S n)), ts | Qident (Isymbol (Sprover n)), ts -> (
+    (*  In the general case, we first search if [n] corresponds to a known
+        prover definition (in which case we apply a substitution), or a known
+        symbol (constructor, builtin).
+        Otherwise, we can create a fresh lsymbol only for Qannotident cases, since
+        Qident are not associated to an SMT sort. *)
+    | Qident (Isymbol (S n)), ts | Qident (Isymbol (Sprover n)), ts ->
         let ts', ts'_concrete = List.split (List.map (term_to_term env) ts) in
-        try
-          (* we first search if [n] is the name of a function defined
-             elsewhere in the SMT model *)
-          let t, t_concrete = Mstr.find n env.prover_fun_defs in
-          let vs_args, _, t' = t_open_lambda t in
-          let subst = Mvs.of_list (List.combine vs_args ts') in
-          begin match t_concrete with
-          | Function {args=args_concrete; body=t'_concrete} ->
-            let subst_concrete = Mstr.of_list (List.combine args_concrete ts'_concrete) in
-            (t_subst subst t', subst_concrete_term subst_concrete t'_concrete)
-          | _ -> error_concrete_syntax "TODO_WIP"
-          end
-        with _ -> (
-          (* if it fails, we search for [n] in constructors and in builtin symbols *)
-          let ls =
-            try Mstr.find n env.constructors
-            with _ -> (
-              try find_builtin_lsymbol env n ts'
-              with NoBuiltinSymbol ->
-                (* no sort is associated to Qident, so we cannot infer the type of the
-                   lsymbol to create and fails instead *)
-                error "No lsymbol found for qualified identifier %a@."
-                  print_qualified_identifier qid)
-          in
-          try (t_app ls ts' ls.ls_value,  concrete_apply_from_ls ls ts'_concrete)
-          with _ ->
-            error "Cannot apply lsymbol %a to terms (%a)@." Pretty.print_ls ls
-              (Pp.print_list Pp.comma Pretty.print_term)
-              ts'))
+        begin match maybe_prover_fun_def env n (ts',ts'_concrete) with
+        | Some (t,t'_concrete) -> (t,t'_concrete)
+        | None -> maybe_known_ls_or_new ~opt_sort:None env n (ts',ts'_concrete)
+        end
     | Qannotident (Isymbol (S n), s), ts
-    | Qannotident (Isymbol (Sprover n), s), ts -> (
-        let ts', ts'_concrete = List.split (List.map (term_to_term env) ts) in
-        try
-          (* we first search if [n] is the name of a function defined
-             elsewhere in the SMT model *)
-          let t, t_concrete = Mstr.find n env.prover_fun_defs in
-          let vs_args, _, t' = t_open_lambda t in
-          let subst = Mvs.of_list (List.combine vs_args ts') in
-          begin match t_concrete with
-          | Function {args=args_concrete; body=t'_concrete}->
-            let subst_concrete = Mstr.of_list (List.combine args_concrete ts'_concrete) in
-            (t_subst subst t', subst_concrete_term subst_concrete t'_concrete)
-          | _ -> error_concrete_syntax "TODO_WIP"
-          end
-        with _ -> (
-          (* if it fails, we search for [n] in constructors and in builtin symbols *)
-          let ls =
-            try Mstr.find n env.constructors
-            with _ -> (
-              try find_builtin_lsymbol env n ts'
-              with NoBuiltinSymbol ->
-                let ts'_ty =
-                  try List.map (fun t -> Opt.get t.t_ty) ts'
-                  with _ ->
-                    error "Arguments of %a should have a type@."
-                      print_qualified_identifier qid
-                in
-                (* for Qannotident, we can infer the type and create a fresh lsymbol *)
-                create_lsymbol (Ident.id_fresh n) ts'_ty
-                  (Some (smt_sort_to_ty env s)))
-          in
-          try (t_app ls ts' ls.ls_value, concrete_apply_from_ls ls ts'_concrete)
-          with _ ->
-            error "Cannot apply lsymbol %a to terms (%a)@." Pretty.print_ls ls
-              (Pp.print_list Pp.comma Pretty.print_term)
-              ts'))
+    | Qannotident (Isymbol (Sprover n), s), ts ->
+      let ts', ts'_concrete = List.split (List.map (term_to_term env) ts) in
+      begin match maybe_prover_fun_def env n (ts',ts'_concrete) with
+      | Some (t,t'_concrete) -> (t,t'_concrete)
+      | None -> maybe_known_ls_or_new ~opt_sort:(Some s) env n (ts',ts'_concrete)
+      end
     | _ -> error "Could not interpret %a@." print_qualified_identifier qid
 
   and array_to_term env s1 s2 elts =
@@ -1000,6 +1013,11 @@ module FromModelToTerm = struct
     in
     (t_lambda [ vs_arg ] [] a, Function {is_array=true; args=[vs_name]; body=a_concrete})
 
+  (*  Interpreting function definitions from the SMT model to [t',t'_concrete].
+      - [t'] is a Term.term
+      - [t'_concrete] is a Model_parser.concrete_syntax_term
+      We go recursively into the function definition [t], while keeping the
+      invariant "t' and t'_concrete must have the same shape". *)
   let smt_term_to_term ~fmla env t s =
     Debug.dprintf debug "[smt_term_to_term] t = %a@." print_term t;
     let ty_s = smt_sort_to_ty env s in
@@ -1013,6 +1031,7 @@ module FromModelToTerm = struct
       (Pp.print_option_or_default "None" Pretty.print_ty_qualified)
       ty_s fmla;
     let (t', t'_concrete) = term_to_term env t in
+    (* convert t' to a formula if the expected type of the result is None (fmla=true) *)
     let t' = if fmla then Term.to_prop t' else t' in
     if Opt.equal Ty.ty_equal ty_s t'.t_ty then (
       Debug.dprintf debug "[smt_term_to_term] t' = %a, t'.t_ty = %a, t'_concrete = %a@."
@@ -1063,7 +1082,7 @@ module FromModelToTerm = struct
       error "Function arity mismatch when interpreting %a with lsymbol %a@."
         print_function_def (args, res, body) Pretty.print_ls ls
 
-  (* Interpretation of function definitons in the model to terms. *)
+  (* Interpretation of function definitions in the model to terms. *)
   let interpret_fun_def_to_term ~fmla env (args, res, body) =
     Debug.dprintf debug "-----------------------------@.";
     Debug.dprintf debug "[interpret_fun_def_to_term] fun_def = %a@."
@@ -1147,8 +1166,10 @@ module FromModelToTerm = struct
   (* Terms interpreted from the SMT model may contain prover variables,
      which can be evaluated using type coercions or fields for record types.
      The goal is to evaluate a term [t] by replacing prover variables with an epsilon term.
-     We also perform some trivial evaluation by simplifying if then else terms when
-     the condition can be evaluated to true/false, etc. *)
+     We also perform some trivial evaluation by e.g. simplifying if then else terms when
+     the condition can be evaluated to true/false, etc.
+     We also have to make sure that we apply the same modifications in [t] and in [t_concrete].
+  *)
 
   (* [eval_prover_var] is set to false when we create the epsilon term (which
      may contain other prover variables)
@@ -1223,6 +1244,7 @@ module FromModelToTerm = struct
             let t'_eval, t'_eval_concrete =
               eval_term env ~eval_prover_var seen_prover_vars terms (t',eps_term) in
             (t_eps_close vs t'_eval, Epsilon (eps_x, t'_eval_concrete))
+          (* some float constants are represented using epsilon terms *)
           | Const (Float _) -> (t,t_concrete)
           | _ ->
             error_concrete_syntax "Unexpected concrete term %a for epsilon term %a"
@@ -1342,7 +1364,7 @@ module FromModelToTerm = struct
           elt)
       ty_fields;
     (* for each prover variable, we create an epsilon term using type coercions
-       or type fields for the type of the prover variable *)
+       or record type fields for the type of the prover variable *)
     Mstr.iter
       (fun key value ->
         Ty.Mty.iter
@@ -1391,7 +1413,7 @@ module FromModelToTerm = struct
               (t_eps_close x f, Epsilon (x_name, f_concrete))
             in
             let (eval_var, eval_var_concrete) =
-              (* first search if [ty] is associated to some fields *)
+              (* first search if [ty] is a record type associated to some fields *)
               match Ty.Mty.find_def [] ty ty_fields with
               | [] -> (
                   (* if no fields, search if there exists some type coercions for [ty] *)
@@ -1411,6 +1433,8 @@ module FromModelToTerm = struct
               Mvs.add vs (eval_var, eval_var_concrete) env.eval_prover_vars)
           value)
       env.prover_vars;
+    (* we know call [eval_term] on each [(t,t_concrete)] in [terms] in order
+       to replace each prover variable by the corresponding epsilon term *)
     Mstr.mapi
       (fun _ ((ls, oloc, attrs), (t, t_concrete)) ->
         let (t', t'_concrete) = eval_term env [] terms (t, t_concrete) in
@@ -1602,9 +1626,21 @@ module FromModelToTerm = struct
         prover_fun_defs = Mstr.empty;
       }
     in
+    (*  Function definitons in the prover output may contain:
+        - functions corresponding to a lsymbol in queried terms,
+        for which we expect a definiton in the model that respects
+        the type of the lsymbol;
+        - other functions, for which we cannot check that the type
+        respects an expected lsymbol type.
+        This is why we split the analysis. *)
     let queried_fun_defs, prover_fun_defs =
       Mstr.partition (fun n _ -> Mstr.mem n qterms) fun_defs
     in
+    (*  We first check that function definitions in [queried_fun_defs]
+        respects the type of the associated lsymbol.
+        Doing this pre-analysis is used to update [env.inferred_types]
+        with pairs of (SMT type, Why3 type) when the SMT type cannot be
+        easily mapped to a Why3 type. *)
     let queried_fun_defs =
       Mstr.mapi_filter
         (fun n def ->
@@ -1615,14 +1651,17 @@ module FromModelToTerm = struct
                 Some def
               with
               | E_parsing str | E_concrete_syntax str ->
-                  Debug.dprintf debug "Error while interpreting %s: %s@." n str;
+                  Debug.dprintf debug
+                    "Error while checking function definition type %s: %s@." n str;
                   None
               | _ ->
-                  Debug.dprintf debug "Error while interpreting %s@." n;
+                  Debug.dprintf debug
+                    "Error while checking function definition type %s@." n;
                   None)
           | exception Not_found -> None)
         queried_fun_defs
     in
+    (*  Enriching [env] with prover function definitions. *)
     Mstr.iter
       (fun n def ->
         match Mstr.find n qterms with
@@ -1638,6 +1677,7 @@ module FromModelToTerm = struct
                 Debug.dprintf debug "Error while interpreting %s: %s@." n str
             | _ -> Debug.dprintf debug "Error while interpreting %s@." n))
       prover_fun_defs;
+    (*  Interpretation of queried function definitions. *)
     let terms =
       Mstr.mapi_filter
         (fun n def ->
@@ -1670,9 +1710,13 @@ module FromModelToTerm = struct
             print_concrete_term t_concrete)
         terms
     in
+    (* 1st pass = interpret function definitions to terms *)
     debug_terms "FROM SMT MODEL" terms;
+    (* 2nd pass = evaluate prover variables using type coercions and
+       fields for record types *)
     let terms = eval pinfo env terms in
     debug_terms "AFTER EVALUATION" terms;
+    (* 3rd pass = cleanup *)
     let terms = clean env terms in
     debug_terms "AFTER CLEANUP" terms;
     terms
