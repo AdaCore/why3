@@ -88,7 +88,6 @@ val print_concrete_term : Format.formatter -> concrete_syntax_term -> unit
 val concrete_var_from_vs : Term.vsymbol -> concrete_syntax_term
 val concrete_const_bool : bool -> concrete_syntax_term
 val concrete_apply_from_ls : Term.lsymbol -> concrete_syntax_term list -> concrete_syntax_term
-val concrete_equ : string
 val concrete_apply_equ : concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term
 val subst_concrete_term :
   concrete_syntax_term Wstdlib.Mstr.t -> concrete_syntax_term -> concrete_syntax_term

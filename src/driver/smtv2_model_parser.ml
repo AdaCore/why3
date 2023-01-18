@@ -361,10 +361,6 @@ module FromSexpToModel = struct
     | List [ Atom "ite"; t1; t2; t3 ] -> Tite (term t1, term t2, term t3)
     | sexp -> error sexp "ite"
 
-  and var_binding = function
-    | List [ Atom s; t ] -> (symbol (Atom s), term t)
-    | sexp -> error sexp "var_binding"
-
   and application = function
     | List (qual_id :: ts) ->
         Tapply (qualified_identifier qual_id, List.map term ts)
@@ -442,8 +438,10 @@ module FromModelToTerm = struct
   exception Float_Infinity
   exception Float_Error
 
-  let error fmt = Format.kasprintf (fun msg -> raise (E_parsing msg)) fmt
-  let error_concrete_syntax fmt = Format.kasprintf (fun msg -> raise (E_parsing msg)) fmt
+  let error fmt =
+    Format.kasprintf (fun msg -> raise (E_parsing msg)) fmt
+  let error_concrete_syntax fmt =
+    Format.kasprintf (fun msg -> raise (E_concrete_syntax msg)) fmt
 
   type env = {
     (* Why3 environment, used to retrieve builtin theories. *)
@@ -1187,7 +1185,7 @@ module FromModelToTerm = struct
                 eval_term env ~eval_prover_var (vs :: seen_prover_vars) terms t_vs
             else (t, t_concrete)
         | None -> (t, t_concrete) (* vs is not a prover variable *))
-    | Term.Tapp (ls, [ t1; t2 ]), Apply (concrete_equ, [t1_concrete; t2_concrete])
+    | Term.Tapp (ls, [ t1; t2 ]), Apply ("=", [t1_concrete; t2_concrete])
           when ls_equal ls ps_equ -> (
         match (t1.t_node, t2.t_node) with
         | Term.Tvar v1, Term.Tvar v2
@@ -1471,7 +1469,7 @@ module FromModelToTerm = struct
               let vs, t' = Term.t_open_bound tb in
               begin match get_opt_record env (vs,eps_x) (t',eps_term) with
               | None ->
-                begin match get_opt_int_range (vs,eps_x) (t',eps_term) with
+                begin match get_opt_int_range vs t' with
                 | None ->
                   let t', t'_concrete = maybe_convert_epsilon_terms env (t',eps_term) in
                   (t_eps_close vs t', Epsilon (eps_x, t'_concrete))
@@ -1532,10 +1530,11 @@ module FromModelToTerm = struct
         List.fold_left
           (fun acc (t,ct) ->
             match t.t_node, ct with
-            | Tapp (ls, [proj;term_value]), Apply (concrete_equ, [cproj;cterm_value])
+            | Tapp (ls, [proj;term_value]), Apply ("=", [cproj;cterm_value])
                 when ls_equal ls ps_equ -> (
               match proj.t_node, cproj with
-              | Tapp (ls, [x]), Apply (ls_name, [Var vs_name]) when t_equal x (t_var vs) ->
+              | Tapp (ls, [x]), Apply (ls_name, [Var vs_name'])
+                  when t_equal x (t_var vs) && vs_name = vs_name' ->
                 if List.mem ls expected_fields then
                   let term_value', cterm_value' =
                     maybe_convert_epsilon_terms env (term_value,cterm_value) in
@@ -1550,35 +1549,34 @@ module FromModelToTerm = struct
       in
       if List.length expected_fields = List.length list_of_fields_values then
         Some (List.map
-          (fun ((ls,ls_name),(t,ct)) -> (ls_name,ct))
+          (fun ((_,ls_name),(_,ct)) -> (ls_name,ct))
           list_of_fields_values)
       else
         raise UnexpectedPattern
     with UnexpectedPattern -> None
   
-  and get_opt_int_range (vs,vs_name) (t',t'_concrete) =
+  and get_opt_int_range vs t' =
   (* special case for int range types:
      if t is of the form epsilon x:ty. ty'int x = v, use a integer constant
      as concrete term *)
     let exception UnexpectedPattern in
     try
-      let ((proj_ls,proj_ls_name), (proj_v,c_proj_v)) =
-        match t'.t_node, t'_concrete with
-        | Tapp (ls, [proj;term_value]), Apply (concrete_equ, [cproj;cterm_value])
-            when ls_equal ls ps_equ -> (
-          match proj.t_node, cproj with
-          | Tapp (ls, [x]), Apply (ls_name, [Var vs_name]) when t_equal x (t_var vs) ->
-            ((ls,ls_name),(term_value,cterm_value))
+      let proj_v =
+        match t'.t_node with
+        | Tapp (ls, [proj;term_value]) when ls_equal ls ps_equ -> (
+          match proj.t_node with
+          | Tapp (_, [x]) when t_equal x (t_var vs) ->
+            term_value
           | _ -> raise UnexpectedPattern
         )
         | _ -> raise UnexpectedPattern
       in
       Debug.dprintf debug "[get_opt_int_range] vs.vs_ty = %a@."
         Pretty.print_ty vs.vs_ty;
-      match vs.vs_ty.ty_node with
-      | Tyapp (ts,_) ->
-        begin match ts.ts_def, proj_v.t_node with
-        | Ty.Range r, Tconst (Constant.ConstInt c) ->
+      match vs.vs_ty.Ty.ty_node with
+      | Ty.Tyapp (ts,_) ->
+        begin match ts.Ty.ts_def, proj_v.t_node with
+        | Ty.Range _, Term.Tconst (Constant.ConstInt c) ->
           Some (BigInt.to_string c.il_int)
         | _ -> raise UnexpectedPattern
         end

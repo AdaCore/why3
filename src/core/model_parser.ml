@@ -96,7 +96,7 @@ type concrete_syntax_term =
    others = ct2 *)
 let rec get_elts_others x body =
   match body with
-  | If (Apply (concrete_equ, [Var x'; ct0]), ct1, ct2) when x=x' ->
+  | If (Apply ("=", [Var x'; ct0]), ct1, ct2) when x=x' ->
     let (elts, others) = get_elts_others x ct2 in
     ((ct0,ct1)::elts, others)
   | _ -> ([], body)
@@ -184,8 +184,7 @@ let concrete_const_bool b = Const (Boolean b)
 let concrete_apply_from_ls ls ts =
   let ls_name = Format.asprintf "@[<h>%a@]" Pretty.print_ls_qualified ls in
   Apply (ls_name, ts)
-let concrete_equ = "="
-let concrete_apply_equ t1 t2 = Apply (concrete_equ, [t1;t2])
+let concrete_apply_equ t1 t2 = Apply ("=", [t1;t2])
 let rec subst_concrete_term subst t =
   match t with
   | Var v -> (try Mstr.find v subst with _ -> t)
@@ -400,6 +399,7 @@ let json_vsymbol ~forget vs =
   let open Pretty in
   let open Json_base in
   let vs_name = Format.asprintf "@[<h>%a@]" print_vs_qualified vs in
+  if forget then forget_var vs;
   Record [
     "vs_name", String vs_name;
     "vs_type", json_type vs.vs_ty
