@@ -495,47 +495,48 @@ let json_of_concrete_bv { bv_binary; bv_int } =
 let rec json_of_concrete_term ct =
   let open Json_base in
   match ct with
-  | Var v -> Record [ "Var", String v ]
+  | Var v -> Record [ "type", String "Var"; "val", String v ]
 
-  | Const (Boolean b) -> Record [ "Const", Record [ "Boolean", Bool b ] ]
-  | Const (String s) -> Record [ "Const", Record [ "String", String s ] ]
-  | Const (Integer i) -> Record [ "Const", Record [ "Integer", String i ] ]
-  | Const (Real d) -> Record [ "Const", Record [ "Real", String d ] ]
-  | Const (BitVector bv) -> Record [ "Const", Record [ "BitVector", json_of_concrete_bv bv ] ]
+  | Const (Boolean b) -> Record [ "type", String "Boolean"; "val", Bool b ]
+  | Const (String s) -> Record [ "type", String "String"; "val", String s ]
+  | Const (Integer i) -> Record [ "type", String "Integer"; "val", String i ]
+  | Const (Real d) -> Record [ "type", String "Real"; "val", String d ]
+  | Const (BitVector bv) ->
+    Record [ "type", String "BitVector"; "val", json_of_concrete_bv bv ]
   | Const (Fraction (f1,f2)) ->
-    Record [ "Const", Record [ "Fraction", String (String.concat "" [f1;"/";f2]) ] ]
+    Record [ "type", String "Fraction"; "val", String (String.concat "" [f1;"/";f2]) ]
 
   | Const (Float Infinity) ->
-    Record [ "Const", Record [ "Float", String "Infinity" ] ]
+    Record [ "type", String "Float"; "val", String "Infinity" ]
   | Const (Float Plus_zero) ->
-    Record [ "Const", Record [ "Float", String "Plus_zero" ] ]
+    Record [ "type", String "Float"; "val", String "Plus_zero" ]
   | Const (Float Minus_zero) ->
-    Record [ "Const", Record [ "Float", String "Minus_zero" ] ]
+    Record [ "type", String "Float"; "val", String "Minus_zero" ]
   | Const (Float NaN) ->
-    Record [ "Const", Record [ "Float", String "NaN" ] ]
+    Record [ "type", String "Float"; "val", String "NaN" ]
   | Const (Float (Float_number {sign;exp;mant;hex})) ->
-    Record [ "Const", Record [
-      "Float",
-      Record [
+    Record [
+      "type", String "Float";
+      "val", Record [
         "sign", String sign;
         "exp", String exp;
         "mant", String mant;
         "hex", String hex
       ]
-    ] ]
+    ]
 
   | Apply (ls, args) ->
     Record [
-      "Apply",
-      Record [
+      "type", String "Apply";
+      "val", Record [
         "app_ls", String ls;
         "app_args", List (List.map json_of_concrete_term args)
       ]
     ]
   | If (b,t1,t2) ->
     Record [
-      "If",
-      Record [
+      "type", String "If";
+      "val", Record [
         "if", json_of_concrete_term b;
         "then", json_of_concrete_term t1;
         "else", json_of_concrete_term t2
@@ -543,8 +544,8 @@ let rec json_of_concrete_term ct =
     ]
   | Epsilon (eps_vs,eps_t) ->
     Record [
-      "Epsilon",
-      Record [
+      "type", String "Epsilon";
+      "val", Record [
         "eps_var", String eps_vs;
         "eps_t", json_of_concrete_term eps_t
       ]
@@ -552,8 +553,8 @@ let rec json_of_concrete_term ct =
   | Quant (quant,quant_vars,quant_t) ->
     let quant_string = match quant with Forall -> "Forall" | Exists -> "Exists" in
     Record [
-      "Quant",
-      Record [
+      "type", String "Quant";
+      "val", Record [
         "quant", String quant_string;
         "quant_vars", List (List.map (fun var -> String var) quant_vars);
         "quant_t", json_of_concrete_term quant_t
@@ -567,19 +568,19 @@ let rec json_of_concrete_term ct =
       | Iff -> "Iff"
     in
     Record [
-      "Binop",
-      Record [
+      "type", String "Binop";
+      "val", Record [
         "binop", String op_string;
         "binop_t1", json_of_concrete_term t1;
         "binop_t2", json_of_concrete_term t2
       ]
     ]
-  | Not t' -> Record [ "Not", json_of_concrete_term t' ]
+  | Not t' -> Record [ "type", String "Not"; "val", json_of_concrete_term t' ]
   | Function {is_array=true; args=[x]; body} ->
     let (elts,others) = get_elts_others x body in
     Record [
-      "Array",
-      Record [
+      "type", String "Array";
+      "val", Record [
         "array_elts",
           List (
             List.map
@@ -595,16 +596,16 @@ let rec json_of_concrete_term ct =
     ]
   | Function {args; body} ->
     Record [
-      "Function",
-      Record [
+      "type", String "Function";
+      "val", Record [
         "fun_args", List (List.map (fun s -> String s) args);
         "fun_body", json_of_concrete_term body
       ]
     ]
   | Record fields_values ->
     Record [
-      "Record",
-      List (
+      "type", String "Record";
+      "val", List (
         List.map
           (fun (field,value) ->
             Record [
@@ -629,6 +630,7 @@ let json_model_element me =
     | Loop_previous_iteration ->"before_iteration"
     | Loop_current_iteration -> "current_iteration" in
   Record [
+      "name", String me.me_name;
       "location", json_loc me.me_location;
       "attrs", json_attrs me.me_attrs;
       "value",
