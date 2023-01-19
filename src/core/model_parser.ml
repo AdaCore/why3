@@ -213,6 +213,7 @@ let rec t_and_l_concrete = function
   | f::fl -> Binop (And, f, (t_and_l_concrete fl))
 
 type model_element = {
+  me_name: string;
   me_kind: model_element_kind;
   me_value: term;
   me_concrete_value: concrete_syntax_term;
@@ -222,6 +223,7 @@ type model_element = {
 }
 
 let create_model_element ~value ~concrete_value ~oloc ~attrs ~lsymbol = {
+  me_name= lsymbol.ls_name.Ident.id_string;
   me_kind= Other;
   me_value= value;
   me_concrete_value= concrete_value;
@@ -229,10 +231,6 @@ let create_model_element ~value ~concrete_value ~oloc ~attrs ~lsymbol = {
   me_attrs= attrs;
   me_lsymbol= lsymbol
 }
-
-let get_name me =
-  Ident.get_model_trace_string
-    ~name:(me.me_lsymbol.ls_name.Ident.id_string) ~attrs:(me.me_attrs)
 
 (*
 ***************************************************************
@@ -283,7 +281,7 @@ let trace_by_id id =
   Ident.get_model_trace_string ~name:id.id_string ~attrs:id.id_attrs
 
 let trace_by_name me =
-  Ident.get_model_trace_string ~name:(get_name me) ~attrs:(me.me_attrs)
+  Ident.get_model_trace_string ~name:(me.me_name) ~attrs:(me.me_attrs)
 
 let search_model_element_for_id m ?loc id =
   let oloc = if loc <> None then loc else id.id_loc in
@@ -327,8 +325,8 @@ let cmp_attrs a1 a2 =
 let find_call_id = Ident.search_attribute_value Ident.get_call_id_value
 
 let similar_model_element_names n1 n2 =
-  let name1 = get_name n1 in
-  let name2 = get_name n2 in
+  let name1 = n1.me_name in
+  let name2 = n2.me_name in
   name1 = name2 &&
   Opt.equal (=) (find_call_id n1.me_attrs) (find_call_id n2.me_attrs) &&
   n1.me_kind = n2.me_kind &&
@@ -685,7 +683,7 @@ let json_model model = json_model_files model.vc_term_loc model.model_files
 let print_model_element ?(print_locs=false) ~print_attrs ~me_name_trans fmt m_element =
   match m_element.me_kind with
   | Error_message ->
-    pp_print_string fmt (get_name m_element)
+    pp_print_string fmt (m_element.me_name)
   | _ ->
       fprintf fmt "@[<hv2>@[<hov2>%s%t :@]@ %a = %a@]"
         (me_name_trans m_element)
@@ -716,7 +714,7 @@ let print_model_file ~filter_similar ~print_attrs ~me_name_trans fmt (filename, 
   let filename = Filename.basename filename in
   let pp fmt (line, m_elements) =
     let cmp me1 me2 =
-      let n = String.compare (get_name me1) (get_name me2) in
+      let n = String.compare (me1.me_name) (me2.me_name) in
       if n = 0 then Sattr.compare me1.me_attrs me2.me_attrs else n in
     let m_elements = List.sort cmp m_elements in
     fprintf fmt "  @[<v 2>Line %d:@ %a@]" line
@@ -726,8 +724,7 @@ let print_model_file ~filter_similar ~print_attrs ~me_name_trans fmt (filename, 
     Pp.(print_list space pp) (Mint.bindings model_file)
 
 let why_name_trans me =
-  let name = get_name me in
-  let name = List.hd (Strings.bounded_split '@' name 2) in
+  let name = List.hd (Strings.bounded_split '@' me.me_name 2) in
   match me.me_kind with
   | Result -> "result"
   | Call_result loc ->
@@ -996,6 +993,7 @@ let build_model_rec pm (elts: model_element list) : model_files =
     let attrs, me_value, me_concrete_value =
       !remove_field (attrs, me.me_value, me.me_concrete_value) in
     Some {
+      me_name= me.me_name;
       me_kind= Other;
       me_value;
       me_concrete_value;
@@ -1062,6 +1060,107 @@ let model_for_positions_and_decls model ~positions =
 
 (*
 ***************************************************************
+** Model cleaning
+***************************************************************
+*)
+
+let map_filter_model_files f =
+  let f_list elts =
+    match List.filter_map f elts with
+    | [] -> None | l -> Some l in
+  let f_files mf =
+    let mf = Mint.map_filter f_list mf in
+    if Mint.is_empty mf then None else Some mf in
+  Mstr.map_filter f_files
+
+let opt_bind_any os f =
+  f (List.filter_map (fun x -> x) os)
+
+let opt_bind_all os f =
+  if List.for_all Opt.inhabited os then
+    f (List.map Opt.get os)
+  else None
+
+class clean = object (self)
+  method model m =
+    {m with model_files= map_filter_model_files self#element m.model_files}
+  method element me =
+    let me =
+      let name = me.me_name in
+      let attrs = me.me_attrs in
+      let name = get_model_trace_string ~name ~attrs in
+      let name = List.hd (Strings.bounded_split '@' name 2) in
+      {me with me_name = name} in
+    if me.me_kind = Error_message then
+      Some me (* Keep unparsed values for error messages *)
+    else
+      Opt.bind (self#value me.me_concrete_value) @@ fun me_concrete_value ->
+      Some {me with me_concrete_value}
+  method value v = match v with
+    | Var v -> self#var v
+    | Const c -> self#const c
+    | Apply (s, vs) -> self#apply s vs
+    | If (b,t1,t2) -> self#cond b t1 t2
+    | Epsilon (x,t) -> self#epsilon x t
+    | Not t -> self#neg t
+    | Quant (q,vars,t) -> self#quant q vars t
+    | Binop (op,t1,t2) -> self#binop op t1 t2
+    | Record fs -> self#record fs
+    | Function {is_array;args;body} -> self#func is_array args body
+  method var v = Some (Var v)
+  method const c = match c with
+    | String v -> self#string v
+    | Integer v -> self#integer v
+    | Real v -> self#real v
+    | Fraction (v1,v2) -> self#fraction v1 v2
+    | Float v -> self#float v
+    | Boolean v -> self#boolean v
+    | BitVector v -> self#bitvector v
+  method string v = Some (Const (String v))
+  method integer v = Some (Const (Integer v))
+  method real v = Some (Const (Real v))
+  method fraction v1 v2 = Some (Const (Fraction (v1,v2)))
+  method float v = Some (Const (Float v))
+  method boolean v = Some (Const (Boolean v))
+  method bitvector v = Some (Const (BitVector v))
+  method neg v =
+    Opt.bind (self#value v) @@ fun v ->
+    Some (Not v)
+  method apply s vs =
+    opt_bind_all (List.map self#value vs) @@ fun vs ->
+    Some (Apply (s, vs))
+  method cond b t1 t2 =
+    Opt.bind (self#value b) @@ fun b ->
+    Opt.bind (self#value t1) @@ fun t1 ->
+    Opt.bind (self#value t2) @@ fun t2 ->
+    Some (If (b,t1,t2))
+  method epsilon x t =
+    Opt.bind (self#value t) @@ fun t ->
+    Some (Epsilon (x,t))
+  method quant q vars t =
+    Opt.bind (self#value t) @@ fun t ->
+    Some (Quant (q,vars,t))
+  method binop op t1 t2 =
+    Opt.bind (self#value t1) @@ fun t1 ->
+    Opt.bind (self#value t2) @@ fun t2 ->
+    Some (Binop (op,t1,t2))
+  method func is_array args body =
+    Opt.bind (self#value body) @@ fun body ->
+    Some (Function {is_array; args; body})
+  method record fs =
+    let clean_field (f, v) =
+      Opt.bind (self#value v) @@ fun v ->
+      Some (f, v) in
+    opt_bind_all (List.map clean_field fs) @@ fun fs ->
+    Some (Record fs)
+end
+
+let clean = ref (new clean)
+
+let customize_clean c = clean := (c :> clean)
+
+(*
+***************************************************************
 ** Registering model parser
 ***************************************************************
 *)
@@ -1070,24 +1169,25 @@ type model_parser = printing_info -> string -> model
 type raw_model_parser = printing_info -> string -> model_element list
 
 let debug_elements elts =
-  let me_name_trans me = get_name me in
+  let me_name_trans me = me.me_name in
   let print_elements = print_model_elements ~sep:Pp.semi ~print_attrs:true
       ~me_name_trans ~filter_similar:false in
   Debug.dprintf debug "@[<v>Elements:@ %a@]@." print_elements elts;
   elts
 
-let debug_files files =
-  let me_name_trans me = get_name me in
+let debug_files desc files =
+  let me_name_trans me = me.me_name in
   let print_file = print_model_file ~filter_similar:false ~print_attrs:true
       ~me_name_trans in
-   Debug.dprintf debug "@[<v>Files:@ %a@]@."
+   Debug.dprintf debug "@[<v>Files %s:@ %a@]@." desc
      (Pp.print_list Pp.newline print_file) (Mstr.bindings files);
    files
 
 let model_parser (raw: raw_model_parser) : model_parser =
   fun ({Printer.vc_term_loc; vc_term_attrs} as pm) str ->
   raw pm str |> debug_elements |>
-  build_model_rec pm |> debug_files |>
+  build_model_rec pm |> debug_files "before" |>
+  map_filter_model_files !clean#element |> debug_files "after" |>
   fun model_files -> { model_files; vc_term_loc; vc_term_attrs }
 
 exception KnownModelParser of string

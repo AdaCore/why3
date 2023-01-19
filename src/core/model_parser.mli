@@ -96,6 +96,7 @@ val t_and_l_concrete : concrete_syntax_term list -> concrete_syntax_term
 (** Counter-example model elements. Each element represents
     a counter-example for a single source-code element.*)
 type model_element = {
+  me_name             : string;
   me_kind             : model_element_kind;
     (** The kind of model element. *)
   me_value            : Term.term;
@@ -125,8 +126,6 @@ val create_model_element :
 
     @param lsymbol logical symbol corresponding to the element
 *)
-
-val get_name : model_element -> string
 
   (** {2 Model definitions} *)
 
@@ -302,6 +301,40 @@ val model_for_positions_and_decls : model ->
 
     Only filename and line number is used to identify positions.
 *)
+
+(*
+***************************************************************
+**  Cleaning the model
+***************************************************************
+*)
+
+(** Method clean#model cleans a model from unparsed values and handles
+   contradictory VCs ("the check fails with all inputs"). *)
+   class clean : object
+    method model : model -> model
+    method element : model_element -> model_element option
+    method value : concrete_syntax_term -> concrete_syntax_term option
+    method var : string -> concrete_syntax_term option
+    method const : concrete_syntax_constant -> concrete_syntax_term option
+    method integer : string -> concrete_syntax_term option
+    method string : string -> concrete_syntax_term option
+    method real : string -> concrete_syntax_term option
+    method fraction : string -> string -> concrete_syntax_term option
+    method float : concrete_syntax_float -> concrete_syntax_term option
+    method boolean : bool -> concrete_syntax_term option
+    method bitvector : concrete_syntax_bv -> concrete_syntax_term option
+    method apply : string -> concrete_syntax_term list -> concrete_syntax_term option
+    method cond : concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term option
+    method epsilon : string -> concrete_syntax_term -> concrete_syntax_term option
+    method neg : concrete_syntax_term -> concrete_syntax_term option
+    method quant : concrete_syntax_quant -> string list -> concrete_syntax_term -> concrete_syntax_term option
+    method binop : concrete_syntax_binop -> concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term option
+    method func : bool -> string list -> concrete_syntax_term -> concrete_syntax_term option
+    method record : (string * concrete_syntax_term) list -> concrete_syntax_term option
+  end
+
+  val customize_clean : #clean -> unit
+  (** Customize the class used to clean the values in the model. *)
 
 (*
 ***************************************************************
