@@ -507,17 +507,27 @@ let rec json_of_concrete_term ct =
     Record [ "type", String "Fraction"; "val", String (String.concat "" [f1;"/";f2]) ]
 
   | Const (Float Infinity) ->
-    Record [ "type", String "Float"; "val", String "Infinity" ]
+    Record [
+      "type", String "Float";
+      "val", Record [ "float_type", String "Infinity" ]
+    ]
   | Const (Float Plus_zero) ->
-    Record [ "type", String "Float"; "val", String "Plus_zero" ]
+    Record [
+      "type", String "Float"; "val", Record [ "float_type", String "Plus_zero" ]
+    ]
   | Const (Float Minus_zero) ->
-    Record [ "type", String "Float"; "val", String "Minus_zero" ]
+    Record [
+      "type", String "Float"; "val", Record [ "float_type", String "Minus_zero" ]
+    ]
   | Const (Float NaN) ->
-    Record [ "type", String "Float"; "val", String "NaN" ]
+    Record [
+      "type", String "Float"; "val", Record [ "float_type", String "NaN" ]
+    ]
   | Const (Float (Float_number {sign;exp;mant;hex})) ->
     Record [
       "type", String "Float";
       "val", Record [
+        "float_type", String "Float_value";
         "sign", String sign;
         "exp", String exp;
         "mant", String mant;
