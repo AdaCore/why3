@@ -25,7 +25,7 @@ let debug = Debug.register_info_flag "smtv2_printer"
   ~desc:"Print@ debugging@ messages@ about@ printing@ \
          the@ input@ of@ smtv2."
 
-let debug_incremental = Debug.register_info_flag "force_incremental"
+let debug_incremental = Debug.register_flag "force_incremental"
     ~desc:"Force@ incremental@ mode@ for@ smtv2@ provers"
 
 (** SMTLIB tokens taken from CVC4/CVC5: src/parser/smt2/{Smt2.g,smt2.cpp} *)
@@ -641,11 +641,7 @@ let print_logic_decl_aux flag info fmt (ls,def) =
     collect_model_ls info ls;
     let vsl,expr = Decl.open_ls_defn def in
     if info.info_incremental && has_quantification expr then begin
-      fprintf fmt ";; %S@\n@[<hov2>(declare-fun %a (%a) %a)@]@\n@\n"
-        ls.ls_name.id_string
-        (print_ident info) ls.ls_name
-        (print_list space (print_type info)) (List.map (fun vs -> vs.vs_ty) vsl)
-        (print_type_value info) ls.ls_value;
+      print_param_decl info fmt ls;
       info.incr_list_ldecls <- (ls, vsl, expr) :: info.incr_list_ldecls
     end else
       let tvs = Term.ls_ty_freevars ls in
@@ -734,13 +730,21 @@ let add_check_sat info fmt =
     fprintf fmt "@[(get-model)@]@\n@\n"
 
 let print_ldecl_axiom info fmt (ls, vls, t) =
+  let tvs = Term.t_ty_freevars Ty.Stv.empty t in
+  let tvs = List.fold_left (fun acc vs -> Ty.ty_freevars acc vs.vs_ty) tvs vls in
   fprintf fmt ";; %S@\n" ls.ls_name.id_string;
   fprintf fmt
-    "@[<hv2>(assert@ @[<hv2>(forall @[(%a)@]@ @[<hv2>(= @[<h>(%a %a)@]@ %a)@])@])@]@\n@\n"
-    (print_typed_var_list info) vls
-    (print_ident info) ls.ls_name
-    (print_var_list info) vls
-    (print_expr info) t
+    "@[<hv2>(assert@ @[<hv2>%a@])@]@\n@\n"
+    (print_par info (fun fmt -> fprintf fmt
+      "(forall @[(%a)@]@ @[<hv2>(= @[<h>(%a %a)@]@ %a)@])"
+         (print_typed_var_list info) vls
+         (print_ident info) ls.ls_name
+         (print_var_list info) vls
+         (print_expr info) t
+     )) tvs
+
+
+
 
 (* TODO if the property doesnt begin with quantifier, then we print it first.
    Else, we print it afterwards. *)
