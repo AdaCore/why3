@@ -1,0 +1,20 @@
+
+use int.Int
+use bool.Bool
+use ref.Ref
+
+val ref x : bool
+val ref y : bool
+val ref z : bool
+val ref t : bool
+val ref u : bool
+
+let main [@bddinfer] ()
+  =
+    x <- True;
+    y <- False;
+    z <- True;
+    t <- andb x y;
+    u <- andb x z;
+    assert Au { u };
+    assert Ant { not t }
