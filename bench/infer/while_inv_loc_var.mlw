@@ -1,0 +1,14 @@
+use int.Int
+
+val ref x : int
+
+let main [@bddinfer] () =
+  [@vc:divergent]
+  begin
+    x <- 0;
+    while x <= 100 do
+        let y = x+1 in
+        x <- y
+    done;
+    [@assert: 101?] assert { x = 101 }
+  end

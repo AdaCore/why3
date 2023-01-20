@@ -1,0 +1,16 @@
+
+
+
+use int.Int
+
+val ref x : int
+val ref y : int
+
+let main [@bddinfer] () diverges
+ =
+ x <- 0;
+ y <- 60;
+ while x <= 100 && y >= 0 do (* while (if x <= 100 then y >= 0 else False) do *)
+   x <- x + 1;
+   y <- y - 1;
+ done

@@ -1,0 +1,17 @@
+
+use int.Int
+
+val randomb () : bool
+
+val ref d0 : int
+val ref d1 : int
+
+let s [@bddinfer] ()
+  diverges
+  requires { d0 = 0 }
+  requires { d1 = 0 }
+  =
+  while true do
+    (* this does not work with "unsupported feature: simple_expr_to_why1_expr: SEseq" *)
+    if (randomb()) then d1 <- d0;
+  done

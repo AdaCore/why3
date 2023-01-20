@@ -1,0 +1,22 @@
+
+use int.Int
+
+val randomb () : bool
+
+val id (input: bool) (src: int) (ref tgt: int) : unit
+writes { tgt }
+ensures { input = True -> tgt = src }
+ensures { input = False -> tgt = old tgt }
+
+val ref d0 : int
+val ref d1 : int
+
+let s [@bddinfer] ()
+  diverges
+  requires { d0 = 0 }
+  requires { d1 = 0 }
+  =
+  while true do
+    (* gives d1 \in ]-oo,+oo[ instead of the more precise [0] *)
+     id (randomb()) d0 d1;
+  done

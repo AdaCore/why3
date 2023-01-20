@@ -1,0 +1,26 @@
+module Example_scan
+
+
+use export ref.Ref
+use export bool.Bool
+use export int.Int
+
+function id_compute (b : int) : int = b + 1
+
+val id (src : int) (tgt : ref int) : unit
+  writes { tgt }
+  ensures { !tgt = id_compute src }
+
+(**********************************************************************************)
+
+val d : ref int
+
+let example_scan [@bddinfer] ()
+  diverges
+  =
+  d := 0;
+  while !d <= 100 do
+	id !d d
+  done
+
+end

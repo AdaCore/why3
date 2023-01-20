@@ -1,0 +1,33 @@
+
+use ref.Ref
+use bool.Bool
+use int.Int
+
+val f (c : int) (s : int) : bool
+  ensures { (result = True && (c >= s))
+         || (result = False && (c < s)) }
+
+val rand () : bool
+
+val m : ref bool
+
+val x : ref bool
+
+val y : ref bool
+
+val c0 : ref int
+
+val s0 : ref int
+
+let main [@bddinfer] ()
+  diverges
+  =
+   while true
+   do
+    let _tmp = andb
+                 (orb ((!x)) ((!y)))
+                 (andb
+                     (not (!m))
+                     (f !c0 !s0)) in
+      x := rand ()
+   done
