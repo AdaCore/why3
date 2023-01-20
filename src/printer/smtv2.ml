@@ -202,15 +202,11 @@ type info = {
   mutable list_projs : Ident.ident Mstr.t;
   mutable type_coercions : Sls.t Mty.t;
   mutable type_fields : (lsymbol list) Mty.t;
-  mutable list_field_def: Ident.ident Mstr.t;
   info_version : version;
   meta_model_projection : Sls.t;
   meta_record_def : Sls.t;
-  mutable list_records : field_info list Mstr.t;
+  mutable record_fields : (lsymbol list) Mls.t;
   mutable constr_proj_id : string list Mls.t;
-  (* For algebraic type counterexamples: constructors with no arguments can be
-     misunderstood for variables *)
-  mutable noarg_constructors: string list;
   mutable constructors: lsymbol Mstr.t;
   info_cntexample_need_push : bool;
   info_cntexample: bool;
@@ -302,15 +298,13 @@ let collect_model_ls info ls =
     end;
     info.list_projs <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
         ls.ls_name info.list_projs);
-  if Sls.mem ls info.meta_record_def then (
+  if Sls.mem ls info.meta_record_def then
     begin match ls.ls_args with
     | [ty] ->
       let fields = ls :: (Mty.find_def [] ty info.type_fields) in
       info.type_fields <- Mty.add ty fields info.type_fields
     | _ -> ()
     end;
-    info.list_field_def <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
-        ls.ls_name info.list_field_def);
   if relevant_for_counterexample ls.ls_name then
     info.info_model <-
       add_model_element (ls, ls.ls_name.id_loc, ls.ls_name.id_attrs) info.info_model
@@ -803,13 +797,10 @@ let print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f = match k 
         vc_term_loc = vc_loc;
         vc_term_attrs = vc_attrs;
         queried_terms = model_list;
-        type_coercions = info.type_coercions;
-        type_fields = info.type_fields;
-        list_projections = info.list_projs;
-        list_fields = info.list_field_def;
-        Printer.list_records = info.list_records;
-        noarg_constructors = info.noarg_constructors;
-        constructors = info.constructors;
+        Printer.type_coercions = info.type_coercions;
+        Printer.type_fields = info.type_fields;
+        Printer.record_fields = info.record_fields;
+        Printer.constructors = info.constructors;
         set_str = info.info_labels;
       }
   | Plemma -> assert false
@@ -819,9 +810,7 @@ let print_constructor_decl info is_record fmt (ls,args) =
   info.constructors <- Mstr.add cons_name ls info.constructors;
   let field_names =
     (match args with
-    | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name;
-        info.noarg_constructors <- cons_name :: info.noarg_constructors;
-        []
+    | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name; []
     | _ ->
         fprintf fmt "@[(%a@ " (print_ident info) ls.ls_name;
         let field_names, _ =
@@ -861,8 +850,10 @@ let print_constructor_decl info is_record fmt (ls,args) =
   info.constr_proj_id <-
     Mls.add ls (List.map (fun x -> x.field_name) field_names) info.constr_proj_id;
   if Strings.has_suffix "'mk" ls.ls_name.id_string then
-    begin
-      info.list_records <- Mstr.add cons_name field_names info.list_records;
+    begin try
+      let args = List.map (Opt.get) args in
+      info.record_fields <- Mls.add ls args info.record_fields
+    with _ -> ()
     end
 
 let print_data_decl info fmt (ts,cl) =
@@ -973,13 +964,11 @@ let print_task version args ?old:_ fmt task =
     list_projs = Mstr.empty;
     type_coercions = Mty.empty;
     type_fields = Mty.empty;
-    list_field_def = Mstr.empty;
     info_version = version;
     meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
     meta_record_def = Task.on_tagged_ls Theory.meta_record task;
-    list_records = Mstr.empty;
+    record_fields = Mls.empty;
     constr_proj_id = Mls.empty;
-    noarg_constructors = [];
     constructors = Mstr.empty;
     info_cntexample_need_push = need_push;
     info_cntexample = cntexample;

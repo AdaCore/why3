@@ -57,20 +57,12 @@ type printing_info = {
   type_coercions : Sls.t Mty.t;
   (** For each type, the set of lsymbols defining a coercion to this type. *)
   type_fields : (lsymbol list) Mty.t;
-  (** For each type, the list of lsymbols defining the fields for this type. *)
-  list_projections: Ident.ident Mstr.t;
-  (** List of projections as printed in the model. They corresponds to an ident
-     which is kept so that we can approximate its used name in task. *)
-  list_fields: Ident.ident Mstr.t;
-  (** These corresponds to meta_record_def (tagged on field function definition).
-     The difference with projections is that you are not allowed to reconstruct
-     two projections into a record (at counterexample parsing level). *)
-  list_records : field_info list Mstr.t;
+  (** For each type, the list of lsymbols defining the fields for this type
+      and associated to meta_record_def. *)
+  record_fields : (lsymbol list) Mls.t;
   (** Descriptions of the fields of all records. *)
-  noarg_constructors: string list;
-  (** List of constructors with no arguments that can be confused for variables
-     during parsing. *)
   constructors: Term.lsymbol Mstr.t;
+  (** Constructors. *)
   set_str: Sattr.t Mstr.t
   (** List of attributes corresponding to a printed constants (that was on the
      immediate term, not inside the ident) *)
@@ -78,9 +70,6 @@ type printing_info = {
 
 val default_printing_info : Env.env -> printing_info
 (** Empty mapping *)
-
-(** Return the union of projections and fields of a printing_info *)
-val fields_projs : printing_info -> ident Mstr.t
 
 type printer_args = {
   env           : Env.env;

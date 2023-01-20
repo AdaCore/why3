@@ -448,6 +448,7 @@ module FromModelToTerm = struct
     why3_env : Env.env;
     (* Constructors from [pinfo.Printer.constructors]. *)
     constructors : lsymbol Mstr.t;
+    record_fields : Term.lsymbol list Mls.t;
     type_fields : Term.lsymbol list Ty.Mty.t;
     (* Queried terms from [pinfo.Printer.queried_terms]. *)
     queried_terms : lsymbol Mstr.t;
@@ -1444,18 +1445,34 @@ module FromModelToTerm = struct
   let rec maybe_convert_epsilon_terms env (t, t_concrete) =
     match t.t_node, t_concrete with
     | Term.Tapp (ls, ts), Apply (ls_name, ts_concrete) ->
+      begin try
+        let ts' = List.combine ts ts_concrete in
+        let ts, ts_concrete =
+          List.split (List.map (maybe_convert_epsilon_terms env ) ts')
+        in
         begin try
-          let ts' = List.combine ts ts_concrete in
-          let ts, ts_concrete =
-            List.split (List.map (maybe_convert_epsilon_terms env ) ts')
-          in
-          (t_app ls ts ls.ls_value, Apply (ls_name, ts_concrete))
-        with _ ->
-          error_concrete_syntax "Mismatch between term %a and concrete term %a:@\
-            arity of application function is not the same"
-            Pretty.print_term t
-            print_concrete_term t_concrete
+          let fields = Mls.find ls env.record_fields in
+          if
+            List.for_all2
+              (fun ls t -> Opt.equal (Ty.ty_equal) ls.ls_value t.t_ty)
+              fields ts
+          then
+            let fields_values =
+              List.combine
+                (List.map (fun ls -> Format.asprintf "@[<h>%a@]" Pretty.print_ls_qualified ls) fields)
+                ts_concrete
+            in
+            (t_app ls ts ls.ls_value, Record fields_values)
+          else
+            (t_app ls ts ls.ls_value, Apply (ls_name, ts_concrete))
+        with _ -> (t_app ls ts ls.ls_value, Apply (ls_name, ts_concrete))
         end
+      with _ ->
+        error_concrete_syntax "Mismatch between term %a and concrete term %a:@\
+          arity of application function is not the same"
+          Pretty.print_term t
+          print_concrete_term t_concrete
+      end
     | Term.Tif (b, t1, t2), If (b_concrete, t1_concrete, t2_concrete) ->
         let b', b'_concrete = maybe_convert_epsilon_terms env (b,b_concrete) in
         let t1',t1'_concrete = maybe_convert_epsilon_terms env (t1,t1_concrete) in
@@ -1621,6 +1638,7 @@ module FromModelToTerm = struct
         prover_vars = Mstr.empty;
         bound_vars = Mstr.empty;
         constructors = pinfo.Printer.constructors;
+        record_fields = pinfo.Printer.record_fields;
         type_fields = pinfo.Printer.type_fields;
         inferred_types = [];
         queried_terms = Mstr.map (fun (ls, _, _) -> ls) qterms;

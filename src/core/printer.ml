@@ -43,16 +43,10 @@ type printing_info = {
   queried_terms      : (Term.lsymbol * Loc.position option * Sattr.t) Mstr.t;
   type_coercions     : Sls.t Mty.t;
   type_fields        : (lsymbol list) Mty.t;
-  list_projections   : Ident.ident Mstr.t;
-  list_fields        : Ident.ident Mstr.t;
-  list_records       : field_info list Mstr.t;
-  noarg_constructors : string list;
+  record_fields      : (lsymbol list) Mls.t;
   constructors       : Term.lsymbol Mstr.t;
   set_str            : Sattr.t Mstr.t
 }
-
-let fields_projs pm =
-  Wstdlib.Mstr.union (fun _ x _ -> Some x) pm.list_fields pm.list_projections
 
 type printer_args = {
   env           : Env.env;
@@ -76,10 +70,7 @@ let default_printing_info env = {
   queried_terms = Mstr.empty;
   type_coercions = Mty.empty;
   type_fields = Mty.empty;
-  list_projections = Mstr.empty;
-  list_fields = Mstr.empty;
-  list_records = Mstr.empty;
-  noarg_constructors = [];
+  record_fields = Mls.empty;
   constructors = Mstr.empty;
   set_str = Mstr.empty
 }

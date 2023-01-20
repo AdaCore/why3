@@ -45,10 +45,6 @@ type info = {
   mutable info_model: S.t;
   info_vc_term: vc_term_info;
   info_in_goal: bool;
-  mutable list_projs: Ident.ident Mstr.t;
-  mutable type_coercions : Sls.t Mty.t;
-  mutable type_fields : (lsymbol list) Mty.t;
-  list_field_def: Ident.ident Mstr.t;
   meta_model_projection: Sls.t;
   info_cntexample: bool
   }
@@ -95,9 +91,6 @@ let print_ident_attr info fmt id =
 let forget_var info v = forget_id info.info_printer v.vs_name
 
 let collect_model_ls info ls =
-  if Sls.mem ls info.meta_model_projection then
-    info.list_projs <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
-        ls.ls_name info.list_projs;
   if relevant_for_counterexample ls.ls_name then
     info.info_model <-
       add_model_element (ls, ls.ls_name.id_loc, ls.ls_name.id_attrs) info.info_model
@@ -444,12 +437,9 @@ let print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f =
         vc_term_loc = vc_loc;
         vc_term_attrs = vc_attrs;
         queried_terms = model_list;
-        type_coercions = info.type_coercions;
-        type_fields = info.type_fields;
-        list_projections = info.list_projs;
-        list_fields = info.list_field_def;
-        list_records = Mstr.empty;
-        noarg_constructors = [];
+        type_coercions = Mty.empty;
+        type_fields = Mty.empty;
+        record_fields = Mls.empty;
         constructors = Mstr.empty;
         set_str = Mstr.empty;
       };
@@ -512,10 +502,6 @@ let print_task args ?old:_ fmt task =
     info_model = S.empty;
     info_vc_term = vc_info;
     info_in_goal = false;
-    list_projs = Mstr.empty;
-    type_coercions = Mty.empty;
-    type_fields = Mty.empty;
-    list_field_def = Mstr.empty;
     meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
     info_cntexample = cntexample;
   } in
