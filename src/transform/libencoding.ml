@@ -140,8 +140,8 @@ let t_monomorph ty_base kept lsmap consts vmap t =
         let ls = ls_of_const ty_base t in
         consts := Sls.add ls !consts;
         fs_app ls [] ty_base
-    | Tapp (ps,[t1;t2]) when ls_equal ps ps_equ ->
-        t_equ (t_mono vmap t1) (t_mono vmap t2)
+    | Tapp (ls,tl) when ls.ls_constr > 0 || ls.ls_proj || ls_equal ls ps_equ ->
+        t_app ls (List.map (t_mono vmap) tl) t.t_ty
     | Tapp (ls,tl) ->
         let ls = lsmap ls in
         t_app ls (List.map (t_mono vmap) tl) ls.ls_value
@@ -155,6 +155,9 @@ let t_monomorph ty_base kept lsmap consts vmap t =
     | Tcase (t, bl) ->
         let conv_b b =
           let p,t,close = t_open_branch_cb b in
+          let vmap = Mvs.union (fun _ _ _ -> assert false) vmap
+                       (Mvs.mapi (fun v () -> t_var v) p.pat_vars)
+          in
           close p (t_mono vmap t)
         in
         t_case (t_mono vmap t) (List.map conv_b bl)
@@ -185,14 +188,7 @@ let d_monomorph ty_base kept lsmap d =
     | Dtype ts when not (Sty.exists (ty_s_any (ts_equal ts)) kept) -> []
     | Dtype ts ->
         [create_ty_decl ts]
-    | Ddata dl ->
-       let kept_d (_, csl) =
-         Sty.mem (Opt.get ((fst (List.hd csl)).ls_value)) kept
-       in
-       if List.for_all kept_d dl then [d]
-       else
-         Printer.unsupportedDecl d
-           "Non-kept algebraic types are not supported, run eliminate_algebraic"
+    | Ddata _ -> [d]
     | Dparam ls ->
         let ls = if ls_equal ls ps_equ then ls else lsmap ls in
         [create_param_decl ls]

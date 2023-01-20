@@ -163,7 +163,7 @@ module Transform = struct
     | Tapp(p,terms) when t.t_ty = None ->
       let terms = List.map (term_transform kept varM) terms in
       ps_app (findL p) terms
-    | Tapp(f,terms) ->
+    | Tapp(f,terms) when not (f.ls_constr > 0 || f.ls_proj) ->
       let terms = args_transform kept varM f terms (t_type t) in
       t_app (findL f) terms t.t_ty
     | Tquant(q,_) ->
@@ -272,14 +272,7 @@ let decl kept d = match d.d_node with
   | Dtype { ts_def = Alias _ } -> []
   | Dtype ts -> d :: Lib.lsdecl_of_ts_select ts
   | Ddata dl ->
-     let kept_d (_, csl) =
-       Sty.mem (Opt.get ((fst (List.hd csl)).ls_value)) kept
-     in
-     if List.for_all kept_d dl then
-       d :: List.concat (List.map (fun (ts, _) -> Lib.lsdecl_of_ts_select ts) dl)
-     else
-       Printer.unsupportedDecl d
-         "Non-kept algebraic types are not supported, run eliminate_algebraic"
+     d :: List.concat (List.map (fun (ts, _) -> Lib.lsdecl_of_ts_select ts) dl)
   | Dparam ls -> Transform.param_transform kept ls
   | Dlogic ldl -> Transform.logic_transform kept d ldl
   | Dind (s, idl) -> Transform.ind_transform kept s idl
