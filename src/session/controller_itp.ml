@@ -412,8 +412,10 @@ let build_prover_call spa =
     Call_provers.(limit.limit_steps > empty_limit.limit_steps) in
   let command =
     Whyconf.get_complete_command config_pr ~with_steps in
-  try
-    let task = Session_itp.get_task c.controller_session spa.spa_id in
+  match Session_itp.get_task c.controller_session spa.spa_id with
+  | exception Not_found (* goal has no task, it is detached *) ->
+    spa.spa_callback Detached
+  | task ->
     Debug.dprintf debug_sched "[build_prover_call] Script file = %a@."
                   (Pp.print_option Pp.string) spa.spa_pr_scr;
     let inplace = config_pr.Whyconf.in_place in
@@ -431,8 +433,6 @@ let build_prover_call spa =
       Hashtbl.replace prover_tasks_in_progress call pa
     with Sys_error _ as e ->
       spa.spa_callback (InternalFailure e)
-  with Not_found (* goal has no task, it is detached *) ->
-       spa.spa_callback Detached
 
 let update_observer () =
   let scheduled = Queue.length scheduled_proof_attempts in
