@@ -335,8 +335,8 @@ let unambig_fs version fs =
     | _ -> ty_all inspect ty
   in
   match version with
-  | V20 | V26 -> true
-  | V26Par ->  inspect (Opt.get fs.ls_value)
+  | V20 -> true
+  | V26 | V26Par ->  inspect (Opt.get fs.ls_value)
 
 (** expr *)
 let rec print_term info fmt t =
