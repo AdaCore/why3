@@ -707,6 +707,8 @@ let clone_decl inst cl uc d = match d.d_node with
           let ls' = Mls.find ls inst.mi_ls in
           let la' = List.assq ls' idl' in
           let handle_case (pr, f) (pr', f') =
+            if pr.pr_name.id_string <> pr'.pr_name.id_string
+            then raise (CannotInstantiate ls.ls_name);
             cl.pr_table <- Mpr.add pr pr' cl.pr_table;
             let f = clone_fmla cl f in
             if not (t_equal f f')
@@ -1163,6 +1165,8 @@ let clone_type_decl loc inst cl tdl decl kn =
             (try save_itd d' with
              | Invalid_argument _ -> raise (CannotInstantiate id));
             let eq_field f1 f2 =
+              if f1.pv_vs.vs_name.id_string <> f2.pv_vs.vs_name.id_string
+              then raise (CannotInstantiate id);
               let ity = conv_ity alg f1.pv_ity in
               let s = ity_match isb ity f2.pv_ity in
               if s.isb_reg <> Mreg.empty then assert false; (* ? *)
@@ -1177,6 +1181,8 @@ let clone_type_decl loc inst cl tdl decl kn =
               let f2 = Opt.get rs2.rs_field in
               eq_field f1 f2 in
             let eq_cons cs1 cs2 =
+              if cs1.rs_name.id_string <> cs2.rs_name.id_string
+              then raise (CannotInstantiate id);
               try List.iter2 eq_field cs1.rs_cty.cty_args cs2.rs_cty.cty_args with
               | Invalid_argument _ -> raise (CannotInstantiate id) in
             List.iter2 eq_proj d.itd_fields d'.itd_fields;
