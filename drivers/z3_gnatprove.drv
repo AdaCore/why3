@@ -51,6 +51,16 @@ theory int.EuclideanDivision
   remove allprops
 end
 
+theory int.ComputerDivision
+  prelude "(define-fun __cdiv ((x Int) (y Int)) Int (ite (>= x 0) (div x y) (- (div (- x) y))))"
+  prelude "(define-fun __cmod ((x Int) (y Int)) Int (ite (>= x 0) (mod x y) (- (mod (- x) y))))"
+
+  syntax function div "(__cdiv %1 %2)"
+  syntax function mod "(__cmod %1 %2)"
+
+  remove allprops
+end
+
 theory int.MinMax
   remove allprops
 end
