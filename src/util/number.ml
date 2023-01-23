@@ -417,6 +417,9 @@ let check_range c {ir_lower = lo; ir_upper = hi} =
   let cval = c.il_int in
   if BigInt.lt cval lo || BigInt.gt cval hi then raise (OutOfRange c)
 
+let int_range_equal ir1 ir2 =
+  BigInt.eq ir1.ir_lower ir2.ir_lower && BigInt.eq ir1.ir_upper ir2.ir_upper
+
 (** Float checks *)
 
 type float_format = {
@@ -525,6 +528,9 @@ let compute_float c fp =
 
 let check_float c fp = ignore (compute_float c fp)
 
+let float_format_equal fp1 fp2 =
+  fp1.fp_exponent_digits = fp2.fp_exponent_digits
+  && fp1.fp_significand_digits = fp2.fp_significand_digits
 
 let full_support =
   {

@@ -1,0 +1,19 @@
+module M
+
+  type f = <float 3 7>
+
+  function f (x : f) : bool =
+    x = (0.5 : f)
+
+  predicate finite (x : f) =
+    f'isFinite x
+
+end
+
+module N
+
+  type f = <float 3 7>
+
+  clone M with type f
+
+end

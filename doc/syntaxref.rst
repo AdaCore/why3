@@ -1617,6 +1617,54 @@ by instantiating ``Exp`` with zero and addition instead.
       goal G: exp 2 3 = 6
     end
 
+It is also possible to substitute certain types of defined symbols :
+logical function and predicate, (co)inductives, algebraic data types, immutable
+records without invariants, range and floating-point types.
+
+.. code-block:: whyml
+
+    module A
+      use int.Int
+
+      predicate pos (n : int) =
+        n >= 0
+
+      function abs (n : int) =
+        if pos n then n else -n
+
+      type 'a list =
+        | Nil
+        | Cons 'a (list 'a)
+
+      type r = { a : int; b : string; }
+    end
+
+    module B
+      use int.Int
+
+      (* logical functions and predicates must be syntactically equal. *)
+      predicate pos (n : int) =
+        n >= 0
+
+      function abs (n : int) =
+        if pos n then n else -n
+
+      (* The signature of each constructor must match by order of definition.
+       * Constructor's names may not match, but a warning will be raised. *)
+      type 'a list =
+        | A
+        | B 'a (list 'a)
+
+      (* The field types must match by order of definition. *)
+      type r = { b : int; a : string; }
+
+      clone A with
+       predicate pos,
+       function abs,
+       type list,
+       type r
+    end
+
 .. index:: standard library
 
 The Why3 Standard Library
