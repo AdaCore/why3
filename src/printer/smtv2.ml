@@ -580,7 +580,12 @@ and print_branches info subject pr fmt bl = match bl with
             | {pat_node = Pvar v} -> v | _ -> error ()) args in
           if bl = [] then print_branch info subject pr fmt (cs,args,t)
           else
-            fprintf fmt "@[<hv2>(ite (is-%a %a) %a %a)@]"
+            begin match info.info_version with
+              | V20 (* It was not defined at that time in the standard *) ->
+                  fprintf fmt "@[<hv2>(ite (is-%a %a) %a %a)@]"
+              | V26 | V26Par ->
+                  fprintf fmt "@[<hv2>(ite ((_ is %a) %a) %a %a)@]"
+            end
               (print_ident info) cs.ls_name (print_var info) subject
               (print_branch info subject pr) (cs,args,t)
               (print_branches info subject pr) bl
