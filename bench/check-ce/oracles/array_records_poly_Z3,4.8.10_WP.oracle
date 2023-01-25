@@ -1987,22 +1987,22 @@ File array_records_poly.mlw:
     flag :
       basic_record
       ->
-      bool = fun x!069 ->
-              if x!069 = {Array_records.flag = false;
-                          Array_records.first_value = 2;
-                          Array_records.second_value = 0}
-              then false else false
+      bool = [|{Array_records.flag = false;
+                Array_records.first_value = 2;
+                Array_records.second_value = 0} =>
+               false;
+             _ => false|]
   Line 17:
     first_val :
       basic_record
       ->
-      int = fun x!069 ->
-             if x!069 = {Array_records.flag = false;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 0}
-             then 2 else 2
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 2;
+               Array_records.second_value = 0} =>
+              2;
+            _ => 2|]
   Line 18:
-    sec_val : basic_record -> int = fun x!066 -> 0
+    sec_val : basic_record -> int = [|_ => 0|]
   Line 23:
     i : int = -1
   Line 27:
@@ -2063,29 +2063,29 @@ File array_records_poly.mlw:
     flag :
       basic_record
       ->
-      bool = fun x!073 ->
-              if x!073 = {Array_records.flag = false;
-                          Array_records.first_value = 2;
-                          Array_records.second_value = 4}
-              then false else false
+      bool = [|{Array_records.flag = false;
+                Array_records.first_value = 2;
+                Array_records.second_value = 4} =>
+               false;
+             _ => false|]
   Line 17:
     first_val :
       basic_record
       ->
-      int = fun x!073 ->
-             if x!073 = {Array_records.flag = false;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 4}
-             then 2 else 2
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 2;
+               Array_records.second_value = 4} =>
+              2;
+            _ => 2|]
   Line 18:
     sec_val :
       basic_record
       ->
-      int = fun x!070 ->
-             if x!070 = {Array_records.flag = false;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 4}
-             then 4 else 4
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 2;
+               Array_records.second_value = 4} =>
+              4;
+            _ => 4|]
   Line 23:
     i : int = -1
   Line 27:
@@ -2155,33 +2155,32 @@ File array_records_poly.mlw:
     flag :
       basic_record
       ->
-      bool = fun x!077 ->
-              if x!077 = {Array_records.flag = false;
-                          Array_records.first_value = 2;
-                          Array_records.second_value = 4}
-              then false
-              else if x!077 = {Array_records.flag = false;
-                               Array_records.first_value = 2;
-                               Array_records.second_value = 4}
-                   then false else false
+      bool = [|{Array_records.flag = false;
+                Array_records.first_value = 2;
+                Array_records.second_value = 4} =>
+               false;
+             {Array_records.flag = false;
+              Array_records.first_value = 2;
+              Array_records.second_value = 4} =>
+             false; _ => false|]
   Line 17:
     first_val :
       basic_record
       ->
-      int = fun x!077 ->
-             if x!077 = {Array_records.flag = false;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 4}
-             then 2 else 2
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 2;
+               Array_records.second_value = 4} =>
+              2;
+            _ => 2|]
   Line 18:
     sec_val :
       basic_record
       ->
-      int = fun x!074 ->
-             if x!074 = {Array_records.flag = false;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 4}
-             then 4 else 4
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 2;
+               Array_records.second_value = 4} =>
+              4;
+            _ => 4|]
   Line 23:
     i : int = -1
   Line 27:
@@ -2260,33 +2259,32 @@ File array_records_poly.mlw:
     flag :
       basic_record
       ->
-      bool = fun x!081 ->
-              if x!081 = {Array_records.flag = false;
-                          Array_records.first_value = 2;
-                          Array_records.second_value = 4}
-              then false
-              else if x!081 = {Array_records.flag = false;
-                               Array_records.first_value = 2;
-                               Array_records.second_value = 4}
-                   then false else false
+      bool = [|{Array_records.flag = false;
+                Array_records.first_value = 2;
+                Array_records.second_value = 4} =>
+               false;
+             {Array_records.flag = false;
+              Array_records.first_value = 2;
+              Array_records.second_value = 4} =>
+             false; _ => false|]
   Line 17:
     first_val :
       basic_record
       ->
-      int = fun x!081 ->
-             if x!081 = {Array_records.flag = false;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 4}
-             then 2 else 2
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 2;
+               Array_records.second_value = 4} =>
+              2;
+            _ => 2|]
   Line 18:
     sec_val :
       basic_record
       ->
-      int = fun x!078 ->
-             if x!078 = {Array_records.flag = false;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 4}
-             then 4 else 4
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 2;
+               Array_records.second_value = 4} =>
+              4;
+            _ => 4|]
   Line 23:
     i : int = -1
   Line 27:
@@ -2366,37 +2364,35 @@ File array_records_poly.mlw:
     flag :
       basic_record
       ->
-      bool = fun x!085 ->
-              if x!085 = {Array_records.flag = false;
-                          Array_records.first_value = 2;
-                          Array_records.second_value = 4}
-              then false
-              else if x!085 = {Array_records.flag = false;
-                               Array_records.first_value = 2;
-                               Array_records.second_value = 4}
-                   then false else false
+      bool = [|{Array_records.flag = false;
+                Array_records.first_value = 2;
+                Array_records.second_value = 4} =>
+               false;
+             {Array_records.flag = false;
+              Array_records.first_value = 2;
+              Array_records.second_value = 4} =>
+             false; _ => false|]
   Line 17:
     first_val :
       basic_record
       ->
-      int = fun x!085 ->
-             if x!085 = {Array_records.flag = false;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 4}
-             then 2 else 2
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 2;
+               Array_records.second_value = 4} =>
+              2;
+            _ => 2|]
   Line 18:
     sec_val :
       basic_record
       ->
-      int = fun x!082 ->
-             if x!082 = {Array_records.flag = false;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 4}
-             then 4
-             else if x!082 = {Array_records.flag = false;
-                              Array_records.first_value = 2;
-                              Array_records.second_value = 6}
-                  then 6 else 4
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 2;
+               Array_records.second_value = 4} =>
+              4;
+            {Array_records.flag = false;
+             Array_records.first_value = 2;
+             Array_records.second_value = 6} =>
+            6; _ => 4|]
   Line 23:
     i : int = -1
   Line 27:
@@ -2486,41 +2482,39 @@ File array_records_poly.mlw:
     flag :
       basic_record
       ->
-      bool = fun x!089 ->
-              if x!089 = {Array_records.flag = false;
-                          Array_records.first_value = 2;
-                          Array_records.second_value = 4}
-              then false
-              else if x!089 = {Array_records.flag = false;
-                               Array_records.first_value = 2;
-                               Array_records.second_value = 4}
-                   then false
-                   else if x!089 = {Array_records.flag = false;
-                                    Array_records.first_value = 2;
-                                    Array_records.second_value = 6}
-                        then false else false
+      bool = [|{Array_records.flag = false;
+                Array_records.first_value = 2;
+                Array_records.second_value = 4} =>
+               false;
+             {Array_records.flag = false;
+              Array_records.first_value = 2;
+              Array_records.second_value = 4} =>
+             false;
+             {Array_records.flag = false;
+              Array_records.first_value = 2;
+              Array_records.second_value = 6} =>
+             false; _ => false|]
   Line 17:
     first_val :
       basic_record
       ->
-      int = fun x!089 ->
-             if x!089 = {Array_records.flag = false;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 4}
-             then 2 else 2
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 2;
+               Array_records.second_value = 4} =>
+              2;
+            _ => 2|]
   Line 18:
     sec_val :
       basic_record
       ->
-      int = fun x!086 ->
-             if x!086 = {Array_records.flag = false;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 4}
-             then 4
-             else if x!086 = {Array_records.flag = false;
-                              Array_records.first_value = 2;
-                              Array_records.second_value = 6}
-                  then 6 else 4
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 2;
+               Array_records.second_value = 4} =>
+              4;
+            {Array_records.flag = false;
+             Array_records.first_value = 2;
+             Array_records.second_value = 6} =>
+            6; _ => 4|]
   Line 23:
     i : int = -1
   Line 27:
@@ -2619,41 +2613,39 @@ File array_records_poly.mlw:
     flag :
       basic_record
       ->
-      bool = fun x!093 ->
-              if x!093 = {Array_records.flag = false;
-                          Array_records.first_value = 2;
-                          Array_records.second_value = 4}
-              then false
-              else if x!093 = {Array_records.flag = false;
-                               Array_records.first_value = 2;
-                               Array_records.second_value = 4}
-                   then false
-                   else if x!093 = {Array_records.flag = false;
-                                    Array_records.first_value = 2;
-                                    Array_records.second_value = 6}
-                        then false else false
+      bool = [|{Array_records.flag = false;
+                Array_records.first_value = 2;
+                Array_records.second_value = 4} =>
+               false;
+             {Array_records.flag = false;
+              Array_records.first_value = 2;
+              Array_records.second_value = 4} =>
+             false;
+             {Array_records.flag = false;
+              Array_records.first_value = 2;
+              Array_records.second_value = 6} =>
+             false; _ => false|]
   Line 17:
     first_val :
       basic_record
       ->
-      int = fun x!093 ->
-             if x!093 = {Array_records.flag = false;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 4}
-             then 2 else 2
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 2;
+               Array_records.second_value = 4} =>
+              2;
+            _ => 2|]
   Line 18:
     sec_val :
       basic_record
       ->
-      int = fun x!090 ->
-             if x!090 = {Array_records.flag = false;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 4}
-             then 4
-             else if x!090 = {Array_records.flag = false;
-                              Array_records.first_value = 2;
-                              Array_records.second_value = 6}
-                  then 6 else 4
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 2;
+               Array_records.second_value = 4} =>
+              4;
+            {Array_records.flag = false;
+             Array_records.first_value = 2;
+             Array_records.second_value = 6} =>
+            6; _ => 4|]
   Line 23:
     i : int = -1
   Line 27:
@@ -2753,45 +2745,43 @@ File array_records_poly.mlw:
     flag :
       basic_record
       ->
-      bool = fun x!097 ->
-              if x!097 = {Array_records.flag = false;
-                          Array_records.first_value = 2;
-                          Array_records.second_value = 4}
-              then false
-              else if x!097 = {Array_records.flag = false;
-                               Array_records.first_value = 2;
-                               Array_records.second_value = 4}
-                   then false
-                   else if x!097 = {Array_records.flag = false;
-                                    Array_records.first_value = 2;
-                                    Array_records.second_value = 6}
-                        then false else false
+      bool = [|{Array_records.flag = false;
+                Array_records.first_value = 2;
+                Array_records.second_value = 4} =>
+               false;
+             {Array_records.flag = false;
+              Array_records.first_value = 2;
+              Array_records.second_value = 4} =>
+             false;
+             {Array_records.flag = false;
+              Array_records.first_value = 2;
+              Array_records.second_value = 6} =>
+             false; _ => false|]
   Line 17:
     first_val :
       basic_record
       ->
-      int = fun x!097 ->
-             if x!097 = {Array_records.flag = false;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 4}
-             then 2 else 2
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 2;
+               Array_records.second_value = 4} =>
+              2;
+            _ => 2|]
   Line 18:
     sec_val :
       basic_record
       ->
-      int = fun x!094 ->
-             if x!094 = {Array_records.flag = false;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 4}
-             then 4
-             else if x!094 = {Array_records.flag = false;
-                              Array_records.first_value = 2;
-                              Array_records.second_value = 6}
-                  then 6
-                  else if x!094 = {Array_records.flag = false;
-                                   Array_records.first_value = 2;
-                                   Array_records.second_value = 7}
-                       then 7 else 4
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 2;
+               Array_records.second_value = 4} =>
+              4;
+            {Array_records.flag = false;
+             Array_records.first_value = 2;
+             Array_records.second_value = 6} =>
+            6;
+            {Array_records.flag = false;
+             Array_records.first_value = 2;
+             Array_records.second_value = 7} =>
+            7; _ => 4|]
   Line 23:
     i : int = -1
   Line 27:
@@ -2903,49 +2893,46 @@ File array_records_poly.mlw:
     flag :
       basic_record
       ->
-      bool = fun x!0101 ->
-              if x!0101 = {Array_records.flag = false;
-                           Array_records.first_value = 2;
-                           Array_records.second_value = 4}
-              then false
-              else if x!0101 = {Array_records.flag = false;
-                                Array_records.first_value = 2;
-                                Array_records.second_value = 4}
-                   then false
-                   else if x!0101 = {Array_records.flag = false;
-                                     Array_records.first_value = 2;
-                                     Array_records.second_value = 6}
-                        then false else false
+      bool = [|{Array_records.flag = false;
+                Array_records.first_value = 2;
+                Array_records.second_value = 4} =>
+               false;
+             {Array_records.flag = false;
+              Array_records.first_value = 2;
+              Array_records.second_value = 4} =>
+             false;
+             {Array_records.flag = false;
+              Array_records.first_value = 2;
+              Array_records.second_value = 6} =>
+             false; _ => false|]
   Line 17:
     first_val :
       basic_record
       ->
-      int = fun x!0101 ->
-             if x!0101 = {Array_records.flag = false;
-                          Array_records.first_value = 2;
-                          Array_records.second_value = 4}
-             then 2
-             else if x!0101 = {Array_records.flag = false;
-                               Array_records.first_value = 8;
-                               Array_records.second_value = 7}
-                  then 8 else 2
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 2;
+               Array_records.second_value = 4} =>
+              2;
+            {Array_records.flag = false;
+             Array_records.first_value = 8;
+             Array_records.second_value = 7} =>
+            8; _ => 2|]
   Line 18:
     sec_val :
       basic_record
       ->
-      int = fun x!098 ->
-             if x!098 = {Array_records.flag = false;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 4}
-             then 4
-             else if x!098 = {Array_records.flag = false;
-                              Array_records.first_value = 2;
-                              Array_records.second_value = 6}
-                  then 6
-                  else if x!098 = {Array_records.flag = false;
-                                   Array_records.first_value = 8;
-                                   Array_records.second_value = 7}
-                       then 7 else 4
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 2;
+               Array_records.second_value = 4} =>
+              4;
+            {Array_records.flag = false;
+             Array_records.first_value = 2;
+             Array_records.second_value = 6} =>
+            6;
+            {Array_records.flag = false;
+             Array_records.first_value = 8;
+             Array_records.second_value = 7} =>
+            7; _ => 4|]
   Line 23:
     i : int = -1
   Line 27:
@@ -3070,57 +3057,54 @@ File array_records_poly.mlw:
     flag :
       basic_record
       ->
-      bool = fun x!0109 ->
-              if x!0109 = {Array_records.flag = false;
-                           Array_records.first_value = 4;
-                           Array_records.second_value = 7}
-              then false
-              else if x!0109 = {Array_records.flag = false;
-                                Array_records.first_value = 4;
-                                Array_records.second_value = 7}
-                   then false
-                   else if x!0109 = {Array_records.flag = false;
-                                     Array_records.first_value = 4;
-                                     Array_records.second_value = 8}
-                        then false else false
+      bool = [|{Array_records.flag = false;
+                Array_records.first_value = 4;
+                Array_records.second_value = 7} =>
+               false;
+             {Array_records.flag = false;
+              Array_records.first_value = 4;
+              Array_records.second_value = 7} =>
+             false;
+             {Array_records.flag = false;
+              Array_records.first_value = 4;
+              Array_records.second_value = 8} =>
+             false; _ => false|]
   Line 17:
     first_val :
       basic_record
       ->
-      int = fun x!0109 ->
-             if x!0109 = {Array_records.flag = false;
-                          Array_records.first_value = 4;
-                          Array_records.second_value = 7}
-             then 4
-             else if x!0109 = {Array_records.flag = false;
-                               Array_records.first_value = 10;
-                               Array_records.second_value = 9}
-                  then 10
-                  else if x!0109 = {Array_records.flag = false;
-                                    Array_records.first_value = 11;
-                                    Array_records.second_value = 69}
-                       then 11 else 4
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 4;
+               Array_records.second_value = 7} =>
+              4;
+            {Array_records.flag = false;
+             Array_records.first_value = 10;
+             Array_records.second_value = 9} =>
+            10;
+            {Array_records.flag = false;
+             Array_records.first_value = 11;
+             Array_records.second_value = 69} =>
+            11; _ => 4|]
   Line 18:
     sec_val :
       basic_record
       ->
-      int = fun x!0106 ->
-             if x!0106 = {Array_records.flag = false;
-                          Array_records.first_value = 4;
-                          Array_records.second_value = 7}
-             then 7
-             else if x!0106 = {Array_records.flag = false;
-                               Array_records.first_value = 4;
-                               Array_records.second_value = 8}
-                  then 8
-                  else if x!0106 = {Array_records.flag = false;
-                                    Array_records.first_value = 10;
-                                    Array_records.second_value = 9}
-                       then 9
-                       else if x!0106 = {Array_records.flag = false;
-                                         Array_records.first_value = 11;
-                                         Array_records.second_value = 69}
-                            then 69 else 7
+      int = [|{Array_records.flag = false;
+               Array_records.first_value = 4;
+               Array_records.second_value = 7} =>
+              7;
+            {Array_records.flag = false;
+             Array_records.first_value = 4;
+             Array_records.second_value = 8} =>
+            8;
+            {Array_records.flag = false;
+             Array_records.first_value = 10;
+             Array_records.second_value = 9} =>
+            9;
+            {Array_records.flag = false;
+             Array_records.first_value = 11;
+             Array_records.second_value = 69} =>
+            69; _ => 7|]
   Line 23:
     i : int = 2
   Line 25:

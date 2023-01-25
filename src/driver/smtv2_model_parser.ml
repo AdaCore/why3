@@ -1011,7 +1011,7 @@ module FromModelToTerm = struct
         (t_others, others_concrete)
         elts.array_indices
     in
-    (t_lambda [ vs_arg ] [] a, Function {is_array=true; args=[vs_name]; body=a_concrete})
+    (t_lambda [ vs_arg ] [] a, Function {args=[vs_name]; body=a_concrete})
 
   (*  Interpreting function definitions from the SMT model to [t',t'_concrete].
       - [t'] is a Term.term
@@ -1115,7 +1115,7 @@ module FromModelToTerm = struct
             (Mstr.values env.bound_vars)
             []
             t_body,
-          Function {is_array=false; args; body=t_body_concrete}
+          Function {args; body=t_body_concrete}
         )
     in
     List.iter
@@ -1252,8 +1252,8 @@ module FromModelToTerm = struct
               Pretty.print_term t
           end
         | vsl, trig, t' ->
-            let is_array, vsl_concrete, t'_concrete = match t_concrete with
-              | Function {is_array; args; body} -> is_array, args, body
+            let vsl_concrete, t'_concrete = match t_concrete with
+              | Function {args; body} -> args, body
               | _ ->
                 error_concrete_syntax "Unexpected concrete term %a for lambda term %a"
                   print_concrete_term t_concrete
@@ -1261,7 +1261,7 @@ module FromModelToTerm = struct
             in
             let t'_eval, t'_eval_concrete =
               eval_term env ~eval_prover_var seen_prover_vars terms (t',t'_concrete) in
-            (t_lambda vsl trig t'_eval, Function {is_array; args=vsl_concrete; body=t'_eval_concrete}))
+            (t_lambda vsl trig t'_eval, Function {args=vsl_concrete; body=t'_eval_concrete}))
     | Term.Tquant (q, tq), Quant (q_concrete, vars_concrete, t_concrete) ->
         let vsl, trig, t' = t_open_quant tq in
         let t',t'_concrete =
@@ -1479,8 +1479,8 @@ module FromModelToTerm = struct
         let t1',t1'_concrete = maybe_convert_epsilon_terms env (t1,t1_concrete) in
         let t2',t2'_concrete = maybe_convert_epsilon_terms env (t2,t2_concrete) in
         (t_if b' t1' t2', If (b'_concrete, t1'_concrete, t2'_concrete))
-    | Term.Teps tb, _ -> (
-        match Term.t_open_lambda t with
+    | Term.Teps tb, _ ->
+        begin match Term.t_open_lambda t with
         | [], _, _ ->
             begin match t_concrete with
             | Epsilon (eps_x, eps_term) ->
@@ -1502,16 +1502,32 @@ module FromModelToTerm = struct
                 print_concrete_term t_concrete
                 Pretty.print_term t
             end
+        | [vs], trig, t' ->
+            begin match t_concrete with
+            | Function {args=[x]; body=t'_concrete} ->
+              begin match get_opt_fun_literal env (vs,x) (t',t'_concrete) with
+              | None ->
+                let t', t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in
+                (t_lambda [vs] trig t', Function {args=[x]; body=t'_concrete})
+              | Some (elts,others) ->
+                (t_lambda [vs] trig t', FunctionLiteral {elts; others})
+              end
+            | _ ->
+              error_concrete_syntax "Unexpected concrete term %a for lambda term %a"
+                print_concrete_term t_concrete
+                Pretty.print_term t
+            end
         | vsl, trig, t' ->
-            let is_array, vsl_concrete, t'_concrete = match t_concrete with
-              | Function {is_array; args; body} -> is_array, args, body
-              | _ ->
-                error_concrete_syntax "Unexpected concrete term %a for lambda term %a"
-                  print_concrete_term t_concrete
-                  Pretty.print_term t
-            in
-            let t', t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in
-            (t_lambda vsl trig t', Function {is_array; args=vsl_concrete; body=t'_concrete}))
+            begin match t_concrete with
+            | Function {args; body=t'_concrete} ->
+              let t', t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in
+              (t_lambda vsl trig t', Function {args; body=t'_concrete})
+            | _ ->
+              error_concrete_syntax "Unexpected concrete term %a for lambda term %a"
+                print_concrete_term t_concrete
+                Pretty.print_term t
+            end
+        end
     | Term.Tquant (q, tq), Quant (q_concrete, vars_concrete, t_concrete) ->
         let vsl, trig, t' = t_open_quant tq in
         let t',t'_concrete = maybe_convert_epsilon_terms env (t',t_concrete) in
@@ -1597,6 +1613,32 @@ module FromModelToTerm = struct
       | _ -> None
     )
     | _ -> None
+
+  and get_opt_fun_literal env (vs,vs_name) (t',t'_concrete) =
+    (* Unfold a concrete term of the form:
+    if x = ct0 then ct1 else if x = ct0' then ct1' else ... else ct2
+    to the following result:
+    elts = [(ct0,ct1),(ct0',ct1')...]
+    others = ct2 *)
+    let rec unfold env (vs,vs_name) (t',t'_concrete) =
+      match t'.t_node, t'_concrete with
+      | Tif ({t_node = Tapp (ls, [x;t0])}, t1, t2), If (Apply ("=", [Var x'; ct0]), ct1, ct2)
+          when t_equal (t_var vs) x &&  x'=vs_name && ls_equal ls ps_equ ->
+        let (elts, others) = unfold env (vs,vs_name) (t2,ct2) in
+        let t0',ct0' = maybe_convert_epsilon_terms env (t0,ct0) in
+        let t1',ct1' = maybe_convert_epsilon_terms env (t1,ct1) in
+        ((ct0',ct1')::elts, others)
+      | _ -> ([], t'_concrete)
+    in
+    if t_v_occurs vs t' = 0 then
+      let t',t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in
+      Some ([],t'_concrete)
+    else
+      match unfold env (vs,vs_name) (t',t'_concrete) with
+      | [], _ -> None
+      | elts, others -> Some (elts,others)
+
+
 
 
   let clean env terms =

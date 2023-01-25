@@ -16,7 +16,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array_records_mono.mlw:
   Line 20:
-    length : array_of_records -> int = fun x!0 -> 0
+    length : array_of_records -> int = [|_ => 0|]
   Line 23:
     mixfix [] :
       array_of_records
@@ -61,7 +61,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array_records_mono.mlw:
   Line 20:
-    length : array_of_records -> int = fun x!01 -> 0
+    length : array_of_records -> int = [|_ => 0|]
   Line 23:
     mixfix [] :
       array_of_records
@@ -111,7 +111,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array_records_mono.mlw:
   Line 20:
-    length : array_of_records -> int = fun x!02 -> 0
+    length : array_of_records -> int = [|_ => 0|]
   Line 23:
     mixfix [] :
       array_of_records
@@ -173,10 +173,8 @@ File array_records_mono.mlw:
     length :
       array_of_records
       ->
-      int = fun x!03 ->
-             if x!03 = epsilon x. (ArrayRecords.length x) = 0 then 0
-             else if x!03 = epsilon x. (ArrayRecords.length x) = 0 then 0
-                  else 0
+      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
+            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
   Line 26:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     i : int = -1
@@ -240,10 +238,8 @@ File array_records_mono.mlw:
     length :
       array_of_records
       ->
-      int = fun x!04 ->
-             if x!04 = epsilon x. (ArrayRecords.length x) = 0 then 0
-             else if x!04 = epsilon x. (ArrayRecords.length x) = 0 then 0
-                  else 0
+      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
+            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
   Line 26:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     i : int = -1
@@ -312,10 +308,8 @@ File array_records_mono.mlw:
     length :
       array_of_records
       ->
-      int = fun x!05 ->
-             if x!05 = epsilon x. (ArrayRecords.length x) = 0 then 0
-             else if x!05 = epsilon x. (ArrayRecords.length x) = 0 then 0
-                  else 0
+      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
+            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
   Line 27:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     i : int = -1
@@ -391,11 +385,9 @@ File array_records_mono.mlw:
     length :
       array_of_records
       ->
-      int = fun x!06 ->
-             if x!06 = epsilon x. (ArrayRecords.length x) = 0 then 0
-             else if x!06 = epsilon x. (ArrayRecords.length x) = 0 then 0
-                  else if x!06 = epsilon x. (ArrayRecords.length x) = 0
-                       then 0 else 0
+      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
+            epsilon x. (ArrayRecords.length x) = 0 => 0;
+            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
   Line 26:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     i : int = -1
@@ -481,11 +473,9 @@ File array_records_mono.mlw:
     length :
       array_of_records
       ->
-      int = fun x!07 ->
-             if x!07 = epsilon x. (ArrayRecords.length x) = 0 then 0
-             else if x!07 = epsilon x. (ArrayRecords.length x) = 0 then 0
-                  else if x!07 = epsilon x. (ArrayRecords.length x) = 0
-                       then 0 else 0
+      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
+            epsilon x. (ArrayRecords.length x) = 0 => 0;
+            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
   Line 26:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     i : int = -1
@@ -576,11 +566,9 @@ File array_records_mono.mlw:
     length :
       array_of_records
       ->
-      int = fun x!08 ->
-             if x!08 = epsilon x. (ArrayRecords.length x) = 0 then 0
-             else if x!08 = epsilon x. (ArrayRecords.length x) = 0 then 0
-                  else if x!08 = epsilon x. (ArrayRecords.length x) = 0
-                       then 0 else 0
+      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
+            epsilon x. (ArrayRecords.length x) = 0 => 0;
+            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
   Line 27:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     i : int = -1
@@ -678,13 +666,10 @@ File array_records_mono.mlw:
     length :
       array_of_records
       ->
-      int = fun x!09 ->
-             if x!09 = epsilon x. (ArrayRecords.length x) = 0 then 0
-             else if x!09 = epsilon x. (ArrayRecords.length x) = 0 then 0
-                  else if x!09 = epsilon x. (ArrayRecords.length x) = 0
-                       then 0
-                       else if x!09 = epsilon x. (ArrayRecords.length x) = 0
-                            then 0 else 0
+      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
+            epsilon x. (ArrayRecords.length x) = 0 => 0;
+            epsilon x. (ArrayRecords.length x) = 0 => 0;
+            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
   Line 26:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     i : int = -1
@@ -795,13 +780,10 @@ File array_records_mono.mlw:
     length :
       array_of_records
       ->
-      int = fun x!010 ->
-             if x!010 = epsilon x. (ArrayRecords.length x) = 0 then 0
-             else if x!010 = epsilon x. (ArrayRecords.length x) = 0 then 0
-                  else if x!010 = epsilon x. (ArrayRecords.length x) = 0
-                       then 0
-                       else if x!010 = epsilon x. (ArrayRecords.length x) = 0
-                            then 0 else 0
+      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
+            epsilon x. (ArrayRecords.length x) = 0 => 0;
+            epsilon x. (ArrayRecords.length x) = 0 => 0;
+            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
   Line 26:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     i : int = -1
@@ -917,13 +899,10 @@ File array_records_mono.mlw:
     length :
       array_of_records
       ->
-      int = fun x!011 ->
-             if x!011 = epsilon x. (ArrayRecords.length x) = 0 then 0
-             else if x!011 = epsilon x. (ArrayRecords.length x) = 0 then 0
-                  else if x!011 = epsilon x. (ArrayRecords.length x) = 0
-                       then 0
-                       else if x!011 = epsilon x. (ArrayRecords.length x) = 0
-                            then 0 else 0
+      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
+            epsilon x. (ArrayRecords.length x) = 0 => 0;
+            epsilon x. (ArrayRecords.length x) = 0 => 0;
+            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
   Line 27:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     i : int = -1
@@ -1050,15 +1029,11 @@ File array_records_mono.mlw:
     length :
       array_of_records
       ->
-      int = fun x!012 ->
-             if x!012 = epsilon x. (ArrayRecords.length x) = 4 then 4
-             else if x!012 = epsilon x. (ArrayRecords.length x) = 4 then 4
-                  else if x!012 = epsilon x. (ArrayRecords.length x) = 4
-                       then 4
-                       else if x!012 = epsilon x. (ArrayRecords.length x) = 4
-                            then 4
-                            else if x!012 = epsilon x.
-                                 (ArrayRecords.length x) = 4 then 4 else 4
+      int = [|epsilon x. (ArrayRecords.length x) = 4 => 4;
+            epsilon x. (ArrayRecords.length x) = 4 => 4;
+            epsilon x. (ArrayRecords.length x) = 4 => 4;
+            epsilon x. (ArrayRecords.length x) = 4 => 4;
+            epsilon x. (ArrayRecords.length x) = 4 => 4; _ => 4|]
   Line 27:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
     i : int = 2

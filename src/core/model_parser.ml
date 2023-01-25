@@ -83,24 +83,16 @@ type concrete_syntax_term =
   | Quant of concrete_syntax_quant * string list * concrete_syntax_term
   | Binop of concrete_syntax_binop * concrete_syntax_term * concrete_syntax_term
   | Not of concrete_syntax_term
-  | Function of { is_array: bool; args: string list ; body: concrete_syntax_term }
+  | Function of { args: string list ; body: concrete_syntax_term }
+  | FunctionLiteral of {
+      elts: (concrete_syntax_term * concrete_syntax_term) list;
+      others: concrete_syntax_term
+    }
   | Record of (string * concrete_syntax_term) list
   | Proj of (string * concrete_syntax_term)
 
 
 (* Pretty printing of concrete terms *)
-
-(* Unfold a concrete term of the form:
-   if x = ct0 then ct1 else if x = ct0' then ct1' else ... else ct2
-   to the following result:
-   elts = [(ct0,ct1),(ct0',ct1')...]
-   others = ct2 *)
-let rec get_elts_others x body =
-  match body with
-  | If (Apply ("=", [Var x'; ct0]), ct1, ct2) when x=x' ->
-    let (elts, others) = get_elts_others x ct2 in
-    ((ct0,ct1)::elts, others)
-  | _ -> ([], body)
 
 let print_concrete_bv fmt { bv_binary; bv_int } =
   fprintf fmt "%s (%s)" bv_int bv_binary
@@ -152,9 +144,9 @@ let rec print_concrete_term fmt ct =
       op_string
       print_concrete_term t2
   | Not ct' -> fprintf fmt "not %a" print_concrete_term ct'
-  | Function {is_array=true; args=[x]; body=t} ->
+  | FunctionLiteral {elts; others} ->
     let print_others fmt others =
-      fprintf fmt "@[others =>@ %a@]"
+      fprintf fmt "@[_ =>@ %a@]"
         print_concrete_term others
     in
     let print_indice_value fmt (indice,value) =
@@ -162,7 +154,6 @@ let rec print_concrete_term fmt ct =
         print_concrete_term indice
         print_concrete_term value
     in
-    let (elts,others) = get_elts_others x t in
     fprintf fmt "@[[|%a%a|]@]"
       (Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.semi ~sep:Pp.semi print_indice_value) elts
       print_others others
@@ -203,7 +194,15 @@ let rec subst_concrete_term subst t =
   | Binop (op,ct1,ct2) ->
     Binop (op, subst_concrete_term subst ct1, subst_concrete_term subst ct2)
   | Not ct -> Not (subst_concrete_term subst ct)
-  | Function {is_array; args; body} -> Function {is_array; args; body= subst_concrete_term subst body}
+  | Function {args; body} -> Function {args; body= subst_concrete_term subst body}
+  | FunctionLiteral {elts; others} ->
+    let elts =
+      List.map
+        (fun (c1,c2) -> (subst_concrete_term subst c1, subst_concrete_term subst c2))
+        elts
+    in
+    let others = subst_concrete_term subst others in
+    FunctionLiteral {elts; others}
   | Record fields_values ->
     Record (
       List.map
@@ -591,12 +590,11 @@ let rec json_of_concrete_term ct =
       ]
     ]
   | Not t' -> Record [ "type", String "Not"; "val", json_of_concrete_term t' ]
-  | Function {is_array=true; args=[x]; body} ->
-    let (elts,others) = get_elts_others x body in
+  | FunctionLiteral {elts; others} ->
     Record [
-      "type", String "Array";
+      "type", String "FunctionLiteral";
       "val", Record [
-        "array_elts",
+        "funliteral_elts",
           List (
             List.map
               (fun (indice,value) ->
@@ -606,7 +604,7 @@ let rec json_of_concrete_term ct =
                 ])
               elts
           );
-        "array_others", json_of_concrete_term others
+        "funliteral_others", json_of_concrete_term others
       ]
     ]
   | Function {args; body} ->
@@ -1132,7 +1130,8 @@ class clean = object (self)
     | Binop (op,t1,t2) -> self#binop op t1 t2
     | Record fs -> self#record fs
     | Proj (s,v) -> self#proj s v
-    | Function {is_array;args;body} -> self#func is_array args body
+    | Function {args;body} -> self#func args body
+    | FunctionLiteral {elts;others} -> self#funliteral elts others
   method var v = Some (Var v)
   method const c = match c with
     | String v -> self#string v
@@ -1170,9 +1169,17 @@ class clean = object (self)
     Opt.bind (self#value t1) @@ fun t1 ->
     Opt.bind (self#value t2) @@ fun t2 ->
     Some (Binop (op,t1,t2))
-  method func is_array args body =
+  method func args body =
     Opt.bind (self#value body) @@ fun body ->
-    Some (Function {is_array; args; body})
+    Some (Function {args; body})
+  method funliteral elts others =
+    let clean_elt (v1, v2) =
+      Opt.bind (self#value v1) @@ fun v1 ->
+      Opt.bind (self#value v2) @@ fun v2 ->
+      Some (v1, v2) in
+    opt_bind_all (List.map clean_elt elts) @@ fun elts ->
+    Opt.bind (self#value others) @@ fun others ->
+    Some (FunctionLiteral {elts; others})
   method record fs =
     let clean_field (f, v) =
       Opt.bind (self#value v) @@ fun v ->

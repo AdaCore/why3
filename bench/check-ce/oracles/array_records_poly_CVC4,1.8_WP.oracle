@@ -12,7 +12,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array basic_record -> int = fun bOUND_VARIABLE_631 -> 0
+    length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
@@ -39,11 +39,11 @@ File array_records_poly.mlw:
                        Array_records.first_value = 3;
                        Array_records.second_value = 5}
   Line 16:
-    flag : basic_record -> bool = fun bOUND_VARIABLE_782 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = fun bOUND_VARIABLE_790 -> 3
+    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val : basic_record -> int = fun bOUND_VARIABLE_790 -> 5
+    sec_val : basic_record -> int = [|_ => 5|]
   Line 23:
     i : int = -1
   Line 27:
@@ -63,7 +63,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array basic_record -> int = fun bOUND_VARIABLE_640 -> 0
+    length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
@@ -90,11 +90,11 @@ File array_records_poly.mlw:
                        Array_records.first_value = 3;
                        Array_records.second_value = 5}
   Line 16:
-    flag : basic_record -> bool = fun bOUND_VARIABLE_791 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = fun bOUND_VARIABLE_799 -> 3
+    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val : basic_record -> int = fun bOUND_VARIABLE_799 -> 5
+    sec_val : basic_record -> int = [|_ => 5|]
   Line 23:
     i : int = -1
   Line 27:
@@ -119,7 +119,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array basic_record -> int = fun bOUND_VARIABLE_660 -> 0
+    length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
@@ -146,11 +146,11 @@ File array_records_poly.mlw:
                        Array_records.first_value = 3;
                        Array_records.second_value = 5}
   Line 16:
-    flag : basic_record -> bool = fun bOUND_VARIABLE_808 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = fun bOUND_VARIABLE_816 -> 3
+    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val : basic_record -> int = fun bOUND_VARIABLE_816 -> 5
+    sec_val : basic_record -> int = [|_ => 5|]
   Line 23:
     i : int = -1
   Line 27:
@@ -193,13 +193,13 @@ File array.mlw:
       ->
       int
       ->
-      basic_record = fun bOUND_VARIABLE_754 ->
-                      [|others =>
-                        {Array_records.flag = true;
-                         Array_records.first_value = 3;
-                         Array_records.second_value = 0}|]
+      basic_record = [|_ =>
+                       [|_ =>
+                         {Array_records.flag = true;
+                          Array_records.first_value = 3;
+                          Array_records.second_value = 0}|]|]
   Line 17:
-    length : array basic_record -> int = fun bOUND_VARIABLE_773 -> 0
+    length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
@@ -226,11 +226,11 @@ File array_records_poly.mlw:
                        Array_records.first_value = 3;
                        Array_records.second_value = 0}
   Line 16:
-    flag : basic_record -> bool = fun bOUND_VARIABLE_936 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = fun bOUND_VARIABLE_941 -> 3
+    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val : basic_record -> int = fun bOUND_VARIABLE_941 -> 0
+    sec_val : basic_record -> int = [|_ => 0|]
   Line 23:
     i : int = -1
   Line 27:
@@ -274,13 +274,13 @@ File array.mlw:
       ->
       int
       ->
-      basic_record = fun bOUND_VARIABLE_768 ->
-                      [|others =>
-                        {Array_records.flag = true;
-                         Array_records.first_value = 3;
-                         Array_records.second_value = 0}|]
+      basic_record = [|_ =>
+                       [|_ =>
+                         {Array_records.flag = true;
+                          Array_records.first_value = 3;
+                          Array_records.second_value = 0}|]|]
   Line 17:
-    length : array basic_record -> int = fun bOUND_VARIABLE_787 -> 0
+    length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
@@ -307,11 +307,11 @@ File array_records_poly.mlw:
                        Array_records.first_value = 3;
                        Array_records.second_value = 0}
   Line 16:
-    flag : basic_record -> bool = fun bOUND_VARIABLE_950 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = fun bOUND_VARIABLE_955 -> 3
+    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val : basic_record -> int = fun bOUND_VARIABLE_955 -> 0
+    sec_val : basic_record -> int = [|_ => 0|]
   Line 23:
     i : int = -1
   Line 27:
@@ -360,13 +360,13 @@ File array.mlw:
       ->
       int
       ->
-      basic_record = fun bOUND_VARIABLE_806 ->
-                      [|others =>
-                        {Array_records.flag = true;
-                         Array_records.first_value = 3;
-                         Array_records.second_value = 0}|]
+      basic_record = [|_ =>
+                       [|_ =>
+                         {Array_records.flag = true;
+                          Array_records.first_value = 3;
+                          Array_records.second_value = 0}|]|]
   Line 17:
-    length : array basic_record -> int = fun bOUND_VARIABLE_825 -> 0
+    length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
@@ -393,11 +393,11 @@ File array_records_poly.mlw:
                        Array_records.first_value = 3;
                        Array_records.second_value = 0}
   Line 16:
-    flag : basic_record -> bool = fun bOUND_VARIABLE_975 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = fun bOUND_VARIABLE_980 -> 3
+    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val : basic_record -> int = fun bOUND_VARIABLE_980 -> 0
+    sec_val : basic_record -> int = [|_ => 0|]
   Line 23:
     i : int = -1
   Line 27:
@@ -449,12 +449,12 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array basic_record -> int = fun bOUND_VARIABLE_9171 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
-    flag : basic_record -> bool = fun bOUND_VARIABLE_1111 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = fun bOUND_VARIABLE_1116 -> 3
+    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
     sec_val :
       basic_record
@@ -516,12 +516,12 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array basic_record -> int = fun bOUND_VARIABLE_9311 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
-    flag : basic_record -> bool = fun bOUND_VARIABLE_1125 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = fun bOUND_VARIABLE_1130 -> 3
+    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
     sec_val :
       basic_record
@@ -594,24 +594,24 @@ File array.mlw:
       ->
       int
       ->
-      basic_record = fun bOUND_VARIABLE_954 ->
-                      [|-1 =>
-                        {Array_records.flag = false;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = -2};
-                      others =>
-                      {Array_records.flag = false;
-                       Array_records.first_value = 2;
-                       Array_records.second_value = -2}|]
+      basic_record = [|_ =>
+                       [|-1 =>
+                         {Array_records.flag = false;
+                          Array_records.first_value = 2;
+                          Array_records.second_value = -2};
+                       _ => epsilon x.
+                       (Array_records.second_value x) = -2 /\
+                       (Array_records.first_value x) = 2 /\
+                       (Array_records.flag x) = false|]|]
   Line 17:
-    length : array basic_record -> int = fun bOUND_VARIABLE_973 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
-    flag : basic_record -> bool = fun bOUND_VARIABLE_1152 -> false
+    flag : basic_record -> bool = [|_ => false|]
   Line 17:
-    first_val : basic_record -> int = fun bOUND_VARIABLE_1157 -> 2
+    first_val : basic_record -> int = [|_ => 2|]
   Line 18:
-    sec_val : basic_record -> int = fun bOUND_VARIABLE_1157 -> -2
+    sec_val : basic_record -> int = [|_ => -2|]
   Line 23:
     i : int = -1
   Line 27:
@@ -678,44 +678,42 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array basic_record -> int = fun bOUND_VARIABLE_1050 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 17:
     first_val :
       basic_record
       ->
-      int = fun bOUND_VARIABLE_1274 ->
-             if bOUND_VARIABLE_1274 = epsilon x.
-             (Array_records.second_value x) = 69 /\
-             (Array_records.first_value x) = 42 then 42
-             else if epsilon x.
-                  (Array_records.second_value x) = 69 /\
-                  (Array_records.first_value x) = 23 = bOUND_VARIABLE_1274
-                  then 23
-                  else if epsilon x.
-                       (Array_records.second_value x) = 69 /\
-                       (Array_records.first_value x) = 23 = bOUND_VARIABLE_1274
-                       then 23 else 3
+      int = [|epsilon x.
+              (Array_records.second_value x) = 69 /\
+              (Array_records.first_value x) = 42 => 42;
+            _ =>
+            if epsilon x.
+            (Array_records.second_value x) = 69 /\
+            (Array_records.first_value x) = 23 = bOUND_VARIABLE_1274 then 23
+            else if epsilon x.
+                 (Array_records.second_value x) = 69 /\
+                 (Array_records.first_value x) = 23 = bOUND_VARIABLE_1274
+                 then 23 else 3|]
   Line 18:
     sec_val :
       basic_record
       ->
-      int = fun bOUND_VARIABLE_1274 ->
-             if bOUND_VARIABLE_1274 = epsilon x.
-             (Array_records.second_value x) = 69 /\
-             (Array_records.first_value x) = 42 then 69
-             else if epsilon x.
-                  (Array_records.second_value x) = 69 /\
-                  (Array_records.first_value x) = 3 = bOUND_VARIABLE_1274
-                  then 69
-                  else if epsilon x.
-                       (Array_records.second_value x) = 69 /\
-                       (Array_records.first_value x) = 23 = bOUND_VARIABLE_1274
-                       then 69
-                       else if epsilon x.
-                            (Array_records.second_value x) = 69 /\
-                            (Array_records.first_value x) = 23 = bOUND_VARIABLE_1274
-                            then 69 else 5
+      int = [|epsilon x.
+              (Array_records.second_value x) = 69 /\
+              (Array_records.first_value x) = 42 => 69;
+            _ =>
+            if epsilon x.
+            (Array_records.second_value x) = 69 /\
+            (Array_records.first_value x) = 3 = bOUND_VARIABLE_1274 then 69
+            else if epsilon x.
+                 (Array_records.second_value x) = 69 /\
+                 (Array_records.first_value x) = 23 = bOUND_VARIABLE_1274
+                 then 69
+                 else if epsilon x.
+                      (Array_records.second_value x) = 69 /\
+                      (Array_records.first_value x) = 23 = bOUND_VARIABLE_1274
+                      then 69 else 5|]
   Line 23:
     i : int = -1
   Line 27:
@@ -781,44 +779,42 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array basic_record -> int = fun bOUND_VARIABLE_1064 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 17:
     first_val :
       basic_record
       ->
-      int = fun bOUND_VARIABLE_1288 ->
-             if bOUND_VARIABLE_1288 = epsilon x.
-             (Array_records.second_value x) = 69 /\
-             (Array_records.first_value x) = 42 then 42
-             else if epsilon x.
-                  (Array_records.second_value x) = 69 /\
-                  (Array_records.first_value x) = 23 = bOUND_VARIABLE_1288
-                  then 23
-                  else if epsilon x.
-                       (Array_records.second_value x) = 69 /\
-                       (Array_records.first_value x) = 23 = bOUND_VARIABLE_1288
-                       then 23 else 3
+      int = [|epsilon x.
+              (Array_records.second_value x) = 69 /\
+              (Array_records.first_value x) = 42 => 42;
+            _ =>
+            if epsilon x.
+            (Array_records.second_value x) = 69 /\
+            (Array_records.first_value x) = 23 = bOUND_VARIABLE_1288 then 23
+            else if epsilon x.
+                 (Array_records.second_value x) = 69 /\
+                 (Array_records.first_value x) = 23 = bOUND_VARIABLE_1288
+                 then 23 else 3|]
   Line 18:
     sec_val :
       basic_record
       ->
-      int = fun bOUND_VARIABLE_1288 ->
-             if bOUND_VARIABLE_1288 = epsilon x.
-             (Array_records.second_value x) = 69 /\
-             (Array_records.first_value x) = 42 then 69
-             else if epsilon x.
-                  (Array_records.second_value x) = 69 /\
-                  (Array_records.first_value x) = 3 = bOUND_VARIABLE_1288
-                  then 69
-                  else if epsilon x.
-                       (Array_records.second_value x) = 69 /\
-                       (Array_records.first_value x) = 23 = bOUND_VARIABLE_1288
-                       then 69
-                       else if epsilon x.
-                            (Array_records.second_value x) = 69 /\
-                            (Array_records.first_value x) = 23 = bOUND_VARIABLE_1288
-                            then 69 else 5
+      int = [|epsilon x.
+              (Array_records.second_value x) = 69 /\
+              (Array_records.first_value x) = 42 => 69;
+            _ =>
+            if epsilon x.
+            (Array_records.second_value x) = 69 /\
+            (Array_records.first_value x) = 3 = bOUND_VARIABLE_1288 then 69
+            else if epsilon x.
+                 (Array_records.second_value x) = 69 /\
+                 (Array_records.first_value x) = 23 = bOUND_VARIABLE_1288
+                 then 69
+                 else if epsilon x.
+                      (Array_records.second_value x) = 69 /\
+                      (Array_records.first_value x) = 23 = bOUND_VARIABLE_1288
+                      then 69 else 5|]
   Line 23:
     i : int = -1
   Line 27:
@@ -889,44 +885,42 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array basic_record -> int = fun bOUND_VARIABLE_1083 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 17:
     first_val :
       basic_record
       ->
-      int = fun bOUND_VARIABLE_1307 ->
-             if bOUND_VARIABLE_1307 = epsilon x.
-             (Array_records.second_value x) = 69 /\
-             (Array_records.first_value x) = 42 then 42
-             else if epsilon x.
-                  (Array_records.second_value x) = 69 /\
-                  (Array_records.first_value x) = 23 = bOUND_VARIABLE_1307
-                  then 23
-                  else if epsilon x.
-                       (Array_records.second_value x) = 69 /\
-                       (Array_records.first_value x) = 23 = bOUND_VARIABLE_1307
-                       then 23 else 3
+      int = [|epsilon x.
+              (Array_records.second_value x) = 69 /\
+              (Array_records.first_value x) = 42 => 42;
+            _ =>
+            if epsilon x.
+            (Array_records.second_value x) = 69 /\
+            (Array_records.first_value x) = 23 = bOUND_VARIABLE_1307 then 23
+            else if epsilon x.
+                 (Array_records.second_value x) = 69 /\
+                 (Array_records.first_value x) = 23 = bOUND_VARIABLE_1307
+                 then 23 else 3|]
   Line 18:
     sec_val :
       basic_record
       ->
-      int = fun bOUND_VARIABLE_1307 ->
-             if bOUND_VARIABLE_1307 = epsilon x.
-             (Array_records.second_value x) = 69 /\
-             (Array_records.first_value x) = 42 then 69
-             else if epsilon x.
-                  (Array_records.second_value x) = 69 /\
-                  (Array_records.first_value x) = 3 = bOUND_VARIABLE_1307
-                  then 69
-                  else if epsilon x.
-                       (Array_records.second_value x) = 69 /\
-                       (Array_records.first_value x) = 23 = bOUND_VARIABLE_1307
-                       then 69
-                       else if epsilon x.
-                            (Array_records.second_value x) = 69 /\
-                            (Array_records.first_value x) = 23 = bOUND_VARIABLE_1307
-                            then 69 else 5
+      int = [|epsilon x.
+              (Array_records.second_value x) = 69 /\
+              (Array_records.first_value x) = 42 => 69;
+            _ =>
+            if epsilon x.
+            (Array_records.second_value x) = 69 /\
+            (Array_records.first_value x) = 3 = bOUND_VARIABLE_1307 then 69
+            else if epsilon x.
+                 (Array_records.second_value x) = 69 /\
+                 (Array_records.first_value x) = 23 = bOUND_VARIABLE_1307
+                 then 69
+                 else if epsilon x.
+                      (Array_records.second_value x) = 69 /\
+                      (Array_records.first_value x) = 23 = bOUND_VARIABLE_1307
+                      then 69 else 5|]
   Line 23:
     i : int = -1
   Line 27:
@@ -1007,7 +1001,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array basic_record -> int = fun bOUND_VARIABLE_1210 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 17:
     first_val :

@@ -12,20 +12,16 @@ The following counterexample model could not be verified
   (both RAC terminated because missing value for return value of call at "WHY3DATA/stdlib/mach/int.mlw", line 432, character 22 to line 433, character 45):
 File int.mlw:
   Line 54:
-    in_bounds : int -> bool = fun x!01 -> if x!01 = 0 then false else false
+    in_bounds : int -> bool = [|0 => false; _ => false|]
   Line 416:
     int63'int :
       int63
       ->
-      int = fun x!01 ->
-             if x!01 = {mach.int.Int63.int63'int => 4611686018427387903}
-             then 4611686018427387903
-             else if x!01 = {mach.int.Int63.int63'int =>
-                            -4611686018427387904}
-                  then -4611686018427387904
-                  else if x!01 = {mach.int.Int63.int63'int => 0} then 0
-                       else if x!01 = {mach.int.Int63.int63'int => 0} then 0
-                            else 0
+      int = [|{mach.int.Int63.int63'int => 4611686018427387903} =>
+              4611686018427387903;
+            {mach.int.Int63.int63'int => -4611686018427387904} =>
+            -4611686018427387904; {mach.int.Int63.int63'int => 0} => 0;
+            {mach.int.Int63.int63'int => 0} => 0; _ => 0|]
   Line 432:
     max_int : int63 = {mach.int.Int63.int63'int => 4611686018427387903}
   Line 434:

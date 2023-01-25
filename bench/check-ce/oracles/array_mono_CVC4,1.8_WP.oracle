@@ -58,14 +58,9 @@ The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `([]<-)` cannot be evaluated):
 File array_mono.mlw:
   Line 9:
-    elts :
-      array
-      ->
-      int
-      ->
-      int = fun bOUND_VARIABLE_432 -> [|0 => 42; 1 => 42; others => 0|]
+    elts : array -> int -> int = [|_ => [|0 => 42; 1 => 42; _ => 0|]|]
   Line 10:
-    length : array -> int = fun bOUND_VARIABLE_437 -> 2
+    length : array -> int = [|_ => 2|]
   Line 19:
     mixfix [<-] :
       array
@@ -75,26 +70,15 @@ File array_mono.mlw:
       int
       ->
       array = fun bOUND_VARIABLE_450 bOUND_VARIABLE_451 bOUND_VARIABLE_452 ->
-               {Array.elts = [|0 => 42; 1 => 42; others => 0|];
-                Array.length = 2}
+               {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
   Line 23:
-    a :
-      array = {Array.elts = [|0 => 42; 1 => 42; others => 0|];
-               Array.length = 2}
+    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
   Line 25:
-    a :
-      array = {Array.elts = [|0 => 42; 1 => 42; others => 0|];
-               Array.length = 2}
+    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
   Line 38:
-    a :
-      array = {Array.elts = [|0 => 42; 1 => 42; others => 0|];
-               Array.length = 2}
+    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
   Line 40:
-    a :
-      array = {Array.elts = [|0 => 42; 1 => 42; others => 0|];
-               Array.length = 2}
+    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
   Line 41:
-    a :
-      array = {Array.elts = [|0 => 42; 1 => 42; others => 0|];
-               Array.length = 2}
+    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
 

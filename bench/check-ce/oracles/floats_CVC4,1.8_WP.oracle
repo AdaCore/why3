@@ -314,7 +314,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `g8'goal1` cannot be evaluated):
 File bv.mlw:
   Line 9:
-    pow2 : int -> int = fun bOUND_VARIABLE_432 -> 0
+    pow2 : int -> int = [|_ => 0|]
 File ieee_float.mlw:
   Line 194:
     of_int :
@@ -336,7 +336,7 @@ File ieee_float.mlw:
     max_int : int = 0
 File real.mlw:
   Line 203:
-    sqrt : real -> real = fun bOUND_VARIABLE_469 -> 0.0
+    sqrt : real -> real = [|_ => 0.0|]
 File floats.mlw:
   Line 19:
     x : t = ∞
@@ -875,7 +875,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `g8'goal3` cannot be evaluated):
 File bv.mlw:
   Line 9:
-    pow2 : int -> int = fun bOUND_VARIABLE_432 -> 0
+    pow2 : int -> int = [|_ => 0|]
 File ieee_float.mlw:
   Line 194:
     of_int :
@@ -897,7 +897,7 @@ File ieee_float.mlw:
     max_int : int = 0
 File real.mlw:
   Line 203:
-    sqrt : real -> real = fun bOUND_VARIABLE_469 -> 0.0
+    sqrt : real -> real = [|_ => 0.0|]
 File floats.mlw:
   Line 55:
     x : t1 = ∞

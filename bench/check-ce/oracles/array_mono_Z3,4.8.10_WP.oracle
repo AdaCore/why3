@@ -58,9 +58,8 @@ File array_mono.mlw:
     length :
       array
       ->
-      int = fun x!0 ->
-             if x!0 = epsilon x. (Array.length x) = 2 then 2
-             else if x!0 = epsilon x. (Array.length x) = 2 then 2 else 2
+      int = [|epsilon x. (Array.length x) = 2 => 2;
+            epsilon x. (Array.length x) = 2 => 2; _ => 2|]
   Line 19:
     mixfix [<-] :
       array

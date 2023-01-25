@@ -12,7 +12,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array basic_record -> int = fun _arg_12 -> 0
+    length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
@@ -38,11 +38,11 @@ File array_records_poly.mlw:
                        Array_records.first_value = 3;
                        Array_records.second_value = 5}
   Line 16:
-    flag : basic_record -> bool = fun _arg_12 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = fun _arg_12 -> 3
+    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val : basic_record -> int = fun _arg_12 -> 5
+    sec_val : basic_record -> int = [|_ => 5|]
   Line 23:
     i : int = -1
   Line 27:
@@ -62,7 +62,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array basic_record -> int = fun _arg_14 -> 0
+    length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
@@ -88,11 +88,11 @@ File array_records_poly.mlw:
                        Array_records.first_value = 3;
                        Array_records.second_value = 5}
   Line 16:
-    flag : basic_record -> bool = fun _arg_14 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = fun _arg_14 -> 3
+    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val : basic_record -> int = fun _arg_14 -> 5
+    sec_val : basic_record -> int = [|_ => 5|]
   Line 23:
     i : int = -1
   Line 27:
@@ -117,7 +117,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array basic_record -> int = fun _arg_16 -> 0
+    length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
@@ -143,11 +143,11 @@ File array_records_poly.mlw:
                        Array_records.first_value = 3;
                        Array_records.second_value = 5}
   Line 16:
-    flag : basic_record -> bool = fun _arg_16 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = fun _arg_16 -> 3
+    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val : basic_record -> int = fun _arg_16 -> 5
+    sec_val : basic_record -> int = [|_ => 5|]
   Line 23:
     i : int = -1
   Line 27:
@@ -187,17 +187,17 @@ File array.mlw:
       ->
       int
       ->
-      basic_record = fun _arg_17 ->
-                      [|-1 =>
-                        {Array_records.flag = true;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 0};
-                      others =>
-                      {Array_records.flag = true;
-                       Array_records.first_value = 2;
-                       Array_records.second_value = 0}|]
+      basic_record = [|_ =>
+                       [|-1 =>
+                         {Array_records.flag = true;
+                          Array_records.first_value = 2;
+                          Array_records.second_value = 0};
+                       _ => epsilon x.
+                       (Array_records.second_value x) = 0 /\
+                       (Array_records.first_value x) = 2 /\
+                       (Array_records.flag x) = true|]|]
   Line 17:
-    length : array basic_record -> int = fun _arg_17 -> 0
+    length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
@@ -211,11 +211,11 @@ File array.mlw:
                        Array_records.second_value = 0}
 File array_records_poly.mlw:
   Line 16:
-    flag : basic_record -> bool = fun _arg_17 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = fun _arg_17 -> 2
+    first_val : basic_record -> int = [|_ => 2|]
   Line 18:
-    sec_val : basic_record -> int = fun bOUND_VARIABLE_743 -> 0
+    sec_val : basic_record -> int = [|_ => 0|]
   Line 23:
     i : int = -1
   Line 27:
@@ -256,17 +256,17 @@ File array.mlw:
       ->
       int
       ->
-      basic_record = fun _arg_19 ->
-                      [|-1 =>
-                        {Array_records.flag = true;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 0};
-                      others =>
-                      {Array_records.flag = true;
-                       Array_records.first_value = 2;
-                       Array_records.second_value = 0}|]
+      basic_record = [|_ =>
+                       [|-1 =>
+                         {Array_records.flag = true;
+                          Array_records.first_value = 2;
+                          Array_records.second_value = 0};
+                       _ => epsilon x.
+                       (Array_records.second_value x) = 0 /\
+                       (Array_records.first_value x) = 2 /\
+                       (Array_records.flag x) = true|]|]
   Line 17:
-    length : array basic_record -> int = fun _arg_19 -> 0
+    length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
@@ -280,11 +280,11 @@ File array.mlw:
                        Array_records.second_value = 0}
 File array_records_poly.mlw:
   Line 16:
-    flag : basic_record -> bool = fun _arg_19 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = fun _arg_19 -> 2
+    first_val : basic_record -> int = [|_ => 2|]
   Line 18:
-    sec_val : basic_record -> int = fun bOUND_VARIABLE_761 -> 0
+    sec_val : basic_record -> int = [|_ => 0|]
   Line 23:
     i : int = -1
   Line 27:
@@ -330,17 +330,17 @@ File array.mlw:
       ->
       int
       ->
-      basic_record = fun _arg_111 ->
-                      [|-1 =>
-                        {Array_records.flag = true;
-                         Array_records.first_value = 2;
-                         Array_records.second_value = 0};
-                      others =>
-                      {Array_records.flag = true;
-                       Array_records.first_value = 2;
-                       Array_records.second_value = 0}|]
+      basic_record = [|_ =>
+                       [|-1 =>
+                         {Array_records.flag = true;
+                          Array_records.first_value = 2;
+                          Array_records.second_value = 0};
+                       _ => epsilon x.
+                       (Array_records.second_value x) = 0 /\
+                       (Array_records.first_value x) = 2 /\
+                       (Array_records.flag x) = true|]|]
   Line 17:
-    length : array basic_record -> int = fun _arg_111 -> 0
+    length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
@@ -354,11 +354,11 @@ File array.mlw:
                        Array_records.second_value = 0}
 File array_records_poly.mlw:
   Line 16:
-    flag : basic_record -> bool = fun _arg_111 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = fun _arg_111 -> 2
+    first_val : basic_record -> int = [|_ => 2|]
   Line 18:
-    sec_val : basic_record -> int = fun bOUND_VARIABLE_788 -> 0
+    sec_val : basic_record -> int = [|_ => 0|]
   Line 23:
     i : int = -1
   Line 27:
@@ -407,10 +407,10 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array basic_record -> int = fun _arg_115 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
-    flag : basic_record -> bool = fun _arg_115 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
     first_val :
       basic_record
@@ -482,10 +482,10 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array basic_record -> int = fun _arg_119 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
-    flag : basic_record -> bool = fun _arg_119 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
     first_val :
       basic_record
@@ -562,10 +562,10 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array basic_record -> int = fun _arg_123 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
-    flag : basic_record -> bool = fun _arg_123 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
     first_val :
       basic_record
@@ -651,10 +651,10 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array basic_record -> int = fun _arg_127 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
-    flag : basic_record -> bool = fun _arg_127 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
     first_val :
       basic_record
@@ -749,10 +749,10 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array basic_record -> int = fun _arg_131 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
-    flag : basic_record -> bool = fun _arg_131 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
     first_val :
       basic_record
@@ -852,10 +852,10 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : array basic_record -> int = fun _arg_135 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
-    flag : basic_record -> bool = fun _arg_135 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
     first_val :
       basic_record
@@ -974,20 +974,20 @@ File array.mlw:
       ->
       int
       ->
-      basic_record = fun _arg_139 ->
-                      [|0 =>
-                        {Array_records.flag = true;
-                         Array_records.first_value = 0;
-                         Array_records.second_value = -3};
-                      others =>
-                      {Array_records.flag = true;
-                       Array_records.first_value = -1;
-                       Array_records.second_value = -3}|]
+      basic_record = [|_ =>
+                       [|0 =>
+                         {Array_records.flag = true;
+                          Array_records.first_value = 0;
+                          Array_records.second_value = -3};
+                       _ => epsilon x.
+                       (Array_records.second_value x) = -3 /\
+                       (Array_records.first_value x) = -1 /\
+                       (Array_records.flag x) = true|]|]
   Line 17:
-    length : array basic_record -> int = fun _arg_139 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
-    flag : basic_record -> bool = fun _arg_139 -> true
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
     first_val :
       basic_record

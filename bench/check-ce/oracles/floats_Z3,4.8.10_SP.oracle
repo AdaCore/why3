@@ -314,7 +314,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `g8'goal` cannot be evaluated):
 File bv.mlw:
   Line 9:
-    pow2 : int -> int = fun x!030 -> 0
+    pow2 : int -> int = [|_ => 0|]
 File ieee_float.mlw:
   Line 194:
     of_int : mode -> int -> t = fun x!030 x!123 -> NaN
@@ -337,7 +337,7 @@ File real.mlw:
   Line 201:
     sqr : real -> real = fun x!030 -> (real.Real.( * ) x!030 x!030)
   Line 203:
-    sqrt : real -> real = fun x!030 -> 0.0
+    sqrt : real -> real = [|_ => 0.0|]
 File floats.mlw:
   Line 19:
     x : t = ∞
@@ -804,7 +804,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `g8'goal3` cannot be evaluated):
 File bv.mlw:
   Line 9:
-    pow2 : int -> int = fun x!094 -> 0
+    pow2 : int -> int = [|_ => 0|]
 File ieee_float.mlw:
   Line 194:
     of_int : mode -> int -> t1 = fun x!094 x!171 -> NaN
@@ -828,7 +828,7 @@ File real.mlw:
   Line 201:
     sqr : real -> real = fun x!094 -> (real.Real.( * ) x!094 x!094)
   Line 203:
-    sqrt : real -> real = fun x!094 -> 0.0
+    sqrt : real -> real = [|_ => 0.0|]
 File floats.mlw:
   Line 55:
     x : t1 = ∞

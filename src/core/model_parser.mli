@@ -77,8 +77,11 @@ type concrete_syntax_term =
   (* Quant (q,vars,t) *)
   | Binop of concrete_syntax_binop * concrete_syntax_term * concrete_syntax_term
   | Not of concrete_syntax_term
-  | Function of { is_array: bool; args: string list ; body: concrete_syntax_term }
-  (* the boolean [is_array] is used for pretty and JSON printing *)
+  | Function of { args: string list ; body: concrete_syntax_term }
+  | FunctionLiteral of {
+      elts: (concrete_syntax_term * concrete_syntax_term) list;
+      others: concrete_syntax_term
+    }
   | Record of (string * concrete_syntax_term) list
   (* list of (field_name,field_value) elements *)
   | Proj of (string * concrete_syntax_term)
@@ -330,7 +333,8 @@ val model_for_positions_and_decls : model ->
     method neg : concrete_syntax_term -> concrete_syntax_term option
     method quant : concrete_syntax_quant -> string list -> concrete_syntax_term -> concrete_syntax_term option
     method binop : concrete_syntax_binop -> concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term option
-    method func : bool -> string list -> concrete_syntax_term -> concrete_syntax_term option
+    method func : string list -> concrete_syntax_term -> concrete_syntax_term option
+    method funliteral : (concrete_syntax_term * concrete_syntax_term) list -> concrete_syntax_term -> concrete_syntax_term option
     method record : (string * concrete_syntax_term) list -> concrete_syntax_term option
     method proj : string -> concrete_syntax_term -> concrete_syntax_term option
   end
