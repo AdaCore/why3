@@ -130,6 +130,8 @@ val create_model_element :
     @param lsymbol logical symbol corresponding to the element
 *)
 
+val get_lsymbol_or_model_trace_name : model_element -> string
+
   (** {2 Model definitions} *)
 
 type model
