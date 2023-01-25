@@ -672,11 +672,10 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
                         ?timelimit ?steplimit () in
                   rac_execute ctx rs
                 in
-                let me_name_trans me = me.me_name in
                 let print_attrs = Debug.test_flag Call_provers.debug_attrs in
                 Debug.dprintf debug_check_ce_rac_results
                   "@[Checking model:@\n@[<hv2>%a@]@]@\n"
-                  (print_model ~filter_similar:false ~me_name_trans ~print_attrs) m;
+                  (print_model ~filter_similar:false ~print_attrs) m;
                 begin
                 let giant_state,giant_log = rac_execute ~giant_steps:true rs m in
                 match only_giant_step with
@@ -700,11 +699,10 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
                         ?timelimit ?steplimit () in
                   rac_execute ctx rs
                 in
-                let me_name_trans me = me.me_name in
                 let print_attrs = Debug.test_flag Call_provers.debug_attrs in
                 Debug.dprintf debug_check_ce_rac_results
                   "@[Checking model:@\n@[<hv2>%a@]@]@\n"
-                  (print_model ~filter_similar:false ~me_name_trans ~print_attrs) m;
+                  (print_model ~filter_similar:false ~print_attrs) m;
                 begin
                 let state,log = rac_execute ~giant_steps:false rs m in
                 RAC_done (state,log), RAC_done (state,log)

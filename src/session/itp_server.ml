@@ -956,8 +956,8 @@ end
       | None          -> list_loc in
     let (source_result, list_loc) =
       Model_parser.interleave_with_source ~print_attrs ?start_comment:None ?end_comment:None
-        ?me_name_trans:None model ~rel_filename:filename
-      ~source_code:source_code ~locations:list_loc
+        model ~rel_filename:filename
+        ~source_code:source_code ~locations:list_loc
     in
     let goal_loc, list_loc = List.partition (fun (_, y) -> y = Goal_loc) list_loc in
     let goal_loc =
@@ -1027,7 +1027,7 @@ match pa.proof_state with
      let selected_model = Opt.get_def Model_parser.empty_model
          (Check_ce.select_model_last_non_empty res.pr_models) in
      let ce_result =
-       Pp.string_of (Model_parser.print_model_human ~filter_similar:true ~print_attrs ?me_name_trans:None)
+       Pp.string_of (Model_parser.print_model_human ~filter_similar:true ~print_attrs)
          selected_model in
      if ce_result = "" then
        let result_pr =

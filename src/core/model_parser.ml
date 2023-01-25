@@ -217,7 +217,6 @@ let rec t_and_l_concrete = function
   | f::fl -> Binop (And, f, (t_and_l_concrete fl))
 
 type model_element = {
-  me_name: string;
   me_kind: model_element_kind;
   me_value: term;
   me_concrete_value: concrete_syntax_term;
@@ -227,7 +226,6 @@ type model_element = {
 }
 
 let create_model_element ~value ~concrete_value ~oloc ~attrs ~lsymbol = {
-  me_name= lsymbol.ls_name.Ident.id_string;
   me_kind= Other;
   me_value= value;
   me_concrete_value= concrete_value;
@@ -235,6 +233,11 @@ let create_model_element ~value ~concrete_value ~oloc ~attrs ~lsymbol = {
   me_attrs= attrs;
   me_lsymbol= lsymbol
 }
+
+let get_lsymbol_or_model_trace_name me =
+  Ident.get_model_trace_string
+    ~name:(me.me_lsymbol.ls_name.id_string)
+    ~attrs:(me.me_attrs)
 
 (*
 ***************************************************************
@@ -284,8 +287,7 @@ let search_model_element ?file ?line m p =
 let trace_by_id id =
   Ident.get_model_trace_string ~name:id.id_string ~attrs:id.id_attrs
 
-let trace_by_name me =
-  Ident.get_model_trace_string ~name:(me.me_name) ~attrs:(me.me_attrs)
+let trace_by_name me = get_lsymbol_or_model_trace_name me
 
 let search_model_element_for_id m ?loc id =
   let oloc = if loc <> None then loc else id.id_loc in
@@ -329,8 +331,8 @@ let cmp_attrs a1 a2 =
 let find_call_id = Ident.search_attribute_value Ident.get_call_id_value
 
 let similar_model_element_names n1 n2 =
-  let name1 = n1.me_name in
-  let name2 = n2.me_name in
+  let name1 = get_lsymbol_or_model_trace_name n1 in
+  let name2 = get_lsymbol_or_model_trace_name n2 in
   name1 = name2 &&
   Opt.equal (=) (find_call_id n1.me_attrs) (find_call_id n2.me_attrs) &&
   n1.me_kind = n2.me_kind &&
@@ -651,7 +653,6 @@ let json_model_element me =
     | Loop_previous_iteration ->"before_iteration"
     | Loop_current_iteration -> "current_iteration" in
   Record [
-      "name", String me.me_name;
       "location", json_loc me.me_location;
       "attrs", json_attrs me.me_attrs;
       "value",
@@ -703,13 +704,26 @@ let json_model model = json_model_files model.vc_term_loc model.model_files
 ***************************************************************
 *)
 
-let print_model_element ?(print_locs=false) ~print_attrs ~me_name_trans fmt m_element =
+let pretty_model_element_name me =
+  let name = get_lsymbol_or_model_trace_name me in
+  let name = List.hd (Strings.bounded_split '@' name 2) in
+  match me.me_kind with
+  | Result -> "result"
+  | Call_result loc ->
+     asprintf "result of call at %a" Loc.pp_position_no_file loc
+  | Old -> "old "^name
+  | At l -> name^" at "^l
+  | Loop_previous_iteration -> "[before iteration] "^name
+  | Loop_current_iteration -> "[current iteration] "^name
+  | Loop_before | Error_message | Other -> name
+
+let print_model_element ?(print_locs=false) ~print_attrs fmt m_element =
   match m_element.me_kind with
   | Error_message ->
-    pp_print_string fmt (m_element.me_name)
+    pp_print_string fmt (pretty_model_element_name m_element)
   | _ ->
       fprintf fmt "@[<hv2>@[<hov2>%s%t :@]@ %a = %a@]"
-        (me_name_trans m_element)
+        (pretty_model_element_name m_element)
         (fun fmt ->
            if print_attrs then
              fprintf fmt " %a" Pp.(print_list space Pretty.print_attr)
@@ -722,52 +736,43 @@ let print_model_element ?(print_locs=false) ~print_attrs ~me_name_trans fmt m_el
         print_concrete_term m_element.me_concrete_value
 
 let print_model_elements ~filter_similar ~print_attrs ?(sep = Pp.newline)
-    ~me_name_trans fmt m_elements =
+    fmt m_elements =
   let m_elements =
     if filter_similar then filter_duplicated m_elements else m_elements in
   fprintf fmt "@[%a@]"
     (Pp.print_list sep
-       (print_model_element ?print_locs:None ~print_attrs
-          ~me_name_trans))
+       (print_model_element ?print_locs:None ~print_attrs))
     m_elements
 
-let print_model_file ~filter_similar ~print_attrs ~me_name_trans fmt (filename, model_file) =
+let print_model_file ~filter_similar ~print_attrs fmt (filename, model_file) =
   (* Relativize does not work on nighly bench: using basename instead. It
      hides the local paths. *)
   let filename = Filename.basename filename in
   let pp fmt (line, m_elements) =
     let cmp me1 me2 =
-      let n = String.compare (me1.me_name) (me2.me_name) in
+      let n =
+        String.compare
+          (get_lsymbol_or_model_trace_name me1)
+          (get_lsymbol_or_model_trace_name me2)
+      in
       if n = 0 then Sattr.compare me1.me_attrs me2.me_attrs else n in
     let m_elements = List.sort cmp m_elements in
     fprintf fmt "  @[<v 2>Line %d:@ %a@]" line
-      (print_model_elements ~filter_similar ?sep:None ~print_attrs
-         ~me_name_trans) m_elements in
+      (print_model_elements ~filter_similar ?sep:None ~print_attrs)
+      m_elements in
   fprintf fmt "@[<v 0>File %s:@ %a@]" filename
     Pp.(print_list space pp) (Mint.bindings model_file)
 
-let why_name_trans me =
-  let name = List.hd (Strings.bounded_split '@' me.me_name 2) in
-  match me.me_kind with
-  | Result -> "result"
-  | Call_result loc ->
-     asprintf "result of call at %a" Loc.pp_position_no_file loc
-  | Old -> "old "^name
-  | At l -> name^" at "^l
-  | Loop_previous_iteration -> "[before iteration] "^name
-  | Loop_current_iteration -> "[current iteration] "^name
-  | Loop_before | Error_message | Other -> name
-
-let print_model ~filter_similar ~print_attrs ?(me_name_trans = why_name_trans)
+let print_model ~filter_similar ~print_attrs
     fmt model =
-  Pp.print_list Pp.newline (print_model_file ~filter_similar ~print_attrs ~me_name_trans)
+  Pp.print_list Pp.newline (print_model_file ~filter_similar ~print_attrs)
     fmt (Mstr.bindings model.model_files)
 
-let print_model_human ?(filter_similar = true) ?(me_name_trans = why_name_trans) fmt model =
-  print_model ~filter_similar ~me_name_trans fmt model
+let print_model_human ?(filter_similar = true) fmt model =
+  print_model ~filter_similar fmt model
 
-let print_model ?(filter_similar = true) ?(me_name_trans = why_name_trans) ~print_attrs fmt model =
-  print_model ~filter_similar ~print_attrs ~me_name_trans fmt model
+let print_model ?(filter_similar = true) ~print_attrs fmt model =
+  print_model ~filter_similar ~print_attrs fmt model
 
 let get_model_file model filename =
   Mstr.find_def empty_model_file filename model
@@ -808,7 +813,7 @@ let add_offset off (loc, a) =
   (Loc.user_position f (bl + off) bc (el + off) ec, a)
 
 let interleave_line ~filename:_ ~print_attrs start_comment end_comment
-    me_name_trans model_file
+    model_file
     (source_code, line_number, offset, remaining_locs, locs) line =
   let remaining_locs, list_loc =
     partition_loc line_number (String.length line) remaining_locs in
@@ -817,8 +822,7 @@ let interleave_line ~filename:_ ~print_attrs start_comment end_comment
     let model_elements = Mint.find line_number model_file in
     let cntexmp_line =
       asprintf "@[<h 0>%s%s%a%s@]" (get_padding line) start_comment
-        (print_model_elements ~filter_similar:true ~sep:Pp.semi
-           ~print_attrs ~me_name_trans)
+        (print_model_elements ~filter_similar:true ~sep:Pp.semi ~print_attrs)
         model_elements end_comment in
     (* We need to know how many lines will be taken by the counterexample. This
        is ad hoc as we don't really know how the lines are split in IDE. *)
@@ -836,7 +840,7 @@ let interleave_line ~filename:_ ~print_attrs start_comment end_comment
     list_loc @ locs
 
 let interleave_with_source ~print_attrs ?(start_comment = "(* ")
-    ?(end_comment = " *)") ?(me_name_trans = why_name_trans) model ~rel_filename
+    ?(end_comment = " *)") model ~rel_filename
     ~source_code ~locations =
   let locations =
     List.sort
@@ -864,7 +868,7 @@ let interleave_with_source ~print_attrs ?(start_comment = "(* ")
     let source_code, _, _, _, gen_loc =
       List.fold_left
         (interleave_line ~filename:rel_filename ~print_attrs start_comment
-           end_comment me_name_trans model_file)
+           end_comment model_file)
         ("", 1, 0, locations, [])
         (src_lines_up_to_last_cntexmp_el source_code model_file) in
     (source_code, gen_loc)
@@ -1008,7 +1012,7 @@ let build_model_rec pm (elts: model_element list) : model_files =
   let process_me me =
     let attrs = Sattr.union me.me_attrs me.me_lsymbol.ls_name.id_attrs in
     Debug.dprintf debug "@[<h>Term attrs for %s at %a:@ %a@]@."
-      (why_name_trans me)
+      (pretty_model_element_name me)
       (Pp.print_option_or_default "NO LOC" Loc.pp_position) me.me_location
       Pretty.print_attrs attrs;
     (* Remove some specific record field related to the front-end language.
@@ -1016,7 +1020,6 @@ let build_model_rec pm (elts: model_element list) : model_files =
     let attrs, me_value, me_concrete_value =
       !remove_field (attrs, me.me_value, me.me_concrete_value) in
     Some {
-      me_name= me.me_name;
       me_kind= Other;
       me_value;
       me_concrete_value;
@@ -1108,17 +1111,8 @@ class clean = object (self)
   method model m =
     {m with model_files= map_filter_model_files self#element m.model_files}
   method element me =
-    let me =
-      let name = me.me_name in
-      let attrs = me.me_attrs in
-      let name = get_model_trace_string ~name ~attrs in
-      let name = List.hd (Strings.bounded_split '@' name 2) in
-      {me with me_name = name} in
-    if me.me_kind = Error_message then
-      Some me (* Keep unparsed values for error messages *)
-    else
-      Opt.bind (self#value me.me_concrete_value) @@ fun me_concrete_value ->
-      Some {me with me_concrete_value}
+    Opt.bind (self#value me.me_concrete_value) @@ fun me_concrete_value ->
+    Some {me with me_concrete_value}
   method value v = match v with
     | Var v -> self#var v
     | Const c -> self#const c
@@ -1189,12 +1183,12 @@ class clean = object (self)
   method proj s v =
     Opt.bind (self#value v) @@ fun v ->
     Some (Proj (s,v))
-
 end
 
 let clean = ref (new clean)
-
-let customize_clean c = clean := (c :> clean)
+let clean_model c model =
+  clean := (c :> clean);
+  !clean#model model
 
 (*
 ***************************************************************
@@ -1206,25 +1200,21 @@ type model_parser = printing_info -> string -> model
 type raw_model_parser = printing_info -> string -> model_element list
 
 let debug_elements elts =
-  let me_name_trans me = me.me_name in
   let print_elements = print_model_elements ~sep:Pp.semi ~print_attrs:true
-      ~me_name_trans ~filter_similar:false in
+    ~filter_similar:false in
   Debug.dprintf debug "@[<v>Elements:@ %a@]@." print_elements elts;
   elts
 
-let debug_files desc files =
-  let me_name_trans me = me.me_name in
-  let print_file = print_model_file ~filter_similar:false ~print_attrs:true
-      ~me_name_trans in
-   Debug.dprintf debug "@[<v>Files %s:@ %a@]@." desc
+let debug_files files =
+  let print_file = print_model_file ~filter_similar:false ~print_attrs:true in
+   Debug.dprintf debug "@[<v>Files:@ %a@]@."
      (Pp.print_list Pp.newline print_file) (Mstr.bindings files);
    files
 
 let model_parser (raw: raw_model_parser) : model_parser =
   fun ({Printer.vc_term_loc; vc_term_attrs} as pm) str ->
   raw pm str |> debug_elements |>
-  build_model_rec pm |> debug_files "before" |>
-  map_filter_model_files !clean#element |> debug_files "after" |>
+  build_model_rec pm |> debug_files |>
   fun model_files -> { model_files; vc_term_loc; vc_term_attrs }
 
 exception KnownModelParser of string

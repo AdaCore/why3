@@ -100,7 +100,6 @@ val t_and_l_concrete : concrete_syntax_term list -> concrete_syntax_term
 (** Counter-example model elements. Each element represents
     a counter-example for a single source-code element.*)
 type model_element = {
-  me_name             : string;
   me_kind             : model_element_kind;
     (** The kind of model element. *)
   me_value            : Term.term;
@@ -233,16 +232,12 @@ val json_model : model -> Json_base.json
 
 val print_model :
   ?filter_similar:bool ->
-  ?me_name_trans:(model_element -> string) ->
   print_attrs:bool ->
   Format.formatter ->
   model ->
   unit
 (** Prints the counter-example model
 
-    @param me_name_trans the transformation of the model elements
-      names. The input is information about model element name. The
-      output is the name of the model element that should be displayed.
     @param model the counter-example model to print
     @param print_attrs when set to true, the name is printed together with the
     attrs associated to the specific ident.
@@ -250,7 +245,6 @@ val print_model :
 
 val print_model_human :
   ?filter_similar:bool ->
-  ?me_name_trans:(model_element -> string) ->
   Format.formatter ->
   model ->
   print_attrs:bool ->
@@ -261,7 +255,6 @@ val interleave_with_source :
   print_attrs:bool ->
   ?start_comment:string ->
   ?end_comment:string ->
-  ?me_name_trans:(model_element -> string) ->
   model ->
   rel_filename:string ->
   source_code:string ->
@@ -275,7 +268,6 @@ val interleave_with_source :
 
     @param start_comment the string that starts a comment
     @param end_comment the string that ends a comment
-    @param me_name_trans see print_model
     @param model counter-example model
     @param rel_filename the file name of the source relative to the session
     @param source_code the input source code
@@ -339,8 +331,7 @@ val model_for_positions_and_decls : model ->
     method proj : string -> concrete_syntax_term -> concrete_syntax_term option
   end
 
-  val customize_clean : #clean -> unit
-  (** Customize the class used to clean the values in the model. *)
+  val clean_model : #clean -> model -> model
 
 (*
 ***************************************************************
