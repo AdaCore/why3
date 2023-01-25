@@ -633,7 +633,10 @@ let rec json_of_concrete_term ct =
   | Proj (proj_name,proj_value) ->
     Record [
       "type", String "Proj";
-      "val", json_of_concrete_term proj_value
+      "val", Record [
+        "proj_name", String proj_name;
+        "proj_value", json_of_concrete_term proj_value
+      ]
     ]
 
 let json_model_element me =
