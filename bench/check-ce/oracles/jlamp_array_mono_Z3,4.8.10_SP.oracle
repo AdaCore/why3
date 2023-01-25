@@ -20,24 +20,19 @@ File jlamp_array_mono.mlw:
       t
       ->
       int = fun x!0 ->
-             if x!0 = epsilon x. (Array.to_int x) = 2 then 2
-             else if x!0 = epsilon x. (Array.to_int x) = 3 then 3 else 2
+             if x!0 = {Array.to_int => 2} then 2
+             else if x!0 = {Array.to_int => 3} then 3 else 2
   Line 11:
-    two : t = epsilon x. (Array.to_int x) = 2
+    two : t = {Array.to_int => 2}
   Line 14:
-    three : t = epsilon x. (Array.to_int x) = 3
+    three : t = {Array.to_int => 3}
   Line 19:
     length :
       array
       ->
       int = fun x!0 -> if x!0 = epsilon x. (Array.length x) = 0 then 0 else 0
   Line 22:
-    mixfix [] :
-      array
-      ->
-      int
-      ->
-      t = fun x!0 x!1 -> epsilon x. (Array.to_int x) = 3
+    mixfix [] : array -> int -> t = fun x!0 x!1 -> {Array.to_int => 3}
   Line 28:
     mixfix [<-] :
       array
@@ -72,12 +67,12 @@ File jlamp_array_mono.mlw:
       t
       ->
       int = fun x!01 ->
-             if x!01 = epsilon x. (Array.to_int x) = 2 then 2
-             else if x!01 = epsilon x. (Array.to_int x) = 3 then 3 else 2
+             if x!01 = {Array.to_int => 2} then 2
+             else if x!01 = {Array.to_int => 3} then 3 else 2
   Line 11:
-    two : t = epsilon x. (Array.to_int x) = 2
+    two : t = {Array.to_int => 2}
   Line 14:
-    three : t = epsilon x. (Array.to_int x) = 3
+    three : t = {Array.to_int => 3}
   Line 19:
     length :
       array
@@ -95,7 +90,7 @@ File jlamp_array_mono.mlw:
       ->
       array = fun x!01 x!11 x!2 ->
                if x!01 = epsilon x. (Array.length x) = 4 /\ x!11 = 42 /\
-                  x!2 = epsilon x. (Array.to_int x) = 2
+                  x!2 = {Array.to_int => 2}
                then epsilon x. (Array.length x) = 4 else epsilon x.
                (Array.length x) = 4
   Line 32:
@@ -106,7 +101,7 @@ File jlamp_array_mono.mlw:
     a : array = epsilon x. (Array.length x) = 4
   Line 47:
     a : array = epsilon x. (Array.length x) = 4
-    three : t = epsilon x. (Array.to_int x) = 3
+    three : t = {Array.to_int => 3}
   Line 48:
     a : array = epsilon x. (Array.length x) = 4
 
@@ -132,12 +127,12 @@ File jlamp_array_mono.mlw:
       t
       ->
       int = fun x!02 ->
-             if x!02 = epsilon x. (Array.to_int x) = 2 then 2
-             else if x!02 = epsilon x. (Array.to_int x) = 3 then 3 else 2
+             if x!02 = {Array.to_int => 2} then 2
+             else if x!02 = {Array.to_int => 3} then 3 else 2
   Line 11:
-    two : t = epsilon x. (Array.to_int x) = 2
+    two : t = {Array.to_int => 2}
   Line 14:
-    three : t = epsilon x. (Array.to_int x) = 3
+    three : t = {Array.to_int => 3}
   Line 19:
     length :
       array
@@ -155,7 +150,7 @@ File jlamp_array_mono.mlw:
       ->
       array = fun x!02 x!11 x!2 ->
                if x!02 = epsilon x. (Array.length x) = 43 /\ x!11 = 42 /\
-                  x!2 = epsilon x. (Array.to_int x) = 2
+                  x!2 = {Array.to_int => 2}
                then epsilon x. (Array.length x) = 43 else epsilon x.
                (Array.length x) = 43
   Line 32:
@@ -166,7 +161,7 @@ File jlamp_array_mono.mlw:
     a : array = epsilon x. (Array.length x) = 43
   Line 53:
     a : array = epsilon x. (Array.length x) = 43
-    three : t = epsilon x. (Array.to_int x) = 3
+    three : t = {Array.to_int => 3}
   Line 54:
     a : array = epsilon x. (Array.length x) = 43
 
@@ -192,12 +187,12 @@ File jlamp_array_mono.mlw:
       t
       ->
       int = fun x!03 ->
-             if x!03 = epsilon x. (Array.to_int x) = 2 then 2
-             else if x!03 = epsilon x. (Array.to_int x) = 3 then 3 else 2
+             if x!03 = {Array.to_int => 2} then 2
+             else if x!03 = {Array.to_int => 3} then 3 else 2
   Line 11:
-    two : t = epsilon x. (Array.to_int x) = 2
+    two : t = {Array.to_int => 2}
   Line 14:
-    three : t = epsilon x. (Array.to_int x) = 3
+    three : t = {Array.to_int => 3}
   Line 19:
     length :
       array
@@ -215,7 +210,7 @@ File jlamp_array_mono.mlw:
       ->
       array = fun x!03 x!11 x!2 ->
                if x!03 = epsilon x. (Array.length x) = 43 /\ x!11 = 17 /\
-                  x!2 = epsilon x. (Array.to_int x) = 2
+                  x!2 = {Array.to_int => 2}
                then epsilon x. (Array.length x) = 43 else epsilon x.
                (Array.length x) = 43
   Line 32:
@@ -226,7 +221,7 @@ File jlamp_array_mono.mlw:
     a : array = epsilon x. (Array.length x) = 43
   Line 59:
     a : array = epsilon x. (Array.length x) = 43
-    three : t = epsilon x. (Array.to_int x) = 3
+    three : t = {Array.to_int => 3}
   Line 60:
     a : array = epsilon x. (Array.length x) = 43
 

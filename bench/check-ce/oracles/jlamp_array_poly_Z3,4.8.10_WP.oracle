@@ -16,12 +16,12 @@ File jlamp_array_poly.mlw:
       t
       ->
       int = fun x!020 ->
-             if x!020 = epsilon x. (Array.to_int x) = 2 then 2
-             else if x!020 = epsilon x. (Array.to_int x) = 3 then 3 else 2
+             if x!020 = {Array.to_int => 2} then 2
+             else if x!020 = {Array.to_int => 3} then 3 else 2
   Line 11:
-    two : t = epsilon x. (Array.to_int x) = 2
+    two : t = {Array.to_int => 2}
   Line 14:
-    three : t = epsilon x. (Array.to_int x) = 3
+    three : t = {Array.to_int => 3}
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -44,14 +44,14 @@ File jlamp_array_poly.mlw:
       t
       ->
       int = fun x!022 ->
-             if x!022 = epsilon x. (Array.to_int x) = 2 then 2
-             else if x!022 = epsilon x. (Array.to_int x) = 3 then 3 else 2
+             if x!022 = {Array.to_int => 2} then 2
+             else if x!022 = {Array.to_int => 3} then 3 else 2
   Line 11:
-    two : t = epsilon x. (Array.to_int x) = 2
+    two : t = {Array.to_int => 2}
   Line 14:
-    three : t = epsilon x. (Array.to_int x) = 3
+    three : t = {Array.to_int => 3}
   Line 21:
-    three : t = epsilon x. (Array.to_int x) = 3
+    three : t = {Array.to_int => 3}
 
 File "bench/check-ce/jlamp_array_poly.mlw", line 28, characters 4-16:
 Sub-goal Index in array bounds of goal g'vc.

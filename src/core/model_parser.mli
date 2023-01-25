@@ -81,6 +81,7 @@ type concrete_syntax_term =
   (* the boolean [is_array] is used for pretty and JSON printing *)
   | Record of (string * concrete_syntax_term) list
   (* list of (field_name,field_value) elements *)
+  | Proj of (string * concrete_syntax_term)
 
 val print_concrete_term : Format.formatter -> concrete_syntax_term -> unit
 
@@ -331,6 +332,7 @@ val model_for_positions_and_decls : model ->
     method binop : concrete_syntax_binop -> concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term option
     method func : bool -> string list -> concrete_syntax_term -> concrete_syntax_term option
     method record : (string * concrete_syntax_term) list -> concrete_syntax_term option
+    method proj : string -> concrete_syntax_term -> concrete_syntax_term option
   end
 
   val customize_clean : #clean -> unit

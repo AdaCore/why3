@@ -20,20 +20,18 @@ File array.mlw:
       ->
       int
       ->
-      t = fun bOUND_VARIABLE_589 bOUND_VARIABLE_590 -> epsilon x.
-           (Array.to_int x) = 3
+      t = fun bOUND_VARIABLE_589 bOUND_VARIABLE_590 -> {Array.to_int => 3}
 File jlamp_array_poly.mlw:
   Line 8:
     to_int :
       t
       ->
       int = fun bOUND_VARIABLE_698 ->
-             if epsilon x. (Array.to_int x) = 3 = bOUND_VARIABLE_698 then 3
-             else 2
+             if {Array.to_int => 3} = bOUND_VARIABLE_698 then 3 else 2
   Line 11:
-    two : t = epsilon x. (Array.to_int x) = 2
+    two : t = {Array.to_int => 2}
   Line 14:
-    three : t = epsilon x. (Array.to_int x) = 3
+    three : t = {Array.to_int => 3}
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -56,14 +54,13 @@ File jlamp_array_poly.mlw:
       t
       ->
       int = fun bOUND_VARIABLE_773 ->
-             if epsilon x. (Array.to_int x) = 3 = bOUND_VARIABLE_773 then 3
-             else 2
+             if {Array.to_int => 3} = bOUND_VARIABLE_773 then 3 else 2
   Line 11:
-    two : t = epsilon x. (Array.to_int x) = 2
+    two : t = {Array.to_int => 2}
   Line 14:
-    three : t = epsilon x. (Array.to_int x) = 3
+    three : t = {Array.to_int => 3}
   Line 21:
-    three : t = epsilon x. (Array.to_int x) = 3
+    three : t = {Array.to_int => 3}
 
 File "bench/check-ce/jlamp_array_poly.mlw", line 28, characters 4-16:
 Sub-goal Index in array bounds of goal g'vc.

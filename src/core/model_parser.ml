@@ -85,6 +85,7 @@ type concrete_syntax_term =
   | Not of concrete_syntax_term
   | Function of { is_array: bool; args: string list ; body: concrete_syntax_term }
   | Record of (string * concrete_syntax_term) list
+  | Proj of (string * concrete_syntax_term)
 
 
 (* Pretty printing of concrete terms *)
@@ -175,6 +176,8 @@ let rec print_concrete_term fmt ct =
     in
     fprintf fmt "@[<hv1>%a@]"
       (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi print_field_value) fields_values
+  | Proj (proj_name,proj_value) ->
+    fprintf fmt "@[{%s =>@ %a}@]" proj_name print_concrete_term proj_value
 
 (* Helper functions for concrete terms *)
 
@@ -207,6 +210,8 @@ let rec subst_concrete_term subst t =
         (fun (field,value) -> (field, subst_concrete_term subst value))
         fields_values
     )
+  | Proj (proj_name,proj_value) ->
+    Proj (proj_name, subst_concrete_term subst proj_value)
 let rec t_and_l_concrete = function
   | [] -> concrete_const_bool true
   | [f] -> f
@@ -624,6 +629,11 @@ let rec json_of_concrete_term ct =
             ])
           fields_values
       )
+    ]
+  | Proj (proj_name,proj_value) ->
+    Record [
+      "type", String "Proj";
+      "val", json_of_concrete_term proj_value
     ]
 
 let json_model_element me =
@@ -1118,6 +1128,7 @@ class clean = object (self)
     | Quant (q,vars,t) -> self#quant q vars t
     | Binop (op,t1,t2) -> self#binop op t1 t2
     | Record fs -> self#record fs
+    | Proj (s,v) -> self#proj s v
     | Function {is_array;args;body} -> self#func is_array args body
   method var v = Some (Var v)
   method const c = match c with
@@ -1165,6 +1176,10 @@ class clean = object (self)
       Some (f, v) in
     opt_bind_all (List.map clean_field fs) @@ fun fs ->
     Some (Record fs)
+  method proj s v =
+    Opt.bind (self#value v) @@ fun v ->
+    Some (Proj (s,v))
+
 end
 
 let clean = ref (new clean)

@@ -199,7 +199,6 @@ type info = {
   mutable info_in_goal : bool;
   info_vc_term : vc_term_info;
   info_printer : ident_printer;
-  mutable list_projs : Ident.ident Mstr.t;
   mutable type_coercions : Sls.t Mty.t;
   mutable type_fields : (lsymbol list) Mty.t;
   info_version : version;
@@ -289,15 +288,13 @@ let print_typed_var_list info fmt vsl =
   print_list space (print_typed_var info) fmt vsl
 
 let collect_model_ls info ls =
-  if Sls.mem ls info.meta_model_projection then (
+  if Sls.mem ls info.meta_model_projection then
     begin match ls.ls_args with
     | [ty] ->
       let coercions = Sls.add ls (Mty.find_def Sls.empty ty info.type_coercions) in
       info.type_coercions <- Mty.add ty coercions info.type_coercions
     | _ -> ()
     end;
-    info.list_projs <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
-        ls.ls_name info.list_projs);
   if Sls.mem ls info.meta_record_def then
     begin match ls.ls_args with
     | [ty] ->
@@ -961,7 +958,6 @@ let print_task version args ?old:_ fmt task =
     info_in_goal = false;
     info_vc_term = vc_info;
     info_printer = ident_printer ();
-    list_projs = Mstr.empty;
     type_coercions = Mty.empty;
     type_fields = Mty.empty;
     info_version = version;

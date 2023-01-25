@@ -450,6 +450,7 @@ module FromModelToTerm = struct
     constructors : lsymbol Mstr.t;
     record_fields : Term.lsymbol list Mls.t;
     type_fields : Term.lsymbol list Ty.Mty.t;
+    type_coercions : Term.Sls.t Ty.Mty.t;
     (* Queried terms from [pinfo.Printer.queried_terms]. *)
     queried_terms : lsymbol Mstr.t;
     (* Function definiions that are not in [pinfo.Printer.queried_terms]. *)
@@ -1486,12 +1487,12 @@ module FromModelToTerm = struct
               let vs, t' = Term.t_open_bound tb in
               begin match get_opt_record env (vs,eps_x) (t',eps_term) with
               | None ->
-                begin match get_opt_int_range vs t' with
+                begin match get_opt_coercion env (vs,eps_x) (t',eps_term) with
                 | None ->
                   let t', t'_concrete = maybe_convert_epsilon_terms env (t',eps_term) in
                   (t_eps_close vs t', Epsilon (eps_x, t'_concrete))
-                | Some int_proj ->
-                  (t_eps_close vs t', Const (Integer int_proj))
+                | Some (proj_name, v_proj) ->
+                  (t_eps_close vs t', Proj (proj_name,v_proj))
                 end
               | Some fields_values -> (t_eps_close vs t', Record fields_values)
               end
@@ -1572,33 +1573,30 @@ module FromModelToTerm = struct
         raise UnexpectedPattern
     with UnexpectedPattern -> None
   
-  and get_opt_int_range vs t' =
-  (* special case for int range types:
-     if t is of the form epsilon x:ty. ty'int x = v, use a integer constant
-     as concrete term *)
-    let exception UnexpectedPattern in
-    try
-      let proj_v =
-        match t'.t_node with
-        | Tapp (ls, [proj;term_value]) when ls_equal ls ps_equ -> (
-          match proj.t_node with
-          | Tapp (_, [x]) when t_equal x (t_var vs) ->
-            term_value
-          | _ -> raise UnexpectedPattern
-        )
-        | _ -> raise UnexpectedPattern
-      in
-      Debug.dprintf debug "[get_opt_int_range] vs.vs_ty = %a@."
-        Pretty.print_ty vs.vs_ty;
-      match vs.vs_ty.Ty.ty_node with
-      | Ty.Tyapp (ts,_) ->
-        begin match ts.Ty.ts_def, proj_v.t_node with
-        | Ty.Range _, Term.Tconst (Constant.ConstInt c) ->
-          Some (BigInt.to_string c.il_int)
-        | _ -> raise UnexpectedPattern
-        end
-      | _ -> raise UnexpectedPattern
-    with UnexpectedPattern -> None
+  and get_opt_coercion env (vs,vs_name) (t',t'_concrete) =
+    (* special case for type coercions:
+     if t is of the form epsilon x:ty. proj x = v, use Proj v as concrete term *)
+    Debug.dprintf debug "[get_opt_coercion] vs.vs_ty = %a@."
+      Pretty.print_ty vs.vs_ty;
+    let is_proj_for_ty ty ls =
+      match Ty.Mty.find_opt ty env.type_coercions with
+      | None -> false
+      | Some sls -> List.mem ls (Sls.elements sls)
+    in
+    match t'.t_node, t'_concrete with
+    | Tapp (ls, [proj;term_value]), Apply ("=", [cproj;cterm_value])
+        when ls_equal ls ps_equ -> (
+      match proj.t_node, cproj with
+      | Tapp (proj_ls, [x]), Apply (ls_name, [Var vs_name'])
+          when t_equal x (t_var vs) && vs_name = vs_name'
+               && is_proj_for_ty vs.vs_ty proj_ls ->
+        let _,concrete_proj_v =
+          maybe_convert_epsilon_terms env (term_value,cterm_value)
+        in
+        Some (ls_name, concrete_proj_v)
+      | _ -> None
+    )
+    | _ -> None
 
 
   let clean env terms =
@@ -1640,6 +1638,7 @@ module FromModelToTerm = struct
         constructors = pinfo.Printer.constructors;
         record_fields = pinfo.Printer.record_fields;
         type_fields = pinfo.Printer.type_fields;
+        type_coercions = pinfo.Printer.type_coercions;
         inferred_types = [];
         queried_terms = Mstr.map (fun (ls, _, _) -> ls) qterms;
         eval_prover_vars = Mvs.empty;
