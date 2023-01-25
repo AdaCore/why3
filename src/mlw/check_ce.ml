@@ -732,29 +732,21 @@ let select_model ?timelimit ?steplimit ?verb_lvl ?compute_term ~check_ce
     | None -> None
     | Some m -> Some (m, (INCOMPLETE "not checking CE model", Pinterp_core.Log.empty_log))
 
-(** Transformations interpretation log and prover models *)
-
 (** Transform an interpretation log into a prover model.
     TODO fail if the log doesn't fail at the location of the original model *)
-let model_of_exec_log ~original_model log =  (* TODO_WIP *)
+let model_of_exec_log ~original_model log = assert false
+(** NOT MAINTAINED since the change of data types in Model_parser.model_value
+    to use Term.term *)
+(*
   let me loc id value =
-    let me_name = "dummy" in
-    let me_kind = match search_model_element_for_id original_model id with
-      | Some me -> me.me_kind
+    let name = asprintf "%a" print_decoded id.id_string in
+    let men_name = get_model_trace_string ~name ~attrs:id.id_attrs in
+    let men_kind = match search_model_element_for_id original_model id with
+      | Some me -> me.me_name.men_kind
       | None -> Other in
-    (*let me_value = model_value value in*)
-    let me_value = Term.t_bool_true in
-    let me_concrete_value = concrete_const_bool true in
-    let me_lsymbol = Term.create_lsymbol (Ident.id_fresh "dummytrue") [] None in
-    {
-      me_name;
-      me_kind;
-      me_value;
-      me_concrete_value;
-      me_location= Some loc;
-      me_attrs= id.id_attrs;
-      me_lsymbol
-    } in
+    let me_name = { men_name; men_kind; men_attrs= id.id_attrs } in
+    let me_value = model_value value in
+    {me_name; me_value; me_location= Some loc; me_lsymbol_location= None} in
   let aux e = match e.Log.log_loc with
     | Some loc when not Loc.(equal loc dummy_position) -> (
         match e.Log.log_desc with
@@ -772,3 +764,4 @@ let model_of_exec_log ~original_model log =  (* TODO_WIP *)
     if Mint.is_empty res then None else Some res in
   let model_files = (Mstr.map_filter aux_mint (Log.sort_log_by_loc log)) in
   set_model_files original_model model_files
+*)
