@@ -42,6 +42,7 @@ let opt_warn_prover = ref None
 let opt_giant_step_rac : bool ref = ref false
 let opt_rac_timelimit = ref (Some 120)
 let opt_rac_prover = ref (Some "cvc4")
+let opt_logging = ref false
 
 let opt_limit_line : Gnat_expl.limit_mode option ref = ref None
 let opt_limit_region : Gnat_loc.region option ref = ref None
@@ -202,6 +203,8 @@ let options = Arg.align [
            by \"file:first_line:last_line\"";
    "--list-transforms", Arg.Unit output_list_transforms,
           " Output the list of available transformations and exit";
+   "--logging", Arg.Set opt_logging,
+          " Enable verbose logging in .why3log files";
    "--debug-prover-errors", Arg.Set opt_debug_prover_errors,
           " Output error/crash messages from provers";
    "--prover", Arg.String set_prover,
@@ -732,3 +735,5 @@ let session_dir =
                      (Filename.basename project_dir)
 
 let session_file = Filename.concat session_dir "why3ession.xml"
+
+let logging = !opt_logging

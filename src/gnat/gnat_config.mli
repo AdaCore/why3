@@ -115,3 +115,6 @@ val actual_cmd : ?main:Whyconf.main -> string -> string -> string
    preceded terms in [cmd] by their corresponding values *)
 
 val replay : bool
+
+val logging : bool
+(* Whether logging is enabled or not *)

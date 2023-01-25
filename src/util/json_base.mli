@@ -28,6 +28,7 @@ type json =
   | Null
 
 val print_json : Format.formatter -> json -> unit
+val print_json_single_line : Format.formatter -> json -> unit
 
 (** Convenience function that returns a field/part of json_value or return
     Not_found if not present *)

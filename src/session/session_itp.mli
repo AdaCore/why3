@@ -50,6 +50,8 @@ val fprintf_any: Format.formatter -> any -> unit
 
 type notifier = any -> unit
 
+val proofNodeID_tostring : proofNodeID -> string
+
 
 (** Session *)
 
