@@ -232,9 +232,23 @@ let report_messages c obj =
         | Some pa -> Some (Session_itp.get_proof_attempt_parent s pa)
       in
       let extra_info =
+        let default = { Gnat_expl.pretty_node = None; inlined = None } in
         match unproved_goal with
-        | None -> { Gnat_expl.pretty_node = None; inlined = None }
-        | Some g -> Gnat_objectives.get_extra_info g
+        | None -> default
+        | Some g ->
+            (* In some cases (CE goals in replay) the goal might not be
+               properly registered. In that case, we attempt to find a parent
+               goal that is registered. *)
+            try
+              Gnat_objectives.get_extra_info g
+            with Not_found ->
+              if C.is_ce_goal s g then
+                match Session_itp.get_proof_parent s g with
+                | Session_itp.Theory _ -> default
+                | Session_itp.Trans t ->
+                  try Gnat_objectives.get_extra_info (Session_itp.get_trans_parent s t)
+                  with Not_found -> default
+              else { Gnat_expl.pretty_node = None; inlined = None }
       in
       Gnat_report.Not_Proved (extra_info, model, manual_info) in
   Gnat_report.register obj (C.Save_VCs.check_to_json s obj) result
