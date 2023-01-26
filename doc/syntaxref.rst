@@ -1618,8 +1618,9 @@ by instantiating ``Exp`` with zero and addition instead.
     end
 
 It is also possible to substitute certain types of defined symbols :
-logical function and predicate, (co)inductives, algebraic data types, immutable
-records without invariants, range and floating-point types.
+logical functions and predicates, (co)inductives, algebraic data types, immutable
+records without invariants, range and floating-point types can all be substituted
+by symbols with the exact same definition.
 
 .. code-block:: whyml
 
@@ -1646,17 +1647,19 @@ records without invariants, range and floating-point types.
       predicate pos (n : int) =
         n >= 0
 
+      (* The substitution of pos is taken into account when checking
+       * that the definitions are identical. *)
       function abs (n : int) =
         if pos n then n else -n
 
-      (* The signature of each constructor must match by order of definition.
-       * Constructor's names may not match, but a warning will be raised. *)
+      (* For algebraic types, same definition means same constructors
+       * in the same order. *)
       type 'a list =
-        | A
-        | B 'a (list 'a)
+        | Nil
+        | Cons 'a (list 'a)
 
-      (* The field types must match by order of definition. *)
-      type r = { b : int; a : string; }
+      (* Similarly records' fields must be in the exact same order. *)
+      type r = { a : int; b : string; }
 
       clone A with
        predicate pos,
