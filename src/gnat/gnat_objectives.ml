@@ -22,7 +22,7 @@ type status =
 module GoalCmp = struct
    (* module to provide comparison goals *)
   type t = goal_id
-  let compare a b = Pervasives.compare a b
+  let compare a b = Stdlib.compare a b
 end
 
 module GoalMap = Session_itp.Hpn
@@ -1165,20 +1165,21 @@ let session_find_ce_pa c obj =
 
 exception Found_goal_id of Session_itp.proofNodeID
 
+let is_ce_goal s g =
+  match parent_transform_name s g with
+  | Some tr when tr = ce_transform -> true
+  | _ -> false
+
 let session_find_unproved_goal c obj =
 
   let obj_rec = Gnat_expl.HCheck.find explmap obj in
   let session = c.Controller_itp.controller_session in
-  let is_ce_goal g =
-    match parent_transform_name session g with
-    | Some tr when tr = ce_transform -> true
-    | _ -> false
-  in
   let traversal_function () g =
     match g with
     | Session_itp.APn g ->
-        if not (Session_itp.pn_proved session g) && (not (is_ce_goal g)) then
-          raise (Found_goal_id g)
+        if not (Session_itp.pn_proved session g)
+           && (not (is_ce_goal session g))
+        then raise (Found_goal_id g)
     | _ -> () in
 
   let iter_on_sub_goal g =
@@ -1284,5 +1285,7 @@ let replay session =
 let (_: unit) = C.register_observer (fun x y z ->
   if x = 0 && y = 0 && z = 0 then
     raise Exit)
+
+
 
 end
