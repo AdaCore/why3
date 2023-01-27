@@ -317,7 +317,7 @@ module BV_Gen
 
   function to_uint t : int
   val to_uint (x:t) : int  ensures { result = to_uint x }
-  val function of_int int : t
+  val function of_int [@rewrite:of_int] int : t
 
   function to_int (x:t) : int =
     if (is_signed_positive x) then (to_uint x) else (- (two_power_size - (to_uint x)))
