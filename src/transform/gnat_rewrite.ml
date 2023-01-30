@@ -6,6 +6,8 @@ let first_attr = Ident.create_attribute "rewrite:first"
 let last_attr = Ident.create_attribute "rewrite:last"
 let of_array_attr = Ident.create_attribute "rewrite:of_array"
 let to_array_attr = Ident.create_attribute "rewrite:to_array"
+let of_int_attr = Ident.create_attribute "rewrite:of_int"
+let t_int_attr = Ident.create_attribute "rewrite:t_int"
 
 let ls_has_attr attr ls = Sattr.mem attr (ls.ls_name.id_attrs)
 let ls_has_outer_attr ls =
@@ -74,6 +76,46 @@ let rewrite_term t =
         else t_map (aux env) t
       with No_Match -> t_map (aux env) t end
     | _ -> assert false
+    end
+  (* rewrite:
+    to_int (of_int x) -> x
+  *)
+  | Tapp (outer, args) when ls_has_attr t_int_attr outer ->
+    assert (List.length args = 1);
+    let arg = List.hd args in
+    let arg =
+      match arg.t_node with
+      | Tvar v ->
+        begin try Mvs.find v env with Not_found -> arg end
+      | _ -> arg
+    in
+    begin match arg.t_node with
+      | Tapp (inner, args)
+        when ls_has_attr of_int_attr inner ->
+        assert (Ty.ty_equal (t_type t) (t_type (List.nth args 0)));
+        assert (List.length args = 1);
+        t_attr_copy t (List.nth args 0)
+      | _ -> t_map (aux env) t
+    end
+  (* rewrite:
+    of_int (to_int x) -> x
+  *)
+  | Tapp (outer, args) when ls_has_attr of_int_attr outer ->
+    assert (List.length args = 1);
+    let arg = List.hd args in
+    let arg =
+      match arg.t_node with
+      | Tvar v ->
+        begin try Mvs.find v env with Not_found -> arg end
+      | _ -> arg
+    in
+    begin match arg.t_node with
+      | Tapp (inner, args)
+        when ls_has_attr t_int_attr inner
+        && Ty.ty_equal (t_type t) (t_type (List.nth args 0)) ->
+        assert (List.length args = 1);
+        t_attr_copy t (List.nth args 0)
+      | _ -> t_map (aux env) t
     end
   | Tlet (tdef, tb) ->
     let tdef = aux env tdef in
