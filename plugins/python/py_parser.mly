@@ -82,13 +82,13 @@
 (* annotations *)
 %token INVARIANT VARIANT ASSUME ASSERT CHECK REQUIRES ENSURES LABEL
 %token FUNCTION PREDICATE AXIOM LEMMA CONSTANT CALL
-%token ARROW LARROW LRARROW FORALL EXISTS DOT THEN LET OLD AT
+%token ARROW LARROW LRARROW FORALL EXISTS DOT THEN LET OLD AT BY SO
 
 (* precedences *)
 
 %nonassoc IN
 %nonassoc DOT ELSE
-%right ARROW LRARROW
+%right ARROW LRARROW BY SO
 %nonassoc IF
 %right OR
 %right AND
@@ -530,6 +530,8 @@ term_sub_:
 | LRARROW { Dterm.DTiff }
 | OR      { Dterm.DTor }
 | AND     { Dterm.DTand }
+| BY      { Dterm.DTby }
+| SO      { Dterm.DTso }
 
 %inline infix_op_1:
 | c=CMP  { let op = match c with

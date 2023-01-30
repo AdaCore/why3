@@ -1,0 +1,21 @@
+
+use int.Int
+use bool.Bool
+
+val ref exit : bool
+val ref c : int
+
+let test [@bddinfer] () diverges =
+  exit <- false;
+  c <- 0;
+  [@bddinfer:myloop]
+  while (not exit) do
+      [@bddinfer:myassert] assert { c <= 42 };
+      c <- c + 1;
+      if c >= 42 then
+        begin
+	exit <- true;
+	(* break*)
+	end
+
+  done

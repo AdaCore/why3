@@ -1,22 +1,22 @@
 Invariant for loop [anonymous_loop_0] is
-  (0 <= j.contents /\ j.contents <= 18) /\
-  (j.contents + (i.contents * 2)) = 20
+  (1 <= i.contents /\ i.contents <= 10) /\
+  ((i.contents * 2) + j.contents) = 20
 Domains for loop [anonymous_loop_0] are i = [1;10]; j = [0;18]
 Invariant for loop [anonymous_loop_0] is
-  (0 <= j1.contents /\ j1.contents <= 18) /\
-  (j1.contents + (i1.contents * 2)) = 20
+  (1 <= i1.contents /\ i1.contents <= 10) /\
+  ((i1.contents * 2) + j1.contents) = 20
 Domains for loop [anonymous_loop_0] are i1 = [1;10]; j1 = [0;18]
 Invariant for loop [anonymous_loop_0] is
-  (0 <= j2.contents /\ j2.contents <= 18) /\
-  (j2.contents + (i2.contents * 2)) = 20
+  (1 <= i2.contents /\ i2.contents <= 10) /\
+  ((i2.contents * 2) + j2.contents) = 20
 Domains for loop [anonymous_loop_0] are i2 = [1;10]; j2 = [0;18]
 File bench/infer/minus1.mlw:
 Goal b'vc.
-Prover result is: Valid (0.01s, 20 steps).
+Prover result is: Valid (0.00s, 20 steps).
 
 File bench/infer/minus1.mlw:
 Goal b2'vc.
-Prover result is: Valid (0.01s, 20 steps).
+Prover result is: Valid (0.00s, 20 steps).
 
 File bench/infer/minus1.mlw:
 Goal b3'vc.

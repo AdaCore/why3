@@ -6,7 +6,7 @@ stages:
   - deploy
 
 variables:
-  BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2022-10-18"
+  BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2023-01-13"
   SPHINX_IMAGE: "$CI_REGISTRY_IMAGE:ci-sphinx"
   GIT_CLEAN_FLAGS: "-ffdxq"
 
@@ -168,7 +168,7 @@ doc:
 
 pages:
   stage: deploy
-  image: busybox
+  image: busybox:uclibc
   dependencies:
     - doc
   script:

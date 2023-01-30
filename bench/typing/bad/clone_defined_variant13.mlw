@@ -1,0 +1,29 @@
+module A
+
+  use int.Int
+
+  type t = { a : int; b : string }
+
+  let f x =
+    { x with a = x.a + 1 }
+
+end
+
+module B
+
+  use int.Int
+
+  type t = { b : int; a : string }
+
+  let g x =
+    { x with b = x.b + 3 }
+
+  clone A with type t
+
+  let main () =
+    let x = { b = 0; a = "a" } in
+    let x = f x in
+    let _ = g x in
+    ()
+
+end

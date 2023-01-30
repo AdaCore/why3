@@ -1,15 +1,21 @@
-BDD-infer failure: unsupported feature, mlw_expr_to_why1_cond: execution of function `ref`
-BDD-infer failure: unsupported feature, mlw_expr_to_why1_cond: execution of function `ref`
-BDD-infer failure: unsupported feature, mlw_expr_to_why1_cond: execution of function `ref`
+Invariant for loop [anonymous_loop_0] is
+  (y.contents = True /\ x <= x1.contents) /\ x1.contents <= 0
+Domains for loop [anonymous_loop_0] are x = ]-oo;0]; x1 = ]-oo;0]; y = true
+Invariant for loop [anonymous_loop_0] is
+  (y1.contents = True /\ x2 <= x3.contents) /\ x3.contents <= 0
+Domains for loop [anonymous_loop_0] are x2 = ]-oo;0]; x3 = ]-oo;0]; y1 = true
+Invariant for loop [anonymous_loop_0] is
+  (y2.contents = True /\ x4 <= x5.contents) /\ x5.contents <= 0
+Domains for loop [anonymous_loop_0] are x4 = ]-oo;0]; x5 = ]-oo;0]; y2 = true
 File bench/infer/bools.mlw:
 Goal f'vc.
-Prover result is: Unknown () (0.01s).
+Prover result is: Valid (0.00s, 20 steps).
 
 File bench/infer/bools.mlw:
 Goal f2'vc.
-Prover result is: Unknown () (0.01s).
+Prover result is: Valid (0.00s, 20 steps).
 
 File bench/infer/bools.mlw:
 Goal f3'vc.
-Prover result is: Unknown () (0.01s).
+Prover result is: Valid (0.00s, 20 steps).
 

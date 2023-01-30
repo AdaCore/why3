@@ -115,7 +115,7 @@ module BraunHeaps
         x, Node r y l
     end
 
-  let rec replace_min (x: elt) (t: tree elt)
+  let rec replace_min (x: elt) (t: tree elt) : tree elt
     requires { heap t }
     requires { inv t }
     requires { 0 < size t }
@@ -191,7 +191,7 @@ module BraunHeaps
 
   use int.ComputerDivision
 
-  let rec diff (m: int) (t: tree elt)
+  let rec diff (m: int) (t: tree elt) : int
     requires { inv t }
     requires { 0 <= m <= size t <= m + 1 }
     variant  { t }
@@ -216,7 +216,7 @@ module BraunHeaps
     ensures  { result = size t }
   =
     match t with
-    | Empty -> 0
+    | Empty      -> 0
     | Node l _ r -> let m = fast_size r in 1 + 2 * m + diff m l
     end
 

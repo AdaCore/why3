@@ -1,0 +1,11 @@
+use int.Int
+use bool.Bool
+
+val ref x : bool
+val ref y : int
+
+let main [@bddinfer] ()
+  =
+  y <- 42;
+  x <- y > 0;
+  assert { x }

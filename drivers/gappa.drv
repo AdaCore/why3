@@ -189,6 +189,8 @@ theory ieee_float.GenericFloat
   meta "instantiate:auto" prop mul_finite
   meta "instantiate:auto" prop div_finite
 
+  remove prop max_int_spec
+  remove prop max_real_int
 end
 
 theory ieee_float.Float32

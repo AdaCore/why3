@@ -1,0 +1,27 @@
+module M
+
+  type vertex
+
+  predicate edge vertex vertex
+
+  inductive path vertex vertex =
+  | path_nil : forall v. path v v
+  | path_cons : forall u v w. path u v -> edge v w -> path u w
+
+end
+
+module N
+
+  type vertex
+
+  predicate edge vertex vertex
+
+  predicate path (x y : vertex) =
+    x = y \/ edge x y
+
+  clone M with
+    type vertex,
+    predicate edge,
+    predicate path
+
+end

@@ -1,0 +1,17 @@
+module M
+
+  inductive ind int real =
+  | case : forall a b. ind a b
+
+end
+
+module N
+
+  type t
+
+  inductive ind int int =
+  | case : forall a b. ind a b
+
+  clone M with predicate ind
+
+end

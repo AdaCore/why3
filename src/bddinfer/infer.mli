@@ -37,3 +37,7 @@ val interp_prog :
    report as defined above.  *)
 
 val report : verbosity:int -> interp_report -> unit
+(** provides a readable report on standard output. verbosity level 0
+   will only report whether the user invariant and assertions are
+   validated by the infered ones. Level 2 report the generated
+   invariants. Level 3 reports abstract states computed *)

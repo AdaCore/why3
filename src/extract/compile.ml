@@ -408,13 +408,14 @@ module Translate = struct
           let fun_ty = ML.t_fun params ml_app.ML.e_mlty in
           ML.e_fun params ml_app ity cty.cty_mask fun_ty
             eff_empty attrs in
+        let mlty = mlty_of_ity mask e.e_ity in
         begin match pvl with
-          | [pv_expr] when is_optimizable_record_rs info rs -> pv_expr
+          | [pv_expr] when is_optimizable_record_rs info rs ->
+              ML.e_coerce pv_expr (ML.I e.e_ity) mask mlty eff attrs
           | []        when is_optimizable_record_rs info rs ->
               eta_exp_pj true
           | [] when rs.rs_field <> None -> eta_exp_pj false
           | _ ->
-             let mlty = mlty_of_ity mask e.e_ity in
              ML.e_app rs pvl (rem <> []) (ML.I e.e_ity) mask mlty eff attrs end
     | Eexec ({c_node = Cfun e; c_cty = {cty_args = []}}, _) ->
         (* abstract block *)
@@ -455,7 +456,10 @@ module Translate = struct
         let e1 = expr info svar e1.e_mask e1 in
         let e2 = expr info svar mask e2 in
         let e3 = expr info svar mask e3 in
-        assert (e2.ML.e_mlty = e3.ML.e_mlty);
+        if (e2.ML.e_mlty <> e3.ML.e_mlty) then
+          Loc.errorm ?loc:e.e_loc
+            "Compiler error: %a <> %a"
+             ML.pp_ty e2.ML.e_mlty ML.pp_ty e3.ML.e_mlty;
         ML.e_if e1 e2 e3 mask e2.ML.e_mlty eff attrs
     | Ewhile (e1, _, _, e2) ->
         Debug.dprintf debug_compile "compiling while block@.";

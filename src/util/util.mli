@@ -107,7 +107,7 @@ val terminal_has_color : bool
    ["TERM"] environment variables is set, and not to ["dump"], and that standard output is
    a terminal. *)
 
-val ansi_color_tags : Format.formatter_tag_functions
+val ansi_color_tags : Format.formatter_stag_functions
 (** Functions to interpret tags as ANSI terminal color codes. The format of the tag is
    [[bold] [<color>] [on <bg-color>]].
 
@@ -120,8 +120,13 @@ val ansi_color_tags : Format.formatter_tag_functions
 
 (** {3 Miscellaneous} *)
 
-(** Check if a non-empty string contains only characters [a-zA-Z0-9_-] *)
 val is_sexp_simple_token : string -> bool
+(** Check if a non-empty string contains only characters [a-zA-Z0-9_-] *)
 
 val get_home_dir : unit -> string
 (** Return the home directory of the user. *)
+
+val split_version : string ->  (string * int) list
+(** Split a version string into its components. For example, ["2.1~beta3"] is
+    split into ["",2;".",1;"~beta",3]. When compared lexicographically, the
+    resulting list respects the traditional ordering on version strings. *)

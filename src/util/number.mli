@@ -137,6 +137,7 @@ val check_range : int_constant -> int_range -> unit
 (** [check_range c ir] checks that [c] is in the range described by [ir].
     @raise OutOfRange if out of range. *)
 
+val int_range_equal : int_range -> int_range -> bool
 
 (** {2 Float checking} *)
 
@@ -159,3 +160,5 @@ val compute_float : real_constant -> float_format -> bool * BigInt.t * BigInt.t
 val check_float : real_constant -> float_format -> unit
 (** [check_float c fp] is the same as [compute_float c fp]
     but does not return any value. *)
+
+val float_format_equal : float_format -> float_format -> bool

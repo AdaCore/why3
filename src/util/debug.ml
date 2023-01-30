@@ -103,7 +103,7 @@ module Args = struct
         in
         Format.printf "@[<v>%a@]@."
           (Pp.print_list Pp.newline print)
-          (List.sort Pervasives.compare list);
+          (List.sort Stdlib.compare list);
       end;
       !opt_list_flags in
     desc,list

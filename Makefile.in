@@ -103,7 +103,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-EXTINCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @INFERINCLUDE@
+EXTINCLUDES = @WHY3INCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @INFERINCLUDE@
 
 # warnings are enabled and non fatal by default, except:
 # - disabled:
@@ -140,9 +140,6 @@ OLINKFLAGS = -linkall $(EXTCMXA)
 BLINKFLAGS = -linkall $(EXTCMA)
 endif
 
-ifeq (@enable_profiling@,yes)
-OFLAGS += -g -p
-endif
 
 # see http://caml.inria.fr/mantis/view.php?id=4991
 CMIHACK = -intf-suffix .cmi
@@ -159,8 +156,8 @@ EXTOBJS =
 EXTLIBS = menhirLib
 endif
 
-EXTLIBS += @SEQLIB@ @RELIB@ unix nums dynlink @ZIPLIB@ @WHY3LIB@ @INFERLIB@
-EXTPKGS = menhirLib @SEQLIB@ @RELIB@ unix num dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
+EXTLIBS += @RELIB@ unix nums dynlink @ZIPLIB@ @WHY3LIB@ @INFERLIB@
+EXTPKGS = menhirLib @RELIB@ unix num dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
 
 EXTCMA	= $(addsuffix .cmo,$(EXTOBJS)) $(addsuffix .cma,$(EXTLIBS))
 EXTCMXA = $(addsuffix .cmx,$(EXTOBJS)) $(addsuffix .cmxa,$(EXTLIBS))
@@ -227,7 +224,6 @@ LIBGENERATED = \
 	src/util/rc.ml src/util/lexlib.ml src/util/mysexplib.ml \
 	src/util/json_parser.mli src/util/json_parser.ml \
 	src/util/json_lexer.ml src/util/mlmpfr_wrapper.ml \
-	src/util/dynlink_wrapper.ml \
 	src/parser/lexer.ml \
 	src/core/parser_tokens.mli src/core/parser_tokens.ml \
 	src/parser/parser.mli src/parser/parser.ml \
@@ -242,7 +238,7 @@ LIB_UTIL = mysexplib config bigInt mlmpfr_wrapper util opt lists strings \
 	   pp extmap extset exthtbl weakhtbl diffmap \
 	   hashcons wstdlib exn_printer getopt \
 	   json_base json_parser json_lexer \
-	   debug loc lexlib print_tree dynlink_wrapper \
+	   debug loc lexlib print_tree \
 	   cmdline sysutil rc plugin bigInt number constant vector pqueue
 
 ifeq (@enable_re@,no)
@@ -292,7 +288,7 @@ LIB_TRANSFORM = simplify_formula inlining split_goal \
 		generic_arg_trans_utils case apply subst \
 		introduction ind_itp destruct cut congruence \
 		intro_vc_vars_counterexmp prepare_for_counterexmp \
-		induction induction_pr reflection
+		induction induction_pr reflection keep_only_arithmetic
 
 LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq\
 	      pvs isabelle \
@@ -338,14 +334,6 @@ $(LIBDEP) $(LIBCMO) $(LIBCMX) $(LIBCMI): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why3
 
 $(LIBDEP): $(LIBGENERATED)
-
-ifeq (@new_dynlink@,yes)
-src/util/dynlink_wrapper.ml: src/util/dynlink_new.ml Makefile
-	$(CMP_CP)
-else
-src/util/dynlink_wrapper.ml: src/util/dynlink_old.ml Makefile
-	$(CMP_CP)
-endif
 
 # Mlmpfr
 
@@ -1802,10 +1790,10 @@ test-api-%.opt: examples/use_api/%.ml lib/why3/why3.cmxa
 test-api-%: test-api-%.@OCAMLBEST@
 	$(HIDE)mkdir -p examples/use_api/results
 	$(HIDE)(./$< | sed -e 's/^\(Versions of Alt-Ergo found: \).*$$/\1<hidden>/' \
-		  	   -e 's/0\.0[0-9]/0.0x/' \
+			   -e 's/0\.0[0-9]/0.0x/g;s/[0-9][0-9]* steps/xx steps/' \
 			    > examples/use_api/results/$@.stdout ) \
 		|| (printf "Execution failed for API test $<. Please fix it.\n"; exit 2)
-	$(HIDE)(diff examples/use_api/oracles/$@.stdout examples/use_api/results/$@.stdout) \
+	$(HIDE)(diff -u examples/use_api/oracles/$@.stdout examples/use_api/results/$@.stdout) \
 		|| (printf "Oracle failed for API test $<. Please fix it.\n"; exit 2)
 	$(HIDE)rm -f $< why3session.xml why3shapes why3shapes.gz
 

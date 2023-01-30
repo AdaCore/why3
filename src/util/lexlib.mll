@@ -36,6 +36,34 @@
 
   let string_to_char s fmt =
     Scanf.sscanf s fmt Char.chr
+
+  let utf8_extra_bytes = function
+    | '\000'..'\127' -> 0
+    | '\192'..'\223' -> 1
+    | '\224'..'\239' -> 2
+    | '\240'..'\247' -> 3
+    | _ -> -1
+
+  let adjust_pos lexbuf n =
+    let pos = lexbuf.lex_curr_p in
+    lexbuf.lex_curr_p <- { pos with pos_cnum = pos.pos_cnum - n };
+    lexbuf.lex_abs_pos <- lexbuf.lex_abs_pos - n
+    (* invariant of Lexing: pos_cnum = lex_abs_pos + lex_curr_pos,
+       with lex_curr_pos the offset in the current buffer *)
+
+  let adjust_pos_utf8 lexbuf s =
+    let l = String.length s in
+    let rec aux i ofs =
+      if i >= l then ofs else
+      (* FIXME: combining characters should increase n by one more *)
+      let n = utf8_extra_bytes s.[i] in
+      if n <> -1 then
+        aux (i + 1 + n) (ofs + n)
+      else
+        aux (i + 1) ofs in
+    let n = aux 0 0 in
+    adjust_pos lexbuf n
+
 }
 
 let dec     = ['0'-'9']
@@ -63,8 +91,10 @@ and comment = parse
       { new_line lexbuf; comment lexbuf }
   | eof
       { raise Not_found }
-  | _
-      { comment lexbuf }
+  | _ as c
+      { let n = utf8_extra_bytes c in
+        if n > 0 then adjust_pos lexbuf n;
+        comment lexbuf }
 
 and string buf = parse
   | "\""
@@ -154,13 +184,7 @@ and string_skip_spaces buf = parse
     let loc = loc lexbuf in
     let b = Buffer.create 2 in
     Buffer.add_char b c;
-    let n =
-      match c with
-      | '\000'..'\127' -> 0
-      | '\192'..'\223' -> 1
-      | '\224'..'\239' -> 2
-      | '\240'..'\247' -> 3
-      | _ -> -1 in
+    let n = utf8_extra_bytes c in
     if n <> 0 && (n == -1 || not (utf8_tail b n lexbuf)) then begin
       (* invalid encoding, convert the first character to a utf8 one *)
       Buffer.reset b;

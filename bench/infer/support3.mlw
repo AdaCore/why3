@@ -1,0 +1,30 @@
+module Example_scan
+
+
+use export ref.Ref
+use export bool.Bool
+use export int.Int
+
+
+val foo (input : bool) (tgt : ref int) : unit
+writes { tgt }
+(* This does not work *)
+ensures { andb input (old !tgt = 42) -> (!tgt = 0) }
+(* But this is OK
+ensures { (old !tgt = 42) -> (!tgt = 0) }
+and this also
+ensures { input && (old !tgt = 42) -> (!tgt = 0) }
+*)
+
+(**********************************************************************************)
+
+val d0 [@model] [@model_trace:D0] : ref int
+
+let example_scan [@bddinfer] ()
+  diverges
+  =
+  while True do
+	foo true d0
+  done
+
+end

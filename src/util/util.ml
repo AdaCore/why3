@@ -89,6 +89,7 @@ let terminal_has_color =
   term <> "" && term <> "dumb" && Unix.isatty Unix.stdout
 
 let esc_seq_of_tag str =
+  let str = match str with Format.String_tag str -> str | _ -> assert false in
   let tokens = String.split_on_char ' ' (String.lowercase_ascii str) in
   let bold, tokens = match tokens with
     | "bold" :: tokens -> true, tokens
@@ -109,10 +110,10 @@ let esc_seq_of_tag str =
   String.concat ";" (aux 30 fg @ aux 40 bg @ bold)
 
 let ansi_color_tags = Format.{
-  mark_open_tag= (fun tag -> sprintf "\027[%sm" (esc_seq_of_tag tag));
-  mark_close_tag= (fun _ -> "\027[0m");
-  print_open_tag= ignore;
-  print_close_tag= ignore;
+  mark_open_stag   = (fun tag -> sprintf "\027[%sm" (esc_seq_of_tag tag));
+  mark_close_stag  = (fun _ -> "\027[0m");
+  print_open_stag  = ignore;
+  print_close_stag = ignore;
 }
 
 let is_sexp_simple_token s =
@@ -136,3 +137,20 @@ let get_home_dir () =
     (* try windows env var *)
     try Sys.getenv "USERPROFILE"
     with Not_found -> ""
+
+let split_version s =
+  let l = String.length s in
+  let rec aux_num i t v =
+    if i >= l then [t, v]
+    else
+      match s.[i] with
+      | '0' .. '9' as c -> aux_num (i + 1) t (v * 10 + Char.code c - Char.code '0')
+      | _ -> (t, v) :: aux_str (i + 1) i
+  and aux_str i j =
+    if i >= l then [String.sub s j (i - j), 0]
+    else
+      match s.[i] with
+      | '0' .. '9' as c ->
+          aux_num (i + 1) (String.sub s j (i - j)) (Char.code c - Char.code '0')
+      | _ -> aux_str (i + 1) j in
+  aux_str 0 0

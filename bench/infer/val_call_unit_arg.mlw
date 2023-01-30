@@ -1,0 +1,14 @@
+use int.Int
+
+val ref x : int
+val ref y : int
+
+val test () : unit
+  writes { x, y }
+  ensures { x + (old y) = 0 }
+  ensures { y = (old x) }
+
+let main [@bddinfer] () =
+  x <- 42;
+  y <- 37;
+  test()

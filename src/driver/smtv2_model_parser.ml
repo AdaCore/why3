@@ -299,7 +299,7 @@ module FromSexp = struct
       failwith
         "Cannot read S-expression as model: next model not separated \
          (missing separator in driver?)";
-    Some (Mstr.of_list (Lists.map_filter decl decls))
+    Some (Mstr.of_list (List.filter_map decl decls))
 end
 
 (* Parses the model returned by CVC4 and Z3. *)

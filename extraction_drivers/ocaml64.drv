@@ -65,7 +65,7 @@ end
 
 module Ref
   syntax type     ref      "%1 ref"
-  syntax val contents "Pervasives.contents" prec 1 0
+  syntax val contents "Stdlib.contents" prec 1 0
   syntax val      ref      "ref"
 end
 
@@ -426,10 +426,10 @@ module string.StringBuffer
 end
 
 module io.StdIO
-  syntax val print_string "Pervasives.print_string"
-  syntax val print_char "Pervasives.print_char"
-  syntax val print_int "Pervasives.print_string (Z.to_string %1)" prec 4 3
-  syntax val print_newline "Pervasives.print_newline"
+  syntax val print_string "Stdlib.print_string"
+  syntax val print_char "Stdlib.print_char"
+  syntax val print_int "Stdlib.print_string (Z.to_string %1)" prec 4 3
+  syntax val print_newline "Stdlib.print_newline"
 end
 
 module random.Random
@@ -444,8 +444,8 @@ module mach.int.Refint63
   syntax val ( *= ) "(fun r v -> r := !r * v) %1 %2" prec 4 3 3
 end
 module mach.int.MinMax63
-  syntax val min "Pervasives.min"
-  syntax val max "Pervasives.max"
+  syntax val min "Stdlib.min"
+  syntax val max "Stdlib.max"
 end
 
 module mach.array.Array32
@@ -518,7 +518,7 @@ module ocaml.Sys
 end
 
 module ocaml.Exceptions
-  syntax exception Exit             "Pervasives.Exit"
+  syntax exception Exit             "Stdlib.Exit"
   syntax exception Not_found        "Not_found"
   syntax exception Invalid_argument "Invalid_argument"
 end

@@ -1,0 +1,17 @@
+module M
+
+  type t =
+    | A (ghost string) int
+    | B t real
+
+end
+
+module N
+
+  type t =
+    | A string int
+    | B t real
+
+  clone M with type t
+
+end

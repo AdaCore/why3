@@ -29,7 +29,10 @@ build: [
    "--disable-why3-lib"
    "--disable-frama-c"
    "--disable-coq-libs"
-   "--disable-js-of-ocaml"]
+   "--disable-js-of-ocaml"
+   "--disable-re"
+   "--enable-ocamlfind"
+   "--enable-ide"]
   [make "-j%{jobs}%" "ide"]
 ]
 
@@ -37,7 +40,7 @@ install: [make "install-ide"]
 
 depends: [
   "conf-autoconf" {build & dev}
-  "ocaml" {>= "4.05.0"}
+  "ocaml" {>= "4.08.0"}
   "ocamlfind" {build}
   "why3" {= version}
   "lablgtk3"

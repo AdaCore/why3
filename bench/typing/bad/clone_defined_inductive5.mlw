@@ -1,0 +1,25 @@
+module M
+
+  use int.Int
+
+  inductive even int =
+  | even_zero : even 0
+  | even_succ : forall n. odd n -> even (n + 1)
+  with odd int =
+  | odd_succ : forall n. even n -> odd (n + 1)
+
+end
+
+module N
+
+  use int.Int
+
+  inductive even int =
+  | even_zero : even 0
+  | even_succ : forall n. odd n -> even (n + 1)
+  with odd int =
+  | odd_succ : forall n. even n -> odd (n + 1)
+
+  clone M with predicate even
+
+end

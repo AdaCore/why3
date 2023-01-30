@@ -11,6 +11,8 @@
 open Apron
 
 let man = Polka.manager_alloc_strict ()
+(* let man = Box.manager_alloc () *)
+(* let man = Oct.manager_alloc () *)
 
 type why_var = {
     var_name : string;
@@ -62,6 +64,8 @@ let  bdd_stats () =
 type t = {
     map_state : var_value VarMap.t;
     apron_state : Polka.strict Polka.t Abstract1.t;
+    (* apron_state : Box.t Abstract1.t; *)
+    (* apron_state : Oct.t Abstract1.t; *)
     bdd_state : B.t;
   }
 
@@ -195,11 +199,13 @@ let restrict_environment state (map : var_value VarMap.t) =
     VarMap.fold
       (fun x _ (acc, l1, l2) ->
         (* apron var associated to x *)
-        let v = VarMap.find x state.map_state in
-        match v with
-        | IntValue w -> (VarMap.add x v acc, w::l1, l2)
-        | BoolValue w -> (VarMap.add x v acc, l1, w::l2)
-        | RefValue _ -> (VarMap.add x v acc, l1, l2)
+         try
+           let v = VarMap.find x state.map_state in
+           match v with
+           | IntValue w -> (VarMap.add x v acc, w::l1, l2)
+           | BoolValue w -> (VarMap.add x v acc, l1, w::l2)
+           | RefValue _ -> (VarMap.add x v acc, l1, l2)
+         with Not_found -> (acc,l1,l2) (* may happen because of drop *)
         )
       map (VarMap.empty, [], [])
   in

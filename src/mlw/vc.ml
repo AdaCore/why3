@@ -62,9 +62,9 @@ let model_trace_result_attribute = create_model_trace_attr "result"
 let explicit_result loc attrs ce ity =
   let name = match ce.c_node with
     | Capp (rs, _) ->
-       Format.asprintf "%a'result" Ident.print_decoded rs.rs_name.id_string
+       Format.asprintf "%s'result" rs.rs_name.id_string
     | Cpur (ls, _) ->
-       Format.asprintf "%a'result" Ident.print_decoded ls.ls_name.id_string
+       Format.asprintf "%s'result" ls.ls_name.id_string
     | Cfun _ -> "anonymous'result"
     | Cany -> "any'result"
   in
@@ -1548,7 +1548,7 @@ let rec sp_expr env k rdm dst = match k with
   | Kval (vl, f) ->
       let rd = Mint.find 0 rdm in
       let lost v = if Spv.mem v rd then None else Some v.pv_vs in
-      let sp = sp_exists (Lists.map_filter lost vl) f in
+      let sp = sp_exists (List.filter_map lost vl) f in
       let rd = List.fold_right Spv.remove vl (t_freepvs rd sp) in
       t_true, Mint.singleton 0 (sp, Mpv.empty), rd
   | Kcut f ->

@@ -1,0 +1,14 @@
+
+use int.Int
+use ref.Ref
+
+val x : ref int
+
+let main [@bddinfer] () diverges
+ =
+ x := 0;
+ while !x <= 100 do
+   (* invariant {100 >= x } *)
+   x := !x + 1;
+ done;
+ assert { !x = 101 }

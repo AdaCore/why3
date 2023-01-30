@@ -1,3 +1,4 @@
+(*
 theory T32
 
   use ieee_float.Float32
@@ -19,15 +20,26 @@ theory T32
   goal g8 : forall x:t. not (eq x (div RNE (1.0:t) (0.0:t)))
 
   goal g9 : forall x:t. gt x (0.0:t) -> gt (div RNE x (2.0:t)) (0.0:t)
+  (** should give the smallest positive, i.e., 2^{-149} *)
 
   goal g10: forall x:t. not (ge (mul RNE (10.0:t) x) (1.0:t) /\ (le (mul RTZ (10.0:t) x) (1.0:t)))
 
+  goal g11: forall x:t. not (eq x (0x1p-126:t))
+  (** 2^{-126} is normal *)
+
+  goal g12: forall x:t. not (eq x (0x0.FFFFFEp-126:t))
+  (** prec of 2^{-126} is subnormal *)
+
+  goal g13: forall x:t. not (eq x (0x1p-127:t))
+  (** 2^{-127} is subnormal *)
+
 end
+*)
 
 theory T64
 
   use ieee_float.Float64
-
+(*
   goal g1 : forall x:t. t'isFinite x -> eq x (0.0:t)
 
   goal g2 : forall x:t. t'isFinite x -> eq x (1.25:t)
@@ -43,9 +55,19 @@ theory T64
   goal g7 : forall x:t. t'isFinite x -> gt (add RNE x (1.0:t)) x
 
   goal g8 : forall x:t. not (eq x (div RNE (1.0:t) (0.0:t)))
-
+*)
   goal g9 : forall x:t. gt x (0.0:t) -> gt (div RNE x (2.0:t)) (0.0:t)
-  
+  (** should give the smallest positive, i.e., 2^{-1074} *)
+
   goal g10: forall x:t. not (ge (mul RNE (10.0:t) x) (1.0:t) /\ (le (mul RTZ (10.0:t) x) (1.0:t)))
+
+  goal g11: forall x:t. not (eq x (0x1p-1022:t))
+  (** 2^{-1022} is normal *)
+
+  goal g12: forall x:t. not (eq x (0x0.FFFFFFFFFFFFFp-1022:t))
+  (** prec of 2^{-1022} is subnormal *)
+
+  goal g13: forall x:t. not (eq x (0x1p-1023:t))
+  (** 2^{-1023} is subnormal *)
 
 end

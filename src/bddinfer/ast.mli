@@ -138,6 +138,9 @@ type statement_node = private
     | Sletin of Abstract.why_var * Abstract.var_value * expression * statement
     (** first argument is the bound variable, second argument is a fresh
        abstract value to be used for interpretation *)
+    | Sdrop of Abstract.why_var * statement
+    (** remove given var from the given statement *)
+    | Sbreak
 
 and statement = private {
     stmt_tag : string;
@@ -183,6 +186,12 @@ val s_havoc : string -> var_type Abstract.VarMap.t -> condition -> statement
 val s_let_in : string -> var_type -> Abstract.why_var -> expression -> statement -> statement
 (** [s_let_in t ty v e s] builds the local binding statement [let v:ty
    = e in s], with tag [t].  *)
+
+val s_drop : string -> Abstract.why_var -> statement -> statement
+(** [s_drop t v s] builds the drop statement [drop v in s], with tag [t].  *)
+
+val s_break : string -> statement
+(** [s_break] creates the break statement. *)
 
 
 type fun_kind = private

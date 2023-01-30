@@ -1,0 +1,30 @@
+module M
+
+  use int.Int
+
+  type t 'a = Nil | Cons 'a (int -> t 'a)
+
+  let rec height_0 (xs : t 'a) : int
+    diverges
+  =
+    match xs with
+    | Nil -> 0
+    | Cons _ g -> height_0 (g 0)
+    end
+
+end
+
+module N
+
+  use int.Int
+
+  type t 'a = Nil | Cons 'a (int -> t 'a)
+
+  clone M with type t
+
+  let f (xs : t 'a)
+    diverges
+  =
+    height_0 xs + 42
+
+end

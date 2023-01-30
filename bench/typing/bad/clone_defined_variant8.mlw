@@ -1,0 +1,17 @@
+module M
+
+  type t =
+    | A string int
+    | B int real
+
+end
+
+module N
+
+  type t =
+    | A string (x : int)
+    | B (x : int) real
+
+  clone M with type t
+
+end
