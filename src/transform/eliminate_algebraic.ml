@@ -375,8 +375,8 @@ let kept_no_case used state = function
 let add_axioms used (state,task) ((ts,csl) as d) =
   let ty = ty_app ts (List.map ty_var ts.ts_args) in
   if kept_no_case used state d then
-    (* for kept enums and rec, we still use the selector function, but always
-       use the non-encoded projections and constructors *)
+    (* for kept enums and records, we still use the selector function, but
+       always use the non-encoded projections and constructors *)
     let state =
       let fold_c state (c, pjs) =
         let pjs = List.map Opt.get pjs in
@@ -432,15 +432,27 @@ let add_tags mts (state,task) (ts,csl) =
     let state = { state with inf_ts = Sts.add ts state.inf_ts } in
     state, add_meta task meta_infinite [MAts ts]
 
+let has_nested_use sts csl =
+  let check_c (c, _) =
+    let check_arg ty = match ty.ty_node with
+    | Tyapp (_, tl) -> List.exists (ty_s_any (Fun.flip Sts.mem sts)) tl
+    | Tyvar _ -> false
+    in
+    List.exists check_arg c.ls_args
+  in
+  List.exists check_c csl
+
 let comp t (state,task) = match t.task_decl.td_node with
   | Decl ({ d_node = Ddata dl } as d) ->
       let used = get_used_syms_decl d in
-      let fold_keep_m state = function
-        | {ts_args = []} as ts, _ as d when state.keep_m && not (kept_no_case used state d) ->
-          { state with kept_m = Mts.add ts (Sty.singleton (ty_app ts [])) state.kept_m }
-        | _ -> state
+      let sts = List.fold_left (fun acc (ts, _) -> Sts.add ts acc) Sts.empty dl in
+      let fold_kept_m state (ts,csl as d) =
+          if has_nested_use sts csl then { state with kept_m = Mts.remove ts state.kept_m }
+          else if ts.ts_args = [] && state.keep_m && not (kept_no_case used state d) then
+            { state with kept_m = Mts.add ts (Sty.singleton (ty_app ts [])) state.kept_m }
+          else state
       in
-      let state = List.fold_left fold_keep_m state dl in
+      let state = List.fold_left fold_kept_m state dl in
       (* add projections to records with keep_recs *)
       let conv_t ((ts, csl) as d) =
         (* complete_projections can only be called on records or enums, so it
