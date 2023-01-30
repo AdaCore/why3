@@ -83,13 +83,16 @@ run () {
   else
     prover="$1,counterexamples"
   fi
+  # one may add reduction_cont_size,stack_trace, in
+  # the debug flags below to test cont_invariant in reduction engine
+  # (note that stack trace may be more detailed with bytecode)
   ($dir/../bin/why3"$suffix" prove -a split_vc -P $prover\
       --stepslimit=$steps --timelimit=10 \
       --rac-steplimit=$steps --rac-timelimit=10 \
       --check-ce --rac-prover="$1" --ce-log-verbosity=5 \
       --library="$2" "${file_path}.mlw" \
       --debug=check-ce-categorization${debug_vc_sp} \
-    || [ $? -eq 2 ]) 2>&1 \
+    || true) 2>&1 \
     | remove_solver_details \
     > "$f.out"
   str_out=$(cat "$f.out")
@@ -175,10 +178,10 @@ end=$(date +%s)
 runtime=$((end-start))
 if [ "$success" = true ]; then
   echo "check-ce-bench: success (runtime = $runtime seconds)"
-  exit 0
+  exitvalue=0
 else
   printf "\ncheck-ce-bench: failed for the following files (runtime = $runtime seconds)\n$failed\n"
-  exit 1
+  exitvalue=1
 fi
 
 # Check the reproduction of the experiments by Petiot (2018).
