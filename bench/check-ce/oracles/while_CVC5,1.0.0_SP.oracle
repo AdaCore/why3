@@ -7,75 +7,46 @@ Sub-goal Loop variant decrease of goal f'vc.
 Prover result is: Valid.
 
 <check-ce-categorization>Categorizations of models:
-- Selected model 0: SW
+- Checked model 0: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/while.mlw", line 10, characters 16-32)
-- Checked model 1: SW
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to ref at "bench/check-ce/while.mlw", line 5, characters 15-16)
+- Selected model 1: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/while.mlw", line 10, characters 16-32)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to ref at "bench/check-ce/while.mlw", line 5, characters 15-16)
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Sub-goal Loop invariant preservation of goal f'vc.
 Prover result is: Unknown or time/memory/step limit.
-The contracts of some function or loop are too weak, for example during the
-  following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
+The following counterexample model could not be verified
+  (abstract RAC terminated because missing value for return value of call to ref at "bench/check-ce/while.mlw", line 5, characters 15-16):
 File while.mlw:
   Line 4:
     z = 0
-    z = 0
-    Execution of main function `f` with env:
-      z = 0
-      zero = 0
-      one = 1
   Line 5:
-    Giant-step execution of function `ref` with args:
-      contents = 0
-    result of `ref` = {contents= 0}
+    result of call at line 5, characters 15-16 = ((as refqtmk (ref Int)) 0)
+    x1 = ((as refqtmk (ref Int)) 0)
   Line 6:
-    Giant-step execution of function `ref` with args:
-      contents = 0
-    result of `ref` = {contents= 0}
+    result of call at line 6, characters 15-16 = ((as refqtmk (ref Int)) 0)
+    x2 = ((as refqtmk (ref Int)) 0)
   Line 7:
-    Giant-step execution of function `ref` with args:
-      contents = 0
-    result of `ref` = {contents= 0}
+    i = ((as refqtmk (ref Int)) 0)
+    result of call at line 7, characters 14-15 = ((as refqtmk (ref Int)) 0)
   Line 8:
-    Giant-step iteration of loop
-    x1 = {contents= (-2)}
-    x2 = {contents= 0}
-    i = {contents= 0}
-    Normal execution of function `contents` with args:
-      arg = {contents= 0}
-    Normal execution of function `(<)` with args:
-      _ = 0
-      _ = 2
-    Normal iteration of loop
-  Line 11:
-    Normal execution of function `contents` with args:
-      arg = {contents= 0}
-    Normal execution of function `(=)` with args:
-      x = 0
-      y = 0
-  Line 12:
-    Normal execution of function `contents` with args:
-      arg = {contents= (-2)}
-    Normal execution of function `(+)` with args:
-      _ = (-2)
-      _ = 1
-  Line 15:
-    Normal execution of function `contents` with args:
-      arg = {contents= 0}
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 1
+    [before iteration] i = 0
+    result of call at line 8, characters 8-13 = true
+    [before iteration] x1 = -2
+    [before iteration] x2 = 0
   Line 10:
-    Property failure at loop invariant preservation with:
-      x1 = {contents= (-1)}
-      i = {contents= 1}
+    [current iteration] i = 1
+    [current iteration] x1 = -1
+  Line 11:
+    result of call at line 11, characters 7-12 = true
+  Line 12:
+    result of call at line 12, characters 12-18 = -1
+    [current iteration] x1 = -1
+  Line 14:
+    result of call at line 14, characters 12-18 = 0
+    [current iteration] x2 = 0
+  Line 15:
+    [current iteration] i = 1
+    result of call at line 15, characters 9-14 = 1
 

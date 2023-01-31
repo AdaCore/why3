@@ -205,45 +205,112 @@ File ref_ex.mlw:
       y = {contents= (-1)}
 
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: BAD_CE
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/ref_ex.mlw", line 35, characters 2-8)
-  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/ref_ex.mlw", line 38, characters 14-36)
-- Selected model 1: BAD_CE
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/ref_ex.mlw", line 35, characters 2-8)
-  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/ref_ex.mlw", line 38, characters 14-36)
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
 File "bench/check-ce/ref_ex.mlw", line 38, characters 14-36:
 Sub-goal Loop invariant init of goal test_loop'vc.
 Prover result is: Unknown or time/memory/step limit.
-Sorry, we don't have a good counterexample for you :(
-
+The following counterexample model could not be verified
+  (both RAC terminated because missing value for parameter `x`):
+File ref_ex.mlw:
+  Line 21:
+    y = -2
+  Line 23:
+    x23 = ((as refqtmk (ref Int)) 0)
+  Line 24:
+    old x = 0
+    x = 0
+  Line 31:
+    x = ((as refqtmk (ref Int)) 0)
+  Line 35:
+    x = 0
+  Line 38:
+    x at L = 0
+    x at M = 0
+    x = 0
 
 File "bench/check-ce/ref_ex.mlw", line 39, characters 12-14:
 Sub-goal Loop variant decrease of goal test_loop'vc.
 Prover result is: Valid.
 
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: BAD_CE
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/ref_ex.mlw", line 35, characters 2-8)
-  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/ref_ex.mlw", line 38, characters 14-36)
-- Selected model 1: BAD_CE
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/ref_ex.mlw", line 35, characters 2-8)
-  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/ref_ex.mlw", line 38, characters 14-36)
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
 File "bench/check-ce/ref_ex.mlw", line 38, characters 14-36:
 Sub-goal Loop invariant preservation of goal test_loop'vc.
 Prover result is: Unknown or time/memory/step limit.
-Sorry, we don't have a good counterexample for you :(
-
+The following counterexample model could not be verified
+  (both RAC terminated because missing value for parameter `x`):
+File ref.mlw:
+  Line 18:
+    x = 1
+  Line 20:
+    x = 0
+File ref_ex.mlw:
+  Line 21:
+    y = -2
+  Line 23:
+    x23 = ((as refqtmk (ref Int)) 0)
+  Line 24:
+    old x = 0
+    x = 0
+  Line 31:
+    x = ((as refqtmk (ref Int)) 0)
+  Line 35:
+    x = 0
+  Line 37:
+    result of call at line 37, characters 8-14 = true
+    result of call at line 37, characters 8-10 = 1
+    [before iteration] x = 1
+  Line 38:
+    x at L = 0
+    x at M = 0
+    [current iteration] x = 0
+  Line 40:
+    result of call at line 40, characters 9-15 = 0
+    result of call at line 40, characters 9-11 = 1
+    [current iteration] x = 0
 
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: BAD_CE
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/ref_ex.mlw", line 35, characters 2-8)
-  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/ref_ex.mlw", line 38, characters 14-36)
-- Selected model 1: BAD_CE
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/ref_ex.mlw", line 35, characters 2-8)
-  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/ref_ex.mlw", line 38, characters 14-36)
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
 File "bench/check-ce/ref_ex.mlw", line 32, characters 12-23:
 Sub-goal Postcondition of goal test_loop'vc.
 Prover result is: Unknown or time/memory/step limit.
-Sorry, we don't have a good counterexample for you :(
-
+The following counterexample model could not be verified
+  (both RAC terminated because missing value for parameter `x`):
+File ref.mlw:
+  Line 18:
+    x = 0
+File ref_ex.mlw:
+  Line 21:
+    y = -3
+  Line 23:
+    x23 = ((as refqtmk (ref Int)) 0)
+  Line 24:
+    old x = 0
+    x = -1
+  Line 31:
+    x = ((as refqtmk (ref Int)) 0)
+  Line 32:
+    old x = 0
+    x = 0
+  Line 35:
+    x = -1
+  Line 37:
+    result of call at line 37, characters 8-14 = false
+    result of call at line 37, characters 8-10 = 0
+    x = 0
 

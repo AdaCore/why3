@@ -1,0 +1,37 @@
+
+module M1
+
+use int.Int
+
+type t = { mutable c : int }
+
+let a = { c = 0 }
+
+let b = { c = 0 }
+
+let f () =
+  a.c <- -1;
+  a.c <- 1;
+  b.c <- 2;
+  while b.c < 10 do
+    variant { 10 - b.c }
+    invariant { b.c - a.c < 5 }
+    b.c <- b.c + a.c;
+  done
+
+end
+
+module M2
+
+use int.Int
+
+type t = { mutable c : int }
+
+let g (a: t)
+  ensures { a.c = old a.c + 1 }
+=
+  label X in
+  if a.c <> 10 then a.c <- a.c + 1;
+  assert { a.c = a.c at X }
+
+end

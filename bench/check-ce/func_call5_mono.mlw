@@ -1,0 +1,22 @@
+
+
+use int.Int
+
+type t = { mutable c : int }
+
+let g1 (y: int)
+  requires { y > 0 }
+  ensures { result.c >= y }
+= { c = y }
+
+let f1 (x : int)
+  requires { x > 0 }
+=
+  let z = g1 x in
+  assert { z.c = x }
+
+let g2 (y: int) = { c = y + 1 }
+
+let f2 (x: int) =
+  let z = g2 x in
+  assert { z.c = x }

@@ -25,6 +25,7 @@ File func_call5.mlw:
   Line 11:
     x = 1
   Line 14:
+    result of call at line 14, characters 10-14 = ((as refqtmk (ref Int)) 2)
     z = 2
   Line 15:
     x = 1
@@ -33,10 +34,10 @@ File func_call5.mlw:
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
-  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to g2 at "bench/check-ce/func_call5.mlw", line 20, characters 10-14)
 - Checked model 1: NC
   - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
-  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to g2 at "bench/check-ce/func_call5.mlw", line 20, characters 10-14)
 File "bench/check-ce/func_call5.mlw", line 21, characters 11-17:
 Sub-goal Assertion of goal f2'vc.
 Prover result is: Unknown or time/memory/step limit.

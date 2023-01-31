@@ -1,0 +1,25 @@
+
+use int.Int
+
+type t = { mutable c : int }
+
+let f () diverges =
+  let x = { c = 0 } in
+  [@loop1]
+  while x.c < 10 do x.c <- x.c + 3 done;
+  [@loop2]
+  while x.c < 100 do x.c <- x.c + 7 done;
+  [@loop3]
+  while x.c < 1000 do x.c <- x.c + 10; assert { x.c < 200 } done
+
+
+
+val h (y:t) : unit
+  writes { y.c }
+  ensures { y.c > old y.c }
+
+let g () =
+  let x = { c = 0 } in
+  [@call1] h x;
+  [@call2] h x;
+  assert { x.c < 200 }
