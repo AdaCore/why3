@@ -315,8 +315,15 @@ The following counterexample model could not be verified
 File bv.mlw:
   Line 9:
     pow2 : int -> int = [|_ => 0|]
+    pow2 : int -> int = [|_ => 0|]
 File ieee_float.mlw:
   Line 194:
+    of_int :
+      mode
+      ->
+      int
+      ->
+      t = fun bOUND_VARIABLE_445 bOUND_VARIABLE_446 -> +0
     of_int :
       mode
       ->
@@ -330,15 +337,25 @@ File ieee_float.mlw:
       t
       ->
       int = fun bOUND_VARIABLE_459 bOUND_VARIABLE_460 -> 0
+    to_int :
+      mode
+      ->
+      t
+      ->
+      int = fun bOUND_VARIABLE_459 bOUND_VARIABLE_460 -> 0
   Line 223:
     max_real : real = 0.0
+    max_real : real = 0.0
   Line 224:
+    max_int : int = 0
     max_int : int = 0
 File real.mlw:
   Line 203:
     sqrt : real -> real = [|_ => 0.0|]
+    sqrt : real -> real = [|_ => 0.0|]
 File floats.mlw:
   Line 19:
+    x : t = ∞
     x : t = ∞
 
 <check-ce-categorization>Categorizations of models:
@@ -876,8 +893,15 @@ The following counterexample model could not be verified
 File bv.mlw:
   Line 9:
     pow2 : int -> int = [|_ => 0|]
+    pow2 : int -> int = [|_ => 0|]
 File ieee_float.mlw:
   Line 194:
+    of_int :
+      mode
+      ->
+      int
+      ->
+      t1 = fun bOUND_VARIABLE_445 bOUND_VARIABLE_446 -> +0
     of_int :
       mode
       ->
@@ -891,15 +915,25 @@ File ieee_float.mlw:
       t1
       ->
       int = fun bOUND_VARIABLE_459 bOUND_VARIABLE_460 -> 0
+    to_int :
+      mode
+      ->
+      t1
+      ->
+      int = fun bOUND_VARIABLE_459 bOUND_VARIABLE_460 -> 0
   Line 223:
     max_real : real = 0.0
+    max_real : real = 0.0
   Line 224:
+    max_int : int = 0
     max_int : int = 0
 File real.mlw:
   Line 203:
     sqrt : real -> real = [|_ => 0.0|]
+    sqrt : real -> real = [|_ => 0.0|]
 File floats.mlw:
   Line 55:
+    x : t1 = ∞
     x : t1 = ∞
 
 <check-ce-categorization>Categorizations of models:

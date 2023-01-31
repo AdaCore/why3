@@ -12,8 +12,31 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_4274 bOUND_VARIABLE_4275 -> 0
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_4274 bOUND_VARIABLE_4275 -> 0
+    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
   Line 20:
+    mixfix [] :
+      array
+      basic_record
+      ->
+      int
+      ->
+      basic_record = fun _arg_12 _arg_2 ->
+                      {Array_records.flag = true;
+                       Array_records.first_value = 3;
+                       Array_records.second_value = 5}
     mixfix [] :
       array
       basic_record
@@ -37,15 +60,31 @@ File array_records_poly.mlw:
                       {Array_records.flag = true;
                        Array_records.first_value = 3;
                        Array_records.second_value = 5}
+    basic_record'mk :
+      bool
+      ->
+      int
+      ->
+      int
+      ->
+      basic_record = fun _arg_12 _arg_2 _arg_3 ->
+                      {Array_records.flag = true;
+                       Array_records.first_value = 3;
+                       Array_records.second_value = 5}
   Line 16:
+    flag : basic_record -> bool = [|_ => true|]
     flag : basic_record -> bool = [|_ => true|]
   Line 17:
     first_val : basic_record -> int = [|_ => 3|]
+    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
+    sec_val : basic_record -> int = [|_ => 5|]
     sec_val : basic_record -> int = [|_ => 5|]
   Line 23:
     i : int = -1
+    i : int = -1
   Line 27:
+    i : int = -1
     i : int = -1
 
 <check-ce-categorization>Categorizations of models:
@@ -62,8 +101,31 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_4287 bOUND_VARIABLE_4288 -> 0
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_4287 bOUND_VARIABLE_4288 -> 0
+    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
   Line 20:
+    mixfix [] :
+      array
+      basic_record
+      ->
+      int
+      ->
+      basic_record = fun _arg_14 _arg_2 ->
+                      {Array_records.flag = true;
+                       Array_records.first_value = 3;
+                       Array_records.second_value = 5}
     mixfix [] :
       array
       basic_record
@@ -87,17 +149,38 @@ File array_records_poly.mlw:
                       {Array_records.flag = true;
                        Array_records.first_value = 3;
                        Array_records.second_value = 5}
+    basic_record'mk :
+      bool
+      ->
+      int
+      ->
+      int
+      ->
+      basic_record = fun _arg_14 _arg_2 _arg_3 ->
+                      {Array_records.flag = true;
+                       Array_records.first_value = 3;
+                       Array_records.second_value = 5}
   Line 16:
+    flag : basic_record -> bool = [|_ => true|]
     flag : basic_record -> bool = [|_ => true|]
   Line 17:
     first_val : basic_record -> int = [|_ => 3|]
+    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
+    sec_val : basic_record -> int = [|_ => 5|]
     sec_val : basic_record -> int = [|_ => 5|]
   Line 23:
     i : int = -1
+    i : int = -1
   Line 27:
     i : int = -1
+    i : int = -1
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
@@ -117,8 +200,31 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_4307 bOUND_VARIABLE_4308 -> 0
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_4307 bOUND_VARIABLE_4308 -> 0
+    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
   Line 20:
+    mixfix [] :
+      array
+      basic_record
+      ->
+      int
+      ->
+      basic_record = fun _arg_16 _arg_2 ->
+                      {Array_records.flag = true;
+                       Array_records.first_value = 3;
+                       Array_records.second_value = 5}
     mixfix [] :
       array
       basic_record
@@ -142,26 +248,56 @@ File array_records_poly.mlw:
                       {Array_records.flag = true;
                        Array_records.first_value = 3;
                        Array_records.second_value = 5}
+    basic_record'mk :
+      bool
+      ->
+      int
+      ->
+      int
+      ->
+      basic_record = fun _arg_16 _arg_2 _arg_3 ->
+                      {Array_records.flag = true;
+                       Array_records.first_value = 3;
+                       Array_records.second_value = 5}
   Line 16:
+    flag : basic_record -> bool = [|_ => true|]
     flag : basic_record -> bool = [|_ => true|]
   Line 17:
     first_val : basic_record -> int = [|_ => 3|]
+    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
+    sec_val : basic_record -> int = [|_ => 5|]
     sec_val : basic_record -> int = [|_ => 5|]
   Line 23:
     i : int = -1
+    i : int = -1
   Line 27:
+    i : int = -1
     i : int = -1
     result of call at line 27, characters 13-81 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 5}
+    result of call at line 27, characters 13-81 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 5}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 5}
+    result of call at line 27, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
@@ -196,9 +332,47 @@ File array.mlw:
                        (Array_records.second_value x) = 0 /\
                        (Array_records.first_value x) = 2 /\
                        (Array_records.flag x) = true|]|]
+    elts :
+      array
+      basic_record
+      ->
+      int
+      ->
+      basic_record = [|_ =>
+                       [|-1 =>
+                         {Array_records.flag = true;
+                          Array_records.first_value = 2;
+                          Array_records.second_value = 0};
+                       _ => epsilon x.
+                       (Array_records.second_value x) = 0 /\
+                       (Array_records.first_value x) = 2 /\
+                       (Array_records.flag x) = true|]|]
   Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_705 bOUND_VARIABLE_706 -> 0
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_705 bOUND_VARIABLE_706 -> 0
+    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
   Line 20:
+    mixfix [] :
+      array
+      basic_record
+      ->
+      int
+      ->
+      basic_record = fun _arg_17 _arg_2 ->
+                      {Array_records.flag = true;
+                       Array_records.first_value = 2;
+                       Array_records.second_value = 0}
     mixfix [] :
       array
       basic_record
@@ -212,28 +386,47 @@ File array.mlw:
 File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
+    first_val : basic_record -> int = [|_ => 2|]
     first_val : basic_record -> int = [|_ => 2|]
   Line 18:
     sec_val : basic_record -> int = [|_ => 0|]
+    sec_val : basic_record -> int = [|_ => 0|]
   Line 23:
+    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 2;
                       Array_records.second_value = 0}
+    result of call at line 27, characters 13-81 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 2;
+                      Array_records.second_value = 0}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 2;
                       Array_records.second_value = 0}
+    result of call at line 27, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 2;
+                      Array_records.second_value = 0}
+    result of call at line 27, characters 45-61 : int = 2
     result of call at line 27, characters 45-61 : int = 2
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 2;
                       Array_records.second_value = 0}
+    result of call at line 27, characters 45-49 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 2;
+                      Array_records.second_value = 0}
   Line 28:
+    i : int = -1
     i : int = -1
 
 <check-ce-categorization>Categorizations of models:
@@ -265,9 +458,47 @@ File array.mlw:
                        (Array_records.second_value x) = 0 /\
                        (Array_records.first_value x) = 2 /\
                        (Array_records.flag x) = true|]|]
+    elts :
+      array
+      basic_record
+      ->
+      int
+      ->
+      basic_record = [|_ =>
+                       [|-1 =>
+                         {Array_records.flag = true;
+                          Array_records.first_value = 2;
+                          Array_records.second_value = 0};
+                       _ => epsilon x.
+                       (Array_records.second_value x) = 0 /\
+                       (Array_records.first_value x) = 2 /\
+                       (Array_records.flag x) = true|]|]
   Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_723 bOUND_VARIABLE_724 -> 0
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_723 bOUND_VARIABLE_724 -> 0
+    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
   Line 20:
+    mixfix [] :
+      array
+      basic_record
+      ->
+      int
+      ->
+      basic_record = fun _arg_19 _arg_21 ->
+                      {Array_records.flag = true;
+                       Array_records.first_value = 2;
+                       Array_records.second_value = 0}
     mixfix [] :
       array
       basic_record
@@ -281,30 +512,54 @@ File array.mlw:
 File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
+    first_val : basic_record -> int = [|_ => 2|]
     first_val : basic_record -> int = [|_ => 2|]
   Line 18:
     sec_val : basic_record -> int = [|_ => 0|]
+    sec_val : basic_record -> int = [|_ => 0|]
   Line 23:
+    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 2;
                       Array_records.second_value = 0}
+    result of call at line 27, characters 13-81 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 2;
+                      Array_records.second_value = 0}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 2;
                       Array_records.second_value = 0}
+    result of call at line 27, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 2;
+                      Array_records.second_value = 0}
     result of call at line 27, characters 45-61 : int = 2
+    result of call at line 27, characters 45-61 : int = 2
+    result of call at line 27, characters 45-49 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 2;
+                      Array_records.second_value = 0}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 2;
                       Array_records.second_value = 0}
   Line 28:
     i : int = -1
+    i : int = -1
     result of call at line 28, characters 64-81 : int = 0
+    result of call at line 28, characters 64-81 : int = 0
+    result of call at line 28, characters 64-68 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 2;
+                      Array_records.second_value = 0}
     result of call at line 28, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 2;
@@ -339,9 +594,47 @@ File array.mlw:
                        (Array_records.second_value x) = 0 /\
                        (Array_records.first_value x) = 2 /\
                        (Array_records.flag x) = true|]|]
+    elts :
+      array
+      basic_record
+      ->
+      int
+      ->
+      basic_record = [|_ =>
+                       [|-1 =>
+                         {Array_records.flag = true;
+                          Array_records.first_value = 2;
+                          Array_records.second_value = 0};
+                       _ => epsilon x.
+                       (Array_records.second_value x) = 0 /\
+                       (Array_records.first_value x) = 2 /\
+                       (Array_records.flag x) = true|]|]
   Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_750 bOUND_VARIABLE_751 -> 0
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_750 bOUND_VARIABLE_751 -> 0
+    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
   Line 20:
+    mixfix [] :
+      array
+      basic_record
+      ->
+      int
+      ->
+      basic_record = fun _arg_111 _arg_22 ->
+                      {Array_records.flag = true;
+                       Array_records.first_value = 2;
+                       Array_records.second_value = 0}
     mixfix [] :
       array
       basic_record
@@ -355,39 +648,72 @@ File array.mlw:
 File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
+    first_val : basic_record -> int = [|_ => 2|]
     first_val : basic_record -> int = [|_ => 2|]
   Line 18:
     sec_val : basic_record -> int = [|_ => 0|]
+    sec_val : basic_record -> int = [|_ => 0|]
   Line 23:
+    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 2;
                       Array_records.second_value = 0}
+    result of call at line 27, characters 13-81 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 2;
+                      Array_records.second_value = 0}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 2;
                       Array_records.second_value = 0}
+    result of call at line 27, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 2;
+                      Array_records.second_value = 0}
     result of call at line 27, characters 45-61 : int = 2
+    result of call at line 27, characters 45-61 : int = 2
+    result of call at line 27, characters 45-49 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 2;
+                      Array_records.second_value = 0}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 2;
                       Array_records.second_value = 0}
   Line 28:
     i : int = -1
+    i : int = -1
+    result of call at line 28, characters 13-82 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 2;
+                      Array_records.second_value = 0}
     result of call at line 28, characters 13-82 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 2;
                       Array_records.second_value = 0}
     result of call at line 28, characters 21-30 : bool = true
+    result of call at line 28, characters 21-30 : bool = true
+    result of call at line 28, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 2;
+                      Array_records.second_value = 0}
     result of call at line 28, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 2;
                       Array_records.second_value = 0}
     result of call at line 28, characters 64-81 : int = 0
+    result of call at line 28, characters 64-81 : int = 0
+    result of call at line 28, characters 64-68 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 2;
+                      Array_records.second_value = 0}
     result of call at line 28, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 2;
@@ -407,11 +733,33 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_5139 bOUND_VARIABLE_5140 -> 0
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_5139 bOUND_VARIABLE_5140 -> 0
+    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
+    first_val :
+      basic_record
+      ->
+      int = fun _arg_115 ->
+             if {Array_records.flag = true;
+                 Array_records.first_value = 42;
+                 Array_records.second_value = 69} = _arg_115
+             then 42 else 3
     first_val :
       basic_record
       ->
@@ -433,19 +781,46 @@ File array_records_poly.mlw:
                       Array_records.first_value = 3;
                       Array_records.second_value = 69} = _arg_115
                   then 69 else 5
+    sec_val :
+      basic_record
+      ->
+      int = fun _arg_115 ->
+             if {Array_records.flag = true;
+                 Array_records.first_value = 42;
+                 Array_records.second_value = 69} = _arg_115
+             then 69
+             else if {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69} = _arg_115
+                  then 69 else 5
   Line 23:
+    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
+    result of call at line 27, characters 13-81 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 5}
+    result of call at line 27, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
@@ -455,17 +830,32 @@ File array_records_poly.mlw:
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 42;
                       Array_records.second_value = 69}
+    result of call at line 28, characters 13-82 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69}
+    result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
+    result of call at line 28, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69}
+    result of call at line 28, characters 64-81 : int = 69
     result of call at line 28, characters 64-81 : int = 69
     result of call at line 28, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
+    result of call at line 28, characters 64-68 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69}
   Line 29:
+    i : int = -1
     i : int = -1
 
 <check-ce-categorization>Categorizations of models:
@@ -482,11 +872,33 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_5160 bOUND_VARIABLE_5161 -> 0
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_5160 bOUND_VARIABLE_5161 -> 0
+    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
+    first_val :
+      basic_record
+      ->
+      int = fun _arg_119 ->
+             if {Array_records.flag = true;
+                 Array_records.first_value = 42;
+                 Array_records.second_value = 69} = _arg_119
+             then 42 else 3
     first_val :
       basic_record
       ->
@@ -508,19 +920,46 @@ File array_records_poly.mlw:
                       Array_records.first_value = 3;
                       Array_records.second_value = 69} = _arg_119
                   then 69 else 5
+    sec_val :
+      basic_record
+      ->
+      int = fun _arg_119 ->
+             if {Array_records.flag = true;
+                 Array_records.first_value = 42;
+                 Array_records.second_value = 69} = _arg_119
+             then 69
+             else if {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69} = _arg_119
+                  then 69 else 5
   Line 23:
+    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
+    result of call at line 27, characters 13-81 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 5}
+    result of call at line 27, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
@@ -530,19 +969,39 @@ File array_records_poly.mlw:
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 42;
                       Array_records.second_value = 69}
+    result of call at line 28, characters 13-82 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69}
+    result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
+    result of call at line 28, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69}
     result of call at line 28, characters 64-81 : int = 69
+    result of call at line 28, characters 64-81 : int = 69
+    result of call at line 28, characters 64-68 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69}
     result of call at line 28, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
   Line 29:
     i : int = -1
+    i : int = -1
     result of call at line 29, characters 64-81 : int = 69
+    result of call at line 29, characters 64-81 : int = 69
+    result of call at line 29, characters 64-68 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69}
     result of call at line 29, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 42;
@@ -562,11 +1021,33 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_5191 bOUND_VARIABLE_5192 -> 0
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_5191 bOUND_VARIABLE_5192 -> 0
+    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
+    first_val :
+      basic_record
+      ->
+      int = fun _arg_123 ->
+             if {Array_records.flag = true;
+                 Array_records.first_value = 42;
+                 Array_records.second_value = 69} = _arg_123
+             then 42 else 3
     first_val :
       basic_record
       ->
@@ -588,19 +1069,46 @@ File array_records_poly.mlw:
                       Array_records.first_value = 3;
                       Array_records.second_value = 69} = _arg_123
                   then 69 else 5
+    sec_val :
+      basic_record
+      ->
+      int = fun _arg_123 ->
+             if {Array_records.flag = true;
+                 Array_records.first_value = 42;
+                 Array_records.second_value = 69} = _arg_123
+             then 69
+             else if {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69} = _arg_123
+                  then 69 else 5
   Line 23:
+    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
+    result of call at line 27, characters 13-81 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 5}
+    result of call at line 27, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
@@ -610,28 +1118,57 @@ File array_records_poly.mlw:
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 42;
                       Array_records.second_value = 69}
+    result of call at line 28, characters 13-82 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69}
+    result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
+    result of call at line 28, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69}
     result of call at line 28, characters 64-81 : int = 69
+    result of call at line 28, characters 64-81 : int = 69
+    result of call at line 28, characters 64-68 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69}
     result of call at line 28, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
   Line 29:
     i : int = -1
+    i : int = -1
+    result of call at line 29, characters 13-82 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69}
     result of call at line 29, characters 13-82 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 42;
                       Array_records.second_value = 69}
     result of call at line 29, characters 21-30 : bool = true
+    result of call at line 29, characters 21-30 : bool = true
+    result of call at line 29, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69}
     result of call at line 29, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 42;
                       Array_records.second_value = 69}
     result of call at line 29, characters 64-81 : int = 69
+    result of call at line 29, characters 64-81 : int = 69
+    result of call at line 29, characters 64-68 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69}
     result of call at line 29, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 42;
@@ -651,11 +1188,37 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_6049 bOUND_VARIABLE_6050 -> 0
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_6049 bOUND_VARIABLE_6050 -> 0
+    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
+    first_val :
+      basic_record
+      ->
+      int = fun _arg_127 ->
+             if {Array_records.flag = true;
+                 Array_records.first_value = 42;
+                 Array_records.second_value = 69} = _arg_127
+             then 42
+             else if {Array_records.flag = true;
+                      Array_records.first_value = 23;
+                      Array_records.second_value = 69} = _arg_127
+                  then 23 else 3
     first_val :
       basic_record
       ->
@@ -685,19 +1248,50 @@ File array_records_poly.mlw:
                            Array_records.first_value = 23;
                            Array_records.second_value = 69} = _arg_127
                        then 69 else 5
+    sec_val :
+      basic_record
+      ->
+      int = fun _arg_127 ->
+             if {Array_records.flag = true;
+                 Array_records.first_value = 3;
+                 Array_records.second_value = 69} = _arg_127
+             then 69
+             else if {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69} = _arg_127
+                  then 69
+                  else if {Array_records.flag = true;
+                           Array_records.first_value = 23;
+                           Array_records.second_value = 69} = _arg_127
+                       then 69 else 5
   Line 23:
+    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
+    result of call at line 27, characters 13-81 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 5}
+    result of call at line 27, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
@@ -707,12 +1301,26 @@ File array_records_poly.mlw:
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 42;
                       Array_records.second_value = 69}
+    result of call at line 28, characters 13-82 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69}
+    result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
+    result of call at line 28, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69}
     result of call at line 28, characters 64-81 : int = 69
+    result of call at line 28, characters 64-81 : int = 69
+    result of call at line 28, characters 64-68 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69}
     result of call at line 28, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
@@ -722,17 +1330,32 @@ File array_records_poly.mlw:
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 23;
                       Array_records.second_value = 69}
+    result of call at line 29, characters 13-82 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 23;
+                      Array_records.second_value = 69}
+    result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 42;
                       Array_records.second_value = 69}
+    result of call at line 29, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69}
+    result of call at line 29, characters 64-81 : int = 69
     result of call at line 29, characters 64-81 : int = 69
     result of call at line 29, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 42;
                       Array_records.second_value = 69}
+    result of call at line 29, characters 64-68 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69}
   Line 30:
+    i : int = -1
     i : int = -1
 
 <check-ce-categorization>Categorizations of models:
@@ -749,11 +1372,37 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_6074 bOUND_VARIABLE_6075 -> 0
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_6074 bOUND_VARIABLE_6075 -> 0
+    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
+    first_val :
+      basic_record
+      ->
+      int = fun _arg_131 ->
+             if {Array_records.flag = true;
+                 Array_records.first_value = 42;
+                 Array_records.second_value = 69} = _arg_131
+             then 42
+             else if {Array_records.flag = true;
+                      Array_records.first_value = 23;
+                      Array_records.second_value = 69} = _arg_131
+                  then 23 else 3
     first_val :
       basic_record
       ->
@@ -783,19 +1432,50 @@ File array_records_poly.mlw:
                            Array_records.first_value = 23;
                            Array_records.second_value = 69} = _arg_131
                        then 69 else 5
+    sec_val :
+      basic_record
+      ->
+      int = fun _arg_131 ->
+             if {Array_records.flag = true;
+                 Array_records.first_value = 3;
+                 Array_records.second_value = 69} = _arg_131
+             then 69
+             else if {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69} = _arg_131
+                  then 69
+                  else if {Array_records.flag = true;
+                           Array_records.first_value = 23;
+                           Array_records.second_value = 69} = _arg_131
+                       then 69 else 5
   Line 23:
+    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
+    result of call at line 27, characters 13-81 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 5}
+    result of call at line 27, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
@@ -805,12 +1485,26 @@ File array_records_poly.mlw:
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 42;
                       Array_records.second_value = 69}
+    result of call at line 28, characters 13-82 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69}
+    result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
+    result of call at line 28, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69}
     result of call at line 28, characters 64-81 : int = 69
+    result of call at line 28, characters 64-81 : int = 69
+    result of call at line 28, characters 64-68 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69}
     result of call at line 28, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
@@ -820,19 +1514,39 @@ File array_records_poly.mlw:
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 23;
                       Array_records.second_value = 69}
+    result of call at line 29, characters 13-82 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 23;
+                      Array_records.second_value = 69}
+    result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 42;
                       Array_records.second_value = 69}
+    result of call at line 29, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69}
     result of call at line 29, characters 64-81 : int = 69
+    result of call at line 29, characters 64-81 : int = 69
+    result of call at line 29, characters 64-68 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69}
     result of call at line 29, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 42;
                       Array_records.second_value = 69}
   Line 30:
     i : int = -1
+    i : int = -1
     result of call at line 30, characters 74-91 : int = 69
+    result of call at line 30, characters 74-91 : int = 69
+    result of call at line 30, characters 74-78 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 23;
+                      Array_records.second_value = 69}
     result of call at line 30, characters 74-78 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 23;
@@ -852,11 +1566,37 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
   Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_6103 bOUND_VARIABLE_6104 -> 0
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_6103 bOUND_VARIABLE_6104 -> 0
+    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
+    first_val :
+      basic_record
+      ->
+      int = fun _arg_135 ->
+             if {Array_records.flag = true;
+                 Array_records.first_value = 42;
+                 Array_records.second_value = 69} = _arg_135
+             then 42
+             else if {Array_records.flag = true;
+                      Array_records.first_value = 23;
+                      Array_records.second_value = 69} = _arg_135
+                  then 23 else 3
     first_val :
       basic_record
       ->
@@ -886,19 +1626,50 @@ File array_records_poly.mlw:
                            Array_records.first_value = 23;
                            Array_records.second_value = 69} = _arg_135
                        then 69 else 5
+    sec_val :
+      basic_record
+      ->
+      int = fun _arg_135 ->
+             if {Array_records.flag = true;
+                 Array_records.first_value = 3;
+                 Array_records.second_value = 69} = _arg_135
+             then 69
+             else if {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69} = _arg_135
+                  then 69
+                  else if {Array_records.flag = true;
+                           Array_records.first_value = 23;
+                           Array_records.second_value = 69} = _arg_135
+                       then 69 else 5
   Line 23:
+    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
+    result of call at line 27, characters 13-81 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 5}
+    result of call at line 27, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
@@ -908,12 +1679,26 @@ File array_records_poly.mlw:
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 42;
                       Array_records.second_value = 69}
+    result of call at line 28, characters 13-82 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69}
+    result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
+    result of call at line 28, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69}
     result of call at line 28, characters 64-81 : int = 69
+    result of call at line 28, characters 64-81 : int = 69
+    result of call at line 28, characters 64-68 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 3;
+                      Array_records.second_value = 69}
     result of call at line 28, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
@@ -923,28 +1708,57 @@ File array_records_poly.mlw:
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 23;
                       Array_records.second_value = 69}
+    result of call at line 29, characters 13-82 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 23;
+                      Array_records.second_value = 69}
+    result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 42;
                       Array_records.second_value = 69}
+    result of call at line 29, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69}
     result of call at line 29, characters 64-81 : int = 69
+    result of call at line 29, characters 64-81 : int = 69
+    result of call at line 29, characters 64-68 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 42;
+                      Array_records.second_value = 69}
     result of call at line 29, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 42;
                       Array_records.second_value = 69}
   Line 30:
     i : int = -1
+    i : int = -1
+    result of call at line 30, characters 13-92 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 23;
+                      Array_records.second_value = 69}
     result of call at line 30, characters 13-92 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 23;
                       Array_records.second_value = 69}
     result of call at line 30, characters 41-57 : int = 23
+    result of call at line 30, characters 41-57 : int = 23
+    result of call at line 30, characters 41-45 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 23;
+                      Array_records.second_value = 69}
     result of call at line 30, characters 41-45 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 23;
                       Array_records.second_value = 69}
     result of call at line 30, characters 74-91 : int = 69
+    result of call at line 30, characters 74-91 : int = 69
+    result of call at line 30, characters 74-78 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 23;
+                      Array_records.second_value = 69}
     result of call at line 30, characters 74-78 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 23;
@@ -983,12 +1797,53 @@ File array.mlw:
                        (Array_records.second_value x) = -3 /\
                        (Array_records.first_value x) = -1 /\
                        (Array_records.flag x) = true|]|]
+    elts :
+      array
+      basic_record
+      ->
+      int
+      ->
+      basic_record = [|_ =>
+                       [|0 =>
+                         {Array_records.flag = true;
+                          Array_records.first_value = 0;
+                          Array_records.second_value = -3};
+                       _ => epsilon x.
+                       (Array_records.second_value x) = -3 /\
+                       (Array_records.first_value x) = -1 /\
+                       (Array_records.flag x) = true|]|]
   Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_1212 bOUND_VARIABLE_1213 -> 0
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_1212 bOUND_VARIABLE_1213 -> 0
+    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
+    flag : basic_record -> bool = [|_ => true|]
   Line 17:
+    first_val :
+      basic_record
+      ->
+      int = fun _arg_139 ->
+             if {Array_records.flag = true;
+                 Array_records.first_value = -1;
+                 Array_records.second_value = -3} = _arg_139
+             then -1
+             else if {Array_records.flag = true;
+                      Array_records.first_value = 4;
+                      Array_records.second_value = -3} = _arg_139
+                  then 4 else 0
     first_val :
       basic_record
       ->
@@ -1018,21 +1873,53 @@ File array_records_poly.mlw:
                            Array_records.first_value = 0;
                            Array_records.second_value = 69} = _arg_139
                        then 69 else -3
+    sec_val :
+      basic_record
+      ->
+      int = fun _arg_139 ->
+             if {Array_records.flag = true;
+                 Array_records.first_value = 0;
+                 Array_records.second_value = 2} = _arg_139
+             then 2
+             else if {Array_records.flag = true;
+                      Array_records.first_value = 0;
+                      Array_records.second_value = -2} = _arg_139
+                  then -2
+                  else if {Array_records.flag = true;
+                           Array_records.first_value = 0;
+                           Array_records.second_value = 69} = _arg_139
+                       then 69 else -3
   Line 23:
     i : int = 0
+    i : int = 0
   Line 25:
+    i : int = 0
     i : int = 0
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 0;
                       Array_records.second_value = -3}
+    result of call at line 27, characters 13-81 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 0;
+                      Array_records.second_value = -3}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = -1;
                       Array_records.second_value = -3}
+    result of call at line 27, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = -1;
+                      Array_records.second_value = -3}
     result of call at line 27, characters 45-61 : int = -1
+    result of call at line 27, characters 45-61 : int = -1
+    result of call at line 27, characters 45-49 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = -1;
+                      Array_records.second_value = -3}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = -1;
@@ -1042,12 +1929,26 @@ File array_records_poly.mlw:
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 0;
                       Array_records.second_value = -3}
+    result of call at line 28, characters 13-82 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 0;
+                      Array_records.second_value = -3}
+    result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 0;
                       Array_records.second_value = 2}
+    result of call at line 28, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 0;
+                      Array_records.second_value = 2}
     result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-68 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 0;
+                      Array_records.second_value = 2}
     result of call at line 28, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 0;
@@ -1057,12 +1958,26 @@ File array_records_poly.mlw:
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 0;
                       Array_records.second_value = -3}
+    result of call at line 29, characters 13-82 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 0;
+                      Array_records.second_value = -3}
+    result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 0;
                       Array_records.second_value = -2}
+    result of call at line 29, characters 21-25 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 0;
+                      Array_records.second_value = -2}
     result of call at line 29, characters 64-81 : int = -2
+    result of call at line 29, characters 64-81 : int = -2
+    result of call at line 29, characters 64-68 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 0;
+                      Array_records.second_value = -2}
     result of call at line 29, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 0;
@@ -1072,12 +1987,26 @@ File array_records_poly.mlw:
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 0;
                       Array_records.second_value = -3}
+    result of call at line 30, characters 13-92 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 0;
+                      Array_records.second_value = -3}
+    result of call at line 30, characters 41-57 : int = 4
     result of call at line 30, characters 41-57 : int = 4
     result of call at line 30, characters 41-45 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 4;
                       Array_records.second_value = -3}
+    result of call at line 30, characters 41-45 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 4;
+                      Array_records.second_value = -3}
     result of call at line 30, characters 74-91 : int = -3
+    result of call at line 30, characters 74-91 : int = -3
+    result of call at line 30, characters 74-78 :
+      basic_record = {Array_records.flag = true;
+                      Array_records.first_value = 4;
+                      Array_records.second_value = -3}
     result of call at line 30, characters 74-78 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 4;

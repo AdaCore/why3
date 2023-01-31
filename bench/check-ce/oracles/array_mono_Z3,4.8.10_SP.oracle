@@ -60,7 +60,24 @@ File array_mono.mlw:
       ->
       int = [|epsilon x. (Array.length x) = 2 => 2;
             epsilon x. (Array.length x) = 2 => 2; _ => 2|]
+    length :
+      array
+      ->
+      int = [|epsilon x. (Array.length x) = 2 => 2;
+            epsilon x. (Array.length x) = 2 => 2; _ => 2|]
   Line 19:
+    mixfix [<-] :
+      array
+      ->
+      int
+      ->
+      int
+      ->
+      array = fun x!0 x!1 x!2 ->
+               if x!0 = epsilon x. (Array.length x) = 2 /\ x!1 = 0 /\
+                  x!2 = 42
+               then epsilon x. (Array.length x) = 2 else epsilon x.
+               (Array.length x) = 2
     mixfix [<-] :
       array
       ->
@@ -75,11 +92,14 @@ File array_mono.mlw:
                (Array.length x) = 2
   Line 23:
     a : array = epsilon x. (Array.length x) = 2
+    a : array = epsilon x. (Array.length x) = 2
   Line 25:
+    a : array = epsilon x. (Array.length x) = 2
     a : array = epsilon x. (Array.length x) = 2
   Line 38:
     a : array = epsilon x. (Array.length x) = 2
   Line 40:
+    a : array = epsilon x. (Array.length x) = 2
     a : array = epsilon x. (Array.length x) = 2
   Line 41:
     a : array = epsilon x. (Array.length x) = 2

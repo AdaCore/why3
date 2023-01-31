@@ -18,7 +18,23 @@ File int.mlw:
       bool = fun _arg_1 ->
               _arg_1 = 4611686018427387903 \/ _arg_1 = -4611686018427387904 \/
               _arg_1 = -2305843009213693952 \/ _arg_1 = -2305843009213693953
+    in_bounds :
+      int
+      ->
+      bool = fun _arg_1 ->
+              _arg_1 = 4611686018427387903 \/ _arg_1 = -4611686018427387904 \/
+              _arg_1 = -2305843009213693952 \/ _arg_1 = -2305843009213693953
   Line 416:
+    int63'int :
+      int63
+      ->
+      int = fun _arg_1 ->
+             if {mach.int.Int63.int63'int => 4611686018427387903} = _arg_1
+             then 4611686018427387903
+             else if {mach.int.Int63.int63'int => -4611686018427387904} = _arg_1
+                  then -4611686018427387904
+                  else if {mach.int.Int63.int63'int => -2305843009213693953} = _arg_1
+                       then -2305843009213693953 else -2305843009213693952
     int63'int :
       int63
       ->
@@ -31,14 +47,20 @@ File int.mlw:
                        then -2305843009213693953 else -2305843009213693952
   Line 432:
     max_int : int63 = {mach.int.Int63.int63'int => 4611686018427387903}
+    max_int : int63 = {mach.int.Int63.int63'int => 4611686018427387903}
   Line 434:
+    min_int : int63 = {mach.int.Int63.int63'int => -4611686018427387904}
     min_int : int63 = {mach.int.Int63.int63'int => -4611686018427387904}
 File tuple1.mlw:
   Line 6:
     a : int63 = {mach.int.Int63.int63'int => -2305843009213693953}
+    a : int63 = {mach.int.Int63.int63'int => -2305843009213693953}
+    b : int63 = {mach.int.Int63.int63'int => -2305843009213693952}
     b : int63 = {mach.int.Int63.int63'int => -2305843009213693952}
   Line 7:
     a : int63 = {mach.int.Int63.int63'int => -2305843009213693953}
+    a : int63 = {mach.int.Int63.int63'int => -2305843009213693953}
+    b : int63 = {mach.int.Int63.int63'int => -2305843009213693952}
     b : int63 = {mach.int.Int63.int63'int => -2305843009213693952}
 
 File "bench/check-ce/tuple1.mlw", line 7, characters 14-23:
