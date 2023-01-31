@@ -1636,7 +1636,9 @@ module FromModelToTerm = struct
         let t0',ct0' = maybe_convert_epsilon_terms env (t0,ct0) in
         let t1',ct1' = maybe_convert_epsilon_terms env (t1,ct1) in
         ((ct0',ct1')::elts, others)
-      | _ -> ([], t'_concrete)
+      | _ ->
+        let t', t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in
+        ([], t'_concrete)
     in
     if t_v_occurs vs t' = 0 then
       let t',t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in

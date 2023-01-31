@@ -1063,10 +1063,10 @@ File array.mlw:
                          {Array_records.flag = false;
                           Array_records.first_value = 2;
                           Array_records.second_value = -2};
-                       _ => epsilon x.
-                       (Array_records.second_value x) = -2 /\
-                       (Array_records.first_value x) = 2 /\
-                       (Array_records.flag x) = false|]|]
+                       _ =>
+                       {Array_records.flag = false;
+                        Array_records.first_value = 2;
+                        Array_records.second_value = -2}|]|]
     elts :
       array
       basic_record
@@ -1078,10 +1078,10 @@ File array.mlw:
                          {Array_records.flag = false;
                           Array_records.first_value = 2;
                           Array_records.second_value = -2};
-                       _ => epsilon x.
-                       (Array_records.second_value x) = -2 /\
-                       (Array_records.first_value x) = 2 /\
-                       (Array_records.flag x) = false|]|]
+                       _ =>
+                       {Array_records.flag = false;
+                        Array_records.first_value = 2;
+                        Array_records.second_value = -2}|]|]
   Line 17:
     length :
       ty

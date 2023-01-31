@@ -115,20 +115,20 @@ File int.mlw:
     one = 1
 File jlamp_projections.mlw:
   Line 53:
-    b = {f= epsilon x:byte. to_int x = 127; g= True}
-    b = {f= epsilon x:byte. to_int x = 127; g= True}
+    b = {f= epsilon x:byte. to_int x = 127; g= true}
+    b = {f= epsilon x:byte. to_int x = 127; g= true}
     Execution of main function `p4` with env:
-      b = {f= epsilon x:byte. to_int x = 127; g= True}
+      b = {f= epsilon x:byte. to_int x = 127; g= true}
       zero = 0
       one = 1
   Line 54:
     Normal execution of function `g` with args:
-      arg = {f= epsilon x:byte. to_int x = 127; g= True}
+      arg = {f= epsilon x:byte. to_int x = 127; g= true}
     (giant-step) execution of unimplemented function `of_int`
       x = 1
     result of `of_int` = epsilon x:byte. to_int x = 1
     Normal execution of function `f` with args:
-      arg = {f= epsilon x:byte. to_int x = 127; g= True}
+      arg = {f= epsilon x:byte. to_int x = 127; g= true}
     (giant-step) execution of unimplemented function `add`
       x = epsilon x:byte. to_int x = 127
       y = epsilon x:byte. to_int x = 1

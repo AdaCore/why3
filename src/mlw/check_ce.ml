@@ -213,6 +213,8 @@ let rec import_model_value loc env check known ity t =
       | Tvar _ -> undefined_value env ity
       | Ttrue -> bool_value true
       | Tfalse -> bool_value false
+      | _ when t_equal t t_bool_true -> bool_value true
+      | _ when t_equal t t_bool_false -> bool_value false
       | Tapp (ls, args) -> (
           let ts, l1, l2 = ity_components ity in
           let subst = its_match_regs ts l1 l2 in

@@ -640,9 +640,12 @@ let gen_model_variable ?check ({giant_steps} as ctx) ?loc id ity : value_gen =
 (** Generate a value by querying the model for a result *)
 let gen_model_result ({giant_steps} as ctx) oid loc ity : value_gen =
   "value from model", fun () ->
-    let res = ctx.oracle.for_result ctx.env ~call_id:oid ~loc ity in
-    Opt.iter (check_assume_type_invs ctx.rac ~loc ~giant_steps ctx.env ity) res;
-    res
+    if ity_equal ity ity_unit
+    then Some unit_value
+    else
+      let res = ctx.oracle.for_result ctx.env ~call_id:oid ~loc ity in
+      Opt.iter (check_assume_type_invs ctx.rac ~loc ~giant_steps ctx.env ity) res;
+      res
 
 (** Generator for a default value *)
 let gen_default ity def : value_gen =

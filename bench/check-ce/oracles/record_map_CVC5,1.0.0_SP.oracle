@@ -68,19 +68,19 @@ File int.mlw:
 File record_map.mlw:
   Line 45:
     rec_map = {f_map= fun (x:bool) -> if x = True then (- 1) else 0;
-               g_bool= True}
+               g_bool= true}
     rec_map = {f_map= fun (x:bool) -> if x = True then (- 1) else 0;
-               g_bool= True}
+               g_bool= true}
     Execution of main function `record_map_proj_test2` with env:
       rec_map = {f_map= fun (x:bool) -> if x = True then (- 1) else 0;
-                 g_bool= True}
+                 g_bool= true}
       zero = 0
       one = 1
   Line 48:
     Normal execution of function `True` with args:
     Normal execution of function `f_map` with args:
       arg = {f_map= fun (x:bool) -> if x = True then (- 1) else 0;
-             g_bool= True}
+             g_bool= true}
     Normal execution of function `([])` with args:
       f = fun (x:bool) -> if x = True then (- 1) else 0
       x = true
@@ -115,17 +115,17 @@ File int.mlw:
     one = 1
 File record_map.mlw:
   Line 50:
-    re_rec_map = {f_map= fun (x:bool) -> 0; g_bool= True}
+    re_rec_map = {f_map= fun (x:bool) -> 0; g_bool= true}
   Line 52:
-    rec_map = {f_map= fun (x:bool) -> 0; g_bool= False}
-    rec_map = {f_map= fun (x:bool) -> 0; g_bool= False}
+    rec_map = {f_map= fun (x:bool) -> 0; g_bool= false}
+    rec_map = {f_map= fun (x:bool) -> 0; g_bool= false}
     Execution of main function `record_map_proj_test3` with env:
-      re_rec_map = {f_map= fun (x:bool) -> 0; g_bool= True}
-      rec_map = {f_map= fun (x:bool) -> 0; g_bool= False}
+      re_rec_map = {f_map= fun (x:bool) -> 0; g_bool= true}
+      rec_map = {f_map= fun (x:bool) -> 0; g_bool= false}
       zero = 0
       one = 1
   Line 53:
     Property failure at postcondition of `record_map_proj_test3` with:
-      re_rec_map = {f_map= fun (x:bool) -> 0; g_bool= True}
-      result = {f_map= fun (x:bool) -> 0; g_bool= False}
+      re_rec_map = {f_map= fun (x:bool) -> 0; g_bool= true}
+      result = {f_map= fun (x:bool) -> 0; g_bool= false}
 
