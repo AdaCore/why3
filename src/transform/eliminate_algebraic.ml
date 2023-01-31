@@ -86,23 +86,6 @@ type state = {
   no_sel : bool;                (* do not generate selector *)
 }
 
-let empty_state = {
-  mt_map = Mts.empty;
-  cc_map = Mls.empty;
-  cp_map = Mls.empty;
-  pp_map = Mls.empty;
-  kept_m = Mts.empty;
-  tp_map = Mid.empty;
-  inf_ts = Sts.add ts_real (Sts.singleton ts_int);
-  ma_map = Mts.empty;
-  keep_e = false;
-  keep_r = false;
-  keep_m = false;
-  no_ind = false;
-  no_inv = false;
-  no_sel = false;
-}
-
 let enc_ty state = function
   | Some({ ty_node = Tyapp (ts,_) } as ty) ->
     not (Sty.mem ty (Mts.find_def Sty.empty ts state.kept_m))
@@ -476,15 +459,6 @@ let comp t (state,task) = match t.task_decl.td_node with
       let fnT = rewriteT t.task_known state in
       let fnF = rewriteF t.task_known state Svs.empty true in
       state, add_decl task (DeclTF.decl_map fnT fnF d)
-  | Meta (m, [MAts ts]) when meta_equal m meta_infinite ->
-      let state = { state with inf_ts = Sts.add ts state.inf_ts } in
-      state, add_tdecl task t.task_decl
-  | Meta (m, [MAts ts; MAint i]) when meta_equal m meta_material ->
-      let ma = try Array.of_list (Mts.find ts state.ma_map) with
-        | Not_found -> Array.make (List.length ts.ts_args) false in
-      let ml = Array.set ma i true; Array.to_list ma in
-      let state = { state with ma_map = Mts.add ts ml state.ma_map } in
-      state, add_tdecl task t.task_decl
   | _ ->
       state, add_tdecl task t.task_decl
 
@@ -509,15 +483,57 @@ let comp t (state,task) = match t.task_decl.td_node with
   | _ ->
       comp t (state,task)
 
-let init_task =
+let fold_comp st =
   let init = Task.add_meta None meta_infinite [MAts ts_int] in
   let init = Task.add_meta init meta_infinite [MAts ts_real] in
+  let init = Task.add_meta init meta_infinite [MAts ts_str] in
   let init = Task.add_param_decl init ps_equ in
-  init
+  Trans.fold comp (st,init)
+
+let on_empty_state t =
+  Trans.on_tagged_ts meta_infinite (fun inf_ts ->
+  Trans.on_meta meta_material (fun ml ->
+    let inf_ts = Sts.union inf_ts (Sts.of_list [ts_real; ts_int; ts_str]) in
+    let fold ma_map = function
+      | [MAts ts; MAint i] ->
+        let ma = match Mts.find ts ma_map with
+        | l -> Array.of_list l
+        | exception Not_found -> Array.make (List.length ts.ts_args) false
+        in
+        ma.(i) <- true;
+        Mts.add ts (Array.to_list ma) ma_map
+      | _ -> assert false
+    in
+    let ma_map = List.fold_left fold Mts.empty ml in
+    let empty_state = {
+      mt_map = Mts.empty; cc_map = Mls.empty; cp_map = Mls.empty;
+      pp_map = Mls.empty; kept_m = Mts.empty; tp_map = Mid.empty;
+      inf_ts; ma_map; keep_e = false; keep_r = false; keep_m = false;
+      no_ind = false; no_inv = false; no_sel = false
+    } in t empty_state))
+
+(* We need to rewrite metas *after* the main pass, because we need to know the
+   final state. Some metas may mention symbols declared after the meta. *)
+let fold_rewrite_metas state t task = match t.task_decl.td_node with
+  | Meta (m, mal) ->
+    let map_arg ma = match ma with
+    | MAls ({ ls_value = Some({ty_node = Tyapp(ts, _)}) } as ls)
+        when ls.ls_constr > 0 && not (Mts.mem ts state.kept_m) ->
+      MAls (Mls.find_def ls ls state.cc_map)
+    | MAls ({ ls_proj = true; ls_args = [{ty_node = Tyapp(ts, _)}] } as ls)
+        when not (Mts.mem ts state.kept_m) ->
+      MAls (Mls.find_def ls ls state.pp_map)
+    | _ -> ma
+    in
+    add_meta task m (List.map map_arg mal)
+  | _ ->
+    add_tdecl task t.task_decl
+
+let rewrite_metas st = Trans.fold (fold_rewrite_metas st) None
 
 let eliminate_match =
-  Trans.compose compile_match (Trans.fold_map comp empty_state init_task)
-
+  Trans.bind (Trans.compose compile_match (on_empty_state fold_comp))
+             (fun (state, task) -> Trans.seq [Trans.return task; rewrite_metas state])
 let meta_elim = register_meta "eliminate_algebraic" [MTstring]
   ~desc:"@[<hov 2>Configure the 'eliminate_algebraic' transformation:@\n\
     - keep_enums:   @[keep monomorphic enumeration types@]@\n\
@@ -527,40 +543,41 @@ let meta_elim = register_meta "eliminate_algebraic" [MTstring]
     - no_inversion: @[do not generate inversion axioms@]@\n\
     - no_selector:  @[do not generate selector@]@]"
 
-let eliminate_algebraic = Trans.compose compile_match
-  (Trans.on_meta meta_elim (fun ml ->
-   Trans.on_tagged_ty meta_alg_kept (fun kept ->
-    let st = empty_state in
-    let check st = function
-      | [MAstr "keep_enums"] -> { st with keep_e = true }
-      | [MAstr "keep_recs"]  -> { st with keep_r = true }
-      | [MAstr "keep_mono"]  -> { st with keep_m = true }
-      | [MAstr "no_index"]   -> { st with no_ind = true }
-      | [MAstr "no_inversion"] -> { st with no_inv = true }
-      | [MAstr "no_selector"]  -> { st with no_sel = true }
-      | [MAstr s] ->
-         raise (
-             Invalid_argument (
-                 "meta eliminate_algebraic, arg = \"" ^ s ^ "\""))
-      | l ->
-         raise (
-             Invalid_argument (
-                 "meta eliminate_algebraic, nb arg = " ^
-                   string_of_int (List.length l) ^ ""))
-    in
-    let st = List.fold_left check st ml in
-    let kept_fold ty m =
-      match ty with
-      | { ty_node=Tyapp(ts, _) } as ty ->
-         let s = Mts.find_def Sty.empty ts m in
-         Mts.add ts (Sty.add ty s) m
-      | _ -> m
-    in
-    let st = { st with kept_m = Sty.fold kept_fold kept Mts.empty } in
-    let add ty decls = create_meta Libencoding.meta_kept [MAty ty] :: decls in
-    let meta_decls = Sty.fold add kept [] in
-    Trans.compose (Trans.fold_map comp st init_task)
-                  (Trans.add_tdecls meta_decls))))
+let eliminate_algebraic =
+  Trans.on_meta meta_elim (fun ml ->
+  Trans.on_tagged_ty meta_alg_kept (fun kept ->
+  on_empty_state (fun st ->
+  let check st = function
+    | [MAstr "keep_enums"] -> { st with keep_e = true }
+    | [MAstr "keep_recs"]  -> { st with keep_r = true }
+    | [MAstr "keep_mono"]  -> { st with keep_m = true }
+    | [MAstr "no_index"]   -> { st with no_ind = true }
+    | [MAstr "no_inversion"] -> { st with no_inv = true }
+    | [MAstr "no_selector"]  -> { st with no_sel = true }
+    | [MAstr s] ->
+        raise (
+            Invalid_argument (
+                "meta eliminate_algebraic, arg = \"" ^ s ^ "\""))
+    | l ->
+        raise (
+            Invalid_argument (
+                "meta eliminate_algebraic, nb arg = " ^
+                  string_of_int (List.length l) ^ ""))
+  in
+  let st = List.fold_left check st ml in
+  let kept_fold ty m =
+    match ty with
+    | { ty_node=Tyapp(ts, _) } as ty ->
+        let s = Mts.find_def Sty.empty ts m in
+        Mts.add ts (Sty.add ty s) m
+    | _ -> m
+  in
+  let st = { st with kept_m = Sty.fold kept_fold kept Mts.empty } in
+  let add ty decls = create_meta Libencoding.meta_kept [MAty ty] :: decls in
+  let add_meta_decls = Trans.add_tdecls (Sty.fold add kept []) in
+  Trans.bind (Trans.compose compile_match (fold_comp st))
+             (fun (state, task) ->
+              Trans.seq [Trans.return task; rewrite_metas state; add_meta_decls]))))
 
 (** Eliminate user-supplied projection functions *)
 
