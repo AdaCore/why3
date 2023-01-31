@@ -1460,7 +1460,15 @@ module FromModelToTerm = struct
           then
             let fields_values =
               List.combine
-                (List.map (fun ls -> Format.asprintf "@[<h>%a@]" Pretty.print_ls_qualified ls) fields)
+                (List.map (fun ls ->
+                  (* FIXME It would be better to always use the qualified name but
+                     currently it impacts the AdaCore testsuite too much since the model
+                     trace attribute is expected to be used as a name, and even when
+                     no model trace is present, the qualified name forbids the recognition
+                     of the special field names __split_fields and __split_discrs. *)
+                  (* let ls_name = Format.asprintf "@[<h>%a@]" Pretty.print_ls_qualified ls in *)
+                  Ident.get_model_trace_string ~name:ls.ls_name.id_string ~attrs:ls.ls_name.id_attrs)
+                  fields)
                 ts_concrete
             in
             (t_app ls ts ls.ls_value, Record fields_values)
