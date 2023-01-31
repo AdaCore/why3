@@ -339,14 +339,18 @@ let similar_model_element_names n1 n2 =
   Strings.has_suffix unused_suffix name1 =
   Strings.has_suffix unused_suffix name2
 
-(* TODO optimize *)
-let rec filter_duplicated l =
-  let exist_similar a l = List.exists (fun x ->
+(* FIXME: filter_duplicated may remove elements that are not
+   duplicates, notably in the case where the content of a
+   reference is updated at a single source code line.
+   To be fixed since removing this filtering of elements
+   leaves *real* duplicates untouched. *)
+let rec filter_duplicated l = l
+  (* let exist_similar a l = List.exists (fun x ->
     similar_model_element_names a x) l in
   match l with
   | [] | [_] -> l
   | me :: l when exist_similar me l -> filter_duplicated l
-  | me :: l -> me :: filter_duplicated l
+  | me :: l -> me :: filter_duplicated l *)
 
 let json_attrs attrs =
   let open Json_base in
