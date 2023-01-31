@@ -91,8 +91,10 @@ val prove_task_prepared :
   ?interactive : bool ->
   driver -> Task.task -> Call_provers.prover_call
 
-(** Call prover on a buffer containing a task prepated by [prepare_task] and
-    printed by [print_task_prepared].
+(** Call prover on a task already prepared and printed in the buffer.
+
+    The task shall be prepared by [prepare_task] and printed with
+    [print_task_prepared]; the buffer shall contain nothing else.
 
     Parameters [input_file], [theory_name] and [goal_name] are used
     to generate canonical temporary files for the prover according to its driver
