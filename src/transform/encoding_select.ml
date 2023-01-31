@@ -145,3 +145,48 @@ module Lsinst = struct
   let () =
     register ft_select_lsinst lsinst_none lsinst_goal lsinst_local lsinst_all
 end
+
+(** {2 select Alginst} *)
+
+module Alginst = struct
+  let add ts tyl m =
+    let styl = Mts.find_def Styl.empty ts m in
+    Mts.add ts (Styl.add tyl styl) m
+
+  let add_alginst_app acc ls tyl tyv =
+    if ls_equal ls ps_equ ||
+       List.exists (fun ty -> not (ty_closed ty)) (oty_cons tyl tyv)then acc
+    else if ls.ls_constr > 0 then
+      match tyv with
+      | Some ({ty_node = Tyapp (tys, tyl)}) -> add tys tyl acc
+      | _ -> assert false
+    else if ls.ls_proj then
+      match tyl with
+      | [{ty_node = Tyapp (tys, tyl)}] -> add tys tyl acc
+      | _ -> assert false
+    else acc
+
+  let add_alginst_case acc tys tyl _ =
+    if tyl = [] || List.exists (fun ty -> not (ty_closed ty)) tyl then acc
+    else add tys tyl acc
+
+  let add_alginst_term acc t =
+    let acc = t_app_fold add_alginst_app acc t in
+    t_case_fold add_alginst_case acc t
+
+  let local_alginst task acc = match task.task_decl.td_node with
+    | Decl d when is_local d -> decl_fold add_alginst_term acc d
+    | _ -> acc
+
+  let all_alginst task acc = match task.task_decl.td_node with
+    | Decl d -> decl_fold add_alginst_term acc d
+    | _ -> acc
+
+  let alginst_none = Trans.return Mts.empty
+  let alginst_goal = trans_on_goal (add_alginst_term Mts.empty)
+  let alginst_local = Trans.fold local_alginst Mts.empty
+  let alginst_all  = Trans.fold all_alginst Mts.empty
+
+  let () =
+    register ft_select_alginst alginst_none alginst_goal alginst_local alginst_all
+end
