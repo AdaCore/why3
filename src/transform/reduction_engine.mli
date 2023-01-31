@@ -108,14 +108,23 @@ val add_rule : Term.term -> engine -> engine
 *)
 
 
-val normalize : ?step_limit:int -> limit:int -> engine -> Term.term Term.Mvs.t -> Term.term -> Term.term
-(** [normalize e sigma t] normalizes the term [t] with respect to the engine
-    [e] with an initial variable environment [sigma].
+val normalize :
+  ?max_growth:int -> ?step_limit:int -> limit:int -> engine ->
+  Term.term Term.Mvs.t -> Term.term -> Term.term
+(** [normalize e sigma t] normalizes the term [t] with respect to the
+   engine [e] with an initial variable environment [sigma].
 
-    parameter [limit] provides a maximum number of steps for execution.
-    When limit is reached, the partially reduced term is returned.
-    parameter [step_limit] provides a maximum number of steps on reductions
-    that would change the term even after reconstruction.
+   Parameter [limit] provides a maximum number of steps for execution.
+   When limit is reached, the partially reduced term is returned.
+
+   Parameter [step_limit] provides a maximum number of steps on
+   reductions that would change the term even after reconstruction.
+
+   Parameter [max_growth] limits the size of intermediate terms during
+   reduction, that is the intermediate terms cannot grow larger than
+   [max_growth] times the initial term.  If this size limit is
+   reached, the partially reduced term is returned. Default value is [1000].
+
 *)
 
 

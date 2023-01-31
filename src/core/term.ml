@@ -1785,3 +1785,13 @@ module TermTF = struct
   let tr_fold fnT fnF = tr_fold (t_selecti fnT fnF)
   let tr_map_fold fnT fnF = tr_map_fold (t_selecti fnT fnF)
 end
+
+
+let term_size t =
+  let rec aux acc t =
+    let acc' = acc+1 in
+    assert (acc' > acc); (* to avoid integer overflow *)
+    t_fold_unsafe aux acc' t
+  in aux 0 t
+
+let term_branch_size (_,_,t) = term_size t
