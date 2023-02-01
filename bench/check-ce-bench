@@ -64,18 +64,17 @@ remove_solver_details () {
 # $4 = true for WP, false for SP
 # $5 = steps
 run () {
-  printf "  $2 ($1)... "
   file_path="$2/$3"
   debug_vc_sp=""
   if $4; then
     f="${file_path}_$1_WP"
     oracle_file="$2/oracles/$3_$1_WP.oracle"
-    printf "Weakest Precondition ${file_path} ($1)... "
+    printf "${file_path},WP,$1... "
   else
     f="${file_path}_$1_SP"
     oracle_file="$2/oracles/$3_$1_SP.oracle"
     debug_vc_sp=",vc_sp"
-    printf "Strongest Postcondition ${file_path} ($1)... "
+    printf "${file_path},SP,$1... "
   fi
   steps=$5
   if [ "$3" = "strings" ] && [[ $1 == CVC* ]] ; then
@@ -127,7 +126,7 @@ for file in $files; do
   if [ "$filebase" = "maps_poly" -o "$filebase" = "maps_mono" ] ; then
     echo "Skipping tests on $filedir/$filebase.mlw";
   else
-    printf "Running provers on $filedir/$filebase.mlw\n";
+    printf "# Running provers on $filedir/$filebase.mlw\n";
     cvc4steps=150000
     cvc5steps=150000
     z3steps=3000000
@@ -173,16 +172,6 @@ for file in $files; do
     run Z3,4.8.10   $filedir $filebase false $z3steps
   fi
 done
-end=$(date +%s)
-
-runtime=$((end-start))
-if [ "$success" = true ]; then
-  echo "check-ce-bench: success (runtime = $runtime seconds)"
-  exitvalue=0
-else
-  printf "\ncheck-ce-bench: failed for the following files (runtime = $runtime seconds)\n$failed\n"
-  exitvalue=1
-fi
 
 # Check the reproduction of the experiments by Petiot (2018).
 if $updateoracle; then
@@ -204,6 +193,16 @@ bench/check-ce/petiot2018/experiments.sh \
   --prover CVC5,1.0.0 --rac-prover CVC5,1.0.0 \
   --ce-prover CVC5,1.0.0,counterexamples --stepslimit 10000 \
   $updatearg
-if [ $? = 1 ]; then exitvalue=1; fi
+if [ $? = 1 ]; then exitvalue=1; failed="$failedPetiot experiments, see above.\n"; fi
 
+end=$(date +%s)
+
+runtime=$((end-start))
+if [ "$success" = true ]; then
+  echo "check-ce-bench: success (runtime = $runtime seconds)"
+  exitvalue=0
+else
+  printf "\ncheck-ce-bench: failed for the following files (runtime = $runtime seconds)\n$failed\n"
+  exitvalue=1
+fi
 exit $exitvalue
