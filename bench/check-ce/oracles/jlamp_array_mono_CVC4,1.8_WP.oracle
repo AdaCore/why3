@@ -174,7 +174,8 @@ File jlamp_array_mono.mlw:
       array = {Array.elts =
                [|42 => {Array.to_int => 2}; _ => {Array.to_int => 3}|];
                Array.length = 0}
-    a : array = {Array.elts = [|_ => {Array.to_int => 3}|]; Array.length = 0}
+    old a :
+      array = {Array.elts = [|_ => {Array.to_int => 3}|]; Array.length = 0}
   Line 44:
     a : array = {Array.elts = [|_ => {Array.to_int => 3}|]; Array.length = 0}
   Line 47:
@@ -284,7 +285,7 @@ File jlamp_array_mono.mlw:
       array = {Array.elts =
                [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
                Array.length = 43}
-    a :
+    old a :
       array = {Array.elts =
                [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
                Array.length = 43}
@@ -413,7 +414,7 @@ File jlamp_array_mono.mlw:
       array = {Array.elts =
                [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
                Array.length = 43}
-    a :
+    old a :
       array = {Array.elts =
                [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
                _ => {Array.to_int => 2}|];

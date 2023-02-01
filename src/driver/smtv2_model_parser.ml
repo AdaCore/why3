@@ -1842,7 +1842,10 @@ let parse pinfo input =
       List.rev
         (Mstr.values
            (Mstr.mapi
-              (fun _ ((ls, oloc, attrs), (t, t_concrete)) ->
+              (fun n ((ls, oloc, attrs), (t, t_concrete)) ->
+                let attrs =
+                  Ident.Sattr.union attrs
+                    (Mstr.find_def Ident.Sattr.empty n pinfo.set_str) in
                 create_model_element ~value:t ~concrete_value:t_concrete
                   ~oloc ~attrs ~lsymbol:ls)
               terms))
