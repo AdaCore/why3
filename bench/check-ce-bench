@@ -179,21 +179,20 @@ if $updateoracle; then
 else
   updatearg=""
 fi
+
+# $1 = prover
+# $2 = stepslimit
+petiot () {
 bench/check-ce/petiot2018/experiments.sh \
-  --prover Z3,4.8.10 --rac-prover Z3,4.8.10 \
-  --ce-prover Z3,4.8.10,counterexamples --stepslimit 500000 \
+  --prover $1 --rac-prover $1 \
+  --ce-prover $1,counterexamples --stepslimit $2 \
   $updatearg
-if [ $? = 1 ]; then exitvalue=1; fi
-bench/check-ce/petiot2018/experiments.sh \
-  --prover CVC4,1.8 --rac-prover CVC4,1.8 \
-  --ce-prover CVC4,1.8,counterexamples --stepslimit 10000 \
-  $updatearg
-if [ $? = 1 ]; then exitvalue=1; fi
-bench/check-ce/petiot2018/experiments.sh \
-  --prover CVC5,1.0.0 --rac-prover CVC5,1.0.0 \
-  --ce-prover CVC5,1.0.0,counterexamples --stepslimit 10000 \
-  $updatearg
-if [ $? = 1 ]; then exitvalue=1; failed="$failedPetiot experiments, see above.\n"; fi
+if [ $? = 1 ]; then exitvalue=1; failed="$failedPetiot experiments with $1.\n"; fi
+}
+
+petiot Z3,4.8.10  500000
+petiot CVC4,1.8 10000
+petiot CVC5,1.0.0 10000
 
 end=$(date +%s)
 
