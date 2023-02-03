@@ -1431,12 +1431,12 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
                 let v = try Mv.find value bindings with Not_found -> default in
                 Normal v
             | [{v_desc= Vterm t}; value ] ->
-                (* special case when [t] is a function defining the mapping of elements
-                for an array or a map, for example:
-                t = fun (x:bool) -> if x = True then -1 else 0 *)
                 begin match t_open_lambda t with
                 | ([vs],_,t') ->
                   begin match t'.t_node with
+                  (* special case when [t] is a function defining the mapping of elements
+                  for an array or a map, for example:
+                  t = fun (x:bool) -> if x = True then -1 else 0 *)
                   | Tif (t1,t2,t3) ->
                     let ctx = {ctx with env= bind_vs vs value ctx.env} in
                     begin match (ctx.compute_term ctx.env t1).t_node with
@@ -1444,6 +1444,10 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
                     | Tfalse ->  exec_expr ctx (e_pure (ctx.compute_term ctx.env t3))
                     | _ -> incomplete "could not reduce %a" print_term t'
                     end
+                  (* special case when [t] is a constant function *)
+                  | Tconst _ ->
+                    let ctx = {ctx with env= bind_vs vs value ctx.env} in
+                    exec_expr ctx (e_pure (ctx.compute_term ctx.env t'))
                   | _ -> raise UnexpectedArgs
                   end
                 | _ -> raise UnexpectedArgs
