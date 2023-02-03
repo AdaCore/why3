@@ -57,7 +57,7 @@ type printing_info = {
   type_coercions : Sls.t Mty.t;
   (** For each type, the set of lsymbols defining a coercion to this type. *)
   type_fields : (lsymbol list) Mty.t;
-  (** For each type, the list of lsymbols defining the fields for this type
+  (** For each type, the list of lsymbols defining the fields for this record type
       and associated to meta_record_def. *)
   record_fields : (lsymbol list) Mls.t;
   (** Descriptions of the fields of all records. *)

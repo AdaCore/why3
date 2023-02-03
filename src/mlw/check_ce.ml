@@ -216,6 +216,8 @@ let rec import_model_value loc env check known ity t =
       | _ when t_equal t t_bool_true -> bool_value true
       | _ when t_equal t t_bool_false -> bool_value false
       | Tapp (ls, args) -> (
+          (* create a constructor value if ls corresponds to a constructor,
+             otherwise create a term value *)
           let ts, l1, l2 = ity_components ity in
           let subst = its_match_regs ts l1 l2 in
           let def = Pdecl.find_its_defn known ts in
@@ -265,7 +267,7 @@ let rec import_model_value loc env check known ity t =
           with
           | UnexpectedPattern ->
           (* check if t is of the form epsilon x:ty. x.f1 = v1 /\ ... /\ x.fn = vn
-          with f1,...,fn the fields associated to type ity *)
+          with f1,...,fn the fields associated to the record type ity *)
           let ts, l1, l2 = ity_components ity in
           let subst = its_match_regs ts l1 l2 in
           let def = Pdecl.find_its_defn known ts in
@@ -315,7 +317,7 @@ let rec import_model_value loc env check known ity t =
         | _ -> term_value ity t
     else
       (* [ity] and the type of [t] may not match for the following reason:
-        - [t] is actually the content of a reference (i.e. a record with a single field) *)
+         [t] is actually the content of a reference (i.e. a record with a single field) *)
       let ts, l1, l2 = ity_components ity in
       let subst = its_match_regs ts l1 l2 in
       let def = Pdecl.find_its_defn known ts in

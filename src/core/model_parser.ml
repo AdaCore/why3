@@ -321,7 +321,7 @@ let search_model_element_call_result model call_id loc =
 
 (*
 ***************************************************************
-**  Converting the model elements to JSON
+**  Printing the model (JSON format and pretty printing)
 ***************************************************************
 *)
 
@@ -952,7 +952,7 @@ let compute_kind vc_attrs oloc attrs =
 
 (*
 ***************************************************************
-**  Building the model from raw model
+**  Building the model
 ***************************************************************
 *)
 
@@ -971,39 +971,6 @@ let add_to_model_if_loc ?kind me model =
       let model_file = Mint.add line_number elements model_file in
       Mstr.add filename model_file model
 
-(*
-let read_one_fields ~attrs value = attrs, value
-  let field_names =
-    let fields = List.filter_map Ident.extract_field (Sattr.elements attrs) in
-    List.sort (fun (d1, _) (d2, _) -> d2 - d1) fields in
-  let add_record v (_, f) = Record [f, v] in
-  match Ident.get_model_trace_attr ~attrs with
-  | mtrace -> (
-      let attrs = Sattr.remove mtrace attrs in
-      (* Special cases for 'Last and 'First. TODO: Should be avoided here but
-         there is no simple way. *)
-      try
-        let new_mtrace =
-          Strings.remove_suffix "'Last" mtrace.attr_string ^
-          String.concat "" (List.map snd field_names) ^
-          "'Last" in
-        let new_attr = create_attribute new_mtrace in
-        Sattr.add new_attr attrs, value
-      with Not_found ->
-      try
-        let new_mtrace =
-          Strings.remove_suffix "'First" mtrace.attr_string ^
-          String.concat "" (List.map snd field_names) ^
-          "'First" in
-        let new_attr = create_attribute new_mtrace in
-        Sattr.add new_attr attrs, value
-      with Not_found -> (* General case *)
-        Sattr.add mtrace attrs, List.fold_left add_record value field_names )
-  | exception Not_found ->
-      (* No model trace attribute present, same as general case *)
-      attrs, List.fold_left add_record value field_names
-*)
-
 let remove_field :
     ( Sattr.t * term * concrete_syntax_term ->
       Sattr.t * term * concrete_syntax_term ) ref =
@@ -1021,10 +988,11 @@ let build_model_rec pm (elts: model_element list) : model_files =
       Pretty.print_attrs attrs;
     (* Remove some specific record field related to the front-end language.
         This function is registered. *)
+    (* FIXME is it used? *)
     let attrs, me_value, me_concrete_value =
       !remove_field (attrs, me.me_value, me.me_concrete_value) in
     Some {
-      me_kind= Other;
+      me_kind= Other; (* will be updated later on *)
       me_value;
       me_concrete_value;
       me_location= me.me_location;

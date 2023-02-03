@@ -40,7 +40,10 @@ module rec Value : sig
   and field
   and value_desc =
     | Vconstr of Expr.rsymbol option * Expr.rsymbol list * field list
-    (** A record or variant *)
+    (** A constructor value (record or variant).
+        The first argument is optional to handle records without constructors
+        (e.g. when a type has an invariant, the constructor is not available
+        to avoid creating an object that does not respect the invariant). *)
     | Vnum of BigInt.t
     (** Any integer number *)
     | Vreal of Big_real.real
@@ -49,15 +52,17 @@ module rec Value : sig
     | Vstring of string
     | Vbool of bool
     | Vproj of Term.lsymbol * value
-    (** [Vproj (ls, v)] is af model projection, i.e.
-        {!const:Model_parser.model_value.Proj} originating from an meta
-        [model_projection]). The only valid operation is applying [ls],
-        resulting in [v]. *)
+    (** TODO/FIXME Was used to represent a model projection originating
+        from a meta [model_projection]).
+        Currently, projections are now handled using Vterm t with
+        t an epsilon term. *)
     | Varray of value array
     (** An array created in code *)
     | Vpurefun of Ty.ty (* type of the keys *) * value Mv.t * value
-    (** A pure, unary function is used to represent arrays from the prover
-        model/candidate counterexample. See {!type:Model_parser.model_array}. *)
+    (** TODO/FIXME Was used to represent arrays from the prover model.
+        Currently, arrays are now handled using Vterm t with
+        t a lambda term corresponding to the function defining the
+        mapping of array elements. *)
     | Vfun of value Term.Mvs.t (* closure values *) * Term.vsymbol * Expr.expr
     (** A function value *)
     | Vterm of Term.term
