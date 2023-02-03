@@ -448,12 +448,17 @@ module FromModelToTerm = struct
     why3_env : Env.env;
     (* Constructors from [pinfo.Printer.constructors]. *)
     constructors : lsymbol Mstr.t;
+    (* List of record fields for each constructor symbol
+       from [pinfo.Printer.record_fields]. *)
     record_fields : Term.lsymbol list Mls.t;
+    (* List of fields for each record type from [pinfo.Printer.type_fields]. *)
     type_fields : Term.lsymbol list Ty.Mty.t;
+    (* Set of coercions for each type from [pinfo.Printer.type_coercions]. *)
     type_coercions : Term.Sls.t Ty.Mty.t;
     (* Queried terms from [pinfo.Printer.queried_terms]. *)
     queried_terms : lsymbol Mstr.t;
-    (* Function definiions that are not in [pinfo.Printer.queried_terms]. *)
+    (* Function definiions from the SMT model
+       that are not in [pinfo.Printer.queried_terms]. *)
     mutable prover_fun_defs : (Term.term * concrete_syntax_term) Mstr.t;
     (* Prover variables, may have the same name if the sort is different. *)
     mutable prover_vars : vsymbol Ty.Mty.t Mstr.t;
@@ -468,7 +473,9 @@ module FromModelToTerm = struct
 
   (* Convert a SMT sort [s] to a Why3 type.
      If [update_ty] is equal to [Some ty], the function updates [env.inferred_types]
-      with the association [(s,ty)]. *)
+     with the association [(s,ty)].
+     TODO/FIXME It would be better to find a way to avoid using [env.inferred_types],
+     maybe by searching in the theories? *)
   let rec smt_sort_to_ty ?(update_ty = None) env s =
     try
       match s with
@@ -1433,7 +1440,7 @@ module FromModelToTerm = struct
               Mvs.add vs (eval_var, eval_var_concrete) env.eval_prover_vars)
           value)
       env.prover_vars;
-    (* we know call [eval_term] on each [(t,t_concrete)] in [terms] in order
+    (* we now call [eval_term] on each [(t,t_concrete)] in [terms] in order
        to replace each prover variable by the corresponding epsilon term *)
     Mstr.mapi
       (fun _ ((ls, oloc, attrs), (t, t_concrete)) ->
@@ -1648,9 +1655,6 @@ module FromModelToTerm = struct
       | [], _ -> None
       | elts, others -> Some (elts,others)
 
-
-
-
   let clean env terms =
     Mstr.map_filter
       (fun ((ls, oloc, attr), (t, t_concrete)) ->
@@ -1661,7 +1665,9 @@ module FromModelToTerm = struct
         else
           (* convert some concrete epsilon terms:
              - when it represents a record,
-             - when it represents the int projection of a range value *)
+             - when it represents the projection of a value
+             - when it represents a function that can be unfolded
+             to a function literal (used notably for arrays) *)
           let (t, t_concrete) = maybe_convert_epsilon_terms env (t, t_concrete) in
           Some ((ls, oloc, attr), (t, t_concrete)))
       terms
@@ -1843,6 +1849,7 @@ let parse pinfo input =
         (Mstr.values
            (Mstr.mapi
               (fun n ((ls, oloc, attrs), (t, t_concrete)) ->
+                (* the printer may add/update attributes *)
                 let attrs =
                   Ident.Sattr.union attrs
                     (Mstr.find_def Ident.Sattr.empty n pinfo.set_str) in
