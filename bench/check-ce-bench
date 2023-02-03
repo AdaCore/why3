@@ -187,7 +187,7 @@ bench/check-ce/petiot2018/experiments.sh \
   --prover $1 --rac-prover $1 \
   --ce-prover $1,counterexamples --stepslimit $2 \
   $updatearg
-if [ $? = 1 ]; then exitvalue=1; failed="$failedPetiot experiments with $1.\n"; fi
+if [ $? = 1 ]; then exitvalue=1; failed="${failed}Petiot experiments with $1.\n"; fi
 }
 
 petiot Z3,4.8.10  500000
