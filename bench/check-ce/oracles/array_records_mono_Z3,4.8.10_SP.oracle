@@ -17,14 +17,7 @@ The following counterexample model could not be verified
 File array_records_mono.mlw:
   Line 20:
     length : array_of_records -> int = [|_ => 0|]
-    length : array_of_records -> int = [|_ => 0|]
   Line 23:
-    mixfix [] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record = fun x!0 x!1 -> {flag = true; first_val = 3; sec_val = 5}
     mixfix [] :
       array_of_records
       ->
@@ -44,22 +37,11 @@ File array_records_mono.mlw:
       ->
       array_of_records = fun x!0 x!1 x!2 -> epsilon x.
                           (ArrayRecords.length x) = 0
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!0 x!1 x!2 -> epsilon x.
-                          (ArrayRecords.length x) = 0
   Line 45:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     i : int = -1
   Line 49:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
     i : int = -1
 
 <check-ce-categorization>Categorizations of models:
@@ -77,15 +59,7 @@ The following counterexample model could not be verified
 File array_records_mono.mlw:
   Line 20:
     length : array_of_records -> int = [|_ => 0|]
-    length : array_of_records -> int = [|_ => 0|]
   Line 23:
-    mixfix [] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record = fun x!01 x!1 ->
-                      {flag = true; first_val = 3; sec_val = 5}
     mixfix [] :
       array_of_records
       ->
@@ -106,27 +80,13 @@ File array_records_mono.mlw:
       ->
       array_of_records = fun x!01 x!1 x!2 -> epsilon x.
                           (ArrayRecords.length x) = 0
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!01 x!1 x!2 -> epsilon x.
-                          (ArrayRecords.length x) = 0
   Line 45:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     i : int = -1
   Line 49:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
     i : int = -1
     result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-49 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
 
@@ -145,15 +105,7 @@ The following counterexample model could not be verified
 File array_records_mono.mlw:
   Line 20:
     length : array_of_records -> int = [|_ => 0|]
-    length : array_of_records -> int = [|_ => 0|]
   Line 23:
-    mixfix [] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record = fun x!02 x!1 ->
-                      {flag = true; first_val = 3; sec_val = 5}
     mixfix [] :
       array_of_records
       ->
@@ -174,37 +126,18 @@ File array_records_mono.mlw:
       ->
       array_of_records = fun x!02 x!1 x!2 -> epsilon x.
                           (ArrayRecords.length x) = 0
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!02 x!1 x!2 -> epsilon x.
-                          (ArrayRecords.length x) = 0
   Line 45:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     i : int = -1
   Line 49:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
     i : int = -1
     result of call at line 49, characters 13-81 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-49 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
 
@@ -227,11 +160,6 @@ File array_records_mono.mlw:
       ->
       int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
             epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
   Line 26:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     i : int = -1
@@ -251,21 +179,7 @@ File array_records_mono.mlw:
                              x!2 = {flag = true; first_val = 3; sec_val = 69}
                           then epsilon x. (ArrayRecords.length x) = 0
                           else epsilon x. (ArrayRecords.length x) = 0
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!03 x!1 x!2 ->
-                          if x!03 = epsilon x. (ArrayRecords.length x) = 0 /\
-                             x!1 = -1 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 0
-                          else epsilon x. (ArrayRecords.length x) = 0
   Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
   Line 45:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
@@ -274,24 +188,14 @@ File array_records_mono.mlw:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     result of call at line 49, characters 13-81 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-49 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 50:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
     i : int = -1
 
 <check-ce-categorization>Categorizations of models:
@@ -313,11 +217,6 @@ File array_records_mono.mlw:
       ->
       int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
             epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
   Line 26:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     i : int = -1
@@ -337,21 +236,7 @@ File array_records_mono.mlw:
                              x!2 = {flag = true; first_val = 3; sec_val = 69}
                           then epsilon x. (ArrayRecords.length x) = 0
                           else epsilon x. (ArrayRecords.length x) = 0
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!04 x!1 x!2 ->
-                          if x!04 = epsilon x. (ArrayRecords.length x) = 0 /\
-                             x!1 = -1 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 0
-                          else epsilon x. (ArrayRecords.length x) = 0
   Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
   Line 45:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
@@ -360,29 +245,16 @@ File array_records_mono.mlw:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     result of call at line 49, characters 13-81 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-49 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 50:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
     i : int = -1
     result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-68 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
 
@@ -405,11 +277,6 @@ File array_records_mono.mlw:
       ->
       int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
             epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
   Line 27:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
@@ -428,21 +295,7 @@ File array_records_mono.mlw:
                              x!2 = {flag = true; first_val = 3; sec_val = 69}
                           then epsilon x. (ArrayRecords.length x) = 0
                           else epsilon x. (ArrayRecords.length x) = 0
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!05 x!1 x!2 ->
-                          if x!05 = epsilon x. (ArrayRecords.length x) = 0 /\
-                             x!1 = -1 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 0
-                          else epsilon x. (ArrayRecords.length x) = 0
   Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
   Line 45:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
@@ -451,39 +304,21 @@ File array_records_mono.mlw:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     result of call at line 49, characters 13-81 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-49 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 50:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
     i : int = -1
     result of call at line 50, characters 13-82 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 21-30 : bool = true
     result of call at line 50, characters 21-30 : bool = true
     result of call at line 50, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 50, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-68 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
 
@@ -507,12 +342,6 @@ File array_records_mono.mlw:
       int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
             epsilon x. (ArrayRecords.length x) = 0 => 0;
             epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
   Line 26:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     i : int = -1
@@ -539,28 +368,7 @@ File array_records_mono.mlw:
                                          sec_val = 69}
                                then epsilon x. (ArrayRecords.length x) = 0
                                else epsilon x. (ArrayRecords.length x) = 0
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!06 x!1 x!2 ->
-                          if x!06 = epsilon x. (ArrayRecords.length x) = 0 /\
-                             x!1 = -1 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 0
-                          else if x!06 = epsilon x.
-                                  (ArrayRecords.length x) = 0 /\ x!1 = -1 /\
-                                  x!2 = {flag = true;
-                                         first_val = 42;
-                                         sec_val = 69}
-                               then epsilon x. (ArrayRecords.length x) = 0
-                               else epsilon x. (ArrayRecords.length x) = 0
   Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
   Line 45:
@@ -570,42 +378,24 @@ File array_records_mono.mlw:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     result of call at line 49, characters 13-81 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-49 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 50:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     result of call at line 50, characters 13-82 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 21-30 : bool = true
     result of call at line 50, characters 21-30 : bool = true
     result of call at line 50, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 50, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-68 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
   Line 51:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
     i : int = -1
 
 <check-ce-categorization>Categorizations of models:
@@ -628,12 +418,6 @@ File array_records_mono.mlw:
       int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
             epsilon x. (ArrayRecords.length x) = 0 => 0;
             epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
   Line 26:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     i : int = -1
@@ -660,28 +444,7 @@ File array_records_mono.mlw:
                                          sec_val = 69}
                                then epsilon x. (ArrayRecords.length x) = 0
                                else epsilon x. (ArrayRecords.length x) = 0
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!07 x!1 x!2 ->
-                          if x!07 = epsilon x. (ArrayRecords.length x) = 0 /\
-                             x!1 = -1 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 0
-                          else if x!07 = epsilon x.
-                                  (ArrayRecords.length x) = 0 /\ x!1 = -1 /\
-                                  x!2 = {flag = true;
-                                         first_val = 42;
-                                         sec_val = 69}
-                               then epsilon x. (ArrayRecords.length x) = 0
-                               else epsilon x. (ArrayRecords.length x) = 0
   Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
   Line 45:
@@ -691,47 +454,26 @@ File array_records_mono.mlw:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     result of call at line 49, characters 13-81 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-49 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 50:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     result of call at line 50, characters 13-82 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 21-30 : bool = true
     result of call at line 50, characters 21-30 : bool = true
     result of call at line 50, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 50, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-68 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
   Line 51:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
     i : int = -1
     result of call at line 51, characters 64-81 : int = 69
-    result of call at line 51, characters 64-81 : int = 69
-    result of call at line 51, characters 64-68 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 51, characters 64-68 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
 
@@ -755,12 +497,6 @@ File array_records_mono.mlw:
       int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
             epsilon x. (ArrayRecords.length x) = 0 => 0;
             epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
   Line 27:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
@@ -786,28 +522,7 @@ File array_records_mono.mlw:
                                          sec_val = 69}
                                then epsilon x. (ArrayRecords.length x) = 0
                                else epsilon x. (ArrayRecords.length x) = 0
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!08 x!1 x!2 ->
-                          if x!08 = epsilon x. (ArrayRecords.length x) = 0 /\
-                             x!1 = -1 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 0
-                          else if x!08 = epsilon x.
-                                  (ArrayRecords.length x) = 0 /\ x!1 = -1 /\
-                                  x!2 = {flag = true;
-                                         first_val = 42;
-                                         sec_val = 69}
-                               then epsilon x. (ArrayRecords.length x) = 0
-                               else epsilon x. (ArrayRecords.length x) = 0
   Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
   Line 45:
@@ -817,57 +532,31 @@ File array_records_mono.mlw:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     result of call at line 49, characters 13-81 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-49 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 50:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     result of call at line 50, characters 13-82 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 21-30 : bool = true
     result of call at line 50, characters 21-30 : bool = true
     result of call at line 50, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 50, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-68 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
   Line 51:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
     i : int = -1
     result of call at line 51, characters 13-82 :
       basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 51, characters 13-82 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 51, characters 21-30 : bool = true
     result of call at line 51, characters 21-30 : bool = true
     result of call at line 51, characters 21-25 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 51, characters 21-25 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 51, characters 64-81 : int = 69
-    result of call at line 51, characters 64-81 : int = 69
-    result of call at line 51, characters 64-68 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 51, characters 64-68 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
 
@@ -892,13 +581,6 @@ File array_records_mono.mlw:
             epsilon x. (ArrayRecords.length x) = 0 => 0;
             epsilon x. (ArrayRecords.length x) = 0 => 0;
             epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
   Line 26:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     i : int = -1
@@ -935,38 +617,7 @@ File array_records_mono.mlw:
                                     (ArrayRecords.length x) = 0
                                     else epsilon x.
                                     (ArrayRecords.length x) = 0
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!09 x!1 x!2 ->
-                          if x!09 = epsilon x. (ArrayRecords.length x) = 0 /\
-                             x!1 = -1 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 0
-                          else if x!09 = epsilon x.
-                                  (ArrayRecords.length x) = 0 /\ x!1 = -1 /\
-                                  x!2 = {flag = true;
-                                         first_val = 42;
-                                         sec_val = 69}
-                               then epsilon x. (ArrayRecords.length x) = 0
-                               else if x!09 = epsilon x.
-                                       (ArrayRecords.length x) = 0 /\
-                                       x!1 = -1 /\
-                                       x!2 = {flag = true;
-                                              first_val = 23;
-                                              sec_val = 69}
-                                    then epsilon x.
-                                    (ArrayRecords.length x) = 0
-                                    else epsilon x.
-                                    (ArrayRecords.length x) = 0
   Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
@@ -977,60 +628,34 @@ File array_records_mono.mlw:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     result of call at line 49, characters 13-81 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-49 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 50:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     result of call at line 50, characters 13-82 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 21-30 : bool = true
     result of call at line 50, characters 21-30 : bool = true
     result of call at line 50, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 50, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-68 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
   Line 51:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     result of call at line 51, characters 13-82 :
       basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 51, characters 13-82 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 51, characters 21-30 : bool = true
     result of call at line 51, characters 21-30 : bool = true
     result of call at line 51, characters 21-25 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 51, characters 21-25 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 51, characters 64-81 : int = 69
-    result of call at line 51, characters 64-81 : int = 69
-    result of call at line 51, characters 64-68 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 51, characters 64-68 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
   Line 52:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
     i : int = -1
 
 <check-ce-categorization>Categorizations of models:
@@ -1054,13 +679,6 @@ File array_records_mono.mlw:
             epsilon x. (ArrayRecords.length x) = 0 => 0;
             epsilon x. (ArrayRecords.length x) = 0 => 0;
             epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
   Line 26:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     i : int = -1
@@ -1097,38 +715,7 @@ File array_records_mono.mlw:
                                     (ArrayRecords.length x) = 0
                                     else epsilon x.
                                     (ArrayRecords.length x) = 0
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!010 x!1 x!2 ->
-                          if x!010 = epsilon x.
-                             (ArrayRecords.length x) = 0 /\ x!1 = -1 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 0
-                          else if x!010 = epsilon x.
-                                  (ArrayRecords.length x) = 0 /\ x!1 = -1 /\
-                                  x!2 = {flag = true;
-                                         first_val = 42;
-                                         sec_val = 69}
-                               then epsilon x. (ArrayRecords.length x) = 0
-                               else if x!010 = epsilon x.
-                                       (ArrayRecords.length x) = 0 /\
-                                       x!1 = -1 /\
-                                       x!2 = {flag = true;
-                                              first_val = 23;
-                                              sec_val = 69}
-                                    then epsilon x.
-                                    (ArrayRecords.length x) = 0
-                                    else epsilon x.
-                                    (ArrayRecords.length x) = 0
   Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
@@ -1139,65 +726,36 @@ File array_records_mono.mlw:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     result of call at line 49, characters 13-81 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-49 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 50:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     result of call at line 50, characters 13-82 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 21-30 : bool = true
     result of call at line 50, characters 21-30 : bool = true
     result of call at line 50, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 50, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-68 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
   Line 51:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     result of call at line 51, characters 13-82 :
       basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 51, characters 13-82 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 51, characters 21-30 : bool = true
     result of call at line 51, characters 21-30 : bool = true
     result of call at line 51, characters 21-25 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 51, characters 21-25 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 51, characters 64-81 : int = 69
-    result of call at line 51, characters 64-81 : int = 69
-    result of call at line 51, characters 64-68 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 51, characters 64-68 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
   Line 52:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
     i : int = -1
     result of call at line 52, characters 74-91 : int = 69
-    result of call at line 52, characters 74-91 : int = 69
-    result of call at line 52, characters 74-78 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
     result of call at line 52, characters 74-78 :
       basic_record = {flag = true; first_val = 23; sec_val = 69}
 
@@ -1222,13 +780,6 @@ File array_records_mono.mlw:
             epsilon x. (ArrayRecords.length x) = 0 => 0;
             epsilon x. (ArrayRecords.length x) = 0 => 0;
             epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
   Line 27:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
@@ -1264,38 +815,7 @@ File array_records_mono.mlw:
                                     (ArrayRecords.length x) = 0
                                     else epsilon x.
                                     (ArrayRecords.length x) = 0
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!011 x!1 x!2 ->
-                          if x!011 = epsilon x.
-                             (ArrayRecords.length x) = 0 /\ x!1 = -1 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 0
-                          else if x!011 = epsilon x.
-                                  (ArrayRecords.length x) = 0 /\ x!1 = -1 /\
-                                  x!2 = {flag = true;
-                                         first_val = 42;
-                                         sec_val = 69}
-                               then epsilon x. (ArrayRecords.length x) = 0
-                               else if x!011 = epsilon x.
-                                       (ArrayRecords.length x) = 0 /\
-                                       x!1 = -1 /\
-                                       x!2 = {flag = true;
-                                              first_val = 23;
-                                              sec_val = 69}
-                                    then epsilon x.
-                                    (ArrayRecords.length x) = 0
-                                    else epsilon x.
-                                    (ArrayRecords.length x) = 0
   Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
@@ -1306,75 +826,41 @@ File array_records_mono.mlw:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     result of call at line 49, characters 13-81 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-49 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 50:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     result of call at line 50, characters 13-82 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 21-30 : bool = true
     result of call at line 50, characters 21-30 : bool = true
     result of call at line 50, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 50, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-68 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
   Line 51:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
     result of call at line 51, characters 13-82 :
       basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 51, characters 13-82 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 51, characters 21-30 : bool = true
     result of call at line 51, characters 21-30 : bool = true
     result of call at line 51, characters 21-25 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 51, characters 21-25 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 51, characters 64-81 : int = 69
-    result of call at line 51, characters 64-81 : int = 69
-    result of call at line 51, characters 64-68 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 51, characters 64-68 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
   Line 52:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
     i : int = -1
     result of call at line 52, characters 13-92 :
       basic_record = {flag = false; first_val = 23; sec_val = 69}
-    result of call at line 52, characters 13-92 :
-      basic_record = {flag = false; first_val = 23; sec_val = 69}
-    result of call at line 52, characters 41-57 : int = 23
     result of call at line 52, characters 41-57 : int = 23
     result of call at line 52, characters 41-45 :
       basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 52, characters 41-45 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
     result of call at line 52, characters 74-91 : int = 69
-    result of call at line 52, characters 74-91 : int = 69
-    result of call at line 52, characters 74-78 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
     result of call at line 52, characters 74-78 :
       basic_record = {flag = true; first_val = 23; sec_val = 69}
 
@@ -1404,14 +890,6 @@ File array_records_mono.mlw:
             epsilon x. (ArrayRecords.length x) = 4 => 4;
             epsilon x. (ArrayRecords.length x) = 4 => 4;
             epsilon x. (ArrayRecords.length x) = 4 => 4; _ => 4|]
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 4 => 4;
-            epsilon x. (ArrayRecords.length x) = 4 => 4;
-            epsilon x. (ArrayRecords.length x) = 4 => 4;
-            epsilon x. (ArrayRecords.length x) = 4 => 4;
-            epsilon x. (ArrayRecords.length x) = 4 => 4; _ => 4|]
   Line 27:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
@@ -1454,46 +932,7 @@ File array_records_mono.mlw:
                                          (ArrayRecords.length x) = 4
                                          else epsilon x.
                                          (ArrayRecords.length x) = 4
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!012 x!1 x!2 ->
-                          if x!012 = epsilon x.
-                             (ArrayRecords.length x) = 4 /\ x!1 = 2 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 4
-                          else if x!012 = epsilon x.
-                                  (ArrayRecords.length x) = 4 /\ x!1 = 2 /\
-                                  x!2 = {flag = true;
-                                         first_val = 42;
-                                         sec_val = 69}
-                               then epsilon x. (ArrayRecords.length x) = 4
-                               else if x!012 = epsilon x.
-                                       (ArrayRecords.length x) = 4 /\ x!1 = 2 /\
-                                       x!2 = {flag = true;
-                                              first_val = 23;
-                                              sec_val = 69}
-                                    then epsilon x.
-                                    (ArrayRecords.length x) = 4
-                                    else if x!012 = epsilon x.
-                                            (ArrayRecords.length x) = 4 /\
-                                            x!1 = 2 /\
-                                            x!2 = {flag = false;
-                                                   first_val = 23;
-                                                   sec_val = 69}
-                                         then epsilon x.
-                                         (ArrayRecords.length x) = 4
-                                         else epsilon x.
-                                         (ArrayRecords.length x) = 4
   Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
@@ -1505,79 +944,45 @@ File array_records_mono.mlw:
     i : int = 2
   Line 47:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
-    i : int = 2
     i : int = 2
   Line 49:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
     result of call at line 49, characters 13-81 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-49 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 50:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
     result of call at line 50, characters 13-82 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 21-30 : bool = true
     result of call at line 50, characters 21-30 : bool = true
     result of call at line 50, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 50, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-68 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
   Line 51:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
     result of call at line 51, characters 13-82 :
       basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 51, characters 13-82 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 51, characters 21-30 : bool = true
     result of call at line 51, characters 21-30 : bool = true
     result of call at line 51, characters 21-25 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 51, characters 21-25 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 51, characters 64-81 : int = 69
-    result of call at line 51, characters 64-81 : int = 69
-    result of call at line 51, characters 64-68 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 51, characters 64-68 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
   Line 52:
     a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
     result of call at line 52, characters 13-92 :
       basic_record = {flag = false; first_val = 23; sec_val = 69}
-    result of call at line 52, characters 13-92 :
-      basic_record = {flag = false; first_val = 23; sec_val = 69}
-    result of call at line 52, characters 41-57 : int = 23
     result of call at line 52, characters 41-57 : int = 23
     result of call at line 52, characters 41-45 :
       basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 52, characters 41-45 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
     result of call at line 52, characters 74-91 : int = 69
-    result of call at line 52, characters 74-91 : int = 69
-    result of call at line 52, characters 74-78 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
     result of call at line 52, characters 74-78 :
       basic_record = {flag = true; first_val = 23; sec_val = 69}
 

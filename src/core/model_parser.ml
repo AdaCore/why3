@@ -330,27 +330,33 @@ let cmp_attrs a1 a2 =
 
 let find_call_id = Ident.search_attribute_value Ident.get_call_id_value
 
-let similar_model_element_names n1 n2 =
-  let name1 = get_lsymbol_or_model_trace_name n1 in
-  let name2 = get_lsymbol_or_model_trace_name n2 in
-  name1 = name2 &&
-  Opt.equal (=) (find_call_id n1.me_attrs) (find_call_id n2.me_attrs) &&
-  n1.me_kind = n2.me_kind &&
-  Strings.has_suffix unused_suffix name1 =
-  Strings.has_suffix unused_suffix name2
+let model_element_equal n1 n2 =
+  let me_kind_equal k1 k2 = match k1,k2 with
+  | Result, Result
+  | Old, Old
+  | Loop_before, Loop_before
+  | Loop_previous_iteration, Loop_previous_iteration
+  | Loop_current_iteration, Loop_current_iteration
+  | Error_message, Error_message
+  | Other, Other -> true
+  | Call_result l1, Call_result l2 -> Loc.equal l1 l2
+  | At s1, At s2 -> String.equal s1 s2
+  | _ -> false
+  in
+  me_kind_equal n1.me_kind n2.me_kind &&
+  Term.t_equal n1.me_value n2.me_value &&
+  Opt.equal Loc.equal n1.me_location n2.me_location &&
+  Sattr.equal n1.me_attrs n2.me_attrs &&
+  Term.ls_equal n1.me_lsymbol n2.me_lsymbol
 
-(* FIXME: filter_duplicated may remove elements that are not
-   duplicates, notably in the case where the content of a
-   reference is updated at a single source code line.
-   To be fixed since removing this filtering of elements
-   leaves *real* duplicates untouched. *)
-let rec filter_duplicated l = l
-  (* let exist_similar a l = List.exists (fun x ->
-    similar_model_element_names a x) l in
+(* FIXME: understand why some elements are duplicated *)
+let rec filter_duplicated l =
+  let is_duplicated a l =
+    List.exists (fun x -> model_element_equal a x) l in
   match l with
   | [] | [_] -> l
-  | me :: l when exist_similar me l -> filter_duplicated l
-  | me :: l -> me :: filter_duplicated l *)
+  | me :: l when is_duplicated me l -> filter_duplicated l
+  | me :: l -> me :: filter_duplicated l
 
 let json_attrs attrs =
   let open Json_base in

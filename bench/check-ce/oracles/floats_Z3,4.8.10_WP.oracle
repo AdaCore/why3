@@ -315,22 +315,14 @@ The following counterexample model could not be verified
 File bv.mlw:
   Line 9:
     pow2 : int -> int = [|_ => 0|]
-    pow2 : int -> int = [|_ => 0|]
 File ieee_float.mlw:
   Line 194:
     of_int : mode -> int -> t = fun x!030 x!123 -> NaN
-    of_int : mode -> int -> t = fun x!030 x!123 -> NaN
   Line 223:
-    max_real : real = 0.0
     max_real : real = 0.0
   Line 224:
     max_int : int = 0
-    max_int : int = 0
   Line 233:
-    in_int_range :
-      int
-      ->
-      bool = fun x!032 -> (int.Int.(<=) 0 x!032) /\ (int.Int.(<=) x!032 0)
     in_int_range :
       int
       ->
@@ -341,21 +333,13 @@ File ieee_float.mlw:
       ->
       bool = fun x!032 ->
               (int.Int.(<=) -16777216 x!032) /\ (int.Int.(<=) x!032 16777216)
-    in_safe_int_range :
-      int
-      ->
-      bool = fun x!032 ->
-              (int.Int.(<=) -16777216 x!032) /\ (int.Int.(<=) x!032 16777216)
 File real.mlw:
   Line 201:
     sqr : real -> real = fun x!030 -> (real.Real.( * ) x!030 x!030)
-    sqr : real -> real = fun x!030 -> (real.Real.( * ) x!030 x!030)
   Line 203:
-    sqrt : real -> real = [|_ => 0.0|]
     sqrt : real -> real = [|_ => 0.0|]
 File floats.mlw:
   Line 19:
-    x : t = ∞
     x : t = ∞
 
 <check-ce-categorization>Categorizations of models:
@@ -821,22 +805,14 @@ The following counterexample model could not be verified
 File bv.mlw:
   Line 9:
     pow2 : int -> int = [|_ => 0|]
-    pow2 : int -> int = [|_ => 0|]
 File ieee_float.mlw:
   Line 194:
     of_int : mode -> int -> t1 = fun x!094 x!171 -> NaN
-    of_int : mode -> int -> t1 = fun x!094 x!171 -> NaN
   Line 223:
-    max_real : real = 0.0
     max_real : real = 0.0
   Line 224:
     max_int : int = 0
-    max_int : int = 0
   Line 233:
-    in_int_range :
-      int
-      ->
-      bool = fun x!096 -> (int.Int.(<=) 0 x!096) /\ (int.Int.(<=) x!096 0)
     in_int_range :
       int
       ->
@@ -848,22 +824,13 @@ File ieee_float.mlw:
       bool = fun x!096 ->
               (int.Int.(<=) -9007199254740992 x!096) /\
               (int.Int.(<=) x!096 9007199254740992)
-    in_safe_int_range :
-      int
-      ->
-      bool = fun x!096 ->
-              (int.Int.(<=) -9007199254740992 x!096) /\
-              (int.Int.(<=) x!096 9007199254740992)
 File real.mlw:
   Line 201:
     sqr : real -> real = fun x!094 -> (real.Real.( * ) x!094 x!094)
-    sqr : real -> real = fun x!094 -> (real.Real.( * ) x!094 x!094)
   Line 203:
-    sqrt : real -> real = [|_ => 0.0|]
     sqrt : real -> real = [|_ => 0.0|]
 File floats.mlw:
   Line 55:
-    x : t1 = ∞
     x : t1 = ∞
 
 <check-ce-categorization>Categorizations of models:

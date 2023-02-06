@@ -18,25 +18,8 @@ File array.mlw:
       uni
       ->
       int = fun bOUND_VARIABLE_622 bOUND_VARIABLE_623 -> 0
-    length :
-      ty
-      ->
-      uni
-      ->
-      int = fun bOUND_VARIABLE_622 bOUND_VARIABLE_623 -> 0
-    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
   Line 20:
-    mixfix [] :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = fun bOUND_VARIABLE_659 bOUND_VARIABLE_660 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 3;
-                       Array_records.second_value = 5}
     mixfix [] :
       array
       basic_record
@@ -61,32 +44,15 @@ File array_records_poly.mlw:
                       {Array_records.flag = true;
                        Array_records.first_value = 3;
                        Array_records.second_value = 5}
-    basic_record'mk :
-      bool
-      ->
-      int
-      ->
-      int
-      ->
-      basic_record = fun bOUND_VARIABLE_772 bOUND_VARIABLE_773
-                      bOUND_VARIABLE_774 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 3;
-                       Array_records.second_value = 5}
   Line 16:
-    flag : basic_record -> bool = [|_ => true|]
     flag : basic_record -> bool = [|_ => true|]
   Line 17:
     first_val : basic_record -> int = [|_ => 3|]
-    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val : basic_record -> int = [|_ => 5|]
     sec_val : basic_record -> int = [|_ => 5|]
   Line 23:
     i : int = -1
-    i : int = -1
   Line 27:
-    i : int = -1
     i : int = -1
 
 <check-ce-categorization>Categorizations of models:
@@ -109,25 +75,8 @@ File array.mlw:
       uni
       ->
       int = fun bOUND_VARIABLE_631 bOUND_VARIABLE_632 -> 0
-    length :
-      ty
-      ->
-      uni
-      ->
-      int = fun bOUND_VARIABLE_631 bOUND_VARIABLE_632 -> 0
-    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
   Line 20:
-    mixfix [] :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = fun bOUND_VARIABLE_668 bOUND_VARIABLE_669 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 3;
-                       Array_records.second_value = 5}
     mixfix [] :
       array
       basic_record
@@ -152,39 +101,17 @@ File array_records_poly.mlw:
                       {Array_records.flag = true;
                        Array_records.first_value = 3;
                        Array_records.second_value = 5}
-    basic_record'mk :
-      bool
-      ->
-      int
-      ->
-      int
-      ->
-      basic_record = fun bOUND_VARIABLE_781 bOUND_VARIABLE_782
-                      bOUND_VARIABLE_783 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 3;
-                       Array_records.second_value = 5}
   Line 16:
-    flag : basic_record -> bool = [|_ => true|]
     flag : basic_record -> bool = [|_ => true|]
   Line 17:
     first_val : basic_record -> int = [|_ => 3|]
-    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val : basic_record -> int = [|_ => 5|]
     sec_val : basic_record -> int = [|_ => 5|]
   Line 23:
     i : int = -1
-    i : int = -1
   Line 27:
     i : int = -1
-    i : int = -1
     result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
@@ -210,25 +137,8 @@ File array.mlw:
       uni
       ->
       int = fun bOUND_VARIABLE_651 bOUND_VARIABLE_652 -> 0
-    length :
-      ty
-      ->
-      uni
-      ->
-      int = fun bOUND_VARIABLE_651 bOUND_VARIABLE_652 -> 0
-    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
   Line 20:
-    mixfix [] :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = fun bOUND_VARIABLE_688 bOUND_VARIABLE_689 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 3;
-                       Array_records.second_value = 5}
     mixfix [] :
       array
       basic_record
@@ -253,57 +163,26 @@ File array_records_poly.mlw:
                       {Array_records.flag = true;
                        Array_records.first_value = 3;
                        Array_records.second_value = 5}
-    basic_record'mk :
-      bool
-      ->
-      int
-      ->
-      int
-      ->
-      basic_record = fun bOUND_VARIABLE_801 bOUND_VARIABLE_802
-                      bOUND_VARIABLE_803 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 3;
-                       Array_records.second_value = 5}
   Line 16:
-    flag : basic_record -> bool = [|_ => true|]
     flag : basic_record -> bool = [|_ => true|]
   Line 17:
     first_val : basic_record -> int = [|_ => 3|]
-    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val : basic_record -> int = [|_ => 5|]
     sec_val : basic_record -> int = [|_ => 5|]
   Line 23:
     i : int = -1
-    i : int = -1
   Line 27:
     i : int = -1
-    i : int = -1
-    result of call at line 27, characters 13-81 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
     result of call at line 27, characters 13-81 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 5}
     result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
     result of call at line 27, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
@@ -337,17 +216,6 @@ File array.mlw:
                          {Array_records.flag = true;
                           Array_records.first_value = 3;
                           Array_records.second_value = 0}|]|]
-    elts :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = [|_ =>
-                       [|_ =>
-                         {Array_records.flag = true;
-                          Array_records.first_value = 3;
-                          Array_records.second_value = 0}|]|]
   Line 17:
     length :
       ty
@@ -355,25 +223,8 @@ File array.mlw:
       uni
       ->
       int = fun bOUND_VARIABLE_767 bOUND_VARIABLE_768 -> 0
-    length :
-      ty
-      ->
-      uni
-      ->
-      int = fun bOUND_VARIABLE_767 bOUND_VARIABLE_768 -> 0
-    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
   Line 20:
-    mixfix [] :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = fun bOUND_VARIABLE_799 bOUND_VARIABLE_800 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 3;
-                       Array_records.second_value = 0}
     mixfix [] :
       array
       basic_record
@@ -398,61 +249,30 @@ File array_records_poly.mlw:
                       {Array_records.flag = true;
                        Array_records.first_value = 3;
                        Array_records.second_value = 0}
-    basic_record'mk :
-      bool
-      ->
-      int
-      ->
-      int
-      ->
-      basic_record = fun bOUND_VARIABLE_9161 bOUND_VARIABLE_9171
-                      bOUND_VARIABLE_9181 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 3;
-                       Array_records.second_value = 0}
   Line 16:
-    flag : basic_record -> bool = [|_ => true|]
     flag : basic_record -> bool = [|_ => true|]
   Line 17:
     first_val : basic_record -> int = [|_ => 3|]
-    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
     sec_val : basic_record -> int = [|_ => 0|]
-    sec_val : basic_record -> int = [|_ => 0|]
   Line 23:
-    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 0}
-    result of call at line 27, characters 13-81 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 0}
-    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 0}
-    result of call at line 27, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 0}
     result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 0}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 0}
   Line 28:
-    i : int = -1
     i : int = -1
 
 <check-ce-categorization>Categorizations of models:
@@ -483,17 +303,6 @@ File array.mlw:
                          {Array_records.flag = true;
                           Array_records.first_value = 3;
                           Array_records.second_value = 0}|]|]
-    elts :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = [|_ =>
-                       [|_ =>
-                         {Array_records.flag = true;
-                          Array_records.first_value = 3;
-                          Array_records.second_value = 0}|]|]
   Line 17:
     length :
       ty
@@ -501,25 +310,8 @@ File array.mlw:
       uni
       ->
       int = fun bOUND_VARIABLE_781 bOUND_VARIABLE_782 -> 0
-    length :
-      ty
-      ->
-      uni
-      ->
-      int = fun bOUND_VARIABLE_781 bOUND_VARIABLE_782 -> 0
-    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
   Line 20:
-    mixfix [] :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = fun bOUND_VARIABLE_813 bOUND_VARIABLE_814 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 3;
-                       Array_records.second_value = 0}
     mixfix [] :
       array
       basic_record
@@ -544,68 +336,32 @@ File array_records_poly.mlw:
                       {Array_records.flag = true;
                        Array_records.first_value = 3;
                        Array_records.second_value = 0}
-    basic_record'mk :
-      bool
-      ->
-      int
-      ->
-      int
-      ->
-      basic_record = fun bOUND_VARIABLE_9301 bOUND_VARIABLE_9311
-                      bOUND_VARIABLE_9321 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 3;
-                       Array_records.second_value = 0}
   Line 16:
-    flag : basic_record -> bool = [|_ => true|]
     flag : basic_record -> bool = [|_ => true|]
   Line 17:
     first_val : basic_record -> int = [|_ => 3|]
-    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
     sec_val : basic_record -> int = [|_ => 0|]
-    sec_val : basic_record -> int = [|_ => 0|]
   Line 23:
-    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 0}
-    result of call at line 27, characters 13-81 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 0}
-    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 0}
-    result of call at line 27, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 0}
     result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 0}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 0}
   Line 28:
     i : int = -1
-    i : int = -1
     result of call at line 28, characters 64-81 : int = 0
-    result of call at line 28, characters 64-81 : int = 0
-    result of call at line 28, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 0}
     result of call at line 28, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
@@ -639,17 +395,6 @@ File array.mlw:
                          {Array_records.flag = true;
                           Array_records.first_value = 3;
                           Array_records.second_value = 0}|]|]
-    elts :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = [|_ =>
-                       [|_ =>
-                         {Array_records.flag = true;
-                          Array_records.first_value = 3;
-                          Array_records.second_value = 0}|]|]
   Line 17:
     length :
       ty
@@ -657,25 +402,8 @@ File array.mlw:
       uni
       ->
       int = fun bOUND_VARIABLE_819 bOUND_VARIABLE_820 -> 0
-    length :
-      ty
-      ->
-      uni
-      ->
-      int = fun bOUND_VARIABLE_819 bOUND_VARIABLE_820 -> 0
-    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
   Line 20:
-    mixfix [] :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = fun bOUND_VARIABLE_854 bOUND_VARIABLE_855 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 3;
-                       Array_records.second_value = 0}
     mixfix [] :
       array
       basic_record
@@ -700,86 +428,41 @@ File array_records_poly.mlw:
                       {Array_records.flag = true;
                        Array_records.first_value = 3;
                        Array_records.second_value = 0}
-    basic_record'mk :
-      bool
-      ->
-      int
-      ->
-      int
-      ->
-      basic_record = fun bOUND_VARIABLE_6301 bOUND_VARIABLE_6302
-                      bOUND_VARIABLE_6303 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 3;
-                       Array_records.second_value = 0}
   Line 16:
-    flag : basic_record -> bool = [|_ => true|]
     flag : basic_record -> bool = [|_ => true|]
   Line 17:
     first_val : basic_record -> int = [|_ => 3|]
-    first_val : basic_record -> int = [|_ => 3|]
   Line 18:
     sec_val : basic_record -> int = [|_ => 0|]
-    sec_val : basic_record -> int = [|_ => 0|]
   Line 23:
-    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 0}
-    result of call at line 27, characters 13-81 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 0}
-    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 0}
-    result of call at line 27, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 0}
     result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 0}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 0}
   Line 28:
     i : int = -1
-    i : int = -1
-    result of call at line 28, characters 13-82 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 0}
     result of call at line 28, characters 13-82 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 0}
     result of call at line 28, characters 21-30 : bool = true
-    result of call at line 28, characters 21-30 : bool = true
-    result of call at line 28, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 0}
     result of call at line 28, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 0}
     result of call at line 28, characters 64-81 : int = 0
-    result of call at line 28, characters 64-81 : int = 0
-    result of call at line 28, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 0}
     result of call at line 28, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
@@ -808,20 +491,11 @@ File array.mlw:
       uni
       ->
       int = fun bOUND_VARIABLE_911 bOUND_VARIABLE_912 -> 0
-    length :
-      ty
-      ->
-      uni
-      ->
-      int = fun bOUND_VARIABLE_911 bOUND_VARIABLE_912 -> 0
-    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
-    flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = [|_ => 3|]
     first_val : basic_record -> int = [|_ => 3|]
   Line 18:
     sec_val :
@@ -832,42 +506,19 @@ File array_records_poly.mlw:
                  Array_records.first_value = 3;
                  Array_records.second_value = 69} = bOUND_VARIABLE_1116
              then 69 else 5
-    sec_val :
-      basic_record
-      ->
-      int = fun bOUND_VARIABLE_1116 ->
-             if {Array_records.flag = true;
-                 Array_records.first_value = 3;
-                 Array_records.second_value = 69} = bOUND_VARIABLE_1116
-             then 69 else 5
   Line 23:
-    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
-    result of call at line 27, characters 13-81 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
-    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 5}
-    result of call at line 27, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
@@ -877,32 +528,17 @@ File array_records_poly.mlw:
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
-    result of call at line 28, characters 13-82 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
-    result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
-    result of call at line 28, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
     result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
     result of call at line 28, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
   Line 29:
-    i : int = -1
     i : int = -1
 
 <check-ce-categorization>Categorizations of models:
@@ -928,20 +564,11 @@ File array.mlw:
       uni
       ->
       int = fun bOUND_VARIABLE_925 bOUND_VARIABLE_926 -> 0
-    length :
-      ty
-      ->
-      uni
-      ->
-      int = fun bOUND_VARIABLE_925 bOUND_VARIABLE_926 -> 0
-    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
-    flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = [|_ => 3|]
     first_val : basic_record -> int = [|_ => 3|]
   Line 18:
     sec_val :
@@ -952,42 +579,19 @@ File array_records_poly.mlw:
                  Array_records.first_value = 3;
                  Array_records.second_value = 69} = bOUND_VARIABLE_1130
              then 69 else 5
-    sec_val :
-      basic_record
-      ->
-      int = fun bOUND_VARIABLE_1130 ->
-             if {Array_records.flag = true;
-                 Array_records.first_value = 3;
-                 Array_records.second_value = 69} = bOUND_VARIABLE_1130
-             then 69 else 5
   Line 23:
-    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
-    result of call at line 27, characters 13-81 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
-    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 5}
-    result of call at line 27, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
@@ -997,39 +601,19 @@ File array_records_poly.mlw:
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
-    result of call at line 28, characters 13-82 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
-    result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
-    result of call at line 28, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
     result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
     result of call at line 28, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
                       Array_records.second_value = 69}
   Line 29:
     i : int = -1
-    i : int = -1
     result of call at line 29, characters 64-81 : int = 69
-    result of call at line 29, characters 64-81 : int = 69
-    result of call at line 29, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
     result of call at line 29, characters 64-68 :
       basic_record = {Array_records.flag = true;
                       Array_records.first_value = 3;
@@ -1067,21 +651,6 @@ File array.mlw:
                        {Array_records.flag = false;
                         Array_records.first_value = 2;
                         Array_records.second_value = -2}|]|]
-    elts :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = [|_ =>
-                       [|-1 =>
-                         {Array_records.flag = false;
-                          Array_records.first_value = 2;
-                          Array_records.second_value = -2};
-                       _ =>
-                       {Array_records.flag = false;
-                        Array_records.first_value = 2;
-                        Array_records.second_value = -2}|]|]
   Line 17:
     length :
       ty
@@ -1089,52 +658,27 @@ File array.mlw:
       uni
       ->
       int = fun bOUND_VARIABLE_967 bOUND_VARIABLE_968 -> 0
-    length :
-      ty
-      ->
-      uni
-      ->
-      int = fun bOUND_VARIABLE_967 bOUND_VARIABLE_968 -> 0
-    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => false|]
-    flag : basic_record -> bool = [|_ => false|]
   Line 17:
-    first_val : basic_record -> int = [|_ => 2|]
     first_val : basic_record -> int = [|_ => 2|]
   Line 18:
     sec_val : basic_record -> int = [|_ => -2|]
-    sec_val : basic_record -> int = [|_ => -2|]
   Line 23:
-    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {Array_records.flag = false;
                       Array_records.first_value = 2;
                       Array_records.second_value = -2}
-    result of call at line 27, characters 13-81 :
-      basic_record = {Array_records.flag = false;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = -2}
-    result of call at line 27, characters 21-30 : bool = false
     result of call at line 27, characters 21-30 : bool = false
     result of call at line 27, characters 21-25 :
       basic_record = {Array_records.flag = false;
                       Array_records.first_value = 2;
                       Array_records.second_value = -2}
-    result of call at line 27, characters 21-25 :
-      basic_record = {Array_records.flag = false;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = -2}
     result of call at line 27, characters 45-61 : int = 2
-    result of call at line 27, characters 45-61 : int = 2
-    result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = false;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = -2}
     result of call at line 27, characters 45-49 :
       basic_record = {Array_records.flag = false;
                       Array_records.first_value = 2;
@@ -1144,57 +688,28 @@ File array_records_poly.mlw:
       basic_record = {Array_records.flag = false;
                       Array_records.first_value = 2;
                       Array_records.second_value = -2}
-    result of call at line 28, characters 13-82 :
-      basic_record = {Array_records.flag = false;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = -2}
-    result of call at line 28, characters 21-30 : bool = false
     result of call at line 28, characters 21-30 : bool = false
     result of call at line 28, characters 21-25 :
       basic_record = {Array_records.flag = false;
                       Array_records.first_value = 2;
                       Array_records.second_value = -2}
-    result of call at line 28, characters 21-25 :
-      basic_record = {Array_records.flag = false;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = -2}
     result of call at line 28, characters 64-81 : int = -2
-    result of call at line 28, characters 64-81 : int = -2
-    result of call at line 28, characters 64-68 :
-      basic_record = {Array_records.flag = false;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = -2}
     result of call at line 28, characters 64-68 :
       basic_record = {Array_records.flag = false;
                       Array_records.first_value = 2;
                       Array_records.second_value = -2}
   Line 29:
     i : int = -1
-    i : int = -1
-    result of call at line 29, characters 13-82 :
-      basic_record = {Array_records.flag = false;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = -2}
     result of call at line 29, characters 13-82 :
       basic_record = {Array_records.flag = false;
                       Array_records.first_value = 2;
                       Array_records.second_value = -2}
     result of call at line 29, characters 21-30 : bool = false
-    result of call at line 29, characters 21-30 : bool = false
-    result of call at line 29, characters 21-25 :
-      basic_record = {Array_records.flag = false;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = -2}
     result of call at line 29, characters 21-25 :
       basic_record = {Array_records.flag = false;
                       Array_records.first_value = 2;
                       Array_records.second_value = -2}
     result of call at line 29, characters 64-81 : int = -2
-    result of call at line 29, characters 64-81 : int = -2
-    result of call at line 29, characters 64-68 :
-      basic_record = {Array_records.flag = false;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = -2}
     result of call at line 29, characters 64-68 :
       basic_record = {Array_records.flag = false;
                       Array_records.first_value = 2;
@@ -1223,30 +738,9 @@ File array.mlw:
       uni
       ->
       int = fun bOUND_VARIABLE_1044 bOUND_VARIABLE_1045 -> 0
-    length :
-      ty
-      ->
-      uni
-      ->
-      int = fun bOUND_VARIABLE_1044 bOUND_VARIABLE_1045 -> 0
-    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 17:
-    first_val :
-      basic_record
-      ->
-      int = [|epsilon x.
-              (Array_records.second_value x) = 69 /\
-              (Array_records.first_value x) = 42 => 42;
-            _ =>
-            if epsilon x.
-            (Array_records.second_value x) = 69 /\
-            (Array_records.first_value x) = 23 = bOUND_VARIABLE_1274 then 23
-            else if epsilon x.
-                 (Array_records.second_value x) = 69 /\
-                 (Array_records.first_value x) = 23 = bOUND_VARIABLE_1274
-                 then 23 else 3|]
     first_val :
       basic_record
       ->
@@ -1280,49 +774,18 @@ File array_records_poly.mlw:
                       (Array_records.second_value x) = 69 /\
                       (Array_records.first_value x) = 23 = bOUND_VARIABLE_1274
                       then 69 else 5|]
-    sec_val :
-      basic_record
-      ->
-      int = [|epsilon x.
-              (Array_records.second_value x) = 69 /\
-              (Array_records.first_value x) = 42 => 69;
-            _ =>
-            if epsilon x.
-            (Array_records.second_value x) = 69 /\
-            (Array_records.first_value x) = 3 = bOUND_VARIABLE_1274 then 69
-            else if epsilon x.
-                 (Array_records.second_value x) = 69 /\
-                 (Array_records.first_value x) = 23 = bOUND_VARIABLE_1274
-                 then 69
-                 else if epsilon x.
-                      (Array_records.second_value x) = 69 /\
-                      (Array_records.first_value x) = 23 = bOUND_VARIABLE_1274
-                      then 69 else 5|]
   Line 23:
-    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 3
-    result of call at line 27, characters 13-81 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 3
-    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 5 /\ (Array_records.first_value x) = 3
-    result of call at line 27, characters 21-25 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 5 /\ (Array_records.first_value x) = 3
     result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 5 /\ (Array_records.first_value x) = 3
     result of call at line 27, characters 45-49 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 5 /\ (Array_records.first_value x) = 3
@@ -1331,26 +794,12 @@ File array_records_poly.mlw:
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 42
-    result of call at line 28, characters 13-82 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 42
-    result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 3
-    result of call at line 28, characters 21-25 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 3
     result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-68 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 3
     result of call at line 28, characters 64-68 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
@@ -1360,32 +809,17 @@ File array_records_poly.mlw:
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 23
-    result of call at line 29, characters 13-82 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 23
-    result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-25 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 42
-    result of call at line 29, characters 21-25 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 42
     result of call at line 29, characters 64-81 : int = 69
-    result of call at line 29, characters 64-81 : int = 69
-    result of call at line 29, characters 64-68 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 42
     result of call at line 29, characters 64-68 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 42
   Line 30:
-    i : int = -1
     i : int = -1
 
 <check-ce-categorization>Categorizations of models:
@@ -1411,30 +845,9 @@ File array.mlw:
       uni
       ->
       int = fun bOUND_VARIABLE_1058 bOUND_VARIABLE_1059 -> 0
-    length :
-      ty
-      ->
-      uni
-      ->
-      int = fun bOUND_VARIABLE_1058 bOUND_VARIABLE_1059 -> 0
-    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 17:
-    first_val :
-      basic_record
-      ->
-      int = [|epsilon x.
-              (Array_records.second_value x) = 69 /\
-              (Array_records.first_value x) = 42 => 42;
-            _ =>
-            if epsilon x.
-            (Array_records.second_value x) = 69 /\
-            (Array_records.first_value x) = 23 = bOUND_VARIABLE_1288 then 23
-            else if epsilon x.
-                 (Array_records.second_value x) = 69 /\
-                 (Array_records.first_value x) = 23 = bOUND_VARIABLE_1288
-                 then 23 else 3|]
     first_val :
       basic_record
       ->
@@ -1468,49 +881,18 @@ File array_records_poly.mlw:
                       (Array_records.second_value x) = 69 /\
                       (Array_records.first_value x) = 23 = bOUND_VARIABLE_1288
                       then 69 else 5|]
-    sec_val :
-      basic_record
-      ->
-      int = [|epsilon x.
-              (Array_records.second_value x) = 69 /\
-              (Array_records.first_value x) = 42 => 69;
-            _ =>
-            if epsilon x.
-            (Array_records.second_value x) = 69 /\
-            (Array_records.first_value x) = 3 = bOUND_VARIABLE_1288 then 69
-            else if epsilon x.
-                 (Array_records.second_value x) = 69 /\
-                 (Array_records.first_value x) = 23 = bOUND_VARIABLE_1288
-                 then 69
-                 else if epsilon x.
-                      (Array_records.second_value x) = 69 /\
-                      (Array_records.first_value x) = 23 = bOUND_VARIABLE_1288
-                      then 69 else 5|]
   Line 23:
-    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 3
-    result of call at line 27, characters 13-81 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 3
-    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 5 /\ (Array_records.first_value x) = 3
-    result of call at line 27, characters 21-25 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 5 /\ (Array_records.first_value x) = 3
     result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 5 /\ (Array_records.first_value x) = 3
     result of call at line 27, characters 45-49 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 5 /\ (Array_records.first_value x) = 3
@@ -1519,26 +901,12 @@ File array_records_poly.mlw:
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 42
-    result of call at line 28, characters 13-82 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 42
-    result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 3
-    result of call at line 28, characters 21-25 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 3
     result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-68 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 3
     result of call at line 28, characters 64-68 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
@@ -1548,39 +916,19 @@ File array_records_poly.mlw:
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 23
-    result of call at line 29, characters 13-82 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 23
-    result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-25 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 42
-    result of call at line 29, characters 21-25 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 42
     result of call at line 29, characters 64-81 : int = 69
-    result of call at line 29, characters 64-81 : int = 69
-    result of call at line 29, characters 64-68 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 42
     result of call at line 29, characters 64-68 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 42
   Line 30:
     i : int = -1
-    i : int = -1
     result of call at line 30, characters 74-91 : int = 69
-    result of call at line 30, characters 74-91 : int = 69
-    result of call at line 30, characters 74-78 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 23
     result of call at line 30, characters 74-78 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
@@ -1609,30 +957,9 @@ File array.mlw:
       uni
       ->
       int = fun bOUND_VARIABLE_1077 bOUND_VARIABLE_1078 -> 0
-    length :
-      ty
-      ->
-      uni
-      ->
-      int = fun bOUND_VARIABLE_1077 bOUND_VARIABLE_1078 -> 0
-    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 17:
-    first_val :
-      basic_record
-      ->
-      int = [|epsilon x.
-              (Array_records.second_value x) = 69 /\
-              (Array_records.first_value x) = 42 => 42;
-            _ =>
-            if epsilon x.
-            (Array_records.second_value x) = 69 /\
-            (Array_records.first_value x) = 23 = bOUND_VARIABLE_1307 then 23
-            else if epsilon x.
-                 (Array_records.second_value x) = 69 /\
-                 (Array_records.first_value x) = 23 = bOUND_VARIABLE_1307
-                 then 23 else 3|]
     first_val :
       basic_record
       ->
@@ -1666,49 +993,18 @@ File array_records_poly.mlw:
                       (Array_records.second_value x) = 69 /\
                       (Array_records.first_value x) = 23 = bOUND_VARIABLE_1307
                       then 69 else 5|]
-    sec_val :
-      basic_record
-      ->
-      int = [|epsilon x.
-              (Array_records.second_value x) = 69 /\
-              (Array_records.first_value x) = 42 => 69;
-            _ =>
-            if epsilon x.
-            (Array_records.second_value x) = 69 /\
-            (Array_records.first_value x) = 3 = bOUND_VARIABLE_1307 then 69
-            else if epsilon x.
-                 (Array_records.second_value x) = 69 /\
-                 (Array_records.first_value x) = 23 = bOUND_VARIABLE_1307
-                 then 69
-                 else if epsilon x.
-                      (Array_records.second_value x) = 69 /\
-                      (Array_records.first_value x) = 23 = bOUND_VARIABLE_1307
-                      then 69 else 5|]
   Line 23:
-    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 3
-    result of call at line 27, characters 13-81 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 3
-    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 5 /\ (Array_records.first_value x) = 3
-    result of call at line 27, characters 21-25 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 5 /\ (Array_records.first_value x) = 3
     result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 5 /\ (Array_records.first_value x) = 3
     result of call at line 27, characters 45-49 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 5 /\ (Array_records.first_value x) = 3
@@ -1717,26 +1013,12 @@ File array_records_poly.mlw:
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 42
-    result of call at line 28, characters 13-82 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 42
-    result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 3
-    result of call at line 28, characters 21-25 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 3
     result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-68 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 3
     result of call at line 28, characters 64-68 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
@@ -1746,57 +1028,28 @@ File array_records_poly.mlw:
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 23
-    result of call at line 29, characters 13-82 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 23
-    result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-25 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 42
-    result of call at line 29, characters 21-25 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 42
     result of call at line 29, characters 64-81 : int = 69
-    result of call at line 29, characters 64-81 : int = 69
-    result of call at line 29, characters 64-68 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 42
     result of call at line 29, characters 64-68 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 42
   Line 30:
     i : int = -1
-    i : int = -1
-    result of call at line 30, characters 13-92 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 23
     result of call at line 30, characters 13-92 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 23
     result of call at line 30, characters 41-57 : int = 23
-    result of call at line 30, characters 41-57 : int = 23
-    result of call at line 30, characters 41-45 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 23
     result of call at line 30, characters 41-45 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 23
     result of call at line 30, characters 74-91 : int = 69
-    result of call at line 30, characters 74-91 : int = 69
-    result of call at line 30, characters 74-78 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 23
     result of call at line 30, characters 74-78 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
@@ -1826,31 +1079,9 @@ File array.mlw:
       uni
       ->
       int = fun bOUND_VARIABLE_1204 bOUND_VARIABLE_1205 -> 0
-    length :
-      ty
-      ->
-      uni
-      ->
-      int = fun bOUND_VARIABLE_1204 bOUND_VARIABLE_1205 -> 0
-    length : array basic_record -> int = [|_ => 0|]
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 17:
-    first_val :
-      basic_record
-      ->
-      int = fun bOUND_VARIABLE_1479 ->
-             if epsilon x.
-             (Array_records.second_value x) = 69 /\
-             (Array_records.first_value x) = 23 = bOUND_VARIABLE_1479 then 23
-             else if epsilon x.
-                  (Array_records.second_value x) = 69 /\
-                  (Array_records.first_value x) = 23 = bOUND_VARIABLE_1479
-                  then 23
-                  else if epsilon x.
-                       (Array_records.second_value x) = 69 /\
-                       (Array_records.first_value x) = 42 = bOUND_VARIABLE_1479
-                       then 42 else 3
     first_val :
       basic_record
       ->
@@ -1886,53 +1117,20 @@ File array_records_poly.mlw:
                             (Array_records.second_value x) = 69 /\
                             (Array_records.first_value x) = 3 = bOUND_VARIABLE_1479
                             then 69 else 5
-    sec_val :
-      basic_record
-      ->
-      int = fun bOUND_VARIABLE_1479 ->
-             if epsilon x.
-             (Array_records.second_value x) = 69 /\
-             (Array_records.first_value x) = 23 = bOUND_VARIABLE_1479 then 69
-             else if epsilon x.
-                  (Array_records.second_value x) = 69 /\
-                  (Array_records.first_value x) = 23 = bOUND_VARIABLE_1479
-                  then 69
-                  else if epsilon x.
-                       (Array_records.second_value x) = 69 /\
-                       (Array_records.first_value x) = 42 = bOUND_VARIABLE_1479
-                       then 69
-                       else if epsilon x.
-                            (Array_records.second_value x) = 69 /\
-                            (Array_records.first_value x) = 3 = bOUND_VARIABLE_1479
-                            then 69 else 5
   Line 23:
     i : int = 0
-    i : int = 0
   Line 25:
-    i : int = 0
     i : int = 0
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 3
-    result of call at line 27, characters 13-81 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 3
-    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 5 /\ (Array_records.first_value x) = 3
-    result of call at line 27, characters 21-25 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 5 /\ (Array_records.first_value x) = 3
     result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 5 /\ (Array_records.first_value x) = 3
     result of call at line 27, characters 45-49 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 5 /\ (Array_records.first_value x) = 3
@@ -1941,26 +1139,12 @@ File array_records_poly.mlw:
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 42
-    result of call at line 28, characters 13-82 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 42
-    result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 3
-    result of call at line 28, characters 21-25 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 3
     result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-68 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 3
     result of call at line 28, characters 64-68 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
@@ -1970,26 +1154,12 @@ File array_records_poly.mlw:
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 23
-    result of call at line 29, characters 13-82 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 23
-    result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-25 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 42
-    result of call at line 29, characters 21-25 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 42
     result of call at line 29, characters 64-81 : int = 69
-    result of call at line 29, characters 64-81 : int = 69
-    result of call at line 29, characters 64-68 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 42
     result of call at line 29, characters 64-68 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
@@ -1999,26 +1169,12 @@ File array_records_poly.mlw:
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 23
-    result of call at line 30, characters 13-92 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 23
-    result of call at line 30, characters 41-57 : int = 23
     result of call at line 30, characters 41-57 : int = 23
     result of call at line 30, characters 41-45 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
       (Array_records.first_value x) = 23
-    result of call at line 30, characters 41-45 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 23
     result of call at line 30, characters 74-91 : int = 69
-    result of call at line 30, characters 74-91 : int = 69
-    result of call at line 30, characters 74-78 :
-      basic_record = epsilon x.
-      (Array_records.second_value x) = 69 /\
-      (Array_records.first_value x) = 23
     result of call at line 30, characters 74-78 :
       basic_record = epsilon x.
       (Array_records.second_value x) = 69 /\
