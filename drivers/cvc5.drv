@@ -1,8 +1,8 @@
 (** Why3 driver for CVC5 1.0.0 *)
 
 prelude ";; produced by cvc5.drv ;;"
-
 prelude "(set-logic ALL)"
+prelude "(set-info :smt-lib-version 2.6)"
 
 unknown "^(error \"Can't get-info :reason-unknown when the last result wasn't unknown!\")$" "(not unknown!)"
 
@@ -11,10 +11,77 @@ outofmemory "cvc5::internal::Minisat::OutOfMemoryException"
 
 steps "resource::resourceUnitsUsed = \\([0-9]+\\)" 1
 
-import "cvc4_16.gen"
-
 theory BuiltIn
-
   meta "supports_smt_get_info_unknown_reason" ""
-
 end
+
+import "smt-libv2.gen"
+printer "smtv2.6"
+import "smt-libv2-bv.gen"
+import "cvc4_bv.gen"
+import "smt-libv2-floats.gen"
+
+import "discrimination.gen"
+theory BuiltIn
+  meta "select_alginst_default" "local"
+  meta "eliminate_algebraic" "keep_mono"
+end
+
+transformation "remove_unused_keep_constants"
+transformation "inline_trivial"
+transformation "eliminate_builtin"
+transformation "detect_polymorphism"
+transformation "eliminate_definition_conditionally"
+transformation "eliminate_inductive"
+transformation "eliminate_epsilon"
+transformation "eliminate_literal"
+transformation "simplify_formula"
+
+(* Prepare for counter-example query: get rid of some quantifiers
+   (makes it possible to query model values of the variables in
+   premises) and introduce counter-example projections.  Note: does
+   nothing if meta get_counterexmp is not set *)
+transformation "prepare_for_counterexmp"
+
+transformation "eliminate_projections_sums"
+transformation "discriminate_if_poly"
+transformation "eliminate_algebraic_if_poly"
+transformation "encoding_smt_if_poly"
+
+(** Error messages specific to CVC4 *)
+
+outofmemory "(error \".*out of memory\")"
+outofmemory "CVC4 suffered a segfault"
+outofmemory "CVC4::BVMinisat::OutOfMemoryException"
+outofmemory "std::bad_alloc"
+outofmemory "Cannot allocate memory"
+timeout "interrupted by timeout"
+steps "smt::SmtEngine::resourceUnitsUsed, \\([0-9]+.?[0-9]*\\)" 1
+(*
+specific output message when CVC4 reaches its resource limit
+*)
+steplimitexceeded "unknown (RESOURCEOUT)"
+
+
+(** Extra theories supported by CVC4 *)
+
+(* CVC4 division seems to be the Euclidean one, not the Computer one *)
+theory int.EuclideanDivision
+  syntax function div "(div %1 %2)"
+  syntax function mod "(mod %1 %2)"
+  remove prop Mod_bound
+  remove prop Div_mod
+  remove prop Mod_1
+  remove prop Div_1
+end
+
+(*
+theory int.ComputerDivision
+  syntax function div "(div %1 %2)"
+  syntax function mod "(mod %1 %2)"
+  remove prop Mod_bound
+  remove prop Div_mod
+  remove prop Mod_1
+  remove prop Div_1
+end
+*)

@@ -3,112 +3,64 @@ Sub-goal Loop invariant init of goal f'vc.
 Prover result is: Valid.
 
 <check-ce-categorization>Categorizations of models:
-- Selected model 0: SW
+- Checked model 0: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/underspec.mlw", line 17, characters 18-33)
-- Checked model 1: SW
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to ref at "bench/check-ce/underspec.mlw", line 14, characters 17-18)
+- Selected model 1: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/underspec.mlw", line 17, characters 18-33)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to ref at "bench/check-ce/underspec.mlw", line 14, characters 17-18)
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Sub-goal Loop invariant preservation of goal f'vc.
 Prover result is: Unknown or time/memory/step limit.
-The contracts of some function or loop are too weak, for example during the
-  following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
-Unknown location:
-    _ = ()
+The following counterexample model could not be verified
+  (abstract RAC terminated because missing value for return value of call to ref at "bench/check-ce/underspec.mlw", line 14, characters 17-18):
 File underspec.mlw:
-  Line 13:
-    _ = ()
-    Execution of main function `f` with env:
-      _ = ()
-      zero = 0
-      one = 1
   Line 14:
-    Giant-step execution of function `ref` with args:
-      contents = 0
-    result of `ref` = {contents= 0}
+    result of call at line 14, characters 17-18 = ((as refqtmk (ref Int)) 0)
+    x1 = ((as refqtmk (ref Int)) 0)
   Line 15:
-    Giant-step execution of function `ref` with args:
-      contents = 0
-    result of `ref` = {contents= 0}
+    result of call at line 15, characters 17-18 = ((as refqtmk (ref Int)) 0)
+    x2 = ((as refqtmk (ref Int)) 0)
   Line 16:
-    Giant-step iteration of loop
-    x1 = {contents= (-1)}
-    x2 = {contents= 0}
-    i = 0
-    Giant-step iteration of loop
-  Line 18:
-    Normal execution of function `(=)` with args:
-      x = 0
-      y = 0
-  Line 19:
-    Normal execution of function `contents` with args:
-      arg = {contents= (-1)}
-    Normal execution of function `(+)` with args:
-      _ = (-1)
-      _ = 1
+    [current iteration] i = 0
+    [before iteration] x1 = -1
+    [before iteration] x2 = 0
   Line 17:
-    Property failure at loop invariant preservation with:
-      x1 = {contents= 0}
-      i = 1
+    [current iteration] x1 = 0
+  Line 18:
+    result of call at line 18, characters 9-14 = true
+  Line 19:
+    result of call at line 19, characters 14-20 = 0
+    [current iteration] x1 = 0
+  Line 21:
+    result of call at line 21, characters 14-20 = 0
 
 File "bench/check-ce/underspec.mlw", line 31, characters 14-23:
 Sub-goal Postcondition of goal g'vc.
 Prover result is: Valid.
 
 <check-ce-categorization>Categorizations of models:
-- Selected model 0: SW
-  - Concrete RAC: NORMAL
-  - Abstract RAC: FAILURE (assertion at "bench/check-ce/underspec.mlw", line 37, characters 13-18)
-- Checked model 1: SW
-  - Concrete RAC: NORMAL
-  - Abstract RAC: FAILURE (assertion at "bench/check-ce/underspec.mlw", line 37, characters 13-18)
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for global `z`)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for global `z`)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for global `z`)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for global `z`)
 File "bench/check-ce/underspec.mlw", line 37, characters 13-18:
 Sub-goal Assertion of goal f'vc.
 Prover result is: Unknown or time/memory/step limit.
-The contracts of some function or loop are too weak, for example during the
-  following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
+The following counterexample model could not be verified
+  (both RAC terminated because missing value for global `z`):
 File underspec.mlw:
   Line 27:
-    Constant z initialization
-    (giant-step) execution of unimplemented function with args:
-    result = 0
-    Normal execution of function `ref` with args:
-      contents = 0
-    Normal execution of function `ref'mk` with args:
-      contents = 0
-    z = {contents= 0}
-Unknown location:
-    _ = ()
-File underspec.mlw:
-  Line 34:
-    _ = ()
-    Execution of main function `f` with env:
-      z = {contents= 0}
-      _ = ()
-      zero = 0
-      one = 1
+    z = ((as refqtmk (ref Int)) 0)
+  Line 31:
+    z = 2
+    old z = 0
+  Line 35:
+    z = 0
   Line 36:
-    Normal execution of function `Tuple0` with args:
-    Giant-step execution of function `g` with args:
-      _ = ()
-    z = {contents= 2}
-    result of `g` = ()
+    z = 2
   Line 37:
-    Property failure at assertion with:
-      z = {contents= 2}
+    z = 2
 

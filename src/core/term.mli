@@ -41,6 +41,7 @@ type lsymbol = private {
   ls_args   : ty list;
   ls_value  : ty option;
   ls_constr : int;
+  ls_proj   : bool;
 }
 
 module Mls : Extmap.S with type key = lsymbol
@@ -52,9 +53,9 @@ val ls_compare : lsymbol -> lsymbol -> int
 val ls_equal : lsymbol -> lsymbol -> bool
 val ls_hash : lsymbol -> int
 
-val create_lsymbol : ?constr:int -> preid -> ty list -> ty option -> lsymbol
+val create_lsymbol : ?constr:int -> ?proj:bool -> preid -> ty list -> ty option -> lsymbol
 
-val create_fsymbol : ?constr:int -> preid -> ty list -> ty -> lsymbol
+val create_fsymbol : ?constr:int -> ?proj:bool -> preid -> ty list -> ty -> lsymbol
 (** ~constr is the number of constructors of the type in which the
    symbol is a constructor otherwise it must be the default 0. *)
 
@@ -584,6 +585,11 @@ val t_app_map :
 
 val t_app_fold :
   ('a -> lsymbol -> ty list -> ty option -> 'a) -> 'a -> term -> 'a
+
+(** Fold over pattern matching (Requires pattern matching to be compiled) *)
+
+val t_case_fold :
+  ('a -> tysymbol -> ty list -> ty option -> 'a) -> 'a -> term -> 'a
 
 (** {2 Subterm occurrence check and replacement} *)
 

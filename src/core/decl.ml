@@ -28,6 +28,7 @@ type ls_defn = lsymbol * term * int list
 type logic_decl = lsymbol * ls_defn
 
 exception UnboundVar of vsymbol
+exception UnexpectedProjOrConstr of lsymbol
 
 let check_fvs f =
   t_v_fold (fun _ vs -> raise (UnboundVar vs)) () f;
@@ -37,6 +38,8 @@ let check_vl ty v = ty_equal_check ty v.vs_ty
 let check_tl ty t = ty_equal_check ty (t_type t)
 
 let make_ls_defn ls vl t =
+  (* check ls *)
+  if ls.ls_constr <> 0 || ls.ls_proj then raise (UnexpectedProjOrConstr ls);
   (* check for duplicate arguments *)
   let add_v s v = Svs.add_new (DuplicateVar v) v s in
   ignore (List.fold_left add_v Svs.empty vl);
@@ -97,7 +100,7 @@ let ls_defn_of_axiom f =
 let ls_defn_of_axiom f =
   try Some (ls_defn_of_axiom f) with
     | Exit | UnboundVar _ | UnboundTypeVar _
-    | DuplicateVar _ | TypeMismatch _ -> None
+    | DuplicateVar _ | TypeMismatch _ | UnexpectedProjOrConstr _ -> None
 
 (** Termination checking for mutually recursive logic declarations *)
 
@@ -463,7 +466,7 @@ let create_data_decl tdl =
   let tss = List.fold_left add Sts.empty tdl in
   let check_proj tyv s tya ls = match ls with
     | None -> s
-    | Some ({ls_args = [ptyv]; ls_value = Some ptya; ls_constr = 0} as ls) ->
+    | Some ({ls_args = [ptyv]; ls_value = Some ptya; ls_constr = 0; ls_proj=true} as ls) ->
         ty_equal_check tyv ptyv;
         ty_equal_check tya ptya;
         Sls.add_new (DuplicateRecordField ls) ls s
@@ -509,6 +512,7 @@ let syms_param_decl ls =
   List.fold_left syms_ty syms ls.ls_args
 
 let create_param_decl ls =
+  if ls.ls_constr <> 0 || ls.ls_proj then raise (UnexpectedProjOrConstr ls);
   let news = Sid.singleton ls.ls_name in
   mk_decl (Dparam ls) news
 
@@ -524,6 +528,7 @@ let create_logic_decl ldl =
   if ldl = [] then raise EmptyDecl;
   let check_decl news (ls,(s,_,_)) =
     if not (ls_equal s ls) then raise (BadLogicDecl (ls, s));
+    if ls.ls_constr <> 0 || ls.ls_proj then raise (UnexpectedProjOrConstr ls);
     news_id news ls.ls_name
   in
   let news = List.fold_left check_decl Sid.empty ldl in
@@ -587,6 +592,7 @@ let create_ind_decl s idl =
   in
   let check_decl news (ps,al) =
     if al = [] then raise (EmptyIndDecl ps);
+    if ps.ls_value <> None then raise (Term.PredicateSymbolExpected ps);
     let news = news_id news ps.ls_name in
     List.fold_left (check_ax ps) news al
   in

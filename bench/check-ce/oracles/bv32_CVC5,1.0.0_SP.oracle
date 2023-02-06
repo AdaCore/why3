@@ -84,9 +84,9 @@ File bv32.mlw:
       r = {contents= 132}
 
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `dummy_update_with_int` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `dummy_update_with_int` cannot be evaluated)
+- Checked model 0: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `dummy_update_with_int` at "bench/check-ce/bv32.mlw", line 13, characters 5-26)
+  - Abstract RAC: STUCK (failure in precondition of `dummy_update_with_int` at "bench/check-ce/bv32.mlw", line 13, characters 5-26)
 File "bench/check-ce/bv32.mlw", line 15, characters 14-28:
 Sub-goal Postcondition of goal dummy_update_with_int'vc.
 Prover result is: Unknown or time/memory/step limit.

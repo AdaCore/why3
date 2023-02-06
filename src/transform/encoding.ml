@@ -14,6 +14,8 @@ open Ty
 open Theory
 open Task
 open Trans
+open Decl
+open Term
 
 let meta_select_kept = register_meta_excl "select_kept" [MTstring]
   ~desc:"Specify@ the@ types@ to@ mark@ with@ 'encoding:kept':@;  \
@@ -70,9 +72,42 @@ let forget_kept = Trans.fold (fun hd task ->
     | Meta (m,_) when meta_equal m Libencoding.meta_kept -> task
     | _ -> add_tdecl task hd.task_decl) None
 
+let keep_field_types =
+  Trans.on_tagged_ty Libencoding.meta_kept (fun sty0 ->
+    let kept_fold ty m =
+      match ty with
+      | { ty_node=Tyapp(ts, _) } as ty ->
+         let s = Mts.find_def Sty.empty ts m in
+         Mts.add ts (Sty.add ty s) m
+      | _ -> m
+    in
+    let kept_m = Sty.fold kept_fold sty0 Mts.empty in
+    let fold_d d sty =
+      match d.d_node with
+      | Ddata dl ->
+        let dl_fold sty (ts, csl) =
+          let inst_fold ty sty =
+            let csl_fold sty (c, _) =
+              let subst = Ty.oty_match Mtv.empty c.ls_value (Some ty) in
+              let tyl = List.rev_map (ty_inst subst) c.ls_args in
+              List.fold_left (Fun.flip Sty.add) sty tyl
+            in
+            List.fold_left csl_fold sty csl
+          in
+          Sty.fold inst_fold (Mts.find_def Sty.empty ts kept_m) sty
+        in
+        List.fold_left dl_fold sty dl
+      | _ -> sty
+    in
+    Trans.bind (Trans.fold_decl fold_d Sty.empty) (fun sty ->
+      let meta ty = create_meta Libencoding.meta_kept [MAty ty] in
+      Trans.add_tdecls (List.rev_map meta (Sty.elements (Sty.diff sty sty0)))
+    ))
+
 let encoding_smt env = Trans.seq [
   Libencoding.monomorphise_goal;
   select_kept def_enco_select_smt env;
+  keep_field_types;
   Trans.print_meta Libencoding.debug Libencoding.meta_kept;
   Trans.trace_goal "meta_enco_kept"
     (Trans.on_flag meta_enco_kept ft_enco_kept def_enco_kept_smt env);

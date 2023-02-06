@@ -1,0 +1,45 @@
+module LoopInvariant
+
+  use int.Int
+
+  type t = { mutable c : int }
+
+  (* use array.Array *)
+  (* let h () = *)
+  (*   let a = Array.make 10 0 in *)
+  (*   for i = 0 to 9 do *)
+  (*     invariant { forall j. 0 <= j < i -> a[j] = 1 } *)
+  (*     a[i] <- a[i] + 1 *)
+  (*   done *)
+
+  let f () =
+    let x1 = { c = 0 } in
+    let x2 = { c = 0 } in
+    for i = 0 to 1 do
+      invariant { i > 0 -> x1.c = 1 }
+      if i = 0 then
+        x1.c <- x1.c + 1
+      else
+        x2.c <- x2.c + 1
+    done
+end
+
+module PostCondition
+
+  use int.Int
+
+  type t = { mutable c : int }
+
+  val z: t
+
+  let g ()
+    writes { z.c }
+    ensures { z.c > old z.c }
+  = z.c <- z.c + 1
+
+  let f () =
+    z.c <- 0;
+    g ();
+    assert { z.c = 1 }
+
+end
