@@ -891,6 +891,7 @@ like in the following example:
 
 .. index:: collections
 .. index:: function literals
+.. _sec.functionliterals:
 
 Function literals
 ^^^^^^^^^^^^^^^^^

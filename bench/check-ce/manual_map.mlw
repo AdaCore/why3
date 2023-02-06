@@ -1,0 +1,7 @@
+use int.Int
+use map.Map
+
+let ghost test_map (ghost x : (map int int)) : map int int
+    ensures { result[0] <> result[1] }
+   =
+     Map.set x 0 3
