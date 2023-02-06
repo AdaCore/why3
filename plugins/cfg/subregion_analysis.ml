@@ -203,7 +203,7 @@ and inner muc st regions e =
       let dom, e = analyze_cexp muc st regions ce in
       (dom, e_exec e, regions)
   | Eassign es ->
-    let (regions), es = List.fold_left_map (fun regions asgn -> analyze_assign muc st regions asgn) regions es in
+    let (regions), es = Lists.map_fold_left (fun regions asgn -> analyze_assign muc st regions asgn) regions es in
 
     Bot, e_assign es, regions
   | Eif (s, i, e) ->
