@@ -165,7 +165,7 @@ val search_model_element_call_result :
 
 val json_model : model -> Json_base.json
 (** Counterexample model in JSON format.
-    The format is documented in the user documentation. *)
+    The format is documented in the user documentation (section Technical Informations). *)
 
 val print_model :
   ?filter_similar:bool ->

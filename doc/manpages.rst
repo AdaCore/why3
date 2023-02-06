@@ -1007,13 +1007,13 @@ The counterexamples can contain values of various types.
 
 -  Integer or real variables are displayed in decimal.
 
--  Bitvectors are displayed in hexadecimal.
+-  Bitvectors are displayed in decimal and binary notations.
 
 -  Integer range types are displayed in a specific notation showing
    their projection to integers.
 
--  Floating-point numbers are displayed both under a decimal
-   approximation and an exact hexadecimal value. The special values
+-  Floating-point numbers are displayed both under a bitvector
+   representation and an hexadecimal value. The special values
    ``+oo``, ``-oo``, and ``NaN`` may occur too.
 
 -  Values from algebraic types and record types are displayed as in the
