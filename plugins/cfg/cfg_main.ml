@@ -23,9 +23,13 @@ let set_stackify f =
   has_stackify := true
 
 let stackify_attr = Ident.create_attribute "cfg:stackify"
+let subregion_attr = Ident.create_attribute "cfg:subregion_analysis"
+
+let has_attr id attr =
+  List.exists (function ATstr a -> Ident.attr_equal a attr | _ -> false) id.id_ats
 
 let translate_cfg_fundef (cf : cfg_fundef) =
-  if List.exists (function ATstr a -> Ident.attr_equal a stackify_attr | _ -> false) cf.cf_name.id_ats
+  if has_attr cf.cf_name stackify_attr
   then !stackify cf else Cfg_paths.translate_cfg_fundef cf
 
 let translate_letcfg d =
@@ -72,12 +76,14 @@ module Typing = struct
         let e = update_any kind e in
         let ld = (create_user_prog_id id, gh, kind, dexpr muc Dexpr.denv_empty e) in
         let ld = Dexpr.let_defn ~keep_loc:true ld in
-        let ld = Subregion_analysis.transform_letdefn muc ld in
+        let ld = if has_attr id subregion_attr then Subregion_analysis.transform_letdefn muc ld else ld in
         add_pdecl ~vc muc (Pdecl.create_let_decl ld)
     | Ptree.Drec fdl ->
+        let fst = List.hd fdl in
+        let (id, _, _ ,_ , _, _, _ , _ , _) = fst in
         let _, rd = drec_defn muc Dexpr.denv_empty fdl in
         let rd = Dexpr.rec_defn ~keep_loc:true rd in
-        let rd = Subregion_analysis.transform_letdefn muc rd in
+        let rd = if has_attr id subregion_attr then Subregion_analysis.transform_letdefn muc rd else rd in
         add_pdecl ~vc muc (Pdecl.create_let_decl rd)
     | _ -> add_decl muc env file d
 
