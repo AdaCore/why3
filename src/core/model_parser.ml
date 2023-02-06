@@ -328,8 +328,6 @@ let search_model_element_call_result model call_id loc =
 let cmp_attrs a1 a2 =
   String.compare a1.attr_string a2.attr_string
 
-let find_call_id = Ident.search_attribute_value Ident.get_call_id_value
-
 let model_element_equal n1 n2 =
   let me_kind_equal k1 k2 = match k1,k2 with
   | Result, Result
@@ -1076,9 +1074,6 @@ let map_filter_model_files f =
     let mf = Mint.map_filter f_list mf in
     if Mint.is_empty mf then None else Some mf in
   Mstr.map_filter f_files
-
-let opt_bind_any os f =
-  f (List.filter_map (fun x -> x) os)
 
 let opt_bind_all os f =
   if List.for_all Opt.inhabited os then
