@@ -1542,6 +1542,10 @@ WhyML Attributes
 
 .. why3:attribute:: case_split
 
+.. why3:attribute:: cfg:stackify
+
+.. why3:attribute:: cfg:subregion_analysis
+
 .. why3:attribute:: extraction:inline
 
    If the name of a function is labeled with this attribute, its body

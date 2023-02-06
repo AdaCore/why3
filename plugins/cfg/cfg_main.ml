@@ -76,14 +76,18 @@ module Typing = struct
         let e = update_any kind e in
         let ld = (create_user_prog_id id, gh, kind, dexpr muc Dexpr.denv_empty e) in
         let ld = Dexpr.let_defn ~keep_loc:true ld in
-        let ld = if has_attr id subregion_attr then Subregion_analysis.transform_letdefn muc ld else ld in
+        let ld =
+          if has_attr id subregion_attr then Subregion_analysis.transform_letdefn muc ld else ld
+        in
         add_pdecl ~vc muc (Pdecl.create_let_decl ld)
     | Ptree.Drec fdl ->
         let fst = List.hd fdl in
         let (id, _, _ ,_ , _, _, _ , _ , _) = fst in
         let _, rd = drec_defn muc Dexpr.denv_empty fdl in
         let rd = Dexpr.rec_defn ~keep_loc:true rd in
-        let rd = if has_attr id subregion_attr then Subregion_analysis.transform_letdefn muc rd else rd in
+        let rd =
+          if has_attr id subregion_attr then Subregion_analysis.transform_letdefn muc rd else rd
+        in
         add_pdecl ~vc muc (Pdecl.create_let_decl rd)
     | _ -> add_decl muc env file d
 
