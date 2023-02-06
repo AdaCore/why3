@@ -19,10 +19,10 @@ File int.mlw:
     one = 1
 File strings.mlw:
   Line 6:
-    s = "\x00"
-    s = "\x00"
+    s = ("\x00":string)
+    s = ("\x00":string)
     Execution of main function `T1'goal` with env:
-      s = "\x00"
+      s = ("\x00":string)
       zero = 0
       one = 1
 Unknown location:
@@ -30,7 +30,7 @@ Unknown location:
 File strings.mlw:
   Line 6:
     Property failure at postcondition of `T1'goal` with:
-      s = "\x00"
+      s = ("\x00":string)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -53,10 +53,10 @@ File int.mlw:
     one = 1
 File strings.mlw:
   Line 7:
-    s = "\x00\x00\x00\x00"
-    s = "\x00\x00\x00\x00"
+    s = ("\x00\x00\x00\x00":string)
+    s = ("\x00\x00\x00\x00":string)
     Execution of main function `T2'goal` with env:
-      s = "\x00\x00\x00\x00"
+      s = ("\x00\x00\x00\x00":string)
       zero = 0
       one = 1
 Unknown location:
@@ -64,7 +64,7 @@ Unknown location:
 File strings.mlw:
   Line 7:
     Property failure at postcondition of `T2'goal` with:
-      s = "\x00\x00\x00\x00"
+      s = ("\x00\x00\x00\x00":string)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -87,13 +87,13 @@ File int.mlw:
     one = 1
 File strings.mlw:
   Line 8:
-    s1 = "\x00"
-    s2 = "\x02"
-    s1 = "\x00"
-    s2 = "\x02"
+    s1 = ("\x00":string)
+    s2 = ("\x02":string)
+    s1 = ("\x00":string)
+    s2 = ("\x02":string)
     Execution of main function `T3'goal` with env:
-      s2 = "\x02"
-      s1 = "\x00"
+      s2 = ("\x02":string)
+      s1 = ("\x00":string)
       zero = 0
       one = 1
 Unknown location:
@@ -101,8 +101,8 @@ Unknown location:
 File strings.mlw:
   Line 8:
     Property failure at postcondition of `T3'goal` with:
-      s2 = "\x02"
-      s1 = "\x00"
+      s2 = ("\x02":string)
+      s1 = ("\x00":string)
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -351,13 +351,13 @@ File int.mlw:
     one = 1
 File strings.mlw:
   Line 20:
-    s = ""
-    i = (-1)
-    s = ""
-    i = (-1)
+    s = ("":string)
+    i = (- 1)
+    s = ("":string)
+    i = (- 1)
     Execution of main function `T15'goal` with env:
-      i = (-1)
-      s = ""
+      i = (- 1)
+      s = ("":string)
       zero = 0
       one = 1
 Unknown location:
@@ -365,8 +365,8 @@ Unknown location:
 File strings.mlw:
   Line 20:
     Property failure at postcondition of `T15'goal` with:
-      i = (-1)
-      s = ""
+      i = (- 1)
+      s = ("":string)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -389,10 +389,10 @@ File int.mlw:
     one = 1
 File strings.mlw:
   Line 21:
-    s = ""
-    s = ""
+    s = ("":string)
+    s = ("":string)
     Execution of main function `T16'goal` with env:
-      s = ""
+      s = ("":string)
       zero = 0
       one = 1
 Unknown location:
@@ -400,7 +400,7 @@ Unknown location:
 File strings.mlw:
   Line 21:
     Property failure at postcondition of `T16'goal` with:
-      s = ""
+      s = ("":string)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -423,10 +423,10 @@ File int.mlw:
     one = 1
 File strings.mlw:
   Line 22:
-    s = "abc"
-    s = "abc"
+    s = ("abc":string)
+    s = ("abc":string)
     Execution of main function `T17'goal` with env:
-      s = "abc"
+      s = ("abc":string)
       zero = 0
       one = 1
 Unknown location:
@@ -434,5 +434,5 @@ Unknown location:
 File strings.mlw:
   Line 22:
     Property failure at postcondition of `T17'goal` with:
-      s = "abc"
+      s = ("abc":string)
 

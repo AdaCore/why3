@@ -66,6 +66,8 @@ module type Printer = sig
     val print_pr_qualified : formatter -> prsymbol -> unit
     val print_th_qualified : formatter -> theory -> unit
     val print_ty_qualified : formatter -> ty -> unit
+    val print_vs_qualified : formatter -> vsymbol -> unit
+    val print_tv_qualified : formatter -> tvsymbol -> unit
 
     val print_quant : formatter -> quant -> unit      (* quantifier *)
     val print_binop : asym:bool -> formatter -> binop -> unit (* binary operator *)

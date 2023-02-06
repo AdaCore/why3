@@ -7,56 +7,161 @@ Sub-goal Loop variant decrease of goal f'vc.
 Prover result is: Valid.
 
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because missing value for global `b`)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for global `b`)
-- Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because missing value for global `b`)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for global `b`)
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_ce.mlw", line 16, characters 16-25)
+  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_ce.mlw", line 16, characters 16-25)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_ce.mlw", line 16, characters 16-25)
+  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_ce.mlw", line 16, characters 16-25)
 File "bench/check-ce/loop_ce.mlw", line 16, characters 16-25:
 Sub-goal Loop invariant preservation of goal f'vc.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because missing value for global `b`):
-File loop_ce.mlw:
-  Line 8:
-    b = ((as refqtmk (ref Int)) 5)
-  Line 12:
-    a = 1
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
   Line 13:
-    b = 2
+    Constant zero initialization
+    zero = 0
   Line 14:
-    [before iteration] b = 5
-    result of call at line 14, characters 8-14 = true
-  Line 16:
-    [current iteration] a = 1
-    [current iteration] b = 6
+    Constant one initialization
+    one = 1
+File loop_ce.mlw:
+  Line 6:
+    Constant a initialization
+    Normal execution of function `ref` with args:
+      contents = 0
+    Normal execution of function `ref'mk` with args:
+      contents = 0
+    a = {contents= 0}
+  Line 8:
+    Constant b initialization
+    Normal execution of function `ref` with args:
+      contents = 0
+    Normal execution of function `ref'mk` with args:
+      contents = 0
+    b = {contents= 0}
+Unknown location:
+    _ = ()
+File loop_ce.mlw:
+  Line 10:
+    _ = ()
+    Execution of main function `f` with env:
+      a = {contents= 0}
+      b = {contents= 0}
+      _ = ()
+      zero = 0
+      one = 1
+  Line 14:
+    Normal execution of function `contents` with args:
+      arg = {contents= 2}
+    Normal execution of function `(<)` with args:
+      _ = 2
+      _ = 10
+    Normal iteration of loop
   Line 17:
-    [current iteration] b = 6
-    result of call at line 17, characters 9-14 = 6
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+    Normal execution of function `contents` with args:
+      arg = {contents= 2}
+    Normal execution of function `(+)` with args:
+      _ = 2
+      _ = 1
+  Line 14:
+    Normal execution of function `contents` with args:
+      arg = {contents= 3}
+    Normal execution of function `(<)` with args:
+      _ = 3
+      _ = 10
+    Normal iteration of loop
+  Line 17:
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+    Normal execution of function `contents` with args:
+      arg = {contents= 3}
+    Normal execution of function `(+)` with args:
+      _ = 3
+      _ = 1
+  Line 14:
+    Normal execution of function `contents` with args:
+      arg = {contents= 4}
+    Normal execution of function `(<)` with args:
+      _ = 4
+      _ = 10
+    Normal iteration of loop
+  Line 17:
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+    Normal execution of function `contents` with args:
+      arg = {contents= 4}
+    Normal execution of function `(+)` with args:
+      _ = 4
+      _ = 1
+  Line 14:
+    Normal execution of function `contents` with args:
+      arg = {contents= 5}
+    Normal execution of function `(<)` with args:
+      _ = 5
+      _ = 10
+    Normal iteration of loop
+  Line 17:
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+    Normal execution of function `contents` with args:
+      arg = {contents= 5}
+    Normal execution of function `(+)` with args:
+      _ = 5
+      _ = 1
+  Line 16:
+    Property failure at loop invariant preservation with:
+      a = {contents= 1}
+      b = {contents= 6}
 
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `a`)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `a`)
-- Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `a`)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `a`)
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/loop_ce.mlw", line 31, characters 11-21)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/loop_ce.mlw", line 31, characters 11-21)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/loop_ce.mlw", line 31, characters 11-21)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/loop_ce.mlw", line 31, characters 11-21)
 File "bench/check-ce/loop_ce.mlw", line 31, characters 11-21:
 Sub-goal Assertion of goal g'vc.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because missing value for parameter `a`):
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
 File loop_ce.mlw:
   Line 26:
-    a = ((as refqtmk (ref Int)) 0)
+    a = {contents= 0}
+    a = {contents= 0}
+    Execution of main function `g` with env:
+      a = {contents= 0}
+      zero = 0
+      one = 1
   Line 30:
-    a = 1
-    result of call at line 30, characters 23-28 = 1
-    result of call at line 30, characters 5-12 = false
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+    Normal execution of function `(=)` with args:
+      x = 0
+      y = 10
+Unknown location:
+    Normal execution of function `True` with args:
+File loop_ce.mlw:
+  Line 30:
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = 1
   Line 31:
-    a = 1
-    a at X = 0
+    Property failure at assertion with:
+      a = {contents= 1}
+      a = ref'mk 0
 
 File "bench/check-ce/loop_ce.mlw", line 27, characters 12-25:
 Sub-goal Postcondition of goal g'vc.
@@ -67,23 +172,45 @@ Sub-goal Assertion of goal g'vc.
 Prover result is: Valid.
 
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `a`)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `a`)
-- Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `a`)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `a`)
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/loop_ce.mlw", line 27, characters 12-25)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/loop_ce.mlw", line 27, characters 12-25)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/loop_ce.mlw", line 27, characters 12-25)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/loop_ce.mlw", line 27, characters 12-25)
 File "bench/check-ce/loop_ce.mlw", line 27, characters 12-25:
 Sub-goal Postcondition of goal g'vc.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because missing value for parameter `a`):
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
 File loop_ce.mlw:
   Line 26:
-    a = ((as refqtmk (ref Int)) 10 (0XA))
-  Line 27:
-    a = 10 (0XA)
-    old a = 10 (0XA)
+    a = {contents= 10}
+    a = {contents= 10}
+    Execution of main function `g` with env:
+      a = {contents= 10}
+      zero = 0
+      one = 1
   Line 30:
-    result of call at line 30, characters 5-12 = true
+    Normal execution of function `contents` with args:
+      arg = {contents= 10}
+    Normal execution of function `(=)` with args:
+      x = 10
+      y = 10
+Unknown location:
+    Normal execution of function `False` with args:
+File loop_ce.mlw:
+  Line 30:
+    Normal execution of function `Tuple0` with args:
+  Line 27:
+    Property failure at postcondition of `g` with:
+      a = {contents= 10}
+      a = {contents= 10}
 

@@ -1056,6 +1056,14 @@ let t_pred_app pr t = t_equ (t_func_app pr t) t_bool_true
 let t_func_app_l fn tl = List.fold_left t_func_app fn tl
 let t_pred_app_l pr tl = t_equ (t_func_app_l pr tl) t_bool_true
 
+let to_prop t =
+  match t.t_ty with
+  | Some _ ->
+    if t_equal t t_bool_true then t_true
+    else if t_equal t t_bool_false then t_false
+    else t_attr_copy t (t_equ t t_bool_true)
+  | None -> t
+
 (** Term library *)
 
 (* generic map over types, symbols and variables *)

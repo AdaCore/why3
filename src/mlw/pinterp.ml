@@ -140,6 +140,27 @@ let get_arg : type t. t vtype -> _ -> _ -> t = fun t rs v ->
   | _, Vundefined ->
       incomplete "an undefined argument was passed to builtin %a"
         Ident.print_decoded rs.rs_name.id_string
+  | VTint, Vterm vt when (Opt.equal Ty.ty_equal vt.t_ty (Some Ty.ty_int)) ->
+      begin match vt.t_node with
+      | Tconst (Constant.ConstInt c) -> BigInt.to_int c.Number.il_int
+      | _ -> assert false
+      end
+  | VTnum, Vterm vt when (Opt.equal Ty.ty_equal vt.t_ty (Some Ty.ty_int)) ->
+      begin match vt.t_node with
+      | Tconst (Constant.ConstInt c) -> c.Number.il_int
+      | _ -> assert false
+      end
+  | VTbool, Vterm vt when (Opt.equal Ty.ty_equal vt.t_ty (Some Ty.ty_bool)) ->
+      begin match vt.t_node with
+      | Ttrue -> true
+      | Tfalse -> false
+      | _ -> assert false
+      end
+  | VTstring, Vterm vt when (Opt.equal Ty.ty_equal vt.t_ty (Some Ty.ty_str)) ->
+      begin match vt.t_node with
+      | Tconst (Constant.ConstStr s) -> s
+      | _ -> assert false
+      end
   | _ -> assert false
 
 let rec eval : type t. t vtype -> t -> _ -> _ list -> _ = fun t f rs l ->
@@ -174,7 +195,10 @@ let (^->) a b = VTfun (a, b)
 
 let big_int_of_const i = i.Number.il_int
 let big_int_of_value v =
-  match v_desc v with Vnum i -> i | _ -> raise NotNum
+  match v_desc v with
+  | Vnum i -> i
+  | Vterm {t_node = Tconst (Constant.ConstInt i)} -> big_int_of_const i
+  | _ -> raise NotNum
 
 let eval_int_op op ls l =
   eval (VTnum ^-> VTnum ^-> VTnum) op ls l
@@ -460,7 +484,7 @@ let rec matching env (v : value) p =
   | Pas (p, vs) -> matching (bind_vs vs v env) v p
   | Papp (ls, pl) -> (
       match v.v_desc with
-      | Vconstr ({rs_logic= RLls ls2}, _, tl) ->
+      | Vconstr (Some {rs_logic= RLls ls2}, _, tl) ->
           if ls_equal ls ls2 then
             List.fold_left2 matching env (List.map field_get tl) pl
           else if ls2.ls_constr > 0 then
@@ -476,14 +500,14 @@ let rec matching env (v : value) p =
 let is_true v = match v.v_desc with
   | Vbool true | Vterm {t_node= Ttrue} -> true
   | Vterm t when t_equal t t_bool_true -> true
-  | Vconstr (rs, [], []) when rs_equal rs rs_true -> true
+  | Vconstr (Some rs, [], []) when rs_equal rs rs_true -> true
   | _ -> false
 
 (* ...and no *)
 let is_false v = match v.v_desc with
   | Vbool false | Vterm {t_node= Tfalse} -> true
   | Vterm t when t_equal t t_bool_false -> true
-  | Vconstr (rs, [], []) when rs_equal rs rs_false -> true
+  | Vconstr (Some rs, [], []) when rs_equal rs rs_false -> true
   | _ -> false
 
 let fix_boolean_term t =
@@ -563,7 +587,7 @@ let value_of_term ctx t =
               defn.Pdecl.itd_fields
           | _ -> raise Exit in
         let vs = List.map aux ts in
-        let res = value ty (Vconstr (rs, fs, List.map field vs)) in
+        let res = value ty (Vconstr (Some rs, fs, List.map field vs)) in
         if ctx.do_rac then
           check_type_invs ctx.rac ~giant_steps:ctx.giant_steps ctx.env
             (ity_of_ty ty) res;
@@ -616,9 +640,12 @@ let gen_model_variable ?check ({giant_steps} as ctx) ?loc id ity : value_gen =
 (** Generate a value by querying the model for a result *)
 let gen_model_result ({giant_steps} as ctx) oid loc ity : value_gen =
   "value from model", fun () ->
-    let res = ctx.oracle.for_result ctx.env ~call_id:oid ~loc ity in
-    Opt.iter (check_assume_type_invs ctx.rac ~loc ~giant_steps ctx.env ity) res;
-    res
+    if ity_equal ity ity_unit
+    then Some unit_value
+    else
+      let res = ctx.oracle.for_result ctx.env ~call_id:oid ~loc ity in
+      Opt.iter (check_assume_type_invs ctx.rac ~loc ~giant_steps ctx.env ity) res;
+      res
 
 (** Generator for a default value *)
 let gen_default ity def : value_gen =
@@ -739,7 +766,7 @@ let get_and_register_global check_model_variable ctx exec_expr id oexp post ity 
 let rec set_fields fs1 fs2 =
   let set_field f1 f2 =
     match (field_get f1).v_desc, (field_get f2).v_desc with
-    | Vconstr (rs1, _, fs1), Vconstr (rs2, _, fs2) ->
+    | Vconstr (Some rs1, _, fs1), Vconstr (Some rs2, _, fs2) ->
         assert (rs_equal rs1 rs2);
         set_fields fs1 fs2
     | _ -> field_set f1 (field_get f2) in
@@ -747,10 +774,12 @@ let rec set_fields fs1 fs2 =
 
 let set_constr v1 v2 =
   match v1.v_desc, v2.v_desc with
-   | Vconstr (rs1, _, fs1), Vconstr (rs2, _, fs2) ->
-       assert (rs_equal rs1 rs2);
-       set_fields fs1 fs2;
-   | _ -> failwith "set_constr"
+  | Vconstr (Some rs1, _, fs1), Vconstr (Some rs2, _, fs2) ->
+      assert (rs_equal rs1 rs2);
+      set_fields fs1 fs2;
+  | Vconstr (_, _, fs1), Vconstr (_, _, fs2) ->
+      set_fields fs1 fs2;
+  | _ -> failwith "set_constr"
 
 let assign_written_vars ?(vars_map=Mpv.empty) wrt loc ctx vs =
   let pv = restore_pv vs in
@@ -1390,16 +1419,48 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
   | Log.Exec_normal ->
       let res =
         if rs_equal rs rs_func_app then begin
-          check_pre_and_register_call Log.Exec_normal;
-          match arg_vs with
-          | [{v_desc= Vfun (cl, arg, e)}; value] ->
-              let vsenv = Mvs.union (fun _ _ v -> Some v) ctx.env.vsenv cl in
-              let ctx = {ctx with env= bind_vs arg value {ctx.env with vsenv}} in
-              exec_expr ctx e
-          | [{v_desc= Vpurefun (_, bindings, default)}; value] ->
-              let v = try Mv.find value bindings with Not_found -> default in
-              Normal v
-          | _ -> assert false
+          let exception UnexpectedArgs in
+          try
+            check_pre_and_register_call Log.Exec_normal;
+            begin match arg_vs with
+            | [{v_desc= Vfun (cl, arg, e)}; value] ->
+                let vsenv = Mvs.union (fun _ _ v -> Some v) ctx.env.vsenv cl in
+                let ctx = {ctx with env= bind_vs arg value {ctx.env with vsenv}} in
+                exec_expr ctx e
+            | [{v_desc= Vpurefun (_, bindings, default)}; value] ->
+                let v = try Mv.find value bindings with Not_found -> default in
+                Normal v
+            | [{v_desc= Vterm t}; value ] ->
+                begin match t_open_lambda t with
+                | ([vs],_,t') ->
+                  begin match t'.t_node with
+                  (* special case when [t] is a function defining the mapping of elements
+                  for an array or a map, for example:
+                  t = fun (x:bool) -> if x = True then -1 else 0 *)
+                  | Tif (t1,t2,t3) ->
+                    let ctx = {ctx with env= bind_vs vs value ctx.env} in
+                    begin match (ctx.compute_term ctx.env t1).t_node with
+                    | Ttrue -> exec_expr ctx (e_pure (ctx.compute_term ctx.env t2))
+                    | Tfalse ->  exec_expr ctx (e_pure (ctx.compute_term ctx.env t3))
+                    | _ -> incomplete "could not reduce %a" print_term t'
+                    end
+                  (* special case when [t] is a constant function *)
+                  | Tconst _ ->
+                    let ctx = {ctx with env= bind_vs vs value ctx.env} in
+                    exec_expr ctx (e_pure (ctx.compute_term ctx.env t'))
+                  | _ -> raise UnexpectedArgs
+                  end
+                | _ -> raise UnexpectedArgs
+                end
+            | [{v_desc= Vundefined }; _] ->
+                incomplete "an undefined argument was passed to %a"
+                  Ident.print_decoded rs.rs_name.id_string
+            | _ -> raise UnexpectedArgs
+            end
+          with
+          | UnexpectedArgs ->
+            incomplete "unexpected arguments passed to %a"
+              Ident.print_decoded rs.rs_name.id_string
           end
         else
           match rs, arg_vs with
@@ -1443,31 +1504,53 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
                   List.fold_left2 aux Mtv.empty rs.rs_cty.cty_args arg_vs in
                 let ty = ty_inst mt (ty_of_ity ity_result) in
                 let vs = List.map field arg_vs in
-                let v = value ty (Vconstr (rs, its_def.Pdecl.itd_fields, vs)) in
+                let v = value ty (Vconstr (Some rs, its_def.Pdecl.itd_fields, vs)) in
                 if ctx.do_rac then
                   check_type_invs ctx.rac ?loc ~giant_steps:ctx.giant_steps
                     ctx.env ity_result v;
                 Normal v
-            | Projection _d -> (
+            | Projection proj_def -> (
+              let exception CannotProject in
+              try
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: PROJECTION@]@." pp_indent print_rs rs;
                 check_pre_and_register_call Log.Exec_normal;
-                match rs.rs_field, arg_vs with
-                | Some pv, [{v_desc= Vconstr (cstr, _, args)} as v] ->
-                    let rec search constr_args args =
-                      match constr_args, args with
-                      | pv2 :: pvl, v :: vl ->
-                          if pv_equal pv pv2 then
-                            Normal (field_get v)
-                          else search pvl vl
-                      | _ -> kasprintf failwith "Cannot project %a by %a"
-                               print_value v print_rs rs
-                    in
-                    search cstr.rs_cty.cty_args args
+                let rec search pv opt_constr_args args v' =
+                  match opt_constr_args, args with
+                  | Some pv2 :: pvl, v :: vl ->
+                      if pv_equal pv pv2 then
+                        Normal (field_get v)
+                      else search pv pvl vl v'
+                  | _ -> raise CannotProject
+                in
+                begin match rs.rs_field, arg_vs with
+                | Some pv, [{v_desc= Vconstr (Some cstr, _, args)} as v] ->
+                    let opt_constr_args = List.map (fun f -> Some f) cstr.rs_cty.cty_args in
+                    search pv opt_constr_args args v
+                | Some pv, [{v_desc= Vconstr (None, field_rss, args)} as v] ->
+                    begin try
+                      let opt_constr_args = List.map (fun rs -> rs.rs_field) field_rss in
+                      search pv opt_constr_args args v
+                    with _ -> raise CannotProject
+                    end
+                | Some pv, [{v_desc= Vterm {t_node = Tapp (ls,args)}} as v] ->
+                  let matching_name rs =
+                    String.equal rs.rs_name.id_string ls.ls_name.id_string in
+                  begin
+                    match List.find matching_name proj_def.Pdecl.itd_constructors with
+                    | rs ->
+                      let opt_constr_args = List.map (fun f -> Some f) rs.rs_cty.cty_args in
+                      let fields = List.map (fun f -> field (term_value (ity_of_ty (Opt.get f.t_ty)) f)) args in
+                      search pv opt_constr_args fields v
+                    | exception Not_found -> raise CannotProject
+                  end
                 | _, [{v_desc= Vundefined}] ->
                     incomplete "cannot project undefined by %a" print_rs rs
-                | _ -> kasprintf failwith "Cannot project values %a by %a"
-                         Pp.(print_list comma print_value) arg_vs
-                         print_rs rs )
+                | _ -> raise CannotProject
+                end
+              with CannotProject ->
+                kasprintf failwith "Cannot project values %a by %a"
+                  Pp.(print_list comma print_value) arg_vs
+                  print_rs rs )
             | exception Not_found ->
                 incomplete "definition of routine %s could not be found"
                   rs.rs_name.id_string in

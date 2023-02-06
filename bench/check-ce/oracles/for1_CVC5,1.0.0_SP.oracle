@@ -7,26 +7,45 @@ Sub-goal Loop invariant preservation of goal f'vc.
 Prover result is: Valid.
 
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
+- Selected model 0: SW
   - Concrete RAC: NORMAL
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to ref at "bench/check-ce/for1.mlw", line 5, characters 14-15)
-- Selected model 1: INCOMPLETE
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/for1.mlw", line 4, characters 12-22)
+- Checked model 1: SW
   - Concrete RAC: NORMAL
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to ref at "bench/check-ce/for1.mlw", line 5, characters 14-15)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/for1.mlw", line 4, characters 12-22)
 File "bench/check-ce/for1.mlw", line 4, characters 12-22:
 Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (abstract RAC terminated because missing value for return value of call to ref at "bench/check-ce/for1.mlw", line 5, characters 14-15):
+The contracts of some function or loop are too weak, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+Unknown location:
+    _ = ()
 File for1.mlw:
-  Line 4:
-    x = 0
+  Line 3:
+    _ = ()
+    Execution of main function `f` with env:
+      _ = ()
+      zero = 0
+      one = 1
   Line 5:
-    result = 0
-    result of call at line 5, characters 14-15 = ((as refqtmk (ref Int)) 0)
-    x = ((as refqtmk (ref Int)) 0)
+    Giant-step execution of function `ref` with args:
+      contents = 0
+    result of `ref` = {contents= 0}
   Line 6:
-    x = 0
-  Line 8:
-    x = 0
+    Giant-step iteration of loop
+    x = {contents= 0}
+    i = 2
+  Line 10:
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+  Line 4:
+    Property failure at postcondition of `f` with:
+      result = 0
 

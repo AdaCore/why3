@@ -50,18 +50,10 @@ File polymorphism.mlw:
       x = (C 0 true)
 
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
-- Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
 File "bench/check-ce/polymorphism.mlw", line 15, characters 30-37:
 Goal g.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because missing value for parameter `x`):
-File polymorphism.mlw:
-  Line 15:
-    x = ((as A (poly Int)) 1)
 

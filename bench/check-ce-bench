@@ -6,7 +6,6 @@ updateoracle=false
 suffix=.opt
 removeoutfile=true
 files=""
-success=true
 failed=""
 whydata=$(bin/why3"$suffix" --print-datadir)
 whylib=$(bin/why3"$suffix" --print-libdir)
@@ -58,6 +57,34 @@ remove_solver_details () {
 }
 
 
+record_time () {
+    elapsed=$(date +%s%N)
+}
+
+# print elapsed time
+elapsed_time () {
+    t=$(date +%s%N)
+    d=$(expr $t - $elapsed)
+#    printf "d=${d}\n"
+    l=$(expr length $d)
+#    printf "l=${l}\n"
+    lmn=$(expr $l - 9 || true)
+    if [ "$lmn" = "0" ] ; then
+	d=0"$d"
+	lmn=1
+    fi
+#    printf "lmn=${lmn}\n"
+    s=$(expr substr "${d}" 1 ${lmn} || true)
+#    printf "s=${s}\n"
+    c=$(expr substr "${d}" ${lmn} 2 || true)
+#    printf "c=${c}\n"
+    elapsed="$s"."$c"
+#    printf "${elapsed}\n"
+}
+
+
+
+
 # $1 = prover
 # $2 = dir
 # $3 = filename
@@ -85,6 +112,7 @@ run () {
   # one may add reduction_cont_size,stack_trace, in
   # the debug flags below to test cont_invariant in reduction engine
   # (note that stack trace may be more detailed with bytecode)
+  record_time
   ($dir/../bin/why3"$suffix" prove -a split_vc -P $prover\
       --stepslimit=$steps --timelimit=10 \
       --rac-steplimit=$steps --rac-timelimit=10 \
@@ -93,7 +121,8 @@ run () {
       --debug=check-ce-categorization${debug_vc_sp} \
     || true) 2>&1 \
     | remove_solver_details \
-    > "$f.out"
+	  > "$f.out"
+  elapsed_time
   str_out=$(cat "$f.out")
   if [ -e "$oracle_file" ]; then
     str_oracle=$(cat "$oracle_file")
@@ -101,7 +130,7 @@ run () {
     str_oracle=""
   fi
   if [ "$str_oracle" = "$str_out" ] ; then
-    echo "OK"
+    echo "OK (in ${elapsed}s)"
   else
     if $updateoracle; then
       echo "Updating oracle"
@@ -112,13 +141,15 @@ run () {
 	    (diff -u "$oracle_file" "$f.out" \
         || [ $? -eq 1 ])|colorize
       failed="$failed$f\n"
-      success=false
     fi
   fi
   if $removeoutfile; then
     rm "$f.out"
   fi
 }
+
+
+
 start=$(date +%s)
 for file in $files; do
   filedir=`dirname $file`
@@ -151,6 +182,9 @@ for file in $files; do
         ;;
       "int_overflow")
         z3steps=400000
+        ;;
+      "loop_inv_real")
+        z3steps=1000000
         ;;
       "maps_poly")
         cvc5steps=300000
@@ -187,7 +221,7 @@ bench/check-ce/petiot2018/experiments.sh \
   --prover $1 --rac-prover $1 \
   --ce-prover $1,counterexamples --stepslimit $2 \
   $updatearg
-if [ $? = 1 ]; then exitvalue=1; failed="${failed}Petiot experiments with $1.\n"; fi
+if [ $? = 1 ]; then failed="${failed}Petiot experiments with $1.\n"; fi
 }
 
 petiot Z3,4.8.10  500000
@@ -197,11 +231,10 @@ petiot CVC5,1.0.0 10000
 end=$(date +%s)
 
 runtime=$((end-start))
-if [ "$success" = true ]; then
+if [ "$failed" = "" ]; then
   echo "check-ce-bench: success (runtime = $runtime seconds)"
-  exitvalue=0
+  exit 0
 else
   printf "\ncheck-ce-bench: failed for the following files (runtime = $runtime seconds)\n$failed\n"
-  exitvalue=1
+  exit 1
 fi
-exit $exitvalue

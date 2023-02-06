@@ -58,10 +58,10 @@ File bv.mlw:
     ones = 0
 File bv32.mlw:
   Line 7:
-    r = {contents= 34}
-    r = {contents= 34}
+    r = {contents= (34:t)}
+    r = {contents= (34:t)}
     Execution of main function `dummy_update` with env:
-      r = {contents= 34}
+      r = {contents= (34:t)}
       zero = 0
       one = 1
       zeros = 0
@@ -78,10 +78,10 @@ File bv32.mlw:
     (giant-step) execution of unimplemented function `add`
       v1 = 66
       v2 = 66
-    result of `add` = 132
+    result of `add` = (132:t)
   Line 9:
     Property failure at postcondition of `dummy_update` with:
-      r = {contents= 132}
+      r = {contents= (132:t)}
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: BAD_CE

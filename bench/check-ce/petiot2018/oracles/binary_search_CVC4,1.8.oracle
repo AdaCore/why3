@@ -74,8 +74,8 @@ The program does not comply to the verification goal, for example during the
 File binary_search-B1.mlw:
   Line 3:
     Execution of main function `binary_search` with env:
-      t = {length= 2; elts= [|; _ -> 0|]}
-      x = (-1)
+      t = {length= 2; elts= fun (x:int) -> 0}
+      x = (- 1)
       zero = 0
       one = 1
   Line 9:
@@ -88,7 +88,7 @@ File lib.mlw:
 File binary_search-B1.mlw:
   Line 10:
     Normal execution of function `length` with args:
-      arg = {length= 2; elts= [|; _ -> 0|]}
+      arg = {length= 2; elts= fun (x:int) -> 0}
     Normal execution of function `(-)` with args:
       x = 2
       y = 1
@@ -157,20 +157,20 @@ File binary_search-B1.mlw:
       y = 2
   Line 17:
     Normal execution of function `([])` with args:
-      a = {length= 2; elts= [|; _ -> 0|]}
+      a = {length= 2; elts= fun (x:int) -> 0}
       i = 0
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 2; elts= [|; _ -> 0|]}
+      arg = {length= 2; elts= fun (x:int) -> 0}
     Normal execution of function `(@)` with args:
-      u = [|; _ -> 0|]
+      u = fun (x:int) -> 0
       u = 0
 File binary_search-B1.mlw:
   Line 17:
     Normal execution of function `(>)` with args:
       x = 0
-      y = (-1)
+      y = (- 1)
   Line 18:
     Normal execution of function `(-)` with args:
       x = 0
@@ -189,10 +189,10 @@ File binary_search-B1.mlw:
       i = (-1)
   Line 15:
     Property failure at loop variant decrease with:
-      t = {length= 2; elts= [|; _ -> 0|]}
+      t = {length= 2; elts= fun (x:int) -> 0}
       r = {contents= (-1)}
       r = {contents= 1}
-      t = {length= 2; elts= [|; _ -> 0|]}
+      t = {length= 2; elts= fun (x:int) -> 0}
 
 File "bench/check-ce/petiot2018/experiments/binary_search-B1.mlw", line 15, characters 10-23:
 Sub-goal Loop variant decrease of goal binary_search'vc.
@@ -202,7 +202,7 @@ The program does not comply to the verification goal, for example during the
 File binary_search-B1.mlw:
   Line 3:
     Execution of main function `binary_search` with env:
-      t = {length= 2; elts= [|; _ -> 0|]}
+      t = {length= 2; elts= fun (x:int) -> 0}
       x = 0
       zero = 0
       one = 1
@@ -216,7 +216,7 @@ File lib.mlw:
 File binary_search-B1.mlw:
   Line 10:
     Normal execution of function `length` with args:
-      arg = {length= 2; elts= [|; _ -> 0|]}
+      arg = {length= 2; elts= fun (x:int) -> 0}
     Normal execution of function `(-)` with args:
       x = 2
       y = 1
@@ -285,14 +285,14 @@ File binary_search-B1.mlw:
       y = 2
   Line 17:
     Normal execution of function `([])` with args:
-      a = {length= 2; elts= [|; _ -> 0|]}
+      a = {length= 2; elts= fun (x:int) -> 0}
       i = 0
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 2; elts= [|; _ -> 0|]}
+      arg = {length= 2; elts= fun (x:int) -> 0}
     Normal execution of function `(@)` with args:
-      u = [|; _ -> 0|]
+      u = fun (x:int) -> 0
       u = 0
 File binary_search-B1.mlw:
   Line 17:
@@ -305,10 +305,10 @@ File binary_search-B1.mlw:
       i = 0
   Line 15:
     Property failure at loop variant decrease with:
-      t = {length= 2; elts= [|; _ -> 0|]}
+      t = {length= 2; elts= fun (x:int) -> 0}
       r = {contents= 1}
       r = {contents= 1}
-      t = {length= 2; elts= [|; _ -> 0|]}
+      t = {length= 2; elts= fun (x:int) -> 0}
 
 ** binary_search-B2
 bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B2.mlw --apply-transform=split_vc --prover=CVC4,1.8,counterexamples --timelimit=15 --check-ce --rac-prover=CVC4,1.8 --sub-goal=:15@loop variant decrease --stepslimit=10000
@@ -324,7 +324,7 @@ The program does not comply to the verification goal, for example during the
 File binary_search-B2.mlw:
   Line 3:
     Execution of main function `binary_search` with env:
-      t = {length= 2; elts= [|; _ -> 0|]}
+      t = {length= 2; elts= fun (x:int) -> 0}
       x = 0
       zero = 0
       one = 1
@@ -338,7 +338,7 @@ File lib.mlw:
 File binary_search-B2.mlw:
   Line 10:
     Normal execution of function `length` with args:
-      arg = {length= 2; elts= [|; _ -> 0|]}
+      arg = {length= 2; elts= fun (x:int) -> 0}
     Normal execution of function `(-)` with args:
       x = 2
       y = 1
@@ -404,14 +404,14 @@ File binary_search-B2.mlw:
       y = 2
   Line 17:
     Normal execution of function `([])` with args:
-      a = {length= 2; elts= [|; _ -> 0|]}
+      a = {length= 2; elts= fun (x:int) -> 0}
       i = 0
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 2; elts= [|; _ -> 0|]}
+      arg = {length= 2; elts= fun (x:int) -> 0}
     Normal execution of function `(@)` with args:
-      u = [|; _ -> 0|]
+      u = fun (x:int) -> 0
       u = 0
 File binary_search-B2.mlw:
   Line 17:
@@ -468,14 +468,14 @@ File binary_search-B2.mlw:
       y = 2
   Line 17:
     Normal execution of function `([])` with args:
-      a = {length= 2; elts= [|; _ -> 0|]}
+      a = {length= 2; elts= fun (x:int) -> 0}
       i = 0
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 2; elts= [|; _ -> 0|]}
+      arg = {length= 2; elts= fun (x:int) -> 0}
     Normal execution of function `(@)` with args:
-      u = [|; _ -> 0|]
+      u = fun (x:int) -> 0
       u = 0
 File binary_search-B2.mlw:
   Line 17:
@@ -503,7 +503,7 @@ The program does not comply to the verification goal, for example during the
 File binary_search-B3.mlw:
   Line 3:
     Execution of main function `binary_search` with env:
-      t = {length= 3; elts= [|1 -> 1; _ -> 0|]}
+      t = {length= 3; elts= fun (x:int) -> if x = 1 then 1 else 0}
       x = 0
       zero = 0
       one = 1
@@ -517,7 +517,7 @@ File lib.mlw:
 File binary_search-B3.mlw:
   Line 10:
     Normal execution of function `length` with args:
-      arg = {length= 3; elts= [|1 -> 1; _ -> 0|]}
+      arg = {length= 3; elts= fun (x:int) -> if x = 1 then 1 else 0}
     Normal execution of function `(-)` with args:
       x = 3
       y = 1
@@ -586,14 +586,14 @@ File binary_search-B3.mlw:
       y = 2
   Line 17:
     Normal execution of function `([])` with args:
-      a = {length= 3; elts= [|1 -> 1; _ -> 0|]}
+      a = {length= 3; elts= fun (x:int) -> if x = 1 then 1 else 0}
       i = 1
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 3; elts= [|1 -> 1; _ -> 0|]}
+      arg = {length= 3; elts= fun (x:int) -> if x = 1 then 1 else 0}
     Normal execution of function `(@)` with args:
-      u = [|1 -> 1; _ -> 0|]
+      u = fun (x:int) -> if x = 1 then 1 else 0
       u = 1
 File binary_search-B3.mlw:
   Line 17:
@@ -618,7 +618,7 @@ File binary_search-B3.mlw:
       i = 0
   Line 14:
     Property failure at loop invariant preservation with:
-      t = {length= 3; elts= [|1 -> 1; _ -> 0|]}
+      t = {length= 3; elts= fun (x:int) -> if x = 1 then 1 else 0}
       x = 0
       r = {contents= 0}
 
@@ -636,17 +636,17 @@ The contracts of some function or loop are too weak, for example during the
 File binary_search-B4.mlw:
   Line 3:
     Execution of main function `binary_search` with env:
-      t = {length= 2; elts= [|; _ -> 0|]}
+      t = {length= 2; elts= fun (x:int) -> 0}
       x = 0
       zero = 0
       one = 1
   Line 9:
     Giant-step execution of function `int_ref` with args:
       i = (-1)
-    result of `int_ref` = {contents= (-1)}
+    result of `int_ref` = {contents= (- 1)}
   Line 10:
     Normal execution of function `length` with args:
-      arg = {length= 2; elts= [|; _ -> 0|]}
+      arg = {length= 2; elts= fun (x:int) -> 0}
     Giant-step execution of function `(-)` with args:
       x = 2
       y = 1
@@ -673,7 +673,7 @@ File binary_search-B4.mlw:
     result of `(!)` = 0
   Line 8:
     Property failure at postcondition of `binary_search` with:
-      t = {length= 2; elts= [|; _ -> 0|]}
+      t = {length= 2; elts= fun (x:int) -> 0}
       x = 0
       result = 0
 

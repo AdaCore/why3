@@ -199,16 +199,14 @@ type info = {
   mutable info_in_goal : bool;
   info_vc_term : vc_term_info;
   info_printer : ident_printer;
-  mutable list_projs : Ident.ident Mstr.t;
-  mutable list_field_def: Ident.ident Mstr.t;
+  mutable type_coercions : Sls.t Mty.t;
+  mutable type_fields : (lsymbol list) Mty.t;
   info_version : version;
   meta_model_projection : Sls.t;
   meta_record_def : Sls.t;
-  mutable list_records : field_info list Mstr.t;
+  mutable record_fields : (lsymbol list) Mls.t;
   mutable constr_proj_id : string list Mls.t;
-  (* For algebraic type counterexamples: constructors with no arguments can be
-     misunderstood for variables *)
-  mutable noarg_constructors: string list;
+  mutable constructors: lsymbol Mstr.t;
   info_cntexample_need_push : bool;
   info_cntexample: bool;
   info_incremental: bool;
@@ -291,12 +289,20 @@ let print_typed_var_list info fmt vsl =
 
 let collect_model_ls info ls =
   if Sls.mem ls info.meta_model_projection then
-    info.list_projs <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
-        ls.ls_name info.list_projs;
+    begin match ls.ls_args with
+    | [ty] ->
+      let coercions = Sls.add ls (Mty.find_def Sls.empty ty info.type_coercions) in
+      info.type_coercions <- Mty.add ty coercions info.type_coercions
+    | _ -> ()
+    end;
   if Sls.mem ls info.meta_record_def then
-    info.list_field_def <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
-        ls.ls_name info.list_field_def;
-  if ls.ls_args = [] && (relevant_for_counterexample ls.ls_name) then
+    begin match ls.ls_args with
+    | [ty] ->
+      let fields = ls :: (Mty.find_def [] ty info.type_fields) in
+      info.type_fields <- Mty.add ty fields info.type_fields
+    | _ -> ()
+    end;
+  if relevant_for_counterexample ls.ls_name then
     info.info_model <-
       add_model_element (ls, ls.ls_name.id_loc, ls.ls_name.id_attrs) info.info_model
 
@@ -758,7 +764,7 @@ let print_incremental_axiom info fmt =
   List.iter (print_ldecl_axiom info fmt) info.incr_list_ldecls;
   add_check_sat info fmt
 
-let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f = match k with
+let print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f = match k with
   | Paxiom ->
       if info.info_incremental && has_quantification f then
         info.incr_list_axioms <- (pr, f) :: info.incr_list_axioms
@@ -784,24 +790,24 @@ let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f = match k with
       let model_list = print_info_model info in
 
       printing_info := Some {
+        why3_env = env;
         vc_term_loc = vc_loc;
         vc_term_attrs = vc_attrs;
         queried_terms = model_list;
-        list_projections = info.list_projs;
-        list_fields = info.list_field_def;
-        Printer.list_records = info.list_records;
-        noarg_constructors = info.noarg_constructors;
+        Printer.type_coercions = info.type_coercions;
+        Printer.type_fields = info.type_fields;
+        Printer.record_fields = info.record_fields;
+        Printer.constructors = info.constructors;
         set_str = info.info_labels;
       }
   | Plemma -> assert false
 
 let print_constructor_decl info is_record fmt (ls,args) =
+  let cons_name = sprintf "%a" (print_ident info) ls.ls_name in
+  info.constructors <- Mstr.add cons_name ls info.constructors;
   let field_names =
     (match args with
-    | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name;
-        let cons_name = sprintf "%a" (print_ident info) ls.ls_name in
-        info.noarg_constructors <- cons_name :: info.noarg_constructors;
-        []
+    | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name; []
     | _ ->
         fprintf fmt "@[(%a@ " (print_ident info) ls.ls_name;
         let field_names, _ =
@@ -841,8 +847,10 @@ let print_constructor_decl info is_record fmt (ls,args) =
   info.constr_proj_id <-
     Mls.add ls (List.map (fun x -> x.field_name) field_names) info.constr_proj_id;
   if Strings.has_suffix "'mk" ls.ls_name.id_string then
-    begin
-      info.list_records <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name) field_names info.list_records;
+    begin try
+      let args = List.map (Opt.get) args in
+      info.record_fields <- Mls.add ls args info.record_fields
+    with _ -> ()
     end
 
 let print_data_decl info fmt (ts,cl) =
@@ -867,7 +875,7 @@ let print_sort_decl info fmt (ts,_) =
     (print_ident info) ts.ts_name
     (List.length ts.ts_args)
 
-let print_decl vc_loc vc_attrs printing_info info fmt d =
+let print_decl vc_loc vc_attrs env printing_info info fmt d =
   match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
@@ -902,7 +910,7 @@ let print_decl vc_loc vc_attrs printing_info info fmt d =
       "smtv2: inductive definitions are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
-      print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f
+      print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f
 
 let set_produce_models fmt info =
   if info.info_cntexample then
@@ -950,14 +958,14 @@ let print_task version args ?old:_ fmt task =
     info_in_goal = false;
     info_vc_term = vc_info;
     info_printer = ident_printer ();
-    list_projs = Mstr.empty;
-    list_field_def = Mstr.empty;
+    type_coercions = Mty.empty;
+    type_fields = Mty.empty;
     info_version = version;
     meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
     meta_record_def = Task.on_tagged_ls Theory.meta_record task;
-    list_records = Mstr.empty;
+    record_fields = Mls.empty;
     constr_proj_id = Mls.empty;
-    noarg_constructors = [];
+    constructors = Mstr.empty;
     info_cntexample_need_push = need_push;
     info_cntexample = cntexample;
     info_incremental = incremental;
@@ -980,7 +988,7 @@ let print_task version args ?old:_ fmt task =
         print_decls t.Task.task_prev;
         begin match t.Task.task_decl.Theory.td_node with
         | Theory.Decl d ->
-            begin try print_decl vc_loc vc_attrs args.printing_info info fmt d
+            begin try print_decl vc_loc vc_attrs args.env args.printing_info info fmt d
             with Unsupported s -> raise (UnsupportedDecl (d,s)) end
         | _ -> () end
     | None -> () in

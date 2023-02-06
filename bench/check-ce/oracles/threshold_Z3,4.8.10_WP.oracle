@@ -26,27 +26,27 @@ File int.mlw:
     max_int32 = 2147483647
 File threshold.mlw:
   Line 8:
-    n = {int32'int => 1}
-    min = {int32'int => 2147483647}
-    max = {int32'int => 1}
-    n = {int32'int => 1}
-    min = {int32'int => 2147483647}
-    max = {int32'int => 1}
+    n = epsilon x:int32. int32'int x = 1
+    min = epsilon x:int32. int32'int x = 2147483647
+    max = epsilon x:int32. int32'int x = 1
+    n = epsilon x:int32. int32'int x = 1
+    min = epsilon x:int32. int32'int x = 2147483647
+    max = epsilon x:int32. int32'int x = 1
     Execution of main function `f` with env:
-      n = {int32'int => 1}
-      min = {int32'int => 2147483647}
-      max = {int32'int => 1}
+      n = epsilon x:int32. int32'int x = 1
+      min = epsilon x:int32. int32'int x = 2147483647
+      max = epsilon x:int32. int32'int x = 1
       zero = 0
       one = 1
       min_int32 = (-2147483648)
       max_int32 = 2147483647
   Line 11:
     (giant-step) execution of unimplemented function `(+)`
-      a = {int32'int => 2147483647}
-      b = {int32'int => 1}
+      a = epsilon x:int32. int32'int x = 2147483647
+      b = epsilon x:int32. int32'int x = 1
     Property failure at precondition of `(+)` with:
-      a = {int32'int => 2147483647}
-      b = {int32'int => 1}
+      a = epsilon x:int32. int32'int x = 2147483647
+      b = epsilon x:int32. int32'int x = 1
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -76,35 +76,35 @@ File int.mlw:
     max_int32 = 2147483647
 File threshold.mlw:
   Line 8:
-    n = {int32'int => 1}
-    min = {int32'int => 2}
-    max = {int32'int => 0}
-    n = {int32'int => 1}
-    min = {int32'int => 2}
-    max = {int32'int => 0}
+    n = epsilon x:int32. int32'int x = 1
+    min = epsilon x:int32. int32'int x = 2
+    max = epsilon x:int32. int32'int x = 0
+    n = epsilon x:int32. int32'int x = 1
+    min = epsilon x:int32. int32'int x = 2
+    max = epsilon x:int32. int32'int x = 0
     Execution of main function `f` with env:
-      n = {int32'int => 1}
-      min = {int32'int => 2}
-      max = {int32'int => 0}
+      n = epsilon x:int32. int32'int x = 1
+      min = epsilon x:int32. int32'int x = 2
+      max = epsilon x:int32. int32'int x = 0
       zero = 0
       one = 1
       min_int32 = (-2147483648)
       max_int32 = 2147483647
   Line 11:
     (giant-step) execution of unimplemented function `(+)`
-      a = {int32'int => 2}
-      b = {int32'int => 0}
-    result of `(+)` = {int32'int => 2}
+      a = epsilon x:int32. int32'int x = 2
+      b = epsilon x:int32. int32'int x = 0
+    result of `(+)` = epsilon x:int32. int32'int x = 2
   Line 12:
     (giant-step) execution of unimplemented function `(<)`
-      a = {int32'int => 1}
-      b = {int32'int => 2}
+      a = epsilon x:int32. int32'int x = 1
+      b = epsilon x:int32. int32'int x = 2
     result of `(<)` = true
   Line 9:
     Property failure at postcondition of `f` with:
-      min = {int32'int => 2}
-      max = {int32'int => 0}
-      result = {int32'int => 2}
+      min = epsilon x:int32. int32'int x = 2
+      max = epsilon x:int32. int32'int x = 0
+      result = epsilon x:int32. int32'int x = 2
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -166,16 +166,16 @@ File bv.mlw:
     ones = 0
 File threshold.mlw:
   Line 26:
-    n = 0
-    min = 2147516419
-    max = 2147524228
-    n = 0
-    min = 2147516419
-    max = 2147524228
+    n = (0:t)
+    min = (2147516419:t)
+    max = (2147524228:t)
+    n = (0:t)
+    min = (2147516419:t)
+    max = (2147524228:t)
     Execution of main function `f` with env:
-      n = 0
-      min = 2147516419
-      max = 2147524228
+      n = (0:t)
+      min = (2147516419:t)
+      max = (2147524228:t)
       zero = 0
       one = 1
       zeros = 0
@@ -186,11 +186,11 @@ File threshold.mlw:
       ones = 0
   Line 30:
     (giant-step) execution of unimplemented function `u_add`
-      a = 2147516419
-      b = 2147524228
+      a = (2147516419:t)
+      b = (2147524228:t)
     Property failure at precondition of `u_add` with:
-      a = 2147516419
-      b = 2147524228
+      a = (2147516419:t)
+      b = (2147524228:t)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -252,16 +252,16 @@ File bv.mlw:
     ones = 0
 File threshold.mlw:
   Line 26:
-    n = 1084386
-    min = 2147651297
-    max = 35552
-    n = 1084386
-    min = 2147651297
-    max = 35552
+    n = (1084386:t)
+    min = (2147651297:t)
+    max = (35552:t)
+    n = (1084386:t)
+    min = (2147651297:t)
+    max = (35552:t)
     Execution of main function `f` with env:
-      n = 1084386
-      min = 2147651297
-      max = 35552
+      n = (1084386:t)
+      min = (2147651297:t)
+      max = (35552:t)
       zero = 0
       one = 1
       zeros = 0
@@ -272,17 +272,17 @@ File threshold.mlw:
       ones = 0
   Line 30:
     (giant-step) execution of unimplemented function `u_add`
-      a = 2147651297
-      b = 35552
-    result of `u_add` = 2147686849
+      a = (2147651297:t)
+      b = (35552:t)
+    result of `u_add` = (2147686849:t)
   Line 31:
     (giant-step) execution of unimplemented function `u_lt`
-      a = 1084386
-      b = 2147651297
+      a = (1084386:t)
+      b = (2147651297:t)
     result of `u_lt` = true
   Line 27:
     Property failure at postcondition of `f1` with:
-      min = 2147651297
-      max = 35552
-      result = 2147651297
+      min = (2147651297:t)
+      max = (35552:t)
+      result = (2147651297:t)
 

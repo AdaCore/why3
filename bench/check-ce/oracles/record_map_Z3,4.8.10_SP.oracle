@@ -1,124 +1,50 @@
 <check-ce-categorization>Categorizations of models:
-- Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/record_map.mlw", line 41, characters 12-22)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/record_map.mlw", line 41, characters 12-22)
-- Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/record_map.mlw", line 41, characters 12-22)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/record_map.mlw", line 41, characters 12-22)
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because an undefined argument was passed to (@))
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `([])` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because an undefined argument was passed to (@))
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `([])` cannot be evaluated)
 File "bench/check-ce/record_map.mlw", line 41, characters 12-22:
 Sub-goal Postcondition of goal map_record_proj_test1'vc.
 Prover result is: Unknown (sat).
-The program does not comply to the verification goal, for example during the
-  following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
+The following counterexample model could not be verified
+  (concrete RAC terminated because an undefined argument was passed to (@), abstract RAC terminated because Postcondition of `([])` cannot be evaluated):
 File record_map.mlw:
-  Line 40:
-    map_rec = [|true -> {f= 2; g= false}; _ -> {f= 2; g= false}|]
-    map_rec = [|true -> {f= 2; g= false}; _ -> {f= 2; g= false}|]
-    Execution of main function `map_record_proj_test1` with env:
-      map_rec = [|true -> {f= 2; g= false}; _ -> {f= 2; g= false}|]
-      zero = 0
-      one = 1
-  Line 43:
-    Normal execution of function `True` with args:
-    Normal execution of function `([])` with args:
-      f = [|true -> {f= 2; g= false}; _ -> {f= 2; g= false}|]
-      x = true
-File map.mlw:
-  Line 17:
-    Normal execution of function `(@)` with args:
-      u = [|true -> {f= 2; g= false}; _ -> {f= 2; g= false}|]
-      u = true
-File record_map.mlw:
-  Line 43:
-    Normal execution of function `f` with args:
-      arg = {f= 2; g= false}
   Line 41:
-    Property failure at postcondition of `map_record_proj_test1` with:
-      result = 2
+    result : int = 2
+    result : int = 2
+  Line 43:
+    result of call at line 43, characters 2-17 : int = 2
+    result of call at line 43, characters 2-15 :
+      r = {.field_f = 2; g = false}
+    result : int = 2
 
 <check-ce-categorization>Categorizations of models:
-- Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/record_map.mlw", line 46, characters 12-22)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/record_map.mlw", line 46, characters 12-22)
-- Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/record_map.mlw", line 46, characters 12-22)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/record_map.mlw", line 46, characters 12-22)
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because an undefined argument was passed to (@))
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `([])` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because an undefined argument was passed to (@))
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `([])` cannot be evaluated)
 File "bench/check-ce/record_map.mlw", line 46, characters 12-22:
 Sub-goal Postcondition of goal record_map_proj_test2'vc.
 Prover result is: Unknown (sat).
-The program does not comply to the verification goal, for example during the
-  following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
-File record_map.mlw:
-  Line 45:
-    rec_map = {f_map= [|true -> 2; _ -> 2|]; g_bool= false}
-    rec_map = {f_map= [|true -> 2; _ -> 2|]; g_bool= false}
-    Execution of main function `record_map_proj_test2` with env:
-      rec_map = {f_map= [|true -> 2; _ -> 2|]; g_bool= false}
-      zero = 0
-      one = 1
-  Line 48:
-    Normal execution of function `True` with args:
-    Normal execution of function `f_map` with args:
-      arg = {f_map= [|true -> 2; _ -> 2|]; g_bool= false}
-    Normal execution of function `([])` with args:
-      f = [|true -> 2; _ -> 2|]
-      x = true
-File map.mlw:
-  Line 17:
-    Normal execution of function `(@)` with args:
-      u = [|true -> 2; _ -> 2|]
-      u = true
+The following counterexample model could not be verified
+  (concrete RAC terminated because an undefined argument was passed to (@), abstract RAC terminated because Postcondition of `([])` cannot be evaluated):
 File record_map.mlw:
   Line 46:
-    Property failure at postcondition of `record_map_proj_test2` with:
-      result = 2
+    result : int = 2
+    result : int = 2
+  Line 48:
+    result of call at line 48, characters 2-21 : int = 2
+    result : int = 2
 
 <check-ce-categorization>Categorizations of models:
-- Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/record_map.mlw", line 53, characters 12-31)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/record_map.mlw", line 53, characters 12-31)
-- Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/record_map.mlw", line 53, characters 12-31)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/record_map.mlw", line 53, characters 12-31)
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
 File "bench/check-ce/record_map.mlw", line 53, characters 12-31:
 Sub-goal Postcondition of goal record_map_proj_test3'vc.
 Prover result is: Unknown (sat).
-The program does not comply to the verification goal, for example during the
-  following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
-File record_map.mlw:
-  Line 50:
-    re_rec_map = {f_map= [|; _ -> 2|]; g_bool= false}
-  Line 52:
-    rec_map = {f_map= [|; _ -> 1|]; g_bool= false}
-    rec_map = {f_map= [|; _ -> 1|]; g_bool= false}
-    Execution of main function `record_map_proj_test3` with env:
-      re_rec_map = {f_map= [|; _ -> 2|]; g_bool= false}
-      rec_map = {f_map= [|; _ -> 1|]; g_bool= false}
-      zero = 0
-      one = 1
-  Line 53:
-    Property failure at postcondition of `record_map_proj_test3` with:
-      re_rec_map = {f_map= [|; _ -> 2|]; g_bool= false}
-      result = {f_map= [|; _ -> 1|]; g_bool= false}
 

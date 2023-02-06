@@ -9,83 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** {1 Counter-example model values} *)
-
-type model_int = { int_value: BigInt.t; int_verbatim: string }
-
-type model_dec = { dec_int: BigInt.t; dec_frac: BigInt.t; dec_verbatim: string }
-
-type model_frac = { frac_nom: BigInt.t; frac_den: BigInt.t; frac_verbatim: string }
-
-type model_bv = { bv_value: BigInt.t; bv_length: int; bv_verbatim: string }
-
-type model_float_binary = { sign: model_bv; exp: model_bv; mant: model_bv }
-
-type model_float =
-  | Plus_infinity | Minus_infinity | Plus_zero | Minus_zero | Not_a_number
-  | Float_number of {hex: string option (* e.g., 0x1.ffp99 *); binary: model_float_binary}
-
-type model_const =
-  | Boolean of bool
-  | String of string
-  | Integer of model_int
-  | Float of model_float
-  | Bitvector of model_bv
-  | Decimal of model_dec
-  | Fraction of model_frac
-
-type model_value =
-  | Const of model_const
-  | Array of model_array
-  | Record of model_record
-  | Proj of model_proj
-  | Apply of string * model_value list
-  | Var of string
-  | Undefined
-  | Unparsed of string
-
-and arr_index = {arr_index_key: model_value; arr_index_value: model_value}
-
-and model_array = {arr_others: model_value; arr_indices: arr_index list}
-
-and model_record = (field_name * model_value) list
-
-and model_proj = proj_name * model_value
-
-and proj_name = string
-
-and field_name = string
-
-val compare_model_value : model_value -> model_value -> int
-
-val array_create_constant :
-  value : model_value ->
-  model_array
-(** Creates constant array with all indices equal to the parameter value. *)
-
-val array_add_element :
-  array : model_array ->
-  index : model_value ->
-  value : model_value ->
-  model_array
-(** Adds an element to the array.
-    @param array the array to that the element will be added
-
-    @param index the index on which the element will be added.
-
-    @param value the value of the element to be added
-*)
-
-val float_of_binary : model_float_binary -> model_float
-
-val print_model_value : Format.formatter -> model_value -> unit
-val print_model_value_human : Format.formatter -> model_value -> unit
-
-val print_model_const_human : Format.formatter -> model_const -> unit
-
-val debug_force_binary_floats : Debug.flag
-(** Print all floats using bitvectors in JSON output for models *)
-
 (*
 ***************************************************************
 **  Model elements
@@ -115,49 +38,106 @@ type model_element_kind =
 
 val print_model_kind : Format.formatter -> model_element_kind -> unit
 
-(** Information about the name of the model element *)
-type model_element_name = {
-  men_name   : string;
-    (** The name of the source-code element.  *)
-  men_kind   : model_element_kind;
-    (** The kind of model element. *)
-  men_attrs : Ident.Sattr.t;
-}
+(* Concrete syntax for model element values
+   (used for pretty printing and JSON printing) *)
 
+type concrete_syntax_bv = { bv_binary: string; bv_int : string }
+
+type concrete_syntax_float =
+  | Infinity
+  | Plus_zero | Minus_zero
+  | NaN
+  | Float_number of
+    {
+      sign : string;
+      exp : string;
+      mant : string;
+      hex : string
+    }
+
+type concrete_syntax_constant =
+  | Boolean of bool
+  | String of string
+  | Integer of string
+  | Real of string
+  | Float of concrete_syntax_float
+  | BitVector of concrete_syntax_bv
+  | Fraction of string * string
+
+type concrete_syntax_quant = Forall | Exists
+type concrete_syntax_binop = And | Or | Implies | Iff
+
+type concrete_syntax_term =
+  | Var of string
+  | Const of concrete_syntax_constant
+  | Apply of string * concrete_syntax_term list
+  | If of concrete_syntax_term * concrete_syntax_term * concrete_syntax_term
+  | Epsilon of string * concrete_syntax_term
+  | Quant of concrete_syntax_quant * string list * concrete_syntax_term
+  (* Quant (q,vars,t) *)
+  | Binop of concrete_syntax_binop * concrete_syntax_term * concrete_syntax_term
+  | Not of concrete_syntax_term
+  | Function of { args: string list ; body: concrete_syntax_term }
+  | FunctionLiteral of {
+      elts: (concrete_syntax_term * concrete_syntax_term) list;
+      others: concrete_syntax_term
+    }
+  (* in particular, arrays are represented using FunctionLiteral *)
+  | Record of (string * concrete_syntax_term) list
+  (* list of (field_name,field_value) elements *)
+  | Proj of (string * concrete_syntax_term)
+  (* represents values that are defined by a type coercion:
+     the value [eps x. ty'int x = 0] is represented by
+     the concrete syntax term [Proj ty'int (Const (Integer 0))] *)
+
+val print_concrete_term : Format.formatter -> concrete_syntax_term -> unit
+
+(* Helper functions to create concrete terms *)
+val concrete_var_from_vs : Term.vsymbol -> concrete_syntax_term
+val concrete_const_bool : bool -> concrete_syntax_term
+val concrete_apply_from_ls : Term.lsymbol -> concrete_syntax_term list -> concrete_syntax_term
+val concrete_apply_equ : concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term
+val subst_concrete_term :
+  concrete_syntax_term Wstdlib.Mstr.t -> concrete_syntax_term -> concrete_syntax_term
+val t_and_l_concrete : concrete_syntax_term list -> concrete_syntax_term
+  
 (** Counter-example model elements. Each element represents
     a counter-example for a single source-code element.*)
 type model_element = {
-  me_name             : model_element_name;
-    (** Information about the name of the model element  *)
-  me_value            : model_value;
-    (** Counter-example value for the element. *)
+  me_kind             : model_element_kind;
+    (** The kind of model element. *)
+  me_value            : Term.term;
+    (** Counterexample value for the element. *)
+  me_concrete_value: concrete_syntax_term;
+    (** Concrete syntax of the counterexample value. *)
   me_location         : Loc.position option;
     (** Source-code location of the element. *)
-  me_lsymbol_location : Loc.position option;
-    (** Source-code location of the Why term corresponding to the element.  *)
+  me_attrs            : Ident.Sattr.t;
+    (** Attributes of the element. *)
+  me_lsymbol          : Term.lsymbol;
+    (** Logical symbol corresponding to the element.  *)
 }
 
 val create_model_element :
-  name      : string ->
-  value     : model_value ->
-  attrs     : Ident.Sattr.t ->
+  value           : Term.term ->
+  concrete_value  : concrete_syntax_term ->
+  oloc            : Loc.position option ->
+  attrs           : Ident.Sattr.t ->
+  lsymbol         : Term.lsymbol ->
   model_element
 (** Creates a counter-example model element.
-    @param name the name of the source-code element
-
-    @param value counter-example value for the element
-
-    @param location source-code location of the element
-
-    @param term why term corresponding to the element
+    @param value counterexample value for the element
+    @param concrete_value concrete syntax of the counterexample value
+    @param oloc (optional) location of the element
+    @param attrs attributes of the element
+    @param lsymbol logical symbol corresponding to the element
 *)
+
+val get_lsymbol_or_model_trace_name : model_element -> string
 
   (** {2 Model definitions} *)
 
 type model
-
-val map_filter_model_elements :
-  (model_element -> model_element option) -> model -> model
 
 val is_model_empty : model -> bool
 val empty_model : model
@@ -184,97 +164,23 @@ val search_model_element_call_result :
 (** {2 Printing the model} *)
 
 val json_model : model -> Json_base.json
-(** Counter-example model for JSON format.
-
-    The format is the following:
-    - counterexample is JSON object with the following fields
-      {ul
-      {- "filename": name of the file}
-      {- "model": JSON list with elements corresponding to
-         counterexample_file}}
-    - counterexample_file is JSON object with the following fields
-      {ul
-      {- "loc": line number}
-      {- "is_vc_line": true if the current line corresponds to the source
-         code element from which the VC originates (this is useful for
-         use cases of Why3 as a library)}
-      {- "model_elements": JSON list with elements corresponding to
-         counterexample_line}}
-    - counterexample_line is JSON list with elements corresponding to
-      counterexample_element
-    - counterexample_element is JSON object with following fields
-      {ul
-      {- "name": name of counterexample element}
-      {- "value": value of counterexample element}
-      {- "attrs": attributes of counterexample element}
-      {- "kind": kind of counterexample element:
-        {ul
-        {- "result": Result of a function call (if the counter-example is
-           for postcondition)}
-        {- "old": Old value of function argument (if the counter-example is
-           for postcondition)}
-        {- "\@X": Value at label X}
-        {- "before_loop": Value before entering the loop}
-        {- "previous_iteration": Value in the previous loop iteration}
-        {- "current_iteration": Value in the current loop iteration}
-        {- "error_message": The model element represents error message,
-            not source-code element.
-            The error message is saved in the name of the model element}
-        {- "other"}}}}
-
-    Example:
-    [{"filename": "records.adb",
-      "model": [
-        { "loc": "84",,
-          "is_vc_line": false
-          "model_elements": [
-            {
-              "name": "A.A",
-              "value": "255",
-              "attrs": ["model_trace:A.A"]
-              "kind": "other"
-            },
-            {
-              "name": "B.B",
-              "value": "0",
-              "attrs": ["model_trace:B.B"]
-              "kind": "other"
-            }]
-        },
-        { "loc": "123",,
-          "is_vc_line": true
-          "model_elements": [
-            {
-              "name": "C.C",
-              "value": "1",
-              "attrs": ["model_trace:C.C"]
-              "kind": "result"
-            }]
-        }
-      ]
-    }]
-*)
+(** Counterexample model in JSON format.
+    The format is documented in the user documentation (section Technical Informations). *)
 
 val print_model :
   ?filter_similar:bool ->
-  ?me_name_trans:(model_element_name -> string) ->
   print_attrs:bool ->
   Format.formatter ->
   model ->
   unit
-(** Prints the counter-example model
-
-    @param me_name_trans the transformation of the model elements
-      names. The input is information about model element name. The
-      output is the name of the model element that should be displayed.
+(** Prints the counterexample model.
     @param model the counter-example model to print
-    @param print_attrs when set to true, the name is printed together with the
-    attrs associated to the specific ident.
+    @param print_attrs when set to true, each element is printed together with the
+    attrs associated to it.
 *)
 
 val print_model_human :
   ?filter_similar:bool ->
-  ?me_name_trans:(model_element_name -> string) ->
   Format.formatter ->
   model ->
   print_attrs:bool ->
@@ -285,22 +191,20 @@ val interleave_with_source :
   print_attrs:bool ->
   ?start_comment:string ->
   ?end_comment:string ->
-  ?me_name_trans:(model_element_name -> string) ->
   model ->
   rel_filename:string ->
   source_code:string ->
   locations:(Loc.position * 'a) list ->
   string * (Loc.position * 'a) list
-(** Given a source code and a counter-example model interleaves
-    the source code with information in about the counter-example.
-    That is, for each location in counter-example trace creates
+(** Given a source code and a counterexample model, interleaves
+    the source code with information about the counterexample.
+    That is, for each location in counterexample trace creates
     a comment in the output source code with information about
-    values of counter-example model elements.
+    values of counterexample model elements.
 
     @param start_comment the string that starts a comment
     @param end_comment the string that ends a comment
-    @param me_name_trans see print_model
-    @param model counter-example model
+    @param model counterexample model
     @param rel_filename the file name of the source relative to the session
     @param source_code the input source code
     @param locations the source locations that are found in the code
@@ -336,31 +240,35 @@ val model_for_positions_and_decls : model ->
 ***************************************************************
 *)
 
-(** Method clean#model cleans a model from unparsed values and handles
-   contradictory VCs ("the check fails with all inputs"). *)
+(** Helper class which can be inherited by API users to clean a model,
+    for example by removing elements that do not match a given condition,
+    or removing some "useless" fields in records, etc. *)
 class clean : object
   method model : model -> model
   method element : model_element -> model_element option
-  method value : model_value -> model_value option
-  method const : model_const -> model_value option
-  method integer : model_int -> model_value option
-  method string : string -> model_value option
-  method decimal : model_dec -> model_value option
-  method fraction : model_frac -> model_value option
-  method float : model_float -> model_value option
-  method boolean : bool -> model_value option
-  method bitvector : model_bv -> model_value option
-  method var : string -> model_value option
-  method proj : string -> model_value -> model_value option
-  method apply : string -> model_value list -> model_value option
-  method array : model_array -> model_value option
-  method record : model_record -> model_value option
-  method undefined : model_value option
-  method unparsed : string -> model_value option
+  method value : concrete_syntax_term -> concrete_syntax_term option
+  method var : string -> concrete_syntax_term option
+  method const : concrete_syntax_constant -> concrete_syntax_term option
+  method integer : string -> concrete_syntax_term option
+  method string : string -> concrete_syntax_term option
+  method real : string -> concrete_syntax_term option
+  method fraction : string -> string -> concrete_syntax_term option
+  method float : concrete_syntax_float -> concrete_syntax_term option
+  method boolean : bool -> concrete_syntax_term option
+  method bitvector : concrete_syntax_bv -> concrete_syntax_term option
+  method apply : string -> concrete_syntax_term list -> concrete_syntax_term option
+  method cond : concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term option
+  method epsilon : string -> concrete_syntax_term -> concrete_syntax_term option
+  method neg : concrete_syntax_term -> concrete_syntax_term option
+  method quant : concrete_syntax_quant -> string list -> concrete_syntax_term -> concrete_syntax_term option
+  method binop : concrete_syntax_binop -> concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term option
+  method func : string list -> concrete_syntax_term -> concrete_syntax_term option
+  method funliteral : (concrete_syntax_term * concrete_syntax_term) list -> concrete_syntax_term -> concrete_syntax_term option
+  method record : (string * concrete_syntax_term) list -> concrete_syntax_term option
+  method proj : string -> concrete_syntax_term -> concrete_syntax_term option
 end
 
-val customize_clean : #clean -> unit
-(** Customize the class used to clean the values in the model. *)
+val clean_model : #clean -> model -> model
 
 (*
 ***************************************************************
@@ -369,14 +277,16 @@ val customize_clean : #clean -> unit
 *)
 
 type model_parser = Printer.printing_info -> string -> model
-(** Parses the input string into model elements, estabilishes a mapping between these
-   elements and mapping from printer and builds model data structure. The model still has
-   to be cleaned using [clean]. *)
+(** Parses the input string (i.e. the output of the SMT solver)
+    into a model (i.e. a mapping of files and source code lines to
+    model elements). *)
 
 type raw_model_parser = Printer.printing_info -> string -> model_element list
 
 val register_remove_field:
-  (Ident.Sattr.t * model_value -> Ident.Sattr.t * model_value) -> unit
+  ( Ident.Sattr.t * Term.term * concrete_syntax_term ->
+    Ident.Sattr.t * Term.term * concrete_syntax_term ) ->
+  unit
 
 val register_model_parser : desc:Pp.formatted -> string -> raw_model_parser -> unit
 

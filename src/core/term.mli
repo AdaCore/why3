@@ -398,6 +398,10 @@ val t_pred_app : term -> term -> term  (* prop-typed application *)
 val t_func_app_l : term -> term list -> term  (* value-typed application *)
 val t_pred_app_l : term -> term list -> term  (* prop-typed application *)
 
+val to_prop : term -> term
+(** [to_prop t] converts the term of type [bool] or [prop] into a term of type [prop].
+    raises a typing error if [t] is not a Boolean term. *)
+
 (** {2 Lambda-term manipulation} *)
 
 val t_lambda : vsymbol list -> trigger -> term -> term

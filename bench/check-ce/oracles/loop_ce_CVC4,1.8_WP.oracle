@@ -172,15 +172,45 @@ Sub-goal Assertion of goal g'vc.
 Prover result is: Valid.
 
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: BAD_CE
-  - Concrete RAC: FAILURE (assertion at "bench/check-ce/loop_ce.mlw", line 31, characters 11-21)
-  - Abstract RAC: FAILURE (assertion at "bench/check-ce/loop_ce.mlw", line 31, characters 11-21)
-- Selected model 1: BAD_CE
-  - Concrete RAC: FAILURE (assertion at "bench/check-ce/loop_ce.mlw", line 31, characters 11-21)
-  - Abstract RAC: FAILURE (assertion at "bench/check-ce/loop_ce.mlw", line 31, characters 11-21)
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/loop_ce.mlw", line 27, characters 12-25)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/loop_ce.mlw", line 27, characters 12-25)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/loop_ce.mlw", line 27, characters 12-25)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/loop_ce.mlw", line 27, characters 12-25)
 File "bench/check-ce/loop_ce.mlw", line 27, characters 12-25:
 Sub-goal Postcondition of goal g'vc.
 Prover result is: Unknown or time/memory/step limit.
-Sorry, we don't have a good counterexample for you :(
-
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File loop_ce.mlw:
+  Line 26:
+    a = {contents= 10}
+    a = {contents= 10}
+    Execution of main function `g` with env:
+      a = {contents= 10}
+      zero = 0
+      one = 1
+  Line 30:
+    Normal execution of function `contents` with args:
+      arg = {contents= 10}
+    Normal execution of function `(=)` with args:
+      x = 10
+      y = 10
+Unknown location:
+    Normal execution of function `False` with args:
+File loop_ce.mlw:
+  Line 30:
+    Normal execution of function `Tuple0` with args:
+  Line 27:
+    Property failure at postcondition of `g` with:
+      a = {contents= 10}
+      a = {contents= 10}
 

@@ -966,7 +966,7 @@ from failing proof attempts, for provers that are able to produce a
 *counter-model* of the proof task. Why3 attempts to turn this
 counter-model into values for the free variables of the original Why3
 input. Currently, this is supported for CVC4 prover version at least
-1.5, and Z3 prover version at least 4.4.0.
+1.5, CVC5, and Z3 prover version at least 4.4.0.
 
 The generation of counterexamples is fully integrated in Why3 IDE. The
 recommended usage is to first start a prover normally, as shown in
@@ -1007,13 +1007,13 @@ The counterexamples can contain values of various types.
 
 -  Integer or real variables are displayed in decimal.
 
--  Bitvectors are displayed in hexadecimal.
+-  Bitvectors are displayed in decimal and binary notations.
 
 -  Integer range types are displayed in a specific notation showing
    their projection to integers.
 
--  Floating-point numbers are displayed both under a decimal
-   approximation and an exact hexadecimal value. The special values
+-  Floating-point numbers are displayed both under a bitvector
+   representation and an hexadecimal value. The special values
    ``+oo``, ``-oo``, and ``NaN`` may occur too.
 
 -  Values from algebraic types and record types are displayed as in the
@@ -1026,38 +1026,36 @@ trivially false postcondition:
 
 .. code-block:: whyml
 
-      use int.Int
-      use ref.Ref
-      use map.Map
+    use int.Int
+    use map.Map
 
-      let ghost test_map (ghost x : ref (map int int)) : unit
-        ensures { !x[0] <> !x[1] }
-      =
-        x := Map.set !x 0 3
+    let ghost test_map (ghost x : (map int int)) : map int int
+      ensures { result[0] <> result[1] }
+     =
+       Map.set x 0 3
 
 Executing CVC4 with the “counterexamples” alternative on goal will
 trigger counterexamples:
 
 .. code-block:: whyml
 
-      use int.Int
-      use ref.Ref
-      use map.Map
+    let ghost test_map (ghost x : (map int int)) : map int int
+    (* x : int -> int = [|1 => 3; _ => 0|]; *)
+        ensures { result[0] <> result[1] }
+        (* result : int -> int = [|0 => 3; 1 => 3; _ => 0|] *)
+       =
+         Map.set x 0 3
+         (* result : int -> int = [|0 => 3; 1 => 3; _ => 0|];
+            result of call at line 7, characters 5-18 :
+              int
+              ->
+              int = [|0 => 3; 1 => 3; _ => 0|] *)
 
-      let ghost test_map (ghost x : ref (map int int)) : unit
-      (* x = (1 => 3,others => 0) *)
-        ensures { !x[0] <> !x[1] }
-        (* x = (0 => 3,1 => 3,others => 0) *)
-      =
-        x := Map.set !x 0 3
-        (* x = (0 => 3,1 => 3,others => 0) *)
-
-The notation for map is to be understood with indices on left of the
-arrows and values on the right “(index => value)”. The meaning of the
-keyword ``others`` is the value for all indices that were not mentioned
-yet. This shows that setting the parameter ``x`` to a map that has value
-3 for index 1 and zero for all other indices is a counterexample. We can
-check that this negates the ``ensures`` clause.
+The notation for map is the one for function literals presented in
+:numref:`sec.functionliterals`. This shows that setting the
+parameter ``x`` to a map that has value 3 for index 1 and zero for all
+other indices is a counterexample. We can check that this negates the
+``ensures`` clause.
 
 Known limitations
 ^^^^^^^^^^^^^^^^^

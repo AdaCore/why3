@@ -58,10 +58,10 @@ File bv.mlw:
     ones = 0
 File bv32_toBig.mlw:
   Line 8:
-    i = 0
-    i = 0
+    i = (0:t)
+    i = (0:t)
     Execution of main function `ok` with env:
-      i = 0
+      i = (0:t)
       zero = 0
       one = 1
       zeros = 0
@@ -71,12 +71,12 @@ File bv32_toBig.mlw:
       one = 0
       ones = 0
     (giant-step) execution of unimplemented function `toBig`
-      _ = 0
-    result of `toBig` = 0
+      _ = (0:t)
+    result of `toBig` = (0:t1)
     (giant-step) execution of unimplemented function `u`
-      i = 0
+      i = (0:t1)
     Property failure at precondition of `u` with:
-      i = 0
+      i = (0:t1)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -138,10 +138,10 @@ File bv.mlw:
     ones = 0
 File bv32_toBig.mlw:
   Line 10:
-    i = 2147483660
-    i = 2147483660
+    i = (2147483660:t)
+    i = (2147483660:t)
     Execution of main function `ko` with env:
-      i = 2147483660
+      i = (2147483660:t)
       zero = 0
       one = 1
       zeros = 0
@@ -151,12 +151,12 @@ File bv32_toBig.mlw:
       one = 0
       ones = 0
     (giant-step) execution of unimplemented function `stoBig`
-      _ = 2147483660
-    result of `stoBig` = 18446744071562067980
+      _ = (2147483660:t)
+    result of `stoBig` = (18446744071562067980:t1)
     (giant-step) execution of unimplemented function `u`
-      i = 18446744071562067980
+      i = (18446744071562067980:t1)
     Property failure at precondition of `u` with:
-      i = 18446744071562067980
+      i = (18446744071562067980:t1)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -218,10 +218,10 @@ File bv.mlw:
     ones = 0
 File bv32_toBig.mlw:
   Line 12:
-    i = 2147483648
-    i = 2147483648
+    i = (2147483648:t)
+    i = (2147483648:t)
     Execution of main function `ko2` with env:
-      i = 2147483648
+      i = (2147483648:t)
       zero = 0
       one = 1
       zeros = 0
@@ -232,8 +232,8 @@ File bv32_toBig.mlw:
       ones = 0
   Line 13:
     (giant-step) execution of unimplemented function `stoBig`
-      _ = 2147483648
-    result of `stoBig` = 18446744071562067968
+      _ = (2147483648:t)
+    result of `stoBig` = (18446744071562067968:t1)
     Property failure at postcondition of `ko2` with:
-      result = 18446744071562067968
+      result = (18446744071562067968:t1)
 

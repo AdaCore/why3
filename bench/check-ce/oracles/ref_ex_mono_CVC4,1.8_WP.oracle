@@ -20,17 +20,17 @@ File int.mlw:
 File ref_ex_mono.mlw:
   Line 9:
     x = 0
-    y = {c= (-1)}
+    y = {c1= (- 1)}
     x = 0
-    y = {c= (-1)}
+    y = {c1= (- 1)}
     Execution of main function `test_post` with env:
       x = 0
-      y = {c= (-1)}
+      y = {c1= (- 1)}
       zero = 0
       one = 1
   Line 12:
     Normal execution of function `c` with args:
-      arg = {c= (-1)}
+      arg = {c1= (- 1)}
     Normal execution of function `(-)` with args:
       x = 0
       y = 1
@@ -45,11 +45,11 @@ File ref_ex_mono.mlw:
   Line 12:
     Normal execution of function `(+)` with args:
       _ = (-1)
-      _ = (-1)
+      _ = (- 1)
   Line 10:
     Property failure at postcondition of `test_post` with:
       x = 0
-      y = {c= (-1)}
+      y = {c1= (- 1)}
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -73,17 +73,17 @@ File int.mlw:
 File ref_ex_mono.mlw:
   Line 14:
     x = 43
-    y = {c= 0}
+    y = {c1= 0}
     x = 43
-    y = {c= 0}
+    y = {c1= 0}
     Execution of main function `test_post2` with env:
       x = 43
-      y = {c= 0}
+      y = {c1= 0}
       zero = 0
       one = 1
   Line 18:
     Normal execution of function `c` with args:
-      arg = {c= 0}
+      arg = {c1= 0}
     Normal execution of function `(-)` with args:
       x = 43
       y = 1
@@ -102,8 +102,8 @@ File ref_ex_mono.mlw:
   Line 16:
     Property failure at postcondition of `test_post2` with:
       x = 43
-      y = {c= 42}
-      y = {c= 0}
+      y = {c1= 42}
+      y = {c1= 0}
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -126,38 +126,38 @@ File int.mlw:
     one = 1
 File ref_ex_mono.mlw:
   Line 24:
-    y = {c= (-1)}
+    y = {c1= (- 1)}
   Line 26:
-    x23 = {c= 0}
-    x23 = {c= 0}
+    x23 = {c1= 0}
+    x23 = {c1= 0}
     Execution of main function `incr` with env:
-      y = {c= (-1)}
-      x23 = {c= 0}
+      y = {c1= (- 1)}
+      x23 = {c1= 0}
       zero = 0
       one = 1
   Line 30:
     Normal execution of function `c` with args:
-      arg = {c= (-1)}
+      arg = {c1= (- 1)}
     Normal execution of function `(+)` with args:
-      _ = (-1)
+      _ = (- 1)
       _ = 1
   Line 31:
     Normal execution of function `c` with args:
-      arg = {c= 0}
+      arg = {c1= 0}
     Normal execution of function `(+)` with args:
       _ = 0
       _ = 1
   Line 32:
     Normal execution of function `c` with args:
-      arg = {c= 1}
+      arg = {c1= 1}
     Normal execution of function `(+)` with args:
       _ = 1
       _ = 1
   Line 27:
     Property failure at postcondition of `incr` with:
-      x23 = {c= 2}
-      x23 = {c= 0}
-      y = {c= (-1)}
+      x23 = {c1= 2}
+      x23 = {c1= 0}
+      y = {c1= (- 1)}
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: BAD_CE

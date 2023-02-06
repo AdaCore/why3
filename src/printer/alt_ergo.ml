@@ -43,8 +43,6 @@ type info = {
   mutable info_model: S.t;
   info_vc_term: vc_term_info;
   info_in_goal: bool;
-  mutable list_projs: Ident.ident Mstr.t;
-  list_field_def: Ident.ident Mstr.t;
   meta_model_projection: Sls.t;
   info_cntexample: bool
   }
@@ -91,10 +89,7 @@ let print_ident_attr info fmt id =
 let forget_var info v = forget_id info.info_printer v.vs_name
 
 let collect_model_ls info ls =
-  if Sls.mem ls info.meta_model_projection then
-    info.list_projs <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
-        ls.ls_name info.list_projs;
-  if ls.ls_args = [] && relevant_for_counterexample ls.ls_name then
+  if relevant_for_counterexample ls.ls_name then
     info.info_model <-
       add_model_element (ls, ls.ls_name.id_loc, ls.ls_name.id_attrs) info.info_model
 
@@ -442,7 +437,7 @@ let print_info_model info =
   else
     Mstr.empty
 
-let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f =
+let print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f =
   match k with
   | Paxiom ->
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n@\n"
@@ -450,24 +445,25 @@ let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f =
   | Pgoal ->
       let model_list = print_info_model info in
       printing_info := Some {
+        why3_env = env;
         vc_term_loc = vc_loc;
         vc_term_attrs = vc_attrs;
         queried_terms = model_list;
-        list_projections = info.list_projs;
-        list_fields = info.list_field_def;
-        list_records = Mstr.empty;
-        noarg_constructors = [];
+        type_coercions = Mty.empty;
+        type_fields = Mty.empty;
+        record_fields = Mls.empty;
+        constructors = Mstr.empty;
         set_str = Mstr.empty;
       };
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
         (print_ident info) pr.pr_name (print_fmla info) f
   | Plemma -> assert false
 
-let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f =
+let print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f =
   if Mid.mem pr.pr_name info.info_syn
-    then () else (print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f; forget_tvs info)
+    then () else (print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f; forget_tvs info)
 
-let print_decl vc_loc vc_attrs printing_info info fmt d =
+let print_decl vc_loc vc_attrs env printing_info info fmt d =
   match d.d_node with
   | Dtype ts ->
       print_ty_decl info fmt ts
@@ -480,7 +476,7 @@ let print_decl vc_loc vc_attrs printing_info info fmt d =
       print_list nothing (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
       "alt-ergo: inductive definitions are not supported"
-  | Dprop (k,pr,f) -> print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f
+  | Dprop (k,pr,f) -> print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f
 
 let check_options ((show,cast) as acc) = function
   | [Theory.MAstr "show_attrs"] -> true, cast
@@ -507,8 +503,6 @@ let print_task args ?old:_ fmt task =
     info_model = S.empty;
     info_vc_term = vc_info;
     info_in_goal = false;
-    list_projs = Mstr.empty;
-    list_field_def = Mstr.empty;
     meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
     info_cntexample = cntexample;
   } in
@@ -519,7 +513,7 @@ let print_task args ?old:_ fmt task =
         print_decls t.Task.task_prev;
         begin match t.Task.task_decl.Theory.td_node with
         | Theory.Decl d ->
-            begin try print_decl vc_loc vc_attrs args.printing_info info fmt d
+            begin try print_decl vc_loc vc_attrs args.env args.printing_info info fmt d
             with Unsupported s -> raise (UnsupportedDecl (d,s)) end
         | _ -> () end
     | None -> () in

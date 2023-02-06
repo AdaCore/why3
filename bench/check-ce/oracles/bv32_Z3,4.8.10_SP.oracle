@@ -58,10 +58,10 @@ File bv.mlw:
     ones = 0
 File bv32.mlw:
   Line 7:
-    r = {contents= 34}
-    r = {contents= 34}
+    r = {contents= (34:t)}
+    r = {contents= (34:t)}
     Execution of main function `dummy_update` with env:
-      r = {contents= 34}
+      r = {contents= (34:t)}
       zero = 0
       one = 1
       zeros = 0
@@ -78,10 +78,10 @@ File bv32.mlw:
     (giant-step) execution of unimplemented function `add`
       v1 = 66
       v2 = 66
-    result of `add` = 132
+    result of `add` = (132:t)
   Line 9:
     Property failure at postcondition of `dummy_update` with:
-      r = {contents= 132}
+      r = {contents= (132:t)}
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -95,14 +95,34 @@ Sub-goal Postcondition of goal dummy_update_with_int'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `dummy_update_with_int` cannot be evaluated):
+File bv.mlw:
+  Line 596:
+    lsr :
+      t1
+      ->
+      int
+      ->
+      t1 = fun x!0 x!1 -> 0 (#x00000000000000000000000000000000)
+    nth : t1 -> int -> bool = fun x!0 x!1 -> false
+    nth_bv : t1 -> t1 -> bool = fun x!0 x!1 -> false
+    of_int : int -> t1 = [|_ => 0 (#x00000000000000000000000000000000)|]
+  Line 638:
+    lsr : t -> int -> t = fun x!0 x!1 -> 0 (#x00000000)
+    nth : t -> int -> bool = fun x!0 x!1 -> false
+    nth_bv : t -> t -> bool = fun x!0 x!1 -> false
+    of_int : int -> t = [|_ => 0 (#x00000000)|]
+File int.mlw:
+  Line 41:
+    abs : int -> int = [|_ => 0|]
 File bv32.mlw:
   Line 13:
-    r = 34 (0X22)
+    r : t = 34 (#x00000022)
   Line 15:
-    r = 132 (0X84)
+    r : t = 132 (#x00000084)
+    r : t = 132 (#x00000084)
   Line 16:
-    r = 66 (0X42)
+    r : t = 66 (#x00000042)
   Line 17:
-    r = 132 (0X84)
-    result of call at line 17, characters 9-16 = 132 (0X84)
+    r : t = 132 (#x00000084)
+    result of call at line 17, characters 9-16 : t = 132 (#x00000084)
 

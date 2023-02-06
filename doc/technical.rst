@@ -1,17 +1,6 @@
 Technical Informations
 ======================
 
-Structure of Session Files
---------------------------
-
-The proof session state is stored in an XML file named
-:file:`{dir}/why3session.xml`, where *dir* is the directory of the
-project. The XML file follows the DTD given in :file:`share/why3session.dtd`
-and reproduced below.
-
-.. literalinclude:: ../share/why3session.dtd
-   :language: dtd
-
 .. _sec.proverdetectiondata:
 
 Prover Detection
@@ -1650,6 +1639,32 @@ Debug Flags
 .. why3:debug:: print-domains-loop
 
 .. why3:debug:: stack_trace
+
+
+Structure of Session Files
+--------------------------
+
+The proof session state is stored in an XML file named
+:file:`{dir}/why3session.xml`, where *dir* is the directory of the
+project. The XML file follows the DTD given in :file:`share/why3session.dtd`
+and reproduced below.
+
+.. literalinclude:: ../share/why3session.dtd
+   :language: dtd
+
+
+.. _sec.jsonce:
+
+Structure of Counterexample files in JSON format
+------------------------------------------------
+
+Generated counterexamples can be exported in JSON format.
+The JSON output follows the JSON Schema given in :file:`share/ce-models.json`
+and reproduced below.
+
+.. literalinclude:: ../share/ce-models.json
+   :language: json
+
 
 Developer Documentation
 -----------------------

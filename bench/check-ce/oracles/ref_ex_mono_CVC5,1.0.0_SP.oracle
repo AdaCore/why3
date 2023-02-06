@@ -20,17 +20,17 @@ File int.mlw:
 File ref_ex_mono.mlw:
   Line 9:
     x = 0
-    y = {c= (-1)}
+    y = {c= (- 1)}
     x = 0
-    y = {c= (-1)}
+    y = {c= (- 1)}
     Execution of main function `test_post` with env:
       x = 0
-      y = {c= (-1)}
+      y = {c= (- 1)}
       zero = 0
       one = 1
   Line 12:
     Normal execution of function `c` with args:
-      arg = {c= (-1)}
+      arg = {c= (- 1)}
     Normal execution of function `(-)` with args:
       x = 0
       y = 1
@@ -45,11 +45,11 @@ File ref_ex_mono.mlw:
   Line 12:
     Normal execution of function `(+)` with args:
       _ = (-1)
-      _ = (-1)
+      _ = (- 1)
   Line 10:
     Property failure at postcondition of `test_post` with:
       x = 0
-      y = {c= (-1)}
+      y = {c= (- 1)}
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -126,20 +126,20 @@ File int.mlw:
     one = 1
 File ref_ex_mono.mlw:
   Line 24:
-    y = {c= (-1)}
+    y = {c= (- 1)}
   Line 26:
     x23 = {c= 0}
     x23 = {c= 0}
     Execution of main function `incr` with env:
-      y = {c= (-1)}
+      y = {c= (- 1)}
       x23 = {c= 0}
       zero = 0
       one = 1
   Line 30:
     Normal execution of function `c` with args:
-      arg = {c= (-1)}
+      arg = {c= (- 1)}
     Normal execution of function `(+)` with args:
-      _ = (-1)
+      _ = (- 1)
       _ = 1
   Line 31:
     Normal execution of function `c` with args:
@@ -157,7 +157,7 @@ File ref_ex_mono.mlw:
     Property failure at postcondition of `incr` with:
       x23 = {c= 2}
       x23 = {c= 0}
-      y = {c= (-1)}
+      y = {c= (- 1)}
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: BAD_CE

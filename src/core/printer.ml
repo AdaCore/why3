@@ -37,18 +37,16 @@ type field_info = {
 }
 
 type printing_info = {
+  why3_env           : Env.env;
   vc_term_loc        : Loc.position option;
   vc_term_attrs      : Sattr.t;
   queried_terms      : (Term.lsymbol * Loc.position option * Sattr.t) Mstr.t;
-  list_projections   : Ident.ident Mstr.t;
-  list_fields        : Ident.ident Mstr.t;
-  list_records       : field_info list Mstr.t;
-  noarg_constructors : string list;
+  type_coercions     : Sls.t Mty.t;
+  type_fields        : (lsymbol list) Mty.t;
+  record_fields      : (lsymbol list) Mls.t;
+  constructors       : Term.lsymbol Mstr.t;
   set_str            : Sattr.t Mstr.t
 }
-
-let fields_projs pm =
-  Wstdlib.Mstr.union (fun _ x _ -> Some x) pm.list_fields pm.list_projections
 
 type printer_args = {
   env           : Env.env;
@@ -65,14 +63,15 @@ let printers : (Pp.formatted * printer) Hstr.t = Hstr.create 17
 exception KnownPrinter of string
 exception UnknownPrinter of string
 
-let default_printing_info = {
+let default_printing_info env = {
+  why3_env = env;
   vc_term_loc = None;
   vc_term_attrs = Sattr.empty;
   queried_terms = Mstr.empty;
-  list_projections = Mstr.empty;
-  list_fields = Mstr.empty;
-  list_records = Mstr.empty;
-  noarg_constructors = [];
+  type_coercions = Mty.empty;
+  type_fields = Mty.empty;
+  record_fields = Mls.empty;
+  constructors = Mstr.empty;
   set_str = Mstr.empty
 }
 

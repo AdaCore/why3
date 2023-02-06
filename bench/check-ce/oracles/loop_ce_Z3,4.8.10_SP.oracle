@@ -34,7 +34,12 @@ File loop_ce.mlw:
       contents = 0
     a = {contents= 0}
   Line 8:
-    b = {contents= 5}
+    Constant b initialization
+    Normal execution of function `ref` with args:
+      contents = 0
+    Normal execution of function `ref'mk` with args:
+      contents = 0
+    b = {contents= 0}
 Unknown location:
     _ = ()
 File loop_ce.mlw:
@@ -42,7 +47,7 @@ File loop_ce.mlw:
     _ = ()
     Execution of main function `f` with env:
       a = {contents= 0}
-      b = {contents= 5}
+      b = {contents= 0}
       _ = ()
       zero = 0
       one = 1
@@ -132,26 +137,26 @@ File int.mlw:
     one = 1
 File loop_ce.mlw:
   Line 26:
-    a = {contents= (-1)}
-    a = {contents= (-1)}
+    a = {contents= (- 1)}
+    a = {contents= (- 1)}
     Execution of main function `g` with env:
-      a = {contents= (-1)}
+      a = {contents= (- 1)}
       zero = 0
       one = 1
   Line 30:
     Normal execution of function `contents` with args:
-      arg = {contents= (-1)}
+      arg = {contents= (- 1)}
     Normal execution of function `(=)` with args:
-      x = (-1)
+      x = (- 1)
       y = 10
 Unknown location:
     Normal execution of function `True` with args:
 File loop_ce.mlw:
   Line 30:
     Normal execution of function `contents` with args:
-      arg = {contents= (-1)}
+      arg = {contents= (- 1)}
     Normal execution of function `(+)` with args:
-      _ = (-1)
+      _ = (- 1)
       _ = 1
   Line 31:
     Property failure at assertion with:

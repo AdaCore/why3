@@ -12,13 +12,19 @@ The following counterexample model could not be verified
   (concrete RAC terminated because many args for exec fun, abstract RAC terminated because Postcondition of `f` cannot be evaluated):
 File anonymous5.mlw:
   Line 6:
-    y = 0
+    y : int = 0
   Line 7:
-    result = 0
-    y = 0
+    result : int = 0
+    result : int = 0
+    y : int = 0
   Line 8:
-    result of call at line 8, characters 2-9 = 0
-    result of call at line 8, characters 2-7 = (others => 0)
-    result of call at line 8, characters 2-5 = (others => (others => 0))
-    result = 0
+    result of call at line 8, characters 2-9 : int = 0
+    result of call at line 8, characters 2-7 : int -> int = [|_ => 0|]
+    result of call at line 8, characters 2-5 :
+      int
+      ->
+      int
+      ->
+      int = [|_ => [|_ => 0|]|]
+    result : int = 0
 
