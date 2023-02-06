@@ -41,7 +41,8 @@ let deco_term kept tvar =
     | Tvar v ->
         if is_protected_vs kept v
         then t else decorate tvar t
-    | Tapp (ls,_) when ls.ls_value <> None && not (is_protected_ls kept ls) ->
+    | Tapp (ls,_) when not (ls.ls_value = None || ls.ls_constr > 0 ||
+                            ls.ls_proj || is_protected_ls kept ls) ->
         decorate tvar (expl t)
     | Tconst _ ->
         if Sty.mem (t_type t) kept
@@ -63,8 +64,7 @@ let deco_term kept tvar =
 let deco_decl kept d = match d.d_node with
   | Dtype { ts_def = Alias _ } -> []
   | Dtype ts -> [d; lsdecl_of_ts ts]
-  | Ddata _ -> Printer.unsupportedDecl d
-      "Algebraic types are not supported, run eliminate_algebraic"
+  | Ddata dl -> d :: List.map (fun (ts, _) -> lsdecl_of_ts ts) dl
   | Dparam _ -> [d]
   | Dlogic [ls,ld] when not (Sid.mem ls.ls_name (get_used_syms_decl d)) ->
       let f = t_type_close (deco_term kept) (ls_defn_axiom ld) in

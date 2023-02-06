@@ -1,0 +1,13 @@
+
+use int.Int
+
+type t = { mutable c : int }
+
+val z: t
+
+val g (): unit
+  writes { z.c }
+  ensures { z.c > old z.c }
+
+let f () =
+  z.c <- 0; g (); assert { z.c = 1 }

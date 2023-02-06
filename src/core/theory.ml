@@ -635,10 +635,11 @@ let cl_find_ls cl ls =
   if not (Sid.mem ls.ls_name cl.cl_local) then ls else
   try Mls.find ls cl.ls_table with Not_found ->
     let constr = ls.ls_constr in
+    let proj = ls.ls_proj in
     let id  = id_clone ls.ls_name in
     let ta' = List.map (cl_trans_ty cl) ls.ls_args in
     let vt' = Opt.map (cl_trans_ty cl) ls.ls_value in
-    let ls' = create_lsymbol ~constr id ta' vt' in
+    let ls' = create_lsymbol ~proj ~constr id ta' vt' in
     cl.ls_table <- Mls.add ls ls' cl.ls_table;
     ls'
 

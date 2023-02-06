@@ -273,12 +273,12 @@ LIB_PARSER = ptree ptree_helpers glob typing \
 LIB_TRANSFORM = simplify_formula inlining split_goal \
 		args_wrapper reduction_engine compute \
 		remove_unused detect_polymorphism \
-		eliminate_definition eliminate_algebraic \
+		eliminate_definition \
 		abstract_quantifiers eliminate_unknown_types \
 		eliminate_unknown_lsymbols eliminate_symbol \
 		eliminate_inductive eliminate_let eliminate_if \
-		libencoding discriminate encoding encoding_select \
-		encoding_guards_full encoding_tags_full \
+		libencoding eliminate_algebraic discriminate encoding \
+		encoding_select encoding_guards_full encoding_tags_full \
 		encoding_guards encoding_tags encoding_twin \
 		encoding_sort simplify_array filter_trigger \
 		abstraction close_epsilon lift_epsilon \

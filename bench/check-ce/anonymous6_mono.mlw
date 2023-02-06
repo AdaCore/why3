@@ -1,0 +1,10 @@
+
+
+use int.Int
+
+type t = { mutable c : int }
+
+let f ()  =
+  let z : t = { c = 0 } in
+  begin ensures { 1 < z.c < 4 } z.c <- 2 end;
+  assert {z.c = 2}

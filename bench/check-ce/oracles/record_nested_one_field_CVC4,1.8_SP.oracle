@@ -20,29 +20,29 @@ File int.mlw:
 File record_nested_one_field.mlw:
   Line 13:
     x = 1
-    y = {cont_four= {contents= {cont_two= {cont_one= 0}}}}
+    y = {cont_four1= {contents= {cont_two1= {cont_one1= 0}}}}
     x = 1
-    y = {cont_four= {contents= {cont_two= {cont_one= 0}}}}
+    y = {cont_four1= {contents= {cont_two1= {cont_one1= 0}}}}
     Execution of main function `test_post` with env:
       x = 1
-      y = {cont_four= {contents= {cont_two= {cont_one= 0}}}}
+      y = {cont_four1= {contents= {cont_two1= {cont_one1= 0}}}}
       zero = 0
       one = 1
   Line 17:
     Normal execution of function `cont_four` with args:
-      arg = {cont_four= {contents= {cont_two= {cont_one= 0}}}}
+      arg = {cont_four1= {contents= {cont_two1= {cont_one1= 0}}}}
     Normal execution of function `(!)` with args:
-      r = {contents= {cont_two= {cont_one= 0}}}
+      r = {contents= {cont_two1= {cont_one1= 0}}}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= {cont_two= {cont_one= 0}}}
+      arg = {contents= {cont_two1= {cont_one1= 0}}}
 File record_nested_one_field.mlw:
   Line 17:
     Normal execution of function `cont_two` with args:
-      arg = {cont_two= {cont_one= 0}}
+      arg = {cont_two1= {cont_one1= 0}}
     Normal execution of function `cont_one` with args:
-      arg = {cont_one= 0}
+      arg = {cont_one1= 0}
   Line 16:
     Normal execution of function `(-)` with args:
       x = 1
@@ -60,13 +60,13 @@ File record_nested_one_field.mlw:
       _ = 0
       _ = 0
     Normal execution of function `cont_four` with args:
-      arg = {cont_four= {contents= {cont_two= {cont_one= 0}}}}
+      arg = {cont_four1= {contents= {cont_two1= {cont_one1= 0}}}}
     Normal execution of function `contents` with args:
-      arg = {contents= {cont_two= {cont_one= 0}}}
+      arg = {contents= {cont_two1= {cont_one1= 0}}}
     Normal execution of function `cont_two` with args:
-      arg = {cont_two= {cont_one= 0}}
+      arg = {cont_two1= {cont_one1= 0}}
   Line 14:
     Property failure at postcondition of `test_post` with:
       x = 1
-      y = {cont_four= {contents= {cont_two= {cont_one= 0}}}}
+      y = {cont_four1= {contents= {cont_two1= {cont_one1= 0}}}}
 

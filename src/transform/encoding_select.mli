@@ -22,3 +22,4 @@ of OCaml 4.04
 module Kept : sig end
 module Lskept : sig end
 module Lsinst : sig end
+module Alginst : sig end

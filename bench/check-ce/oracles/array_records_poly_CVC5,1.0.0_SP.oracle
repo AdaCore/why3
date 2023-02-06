@@ -17,7 +17,7 @@ File array.mlw:
       ->
       uni
       ->
-      int = fun bOUND_VARIABLE_4274 bOUND_VARIABLE_4275 -> 0
+      int = fun bOUND_VARIABLE_3997 bOUND_VARIABLE_3998 -> 0
     length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
@@ -26,29 +26,9 @@ File array.mlw:
       ->
       int
       ->
-      basic_record = fun _arg_12 _arg_2 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 3;
-                       Array_records.second_value = 5}
+      basic_record = fun _arg_1 _arg_2 ->
+                      {flag = true; first_val = 3; sec_val = 5}
 File array_records_poly.mlw:
-  Line 14:
-    basic_record'mk :
-      bool
-      ->
-      int
-      ->
-      int
-      ->
-      basic_record = fun _arg_12 _arg_2 _arg_3 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 3;
-                       Array_records.second_value = 5}
-  Line 16:
-    flag : basic_record -> bool = [|_ => true|]
-  Line 17:
-    first_val : basic_record -> int = [|_ => 3|]
-  Line 18:
-    sec_val : basic_record -> int = [|_ => 5|]
   Line 23:
     i : int = -1
   Line 27:
@@ -73,7 +53,7 @@ File array.mlw:
       ->
       uni
       ->
-      int = fun bOUND_VARIABLE_4287 bOUND_VARIABLE_4288 -> 0
+      int = fun bOUND_VARIABLE_4018 bOUND_VARIABLE_4019 -> 0
     length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
@@ -82,38 +62,16 @@ File array.mlw:
       ->
       int
       ->
-      basic_record = fun _arg_14 _arg_2 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 3;
-                       Array_records.second_value = 5}
+      basic_record = fun _arg_1 _arg_2 ->
+                      {flag = true; first_val = 3; sec_val = 5}
 File array_records_poly.mlw:
-  Line 14:
-    basic_record'mk :
-      bool
-      ->
-      int
-      ->
-      int
-      ->
-      basic_record = fun _arg_14 _arg_2 _arg_3 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 3;
-                       Array_records.second_value = 5}
-  Line 16:
-    flag : basic_record -> bool = [|_ => true|]
-  Line 17:
-    first_val : basic_record -> int = [|_ => 3|]
-  Line 18:
-    sec_val : basic_record -> int = [|_ => 5|]
   Line 23:
     i : int = -1
   Line 27:
     i : int = -1
     result of call at line 27, characters 45-61 : int = 3
     result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -134,7 +92,7 @@ File array.mlw:
       ->
       uni
       ->
-      int = fun bOUND_VARIABLE_4307 bOUND_VARIABLE_4308 -> 0
+      int = fun bOUND_VARIABLE_4050 bOUND_VARIABLE_4051 -> 0
     length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
@@ -143,53 +101,27 @@ File array.mlw:
       ->
       int
       ->
-      basic_record = fun _arg_16 _arg_2 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 3;
-                       Array_records.second_value = 5}
+      basic_record = fun _arg_1 _arg_2 ->
+                      {flag = true; first_val = 3; sec_val = 5}
 File array_records_poly.mlw:
-  Line 14:
-    basic_record'mk :
-      bool
-      ->
-      int
-      ->
-      int
-      ->
-      basic_record = fun _arg_16 _arg_2 _arg_3 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 3;
-                       Array_records.second_value = 5}
-  Line 16:
-    flag : basic_record -> bool = [|_ => true|]
-  Line 17:
-    first_val : basic_record -> int = [|_ => 3|]
-  Line 18:
-    sec_val : basic_record -> int = [|_ => 5|]
   Line 23:
     i : int = -1
   Line 27:
     i : int = -1
     result of call at line 27, characters 13-81 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 27, characters 45-61 : int = 3
     result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
 
 <check-ce-categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 28, characters 64-68:
@@ -198,73 +130,34 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
-  Line 16:
-    elts :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = [|_ =>
-                       [|-1 =>
-                         {Array_records.flag = true;
-                          Array_records.first_value = 2;
-                          Array_records.second_value = 0};
-                       _ =>
-                       {Array_records.flag = true;
-                        Array_records.first_value = 2;
-                        Array_records.second_value = 0}|]|]
   Line 17:
     length :
       ty
       ->
       uni
       ->
-      int = fun bOUND_VARIABLE_705 bOUND_VARIABLE_706 -> 0
+      int = fun bOUND_VARIABLE_4076 bOUND_VARIABLE_4077 -> 0
     length : array basic_record -> int = [|_ => 0|]
-  Line 20:
-    mixfix [] :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = fun _arg_17 _arg_2 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 2;
-                       Array_records.second_value = 0}
 File array_records_poly.mlw:
-  Line 16:
-    flag : basic_record -> bool = [|_ => true|]
-  Line 17:
-    first_val : basic_record -> int = [|_ => 2|]
-  Line 18:
-    sec_val : basic_record -> int = [|_ => 0|]
   Line 23:
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = 0}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = 0}
-    result of call at line 27, characters 45-61 : int = 2
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 27, characters 45-61 : int = 3
     result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = 0}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
     i : int = -1
 
 <check-ce-categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 28, characters 21-25:
@@ -273,78 +166,37 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
-  Line 16:
-    elts :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = [|_ =>
-                       [|-1 =>
-                         {Array_records.flag = true;
-                          Array_records.first_value = 2;
-                          Array_records.second_value = 0};
-                       _ =>
-                       {Array_records.flag = true;
-                        Array_records.first_value = 2;
-                        Array_records.second_value = 0}|]|]
   Line 17:
     length :
       ty
       ->
       uni
       ->
-      int = fun bOUND_VARIABLE_723 bOUND_VARIABLE_724 -> 0
+      int = fun bOUND_VARIABLE_4094 bOUND_VARIABLE_4095 -> 0
     length : array basic_record -> int = [|_ => 0|]
-  Line 20:
-    mixfix [] :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = fun _arg_19 _arg_21 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 2;
-                       Array_records.second_value = 0}
 File array_records_poly.mlw:
-  Line 16:
-    flag : basic_record -> bool = [|_ => true|]
-  Line 17:
-    first_val : basic_record -> int = [|_ => 2|]
-  Line 18:
-    sec_val : basic_record -> int = [|_ => 0|]
   Line 23:
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = 0}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = 0}
-    result of call at line 27, characters 45-61 : int = 2
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 27, characters 45-61 : int = 3
     result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = 0}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
     i : int = -1
-    result of call at line 28, characters 64-81 : int = 0
+    result of call at line 28, characters 64-81 : int = 69
     result of call at line 28, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = 0}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
 
 <check-ce-categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 28, characters 5-82:
@@ -353,81 +205,36 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
-  Line 16:
-    elts :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = [|_ =>
-                       [|-1 =>
-                         {Array_records.flag = true;
-                          Array_records.first_value = 2;
-                          Array_records.second_value = 0};
-                       _ =>
-                       {Array_records.flag = true;
-                        Array_records.first_value = 2;
-                        Array_records.second_value = 0}|]|]
   Line 17:
     length :
       ty
       ->
       uni
       ->
-      int = fun bOUND_VARIABLE_750 bOUND_VARIABLE_751 -> 0
+      int = fun bOUND_VARIABLE_4122 bOUND_VARIABLE_4123 -> 0
     length : array basic_record -> int = [|_ => 0|]
-  Line 20:
-    mixfix [] :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = fun _arg_111 _arg_22 ->
-                      {Array_records.flag = true;
-                       Array_records.first_value = 2;
-                       Array_records.second_value = 0}
 File array_records_poly.mlw:
-  Line 16:
-    flag : basic_record -> bool = [|_ => true|]
-  Line 17:
-    first_val : basic_record -> int = [|_ => 2|]
-  Line 18:
-    sec_val : basic_record -> int = [|_ => 0|]
   Line 23:
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = 0}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = 0}
-    result of call at line 27, characters 45-61 : int = 2
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 27, characters 45-61 : int = 3
     result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = 0}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
     i : int = -1
     result of call at line 28, characters 13-82 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = 0}
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = 0}
-    result of call at line 28, characters 64-81 : int = 0
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 28, characters 64-81 : int = 69
     result of call at line 28, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 2;
-                      Array_records.second_value = 0}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -448,65 +255,29 @@ File array.mlw:
       ->
       uni
       ->
-      int = fun bOUND_VARIABLE_5139 bOUND_VARIABLE_5140 -> 0
+      int = fun bOUND_VARIABLE_4993 bOUND_VARIABLE_4994 -> 0
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
-  Line 16:
-    flag : basic_record -> bool = [|_ => true|]
-  Line 17:
-    first_val :
-      basic_record
-      ->
-      int = fun _arg_115 ->
-             if {Array_records.flag = true;
-                 Array_records.first_value = 42;
-                 Array_records.second_value = 69} = _arg_115
-             then 42 else 3
-  Line 18:
-    sec_val :
-      basic_record
-      ->
-      int = fun _arg_115 ->
-             if {Array_records.flag = true;
-                 Array_records.first_value = 42;
-                 Array_records.second_value = 69} = _arg_115
-             then 69
-             else if {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69} = _arg_115
-                  then 69 else 5
   Line 23:
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 27, characters 45-61 : int = 3
     result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
     result of call at line 28, characters 13-82 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 28, characters 64-81 : int = 69
     result of call at line 28, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
   Line 29:
     i : int = -1
 
@@ -529,72 +300,34 @@ File array.mlw:
       ->
       uni
       ->
-      int = fun bOUND_VARIABLE_5160 bOUND_VARIABLE_5161 -> 0
+      int = fun bOUND_VARIABLE_5013 bOUND_VARIABLE_5014 -> 0
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
-  Line 16:
-    flag : basic_record -> bool = [|_ => true|]
-  Line 17:
-    first_val :
-      basic_record
-      ->
-      int = fun _arg_119 ->
-             if {Array_records.flag = true;
-                 Array_records.first_value = 42;
-                 Array_records.second_value = 69} = _arg_119
-             then 42 else 3
-  Line 18:
-    sec_val :
-      basic_record
-      ->
-      int = fun _arg_119 ->
-             if {Array_records.flag = true;
-                 Array_records.first_value = 42;
-                 Array_records.second_value = 69} = _arg_119
-             then 69
-             else if {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69} = _arg_119
-                  then 69 else 5
   Line 23:
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 27, characters 45-61 : int = 3
     result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
     result of call at line 28, characters 13-82 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 28, characters 64-81 : int = 69
     result of call at line 28, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
   Line 29:
     i : int = -1
     result of call at line 29, characters 64-81 : int = 69
     result of call at line 29, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -615,81 +348,39 @@ File array.mlw:
       ->
       uni
       ->
-      int = fun bOUND_VARIABLE_5191 bOUND_VARIABLE_5192 -> 0
+      int = fun bOUND_VARIABLE_5041 bOUND_VARIABLE_5042 -> 0
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
-  Line 16:
-    flag : basic_record -> bool = [|_ => true|]
-  Line 17:
-    first_val :
-      basic_record
-      ->
-      int = fun _arg_123 ->
-             if {Array_records.flag = true;
-                 Array_records.first_value = 42;
-                 Array_records.second_value = 69} = _arg_123
-             then 42 else 3
-  Line 18:
-    sec_val :
-      basic_record
-      ->
-      int = fun _arg_123 ->
-             if {Array_records.flag = true;
-                 Array_records.first_value = 42;
-                 Array_records.second_value = 69} = _arg_123
-             then 69
-             else if {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69} = _arg_123
-                  then 69 else 5
   Line 23:
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 27, characters 45-61 : int = 3
     result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
     result of call at line 28, characters 13-82 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 28, characters 64-81 : int = 69
     result of call at line 28, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
   Line 29:
     i : int = -1
     result of call at line 29, characters 13-82 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
     result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 29, characters 64-81 : int = 69
     result of call at line 29, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -710,88 +401,38 @@ File array.mlw:
       ->
       uni
       ->
-      int = fun bOUND_VARIABLE_6049 bOUND_VARIABLE_6050 -> 0
+      int = fun bOUND_VARIABLE_5981 bOUND_VARIABLE_5982 -> 0
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
-  Line 16:
-    flag : basic_record -> bool = [|_ => true|]
-  Line 17:
-    first_val :
-      basic_record
-      ->
-      int = fun _arg_127 ->
-             if {Array_records.flag = true;
-                 Array_records.first_value = 42;
-                 Array_records.second_value = 69} = _arg_127
-             then 42
-             else if {Array_records.flag = true;
-                      Array_records.first_value = 23;
-                      Array_records.second_value = 69} = _arg_127
-                  then 23 else 3
-  Line 18:
-    sec_val :
-      basic_record
-      ->
-      int = fun _arg_127 ->
-             if {Array_records.flag = true;
-                 Array_records.first_value = 3;
-                 Array_records.second_value = 69} = _arg_127
-             then 69
-             else if {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69} = _arg_127
-                  then 69
-                  else if {Array_records.flag = true;
-                           Array_records.first_value = 23;
-                           Array_records.second_value = 69} = _arg_127
-                       then 69 else 5
   Line 23:
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 27, characters 45-61 : int = 3
     result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
     result of call at line 28, characters 13-82 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 28, characters 64-81 : int = 69
     result of call at line 28, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
   Line 29:
     result of call at line 29, characters 13-82 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 23;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
     result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 29, characters 64-81 : int = 69
     result of call at line 29, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
   Line 30:
     i : int = -1
 
@@ -814,95 +455,43 @@ File array.mlw:
       ->
       uni
       ->
-      int = fun bOUND_VARIABLE_6074 bOUND_VARIABLE_6075 -> 0
+      int = fun bOUND_VARIABLE_6003 bOUND_VARIABLE_6004 -> 0
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
-  Line 16:
-    flag : basic_record -> bool = [|_ => true|]
-  Line 17:
-    first_val :
-      basic_record
-      ->
-      int = fun _arg_131 ->
-             if {Array_records.flag = true;
-                 Array_records.first_value = 42;
-                 Array_records.second_value = 69} = _arg_131
-             then 42
-             else if {Array_records.flag = true;
-                      Array_records.first_value = 23;
-                      Array_records.second_value = 69} = _arg_131
-                  then 23 else 3
-  Line 18:
-    sec_val :
-      basic_record
-      ->
-      int = fun _arg_131 ->
-             if {Array_records.flag = true;
-                 Array_records.first_value = 3;
-                 Array_records.second_value = 69} = _arg_131
-             then 69
-             else if {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69} = _arg_131
-                  then 69
-                  else if {Array_records.flag = true;
-                           Array_records.first_value = 23;
-                           Array_records.second_value = 69} = _arg_131
-                       then 69 else 5
   Line 23:
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 27, characters 45-61 : int = 3
     result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
     result of call at line 28, characters 13-82 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 28, characters 64-81 : int = 69
     result of call at line 28, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
   Line 29:
     result of call at line 29, characters 13-82 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 23;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
     result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 29, characters 64-81 : int = 69
     result of call at line 29, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
   Line 30:
     i : int = -1
     result of call at line 30, characters 74-91 : int = 69
     result of call at line 30, characters 74-78 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 23;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -923,114 +512,58 @@ File array.mlw:
       ->
       uni
       ->
-      int = fun bOUND_VARIABLE_6103 bOUND_VARIABLE_6104 -> 0
+      int = fun bOUND_VARIABLE_6031 bOUND_VARIABLE_6032 -> 0
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
-  Line 16:
-    flag : basic_record -> bool = [|_ => true|]
-  Line 17:
-    first_val :
-      basic_record
-      ->
-      int = fun _arg_135 ->
-             if {Array_records.flag = true;
-                 Array_records.first_value = 42;
-                 Array_records.second_value = 69} = _arg_135
-             then 42
-             else if {Array_records.flag = true;
-                      Array_records.first_value = 23;
-                      Array_records.second_value = 69} = _arg_135
-                  then 23 else 3
-  Line 18:
-    sec_val :
-      basic_record
-      ->
-      int = fun _arg_135 ->
-             if {Array_records.flag = true;
-                 Array_records.first_value = 3;
-                 Array_records.second_value = 69} = _arg_135
-             then 69
-             else if {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69} = _arg_135
-                  then 69
-                  else if {Array_records.flag = true;
-                           Array_records.first_value = 23;
-                           Array_records.second_value = 69} = _arg_135
-                       then 69 else 5
   Line 23:
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 27, characters 45-61 : int = 3
     result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 5}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
     result of call at line 28, characters 13-82 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 28, characters 64-81 : int = 69
     result of call at line 28, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 3;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
   Line 29:
     result of call at line 29, characters 13-82 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 23;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
     result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 29, characters 64-81 : int = 69
     result of call at line 29, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 42;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
   Line 30:
     i : int = -1
     result of call at line 30, characters 13-92 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 23;
-                      Array_records.second_value = 69}
+      basic_record = {flag = false; first_val = 23; sec_val = 69}
     result of call at line 30, characters 41-57 : int = 23
     result of call at line 30, characters 41-45 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 23;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
     result of call at line 30, characters 74-91 : int = 69
     result of call at line 30, characters 74-78 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 23;
-                      Array_records.second_value = 69}
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
 
 File "bench/check-ce/array_records_poly.mlw", line 31, characters 13-35:
 Sub-goal Assertion of goal var_overwrite'vc.
 Prover result is: Valid.
 
 <check-ce-categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 25, characters 15-36:
@@ -1039,125 +572,53 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
-  Line 16:
-    elts :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = [|_ =>
-                       [|0 =>
-                         {Array_records.flag = true;
-                          Array_records.first_value = 0;
-                          Array_records.second_value = -3};
-                       _ =>
-                       {Array_records.flag = true;
-                        Array_records.first_value = -1;
-                        Array_records.second_value = -3}|]|]
   Line 17:
     length :
       ty
       ->
       uni
       ->
-      int = fun bOUND_VARIABLE_1212 bOUND_VARIABLE_1213 -> 0
+      int = fun bOUND_VARIABLE_7067 bOUND_VARIABLE_7068 -> 0
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
-  Line 16:
-    flag : basic_record -> bool = [|_ => true|]
-  Line 17:
-    first_val :
-      basic_record
-      ->
-      int = fun _arg_139 ->
-             if {Array_records.flag = true;
-                 Array_records.first_value = -1;
-                 Array_records.second_value = -3} = _arg_139
-             then -1
-             else if {Array_records.flag = true;
-                      Array_records.first_value = 4;
-                      Array_records.second_value = -3} = _arg_139
-                  then 4 else 0
-  Line 18:
-    sec_val :
-      basic_record
-      ->
-      int = fun _arg_139 ->
-             if {Array_records.flag = true;
-                 Array_records.first_value = 0;
-                 Array_records.second_value = 2} = _arg_139
-             then 2
-             else if {Array_records.flag = true;
-                      Array_records.first_value = 0;
-                      Array_records.second_value = -2} = _arg_139
-                  then -2
-                  else if {Array_records.flag = true;
-                           Array_records.first_value = 0;
-                           Array_records.second_value = 69} = _arg_139
-                       then 69 else -3
   Line 23:
     i : int = 0
   Line 25:
     i : int = 0
   Line 27:
     result of call at line 27, characters 13-81 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 0;
-                      Array_records.second_value = -3}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = -1;
-                      Array_records.second_value = -3}
-    result of call at line 27, characters 45-61 : int = -1
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 27, characters 45-61 : int = 3
     result of call at line 27, characters 45-49 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = -1;
-                      Array_records.second_value = -3}
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
     result of call at line 28, characters 13-82 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 0;
-                      Array_records.second_value = -3}
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 28, characters 21-30 : bool = true
     result of call at line 28, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 0;
-                      Array_records.second_value = 2}
-    result of call at line 28, characters 64-81 : int = 2
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 28, characters 64-81 : int = 69
     result of call at line 28, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 0;
-                      Array_records.second_value = 2}
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
   Line 29:
     result of call at line 29, characters 13-82 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 0;
-                      Array_records.second_value = -3}
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
     result of call at line 29, characters 21-30 : bool = true
     result of call at line 29, characters 21-25 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 0;
-                      Array_records.second_value = -2}
-    result of call at line 29, characters 64-81 : int = -2
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
+    result of call at line 29, characters 64-81 : int = 69
     result of call at line 29, characters 64-68 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 0;
-                      Array_records.second_value = -2}
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
   Line 30:
     result of call at line 30, characters 13-92 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 0;
-                      Array_records.second_value = -3}
-    result of call at line 30, characters 41-57 : int = 4
+      basic_record = {flag = false; first_val = 23; sec_val = 69}
+    result of call at line 30, characters 41-57 : int = 23
     result of call at line 30, characters 41-45 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 4;
-                      Array_records.second_value = -3}
-    result of call at line 30, characters 74-91 : int = -3
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
+    result of call at line 30, characters 74-91 : int = 69
     result of call at line 30, characters 74-78 :
-      basic_record = {Array_records.flag = true;
-                      Array_records.first_value = 4;
-                      Array_records.second_value = -3}
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
 
