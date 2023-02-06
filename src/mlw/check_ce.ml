@@ -10,7 +10,6 @@
 (********************************************************************)
 
 open Format
-open Wstdlib
 open Ident
 open Term
 open Ity

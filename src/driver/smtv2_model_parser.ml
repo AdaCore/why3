@@ -1640,15 +1640,15 @@ module FromModelToTerm = struct
       | Tif ({t_node = Tapp (ls, [x;t0])}, t1, t2), If (Apply ("=", [Var x'; ct0]), ct1, ct2)
           when t_equal (t_var vs) x &&  x'=vs_name && ls_equal ls ps_equ ->
         let (elts, others) = unfold env (vs,vs_name) (t2,ct2) in
-        let t0',ct0' = maybe_convert_epsilon_terms env (t0,ct0) in
-        let t1',ct1' = maybe_convert_epsilon_terms env (t1,ct1) in
+        let _,ct0' = maybe_convert_epsilon_terms env (t0,ct0) in
+        let _,ct1' = maybe_convert_epsilon_terms env (t1,ct1) in
         ((ct0',ct1')::elts, others)
       | _ ->
-        let t', t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in
+        let _, t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in
         ([], t'_concrete)
     in
     if t_v_occurs vs t' = 0 then
-      let t',t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in
+      let _,t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in
       Some ([],t'_concrete)
     else
       match unfold env (vs,vs_name) (t',t'_concrete) with
