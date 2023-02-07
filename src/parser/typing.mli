@@ -51,3 +51,12 @@ val type_fmla_in_namespace :
 
 val type_expr_in_muc :
   Pmodule.pmodule_uc -> ?denv:Dexpr.denv -> Ptree.expr -> Expr.expr
+
+module Unsafe : sig
+  val dexpr : Pmodule.pmodule_uc -> Dexpr.denv -> Ptree.expr -> Dexpr.dexpr
+  val drec_defn : Pmodule.pmodule_uc -> Dexpr.denv -> Ptree.fundef list -> Dexpr.denv * Dexpr.drec_defn
+
+  val add_decl : Pmodule.pmodule_uc -> Env.env -> Pmodule.pmodule Wstdlib.Mstr.t -> Ptree.decl -> Pmodule.pmodule_uc
+  val create_user_id : Ptree.ident -> Ident.preid
+  val create_user_prog_id : Ptree.ident -> Ident.preid
+end

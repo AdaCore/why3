@@ -1,0 +1,74 @@
+(*module WhileLoop
+
+type borrowed 'a = { cur: 'a ; fin: 'a }
+(*
+let cfg f [@cfg:stackify] () : () =
+var a : int;
+{ a <- 0; return () }
+*)
+
+let cfg nested_loops [@cfg:stackify] _x : ()
+  diverges
+  ensures { true }
+
+=
+  var b : borrowed int;
+  {
+    goto BB0
+  }
+  BB0 {
+    switch (any bool)
+    | True -> goto BB1
+    | False -> goto BB2
+    end
+  }
+  BB1 {
+      b <- { b with cur = 0 };
+      goto BB0
+  }
+  BB2 {
+  assert { b.fin = b.cur };
+  return ()
+  }
+end*)
+
+module Decrement_Test
+  use mach.int.UInt32
+  use mach.int.Int
+  use mach.int.Int32
+
+  type borrowed 'a = { cur: 'a ; fin: 'a }
+
+  let cfg test [@cfg:stackify] (x : borrowed uint32) : ()
+    ensures { UInt32.to_int (x.fin) = 0 }
+   =
+  var _0 : ();
+  var x_1 : borrowed uint32 = x;
+  var _3 : bool;
+  var _4 : uint32;
+  {
+    goto BB0
+  }
+  BB0 {
+    goto BB1
+  }
+  BB1 {
+    invariant x { UInt32.to_int (x_1.cur) >= 0 };
+    _4 <-  x_1.cur;
+    _3 <- _4 > (0 : uint32);
+    switch (_3)
+      | False -> goto BB3
+      | _ -> goto BB2
+      end
+  }
+  BB2 {
+    x_1 <- { x_1 with cur = ( x_1.cur - (1 : uint32)) };
+    goto BB1
+  }
+  BB3 {
+    assume { x_1.fin = x_1.cur };
+
+    return _0
+  }
+
+end

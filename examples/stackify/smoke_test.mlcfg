@@ -1,0 +1,51 @@
+module C206_U2_Impl
+  use Type
+  use mach.int.Int
+  use prelude.Prelude
+  use mach.int.UInt64
+  clone CreusotContracts_Std1_Vec_Impl0_Model as Model0 with type t = usize
+  let rec ghost function u2 (a : Type.c206_a) : ()
+    ensures { true }
+   = 
+    ()
+ends
+module ProjectionToggle_Main
+  use mach.int.Int32
+  let rec cfg main [@cfg:stackify] () : () =
+  var _0 : ();
+  var _9 : bool;
+  var _10 : bool;
+  var _11 : int32;
+  {
+    _10 <- _11 = (15 : int32);
+    _9 <- not _10;
+    return _0
+  }
+end
+module C217_Ex_Impl
+  use seq.Seq
+
+  function tail (self : Seq.seq int) : Seq.seq int =  self[1..]
+
+  let rec ghost function ex (c : Seq.seq int) (a : int) : int
+    variant {Seq.length c}
+
+   = ex (tail c) a
+end
+module ListIndexMut_IndexMut
+  type borrowed 'a = { current : 'a ; final : 'a; }
+  use mach.int.UInt32
+  let rec cfg index_mut [@cfg:stackify] () : borrowed uint32
+   =
+  var _0 : borrowed uint32;
+  var _8 : bool;
+  {
+    goto BB1
+  }
+  BB1 {
+    switch (_8)
+      | False -> return _0
+      | True -> absurd
+      end
+  }
+end
