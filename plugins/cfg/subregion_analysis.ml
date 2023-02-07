@@ -138,8 +138,6 @@ let rec generate_equality known f v (k : term -> term) : term list =
   *)
   | _, _ -> assert false (* unreachable *)
 
-open Wstdlib
-
 (* The domain maps symbols to their symbolic value *)
 type domain = domain_elt Mpv.t
 
@@ -409,7 +407,7 @@ and analyze_letdefn muc st (regions : domain) (l : let_defn) : FreshNames.t * le
                     let _, e, _ = analyze muc st Mpv.empty e in
                     let cty = def.rec_fun.c_cty in
                     c_fun cty.cty_args cty.cty_pre cty.cty_post cty.cty_xpost cty.cty_oldies e
-                | ce -> def.rec_fun
+                | _ -> def.rec_fun
               end
             in
             (def.rec_rsym, f, def.rec_varl, rs_kind def.rec_sym))
@@ -423,7 +421,7 @@ and analyze_letdefn muc st (regions : domain) (l : let_defn) : FreshNames.t * le
 
       (FreshNames.merge_rs st subst, def, regions)
 
-and analyze_cexp _muc st regions (c : cexp) : domain_elt * cexp =
+and analyze_cexp muc st regions (c : cexp) : domain_elt * cexp =
   match c.c_node with
   | Capp (r, args) ->
       let region =
@@ -450,7 +448,10 @@ and analyze_cexp _muc st regions (c : cexp) : domain_elt * cexp =
       let vl = List.map (fun v -> FreshNames.pv st v v) args in
       let al = List.map (fun v -> v.pv_ity) c.c_cty.cty_args in
       (Bot, c_pur l vl al c.c_cty.cty_result)
-  | Cfun _ -> assert false
+  | Cfun expr ->
+      let _, e, _ = analyze muc st regions expr in
+      let cty = c.c_cty in
+      (Bot, c_fun cty.cty_args cty.cty_pre cty.cty_post cty.cty_xpost cty.cty_oldies e)
   | Cany -> (Bot, c)
 
 and analyze_br muc st regions (b : reg_branch) =
