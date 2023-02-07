@@ -304,14 +304,6 @@ let file_of_task drv input_file theory_name task =
 let file_of_theory drv input_file th =
   get_filename drv ~input_file ~theory_name:th.th_name.Ident.id_string ~goal_name:"null"
 
-let call_on_buffer
-      ~command ~config ~limit ~gen_new_file ?inplace ~filename
-    ~printing_info drv buffer =
-  Call_provers.call_on_buffer
-    ~command ~config ~limit ~gen_new_file
-    ~res_parser:drv.drv_res_parser
-    ~filename ~printing_info ?inplace buffer
-
 (** print'n'prove *)
 
 exception NoPrinter
@@ -451,9 +443,10 @@ let prove_task_prepared
     file_name_of_task ?old ?inplace ?interactive drv task in
   let get_counterexmp = get_counterexmp task in
   let res =
-    call_on_buffer
+    Call_provers.call_on_buffer
       ~command ~config ~limit ~gen_new_file ?inplace ~filename
-      ~get_counterexmp ~printing_info drv buf
+      ~res_parser:drv.drv_res_parser
+      ~get_counterexmp ~printing_info buf
   in
   Buffer.reset buf;
   res
@@ -465,12 +458,13 @@ let prove_buffer_prepared
     ?(goal_name="vc")
     drv buffer =
   let filename = get_filename drv ~input_file ~theory_name ~goal_name in
-  call_on_buffer
+  Call_provers.call_on_buffer
     ~command ~config ~limit
     ~gen_new_file:true ~filename
     ~get_counterexmp:false
     ~printing_info:default_printing_info
-    drv buffer
+    ~res_parser:drv.drv_res_parser
+    buffer
 
 let prove_task
       ~command ~config ~limit ?old ?inplace ?interactive drv task =
