@@ -140,7 +140,7 @@ module Log : sig
     | Exec_pure of (Term.lsymbol * exec_mode)
     | Exec_any of (Expr.rsymbol option * value Term.Mvs.t)
     | Iter_loop of exec_mode
-    | Exec_main of (Expr.rsymbol * value Term.Mvs.t * value_or_invalid Expr.Mrs.t)
+    | Exec_main of (Expr.rsymbol * value_or_invalid Term.Mls.t * value Term.Mvs.t * value_or_invalid Expr.Mrs.t)
     | Exec_stucked of (string * value Ident.Mid.t)
     | Exec_failed of (string * value Ident.Mid.t)
     | Exec_ended
@@ -162,7 +162,7 @@ module Log : sig
   val log_any_call : log_uc -> Expr.rsymbol option -> value Term.Mvs.t
                      -> Loc.position option -> unit
   val log_iter_loop : log_uc -> exec_mode -> Loc.position option -> unit
-  val log_exec_main : log_uc -> Expr.rsymbol -> value Term.Mvs.t -> value Lazy.t Expr.Mrs.t ->
+  val log_exec_main : log_uc -> Expr.rsymbol -> value Lazy.t Term.Mls.t -> value Term.Mvs.t -> value Lazy.t Expr.Mrs.t ->
                       Loc.position option -> unit
   val log_failed : log_uc -> string -> value Ident.Mid.t ->
                    Loc.position option -> unit
@@ -209,6 +209,8 @@ type env = {
   (** local functions *)
   vsenv    : value Term.Mvs.t;
   (** local variables *)
+  lsenv    : value Lazy.t Term.Mls.t;
+  (** global logical functions and constants *)
   rsenv    : value Lazy.t Expr.Mrs.t;
   (** global variables *)
   premises : premises;
@@ -224,6 +226,8 @@ val get_vs : env -> Term.Mvs.key -> Value.value
 val get_pvs : env -> Ity.pvsymbol -> Value.value
 
 val bind_vs : Term.Mvs.key -> value -> env -> env
+
+val bind_ls : Term.Mls.key -> value Lazy.t -> env -> env
 
 val bind_rs : Expr.Mrs.key -> value Lazy.t -> env -> env
 

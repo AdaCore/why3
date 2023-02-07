@@ -141,6 +141,10 @@ let task_of_term ?(vsenv=[]) metas (env: env) t =
       | RLls ls when Sls.mem ls free_sls -> Mls.add ls v mls
       | _ -> mls in
     Mrs.fold aux env.rsenv Mls.empty in
+  (* Add to lsenv the logical symbols from env.lsenv that are in free_sls *)
+  let lsenv =
+    let aux ls v mls = if Sls.mem ls free_sls then Mls.add ls v mls else mls in
+    Mls.fold aux env.lsenv lsenv in
   let add_used task td =
     let open Theory in
     match td.td_node with
@@ -156,7 +160,7 @@ let task_of_term ?(vsenv=[]) metas (env: env) t =
   let add_known _ decl (task, ls_mt, ls_mv) =
     match decl.d_node with
     | Dparam ls when Mls.contains lsenv ls ->
-        (* Take value from lsenv (i.e. env.rsenv) for declaration *)
+        (* Take value from lsenv (i.e. env.rsenv and env.lsenv) for declaration *)
         let vsenv, t = term_of_value env [] (Lazy.force (Mls.find ls lsenv)) in
         let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
         let t = t_ty_subst ls_mt ls_mv t in
