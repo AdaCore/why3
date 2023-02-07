@@ -37,16 +37,12 @@ type info = {
   info_ac  : Sls.t;
   info_show_attrs : bool;
   info_type_casts : bool;
-  info_csm : lsymbol list Mls.t;
-  info_pjs : Sls.t;
-  info_axs : Spr.t;
+  mutable info_csm : string list Mls.t;
   info_inv_trig : Sls.t;
   info_printer : ident_printer;
   mutable info_model: S.t;
   info_vc_term: vc_term_info;
   info_in_goal: bool;
-  mutable list_projs: Ident.ident Mstr.t;
-  list_field_def: Ident.ident Mstr.t;
   meta_model_projection: Sls.t;
   info_cntexample: bool
   }
@@ -93,10 +89,7 @@ let print_ident_attr info fmt id =
 let forget_var info v = forget_id info.info_printer v.vs_name
 
 let collect_model_ls info ls =
-  if Sls.mem ls info.meta_model_projection then
-    info.list_projs <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
-        ls.ls_name info.list_projs;
-  if ls.ls_args = [] && relevant_for_counterexample ls.ls_name then
+  if relevant_for_counterexample ls.ls_name then
     info.info_model <-
       add_model_element (ls, ls.ls_name.id_loc, ls.ls_name.id_attrs) info.info_model
 
@@ -205,12 +198,12 @@ let rec print_term info fmt t =
 	  end;
 	  if (Mls.mem ls info.info_csm) then
 	    begin
-              let print_field fmt ({ls_name = id},t) =
-		fprintf fmt "%a =@ %a" (print_ident info) id (print_term info) t in
+              let print_field fmt (id,t) =
+		fprintf fmt "%s =@ %a" id (print_term info) t in
               fprintf fmt "{@ %a@ }" (print_list semi print_field)
 		(List.combine (Mls.find ls info.info_csm) tl)
 	    end
-	  else if (Sls.mem ls info.info_pjs) then
+	  else if ls.ls_proj then
 	    begin
               fprintf fmt "%a.%a" (print_tapp info) tl (print_ident info) ls.ls_name
 	    end
@@ -355,24 +348,38 @@ let print_ty_decl info fmt ts =
   if Mid.mem ts.ts_name info.info_syn then () else
   (fprintf fmt "%a@\n@\n" (print_type_decl info) ts; forget_tvs info)
 
-let print_data_decl info fmt = function
+let print_data_decl info d fmt = function
   | ts, csl (* monomorphic enumeration *)
     when ts.ts_args = [] && List.for_all (fun (_,l) -> l = []) csl ->
       print_enum_decl info fmt ts csl
-  | ts, [cs,_] (* non-recursive records *)
-    when Mls.mem cs info.info_csm ->
-      let pjl = Mls.find cs info.info_csm in
-      let print_field fmt ls =
-        fprintf fmt "%a@ :@ %a" (print_ident info) ls.ls_name
-          (print_type info) (Opt.get ls.ls_value) in
+  | ts, [cs,pjl] (* records *) ->
+      if Sid.mem ts.ts_name (get_used_syms_decl d) then
+        unsupported "alt-ergo: recursive records are not supported";
+      let field_name_ty pj ty =
+        let pj =
+          match pj with
+          | Some pj -> pj.ls_name
+          | None ->
+             let field_name = id_fresh (cs.ls_name.id_string^"_proj") in
+             let field_name = create_vsymbol field_name ty(*dummy*) in
+             field_name.vs_name
+        in
+        let pj = sprintf "%a" (print_ident info) pj in
+        pj,ty
+      in
+      let l = List.map2 field_name_ty pjl cs.ls_args in
+      info.info_csm <- Mls.add cs (List.map fst l) info.info_csm;
+      let print_field fmt (pj,ty) =
+        fprintf fmt "%s@ :@ %a" pj (print_type info) ty
+      in
       fprintf fmt "%a@ =@ {@ %a@ }@\n@\n" (print_type_decl info) ts
-        (print_list semi print_field) pjl
+        (print_list semi print_field) l
   | _, _ -> unsupported
       "alt-ergo: algebraic datatype are not supported"
 
-let print_data_decl info fmt ((ts, _csl) as p) =
+let print_data_decl info d fmt ((ts, _csl) as p) =
   if Mid.mem ts.ts_name info.info_syn then () else
-  print_data_decl info fmt p
+  print_data_decl info d fmt p
 
 let print_param_decl info fmt ls =
   let sac = if Sls.mem ls info.info_ac then "ac " else "" in
@@ -383,8 +390,8 @@ let print_param_decl info fmt ls =
     (print_option_or_default "prop" (print_type info)) ls.ls_value
 
 let print_param_decl info fmt ls =
-  if Mid.mem ls.ls_name info.info_syn || Sls.mem ls info.info_pjs
-    then () else (print_param_decl info fmt ls; forget_tvs info)
+  if Mid.mem ls.ls_name info.info_syn then () else
+  (print_param_decl info fmt ls; forget_tvs info)
 
 let print_logic_decl info fmt ls ld =
   collect_model_ls info ls;
@@ -406,8 +413,8 @@ let print_logic_decl info fmt ls ld =
   List.iter (forget_var info) vl
 
 let print_logic_decl info fmt (ls,ld) =
-  if Mid.mem ls.ls_name info.info_syn || Sls.mem ls info.info_pjs
-    then () else (print_logic_decl info fmt ls ld; forget_tvs info)
+  if Mid.mem ls.ls_name info.info_syn then () else
+  (print_logic_decl info fmt ls ld; forget_tvs info)
 
 let print_info_model info =
   (* Prints the content of info.info_model *)
@@ -430,7 +437,7 @@ let print_info_model info =
   else
     Mstr.empty
 
-let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f =
+let print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f =
   match k with
   | Paxiom ->
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n@\n"
@@ -442,28 +449,30 @@ let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f =
             Loc.pp_position loc);
       let model_list = print_info_model info in
       printing_info := Some {
+        why3_env = env;
         vc_term_loc = vc_loc;
         vc_term_attrs = vc_attrs;
         queried_terms = model_list;
-        list_projections = info.list_projs;
-        list_fields = info.list_field_def;
-        list_records = Mstr.empty;
-        noarg_constructors = [];
+        type_coercions = Mty.empty;
+        type_fields = Mty.empty;
+        record_fields = Mls.empty;
+        constructors = Mstr.empty;
         set_str = Mstr.empty;
       };
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
         (print_ident info) pr.pr_name (print_fmla info) f
   | Plemma -> assert false
 
-let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f =
-  if Mid.mem pr.pr_name info.info_syn || Spr.mem pr info.info_axs
-    then () else (print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f; forget_tvs info)
+let print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f =
+  if Mid.mem pr.pr_name info.info_syn
+    then () else (print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f; forget_tvs info)
 
-let print_decl vc_loc vc_attrs printing_info info fmt d = match d.d_node with
+let print_decl vc_loc vc_attrs env printing_info info fmt d =
+  match d.d_node with
   | Dtype ts ->
       print_ty_decl info fmt ts
   | Ddata dl ->
-      print_list nothing (print_data_decl info) fmt dl
+      print_list nothing (print_data_decl info d) fmt dl
   | Dparam ls ->
       collect_model_ls info ls;
       print_param_decl info fmt ls
@@ -471,15 +480,7 @@ let print_decl vc_loc vc_attrs printing_info info fmt d = match d.d_node with
       print_list nothing (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
       "alt-ergo: inductive definitions are not supported"
-  | Dprop (k,pr,f) -> print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f
-
-let add_projection (csm,pjs,axs) = function
-  | [Theory.MAls ls; Theory.MAls cs; Theory.MAint ind; Theory.MApr pr] ->
-      let csm = try Array.set (Mls.find cs csm) ind ls; csm
-      with Not_found ->
-        Mls.add cs (Array.make (List.length cs.ls_args) ls) csm in
-      csm, Sls.add ls pjs, Spr.add pr axs
-  | _ -> assert false
+  | Dprop (k,pr,f) -> print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f
 
 let check_options ((show,cast) as acc) = function
   | [Theory.MAstr "show_attrs"] -> true, cast
@@ -488,8 +489,6 @@ let check_options ((show,cast) as acc) = function
   | _ -> assert false
 
 let print_task args ?old:_ fmt task =
-  let csm,pjs,axs = Task.on_meta Eliminate_algebraic.meta_proj
-    add_projection (Mls.empty,Sls.empty,Spr.empty) task in
   let inv_trig = Task.on_tagged_ls meta_invalid_trigger task in
   let show,cast = Task.on_meta meta_printer_option
     check_options (false,true) task in
@@ -502,16 +501,12 @@ let print_task args ?old:_ fmt task =
     info_ac  = Task.on_tagged_ls meta_ac task;
     info_show_attrs = show;
     info_type_casts = cast;
-    info_csm = Mls.map Array.to_list csm;
-    info_pjs = pjs;
-    info_axs = axs;
+    info_csm = Mls.empty;
     info_inv_trig = Sls.add ps_equ inv_trig;
     info_printer = ident_printer ();
     info_model = S.empty;
     info_vc_term = vc_info;
     info_in_goal = false;
-    list_projs = Mstr.empty;
-    list_field_def = Mstr.empty;
     meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
     info_cntexample = cntexample;
   } in
@@ -522,7 +517,7 @@ let print_task args ?old:_ fmt task =
         print_decls t.Task.task_prev;
         begin match t.Task.task_decl.Theory.td_node with
         | Theory.Decl d ->
-            begin try print_decl vc_loc vc_attrs args.printing_info info fmt d
+            begin try print_decl vc_loc vc_attrs args.env args.printing_info info fmt d
             with Unsupported s -> raise (UnsupportedDecl (d,s)) end
         | _ -> () end
     | None -> () in

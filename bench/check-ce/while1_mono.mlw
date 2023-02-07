@@ -1,0 +1,27 @@
+
+use int.Int
+
+type t = { mutable c : int }
+
+let f ()
+  ensures { result = 2 }
+  = let x = { c = 0 } in
+    let i = { c = 0 } in
+    while i.c < 2 do
+      variant { 2 - i.c }
+      invariant { x.c >= 0 }
+      x.c <- x.c + 1;
+      i.c <- i.c + 1
+    done;
+    x.c
+
+(*
+counterexample: `x = 0`, `i = 2` at beginning of the loop.
+
+The execution of `f` with the counterexample:
+- terminates normally if executed concretely;
+- terminates in error if executed abstractly (postcondition fails)
+
+It is a real counterexample due to underspecification (weak loop
+invariant).
+*)

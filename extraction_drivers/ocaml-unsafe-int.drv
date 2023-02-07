@@ -36,15 +36,15 @@ theory int.ComputerDivision
   syntax function mod "(%1 mod %2)"
 end
 
-(* FIXME: avoid Pervasives using a black list of reserved OCaml names *)
+(* FIXME: avoid Stdlib using a black list of reserved OCaml names *)
 
 theory int.Abs
-  syntax function abs "Pervasives.abs"
+  syntax function abs "Stdlib.abs"
 end
 
 theory int.MinMax
-  syntax function min "Pervasives.min"
-  syntax function max "Pervasives.max"
+  syntax function min "Stdlib.min"
+  syntax function max "Stdlib.max"
 end
 
 (* TODO
@@ -186,15 +186,15 @@ module mach.int.Int63
   syntax val      (>)       "(>)"
 end
 module mach.int.Refint63
-  syntax val incr "Pervasives.incr"
-  syntax val decr "Pervasives.decr"
-  syntax val (+=) "(fun r v -> Pervasives.(:=) r (Pervasives.(!) r + v))"
-  syntax val (-=) "(fun r v -> Pervasives.(:=) r (Pervasives.(!) r - v))"
-  syntax val ( *= ) "(fun r v -> Pervasives.(:=) r (Pervasives.(!) r * v))"
+  syntax val incr "Stdlib.incr"
+  syntax val decr "Stdlib.decr"
+  syntax val (+=) "(fun r v -> Stdlib.(:=) r (Stdlib.(!) r + v))"
+  syntax val (-=) "(fun r v -> Stdlib.(:=) r (Stdlib.(!) r - v))"
+  syntax val ( *= ) "(fun r v -> Stdlib.(:=) r (Stdlib.(!) r * v))"
 end
 module mach.int.MinMax63
-  syntax val min "Pervasives.min"
-  syntax val max "Pervasives.max"
+  syntax val min "Stdlib.min"
+  syntax val max "Stdlib.max"
 end
 
 (* TODO

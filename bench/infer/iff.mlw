@@ -1,0 +1,16 @@
+
+
+use int.Int
+
+val g (x:int) : bool
+  ensures { (result = True) <-> (x >= 0) }
+
+let f [@bddinfer] (x:int) : unit =
+  let ref y = 0 in
+  let z = g x in
+  [@bddinfer:beforeif]
+  if z then
+     [@bddinfer:then] y <- x else
+     [@bddinfer:else] y <- -x;
+  [@bddinfer:afterif]
+  assert { y >= 0 }

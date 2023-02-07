@@ -10,11 +10,34 @@ Sub-goal Index in array bounds of goal f'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_555 bOUND_VARIABLE_556 -> 0
+    length : array t -> int = [|_ => 0|]
+  Line 20:
+    mixfix [] :
+      array
+      t
+      ->
+      int
+      ->
+      t = fun bOUND_VARIABLE_589 bOUND_VARIABLE_590 -> {Array.to_int => 3}
 File jlamp_array_poly.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = fun bOUND_VARIABLE_698 ->
+             if {Array.to_int => 3} = bOUND_VARIABLE_698 then 3 else 2
   Line 11:
-    two = {to_int => 2}
+    two : t = {Array.to_int => 2}
   Line 14:
-    three = {to_int => 3}
+    three : t = {Array.to_int => 3}
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -28,13 +51,28 @@ Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_622 bOUND_VARIABLE_623 -> 0
+    length : array t -> int = [|_ => 0|]
 File jlamp_array_poly.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = fun bOUND_VARIABLE_773 ->
+             if {Array.to_int => 3} = bOUND_VARIABLE_773 then 3 else 2
   Line 11:
-    two = {to_int => 2}
+    two : t = {Array.to_int => 2}
   Line 14:
-    three = {to_int => 3}
+    three : t = {Array.to_int => 3}
   Line 21:
-    three = {to_int => 3}
+    three : t = {Array.to_int => 3}
 
 File "bench/check-ce/jlamp_array_poly.mlw", line 28, characters 4-16:
 Sub-goal Index in array bounds of goal g'vc.

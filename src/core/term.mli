@@ -41,6 +41,7 @@ type lsymbol = private {
   ls_args   : ty list;
   ls_value  : ty option;
   ls_constr : int;
+  ls_proj   : bool;
 }
 
 module Mls : Extmap.S with type key = lsymbol
@@ -52,9 +53,9 @@ val ls_compare : lsymbol -> lsymbol -> int
 val ls_equal : lsymbol -> lsymbol -> bool
 val ls_hash : lsymbol -> int
 
-val create_lsymbol : ?constr:int -> preid -> ty list -> ty option -> lsymbol
+val create_lsymbol : ?constr:int -> ?proj:bool -> preid -> ty list -> ty option -> lsymbol
 
-val create_fsymbol : ?constr:int -> preid -> ty list -> ty -> lsymbol
+val create_fsymbol : ?constr:int -> ?proj:bool -> preid -> ty list -> ty -> lsymbol
 (** ~constr is the number of constructors of the type in which the
    symbol is a constructor otherwise it must be the default 0. *)
 
@@ -143,6 +144,12 @@ and term_branch
 and term_quant
 
 and trigger = term list list
+
+val term_size : term -> int
+(** [term_size t] is the size, i.e. the number of [term_node] constructors occuring in [t] *)
+
+val term_branch_size : term_branch -> int
+(** [term_branch_size t] is the size of the term in the given term branch *)
 
 (** {2 Generic term equality} *)
 
@@ -391,6 +398,10 @@ val t_pred_app : term -> term -> term  (* prop-typed application *)
 val t_func_app_l : term -> term list -> term  (* value-typed application *)
 val t_pred_app_l : term -> term list -> term  (* prop-typed application *)
 
+val to_prop : term -> term
+(** [to_prop t] converts the term of type [bool] or [prop] into a term of type [prop].
+    raises a typing error if [t] is not a Boolean term. *)
+
 (** {2 Lambda-term manipulation} *)
 
 val t_lambda : vsymbol list -> trigger -> term -> term
@@ -578,6 +589,11 @@ val t_app_map :
 
 val t_app_fold :
   ('a -> lsymbol -> ty list -> ty option -> 'a) -> 'a -> term -> 'a
+
+(** Fold over pattern matching (Requires pattern matching to be compiled) *)
+
+val t_case_fold :
+  ('a -> tysymbol -> ty list -> ty option -> 'a) -> 'a -> term -> 'a
 
 (** {2 Subterm occurrence check and replacement} *)
 

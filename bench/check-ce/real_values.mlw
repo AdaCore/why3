@@ -1,0 +1,9 @@
+use real.Real
+
+goal test1 : forall x:real. x * 2.0 <> -1.0
+
+goal test2 : forall x:real. x <> 10.0
+
+goal test3 : forall x:real. not (0.0 < x < 1.0)
+
+goal test4 : forall x:real. (x/x = 1.0)

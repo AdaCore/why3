@@ -1,0 +1,6 @@
+
+type t = { mutable c : int }
+
+let f () =
+  let x = { c = 1 } in
+  assert { false }

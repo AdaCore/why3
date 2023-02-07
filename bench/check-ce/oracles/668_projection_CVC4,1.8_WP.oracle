@@ -39,13 +39,13 @@ File bv.mlw:
     ones = 0
 File 668_projection.mlw:
   Line 12:
-    n = {t'int => (-1)}
-    min = {t'int => 0}
-    n = {t'int => (-1)}
-    min = {t'int => 0}
+    n = epsilon x:t. t'int x = (- 1)
+    min = epsilon x:t. t'int x = 0
+    n = epsilon x:t. t'int x = (- 1)
+    min = epsilon x:t. t'int x = 0
     Execution of main function `f` with env:
-      n = {t'int => (-1)}
-      min = {t'int => 0}
+      n = epsilon x:t. t'int x = (- 1)
+      min = epsilon x:t. t'int x = 0
       zero = 0
       one = 1
       zeros = 0
@@ -53,14 +53,19 @@ File 668_projection.mlw:
       ones = 0
   Line 13:
     Property failure at postcondition of `f` with:
-      min = {t'int => 0}
-      result = {t'int => (-1)}
+      min = epsilon x:t. t'int x = 0
+      result = epsilon x:t. t'int x = (- 1)
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
 File "bench/check-ce/668_projection.mlw", line 16, characters 14-26:
 Sub-goal Postcondition of goal g'vc.
 Prover result is: Unknown or time/memory/step limit.
+Sorry, we don't have a good counterexample for you :(
+
 

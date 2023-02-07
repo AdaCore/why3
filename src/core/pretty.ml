@@ -78,6 +78,8 @@ module type Printer = sig
     val print_pr_qualified : formatter -> prsymbol -> unit
     val print_th_qualified : formatter -> theory -> unit
     val print_ty_qualified : formatter -> ty -> unit
+    val print_vs_qualified : formatter -> vsymbol -> unit
+    val print_tv_qualified : formatter -> tvsymbol -> unit
 
     val print_quant : formatter -> quant -> unit      (* quantifier *)
     val print_binop : asym:bool -> formatter -> binop -> unit (* binary operator *)
@@ -244,6 +246,12 @@ let print_ls_qualified fmt ls =
 
 let print_pr_qualified fmt pr =
   try print_qualified true fmt pr.pr_name with Not_found -> print_pr fmt pr
+
+let print_vs_qualified fmt vs =
+  try print_qualified true fmt vs.vs_name with Not_found -> print_vs fmt vs
+
+let print_tv_qualified fmt tv =
+  try print_qualified true fmt tv.tv_name with Not_found -> print_tv fmt tv
 
 (** Types *)
 
@@ -928,6 +936,8 @@ let () = Exn_printer.register
         Ident.print_decoded s
   | Decl.NoTerminationProof ls ->
       fprintf fmt "Cannot prove termination for %a" print_ls ls
+  | Decl.UnexpectedProjOrConstr ls ->
+      fprintf fmt "Unexpected projection or constructor symbol %a" print_ls ls
   | NonLocal id -> Format.fprintf fmt
       "Non-local symbol: %a" print_id id
   | CannotInstantiate id -> Format.fprintf fmt

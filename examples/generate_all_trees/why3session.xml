@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC5" version="1.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="generate_all_trees.mlw"/>
@@ -16,39 +16,10 @@
  </transf>
  </goal>
  <goal name="size_left" proved="true">
- <transf name="introduce_premises" proved="true" >
-  <goal name="size_left.0" proved="true">
-  <transf name="destruct_term" proved="true" arg1="t">
-   <goal name="size_left.0.0" proved="true">
-   <proof prover="3"><result status="valid" time="0.01" steps="5046"/></proof>
-   </goal>
-   <goal name="size_left.0.1" proved="true">
-   <proof prover="3"><result status="valid" time="0.02" steps="4718"/></proof>
-   </goal>
-  </transf>
-  </goal>
- </transf>
+ <proof prover="2"><result status="valid" time="0.02" steps="3625"/></proof>
  </goal>
  <goal name="all_trees_0" proved="true">
- <transf name="introduce_premises" proved="true" >
-  <goal name="all_trees_0.0" proved="true">
-  <transf name="inline_goal" proved="true" >
-   <goal name="all_trees_0.0.0" proved="true">
-   <transf name="split_goal_right" proved="true" >
-    <goal name="all_trees_0.0.0.0" proved="true">
-    <proof prover="3"><result status="valid" time="0.03" steps="6752"/></proof>
-    </goal>
-    <goal name="all_trees_0.0.0.1" proved="true">
-    <proof prover="0"><result status="valid" time="0.38"/></proof>
-    </goal>
-    <goal name="all_trees_0.0.0.2" proved="true">
-    <proof prover="3"><result status="valid" time="0.02" steps="7890"/></proof>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
- </transf>
+ <proof prover="2"><result status="valid" time="0.03" steps="8262"/></proof>
  </goal>
  <goal name="tree_diff" proved="true">
  <proof prover="3"><result status="valid" time="0.04" steps="6182"/></proof>

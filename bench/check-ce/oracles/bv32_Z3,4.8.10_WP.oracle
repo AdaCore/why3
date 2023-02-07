@@ -58,10 +58,10 @@ File bv.mlw:
     ones = 0
 File bv32.mlw:
   Line 7:
-    r = {contents= 34}
-    r = {contents= 34}
+    r = {contents= (34:t)}
+    r = {contents= (34:t)}
     Execution of main function `dummy_update` with env:
-      r = {contents= 34}
+      r = {contents= (34:t)}
       zero = 0
       one = 1
       zeros = 0
@@ -78,93 +78,51 @@ File bv32.mlw:
     (giant-step) execution of unimplemented function `add`
       v1 = 66
       v2 = 66
-    result of `add` = 132
+    result of `add` = (132:t)
   Line 9:
     Property failure at postcondition of `dummy_update` with:
-      r = {contents= 132}
+      r = {contents= (132:t)}
 
 <check-ce-categorization>Categorizations of models:
-- Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/bv32.mlw", line 15, characters 14-28)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/bv32.mlw", line 15, characters 14-28)
-- Checked model 1: BAD_CE
-  - Concrete RAC: STUCK (failure in precondition of `dummy_update_with_int` at "bench/check-ce/bv32.mlw", line 13, characters 5-26)
-  - Abstract RAC: STUCK (failure in precondition of `dummy_update_with_int` at "bench/check-ce/bv32.mlw", line 13, characters 5-26)
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `dummy_update_with_int` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `dummy_update_with_int` cannot be evaluated)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `dummy_update_with_int` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `dummy_update_with_int` cannot be evaluated)
 File "bench/check-ce/bv32.mlw", line 15, characters 14-28:
 Sub-goal Postcondition of goal dummy_update_with_int'vc.
 Prover result is: Unknown or time/memory/step limit.
-The program does not comply to the verification goal, for example during the
-  following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `dummy_update_with_int` cannot be evaluated):
 File bv.mlw:
   Line 596:
-    Constant zeros initialization
-  Line 192:
-    (giant-step) execution of unimplemented function with args:
-    result = 0
-  Line 596:
-    zeros = 0
-    Constant one initialization
-  Line 197:
-    (giant-step) execution of unimplemented function with args:
-    result = 0
-  Line 596:
-    one = 0
-    Constant ones initialization
-  Line 199:
-    (giant-step) execution of unimplemented function with args:
-    result = 0
-  Line 596:
-    ones = 0
+    lsr :
+      t1
+      ->
+      int
+      ->
+      t1 = fun x!0 x!1 -> 0 (#x00000000000000000000000000000000)
+    nth : t1 -> int -> bool = fun x!0 x!1 -> false
+    nth_bv : t1 -> t1 -> bool = fun x!0 x!1 -> false
+    of_int : int -> t1 = [|_ => 0 (#x00000000000000000000000000000000)|]
   Line 638:
-    Constant zeros initialization
-  Line 192:
-    (giant-step) execution of unimplemented function with args:
-    result = 0
-  Line 638:
-    zeros = 0
-    Constant one initialization
-  Line 197:
-    (giant-step) execution of unimplemented function with args:
-    result = 0
-  Line 638:
-    one = 0
-    Constant ones initialization
-  Line 199:
-    (giant-step) execution of unimplemented function with args:
-    result = 0
-  Line 638:
-    ones = 0
+    lsr : t -> int -> t = fun x!0 x!1 -> 0 (#x00000000)
+    nth : t -> int -> bool = fun x!0 x!1 -> false
+    nth_bv : t -> t -> bool = fun x!0 x!1 -> false
+    of_int : int -> t = [|_ => 0 (#x00000000)|]
+File int.mlw:
+  Line 41:
+    abs : int -> int = [|_ => 0|]
 File bv32.mlw:
   Line 13:
-    r = {contents= 34}
-    r = {contents= 34}
-    Execution of main function `dummy_update_with_int` with env:
-      r = {contents= 34}
-      zero = 0
-      one = 1
-      zeros = 0
-      one = 0
-      ones = 0
-      zeros = 0
-      one = 0
-      ones = 0
-  Line 17:
-    Normal execution of function `contents` with args:
-      arg = {contents= 66}
-    Normal execution of function `contents` with args:
-      arg = {contents= 66}
-    (giant-step) execution of unimplemented function `add`
-      v1 = 66
-      v2 = 66
-    result of `add` = 132
+    r : t = 34 (#x00000022)
   Line 15:
-    Property failure at postcondition of `dummy_update_with_int` with:
-      r = {contents= 132}
+    r : t = 132 (#x00000084)
+    r : t = 132 (#x00000084)
+  Line 16:
+    r : t = 66 (#x00000042)
+  Line 17:
+    r : t = 132 (#x00000084)
+    result of call at line 17, characters 9-16 : t = 132 (#x00000084)
 

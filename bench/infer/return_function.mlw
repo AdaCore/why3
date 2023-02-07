@@ -1,0 +1,10 @@
+use int.Int
+
+val ref x : int
+
+let  f (a : int) : int = a + a
+
+let main [@bddinfer] () =
+   let temp = f 6 in
+   x <- temp;
+   assert { x = 12 }

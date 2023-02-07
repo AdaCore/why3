@@ -889,15 +889,8 @@ the JSON output as follows:
    :start-after: BEGIN{ce_callprover}
    :end-before: END{ce_callprover}
 
+The structure of JSON output is described in :numref:`sec.jsonce`.
 
-..
-   The following is supposed to be a comment for Sphinx
-   Local Variables:
-   mode: flyspell
-   ispell-local-dictionary: "american"
-   End:
-   LocalWords:  prover provers untyped disjunction programmatically invariants
-   LocalWords:  uncommented OCaml AST
 
 Checking counterexamples
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -923,3 +916,14 @@ or any other strategy implemented by the user.
    :language: ocaml
    :start-after: BEGIN{check_ce_giant_step}
    :end-before: END{check_ce_giant_step}
+
+
+
+..
+   The following is supposed to be a comment for Sphinx
+   Local Variables:
+   mode: flyspell
+   ispell-local-dictionary: "american"
+   End:
+   LocalWords:  prover provers untyped disjunction programmatically invariants
+   LocalWords:  uncommented OCaml AST

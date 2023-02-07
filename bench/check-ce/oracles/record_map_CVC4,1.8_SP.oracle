@@ -19,29 +19,32 @@ File int.mlw:
     one = 1
 File record_map.mlw:
   Line 40:
-    map_rec = [|true -> {f= (-1); g= false}; _ -> {f= 0; g= false}|]
-    map_rec = [|true -> {f= (-1); g= false}; _ -> {f= 0; g= false}|]
+    map_rec = fun (x:bool) ->
+               if x = True then r'mk (- 1) False else r'mk 0 False
+    map_rec = fun (x:bool) ->
+               if x = True then r'mk (- 1) False else r'mk 0 False
     Execution of main function `map_record_proj_test1` with env:
-      map_rec = [|true -> {f= (-1); g= false}; _ -> {f= 0; g= false}|]
+      map_rec = fun (x:bool) ->
+                 if x = True then r'mk (- 1) False else r'mk 0 False
       zero = 0
       one = 1
   Line 43:
     Normal execution of function `True` with args:
     Normal execution of function `([])` with args:
-      f = [|true -> {f= (-1); g= false}; _ -> {f= 0; g= false}|]
+      f = fun (x:bool) -> if x = True then r'mk (- 1) False else r'mk 0 False
       x = true
 File map.mlw:
   Line 17:
     Normal execution of function `(@)` with args:
-      u = [|true -> {f= (-1); g= false}; _ -> {f= 0; g= false}|]
+      u = fun (x:bool) -> if x = True then r'mk (- 1) False else r'mk 0 False
       u = true
 File record_map.mlw:
   Line 43:
     Normal execution of function `f` with args:
-      arg = {f= (-1); g= false}
+      arg = r'mk (- 1) False
   Line 41:
     Property failure at postcondition of `map_record_proj_test1` with:
-      result = (-1)
+      result = (- 1)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -64,28 +67,32 @@ File int.mlw:
     one = 1
 File record_map.mlw:
   Line 45:
-    rec_map = {f_map= [|true -> (-1); _ -> 0|]; g_bool= false}
-    rec_map = {f_map= [|true -> (-1); _ -> 0|]; g_bool= false}
+    rec_map = {f_map= fun (x:bool) -> if x = True then (- 1) else 0;
+               g_bool= false}
+    rec_map = {f_map= fun (x:bool) -> if x = True then (- 1) else 0;
+               g_bool= false}
     Execution of main function `record_map_proj_test2` with env:
-      rec_map = {f_map= [|true -> (-1); _ -> 0|]; g_bool= false}
+      rec_map = {f_map= fun (x:bool) -> if x = True then (- 1) else 0;
+                 g_bool= false}
       zero = 0
       one = 1
   Line 48:
     Normal execution of function `True` with args:
     Normal execution of function `f_map` with args:
-      arg = {f_map= [|true -> (-1); _ -> 0|]; g_bool= false}
+      arg = {f_map= fun (x:bool) -> if x = True then (- 1) else 0;
+             g_bool= false}
     Normal execution of function `([])` with args:
-      f = [|true -> (-1); _ -> 0|]
+      f = fun (x:bool) -> if x = True then (- 1) else 0
       x = true
 File map.mlw:
   Line 17:
     Normal execution of function `(@)` with args:
-      u = [|true -> (-1); _ -> 0|]
+      u = fun (x:bool) -> if x = True then (- 1) else 0
       u = true
 File record_map.mlw:
   Line 46:
     Property failure at postcondition of `record_map_proj_test2` with:
-      result = (-1)
+      result = (- 1)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -108,17 +115,17 @@ File int.mlw:
     one = 1
 File record_map.mlw:
   Line 50:
-    re_rec_map = {f_map= [|; _ -> 0|]; g_bool= true}
+    re_rec_map = {f_map= fun (x:bool) -> 0; g_bool= true}
   Line 52:
-    rec_map = {f_map= [|; _ -> 0|]; g_bool= false}
-    rec_map = {f_map= [|; _ -> 0|]; g_bool= false}
+    rec_map = {f_map= fun (x:bool) -> 0; g_bool= false}
+    rec_map = {f_map= fun (x:bool) -> 0; g_bool= false}
     Execution of main function `record_map_proj_test3` with env:
-      re_rec_map = {f_map= [|; _ -> 0|]; g_bool= true}
-      rec_map = {f_map= [|; _ -> 0|]; g_bool= false}
+      re_rec_map = {f_map= fun (x:bool) -> 0; g_bool= true}
+      rec_map = {f_map= fun (x:bool) -> 0; g_bool= false}
       zero = 0
       one = 1
   Line 53:
     Property failure at postcondition of `record_map_proj_test3` with:
-      re_rec_map = {f_map= [|; _ -> 0|]; g_bool= true}
-      result = {f_map= [|; _ -> 0|]; g_bool= false}
+      re_rec_map = {f_map= fun (x:bool) -> 0; g_bool= true}
+      result = {f_map= fun (x:bool) -> 0; g_bool= false}
 

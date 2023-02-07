@@ -1,0 +1,46 @@
+
+module M
+
+  use list.List
+  use int.Int
+
+  type t = { mutable c : int }
+
+  let test_post (x: int) (y: t): unit
+    ensures { old y.c >= x }
+      =
+      y.c <- x - 1 + y.c
+
+  let test_post2 (x: int) (y: t): unit
+    requires { x > 42 }
+    ensures { old y.c > y.c + x }
+      =
+      y.c <- x - 1 + y.c
+
+
+  (**********************************************************
+   ** Getting counterexamples for terms of primitive types **
+   **********************************************************)
+  val y : t
+
+  let incr (x23: t): unit
+  ensures { x23.c = old x23.c + 2 + y.c }
+  =
+  (*#"random_path.random" 62 27 32#*)
+  y.c <- y.c + 1;
+  x23.c <- x23.c + 1;
+  x23.c <- x23.c + 1
+
+  let test_loop (x: t): unit
+  ensures { x.c < old x.c }
+  =
+  label L in
+  incr x;
+  label M in
+  while x.c > 0 do
+  invariant { x.c > x.c at L + x.c at M }
+  variant { x.c }
+    x.c <- x.c - 1
+  done
+
+end

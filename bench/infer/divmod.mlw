@@ -1,0 +1,16 @@
+
+
+
+
+use int.Int
+use int.ComputerDivision
+
+let s [@bddinfer] (x y:int) : unit
+  requires { 1 <= y <= 100 }
+  requires { 0 <= x <= 100 }
+  =
+  let ref z = div x y in
+  let ref t = mod x y in
+  [@bddinfer:check1] check { t >= 0 };
+  [@bddinfer:check2] check { z >= 0 };
+  [@bddinfer:check3] check { t < y }

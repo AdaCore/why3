@@ -385,6 +385,8 @@ end
 module Arrays
   use array.Array
 
+  meta compute_max_steps 10_000
+
   let test0 () =
     let a = make 10 0 in
     a[0] <- 10;

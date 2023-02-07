@@ -206,7 +206,7 @@ module type BDD = sig
         smallest bucket length, median bucket length, biggest bucket length. *)
 end
 
-module Make(X: sig
+module Make(_:sig
   val print_var: Format.formatter -> int -> unit
   val size: int
   val max_var: int

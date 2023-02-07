@@ -145,9 +145,9 @@ Prover result is: Valid.
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 25, characters 12-23)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 25, characters 12-23)
-- Checked model 1: BAD_CE
-  - Concrete RAC: FAILURE (assertion at "bench/check-ce/if_assign.mlw", line 28, characters 31-38)
-  - Abstract RAC: FAILURE (assertion at "bench/check-ce/if_assign.mlw", line 28, characters 31-38)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 25, characters 12-23)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 25, characters 12-23)
 File "bench/check-ce/if_assign.mlw", line 25, characters 12-23:
 Sub-goal Postcondition of goal fTest2'vc.
 Prover result is: Unknown or time/memory/step limit.
@@ -167,16 +167,16 @@ File if_assign.mlw:
     result = {contents= 0}
     x = {contents= 0}
   Line 24:
-    a = (-1)
-    a = (-1)
+    a = (- 1)
+    a = (- 1)
     Execution of main function `fTest2` with env:
       x = {contents= 0}
-      a = (-1)
+      a = (- 1)
       zero = 0
       one = 1
   Line 27:
     Normal execution of function `(=)` with args:
-      x = (-1)
+      x = (- 1)
       y = 0
   Line 30:
     Normal execution of function `(:=)` with args:

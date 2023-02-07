@@ -1,0 +1,25 @@
+
+
+use int.Int
+
+val cp (input : bool) (src : int) (ref tgt : int) : unit
+writes { tgt }
+ensures { (input = True /\ tgt = src) \/ ((input = False) /\ tgt = old tgt)}
+
+val ref d : int
+
+let e [@bddinfer] ()
+  diverges
+  requires { d = 0 }
+  =
+  while True
+  do
+    d <- d+1;
+
+    (* cp (0 < d) 0 d *)
+    (* This gives [0;0] as domain for d *)
+
+   cp (1 < d) 0 d
+    (* This gives [0;0[ as domain for d *)
+
+  done

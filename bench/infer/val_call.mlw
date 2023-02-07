@@ -1,0 +1,17 @@
+use int.Int
+
+val ref x : int
+val ref y : int
+val ref z : int
+
+val test (n:int) : unit
+  reads { x,y,z }
+  writes { x,y }
+  ensures { x = old y }
+  ensures { y = n+z }
+
+let main [@bddinfer] () =
+  x <- 42;
+  y <- 37;
+  z <- 1;
+  test(2)

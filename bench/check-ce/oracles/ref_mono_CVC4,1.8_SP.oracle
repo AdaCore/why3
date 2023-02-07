@@ -32,20 +32,20 @@ File int.mlw:
 File ref_mono.mlw:
   Line 20:
     x = 0
-    y = {contents= (-1)}
+    y = {contents1= (- 1)}
     x = 0
-    y = {contents= (-1)}
+    y = {contents1= (- 1)}
     Execution of main function `test_post` with env:
       x = 0
-      y = {contents= (-1)}
+      y = {contents1= (- 1)}
       zero = 0
       one = 1
   Line 23:
     Normal execution of function `(!)` with args:
-      r = {contents= (-1)}
+      r = {contents1= (- 1)}
   Line 9:
     Normal execution of function `contents` with args:
-      arg = {contents= (-1)}
+      arg = {contents1= (- 1)}
   Line 23:
     Normal execution of function `(-)` with args:
       x = 0
@@ -61,14 +61,14 @@ File ref_mono.mlw:
   Line 23:
     Normal execution of function `(+)` with args:
       _ = (-1)
-      _ = (-1)
+      _ = (- 1)
     Normal execution of function `(:=)` with args:
-      r = {contents= (-1)}
+      r = {contents1= (- 1)}
       v = (-2)
   Line 21:
     Property failure at postcondition of `test_post` with:
       x = 0
-      y = {contents= (-1)}
+      y = {contents1= (- 1)}
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -92,20 +92,20 @@ File int.mlw:
 File ref_mono.mlw:
   Line 25:
     x = 43
-    y = {contents= 0}
+    y = {contents1= 0}
     x = 43
-    y = {contents= 0}
+    y = {contents1= 0}
     Execution of main function `test_post2` with env:
       x = 43
-      y = {contents= 0}
+      y = {contents1= 0}
       zero = 0
       one = 1
   Line 29:
     Normal execution of function `(!)` with args:
-      r = {contents= 0}
+      r = {contents1= 0}
   Line 9:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
+      arg = {contents1= 0}
   Line 29:
     Normal execution of function `(-)` with args:
       x = 43
@@ -123,13 +123,13 @@ File ref_mono.mlw:
       _ = 42
       _ = 0
     Normal execution of function `(:=)` with args:
-      r = {contents= 0}
+      r = {contents1= 0}
       v = 42
   Line 27:
     Property failure at postcondition of `test_post2` with:
       x = 43
-      y = {contents= 42}
-      y = {contents= 0}
+      y = {contents1= 42}
+      y = {contents1= 0}
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -152,59 +152,59 @@ File int.mlw:
     one = 1
 File ref_mono.mlw:
   Line 35:
-    y = {contents= (-1)}
+    y = {contents1= (- 1)}
   Line 37:
-    x23 = {contents= 0}
-    x23 = {contents= 0}
+    x23 = {contents1= 0}
+    x23 = {contents1= 0}
     Execution of main function `incr` with env:
-      y = {contents= (-1)}
-      x23 = {contents= 0}
+      y = {contents1= (- 1)}
+      x23 = {contents1= 0}
       zero = 0
       one = 1
   Line 40:
     Normal execution of function `(!)` with args:
-      r = {contents= (-1)}
+      r = {contents1= (- 1)}
   Line 9:
     Normal execution of function `contents` with args:
-      arg = {contents= (-1)}
+      arg = {contents1= (- 1)}
   Line 40:
     Normal execution of function `(+)` with args:
-      _ = (-1)
+      _ = (- 1)
       _ = 1
     Normal execution of function `(:=)` with args:
-      r = {contents= (-1)}
+      r = {contents1= (- 1)}
       v = 0
   Line 41:
     Normal execution of function `(!)` with args:
-      r = {contents= 0}
+      r = {contents1= 0}
   Line 9:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
+      arg = {contents1= 0}
   Line 41:
     Normal execution of function `(+)` with args:
       _ = 0
       _ = 1
     Normal execution of function `(:=)` with args:
-      r = {contents= 0}
+      r = {contents1= 0}
       v = 1
   Line 42:
     Normal execution of function `(!)` with args:
-      r = {contents= 1}
+      r = {contents1= 1}
   Line 9:
     Normal execution of function `contents` with args:
-      arg = {contents= 1}
+      arg = {contents1= 1}
   Line 42:
     Normal execution of function `(+)` with args:
       _ = 1
       _ = 1
     Normal execution of function `(:=)` with args:
-      r = {contents= 1}
+      r = {contents1= 1}
       v = 2
   Line 38:
     Property failure at postcondition of `incr` with:
-      x23 = {contents= 2}
-      x23 = {contents= 0}
-      y = {contents= (-1)}
+      x23 = {contents1= 2}
+      x23 = {contents1= 0}
+      y = {contents1= (- 1)}
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: BAD_CE

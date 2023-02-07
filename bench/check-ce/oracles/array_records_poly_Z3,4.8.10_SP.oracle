@@ -12,9 +12,9 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array_records_poly.mlw:
   Line 23:
-    i = -1
+    i : int = -1
   Line 27:
-    i = -1
+    i : int = -1
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -30,12 +30,12 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array_records_poly.mlw:
   Line 23:
-    i = -1
+    i : int = -1
   Line 27:
-    i = -1
-    result of call at line 27, characters 45-61 = 3
-    result of call at line 27, characters 45-49 =
-      {first_val = 3; flag = true; sec_val = 5}
+    i : int = -1
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -51,17 +51,17 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array_records_poly.mlw:
   Line 23:
-    i = -1
+    i : int = -1
   Line 27:
-    i = -1
-    result of call at line 27, characters 13-81 =
-      {first_val = 3; flag = true; sec_val = 69 (0X45)}
-    result of call at line 27, characters 21-30 = true
-    result of call at line 27, characters 21-25 =
-      {first_val = 3; flag = true; sec_val = 5}
-    result of call at line 27, characters 45-61 = 3
-    result of call at line 27, characters 45-49 =
-      {first_val = 3; flag = true; sec_val = 5}
+    i : int = -1
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 27, characters 21-30 : bool = true
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -75,20 +75,23 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : ty -> uni -> int = fun x!066 x!13 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i = -1
+    i : int = -1
   Line 27:
-    result of call at line 27, characters 13-81 =
-      {first_val = 2; flag = false; sec_val = 0}
-    result of call at line 27, characters 21-30 = false
-    result of call at line 27, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 0}
-    result of call at line 27, characters 45-61 = 2
-    result of call at line 27, characters 45-49 =
-      {first_val = 2; flag = false; sec_val = 0}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 27, characters 21-30 : bool = true
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
-    i = -1
+    i : int = -1
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -102,23 +105,26 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : ty -> uni -> int = fun x!070 x!13 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i = -1
+    i : int = -1
   Line 27:
-    result of call at line 27, characters 13-81 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 27, characters 21-30 = false
-    result of call at line 27, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 27, characters 45-61 = 2
-    result of call at line 27, characters 45-49 =
-      {first_val = 2; flag = false; sec_val = 4}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 27, characters 21-30 : bool = true
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
-    i = -1
-    result of call at line 28, characters 64-81 = 4
-    result of call at line 28, characters 64-68 =
-      {first_val = 2; flag = false; sec_val = 4}
+    i : int = -1
+    result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-68 :
+      basic_record = {flag = false; first_val = 4; sec_val = 2}
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -132,28 +138,31 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : ty -> uni -> int = fun x!074 x!13 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i = -1
+    i : int = -1
   Line 27:
-    result of call at line 27, characters 13-81 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 27, characters 21-30 = false
-    result of call at line 27, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 27, characters 45-61 = 2
-    result of call at line 27, characters 45-49 =
-      {first_val = 2; flag = false; sec_val = 4}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 27, characters 21-30 : bool = true
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
-    i = -1
-    result of call at line 28, characters 13-82 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 28, characters 21-30 = false
-    result of call at line 28, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 28, characters 64-81 = 4
-    result of call at line 28, characters 64-68 =
-      {first_val = 2; flag = false; sec_val = 4}
+    i : int = -1
+    result of call at line 28, characters 13-82 :
+      basic_record = {flag = false; first_val = 42; sec_val = 2}
+    result of call at line 28, characters 21-30 : bool = false
+    result of call at line 28, characters 21-25 :
+      basic_record = {flag = false; first_val = 4; sec_val = 2}
+    result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-68 :
+      basic_record = {flag = false; first_val = 4; sec_val = 2}
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -167,29 +176,32 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : ty -> uni -> int = fun x!078 x!13 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i = -1
+    i : int = -1
   Line 27:
-    result of call at line 27, characters 13-81 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 27, characters 21-30 = false
-    result of call at line 27, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 27, characters 45-61 = 2
-    result of call at line 27, characters 45-49 =
-      {first_val = 2; flag = false; sec_val = 4}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 27, characters 21-30 : bool = true
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
-    result of call at line 28, characters 13-82 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 28, characters 21-30 = false
-    result of call at line 28, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 28, characters 64-81 = 4
-    result of call at line 28, characters 64-68 =
-      {first_val = 2; flag = false; sec_val = 4}
+    result of call at line 28, characters 13-82 :
+      basic_record = {flag = false; first_val = 42; sec_val = 2}
+    result of call at line 28, characters 21-30 : bool = false
+    result of call at line 28, characters 21-25 :
+      basic_record = {flag = false; first_val = 4; sec_val = 2}
+    result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-68 :
+      basic_record = {flag = false; first_val = 4; sec_val = 2}
   Line 29:
-    i = -1
+    i : int = -1
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -203,32 +215,35 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : ty -> uni -> int = fun x!082 x!13 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i = -1
+    i : int = -1
   Line 27:
-    result of call at line 27, characters 13-81 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 27, characters 21-30 = false
-    result of call at line 27, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 27, characters 45-61 = 2
-    result of call at line 27, characters 45-49 =
-      {first_val = 2; flag = false; sec_val = 4}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 27, characters 21-30 : bool = true
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
-    result of call at line 28, characters 13-82 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 28, characters 21-30 = false
-    result of call at line 28, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 28, characters 64-81 = 4
-    result of call at line 28, characters 64-68 =
-      {first_val = 2; flag = false; sec_val = 4}
+    result of call at line 28, characters 13-82 :
+      basic_record = {flag = false; first_val = 42; sec_val = 2}
+    result of call at line 28, characters 21-30 : bool = false
+    result of call at line 28, characters 21-25 :
+      basic_record = {flag = false; first_val = 4; sec_val = 2}
+    result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-68 :
+      basic_record = {flag = false; first_val = 4; sec_val = 2}
   Line 29:
-    i = -1
-    result of call at line 29, characters 64-81 = 6
-    result of call at line 29, characters 64-68 =
-      {first_val = 2; flag = false; sec_val = 6}
+    i : int = -1
+    result of call at line 29, characters 64-81 : int = 6
+    result of call at line 29, characters 64-68 :
+      basic_record = {flag = false; first_val = 7; sec_val = 6}
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -242,37 +257,40 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : ty -> uni -> int = fun x!086 x!13 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i = -1
+    i : int = -1
   Line 27:
-    result of call at line 27, characters 13-81 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 27, characters 21-30 = false
-    result of call at line 27, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 27, characters 45-61 = 2
-    result of call at line 27, characters 45-49 =
-      {first_val = 2; flag = false; sec_val = 4}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 27, characters 21-30 : bool = true
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
-    result of call at line 28, characters 13-82 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 28, characters 21-30 = false
-    result of call at line 28, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 28, characters 64-81 = 4
-    result of call at line 28, characters 64-68 =
-      {first_val = 2; flag = false; sec_val = 4}
+    result of call at line 28, characters 13-82 :
+      basic_record = {flag = false; first_val = 42; sec_val = 2}
+    result of call at line 28, characters 21-30 : bool = false
+    result of call at line 28, characters 21-25 :
+      basic_record = {flag = false; first_val = 4; sec_val = 2}
+    result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-68 :
+      basic_record = {flag = false; first_val = 4; sec_val = 2}
   Line 29:
-    i = -1
-    result of call at line 29, characters 13-82 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 29, characters 21-30 = false
-    result of call at line 29, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 6}
-    result of call at line 29, characters 64-81 = 6
-    result of call at line 29, characters 64-68 =
-      {first_val = 2; flag = false; sec_val = 6}
+    i : int = -1
+    result of call at line 29, characters 13-82 :
+      basic_record = {flag = false; first_val = 23; sec_val = 6}
+    result of call at line 29, characters 21-30 : bool = false
+    result of call at line 29, characters 21-25 :
+      basic_record = {flag = false; first_val = 7; sec_val = 6}
+    result of call at line 29, characters 64-81 : int = 6
+    result of call at line 29, characters 64-68 :
+      basic_record = {flag = false; first_val = 7; sec_val = 6}
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -286,38 +304,41 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : ty -> uni -> int = fun x!090 x!13 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i = -1
+    i : int = -1
   Line 27:
-    result of call at line 27, characters 13-81 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 27, characters 21-30 = false
-    result of call at line 27, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 27, characters 45-61 = 2
-    result of call at line 27, characters 45-49 =
-      {first_val = 2; flag = false; sec_val = 4}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 27, characters 21-30 : bool = true
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
-    result of call at line 28, characters 13-82 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 28, characters 21-30 = false
-    result of call at line 28, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 28, characters 64-81 = 4
-    result of call at line 28, characters 64-68 =
-      {first_val = 2; flag = false; sec_val = 4}
+    result of call at line 28, characters 13-82 :
+      basic_record = {flag = false; first_val = 42; sec_val = 2}
+    result of call at line 28, characters 21-30 : bool = false
+    result of call at line 28, characters 21-25 :
+      basic_record = {flag = false; first_val = 4; sec_val = 2}
+    result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-68 :
+      basic_record = {flag = false; first_val = 4; sec_val = 2}
   Line 29:
-    result of call at line 29, characters 13-82 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 29, characters 21-30 = false
-    result of call at line 29, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 6}
-    result of call at line 29, characters 64-81 = 6
-    result of call at line 29, characters 64-68 =
-      {first_val = 2; flag = false; sec_val = 6}
+    result of call at line 29, characters 13-82 :
+      basic_record = {flag = false; first_val = 23; sec_val = 6}
+    result of call at line 29, characters 21-30 : bool = false
+    result of call at line 29, characters 21-25 :
+      basic_record = {flag = false; first_val = 7; sec_val = 6}
+    result of call at line 29, characters 64-81 : int = 6
+    result of call at line 29, characters 64-68 :
+      basic_record = {flag = false; first_val = 7; sec_val = 6}
   Line 30:
-    i = -1
+    i : int = -1
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -331,41 +352,44 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : ty -> uni -> int = fun x!094 x!13 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i = -1
+    i : int = -1
   Line 27:
-    result of call at line 27, characters 13-81 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 27, characters 21-30 = false
-    result of call at line 27, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 27, characters 45-61 = 2
-    result of call at line 27, characters 45-49 =
-      {first_val = 2; flag = false; sec_val = 4}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 27, characters 21-30 : bool = true
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
-    result of call at line 28, characters 13-82 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 28, characters 21-30 = false
-    result of call at line 28, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 28, characters 64-81 = 4
-    result of call at line 28, characters 64-68 =
-      {first_val = 2; flag = false; sec_val = 4}
+    result of call at line 28, characters 13-82 :
+      basic_record = {flag = false; first_val = 42; sec_val = 2}
+    result of call at line 28, characters 21-30 : bool = false
+    result of call at line 28, characters 21-25 :
+      basic_record = {flag = false; first_val = 4; sec_val = 2}
+    result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-68 :
+      basic_record = {flag = false; first_val = 4; sec_val = 2}
   Line 29:
-    result of call at line 29, characters 13-82 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 29, characters 21-30 = false
-    result of call at line 29, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 6}
-    result of call at line 29, characters 64-81 = 6
-    result of call at line 29, characters 64-68 =
-      {first_val = 2; flag = false; sec_val = 6}
+    result of call at line 29, characters 13-82 :
+      basic_record = {flag = false; first_val = 23; sec_val = 6}
+    result of call at line 29, characters 21-30 : bool = false
+    result of call at line 29, characters 21-25 :
+      basic_record = {flag = false; first_val = 7; sec_val = 6}
+    result of call at line 29, characters 64-81 : int = 6
+    result of call at line 29, characters 64-68 :
+      basic_record = {flag = false; first_val = 7; sec_val = 6}
   Line 30:
-    i = -1
-    result of call at line 30, characters 74-91 = 7
-    result of call at line 30, characters 74-78 =
-      {first_val = 2; flag = false; sec_val = 7}
+    i : int = -1
+    result of call at line 30, characters 74-91 : int = 8
+    result of call at line 30, characters 74-78 :
+      basic_record = {flag = false; first_val = 9; sec_val = 8}
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -379,46 +403,49 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : ty -> uni -> int = fun x!098 x!13 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i = -1
+    i : int = -1
   Line 27:
-    result of call at line 27, characters 13-81 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 27, characters 21-30 = false
-    result of call at line 27, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 27, characters 45-61 = 2
-    result of call at line 27, characters 45-49 =
-      {first_val = 2; flag = false; sec_val = 4}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 27, characters 21-30 : bool = true
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
-    result of call at line 28, characters 13-82 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 28, characters 21-30 = false
-    result of call at line 28, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 28, characters 64-81 = 4
-    result of call at line 28, characters 64-68 =
-      {first_val = 2; flag = false; sec_val = 4}
+    result of call at line 28, characters 13-82 :
+      basic_record = {flag = false; first_val = 42; sec_val = 2}
+    result of call at line 28, characters 21-30 : bool = false
+    result of call at line 28, characters 21-25 :
+      basic_record = {flag = false; first_val = 4; sec_val = 2}
+    result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-68 :
+      basic_record = {flag = false; first_val = 4; sec_val = 2}
   Line 29:
-    result of call at line 29, characters 13-82 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 29, characters 21-30 = false
-    result of call at line 29, characters 21-25 =
-      {first_val = 2; flag = false; sec_val = 6}
-    result of call at line 29, characters 64-81 = 6
-    result of call at line 29, characters 64-68 =
-      {first_val = 2; flag = false; sec_val = 6}
+    result of call at line 29, characters 13-82 :
+      basic_record = {flag = false; first_val = 23; sec_val = 6}
+    result of call at line 29, characters 21-30 : bool = false
+    result of call at line 29, characters 21-25 :
+      basic_record = {flag = false; first_val = 7; sec_val = 6}
+    result of call at line 29, characters 64-81 : int = 6
+    result of call at line 29, characters 64-68 :
+      basic_record = {flag = false; first_val = 7; sec_val = 6}
   Line 30:
-    i = -1
-    result of call at line 30, characters 13-92 =
-      {first_val = 2; flag = false; sec_val = 4}
-    result of call at line 30, characters 41-57 = 8
-    result of call at line 30, characters 41-45 =
-      {first_val = 8; flag = false; sec_val = 7}
-    result of call at line 30, characters 74-91 = 7
-    result of call at line 30, characters 74-78 =
-      {first_val = 8; flag = false; sec_val = 7}
+    i : int = -1
+    result of call at line 30, characters 13-92 :
+      basic_record = {flag = false; first_val = 9; sec_val = 8}
+    result of call at line 30, characters 41-57 : int = 9
+    result of call at line 30, characters 41-45 :
+      basic_record = {flag = false; first_val = 9; sec_val = 8}
+    result of call at line 30, characters 74-91 : int = 8
+    result of call at line 30, characters 74-78 :
+      basic_record = {flag = false; first_val = 9; sec_val = 8}
 
 File "bench/check-ce/array_records_poly.mlw", line 31, characters 13-35:
 Sub-goal Assertion of goal var_overwrite'vc.
@@ -436,45 +463,48 @@ Sub-goal Postcondition of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : ty -> uni -> int = fun x!0106 x!13 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i = 2
+    i : int = 2
   Line 25:
-    i = 2
+    i : int = 2
   Line 27:
-    result of call at line 27, characters 13-81 =
-      {first_val = 4; flag = false; sec_val = 7}
-    result of call at line 27, characters 21-30 = false
-    result of call at line 27, characters 21-25 =
-      {first_val = 4; flag = false; sec_val = 7}
-    result of call at line 27, characters 45-61 = 4
-    result of call at line 27, characters 45-49 =
-      {first_val = 4; flag = false; sec_val = 7}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 27, characters 21-30 : bool = true
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 28:
-    result of call at line 28, characters 13-82 =
-      {first_val = 4; flag = false; sec_val = 7}
-    result of call at line 28, characters 21-30 = false
-    result of call at line 28, characters 21-25 =
-      {first_val = 4; flag = false; sec_val = 7}
-    result of call at line 28, characters 64-81 = 7
-    result of call at line 28, characters 64-68 =
-      {first_val = 4; flag = false; sec_val = 7}
+    result of call at line 28, characters 13-82 :
+      basic_record = {flag = false; first_val = 42; sec_val = 6}
+    result of call at line 28, characters 21-30 : bool = false
+    result of call at line 28, characters 21-25 :
+      basic_record = {flag = false; first_val = 7; sec_val = 6}
+    result of call at line 28, characters 64-81 : int = 6
+    result of call at line 28, characters 64-68 :
+      basic_record = {flag = false; first_val = 7; sec_val = 6}
   Line 29:
-    result of call at line 29, characters 13-82 =
-      {first_val = 4; flag = false; sec_val = 7}
-    result of call at line 29, characters 21-30 = false
-    result of call at line 29, characters 21-25 =
-      {first_val = 4; flag = false; sec_val = 8}
-    result of call at line 29, characters 64-81 = 8
-    result of call at line 29, characters 64-68 =
-      {first_val = 4; flag = false; sec_val = 8}
+    result of call at line 29, characters 13-82 :
+      basic_record = {flag = false; first_val = 23; sec_val = 8}
+    result of call at line 29, characters 21-30 : bool = false
+    result of call at line 29, characters 21-25 :
+      basic_record = {flag = false; first_val = 9; sec_val = 8}
+    result of call at line 29, characters 64-81 : int = 8
+    result of call at line 29, characters 64-68 :
+      basic_record = {flag = false; first_val = 9; sec_val = 8}
   Line 30:
-    result of call at line 30, characters 13-92 =
-      {first_val = 4; flag = false; sec_val = 7}
-    result of call at line 30, characters 41-57 = 10 (0XA)
-    result of call at line 30, characters 41-45 =
-      {first_val = 10 (0XA); flag = false; sec_val = 9}
-    result of call at line 30, characters 74-91 = 9
-    result of call at line 30, characters 74-78 =
-      {first_val = 10 (0XA); flag = false; sec_val = 9}
+    result of call at line 30, characters 13-92 :
+      basic_record = {flag = false; first_val = 11; sec_val = 10}
+    result of call at line 30, characters 41-57 : int = 11
+    result of call at line 30, characters 41-45 :
+      basic_record = {flag = false; first_val = 11; sec_val = 10}
+    result of call at line 30, characters 74-91 : int = 10
+    result of call at line 30, characters 74-78 :
+      basic_record = {flag = false; first_val = 11; sec_val = 10}
 

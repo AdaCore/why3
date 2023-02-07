@@ -1,0 +1,392 @@
+module Use_flags__base
+  use int.Int
+  use bv.BV32 as BV32
+
+  val function base :
+    BV32.t
+end
+
+module Flags__Oor
+  use int.Int
+  use bv.BV32 as BV32
+
+  val function oor (param__l: BV32.t) (param__r: BV32.t) :
+    BV32.t
+
+  val function oor__function_guard (temp___result_168: BV32.t) (param__l:
+    BV32.t) (param__r: BV32.t) : BV32.t
+end
+
+module Flags__Oand
+  use int.Int
+  use bv.BV32 as BV32
+
+  val function oand (param__l: BV32.t) (param__r: BV32.t) :
+    BV32.t
+
+  val function oand__function_guard (temp___result_169: BV32.t) (param__l:
+    BV32.t) (param__r: BV32.t) : BV32.t
+end
+
+module Use_flags__local___axiom
+  use int.Int
+  use bv.BV32 as BV32
+  use Flags__Oor as Flags__Oor
+  use Flags__Oand as Flags__Oand
+
+  val local (param__f: BV32.t) : unit
+    requires { ((let temp___260 =
+                   let temp___258 =
+                     16777216 : BV32.t in
+                   let temp___257 =
+                     let temp___255 =
+                       8388608 : BV32.t in
+                     let temp___254 =
+                       let temp___252 =
+                         4194304 : BV32.t in
+                       let temp___251 =
+                         let temp___249 =
+                           2097152 : BV32.t in
+                         let temp___248 =
+                           let temp___246 =
+                             1048576 : BV32.t in
+                           let temp___245 =
+                             let temp___243 =
+                               524288 : BV32.t in
+                             let temp___242 =
+                               let temp___240 =
+                                 262144 : BV32.t in
+                               let temp___239 =
+                                 let temp___237 =
+                                   131072 : BV32.t in
+                                 let temp___236 =
+                                   let temp___234 =
+                                     65536 : BV32.t in
+                                   let temp___233 =
+                                     let temp___231 =
+                                       32768 : BV32.t in
+                                     let temp___230 =
+                                       let temp___228 =
+                                         16384 : BV32.t in
+                                       let temp___227 =
+                                         let temp___225 =
+                                           8192 : BV32.t in
+                                         let temp___224 =
+                                           let temp___222 =
+                                             4096 : BV32.t in
+                                           let temp___221 =
+                                             let temp___219 =
+                                               2048 : BV32.t in
+                                             let temp___218 =
+                                               let temp___216 =
+                                                 1024 : BV32.t in
+                                               let temp___215 =
+                                                 let temp___213 =
+                                                   512 : BV32.t in
+                                                 let temp___212 =
+                                                   let temp___210 =
+                                                     256 : BV32.t in
+                                                   let temp___209 =
+                                                     let temp___207 =
+                                                       128 : BV32.t in
+                                                     let temp___206 =
+                                                       let temp___204 =
+                                                         64 : BV32.t in
+                                                       let temp___203 =
+                                                         let temp___201 =
+                                                           32 : BV32.t in
+                                                         let temp___200 =
+                                                           let temp___198 =
+                                                             16 : BV32.t in
+                                                           let temp___197 =
+                                                             let temp___195 =
+                                                               8 : BV32.t in
+                                                             let temp___194 =
+                                                               let temp___192 =
+                                                                 4 : BV32.t in
+                                                               let temp___191 =
+                                                                 let temp___189 =
+                                                                   2 : BV32.t in
+                                                                 let temp___188 =
+                                                                   let temp___186 =
+                                                                    1 :
+                                                                    BV32.t in
+                                                                   let temp___185 =
+                                                                    0 :
+                                                                    BV32.t in
+                                                                   let temp___result_184:
+                                                                    BV32.t
+                                                                    = ([@rac:call_id:1]
+                                                                    (Flags__Oor.oor
+                                                                    temp___185
+                                                                    temp___186)) in
+                                                                    ([@rac:call_id:2]
+                                                                    (Flags__Oor.oor__function_guard
+                                                                    temp___result_184
+                                                                    temp___185
+                                                                    temp___186)) in
+                                                                 let temp___result_187:
+                                                                   BV32.t
+                                                                    = ([@rac:call_id:3]
+                                                                    (Flags__Oor.oor
+                                                                    temp___188
+                                                                    temp___189)) in
+                                                                    ([@rac:call_id:4]
+                                                                    (Flags__Oor.oor__function_guard
+                                                                    temp___result_187
+                                                                    temp___188
+                                                                    temp___189)) in
+                                                               let temp___result_190:
+                                                                 BV32.t
+                                                                    =
+                                                                    ([@rac:call_id:5]
+                                                                    (Flags__Oor.oor
+                                                                    temp___191
+                                                                    temp___192)) in
+                                                                    ([@rac:call_id:6]
+                                                                    (Flags__Oor.oor__function_guard
+                                                                    temp___result_190
+                                                                    temp___191
+                                                                    temp___192)) in
+                                                             let temp___result_193:
+                                                               BV32.t
+                                                                   =
+                                                                   ([@rac:call_id:7]
+                                                                    (Flags__Oor.oor
+                                                                    temp___194
+                                                                    temp___195)) in
+                                                                  ([@rac:call_id:8]
+                                                                   (Flags__Oor.oor__function_guard
+                                                                    temp___result_193
+                                                                    temp___194
+                                                                    temp___195)) in
+                                                           let temp___result_196:
+                                                             BV32.t
+                                                                 = ([@rac:call_id:9]
+                                                                    (Flags__Oor.oor
+                                                                    temp___197
+                                                                    temp___198)) in
+                                                                ([@rac:call_id:10]
+                                                                 (Flags__Oor.oor__function_guard
+                                                                    temp___result_196
+                                                                    temp___197
+                                                                    temp___198)) in
+                                                         let temp___result_199:
+                                                           BV32.t
+                                                               = ([@rac:call_id:11]
+                                                                  (Flags__Oor.oor
+                                                                    temp___200
+                                                                    temp___201)) in
+                                                              ([@rac:call_id:12]
+                                                               (Flags__Oor.oor__function_guard
+                                                                  temp___result_199
+                                                                  temp___200
+                                                                  temp___201)) in
+                                                       let temp___result_202:
+                                                         BV32.t
+                                                             = ([@rac:call_id:13]
+                                                                (Flags__Oor.oor
+                                                                   temp___203
+                                                                   temp___204)) in
+                                                            ([@rac:call_id:14]
+                                                             (Flags__Oor.oor__function_guard
+                                                                temp___result_202
+                                                                temp___203
+                                                                temp___204)) in
+                                                     let temp___result_205:
+                                                       BV32.t
+                                                           = ([@rac:call_id:15]
+                                                              (Flags__Oor.oor
+                                                                 temp___206
+                                                                 temp___207)) in
+                                                          ([@rac:call_id:16]
+                                                           (Flags__Oor.oor__function_guard
+                                                              temp___result_205
+                                                              temp___206
+                                                              temp___207)) in
+                                                   let temp___result_208:
+                                                     BV32.t
+                                                         = ([@rac:call_id:17]
+                                                            (Flags__Oor.oor
+                                                               temp___209
+                                                               temp___210)) in
+                                                        ([@rac:call_id:18]
+                                                         (Flags__Oor.oor__function_guard
+                                                            temp___result_208
+                                                            temp___209
+                                                            temp___210)) in
+                                                 let temp___result_211:
+                                                   BV32.t
+                                                       = ([@rac:call_id:19]
+                                                          (Flags__Oor.oor
+                                                             temp___212
+                                                             temp___213)) in
+                                                      ([@rac:call_id:20]
+                                                       (Flags__Oor.oor__function_guard
+                                                          temp___result_211
+                                                          temp___212
+                                                          temp___213)) in
+                                               let temp___result_214:
+                                                 BV32.t
+                                                     = ([@rac:call_id:21]
+                                                        (Flags__Oor.oor
+                                                           temp___215
+                                                           temp___216)) in
+                                                    ([@rac:call_id:22]
+                                                     (Flags__Oor.oor__function_guard
+                                                        temp___result_214
+                                                        temp___215
+                                                        temp___216)) in
+                                             let temp___result_217:
+                                               BV32.t
+                                                   = ([@rac:call_id:23]
+                                                      (Flags__Oor.oor
+                                                         temp___218
+                                                         temp___219)) in
+                                                  ([@rac:call_id:24]
+                                                   (Flags__Oor.oor__function_guard
+                                                      temp___result_217
+                                                      temp___218
+                                                      temp___219)) in
+                                           let temp___result_220:
+                                             BV32.t
+                                                 = ([@rac:call_id:25]
+                                                    (Flags__Oor.oor
+                                                       temp___221
+                                                       temp___222)) in
+                                                ([@rac:call_id:26]
+                                                 (Flags__Oor.oor__function_guard
+                                                    temp___result_220
+                                                    temp___221
+                                                    temp___222)) in
+                                         let temp___result_223: BV32.t
+                                               = ([@rac:call_id:27]
+                                                  (Flags__Oor.oor
+                                                     temp___224
+                                                     temp___225)) in
+                                              ([@rac:call_id:28]
+                                               (Flags__Oor.oor__function_guard
+                                                  temp___result_223
+                                                  temp___224
+                                                  temp___225)) in
+                                       let temp___result_226: BV32.t
+                                             = ([@rac:call_id:29]
+                                                (Flags__Oor.oor
+                                                   temp___227
+                                                   temp___228)) in
+                                            ([@rac:call_id:30]
+                                             (Flags__Oor.oor__function_guard
+                                                temp___result_226
+                                                temp___227
+                                                temp___228)) in
+                                     let temp___result_229: BV32.t
+                                           = ([@rac:call_id:31]
+                                              (Flags__Oor.oor
+                                                 temp___230
+                                                 temp___231)) in
+                                          ([@rac:call_id:32]
+                                           (Flags__Oor.oor__function_guard
+                                              temp___result_229
+                                              temp___230
+                                              temp___231)) in
+                                   let temp___result_232: BV32.t
+                                         = ([@rac:call_id:33]
+                                            (Flags__Oor.oor
+                                               temp___233
+                                               temp___234)) in
+                                        ([@rac:call_id:34]
+                                         (Flags__Oor.oor__function_guard
+                                            temp___result_232
+                                            temp___233
+                                            temp___234)) in
+                                 let temp___result_235: BV32.t
+                                       = ([@rac:call_id:35]
+                                          (Flags__Oor.oor
+                                             temp___236
+                                             temp___237)) in
+                                      ([@rac:call_id:36]
+                                       (Flags__Oor.oor__function_guard
+                                          temp___result_235
+                                          temp___236
+                                          temp___237)) in
+                               let temp___result_238: BV32.t
+                                     = ([@rac:call_id:37]
+                                        (Flags__Oor.oor temp___239 temp___240)) in
+                                    ([@rac:call_id:38]
+                                     (Flags__Oor.oor__function_guard
+                                        temp___result_238
+                                        temp___239
+                                        temp___240)) in
+                             let temp___result_241: BV32.t
+                                   = ([@rac:call_id:39]
+                                      (Flags__Oor.oor temp___242 temp___243)) in
+                                  ([@rac:call_id:40]
+                                   (Flags__Oor.oor__function_guard
+                                      temp___result_241
+                                      temp___242
+                                      temp___243)) in
+                           let temp___result_244: BV32.t
+                                 = ([@rac:call_id:41]
+                                    (Flags__Oor.oor temp___245 temp___246)) in
+                                ([@rac:call_id:42]
+                                 (Flags__Oor.oor__function_guard
+                                    temp___result_244
+                                    temp___245
+                                    temp___246)) in
+                         let temp___result_247: BV32.t
+                               = ([@rac:call_id:43]
+                                  (Flags__Oor.oor temp___248 temp___249)) in
+                              ([@rac:call_id:44]
+                               (Flags__Oor.oor__function_guard
+                                  temp___result_247
+                                  temp___248
+                                  temp___249)) in
+                       let temp___result_250: BV32.t
+                             = ([@rac:call_id:45]
+                                (Flags__Oor.oor temp___251 temp___252)) in
+                            ([@rac:call_id:46]
+                             (Flags__Oor.oor__function_guard
+                                temp___result_250
+                                temp___251
+                                temp___252)) in
+                     let temp___result_253: BV32.t
+                           = ([@rac:call_id:47]
+                              (Flags__Oor.oor temp___254 temp___255)) in
+                          ([@rac:call_id:48]
+                           (Flags__Oor.oor__function_guard
+                              temp___result_253
+                              temp___254
+                              temp___255)) in
+                   let temp___result_256: BV32.t
+                         = ([@rac:call_id:49]
+                            (Flags__Oor.oor temp___257 temp___258)) in
+                        ([@rac:call_id:50]
+                         (Flags__Oor.oor__function_guard
+                            temp___result_256
+                            temp___257
+                            temp___258)) in
+                 let temp___result_259: BV32.t
+                       = ([@rac:call_id:51]
+                          (Flags__Oand.oand param__f temp___260)) in
+                      ([@rac:call_id:52]
+                       (Flags__Oand.oand__function_guard
+                          temp___result_259
+                          param__f
+                          temp___260)))
+                  = param__f)
+    }
+    ensures { true }
+end
+
+module Use_flags__subprogram_def
+  use int.Int
+  use bv.BV32 as BV32
+  use Use_flags__base as Use_flags__base
+  use Flags__Oor as Flags__Oor
+  use Flags__Oand as Flags__Oand
+  use Use_flags__local___axiom as Use_flags__local___axiom
+
+  (*meta "compute_max_steps" 10*)
+  let def (__void_param : unit) =
+    Use_flags__local___axiom.local Use_flags__base.base
+end

@@ -55,74 +55,38 @@ let for_field clean (f, v) =
 
 (* The returned [fields] are the strings S in attributes [field:N:S], which have
    to be removed from the model element name *)
-let collect_attrs a (men_attrs, fields) = match get_field_attr a with
-  | Some f when only_first_field1 f -> men_attrs, f :: fields
-  | _ -> Sattr.add a men_attrs, fields
+let collect_attrs a (attrs, fields) = match get_field_attr a with
+  | Some f when only_first_field1 f -> attrs, f :: fields
+  | _ -> Sattr.add a attrs, fields
 
 (* Correct a model element name by a field string *)
 let correct_name f = Re.Str.global_replace (Re.Str.regexp_string f) ""
 
-let clean_name men =
-  let men_attrs, fields =
-    Sattr.fold collect_attrs men.men_attrs (Sattr.empty, []) in
-  let men_name = List.fold_right correct_name fields men.men_name in
-  {men with men_name; men_attrs}
+let clean_name me =
+  let me_attrs, fields =
+    Sattr.fold collect_attrs me.me_attrs (Sattr.empty, []) in
+  let me_name = List.fold_right correct_name fields me.me_name in
+  {me with me_name; me_attrs}
 
 (* Filtering the model to remove elements that are not understood by gnat2why
    (sole purpose is to reduce the size of the output). *)
 let in_spark (e: model_element) =
-  let name = e.me_name.men_name in
+  let name = e.me_name in
   (* Names that do not begin with either '.' or a number are not recognized by
      gnat2why *)
   String.length name > 0 && (name.[0] = '.' || (name.[0] <= '9' && name.[0] >= '0'))
 
-(* Don't clean values that will be removed by [post_clean]. TODO Can we entierly
-   remove this and do all cleaning after retrieving the Model_parser.model? *)
-let clean = object (self)
-  inherit Model_parser.clean
-
-  method! element me =
-    (* Don't clean names here but in post_clean *)
-    if me.me_name.men_kind = Error_message then
-      Some me (* Keep unparsed values for error messages *)
-    else
-      Opt.bind (self#value me.me_value) @@ fun me_value ->
-      Some {me with me_value}
-
-  method! record fs =
-    if only_first_field2 (List.map fst fs) then
-      (* Clean only the first field *)
-      match fs with
-      | (f, v) :: fs ->
-          Opt.bind (self#value v) @@ fun v ->
-          Some (Record ((f, v) :: fs))
-      | _ -> assert false
-    else
-      let for_field (f, v) =
-        if is_split_field f || is_rec_ext_field f then
-          Some (f, v)
-        else
-          Opt.bind (self#value v) @@ fun v ->
-          Some (f, v) in
-      match List.filter_map for_field fs with
-      | [] -> None
-      | fs -> Some (Record fs)
-end
-
-(** Clean values by a) replacing records according to [only_first_field2] and
-   simplifying discriminant records b) removing unparsed values, in which the
-   function returns [None]. *)
+(** Clean values by
+    a) replacing records according to [only_first_field2] and
+    b) simplifying discriminant records. *)
 let post_clean = object (self)
   inherit Model_parser.clean as super
 
   method! element me =
     match super#element me with
     | Some me ->
-        let {Model_parser.men_name= name; men_attrs= attrs} = me.me_name in
-        let men_name = Ident.get_model_trace_string ~name ~attrs in
-        let men_name = List.hd (Strings.bounded_split '@' men_name 2) in
-        let me_name = clean_name {me.me_name with men_name} in
-        let me = {me with me_name} in
+        let me_name = List.hd (Strings.bounded_split '@' me.me_name 2) in
+        let me = clean_name {me with me_name} in
         if in_spark me then Some me else None
     | _ -> None
 
@@ -134,10 +98,3 @@ let post_clean = object (self)
       | [] -> None
       | fs -> Some (Record fs)
 end
-
-let model_to_model (m, summary) =
-  let open Check_ce in
-  match summary with
-  | (NC | SW | NC_SW), log ->
-      Some (model_of_exec_log ~original_model:m log, summary)
-  | _ -> None

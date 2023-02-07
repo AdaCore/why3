@@ -1,0 +1,16 @@
+module M
+
+  type t (* avoid a warning *)
+
+  function f () : bool = true
+
+end
+
+module N
+
+  (* Ok-ish message *)
+  function f () : int = 0
+
+  clone M with function f
+
+end

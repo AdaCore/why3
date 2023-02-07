@@ -891,6 +891,7 @@ like in the following example:
 
 .. index:: collections
 .. index:: function literals
+.. _sec.functionliterals:
 
 Function literals
 ^^^^^^^^^^^^^^^^^
@@ -1615,6 +1616,57 @@ by instantiating ``Exp`` with zero and addition instead.
       use int.Int
       clone Exp with type t = int, val one = zero, val mul = (+)
       goal G: exp 2 3 = 6
+    end
+
+It is also possible to substitute certain types of defined symbols :
+logical functions and predicates, (co)inductives, algebraic data types, immutable
+records without invariants, range and floating-point types can all be substituted
+by symbols with the exact same definition.
+
+.. code-block:: whyml
+
+    module A
+      use int.Int
+
+      predicate pos (n : int) =
+        n >= 0
+
+      function abs (n : int) =
+        if pos n then n else -n
+
+      type 'a list =
+        | Nil
+        | Cons 'a (list 'a)
+
+      type r = { a : int; b : string; }
+    end
+
+    module B
+      use int.Int
+
+      (* logical functions and predicates must be syntactically equal. *)
+      predicate pos (n : int) =
+        n >= 0
+
+      (* The substitution of pos is taken into account when checking
+       * that the definitions are identical. *)
+      function abs (n : int) =
+        if pos n then n else -n
+
+      (* For algebraic types, same definition means same constructors
+       * in the same order. *)
+      type 'a list =
+        | Nil
+        | Cons 'a (list 'a)
+
+      (* Similarly records' fields must be in the exact same order. *)
+      type r = { a : int; b : string; }
+
+      clone A with
+       predicate pos,
+       function abs,
+       type list,
+       type r
     end
 
 .. index:: standard library

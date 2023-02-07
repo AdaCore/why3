@@ -6,7 +6,6 @@ updateoracle=false
 suffix=.opt
 removeoutfile=true
 files=""
-success=true
 failed=""
 whydata=$(bin/why3"$suffix" --print-datadir)
 whylib=$(bin/why3"$suffix" --print-libdir)
@@ -58,24 +57,51 @@ remove_solver_details () {
 }
 
 
+record_time () {
+    elapsed=$(date +%s%N)
+}
+
+# print elapsed time
+elapsed_time () {
+    t=$(date +%s%N)
+    d=$(expr $t - $elapsed)
+#    printf "d=${d}\n"
+    l=$(expr length $d)
+#    printf "l=${l}\n"
+    lmn=$(expr $l - 9 || true)
+    if [ "$lmn" = "0" ] ; then
+	d=0"$d"
+	lmn=1
+    fi
+#    printf "lmn=${lmn}\n"
+    s=$(expr substr "${d}" 1 ${lmn} || true)
+#    printf "s=${s}\n"
+    c=$(expr substr "${d}" ${lmn} 2 || true)
+#    printf "c=${c}\n"
+    elapsed="$s"."$c"
+#    printf "${elapsed}\n"
+}
+
+
+
+
 # $1 = prover
 # $2 = dir
 # $3 = filename
 # $4 = true for WP, false for SP
 # $5 = steps
 run () {
-  printf "  $2 ($1)... "
   file_path="$2/$3"
   debug_vc_sp=""
   if $4; then
     f="${file_path}_$1_WP"
     oracle_file="$2/oracles/$3_$1_WP.oracle"
-    printf "Weakest Precondition ${file_path} ($1)... "
+    printf "${file_path},WP,$1... "
   else
     f="${file_path}_$1_SP"
     oracle_file="$2/oracles/$3_$1_SP.oracle"
     debug_vc_sp=",vc_sp"
-    printf "Strongest Postcondition ${file_path} ($1)... "
+    printf "${file_path},SP,$1... "
   fi
   steps=$5
   if [ "$3" = "strings" ] && [[ $1 == CVC* ]] ; then
@@ -83,15 +109,20 @@ run () {
   else
     prover="$1,counterexamples"
   fi
+  # one may add reduction_cont_size,stack_trace, in
+  # the debug flags below to test cont_invariant in reduction engine
+  # (note that stack trace may be more detailed with bytecode)
+  record_time
   ($dir/../bin/why3"$suffix" prove -a split_vc -P $prover\
       --stepslimit=$steps --timelimit=10 \
       --rac-steplimit=$steps --rac-timelimit=10 \
       --check-ce --rac-prover="$1" --ce-log-verbosity=5 \
       --library="$2" "${file_path}.mlw" \
       --debug=check-ce-categorization${debug_vc_sp} \
-    || [ $? -eq 2 ]) 2>&1 \
+    || true) 2>&1 \
     | remove_solver_details \
-    > "$f.out"
+	  > "$f.out"
+  elapsed_time
   str_out=$(cat "$f.out")
   if [ -e "$oracle_file" ]; then
     str_oracle=$(cat "$oracle_file")
@@ -99,7 +130,7 @@ run () {
     str_oracle=""
   fi
   if [ "$str_oracle" = "$str_out" ] ; then
-    echo "OK"
+    echo "OK (in ${elapsed}s)"
   else
     if $updateoracle; then
       echo "Updating oracle"
@@ -110,13 +141,15 @@ run () {
 	    (diff -u "$oracle_file" "$f.out" \
         || [ $? -eq 1 ])|colorize
       failed="$failed$f\n"
-      success=false
     fi
   fi
   if $removeoutfile; then
     rm "$f.out"
   fi
 }
+
+
+
 start=$(date +%s)
 for file in $files; do
   filedir=`dirname $file`
@@ -124,7 +157,7 @@ for file in $files; do
   if [ "$filebase" = "maps_poly" -o "$filebase" = "maps_mono" ] ; then
     echo "Skipping tests on $filedir/$filebase.mlw";
   else
-    printf "Running provers on $filedir/$filebase.mlw\n";
+    printf "# Running provers on $filedir/$filebase.mlw\n";
     cvc4steps=150000
     cvc5steps=150000
     z3steps=3000000
@@ -150,6 +183,9 @@ for file in $files; do
       "int_overflow")
         z3steps=400000
         ;;
+      "loop_inv_real")
+        z3steps=1000000
+        ;;
       "maps_poly")
         cvc5steps=300000
         ;;
@@ -170,16 +206,6 @@ for file in $files; do
     run Z3,4.8.10   $filedir $filebase false $z3steps
   fi
 done
-end=$(date +%s)
-
-runtime=$((end-start))
-if [ "$success" = true ]; then
-  echo "check-ce-bench: success (runtime = $runtime seconds)"
-  exit 0
-else
-  printf "\ncheck-ce-bench: failed for the following files (runtime = $runtime seconds)\n$failed\n"
-  exit 1
-fi
 
 # Check the reproduction of the experiments by Petiot (2018).
 if $updateoracle; then
@@ -187,20 +213,28 @@ if $updateoracle; then
 else
   updatearg=""
 fi
-bench/check-ce/petiot2018/experiments.sh \
-  --prover Z3,4.8.10 --rac-prover Z3,4.8.10 \
-  --ce-prover Z3,4.8.10,counterexamples --stepslimit 500000 \
-  $updatearg
-if [ $? = 1 ]; then exitvalue=1; fi
-bench/check-ce/petiot2018/experiments.sh \
-  --prover CVC4,1.8 --rac-prover CVC4,1.8 \
-  --ce-prover CVC4,1.8,counterexamples --stepslimit 10000 \
-  $updatearg
-if [ $? = 1 ]; then exitvalue=1; fi
-bench/check-ce/petiot2018/experiments.sh \
-  --prover CVC5,1.0.0 --rac-prover CVC5,1.0.0 \
-  --ce-prover CVC5,1.0.0,counterexamples --stepslimit 10000 \
-  $updatearg
-if [ $? = 1 ]; then exitvalue=1; fi
 
-exit $exitvalue
+# $1 = prover
+# $2 = stepslimit
+petiot () {
+bench/check-ce/petiot2018/experiments.sh \
+  --prover $1 --rac-prover $1 \
+  --ce-prover $1,counterexamples --stepslimit $2 \
+  $updatearg
+if [ $? = 1 ]; then failed="${failed}Petiot experiments with $1.\n"; fi
+}
+
+petiot Z3,4.8.10  500000
+petiot CVC4,1.8 10000
+petiot CVC5,1.0.0 10000
+
+end=$(date +%s)
+
+runtime=$((end-start))
+if [ "$failed" = "" ]; then
+  echo "check-ce-bench: success (runtime = $runtime seconds)"
+  exit 0
+else
+  printf "\ncheck-ce-bench: failed for the following files (runtime = $runtime seconds)\n$failed\n"
+  exit 1
+fi

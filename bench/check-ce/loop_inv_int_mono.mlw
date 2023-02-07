@@ -1,0 +1,43 @@
+
+module M
+
+use int.Int
+
+type t = { mutable c : int }
+
+let f () : unit
+  diverges
+  =
+  let a = { c = 0 } in
+  a.c <- 1;
+  let b = { c = 2 } in
+  while b.c < 10 do
+    invariant { b.c < a.c + 5 }
+    b.c <- a.c + b.c
+  done
+
+end
+
+module N
+
+use int.Int
+
+type t = { mutable c : int }
+
+val a : t
+
+val b : t
+
+let f () : int
+  diverges
+  ensures { result < a.c }
+  =
+  a.c <- 1;
+  b.c <- 2;
+  while b.c < 10 do
+    invariant { b.c < a.c + 5 }
+    b.c <- a.c + b.c
+  done;
+  b.c
+
+end

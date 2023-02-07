@@ -40,6 +40,9 @@ let int_const_of_int n =
 let real_const ?(pow2 = BigInt.zero) ?(pow5 = BigInt.zero) i =
   ConstReal { rl_kind = RLitUnk; rl_real = real_value ~pow2 ~pow5 i }
 
+let real_const_from_string ~radix ~neg ~int ~frac ~exp =
+  ConstReal (real_literal ~radix ~neg ~int ~frac ~exp)
+
 let string_const s =
   ConstStr s
 
