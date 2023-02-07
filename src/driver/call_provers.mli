@@ -144,8 +144,7 @@ val call_on_buffer :
   limit           : resource_limit ->
   res_parser      : prover_result_parser ->
   filename        : string ->
-  get_counterexmp : bool ->
-  printing_info   : Printer.printing_info ->
+  get_model       : Printer.printing_info option ->
   gen_new_file    : bool ->
   ?inplace        : bool ->
   Buffer.t -> prover_call

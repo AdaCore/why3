@@ -441,12 +441,12 @@ let prove_task_prepared
   Opt.iter close_in old_channel;
   let gen_new_file, filename =
     file_name_of_task ?old ?inplace ?interactive drv task in
-  let get_counterexmp = get_counterexmp task in
+  let get_model = if get_counterexmp task then Some printing_info else None in
   let res =
     Call_provers.call_on_buffer
       ~command ~config ~limit ~gen_new_file ?inplace ~filename
       ~res_parser:drv.drv_res_parser
-      ~get_counterexmp ~printing_info buf
+      ~get_model buf
   in
   Buffer.reset buf;
   res
@@ -456,15 +456,14 @@ let prove_buffer_prepared
     ?(input_file="f")
     ?(theory_name="T")
     ?(goal_name="vc")
+    ?get_model
     drv buffer =
   let filename = get_filename drv ~input_file ~theory_name ~goal_name in
   Call_provers.call_on_buffer
     ~command ~config ~limit
     ~gen_new_file:true ~filename
-    ~get_counterexmp:false
-    ~printing_info:default_printing_info
     ~res_parser:drv.drv_res_parser
-    buffer
+    ~get_model buffer
 
 let prove_task
       ~command ~config ~limit ?old ?inplace ?interactive drv task =

@@ -100,6 +100,9 @@ val prove_task_prepared :
     to generate canonical temporary files for the prover according to its driver
     definition. They are purely informative and their respective default
     values are ["f"], ["T"] and ["vc"].
+
+    Parameter [get_model] shall be passed to obtain couter examples.
+    The printing-infos are those obtained from task preparation.
 *)
 val prove_buffer_prepared :
   command      : string ->
@@ -108,6 +111,7 @@ val prove_buffer_prepared :
   ?input_file  : string ->
   ?theory_name : string ->
   ?goal_name   : string ->
+  ?get_model   : Printer.printing_info ->
   driver -> Buffer.t -> Call_provers.prover_call
 
 (** Traverse all metas from a driver *)

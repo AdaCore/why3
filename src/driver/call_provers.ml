@@ -227,7 +227,7 @@ let debug_print_model ~print_attrs model =
 
 type answer_or_model = Answer of prover_answer | Model of string
 
-let analyse_result exit_result res_parser get_counterexmp printing_info out =
+let analyse_result exit_result res_parser get_model out =
   let list_re = res_parser.prp_regexps in
   let re = craft_efficient_re list_re in
   let list_re = List.map (fun (a, b) -> Re.Str.regexp a, b) list_re in
@@ -293,15 +293,16 @@ let analyse_result exit_result res_parser get_counterexmp printing_info out =
         if res = Valid then
           (Valid, [])
         else
-          if get_counterexmp then
-            begin
-            let m = res_parser.prp_model_parser printing_info model_str in
-            Debug.dprintf debug "Call_provers: model:@.";
-            debug_print_model ~print_attrs:false m;
-            analyse ((res, m) :: saved_models) (Some res) tl
-            end
-          else
-            analyse saved_models (merge_answers (Some res) saved_res) tl
+          begin
+            match get_model with
+            | Some printing_info ->
+                let m = res_parser.prp_model_parser printing_info model_str in
+                Debug.dprintf debug "Call_provers: model:@.";
+                debug_print_model ~print_attrs:false m;
+                analyse ((res, m) :: saved_models) (Some res) tl
+            | None ->
+                analyse saved_models (merge_answers (Some res) saved_res) tl
+          end
     | Answer res :: tl ->
         if res = Valid then
           (Valid, [])
@@ -314,7 +315,7 @@ let analyse_result exit_result res_parser get_counterexmp printing_info out =
 
 let backup_file f = f ^ ".save"
 
-let parse_prover_run res_parser signaled time out exitcode limit get_counterexmp printing_info =
+let parse_prover_run res_parser signaled time out exitcode limit get_model =
   Debug.dprintf debug "Call_provers: exited with status %Ld@." exitcode;
   (* the following conversion is incorrect (but does not fail) on 32bit, but if
      the incoming exitcode was really outside the bounds of [int], its exact
@@ -326,7 +327,7 @@ let parse_prover_run res_parser signaled time out exitcode limit get_counterexmp
       if signaled then [Answer HighFailure] else
       try [Answer (List.assoc int_exitcode res_parser.prp_exitcodes)]
       with Not_found -> []
-    in analyse_result exit_result res_parser get_counterexmp printing_info out
+    in analyse_result exit_result res_parser get_model out
   in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
@@ -361,7 +362,7 @@ let parse_prover_run res_parser signaled time out exitcode limit get_counterexmp
     pr_models = models;
   }
 
-let parse_prover_run res_parser signaled time outfile exitcode limit get_counterexmp printing_info =
+let parse_prover_run res_parser signaled time outfile exitcode limit get_model =
   if outfile = "" then
     { pr_answer = Failure "interrupted";
       pr_status = Unix.WEXITED 1;
@@ -371,7 +372,7 @@ let parse_prover_run res_parser signaled time outfile exitcode limit get_counter
       pr_models = [] }
   else
     let out = read_and_delete_file outfile in
-    parse_prover_run res_parser signaled time out exitcode limit get_counterexmp printing_info
+    parse_prover_run res_parser signaled time out exitcode limit get_model
 
 let actualcommand ~config command limit file =
   let stime = string_of_int limit.limit_time in
@@ -437,8 +438,7 @@ type save_data = {
   inplace         : bool;
   limit           : resource_limit;
   res_parser      : prover_result_parser;
-  printing_info   : Printer.printing_info;
-  get_counterexmp : bool;
+  get_model       : Printer.printing_info option;
 }
 
 let saved_data : (int, save_data) Hashtbl.t = Hashtbl.create 17
@@ -459,7 +459,7 @@ let handle_answer answer =
         if save.inplace then Sys.rename (backup_file save.vc_file) save.vc_file
       end;
       let ans = parse_prover_run save.res_parser timeout time out_file exit_code
-          save.limit save.get_counterexmp save.printing_info in
+          save.limit save.get_model in
       id, Some ans
   | Started id ->
       id, None
@@ -472,8 +472,7 @@ type prover_call =
   | EditorCall of int
 
 let call_on_file
-      ~config ~command ~limit ~res_parser ~get_counterexmp
-      ~printing_info ?(inplace=false) fin =
+      ~config ~command ~limit ~res_parser ~get_model ?(inplace=false) fin =
   let id = gen_id () in
   let cmd, use_stdin, on_timelimit =
     actualcommand ~cleanup:true ~inplace ~config command limit fin in
@@ -482,8 +481,7 @@ let call_on_file
     inplace         = inplace;
     limit           = limit;
     res_parser      = res_parser;
-    get_counterexmp = get_counterexmp;
-    printing_info   = printing_info
+    get_model       = get_model;
   } in
   Hashtbl.add saved_data id save;
   let limit = adapt_limits limit on_timelimit in
@@ -570,7 +568,7 @@ let rec wait_on_call = function
       let _, ret = Unix.waitpid [] pid in
       editor_result ret
 
-let call_on_buffer ~command ~config ~limit ~res_parser ~filename ~get_counterexmp ~printing_info
+let call_on_buffer ~command ~config ~limit ~res_parser ~filename ~get_model
     ~gen_new_file ?(inplace=false) buffer =
   let fin,cin =
     if gen_new_file then
@@ -584,7 +582,7 @@ let call_on_buffer ~command ~config ~limit ~res_parser ~filename ~get_counterexm
       end
   in
   Buffer.output_buffer cin buffer; close_out cin;
-  call_on_file ~command ~config ~limit ~res_parser ~get_counterexmp ~printing_info ~inplace fin
+  call_on_file ~command ~config ~limit ~res_parser ~get_model ~inplace fin
 
 let call_editor ~config ~command fin =
   let command, use_stdin, _ =
