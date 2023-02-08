@@ -6,12 +6,15 @@ Tools
     environment variables `WHY3LIB` and `WHY3DATA`
 
 MLCFG language
-  * attributes on the body of an MLCFG function are now supported
+  * attributes on function bodies are now supported
 
 Python language
   * added `by` and `so` connectives in predicates
   * fixed overloading of `+` in Python code
   * added `add_list` for list concatenation in logic
+
+IDE
+  * pressing Tab now auto-completes commands
 
 API
   * source locations are now represented by both a start line number
@@ -24,8 +27,8 @@ API
   * `Warning.emit` has been replaced by `Loc.warning` :x:
 
 Provers
-  * support for CVC5 1.0.0 (released April 6, 2022)
-  * support for Alt-Ergo 2.4.2 (released August 1, 2022)
+  * support for CVC5 1.0.0 (released Apr 6, 2022)
+  * support for Alt-Ergo 2.4.2 (released Aug 1, 2022)
 
 Miscellaneous
   * fixed soundness bug with existential quantifiers in `introduce_premises`
@@ -51,11 +54,11 @@ Python language
   (contribution by Jean-Paul Bodeveix)
 
 Provers
-  * support for Z3 4.9.0 and 4.9.1 (released July 6, 2022)
-  * support for Z3 4.10.0, 4.10.1 and 4.10.2 (released July 30, 2022)
-  * support for Z3 4.11.0 (released August 18, 2022)
-  * support for Coq 8.16.0 (release September 5, 2022)
-  * support for Gappa 1.4.0 (released April 16, 2022)
+  * support for Z3 4.9.0 and 4.9.1 (released Jul 6, 2022)
+  * support for Z3 4.10.0, 4.10.1 and 4.10.2 (released Jul 30, 2022)
+  * support for Z3 4.11.0 (released Aug 18, 2022)
+  * support for Coq 8.16.0 (release Sep 5, 2022)
+  * support for Gappa 1.4.0 (released Apr 16, 2022)
 
 Version 1.5.0, April 29, 2022
 -----------------------------
@@ -133,7 +136,7 @@ Bug fixes
   * fixed usage of various dependencies: `menhir`, `camlzip`, `ppx_deriving`, `coq-flocq`, `mlmpfr`
 
 Provers
-  * support for Alt-Ergo 2.4.1 (released July 28, 2021)
+  * support for Alt-Ergo 2.4.1 (released Jul 28, 2021)
 
 Version 1.4.0, March 13, 2021
 -----------------------------
@@ -365,7 +368,7 @@ Realizations
 
 Provers
   * support for Alt-Ergo 2.3.1 (released Feb 19, 2020)
-  * support for Isabelle 2019 (released June 2019)
+  * support for Isabelle 2019 (released Jun 2019)
   * support for Vampire 4.2.2 (released Dec 14, 2017)
   * support for Coq 8.10.0 (released Oct 8, 2019)
   * support for Coq 8.10.1 (released Oct 25, 2019)
