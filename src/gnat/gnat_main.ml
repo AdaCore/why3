@@ -299,9 +299,7 @@ let save_session_and_exit c signum =
 
 let _ =
   if Gnat_config.debug then Debug.(set_flag (lookup_flag "gnat_ast"));
-  Debug.set_flag Model_parser.debug_force_binary_floats;
   Debug.set_flag Pinterp.debug_disable_builtin_mach;
-  Model_parser.customize_clean Gnat_counterexamples.clean;
   List.iter Introduction.push_attributes_with_prefix
     ["GP_Check:"; "GP_Pretty_Ada:"; "GP_Shape:"; "GP_Sloc:";
      "GP_Already_Proved"; "GP_Inline"; "GP_Inlined"];

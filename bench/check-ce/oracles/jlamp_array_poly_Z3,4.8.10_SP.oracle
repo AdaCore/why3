@@ -11,10 +11,15 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_poly.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = [|{Array.to_int => 2} => 2; {Array.to_int => 3} => 3; _ => 2|]
   Line 11:
-    two = {to_int => 2}
+    two : t = {Array.to_int => 2}
   Line 14:
-    three = {to_int => 3}
+    three : t = {Array.to_int => 3}
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -28,13 +33,21 @@ Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : ty -> uni -> int = fun x!025 x!11 -> 0
 File jlamp_array_poly.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = [|{Array.to_int => 2} => 2; {Array.to_int => 3} => 3; _ => 2|]
   Line 11:
-    two = {to_int => 2}
+    two : t = {Array.to_int => 2}
   Line 14:
-    three = {to_int => 3}
+    three : t = {Array.to_int => 3}
   Line 21:
-    three = {to_int => 3}
+    three : t = {Array.to_int => 3}
 
 File "bench/check-ce/jlamp_array_poly.mlw", line 28, characters 4-16:
 Sub-goal Index in array bounds of goal g'vc.

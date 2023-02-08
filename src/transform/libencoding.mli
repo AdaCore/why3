@@ -74,4 +74,3 @@ val close_kept : Task.task Trans.trans
 
 (* reconstruct a definition of an lsymbol or make a defining axiom *)
 val defn_or_axiom : lsymbol -> term -> decl list
-

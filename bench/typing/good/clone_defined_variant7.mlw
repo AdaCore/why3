@@ -1,0 +1,34 @@
+module M
+
+  use int.Int
+
+  type t 'a = Nil | Cons 'a (t 'a)
+
+  let rec function length (xs : t 'a) : int =
+    match xs with
+    | Nil -> 0
+    | Cons _ xs -> length xs + 1
+    end
+
+  let rec function map (f : 'a -> 'b) (xs : t 'a) : t 'b =
+    match xs with
+    | Nil -> Nil
+    | Cons x xs -> Cons (f x) (map f xs)
+    end
+
+end
+
+module N
+
+  use int.Int
+
+  type t 'a = Nil | Cons 'a (t 'a)
+
+  clone M with type t
+
+  let f (xs : t 'a) =
+    if length xs > 0
+    then map (fun _ -> 3) xs
+    else Cons 42 Nil
+
+end

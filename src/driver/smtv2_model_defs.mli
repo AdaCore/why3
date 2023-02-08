@@ -9,39 +9,76 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Wstdlib
-open Model_parser
+(* Based on SMT-LIB Standard: Version 2.6 *)
 
-type ident = string
+type symbol = S of string | Sprover of string
+type index = Idxnumeral of BigInt.t | Idxsymbol of symbol
+type identifier = Isymbol of symbol | Iindexedsymbol of symbol * index list
 
-type typ = string
+type sort =
+  | Sstring
+  | Sreglan
+  | Sint
+  | Sreal
+  | Sroundingmode
+  | Sbool
+  | Sbitvec of int
+  | Sfloatingpoint of int * int
+  | Sarray of sort * sort
+  | Ssimple of identifier
+  | Smultiple of identifier * sort list
+
+type constant_bv = {
+  bv_value : BigInt.t;
+  bv_length : int;
+  bv_verbatim : string;
+}
+
+type constant_real = {
+  real_neg : bool; (* true for negative real numbers *)
+  real_int : string;
+  real_frac : string;
+}
+
+type constant_float =
+  | Fplusinfinity
+  | Fminusinfinity
+  | Fpluszero
+  | Fminuszero
+  | Fnan
+  | Fnumber of { sign : constant_bv; exp : constant_bv; mant : constant_bv }
+
+type constant =
+  | Cint of BigInt.t
+  | Cdecimal of constant_real
+  | Cfraction of constant_real * constant_real
+  | Cbitvector of constant_bv
+  | Cfloat of constant_float
+  | Cbool of bool
+  | Cstring of string
+
+type qual_identifier = Qident of identifier | Qannotident of identifier * sort
 
 type term =
-  | Tconst of model_const
-  | Tvar of ident
-  | Typed_var of typ * ident
-  | Tapply of (string * term list)
-  | Tarray of array
+  | Tconst of constant
+  | Tvar of qual_identifier
+  | Tapply of qual_identifier * term list
   | Tite of term * term * term
-  | Tlet of (string * term) list * term
-  | Tto_array of term
+  | Tarray of sort * sort * array_elements
   | Tunparsed of string
 
-and array =
-  | Avar of ident (* Used by let-bindings only *)
-  | Aconst of term
-  | Astore of array * term * term
+and var_binding = symbol * term
+and array_elements = { array_indices : (term * term) list; array_others : term }
 
-type definition =
-  | Dfunction of (ident * typ option) list * typ option * term
-  | Dterm of term (* corresponding value of a term *)
-  | Dnoelement
+type function_def = (symbol * sort) list * sort * term
 
-val add_element: (string * definition) option ->
-  definition Mstr.t -> definition Mstr.t
-
-val substitute: (string * term) list -> term -> term
-(** Substitute variables by terms. Used for let bindings of z3 *)
-
-val print_term : term Pp.pp
-val print_definition : definition Pp.pp
+val sort_equal : sort -> sort -> bool
+val print_index : Format.formatter -> index -> unit
+val print_identifier : Format.formatter -> identifier -> unit
+val print_sort : Format.formatter -> sort -> unit
+val print_constant : Format.formatter -> constant -> unit
+val print_qualified_identifier : Format.formatter -> qual_identifier -> unit
+val print_term : Format.formatter -> term -> unit
+val print_var_binding : Format.formatter -> var_binding -> unit
+val print_array : Format.formatter -> array_elements -> unit
+val print_function_def : Format.formatter -> function_def -> unit

@@ -1,0 +1,21 @@
+module M
+
+  use int.Int
+
+  type r = <range -42 42>
+
+  function f (x : r) : bool =
+    x = (0 : r)
+
+  predicate in_range (x : int) =
+    r'minInt <= x <= r'maxInt
+
+end
+
+module N
+
+  type r = <range -42 42>
+
+  clone M with type r
+
+end

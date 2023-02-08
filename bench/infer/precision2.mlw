@@ -1,0 +1,16 @@
+
+
+use int.Int
+
+val ref d : int
+
+let e [@bddinfer] ()
+  diverges
+  requires { d = 0 }
+  =
+  while True
+  do
+    d <- d+1;
+
+    if 0 < d then d <- 0
+  done

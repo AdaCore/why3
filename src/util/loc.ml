@@ -29,12 +29,15 @@ let transfer_loc lb_from lb_to =
 To reduce memory consumption, a pair (line,col) is stored in a single
    int using
 
-     (line << 12) | col
+     (line << bits) | col
 
-   This will thus support column numbers up to 4095 and line numbers up
-   to 2^18 on 32-bit architecture.
+  On 32-bits architecture, bits is 12. This will thus support column
+   numbers up to 4095 and line numbers up to 2^19
 
-The file names are also hashed to ensure an optimal sharing
+  On 64-bits architecture, bits is 16. This will thus support column
+   numbers up to 65535 and line numbers up to 2^47
+
+  The file names are also hashed to ensure an optimal sharing
 *)
 
 module FileTags = struct
@@ -68,11 +71,20 @@ type position = {
     pos_end : int (* compressed line/col *);
   }
 
+let bits_col =
+  if Sys.word_size = 32 then 12 else
+  if Sys.word_size = 64 then 16 else
+    failwith "word size should be 32 or 64"
+
+let mask_col = (1 lsl bits_col) - 1
+
+let max_line = (1 lsl (Sys.word_size - bits_col - 1)) - 1
+
 let get p =
   let f = FileTags.tag_to_file p.pos_file_tag in
   let b = p.pos_start in
   let e = p.pos_end in
-  (f, b lsr 12, b land 0x0FFF, e lsr 12, e land 0x0FFF)
+  (f, b lsr bits_col, b land mask_col, e lsr bits_col, e land mask_col)
 
 let sexp_of_expanded_position _ = assert false  [@@warning "-32"]
 (* default value if the line below does not produce anything, i.e.,
@@ -143,36 +155,34 @@ let warning ?loc p =
 let warning_emitted = ref false
 
 let user_position f bl bc el ec =
-  let not_64_bits = Sys.int_size < 63 in
-  (* Do not fail for 64-bits architectures *)
-  if bl < 0 || (not_64_bits && bl >= 0x4_0000) then
+  if bl < 0 || bl > max_line then
     failwith ("Loc.user_position: start line number `" ^
                 string_of_int bl ^ "` out of bounds");
   if bc < 0 then
     failwith ("Loc.user_position: start char number `" ^
                 string_of_int bc ^ "` out of bounds");
-  (* bc >= 0x1000 may happen with SPARK, but we do not want to display it *)
-  (* if bc >= 0x1000 && not !warning_emitted then
+  (* bc >= mask_col may happen with SPARK, but we do not want to display it *)
+  if bc > mask_col && not !warning_emitted then
     begin
       warning "Loc.user_position: start char number `%d` overflows on next line" bc;
       warning_emitted := true;
-    end; *)
-  if el < 0 || (not_64_bits && el >= 0x40000) then
+    end;
+  if el < 0 || el > max_line then
     failwith ("Loc.user_position: end line number `" ^
                 string_of_int el ^ "` out of bounds");
   if ec < 0 then
     failwith ("Loc.user_position: end char number `" ^
                 string_of_int ec ^ "` out of bounds");
-  (* ec >= 0x1000 may happen with SPARK, but we do not want to display it *)
-  (* if ec >= 0x1000  && not !warning_emitted then
+  (* ec >= mask_col may happen with SPARK, but we do not want to display it *)
+  if ec >= mask_col  && not !warning_emitted then
     begin
       warning "Loc.user_position: end char number `%d` overflows on next line" ec;
       warning_emitted := true;
-    end; *)
+    end;
   let tag = FileTags.get_file_tag f in
   { pos_file_tag = tag;
-    pos_start = (bl lsl 12) lor bc;
-    pos_end = (el lsl 12) lor ec }
+    pos_start = (bl lsl bits_col) lor bc;
+    pos_end = (el lsl bits_col) lor ec }
 
 
 let extract (b,e) =

@@ -1,0 +1,13 @@
+module Ce_int32
+
+  use mach.int.Int32
+
+  type t = { mutable c : int32 }
+
+  let dummy_update (r : t)
+    requires { int32'int r.c = 22}
+    ensures { int32'int r.c = 42} =
+    r.c <- (42:int32);
+    r.c <- r.c + r.c;
+
+end

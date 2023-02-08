@@ -171,14 +171,14 @@ let rs_dup ({rs_name = {id_loc = loc}} as s) c =
       check_effects ?loc c;
       mk_rs id c RLlemma None
 
-let create_projection s v =
+let create_projection proj s v =
   let id = id_clone v.pv_vs.vs_name in
   let eff = eff_ghostify v.pv_ghost eff_empty in
   let tyl = List.map ity_var s.its_ts.ts_args in
   let rgl = List.map ity_reg s.its_regions in
   let ity = ity_app s tyl rgl in
   let arg = create_pvsymbol (id_fresh "arg") ity in
-  let ls = create_fsymbol id [arg.pv_vs.vs_ty] v.pv_vs.vs_ty in
+  let ls = create_fsymbol ~proj id [arg.pv_vs.vs_ty] v.pv_vs.vs_ty in
   let q = make_post (fs_app ls [t_var arg.pv_vs] v.pv_vs.vs_ty) in
   let c = create_cty [arg] [] [q] Mxs.empty Mpv.empty eff v.pv_ity in
   mk_rs ls.ls_name c (RLls ls) (Some v)

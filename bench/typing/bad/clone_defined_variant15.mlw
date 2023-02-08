@@ -1,0 +1,19 @@
+module M
+
+  type t =
+    | C int int
+    | D int int
+
+end
+
+module N
+
+  type t =
+    | D int int
+    | C int int
+
+  (* A bit dangerous ?*)
+  clone M with
+    type t
+
+end

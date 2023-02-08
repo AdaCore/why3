@@ -1,0 +1,13 @@
+module M
+
+  type t 'a = C 'a
+
+end
+
+module N
+
+  type t 'b = C 'b
+
+  clone M with type t
+
+end

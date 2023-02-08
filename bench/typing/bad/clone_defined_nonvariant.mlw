@@ -1,0 +1,14 @@
+module M
+
+  type t = { f : int; g : int }
+
+end
+
+module N
+
+  type t = { mutable f : int; g : int }
+
+  clone M with
+    type t
+
+end

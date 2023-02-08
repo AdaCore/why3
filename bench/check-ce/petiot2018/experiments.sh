@@ -99,7 +99,7 @@ why3provece () {
 # Run an experiment with name $1. The program modifications are read from stdin.
 # Stdout and stderr of the calls to why3 goes to stdout and will be piped to
 # outfiles in under $outbase/, progress goes to stderr.
-echo "Running experiments for prover $prover"
+echo "# Petiot (2018) experiments for prover $prover:"
 experiment () {
     experiment=$1
     echo -n "Experiment $experiment:" >&2
@@ -168,7 +168,7 @@ for filebase in "${filebases[@]}"; do
   out_file="$outbase/${filebase}.out"
   str_oracle=$(tr -d ' \n' < "${oracle_file}")
   str_out=$(tr -d ' \n' < "${out_file}")
-  echo "Checking differences between output and oracle for ${filebase}"
+  printf "Check diffs for ${filebase}... "
   if [ "$str_oracle" = "$str_out" ] ; then
     echo "OK"
   else
@@ -189,7 +189,7 @@ for filebase in "${filebases[@]}"; do
 done
 
 if [ "$success" = true ]; then
-    echo "Petiot (2018) experiments with prover $prover: success"
+    echo "experiments with prover $prover: success"
     exit 0
 else
     printf "\nPetiot (2018) experiments with prover $prover: failed\n$failed\n"

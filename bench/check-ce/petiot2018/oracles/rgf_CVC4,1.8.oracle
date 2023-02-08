@@ -154,12 +154,17 @@ The program does not comply to the verification goal, for example during the
 File rgf-R1.mlw:
   Line 24:
     Execution of main function `f` with env:
-      a = {length= 2; elts= [|0 -> (-1); 1 -> (-1); _ -> 0|]}
+      a = {length= 2;
+           elts=
+           fun (x:int) -> if x = 0 then (- 1) else if x = 1 then (- 1) else 0}
       zero = 0
       one = 1
   Line 32:
     Normal execution of function `length` with args:
-      arg = {length= 2; elts= [|0 -> (-1); 1 -> (-1); _ -> 0|]}
+      arg = {length= 2;
+             elts=
+             fun (x:int) ->
+              if x = 0 then (- 1) else if x = 1 then (- 1) else 0}
     Normal execution of function `(-)` with args:
       x = 2
       y = 1
@@ -214,14 +219,19 @@ File int.mlw:
 File rgf-R1.mlw:
   Line 36:
     Normal execution of function `([])` with args:
-      a = {length= 2; elts= [|0 -> (-1); 1 -> (-1); _ -> 0|]}
+      a = {length= 2;
+           elts=
+           fun (x:int) -> if x = 0 then (- 1) else if x = 1 then (- 1) else 0}
       i = 0
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 2; elts= [|0 -> (-1); 1 -> (-1); _ -> 0|]}
+      arg = {length= 2;
+             elts=
+             fun (x:int) ->
+              if x = 0 then (- 1) else if x = 1 then (- 1) else 0}
     Normal execution of function `(@)` with args:
-      u = [|0 -> (-1); 1 -> (-1); _ -> 0|]
+      u = fun (x:int) -> if x = 0 then (- 1) else if x = 1 then (- 1) else 0
       u = 0
 File rgf-R1.mlw:
   Line 36:
@@ -234,20 +244,25 @@ File lib.mlw:
 File rgf-R1.mlw:
   Line 36:
     Normal execution of function `([])` with args:
-      a = {length= 2; elts= [|0 -> (-1); 1 -> (-1); _ -> 0|]}
+      a = {length= 2;
+           elts=
+           fun (x:int) -> if x = 0 then (- 1) else if x = 1 then (- 1) else 0}
       i = 1
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 2; elts= [|0 -> (-1); 1 -> (-1); _ -> 0|]}
+      arg = {length= 2;
+             elts=
+             fun (x:int) ->
+              if x = 0 then (- 1) else if x = 1 then (- 1) else 0}
     Normal execution of function `(@)` with args:
-      u = [|0 -> (-1); 1 -> (-1); _ -> 0|]
+      u = fun (x:int) -> if x = 0 then (- 1) else if x = 1 then (- 1) else 0
       u = 1
 File rgf-R1.mlw:
   Line 36:
     Normal execution of function `(<=)` with args:
-      x = (-1)
-      y = (-1)
+      x = (- 1)
+      y = (- 1)
     Normal execution of function `Tuple0` with args:
 Unknown location:
     Normal execution of function `Tuple0` with args:
@@ -275,19 +290,24 @@ File lib.mlw:
 File rgf-R1.mlw:
   Line 40:
     Normal execution of function `([])` with args:
-      a = {length= 2; elts= [|0 -> (-1); 1 -> (-1); _ -> 0|]}
+      a = {length= 2;
+           elts=
+           fun (x:int) -> if x = 0 then (- 1) else if x = 1 then (- 1) else 0}
       i = 1
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 2; elts= [|0 -> (-1); 1 -> (-1); _ -> 0|]}
+      arg = {length= 2;
+             elts=
+             fun (x:int) ->
+              if x = 0 then (- 1) else if x = 1 then (- 1) else 0}
     Normal execution of function `(@)` with args:
-      u = [|0 -> (-1); 1 -> (-1); _ -> 0|]
+      u = fun (x:int) -> if x = 0 then (- 1) else if x = 1 then (- 1) else 0
       u = 1
 File rgf-R1.mlw:
   Line 40:
     Normal execution of function `(+)` with args:
-      _ = (-1)
+      _ = (- 1)
       _ = 1
     Normal execution of function `(!)` with args:
       r = {contents= 1}
@@ -298,13 +318,18 @@ File lib.mlw:
 File rgf-R1.mlw:
   Line 40:
     Normal execution of function `([]<-)` with args:
-      a = {length= 2; elts= [|0 -> (-1); 1 -> (-1); _ -> 0|]}
+      a = {length= 2;
+           elts=
+           fun (x:int) -> if x = 0 then (- 1) else if x = 1 then (- 1) else 0}
       i = 1
       v = 0
 File lib.mlw:
   Line 48:
     Normal execution of function `elts` with args:
-      arg = {length= 2; elts= [|0 -> (-1); 1 -> (-1); _ -> 0|]}
+      arg = {length= 2;
+             elts=
+             fun (x:int) ->
+              if x = 0 then (- 1) else if x = 1 then (- 1) else 0}
 File rgf-R1.mlw:
   Line 41:
     Normal execution of function `(!)` with args:
@@ -319,15 +344,21 @@ File rgf-R1.mlw:
       a = {length= 2;
            elts=
            (fun j -> if j = i then v
-              else elts1 j) with i = 1, v = 0, elts1 = [|0 -> (-1);
-                                                       1 -> (-1); _ -> 0|]}
+              else elts1 j) with i = 1, v = 0, elts1 = fun (x:int) ->
+                                                        if x = 0 then (- 1)
+                                                        else if x = 1
+                                                             then (- 1)
+                                                             else 0}
       i = 1
     Property failure at precondition of `g` with:
       a = {length= 2;
            elts=
            (fun j -> if j = i then v
-              else elts1 j) with i = 1, v = 0, elts1 = [|0 -> (-1);
-                                                       1 -> (-1); _ -> 0|]}
+              else elts1 j) with i = 1, v = 0, elts1 = fun (x:int) ->
+                                                        if x = 0 then (- 1)
+                                                        else if x = 1
+                                                             then (- 1)
+                                                             else 0}
       i = 1
 
 File "bench/check-ce/petiot2018/experiments/rgf-R1.mlw", line 41, characters 2-8:
@@ -352,12 +383,12 @@ The program does not comply to the verification goal, for example during the
 File rgf-R4.mlw:
   Line 24:
     Execution of main function `f` with env:
-      a = {length= 2; elts= [|; _ -> 0|]}
+      a = {length= 2; elts= fun (x:int) -> 0}
       zero = 0
       one = 1
   Line 32:
     Normal execution of function `length` with args:
-      arg = {length= 2; elts= [|; _ -> 0|]}
+      arg = {length= 2; elts= fun (x:int) -> 0}
     Normal execution of function `(-)` with args:
       x = 2
       y = 1
@@ -412,14 +443,14 @@ File int.mlw:
 File rgf-R4.mlw:
   Line 36:
     Normal execution of function `([])` with args:
-      a = {length= 2; elts= [|; _ -> 0|]}
+      a = {length= 2; elts= fun (x:int) -> 0}
       i = 0
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 2; elts= [|; _ -> 0|]}
+      arg = {length= 2; elts= fun (x:int) -> 0}
     Normal execution of function `(@)` with args:
-      u = [|; _ -> 0|]
+      u = fun (x:int) -> 0
       u = 0
 File rgf-R4.mlw:
   Line 36:
@@ -432,14 +463,14 @@ File lib.mlw:
 File rgf-R4.mlw:
   Line 36:
     Normal execution of function `([])` with args:
-      a = {length= 2; elts= [|; _ -> 0|]}
+      a = {length= 2; elts= fun (x:int) -> 0}
       i = 1
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 2; elts= [|; _ -> 0|]}
+      arg = {length= 2; elts= fun (x:int) -> 0}
     Normal execution of function `(@)` with args:
-      u = [|; _ -> 0|]
+      u = fun (x:int) -> 0
       u = 1
 File rgf-R4.mlw:
   Line 36:
@@ -473,14 +504,14 @@ File lib.mlw:
 File rgf-R4.mlw:
   Line 40:
     Normal execution of function `([])` with args:
-      a = {length= 2; elts= [|; _ -> 0|]}
+      a = {length= 2; elts= fun (x:int) -> 0}
       i = 1
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 2; elts= [|; _ -> 0|]}
+      arg = {length= 2; elts= fun (x:int) -> 0}
     Normal execution of function `(@)` with args:
-      u = [|; _ -> 0|]
+      u = fun (x:int) -> 0
       u = 1
 File rgf-R4.mlw:
   Line 40:
@@ -496,13 +527,13 @@ File lib.mlw:
 File rgf-R4.mlw:
   Line 40:
     Normal execution of function `([]<-)` with args:
-      a = {length= 2; elts= [|; _ -> 0|]}
+      a = {length= 2; elts= fun (x:int) -> 0}
       i = 1
       v = 2
 File lib.mlw:
   Line 48:
     Normal execution of function `elts` with args:
-      arg = {length= 2; elts= [|; _ -> 0|]}
+      arg = {length= 2; elts= fun (x:int) -> 0}
 File rgf-R4.mlw:
   Line 41:
     Normal execution of function `(!)` with args:
@@ -517,13 +548,13 @@ File rgf-R4.mlw:
       a = {length= 2;
            elts=
            (fun j -> if j = i then v
-              else elts1 j) with i = 1, v = 2, elts1 = [|; _ -> 0|]}
+              else elts1 j) with i = 1, v = 2, elts1 = fun (x:int) -> 0}
       i = 1
     Property failure at precondition of `g` with:
       a = {length= 2;
            elts=
            (fun j -> if j = i then v
-              else elts1 j) with i = 1, v = 2, elts1 = [|; _ -> 0|]}
+              else elts1 j) with i = 1, v = 2, elts1 = fun (x:int) -> 0}
       i = 1
 
 File "bench/check-ce/petiot2018/experiments/rgf-R4.mlw", line 41, characters 2-8:

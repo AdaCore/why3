@@ -639,10 +639,11 @@ let cl_init m inst =
 
 let clone_ls cl ls =
   let constr = ls.ls_constr in
+  let proj = ls.ls_proj in
   let id = id_clone ls.ls_name in
   let at = List.map (clone_ty cl) ls.ls_args in
   let vt = Opt.map (clone_ty cl) ls.ls_value in
-  let ls' = create_lsymbol ~constr id at vt in
+  let ls' = create_lsymbol ~proj ~constr id at vt in
   cl.ls_table <- Mls.add ls ls' cl.ls_table;
   ls'
 
@@ -664,6 +665,23 @@ let clone_decl inst cl uc d = match d.d_node with
   | Dparam ls ->
       let d = create_param_decl (clone_ls cl ls) in
       add_pdecl ~warn:false ~vc:false uc (create_pure_decl d)
+  | Dlogic ((ls, _) :: _ as ldl) when Mls.mem ls inst.mi_ls ->
+      List.iter (fun (ls, _) ->
+          (* When one logic definition is instantiated, they must all be *)
+          if not (Mls.mem ls inst.mi_ls)
+          then raise (CannotInstantiate ls.ls_name);
+          let ls' = Mls.find ls inst.mi_ls in
+          cl.ls_table <- Mls.add ls ls' cl.ls_table) ldl;
+      List.iter (fun (ls, ld) ->
+          let ls' = Mls.find ls inst.mi_ls in
+          let ld' = match find_logic_definition uc.muc_theory.uc_known ls' with
+            | Some ld' -> ld'
+            | None -> raise (CannotInstantiate ls.ls_name) in
+          let lda = clone_fmla cl (ls_defn_axiom ld) in
+          let lda' = ls_defn_axiom ld' in
+          if not (t_equal lda lda')
+          then raise (CannotInstantiate ls.ls_name)) ldl;
+      uc
   | Dlogic ldl ->
       List.iter (fun (ls,_) ->
         if Mls.mem ls inst.mi_ls then raise (CannotInstantiate ls.ls_name);
@@ -672,6 +690,33 @@ let clone_decl inst cl uc d = match d.d_node with
         Opt.get (ls_defn_of_axiom (clone_fmla cl (ls_defn_axiom ld))) in
       let d = create_logic_decl (List.map get_logic ldl) in
       add_pdecl ~warn:false ~vc:false uc (create_pure_decl d)
+  | Dind (s, ((ls, _) :: _ as idl)) when Mls.mem ls inst.mi_ls ->
+      List.iter (fun (ls, _) ->
+          (* When one logic definition is instantiated, they must all be *)
+          if not (Mls.mem ls inst.mi_ls)
+          then raise (CannotInstantiate ls.ls_name);
+          let ls' = Mls.find ls inst.mi_ls in
+          cl.ls_table <- Mls.add ls ls' cl.ls_table) idl;
+      let ls' = Mls.find ls inst.mi_ls in
+      let s', idl' =
+        match (Mid.find ls'.ls_name uc.muc_theory.uc_known).d_node with
+        | Dind (s, idl) -> s, idl
+        | Dlogic _ | Dparam _ | Ddata _ -> raise (CannotInstantiate ls.ls_name)
+        | Dtype _ | Dprop _ -> assert false in
+      if s' <> s then raise (CannotInstantiate ls.ls_name);
+      List.iter (fun (ls, la) ->
+          let ls' = Mls.find ls inst.mi_ls in
+          let la' = List.assq ls' idl' in
+          let handle_case (pr, f) (pr', f') =
+            if pr.pr_name.id_string <> pr'.pr_name.id_string
+            then raise (CannotInstantiate ls.ls_name);
+            cl.pr_table <- Mpr.add pr pr' cl.pr_table;
+            let f = clone_fmla cl f in
+            if not (t_equal f f')
+            then raise (CannotInstantiate ls.ls_name) in
+          try List.iter2 handle_case la la' with
+          | Invalid_argument _ -> raise (CannotInstantiate ls.ls_name)) idl;
+      uc
   | Dind (s, idl) ->
       let lls = List.map (fun (ls,_) ->
         if Mls.mem ls inst.mi_ls then raise (CannotInstantiate ls.ls_name);
@@ -1006,16 +1051,41 @@ let clone_type_record cl s d s' d' =
   (* validate the refinement *)
   cl.ts_table <- Mts.add s.its_ts s' cl.ts_table
 
-let clone_type_decl inst cl tdl kn =
+let warn_constructors_mismatch loc d d' =
+  let warn_cons c c' =
+    if c.rs_name.id_string <> c'.rs_name.id_string
+    then Loc.warning ?loc
+        "trying to match constructor %a with %a, this is likely an error"
+        print_rs c print_rs c' in
+  if d.itd_its.its_ts.ts_name.id_string = d'.itd_its.its_ts.ts_name.id_string
+  then List.iter2 warn_cons d.itd_constructors d'.itd_constructors
+
+let save_special_ls cl d d' = match d.d_node, d'.d_node with
+  | Dparam ls, Dparam ls' | Dlogic [ls,_], Dlogic [ls',_] ->
+      cl.ls_table <- Mls.add ls ls' cl.ls_table;
+  | Dtype _, Dtype _ -> ()
+  | _ -> assert false
+
+let clone_type_decl loc inst cl tdl decl kn =
   let def =
     List.fold_left (fun m d -> Mits.add d.itd_its d m) Mits.empty tdl in
+  let cloned =
+    let cloned td =
+      let ts = td.itd_its.its_ts in
+      Mts.mem ts inst.mi_ts || Mts.mem ts inst.mi_ty in
+    match tdl with
+    | td :: tdl ->
+        let c = cloned td in
+        if List.exists (fun td -> cloned td <> c) tdl
+        then raise (CannotInstantiate td.itd_its.its_ts.ts_name);
+        c
+    | _ -> assert false in
   let htd = Hits.create 5 in
   let vcs = ref ([] : (itysymbol * term) list) in
   let rec visit alg ({its_ts = {ts_name = id} as ts} as s) d =
     if not (Hits.mem htd s) then
     let alg = Sits.add s alg in
     let id' = id_clone id in
-    let cloned = Mts.mem ts inst.mi_ts || Mts.mem ts inst.mi_ty in
     let conv_pj v = create_pvsymbol
       (id_clone v.pv_vs.vs_name) ~ghost:v.pv_ghost (conv_ity alg v.pv_ity) in
     let save_itd itd =
@@ -1024,14 +1094,29 @@ let clone_type_decl inst cl tdl kn =
       Hits.add htd s (Some itd) in
     (* alias *)
     if s.its_def <> NoDef then begin
-      if cloned then raise (CannotInstantiate id);
-      let itd = match s.its_def with
-        | Alias ty -> create_alias_decl id' ts.ts_args (conv_ity alg ty)
-        | Range ir -> create_range_decl id' ir
-        | Float ff -> create_float_decl id' ff
-        | NoDef -> assert false (* never *) in
-      cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
-      save_itd itd
+      if cloned then
+        let s' = match s.its_def, Mts.find_opt ts inst.mi_ts with
+          | Range ir, Some ({ its_def = Range ir'; _ } as s') ->
+              if not (Number.int_range_equal ir ir')
+              then raise (CannotInstantiate id);
+              s'
+          | Float ff, Some ({ its_def = Float ff'; _ } as s') ->
+              if not (Number.float_format_equal ff ff')
+              then raise (CannotInstantiate id);
+              s'
+          | _ -> raise (CannotInstantiate id) in
+        cl.ts_table <- Mts.add ts s' cl.ts_table;
+        let decl' = Mid.find s'.its_ts.ts_name kn in
+        List.iter2 (save_special_ls cl) decl.pd_pure decl'.pd_pure;
+        Hits.add htd s None
+      else
+        let itd = match s.its_def with
+          | Alias ty -> create_alias_decl id' ts.ts_args (conv_ity alg ty)
+          | Range ir -> create_range_decl id' ir
+          | Float ff -> create_float_decl id' ff
+          | NoDef -> assert false (* never *) in
+        cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
+        save_itd itd
     end else
     (* abstract *)
     if s.its_private && cloned then begin
@@ -1041,9 +1126,7 @@ let clone_type_decl inst cl tdl kn =
             raise (BadInstance (BadI_ty_arity ts));
           let pd' = Mid.find s'.its_ts.ts_name kn in
           let d' = match pd'.pd_node with
-            | PDtype [d'] -> d'
-            (* FIXME? we could refine with mutual types *)
-            | PDtype _ -> raise (BadInstance (BadI_ty_rec ts))
+            | PDtype dl -> List.find (fun d -> its_equal d.itd_its s') dl
             | PDlet _ | PDexn _ | PDpure -> assert false in
           clone_type_record cl s d s' d'; (* clone record fields *)
           (* generate and add VC for type invariant implication *)
@@ -1068,23 +1151,63 @@ let clone_type_decl inst cl tdl kn =
     (* variant *)
     if not s.its_mutable && d.itd_constructors <> [] &&
                             d.itd_invariant = [] then begin
-      if cloned then raise (CannotInstantiate id);
-      let conv_fd m fd =
-        let v = fd_of_rs fd in Mpv.add v (conv_pj v) m in
-      let fldm = List.fold_left conv_fd Mpv.empty d.itd_fields in
-      let conv_pj pj = match Mpv.find_opt pj fldm with
-        | Some pj' -> true, pj' | None -> false, conv_pj pj in
-      let conv_cs cs =
-        id_clone cs.rs_name, List.map conv_pj cs.rs_cty.cty_args in
-      let csl = List.map conv_cs d.itd_constructors in
-      match Mts.find_opt ts cl.ts_table with
-      | Some s' ->
-          let itd = create_rec_variant_decl s' csl in
-          save_itd itd
-      | None ->
-          let itd = create_plain_variant_decl id' ts.ts_args csl in
-          cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
-          save_itd itd
+      if cloned then begin
+        match Mts.find_opt ts inst.mi_ts with
+        | Some s' ->
+            let d' = find_its_defn kn s' in
+            (* make sure that d' is also a variant *)
+            if d'.itd_its.its_mutable || d'.itd_constructors = []
+               || d'.itd_invariant <> []
+            then raise (CannotInstantiate id);
+            (* with ity_match, used to check if the two types are equal modulo
+             * alpha-equivalence of type variables *)
+            let isb = its_match_args s (List.map ity_var s'.its_ts.ts_args) in
+            cl.ts_table <- Mts.add ts d'.itd_its cl.ts_table;
+            (try save_itd d' with
+             | Invalid_argument _ -> raise (CannotInstantiate id));
+            let eq_field f1 f2 =
+              if f1.pv_vs.vs_name.id_string <> f2.pv_vs.vs_name.id_string
+              then raise (CannotInstantiate id);
+              let ity = conv_ity alg f1.pv_ity in
+              let s = ity_match isb ity f2.pv_ity in
+              if s.isb_reg <> Mreg.empty then assert false; (* ? *)
+              if f1.pv_ghost <> f2.pv_ghost
+              then raise (CannotInstantiate id);
+              match Mpv.find_opt f1 cl.fd_table with
+              | Some v -> if not (pv_equal v f2)
+                          then raise (CannotInstantiate id)
+              | None -> () in
+            let eq_proj rs1 rs2 =
+              let f1 = Opt.get rs1.rs_field in
+              let f2 = Opt.get rs2.rs_field in
+              eq_field f1 f2 in
+            let eq_cons cs1 cs2 =
+              if cs1.rs_name.id_string <> cs2.rs_name.id_string
+              then raise (CannotInstantiate id);
+              try List.iter2 eq_field cs1.rs_cty.cty_args cs2.rs_cty.cty_args with
+              | Invalid_argument _ -> raise (CannotInstantiate id) in
+            List.iter2 eq_proj d.itd_fields d'.itd_fields;
+            List.iter2 eq_cons d.itd_constructors d'.itd_constructors;
+            warn_constructors_mismatch loc d d';
+            Hits.replace htd s None
+        | None -> raise (CannotInstantiate id)
+      end else
+        let conv_fd m fd =
+          let v = fd_of_rs fd in Mpv.add v (conv_pj v) m in
+        let fldm = List.fold_left conv_fd Mpv.empty d.itd_fields in
+        let conv_pj pj = match Mpv.find_opt pj fldm with
+          | Some pj' -> true, pj' | None -> false, conv_pj pj in
+        let conv_cs cs =
+          id_clone cs.rs_name, List.map conv_pj cs.rs_cty.cty_args in
+        let csl = List.map conv_cs d.itd_constructors in
+        match Mts.find_opt ts cl.ts_table with
+        | Some s' ->
+            let itd = create_rec_variant_decl s' csl in
+            save_itd itd
+        | None ->
+            let itd = create_plain_variant_decl id' ts.ts_args csl in
+            cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
+            save_itd itd
     end else begin
     (* flat record *)
       if cloned then raise (CannotInstantiate id);
@@ -1143,17 +1266,12 @@ let clone_pdecl loc inst cl uc d = match d.pd_node with
       let add_e spv e = Spv.union spv e.e_effect.eff_reads in
       let add_d spv d = Opt.fold add_e spv d.itd_witness in
       freeze_foreign cl (List.fold_left add_d Spv.empty tdl);
-      let ndl, vcl = clone_type_decl inst cl tdl uc.muc_known in
+      let ndl, vcl = clone_type_decl loc inst cl tdl d uc.muc_known in
       let uc = List.fold_left add_vc uc vcl in
       let dl = if ndl <> [] then create_type_decl ndl else [] in
-      let save_special_ls d d' = match d.d_node, d'.d_node with
-        | Dparam ls, Dparam ls' | Dlogic [ls,_], Dlogic [ls',_] ->
-            cl.ls_table <- Mls.add ls ls' cl.ls_table;
-        | Dtype _, Dtype _ -> ()
-        | _ -> assert false in
       begin match tdl, dl with
       | [{itd_its = {its_def = (Range _|Float _)}}], [d'] ->
-          List.iter2 save_special_ls d.pd_pure d'.pd_pure
+          List.iter2 (save_special_ls cl) d.pd_pure d'.pd_pure
       | _ -> () end;
       let add uc d = add_pdecl ~warn:false ~vc:false uc d in
       List.fold_left add uc dl

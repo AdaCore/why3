@@ -73,32 +73,28 @@ File if_assign.mlw:
     result = {contents= 0}
     x = {contents= 0}
   Line 15:
-    a = 2
-    a = 2
+    a = 0
+    a = 0
     Execution of main function `fTest1` with env:
       x = {contents= 0}
-      a = 2
+      a = 0
       zero = 0
       one = 1
   Line 18:
     Normal execution of function `(=)` with args:
-      x = 2
+      x = 0
       y = 0
-  Line 21:
-    Normal execution of function `(:=)` with args:
-      r = {contents= 0}
-      v = 18
   Line 22:
     Normal execution of function `(!)` with args:
-      r = {contents= 18}
+      r = {contents= 42}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 18}
+      arg = {contents= 42}
 File if_assign.mlw:
   Line 16:
     Property failure at postcondition of `fTest1` with:
-      result = 18
+      result = 42
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC

@@ -50,7 +50,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `test2'goal1` cannot be evaluated):
 File int_overflow.mlw:
   Line 14:
-    x = 0
+    x : int = 0
 
 File "bench/check-ce/int_overflow.mlw", line 19, characters 43-53:
 Goal test_overflow.
@@ -116,14 +116,14 @@ File int.mlw:
     one = 1
 File int_overflow.mlw:
   Line 30:
-    x = (-65536)
-    y = (-1)
+    x = (- 65536)
+    y = (- 1)
   Line 29:
-    x = (-65536)
-    y = (-1)
+    x = (- 65536)
+    y = (- 1)
     Execution of main function `test_overflow_int16'goal` with env:
-      y = (-1)
-      x = (-65536)
+      y = (- 1)
+      x = (- 65536)
       zero = 0
       one = 1
 Unknown location:
@@ -131,8 +131,8 @@ Unknown location:
 File int_overflow.mlw:
   Line 31:
     Property failure at postcondition of `test_overflow_int16'goal` with:
-      y = (-1)
-      x = (-65536)
+      y = (- 1)
+      x = (- 65536)
 
 <check-ce-categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -220,14 +220,14 @@ File int.mlw:
     one = 1
 File int_overflow.mlw:
   Line 48:
-    x = (-2147483648)
-    y = (-1)
+    x = (- 2147483648)
+    y = (- 1)
   Line 47:
-    x = (-2147483648)
-    y = (-1)
+    x = (- 2147483648)
+    y = (- 1)
     Execution of main function `test_overflow_int32'goal` with env:
-      y = (-1)
-      x = (-2147483648)
+      y = (- 1)
+      x = (- 2147483648)
       zero = 0
       one = 1
 Unknown location:
@@ -235,8 +235,8 @@ Unknown location:
 File int_overflow.mlw:
   Line 49:
     Property failure at postcondition of `test_overflow_int32'goal` with:
-      y = (-1)
-      x = (-2147483648)
+      y = (- 1)
+      x = (- 2147483648)
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC

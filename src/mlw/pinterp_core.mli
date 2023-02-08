@@ -39,8 +39,11 @@ module rec Value : sig
   }
   and field
   and value_desc =
-    | Vconstr of Expr.rsymbol * Expr.rsymbol list * field list
-    (** A record or variant *)
+    | Vconstr of Expr.rsymbol option * Expr.rsymbol list * field list
+    (** A constructor value (record or variant).
+        The first argument is optional to handle records without constructors
+        (e.g. when a type has an invariant, the constructor is not available
+        to avoid creating an object that does not respect the invariant). *)
     | Vnum of BigInt.t
     (** Any integer number *)
     | Vreal of Big_real.real
@@ -49,15 +52,17 @@ module rec Value : sig
     | Vstring of string
     | Vbool of bool
     | Vproj of Term.lsymbol * value
-    (** [Vproj (ls, v)] is af model projection, i.e.
-        {!const:Model_parser.model_value.Proj} originating from an meta
-        [model_projection]). The only valid operation is applying [ls],
-        resulting in [v]. *)
+    (** TODO/FIXME Was used to represent a model projection originating
+        from a meta [model_projection]).
+        Currently, projections are now handled using Vterm t with
+        t an epsilon term. *)
     | Varray of value array
     (** An array created in code *)
     | Vpurefun of Ty.ty (* type of the keys *) * value Mv.t * value
-    (** A pure, unary function is used to represent arrays from the prover
-        model/candidate counterexample. See {!type:Model_parser.model_array}. *)
+    (** TODO/FIXME Was used to represent arrays from the prover model.
+        Currently, arrays are now handled using Vterm t with
+        t a lambda term corresponding to the function defining the
+        mapping of array elements. *)
     | Vfun of value Term.Mvs.t (* closure values *) * Term.vsymbol * Expr.expr
     (** A function value *)
     | Vterm of Term.term
@@ -97,16 +102,14 @@ val num_value : Ity.ity -> BigInt.t -> value
 val float_value : Ity.ity -> big_float -> value
 val real_value : Big_real.real -> value
 
-val constr_value : Ity.ity -> Expr.rsymbol -> Expr.rsymbol list -> value list -> value
+val constr_value : Ity.ity -> Expr.rsymbol option -> Expr.rsymbol list -> value list -> value
 val purefun_value : result_ity:Ity.ity -> arg_ity:Ity.ity -> value Mv.t -> value -> value
 val unit_value : value
 
 val range_value : Ity.ity -> BigInt.t -> value
 (** Returns a range value, or raises [Incomplete] if the value is outside the range. *)
 
-val proj_value : Ity.ity -> Term.lsymbol -> value -> value option
-(** Returns a range value, or [None] if the type is a range, the value is
-   outside. *)
+val term_value : Ity.ity -> Term.term -> value
 
 (** {4 Snapshots}
 

@@ -1,0 +1,11 @@
+use int.Int
+
+val ref x : int
+
+val test (n:int) (ref a:int) : unit
+  writes { a }
+  ensures { a = old a + n }
+
+let main [@bddinfer] () =
+  x <- 42;
+  test 2 x

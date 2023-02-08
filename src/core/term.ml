@@ -46,6 +46,7 @@ type lsymbol = {
   ls_args   : ty list;
   ls_value  : ty option;
   ls_constr : int;
+  ls_proj   : bool;
 }
 
 module Lsym = MakeMSHW (struct
@@ -66,18 +67,23 @@ let check_constr constr _args value =
   if constr = 0 || (constr > 0 && value <> None)
   then constr else invalid_arg "Term.create_lsymbol"
 
-let create_lsymbol ?(constr=0) name args value = {
+let check_proj proj constr args value =
+  if not proj || (constr = 0  && value <> None && List.length args = 1)
+  then proj else invalid_arg "Term.create_lsymbol"
+
+let create_lsymbol ?(constr=0) ?(proj=false) name args value = {
   ls_name   = id_register name;
   ls_args   = args;
   ls_value  = value;
   ls_constr = check_constr constr args value;
+  ls_proj   = check_proj proj constr args value;
 }
 
-let create_fsymbol ?constr nm al vl =
-  create_lsymbol ?constr nm al (Some vl)
+let create_fsymbol ?constr ?proj nm al vl =
+  create_lsymbol ?constr ?proj nm al (Some vl)
 
 let create_psymbol nm al =
-  create_lsymbol ~constr:0 nm al None
+  create_lsymbol nm al None
 
 let ls_ty_freevars ls =
   let acc = oty_freevars Stv.empty ls.ls_value in
@@ -1050,6 +1056,14 @@ let t_pred_app pr t = t_equ (t_func_app pr t) t_bool_true
 let t_func_app_l fn tl = List.fold_left t_func_app fn tl
 let t_pred_app_l pr tl = t_equ (t_func_app_l pr tl) t_bool_true
 
+let to_prop t =
+  match t.t_ty with
+  | Some _ ->
+    if t_equal t t_bool_true then t_true
+    else if t_equal t t_bool_false then t_false
+    else t_attr_copy t (t_equ t t_bool_true)
+  | None -> t
+
 (** Term library *)
 
 (* generic map over types, symbols and variables *)
@@ -1089,8 +1103,8 @@ let rec t_gen_map fnT fnL m t =
         let u = Mvs.find_def v v m in
         ty_equal_check (fnT v.vs_ty) u.vs_ty;
         t_var u
-    | Tconst _ ->
-        t
+    | Tconst c ->
+        t_const c (fnT (Opt.get t.t_ty))
     | Tapp (fs, tl) ->
         t_app (fnL fs) (List.map fn tl) (Opt.map fnT t.t_ty)
     | Tif (f, t1, t2) ->
@@ -1194,6 +1208,24 @@ let rec t_app_fold fn acc t =
   let acc = t_fold_unsafe (t_app_fold fn) acc t in
   match t.t_node with
     | Tapp (ls,tl) -> fn acc ls (List.map t_type tl) t.t_ty
+    | _ -> acc
+
+(* Fold over pattern matching *)
+
+let rec t_case_fold fn acc t =
+  let acc = t_fold_unsafe (t_case_fold fn) acc t in
+  match t.t_node with
+    | Tcase({ t_ty = Some({ty_node = Tyapp (tys, tyl)})}, bl) ->
+       let error () = failwith "t_case_fold: compiled pattern matching required." in
+       let check_branch = function
+         | ({pat_node = Pwild}, _, _) -> ()
+         | ({pat_node = Papp (_, args)}, _, _) ->
+            List.iter (function {pat_node = Pvar _} -> () | _ -> error ()) args
+         | _ -> error ()
+       in
+       List.iter check_branch bl;
+       fn acc tys tyl t.t_ty
+    | Tcase(_, _) -> assert false
     | _ -> acc
 
 (* Type- and binding-safe traversal *)
@@ -1785,3 +1817,13 @@ module TermTF = struct
   let tr_fold fnT fnF = tr_fold (t_selecti fnT fnF)
   let tr_map_fold fnT fnF = tr_map_fold (t_selecti fnT fnF)
 end
+
+
+let term_size t =
+  let rec aux acc t =
+    let acc' = acc+1 in
+    assert (acc' > acc); (* to avoid integer overflow *)
+    t_fold_unsafe aux acc' t
+  in aux 0 t
+
+let term_branch_size (_,_,t) = term_size t

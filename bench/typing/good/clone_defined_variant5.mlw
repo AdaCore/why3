@@ -1,0 +1,16 @@
+module M
+
+  type t
+
+  type u = C t
+
+end
+
+module N
+
+  type t = N | D u
+  with u = C t
+
+  clone M with type t, type u
+
+end

@@ -1,0 +1,35 @@
+module M
+
+  type t 'a = Nil | Cons 'a (t 'a)
+
+  function map (f : 'a -> 'b) (xs : t 'a) : t 'b =
+    match xs with
+    | Nil -> Nil
+    | Cons x xs -> Cons (f x) (map f xs)
+    end
+
+end
+
+module N
+
+  type t 'a = N | C 'a (t 'a)
+
+  (* A bit strange *)
+  clone M with type t
+
+end
+
+module O
+
+  type t = { f : int; g : string }
+
+end
+
+module P
+
+  type t = Cons (f : int) (g : string)
+
+  (* even stranger *)
+  clone O with type t
+
+end

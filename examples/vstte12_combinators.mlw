@@ -6,7 +6,6 @@
    Combinators S and K *)
 
 module Combinators
-
   type term = S | K | App term term
 
   let rec predicate eq (x y : term)

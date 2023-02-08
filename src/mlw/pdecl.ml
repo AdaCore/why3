@@ -82,7 +82,7 @@ let create_plain_record_decl ~priv ~mut id args fdl invl witn =
   let fds = List.fold_left add_fd Mpv.empty fdl in
   let fdl = List.map snd fdl in
   let s = create_plain_record_itysymbol ~priv ~mut id args fds invl in
-  let pjl = List.map (create_projection s) fdl in
+  let pjl = List.map (create_projection (invl = [] && not priv) s) fdl in
   let csl = if priv then [] else if invl <> [] then
     [create_semi_constructor cid s fdl pjl invl] else
     [create_constructor ~constr:1 cid s fdl] in
@@ -107,7 +107,7 @@ let create_rec_record_decl s fdl =
   let cid = id_fresh ?loc:id.id_loc (id.id_string ^ "'mk") in
   List.iter (check_field (Stv.of_list s.its_ts.ts_args)) fdl;
   let cs = create_constructor ~constr:1 cid s fdl in
-  let pjl = List.map (create_projection s) fdl in
+  let pjl = List.map (create_projection true s) fdl in
   mk_itd s pjl [cs] [] None
 
 let create_variant_decl exn get_its csl =
@@ -128,7 +128,7 @@ let create_variant_decl exn get_its csl =
   (* and now we can create the type symbol and the constructors *)
   let s = get_its (List.map get_fds csl) and constr = List.length csl in
   let mk_cs (id, fdl) = create_constructor ~constr id s (List.map snd fdl) in
-  mk_itd s (List.map (create_projection s) pjl) (List.map mk_cs csl) [] None
+  mk_itd s (List.map (create_projection true s) pjl) (List.map mk_cs csl) [] None
 
 let create_plain_variant_decl id args csl =
   let exn = Invalid_argument "Pdecl.create_plain_variant_decl" in

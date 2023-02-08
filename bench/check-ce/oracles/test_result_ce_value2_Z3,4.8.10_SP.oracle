@@ -28,24 +28,24 @@ File test_result_ce_value2.mlw:
       contents = 0
     a = {contents= 0}
   Line 10:
-    x = (-1)
-    x = (-1)
+    x = (- 1)
+    x = (- 1)
     Execution of main function `test2` with env:
       a = {contents= 0}
-      x = (-1)
+      x = (- 1)
       zero = 0
       one = 1
   Line 12:
     (giant-step) execution of unimplemented function `id`
-      x = (-1)
-    a = {contents= (-1)}
+      x = (- 1)
+    a = {contents= (- 1)}
     result of `id` = 0
     Normal execution of function `(<)` with args:
       _ = 0
       _ = 10
   Line 13:
     Property failure at assertion with:
-      a = {contents= (-1)}
+      a = {contents= (- 1)}
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -126,30 +126,34 @@ File test_result_ce_value2.mlw:
       contents = 0
     a = {contents= 0}
   Line 17:
-    x = 40
-    x = 40
+    x = (- 1)
+    x = (- 1)
     Execution of main function `test3` with env:
       a = {contents= 0}
-      x = 40
+      x = (- 1)
       zero = 0
       one = 1
   Line 21:
     (giant-step) execution of unimplemented function `id`
-      x = 40
-    a = {contents= 40}
-    result of `id` = 100
+      x = (- 1)
+    a = {contents= (- 1)}
+    result of `id` = 0
     Normal execution of function `(<)` with args:
+      _ = 0
       _ = 100
-      _ = 100
-Unknown location:
-    Normal execution of function `False` with args:
-File test_result_ce_value2.mlw:
-  Line 24:
+    (giant-step) execution of unimplemented function `id`
+      x = (- 1)
+    a = {contents= 41}
+    result of `id` = 51
+    Normal execution of function `(>)` with args:
+      x = 51
+      y = 50
+  Line 22:
     Normal execution of function `contents` with args:
-      arg = {contents= 40}
+      arg = {contents= 41}
     Normal execution of function `(+)` with args:
-      _ = 40
-      _ = 2
+      _ = 41
+      _ = 1
   Line 18:
     Property failure at postcondition of `test3` with:
       a = {contents= 42}

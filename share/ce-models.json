@@ -1,0 +1,775 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Model_parser.json_model",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "filename": {
+                "type": "string"
+            },
+            "model": {
+                "$comment": "list of counterexample model values, sorted by file and line number",
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "is_vc_line": {
+                            "$comment": "true if the current line corresponds to the source code element from which the VC originates",
+                            "type": "boolean"
+                        },
+                        "line": {
+                            "type": "string"
+                        },
+                        "model_elements": {
+                            "$comment": "see src/core/model_parser.mli for a description of the model_element type",
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "attrs": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "kind": {
+                                        "type": "string"
+                                    },
+                                    "location": {
+                                        "$ref": "#/$defs/location"
+                                    },
+                                    "lsymbol": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "attrs": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "loc": {
+                                                "$ref": "#/$defs/location"
+                                            }
+                                        }
+                                    },
+                                    "value": {
+                                        "type": "object",
+                                        "properties": {
+                                            "value_concrete_term": {
+                                                "$ref": "#/$defs/concrete_term"
+                                            },
+                                            "value_term": {
+                                                "$ref": "#/$defs/term"
+                                            },
+                                            "value_type": {
+                                                "$ref": "#/$defs/type"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "location": {
+            "oneOf": [
+                {
+                    "type": "string",
+                    "pattern": "^NO_LOC$"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "file-name": {
+                            "type": "string"
+                        },
+                        "start-line": {
+                            "type": "number"
+                        },
+                        "start-char": {
+                            "type": "number"
+                        },
+                        "end-line": {
+                            "type": "number"
+                        },
+                        "end-char": {
+                            "type": "number"
+                        }
+                    }
+                }
+            ]
+        },
+        "type": {
+            "oneOf": [
+                {
+                    "type": "null"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tyvar": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["Tyvar"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tyapp": {
+                            "type": "object",
+                            "properties": {
+                                "ty_symbol": {
+                                    "type": "string"
+                                },
+                                "ty_args": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#"
+                                    }
+                                }
+                            },
+                            "required": ["ty_symbol","ty_args"]
+                        }
+                    },
+                    "required": ["Tyapp"]
+                }
+            ]
+        },
+        "vsymbol": {
+            "type": "object",
+            "properties": {
+                "vs_name": {
+                    "type": "string"
+                },
+                "vs_type": {
+                    "$ref": "#/$defs/type"
+                }
+            },
+            "required": ["vs_name","vs_type"]
+        },
+        "term": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tvar": {
+                            "$ref": "#/$defs/vsymbol"
+                        }
+                    },
+                    "required": ["Tvar"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tconst": {
+                            "type": "object",
+                            "properties": {
+                                "const_type": {
+                                    "type": "string"
+                                },
+                                "const_value": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["const_type","const_value"]
+                        }
+                    },
+                    "required": ["Tconst"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tapp": {
+                            "type": "object",
+                            "properties": {
+                                "app_ls": {
+                                    "type": "string"
+                                },
+                                "app_args": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#"
+                                    }
+                                }
+                            },
+                            "required": ["app_ls","app_args"]
+                        }
+                    },
+                    "required": ["Tapp"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tif": {
+                            "type": "object",
+                            "properties": {
+                                "if": {
+                                    "$ref": "#"
+                                },
+                                "then": {
+                                    "$ref": "#"
+                                },
+                                "else": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["if","then","else"]
+                        }
+                    },
+                    "required": ["Tif"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Teps": {
+                            "type": "object",
+                            "properties": {
+                                "eps_vs": {
+                                    "$ref": "#/$defs/vsymbol"
+                                },
+                                "eps_t": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["eps_vs","eps_t"]
+                        }
+                    },
+                    "required": ["Teps"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tfun": {
+                            "type": "object",
+                            "properties": {
+                                "fun_args": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/$defs/vsymbol"
+                                    }
+                                },
+                                "fun_body": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["fun_args","fun_body"]
+                        }
+                    },
+                    "required": ["Tfun"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tquant": {
+                            "type": "object",
+                            "properties": {
+                                "quant": {
+                                    "type": "string"
+                                },
+                                "quant_vs": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/$defs/vsymbol"
+                                    }
+                                },
+                                "quant_t": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["quant","quant_vs","quant_t"]
+                        }
+                    },
+                    "required": ["Tquant"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tbinop": {
+                            "type": "object",
+                            "properties": {
+                                "binop": {
+                                    "type": "string"
+                                },
+                                "binop_t1": {
+                                    "$ref": "#"
+                                },
+                                "binop_t2": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["binop","binop_t1","binop_t2"]
+                        }
+                    },
+                    "required": ["Tbinop"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tnot": {
+                            "$ref": "#"
+                        }
+                    },
+                    "required": ["Tnot"]
+                },
+                {
+                    "type": "string",
+                    "pattern": "^Ttrue$"
+                },
+                {
+                    "type": "string",
+                    "pattern": "^Tfalse$"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tlet": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["Tlet"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "Tcase": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["Tcase"]
+                }
+            ]
+        },
+        "concrete_term": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "pattern": "^Var$"
+                        },
+                        "val": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["type","val"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "pattern": "^Boolean$"
+                        },
+                        "val": {
+                            "type": "boolean"
+                        }
+                    },
+                    "required": ["type","val"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "pattern": "^String$"
+                        },
+                        "val": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["type","val"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "pattern": "^Integer$"
+                        },
+                        "val": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["type","val"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "pattern": "^Real$"
+                        },
+                        "val": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["type","val"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "pattern": "^BitVector$"
+                        },
+                        "val": {
+                            "type": "object",
+                            "properties": {
+                                "bv_binary": {
+                                    "type": "string"
+                                },
+                                "bv_int": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "required": ["type","val"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "pattern": "^Fraction$"
+                        },
+                        "val": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["type","val"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "pattern": "^Float$"
+                        },
+                        "val": {
+                            "oneOf": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "float_type": {
+                                            "type": "string",
+                                            "pattern": "^Infinity"
+                                        }
+                                    },
+                                    "required": ["float_type"]
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "float_type": {
+                                            "type": "string",
+                                            "pattern": "^Plus_zero"
+                                        }
+                                    },
+                                    "required": ["float_type"]
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "float_type": {
+                                            "type": "string",
+                                            "pattern": "^Minus_zero"
+                                        }
+                                    },
+                                    "required": ["float_type"]
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "float_type": {
+                                            "type": "string",
+                                            "pattern": "^NaN"
+                                        }
+                                    },
+                                    "required": ["float_type"]
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "float_type": {
+                                            "type": "string",
+                                            "pattern": "^Float_value"
+                                        },
+                                        "sign": {
+                                            "type": "string"
+                                        },
+                                        "exp": {
+                                            "type": "string"
+                                        },
+                                        "mant": {
+                                            "type": "string"
+                                        },
+                                        "hex": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": ["float_type","sign","exp","mant","hex"]
+                                }
+                            ]
+                        }
+                    },
+                    "required": ["type","val"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "pattern": "^Apply$"
+                        },
+                        "val": {
+                            "type": "object",
+                            "properties": {
+                                "app_ls": {
+                                    "type": "string"
+                                },
+                                "app_args": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#"
+                                    }
+                                }
+                            },
+                            "required": ["app_ls","app_args"]
+                        }
+                    },
+                    "required": ["type","val"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "pattern": "^If$"
+                        },
+                        "val": {
+                            "type": "object",
+                            "properties": {
+                                "if": {
+                                    "$ref": "#"
+                                },
+                                "then": {
+                                    "$ref": "#"
+                                },
+                                "else": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["if","then","else"]
+                        }
+                    },
+                    "required": ["type","val"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "pattern": "^Epsilon$"
+                        },
+                        "val": {
+                            "type": "object",
+                            "properties": {
+                                "eps_var": {
+                                    "type": "string"
+                                },
+                                "eps_t": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["eps_var","eps_t"]
+                        }
+                    },
+                    "required": ["type","val"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "pattern": "^Function$"
+                        },
+                        "val": {
+                            "type": "object",
+                            "properties": {
+                                "fun_args": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "fun_body": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["fun_args","fun_body"]
+                        }
+                    },
+                    "required": ["type","val"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "pattern": "^Quant$"
+                        },
+                        "val": {
+                            "type": "object",
+                            "properties": {
+                                "quant": {
+                                    "type": "string"
+                                },
+                                "quant_vars": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "quant_t": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["quant","quant_vars","quant_t"]
+                        }
+                    },
+                    "required": ["type","val"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "pattern": "^Binop$"
+                        },
+                        "val": {
+                            "type": "object",
+                            "properties": {
+                                "binop": {
+                                    "type": "string"
+                                },
+                                "binop_t1": {
+                                    "$ref": "#"
+                                },
+                                "binop_t2": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["binop","binop_t1","binop_t2"]
+                        }
+                    },
+                    "required": ["type","val"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "pattern": "^Not$"
+                        },
+                        "val": {
+                            "$ref": "#"
+                        }
+                    },
+                    "required": ["type","val"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "pattern": "^FunctionLiteral$"
+                        },
+                        "val": {
+                            "type": "object",
+                            "properties": {
+                                "funliteral_elts": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "indice": {
+                                                "$ref": "#"
+                                            },
+                                            "value": {
+                                                "$ref": "#"
+                                            }
+                                        },
+                                        "required": ["indice","value"]
+                                    }
+                                },
+                                "funliteral_others": {
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["array_elts","array_others"]
+                        }
+                    },
+                    "required": ["type","val"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "pattern": "^Record$"
+                        },
+                        "val": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "field": {
+                                        "type": "string"
+                                    },
+                                    "value":{
+                                        "$ref": "#"
+                                    }
+                                },
+                                "required": ["field","value"]
+                            }
+                        }
+                    },
+                    "required": ["type","val"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "pattern": "^Proj$"
+                        },
+                        "val": {
+                            "type": "object",
+                            "properties": {
+                                "proj_name": {
+                                    "type": "string"
+                                },
+                                "proj_value":{
+                                    "$ref": "#"
+                                }
+                            },
+                            "required": ["proj_name","proj_value"]
+                        }
+                    },
+                    "required": ["type","val"]
+                }
+            ]
+        }
+    }
+}

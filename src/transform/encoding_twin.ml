@@ -67,29 +67,29 @@ let add_decls tenv decls =
 let conv_arg tenv t aty =
   let tty = t_type t in
   if ty_equal tty aty then t else
-  try
-    let t2tb,tb2t,_ = Mty.find tty tenv in
+  match Mty.find tty tenv with
+  | exception Not_found -> t
+  | t2tb,tb2t,_ ->
     check_in tty;
     match t.t_node with
-      | Tapp (fs,[t]) when ls_equal fs tb2t -> t
-      | _ -> fs_app t2tb [t] tty
-  with Not_found -> t
+    | Tapp (fs,[t]) when ls_equal fs tb2t -> t
+    | _ -> fs_app t2tb [t] tty
 
 let conv_app tenv fs tl tty =
   let t = fs_app fs tl tty in
   let vty = Opt.get fs.ls_value in
   if ty_equal tty vty then t else
-  try
-    let _,tb2t,_ = Mty.find tty tenv in
+  match Mty.find tty tenv with
+  | exception Not_found -> t
+  | _,tb2t,_ ->
     check_in tty;
     fs_app tb2t [t] tty
-  with Not_found -> t
 
 (* FIXME? in quantifiers we might generate triggers
    with unnecessary bridge functions over them *)
 let rec rewrite tenv t = match t.t_node with
-  | Tapp (ls,[t1;t2]) when ls_equal ls ps_equ ->
-      t_attr_copy t (t_equ (rewrite tenv t1) (rewrite tenv t2))
+  | Tapp (ls,tl) when ls_equal ls ps_equ || ls.ls_constr > 0 || ls.ls_proj ->
+      t_attr_copy t (t_app ls (List.map (rewrite tenv) tl) t.t_ty)
   | Tapp (ls,tl) ->
       let tl = List.map (rewrite tenv) tl in
       let tl = List.map2 (conv_arg tenv) tl ls.ls_args in
@@ -98,10 +98,7 @@ let rec rewrite tenv t = match t.t_node with
   | _ -> t_map (rewrite tenv) t
 
 let decl tenv d = match d.d_node with
-  | Dtype _ | Dparam _ -> [d]
-  | Ddata _ -> Printer.unsupportedDecl d
-      "Algebraic and recursively-defined types are \
-            not supported, run eliminate_algebraic"
+  | Dtype _ | Dparam _ | Ddata _ -> [d]
   | Dlogic [ls,ld] when not (Sid.mem ls.ls_name (get_used_syms_decl d)) ->
       let f = rewrite tenv (ls_defn_axiom ld) in
       Libencoding.defn_or_axiom ls f

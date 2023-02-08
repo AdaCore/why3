@@ -1,0 +1,16 @@
+
+use int.Int
+
+function succ (n : int) : int = n + 1
+
+val incr (ref x : int) : unit
+  writes { x }
+  ensures { x = succ (old x) }
+
+let f [@bddinfer] [@infer] () : unit =
+  let ref a = 0 in
+  while a <= 100 do
+    variant { 100 - a }
+    incr a
+  done;
+  assert { a = 101 }

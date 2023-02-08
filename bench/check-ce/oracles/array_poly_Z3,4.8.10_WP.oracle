@@ -2,6 +2,9 @@
 - Selected model 0: NC
   - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_poly.mlw", line 8, characters 4-8)
   - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_poly.mlw", line 8, characters 4-8)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_poly.mlw", line 8, characters 4-8)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_poly.mlw", line 8, characters 4-8)
 File "bench/check-ce/array_poly.mlw", line 8, characters 4-8:
 Sub-goal Index in array bounds of goal f1'vc.
 Prover result is: Unknown or time/memory/step limit.
@@ -35,26 +38,47 @@ Sub-goal Index in array bounds of goal f2'vc.
 Prover result is: Valid.
 
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: BAD_CE
+- Selected model 0: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `f2` at "bench/check-ce/array_poly.mlw", line 10, characters 6-8)
+  - Abstract RAC: STUCK (failure in precondition of `f2` at "bench/check-ce/array_poly.mlw", line 10, characters 6-8)
+- Checked model 1: BAD_CE
   - Concrete RAC: STUCK (failure in precondition of `f2` at "bench/check-ce/array_poly.mlw", line 10, characters 6-8)
   - Abstract RAC: STUCK (failure in precondition of `f2` at "bench/check-ce/array_poly.mlw", line 10, characters 6-8)
 File "bench/check-ce/array_poly.mlw", line 12, characters 14-26:
 Sub-goal Postcondition of goal f2'vc.
 Prover result is: Unknown or time/memory/step limit.
+Sorry, we don't have a good counterexample for you :(
+
 
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
+- Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated with uncaught exception)
   - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
 File "bench/check-ce/array_poly.mlw", line 27, characters 14-22:
 Sub-goal Postcondition of goal f1'vc.
 Prover result is: Unknown or time/memory/step limit.
+The following counterexample model could not be verified
+  (both RAC terminated with uncaught exception):
+File array.mlw:
+  Line 17:
+    length : ty -> uni -> int = fun x!022 x!11 -> 0
 
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
+- Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated with uncaught exception)
   - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
 File "bench/check-ce/array_poly.mlw", line 32, characters 14-27:
 Sub-goal Postcondition of goal f2'vc.
 Prover result is: Unknown or time/memory/step limit.
+The following counterexample model could not be verified
+  (both RAC terminated with uncaught exception):
+File array.mlw:
+  Line 17:
+    length : ty -> uni -> int = fun x!023 x!11 -> 0
 

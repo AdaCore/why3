@@ -55,10 +55,14 @@ let rec detect svs t = match t.t_node with
       let u,t2 = t_open_bound b in
       let svs = if s then Svs.add u svs else svs in
       detect svs t2
+  | Tcase (_t, bl) ->
+    (* _t has necessarily a kept type and only contains values of kept types, so
+       it cannot be equal/contain a variable in svs *)
+    List.exists (fun b -> detect svs (snd (t_open_branch b))) bl
   | _ -> assert false (* match and epsilon gone, the rest is prop *)
 
 let rec expl_term info svs sign t = match t.t_node with
-  | Tapp (ls,tl) when not (ls_equal ls ps_equ) ->
+  | Tapp (ls,tl) when not (ls_equal ls ps_equ || ls.ls_constr > 0 || ls.ls_proj) ->
       let tv_to_ty = ls_app_inst ls tl t.t_ty in
       let tl = List.map (expl_term info svs sign) tl in
       let add _ ty tl = term_of_ty info.varm ty :: tl in
@@ -117,8 +121,7 @@ let ls_desc info ls =
 let decl info d = match d.d_node with
   | Dtype { ts_def = Alias _ } -> []
   | Dtype ts -> [d; lsdecl_of_ts ts]
-  | Ddata _ -> Printer.unsupportedDecl d
-      "Algebraic types are not supported, run eliminate_algebraic"
+  | Ddata dl -> d :: List.map (fun (ts, _) -> lsdecl_of_ts ts) dl
   | Dparam ls ->
       [create_param_decl (ls_extend ls)] @ ls_desc info ls
   | Dlogic [ls,ld] when not (Sid.mem ls.ls_name (get_used_syms_decl d)) ->
