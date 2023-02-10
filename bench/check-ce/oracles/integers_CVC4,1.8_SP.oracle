@@ -67,22 +67,41 @@ File integers.mlw:
       x = 48
 
 <check-ce-categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g2_lab'goal` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g2_lab'goal` cannot be evaluated)
-- Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g2_lab'goal1` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g2_lab'goal1` cannot be evaluated)
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/integers.mlw", line 11, characters 30-38)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/integers.mlw", line 11, characters 30-38)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/integers.mlw", line 11, characters 30-38)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/integers.mlw", line 11, characters 30-38)
 File "bench/check-ce/integers.mlw", line 11, characters 30-38:
 Goal g2_lab.
 Prover result is: Unknown (sat).
-The following counterexample model could not be verified
-  (both RAC terminated because Postcondition of `g2_lab'goal1` cannot be evaluated):
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
 File integers.mlw:
   Line 9:
-    g : int = -1
+    g = (- 1)
   Line 11:
-    x : int = 0
+    x = 0
+    x = 0
+    Execution of main function `g2_lab'goal` with env:
+      g = (- 1)
+      x = 0
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File integers.mlw:
+  Line 11:
+    Property failure at postcondition of `g2_lab'goal` with:
+      x = 0
 
 <check-ce-categorization>Categorizations of models:
 - Selected model 0: NC
@@ -104,6 +123,8 @@ File int.mlw:
     Constant one initialization
     one = 1
 File integers.mlw:
+  Line 9:
+    g = 0
   Line 13:
     x1 = 1
     x2 = 1
@@ -122,6 +143,7 @@ File integers.mlw:
     x7 = 1
     x8 = 1
     Execution of main function `newgoal'goal` with env:
+      g = 0
       x8 = 1
       x7 = 1
       x6 = 1

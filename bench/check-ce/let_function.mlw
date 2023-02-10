@@ -1,0 +1,9 @@
+use int.Int
+
+let function f(x:int) : int = x+1
+
+let main_f (y:int)
+  ensures { result <> 44 }
+=
+  let z = f y in
+  z+1
