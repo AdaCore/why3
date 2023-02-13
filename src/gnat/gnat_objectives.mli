@@ -178,6 +178,7 @@ val all_split_leaf_goals : unit -> unit
 
 val goal_has_splits : Session_itp.session -> goal_id -> bool
 
+val is_ce_goal : Session_itp.session -> Session_itp.proofNodeID -> bool
 val is_valid_not_ce: Session_itp.session -> Session_itp.proofNodeID -> bool
 
 val session_proved_status : Controller_itp.controller -> objective -> bool
