@@ -23,7 +23,7 @@ val infer_loop_invs :
    [mkn] are respectively the environment, the theory known map and
    the module known map of that function.
 
-  The set [attrs] is checked for the presence of the [[@bddinfer]]
+  The set [attrs] is checked for the presence of the [[\@bddinfer]]
    attribute. Without it, the empty list is immediately returned.
 
   The environment [env] is needed to access the builtin functions such
