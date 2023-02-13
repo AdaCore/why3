@@ -421,16 +421,13 @@ module Log = struct
     let vs2string vs = vs.vs_name.id_string in
     let rs2string rs = rs.rs_name.id_string in
     let id2string id = id.id_string in
-    let print_value_or_invalid fmt = function
-      | Value v -> print_value fmt v
-      | Invalid -> Pp.string fmt "invalid value" in
+    let filter_invalid_values l =
+      List.filter_map (function (x,Value v) -> Some (x,v) | (_,Invalid) -> None) l in
     let print_assoc key2string print_value fmt (k,v) =
       fprintf fmt "@[%a = %a@]"
         print_decoded (key2string k) print_value v in
     let print_list key2string =
       Pp.print_list_pre Pp.newline (print_assoc key2string print_value) in
-    let print_list_or_invalid key2string =
-      Pp.print_list_pre Pp.newline (print_assoc key2string print_value_or_invalid) in
     match e.log_desc with
     | Val_assumed (id, v) ->
         fprintf fmt "@[<h2>%a = %a@]" print_decoded id.id_string print_value v;
@@ -463,9 +460,9 @@ module Log = struct
     | Exec_main (rs, mls, mvs, mrs) ->
         fprintf fmt "@[<h2>Execution of main function `%a` with env:%a%a%a@]"
           print_decoded rs.rs_name.id_string
-          (print_list_or_invalid ls2string) (Mls.bindings mls)
+          (print_list ls2string) (filter_invalid_values (Mls.bindings mls))
           (print_list vs2string) (Mvs.bindings mvs)
-          (print_list_or_invalid rs2string) (Mrs.bindings mrs)
+          (print_list rs2string) (filter_invalid_values (Mrs.bindings mrs))
     | Exec_failed (msg,mid) ->
        fprintf fmt "@[<h2>Property failure at %s with:%a@]"
          msg (print_list id2string) (Mid.bindings mid)
@@ -879,8 +876,16 @@ let check_type_invs rac ?loc ~giant_steps env ity v =
   let ts = match ity.ity_node with
   | Ityapp (ts, _, _) | Ityreg {reg_its= ts} -> ts
   | Ityvar _ -> failwith "check_type_invs: type variable" in
-  let def = Pdecl.find_its_defn env.pmodule.Pmodule.mod_known ts in
-  if def.Pdecl.itd_invariant <> [] then
+  let opt_def =
+    try
+      let def = Pdecl.find_its_defn env.pmodule.Pmodule.mod_known ts in
+      if def.Pdecl.itd_invariant = [] then None
+      else Some def
+    with Not_found -> None (* case of abstract type, nothing to check *)
+  in
+  match opt_def with
+  | None -> ()
+  | Some def ->
     let fs_vs = match v.v_desc with
       | Vconstr (_, fs, vs) ->
           List.fold_right2 Mrs.add fs (List.map field_get vs) Mrs.empty

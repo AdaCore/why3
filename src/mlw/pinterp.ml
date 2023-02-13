@@ -756,7 +756,9 @@ let get_and_register_global check_model_variable ctx exec_expr id oexp post ity 
       let cntr_ctx = mk_cntr_ctx ctx ~desc Vc.expl_post in
       check_assume_posts ctx.rac cntr_ctx value post );
     lazy value
-  with (* Incomplete _ | *) Stuck _ as e ->
+  with Incomplete _ | Stuck _ as e ->
+    (* We should not need to capture these exceptions if this function was not
+       executed on logic constants and logic functions. *)
     lazy Printexc.(raise_with_backtrace e (get_raw_backtrace ()))
 
 (******************************************************************************)
@@ -1688,6 +1690,18 @@ let bind_globals ?rs_main ctx =
           let v = get_and_register_global (Sidpos.check locs) ctx exec_expr id None [] (Ity.ity_of_ty ty) in
           {ctx with env= bind_ls ls v ctx.env}, Sidpos.add_id id locs
         end
+      | [{d_node = Decl.Dparam ls}] ->
+        let ty = match ls.ls_value with
+          | None -> ty_bool
+          | Some ty -> ty
+        in
+        let ls_ty = List.fold_right ty_func ls.ls_args ty in
+        Debug.dprintf debug_trace_exec "EVAL GLOBAL LOGICAL FUN %a of type @[%a@] at %a@."
+          print_decoded id.id_string
+          Pretty.print_ty ls_ty
+          Pp.(print_option_or_default "NO LOC" Loc.pp_position) id.id_loc;
+        let v = get_and_register_global (Sidpos.check locs) ctx exec_expr id None [] (Ity.ity_of_ty ls_ty) in
+        {ctx with env= bind_ls ls v ctx.env}, Sidpos.add_id id locs
       | _ -> ctx, locs
       end
     | _ -> ctx, locs in
