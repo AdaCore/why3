@@ -22,10 +22,17 @@ File int.mlw:
     Constant one initialization
     one = 1
 File jlamp_projections.mlw:
+  Line 7:
+    to_int = fun (bOUND_VARIABLE_394:byte) ->
+              if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_394 then 1
+              else 127
   Line 28:
     a = epsilon x:byte. to_int x = 127
     a = epsilon x:byte. to_int x = 127
     Execution of main function `p3` with env:
+      to_int = fun (bOUND_VARIABLE_394:byte) ->
+                if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_394 then 1
+                else 127
       a = epsilon x:byte. to_int x = 127
       zero = 0
       one = 1
@@ -64,10 +71,17 @@ File int.mlw:
     Constant one initialization
     one = 1
 File jlamp_projections.mlw:
+  Line 7:
+    to_int = fun (bOUND_VARIABLE_398:byte) ->
+              if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_398 then 1
+              else 127
   Line 41:
     a = {contents= epsilon x:byte. to_int x = 127}
     a = {contents= epsilon x:byte. to_int x = 127}
     Execution of main function `p3` with env:
+      to_int = fun (bOUND_VARIABLE_398:byte) ->
+                if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_398 then 1
+                else 127
       a = {contents= epsilon x:byte. to_int x = 127}
       zero = 0
       one = 1
@@ -114,10 +128,17 @@ File int.mlw:
     Constant one initialization
     one = 1
 File jlamp_projections.mlw:
+  Line 7:
+    to_int = fun (bOUND_VARIABLE_487:byte) ->
+              if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_487 then 1
+              else 127
   Line 53:
     b = {f= epsilon x:byte. to_int x = 127; g= true}
     b = {f= epsilon x:byte. to_int x = 127; g= true}
     Execution of main function `p4` with env:
+      to_int = fun (bOUND_VARIABLE_487:byte) ->
+                if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_487 then 1
+                else 127
       b = {f= epsilon x:byte. to_int x = 127; g= true}
       zero = 0
       one = 1

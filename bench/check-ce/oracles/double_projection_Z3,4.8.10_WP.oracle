@@ -1,8 +1,8 @@
 <check-ce-categorization>Categorizations of models:
-- Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/double_projection.mlw", line 19, characters 15-22)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/double_projection.mlw", line 19, characters 15-22)
-- Checked model 1: NC
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
+- Selected model 1: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/double_projection.mlw", line 19, characters 15-22)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/double_projection.mlw", line 19, characters 15-22)
 File "bench/check-ce/double_projection.mlw", line 19, characters 15-22:
@@ -18,10 +18,16 @@ File int.mlw:
     Constant one initialization
     one = 1
 File double_projection.mlw:
+  Line 8:
+    d = fun (x!0:t) -> 0
+  Line 12:
+    c = fun (x!0:t) -> 1
   Line 17:
     x = epsilon x:t. d x = 0 /\ c x = 1
     x = epsilon x:t. d x = 0 /\ c x = 1
     Execution of main function `f` with env:
+      d = fun (x!0:t) -> 0
+      c = fun (x!0:t) -> 1
       x = epsilon x:t. d x = 0 /\ c x = 1
       zero = 0
       one = 1

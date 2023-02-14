@@ -1,0 +1,22 @@
+
+use int.Int
+
+function g (x:int) : int
+
+let main_g (y:int) : unit
+=
+  assert { g y <> 42 }
+
+function h (x1:int) (x2:bool) : int
+
+let main_h (y1:int) (y2:bool) : unit
+=
+  assert { h y1 y2 <> 42 }
+
+function f (x:int) : int
+
+let main_f (y:int) : unit
+  requires { y = 0 }
+=
+  assert { f 0 <> y };
+  assert { f 1 <> y }

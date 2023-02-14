@@ -1,0 +1,15 @@
+use int.Int
+
+function g(x:int) : int
+
+axiom g_def : forall x. g x = x + 1
+
+let f(x:int) : int
+  ensures { result = g x }
+  = x+1
+
+let main (y:int)
+  ensures { result <> 44 }
+=
+  let z = f y in
+  z+1

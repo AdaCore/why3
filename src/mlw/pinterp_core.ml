@@ -330,7 +330,7 @@ module Log = struct
     | Exec_pure of (lsymbol * exec_mode)
     | Exec_any of (rsymbol option * value Mvs.t)
     | Iter_loop of exec_mode
-    | Exec_main of (rsymbol * value Mvs.t * value_or_invalid Mrs.t)
+    | Exec_main of (rsymbol * value_or_invalid Mls.t * value Mvs.t * value_or_invalid Mrs.t)
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
     | Exec_ended
@@ -374,9 +374,10 @@ module Log = struct
   let log_iter_loop log_uc kind loc =
     log_entry log_uc (Iter_loop kind) loc
 
-  let log_exec_main log_uc rs mvs mrs loc =
+  let log_exec_main log_uc rs mls mvs mrs loc =
+    let mls = Mls.map (fun v -> try Value (Lazy.force v) with _ -> Invalid) mls in
     let mrs = Mrs.map (fun v -> try Value (Lazy.force v) with _ -> Invalid) mrs in
-    log_entry log_uc (Exec_main (rs,mvs,mrs)) loc
+    log_entry log_uc (Exec_main (rs,mls,mvs,mrs)) loc
 
   let log_failed log_uc s mvs loc =
     log_entry log_uc (Exec_failed (s,mvs)) loc
@@ -416,19 +417,17 @@ module Log = struct
             consecutives key ~sofar:(to_list current @ sofar) ~current:(k, [x]) xs
 
   let print_log_entry_desc fmt e =
+    let ls2string ls = ls.ls_name.id_string in
     let vs2string vs = vs.vs_name.id_string in
     let rs2string rs = rs.rs_name.id_string in
     let id2string id = id.id_string in
-    let print_value_or_invalid fmt = function
-      | Value v -> print_value fmt v
-      | Invalid -> Pp.string fmt "invalid value" in
+    let filter_invalid_values l =
+      List.filter_map (function (x,Value v) -> Some (x,v) | (_,Invalid) -> None) l in
     let print_assoc key2string print_value fmt (k,v) =
       fprintf fmt "@[%a = %a@]"
         print_decoded (key2string k) print_value v in
     let print_list key2string =
       Pp.print_list_pre Pp.newline (print_assoc key2string print_value) in
-    let print_list_or_invalid =
-      Pp.print_list_pre Pp.newline (print_assoc rs2string print_value_or_invalid) in
     match e.log_desc with
     | Val_assumed (id, v) ->
         fprintf fmt "@[<h2>%a = %a@]" print_decoded id.id_string print_value v;
@@ -458,11 +457,12 @@ module Log = struct
            (print_list vs2string) (Mvs.bindings mvs)
     | Iter_loop k ->
         fprintf fmt "@[<h2>%s iteration of loop@]" (exec_kind_to_string k)
-    | Exec_main (rs, mvs, mrs) ->
-        fprintf fmt "@[<h2>Execution of main function `%a` with env:%a%a@]"
+    | Exec_main (rs, mls, mvs, mrs) ->
+        fprintf fmt "@[<h2>Execution of main function `%a` with env:%a%a%a@]"
           print_decoded rs.rs_name.id_string
+          (print_list ls2string) (filter_invalid_values (Mls.bindings mls))
           (print_list vs2string) (Mvs.bindings mvs)
-          print_list_or_invalid (Mrs.bindings mrs)
+          (print_list rs2string) (filter_invalid_values (Mrs.bindings mrs))
     | Exec_failed (msg,mid) ->
        fprintf fmt "@[<h2>Property failure at %s with:%a@]"
          msg (print_list id2string) (Mid.bindings mid)
@@ -475,6 +475,7 @@ module Log = struct
   let json_log entry_log =
     let open Json_base in
     let string f x = String (Format.asprintf "%a" f x) in
+    let ls2string ls = ls.ls_name.id_string in
     let vs2string vs = vs.vs_name.id_string in
     let id2string id = id.id_string in
     let rs2string rs = rs.rs_name.id_string in
@@ -489,9 +490,9 @@ module Log = struct
           "name", String (key2string k);
           "value", string print_value v
         ] in
-    let key_value_or_undefined (k,v) =
+    let key_value_or_undefined key2string (k,v) =
       Record [
-          "name", String (rs2string k);
+          "name", String (key2string k);
           "value", value_or_undefined v
         ] in
     let log_entry = function
@@ -545,12 +546,13 @@ module Log = struct
                 "kind", String "ITER_LOOP";
                 "exec", json_kind kind;
               ]
-        | Exec_main (rs,mvs,mrs) ->
+        | Exec_main (rs,mls,mvs,mrs) ->
             Record [
                 "kind", String "EXEC_MAIN";
                 "rs", string print_decoded rs.rs_name.id_string;
-                "env", List (List.map (key_value vs2string) (Mvs.bindings mvs));
-                "globals", List (List.map key_value_or_undefined (Mrs.bindings mrs))
+                "env", List (List.concat [(List.map (key_value_or_undefined ls2string) (Mls.bindings mls));
+                                          (List.map (key_value vs2string) (Mvs.bindings mvs))]);
+                "globals", List (List.map (key_value_or_undefined rs2string) (Mrs.bindings mrs))
               ]
         | Exec_failed (reason,mid) ->
             Record [
@@ -671,13 +673,14 @@ type env = {
   pmodule  : Pmodule.pmodule;
   funenv   : (cexp * rec_defn list option) Mrs.t;
   vsenv    : value Mvs.t;
+  lsenv    : value Lazy.t Mls.t; (* global logical functions and constants *)
   rsenv    : value Lazy.t Mrs.t; (* global constants *)
   premises : premises;
   log_uc   : Log.log_uc;
 }
 
 let mk_empty_env env pmodule =
-  {pmodule; funenv= Mrs.empty; vsenv= Mvs.empty; rsenv= Mrs.empty;
+  {pmodule; funenv= Mrs.empty; vsenv= Mvs.empty; lsenv= Mls.empty; rsenv= Mrs.empty;
    premises= mk_empty_premises (); why_env= env; log_uc= Log.empty_log_uc ()}
 
 let snapshot_env env =
@@ -697,6 +700,8 @@ let get_pvs env pvs =
   get_vs env pvs.pv_vs
 
 let bind_vs vs v ctx = {ctx with vsenv= Mvs.add vs v ctx.vsenv}
+
+let bind_ls ls v ctx = {ctx with lsenv= Mls.add ls v ctx.lsenv}
 
 let bind_rs rs v ctx = {ctx with rsenv= Mrs.add rs v ctx.rsenv}
 
@@ -748,7 +753,7 @@ let register_iter_loop env loc kind =
   Log.log_iter_loop env.log_uc kind loc
 
 let register_exec_main env rs =
-  Log.log_exec_main env.log_uc rs (Mvs.map snapshot env.vsenv)
+  Log.log_exec_main env.log_uc rs env.lsenv (Mvs.map snapshot env.vsenv)
     env.rsenv rs.rs_name.id_loc
 
 let register_failure env loc reason mvs =
@@ -871,8 +876,16 @@ let check_type_invs rac ?loc ~giant_steps env ity v =
   let ts = match ity.ity_node with
   | Ityapp (ts, _, _) | Ityreg {reg_its= ts} -> ts
   | Ityvar _ -> failwith "check_type_invs: type variable" in
-  let def = Pdecl.find_its_defn env.pmodule.Pmodule.mod_known ts in
-  if def.Pdecl.itd_invariant <> [] then
+  let opt_def =
+    try
+      let def = Pdecl.find_its_defn env.pmodule.Pmodule.mod_known ts in
+      if def.Pdecl.itd_invariant = [] then None
+      else Some def
+    with Not_found -> None (* case of abstract type, nothing to check *)
+  in
+  match opt_def with
+  | None -> ()
+  | Some def ->
     let fs_vs = match v.v_desc with
       | Vconstr (_, fs, vs) ->
           List.fold_right2 Mrs.add fs (List.map field_get vs) Mrs.empty
