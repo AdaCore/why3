@@ -2,6 +2,15 @@
 
 # Helper script to compute statistics about checking counterexamples.
 
+# The script creates 4 files:
+# - [export_file_raw], a CSV file with columns date / file / prover /
+#   verdict / concrete_RAC / abstract_RAC for each CE that is checked
+# - [export_file], the same data aggregated according to the verdict
+# - [export_file_incomplete_small_step], only the data corresponding
+#   to incomplete verdicts, grouped by small-step RAC result
+# - [export_file_incomplete_giant_step], only the data corresponding
+#   to incomplete verdicts, grouped by giant-step RAC result
+
 from datetime import date
 import os
 import pandas as pd
@@ -22,6 +31,8 @@ rx_dict_incomplete = {
     "cannot import": re.compile(r"(.*)cannot import value(.*)"),
     "missing return value": re.compile(r"(.*)missing value for return value(.*)"),
     "many args for exec": re.compile(r"(.*)many args for exec fun(.*)"),
+    "uncaught exception": re.compile(r"(.*)uncaught exception(.*)"),
+    "undefined argument": re.compile(r"(.*)undefined argument(.*)"),
 }
 list_of_verdicts = [
     "INCOMPLETE",
