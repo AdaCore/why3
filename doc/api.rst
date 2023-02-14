@@ -891,6 +891,10 @@ the JSON output as follows:
 
 The structure of JSON output is described in :numref:`sec.jsonce`.
 
+In the code above, the variable ``m`` has type ``Model_parser.model``.
+This type is described in
+`Model_parser <http://why3.lri.fr/api/Model_parser.html>`_.
+
 
 Checking counterexamples
 ~~~~~~~~~~~~~~~~~~~~~~~~

@@ -97,32 +97,27 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `dummy_update_with_int` cannot be evaluated):
 File bv.mlw:
   Line 596:
-    lsr :
-      t1
-      ->
-      int
-      ->
-      t1 = fun x!0 x!1 -> 0 (#x00000000000000000000000000000000)
+    lsr : t1 -> int -> t1 = fun x!0 x!1 -> #x00000000000000000000000000000000
     nth : t1 -> int -> bool = fun x!0 x!1 -> false
     nth_bv : t1 -> t1 -> bool = fun x!0 x!1 -> false
-    of_int : int -> t1 = [|_ => 0 (#x00000000000000000000000000000000)|]
+    of_int : int -> t1 = [|_ => #x00000000000000000000000000000000|]
   Line 638:
-    lsr : t -> int -> t = fun x!0 x!1 -> 0 (#x00000000)
+    lsr : t -> int -> t = fun x!0 x!1 -> #x00000000
     nth : t -> int -> bool = fun x!0 x!1 -> false
     nth_bv : t -> t -> bool = fun x!0 x!1 -> false
-    of_int : int -> t = [|_ => 0 (#x00000000)|]
+    of_int : int -> t = [|_ => #x00000000|]
 File int.mlw:
   Line 41:
     abs : int -> int = [|_ => 0|]
 File bv32.mlw:
   Line 13:
-    r : t = 34 (#x00000022)
+    r : t = #x00000022
   Line 15:
-    r : t = 132 (#x00000084)
-    r : t = 132 (#x00000084)
+    r : t = #x00000084
+    r : t = #x00000084
   Line 16:
-    r : t = 66 (#x00000042)
+    r : t = #x00000042
   Line 17:
-    r : t = 132 (#x00000084)
-    result of call at line 17, characters 9-16 : t = 132 (#x00000084)
+    r : t = #x00000084
+    result of call at line 17, characters 9-16 : t = #x00000084
 
