@@ -261,7 +261,7 @@ LIB_INFER = o2oterm domain infer_why3 quant_domain union_find disjunctive_term_d
 endif
 
 ifeq (@enable_bddinfer@,yes)
-LIB_BDDINFER = bdd abstract ast interp_expression infer why3infer
+LIB_BDDINFER = bddparam abstract ast interp_expression infer why3infer
 endif
 
 LIB_EXTRACT = mltree compile mlinterp pdriver ml_printer \

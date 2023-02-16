@@ -1680,7 +1680,7 @@ let bind_globals ?rs_main ctx =
         {ctx with env= bind_rs rs v ctx.env}, Sidpos.add_id id locs )
     | PDpure ->
       begin match d.pd_pure with
-      | [{d_node = Decl.Dparam ls}] when ls.ls_args = [] ->
+      | [Decl.{d_node = Dparam ls}] when ls.ls_args = [] ->
         begin match ls.ls_value with
         | None -> ctx, locs
         | Some ty ->
@@ -1690,7 +1690,7 @@ let bind_globals ?rs_main ctx =
           let v = get_and_register_global (Sidpos.check locs) ctx exec_expr id None [] (Ity.ity_of_ty ty) in
           {ctx with env= bind_ls ls v ctx.env}, Sidpos.add_id id locs
         end
-      | [{d_node = Decl.Dparam ls}] ->
+      | [Decl.{d_node = Dparam ls}] ->
         let ty = match ls.ls_value with
           | None -> ty_bool
           | Some ty -> ty

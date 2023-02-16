@@ -8,8 +8,9 @@
 (* to comment out when inside Why3 *)
 
 type var_type =
-    | Tint
-    | Tbool
+  | Tunit
+  | Tint
+  | Tbool
 
 type label = Here | Old
 
@@ -79,35 +80,60 @@ let e_let_in_expression v e1 e2 = subst_e v e1 e2
 type atomic_condition =
     | Ceq of expression * expression
     | Cne of expression * expression
-    | Ceq_bool of expression * expression
-    | Cne_bool of expression * expression
     | Clt of expression * expression
     | Cle of expression * expression
     | Cgt of expression * expression
     | Cge of expression * expression
     | C_is_true of expression
-    | C_is_false of expression
 
 let c_eq_int e1 e2 = Ceq(e1,e2)
 let c_ne_int e1 e2 = Cne(e1,e2)
-
-let c_eq_bool e1 e2 = Ceq_bool(e1,e2)
-let c_ne_bool e1 e2 = Cne_bool(e1,e2)
 
 let c_le e1 e2 = Cle(e1,e2)
 let c_lt e1 e2 = Clt(e1,e2)
 let c_ge e1 e2 = Cge(e1,e2)
 let c_gt e1 e2 = Cgt(e1,e2)
 
-let c_is_true e =
+let rec c_is_true e =
   match e with
-  | Ebwnot e -> C_is_false e
+  | Ebwnot e -> c_is_false e
   | _ -> C_is_true e
 
-let c_is_false e =
+and c_is_false e =
   match e with
-  | Ebwnot e -> C_is_true e
-  | _ -> C_is_false e
+  | Ebwnot e -> c_is_true e
+  | _ -> C_is_true (Ebwnot e)
+
+
+let neg_atomic_cond : atomic_condition -> atomic_condition = fun c ->
+    match c with
+    | Ceq (e1, e2) -> Cne (e1, e2)
+    | Cne (e1, e2) -> Ceq (e1, e2)
+    | Clt (e1, e2) -> Cge (e1, e2)
+    | Cle (e1, e2) -> Cgt (e1, e2)
+    | Cgt (e1, e2) -> Cle (e1, e2)
+    | Cge (e1, e2) -> Clt (e1, e2)
+    | C_is_true e -> c_is_false e
+
+let c_eq_bool e1 e2 =
+  match e1,e2 with
+  | _, Ebwtrue -> c_is_true e1
+  | Ebwtrue, _ -> c_is_true e2
+  | _, Ebwfalse -> c_is_false e1
+  | Ebwfalse, _ -> c_is_false e2
+  | _ ->
+    c_is_true (bwor_simp (bwand_simp e1 e2)
+                 (bwand_simp (bwnot_simp e1) (bwnot_simp e2)))
+
+let c_ne_bool e1 e2 =
+  match e1,e2 with
+  | _, Ebwtrue -> c_is_false e1
+  | Ebwtrue, _ -> c_is_false e2
+  | _, Ebwfalse -> c_is_true e1
+  | Ebwfalse, _ -> c_is_true e2
+  | _ ->
+    c_is_true (bwor_simp (bwand_simp e1 (bwnot_simp e2))
+                 (bwand_simp (bwnot_simp e1) e2))
 
 type condition =
     | BTrue
@@ -116,18 +142,7 @@ type condition =
     | BOr of condition * condition
     | BAtomic of atomic_condition
 
-let neg_atomic_cond : atomic_condition -> atomic_condition = fun c ->
-    match c with
-    | Ceq (e1, e2) -> Cne (e1, e2)
-    | Cne (e1, e2) -> Ceq (e1, e2)
-    | Ceq_bool (e1, e2) -> Cne_bool (e1, e2)
-    | Cne_bool (e1, e2) -> Ceq_bool (e1, e2)
-    | Clt (e1, e2) -> Cge (e1, e2)
-    | Cle (e1, e2) -> Cgt (e1, e2)
-    | Cgt (e1, e2) -> Cle (e1, e2)
-    | Cge (e1, e2) -> Clt (e1, e2)
-    | C_is_true e -> C_is_false e
-    | C_is_false e -> C_is_true e
+
 
 let true_cond = BTrue
 let false_cond = BFalse
@@ -167,14 +182,11 @@ let rec subst_c (x:Abstract.why_var) (t:expression) (c:condition) : condition =
        match a with
        | Ceq (e1, e2) -> Ceq (subst_e x t e1, subst_e x t e2)
        | Cne (e1, e2) -> Cne (subst_e x t e1, subst_e x t e2)
-       | Ceq_bool (e1, e2) -> Ceq_bool (subst_e x t e1, subst_e x t e2)
-       | Cne_bool (e1, e2) -> Cne_bool (subst_e x t e1, subst_e x t e2)
        | Clt (e1, e2) -> Clt (subst_e x t e1, subst_e x t e2)
        | Cle (e1, e2) -> Cle (subst_e x t e1, subst_e x t e2)
        | Cgt (e1, e2) -> Cgt (subst_e x t e1, subst_e x t e2)
        | Cge (e1, e2) -> Cge (subst_e x t e1, subst_e x t e2)
        | C_is_true e -> C_is_true (subst_e x t e)
-       | C_is_false e -> C_is_false (subst_e x t e)
      in BAtomic a'
 
 
@@ -204,17 +216,16 @@ let create_fun_id =
     }
 
 type statement_node =
-    | Sassign of Abstract.why_var * expression
-    | Sassign_bool of Abstract.why_var * Bdd.variable * expression
     | Swhile of condition * (string option * condition) list * statement
-    | Sfcall of (Abstract.why_var * statement * Abstract.var_value) option * fun_id * expression list
+    | Sfcall of (Abstract.why_var * statement * Abstract.var_value) option *
+                (Abstract.why_var * Abstract.var_value * expression) list *
+                fun_id * expression list
     | Site of condition * statement * statement
     | Sblock of statement list
     | Sassert of condition
     | Sassume of condition
     | Shavoc of Abstract.why_env * condition
     | Sletin of Abstract.why_var * Abstract.var_value * expression * statement
-    | Sdrop of Abstract.why_var * statement
     | Sbreak
 
 and statement = {
@@ -230,14 +241,41 @@ let fresh_var ty =
   assert !calling_fresh_allowed;
   let open Abstract in
   match ty with
+  | Tunit -> UnitValue
   | Tint -> IntValue (fresh_apron_var ())
   | Tbool -> BoolValue (fresh_bdd_var ())
+
+let rec oldify v e =
+  match e with
+  | Evar(_,Old) -> assert false
+  | Evar(x,Here) when Abstract.compare_var x v = 0 -> e_var x Old
+  | Evar(_,Here) | Ecst _ | Ebwfalse | Ebwtrue -> e
+  | Eadd(e1,e2)-> e_add (oldify v e1) (oldify v e2)
+  | Esub(e1,e2)-> e_sub (oldify v e1) (oldify v e2)
+  | Emul(e1,e2)-> e_mul (oldify v e1) (oldify v e2)
+  | Ediv(e1,e2)-> e_div (oldify v e1) (oldify v e2)
+  | Emod(e1,e2)-> e_mod (oldify v e1) (oldify v e2)
+  | Ebwand(e1,e2)-> bwand_simp (oldify v e1) (oldify v e2)
+  | Ebwor(e1,e2)-> bwor_simp (oldify v e1) (oldify v e2)
+  | Ebwnot(e) -> bwnot_simp (oldify v e)
 
 let s_assign tag ty v e =
   let n =
     match ty with
-    | Tint -> Sassign(v,e)
-    | Tbool -> let b = Abstract.fresh_bdd_var () in Sassign_bool(v,b,e)
+    | Tunit ->
+      Sblock []
+    | Tint ->
+      let w = Abstract.fresh_apron_var () in
+      let env = Abstract.(VarMap.add v (IntValue w) VarMap.empty) in
+      let eold = oldify v e in
+      let c = c_eq_int (e_var v Here) eold in
+      Shavoc(env,atomic_cond c)
+    | Tbool ->
+      let b = Abstract.fresh_bdd_var () in
+      let env = Abstract.(VarMap.add v (BoolValue b) VarMap.empty) in
+      let eold = oldify v e in
+      let c = c_eq_bool (e_var v Here) eold in
+      Shavoc(env,atomic_cond c)
   in
   mk_stmt tag n
 
@@ -265,13 +303,20 @@ let s_ite tag c e1 e2 =
 let s_while tag cond invs body =
   mk_stmt tag (Swhile(cond, invs, body))
 
-let s_call tag ret f el =
+let s_call tag ret lets f el =
+  let lets =
+    List.fold_right
+      (fun (ty,v,e) acc ->
+         let av = fresh_var ty in
+         (v,av,e) :: acc)
+      lets []
+  in
   let n =
     match ret with
-    | None -> Sfcall(None,f,el)
+    | None -> Sfcall(None,lets,f,el)
     | Some (ty,v,e) ->
        let ab = fresh_var ty in
-       Sfcall(Some(v,e,ab),f,el)
+       Sfcall(Some(v,e,ab),lets,f,el)
   in
   mk_stmt tag n
 
@@ -287,9 +332,6 @@ let s_havoc tag writes c =
 let s_let_in tag ty v e s =
   let av = fresh_var ty in
   mk_stmt tag (Sletin(v,av,e,s))
-
-let s_drop tag v s =
-  mk_stmt tag (Sdrop(v,s))
 
 let s_break tag  =
   mk_stmt tag Sbreak
@@ -380,8 +422,10 @@ let map_to_varmap (map: var_type Abstract.VarMap.t) : Abstract.var_value Abstrac
   let open Abstract in
   let to_abstract v t varmap =
     let var = match t with
+      | Tunit -> UnitValue
       | Tint -> IntValue (fresh_apron_var ())
-      | Tbool -> BoolValue (fresh_bdd_var ()) in
+      | Tbool -> BoolValue (fresh_bdd_var ())
+    in
     VarMap.add v var varmap in
   VarMap.fold to_abstract map VarMap.empty
 
@@ -403,9 +447,11 @@ let reset_ast_generation () =
 
 
 let print_type fmt t =
-    match t with
-    | Tint -> Format.fprintf fmt "int"
-    | Tbool -> Format.fprintf fmt "bool"
+  match t with
+  | Tunit -> Format.fprintf fmt "unit"
+  | Tint -> Format.fprintf fmt "int"
+  | Tbool -> Format.fprintf fmt "bool"
+
 let rec print_expression fmt e =
     match e with
     | Evar (v, Here) -> Format.fprintf fmt "%a" Abstract.print_var v
@@ -434,29 +480,38 @@ let rec print_condition fmt c =
         match a with
         | Ceq(e1, e2) -> Format.fprintf fmt "%a = %a" print_expression e1 print_expression e2
         | Cne(e1, e2) -> Format.fprintf fmt "%a <> %a" print_expression e1 print_expression e2
-        | Ceq_bool(e1, e2) -> Format.fprintf fmt "%a == %a" print_expression e1 print_expression e2
-        | Cne_bool(e1, e2) -> Format.fprintf fmt "%a =/= %a" print_expression e1 print_expression e2
         | Clt(e1, e2) -> Format.fprintf fmt "%a < %a" print_expression e1 print_expression e2
         | Cle(e1, e2) -> Format.fprintf fmt "%a <= %a" print_expression e1 print_expression e2
         | Cgt(e1, e2) -> Format.fprintf fmt "%a > %a" print_expression e1 print_expression e2
         | Cge(e1, e2) -> Format.fprintf fmt "%a >= %a" print_expression e1 print_expression e2
         | C_is_true e' -> Format.fprintf fmt "%a" print_expression e'
-        | C_is_false e' -> Format.fprintf fmt "~%a" print_expression e'
 
+let print_lets fmt lets =
+  List.iter
+    (fun (v,_,e) ->
+       Format.fprintf fmt "let @[<hv 0>%a =@ @[%a@]@]@ in@ "
+         Abstract.print_var v print_expression e)
+    lets
 
 let rec print_statement_node fmt s =
   let open Format in
   match s with
+(*
   | Sassign(v,e) ->
      fprintf fmt "@[<hv 2>%a <-@ @[%a@]@]" Abstract.print_var v print_expression e
-  | Sassign_bool(v,_,e) ->
-     fprintf fmt "@[<hv 2>%a <-@ @[%a@]@]" Abstract.print_var v print_expression e
-  | Sfcall(None,id,el) ->
-     fprintf fmt "@[%a(%a)@]" print_fun_id id
-       (Pp.print_list Pp.comma print_expression) el
-  | Sfcall(Some (x,s,_),id,el) ->
-     fprintf fmt "@[<hv 0>letcall %a <- @[%a(%a)@]@ in@ @[%a@]@ endletcall@]"
-       Abstract.print_var x print_fun_id id
+*)
+  (* | Sassign_bool(v,_,e) ->
+   *    fprintf fmt "@[<hv 2>%a <-@ @[%a@]@]" Abstract.print_var v print_expression e *)
+  | Sfcall(None,lets,id,el) ->
+    fprintf fmt "@[%a%a(%a)@]"
+      print_lets lets
+      print_fun_id id
+      (Pp.print_list Pp.comma print_expression) el
+  | Sfcall(Some (x,s,_),lets,id,el) ->
+     fprintf fmt "@[<hv 0>letcall %a <- @[%a%a(%a)@]@ in@ @[%a@]@ endletcall@]"
+       Abstract.print_var x
+       print_lets lets
+       print_fun_id id
        (Pp.print_list Pp.comma print_expression) el print_statement s
   | Swhile(c,invs,s) ->
     fprintf fmt "@[<hv 2>while @[%a@] do@ " print_condition c;
@@ -484,9 +539,6 @@ let rec print_statement_node fmt s =
   | Sletin(v,_,e,s) ->
      fprintf fmt "@[<hv 0>let @[<hv 0>%a =@ @[%a@]@]@ in@ @[%a@]@ endlet@]"
        Abstract.print_var v print_expression e print_statement s
-  | Sdrop(v,s) ->
-     fprintf fmt "@[<hv 0>drop %a in@ @[%a@]@ enddrop@]"
-       Abstract.print_var v print_statement s
   | Sbreak -> fprintf fmt "break"
 
 and print_statement fmt s =

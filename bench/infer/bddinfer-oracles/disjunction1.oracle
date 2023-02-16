@@ -1,6 +1,7 @@
-Invariant for loop [anonymous_loop_0] is 0 <= j.contents /\ j.contents <= 6
+Invariant for loop [anonymous_loop_0] is
+  ((0 <= j.contents /\ j.contents <= 6) /\ o = 0) /\ o1 = 0
 Domains for loop [anonymous_loop_0] are
-  x = ]-oo;+oo[; i = ]-oo;+oo[; j = [0;6]
+  x = ]-oo;+oo[; o = [0;0]; i = ]-oo;+oo[; o1 = [0;0]; j = [0;6]
 File bench/infer/disjunction1.mlw:
 Goal a'vc.
 Prover result is: Unknown () (0.02s).
