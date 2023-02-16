@@ -741,7 +741,7 @@ let select_model ?timelimit ?steplimit ?verb_lvl ?compute_term ~check_ce
 
 (** Transform an interpretation log into a prover model.
     TODO fail if the log doesn't fail at the location of the original model *)
-let model_of_exec_log ~original_model log = assert false
+let model_of_exec_log ~original_model log = ignore original_model; ignore log; assert false
 (** NOT MAINTAINED since the change of data types in Model_parser.model_value
     to use Term.term *)
 (*

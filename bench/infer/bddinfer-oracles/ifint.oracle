@@ -1,7 +1,7 @@
 Invariant for loop [anonymous_loop_0] is
-  (0 <= y.contents /\ x.contents <= 11) /\ y.contents <= x.contents
+  (y.contents <= x.contents /\ 0 <= y.contents) /\ x.contents <= 11
 Domains for loop [anonymous_loop_0] are x = [0;11]; y = [0;11]
 File bench/infer/ifint.mlw:
 Goal test1'vc.
-Prover result is: Valid (0.00s, 30 steps).
+Prover result is: Valid (0.01s, 30 steps).
 

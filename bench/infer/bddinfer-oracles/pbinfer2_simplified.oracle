@@ -1,4 +1,7 @@
-Invariant for loop [anonymous_loop_0] is orb (notb (a.contents)) x = True
-Domains for loop [anonymous_loop_0] are x = top; a = top
-File "bench/infer/pbinfer2_simplified.mlw", line 8, character 0 to line 14, character 5:
-Ident orb is not yet declared
+Invariant for loop [anonymous_loop_0] is
+  (a.contents = False \/ x = True) /\ o = False
+Domains for loop [anonymous_loop_0] are x = top; o = false; a = top
+File bench/infer/pbinfer2_simplified.mlw:
+Goal pgmtest'vc.
+Prover result is: Valid (0.00s, 4 steps).
+

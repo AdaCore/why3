@@ -1,12 +1,17 @@
 Invariant for loop [anonymous_loop_0] is
-  (y.contents = True /\ x <= x1.contents) /\ x1.contents <= 0
-Domains for loop [anonymous_loop_0] are x = ]-oo;0]; x1 = ]-oo;0]; y = true
+  ((x <= x1.contents /\ x1.contents <= 0) /\ y.contents = True) /\ o = True
+Domains for loop [anonymous_loop_0] are
+  x = ]-oo;0]; x1 = ]-oo;0]; o = true; y = true
 Invariant for loop [anonymous_loop_0] is
-  (y1.contents = True /\ x2 <= x3.contents) /\ x3.contents <= 0
-Domains for loop [anonymous_loop_0] are x2 = ]-oo;0]; x3 = ]-oo;0]; y1 = true
+  ((x2 <= x3.contents /\ x3.contents <= 0) /\ y1.contents = True) /\
+  o1 = True
+Domains for loop [anonymous_loop_0] are
+  x2 = ]-oo;0]; x3 = ]-oo;0]; o1 = true; y1 = true
 Invariant for loop [anonymous_loop_0] is
-  (y2.contents = True /\ x4 <= x5.contents) /\ x5.contents <= 0
-Domains for loop [anonymous_loop_0] are x4 = ]-oo;0]; x5 = ]-oo;0]; y2 = true
+  ((x4 <= x5.contents /\ x5.contents <= 0) /\ y2.contents = True) /\
+  o2 = True
+Domains for loop [anonymous_loop_0] are
+  x4 = ]-oo;0]; x5 = ]-oo;0]; o2 = true; y2 = true
 File bench/infer/bools.mlw:
 Goal f'vc.
 Prover result is: Valid (0.00s, 20 steps).
