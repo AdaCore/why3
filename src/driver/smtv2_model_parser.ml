@@ -20,6 +20,7 @@
 
 open Wstdlib
 open Term
+open Number
 open Smtv2_model_defs
 open Model_parser
 
@@ -120,15 +121,15 @@ module FromSexpToModel = struct
   let positive_constant_int = function
     | Atom s -> (
         try
-          { constant_int_value= BigInt.of_string s;
+          { constant_int_value= int_literal ILitDec ~neg:false s;
             constant_int_verbatim= s }
-        with _ -> atom_error s "constant_int")
+        with _ -> atom_error s "positive_constant_int")
     | sexp -> error sexp "positive_constant_int"
 
   let negative_constant_int = function
     | List [ Atom "-"; Atom s ] as sexp -> (
         try
-          { constant_int_value= BigInt.minus (BigInt.of_string s);
+          { constant_int_value= int_literal ILitDec ~neg:true s;
             constant_int_verbatim= "-" ^ s }
         with _ -> error sexp "negative_constant_int")
     | sexp -> error sexp "negative_constant_int"
@@ -141,50 +142,50 @@ module FromSexpToModel = struct
   let positive_constant_real s =
     try
       Scanf.sscanf s "%[^.].%s"
-        (fun s1 s2 -> (s, BigInt.of_string s1, BigInt.of_string s2))
+        (fun s1 s2 -> (s, s1, s2))
     with _ -> atom_error s "positive_constant_real"
 
   let constant_real = function
     | Atom s ->
       let s', i1, i2 = positive_constant_real s in
-      { constant_real_int= i1;
-        constant_real_frac= i2;
+      { constant_real_value=
+          real_literal ~radix:10 ~neg:false ~int:i1 ~frac:i2 ~exp:None;
         constant_real_verbatim= s'
       }
     | List [ Atom "-"; Atom s ] ->
       let s', i1, i2 = positive_constant_real s in
-      { constant_real_int= BigInt.minus i1;
-        constant_real_frac= i2;
+      { constant_real_value=
+          real_literal ~radix:10 ~neg:true ~int:i1 ~frac:i2 ~exp:None;
         constant_real_verbatim= "-" ^ s'
       }
     | sexp -> error sexp "constant_real"
 
   let constant_fraction ~neg sexp =
-    let constant_int_fraction sexp =
-      let c =
-        try positive_constant_int sexp
-        with _ -> (
-          try negative_constant_int sexp
-          with _ -> error sexp "constant_int_fraction")
-      in
-      { constant_real_int= c.constant_int_value;
-        constant_real_frac= BigInt.zero;
-        constant_real_verbatim= c.constant_int_verbatim }
+    let constant_int_fraction = function
+      | Atom s ->
+        { constant_real_value=
+            real_literal ~radix:10 ~neg:false ~int:s ~frac:"0" ~exp:None;
+          constant_real_verbatim= s
+        }
+      | List [ Atom "-"; Atom s ] ->
+        { constant_real_value=
+            real_literal ~radix:10 ~neg:true ~int:s ~frac:"0" ~exp:None;
+          constant_real_verbatim= "-" ^ s
+        }
+      | sexp -> error sexp "constant_int_fraction"
     in
     let constant_int_or_real_fraction n =
       try constant_int_fraction n with _ -> constant_real n
-    in
-    let neg_constant_real { constant_real_int; constant_real_frac; constant_real_verbatim} =
-      { constant_real_int= BigInt.minus constant_real_int;
-        constant_real_frac;
-        constant_real_verbatim= "-" ^ constant_real_verbatim
-      }
     in
     match sexp with
     | List [ Atom "/"; n1; n2 ] ->
         let r1 = constant_int_or_real_fraction n1 in
         let r2 = constant_int_or_real_fraction n2 in
-        let r1 = if neg then neg_constant_real r1 else r1 in
+        let r1 =
+          if neg then
+            { constant_real_value= neg_real r1.constant_real_value;
+              constant_real_verbatim= "-" ^ r1.constant_real_verbatim }
+          else r1 in
         {
           constant_frac_num= r1;
           constant_frac_den= r2;
@@ -698,40 +699,29 @@ module FromModelToTerm = struct
           (is_neg, "1", frac, Some (BigInt.to_string exp), fp_binary, fp_hex)
 
   let constant_to_term env c =
-    let constant_real {constant_real_int; constant_real_frac; constant_real_verbatim} =
-      let neg = BigInt.sign constant_real_int < 0 in
-      let s1 = BigInt.to_string (BigInt.abs constant_real_int) in
-      let s2 = BigInt.to_string constant_real_frac in
-      t_const
-        (Constant.real_const_from_string ~radix:10 ~neg ~int:s1 ~frac:s2
-            ~exp:None)
-        Ty.ty_real
-    in
     match c with
     | Cint {constant_int_value= int_value; constant_int_verbatim= int_verbatim} ->
-      let t = t_const (Constant.int_const int_value) Ty.ty_int in
+      let t = t_const (Constant.ConstInt int_value) Ty.ty_int in
       let t_concrete = Const (Integer {int_value; int_verbatim}) in
       (t, t_concrete)
-    | Creal ({ constant_real_int= real_int; constant_real_frac= real_frac; constant_real_verbatim= real_verbatim } as r) ->
-      let t = constant_real r in
-      let t_concrete = Const (Real {real_int; real_frac; real_verbatim}) in
+    | Creal { constant_real_value= real_value; constant_real_verbatim= real_verbatim } ->
+      let t = t_const (Constant.ConstReal real_value) Ty.ty_real in
+      let t_concrete = Const (Real {real_value; real_verbatim}) in
       (t, t_concrete)
     | Cfraction { constant_frac_num; constant_frac_den; constant_frac_verbatim } -> (
         try
-          let t = constant_real constant_frac_num in
-          let t' = constant_real constant_frac_den in
+          let t = t_const (Constant.ConstReal constant_frac_num.constant_real_value) Ty.ty_real in
+          let t' = t_const (Constant.ConstReal constant_frac_den.constant_real_value) Ty.ty_real in
           let th = Env.read_theory env.why3_env [ "real" ] "Real" in
           let div_ls =
             Theory.ns_find_ls th.Theory.th_export [ Ident.op_infix "/" ]
           in
           let frac_num = {
-            real_int= constant_frac_num.constant_real_int;
-            real_frac= constant_frac_num.constant_real_frac;
+            real_value= constant_frac_num.constant_real_value;
             real_verbatim= constant_frac_num.constant_real_verbatim
           } in
           let frac_den = {
-            real_int= constant_frac_den.constant_real_int;
-            real_frac= constant_frac_den.constant_real_frac;
+            real_value= constant_frac_den.constant_real_value;
             real_verbatim= constant_frac_den.constant_real_verbatim
           } in
           let frac_verbatim = constant_frac_verbatim in

@@ -29,7 +29,7 @@ type sort =
   | Smultiple of identifier * sort list
 
 type constant_int = {
-  constant_int_value: BigInt.t;
+  constant_int_value: Number.int_constant;
   constant_int_verbatim: string
 }
 
@@ -40,8 +40,7 @@ type constant_bv = {
 }
 
 type constant_real = {
-  constant_real_int: BigInt.t;
-  constant_real_frac: BigInt.t;
+  constant_real_value: Number.real_constant;
   constant_real_verbatim: string
 }
 

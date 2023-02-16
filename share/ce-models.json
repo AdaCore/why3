@@ -366,17 +366,14 @@
         "concrete_real": {
             "type": "object",
             "properties": {
-                "real_int_as_decimal": {
-                    "type": "string"
-                },
-                "real_frac_as_decimal": {
+                "real_value": {
                     "type": "string"
                 },
                 "real_verbatim": {
                     "type": "string"
                 }
             },
-            "required": ["real_int_as_decimal","real_frac_as_decimal","real_verbatim"]
+            "required": ["real_value","real_verbatim"]
         },
         "concrete_term": {
             "oneOf": [
@@ -429,14 +426,14 @@
                         "val": {
                             "type": "object",
                             "properties": {
-                                "int_value_as_decimal": {
+                                "int_value": {
                                     "type": "string"
                                 },
                                 "int_verbatim": {
                                     "type": "string"
                                 }
                             },
-                            "required": ["int_value_as_decimal","int_verbatim"]
+                            "required": ["int_value","int_verbatim"]
                         }
                     },
                     "required": ["type","val"]

@@ -49,7 +49,7 @@ let print_model_kind fmt = function
   | Other -> pp_print_string fmt "Other"
 
 type concrete_syntax_int = {
-  int_value: BigInt.t;
+  int_value: Number.int_constant;
   int_verbatim: string
 }
 
@@ -60,8 +60,7 @@ type concrete_syntax_bv = {
 }
 
 type concrete_syntax_real = {
-  real_int: BigInt.t;
-  real_frac: BigInt.t;
+  real_value: Number.real_constant;
   real_verbatim: string
 }
 
@@ -125,7 +124,7 @@ let rec print_concrete_term fmt ct =
   | Const (Boolean b) -> pp_print_bool fmt b
   | Const (String s) -> Constant.print_string_def fmt s
   | Const (Integer {int_value; int_verbatim}) -> pp_print_string fmt int_verbatim
-  | Const (Real {real_int; real_frac; real_verbatim}) -> pp_print_string fmt real_verbatim
+  | Const (Real {real_value; real_verbatim}) -> pp_print_string fmt real_verbatim
   | Const (Float Infinity) -> pp_print_string fmt "∞"
   | Const (Float Plus_zero) -> pp_print_string fmt "+0"
   | Const (Float Minus_zero) -> pp_print_string fmt "-0"
@@ -532,14 +531,17 @@ let json_of_concrete_bv { bv_value; bv_length; bv_verbatim } =
     "bv_verbatim", String bv_verbatim
   ]
 
-let json_of_concrete_real { real_int; real_frac; real_verbatim } =
+let json_of_concrete_real { real_value; real_verbatim } =
   let open Json_base in
+  let real_value_string =
+    Format.asprintf "@[<h>%a@]"
+      (Number.(print_real_constant full_support)) real_value
+  in
   Record [
     "type", String "Real";
     "val",
       Record [
-        "real_int_as_decimal", String (BigInt.to_string real_int);
-        "real_frac_as_decimal", String (BigInt.to_string real_frac);
+        "real_value", String real_value_string;
         "real_verbatim", String real_verbatim
       ]
   ]
@@ -552,11 +554,15 @@ let rec json_of_concrete_term ct =
   | Const (Boolean b) -> Record [ "type", String "Boolean"; "val", Bool b ]
   | Const (String s) -> Record [ "type", String "String"; "val", String s ]
   | Const (Integer {int_value; int_verbatim}) ->
+    let int_value_string =
+      Format.asprintf "@[<h>%a@]"
+        (Number.(print_int_constant full_support)) int_value
+    in
     Record [
       "type", String "Integer";
       "val",
         Record [
-          "int_value_as_decimal", String (BigInt.to_string int_value);
+          "int_value", String int_value_string;
           "int_verbatim", String int_verbatim
         ]
     ]

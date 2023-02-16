@@ -27,7 +27,7 @@ type sort =
   | Smultiple of identifier * sort list
 
 type constant_int = {
-  constant_int_value: BigInt.t;
+  constant_int_value: Number.int_constant;
   constant_int_verbatim: string
 }
 
@@ -38,8 +38,7 @@ type constant_bv = {
 }
 
 type constant_real = {
-  constant_real_int: BigInt.t;
-  constant_real_frac: BigInt.t;
+  constant_real_value: Number.real_constant;
   constant_real_verbatim: string
 }
 
@@ -135,14 +134,14 @@ let print_bv fmt { constant_bv_value; constant_bv_length; constant_bv_verbatim }
   fprintf fmt "(Cbitvector {value=%a; length=%d; verbatim=%s})"
     print_bigint constant_bv_value constant_bv_length constant_bv_verbatim
 
-let print_real fmt { constant_real_int; constant_real_frac; constant_real_verbatim } =
-  fprintf fmt "(Creal {int=%a; frac=%a; verbatim=%s})"
-    print_bigint constant_real_int print_bigint constant_real_frac constant_real_verbatim
+let print_real fmt { constant_real_value; constant_real_verbatim } =
+  fprintf fmt "(Creal {value=%a; verbatim=%s})"
+    Number.(print_real_constant full_support) constant_real_value constant_real_verbatim
 
 let print_constant fmt = function
   | Cint {constant_int_value; constant_int_verbatim} ->
     fprintf fmt "(Cint {value=%a; verbatim=%s)"
-      print_bigint constant_int_value constant_int_verbatim
+      Number.(print_int_constant full_support) constant_int_value constant_int_verbatim
   | Creal r -> print_real fmt r
   | Cfraction {constant_frac_num; constant_frac_den; constant_frac_verbatim} ->
       fprintf fmt "(Cfraction {num=%a; den=%a; verbatim=%s})"

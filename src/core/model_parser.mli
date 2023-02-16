@@ -47,7 +47,7 @@ val print_model_kind : Format.formatter -> model_element_kind -> unit
 (** Integers *)
 
 type concrete_syntax_int = {
-  int_value: BigInt.t; (** Integer value *)
+  int_value: Number.int_constant; (** Integer value *)
   int_verbatim: string (** String verbatim, as given by the SMT solver *)
 }
 
@@ -62,8 +62,7 @@ type concrete_syntax_bv = {
 (** Real numbers *)
 
 type concrete_syntax_real = {
-  real_int: BigInt.t; (** Integer part of the decimal notation (may be negative) *)
-  real_frac: BigInt.t; (** Fractional part of the decimal notation *)
+  real_value: Number.real_constant; (** Real value *)
   real_verbatim: string (** String verbatim, as given by the SMT solver *)
 }
 
