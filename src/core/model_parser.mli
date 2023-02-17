@@ -54,7 +54,7 @@ type concrete_syntax_int = {
 (** Bitvectors *)
 
 type concrete_syntax_bv = {
-  bv_value: BigInt.t; (** Bitvector value (in decimal notation) *)
+  bv_value: BigInt.t; (** Bitvector value *)
   bv_length: int; (** Length of the bitvector *)
   bv_verbatim : string (** String verbatim, as given by the SMT solver *)
 }
