@@ -48,7 +48,27 @@ let print_model_kind fmt = function
   | Loop_current_iteration -> pp_print_string fmt "Loop_current_iteration"
   | Other -> pp_print_string fmt "Other"
 
-type concrete_syntax_bv = { bv_binary: string; bv_int : string }
+type concrete_syntax_int = {
+  int_value: Number.int_constant;
+  int_verbatim: string
+}
+
+type concrete_syntax_bv = {
+  bv_value: BigInt.t;
+  bv_length: int;
+  bv_verbatim : string
+}
+
+type concrete_syntax_real = {
+  real_value: Number.real_constant;
+  real_verbatim: string
+}
+
+type concrete_syntax_frac = {
+  frac_num: concrete_syntax_real;
+  frac_den: concrete_syntax_real;
+  frac_verbatim: string
+}
 
 type concrete_syntax_float =
   | Infinity
@@ -56,20 +76,20 @@ type concrete_syntax_float =
   | NaN
   | Float_number of
     {
-      sign : string;
-      exp : string;
-      mant : string;
-      hex : string
+      float_sign : concrete_syntax_bv;
+      float_exp : concrete_syntax_bv;
+      float_mant : concrete_syntax_bv;
+      float_hex : string
     }
 
 type concrete_syntax_constant =
   | Boolean of bool
   | String of string
-  | Integer of string
-  | Real of string
+  | Integer of concrete_syntax_int
+  | Real of concrete_syntax_real
   | Float of concrete_syntax_float
   | BitVector of concrete_syntax_bv
-  | Fraction of string * string
+  | Fraction of concrete_syntax_frac
 
 type concrete_syntax_quant = Forall | Exists
 type concrete_syntax_binop = And | Or | Implies | Iff
@@ -94,8 +114,8 @@ type concrete_syntax_term =
 
 (* Pretty printing of concrete terms *)
 
-let print_concrete_bv fmt { bv_binary; bv_int } =
-  fprintf fmt "%s (%s)" bv_int bv_binary
+let print_concrete_bv fmt { bv_value; bv_length; bv_verbatim } =
+  fprintf fmt "%s" bv_verbatim
 
 let rec print_concrete_term fmt ct =
   let open Format in
@@ -103,16 +123,20 @@ let rec print_concrete_term fmt ct =
   | Var v -> pp_print_string fmt v
   | Const (Boolean b) -> pp_print_bool fmt b
   | Const (String s) -> Constant.print_string_def fmt s
-  | Const (Integer i) -> pp_print_string fmt i
-  | Const (Real d) -> pp_print_string fmt d
+  | Const (Integer {int_value; int_verbatim}) -> pp_print_string fmt int_verbatim
+  | Const (Real {real_value; real_verbatim}) -> pp_print_string fmt real_verbatim
   | Const (Float Infinity) -> pp_print_string fmt "∞"
   | Const (Float Plus_zero) -> pp_print_string fmt "+0"
   | Const (Float Minus_zero) -> pp_print_string fmt "-0"
   | Const (Float NaN) -> pp_print_string fmt "NaN"
-  | Const (Float (Float_number {exp;sign;mant;hex})) ->
-    fprintf fmt "float{exp=%s, sign=%s, mant=%s} (%s)" exp sign mant hex
+  | Const (Float (Float_number {float_exp;float_sign;float_mant;float_hex})) ->
+    fprintf fmt "float{exp=%a, sign=%a, mant=%a, hex=%s}"
+      print_concrete_bv float_exp
+      print_concrete_bv float_sign
+      print_concrete_bv float_mant
+      float_hex
   | Const (BitVector bv) -> fprintf fmt "%a" print_concrete_bv bv
-  | Const (Fraction (f1,f2)) -> fprintf fmt "%s/%s" f1 f2
+  | Const (Fraction {frac_num;frac_den;frac_verbatim}) -> fprintf fmt "%s" frac_verbatim
   | Apply ("=",[t1;t2]) ->
     fprintf fmt "%a = %a"
       print_concrete_term t1
@@ -499,11 +523,27 @@ let rec json_of_term t =
   | Tlet _ -> Record [ "Tlet", String "UNSUPPORTED" ]
   | Tcase _ -> Record [ "Tcase", String "UNSUPPORTED" ]
 
-let json_of_concrete_bv { bv_binary; bv_int } =
+let json_of_concrete_bv { bv_value; bv_length; bv_verbatim } =
   let open Json_base in
   Record [
-    "bv_binary", String bv_binary;
-    "bv_int", String bv_int
+    "bv_value_as_decimal", String (BigInt.to_string bv_value);
+    "bv_length", Int bv_length;
+    "bv_verbatim", String bv_verbatim
+  ]
+
+let json_of_concrete_real { real_value; real_verbatim } =
+  let open Json_base in
+  let real_value_string =
+    Format.asprintf "@[<h>%a@]"
+      (Number.(print_real_constant full_support)) real_value
+  in
+  Record [
+    "type", String "Real";
+    "val",
+      Record [
+        "real_value", String real_value_string;
+        "real_verbatim", String real_verbatim
+      ]
   ]
 
 let rec json_of_concrete_term ct =
@@ -513,12 +553,32 @@ let rec json_of_concrete_term ct =
 
   | Const (Boolean b) -> Record [ "type", String "Boolean"; "val", Bool b ]
   | Const (String s) -> Record [ "type", String "String"; "val", String s ]
-  | Const (Integer i) -> Record [ "type", String "Integer"; "val", String i ]
-  | Const (Real d) -> Record [ "type", String "Real"; "val", String d ]
+  | Const (Integer {int_value; int_verbatim}) ->
+    let int_value_string =
+      Format.asprintf "@[<h>%a@]"
+        (Number.(print_int_constant full_support)) int_value
+    in
+    Record [
+      "type", String "Integer";
+      "val",
+        Record [
+          "int_value", String int_value_string;
+          "int_verbatim", String int_verbatim
+        ]
+    ]
+  | Const (Real d) -> json_of_concrete_real d
   | Const (BitVector bv) ->
     Record [ "type", String "BitVector"; "val", json_of_concrete_bv bv ]
-  | Const (Fraction (f1,f2)) ->
-    Record [ "type", String "Fraction"; "val", String (String.concat "" [f1;"/";f2]) ]
+  | Const (Fraction {frac_num;frac_den;frac_verbatim}) ->
+    Record [
+      "type", String "Fraction";
+      "val",
+        Record [
+          "frac_num", json_of_concrete_real frac_num;
+          "frac_den", json_of_concrete_real frac_den;
+          "frac_verbatim", String frac_verbatim
+        ]
+    ]
 
   | Const (Float Infinity) ->
     Record [
@@ -537,15 +597,15 @@ let rec json_of_concrete_term ct =
     Record [
       "type", String "Float"; "val", Record [ "float_type", String "NaN" ]
     ]
-  | Const (Float (Float_number {sign;exp;mant;hex})) ->
+  | Const (Float (Float_number {float_sign;float_exp;float_mant;float_hex})) ->
     Record [
       "type", String "Float";
       "val", Record [
         "float_type", String "Float_value";
-        "sign", String sign;
-        "exp", String exp;
-        "mant", String mant;
-        "hex", String hex
+        "float_sign", json_of_concrete_bv float_sign;
+        "float_exp", json_of_concrete_bv float_exp;
+        "float_mant", json_of_concrete_bv float_mant;
+        "float_hex", String float_hex
       ]
     ]
 
@@ -1104,14 +1164,14 @@ class clean = object (self)
     | String v -> self#string v
     | Integer v -> self#integer v
     | Real v -> self#real v
-    | Fraction (v1,v2) -> self#fraction v1 v2
+    | Fraction v -> self#fraction v
     | Float v -> self#float v
     | Boolean v -> self#boolean v
     | BitVector v -> self#bitvector v
   method string v = Some (Const (String v))
   method integer v = Some (Const (Integer v))
   method real v = Some (Const (Real v))
-  method fraction v1 v2 = Some (Const (Fraction (v1,v2)))
+  method fraction v = Some (Const (Fraction v))
   method float v = Some (Const (Float v))
   method boolean v = Some (Const (Boolean v))
   method bitvector v = Some (Const (BitVector v))

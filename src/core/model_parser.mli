@@ -9,11 +9,12 @@
 (*                                                                  *)
 (********************************************************************)
 
-(*
-***************************************************************
-**  Model elements
-***************************************************************
-*)
+(** {2 Model} *)
+
+(** For a given VC, a model is a set of model elements representing
+    CE values for source code elements. *)
+
+(** {3 Model element kind} *)
 
 type model_element_kind =
   | Result
@@ -38,10 +39,42 @@ type model_element_kind =
 
 val print_model_kind : Format.formatter -> model_element_kind -> unit
 
-(* Concrete syntax for model element values
-   (used for pretty printing and JSON printing) *)
+(** {3 Model element concrete value} *)
 
-type concrete_syntax_bv = { bv_binary: string; bv_int : string }
+(** Concrete syntax for model element values (which are of type [Term.term]),
+    used for pretty printing and JSON printing. *)
+
+(** Integers *)
+
+type concrete_syntax_int = {
+  int_value: Number.int_constant; (** Integer value *)
+  int_verbatim: string (** String verbatim, as given by the SMT solver *)
+}
+
+(** Bitvectors *)
+
+type concrete_syntax_bv = {
+  bv_value: BigInt.t; (** Bitvector value *)
+  bv_length: int; (** Length of the bitvector *)
+  bv_verbatim : string (** String verbatim, as given by the SMT solver *)
+}
+
+(** Real numbers *)
+
+type concrete_syntax_real = {
+  real_value: Number.real_constant; (** Real value *)
+  real_verbatim: string (** String verbatim, as given by the SMT solver *)
+}
+
+(** Fractions *)
+
+type concrete_syntax_frac = {
+  frac_num: concrete_syntax_real; (** Numerator *)
+  frac_den: concrete_syntax_real; (** Denominator *)
+  frac_verbatim: string (** String verbatim, as given by the SMT solver *)
+}
+
+(** Floats *)
 
 type concrete_syntax_float =
   | Infinity
@@ -49,50 +82,68 @@ type concrete_syntax_float =
   | NaN
   | Float_number of
     {
-      sign : string;
-      exp : string;
-      mant : string;
-      hex : string
+      float_sign : concrete_syntax_bv; (** Sign bit *)
+      float_exp : concrete_syntax_bv; (** Exponent bits *)
+      float_mant : concrete_syntax_bv; (** Mantissa (or significand) bits *)
+      float_hex : string (** Hexadecimal reprensation *)
     }
+
+(** Constants *)
 
 type concrete_syntax_constant =
   | Boolean of bool
   | String of string
-  | Integer of string
-  | Real of string
+  | Integer of concrete_syntax_int
+  | Real of concrete_syntax_real
   | Float of concrete_syntax_float
   | BitVector of concrete_syntax_bv
-  | Fraction of string * string
+  | Fraction of concrete_syntax_frac
+
+(** Quantifiers *)
 
 type concrete_syntax_quant = Forall | Exists
+
+(** Binary operators *)
+
 type concrete_syntax_binop = And | Or | Implies | Iff
+
+(** Concrete term *)
 
 type concrete_syntax_term =
   | Var of string
+  (** Variable of the given name *)
   | Const of concrete_syntax_constant
+  (** Constant *)
   | Apply of string * concrete_syntax_term list
+  (** Application of the given function symbol to the given list of concrete terms *)
   | If of concrete_syntax_term * concrete_syntax_term * concrete_syntax_term
+  (** [If (cb,ct1,ct2)] stands for [if cb then t1 else ct2] *)
   | Epsilon of string * concrete_syntax_term
+  (** [Epsilon (x,ct)] stands for [eps x. ct] *)
   | Quant of concrete_syntax_quant * string list * concrete_syntax_term
-  (* Quant (q,vars,t) *)
+  (** [Quant (q,vars,ct)] stands for [q vars. ct] *)
   | Binop of concrete_syntax_binop * concrete_syntax_term * concrete_syntax_term
+  (** [If (op,ct1,ct2)] stands for [ct1 op ct2] *)
   | Not of concrete_syntax_term
+  (** Negation of a concrete term *)
   | Function of { args: string list ; body: concrete_syntax_term }
+  (** Function defined by the given list of arguments and the given body *)
   | FunctionLiteral of {
       elts: (concrete_syntax_term * concrete_syntax_term) list;
       others: concrete_syntax_term
     }
-  (* in particular, arrays are represented using FunctionLiteral *)
+  (** Special case for function literals, also used for arrays *)
   | Record of (string * concrete_syntax_term) list
-  (* list of (field_name,field_value) elements *)
+  (** Record defined by the given list of (field_name,field_value) elements *)
   | Proj of (string * concrete_syntax_term)
-  (* represents values that are defined by a type coercion:
+  (** Projections represent values that are defined by a type coercion:
      the value [eps x. ty'int x = 0] is represented by
      the concrete syntax term [Proj ty'int (Const (Integer 0))] *)
 
 val print_concrete_term : Format.formatter -> concrete_syntax_term -> unit
 
-(* Helper functions to create concrete terms *)
+(** Helper functions to create concrete terms *)
+
 val concrete_var_from_vs : Term.vsymbol -> concrete_syntax_term
 val concrete_const_bool : bool -> concrete_syntax_term
 val concrete_apply_from_ls : Term.lsymbol -> concrete_syntax_term list -> concrete_syntax_term
@@ -100,9 +151,11 @@ val concrete_apply_equ : concrete_syntax_term -> concrete_syntax_term -> concret
 val subst_concrete_term :
   concrete_syntax_term Wstdlib.Mstr.t -> concrete_syntax_term -> concrete_syntax_term
 val t_and_l_concrete : concrete_syntax_term list -> concrete_syntax_term
-  
+
+(** {3 Model elements} *)
+
 (** Counter-example model elements. Each element represents
-    a counter-example for a single source-code element.*)
+    a counterexample value for a single source code element.*)
 type model_element = {
   me_kind             : model_element_kind;
     (** The kind of model element. *)
@@ -125,7 +178,7 @@ val create_model_element :
   attrs           : Ident.Sattr.t ->
   lsymbol         : Term.lsymbol ->
   model_element
-(** Creates a counter-example model element.
+(** Creates a counterexample model element.
     @param value counterexample value for the element
     @param concrete_value concrete syntax of the counterexample value
     @param oloc (optional) location of the element
@@ -134,8 +187,11 @@ val create_model_element :
 *)
 
 val get_lsymbol_or_model_trace_name : model_element -> string
+(** Given a model element [me], returns the model_trace attribute if it
+    exists in [me.me_attrs], otherwise returns the name of the
+    [me.me_lsymbol]. *)
 
-  (** {2 Model definitions} *)
+(** {3 Model} *)
 
 type model
 
@@ -149,7 +205,7 @@ val get_model_elements : model -> model_element list
 val get_model_term_loc : model -> Loc.position option
 val get_model_term_attrs : model -> Ident.Sattr.t
 
-(** {2 Search model elements} *)
+(** {2 Searching model elements} *)
 
 val search_model_element_for_id :
   model -> ?loc:Loc.position -> Ident.ident -> model_element option
@@ -165,7 +221,7 @@ val search_model_element_call_result :
 
 val json_model : model -> Json_base.json
 (** Counterexample model in JSON format.
-    The format is documented in the user documentation (section Technical Informations). *)
+    The format is documented in [share/ce-models.json]. *)
 
 val print_model :
   ?filter_similar:bool ->
@@ -186,6 +242,8 @@ val print_model_human :
   print_attrs:bool ->
   unit
 (** Same as print_model but is intended to be human readable.*)
+
+(** {2 Interleaving source code and model} *)
 
 val interleave_with_source :
   print_attrs:bool ->
@@ -215,11 +273,8 @@ val interleave_with_source :
     were added.
 *)
 
-(*
-***************************************************************
-**  Filtering the model
-***************************************************************
-*)
+(** {2 Filtering the model} *)
+
 val model_for_positions_and_decls : model ->
   positions: Loc.position list -> model
 (** Given a model and a list of source-code positions returns model
@@ -234,11 +289,7 @@ val model_for_positions_and_decls : model ->
     Only filename and line number is used to identify positions.
 *)
 
-(*
-***************************************************************
-**  Cleaning the model
-***************************************************************
-*)
+(** {2 Cleaning the model} *)
 
 (** Helper class which can be inherited by API users to clean a model,
     for example by removing elements that do not match a given condition,
@@ -249,10 +300,10 @@ class clean : object
   method value : concrete_syntax_term -> concrete_syntax_term option
   method var : string -> concrete_syntax_term option
   method const : concrete_syntax_constant -> concrete_syntax_term option
-  method integer : string -> concrete_syntax_term option
+  method integer : concrete_syntax_int -> concrete_syntax_term option
   method string : string -> concrete_syntax_term option
-  method real : string -> concrete_syntax_term option
-  method fraction : string -> string -> concrete_syntax_term option
+  method real : concrete_syntax_real -> concrete_syntax_term option
+  method fraction : concrete_syntax_frac -> concrete_syntax_term option
   method float : concrete_syntax_float -> concrete_syntax_term option
   method boolean : bool -> concrete_syntax_term option
   method bitvector : concrete_syntax_bv -> concrete_syntax_term option
@@ -270,11 +321,7 @@ end
 
 val clean_model : #clean -> model -> model
 
-(*
-***************************************************************
-** Registering model parser
-***************************************************************
-*)
+(** {2 Registering model parser} *)
 
 type model_parser = Printer.printing_info -> string -> model
 (** Parses the input string (i.e. the output of the SMT solver)

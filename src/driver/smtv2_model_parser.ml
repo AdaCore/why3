@@ -20,6 +20,7 @@
 
 open Wstdlib
 open Term
+open Number
 open Smtv2_model_defs
 open Model_parser
 
@@ -119,12 +120,17 @@ module FromSexpToModel = struct
 
   let positive_constant_int = function
     | Atom s -> (
-        try BigInt.of_string s with _ -> atom_error s "constant_int")
+        try
+          { constant_int_value= int_literal ILitDec ~neg:false s;
+            constant_int_verbatim= s }
+        with _ -> atom_error s "positive_constant_int")
     | sexp -> error sexp "positive_constant_int"
 
   let negative_constant_int = function
-    | List [ Atom "-"; i ] as sexp -> (
-        try BigInt.minus (atom BigInt.of_string i)
+    | List [ Atom "-"; Atom s ] as sexp -> (
+        try
+          { constant_int_value= int_literal ILitDec ~neg:true s;
+            constant_int_verbatim= "-" ^ s }
         with _ -> error sexp "negative_constant_int")
     | sexp -> error sexp "negative_constant_int"
 
@@ -133,53 +139,58 @@ module FromSexpToModel = struct
     with _ -> (
       try negative_constant_int sexp with _ -> error sexp "constant_int")
 
-  let positive_constant_dec s =
-    try Scanf.sscanf s "%[^.].%s" (fun s1 s2 -> (s1, s2))
-    with _ -> atom_error s "constant_dec"
+  let positive_constant_real s =
+    try
+      Scanf.sscanf s "%[^.].%s"
+        (fun s1 s2 -> (s, s1, s2))
+    with _ -> atom_error s "positive_constant_real"
 
-  let constant_dec = function
+  let constant_real = function
     | Atom s ->
-        let s1, s2 = positive_constant_dec s in
-        { real_neg = false; real_int = s1; real_frac = s2 }
+      let s', i1, i2 = positive_constant_real s in
+      { constant_real_value=
+          real_literal ~radix:10 ~neg:false ~int:i1 ~frac:i2 ~exp:None;
+        constant_real_verbatim= s'
+      }
     | List [ Atom "-"; Atom s ] ->
-        let s1, s2 = positive_constant_dec s in
-        { real_neg = true; real_int = s1; real_frac = s2 }
-    | sexp -> error sexp "constant_dec"
+      let s', i1, i2 = positive_constant_real s in
+      { constant_real_value=
+          real_literal ~radix:10 ~neg:true ~int:i1 ~frac:i2 ~exp:None;
+        constant_real_verbatim= "-" ^ s'
+      }
+    | sexp -> error sexp "constant_real"
 
   let constant_fraction ~neg sexp =
-    let positive_constant_int_fraction = function
-      | Atom s -> (
-          try (false, BigInt.of_string s)
-          with _ -> atom_error s "positive_constant_int_fraction")
-      | sexp -> error sexp "positive_constant_int_fraction"
+    let constant_int_fraction = function
+      | Atom s ->
+        { constant_real_value=
+            real_literal ~radix:10 ~neg:false ~int:s ~frac:"0" ~exp:None;
+          constant_real_verbatim= s
+        }
+      | List [ Atom "-"; Atom s ] ->
+        { constant_real_value=
+            real_literal ~radix:10 ~neg:true ~int:s ~frac:"0" ~exp:None;
+          constant_real_verbatim= "-" ^ s
+        }
+      | sexp -> error sexp "constant_int_fraction"
     in
-    let negative_constant_int_fraction = function
-      | List [ Atom "-"; i ] as sexp -> (
-          try (true, atom BigInt.of_string i)
-          with _ -> error sexp "negative_constant_int_fraction")
-      | sexp -> error sexp "negative_constant_int_fraction"
-    in
-    let constant_int_fraction sexp =
-      let zero = "0" in
-      let neg, c =
-        try positive_constant_int_fraction sexp
-        with _ -> (
-          try negative_constant_int_fraction sexp
-          with _ -> error sexp "constant_int_fraction")
-      in
-      { real_neg = neg; real_int = BigInt.to_string c; real_frac = zero }
-    in
-    let constant_int_or_dec_fraction n =
-      try constant_int_fraction n with _ -> constant_dec n
-    in
-    let neg_constant_real { real_neg = neg; real_int = s1; real_frac = s2 } =
-      { real_neg = not neg; real_int = s1; real_frac = s2 }
+    let constant_int_or_real_fraction n =
+      try constant_int_fraction n with _ -> constant_real n
     in
     match sexp with
     | List [ Atom "/"; n1; n2 ] ->
-        let r1 = constant_int_or_dec_fraction n1 in
-        let r2 = constant_int_or_dec_fraction n2 in
-        if neg then Cfraction (neg_constant_real r1, r2) else Cfraction (r1, r2)
+        let r1 = constant_int_or_real_fraction n1 in
+        let r2 = constant_int_or_real_fraction n2 in
+        let r1 =
+          if neg then
+            { constant_real_value= neg_real r1.constant_real_value;
+              constant_real_verbatim= "-" ^ r1.constant_real_verbatim }
+          else r1 in
+        {
+          constant_frac_num= r1;
+          constant_frac_den= r2;
+          constant_frac_verbatim= r1.constant_real_verbatim ^ "/" ^ r2.constant_real_verbatim
+        }
     | _ -> error sexp "constant_fraction"
 
   let constant_fraction sexp =
@@ -191,9 +202,9 @@ module FromSexpToModel = struct
     | Atom s -> (
         try
           let s' = Strings.remove_prefix "#b" s in
-          let bv_value = BigInt.of_string ("0b" ^ s') in
-          let bv_length = String.length s' in
-          { bv_value; bv_length; bv_verbatim = s }
+          let constant_bv_value = BigInt.of_string ("0b" ^ s') in
+          let constant_bv_length = String.length s' in
+          { constant_bv_value; constant_bv_length; constant_bv_verbatim = s }
         with _ -> atom_error s "constant_bv_bin")
     | sexp -> error sexp "constant_bv_bin"
 
@@ -201,18 +212,18 @@ module FromSexpToModel = struct
     | Atom s -> (
         try
           let s' = Strings.remove_prefix "#x" s in
-          let bv_value = BigInt.of_string ("0x" ^ s') in
-          let bv_length = String.length s' * 4 in
-          { bv_value; bv_length; bv_verbatim = s }
+          let constant_bv_value = BigInt.of_string ("0x" ^ s') in
+          let constant_bv_length = String.length s' * 4 in
+          { constant_bv_value; constant_bv_length; constant_bv_verbatim = s }
         with _ -> atom_error s "constant_bv_hex")
     | sexp -> error sexp "constant_bv_hex"
 
   let constant_bv_dec = function
     | List [ Atom "_"; Atom n; l ] as sexp -> (
         try
-          let bv_value = BigInt.of_string (Strings.remove_prefix "bv" n) in
-          let bv_length = int l in
-          { bv_value; bv_length; bv_verbatim = string_of_sexp sexp }
+          let constant_bv_value = BigInt.of_string (Strings.remove_prefix "bv" n) in
+          let constant_bv_length = int l in
+          { constant_bv_value; constant_bv_length; constant_bv_verbatim = string_of_sexp sexp }
         with _ -> error sexp "constant_bv_dec")
     | sexp -> error sexp "constant_bv_dec"
 
@@ -240,19 +251,19 @@ module FromSexpToModel = struct
         ignore (bigint n1, bigint n2);
         Fnan
     | List [ Atom "fp"; sign; exp; mant ] ->
-        let sign = constant_bv sign
-        and exp = constant_bv exp
-        and mant = constant_bv mant in
-        Fnumber { sign; exp; mant }
+        let constant_float_sign = constant_bv sign
+        and constant_float_exp = constant_bv exp
+        and constant_float_mant = constant_bv mant in
+        Fnumber { constant_float_sign; constant_float_exp; constant_float_mant }
     | sexp -> error sexp "constant_float"
 
   let constant sexp : term =
     let cst =
       try Cint (constant_int sexp)
       with _ -> (
-        try Cdecimal (constant_dec sexp)
+        try Creal (constant_real sexp)
         with _ -> (
-          try constant_fraction sexp
+          try Cfraction (constant_fraction sexp)
           with _ -> (
             try Cbitvector (constant_bv sexp)
             with _ -> (
@@ -606,13 +617,24 @@ module FromModelToTerm = struct
 
   (* Be careful when modifying this code! *)
   let float_of_binary fp =
+    let smtv2_model_bv_to_model_parser_bv
+        { constant_bv_value; constant_bv_length; constant_bv_verbatim } =
+      {
+        bv_value= constant_bv_value;
+        bv_length= constant_bv_length;
+        bv_verbatim= constant_bv_verbatim
+      }
+    in
     match fp with
     | Fplusinfinity | Fminusinfinity -> raise Float_Infinity
     | Fpluszero -> raise Float_PlusZero
     | Fminuszero -> raise Float_MinusZero
     | Fnan -> raise Float_NaN
-    | Fnumber { sign; exp; mant } ->
-        let fp_binary = (sign.bv_verbatim, exp.bv_verbatim, mant.bv_verbatim) in
+    | Fnumber { constant_float_sign; constant_float_exp; constant_float_mant } ->
+        let sign = smtv2_model_bv_to_model_parser_bv constant_float_sign in
+        let exp = smtv2_model_bv_to_model_parser_bv constant_float_exp in
+        let mant = smtv2_model_bv_to_model_parser_bv constant_float_mant in
+        let fp_binary = (sign, exp, mant) in
         let exp_bias = BigInt.pred (BigInt.pow_int_pos 2 (exp.bv_length - 1)) in
         let exp_max = BigInt.pred (BigInt.pow_int_pos 2 exp.bv_length) in
         let frac_len =
@@ -677,63 +699,53 @@ module FromModelToTerm = struct
           (is_neg, "1", frac, Some (BigInt.to_string exp), fp_binary, fp_hex)
 
   let constant_to_term env c =
-    let decimal_string neg s1 s2 =
-      if neg then String.concat "" ["-";s1;".";s2]
-      else String.concat "" [s1;".";s2]
-    in
-    let constant_bv bv_binary bv_int =
-      Const (BitVector { bv_binary; bv_int })
-    in
     match c with
-    | Cint bigint ->
-      let t = t_const (Constant.int_const bigint) Ty.ty_int in
-      let t_concrete = Const (Integer (BigInt.to_string bigint)) in
+    | Cint {constant_int_value= int_value; constant_int_verbatim= int_verbatim} ->
+      let t = t_const (Constant.ConstInt int_value) Ty.ty_int in
+      let t_concrete = Const (Integer {int_value; int_verbatim}) in
       (t, t_concrete)
-    | Cdecimal { real_neg = neg; real_int = s1; real_frac = s2 } ->
-      let t =
-        t_const
-          (Constant.real_const_from_string ~radix:10 ~neg ~int:s1 ~frac:s2
-             ~exp:None)
-          Ty.ty_real
-      in
-      let t_concrete = Const (Real (decimal_string neg s1 s2)) in
+    | Creal { constant_real_value= real_value; constant_real_verbatim= real_verbatim } ->
+      let t = t_const (Constant.ConstReal real_value) Ty.ty_real in
+      let t_concrete = Const (Real {real_value; real_verbatim}) in
       (t, t_concrete)
-    | Cfraction
-        ( { real_neg = neg; real_int = s1; real_frac = s2 },
-          { real_neg = neg'; real_int = s1'; real_frac = s2' } ) -> (
+    | Cfraction { constant_frac_num; constant_frac_den; constant_frac_verbatim } -> (
         try
-          let t =
-            t_const
-              (Constant.real_const_from_string ~radix:10 ~neg ~int:s1 ~frac:s2
-                 ~exp:None)
-              Ty.ty_real
-          in
-          let t' =
-            t_const
-              (Constant.real_const_from_string ~radix:10 ~neg:neg' ~int:s1'
-                 ~frac:s2' ~exp:None)
-              Ty.ty_real
-          in
+          let t = t_const (Constant.ConstReal constant_frac_num.constant_real_value) Ty.ty_real in
+          let t' = t_const (Constant.ConstReal constant_frac_den.constant_real_value) Ty.ty_real in
           let th = Env.read_theory env.why3_env [ "real" ] "Real" in
           let div_ls =
             Theory.ns_find_ls th.Theory.th_export [ Ident.op_infix "/" ]
           in
+          let frac_num = {
+            real_value= constant_frac_num.constant_real_value;
+            real_verbatim= constant_frac_num.constant_real_verbatim
+          } in
+          let frac_den = {
+            real_value= constant_frac_den.constant_real_value;
+            real_verbatim= constant_frac_den.constant_real_verbatim
+          } in
+          let frac_verbatim = constant_frac_verbatim in
           let t_concrete =
-            Const (Fraction (decimal_string neg s1 s2, decimal_string neg' s1' s2'))
+            Const (Fraction {frac_num; frac_den; frac_verbatim})
           in
           (t_app div_ls [ t; t' ] div_ls.ls_value, t_concrete)
         with _ ->
           error "Could not interpret constant %a as a fraction@." print_constant
             c)
-    | Cbitvector { bv_value = bigint; bv_length = n; bv_verbatim } -> (
+    | Cbitvector { constant_bv_value; constant_bv_length; constant_bv_verbatim } -> (
         try
           let _, ty =
             List.find
-              (function Sbitvec n', _ when n = n' -> true | _ -> false)
+              (function Sbitvec n', _ when constant_bv_length = n' -> true | _ -> false)
               env.inferred_types
           in
-          let t_concrete = constant_bv bv_verbatim (BigInt.to_string bigint) in
-          (t_const (Constant.int_const bigint) ty, t_concrete)
+          let t_concrete =
+            Const (BitVector {
+              bv_value= constant_bv_value;
+              bv_length= constant_bv_length;
+              bv_verbatim= constant_bv_verbatim
+            }) in
+          (t_const (Constant.int_const constant_bv_value) ty, t_concrete)
         with Not_found ->
           error
             "No matching type found in inferred_type for bitvector constant \
@@ -767,7 +779,7 @@ module FromModelToTerm = struct
         in
         try
           (* general case *)
-          let neg, s1, s2, exp, (binary_sign,binary_exp,binary_mant), hex = float_of_binary fp in
+          let neg, s1, s2, exp, (bv_sign,bv_exp,bv_mant), hex = float_of_binary fp in
           let t =
             t_const
               (Constant.real_const_from_string ~radix:16 ~neg ~int:s1 ~frac:s2
@@ -776,10 +788,10 @@ module FromModelToTerm = struct
           in
           let t_concrete =
             Const (Float (Float_number {
-              sign= binary_sign;
-              exp= binary_exp;
-              mant= binary_mant;
-              hex
+              float_sign= bv_sign;
+              float_exp= bv_exp;
+              float_mant= bv_mant;
+              float_hex= hex
             }))
           in
           (t, t_concrete)
