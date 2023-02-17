@@ -1,0 +1,60 @@
+
+(** Binomial coefficients
+
+    The binomial coefficient C(n,k) is equal to
+
+      n*(n-1)*(n-2)*...*(n-k+1)
+      -------------------------
+         k*(k-1)*(k-2)*...*1
+
+    This can be readily computed with three lines of C:
+
+      int c = 1;
+      for (int i = 1; i <= k ; i++)
+        c = c * (n - i + 1) / i;
+
+    In the code above, it is not obvious that each division is exact.
+    Below is a proof.
+
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+use int.Int
+use int.EuclideanDivision
+use int.MinMax
+
+let function (/) (x: int) (y: int)
+  requires { [@expl:check division by zero] y <> 0 }
+= div x y
+
+let rec function comb (n k: int) : int
+  requires { 0 <= k <= n }
+  variant  { n }
+  ensures  { result >= 1 }
+= if k = 0 || k = n then 1 else comb (n-1) k + comb (n-1) (k-1)
+
+let rec lemma prop1 (n k: int)
+  requires { 0 <= k <= n }
+  ensures  { comb n (n - k) = comb n k }
+  variant  { n }
+= if 0 < k < n then (prop1 (n-1) k; prop1 (n-1) (k-1))
+
+let rec lemma prop2 (n k: int)
+  requires { 1 <= k <= n }
+  ensures  { k * comb n k = comb n (k - 1) * (n - k + 1) }
+  variant  { n }
+= if k < n then prop2 (n-1) k;
+  if 1 < k then prop2 (n-1) (k-1)
+
+let compute (n k: int) : (r: int)
+  requires { 0 <= k <= n }
+  ensures  { r = comb n k }
+= let k = min k (n - k) in
+  let ref r = 1 in
+  for i = 1 to k do
+    invariant { 1 <= i <= k + 1 }
+    invariant { r = comb n (i - 1) }
+    r <- r * (n - i + 1) / i;
+    prop2 n i;
+  done;
+  r
