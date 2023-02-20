@@ -7,6 +7,13 @@ Tools
 
 MLCFG language
   * attributes on function bodies are now supported
+  * variant "stackify" for generating VCs, which attempts to recover a
+    more structured program body, reconstructing loops when
+    possible. see manual Section 7.3.5 "Alternative Translation
+    Scheme: Stackify".
+  * an experimental option called "subregion analysis" triggers the
+    inference of extra invariants. see manual Section 7.3.6 "Subregion
+    Analysis"
 
 Python language
   * added `by` and `so` connectives in predicates
@@ -25,6 +32,12 @@ API
     and `datadir` :x:
   * `Whyconf.load_driver` has been replaced by `Driver.load_driver_for_prover` :x:
   * `Warning.emit` has been replaced by `Loc.warning` :x:
+  * OCaml data structure for counterexamples is modified. See manual
+    Section 5.3.7.1 "Notes on format of displayed values", Section
+    11.10.3 "Counterexamples output formats", and the API doc
+    `http://why3.lri.fr/api/Model_parser.html`. The JSON format is
+    also modified accordingly, see manual Section 12.11 "Structure of
+    Counterexample files in JSON format"
 
 Provers
   * support for CVC5 1.0.0 (released Apr 6, 2022)
