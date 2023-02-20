@@ -921,15 +921,15 @@ let set_incremental fmt info =
     fprintf fmt "(set-option :incremental true)@\n"
 
 let meta_counterexmp_need_push =
-  Theory.register_meta_excl "counterexample_need_smtlib_push" [Theory.MTstring]
+  Theory.register_meta_excl "counterexample_need_smtlib_push" []
                             ~desc:"Internal@ use@ only"
 
 let meta_incremental =
-  Theory.register_meta_excl "meta_incremental" [Theory.MTstring]
+  Theory.register_meta_excl "meta_incremental" []
                             ~desc:"Internal@ use@ only"
 
 let meta_supports_reason_unknown =
-  Theory.register_meta_excl "supports_smt_get_info_unknown_reason" [Theory.MTstring]
+  Theory.register_meta_excl "supports_smt_get_info_unknown_reason" []
                             ~desc:"Internal@ use@ only"
 
 

@@ -26,7 +26,7 @@ let driver_debug =
     ~desc:"Print intermediate task generated during processing of a driver"
 
 let meta_get_counterexmp =
-  Theory.register_meta_excl "get_counterexmp" [Theory.MTstring]
+  Theory.register_meta_excl "get_counterexmp" []
   ~desc:"Set@ when@ counter-example@ should@ be@ get."
 
 let get_counterexmp task =

@@ -430,6 +430,7 @@ single_clone_subst:
 (* Meta declarations *)
 
 %public meta_decl:
+| META sident LEFTPAR RIGHTPAR       { Dmeta ($2, []) }
 | META sident comma_list1(meta_arg)  { Dmeta ($2, $3) }
 
 meta_arg:

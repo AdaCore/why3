@@ -930,10 +930,15 @@ let create_meta m al =
     let mt = get_meta_arg_type a in
     if at = mt then a else raise (MetaTypeMismatch (m,at,mt))
   in
-  let al = try List.map2 get_meta_arg m.meta_type al with
-    | Invalid_argument _ -> raise (BadMetaArity (m, List.length al))
-  in
-  mk_tdecl (Meta (m,al))
+  if m.meta_type = [] && al = [MAstr ""] then
+    (* backward compatibility *)
+    mk_tdecl (Meta (m, []))
+  else
+    let al = try
+        List.map2 get_meta_arg m.meta_type al
+      with Invalid_argument _ ->
+        raise (BadMetaArity (m, List.length al)) in
+    mk_tdecl (Meta (m,al))
 
 let add_meta uc s al = add_tdecl uc (create_meta s al)
 

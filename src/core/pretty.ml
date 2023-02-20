@@ -674,8 +674,9 @@ let print_tdecl fmt td = match td.td_node with
                     (print_list_suf comma print_inst_ls) lm
                     (print_list_suf comma print_inst_pr) pm
   | Meta (m,al) ->
-      fprintf fmt "@[<hov 2>(* meta %s %a *)@]"
-        m.meta_name (print_list comma print_meta_arg) al
+      fprintf fmt "@[<hov 2>(* meta %s%a *)@]"
+        m.meta_name
+        (print_list_delim ~start:space ~stop:nothing ~sep:comma print_meta_arg) al
 
 let print_theory fmt th =
   fprintf fmt "@[<hov 2>theory %a%a@\n%a@]@\nend@."
