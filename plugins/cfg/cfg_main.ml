@@ -16,7 +16,7 @@ open Pmodule
 open Ptree
 
 let has_stackify = ref false
-let stackify = ref (fun _ -> failwith "stackify is not compiled")
+let stackify = ref (fun _ -> failwith "stackify not compiled. Install `ocamlgraph` to enable.")
 
 let set_stackify f =
   stackify := f;
