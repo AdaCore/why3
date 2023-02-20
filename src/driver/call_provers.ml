@@ -44,18 +44,19 @@ type prover_result = {
 
 (* BEGIN{resourcelimit} anchor for automatic documentation, do not remove *)
 type resource_limit = {
-  limit_time  : int;
+  limit_time  : float;
   limit_mem   : int;
   limit_steps : int;
 }
 (* END{resourcelimit} anchor for automatic documentation, do not remove *)
 
-let empty_limit = { limit_time = 0 ; limit_mem = 0; limit_steps = 0 }
+let empty_limit = { limit_time = 0.0 ; limit_mem = 0; limit_steps = 0 }
 
 let limit_max =
   let single_limit_max a b = if a = 0 || b = 0 then 0 else max a b in
+  let single_limit_maxf a b : float = if a = 0.0 || b = 0.0 then 0.0 else max a b in
   fun a b ->
-    { limit_time = single_limit_max a.limit_time b.limit_time;
+    { limit_time = single_limit_maxf a.limit_time b.limit_time;
       limit_steps = single_limit_max a.limit_steps b.limit_steps;
       limit_mem = single_limit_max a.limit_mem b.limit_mem; }
 
@@ -331,9 +332,10 @@ let parse_prover_run res_parser signaled time out exitcode limit get_counterexmp
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
   let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in
-  let tlimit = float limit.limit_time in
+  let tlimit = limit.limit_time in
   let stepslimit = limit.limit_steps in
   let ans, time, steps =
+
     (* HighFailure or Unknown close to time limit are assumed to be timeouts *)
     if tlimit > 0.0 && time >= 0.9 *. tlimit -. 0.1 then
     match ans with
@@ -374,7 +376,7 @@ let parse_prover_run res_parser signaled time outfile exitcode limit get_counter
     parse_prover_run res_parser signaled time out exitcode limit get_counterexmp printing_info
 
 let actualcommand ~config command limit file =
-  let stime = string_of_int limit.limit_time in
+  let stime = string_of_float limit.limit_time in
   let smem = string_of_int limit.limit_mem in
   let arglist = Cmdline.cmdline_split command in
   let use_stdin = ref true in
@@ -418,9 +420,9 @@ let adapt_limits limit on_timelimit =
     { limit with limit_time =
       (* for steps limit use 2 * t + 1 time *)
       if limit.limit_steps <> empty_limit.limit_steps
-      then (2 * limit.limit_time + 1)
+      then (2.0 *. limit.limit_time +. 1.0)
       (* if prover implements time limit, use 4t + 1 *)
-      else if on_timelimit then 4 * limit.limit_time + 1
+      else if on_timelimit then 4.0 *. limit.limit_time +. 1.0
       (* otherwise use t *)
       else limit.limit_time }
 
@@ -490,7 +492,7 @@ let call_on_file
   let use_stdin = if use_stdin then Some fin else None in
   Debug.dprintf
     debug
-    "Request sent to prove_client:@ timelimit=%d@ memlimit=%d@ cmd=@[[%a]@]@."
+    "Request sent to prove_client:@ timelimit=%f@ memlimit=%d@ cmd=@[[%a]@]@."
     limit.limit_time limit.limit_mem
     (Pp.print_list Pp.comma Pp.string) cmd;
   let libdir = Whyconf.libdir config in

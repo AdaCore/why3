@@ -549,7 +549,7 @@ open Format
 open Ident
 
 let print_proof_attempt fmt pa =
-  fprintf fmt "@[<h>%a tl=%d %a@]"
+  fprintf fmt "@[<h>%a tl=%f %a@]"
           Whyconf.print_prover pa.prover
           pa.limit.Call_provers.limit_time
           (Pp.print_option (Call_provers.print_prover_result ~json:false))
@@ -985,6 +985,11 @@ let bool_attribute field r def =
     | _ -> assert false
   with Not_found -> def
 
+let float_attribute_def field r def =
+  try
+    float_of_string (List.assoc field r.Xml.attributes)
+  with Not_found | Invalid_argument _ -> def
+
 let int_attribute_def field r def =
   try
     int_of_string (List.assoc field r.Xml.attributes)
@@ -1007,6 +1012,7 @@ let string_attribute field r =
     Loc.warning "[Error] missing required attribute '%s' from element '%s'@."
       field r.Xml.name;
     assert false
+
 
 let default_unknown_result =
      {
@@ -1137,7 +1143,7 @@ and load_proof_or_transf session old_provers pid a =
               Some path
           in
           let obsolete = bool_attribute "obsolete" a false in
-          let timelimit = int_attribute_def "timelimit" a timelimit in
+          let timelimit = float_attribute_def "timelimit" a timelimit in
           let steplimit = int_attribute_def "steplimit" a steplimit in
           let memlimit = int_attribute_def "memlimit" a memlimit in
           let limit = { Call_provers.limit_time  = timelimit;
@@ -1245,7 +1251,7 @@ let load_file session old_provers f =
         let name = string_attribute "name" f in
         let version = string_attribute "version" f in
         let altern = string_attribute_def "alternative" f "" in
-        let timelimit = int_attribute_def "timelimit" f 5 in
+        let timelimit = float_attribute_def "timelimit" f 5.0 in
         let steplimit = int_attribute_def "steplimit" f 1 in
         let memlimit = int_attribute_def "memlimit" f 1000 in
         let p = {Whyconf.prover_name = name;
@@ -1921,7 +1927,15 @@ open Format
 let save_string = Pp.html_string
 
 type save_ctxt = {
-  provers : (int * int * int * int) Mprover.t;
+  provers : (
+    (* id *)
+    int *
+    (* timelimit *)
+    float *
+    (* steplimit *)
+    int *
+    (* mem limit *)
+    int) Mprover.t;
   ch_shapes : Compress.Compress_z.out_channel;
 }
 
@@ -1950,12 +1964,12 @@ let get_used_provers_with_stats session =
     session;
   prover_table
 
-let get_prover_to_save prover_ids p (timelimits,steplimits,memlimits) provers =
+let get_prover_to_save prover_ids p ((timelimits : (float, int) Hashtbl.t),steplimits,memlimits) provers =
   let mostfrequent_timelimit,_ =
     Hashtbl.fold
       (fun t f ((_,f') as t') -> if f > f' then (t,f) else t')
       timelimits
-      (0,0)
+      (0.0,0)
   in
   let mostfrequent_steplimit,_ =
     Hashtbl.fold
@@ -1994,12 +2008,12 @@ let opt pr lab fmt = function
   | None -> ()
   | Some s -> fprintf fmt "@ %s=\"%a\"" lab pr s
 
-let save_prover fmt id (p,mostfrequent_timelimit,mostfrequent_steplimit,mostfrequent_memlimit) =
+let save_prover fmt id (p,(mostfrequent_timelimit : float),mostfrequent_steplimit,mostfrequent_memlimit) =
   let steplimit =
     if mostfrequent_steplimit < 0 then None else Some mostfrequent_steplimit
   in
   fprintf fmt "@\n@[<h><prover@ id=\"%i\"@ name=\"%a\"@ \
-               version=\"%a\"%a@ timelimit=\"%d\"%a@ memlimit=\"%d\"/>@]"
+               version=\"%a\"%a@ timelimit=\"%f\"%a@ memlimit=\"%d\"/>@]"
     id save_string p.Whyconf.prover_name save_string p.Whyconf.prover_version
     (fun fmt s -> if s <> "" then fprintf fmt "@ alternative=\"%a\""
         save_string s)
@@ -2023,6 +2037,9 @@ let save_bool_def name def fmt b =
 
 let save_int_def name def fmt n =
   if n <> def then fprintf fmt "@ %s=\"%d\"" name n
+
+let save_float_def name def fmt n =
+  if n <> def then fprintf fmt "@ %s=\"%f\"" name n
 
 let save_result fmt r =
   let steps = if  r.Call_provers.pr_steps >= 0 then
@@ -2057,7 +2074,7 @@ let save_proof_attempt fmt ((id,tl,sl,ml),a) =
   fprintf fmt
     "@\n@[<h><proof@ prover=\"%i\"%a%a%a%a>"
     id
-    (save_int_def "timelimit" tl) (a.limit.Call_provers.limit_time)
+    (save_float_def "timelimit" tl) (a.limit.Call_provers.limit_time)
     (save_int_def "steplimit" sl) (a.limit.Call_provers.limit_steps)
     (save_int_def "memlimit" ml) (a.limit.Call_provers.limit_mem)
     (save_bool_def "obsolete" false) a.proof_obsolete;
@@ -2156,7 +2173,7 @@ let save fname shfname session =
   in
   let provers_to_save =
     Mprover.fold
-      (fun p (id,mostfrequent_timelimit,mostfrequent_steplimit,mostfrequent_memlimit) acc ->
+      (fun p (id,(mostfrequent_timelimit : float),mostfrequent_steplimit,mostfrequent_memlimit) acc ->
         Mint.add id (p,mostfrequent_timelimit,mostfrequent_steplimit,mostfrequent_memlimit) acc)
       provers Mint.empty
   in

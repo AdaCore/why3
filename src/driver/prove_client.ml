@@ -154,7 +154,7 @@ let connect_internal libdir =
 let disconnect = client_disconnect
 
 (* TODO/FIXME: is this the right place to connect-on-demand? *)
-let send_request ~libdir ~id ~timelimit ~memlimit ~use_stdin ~cmd =
+let send_request ~libdir ~id ~(timelimit:float) ~memlimit ~use_stdin ~cmd =
   if not (is_connected ()) then connect_internal libdir;
   Buffer.clear send_buf;
   let servercommand =
@@ -162,7 +162,7 @@ let send_request ~libdir ~id ~timelimit ~memlimit ~use_stdin ~cmd =
   Buffer.add_string send_buf servercommand;
   Buffer.add_string send_buf (string_of_int id);
   Buffer.add_char send_buf ';';
-  Buffer.add_string send_buf (string_of_int timelimit);
+  Buffer.add_string send_buf (string_of_float timelimit);
   Buffer.add_char send_buf ';';
   Buffer.add_string send_buf (string_of_int memlimit);
   List.iter (fun x ->

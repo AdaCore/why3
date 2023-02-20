@@ -38,7 +38,7 @@ val set_max_running_provers : int -> unit
 val send_request :
   libdir:string ->
   id:int ->
-  timelimit:int ->
+  timelimit:float ->
   memlimit:int ->
   use_stdin:string option ->
   cmd:string list ->

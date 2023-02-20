@@ -108,7 +108,7 @@ type prover_call
 (** Type that represents a single prover run *)
 
 type resource_limit = {
-  limit_time  : int;
+  limit_time  : float;
   limit_mem   : int;
   limit_steps : int;
 }

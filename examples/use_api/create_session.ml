@@ -87,7 +87,7 @@ let add_proofs_attempts g =
       let _pa : Session_itp.proofAttemptID =
         Session_itp.graft_proof_attempt
           ~limit:{Call_provers.empty_limit with
-                  Call_provers.limit_time = 5;
+                  Call_provers.limit_time = 5.0;
                                limit_mem = 1000 }
           session g p.Whyconf.prover
       in ())

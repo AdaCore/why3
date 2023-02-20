@@ -184,7 +184,7 @@ type main = {
   (* add the standard library in the loadpath (default true) *)
   load_default_plugins  : bool;
   (* autoload the plugins in libdir (default true) *)
-  timelimit : int;
+  timelimit : float;
   (* default prover time limit in seconds (0 means unlimited) *)
   memlimit  : int;
   (* default prover memory limit in megabytes (0 means unlimited)*)
@@ -298,7 +298,7 @@ let empty_main =
     loadpath = [];
     stdlib = true;
     load_default_plugins = true;
-    timelimit = 5;   (* 5 seconds *)
+    timelimit = 5.0;   (* 5 seconds *)
     memlimit = 1000; (* 1 Mb *)
     running_provers_max = 2; (* two provers run in parallel *)
     plugins = [];
@@ -472,7 +472,7 @@ module RC_load = struct
         | l -> List.map (Sysutil.concat dirname) l end;
       stdlib = get_bool ~default:old.stdlib section "stdlib";
       load_default_plugins = get_bool ~default:old.load_default_plugins section "load_default_plugins";
-      timelimit = get_int ~default:old.timelimit section "timelimit";
+      timelimit = get_float ~default:old.timelimit section "timelimit";
       memlimit  = get_int ~default:old.memlimit section "memlimit";
       running_provers_max = get_int ~default:old.running_provers_max
           section "running_provers_max";
@@ -517,13 +517,13 @@ module RC_load = struct
 end
 
 module RC_save = struct
-  let set_limits ~time ~mem ~j section =
+  let set_limits ~(time:float) ~mem ~j section =
     let section =
       match get_into section "magic" with
       | None -> set_int section "magic" magicnumber
       | _ -> section
     in
-    let section = set_int section "timelimit" time in
+    let section = set_float section "timelimit" time in
     let section = set_int section "memlimit" mem in
     let section =
       set_int section "running_provers_max" j in
@@ -939,7 +939,7 @@ module User = struct
       main = set_default_editor config.main editor;
     }
 
-  let set_limits ~time ~mem ~j config =
+  let set_limits ~(time:float) ~mem ~j config =
     { config with
       user_rc = update_section config.user_rc "main"
         @@ RC_save.set_limits ~time ~mem ~j;

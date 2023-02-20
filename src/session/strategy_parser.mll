@@ -98,6 +98,17 @@
       | _ ->
           error "unable to parse %s argument '%s'" msg s
 
+  let real msg s =
+    try Some (float_of_string s)
+    with Failure _ ->
+      match s with
+      | "%t" -> None
+      | "%m" -> None
+      | "%s" -> None
+      | _ ->
+          error "unable to parse %s argument '%s'" msg s
+
+
   let transform code t =
     try
       ignore (Trans.lookup_transform t code.env)
@@ -111,11 +122,15 @@
 
 let space = [' ' '\t' '\r' '\n']
 let ident = [^ ' ' '\t' '\r' '\n' ':' '#']+
-let integer = ['0'-'9']+
+let digit = ['0'-'9']
+let integer = digit+
 let goto = 'g' | "goto"
 let call = 'c' | "call"
 let transform = 't' | "transform"
-let timelimit = integer | "%t"
+let sign = '-' | '+'
+let mantissa = ['e''E'] sign? digit+
+let real = sign? digit* '.' digit* mantissa?
+let timelimit = real | integer | "%t"
 let memlimit = integer | "%m"
 let steplimit = integer | "%s"
 
@@ -133,9 +148,9 @@ rule scan code = parse
   | call space+ (ident as p) space+ (timelimit as t) space+ (memlimit as m)
          (space+ (steplimit as s))?
       { let p = prover code p in
-        let t = integer "timelimit" t in
-        if t <> None && Opt.get t <= 0 then
-          error "timelimit %d is invalid" (Opt.get t);
+        let t = real "timelimit" t in
+        if t <> None && Opt.get t <= 0.0 then
+          error "timelimit %f is invalid" (Opt.get t);
         let m = integer "memlimit" m in
         if m <> None && Opt.get m <= 0 then
           error "memlimit %d is invalid" (Opt.get m);

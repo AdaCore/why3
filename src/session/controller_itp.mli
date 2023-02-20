@@ -109,7 +109,7 @@ val set_session_max_tasks : int -> unit
 val set_session_memlimit: controller -> int -> unit
 (** sets the default memlimit for proof attempts *)
 
-val set_session_timelimit: controller -> int -> unit
+val set_session_timelimit: controller -> float -> unit
 (** sets the default timelimit for proof attempts *)
 
 val set_session_prover_upgrade_policy :

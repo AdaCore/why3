@@ -59,7 +59,7 @@ let convert_prover_answer (pa: prover_answer) =
 
 let convert_limit (l: Call_provers.resource_limit) =
   Record
-    ["limit_time", Int l.Call_provers.limit_time;
+    ["limit_time", Float l.Call_provers.limit_time;
      "limit_mem", Int l.Call_provers.limit_mem;
      "limit_steps", Int l.Call_provers.limit_steps]
 
@@ -172,6 +172,12 @@ let parse_strat j =
   | String "Clever" -> Clever
   | _ -> assert false
 
+let convert_config_param (p : config_param)  =
+  match p with
+  | Max_tasks m -> ["param", String "max_tasks"; "value", Int m]
+  | Timelimit f -> ["param", String "timelimit"; "value", Float f]
+  | Memlimit m ->  ["param", String "memlimit"; "value", Int m]
+
 let convert_request (r: ide_request): Json_base.json =
   Record (
   match r with
@@ -185,9 +191,8 @@ let convert_request (r: ide_request): Json_base.json =
   | Save_file_req (f,_) ->
       ["ide_request", String "Save_file_req";
        "file", String f]
-  | Set_config_param(s,n) ->
-      ["ide_request", String "Set_config_param";
-       "param", String s; "value", Int n]
+  | Set_config_param p ->
+      ["ide_request", String "Set_config_param"] @ convert_config_param p
   | Set_prover_policy(p,u) ->
       ["ide_request", String "Set_prover_policy"] @
         convert_prover_aux "" p @ convert_policy u
@@ -444,7 +449,7 @@ exception NotLimit
 
 let parse_limit_from_json (j: json) =
   try
-    let t = get_int_field j "limit_time" in
+    let t = get_float_field j "limit_time" in
     let m = get_int_field j "limit_mem" in
     let s = get_int_field j "limit_steps" in
     {limit_time = t; limit_mem = m; limit_steps = s}
@@ -470,8 +475,13 @@ let parse_request (constr: string) j =
 
   | "Set_config_param" ->
     let s = get_string_field j "param" in
-    let n = get_int_field j "value" in
-    Set_config_param(s,n)
+    let p = begin match s with
+      | "max_tasks" -> Max_tasks (get_int_field j "value")
+      | "timelimit" -> Timelimit (get_float_field j "value")
+      | "memlimit" -> Memlimit (get_int_field j "value")
+      | _ -> raise (NotRequest constr)
+    end in
+    Set_config_param p
 
   | "Set_prover_policy" ->
     let p = parse_prover_from_json "" j in

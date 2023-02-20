@@ -115,6 +115,10 @@ val set_simple_family : t -> string -> simple_family -> t
     using the associated [string] as argument of the family [name] in [rc].
     It overwrites any former section of family [name]. *)
 
+val get_float : ?default:float -> section -> string -> float
+
+val set_float : ?default:float -> section -> string -> float -> section
+
 val get_int : ?default:int -> section -> string -> int
 (** [get_int ?default section key] returns the integer value associated to key [key].
 
