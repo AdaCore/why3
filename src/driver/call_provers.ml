@@ -376,7 +376,9 @@ let parse_prover_run res_parser signaled time outfile exitcode limit get_counter
     parse_prover_run res_parser signaled time out exitcode limit get_counterexmp printing_info
 
 let actualcommand ~config command limit file =
-  let stime = string_of_float limit.limit_time in
+  let stime = string_of_int (Float.to_int (Float.ceil limit.limit_time)) in
+  let stimef = string_of_float limit.limit_time in
+  let stimems = string_of_int (Float.to_int (limit.limit_time *. 1000.)) in
   let smem = string_of_int limit.limit_mem in
   let arglist = Cmdline.cmdline_split command in
   let use_stdin = ref true in
@@ -386,6 +388,8 @@ let actualcommand ~config command limit file =
     | "%" -> "%"
     | "f" -> use_stdin := false; file
     | "t" -> on_timelimit := true; stime
+    | "tf" -> on_timelimit := true; stimef
+    | "T" -> on_timelimit := true; stimems
     | "m" -> smem
     | "l" -> Whyconf.libdir config
     | "d" -> Whyconf.datadir config

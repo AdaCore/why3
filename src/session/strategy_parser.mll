@@ -93,6 +93,8 @@
     with Failure _ ->
       match s with
       | "%t" -> None
+      | "%tf" -> None
+      | "%T" -> None
       | "%m" -> None
       | "%s" -> None
       | _ ->
@@ -103,6 +105,9 @@
     with Failure _ ->
       match s with
       | "%t" -> None
+      | "%tf" -> None
+      | "%T" -> None
+      | "%S" -> None
       | "%m" -> None
       | "%s" -> None
       | _ ->
@@ -130,7 +135,7 @@ let transform = 't' | "transform"
 let sign = '-' | '+'
 let mantissa = ['e''E'] sign? digit+
 let real = sign? digit* '.' digit* mantissa?
-let timelimit = real | integer | "%t"
+let timelimit = real | integer | "%t" | "%tf" | "%T"
 let memlimit = integer | "%m"
 let steplimit = integer | "%s"
 
