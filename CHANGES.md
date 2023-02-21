@@ -4,6 +4,9 @@ Tools
   * `libdir` and `datadir` are not stored anymore in the configuration
     file, but they can be manually set there if desired; see also the
     environment variables `WHY3LIB` and `WHY3DATA`
+  * several debug flags have been renamed, in particular to avoid the
+    use of `-` character. Use `why3 --list-debug-flags` to obtain the
+    new names.
 
 MLCFG language
   * attributes on function bodies are now supported

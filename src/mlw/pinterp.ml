@@ -20,11 +20,11 @@ open Pinterp_core
 open Value
 
 let debug_rac_values =
-  Debug.register_info_flag "rac-values"
+  Debug.register_info_flag "rac:values"
     ~desc:"print values that are taken into account during interpretation"
 
 let debug_disable_builtin_mach =
-  Debug.register_flag "execute-no-builtin-mach"
+  Debug.register_flag "rac:execute_no_builtin_mach"
     ~desc:"don't register builtins for modules under stdlib/mach"
 
 let pp_typed pp ty fmt x =

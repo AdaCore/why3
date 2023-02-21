@@ -20,13 +20,13 @@ open Pretty
 open Value
 
 let debug_rac_check_sat =
-  Debug.register_info_flag "rac-check-term-sat"
+  Debug.register_info_flag "rac:check_term_sat"
     ~desc:"satisfiability of terms in rac"
 (* print debug information when checking the satisfiability of terms
    during rac *)
 
 let debug_rac_check_term_result =
-  Debug.register_info_flag "rac-check-term-result"
+  Debug.register_info_flag "rac:check_term_result"
     ~desc:"print the result when terms are checked for validity"
 
 type oracle_quant_var = env -> Term.vsymbol -> Value.value option
