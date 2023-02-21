@@ -320,7 +320,7 @@ Why3 can be executed with support for inferring loop invariants
 about the compilation of Why3 with support for `infer-loop`).
 
 There are two ways of enabling the inference of loop invariants: by
-passing the debug flag :why3:debug:`infer-loop` to Why3 or by annotating ``let``
+passing the debug flag :why3:debug:`infer:loop` to Why3 or by annotating ``let``
 declarations with the :why3:attribute:`[@infer]` attribute.
 
 Below is an example on how to invoke Why3 such that invariants are
@@ -328,7 +328,7 @@ inferred for all the loops in the given file.
 
 ::
 
-   why3 ide tests/infer/incr.mlw --debug=infer-loop
+   why3 ide tests/infer/incr.mlw --debug=infer:loop
 
 In this case, the *Polyhedra* default domain will be used together
 with the default widening value of *3*. Why3 GUI will not display the
@@ -373,14 +373,14 @@ produce exactly the same invariants.
 
 There are a few debugging flags that can be passed to Why3 to output
 additional information about the inference of loop invariants. Flag
-:why3:debug:`infer-print-cfg` will print the Control Flow Graph (CFG) used for
+:why3:debug:`infer:print_cfg` will print the Control Flow Graph (CFG) used for
 abstract interpretation in a file with the name :file:`inferdbg.dot`;
-:why3:debug:`infer-print-ai-result` will print to the standard output the
+:why3:debug:`infer:print_ai_result` will print to the standard output the
 computed abstract values at each point of the CFG;
-:why3:debug:`print-inferred-invs` will print the inferred invariants to the
+:why3:debug:`print:inferred_invs` will print the inferred invariants to the
 standard output (note that the displayed identifiers names might not
 be consistent with those in the initial program); finally,
-:why3:debug:`print-domains-loop` will print for each loop the
+:why3:debug:`print:domains_loop` will print for each loop the
 loop expression, the domain at that point, and its translation into a
 Why3 term.
 

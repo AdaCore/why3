@@ -14,10 +14,10 @@ open Ity
 open Expr
 
 let infer_flag =
-  Debug.register_flag "infer-loop" ~desc:"Infer loop invariants"
+  Debug.register_flag "infer:loop" ~desc:"Infer loop invariants"
 
 let print_inferred_invs =
-  Debug.register_flag "print-inferred-invs" ~desc:"Print inferred invariant"
+  Debug.register_flag "infer:print_inferred_invs" ~desc:"Print inferred invariant"
 
 let is_infer_attr s = Strings.has_prefix "infer" s || s = "infer"
 

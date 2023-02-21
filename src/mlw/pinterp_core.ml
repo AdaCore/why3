@@ -19,7 +19,7 @@ open Ty
 open Pretty
 
 let debug_array_as_update_chains_not_epsilon =
-  Debug.register_flag "rac-array-as-update-chains"
+  Debug.register_flag "rac:array_as_update_chains"
     ~desc:"represent arrays in terms for RAC as chains of updates, not epsilons"
 
 let debug_trace_exec =

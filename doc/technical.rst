@@ -1632,15 +1632,19 @@ Why3 Metas
 Debug Flags
 -----------
 
-.. why3:debug:: infer-loop
+The list of debug flags can be obtained using
+:file:`why3 --list-debug-flags`. The following excerpt is the
+list of flags mentioned in this manual.
 
-.. why3:debug:: infer-print-ai-result
+.. why3:debug:: infer:loop
 
-.. why3:debug:: infer-print-cfg
+.. why3:debug:: infer:print_ai_result
 
-.. why3:debug:: print-inferred-invs
+.. why3:debug:: infer:print_cfg
 
-.. why3:debug:: print-domains-loop
+.. why3:debug:: print:inferred_invs
+
+.. why3:debug:: print:domains_loop
 
 .. why3:debug:: stack_trace
 

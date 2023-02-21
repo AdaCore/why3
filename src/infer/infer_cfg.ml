@@ -18,13 +18,13 @@ open Expr
 open Ity
 
 let infer_print_cfg =
-  Debug.register_flag "infer-print-cfg" ~desc:"Print CFG used in abstract interpretation"
+  Debug.register_flag "infer:print_cfg" ~desc:"Print CFG used in abstract interpretation"
 
 let infer_print_ai_result =
-  Debug.register_flag "infer-print-ai-result" ~desc:"Print result of Abstract Interpretation"
+  Debug.register_flag "infer:print_ai_result" ~desc:"Print result of Abstract Interpretation"
 
 let print_domains_loop =
-  Debug.register_flag "print-domains-loop" ~desc:"Print domains in loops"
+  Debug.register_flag "infer:print_domains_loop" ~desc:"Print domains in loops"
 
 module type INFERCFG = sig
   module QDom : Domain.TERM_DOMAIN

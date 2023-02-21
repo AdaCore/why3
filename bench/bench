@@ -449,7 +449,7 @@ rac () {
         echo "** $mod.$expr"
         bin/why3"$suffix" execute --rac --rac-prover="cvc4" \
                 "${RACARGS[@]}" "$file" --use="$mod" "$expr" \
-                --debug="rac-check-term-result" 2>&1 |\
+                --debug="rac:check_term_result" 2>&1 |\
             sed "s|$(bin/why3$suffix --print-datadir)|WHY3DATA|g" |\
             sed "s|$(bin/why3$suffix --print-libdir)|WHY3LIB|g"
     done

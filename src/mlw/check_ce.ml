@@ -18,10 +18,10 @@ open Model_parser
 open Pinterp_core
 open Pinterp
 
-let debug_check_ce_rac_results = Debug.register_info_flag "check-ce-rac-results"
+let debug_check_ce_rac_results = Debug.register_info_flag "check_ce:rac_results"
     ~desc:"Debug@ info@ about@ RAC@ results@ for@ --check-ce"
 
-let debug_check_ce_categorization = Debug.register_info_flag "check-ce-categorization"
+let debug_check_ce_categorization = Debug.register_info_flag "check_ce:categorization"
     ~desc:"Debug@ info@ about@ categorization@ of@ RAC@ results@ for@ --check-ce"
 
 (** Result of checking solvers' counterexample models *)
