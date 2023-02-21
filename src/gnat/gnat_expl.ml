@@ -43,6 +43,7 @@ type reason =
    | VC_Assert_Premise
    | VC_Assert_Step
    | VC_Raise
+   | VC_Feasible_Post
    | VC_Inline_Check
    | VC_UC_No_Holes
    | VC_UC_Same_Size
@@ -104,6 +105,7 @@ let is_warning_reason r =
    | VC_Assert_Premise
    | VC_Assert_Step
    | VC_Raise
+   | VC_Feasible_Post
    | VC_Inline_Check
    | VC_UC_No_Holes
    | VC_UC_Same_Size
@@ -214,6 +216,7 @@ let reason_from_string s =
    | "VC_ASSERT_PREMISE"            -> VC_Assert_Premise
    | "VC_ASSERT_STEP"               -> VC_Assert_Step
    | "VC_RAISE"                     -> VC_Raise
+   | "VC_FEASIBLE_POST"             -> VC_Feasible_Post
    | "VC_INLINE_CHECK"              -> VC_Inline_Check
    | "VC_UC_NO_HOLES"               -> VC_UC_No_Holes
    | "VC_UC_SAME_SIZE"              -> VC_UC_Same_Size
@@ -280,6 +283,7 @@ let reason_to_ada reason =
    | VC_Assert_Premise            -> "VC_ASSERT_PREMISE"
    | VC_Assert_Step               -> "VC_ASSERT_STEP"
    | VC_Raise                     -> "VC_RAISE"
+   | VC_Feasible_Post             -> "VC_FEASIBLE_POST"
    | VC_Inline_Check              -> "VC_INLINE_CHECK"
    | VC_UC_No_Holes               -> "VC_UC_NO_HOLES"
    | VC_UC_Same_Size              -> "VC_UC_SAME_SIZE"
@@ -341,6 +345,7 @@ let reason_to_string reason =
    | VC_Assert_Premise            -> "assert_premise"
    | VC_Assert_Step               -> "assert_step"
    | VC_Raise                     -> "raise"
+   | VC_Feasible_Post             -> "feasible_post"
    | VC_Inline_Check              -> "inline_check"
    | VC_UC_No_Holes               -> "uc_no_holes"
    | VC_UC_Same_Size              -> "uc_same_size"

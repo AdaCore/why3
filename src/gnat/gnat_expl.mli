@@ -47,6 +47,7 @@ type reason =
    | VC_Assert_Premise
    | VC_Assert_Step
    | VC_Raise
+   | VC_Feasible_Post
    | VC_Inline_Check
    | VC_UC_No_Holes
    | VC_UC_Same_Size
