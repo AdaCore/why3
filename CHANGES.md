@@ -40,7 +40,8 @@ API
     Counterexample files in JSON format"
 
 Provers
-  * support for CVC5 1.0.0 (released Apr 6, 2022)
+  * support for CVC5 versions 1.0.0 (released Apr 6, 2022) to
+    1.0.4 (released Jan 31, 2023)
   * support for Alt-Ergo 2.4.2 (released Aug 1, 2022)
 
 Miscellaneous
