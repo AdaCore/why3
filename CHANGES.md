@@ -43,6 +43,7 @@ Provers
   * support for CVC5 versions 1.0.0 (released Apr 6, 2022) to
     1.0.4 (released Jan 31, 2023)
   * support for Alt-Ergo 2.4.2 (released Aug 1, 2022)
+  * support for Z3 version 4.10.x, 4.11.x and 4.12.x
 
 Miscellaneous
   * fixed soundness bug with existential quantifiers in `introduce_premises`
