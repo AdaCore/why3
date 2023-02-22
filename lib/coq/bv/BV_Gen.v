@@ -13,6 +13,7 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require HighOrd.
 Require bool.Bool.
 Require int.Int.
 Require int.Abs.
@@ -226,6 +227,15 @@ Qed.
 Definition zeros_aux {l} : Vector.t bool l.
   exact (Vector.const false l).
 Defined.
+
+Global Instance t_WhyType : WhyType t.
+Proof.
+split.
+exact zeros_aux.
+intros x y.
+eapply (VectorEq.eq_dec _ eqb).
+apply eqb_true_iff.
+Qed.
 
 (* Why3 goal *)
 Definition zeros : t.
@@ -1419,7 +1429,47 @@ Lemma to_uint_ones : ((to_uint ones) = max_int).
 Qed.
 
 (* Why3 assumption *)
+Inductive acc {a:Type} {a_WT:WhyType a}: (a -> a -> Init.Datatypes.bool) ->
+  a -> Prop :=
+  | acc_x :
+      forall (r:a -> a -> Init.Datatypes.bool) (x:a),
+      (forall (y:a), ((r y x) = Init.Datatypes.true) -> acc r y) -> acc r x.
+
+(* Why3 assumption *)
+Definition well_founded {a:Type} {a_WT:WhyType a}
+    (r:a -> a -> Init.Datatypes.bool) : Prop :=
+  forall (x:a), acc r x.
+
+(* Why3 assumption *)
 Definition ult (x:t) (y:t) : Prop := ((to_uint x) < (to_uint y))%Z.
+
+(* Why3 goal *)
+Definition ult_closure : t -> t -> Init.Datatypes.bool.
+Proof.
+intros x y.
+case (Z_lt_dec (to_uint x) (to_uint y)); intro H.
+exact true.
+exact false.
+Defined.
+
+(* Why3 goal *)
+Lemma ult_closure_def :
+  forall (y:t) (y1:t),
+  ((ult_closure y y1) = Init.Datatypes.true) <-> ult y y1.
+Proof.
+intros y y1.
+unfold ult_closure, ult.
+case (Z_lt_dec (to_uint y) (to_uint y1)); intro H.
+split; auto.
+split; auto.
+discriminate.
+Qed.
+
+(* Why3 goal *)
+Lemma ult_wf : well_founded ult_closure.
+Proof.
+(* we need to realize WellFounded theory first *)
+Admitted.
 
 (* Why3 assumption *)
 Definition ule (x:t) (y:t) : Prop := ((to_uint x) <= (to_uint y))%Z.
@@ -1427,17 +1477,98 @@ Definition ule (x:t) (y:t) : Prop := ((to_uint x) <= (to_uint y))%Z.
 (* Why3 assumption *)
 Definition ugt (x:t) (y:t) : Prop := ((to_uint y) < (to_uint x))%Z.
 
+(* Why3 goal *)
+Definition ugt_closure : t -> t -> Init.Datatypes.bool.
+Proof.
+intros x y.
+case (Z_lt_dec (to_uint y) (to_uint x)); intro H.
+exact true.
+exact false.
+Defined.
+
+(* Why3 goal *)
+Lemma ugt_closure_def :
+  forall (y:t) (y1:t),
+  ((ugt_closure y y1) = Init.Datatypes.true) <-> ugt y y1.
+Proof.
+intros y y1.
+unfold ugt_closure,ugt.
+case (Z_lt_dec (to_uint y1) (to_uint y)); intro H.
+split; auto.
+split; auto; discriminate.
+Qed.
+
+(* Why3 goal *)
+Lemma ugt_wf : well_founded ugt_closure.
+Proof.
+(* we need to realize WellFounded theory first *)
+Admitted.
+
 (* Why3 assumption *)
 Definition uge (x:t) (y:t) : Prop := ((to_uint y) <= (to_uint x))%Z.
 
 (* Why3 assumption *)
 Definition slt (v1:t) (v2:t) : Prop := ((to_int v1) < (to_int v2))%Z.
 
+(* Why3 goal *)
+Definition slt_closure : t -> t -> Init.Datatypes.bool.
+Proof.
+intros x y.
+case (Z_lt_dec (to_int x) (to_int y)); intro H.
+exact true.
+exact false.
+Defined.
+
+(* Why3 goal *)
+Lemma slt_closure_def :
+  forall (y:t) (y1:t),
+  ((slt_closure y y1) = Init.Datatypes.true) <-> slt y y1.
+Proof.
+intros y y1.
+unfold slt_closure,slt.
+case (Z_lt_dec (to_int y) (to_int y1)); intro H.
+split; auto.
+split; auto; discriminate.
+Qed.
+
+(* Why3 goal *)
+Lemma slt_wf : well_founded slt_closure.
+Proof.
+(* we need to realize WellFounded theory first *)
+Admitted.
+
 (* Why3 assumption *)
 Definition sle (v1:t) (v2:t) : Prop := ((to_int v1) <= (to_int v2))%Z.
 
 (* Why3 assumption *)
 Definition sgt (v1:t) (v2:t) : Prop := ((to_int v2) < (to_int v1))%Z.
+
+(* Why3 goal *)
+Definition sgt_closure : t -> t -> Init.Datatypes.bool.
+Proof.
+intros x y.
+case (Z_lt_dec (to_int y) (to_int x)); intro H.
+exact true.
+exact false.
+Defined.
+
+(* Why3 goal *)
+Lemma sgt_closure_def :
+  forall (y:t) (y1:t),
+  ((sgt_closure y y1) = Init.Datatypes.true) <-> sgt y y1.
+Proof.
+intros y y1.
+unfold sgt_closure,sgt.
+case (Z_lt_dec (to_int y1) (to_int y)); intro H.
+split; auto.
+split; auto; discriminate.
+Qed.
+
+(* Why3 goal *)
+Lemma sgt_wf : well_founded sgt_closure.
+Proof.
+(* we need to realize WellFounded theory first *)
+Admitted.
 
 (* Why3 assumption *)
 Definition sge (v1:t) (v2:t) : Prop := ((to_int v2) <= (to_int v1))%Z.

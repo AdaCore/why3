@@ -90,7 +90,6 @@ let wp_attr = Ident.create_attribute "vc:wp"
 let wb_attr = Ident.create_attribute "vc:white_box"
 let kp_attr = Ident.create_attribute "vc:keep_precondition"
 let nt_attr = Ident.create_attribute "vc:divergent"
-let trusted_wf_attr = Ident.create_attribute "vc:trusted_wf"
 
 let do_not_keep_trace_attr = Ident.create_attribute "vc:do_not_keep_trace"
 let do_not_keep_trace_flag = Debug.register_flag "vc:do_not_keep_trace"
@@ -105,13 +104,14 @@ let vc_attrs =
 type vc_env = {
   known_map : Pdecl.known_map;
   ts_ranges : Theory.tdecl Mts.t;
+  proved_wf : Sls.t;
+  (* Set of predicate symbols for which a meta "vc:proved_wf" was set and checked correct *)
   ps_int_le : lsymbol;
   ps_int_ge : lsymbol;
   ps_int_lt : lsymbol;
   ps_int_gt : lsymbol;
   fs_int_pl : lsymbol;
   fs_int_mn : lsymbol;
-  ps_wf_acc : lsymbol;
   exn_count : int ref;
   divergent : bool;
   inferinvs : (expr * term) list;   (* inferred invariants *)
@@ -130,29 +130,35 @@ let mk_env ?(attrs=Sattr.empty)
       end
     else true
   in
+  let ps_wf = Theory.ns_find_ls ns_acc ["well_founded"] in
+  let proved_wf =
+    Mls.fold
+      (fun r (pr,wf) acc ->
+         if ls_equal wf ps_wf then Sls.add r acc else
+           Loc.error ?loc:pr.pr_name.id_loc (Theory.IllFormedWf(pr,r)))
+      tuc.Theory.uc_proved_wf
+      Sls.empty
+  in
   {
   known_map = kn;
   ts_ranges = tuc.Theory.uc_ranges;
+  proved_wf;
   ps_int_le = Theory.ns_find_ls ns_int [Ident.op_infix "<="];
   ps_int_ge = Theory.ns_find_ls ns_int [Ident.op_infix ">="];
   ps_int_lt = Theory.ns_find_ls ns_int [Ident.op_infix "<"];
   ps_int_gt = Theory.ns_find_ls ns_int [Ident.op_infix ">"];
   fs_int_pl = Theory.ns_find_ls ns_int [Ident.op_infix "+"];
   fs_int_mn = Theory.ns_find_ls ns_int [Ident.op_infix "-"];
-  ps_wf_acc = Theory.ns_find_ls ns_acc ["acc"];
   exn_count = ref 0;
   divergent = false;
   inferinvs = invs;
   keep_trace;
   }
 
-let accessible env r t =
-  let ps = env.ps_wf_acc in
-  if not (Mid.mem ps.ls_name env.known_map) then
-    Loc.errorm ?loc:t.t_loc "please import relations.WellFounded";
+let accessible r t =
   let ty = t_type t in
   let r = t_closure r [ty; ty] None in
-  ps_app ps [r; t]
+  ps_app ps_acc [r; t]
 
 (* every exception-catching clause is represented by
    a unique integer, so that we can move code inside
@@ -164,7 +170,7 @@ let new_exn env = incr env.exn_count; !(env.exn_count)
    We should be able to extract the necessary lsymbols from kn. *)
 let mk_env ?attrs env kn tuc invs =
   let th_int = Env.read_theory env ["int"] "Int" in
-  let th_wf  = Env.read_theory env ["relations"] "WellFounded" in
+  let th_wf  = Env.read_theory env ["why3";"WellFounded"] "WellFounded" in
   mk_env ?attrs th_int th_wf kn tuc invs
 
 let int_of_range env ty =
@@ -321,8 +327,8 @@ let decrease env loc attrs expl olds news =
         if t_equal old_t t then decr olds news else
         let dt = ps_app r [t; old_t] in
         let dt =
-          if Sattr.mem trusted_wf_attr r.ls_name.id_attrs then dt else
-            t_and dt (accessible env r old_t) in
+          if Mls.mem r env.proved_wf then dt else
+            t_and dt (accessible r old_t) in
         t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds news))
     | (old_t, None)::olds, (t, None)::news when oty_equal old_t.t_ty t.t_ty ->
         if t_equal old_t t then decr olds news else

@@ -368,26 +368,41 @@ module BV_Gen
 
   (** comparison operators *)
 
-  let predicate ult [@vc:trusted_wf] (x y : t) =
+  use export why3.WellFounded.WellFounded
+
+  let predicate ult (x y : t) =
     Int.(<) (to_uint x) (to_uint y)
+
+  (* note : the following must be a lemma so that it is cloned in the instances *)
+  lemma ult_wf : well_founded ult
+  meta "vc:proved_wf" predicate ult, lemma ult_wf
 
   let predicate ule (x y : t) =
     Int.(<=) (to_uint x) (to_uint y)
 
-  let predicate ugt [@vc:trusted_wf] (x y : t) =
+  let predicate ugt (x y : t) =
     Int.(>) (to_uint x) (to_uint y)
+
+  lemma ugt_wf : well_founded ugt
+  meta "vc:proved_wf" predicate ugt, lemma ugt_wf
 
   let predicate uge (x y : t) =
     Int.(>=) (to_uint x) (to_uint y)
 
-  let predicate slt [@vc:trusted_wf] (v1 v2 : t) =
+  let predicate slt (v1 v2 : t) =
     Int.(<) (to_int v1) (to_int v2)
 
-  let predicate sle (v1 v2 : t) =
+  lemma slt_wf : well_founded slt
+  meta "vc:proved_wf" predicate slt, lemma slt_wf
+
+let predicate sle (v1 v2 : t) =
     Int.(<=) (to_int v1) (to_int v2)
 
-  let predicate sgt [@vc:trusted_wf] (v1 v2 : t) =
+  let predicate sgt (v1 v2 : t) =
     Int.(>) (to_int v1) (to_int v2)
+
+  lemma sgt_wf : well_founded sgt
+  meta "vc:proved_wf" predicate sgt, lemma sgt_wf
 
   let predicate sge (v1 v2 : t) =
     Int.(>=) (to_int v1) (to_int v2)
