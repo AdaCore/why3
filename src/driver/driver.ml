@@ -242,7 +242,10 @@ let load_driver_raw =
       thuse := Mid.add th.th_name (th, Theory.close_theory th_uc') !thuse
   in
   List.iter add_theory f.f_rules;
-  List.iter (fun f -> List.iter add_theory (load_file whyconf_main f).f_rules) extra_files;
+  List.iter (fun f ->
+      let c = load_file whyconf_main f in
+      List.iter add_global c.f_global;
+      List.iter add_theory c.f_rules) extra_files;
   incr driver_tag;
   {
     drv_env         = env;

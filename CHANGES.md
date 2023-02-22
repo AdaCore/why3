@@ -48,6 +48,10 @@ Provers
   * support for Alt-Ergo 2.4.2 (released Aug 1, 2022)
   * support for Z3 version 4.10.x, 4.11.x and 4.12.x
 
+Drivers
+  * the global directives of extra drivers are now taken into account,
+	not only the theories
+
 Miscellaneous
   * fixed soundness bug with existential quantifiers in `introduce_premises`
   * configuration option `--enable-profiling` has been removed
