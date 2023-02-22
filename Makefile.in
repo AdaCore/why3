@@ -1061,7 +1061,7 @@ endif
 COQLIBS_FOR_DRIVERS_FILES = ComputerOfEuclideanDivision
 COQLIBS_FOR_DRIVERS = $(addprefix lib/coq/for_drivers/, $(COQLIBS_FOR_DRIVERS_FILES))
 
-COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_FP)  $(COQLIBS_BV) $(COQLIBS_IEEEFLOAT) $(COQLIBS_FOR_DRIVERS)
+COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd lib/coq/WellFounded $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_FP)  $(COQLIBS_BV) $(COQLIBS_IEEEFLOAT) $(COQLIBS_FOR_DRIVERS)
 
 %.vo: %.v
 	$(SHOW) 'Coqc     $<'
@@ -1088,6 +1088,7 @@ drivers/coq-realizations.aux: Makefile
 	$(HIDE)(echo "(* generated automatically at compilation time *)"; \
 	echo 'theory BuiltIn meta "realized_theory" "BuiltIn", "" end'; \
 	echo 'theory HighOrd meta "realized_theory" "HighOrd", "" end'; \
+	echo 'theory WellFounded meta "realized_theory" "WellFounded", "" end'; \
 	for f in $(COQLIBS_INT_FILES); do \
 	echo 'theory int.'"$$f"' meta "realized_theory" "int.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_BOOL_FILES); do \
@@ -1162,7 +1163,7 @@ uninstall-coq:
 install-coq:
 	$(MKDIR_P) $(LIBDIR)/why3/coq
 	$(INSTALL_DATA) lib/coq/version $(LIBDIR)/why3/coq/
-	$(INSTALL_DATA) lib/coq/BuiltIn.vo lib/coq/HighOrd.vo $(LIBDIR)/why3/coq/
+	$(INSTALL_DATA) lib/coq/BuiltIn.vo lib/coq/HighOrd.vo lib/coq/WellFounded.vo $(LIBDIR)/why3/coq/
 	$(MKDIR_P) $(LIBDIR)/why3/coq/int
 	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_INT)) $(LIBDIR)/why3/coq/int/
 	$(MKDIR_P) $(LIBDIR)/why3/coq/bool

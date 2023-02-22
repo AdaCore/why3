@@ -14,6 +14,7 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require HighOrd.
+Require WellFounded.
 Require bool.Bool.
 Require int.Int.
 Require int.Abs.
@@ -1429,18 +1430,6 @@ Lemma to_uint_ones : ((to_uint ones) = max_int).
 Qed.
 
 (* Why3 assumption *)
-Inductive acc {a:Type} {a_WT:WhyType a}: (a -> a -> Init.Datatypes.bool) ->
-  a -> Prop :=
-  | acc_x :
-      forall (r:a -> a -> Init.Datatypes.bool) (x:a),
-      (forall (y:a), ((r y x) = Init.Datatypes.true) -> acc r y) -> acc r x.
-
-(* Why3 assumption *)
-Definition well_founded {a:Type} {a_WT:WhyType a}
-    (r:a -> a -> Init.Datatypes.bool) : Prop :=
-  forall (x:a), acc r x.
-
-(* Why3 assumption *)
 Definition ult (x:t) (y:t) : Prop := ((to_uint x) < (to_uint y))%Z.
 
 (* Why3 goal *)
@@ -1466,10 +1455,22 @@ discriminate.
 Qed.
 
 (* Why3 goal *)
-Lemma ult_wf : well_founded ult_closure.
+Lemma ult_wf : WellFounded.well_founded ult_closure.
 Proof.
-(* we need to realize WellFounded theory first *)
-Admitted.
+intros x.
+remember (to_uint x) as x'.
+assert (H := Z.lt_wf 0 x').
+revert x Heqx'.
+induction H as [x' _].
+intros x ->.
+constructor.
+intros y HR.
+apply (H (to_uint y)).
+2: easy.
+split.
+apply to_uint_bounds.
+now apply -> ult_closure_def.
+Qed.
 
 (* Why3 assumption *)
 Definition ule (x:t) (y:t) : Prop := ((to_uint x) <= (to_uint y))%Z.
@@ -1499,10 +1500,22 @@ split; auto; discriminate.
 Qed.
 
 (* Why3 goal *)
-Lemma ugt_wf : well_founded ugt_closure.
+Lemma ugt_wf : WellFounded.well_founded ugt_closure.
 Proof.
-(* we need to realize WellFounded theory first *)
-Admitted.
+intros x.
+remember (to_uint x) as x'.
+assert (H := Z.gt_wf two_power_size x').
+revert x Heqx'.
+induction H as [x' _].
+intros x ->.
+constructor.
+intros y HR.
+apply (H (to_uint y)).
+2: easy.
+split.
+now apply -> ugt_closure_def.
+apply Zlt_le_weak, to_uint_bounds.
+Qed.
 
 (* Why3 assumption *)
 Definition uge (x:t) (y:t) : Prop := ((to_uint y) <= (to_uint x))%Z.
@@ -1532,10 +1545,25 @@ split; auto; discriminate.
 Qed.
 
 (* Why3 goal *)
-Lemma slt_wf : well_founded slt_closure.
+Lemma slt_wf : WellFounded.well_founded slt_closure.
 Proof.
-(* we need to realize WellFounded theory first *)
-Admitted.
+intros x.
+remember (to_int x) as x'.
+assert (H := Z.lt_wf (-two_power_size) x').
+revert x Heqx'.
+induction H as [x' _].
+intros x ->.
+constructor.
+intros y HR.
+apply (H (to_int y)).
+2: easy.
+split.
+2: now apply -> slt_closure_def.
+clear.
+generalize (to_int'def y).
+unfold is_signed_positive.
+destruct Bsign ; generalize (to_uint_bounds y) ; lia.
+Qed.
 
 (* Why3 assumption *)
 Definition sle (v1:t) (v2:t) : Prop := ((to_int v1) <= (to_int v2))%Z.
@@ -1565,10 +1593,25 @@ split; auto; discriminate.
 Qed.
 
 (* Why3 goal *)
-Lemma sgt_wf : well_founded sgt_closure.
+Lemma sgt_wf : WellFounded.well_founded sgt_closure.
 Proof.
-(* we need to realize WellFounded theory first *)
-Admitted.
+intros x.
+remember (to_int x) as x'.
+assert (H := Z.gt_wf two_power_size x').
+revert x Heqx'.
+induction H as [x' _].
+intros x ->.
+constructor.
+intros y HR.
+apply (H (to_int y)).
+2: easy.
+split.
+now apply -> sgt_closure_def.
+clear.
+generalize (to_int'def y).
+unfold is_signed_positive.
+destruct Bsign ; generalize (to_uint_bounds y) ; lia.
+Qed.
 
 (* Why3 assumption *)
 Definition sge (v1:t) (v2:t) : Prop := ((to_int v2) <= (to_int v1))%Z.
