@@ -156,6 +156,7 @@ type ide_request =
   (** [Find_ident_req (position)] *)
   | Unfocus_req
   | Save_req
+  | Export_as_zip
   | Reload_req
   | Check_need_saving_req
   | Exit_req

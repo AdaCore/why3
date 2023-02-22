@@ -1138,6 +1138,8 @@ let reload_unsafe () =
 
 let save_and_reload () = save_sources (); reload_unsafe ()
 
+let export_as_zip () = save_sources (); send_request Export_as_zip
+
 (****************************)
 (* command entry completion *)
 (****************************)
@@ -2057,8 +2059,13 @@ let (_: GMenu.menu_item) =
 let (_: GMenu.menu_item) =
   file_factory#add_item "Save all and _Refresh session"
     ~modi:primary_modifiers ~key:GdkKeysyms._R
-    ~tooltip:"Save the current proof session and the source files, then refresh the proof session with updated source files."
+    ~tooltip:"Save the current proof session and the source files, then refresh the proof session with updated source files"
     ~callback:save_and_reload
+
+let (_: GMenu.menu_item) =
+  file_factory#add_item "Export session as zip file"
+    ~tooltip:"Produces a zip archive of the current proof session"
+    ~callback:export_as_zip
 
 let (_: GMenu.menu_item) =
   file_factory#add_item "_Quit"

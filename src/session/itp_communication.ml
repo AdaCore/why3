@@ -134,6 +134,7 @@ type ide_request =
   | Find_ident_req          of Loc.position
   | Unfocus_req
   | Save_req
+  | Export_as_zip
   | Reload_req
   | Check_need_saving_req
   | Exit_req
@@ -163,6 +164,7 @@ let print_request fmt r =
   | Save_file_req _                 -> pp_print_string fmt "save file"
   | Unfocus_req                     -> pp_print_string fmt "unfocus"
   | Save_req                        -> pp_print_string fmt "save"
+  | Export_as_zip                   -> pp_print_string fmt "export as zip"
   | Reload_req                      -> pp_print_string fmt "reload"
   | Check_need_saving_req           -> pp_print_string fmt "check need saving"
   | Exit_req                        -> pp_print_string fmt "exit"

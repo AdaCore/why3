@@ -32,6 +32,8 @@ Python language
 
 IDE
   * pressing Tab now auto-completes commands
+  * New menu "File/Export as Zip" to export a zip archive of the
+    current session and all related files
 
 API
   * source locations are now represented by both a start line number

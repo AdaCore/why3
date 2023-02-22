@@ -1404,6 +1404,14 @@ match pa.proof_state with
     Session_itp.save_session d.cont.controller_session;
     P.notify Saved
 
+  let export_as_zip () =
+    let d = get_server_data () in
+    try
+      let archive = Session_itp.export_as_zip d.cont.controller_session in
+      P.notify (Message (Information ("Zip archive " ^ archive ^ " created")))
+    with Sys_error msg ->
+        P.notify (Message (Error msg))
+
   (* ----------------- Reload session ------------------- *)
   let clear_tables () : unit =
     reset ();
@@ -1541,7 +1549,7 @@ match pa.proof_state with
    (* Check if a request is valid (does not suppose existence of obsolete node_id) *)
    let request_is_valid r =
      match r with
-     | Save_req | Check_need_saving_req | Reload_req
+     | Save_req | Export_as_zip | Check_need_saving_req | Reload_req
      | Get_file_contents _ | Save_file_req _
      | Interrupt_req | Add_file_req _ | Set_config_param _ | Set_prover_policy _
      | Exit_req | Get_global_infos | Itp_communication.Unfocus_req
@@ -1615,6 +1623,10 @@ match pa.proof_state with
     | Save_req                     ->
        save_session ();
        session_needs_saving := false
+    | Export_as_zip ->
+        save_session ();
+        session_needs_saving := false;
+        export_as_zip ()
     | Reload_req                   ->
        reload_session ();
        session_needs_saving := true
