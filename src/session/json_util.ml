@@ -219,6 +219,8 @@ let convert_request (r: ide_request): Json_base.json =
       ["ide_request", String "Unfocus_req"]
   | Save_req ->
       ["ide_request", String "Save_req"]
+  | Export_as_zip ->
+      ["ide_request", String "Export_as_zip"]
   | Reload_req ->
       ["ide_request", String "Reload_req"]
   | Exit_req ->
@@ -512,6 +514,8 @@ let parse_request (constr: string) j =
     Interrupt_req
   | "Save_req" ->
     Save_req
+  | "Export_as_zip" ->
+    Export_as_zip
   | "Reload_req" ->
     Reload_req
   | "Reset_proofs_req" ->

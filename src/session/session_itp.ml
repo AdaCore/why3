@@ -2215,6 +2215,30 @@ let save_session (s : session) =
   let fs = if Compress.compression_supported then fz else fs in
   save f fs s
 
+let export_as_zip s =
+  let cd = Filename.dirname s.session_dir in
+  let dir = Filename.basename s.session_dir in
+  let archive = dir ^ ".zip" in
+  let files =
+    Hfile.fold
+      (fun _ f acc ->
+         let l = Sysutil.decompose_path f.file_path in
+         let l =
+           match l with
+           | ".." :: r -> r
+           | _ -> dir :: l
+         in
+         let f = String.concat Filename.dir_sep l in
+         acc ^ " " ^ f)
+      s.session_files dir
+  in
+  let cmd = "cd " ^ cd ^ " ; zip -r " ^ archive ^ " " ^ files in
+  let n = Sys.command cmd in
+  if n = 0 then archive else raise (Sys_error ("cannot produce archive " ^ archive))
+
+
+
+
 (**********************)
 (* Edition of session *)
 (**********************)
