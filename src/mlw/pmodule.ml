@@ -397,6 +397,75 @@ let highord_module =
   let m = close_module uc in
   { m with mod_theory = highord_theory }
 
+let acc_ind_decl =
+  try
+    let ty_alpha,ty_rel =
+      match ps_acc.ls_args with
+      | [t1;t2] -> t2,t1
+      | _ -> assert false
+    in
+    let var_r = create_vsymbol (id_fresh "r") ty_rel in
+    let r = t_var var_r in
+    let var_x = create_vsymbol (id_fresh "x") ty_alpha in
+    let x = t_var var_x in
+    let f =
+      (* forall r, x: 'a. (forall y. r y x -> acc r y) -> acc r x *)
+      let g =
+        let var_y = create_vsymbol (id_fresh "y") ty_alpha in
+        let y = t_var var_y in
+        t_forall_close [var_y] []
+          (t_implies (t_pred_app_l r [y; x]) (ps_app ps_acc [r; y]))
+      in
+      t_forall_close [var_r;var_x] [] (t_implies g (ps_app ps_acc [r; x]))
+    in
+    let acc_x = Decl.create_prsymbol (id_fresh "acc_x") in
+    (ps_acc,[acc_x,f])
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    Loc.errorm "[Theory.acc_ind_decl] %a" Exn_printer.exn_printer e
+
+let wf_def =
+  try
+    let ty_rel =
+      match ps_wf.ls_args with
+        [ty] -> ty
+      | _ -> assert false
+    in
+    let ty_alpha =
+      match ty_rel.ty_node with
+      | Tyapp(_,[t;_]) -> t
+      | _ -> assert false
+    in
+    let var_r = create_vsymbol (id_fresh "r") ty_rel in
+    let r = t_var var_r in
+    let f =
+      (* forall x, acc r x *)
+      let var_x = create_vsymbol (id_fresh "x") ty_alpha in
+      let x = t_var var_x in
+      t_forall_close [var_x] [] (ps_app ps_acc [r;x])
+    in
+    Decl.make_ls_defn ps_wf [var_r] f
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    Loc.errorm "[Theory.wf_def] %a" Exn_printer.exn_printer e
+
+
+let wf_module =
+  try
+    let uc = empty_module dummy_env (id_fresh "WellFounded") ["why3";"WellFounded"] in
+    let uc = use_export uc builtin_module (* needed for "=" *) in
+    let uc = use_export uc bool_module (* needed for "bool" *) in
+    let uc = use_export uc highord_module (* needed for "->" *) in
+    let d = create_pure_decl (Decl.create_ind_decl Decl.Ind [acc_ind_decl]) in
+    let uc = add_pdecl_raw uc d in
+    let d = create_pure_decl (Decl.create_logic_decl [wf_def]) in
+    let uc = add_pdecl_raw uc d in
+    close_module uc
+  with
+  | UnknownIdent id ->
+      Loc.errorm "[Pmodule.wf_module] unknown ident %s" id.id_string
+  | e when not (Debug.test_flag Debug.stack_trace) ->
+      Loc.errorm "[Pmodule.wf_module] %a" Exn_printer.exn_printer e
+
+
 let tuple_module = Hint.memo 17 (fun n ->
   let nm = "Tuple" ^ string_of_int n in
   let uc = empty_module dummy_env (id_fresh nm) ["why3";nm] in
@@ -1470,6 +1539,7 @@ let mlw_language_builtin =
     if s = ref_module.mod_theory.th_name.id_string then ref_module else
     if s = builtin_theory.th_name.id_string then builtin_module else
     if s = highord_theory.th_name.id_string then highord_module else
+    if s = wf_module.mod_theory.th_name.id_string then wf_module else
     if s = bool_theory.th_name.id_string then bool_module else
     match tuple_theory_name s with
     | Some n -> tuple_module n

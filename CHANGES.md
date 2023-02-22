@@ -8,6 +8,13 @@ Tools
     use of `-` character. Use `why3 --list-debug-flags` to obtain the
     new names.
 
+WhyML langage
+  * A new meta `vc:proved_wf` can be used to declare well-founded
+    relations, to be used as termination orderings in variants. See
+    manual Section 8.2.3. "Using a custom well-founded relation for
+    termination". Using this mechanism, relations `ult`, `ugt`, `slt`
+    and `sgt` from bitvector modules are proved well-founded
+
 MLCFG language
   * attributes on function bodies are now supported
   * variant "stackify" for generating VCs, which attempts to recover a

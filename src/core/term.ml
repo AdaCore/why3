@@ -1023,6 +1023,14 @@ let fs_bool_false = create_fsymbol ~constr:2 (id_fresh "False") [] ty_bool
 let t_bool_true  = fs_app fs_bool_true [] ty_bool
 let t_bool_false = fs_app fs_bool_false [] ty_bool
 
+let to_prop t =
+  match t.t_ty with
+  | Some _ ->
+    if t_equal t t_bool_true then t_true
+    else if t_equal t t_bool_false then t_false
+    else t_attr_copy t (t_equ t t_bool_true)
+  | None -> t
+
 let fs_tuple_ids = Hid.create 17
 
 let fs_tuple = Hint.memo 17 (fun n ->
@@ -1056,13 +1064,15 @@ let t_pred_app pr t = t_equ (t_func_app pr t) t_bool_true
 let t_func_app_l fn tl = List.fold_left t_func_app fn tl
 let t_pred_app_l pr tl = t_equ (t_func_app_l pr tl) t_bool_true
 
-let to_prop t =
-  match t.t_ty with
-  | Some _ ->
-    if t_equal t t_bool_true then t_true
-    else if t_equal t t_bool_false then t_false
-    else t_attr_copy t (t_equ t t_bool_true)
-  | None -> t
+let ps_acc =
+  let alpha = ty_var (create_tvsymbol (id_fresh "a")) in
+  let ty_rel = ty_func alpha (ty_pred alpha) in
+  create_psymbol (id_fresh "acc") [ty_rel;alpha]
+
+let ps_wf =
+  let alpha = ty_var (create_tvsymbol (id_fresh "a")) in
+  let ty_rel = ty_func alpha (ty_pred alpha) in
+  create_psymbol (id_fresh "well_founded") [ty_rel]
 
 (** Term library *)
 

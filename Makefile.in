@@ -117,6 +117,7 @@ EXTINCLUDES = @WHY3INCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE
 #   52   The argument of this constructor should not be matched against a
 #        constant pattern; the actual value of the argument could change
 #        in the future.
+#   70   No mli file
 # - fatal:
 #   5    Partially applied function: expression whose result has function
 #        type and is ignored.
@@ -124,7 +125,7 @@ EXTINCLUDES = @WHY3INCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE
 #   48   Implicit elimination of optional arguments.
 #   50   Unexpected documentation comment.
 
-WARNINGS = A-4-9-41-44-45-52@5@8@48@50
+WARNINGS = A-4-9-41-44-45-52-70@5@8@48@50
 
 FLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g -thread $(INCLUDES)
 OFLAGS = $(FLAGS)
@@ -1338,7 +1339,8 @@ ISABELLELIBS_MAP = $(addsuffix .xml, $(addprefix $(GENERATED_PREFIX_ISABELLE)/ma
 ISABELLELIBS_LIST_FILES = List Length Mem Nth NthNoOpt NthLength HdTl NthHdTl Append NthLengthAppend Reverse HdTlNoOpt RevAppend Combine Distinct NumOcc Permut
 ISABELLELIBS_LIST = $(addsuffix .xml, $(addprefix $(GENERATED_PREFIX_ISABELLE)/list/, $(ISABELLELIBS_LIST_FILES)))
 
-ISABELLELIBS_BV_FILES = Pow2int BV8 BV16 BV32 BV64 BVConverter_32_64 BVConverter_16_64 BVConverter_8_64 BVConverter_16_32 BVConverter_8_32 BVConverter_8_16
+ISABELLELIBS_BV_FILES = Pow2int
+# BV8 BV16 BV32 BV64 BVConverter_32_64 BVConverter_16_64 BVConverter_8_64 BVConverter_16_32 BVConverter_8_32 BVConverter_8_16
 ISABELLELIBS_BV = $(addsuffix .xml, $(addprefix $(GENERATED_PREFIX_ISABELLE)/bv/, $(ISABELLELIBS_BV_FILES)))
 
 ISABELLELIBS = $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION) $(ISABELLELIBS_BV)
@@ -1426,11 +1428,11 @@ $(ISABELLELIBS_OPTION): bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drive
 	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/option
 	$(HIDE)WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T option.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/option/
 
-$(ISABELLELIBS_BV): bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/isabelle-realizations.aux \
-  $(ISABELLEREALIZEDRVPATH) drivers/isabelle-common.gen stdlib/bv.mlw
-	$(SHOW) "Generating Isabelle realization for bv.$(notdir $(basename $@))"
-	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/bv
-	$(HIDE)WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T bv.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/bv/
+# $(ISABELLELIBS_BV): bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/isabelle-realizations.aux \
+#   $(ISABELLEREALIZEDRVPATH) drivers/isabelle-common.gen stdlib/bv.mlw
+# 	$(SHOW) "Generating Isabelle realization for bv.$(notdir $(basename $@))"
+# 	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/bv
+# 	$(HIDE)WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T bv.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/bv/
 
 ifeq (@enable_isabelle_libs@,yes)
 

@@ -1486,7 +1486,7 @@ module FromModelToTerm = struct
                      no model trace is present, the qualified name forbids the recognition
                      of the special field names __split_fields and __split_discrs. *)
                   (* let ls_name = Format.asprintf "@[<h>%a@]" Pretty.print_ls_qualified ls in *)
-                  Ident.get_model_trace_string ~name:ls.ls_name.id_string ~attrs:ls.ls_name.id_attrs)
+                  Ident.(get_model_trace_string ~name:ls.ls_name.id_string ~attrs:ls.ls_name.id_attrs))
                   fields)
                 ts_concrete
             in
@@ -1615,7 +1615,7 @@ module FromModelToTerm = struct
       else
         raise UnexpectedPattern
     with UnexpectedPattern -> None
-  
+
   and get_opt_coercion env (vs,vs_name) (t',t'_concrete) =
     (* special case for type coercions:
      if t is of the form epsilon x:ty. proj x = v, use Proj v as concrete term *)
@@ -1864,7 +1864,7 @@ let parse pinfo input =
                 (* the printer may add/update attributes *)
                 let attrs =
                   Ident.Sattr.union attrs
-                    (Mstr.find_def Ident.Sattr.empty n pinfo.set_str) in
+                    (Mstr.find_def Ident.Sattr.empty n pinfo.Printer.set_str) in
                 create_model_element ~value:t ~concrete_value:t_concrete
                   ~oloc ~attrs ~lsymbol:ls)
               terms))

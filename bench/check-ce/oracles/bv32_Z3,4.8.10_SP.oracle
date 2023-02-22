@@ -18,43 +18,43 @@ File int.mlw:
     Constant one initialization
     one = 1
 File bv.mlw:
-  Line 596:
+  Line 611:
     Constant zeros initialization
   Line 192:
     (giant-step) execution of unimplemented function with args:
     result = 0
-  Line 596:
+  Line 611:
     zeros = 0
     Constant one initialization
   Line 197:
     (giant-step) execution of unimplemented function with args:
     result = 0
-  Line 596:
+  Line 611:
     one = 0
     Constant ones initialization
   Line 199:
     (giant-step) execution of unimplemented function with args:
     result = 0
-  Line 596:
+  Line 611:
     ones = 0
-  Line 638:
+  Line 653:
     Constant zeros initialization
   Line 192:
     (giant-step) execution of unimplemented function with args:
     result = 0
-  Line 638:
+  Line 653:
     zeros = 0
     Constant one initialization
   Line 197:
     (giant-step) execution of unimplemented function with args:
     result = 0
-  Line 638:
+  Line 653:
     one = 0
     Constant ones initialization
   Line 199:
     (giant-step) execution of unimplemented function with args:
     result = 0
-  Line 638:
+  Line 653:
     ones = 0
 File bv32.mlw:
   Line 7:
@@ -96,12 +96,15 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `dummy_update_with_int` cannot be evaluated):
 File bv.mlw:
-  Line 596:
+  Line 326:
+    to_int : t -> int = [|_ => 0|]
+    to_int : t1 -> int = [|_ => 0|]
+  Line 611:
     lsr : t1 -> int -> t1 = fun x!0 x!1 -> #x00000000000000000000000000000000
     nth : t1 -> int -> bool = fun x!0 x!1 -> false
     nth_bv : t1 -> t1 -> bool = fun x!0 x!1 -> false
     of_int : int -> t1 = [|_ => #x00000000000000000000000000000000|]
-  Line 638:
+  Line 653:
     lsr : t -> int -> t = fun x!0 x!1 -> #x00000000
     nth : t -> int -> bool = fun x!0 x!1 -> false
     nth_bv : t -> t -> bool = fun x!0 x!1 -> false

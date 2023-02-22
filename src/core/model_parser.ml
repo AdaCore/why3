@@ -115,6 +115,7 @@ type concrete_syntax_term =
 (* Pretty printing of concrete terms *)
 
 let print_concrete_bv fmt { bv_value; bv_length; bv_verbatim } =
+  ignore bv_value; ignore bv_length;
   fprintf fmt "%s" bv_verbatim
 
 let rec print_concrete_term fmt ct =
@@ -123,8 +124,10 @@ let rec print_concrete_term fmt ct =
   | Var v -> pp_print_string fmt v
   | Const (Boolean b) -> pp_print_bool fmt b
   | Const (String s) -> Constant.print_string_def fmt s
-  | Const (Integer {int_value; int_verbatim}) -> pp_print_string fmt int_verbatim
-  | Const (Real {real_value; real_verbatim}) -> pp_print_string fmt real_verbatim
+  | Const (Integer {int_value; int_verbatim}) ->
+      ignore int_value; pp_print_string fmt int_verbatim
+  | Const (Real {real_value; real_verbatim}) ->
+      ignore real_value; pp_print_string fmt real_verbatim
   | Const (Float Infinity) -> pp_print_string fmt "∞"
   | Const (Float Plus_zero) -> pp_print_string fmt "+0"
   | Const (Float Minus_zero) -> pp_print_string fmt "-0"
@@ -136,7 +139,8 @@ let rec print_concrete_term fmt ct =
       print_concrete_bv float_mant
       float_hex
   | Const (BitVector bv) -> fprintf fmt "%a" print_concrete_bv bv
-  | Const (Fraction {frac_num;frac_den;frac_verbatim}) -> fprintf fmt "%s" frac_verbatim
+  | Const (Fraction {frac_num;frac_den;frac_verbatim}) ->
+      ignore frac_num; ignore frac_den; fprintf fmt "%s" frac_verbatim
   | Apply ("=",[t1;t2]) ->
     fprintf fmt "%a = %a"
       print_concrete_term t1
@@ -546,7 +550,7 @@ let json_of_concrete_real { real_value; real_verbatim } =
       ]
   ]
 
-let rec json_of_concrete_term ct =
+let [@warning "-42"] rec json_of_concrete_term ct =
   let open Json_base in
   match ct with
   | Var v -> Record [ "type", String "Var"; "val", String v ]

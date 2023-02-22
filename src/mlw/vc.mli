@@ -18,7 +18,6 @@ val wp_attr : Ident.attribute (* switch to classical WP (Cfun only) *)
 val kp_attr : Ident.attribute (* preserve preconditions after the call *)
 val wb_attr : Ident.attribute (* treat an abstract block as a whitebox *)
 val nt_attr : Ident.attribute (* allow non-terminating calls and loops *)
-val trusted_wf_attr : Ident.attribute (* order relation is trusted to be well-founded *)
 
 val set_infer_invs :
   (Ident.Sattr.t -> Env.env -> Decl.known_map -> known_map -> Expr.expr ->

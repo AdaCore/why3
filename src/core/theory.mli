@@ -84,23 +84,31 @@ val list_metas  : unit -> meta list
 
 val meta_range : meta
 val meta_float : meta
-val meta_projection: meta
-val meta_record: meta
-
+val meta_projection : meta
+val meta_record : meta
+val meta_proved_wf: meta
+(** meta used to declare than a given predicate symbol is proved well-founded *)
 
 (** {2 Theories} *)
 
 type theory = private {
-  th_name   : ident;          (* theory name *)
-  th_path   : string list;    (* environment qualifiers *)
-  th_decls  : tdecl list;     (* theory declarations *)
-  th_ranges : tdecl Mts.t;    (* range type projections *)
-  th_floats : tdecl Mts.t;    (* float type projections *)
-  th_crcmap : Coercion.t;     (* implicit coercions *)
-  th_export : namespace;      (* exported namespace *)
-  th_known  : known_map;      (* known identifiers *)
-  th_local  : Sid.t;          (* locally declared idents *)
-  th_used   : Sid.t;          (* used theories *)
+  th_name   : ident;          (** theory name *)
+  th_path   : string list;    (** environment qualifiers *)
+  th_decls  : tdecl list;     (** theory declarations *)
+  th_ranges : tdecl Mts.t;    (** range type projections *)
+  th_floats : tdecl Mts.t;    (** float type projections *)
+  th_crcmap : Coercion.t;     (** implicit coercions *)
+  th_proved_wf : (prsymbol * lsymbol) Mls.t;
+  (** Mapping of predicate symbols [r] to symbols [pr,wf], for which
+     a meta ["vc:proved_wf" r pr] was set, and [pr] checked to refer
+     to a proposition of the form [(wf r)]. Note that
+     [wf] is any lsymbol, it is NOT checked that it is equal to the
+     stdlib symbol [relations.WellFounded.well_founded] (it is too
+     early to do that in this module). *)
+  th_export : namespace;      (** exported namespace *)
+  th_known  : known_map;      (** known identifiers *)
+  th_local  : Sid.t;          (** locally declared idents *)
+  th_used   : Sid.t;          (** used theories *)
 }
 
 and tdecl = private {
@@ -130,6 +138,7 @@ val td_hash : tdecl -> int
 
 (** {2 Constructors and utilities} *)
 
+(** theories under constructions *)
 type theory_uc = private {
   uc_name   : ident;
   uc_path   : string list;
@@ -137,6 +146,8 @@ type theory_uc = private {
   uc_ranges : tdecl Mts.t;
   uc_floats : tdecl Mts.t;
   uc_crcmap : Coercion.t;
+  uc_proved_wf : (prsymbol * lsymbol) Mls.t;
+  (** see field [th_proved_wf] above *)
   uc_prefix : string list;
   uc_import : namespace list;
   uc_export : namespace list;
@@ -228,6 +239,8 @@ val bool_theory : theory
 
 val highord_theory : theory
 
+(* val wf_theory : theory *)
+
 val tuple_theory : int -> theory
 
 val tuple_theory_name : string -> int option
@@ -286,3 +299,5 @@ exception MetaTypeMismatch of meta * meta_arg_type * meta_arg_type
 
 exception RangeConflict of tysymbol
 exception FloatConflict of tysymbol
+exception IllFormedWf of prsymbol * lsymbol
+exception ProvedWfConflict of lsymbol

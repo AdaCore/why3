@@ -1099,6 +1099,13 @@ let () = Exn_printer.register
   | FloatConflict ts ->
       Format.fprintf fmt "Conflicting definitions for float type %a"
         print_ts ts
+  | ProvedWfConflict ls ->
+      Format.fprintf fmt "Conflicting definitions for well-foundedness of relation %a"
+        print_ls ls
+  | IllFormedWf(pr,ls) ->
+      Format.fprintf fmt
+        "meta \"vc:proved_wf\" requires that proposition %a has the form (well_founded %a)"
+        print_pr pr print_ls ls
   | _ -> raise exn
   end
 
