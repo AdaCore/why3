@@ -152,42 +152,29 @@ then no warning is issued for :code:`f1`, and its VC does not contain
 proved. The :code:`diverges` clause must be added in the contract of
 :code:`g1` too.
 
-Notice that putting a :code:`diverges` clause in a contract of a
-function that contains no loop and no recursive call is an error,
-signaled by Why3. This behavior might be annoying when one generates
-WhyML code automatically, and doesn't know if the code is terminating
-or not. For such a purpose, the VC generator interprets the attribute
-:why3:attribute:`[@vc:divergent]` when it is given on the body of a
-function.  The effect is that the VC does not contain termination
-checks anymore. For these reason the code
-
-.. code-block:: whyml
-
-   let f2 (x:int) : int =
-     [@vc:divergent]
-     let ref r = 100 in
-     while r > 0 do r <- r - x done;
-     r
-
-is accepted without any warning, and the VC does not include any
-:code:`false` formula to prove. Notice however that the presence of
-the attribute it doesn't prevent Why3 to consider the function :code:`f2`
-potentially non-terminating. On the same example, adding the code
-
-.. code-block:: whyml
-
-   let g2 () = f2 7
-
-will again trigger the warning for non-termination of the call to
-:code:`f2`. The presence of the attribute thus somehow acts the same
-as the :code:`diverges` clause, except that it is not an error the put
-the attribute on a terminating program, for example on
+Note that putting the :code:`diverges` clause in the contract of a
+function triggers an error when the function contains neither
+variant-free loops nor variant-free recursive calls nor calls to
+diverging functions. This behavior might be annoying for code
+generators, so they can put the attribute
+:why3:attribute:`[@vc:divergent]` on the body of the function, in
+place of the :code:`diverges` clause:
 
 .. code-block:: whyml
 
    let f2 (x:int) : int =
      [@vc:divergent]
      100 - x
+
+Note that :why3:attribute:`[@vc:divergent]` has the same effect as
+:code:`diverges`, which means that :code:`f2` is now assumed to be
+diverging for functions that call it. As a consequence, the following
+code will again trigger a warning about the potentially
+non-terminating call to :code:`f2`.
+
+.. code-block:: whyml
+
+   let g2 () = f2 7
 
 
 .. _sec.custom_wf:

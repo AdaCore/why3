@@ -1,65 +1,52 @@
 :x: marks a potential source of incompatibility
 
+Core
+  * added meta `vc:proved_wf` for annotating well-founded relations, to make
+    them easier to use in variants; see Section 8.2.3 of the manual
+
+Standard library
+  * relations `ult`, `ugt`, `slt`, and `sgt` from `bv` modules are now
+    recognized as well-founded
+
 Tools
-  * `libdir` and `datadir` are not stored anymore in the configuration
-    file, but they can be manually set there if desired; see also the
-    environment variables `WHY3LIB` and `WHY3DATA`
-  * several debug flags have been renamed, in particular to avoid the
-    use of `-` character. Use `why3 --list-debug-flags` to obtain the
-    new names.
+  * `libdir` and `datadir` are not stored anymore in the configuration file,
+    but they can still be manually set there if needed;
+    see also the environment variables `WHY3LIB` and `WHY3DATA`
+  * several debug flags have been renamed;
+    use `why3 --list-debug-flags` to obtain the new names :x:
+  * global directives in extra drivers are now taken into account
 
-WhyML langage
-  * A new meta `vc:proved_wf` can be used to declare well-founded
-    relations, to be used as termination orderings in variants. See
-    manual Section 8.2.3. "Using a custom well-founded relation for
-    termination". Using this mechanism, relations `ult`, `ugt`, `slt`
-    and `sgt` from bitvector modules are proved well-founded
-
-MLCFG language
-  * attributes on function bodies are now supported
-  * variant "stackify" for generating VCs, which attempts to recover a
-    more structured program body, reconstructing loops when
-    possible. see manual Section 7.3.5 "Alternative Translation
-    Scheme: Stackify".
-  * an experimental option called "subregion analysis" triggers the
-    inference of extra invariants. see manual Section 7.3.6 "Subregion
-    Analysis"
+IDE
+  * pressing Tab now auto-completes commands
+  * added menu item "File/Export as Zip" to export a zip archive of the
+    current session and all the related files
 
 Python language
   * added `by` and `so` connectives in predicates
   * fixed overloading of `+` in Python code
   * added `add_list` for list concatenation in logic
 
-IDE
-  * pressing Tab now auto-completes commands
-  * New menu "File/Export as Zip" to export a zip archive of the
-    current session and all related files
+MLCFG language
+  * attributes on function bodies are now supported
+  * attributes `[@cfg:stackify]` and `[@cfg:subregion_analysis]` can
+    be used to improve the VC structure and generate extra invariants;
+    see Sections 7.3.5 and 7.3.6 of the manual
 
 API
-  * source locations are now represented by both a start line number
-    and an end line number; the fourth number is thus now the column
-    number on the end line :x:
+  * source locations now use both a starting line and an ending line;
+    the fourth number is thus the column on the last line :x:
   * several functions from `Call_prover` and `Driver` now take as input a
     `Whyconf.main` configuration type instead of directly taking `libdir`
     and `datadir` :x:
   * `Whyconf.load_driver` has been replaced by `Driver.load_driver_for_prover` :x:
   * `Warning.emit` has been replaced by `Loc.warning` :x:
-  * OCaml data structure for counterexamples is modified. See manual
-    Section 5.3.7.1 "Notes on format of displayed values", Section
-    11.10.3 "Counterexamples output formats", and the API doc
-    `http://why3.lri.fr/api/Model_parser.html`. The JSON format is
-    also modified accordingly, see manual Section 12.11 "Structure of
-    Counterexample files in JSON format"
+  * representation of counterexamples has been modified;
+    see Sections 5.3.7.1, 11.10.3, and 12.11 of the manual
 
 Provers
-  * support for CVC5 versions 1.0.0 (released Apr 6, 2022) to
-    1.0.4 (released Jan 31, 2023)
+  * support for CVC5 1.0.0 to 1.0.4 (released Jan 31, 2023)
   * support for Alt-Ergo 2.4.2 (released Aug 1, 2022)
-  * support for Z3 version 4.10.x, 4.11.x and 4.12.x
-
-Drivers
-  * the global directives of extra drivers are now taken into account,
-	not only the theories
+  * support for Z3 4.12.0 and 4.12.1 (released Jan 18, 2023)
 
 Miscellaneous
   * fixed soundness bug with existential quantifiers in `introduce_premises`
@@ -86,7 +73,7 @@ Python language
 
 Provers
   * support for Z3 4.9.0 and 4.9.1 (released Jul 6, 2022)
-  * support for Z3 4.10.0, 4.10.1 and 4.10.2 (released Jul 30, 2022)
+  * support for Z3 4.10.0, 4.10.1, and 4.10.2 (released Jul 30, 2022)
   * support for Z3 4.11.0 (released Aug 18, 2022)
   * support for Coq 8.16.0 (release Sep 5, 2022)
   * support for Gappa 1.4.0 (released Apr 16, 2022)
@@ -95,10 +82,10 @@ Version 1.5.0, April 29, 2022
 -----------------------------
 
 Standard library
-  * deeply revised library `mach.bv` for bitvectors operations in
-    programs. Pre- and post-conditions are now expressed both in terms
-    of mathematical integers and in terms of purely bit-vector
-    formulas, thanks to conversion to 128 bits :x:
+  * deeply revised library `mach.bv` for bitvector operations in programs;
+    pre- and post-conditions are now expressed both in terms
+    of mathematical integers and in terms of pure bitvectors,
+    thanks to conversion to 128 bits :x:
 
 Core
   * equality of numeric literals is now semantic, i.e., independent of the radix :x:

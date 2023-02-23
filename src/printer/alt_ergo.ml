@@ -43,7 +43,6 @@ type info = {
   mutable info_model: S.t;
   info_vc_term: vc_term_info;
   info_in_goal: bool;
-  meta_model_projection: Sls.t;
   info_cntexample: bool
   }
 
@@ -503,7 +502,6 @@ let print_task args ?old:_ fmt task =
     info_model = S.empty;
     info_vc_term = vc_info;
     info_in_goal = false;
-    meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
     info_cntexample = cntexample;
   } in
   print_prelude fmt args.prelude;

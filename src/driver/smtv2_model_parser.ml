@@ -466,8 +466,6 @@ module FromModelToTerm = struct
     type_fields : Term.lsymbol list Ty.Mty.t;
     (* Set of coercions for each type from [pinfo.Printer.type_coercions]. *)
     type_coercions : Term.Sls.t Ty.Mty.t;
-    (* Queried terms from [pinfo.Printer.queried_terms]. *)
-    queried_terms : lsymbol Mstr.t;
     (* Function definiions from the SMT model
        that are not in [pinfo.Printer.queried_terms]. *)
     mutable prover_fun_defs : (Term.term * concrete_syntax_term) Mstr.t;
@@ -1710,7 +1708,6 @@ module FromModelToTerm = struct
         type_fields = pinfo.Printer.type_fields;
         type_coercions = pinfo.Printer.type_coercions;
         inferred_types = [];
-        queried_terms = Mstr.map (fun (ls, _, _) -> ls) qterms;
         eval_prover_vars = Mvs.empty;
         prover_fun_defs = Mstr.empty;
       }
