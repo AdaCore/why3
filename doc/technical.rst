@@ -1663,8 +1663,8 @@ and reproduced below.
 
 .. _sec.jsonce:
 
-Structure of Counterexample files in JSON format
-------------------------------------------------
+Structure of Counterexamples
+----------------------------
 
 Generated counterexamples can be exported in JSON format.
 The JSON output follows the JSON Schema given in :file:`share/ce-models.json`
