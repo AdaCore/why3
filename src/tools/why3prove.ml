@@ -270,8 +270,8 @@ let () = try
     exit 1
 
 let timelimit = match !opt_timelimit with
-  | None -> 10.0
-  | Some i when i <= 0.0 -> 0.0
+  | None -> 10.
+  | Some i when i <= 0. -> 0.
   | Some i -> i
 
 let stepslimit = Opt.get_def 0 !opt_stepslimit

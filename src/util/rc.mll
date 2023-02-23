@@ -233,6 +233,7 @@ let set_valueo write section key valueo =
 
 let rfloat k = function
   | RCfloat n -> n
+  | RCint n -> float n
   | v -> raise (FloatExpected (k,v))
 
 let wfloat f = RCfloat f
@@ -311,8 +312,8 @@ let letter = ['a'-'z' 'A'-'Z']
 let ident = (letter | '_') (letter | digit | '_' | '-' | '+' | '.') *
 let sign = '-' | '+'
 let integer = sign? digit+
-let mantissa = ['e''E'] sign? digit+
-let real = sign? digit* '.' digit* mantissa?
+let exponent = ['e''E'] sign? digit+
+let real = sign? digit* '.' digit* exponent?
 let escape = ['\\''"''n''t''r']
 
 rule record = parse

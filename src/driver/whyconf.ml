@@ -298,7 +298,7 @@ let empty_main =
     loadpath = [];
     stdlib = true;
     load_default_plugins = true;
-    timelimit = 5.0;   (* 5 seconds *)
+    timelimit = 5.;   (* 5 seconds *)
     memlimit = 1000; (* 1 Mb *)
     running_provers_max = 2; (* two provers run in parallel *)
     plugins = [];
@@ -517,7 +517,7 @@ module RC_load = struct
 end
 
 module RC_save = struct
-  let set_limits ~(time:float) ~mem ~j section =
+  let set_limits ~time ~mem ~j section =
     let section =
       match get_into section "magic" with
       | None -> set_int section "magic" magicnumber
@@ -939,7 +939,7 @@ module User = struct
       main = set_default_editor config.main editor;
     }
 
-  let set_limits ~(time:float) ~mem ~j config =
+  let set_limits ~time ~mem ~j config =
     { config with
       user_rc = update_section config.user_rc "main"
         @@ RC_save.set_limits ~time ~mem ~j;

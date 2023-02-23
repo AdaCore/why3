@@ -1793,7 +1793,7 @@ let set_status_and_time_column ?limit row =
              if gconfig.show_time_limit then
                match limit with
                  | Some l ->
-                    Format.sprintf "%.2f [%f]" time
+                    Format.sprintf "%.2f [%.2f]" time
                                    (l.Call_provers.limit_time)
                  | None ->
                     Format.sprintf "%.2f" time
@@ -1819,7 +1819,7 @@ let set_status_and_time_column ?limit row =
            begin
              match limit with
              | Some l -> t ^
-                Format.sprintf " [limit=%f sec., %d M]"
+                Format.sprintf " [limit=%.2f sec., %d M]"
                                (l.Call_provers.limit_time)
                                (l.Call_provers.limit_mem)
              | None -> t ^ " [no limit known]"

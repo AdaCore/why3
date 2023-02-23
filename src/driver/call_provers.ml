@@ -50,11 +50,11 @@ type resource_limit = {
 }
 (* END{resourcelimit} anchor for automatic documentation, do not remove *)
 
-let empty_limit = { limit_time = 0.0 ; limit_mem = 0; limit_steps = 0 }
+let empty_limit = { limit_time = 0. ; limit_mem = 0; limit_steps = 0 }
 
 let limit_max =
   let single_limit_max a b = if a = 0 || b = 0 then 0 else max a b in
-  let single_limit_maxf a b : float = if a = 0.0 || b = 0.0 then 0.0 else max a b in
+  let single_limit_maxf a b = if a = 0. || b = 0. then 0. else max a b in
   fun a b ->
     { limit_time = single_limit_maxf a.limit_time b.limit_time;
       limit_steps = single_limit_max a.limit_steps b.limit_steps;
@@ -383,12 +383,12 @@ let actualcommand ~config command limit file =
   let arglist = Cmdline.cmdline_split command in
   let use_stdin = ref true in
   let on_timelimit = ref false in
-  let cmd_regexp = Re.Str.regexp "%\\(.\\)" in
+  let cmd_regexp = Re.Str.regexp "%\\(\.?.\\)" in
   let replace s = match Re.Str.matched_group 1 s with
     | "%" -> "%"
     | "f" -> use_stdin := false; file
     | "t" -> on_timelimit := true; stime
-    | "tf" -> on_timelimit := true; stimef
+    | ".t" -> on_timelimit := true; stimef
     | "T" -> on_timelimit := true; stimems
     | "m" -> smem
     | "l" -> Whyconf.libdir config
@@ -424,9 +424,9 @@ let adapt_limits limit on_timelimit =
     { limit with limit_time =
       (* for steps limit use 2 * t + 1 time *)
       if limit.limit_steps <> empty_limit.limit_steps
-      then (2.0 *. limit.limit_time +. 1.0)
+      then (2. *. limit.limit_time +. 1.)
       (* if prover implements time limit, use 4t + 1 *)
-      else if on_timelimit then 4.0 *. limit.limit_time +. 1.0
+      else if on_timelimit then 4. *. limit.limit_time +. 1.
       (* otherwise use t *)
       else limit.limit_time }
 
@@ -496,7 +496,7 @@ let call_on_file
   let use_stdin = if use_stdin then Some fin else None in
   Debug.dprintf
     debug
-    "Request sent to prove_client:@ timelimit=%f@ memlimit=%d@ cmd=@[[%a]@]@."
+    "Request sent to prove_client:@ timelimit=%.2f@ memlimit=%d@ cmd=@[[%a]@]@."
     limit.limit_time limit.limit_mem
     (Pp.print_list Pp.comma Pp.string) cmd;
   let libdir = Whyconf.libdir config in

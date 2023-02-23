@@ -1,4 +1,4 @@
- (********************************************************************)
+(********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
 (*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)

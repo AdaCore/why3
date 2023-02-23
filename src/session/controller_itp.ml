@@ -340,7 +340,7 @@ module Hprover = Whyconf.Hprover
    proof *)
 
 let adapt_limits ~interactive ~use_steps limits a =
-  let (t : float), m, s =
+  let t, m, s =
     let timelimit = limits.Call_provers.limit_time in
     let memlimit = limits.Call_provers.limit_mem in
     let steplimit = limits.Call_provers.limit_steps in
@@ -352,8 +352,8 @@ let adapt_limits ~interactive ~use_steps limits a =
        but enforced to remain inside the interval [l,2l] where l is
        the previous time limit *)
        let t = (1.5 +. 2.0 *. t) in
-       let increased_time = if interactive then 0.0
-                            else max timelimit (min t (2.0 *. timelimit)) in
+       let increased_time = if interactive then 0.
+                            else max timelimit (min t (2. *. timelimit)) in
        (* increased mem limit is just 1.5 times the previous mem limit *)
        let increased_mem = if interactive then 0 else 3 * memlimit / 2 in
        begin
@@ -381,7 +381,7 @@ let adapt_limits ~interactive ~use_steps limits a =
             (* correct ? failures are supposed to appear quickly anyway... *)
             timelimit, memlimit, steplimit
        end
-    | None when interactive -> 0.0, 0, 0
+    | None when interactive -> 0., 0, 0
     | None -> timelimit, memlimit, steplimit
   in
   { Call_provers.limit_time = t; limit_mem = m; limit_steps = s }
@@ -821,9 +821,9 @@ let run_strategy_on_goal
       callback STShalt
     else
       match Array.get strat pc with
-      | Icall_prover(p,(timelimit : float option),memlimit,steplimit) ->
+      | Icall_prover(p,timelimit,memlimit,steplimit) ->
          let main = Whyconf.get_main c.controller_config in
-         let timelimit : float = Opt.get_def (Whyconf.timelimit main) timelimit in
+         let timelimit = Opt.get_def (Whyconf.timelimit main) timelimit in
          let memlimit = Opt.get_def (Whyconf.memlimit main) memlimit in
          let steplimit = Opt.get_def 0 steplimit in
          let callback panid res =
@@ -1124,7 +1124,7 @@ let print_report fmt (r: report) =
 (* TODO to be removed when we have a better way to print *)
 let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list) =
   let pp_elem fmt (id, pr, rl, report) =
-    fprintf fmt "ProofNodeID: %d, Prover: %a, Timelimit?: %f, Result: @[<h>%a@]"
+    fprintf fmt "ProofNodeID: %d, Prover: %a, Timelimit?: %.2f, Result: @[<h>%a@]"
       (Obj.magic id) Whyconf.print_prover pr
       rl.Call_provers.limit_time print_report report
   in
@@ -1271,7 +1271,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
   in
   let timelimit = ref limit.Call_provers.limit_time in
   let set_timelimit res =
-    timelimit := 1.0 +. (floor res.Call_provers.pr_time) in
+    timelimit := 1. +. (floor res.Call_provers.pr_time) in
   let bisect_end rem =
     if Decl.Spr.is_empty rem.Eliminate_definition.rem_pr &&
          Term.Sls.is_empty rem.Eliminate_definition.rem_ls &&

@@ -93,7 +93,7 @@
     with Failure _ ->
       match s with
       | "%t" -> None
-      | "%tf" -> None
+      | "%.t" -> None
       | "%T" -> None
       | "%m" -> None
       | "%s" -> None
@@ -105,7 +105,7 @@
     with Failure _ ->
       match s with
       | "%t" -> None
-      | "%tf" -> None
+      | "%.t" -> None
       | "%T" -> None
       | "%S" -> None
       | "%m" -> None
@@ -133,9 +133,9 @@ let goto = 'g' | "goto"
 let call = 'c' | "call"
 let transform = 't' | "transform"
 let sign = '-' | '+'
-let mantissa = ['e''E'] sign? digit+
-let real = sign? digit* '.' digit* mantissa?
-let timelimit = real | integer | "%t" | "%tf" | "%T"
+let exponent = ['e''E'] sign? digit+
+let real = sign? digit* '.' digit* exponent?
+let timelimit = real | integer | "%t" | "%.t" | "%T"
 let memlimit = integer | "%m"
 let steplimit = integer | "%s"
 

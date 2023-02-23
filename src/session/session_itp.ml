@@ -549,7 +549,7 @@ open Format
 open Ident
 
 let print_proof_attempt fmt pa =
-  fprintf fmt "@[<h>%a tl=%f %a@]"
+  fprintf fmt "@[<h>%a tl=%g %a@]"
           Whyconf.print_prover pa.prover
           pa.limit.Call_provers.limit_time
           (Pp.print_option (Call_provers.print_prover_result ~json:false))
@@ -1251,7 +1251,7 @@ let load_file session old_provers f =
         let name = string_attribute "name" f in
         let version = string_attribute "version" f in
         let altern = string_attribute_def "alternative" f "" in
-        let timelimit = float_attribute_def "timelimit" f 5.0 in
+        let timelimit = float_attribute_def "timelimit" f 5. in
         let steplimit = int_attribute_def "steplimit" f 1 in
         let memlimit = int_attribute_def "memlimit" f 1000 in
         let p = {Whyconf.prover_name = name;
@@ -1964,12 +1964,12 @@ let get_used_provers_with_stats session =
     session;
   prover_table
 
-let get_prover_to_save prover_ids p ((timelimits : (float, int) Hashtbl.t),steplimits,memlimits) provers =
+let get_prover_to_save prover_ids p (timelimits,steplimits,memlimits) provers =
   let mostfrequent_timelimit,_ =
     Hashtbl.fold
       (fun t f ((_,f') as t') -> if f > f' then (t,f) else t')
       timelimits
-      (0.0,0)
+      (0.,0)
   in
   let mostfrequent_steplimit,_ =
     Hashtbl.fold
@@ -2008,12 +2008,12 @@ let opt pr lab fmt = function
   | None -> ()
   | Some s -> fprintf fmt "@ %s=\"%a\"" lab pr s
 
-let save_prover fmt id (p,(mostfrequent_timelimit : float),mostfrequent_steplimit,mostfrequent_memlimit) =
+let save_prover fmt id (p,mostfrequent_timelimit,mostfrequent_steplimit,mostfrequent_memlimit) =
   let steplimit =
     if mostfrequent_steplimit < 0 then None else Some mostfrequent_steplimit
   in
   fprintf fmt "@\n@[<h><prover@ id=\"%i\"@ name=\"%a\"@ \
-               version=\"%a\"%a@ timelimit=\"%f\"%a@ memlimit=\"%d\"/>@]"
+               version=\"%a\"%a@ timelimit=\"%g\"%a@ memlimit=\"%d\"/>@]"
     id save_string p.Whyconf.prover_name save_string p.Whyconf.prover_version
     (fun fmt s -> if s <> "" then fprintf fmt "@ alternative=\"%a\""
         save_string s)
@@ -2039,7 +2039,7 @@ let save_int_def name def fmt n =
   if n <> def then fprintf fmt "@ %s=\"%d\"" name n
 
 let save_float_def name def fmt n =
-  if n <> def then fprintf fmt "@ %s=\"%f\"" name n
+  if n <> def then fprintf fmt "@ %s=\"%g\"" name n
 
 let save_result fmt r =
   let steps = if  r.Call_provers.pr_steps >= 0 then
@@ -2173,7 +2173,7 @@ let save fname shfname session =
   in
   let provers_to_save =
     Mprover.fold
-      (fun p (id,(mostfrequent_timelimit : float),mostfrequent_steplimit,mostfrequent_memlimit) acc ->
+      (fun p (id,mostfrequent_timelimit,mostfrequent_steplimit,mostfrequent_memlimit) acc ->
         Mint.add id (p,mostfrequent_timelimit,mostfrequent_steplimit,mostfrequent_memlimit) acc)
       provers Mint.empty
   in

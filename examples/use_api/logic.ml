@@ -154,7 +154,7 @@ let result2 : Call_provers.prover_result =
     (Driver.prove_task
        ~command:alt_ergo.Whyconf.command
        ~config:main
-       ~limit:{Call_provers.empty_limit with Call_provers.limit_time = 10.0}
+       ~limit:{Call_provers.empty_limit with Call_provers.limit_time = 10.}
        alt_ergo_driver
        task2)
 
