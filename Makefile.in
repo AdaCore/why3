@@ -1429,11 +1429,11 @@ $(ISABELLELIBS_OPTION): bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drive
 	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/option
 	$(HIDE)WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T option.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/option/
 
-# $(ISABELLELIBS_BV): bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/isabelle-realizations.aux \
-#   $(ISABELLEREALIZEDRVPATH) drivers/isabelle-common.gen stdlib/bv.mlw
-# 	$(SHOW) "Generating Isabelle realization for bv.$(notdir $(basename $@))"
-# 	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/bv
-# 	$(HIDE)WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T bv.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/bv/
+$(ISABELLELIBS_BV): bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/isabelle-realizations.aux \
+  $(ISABELLEREALIZEDRVPATH) drivers/isabelle-common.gen stdlib/bv.mlw
+	$(SHOW) "Generating Isabelle realization for bv.$(notdir $(basename $@))"
+	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/bv
+	$(HIDE)WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T bv.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/bv/
 
 ifeq (@enable_isabelle_libs@,yes)
 
