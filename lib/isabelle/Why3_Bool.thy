@@ -2,7 +2,7 @@ theory Why3_Bool
 imports Why3_Setup
 begin
 
-section {* Basic theory of Booleans *}
+section \<open> Basic theory of Booleans \<close>
 
 why3_open "bool/Bool.xml"
 

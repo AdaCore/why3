@@ -206,7 +206,7 @@ endif
 .PHONY: ide install-ide uninstall-ide
 .PHONY: coq install-coq uninstall-coq clean-coq
 .PHONY: pvs install-pvs uninstall-pvs clean-pvs
-.PHONY: install-isabelle
+.PHONY: install-isabelle clean-isabelle
 .PHONY: plugins plugins.byte plugins.opt
 .PHONY: trywhy3 clean-trywhy3
 
@@ -1014,9 +1014,8 @@ COQVERSIONSPECIFICTARGETS=$(addprefix lib/coq/, $(COQVERSIONSPECIFIC))
 $(COQVERSIONSPECIFICTARGETS): %: %.@coq_compat_version@
 	$(CMP_CP)
 
-clean::
+clean-coq::
 	rm -f $(COQVERSIONSPECIFICTARGETS)
-
 
 COQLIBS_INT_FILES = Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power NumOf
 COQLIBS_INT_ALL_FILES = Exponentiation $(COQLIBS_INT_FILES)
@@ -1078,11 +1077,9 @@ COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
 
 coq: $(COQVO) drivers/coq-realizations.aux lib/coq/version
 
-clean-coq:
+clean-coq::
 	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES)) lib/coq/version \
 		$(foreach f,$(COQLIBS_FILES),$(dir $f).$(notdir $f).aux)
-
-clean:: clean-coq
 
 drivers/coq-realizations.aux: Makefile
 	$(SHOW) 'Generate $@'
@@ -1210,7 +1207,7 @@ install-data::
 
 all: drivers/coq-realizations.aux
 
-clean::
+clean:: clean-coq
 	rm -f drivers/coq-realizations.aux
 
 ####################
@@ -1266,8 +1263,6 @@ pvs: lib/pvs/version
 clean-pvs:
 	rm -f lib/pvs/version
 
-clean:: clean-pvs
-
 ifeq (@enable_pvs_libs@,yes)
 
 uninstall-pvs:
@@ -1299,7 +1294,7 @@ install-data::
 
 all: drivers/pvs-realizations.aux
 
-clean::
+clean:: clean-pvs
 	rm -f drivers/pvs-realizations.aux
 
 #######################
@@ -1317,7 +1312,7 @@ ISABELLEREALIZEDRVPATH=drivers/$(ISABELLEREALIZEDRV).drv
 $(ISABELLEVERSIONSPECIFICTARGETS): %: %.@ISABELLEVERSION@
 	$(CMP_CP)
 
-clean::
+clean-isabelle::
 	rm -f $(ISABELLEVERSIONSPECIFICTARGETS)
 
 ISABELLELIBS_INT_FILES = Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power
@@ -1457,9 +1452,6 @@ install-isabelle: $(GENERATED_PREFIX_ISABELLE)/last_build
 install_local:: install-isabelle
 install:: install-isabelle
 
-clean::
-	rm -f $(GENERATED_PREFIX_ISABELLE)/*/*.xml
-
 endif
 
 all: drivers/isabelle-realizations.aux
@@ -1467,7 +1459,10 @@ all: drivers/isabelle-realizations.aux
 install-data::
 	$(INSTALL_DATA) drivers/isabelle-realizations.aux $(DATADIR)/why3/drivers/
 
-clean::
+clean-isabelle::
+	rm -f $(GENERATED_PREFIX_ISABELLE)/*/*.xml
+
+clean:: clean-isabelle
 	rm -f drivers/isabelle-realizations.aux
 
 #######################

@@ -5,7 +5,7 @@ imports
   "HOL-Library.FSet"
 begin
 
-section {* Potentially infinite sets *}
+section \<open> Potentially infinite sets \<close>
 
 definition complement :: "('a \<Rightarrow> bool) \<Rightarrow> 'a \<Rightarrow> bool" where
   "complement S v = Not (S v)"
@@ -118,7 +118,7 @@ why3_vc product_def
 why3_end
 
 
-section {* Finite sets *}
+section \<open> Finite sets \<close>
 
 definition fremove :: "'a \<Rightarrow> 'a fset \<Rightarrow> 'a fset" where
   "fremove x A = A - {|x|}"
