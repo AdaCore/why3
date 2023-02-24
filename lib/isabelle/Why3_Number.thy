@@ -4,7 +4,7 @@ imports
   "HOL-Computational_Algebra.Primes"
 begin
 
-section {* Parity properties *}
+section \<open> Parity properties \<close>
 
 why3_open "number/Parity.xml"
 
@@ -36,7 +36,7 @@ why3_vc even_mod2
 why3_end
 
 
-section {* Divisibility *}
+section \<open> Divisibility \<close>
 
 why3_open "number/Divisibility.xml"
 
@@ -112,7 +112,7 @@ why3_vc dividesqtspec
 why3_end
 
 
-section {* Greatest Common Divisor *}
+section \<open> Greatest Common Divisor \<close>
 
 why3_open "number/Gcd.xml"
 
@@ -157,7 +157,7 @@ why3_vc gcd_mult using assms
 why3_end
 
 
-section {* Prime numbers *}
+section \<open> Prime numbers \<close>
 
 why3_open "number/Prime.xml"
 
@@ -256,7 +256,7 @@ qed
 why3_end
 
 
-section {* Coprime numbers *}
+section \<open> Coprime numbers \<close>
 
 why3_open "number/Coprime.xml"
 

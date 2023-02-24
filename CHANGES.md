@@ -47,6 +47,7 @@ Provers
   * support for CVC5 1.0.0 to 1.0.4 (released Jan 31, 2023)
   * support for Alt-Ergo 2.4.2 (released Aug 1, 2022)
   * support for Z3 4.12.0 and 4.12.1 (released Jan 18, 2023)
+  * support for Isabelle 2022 (released Oct 2022)
 
 Miscellaneous
   * fixed soundness bug with existential quantifiers in `introduce_premises`

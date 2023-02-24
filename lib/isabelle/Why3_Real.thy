@@ -5,7 +5,7 @@ imports
   "HOL-Decision_Procs.Approximation"
 begin
 
-section {* Real numbers and the basic unary and binary operators *}
+section \<open> Real numbers and the basic unary and binary operators \<close>
 
 why3_open "real/Real.xml"
 
@@ -77,13 +77,13 @@ why3_vc infix_slqtdef by (simp add: Real.divide_real_def)
 
 why3_end
 
-section {* Alternative Infix Operators *}
+section \<open> Alternative Infix Operators \<close>
 
 why3_open "real/RealInfix.xml"
 
 why3_end
 
-section {* Absolute Value *}
+section \<open> Absolute Value \<close>
 
 why3_open "real/Abs.xml"
 
@@ -101,7 +101,7 @@ why3_vc triangular_inequality by (simp add: Real.abs_real_def)
 
 why3_end
 
-section {* Minimum and Maximum *}
+section \<open> Minimum and Maximum \<close>
 
 why3_open "real/MinMax.xml"
 
@@ -127,7 +127,7 @@ why3_vc Min_assoc by auto
 
 why3_end
 
-section {* Injection of integers into reals *}
+section \<open> Injection of integers into reals \<close>
 
 why3_open "real/FromInt.xml"
   constants
@@ -151,7 +151,7 @@ why3_vc Injective using assms by auto
 
 why3_end
 
-section {* Various truncation functions *}
+section \<open> Various truncation functions \<close>
 
 (* truncate: rounds towards zero *)
 
@@ -164,7 +164,7 @@ why3_open "real/Truncate.xml"
   floor = floor
   ceil = ceiling
 
-subsection {* Roundings up and down *}
+subsection \<open> Roundings up and down \<close>
 
 why3_vc Ceil_up
   by (simp_all add: ceiling_correct)
@@ -184,7 +184,7 @@ why3_vc Floor_monotonic
   using assms
   by (simp add:floor_mono)
 
-subsection {* Rounding towards zero *}
+subsection \<open> Rounding towards zero \<close>
 
 why3_vc Real_of_truncate
   using floor_correct [of x] ceiling_correct [of x]
@@ -215,7 +215,7 @@ why3_vc Truncate_monotonic_int2
 
 why3_end
 
-section {* Square and Square Root *}
+section \<open> Square and Square Root \<close>
 
 why3_open "real/Square.xml"
   constants
@@ -241,7 +241,7 @@ why3_vc Sqrt_positive
 
 why3_end
 
-section {* Exponential and Logarithm *}
+section \<open> Exponential and Logarithm \<close>
 
 why3_open "real/ExpLog.xml"
   constants
@@ -266,7 +266,7 @@ why3_vc Exp_zero by auto
 
 why3_end
 
-section {* Power of a real to an integer *}
+section \<open> Power of a real to an integer \<close>
 
 (* TODO: clones int.Exponentiation which is not yet realized *)
 
@@ -302,11 +302,11 @@ qed
 
 why3_end
 
-section {* Power of a real to a real exponent *}
+section \<open> Power of a real to a real exponent \<close>
 
 (* TODO: no power to a real exponent in Isabelle? *)
 
-section {* Trigonometric Functions *}
+section \<open> Trigonometric Functions \<close>
 
 abbreviation (input)
   "why3_divide \<equiv> divide"
@@ -369,11 +369,11 @@ why3_vc Pythagorean_identity
 
 why3_end
 
-section {* Hyperbolic Functions *}
+section \<open> Hyperbolic Functions \<close>
 
 (* TODO: missing acosh *)
 
-section {* Polar Coordinates *}
+section \<open> Polar Coordinates \<close>
 
 (* TODO: missing atan2 *)
 
