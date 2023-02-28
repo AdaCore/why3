@@ -88,6 +88,7 @@ let rec pp_why_node : type a . Format.formatter -> a why_node -> unit =
   match n with
   | { desc = Type _ } as n -> pp_type fmt n
   | { desc = Name _ } as n -> pp_name fmt n
+  | { desc = Raise_effect _ } as n -> pp_raise_effect fmt n
   | { desc = Effects _ } as n -> pp_effects fmt n
   | { desc = Binder _ } as n -> pp_binder fmt n
   | { desc = Transparent_type_definition _ } as n -> pp_transparent_type_definition fmt n
@@ -413,7 +414,7 @@ and pp_handler fmt (n : handler_id) =
   match n.desc with
   | Handler r ->
     Format.fprintf fmt "| %a %a@ ->@ @[%a@]"
-      pp_why_node r.name pp_why_node_option r.arg pp_why_node r.def
+      pp_why_node r.name pp_why_node_option r.arg_id pp_why_node r.def
 
 and pp_assignment fmt (n : assignment_id) =
   match n.desc with
@@ -424,7 +425,7 @@ and pp_assignment fmt (n : assignment_id) =
 and pp_raise fmt (n : raise_id) =
   match n.desc with
   | Raise r ->
-     Format.fprintf fmt "raise %a" pp_why_node r.name
+     Format.fprintf fmt "raise %a %a" pp_why_node r.name pp_why_node_option r.arg
 
 and pp_elsif fmt (n : elsif_id) =
   match n.desc with
@@ -553,6 +554,8 @@ and pp_binding_ref fmt (n : binding_ref_id) =
   let Binding_ref r = n.desc in
   Format.fprintf fmt "(let ref %a@ =@ @[<hov2 >%a@]@ in@ %a)"
     pp_why_node r.name pp_why_node r.def pp_why_node r.context
+
+and pp_raise_effect fmt (_ : raise_effect_id) = Format.fprintf fmt "--pp_raise_effect NOT IMPLEMENTED"
 
 and pp_effects fmt (_ : effects_id) = Format.fprintf fmt "--pp_effects NOT IMPLEMENTED"
 

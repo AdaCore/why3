@@ -5,8 +5,7 @@ val gnat_json_format : Why3.Env.fformat
 val mk_pty_of_type : Gnat_ast.type_id -> Why3.Ptree.pty
 
 val mk_effects : Gnat_ast.effects_id ->
-  Why3.Ptree.qualid list * Why3.Ptree.term list *
-  (Why3.Loc.position * (Why3.Ptree.qualid * 'a option) list) list
+  Why3.Ptree.qualid list * Why3.Ptree.term list * Why3.Ptree.xpost list
 
 val mk_expr_of_expr : Gnat_ast.expr_id -> Why3.Ptree.expr
 

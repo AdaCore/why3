@@ -88,6 +88,7 @@ let list_of_nonempty n = n.elt0 :: n.elts
 type type_tag = [`Type]
 type name_tag = [`Name]
 type effects_tag = [`Effects]
+type raise_effect_tag = [`Raise_effect]
 type binder_tag = [`Binder]
 type transparent_type_definition_tag = [`Transparent_type_definition]
 type record_binder_tag = [`Record_binder]
@@ -280,6 +281,7 @@ type any_node_tag = [
  | `Type
  | `Name
  | `Effects
+ | `Raise_effect
  | `Binder
  | `Transparent_type_definition
  | `Record_binder
@@ -350,7 +352,8 @@ and why_node_info = {id: int; node: node_id; domain: domain; link: why_node_set;
 and 'a why_node_desc =
   | Type : {type_kind: type_; name: name_id; is_mutable: bool; relaxed_init: bool} -> [> type_tag] why_node_desc
   | Name : {symb: symbol; namespace: symbol; module_: module_oid; infix: bool} -> [> name_tag] why_node_desc
-  | Effects : {reads: identifier_olist; writes: identifier_olist; raises: identifier_olist} -> [> effects_tag] why_node_desc
+  | Effects : {reads: identifier_olist; writes: identifier_olist; raises: raise_effect_olist} -> [> effects_tag] why_node_desc
+  | Raise_effect : {name: name_id; arg_id: identifier_oid; post: pred_oid} -> [> raise_effect_tag] why_node_desc
   | Binder : {name: identifier_oid; arg_type: type_id} -> [> binder_tag] why_node_desc
   | Transparent_type_definition : {type_definition: type_id} -> [> transparent_type_definition_tag] why_node_desc
   | Record_binder : {name: identifier_oid; arg_type: type_id; labels: symbol_set; is_mutable: bool} -> [> record_binder_tag] why_node_desc
@@ -359,7 +362,7 @@ and 'a why_node_desc =
   | Triggers : {triggers: trigger_list} -> [> triggers_tag] why_node_desc
   | Trigger : {terms: expr_list} -> [> trigger_tag] why_node_desc
   | Axiom_dep : {name: identifier_id; kind: axiom_dep_kind} -> [> axiom_dep_tag] why_node_desc
-  | Handler : {name: name_id; arg: prog_oid; def: prog_id} -> [> handler_tag] why_node_desc
+  | Handler : {name: name_id; arg_id: identifier_oid; def: prog_id} -> [> handler_tag] why_node_desc
   | Field_association : {field: identifier_id; value: expr_id} -> [> field_association_tag] why_node_desc
   | Variant : {cmp_op: identifier_id; labels: symbol_set; expr: term_id} -> [> variant_tag] why_node_desc
   | Variants : {variants: variant_list} -> [> variants_tag] why_node_desc
@@ -395,7 +398,7 @@ and 'a why_node_desc =
   | Statement_sequence : {statements: prog_list} -> [> statement_sequence_tag] why_node_desc
   | Abstract_expr : {expr: prog_id; post: pred_id; typ: type_oid} -> [> abstract_expr_tag] why_node_desc
   | Assert : {pred: pred_id; assert_kind: assert_kind} -> [> assert_tag] why_node_desc
-  | Raise : {name: name_id; exn_type: type_oid; typ: type_oid} -> [> raise_tag] why_node_desc
+  | Raise : {name: name_id; arg: expr_oid; typ: type_oid} -> [> raise_tag] why_node_desc
   | Try_block : {prog: prog_id; handler: handler_list; typ: type_oid} -> [> try_block_tag] why_node_desc
   | Function_decl : {name: identifier_id; binders: binder_olist; effects: effects_oid; pre: pred_oid; post: pred_oid; return_type: type_oid; def: expr_oid; labels: symbol_set; location: source_ptr} -> [> function_decl_tag] why_node_desc
   | Axiom : {name: symbol; def: pred_id; dep: axiom_dep_oid} -> [> axiom_tag] why_node_desc
@@ -432,6 +435,11 @@ and effects_oid = effects_tag why_node_oid
 and effects_olist = effects_tag why_node_olist
 and effects_id = effects_tag why_node_id
 and effects_list = effects_tag why_node_list
+
+and raise_effect_oid = raise_effect_tag why_node_oid
+and raise_effect_olist = raise_effect_tag why_node_olist
+and raise_effect_id = raise_effect_tag why_node_id
+and raise_effect_list = raise_effect_tag why_node_list
 
 and binder_oid = binder_tag why_node_oid
 and binder_olist = binder_tag why_node_olist
@@ -782,6 +790,11 @@ let effects_coercion (node : any_node_tag why_node) : effects_tag why_node =
   match node.desc with
   | Effects _ as desc -> {info=node.info; desc}
   | _ -> invalid_arg "effects_coercion"
+
+let raise_effect_coercion (node : any_node_tag why_node) : raise_effect_tag why_node =
+  match node.desc with
+  | Raise_effect _ as desc -> {info=node.info; desc}
+  | _ -> invalid_arg "raise_effect_coercion"
 
 let binder_coercion (node : any_node_tag why_node) : binder_tag why_node =
   match node.desc with
@@ -1229,6 +1242,7 @@ let any_node_coercion (node : any_node_tag why_node) : any_node_tag why_node =
   | Type _ as desc -> {info=node.info; desc}
   | Name _ as desc -> {info=node.info; desc}
   | Effects _ as desc -> {info=node.info; desc}
+  | Raise_effect _ as desc -> {info=node.info; desc}
   | Binder _ as desc -> {info=node.info; desc}
   | Transparent_type_definition _ as desc -> {info=node.info; desc}
   | Record_binder _ as desc -> {info=node.info; desc}
@@ -1466,7 +1480,21 @@ module From_json = struct
       let desc = Effects {
         reads = identifier_opaque_olist_from_json reads;
         writes = identifier_opaque_olist_from_json writes;
-        raises = identifier_opaque_olist_from_json raises;
+        raises = raise_effect_opaque_olist_from_json raises;
+      } in
+      {info; desc}
+    | `List [`String "W_RAISE_EFFECT"; id; node; domain; link; checked; name; arg_id; post] ->
+      let info = {
+        id = int_from_json id;
+        node = node_id_from_json node;
+        domain = domain_from_json domain;
+        link = why_node_set_from_json link;
+        checked = boolean_from_json checked;
+      } in
+      let desc = Raise_effect {
+        name = name_opaque_id_from_json name;
+        arg_id = identifier_opaque_oid_from_json arg_id;
+        post = pred_opaque_oid_from_json post;
       } in
       {info; desc}
     | `List [`String "W_BINDER"; id; node; domain; link; checked; name; arg_type] ->
@@ -1571,7 +1599,7 @@ module From_json = struct
         kind = axiom_dep_kind_from_json kind;
       } in
       {info; desc}
-    | `List [`String "W_HANDLER"; id; node; domain; link; checked; name; arg; def] ->
+    | `List [`String "W_HANDLER"; id; node; domain; link; checked; name; arg_id; def] ->
       let info = {
         id = int_from_json id;
         node = node_id_from_json node;
@@ -1581,7 +1609,7 @@ module From_json = struct
       } in
       let desc = Handler {
         name = name_opaque_id_from_json name;
-        arg = prog_opaque_oid_from_json arg;
+        arg_id = identifier_opaque_oid_from_json arg_id;
         def = prog_opaque_id_from_json def;
       } in
       {info; desc}
@@ -2066,7 +2094,7 @@ module From_json = struct
         assert_kind = assert_kind_from_json assert_kind;
       } in
       {info; desc}
-    | `List [`String "W_RAISE"; id; node; domain; link; checked; name; exn_type; typ] ->
+    | `List [`String "W_RAISE"; id; node; domain; link; checked; name; arg; typ] ->
       let info = {
         id = int_from_json id;
         node = node_id_from_json node;
@@ -2076,7 +2104,7 @@ module From_json = struct
       } in
       let desc = Raise {
         name = name_opaque_id_from_json name;
-        exn_type = type_opaque_oid_from_json exn_type;
+        arg = expr_opaque_oid_from_json arg;
         typ = type_opaque_oid_from_json typ;
       } in
       {info; desc}
@@ -2337,6 +2365,11 @@ module From_json = struct
   and effects_opaque_olist_from_json json =  why_node_olist_from_json effects_coercion json
   and effects_opaque_id_from_json json =  why_node_id_from_json effects_coercion json
   and effects_opaque_list_from_json json =  why_node_list_from_json effects_coercion json
+
+  and raise_effect_opaque_oid_from_json json =  why_node_oid_from_json raise_effect_coercion json
+  and raise_effect_opaque_olist_from_json json =  why_node_olist_from_json raise_effect_coercion json
+  and raise_effect_opaque_id_from_json json =  why_node_id_from_json raise_effect_coercion json
+  and raise_effect_opaque_list_from_json json =  why_node_list_from_json raise_effect_coercion json
 
   and binder_opaque_oid_from_json json =  why_node_oid_from_json binder_coercion json
   and binder_opaque_olist_from_json json =  why_node_olist_from_json binder_coercion json
