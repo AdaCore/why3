@@ -53,17 +53,6 @@ val get_filename : driver ->
   string
 (** Mangles a filename for the prover of the given driver *)
 
-(* unused outside ?
-val call_on_buffer :
-  command      : string ->
-  limit        : Call_provers.resource_limit ->
-  gen_new_file : bool ->
-  ?inplace     : bool ->
-  filename     : string ->
-  printer_mapping : Printer.printer_mapping ->
-  driver -> Buffer.t -> Call_provers.prover_call
- *)
-
 val print_task :
   ?old       : in_channel ->
   driver -> Format.formatter -> Task.task -> unit
@@ -92,6 +81,7 @@ val print_task_prepared :
   ?old       : in_channel ->
   driver -> Format.formatter -> Task.task -> Printer.printing_info
 
+(** Call prover on a task prepared by [prepare_task]. *)
 val prove_task_prepared :
   command      : string ->
   config       : Whyconf.main ->
@@ -101,6 +91,28 @@ val prove_task_prepared :
   ?interactive : bool ->
   driver -> Task.task -> Call_provers.prover_call
 
+(** Call prover on a task already prepared and printed in the buffer.
+
+    The task shall be prepared by [prepare_task] and printed with
+    [print_task_prepared]; the buffer shall contain nothing else.
+
+    Parameters [input_file], [theory_name] and [goal_name] are used
+    to generate canonical temporary files for the prover according to its driver
+    definition. They are purely informative and their respective default
+    values are ["f"], ["T"] and ["vc"].
+
+    Parameter [get_model] shall be passed to obtain couter examples.
+    The printing-infos are those obtained from task preparation.
+*)
+val prove_buffer_prepared :
+  command      : string ->
+  config       : Whyconf.main ->
+  limit        : Call_provers.resource_limit ->
+  ?input_file  : string ->
+  ?theory_name : string ->
+  ?goal_name   : string ->
+  ?get_model   : Printer.printing_info ->
+  driver -> Buffer.t -> Call_provers.prover_call
 
 (** Traverse all metas from a driver *)
 

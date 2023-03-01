@@ -307,14 +307,6 @@ let file_of_task drv input_file theory_name task =
 let file_of_theory drv input_file th =
   get_filename drv ~input_file ~theory_name:th.th_name.Ident.id_string ~goal_name:"null"
 
-let call_on_buffer
-      ~command ~config ~limit ~gen_new_file ?inplace ~filename
-    ~printing_info drv buffer =
-  Call_provers.call_on_buffer
-    ~command ~config ~limit ~gen_new_file
-    ~res_parser:drv.drv_res_parser
-    ~filename ~printing_info ?inplace buffer
-
 (** print'n'prove *)
 
 exception NoPrinter
@@ -452,14 +444,29 @@ let prove_task_prepared
   Opt.iter close_in old_channel;
   let gen_new_file, filename =
     file_name_of_task ?old ?inplace ?interactive drv task in
-  let get_counterexmp = get_counterexmp task in
+  let get_model = if get_counterexmp task then Some printing_info else None in
   let res =
-    call_on_buffer
+    Call_provers.call_on_buffer
       ~command ~config ~limit ~gen_new_file ?inplace ~filename
-      ~get_counterexmp ~printing_info drv buf
+      ~res_parser:drv.drv_res_parser
+      ~get_model buf
   in
   Buffer.reset buf;
   res
+
+let prove_buffer_prepared
+    ~command ~config ~limit
+    ?(input_file="f")
+    ?(theory_name="T")
+    ?(goal_name="vc")
+    ?get_model
+    drv buffer =
+  let filename = get_filename drv ~input_file ~theory_name ~goal_name in
+  Call_provers.call_on_buffer
+    ~command ~config ~limit
+    ~gen_new_file:true ~filename
+    ~res_parser:drv.drv_res_parser
+    ~get_model buffer
 
 let prove_task
       ~command ~config ~limit ?old ?inplace ?interactive drv task =
