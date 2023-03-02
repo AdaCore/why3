@@ -1697,7 +1697,8 @@ let rec add_decl muc env file d =
   | Ptree.Dcloneexport (loc, use, inst) ->
       let m = find_module env file use in
       warn_clone_not_abstract (qloc use) m.mod_theory;
-      clone_export ~loc muc m (type_inst muc m inst)
+      begin try clone_export ~loc muc m (type_inst muc m inst)
+      with e -> raise (Loc.Located (loc, e)) end
   | Ptree.Duseimport (_loc,import,uses) ->
       let add_import muc (m, q) =
         let import = import || q = None in
@@ -1711,9 +1712,11 @@ let rec add_decl muc env file d =
       let muc = open_scope muc (use_as qid as_opt).id_str in
       let m = find_module env file qid in
       warn_clone_not_abstract (qloc qid) m.mod_theory;
-      let muc = clone_export ~loc muc m (type_inst muc m inst) in
-      let muc = close_scope muc ~import in
-      muc
+      begin try
+        let muc = clone_export ~loc muc m (type_inst muc m inst) in
+        let muc = close_scope muc ~import in
+        muc
+      with e -> raise (Loc.Located (loc, e)) end
   | Ptree.Dimport q ->
       import_scope muc (string_list_of_qualid q)
   | Ptree.Dscope (_loc,import,qid,decls) ->
