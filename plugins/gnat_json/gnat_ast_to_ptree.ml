@@ -130,6 +130,12 @@ let mk_idents_of_type (node: type_id) =
   else
     idents
 
+let mk_pattern_of_ident id =
+  let w_id = List.get_last
+    (conversion_error id.info.id "empty pattern")
+    (mk_idents_of_identifier ~notation:None [] id) in
+  mk_pat (Pvar w_id)
+
 module Include_Decl = struct
   (* The purpose of this model is to allow suppression of duplicate imports in
      Why3 theories. This requires a canonical representation of typical
@@ -230,34 +236,9 @@ let is_op234 (node: identifier_id) =
         ['+'; '-'; '*'; '/'; '\\'; '%'; '!'; '$'; '&'; '?'; '@'; '^'; '|']
   | _ -> conversion_error node.info.id "empty operator identifier" ()
 
-let mk_pattern_of_prog (node : prog_id) =
-  match node.desc with
-  | _ -> failwith "mk_pattern_of_prog"
-
 let mk_comment_attr = function
   | No_symbol -> None
   | Symbol s -> Some (mk_str ("GNAT-comment:"^s))
-
-let mk_effects (effects: effects_id) =
-  let Effects r = effects.desc in
-  let reads =
-    List.(map mk_qualid
-            (map (mk_idents_of_identifier ~notation:None [])
-               r.reads)) in
-  let writes =
-    List.(map (T.mk_var ?loc:None)
-            (map mk_qualid
-               (map (mk_idents_of_identifier ~notation:None [])
-                  r.writes))) in
-  let xpost =
-    if r.raises = []
-    then []
-    else
-      let aux id =
-        mk_qualid (mk_idents_of_identifier ~notation:None [] id),
-        None in
-      [get_pos (), List.map aux r.raises] in
-  reads, writes, xpost
 
 module Curr = struct
 
@@ -948,7 +929,9 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
 
     | Raise r ->
         expr_only "raise"
-          (let e = E.mk_raise (mk_qualid (mk_idents_of_name ~notation:None [] r.name)) None in
+          (let e = E.mk_raise
+	     (mk_qualid (mk_idents_of_name ~notation:None [] r.name))
+	     (Option.map mk_expr_of_expr r.arg) in
            match r.typ with
            | None -> e
            | Some typ ->
@@ -962,7 +945,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
              let aux (node: handler_id) =
                let Handler r = node.desc in
                mk_qualid (mk_idents_of_name ~notation:None [] r.name),
-               Opt.map mk_pattern_of_prog r.arg,
+               Opt.map mk_pattern_of_ident r.arg_id,
                mk_expr_of_prog r.def in
              List.map aux (list_of_nonempty r.handler) in
            E.mk_match expr [] exn_handlers)
@@ -1009,7 +992,33 @@ and mk_term_of_pred (node : pred_id) : term =
   | Binding _ | Elsif _ | Epsilon _ | Conditional _ as desc ->
       mk_term_of_expr {node with desc}
 
-
+and mk_effects (effects: effects_id) =
+  let Effects r = effects.desc in
+  let reads =
+    List.(map mk_qualid
+            (map (mk_idents_of_identifier ~notation:None [])
+               r.reads)) in
+  let writes =
+    List.(map (T.mk_var ?loc:None)
+            (map mk_qualid
+               (map (mk_idents_of_identifier ~notation:None [])
+                  r.writes))) in
+  let xpost =
+    if r.raises = []
+    then []
+    else
+      let aux re =
+        match re.desc with
+	  | Raise_effect re_desc ->
+            let pat = match re_desc.arg_id with
+	      | Some v_id -> mk_pattern_of_ident v_id
+	      | None -> mk_pat (Ptuple []) in
+            (mk_qualid (mk_idents_of_name ~notation:None [] re_desc.name),
+            Option.map (fun post -> (pat, mk_term_of_pred post)) re_desc.post)
+	  | _ -> conversion_error re.info.id "ill-formed raises effect" () in
+      [ get_pos (), List.map aux r.raises ] in
+  reads, writes, xpost
+  
 let mk_function_decl (node: function_decl_id) =
   let Function_decl r = node.desc in
   let ident =
