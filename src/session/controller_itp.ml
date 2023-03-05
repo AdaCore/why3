@@ -351,7 +351,7 @@ let adapt_limits ~interactive ~use_steps limits a =
        (* increased time limit is 1 + twice the previous running time,
        but enforced to remain inside the interval [l,2l] where l is
        the previous time limit *)
-       let t = (1.5 +. 2.0 *. t) in
+       let t = (1. +. 2.0 *. t) in
        let increased_time = if interactive then 0.
                             else max timelimit (min t (2. *. timelimit)) in
        (* increased mem limit is just 1.5 times the previous mem limit *)
@@ -1271,7 +1271,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
   in
   let timelimit = ref limit.Call_provers.limit_time in
   let set_timelimit res =
-    timelimit := 1. +. (floor res.Call_provers.pr_time) in
+    timelimit := res.Call_provers.pr_time in
   let bisect_end rem =
     if Decl.Spr.is_empty rem.Eliminate_definition.rem_pr &&
          Term.Sls.is_empty rem.Eliminate_definition.rem_ls &&
