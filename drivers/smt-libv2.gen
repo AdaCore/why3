@@ -178,14 +178,6 @@ theory HighOrd
   meta "encoding:ignore_polymorphism_ls" function (@)
 end
 
-theory WellFounded
-
-  (* this theory is never useful for SMT solvers *)
-
-  meta "remove_logic" predicate acc
-  meta "remove_logic" predicate well_founded
-
-end
 
 theory bv.BV_Gen
 

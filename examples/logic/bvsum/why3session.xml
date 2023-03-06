@@ -2,36 +2,28 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Z3" version="4.8.4" timelimit="10" steplimit="0" memlimit="4000"/>
 <prover id="1" name="CVC4" version="1.6" alternative="counterexamples" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.8.4" alternative="counterexamples" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="2.3.0" timelimit="10" steplimit="0" memlimit="4000"/>
+<prover id="3" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml">
 <path name=".."/><path name="bvsum.mlw"/>
 <theory name="PureBV" proved="true">
  <goal name="add_bv" proved="true">
- <proof prover="4"><result status="valid" time="0.05" steps="13433"/></proof>
+ <proof prover="4"><result status="valid" time="0.05" steps="12411"/></proof>
  </goal>
  <goal name="g" proved="true">
- <proof prover="4"><result status="valid" time="0.08" steps="30571"/></proof>
+ <proof prover="4"><result status="valid" time="0.08" steps="29525"/></proof>
  </goal>
 </theory>
 <theory name="Mixed">
  <goal name="add_bv" proved="true">
- <proof prover="4"><result status="valid" time="0.03" steps="13433"/></proof>
+ <proof prover="4"><result status="valid" time="0.03" steps="12411"/></proof>
  </goal>
  <goal name="add_bv_int">
- <proof prover="1"><result status="timeout" time="1.00" steps="241531"/></proof>
- <proof prover="2"><result status="timeout" time="1.00" steps="11511601"/></proof>
- <proof prover="3" timelimit="1" memlimit="1000"><result status="timeout" time="1.00"/></proof>
- <transf name="split_vc" >
-  <goal name="add_bv_int.0">
-  <proof prover="0"><result status="timeout" time="10.00" steps="32559604"/></proof>
-  <proof prover="3"><result status="timeout" time="10.00"/></proof>
-  <proof prover="4" timelimit="10" memlimit="4000"><result status="timeout" time="10.00" steps="3380819"/></proof>
-  </goal>
- </transf>
+ <proof prover="1"><result status="timeout" time="1.00" steps="239720"/></proof>
+ <proof prover="2"><result status="timeout" time="1.00" steps="13746671"/></proof>
+ <proof prover="3"><result status="timeout" time="1.00"/></proof>
  </goal>
 </theory>
 </file>

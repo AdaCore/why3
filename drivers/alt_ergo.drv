@@ -5,9 +5,8 @@ prelude "(* this is the prelude for Alt-Ergo, version >= 2.4.0 *)"
 filename "%f-%t-%g.ae"
 
 transformation "inline_trivial"
-
-transformation "remove_unused_keep_constants"
 transformation "eliminate_builtin"
+transformation "remove_unused_keep_constants"
 transformation "eliminate_recursion"
 transformation "eliminate_inductive"
 transformation "eliminate_epsilon"

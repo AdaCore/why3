@@ -12,7 +12,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `f` cannot be evaluated):
 File val_function.mlw:
   Line 4:
-    f : int -> int = [|_ => 42|]
+    f : int -> int = [|2 => 42; _ => 42|]
   Line 6:
     y : int = 2
   Line 7:
