@@ -18,9 +18,9 @@ theory BuiltIn
   meta "eliminate_algebraic" "keep_mono"
 end
 
-transformation "remove_unused_keep_constants"
 transformation "inline_trivial"
 transformation "eliminate_builtin"
+transformation "remove_unused_keep_constants"
 transformation "detect_polymorphism"
 transformation "eliminate_definition_conditionally"
 transformation "eliminate_inductive"

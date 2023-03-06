@@ -2,12 +2,12 @@
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 5, characters 40-52)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 5, characters 40-52)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `g1'goal1` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `g1'goal1` cannot be evaluated)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 5, characters 40-52)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 5, characters 40-52)
 File "bench/check-ce/floats.mlw", line 5, characters 40-52:
 Goal g1.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -17,9 +17,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!04:int) -> 0
 File ieee_float.mlw:
   Line 861:
     Constant zeroF initialization
@@ -28,8 +25,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!04:mode) (x!13:int) -> epsilon x:t. is_nan x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -39,8 +34,6 @@ File floats.mlw:
     x = ((- 0x1.000002p-126):t)
     x = ((- 0x1.000002p-126):t)
     Execution of main function `g1'goal` with env:
-      pow2 = fun (x!04:int) -> 0
-      of_int = fun (x!04:mode) (x!13:int) -> epsilon x:t. is_nan x
       max_real = 0.0
       max_int = 0
       x = ((- 0x1.000002p-126):t)
@@ -58,12 +51,12 @@ File floats.mlw:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 7, characters 40-53)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 7, characters 40-53)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `g2'goal1` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `g2'goal1` cannot be evaluated)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 7, characters 40-53)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 7, characters 40-53)
 File "bench/check-ce/floats.mlw", line 7, characters 40-53:
 Goal g2.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -73,9 +66,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!08:int) -> 0
 File ieee_float.mlw:
   Line 861:
     Constant zeroF initialization
@@ -84,8 +74,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!08:mode) (x!16:int) -> epsilon x:t. is_nan x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -95,8 +83,6 @@ File floats.mlw:
     x = ((- 0x0.000002p-126):t)
     x = ((- 0x0.000002p-126):t)
     Execution of main function `g2'goal` with env:
-      pow2 = fun (x!08:int) -> 0
-      of_int = fun (x!08:mode) (x!16:int) -> epsilon x:t. is_nan x
       max_real = 0.0
       max_int = 0
       x = ((- 0x0.000002p-126):t)
@@ -114,12 +100,12 @@ File floats.mlw:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 9, characters 24-42)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 9, characters 24-42)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g3'goal1` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g3'goal1` cannot be evaluated)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 9, characters 24-42)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 9, characters 24-42)
 File "bench/check-ce/floats.mlw", line 9, characters 24-42:
 Goal g3.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -129,9 +115,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!012:int) -> 0
 File ieee_float.mlw:
   Line 861:
     Constant zeroF initialization
@@ -140,8 +123,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!012:mode) (x!19:int) -> epsilon x:t. is_nan x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -151,8 +132,6 @@ File floats.mlw:
     x = (0.0:t)
     x = (0.0:t)
     Execution of main function `g3'goal` with env:
-      pow2 = fun (x!012:int) -> 0
-      of_int = fun (x!012:mode) (x!19:int) -> epsilon x:t. is_nan x
       max_real = 0.0
       max_int = 0
       x = (0.0:t)
@@ -170,12 +149,12 @@ File floats.mlw:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 11, characters 24-43)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 11, characters 24-43)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g4'goal1` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g4'goal1` cannot be evaluated)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 11, characters 24-43)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 11, characters 24-43)
 File "bench/check-ce/floats.mlw", line 11, characters 24-43:
 Goal g4.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -185,9 +164,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!016:int) -> 0
 File ieee_float.mlw:
   Line 861:
     Constant zeroF initialization
@@ -196,8 +172,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!016:mode) (x!112:int) -> epsilon x:t. is_nan x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -207,8 +181,6 @@ File floats.mlw:
     x = (0x1.4p0:t)
     x = (0x1.4p0:t)
     Execution of main function `g4'goal` with env:
-      pow2 = fun (x!016:int) -> 0
-      of_int = fun (x!016:mode) (x!112:int) -> epsilon x:t. is_nan x
       max_real = 0.0
       max_int = 0
       x = (0x1.4p0:t)
@@ -241,9 +213,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!020:int) -> 0
 File ieee_float.mlw:
   Line 861:
     Constant zeroF initialization
@@ -252,8 +221,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!020:mode) (x!115:int) -> epsilon x:t. is_nan x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -263,8 +230,6 @@ File floats.mlw:
     x = (0x1.50002p3:t)
     x = (0x1.50002p3:t)
     Execution of main function `g5'goal` with env:
-      pow2 = fun (x!020:int) -> 0
-      of_int = fun (x!020:mode) (x!115:int) -> epsilon x:t. is_nan x
       max_real = 0.0
       max_int = 0
       x = (0x1.50002p3:t)
@@ -282,12 +247,12 @@ File floats.mlw:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 15, characters 24-30)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 15, characters 24-30)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g6'goal1` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g6'goal1` cannot be evaluated)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 15, characters 24-30)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 15, characters 24-30)
 File "bench/check-ce/floats.mlw", line 15, characters 24-30:
 Goal g6.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -297,9 +262,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!024:int) -> 0
 File ieee_float.mlw:
   Line 861:
     Constant zeroF initialization
@@ -308,8 +270,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!024:mode) (x!118:int) -> epsilon x:t. is_nan x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -319,8 +279,6 @@ File floats.mlw:
     x = epsilon x:t. is_nan x
     x = epsilon x:t. is_nan x
     Execution of main function `g6'goal` with env:
-      pow2 = fun (x!024:int) -> 0
-      of_int = fun (x!024:mode) (x!118:int) -> epsilon x:t. is_nan x
       max_real = 0.0
       max_int = 0
       x = epsilon x:t. is_nan x
@@ -353,9 +311,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!028:int) -> 0
 File ieee_float.mlw:
   Line 861:
     Constant zeroF initialization
@@ -364,8 +319,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!028:mode) (x!121:int) -> epsilon x:t. is_nan x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -375,8 +328,6 @@ File floats.mlw:
     x = ((- 0x1.0p64):t)
     x = ((- 0x1.0p64):t)
     Execution of main function `g7'goal` with env:
-      pow2 = fun (x!028:int) -> 0
-      of_int = fun (x!028:mode) (x!121:int) -> epsilon x:t. is_nan x
       max_real = 0.0
       max_int = 0
       x = ((- 0x1.0p64):t)
@@ -392,43 +343,22 @@ File floats.mlw:
       x = ((- 0x1.0p64):t)
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g8'goal` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g8'goal` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g8'goal1` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g8'goal1` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 19, characters 24-60:
 Goal g8.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat).
 The following counterexample model could not be verified
-  (both RAC terminated because Postcondition of `g8'goal` cannot be evaluated):
-File bv.mlw:
-  Line 9:
-    pow2 : int -> int = [|_ => 0|]
+  (both RAC terminated because Postcondition of `g8'goal1` cannot be evaluated):
 File ieee_float.mlw:
-  Line 194:
-    of_int : mode -> int -> t = fun x!030 x!123 -> NaN
   Line 223:
     max_real : real = 0.0
   Line 224:
     max_int : int = 0
-  Line 233:
-    in_int_range :
-      int
-      ->
-      bool = fun x!032 -> (int.Int.(<=) 0 x!032) /\ (int.Int.(<=) x!032 0)
-  Line 269:
-    in_safe_int_range :
-      int
-      ->
-      bool = fun x!032 ->
-              (int.Int.(<=) -16777216 x!032) /\ (int.Int.(<=) x!032 16777216)
-File real.mlw:
-  Line 201:
-    sqr : real -> real = fun x!030 -> (real.Real.( * ) x!030 x!030)
-  Line 203:
-    sqrt : real -> real = [|_ => 0.0|]
 File floats.mlw:
   Line 19:
     x : t = ∞
@@ -460,9 +390,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!036:int) -> 0
 File ieee_float.mlw:
   Line 861:
     Constant zeroF initialization
@@ -471,8 +398,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!036:mode) (x!127:int) -> epsilon x:t. is_nan x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -482,8 +407,6 @@ File floats.mlw:
     x = (0x1.99999Cp-4:t)
     x = (0x1.99999Cp-4:t)
     Execution of main function `g10'goal` with env:
-      pow2 = fun (x!036:int) -> 0
-      of_int = fun (x!036:mode) (x!127:int) -> epsilon x:t. is_nan x
       max_real = 0.0
       max_int = 0
       x = (0x1.99999Cp-4:t)
@@ -503,12 +426,12 @@ File floats.mlw:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 26, characters 24-47)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 26, characters 24-47)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g11'goal1` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g11'goal1` cannot be evaluated)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 26, characters 24-47)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 26, characters 24-47)
 File "bench/check-ce/floats.mlw", line 26, characters 24-47:
 Goal g11.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -518,9 +441,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!040:int) -> 0
 File ieee_float.mlw:
   Line 861:
     Constant zeroF initialization
@@ -529,8 +449,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!040:mode) (x!130:int) -> epsilon x:t. is_nan x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -540,8 +458,6 @@ File floats.mlw:
     x = (0x1.0p-126:t)
     x = (0x1.0p-126:t)
     Execution of main function `g11'goal` with env:
-      pow2 = fun (x!040:int) -> 0
-      of_int = fun (x!040:mode) (x!130:int) -> epsilon x:t. is_nan x
       max_real = 0.0
       max_int = 0
       x = (0x1.0p-126:t)
@@ -559,12 +475,12 @@ File floats.mlw:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 29, characters 24-54)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 29, characters 24-54)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g12'goal1` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g12'goal1` cannot be evaluated)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 29, characters 24-54)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 29, characters 24-54)
 File "bench/check-ce/floats.mlw", line 29, characters 24-54:
 Goal g12.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -574,9 +490,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!044:int) -> 0
 File ieee_float.mlw:
   Line 861:
     Constant zeroF initialization
@@ -585,8 +498,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!044:mode) (x!133:int) -> epsilon x:t. is_nan x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -596,8 +507,6 @@ File floats.mlw:
     x = (0x0.FFFFFEp-126:t)
     x = (0x0.FFFFFEp-126:t)
     Execution of main function `g12'goal` with env:
-      pow2 = fun (x!044:int) -> 0
-      of_int = fun (x!044:mode) (x!133:int) -> epsilon x:t. is_nan x
       max_real = 0.0
       max_int = 0
       x = (0x0.FFFFFEp-126:t)
@@ -615,12 +524,12 @@ File floats.mlw:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 32, characters 24-47)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 32, characters 24-47)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g13'goal1` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g13'goal1` cannot be evaluated)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 32, characters 24-47)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 32, characters 24-47)
 File "bench/check-ce/floats.mlw", line 32, characters 24-47:
 Goal g13.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -630,9 +539,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!048:int) -> 0
 File ieee_float.mlw:
   Line 861:
     Constant zeroF initialization
@@ -641,8 +547,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!048:mode) (x!136:int) -> epsilon x:t. is_nan x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -652,8 +556,6 @@ File floats.mlw:
     x = (0x0.8p-126:t)
     x = (0x0.8p-126:t)
     Execution of main function `g13'goal` with env:
-      pow2 = fun (x!048:int) -> 0
-      of_int = fun (x!048:mode) (x!136:int) -> epsilon x:t. is_nan x
       max_real = 0.0
       max_int = 0
       x = (0x0.8p-126:t)
@@ -686,9 +588,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!056:int) -> 0
 File ieee_float.mlw:
   Line 902:
     Constant zeroF initialization
@@ -697,8 +596,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!056:mode) (x!142:int) -> epsilon x:t1. is_nan1 x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -708,8 +605,6 @@ File floats.mlw:
     x = ((- 0x1.0000000000001p-1022):t1)
     x = ((- 0x1.0000000000001p-1022):t1)
     Execution of main function `g1'goal` with env:
-      pow2 = fun (x!056:int) -> 0
-      of_int = fun (x!056:mode) (x!142:int) -> epsilon x:t1. is_nan1 x
       max_real = 0.0
       max_int = 0
       x = ((- 0x1.0000000000001p-1022):t1)
@@ -742,9 +637,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!064:int) -> 0
 File ieee_float.mlw:
   Line 902:
     Constant zeroF initialization
@@ -753,8 +645,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!064:mode) (x!148:int) -> epsilon x:t1. is_nan1 x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -764,8 +654,6 @@ File floats.mlw:
     x = ((- 0x0.0000000000001p-1022):t1)
     x = ((- 0x0.0000000000001p-1022):t1)
     Execution of main function `g2'goal` with env:
-      pow2 = fun (x!064:int) -> 0
-      of_int = fun (x!064:mode) (x!148:int) -> epsilon x:t1. is_nan1 x
       max_real = 0.0
       max_int = 0
       x = ((- 0x0.0000000000001p-1022):t1)
@@ -783,12 +671,12 @@ File floats.mlw:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 45, characters 24-42)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 45, characters 24-42)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g3'goal3` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g3'goal3` cannot be evaluated)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 45, characters 24-42)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 45, characters 24-42)
 File "bench/check-ce/floats.mlw", line 45, characters 24-42:
 Goal g3.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -798,9 +686,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!068:int) -> 0
 File ieee_float.mlw:
   Line 902:
     Constant zeroF initialization
@@ -809,8 +694,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!068:mode) (x!151:int) -> epsilon x:t1. is_nan1 x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -820,8 +703,6 @@ File floats.mlw:
     x = (0.0:t1)
     x = (0.0:t1)
     Execution of main function `g3'goal` with env:
-      pow2 = fun (x!068:int) -> 0
-      of_int = fun (x!068:mode) (x!151:int) -> epsilon x:t1. is_nan1 x
       max_real = 0.0
       max_int = 0
       x = (0.0:t1)
@@ -844,7 +725,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 47, characters 24-43)
 File "bench/check-ce/floats.mlw", line 47, characters 24-43:
 Goal g4.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -854,9 +735,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!076:int) -> 0
 File ieee_float.mlw:
   Line 902:
     Constant zeroF initialization
@@ -865,8 +743,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!076:mode) (x!157:int) -> epsilon x:t1. is_nan1 x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -876,8 +752,6 @@ File floats.mlw:
     x = (0x1.4p0:t1)
     x = (0x1.4p0:t1)
     Execution of main function `g4'goal` with env:
-      pow2 = fun (x!076:int) -> 0
-      of_int = fun (x!076:mode) (x!157:int) -> epsilon x:t1. is_nan1 x
       max_real = 0.0
       max_int = 0
       x = (0x1.4p0:t1)
@@ -895,12 +769,12 @@ File floats.mlw:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 49, characters 24-43)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 49, characters 24-43)
-- Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 49, characters 24-43)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 49, characters 24-43)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g5'goal3` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g5'goal3` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 49, characters 24-43:
 Goal g5.
-Prover result is: Unknown (sat).
+Prover result is: Unknown or time/memory/step limit.
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -910,9 +784,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!084:int) -> 0
 File ieee_float.mlw:
   Line 902:
     Constant zeroF initialization
@@ -921,8 +792,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!084:mode) (x!163:int) -> epsilon x:t1. is_nan1 x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -932,8 +801,6 @@ File floats.mlw:
     x = (0x1.3000000000002p3:t1)
     x = (0x1.3000000000002p3:t1)
     Execution of main function `g5'goal` with env:
-      pow2 = fun (x!084:int) -> 0
-      of_int = fun (x!084:mode) (x!163:int) -> epsilon x:t1. is_nan1 x
       max_real = 0.0
       max_int = 0
       x = (0x1.3000000000002p3:t1)
@@ -951,12 +818,12 @@ File floats.mlw:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 51, characters 24-30)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 51, characters 24-30)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g6'goal3` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g6'goal3` cannot be evaluated)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 51, characters 24-30)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 51, characters 24-30)
 File "bench/check-ce/floats.mlw", line 51, characters 24-30:
 Goal g6.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -966,9 +833,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!088:int) -> 0
 File ieee_float.mlw:
   Line 902:
     Constant zeroF initialization
@@ -977,8 +841,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!088:mode) (x!166:int) -> epsilon x:t1. is_nan1 x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -988,8 +850,6 @@ File floats.mlw:
     x = epsilon x:t1. is_nan1 x
     x = epsilon x:t1. is_nan1 x
     Execution of main function `g6'goal` with env:
-      pow2 = fun (x!088:int) -> 0
-      of_int = fun (x!088:mode) (x!166:int) -> epsilon x:t1. is_nan1 x
       max_real = 0.0
       max_int = 0
       x = epsilon x:t1. is_nan1 x
@@ -1020,36 +880,14 @@ Prover result is: Unknown or time/memory/step limit.
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g8'goal3` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 55, characters 24-60:
 Goal g8.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat).
 The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `g8'goal3` cannot be evaluated):
-File bv.mlw:
-  Line 9:
-    pow2 : int -> int = [|_ => 0|]
 File ieee_float.mlw:
-  Line 194:
-    of_int : mode -> int -> t1 = fun x!094 x!171 -> NaN
   Line 223:
     max_real : real = 0.0
   Line 224:
     max_int : int = 0
-  Line 233:
-    in_int_range :
-      int
-      ->
-      bool = fun x!096 -> (int.Int.(<=) 0 x!096) /\ (int.Int.(<=) x!096 0)
-  Line 269:
-    in_safe_int_range :
-      int
-      ->
-      bool = fun x!096 ->
-              (int.Int.(<=) -9007199254740992 x!096) /\
-              (int.Int.(<=) x!096 9007199254740992)
-File real.mlw:
-  Line 201:
-    sqr : real -> real = fun x!094 -> (real.Real.( * ) x!094 x!094)
-  Line 203:
-    sqrt : real -> real = [|_ => 0.0|]
 File floats.mlw:
   Line 55:
     x : t1 = ∞
@@ -1081,9 +919,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!0100:int) -> 0
 File ieee_float.mlw:
   Line 902:
     Constant zeroF initialization
@@ -1092,8 +927,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!0100:mode) (x!175:int) -> epsilon x:t1. is_nan1 x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -1103,8 +936,6 @@ File floats.mlw:
     x = (0x1.999999999999Bp-4:t1)
     x = (0x1.999999999999Bp-4:t1)
     Execution of main function `g10'goal` with env:
-      pow2 = fun (x!0100:int) -> 0
-      of_int = fun (x!0100:mode) (x!175:int) -> epsilon x:t1. is_nan1 x
       max_real = 0.0
       max_int = 0
       x = (0x1.999999999999Bp-4:t1)
@@ -1129,7 +960,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 62, characters 24-48)
 File "bench/check-ce/floats.mlw", line 62, characters 24-48:
 Goal g11.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1139,9 +970,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!0108:int) -> 0
 File ieee_float.mlw:
   Line 902:
     Constant zeroF initialization
@@ -1150,8 +978,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!0108:mode) (x!181:int) -> epsilon x:t1. is_nan1 x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -1161,8 +987,6 @@ File floats.mlw:
     x = (0x1.0p-1022:t1)
     x = (0x1.0p-1022:t1)
     Execution of main function `g11'goal` with env:
-      pow2 = fun (x!0108:int) -> 0
-      of_int = fun (x!0108:mode) (x!181:int) -> epsilon x:t1. is_nan1 x
       max_real = 0.0
       max_int = 0
       x = (0x1.0p-1022:t1)
@@ -1185,7 +1009,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 65, characters 24-62)
 File "bench/check-ce/floats.mlw", line 65, characters 24-62:
 Goal g12.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1195,9 +1019,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!0116:int) -> 0
 File ieee_float.mlw:
   Line 902:
     Constant zeroF initialization
@@ -1206,8 +1027,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!0116:mode) (x!187:int) -> epsilon x:t1. is_nan1 x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -1217,8 +1036,6 @@ File floats.mlw:
     x = (0x0.FFFFFFFFFFFFFp-1022:t1)
     x = (0x0.FFFFFFFFFFFFFp-1022:t1)
     Execution of main function `g12'goal` with env:
-      pow2 = fun (x!0116:int) -> 0
-      of_int = fun (x!0116:mode) (x!187:int) -> epsilon x:t1. is_nan1 x
       max_real = 0.0
       max_int = 0
       x = (0x0.FFFFFFFFFFFFFp-1022:t1)
@@ -1241,7 +1058,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 68, characters 24-48)
 File "bench/check-ce/floats.mlw", line 68, characters 24-48:
 Goal g13.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1251,9 +1068,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 9:
-    pow2 = fun (x!0124:int) -> 0
 File ieee_float.mlw:
   Line 902:
     Constant zeroF initialization
@@ -1262,8 +1076,6 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
-  Line 194:
-    of_int = fun (x!0124:mode) (x!193:int) -> epsilon x:t1. is_nan1 x
   Line 223:
     max_real = 0.0
   Line 224:
@@ -1273,8 +1085,6 @@ File floats.mlw:
     x = (0x0.8p-1022:t1)
     x = (0x0.8p-1022:t1)
     Execution of main function `g13'goal` with env:
-      pow2 = fun (x!0124:int) -> 0
-      of_int = fun (x!0124:mode) (x!193:int) -> epsilon x:t1. is_nan1 x
       max_real = 0.0
       max_int = 0
       x = (0x0.8p-1022:t1)

@@ -2,12 +2,9 @@
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/bv32.mlw", line 9, characters 14-29)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/bv32.mlw", line 9, characters 14-29)
-- Checked model 1: BAD_CE
-  - Concrete RAC: STUCK (failure in precondition of `dummy_update` at "bench/check-ce/bv32.mlw", line 7, characters 6-18)
-  - Abstract RAC: STUCK (failure in precondition of `dummy_update` at "bench/check-ce/bv32.mlw", line 7, characters 6-18)
 File "bench/check-ce/bv32.mlw", line 9, characters 14-29:
 Sub-goal Postcondition of goal dummy_update'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Timeout (10.00s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -96,22 +93,8 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `dummy_update_with_int` cannot be evaluated):
 File bv.mlw:
-  Line 326:
-    to_int : t -> int = [|_ => 0|]
-    to_int : t1 -> int = [|_ => 0|]
-  Line 611:
-    lsr : t1 -> int -> t1 = fun x!0 x!1 -> #x00000000000000000000000000000000
-    nth : t1 -> int -> bool = fun x!0 x!1 -> false
-    nth_bv : t1 -> t1 -> bool = fun x!0 x!1 -> false
-    of_int : int -> t1 = [|_ => #x00000000000000000000000000000000|]
   Line 653:
-    lsr : t -> int -> t = fun x!0 x!1 -> #x00000000
-    nth : t -> int -> bool = fun x!0 x!1 -> false
-    nth_bv : t -> t -> bool = fun x!0 x!1 -> false
     of_int : int -> t = [|_ => #x00000000|]
-File int.mlw:
-  Line 41:
-    abs : int -> int = [|_ => 0|]
 File bv32.mlw:
   Line 13:
     r : t = #x00000022

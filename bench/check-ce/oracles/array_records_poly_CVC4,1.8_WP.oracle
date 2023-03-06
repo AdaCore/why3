@@ -373,8 +373,8 @@ File array_records_poly.mlw:
       ->
       int
       ->
-      basic_record = fun bOUND_VARIABLE_6095 bOUND_VARIABLE_6096
-                      bOUND_VARIABLE_6097 ->
+      basic_record = fun bOUND_VARIABLE_5973 bOUND_VARIABLE_5974
+                      bOUND_VARIABLE_5975 ->
                       {flag = true; first_value = 3; second_value = 0}
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
@@ -927,11 +927,11 @@ File array_records_poly.mlw:
              (second_value x) = 69 /\ (first_value x) = 23 = bOUND_VARIABLE_1403
              then 23
              else if epsilon x.
-                  (second_value x) = 69 /\ (first_value x) = 23 = bOUND_VARIABLE_1403
-                  then 23
+                  (second_value x) = 69 /\ (first_value x) = 42 = bOUND_VARIABLE_1403
+                  then 42
                   else if epsilon x.
-                       (second_value x) = 69 /\ (first_value x) = 42 = bOUND_VARIABLE_1403
-                       then 42 else 3
+                       (second_value x) = 69 /\ (first_value x) = 23 = bOUND_VARIABLE_1403
+                       then 23 else 3
   Line 18:
     sec_val :
       basic_record
@@ -941,10 +941,10 @@ File array_records_poly.mlw:
              (second_value x) = 69 /\ (first_value x) = 23 = bOUND_VARIABLE_1403
              then 69
              else if epsilon x.
-                  (second_value x) = 69 /\ (first_value x) = 23 = bOUND_VARIABLE_1403
+                  (second_value x) = 69 /\ (first_value x) = 42 = bOUND_VARIABLE_1403
                   then 69
                   else if epsilon x.
-                       (second_value x) = 69 /\ (first_value x) = 42 = bOUND_VARIABLE_1403
+                       (second_value x) = 69 /\ (first_value x) = 23 = bOUND_VARIABLE_1403
                        then 69
                        else if epsilon x.
                             (second_value x) = 69 /\ (first_value x) = 3 = bOUND_VARIABLE_1403

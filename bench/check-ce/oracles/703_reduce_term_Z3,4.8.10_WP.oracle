@@ -6,39 +6,15 @@ Warning: term reduction aborted (term size blows up from 289 to 491721, after 27
 
 Warning: term reduction aborted (takes more than 1024 steps).
 
-Warning: term reduction aborted (term size blows up from 289 to 491721, after 278 steps).
-
-Warning: term reduction aborted (takes more than 1024 steps).
-
-Warning: term reduction aborted (term size blows up from 289 to 491721, after 278 steps).
-
-Warning: term reduction aborted (takes more than 1024 steps).
-
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `local` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `local` cannot be evaluated)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `local` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `local` cannot be evaluated)
 File "bench/check-ce/703_reduce_term.mlw", line 391, characters 4-55:
 Sub-goal Precondition of goal def'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Timeout (10.00s).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `local` cannot be evaluated):
-File bv.mlw:
-  Line 653:
-    lsr : t -> int -> t = fun x!01 x!1 -> #x00000000
-    nth : t -> int -> bool = fun x!01 x!1 -> false
-    nth_bv : t -> t -> bool = fun x!01 x!1 -> false
-    of_int : int -> t = [|_ => #x00000000|]
-File int.mlw:
-  Line 41:
-    abs :
-      int
-      ->
-      int = fun x!01 ->
-             if (int.Int.(<=) 0 x!01) then x!01 else (int.Int.( * ) -1 x!01)
 File 703_reduce_term.mlw:
   Line 5:
     base : t = #x00000001
@@ -48,98 +24,98 @@ File 703_reduce_term.mlw:
       ->
       t
       ->
-      t = fun x!01 x!1 ->
-           if x!01 = #x00000000 /\ x!1 = #x00000001 then #x00000000
-           else if x!01 = #x00000000 /\ x!1 = #x00000002 then #x00000000
-                else if x!01 = #x00000000 /\ x!1 = #x00000004 then #x00000000
-                     else if x!01 = #x00000000 /\ x!1 = #x00000008
+      t = fun x!0 x!1 ->
+           if x!0 = #x00000000 /\ x!1 = #x00000001 then #x00000000
+           else if x!0 = #x00000000 /\ x!1 = #x00000002 then #x00000000
+                else if x!0 = #x00000000 /\ x!1 = #x00000004 then #x00000000
+                     else if x!0 = #x00000000 /\ x!1 = #x00000008
                           then #x00000000
-                          else if x!01 = #x00000000 /\ x!1 = #x00000010
+                          else if x!0 = #x00000000 /\ x!1 = #x00000010
                                then #x00000000
-                               else if x!01 = #x00000000 /\ x!1 = #x00000020
+                               else if x!0 = #x00000000 /\ x!1 = #x00000020
                                     then #x00000000
-                                    else if x!01 = #x00000000 /\
+                                    else if x!0 = #x00000000 /\
                                             x!1 = #x00000040
                                          then #x00000000
-                                         else if x!01 = #x00000000 /\
+                                         else if x!0 = #x00000000 /\
                                                  x!1 = #x00000080
                                               then #x00000000
-                                              else if x!01 = #x00000000 /\
+                                              else if x!0 = #x00000000 /\
                                                       x!1 = #x00000100
                                                    then #x00000000
-                                                   else if x!01 = #x00000000 /\
+                                                   else if x!0 = #x00000000 /\
                                                            x!1 = #x00000200
                                                         then #x00000000
-                                                        else if x!01 = #x00000000 /\
+                                                        else if x!0 = #x00000000 /\
                                                                 x!1 = #x00000400
                                                              then #x00000000
                                                              else if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00000800
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00001000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00002000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00004000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00008000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00010000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00020000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00040000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00080000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00100000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00200000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00400000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00800000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x01000000
                                                                   then #x00000000
                                                                   else #x00000000
@@ -151,123 +127,123 @@ File 703_reduce_term.mlw:
       ->
       t
       ->
-      t = fun x!01 x!1 x!2 ->
-           if x!01 = #x00000000 /\ x!1 = #x00000000 /\ x!2 = #x00000001
+      t = fun x!0 x!1 x!2 ->
+           if x!0 = #x00000000 /\ x!1 = #x00000000 /\ x!2 = #x00000001
            then #x00000000
-           else if x!01 = #x00000000 /\ x!1 = #x00000000 /\ x!2 = #x00000002
+           else if x!0 = #x00000000 /\ x!1 = #x00000000 /\ x!2 = #x00000002
                 then #x00000000
-                else if x!01 = #x00000000 /\ x!1 = #x00000000 /\
+                else if x!0 = #x00000000 /\ x!1 = #x00000000 /\
                         x!2 = #x00000004
                      then #x00000000
-                     else if x!01 = #x00000000 /\ x!1 = #x00000000 /\
+                     else if x!0 = #x00000000 /\ x!1 = #x00000000 /\
                              x!2 = #x00000008
                           then #x00000000
-                          else if x!01 = #x00000000 /\ x!1 = #x00000000 /\
+                          else if x!0 = #x00000000 /\ x!1 = #x00000000 /\
                                   x!2 = #x00000010
                                then #x00000000
-                               else if x!01 = #x00000000 /\ x!1 = #x00000000 /\
+                               else if x!0 = #x00000000 /\ x!1 = #x00000000 /\
                                        x!2 = #x00000020
                                     then #x00000000
-                                    else if x!01 = #x00000000 /\
+                                    else if x!0 = #x00000000 /\
                                             x!1 = #x00000000 /\
                                             x!2 = #x00000040
                                          then #x00000000
-                                         else if x!01 = #x00000000 /\
+                                         else if x!0 = #x00000000 /\
                                                  x!1 = #x00000000 /\
                                                  x!2 = #x00000080
                                               then #x00000000
-                                              else if x!01 = #x00000000 /\
+                                              else if x!0 = #x00000000 /\
                                                       x!1 = #x00000000 /\
                                                       x!2 = #x00000100
                                                    then #x00000000
-                                                   else if x!01 = #x00000000 /\
+                                                   else if x!0 = #x00000000 /\
                                                            x!1 = #x00000000 /\
                                                            x!2 = #x00000200
                                                         then #x00000000
-                                                        else if x!01 = #x00000000 /\
+                                                        else if x!0 = #x00000000 /\
                                                                 x!1 = #x00000000 /\
                                                                 x!2 = #x00000400
                                                              then #x00000000
                                                              else if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00000000 /\
                                                                   x!2 = #x00000800
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00000000 /\
                                                                   x!2 = #x00001000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00000000 /\
                                                                   x!2 = #x00002000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00000000 /\
                                                                   x!2 = #x00004000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00000000 /\
                                                                   x!2 = #x00008000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00000000 /\
                                                                   x!2 = #x00010000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00000000 /\
                                                                   x!2 = #x00020000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00000000 /\
                                                                   x!2 = #x00040000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00000000 /\
                                                                   x!2 = #x00080000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00000000 /\
                                                                   x!2 = #x00100000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00000000 /\
                                                                   x!2 = #x00200000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00000000 /\
                                                                   x!2 = #x00400000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00000000 /\
                                                                   x!2 = #x00800000
                                                                   then #x00000000
                                                                   else 
                                                                   if 
-                                                                  x!01 = #x00000000 /\
+                                                                  x!0 = #x00000000 /\
                                                                   x!1 = #x00000000 /\
                                                                   x!2 = #x01000000
                                                                   then #x00000000
@@ -278,8 +254,8 @@ File 703_reduce_term.mlw:
       ->
       t
       ->
-      t = fun x!01 x!1 ->
-           if x!01 = #x00000001 /\ x!1 = #x00000000 then #x00000000
+      t = fun x!0 x!1 ->
+           if x!0 = #x00000001 /\ x!1 = #x00000000 then #x00000000
            else #x00000000
   Line 27:
     oand__function_guard :
@@ -289,8 +265,8 @@ File 703_reduce_term.mlw:
       ->
       t
       ->
-      t = fun x!01 x!1 x!2 ->
-           if x!01 = #x00000000 /\ x!1 = #x00000001 /\ x!2 = #x00000000
+      t = fun x!0 x!1 x!2 ->
+           if x!0 = #x00000000 /\ x!1 = #x00000001 /\ x!2 = #x00000000
            then #x00000000 else #x00000000
   Line 391:
     base : t = #x00000001
