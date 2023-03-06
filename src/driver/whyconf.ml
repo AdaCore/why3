@@ -286,6 +286,7 @@ type config = {
   main      : main;
   provers   : config_prover Mprover.t;
   prover_shortcuts : prover Mstr.t;
+  prover_editors : string Mprover.t;
   editors   : config_editor Meditor.t;
   provers_upgrade_policy : prover_upgrade_policy Mprover.t;
   strategies : config_strategy Mstr.t;
@@ -371,16 +372,20 @@ module RC_load = struct
 
   let load_shortcut acc section =
     try
-      let name = get_string section "name" in
-      let version = get_string section "version" in
-      let altern = get_string ~default:"" section "alternative" in
+      let prover = load_prover_id section in
       let shortcuts = get_stringl section "shortcut" in
-      let prover = { prover_name = name;
-                     prover_version = version;
-                     prover_altern = altern} in
       add_prover_shortcuts acc prover shortcuts
     with MissingField s ->
       Loc.warning "Missing field '%s' in [shortcut] section@." s;
+      acc
+
+  let load_prover_editor acc section =
+    try
+      let prover = load_prover_id section in
+      let editor = get_string section "editor" in
+      Mprover.add prover editor acc
+    with MissingField s ->
+      Loc.warning "Missing field '%s' in [prover_editor] section@." s;
       acc
 
   let load_editor editors (id, section) =
@@ -404,11 +409,7 @@ module RC_load = struct
 
   let load_policy acc (_,section) =
     try
-      let source =
-        {prover_name = get_string section "name";
-         prover_version = get_string section "version";
-         prover_altern = get_string ~default:"" section "alternative"
-        } in
+      let source = load_prover_id section in
       try
         match get_string section "policy" with
         | "keep" -> Mprover.add source CPU_keep acc
@@ -498,6 +499,8 @@ module RC_load = struct
         (config.provers,config.prover_shortcuts) provers in
     let fam_shortcuts = get_simple_family rc "shortcut" in
     let shortcuts = List.fold_left load_shortcut shortcuts fam_shortcuts in
+    let fam_editors = get_simple_family rc "prover_editor" in
+    let prover_editors = List.fold_left load_prover_editor config.prover_editors fam_editors in
     let editors = get_family rc "editor" in
     let editors = List.fold_left load_editor config.editors editors in
     let policy = get_family rc "uninstalled_prover" in
@@ -509,6 +512,7 @@ module RC_load = struct
       main      = main;
       provers   = provers;
       prover_shortcuts = shortcuts;
+      prover_editors = prover_editors;
       editors   = editors;
       provers_upgrade_policy = policy;
       strategies = strategies;
@@ -555,19 +559,16 @@ module RC_save = struct
     let section = set_limits ~time:main.timelimit ~mem:main.memlimit ~j:main.running_provers_max section in
     set_section rc "main" section
 
-  let set_prover_id section prover =
+  let prover_section prover =
+    let section = empty_section in
     let section = set_string section "name" prover.prover_name in
     let section = set_string section "version" prover.prover_version in
-    let section =
-      set_string ~default:"" section "alternative" prover.prover_altern in
-    section
+    set_string ~default:"" section "alternative" prover.prover_altern
 
   let set_prover _ (prover,shortcuts) family =
-    let section = empty_section in
-    let section = set_prover_id section prover.prover in
+    let section = prover_section prover.prover in
     let section = set_string section "command" prover.command in
-    let section = set_stringo section "command_steps" prover.command_steps
-    in
+    let section = set_stringo section "command_steps" prover.command_steps in
     let section = set_string section "driver" prover.driver in
     let section = set_string section "editor" prover.editor in
     let section = set_bool section "interactive" prover.interactive in
@@ -575,40 +576,12 @@ module RC_save = struct
     let section = set_stringl section "shortcut" shortcuts in
     section::family
 
-  let update_prover_editor rc prover editor =
-    let family = Rc.get_simple_family rc "prover" in
-    let update_section section =
-      let section = set_string section "editor" editor in
-      section
-    in
-    let rec aux acc = function
-      | [] ->
-          let section = set_prover_id empty_section prover in
-          let section = update_section section in
-          List.rev_append acc [section]
-      | s::l -> begin
-          match RC_load.load_prover_id s with
-          | exception MissingField field ->
-              Loc.warning "Missing field '%s' in [prover] section@." field;
-              aux (s::acc) l
-          | p when Prover.equal p prover ->
-              let s = update_section s in
-              List.rev_append acc (s::l)
-          | _ -> aux (s::acc) l
-        end
-    in
-    Rc.set_simple_family rc "prover" (aux [] family)
-
   let set_provers rc provers =
     let family = Mprover.fold set_prover provers [] in
     set_simple_family rc "prover" family
 
   let set_prover_shortcut prover shortcuts family =
-    let section = empty_section in
-    let section = set_string section "name" prover.prover_name in
-    let section = set_string section "version" prover.prover_version in
-    let section =
-      set_string ~default:"" section "alternative" prover.prover_altern in
+    let section = prover_section prover in
     let section = set_stringl section "shortcut" shortcuts in
     section::family
 
@@ -639,6 +612,15 @@ module RC_save = struct
     let rc = set_provers rc shortcuts_provers_known in
     rc
 
+  let set_prover_editor prover editor family =
+    let section = prover_section prover in
+    let section = set_string section "editor" editor in
+    section::family
+
+  let set_prover_editors rc prover_editors =
+    let family = Mprover.fold set_prover_editor prover_editors [] in
+    set_simple_family rc "prover_editor" family
+
   exception NonUniqueId
 
   let set_editor id editor (ids, family) =
@@ -653,10 +635,7 @@ module RC_save = struct
     set_family rc "editor" family
 
   let set_prover_upgrade_policy prover policy (i, family) =
-    let section = empty_section in
-    let section = set_string section "name" prover.prover_name in
-    let section = set_string section "version" prover.prover_version in
-    let section = set_string section "alternative" prover.prover_altern in
+    let section = prover_section prover in
     let section =
       match policy with
       | CPU_keep ->
@@ -707,6 +686,7 @@ let empty_config conf_file =
     main = empty_main;
     provers = Mprover.empty;
     prover_shortcuts = Mstr.empty;
+    prover_editors = Mprover.empty;
     editors = Meditor.empty;
     provers_upgrade_policy = Mprover.empty;
     strategies = Mstr.empty;
@@ -733,6 +713,7 @@ let read_config conf_file =
 let rc_of_config { main;
                    provers;
                    prover_shortcuts;
+                   prover_editors;
                    editors;
                    provers_upgrade_policy;
                    strategies;
@@ -743,6 +724,7 @@ let rc_of_config { main;
   let rc = RC_save.set_main rc main in
   let rc = set_strategies rc strategies in
   let rc = RC_save.set_provers_shortcuts rc prover_shortcuts provers in
+  let rc = RC_save.set_prover_editors rc prover_editors in
   let rc = RC_save.set_editors rc editors in
   let rc = RC_save.set_policies rc provers_upgrade_policy in
   rc
@@ -901,6 +883,7 @@ let save_config config =
 
 let get_main config = config.main
 let get_provers config = config.provers
+let get_prover_editors config = config.prover_editors
 let get_prover_config config prover =
   Mprover.find prover (get_provers config)
 let get_prover_shortcuts config = config.prover_shortcuts
@@ -913,24 +896,27 @@ let set_main config main =
     main = main;
   }
 
+let get_prover_editor config prover =
+  try Mprover.find prover config.prover_editors
+  with Not_found ->
+    (Mprover.find prover config.provers).editor
+
 module User = struct
   let update_section rc section f =
     Opt.get_def empty_section (Rc.get_section rc section)
     |> f
     |> Rc.set_section rc section
 
-  let update_prover_editor config prover editor =
-    match Mprover.find_opt prover config.provers with
-    | None ->
-        invalid_arg "Update the editor of a non existing prover"
-    | Some info ->
-        if info.editor = editor then config
-        else
-          let info = { info with editor } in
-          { config with
-            provers = Mprover.add prover info config.provers;
-            user_rc = RC_save.update_prover_editor config.user_rc prover editor;
-          }
+  let set_prover_editor config prover editor =
+    let p = Mprover.find prover config.provers in
+    let m =
+      if editor = p.editor then
+        Mprover.remove prover config.prover_editors
+      else
+        Mprover.add prover editor config.prover_editors in
+    { config with
+      user_rc = RC_save.set_prover_editors config.user_rc m;
+      prover_editors = m }
 
   let set_default_editor config editor =
     { config with
@@ -1004,6 +990,9 @@ let set_prover_shortcuts config shortcuts =
   {config with
     prover_shortcuts = shortcuts;
   }
+
+let set_prover_editors config editors =
+  { config with prover_editors = editors }
 
 let set_editors config editors =
   { config with

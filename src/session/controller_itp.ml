@@ -85,6 +85,7 @@ type controller =
 let set_partial_config cont c =
   let open Whyconf in
   let config = set_editors cont.controller_config (get_editors c) in
+  let config = set_prover_editors config (get_prover_editors c) in
   let config = set_provers config (get_provers c) in
   cont.controller_config <- config
 
@@ -724,10 +725,9 @@ let schedule_edition c id pr ~callback ~notification =
   Debug.dprintf debug_sched "[Sched] Scheduling an edition@.";
   let config = c.controller_config in
   let session = c.controller_session in
-  let prover_conf = Whyconf.get_prover_config config pr in
   (* Make sure editor exists. Fails otherwise *)
   let editor =
-    match prover_conf.Whyconf.editor with
+    match Whyconf.get_prover_editor config pr with
     | "" -> Whyconf.(default_editor (get_main config))
     | s ->
        try

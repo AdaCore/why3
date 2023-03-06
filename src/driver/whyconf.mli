@@ -203,6 +203,12 @@ val editor_by_id : config -> string -> config_editor
 (** return the configuration of the editor if found, otherwise raise
     [Not_found] *)
 
+val set_prover_editors : config -> string Mprover.t -> config
+
+val get_prover_editors : config -> string Mprover.t
+
+val get_prover_editor : config -> prover -> string
+
 (** prover upgrade policy *)
 
 type prover_upgrade_policy =
@@ -284,7 +290,7 @@ module User: sig
 
   val update_section : Rc.t -> string -> (Rc.section -> Rc.section) -> Rc.t
 
-  val update_prover_editor : config -> Mprover.key -> string -> config
+  val set_prover_editor : config -> Mprover.key -> string -> config
 
   val set_default_editor : config -> string -> config
 

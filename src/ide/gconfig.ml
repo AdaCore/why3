@@ -1159,7 +1159,7 @@ let editors_page c (notebook:GPack.notebook) =
       editors (2, [], Meditor.empty, Meditor.empty)
   in
   let strings = "(default)" :: "--" :: (List.rev strings) in
-  let add_prover p pi =
+  let add_prover p _pi =
     let text = Pp.string_of_wnl Whyconf.print_prover p in
     let hb = GPack.hbox ~homogeneous:false ~packing:box_pack () in
     let hb_pack_fill_expand =
@@ -1174,7 +1174,8 @@ let editors_page c (notebook:GPack.notebook) =
     combo#set_row_separator_func
       (Some (fun m row -> m#get ~row ~column = "--"));
     let i =
-      try Meditor.find pi.editor indexes with Not_found -> 0
+      let ed = Whyconf.get_prover_editor c.config p in
+      try Meditor.find ed indexes with Not_found -> 0
     in
     combo#set_active i;
     let ( _ : GtkSignal.id) = combo#connect#changed
@@ -1192,8 +1193,7 @@ let editors_page c (notebook:GPack.notebook) =
 	    (* Debug.dprintf debug "prover %a: selected editor '%s'@." *)
             (*   print_prover p data; *)
             c.config <-
-              Whyconf.User.update_prover_editor c.config
-                p data
+              Whyconf.User.set_prover_editor c.config p data
       )
     in
     ()
