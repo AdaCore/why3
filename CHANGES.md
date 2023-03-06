@@ -15,6 +15,7 @@ Tools
   * several debug flags have been renamed;
     use `why3 --list-debug-flags` to obtain the new names :x:
   * global directives in extra drivers are now taken into account
+  * time limits now have a sub-second accuracy, e.g., `--timelimit=0.5`
 
 IDE
   * pressing Tab now auto-completes commands
