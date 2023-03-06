@@ -131,6 +131,12 @@ type next_unproved_node_strat =
   | Next
   | Clever
 
+
+type config_param =
+  | Max_tasks of int
+  | Timelimit of float
+  | Memlimit of int
+
 type ide_request =
   | Command_req             of node_ID * string
   (* executes the given command on the given node. command is
@@ -139,7 +145,7 @@ type ide_request =
   | Add_file_req            of string
   (* The file argument should be absolute. Or, at least, contain the session
      directory path: relative path will be taken from there *)
-  | Set_config_param        of string * int
+  | Set_config_param        of config_param
   | Set_prover_policy       of Whyconf.prover * Whyconf.prover_upgrade_policy
   | Get_file_contents       of string
   | Get_task                of node_ID * bool * bool

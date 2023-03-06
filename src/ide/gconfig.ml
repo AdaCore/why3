@@ -61,7 +61,7 @@ type t =
       (* mutable altern_provers : altern_provers; *)
       (* mutable replace_prover : conf_replace_prover; *)
       mutable hidden_provers : string list;
-      mutable session_time_limit : int;
+      mutable session_time_limit : float;
       mutable session_mem_limit : int;
       mutable session_nb_processes : int;
     }
@@ -721,10 +721,10 @@ let general_settings (c : t) (notebook:GPack.notebook) =
     ~packing:hb_pack () in
   let timelimit_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
   timelimit_spin#adjustment#set_bounds ~lower:0. ~upper:86_400. ~step_incr:5. ();
-  timelimit_spin#adjustment#set_value (float_of_int c.session_time_limit);
+  timelimit_spin#adjustment#set_value (c.session_time_limit);
   let (_ : GtkSignal.id) =
     timelimit_spin#connect#value_changed ~callback:
-      (fun () -> c.session_time_limit <- timelimit_spin#value_as_int)
+      (fun () -> c.session_time_limit <- timelimit_spin#value)
   in
   (* mem limit *)
   let hb = GPack.hbox ~homogeneous:false ~packing:vb#add () in

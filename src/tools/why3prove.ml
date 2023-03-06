@@ -155,7 +155,7 @@ let option_list =
     "<prover> prove or print (with -o) the selected goals";
     Key ('F', "format"), Hnd1 (AString, fun s -> opt_parser := Some s),
     "<format> select input format (default: \"why\")";
-    Key ('t', "timelimit"), Hnd1 (AInt, fun i -> opt_timelimit := Some i),
+    Key ('t', "timelimit"), Hnd1 (AFloat, fun i -> opt_timelimit := Some i),
     "<sec> set the prover's time limit (default=10, no limit=0)";
     Key ('s', "stepslimit"), Hnd1 (AInt, fun i -> opt_stepslimit := Some i),
     "<steps> set the prover's step limit (default: no limit)";
@@ -270,8 +270,8 @@ let () = try
     exit 1
 
 let timelimit = match !opt_timelimit with
-  | None -> 10
-  | Some i when i <= 0 -> 0
+  | None -> 10.
+  | Some i when i <= 0. -> 0.
   | Some i -> i
 
 let stepslimit = Opt.get_def 0 !opt_stepslimit

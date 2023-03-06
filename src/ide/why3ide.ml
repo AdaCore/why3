@@ -473,11 +473,11 @@ let context_tools_menu = GMenu.menu ()
 
 let send_session_config_to_server () =
   let nb = gconfig.session_nb_processes in
-  send_request (Set_config_param("max_tasks",nb));
+  send_request (Set_config_param(Max_tasks nb));
   let nb = gconfig.session_time_limit in
-  send_request (Set_config_param("timelimit",nb));
+  send_request (Set_config_param(Timelimit nb));
   let nb = gconfig.session_mem_limit in
-  send_request (Set_config_param("memlimit",nb))
+  send_request (Set_config_param(Memlimit nb))
 
 let (_ : GtkSignal.id) =
   main_window#connect#destroy
@@ -1795,7 +1795,7 @@ let set_status_and_time_column ?limit row =
              if gconfig.show_time_limit then
                match limit with
                  | Some l ->
-                    Format.sprintf "%.2f [%d.0]" time
+                    Format.sprintf "%.2f [%.2f]" time
                                    (l.Call_provers.limit_time)
                  | None ->
                     Format.sprintf "%.2f" time
@@ -1821,7 +1821,7 @@ let set_status_and_time_column ?limit row =
            begin
              match limit with
              | Some l -> t ^
-                Format.sprintf " [limit=%d sec., %d M]"
+                Format.sprintf " [limit=%.2f sec., %d M]"
                                (l.Call_provers.limit_time)
                                (l.Call_provers.limit_mem)
              | None -> t ^ " [no limit known]"

@@ -114,7 +114,7 @@ let print_result_prov s proofs prov fmt=
 		| Call_provers.Invalid ->
                   fprintf fmt "& \\invalid{%.2f} " res.Call_provers.pr_time
 		| Call_provers.Timeout ->
-                  fprintf fmt "& \\timeout{%ds} "
+                  fprintf fmt "& \\timeout{%.2fs} "
                     pr.limit.Call_provers.limit_time
 		| Call_provers.OutOfMemory ->
                   fprintf fmt "& \\outofmemory{%dM} "

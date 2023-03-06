@@ -1733,13 +1733,12 @@ match pa.proof_state with
        end
     | Add_file_req f ->
       add_file_to_session d.cont f
-    | Set_config_param(s,i)   ->
+    | Set_config_param p   ->
        begin
-         match s with
-         | "max_tasks" -> Controller_itp.set_session_max_tasks i
-         | "timelimit" -> Controller_itp.set_session_timelimit d.cont i
-         | "memlimit" -> Controller_itp.set_session_memlimit d.cont i
-         | _ -> P.notify (Message (Error ("Unknown config parameter "^s)))
+         match p with
+         | Max_tasks i -> Controller_itp.set_session_max_tasks i
+         | Timelimit i -> Controller_itp.set_session_timelimit d.cont i
+         | Memlimit i -> Controller_itp.set_session_memlimit d.cont i
        end
     | Set_prover_policy(p,u)   ->
        let c = d.cont in

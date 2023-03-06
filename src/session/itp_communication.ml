@@ -120,10 +120,15 @@ type next_unproved_node_strat =
   | Next
   | Clever
 
+type config_param =
+  | Max_tasks of int
+  | Timelimit of float
+  | Memlimit of int
+
 type ide_request =
   | Command_req             of node_ID * string
   | Add_file_req            of string
-  | Set_config_param        of string * int
+  | Set_config_param        of config_param
   | Set_prover_policy       of Whyconf.prover * Whyconf.prover_upgrade_policy
   | Get_file_contents       of string
   | Get_task                of node_ID * bool * bool
@@ -147,11 +152,17 @@ type ide_request =
 
 open Format
 
+let print_config_param fmt p =
+  match p with
+  | Max_tasks m -> fprintf fmt "max_tasks %d" m
+  | Timelimit f -> fprintf fmt "timelimit %f" f
+  | Memlimit m -> fprintf fmt "memlimit %d" m
+
 let print_request fmt r =
   match r with
   | Command_req (_nid, s)           -> fprintf fmt "command \"%s\"" s
   | Add_file_req f                  -> fprintf fmt "open file %s" f
-  | Set_config_param(s,i)           -> fprintf fmt "set config param %s %i" s i
+  | Set_config_param p              -> fprintf fmt "set config param %a" print_config_param p
   | Set_prover_policy(p1,p2)        ->
      fprintf fmt "set prover policy %a -> %a" Whyconf.print_prover p1
              Whyconf.print_prover_upgrade_policy p2

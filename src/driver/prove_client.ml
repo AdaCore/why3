@@ -162,7 +162,7 @@ let send_request ~libdir ~id ~timelimit ~memlimit ~use_stdin ~cmd =
   Buffer.add_string send_buf servercommand;
   Buffer.add_string send_buf (string_of_int id);
   Buffer.add_char send_buf ';';
-  Buffer.add_string send_buf (string_of_int timelimit);
+  Buffer.add_string send_buf (string_of_float timelimit);
   Buffer.add_char send_buf ';';
   Buffer.add_string send_buf (string_of_int memlimit);
   List.iter (fun x ->

@@ -56,8 +56,8 @@ let letter = ['a'-'z' 'A'-'Z']
 let ident = (letter | digit | '_') +
 let sign = '-' | '+'
 let integer = sign? digit+
-let mantissa = ['e''E'] sign? digit+
-let real = sign? digit* '.' digit* mantissa?
+let exponent = ['e''E'] sign? digit+
+let real = sign? digit* '.' digit* exponent?
 let escape = ['\\''"''n''t''r']
 
 rule xml_prolog fixattrs = parse

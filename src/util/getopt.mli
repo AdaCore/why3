@@ -41,6 +41,7 @@ type key =
 
 type _ arg =
   | AInt : int arg
+  | AFloat : float arg
   | AString : string arg
   | ASymbol : string list -> string arg
   | APair : char * 'a arg * 'b arg -> ('a * 'b) arg

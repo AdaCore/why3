@@ -98,10 +98,10 @@ val datadir: main -> string
 val set_datadir : main -> string -> main
 val loadpath: main -> string list
 val set_loadpath : main -> string list -> main
-val timelimit: main -> int
+val timelimit: main -> float
 val memlimit: main -> int
 val running_provers_max: main -> int
-val set_limits: main -> int -> int -> int -> main
+val set_limits: main -> float -> int -> int -> main
 
 val default_editor: main -> string
 (** Editor name used when no specific editor is known for a prover *)
@@ -288,7 +288,7 @@ module User: sig
 
   val set_default_editor : config -> string -> config
 
-  val set_limits : time:int -> mem:int -> j:int -> config -> config
+  val set_limits : time:float -> mem:int -> j:int -> config -> config
 
 (*
   val set_dirs : libdir:string -> datadir:string -> config -> config

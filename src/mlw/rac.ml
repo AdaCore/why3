@@ -262,10 +262,10 @@ module Why = struct
         let name, limit_time, limit_mem =
           match Strings.split ' ' prover_string with
           | [name; limit_time; limit_mem] ->
-              name, int_of_string limit_time, int_of_string limit_mem
+              name, float_of_string limit_time, int_of_string limit_mem
           | [name; limit_time] ->
-              name, int_of_string limit_time, 1000
-          | [name] -> name, 1, 1000
+              name, float_of_string limit_time, 1000
+          | [name] -> name, 1., 1000
           | _ -> failwith "RAC reduce prover config must have format <prover>[ <time limit>[ <mem limit>]]" in
         let pr = Whyconf.filter_one_prover config (Whyconf.parse_filter_prover name) in
         let command = String.concat " " (pr.Whyconf.command :: pr.Whyconf.extra_options) in
