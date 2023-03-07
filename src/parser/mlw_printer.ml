@@ -1197,8 +1197,9 @@ and pp_decl ?(attr=true) fmt = function
         | Mint i -> pp_print_int fmt i in
       let pp_args = pp_print_list ~pp_sep:(pp_sep ", ") pp_metarg in
       fprintf fmt "meta \"%a\" %a" (pp_id ~attr) ident pp_args args
-  | Dcloneexport (_, qid, substs) ->
-      fprintf fmt "@[<hv2>clone export %a%a@]"
+  | Dcloneexport (loc, qid, substs) ->
+      fprintf fmt "@[<hv2>%aclone export %a%a@]"
+        pp_maybe_marker loc
         (pp_qualid ~attr) qid (pp_substs ~attr) substs
   | Duseexport qid ->
       fprintf fmt "@[<hv2>use export %a@]" (pp_qualid ~attr) qid
