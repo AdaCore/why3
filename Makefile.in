@@ -1842,6 +1842,7 @@ update-doc-png:
 	export WHY3CONFIG=doc/why3ide-doc.conf; \
 	export WHY3LOADPATH=stdlib; \
 	export GTK_THEME=Adwaita; \
+	export WAYLAND_DISPLAY=; \
 	sed -n -e 's/^.. %EXECUTE \(.*\)/\1/p' $(DOCRST) | $(SHELL) -e
 
 ifeq (@enable_doc@,yes)

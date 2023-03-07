@@ -49,7 +49,7 @@ and check the validity of goals with external provers, in a friendly
 way. This section presents the basic use of this GUI. Please refer to
 :numref:`sec.ideref` for a more complete description.
 
-.. %EXECUTE bin/why3 ide --batch="snap doc/images/gui-1.png" doc/hello_proof.why
+.. %EXECUTE bin/why3 ide --batch="wait 1;snap doc/images/gui-1.png" doc/hello_proof.why
 
 .. _fig.gui1:
 
