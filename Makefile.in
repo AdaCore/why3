@@ -118,15 +118,15 @@ EXTINCLUDES = @WHY3INCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE
 #   52   The argument of this constructor should not be matched against a
 #        constant pattern; the actual value of the argument could change
 #        in the future.
-#   70   No mli file
 # - fatal:
 #   5    Partially applied function: expression whose result has function
 #        type and is ignored.
 #   8    Partial match: missing cases in pattern-matching.
+#   14   Illegal backslash escape in string
 #   48   Implicit elimination of optional arguments.
 #   50   Unexpected documentation comment.
 
-WARNINGS = A-4-9-41-42-44-45-52-70@5@8@48@50
+WARNINGS = A-4-9-41-42-44-45-52@5@8@14@48@50
 
 FLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g -thread $(INCLUDES)
 OFLAGS = $(FLAGS)
@@ -336,6 +336,9 @@ $(LIBDEP) $(LIBCMO) $(LIBCMX) $(LIBCMI): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why3
 
 $(LIBDEP): $(LIBGENERATED)
+
+src/parser/ptree.cmx src/parser/ptree.cmo: FLAGS += -w -70
+src/util/mysexplib.cmx src/util/mysexplib.cmo: FLAGS += -w -70
 
 # Mlmpfr
 

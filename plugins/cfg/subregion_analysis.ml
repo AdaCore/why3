@@ -12,13 +12,6 @@ type domain_elt =
   | Proj of ity * rsymbol * domain_elt
   | Bot
 
-let rec print_elt _fmt e =
-  match e with
-  | Union (_, doms) -> Format.printf "{ %a }" (Pp.print_list Pp.simple_comma print_elt) doms
-  | Variable pv -> Format.printf "%a" print_pv pv
-  | Proj (_, sym, e) -> Format.printf "%a.%a" print_elt e print_rs sym
-  | Bot -> Format.printf "bot"
-
 let rec ity_of d : ity =
   match d with
   | Variable p -> p.pv_ity
@@ -162,8 +155,6 @@ let merge_domains known d1 d2 =
     (fun _ a b ->
       match (a, b) with Some a, Some b -> Some (merge known a b) | None, b -> b | a, None -> a)
     d1 d2
-
-let print_map m = Mpv.iter (fun k v -> Format.printf "%a ~~> %a \n" print_pv k print_elt v) m
 
 let rec analyze muc (st : FreshNames.t) (regions : domain) (e : expr) : domain_elt * expr * domain =
   let attrs = e.e_attrs in
