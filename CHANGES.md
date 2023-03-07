@@ -1,5 +1,8 @@
 :x: marks a potential source of incompatibility
 
+Version 1.6.0, March 7 2023
+---------------------------
+
 Core
   * added meta `vc:proved_wf` for annotating well-founded relations, to make
     them easier to use in variants; see Section 8.2.3 of the manual
