@@ -156,7 +156,7 @@ module Task =
       fun () -> incr c; !c
 
     let task_text t =
-      Pp.string_of Pretty.print_task t
+      Pp.string_of Pretty.print_sequent t
 
     let register_task parent_id task =
       let id = gen_id () in

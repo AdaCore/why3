@@ -22,6 +22,9 @@ IDE
   * added menu item "File/Export as Zip" to export a zip archive of the
     current session and all the related files
 
+Web interface TryWhy3
+  * proof obligations are now displayed as a sequent rather than a full task
+
 Python language
   * added `by` and `so` connectives in predicates
   * fixed overloading of `+` in Python code
