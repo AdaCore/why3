@@ -384,7 +384,7 @@ let actualcommand ~config command limit file =
   let arglist = Cmdline.cmdline_split command in
   let use_stdin = ref true in
   let on_timelimit = ref false in
-  let cmd_regexp = Re.Str.regexp "%\\(\.?.\\)" in
+  let cmd_regexp = Re.Str.regexp "%\\([.]?.\\)" in
   let replace s = match Re.Str.matched_group 1 s with
     | "%" -> "%"
     | "f" -> use_stdin := false; file
@@ -395,7 +395,7 @@ let actualcommand ~config command limit file =
     | "l" -> Whyconf.libdir config
     | "d" -> Whyconf.datadir config
     | "S" -> string_of_int limit.limit_steps
-    | _ -> failwith "unknown specifier, use %%, %f, %t, %m, %l, %d or %S"
+    | _ -> failwith "unknown specifier, use %%, %f, %t, %.t, %T, %m, %l, %d or %S"
   in
   let args =
     List.map (Re.Str.global_substitute cmd_regexp replace) arglist
