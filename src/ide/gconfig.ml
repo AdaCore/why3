@@ -655,10 +655,12 @@ let show_about_window ~parent () =
                 "Martin Clochard";
                 "Simon Cruanes";
                 "Sylvain Dailler";
+                "Xavier Denis";
                 "Clément Fumex";
                 "Léon Gondelman";
                 "David Hauzar";
                 "Daisuke Ishii";
+                "Jacques-Henri Jourdan";
                 "Johannes Kanig";
                 "Mikhail Mandrykin";
                 "David Mentré";
@@ -672,7 +674,7 @@ let show_about_window ~parent () =
                 "Piotr Trojanek";
                 "Makarius Wenzel";
                ]
-      ~copyright:"Copyright 2010-2022 Inria, CNRS, Paris-Saclay University"
+      ~copyright:"Copyright 2010-2023 Inria, CNRS, Paris-Saclay University"
       ~license:("See file " ^ Filename.concat Config.datadir "LICENSE")
       ~website:"http://why3.lri.fr/"
       ~website_label:"http://why3.lri.fr/"
