@@ -427,8 +427,7 @@ test_mlw_printer () {
     find stdlib examples bench -name '*.mlw' \
          -not -path '*/\.*' \
          -not -path "bench/parsing/bad/*" \
-         -not -path "bench/programs/bad-to-keep/*" \
-         -not -path "examples/in_progress/*" |
+         -not -path "bench/programs/bad-to-keep/*" |
     sort | \
     while read filename; do
         bench/test_mlw_printer "$why3" "$filename" || exit 1
@@ -505,12 +504,11 @@ goods examples/bitvectors "-L examples/bitvectors"
 goods examples/avl "-L examples/avl"
 goods examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_2016_matrix_multiplication"
 goods examples/double_wp "-L examples/double_wp"
-goods examples/in_progress/ring_decision "-L examples/in_progress/ring_decision"
+goods examples/ring_decision "-L examples/ring_decision"
 goods examples/multiprecision "-L examples/multiprecision"
 goods examples/prover "-L examples/prover --debug=ignore_unused_vars"
 goods examples/python
 goods examples/micro-c
-goods examples/in_progress
 goods bench/plugins/mlcfg
 echo ""
 fi
@@ -694,7 +692,7 @@ replay examples/avl "-L examples/avl --merging-only"
 replay examples/c_cursor "-L examples/c_cursor --merging-only"
 replay examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_2016_matrix_multiplication --merging-only"
 replay examples/double_wp "-L examples/double_wp --merging-only"
-#replay examples/in_progress/ring_decision "-L examples/in_progress/ring_decision --merging-only"
+#replay examples/ring_decision "-L examples/ring_decision --merging-only"
 replay examples/multiprecision "-L examples/multiprecision --merging-only"
 replay examples/prover "-L examples/prover --merging-only --debug=ignore_unused_vars"
 #replay examples/in_progress --merging-only

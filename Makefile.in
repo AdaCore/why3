@@ -817,7 +817,7 @@ xml-validate:
 	done
 
 xml-validate-local:
-	@for x in `find examples/ -path examples/in_progress -prune -o -name why3session.xml -print`; do \
+	@for x in `find examples/ -name why3session.xml -print`; do \
 	  xmllint --nonet --noout --path share --valid $$x 2>&1 | sed -e '/I.O error/d' | head -1; \
 	done
 
