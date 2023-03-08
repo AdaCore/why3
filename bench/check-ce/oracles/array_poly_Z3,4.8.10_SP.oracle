@@ -7,7 +7,7 @@
   - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_poly.mlw", line 8, characters 4-8)
 File "bench/check-ce/array_poly.mlw", line 8, characters 4-8:
 Sub-goal Index in array bounds of goal f1'vc.
-Prover result is: Unknown (unknown) (7902 steps).
+Prover result is: Step limit exceeded (3000020 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -35,7 +35,7 @@ File array_poly.mlw:
 
 File "bench/check-ce/array_poly.mlw", line 13, characters 4-14:
 Sub-goal Index in array bounds of goal f2'vc.
-Prover result is: Valid (3825 steps).
+Prover result is: Valid (3345 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: BAD_CE
@@ -64,7 +64,7 @@ The following counterexample model could not be verified
   (both RAC terminated with uncaught exception):
 File array.mlw:
   Line 17:
-    length : ty -> uni -> int = fun x!0105 x!143 -> 0
+    length : ty -> uni -> int = fun x!050 x!127 -> 0
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -80,5 +80,5 @@ The following counterexample model could not be verified
   (both RAC terminated with uncaught exception):
 File array.mlw:
   Line 17:
-    length : ty -> uni -> int = fun x!0121 x!152 -> 0
+    length : ty -> uni -> int = fun x!066 x!136 -> 0
 
