@@ -38,6 +38,7 @@ type reason =
    | VC_Contract_Case
    | VC_Disjoint_Contract_Cases
    | VC_Complete_Contract_Cases
+   | VC_Exceptional_Case
    | VC_Loop_Invariant
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv

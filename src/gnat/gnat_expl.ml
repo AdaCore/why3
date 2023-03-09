@@ -34,6 +34,7 @@ type reason =
    | VC_Contract_Case
    | VC_Disjoint_Contract_Cases
    | VC_Complete_Contract_Cases
+   | VC_Exceptional_Case
    | VC_Loop_Invariant
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv
@@ -96,6 +97,7 @@ let is_warning_reason r =
    | VC_Contract_Case
    | VC_Disjoint_Contract_Cases
    | VC_Complete_Contract_Cases
+   | VC_Exceptional_Case
    | VC_Loop_Invariant
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv
@@ -207,6 +209,7 @@ let reason_from_string s =
    | "VC_CONTRACT_CASE"             -> VC_Contract_Case
    | "VC_DISJOINT_CONTRACT_CASES"   -> VC_Disjoint_Contract_Cases
    | "VC_COMPLETE_CONTRACT_CASES"   -> VC_Complete_Contract_Cases
+   | "VC_EXCEPTIONAL_CASE"          -> VC_Exceptional_Case
    | "VC_LOOP_INVARIANT"            -> VC_Loop_Invariant
    | "VC_LOOP_INVARIANT_INIT"       -> VC_Loop_Invariant_Init
    | "VC_LOOP_INVARIANT_PRESERV"    -> VC_Loop_Invariant_Preserv
@@ -274,6 +277,7 @@ let reason_to_ada reason =
    | VC_Contract_Case             -> "VC_CONTRACT_CASE"
    | VC_Disjoint_Contract_Cases   -> "VC_DISJOINT_CONTRACT_CASES"
    | VC_Complete_Contract_Cases   -> "VC_COMPLETE_CONTRACT_CASES"
+   | VC_Exceptional_Case          -> "VC_EXCEPTIONAL_CASE"
    | VC_Loop_Invariant            -> "VC_LOOP_INVARIANT"
    | VC_Loop_Invariant_Init       -> "VC_LOOP_INVARIANT_INIT"
    | VC_Loop_Invariant_Preserv    -> "VC_LOOP_INVARIANT_PRESERV"
@@ -336,6 +340,7 @@ let reason_to_string reason =
    | VC_Contract_Case             -> "contract_case"
    | VC_Disjoint_Contract_Cases   -> "disjoint_contract_cases"
    | VC_Complete_Contract_Cases   -> "complete_contract_cases"
+   | VC_Exceptional_Case          -> "exceptional_case"
    | VC_Loop_Invariant            -> "loop_invariant"
    | VC_Loop_Invariant_Init       -> "loop_invariant_init"
    | VC_Loop_Invariant_Preserv    -> "loop_invariant_preserv"
