@@ -487,9 +487,9 @@ goods bench/typing/x-good --parse-only
 bads bench/typing/x-good --type-only
 goods bench/programs/good
 goods bench/check-ce "-L bench/check-ce"
-goods src/trywhy3/examples/whyml "--debug=ignore_missing_diverges"
-goods src/trywhy3/examples/python "--debug=ignore_missing_diverges"
-goods src/trywhy3/examples/micro-c "--debug=ignore_missing_diverges"
+goods src/trywhy3/examples/whyml "--warn-off=missing_diverges"
+goods src/trywhy3/examples/python "--warn-off=missing_diverges"
+goods src/trywhy3/examples/micro-c "--warn-off=missing_diverges"
 goods examples/bts
 goods examples/tests
 goods examples/tests-provers
@@ -505,7 +505,7 @@ goods examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_201
 goods examples/double_wp "-L examples/double_wp"
 goods examples/ring_decision "-L examples/ring_decision"
 goods examples/multiprecision "-L examples/multiprecision"
-goods examples/prover "-L examples/prover --debug=ignore_unused_vars"
+goods examples/prover "-L examples/prover --warn-off=unused_variable"
 goods examples/python
 goods examples/micro-c
 goods bench/plugins/mlcfg
@@ -696,7 +696,7 @@ replay examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_20
 replay examples/double_wp "-L examples/double_wp --merging-only"
 #replay examples/ring_decision "-L examples/ring_decision --merging-only"
 replay examples/multiprecision "-L examples/multiprecision --merging-only"
-replay examples/prover "-L examples/prover --merging-only --debug=ignore_unused_vars"
+replay examples/prover "-L examples/prover --merging-only --warn-off=unused_variable"
 #replay examples/in_progress --merging-only
 replay examples/mlcfg --merging-only
 echo ""

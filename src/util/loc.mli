@@ -80,8 +80,37 @@ val transfer_loc : Lexing.lexbuf -> Lexing.lexbuf -> unit
 
 (** {2 Located warnings} *)
 
-val warning:
+type warning_id
+
+val register_warning : string -> Pp.formatted -> warning_id
+
+val without_warning : warning_id -> (unit -> 'a) -> 'a
+
+val warning: ?id:warning_id ->
   ?loc:position -> ('b, Format.formatter, unit, unit) format4 -> 'b
+
+(** Command line arguments *)
+module Args : sig
+  type spec = Getopt.opt
+
+  val desc_warning_list : spec
+  (** Option for printing the list of warning flags. *)
+
+  val option_list : unit -> bool
+  (** Print the list of flags if requested (in this case return [true]).
+      You should run this function after the plugins have been loaded. *)
+
+  val desc_no_warn : spec
+  (** Option for specifying a warning flag to set. *)
+
+  val desc_shortcut : string -> Getopt.key -> Getopt.doc -> spec
+  (** Option for setting a specific flag. *)
+
+  val set_flags_selected : ?silent:bool -> unit -> unit
+  (** Set the flags selected by warning or a shortcut.
+      When called before the plugins are loaded, pass [~silent:true] to
+      prevent errors due to unknown plugin flags. *)
+end
 
 (** The default behavior is to emit warning on standard error,
    with position on a first line (if any) and message on a second line.

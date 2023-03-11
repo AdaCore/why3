@@ -18,9 +18,10 @@ ifeq ($(BENCH),yes)
   INCLUDE += -I ../../lib/why3
 endif
 
+
 INCLUDES=$(INCLUDE) -I ../../plugins/tptp
 LIBS=$(BIGINTLIB).cmxa why3.cmxa tptp_typing.cmx tptp_parser.cmx tptp_lexer.cmx
-WHY3FLAGS=-L . --debug=ignore_unused_vars
+WHY3FLAGS=-L . --warn-off=unused_variable
 PKGS=$(addprefix -package ,$(EXTPKGS))
 
 .PHONY: clean doc extract replay

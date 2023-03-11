@@ -570,26 +570,27 @@ let quant_vars ~strict env vl =
   let acc, vl = Lists.map_fold_left add Mstr.empty vl in
   Mstr.set_union acc env, vl
 
-
-let debug_ignore_unused_var = Debug.register_info_flag "ignore_unused_vars"
-  ~desc:"Suppress@ warnings@ on@ unused@ variables"
-
 let attr_w_unused_var_no =
   Ident.create_attribute "W:unused_variable:N"
 
+let warn_unused_variable =
+  Loc.register_warning "unused_variable" "Detects variables which are not used in anyway"
+
+let warn_exists_implies =
+  Loc.register_warning "exists_implies" "Detects usages of implications inside of existential quantifiers."
+
 let check_used_var t vs =
-  if not (Sattr.mem attr_w_unused_var_no vs.vs_name.id_attrs) &&
-      Debug.test_noflag debug_ignore_unused_var then
+  if not (Sattr.mem attr_w_unused_var_no vs.vs_name.id_attrs) then
     begin
       let s = vs.vs_name.id_string in
       if (s = "" || s.[0] <> '_') && t_v_occurs vs t = 0 then
-        Loc.warning ?loc:vs.vs_name.id_loc "unused variable %s" s
+        Loc.warning ~id:warn_unused_variable ?loc:vs.vs_name.id_loc "unused variable %s" s
     end
 
 let check_exists_implies f = match f.t_node with
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,f,{ t_node = Ttrue }) },_)
     when Sattr.mem Term.asym_split f.t_attrs -> ()
-  | Tbinop (Timplies,_,_) -> Loc.warning ?loc:f.t_loc
+  | Tbinop (Timplies,_,_) -> Loc.warning ~id:warn_exists_implies ?loc:f.t_loc
       "form \"exists x. P -> Q\" is likely an error (use \"not P \\/ Q\" if not)"
   | _ -> ()
 
