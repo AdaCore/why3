@@ -138,7 +138,7 @@ type config_prover = {
   editor  : string;
   interactive : bool;
   extra_options : string list;
-  extra_drivers : string list;
+  extra_drivers : (string * string list) list;
 }
 
 type config_editor = {
@@ -852,7 +852,7 @@ let add_extra_config config filename =
             let drv = get_stringl section "driver" in
             { c with
             extra_options = opt @ c.extra_options;
-            extra_drivers = drv @ c.extra_drivers }
+            extra_drivers = (dirname,drv) :: c.extra_drivers }
           end)
         provers
     ) config.provers prover_modifiers in

@@ -147,7 +147,7 @@ type config_prover = {
   editor       : string;   (* Dedicated editor *)
   interactive  : bool; (* Interactive theorem prover *)
   extra_options: string list;
-  extra_drivers: string list;
+  extra_drivers: (string * string list) list;  (* dirname of extra config file, driver name *)
 }
 
 val get_complete_command : config_prover -> with_steps:bool -> string

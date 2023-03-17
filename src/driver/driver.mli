@@ -18,7 +18,7 @@ type driver
 (** Loading drivers *)
 
 val load_driver_file_and_extras :
-  Whyconf.main -> Env.env -> string -> string list -> driver
+  Whyconf.main -> Env.env -> string -> (string * string list) list -> driver
 (** [load_driver_file_and_extras main env file extras] loads the
    driver in file [file] and with additional drivers in list [extras],
    in the context of the configuration [main] and environment
@@ -29,10 +29,11 @@ val load_driver_for_prover :
 (** [load_driver main env p] loads the driver for prover [p], in the
    context of the configuration [main] and environment [env].*)
 
-val resolve_driver_name : Whyconf.main -> string -> string -> string
-(** [resolve_driver_name main dir name] resolves the driver name
-   [name] into a file name. [dir] is the name of the subdirectory of
-   DATADIR where driver files are expected to be.  *)
+val resolve_driver_name : Whyconf.main -> string -> ?extra_dir:string -> string -> string
+(** [resolve_driver_name main dir ?extra_dir name] resolves the driver
+   name [name] into a file name. [dir] is the name of the subdirectory
+   of DATADIR where driver files are expected to be. [?extra_dir] is
+   an optional extra directory to search into.  *)
 
 (** {2 Use a driver} *)
 

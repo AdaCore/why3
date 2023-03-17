@@ -56,12 +56,18 @@ let load_plugin dir (byte,nat) =
   let file = Filename.concat dir file in
   Dynlink.loadfile_private file
 
-let resolve_driver_name whyconf_main drivers_subdir name =
+let resolve_driver_name whyconf_main drivers_subdir ?extra_dir name =
   let drivers_path = Filename.concat (Whyconf.datadir whyconf_main) drivers_subdir in
   if Filename.check_suffix name ".drv" then
     (* driver file with extension .drv are searched in the current
-         directory or the drivers path of Why3 *)
-    let paths = [ Filename.current_dir_name ; drivers_path ] in
+       directory, the extra directory `extra_dir`, and finally in the
+       drivers path of Why3 *)
+    let paths = [ drivers_path ] in
+    let paths = match extra_dir with
+        None -> paths
+      | Some d -> d :: paths
+    in
+    let paths = Filename.current_dir_name :: paths in
     Sysutil.resolve_from_paths paths name
   else
     (* driver names without extension are searched, with extension
@@ -69,8 +75,8 @@ let resolve_driver_name whyconf_main drivers_subdir name =
     let paths = [ drivers_path ] in
     Sysutil.resolve_from_paths paths (name ^ ".drv")
 
-let load_file whyconf_main file =
-  let file = resolve_driver_name whyconf_main "drivers" file in
+let load_file whyconf_main ?extra_dir file =
+  let file = resolve_driver_name whyconf_main "drivers" ?extra_dir file in
   let c = open_in file in
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
@@ -242,10 +248,11 @@ let load_driver_raw =
       thuse := Mid.add th.th_name (th, Theory.close_theory th_uc') !thuse
   in
   List.iter add_theory f.f_rules;
-  List.iter (fun f ->
-      let c = load_file whyconf_main f in
-      List.iter add_global c.f_global;
-      List.iter add_theory c.f_rules) extra_files;
+  List.iter (fun (d,l) ->
+      List.iter (fun f ->
+          let c = load_file whyconf_main ~extra_dir:d f in
+          List.iter add_global c.f_global;
+          List.iter add_theory c.f_rules) l) extra_files;
   incr driver_tag;
   {
     drv_env         = env;

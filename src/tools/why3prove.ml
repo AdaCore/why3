@@ -203,7 +203,7 @@ let config, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let opt_driver = ref (match !opt_driver with
-  | f::ef -> Some (f, ef)
+  | f::ef -> Some (f, ["",ef])
   | [] -> None)
 
 let () = try
