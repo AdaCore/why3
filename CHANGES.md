@@ -1,5 +1,10 @@
 :x: marks a potential source of incompatibility
 
+Tools
+  * the driver files appearing in a config file specified using option
+    `--extra-config` are searched also in the sub-directory of that
+    config file
+
 Version 1.6.0, March 7 2023
 ---------------------------
 
