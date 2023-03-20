@@ -45,8 +45,12 @@ MPFRLIB     = @MLMPFR@
 INFERLIB    = @INFERLIB@
 STACKIFY    = @enable_stackify@
 INCLUDE     = @BIGINTINCLUDE@ -I $ocamllib
-INCLUDEALL  = @BIGINTINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ -I $ocamllib
+EXTPKGS     = menhirLib @RELIB@ unix num dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
 " > $makefileconfig
+
+if [ "@enable_ocamlfind@" = "yes" ]; then
+echo "OCAMLFIND   = @OCAMLFIND@" >> $makefileconfig
+fi
 
 if [ "@enable_relocation@" = "no" ]; then
 
