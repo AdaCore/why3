@@ -23,10 +23,12 @@ type ty =
 
 let rec pp_ty fmt : ty -> unit = function
   | Tvar ty -> Pretty.print_tv fmt ty
-  | Tapp (ps,l) -> Format.fprintf fmt "%s(%a)"
-                        ps.Ident.id_string
-                        Pp.(print_list comma
-                              pp_ty) l
+  | Tapp (ps, []) ->
+      Format.pp_print_string fmt ps.Ident.id_string
+  | Tapp (ps, l) ->
+      Format.fprintf fmt "%s(%a)"
+        ps.Ident.id_string
+        Pp.(print_list comma pp_ty) l
   | Tarrow _ -> Format.fprintf fmt "arrow"
   | Ttuple _ -> Format.fprintf fmt "tuple"
 
