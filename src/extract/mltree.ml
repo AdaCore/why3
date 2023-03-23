@@ -23,10 +23,12 @@ type ty =
 
 let rec pp_ty fmt : ty -> unit = function
   | Tvar ty -> Pretty.print_tv fmt ty
-  | Tapp (ps,l) -> Format.fprintf fmt "%s(%a)"
-                        ps.Ident.id_string
-                        Pp.(print_list comma
-                              pp_ty) l
+  | Tapp (ps, []) ->
+      Format.pp_print_string fmt ps.Ident.id_string
+  | Tapp (ps, l) ->
+      Format.fprintf fmt "%s(%a)"
+        ps.Ident.id_string
+        Pp.(print_list comma pp_ty) l
   | Tarrow _ -> Format.fprintf fmt "arrow"
   | Ttuple _ -> Format.fprintf fmt "tuple"
 
@@ -272,19 +274,8 @@ let rec iter_deps f = function
 
 let ity_unit = I Ity.ity_unit
 
-let ity_of_mask ity mask =
-  let mk_ty acc ty = function MaskGhost -> acc | _ -> ty :: acc in
-  match ity, mask with
-  | _, MaskGhost   -> ity_unit
-  | _, MaskVisible -> ity
-  | I ({ity_node = Ityapp ({its_ts = s}, tl, _)}), MaskTuple m
-    when is_ts_tuple s && List.length tl = List.length m ->
-      let tl = List.fold_left2 mk_ty [] tl m in
-      I (ity_tuple tl)
-  | _ -> ity (* FIXME ? *)
-
-let mk_expr e_node e_ity mask e_mlty e_effect e_attrs =
-  { e_node; e_ity = ity_of_mask e_ity mask; e_mlty; e_effect; e_attrs; }
+let mk_expr e_node e_ity _mask e_mlty e_effect e_attrs =
+  { e_node; e_ity; e_mlty; e_effect; e_attrs; }
 
 let tunit = Ttuple []
 
