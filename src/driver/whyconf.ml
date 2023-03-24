@@ -257,7 +257,7 @@ let add_plugin m p =
   then m
   else { m with plugins = List.rev (p::(List.rev m.plugins))}
 
-let pluginsdir m = Filename.concat m.libdir "plugins"
+let pluginsdir m = Filename.concat (libdir m) "plugins"
 
 let plugins_auto_detection main =
   let dir = pluginsdir main in
