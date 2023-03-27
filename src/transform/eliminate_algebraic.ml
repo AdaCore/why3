@@ -28,7 +28,7 @@ let meta_material = register_meta "material_type_arg" [MTtysymbol;MTint]
          type@ then@ the@ associated@ type@ constructor@ is@ infinite"
 
 let meta_alg_kept = register_meta "algebraic:kept" [MTty]
-  ~desc:"Keep@ primitive@ operations@ over@ this@ algebraic@ types."
+  ~desc:"Keep@ primitive@ operations@ over@ this@ algebraic@ type."
 
 let get_material_args matl =
   let add_arg acc = function
@@ -536,8 +536,8 @@ let eliminate_match =
              (fun (state, task) -> Trans.seq [Trans.return task; rewrite_metas state])
 let meta_elim = register_meta "eliminate_algebraic" [MTstring]
   ~desc:"@[<hov 2>Configure the 'eliminate_algebraic' transformation:@\n\
-    - keep_enums:   @[keep monomorphic enumeration types@]@\n\
-    - keep_recs:    @[keep non-recursive records@]@\n\
+    - keep_enums:   @[keep monomorphic enumeration types (do not use with polymorphism encoding)@]@\n\
+    - keep_recs:    @[keep non-recursive records (do not use with polymorphism encoding)@]@\n\
     - keep_mono:    @[keep monomorphic algebraic datatypes@]@\n\
     - no_index:     @[do not generate indexing functions@]@\n\
     - no_inversion: @[do not generate inversion axioms@]@\n\
@@ -574,10 +574,14 @@ let eliminate_algebraic =
   in
   let st = { st with kept_m = Sty.fold kept_fold kept Mts.empty } in
   let add ty decls = create_meta Libencoding.meta_kept [MAty ty] :: decls in
-  let add_meta_decls = Trans.add_tdecls (Sty.fold add kept []) in
+  let add_meta_decls kept_m =
+    Trans.add_tdecls (Mts.fold (fun _ -> Sty.fold add) kept_m [])
+  in
   Trans.bind (Trans.compose compile_match (fold_comp st))
              (fun (state, task) ->
-              Trans.seq [Trans.return task; rewrite_metas state; add_meta_decls]))))
+              Trans.seq [Trans.return task;
+                         rewrite_metas state;
+                         add_meta_decls state.kept_m]))))
 
 (** Eliminate user-supplied projection functions *)
 
