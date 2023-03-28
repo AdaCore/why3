@@ -8,7 +8,7 @@
 <path name=".."/><path name="bitvector_examples.mlw"/>
 <theory name="Test_proofinuse" proved="true">
  <goal name="shift_is_div&#39;vc" expl="VC for shift_is_div" proved="true">
- <proof prover="0"><result status="valid" time="0.06" steps="117"/></proof>
+ <proof prover="0"><result status="valid" time="0.06" steps="121"/></proof>
  </goal>
  <goal name="mask&#39;vc" expl="VC for mask" proved="true">
  <proof prover="4"><result status="valid" time="0.02" steps="5802"/></proof>
@@ -16,12 +16,12 @@
  <goal name="testVariant&#39;vc" expl="VC for testVariant" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="testVariant&#39;vc.0" expl="loop variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.40" steps="583"/></proof>
+  <proof prover="0"><result status="valid" time="0.40" steps="595"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="ttt" proved="true">
- <proof prover="4"><result status="valid" time="0.05" steps="18339"/></proof>
+ <proof prover="4"><result status="valid" time="0.05" steps="18084"/></proof>
  </goal>
 </theory>
 <theory name="Hackers_delight" proved="true">
@@ -147,51 +147,51 @@
 </theory>
 <theory name="Test_imperial_violet" proved="true">
  <goal name="bv32_bounds_bv" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="4185"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="3923"/></proof>
  </goal>
  <goal name="to_int_ule" proved="true">
- <proof prover="0"><result status="valid" time="0.01" steps="72"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="76"/></proof>
  </goal>
  <goal name="to_int_ult" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="72"/></proof>
+ <proof prover="0"><result status="valid" time="0.02" steps="76"/></proof>
  </goal>
  <goal name="bv32_bounds_0" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="4781"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="4468"/></proof>
  </goal>
  <goal name="bv32_bounds" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="4861"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="4548"/></proof>
  </goal>
  <goal name="add&#39;vc" expl="VC for add" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="add&#39;vc.0" expl="array creation size" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="14739"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="14426"/></proof>
   </goal>
   <goal name="add&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="5785"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="5523"/></proof>
   </goal>
   <goal name="add&#39;vc.2" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="5885"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="5623"/></proof>
   </goal>
   <goal name="add&#39;vc.3" expl="index in array bounds" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="7431"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="7114"/></proof>
   </goal>
   <goal name="add&#39;vc.4" expl="index in array bounds" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="7368"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="7051"/></proof>
   </goal>
   <goal name="add&#39;vc.5" expl="index in array bounds" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="7448"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="7131"/></proof>
   </goal>
   <goal name="add&#39;vc.6" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="138"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="142"/></proof>
   </goal>
   <goal name="add&#39;vc.7" expl="loop invariant preservation" proved="true">
-  <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.17" steps="267"/></proof>
+  <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.17" steps="271"/></proof>
   </goal>
   <goal name="add&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="19654"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="19337"/></proof>
   </goal>
   <goal name="add&#39;vc.9" expl="out of loop bounds" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="6717"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="6400"/></proof>
   </goal>
  </transf>
  </goal>

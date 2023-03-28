@@ -247,7 +247,7 @@ choice.
 
 .. code-block:: console
 
-    > why3 prove -P alt-ergo einstein.why
+    $ why3 prove -P alt-ergo einstein.why
     einstein.why Goals G: Valid (1.27s, 989 steps)
 
 The source code for this puzzle is available in the source distribution

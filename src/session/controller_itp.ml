@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -85,6 +85,7 @@ type controller =
 let set_partial_config cont c =
   let open Whyconf in
   let config = set_editors cont.controller_config (get_editors c) in
+  let config = set_prover_editors config (get_prover_editors c) in
   let config = set_provers config (get_provers c) in
   cont.controller_config <- config
 
@@ -351,9 +352,9 @@ let _adapt_limits ~interactive ~use_steps limits a =
        (* increased time limit is 1 + twice the previous running time,
        but enforced to remain inside the interval [l,2l] where l is
        the previous time limit *)
-       let t = truncate (1.5 +. 2.0 *. t) in
-       let increased_time = if interactive then 0
-                            else max timelimit (min t (2 * timelimit)) in
+       let t = (1. +. 2.0 *. t) in
+       let increased_time = if interactive then 0.
+                            else max timelimit (min t (2. *. timelimit)) in
        (* increased mem limit is just 1.5 times the previous mem limit *)
        let increased_mem = if interactive then 0 else 3 * memlimit / 2 in
        begin
@@ -381,7 +382,7 @@ let _adapt_limits ~interactive ~use_steps limits a =
             (* correct ? failures are supposed to appear quickly anyway... *)
             timelimit, memlimit, steplimit
        end
-    | None when interactive -> 0, 0, 0
+    | None when interactive -> 0., 0, 0
     | None -> timelimit, memlimit, steplimit
   in
   { Call_provers.limit_time = t; limit_mem = m; limit_steps = s }
@@ -723,10 +724,9 @@ let schedule_edition c id pr ~callback ~notification =
   Debug.dprintf debug_sched "[Sched] Scheduling an edition@.";
   let config = c.controller_config in
   let session = c.controller_session in
-  let prover_conf = Whyconf.get_prover_config config pr in
   (* Make sure editor exists. Fails otherwise *)
   let editor =
-    match prover_conf.Whyconf.editor with
+    match Whyconf.get_prover_editor config pr with
     | "" -> Whyconf.(default_editor (get_main config))
     | s ->
        try
@@ -1123,7 +1123,7 @@ let print_report fmt (r: report) =
 (* TODO to be removed when we have a better way to print *)
 let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list) =
   let pp_elem fmt (id, pr, rl, report) =
-    fprintf fmt "ProofNodeID: %d, Prover: %a, Timelimit?: %d, Result: @[<h>%a@]"
+    fprintf fmt "ProofNodeID: %d, Prover: %a, Timelimit?: %.2f, Result: @[<h>%a@]"
       (Obj.magic id) Whyconf.print_prover pr
       rl.Call_provers.limit_time print_report report
   in
@@ -1270,7 +1270,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
   in
   let timelimit = ref limit.Call_provers.limit_time in
   let set_timelimit res =
-    timelimit := 1 + (int_of_float (floor res.Call_provers.pr_time)) in
+    timelimit := res.Call_provers.pr_time in
   let bisect_end rem =
     if Decl.Spr.is_empty rem.Eliminate_definition.rem_pr &&
          Term.Sls.is_empty rem.Eliminate_definition.rem_ls &&

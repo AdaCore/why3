@@ -1,4 +1,4 @@
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 9, characters 12-24)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 9, characters 12-24)
@@ -37,11 +37,11 @@ File call-val-function.mlw:
     Property failure at postcondition of `main` with:
       result = 44
 
-<check-ce-categorization>Categorizations of models:
-- Checked model 0: BAD_CE
-  - Concrete RAC: STUCK (failure in postcondition of `f1` at "bench/check-ce/call-val-function.mlw", line 25, characters 12-24)
-  - Abstract RAC: STUCK (failure in postcondition of `f1` at "bench/check-ce/call-val-function.mlw", line 25, characters 12-24)
-- Selected model 1: NC
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 28, characters 12-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 28, characters 12-24)
+- Checked model 1: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 28, characters 12-24)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 28, characters 12-24)
 File "bench/check-ce/call-val-function.mlw", line 28, characters 12-24:
@@ -57,16 +57,19 @@ File int.mlw:
     Constant one initialization
     one = 1
 File call-val-function.mlw:
+  Line 20:
+    f = fun (x!0:int) -> if x!0 = 2 then 43 else 43
   Line 27:
-    y = 42
-    y = 42
+    y = 2
+    y = 2
     Execution of main function `main` with env:
-      y = 42
+      f = fun (x!0:int) -> if x!0 = 2 then 43 else 43
+      y = 2
       zero = 0
       one = 1
   Line 30:
     (giant-step) execution of unimplemented function `f1`
-      x = 42
+      x = 2
     result of `f1` = 43
   Line 31:
     Normal execution of function `(+)` with args:
@@ -76,7 +79,7 @@ File call-val-function.mlw:
     Property failure at postcondition of `main1` with:
       result = 44
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
   - Concrete RAC: STUCK (failure in postcondition of `f2` at unknown location)
   - Abstract RAC: STUCK (failure in postcondition of `f2` at unknown location)

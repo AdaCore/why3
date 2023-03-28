@@ -42,8 +42,7 @@ Controlling the VC generation
 
 The generation of VCs can be controlled by the user, in particular
 using attributes put inside the WhyML source code. These attributes
-are :why3:attribute:`[@vc:divergent]`,
-:why3:attribute:`[@vc:trusted_wf]`, :why3:attribute:`[@vc:sp]`,
+are :why3:attribute:`[@vc:divergent]`, :why3:attribute:`[@vc:sp]`,
 :why3:attribute:`[@vc:wp]` and
 :why3:attribute:`[@vc:keep_precondition]`. Their effects are detailed
 below.
@@ -153,36 +152,13 @@ then no warning is issued for :code:`f1`, and its VC does not contain
 proved. The :code:`diverges` clause must be added in the contract of
 :code:`g1` too.
 
-Notice that putting a :code:`diverges` clause in a contract of a
-function that contains no loop and no recursive call is an error,
-signaled by Why3. This behavior might be annoying when one generates
-WhyML code automatically, and doesn't know if the code is terminating
-or not. For such a purpose, the VC generator interprets the attribute
-:why3:attribute:`[@vc:divergent]` when it is given on the body of a
-function.  The effect is that the VC does not contain termination
-checks anymore. For these reason the code
-
-.. code-block:: whyml
-
-   let f2 (x:int) : int =
-     [@vc:divergent]
-     let ref r = 100 in
-     while r > 0 do r <- r - x done;
-     r
-
-is accepted without any warning, and the VC does not include any
-:code:`false` formula to prove. Notice however that the presence of
-the attribute it doesn't prevent Why3 to consider the function :code:`f2`
-potentially non-terminating. On the same example, adding the code
-
-.. code-block:: whyml
-
-   let g2 () = f2 7
-
-will again trigger the warning for non-termination of the call to
-:code:`f2`. The presence of the attribute thus somehow acts the same
-as the :code:`diverges` clause, except that it is not an error the put
-the attribute on a terminating program, for example on
+Note that putting the :code:`diverges` clause in the contract of a
+function triggers an error when the function contains neither
+variant-free loops nor variant-free recursive calls nor calls to
+diverging functions. This behavior might be annoying for code
+generators, so they can put the attribute
+:why3:attribute:`[@vc:divergent]` on the body of the function, in
+place of the :code:`diverges` clause:
 
 .. code-block:: whyml
 
@@ -190,8 +166,18 @@ the attribute on a terminating program, for example on
      [@vc:divergent]
      100 - x
 
+Note that :why3:attribute:`[@vc:divergent]` has the same effect as
+:code:`diverges`, which means that :code:`f2` is now assumed to be
+diverging for functions that call it. As a consequence, the following
+code will again trigger a warning about the potentially
+non-terminating call to :code:`f2`.
 
-.. _sec.trusted_wf:
+.. code-block:: whyml
+
+   let g2 () = f2 7
+
+
+.. _sec.custom_wf:
 
 Using a custom well-founded relation for termination
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -216,14 +202,14 @@ must be proved well-founded. In fact, it suffices to prove that,
 whenever proving :math:`r~x~y`, the term :math:`y` is accessible by
 :math:`r`. The VC generator introduces a proof obligation for that.
 
-Alternatively, the attribute :why3:attribute:`[@vc:trusted_wf]` can be
-attached to the declaration of a binary relation. It declares that the
-relation is trusted to be well-founded, and consequently the VC
-generator does not introduce any accessibility obligation whenever
-this relation is used in a variant clause. The default orderings used
-in variant clause (on integers, range types, or algebraic types) are
-known to be well-founded by Why3, and so are the strict ordering
-relations on bitvectors, as in the example above.
+A binary relation may be proved well-founded once and for all. In that
+case, one should add the meta :why3:meta:`vc:proved_wf` to the goal
+proving this fact. It will prevent the VC generator to introduce any
+accessibility obligation whenever this relation is used in a variant
+clause. The default orderings used in variant clause (on integers,
+range types, or algebraic types) are known to be well-founded by Why3,
+and so are the strict ordering relations on bitvectors, as in the
+example above.
 
 
 .. _sec.keeppreconditions:
@@ -320,7 +306,7 @@ Why3 can be executed with support for inferring loop invariants
 about the compilation of Why3 with support for `infer-loop`).
 
 There are two ways of enabling the inference of loop invariants: by
-passing the debug flag :why3:debug:`infer-loop` to Why3 or by annotating ``let``
+passing the debug flag :why3:debug:`infer:loop` to Why3 or by annotating ``let``
 declarations with the :why3:attribute:`[@infer]` attribute.
 
 Below is an example on how to invoke Why3 such that invariants are
@@ -328,7 +314,7 @@ inferred for all the loops in the given file.
 
 ::
 
-   why3 ide tests/infer/incr.mlw --debug=infer-loop
+   why3 ide tests/infer/incr.mlw --debug=infer:loop
 
 In this case, the *Polyhedra* default domain will be used together
 with the default widening value of *3*. Why3 GUI will not display the
@@ -373,14 +359,14 @@ produce exactly the same invariants.
 
 There are a few debugging flags that can be passed to Why3 to output
 additional information about the inference of loop invariants. Flag
-:why3:debug:`infer-print-cfg` will print the Control Flow Graph (CFG) used for
+:why3:debug:`infer:print_cfg` will print the Control Flow Graph (CFG) used for
 abstract interpretation in a file with the name :file:`inferdbg.dot`;
-:why3:debug:`infer-print-ai-result` will print to the standard output the
+:why3:debug:`infer:print_ai_result` will print to the standard output the
 computed abstract values at each point of the CFG;
-:why3:debug:`print-inferred-invs` will print the inferred invariants to the
+:why3:debug:`print:inferred_invs` will print the inferred invariants to the
 standard output (note that the displayed identifiers names might not
 be consistent with those in the initial program); finally,
-:why3:debug:`print-domains-loop` will print for each loop the
+:why3:debug:`print:domains_loop` will print for each loop the
 loop expression, the domain at that point, and its translation into a
 Why3 term.
 

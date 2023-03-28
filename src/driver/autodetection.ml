@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -386,7 +386,7 @@ let generate_auto_strategies env =
          let name = Whyconf.prover_parseable_format p in name :: acc
        else acc) env.prover_auto_levels []
   in
-  List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level1;
+  List.iter (fun s -> fprintf str_formatter "c %s 1. 1000@\n" s) provers_level1;
   let code = flush_str_formatter () in
   let auto0 = {
       strategy_name = "Auto_level_0";
@@ -394,7 +394,7 @@ let generate_auto_strategies env =
       strategy_shortcut = "0";
       strategy_code = code }
   in
-  List.iter (fun s -> fprintf str_formatter "c %s 5 1000@\n" s) provers_level1;
+  List.iter (fun s -> fprintf str_formatter "c %s 5. 1000@\n" s) provers_level1;
   let code = flush_str_formatter () in
   let auto1 = {
       strategy_name = "Auto_level_1";
@@ -403,9 +403,9 @@ let generate_auto_strategies env =
       strategy_code = code }
   in
   fprintf str_formatter "start:@\n";
-  List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level1;
+  List.iter (fun s -> fprintf str_formatter "c %s 1. 1000@\n" s) provers_level1;
   fprintf str_formatter "t split_vc start@\n";
-  List.iter (fun s -> fprintf str_formatter "c %s 10 4000@\n" s) provers_level1;
+  List.iter (fun s -> fprintf str_formatter "c %s 10. 4000@\n" s) provers_level1;
   let code = flush_str_formatter () in
   let auto2 = {
       strategy_name = "Auto_level_2";
@@ -422,9 +422,9 @@ let generate_auto_strategies env =
        else acc) env.prover_auto_levels []
   in
   fprintf str_formatter "start:@\n";
-  List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level3;
+  List.iter (fun s -> fprintf str_formatter "c %s 1. 1000@\n" s) provers_level3;
   fprintf str_formatter "t split_vc start@\n";
-  List.iter (fun s -> fprintf str_formatter "c %s 5 2000@\n" s) provers_level3;
+  List.iter (fun s -> fprintf str_formatter "c %s 5. 2000@\n" s) provers_level3;
   fprintf str_formatter "t introduce_premises afterintro@\n";
   fprintf str_formatter "afterintro:@\n";
   fprintf str_formatter "t inline_goal afterinline@\n";
@@ -432,7 +432,7 @@ let generate_auto_strategies env =
   fprintf str_formatter "afterinline:@\n";
   fprintf str_formatter "t split_all_full start@\n";
   fprintf str_formatter "trylongertime:@\n";
-  List.iter (fun s -> fprintf str_formatter "c %s 30 4000@\n" s) provers_level3;
+  List.iter (fun s -> fprintf str_formatter "c %s 30. 4000@\n" s) provers_level3;
   let code = flush_str_formatter () in
   let auto3 = {
       strategy_name = "Auto_level_3";

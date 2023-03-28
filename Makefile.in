@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  #
+#  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -113,6 +113,7 @@ EXTINCLUDES = @WHY3INCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE
 #        matched.
 #   9    Missing fields in a record pattern.
 #   41   Ambiguous constructor or label name.
+#   42   Reliance on type-directed disambiguation
 #   44   Open statement shadows an already defined identifier.
 #   45   Open statement shadows an already defined label or constructor.
 #   52   The argument of this constructor should not be matched against a
@@ -122,10 +123,11 @@ EXTINCLUDES = @WHY3INCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE
 #   5    Partially applied function: expression whose result has function
 #        type and is ignored.
 #   8    Partial match: missing cases in pattern-matching.
+#   14   Illegal backslash escape in string
 #   48   Implicit elimination of optional arguments.
 #   50   Unexpected documentation comment.
 
-WARNINGS = A-4-9-41-44-45-52@5@8@48@50
+WARNINGS = A-4-9-41-42-44-45-52@5@8@14@48@50
 
 FLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g -thread $(INCLUDES)
 OFLAGS = $(FLAGS)
@@ -205,7 +207,7 @@ endif
 .PHONY: ide install-ide uninstall-ide
 .PHONY: coq install-coq uninstall-coq clean-coq
 .PHONY: pvs install-pvs uninstall-pvs clean-pvs
-.PHONY: install-isabelle
+.PHONY: install-isabelle clean-isabelle
 .PHONY: plugins plugins.byte plugins.opt
 .PHONY: trywhy3 clean-trywhy3
 
@@ -263,7 +265,7 @@ LIB_INFER = o2oterm domain infer_why3 quant_domain union_find disjunctive_term_d
 endif
 
 ifeq (@enable_bddinfer@,yes)
-LIB_BDDINFER = bdd abstract ast interp_expression infer why3infer
+LIB_BDDINFER = bddparam abstract ast interp_expression infer why3infer
 endif
 
 LIB_EXTRACT = mltree compile mlinterp pdriver ml_printer \
@@ -340,6 +342,9 @@ $(LIBDEP) $(LIBCMO) $(LIBCMX) $(LIBCMI): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why3
 
 $(LIBDEP): $(LIBGENERATED)
+
+src/parser/ptree.cmx src/parser/ptree.cmo: FLAGS += -w -70
+src/util/mysexplib.cmx src/util/mysexplib.cmo: FLAGS += -w -70
 
 # Mlmpfr
 
@@ -556,7 +561,7 @@ PLUG_TRANSFORM =
 PLUG_TPTP = tptp_parser tptp_typing tptp_lexer tptp_printer
 PLUG_PYTHON = py_parser py_lexer py_main
 PLUG_MICROC = mc_parser mc_lexer mc_printer mc_main
-PLUG_CFG = cfg_parser cfg_lexer cfg_paths cfg_main
+PLUG_CFG = cfg_parser cfg_lexer cfg_paths subregion_analysis cfg_main
 ifeq (@enable_stackify@,yes)
 PLUG_CFG += stackify cfg_stackify
 endif
@@ -929,7 +934,7 @@ xml-validate:
 	done
 
 xml-validate-local:
-	@for x in `find examples/ -path examples/in_progress -prune -o -name why3session.xml -print`; do \
+	@for x in `find examples/ -name why3session.xml -print`; do \
 	  xmllint --nonet --noout --path share --valid $$x 2>&1 | sed -e '/I.O error/d' | head -1; \
 	done
 
@@ -1129,9 +1134,8 @@ COQVERSIONSPECIFICTARGETS=$(addprefix lib/coq/, $(COQVERSIONSPECIFIC))
 $(COQVERSIONSPECIFICTARGETS): %: %.@coq_compat_version@
 	$(CMP_CP)
 
-clean::
+clean-coq::
 	rm -f $(COQVERSIONSPECIFICTARGETS)
-
 
 COQLIBS_INT_FILES = Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power NumOf
 COQLIBS_INT_ALL_FILES = Exponentiation $(COQLIBS_INT_FILES)
@@ -1177,7 +1181,7 @@ endif
 COQLIBS_FOR_DRIVERS_FILES = ComputerOfEuclideanDivision
 COQLIBS_FOR_DRIVERS = $(addprefix lib/coq/for_drivers/, $(COQLIBS_FOR_DRIVERS_FILES))
 
-COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_FP)  $(COQLIBS_BV) $(COQLIBS_IEEEFLOAT) $(COQLIBS_FOR_DRIVERS)
+COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd lib/coq/WellFounded $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_FP)  $(COQLIBS_BV) $(COQLIBS_IEEEFLOAT) $(COQLIBS_FOR_DRIVERS)
 
 %.vo: %.v
 	$(SHOW) 'Coqc     $<'
@@ -1193,17 +1197,16 @@ COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
 
 coq: $(COQVO) drivers/coq-realizations.aux lib/coq/version
 
-clean-coq:
+clean-coq::
 	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES)) lib/coq/version \
 		$(foreach f,$(COQLIBS_FILES),$(dir $f).$(notdir $f).aux)
-
-clean:: clean-coq
 
 drivers/coq-realizations.aux: Makefile
 	$(SHOW) 'Generate $@'
 	$(HIDE)(echo "(* generated automatically at compilation time *)"; \
 	echo 'theory BuiltIn meta "realized_theory" "BuiltIn", "" end'; \
 	echo 'theory HighOrd meta "realized_theory" "HighOrd", "" end'; \
+	echo 'theory WellFounded meta "realized_theory" "WellFounded", "" end'; \
 	for f in $(COQLIBS_INT_FILES); do \
 	echo 'theory int.'"$$f"' meta "realized_theory" "int.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_BOOL_FILES); do \
@@ -1278,7 +1281,7 @@ uninstall-coq:
 install-coq:
 	$(MKDIR_P) $(LIBDIR)/why3/coq
 	$(INSTALL_DATA) lib/coq/version $(LIBDIR)/why3/coq/
-	$(INSTALL_DATA) lib/coq/BuiltIn.vo lib/coq/HighOrd.vo $(LIBDIR)/why3/coq/
+	$(INSTALL_DATA) lib/coq/BuiltIn.vo lib/coq/HighOrd.vo lib/coq/WellFounded.vo $(LIBDIR)/why3/coq/
 	$(MKDIR_P) $(LIBDIR)/why3/coq/int
 	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_INT)) $(LIBDIR)/why3/coq/int/
 	$(MKDIR_P) $(LIBDIR)/why3/coq/bool
@@ -1324,7 +1327,7 @@ install-data::
 
 all: drivers/coq-realizations.aux
 
-clean::
+clean:: clean-coq
 	rm -f drivers/coq-realizations.aux
 
 ####################
@@ -1380,8 +1383,6 @@ pvs: lib/pvs/version
 clean-pvs:
 	rm -f lib/pvs/version
 
-clean:: clean-pvs
-
 ifeq (@enable_pvs_libs@,yes)
 
 uninstall-pvs:
@@ -1413,7 +1414,7 @@ install-data::
 
 all: drivers/pvs-realizations.aux
 
-clean::
+clean:: clean-pvs
 	rm -f drivers/pvs-realizations.aux
 
 #######################
@@ -1431,7 +1432,7 @@ ISABELLEREALIZEDRVPATH=drivers/$(ISABELLEREALIZEDRV).drv
 $(ISABELLEVERSIONSPECIFICTARGETS): %: %.@ISABELLEVERSION@
 	$(CMP_CP)
 
-clean::
+clean-isabelle::
 	rm -f $(ISABELLEVERSIONSPECIFICTARGETS)
 
 ISABELLELIBS_INT_FILES = Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power
@@ -1455,7 +1456,8 @@ ISABELLELIBS_MAP = $(addsuffix .xml, $(addprefix $(GENERATED_PREFIX_ISABELLE)/ma
 ISABELLELIBS_LIST_FILES = List Length Mem Nth NthNoOpt NthLength HdTl NthHdTl Append NthLengthAppend Reverse HdTlNoOpt RevAppend Combine Distinct NumOcc Permut
 ISABELLELIBS_LIST = $(addsuffix .xml, $(addprefix $(GENERATED_PREFIX_ISABELLE)/list/, $(ISABELLELIBS_LIST_FILES)))
 
-ISABELLELIBS_BV_FILES = Pow2int BV8 BV16 BV32 BV64 BVConverter_32_64 BVConverter_16_64 BVConverter_8_64 BVConverter_16_32 BVConverter_8_32 BVConverter_8_16
+ISABELLELIBS_BV_FILES = Pow2int
+# BV8 BV16 BV32 BV64 BVConverter_32_64 BVConverter_16_64 BVConverter_8_64 BVConverter_16_32 BVConverter_8_32 BVConverter_8_16
 ISABELLELIBS_BV = $(addsuffix .xml, $(addprefix $(GENERATED_PREFIX_ISABELLE)/bv/, $(ISABELLELIBS_BV_FILES)))
 
 ISABELLELIBS = $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION) $(ISABELLELIBS_BV)
@@ -1570,9 +1572,6 @@ install-isabelle: $(GENERATED_PREFIX_ISABELLE)/last_build
 install_local:: install-isabelle
 install:: install-isabelle
 
-clean::
-	rm -f $(GENERATED_PREFIX_ISABELLE)/*/*.xml
-
 endif
 
 all: drivers/isabelle-realizations.aux
@@ -1580,7 +1579,10 @@ all: drivers/isabelle-realizations.aux
 install-data::
 	$(INSTALL_DATA) drivers/isabelle-realizations.aux $(DATADIR)/why3/drivers/
 
-clean::
+clean-isabelle::
+	rm -f $(GENERATED_PREFIX_ISABELLE)/*/*.xml
+
+clean:: clean-isabelle
 	rm -f drivers/isabelle-realizations.aux
 
 #######################
@@ -1957,6 +1959,7 @@ update-doc-png:
 	export WHY3CONFIG=doc/why3ide-doc.conf; \
 	export WHY3LOADPATH=stdlib; \
 	export GTK_THEME=Adwaita; \
+	export WAYLAND_DISPLAY=; \
 	sed -n -e 's/^.. %EXECUTE \(.*\)/\1/p' $(DOCRST) | $(SHELL) -e
 
 ifeq (@enable_doc@,yes)

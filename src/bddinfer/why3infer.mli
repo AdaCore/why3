@@ -1,3 +1,13 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (**
 
@@ -23,7 +33,7 @@ val infer_loop_invs :
    [mkn] are respectively the environment, the theory known map and
    the module known map of that function.
 
-  The set [attrs] is checked for the presence of the [[@bddinfer]]
+  The set [attrs] is checked for the presence of the [[\@bddinfer]]
    attribute. Without it, the empty list is immediately returned.
 
   The environment [env] is needed to access the builtin functions such

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -1406,6 +1406,14 @@ match pa.proof_state with
     Session_itp.save_session d.cont.controller_session;
     P.notify Saved
 
+  let export_as_zip () =
+    let d = get_server_data () in
+    try
+      let archive = Session_itp.export_as_zip d.cont.controller_session in
+      P.notify (Message (Information ("Zip archive " ^ archive ^ " created")))
+    with Sys_error msg ->
+        P.notify (Message (Error msg))
+
   (* ----------------- Reload session ------------------- *)
   let clear_tables () : unit =
     reset ();
@@ -1543,7 +1551,7 @@ match pa.proof_state with
    (* Check if a request is valid (does not suppose existence of obsolete node_id) *)
    let request_is_valid r =
      match r with
-     | Save_req | Check_need_saving_req | Reload_req
+     | Save_req | Export_as_zip | Check_need_saving_req | Reload_req
      | Get_file_contents _ | Save_file_req _
      | Interrupt_req | Add_file_req _ | Set_config_param _ | Set_prover_policy _
      | Exit_req | Get_global_infos | Itp_communication.Unfocus_req
@@ -1617,6 +1625,10 @@ match pa.proof_state with
     | Save_req                     ->
        save_session ();
        session_needs_saving := false
+    | Export_as_zip ->
+        save_session ();
+        session_needs_saving := false;
+        export_as_zip ()
     | Reload_req                   ->
        reload_session ();
        session_needs_saving := true
@@ -1723,13 +1735,12 @@ match pa.proof_state with
        end
     | Add_file_req f ->
       add_file_to_session d.cont f
-    | Set_config_param(s,i)   ->
+    | Set_config_param p   ->
        begin
-         match s with
-         | "max_tasks" -> Controller_itp.set_session_max_tasks i
-         | "timelimit" -> Controller_itp.set_session_timelimit d.cont i
-         | "memlimit" -> Controller_itp.set_session_memlimit d.cont i
-         | _ -> P.notify (Message (Error ("Unknown config parameter "^s)))
+         match p with
+         | Max_tasks i -> Controller_itp.set_session_max_tasks i
+         | Timelimit i -> Controller_itp.set_session_timelimit d.cont i
+         | Memlimit i -> Controller_itp.set_session_memlimit d.cont i
        end
     | Set_prover_policy(p,u)   ->
        let c = d.cont in

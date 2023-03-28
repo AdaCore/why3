@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -26,7 +26,7 @@ let driver_debug =
     ~desc:"Print intermediate task generated during processing of a driver"
 
 let meta_get_counterexmp =
-  Theory.register_meta_excl "get_counterexmp" [Theory.MTstring]
+  Theory.register_meta_excl "get_counterexmp" []
   ~desc:"Set@ when@ counter-example@ should@ be@ get."
 
 let get_counterexmp task =
@@ -56,12 +56,18 @@ let load_plugin dir (byte,nat) =
   let file = Filename.concat dir file in
   Dynlink.loadfile_private file
 
-let resolve_driver_name whyconf_main drivers_subdir name =
+let resolve_driver_name whyconf_main drivers_subdir ?extra_dir name =
   let drivers_path = Filename.concat (Whyconf.datadir whyconf_main) drivers_subdir in
   if Filename.check_suffix name ".drv" then
     (* driver file with extension .drv are searched in the current
-         directory or the drivers path of Why3 *)
-    let paths = [ Filename.current_dir_name ; drivers_path ] in
+       directory, the extra directory `extra_dir`, and finally in the
+       drivers path of Why3 *)
+    let paths = [ drivers_path ] in
+    let paths = match extra_dir with
+        None -> paths
+      | Some d -> d :: paths
+    in
+    let paths = Filename.current_dir_name :: paths in
     Sysutil.resolve_from_paths paths name
   else
     (* driver names without extension are searched, with extension
@@ -69,8 +75,8 @@ let resolve_driver_name whyconf_main drivers_subdir name =
     let paths = [ drivers_path ] in
     Sysutil.resolve_from_paths paths (name ^ ".drv")
 
-let load_file whyconf_main file =
-  let file = resolve_driver_name whyconf_main "drivers" file in
+let load_file whyconf_main ?extra_dir file =
+  let file = resolve_driver_name whyconf_main "drivers" ?extra_dir file in
   let c = open_in file in
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
@@ -242,7 +248,11 @@ let load_driver_raw =
       thuse := Mid.add th.th_name (th, Theory.close_theory th_uc') !thuse
   in
   List.iter add_theory f.f_rules;
-  List.iter (fun f -> List.iter add_theory (load_file whyconf_main f).f_rules) extra_files;
+  List.iter (fun (d,l) ->
+      List.iter (fun f ->
+          let c = load_file whyconf_main ~extra_dir:d f in
+          List.iter add_global c.f_global;
+          List.iter add_theory c.f_rules) l) extra_files;
   incr driver_tag;
   {
     drv_env         = env;
@@ -313,14 +323,6 @@ let file_of_task drv input_file theory_name task =
 
 let file_of_theory drv input_file th =
   get_filename drv ~input_file ~theory_name:th.th_name.Ident.id_string ~goal_name:"null"
-
-let call_on_buffer
-      ~command ~config ~limit ~gen_new_file ?inplace ~filename
-    ~printing_info drv buffer =
-  Call_provers.call_on_buffer
-    ~command ~config ~limit ~gen_new_file
-    ~res_parser:drv.drv_res_parser
-    ~filename ~printing_info ?inplace buffer
 
 (** print'n'prove *)
 
@@ -467,14 +469,29 @@ let prove_task_prepared
   Opt.iter close_in old_channel;
   let gen_new_file, filename =
     file_name_of_task ?old ?inplace ?interactive drv task in
-  let get_counterexmp = get_counterexmp task in
+  let get_model = if get_counterexmp task then Some printing_info else None in
   let res =
-    call_on_buffer
+    Call_provers.call_on_buffer
       ~command ~config ~limit ~gen_new_file ?inplace ~filename
-      ~get_counterexmp ~printing_info drv buf
+      ~res_parser:drv.drv_res_parser
+      ~get_model buf
   in
   Buffer.reset buf;
   ServerCall res
+
+let prove_buffer_prepared
+    ~command ~config ~limit
+    ?(input_file="f")
+    ?(theory_name="T")
+    ?(goal_name="vc")
+    ?get_model
+    drv buffer =
+  let filename = get_filename drv ~input_file ~theory_name ~goal_name in
+  Call_provers.call_on_buffer
+    ~command ~config ~limit
+    ~gen_new_file:true ~filename
+    ~res_parser:drv.drv_res_parser
+    ~get_model buffer
 
 let prove_task
       ~command ~config ~limit ?old ?inplace ?interactive drv task =

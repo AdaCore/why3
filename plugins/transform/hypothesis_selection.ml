@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -208,7 +208,7 @@ end
 module GraphConstant = struct
 
   (** memoizing for formulae and terms, and then expressions *)
-  let rec findF fTbl fmla = try
+  let findF fTbl fmla = try
     Hterm.find fTbl fmla
   with Not_found ->
     let new_v = GC.V.create fmla in
@@ -216,7 +216,8 @@ module GraphConstant = struct
     (* Format.eprintf "generating new vertex: %a@."
       Pretty.print_term fmla; *)
     new_v
-  and findT tTbl term = try
+
+  let findT tTbl term = try
     Hterm.find tTbl term
   with Not_found ->
     let new_v = GC.V.create term in
@@ -224,11 +225,6 @@ module GraphConstant = struct
     (* Format.eprintf "generating new vertex: %a@."
       Pretty.print_term fmla; *)
     new_v
-  and find fTbl tTbl expr = TermTF.t_select (findT tTbl) (findF fTbl) expr
-
-  (** adds a symbol to the graph *)
-  let add_symbol fTbl tTbl gc expr =
-    GC.add_vertex gc (find fTbl tTbl expr)
 
   (** analyse dynamic dependencies in one atomic formula, from the bottom *)
   let rec analyse_fmla_base fTbl tTbl gc fmla =

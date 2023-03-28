@@ -1,53 +1,59 @@
 Invariant for loop [anonymous_loop_0] is
-  ((((e.contents * 10) + 91) <= n.contents /\ 0 <= e.contents) /\
-   e.contents <= 1) /\
+  (((((e.contents * 10) + 91) <= n.contents /\ 0 <= e.contents) /\
+    e.contents <= 1) /\
+   o = 1) /\
   ((e.contents * 10) + n0) = (n.contents + 10)
 Domains for loop [anonymous_loop_0] are
-  n0 = [101;+oo[; e = [0;1]; n = [91;+oo[
+  n0 = [101;+oo[; o = [1;1]; e = [0;1]; n = [91;+oo[
 The generated invariant implies { T }
 
 Invariant for loop [anonymous_loop_0] is
-  ((((e1.contents * 10) + 91) <= n1.contents /\ 0 <= e1.contents) /\
-   e1.contents <= 1) /\
+  (((((e1.contents * 10) + 91) <= n1.contents /\ 0 <= e1.contents) /\
+    e1.contents <= 1) /\
+   o1 = 1) /\
   ((e1.contents * 10) + n01) = (n1.contents + 10)
 Domains for loop [anonymous_loop_0] are
-  n01 = [101;+oo[; e1 = [0;1]; n1 = [91;+oo[
+  n01 = [101;+oo[; o1 = [1;1]; e1 = [0;1]; n1 = [91;+oo[
 The generated invariant implies { T }
 
 Invariant for loop [anonymous_loop_0] is
-  ((((e2.contents * 10) + 91) <= n2.contents /\ 0 <= e2.contents) /\
-   e2.contents <= 1) /\
+  (((((e2.contents * 10) + 91) <= n2.contents /\ 0 <= e2.contents) /\
+    e2.contents <= 1) /\
+   o2 = 1) /\
   ((e2.contents * 10) + n02) = (n2.contents + 10)
 Domains for loop [anonymous_loop_0] are
-  n02 = [101;+oo[; e2 = [0;1]; n2 = [91;+oo[
+  n02 = [101;+oo[; o2 = [1;1]; e2 = [0;1]; n2 = [91;+oo[
 The generated invariant implies { T }
 
 Invariant for loop [anonymous_loop_0] is
-  (((((((e3.contents * 99) + (n03 * 10)) <= ((n3.contents * 10) + 99) /\
-       n03 <= (n3.contents + 9)) /\
-      ((e3.contents * 11) + n03) <= (n3.contents + 11)) /\
-     0 <= e3.contents) /\
-    n03 <= 100) /\
-   n3.contents <= ((e3.contents * 10) + 91)) /\
-  n3.contents <= 111
+  ((((((((e3.contents * 99) + (n03 * 10)) <= ((n3.contents * 10) + 99) /\
+        n03 <= (n3.contents + 9)) /\
+       ((e3.contents * 11) + n03) <= (n3.contents + 11)) /\
+      0 <= e3.contents) /\
+     n03 <= 100) /\
+    n3.contents <= ((e3.contents * 10) + 91)) /\
+   n3.contents <= 111) /\
+  o3 = 1
 Domains for loop [anonymous_loop_0] are
-  n03 = ]-oo;100]; e3 = [0;+oo[; n3 = ]-oo;111]
+  n03 = ]-oo;100]; o3 = [1;1]; e3 = [0;+oo[; n3 = ]-oo;111]
 The generated invariant implies { (e <> 0 || n > 90) }
 
 Invariant for loop [anonymous_loop_0] is
-  (((e4.contents * 10) + n04) <= (n4.contents + 10) /\
-   ((e4.contents * 11) + n04) <= (n4.contents + 11)) /\
-  0 <= e4.contents
+  ((((e4.contents * 10) + n04) <= (n4.contents + 10) /\
+    ((e4.contents * 11) + n04) <= (n4.contents + 11)) /\
+   0 <= e4.contents) /\
+  o4 = 1
 Domains for loop [anonymous_loop_0] are
-  n04 = ]-oo;+oo[; e4 = [0;+oo[; n4 = ]-oo;+oo[
+  n04 = ]-oo;+oo[; o4 = [1;1]; e4 = [0;+oo[; n4 = ]-oo;+oo[
 The generated invariant implies { T }
 
 Invariant for loop [anonymous_loop_0] is
-  (((e5.contents * 10) + n05) <= (n5.contents + 10) /\
-   ((e5.contents * 11) + n05) <= (n5.contents + 11)) /\
-  0 <= e5.contents
+  ((((e5.contents * 10) + n05) <= (n5.contents + 10) /\
+    ((e5.contents * 11) + n05) <= (n5.contents + 11)) /\
+   0 <= e5.contents) /\
+  o5 = 1
 Domains for loop [anonymous_loop_0] are
-  n05 = ]-oo;+oo[; e5 = [0;+oo[; n5 = ]-oo;+oo[
+  n05 = ]-oo;+oo[; o5 = [1;1]; e5 = [0;+oo[; n5 = ]-oo;+oo[
 The generated invariant implies { T }
 
 File bench/infer/mccarthy.mlw:
@@ -64,7 +70,7 @@ Prover result is: Valid (0.01s, 57 steps).
 
 File bench/infer/mccarthy.mlw:
 Goal f91_nonrec_box'vc.
-Prover result is: Valid (0.00s, 57 steps).
+Prover result is: Valid (0.01s, 57 steps).
 
 File bench/infer/mccarthy.mlw:
 Goal f91_nonrec2'vc.
@@ -76,7 +82,7 @@ Prover result is: Unknown () (0.01s).
 
 File bench/infer/mccarthy.mlw:
 Goal f91_nonrec_hard_box'vc.
-Prover result is: Unknown () (0.01s).
+Prover result is: Unknown () (0.02s).
 
 File bench/infer/mccarthy.mlw:
 Goal f91_pseudorec'vc.

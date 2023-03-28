@@ -49,7 +49,7 @@ and check the validity of goals with external provers, in a friendly
 way. This section presents the basic use of this GUI. Please refer to
 :numref:`sec.ideref` for a more complete description.
 
-.. %EXECUTE bin/why3 ide --batch="snap doc/images/gui-1.png" doc/hello_proof.why
+.. %EXECUTE bin/why3 ide --batch="wait 1;snap doc/images/gui-1.png" doc/hello_proof.why
 
 .. _fig.gui1:
 
@@ -205,7 +205,7 @@ on the ``hello_proof`` example is as follows (assuming ``G2`` still is
 
 .. code-block:: console
 
-    > why3 replay hello_proof
+    $ why3 replay hello_proof
      2/3 (replay OK)
        +--file ../hello_proof.why: 2/3
           +--theory HelloProof: 2/3
@@ -243,7 +243,7 @@ follows.
 
 .. code-block:: console
 
-    > why3 config list-provers
+    $ why3 config list-provers
     Alt-Ergo 1.30
     CVC4 1.5
     Coq 8.6
@@ -259,7 +259,7 @@ option is followed by the unique prover identifier (as shown by
 
 .. code-block:: console
 
-    > why3 prove -P Alt-Ergo hello_proof.why
+    $ why3 prove -P Alt-Ergo hello_proof.why
     hello_proof.why HelloProof G1: Valid (0.00s, 1 steps)
     hello_proof.why HelloProof G2: Unknown (other) (0.01s)
     hello_proof.why HelloProof G3: Valid (0.00s, 1 steps)
@@ -273,7 +273,7 @@ call Alt-Ergo on goals ``G2`` and ``G3``.
 
 .. code-block:: console
 
-    > why3 prove -P Alt-Ergo hello_proof.why -T HelloProof -G G2 -G G3
+    $ why3 prove -P Alt-Ergo hello_proof.why -T HelloProof -G G2 -G G3
     hello_proof.why HelloProof G2 : Unknown: Unknown (0.01s)
     hello_proof.why HelloProof G3 : Valid (0.01s)
 
@@ -283,7 +283,7 @@ do as follows.
 
 .. code-block:: console
 
-    > why3 show transformations
+    $ why3 show transformations
     Known non-splitting transformations:
       [...]
 
@@ -296,7 +296,7 @@ on the resulting subgoals.
 
 .. code-block:: console
 
-    > why3 prove -P Alt-Ergo hello_proof.why -a split_goal_right -T HelloProof -G G2
+    $ why3 prove -P Alt-Ergo hello_proof.why -a split_goal_right -T HelloProof -G G2
     hello_proof.why HelloProof G2: Unknown (other) (0.01s)
     hello_proof.why HelloProof G2: Valid (0.00s, 1 steps)
 

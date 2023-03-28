@@ -117,11 +117,16 @@ let editor_command (prover: Whyconf.prover) fn =
         editor_command = "";
         editor_options = [] }
   in
-  let cmd_line =
-    List.fold_left (fun str s -> str ^ " " ^ s)
-                  editor.Whyconf.editor_command
-                  editor.Whyconf.editor_options in
-  Gnat_config.actual_cmd fn cmd_line
+  let cmd_line = Gnat_config.join " "
+     (editor.Whyconf.editor_command :: editor.Whyconf.editor_options) in
+  let limit = Call_provers.empty_limit in
+  let cmd, _, _ = 
+    Call_provers.actualcommand 
+      ~inplace:false
+      ~cleanup:false
+      ~config:(Whyconf.get_main Gnat_config.config) cmd_line limit fn in
+  Gnat_config.join " " cmd
+
 
 let manual_proof_info session pa =
   let pa = Session_itp.get_proof_attempt_node session pa in

@@ -162,6 +162,11 @@ end
 
 module WellFounded
 
+use export why3.WellFounded.WellFounded
+
+(** This is now part of the built-in theories. The contents is reproduced here for information
+{h <pre>
+
   inductive acc (r: 'a -> 'a -> bool) (x: 'a) =
   | acc_x: forall r, x: 'a. (forall y. r y x -> acc r y) -> acc r x
 
@@ -169,4 +174,8 @@ module WellFounded
     forall x. acc r x
 
 end
+</pre>}
 
+*)
+
+end

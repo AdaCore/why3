@@ -118,7 +118,7 @@ run () {
       --rac-steplimit=$steps --rac-timelimit=10 \
       --check-ce --rac-prover="$1" --ce-log-verbosity=5 \
       --library="$2" "${file_path}.mlw" \
-      --debug=check-ce-categorization${debug_vc_sp} \
+      --debug=check_ce:categorization${debug_vc_sp} \
     || true) 2>&1 \
     | remove_solver_details \
 	  > "$f.out"
@@ -173,6 +173,9 @@ for file in $files; do
         ;;
       "bv32")
         z3steps=2500000
+        ;;
+      "bv32_mono")
+        z3steps=100000
         ;;
       "bv32_toBig")
         z3steps=100000

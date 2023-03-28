@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -18,7 +18,7 @@ type driver
 (** Loading drivers *)
 
 val load_driver_file_and_extras :
-  Whyconf.main -> Env.env -> string -> string list -> driver
+  Whyconf.main -> Env.env -> string -> (string * string list) list -> driver
 (** [load_driver_file_and_extras main env file extras] loads the
    driver in file [file] and with additional drivers in list [extras],
    in the context of the configuration [main] and environment
@@ -29,10 +29,11 @@ val load_driver_for_prover :
 (** [load_driver main env p] loads the driver for prover [p], in the
    context of the configuration [main] and environment [env].*)
 
-val resolve_driver_name : Whyconf.main -> string -> string -> string
-(** [resolve_driver_name main dir name] resolves the driver name
-   [name] into a file name. [dir] is the name of the subdirectory of
-   DATADIR where driver files are expected to be.  *)
+val resolve_driver_name : Whyconf.main -> string -> ?extra_dir:string -> string -> string
+(** [resolve_driver_name main dir ?extra_dir name] resolves the driver
+   name [name] into a file name. [dir] is the name of the subdirectory
+   of DATADIR where driver files are expected to be. [?extra_dir] is
+   an optional extra directory to search into.  *)
 
 (** {2 Use a driver} *)
 
@@ -55,17 +56,6 @@ val get_filename : driver ->
   goal_name:string ->
   string
 (** Mangles a filename for the prover of the given driver *)
-
-(* unused outside ?
-val call_on_buffer :
-  command      : string ->
-  limit        : Call_provers.resource_limit ->
-  gen_new_file : bool ->
-  ?inplace     : bool ->
-  filename     : string ->
-  printer_mapping : Printer.printer_mapping ->
-  driver -> Buffer.t -> Call_provers.prover_call
- *)
 
 val print_task :
   ?old        : in_channel ->
@@ -95,6 +85,7 @@ val print_task_prepared :
   ?old       : in_channel ->
   driver -> Format.formatter -> Task.task -> Printer.printing_info
 
+(** Call prover on a task prepared by [prepare_task]. *)
 val prove_task_prepared :
   command      : string ->
   config       : Whyconf.main ->
@@ -103,6 +94,29 @@ val prove_task_prepared :
   ?inplace     : bool ->
   ?interactive : bool ->
   driver -> Task.task -> Call_provers.prover_call
+
+(** Call prover on a task already prepared and printed in the buffer.
+
+    The task shall be prepared by [prepare_task] and printed with
+    [print_task_prepared]; the buffer shall contain nothing else.
+
+    Parameters [input_file], [theory_name] and [goal_name] are used
+    to generate canonical temporary files for the prover according to its driver
+    definition. They are purely informative and their respective default
+    values are ["f"], ["T"] and ["vc"].
+
+    Parameter [get_model] shall be passed to obtain couter examples.
+    The printing-infos are those obtained from task preparation.
+*)
+val prove_buffer_prepared :
+  command      : string ->
+  config       : Whyconf.main ->
+  limit        : Call_provers.resource_limit ->
+  ?input_file  : string ->
+  ?theory_name : string ->
+  ?goal_name   : string ->
+  ?get_model   : Printer.printing_info ->
+  driver -> Buffer.t -> Call_provers.server_id
 
 (** Traverse all metas from a driver *)
 

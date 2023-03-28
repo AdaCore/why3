@@ -1,4 +1,3 @@
-
 BENCH ?= no
 
 ifeq ($(BENCH),yes)
@@ -19,41 +18,25 @@ ifeq ($(BENCH),yes)
   INCLUDE += -I ../../lib/why3
 endif
 
-
-BD=prover
-OCAMLC=ocamlopt.opt
-INCLUDES=$(INCLUDEALL) -I ../../plugins/tptp
-LIBS=unix.cmxa nums.cmxa $(BIGINTLIB).cmxa dynlink.cmxa str.cmxa menhirLib.cmx zip.cmxa why3.cmxa why3extract.cmxa tptp_ast.cmx tptp_typing.cmx tptp_parser.cmx tptp_lexer.cmx
+INCLUDES=$(INCLUDE) -I ../../plugins/tptp
+LIBS=$(BIGINTLIB).cmxa why3.cmxa tptp_typing.cmx tptp_parser.cmx tptp_lexer.cmx
 WHY3FLAGS=-L . --debug=ignore_unused_vars
-MLFLAGS=
-MLIFLAGS=
-MLEXECFLAGS=
+PKGS=$(addprefix -package ,$(EXTPKGS))
 
-.PHONY: clean depend extract replay
+.PHONY: clean doc extract replay
 
-$(BD): $(BD).cmx run.cmx
-	echo "WHY3SHARE="$(WHY3SHARE)
-	$(OCAMLC) $(INCLUDES) $(LIBS) $(MLFLAGS) $(MLEXECFLAGS) \
-		-o $(BD) $^
+main.opt: prover.cmx run.cmx
+	$(OCAMLFIND) ocamlopt $(PKGS) -linkpkg $(INCLUDES) $(LIBS) -o $@ $^
 
-extract: $(ML)
+extract: prover.ml
 
-$(BD).ml:
-	why3 $(WHY3FLAGS) extract -D ocaml64 -o $(BD).ml ProverTest.mlw
+prover.ml:
+	$(WHY3) $(WHY3FLAGS) extract -D ocaml64 -o prover.ml ProverTest.mlw
 
 %.cmx: %.ml
-	$(OCAMLC) $(INCLUDES) $(MLFLAGS) -c $<
+	$(OCAMLFIND) ocamlopt $(PKGS) $(INCLUDES) -c $<
 
-.depend: Makefile $(ML)
-	ocamldep.opt -I $(BD) $(ML) > .depend
-
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
-ifneq "$(MAKECMDGOALS:extract%=extract)" "extract"
-ifneq "$(MAKECMDGOALS:extract%=replay)" "replay"
-include .depend
-endif
-endif
-endif
+doc:
 
 replay:
 	@printf "===================================\n"
@@ -62,16 +45,12 @@ replay:
 	@printf "===================================\n"
 	@for i in *.mlw; do \
 		printf "Replaying $$i..." ; \
-		why3 $(WHY3FLAGS) replay -q `basename $$i .mlw` ; \
+		$(WHY3) $(WHY3FLAGS) replay -q `basename $$i .mlw` ; \
 	 done
 	@printf "===================================\n"
 	@printf "Ending time (UTC): "
 	@date --utc +%H:%M
 	@printf "===================================\n"
 
-depend: .depend
-
 clean:
-	rm -f $(BD)/*.o $(BD)/*.cmi $(BD)/*.cmx
-	rm -f $(BD)*.ml
-	rm -f *~ *.o *.cmi *.cmx build/prover
+	rm -f *.o *.cmi *.cmx prover.ml main.opt

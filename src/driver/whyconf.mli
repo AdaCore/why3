@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -100,10 +100,10 @@ val datadir: main -> string
 val set_datadir : main -> string -> main
 val loadpath: main -> string list
 val set_loadpath : main -> string list -> main
-val timelimit: main -> int
+val timelimit: main -> float
 val memlimit: main -> int
 val running_provers_max: main -> int
-val set_limits: main -> int -> int -> int -> main
+val set_limits: main -> float -> int -> int -> main
 
 val default_editor: main -> string
 (** Editor name used when no specific editor is known for a prover *)
@@ -149,7 +149,7 @@ type config_prover = {
   editor       : string;   (* Dedicated editor *)
   interactive  : bool; (* Interactive theorem prover *)
   extra_options: string list;
-  extra_drivers: string list;
+  extra_drivers: (string * string list) list;  (* dirname of extra config file, driver name *)
   configure_build : string; (* Added for spark, default = "" *)
   build_commands : string list; (* Added for spark, default = [] *)
 }
@@ -206,6 +206,12 @@ val get_editors : config -> config_editor Meditor.t
 val editor_by_id : config -> string -> config_editor
 (** return the configuration of the editor if found, otherwise raise
     [Not_found] *)
+
+val set_prover_editors : config -> string Mprover.t -> config
+
+val get_prover_editors : config -> string Mprover.t
+
+val get_prover_editor : config -> prover -> string
 
 (** prover upgrade policy *)
 
@@ -288,11 +294,11 @@ module User: sig
 
   val update_section : Rc.t -> string -> (Rc.section -> Rc.section) -> Rc.t
 
-  val update_prover_editor : config -> Mprover.key -> string -> config
+  val set_prover_editor : config -> Mprover.key -> string -> config
 
   val set_default_editor : config -> string -> config
 
-  val set_limits : time:int -> mem:int -> j:int -> config -> config
+  val set_limits : time:float -> mem:int -> j:int -> config -> config
 
 (*
   val set_dirs : libdir:string -> datadir:string -> config -> config

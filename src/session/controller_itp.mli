@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -109,7 +109,7 @@ val set_session_max_tasks : int -> unit
 val set_session_memlimit: controller -> int -> unit
 (** sets the default memlimit for proof attempts *)
 
-val set_session_timelimit: controller -> int -> unit
+val set_session_timelimit: controller -> float -> unit
 (** sets the default timelimit for proof attempts *)
 
 val set_session_prover_upgrade_policy :

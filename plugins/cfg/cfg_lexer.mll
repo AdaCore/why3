@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -263,6 +263,10 @@ rule token = parse
       { RIGHTPAR_QUOTE s }
   | ")" ('_' alpha suffix core_suffix* as s)
       { RIGHTPAR_USCORE s }
+  | "[|"
+      { LEFTSQBAR }
+  | "|]"
+      { BARRIGHTSQ }
   | op_char_pref op_char_4* quote* as s
       { OPPREF s }
   | op_char_1234* op_char_1 op_char_1234* quote* as s

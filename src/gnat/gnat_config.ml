@@ -406,31 +406,6 @@ let provers, prover_ce, prover_warn, config, env =
   in
   provers, prover_ce, prover_warn, config, env
 
-(* The function replaces %{f,t,T,m,l,d} to their corresponding values
-   in the string cmd.
-   This function is based on the Call_provers.actualcommand, for
-   some reason not in the Why3 API nor really convenient *)
-(* ??? delete this and use the one from Call_provers *)
-
-let actual_cmd ?main filename cmd =
-  let m = match main with
-    | None -> get_main config
-    | Some m -> m in
-  let replace_func s =
-    match (Re.Str.matched_string s).[1] with
-    | '%' -> "%"
-    | 'f' -> Sys.getcwd () ^ Filename.dir_sep ^ filename
-    (* Can %t and %T be on an editor command line and have a meaning?
-       Is it allowed by Why3config? *)
-    | 't' -> string_of_int (timelimit m)
-    | 'T' -> string_of_int (succ (timelimit m))
-    | 'm' -> string_of_int (memlimit m)
-    | 'l' -> libdir m
-    | 'd' -> datadir m
-    | 'o' -> libobjdir m
-    | a ->  Char.escaped a in
-  Re.Str.global_substitute (Re.Str.regexp "%.") replace_func cmd
-
 (* function to build manual elements *)
 (* pass proof dir and prover as args *)
 
@@ -442,6 +417,20 @@ let list_and_filter dir =
                      else l) [] (Sys.readdir dir)
   with
   | Sys_error _ -> []
+
+let join separator = function
+  | [] -> ""
+  | [str] -> str
+  | str::strs ->
+    let buf = Buffer.create 0 in
+    Buffer.add_string buf str;
+    List.iter (function
+        | "" -> ()
+        | s ->
+          Buffer.add_string buf separator;
+          Buffer.add_string buf s)
+      strs;
+    Buffer.contents buf
 
 let build_shared proof_dir (prover: prover) =
   let prover_name = prover.prover_name in
@@ -472,8 +461,18 @@ let build_shared proof_dir (prover: prover) =
     let hackish_filename =
       List.fold_left (fun s fn -> s ^ fn)
                      (List.hd vc_files) (List.tl vc_files) in
-    let cmd = actual_cmd hackish_filename cmd in
-    Sys.command cmd
+    let config = get_main config in
+    let limit = { Call_provers.limit_time = timelimit config;
+                  limit_mem = memlimit config;
+                  limit_steps = 0
+                } in
+    let cmd, _, _ =
+      Call_provers.actualcommand
+        ~cleanup:false
+        ~inplace:false
+        ~config
+        cmd limit hackish_filename in
+    Sys.command (join " " cmd)
   in
 
   let check_success res msg =
@@ -565,13 +564,13 @@ let filename =
 
 let limit_time ~prover ~warning =
   if warning then
-    !opt_warn_timeout
+    float (!opt_warn_timeout)
   else match prover_ce, !opt_timeout with
   | Some p, _ when prover = p.prover_name &&
                    !opt_ce_timeout <> None ->
-      Opt.get !opt_ce_timeout
+      float (Opt.get !opt_ce_timeout)
   | _, None -> Call_provers.empty_limit.Call_provers.limit_time
-  | _, Some x -> x
+  | _, Some x -> float (x)
 
 type steps_convert = { add : int; mult : int }
 

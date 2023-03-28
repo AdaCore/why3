@@ -2,7 +2,7 @@ theory Why3_Int
 imports Why3_Setup
 begin
 
-section {* Integers and the basic operators *}
+section \<open> Integers and the basic operators \<close>
 
 why3_open "int/Int.xml"
 
@@ -51,7 +51,7 @@ why3_vc CompatOrderMult using assms by (rule mult_right_mono)
 why3_end
 
 
-section {* Absolute Value *}
+section \<open> Absolute Value \<close>
 
 why3_open "int/Abs.xml"
 
@@ -64,7 +64,7 @@ why3_vc Abs_pos by simp
 why3_end
 
 
-section {* Minimum and Maximum *}
+section \<open> Minimum and Maximum \<close>
 
 why3_open "int/MinMax.xml"
 
@@ -87,7 +87,7 @@ why3_vc minqtdef by auto
 why3_end
 
 
-section {* Euclidean Division *}
+section \<open> Euclidean Division \<close>
 
 definition ediv :: "int \<Rightarrow> int \<Rightarrow> int" (infixl "ediv" 70) where
   "a ediv b = sgn b * (a div \<bar>b\<bar>)"
@@ -186,7 +186,7 @@ qed
 
 why3_end
 
-section {* Computer Division *}
+section \<open> Computer Division \<close>
 
 definition cdiv :: "int \<Rightarrow> int \<Rightarrow> int" (infixl "cdiv" 70) where
   "a cdiv b = sgn a * sgn b * (\<bar>a\<bar> div \<bar>b\<bar>)"
@@ -294,7 +294,7 @@ qed (simp add: cdiv_def)
 why3_end
 
 
-section {* Division by 2 *}
+section \<open> Division by 2 \<close>
 
 why3_open "int/Div2.xml"
 
@@ -304,7 +304,7 @@ why3_vc div2
 why3_end
 
 
-section {* Power of an integer to an integer *}
+section \<open> Power of an integer to an integer \<close>
 
 why3_open "int/Power.xml"
 

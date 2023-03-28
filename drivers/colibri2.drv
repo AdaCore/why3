@@ -123,13 +123,26 @@ theory real.FromInt
   (* remove allprops *)
 end
 
-(*
 theory real.Abs
-  syntax function abs "(ite (>= %1 0.0) %1 (- %1))"
-
-  remove allprops
+  syntax function abs "(colibri_abs_real %1)"
 end
 
+theory int.Abs
+  syntax function abs "(colibri_abs_int %1)"
+end
+
+theory int.EuclideanDivision
+  syntax function div "(div %1 %2)"
+  syntax function mod "(mod %1 %2)"
+end
+
+theory int.ComputerDivision
+  syntax function div "(colibri_cdiv %1 %2)"
+  syntax function mod "(colibri_crem %1 %2)"
+end
+
+
+(*
 theory real.MinMax
 
   remove allprops

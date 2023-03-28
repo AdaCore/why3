@@ -1,13 +1,14 @@
-Invariant for loop [anonymous_loop_0] is 0 <= i.contents /\ i.contents <= 15
-Domains for loop [anonymous_loop_0] are i = [0;15]
 Invariant for loop [anonymous_loop_0] is
-  0 <= i1.contents /\ i1.contents <= 15
-Domains for loop [anonymous_loop_0] are i1 = [0;15]
+  (0 <= i.contents /\ i.contents <= 15) /\ o = 0
+Domains for loop [anonymous_loop_0] are o = [0;0]; i = [0;15]
+Invariant for loop [anonymous_loop_0] is
+  (0 <= i1.contents /\ i1.contents <= 15) /\ o1 = 0
+Domains for loop [anonymous_loop_0] are o1 = [0;0]; i1 = [0;15]
 File bench/infer/while5.mlw:
 Goal b'vc.
-Prover result is: Unknown () (0.00s).
+Prover result is: Unknown () (0.02s).
 
 File bench/infer/while5.mlw:
 Goal b2'vc.
-Prover result is: Unknown () (0.01s).
+Prover result is: Unknown () (0.00s).
 

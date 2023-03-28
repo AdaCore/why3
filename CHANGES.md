@@ -1,31 +1,65 @@
 :x: marks a potential source of incompatibility
 
 Tools
-  * `libdir` and `datadir` are not stored anymore in the configuration
-    file, but they can be manually set there if desired; see also the
-    environment variables `WHY3LIB` and `WHY3DATA`
+  * the driver files appearing in a config file specified using option
+    `--extra-config` are searched also in the sub-directory of that
+    config file
 
-MLCFG language
-  * attributes on the body of an MLCFG function are now supported
+Version 1.6.0, March 7 2023
+---------------------------
+
+Core
+  * added meta `vc:proved_wf` for annotating well-founded relations, to make
+    them easier to use in variants; see Section 8.2.3 of the manual
+
+Standard library
+  * relations `ult`, `ugt`, `slt`, and `sgt` from `bv` modules are now
+    recognized as well-founded
+
+Tools
+  * `libdir` and `datadir` are not stored anymore in the configuration file,
+    but they can still be manually set there if needed;
+    see also the environment variables `WHY3LIB` and `WHY3DATA`
+  * several debug flags have been renamed;
+    use `why3 --list-debug-flags` to obtain the new names :x:
+  * global directives in extra drivers are now taken into account
+  * time limits now have a sub-second accuracy, e.g., `--timelimit=0.5`
+
+IDE
+  * pressing Tab now auto-completes commands
+  * added menu item "File/Export as Zip" to export a zip archive of the
+    current session and all the related files
+
+Web interface TryWhy3
+  * proof obligations are now displayed as a sequent rather than a full task
 
 Python language
   * added `by` and `so` connectives in predicates
   * fixed overloading of `+` in Python code
   * added `add_list` for list concatenation in logic
 
+MLCFG language
+  * attributes on function bodies are now supported
+  * attributes `[@cfg:stackify]` and `[@cfg:subregion_analysis]` can
+    be used to improve the VC structure and generate extra invariants;
+    see Sections 7.3.5 and 7.3.6 of the manual
+
 API
-  * source locations are now represented by both a start line number
-    and an end line number; the fourth number is thus now the column
-    number on the end line :x:
+  * source locations now use both a starting line and an ending line;
+    the fourth number is thus the column on the last line :x:
   * several functions from `Call_prover` and `Driver` now take as input a
     `Whyconf.main` configuration type instead of directly taking `libdir`
     and `datadir` :x:
   * `Whyconf.load_driver` has been replaced by `Driver.load_driver_for_prover` :x:
   * `Warning.emit` has been replaced by `Loc.warning` :x:
+  * representation of counterexamples has been modified;
+    see Sections 5.3.7.1, 11.10.3, and 12.11 of the manual
 
 Provers
-  * support for CVC5 1.0.0 (released April 6, 2022)
-  * support for Alt-Ergo 2.4.2 (released August 1, 2022)
+  * support for CVC5 1.0.0 to 1.0.4 (released Jan 31, 2023)
+  * support for Alt-Ergo 2.4.2 (released Aug 1, 2022)
+  * support for Z3 4.12.0 and 4.12.1 (released Jan 18, 2023)
+  * support for Isabelle 2022 (released Oct 2022)
 
 Miscellaneous
   * fixed soundness bug with existential quantifiers in `introduce_premises`
@@ -51,20 +85,20 @@ Python language
   (contribution by Jean-Paul Bodeveix)
 
 Provers
-  * support for Z3 4.9.0 and 4.9.1 (released July 6, 2022)
-  * support for Z3 4.10.0, 4.10.1 and 4.10.2 (released July 30, 2022)
-  * support for Z3 4.11.0 (released August 18, 2022)
-  * support for Coq 8.16.0 (release September 5, 2022)
-  * support for Gappa 1.4.0 (released April 16, 2022)
+  * support for Z3 4.9.0 and 4.9.1 (released Jul 6, 2022)
+  * support for Z3 4.10.0, 4.10.1, and 4.10.2 (released Jul 30, 2022)
+  * support for Z3 4.11.0 (released Aug 18, 2022)
+  * support for Coq 8.16.0 (release Sep 5, 2022)
+  * support for Gappa 1.4.0 (released Apr 16, 2022)
 
 Version 1.5.0, April 29, 2022
 -----------------------------
 
 Standard library
-  * deeply revised library `mach.bv` for bitvectors operations in
-    programs. Pre- and post-conditions are now expressed both in terms
-    of mathematical integers and in terms of purely bit-vector
-    formulas, thanks to conversion to 128 bits :x:
+  * deeply revised library `mach.bv` for bitvector operations in programs;
+    pre- and post-conditions are now expressed both in terms
+    of mathematical integers and in terms of pure bitvectors,
+    thanks to conversion to 128 bits :x:
 
 Core
   * equality of numeric literals is now semantic, i.e., independent of the radix :x:
@@ -133,7 +167,7 @@ Bug fixes
   * fixed usage of various dependencies: `menhir`, `camlzip`, `ppx_deriving`, `coq-flocq`, `mlmpfr`
 
 Provers
-  * support for Alt-Ergo 2.4.1 (released July 28, 2021)
+  * support for Alt-Ergo 2.4.1 (released Jul 28, 2021)
 
 Version 1.4.0, March 13, 2021
 -----------------------------
@@ -365,7 +399,7 @@ Realizations
 
 Provers
   * support for Alt-Ergo 2.3.1 (released Feb 19, 2020)
-  * support for Isabelle 2019 (released June 2019)
+  * support for Isabelle 2019 (released Jun 2019)
   * support for Vampire 4.2.2 (released Dec 14, 2017)
   * support for Coq 8.10.0 (released Oct 8, 2019)
   * support for Coq 8.10.1 (released Oct 25, 2019)

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -27,12 +27,12 @@ open Why3
 let () = Debug.set_flag Call_provers.debug
 *)
 
-let limit = Call_provers.{ limit_time = 1 ;
+let limit = Call_provers.{ limit_time = 1. ;
                            limit_mem  = 1000;
                            limit_steps = -1;}
 
 let run_on_task fmt prover prover_driver t =
-  let limit = { Call_provers.empty_limit with Call_provers.limit_time = 3 } in
+  let limit = { Call_provers.empty_limit with Call_provers.limit_time = 3. } in
   let result =
     Call_provers.wait_on_call
       (Why3.Driver.prove_task

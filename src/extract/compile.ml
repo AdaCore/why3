@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -456,10 +456,6 @@ module Translate = struct
         let e1 = expr info svar e1.e_mask e1 in
         let e2 = expr info svar mask e2 in
         let e3 = expr info svar mask e3 in
-        if (e2.ML.e_mlty <> e3.ML.e_mlty) then
-          Loc.errorm ?loc:e.e_loc
-            "Compiler error: %a <> %a"
-             ML.pp_ty e2.ML.e_mlty ML.pp_ty e3.ML.e_mlty;
         ML.e_if e1 e2 e3 mask e2.ML.e_mlty eff attrs
     | Ewhile (e1, _, _, e2) ->
         Debug.dprintf debug_compile "compiling while block@.";

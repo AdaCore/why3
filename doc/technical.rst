@@ -1531,6 +1531,10 @@ WhyML Attributes
 
 .. why3:attribute:: case_split
 
+.. why3:attribute:: cfg:stackify
+
+.. why3:attribute:: cfg:subregion_analysis
+
 .. why3:attribute:: extraction:inline
 
    If the name of a function is labeled with this attribute, its body
@@ -1576,11 +1580,6 @@ WhyML Attributes
    This attribute indicates whether VCs for termination should be
    generated.  See :numref:`sec.terminationvc` for details.
 
-.. why3:attribute:: vc:trusted_wf
-
-   This attribute indicates that a binary relation must be assumed
-   well-founded.  See :numref:`sec.trusted_wf` for details.
-
 .. why3:attribute:: vc:keep_precondition
 
    This attribute indicates whether preconditions of calls should be kept
@@ -1623,20 +1622,29 @@ Why3 Metas
 
 .. why3:meta:: rewrite_def
 
+.. why3:meta:: vc:proved_wf
+
+  Declares an hypothesis as a proof of well-foundness of a binary
+  relation. See section :numref:`sec.custom_wf`.
+
 .. _sec.debug:
 
 Debug Flags
 -----------
 
-.. why3:debug:: infer-loop
+The list of debug flags can be obtained using
+:file:`why3 --list-debug-flags`. The following excerpt is the
+list of flags mentioned in this manual.
 
-.. why3:debug:: infer-print-ai-result
+.. why3:debug:: infer:loop
 
-.. why3:debug:: infer-print-cfg
+.. why3:debug:: infer:print_ai_result
 
-.. why3:debug:: print-inferred-invs
+.. why3:debug:: infer:print_cfg
 
-.. why3:debug:: print-domains-loop
+.. why3:debug:: print:inferred_invs
+
+.. why3:debug:: print:domains_loop
 
 .. why3:debug:: stack_trace
 
@@ -1655,8 +1663,8 @@ and reproduced below.
 
 .. _sec.jsonce:
 
-Structure of Counterexample files in JSON format
-------------------------------------------------
+Structure of Counterexamples
+----------------------------
 
 Generated counterexamples can be exported in JSON format.
 The JSON output follows the JSON Schema given in :file:`share/ce-models.json`

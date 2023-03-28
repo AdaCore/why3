@@ -1,4 +1,4 @@
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/668_projection.mlw", line 13, characters 14-50)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/668_projection.mlw", line 13, characters 14-50)
@@ -18,24 +18,24 @@ File int.mlw:
     Constant one initialization
     one = 1
 File bv.mlw:
-  Line 617:
+  Line 632:
     Constant zeros initialization
   Line 192:
     (giant-step) execution of unimplemented function with args:
     result = 0
-  Line 617:
+  Line 632:
     zeros = 0
     Constant one initialization
   Line 197:
     (giant-step) execution of unimplemented function with args:
     result = 0
-  Line 617:
+  Line 632:
     one = 0
     Constant ones initialization
   Line 199:
     (giant-step) execution of unimplemented function with args:
     result = 0
-  Line 617:
+  Line 632:
     ones = 0
 File 668_projection.mlw:
   Line 12:
@@ -56,16 +56,11 @@ File 668_projection.mlw:
       min = epsilon x:t. t'int x = 2
       result = epsilon x:t. t'int x = 3
 
-<check-ce-categorization>Categorizations of models:
-- Selected model 0: BAD_CE
-  - Concrete RAC: NORMAL
-  - Abstract RAC: NORMAL
-- Checked model 1: BAD_CE
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
 File "bench/check-ce/668_projection.mlw", line 16, characters 14-26:
 Sub-goal Postcondition of goal g'vc.
 Prover result is: Unknown or time/memory/step limit.
-Sorry, we don't have a good counterexample for you :(
-
 
