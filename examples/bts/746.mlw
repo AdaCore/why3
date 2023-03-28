@@ -1,0 +1,60 @@
+module M
+
+type seq 'a
+type t = { l : seq int }
+constant x : t
+goal seq_l_vc : true
+
+end
+
+
+module M0
+
+type seq 'a
+type t  = { l : seq int }
+constant self : t
+constant result : seq int = self.l
+goal seq_l_vc : result = self.l
+
+end
+
+module M1
+  use int.Int
+  use seq.Seq
+
+  type t  = {
+    a : int;
+    l : seq int;
+  }
+
+  let ghost function seq_l  (self : t) : Seq.seq int
+    ensures { result = self.l }
+  =
+    self.l
+
+  let function double_a (self : t) : int
+    ensures { result = 2 * self.a }
+  =
+    self.a + self.a
+end
+
+module M2
+  use int.Int
+  use seq.Seq
+
+  type t  = {
+    a : int;
+    l : seq int;
+  }
+
+  let function double_a (self : t) : int
+    ensures { result = 2 * self.a }
+  =
+    self.a + self.a
+
+  let ghost function seq_l  (self : t) : Seq.seq int
+    ensures { result = self.l }
+  =
+    self.l
+
+end
