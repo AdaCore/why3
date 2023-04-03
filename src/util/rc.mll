@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -39,6 +39,7 @@ exception IdentExpected of string * rc_value
 *)
 exception IntExpected of string * rc_value
 exception BoolExpected of string * rc_value
+exception FloatExpected of string * rc_value
 
 (* dead code
 let error ?loc e = match loc with
@@ -114,6 +115,10 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | IntExpected (s,v) ->
       fprintf fmt "cannot set field '%s' to %a: an integer is expected"
         s print_rc_value v
+  | FloatExpected (s,v) ->
+      fprintf fmt "cannot set field '%s' to %a: a float is expected"
+        s print_rc_value v
+
   | e -> raise e)
 
 type section = rc_value list Mstr.t
@@ -226,6 +231,13 @@ let set_valueo write section key valueo =
   | None -> Mstr.remove key section
   | Some value -> Mstr.add key [write value] section
 
+let rfloat k = function
+  | RCfloat n -> n
+  | RCint n -> float n
+  | v -> raise (FloatExpected (k,v))
+
+let wfloat f = RCfloat f
+
 let rint k = function
   | RCint n -> n
   | v -> raise (IntExpected (k,v))
@@ -243,6 +255,9 @@ let rstring k = function
   | v -> raise (StringExpected (k,v))
 
 let wstring ?(escape_eol=false) s = RCstring (s,escape_eol)
+
+let get_float = get_value rfloat
+let set_float = set_value wfloat
 
 let get_int = get_value rint
 let get_intl = get_valuel rint
@@ -297,8 +312,8 @@ let letter = ['a'-'z' 'A'-'Z']
 let ident = (letter | '_') (letter | digit | '_' | '-' | '+' | '.') *
 let sign = '-' | '+'
 let integer = sign? digit+
-let mantissa = ['e''E'] sign? digit+
-let real = sign? digit* '.' digit* mantissa?
+let exponent = ['e''E'] sign? digit+
+let real = sign? digit* '.' digit* exponent?
 let escape = ['\\''"''n''t''r']
 
 rule record = parse

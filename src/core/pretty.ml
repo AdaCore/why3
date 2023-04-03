@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -674,8 +674,9 @@ let print_tdecl fmt td = match td.td_node with
                     (print_list_suf comma print_inst_ls) lm
                     (print_list_suf comma print_inst_pr) pm
   | Meta (m,al) ->
-      fprintf fmt "@[<hov 2>(* meta %s %a *)@]"
-        m.meta_name (print_list comma print_meta_arg) al
+      fprintf fmt "@[<hov 2>(* meta %s%a *)@]"
+        m.meta_name
+        (print_list_delim ~start:space ~stop:nothing ~sep:comma print_meta_arg) al
 
 let print_theory fmt th =
   fprintf fmt "@[<hov 2>theory %a%a@\n%a@]@\nend@."
@@ -1098,6 +1099,13 @@ let () = Exn_printer.register
   | FloatConflict ts ->
       Format.fprintf fmt "Conflicting definitions for float type %a"
         print_ts ts
+  | ProvedWfConflict ls ->
+      Format.fprintf fmt "Conflicting definitions for well-foundedness of relation %a"
+        print_ls ls
+  | IllFormedWf(pr,ls) ->
+      Format.fprintf fmt
+        "meta \"vc:proved_wf\" requires that proposition %a has the form (well_founded %a)"
+        print_pr pr print_ls ls
   | _ -> raise exn
   end
 

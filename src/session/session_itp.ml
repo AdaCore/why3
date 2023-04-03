@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -551,7 +551,7 @@ open Format
 open Ident
 
 let print_proof_attempt fmt pa =
-  fprintf fmt "@[<h>%a tl=%d %a@]"
+  fprintf fmt "@[<h>%a tl=%g %a@]"
           Whyconf.print_prover pa.prover
           pa.limit.Call_provers.limit_time
           (Pp.print_option (Call_provers.print_prover_result ~json:false))
@@ -987,6 +987,11 @@ let bool_attribute field r def =
     | _ -> assert false
   with Not_found -> def
 
+let float_attribute_def field r def =
+  try
+    float_of_string (List.assoc field r.Xml.attributes)
+  with Not_found | Invalid_argument _ -> def
+
 let int_attribute_def field r def =
   try
     int_of_string (List.assoc field r.Xml.attributes)
@@ -1009,6 +1014,7 @@ let string_attribute field r =
     Loc.warning "[Error] missing required attribute '%s' from element '%s'@."
       field r.Xml.name;
     assert false
+
 
 let default_unknown_result =
      {
@@ -1139,7 +1145,7 @@ and load_proof_or_transf session old_provers pid a =
               Some path
           in
           let obsolete = bool_attribute "obsolete" a false in
-          let timelimit = int_attribute_def "timelimit" a timelimit in
+          let timelimit = float_attribute_def "timelimit" a timelimit in
           let steplimit = int_attribute_def "steplimit" a steplimit in
           let memlimit = int_attribute_def "memlimit" a memlimit in
           let limit = { Call_provers.limit_time  = timelimit;
@@ -1247,7 +1253,7 @@ let load_file session old_provers f =
         let name = string_attribute "name" f in
         let version = string_attribute "version" f in
         let altern = string_attribute_def "alternative" f "" in
-        let timelimit = int_attribute_def "timelimit" f 5 in
+        let timelimit = float_attribute_def "timelimit" f 5. in
         let steplimit = int_attribute_def "steplimit" f 1 in
         let memlimit = int_attribute_def "memlimit" f 1000 in
         let p = {Whyconf.prover_name = name;
@@ -1919,7 +1925,15 @@ open Format
 let save_string = Pp.html_string
 
 type save_ctxt = {
-  provers : (int * int * int * int) Mprover.t;
+  provers : (
+    (* id *)
+    int *
+    (* timelimit *)
+    float *
+    (* steplimit *)
+    int *
+    (* mem limit *)
+    int) Mprover.t;
   ch_shapes : Compress.Compress_z.out_channel;
 }
 
@@ -1953,7 +1967,7 @@ let get_prover_to_save prover_ids p (timelimits,steplimits,memlimits) provers =
     Hashtbl.fold
       (fun t f ((_,f') as t') -> if f > f' then (t,f) else t')
       timelimits
-      (0,0)
+      (0.,0)
   in
   let mostfrequent_steplimit,_ =
     Hashtbl.fold
@@ -1997,7 +2011,7 @@ let save_prover fmt id (p,mostfrequent_timelimit,mostfrequent_steplimit,mostfreq
     if mostfrequent_steplimit < 0 then None else Some mostfrequent_steplimit
   in
   fprintf fmt "@\n@[<h><prover@ id=\"%i\"@ name=\"%a\"@ \
-               version=\"%a\"%a@ timelimit=\"%d\"%a@ memlimit=\"%d\"/>@]"
+               version=\"%a\"%a@ timelimit=\"%g\"%a@ memlimit=\"%d\"/>@]"
     id save_string p.Whyconf.prover_name save_string p.Whyconf.prover_version
     (fun fmt s -> if s <> "" then fprintf fmt "@ alternative=\"%a\""
         save_string s)
@@ -2021,6 +2035,9 @@ let save_bool_def name def fmt b =
 
 let save_int_def name def fmt n =
   if n <> def then fprintf fmt "@ %s=\"%d\"" name n
+
+let save_float_def name def fmt n =
+  if n <> def then fprintf fmt "@ %s=\"%g\"" name n
 
 let save_result fmt r =
   let steps = if  r.Call_provers.pr_steps >= 0 then
@@ -2054,7 +2071,7 @@ let save_proof_attempt fmt ((id,tl,sl,ml),a) =
   fprintf fmt
     "@\n@[<h><proof@ prover=\"%i\"%a%a%a%a>"
     id
-    (save_int_def "timelimit" tl) (a.limit.Call_provers.limit_time)
+    (save_float_def "timelimit" tl) (a.limit.Call_provers.limit_time)
     (save_int_def "steplimit" sl) (a.limit.Call_provers.limit_steps)
     (save_int_def "memlimit" ml) (a.limit.Call_provers.limit_mem)
     (save_bool_def "obsolete" false) a.proof_obsolete;
@@ -2211,6 +2228,30 @@ let save_session (s : session) =
   session_dir_for_save := s.session_dir;
   let fs = if Compress.compression_supported then fz else fs in
   save f fs s
+
+let export_as_zip s =
+  let cd = Filename.dirname s.session_dir in
+  let dir = Filename.basename s.session_dir in
+  let archive = dir ^ ".zip" in
+  let files =
+    Hfile.fold
+      (fun _ f acc ->
+         let l = Sysutil.decompose_path f.file_path in
+         let l =
+           match l with
+           | ".." :: r -> r
+           | _ -> dir :: l
+         in
+         let f = String.concat Filename.dir_sep l in
+         acc ^ " " ^ f)
+      s.session_files dir
+  in
+  let cmd = "cd " ^ cd ^ " ; zip -r " ^ archive ^ " " ^ files in
+  let n = Sys.command cmd in
+  if n = 0 then archive else raise (Sys_error ("cannot produce archive " ^ archive))
+
+
+
 
 (**********************)
 (* Edition of session *)

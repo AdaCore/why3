@@ -1,7 +1,8 @@
-Invariant for loop [anonymous_loop_0] is 0 <= i.contents
-Domains for loop [anonymous_loop_0] are x = ]-oo;+oo[; i = [0;+oo[
-Invariant for loop [anonymous_loop_0] is 0 <= i1.contents
-Domains for loop [anonymous_loop_0] are x1 = ]-oo;+oo[; i1 = [0;+oo[
+Invariant for loop [anonymous_loop_0] is 0 <= i.contents /\ o = 0
+Domains for loop [anonymous_loop_0] are x = ]-oo;+oo[; o = [0;0]; i = [0;+oo[
+Invariant for loop [anonymous_loop_0] is 0 <= i1.contents /\ o1 = 0
+Domains for loop [anonymous_loop_0] are
+  x1 = ]-oo;+oo[; o1 = [0;0]; i1 = [0;+oo[
 File bench/infer/incr.mlw:
 Goal incr1'vc.
 Prover result is: Timeout (1.00s).

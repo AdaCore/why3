@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -13,6 +13,8 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require HighOrd.
+Require WellFounded.
 Require bool.Bool.
 Require int.Int.
 Require int.Abs.
@@ -226,6 +228,15 @@ Qed.
 Definition zeros_aux {l} : Vector.t bool l.
   exact (Vector.const false l).
 Defined.
+
+Global Instance t_WhyType : WhyType t.
+Proof.
+split.
+exact zeros_aux.
+intros x y.
+eapply (VectorEq.eq_dec _ eqb).
+apply eqb_true_iff.
+Qed.
 
 (* Why3 goal *)
 Definition zeros : t.
@@ -1430,11 +1441,90 @@ Qed.
 (* Why3 assumption *)
 Definition ult (x:t) (y:t) : Prop := ((to_uint x) < (to_uint y))%Z.
 
+(* Why3 goal *)
+Definition ult_closure : t -> t -> Init.Datatypes.bool.
+Proof.
+intros x y.
+case (Z_lt_dec (to_uint x) (to_uint y)); intro H.
+exact true.
+exact false.
+Defined.
+
+(* Why3 goal *)
+Lemma ult_closure_def :
+  forall (y:t) (y1:t),
+  ((ult_closure y y1) = Init.Datatypes.true) <-> ult y y1.
+Proof.
+intros y y1.
+unfold ult_closure, ult.
+case (Z_lt_dec (to_uint y) (to_uint y1)); intro H.
+split; auto.
+split; auto.
+discriminate.
+Qed.
+
+(* Why3 goal *)
+Lemma ult_wf : WellFounded.well_founded ult_closure.
+Proof.
+intros x.
+remember (to_uint x) as x'.
+assert (H := Z.lt_wf 0 x').
+revert x Heqx'.
+induction H as [x' _].
+intros x ->.
+constructor.
+intros y HR.
+apply (H (to_uint y)).
+2: easy.
+split.
+apply to_uint_bounds.
+now apply -> ult_closure_def.
+Qed.
+
 (* Why3 assumption *)
 Definition ule (x:t) (y:t) : Prop := ((to_uint x) <= (to_uint y))%Z.
 
 (* Why3 assumption *)
 Definition ugt (x:t) (y:t) : Prop := ((to_uint y) < (to_uint x))%Z.
+
+(* Why3 goal *)
+Definition ugt_closure : t -> t -> Init.Datatypes.bool.
+Proof.
+intros x y.
+case (Z_lt_dec (to_uint y) (to_uint x)); intro H.
+exact true.
+exact false.
+Defined.
+
+(* Why3 goal *)
+Lemma ugt_closure_def :
+  forall (y:t) (y1:t),
+  ((ugt_closure y y1) = Init.Datatypes.true) <-> ugt y y1.
+Proof.
+intros y y1.
+unfold ugt_closure,ugt.
+case (Z_lt_dec (to_uint y1) (to_uint y)); intro H.
+split; auto.
+split; auto; discriminate.
+Qed.
+
+(* Why3 goal *)
+Lemma ugt_wf : WellFounded.well_founded ugt_closure.
+Proof.
+intros x.
+remember (to_uint x) as x'.
+assert (H := Z.gt_wf two_power_size x').
+revert x Heqx'.
+induction H as [x' _].
+intros x ->.
+constructor.
+intros y HR.
+apply (H (to_uint y)).
+2: easy.
+split.
+now apply -> ugt_closure_def.
+apply Zlt_le_weak, to_uint_bounds.
+Qed.
 
 (* Why3 assumption *)
 Definition uge (x:t) (y:t) : Prop := ((to_uint y) <= (to_uint x))%Z.
@@ -1442,11 +1532,95 @@ Definition uge (x:t) (y:t) : Prop := ((to_uint y) <= (to_uint x))%Z.
 (* Why3 assumption *)
 Definition slt (v1:t) (v2:t) : Prop := ((to_int v1) < (to_int v2))%Z.
 
+(* Why3 goal *)
+Definition slt_closure : t -> t -> Init.Datatypes.bool.
+Proof.
+intros x y.
+case (Z_lt_dec (to_int x) (to_int y)); intro H.
+exact true.
+exact false.
+Defined.
+
+(* Why3 goal *)
+Lemma slt_closure_def :
+  forall (y:t) (y1:t),
+  ((slt_closure y y1) = Init.Datatypes.true) <-> slt y y1.
+Proof.
+intros y y1.
+unfold slt_closure,slt.
+case (Z_lt_dec (to_int y) (to_int y1)); intro H.
+split; auto.
+split; auto; discriminate.
+Qed.
+
+(* Why3 goal *)
+Lemma slt_wf : WellFounded.well_founded slt_closure.
+Proof.
+intros x.
+remember (to_int x) as x'.
+assert (H := Z.lt_wf (-two_power_size) x').
+revert x Heqx'.
+induction H as [x' _].
+intros x ->.
+constructor.
+intros y HR.
+apply (H (to_int y)).
+2: easy.
+split.
+2: now apply -> slt_closure_def.
+clear.
+generalize (to_int'def y).
+unfold is_signed_positive.
+destruct Bsign ; generalize (to_uint_bounds y) ; lia.
+Qed.
+
 (* Why3 assumption *)
 Definition sle (v1:t) (v2:t) : Prop := ((to_int v1) <= (to_int v2))%Z.
 
 (* Why3 assumption *)
 Definition sgt (v1:t) (v2:t) : Prop := ((to_int v2) < (to_int v1))%Z.
+
+(* Why3 goal *)
+Definition sgt_closure : t -> t -> Init.Datatypes.bool.
+Proof.
+intros x y.
+case (Z_lt_dec (to_int y) (to_int x)); intro H.
+exact true.
+exact false.
+Defined.
+
+(* Why3 goal *)
+Lemma sgt_closure_def :
+  forall (y:t) (y1:t),
+  ((sgt_closure y y1) = Init.Datatypes.true) <-> sgt y y1.
+Proof.
+intros y y1.
+unfold sgt_closure,sgt.
+case (Z_lt_dec (to_int y1) (to_int y)); intro H.
+split; auto.
+split; auto; discriminate.
+Qed.
+
+(* Why3 goal *)
+Lemma sgt_wf : WellFounded.well_founded sgt_closure.
+Proof.
+intros x.
+remember (to_int x) as x'.
+assert (H := Z.gt_wf two_power_size x').
+revert x Heqx'.
+induction H as [x' _].
+intros x ->.
+constructor.
+intros y HR.
+apply (H (to_int y)).
+2: easy.
+split.
+now apply -> sgt_closure_def.
+clear.
+generalize (to_int'def y).
+unfold is_signed_positive.
+destruct Bsign ; generalize (to_uint_bounds y) ; lia.
+Qed.
 
 (* Why3 assumption *)
 Definition sge (v1:t) (v2:t) : Prop := ((to_int v2) <= (to_int v1))%Z.

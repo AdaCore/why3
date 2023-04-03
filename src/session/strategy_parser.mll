@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -93,10 +93,26 @@
     with Failure _ ->
       match s with
       | "%t" -> None
+      | "%.t" -> None
+      | "%T" -> None
       | "%m" -> None
       | "%s" -> None
       | _ ->
           error "unable to parse %s argument '%s'" msg s
+
+  let real msg s =
+    try Some (float_of_string s)
+    with Failure _ ->
+      match s with
+      | "%t" -> None
+      | "%.t" -> None
+      | "%T" -> None
+      | "%S" -> None
+      | "%m" -> None
+      | "%s" -> None
+      | _ ->
+          error "unable to parse %s argument '%s'" msg s
+
 
   let transform code t =
     try
@@ -111,11 +127,15 @@
 
 let space = [' ' '\t' '\r' '\n']
 let ident = [^ ' ' '\t' '\r' '\n' ':' '#']+
-let integer = ['0'-'9']+
+let digit = ['0'-'9']
+let integer = digit+
 let goto = 'g' | "goto"
 let call = 'c' | "call"
 let transform = 't' | "transform"
-let timelimit = integer | "%t"
+let sign = '-' | '+'
+let exponent = ['e''E'] sign? digit+
+let real = sign? digit* '.' digit* exponent?
+let timelimit = real | integer | "%t" | "%.t" | "%T"
 let memlimit = integer | "%m"
 let steplimit = integer | "%s"
 
@@ -133,9 +153,9 @@ rule scan code = parse
   | call space+ (ident as p) space+ (timelimit as t) space+ (memlimit as m)
          (space+ (steplimit as s))?
       { let p = prover code p in
-        let t = integer "timelimit" t in
-        if t <> None && Opt.get t <= 0 then
-          error "timelimit %d is invalid" (Opt.get t);
+        let t = real "timelimit" t in
+        if t <> None && Opt.get t <= 0.0 then
+          error "timelimit %f is invalid" (Opt.get t);
         let m = integer "memlimit" m in
         if m <> None && Opt.get m <= 0 then
           error "memlimit %d is invalid" (Opt.get m);

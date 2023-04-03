@@ -4,6 +4,7 @@
 <why3session shape_version="6">
 <prover id="0" name="CVC5" version="1.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -87,7 +88,7 @@
   <proof prover="3"><result status="valid" time="0.03" steps="168"/></proof>
   </goal>
   <goal name="smaller_left&#39;vc.20" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.76" steps="102867"/></proof>
+  <proof prover="4"><result status="valid" time="0.76" steps="100943"/></proof>
   </goal>
   <goal name="smaller_left&#39;vc.21" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="153"/></proof>
@@ -162,10 +163,10 @@
   <proof prover="3"><result status="valid" time="0.18" steps="842"/></proof>
   </goal>
   <goal name="smaller_left&#39;vc.45" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.39" steps="63646"/></proof>
+  <proof prover="4"><result status="valid" time="0.39" steps="62543"/></proof>
   </goal>
   <goal name="smaller_left&#39;vc.46" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="2.54" steps="9893"/></proof>
+  <proof prover="3"><result status="valid" time="2.54" steps="9406"/></proof>
   </goal>
   <goal name="smaller_left&#39;vc.47" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.13" steps="704"/></proof>
@@ -230,7 +231,7 @@
   </transf>
   </goal>
   <goal name="construct_dirs&#39;vc.11" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="27389"/></proof>
+  <proof prover="4"><result status="valid" time="0.18" steps="27010"/></proof>
   </goal>
   <goal name="construct_dirs&#39;vc.12" expl="loop invariant preservation" proved="true">
   <transf name="case" proved="true" arg1="(p = li)">
@@ -254,12 +255,12 @@
    <proof prover="3"><result status="valid" time="0.18" steps="651"/></proof>
    </goal>
    <goal name="construct_dirs&#39;vc.15.1" expl="false case (loop invariant preservation)" proved="true">
-   <proof prover="3"><result status="valid" time="1.05" steps="1501"/></proof>
+   <proof prover="3"><result status="valid" time="1.05" steps="1392"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="construct_dirs&#39;vc.16" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.26" steps="34656"/></proof>
+  <proof prover="0"><result status="valid" time="0.26" steps="35025"/></proof>
   </goal>
   <goal name="construct_dirs&#39;vc.17" expl="loop invariant preservation" proved="true">
   <transf name="case" proved="true" arg1="(p = ri)">
@@ -288,7 +289,7 @@
   </transf>
   </goal>
   <goal name="construct_dirs&#39;vc.21" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="1.17" steps="3405"/></proof>
+  <proof prover="3"><result status="valid" time="1.17" steps="3408"/></proof>
   </goal>
   <goal name="construct_dirs&#39;vc.22" expl="loop invariant preservation" proved="true">
   <transf name="case" proved="true" arg1="(p = li)">
@@ -312,12 +313,12 @@
    <proof prover="3"><result status="valid" time="0.12" steps="514"/></proof>
    </goal>
    <goal name="construct_dirs&#39;vc.25.1" expl="false case (loop invariant preservation)" proved="true">
-   <proof prover="3"><result status="valid" time="0.48" steps="1527"/></proof>
+   <proof prover="3"><result status="valid" time="0.48" steps="1239"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="construct_dirs&#39;vc.26" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.71" steps="2465"/></proof>
+  <proof prover="3"><result status="valid" time="0.71" steps="2486"/></proof>
   </goal>
   <goal name="construct_dirs&#39;vc.27" expl="loop invariant preservation" proved="true">
   <transf name="case" proved="true" arg1="(p = ri)">
@@ -809,12 +810,19 @@
    <proof prover="3"><result status="valid" time="0.01" steps="21"/></proof>
    </goal>
    <goal name="traversal&#39;vc.14.1" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.16" steps="1257"/></proof>
+   <proof prover="3"><result status="valid" time="0.16" steps="1543"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="traversal&#39;vc.15" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.22" steps="70988"/></proof>
+  <transf name="destruct" proved="true" arg1="H">
+   <goal name="traversal&#39;vc.15.0" expl="postcondition" proved="true">
+   <proof prover="4" timelimit="1"><result status="valid" time="0.08" steps="20859"/></proof>
+   </goal>
+   <goal name="traversal&#39;vc.15.1" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.35" steps="3692"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>

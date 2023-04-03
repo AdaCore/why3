@@ -8,9 +8,8 @@
 # export WHY3LOADPATH=theories
 
 has_mpfr=`sed -n -e 's/MPFRLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
-
 has_infer=`sed -n -e 's/INFERLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
-
+has_ocamlfind=`sed -n -e 's/OCAMLFIND *= *\([^ ]\+\)/\1/p' share/Makefile.config`
 has_stackify=`sed -n -e 's/STACKIFY *= *\(yes\)/\1/p' share/Makefile.config`
 
 shopt -s nullglob
@@ -427,8 +426,7 @@ test_mlw_printer () {
     find stdlib examples bench -name '*.mlw' \
          -not -path '*/\.*' \
          -not -path "bench/parsing/bad/*" \
-         -not -path "bench/programs/bad-to-keep/*" \
-         -not -path "examples/in_progress/*" |
+         -not -path "bench/programs/bad-to-keep/*" |
     sort | \
     while read filename; do
         bench/test_mlw_printer "$why3" "$filename" || exit 1
@@ -449,7 +447,7 @@ rac () {
         echo "** $mod.$expr"
         bin/why3"$suffix" execute --rac --rac-prover="cvc4" \
                 "${RACARGS[@]}" "$file" --use="$mod" "$expr" \
-                --debug="rac-check-term-result" 2>&1 |\
+                --debug="rac:check_term_result" 2>&1 |\
             sed "s|$(bin/why3$suffix --print-datadir)|WHY3DATA|g" |\
             sed "s|$(bin/why3$suffix --print-libdir)|WHY3LIB|g"
     done
@@ -505,12 +503,11 @@ goods examples/bitvectors "-L examples/bitvectors"
 goods examples/avl "-L examples/avl"
 goods examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_2016_matrix_multiplication"
 goods examples/double_wp "-L examples/double_wp"
-goods examples/in_progress/ring_decision "-L examples/in_progress/ring_decision"
+goods examples/ring_decision "-L examples/ring_decision"
 goods examples/multiprecision "-L examples/multiprecision"
 goods examples/prover "-L examples/prover --debug=ignore_unused_vars"
 goods examples/python
 goods examples/micro-c
-goods examples/in_progress
 goods bench/plugins/mlcfg
 echo ""
 fi
@@ -660,6 +657,9 @@ extract_and_run examples/vstte10_max_sum
 extract_and_run examples/vstte12_combinators "((((K K) K) K) K)"
 extract_and_run examples/defunctionalization
 extract_and_run examples/sudoku 2,0,9,0,0,0,0,1,0,0,0,0,0,6,0,0,0,0,0,5,3,8,0,2,7,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,7,5,0,0,3,0,4,1,2,0,8,9,0,0,0,0,4,0,9,0,0,2,0,8,0,0,0,0,1,0,0,5,0,0,0,0,0,0,0,7,6
+if test -n "$has_ocamlfind"; then
+    extract_and_run examples/prover
+fi
 echo ""
 
 echo "=== Checking extraction to C ==="
@@ -694,7 +694,7 @@ replay examples/avl "-L examples/avl --merging-only"
 replay examples/c_cursor "-L examples/c_cursor --merging-only"
 replay examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_2016_matrix_multiplication --merging-only"
 replay examples/double_wp "-L examples/double_wp --merging-only"
-#replay examples/in_progress/ring_decision "-L examples/in_progress/ring_decision --merging-only"
+#replay examples/ring_decision "-L examples/ring_decision --merging-only"
 replay examples/multiprecision "-L examples/multiprecision --merging-only"
 replay examples/prover "-L examples/prover --merging-only --debug=ignore_unused_vars"
 #replay examples/in_progress --merging-only

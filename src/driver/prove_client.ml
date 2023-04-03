@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -167,7 +167,7 @@ let send_request ~libdir ~id ~timelimit ~memlimit ~use_stdin ~cmd =
   Buffer.add_string send_buf servercommand;
   Buffer.add_string send_buf (string_of_int id);
   Buffer.add_char send_buf ';';
-  Buffer.add_string send_buf (string_of_int timelimit);
+  Buffer.add_string send_buf (string_of_float timelimit);
   Buffer.add_char send_buf ';';
   Buffer.add_string send_buf (string_of_int memlimit);
   List.iter (fun x ->

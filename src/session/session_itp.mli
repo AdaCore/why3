@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -249,6 +249,10 @@ val mark_obsolete: session -> proofAttemptID -> unit
 
 val save_session : session -> unit
 (** [save_session s] Save the session [s] *)
+
+val export_as_zip : session -> string
+(** [export_as_zip s] produces a zip archive of the session
+   file. Returns the file name of the archive. *)
 
 val load_session : string -> session
 (** [load_session dir] load a session in directory [dir]; all the

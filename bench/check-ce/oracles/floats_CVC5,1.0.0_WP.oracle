@@ -1,4 +1,4 @@
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 5, characters 40-52)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 5, characters 40-52)
@@ -25,11 +25,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 5:
     x = ((- 0x1.0p0):t)
     x = ((- 0x1.0p0):t)
     Execution of main function `g1'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = ((- 0x1.0p0):t)
       zero = 0
       one = 1
@@ -41,7 +47,7 @@ File floats.mlw:
     Property failure at postcondition of `g1'goal` with:
       x = ((- 0x1.0p0):t)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 7, characters 40-53)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 7, characters 40-53)
@@ -68,11 +74,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 7:
     x = (0x1.4p1:t)
     x = (0x1.4p1:t)
     Execution of main function `g2'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0x1.4p1:t)
       zero = 0
       one = 1
@@ -84,7 +96,7 @@ File floats.mlw:
     Property failure at postcondition of `g2'goal` with:
       x = (0x1.4p1:t)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 9, characters 24-42)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 9, characters 24-42)
@@ -111,11 +123,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 9:
     x = (0.0:t)
     x = (0.0:t)
     Execution of main function `g3'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0.0:t)
       zero = 0
       one = 1
@@ -127,7 +145,7 @@ File floats.mlw:
     Property failure at postcondition of `g3'goal` with:
       x = (0.0:t)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 11, characters 24-43)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 11, characters 24-43)
@@ -154,11 +172,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 11:
     x = (0x1.4p0:t)
     x = (0x1.4p0:t)
     Execution of main function `g4'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0x1.4p0:t)
       zero = 0
       one = 1
@@ -170,7 +194,7 @@ File floats.mlw:
     Property failure at postcondition of `g4'goal` with:
       x = (0x1.4p0:t)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 13, characters 24-43)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 13, characters 24-43)
@@ -197,11 +221,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 13:
     x = (0x1.100002p18:t)
     x = (0x1.100002p18:t)
     Execution of main function `g5'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0x1.100002p18:t)
       zero = 0
       one = 1
@@ -213,7 +243,7 @@ File floats.mlw:
     Property failure at postcondition of `g5'goal` with:
       x = (0x1.100002p18:t)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 15, characters 24-30)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 15, characters 24-30)
@@ -240,11 +270,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 15:
     x = epsilon x:t. is_nan x
     x = epsilon x:t. is_nan x
     Execution of main function `g6'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = epsilon x:t. is_nan x
       zero = 0
       one = 1
@@ -256,7 +292,7 @@ File floats.mlw:
     Property failure at postcondition of `g6'goal` with:
       x = epsilon x:t. is_nan x
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 17, characters 40-64)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 17, characters 40-64)
@@ -283,11 +319,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 17:
     x = (0x1.0p89:t)
     x = (0x1.0p89:t)
     Execution of main function `g7'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0x1.0p89:t)
       zero = 0
       one = 1
@@ -300,7 +342,7 @@ File floats.mlw:
       RNE = UNDEFINED
       x = (0x1.0p89:t)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g8'goal` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g8'goal` cannot be evaluated)
@@ -312,24 +354,7 @@ Goal g8.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `g8'goal` cannot be evaluated):
-File bv.mlw:
-  Line 9:
-    pow2 : int -> int = [|_ => 0|]
 File ieee_float.mlw:
-  Line 194:
-    of_int :
-      mode
-      ->
-      int
-      ->
-      t = fun bOUND_VARIABLE_509 bOUND_VARIABLE_510 -> +0
-  Line 208:
-    to_int :
-      mode
-      ->
-      t
-      ->
-      int = fun bOUND_VARIABLE_513 bOUND_VARIABLE_514 -> 0
   Line 223:
     max_real : real = 0.0
   Line 224:
@@ -341,7 +366,7 @@ File floats.mlw:
   Line 19:
     x : t = ∞
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 21, characters 40-70)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 21, characters 40-70)
@@ -368,11 +393,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 21:
     x = (0x0.000002p-126:t)
     x = (0x0.000002p-126:t)
     Execution of main function `g9'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0x0.000002p-126:t)
       zero = 0
       one = 1
@@ -385,7 +416,7 @@ File floats.mlw:
       RNE = UNDEFINED
       x = (0x0.000002p-126:t)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 24, characters 24-98)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 24, characters 24-98)
@@ -412,11 +443,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 24:
     x = (0x1.99999Cp-4:t)
     x = (0x1.99999Cp-4:t)
     Execution of main function `g10'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0x1.99999Cp-4:t)
       zero = 0
       one = 1
@@ -430,7 +467,7 @@ File floats.mlw:
       RTZ = UNDEFINED
       x = (0x1.99999Cp-4:t)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 26, characters 24-47)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 26, characters 24-47)
@@ -457,11 +494,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 26:
     x = (0x1.0p-126:t)
     x = (0x1.0p-126:t)
     Execution of main function `g11'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0x1.0p-126:t)
       zero = 0
       one = 1
@@ -473,7 +516,7 @@ File floats.mlw:
     Property failure at postcondition of `g11'goal` with:
       x = (0x1.0p-126:t)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 29, characters 24-54)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 29, characters 24-54)
@@ -500,11 +543,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 29:
     x = (0x0.FFFFFEp-126:t)
     x = (0x0.FFFFFEp-126:t)
     Execution of main function `g12'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0x0.FFFFFEp-126:t)
       zero = 0
       one = 1
@@ -516,7 +565,7 @@ File floats.mlw:
     Property failure at postcondition of `g12'goal` with:
       x = (0x0.FFFFFEp-126:t)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 32, characters 24-47)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 32, characters 24-47)
@@ -543,11 +592,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 861:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 32:
     x = (0x0.8p-126:t)
     x = (0x0.8p-126:t)
     Execution of main function `g13'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0x0.8p-126:t)
       zero = 0
       one = 1
@@ -559,7 +614,7 @@ File floats.mlw:
     Property failure at postcondition of `g13'goal` with:
       x = (0x0.8p-126:t)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 41, characters 40-52)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 41, characters 40-52)
@@ -586,11 +641,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 41:
     x = ((- 0x1.0p0):t1)
     x = ((- 0x1.0p0):t1)
     Execution of main function `g1'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = ((- 0x1.0p0):t1)
       zero = 0
       one = 1
@@ -602,7 +663,7 @@ File floats.mlw:
     Property failure at postcondition of `g1'goal2` with:
       x = ((- 0x1.0p0):t1)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 43, characters 40-53)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 43, characters 40-53)
@@ -629,11 +690,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 43:
     x = (0x1.4p1:t1)
     x = (0x1.4p1:t1)
     Execution of main function `g2'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0x1.4p1:t1)
       zero = 0
       one = 1
@@ -645,7 +712,7 @@ File floats.mlw:
     Property failure at postcondition of `g2'goal2` with:
       x = (0x1.4p1:t1)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 45, characters 24-42)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 45, characters 24-42)
@@ -672,11 +739,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 45:
     x = (0.0:t1)
     x = (0.0:t1)
     Execution of main function `g3'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0.0:t1)
       zero = 0
       one = 1
@@ -688,7 +761,7 @@ File floats.mlw:
     Property failure at postcondition of `g3'goal2` with:
       x = (0.0:t1)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 47, characters 24-43)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 47, characters 24-43)
@@ -715,11 +788,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 47:
     x = (0x1.4p0:t1)
     x = (0x1.4p0:t1)
     Execution of main function `g4'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0x1.4p0:t1)
       zero = 0
       one = 1
@@ -731,7 +810,7 @@ File floats.mlw:
     Property failure at postcondition of `g4'goal2` with:
       x = (0x1.4p0:t1)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 49, characters 24-43)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 49, characters 24-43)
@@ -758,11 +837,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 49:
     x = (0x1.1000000000001p34:t1)
     x = (0x1.1000000000001p34:t1)
     Execution of main function `g5'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0x1.1000000000001p34:t1)
       zero = 0
       one = 1
@@ -774,7 +859,7 @@ File floats.mlw:
     Property failure at postcondition of `g5'goal2` with:
       x = (0x1.1000000000001p34:t1)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 51, characters 24-30)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 51, characters 24-30)
@@ -801,11 +886,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 51:
     x = epsilon x:t1. is_nan1 x
     x = epsilon x:t1. is_nan1 x
     Execution of main function `g6'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = epsilon x:t1. is_nan1 x
       zero = 0
       one = 1
@@ -817,7 +908,7 @@ File floats.mlw:
     Property failure at postcondition of `g6'goal2` with:
       x = epsilon x:t1. is_nan1 x
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 53, characters 40-64)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 53, characters 40-64)
@@ -844,11 +935,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 53:
     x = ((- 0x1.FFFFFFFFFFFFFp58):t1)
     x = ((- 0x1.FFFFFFFFFFFFFp58):t1)
     Execution of main function `g7'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = ((- 0x1.FFFFFFFFFFFFFp58):t1)
       zero = 0
       one = 1
@@ -861,7 +958,7 @@ File floats.mlw:
       RNE = UNDEFINED
       x = ((- 0x1.FFFFFFFFFFFFFp58):t1)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g8'goal2` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g8'goal2` cannot be evaluated)
@@ -873,24 +970,7 @@ Goal g8.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `g8'goal2` cannot be evaluated):
-File bv.mlw:
-  Line 9:
-    pow2 : int -> int = [|_ => 0|]
 File ieee_float.mlw:
-  Line 194:
-    of_int :
-      mode
-      ->
-      int
-      ->
-      t1 = fun bOUND_VARIABLE_509 bOUND_VARIABLE_510 -> +0
-  Line 208:
-    to_int :
-      mode
-      ->
-      t1
-      ->
-      int = fun bOUND_VARIABLE_513 bOUND_VARIABLE_514 -> 0
   Line 223:
     max_real : real = 0.0
   Line 224:
@@ -902,7 +982,7 @@ File floats.mlw:
   Line 55:
     x : t1 = ∞
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 57, characters 40-70)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 57, characters 40-70)
@@ -929,11 +1009,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 57:
     x = (0x0.0000000000001p-1022:t1)
     x = (0x0.0000000000001p-1022:t1)
     Execution of main function `g9'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0x0.0000000000001p-1022:t1)
       zero = 0
       one = 1
@@ -946,7 +1032,7 @@ File floats.mlw:
       RNE = UNDEFINED
       x = (0x0.0000000000001p-1022:t1)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 60, characters 24-98)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 60, characters 24-98)
@@ -973,11 +1059,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 60:
     x = (0x1.999999999999Bp-4:t1)
     x = (0x1.999999999999Bp-4:t1)
     Execution of main function `g10'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0x1.999999999999Bp-4:t1)
       zero = 0
       one = 1
@@ -991,7 +1083,7 @@ File floats.mlw:
       RTZ = UNDEFINED
       x = (0x1.999999999999Bp-4:t1)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 62, characters 24-48)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 62, characters 24-48)
@@ -1018,11 +1110,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 62:
     x = (0x1.0p-1022:t1)
     x = (0x1.0p-1022:t1)
     Execution of main function `g11'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0x1.0p-1022:t1)
       zero = 0
       one = 1
@@ -1034,7 +1132,7 @@ File floats.mlw:
     Property failure at postcondition of `g11'goal2` with:
       x = (0x1.0p-1022:t1)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 65, characters 24-62)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 65, characters 24-62)
@@ -1061,11 +1159,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 65:
     x = (0x0.FFFFFFFFFFFFFp-1022:t1)
     x = (0x0.FFFFFFFFFFFFFp-1022:t1)
     Execution of main function `g12'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0x0.FFFFFFFFFFFFFp-1022:t1)
       zero = 0
       one = 1
@@ -1077,7 +1181,7 @@ File floats.mlw:
     Property failure at postcondition of `g12'goal2` with:
       x = (0x0.FFFFFFFFFFFFFp-1022:t1)
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 68, characters 24-48)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 68, characters 24-48)
@@ -1104,11 +1208,17 @@ File ieee_float.mlw:
     result = UNDEFINED
   Line 902:
     zeroF = UNDEFINED
+  Line 223:
+    max_real = 0.0
+  Line 224:
+    max_int = 0
 File floats.mlw:
   Line 68:
     x = (0x0.8p-1022:t1)
     x = (0x0.8p-1022:t1)
     Execution of main function `g13'goal` with env:
+      max_real = 0.0
+      max_int = 0
       x = (0x0.8p-1022:t1)
       zero = 0
       one = 1

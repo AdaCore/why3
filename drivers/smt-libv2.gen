@@ -143,6 +143,19 @@ theory HighOrd
   meta "encoding:ignore_polymorphism_ls" function (@)
 end
 
+
+theory bv.BV_Gen
+
+  (* removing well-founded properties, they cannot be useful
+     for SMT solvers, and they imply polymorphism *)
+  remove prop ult_wf
+  remove prop ugt_wf
+  remove prop slt_wf
+  remove prop sgt_wf
+
+end
+
+
 theory map.Map
   syntax function get "(select %1 %2)"
   syntax function set "(store %1 %2 %3)"

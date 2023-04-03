@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -105,7 +105,7 @@ type prover_result_parser = {
 (** {2 Functions for calling external provers} *)
 
 type resource_limit = {
-  limit_time  : int;
+  limit_time  : float;
   limit_mem   : int;
   limit_steps : int;
 }
@@ -142,14 +142,22 @@ val call_on_file :
   string -> int
 *)
 
+val actualcommand :
+  cleanup : bool ->
+  inplace : bool ->
+  config  : Whyconf.main ->
+  string ->
+  resource_limit ->
+  string ->
+  string list * bool * bool
+
 val call_on_buffer :
   command         : string ->
   config          : Whyconf.main ->
   limit           : resource_limit ->
   res_parser      : prover_result_parser ->
   filename        : string ->
-  get_counterexmp : bool ->
-  printing_info   : Printer.printing_info ->
+  get_model       : Printer.printing_info option ->
   gen_new_file    : bool ->
   ?inplace        : bool ->
   Buffer.t -> server_id

@@ -2,7 +2,7 @@ theory Why3_Map
 imports Why3_Setup
 begin
 
-section {* Generic Maps *}
+section \<open> Generic Maps \<close>
 
 why3_open "map/Map.xml"
 
@@ -11,7 +11,7 @@ why3_vc setqtdef by auto
 why3_end
 
 
-section {* Constant Maps *}
+section \<open> Constant Maps \<close>
 
 definition abs_const :: "'a \<Rightarrow> ('b \<Rightarrow> 'a)" where
   "abs_const v y = v"
@@ -25,7 +25,7 @@ why3_vc constqtdef
 
 why3_end
 
-section {* Number of occurrences *}
+section \<open> Number of occurrences \<close>
 
 definition occ :: "'a \<Rightarrow> (int \<Rightarrow> 'a) \<Rightarrow> int \<Rightarrow> int \<Rightarrow> int" where
   "occ v m l u = int (card (m -` {v} \<inter> {l..<u}))"
@@ -130,7 +130,7 @@ qed
 why3_end
 
 
-section {* Injectivity and surjectivity for maps (indexed by integers) *}
+section \<open> Injectivity and surjectivity for maps (indexed by integers) \<close>
 
 why3_open "map/MapInjection.xml"
 

@@ -18,9 +18,9 @@ theory BuiltIn
   meta "eliminate_algebraic" "keep_mono"
 end
 
-transformation "remove_unused_keep_constants"
 transformation "inline_trivial"
 transformation "eliminate_builtin"
+transformation "remove_unused_keep_constants"
 transformation "detect_polymorphism"
 transformation "eliminate_definition_conditionally"
 transformation "eliminate_inductive"
@@ -51,6 +51,7 @@ outofmemory "Cannot allocate memory"
 (* not convenient: is more a problem of fork
 outofmemory "error while loading shared libraries:.*failed to map segment from shared object"
 *)
+timeout "^timeout$"
 timeout "interrupted by timeout"
 steps ":rlimit-count +\\([0-9]+\\)" 1
 steplimitexceeded "Maximal allocation counts [0-9]+ have been exceeded"

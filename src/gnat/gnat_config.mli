@@ -110,11 +110,9 @@ val socket_name : string
 
 val proof_dir : string option
 
-val actual_cmd : ?main:Whyconf.main -> string -> string -> string
-(* [actual_cmd main filename cmd] replaces the different '%'
-   preceded terms in [cmd] by their corresponding values *)
-
 val replay : bool
+
+val join : string -> string list -> string
 
 val logging : bool
 (* Whether logging is enabled or not *)

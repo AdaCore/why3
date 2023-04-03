@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -473,11 +473,11 @@ let context_tools_menu = GMenu.menu ()
 
 let send_session_config_to_server () =
   let nb = gconfig.session_nb_processes in
-  send_request (Set_config_param("max_tasks",nb));
+  send_request (Set_config_param(Max_tasks nb));
   let nb = gconfig.session_time_limit in
-  send_request (Set_config_param("timelimit",nb));
+  send_request (Set_config_param(Timelimit nb));
   let nb = gconfig.session_mem_limit in
-  send_request (Set_config_param("memlimit",nb))
+  send_request (Set_config_param(Memlimit nb))
 
 let (_ : GtkSignal.id) =
   main_window#connect#destroy
@@ -1138,6 +1138,8 @@ let reload_unsafe () =
 
 let save_and_reload () = save_sources (); reload_unsafe ()
 
+let export_as_zip () = save_sources (); send_request Export_as_zip
+
 (****************************)
 (* command entry completion *)
 (****************************)
@@ -1793,7 +1795,7 @@ let set_status_and_time_column ?limit row =
              if gconfig.show_time_limit then
                match limit with
                  | Some l ->
-                    Format.sprintf "%.2f [%d.0]" time
+                    Format.sprintf "%.2f [%.2f]" time
                                    (l.Call_provers.limit_time)
                  | None ->
                     Format.sprintf "%.2f" time
@@ -1819,7 +1821,7 @@ let set_status_and_time_column ?limit row =
            begin
              match limit with
              | Some l -> t ^
-                Format.sprintf " [limit=%d sec., %d M]"
+                Format.sprintf " [limit=%.2f sec., %d M]"
                                (l.Call_provers.limit_time)
                                (l.Call_provers.limit_mem)
              | None -> t ^ " [no limit known]"
@@ -2057,8 +2059,13 @@ let (_: GMenu.menu_item) =
 let (_: GMenu.menu_item) =
   file_factory#add_item "Save all and _Refresh session"
     ~modi:primary_modifiers ~key:GdkKeysyms._R
-    ~tooltip:"Save the current proof session and the source files, then refresh the proof session with updated source files."
+    ~tooltip:"Save the current proof session and the source files, then refresh the proof session with updated source files"
     ~callback:save_and_reload
+
+let (_: GMenu.menu_item) =
+  file_factory#add_item "Export session as zip file"
+    ~tooltip:"Produces a zip archive of the current proof session"
+    ~callback:export_as_zip
 
 let (_: GMenu.menu_item) =
   file_factory#add_item "_Quit"

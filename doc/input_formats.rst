@@ -532,3 +532,20 @@ Current limitations
 - Conditional statements ``if e then i1 else i2`` are not yet
   supported, but can be simulated with ``switch (e) | True -> i1 |
   False -> i2 end``.
+
+Alternative translation scheme: Stackify
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An alternative translation scheme from MLCFG to regular WhyML
+can be triggered by putting the attribute :why3:attribute:`[@cfg:stackify]` on
+a function. This method attempts to recover a more
+structured program body, reconstructing loops when possible.
+
+
+Subregion analysis
+~~~~~~~~~~~~~~~~~~
+
+Additional invariants on the generated WhyML code can be inferred by
+putting the attribute :why3:attribute:`[@cfg:subregion_analysis]` on a
+function. These invariants are derived by a static analysis of the
+subregions that are never modified in a loop.

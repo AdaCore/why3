@@ -50,8 +50,8 @@ Acknowledgements
 
 We gratefully thank the people who contributed to Why3, directly or
 indirectly: Stefan Berghofer, Sylvie Boldo, Martin Clochard, Simon
-Cruanes, Sylvain Dailler, Clément Fumex, Léon Gondelman, David Hauzar,
-Daisuke Ishii, Johannes Kanig, Mikhail Mandrykin, David Mentré, Benjamin
+Cruanes, Sylvain Dailler, Xavier Denis, Clément Fumex, Léon Gondelman, David Hauzar,
+Daisuke Ishii, Jacques-Henri Jourdan, Johannes Kanig, Mikhail Mandrykin, David Mentré, Benjamin
 Monate, Kim Nguyen, Thi-Minh-Tuyen Nguyen, Mário Pereira, Raphaël
 Rieu-Helft, Simāo Melo de Sousa, Asma Tafat, Piotr Trojanek, Makarius
 Wenzel.

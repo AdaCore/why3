@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -936,15 +936,15 @@ let set_incremental fmt info =
     fprintf fmt "(set-option :incremental true)@\n"
 
 let meta_counterexmp_need_push =
-  Theory.register_meta_excl "counterexample_need_smtlib_push" [Theory.MTstring]
+  Theory.register_meta_excl "counterexample_need_smtlib_push" []
                             ~desc:"Internal@ use@ only"
 
 let meta_incremental =
-  Theory.register_meta_excl "meta_incremental" [Theory.MTstring]
+  Theory.register_meta_excl "meta_incremental" []
                             ~desc:"Internal@ use@ only"
 
 let meta_supports_reason_unknown =
-  Theory.register_meta_excl "supports_smt_get_info_unknown_reason" [Theory.MTstring]
+  Theory.register_meta_excl "supports_smt_get_info_unknown_reason" []
                             ~desc:"Internal@ use@ only"
 
 

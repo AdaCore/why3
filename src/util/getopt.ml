@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -16,6 +16,7 @@ type key =
 
 type _ arg =
   | AInt : int arg
+  | AFloat : float arg
   | AString : string arg
   | ASymbol : string list -> string arg
   | APair : char * 'a arg * 'b arg -> ('a * 'b) arg
@@ -114,8 +115,13 @@ let rec parse_kind : type a. string -> a arg -> (a -> unit) -> string -> int -> 
               parse_kind key k (fun a -> f (List.rev (a :: acc))) arg i in
       aux i []
   | AInt ->
-    match int_of_string s with
-    | i -> f i
+    begin match int_of_string s with
+      | i -> f i
+      | exception Failure _ -> fail ()
+    end
+  | AFloat ->
+    match float_of_string s with
+    | flt -> f flt
     | exception Failure _ -> fail ()
 
 exception NeedArg of (string -> unit)

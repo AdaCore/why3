@@ -172,8 +172,7 @@ let rec tr_term env e =
         (env,fotnil)
     in
     let env,sym = find_sym env w in
-    let o = NLCVar_symbol sym in
-    let sym = construct_symbol o in
+    let sym = construct_symbol sym in
     let o = NLC_App (sym, tl) in
     env,construct_fo_term o
   | Edef(w,el) -> unsupported "def"
@@ -258,8 +257,7 @@ let rec tr_fmla env e =
         (env,fotnil)
     in
     let env,sym = find_sym env w in
-    let o = NLCVar_symbol sym in
-    let sym = construct_symbol o in
+    let sym = construct_symbol sym in
     let o = NLC_PApp (sym, tl) in
     env,construct_fo_formula o
   | Edef(DP(DPfalse),[]) ->
@@ -301,8 +299,7 @@ let tr_cnf env e =
           (env,fotnil)
       in
       let env,sym = find_sym env w in
-      let o = NLCVar_symbol sym in
-      let sym = construct_symbol o in
+      let sym = construct_symbol sym in
       let o = NLC_PApp (sym, tl) in
       env,construct_fo_formula o
     | Edef(w,el) -> unsupported "def in cnf"

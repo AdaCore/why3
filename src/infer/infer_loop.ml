@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -14,10 +14,10 @@ open Ity
 open Expr
 
 let infer_flag =
-  Debug.register_flag "infer-loop" ~desc:"Infer loop invariants"
+  Debug.register_flag "infer:loop" ~desc:"Infer loop invariants"
 
 let print_inferred_invs =
-  Debug.register_flag "print-inferred-invs" ~desc:"Print inferred invariant"
+  Debug.register_flag "infer:print_inferred_invs" ~desc:"Print inferred invariant"
 
 let is_infer_attr s = Strings.has_prefix "infer" s || s = "infer"
 

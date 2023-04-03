@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -143,7 +143,7 @@ let print_report ses (id,p,l,r) =
      begin
        match r with
        | C.Result(new_res,old_res) ->
-          printf "@[<h>%a instead of %a (timelimit=%d, memlimit=%d, steplimit=%d)@]@."
+          printf "@[<h>%a instead of %a (timelimit=%.2f, memlimit=%d, steplimit=%d)@]@."
                  print_result new_res print_result old_res
                  l.Call_provers.limit_time
                  l.Call_provers.limit_mem
@@ -354,7 +354,7 @@ let run_as_bench env_session =
     eprintf " done.@.";
     exit 0
   in
-  let limit = { Call_provers.empty_limit with Call_provers.limit_time = 2} in
+  let limit = { Call_provers.empty_limit with Call_provers.limit_time = 2.} in
   M.play_all env_session sched ~callback ~limit provers;
   main_loop ();
   eprintf "main replayer (in bench mode) exited unexpectedly@.";

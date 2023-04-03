@@ -1,7 +1,8 @@
 Invariant for loop [anonymous_loop_0] is
-  (orb (andb (a.contents) (b.contents))
-   (andb (notb (a.contents)) (notb (b.contents))) = True /\ 0 <= x.contents) /\
-  x.contents <= 101
+  a.contents = True /\
+  b.contents = True /\ 0 <= x.contents /\ x.contents <= 101 \/
+  a.contents = False /\
+  b.contents = False /\ 1 <= x.contents /\ x.contents <= 101
 Domains for loop [anonymous_loop_0] are x = [0;101]; a = top; b = top
 Check: assertion [A1] is valid
 
@@ -9,5 +10,5 @@ Check: assertion [A2] is valid
 
 File bench/infer/while_loop_bool.mlw:
 Goal main'vc.
-Prover result is: Valid (0.06s, 907 steps).
+Prover result is: Valid (0.01s, 48 steps).
 

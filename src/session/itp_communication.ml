@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -120,10 +120,15 @@ type next_unproved_node_strat =
   | Next
   | Clever
 
+type config_param =
+  | Max_tasks of int
+  | Timelimit of float
+  | Memlimit of int
+
 type ide_request =
   | Command_req             of node_ID * string
   | Add_file_req            of string
-  | Set_config_param        of string * int
+  | Set_config_param        of config_param
   | Set_prover_policy       of Whyconf.prover * Whyconf.prover_upgrade_policy
   | Get_file_contents       of string
   | Get_task                of node_ID * bool * bool
@@ -134,6 +139,7 @@ type ide_request =
   | Find_ident_req          of Loc.position
   | Unfocus_req
   | Save_req
+  | Export_as_zip
   | Reload_req
   | Check_need_saving_req
   | Exit_req
@@ -146,11 +152,17 @@ type ide_request =
 
 open Format
 
+let print_config_param fmt p =
+  match p with
+  | Max_tasks m -> fprintf fmt "max_tasks %d" m
+  | Timelimit f -> fprintf fmt "timelimit %f" f
+  | Memlimit m -> fprintf fmt "memlimit %d" m
+
 let print_request fmt r =
   match r with
   | Command_req (_nid, s)           -> fprintf fmt "command \"%s\"" s
   | Add_file_req f                  -> fprintf fmt "open file %s" f
-  | Set_config_param(s,i)           -> fprintf fmt "set config param %s %i" s i
+  | Set_config_param p              -> fprintf fmt "set config param %a" print_config_param p
   | Set_prover_policy(p1,p2)        ->
      fprintf fmt "set prover policy %a -> %a" Whyconf.print_prover p1
              Whyconf.print_prover_upgrade_policy p2
@@ -163,6 +175,7 @@ let print_request fmt r =
   | Save_file_req _                 -> pp_print_string fmt "save file"
   | Unfocus_req                     -> pp_print_string fmt "unfocus"
   | Save_req                        -> pp_print_string fmt "save"
+  | Export_as_zip                   -> pp_print_string fmt "export as zip"
   | Reload_req                      -> pp_print_string fmt "reload"
   | Check_need_saving_req           -> pp_print_string fmt "check need saving"
   | Exit_req                        -> pp_print_string fmt "exit"

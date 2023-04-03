@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -18,10 +18,10 @@ open Model_parser
 open Pinterp_core
 open Pinterp
 
-let debug_check_ce_rac_results = Debug.register_info_flag "check-ce-rac-results"
+let debug_check_ce_rac_results = Debug.register_info_flag "check_ce:rac_results"
     ~desc:"Debug@ info@ about@ RAC@ results@ for@ --check-ce"
 
-let debug_check_ce_categorization = Debug.register_info_flag "check-ce-categorization"
+let debug_check_ce_categorization = Debug.register_info_flag "check_ce:categorization"
     ~desc:"Debug@ info@ about@ categorization@ of@ RAC@ results@ for@ --check-ce"
 
 (** Result of checking solvers' counterexample models *)
@@ -233,87 +233,93 @@ let rec import_model_value loc env check known ity t =
       | Teps tb ->
         begin
           let exception UnexpectedPattern in
-          let x_eps, t' = t_open_bound tb in
-          (* special case for range types:
-             if t is of the form epsilon x:ty. ty'int x = v, check that v is in the
-             range of values defined by type ty *)
-          try
-            let (proj_ls, proj_v) =
-              match t'.t_node with
-              | Tapp (ls, [proj;term_value]) when ls_equal ls ps_equ -> (
-                match proj.t_node with
-                | Tapp (ls, [x]) when t_equal x (t_var x_eps) -> (ls,term_value)
-                | _ -> raise UnexpectedPattern
-              )
-              | _ -> raise UnexpectedPattern
-            in
-            let valid_range =
-              match ity_components ity, proj_v with
-              | ({ its_def = Ty.Range r; its_ts= ts }, _, _),
-                { t_node= Tconst (Constant.ConstInt c) }
-                when proj_ls.ls_name.id_string = ts.Ty.ts_name.id_string ^ "'int"
-                  && Opt.equal Ty.ty_equal proj_ls.ls_value (Some Ty.ty_int) -> (
-                  try Number.(check_range c r); true
-                  with Number.OutOfRange _ -> false )
-              | _ -> raise UnexpectedPattern
-            in
-            if valid_range then
-              term_value ity t
-            else
-              let desc = asprintf "for range projection %a" print_ity ity in
-              let cntr_ctx = mk_cntr_ctx env ~desc ~giant_steps:None Vc.expl_pre in
-              stuck ?loc cntr_ctx "%s" desc
-          with
-          | UnexpectedPattern ->
-          (* check if t is of the form epsilon x:ty. x.f1 = v1 /\ ... /\ x.fn = vn
-          with f1,...,fn the fields associated to the record type ity *)
-          let ts, l1, l2 = ity_components ity in
-          let subst = its_match_regs ts l1 l2 in
-          let def = Pdecl.find_its_defn known ts in
-          let rec get_conjuncts t' = match t'.t_node with
-            | Tbinop (Tand, t1, t2) -> t1 :: (get_conjuncts t2)
-            | _ -> [t']
-          in
-          try
-            let list_of_fields_values =
-              List.fold_left
-                (fun acc c ->
-                  match c.t_node with
+          match Term.t_open_lambda t with
+          | [], _, _ ->
+            (* special cases for range types and records represented as epsilon terms *)
+            begin
+              let x_eps, t' = t_open_bound tb in
+              (* special case for range types:
+                if t is of the form epsilon x:ty. ty'int x = v, check that v is in the
+                range of values defined by type ty *)
+              try
+                let (proj_ls, proj_v) =
+                  match t'.t_node with
                   | Tapp (ls, [proj;term_value]) when ls_equal ls ps_equ -> (
                     match proj.t_node with
-                    | Tapp (ls, [x]) when t_equal x (t_var x_eps) ->
-                      (ls,term_value) :: acc
+                    | Tapp (ls, [x]) when t_equal x (t_var x_eps) -> (ls,term_value)
                     | _ -> raise UnexpectedPattern
                   )
                   | _ -> raise UnexpectedPattern
-                )
-                []
-                (get_conjuncts t')
-            in
-            let field_values =
-              List.map
-                (fun field_rs ->
-                  let field_ity = ity_full_inst subst (fd_of_rs field_rs).pv_ity in
-                  let matching_field_name rs (ls,_) =
-                    String.equal ls.ls_name.id_string rs.rs_name.id_string in
-                  match List.find_all (matching_field_name field_rs) list_of_fields_values with
-                  | [(_ls,term_value)] ->
-                    import_model_value loc env check known field_ity term_value
-                  | [] ->
-                    (* if the epsilon term does not define a value for field_rs,
-                      use undefined value *)
-                    undefined_value env field_ity
+                in
+                let valid_range =
+                  match ity_components ity, proj_v with
+                  | ({ its_def = Ty.Range r; its_ts= ts }, _, _),
+                    { t_node= Tconst (Constant.ConstInt c) }
+                    when proj_ls.ls_name.id_string = ts.Ty.ts_name.id_string ^ "'int"
+                      && Opt.equal Ty.ty_equal proj_ls.ls_value (Some Ty.ty_int) -> (
+                      try Number.(check_range c r); true
+                      with Number.OutOfRange _ -> false )
                   | _ -> raise UnexpectedPattern
-                  )
-                def.Pdecl.itd_fields
-            in
-            if (List.length field_values > 0) then
-              constr_value ity None def.Pdecl.itd_fields field_values
-            else raise UnexpectedPattern
-          with
-          | UnexpectedPattern -> term_value ity t
+                in
+                if valid_range then
+                  term_value ity t
+                else
+                  let desc = asprintf "for range projection %a" print_ity ity in
+                  let cntr_ctx = mk_cntr_ctx env ~desc ~giant_steps:None Vc.expl_pre in
+                  stuck ?loc cntr_ctx "%s" desc
+              with
+              | UnexpectedPattern ->
+              (* check if t is of the form epsilon x:ty. x.f1 = v1 /\ ... /\ x.fn = vn
+              with f1,...,fn the fields associated to the record type ity *)
+              let ts, l1, l2 = ity_components ity in
+              let subst = its_match_regs ts l1 l2 in
+              let def = Pdecl.find_its_defn known ts in
+              let rec get_conjuncts t' = match t'.t_node with
+                | Tbinop (Tand, t1, t2) -> t1 :: (get_conjuncts t2)
+                | _ -> [t']
+              in
+              try
+                let list_of_fields_values =
+                  List.fold_left
+                    (fun acc c ->
+                      match c.t_node with
+                      | Tapp (ls, [proj;term_value]) when ls_equal ls ps_equ -> (
+                        match proj.t_node with
+                        | Tapp (ls, [x]) when t_equal x (t_var x_eps) ->
+                          (ls,term_value) :: acc
+                        | _ -> raise UnexpectedPattern
+                      )
+                      | _ -> raise UnexpectedPattern
+                    )
+                    []
+                    (get_conjuncts t')
+                in
+                let field_values =
+                  List.map
+                    (fun field_rs ->
+                      let field_ity = ity_full_inst subst (fd_of_rs field_rs).pv_ity in
+                      let matching_field_name rs (ls,_) =
+                        String.equal ls.ls_name.id_string rs.rs_name.id_string in
+                      match List.find_all (matching_field_name field_rs) list_of_fields_values with
+                      | [(_ls,term_value)] ->
+                        import_model_value loc env check known field_ity term_value
+                      | [] ->
+                        (* if the epsilon term does not define a value for field_rs,
+                          use undefined value *)
+                        undefined_value env field_ity
+                      | _ -> raise UnexpectedPattern
+                      )
+                    def.Pdecl.itd_fields
+                in
+                if (List.length field_values > 0) then
+                  constr_value ity None def.Pdecl.itd_fields field_values
+                else raise UnexpectedPattern
+              with
+              | UnexpectedPattern -> term_value ity t
+            end
+          | _ -> term_value ity t
         end
-        | _ -> term_value ity t
+      | _ -> term_value ity t
     else
       (* [ity] and the type of [t] may not match for the following reason:
          [t] is actually the content of a reference (i.e. a record with a single field) *)
@@ -331,9 +337,9 @@ let rec import_model_value loc env check known ity t =
             (List.length def.Pdecl.itd_constructors)
             (List.length def.Pdecl.itd_fields)
   in
+  check ity res;
   Debug.dprintf debug_check_ce_rac_results "[import_model_value] res = %a@."
     Pinterp_core.print_value res;
-  check ity res;
   res
 
 let oracle_of_model pm model =
@@ -735,7 +741,7 @@ let select_model ?timelimit ?steplimit ?verb_lvl ?compute_term ~check_ce
 
 (** Transform an interpretation log into a prover model.
     TODO fail if the log doesn't fail at the location of the original model *)
-let model_of_exec_log ~original_model log = assert false
+let model_of_exec_log ~original_model log = ignore original_model; ignore log; assert false
 (** NOT MAINTAINED since the change of data types in Model_parser.model_value
     to use Term.term *)
 (*

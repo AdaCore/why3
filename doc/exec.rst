@@ -32,7 +32,7 @@ follows:
 
 .. code-block:: console
 
-    > why3 execute maxsum.mlw --use=MaxAndSum 'test ()'
+    $ why3 execute maxsum.mlw --use=MaxAndSum 'test ()'
     result: (int, int) = (45, 10)
     globals:
 
@@ -289,7 +289,7 @@ actual arguments. Here is the extraction command line and its output:
 
 .. code-block:: console
 
-    > why3 extract -D ocaml64 -D mydriver.drv -L . file.M
+    $ why3 extract -D ocaml64 -D mydriver.drv -L . file.M
     let double (x: int) : int = x + x
     ...
 

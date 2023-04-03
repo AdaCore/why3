@@ -1,7 +1,10 @@
 Invariant for loop [anonymous_loop_0] is
-  (0 <= (x.contents + (y.contents * 52)) /\ y.contents <= x.contents) /\
-  0 <= (y.contents + 1)
-Domains for loop [anonymous_loop_0] are x = [0;+oo[; y = [-1;+oo[
+  (((0 <= ((y.contents * 52) + x.contents) /\ 0 <= (y.contents + 1)) /\
+    y.contents <= x.contents) /\
+   o = 0) /\
+  o1 = 0
+Domains for loop [anonymous_loop_0] are
+  o1 = [0;0]; x = [0;+oo[; o = [0;0]; y = [-1;+oo[
 File bench/infer/junjie.mlw:
 Goal b'vc.
 Prover result is: Unknown () (0.01s).

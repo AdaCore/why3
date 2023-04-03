@@ -1,8 +1,10 @@
-Invariant for loop [myloop] is 0 <= c.contents
+Invariant for loop [myloop] is
+  exit.contents = True /\ 42 <= c.contents \/
+  exit.contents = False /\ 0 <= c.contents /\ c.contents <= 41
 Domains for loop [myloop] are exit = top; c = [0;+oo[
-Check: assertion [myassert] is NOT valid
+Check: assertion [myassert] is valid
 
 File bench/infer/while_loop_count.mlw:
 Goal test'vc.
-Prover result is: Unknown () (0.01s).
+Prover result is: Valid (0.00s, 12 steps).
 

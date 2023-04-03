@@ -1,37 +1,41 @@
 Invariant for loop [anonymous_loop_0] is
-  (0 <= k.contents /\ 1 <= x) /\ k.contents <= x
-Domains for loop [anonymous_loop_0] are x = [1;+oo[; k = [0;+oo[
+  ((0 <= k.contents /\ 1 <= x) /\ k.contents <= x) /\ o = 0
+Domains for loop [anonymous_loop_0] are x = [1;+oo[; o = [0;0]; k = [0;+oo[
 The generated invariant does not imply { k < 1 }
 
 Invariant for loop [anonymous_loop_0] is
-  (0 <= k1.contents /\ 1 <= x1) /\ k1.contents <= x1
-Domains for loop [anonymous_loop_0] are x1 = [1;+oo[; k1 = [0;+oo[
+  ((0 <= k1.contents /\ 1 <= x1) /\ k1.contents <= x1) /\ o1 = 0
+Domains for loop [anonymous_loop_0] are
+  x1 = [1;+oo[; o1 = [0;0]; k1 = [0;+oo[
 The generated invariant does not imply { k < 1 }
 
 Invariant for loop [anonymous_loop_0] is
-  ((0 <= j.contents /\ 2 <= x2) /\ j.contents <= (x2 * 2)) /\
+  ((((0 <= j.contents /\ 2 <= x2) /\ j.contents <= (x2 * 2)) /\ o2 = 0) /\
+   o3 = 0) /\
   (k2.contents * 2) = j.contents
 Domains for loop [anonymous_loop_0] are
-  x2 = [2;+oo[; k2 = [0;+oo[; j = [0;+oo[
+  x2 = [2;+oo[; o3 = [0;0]; k2 = [0;+oo[; o2 = [0;0]; j = [0;+oo[
 The generated invariant does not imply { j < 4 }
 
 Invariant for loop [anonymous_loop_0] is
-  ((0 <= j1.contents /\ 2 <= x3) /\ j1.contents <= (x3 * 2)) /\
+  ((((0 <= j1.contents /\ 2 <= x3) /\ j1.contents <= (x3 * 2)) /\ o4 = 0) /\
+   o5 = 0) /\
   (k3.contents * 2) = j1.contents
 Domains for loop [anonymous_loop_0] are
-  x3 = [2;+oo[; k3 = [0;+oo[; j1 = [0;+oo[
+  x3 = [2;+oo[; o5 = [0;0]; k3 = [0;+oo[; o4 = [0;0]; j1 = [0;+oo[
 The generated invariant does not imply { j < 4 }
 
 Invariant for loop [anonymous_loop_0] is
-  ((0 <= j2.contents /\ 2 <= x4) /\ j2.contents <= (x4 * 2)) /\
+  ((((0 <= j2.contents /\ 2 <= x4) /\ j2.contents <= (x4 * 2)) /\ o6 = 0) /\
+   o7 = 0) /\
   (k4.contents * 2) = j2.contents
 Domains for loop [anonymous_loop_0] are
-  x4 = [2;+oo[; k4 = [0;+oo[; j2 = [0;+oo[
+  x4 = [2;+oo[; o7 = [0;0]; k4 = [0;+oo[; o6 = [0;0]; j2 = [0;+oo[
 The generated invariant does not imply { j < 4 }
 
 File bench/infer/auto_ref_false.mlw:
 Goal b'vc.
-Prover result is: Unknown () (0.01s).
+Prover result is: Unknown () (0.02s).
 
 File bench/infer/auto_ref_false.mlw:
 Goal b3'vc.
@@ -39,11 +43,11 @@ Prover result is: Unknown () (0.01s).
 
 File bench/infer/auto_ref_false.mlw:
 Goal c'vc.
-Prover result is: Unknown () (0.01s).
+Prover result is: Unknown () (0.02s).
 
 File bench/infer/auto_ref_false.mlw:
 Goal c2'vc.
-Prover result is: Unknown () (0.01s).
+Prover result is: Unknown () (0.02s).
 
 File bench/infer/auto_ref_false.mlw:
 Goal c3'vc.

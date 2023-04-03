@@ -249,7 +249,7 @@ let trivial_prover =
   }
 
 let trivial_resource_limit =
-  { Call_provers.limit_time = 1;
+  { Call_provers.limit_time = 1.;
     limit_mem = 1000;
     limit_steps = 1;
   }

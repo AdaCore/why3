@@ -348,6 +348,33 @@
                 }
             ]
         },
+        "concrete_bv": {
+            "type": "object",
+            "properties": {
+                "bv_value_as_decimal": {
+                    "type": "string"
+                },
+                "bv_length": {
+                    "type": "number"
+                },
+                "bv_verbatim": {
+                    "type": "string"
+                }
+            },
+            "required": ["bv_value_as_decimal","bv_length","bv_verbatim"]
+        },
+        "concrete_real": {
+            "type": "object",
+            "properties": {
+                "real_value": {
+                    "type": "string"
+                },
+                "real_verbatim": {
+                    "type": "string"
+                }
+            },
+            "required": ["real_value","real_verbatim"]
+        },
         "concrete_term": {
             "oneOf": [
                 {
@@ -397,7 +424,16 @@
                             "pattern": "^Integer$"
                         },
                         "val": {
-                            "type": "string"
+                            "type": "object",
+                            "properties": {
+                                "int_value": {
+                                    "type": "string"
+                                },
+                                "int_verbatim": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["int_value","int_verbatim"]
                         }
                     },
                     "required": ["type","val"]
@@ -410,7 +446,7 @@
                             "pattern": "^Real$"
                         },
                         "val": {
-                            "type": "string"
+                            "$ref": "#/$defs/concrete_real"
                         }
                     },
                     "required": ["type","val"]
@@ -423,15 +459,7 @@
                             "pattern": "^BitVector$"
                         },
                         "val": {
-                            "type": "object",
-                            "properties": {
-                                "bv_binary": {
-                                    "type": "string"
-                                },
-                                "bv_int": {
-                                    "type": "string"
-                                }
-                            }
+                            "$ref": "#/$defs/concrete_bv"
                         }
                     },
                     "required": ["type","val"]
@@ -444,7 +472,19 @@
                             "pattern": "^Fraction$"
                         },
                         "val": {
-                            "type": "string"
+                            "type": "object",
+                            "properties": {
+                                "frac_num": {
+                                    "$ref": "#/$defs/concrete_real"
+                                },
+                                "frac_den": {
+                                    "$ref": "#/$defs/concrete_real"
+                                },
+                                "frac_verbatim": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["frac_num","frac_den","frac_verbatim"]
                         }
                     },
                     "required": ["type","val"]
@@ -505,20 +545,20 @@
                                             "type": "string",
                                             "pattern": "^Float_value"
                                         },
-                                        "sign": {
-                                            "type": "string"
+                                        "float_sign": {
+                                            "$ref": "#/$defs/concrete_bv"
                                         },
-                                        "exp": {
-                                            "type": "string"
+                                        "float_exp": {
+                                            "$ref": "#/$defs/concrete_bv"
                                         },
-                                        "mant": {
-                                            "type": "string"
+                                        "float_mant": {
+                                            "$ref": "#/$defs/concrete_bv"
                                         },
-                                        "hex": {
+                                        "float_hex": {
                                             "type": "string"
                                         }
                                     },
-                                    "required": ["float_type","sign","exp","mant","hex"]
+                                    "required": ["float_type","float_sign","float_exp","float_mant","float_hex"]
                                 }
                             ]
                         }

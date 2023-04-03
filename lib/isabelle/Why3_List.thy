@@ -2,7 +2,7 @@ theory Why3_List
 imports Why3_Setup
 begin
 
-section {* Length of a list *}
+section \<open> Length of a list \<close>
 
 why3_open "list/Length.xml"
 
@@ -15,7 +15,7 @@ why3_vc Length_nonnegative by simp
 why3_end
 
 
-section {* Membership in a list *}
+section \<open> Membership in a list \<close>
 
 why3_open "list/Mem.xml"
 
@@ -24,7 +24,7 @@ why3_vc memqtdef by (simp split: list.split)
 why3_end
 
 
-section {* Nth element of a list *}
+section \<open> Nth element of a list \<close>
 
 why3_open "list/Nth.xml"
 
@@ -82,7 +82,7 @@ why3_vc is_noneqtspec
 why3_end
 
 
-section {* Head and tail *}
+section \<open> Head and tail \<close>
 
 why3_open "list/HdTl.xml"
 
@@ -101,7 +101,7 @@ why3_vc tl_cons by simp
 why3_end
 
 
-section {* Relation between head, tail, and nth *}
+section \<open> Relation between head, tail, and nth \<close>
 
 why3_open "list/NthHdTl.xml"
 
@@ -118,7 +118,7 @@ why3_vc is_noneqtspec
 why3_end
 
 
-section {* Appending two lists *}
+section \<open> Appending two lists \<close>
 
 why3_open "list/Append.xml"
 
@@ -168,7 +168,7 @@ why3_vc is_noneqtspec
 why3_end
 
 
-section {* Reversing a list *}
+section \<open> Reversing a list \<close>
 
 why3_open "list/Reverse.xml"
 
@@ -189,7 +189,7 @@ why3_vc cons_reverse by simp
 why3_end
 
 
-section {* Reverse append *}
+section \<open> Reverse append \<close>
 
 why3_open "list/RevAppend.xml"
 
@@ -211,14 +211,14 @@ why3_vc rev_append_def
 why3_end
 
 
-section {* Zip *}
+section \<open> Zip \<close>
 
 why3_open "list/Combine.xml"
 
 why3_end
 
 
-section {* List with pairwise distinct elements *}
+section \<open> List with pairwise distinct elements \<close>
 
 why3_open "list/Distinct.xml"
 
@@ -233,7 +233,7 @@ why3_vc distinct_append using assms by auto
 why3_end
 
 
-section {* Number of occurrences in a list *}
+section \<open> Number of occurrences in a list \<close>
 
 why3_open "list/NumOcc.xml"
 
@@ -257,7 +257,7 @@ why3_vc reverse_num_occ
 why3_end
 
 
-section {* Permutation of lists *}
+section \<open> Permutation of lists \<close>
 
 why3_open "list/Permut.xml"
 

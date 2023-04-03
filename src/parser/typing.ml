@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2022 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -1747,6 +1747,15 @@ let type_mlw_file env path filename mlw_file =
         List.fold_left type_module_env_loc_path file m_or_t
   in
   file
+
+module Unsafe = struct
+  let dexpr = dexpr
+  let drec_defn = drec_defn
+
+  let create_user_id = create_user_id
+  let create_user_prog_id = create_user_prog_id
+  let add_decl = add_decl
+end
 
 (* incremental parsing *)
 

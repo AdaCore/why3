@@ -160,10 +160,10 @@ Installation can be tested as follows:
 
    .. code-block:: console
 
-       > cd examples
-       > why3 replay logic/scottish-private-club
+       $ cd examples
+       $ why3 replay logic/scottish-private-club
         1/1 (replay OK)
-       > why3 replay same_fringe
+       $ why3 replay same_fringe
         18/18 (replay OK)
 
 Local use, without installation
