@@ -12,7 +12,7 @@
 (** {2 User-defined strategies} *)
 
 type instruction =
-  | Icall_prover of Whyconf.prover * float option * int option * int option
+  | Icall_prover of (Whyconf.prover * float option * int option * int option) list
     (** timelimit (if none use default timelimit),
         memlimit (if none use default memlimit)
         steplimit (if none use no step limit)

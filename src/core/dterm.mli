@@ -119,7 +119,8 @@ val dpattern : ?loc:Loc.position -> dpattern_node -> dpattern
 val dterm : Coercion.t -> ?loc:Loc.position -> dterm_node -> dterm
 
 (** Unused variables *)
-val debug_ignore_unused_var : Debug.flag
+val warn_unused_variable : Loc.warning_id
+
 val attr_w_unused_var_no : attribute
 
 (* Emit a warning if the variable is unused *)

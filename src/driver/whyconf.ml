@@ -1114,6 +1114,8 @@ module Args = struct
       Debug.Args.desc_debug;
       Debug.Args.desc_debug_all;
       Debug.Args.desc_debug_list;
+      Loc.Args.desc_no_warn;
+      Loc.Args.desc_warning_list;
     ]
 
   let do_usage fmt options header footer =
@@ -1148,7 +1150,9 @@ module Args = struct
     let config = set_main config (set_loadpath main lp) in
     load_plugins main;
     Debug.Args.set_flags_selected ();
+    Loc.Args.set_flags_selected ();
     if Debug.Args.option_list () then exit 0;
+    if Loc.Args.option_list () then exit 0;
     config, Env.create_env lp
 
   let initialize ?(extra_help="") options default usage =

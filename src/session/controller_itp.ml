@@ -814,6 +814,20 @@ let schedule_transformation c id name args ~callback ~notification =
 
 open Strategy
 
+let call_one_prover c (p, timelimit, memlimit, steplimit) ~callback ~notification g =
+  let main = Whyconf.get_main c.controller_config in
+  let timelimit = Opt.get_def (Whyconf.timelimit main) timelimit in
+  let memlimit = Opt.get_def (Whyconf.memlimit main) memlimit in
+  let steplimit = Opt.get_def 0 steplimit in
+
+  let limit = {
+    Call_provers.limit_time = timelimit;
+    limit_mem  = memlimit;
+    limit_steps = steplimit;
+  } in
+
+  schedule_proof_attempt c g p ~limit ~callback ~notification
+
 let run_strategy_on_goal
     c id strat ~callback_pa ~callback_tr ~callback ~notification =
   let rec exec_strategy pc strat g =
@@ -821,17 +835,17 @@ let run_strategy_on_goal
       callback STShalt
     else
       match Array.get strat pc with
-      | Icall_prover(p,timelimit,memlimit,steplimit) ->
-         let main = Whyconf.get_main c.controller_config in
-         let timelimit = Opt.get_def (Whyconf.timelimit main) timelimit in
-         let memlimit = Opt.get_def (Whyconf.memlimit main) memlimit in
-         let steplimit = Opt.get_def 0 steplimit in
-         let callback panid res =
+      | Icall_prover is ->
+        (* let already_done = ref false in *)
+        let callback panid res =
            callback_pa panid res;
+           (* if !already_done then (interrupt_proof_attempts_for_goal c g); *)
            match res with
            | UpgradeProver _ | Scheduled | Running -> (* nothing to do yet *) ()
            | Done { Call_provers.pr_answer = Call_provers.Valid } ->
               (* proof succeeded, nothing more to do *)
+              interrupt_proof_attempts_for_goal c g;
+              (* already_done := true; *)
               callback STShalt
            | Interrupted ->
               callback STShalt
@@ -843,13 +857,9 @@ let run_strategy_on_goal
            | Undone | Detached | Uninstalled _ | Removed _ ->
                          (* should not happen *)
                          assert false
-         in
-         let limit = {
-                       Call_provers.limit_time = timelimit;
-                       limit_mem  = memlimit;
-                       limit_steps = steplimit;
-                     } in
-         schedule_proof_attempt c g p ~limit ~callback ~notification
+        in
+        List.iter (fun i -> call_one_prover c i ~callback ~notification g) is
+
       | Itransform(trname,pcsuccess) ->
          let callback ntr =
            callback_tr trname [] ntr;

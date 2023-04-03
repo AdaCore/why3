@@ -139,7 +139,26 @@ let timelimit = real | integer | "%t" | "%.t" | "%T"
 let memlimit = integer | "%m"
 let steplimit = integer | "%s"
 
-rule scan code = parse
+rule invok code = parse
+| (ident as p) space+ (timelimit as t) space+ (memlimit as m)
+         (space+ (steplimit as s))? (space+ ('|' as sep) space+)?
+  {
+    let p = prover code p in
+    let t = real "timelimit" t in
+    if t <> None && Opt.get t <= 0.0 then
+      error "timelimit %f is invalid" (Opt.get t);
+    let m = integer "memlimit" m in
+    if m <> None && Opt.get m <= 0 then
+      error "memlimit %d is invalid" (Opt.get m);
+    let s = integer "steplimit" (Opt.get_def "%s" s) in
+    if s <> None && Opt.get s < 0 then
+      error "steplimit %d is invalid" (Opt.get s);
+    if sep <> None then
+      (p.Whyconf.prover, t, m, s) :: invok code lexbuf
+    else
+      [p.Whyconf.prover, t, m, s]
+  }
+and scan code = parse
   | space+
       { scan code lexbuf }
   | '#' [^ '\n']* ('\n' | eof)
@@ -150,20 +169,10 @@ rule scan code = parse
   | goto space+ (ident as id)
       { add_instr code (Igoto (find_label code id));
         scan code lexbuf }
-  | call space+ (ident as p) space+ (timelimit as t) space+ (memlimit as m)
-         (space+ (steplimit as s))?
-      { let p = prover code p in
-        let t = real "timelimit" t in
-        if t <> None && Opt.get t <= 0.0 then
-          error "timelimit %f is invalid" (Opt.get t);
-        let m = integer "memlimit" m in
-        if m <> None && Opt.get m <= 0 then
-          error "memlimit %d is invalid" (Opt.get m);
-        let s = integer "steplimit" (Opt.get_def "%s" s) in
-        if s <> None && Opt.get s < 0 then
-          error "steplimit %d is invalid" (Opt.get s);
-        add_instr code (Icall_prover (p.Whyconf.prover, t, m, s));
-        scan code lexbuf }
+  | call space+
+    { let i = invok code lexbuf in
+      add_instr code (Icall_prover i);
+      scan code lexbuf }
   | transform space+ (ident as t) space+ (ident as l)
       { transform code t;
         add_instr code (Itransform (t, find_label code l));
