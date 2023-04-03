@@ -113,7 +113,7 @@ under Linux using `perf`. A typical usage is
 perf record --call-graph=dwarf -- why3 command <options> <arguments>
 perf report
 ```
-Note that perf may complain you don't have enough priviledges. A typical configuration change required is, for the sssion only, execute
+Note that perf may complain you don't have enough priviledges. A typical configuration change required is, for the session only, execute
 ```
 sysctl kernel.perf_event_paranoid=2
 ```
