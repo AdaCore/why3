@@ -25,7 +25,7 @@ let key loc = let f, l, c, _, _ = Loc.get loc in f, (l, c)
 
 let add loc idk =
   let kf, k = key loc in
-  match (Hashtbl.find glob kf) with
+  match Hashtbl.find glob kf with
   | hash_f -> if not (Hashtbl.mem hash_f k) then Hashtbl.add hash_f k idk
   | exception Not_found ->
       let hash_f = Hashtbl.create 255 in
@@ -42,6 +42,18 @@ let clear f =
   match Hashtbl.find glob f with
   | exception Not_found -> ()
   | hash_f -> Hashtbl.clear hash_f
+
+type state = (int * int, ident * def_use * string)  Hashtbl.t
+
+let drop f =
+  match Hashtbl.find glob f with
+  | exception Not_found -> Hashtbl.create 255
+  | hash_f ->
+      Hashtbl.remove glob f;
+      hash_f
+
+let restore f h =
+  Hashtbl.replace glob f h
 
 let find loc =
   let (kf, k) = key loc in
