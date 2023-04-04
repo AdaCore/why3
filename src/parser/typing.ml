@@ -31,8 +31,8 @@ let debug_type_only  = Debug.register_flag "type_only"
   ~desc:"Stop@ after@ type-checking."
 
 
-let warn_ignore_useless_at = Loc.register_warning "useless_at"
-  "Detects usages of at/old in locations where it has no impact."
+let warn_useless_at = Loc.register_warning "useless_at"
+  "Warn about `at'/`old' operators used in locations where they have no impact."
 
 (** symbol lookup *)
 
@@ -496,7 +496,7 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       ignore (Loc.try2 ~loc gvars (Some l) (Qident id));
       let e1 = dterm ns km crcmap gvars (Some l) denv e1 in
       if not (Hstr.find at_uses l) then
-        Loc.warning ~id:warn_ignore_useless_at ~loc "this `at'/`old' operator is never used";
+        Loc.warning ~id:warn_useless_at ~loc "this `at'/`old' operator is never used";
       Hstr.remove at_uses l;
       DTattr (e1, Sattr.empty)
   | Ptree.Tscope (q, e1) ->
@@ -1151,7 +1151,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let gvars _at q = try match find_prog_symbol muc q with
         | PV v -> Some v | _ -> None with _ -> None in
       let get_dty pure_denv =
-        let dt = Loc.without_warning warn_unused_variable (fun () -> dterm muc gvars None pure_denv t) in
+        let dt = Loc.without_warning warn_useless_at (fun () -> dterm muc gvars None pure_denv t) in
         match dt.dt_dty with Some dty -> dty | None -> dty_bool in
       DEpure (get_term, denv_pure denv get_dty)
   | Ptree.Eassert (ak, f) ->

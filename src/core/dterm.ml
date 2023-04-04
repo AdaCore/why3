@@ -574,10 +574,10 @@ let attr_w_unused_var_no =
   Ident.create_attribute "W:unused_variable:N"
 
 let warn_unused_variable =
-  Loc.register_warning "unused_variable" "Detects variables which are not used in anyway"
+  Loc.register_warning "unused_variable" "Warn about variables which are not used in any way."
 
 let warn_exists_implies =
-  Loc.register_warning "exists_implies" "Detects usages of implications inside of existential quantifiers."
+  Loc.register_warning "exists_implies" "Warn about formulas of the form \"exists x. P -> Q\"."
 
 let check_used_var t vs =
   if not (Sattr.mem attr_w_unused_var_no vs.vs_name.id_attrs) then

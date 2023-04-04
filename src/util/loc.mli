@@ -103,9 +103,6 @@ module Args : sig
   val desc_no_warn : spec
   (** Option for specifying a warning flag to set. *)
 
-  val desc_shortcut : string -> Getopt.key -> Getopt.doc -> spec
-  (** Option for setting a specific flag. *)
-
   val set_flags_selected : ?silent:bool -> unit -> unit
   (** Set the flags selected by warning or a shortcut.
       When called before the plugins are loaded, pass [~silent:true] to

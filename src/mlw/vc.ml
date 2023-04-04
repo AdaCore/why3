@@ -32,8 +32,8 @@ let debug_sp = Debug.register_flag "vc_sp"
 let debug_no_eval = Debug.register_flag "vc_no_eval"
   ~desc:"Do@ not@ simplify@ pattern@ matching@ on@ record@ datatypes@ in@ VCs."
 
-let warn_ignore_diverges = Loc.register_warning "missing_diverges"
-  "Suppress@ warnings@ on@ missing@ diverges."
+let warn_missing_diverges = Loc.register_warning "missing_diverges"
+  "Warn about missing `diverges' clauses."
 
 
 let case_split = Ident.create_attribute "case_split"
@@ -605,7 +605,7 @@ let rec k_expr env lps e res xmap =
   let var_or_proxy = var_or_proxy_case xmap in
   let check_divergence k =
     if diverges eff.eff_oneway && not env.divergent then begin
-      Loc.warning ~id:warn_ignore_diverges ?loc "termination@ of@ this@ expression@ \
+      Loc.warning ~id:warn_missing_diverges ?loc "termination@ of@ this@ expression@ \
         cannot@ be@ proved,@ but@ there@ is@ no@ `diverges'@ \
         clause@ in@ the@ outer@ specification";
       Kpar (Kstop (vc_expl loc attrs expl_divergent t_false), k)

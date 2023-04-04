@@ -17,7 +17,7 @@ open Term
 open Decl
 
 let warn_clone_not_abstract =
-  Loc.register_warning "clone_not_abstract" "Detects clones which have no abstract symbols being substituted"
+  Loc.register_warning "clone_not_abstract" "Warn about theories cloned without substituting any abstract symbols."
 
 (** Namespace *)
 
@@ -505,7 +505,7 @@ let create_decl d = mk_tdecl (Decl d)
 let print_id fmt id = Ident.print_decoded fmt id.id_string
 
 let warn_axiom_abstract =
-  Loc.register_warning "axiom_abstract" "Detects axioms that are free of abstract symbols"
+  Loc.register_warning "axiom_abstract" "Warn about axioms that are free of abstract symbols."
 
 let warn_dubious_axiom uc k p syms =
   match k with
