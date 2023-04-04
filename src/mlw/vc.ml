@@ -308,18 +308,21 @@ let decrease_alg env loc old_t t =
 
 let decrease_def env loc old_t t =
   let ty = t_type t in
-  if ty_equal (t_type old_t) ty then
-    match ty.ty_node with
-    | Tyapp (ts,_) when ts_equal ts ts_int ->
-        t_and (ps_app env.ps_int_le [t_nat_const 0; old_t])
-              (ps_app env.ps_int_lt [t; old_t])
-    | Tyapp (ts, _) when is_range_type_def ts.ts_def ->
-        let ls = int_of_range env ts in
-        let proj t = fs_app ls [t] ty_int in
-        ps_app env.ps_int_lt [proj t; proj old_t]
-    | _ ->
-        decrease_alg env loc old_t t
-  else decrease_alg env loc old_t t
+  let f =
+    if ty_equal (t_type old_t) ty then
+      match ty.ty_node with
+      | Tyapp (ts,_) when ts_equal ts ts_int ->
+         t_and (ps_app env.ps_int_le [t_nat_const 0; old_t])
+           (ps_app env.ps_int_lt [t; old_t])
+      | Tyapp (ts, _) when is_range_type_def ts.ts_def ->
+         let ls = int_of_range env ts in
+         let proj t = fs_app ls [t] ty_int in
+         ps_app env.ps_int_lt [proj t; proj old_t]
+      | _ ->
+         decrease_alg env loc old_t t
+    else decrease_alg env loc old_t t
+  in
+  t_attr_copy t f
 
 let decrease env loc attrs expl olds news =
   if olds = [] && news = [] then t_true else

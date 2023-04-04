@@ -1,0 +1,31 @@
+
+use int.Int
+
+let f () =
+  let ref x = 10 in
+  while x > 0 do
+    invariant I { 0 <= x <= 10 }
+    variant V { [@my_variant] [@expl:my_variant_decreases] x }
+    x <- x - 1
+  done
+
+let g () =
+  let ref x = 10 in
+  let ref y = 10 in
+  while x > 0 || y > 0 do
+    invariant I1 { 0 <= x <= 10 }
+    invariant I2 { 0 <= y <= 10 }
+    variant V { ([@my_var_x] [@expl:my_var_x_decreases] x) ,
+              ([@my_var_y] [@expl:my_var_y_decreases] y) }
+    if y > 0 then y <- y - 1 else
+      (x <- x - 1; y <- 10)
+  done
+
+let rec h x y
+  requires R1 { 0 <= x <= 10 }
+  requires R2 { 0 <= y <= 10 }
+  variant V { ([@my_var_x] [@expl:my_var_x_decreases] x) ,
+              ([@my_var_y] [@expl:my_var_y_decreases] y) }
+= if x > 0 then
+    if y > 0 then h x (y - 1) else h (x-1) y
+  else 42
