@@ -857,12 +857,16 @@ module Float32
   type t = < float 8 24 >
 
   constant pow2sb : int = 16777216
+  constant max_int : int = 0xFFFF_FF00_0000_0000_0000_0000_0000_0000
+  constant max_real : real = 0x1.FFFFFEp127
 
   clone export GenericFloat with
     type t = t,
     constant eb = t'eb,
     constant sb = t'sb,
     constant pow2sb = pow2sb,
+    constant max_int = max_int,
+    constant max_real = max_real,
     function to_real = t'real,
     predicate is_finite = t'isFinite,
     (* the following are lemmas and not goals, because we want to
@@ -874,9 +878,6 @@ module Float32
     lemma max_real_int,
     lemma pow2sb,
     axiom . (* TODO: "lemma"? "goal"? *)
-
-  lemma max_int_def : max_int = 0xFFFF_FF00_0000_0000_0000_0000_0000_0000
-  lemma max_real_def : max_real = 0x1.FFFFFEp127
 
   lemma round_bound_ne :
     forall x:real [round RNE x].
@@ -898,12 +899,16 @@ module Float64
   type t = < float 11 53 >
 
   constant pow2sb : int = 9007199254740992  (* 242 *)
+  constant max_int : int = 0xFFFF_FFFF_FFFF_F800_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000
+  constant max_real : real = 0x1.FFFFFFFFFFFFFp1023
 
   clone export GenericFloat with
     type t = t,
     constant eb = t'eb,
     constant sb = t'sb,
     constant pow2sb = pow2sb,
+    constant max_int = max_int,
+    constant max_real = max_real,
     function to_real = t'real,
     predicate is_finite = t'isFinite,
     (* the following are lemmas and not goals, because we want to
@@ -915,9 +920,6 @@ module Float64
     lemma max_real_int,
     lemma pow2sb,
     axiom . (* TODO: "lemma"? "goal"? *)
-
-  lemma max_int_def : max_int = 0xFFFF_FFFF_FFFF_F800_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000
-  lemma max_real_def : max_real = 0x1.FFFFFFFFFFFFFp1023
 
   lemma round_bound_ne :
     forall x:real [round RNE x].
