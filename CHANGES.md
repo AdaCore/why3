@@ -15,6 +15,9 @@ Tools
     `--extra-config` are searched also in the sub-directory of that
     config file
 
+Provers
+  * support for Coq 8.17.0 (released Mar 23, 2023)
+
 Version 1.6.0, March 7 2023
 ---------------------------
 
