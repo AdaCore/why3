@@ -62,6 +62,7 @@ OCAMLBEST = @OCAMLBEST@
 OCAMLVERSION = @OCAMLVERSION@
 COQC      = @COQC@
 COQDEP    = @COQDEP@
+COQFLAGS  = @COQFLAGS@
 FRAMAC_LIBDIR = $(DESTDIR)@FRAMAC_LIBDIR@
 MENHIR	  = @MENHIR@
 
@@ -1068,7 +1069,7 @@ COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd lib/coq/WellFounded $(COQLIBS_IN
 
 %.vo: %.v
 	$(SHOW) 'Coqc     $<'
-	$(HIDE)$(COQC) -R lib/coq Why3 $<
+	$(HIDE)$(COQC) $(COQFLAGS) -R lib/coq Why3 $<
 
 %.vd: %.v
 	$(SHOW) 'Coqdep   $<'
