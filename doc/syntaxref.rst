@@ -650,8 +650,8 @@ conjunction and disjunction, respectively.
       : | "(" `ret_name` ("," `ret_name`)* ")"
     ret_type: "ghost"? `type`   ; unnamed result
     ret_name: "ghost"? `binder` ":" `type`   ; named result
-    spec: "requires" "{" `term` "}"   ; pre-condition
-      : | "ensures" "{" `term` "}"   ; post-condition
+    spec: "requires" ident? "{" `term` "}"   ; pre-condition
+      : | "ensures" ident? "{" `term` "}"   ; post-condition
       : | "returns" "{" ("|" `pattern` "->" `term`)+ "}"   ; post-condition
       : | "raises" "{" ("|" `pattern` "->" `term`)+ "}"   ; exceptional post-c.
       : | "raises" "{" `uqualid` ("," `uqualid`)* "}"   ; raised exceptions
@@ -663,8 +663,8 @@ conjunction and disjunction, respectively.
       : | ("reads" | "writes" | "alias") "{" "}"   ; empty effect
     path: `lqualid` ("." `lqualid`)*   ; v.field1.field2
     alias: `path` "with" `path`   ; arg1 with result
-    invariant: "invariant" "{" `term` "}"   ; loop and type invariant
-    variant: "variant" "{" `variant_term` ("," `variant_term`)* "}"   ; termination variant
+    invariant: "invariant" ident? "{" `term` "}"   ; loop and type invariant
+    variant: "variant" ident? "{" `variant_term` ("," `variant_term`)* "}"   ; termination variant
     variant_term: `term` ("with" `lqualid`)?   ; variant term + WF-order
 
 .. index:: pair: keyword; ghost

@@ -1338,7 +1338,8 @@ type_invariant:
     { name_term $2 "TypeInvariant" $4 }
 
 variant:
-| VARIANT LEFTBRC comma_list1(single_variant) RIGHTBRC { $3 }
+| VARIANT option(ident_nq) LEFTBRC comma_list1(single_variant) RIGHTBRC
+    { List.map (fun (t,r) -> (name_term $2 "Variant" t,r)) $4 }
 
 single_variant:
 | single_term preceded(WITH,lqualid)?  { $1, $2 }
