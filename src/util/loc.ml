@@ -148,7 +148,8 @@ let warning_table : (warning_id, warning) Hashtbl.t = Hashtbl.create 17
 
 exception UnknownWarning of warning_id
 
-let lookup_flag (s : warning_id) : warning = try Hashtbl.find warning_table s with Not_found -> raise (UnknownWarning s)
+let lookup_flag (s : warning_id) : warning =
+  try Hashtbl.find warning_table s with Not_found -> raise (UnknownWarning s)
 
 let unset_flag s = s.enabled <- false
 
@@ -160,6 +161,9 @@ let register_warning name (descr : Pp.formatted) =
     name
   end
 
+let warn_unknown_warning =
+  register_warning "unknown_warning" "Warn about unknown warning flags."
+
 let warning_active id =
   match id with
   | None -> true
@@ -167,11 +171,16 @@ let warning_active id =
 
 let without_warning name inner =
   let old = Hashtbl.find warning_table name in
-  let old_state = old.enabled in
-  old.enabled <- false;
-  let res = inner () in
-  old.enabled <- true;
-  res
+  if not old.enabled then inner ()
+  else
+    try
+      old.enabled <- false;
+      let res = inner () in
+      old.enabled <- true;
+      res
+    with e when not (Debug.test_flag Debug.stack_trace) ->
+      old.enabled <- true;
+      raise e
 
 let warning ?id ?loc p =
     let open Format in
@@ -181,7 +190,6 @@ let warning ?id ?loc p =
     pp_open_box fmt 0;
     let handle fmt =
       pp_print_flush fmt (); !warning_hook ?loc (Buffer.contents b) in
-
     if warning_active id then kfprintf handle fmt p else ifprintf fmt p
 
 module Args = struct
@@ -215,10 +223,6 @@ module Args = struct
 
   let add_flag s = Queue.add s opt_list_flags
 
-  let desc_shortcut flag option desc =
-    let desc = Printf.sprintf "%s (same as --warn-off=%s)" desc flag in
-    (option, Hnd0 (fun () -> add_flag flag), desc)
-
   let desc_no_warn =
     KLong "warn-off", Hnd1 (AList (',', AString), fun l -> List.iter add_flag l),
     "<flag>,... set some warning flags"
@@ -227,7 +231,9 @@ module Args = struct
     let check flag =
       match lookup_flag flag with
       | f -> unset_flag f
-      | exception UnknownWarning _ when silent -> () in
+      | exception UnknownWarning _ when silent -> ()
+      | exception UnknownWarning _ ->
+          warning ~id:warn_unknown_warning "unknown warning flag `%s'" flag in
     Queue.iter check opt_list_flags
 end
 
