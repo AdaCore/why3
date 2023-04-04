@@ -126,3 +126,43 @@ theory PolyPaverExamples
     b > a + 0.1 ->
     exp a - exp b > (b-a) * exp ((a + b) / 2.0)
 end
+
+theory TestBigConstantElimination
+  use ieee_float.Float64
+  use real.RealInfix
+  use real.Abs
+  use real.ExpLog
+  use int.Int
+
+  (*
+    Real constants that are too big or too small cause dReal to crash on a call
+    to strtod
+    As long as this is not fixed, these constants are removed by the
+    transformation "eliminate_big_constants"
+  *)
+  constant r1:real
+  constant r2:real
+  constant r3:real
+  constant r4:real
+  (* These are removed *)
+  axiom H1 : r1 = 0x1p1023
+  axiom H2 : r2 = 0x1p-1024
+  (* These are kept *)
+  axiom H3 : r3 = 0x1p1022
+  axiom H4 : r4 = 0x1p-1023
+
+  goal g1 : forall x : real. abs x <=. 25. -> exp x <=. 72004899338.
+
+  (*
+    Int constants that are too big cause dReal to prove false.
+    As long as this is not fixed, these constants are removed by the
+    transformation "eliminate_big_constants"
+  *)
+  constant i1:int
+  constant i2:int
+  (* i1 is removed *)
+  axiom H5 : i1 = 0x80000000
+  (* i2 is kept *)
+  axiom H6 : i2 = 0x7FFFFFFF
+  goal G2_KO : false
+end
