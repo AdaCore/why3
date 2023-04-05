@@ -3,9 +3,9 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="16" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.1.0" timelimit="16" steplimit="0" memlimit="1000"/>
 <file format="whyml">
 <path name=".."/><path name=".."/><path name=".."/><path name="stdlib"/>
 <path name="pigeon.mlw"/>
@@ -28,8 +28,8 @@
   <proof prover="3"><result status="valid" time="0.01" steps="792"/></proof>
   </goal>
   <goal name="pigeonhole&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
   <proof prover="3"><result status="valid" time="0.01" steps="1256"/></proof>
+  <proof prover="4"><result status="valid" time="0.00" steps="16"/></proof>
   </goal>
   <goal name="pigeonhole&#39;vc.6" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="2124"/></proof>
@@ -38,15 +38,15 @@
   <proof prover="3"><result status="valid" time="0.04" steps="8727"/></proof>
   </goal>
   <goal name="pigeonhole&#39;vc.8" expl="out of loop bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
   <proof prover="3"><result status="valid" time="0.01" steps="1335"/></proof>
+  <proof prover="4"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
   <goal name="pigeonhole&#39;vc.9" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="904"/></proof>
   </goal>
   <goal name="pigeonhole&#39;vc.10" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
   <proof prover="3"><result status="valid" time="0.01" steps="511"/></proof>
+  <proof prover="4"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
   <goal name="pigeonhole&#39;vc.11" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="1716"/></proof>
@@ -75,15 +75,15 @@
     <goal name="pigeon_0.0.0.0" proved="true">
     <transf name="assert" proved="true" arg1="(mem x1 empty)">
      <goal name="pigeon_0.0.0.0.0" expl="asserted formula" proved="true">
-     <proof prover="2"><result status="valid" time="0.06" steps="14434"/></proof>
+     <proof prover="2"><result status="valid" time="0.06" steps="14077"/></proof>
      </goal>
      <goal name="pigeon_0.0.0.0.1" proved="true">
-     <proof prover="2"><result status="valid" time="0.05" steps="13666"/></proof>
+     <proof prover="2"><result status="valid" time="0.05" steps="13308"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="pigeon_0.0.0.1" proved="true">
-    <proof prover="2"><result status="valid" time="0.04" steps="13607"/></proof>
+    <proof prover="2"><result status="valid" time="0.04" steps="13248"/></proof>
     </goal>
    </transf>
    </goal>
@@ -94,10 +94,10 @@
  <goal name="pigeon_1">
  </goal>
  <goal name="pigeon_2" proved="true">
- <proof prover="2"><result status="valid" time="0.05" steps="9412"/></proof>
+ <proof prover="2"><result status="valid" time="0.05" steps="9065"/></proof>
  </goal>
  <goal name="pigeonhole" proved="true">
- <proof prover="0"><result status="valid" time="0.84" steps="1633487"/></proof>
+ <proof prover="0"><result status="valid" time="0.84" steps="1632107"/></proof>
  </goal>
 </theory>
 </file>

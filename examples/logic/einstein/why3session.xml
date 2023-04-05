@@ -2,6 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Eprover" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -15,7 +16,6 @@
 <prover id="12" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="14" name="Vampire" version="0.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="16" name="veriT" version="201410" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="17" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="19" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="20" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="21" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -23,6 +23,7 @@
 <path name=".."/><path name="einstein.why"/>
 <theory name="Goals">
  <goal name="G1" proved="true">
+ <proof prover="0"><result status="valid" time="0.09" steps="374"/></proof>
  <proof prover="1"><result status="timeout" time="1.00"/></proof>
  <proof prover="2"><result status="unknown" time="0.17"/></proof>
  <proof prover="3"><result status="unknown" time="0.04"/></proof>
@@ -36,12 +37,12 @@
  <proof prover="12"><result status="valid" time="0.10" steps="374"/></proof>
  <proof prover="14"><result status="valid" time="1.50"/></proof>
  <proof prover="16"><result status="timeout" time="1.00"/></proof>
- <proof prover="17"><result status="valid" time="1.17" steps="983"/></proof>
  <proof prover="19"><result status="valid" time="0.21" steps="414407"/></proof>
  <proof prover="20"><result status="valid" time="0.21" steps="461289"/></proof>
  <proof prover="21"><result status="valid" time="0.08" steps="12598"/></proof>
  </goal>
  <goal name="Wrong">
+ <proof prover="0"><result status="unknown" time="0.16"/></proof>
  <proof prover="1"><result status="timeout" time="1.00"/></proof>
  <proof prover="2"><result status="unknown" time="0.06"/></proof>
  <proof prover="3"><result status="unknown" time="0.04"/></proof>
@@ -55,12 +56,12 @@
  <proof prover="12" timelimit="1"><result status="unknown" time="0.16"/></proof>
  <proof prover="14"><result status="timeout" time="1.00"/></proof>
  <proof prover="16"><result status="timeout" time="1.00"/></proof>
- <proof prover="17"><result status="unknown" time="0.57"/></proof>
- <proof prover="19"><result status="timeout" time="1.00" steps="4577950"/></proof>
- <proof prover="20"><result status="timeout" time="1.00" steps="2590731"/></proof>
+ <proof prover="19"><result status="timeout" time="1.00" steps="4632102"/></proof>
+ <proof prover="20"><result status="timeout" time="1.00" steps="2626120"/></proof>
  <proof prover="21"><result status="unknown" time="0.07" steps="12727"/></proof>
  </goal>
  <goal name="G2" proved="true">
+ <proof prover="0"><result status="valid" time="0.11" steps="385"/></proof>
  <proof prover="1"><result status="timeout" time="1.00"/></proof>
  <proof prover="2"><result status="unknown" time="0.06"/></proof>
  <proof prover="3"><result status="unknown" time="0.04"/></proof>
@@ -74,7 +75,6 @@
  <proof prover="12"><result status="valid" time="0.11" steps="385"/></proof>
  <proof prover="14"><result status="valid" time="1.27"/></proof>
  <proof prover="16"><result status="timeout" time="1.00"/></proof>
- <proof prover="17"><result status="valid" time="0.96" steps="1152"/></proof>
  <proof prover="19"><result status="valid" time="0.20" steps="391495"/></proof>
  <proof prover="20"><result status="valid" time="0.18" steps="341318"/></proof>
  <proof prover="21"><result status="valid" time="0.05" steps="11744"/></proof>

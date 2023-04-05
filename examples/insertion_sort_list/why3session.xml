@@ -2,32 +2,32 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.1.0" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="11" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="11" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="insertion_sort_list.mlw"/>
 <theory name="InsertionSort" proved="true">
  <goal name="Transitive.Trans" proved="true">
- <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
  </goal>
  <goal name="insert&#39;vc" expl="VC for insert" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="insert&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="46"/></proof>
   </goal>
   <goal name="insert&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.00" steps="13"/></proof>
+  <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
   <goal name="insert&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="1"><result status="valid" time="0.12" steps="27245"/></proof>
+  <proof prover="2" timelimit="1"><result status="valid" time="0.12" steps="26898"/></proof>
   </goal>
   <goal name="insert&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.34" steps="56046"/></proof>
+  <proof prover="2"><result status="valid" time="0.34" steps="55705"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="insertion_sort&#39;vc" expl="VC for insertion_sort" proved="true">
- <proof prover="3"><result status="valid" time="0.11" steps="548"/></proof>
+ <proof prover="0"><result status="valid" time="0.11" steps="228"/></proof>
  </goal>
 </theory>
 </file>
