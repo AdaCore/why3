@@ -3,9 +3,9 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="pairing_heap_bin.mlw"/>
 <theory name="Heap" proved="true">
@@ -15,67 +15,67 @@
 </theory>
 <theory name="Size" proved="true">
  <goal name="size_nonneg&#39;vc" expl="VC for size_nonneg" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="14"/></proof>
+ <proof prover="4"><result status="valid" time="0.00" steps="40"/></proof>
  </goal>
  <goal name="size_empty" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="18"/></proof>
+ <proof prover="4"><result status="valid" time="0.00" steps="24"/></proof>
  </goal>
 </theory>
 <theory name="Occ" proved="true">
  <goal name="occ_nonneg&#39;vc" expl="VC for occ_nonneg" proved="true">
- <proof prover="3"><result status="valid" time="0.01" steps="3888"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="3571"/></proof>
  </goal>
 </theory>
 <theory name="PairingHeap" proved="true">
  <goal name="le_root_trans" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="17"/></proof>
+ <proof prover="4"><result status="valid" time="0.00" steps="36"/></proof>
  </goal>
  <goal name="le_root_tree_trans" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="le_root_tree_trans.0" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="50"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="68"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="mem_heap_tree&#39;vc" expl="VC for mem_heap_tree" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="224"/></proof>
+ <proof prover="4"><result status="valid" time="0.03" steps="304"/></proof>
  </goal>
  <goal name="mem_heap&#39;vc" expl="VC for mem_heap" proved="true">
- <proof prover="3"><result status="valid" time="0.04" steps="8426"/></proof>
+ <proof prover="3"><result status="valid" time="0.04" steps="8105"/></proof>
  </goal>
  <goal name="root_is_minimum" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="135"/></proof>
+ <proof prover="4"><result status="valid" time="0.03" steps="146"/></proof>
  </goal>
  <goal name="empty&#39;vc" expl="VC for empty" proved="true">
- <proof prover="3"><result status="valid" time="0.01" steps="5169"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="4832"/></proof>
  </goal>
  <goal name="is_empty&#39;vc" expl="VC for is_empty" proved="true">
- <proof prover="0"><result status="valid" time="0.05" steps="5073"/></proof>
- <proof prover="1"><result status="valid" time="0.00" steps="15"/></proof>
+ <proof prover="0"><result status="valid" time="0.05" steps="4746"/></proof>
+ <proof prover="4"><result status="valid" time="0.00" steps="57"/></proof>
  </goal>
  <goal name="size&#39;vc" expl="VC for size" proved="true">
  <proof prover="0"><result status="valid" time="0.05" steps="4003"/></proof>
- <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+ <proof prover="4"><result status="valid" time="0.00" steps="10"/></proof>
  </goal>
  <goal name="merge&#39;vc" expl="VC for merge" proved="true">
- <proof prover="0"><result status="valid" time="0.23" steps="20662"/></proof>
- <proof prover="3"><result status="valid" time="0.06" steps="18247"/></proof>
+ <proof prover="0"><result status="valid" time="0.10" steps="20982"/></proof>
+ <proof prover="3"><result status="valid" time="0.06" steps="17884"/></proof>
  </goal>
  <goal name="insert&#39;vc" expl="VC for insert" proved="true">
  <proof prover="0"><result status="valid" time="0.09" steps="7923"/></proof>
- <proof prover="3"><result status="valid" time="0.03" steps="8359"/></proof>
+ <proof prover="3"><result status="valid" time="0.03" steps="8006"/></proof>
  </goal>
  <goal name="find_min&#39;vc" expl="VC for find_min" proved="true">
  <proof prover="0"><result status="valid" time="0.05" steps="4749"/></proof>
- <proof prover="1"><result status="valid" time="0.00" steps="14"/></proof>
+ <proof prover="4"><result status="valid" time="0.00" steps="60"/></proof>
  </goal>
  <goal name="merge_pairs&#39;vc" expl="VC for merge_pairs" proved="true">
  <proof prover="0"><result status="valid" time="0.34" steps="52495"/></proof>
- <proof prover="3"><result status="valid" time="0.27" steps="46951"/></proof>
+ <proof prover="3"><result status="valid" time="0.27" steps="46598"/></proof>
  </goal>
  <goal name="delete_min&#39;vc" expl="VC for delete_min" proved="true">
  <proof prover="0"><result status="valid" time="0.08" steps="7778"/></proof>
- <proof prover="1"><result status="valid" time="0.02" steps="198"/></proof>
+ <proof prover="4"><result status="valid" time="0.02" steps="261"/></proof>
  </goal>
 </theory>
 </file>

@@ -4,60 +4,60 @@
 <why3session shape_version="6">
 <prover id="0" name="Coq" version="8.11.2" timelimit="5" steplimit="0" memlimit="0"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="0"/>
-<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="20" steplimit="0" memlimit="0"/>
+<prover id="3" name="Alt-Ergo" version="2.1.0" timelimit="20" steplimit="0" memlimit="0"/>
 <prover id="6" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="0"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="vstte10_search_list.mlw"/>
 <theory name="SearchingALinkedList" proved="true">
  <goal name="search&#39;vc" expl="VC for search" proved="true">
- <proof prover="2"><result status="valid" time="0.07" steps="285"/></proof>
+ <proof prover="3"><result status="valid" time="0.07" steps="303"/></proof>
  </goal>
  <goal name="search_list&#39;vc" expl="VC for search_list" proved="true">
  <proof prover="1"><result status="valid" time="0.00"/></proof>
- <proof prover="2"><result status="valid" time="0.01" steps="21"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="2"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="head&#39;vc" expl="VC for head" proved="true">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
- <proof prover="2"><result status="valid" time="0.00" steps="12"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="30"/></proof>
  <proof prover="6"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="tail&#39;vc" expl="VC for tail" proved="true">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
- <proof prover="2"><result status="valid" time="0.02" steps="12"/></proof>
+ <proof prover="3"><result status="valid" time="0.02" steps="30"/></proof>
  <proof prover="6"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="search_loop&#39;vc" expl="VC for search_loop" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="search_loop&#39;vc.0" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
   <proof prover="6"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="search_loop&#39;vc.1" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="search_loop&#39;vc.2" expl="precondition" proved="true">
   <proof prover="1" timelimit="20"><result status="valid" time="0.01"/></proof>
-  <proof prover="2" timelimit="5"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="16"/></proof>
   <proof prover="6"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="search_loop&#39;vc.3" expl="loop variant decrease" proved="true">
   <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.01" steps="40"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="62"/></proof>
   </goal>
   <goal name="search_loop&#39;vc.4" expl="loop invariant preservation" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="search_loop&#39;vc.4.0" expl="VC for search_loop" proved="true">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="20"/></proof>
    <proof prover="6"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="search_loop&#39;vc.4.1" expl="VC for search_loop" proved="true">
    <proof prover="1"><result status="timeout" time="5.00"/></proof>
-   <proof prover="2"><result status="valid" time="0.02" steps="35"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="54"/></proof>
    <proof prover="6"><result status="timeout" time="5.00"/></proof>
    </goal>
    <goal name="search_loop&#39;vc.4.2" expl="VC for search_loop" proved="true">
