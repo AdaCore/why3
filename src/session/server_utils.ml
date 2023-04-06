@@ -269,7 +269,7 @@ let return_prover name config =
   (* all provers that have the name/version/altern name *)
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
-    Debug.dprintf debug "Prover corresponding to %s has not been found@." name;
+    Debug.dprintf debug "no prover name corresponding to `%s` was found@." name;
     None
   end else
     Some (snd (Whyconf.Mprover.choose provers))

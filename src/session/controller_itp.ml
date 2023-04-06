@@ -530,11 +530,15 @@ let idle_handler () =
   !idle_handler_running
 
 let interrupt c =
+  Debug.dprintf debug_sched "interrupt called@.";
   let config = Whyconf.get_main c.controller_config in
   (* Interrupt provers *)
   Hashtbl.iter
     (fun call e ->
      Call_provers.interrupt_call ~config call;
+     Debug.dprintf debug_sched "interrupt running proof, calling callback with s=%a@."
+        print_status Interrupted;
+     if e.tp_started then decr number_of_running_provers;
      e.tp_callback Interrupted)
     prover_tasks_in_progress;
   (* Do not interrupt editors
@@ -545,8 +549,11 @@ let interrupt c =
   done;
   *)
   number_of_running_provers := 0;
+  Hashtbl.clear prover_tasks_in_progress;
   while not (Queue.is_empty scheduled_proof_attempts) do
     let spa = Queue.pop scheduled_proof_attempts in
+    Debug.dprintf debug_sched "interrupt scheduled proof, calling callback with s=%a@."
+        print_status Interrupted;
     spa.spa_callback Interrupted
   done;
   !observer 0 0 0
@@ -554,9 +561,19 @@ let interrupt c =
 let interrupt_proof_attempts_for_goal c id =
   let config = Whyconf.get_main c.controller_config in
   (* First kill running proof attempts. *)
-  Hashtbl.iter (fun call e ->
-    if e.tp_id = id then Call_provers.interrupt_call ~config call
-    ) prover_tasks_in_progress;
+  let l =
+    Hashtbl.fold (fun call e acc ->
+        if e.tp_id = id then
+          begin
+            Call_provers.interrupt_call ~config call;
+            if e.tp_started then decr number_of_running_provers;
+            e.tp_callback Interrupted;
+            call::acc
+          end
+        else acc)
+      prover_tasks_in_progress []
+  in
+  List.iter (fun x -> Hashtbl.remove prover_tasks_in_progress x) l;
   (* Remove relevant proof attempts from the queue. This requires rebuilding
   the queue as the Stdlib doesn't allow modifying the queue other than via
   push/pop and clear.  *)
@@ -585,8 +602,11 @@ let run_idle_handler () =
 
 let schedule_proof_attempt ?proof_script_filename c id pr ~limit ~callback ~notification =
   let ses = c.controller_session in
+  Debug.dprintf debug_sched "schedule_proof_attempt called@.";
   let callback panid s =
     begin
+      Debug.dprintf debug_sched "schedule_proof_attempt(callback): s=%a@."
+        print_status s;
       match s with
       | UpgradeProver _ | Removed _ -> ()
       | Scheduled ->
@@ -1177,7 +1197,7 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
 
   let need_replay id pa =
     filter pa &&
-      (pa.proof_obsolete || not obsolete_only) &&
+      (pa.proof_state = None || pa.proof_obsolete || not obsolete_only) &&
         (* When on a single proofattempt node, we want to always replay even non
            valid proofattempts.
         *)
