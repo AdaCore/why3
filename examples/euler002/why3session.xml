@@ -3,10 +3,10 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Yices" version="1.0.38" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="euler002.mlw"/>
@@ -14,17 +14,17 @@
  <goal name="fib_even_3n&#39;vc" expl="VC for fib_even_3n" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="fib_even_3n&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="70"/></proof>
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="5"><result status="valid" time="0.01" steps="70"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="5"/></proof>
   <proof prover="7"><result status="valid" time="0.01" steps="2047"/></proof>
   </goal>
   <goal name="fib_even_3n&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="826"/></proof>
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="5"><result status="valid" time="0.01" steps="826"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="5"/></proof>
   <proof prover="7"><result status="valid" time="0.01" steps="2033"/></proof>
   </goal>
   <goal name="fib_even_3n&#39;vc.2" expl="postcondition" proved="true">
@@ -88,8 +88,8 @@
   <proof prover="1"><result status="valid" time="0.01" steps="46"/></proof>
   </goal>
   <goal name="f&#39;vc.14" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="timeout" time="5.00"/></proof>
-  <proof prover="5" timelimit="1"><result status="valid" time="0.05" steps="214278"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.05" steps="214278"/></proof>
+  <proof prover="6"><result status="timeout" time="5.00"/></proof>
   </goal>
   <goal name="f&#39;vc.15" expl="loop invariant preservation" proved="true">
   <proof prover="2" timelimit="60"><result status="valid" time="10.04"/></proof>
@@ -98,8 +98,8 @@
   <proof prover="1"><result status="valid" time="0.01" steps="50"/></proof>
   </goal>
   <goal name="f&#39;vc.17" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="30"/></proof>
-  <proof prover="5"><result status="valid" time="0.01" steps="11264"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="11264"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
  </transf>
  </goal>

@@ -3,10 +3,11 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="7" name="CVC5" version="1.0.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="bignum.mlw"/>
 <theory name="BigNum" proved="true">
@@ -82,7 +83,7 @@
   <proof prover="5"><result status="valid" time="0.03" steps="66"/></proof>
   </goal>
   <goal name="add_cin&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="7"><result status="valid" time="0.03" steps="3075"/></proof>
   </goal>
   <goal name="add_cin&#39;vc.8" expl="variant decrease" proved="true">
   <proof prover="5"><result status="valid" time="0.03" steps="66"/></proof>
@@ -93,22 +94,22 @@
   <goal name="add_cin&#39;vc.10" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="add_cin&#39;vc.10.0" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.01"/></proof>
    <proof prover="5"><result status="valid" time="0.00" steps="22"/></proof>
+   <proof prover="6"><result status="valid" time="0.01" steps="2526"/></proof>
    </goal>
    <goal name="add_cin&#39;vc.10.1" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.01"/></proof>
    <proof prover="5"><result status="valid" time="0.00" steps="24"/></proof>
+   <proof prover="6"><result status="valid" time="0.01" steps="2780"/></proof>
    </goal>
    <goal name="add_cin&#39;vc.10.2" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.01"/></proof>
    <proof prover="5"><result status="valid" time="0.00" steps="24"/></proof>
+   <proof prover="6"><result status="valid" time="0.01" steps="2790"/></proof>
    </goal>
    <goal name="add_cin&#39;vc.10.3" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.04"/></proof>
+   <proof prover="7"><result status="valid" time="0.04" steps="4231"/></proof>
    </goal>
    <goal name="add_cin&#39;vc.10.4" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.04"/></proof>
+   <proof prover="7"><result status="valid" time="0.04" steps="4101"/></proof>
    </goal>
   </transf>
   </goal>

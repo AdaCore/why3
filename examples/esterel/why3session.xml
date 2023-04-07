@@ -3,7 +3,7 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="4000"/>
-<prover id="4" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="4000"/>
+<prover id="1" name="Z3" version="4.7.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="5" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="4000"/>
 <file format="whyml" proved="true">
@@ -30,11 +30,11 @@
   <proof prover="7"><result status="valid" time="1.59" steps="290397"/></proof>
   </goal>
   <goal name="aboveMin&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.48" steps="1345"/></proof>
+  <proof prover="0"><result status="valid" time="0.52" steps="1345"/></proof>
   </goal>
   <goal name="aboveMin&#39;vc.4" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="158"/></proof>
-  <proof prover="4"><result status="valid" time="0.01" steps="27410"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="27410"/></proof>
   <proof prover="7"><result status="valid" time="0.03" steps="10151"/></proof>
   </goal>
  </transf>
@@ -43,16 +43,16 @@
  <transf name="split_goal_right" proved="true" >
   <goal name="maxUnion&#39;vc.0" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="150"/></proof>
-  <proof prover="4"><result status="valid" time="0.02" steps="24676"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="24676"/></proof>
   <proof prover="7"><result status="valid" time="0.05" steps="10022"/></proof>
   </goal>
   <goal name="maxUnion&#39;vc.1" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="152"/></proof>
-  <proof prover="4"><result status="valid" time="0.01" steps="24889"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="24889"/></proof>
   <proof prover="7"><result status="valid" time="0.05" steps="10082"/></proof>
   </goal>
   <goal name="maxUnion&#39;vc.2" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="5.03" steps="6123764"/></proof>
+  <proof prover="1"><result status="valid" time="5.45" steps="6123764"/></proof>
   <proof prover="7"><result status="valid" time="0.53" steps="67118"/></proof>
   </goal>
   <goal name="maxUnion&#39;vc.3" expl="postcondition" proved="true">
@@ -64,7 +64,7 @@
    <proof prover="7"><result status="valid" time="0.06" steps="17280"/></proof>
    </goal>
    <goal name="maxUnion&#39;vc.4.1" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.18" steps="824"/></proof>
+   <proof prover="0"><result status="valid" time="0.22" steps="824"/></proof>
    <proof prover="7"><result status="valid" time="0.17" steps="27881"/></proof>
    </goal>
   </transf>

@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Z3" version="4.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="gnome_sort.mlw"/>
 <theory name="GnomeSort" proved="true">
@@ -25,7 +25,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
   <goal name="gnome_sort&#39;vc.5" expl="loop variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.08" steps="50351"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="50351"/></proof>
   </goal>
   <goal name="gnome_sort&#39;vc.6" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
@@ -40,7 +40,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
   <goal name="gnome_sort&#39;vc.10" expl="loop variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.13" steps="362549"/></proof>
+  <proof prover="0"><result status="valid" time="0.13" steps="362549"/></proof>
   </goal>
   <goal name="gnome_sort&#39;vc.11" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>

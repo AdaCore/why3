@@ -2,24 +2,24 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="2" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.7.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="add.mlw"/>
 <theory name="Add" proved="true">
  <goal name="wmpn_add_n&#39;vc" expl="VC for wmpn_add_n" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="wmpn_add_n&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="11072"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="10418"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="16573"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="15574"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.2" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="11161"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="10506"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.3" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="34"/></proof>
@@ -31,22 +31,22 @@
   <proof prover="3"><result status="valid" time="0.01" steps="40"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.6" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="16695"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="15822"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.7" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="11252"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="10598"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="19052"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="18186"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="19095"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="18229"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="19066"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="18200"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="19067"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="18201"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.12" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -73,34 +73,34 @@
   </transf>
   </goal>
   <goal name="wmpn_add_n&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="12169"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="11516"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="12505"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="11852"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.15" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="12532"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="11879"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.16" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="18998"/></proof>
+  <proof prover="4"><result status="valid" time="0.15" steps="18168"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.17" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="12320"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="11667"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.18" expl="assertion" proved="true">
   <proof prover="2" timelimit="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.19" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="14369"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="13546"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.20" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="12804"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="12151"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.21" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="12843"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="12190"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.22" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="12879"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="12226"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.23" expl="assertion" proved="true">
   <transf name="use_th" proved="true" arg1="lineardecision.LinearDecisionIntMP">
@@ -110,29 +110,29 @@
     <proof prover="2"><result status="valid" time="0.08"/></proof>
     </goal>
     <goal name="wmpn_add_n&#39;vc.23.0.1" proved="true">
-    <proof prover="4"><result status="valid" time="0.24" steps="69846"/></proof>
+    <proof prover="4"><result status="valid" time="0.24" steps="68726"/></proof>
     </goal>
     <goal name="wmpn_add_n&#39;vc.23.0.2" proved="true">
-    <proof prover="4"><result status="valid" time="0.37" steps="69857"/></proof>
+    <proof prover="4"><result status="valid" time="0.37" steps="68737"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_add_n&#39;vc.24" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="19834"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="19002"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.25" expl="loop variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="14572"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="13761"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.26" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="14645"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="13822"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.27" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.28" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.13" steps="21501"/></proof>
+  <proof prover="4"><result status="valid" time="0.13" steps="20661"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.29" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -141,55 +141,55 @@
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.31" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.24" steps="44675"/></proof>
+  <proof prover="4"><result status="valid" time="0.24" steps="43433"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.32" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.29" steps="47329"/></proof>
+  <proof prover="4"><result status="valid" time="0.29" steps="46087"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.33" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="13323"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="12670"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.34" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="79"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.35" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="12072"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="11419"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.36" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="17605"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="16781"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.37" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="13037"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="12384"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.38" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="13040"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="12387"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="wmpn_add&#39;vc" expl="VC for wmpn_add" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="wmpn_add&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="11084"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="10430"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="14468"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="13648"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="12588"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="11768"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="12643"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="11821"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="11320"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="10666"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="11240"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="10586"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.6" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_add&#39;vc.6.0" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.06" steps="13616"/></proof>
+   <proof prover="4"><result status="valid" time="0.06" steps="12798"/></proof>
    </goal>
    <goal name="wmpn_add&#39;vc.6.1" expl="VC for wmpn_add" proved="true">
    <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -197,13 +197,13 @@
   </transf>
   </goal>
   <goal name="wmpn_add&#39;vc.7" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="12157"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="11503"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.8" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="12161"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="11507"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.9" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="17587"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="16760"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.10" expl="loop invariant init" proved="true">
   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.03" steps="85"/></proof>
@@ -215,22 +215,22 @@
   <proof prover="1"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.13" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="13148"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="12494"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.14" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="12358"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="11704"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.15" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="13677"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="12859"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.16" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="14556"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="13756"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.17" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="19137"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="18312"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.18" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="19105"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="18280"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.19" expl="assertion" proved="true">
   <transf name="case" proved="true" arg1="(offset r = offset x)">
@@ -243,46 +243,46 @@
   </transf>
   </goal>
   <goal name="wmpn_add&#39;vc.20" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="15069"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="14253"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.21" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="13430"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="12777"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.22" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.19" steps="20903"/></proof>
+  <proof prover="4"><result status="valid" time="0.19" steps="20078"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.23" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="13218"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="12565"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.24" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.14" steps="189"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.25" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="15538"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="14720"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.26" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="15601"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="14783"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.27" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.19" steps="21179"/></proof>
+  <proof prover="4"><result status="valid" time="0.19" steps="20352"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.28" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.26" steps="23368"/></proof>
+  <proof prover="4"><result status="valid" time="0.26" steps="22543"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.29" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.29" steps="190"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.30" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="15910"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="15094"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.31" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="15761"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="14951"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.32" expl="loop invariant init" proved="true">
   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.46" steps="194"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.33" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.13" steps="23568"/></proof>
+  <proof prover="4"><result status="valid" time="0.13" steps="22735"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.34" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.60" steps="210"/></proof>
@@ -291,22 +291,22 @@
   <proof prover="3"><result status="valid" time="0.70" steps="212"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.36" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.40" steps="49229"/></proof>
+  <proof prover="4"><result status="valid" time="0.40" steps="47862"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.37" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.34" steps="48732"/></proof>
+  <proof prover="4"><result status="valid" time="0.34" steps="47365"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.38" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="16192"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="15386"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.39" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="16988"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="16184"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.40" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="24375"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="23546"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.41" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="24377"/></proof>
+  <proof prover="4"><result status="valid" time="0.15" steps="23548"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.42" expl="assertion" proved="true">
   <transf name="case" proved="true" arg1="(offset r = offset x)">
@@ -314,51 +314,51 @@
    <proof prover="2"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="wmpn_add&#39;vc.42.1" expl="false case (assertion)" proved="true">
-   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.03" steps="83892"/></proof>
+   <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.03" steps="80583"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_add&#39;vc.43" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="17406"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="16586"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.44" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="15111"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="14458"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.45" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="25490"/></proof>
+  <proof prover="4"><result status="valid" time="0.17" steps="24661"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.46" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="14899"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="14246"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.47" expl="assertion" proved="true">
   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="1.08" steps="306"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.48" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="17879"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="17057"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.49" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="17961"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="17139"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.50" expl="assertion" proved="true">
   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.74" steps="291"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.51" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.19" steps="30361"/></proof>
+  <proof prover="4"><result status="valid" time="0.19" steps="29530"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.52" expl="loop variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="17852"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="17042"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.53" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="18187"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="17365"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.54" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="15596"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="14943"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.55" expl="loop invariant preservation" proved="true">
   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.79" steps="296"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.56" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="28313"/></proof>
+  <proof prover="4"><result status="valid" time="0.18" steps="27474"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.57" expl="loop invariant preservation" proved="true">
   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="1.45" steps="318"/></proof>
@@ -367,46 +367,46 @@
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.59" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.93" steps="77024"/></proof>
+  <proof prover="4"><result status="valid" time="0.93" steps="75291"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.60" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.96" steps="76525"/></proof>
+  <proof prover="4"><result status="valid" time="0.96" steps="74806"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.61" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="15920"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="15267"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.62" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.53" steps="242"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.63" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="14838"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="14185"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.64" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="25834"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="25003"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.65" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="15581"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="14928"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.66" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="15584"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="14931"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.67" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.19" steps="21355"/></proof>
+  <proof prover="4"><result status="valid" time="0.19" steps="20530"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.68" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.33" steps="203"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.69" expl="loop variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="15680"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="14874"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.70" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.13" steps="15837"/></proof>
+  <proof prover="4"><result status="valid" time="0.13" steps="15019"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.71" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.23" steps="192"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.72" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="23529"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="22694"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.73" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.33" steps="207"/></proof>
@@ -415,28 +415,28 @@
   <proof prover="3"><result status="valid" time="0.46" steps="209"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.75" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.31" steps="46911"/></proof>
+  <proof prover="4"><result status="valid" time="0.31" steps="45542"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.76" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.33" steps="47769"/></proof>
+  <proof prover="4"><result status="valid" time="0.33" steps="46400"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.77" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="14222"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="13569"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.78" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="14240"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="13587"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.79" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="13022"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="12369"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.80" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="14585"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="13769"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.81" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="127"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.82" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="19890"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="19062"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.83" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="127"/></proof>
@@ -445,22 +445,22 @@
   <proof prover="3"><result status="valid" time="0.04" steps="127"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.85" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="13931"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="13278"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.86" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="13934"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="13281"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.87" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="13189"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="12536"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.88" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="15684"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="14882"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.89" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="20985"/></proof>
+  <proof prover="4"><result status="valid" time="0.15" steps="20158"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.90" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="20945"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="20118"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.91" expl="assertion" proved="true">
   <transf name="case" proved="true" arg1="(offset r = offset x)">
@@ -473,46 +473,46 @@
   </transf>
   </goal>
   <goal name="wmpn_add&#39;vc.92" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="16011"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="15193"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.93" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="14201"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="13548"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.94" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="22518"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="21691"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.95" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="13989"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="13336"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.96" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.19" steps="242"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.97" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="16475"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="15655"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.98" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.13" steps="16557"/></proof>
+  <proof prover="4"><result status="valid" time="0.13" steps="15737"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.99" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.12" steps="226"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.100" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="24476"/></proof>
+  <proof prover="4"><result status="valid" time="0.17" steps="23647"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.101" expl="loop variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.13" steps="16534"/></proof>
+  <proof prover="4"><result status="valid" time="0.13" steps="15726"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.102" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="16763"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="15943"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.103" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="14677"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="14024"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.104" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.18" steps="231"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.105" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.21" steps="25264"/></proof>
+  <proof prover="4"><result status="valid" time="0.21" steps="24427"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.106" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.30" steps="254"/></proof>
@@ -521,40 +521,40 @@
   <proof prover="3"><result status="valid" time="0.31" steps="256"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.108" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.36" steps="50941"/></proof>
+  <proof prover="4"><result status="valid" time="0.36" steps="49438"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.109" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.49" steps="50808"/></proof>
+  <proof prover="4"><result status="valid" time="0.49" steps="49305"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.110" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="15001"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="14348"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.111" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.10" steps="175"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.112" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="13919"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="13266"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.113" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="22047"/></proof>
+  <proof prover="4"><result status="valid" time="0.18" steps="21217"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.114" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="14748"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="14095"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.115" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="14751"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="14098"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.116" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="12153"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="11499"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.117" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="12177"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="11523"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.118" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="12175"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="11521"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.119" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="17291"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="16464"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.120" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="86"/></proof>
@@ -563,22 +563,22 @@
   <proof prover="3"><result status="valid" time="0.04" steps="88"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.122" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="17899"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="17065"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.123" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="13162"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="12508"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.124" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="12372"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="11718"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.125" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="12978"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="12325"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.126" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="18706"/></proof>
+  <proof prover="4"><result status="valid" time="0.18" steps="17883"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.127" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="18674"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="17851"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.128" expl="assertion" proved="true">
   <transf name="case" proved="true" arg1="(offset r = offset x)">
@@ -586,51 +586,51 @@
    <proof prover="2"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="wmpn_add&#39;vc.128.1" expl="false case (assertion)" proved="true">
-   <proof prover="0"><result status="valid" time="0.04" steps="61413"/></proof>
+   <proof prover="5"><result status="valid" time="0.04" steps="58490"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_add&#39;vc.129" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.13" steps="14858"/></proof>
+  <proof prover="4"><result status="valid" time="0.13" steps="14044"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.130" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="13327"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="12674"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.131" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="20139"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="19316"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.132" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="13115"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="12462"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.133" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="52380"/></proof>
+  <proof prover="5"><result status="valid" time="0.04" steps="50026"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.134" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="15313"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="14497"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.135" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="15390"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="14574"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.136" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="174"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.137" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="20805"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="19980"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.138" expl="loop variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="15477"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="14673"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.139" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="15610"/></proof>
+  <proof prover="4"><result status="valid" time="0.15" steps="14794"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.140" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="13794"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="13141"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.141" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.10" steps="179"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.142" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="22839"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="22006"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.143" expl="loop invariant preservation" proved="true">
   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.17" steps="195"/></proof>
@@ -642,75 +642,75 @@
   <proof prover="1"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.146" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.32" steps="542630"/></proof>
+  <proof prover="5"><result status="valid" time="0.32" steps="536612"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.147" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="14118"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="13465"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.148" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="14627"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="13813"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.149" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="13036"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="12383"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.150" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="19644"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="18817"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.151" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="13925"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="13272"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.152" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="13928"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="13275"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="add_n&#39;vc" expl="VC for add_n" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="add_n&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="10822"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="10391"/></proof>
   </goal>
   <goal name="add_n&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="10465"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="10034"/></proof>
   </goal>
   <goal name="add_n&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="10492"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="10061"/></proof>
   </goal>
   <goal name="add_n&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="11668"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="11248"/></proof>
   </goal>
   <goal name="add_n&#39;vc.4" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.10" steps="103"/></proof>
   </goal>
   <goal name="add_n&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="11957"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="11537"/></proof>
   </goal>
   <goal name="add_n&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="13628"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="12994"/></proof>
   </goal>
   <goal name="add_n&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="11876"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="11456"/></proof>
   </goal>
   <goal name="add_n&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="11775"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="11355"/></proof>
   </goal>
   <goal name="add_n&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="12473"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="12053"/></proof>
   </goal>
   <goal name="add_n&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="12496"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="12076"/></proof>
   </goal>
   <goal name="add_n&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="12513"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="12093"/></proof>
   </goal>
   <goal name="add_n&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="12504"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="12084"/></proof>
   </goal>
   <goal name="add_n&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="14657"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="14026"/></proof>
   </goal>
   <goal name="add_n&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="12553"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="12133"/></proof>
   </goal>
   <goal name="add_n&#39;vc.15" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -724,7 +724,7 @@
    <proof prover="3"><result status="valid" time="0.06" steps="233"/></proof>
    </goal>
    <goal name="add_n&#39;vc.15.3" expl="VC for add_n" proved="true">
-   <proof prover="4"><result status="valid" time="0.09" steps="16406"/></proof>
+   <proof prover="4"><result status="valid" time="0.09" steps="15836"/></proof>
    </goal>
   </transf>
   </goal>
@@ -740,7 +740,7 @@
    <proof prover="3"><result status="valid" time="0.06" steps="233"/></proof>
    </goal>
    <goal name="add_n&#39;vc.16.3" expl="VC for add_n" proved="true">
-   <proof prover="4"><result status="valid" time="0.10" steps="16552"/></proof>
+   <proof prover="4"><result status="valid" time="0.10" steps="15982"/></proof>
    </goal>
   </transf>
   </goal>
@@ -748,10 +748,10 @@
   <proof prover="2"><result status="valid" time="1.57"/></proof>
   </goal>
   <goal name="add_n&#39;vc.18" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="13986"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="13566"/></proof>
   </goal>
   <goal name="add_n&#39;vc.19" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="24055"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="23408"/></proof>
   </goal>
   <goal name="add_n&#39;vc.20" expl="postcondition" proved="true">
   <transf name="case" proved="true" arg1="(offset x &lt;= j &lt; offset x + sz)">
@@ -761,12 +761,12 @@
     <proof prover="3"><result status="valid" time="0.06" steps="235"/></proof>
     </goal>
     <goal name="add_n&#39;vc.20.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="4"><result status="valid" time="0.05" steps="14374"/></proof>
+    <proof prover="4"><result status="valid" time="0.05" steps="13954"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="add_n&#39;vc.20.1" expl="false case (postcondition)" proved="true">
-   <proof prover="4"><result status="valid" time="0.15" steps="24122"/></proof>
+   <proof prover="4"><result status="valid" time="0.15" steps="23475"/></proof>
    </goal>
   </transf>
   </goal>
@@ -778,12 +778,12 @@
     <proof prover="3"><result status="valid" time="0.07" steps="235"/></proof>
     </goal>
     <goal name="add_n&#39;vc.21.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="4"><result status="valid" time="0.05" steps="14434"/></proof>
+    <proof prover="4"><result status="valid" time="0.05" steps="14014"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="add_n&#39;vc.21.1" expl="false case (postcondition)" proved="true">
-   <proof prover="4"><result status="valid" time="0.15" steps="24181"/></proof>
+   <proof prover="4"><result status="valid" time="0.15" steps="23534"/></proof>
    </goal>
   </transf>
   </goal>
@@ -794,44 +794,44 @@
   <proof prover="3"><result status="valid" time="0.24" steps="763"/></proof>
   </goal>
   <goal name="add_n&#39;vc.24" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="16771"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="16137"/></proof>
   </goal>
   <goal name="add_n&#39;vc.25" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="16840"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="16200"/></proof>
   </goal>
   <goal name="add_n&#39;vc.26" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.13" steps="16909"/></proof>
+  <proof prover="4"><result status="valid" time="0.13" steps="16263"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="add_n_rx&#39;vc" expl="VC for add_n_rx" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="add_n_rx&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="10805"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="10374"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="10460"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="10029"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="10464"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="10033"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="11575"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="11152"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.4" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.28" steps="236"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="13530"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="12913"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="13690"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="13073"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="11815"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="11392"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="11734"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="11311"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.9" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -844,22 +844,22 @@
   </transf>
   </goal>
   <goal name="add_n_rx&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="12411"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="11988"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="12434"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="12011"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.12" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.11"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="14537"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="13925"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="12549"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="12126"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.15" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="12539"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="12116"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.16" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -873,18 +873,18 @@
    <proof prover="3"><result status="valid" time="0.08" steps="188"/></proof>
    </goal>
    <goal name="add_n_rx&#39;vc.16.3" expl="VC for add_n_rx" proved="true">
-   <proof prover="4"><result status="valid" time="0.09" steps="15888"/></proof>
+   <proof prover="4"><result status="valid" time="0.09" steps="15320"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="add_n_rx&#39;vc.17" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="21926"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="21303"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.18" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="1.36"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.19" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="13458"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="13038"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.20" expl="postcondition" proved="true">
   <transf name="case" proved="true" arg1="(offset x &lt;= j &lt; offset x + sz)">
@@ -892,15 +892,15 @@
    <transf name="replace" proved="true" arg1="j" arg2="(offset x + (j - offset x))">
     <goal name="add_n_rx&#39;vc.20.0.0" expl="true case (postcondition)" proved="true">
     <proof prover="3"><result status="valid" time="0.03" steps="179"/></proof>
-    <proof prover="4"><result status="valid" time="0.09" steps="14222"/></proof>
+    <proof prover="4"><result status="valid" time="0.09" steps="13802"/></proof>
     </goal>
     <goal name="add_n_rx&#39;vc.20.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="4"><result status="valid" time="0.05" steps="13756"/></proof>
+    <proof prover="4"><result status="valid" time="0.05" steps="13336"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="add_n_rx&#39;vc.20.1" expl="false case (postcondition)" proved="true">
-   <proof prover="4"><result status="valid" time="0.16" steps="23066"/></proof>
+   <proof prover="4"><result status="valid" time="0.16" steps="22443"/></proof>
    </goal>
   </transf>
   </goal>
@@ -912,12 +912,12 @@
     <proof prover="3"><result status="valid" time="0.07" steps="192"/></proof>
     </goal>
     <goal name="add_n_rx&#39;vc.21.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="4"><result status="valid" time="0.06" steps="13852"/></proof>
+    <proof prover="4"><result status="valid" time="0.06" steps="13432"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="add_n_rx&#39;vc.21.1" expl="false case (postcondition)" proved="true">
-   <proof prover="4"><result status="valid" time="0.13" steps="23131"/></proof>
+   <proof prover="4"><result status="valid" time="0.13" steps="22508"/></proof>
    </goal>
   </transf>
   </goal>
@@ -926,59 +926,59 @@
   <proof prover="3"><result status="valid" time="0.08" steps="188"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.23" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="15980"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="15370"/></proof>
   </goal>
   <goal name="add_n_rx&#39;vc.24" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="16049"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="15433"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="add&#39;vc" expl="VC for add" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="add&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="10853"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="10422"/></proof>
   </goal>
   <goal name="add&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="10496"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="10065"/></proof>
   </goal>
   <goal name="add&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="10511"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="10080"/></proof>
   </goal>
   <goal name="add&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="11706"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="11286"/></proof>
   </goal>
   <goal name="add&#39;vc.4" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="105"/></proof>
   </goal>
   <goal name="add&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="11996"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="11576"/></proof>
   </goal>
   <goal name="add&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="13690"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="13060"/></proof>
   </goal>
   <goal name="add&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="11915"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="11495"/></proof>
   </goal>
   <goal name="add&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="11814"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="11394"/></proof>
   </goal>
   <goal name="add&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="12500"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="12080"/></proof>
   </goal>
   <goal name="add&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="12511"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="12091"/></proof>
   </goal>
   <goal name="add&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="12528"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="12108"/></proof>
   </goal>
   <goal name="add&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="12519"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="12099"/></proof>
   </goal>
   <goal name="add&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="14693"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="14066"/></proof>
   </goal>
   <goal name="add&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="12568"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="12148"/></proof>
   </goal>
   <goal name="add&#39;vc.15" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -992,7 +992,7 @@
    <proof prover="3"><result status="valid" time="0.06" steps="235"/></proof>
    </goal>
    <goal name="add&#39;vc.15.3" expl="VC for add" proved="true">
-   <proof prover="4"><result status="valid" time="0.10" steps="16462"/></proof>
+   <proof prover="4"><result status="valid" time="0.10" steps="15892"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1008,7 +1008,7 @@
    <proof prover="3"><result status="valid" time="0.04" steps="235"/></proof>
    </goal>
    <goal name="add&#39;vc.16.3" expl="VC for add" proved="true">
-   <proof prover="4"><result status="valid" time="0.09" steps="16608"/></proof>
+   <proof prover="4"><result status="valid" time="0.09" steps="16038"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1016,10 +1016,10 @@
   <proof prover="2"><result status="valid" time="1.87"/></proof>
   </goal>
   <goal name="add&#39;vc.18" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="14022"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="13602"/></proof>
   </goal>
   <goal name="add&#39;vc.19" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.20" steps="24257"/></proof>
+  <proof prover="4"><result status="valid" time="0.20" steps="23614"/></proof>
   </goal>
   <goal name="add&#39;vc.20" expl="postcondition" proved="true">
   <transf name="case" proved="true" arg1="(offset x &lt;= j &lt; offset x + sx)">
@@ -1029,12 +1029,12 @@
     <proof prover="3"><result status="valid" time="0.07" steps="237"/></proof>
     </goal>
     <goal name="add&#39;vc.20.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="4"><result status="valid" time="0.04" steps="14410"/></proof>
+    <proof prover="4"><result status="valid" time="0.04" steps="13990"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="add&#39;vc.20.1" expl="false case (postcondition)" proved="true">
-   <proof prover="4"><result status="valid" time="0.14" steps="24324"/></proof>
+   <proof prover="4"><result status="valid" time="0.14" steps="23681"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1046,12 +1046,12 @@
     <proof prover="3"><result status="valid" time="0.09" steps="237"/></proof>
     </goal>
     <goal name="add&#39;vc.21.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="4"><result status="valid" time="0.05" steps="14470"/></proof>
+    <proof prover="4"><result status="valid" time="0.05" steps="14050"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="add&#39;vc.21.1" expl="false case (postcondition)" proved="true">
-   <proof prover="4"><result status="valid" time="0.14" steps="24384"/></proof>
+   <proof prover="4"><result status="valid" time="0.14" steps="23741"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1062,44 +1062,44 @@
   <proof prover="3"><result status="valid" time="0.30" steps="779"/></proof>
   </goal>
   <goal name="add&#39;vc.24" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="16823"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="16193"/></proof>
   </goal>
   <goal name="add&#39;vc.25" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="16892"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="16256"/></proof>
   </goal>
   <goal name="add&#39;vc.26" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="16961"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="16319"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="add_rx&#39;vc" expl="VC for add_rx" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="add_rx&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="10836"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="10405"/></proof>
   </goal>
   <goal name="add_rx&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="10479"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="10048"/></proof>
   </goal>
   <goal name="add_rx&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="10483"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="10052"/></proof>
   </goal>
   <goal name="add_rx&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="11613"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="11190"/></proof>
   </goal>
   <goal name="add_rx&#39;vc.4" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.13" steps="249"/></proof>
   </goal>
   <goal name="add_rx&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.08" steps="13603"/></proof>
+  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.08" steps="12986"/></proof>
   </goal>
   <goal name="add_rx&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="13779"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="13162"/></proof>
   </goal>
   <goal name="add_rx&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="11854"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="11431"/></proof>
   </goal>
   <goal name="add_rx&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="11773"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="11350"/></proof>
   </goal>
   <goal name="add_rx&#39;vc.9" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1112,10 +1112,10 @@
   </transf>
   </goal>
   <goal name="add_rx&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="12438"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="12015"/></proof>
   </goal>
   <goal name="add_rx&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="12449"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="12026"/></proof>
   </goal>
   <goal name="add_rx&#39;vc.12" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.10"/></proof>
@@ -1126,13 +1126,13 @@
   </transf>
   </goal>
   <goal name="add_rx&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="14628"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="14016"/></proof>
   </goal>
   <goal name="add_rx&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="12564"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="12141"/></proof>
   </goal>
   <goal name="add_rx&#39;vc.15" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="12554"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="12131"/></proof>
   </goal>
   <goal name="add_rx&#39;vc.16" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1146,7 +1146,7 @@
    <proof prover="3"><result status="valid" time="0.06" steps="190"/></proof>
    </goal>
    <goal name="add_rx&#39;vc.16.3" expl="VC for add_rx" proved="true">
-   <proof prover="4"><result status="valid" time="0.12" steps="15944"/></proof>
+   <proof prover="4"><result status="valid" time="0.12" steps="15376"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1161,7 +1161,7 @@
   <proof prover="2"><result status="valid" time="2.15"/></proof>
   </goal>
   <goal name="add_rx&#39;vc.19" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="13496"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="13076"/></proof>
   </goal>
   <goal name="add_rx&#39;vc.20" expl="postcondition" proved="true">
   <transf name="case" proved="true" arg1="(offset x &lt;= j &lt; offset x + sx)">
@@ -1169,15 +1169,15 @@
    <transf name="replace" proved="true" arg1="j" arg2="(offset x + (j - offset x))">
     <goal name="add_rx&#39;vc.20.0.0" expl="true case (postcondition)" proved="true">
     <proof prover="3"><result status="valid" time="0.03" steps="181"/></proof>
-    <proof prover="4"><result status="valid" time="0.09" steps="14260"/></proof>
+    <proof prover="4"><result status="valid" time="0.09" steps="13840"/></proof>
     </goal>
     <goal name="add_rx&#39;vc.20.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="4"><result status="valid" time="0.04" steps="13794"/></proof>
+    <proof prover="4"><result status="valid" time="0.04" steps="13374"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="add_rx&#39;vc.20.1" expl="false case (postcondition)" proved="true">
-   <proof prover="4"><result status="valid" time="0.14" steps="23372"/></proof>
+   <proof prover="4"><result status="valid" time="0.14" steps="22749"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1189,12 +1189,12 @@
     <proof prover="3"><result status="valid" time="0.07" steps="194"/></proof>
     </goal>
     <goal name="add_rx&#39;vc.21.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="4"><result status="valid" time="0.06" steps="13890"/></proof>
+    <proof prover="4"><result status="valid" time="0.06" steps="13470"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="add_rx&#39;vc.21.1" expl="false case (postcondition)" proved="true">
-   <proof prover="4"><result status="valid" time="0.12" steps="23438"/></proof>
+   <proof prover="4"><result status="valid" time="0.12" steps="22815"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1202,23 +1202,23 @@
   <proof prover="3"><result status="valid" time="0.10" steps="190"/></proof>
   </goal>
   <goal name="add_rx&#39;vc.23" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="16051"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="15441"/></proof>
   </goal>
   <goal name="add_rx&#39;vc.24" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="16120"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="15504"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="add_ry&#39;vc" expl="VC for add_ry" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="add_ry&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="10836"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="10405"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="11483"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="10900"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="10502"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="10071"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.3" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.16" steps="253"/></proof>
@@ -1227,10 +1227,10 @@
   <proof prover="3"><result status="valid" time="0.02" steps="87"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.5" expl="assertion" proved="true">
-  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.04" steps="11680"/></proof>
+  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.04" steps="11257"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="11690"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="11267"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.7" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1238,45 +1238,45 @@
    <proof prover="2"><result status="valid" time="1.88"/></proof>
    </goal>
    <goal name="add_ry&#39;vc.7.1" expl="precondition" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.06" steps="12028"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.06" steps="11605"/></proof>
    </goal>
    <goal name="add_ry&#39;vc.7.2" expl="precondition" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.15" steps="28529"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.15" steps="27942"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="add_ry&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="18695"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="18069"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.11" steps="13862"/></proof>
+  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.11" steps="13245"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="13424"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="12825"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="11885"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="11462"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="12476"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="12053"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="12515"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="12092"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="14118"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="13509"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.15" expl="precondition" proved="true">
-  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.08" steps="14381"/></proof>
+  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.08" steps="13771"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.16" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="14691"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="14081"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.17" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="12667"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="12244"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.18" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="12657"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="12234"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.19" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1284,27 +1284,27 @@
    <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.05" steps="194"/></proof>
    </goal>
    <goal name="add_ry&#39;vc.19.1" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="4.72"/></proof>
+   <proof prover="1"><result status="valid" time="2.63"/></proof>
    </goal>
    <goal name="add_ry&#39;vc.19.2" expl="assertion" proved="true">
    <proof prover="3"><result status="valid" time="0.08" steps="194"/></proof>
    </goal>
    <goal name="add_ry&#39;vc.19.3" expl="VC for add_ry" proved="true">
-   <proof prover="4"><result status="valid" time="0.09" steps="16019"/></proof>
+   <proof prover="4"><result status="valid" time="0.09" steps="15451"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="add_ry&#39;vc.20" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.20" steps="23120"/></proof>
+  <proof prover="4"><result status="valid" time="0.20" steps="22499"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.21" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.22" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="13562"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="13142"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.23" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="24256"/></proof>
+  <proof prover="4"><result status="valid" time="0.18" steps="23635"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.24" expl="postcondition" proved="true">
   <transf name="case" proved="true" arg1="(offset x &lt;= j &lt; offset x + sx)">
@@ -1314,12 +1314,12 @@
     <proof prover="3"><result status="valid" time="0.06" steps="198"/></proof>
     </goal>
     <goal name="add_ry&#39;vc.24.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="4"><result status="valid" time="0.06" steps="13956"/></proof>
+    <proof prover="4"><result status="valid" time="0.06" steps="13536"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="add_ry&#39;vc.24.1" expl="false case (postcondition)" proved="true">
-   <proof prover="4"><result status="valid" time="0.15" steps="24307"/></proof>
+   <proof prover="4"><result status="valid" time="0.15" steps="23686"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1328,26 +1328,26 @@
   <proof prover="3"><result status="valid" time="0.10" steps="194"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.26" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="16120"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="15512"/></proof>
   </goal>
   <goal name="add_ry&#39;vc.27" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="16189"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="15575"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="add_n_rxy&#39;vc" expl="VC for add_n_rxy" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="add_n_rxy&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="10411"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="9980"/></proof>
   </goal>
   <goal name="add_n_rxy&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="10789"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="10358"/></proof>
   </goal>
   <goal name="add_n_rxy&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="10415"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="9983"/></proof>
   </goal>
   <goal name="add_n_rxy&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="10416"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="9984"/></proof>
   </goal>
   <goal name="add_n_rxy&#39;vc.4" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="19"/></proof>
@@ -1363,7 +1363,7 @@
   <proof prover="2"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="add_n_rxy&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="10974"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="10543"/></proof>
   </goal>
   <goal name="add_n_rxy&#39;vc.8" expl="postcondition" proved="true">
   <transf name="case" proved="true" arg1="(offset x &lt;= j &lt; offset x + sx)">
@@ -1373,21 +1373,21 @@
     <proof prover="3"><result status="valid" time="0.06" steps="43"/></proof>
     </goal>
     <goal name="add_n_rxy&#39;vc.8.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="4"><result status="valid" time="0.04" steps="11314"/></proof>
+    <proof prover="4"><result status="valid" time="0.04" steps="10883"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="add_n_rxy&#39;vc.8.1" expl="false case (postcondition)" proved="true">
-   <proof prover="0"><result status="valid" time="0.02" steps="42517"/></proof>
    <proof prover="1"><result status="valid" time="0.09"/></proof>
    <proof prover="2"><result status="valid" time="0.04"/></proof>
    <proof prover="3"><result status="valid" time="0.11" steps="40"/></proof>
-   <proof prover="4"><result status="valid" time="0.18" steps="14725"/></proof>
+   <proof prover="4"><result status="valid" time="0.18" steps="14126"/></proof>
+   <proof prover="5"><result status="valid" time="0.02" steps="40983"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="add_n_rxy&#39;vc.9" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="12697"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="12110"/></proof>
   </goal>
  </transf>
  </goal>
@@ -1396,31 +1396,31 @@
  <goal name="wmpn_add_n&#39;vc" expl="VC for wmpn_add_n" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="wmpn_add_n&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="13827"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="12961"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="15702"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="14769"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.2" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="10757"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="10103"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.3" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="10801"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="10146"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="16515"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="15649"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="16598"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="15732"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="11414"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="10761"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="16291"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="15465"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="11525"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="10872"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.9" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1428,18 +1428,18 @@
    <proof prover="2" timelimit="1" memlimit="1000"><result status="valid" time="0.82"/></proof>
    </goal>
    <goal name="wmpn_add_n&#39;vc.9.1" expl="VC for wmpn_add_n" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.11" steps="13025"/></proof>
+   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.11" steps="12212"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_add_n&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="11709"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="11056"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="11748"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="11095"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="11784"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="11131"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.13" expl="assertion" proved="true">
   <transf name="use_th" proved="true" arg1="lineardecision.LinearDecisionIntMP">
@@ -1449,132 +1449,132 @@
     <proof prover="2"><result status="valid" time="0.08"/></proof>
     </goal>
     <goal name="wmpn_add_n&#39;vc.13.0.1" proved="true">
-    <proof prover="4"><result status="valid" time="0.34" steps="67648"/></proof>
+    <proof prover="4"><result status="valid" time="0.34" steps="66532"/></proof>
     </goal>
     <goal name="wmpn_add_n&#39;vc.13.0.2" proved="true">
-    <proof prover="4"><result status="valid" time="0.24" steps="67659"/></proof>
+    <proof prover="4"><result status="valid" time="0.24" steps="66543"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_add_n&#39;vc.14" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="16829"/></proof>
+  <proof prover="4"><result status="valid" time="0.15" steps="16001"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.15" expl="loop variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="13274"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="12467"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.16" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="13317"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="12498"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.17" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.18" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="11964"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="11311"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.19" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="17735"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="16899"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.20" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="11310"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="10657"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.21" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="47"/></proof>
   </goal>
   <goal name="wmpn_add_n&#39;vc.22" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="15518"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="14694"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="wmpn_add&#39;vc" expl="VC for wmpn_add" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="wmpn_add&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="13658"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="12838"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="11075"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="10421"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="13708"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="12888"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.08" steps="10734"/></proof>
+  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.08" steps="10080"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.4" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="11339"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="10685"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.5" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="11343"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="10689"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.6" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="11353"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="10699"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.7" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="12517"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="11699"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.8" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="15512"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="14685"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.9" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="12987"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="12187"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="16309"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="15484"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="17021"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="16196"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.07" steps="11937"/></proof>
+  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.07" steps="11284"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.13" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="1.62"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="13619"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="12801"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.15" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="13682"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="12864"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.16" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="17116"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="16289"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.17" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="18184"/></proof>
+  <proof prover="4"><result status="valid" time="0.18" steps="17359"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.18" expl="assertion" proved="true">
   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.26" steps="112"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.19" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="13996"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="13180"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.20" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="13892"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="13082"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.21" expl="loop invariant init" proved="true">
   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.32" steps="116"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.22" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="18449"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="17616"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.23" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="14463"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="13659"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.24" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.20" steps="19135"/></proof>
+  <proof prover="4"><result status="valid" time="0.20" steps="18306"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.25" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="19208"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="18379"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.26" expl="precondition" proved="true">
-  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.07" steps="12836"/></proof>
+  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.07" steps="12183"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.27" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="14842"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="14020"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.28" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="14931"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="14109"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.29" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="1.68"/></proof>
@@ -1583,148 +1583,148 @@
   <proof prover="3"><result status="valid" time="0.58" steps="159"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.31" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="21327"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="20496"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.32" expl="loop variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="14964"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="14154"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.33" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="15172"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="14350"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.34" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="13226"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="12573"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.35" expl="loop invariant preservation" proved="true">
   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.61" steps="164"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.36" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="20256"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="19417"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.37" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.46" steps="136"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.38" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="19060"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="18229"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.39" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="14577"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="13773"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.40" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="17292"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="16467"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.41" expl="assertion" proved="true">
   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.25" steps="112"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.42" expl="loop variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="13799"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="12993"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.43" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="13918"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="13100"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.44" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.20" steps="114"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.45" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="12408"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="11755"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.46" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="12426"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="11773"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.47" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="18305"/></proof>
+  <proof prover="4"><result status="valid" time="0.15" steps="17470"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.48" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="11800"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="11147"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.49" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="13090"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="12274"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.50" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="75"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.51" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="16419"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="15591"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.52" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="13615"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="12813"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.53" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="16979"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="16152"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.54" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="17055"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="16228"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.55" expl="precondition" proved="true">
-  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.07" steps="12304"/></proof>
+  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.07" steps="11651"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.56" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="13951"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="13131"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.57" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="14040"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="13220"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.58" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.82"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.59" expl="assertion" proved="true">
-  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="1.67" steps="156563"/></proof>
+  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="1.67" steps="152056"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.60" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="18231"/></proof>
+  <proof prover="4"><result status="valid" time="0.15" steps="17402"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.61" expl="loop variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="14127"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="13319"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.62" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="14266"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="13446"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.63" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="12691"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="12038"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.64" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.09" steps="127"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.65" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="18537"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="17700"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.66" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.07" steps="97"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.67" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="17285"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="16455"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.68" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="12410"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="11757"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.69" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="11335"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="10681"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.70" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="11359"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="10705"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.71" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="11357"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="10703"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.72" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="15267"/></proof>
+  <proof prover="4"><result status="valid" time="0.15" steps="14440"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.73" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="11750"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="11097"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.74" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="15870"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="15047"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.75" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="15946"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="15123"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.76" expl="precondition" proved="true">
-  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.08" steps="11828"/></proof>
+  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.08" steps="11175"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.77" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="13348"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="12532"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.78" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="13432"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="12616"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.79" expl="assertion" proved="true">
   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.32" steps="338"/></proof>
@@ -1733,68 +1733,68 @@
   <proof prover="3"><result status="valid" time="0.04" steps="96"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.81" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="16797"/></proof>
+  <proof prover="4"><result status="valid" time="0.18" steps="15972"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.82" expl="loop variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="13594"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="12790"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.83" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="13688"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="12872"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.84" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="12212"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="11559"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.85" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="101"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.86" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="17753"/></proof>
+  <proof prover="4"><result status="valid" time="0.18" steps="16920"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.87" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="13124"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="12310"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.88" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="16081"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="15254"/></proof>
   </goal>
   <goal name="wmpn_add&#39;vc.89" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="11931"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="11278"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="wmpn_add_n_in_place&#39;vc" expl="VC for wmpn_add_n_in_place" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="wmpn_add_n_in_place&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="13689"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="12823"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="14596"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="13685"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.2" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="10731"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="10077"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.3" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="10758"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="10103"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.4" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="10776"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="10121"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="16392"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="15526"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.6" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="49"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="15521"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="14701"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="11586"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="10933"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="16174"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="15348"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="11690"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="11037"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.11" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1805,7 +1805,7 @@
    <proof prover="2"><result status="valid" time="0.27"/></proof>
    </goal>
    <goal name="wmpn_add_n_in_place&#39;vc.11.2" expl="VC for wmpn_add_n_in_place" proved="true">
-   <proof prover="4"><result status="valid" time="0.10" steps="13957"/></proof>
+   <proof prover="4"><result status="valid" time="0.10" steps="13154"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1813,13 +1813,13 @@
   <proof prover="2"><result status="valid" time="2.12"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="12050"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="11397"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="12089"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="11436"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.15" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="12125"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="11472"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.16" expl="assertion" proved="true">
   <transf name="use_th" proved="true" arg1="lineardecision.LinearDecisionIntMP">
@@ -1829,96 +1829,96 @@
     <proof prover="2"><result status="valid" time="0.14"/></proof>
     </goal>
     <goal name="wmpn_add_n_in_place&#39;vc.16.0.1" proved="true">
-    <proof prover="4"><result status="valid" time="0.26" steps="67676"/></proof>
+    <proof prover="4"><result status="valid" time="0.26" steps="66560"/></proof>
     </goal>
     <goal name="wmpn_add_n_in_place&#39;vc.16.0.2" proved="true">
-    <proof prover="4"><result status="valid" time="0.24" steps="67687"/></proof>
+    <proof prover="4"><result status="valid" time="0.24" steps="66571"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.17" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="16977"/></proof>
+  <proof prover="4"><result status="valid" time="0.14" steps="16149"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.18" expl="loop variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="13606"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="12799"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.19" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="13654"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="12835"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.20" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.21" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="12305"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="11652"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.22" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.32"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.23" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="18090"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="17254"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.24" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="11457"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="10804"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.25" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="45"/></proof>
   </goal>
   <goal name="wmpn_add_n_in_place&#39;vc.26" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="15519"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="14695"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="wmpn_add_in_place&#39;vc" expl="VC for wmpn_add_in_place" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="wmpn_add_in_place&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="13557"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="12737"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="11063"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="10409"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="10701"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="10047"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.3" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="11320"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="10666"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.4" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="11324"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="10670"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.5" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="11334"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="10680"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.6" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="12497"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="11679"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.7" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.13" steps="16088"/></proof>
+  <proof prover="4"><result status="valid" time="0.13" steps="15261"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.8" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="15491"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="14664"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.9" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="13143"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="12343"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="16233"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="15408"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.11" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="79"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="12355"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="11702"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="12382"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="11729"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="17999"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="17174"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.15" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="12170"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="11517"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.16" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="2.08"/></proof>
@@ -1927,16 +1927,16 @@
   <proof prover="3"><result status="valid" time="0.16" steps="332"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.18" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="14070"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="13252"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.19" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="14154"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="13336"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.20" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="18360"/></proof>
+  <proof prover="4"><result status="valid" time="0.17" steps="17533"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.21" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.20" steps="19519"/></proof>
+  <proof prover="4"><result status="valid" time="0.20" steps="18694"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.22" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.46" steps="114"/></proof>
@@ -1944,105 +1944,105 @@
   <goal name="wmpn_add_in_place&#39;vc.23" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_add_in_place&#39;vc.23.0" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.06" steps="13054"/></proof>
+   <proof prover="4"><result status="valid" time="0.06" steps="12401"/></proof>
    </goal>
    <goal name="wmpn_add_in_place&#39;vc.23.1" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.04" steps="13067"/></proof>
+   <proof prover="4"><result status="valid" time="0.04" steps="12414"/></proof>
    </goal>
    <goal name="wmpn_add_in_place&#39;vc.23.2" expl="VC for wmpn_add_in_place" proved="true">
    <proof prover="3"><result status="valid" time="0.45" steps="123"/></proof>
    </goal>
    <goal name="wmpn_add_in_place&#39;vc.23.3" expl="VC for wmpn_add_in_place" proved="true">
-   <proof prover="4"><result status="valid" time="0.05" steps="13254"/></proof>
+   <proof prover="4"><result status="valid" time="0.05" steps="12601"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.24" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="20365"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="19536"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.25" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="14670"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="13854"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.26" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="14735"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="13919"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.27" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.46" steps="121"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.28" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="14744"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="13942"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.29" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="23240"/></proof>
+  <proof prover="4"><result status="valid" time="0.18" steps="22407"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.30" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="18536"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="17711"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.31" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.29" steps="114"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.32" expl="loop variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="14241"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="13435"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.33" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="14365"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="13547"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.34" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="14278"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="13470"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.35" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="12813"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="12160"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.36" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="12831"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="12178"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.37" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.42" steps="123"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.38" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="20079"/></proof>
+  <proof prover="4"><result status="valid" time="0.18" steps="19244"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.39" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="13778"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="12959"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.40" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="17047"/></proof>
+  <proof prover="4"><result status="valid" time="0.15" steps="16219"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.41" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="13399"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="12582"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.42" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="13452"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="12635"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.43" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.06" steps="78"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.44" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="12261"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="11608"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.45" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.13" steps="18265"/></proof>
+  <proof prover="4"><result status="valid" time="0.13" steps="17437"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.46" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="15033"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="14206"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.47" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="16846"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="15973"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.48" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="11496"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="10842"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.49" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="11528"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="10874"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.50" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="53"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.51" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="11623"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="10969"/></proof>
   </goal>
   <goal name="wmpn_add_in_place&#39;vc.52" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="17143"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="16316"/></proof>
   </goal>
  </transf>
  </goal>
