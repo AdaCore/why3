@@ -840,6 +840,10 @@ let dexpr ?loc node =
         dexpr_expected_type de1 dity_bool;
         dexpr_expected_type de2 dity_bool;
         dvty_bool
+    | DEif (de1,de2,{de_node=DEsym (RS rs)}) when rs_equal rs (rs_tuple 0) ->
+        dexpr_expected_type de1 dity_bool;
+        dexpr_expected_type de2 dity_unit;
+        dvty_unit
     | DEif (de1,de2,de3) ->
         let res = dity_fresh () in
         dexpr_expected_type de1 dity_bool;
