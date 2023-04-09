@@ -3,23 +3,24 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Coq" version="8.11.2" timelimit="8" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.8.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="4000"/>
-<prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="9" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="dfa_example.mlw"/>
 <theory name="DfaExample" proved="true">
  <goal name="nil_notin_r1" proved="true">
  <proof prover="0"><path name="dfa_example_DfaExample_nil_notin_r1_1.v"/><result status="valid" time="0.29"/></proof>
- <proof prover="1" memlimit="4000"><result status="valid" time="0.08" steps="518"/></proof>
+ <proof prover="2" memlimit="4000"><result status="valid" time="0.24" steps="444477"/></proof>
  <proof prover="4"><result status="valid" time="0.10"/></proof>
  </goal>
  <goal name="all_in_r0&#39;vc" expl="VC for all_in_r0" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="219"/></proof>
+ <proof prover="5"><result status="valid" time="0.02" steps="368"/></proof>
  </goal>
  <goal name="words_in_r1_end_with_one" proved="true">
- <proof prover="1"><result status="valid" time="0.41" steps="820724"/></proof>
+ <proof prover="2"><result status="valid" time="0.11" steps="215814"/></proof>
  </goal>
  <goal name="words_in_r1_suffix_in_r1&#39;vc" expl="VC for words_in_r1_suffix_in_r1" proved="true">
  <proof prover="9"><result status="valid" time="0.70" steps="111492"/></proof>
@@ -27,27 +28,37 @@
  <goal name="zero_w_in_r1&#39;vc" expl="VC for zero_w_in_r1" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="zero_w_in_r1&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="65"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="27156"/></proof>
   </goal>
   <goal name="zero_w_in_r1&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="3.30" steps="5705185"/></proof>
+  <proof prover="2"><result status="valid" time="3.30" steps="5112750"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="one_w_in_r1&#39;vc" expl="VC for one_w_in_r1" proved="true">
- <proof prover="1"><result status="valid" time="2.23" steps="8152"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="one_w_in_r1&#39;vc.0" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.11" steps="17533"/></proof>
+  </goal>
+  <goal name="one_w_in_r1&#39;vc.1" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="7242"/></proof>
+  </goal>
+  <goal name="one_w_in_r1&#39;vc.2" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.32" steps="54372"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="zero_w_in_r2" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="62"/></proof>
+ <proof prover="3"><result status="valid" time="0.06" steps="8741"/></proof>
  </goal>
  <goal name="one_w_in_r2" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="65"/></proof>
+ <proof prover="3"><result status="valid" time="0.06" steps="8761"/></proof>
  </goal>
  <goal name="astate1&#39;vc" expl="VC for astate1" proved="true">
- <proof prover="1"><result status="valid" time="0.05" steps="673"/></proof>
+ <proof prover="3"><result status="valid" time="0.08" steps="12478"/></proof>
  </goal>
  <goal name="astate2&#39;vc" expl="VC for astate2" proved="true">
- <proof prover="1"><result status="valid" time="0.06" steps="671"/></proof>
+ <proof prover="3"><result status="valid" time="0.08" steps="13102"/></proof>
  </goal>
 </theory>
 </file>

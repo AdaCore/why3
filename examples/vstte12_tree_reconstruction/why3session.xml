@@ -3,35 +3,38 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.8.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Coq" version="8.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="7" name="CVC5" version="1.0.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="8" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="vstte12_tree_reconstruction.mlw"/>
 <theory name="Tree" proved="true">
  <goal name="depths_head" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="depths_head.0" proved="true">
-  <proof prover="3"><result status="valid" time="0.01" steps="131"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="200"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="depths_unique&#39;vc" expl="VC for depths_unique" proved="true">
- <proof prover="3"><result status="valid" time="0.09" steps="864"/></proof>
+ <proof prover="8"><result status="valid" time="0.17" steps="1947"/></proof>
  </goal>
  <goal name="depths_prefix" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="depths_prefix.0" proved="true">
-  <proof prover="3"><result status="valid" time="0.02" steps="175"/></proof>
+  <proof prover="1"><result status="valid" time="2.33" steps="3529217"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="depths_prefix_simple" proved="true">
- <proof prover="3"><result status="valid" time="0.03" steps="88827"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="190871"/></proof>
  </goal>
  <goal name="depths_subtree&#39;vc" expl="VC for depths_subtree" proved="true">
- <proof prover="3"><result status="valid" time="0.08" steps="442"/></proof>
+ <proof prover="8"><result status="valid" time="0.10" steps="1365"/></proof>
  </goal>
  <goal name="depths_unique2" proved="true">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -41,22 +44,22 @@
  <goal name="build_rec&#39;vc" expl="VC for build_rec" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="build_rec&#39;vc.0" expl="exceptional postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="16973"/></proof>
   </goal>
   <goal name="build_rec&#39;vc.1" expl="exceptional postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.06" steps="9378"/></proof>
   </goal>
   <goal name="build_rec&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01" steps="64"/></proof>
+  <proof prover="6"><result status="valid" time="0.05" steps="7459"/></proof>
   </goal>
   <goal name="build_rec&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.02" steps="10"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="17431"/></proof>
   </goal>
   <goal name="build_rec&#39;vc.4" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.03" steps="62"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="19940"/></proof>
   </goal>
   <goal name="build_rec&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01" steps="18"/></proof>
+  <proof prover="6"><result status="valid" time="0.05" steps="7258"/></proof>
   </goal>
   <goal name="build_rec&#39;vc.6" expl="exceptional postcondition" proved="true">
   <proof prover="5"><path name="vstte12_tree_reconstruction_TreeReconstruction_VC_build_rec_1.v"/><result status="valid" time="0.44"/></proof>
@@ -158,7 +161,7 @@
   <proof prover="4"><result status="valid" time="0.04" steps="14351"/></proof>
   </goal>
   <goal name="tc&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.98" steps="2919"/></proof>
+  <proof prover="7"><result status="valid" time="0.06" steps="9079"/></proof>
   </goal>
   <goal name="tc&#39;vc.9" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.04" steps="11578"/></proof>
@@ -194,7 +197,7 @@
   <proof prover="4"><result status="valid" time="0.06" steps="14561"/></proof>
   </goal>
   <goal name="tc&#39;vc.20" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.74" steps="2227"/></proof>
+  <proof prover="7"><result status="valid" time="0.06" steps="9728"/></proof>
   </goal>
   <goal name="tc&#39;vc.21" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.04" steps="11620"/></proof>
