@@ -22,7 +22,8 @@ open Session_itp
 open Wstdlib
 
 let opt_print_provers = ref false
-let opt_stats_print = ref false
+let opt_provers_stats = ref false
+let opt_session_stats = ref false
 let opt_hist_print = ref false
 let opt_project_dir = ref false
 let opt_print0 = ref false
@@ -31,8 +32,10 @@ let spec =
   let open Getopt in
   [ KLong "provers", Hnd0 (fun () -> opt_print_provers := true),
     " print provers used in the session";
-    KLong "stats", Hnd0 (fun () -> opt_stats_print := true),
-    " print various proofs statistics";
+    KLong "session-stats", Hnd0 (fun () -> opt_session_stats := true),
+    " print proofs statistics per sessions";
+    KLong "provers-stats", Hnd0 (fun () -> opt_provers_stats := true),
+    " print statistics of prover usage for all given sessions";
     KLong "graph", Hnd0 (fun () -> opt_hist_print := true),
     " print a graph of the total time needed by each prover\n\
       depending on the number of goals";
@@ -54,7 +57,8 @@ type proof_stats =
       prover_min_time : float Hprover.t;
       prover_sum_time : float Hprover.t;
       prover_max_time : float Hprover.t;
-      prover_num_proofs : int Hprover.t;
+      prover_successful_proofs : int Hprover.t;
+      prover_all_proofs : int Hprover.t;
       (* prover_data : (string) Hprover.t *)
     }
 
@@ -70,7 +74,8 @@ let new_proof_stats () =
     prover_min_time = Hprover.create 3;
     prover_sum_time = Hprover.create 3;
     prover_max_time = Hprover.create 3;
-    prover_num_proofs =  Hprover.create 3;
+    prover_successful_proofs =  Hprover.create 3;
+    prover_all_proofs =  Hprover.create 3;
     (* prover_data = Hprover.create 3  *)}
 
 let apply_f_on_hashtbl_entry ~tbl ~f ~name  =
@@ -131,7 +136,7 @@ let update_perf_stats stats ((_,t) as prover_and_time) =
   update_min_time stats.prover_min_time prover_and_time;
   update_max_time stats.prover_max_time prover_and_time;
   update_sum_time stats.prover_sum_time prover_and_time;
-  update_count stats.prover_num_proofs prover_and_time;
+  update_count stats.prover_successful_proofs prover_and_time;
   update_hist stats.prover_hist prover_and_time
 
 let string_of_prover p = Pp.string_of_wnl print_prover p
@@ -143,6 +148,11 @@ let rec stats_of_goal ~root prefix_name stats ses goal =
   let proof_list =
     List.fold_left
       (fun acc pa ->
+         let n = try
+             Hprover.find stats.prover_all_proofs pa.prover
+           with Not_found -> 0
+         in
+         Hprover.replace stats.prover_all_proofs pa.prover (n+1);
         match pa.proof_state with
           | Some result ->
             begin
@@ -312,7 +322,7 @@ let finalize_stats stats =
     stats.prover_avg_time
 *)
 
-let print_stats ses r0 r1 stats =
+let print_session_stats ses r0 r1 stats =
   printf "== Number of root goals ==@\n  total: %d  proved: %d@\n@\n"
     stats.nb_root_goals stats.nb_proved_root_goals;
 
@@ -327,17 +337,27 @@ let print_stats ses r0 r1 stats =
   printf "== Goals proved by only one prover ==@\n  @[";
   print_session_stats ~time:false ses r1;
   (* Sstr.iter (fun s -> printf "%s@\n" s) stats.only_one_proof; *)
-  printf "@]@\n";
+  printf "@]@\n"
 
-  printf "== Statistics per prover: number of proofs, time (minimum/maximum/average) in seconds ==@\n  @[";
-  Hprover.iter (fun prover n ->
-    let sum_times = Hprover.find stats.prover_sum_time prover in
-    printf "%-20s: %3d %6.2f %6.2f %6.2f@\n"
-      (string_of_prover prover) n
-      (Hprover.find stats.prover_min_time prover)
-      (Hprover.find stats.prover_max_time prover)
-      (sum_times /. (float_of_int n)))
-    stats.prover_num_proofs;
+
+let print_overall_stats stats =
+  printf "== Statistics per prover: number of proof attempts, successful ones, time (minimum/maximum/average) in seconds ==@\n  @[";
+  let l = Hprover.fold (fun prover n acc ->
+      let ns,min,max,avg =
+        try
+          let ns = Hprover.find stats.prover_successful_proofs prover in
+          let sum_times = Hprover.find stats.prover_sum_time prover in
+          ns,Hprover.find stats.prover_min_time prover,
+          Hprover.find stats.prover_max_time prover,
+          sum_times /. (float_of_int n)
+        with Not_found -> 0,0.0,0.0,0.0
+      in (string_of_prover prover,n,ns,min,max,avg)::acc)
+      stats.prover_all_proofs []
+  in
+  let l = List.sort (fun (p1,_,_,_,_,_) (p2,_,_,_,_,_) -> compare p1 p2) l in
+  List.iter (fun (p,n,ns, min,max,avg) ->
+    printf "%-30s: %5d %5d %6.2f %6.2f %6.2f@\n" p n ns min max avg)
+    l;
   printf "@]@\n"
 
 
@@ -348,17 +368,17 @@ let run_one stats r0 r1 fname =
     printf "%a@."
       (Pp.print_iter1 Sprover.iter sep print_prover)
       (get_used_provers ses);
-  if !opt_stats_print || !opt_hist_print then
+  if !opt_provers_stats || !opt_session_stats || !opt_hist_print then
     begin
       (* fill_prover_data stats session; *)
       Hfile.iter (stats_of_file stats ses) (get_files ses);
       r0 := stats2_of_session ~nb_proofs:0 ses !r0;
       r1 := stats2_of_session ~nb_proofs:1 ses !r1
     end;
-  if !opt_stats_print then
+  if !opt_session_stats then
     begin
       (* finalize_stats stats; *)
-      print_stats ses !r0 !r1 stats
+      print_session_stats ses !r0 !r1 stats
     end
 
 (**** print histograms ******)
@@ -426,6 +446,7 @@ let run () =
   let stats = new_proof_stats () in
   let r0 = ref [] and r1 = ref [] in
   iter_files (run_one stats r0 r1);
+  if !opt_provers_stats then print_overall_stats stats;
   if !opt_hist_print then print_hist stats
 
 

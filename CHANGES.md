@@ -4,16 +4,19 @@
 
 Tools
   * Strategies can now execute a group of provers simultaneously in a single
-    `call` step. Each prover invocation is separated by a `|`. 
-  * New options have been added to enable warnings `--warn=WARNING` and 
-    disable them `--warn-off=WARNING`. Available warnings can be listed 
-    using `--list-warning-flags`. 
+    `call` step. Each prover invocation is separated by a `|`.
+  * New options have been added to enable warnings `--warn=WARNING` and
+    disable them `--warn-off=WARNING`. Available warnings can be listed
+    using `--list-warning-flags`.
   * The debug flags `ignore_missing_diverges` and `ignore_unused_vars` have
-    been replaced by the warnings `missing_diverges` and `unused_variable` 
+    been replaced by the warnings `missing_diverges` and `unused_variable`
     respectively.
-  * the driver files appearing in a config file specified using option
+  * The driver files appearing in a config file specified using option
     `--extra-config` are searched also in the sub-directory of that
     config file
+  * Statistics given by `why3 session info` have been restructured
+    into separate statistics per session and overall statistics. See
+    manual Section 5.5.1 "Command info" for details. :x:
 
 Provers
   * support for Coq 8.17.0 (released Mar 23, 2023)
