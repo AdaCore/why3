@@ -546,6 +546,7 @@ if enabled rac; then
 echo "=== Checking RAC ==="
 mlw="examples/tests/rac.mlw"
 output="examples/tests/rac.out"
+oracle="examples/tests/rac.oracle"
 (
     rac "$mlw" Local test1 test2 test3 test4 test5
     rac "$mlw" Global test1 test2
@@ -570,10 +571,11 @@ output="examples/tests/rac.out"
     rac "$mlw" FunctionVariant 'test1 2' 'test2 2' 'test3 2' 'test4 2' 'test5 2'
     rac "$mlw" ArrayList main
 ) > "$output"
-if git diff --exit-code --src-prefix=EXPECTED/ --dst-prefix=ACTUAL/ "$output"; then
+if diff "$oracle" "$output"; then
     echo "RAC: ok"
 else
-    echo "RAC: diff in output $output"
+    echo "RAC: differences detected as shown above"
+    echo "To validate the differences, please manually copy file $output to $oracle"
     exit 1
 fi
 echo ""
