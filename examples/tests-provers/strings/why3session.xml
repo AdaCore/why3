@@ -2,11 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Z3" version="4.8.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.8" alternative="strings" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.8.6" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.8.15" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml">
@@ -140,13 +138,13 @@
  </goal>
  <goal name="to_int_lt_0">
  <proof prover="1"><result status="timeout" time="5.00" steps="453399"/></proof>
- <proof prover="5"><result status="timeout" time="1.00"/></proof>
+ <proof prover="2" timelimit="1"><result status="timeout" time="1.00"/></proof>
  <proof prover="6"><result status="timeout" time="1.00" steps="117443"/></proof>
  <proof prover="7"><result status="timeout" time="1.00"/></proof>
  </goal>
  <goal name="to_int_gt_9">
  <proof prover="1"><result status="timeout" time="5.00" steps="471301"/></proof>
- <proof prover="5"><result status="timeout" time="1.00"/></proof>
+ <proof prover="2" timelimit="1"><result status="timeout" time="1.00"/></proof>
  <proof prover="6"><result status="timeout" time="1.00" steps="117457"/></proof>
  <proof prover="7"><result status="timeout" time="1.00"/></proof>
  </goal>
@@ -327,7 +325,7 @@
  <proof prover="1"><result status="valid" time="0.02" steps="1900"/></proof>
  </goal>
  <goal name="TestDigit" proved="true">
- <proof prover="3"><result status="valid" time="0.03" steps="11263"/></proof>
+ <proof prover="2"><result status="valid" time="0.01" steps="10836"/></proof>
  </goal>
  <goal name="star1">
  </goal>
@@ -385,7 +383,7 @@
  <proof prover="1"><result status="valid" time="0.02" steps="2253"/></proof>
  </goal>
  <goal name="range_negative" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="3489"/></proof>
+ <proof prover="2"><result status="valid" time="0.01" steps="4975"/></proof>
  </goal>
  <goal name="range_not_singleton">
  </goal>

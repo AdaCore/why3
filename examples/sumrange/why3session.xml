@@ -4,8 +4,8 @@
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC5" version="1.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.11.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="sumrange.mlw"/>
 <theory name="ArraySum" proved="true">
@@ -37,7 +37,7 @@
    <goal name="sum_right.0.1" proved="true">
    <transf name="instantiate" proved="true" arg1="h" arg2="(j-i)">
     <goal name="sum_right.0.1.0" proved="true">
-    <proof prover="2"><result status="valid" time="0.31" steps="693476"/></proof>
+    <proof prover="4"><result status="valid" time="0.07" steps="529970"/></proof>
     </goal>
    </transf>
    </goal>
@@ -144,13 +144,13 @@
 </theory>
 <theory name="CumulativeArray" proved="true">
  <goal name="create&#39;vc" expl="VC for create" proved="true">
- <proof prover="2"><result status="valid" time="0.02" steps="15492"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="22848"/></proof>
  </goal>
  <goal name="query&#39;vc" expl="VC for query" proved="true">
  <proof prover="3"><result status="valid" time="0.06" steps="12547"/></proof>
  </goal>
  <goal name="update&#39;vc" expl="VC for update" proved="true">
- <proof prover="2"><result status="valid" time="0.05" steps="62699"/></proof>
+ <proof prover="4"><result status="valid" time="0.02" steps="71868"/></proof>
  </goal>
 </theory>
 <theory name="CumulativeTree" proved="true">

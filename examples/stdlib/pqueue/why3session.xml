@@ -2,15 +2,15 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Z3" version="4.8.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.11.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name=".."/><path name=".."/><path name="stdlib"/>
 <path name="pqueue.mlw"/>
 <theory name="Pqueue" proved="true">
  <goal name="t&#39;vc" expl="VC for t" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="47631"/></proof>
+ <proof prover="3"><result status="valid" time="0.02" steps="60300"/></proof>
  </goal>
 </theory>
 <theory name="Harness" proved="true">

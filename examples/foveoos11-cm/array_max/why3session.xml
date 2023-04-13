@@ -2,15 +2,15 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="0"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="0"/>
+<prover id="2" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="0"/>
 <prover id="3" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="array_max.mlw"/>
 <theory name="ArrayMax" proved="true">
  <goal name="max&#39;vc" expl="VC for max" proved="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
  <proof prover="1"><result status="valid" time="0.05"/></proof>
+ <proof prover="2"><result status="valid" time="0.02" steps="40772"/></proof>
  <proof prover="3"><result status="valid" time="0.31" steps="846"/></proof>
  </goal>
 </theory>

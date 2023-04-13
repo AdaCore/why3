@@ -6,8 +6,8 @@
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.8.10" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_2021_dll_to_bst.mlw"/>
@@ -219,7 +219,7 @@
      <goal name="dll_to_bst_rec&#39;vc.18.0.8.0" expl="apply premises" proved="true">
      <proof prover="2"><result status="valid" time="0.03" steps="81"/></proof>
      <proof prover="3"><result status="valid" time="0.10" steps="31392"/></proof>
-     <proof prover="4"><result status="valid" time="0.04" steps="171044"/></proof>
+     <proof prover="6"><result status="valid" time="0.03" steps="161087"/></proof>
      </goal>
      <goal name="dll_to_bst_rec&#39;vc.18.0.8.1" expl="apply premises" proved="true">
      <proof prover="1"><result status="valid" time="2.74" steps="2482"/></proof>
@@ -253,7 +253,7 @@
   <proof prover="3"><result status="valid" time="1.09" steps="205196"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.23" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="205819"/></proof>
+  <proof prover="6"><result status="valid" time="0.04" steps="183295"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.24" expl="postcondition" proved="true">
   <transf name="split_all_full" proved="true" >

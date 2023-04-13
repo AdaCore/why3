@@ -2,12 +2,11 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="1" name="Z3" version="4.7.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Z3" version="4.11.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.1.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="11" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="12" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="bitwalker.mlw"/>
@@ -21,22 +20,22 @@
  <goal name="nth_ultpre0&#39;vc" expl="VC for nth_ultpre0" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="nth_ultpre0&#39;vc.0" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="51851"/></proof>
   <proof prover="2"><result status="valid" time="0.06" steps="215"/></proof>
-  <proof prover="11"><result status="valid" time="0.05" steps="29524"/></proof>
   </goal>
   <goal name="nth_ultpre0&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.12" steps="177089"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="147503"/></proof>
   </goal>
   <goal name="nth_ultpre0&#39;vc.2" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.17" steps="1768477"/></proof>
   <proof prover="2"><result status="valid" time="0.10" steps="655"/></proof>
-  <proof prover="11"><result status="valid" time="0.65" steps="1111346"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="poke_64bit_bv&#39;vc" expl="VC for poke_64bit_bv" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="poke_64bit_bv&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="11"><result status="valid" time="0.02" steps="33648"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="41342"/></proof>
   </goal>
   <goal name="poke_64bit_bv&#39;vc.1" expl="arithmetic overflow" proved="true">
   <proof prover="12"><result status="valid" time="0.02" steps="10642"/></proof>
@@ -48,20 +47,20 @@
   <proof prover="3"><result status="valid" time="0.10" steps="18090"/></proof>
   </goal>
   <goal name="poke_64bit_bv&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="11"><result status="valid" time="0.08" steps="79202"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="115578"/></proof>
   </goal>
   <goal name="poke_64bit_bv&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="11"><result status="valid" time="0.23" steps="267734"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="369034"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="poke_64bit&#39;vc" expl="VC for poke_64bit" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="poke_64bit&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="11"><result status="valid" time="0.05" steps="59618"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="86255"/></proof>
   </goal>
   <goal name="poke_64bit&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="11"><result status="valid" time="0.09" steps="110254"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="261345"/></proof>
   </goal>
   <goal name="poke_64bit&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="12"><result status="valid" time="0.04" steps="23473"/></proof>
@@ -80,7 +79,7 @@
  <goal name="peek_8bit_bv&#39;vc" expl="VC for peek_8bit_bv" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="peek_8bit_bv&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="11"><result status="valid" time="0.04" steps="34461"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="48372"/></proof>
   </goal>
   <goal name="peek_8bit_bv&#39;vc.1" expl="arithmetic overflow" proved="true">
   <proof prover="12"><result status="valid" time="0.02" steps="10656"/></proof>
@@ -89,7 +88,7 @@
   <proof prover="3"><result status="valid" time="0.06" steps="9917"/></proof>
   </goal>
   <goal name="peek_8bit_bv&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="11"><result status="valid" time="0.05" steps="39689"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="76674"/></proof>
   </goal>
  </transf>
  </goal>
@@ -108,7 +107,7 @@
   <proof prover="12"><result status="valid" time="0.04" steps="12868"/></proof>
   </goal>
   <goal name="peek_8bit_array&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="11"><result status="valid" time="0.02" steps="14508"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="34600"/></proof>
   </goal>
  </transf>
  </goal>
@@ -130,13 +129,13 @@
   <proof prover="12"><result status="valid" time="0.02" steps="12925"/></proof>
   </goal>
   <goal name="peek&#39;vc.5" expl="loop invariant init" proved="true">
-  <proof prover="11"><result status="valid" time="0.03" steps="1168"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="2447"/></proof>
   </goal>
   <goal name="peek&#39;vc.6" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.07" steps="234"/></proof>
   </goal>
   <goal name="peek&#39;vc.7" expl="loop invariant init" proved="true">
-  <proof prover="11"><result status="valid" time="0.02" steps="17622"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="33109"/></proof>
   </goal>
   <goal name="peek&#39;vc.8" expl="arithmetic overflow" proved="true">
   <proof prover="12"><result status="valid" time="0.02" steps="13262"/></proof>
@@ -145,13 +144,13 @@
   <proof prover="12"><result status="valid" time="0.01" steps="12033"/></proof>
   </goal>
   <goal name="peek&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="11"><result status="valid" time="0.07" steps="85195"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="297202"/></proof>
   </goal>
   <goal name="peek&#39;vc.11" expl="arithmetic overflow" proved="true">
   <proof prover="12"><result status="valid" time="0.02" steps="13470"/></proof>
   </goal>
   <goal name="peek&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="11"><result status="valid" time="0.08" steps="82074"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="167665"/></proof>
   </goal>
   <goal name="peek&#39;vc.13" expl="arithmetic overflow" proved="true">
   <proof prover="12"><result status="valid" time="0.02" steps="14317"/></proof>
@@ -160,29 +159,29 @@
   <proof prover="12"><result status="valid" time="0.03" steps="14499"/></proof>
   </goal>
   <goal name="peek&#39;vc.15" expl="loop invariant preservation" proved="true">
-  <proof prover="11"><result status="valid" time="0.19" steps="137186"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="546800"/></proof>
   </goal>
   <goal name="peek&#39;vc.16" expl="loop invariant preservation" proved="true">
-  <proof prover="11"><result status="valid" time="0.65" steps="608385"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="1041703"/></proof>
   </goal>
   <goal name="peek&#39;vc.17" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.25" steps="797"/></proof>
   </goal>
   <goal name="peek&#39;vc.18" expl="loop invariant preservation" proved="true">
-  <proof prover="11"><result status="valid" time="0.03" steps="21784"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="55441"/></proof>
   </goal>
   <goal name="peek&#39;vc.19" expl="postcondition" proved="true">
   <proof prover="12"><result status="valid" time="0.02" steps="13232"/></proof>
   </goal>
   <goal name="peek&#39;vc.20" expl="postcondition" proved="true">
-  <proof prover="11"><result status="valid" time="0.09" steps="85319"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="444691"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="peek_64bit&#39;vc" expl="VC for peek_64bit" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="peek_64bit&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="11"><result status="valid" time="0.02" steps="33648"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="41342"/></proof>
   </goal>
   <goal name="peek_64bit&#39;vc.1" expl="arithmetic overflow" proved="true">
   <proof prover="12"><result status="valid" time="0.02" steps="10642"/></proof>
@@ -191,14 +190,14 @@
   <proof prover="3"><result status="valid" time="0.10" steps="17724"/></proof>
   </goal>
   <goal name="peek_64bit&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="11"><result status="valid" time="0.49" steps="727117"/></proof>
+  <proof prover="0"><result status="valid" time="0.23" steps="871174"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="poke_8bit&#39;vc" expl="VC for poke_8bit" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="poke_8bit&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="11"><result status="valid" time="0.02" steps="30898"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="42552"/></proof>
   </goal>
   <goal name="poke_8bit&#39;vc.1" expl="arithmetic overflow" proved="true">
   <proof prover="3"><result status="valid" time="0.08" steps="5867"/></proof>
@@ -210,10 +209,10 @@
   <proof prover="3"><result status="valid" time="0.05" steps="8463"/></proof>
   </goal>
   <goal name="poke_8bit&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="11"><result status="valid" time="0.07" steps="71058"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="75294"/></proof>
   </goal>
   <goal name="poke_8bit&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="11"><result status="valid" time="0.50" steps="573640"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="122058"/></proof>
   </goal>
  </transf>
  </goal>
@@ -280,7 +279,7 @@
   <proof prover="12"><result status="valid" time="0.03" steps="12397"/></proof>
   </goal>
   <goal name="poke&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="11"><result status="valid" time="0.26" steps="609401"/></proof>
+  <proof prover="0"><result status="valid" time="0.13" steps="1303267"/></proof>
   </goal>
   <goal name="poke&#39;vc.9" expl="postcondition" proved="true">
   <proof prover="12"><result status="valid" time="0.02" steps="11490"/></proof>
@@ -307,7 +306,7 @@
   <proof prover="12"><result status="valid" time="0.02" steps="13499"/></proof>
   </goal>
   <goal name="poke&#39;vc.17" expl="precondition" proved="true">
-  <proof prover="11"><result status="valid" time="0.08" steps="69301"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="161202"/></proof>
   </goal>
   <goal name="poke&#39;vc.18" expl="arithmetic overflow" proved="true">
   <proof prover="12"><result status="valid" time="0.04" steps="13670"/></proof>
@@ -316,7 +315,7 @@
   <proof prover="12"><result status="valid" time="0.02" steps="13724"/></proof>
   </goal>
   <goal name="poke&#39;vc.20" expl="precondition" proved="true">
-  <proof prover="11"><result status="valid" time="0.06" steps="69124"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="156107"/></proof>
   </goal>
   <goal name="poke&#39;vc.21" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -337,7 +336,7 @@
    <proof prover="3"><result status="valid" time="0.05" steps="9113"/></proof>
    </goal>
    <goal name="poke&#39;vc.22.3" expl="assertion" proved="true">
-   <proof prover="11"><result status="valid" time="0.03" steps="19040"/></proof>
+   <proof prover="0"><result status="valid" time="0.02" steps="40229"/></proof>
    </goal>
   </transf>
   </goal>
@@ -348,7 +347,7 @@
   <proof prover="12"><result status="valid" time="0.04" steps="15479"/></proof>
   </goal>
   <goal name="poke&#39;vc.25" expl="loop invariant preservation" proved="true">
-  <proof prover="11"><result status="valid" time="0.16" steps="119308"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="920453"/></proof>
   </goal>
   <goal name="poke&#39;vc.26" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.14" steps="31090"/></proof>
@@ -357,7 +356,7 @@
   <proof prover="2"><result status="valid" time="0.25" steps="960"/></proof>
   </goal>
   <goal name="poke&#39;vc.28" expl="loop invariant preservation" proved="true">
-  <proof prover="11"><result status="valid" time="0.15" steps="165773"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="1054649"/></proof>
   </goal>
   <goal name="poke&#39;vc.29" expl="postcondition" proved="true">
   <proof prover="12"><result status="valid" time="0.01" steps="11854"/></proof>
@@ -369,10 +368,10 @@
   <proof prover="2"><result status="valid" time="0.07" steps="243"/></proof>
   </goal>
   <goal name="poke&#39;vc.32" expl="postcondition" proved="true">
-  <proof prover="11"><result status="valid" time="0.02" steps="12580"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="26095"/></proof>
   </goal>
   <goal name="poke&#39;vc.33" expl="postcondition" proved="true">
-  <proof prover="11"><result status="valid" time="0.42" steps="449742"/></proof>
+  <proof prover="0"><result status="valid" time="0.21" steps="1106672"/></proof>
   </goal>
  </transf>
  </goal>
@@ -397,7 +396,7 @@
   <proof prover="12"><result status="valid" time="0.01" steps="11610"/></proof>
   </goal>
   <goal name="peekthenpoke&#39;vc.6" expl="assertion" proved="true">
-  <proof prover="11"><result status="valid" time="0.04" steps="21527"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="194475"/></proof>
   </goal>
   <goal name="peekthenpoke&#39;vc.7" expl="assertion" proved="true">
   <proof prover="12"><result status="valid" time="0.24" steps="30550"/></proof>
@@ -413,7 +412,7 @@
  <goal name="pokethenpeek&#39;vc" expl="VC for pokethenpeek" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="pokethenpeek&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="11"><result status="valid" time="0.15" steps="62001"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="240172"/></proof>
   </goal>
   <goal name="pokethenpeek&#39;vc.1" expl="precondition" proved="true">
   <proof prover="12"><result status="valid" time="0.01" steps="11357"/></proof>

@@ -3,13 +3,13 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.8.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC5" version="1.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="8" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="linked_list_rev.mlw"/>
 <theory name="InPlaceRev" proved="true">
@@ -515,7 +515,7 @@
  <proof prover="2"><result status="valid" time="0.09" steps="813"/></proof>
  </goal>
  <goal name="list_reversal&#39;vc" expl="VC for list_reversal" proved="true">
- <proof prover="1" timelimit="1"><result status="valid" time="0.18" steps="70261"/></proof>
+ <proof prover="8" timelimit="1"><result status="valid" time="0.04" steps="155672"/></proof>
  </goal>
  <goal name="is_list&#39;vc" expl="VC for is_list" proved="true">
  <proof prover="2"><result status="valid" time="0.07" steps="632"/></proof>
@@ -543,7 +543,7 @@
  </transf>
  </goal>
  <goal name="list_of_cells&#39;vc" expl="VC for list_of_cells" proved="true">
- <proof prover="1" timelimit="1"><result status="valid" time="0.37" steps="619805"/></proof>
+ <proof prover="8" timelimit="1"><result status="valid" time="0.09" steps="416085"/></proof>
  <transf name="split_vc" proved="true" >
   <goal name="list_of_cells&#39;vc.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.04" steps="2672"/></proof>
@@ -590,7 +590,7 @@
    <proof prover="2"><result status="valid" time="0.41" steps="68861"/></proof>
    </goal>
    <goal name="set_idx&#39;vc.0.3" expl="VC for set_idx" proved="true">
-   <proof prover="1"><result status="valid" time="0.28" steps="839596"/></proof>
+   <proof prover="8"><result status="valid" time="0.22" steps="1433297"/></proof>
    </goal>
   </transf>
   </goal>
@@ -629,8 +629,8 @@
   <proof prover="2"><result status="valid" time="0.03" steps="3863"/></proof>
   </goal>
   <goal name="list_reversal&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="2363"/></proof>
   <proof prover="2"><result status="valid" time="0.03" steps="3862"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="2031"/></proof>
   </goal>
   <goal name="list_reversal&#39;vc.10" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.04" steps="3865"/></proof>
