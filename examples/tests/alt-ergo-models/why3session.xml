@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="3" steplimit="1" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.5-prerelease" alternative="alt" timelimit="5" steplimit="1" memlimit="1000"/>
+<file format="whyml">
+<path name=".."/><path name="alt-ergo-models.mlw"/>
+<theory name="M1">
+ <goal name="f&#39;vc" expl="VC for f">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.00"/></proof>
+ <proof prover="1" obsolete="true"><result status="unknown" time="0.00" steps="655"/></proof>
+ </goal>
+ <goal name="f_no_lab&#39;vc" expl="VC for f_no_lab">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.00"/></proof>
+ <proof prover="1" obsolete="true"><result status="unknown" time="0.00" steps="920"/></proof>
+ </goal>
+ <goal name="g&#39;vc" expl="VC for g">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.00"/></proof>
+ <proof prover="1" obsolete="true"><result status="unknown" time="0.00" steps="655"/></proof>
+ </goal>
+</theory>
+</file>
+<file format="whyml">
+<path name=".."/><path name="alt-ergo-models.why"/>
+<theory name="T">
+ <goal name="g_no_lab">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.00"/></proof>
+ </goal>
+ <goal name="g_lab0">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.00"/></proof>
+ </goal>
+ <goal name="g_lab1">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.01"/></proof>
+ </goal>
+ <goal name="g2_lab">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.00"/></proof>
+ </goal>
+</theory>
+<theory name="ModelInt">
+ <goal name="test0">
+ <proof prover="0" obsolete="true"><result status="valid" time="0.00"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.01" steps="251"/></proof>
+ </goal>
+ <goal name="test1">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.00"/></proof>
+ </goal>
+ <goal name="test2">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.01"/></proof>
+ </goal>
+ <goal name="test_overflow">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.02"/></proof>
+ </goal>
+ <goal name="test_overflow2">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.01"/></proof>
+ </goal>
+ <goal name="test_overflow_int16">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.00"/></proof>
+ </goal>
+ <goal name="test_overflow_int16_alt">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.01"/></proof>
+ </goal>
+ <goal name="test_overflow_int16_bis">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.01"/></proof>
+ </goal>
+ <goal name="test_overflow_int32">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.01"/></proof>
+ </goal>
+ <goal name="test_overflow_int32_bis">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.01"/></proof>
+ </goal>
+ <goal name="test_overflow_int32_bis_inline">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.00"/></proof>
+ </goal>
+</theory>
+<theory name="ModelReal">
+ <goal name="test1">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.00"/></proof>
+ </goal>
+ <goal name="test2">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.00"/></proof>
+ </goal>
+</theory>
+<theory name="ModelArray">
+ <goal name="t1">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.00"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

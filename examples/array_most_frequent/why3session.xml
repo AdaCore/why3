@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Z3" version="4.8.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.7.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="array_most_frequent.mlw"/>
 <theory name="Top" proved="true">
@@ -50,13 +50,13 @@
   <proof prover="2"><result status="valid" time="0.29" steps="52725"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.13" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.03" steps="96957"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="87544"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.14" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.46" steps="836"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.15" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.09" steps="241177"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="208364"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.16" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.26" steps="1059"/></proof>

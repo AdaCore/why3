@@ -2,13 +2,13 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Z3" version="4.11.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="5" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="6" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="7" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="9" name="CVC5" version="1.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="10" name="Alt-Ergo" version="2.4.2" timelimit="5" steplimit="0" memlimit="2000"/>
-<prover id="11" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="ringdecision.mlw"/>
 <theory name="UnitaryCommutativeRingDecision" proved="true">
@@ -146,7 +146,7 @@
   </transf>
   </goal>
   <goal name="insert_mon&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="11"><result status="valid" time="0.02" steps="54179"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="51497"/></proof>
   </goal>
   <goal name="insert_mon&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="9"><result status="valid" time="0.28" steps="41549"/></proof>
@@ -160,7 +160,7 @@
  <proof prover="10" timelimit="15"><result status="valid" time="0.02" steps="63"/></proof>
  </goal>
  <goal name="norm&#39;" proved="true">
- <proof prover="11"><result status="valid" time="0.02" steps="52960"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="50342"/></proof>
  </goal>
  <goal name="norm" proved="true">
  <proof prover="6" timelimit="15"><result status="valid" time="0.02" steps="64"/></proof>
@@ -195,7 +195,7 @@
    <goal name="g.0.1" expl="asserted formula" proved="true">
    <transf name="compute_in_goal" proved="true" >
     <goal name="g.0.1.0" expl="asserted formula" proved="true">
-    <proof prover="11"><result status="valid" time="0.02" steps="13289"/></proof>
+    <proof prover="0"><result status="valid" time="0.01" steps="13289"/></proof>
     </goal>
    </transf>
    </goal>
@@ -296,8 +296,8 @@
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  <transf name="compute_in_goal" proved="true" >
   <goal name="squash_append.0" proved="true">
+  <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.04" steps="169533"/></proof>
   <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="11" timelimit="5" memlimit="2000"><result status="valid" time="0.02" steps="174556"/></proof>
   </goal>
  </transf>
  </goal>
@@ -347,7 +347,7 @@
  <proof prover="10"><result status="valid" time="0.02" steps="54"/></proof>
  </goal>
  <goal name="norm_f&#39;vc" expl="VC for norm_f" proved="true">
- <proof prover="11"><result status="valid" time="0.07" steps="99666"/></proof>
+ <proof prover="0"><result status="valid" time="0.04" steps="96403"/></proof>
  </goal>
 </theory>
 <theory name="ReifyTests" proved="true">
@@ -355,10 +355,10 @@
  <proof prover="10"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
  <goal name="A.Unit_def_l" proved="true">
- <proof prover="11"><result status="valid" time="0.02" steps="632"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="632"/></proof>
  </goal>
  <goal name="A.Unit_def_r" proved="true">
- <proof prover="11"><result status="valid" time="0.01" steps="632"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="632"/></proof>
  </goal>
  <goal name="A.Comm" proved="true">
  <proof prover="10"><result status="valid" time="0.00" steps="1"/></proof>
@@ -370,7 +370,7 @@
  <proof prover="10"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
  <goal name="ANonTrivial" proved="true">
- <proof prover="11"><result status="valid" time="0.01" steps="728"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="728"/></proof>
  </goal>
  <goal name="ExtDistSumA" proved="true">
  <proof prover="10"><result status="valid" time="0.00" steps="1"/></proof>

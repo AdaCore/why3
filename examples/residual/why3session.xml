@@ -3,7 +3,7 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.8.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.11.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -12,24 +12,24 @@
  <goal name="accepts_epsilon&#39;vc" expl="VC for accepts_epsilon" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="accepts_epsilon&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="11871"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="9684"/></proof>
   </goal>
   <goal name="accepts_epsilon&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="22218"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="19237"/></proof>
   </goal>
   <goal name="accepts_epsilon&#39;vc.2" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="11928"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="9730"/></proof>
   </goal>
   <goal name="accepts_epsilon&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="22571"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="19607"/></proof>
   </goal>
   <goal name="accepts_epsilon&#39;vc.4" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="accepts_epsilon&#39;vc.4.0" expl="VC for accepts_epsilon" proved="true">
-   <proof prover="2"><result status="valid" time="0.02" steps="23260"/></proof>
+   <proof prover="1"><result status="valid" time="0.01" steps="24275"/></proof>
    </goal>
    <goal name="accepts_epsilon&#39;vc.4.1" expl="VC for accepts_epsilon" proved="true">
-   <proof prover="2"><result status="valid" time="0.05" steps="58847"/></proof>
+   <proof prover="1"><result status="valid" time="0.01" steps="32903"/></proof>
    </goal>
   </transf>
   </goal>
@@ -38,22 +38,22 @@
  <goal name="inversion_mem_star_gen" proved="true">
  <transf name="induction_pr" proved="true" >
   <goal name="inversion_mem_star_gen.0" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="20554"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="18900"/></proof>
   </goal>
   <goal name="inversion_mem_star_gen.1" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="20719"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="18991"/></proof>
   </goal>
   <goal name="inversion_mem_star_gen.2" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="21579"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="19986"/></proof>
   </goal>
   <goal name="inversion_mem_star_gen.3" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="21579"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="19986"/></proof>
   </goal>
   <goal name="inversion_mem_star_gen.4" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="22802"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="21027"/></proof>
   </goal>
   <goal name="inversion_mem_star_gen.5" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="20619"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="18943"/></proof>
   </goal>
   <goal name="inversion_mem_star_gen.6" proved="true">
   <proof prover="3"><result status="valid" time="1.80"/></proof>
@@ -61,27 +61,27 @@
  </transf>
  </goal>
  <goal name="inversion_mem_star" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="23148"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="22822"/></proof>
  </goal>
  <goal name="residual&#39;vc" expl="VC for residual" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="residual&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="20711"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="19673"/></proof>
   </goal>
   <goal name="residual&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="24045"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="21153"/></proof>
   </goal>
   <goal name="residual&#39;vc.2" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="24260"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="21370"/></proof>
   </goal>
   <goal name="residual&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="25402"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="21602"/></proof>
   </goal>
   <goal name="residual&#39;vc.4" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="23949"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="21055"/></proof>
   </goal>
   <goal name="residual&#39;vc.5" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="21615"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="20058"/></proof>
   </goal>
   <goal name="residual&#39;vc.6" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -147,10 +147,10 @@
  <goal name="decide_mem&#39;vc" expl="VC for decide_mem" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="decide_mem&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="24982"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="20417"/></proof>
   </goal>
   <goal name="decide_mem&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="24599"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="23520"/></proof>
   </goal>
  </transf>
  </goal>

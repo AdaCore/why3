@@ -3,12 +3,11 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.8.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.11.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Coq" version="8.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="7" name="Z3" version="4.7.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="kmp.mlw"/>
 <theory name="KnuthMorrisPratt" proved="true">
@@ -23,12 +22,12 @@
  <proof prover="4"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="matches_contradiction_at_i" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="12824"/></proof>
  <proof prover="5"><result status="valid" time="0.00" steps="23"/></proof>
- <proof prover="7"><result status="valid" time="0.01" steps="10153"/></proof>
  </goal>
  <goal name="matches_right_weakening" proved="true">
+ <proof prover="1"><result status="valid" time="0.04" steps="170864"/></proof>
  <proof prover="5"><result status="valid" time="0.00" steps="21"/></proof>
- <proof prover="7"><result status="valid" time="0.06" steps="90605"/></proof>
  </goal>
  <goal name="matches_left_weakening" proved="true">
  <proof prover="3"><path name="kmp_WP_KnuthMorrisPratt_matches_left_weakening_1.v"/><result status="valid" time="0.35"/></proof>
@@ -42,7 +41,7 @@
  </goal>
  <goal name="next_iteration" proved="true">
  <proof prover="0"><result status="valid" time="0.05" steps="13910"/></proof>
- <proof prover="7" timelimit="5"><result status="valid" time="0.02" steps="26492"/></proof>
+ <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="22108"/></proof>
  </goal>
  <goal name="next_is_maximal" proved="true">
  <proof prover="3"><path name="kmp_WP_KnuthMorrisPratt_next_is_maximal_1.v"/><result status="valid" time="0.31"/></proof>
@@ -248,7 +247,7 @@
    <goal name="kmp&#39;vc.18.0" expl="loop invariant preservation" proved="true">
    <transf name="instantiate" proved="true" arg1="LoopInvariant2" arg2="(k-1)">
     <goal name="kmp&#39;vc.18.0.0" expl="loop invariant preservation" proved="true">
-    <proof prover="2"><result status="valid" time="0.06" steps="101470"/></proof>
+    <proof prover="1"><result status="valid" time="0.02" steps="65179"/></proof>
     </goal>
    </transf>
    </goal>

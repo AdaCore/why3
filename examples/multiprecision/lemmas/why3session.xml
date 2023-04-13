@@ -5,8 +5,8 @@
 <prover id="0" name="Eprover" version="1.9.1-001" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="lemmas.mlw"/>
@@ -107,7 +107,7 @@
    <transf name="inline_goal" proved="true" >
     <goal name="value_sub_frame_shift&#39;vc.4.0.0" expl="precondition" proved="true">
     <proof prover="0"><result status="valid" time="0.04"/></proof>
-    <proof prover="3"><result status="valid" time="0.02" steps="1570"/></proof>
+    <proof prover="5"><result status="valid" time="0.01" steps="3290"/></proof>
     </goal>
    </transf>
    </goal>
@@ -194,7 +194,7 @@
   <proof prover="6"><result status="valid" time="0.04" steps="71"/></proof>
   </goal>
   <goal name="value_zero&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02" steps="25344"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="56390"/></proof>
   </goal>
  </transf>
  </goal>
@@ -266,7 +266,7 @@
   <proof prover="6"><result status="valid" time="0.04" steps="15"/></proof>
   </goal>
   <goal name="value_sub_upper_bound_tight&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03" steps="20555"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="53448"/></proof>
   </goal>
  </transf>
  </goal>

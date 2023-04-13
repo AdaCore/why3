@@ -4,9 +4,9 @@
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.8.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_2021_lexicographic_permutations_2.mlw"/>
 <theory name="ArrayListConversions" proved="true">
@@ -106,7 +106,7 @@
   <proof prover="0" timelimit="1"><result status="valid" time="0.03" steps="7192"/></proof>
   </goal>
   <goal name="eq_nth&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="1"><result status="valid" time="0.24" steps="1616046"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.01" steps="26636"/></proof>
   </goal>
  </transf>
  </goal>
@@ -191,7 +191,7 @@
   <proof prover="0"><result status="valid" time="0.25" steps="46594"/></proof>
   </goal>
   <goal name="le_permut_sorted.2" proved="true">
-  <proof prover="2"><result status="valid" time="0.04" steps="92307"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="56835"/></proof>
   </goal>
   <goal name="le_permut_sorted.3" proved="true">
   <proof prover="0"><result status="valid" time="0.07" steps="18863"/></proof>
@@ -241,7 +241,7 @@
   <proof prover="0"><result status="valid" time="0.08" steps="14722"/></proof>
   </goal>
   <goal name="next&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.20" steps="260221"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="85743"/></proof>
   </goal>
   <goal name="next&#39;vc.9" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.04" steps="12391"/></proof>
@@ -304,7 +304,7 @@
   <proof prover="0"><result status="valid" time="0.07" steps="17343"/></proof>
   </goal>
   <goal name="next&#39;vc.29" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.10" steps="304709"/></proof>
+  <proof prover="5"><result status="valid" time="0.58" steps="3336035"/></proof>
   </goal>
   <goal name="next&#39;vc.30" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.04" steps="18048"/></proof>
@@ -352,7 +352,7 @@
   <proof prover="4"><result status="valid" time="0.35" steps="2517"/></proof>
   </goal>
   <goal name="next&#39;vc.45" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="128882"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="130568"/></proof>
   </goal>
   <goal name="next&#39;vc.46" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.59" steps="4728"/></proof>
@@ -361,10 +361,10 @@
   <proof prover="1"><result status="valid" time="0.25" steps="2315"/></proof>
   </goal>
   <goal name="next&#39;vc.48" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.08" steps="184895"/></proof>
+  <proof prover="5"><result status="valid" time="0.10" steps="447821"/></proof>
   </goal>
   <goal name="next&#39;vc.49" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.54" steps="1073711"/></proof>
+  <proof prover="5"><result status="valid" time="0.07" steps="398973"/></proof>
   </goal>
   <goal name="next&#39;vc.50" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.38" steps="2482"/></proof>
@@ -393,7 +393,7 @@
    <proof prover="0"><result status="valid" time="4.82" steps="468948"/></proof>
    </goal>
    <goal name="next&#39;vc.51.7" expl="VC for next" proved="true">
-   <proof prover="2"><result status="valid" time="0.05" steps="146873"/></proof>
+   <proof prover="5"><result status="valid" time="0.25" steps="1403259"/></proof>
    </goal>
    <goal name="next&#39;vc.51.8" expl="VC for next" proved="true">
    <proof prover="0"><result status="valid" time="0.10" steps="21418"/></proof>
@@ -405,7 +405,7 @@
    <proof prover="0"><result status="valid" time="0.21" steps="36493"/></proof>
    </goal>
    <goal name="next&#39;vc.51.11" expl="VC for next" proved="true">
-   <proof prover="2"><result status="valid" time="0.10" steps="288113"/></proof>
+   <proof prover="5"><result status="valid" time="0.03" steps="141269"/></proof>
    </goal>
    <goal name="next&#39;vc.51.12" expl="VC for next" proved="true">
    <proof prover="0"><result status="valid" time="0.60" steps="98959"/></proof>
@@ -517,7 +517,7 @@
  <proof prover="0"><result status="valid" time="4.70" steps="347052"/></proof>
  </goal>
  <goal name="seq_snoc_mem" proved="true">
- <proof prover="2"><result status="valid" time="0.13" steps="185219"/></proof>
+ <proof prover="5"><result status="valid" time="0.04" steps="169587"/></proof>
  </goal>
  <goal name="permut&#39;vc" expl="VC for permut" proved="true">
  <transf name="split_vc" proved="true" >

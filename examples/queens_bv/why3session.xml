@@ -2,18 +2,16 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Z3" version="4.11.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="8" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="9" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="10" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="11" name="CVC4" version="1.7" timelimit="10" steplimit="0" memlimit="4000"/>
-<prover id="12" name="Z3" version="4.7.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="queens_bv.mlw"/>
 <theory name="Solution" proved="true">
@@ -89,16 +87,16 @@
   <proof prover="6"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="rightmost_bit_trick&#39;vc.2" expl="assertion" proved="true">
-  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="72078"/></proof>
   </goal>
   <goal name="rightmost_bit_trick&#39;vc.3" expl="assertion" proved="true">
   <proof prover="10" timelimit="1"><result status="valid" time="0.05" steps="148"/></proof>
   </goal>
   <goal name="rightmost_bit_trick&#39;vc.4" expl="assertion" proved="true">
-  <proof prover="8"><result status="valid" time="0.21"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="153533"/></proof>
   </goal>
   <goal name="rightmost_bit_trick&#39;vc.5" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.08" steps="125270"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="133482"/></proof>
   </goal>
   <goal name="rightmost_bit_trick&#39;vc.6" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.19" steps="490"/></proof>
@@ -159,7 +157,7 @@
   <proof prover="3"><result status="valid" time="0.50"/></proof>
   </goal>
   <goal name="t&#39;vc.13" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.04" steps="73105"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="118364"/></proof>
   </goal>
   <goal name="t&#39;vc.14" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.16"/></proof>
@@ -179,7 +177,7 @@
   <goal name="t&#39;vc.19" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="t&#39;vc.19.0" expl="assertion" proved="true">
-   <proof prover="8"><result status="valid" time="1.01"/></proof>
+   <proof prover="0"><result status="valid" time="0.37" steps="2064527"/></proof>
    </goal>
    <goal name="t&#39;vc.19.1" expl="assertion" proved="true">
    <proof prover="10" timelimit="10" memlimit="4000"><result status="valid" time="1.46" steps="1515"/></proof>
@@ -261,7 +259,7 @@
    <proof prover="4"><result status="valid" time="0.10" steps="34728"/></proof>
    </goal>
    <goal name="t&#39;vc.35.3" expl="assertion" proved="true">
-   <proof prover="12"><result status="valid" time="0.05" steps="110420"/></proof>
+   <proof prover="0"><result status="valid" time="0.03" steps="124970"/></proof>
    </goal>
    <goal name="t&#39;vc.35.4" expl="assertion" proved="true">
    <proof prover="4"><result status="valid" time="0.22" steps="56464"/></proof>
@@ -381,10 +379,10 @@
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="t&#39;vc.58" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02" steps="31985"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="70761"/></proof>
   </goal>
   <goal name="t&#39;vc.59" expl="postcondition" proved="true">
-  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="72361"/></proof>
   </goal>
   <goal name="t&#39;vc.60" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.06"/></proof>
