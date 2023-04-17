@@ -856,27 +856,32 @@ let run_strategy_on_goal
     else
       match Array.get strat pc with
       | Icall_prover is ->
-        (* let already_done = ref false in *)
+        let already_done = ref (List.length is) in
         let callback panid res =
            callback_pa panid res;
-           (* if !already_done then (interrupt_proof_attempts_for_goal c g); *)
+           begin
            match res with
            | UpgradeProver _ | Scheduled | Running -> (* nothing to do yet *) ()
            | Done { Call_provers.pr_answer = Call_provers.Valid } ->
               (* proof succeeded, nothing more to do *)
               interrupt_proof_attempts_for_goal c g;
-              (* already_done := true; *)
+              already_done := 0;
               callback STShalt
            | Interrupted ->
+              already_done := 0;
               callback STShalt
            | Done _ | InternalFailure _ ->
-              (* proof did not succeed, goto to next step *)
-              callback (STSgoto (g,pc+1));
-              let run_next () = exec_strategy (pc+1) strat g; false in
-              S.idle ~prio:0 run_next
+              already_done := !already_done - 1;
+              if !already_done = 0 then begin
+                (* proof did not succeed, goto to next step *)
+                callback (STSgoto (g,pc+1));
+                let run_next () = exec_strategy (pc+1) strat g; false in
+                S.idle ~prio:0 run_next
+              end
            | Undone | Detached | Uninstalled _ | Removed _ ->
                          (* should not happen *)
                          assert false
+            end
         in
         List.iter (fun i -> call_one_prover c i ~callback ~notification g) is
 
