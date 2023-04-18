@@ -45,14 +45,12 @@ val print_model_kind : Format.formatter -> model_element_kind -> unit
     used for pretty printing and JSON printing. *)
 
 (** Integers *)
-
 type concrete_syntax_int = {
   int_value: Number.int_constant; (** Integer value *)
   int_verbatim: string (** String verbatim, as given by the SMT solver *)
 }
 
 (** Bitvectors *)
-
 type concrete_syntax_bv = {
   bv_value: BigInt.t; (** Bitvector value *)
   bv_length: int; (** Length of the bitvector *)
@@ -67,7 +65,6 @@ type concrete_syntax_real = {
 }
 
 (** Fractions *)
-
 type concrete_syntax_frac = {
   frac_num: concrete_syntax_real; (** Numerator *)
   frac_den: concrete_syntax_real; (** Denominator *)
@@ -75,9 +72,8 @@ type concrete_syntax_frac = {
 }
 
 (** Floats *)
-
 type concrete_syntax_float =
-  | Infinity
+  | Plus_infinity | Minus_infinity
   | Plus_zero | Minus_zero
   | NaN
   | Float_number of
@@ -89,7 +85,6 @@ type concrete_syntax_float =
     }
 
 (** Constants *)
-
 type concrete_syntax_constant =
   | Boolean of bool
   | String of string
@@ -100,16 +95,29 @@ type concrete_syntax_constant =
   | Fraction of concrete_syntax_frac
 
 (** Quantifiers *)
-
 type concrete_syntax_quant = Forall | Exists
 
 (** Binary operators *)
-
 type concrete_syntax_binop = And | Or | Implies | Iff
 
-(** Concrete term *)
+type concrete_syntax_funlit_elts =
+  {
+    elts_index : concrete_syntax_term;
+    elts_value : concrete_syntax_term;
+  }
 
-type concrete_syntax_term =
+(** Function literal value *)
+and concrete_syntax_funlit =
+  {
+    elts : concrete_syntax_funlit_elts list;
+    others : concrete_syntax_term;
+  }
+
+(** Function arguments and body *)
+and concrete_syntax_fun = { args : string list; body : concrete_syntax_term; }
+
+(** Concrete term *)
+and concrete_syntax_term =
   | Var of string
   (** Variable of the given name *)
   | Const of concrete_syntax_constant
@@ -126,12 +134,9 @@ type concrete_syntax_term =
   (** [If (op,ct1,ct2)] stands for [ct1 op ct2] *)
   | Not of concrete_syntax_term
   (** Negation of a concrete term *)
-  | Function of { args: string list ; body: concrete_syntax_term }
+  | Function of concrete_syntax_fun
   (** Function defined by the given list of arguments and the given body *)
-  | FunctionLiteral of {
-      elts: (concrete_syntax_term * concrete_syntax_term) list;
-      others: concrete_syntax_term
-    }
+  | FunctionLiteral of concrete_syntax_funlit
   (** Special case for function literals, also used for arrays *)
   | Record of (string * concrete_syntax_term) list
   (** Record defined by the given list of (field_name,field_value) elements *)
@@ -314,7 +319,7 @@ class clean : object
   method quant : concrete_syntax_quant -> string list -> concrete_syntax_term -> concrete_syntax_term option
   method binop : concrete_syntax_binop -> concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term option
   method func : string list -> concrete_syntax_term -> concrete_syntax_term option
-  method funliteral : (concrete_syntax_term * concrete_syntax_term) list -> concrete_syntax_term -> concrete_syntax_term option
+  method funliteral : concrete_syntax_funlit_elts list -> concrete_syntax_term -> concrete_syntax_term option
   method record : (string * concrete_syntax_term) list -> concrete_syntax_term option
   method proj : string -> concrete_syntax_term -> concrete_syntax_term option
 end

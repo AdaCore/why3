@@ -71,7 +71,7 @@ type concrete_syntax_frac = {
 }
 
 type concrete_syntax_float =
-  | Infinity
+  | Plus_infinity | Minus_infinity
   | Plus_zero | Minus_zero
   | NaN
   | Float_number of
@@ -94,7 +94,23 @@ type concrete_syntax_constant =
 type concrete_syntax_quant = Forall | Exists
 type concrete_syntax_binop = And | Or | Implies | Iff
 
-type concrete_syntax_term =
+type concrete_syntax_funlit_elts =
+  {
+    elts_index : concrete_syntax_term;
+    elts_value : concrete_syntax_term;
+  }
+
+(** Function literal value *)
+and concrete_syntax_funlit =
+  {
+    elts : concrete_syntax_funlit_elts list;
+    others : concrete_syntax_term;
+  }
+
+(** Function arguments and body *)
+and concrete_syntax_fun = { args : string list; body : concrete_syntax_term; }
+
+and concrete_syntax_term =
   | Var of string
   | Const of concrete_syntax_constant
   | Apply of string * concrete_syntax_term list
@@ -103,11 +119,8 @@ type concrete_syntax_term =
   | Quant of concrete_syntax_quant * string list * concrete_syntax_term
   | Binop of concrete_syntax_binop * concrete_syntax_term * concrete_syntax_term
   | Not of concrete_syntax_term
-  | Function of { args: string list ; body: concrete_syntax_term }
-  | FunctionLiteral of {
-      elts: (concrete_syntax_term * concrete_syntax_term) list;
-      others: concrete_syntax_term
-    }
+  | Function of concrete_syntax_fun
+  | FunctionLiteral of concrete_syntax_funlit
   | Record of (string * concrete_syntax_term) list
   | Proj of (string * concrete_syntax_term)
 
@@ -128,7 +141,8 @@ let rec print_concrete_term fmt ct =
       ignore int_value; pp_print_string fmt int_verbatim
   | Const (Real {real_value; real_verbatim}) ->
       ignore real_value; pp_print_string fmt real_verbatim
-  | Const (Float Infinity) -> pp_print_string fmt "∞"
+  | Const (Float Plus_infinity) -> pp_print_string fmt "+∞"
+  | Const (Float Minus_infinity) -> pp_print_string fmt "-∞"
   | Const (Float Plus_zero) -> pp_print_string fmt "+0"
   | Const (Float Minus_zero) -> pp_print_string fmt "-0"
   | Const (Float NaN) -> pp_print_string fmt "NaN"
@@ -177,10 +191,10 @@ let rec print_concrete_term fmt ct =
       fprintf fmt "@[_ =>@ %a@]"
         print_concrete_term others
     in
-    let print_indice_value fmt (indice,value) =
+    let print_indice_value fmt { elts_index; elts_value } =
       fprintf fmt "@[%a =>@ %a@]"
-        print_concrete_term indice
-        print_concrete_term value
+        print_concrete_term elts_index
+        print_concrete_term elts_value
     in
     fprintf fmt "@[[|%a%a|]@]"
       (Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.semi ~sep:Pp.semi print_indice_value) elts
@@ -226,7 +240,9 @@ let rec subst_concrete_term subst t =
   | FunctionLiteral {elts; others} ->
     let elts =
       List.map
-        (fun (c1,c2) -> (subst_concrete_term subst c1, subst_concrete_term subst c2))
+        (fun e ->
+            { elts_index = subst_concrete_term subst e.elts_index;
+              elts_value = subst_concrete_term subst e.elts_value })
         elts
     in
     let others = subst_concrete_term subst others in
@@ -584,10 +600,15 @@ let [@warning "-42"] rec json_of_concrete_term ct =
         ]
     ]
 
-  | Const (Float Infinity) ->
+  | Const (Float Plus_infinity) ->
     Record [
       "type", String "Float";
-      "val", Record [ "float_type", String "Infinity" ]
+      "val", Record [ "float_type", String "Plus_Infinity" ]
+    ]
+  | Const (Float Minus_infinity) ->
+    Record [
+      "type", String "Float";
+      "val", Record [ "float_type", String "Minus_infinity" ]
     ]
   | Const (Float Plus_zero) ->
     Record [
@@ -671,10 +692,10 @@ let [@warning "-42"] rec json_of_concrete_term ct =
         "funliteral_elts",
           List (
             List.map
-              (fun (indice,value) ->
+              (fun { elts_index; elts_value }->
                 Record [
-                  "indice", json_of_concrete_term indice;
-                  "value", json_of_concrete_term value
+                  "indice", json_of_concrete_term elts_index;
+                  "value", json_of_concrete_term elts_value
                 ])
               elts
           );
@@ -1204,10 +1225,10 @@ class clean = object (self)
     Opt.bind (self#value body) @@ fun body ->
     Some (Function {args; body})
   method funliteral elts others =
-    let clean_elt (v1, v2) =
+    let clean_elt { elts_index = v1; elts_value = v2 } =
       Opt.bind (self#value v1) @@ fun v1 ->
       Opt.bind (self#value v2) @@ fun v2 ->
-      Some (v1, v2) in
+      Some { elts_index = v1; elts_value = v2 } in
     opt_bind_all (List.map clean_elt elts) @@ fun elts ->
     Opt.bind (self#value others) @@ fun others ->
     Some (FunctionLiteral {elts; others})
