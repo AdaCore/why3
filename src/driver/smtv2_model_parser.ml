@@ -446,7 +446,8 @@ module FromModelToTerm = struct
   exception Float_MinusZero
   exception Float_PlusZero
   exception Float_NaN
-  exception Float_Infinity
+  exception Float_Plus_Infinity
+  exception Float_Minus_Infinity
   exception Float_Error
 
   let error fmt =
@@ -624,7 +625,8 @@ module FromModelToTerm = struct
       }
     in
     match fp with
-    | Fplusinfinity | Fminusinfinity -> raise Float_Infinity
+    | Fplusinfinity -> raise Float_Plus_Infinity
+    | Fminusinfinity -> raise Float_Minus_Infinity
     | Fpluszero -> raise Float_PlusZero
     | Fminuszero -> raise Float_MinusZero
     | Fnan -> raise Float_NaN
@@ -687,7 +689,10 @@ module FromModelToTerm = struct
               fp_binary,
               fp_hex )
         else if BigInt.eq exp.bv_value exp_max (* infinities and NaN *) then
-          if BigInt.eq mant.bv_value BigInt.zero then raise Float_Infinity
+          if BigInt.eq mant.bv_value BigInt.zero then
+            if is_neg
+            then raise Float_Minus_Infinity
+            else raise Float_Plus_Infinity
           else raise Float_NaN
         else
           let exp = BigInt.sub exp.bv_value exp_bias in
@@ -823,18 +828,31 @@ module FromModelToTerm = struct
             let x = create_vsymbol (Ident.id_fresh "x") ty in
             let f = t_app is_nan_ls [ t_var x ] None in
             (t_eps_close x f, Const (Float NaN))
-        | Float_Infinity ->
-            let is_infinite_ls =
+        | Float_Plus_Infinity ->
+            let is_plus_infinite_ls =
               try
                 let th =
                   Env.read_theory env.why3_env [ "ieee_float" ] float_lib
                 in
-                Theory.ns_find_ls th.Theory.th_export [ "is_infinite" ]
-              with _ -> error "No lsymbol found in theory for is_infinite@."
+                Theory.ns_find_ls th.Theory.th_export [ "is_plus_infinity" ]
+              with _ -> error "No lsymbol found in theory for is_plus_infinity@."
             in
             let x = create_vsymbol (Ident.id_fresh "x") ty in
-            let f = t_app is_infinite_ls [ t_var x ] None in
-            (t_eps_close x f, Const (Float Infinity))
+            let f = t_app is_plus_infinite_ls [ t_var x ] None in
+            (t_eps_close x f, Const (Float Plus_infinity))
+        | Float_Minus_Infinity ->
+            let is_plus_infinite_ls =
+              try
+                let th =
+                  Env.read_theory env.why3_env [ "ieee_float" ] float_lib
+                in
+                Theory.ns_find_ls th.Theory.th_export [ "is_minus_infinity" ]
+              with _ ->
+                error "No lsymbol found in theory for is_minus_infinity@."
+            in
+            let x = create_vsymbol (Ident.id_fresh "x") ty in
+            let f = t_app is_plus_infinite_ls [ t_var x ] None in
+            (t_eps_close x f, Const (Float Minus_infinity))
         | Float_Error ->
             error "Error while interpreting float constant %a@." print_constant
               c)
@@ -1652,7 +1670,7 @@ module FromModelToTerm = struct
         let (elts, others) = unfold env (vs,vs_name) (t2,ct2) in
         let _,ct0' = maybe_convert_epsilon_terms env (t0,ct0) in
         let _,ct1' = maybe_convert_epsilon_terms env (t1,ct1) in
-        ((ct0',ct1')::elts, others)
+        ({ elts_index = ct0'; elts_value = ct1' } :: elts, others)
       | _ ->
         let _, t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in
         ([], t'_concrete)
