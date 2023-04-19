@@ -26,7 +26,7 @@ while test $# != 0; do
       ;;
     "-"*)
       printf "unknown option: %s\n" "$1"
-      printf "usage: check-ce-bench [--update-oracle] [--keep-out-file] [--suffix s] <files>\n"
+      printf "usage: check-ce-bench [--update-oracle] [--keep-out-files] [--suffix s] <files>\n"
       printf "  <files> must be given without the '.mlw' suffix.\n"
       printf "  If <files> is empty, use all files from directory 'check-ce'.\n"
       printf "  The suffix <s> is appended on the Why3 executable name, e.g. '.opt'.\n"
