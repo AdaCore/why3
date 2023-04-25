@@ -1,0 +1,28 @@
+(* checks that subregion analysis doesn't introduce bad equations into the proof context )
+module Challenge1_ListReversalH
+  use int.Int
+  let rec cfg list_reversal_h [@cfg:stackify] [@cfg:subregion_analysis] (l : int) : int
+    
+   = [@vc:do_not_keep_trace] [@vc:sp]
+  var r_3 : int;
+  {
+    r_3 <- 0;
+    goto BB0
+  }
+  BB0 {
+    invariant l { true };
+    switch (l <> 0)
+      | False -> goto BB3
+      | True -> goto BB2
+      end
+  }
+  BB2 {
+    assert { false };
+    r_3 <- l;
+    goto BB0
+  }
+  BB3 {
+    return r_3
+  }
+  
+end
