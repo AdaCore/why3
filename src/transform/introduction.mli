@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Introduction of premises *)
+(** {1 Introduction of premises} *)
 
 (** The premises of the goal of a task are introduced in the
     context, e.g
@@ -33,8 +33,35 @@ val intros :
      premises of [goal G : f] *)
 
 val introduce_premises : Task.task Trans.trans
+(** [introduce_premises] pushes the universal quantifications, the
+   implications and the let bindings of the goal into the context,
+   when possible. Example:
+   `|- G : forall x:t. p -> let y = u in q`
+   becomes
+   `constant x:t, H: q, constant y = u |- G : q`
 
-val simplify_intros: Task.task Trans.trans
+*)
+
+(** {2 variants dedicated to counterexample generation} *)
+
+val dequantification: Task.task Trans.trans
+(** [dequantification] attempts to move quantifications and bindings
+   in the context when possible. Example:
+   `H: let z:t = v in exists w. r
+    |- G : forall x:t. p -> let y:t = u in q`
+   becomes
+   `constant z:t, constant w:t, H: z = v /\ r, constant x:t, constant y:t
+    |- G : p -> y = u -> q `
+
+    Intended to be used by drivers for provers when no
+    counterexamples are expected. See also [prepare_for_counterexmp.ml].
+ *)
+
+val remove_unused_from_context: Task.task Trans.trans
+(** [remove_unused_from_context] removes all the extra symbols that
+   where kept for tracing, for the purpose of counterexample
+   generation. Intended to be used by drivers for provers when no
+   counterexamples are expected.  See also [prepare_for_counterexmp.ml]. *)
 
 val push_attributes_with_prefix : string -> unit
 (** [intros] preserves attributes with given prefixes (initially ["expl:"] and

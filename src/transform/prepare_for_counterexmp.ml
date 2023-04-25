@@ -23,10 +23,10 @@ let prepare_for_counterexmp2 env task =
     (* Counter-example will be queried, prepare the task *)
     Debug.dprintf debug "Get ce@.";
     let comp_trans = Trans.seq [
-      Introduction.simplify_intros;
-      Intro_vc_vars_counterexmp.intro_vc_vars_counterexmp;
-      Intro_projections_counterexmp.intro_projections_counterexmp env
-    ] in
+        Intro_vc_vars_counterexmp.intro_vc_vars_counterexmp;
+        Intro_projections_counterexmp.intro_projections_counterexmp env
+      ]
+    in
     Trans.apply comp_trans task
   end
 
@@ -37,3 +37,28 @@ let () = Trans.register_env_transform "prepare_for_counterexmp"
   ~desc:"Prepare@ the@ task@ for@ querying@ for@ \
     the@ counter-example@ model.@ This@ transformation@ does@ so@ only@ \
     when@ the@ solver@ will@ be@ asked@ for@ the@ counter-example."
+
+
+let counterexamples_dependent_intros task =
+  let trans =
+    if not (Driver.get_counterexmp task) then
+      begin
+        (* Counter-example will not be queried, remove unused symbols,
+           both in the context and in the goal *)
+        Introduction.remove_unused_from_context;
+      end
+    else
+      begin
+        (* Counter-example will be queried, so introduce as much as
+           possible *)
+        Debug.dprintf debug "Get ce@.";
+        Introduction.dequantification
+      end
+  in
+  Trans.apply trans task
+
+let () = Trans.register_transform "counterexamples_dependent_intros"
+  (Trans.store counterexamples_dependent_intros)
+  ~desc:"Manages the extra CE symbols depending on whether CE are \
+         requested or not: either remove them or introduce them in the \
+         context."

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.8" alternative="counterexamples" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml">
+<path name=".."/><path name="ce_symbols.mlw"/>
+<theory name="TestDequant">
+ <goal name="G">
+ <transf name="dequantification" >
+  <goal name="G.0">
+  </goal>
+ </transf>
+ <transf name="split_vc" >
+  <goal name="G.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="TestPretty">
+ <goal name="f&#39;vc" expl="VC for f">
+ <proof prover="0"><result status="unknown" time="0.02" steps="288"/></proof>
+ <proof prover="1"><result status="unknown" time="0.02" steps="328"/></proof>
+ <transf name="dequantification" >
+  <goal name="f&#39;vc.0" expl="VC for f">
+  <transf name="remove_unused_from_context" >
+   <goal name="f&#39;vc.0.0" expl="VC for f">
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ <transf name="remove_unused_from_context" >
+  <goal name="f&#39;vc.0" expl="VC for f">
+  </goal>
+ </transf>
+ <transf name="split_vc" >
+  <goal name="f&#39;vc.0" expl="postcondition">
+  <proof prover="0"><result status="unknown" time="0.02" steps="147"/></proof>
+  <proof prover="1"><result status="unknown" time="0.02" steps="337"/></proof>
+  <transf name="dequantification" >
+   <goal name="f&#39;vc.0.0" expl="postcondition">
+   <transf name="remove_unused_from_context" >
+    <goal name="f&#39;vc.0.0.0" expl="postcondition">
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

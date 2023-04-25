@@ -5,6 +5,7 @@
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="10" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="12" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -287,7 +288,7 @@
  </transf>
  </goal>
  <goal name="unbind_var_symbol_in_fo_term_list&#39;vc" expl="VC for unbind_var_symbol_in_fo_term_list" proved="true">
- <proof prover="10"><result status="valid" time="1.04"/></proof>
+ <proof prover="10"><result status="valid" time="1.31"/></proof>
  </goal>
  <goal name="unbind_var_fo_term_in_fo_term_list&#39;vc" expl="VC for unbind_var_fo_term_in_fo_term_list" proved="true">
  <proof prover="10"><result status="valid" time="1.20"/></proof>
@@ -718,7 +719,7 @@
   <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="15"/></proof>
   </goal>
   <goal name="construct_fo_term_list&#39;vc.15" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.12" steps="41494"/></proof>
+  <proof prover="1"><result status="valid" time="0.12" steps="41232"/></proof>
   </goal>
   <goal name="construct_fo_term_list&#39;vc.16" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
@@ -745,7 +746,7 @@
   <proof prover="0"><result status="valid" time="0.06" steps="15"/></proof>
   </goal>
   <goal name="construct_fo_term_list&#39;vc.24" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.11" steps="41494"/></proof>
+  <proof prover="1"><result status="valid" time="0.11" steps="41232"/></proof>
   </goal>
   <goal name="construct_fo_term_list&#39;vc.25" expl="precondition" proved="true">
   <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="5"/></proof>
@@ -796,7 +797,7 @@
    <proof prover="0"><result status="valid" time="0.07" steps="35"/></proof>
    </goal>
    <goal name="construct_fo_term&#39;vc.3.4" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.13" steps="66308"/></proof>
+   <proof prover="1"><result status="valid" time="0.13" steps="65741"/></proof>
    </goal>
    <goal name="construct_fo_term&#39;vc.3.5" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.07" steps="14"/></proof>
@@ -840,7 +841,7 @@
   <proof prover="0"><result status="valid" time="0.06" steps="13"/></proof>
   </goal>
   <goal name="construct_fo_term&#39;vc.16" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.11" steps="41494"/></proof>
+  <proof prover="1"><result status="valid" time="0.11" steps="41232"/></proof>
   </goal>
   <goal name="construct_fo_term&#39;vc.17" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
@@ -1094,22 +1095,22 @@
   <goal name="nlsubst_symbol_in_fo_term_list&#39;vc.9" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="nlsubst_symbol_in_fo_term_list&#39;vc.9.0" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.54" steps="125778"/></proof>
+   <proof prover="1"><result status="valid" time="0.54" steps="125145"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_fo_term_list&#39;vc.9.1" expl="assertion" proved="true">
-   <proof prover="12"><result status="valid" time="0.68"/></proof>
+   <proof prover="3"><result status="valid" time="0.26" steps="51251"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_fo_term_list&#39;vc.9.2" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.11" steps="57"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_fo_term_list&#39;vc.9.3" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.18" steps="110407"/></proof>
+   <proof prover="1"><result status="valid" time="0.18" steps="110145"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_fo_term_list&#39;vc.9.4" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.44" steps="123075"/></proof>
+   <proof prover="1"><result status="valid" time="0.44" steps="122442"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_fo_term_list&#39;vc.9.5" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.44" steps="125983"/></proof>
+   <proof prover="1"><result status="valid" time="0.44" steps="125346"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1134,7 +1135,7 @@
   </transf>
   </goal>
   <goal name="nlsubst_symbol_in_fo_term_list&#39;vc.12" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.22" steps="122402"/></proof>
+  <proof prover="1"><result status="valid" time="0.22" steps="122141"/></proof>
   </goal>
  </transf>
  </goal>
@@ -1192,7 +1193,7 @@
    <proof prover="0"><result status="valid" time="0.10" steps="92"/></proof>
    </goal>
    <goal name="nlsubst_fo_term_in_fo_term_list&#39;vc.11.3" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.45" steps="124506"/></proof>
+   <proof prover="1"><result status="valid" time="0.45" steps="123885"/></proof>
    </goal>
    <goal name="nlsubst_fo_term_in_fo_term_list&#39;vc.11.4" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.07" steps="21"/></proof>
@@ -1229,7 +1230,7 @@
   </transf>
   </goal>
   <goal name="nlsubst_fo_term_in_fo_term_list&#39;vc.14" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.22" steps="122621"/></proof>
+  <proof prover="1"><result status="valid" time="0.22" steps="122360"/></proof>
   </goal>
  </transf>
  </goal>
@@ -1265,22 +1266,22 @@
   <goal name="nlsubst_symbol_in_fo_term&#39;vc.9" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="nlsubst_symbol_in_fo_term&#39;vc.9.0" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.49" steps="125782"/></proof>
+   <proof prover="1"><result status="valid" time="0.49" steps="125149"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_fo_term&#39;vc.9.1" expl="assertion" proved="true">
-   <proof prover="12"><result status="valid" time="0.61"/></proof>
+   <proof prover="3"><result status="valid" time="0.26" steps="51408"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_fo_term&#39;vc.9.2" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.12" steps="57"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_fo_term&#39;vc.9.3" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.22" steps="111097"/></proof>
+   <proof prover="1"><result status="valid" time="0.22" steps="110835"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_fo_term&#39;vc.9.4" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.45" steps="116380"/></proof>
+   <proof prover="1"><result status="valid" time="0.45" steps="115747"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_fo_term&#39;vc.9.5" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.43" steps="119406"/></proof>
+   <proof prover="1"><result status="valid" time="0.43" steps="118769"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1288,15 +1289,15 @@
   <transf name="split_goal_right" proved="true" >
    <goal name="nlsubst_symbol_in_fo_term&#39;vc.10.0" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.07" steps="96"/></proof>
-   <proof prover="1"><result status="valid" time="0.38" steps="119902"/></proof>
+   <proof prover="1"><result status="valid" time="0.52" steps="119265"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_fo_term&#39;vc.10.1" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.48" steps="126884"/></proof>
+   <proof prover="1"><result status="valid" time="0.48" steps="126247"/></proof>
    <proof prover="2" timelimit="60"><result status="valid" time="0.26"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_fo_term&#39;vc.10.2" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.08" steps="87"/></proof>
-   <proof prover="1"><result status="valid" time="0.45" steps="119681"/></proof>
+   <proof prover="1"><result status="valid" time="0.45" steps="119044"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1308,7 +1309,7 @@
   </transf>
   </goal>
   <goal name="nlsubst_symbol_in_fo_term&#39;vc.12" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.22" steps="113688"/></proof>
+  <proof prover="1"><result status="valid" time="0.22" steps="113427"/></proof>
   </goal>
  </transf>
  </goal>
@@ -1372,7 +1373,7 @@
    <proof prover="0"><result status="valid" time="0.10" steps="92"/></proof>
    </goal>
    <goal name="nlsubst_fo_term_in_fo_term&#39;vc.11.3" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.45" steps="115752"/></proof>
+   <proof prover="1"><result status="valid" time="0.45" steps="115131"/></proof>
    </goal>
    <goal name="nlsubst_fo_term_in_fo_term&#39;vc.11.4" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.06" steps="21"/></proof>
@@ -1409,7 +1410,7 @@
   </transf>
   </goal>
   <goal name="nlsubst_fo_term_in_fo_term&#39;vc.14" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.20" steps="112035"/></proof>
+  <proof prover="1"><result status="valid" time="0.20" steps="111774"/></proof>
   </goal>
  </transf>
  </goal>
