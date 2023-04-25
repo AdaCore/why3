@@ -77,6 +77,7 @@ type term =
   | Tapply of qual_identifier * term list
   | Tite of term * term * term
   | Tarray of sort * sort * array_elements
+  | Tasarray of term
   | Tunparsed of string
 
 and var_binding = symbol * term
@@ -207,6 +208,8 @@ let rec print_term fmt = function
   | Tarray (s1, s2, elts) ->
       fprintf fmt "@[<hv>(Array (%a -> %a) %a)@]" print_sort s1 print_sort s2
         print_array elts
+  | Tasarray t ->
+      fprintf fmt "@[<hv>(AsArray %a)@]" print_term t
   | Tunparsed s -> fprintf fmt "(UNPARSED %s)" s
 
 and print_var_binding fmt (s, t) =

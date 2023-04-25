@@ -24,10 +24,28 @@ File jlamp_array_mono.mlw:
     two : t = {Array.to_int => 2}
   Line 14:
     three : t = {Array.to_int => 3}
+  Line 18:
+    elts :
+      array
+      ->
+      int
+      ->
+      t = [|{Array.elts =
+             [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
+             Array.length = 0} =>
+            [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
+          _ => [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|]|]
   Line 19:
-    length : array -> int = [|epsilon x. (Array.length x) = 0 => 0; _ => 0|]
+    length :
+      array
+      ->
+      int = [|{Array.elts =
+               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
+               Array.length = 0} =>
+              0;
+            _ => 0|]
   Line 22:
-    mixfix [] : array -> int -> t = fun x!0 x!1 -> {Array.to_int => 3}
+    mixfix [] : array -> int -> t = fun x!02 x!1 -> {Array.to_int => 3}
   Line 28:
     mixfix [<-] :
       array
@@ -36,13 +54,25 @@ File jlamp_array_mono.mlw:
       ->
       t
       ->
-      array = fun x!0 x!1 x!2 -> epsilon x. (Array.length x) = 0
+      array = fun x!03 x!11 x!2 ->
+               {Array.elts =
+                [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
+                Array.length = 0}
   Line 33:
-    a : array = epsilon x. (Array.length x) = 0
+    a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
+               Array.length = 0}
   Line 44:
-    a : array = epsilon x. (Array.length x) = 0
+    a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
+               Array.length = 0}
   Line 48:
-    a : array = epsilon x. (Array.length x) = 0
+    a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
+               Array.length = 0}
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -66,12 +96,33 @@ File jlamp_array_mono.mlw:
     two : t = {Array.to_int => 2}
   Line 14:
     three : t = {Array.to_int => 3}
+  Line 18:
+    elts :
+      array
+      ->
+      int
+      ->
+      t = [|{Array.elts =
+             [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+             Array.length = 4} =>
+            [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+          {Array.elts =
+           [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
+           Array.length = 4} =>
+          [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
+          _ => [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|]|]
   Line 19:
     length :
       array
       ->
-      int = [|epsilon x. (Array.length x) = 4 => 4;
-            epsilon x. (Array.length x) = 4 => 4; _ => 4|]
+      int = [|{Array.elts =
+               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
+               Array.length = 4} =>
+              4;
+            {Array.elts =
+             [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+             Array.length = 4} =>
+            4; _ => 4|]
   Line 28:
     mixfix [<-] :
       array
@@ -80,23 +131,48 @@ File jlamp_array_mono.mlw:
       ->
       t
       ->
-      array = fun x!01 x!11 x!2 ->
-               if x!01 = epsilon x. (Array.length x) = 4 /\ x!11 = 42 /\
-                  x!2 = {Array.to_int => 2}
-               then epsilon x. (Array.length x) = 4 else epsilon x.
-               (Array.length x) = 4
+      array = fun x!09 x!13 x!21 ->
+               if x!09 = {Array.elts =
+                          [|42 => {Array.to_int => 3};
+                          _ => {Array.to_int => 2}|];
+                          Array.length = 4} /\
+                  x!13 = 42 /\ x!21 = {Array.to_int => 2}
+               then {Array.elts =
+                     [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
+                     Array.length = 4}
+               else {Array.elts =
+                     [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
+                     Array.length = 4}
   Line 32:
-    a : array = epsilon x. (Array.length x) = 4
+    a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+               Array.length = 4}
   Line 34:
-    a : array = epsilon x. (Array.length x) = 4
-    old a : array = epsilon x. (Array.length x) = 4
+    a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
+               Array.length = 4}
+    old a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+               Array.length = 4}
   Line 44:
-    a : array = epsilon x. (Array.length x) = 4
+    a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+               Array.length = 4}
   Line 47:
-    a : array = epsilon x. (Array.length x) = 4
+    a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
+               Array.length = 4}
     three : t = {Array.to_int => 3}
   Line 48:
-    a : array = epsilon x. (Array.length x) = 4
+    a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
+               Array.length = 4}
 
 File "bench/check-ce/jlamp_array_mono.mlw", line 54, characters 4-16:
 Sub-goal Index in array bounds of goal g'vc.
@@ -124,12 +200,36 @@ File jlamp_array_mono.mlw:
     two : t = {Array.to_int => 2}
   Line 14:
     three : t = {Array.to_int => 3}
+  Line 18:
+    elts :
+      array
+      ->
+      int
+      ->
+      t = [|{Array.elts =
+             [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+             Array.length = 43} =>
+            [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+          {Array.elts =
+           [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+           _ => {Array.to_int => 2}|];
+           Array.length = 43} =>
+          [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+          _ => {Array.to_int => 2}|];
+          _ => [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|]|]
   Line 19:
     length :
       array
       ->
-      int = [|epsilon x. (Array.length x) = 43 => 43;
-            epsilon x. (Array.length x) = 43 => 43; _ => 43|]
+      int = [|{Array.elts =
+               [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+               Array.length = 43} =>
+              43;
+            {Array.elts =
+             [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+             _ => {Array.to_int => 2}|];
+             Array.length = 43} =>
+            43; _ => 43|]
   Line 28:
     mixfix [<-] :
       array
@@ -138,23 +238,53 @@ File jlamp_array_mono.mlw:
       ->
       t
       ->
-      array = fun x!02 x!11 x!2 ->
-               if x!02 = epsilon x. (Array.length x) = 43 /\ x!11 = 42 /\
-                  x!2 = {Array.to_int => 2}
-               then epsilon x. (Array.length x) = 43 else epsilon x.
-               (Array.length x) = 43
+      array = fun x!015 x!14 x!22 ->
+               if x!015 = {Array.elts =
+                           [|17 => {Array.to_int => 3};
+                           _ => {Array.to_int => 2}|];
+                           Array.length = 43} /\
+                  x!14 = 42 /\ x!22 = {Array.to_int => 2}
+               then {Array.elts =
+                     [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+                     _ => {Array.to_int => 2}|];
+                     Array.length = 43}
+               else {Array.elts =
+                     [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+                     _ => {Array.to_int => 2}|];
+                     Array.length = 43}
   Line 32:
-    a : array = epsilon x. (Array.length x) = 43
+    a :
+      array = {Array.elts =
+               [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+               Array.length = 43}
   Line 34:
-    a : array = epsilon x. (Array.length x) = 43
-    old a : array = epsilon x. (Array.length x) = 43
+    a :
+      array = {Array.elts =
+               [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+               _ => {Array.to_int => 2}|];
+               Array.length = 43}
+    old a :
+      array = {Array.elts =
+               [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+               Array.length = 43}
   Line 50:
-    a : array = epsilon x. (Array.length x) = 43
+    a :
+      array = {Array.elts =
+               [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+               Array.length = 43}
   Line 53:
-    a : array = epsilon x. (Array.length x) = 43
+    a :
+      array = {Array.elts =
+               [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+               _ => {Array.to_int => 2}|];
+               Array.length = 43}
     three : t = {Array.to_int => 3}
   Line 54:
-    a : array = epsilon x. (Array.length x) = 43
+    a :
+      array = {Array.elts =
+               [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+               _ => {Array.to_int => 2}|];
+               Array.length = 43}
 
 File "bench/check-ce/jlamp_array_mono.mlw", line 60, characters 4-16:
 Sub-goal Index in array bounds of goal h'vc.
@@ -182,12 +312,41 @@ File jlamp_array_mono.mlw:
     two : t = {Array.to_int => 2}
   Line 14:
     three : t = {Array.to_int => 3}
+  Line 18:
+    elts :
+      array
+      ->
+      int
+      ->
+      t = [|{Array.elts =
+             [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
+             _ => {Array.to_int => 2}|];
+             Array.length = 43} =>
+            [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
+            _ => {Array.to_int => 2}|];
+          {Array.elts =
+           [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
+           _ => {Array.to_int => 2}|];
+           Array.length = 43} =>
+          [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
+          _ => {Array.to_int => 2}|];
+          _ =>
+          [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
+          _ => {Array.to_int => 2}|]|]
   Line 19:
     length :
       array
       ->
-      int = [|epsilon x. (Array.length x) = 43 => 43;
-            epsilon x. (Array.length x) = 43 => 43; _ => 43|]
+      int = [|{Array.elts =
+               [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
+               _ => {Array.to_int => 2}|];
+               Array.length = 43} =>
+              43;
+            {Array.elts =
+             [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
+             _ => {Array.to_int => 2}|];
+             Array.length = 43} =>
+            43; _ => 43|]
   Line 28:
     mixfix [<-] :
       array
@@ -196,21 +355,55 @@ File jlamp_array_mono.mlw:
       ->
       t
       ->
-      array = fun x!03 x!11 x!2 ->
-               if x!03 = epsilon x. (Array.length x) = 43 /\ x!11 = 17 /\
-                  x!2 = {Array.to_int => 2}
-               then epsilon x. (Array.length x) = 43 else epsilon x.
-               (Array.length x) = 43
+      array = fun x!021 x!15 x!23 ->
+               if x!021 = {Array.elts =
+                           [|42 => {Array.to_int => 2};
+                           17 => {Array.to_int => 3};
+                           _ => {Array.to_int => 2}|];
+                           Array.length = 43} /\
+                  x!15 = 17 /\ x!23 = {Array.to_int => 2}
+               then {Array.elts =
+                     [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
+                     _ => {Array.to_int => 2}|];
+                     Array.length = 43}
+               else {Array.elts =
+                     [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
+                     _ => {Array.to_int => 2}|];
+                     Array.length = 43}
   Line 32:
-    a : array = epsilon x. (Array.length x) = 43
+    a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
+               _ => {Array.to_int => 2}|];
+               Array.length = 43}
   Line 34:
-    a : array = epsilon x. (Array.length x) = 43
-    old a : array = epsilon x. (Array.length x) = 43
+    a :
+      array = {Array.elts =
+               [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
+               _ => {Array.to_int => 2}|];
+               Array.length = 43}
+    old a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
+               _ => {Array.to_int => 2}|];
+               Array.length = 43}
   Line 56:
-    a : array = epsilon x. (Array.length x) = 43
+    a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
+               _ => {Array.to_int => 2}|];
+               Array.length = 43}
   Line 59:
-    a : array = epsilon x. (Array.length x) = 43
+    a :
+      array = {Array.elts =
+               [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
+               _ => {Array.to_int => 2}|];
+               Array.length = 43}
     three : t = {Array.to_int => 3}
   Line 60:
-    a : array = epsilon x. (Array.length x) = 43
+    a :
+      array = {Array.elts =
+               [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
+               _ => {Array.to_int => 2}|];
+               Array.length = 43}
 

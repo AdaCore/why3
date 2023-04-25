@@ -379,7 +379,8 @@ module FromSexpToModel = struct
 
   and array sexp =
     match sexp with
-    (* "_ as-array" not supported because not associated to sorts for indices/values *)
+    | List [Atom "_"; Atom "as-array"; n] ->
+        Tasarray (term n)
     | List
         [ List [ Atom "as"; Atom "const"; List [ Atom "Array"; s1; s2 ] ]; t ]
       ->
@@ -401,7 +402,8 @@ module FromSexpToModel = struct
   let fun_def : sexp -> (string * function_def) option = function
     | List [ Atom "define-fun"; Atom n; args; res; body ] ->
         let res = sort res in
-        let args = list arg args and body = term body in
+        let args = list arg args in
+        let body = term body in
         Some (n, (args, res, body))
     | _ -> None
 
@@ -915,6 +917,7 @@ module FromModelToTerm = struct
         (t_if b' t1' t2', If (b'_concrete, t1'_concrete, t2'_concrete))
     | Tapply (qid, ts) -> apply_to_term env qid ts
     | Tarray (s1, s2, a) -> array_to_term env s1 s2 a
+    | Tasarray t -> asarray_to_term env t
     | Tunparsed _ -> error "Could not interpret term %a@." print_term t
 
   and apply_to_term env qid ts =
@@ -1022,7 +1025,6 @@ module FromModelToTerm = struct
     let ty2 = smt_sort_to_ty env s2 in
     let vs_arg = create_vsymbol (Ident.id_fresh "x") ty1 in
     let vs_name = Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs_arg in
-    Pretty.forget_var vs_arg;
     let mk_case key value (t, t_concrete) =
       let key,key_concrete = term_to_term env key in
       let value,value_concrete = term_to_term env value in
@@ -1046,7 +1048,18 @@ module FromModelToTerm = struct
         (t_others, others_concrete)
         elts.array_indices
     in
+    Pretty.forget_var vs_arg;
     (t_lambda [ vs_arg ] [] a, Function {args=[vs_name]; body=a_concrete})
+
+  and asarray_to_term env elt =
+    match elt with
+    | Tvar (Qident (Isymbol (S n)) | Qident (Isymbol (Sprover n))) -> begin
+      match Mstr.find_opt n env.prover_fun_defs with
+      | Some (t, (Function { args = [ _ ]; _ } as t_concrete)) ->
+        t, t_concrete
+      | _ -> error "The function %s cannot be converted into an array type@." n
+    end
+    | _ -> error "Cannot interpret the 'as-array' term"
 
   (*  Interpreting function definitions from the SMT model to [t',t'_concrete].
       - [t'] is a Term.term
@@ -1092,10 +1105,11 @@ module FromModelToTerm = struct
     Debug.dprintf debug "[check_fun_def_type] ls.ls_value = %a@."
       (Pp.print_option_or_default "None" Pretty.print_ty_qualified)
       ls.ls_value;
-    List.iter
-      (Debug.dprintf debug "[check_fun_def_type] ls.ls_args = %a@."
-         Pretty.print_ty_qualified)
-      ls.ls_args;
+    if (Debug.test_flag debug) then
+      List.iter
+        (Debug.dprintf debug "[check_fun_def_type] ls.ls_args = %a@."
+           Pretty.print_ty_qualified)
+        ls.ls_args;
     let check_or_update_inferred_types s ty =
       Ty.ty_equal ty (smt_sort_to_ty ~update_ty:(Some ty) env s)
     in
@@ -1131,11 +1145,12 @@ module FromModelToTerm = struct
             let vs = create_vsymbol fresh_str (smt_sort_to_ty env sort) in
             env.bound_vars <- Mstr.add str vs env.bound_vars)
       args;
-    Mstr.iter
-      (fun key vs ->
-        Debug.dprintf debug "[interpret_fun_def_to_term] bound_var = (%s, %a)@."
-          key Pretty.print_vs vs)
-      env.bound_vars;
+    if (Debug.test_flag debug) then
+      Mstr.iter
+        (fun key vs ->
+          Debug.dprintf debug "[interpret_fun_def_to_term] bound_var = (%s, %a)@."
+            key Pretty.print_vs vs)
+        env.bound_vars;
     let (t_body, t_body_concrete) = smt_term_to_term ~fmla env body res in
     let (t,t_concrete) =
       if List.length (Mstr.values env.bound_vars) = 0 then
@@ -1153,9 +1168,9 @@ module FromModelToTerm = struct
           Function {args; body=t_body_concrete}
         )
     in
-    List.iter
+    (* List.iter
       Pretty.forget_var
-      (Mstr.values env.bound_vars);
+      (Mstr.values env.bound_vars); *)
     Debug.dprintf debug "[interpret_fun_def_to_term] t = %a@."
       Pretty.print_term t;
     Debug.dprintf debug "[interpret_fun_def_to_term] t_concrete = %a@."
@@ -1362,15 +1377,16 @@ module FromModelToTerm = struct
                (Sls.elements sls)))
         pinfo.Printer.type_coercions
     in
-    Ty.Mty.iter
-      (fun key elt ->
-        List.iter
-          (fun (str, (ls, t, t_concrete)) ->
-            Debug.dprintf debug
-              "[ty_coercions] ty = %a, str=%s, ls = %a, t=%a, t_concrete=%a@." Pretty.print_ty
-              key str Pretty.print_ls ls Pretty.print_term t print_concrete_term t_concrete)
-          elt)
-      ty_coercions;
+    if (Debug.test_flag debug) then
+      Ty.Mty.iter
+        (fun key elt ->
+          List.iter
+            (fun (str, (ls, t, t_concrete)) ->
+              Debug.dprintf debug
+                "[ty_coercions] ty = %a, str=%s, ls = %a, t=%a, t_concrete=%a@." Pretty.print_ty
+                key str Pretty.print_ls ls Pretty.print_term t print_concrete_term t_concrete)
+            elt)
+        ty_coercions;
     let ty_fields =
       Ty.Mty.map (* for each list of lsymbols associated to a type *)
         (fun lls ->
@@ -1390,14 +1406,15 @@ module FromModelToTerm = struct
                lls))
         pinfo.Printer.type_fields
     in
-    Ty.Mty.iter
-      (fun key elt ->
-        List.iter
-          (fun (str, (ls, t, t_concrete)) ->
-            Debug.dprintf debug "[ty_fields] ty = %a, str=%s, ls = %a, t=%a, t_concrete=%a@."
-              Pretty.print_ty key str Pretty.print_ls ls Pretty.print_term t print_concrete_term t_concrete)
-          elt)
-      ty_fields;
+    if (Debug.test_flag debug) then
+      Ty.Mty.iter
+        (fun key elt ->
+          List.iter
+            (fun (str, (ls, t, t_concrete)) ->
+              Debug.dprintf debug "[ty_fields] ty = %a, str=%s, ls = %a, t=%a, t_concrete=%a@."
+                Pretty.print_ty key str Pretty.print_ls ls Pretty.print_term t print_concrete_term t_concrete)
+            elt)
+        ty_fields;
     (* for each prover variable, we create an epsilon term using type coercions
        or record type fields for the type of the prover variable *)
     Mstr.iter
@@ -1405,12 +1422,10 @@ module FromModelToTerm = struct
         Ty.Mty.iter
           (fun ty vs ->
             let vs_name = Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs in
-            Pretty.forget_var vs;
             let create_epsilon_term ty l =
               (* create a fresh vsymbol for the variable bound by the epsilon term *)
               let x = create_vsymbol (Ident.id_fresh "x") ty in
               let x_name = Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified x in
-              Pretty.forget_var x;
               let aux (_, (ls', t', t'_concrete)) =
                 let vs_list', _, t' = t_open_lambda t' in
                 match t'_concrete with
@@ -1444,6 +1459,7 @@ module FromModelToTerm = struct
               let l', l'_concrete = List.split (List.map aux l) in
               let f = t_and_l l' in
               let f_concrete = t_and_l_concrete l'_concrete in
+              Pretty.forget_var x;
               (* replace [t] by [eps x. f] *)
               (t_eps_close x f, Epsilon (x_name, f_concrete))
             in
@@ -1465,7 +1481,8 @@ module FromModelToTerm = struct
               Pretty.print_term eval_var
               print_concrete_term eval_var_concrete;
             env.eval_prover_vars <-
-              Mvs.add vs (eval_var, eval_var_concrete) env.eval_prover_vars)
+              Mvs.add vs (eval_var, eval_var_concrete) env.eval_prover_vars;
+            Pretty.forget_var vs )
           value)
       env.prover_vars;
     (* we now call [eval_term] on each [(t,t_concrete)] in [terms] in order
@@ -1703,19 +1720,21 @@ module FromModelToTerm = struct
   let get_terms (pinfo : Printer.printing_info)
       (fun_defs : Smtv2_model_defs.function_def Mstr.t) =
     let qterms = pinfo.Printer.queried_terms in
-    Mstr.iter
-      (fun key _ -> Debug.dprintf debug "[fun_defs] name = %s@." key)
-      fun_defs;
-    Mstr.iter
-      (fun key (ls, _, _) ->
-        Debug.dprintf debug "[queried_terms] name = %s, ls = %a@." key
-          Pretty.print_ls ls)
-      qterms;
-    Mstr.iter
-      (fun key ls ->
-        Debug.dprintf debug "[constructors] name = %s, ls = %a/%d@." key
-          Pretty.print_ls ls (List.length ls.ls_args))
-      pinfo.Printer.constructors;
+    if (Debug.test_flag debug) then begin
+      Mstr.iter
+        (fun key _ -> Debug.dprintf debug "[fun_defs] name = %s@." key)
+        fun_defs;
+      Mstr.iter
+        (fun key (ls, _, _) ->
+          Debug.dprintf debug "[queried_terms] name = %s, ls = %a@." key
+            Pretty.print_ls ls)
+        qterms;
+      Mstr.iter
+        (fun key ls ->
+          Debug.dprintf debug "[constructors] name = %s, ls = %a/%d@." key
+            Pretty.print_ls ls (List.length ls.ls_args))
+        pinfo.Printer.constructors;
+      end;
     let env =
       {
         why3_env = pinfo.Printer.why3_env;
@@ -1804,15 +1823,16 @@ module FromModelToTerm = struct
         queried_fun_defs
     in
     let debug_terms desc terms =
-      Mstr.iter
-        (fun n ((ls, oloc, _), (t, t_concrete)) ->
-          Debug.dprintf debug
-            "[TERMS %s] name = %s, ls = %a, oloc = %a, t = %a, t_concrete = %a@." desc n
-            Pretty.print_ls ls
-            (Pp.print_option Pretty.print_loc_as_attribute) oloc
-            Pretty.print_term t
-            print_concrete_term t_concrete)
-        terms
+      if (Debug.test_flag debug) then
+        Mstr.iter
+          (fun n ((ls, oloc, _), (t, t_concrete)) ->
+            Debug.dprintf debug
+              "[TERMS %s] name = %s, ls = %a, oloc = %a, t = %a, t_concrete = %a@." desc n
+              Pretty.print_ls ls
+              (Pp.print_option Pretty.print_loc_as_attribute) oloc
+              Pretty.print_term t
+              print_concrete_term t_concrete)
+          terms
     in
     (* 1st pass = interpret function definitions to terms *)
     debug_terms "FROM SMT MODEL" terms;

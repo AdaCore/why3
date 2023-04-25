@@ -79,6 +79,7 @@ type term =
   | Tapply of qual_identifier * term list
   | Tite of term * term * term
   | Tarray of sort * sort * array_elements
+  | Tasarray of term
   | Tunparsed of string
 
 and var_binding = symbol * term
