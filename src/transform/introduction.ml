@@ -9,11 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-(*
-  This module was poorly designed by Claude Marché, with the
-  enormous help of Jean-Christophe Filliâtre and Andrei Paskevich
-  for finding the right function in the Why3 API
-*)
 
 open Wstdlib
 open Ident
@@ -93,7 +88,7 @@ let rec dequant ht pos f =
   | Tlet (t,fb) ->
       let vs, f1 = t_open_bound fb in
       Hvs.replace ht vs (t_peek_bound fb);
-      (if pos then t_implies else t_and) (t_equ (t_var vs) t) (dequant pos f1)
+      (if pos then t_implies_simp else t_and_simp) (t_equ (t_var vs) t) (dequant pos f1)
   | Tcase (t,bl) ->
       let branch bf =
         let pat, f1 = t_open_branch bf in
@@ -239,7 +234,10 @@ let rec intros kn knl pr mal old_pushed f =
       d :: intros kn knl pr mal pushed f
   | _ -> [create_prop_decl Pgoal pr (move_attrs f)]
 
-let intros kn mal pr f =
+
+(** [intros] for a goal.  First the type variables are introduced as abstract
+   types.  *)
+let intros_in_goal kn mal pr f =
   let tvs = t_ty_freevars Stv.empty f in
   let mk_ts tv () = create_tysymbol (id_clone tv.tv_name) [] NoDef in
   let tvm = Mtv.mapi mk_ts tvs in
@@ -255,7 +253,7 @@ let rec introduce hd =
   | Theory.Decl {d_node = Dprop (Pgoal,pr,f)} ->
       let mal, task = apply_prev introduce hd in
       let kn = Some (Task.task_known task) in
-      let dl = intros kn (List.rev mal) pr f in
+      let dl = intros_in_goal kn (List.rev mal) pr f in
       [], List.fold_left Task.add_decl task dl
   | Theory.Meta (m,[ma])
     when Theory.meta_equal m meta_intro_ls ||
@@ -268,13 +266,107 @@ let rec introduce hd =
   | _ ->
       [], Some hd
 
-let intros ?known_map pr f = intros known_map [] pr f
+let intros ?known_map pr f = intros_in_goal known_map [] pr f
 
 let introduce_premises = Trans.store (apply_head introduce)
 
 let () = Trans.register_transform "introduce_premises" introduce_premises
   ~desc:"Introduce@ universal@ quantification@ and@ hypothesis@ in@ the@ \
          goal@ into@ constant@ symbol@ and@ axioms."
+
+
+(*
+
+  Specific version of introduction that is pushing the local let in
+   the context too. This is specifically intended for counterexamples
+   generation. See also [prepare_for_counterexmp.ml]
+
+*)
+
+
+let rec dequantify ht pos f =
+  let dequantify = dequantify ht in
+  t_attr_copy f (match f.t_node with
+  | Ttrue | Tfalse | Tvar _ | Tconst _ | Teps _ | Tapp _ -> f
+  | Tlet (t,fb) ->
+      let vs, f1 = t_open_bound fb in
+      Hvs.replace ht vs (t_peek_bound fb);
+      (if pos then t_implies_simp else t_and_simp) (t_equ (t_var vs) t) (dequantify pos f1)
+  | Tquant (q,fq) when (match q with Tforall -> pos | Texists -> not pos) ->
+      let vl,_,f1 = t_open_quant fq in
+      List.iter2 (Hvs.replace ht) vl (t_peek_quant fq);
+      dequantify pos f1
+  | Tquant _ | Tif _ | Tcase _ | Tbinop _ | Tnot _ ->
+      t_map_sign dequantify pos f)
+
+let dequantify pos pr f =
+  let ht = Hvs.create 7 in
+  let f = dequantify ht pos f in
+  let fl = [f] in
+  (* construct new premises, reusing lsymbols and propositions *)
+  let add (knl,subst,dl) f =
+    let svs = Mvs.set_diff (t_freevars Mvs.empty f) subst in
+    let knl, subst, dl =
+      Mvs.fold
+        (fun vs _ (knl,subst,dl) ->
+           let (knl,subst,_), d =
+             intro_var (knl, subst, []) (vs, Hvs.find ht vs)
+           in knl, subst, d::dl)
+        svs (knl, subst, dl)
+    in
+    let d = create_prop_decl (if pos then Pgoal else Paxiom) pr (t_subst subst f) in
+    let d = find_fresh_axiom knl d in
+    let add id knl = Mid.add_new clash_exn id d knl in
+    let knl = Sid.fold add d.d_news knl in
+    knl, subst, d::dl
+  in
+  (* consume the topmost name *)
+  let _,_,dl = List.fold_left add (Mid.empty,Mvs.empty,[]) fl in
+  List.rev dl
+
+
+let rec dequantification hd =
+  let d = hd.Task.task_decl in
+  match d.Theory.td_node with
+  | Theory.Decl {d_node = Dprop (Pgoal,pr,f)} ->
+      let _, task = apply_prev dequantification hd in
+      let _kn = Some (Task.task_known task) in
+      let dl = dequantify true pr f in
+      [], List.fold_left Task.add_decl task dl
+  | Theory.Decl {d_node = Dprop (Paxiom,pr,f)} ->
+      let _, task = apply_prev dequantification hd in
+      let _kn = Some (Task.task_known task) in
+      let dl = dequantify false pr f in
+      [], List.fold_left Task.add_decl task dl
+  | Theory.Meta (m,[ma])
+    when Theory.meta_equal m meta_intro_ls ||
+         Theory.meta_equal m meta_intro_pr ->
+      let mal, task = apply_prev dequantification hd in
+      ma::mal, task
+  | Theory.Meta _ ->
+      let mal, task = apply_prev dequantification hd in
+      mal, Task.add_tdecl task hd.Task.task_decl
+  | _ ->
+      [], Some hd
+
+
+let dequantification = Trans.store (apply_head dequantification)
+
+let () = Trans.register_transform "dequantification" dequantification
+  ~desc:"Introduce@ quantifications@ and@ local bindings@ as@ constant@ symbols."
+
+
+
+
+
+
+
+(*
+
+  Generalization : put the introduced symbols back into the goal
+
+*)
+
 
 (* In this file t_replace is used to substitute vsymbol with lsymbols. This is
    done in [set_vs]; but in cases where the attribute is directly on the lsymbol
@@ -397,3 +489,31 @@ let () = Trans.register_transform_l
            ~desc:"The@ recommended@ splitting@ transformation@ to@ apply@ \
               on@ VCs@ generated@ by@ WP@ (split_goal_right@ followed@ \
               by@ introduce_premises@ followed@ by@ subst_all)."
+
+
+(*
+
+  Specific transformation for removing unused CE variables from the
+   task.  This is intended to be used by the user-friendly printing of
+   tasks and for drivers of provers when no counterexample are
+   expected.
+
+*)
+
+let remove_unused_in_decl d =
+  match d.d_node with
+  | Dparam ls | Dlogic [(ls,_)] when Sattr.mem unused_attr ls.ls_name.id_attrs -> []
+  | Ddata _ | Dtype _ | Dparam _ -> [d]
+  | Dlogic _ -> [d]  (* TODO ? *)
+  | Dind _ -> [d] (* TODO ? *)
+  | Dprop(k,pr,f) ->
+      let pol = match k with Pgoal -> true | Paxiom -> false | Plemma -> assert false in
+      let f = remove_unused_in_term pol f in
+      [create_prop_decl k pr f]
+
+let remove_unused_from_context = Trans.decl remove_unused_in_decl None
+
+let () = Trans.register_transform
+           "remove_unused_from_context"
+           remove_unused_from_context
+           ~desc:"Remove declarations marked with [@@id:unused] from the context."

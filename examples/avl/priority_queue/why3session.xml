@@ -9,6 +9,8 @@
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC5" version="1.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.4.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="7" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="8" name="CVC5" version="1.0.4" timelimit="5" steplimit="0" memlimit="2000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="priority_queue.mlw"/>
 <theory name="PQueue" proved="true">
@@ -92,16 +94,16 @@
  <goal name="monoid_sum_is_min&#39;vc" expl="VC for monoid_sum_is_min" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="monoid_sum_is_min&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="monoid_sum_is_min&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="20"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
   <goal name="monoid_sum_is_min&#39;vc.2" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="monoid_sum_is_min&#39;vc.3" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="46"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="45"/></proof>
   </goal>
   <goal name="monoid_sum_is_min&#39;vc.4" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -126,7 +128,7 @@
   <goal name="selected_is_min&#39;vc.1" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="selected_is_min&#39;vc.1.0" expl="assertion" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.15" steps="39966"/></proof>
+   <proof prover="5" timelimit="5"><result status="valid" time="0.59" steps="73305"/></proof>
    </goal>
    <goal name="selected_is_min&#39;vc.1.1" expl="assertion" proved="true">
    <proof prover="1"><result status="valid" time="0.84" steps="131971"/></proof>
@@ -187,43 +189,64 @@
    <goal name="selected_part&#39;vc.0.12" expl="VC for selected_part" proved="true">
    <transf name="split_vc" proved="true" >
     <goal name="selected_part&#39;vc.0.12.0" expl="VC for selected_part" proved="true">
-    <proof prover="5"><result status="valid" time="0.04" steps="14474"/></proof>
+    <proof prover="5"><result status="valid" time="0.04" steps="14379"/></proof>
     </goal>
     <goal name="selected_part&#39;vc.0.12.1" expl="VC for selected_part" proved="true">
-    <proof prover="5"><result status="valid" time="0.05" steps="15225"/></proof>
+    <proof prover="5"><result status="valid" time="0.05" steps="15061"/></proof>
     </goal>
     <goal name="selected_part&#39;vc.0.12.2" expl="VC for selected_part" proved="true">
     <transf name="split_vc" proved="true" >
      <goal name="selected_part&#39;vc.0.12.2.0" expl="VC for selected_part" proved="true">
-     <proof prover="5"><result status="valid" time="0.05" steps="14468"/></proof>
+     <proof prover="6" memlimit="2000"><result status="valid" time="0.02" steps="44"/></proof>
      </goal>
      <goal name="selected_part&#39;vc.0.12.2.1" expl="VC for selected_part" proved="true">
-     <proof prover="6" memlimit="2000"><result status="valid" time="3.00" steps="44349"/></proof>
+     <proof prover="8"><result status="valid" time="3.46" steps="322220"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="selected_part&#39;vc.0.12.3" expl="VC for selected_part" proved="true">
     <transf name="split_vc" proved="true" >
      <goal name="selected_part&#39;vc.0.12.3.0" expl="VC for selected_part" proved="true">
-     <proof prover="5"><result status="valid" time="0.06" steps="15254"/></proof>
+     <transf name="split_vc" proved="true" >
+      <goal name="selected_part&#39;vc.0.12.3.0.0" expl="VC for selected_part" proved="true">
+      <transf name="inline_goal" proved="true" >
+       <goal name="selected_part&#39;vc.0.12.3.0.0.0" expl="VC for selected_part" proved="true">
+       <transf name="split_all_full" proved="true" >
+        <goal name="selected_part&#39;vc.0.12.3.0.0.0.0" expl="VC for selected_part" proved="true">
+        <proof prover="7"><result status="valid" time="0.18" steps="29621"/></proof>
+        </goal>
+        <goal name="selected_part&#39;vc.0.12.3.0.0.0.1" expl="VC for selected_part" proved="true">
+        <proof prover="6" timelimit="1"><result status="valid" time="0.03" steps="55"/></proof>
+        </goal>
+        <goal name="selected_part&#39;vc.0.12.3.0.0.0.2" expl="VC for selected_part" proved="true">
+        <proof prover="6" timelimit="1"><result status="valid" time="0.02" steps="55"/></proof>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="selected_part&#39;vc.0.12.3.0.1" expl="VC for selected_part" proved="true">
+      <proof prover="7"><result status="valid" time="0.14" steps="24766"/></proof>
+      </goal>
+     </transf>
      </goal>
      <goal name="selected_part&#39;vc.0.12.3.1" expl="VC for selected_part" proved="true">
      <transf name="split_vc" proved="true" >
       <goal name="selected_part&#39;vc.0.12.3.1.0" expl="VC for selected_part" proved="true">
-      <proof prover="5"><result status="valid" time="0.05" steps="14565"/></proof>
+      <proof prover="5"><result status="valid" time="0.05" steps="14440"/></proof>
       </goal>
       <goal name="selected_part&#39;vc.0.12.3.1.1" expl="VC for selected_part" proved="true">
       <transf name="inline_goal" proved="true" >
        <goal name="selected_part&#39;vc.0.12.3.1.1.0" expl="VC for selected_part" proved="true">
        <transf name="split_all_full" proved="true" >
         <goal name="selected_part&#39;vc.0.12.3.1.1.0.0" expl="VC for selected_part" proved="true">
-        <proof prover="5"><result status="valid" time="0.08" steps="22907"/></proof>
+        <proof prover="5"><result status="valid" time="0.08" steps="22346"/></proof>
         </goal>
         <goal name="selected_part&#39;vc.0.12.3.1.1.0.1" expl="VC for selected_part" proved="true">
-        <proof prover="5"><result status="valid" time="0.08" steps="23228"/></proof>
+        <proof prover="5"><result status="valid" time="0.19" steps="22647"/></proof>
         </goal>
         <goal name="selected_part&#39;vc.0.12.3.1.1.0.2" expl="VC for selected_part" proved="true">
-        <proof prover="6" timelimit="1"><result status="valid" time="0.31" steps="3884"/></proof>
+        <proof prover="6" timelimit="1"><result status="valid" time="0.51" steps="3880"/></proof>
         </goal>
        </transf>
        </goal>
@@ -267,7 +290,7 @@
  <proof prover="4"><result status="valid" time="0.02" steps="9"/></proof>
  </goal>
  <goal name="Sel.selected_part&#39;refn&#39;vc" expl="VC for selected_part&#39;refn" proved="true">
- <proof prover="4"><result status="valid" time="0.04" steps="257"/></proof>
+ <proof prover="4"><result status="valid" time="0.04" steps="7"/></proof>
  </goal>
  <goal name="to_bag&#39;vc" expl="VC for to_bag" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
@@ -310,7 +333,7 @@
   <proof prover="4"><result status="valid" time="0.17" steps="203"/></proof>
   </goal>
   <goal name="get_minimum_index&#39;vc.4" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.27" steps="5255"/></proof>
+  <proof prover="6"><result status="valid" time="0.62" steps="5251"/></proof>
   </goal>
   <goal name="get_minimum_index&#39;vc.5" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="165"/></proof>
@@ -322,7 +345,7 @@
   <proof prover="4"><result status="valid" time="0.03" steps="16"/></proof>
   </goal>
   <goal name="get_minimum_index&#39;vc.8" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.12" steps="2249"/></proof>
+  <proof prover="6"><result status="valid" time="0.27" steps="2250"/></proof>
   </goal>
   <goal name="get_minimum_index&#39;vc.9" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="17"/></proof>
@@ -362,7 +385,7 @@
   <proof prover="4"><result status="valid" time="0.15" steps="158"/></proof>
   </goal>
   <goal name="split_gives_minimum&#39;vc.4" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.52" steps="117053"/></proof>
+  <proof prover="1"><result status="valid" time="0.75" steps="117053"/></proof>
   </goal>
   <goal name="split_gives_minimum&#39;vc.5" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.31" steps="641"/></proof>
@@ -381,7 +404,7 @@
   <proof prover="4"><result status="valid" time="0.04" steps="84"/></proof>
   </goal>
   <goal name="correction&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.04" steps="174788"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="166769"/></proof>
   </goal>
   <goal name="correction&#39;vc.4" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.05" steps="38"/></proof>
@@ -412,7 +435,7 @@
   <proof prover="4"><result status="valid" time="0.03" steps="72"/></proof>
   </goal>
   <goal name="remove_count&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.83" steps="194892"/></proof>
+  <proof prover="1" timelimit="10"><result status="valid" time="1.08" steps="194892"/></proof>
   </goal>
   <goal name="remove_count&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="1" timelimit="10"><result status="valid" time="0.22" steps="49370"/></proof>
@@ -484,10 +507,10 @@
    <proof prover="4"><result status="valid" time="0.12" steps="77"/></proof>
    </goal>
    <goal name="pop_min&#39;vc.3.1" expl="VC for pop_min" proved="true">
-   <proof prover="4" timelimit="5"><result status="valid" time="0.71" steps="688"/></proof>
+   <proof prover="4" timelimit="5"><result status="valid" time="1.12" steps="688"/></proof>
    </goal>
    <goal name="pop_min&#39;vc.3.2" expl="VC for pop_min" proved="true">
-   <proof prover="4" timelimit="20"><result status="valid" time="4.76" steps="3557"/></proof>
+   <proof prover="4" timelimit="20"><result status="valid" time="8.02" steps="3557"/></proof>
    </goal>
   </transf>
   </goal>
@@ -499,7 +522,7 @@
   <proof prover="4"><result status="valid" time="0.03" steps="81"/></proof>
   </goal>
   <goal name="add&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="20"><result status="valid" time="0.54" steps="1513"/></proof>
+  <proof prover="4" timelimit="20"><result status="valid" time="0.90" steps="1513"/></proof>
   </goal>
   <goal name="add&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="11"/></proof>

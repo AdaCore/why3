@@ -3,7 +3,7 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Vampire" version="0.6" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -29,7 +29,7 @@
  <proof prover="6" timelimit="6"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
  <goal name="sizew_nonneg" proved="true">
- <proof prover="2"><result status="valid" time="0.11"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="47"/></proof>
  </goal>
  <goal name="height1&#39;vc" expl="VC for height1" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -143,7 +143,7 @@
  <proof prover="3"><result status="valid" time="0.31" steps="54645"/></proof>
  </goal>
  <goal name="height&#39;vc" expl="VC for height" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="7686"/></proof>
+ <proof prover="0"><result status="valid" time="0.03" steps="7417"/></proof>
  </goal>
 </theory>
 </file>
