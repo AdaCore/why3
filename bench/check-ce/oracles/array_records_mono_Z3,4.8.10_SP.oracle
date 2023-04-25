@@ -3,866 +3,205 @@ Goal array_of_records'vc.
 Prover result is: Valid.
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
 File array_records_mono.mlw:
-  Line 20:
-    length : array_of_records -> int = [|_ => 0|]
-  Line 23:
-    mixfix [] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record = fun x!0 x!1 -> {flag = true; first_val = 3; sec_val = 5}
-  Line 26:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 29:
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!0 x!1 x!2 -> epsilon x.
-                          (ArrayRecords.length x) = 0
   Line 45:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
+    a = {elts=
+         fun (x!05:int) ->
+          if x!05 = (- 1) then basic_record'mk True 3 5
+          else basic_record'mk True 3 5;
+         length= 0}
+    i = (- 1)
+    a = {elts=
+         fun (x!05:int) ->
+          if x!05 = (- 1) then basic_record'mk True 3 5
+          else basic_record'mk True 3 5;
+         length= 0}
+    i = (- 1)
+    Execution of main function `var_overwrite` with env:
+      a = {elts=
+           fun (x!05:int) ->
+            if x!05 = (- 1) then basic_record'mk True 3 5
+            else basic_record'mk True 3 5;
+           length= 0}
+      i = (- 1)
+      zero = 0
+      one = 1
   Line 49:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
+    (giant-step) execution of unimplemented function `([])`
+      a = {elts=
+           fun (x!05:int) ->
+            if x!05 = (- 1) then basic_record'mk True 3 5
+            else basic_record'mk True 3 5;
+           length= 0}
+      i = (- 1)
+    Property failure at precondition of `([])` with:
+      a = {elts=
+           fun (x!05:int) ->
+            if x!05 = (- 1) then basic_record'mk True 3 5
+            else basic_record'mk True 3 5;
+           length= 0}
+      i = (- 1)
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_mono.mlw", line 49, characters 21-25:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array_records_mono.mlw:
-  Line 20:
-    length : array_of_records -> int = [|_ => 0|]
-  Line 23:
-    mixfix [] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record = fun x!01 x!1 ->
-                      {flag = true; first_val = 3; sec_val = 5}
-  Line 26:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 29:
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!01 x!1 x!2 -> epsilon x.
-                          (ArrayRecords.length x) = 0
-  Line 45:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 49:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
+Sorry, we don't have a good counterexample for you :(
+
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_mono.mlw", line 49, characters 5-81:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array_records_mono.mlw:
-  Line 20:
-    length : array_of_records -> int = [|_ => 0|]
-  Line 23:
-    mixfix [] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record = fun x!02 x!1 ->
-                      {flag = true; first_val = 3; sec_val = 5}
-  Line 27:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 29:
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!02 x!1 x!2 -> epsilon x.
-                          (ArrayRecords.length x) = 0
-  Line 45:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 49:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
+Sorry, we don't have a good counterexample for you :(
+
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_mono.mlw", line 50, characters 64-68:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array_records_mono.mlw:
-  Line 20:
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
-  Line 26:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 27:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-  Line 29:
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!03 x!1 x!2 ->
-                          if x!03 = epsilon x. (ArrayRecords.length x) = 0 /\
-                             x!1 = -1 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 0
-                          else epsilon x. (ArrayRecords.length x) = 0
-  Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-  Line 45:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 49:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 50:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
+Sorry, we don't have a good counterexample for you :(
+
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_mono.mlw", line 50, characters 21-25:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array_records_mono.mlw:
-  Line 20:
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
-  Line 26:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 27:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-  Line 29:
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!04 x!1 x!2 ->
-                          if x!04 = epsilon x. (ArrayRecords.length x) = 0 /\
-                             x!1 = -1 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 0
-                          else epsilon x. (ArrayRecords.length x) = 0
-  Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-  Line 45:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 49:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 50:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-    result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
+Sorry, we don't have a good counterexample for you :(
+
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_mono.mlw", line 50, characters 5-82:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array_records_mono.mlw:
-  Line 20:
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
-  Line 27:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 29:
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!05 x!1 x!2 ->
-                          if x!05 = epsilon x. (ArrayRecords.length x) = 0 /\
-                             x!1 = -1 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 0
-                          else epsilon x. (ArrayRecords.length x) = 0
-  Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-  Line 45:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 49:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 50:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-    result of call at line 50, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 21-30 : bool = true
-    result of call at line 50, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
+Sorry, we don't have a good counterexample for you :(
+
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_mono.mlw", line 51, characters 64-68:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array_records_mono.mlw:
-  Line 20:
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
-  Line 26:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 27:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-  Line 29:
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!06 x!1 x!2 ->
-                          if x!06 = epsilon x. (ArrayRecords.length x) = 0 /\
-                             x!1 = -1 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 0
-                          else if x!06 = epsilon x.
-                                  (ArrayRecords.length x) = 0 /\ x!1 = -1 /\
-                                  x!2 = {flag = true;
-                                         first_val = 42;
-                                         sec_val = 69}
-                               then epsilon x. (ArrayRecords.length x) = 0
-                               else epsilon x. (ArrayRecords.length x) = 0
-  Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-  Line 45:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 49:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 50:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    result of call at line 50, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 21-30 : bool = true
-    result of call at line 50, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-  Line 51:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
+Sorry, we don't have a good counterexample for you :(
+
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_mono.mlw", line 51, characters 21-25:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array_records_mono.mlw:
-  Line 20:
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
-  Line 26:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 27:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-  Line 29:
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!07 x!1 x!2 ->
-                          if x!07 = epsilon x. (ArrayRecords.length x) = 0 /\
-                             x!1 = -1 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 0
-                          else if x!07 = epsilon x.
-                                  (ArrayRecords.length x) = 0 /\ x!1 = -1 /\
-                                  x!2 = {flag = true;
-                                         first_val = 42;
-                                         sec_val = 69}
-                               then epsilon x. (ArrayRecords.length x) = 0
-                               else epsilon x. (ArrayRecords.length x) = 0
-  Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-  Line 45:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 49:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 50:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    result of call at line 50, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 21-30 : bool = true
-    result of call at line 50, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-  Line 51:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-    result of call at line 51, characters 64-81 : int = 69
-    result of call at line 51, characters 64-68 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
+Sorry, we don't have a good counterexample for you :(
+
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_mono.mlw", line 51, characters 5-82:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array_records_mono.mlw:
-  Line 20:
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
-  Line 27:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 29:
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!08 x!1 x!2 ->
-                          if x!08 = epsilon x. (ArrayRecords.length x) = 0 /\
-                             x!1 = -1 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 0
-                          else if x!08 = epsilon x.
-                                  (ArrayRecords.length x) = 0 /\ x!1 = -1 /\
-                                  x!2 = {flag = true;
-                                         first_val = 42;
-                                         sec_val = 69}
-                               then epsilon x. (ArrayRecords.length x) = 0
-                               else epsilon x. (ArrayRecords.length x) = 0
-  Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-  Line 45:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 49:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 50:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    result of call at line 50, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 21-30 : bool = true
-    result of call at line 50, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-  Line 51:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-    result of call at line 51, characters 13-82 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 51, characters 21-30 : bool = true
-    result of call at line 51, characters 21-25 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 51, characters 64-81 : int = 69
-    result of call at line 51, characters 64-68 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
+Sorry, we don't have a good counterexample for you :(
+
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_mono.mlw", line 52, characters 74-78:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array_records_mono.mlw:
-  Line 20:
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
-  Line 26:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 27:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-  Line 29:
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!09 x!1 x!2 ->
-                          if x!09 = epsilon x. (ArrayRecords.length x) = 0 /\
-                             x!1 = -1 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 0
-                          else if x!09 = epsilon x.
-                                  (ArrayRecords.length x) = 0 /\ x!1 = -1 /\
-                                  x!2 = {flag = true;
-                                         first_val = 42;
-                                         sec_val = 69}
-                               then epsilon x. (ArrayRecords.length x) = 0
-                               else if x!09 = epsilon x.
-                                       (ArrayRecords.length x) = 0 /\
-                                       x!1 = -1 /\
-                                       x!2 = {flag = true;
-                                              first_val = 23;
-                                              sec_val = 69}
-                                    then epsilon x.
-                                    (ArrayRecords.length x) = 0
-                                    else epsilon x.
-                                    (ArrayRecords.length x) = 0
-  Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-  Line 45:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 49:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 50:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    result of call at line 50, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 21-30 : bool = true
-    result of call at line 50, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-  Line 51:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    result of call at line 51, characters 13-82 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 51, characters 21-30 : bool = true
-    result of call at line 51, characters 21-25 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 51, characters 64-81 : int = 69
-    result of call at line 51, characters 64-68 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-  Line 52:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
+Sorry, we don't have a good counterexample for you :(
+
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_mono.mlw", line 52, characters 41-45:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array_records_mono.mlw:
-  Line 20:
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
-  Line 26:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 27:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-  Line 29:
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!010 x!1 x!2 ->
-                          if x!010 = epsilon x.
-                             (ArrayRecords.length x) = 0 /\ x!1 = -1 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 0
-                          else if x!010 = epsilon x.
-                                  (ArrayRecords.length x) = 0 /\ x!1 = -1 /\
-                                  x!2 = {flag = true;
-                                         first_val = 42;
-                                         sec_val = 69}
-                               then epsilon x. (ArrayRecords.length x) = 0
-                               else if x!010 = epsilon x.
-                                       (ArrayRecords.length x) = 0 /\
-                                       x!1 = -1 /\
-                                       x!2 = {flag = true;
-                                              first_val = 23;
-                                              sec_val = 69}
-                                    then epsilon x.
-                                    (ArrayRecords.length x) = 0
-                                    else epsilon x.
-                                    (ArrayRecords.length x) = 0
-  Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-  Line 45:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 49:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 50:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    result of call at line 50, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 21-30 : bool = true
-    result of call at line 50, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-  Line 51:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    result of call at line 51, characters 13-82 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 51, characters 21-30 : bool = true
-    result of call at line 51, characters 21-25 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 51, characters 64-81 : int = 69
-    result of call at line 51, characters 64-68 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-  Line 52:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-    result of call at line 52, characters 74-91 : int = 69
-    result of call at line 52, characters 74-78 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
+Sorry, we don't have a good counterexample for you :(
+
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_mono.mlw", line 52, characters 5-92:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array_records_mono.mlw:
-  Line 20:
-    length :
-      array_of_records
-      ->
-      int = [|epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0;
-            epsilon x. (ArrayRecords.length x) = 0 => 0; _ => 0|]
-  Line 27:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 29:
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!011 x!1 x!2 ->
-                          if x!011 = epsilon x.
-                             (ArrayRecords.length x) = 0 /\ x!1 = -1 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 0
-                          else if x!011 = epsilon x.
-                                  (ArrayRecords.length x) = 0 /\ x!1 = -1 /\
-                                  x!2 = {flag = true;
-                                         first_val = 42;
-                                         sec_val = 69}
-                               then epsilon x. (ArrayRecords.length x) = 0
-                               else if x!011 = epsilon x.
-                                       (ArrayRecords.length x) = 0 /\
-                                       x!1 = -1 /\
-                                       x!2 = {flag = true;
-                                              first_val = 23;
-                                              sec_val = 69}
-                                    then epsilon x.
-                                    (ArrayRecords.length x) = 0
-                                    else epsilon x.
-                                    (ArrayRecords.length x) = 0
-  Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-  Line 45:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-  Line 49:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    result of call at line 49, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 49, characters 21-30 : bool = true
-    result of call at line 49, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 49, characters 45-61 : int = 3
-    result of call at line 49, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 50:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    result of call at line 50, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 50, characters 21-30 : bool = true
-    result of call at line 50, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 50, characters 64-81 : int = 69
-    result of call at line 50, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-  Line 51:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    result of call at line 51, characters 13-82 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 51, characters 21-30 : bool = true
-    result of call at line 51, characters 21-25 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 51, characters 64-81 : int = 69
-    result of call at line 51, characters 64-68 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-  Line 52:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 0
-    i : int = -1
-    result of call at line 52, characters 13-92 :
-      basic_record = {flag = false; first_val = 23; sec_val = 69}
-    result of call at line 52, characters 41-57 : int = 23
-    result of call at line 52, characters 41-45 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 52, characters 74-91 : int = 69
-    result of call at line 52, characters 74-78 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
+Sorry, we don't have a good counterexample for you :(
+
 
 File "bench/check-ce/array_records_mono.mlw", line 53, characters 13-35:
 Sub-goal Assertion of goal var_overwrite'vc.
@@ -870,8 +209,8 @@ Prover result is: Valid.
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `([]<-)` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `([]<-)` cannot be evaluated)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
@@ -879,22 +218,97 @@ File "bench/check-ce/array_records_mono.mlw", line 47, characters 15-36:
 Sub-goal Postcondition of goal var_overwrite'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
-  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+  (both RAC terminated because Postcondition of `([]<-)` cannot be evaluated):
 File array_records_mono.mlw:
+  Line 19:
+    elts :
+      array_of_records
+      ->
+      int
+      ->
+      basic_record = [|{ArrayRecords.elts =
+                        [|2 => {flag = true; first_val = 3; sec_val = 5};
+                        _ => {flag = false; first_val = 6; sec_val = 2}|];
+                        ArrayRecords.length = 4} =>
+                       [|2 => {flag = true; first_val = 3; sec_val = 5};
+                       _ => {flag = false; first_val = 6; sec_val = 2}|];
+                     {ArrayRecords.elts =
+                      [|2 => {flag = true; first_val = 3; sec_val = 69};
+                      _ => {flag = false; first_val = 6; sec_val = 2}|];
+                      ArrayRecords.length = 4} =>
+                     [|2 => {flag = true; first_val = 3; sec_val = 69};
+                     _ => {flag = false; first_val = 6; sec_val = 2}|];
+                     {ArrayRecords.elts =
+                      [|2 => {flag = true; first_val = 42; sec_val = 69};
+                      _ => {flag = false; first_val = 6; sec_val = 2}|];
+                      ArrayRecords.length = 4} =>
+                     [|2 => {flag = true; first_val = 42; sec_val = 69};
+                     _ => {flag = false; first_val = 6; sec_val = 2}|];
+                     {ArrayRecords.elts =
+                      [|2 => {flag = true; first_val = 23; sec_val = 69};
+                      _ => {flag = false; first_val = 6; sec_val = 2}|];
+                      ArrayRecords.length = 4} =>
+                     [|2 => {flag = true; first_val = 23; sec_val = 69};
+                     _ => {flag = false; first_val = 6; sec_val = 2}|];
+                     {ArrayRecords.elts =
+                      [|2 => {flag = false; first_val = 23; sec_val = 69};
+                      _ => {flag = false; first_val = 6; sec_val = 2}|];
+                      ArrayRecords.length = 4} =>
+                     [|2 => {flag = false; first_val = 23; sec_val = 69};
+                     _ => {flag = false; first_val = 6; sec_val = 2}|];
+                     _ =>
+                     [|2 => {flag = true; first_val = 3; sec_val = 5};
+                     _ => {flag = false; first_val = 6; sec_val = 2}|]|]
   Line 20:
     length :
       array_of_records
       ->
-      int = [|epsilon x. (ArrayRecords.length x) = 4 => 4;
-            epsilon x. (ArrayRecords.length x) = 4 => 4;
-            epsilon x. (ArrayRecords.length x) = 4 => 4;
-            epsilon x. (ArrayRecords.length x) = 4 => 4;
-            epsilon x. (ArrayRecords.length x) = 4 => 4; _ => 4|]
+      int = [|{ArrayRecords.elts =
+               [|2 => {flag = true; first_val = 3; sec_val = 69};
+               _ => {flag = false; first_val = 6; sec_val = 2}|];
+               ArrayRecords.length = 4} =>
+              4;
+            {ArrayRecords.elts =
+             [|2 => {flag = true; first_val = 3; sec_val = 5};
+             _ => {flag = false; first_val = 6; sec_val = 2}|];
+             ArrayRecords.length = 4} =>
+            4;
+            {ArrayRecords.elts =
+             [|2 => {flag = true; first_val = 42; sec_val = 69};
+             _ => {flag = false; first_val = 6; sec_val = 2}|];
+             ArrayRecords.length = 4} =>
+            4;
+            {ArrayRecords.elts =
+             [|2 => {flag = true; first_val = 23; sec_val = 69};
+             _ => {flag = false; first_val = 6; sec_val = 2}|];
+             ArrayRecords.length = 4} =>
+            4;
+            {ArrayRecords.elts =
+             [|2 => {flag = false; first_val = 23; sec_val = 69};
+             _ => {flag = false; first_val = 6; sec_val = 2}|];
+             ArrayRecords.length = 4} =>
+            4; _ => 4|]
   Line 27:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = true; first_val = 3; sec_val = 5};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = true; first_val = 3; sec_val = 69};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = true; first_val = 42; sec_val = 69};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = true; first_val = 23; sec_val = 69};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
     i : int = 2
   Line 29:
     mixfix [<-] :
@@ -904,49 +318,156 @@ File array_records_mono.mlw:
       ->
       basic_record
       ->
-      array_of_records = fun x!012 x!1 x!2 ->
-                          if x!012 = epsilon x.
-                             (ArrayRecords.length x) = 4 /\ x!1 = 2 /\
-                             x!2 = {flag = true; first_val = 3; sec_val = 69}
-                          then epsilon x. (ArrayRecords.length x) = 4
-                          else if x!012 = epsilon x.
-                                  (ArrayRecords.length x) = 4 /\ x!1 = 2 /\
-                                  x!2 = {flag = true;
-                                         first_val = 42;
-                                         sec_val = 69}
-                               then epsilon x. (ArrayRecords.length x) = 4
-                               else if x!012 = epsilon x.
-                                       (ArrayRecords.length x) = 4 /\ x!1 = 2 /\
-                                       x!2 = {flag = true;
-                                              first_val = 23;
-                                              sec_val = 69}
-                                    then epsilon x.
-                                    (ArrayRecords.length x) = 4
-                                    else if x!012 = epsilon x.
-                                            (ArrayRecords.length x) = 4 /\
-                                            x!1 = 2 /\
-                                            x!2 = {flag = false;
-                                                   first_val = 23;
-                                                   sec_val = 69}
-                                         then epsilon x.
-                                         (ArrayRecords.length x) = 4
-                                         else epsilon x.
-                                         (ArrayRecords.length x) = 4
+      array_of_records = fun x!074 x!115 x!212 ->
+                          if x!074 = {ArrayRecords.elts =
+                                      [|2 =>
+                                        {flag = true;
+                                         first_val = 3;
+                                         sec_val = 5};
+                                      _ =>
+                                      {flag = false;
+                                       first_val = 6;
+                                       sec_val = 2}|];
+                                      ArrayRecords.length = 4} /\
+                             x!115 = 2 /\
+                             x!212 = {flag = true;
+                                      first_val = 3;
+                                      sec_val = 69}
+                          then {ArrayRecords.elts =
+                                [|2 =>
+                                  {flag = true; first_val = 3; sec_val = 69};
+                                _ =>
+                                {flag = false; first_val = 6; sec_val = 2}|];
+                                ArrayRecords.length = 4}
+                          else if x!074 = {ArrayRecords.elts =
+                                           [|2 =>
+                                             {flag = true;
+                                              first_val = 3;
+                                              sec_val = 69};
+                                           _ =>
+                                           {flag = false;
+                                            first_val = 6;
+                                            sec_val = 2}|];
+                                           ArrayRecords.length = 4} /\
+                                  x!115 = 2 /\
+                                  x!212 = {flag = true;
+                                           first_val = 42;
+                                           sec_val = 69}
+                               then {ArrayRecords.elts =
+                                     [|2 =>
+                                       {flag = true;
+                                        first_val = 42;
+                                        sec_val = 69};
+                                     _ =>
+                                     {flag = false;
+                                      first_val = 6;
+                                      sec_val = 2}|];
+                                     ArrayRecords.length = 4}
+                               else if x!074 = {ArrayRecords.elts =
+                                                [|2 =>
+                                                  {flag = true;
+                                                   first_val = 42;
+                                                   sec_val = 69};
+                                                _ =>
+                                                {flag = false;
+                                                 first_val = 6;
+                                                 sec_val = 2}|];
+                                                ArrayRecords.length = 4} /\
+                                       x!115 = 2 /\
+                                       x!212 = {flag = true;
+                                                first_val = 23;
+                                                sec_val = 69}
+                                    then {ArrayRecords.elts =
+                                          [|2 =>
+                                            {flag = true;
+                                             first_val = 23;
+                                             sec_val = 69};
+                                          _ =>
+                                          {flag = false;
+                                           first_val = 6;
+                                           sec_val = 2}|];
+                                          ArrayRecords.length = 4}
+                                    else if x!074 = {ArrayRecords.elts =
+                                                     [|2 =>
+                                                       {flag = true;
+                                                        first_val = 23;
+                                                        sec_val = 69};
+                                                     _ =>
+                                                     {flag = false;
+                                                      first_val = 6;
+                                                      sec_val = 2}|];
+                                                     ArrayRecords.length = 4} /\
+                                            x!115 = 2 /\
+                                            x!212 = {flag = false;
+                                                     first_val = 23;
+                                                     sec_val = 69}
+                                         then {ArrayRecords.elts =
+                                               [|2 =>
+                                                 {flag = false;
+                                                  first_val = 23;
+                                                  sec_val = 69};
+                                               _ =>
+                                               {flag = false;
+                                                first_val = 6;
+                                                sec_val = 2}|];
+                                               ArrayRecords.length = 4}
+                                         else {ArrayRecords.elts =
+                                               [|2 =>
+                                                 {flag = true;
+                                                  first_val = 3;
+                                                  sec_val = 69};
+                                               _ =>
+                                               {flag = false;
+                                                first_val = 6;
+                                                sec_val = 2}|];
+                                               ArrayRecords.length = 4}
   Line 33:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = true; first_val = 3; sec_val = 5};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = true; first_val = 3; sec_val = 69};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = true; first_val = 42; sec_val = 69};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = true; first_val = 23; sec_val = 69};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
   Line 35:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = false; first_val = 23; sec_val = 69};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
   Line 45:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = true; first_val = 3; sec_val = 5};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
     i : int = 2
   Line 47:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = false; first_val = 23; sec_val = 69};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
     i : int = 2
   Line 49:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = true; first_val = 3; sec_val = 69};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
     result of call at line 49, characters 13-81 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 49, characters 21-30 : bool = true
@@ -956,7 +477,11 @@ File array_records_mono.mlw:
     result of call at line 49, characters 45-49 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 50:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = true; first_val = 42; sec_val = 69};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
     result of call at line 50, characters 13-82 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 50, characters 21-30 : bool = true
@@ -966,7 +491,11 @@ File array_records_mono.mlw:
     result of call at line 50, characters 64-68 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
   Line 51:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = true; first_val = 23; sec_val = 69};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
     result of call at line 51, characters 13-82 :
       basic_record = {flag = true; first_val = 23; sec_val = 69}
     result of call at line 51, characters 21-30 : bool = true
@@ -976,7 +505,11 @@ File array_records_mono.mlw:
     result of call at line 51, characters 64-68 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
   Line 52:
-    a : array_of_records = epsilon x. (ArrayRecords.length x) = 4
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = false; first_val = 23; sec_val = 69};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
     result of call at line 52, characters 13-92 :
       basic_record = {flag = false; first_val = 23; sec_val = 69}
     result of call at line 52, characters 41-57 : int = 23

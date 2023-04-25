@@ -54,12 +54,23 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `([]<-)` cannot be evaluated):
 File array_mono.mlw:
+  Line 9:
+    elts :
+      array
+      ->
+      int
+      ->
+      int = [|{Array.elts = [|0 => 42; 1 => 42; _ => 3|]; Array.length = 2} =>
+              [|0 => 42; 1 => 42; _ => 3|];
+            {Array.elts = [|1 => 42; _ => 3|]; Array.length = 2} =>
+            [|1 => 42; _ => 3|]; _ => [|0 => 42; 1 => 42; _ => 3|]|]
   Line 10:
     length :
       array
       ->
-      int = [|epsilon x. (Array.length x) = 2 => 2;
-            epsilon x. (Array.length x) = 2 => 2; _ => 2|]
+      int = [|{Array.elts = [|1 => 42; _ => 3|]; Array.length = 2} => 2;
+            {Array.elts = [|0 => 42; 1 => 42; _ => 3|]; Array.length = 2} =>
+            2; _ => 2|]
   Line 19:
     mixfix [<-] :
       array
@@ -68,20 +79,22 @@ File array_mono.mlw:
       ->
       int
       ->
-      array = fun x!0 x!1 x!2 ->
-               if x!0 = epsilon x. (Array.length x) = 2 /\ x!1 = 0 /\
-                  x!2 = 42
-               then epsilon x. (Array.length x) = 2 else epsilon x.
-               (Array.length x) = 2
+      array = fun x!05 x!11 x!21 ->
+               if x!05 = {Array.elts = [|1 => 42; _ => 3|]; Array.length = 2} /\
+                  x!11 = 0 /\ x!21 = 42
+               then {Array.elts = [|0 => 42; 1 => 42; _ => 3|];
+                     Array.length = 2}
+               else {Array.elts = [|0 => 42; 1 => 42; _ => 3|];
+                     Array.length = 2}
   Line 23:
-    a : array = epsilon x. (Array.length x) = 2
+    a : array = {Array.elts = [|1 => 42; _ => 3|]; Array.length = 2}
   Line 25:
-    a : array = epsilon x. (Array.length x) = 2
-    old a : array = epsilon x. (Array.length x) = 2
+    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 3|]; Array.length = 2}
+    old a : array = {Array.elts = [|1 => 42; _ => 3|]; Array.length = 2}
   Line 38:
-    a : array = epsilon x. (Array.length x) = 2
+    a : array = {Array.elts = [|1 => 42; _ => 3|]; Array.length = 2}
   Line 40:
-    a : array = epsilon x. (Array.length x) = 2
+    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 3|]; Array.length = 2}
   Line 41:
-    a : array = epsilon x. (Array.length x) = 2
+    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 3|]; Array.length = 2}
 
