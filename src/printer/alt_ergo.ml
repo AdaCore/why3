@@ -450,6 +450,7 @@ let print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f =
         queried_terms = model_list;
         type_coercions = Mty.empty;
         type_fields = Mty.empty;
+        type_sorts = Mstr.empty;
         record_fields = Mls.empty;
         constructors = Mstr.empty;
         set_str = Mstr.empty;

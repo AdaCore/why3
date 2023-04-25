@@ -59,6 +59,8 @@ type printing_info = {
   type_fields : (lsymbol list) Mty.t;
   (** For each type, the list of lsymbols defining the fields for this record type
       and associated to meta_record_def. *)
+  type_sorts : Ty.ty Mstr.t;
+  (** Sorts defined in the prover output file. *)
   record_fields : (lsymbol list) Mls.t;
   (** Descriptions of the fields of all records. *)
   constructors: Term.lsymbol Mstr.t;

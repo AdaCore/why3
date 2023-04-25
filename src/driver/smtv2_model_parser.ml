@@ -443,7 +443,6 @@ module FromModelToTerm = struct
   exception E_concrete_syntax of string
 
   exception NoArgConstructor
-  exception UnknownType
   exception NoBuiltinSymbol
   exception Float_MinusZero
   exception Float_PlusZero
@@ -471,6 +470,8 @@ module FromModelToTerm = struct
     type_coercions : Term.Sls.t Ty.Mty.t;
     (* Function definiions from the SMT model
        that are not in [pinfo.Printer.queried_terms]. *)
+    type_sorts : Ty.ty Mstr.t;
+    (* Sorts defined in the smtv2 file output. *)
     mutable prover_fun_defs : (Term.term * concrete_syntax_term) Mstr.t;
     (* Prover variables, may have the same name if the sort is different. *)
     mutable prover_vars : vsymbol Ty.Mty.t Mstr.t;
@@ -489,48 +490,74 @@ module FromModelToTerm = struct
      TODO/FIXME It would be better to find a way to avoid using [env.inferred_types],
      maybe by searching in the theories? *)
   let rec smt_sort_to_ty ?(update_ty = None) env s =
-    try
-      match s with
-      | Sstring -> Ty.ty_str
-      | Sint -> Ty.ty_int
-      | Sreal -> Ty.ty_real
-      | Sbool -> Ty.ty_bool
-      | Sarray (s1, s2) -> (
-          match update_ty with
-          | None ->
-              Ty.ty_app Ty.ts_func
-                [ smt_sort_to_ty env s1; smt_sort_to_ty env s2 ]
-          | Some ty -> (
-              match ty.Ty.ty_node with
-              | Ty.Tyapp (ts, [ ty1; ty2 ]) when Ty.ts_equal ts Ty.ts_func ->
-                  Ty.ty_app Ty.ts_func
-                    [
-                      smt_sort_to_ty ~update_ty:(Some ty1) env s1;
-                      smt_sort_to_ty ~update_ty:(Some ty2) env s2;
-                    ]
-              | _ ->
-                  error "Inconsistent shapes for type %a and sort %a"
-                    Pretty.print_ty ty print_sort s))
-      | Sroundingmode | Sfloatingpoint _ | Sbitvec _ | Ssimple _ | Smultiple _
-        -> (
-          match
-            List.find_all (fun (s', _) -> sort_equal s s') env.inferred_types
-          with
-          | [] -> raise UnknownType
-          | [ (_, ty) ] -> ty
-          | _ ->
-              error "Multiple matches in inferred_types for sort %a@."
-                print_sort s)
-      | _ -> raise UnknownType
-    with UnknownType -> (
+    let optionally_update_sort s =
       match update_ty with
-      | None -> error "Cannot infer type from sort %a@." print_sort s
-      | Some ty ->
+        | None -> error "Cannot infer type from sort %a@." print_sort s
+        | Some ty ->
           Debug.dprintf debug
             "[smt_sort_to_ty] updating inferred_types with s = %a, ty = %a@."
             print_sort s Pretty.print_ty ty;
           env.inferred_types <- (s, ty) :: env.inferred_types;
-          ty)
+          ty
+    in
+    let find_in_inferred_types not_found s =
+      match
+        List.find_all (fun (s', _) -> sort_equal s s') env.inferred_types
+      with
+      | [] -> not_found s
+      | [ (_, ty) ] -> ty
+      | _ ->
+          error "Multiple matches in inferred_types for sort %a@."
+            print_sort s
+    in
+    match s with
+    | Sstring -> Ty.ty_str
+    | Sint -> Ty.ty_int
+    | Sreal -> Ty.ty_real
+    | Sbool -> Ty.ty_bool
+    | Sarray (s1, s2) -> (
+        match update_ty with
+        | None ->
+            Ty.ty_app Ty.ts_func
+              [ smt_sort_to_ty env s1; smt_sort_to_ty env s2 ]
+        | Some ty -> (
+            match ty.Ty.ty_node with
+            | Ty.Tyapp (ts, [ ty1; ty2 ]) when Ty.ts_equal ts Ty.ts_func ->
+                Ty.ty_app Ty.ts_func
+                  [
+                    smt_sort_to_ty ~update_ty:(Some ty1) env s1;
+                    smt_sort_to_ty ~update_ty:(Some ty2) env s2;
+                  ]
+            | _ ->
+                error "Inconsistent shapes for type %a and sort %a"
+                  Pretty.print_ty ty print_sort s))
+    | Ssimple i | Smultiple (i, _) ->
+        let not_found s =
+          let sort_name =
+            match i with
+            | Isymbol (S s | Sprover s) -> s
+            | Iindexedsymbol ((S s | Sprover s), _) -> s
+          in
+          (* Find the corresponding sorts among the ones printed in the
+            smtv2 file passed to the prover. *)
+          match Mstr.find_opt sort_name env.type_sorts with
+          | None -> optionally_update_sort s
+          | Some ty -> ty
+        in
+        find_in_inferred_types not_found s
+    | Sbitvec size ->
+      let find_builtin_bitvec s =
+        (* Find the corresponding sorts among the ones printed in the
+          smtv2 file passed to the prover. *)
+        let type_name = Format.sprintf "(_ BitVec %d)" size in
+        match Mstr.find_opt type_name env.type_sorts with
+        | None -> optionally_update_sort s
+        | Some ty -> ty
+      in
+      find_in_inferred_types find_builtin_bitvec s
+    | Sroundingmode | Sfloatingpoint _ ->
+      find_in_inferred_types optionally_update_sort s
+    | Sreglan -> optionally_update_sort s
 
   let qual_id_to_term env qid =
     (* Constructors without arguments should not be confused with variables. *)
@@ -737,25 +764,15 @@ module FromModelToTerm = struct
         with _ ->
           error "Could not interpret constant %a as a fraction@." print_constant
             c)
-    | Cbitvector { constant_bv_value; constant_bv_length; constant_bv_verbatim } -> (
-        try
-          let _, ty =
-            List.find
-              (function Sbitvec n', _ when constant_bv_length = n' -> true | _ -> false)
-              env.inferred_types
-          in
-          let t_concrete =
-            Const (BitVector {
-              bv_value= constant_bv_value;
-              bv_length= constant_bv_length;
-              bv_verbatim= constant_bv_verbatim
-            }) in
-          (t_const (Constant.int_const constant_bv_value) ty, t_concrete)
-        with Not_found ->
-          error
-            "No matching type found in inferred_type for bitvector constant \
-             %a@."
-            print_constant c)
+    | Cbitvector { constant_bv_value; constant_bv_length; constant_bv_verbatim } ->
+        let ty = smt_sort_to_ty env (Sbitvec constant_bv_length) in
+        let t_concrete =
+          Const (BitVector {
+            bv_value= constant_bv_value;
+            bv_length= constant_bv_length;
+            bv_verbatim= constant_bv_verbatim })
+        in
+        (t_const (Constant.int_const constant_bv_value) ty, t_concrete)
     | Cfloat fp -> (
         let sort, ty =
           match
@@ -1734,6 +1751,11 @@ module FromModelToTerm = struct
           Debug.dprintf debug "[constructors] name = %s, ls = %a/%d@." key
             Pretty.print_ls ls (List.length ls.ls_args))
         pinfo.Printer.constructors;
+      Mstr.iter
+        (fun key ty ->
+          Debug.dprintf debug "[types] name = %s, ty = %a@." key
+            Pretty.print_ty ty)
+        pinfo.Printer.type_sorts
       end;
     let env =
       {
@@ -1744,6 +1766,7 @@ module FromModelToTerm = struct
         record_fields = pinfo.Printer.record_fields;
         type_fields = pinfo.Printer.type_fields;
         type_coercions = pinfo.Printer.type_coercions;
+        type_sorts = pinfo.Printer.type_sorts;
         inferred_types = [];
         eval_prover_vars = Mvs.empty;
         prover_fun_defs = Mstr.empty;
