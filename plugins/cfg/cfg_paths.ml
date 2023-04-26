@@ -110,10 +110,10 @@ let translate_cfg preconds block (blocks : (label * block) list) =
             | CFGinvariant l1, { cfg_instr_desc = CFGinvariant l2 } :: rem ->
                 traverse_block ({ i with cfg_instr_desc = CFGinvariant (l1 @ l2) } :: rem, term)
             | CFGinvariant l, _ ->
-                let id = match l with [] -> assert false | (id, _) :: _ -> id in
+                let id = match l with [] -> assert false | (_, id, _) :: _ -> id in
                 let l =
                   List.map
-                    (fun (id, t) ->
+                    (fun (_, id, t) ->
                       let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ id.id_str)) in
                       (* TODO : add also an "expl:" *)
                       { t with term_desc = Tattr (attr, t) })

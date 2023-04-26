@@ -18,9 +18,7 @@ module G = Graph.Imperative.Digraph.Concrete (struct
   type t = label
 
   let equal a b = a.id_str = b.id_str
-
   let compare a b = String.compare a.id_str b.id_str
-
   let hash a = Hashtbl.hash a.id_str
 end)
 
@@ -35,12 +33,11 @@ let rec targets (t : cfg_term) : label list =
   | CFGabsurd -> []
 
 type labeled_block = label * block
-
 type usage = Multi | One
 
 type exp_tree =
   | Scope of label * usage * exp_tree * exp_tree
-  | Loop of (ident * Ptree.term) list * exp_tree
+  | Loop of (loop_clause * ident * Ptree.term) list * exp_tree
   | Block of labeled_block
 
 let rec _print_exp_structure' exp =
@@ -68,20 +65,17 @@ let graph_from_blocks (bl : (label * block) list) : G.t =
   g
 
 exception NotReducible of (string * string)
-
 exception NotConnected of G.V.t list
 
 let () =
   Exn_printer.register (fun fmt exn ->
       match exn with
       | NotReducible (n1, n2) ->
-          Format.fprintf fmt
-            "CFG is not a reducible graph. The nodes %s %s belong to a cycle with multiple entries"
-            n1 n2
+          Format.fprintf fmt "CFG is not a reducible graph. The nodes %s %s belong to a cycle with multiple entries" n1
+            n2
       | NotConnected s ->
           Format.fprintf fmt
-            "CFG is not a connected graph. The following nodes are not reachable from the start \
-             block: ";
+            "CFG is not a connected graph. The following nodes are not reachable from the start block: ";
           List.iter (fun el -> Format.printf "%s" el.id_str) s
       | _ -> raise exn)
 
@@ -108,20 +102,17 @@ let _graph_is_reducible (g : G.t) (dom : G.V.t -> G.V.t -> bool) (entry : label)
       g node
   done;
   (* graph is connected *)
-  let unreached =
-    G.fold_vertex (fun v u -> if not (Sint.mem v !visited) then Sint.add v u else u) g Sint.empty
-  in
+  let unreached = G.fold_vertex (fun v u -> if not (Sint.mem v !visited) then Sint.add v u else u) g Sint.empty in
   if not (Sint.is_empty unreached) then raise (NotConnected (Sint.elements unreached));
   ()
 
-let rec entry e =
-  match e with Block b -> b | Loop (_, h) -> entry h | Scope (_, _, _, h) -> entry h
+let rec entry e = match e with Block b -> b | Loop (_, h) -> entry h | Scope (_, _, _, h) -> entry h
 (* unused | _ -> assert false *)
 
 let mk_scope label usage tgt body = Scope (label, usage, tgt, body)
 
-let rec treeify_from_components pred dom (prev : exp_tree option) blocks
-    (wto : label Graph.WeakTopological.t) : exp_tree =
+let rec treeify_from_components pred dom (prev : exp_tree option) blocks (wto : label Graph.WeakTopological.t) :
+    exp_tree =
   Option.get
     (Graph.WeakTopological.fold_left
        (fun prev c ->
