@@ -234,27 +234,39 @@ module FromSexpToModel = struct
       with _ -> (
         try constant_bv_bin sexp with _ -> error sexp "constant_bv"))
 
-  let constant_float = function
+  let constant_float sexp =
+    let const_float e s v =
+      {
+        const_float_exp_size = e;
+        const_float_significand_size = s;
+        const_float_val = v
+      }
+    in
+    match sexp with
     | List [ Atom "_"; Atom "+zero"; n1; n2 ] ->
-        ignore (bigint n1, bigint n2);
-        Fpluszero
+        const_float (int n1) (int n2) Fpluszero
     | List [ Atom "_"; Atom "-zero"; n1; n2 ] ->
-        ignore (bigint n1, bigint n2);
-        Fminuszero
+        const_float (int n1) (int n2) Fminuszero
     | List [ Atom "_"; Atom "+oo"; n1; n2 ] ->
-        ignore (bigint n1, bigint n2);
-        Fplusinfinity
+        const_float (int n1) (int n2) Fplusinfinity
     | List [ Atom "_"; Atom "-oo"; n1; n2 ] ->
-        ignore (bigint n1, bigint n2);
-        Fminusinfinity
+        const_float (int n1) (int n2) Fminusinfinity
     | List [ Atom "_"; Atom "NaN"; n1; n2 ] ->
-        ignore (bigint n1, bigint n2);
-        Fnan
+        const_float (int n1) (int n2) Fnan
     | List [ Atom "fp"; sign; exp; mant ] ->
-        let constant_float_sign = constant_bv sign
-        and constant_float_exp = constant_bv exp
-        and constant_float_mant = constant_bv mant in
-        Fnumber { constant_float_sign; constant_float_exp; constant_float_mant }
+        let constant_float_sign = constant_bv sign in
+        let constant_float_exp = constant_bv exp in
+        let constant_float_mant = constant_bv mant in
+        let v =
+          Fnumber
+            { constant_float_sign; constant_float_exp; constant_float_mant }
+        in
+        let exp_size = constant_float_exp.constant_bv_length in
+        let significand =
+          constant_float_mant.constant_bv_length +
+          constant_float_sign.constant_bv_length
+        in
+        const_float exp_size significand v
     | sexp -> error sexp "constant_float"
 
   let constant sexp : term =
@@ -555,7 +567,17 @@ module FromModelToTerm = struct
         | Some ty -> ty
       in
       find_in_inferred_types find_builtin_bitvec s
-    | Sroundingmode | Sfloatingpoint _ ->
+    | Sfloatingpoint (exp, significand) ->
+      let find_builtin_float s =
+        (* Currenlty, float types are translated as Float32 or Float64 in smtlib
+            drivers. *)
+        let type_name = Format.sprintf "Float%d" (exp + significand) in
+        match Mstr.find_opt type_name env.type_sorts with
+        | None -> optionally_update_sort s
+        | Some ty -> ty
+      in
+      find_in_inferred_types find_builtin_float s
+    | Sroundingmode ->
       find_in_inferred_types optionally_update_sort s
     | Sreglan -> optionally_update_sort s
 
@@ -774,34 +796,24 @@ module FromModelToTerm = struct
         in
         (t_const (Constant.int_const constant_bv_value) ty, t_concrete)
     | Cfloat fp -> (
-        let sort, ty =
-          match
-            List.find_all
-              (function Sfloatingpoint _, _ -> true | _ -> false)
-              env.inferred_types
-          with
-          | [] ->
-              error
-                "No matching type found in inferred_type for float constant \
-                 %a@."
-                print_constant c
-          | [ sort_ty ] -> sort_ty
-          | _ ->
-              (* FIXME we should use the size of bitvectors in [fp] to match more
-                 precisely with sorts [Sfloatingpoint _,_] *)
-              error
-                "Multiple matching types found in inferred_type for float \
-                 constant %a@."
-                print_constant c
-        in
-        let float_lib =
-          match sort with
-          | Sfloatingpoint (a, b) -> "Float" ^ string_of_int (a + b)
-          | _ -> assert false
+        let exp_size = fp.const_float_exp_size in
+        let significand_size = fp.const_float_significand_size in
+        let sort = Sfloatingpoint (exp_size, significand_size) in
+        let ty = smt_sort_to_ty env sort in
+        let float_lib = "Float" ^ string_of_int (exp_size + significand_size) in
+        let t_concrete_float_const v =
+          Const (
+            Float {
+              float_exp_size = exp_size;
+              float_significand_size = significand_size;
+              float_val = v
+            })
         in
         try
           (* general case *)
-          let neg, s1, s2, exp, (bv_sign,bv_exp,bv_mant), hex = float_of_binary fp in
+          let neg, s1, s2, exp, (bv_sign,bv_exp,bv_mant), hex =
+            float_of_binary fp.const_float_val
+          in
           let t =
             t_const
               (Constant.real_const_from_string ~radix:16 ~neg ~int:s1 ~frac:s2
@@ -809,12 +821,13 @@ module FromModelToTerm = struct
               ty
           in
           let t_concrete =
-            Const (Float (Float_number {
-              float_sign= bv_sign;
-              float_exp= bv_exp;
-              float_mant= bv_mant;
-              float_hex= hex
-            }))
+            t_concrete_float_const
+              (Float_number {
+                float_sign= bv_sign;
+                float_exp= bv_exp;
+                float_mant= bv_mant;
+                float_hex= hex
+              })
           in
           (t, t_concrete)
         with
@@ -826,7 +839,7 @@ module FromModelToTerm = struct
                  ~frac:"0" ~exp:None)
               ty
           in
-          (t, Const (Float Minus_zero))
+          (t, t_concrete_float_const Minus_zero)
         | Float_PlusZero ->
           let t =
             t_const
@@ -834,7 +847,7 @@ module FromModelToTerm = struct
                  ~frac:"0" ~exp:None)
               ty
           in
-          (t, Const (Float Plus_zero))
+          (t, t_concrete_float_const Plus_zero)
         | Float_NaN ->
             let is_nan_ls =
               try
@@ -846,7 +859,7 @@ module FromModelToTerm = struct
             in
             let x = create_vsymbol (Ident.id_fresh "x") ty in
             let f = t_app is_nan_ls [ t_var x ] None in
-            (t_eps_close x f, Const (Float NaN))
+            (t_eps_close x f, t_concrete_float_const NaN)
         | Float_Plus_Infinity ->
             let is_plus_infinite_ls =
               try
@@ -858,7 +871,7 @@ module FromModelToTerm = struct
             in
             let x = create_vsymbol (Ident.id_fresh "x") ty in
             let f = t_app is_plus_infinite_ls [ t_var x ] None in
-            (t_eps_close x f, Const (Float Plus_infinity))
+            (t_eps_close x f, t_concrete_float_const Plus_infinity)
         | Float_Minus_Infinity ->
             let is_plus_infinite_ls =
               try
@@ -871,7 +884,7 @@ module FromModelToTerm = struct
             in
             let x = create_vsymbol (Ident.id_fresh "x") ty in
             let f = t_app is_plus_infinite_ls [ t_var x ] None in
-            (t_eps_close x f, Const (Float Minus_infinity))
+            (t_eps_close x f, t_concrete_float_const Minus_infinity)
         | Float_Error ->
             error "Error while interpreting float constant %a@." print_constant
               c)
