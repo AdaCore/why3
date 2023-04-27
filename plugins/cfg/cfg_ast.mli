@@ -28,7 +28,7 @@ and cfg_term = {
   }
 
 and cfg_instr_desc =
-  | CFGinvariant of (loop_clause * ident * Ptree.term) list
+  | CFGinvariant of (loop_clause * ident option * Ptree.term) list
   (** named invariants *)
   | CFGexpr of Ptree.expr
   (** any other regular WhyML expressions *)

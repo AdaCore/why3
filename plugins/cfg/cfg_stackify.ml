@@ -14,6 +14,9 @@ open Stackify
 open Cfg_ast
 open Ptree
 
+let warn_deprecated_named_invariant =
+    Loc.register_warning "deprecated_named_invariant" "Named invariants in MLCFG are deprecated. Use hyp_name: attribute to provide hypothesis names instead"
+
 let debug = Debug.register_flag "cfg" ~desc:"CFG plugin debug flag"
 let unit_type = PTtuple [] [@@warning "-32"]
 let mk_id ~loc name = { id_str = name; id_ats = []; id_loc = loc }
@@ -59,14 +62,15 @@ let () =
 
 let mk_loop_continue entry : Ptree.expr = mk_expr ~loc:entry.id_loc (Eraise (Qident entry, None))
 
-let mk_loop_expr entry invariants (e : Ptree.expr) : Ptree.expr =
+let mk_loop_expr entry (invariants : (loop_clause * ident option * term) list) (e : Ptree.expr) : Ptree.expr =
   let continue = mk_expr ~loc:Loc.dummy_position (Eoptexn (entry, Ity.MaskVisible, e)) in
   let invariants, variants =
     List.partition_map
       (fun (claus, id, t) ->
-        let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ id.id_str)) in
-        let x = { term_loc = t.term_loc; term_desc = Tattr (attr, t) } in
-        match claus with Invariant -> Either.Left x | Variant -> Either.Right (x, None))
+        if id <> None then
+          Loc.warning ~loc:t.term_loc ~id:warn_deprecated_named_invariant  "Named invariants are deprecated. Please use the `hyp_name` attribute directly";
+
+        match claus with Invariant -> Either.Left t | Variant -> Either.Right (t, None))
       invariants
   in
   let infinite_loop =
