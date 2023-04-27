@@ -92,8 +92,8 @@ sequence:
 instr:
   | contract_expr
     { mk_cfginstr (CFGexpr $1) $startpos $endpos }
-  | VARIANT nm=option(ident) LEFTBRC t=term RIGHTBRC
-    { mk_cfginstr (CFGinvariant [Variant, nm, t]) $startpos $endpos }
+  | VARIANT LEFTBRC t=term RIGHTBRC
+    { mk_cfginstr (CFGinvariant [Variant, None, t]) $startpos $endpos }
   | INVARIANT nm=option(ident) LEFTBRC t=term RIGHTBRC
     { mk_cfginstr (CFGinvariant [Invariant, nm, t]) $startpos $endpos }
 ;
