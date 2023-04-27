@@ -1,6 +1,8 @@
 :x: marks a potential source of incompatibility
 
-
+MLCFG language
+  * `variant` clauses are supported with the `stackify` backend. 
+  * `invariant` names are now optional and depreated.
 
 Tools
   * Strategies can now execute a group of provers simultaneously in a single
