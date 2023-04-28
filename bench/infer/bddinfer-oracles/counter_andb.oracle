@@ -1,0 +1,12 @@
+Invariant for loop [anonymous_loop_0] is
+  if serr = True then s1 = False /\ s0 = False /\ 43 <= c0
+  else if s1 = True then s0 = False /\ 0 <= c0 /\ c0 <= 42
+       else s0 = True /\ c0 = 0
+Domains for loop [anonymous_loop_0] are
+  c0 = [0;+oo[; s0 = top; s1 = top; serr = top
+The generated invariant does not imply { c0 <= 43 }
+
+File bench/infer/counter_andb.mlw:
+Goal c'vc.
+Prover result is: Valid (0.00s, 33 steps).
+

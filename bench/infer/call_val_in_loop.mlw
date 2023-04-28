@@ -1,0 +1,19 @@
+
+use bool.Bool
+use int.Int
+
+val ref x : bool
+val ref t : int
+
+val rnd () : bool
+
+let f [@bddinfer] ()
+  diverges
+  =
+  x <- False;
+  t <- 0;
+
+  while True do
+    x <- rnd();
+    t <- t + 1
+  done

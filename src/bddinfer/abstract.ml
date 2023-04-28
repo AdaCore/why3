@@ -1,13 +1,3 @@
-(********************************************************************)
-(*                                                                  *)
-(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
-(*                                                                  *)
-(*  This software is distributed under the terms of the GNU Lesser  *)
-(*  General Public License version 2.1, with the special exception  *)
-(*  on linking described in file LICENSE.                           *)
-(*                                                                  *)
-(********************************************************************)
 
 (**
 
@@ -18,7 +8,8 @@
 (* open Why3 *)
 (* to comment out when inside Why3 *)
 
-let do_not_check_invariant = false
+let do_not_check_invariant = true
+(* set to true when inside Why3 *)
 
 open Apron
 
@@ -27,8 +18,8 @@ let man = Polka.manager_alloc_strict ()
 (* let man = Oct.manager_alloc () *)
 
 type apron_state = Polka.strict Polka.t Abstract1.t
-
-(* type apron_constraint = Tcons1.t *)
+(* type apron_state = Box.t Abstract1.t *)
+(* type apron_state = Oct.t Abstract1.t *)
 
 type why_var = {
     var_name : string;
@@ -87,7 +78,10 @@ module Dom (* : Bddparam.ParamDomain *) = struct
 
   type param_state = apron_state
 
+  let new_ctx_id = let c = ref 0 in fun () -> let x = !c in incr c; x
+
   type param_context = {
+    ctx_unique_id : int;
     apron_env : Apron.Environment.t;
     mutable counter : int;
     state_to_int : int H.t;
@@ -152,7 +146,7 @@ module Dom (* : Bddparam.ParamDomain *) = struct
     let sj = get ctx j in
     Abstract1.is_leq man si sj
 
-  let rename f ctxi i ctx =
+  let change f ctxi i ctx =
     let si = get ctxi i in
     let s = f si in
     record ctx s
@@ -175,6 +169,7 @@ module B = Bdd.Make(Dom)(struct
              end)
 
 let empty_context env = Dom.{
+    ctx_unique_id = new_ctx_id ();
     apron_env = env;
     counter = 0;
     state_to_int = H.create 17;
@@ -251,44 +246,78 @@ let apron_env_of_why_env (map : why_env) =
   let env_array = apron_array_vars_of_why_env map in
   Apron.Environment.make env_array [||]
 
-let ctx_change_gen fenv fstates ctx =
+(*
+let ctx_extend_env new_env ctx =
   let i_to_s = Wstdlib.Hint.create 17 in
   let s_to_i = H.create 17 in
   Wstdlib.Hint.iter
     (fun i s ->
-       let s = fstates s in
+       let s = Abstract1.change_environment man s new_env false in
        Wstdlib.Hint.add i_to_s i s; H.add s_to_i s i)
     ctx.Dom.int_to_state;
   Dom.{
-    apron_env = fenv ctx.apron_env;
+    ctx_unique_id = new_ctx_id ();
+    apron_env = new_env;
     counter = ctx.counter;
     int_to_state = i_to_s;
     state_to_int = s_to_i;
   }
+*)
 
-let ctx_extend_env new_env ctx =
-  ctx_change_gen
-    (fun _ -> new_env)
-    (fun s -> Abstract1.change_environment man s new_env false)
-    ctx
+(*
+let ctx_extend_env ctx_src new_env ctx =
+  let open Wstdlib in
+  Hint.iter
+    (fun i s ->
+       try
+         let _ = Hint.find ctx.Dom.int_to_state i in
+         ()
+       with Not_found ->
+         let s = Abstract1.change_environment man s new_env false in
+         Hint.add ctx.Dom.int_to_state i s; H.add ctx.Dom.state_to_int s i)
+    ctx_src.Dom.int_to_state
+*)
 
-let add_in_environment state (map : why_env) =
-  let array_env = apron_array_vars_of_why_env map in
-  let union_env = Environment.add state.ctx_state.Dom.apron_env array_env [||] in
-  let ctx = ctx_extend_env union_env state.ctx_state
+type memo_add_env = B.param_context * Apron.Environment.t * var_value VarMap.t
+
+let utime () = Unix.((times ()).tms_utime)
+
+let time_in_add_in_environment = ref 0.0
+
+let add_in_environment memo state (map : why_env) =
+  let t = utime () in
+  let (ctx,env,map) =
+    match !memo with
+    | Some x -> x
+    | None ->
+      let array_env = apron_array_vars_of_why_env map in
+      let union_env = Environment.add state.ctx_state.Dom.apron_env array_env [||] in
+      (* let ctx = ctx_extend_env union_env state.ctx_state in *)
+      let ctx = empty_context union_env in
+      let map =
+        VarMap.union
+          (fun _ _ _ ->
+             Format.eprintf
+               "@[<v 2>[Abstract.add_in_environment] \
+                Attempt to add a variable already present in the environment:@ \
+                abstract env = @[%a@] ;@ map = @[%a@]@]@."
+               print_env state.map_state print_env map;
+             assert false)
+          state.map_state map
+      in
+      let x = (ctx,union_env,map) in
+      memo := Some x;
+      x
   in
-  { map_state =
-      VarMap.union
-        (fun _ _ _ ->
-          Format.eprintf
-            "@[<v 2>[Abstract.add_in_environment] \
-             Attempt to add a variable already present in the environment:@ \
-             abstract env = @[%a@] ;@ map = @[%a@]@]@."
-            print_env state.map_state print_env map;
-          assert false)
-        state.map_state map;
+  let change_state s =
+    let s = Abstract1.change_environment man s env false in
+    s
+  in
+  let b = B.change_ctx change_state state.ctx_state state.bdd_state ctx in
+  time_in_add_in_environment := !time_in_add_in_environment +. (utime() -. t);
+  { map_state = map;
     ctx_state = ctx;
-    bdd_state = state.bdd_state;
+    bdd_state = b;
   }
 
 let top s =
@@ -302,32 +331,30 @@ let top_new_ctx (map : why_env) =
     bdd_state = B.top;
   }
 
+
 let bottom s =
   { s with bdd_state = B.bottom }
+
 
 let singleton_boolean_var_true state v =
   { state with bdd_state = B.mk_var v }
 
-(*
-let state_of_linear_constraint state (c : Tcons1.t) : t =
-  let ctx = state.ctx_state in
-  let env = ctx.Dom.apron_env in
-  let array_cond = Tcons1.array_make env 1 in
-  Tcons1.array_set array_cond 0 c;
-  let s = Abstract1.of_tcons_array man env array_cond in
-  let param = Dom.record ctx s in
-  { state with bdd_state = B.mk_param param }
-  *)
+let time_in_meet_with_apron_constraint = ref 0.0
+let time_in_meet_with_param_constraint = ref 0.0
 
 let meet_with_apron_constraint s (c : Tcons1.t) =
+  let t = utime () in
   let env = s.ctx_state.Dom.apron_env in
   let array_cond = Tcons1.array_make env 1 in
   Tcons1.array_set array_cond 0 c;
   let f s = Abstract1.meet_tcons_array man s array_cond in
-  { s with bdd_state = B.meet_with_param_constraint f s.ctx_state s.bdd_state }
+  let u = utime () in
+  let b = B.meet_with_param_constraint f s.ctx_state s.bdd_state in
+  let v = utime () in
+  time_in_meet_with_param_constraint := !time_in_meet_with_param_constraint +. (v -. u);
+  time_in_meet_with_apron_constraint := !time_in_meet_with_apron_constraint +. (v -. t);
+  { s with bdd_state = b }
 
-
-let _apron_env st = st.ctx_state.Dom.apron_env
 
 let of_apron_expr s e =
   let env = s.ctx_state.Dom.apron_env in
@@ -338,18 +365,14 @@ let why_env st = st.map_state
 let is_eq s1 s2 =
   B.equivalent s1.bdd_state s2.bdd_state
 
-let is_leq s1 s2 =
-  assert (s1.ctx_state == s2.ctx_state);
-  B.entails s1.ctx_state s1.bdd_state s2.bdd_state
+let time_in_is_leq = ref 0.0
 
-(*
-let assign_texpr state x te =
-  { apron_state =
-      Abstract1.assign_texpr man state.apron_state x te None;
-    map_state = state.map_state;
-    bdd_state = state.bdd_state;
-  }
-*)
+let is_leq s1 s2 =
+  assert (do_not_check_invariant || s1.ctx_state == s2.ctx_state);
+  let t = utime () in
+  let b = B.entails s1.ctx_state s1.bdd_state s2.bdd_state in
+  time_in_is_leq := !time_in_is_leq +. (utime () -. t);
+  b
 
 
 let fresh_apron_var_counter = ref 0
@@ -365,32 +388,47 @@ let fresh_apron_var () =
 
 let is_bottom s = B.is_bottom s.bdd_state
 
+let time_in_join = ref 0.0
+
 let join s1 s2 =
+  let t = utime () in
   assert (do_not_check_invariant || same_map s1.map_state s2.map_state);
   assert (do_not_check_invariant || Dom.ctx_equal s1.ctx_state s2.ctx_state);
+  let s = B.join s1.ctx_state s1.bdd_state s2.bdd_state in
+  time_in_join := !time_in_join +. (utime () -. t);
   { map_state = s1.map_state;
     ctx_state = s1.ctx_state;
-    bdd_state = B.join s1.ctx_state s1.bdd_state s2.bdd_state;
+    bdd_state = s;
   }
 
+let time_in_meet = ref 0.0
+
 let meet s1 s2 =
+  let t = utime () in
   assert (do_not_check_invariant || same_map s1.map_state s2.map_state);
   assert (do_not_check_invariant || Dom.ctx_equal s1.ctx_state s2.ctx_state);
+  let s = B.meet s1.ctx_state s1.bdd_state s2.bdd_state in
+  time_in_meet := !time_in_meet +. (utime () -. t);
   { map_state = s1.map_state;
     ctx_state = s1.ctx_state;
-    bdd_state = B.meet s1.ctx_state s1.bdd_state s2.bdd_state;
+    bdd_state = s;
   }
+
+let time_in_widening = ref 0.0
 
 let widening s1 s2 =
   (* Format.eprintf "@[widening, s1:@ @[%a@]@]@." print s1; *)
   (* Format.eprintf "@[widening, s2:@ @[%a@]@]@." print s2; *)
   assert (do_not_check_invariant || same_map s1.map_state s2.map_state);
   assert (do_not_check_invariant || Dom.ctx_equal s1.ctx_state s2.ctx_state);
+  let t = utime () in
   if do_not_check_invariant || is_leq s1 s2 then
     begin
+      let b = B.widening s1.ctx_state s1.bdd_state s2.bdd_state in
+      time_in_widening := !time_in_widening +. (utime () -. t);
       { map_state = s1.map_state;
         ctx_state = s1.ctx_state;
-        bdd_state = B.widening s1.ctx_state s1.bdd_state s2.bdd_state;
+        bdd_state = b;
       }
     end
   else
@@ -405,7 +443,10 @@ let rec get_value env x =
   | RefValue y -> get_value env y
   | v -> (x, v)
 
+let time_in_restrict_environment = ref 0.0
+
 let restrict_environment state target_state =
+  let t = utime () in
   let new_bdd_vars =
     VarMap.fold
       (fun x _ l2 ->
@@ -420,197 +461,78 @@ let restrict_environment state target_state =
         )
       target_state.map_state []
   in
-  { target_state with
-    bdd_state = B.mk_exist (fun x -> not (List.mem x new_bdd_vars))
+  let b = B.mk_exist (fun x -> not (List.mem x new_bdd_vars))
         state.ctx_state state.bdd_state target_state.ctx_state;
-  }
-
-let drop_var state v =
-  let s = { state with map_state = VarMap.remove v state.map_state } in
-  restrict_environment state s
-
-
-type havoc_data =
-  (why_var * Apron.Var.t * Apron.Var.t) list * (why_var * Bdd.variable * Bdd.variable) list
-
-(*
-let prepare_havoc vars state =
-  let new_map, new_apron_vars, intd, boold, oldenv =
-    VarMap.fold
-      (fun x var (acc, l, intd, boold, oldenv) ->
-          match get_value acc x with
-          | (y, IntValue v) ->
-             (* v: apron var associated to x *)
-             (* fresh apron var *)
-             (* let w = fresh_apron_var () in *)
-             (* y mapsto w, oldx mapsto v *)
-             let w = match var with
-             | IntValue w -> w
-             | _ -> assert false in
-             (VarMap.add y var acc, w::l, (y,w,v)::intd, boold,
-              VarMap.add x (IntValue v) oldenv)
-          | (y, BoolValue v) ->
-             (* let w = fresh_bdd_var () in *)
-             (* y mapsto w, oldx mapsto v *)
-             let w = match var with
-             | BoolValue w -> w
-             | _ -> assert false in
-             (VarMap.add y var acc, l, intd, (y,w,v)::boold,
-              VarMap.add x (BoolValue v) oldenv)
-          | (_, RefValue _) -> assert false
-      )
-      vars (state.map_state, [], [], [], VarMap.empty)
   in
-  let array_env = Array.of_list new_apron_vars in
-  let union_env = Environment.add state.ctx_state.Dom.apron_env array_env [||] in
-  let ctx = ctx_extend_env union_env state.ctx_state in
-  {
-    map_state = new_map;
-    ctx_state = ctx;
-    bdd_state = state.bdd_state;
-  }, oldenv, (intd, boold)
-*)
+  time_in_restrict_environment := !time_in_restrict_environment +. (utime() -. t);
+  { target_state with bdd_state = b }
 
-let prepare_havoc writes state =
+
+type memo_havoc = (B.param_context * var_value VarMap.t *
+   (apron_state -> apron_state) * (int * int) list)
+
+let time_in_prepare_havoc = ref 0.0
+
+let prepare_havoc memo writes state =
+  let t = utime () in
   let map = state.map_state in
-  let ctx = state.ctx_state in
-  let oldenv, map_bvar, av1, av2 =
-    VarMap.fold
-      (fun x var (old,mb,av1,av2) ->
-         (* we want: y mapsto w, oldx mapsto v *)
-         match get_value map x with
-         | (y, UnitValue) ->
-           let old = VarMap.add x (RefValue y) old in
-           (VarMap.add y UnitValue old, mb, av1, av2)
-         | (y, IntValue v) ->
-           let w = match var with
-             | IntValue w -> w
-             | _ -> assert false
-           in
-           let old = VarMap.add x (RefValue y) old in
-           (VarMap.add y (IntValue w) old, mb, v::av1, w::av2)
-         | (y, BoolValue v) ->
-           let w = match var with
-             | BoolValue w -> w
-             | _ -> assert false
-           in
-           let old = VarMap.add x (RefValue y) old in
-           (VarMap.add y (BoolValue w) old,
-            Bddparam.BddVarMap.add v w mb, av1, av2)
-         | (_, RefValue _) -> assert false
-      )
-      writes (VarMap.empty,Bddparam.BddVarMap.empty,[],[])
+  let ctx,oldenv,rename_apron,rename_var =
+    match !memo with
+    | Some(ctx,ov,ra,rv) -> ctx,ov,ra,rv
+    | None ->
+      let ctx = state.ctx_state in
+      let oldenv, map_bvar, av1, av2 =
+        VarMap.fold
+          (fun x var (old,mb,av1,av2) ->
+             (* we want: y mapsto w, oldx mapsto v *)
+             match get_value map x with
+             | (y, UnitValue) ->
+               let old = VarMap.add x (RefValue y) old in
+               (VarMap.add y UnitValue old, mb, av1, av2)
+             | (y, IntValue v) ->
+               let w = match var with
+                 | IntValue w -> w
+                 | _ -> assert false
+               in
+               let old = VarMap.add x (RefValue y) old in
+               (VarMap.add y (IntValue w) old, mb, v::av1, w::av2)
+             | (y, BoolValue v) ->
+               let w = match var with
+                 | BoolValue w -> w
+                 | _ -> assert false
+               in
+               let old = VarMap.add x (RefValue y) old in
+               (VarMap.add y (BoolValue w) old,
+                (v,w)::mb, av1, av2)
+             | (_, RefValue _) -> assert false
+          )
+          writes (VarMap.empty,[],[],[])
+      in
+      let av1 = Array.of_list av1 in
+      let av2 = Array.of_list av2 in
+      let renamed_apron_env = Environment.rename ctx.Dom.apron_env av1 av2 in
+      let full_apron_env = Environment.add renamed_apron_env av1 [||] in
+      let rename_apron s =
+        let s = Abstract1.rename_array man s av1 av2 in
+        Abstract1.change_environment man s full_apron_env false
+      in
+      let ctx = empty_context full_apron_env in
+      memo := Some(ctx,oldenv,rename_apron,map_bvar);
+      ctx,oldenv,rename_apron,map_bvar
   in
-  let av1 = Array.of_list av1 in
-  let av2 = Array.of_list av2 in
-  let renamed_apron_env = Environment.rename ctx.Dom.apron_env av1 av2 in
-  let full_apron_env = Environment.add renamed_apron_env av1 [||] in
-  let rename_apron s =
-    let s = Abstract1.rename_array man s av1 av2 in
-    Abstract1.change_environment man s full_apron_env false
-  in
-  let rename_var v =
-    try
-      Bddparam.BddVarMap.find v map_bvar
-    with Not_found -> v
-  in
-  let ctx = empty_context full_apron_env in
-  let b = B.rename rename_var rename_apron state.ctx_state state.bdd_state ctx in
-  (* now ctx is a new context from state where all abstract variables are renamed to fresh ones
-     we now insert the former association of variables
-  *)
+  let b = B.rename_few rename_var rename_apron state.ctx_state state.bdd_state ctx in
+  time_in_prepare_havoc := !time_in_prepare_havoc +. (utime() -. t);
   {
     map_state = map;
     ctx_state = ctx;
     bdd_state = b;
-  }, oldenv (*, ([],[]) *)
-
-(*
-let finalize_havoc state (intd,boold) =
-  ignore state;
-  ignore intd;
-  ignore boold;
-  assert false
-*)
-(*
-  let b,l =
-    List.fold_left
-      (fun (b,l) (x,w,v) -> B.(meet ctx (mk_eq_var v w) b), w::l)
-      (state.bdd_state,[]) boold
-  in
-  let b = B.mk_exist (fun v -> List.mem v l) ctx b ctx in
-  let m,av1,av2 =
-    List.fold_left
-      (fun (m,av1,av2) (x,w,v) ->
-        VarMap.add x (IntValue v) m, w::av1, v::av2)
-      (state.map_state,[],[]) intd
-  in
-  (* and finally we rename the apron vars (we can't rename before
-     existential elimination of old vars, it would be unsound *)
-
-  let av1 = Array.of_list av1 in
-  let av2 = Array.of_list av2 in
-  let new_apron_env = Environment.rename ctx.Dom.apron_env av1 av2 in
-  let ctx = ctx_rename_env av1 av2 state.ctx_state in
-(*
-let ctx_rename_env av1 av2 ctx =
-  ctx_change_gen
-    (fun env -> Environment.rename env av1 av2)
-    (fun s -> Abstract1.rename_array man s av1 av2)
-    ctx
-*)
-  { map_state = m;
-    ctx_state = ctx;
-    bdd_state = b;
-  }
-*)
+  }, oldenv
 
 
-(** BDD *)
 
-(*
-let meet_with_bdd state b =
-   { state with bdd_state = B.mk_and state.bdd_state b }
-*)
 
-(** interprets variable introduction [let x (as boolean var v) = e in ...] *)
-(*
-let interp_bool_var_intro state x v e : t =
-  (* Format.printf "@[interp_bool_var_intro: state=@ @[%a@]@]@." print state; *)
-  (* Format.printf "@[v =@ %d@]@." v; *)
-  let b = B.(mk_and (mk_iff (mk_var v) e) state.bdd_state) in
-  (* Format.printf "@[BDD =@ %a@]@." B.print_compact b; *)
-  let s =
-    { state with
-      map_state = VarMap.add x (BoolValue v) state.map_state;
-      bdd_state = b }
-    in
-  (* Format.printf "@[interp_bool_var_intro: s=@ @[%a@]@]@." print s; *)
-  s
-*)
+(** State to formula *)
 
-(*
-let interp_bool_assign state v w bexpr =
-  (* we have a state with a (boolean) Why variable `x` associated to
-     bdd variable `v`, and a BDD B(v). I write B(v) to make explicit that v occurs in B.
-     We want `x` to be now equal to expression `bexpr`
-     which may use `v` itself. We want to keep `x` associated to `v`
-     at the end. *)
-  let b = state.bdd_state in
-  (* Format.printf "@[v =@ %d, extrav = %d@]@." v w;
-   * Format.printf "@[BDD state =@ %a@]@." B.print_compact b;
-   * Format.printf "@[BDD expr =@ %a@]@." B.print_compact bexpr; *)
-  (* we first build the BDD  [B(v) /\ w=bexpr] *)
-  let b1 = B.(mk_and (mk_iff (mk_var w) bexpr) b) in
-  (* we abstract away v *)
-  let b2 = B.(mk_exist ((==) v) b1) in
-  (* we "rename" w into v by first asserting that v=w and then
-     abstracting away w *)
-  let b3 = B.(mk_and (mk_iff (mk_var v) (mk_var w)) b2) in
-  let b4 = B.(mk_exist ((==) w) b3) in
-  (* Format.printf "@[b4 =@ %a@]@." B.print_compact b4; *)
-  { state with bdd_state = b4 }
-*)
 
 
 
@@ -735,9 +657,9 @@ exception Bottom
 let get_int x =
   match x with
   | Scalar.Mpqf q ->
-     let cst, denom = Mpqf.to_mpzf2 q in
-     assert (Mpz.to_string denom = "1");
-     Z.of_string (Mpz.to_string cst)
+    let num, den = Mpqf.to_mpzf2 q in
+    (Z.of_string (Mpz.to_string num),
+     Z.of_string (Mpz.to_string den))
   | _ -> assert false
 
 let get_apron_interval i  =
@@ -747,10 +669,20 @@ let get_apron_interval i  =
     { id_min = None; id_max = None }
   else
     let id_min =
-      if Scalar.is_infty i.inf = -1 then None else Some (get_int i.inf)
+      if Scalar.is_infty i.inf = -1 then None else
+        let (n,d) = get_int i.inf in
+        let (q,r) = Z.div_rem n d in
+        let c = (* n = q * d + r *)
+          if Z.lt r Z.zero then Z.pred q else q in
+        Some c
     in
     let id_max =
-      if Scalar.is_infty i.sup = 1 then None else Some (get_int i.sup)
+      if Scalar.is_infty i.sup = 1 then None else
+        let (n,d) = get_int i.sup in
+        let (q,r) = Z.div_rem n d in
+        let c =
+          if Z.gt r Z.zero then Z.succ q else q in
+        Some c
     in
     { id_min ; id_max }
 
@@ -825,9 +757,11 @@ let print_int_to_state fmt h =
 
 let print_ctx fmt ctx =
   Format.fprintf fmt
-    "@[<hv 2>{ @[<hv 2>apron_env:@ @[%a@];@]@ \
+    "@[<hv 2>{ @[<hv 2>unique_id:@ %d;@]@ \
+     @[<hv 2>apron_env:@ @[%a@];@]@ \
      @[<hv 2>counter:@ %d;@]@ \
      @[<hv 2>int_to_state:@ @[%a@];@] }@]"
+    ctx.Dom.ctx_unique_id
     (fun fmt -> Environment.print fmt) ctx.Dom.apron_env
     ctx.Dom.counter
     print_int_to_state ctx.Dom.int_to_state

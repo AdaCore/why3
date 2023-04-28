@@ -1,10 +1,9 @@
 Invariant for loop [myloop] is
-  exit.contents = True /\ 42 <= c.contents \/
-  exit.contents = False /\ 0 <= c.contents /\ c.contents <= 41
-Domains for loop [myloop] are exit = top; c = [0;+oo[
+  if exit = True then 42 <= c /\ c <= 43 else 0 <= c /\ c <= 41
+Domains for loop [myloop] are exit = top; c = [0;43]
 Check: assertion [myassert] is valid
 
 File bench/infer/while_loop_count.mlw:
 Goal test'vc.
-Prover result is: Valid (0.00s, 12 steps).
+Prover result is: Valid (0.00s, 13 steps).
 

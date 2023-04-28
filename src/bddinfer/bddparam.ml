@@ -1,13 +1,6 @@
-(********************************************************************)
-(*                                                                  *)
-(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
-(*                                                                  *)
-(*  This software is distributed under the terms of the GNU Lesser  *)
-(*  General Public License version 2.1, with the special exception  *)
-(*  on linking described in file LICENSE.                           *)
-(*                                                                  *)
-(********************************************************************)
+
+(* open Why3 *)
+(* to comment out when inside Why3 *)
 
 (** {1 Parametric Binary Decision Diagrams} *)
 
@@ -38,10 +31,6 @@ module type BDD = sig
     | Fnot of formula
     | Fite of formula * formula * formula (* if f1 then f2 else f3 *)
 
-(*
-  val zero : t
-  val one : t
-*)
   val bottom : t
   val top : t
   val make : variable -> low:t -> high:t -> t
@@ -52,8 +41,15 @@ module type BDD = sig
   val join : param_context -> t -> t -> t
   val widening : param_context -> t -> t -> t
   (* val mk_eq_var : variable -> variable -> t *)
-  val rename :
+  val change_ctx :
+    (param_state -> param_state) ->
+    param_context -> t -> param_context -> t
+  val rename_many :
     (variable -> variable) ->
+    (param_state -> param_state) ->
+    param_context -> t -> param_context -> t
+  val rename_few :
+    (variable * variable) list ->
     (param_state -> param_state) ->
     param_context -> t -> param_context -> t
   val meet_with_param_constraint :
@@ -96,7 +92,7 @@ module type ParamDomain = sig
   val widening : param_context -> param_index -> param_index -> param_index option
   val exist_elim : param_context -> param_index -> param_context -> param_index option
   val entails : param_context -> param_index -> param_index -> bool
-  val rename :
+  val change :
     (param_state -> param_state) ->
     param_context -> param_index -> param_context -> param_index
   val meet_with_constraint :
@@ -120,6 +116,11 @@ let get_max_var () = max_var
 
 type bdd = { tag: int; node : view }
 and view = Zero | One | Leaf of int | Node of variable * bdd (*low*) * bdd (*high*)
+
+let smaller_var v b = match b.node with
+  | Zero | One | Leaf _ -> true
+  | Node (w, _, _) -> v < w
+
 
 type t = bdd (* export *)
 
@@ -162,19 +163,6 @@ let rec print_compact fmt b =
      Format.fprintf fmt "@[<hv 2>if %a@ then %a@ else %a@]" print_var v print_compact h print_compact l
 
 
-(* unused
-let equal x y = match x, y with
-  | Node (v1, l1, h1), Node (v2, l2, h2) ->
-      v1 == v2 && l1 == l2 && h1 == h2
-  | _ ->
-      x == y
-*)
-
-(** perfect hashing is actually less efficient
-let pair a b = (a + b) * (a + b + 1) / 2 + a
-let triple a b c = pair c (pair a b)
-let hash_node v l h = abs (triple l.tag h.tag v)
-**)
 let hash_node l h = 19 * l.tag + h.tag
 
 let hash = function
@@ -208,17 +196,6 @@ let fold f t init =
   in
   Array.fold_right (fold_bucket 0) t.table init
 
-(* unused
-
-let iter f t =
-  let rec iter_bucket i b =
-    if i >= Weak.length b then () else
-      match Weak.get b i with
-        | Some v -> f v; iter_bucket (i+1) b
-        | None -> iter_bucket (i+1) b
-  in
-  Array.iter (iter_bucket 0) t.table
-*)
 
 let count t =
   let rec count_bucket i b accu =
@@ -302,21 +279,6 @@ let one = { tag = gentag (); node = One }
 let bottom = zero
 let top = one
 
-(*
-let var b = match b.node with
-  | Zero | One -> max_var + 1 (* this may happen indeed *)
-  | Leaf _ -> invalid_arg "Bdd.var" (* should not happen *)
-  | Node (v, _, _) -> v
-
-let low b = match b.node with
-  | Zero | One | Leaf _ -> invalid_arg "Bdd.low"
-  | Node (_, l, _) -> l
-
-let high b = match b.node with
-  | Zero | One | Leaf _ -> invalid_arg "Bdd.low"
-  | Node (_, _, h) -> h
-*)
-
 let mk v ~low ~high =
   if low == high then low else hashcons_node v low high
 
@@ -390,12 +352,6 @@ module H2 = Hashtbl.Make(
   end)
 
 
-(*
-let mk_and = gapply Op_and
-let mk_or = gapply Op_or
-let mk_imp = gapply Op_imp
-let mk_iff = gapply (Op_any (fun b1 b2 -> b1 == b2))
-*)
 
 let meet ctx b1 b2 =
   let cache = H2.create cache_default_size in
@@ -479,9 +435,10 @@ let join = generic_or D.join
 let widening = generic_or D.widening
 
 
-(** renaming *)
+(* change context *)
 
-let rec rename_rec cache rename_var rename_param ctxb b ctx =
+
+let rec change_ctx_rec cache f ctx_src b ctx =
   match b.node with
   | One | Zero -> b
   | _ ->
@@ -492,61 +449,21 @@ let rec rename_rec cache rename_var rename_param ctxb b ctx =
         match b.node with
         | One | Zero -> assert false
         | Leaf i ->
-          let j = D.rename rename_param ctxb i ctx in
+          let j = D.change f ctx_src i ctx in
           mk_param j
         | Node(v,l,h) ->
-          let l = rename_rec cache rename_var rename_param ctxb l ctx in
-          let h = rename_rec cache rename_var rename_param ctxb h ctx in
-          let w = rename_var v in
-          (* Format.eprintf "[renaming bvar %d into %d@." v w; *)
-          let mkv = mk_var w in
-          let mknv = mk_not_var w in
-          join ctx (meet ctx mknv l) (meet ctx mkv h)
+          let low = change_ctx_rec cache f ctx_src l ctx in
+          let high = change_ctx_rec cache f ctx_src h ctx in
+          mk v ~low ~high
       in
       H1.add cache b res;
       res
 
-let rename rename_var rename_param ctxb b ctx =
+let change_ctx f ctx_src b ctx =
   let cache = H1.create cache_default_size in
-  rename_rec cache rename_var rename_param ctxb b ctx
+  change_ctx_rec cache f ctx_src b ctx
 
-(** meet with a constraint in the parameter domain *)
 
-let rec meet_with_rec cache meet_with ctxb b =
-  match b.node with
-  | Zero -> b
-  | _ ->
-    try
-      H1.find cache b
-    with Not_found ->
-      let res =
-        match b.node with
-        | Zero -> assert false
-        | One ->
-          begin
-            match D.meet_with_constraint meet_with ctxb None with
-            | None -> zero
-            | Some j -> mk_param j
-          end
-        | Leaf i ->
-          begin
-            match D.meet_with_constraint meet_with ctxb (Some i) with
-            | None -> zero
-            | Some j -> mk_param j
-          end
-        | Node(v,l,h) ->
-          let l = meet_with_rec cache meet_with ctxb l in
-          let h = meet_with_rec cache meet_with ctxb h in
-          let mkv = mk_var v in
-          let mknv = mk_not_var v in
-          join ctxb (meet ctxb mknv l) (meet ctxb mkv h)
-      in
-      H1.add cache b res;
-      res
-
-let meet_with_param_constraint meet_with ctxb b =
-  let cache = H1.create cache_default_size in
-  meet_with_rec cache meet_with ctxb b
 
 (** {2 quantifier elimination} *)
 
@@ -583,6 +500,102 @@ let mk_exist_bdd_only filter ctx b =
   let cache = H1.create cache_default_size in
   quantifier_elim ~bddonly:true cache (join ctx) filter ctx b ctx
 
+
+
+(** renaming *)
+
+let rec rename_many_rec cache rename_var rename_param ctxb b ctx =
+  match b.node with
+  | One | Zero -> b
+  | _ ->
+    try
+      H1.find cache b
+    with Not_found ->
+      let res =
+        match b.node with
+        | One | Zero -> assert false
+        | Leaf i ->
+          let j = D.change rename_param ctxb i ctx in
+          mk_param j
+        | Node(v,l,h) ->
+          let l = rename_many_rec cache rename_var rename_param ctxb l ctx in
+          let h = rename_many_rec cache rename_var rename_param ctxb h ctx in
+          let w = rename_var v in
+          (* Format.eprintf "[renaming bvar %d into %d@." v w; *)
+          if smaller_var w l && smaller_var w h then
+            mk w ~low:l ~high:h
+          else
+            let mkv = mk_var w in
+            let mknv = mk_not_var w in
+            join ctx (meet ctx mknv l) (meet ctx mkv h)
+      in
+      H1.add cache b res;
+      res
+
+let rename_many rename_var rename_param ctxb b ctx =
+  let cache = H1.create cache_default_size in
+  rename_many_rec cache rename_var rename_param ctxb b ctx
+
+let eq_var ctx v1 v2 =
+  let mkv1 = mk_var v1 in
+  let mkv2 = mk_var v2 in
+  let mknv1 = mk_not_var v1 in
+  let mknv2 = mk_not_var v2 in
+  join ctx (meet ctx mkv1 mkv2) (meet ctx mknv1 mknv2)
+
+let rename_few bool_renamings rename_param ctxb b ctx =
+  (* first rename the parameter states *)
+  let b = change_ctx rename_param ctxb b ctx in
+  (* then build the BDD for variable equalities *)
+  let br,s =
+    List.fold_left
+      (fun (acc,s) (v1,v2) -> (meet ctx acc (eq_var ctx v1 v2),BddVarMap.add v1 true s))
+      (top,BddVarMap.empty)
+      bool_renamings
+  in
+  (* build the conjunction *)
+  let b = meet ctx b br in
+  (* then eliminate variables *)
+  let filter v =
+    try BddVarMap.find v s with Not_found -> false
+  in
+  mk_exist_bdd_only filter ctx b
+
+(** meet with a constraint in the parameter domain *)
+
+let rec meet_with_rec cache meet_with ctxb b =
+  match b.node with
+  | Zero -> b
+  | _ ->
+    try
+      H1.find cache b
+    with Not_found ->
+      let res =
+        match b.node with
+        | Zero -> assert false
+        | One ->
+          begin
+            match D.meet_with_constraint meet_with ctxb None with
+            | None -> zero
+            | Some j -> mk_param j
+          end
+        | Leaf i ->
+          begin
+            match D.meet_with_constraint meet_with ctxb (Some i) with
+            | None -> zero
+            | Some j -> mk_param j
+          end
+        | Node(v,l,h) ->
+          let l = meet_with_rec cache meet_with ctxb l in
+          let h = meet_with_rec cache meet_with ctxb h in
+          mk v ~low:l ~high:h
+      in
+      H1.add cache b res;
+      res
+
+let meet_with_param_constraint meet_with ctxb b =
+  let cache = H1.create cache_default_size in
+  meet_with_rec cache meet_with ctxb b
 
 let rec extract_known_values cache b =
   try
@@ -641,90 +654,6 @@ let fold_param_states f0 f b acc =
 
 
 
-
-(*
-let apply f = gapply (Op_any f)
-
-let constrain b1 b2 =
-  let cache = H2.create cache_default_size in
-  let rec app ((u1,u2) as u12) =
-    match u1.node, u2.node with
-    | _, Zero -> failwith "constrain 0 is undefined"
-    | _, One  -> u1
-    | Zero, _ -> u1
-    | One, _  -> u1
-    | _ ->
-      try
-        H2.find cache u12
-      with Not_found ->
-        let res =
-          let v1 = var u1 in
-          let v2 = var u2 in
-          if v1 == v2 then begin
-            if low u2 == zero then app (high u1, high u2)
-            else if high u2 == zero then app (low u1, low u2)
-            else mk (var u1) ~low:(app (low u1, low u2)) ~high:(app (high u1, high u2))
-          end
-          else if v1 < v2 then
-            mk v1 ~low:(app (low u1, u2)) ~high:(app (high u1, u2))
-          else (* v1 > v2 *)
-            mk v2 ~low:(app (u1, low u2)) ~high:(app (u1, high u2))
-        in
-        H2.add cache u12 res;
-        res
-  in
-  app (b1, b2)
-
-let restriction b1 b2 =
-  let cache = H2.create cache_default_size in
-  let rec app ((u1,u2) as u12) =
-    match u1.node, u2.node with
-    | _, Zero -> failwith "constrain 0 is undefined"
-    | _, One  -> u1
-    | Zero, _ -> u1
-    | One, _  -> u1
-    | _ ->
-      try
-        H2.find cache u12
-      with Not_found ->
-        let res =
-          let v1 = var u1 in
-          let v2 = var u2 in
-          if v1 == v2 then begin
-            if low u2 == zero then app (high u1, high u2)
-            else if high u2 == zero then app (low u1, low u2)
-            else mk (var u1) ~low:(app (low u1, low u2)) ~high:(app (high u1, high u2))
-          end
-          else if v1 < v2 then
-            mk v1 ~low:(app (low u1, u2)) ~high:(app (high u1, u2))
-          else (* v1 > v2 *)
-            app (u1, mk_or (low u2) (high u2))
-        in
-        H2.add cache u12 res;
-        res
-  in
-  app (b1, b2)
-*)
-
-(*
-let restrict u x b =
-  let cache = H1.create cache_default_size in
-  let rec app u =
-    try
-      H1.find cache u
-    with Not_found ->
-      let res =
-        if var u > x then u
-        else if var u < x then mk (var u) ~low:(app (low u)) ~high:(app (high u))
-        else (* var u = x *) if b then app (high u)
-        else (* var u = x, b = 0 *) app (low u)
-      in
-      H1.add cache u res;
-      res
-  in
-  app u
-*)
-
 (* formula -> bdd *)
 
   type formula =
@@ -740,19 +669,6 @@ let restrict u x b =
     | Fite of formula * formula * formula (* if f1 then f2 else f3 *)
 
 
-(*
-let rec build = function
-  | Ffalse -> zero
-  | Ftrue -> one
-  | Fstate _ -> assert false (* TODO *)
-  | Fvar v -> mk_var v
-  | Fand (f1, f2) -> mk_and (build f1) (build f2)
-  | For (f1, f2) -> mk_or (build f1) (build f2)
-  | Fimp (f1, f2) -> mk_imp (build f1) (build f2)
-  | Fiff (f1, f2) -> mk_iff (build f1) (build f2)
-  | Fnot f -> mk_not (build f)
-  | Fite (f1, f2, f3) -> mk_ite (build f1) (build f2) (build f3)
-*)
 
 let rec as_formula b =
   match b.node with

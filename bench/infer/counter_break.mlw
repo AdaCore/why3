@@ -1,0 +1,29 @@
+use bool.Bool
+use int.Int
+
+val randomb () : bool
+
+val ref c0 : int
+
+val ref s0 : bool
+val ref s1 : bool
+val ref s2 : bool
+val ref serr : bool
+
+let c [@bddinfer] ()
+  requires { s0 = True}
+  requires { s1 = serr = False}
+  requires { c0 = 0 }
+  diverges
+  =
+   while (not serr) do
+     invariant { c0 <= 43 }
+     if s1 then c0 <- c0 +1;
+     if andb s0 (randomb()) then
+        (s0 <- False; s1 <- True; c0 <- 0)
+     else
+       if (s1 && (c0 > 42)) then
+         (s1 <- False; serr <- True; break (* works, see counter.mlw *))
+       ;
+
+ done

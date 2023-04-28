@@ -1,20 +1,16 @@
 Invariant for loop [anonymous_loop_0] is
-  ((((0 <= i.contents /\ j.contents <= (i.contents + 1)) /\ j.contents <= 10) /\
-    i.contents <= j.contents) /\
-   o = 0) /\
+  ((((0 <= !i /\ !j <= (!i + 1)) /\ !j <= 10) /\ !i <= !j) /\ o = 0) /\
   o1 = 0
 Domains for loop [anonymous_loop_0] are
   o = [0;0]; i = [0;10]; o1 = [0;0]; j = [0;10]
 Invariant for loop [anonymous_loop_0] is
-  ((((j1.contents <= i1.contents /\ 0 <= j1.contents) /\ j1.contents <= 9) /\
-    i1.contents <= (j1.contents + 1)) /\
-   o2 = 0) /\
+  ((((!j1 <= !i1 /\ 0 <= !j1) /\ !j1 <= 9) /\ !i1 <= (!j1 + 1)) /\ o2 = 0) /\
   o3 = 0
 Domains for loop [anonymous_loop_0] are
   o2 = [0;0]; i1 = [0;10]; o3 = [0;0]; j1 = [0;9]
 File bench/infer/if.mlw:
 Goal b'vc.
-Prover result is: Unknown () (0.03s).
+Prover result is: Unknown () (0.01s).
 
 File bench/infer/if.mlw:
 Goal c'vc.

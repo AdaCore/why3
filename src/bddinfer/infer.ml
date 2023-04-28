@@ -1,13 +1,3 @@
-(********************************************************************)
-(*                                                                  *)
-(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
-(*                                                                  *)
-(*  This software is distributed under the terms of the GNU Lesser  *)
-(*  General Public License version 2.1, with the special exception  *)
-(*  on linking described in file LICENSE.                           *)
-(*                                                                  *)
-(********************************************************************)
 
 (**
 
@@ -25,6 +15,7 @@ let checked_annotations_counter = ref 0
 let checked_user_annotations = ref Wstdlib.Mstr.empty
 let generated_loop_invariants = ref Wstdlib.Mstr.empty
 let generated_entry_states = ref Wstdlib.Mstr.empty
+let widening_count = ref 0
 
 let add_checked_user_annotations tag is_inv orig cond is_valid =
   let n =
@@ -40,24 +31,13 @@ let add_checked_user_annotations tag is_inv orig cond is_valid =
     Wstdlib.Mstr.add n (is_inv,orig,cond,is_valid)
       !checked_user_annotations
 
-let cond_to_abs env cond =
-    Interp_expression.meet_condition ~old:Abstract.VarMap.empty (Abstract.top env) cond
-
-(*
-let rec _deref_var env v =
-  let open Abstract in
-  match VarMap.find v env with
-  | RefValue r -> _deref_var env r
-  | (IntValue _ | BoolValue _ as x) -> x
-*)
-
-(** [interp_let_noin state x v e] returns a new state [s] obtained
-   from [state] by adding the program variable [x], associated to
-   abstract variable [v], with initial value [e]. [x] and [v] are
-   assumed to not occur in state [state].  *)
-let interp_let_noin (state:Abstract.t) (x:Abstract.why_var) (v:Abstract.var_value) (e:Ast.expression) =
-  let m = Abstract.VarMap.singleton x v in
-  let state1 = Abstract.add_in_environment state m in
+(** [intro_local_var env conds x v e] returns a pair [newenv,newcond]
+   where [newenv] is the environment [env] extend to contain the new
+   program variable [x], associated to abstract variable
+   [v]. [newconds] extends the conditions [cons] with a condition that
+   expresses that [x] is equal to [e]. *)
+let intro_local_var env conds x v e =
+  let m = Abstract.VarMap.add x v env in
   let cond =
     match v with
     | Abstract.BoolValue _ ->
@@ -66,9 +46,10 @@ let interp_let_noin (state:Abstract.t) (x:Abstract.why_var) (v:Abstract.var_valu
       c_eq_int (e_var x Here) e
     | _ -> assert false
   in
-  Interp_expression.meet_condition ~old:Abstract.VarMap.empty state1 (atomic_cond cond)
+  m,and_cond conds (atomic_cond cond)
 
-let rec interp_stmt (functions : func list) (state : Abstract.t) (stmt : statement) : (Abstract.t * Abstract.t) =
+
+let rec interp_stmt (functions : func FuncMap.t) (state : Abstract.t) (stmt : statement) : (Abstract.t * Abstract.t) =
   begin match stmt.stmt_tag with
   | "" -> ()
   | a ->
@@ -78,145 +59,167 @@ let rec interp_stmt (functions : func list) (state : Abstract.t) (stmt : stateme
      state
     else *) (* Correct, but not clearly useful. *)
   match stmt.stmt_node with
-(*
-  | Sassign(x, e) ->
-     let env = Abstract.why_env state in
-     Abstract.(begin
-       match deref_var env x with
-       | RefValue _ | BoolValue _ -> assert false
-       | IntValue(v) ->
-          let old = VarMap.empty in
-          let aenv = apron_env state in
-          let te = Interp_expression.to_expr ~old env aenv e in
-          (assign_texpr state v te, Abstract.bottom env)
-     end)
-*)
-(*
-  | Sassign_bool(x, extrav, e) ->
-     let env = Abstract.why_env state in
-     Abstract.(begin
-       match deref_var env x with
-       | IntValue _ | RefValue _ -> assert false
-       | BoolValue v ->
-          (* Format.printf "@[State before assign bool =@ %a@]@." Abstract.print state; *)
-           (* we have in state x -> v, we evaluate expression e as a BDD, which may use v *)
-          let b = Interp_expression.interp_bool_expr ~old:VarMap.empty env e in
-          let state1 = interp_bool_assign state v extrav b in
-          (* Format.printf "@[State after assign bool =@ %a@]@." Abstract.print state1; *)
-          (state1, Abstract.bottom env)
-     end)
-*)
 
   | Swhile(cond, user_invariants, body) ->
-      let invariant, exceptionnal_state = interp_loop functions 0 state cond body in
+      let invariant, exceptional_state = interp_loop functions 0 state cond body in
       generated_loop_invariants :=
         Wstdlib.Mstr.add stmt.stmt_tag invariant !generated_loop_invariants;
       (* check user invariants *)
-      let _ = List.fold_left
-                (fun c (n, i) ->
-                  let user_invariant = cond_to_abs state i in
-                  let valid = Abstract.is_leq invariant user_invariant in
-                  let tag,orig =
-                    match n with
-                    | None -> stmt.stmt_tag ^ (string_of_int c), ""
-                    | Some n -> n,n
-                  in
-                  add_checked_user_annotations tag true orig i valid;
-                  c+1) 0 user_invariants
+      let _ =
+        List.fold_left
+          (fun c (n, i) ->
+             (* Format.eprintf "user_invariant is: @[%a@]@." print_condition i; *)
+             let complement = Interp_expression.meet_condition ~old:Abstract.VarMap.empty
+                 invariant (neg_cond i)
+             in
+             let valid = Abstract.is_bottom complement in
+             (* Format.eprintf "complement as abstract state: @[%a@]@." Abstract.print complement; *)
+             let tag,orig =
+               match n with
+               | None -> stmt.stmt_tag ^ (string_of_int c), ""
+               | Some n -> n,n
+             in
+             add_checked_user_annotations tag true orig i valid;
+             c+1) 0 user_invariants
       in
-      Abstract.join (Interp_expression.meet_condition ~old:Abstract.VarMap.empty invariant (neg_cond cond)) exceptionnal_state, Abstract.bottom state
+      Abstract.join (Interp_expression.meet_condition ~old:Abstract.VarMap.empty invariant (neg_cond cond)) exceptional_state, Abstract.bottom state
 
-  | Sfcall(opt_result, lets, f, args) ->
+  | Sfcall(opt_result, lets, f, args, memo_env, memo_res_env, memo_add_env, memo_havoc, memo_body) ->
      begin
-       match List.find (fun g -> g.func_name = f) functions with
+       match FuncMap.find f functions with
        | exception Not_found -> assert false
        | { func_params ; func_def; _ } ->
-          let state_with_params state =
+          let env_with_params envcond =
             List.fold_left2
-              (fun s (x, v) e ->
+              (fun (env,cond) (x, v) e ->
                 match v with
                 | Param_ref _ ->
                    begin
                      match e with
                      | Evar (y, Here) ->
-                        let m = Abstract.VarMap.singleton x (Abstract.RefValue y) in
-                        Abstract.add_in_environment s m
+                        let m = Abstract.VarMap.add x (Abstract.RefValue y) env in
+                        (m,cond)
                      | Evar (_, Old) -> assert false (* impossible *)
                      | _ ->
                         Format.eprintf "e = %a@." Ast.print_expression e;
                         assert false (* only vars should be passed by ref *)
                    end
                 | Param_noref av ->
-                   interp_let_noin s x av e)
-              state func_params args
+                   intro_local_var env cond x av e)
+              envcond func_params args
           in
-          let local_state state =
+          let local_env () =
             List.fold_left
-              (fun s (x,v,e) -> interp_let_noin s x v e)
-              state lets
+              (fun (env,c) (x,v,e) -> intro_local_var env c x v e)
+              (Abstract.VarMap.empty,true_cond) lets
+          in
+          let get_env memo_env res_opt =
+            match !memo_env with
+            | None ->
+              let lenv,lcond = local_env () in
+              let lenv,lcond = env_with_params (lenv,lcond) in
+              let lenv = match res_opt with
+                | None -> lenv
+                | Some(x,v) -> Abstract.VarMap.add x v lenv
+              in
+              let x = (lenv,lcond) in
+              memo_env := Some x;
+              x
+            | Some x -> x
+          in
+          let get_body memo b =
+            match !memo with
+            | Some b -> b
+            | None -> let b = copy_stmt b in memo := Some b; b
           in
           match func_def, opt_result with
           | Fun_let(body,None), None ->
-            let s0 = local_state state in
-            let s1 = state_with_params s0 in
-            let s2, s2' = interp_stmt functions s1 body in
+            let lenv,lcond = get_env memo_env None in
+            let s1 = Abstract.add_in_environment memo_add_env state lenv in
+            (* Format.eprintf "@[[Sfcall,Fun_let] state with env:@ @[%a@]@]@." Abstract.print s1; *)
+            let s1 =
+              Interp_expression.meet_condition ~old:Abstract.VarMap.empty s1 lcond
+            in
+            (* Format.eprintf "@[[Sfcall,Fun_let] state after meet lcond:@ @[%a@]@]@." Abstract.print s1; *)
+            let b = get_body memo_body body in
+            let s2, s2' = interp_stmt functions s1 b in
+            (* Format.eprintf "@[[Sfcall,Fun_let] state after body:@ @[%a@]@]@." Abstract.print s2; *)
             assert (Abstract.is_bottom s2');
             (* restoring the env as before the call *)
-            Abstract.restrict_environment s2 state, Abstract.bottom state
+            let s_final = Abstract.restrict_environment s2 state in
+            (* Format.eprintf "@[[Sfcall,Fun_let] state final:@ @[%a@]@]@." Abstract.print s_final; *)
+            s_final, Abstract.bottom state
           | Fun_let(body,Some return_expr), Some(res,rem,av) ->
-             let s0 = local_state state in
-             let s1 = state_with_params s0 in
-             let s2,s2' = interp_stmt functions s1 body in
-             assert (Abstract.is_bottom s2');
-             (* do as let res = return_expr in rem *)
-             (* !!FIXME: remove the params from the env *before* interpreting rem ! *)
-             let s3,s3' = interp_let_in functions s2 res av return_expr rem in
-             Abstract.restrict_environment s3 state, Abstract.restrict_environment s3' state
-          | Fun_val(writes, None, post), None ->
-            let s0 = local_state state in
-            let s_with_params = state_with_params s0 in
-            let renamed, old = Abstract.prepare_havoc writes s_with_params in
-            let state_meet = Interp_expression.meet_condition ~old renamed post in
-            (* FIXME: why restrict in two steps ? *)
-            let result =
-              Abstract.restrict_environment state_meet s_with_params
+            let lenv,lcond = get_env memo_env None (* FIXME!!! should be Some ... *) in
+            let s1 = Abstract.add_in_environment memo_add_env state lenv in
+            let s1 =
+              Interp_expression.meet_condition ~old:Abstract.VarMap.empty s1 lcond
             in
-            let s_final = Abstract.restrict_environment result state in
+            let b = get_body memo_body body in
+            let s2,s2' = interp_stmt functions s1 b in
+            assert (Abstract.is_bottom s2');
+            (* do as let res = return_expr in rem *)
+            (* !!FIXME: remove the params from the env *before* interpreting rem ! *)
+            let s3,s3' = interp_let_in functions s2 res av return_expr rem in
+            Abstract.restrict_environment s3 state, Abstract.restrict_environment s3' state
+          | Fun_val(writes, None, post), None ->
+            let lenv,lcond = get_env memo_env None in
+            let s1 = Abstract.add_in_environment memo_add_env state lenv in
+            (* Format.eprintf "@[[Sfcall,Fun_val] state with env:@ @[%a@]@]@." Abstract.print s1; *)
+            let s2 =
+              Interp_expression.meet_condition ~old:Abstract.VarMap.empty s1 lcond
+            in
+            (* Format.eprintf "@[[Sfcall,Fun_val] state after meet lcond:@ @[%a@]@]@." Abstract.print s2; *)
+            let renamed, old = Abstract.prepare_havoc memo_havoc writes s2 in
+            (* Format.eprintf "@[[Sfcall,Fun_val] state after havoc:@ @[%a@]@]@." Abstract.print renamed; *)
+            let state_meet = Interp_expression.meet_condition ~old renamed post in
+            (* Format.eprintf "@[[Sfcall,Fun_val] state after meet:@ @[%a@]@]@." Abstract.print state_meet; *)
+            let s_final = Abstract.restrict_environment state_meet state in
+            (* Format.eprintf "@[[Sfcall,Fun_val] state final:@ @[%a@]@]@." Abstract.print s_final; *)
             s_final, Abstract.bottom state
 
           | Fun_val(writes, Some(result,aresult), post), Some(res,rem,av) ->
-             (* first adding the expected res var in the env *)
-             let m = Abstract.VarMap.singleton res av in
-             let s_with_res = Abstract.add_in_environment state m in
-             let s_with_locals = local_state s_with_res in
-             let s_with_params = state_with_params s_with_locals in
-             (* we do as an havoc statement, first adding result in the env *)
-             let m = Abstract.VarMap.singleton result aresult in
-             let s_with_result = Abstract.add_in_environment s_with_params m in
-             let renamed, old = Abstract.prepare_havoc writes s_with_result in
-             let state_meet = Interp_expression.meet_condition ~old renamed post in
-             let after_havoc =
-               Abstract.restrict_environment state_meet s_with_result
-             in
-             (* we then identify res with result *)
-             (* FIXME: do not compute the same cond all the time! *)
-             let eq_result_res =
-               match aresult with
-               | Abstract.UnitValue -> assert false
-               | Abstract.BoolValue _ -> c_eq_bool (e_var result Here) (e_var res Here)
-               | Abstract.IntValue _ ->  c_eq_int (e_var result Here) (e_var res Here)
-               | Abstract.RefValue _ -> assert false
-             in
-             let cond = atomic_cond eq_result_res in
-             let state_eq = Interp_expression.meet_condition ~old:Abstract.VarMap.empty after_havoc cond in
-             (* we then remove result and params from state *)
-             let state_no_result_no_params =
-               Abstract.restrict_environment state_eq s_with_res
-             in
-             let s,s' = interp_stmt functions state_no_result_no_params rem in
-             (* finally removing the res variable from the state *)
-             Abstract.restrict_environment s state, Abstract.restrict_environment s' state
-
+            (* first adding the expected res var in the env *)
+            (* Format.eprintf "@[[Sfcall,Fun_val] state before:@ @[%a@]@]@." Abstract.print state; *)
+            let m = Abstract.VarMap.singleton res av in
+            let s_with_res = Abstract.add_in_environment memo_res_env state m in
+            (* Format.eprintf "@[[Sfcall,Fun_val] state with res:@ @[%a@]@]@." Abstract.print s_with_res; *)
+            (* then adding the parameters and the result var *)
+            let lenv,lcond = get_env memo_env (Some(result,aresult)) in
+            let s1 = Abstract.add_in_environment memo_add_env s_with_res lenv in
+            (* Format.eprintf "@[[Sfcall,Fun_val] state with env:@ @[%a@]@]@." Abstract.print s1; *)
+            let s_with_params_and_result =
+              Interp_expression.meet_condition ~old:Abstract.VarMap.empty s1 lcond
+            in
+            (* Format.eprintf "@[[Sfcall,Fun_val] state after meet:@ @[%a@]@]@." Abstract.print s_with_params_and_result; *)
+            let renamed, old = Abstract.prepare_havoc memo_havoc writes s_with_params_and_result in
+            (* Format.eprintf "@[[Sfcall,Fun_val] state after havoc:@ @[%a@]@]@." Abstract.print renamed; *)
+            let state_meet = Interp_expression.meet_condition ~old renamed post in
+            (* Format.eprintf "@[[Sfcall,Fun_val] state after meet:@ @[%a@]@]@." Abstract.print state_meet; *)
+            let after_havoc =
+              Abstract.restrict_environment state_meet s_with_params_and_result
+            in
+            (* Format.eprintf "@[[Sfcall,Fun_val] state after restrict:@ @[%a@]@]@." Abstract.print after_havoc; *)
+            (* we then identify res with result *)
+            (* FIXME: do not compute the same cond all the time! *)
+            let eq_result_res =
+              match aresult with
+              | Abstract.UnitValue -> assert false
+              | Abstract.BoolValue _ -> c_eq_bool (e_var result Here) (e_var res Here)
+              | Abstract.IntValue _ ->  c_eq_int (e_var result Here) (e_var res Here)
+              | Abstract.RefValue _ -> assert false
+            in
+            let cond = atomic_cond eq_result_res in
+            let state_eq = Interp_expression.meet_condition ~old:Abstract.VarMap.empty after_havoc cond in
+            (* Format.eprintf "@[[Sfcall,Fun_val] state after eq_res:@ @[%a@]@]@." Abstract.print state_eq; *)
+            (* we then remove result and params from state *)
+            let state_no_result_no_params =
+              Abstract.restrict_environment state_eq s_with_res
+            in
+            (* Format.eprintf "@[[Sfcall,Fun_val] state without params:@ @[%a@]@]@." Abstract.print state_no_result_no_params; *)
+            let s,s' = interp_stmt functions state_no_result_no_params rem in
+            (* finally removing the res variable from the state *)
+            Abstract.restrict_environment s state, Abstract.restrict_environment s' state
           | _, None ->
              Format.eprintf
                "[interp fun call] impossible case, call to %a with no result var@."
@@ -256,26 +259,36 @@ let rec interp_stmt (functions : func list) (state : Abstract.t) (stmt : stateme
            s1, r) (state, Abstract.bottom state) stmts
 
   | Sassert cond ->
-     let abs_cond = cond_to_abs state cond in
-     let valid = Abstract.is_leq state abs_cond in
-     if stmt.stmt_tag <> "" || not valid then
-       begin
-         checked_user_annotations :=
-           Wstdlib.Mstr.add stmt.stmt_tag (false,stmt.stmt_tag,cond,valid)
-             !checked_user_annotations
-       end;
-    state, Abstract.bottom state
+    let abs_neg_cond = Interp_expression.meet_condition ~old:Abstract.VarMap.empty
+        state (neg_cond cond)
+    in
+    let valid = Abstract.is_bottom abs_neg_cond in
+    if stmt.stmt_tag <> "" || not valid then
+      begin
+(*
+        if not valid then
+          Format.eprintf "abs_neg_cond as abstract state: @[%a@]@." Abstract.print abs_neg_cond;
+*)
+        checked_user_annotations :=
+          Wstdlib.Mstr.add stmt.stmt_tag (false,stmt.stmt_tag,cond,valid)
+            !checked_user_annotations
+      end;
+    let abs_cond = Interp_expression.meet_condition ~old:Abstract.VarMap.empty
+        state cond
+    in
+    abs_cond, Abstract.bottom state
 
   | Sassume cond ->
-      (* Format.eprintf "@[Sassume before [abs_cond]:@ @[%a@]@]@." Abstract.print state; *)
-      let abs_cond = cond_to_abs state cond in
-      (* Format.eprintf "@[Sassume abs_cond:@ @[%a@]@]@." Abstract.print abs_cond; *)
-      let result = Abstract.meet state abs_cond in
-      result, Abstract.bottom state
+    (* Format.eprintf "@[Sassume before [abs_cond]:@ @[%a@]@]@." Abstract.print state; *)
+    let abs_cond = Interp_expression.meet_condition ~old:Abstract.VarMap.empty
+        state cond
+    in
+    (* Format.eprintf "@[Sassume abs_cond:@ @[%a@]@]@." Abstract.print abs_cond; *)
+    abs_cond, Abstract.bottom state
 
-  | Shavoc(vars, cond) ->
+  | Shavoc(vars, cond, memo_havoc) ->
      (* Format.eprintf "@[State before [havoc]:@ @[%a@]@]@." Abstract.print state; *)
-     let renamed, old (*, _data*) = Abstract.prepare_havoc vars state in
+     let renamed, old = Abstract.prepare_havoc memo_havoc vars state in
      (* Format.eprintf "@[State after prepare_havoc:@ @[%a@]@]@." Abstract.print renamed; *)
      (* Format.eprintf "@[old after prepare_havoc:@ @[%a@]@]@." Abstract.print_env old; *)
      let state_meet = Interp_expression.meet_condition ~old renamed cond in
@@ -291,16 +304,18 @@ let rec interp_stmt (functions : func list) (state : Abstract.t) (stmt : stateme
 
 
 and interp_let_in functions state x v e stmt =
-  (* Format.eprintf "@[State before [let in:@ @[%a@]@]@." Abstract.print state; *)
-  let state2 = interp_let_noin state x v e in
-  (* Format.eprintf "@[State after [let noin:@ @[%a@]@]@." Abstract.print state2; *)
+  (* Format.eprintf "@[State before [let in]:@ @[%a@]@]@." Abstract.print state; *)
+  let m,cond = intro_local_var Abstract.VarMap.empty true_cond x v e in
+  let state1 = Abstract.add_in_environment (ref None) state m in
+  let state2 = Interp_expression.meet_condition ~old:Abstract.VarMap.empty state1 cond in
+  (* Format.eprintf "@[State before [in]:@ @[%a@]@]@." Abstract.print state2; *)
   let state3,state3' = interp_stmt functions state2 stmt in
-  (* Format.eprintf "@[State after [let in:@ @[%a@]@]@." Abstract.print state3; *)
-  (* Format.eprintf "@[State after [break:@ @[%a@]@]@." Abstract.print state3'; *)
+  (* Format.eprintf "@[State after [let in]:@ @[%a@]@]@." Abstract.print state3; *)
+  (* Format.eprintf "@[State after [break]:@ @[%a@]@]@." Abstract.print state3'; *)
   Abstract.restrict_environment state3 state, Abstract.restrict_environment state3' state
 
 
-and interp_loop (functions: func list) (counter: int)
+and interp_loop (functions: func FuncMap.t) (counter: int)
       (s: Abstract.t) (cond: condition) (body: statement) : (Abstract.t * Abstract.t) =
     (* Format.eprintf "@[interp_loop s:@ @[%a@]@]@." Abstract.print s; *)
     let s1 = Interp_expression.meet_condition ~old:Abstract.VarMap.empty s cond in
@@ -316,8 +331,9 @@ and interp_loop (functions: func list) (counter: int)
         interp_loop functions (counter + 1) s3 cond body
     else
       begin
-        (* Format.eprintf "@[interp_loop, before widening:@ @[%a@]@]@." Abstract.print s2; *)
+        (* Format.eprintf "@[interp_loop, before widening:@ @[%a@]@]@." Abstract.print s3; *)
         let s4 = Abstract.widening s s3 in
+        incr widening_count;
         (* Format.eprintf "@[interp_loop, after widening:@ @[%a@]@]@." Abstract.print s4; *)
         let s5 = Interp_expression.meet_condition ~old:Abstract.VarMap.empty s4 cond in
         (* Format.eprintf "@[interp_loop, after meet:@ @[%a@]@]@." Abstract.print s5; *)
@@ -333,6 +349,7 @@ type interp_report = {
     invariants : Abstract.t Wstdlib.Mstr.t;
     entry_states : Abstract.t Wstdlib.Mstr.t;
     checks : (bool * string * Ast.condition * bool) Wstdlib.Mstr.t;
+    widenings : int;
   }
 
 let interp_prog (p : why1program) : interp_report =
@@ -340,13 +357,15 @@ let interp_prog (p : why1program) : interp_report =
   checked_user_annotations := Wstdlib.Mstr.empty;
   generated_loop_invariants := Wstdlib.Mstr.empty;
   generated_entry_states := Wstdlib.Mstr.empty;
+  widening_count := 0;
   let initial_state = Abstract.top_new_ctx p.vars in
   let final_state, sbreak = interp_stmt p.functions initial_state p.statements in
   assert (Abstract.is_bottom sbreak);
   { final_state ;
     invariants = !generated_loop_invariants;
     entry_states = !generated_entry_states;
-    checks = !checked_user_annotations
+    checks = !checked_user_annotations;
+    widenings = !widening_count;
   }
 
 

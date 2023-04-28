@@ -1,0 +1,30 @@
+use bool.Bool
+use int.Int
+
+val ref x : bool
+val ref y : bool
+val ref t0 : int
+val ref t1 : int
+
+val randomb () : bool
+
+let test [@bddinfer] ()
+  diverges
+  =
+  t0 <- 0;
+  t1 <- 0;
+  x <- true;
+  y <- False;
+
+  while true do
+    invariant { y -> t0 + t1 >= 50 }
+     x <- randomb();
+     if x && (t0 <= 30) then
+       t0 <- t0 + 1
+     else
+       if x && (t0 > 30) then
+         t1 <- t1 + 1
+       else
+         (t0 <- 0; t1 <- 0);
+    y <- (t1 >= 20);
+  done

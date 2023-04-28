@@ -1,0 +1,16 @@
+use int.Int
+
+val ref x : int
+val ref b : bool
+
+let f [@bddinfer] ()
+  diverges
+  =
+  x <- 0;
+  while true do
+    if (x >= 42) && b then break;
+    if (x >= 42) && not b then break;
+    [@bddinfer:assert]
+    assert { x < 42 };
+    x <- x+1
+  done
