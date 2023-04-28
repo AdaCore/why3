@@ -1,0 +1,42 @@
+
+use int.Int
+
+val ref x : int
+
+
+let f0 [@bddinfer] () diverges =
+  x <- 0;
+  while True do
+    if x >= 100 then break;
+    x <- x+1
+  done
+
+
+let f1 [@bddinfer] () diverges =
+  x <- 0;
+  while True do
+    if x = 100 then break;
+    x <- x+1
+  done
+
+
+
+let f2 [@bddinfer] () diverges =
+  x <- 0;
+  while True do
+    if x < 100 then x <- x+1
+  done
+
+
+
+val coil(ref x: int) : unit
+  writes { x }
+  ensures { if old x < 100 then x = old x + 1 else
+            x = 100 }
+
+
+let f3 [@bddinfer] () diverges =
+  x <- 0;
+  while True do
+    coil x;
+  done

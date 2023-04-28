@@ -1,0 +1,14 @@
+use ref.Ref
+
+val ref x0 : bool
+val x1 : ref bool
+val x2 : ref bool
+
+let main [@bddinfer] () = [@vc:divergent]
+begin
+
+while (not x0 && (!x1 && !x2))
+do
+  x1 := !x1;
+done
+end

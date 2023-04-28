@@ -1,18 +1,16 @@
 Invariant for loop [anonymous_loop_0] is
-  (((0 <= j.contents /\ j.contents <= 18) /\ o = 0) /\ o1 = 0) /\
-  (i.contents * 2) = (j.contents + 2)
+  (((0 <= !j /\ !j <= 18) /\ o = 0) /\ o1 = 0) /\ (!i * 2) = (!j + 2)
 Domains for loop [anonymous_loop_0] are
   o1 = [0;0]; i = [1;10]; o = [0;0]; j = [0;18]
 Invariant for loop [anonymous_loop_1] is
-  (((0 <= j.contents /\ j.contents <= 18) /\ o = 0) /\ o1 = 0) /\
-  (i.contents * 2) = (j.contents + 2)
+  (((0 <= !j /\ !j <= 18) /\ o = 0) /\ o1 = 0) /\ (!i * 2) = (!j + 2)
 Domains for loop [anonymous_loop_1] are
   o1 = [0;0]; i = [1;10]; o = [0;0]; j = [0;18]
 Invariant for loop [anonymous_loop_2] is
-  ((j.contents = 0 /\ o = 0) /\ i.contents = 1) /\ o1 = 0
+  ((!j = 0 /\ o = 0) /\ !i = 1) /\ o1 = 0
 Domains for loop [anonymous_loop_2] are
   o1 = [0;0]; i = [1;1]; o = [0;0]; j = [0;0]
 File bench/infer/while4.mlw:
 Goal b'vc.
-Prover result is: Valid (0.00s, 56 steps).
+Prover result is: Valid (0.01s, 56 steps).
 

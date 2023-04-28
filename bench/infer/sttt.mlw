@@ -1,0 +1,19 @@
+use int.Int
+
+val ref b : bool
+val ref x : int
+
+let toy [@bddinfer] () : unit
+  requires { 0 <= x <= 10 }
+  writes { b, x }
+  diverges
+  ensures { not b }
+  ensures { x <= 200 }
+=
+  b <- False;
+  while x < 100 do
+    b <- (x < 50);
+    if b then x <- x + 2
+         else x <- x + 3;
+  done;
+  assert { x >= 75 }
