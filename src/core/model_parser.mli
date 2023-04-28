@@ -72,7 +72,7 @@ type concrete_syntax_frac = {
 }
 
 (** Floats *)
-type concrete_syntax_float =
+type concrete_syntax_float_value =
   | Plus_infinity | Minus_infinity
   | Plus_zero | Minus_zero
   | NaN
@@ -83,6 +83,12 @@ type concrete_syntax_float =
       float_mant : concrete_syntax_bv; (** Mantissa (or significand) bits *)
       float_hex : string (** Hexadecimal reprensation *)
     }
+
+type concrete_syntax_float = {
+    float_exp_size : int; (** Size of the exponent *)
+    float_significand_size : int; (** Size of the significand *)
+    float_val : concrete_syntax_float_value (** Value of the constant *)
+  }
 
 (** Constants *)
 type concrete_syntax_constant =

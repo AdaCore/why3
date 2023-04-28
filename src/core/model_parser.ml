@@ -70,7 +70,7 @@ type concrete_syntax_frac = {
   frac_verbatim: string
 }
 
-type concrete_syntax_float =
+type concrete_syntax_float_value =
   | Plus_infinity | Minus_infinity
   | Plus_zero | Minus_zero
   | NaN
@@ -81,6 +81,12 @@ type concrete_syntax_float =
       float_mant : concrete_syntax_bv;
       float_hex : string
     }
+
+type concrete_syntax_float = {
+    float_exp_size : int;
+    float_significand_size : int;
+    float_val : concrete_syntax_float_value
+  }
 
 type concrete_syntax_constant =
   | Boolean of bool
@@ -131,8 +137,20 @@ let print_concrete_bv fmt { bv_value; bv_length; bv_verbatim } =
   ignore bv_value; ignore bv_length;
   fprintf fmt "%s" bv_verbatim
 
+let print_concrete_float_value fmt = function
+  | Plus_infinity -> pp_print_string fmt "+infty"
+  | Minus_infinity -> pp_print_string fmt "-infty"
+  | Plus_zero -> pp_print_string fmt "+0"
+  | Minus_zero -> pp_print_string fmt "-0"
+  | NaN -> pp_print_string fmt "NaN"
+  | Float_number {float_exp;float_sign;float_mant;float_hex} ->
+    fprintf fmt "number{exp=%a, sign=%a, mant=%a, hex=%s}"
+      print_concrete_bv float_exp
+      print_concrete_bv float_sign
+      print_concrete_bv float_mant
+      float_hex
+
 let rec print_concrete_term fmt ct =
-  let open Format in
   match ct with
   | Var v -> pp_print_string fmt v
   | Const (Boolean b) -> pp_print_bool fmt b
@@ -141,17 +159,12 @@ let rec print_concrete_term fmt ct =
       ignore int_value; pp_print_string fmt int_verbatim
   | Const (Real {real_value; real_verbatim}) ->
       ignore real_value; pp_print_string fmt real_verbatim
-  | Const (Float Plus_infinity) -> pp_print_string fmt "+∞"
-  | Const (Float Minus_infinity) -> pp_print_string fmt "-∞"
-  | Const (Float Plus_zero) -> pp_print_string fmt "+0"
-  | Const (Float Minus_zero) -> pp_print_string fmt "-0"
-  | Const (Float NaN) -> pp_print_string fmt "NaN"
-  | Const (Float (Float_number {float_exp;float_sign;float_mant;float_hex})) ->
-    fprintf fmt "float{exp=%a, sign=%a, mant=%a, hex=%s}"
-      print_concrete_bv float_exp
-      print_concrete_bv float_sign
-      print_concrete_bv float_mant
-      float_hex
+  | Const (Float { float_exp_size; float_significand_size; float_val } ) ->
+    fprintf fmt
+      "float{ @[<hov>exp_size = %d;@ significand_size = %d;@ value = %a@] }"
+      float_exp_size
+      float_significand_size
+      print_concrete_float_value float_val
   | Const (BitVector bv) -> fprintf fmt "%a" print_concrete_bv bv
   | Const (Fraction {frac_num;frac_den;frac_verbatim}) ->
       ignore frac_num; ignore frac_den; fprintf fmt "%s" frac_verbatim
@@ -566,6 +579,23 @@ let json_of_concrete_real { real_value; real_verbatim } =
       ]
   ]
 
+let json_of_float_value f =
+  let open Json_base in
+  match f with
+  | Plus_infinity -> Record [ "float_type", String "Plus_Infinity" ]
+  | Minus_infinity -> Record [ "float_type", String "Minus_infinity" ]
+  | Plus_zero -> Record [ "float_type", String "Plus_zero" ]
+  | Minus_zero -> Record [ "float_type", String "Minus_zero" ]
+  | NaN -> Record [ "float_type", String "NaN" ]
+  | Float_number {float_sign;float_exp;float_mant;float_hex} ->
+    Record [
+      "float_type", String "Float_value";
+      "float_sign", json_of_concrete_bv float_sign;
+      "float_exp", json_of_concrete_bv float_exp;
+      "float_mant", json_of_concrete_bv float_mant;
+      "float_hex", String float_hex
+    ]
+
 let [@warning "-42"] rec json_of_concrete_term ct =
   let open Json_base in
   match ct with
@@ -600,38 +630,10 @@ let [@warning "-42"] rec json_of_concrete_term ct =
         ]
     ]
 
-  | Const (Float Plus_infinity) ->
+  | Const (Float { float_val; _ }) ->
     Record [
       "type", String "Float";
-      "val", Record [ "float_type", String "Plus_Infinity" ]
-    ]
-  | Const (Float Minus_infinity) ->
-    Record [
-      "type", String "Float";
-      "val", Record [ "float_type", String "Minus_infinity" ]
-    ]
-  | Const (Float Plus_zero) ->
-    Record [
-      "type", String "Float"; "val", Record [ "float_type", String "Plus_zero" ]
-    ]
-  | Const (Float Minus_zero) ->
-    Record [
-      "type", String "Float"; "val", Record [ "float_type", String "Minus_zero" ]
-    ]
-  | Const (Float NaN) ->
-    Record [
-      "type", String "Float"; "val", Record [ "float_type", String "NaN" ]
-    ]
-  | Const (Float (Float_number {float_sign;float_exp;float_mant;float_hex})) ->
-    Record [
-      "type", String "Float";
-      "val", Record [
-        "float_type", String "Float_value";
-        "float_sign", json_of_concrete_bv float_sign;
-        "float_exp", json_of_concrete_bv float_exp;
-        "float_mant", json_of_concrete_bv float_mant;
-        "float_hex", String float_hex
-      ]
+      "val", Record [ "float_type", json_of_float_value float_val ]
     ]
 
   | Apply (ls, args) ->
