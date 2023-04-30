@@ -145,18 +145,28 @@ let intro_var (knl, subst, mal) (vs, id) =
   let d = create_param_decl ls in
   (Mid.add_new clash_exn ls.ls_name d knl, subst, mal), d
 
-let pushed_attr_prefixes = ref ["expl:"; "hyp_name:"]
+let pushed_attr_filtered_prefixes = ref []
+let pushed_attr_unique_prefixes = ref [ "expl:"; "hyp_name:" ]
 
-let push_attributes_with_prefix s =
-  pushed_attr_prefixes := s :: !pushed_attr_prefixes
+let add_filtered_prefix s =
+  pushed_attr_filtered_prefixes := s :: !pushed_attr_filtered_prefixes
+
+let add_unique_prefix s =
+  pushed_attr_unique_prefixes := s :: !pushed_attr_unique_prefixes
 
 let pushed_attrs f =
+  let has_prefix a s = Strings.has_prefix s a.attr_string in
+  let attrs =
+    Sattr.filter
+      (fun a -> not (List.exists (has_prefix a) !pushed_attr_filtered_prefixes))
+      f.t_attrs
+  in
   let add_by_prefix a pushed =
-    let has_prefix s = Strings.has_prefix s a.attr_string in
-    match List.find_opt has_prefix !pushed_attr_prefixes with
+    match List.find_opt (has_prefix a) !pushed_attr_unique_prefixes with
     | Some s -> Mstr.add s a pushed
-    | None -> pushed in
-  Sattr.fold add_by_prefix f.t_attrs Mstr.empty
+    | None -> Mstr.add a.attr_string a pushed
+  in
+  Sattr.fold add_by_prefix attrs Mstr.empty
 
 (* Check if we already have a proposition with the same content.
    If we have a hash-consed one, and it is not yet used in the task,
