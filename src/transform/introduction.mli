@@ -63,7 +63,14 @@ val remove_unused_from_context: Task.task Trans.trans
    generation. Intended to be used by drivers for provers when no
    counterexamples are expected.  See also [prepare_for_counterexmp.ml]. *)
 
-val push_attributes_with_prefix : string -> unit
-(** [intros] preserves attributes with given prefixes (initially ["expl:"] and
-    ["hyp_name:"]) by pushing them through variables bindings. Custom attributes
-    prefixes can be added with this function. *)
+val add_filtered_prefix : string -> unit
+(** [intros] will push all attributes through variables bindings. Custom
+    attributes prefixes to be filtered can be added with this function *)
+
+val add_unique_prefix : string -> unit
+(** [intros] will push all attributes through variables bindings. However, we
+    don't always want to have two different attributes with the same prefix.
+    Custom attributes prefixes (initially ["expl:"] and ["hyp_name:"]) can be
+    added with this function. An attribute with a unique prefix will only be
+    pushed if an other attribute with the same prefix is not present in the
+    subterm. *)
