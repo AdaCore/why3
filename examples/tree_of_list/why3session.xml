@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="CVC5" version="1.0.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="tree_of_list.mlw"/>
@@ -12,43 +12,43 @@
  <goal name="tree_of_list_aux&#39;vc" expl="VC for tree_of_list_aux" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="tree_of_list_aux&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.04" steps="6401"/></proof>
+  <proof prover="1"><result status="valid" time="0.040000" steps="6401"/></proof>
   </goal>
   <goal name="tree_of_list_aux&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.05" steps="9259"/></proof>
+  <proof prover="1"><result status="valid" time="0.050000" steps="9259"/></proof>
   </goal>
   <goal name="tree_of_list_aux&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.05" steps="9326"/></proof>
+  <proof prover="1"><result status="valid" time="0.050000" steps="9326"/></proof>
   </goal>
   <goal name="tree_of_list_aux&#39;vc.3" expl="unreachable point" proved="true">
-  <proof prover="1"><result status="valid" time="0.07" steps="12247"/></proof>
+  <proof prover="1"><result status="valid" time="0.070000" steps="12247"/></proof>
   </goal>
   <goal name="tree_of_list_aux&#39;vc.4" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.07" steps="11931"/></proof>
+  <proof prover="1"><result status="valid" time="0.070000" steps="11931"/></proof>
   </goal>
   <goal name="tree_of_list_aux&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.07" steps="12062"/></proof>
+  <proof prover="1"><result status="valid" time="0.070000" steps="12062"/></proof>
   </goal>
   <goal name="tree_of_list_aux&#39;vc.6" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="tree_of_list_aux&#39;vc.6.0" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.18" steps="21932"/></proof>
+   <proof prover="3"><result status="valid" time="0.180000" steps="21932"/></proof>
    </goal>
    <goal name="tree_of_list_aux&#39;vc.6.1" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.09" steps="11115"/></proof>
+   <proof prover="3"><result status="valid" time="0.090000" steps="11115"/></proof>
    </goal>
    <goal name="tree_of_list_aux&#39;vc.6.2" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.39" steps="43378"/></proof>
+   <proof prover="3"><result status="valid" time="0.150066" steps="43378"/></proof>
    </goal>
    <goal name="tree_of_list_aux&#39;vc.6.3" expl="postcondition" proved="true">
    <transf name="split_vc" proved="true" >
     <goal name="tree_of_list_aux&#39;vc.6.3.0" expl="postcondition" proved="true">
-    <proof prover="1"><result status="valid" time="0.04" steps="7751"/></proof>
+    <proof prover="1"><result status="valid" time="0.040000" steps="7751"/></proof>
     </goal>
     <goal name="tree_of_list_aux&#39;vc.6.3.1" expl="postcondition" proved="true">
     <transf name="split_vc" proved="true" >
      <goal name="tree_of_list_aux&#39;vc.6.3.1.0" expl="postcondition" proved="true">
-     <proof prover="2"><result status="valid" time="0.37" steps="4082"/></proof>
+     <proof prover="2"><result status="valid" time="0.370000" steps="4082"/></proof>
      </goal>
     </transf>
     </goal>
@@ -59,7 +59,7 @@
  </transf>
  </goal>
  <goal name="tree_of_list&#39;vc" expl="VC for tree_of_list" proved="true">
- <proof prover="4"><result status="valid" time="0.08" steps="13989"/></proof>
+ <proof prover="4"><result status="valid" time="0.080000" steps="13989"/></proof>
  </goal>
 </theory>
 </file>
