@@ -1,7 +1,7 @@
 :x: marks a potential source of incompatibility
 
 MLCFG language
-  * `variant` clauses are supported with the `stackify` backend. 
+  * `variant` clauses are supported with the `stackify` backend.
   * `invariant` names are now optional and depreated.
 
 Tools
@@ -19,6 +19,9 @@ Tools
   * Statistics given by `why3 session info` have been restructured
     into separate statistics per session and overall statistics. See
     manual Section 5.5.1 "Command info" for details. :x:
+  * `why3 session`: new option `--mark-obsolete` for subcommand
+    `update`, together with selection of proof nodes via filters. See
+    manual Section 5.5.4.
 
 Provers
   * support for Coq 8.17.0 (released Mar 23, 2023)
