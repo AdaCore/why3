@@ -1,0 +1,16 @@
+
+  type t = < range 0 1 >
+  type s = { c3 : t }
+
+  let f (s0 : s) : int
+    requires { s0 = { c3 = (0 : t) } }
+    ensures { true }
+    = 1
+
+(*
+
+bug exposed with
+
+bin/why3 prove examples/bts/753.mlw -a split_vc -P cvc5
+
+*)
