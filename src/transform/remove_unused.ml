@@ -63,6 +63,15 @@ let add_dependency usymb l =
 
 (* The second step of the removal : transverse the task decls and keep
    only the ones we want *)
+
+let metas_keep_if_at_least_one_arg_is_used =
+  let open Theory in
+  List.fold_left
+    (fun acc mt -> Smeta.add mt acc)
+    Smeta.empty
+    [meta_range;
+     meta_float]
+
 let do_removal_unused_decl usymb (td : Theory.tdecl) : Theory.tdecl option =
   let open Ident in
   let open Decl in
@@ -70,7 +79,7 @@ let do_removal_unused_decl usymb (td : Theory.tdecl) : Theory.tdecl option =
   match td.td_node with
   | Meta (mt, [ MApr pr; MAls _ls ]) when meta_equal mt meta_depends ->
       if Sid.mem pr.pr_name usymb.used_ids then Some td else None
-  | Meta (_, margs) ->
+  | Meta (mt, margs) ->
       let kept_arg = function
         | MApr pr -> Sid.mem pr.pr_name usymb.used_ids
         | MAty ty ->
@@ -80,6 +89,9 @@ let do_removal_unused_decl usymb (td : Theory.tdecl) : Theory.tdecl option =
         | MAls ls -> Sid.mem ls.Term.ls_name usymb.used_ids
         | MAstr _ | MAint _ | MAid _ -> true
       in
+      if Smeta.mem mt metas_keep_if_at_least_one_arg_is_used then
+        if List.exists kept_arg margs then Some td else None
+      else
       if List.for_all kept_arg margs then Some td else None
   | Use _ | Clone _ -> Some td
   | Decl d -> (
@@ -89,17 +101,8 @@ let do_removal_unused_decl usymb (td : Theory.tdecl) : Theory.tdecl option =
       | Ddata _ | Dlogic _ | Dtype _ | Dparam _ | Dind _ ->
           if Sid.is_empty (Sid.inter d.d_news usymb.used_ids) then None
           else Some td)
-(*
-let metas_remove =
-  let open Theory in
-  List.fold_left
-    (fun acc mt -> Smeta.add mt acc)
-    Smeta.empty
-    [meta_depends ;
-     Printer.meta_remove_prop;
-     Printer.meta_remove_logic;
-     Printer.meta_remove_type]
-*)
+
+
 (* The first step of the removal : compute the used identifiers *)
 let rec compute_used_ids usymb task : used_symbols =
   let open Theory in
@@ -111,24 +114,6 @@ let rec compute_used_ids usymb task : used_symbols =
       let usymb =
         match td.td_node with
         | Use _ | Clone _ | Meta _ -> usymb
-          (*
-        | Meta (mt, _) when Smeta.mem mt metas_remove -> usymb
-        | Meta (_, margs) ->
-            let used_ids =
-              List.fold_left
-                (fun acc arg ->
-                   match arg with
-                   | MApr pr -> Sid.add pr.pr_name acc
-                   | MAty ty ->
-                       let s = Decl.get_used_syms_ty ty in
-                       Sid.union s acc
-                   | MAts ts -> Sid.add ts.Ty.ts_name acc
-                   | MAls ls -> Sid.add ls.Term.ls_name acc
-                   | MAstr _ | MAint _ | MAid _ -> acc)
-                usymb.used_ids margs
-            in
-            { usymb with used_ids }
-*)
         | Decl d ->
             begin
             match d.d_node with
