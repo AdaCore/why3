@@ -1517,6 +1517,26 @@ contents, depending on the following specific options.
    rename the file *<src>* to *<dst>* in the session. The file *<src>*
    itself is also renamed to *<dst>* in your filesystem.
 
+.. option:: --mark-obsolete
+
+   marks as obsolete all the proof attempts of the session. If a filter is provided by the options below, then only the proof attempts that match the filters are affected.
+
+.. option:: --filter-prover=[<name>[,<version>[,<alternative>]]|<id>]
+
+   selects proof attempts with this or these prover(s)
+
+.. option:: --filter-obsolete[=[yes|no]]
+
+   select only (non-)obsolete proofs
+
+.. option:: --filter-proved[=[yes|no]]
+
+   select only proofs below (non-)proved goals
+
+.. option:: --filter-status=[valid|invalid|highfailure]
+
+   select proofs attempts with the given status
+
 .. why3:tool:: doc
 .. _sec.why3doc:
 
