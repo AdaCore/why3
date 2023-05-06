@@ -87,15 +87,16 @@ let get p =
   (f, b lsr bits_col, b land mask_col, e lsr bits_col, e land mask_col)
 
 let sexp_of_expanded_position _ = assert false  [@@warning "-32"]
-(* default value if the line below does not produce anything, i.e.,
+let expanded_position_of_sexp _ = assert false  [@@warning "-32"]
+(* default values if the line below does not produce anything, i.e.,
    when ppx_sexp_conv is not installed *)
 
 type expanded_position = string * int * int * int * int  [@@warning "-34"]
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 let sexp_of_position loc =
   let eloc = get loc in sexp_of_expanded_position eloc
-                          [@@warning "-32"]
+[@@warning "-32"]
 
 let dummy_position =
   let tag = FileTags.get_file_tag "" in
@@ -270,6 +271,13 @@ let user_position f bl bc el ec =
   { pos_file_tag = tag;
     pos_start = (bl lsl bits_col) lor bc;
     pos_end = (el lsl bits_col) lor ec }
+
+
+let position_of_sexp sexp =
+  let (s,bl,bc,el,ec) = expanded_position_of_sexp sexp in
+  user_position s bl bc el ec
+                          [@@warning "-32"]
+
 
 let extract (b,e) =
   let f = b.pos_fname in
