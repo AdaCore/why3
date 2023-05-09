@@ -52,8 +52,6 @@ val next () : elt
 let space_saving_2 ()
   requires { n = 0 }
   diverges
-  ensures  { s[0] = s[0] } (* <- otherwise Why3 complains about s not *)
-                           (*    appearing in the specification       *)
 = let ref x1 = dummy in
   let ref n1 = 0 in
   let ref x2 = dummy in
