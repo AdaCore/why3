@@ -1,0 +1,80 @@
+
+(** Space-Saving Algorithm
+
+  This is an online algorithm to find out frequent elements in a data
+  stream. Say we want to detect an element occurring more than N/2 times
+  in a stream of N elements. We maintain two values (x1 and x2) and two
+  counters (n1 and n2). If the next value is x1 or x2, we increment the
+  corresponding counter. Otherwise, we replace the value with the smallest
+  counter with the next value, *and we increment the corresponding counter*.
+  If the stream contains a value occurring more than N/2 times, it is
+  guaranteed to be eother x1 or x2.
+
+  The algorithm is described here (generalized to k values being monitored):
+
+    Metwally, A., Agrawal, D., El Abbadi, A.
+    Efficient Computation of Frequent and Top-k Elements in Data Streams.
+    ICDT 2005. LNCS vol 3363.
+
+  See also mjrty.mlw for a related algorithm.
+*)
+
+use int.Int
+use int.MinMax
+use seq.Seq
+use seq.Occ
+
+(** The elements of the stream. The only thing we can do is to test
+    elements for equality. *)
+type elt
+
+val (=) (x y: elt) : bool
+  ensures { result <-> x = y }
+
+(** We introduce a dummy value in order to initialize variables in the code. *)
+val constant dummy: elt
+
+(** We model an online algorithm with a sequence `s` (whose length is unknown,
+    so it is arbitrarily long) and a function `next` to get the next element
+    from the stream. The reference `n` is the number of elements retrieved so
+    far. *)
+val ghost s: seq elt
+  ensures { forall i. 0 <= i < length result -> result[i] <> dummy }
+
+val ghost ref n: int
+
+val next () : elt
+  requires { n >= 0 }
+  writes   { n }
+  ensures  { n = old n + 1 }
+  ensures  { result = s[old n] <> dummy }
+
+let space_saving_2 ()
+  requires { n = 0 }
+  diverges
+= let ref x1 = dummy in
+  let ref n1 = 0 in
+  let ref x2 = dummy in
+  let ref n2 = 0 in
+  while true do
+    invariant { n1 + n2 = n >= 0 }
+    invariant { 0 <= occ x1 s 0 n <= n1 }
+    invariant { 0 <= occ x2 s 0 n <= n2 }
+    invariant { if n1 = 0 then x1 = dummy else x1 <> dummy }
+    invariant { if n2 = 0 then x2 = dummy else x2 <> dummy }
+    invariant { n1 > 0 -> n2 > 0 -> x1 <> x2 }
+    invariant { forall y. y <> x1 -> y <> x2 -> occ y s 0 n <= min n1 n2 }
+    (* 1. We show that the desired property is a consequence of the
+       invariants above: any frequent value v (i.e. occurring strictly
+       more than min(n1, n2) times) is either x1 or x2. *)
+    assert { [@expl:thm] forall v. occ v s 0 n > min n1 n2 -> v = x1 || v = x2 };
+    (* and beside, we have min(n1, n2) <= n/2 (from the first invariant)
+       so any value occurring >n/2 times is either x1 or x2. *)
+    assert { [@expl:thm] forall v. 2 * occ v s 0 n > n -> v = x1 || v = x2 };
+    (* 2. Read the next value and update the state. *)
+    let x = next () in
+    if x = x1 then n1 <- n1 + 1
+    else if x = x2 then n2 <- n2 + 1
+    else if n1 <= n2 then (x1 <- x; n1 <- n1 + 1)
+                     else (x2 <- x; n2 <- n2 + 1)
+  done
