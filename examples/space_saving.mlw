@@ -21,8 +21,7 @@
 
 use int.Int
 use int.MinMax
-use seq.Seq
-use seq.Occ
+use map.Occ
 
 (** The elements of the stream. The only thing we can do is to test
     elements for equality. *)
@@ -34,12 +33,11 @@ val (=) (x y: elt) : bool
 (** We introduce a dummy value in order to initialize variables in the code. *)
 val constant dummy: elt
 
-(** We model an online algorithm with a sequence `s` (whose length is unknown,
-    so it is arbitrarily long) and a function `next` to get the next element
-    from the stream. The reference `n` is the number of elements retrieved so
-    far. *)
-val ghost s: seq elt
-  ensures { forall i. 0 <= i < length result -> result[i] <> dummy }
+(** We model an online algorithm with a stream `s` of elements
+    and a function `next` to get the next element from the stream.
+    The reference `n` is the number of elements retrieved so far. *)
+val ghost s: int -> elt
+  ensures { forall i. result i <> dummy }
 
 val ghost ref n: int
 
@@ -47,7 +45,7 @@ val next () : elt
   requires { n >= 0 }
   writes   { n }
   ensures  { n = old n + 1 }
-  ensures  { result = s[old n] <> dummy }
+  ensures  { result = s (old n) <> dummy }
 
 let space_saving_2 ()
   requires { n = 0 }
