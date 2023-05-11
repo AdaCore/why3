@@ -40,6 +40,7 @@ type reason =
    | VC_Loop_Invariant_Preserv
    | VC_Loop_Variant
    | VC_Subprogram_Variant
+   | VC_Termination_Check
    | VC_Assert
    | VC_Assert_Premise
    | VC_Assert_Step
@@ -103,6 +104,7 @@ let is_warning_reason r =
    | VC_Loop_Invariant_Preserv
    | VC_Loop_Variant
    | VC_Subprogram_Variant
+   | VC_Termination_Check
    | VC_Assert
    | VC_Assert_Premise
    | VC_Assert_Step
@@ -215,6 +217,7 @@ let reason_from_string s =
    | "VC_LOOP_INVARIANT_PRESERV"    -> VC_Loop_Invariant_Preserv
    | "VC_LOOP_VARIANT"              -> VC_Loop_Variant
    | "VC_SUBPROGRAM_VARIANT"        -> VC_Subprogram_Variant
+   | "VC_TERMINATION_CHECK"         -> VC_Termination_Check
    | "VC_ASSERT"                    -> VC_Assert
    | "VC_ASSERT_PREMISE"            -> VC_Assert_Premise
    | "VC_ASSERT_STEP"               -> VC_Assert_Step
@@ -283,6 +286,7 @@ let reason_to_ada reason =
    | VC_Loop_Invariant_Preserv    -> "VC_LOOP_INVARIANT_PRESERV"
    | VC_Loop_Variant              -> "VC_LOOP_VARIANT"
    | VC_Subprogram_Variant        -> "VC_SUBPROGRAM_VARIANT"
+   | VC_Termination_Check         -> "VC_TERMINATION_CHECK"
    | VC_Assert                    -> "VC_ASSERT"
    | VC_Assert_Premise            -> "VC_ASSERT_PREMISE"
    | VC_Assert_Step               -> "VC_ASSERT_STEP"
@@ -346,6 +350,7 @@ let reason_to_string reason =
    | VC_Loop_Invariant_Preserv    -> "loop_invariant_preserv"
    | VC_Loop_Variant              -> "loop_variant"
    | VC_Subprogram_Variant        -> "subprogram_variant"
+   | VC_Termination_Check         -> "termination_check"
    | VC_Assert                    -> "assert"
    | VC_Assert_Premise            -> "assert_premise"
    | VC_Assert_Step               -> "assert_step"
