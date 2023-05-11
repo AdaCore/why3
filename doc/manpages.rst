@@ -1521,6 +1521,10 @@ contents, depending on the following specific options.
 
    marks as obsolete all the proof attempts of the session. If a filter is provided by the options below, then only the proof attempts that match the filters are affected.
 
+.. option:: --remove-proofs
+
+   removes all the proof attempts. If a filter is provided by the options below, then only the proof attempts that match the filters are affected.
+
 .. option:: --filter-prover=[<name>[,<version>[,<alternative>]]|<id>]
 
    selects proof attempts with this or these prover(s)

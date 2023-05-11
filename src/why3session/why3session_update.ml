@@ -15,6 +15,7 @@ open Why3session_lib
 type action =
   | RenameFile of string * string
   | MarkObsolete (* optionally with given prover filter *)
+  | RemoveProofs
 
 let actions = ref ([] : action list)
 
@@ -26,6 +27,9 @@ let spec_update =
     KLong "mark-obsolete",
     Hnd0 (fun () -> actions := MarkObsolete :: !actions),
     " mark proofs (specified as filters below) as obsolete";
+    KLong "remove-proofs",
+    Hnd0 (fun () -> actions := RemoveProofs :: !actions),
+    " delete proofs (specified as filters below)";
   ] @ Why3session_lib.filter_spec
 
 let do_action ~config ~env ~session action =
@@ -50,6 +54,16 @@ let do_action ~config ~env ~session action =
              Session_itp.print_proofAttemptID id;
 *)
            Session_itp.mark_obsolete session id)
+  | RemoveProofs ->
+      let (f,e) = Why3session_lib.read_filter_spec config in
+      if e then exit 1;
+      Why3session_lib.session_iter_proof_attempt_by_filter
+        session f
+        (fun _ pa_node ->
+          let open Session_itp in
+          let parent =  pa_node.parent in
+          let prover = pa_node.prover in
+          remove_proof_attempt session parent prover)
 
 let run_update () =
   let config,env = Whyconf.Args.complete_initialization () in
