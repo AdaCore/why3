@@ -18,7 +18,7 @@ type attribute = {
   attr_string : string;
   attr_tag    : int;
 }
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 module Attr = MakeMSH (struct
   type t = attribute

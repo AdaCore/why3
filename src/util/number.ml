@@ -17,34 +17,34 @@ let debug_float = Debug.register_info_flag "float"
 
 (** Construction *)
 type int_value = BigInt.t
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 type int_literal_kind =
   ILitUnk | ILitDec | ILitHex | ILitOct | ILitBin
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 type int_constant = {
   il_kind : int_literal_kind;
   il_int  : BigInt.t;
 }
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 type real_value = {
   rv_sig  : BigInt.t;
   rv_pow2 : BigInt.t;
   rv_pow5 : BigInt.t;
 }
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 type real_literal_kind =
   RLitUnk | RLitDec of int | RLitHex of int
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 type real_constant = {
   rl_kind : real_literal_kind;
   rl_real : real_value
 }
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 let compare_real ?(structural=true) { rv_sig = s1; rv_pow2 = p21; rv_pow5 = p51 }
                                     { rv_sig = s2; rv_pow2 = p22; rv_pow5 = p52 } =
@@ -404,7 +404,7 @@ type int_range = {
   ir_lower : BigInt.t;
   ir_upper : BigInt.t;
 }
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 let create_range lo hi =
   { ir_lower = lo;
@@ -426,7 +426,7 @@ type float_format = {
   fp_exponent_digits    : int;
   fp_significand_digits : int; (* counting the hidden bit *)
 }
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 exception NonRepresentableFloat of real_constant
 

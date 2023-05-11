@@ -273,6 +273,10 @@ LIB_EXTRACT = mltree compile mlinterp pdriver ml_printer \
 LIB_PARSER = ptree ptree_helpers glob typing \
 		parser_messages parser typing report lexer mlw_printer
 
+ifeq (@enable_sexp@,yes)
+LIB_PARSER += sexp_parser
+endif
+
 LIB_TRANSFORM = simplify_formula inlining split_goal \
 		args_wrapper reduction_engine compute \
 		remove_unused detect_polymorphism \
@@ -368,9 +372,9 @@ src/session/compress.ml: src/session/compress_none.ml Makefile
 	$(CMP_CP)
 endif
 
-# pp_sexp_conv
+# sexp_conv
 
-ifeq (@enable_pp_sexp@, yes)
+ifeq (@enable_sexp@, yes)
 src/util/mysexplib.ml: src/util/mysexplib-real.ml Makefile
 	$(CMP_CP)
 src/tools/why3pp_sexp.ml: src/tools/why3pp_sexp-real.ml Makefile

@@ -25,7 +25,7 @@ So far, line numbers start with 1 and column number start with 0. [FIXME]
 *)
 
 type position
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 val user_position : string -> int -> int -> int -> int -> position
 (** [user_position f bl bc el ec] builds the source position for file
