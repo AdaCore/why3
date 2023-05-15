@@ -515,7 +515,13 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       DTconst (c, dty_of_pty ns pty)
   | Ptree.Tcast (e1, pty) ->
       let d1 = dterm ns km crcmap gvars at denv e1 in
-      DTcast (d1, dty_of_pty ns pty))
+      DTcast (d1, dty_of_pty ns pty)
+  | Ptree.Teps (x, pty, e) ->
+      let id = create_user_id x in
+      let pty = dty_of_pty ns pty in
+      let denv = denv_add_var denv id pty in
+      let e = dterm ns km crcmap gvars at denv e in
+      DTeps (id, pty, e))
 
 let no_gvars at q = match at with
   | Some _ -> Loc.errorm ~loc:(qloc q)
@@ -906,7 +912,7 @@ let rec eff_dterm muc denv {term_desc = desc; term_loc = loc} =
   | Ptree.Tidapp _ | Ptree.Tconst _ | Ptree.Tinfix _ | Ptree.Tinnfix _
   | Ptree.Ttuple _ | Ptree.Tlet _ | Ptree.Tcase _ | Ptree.Tif _
   | Ptree.Ttrue | Ptree.Tfalse | Ptree.Tnot _ | Ptree.Tbinop _ | Ptree.Tbinnop _
-  | Ptree.Tquant _ | Ptree.Trecord _ | Ptree.Tupdate _ ->
+  | Ptree.Tquant _ | Ptree.Trecord _ | Ptree.Tupdate _ | Ptree.Teps _ ->
       Loc.errorm ~loc "unsupported effect expression")
 
 let tick_lemma id =
