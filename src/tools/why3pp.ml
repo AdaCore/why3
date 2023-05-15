@@ -305,6 +305,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     | Tattr _ -> failwith "pp_term: attr"
     | Tat _ -> failwith "pp_term: at"
     | Tasref _ -> failwith "pp_term: asref"
+    | Teps _ -> failwith "pp_term: teps"
 
   let pp_rule fmt (id, terms) : unit =
     match List.rev terms with

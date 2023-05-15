@@ -161,6 +161,12 @@ and term_desc =
   (** if-expression *)
   | Tquant of Dterm.dquant * binder list * term list list * term
   (** quantified formulas. The third argument is a list of triggers. *)
+  | Teps of ident * pty * term
+  (** [Teps(x,ty,f)] denotes the epsilon term "any [x] of type [ty]
+     that satisfies [f]".  Use with caution since if there is no such
+     [x] satisfying [f], then it acts like introducing an inconsistent
+     axiom. (As a matter of fact, this is the reason why there is no
+     concrete syntax for such epsilon-terms.) *)
   | Tattr of attr * term
   (** term annotated with an attribute *)
   | Tlet of ident * term * term
@@ -180,6 +186,7 @@ and term_desc =
   | Tat of term * ident
   (** "at" modifier. The "old" modifier is a particular case with
      the identifier [Dexpr.old_label]  *)
+
 [@@deriving sexp]
 
 (** {2 Program expressions} *)
