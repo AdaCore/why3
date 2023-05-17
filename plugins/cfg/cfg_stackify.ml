@@ -62,15 +62,30 @@ let () =
 
 let mk_loop_continue entry : Ptree.expr = mk_expr ~loc:entry.id_loc (Eraise (Qident entry, None))
 
+
+(* copied from ocaml stdlib implementation, as it's not available in 4.11 *)
+type ('a, 'b) either = Left of 'a | Right of 'b
+
+let partition_map p l =
+  let rec part left right = function
+  | [] -> (List.rev left, List.rev right)
+  | x :: l ->
+     begin match p x with
+       | Left v -> part (v :: left) right l
+       | Right v -> part left (v :: right) l
+     end
+  in
+  part [] [] l
+
 let mk_loop_expr entry (invariants : (loop_clause * ident option * term) list) (e : Ptree.expr) : Ptree.expr =
   let continue = mk_expr ~loc:Loc.dummy_position (Eoptexn (entry, Ity.MaskVisible, e)) in
   let invariants, variants =
-    List.partition_map
+    partition_map
       (fun (claus, id, t) ->
         if id <> None then
           Loc.warning ~loc:t.term_loc ~id:warn_deprecated_named_invariant  "Named invariants are deprecated. Please use the `hyp_name` attribute directly";
 
-        match claus with Invariant -> Either.Left t | Variant -> Either.Right (t, None))
+        match claus with Invariant -> Left t | Variant -> Right (t, None))
       invariants
   in
   let infinite_loop =

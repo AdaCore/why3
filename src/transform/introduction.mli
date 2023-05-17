@@ -32,6 +32,8 @@ val intros :
  (** [intros ?known_map G f] returns the declarations after introducing
      premises of [goal G : f] *)
 
+val simplify_intros : Task.task Trans.trans
+
 val introduce_premises : Task.task Trans.trans
 (** [introduce_premises] pushes the universal quantifications, the
    implications and the let bindings of the goal into the context,
@@ -69,10 +71,6 @@ val add_filtered_prefix : string -> unit
 
 val split_vc: Task.task Trans.tlist
 
-val push_attributes_with_prefix : string -> unit
-(** [intros] preserves attributes with given prefixes (initially ["expl:"] and
-    ["hyp_name:"]) by pushing them through variables bindings. Custom attributes
-    prefixes can be added with this function. *)
 val add_unique_prefix : string -> unit
 (** [intros] will push all attributes through variables bindings. However, we
     don't always want to have two different attributes with the same prefix.

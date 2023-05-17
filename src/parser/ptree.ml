@@ -181,7 +181,6 @@ and term_desc =
   (** record expressions *)
   | Tupdate of term * (qualid * term) list
   (** record update expression *)
-  | Teps of (ident * pty) * term
   | Tscope of qualid * term
   (** local scope *)
   | Tat of term * ident

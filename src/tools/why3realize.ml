@@ -12,9 +12,6 @@
 open Format
 open Why3
 
-(* Ignore unused variables in why3realize too *)
-let () = Debug.set_flag Dterm.debug_ignore_unused_var
-
 let usage_msg =
   "-D <driver> -o <dir> -T <theory> ...\n\
    Output realization skeletons for the given theories or update them."

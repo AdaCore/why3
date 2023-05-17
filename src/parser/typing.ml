@@ -468,12 +468,6 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       let trl = List.map (List.map dterm) trl in
       let e1 = dterm e1 in
       DTquant (q, qvl, trl, e1)
-  | Ptree.Teps ((x, ty), e1) ->
-      let id = create_user_id x in
-      let dty = dty_of_ty (ty_of_pty ns ty) in
-      let denv = denv_add_quant denv [(Some id, dty, None)] in
-      let e1 = dterm ns km crcmap gvars at denv e1 in
-      DTeps (id, dty, e1)
   | Ptree.Trecord fl ->
       let get_val _cs pj = function
         | Some e -> dterm ns km crcmap gvars at denv e

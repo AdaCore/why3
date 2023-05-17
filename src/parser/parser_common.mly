@@ -768,8 +768,8 @@ single_term_:
       Tquant ($1, l, $3, $5) }
 | FUN binders ARROW term
     { Tquant (Dterm.DTlambda, $2, [], $4) }
-| EPSILON eps_var DOT term
-    { Teps ($2, $4) }
+| EPSILON
+    { Loc.errorm "Epsilon terms are currently not supported in WhyML" }
 | attr single_term %prec prec_attr
     { Tattr ($1, $2) }
 | single_term cast
@@ -843,9 +843,6 @@ match_cases(X):
 
 quant_vars:
 | binder_var+ cast? { List.map (fun (l,i) -> l, i, false, $2) $1 }
-
-eps_var:
-| attrs(lident) cast { ($1, $2) }
 
 triggers:
 | (* epsilon *)                                                         { [] }

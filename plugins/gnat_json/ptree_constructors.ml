@@ -199,7 +199,7 @@ module T = struct
   let mk_at ?loc t id =
     mk ?loc (Tat (t, id))
   let mk_eps ?loc id pty t =
-    mk ?loc (Teps ((id, pty), t))
+    mk ?loc (Teps (id, pty, t))
   let mk_quant ?loc quant binders triggers term =
     mk ?loc (Tquant (quant, binders, triggers, term))
   let name_term name t =

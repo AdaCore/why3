@@ -913,9 +913,7 @@ and pp_term ~attr =
         fprintf fmt "%aold %a" pp_maybe_marker id_loc (pp_term ~attr).closed t
     | Tat (t, id) ->
         fprintf fmt "%a at %a" (pp_term ~attr).closed t (pp_id ~attr) id
-    | Teps ((id, pty), t) ->
-        fprintf fmt "@[<v2>epsilon %a: %a.@ %a@]" (pp_id ~attr) id
-          (pp_pty ~attr).marked pty (pp_term ~attr).marked t in
+  in
   let marked fmt t = pp_maybe_marked (fun t -> t.term_loc) raw fmt t in
   let closed fmt = pp_closed term_closed marked fmt in
   { closed; marked }

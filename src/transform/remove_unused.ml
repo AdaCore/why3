@@ -184,7 +184,7 @@ let rec compute_used_ids usymb task : used_symbols =
                 else
                   let def_ids = defined_ids d in
                   Sid.fold (fun x acc -> add_dep acc x ids) def_ids usymb
-              )
+            end
       in
       compute_used_ids usymb ta
 
