@@ -713,7 +713,7 @@ As long as ``s`` is not empty and its head is not zero, it increments
         ensures { ... same postcondition as in search_list ... }
       = let i = ref 0 in
         let s = ref l in
-        while !s <> Nil && head !s <> 0 do
+        while not (is_nil !s) && head !s <> 0 do
           invariant { ... }
           variant   { !s }
           i := !i + 1;
