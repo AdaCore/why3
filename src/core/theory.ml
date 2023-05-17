@@ -16,6 +16,9 @@ open Ty
 open Term
 open Decl
 
+let warn_clone_not_abstract =
+  Loc.register_warning "clone_not_abstract" "Warn about theories cloned without substituting any abstract symbols."
+
 (** Namespace *)
 
 type namespace = {
@@ -501,6 +504,9 @@ let create_decl d = mk_tdecl (Decl d)
 
 let print_id fmt id = Ident.print_decoded fmt id.id_string
 
+let warn_axiom_abstract =
+  Loc.register_warning "axiom_abstract" "Warn about axioms that are free of abstract symbols."
+
 let warn_dubious_axiom uc k _ syms =
   match k with
   | Plemma | Pgoal -> ()
@@ -514,7 +520,7 @@ let warn_dubious_axiom uc k _ syms =
           | _ -> ())
         syms;
 (*
-      Warning.emit ?loc:p.id_loc
+      Loc.warning ~id:warn_axiom_abstract ?loc:p.id_loc
         "@[axiom %s does not contain any local abstract symbol@ \
           (contains: @[%a@])@]" p.id_string
         (Pp.print_list Pp.comma print_id) (Sid.elements syms)
@@ -870,7 +876,7 @@ let warn_clone_not_abstract loc th =
         end
       | _ -> ()
     ) th.th_decls;
-    Loc.warning ~loc "cloned theory %a.%s does not contain \
+    Loc.warning ~id:warn_clone_not_abstract ~loc "cloned theory %a.%s does not contain \
         any abstract symbol; it should be used instead"
       (Pp.print_list (Pp.constant_string ".") Pp.string) th.th_path
       th.th_name.id_string

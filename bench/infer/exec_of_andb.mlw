@@ -1,0 +1,46 @@
+
+use export ref.Ref
+use export bool.Bool
+use export int.Int
+
+val rand () : bool
+
+val m : ref bool
+
+val x0 : ref bool
+
+val x1 : ref bool
+
+val x2 : ref bool
+
+val x3 : ref bool
+
+val x4 : ref bool
+
+val y : ref bool
+
+
+let main [@bddinfer] ()
+  requires { ((!x3) = True) }
+  requires { ((!m) = False) }
+  requires { ((!y) = False) }
+  requires { ((!x2) = False) }
+  requires { ((!x1) = False) }
+  requires { ((!x4) = True) }
+  requires { ((!x0) = False) }
+  diverges
+  =
+   while andb
+             ((not ((!x0))))
+             (andb
+                  ((not ((!x1))))
+                  (andb ((not ((!x2)))) (andb ((!x3)) ((!x4)))))
+   do
+	let _tmp = andb
+                         (orb ((!x0)) ((!y)))
+                         (andb
+                              ((not ((!m))))
+			      ( not !m)) in
+
+      x0 := rand ()
+   done

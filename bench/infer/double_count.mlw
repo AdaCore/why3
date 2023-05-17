@@ -1,0 +1,23 @@
+
+use bool.Bool
+
+use int.Int
+
+val ref t0 : int
+val ref t1 : int
+
+val randomb () : bool
+
+let test [@bddinfer] ()
+  diverges
+  =
+  t0 <- 0;
+  t1 <- 0;
+
+  while true do
+    if t0 <= 30 then
+      t0 <- t0 + 1
+    else
+      t1 <- t1 + 1
+
+done

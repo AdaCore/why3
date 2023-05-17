@@ -87,15 +87,16 @@ let get p =
   (f, b lsr bits_col, b land mask_col, e lsr bits_col, e land mask_col)
 
 let sexp_of_expanded_position _ = assert false  [@@warning "-32"]
-(* default value if the line below does not produce anything, i.e.,
+let expanded_position_of_sexp _ = assert false  [@@warning "-32"]
+(* default values if the line below does not produce anything, i.e.,
    when ppx_sexp_conv is not installed *)
 
 type expanded_position = string * int * int * int * int  [@@warning "-34"]
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 let sexp_of_position loc =
   let eloc = get loc in sexp_of_expanded_position eloc
-                          [@@warning "-32"]
+[@@warning "-32"]
 
 let dummy_position =
   let tag = FileTags.get_file_tag "" in
@@ -140,15 +141,104 @@ let default_hook ?loc s =
 let warning_hook = ref default_hook
 let set_warning_hook = (:=) warning_hook
 
-let warning ?loc p =
-  let open Format in
-  let b = Buffer.create 100 in
-  let fmt = formatter_of_buffer b in
-  pp_set_margin fmt 1000000000;
-  pp_open_box fmt 0;
-  let handle fmt =
-    pp_print_flush fmt (); !warning_hook ?loc (Buffer.contents b) in
-  kfprintf handle fmt p
+type warning_id = string
+
+type warning = { descr: Pp.formatted ; mutable enabled : bool }
+
+let warning_table : (warning_id, warning) Hashtbl.t = Hashtbl.create 17
+
+exception UnknownWarning of warning_id
+
+let lookup_flag (s : warning_id) : warning =
+  try Hashtbl.find warning_table s with Not_found -> raise (UnknownWarning s)
+
+let unset_flag s = s.enabled <- false
+
+let register_warning name (descr : Pp.formatted) =
+  if Hashtbl.mem warning_table name then
+    name
+  else begin
+    Hashtbl.replace warning_table name { descr; enabled = true };
+    name
+  end
+
+let warn_unknown_warning =
+  register_warning "unknown_warning" "Warn about unknown warning flags."
+
+let warning_active id =
+  match id with
+  | None -> true
+  | Some id -> (Hashtbl.find warning_table id).enabled
+
+let without_warning name inner =
+  let old = Hashtbl.find warning_table name in
+  if not old.enabled then inner ()
+  else
+    try
+      old.enabled <- false;
+      let res = inner () in
+      old.enabled <- true;
+      res
+    with e when not (Debug.test_flag Debug.stack_trace) ->
+      old.enabled <- true;
+      raise e
+
+let warning ?id ?loc p =
+    let open Format in
+    let b = Buffer.create 100 in
+    let fmt = formatter_of_buffer b in
+    pp_set_margin fmt 1000000000;
+    pp_open_box fmt 0;
+    let handle fmt =
+      pp_print_flush fmt (); !warning_hook ?loc (Buffer.contents b) in
+    if warning_active id then kfprintf handle fmt p else ifprintf fmt p
+
+module Args = struct
+  open Getopt
+
+  type spec = key * handler * doc
+
+  let desc_warning_list, option_list =
+    let opt_list_flags = ref false in
+    let desc =
+      KLong "list-warning-flags", Hnd0 (fun () -> opt_list_flags := true),
+      " list warnings" in
+    let list () =
+      if !opt_list_flags then begin
+        let list : (_ * _) list =
+          Hashtbl.fold (fun s (desc) acc -> (s,desc.descr)::acc)
+            warning_table [] in
+        let print fmt (p,desc) =
+          Format.fprintf fmt "@[%s@\n  @[%a@]@]"
+            p
+            Pp.formatted desc
+        in
+        Format.printf "@[<v>%a@]@."
+          (Pp.print_list Pp.newline print)
+          (List.sort Stdlib.compare list);
+      end;
+      !opt_list_flags in
+    desc,list
+
+  let opt_list_flags = Queue.create ()
+
+  let add_flag s = Queue.add s opt_list_flags
+
+  let desc_no_warn =
+    KLong "warn-off", Hnd1 (AList (',', AString), fun l -> List.iter add_flag l),
+    "<flag>,... set some warning flags"
+
+  let set_flags_selected ?(silent=false) () =
+    let check flag =
+      match lookup_flag flag with
+      | f -> unset_flag f
+      | exception UnknownWarning _ when silent -> ()
+      | exception UnknownWarning _ ->
+          warning ~id:warn_unknown_warning "unknown warning flag `%s'" flag in
+    Queue.iter check opt_list_flags
+end
+
+
 
 (* user positions *)
 
@@ -183,6 +273,12 @@ let user_position f bl bc el ec =
   { pos_file_tag = tag;
     pos_start = (bl lsl bits_col) lor bc;
     pos_end = (el lsl bits_col) lor ec }
+
+
+let position_of_sexp sexp =
+  let (s,bl,bc,el,ec) = expanded_position_of_sexp sexp in
+  user_position s bl bc el ec
+                          [@@warning "-32"]
 
 
 let extract (b,e) =

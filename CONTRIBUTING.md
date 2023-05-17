@@ -60,6 +60,12 @@ For example to run the 'good file' tests, use:
 ./bench/bench -only goodfiles
 ```
 
+## Gitlab CI
+
+Every new commit pushed on the gitlab repository invokes an continuous
+integration check. The description on how to upgrade this CI procedure
+is specifically done in `misc/ci.md`
+
 ## Adding new test suites
 
 To add a new directory of tests add a new line in `bench/bench`. The suite should be added to the relevant block, which is determined by the kind of assertion it performs. For example, if you wished to add a set of files which should successfully prove, add a line like `goods path/to/tests` to the appropriate block.
@@ -68,7 +74,11 @@ Certain tests, those in `examples/`, `examples/bts`, `examples/programs` and `ex
 
 ## Nightly CI
 
-Every night, the latest master is tested against a series of standard configurations, on Moloch (`moloch.lri.fr`). This ensures that regressions are caught across a wide array of different prover versions and families. The results of Nightly CI are emailed in the `why3-commits@lists.gforge.inria.fr` mailing list each morning.
+Every night, the latest master is tested against a series of standard
+configurations, on Moloch (`moloch.lri.fr`). This ensures that
+regressions are caught across a wide array of different prover
+versions and families. The results of Nightly CI are emailed to a set
+of selected developers emails each morning.
 
 If you require access to Moloch in order to update sessions or test a new prover, ask one of the maintainers for help.
 
@@ -129,7 +139,7 @@ under Linux using `perf`. A typical usage is
 perf record --call-graph=dwarf -- why3 command <options> <arguments>
 perf report
 ```
-Note that perf may complain you don't have enough priviledges. A typical configuration change required is, for the sssion only, execute
+Note that perf may complain you don't have enough priviledges. A typical configuration change required is, for the session only, execute
 ```
 sysctl kernel.perf_event_paranoid=2
 ```

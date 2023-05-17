@@ -2,14 +2,15 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Z3" version="4.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="CVC5" version="1.0.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="three_idem_ring.mlw"/>
 <theory name="Top" proved="true">
  <goal name="mul&#39;vc" expl="VC for mul" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="698"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="595"/></proof>
  </goal>
  <goal name="Exponentiation.Assoc" proved="true">
  <proof prover="4"><result status="valid" time="0.01" steps="668"/></proof>
@@ -21,16 +22,16 @@
  <proof prover="4"><result status="valid" time="0.01" steps="759"/></proof>
  </goal>
  <goal name="Exponentiation.Power_0" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="872"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="839"/></proof>
  </goal>
  <goal name="Exponentiation.Power_s" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="1176"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="1111"/></proof>
  </goal>
  <goal name="simpl_left" proved="true">
  <proof prover="2"><result status="valid" time="0.08" steps="22"/></proof>
  </goal>
  <goal name="simpl_right" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="2311"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="2246"/></proof>
  </goal>
  <goal name="zero_star_l" proved="true">
  <proof prover="2"><result status="valid" time="0.03" steps="36"/></proof>
@@ -52,22 +53,22 @@
  </transf>
  </goal>
  <goal name="neg_neg" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="2526"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="2492"/></proof>
  </goal>
  <goal name="null_add" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="2924"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="2952"/></proof>
  </goal>
  <goal name="mul_star_l&#39;vc" expl="VC for mul_star_l" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="3458"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="3347"/></proof>
  </goal>
  <goal name="mul_star_r&#39;vc" expl="VC for mul_star_r" proved="true">
- <proof prover="4"><result status="valid" time="0.02" steps="3588"/></proof>
+ <proof prover="4"><result status="valid" time="0.02" steps="3477"/></proof>
  </goal>
  <goal name="null_star_l" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="3116"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="3206"/></proof>
  </goal>
  <goal name="null_star_r" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="3242"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="3394"/></proof>
  </goal>
  <goal name="null_mul_congr" proved="true">
  <proof prover="2"><result status="valid" time="0.03" steps="18"/></proof>
@@ -75,7 +76,7 @@
  <goal name="all_null6" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="all_null6.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="118504"/></proof>
+  <proof prover="1"><result status="valid" time="0.06" steps="145511"/></proof>
   </goal>
   <goal name="all_null6.1" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="3165"/></proof>
@@ -105,18 +106,18 @@
  </transf>
  </goal>
  <goal name="free_split" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="3781"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="4055"/></proof>
  </goal>
  <goal name="null_2_idem" proved="true">
- <proof prover="4"><result status="valid" time="0.20" steps="62505"/></proof>
+ <proof prover="0"><result status="valid" time="0.24" steps="54392"/></proof>
  </goal>
  <goal name="null2_comm" proved="true">
- <proof prover="4"><result status="valid" time="0.25" steps="63668"/></proof>
+ <proof prover="4"><result status="valid" time="0.25" steps="60859"/></proof>
  </goal>
  <goal name="swap_equality" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="swap_equality.0" proved="true">
-  <proof prover="0"><result status="valid" time="2.39" steps="1101324"/></proof>
+  <proof prover="1"><result status="valid" time="3.66" steps="1623021"/></proof>
   </goal>
   <goal name="swap_equality.1" proved="true">
   <proof prover="4"><result status="valid" time="0.10" steps="31318"/></proof>
@@ -134,7 +135,7 @@
   <proof prover="4"><result status="valid" time="3.59" steps="85070"/></proof>
   </goal>
   <goal name="swap_equality.6" proved="true">
-  <proof prover="0"><result status="valid" time="0.54" steps="221825"/></proof>
+  <proof prover="1"><result status="valid" time="1.14" steps="379117"/></proof>
   </goal>
   <goal name="swap_equality.7" proved="true">
   <proof prover="4"><result status="valid" time="0.09" steps="30622"/></proof>

@@ -110,11 +110,11 @@ let status_filter x =
 let filter_spec =
   let open Getopt in
   [ KLong "filter-prover", Hnd1 (AString, add_filter_prover),
-    "[<name>,<version>[,<alternative>]|<id>] select proof attempts containing this prover";
+    "[<name>,[<version>[,<alternative>]]|<id>] select proof attempts with the given prover(s)";
     KLong "filter-obsolete", opt_three opt_filter_obsolete,
-    "[yes|no] select only (non-)obsolete goals";
-    KLong "filter-verified", opt_three opt_filter_verified,
-    "[yes|no] select only (non-)verified goals";
+    "[yes|no] select only (non-)obsolete proofs";
+    KLong "filter-proved", opt_three opt_filter_verified,
+    "[yes|no] select only proofs of (non-)proved goals";
     KLong "filter-status",
     Hnd1 (AList (',', ASymbol ["valid"; "invalid"; "highfailure"]),
           fun l -> opt_status := List.map status_filter l),
@@ -160,44 +160,44 @@ let read_filter_spec whyconf : filters * bool =
 
 let iter_proof_attempt_by_filter ses iter filters f =
   (* provers *)
-  let iter_provers a =
-    if C.Sprover.mem a.S.prover filters.provers then f a in
+  let iter_provers id a =
+    if C.Sprover.mem a.S.prover filters.provers then f id a in
   let f = if C.Sprover.is_empty filters.provers then f else iter_provers in
   (* three value *)
   let three_value f v p =
-    let iter_obsolete a =
-      match v, p a with
-        | FT_No, false -> f a
-        | FT_Yes, true -> f a
+    let iter_obsolete id a =
+      match v, p id a with
+        | FT_No, false -> f id a
+        | FT_Yes, true -> f id a
         | _ -> () (* FT_All treated after *) in
     if v = FT_All then f else iter_obsolete in
   (* obsolete *)
-  let f = three_value f filters.obsolete (fun a -> a.S.proof_obsolete) in
+  let f = three_value f filters.obsolete (fun _ a -> a.S.proof_obsolete) in
   (* archived *)
 (*
-  let f = three_value f filters.archived (fun a -> a.S.proof_archived) in
+  let f = three_value f filters.archived (fun _ a -> a.S.proof_archived) in
  *)
   (* verified *)
   let f = three_value f filters.verified
-    (fun a -> S.pn_proved ses a.S.parent) in
+    (fun _ a -> S.pn_proved ses a.S.parent) in
   (* status *)
   let f = if filters.status = [] then f else
-      (fun a -> match a.S.proof_state with
-      | Some pr when List.mem pr.Call_provers.pr_answer filters.status -> f a
+      (fun id a -> match a.S.proof_state with
+      | Some pr when List.mem pr.Call_provers.pr_answer filters.status -> f id a
       | _ -> ()) in
   iter f ses
 
 let theory_iter_proof_attempt_by_filter s filters f th =
   iter_proof_attempt_by_filter
     s
-    (fun f s -> S.theory_iter_proof_attempt s (fun _ -> f))
+    (fun f s -> S.theory_iter_proof_attempt s f)
     filters f th
 
 let session_iter_proof_attempt_by_filter s filters f =
   iter_proof_attempt_by_filter
     s
     (fun f _s ->
-     S.session_iter_proof_attempt (fun _ x -> f x))
+     S.session_iter_proof_attempt f)
     filters f s
 
 

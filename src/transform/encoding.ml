@@ -94,7 +94,7 @@ let keep_field_types =
             in
             List.fold_left csl_fold sty csl
           in
-          Sty.fold inst_fold (Mts.find_def Sty.empty ts kept_m) sty
+          Sty.fold inst_fold (Mts.find ts kept_m) sty
         in
         List.fold_left dl_fold sty dl
       | _ -> sty

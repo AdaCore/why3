@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="15" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.1.0" timelimit="15" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name=".."/><path name=".."/><path name="stdlib"/>
 <path name="witness.mlw"/>
@@ -18,13 +18,13 @@
   <proof prover="2"><result status="valid" time="0.02" steps="3685"/></proof>
   </goal>
   <goal name="witness&#39;vc.2" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="3204"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="3179"/></proof>
   </goal>
   <goal name="witness&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="3455"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="3429"/></proof>
   </goal>
   <goal name="witness&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="58"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="120"/></proof>
   </goal>
   <goal name="witness&#39;vc.5" expl="variant decrease" proved="true">
   <transf name="split_vc" proved="true" >
@@ -44,7 +44,7 @@
   <proof prover="2"><result status="valid" time="0.01" steps="3931"/></proof>
   </goal>
   <goal name="witness&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="3717"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="3653"/></proof>
   </goal>
   <goal name="witness&#39;vc.8" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3460"/></proof>

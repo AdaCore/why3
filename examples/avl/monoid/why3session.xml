@@ -2,34 +2,34 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.1.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="monoid.mlw"/>
 <theory name="MonoidSumDef" proved="true">
  <goal name="agg&#39;vc" expl="VC for agg" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
  </goal>
  <goal name="agg_sing_core" proved="true">
- <proof prover="2"><result status="valid" time="0.00" steps="22"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="35"/></proof>
  </goal>
  <goal name="agg_cat&#39;vc" expl="VC for agg_cat" proved="true">
- <proof prover="2"><result status="valid" time="0.07" steps="378"/></proof>
+ <proof prover="0"><result status="valid" time="0.07" steps="895"/></proof>
  </goal>
  <goal name="MS.M.assoc" proved="true">
- <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
  <goal name="MS.M.neutral" proved="true">
- <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
  <goal name="MS.agg_empty" proved="true">
- <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
  <goal name="MS.agg_sing" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="14595"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="14242"/></proof>
  </goal>
  <goal name="MS.agg_cat" proved="true">
- <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
 </theory>
 </file>

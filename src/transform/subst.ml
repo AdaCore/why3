@@ -200,6 +200,12 @@ let find_equalities ~subst_proxy filter =
     List.for_all Ty.ty_closed (Ty.oty_cons ls.ls_args ls.ls_value) &&
     filter ls
   in
+  let valid_rhs t =
+    match t.t_node with
+    | Tvar { vs_name = id } | Tapp({ls_name = id},[]) ->
+        not (Sattr.mem unused_attr id.id_attrs)
+    | _ -> true
+  in
   let bad_proxy_subst ls t =
     not subst_proxy && t_is_proxy t && not (ls_is_proxy ls)
   in
@@ -221,7 +227,7 @@ let find_equalities ~subst_proxy filter =
              begin
                try match t1.t_node with
                | Tapp (ls, []) when
-                      valid ls && not (Mls.mem ls sigma) ->
+                   valid ls && not (Mls.mem ls sigma) && valid_rhs t2 ->
                   let t2' = subst_in_term sigma t2 in
                   if occurs_in_term ls t2' then raise Exit else
                   if bad_proxy_subst ls t2' then raise Exit else
@@ -230,7 +236,7 @@ let find_equalities ~subst_proxy filter =
                with Exit ->
                     match t2.t_node with
                     | Tapp (ls, []) when
-                           valid ls && not (Mls.mem ls sigma) ->
+                           valid ls && not (Mls.mem ls sigma) && valid_rhs t1 ->
                        let t1' = subst_in_term sigma t1 in
                        if occurs_in_term ls t1' then acc else
                        if bad_proxy_subst ls t1' then acc else

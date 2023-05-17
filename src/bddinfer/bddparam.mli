@@ -1,13 +1,3 @@
-(********************************************************************)
-(*                                                                  *)
-(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
-(*                                                                  *)
-(*  This software is distributed under the terms of the GNU Lesser  *)
-(*  General Public License version 2.1, with the special exception  *)
-(*  on linking described in file LICENSE.                           *)
-(*                                                                  *)
-(********************************************************************)
 
 (** {1 Parametric Binary Decision Diagrams}
 
@@ -103,13 +93,34 @@ module type BDD = sig
   val widening : param_context -> t -> t -> t
   (** Builds bdds for negation, conjunction, disjunction, widening *)
 
+  (** change context *)
+
+  val change_ctx : (param_state -> param_state) -> param_context -> t -> param_context -> t
+  (** [change_ctx f ctx_src b ctx_dst] produces a bdd in the context
+     [ctx_dst], by copying the bdd [b] defined in context [ctx_src]
+     and applying [f] to each underlying parametric state *)
+
   (** renaming *)
 
-  val rename :
+  val rename_many :
     (variable -> variable) ->
     (param_state -> param_state) ->
     param_context -> t -> param_context -> t
+  (** [rename_many fb fp ctx_src b ctx_dst] produces a BDD in context
+     [cts_dst] from BDD [b] of context [ctx_src], by applying the
+     renaming function [fb] on Boolean variables, and renaming
+     function [fp] on underlying parameter states. [fp] is indeed any
+     function that transform a parameter state in context [ctx_src]
+     into a parameter state in context [cts_dst], it is not limited to
+     renamings, though it should always return a state that is neither
+     top nor bottom. *)
 
+  val rename_few :
+    (variable * variable) list ->
+    (param_state -> param_state) ->
+    param_context -> t -> param_context -> t
+  (** same as [rename_many] but with better efficiency when the number
+     of Boolean variables to rename is small. *)
 
   (** meet with a constraint in the parameter domain *)
 
@@ -184,25 +195,6 @@ module type BDD = sig
         [b1] implies [b2] *)
 
 
-  (*
-  val count_sat_int : t -> int
-  val count_sat : t -> Int64.t
-    (** Counts the number of different ways to satisfy a bdd. *)
-
-  val any_sat : t -> (variable * bool) list
-    (** Returns one truth assignment which satisfies a bdd, if any.
-        The result is chosen deterministically.
-        Raises [Not_found] if the bdd is [zero] *)
-
-  val random_sat : t -> (variable * bool) list
-    (** Returns one truth assignment which satisfies a bdd, if any.
-        The result is chosen randomly.
-        Raises [Not_found] if the bdd is [zero] *)
-
-  val all_sat : t -> (variable * bool) list list
-    (** Returns all truth assignments which satisfy a bdd [b]. *)
-*)
-
   (** Pretty printer *)
 
   val print_var : Format.formatter -> variable -> unit
@@ -213,15 +205,6 @@ module type BDD = sig
   val print_compact : Format.formatter -> t -> unit
   (** prints as Boolean expressions, with fallback to if-then-else
      expressions when nothing is more compact *)
-
-(*
-  val to_dot : t -> string
-
-  val print_to_dot : t -> file:string -> unit
-
-  val display : t -> unit
-    (** displays the given bdd using a shell command "dot -Tps <file> | gv -" *)
-*)
 
   (** Stats *)
 
@@ -261,9 +244,11 @@ module type ParamDomain = sig
 
   val entails : param_context -> param_index -> param_index -> bool
 
-  val rename :
-    (param_state -> param_state) ->
-    param_context -> param_index -> param_context -> param_index
+  val change : (param_state -> param_state) ->
+    param_context -> param_index -> param_context  -> param_index
+  (** [change f ctx_src i ctx_dst] returns an index in context
+     [ctx_dst] for [f s] where [s] is the state of index [i] in
+     [ctx_src] *)
 
   val meet_with_constraint :
     (param_state -> param_state) ->

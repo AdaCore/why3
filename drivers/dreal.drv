@@ -9,6 +9,13 @@ unknown "delta-sat with delta = .*" ""
 time "why3cpulimit time : %s s"
 valid "^unsat$"
 
+(* Performed introductions depending on whether counterexamples are
+   requested, as said by the meta "get_counterexmp". When this meta
+   set, this transformation introduces the model variables that are
+   still embedded in the goal. When it is not set, it removes all
+   these unused-ce-related variables, even in the context.  *)
+transformation "counterexamples_dependent_intros"
+
 transformation "inline_trivial"
 transformation "eliminate_definition"
 transformation "eliminate_builtin"
@@ -26,6 +33,7 @@ transformation "keep_only_arithmetic"
 transformation "abstract_unknown_lsymbols"
 transformation "eliminate_unknown_lsymbols"
 transformation "eliminate_unknown_types"
+transformation "eliminate_big_constants"
 
 prelude "(set-logic QF_NRA)"
 
@@ -150,15 +158,5 @@ theory real.Hyperbolic
 end
 
 theory ieee_float.GenericFloat
-  remove allprops
-end
-
-theory ieee_float.Float64
-  remove prop max_int_def
-  remove prop max_real_def
-end
-
-theory bv.Pow2int
-  remove allprops
   remove allprops
 end

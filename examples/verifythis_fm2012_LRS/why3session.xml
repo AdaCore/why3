@@ -3,14 +3,14 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.11.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_fm2012_LRS.mlw"/>
 <theory name="LCP" proved="true">
  <goal name="not_common_prefix_if_last_char_are_different" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="5219"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="10399"/></proof>
  </goal>
  <goal name="longest_common_prefix_succ" proved="true">
  <proof prover="3"><result status="valid" time="0.00" steps="28"/></proof>
@@ -30,10 +30,10 @@
   <proof prover="2"><result status="valid" time="0.02" steps="4129"/></proof>
   </goal>
   <goal name="lcp&#39;vc.4" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="14527"/></proof>
+  <proof prover="4"><result status="valid" time="0.37" steps="5649328"/></proof>
   </goal>
   <goal name="lcp&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="8381"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="14281"/></proof>
   </goal>
  </transf>
  </goal>
@@ -198,7 +198,7 @@
  <proof prover="2"><result status="valid" time="0.04" steps="13629"/></proof>
  </goal>
  <goal name="permut_permutation" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="33395"/></proof>
+ <proof prover="4"><result status="valid" time="0.03" steps="126475"/></proof>
  </goal>
  <goal name="create&#39;vc" expl="VC for create" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -221,7 +221,7 @@
   <proof prover="2"><result status="valid" time="0.06" steps="19944"/></proof>
   </goal>
   <goal name="create&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.06" steps="32717"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="148886"/></proof>
   </goal>
   <goal name="create&#39;vc.7" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="12772"/></proof>

@@ -19,7 +19,7 @@ File jlamp_array_mono.mlw:
     to_int :
       t
       ->
-      int = fun _arg_1 -> if {Array.to_int => 3} = _arg_1 then 3 else 2
+      int = fun _arg_13 -> if {Array.to_int => 3} = _arg_13 then 3 else 2
   Line 11:
     two : t = {Array.to_int => 2}
   Line 14:
@@ -78,7 +78,7 @@ File jlamp_array_mono.mlw:
     to_int :
       t
       ->
-      int = fun _arg_1 -> if {Array.to_int => 3} = _arg_1 then 3 else 2
+      int = fun _arg_110 -> if {Array.to_int => 3} = _arg_110 then 3 else 2
   Line 11:
     two : t = {Array.to_int => 2}
   Line 14:
@@ -89,8 +89,8 @@ File jlamp_array_mono.mlw:
       ->
       int
       ->
-      t = fun _arg_1 ->
-           if {Array.elts = [|_ => {Array.to_int => 3}|]; Array.length = 0} = _arg_1
+      t = fun _arg_113 ->
+           if {Array.elts = [|_ => {Array.to_int => 3}|]; Array.length = 0} = _arg_113
            then [|_ => {Array.to_int => 3}|]
            else [|42 => {Array.to_int => 2}; _ => {Array.to_int => 3}|]
   Line 19:
@@ -103,7 +103,7 @@ File jlamp_array_mono.mlw:
       ->
       t
       ->
-      array = fun _arg_1 _arg_2 _arg_3 ->
+      array = fun _arg_111 _arg_21 _arg_31 ->
                {Array.elts =
                 [|42 => {Array.to_int => 2}; _ => {Array.to_int => 3}|];
                 Array.length = 0}
@@ -151,7 +151,7 @@ File jlamp_array_mono.mlw:
     to_int :
       t
       ->
-      int = fun _arg_1 -> if {Array.to_int => 3} = _arg_1 then 3 else 2
+      int = fun _arg_114 -> if {Array.to_int => 3} = _arg_114 then 3 else 2
   Line 11:
     two : t = {Array.to_int => 2}
   Line 14:
@@ -173,7 +173,7 @@ File jlamp_array_mono.mlw:
       ->
       t
       ->
-      array = fun _arg_1 _arg_2 _arg_3 ->
+      array = fun _arg_115 _arg_22 _arg_32 ->
                {Array.elts =
                 [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
                 Array.length = 43}
@@ -229,7 +229,7 @@ File jlamp_array_mono.mlw:
     to_int :
       t
       ->
-      int = fun _arg_1 -> if {Array.to_int => 3} = _arg_1 then 3 else 2
+      int = fun _arg_122 -> if {Array.to_int => 3} = _arg_122 then 3 else 2
   Line 11:
     two : t = {Array.to_int => 2}
   Line 14:
@@ -240,11 +240,11 @@ File jlamp_array_mono.mlw:
       ->
       int
       ->
-      t = fun _arg_1 ->
+      t = fun _arg_125 ->
            if {Array.elts =
                [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
                _ => {Array.to_int => 2}|];
-               Array.length = 43} = _arg_1
+               Array.length = 43} = _arg_125
            then [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
                 _ => {Array.to_int => 2}|]
            else [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|]
@@ -258,7 +258,7 @@ File jlamp_array_mono.mlw:
       ->
       t
       ->
-      array = fun _arg_1 _arg_2 _arg_3 ->
+      array = fun _arg_123 _arg_24 _arg_34 ->
                {Array.elts =
                 [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
                 Array.length = 43}

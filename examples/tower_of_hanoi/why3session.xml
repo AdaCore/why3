@@ -3,164 +3,164 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="tower_of_hanoi.mlw"/>
 <theory name="Hanoi" proved="true">
  <goal name="tower&#39;vc" expl="VC for tower" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
+ <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
  <goal name="move&#39;vc" expl="VC for move" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="move&#39;vc.0" expl="type invariant" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="27"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="move&#39;vc.1" expl="type invariant" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="88"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="115"/></proof>
   </goal>
   <goal name="move&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
   <goal name="move&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
   <goal name="move&#39;vc.4" expl="unreachable point" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="hanoi_rec&#39;vc" expl="VC for hanoi_rec" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="hanoi_rec&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="29"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="30"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="81"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="30"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="88"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="24"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="40"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="102"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.6" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="17"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="32"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="17"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="32"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="21"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="38"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.92" steps="2746"/></proof>
+  <proof prover="2"><result status="valid" time="0.33" steps="3267"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.10" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="23"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="44"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.11" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="25"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="49"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.12" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="25"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="47"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.13" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="15"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="16"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.14" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="9"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.15" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="tower_of_hanoi&#39;vc" expl="VC for tower_of_hanoi" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="tower_of_hanoi&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
   <goal name="tower_of_hanoi&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
   <goal name="tower_of_hanoi&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="tower_of_hanoi&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="14"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="26"/></proof>
   </goal>
   <goal name="tower_of_hanoi&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="15"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="27"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="Tower_of_Hanoi" proved="true">
  <goal name="RevSorted.Transitive.Trans" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
+ <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
  <goal name="tower&#39;vc" expl="VC for tower" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
+ <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
  <goal name="move&#39;vc" expl="VC for move" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="move&#39;vc.0" expl="type invariant" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="30"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="move&#39;vc.1" expl="type invariant" proved="true">
-  <proof prover="1"><result status="valid" time="0.03" steps="95"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="134"/></proof>
   </goal>
   <goal name="move&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
   <goal name="move&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="23"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
   <goal name="move&#39;vc.4" expl="unreachable point" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="hanoi_rec&#39;vc" expl="VC for hanoi_rec" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="hanoi_rec&#39;vc.0" expl="unreachable point" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="55"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="49"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="4.63" steps="11369"/></proof>
+  <proof prover="2"><result status="valid" time="0.95" steps="6165"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.5" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="1.12" steps="4187"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.05" steps="130"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="269"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.8" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="25"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="44"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="94"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="84"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="27"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="48"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.11" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.04" steps="157"/></proof>
@@ -169,44 +169,44 @@
   <proof prover="0" timelimit="1"><result status="valid" time="1.93" steps="6201"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.13" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="31"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="56"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.14" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="33"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="59"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.15" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="33"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="59"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.16" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="29"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="61"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.17" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.03" steps="87"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="71"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.18" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="3"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="tower_of_hanoi&#39;vc" expl="VC for tower_of_hanoi" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="tower_of_hanoi&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="43"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="92"/></proof>
   </goal>
   <goal name="tower_of_hanoi&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="53"/></proof>
   </goal>
   <goal name="tower_of_hanoi&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
   <goal name="tower_of_hanoi&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
   <goal name="tower_of_hanoi&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="32"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="57"/></proof>
   </goal>
   <goal name="tower_of_hanoi&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="28"/></proof>
   </goal>
  </transf>
  </goal>

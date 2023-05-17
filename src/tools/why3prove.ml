@@ -55,7 +55,7 @@ let add_opt_theory x =
   match !opt_input, p with
   | None, [] ->
       let msg = "Option '-T'/'--theory' with a non-qualified \
-                 argument requires an input file.@." in
+                 argument requires an input file." in
       raise (Getopt.GetoptFailure msg)
   | Some tlist, [] ->
       let glist = Queue.create () in
@@ -75,7 +75,7 @@ let add_opt_goal x =
   let glist = match !opt_theory, !opt_input with
     | None, None ->
         let msg = "Option '-G'/'--goal' requires an input file or a library \
-                   theory.@." in
+                   theory." in
         raise (Getopt.GetoptFailure msg)
     | None, Some _ ->
         add_opt_theory "Top";

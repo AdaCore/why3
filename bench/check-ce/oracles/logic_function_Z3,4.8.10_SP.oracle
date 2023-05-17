@@ -19,12 +19,12 @@ File int.mlw:
     one = 1
 File logic_function.mlw:
   Line 4:
-    g = fun (x!0:int) -> if x!0 = 2 then 42 else 42
+    g = fun (x!02:int) -> if x!02 = 2 then 42 else 42
   Line 6:
     y = 2
     y = 2
     Execution of main function `main_g` with env:
-      g = fun (x!0:int) -> if x!0 = 2 then 42 else 42
+      g = fun (x!02:int) -> if x!02 = 2 then 42 else 42
       y = 2
       zero = 0
       one = 1
@@ -53,15 +53,16 @@ File int.mlw:
     one = 1
 File logic_function.mlw:
   Line 10:
-    h = fun (x!0:int) (x!1:bool) -> if x!0 = 2 /\ x!1 = False then 42 else 42
+    h = fun (x!04:int) (x!12:bool) ->
+         if x!04 = 2 /\ x!12 = False then 42 else 42
   Line 12:
     y1 = 2
     y2 = false
     y1 = 2
     y2 = false
     Execution of main function `main_h` with env:
-      h = fun (x!0:int) (x!1:bool) ->
-           if x!0 = 2 /\ x!1 = False then 42 else 42
+      h = fun (x!04:int) (x!12:bool) ->
+           if x!04 = 2 /\ x!12 = False then 42 else 42
       y1 = 2
       y2 = false
       zero = 0
@@ -92,12 +93,12 @@ File int.mlw:
     one = 1
 File logic_function.mlw:
   Line 16:
-    f = fun (x!0:int) -> if x!0 = 0 then 0 else 0
+    f = fun (x!06:int) -> if x!06 = 0 then 0 else 0
   Line 18:
     y = 0
     y = 0
     Execution of main function `main_f` with env:
-      f = fun (x!0:int) -> if x!0 = 0 then 0 else 0
+      f = fun (x!06:int) -> if x!06 = 0 then 0 else 0
       y = 0
       zero = 0
       one = 1
@@ -126,12 +127,12 @@ File int.mlw:
     one = 1
 File logic_function.mlw:
   Line 16:
-    f = fun (x!0:int) -> if x!0 = 0 then 2 else if x!0 = 1 then 0 else 2
+    f = fun (x!08:int) -> if x!08 = 0 then 2 else if x!08 = 1 then 0 else 2
   Line 18:
     y = 0
     y = 0
     Execution of main function `main_f` with env:
-      f = fun (x!0:int) -> if x!0 = 0 then 2 else if x!0 = 1 then 0 else 2
+      f = fun (x!08:int) -> if x!08 = 0 then 2 else if x!08 = 1 then 0 else 2
       y = 0
       zero = 0
       one = 1

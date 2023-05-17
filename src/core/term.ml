@@ -1660,6 +1660,7 @@ let t_if_simp f1 f2 f3 = match f1.t_node, f2.t_node, f3.t_node with
   | _, _, _ when t_equal f2 f3 -> f2
   | _, _, _ -> t_if f1 f2 f3
 
+
 let small t = match t.t_node with
   | Tvar _ | Tconst _ -> true
 (* NOTE: shouldn't we allow this?
@@ -1803,8 +1804,10 @@ let t_map_simp fn f = t_attr_copy f (match f.t_node with
       t_not_simp (fn f1)
   | _ -> t_map fn f)
 
+
 let t_map_simp fn = t_map_simp (fun t ->
   let res = fn t in t_ty_check res t.t_ty; res)
+
 
 (** Traversal with separate functions for value-typed and prop-typed terms *)
 
@@ -1837,3 +1840,45 @@ let term_size t =
   in aux 0 t
 
 let term_branch_size (_,_,t) = term_size t
+
+
+
+let rec remove_unused_in_term polarity t =
+  t_attr_copy t (match t.t_node with
+  | Tbinop (Timplies, t1, t2) ->
+      t_implies_simp
+        (remove_unused_in_term (not polarity) t1)
+        (remove_unused_in_term polarity t2)
+  | Tbinop (Tiff, t1, t2) ->
+      let t1p = remove_unused_in_term polarity t1 in
+      let t1n = remove_unused_in_term (not polarity) t1 in
+      let t2p = remove_unused_in_term polarity t2 in
+      let t2n = remove_unused_in_term (not polarity) t2 in
+      if t_equal t1p t1n && t_equal t2p t2n then t_iff_simp t1p t2p
+      else if polarity
+        then t_and_simp (t_implies_simp t1n t2p) (t_implies_simp t2n t1p)
+        else t_implies_simp (t_or_simp t1n t2n) (t_and_simp t1p t2p)
+  | Tnot t1 ->
+      t_not_simp (remove_unused_in_term (not polarity) t1)
+  | Tlet(t,fb) ->
+      let vs, t1, cb = t_open_bound_cb fb in
+      let t1 = t_map_simp (remove_unused_in_term polarity) t1 in
+      if Sattr.mem unused_attr vs.vs_name.id_attrs then t1
+      else
+        t_let_simp_keep_var ~keep:true t (cb vs t1)
+  | (Tapp(ls,[{t_node=Tvar {vs_name = id; _ }; _ } ;_])
+    | Tapp(ls,[{t_node=Tapp({ls_name = id;_} ,[]); _ };_]))
+    when ls_equal ls ps_equ &&
+         Sattr.mem unused_attr id.id_attrs ->
+      if polarity then t_false else t_true
+  | Tif (t1, t2, t3) when t.t_ty = None ->
+      let t1p = remove_unused_in_term polarity t1 in
+      let t1n = remove_unused_in_term (not polarity) t1 in
+      let t2 = remove_unused_in_term polarity t2 in
+      let t3 = remove_unused_in_term polarity t3 in
+      if t_equal t1p t1n then t_if_simp t1p t2 t3 else
+      if polarity
+        then t_and_simp (t_implies_simp t1n t2) (t_implies_simp (t_not_simp t1p) t3)
+        else t_or_simp (t_and_simp t1p t2) (t_and_simp (t_not_simp t1n) t3)
+  | Tif _ | Teps _ -> t
+  | _ -> t_map_simp (remove_unused_in_term polarity) t)

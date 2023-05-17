@@ -1,13 +1,3 @@
-(********************************************************************)
-(*                                                                  *)
-(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
-(*                                                                  *)
-(*  This software is distributed under the terms of the GNU Lesser  *)
-(*  General Public License version 2.1, with the special exception  *)
-(*  on linking described in file LICENSE.                           *)
-(*                                                                  *)
-(********************************************************************)
 
 (**
 
@@ -23,6 +13,38 @@ TODO list:
 
 (* open Why3 *)
 (* to comment out when inside Why3 *)
+
+
+(* term printer *)
+
+let rec ext_printer print_any fmt a =
+  let open Term in
+  let open Pretty in
+  match a with
+  | Pp_term (t, pri) ->
+      begin match t.t_node with
+        | Tapp (ls, [{t_node = Tvar v} as t]) when Term.ls_equal ls Pmodule.ls_ref_proj ->
+          if Ident.Sattr.mem Pmodule.ref_attr v.vs_name.Ident.id_attrs
+          then
+            ext_printer print_any fmt (Pp_term(t,pri))
+          else
+            Format.fprintf fmt "!%a" (ext_printer print_any) (Pp_term(t,pri))
+        | _ -> print_any fmt a
+      end
+  | _ -> print_any fmt a
+
+
+module Pretty =
+  (val (let sprinter,aprinter,tprinter,pprinter =
+          let open Ident in
+          let open Pretty in
+    let same = fun x -> x in
+    create_ident_printer why3_keywords ~sanitizer:same,
+    create_ident_printer why3_keywords ~sanitizer:same,
+    create_ident_printer why3_keywords ~sanitizer:same,
+    create_ident_printer why3_keywords ~sanitizer:same
+  in
+  Pretty.create ~print_ext_any:ext_printer sprinter aprinter tprinter pprinter))
 
 
 open Expr
@@ -1054,7 +1076,7 @@ let decl_global_vs vs d acc =
   in VarMap.add name ty acc
 
 
-let f_decl_rs ctx rs name acc : func list =
+let f_decl_rs ctx rs name acc : func FuncMap.t =
   (* Format.printf "f_decl : %a@." print_rs rs; *)
   let cty = rs.rs_cty in
   let ctx, args =
@@ -1187,7 +1209,8 @@ let f_decl_rs ctx rs name acc : func list =
          assert (not is_ref);
          Some(ty,res)
   in
-  declare_function_val ~name ~params:args ~writes ~result ~post :: acc
+  let d = declare_function_val ~name ~params:args ~writes ~result ~post in
+  FuncMap.add name d acc
 
 
 
@@ -1344,6 +1367,11 @@ let rec condition_to_term rev_map c =
   | BAtomic c -> atomic_condition_to_term rev_map c
   | BTrue -> t_true
   | BFalse  -> t_false
+  | Bite(c,c1,c2) ->
+    t_if
+      (condition_to_term rev_map c)
+      (condition_to_term rev_map c1)
+      (condition_to_term rev_map c2)
   | BAnd(c1,c2) ->
      t_and (condition_to_term rev_map c1) (condition_to_term rev_map c2)
   | BOr(c1,c2)  ->
@@ -1444,7 +1472,7 @@ let infer_loop_invs_for_mlw_expr last_report _attrs env tkn mkn e cty =
             (Term.Mvs.bindings ctx.env);
         end;
       let decl = Term.Mvs.fold decl_global_vs ctx.env VarMap.empty in
-      let f_decl = Expr.Mrs.fold (f_decl_rs ctx) !rs_table [] in
+      let f_decl = Expr.Mrs.fold (f_decl_rs ctx) !rs_table FuncMap.empty in
       let variables = decl in
       let functions = f_decl in
       let main = p_ast in

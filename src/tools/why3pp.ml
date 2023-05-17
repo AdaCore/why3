@@ -305,9 +305,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     | Tattr _ -> failwith "pp_term: attr"
     | Tat _ -> failwith "pp_term: at"
     | Tasref _ -> failwith "pp_term: asref"
-    | Teps _ ->
-        (* Not to be used from SPARK: Why3 has no epsilon in programs *)
-        assert false
+    | Teps _ -> failwith "pp_term: teps"
 
   let pp_rule fmt (id, terms) : unit =
     match List.rev terms with
@@ -405,12 +403,16 @@ type output = Latex | Mlw | Sexp | Dep
 
 let output = ref Mlw
 
-let set_output = function
-  | "latex" -> output := Latex
-  | "mlw" -> output := Mlw
-  | "sexp" -> output := Sexp
-  | "dep" -> output := Dep
-  | _ -> assert false
+let output_of_str = [
+  "mlw", Mlw;
+  "latex", Latex;
+  "sexp", Sexp;
+  "dep", Dep;
+]
+
+let set_output s =
+  try output := List.assoc s output_of_str
+  with Not_found -> assert false
 
 let prefix = ref "WHY"
 
@@ -418,8 +420,10 @@ let usage_msg = "<filename> [<Module>.]<type> ..."
 
 let spec =
   let open Why3.Getopt in
-  [ KLong "output", Hnd1 (ASymbol ["latex"; "mlw"; "sexp"; "dep"], set_output),
-    "<output> select output format (default: \"mlw\")";
+  let formats = List.map fst output_of_str in
+  let format_help = String.concat "|" formats in
+  [ KLong "output", Hnd1 (ASymbol formats, set_output),
+    "<format> select output format (" ^ format_help ^ "), default is " ^ List.hd formats;
     KLong "kind", Hnd1 (ASymbol ["inductive"], set_kind),
     "<category> select syntactic category to be printed (only\n\
      \"inductive\" for --output=latex)";
@@ -430,6 +434,7 @@ let spec =
 let parse_mlw_file filename =
   let c = if filename = "-" then stdin else open_in filename in
   let lexbuf = Lexing.from_channel c in
+  Loc.set_file filename lexbuf;
   let mlw_file = Lexer.parse_mlw_file lexbuf in
   if filename <> "-" then
     close_in c;

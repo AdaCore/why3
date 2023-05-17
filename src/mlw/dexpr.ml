@@ -840,6 +840,10 @@ let dexpr ?loc node =
         dexpr_expected_type de1 dity_bool;
         dexpr_expected_type de2 dity_bool;
         dvty_bool
+    | DEif (de1,de2,{de_node=DEsym (RS rs)}) when rs_equal rs (rs_tuple 0) ->
+        dexpr_expected_type de1 dity_bool;
+        dexpr_expected_type de2 dity_unit;
+        dvty_unit
     | DEif (de1,de2,de3) ->
         let res = dity_fresh () in
         dexpr_expected_type de1 dity_bool;
@@ -1212,8 +1216,7 @@ exception Unused of Loc.position option * string
 
 (* Check that [pv] is used according to [check_present] *)
 let check_used_gen ~check_present pv =
-  if not (Sattr.mem Dterm.attr_w_unused_var_no pv.pv_vs.vs_name.id_attrs) &&
-      Debug.test_noflag Dterm.debug_ignore_unused_var then
+  if not (Sattr.mem Dterm.attr_w_unused_var_no pv.pv_vs.vs_name.id_attrs) then
     begin
       let s = pv.pv_vs.vs_name.id_string in
       if (s = "" || s.[0] <> '_') && not (check_present pv) then
@@ -1224,7 +1227,7 @@ let check_used_gen ~check_present pv =
 let check_used_pv e pv =
   let check_present pv = Spv.mem pv e.e_effect.eff_reads in
   try check_used_gen ~check_present pv with
-  | Unused (loc, msg) -> Loc.warning ?loc "%s" msg
+  | Unused (loc, msg) -> Loc.warning ~id:Dterm.warn_unused_variable ?loc "%s" msg
 
 (* Return warnings if unused variables are found in functions spec/body:
    [bl] is the list of arguments,
@@ -1233,7 +1236,7 @@ let check_used_pv e pv =
    No warnings are returned on result variables of type [unit].
    No warnings are returned if there are no body, no pre, and no (x)post.
 *)
-let check_unused_vars_fun (bl: Ity.pvsymbol list) (dsp: dspec_final) eff_reads =
+let check_unused_variable_fun (bl: Ity.pvsymbol list) (dsp: dspec_final) eff_reads =
   (* TBD: When there is no pre/post contract and body, no warnings. *)
   if dsp.ds_pre = [] && dsp.ds_post = [] && Ity.Mxs.is_empty dsp.ds_xpost &&
      eff_reads = None then
@@ -1274,7 +1277,7 @@ let check_unused_vars_fun (bl: Ity.pvsymbol list) (dsp: dspec_final) eff_reads =
     let check_present pv = Mvs.mem pv.pv_vs fvars_uc in
     let check_used pv =
       try check_used_gen ~check_present pv with
-      | Unused (loc, msg) -> Loc.warning ?loc "%s" msg
+      | Unused (loc, msg) -> Loc.warning ~id:Dterm.warn_unused_variable ?loc "%s" msg
     in
     (* Check the usage of normal arguments *)
     List.iter check_used bl;
@@ -1291,7 +1294,7 @@ let check_unused_vars_fun (bl: Ity.pvsymbol list) (dsp: dspec_final) eff_reads =
       in
       match unused with
       | Some (loc, msg) when loc <> None
-         (* loc = None not supported for results *) -> Loc.warning ?loc "%s" msg
+         (* loc = None not supported for results *) -> Loc.warning ~id:Dterm.warn_unused_variable ?loc "%s" msg
       | _ -> ()
     with Exit -> ()
   end
@@ -1315,7 +1318,7 @@ let cty_of_spec loc env bl mask dsp dity =
   let q = create_post ity dsp.ds_post in
   let xq = create_xpost dsp.ds_xpost in
   (* Check for unused variables *)
-  check_unused_vars_fun bl dsp None;
+  check_unused_variable_fun bl dsp None;
   let cty = create_cty_defensive ~mask bl p q xq (get_oldies old) eff ity in
   (* Not useful in SPARK:
   (\* check that oldies are affected by the writes *\)
@@ -1774,7 +1777,7 @@ and lambda uloc env pvl mask dsp dvl de =
   let e = if not dsp.ds_diverge then e
           else e_attr_add Vc.nt_attr e in
   (* Check for unused variables *)
-  check_unused_vars_fun pvl dsp (Some (Ity.Spv.elements e.e_effect.eff_reads));
+  check_unused_variable_fun pvl dsp (Some (Ity.Spv.elements e.e_effect.eff_reads));
   c_fun ~mask pvl p q xq (get_oldies old) e, dsp, dvl
 
 let rec_defn ?(keep_loc=true) drdf =

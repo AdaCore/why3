@@ -4,30 +4,30 @@
 <why3session shape_version="6">
 <prover id="0" name="Coq" version="8.11.2" timelimit="3" steplimit="0" memlimit="0"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="3" steplimit="0" memlimit="0"/>
-<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="imp_n.why"/>
 <theory name="Imp" proved="true">
  <goal name="ident_eq_dec" proved="true">
- <proof prover="2"><result status="valid" time="0.00" steps="1"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="0"/></proof>
  </goal>
  <goal name="check_skip" proved="true">
- <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
  <goal name="Test13" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="3"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="Test42" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="3"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="Test55" proved="true">
- <proof prover="2"><result status="valid" time="0.00" steps="16"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="30"/></proof>
  </goal>
  <goal name="Ass42" proved="true">
- <proof prover="2"><result status="valid" time="0.04" steps="91"/></proof>
+ <proof prover="3"><result status="valid" time="0.04" steps="148"/></proof>
  </goal>
  <goal name="If42" proved="true">
- <proof prover="2"><result status="valid" time="0.13" steps="328"/></proof>
+ <proof prover="3"><result status="valid" time="0.13" steps="448"/></proof>
  </goal>
  <goal name="progress" proved="true">
  <proof prover="0"><path name="imp_n_Imp_progress_1.v"/><result status="valid" time="0.30"/></proof>
@@ -41,7 +41,7 @@
  <goal name="eval_subst_expr" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="eval_subst_expr.0" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="107"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="168"/></proof>
   </goal>
  </transf>
  </goal>
@@ -49,13 +49,13 @@
  <proof prover="0"><path name="imp_n_Imp_eval_subst_1.v"/><result status="valid" time="0.33"/></proof>
  </goal>
  <goal name="skip_rule" proved="true">
- <proof prover="2"><result status="valid" time="0.04" steps="149"/></proof>
+ <proof prover="3"><result status="valid" time="0.04" steps="226"/></proof>
  </goal>
  <goal name="assign_rule" proved="true">
- <proof prover="2"><result status="valid" time="0.70" steps="1641"/></proof>
+ <proof prover="3"><result status="valid" time="0.48" steps="2840"/></proof>
  </goal>
  <goal name="seq_rule" proved="true">
- <proof prover="2"><result status="valid" time="0.84" steps="3015"/></proof>
+ <proof prover="3"><result status="valid" time="0.02" steps="94"/></proof>
  </goal>
  <goal name="if_rule" proved="true">
  <proof prover="0"><path name="imp_n_Imp_if_rule_1.v"/><result status="valid" time="0.34"/></proof>

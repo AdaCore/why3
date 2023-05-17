@@ -1,14 +1,12 @@
-Invariant for loop [anonymous_loop_0] is
-  (0 <= i.contents /\ i.contents <= 12) /\ o = 0
+Invariant for loop [anonymous_loop_0] is (0 <= !i /\ !i <= 12) /\ o = 0
 Domains for loop [anonymous_loop_0] are o = [0;0]; i = [0;12]
-Invariant for loop [anonymous_loop_0] is
-  (0 <= i1.contents /\ i1.contents <= 12) /\ o1 = 0
+Invariant for loop [anonymous_loop_0] is (0 <= !i1 /\ !i1 <= 12) /\ o1 = 0
 Domains for loop [anonymous_loop_0] are o1 = [0;0]; i1 = [0;12]
 File bench/infer/neg1.mlw:
 Goal b'vc.
-Prover result is: Unknown () (0.02s).
+Prover result is: Unknown () (0.01s).
 
 File bench/infer/neg1.mlw:
 Goal b2'vc.
-Prover result is: Unknown () (0.02s).
+Prover result is: Unknown () (0.01s).
 

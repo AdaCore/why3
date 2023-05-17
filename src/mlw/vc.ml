@@ -32,8 +32,9 @@ let debug_sp = Debug.register_flag "vc_sp"
 let debug_no_eval = Debug.register_flag "vc_no_eval"
   ~desc:"Do@ not@ simplify@ pattern@ matching@ on@ record@ datatypes@ in@ VCs."
 
-let debug_ignore_diverges = Debug.register_info_flag "ignore_missing_diverges"
-  ~desc:"Suppress@ warnings@ on@ missing@ diverges."
+let warn_missing_diverges = Loc.register_warning "missing_diverges"
+  "Warn about missing `diverges' clauses."
+
 
 let case_split = Ident.create_attribute "case_split"
 let add_case t = t_attr_add case_split t
@@ -307,18 +308,21 @@ let decrease_alg env loc old_t t =
 
 let decrease_def env loc old_t t =
   let ty = t_type t in
-  if ty_equal (t_type old_t) ty then
-    match ty.ty_node with
-    | Tyapp (ts,_) when ts_equal ts ts_int ->
-        t_and (ps_app env.ps_int_le [t_nat_const 0; old_t])
-              (ps_app env.ps_int_lt [t; old_t])
-    | Tyapp (ts, _) when is_range_type_def ts.ts_def ->
-        let ls = int_of_range env ts in
-        let proj t = fs_app ls [t] ty_int in
-        ps_app env.ps_int_lt [proj t; proj old_t]
-    | _ ->
-        decrease_alg env loc old_t t
-  else decrease_alg env loc old_t t
+  let f =
+    if ty_equal (t_type old_t) ty then
+      match ty.ty_node with
+      | Tyapp (ts,_) when ts_equal ts ts_int ->
+         t_and (ps_app env.ps_int_le [t_nat_const 0; old_t])
+           (ps_app env.ps_int_lt [t; old_t])
+      | Tyapp (ts, _) when is_range_type_def ts.ts_def ->
+         let ls = int_of_range env ts in
+         let proj t = fs_app ls [t] ty_int in
+         ps_app env.ps_int_lt [proj t; proj old_t]
+      | _ ->
+         decrease_alg env loc old_t t
+    else decrease_alg env loc old_t t
+  in
+  t_attr_copy t f
 
 let decrease env loc attrs expl olds news =
   if olds = [] && news = [] then t_true else
@@ -604,8 +608,7 @@ let rec k_expr env lps e res xmap =
   let var_or_proxy = var_or_proxy_case xmap in
   let check_divergence k =
     if diverges eff.eff_oneway && not env.divergent then begin
-      if Debug.test_noflag debug_ignore_diverges then
-      Loc.warning ?loc "termination@ of@ this@ expression@ \
+      Loc.warning ~id:warn_missing_diverges ?loc "termination@ of@ this@ expression@ \
         cannot@ be@ proved,@ but@ there@ is@ no@ `diverges'@ \
         clause@ in@ the@ outer@ specification";
       Kpar (Kstop (vc_expl loc attrs expl_divergent t_false), k)

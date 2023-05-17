@@ -1,0 +1,181 @@
+
+(** Space-Saving Algorithm
+
+  This is an online algorithm to find out frequent elements in a data
+  stream. Say we want to detect an element occurring more than N/2 times
+  in a stream of N elements. We maintain two values (x1 and x2) and two
+  counters (n1 and n2). If the next value is x1 or x2, we increment the
+  corresponding counter. Otherwise, we replace the value with the smallest
+  counter with the next value, *and we increment the corresponding counter*.
+  If the stream contains a value occurring more than N/2 times, it is
+  guaranteed to be eother x1 or x2.
+
+  This generalizes to k values being monitored.
+
+  The algorithm is described here:
+
+    Metwally, A., Agrawal, D., El Abbadi, A.
+    Efficient Computation of Frequent and Top-k Elements in Data Streams.
+    ICDT 2005. LNCS vol 3363.
+
+  See also mjrty.mlw for a related algorithm.
+
+  Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+use int.Int
+use int.MinMax
+use map.Occ
+
+(** The elements of the stream. The only thing we can do is to test
+    elements for equality. *)
+type elt
+
+val (=) (x y: elt) : bool
+  ensures { result <-> x = y }
+
+(** We introduce a dummy value in order to initialize variables in the code. *)
+val constant dummy: elt
+
+(** We model an online algorithm with a stream `s` of elements
+    and a function `next` to get the next element from the stream.
+    The reference `n` is the number of elements retrieved so far. *)
+val ghost s: int -> elt
+  ensures { forall i. result i <> dummy }
+
+val ghost ref n: int
+
+val next () : elt
+  requires { n >= 0 }
+  writes   { n }
+  ensures  { n = old n + 1 }
+  ensures  { result = s (old n) <> dummy }
+
+(** Let us start gently with k=2 values monitored. *)
+
+let space_saving_2 () : unit
+  requires { n = 0 }
+  diverges
+= let ref x1 = dummy in
+  let ref n1 = 0 in
+  let ref x2 = dummy in
+  let ref n2 = 0 in
+  while true do
+    invariant { n1 + n2 = n >= 0 }
+    invariant { 0 <= occ x1 s 0 n <= n1 }
+    invariant { 0 <= occ x2 s 0 n <= n2 }
+    invariant { if n1 = 0 then x1 = dummy else x1 <> dummy }
+    invariant { if n2 = 0 then x2 = dummy else x2 <> dummy }
+    invariant { n1 > 0 -> n2 > 0 -> x1 <> x2 }
+    invariant { forall y. y <> x1 -> y <> x2 -> occ y s 0 n <= min n1 n2 }
+    (* 1. We show that the desired property is a consequence of the
+       invariants above: any frequent value v (i.e. occurring strictly
+       more than min(n1, n2) times) is either x1 or x2. *)
+    assert { [@expl:thm] forall v. occ v s 0 n > min n1 n2 -> v = x1 || v = x2 };
+    (* and beside, we have min(n1, n2) <= n/2 (from the first invariant)
+       so any value occurring >n/2 times is either x1 or x2. *)
+    assert { [@expl:thm] forall v. 2 * occ v s 0 n > n -> v = x1 || v = x2 };
+    (* 2. Read the next value and update the state. *)
+    let x = next () in
+    if x = x1 then n1 <- n1 + 1
+    else if x = x2 then n2 <- n2 + 1
+    else if n1 <= n2 then (x1 <- x; n1 <- n1 + 1)
+                     else (x2 <- x; n2 <- n2 + 1)
+  done
+
+(** Note: for k=2 (i.e. two values monitored), this is less precise
+    than MJRTY (see mjrty.mlw). Indeed, Space-Saving only tells us
+    that a value with more than N/2 occurrences, if any, is either x1
+    or x2, while MJRTY determines what would be this value. *)
+
+(** Now we go for the general case of `k` values being monitored,
+    for any k >= 2. *)
+
+use array.Array
+use array.ArraySum
+
+(** The index for the minimum value of a non-empty array. *)
+let function minimum (a: array int) : (m: int)
+  requires { length a > 0 }
+  ensures  { 0 <= m < length a }
+  ensures  { forall i. 0 <= i < length a -> a[m] <= a[i] }
+= let ref m = 0 in
+  for i = 1 to length a - 1 do
+    invariant { 0 <= m < length a }
+    invariant { forall j. 0 <= j < i -> a[m] <= a[j] }
+    if a[i] < a[m] then m <- i
+  done;
+  return m
+
+predicate occurs (v: elt) (a: array elt) =
+  exists i. 0 <= i < length a /\ v = a[i]
+
+(** It is a bit of a pity that we have to split sums like this to help
+    SMT solvers... *)
+let increment (ghost k: int) (c: array int) (i: int) (ghost n: int) : unit
+  requires { 0 <= i < length c = k }
+  requires { sum c 0 k = n - 1 }
+  ensures  { c[i] = old c[i] + 1 }
+  ensures  { forall j. 0 <= j < k -> j <> i -> c[j] = old c[j] }
+  ensures  { sum c 0 k = n }
+= assert { sum c 0 k = sum c 0 i + sum c i (i+1) + sum c (i+1) k };
+  c[i] <- c[i] + 1;
+  assert { sum c 0 k = sum c 0 i + sum c i (i+1) + sum c (i+1) k }
+
+(** Finds x in array e of size k, or returns k if not present. *)
+let find (k: int) (x: elt) (e: array elt) : (i: int)
+  requires { length e = k }
+  ensures  { 0 <= i <= k }
+  ensures  { forall j. 0 <= j < i -> e[j] <> x }
+  ensures  { i < k -> e[i] = x }
+= for i = 0 to k-1 do
+    invariant { forall j. 0 <= j < i -> e[j] <> x }
+    if e[i] = x then return i
+  done;
+  return k
+
+(** Let us help SMT solvers with non-linear arithmetic. *)
+let lemma minimum_k (k: int) (c: array int) (n: int)
+  requires { length c = k >= 2 }
+  requires { sum c 0 k = n >= 0 }
+  ensures  { k * c[minimum c] <= n }
+= let m = minimum c in
+  for i = 0 to k - 1 do invariant { i * c[m] <= sum c 0 i } () done
+
+(** Space-Saving Algorithm with `k` values being monitored. *)
+
+let space_saving_k (k: int) : unit
+  requires { k >= 2 }
+  requires { n = 0 }
+  diverges
+= let ref e = Array.make k dummy in
+  let ref c = Array.make k 0 in
+  while true do
+    invariant { sum c 0 k = n >= 0 }
+    invariant { forall i. 0 <= i < k -> 0 <= occ e[i] s 0 n <= c[i] }
+    invariant { forall i. 0 <= i < k ->
+                  if c[i] = 0 then e[i] = dummy else e[i] <> dummy }
+    invariant { forall i. 0 <= i < k -> c[i] > 0 ->
+                forall j. 0 <= j < k -> c[j] > 0 -> i <> j -> e[i] <> e[j] }
+    invariant { forall y. (forall i. 0 <= i < k -> y <> e[i]) ->
+                          occ y s 0 n <= c[minimum c] }
+    (* 1. We show that the desired property is a consequence of the
+       invariants above: any frequent value `v` (i.e. occurring strictly
+       more than min(c) times) is in `e`. *)
+    assert { [@expl:thm] forall v. occ v s 0 n > c[minimum c] -> occurs v e };
+    (* and beside, we have min(c) <= n/k (from the first invariant) *)
+    minimum_k k c n;
+    (* so any value occurring >n/k times is in `e`. *)
+    assert { [@expl:thm] forall v. k * occ v s 0 n > n -> occurs v e
+                                by k * occ v s 0 n > k * c[minimum c] };
+    (* 2. Read the next value and update the state. *)
+    let x = next () in
+    let i = find k x e in
+    if i < k then
+      increment k c i n
+    else (
+      let m = minimum c in
+      e[m] <- x;
+      increment k c m n;
+    )
+  done

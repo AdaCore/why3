@@ -50,7 +50,7 @@ type constant_frac = {
   constant_frac_verbatim: string
 }
 
-type constant_float =
+type constant_float_value =
   | Fplusinfinity
   | Fminusinfinity
   | Fpluszero
@@ -61,6 +61,12 @@ type constant_float =
       constant_float_exp : constant_bv;
       constant_float_mant : constant_bv
     }
+
+type constant_float = {
+  const_float_exp_size : int;
+  const_float_significand_size : int;
+  const_float_val : constant_float_value
+}
 
 type constant =
   | Cint of constant_int
@@ -79,6 +85,7 @@ type term =
   | Tapply of qual_identifier * term list
   | Tite of term * term * term
   | Tarray of sort * sort * array_elements
+  | Tasarray of term
   | Tunparsed of string
 
 and var_binding = symbol * term

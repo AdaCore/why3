@@ -1,14 +1,3 @@
-(********************************************************************)
-(*                                                                  *)
-(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
-(*                                                                  *)
-(*  This software is distributed under the terms of the GNU Lesser  *)
-(*  General Public License version 2.1, with the special exception  *)
-(*  on linking described in file LICENSE.                           *)
-(*                                                                  *)
-(********************************************************************)
-
 (**
 
    {1 Abstract syntax trees}
@@ -99,6 +88,7 @@ type condition = private
     | BAnd of condition * condition
     | BOr of condition * condition
     | BAtomic of atomic_condition
+    | Bite of condition * condition * condition (* For printing only ! *)
 
 val true_cond : condition
 val false_cond : condition
@@ -113,6 +103,8 @@ val e_let_in_condition : Abstract.why_var -> expression -> condition -> conditio
 
 val ternary_condition : condition -> condition -> condition -> condition
 
+val ternary_condition_no_simpl : condition -> condition -> condition -> condition
+
 
 (** {2 Statements} *)
 
@@ -122,15 +114,21 @@ type fun_id = private {
     fun_tag : int;
   }
 
+module FuncMap : Map.S with type key = fun_id
+
 val create_fun_id : string -> fun_id
 
 val print_fun_id : Format.formatter -> fun_id -> unit
+
+type memo_env = Abstract.why_env * condition
 
 type statement_node = private
     | Swhile of condition * (string option * condition) list * statement
     | Sfcall of (Abstract.why_var * statement * Abstract.var_value) option *
                 (Abstract.why_var * Abstract.var_value * expression) list *
-                fun_id * expression list
+                fun_id * expression list * memo_env option ref *
+                Abstract.memo_add_env option ref * Abstract.memo_add_env option ref *
+                Abstract.memo_havoc option ref * statement option ref
     (** First argument is [None] for procedures. For functions
        returning values, the triple [(v,s,av)] denotes the program
        variable [v] in which the result is stored, the statement [s]
@@ -141,7 +139,7 @@ type statement_node = private
     | Sblock of statement list
     | Sassert of condition
     | Sassume of condition
-    | Shavoc of Abstract.why_env * condition
+    | Shavoc of Abstract.why_env * condition * Abstract.memo_havoc option ref
     (** first argument is the set of written variables, each of them
        being associated to an abstract variable needed during
        interpretation of this havoc instruction.*)
@@ -201,6 +199,7 @@ val s_let_in : string -> var_type -> Abstract.why_var -> expression -> statement
 val s_break : string -> statement
 (** [s_break] creates the break statement. *)
 
+val copy_stmt : statement -> statement
 
 type fun_kind = private
   | Fun_let of statement * expression option
@@ -241,14 +240,14 @@ val declare_function_val :
 type why1program = private
   { name : string;
     vars : Abstract.why_env;
-    functions : func list;
+    functions : func FuncMap.t;
     statements : statement }
 (** whole programs *)
 
 val mk_program :
   name:string ->
   variables:var_type Abstract.VarMap.t ->
-  functions:func list ->
+  functions:func FuncMap.t ->
   main:statement ->
   why1program
 

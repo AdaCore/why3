@@ -1,15 +1,13 @@
 Invariant for loop [anonymous_loop_0] is
-  ((x <= x1.contents /\ x1.contents <= 0) /\ y.contents = True) /\ o = True
+  ((x <= !x1 /\ !x1 <= 0) /\ !y = True) /\ o = True
 Domains for loop [anonymous_loop_0] are
   x = ]-oo;0]; x1 = ]-oo;0]; o = true; y = true
 Invariant for loop [anonymous_loop_0] is
-  ((x2 <= x3.contents /\ x3.contents <= 0) /\ y1.contents = True) /\
-  o1 = True
+  ((x2 <= !x3 /\ !x3 <= 0) /\ !y1 = True) /\ o1 = True
 Domains for loop [anonymous_loop_0] are
   x2 = ]-oo;0]; x3 = ]-oo;0]; o1 = true; y1 = true
 Invariant for loop [anonymous_loop_0] is
-  ((x4 <= x5.contents /\ x5.contents <= 0) /\ y2.contents = True) /\
-  o2 = True
+  ((x4 <= !x5 /\ !x5 <= 0) /\ !y2 = True) /\ o2 = True
 Domains for loop [anonymous_loop_0] are
   x4 = ]-oo;0]; x5 = ]-oo;0]; o2 = true; y2 = true
 File bench/infer/bools.mlw:

@@ -49,16 +49,19 @@ type filters
 val filter_spec : spec_list
 
 val read_filter_spec : Whyconf.config -> filters * bool
+(** [read_filter_spec conf] returns a pair [(filters,b)] where
+    [filters] is a data to pass to the following iteration functions *)
 
 val theory_iter_proof_attempt_by_filter :
   Session_itp.session ->
   filters ->
-  (Session_itp.proof_attempt_node -> unit) -> Session_itp.theory -> unit
+  (Session_itp.proofAttemptID -> Session_itp.proof_attempt_node -> unit) ->
+  Session_itp.theory -> unit
 
 val session_iter_proof_attempt_by_filter :
   Session_itp.session ->
   filters ->
-  (Session_itp.proof_attempt_node -> unit) ->  unit
+  (Session_itp.proofAttemptID -> Session_itp.proof_attempt_node -> unit) ->  unit
 
 
 (* quite ad-hoc *)

@@ -1,0 +1,35 @@
+module Mem
+  use bv.BV32
+
+  type p =
+  | Freeable
+  | Writable
+  | Readable
+  | Nonempty
+  | None
+
+  type mp = {
+    block_size : int -> BV32.t;
+    mem_access_address : int -> p;
+  }
+
+  type loc = { base_addr : int ; offset : BV32.t }
+
+  predicate perm_leq (p1 p2 : p) =
+    p1 = p2 ||
+    p2 = Freeable ||
+    p1 = None ||
+    p1 = Readable && p2 = Writable ||
+    p1 = Nonempty && p2 = Writable ||
+    p1 = Nonempty && p2 = Readable
+
+  val load_val (m : mp) (x : loc) : unit
+    requires { perm_leq (m.mem_access_address x.base_addr) Writable }
+end
+
+module Main_module
+  use Mem
+
+  let rec not_valid (m : mp) (x : loc) : unit =
+    load_val m x
+end

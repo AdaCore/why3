@@ -626,3 +626,10 @@ val t_case_fold :
 
 val t_occurs  : term -> term -> bool
 val t_replace : term -> term -> term -> term
+
+val remove_unused_in_term : bool -> term -> term
+(** [remove_unused_in_term polarity t] removes from [t] the
+   occurrences and uses of symbols marked with attribute
+   [Ident.unused_attr]. [polarity] is the polarity of [t]. Does
+   nothing on sub-terms where polarity cannot be determined, so there
+   might be some unused symbols left. *)

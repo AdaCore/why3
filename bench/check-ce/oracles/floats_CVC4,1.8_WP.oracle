@@ -18,24 +18,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 861:
+  Line 863:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 861:
+  Line 863:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 5:
     x = (0x1.000002p0:t)
     x = (0x1.000002p0:t)
     Execution of main function `g1'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x1.000002p0:t)
       zero = 0
       one = 1
@@ -67,24 +61,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 861:
+  Line 863:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 861:
+  Line 863:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 7:
     x = (0x1.000002p0:t)
     x = (0x1.000002p0:t)
     Execution of main function `g2'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x1.000002p0:t)
       zero = 0
       one = 1
@@ -116,24 +104,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 861:
+  Line 863:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 861:
+  Line 863:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 9:
     x = (0.0:t)
     x = (0.0:t)
     Execution of main function `g3'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0.0:t)
       zero = 0
       one = 1
@@ -165,24 +147,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 861:
+  Line 863:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 861:
+  Line 863:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 11:
     x = (0x1.4p0:t)
     x = (0x1.4p0:t)
     Execution of main function `g4'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x1.4p0:t)
       zero = 0
       one = 1
@@ -214,24 +190,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 861:
+  Line 863:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 861:
+  Line 863:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 13:
     x = (0x1.04p32:t)
     x = (0x1.04p32:t)
     Execution of main function `g5'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x1.04p32:t)
       zero = 0
       one = 1
@@ -263,24 +233,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 861:
+  Line 863:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 861:
+  Line 863:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 15:
     x = epsilon x:t. is_nan x
     x = epsilon x:t. is_nan x
     Execution of main function `g6'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = epsilon x:t. is_nan x
       zero = 0
       one = 1
@@ -312,24 +276,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 861:
+  Line 863:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 861:
+  Line 863:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 17:
     x = (0x1.8008p27:t)
     x = (0x1.8008p27:t)
     Execution of main function `g7'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x1.8008p27:t)
       zero = 0
       one = 1
@@ -343,28 +301,48 @@ File floats.mlw:
       x = (0x1.8008p27:t)
 
 <check_ce:categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g8'goal` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g8'goal` cannot be evaluated)
-- Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g8'goal1` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g8'goal1` cannot be evaluated)
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 19, characters 24-60)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 19, characters 24-60)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 19, characters 24-60)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 19, characters 24-60)
 File "bench/check-ce/floats.mlw", line 19, characters 24-60:
 Goal g8.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because Postcondition of `g8'goal1` cannot be evaluated):
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
 File ieee_float.mlw:
-  Line 223:
-    max_real : real = 0.0
-  Line 224:
-    max_int : int = 0
-File real.mlw:
-  Line 203:
-    sqrt : real -> real = [|_ => 0.0|]
+  Line 863:
+    Constant zeroF initialization
+  Line 63:
+    (giant-step) execution of unimplemented function with args:
+    result = UNDEFINED
+  Line 863:
+    zeroF = UNDEFINED
 File floats.mlw:
   Line 19:
-    x : t = ∞
+    x = epsilon x:t. is_plus_infinity x
+    x = epsilon x:t. is_plus_infinity x
+    Execution of main function `g8'goal` with env:
+      x = epsilon x:t. is_plus_infinity x
+      zero = 0
+      one = 1
+      zeroF = UNDEFINED
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File floats.mlw:
+  Line 19:
+    Property failure at postcondition of `g8'goal` with:
+      RNE = UNDEFINED
+      x = epsilon x:t. is_plus_infinity x
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -386,24 +364,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 861:
+  Line 863:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 861:
+  Line 863:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 21:
     x = (0x0.000002p-126:t)
     x = (0x0.000002p-126:t)
     Execution of main function `g9'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x0.000002p-126:t)
       zero = 0
       one = 1
@@ -436,24 +408,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 861:
+  Line 863:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 861:
+  Line 863:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 24:
     x = (0x1.99999Cp-4:t)
     x = (0x1.99999Cp-4:t)
     Execution of main function `g10'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x1.99999Cp-4:t)
       zero = 0
       one = 1
@@ -487,24 +453,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 861:
+  Line 863:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 861:
+  Line 863:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 26:
     x = (0x1.0p-126:t)
     x = (0x1.0p-126:t)
     Execution of main function `g11'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x1.0p-126:t)
       zero = 0
       one = 1
@@ -536,24 +496,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 861:
+  Line 863:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 861:
+  Line 863:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 29:
     x = (0x0.FFFFFEp-126:t)
     x = (0x0.FFFFFEp-126:t)
     Execution of main function `g12'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x0.FFFFFEp-126:t)
       zero = 0
       one = 1
@@ -585,24 +539,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 861:
+  Line 863:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 861:
+  Line 863:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 32:
     x = (0x0.8p-126:t)
     x = (0x0.8p-126:t)
     Execution of main function `g13'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x0.8p-126:t)
       zero = 0
       one = 1
@@ -634,24 +582,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 902:
+  Line 905:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 902:
+  Line 905:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 41:
     x = (0x1.0000000000001p0:t1)
     x = (0x1.0000000000001p0:t1)
     Execution of main function `g1'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x1.0000000000001p0:t1)
       zero = 0
       one = 1
@@ -683,24 +625,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 902:
+  Line 905:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 902:
+  Line 905:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 43:
     x = (0x1.0000000000001p0:t1)
     x = (0x1.0000000000001p0:t1)
     Execution of main function `g2'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x1.0000000000001p0:t1)
       zero = 0
       one = 1
@@ -732,24 +668,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 902:
+  Line 905:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 902:
+  Line 905:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 45:
     x = (0.0:t1)
     x = (0.0:t1)
     Execution of main function `g3'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0.0:t1)
       zero = 0
       one = 1
@@ -781,24 +711,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 902:
+  Line 905:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 902:
+  Line 905:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 47:
     x = (0x1.4p0:t1)
     x = (0x1.4p0:t1)
     Execution of main function `g4'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x1.4p0:t1)
       zero = 0
       one = 1
@@ -830,24 +754,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 902:
+  Line 905:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 902:
+  Line 905:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 49:
     x = (0x1.0p64:t1)
     x = (0x1.0p64:t1)
     Execution of main function `g5'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x1.0p64:t1)
       zero = 0
       one = 1
@@ -879,24 +797,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 902:
+  Line 905:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 902:
+  Line 905:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 51:
     x = epsilon x:t1. is_nan1 x
     x = epsilon x:t1. is_nan1 x
     Execution of main function `g6'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = epsilon x:t1. is_nan1 x
       zero = 0
       one = 1
@@ -928,24 +840,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 902:
+  Line 905:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 902:
+  Line 905:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 53:
     x = (0x1.AD43755C4BE7Ep53:t1)
     x = (0x1.AD43755C4BE7Ep53:t1)
     Execution of main function `g7'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x1.AD43755C4BE7Ep53:t1)
       zero = 0
       one = 1
@@ -959,28 +865,48 @@ File floats.mlw:
       x = (0x1.AD43755C4BE7Ep53:t1)
 
 <check_ce:categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g8'goal2` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g8'goal2` cannot be evaluated)
-- Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g8'goal3` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g8'goal3` cannot be evaluated)
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 55, characters 24-60)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 55, characters 24-60)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 55, characters 24-60)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 55, characters 24-60)
 File "bench/check-ce/floats.mlw", line 55, characters 24-60:
 Goal g8.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because Postcondition of `g8'goal3` cannot be evaluated):
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
 File ieee_float.mlw:
-  Line 223:
-    max_real : real = 0.0
-  Line 224:
-    max_int : int = 0
-File real.mlw:
-  Line 203:
-    sqrt : real -> real = [|_ => 0.0|]
+  Line 905:
+    Constant zeroF initialization
+  Line 63:
+    (giant-step) execution of unimplemented function with args:
+    result = UNDEFINED
+  Line 905:
+    zeroF = UNDEFINED
 File floats.mlw:
   Line 55:
-    x : t1 = ∞
+    x = epsilon x:t1. is_plus_infinity1 x
+    x = epsilon x:t1. is_plus_infinity1 x
+    Execution of main function `g8'goal` with env:
+      x = epsilon x:t1. is_plus_infinity1 x
+      zero = 0
+      one = 1
+      zeroF = UNDEFINED
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File floats.mlw:
+  Line 55:
+    Property failure at postcondition of `g8'goal2` with:
+      RNE = UNDEFINED
+      x = epsilon x:t1. is_plus_infinity1 x
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -1002,24 +928,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 902:
+  Line 905:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 902:
+  Line 905:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 57:
     x = (0x0.0000000000001p-1022:t1)
     x = (0x0.0000000000001p-1022:t1)
     Execution of main function `g9'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x0.0000000000001p-1022:t1)
       zero = 0
       one = 1
@@ -1052,24 +972,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 902:
+  Line 905:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 902:
+  Line 905:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 60:
     x = (0x1.999999999999Bp-4:t1)
     x = (0x1.999999999999Bp-4:t1)
     Execution of main function `g10'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x1.999999999999Bp-4:t1)
       zero = 0
       one = 1
@@ -1103,24 +1017,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 902:
+  Line 905:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 902:
+  Line 905:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 62:
     x = (0x1.0p-1022:t1)
     x = (0x1.0p-1022:t1)
     Execution of main function `g11'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x1.0p-1022:t1)
       zero = 0
       one = 1
@@ -1152,24 +1060,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 902:
+  Line 905:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 902:
+  Line 905:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 65:
     x = (0x0.FFFFFFFFFFFFFp-1022:t1)
     x = (0x0.FFFFFFFFFFFFFp-1022:t1)
     Execution of main function `g12'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x0.FFFFFFFFFFFFFp-1022:t1)
       zero = 0
       one = 1
@@ -1201,24 +1103,18 @@ File int.mlw:
     Constant one initialization
     one = 1
 File ieee_float.mlw:
-  Line 902:
+  Line 905:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args:
     result = UNDEFINED
-  Line 902:
+  Line 905:
     zeroF = UNDEFINED
-  Line 223:
-    max_real = 0.0
-  Line 224:
-    max_int = 0
 File floats.mlw:
   Line 68:
     x = (0x0.8p-1022:t1)
     x = (0x0.8p-1022:t1)
     Execution of main function `g13'goal` with env:
-      max_real = 0.0
-      max_int = 0
       x = (0x0.8p-1022:t1)
       zero = 0
       one = 1

@@ -1,13 +1,3 @@
-(********************************************************************)
-(*                                                                  *)
-(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
-(*                                                                  *)
-(*  This software is distributed under the terms of the GNU Lesser  *)
-(*  General Public License version 2.1, with the special exception  *)
-(*  on linking described in file LICENSE.                           *)
-(*                                                                  *)
-(********************************************************************)
 
 
 (** {1 Translation between expressions and abstract states}
@@ -18,6 +8,9 @@ TODO list:
 
 *)
 
+
+(* open Why3 *)
+(* to comment out when inside Why3 *)
 
 open Ast
 open Apron
@@ -75,9 +68,10 @@ let integer_condition_to_tcons ~old (a : t) (c:atomic_condition) : Tcons1.t =
     | Ceq (e1, e2) ->
         let e = to_texpr ~old whyenv (e_sub e1 e2) |> of_apron_expr a in
         Tcons1.make e Tcons1.EQ
-    | Cne (e1, e2) ->
-        let e = to_texpr ~old whyenv (e_sub e1 e2) |> of_apron_expr a in
+    | Cne (_e1, _e2) -> assert false
+(*        let e = to_texpr ~old whyenv (e_sub e1 e2) |> of_apron_expr a in
         Tcons1.make e Tcons1.DISEQ
+*)
     | Cge (e1, e2) ->
         let e = to_texpr ~old whyenv (e_sub e1 e2) |> of_apron_expr a in
         Tcons1.make e Tcons1.SUPEQ
@@ -117,12 +111,16 @@ let rec interp_bool_expr state ~old env (e : expression) : t =
   | Ecst _ | Eadd _ | Esub _ | Emul _ | Ediv _ | Emod _ -> assert false
 
 
-let meet_atomic_condition ~old (state : t)  (c:atomic_condition) : t =
+let rec meet_atomic_condition ~old (state : t)  (c:atomic_condition) : t =
   let env = why_env state in
   match c with
   | C_is_true e ->
     let b = interp_bool_expr state ~old env e in
     meet state b
+  | Cne(e1,e2) ->
+    let s1 = meet_atomic_condition ~old state (c_lt e1 e2) in
+    let s2 = meet_atomic_condition ~old state (c_gt e1 e2) in
+    join s1 s2
   | _ ->
     let a = integer_condition_to_tcons ~old state c in
     (* Format.eprintf "@[meet_atomic_condition with state:@ @[%a@]@]@." Abstract.print state; *)
@@ -142,10 +140,19 @@ let rec meet_condition ~old (state: t) (c:condition) : t =
     | BFalse -> bottom state
     | BAnd (c1, c2) -> meet (meet_condition ~old state c1) (meet_condition ~old state c2)
     | BOr (c1, c2) -> join (meet_condition ~old state c1) (meet_condition ~old state c2)
+    | Bite _ -> assert false
     | BAtomic c ->
        meet_atomic_condition ~old state c
 
+let utime () = Unix.((times ()).tms_utime)
 
+let time_in_meet_condition = ref 0.0
+
+let meet_condition ~old s c =
+  let t = utime () in
+  let s = meet_condition ~old s c in
+  time_in_meet_condition := !time_in_meet_condition +. (utime () -. t);
+  s
 
 
 
@@ -212,7 +219,7 @@ let rec formula_to_condition mb mi fi f =
      let f1 = formula_to_condition mb mi fi f1 in
      let f2 = formula_to_condition mb mi fi f2 in
      let x_true = atomic_cond (c_is_true (e_var x Here)) in
-     ternary_condition x_true f1 f2
+     ternary_condition_no_simpl x_true f1 f2
   | Fite _ -> assert false (* should not happen *)
   | Fimp _ -> assert false (* should not happen *)
   | Fiff _ -> assert false (* should not happen *)

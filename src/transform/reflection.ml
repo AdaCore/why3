@@ -633,7 +633,8 @@ open Pmodule
 
 exception ReductionFail of reify_env
 
-let reflection_by_function do_trans s env = Trans.store (fun task ->
+let reflection_by_function do_trans s env =
+  let tr task =
   Debug.dprintf debug_refl "reflection_f start@.";
   let kn = task_known task in
   let nt = Args_wrapper.build_naming_tables task in
@@ -735,7 +736,9 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
     let _, prev, _, _ = build_vars_map renv prev in
     let fg = create_prsymbol (id_fresh "Failure") in
     let df = create_prop_decl Pgoal fg t_false in
-    [Task.add_decl prev df] )
+    [Task.add_decl prev df]
+  in Trans.compose Introduction.remove_unused_from_context (Trans.store tr)
+
 
 let () = wrap_and_register
            ~desc:"reflection_l <prop>@ \

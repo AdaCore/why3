@@ -366,7 +366,7 @@ let parse_prover_run res_parser signaled time out exitcode limit get_model =
 
 let parse_prover_run res_parser signaled time outfile exitcode limit get_model =
   if outfile = "" then
-    { pr_answer = Failure "interrupted";
+    { pr_answer = Unknown "empty prover answer";
       pr_status = Unix.WEXITED 1;
       pr_output = "";
       pr_time = time;

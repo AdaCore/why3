@@ -3,8 +3,8 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.7.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.11.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="mpz_realloc2.mlw"/>
 <theory name="Zrealloc2" proved="true">
@@ -199,8 +199,8 @@
      </goal>
      <goal name="wmpz_realloc2&#39;vc.48.1.1.1" expl="apply premises" proved="true">
      <proof prover="0"><result status="valid" time="0.08" steps="21615"/></proof>
-     <proof prover="1"><result status="valid" time="0.02" steps="60330"/></proof>
      <proof prover="2"><result status="valid" time="0.05" steps="136"/></proof>
+     <proof prover="3"><result status="valid" time="0.03" steps="93468"/></proof>
      </goal>
     </transf>
     </goal>

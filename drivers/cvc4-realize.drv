@@ -17,6 +17,13 @@ printer "smtv2"
 import "smt-libv2-bv-realization.gen"
 import "discrimination.gen"
 
+(* Performed introductions depending on whether counterexamples are
+   requested, as said by the meta "get_counterexmp". When this meta
+   set, this transformation introduces the model variables that are
+   still embedded in the goal. When it is not set, it removes all
+   these unused-ce-related variables, even in the context.  *)
+transformation "counterexamples_dependent_intros"
+
 transformation "inline_trivial"
 transformation "eliminate_builtin"
 transformation "detect_polymorphism"

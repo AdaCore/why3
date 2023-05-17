@@ -93,6 +93,15 @@ let add_dependency usymb l =
 
 (* The second step of the removal : transverse the task decls and keep
    only the ones we want *)
+
+let metas_keep_if_at_least_one_arg_is_used =
+  let open Theory in
+  List.fold_left
+    (fun acc mt -> Smeta.add mt acc)
+    Smeta.empty
+    [meta_range;
+     meta_float]
+
 let do_removal_unused_decl usymb (td : Theory.tdecl) : Theory.tdecl option =
   let open Ident in
   let open Decl in
@@ -100,7 +109,7 @@ let do_removal_unused_decl usymb (td : Theory.tdecl) : Theory.tdecl option =
   match td.td_node with
   | Meta (mt, [ MApr pr; MAls _ls ]) when meta_equal mt meta_depends ->
       if Sid.mem pr.pr_name usymb.used_ids then Some td else None
-  | Meta (_, margs) ->
+  | Meta (mt, margs) ->
       let kept_arg = function
         | MApr pr -> Sid.mem pr.pr_name usymb.used_ids
         | MAty ty ->
@@ -110,6 +119,9 @@ let do_removal_unused_decl usymb (td : Theory.tdecl) : Theory.tdecl option =
         | MAls ls -> Sid.mem ls.Term.ls_name usymb.used_ids
         | MAstr _ | MAint _ | MAid _ -> true
       in
+      if Smeta.mem mt metas_keep_if_at_least_one_arg_is_used then
+        if List.exists kept_arg margs then Some td else None
+      else
       if List.for_all kept_arg margs then Some td else None
   | Use _ | Clone _ -> Some td
   | Decl d -> (
@@ -137,7 +149,8 @@ let rec compute_used_ids usymb task : used_symbols =
       let usymb =
         match td.td_node with
         | Use _ | Clone _ | Meta _ -> usymb
-        | Decl d -> (
+        | Decl d ->
+            begin
             match d.d_node with
             | Dprop (_, pr, _t) -> (
                 try

@@ -1,0 +1,24 @@
+
+module TestDequant
+
+type t
+
+constant v : t
+
+predicate p t t
+
+axiom H: let z:t = v in exists w:t. p z w
+
+goal G: forall x:t. p x x -> let y:t = v in p x y
+
+end
+
+module TestPretty
+
+use int.Int
+
+let f (x:int) : int
+  ensures { result > 0 }
+= if x > 0 then x - 1 else x + 1
+
+end
