@@ -130,5 +130,4 @@ let set_debug_flags_gnatprove () =
   let debug_useless_at = Debug.register_flag "ignore_useless_at"
     ~desc:"Remove@ warning@ for@ useless@ at/old." in
   Debug.set_flag debug_useless_at;
-  (* Loc.unset_flag Dterm.warn_unused_variable *)
-  ()
+  Loc.disable_warning Dterm.warn_unused_variable

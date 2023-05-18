@@ -89,6 +89,8 @@ val without_warning : warning_id -> (unit -> 'a) -> 'a
 val warning: ?id:warning_id ->
   ?loc:position -> ('b, Format.formatter, unit, unit) format4 -> 'b
 
+val disable_warning : warning_id -> unit
+
 (** Command line arguments *)
 module Args : sig
   type spec = Getopt.opt
