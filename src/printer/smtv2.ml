@@ -392,11 +392,17 @@ let rec print_term info fmt t =
             | _ -> assert false in
           syntax_float_literal st fp fmt c
         | _, Constant.ConstStr _
-        | None, _ -> Constant.print number_format escape fmt c
-        (* TODO/FIXME: we must assert here that the type is either
-            ty_int or ty_real, otherwise it makes no sense to print
-            the literal. Do we ensure that preserved literal types
-            are exactly those that have a dedicated syntax? *)
+        | None, _ ->
+            (* we must check here that the type is either ty_int or
+               ty_real, otherwise it makes no sense to print the
+               literal. This may happen since we can't ensure that
+               preserved literal types are exactly those that have a
+               dedicated syntax rule *)
+            if ts_equal ts ts_int || ts_equal ts ts_real || ts_equal ts ts_str then
+              Constant.print number_format escape fmt c
+            else
+              unsupportedTerm t
+                "smtv2: don't know how to print this literal, consider adding a syntax rule in the driver"
       end
   | Tvar v -> print_var info fmt v
   | Tapp (ls, tl) ->
