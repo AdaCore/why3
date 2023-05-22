@@ -183,6 +183,13 @@ module BV_Gen
 
   type t
 
+  (** this meta seems somehow placed too early since we cannot give a
+     syntax rule for the literals yet, it is only possible in the
+     clones. Yet, this will prevent users who clone this module to
+     forget to add such a syntax rule in their driver. See also issue
+     https://gitlab.inria.fr/why3/why3/-/issues/759 *)
+  meta "literal:keep" type t
+
   (** `nth b n` is the `n`-th bit of `b`. Bit 0 is
       the least significant bit *)
   val function nth t int : bool

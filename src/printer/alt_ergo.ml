@@ -165,7 +165,17 @@ let rec print_term info fmt t =
 
   let () = match t.t_node with
   | Tconst c ->
-      Constant.(print number_format unsupported_escape) fmt c
+      let ts = match t.t_ty with
+        | Some { ty_node = Tyapp (ts, []) } ->
+            ts
+        | _ -> assert false (* impossible *)
+      in
+      if ts_equal ts ts_int || ts_equal ts ts_real || ts_equal ts ts_str then
+        Constant.(print number_format unsupported_escape) fmt c
+      else
+        unsupportedTerm t
+          "alt-ergo printer: don't know how to print this literal, consider adding a syntax rule in the driver"
+
   | Tvar { vs_name = id } ->
       print_ident info fmt id
   | Tapp (ls, tl) ->
