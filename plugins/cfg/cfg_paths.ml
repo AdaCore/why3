@@ -106,12 +106,19 @@ let translate_cfg preconds block (blocks : (label * block) list) =
             | CFGinvariant l1, { cfg_instr_desc = CFGinvariant l2 } :: rem ->
                 traverse_block ({ i with cfg_instr_desc = CFGinvariant (l1 @ l2) } :: rem, term)
             | CFGinvariant l, _ ->
-                let id = match l with (_, id, _) :: _ -> id | _ -> assert false in
-                let id = match id with Some i -> i.id_str | None -> "invariant" ^ string_of_int !invcounter in
-                invcounter := !invcounter + 1;
+                let id =
+                  match l with
+                  | (_, _, _, { contents = Some id }) :: _ -> id
+                  | (_, _, _, idr) :: _ ->
+                     let i = !invcounter in invcounter := !invcounter + 1;
+                     idr := Some i;
+                     i
+                  | _ -> assert false
+                in
+                let id = Printf.sprintf "invariant_%d" id in
                 let l =
                   List.map
-                    (fun (k, id, t) ->
+                    (fun (k, id, t, _) ->
                       if k = Variant then
                         Loc.errorm ~loc:t.term_loc "`variant` clauses are not supported in the Paths backend";
                       if id <> None then
