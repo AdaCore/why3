@@ -5,8 +5,6 @@ open Ptree_constructors
 
 let debug = Debug.register_info_flag "gnat_ast" ~desc:"Output@ mlw@ file"
 
-let () = Debug.set_flag debug
-
 [@@@warning "-42"]
 
 exception Conversion_error of {node_id: int; message: string}
@@ -1384,6 +1382,12 @@ exception Located_by_marker of string * exn
 let gnat_json_format : Env.fformat = "gnat-json"
 let gnat_json_file_ext : string = "gnat-json"
 
+let save_mlw_as_sexp mlw fn =
+  let sexp = Ptree.sexp_of_mlw_file mlw in
+  let out_channel = open_out fn in
+  output_string out_channel (Sexplib.Sexp.to_string sexp);
+  close_out out_channel
+
 let read_channel env path filename c =
   let json = Yojson.Safe.from_channel c in
   let gnat_file =
@@ -1398,7 +1402,9 @@ let read_channel env path filename c =
         Gnat_ast_pretty.pp_file gnat_file
   end;
   let mlw_file = mlw_file gnat_file.theory_declarations in
-  let mlw_filename = Strings.remove_suffix ("."^gnat_json_file_ext) filename^".mlw" in
+  let basename = Strings.remove_suffix ("."^gnat_json_file_ext) filename in
+  let mlw_filename = basename ^".mlw" in
+  let sexp_filename = basename ^".sexp" in
   (* Defer printing of mlw file until after the typing, to set the marker of located
      exceptions *)
   let print_mlw_file ?mark () =
@@ -1406,6 +1412,7 @@ let read_channel env path filename c =
     let pp = match mark with
       | None -> pp
       | Some (msg, pos) -> Mlw_printer.with_marker ~msg pos pp in
+    save_mlw_as_sexp mlw_file sexp_filename;
     let out = open_out mlw_filename in
     Format.fprintf (Format.formatter_of_out_channel out) "%a@." pp mlw_file;
     close_out out in
