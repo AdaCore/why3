@@ -37,7 +37,7 @@ type usage = Multi | One
 
 type exp_tree =
   | Scope of label * usage * exp_tree * exp_tree
-  | Loop of (loop_clause * ident option * Ptree.term) list * exp_tree
+  | Loop of (loop_clause * ident option * Ptree.term * int option ref) list * exp_tree
   | Block of labeled_block
 
 let rec _print_exp_structure' exp =

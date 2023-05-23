@@ -62,11 +62,11 @@ let () =
 
 let mk_loop_continue entry : Ptree.expr = mk_expr ~loc:entry.id_loc (Eraise (Qident entry, None))
 
-let mk_loop_expr entry (invariants : (loop_clause * ident option * term) list) (e : Ptree.expr) : Ptree.expr =
+let mk_loop_expr entry (invariants : (loop_clause * ident option * term * int option ref) list) (e : Ptree.expr) : Ptree.expr =
   let continue = mk_expr ~loc:Loc.dummy_position (Eoptexn (entry, Ity.MaskVisible, e)) in
   let invariants, variants =
     List.partition_map
-      (fun (claus, id, t) ->
+      (fun (claus, id, t, _) ->
         if id <> None then
           Loc.warning ~loc:t.term_loc ~id:warn_deprecated_named_invariant  "Named invariants are deprecated. Please use the `hyp_name` attribute directly";
 

@@ -34,9 +34,9 @@ let cfg cfg_inv (x:int) : int
   var y:int;
   {
   y <- x;
-  invariant I { y >= 0} ;
+  invariant { y >= 0} ;
   y <- y + 1;
-  invariant J { y >= 1} ;
+  invariant { y >= 1} ;
   y <- y + 1;
   return y
   }
@@ -53,7 +53,7 @@ let cfg cfg_infinite_loop (x:int) : int
   }
   L {
   y <- y + 1;
-  invariant I { exists z. y = z+z+1 };
+  invariant { exists z. y = z+z+1 };
   y <- y + 1;
   goto L
   }
@@ -70,7 +70,7 @@ let cfg cfg_finite_loop (x:int) : int
   }
   L {
   y <- y + 1;
-  invariant I { exists z. y = z+z+1 };
+  invariant { exists z. y = z+z+1 };
   y <- y + 1;
   switch (y <= x)
   | True -> goto L
