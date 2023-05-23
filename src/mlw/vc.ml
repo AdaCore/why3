@@ -333,6 +333,7 @@ let decrease env loc attrs expl olds news =
         let dt =
           if Mls.mem r env.proved_wf then dt else
             t_and dt (accessible r old_t) in
+        let dt = t_attr_copy t dt in
         t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds news))
     | (old_t, None)::olds, (t, None)::news when oty_equal old_t.t_ty t.t_ty ->
         if t_equal old_t t then decr olds news else
