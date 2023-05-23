@@ -8,6 +8,13 @@ theory bv.BV_Gen
   remove prop Nth_zeros
   remove prop Nth_ones
 
+  (** this meta seems somehow placed too early since we cannot give a
+     syntax rule for the literals yet, it is only possible in the
+     clones. Yet, this will prevent users who clone this module to
+     forget to add such a syntax rule in their driver. See also issue
+     https://gitlab.inria.fr/why3/why3/-/issues/759 *)
+  meta "literal:keep" type t
+
   (* Note: the syntax rules given in this module are somehow given too
      early, since they are only valid in each clones. Yet, it is
      convenient to share those declarations once and for all. See also issue
