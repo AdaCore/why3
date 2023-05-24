@@ -33,6 +33,8 @@ type namespace = {
   ns_ns : namespace   Mstr.t;  (* inner namespaces *)
 }
 
+val empty_ns : namespace
+
 val ns_find_prog_symbol : namespace -> string list -> prog_symbol
 
 val ns_find_its : namespace -> string list -> itysymbol
@@ -139,6 +141,10 @@ val add_meta : pmodule_uc -> meta -> meta_arg list -> pmodule_uc
 val add_pdecl : ?warn:bool -> vc:bool -> pmodule_uc -> pdecl -> pmodule_uc
 (** [add_pdecl ~vc m d] adds declaration [d] in module [m].
     If [vc] is [true], VC is computed and added to [m]. *)
+
+val mod_impl : Env.env -> pmodule -> pmodule
+
+val mod_impl_register : Env.env -> pmodule -> pmodule -> mod_inst -> unit
 
 (** {2 Builtin symbols} *)
 

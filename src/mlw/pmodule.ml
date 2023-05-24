@@ -554,7 +554,7 @@ let add_meta uc m al =
 (** {2 Cloning} *)
 
 type clones = {
-  cl_local : Sid.t;
+  mutable cl_local : Sid.t;
   mutable ty_table : ity Mts.t;
   mutable ts_table : itysymbol Mts.t;
   mutable ls_table : lsymbol Mls.t;
@@ -566,8 +566,8 @@ type clones = {
   mutable xs_table : xsymbol Mxs.t;
 }
 
-let empty_clones m = {
-  cl_local = m.mod_local;
+let empty_clones' local = {
+  cl_local = local;
   ty_table = Mts.empty;
   ts_table = Mts.empty;
   ls_table = Mls.empty;
@@ -578,6 +578,9 @@ let empty_clones m = {
   rs_table = Mrs.empty;
   xs_table = Mxs.empty;
 }
+
+let empty_clones m =
+  empty_clones' m.mod_local
 
 (* populate the clone structure *)
 
@@ -1453,6 +1456,10 @@ let clone_pdecl loc inst cl uc d = match d.pd_node with
       assert (d.pd_meta = []); (* pure decls do not produce metas *)
       uc
 
+let impl_cl = empty_clones' Sid.empty
+
+let mod_table = Hid.create 17
+
 let theory_add_clone = Theory.add_clone_internal ()
 
 let add_clone uc mi =
@@ -1469,8 +1476,100 @@ let add_clone uc mi =
       muc_theory = theory_add_clone uc.muc_theory mi.mi_mod.mod_theory sm;
       muc_units  = Uclone mi :: uc.muc_units }
 
-let clone_export ?loc uc m inst =
-  let cl = cl_init m inst in
+let decl_impl uc d =
+  match d.d_node with
+  | Dprop (Pgoal, pr, f) ->
+     (* when the prop is a Pgoal clone_pdecl do not copy it *)
+     let attr = Sattr.remove Ident.useraxiom_attr pr.pr_name.id_attrs in
+     let pr' = create_prsymbol (id_attr pr.pr_name attr) in
+     impl_cl.pr_table <- Mpr.add pr pr' impl_cl.pr_table;
+     let d = create_prop_decl Pgoal pr' (clone_fmla impl_cl f) in
+     add_pdecl ~warn:false ~vc:false uc (create_pure_decl d)
+  | _ -> uc
+
+let need_copy m =
+  Sid.exists (fun id -> Hid.mem mod_table id) m.mod_theory.th_used
+
+let pdecl_impl inst uc d =
+  let uc = clone_pdecl None inst impl_cl uc d in
+  match d.pd_node with
+  | PDpure ->
+     List.fold_left decl_impl uc d.pd_pure
+  | _ -> uc
+
+let rec mi_impl e mi =
+  let aux fold add empty findk findv m =
+    fold (fun k v m -> add (findk impl_cl k) (findv impl_cl v) m) m empty in
+  let mi_mod = mod_impl e mi.mi_mod in
+  {
+    mi_mod = mi_mod;
+    mi_ty = aux Mts.fold Mts.add Mts.empty cl_find_ts clone_ity mi.mi_ty;
+    mi_ts = aux Mts.fold Mts.add Mts.empty cl_find_ts cl_find_its mi.mi_ts;
+    mi_ls = aux Mls.fold Mls.add Mls.empty cl_find_ls cl_find_ls mi.mi_ls;
+    mi_pr = aux Mpr.fold Mpr.add Mpr.empty cl_find_pr cl_find_pr mi.mi_pr;
+    mi_pk = aux Mpr.fold Mpr.add Mpr.empty cl_find_pr (fun _ k -> k) mi.mi_pk;
+    mi_pv = Mvs.(aux fold add empty (fun cl vs -> (find vs cl.pv_table).pv_vs)
+                   cl_find_pv mi.mi_pv);
+    mi_rs = aux Mrs.fold Mrs.add Mrs.empty cl_find_rs cl_find_rs mi.mi_rs;
+    mi_xs = aux Mxs.fold Mxs.add Mxs.empty cl_find_xs cl_find_xs mi.mi_xs;
+    mi_df = mi.mi_df;
+  }
+
+and unit_impl e inst uc = function
+  | Udecl d -> pdecl_impl inst uc d
+  | Uuse m -> use_export uc (mod_impl e m)
+
+  | Umeta (m, al) ->
+     begin try add_meta uc m (List.map (function
+       | MAty ty -> MAty (clone_ty impl_cl ty)
+       | MAts ts -> MAts (cl_find_ts impl_cl ts)
+       | MAls ls -> MAls (cl_find_ls impl_cl ls)
+       | MApr pr -> MApr (cl_find_pr impl_cl pr)
+       | a -> a) al)
+     with Not_found -> uc end
+
+  | Uscope (n, ul) ->
+     let uc = open_scope uc n in
+     let uc = List.fold_left (unit_impl e inst) uc ul in
+     close_scope ~import:false uc
+
+  | Uclone mi ->
+     try add_clone uc (mi_impl e mi) with
+     | Not_found -> uc
+
+and mod_impl'' e m =
+  impl_cl.cl_local <- Sid.union impl_cl.cl_local m.mod_local;
+  let id = id_clone m.mod_theory.th_name in
+  let muc = empty_module e id m.mod_theory.th_path in
+  let muc = List.fold_left (unit_impl e (empty_mod_inst m)) muc m.mod_units in
+  muc
+
+and mod_impl' e m =
+  close_module (mod_impl'' e m)
+
+and mod_impl e m =
+  let id = m.mod_theory.th_name in
+  try Hid.find mod_table id with
+  | Not_found ->
+     if not (need_copy m)
+     then m
+     else begin
+         let m = mod_impl' e m in
+         Hid.add mod_table id m;
+         m
+       end
+
+let add_clone uc mi =
+  let sm = {
+    sm_ty = Mts.map ty_of_ity mi.mi_ty;
+    sm_ts = Mts.map (fun s -> s.its_ts) mi.mi_ts;
+    sm_ls = mi.mi_ls;
+    sm_pr = mi.mi_pr } in
+  { uc with
+      muc_theory = theory_add_clone uc.muc_theory mi.mi_mod.mod_theory sm;
+      muc_units  = Uclone mi :: uc.muc_units }
+
+let clone_export' ?loc uc m inst cl =
   let rec add_unit uc u = match u with
     | Udecl d -> clone_pdecl loc inst cl uc d
     | Uuse m -> use_export uc m
@@ -1499,18 +1598,44 @@ let clone_export ?loc uc m inst =
         let uc = List.fold_left add_unit uc ul in
         close_scope ~import:false uc in
   let uc = List.fold_left add_unit uc m.mod_units in
+  let local id _ = Sid.mem id m.mod_local in
   let mi = {
     mi_mod = m;
-    mi_ty  = cl.ty_table;
-    mi_ts  = cl.ts_table;
-    mi_ls  = cl.ls_table;
-    mi_pr  = cl.pr_table;
+    mi_ty  = Mts.filter (fun k -> local k.ts_name) cl.ty_table;
+    mi_ts  = Mts.filter (fun k -> local k.ts_name) cl.ts_table;
+    mi_ls  = Mls.filter (fun k -> local k.ls_name) cl.ls_table;
+    mi_pr  = Mpr.filter (fun k -> local k.pr_name) cl.pr_table;
     mi_pk  = inst.mi_pk;
-    mi_pv  = cl.pv_table;
-    mi_rs  = cl.rs_table;
-    mi_xs  = cl.xs_table;
+    mi_pv  = Mvs.filter (fun k -> local k.vs_name) cl.pv_table;
+    mi_rs  = Mrs.filter (fun k -> local k.rs_name) cl.rs_table;
+    mi_xs  = Mxs.filter (fun k -> local k.xs_name) cl.xs_table;
     mi_df  = inst.mi_df} in
   add_clone uc mi
+
+let clone_export ?loc uc m inst =
+  clone_export' ?loc uc m inst (cl_init m inst)
+
+let mod_impl_register e m mimpl inst =
+  let mimpl' = mod_impl'' e mimpl in
+  let mimpl' = open_scope mimpl' "some'scope" in
+  let inst = {
+      mi_mod = inst.mi_mod;
+      mi_ty = Mts.map (clone_ity impl_cl) inst.mi_ty;
+      mi_ts = Mts.map (cl_find_its impl_cl) inst.mi_ts;
+      mi_ls = Mls.map (cl_find_ls impl_cl) inst.mi_ls;
+      mi_pr = Mpr.map (cl_find_pr impl_cl) inst.mi_pr;
+      mi_pk = inst.mi_pk;
+      mi_pv = Mvs.map (cl_find_pv impl_cl) inst.mi_pv;
+      mi_rs = Mrs.map (cl_find_rs impl_cl) inst.mi_rs;
+      mi_xs = Mxs.map (cl_find_xs impl_cl) inst.mi_xs;
+      mi_df = inst.mi_df
+    } in
+  impl_cl.cl_local <- Sid.union impl_cl.cl_local m.mod_local;
+  let mimpl' = clone_export' mimpl' m inst impl_cl in
+  let mimpl' = close_scope mimpl' ~import:false in
+  let mimpl' = close_module mimpl' in
+  Hid.add mod_table mimpl.mod_theory.th_name mimpl';
+  Hid.add mod_table m.mod_theory.th_name mimpl'
 
 (** {2 WhyML language} *)
 

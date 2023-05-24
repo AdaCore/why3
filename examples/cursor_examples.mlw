@@ -36,7 +36,7 @@ end
 
     here we choose a list *)
 
-module ListCursorImpl (* : ListCursor *)
+module ListCursorImpl : cursor.ListCursor
 
   use int.Int
   use list.List
@@ -61,42 +61,40 @@ module ListCursorImpl (* : ListCursor *)
     ensures { snoc s x ++ l == s ++ Cons x l }
   = ()
 
-  let next (c: cursor 'a) : 'a
-    requires { not (complete c) }
-    writes   { c }
-    ensures  { c.visited = snoc (old c).visited result }
-    ensures  { match (old c).to_visit with
-               | Nil -> false
-               | Cons x r -> c.to_visit = r /\ x = result
-               end }
-  = match c.to_visit with
-    | Nil -> absurd
-    | Cons x r ->
-      let ghost v0 = c.visited in
-      c.visited <- snoc c.visited x; c.to_visit <- r;
-      snoc_Cons v0 r x;
-      assert { c.to_visit == c.collection [length c.visited ..] };
-      x
-    end
+  scope C
 
-  let has_next (c: cursor 'a) : bool
-    ensures { result <-> not (complete c) }
-  = match c.to_visit with (* could define a [val eq (l1 l2: list 'a) : bool] *)
-    | Nil -> false
-    | _   -> true
-    end
+    let next (c: cursor 'a) : 'a
+      requires { not (complete c) }
+      writes   { c }
+      ensures  { c.visited = snoc (old c).visited result }
+      ensures  { match (old c).to_visit with
+                 | Nil -> false
+                 | Cons x r -> c.to_visit = r /\ x = result
+                 end }
+    = match c.to_visit with
+      | Nil -> absurd
+      | Cons x r ->
+        let ghost v0 = c.visited in
+        c.visited <- snoc c.visited x; c.to_visit <- r;
+        snoc_Cons v0 r x;
+        assert { c.to_visit == c.collection [length c.visited ..] };
+        x
+      end
+
+    let has_next (c: cursor 'a) : bool
+      ensures { result <-> not (complete c) }
+    = match c.to_visit with (* could define a [val eq (l1 l2: list 'a) : bool] *)
+      | Nil -> false
+      | _   -> true
+      end
+
+  end
 
   let create (t: list 'a) : cursor 'a
     ensures { result.visited = empty }
     ensures { result.collection = t }
     ensures { result.to_visit = t }
   = { visited = empty; collection = t; to_visit = t }
-
-  clone cursor.ListCursor with
-    type cursor     = cursor,
-    val  create     = create,
-    val  C.has_next = has_next,
-    val  C.next     = next
 
 end
 
@@ -111,7 +109,7 @@ module TestListCursor
   use seq.Seq
   use seq.OfList
 
-  clone cursor.ListCursor
+  use ListCursorImpl
 
   lemma sum_of_list: forall l: list int.
     sum l = S.sum (get (of_list l)) 0 (length l)
@@ -131,23 +129,11 @@ module TestListCursor
 
 end
 
-module TestListCursorLink
-
-  use ListCursorImpl
-
-  clone TestListCursor with
-    type ListCursor.cursor     = cursor,
-    val  ListCursor.C.next     = next,
-    val  ListCursor.C.has_next = has_next,
-    val  ListCursor.create     = create
-
-end
-
 (** {2 Iteration over a mutable collection}
 
     here we choose an array of integers *)
 
-module ArrayCursorImpl (* : ArrayCursor *)
+module ArrayCursorImpl : cursor.ArrayCursor
 
   use int.Int
   use array.Array
@@ -179,26 +165,24 @@ module ArrayCursorImpl (* : ArrayCursor *)
     ensures { result.collection = to_seq a }
   = { visited = empty; collection = to_seq a; index = 0; }
 
-  let has_next (c: cursor 'a) : bool
-    ensures  { result <-> not (complete c) }
-  = c.index < length c.collection
+  scope C
 
-  let next (c: cursor 'a) : 'a
-    requires { not (complete c) }
-    writes   { c }
-    ensures  { c.visited = snoc (old c).visited result }
-    ensures  { c.index = (old c).index + 1 }
-  = if c.index >= length c.collection then absurd
-    else begin let x = c.collection[c.index] in
-      c.visited <- snoc c.visited x;
-      c.index <- c.index + 1;
-      x end
+    let has_next (c: cursor 'a) : bool
+      ensures  { result <-> not (complete c) }
+    = c.index < length c.collection
 
-  clone cursor.ArrayCursor with
-    type cursor   = cursor,
-    val  C.next     = next,
-    val  C.has_next = has_next,
-    val  create     = create
+    let next (c: cursor 'a) : 'a
+      requires { not (complete c) }
+      writes   { c }
+      ensures  { c.visited = snoc (old c).visited result }
+      ensures  { c.index = (old c).index + 1 }
+    = if c.index >= length c.collection then absurd
+      else begin let x = c.collection[c.index] in
+        c.visited <- snoc c.visited x;
+        c.index <- c.index + 1;
+        x end
+
+  end
 
 end
 
@@ -211,7 +195,7 @@ module TestArrayCursor
   use int.Sum
   use ref.Refint
 
-  clone cursor.ArrayCursor
+  use ArrayCursorImpl
 
   let array_sum (a: array int) : int
     ensures { result = sum (Array.([]) a) 0 (length a) }
@@ -231,17 +215,5 @@ module TestArrayCursor
     let c = create a in
     let x = C.next c in
     assert { x = 0 }
-
-end
-
-module TestArrayCursorLink
-
-  use ArrayCursorImpl
-
-  clone TestArrayCursor with
-    type ArrayCursor.cursor     = cursor,
-    val  ArrayCursor.C.next     = next,
-    val  ArrayCursor.C.has_next = has_next,
-    val  ArrayCursor.create     = create
 
 end
