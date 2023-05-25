@@ -20,7 +20,8 @@ In Why3, source locations represent a part of a file, denoted by a
 starting point and an end point. Both of these points are
 represented by a line number and a column number.
 
-So far, line numbers start with 1 and column number start with 0. [FIXME]
+So far, line numbers start with 1 and column number start with 0.
+(See {h <a href="https://gitlab.inria.fr/why3/why3/-/issues/706">this issue</a>})
 
 *)
 
@@ -81,15 +82,33 @@ val transfer_loc : Lexing.lexbuf -> Lexing.lexbuf -> unit
 (** {2 Located warnings} *)
 
 type warning_id
+(** warning identifiers *)
 
 val register_warning : string -> Pp.formatted -> warning_id
-
-val without_warning : warning_id -> (unit -> 'a) -> 'a
+(** [register_warning name desc] registers a new warning under the
+   given [name] with the given [desc]ription. *)
 
 val warning: ?id:warning_id ->
   ?loc:position -> ('b, Format.formatter, unit, unit) format4 -> 'b
+(** [warning ~id ~loc fmt] emits a warning in the given formattter
+   [fmt]. Adds the location [loc] if it is given. Emits nothing if the
+   [id] is given and disabled, with one of the functions below. *)
 
-(** Command line arguments *)
+val without_warning : warning_id -> (unit -> 'a) -> 'a
+(** Given a warning identifier, execute an inner operation with the
+   warning temporarily disabled. *)
+
+val disable_warning : warning_id -> unit
+(** [disable_warning id] globally disables the warning with this
+   [id]. *)
+
+val set_warning_hook: (?loc:position -> string -> unit) -> unit
+(** The default behavior is to emit warning on standard error,
+   with position on a first line (if any) and message on a second line.
+   This can be changed using this hook. *)
+
+(** {2 Command line arguments} *)
+
 module Args : sig
   type spec = Getopt.opt
 
@@ -108,12 +127,6 @@ module Args : sig
       When called before the plugins are loaded, pass [~silent:true] to
       prevent errors due to unknown plugin flags. *)
 end
-
-(** The default behavior is to emit warning on standard error,
-   with position on a first line (if any) and message on a second line.
-   This can be changed using the following function. *)
-
-val set_warning_hook: (?loc:position -> string -> unit) -> unit
 
 (** {2 Located exceptions} *)
 
