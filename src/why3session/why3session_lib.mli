@@ -63,6 +63,11 @@ val session_iter_proof_attempt_by_filter :
   filters ->
   (Session_itp.proofAttemptID -> Session_itp.proof_attempt_node -> unit) ->  unit
 
+val session_iter_proof_node_id_by_filter :
+  Session_itp.session ->
+  filters ->
+  (Session_itp.proofNodeID -> unit) ->  unit
+
 
 (* quite ad-hoc *)
 type filter_three = | FT_Yes | FT_No | FT_All

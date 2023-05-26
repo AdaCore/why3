@@ -215,6 +215,9 @@ let theory_parent s th =
 let session_iter_proof_attempt f s =
   Hint.iter f s.proofAttempt_table
 
+let session_iter_proof_node_id f s =
+  Hpn.iter (fun id _ -> f id) s.proofNode_table
+
 (* This is not needed. Keeping it as information on the structure
 type tree = {
     tree_node_id : proofNodeID;

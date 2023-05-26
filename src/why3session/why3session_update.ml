@@ -74,6 +74,8 @@ let do_action ~config ~env ~session action =
         let prover = pa_node.prover in
         remove_proof_attempt session parent prover)
   | AddProver p ->
+    let f, e = Why3session_lib.read_filter_spec config in
+    if e then exit 1;
     let p =
       let filter_prover = Whyconf.parse_filter_prover p in
       Whyconf.filter_one_prover config filter_prover
@@ -86,14 +88,9 @@ let do_action ~config ~env ~session action =
         Call_provers.limit_mem = Whyconf.memlimit main;
       }
     in
-    let ids = Hpn.create 100 in
-    session_iter_proof_attempt
-      (fun _ pa ->
-        let id = pa.parent in
-        if not (Hpn.mem ids id) then
-          let _ = graft_proof_attempt session id p.Whyconf.prover ~limit in
-          Hpn.add ids id ())
-      session
+    Why3session_lib.session_iter_proof_node_id_by_filter session f (fun pn ->
+        let _ = graft_proof_attempt session pn p.Whyconf.prover ~limit in
+        ())
 
 let run_update () =
   let config, env = Whyconf.Args.complete_initialization () in

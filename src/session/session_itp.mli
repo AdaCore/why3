@@ -153,6 +153,9 @@ val any_iter_proof_attempt:
 val session_iter_proof_attempt:
     (proofAttemptID -> proof_attempt_node -> unit) -> session -> unit
 
+val session_iter_proof_node_id:
+    (proofNodeID -> unit) -> session -> unit
+
 val fold_all_any: session -> ('a -> any -> 'a) -> 'a -> any -> 'a
 (** [fold_all_any s f acc any] folds on all the subnodes of any *)
 
