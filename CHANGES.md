@@ -30,9 +30,9 @@ Tools
   * Statistics given by `why3 session info` have been restructured
     into separate statistics per session and overall statistics. See
     manual Section 5.5.1 "Command info" for details. :x:
-  * `why3 session`: new options `--mark-obsolete` and `--remove-proofs`
-    for subcommand `update`, together with selection of proof nodes via
-    filters. See manual Section 5.5.4.
+  * `why3 session`: new options `--mark-obsolete`, `--remove-proofs` and
+    `--add-provers` for subcommand `update`, together with selection of proof
+    nodes via filters. See manual Section 5.5.4.
     New option `create`, which generates a new session for the specified files.
     See manual Section 5.5.5.
   - New command `why3 bench` which runs all proofs attempts nodes that have not
