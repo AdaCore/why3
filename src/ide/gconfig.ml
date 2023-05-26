@@ -38,6 +38,7 @@ type t =
       mutable current_tab : int;
       mutable verbose : int;
       mutable show_full_context : bool;
+      mutable show_uses_clones_metas : bool;
       mutable show_attributes : bool;
       mutable show_coercions : bool;
       mutable show_locs : bool;
@@ -76,6 +77,7 @@ type ide = {
   ide_current_tab : int;
   ide_verbose : int;
   ide_show_full_context : bool;
+  ide_show_uses_clones_metas : bool;
   ide_show_attributes : bool;
   ide_show_coercions : bool;
   ide_show_locs : bool;
@@ -107,6 +109,7 @@ let default_ide =
     ide_current_tab = 0;
     ide_verbose = 0;
     ide_show_full_context = false;
+    ide_show_uses_clones_metas = false;
     ide_show_attributes = false;
     ide_show_coercions = true;
     ide_show_locs = false;
@@ -146,6 +149,9 @@ let load_ide section =
     ide_show_full_context =
       get_bool section ~default:default_ide.ide_show_full_context
         "show_full_context";
+    ide_show_uses_clones_metas =
+      get_bool section ~default:default_ide.ide_show_uses_clones_metas
+        "show_uses_clones_metas";
     ide_show_attributes =
       get_bool section ~default:default_ide.ide_show_attributes "print_attributes";
     ide_show_coercions =
@@ -230,6 +236,7 @@ let load_config config =
     font_size     = ide.ide_font_size;
     verbose       = ide.ide_verbose;
     show_full_context= ide.ide_show_full_context ;
+    show_uses_clones_metas = ide.ide_show_uses_clones_metas ;
     show_attributes   = ide.ide_show_attributes ;
     show_coercions = ide.ide_show_coercions ;
     show_locs     = ide.ide_show_locs ;
@@ -284,6 +291,7 @@ let get_config t =
   let ide = set_int ide "font_size" t.font_size in
   let ide = set_int ide "verbose" t.verbose in
   let ide = set_bool ide "show_full_context" t.show_full_context in
+  let ide = set_bool ide "show_uses_clones_metas" t.show_uses_clones_metas in
   let ide = set_bool ide "print_attributes" t.show_attributes in
   let ide = set_bool ide "print_coercions" t.show_coercions in
   let ide = set_bool ide "print_locs" t.show_locs in
@@ -883,6 +891,15 @@ let appearance_settings (c : t) (notebook:GPack.notebook) =
   let (_ : GtkSignal.id) =
     showfullcontext#connect#toggled ~callback:
       (fun () -> c.show_full_context <- not c.show_full_context)
+  in
+  let show_uses_clones_metas =
+    GButton.check_button ~label:"show uses, clones and metas"
+      ~packing:display_options_box#add ()
+      ~active:c.show_uses_clones_metas
+  in
+  let (_ : GtkSignal.id) =
+    show_uses_clones_metas#connect#toggled ~callback:
+      (fun () -> c.show_uses_clones_metas <- not c.show_uses_clones_metas)
   in
   let showattrs =
     GButton.check_button
