@@ -201,24 +201,16 @@ let session_iter_proof_attempt_by_filter s filters f =
     filters f s
 
 let session_iter_proof_node_id_by_filter s filters f =
-  let rec g pn =
-    let do_call () =
-      f pn;
-      let trans_l = S.get_transformations s pn in
-      let sub_pns =
-        List.fold_left (fun l trans -> l @ S.get_sub_tasks s trans) [] trans_l
-      in
-      List.iter g sub_pns
-    in
+  let f pn =
     match filters.verified with
-    | FT_No -> do_call ()
+    | FT_No -> f pn
     | _ ->
       if S.pn_proved s pn then
         ()
       else
-        do_call ()
+        f pn
   in
-  S.session_iter_proof_node_id g s
+  S.session_iter_proof_node_id f s
 
 let opt_force_obsolete = ref false
 
