@@ -1490,7 +1490,8 @@ let on_selected_row r =
     match typ with
     | NGoal ->
         let c = gconfig.show_full_context in
-        send_request (Get_task(id,c,true))
+        let show_uses_clones_metas = gconfig.show_uses_clones_metas in
+        send_request (Get_task(id,c,show_uses_clones_metas,true))
     | NProofAttempt ->
        let (pa, _obs, _l) = Hint.find node_id_pa id in
        let output_text =
@@ -1518,10 +1519,12 @@ let on_selected_row r =
        counterexample_view#source_buffer#set_text "(not yet available)";
        counterexample_view#scroll_to_mark `INSERT;
        let c = gconfig.show_full_context in
-       send_request (Get_task(id,c,true))
+       let show_uses_clones_metas = gconfig.show_uses_clones_metas in
+       send_request (Get_task(id,c,show_uses_clones_metas,true))
     | _ ->
        let c = gconfig.show_full_context in
-       send_request (Get_task(id,c,true))
+       let show_uses_clones_metas = gconfig.show_uses_clones_metas in
+       send_request (Get_task(id,c,show_uses_clones_metas,true))
   with
     | Not_found -> task_view#source_buffer#set_text ""
 

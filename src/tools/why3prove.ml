@@ -282,7 +282,7 @@ let memlimit = match !opt_memlimit with
   | Some i -> i
 
 let print_th_namespace fmt th =
-  Pretty.print_namespace fmt th.th_name.Ident.id_string th
+  Pretty.print_namespace th.th_name.Ident.id_string fmt th
 
 let really_do_task (task: task) =
   let t = task_goal_fmla task in

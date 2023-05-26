@@ -336,16 +336,17 @@ let interp fmt cmd =
     | ["goto"; n] when int_of_string n < !max_ID ->
         cur_id := int_of_string n;
         let c = false (* TODO *) in
-        send_request (Get_task(!cur_id,c,false));
+        let show_uses_clones_metas = false (* TODO *) in
+        send_request (Get_task(!cur_id,c,show_uses_clones_metas,false));
         print_session fmt
     | _ ->
         begin
           match cmd with
           | "ng" -> cur_id := (!cur_id + 1) mod !max_ID; print_session fmt
           | "g" ->
-              send_request (Get_task(!cur_id,false,false))
+              send_request (Get_task(!cur_id,false,false,false))
           | "gf" ->
-              send_request (Get_task(!cur_id, true, false))
+              send_request (Get_task(!cur_id, true, false, false))
           | "p" -> print_session fmt
           | "help" ->
               fprintf fmt "%s@." additional_help;

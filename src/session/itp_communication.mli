@@ -148,11 +148,13 @@ type ide_request =
   | Set_config_param        of config_param
   | Set_prover_policy       of Whyconf.prover * Whyconf.prover_upgrade_policy
   | Get_file_contents       of string
-  | Get_task                of node_ID * bool * bool
-  (** [Get_task(id,b,loc)] requests for the text of the task in node
-      [id].  When [b] is true then the
-      full context is show.  When [loc] is false the locations are not
-      returned *)
+  | Get_task                of node_ID * bool * bool * bool
+  (** [Get_task(id,full_ctx,show_clones,show_loc)] requests for the
+     text of the task in node [id].  When [full_ctx] is true then the
+     full context is show. When [show_clones] is true then
+     declarations for used and cloned theories, together with metas,
+     are show in comments. When [show_loc] is false the locations are not
+     returned. *)
   | Remove_subtree          of node_ID
   | Copy_paste              of node_ID * node_ID
   | Save_file_req           of string * string

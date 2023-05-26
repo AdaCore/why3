@@ -118,7 +118,7 @@ let () =
   printf "Tasks are:@.";
   let _ =
     List.fold_left
-      (fun i t -> printf "Task %d: %a@." i Pretty.print_task t; i+1)
+      (fun i t -> printf  "@[<v 0>== Task %d ==@\n@\n%a@]@." i Pretty.print_task t; i+1)
       1 my_tasks
   in ()
 

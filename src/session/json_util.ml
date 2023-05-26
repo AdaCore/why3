@@ -196,10 +196,11 @@ let convert_request (r: ide_request): Json_base.json =
   | Set_prover_policy(p,u) ->
       ["ide_request", String "Set_prover_policy"] @
         convert_prover_aux "" p @ convert_policy u
-  | Get_task(n,b,loc) ->
+  | Get_task(n,b,show_uses_clones_metas,loc) ->
       ["ide_request", String "Get_task";
        "node_ID", Int n;
        "full_context", Bool b;
+       "show_uses_clones_metas", Bool show_uses_clones_metas;
        "loc", Bool loc]
   | Get_file_contents s ->
       ["ide_request", String "Get_file_contents";
@@ -506,8 +507,9 @@ let parse_request (constr: string) j =
   | "Get_task" ->
     let n = get_int_field j "node_ID" in
     let b = get_bool_opt (get_field j "full_context") false in
+    let show_uses_clones_metas = get_bool_opt (get_field j "show_uses_clones_metas") false in
     let loc = get_bool_opt (get_field j "loc") false in
-    Get_task(n,b,loc)
+    Get_task(n,b,show_uses_clones_metas,loc)
 
   | "Remove_subtree" ->
     let n = get_int_field j "node_ID" in
