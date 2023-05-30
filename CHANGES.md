@@ -40,6 +40,9 @@ Provers
 Configuration
   * the `./configure` option `--disable-pp-sexp` is renamed into `--disable-sexp` :x:
 
+API
+  * Exported declarations of various warning flags
+
 Version 1.6.0, March 7 2023
 ---------------------------
 
