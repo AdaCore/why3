@@ -16,7 +16,7 @@ open Ty
 open Term
 open Decl
 
-let warn_clone_not_abstract =
+let warning_clone_not_abstract =
   Loc.register_warning "clone_not_abstract" "Warn about theories cloned without substituting any abstract symbols."
 
 (** Namespace *)
@@ -874,7 +874,7 @@ let warn_clone_not_abstract loc th =
         end
       | _ -> ()
     ) th.th_decls;
-    Loc.warning ~id:warn_clone_not_abstract ~loc "cloned theory %a.%s does not contain \
+    Loc.warning ~id:warning_clone_not_abstract ~loc "cloned theory %a.%s does not contain \
         any abstract symbol; it should be used instead"
       (Pp.print_list (Pp.constant_string ".") Pp.string) th.th_path
       th.th_name.id_string

@@ -121,6 +121,8 @@ val dterm : Coercion.t -> ?loc:Loc.position -> dterm_node -> dterm
 (** Unused variables *)
 val warn_unused_variable : Loc.warning_id
 
+val warn_exists_implies : Loc.warning_id
+
 val attr_w_unused_var_no : attribute
 
 (* Emit a warning if the variable is unused *)
