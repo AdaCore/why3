@@ -1559,16 +1559,6 @@ and mod_impl e m =
          m
        end
 
-let add_clone uc mi =
-  let sm = {
-    sm_ty = Mts.map ty_of_ity mi.mi_ty;
-    sm_ts = Mts.map (fun s -> s.its_ts) mi.mi_ts;
-    sm_ls = mi.mi_ls;
-    sm_pr = mi.mi_pr } in
-  { uc with
-      muc_theory = theory_add_clone uc.muc_theory mi.mi_mod.mod_theory sm;
-      muc_units  = Uclone mi :: uc.muc_units }
-
 let clone_export' ?loc uc m inst cl =
   let rec add_unit uc u = match u with
     | Udecl d -> clone_pdecl loc inst cl uc d
