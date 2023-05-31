@@ -203,12 +203,9 @@ let session_iter_proof_attempt_by_filter s filters f =
 let session_iter_proof_node_id_by_filter s filters f =
   let f pn =
     match filters.verified with
-    | FT_No -> f pn
-    | _ ->
-      if S.pn_proved s pn then
-        ()
-      else
-        f pn
+    | FT_All -> f pn
+    | FT_No -> if not (S.pn_proved s pn) then f pn
+    | FT_Yes -> if S.pn_proved s pn then f pn
   in
   S.session_iter_proof_node_id f s
 
