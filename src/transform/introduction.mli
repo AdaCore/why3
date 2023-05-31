@@ -42,6 +42,8 @@ val introduce_premises : Task.task Trans.trans
 
 *)
 
+val simplify_intros : Task.task Trans.trans
+
 (** {2 variants dedicated to counterexample generation} *)
 
 val dequantification: Task.task Trans.trans

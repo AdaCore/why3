@@ -23,6 +23,14 @@ let prepare_for_counterexmp2 env task =
     (* Counter-example will be queried, prepare the task *)
     Debug.dprintf debug "Get ce@.";
     let comp_trans = Trans.seq [
+        (* simplify_intros and intro_vc_vars_counterxmp are needed to
+           introduce extra variable whose source location is the same
+           as the location of the VC. It is never used by Why3 itself,
+           but used by the Spark front-end to display short versions
+           of counterexamples, with only the values of variables at
+           the source line of the VC. It should be investigated
+           whether this should be made differently. *)
+        Introduction.simplify_intros;
         Intro_vc_vars_counterexmp.intro_vc_vars_counterexmp;
         Intro_projections_counterexmp.intro_projections_counterexmp env
       ]
