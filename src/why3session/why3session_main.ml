@@ -18,24 +18,22 @@ let cmds =
     Why3session_html.cmd;
     Why3session_latex.cmd;
     Why3session_update.cmd_update;
-(*
-    Why3session_csv.cmd;
-    Why3session_copy.cmd_mod;
-    Why3session_copy.cmd_copy;
-    Why3session_copy.cmd_archive;
-    Why3session_rm.cmd;
-    Why3session_output.cmd;
-    Why3session_run.cmd;
-*)
+    Why3session_create.cmd;
+    (* Why3session_csv.cmd; Why3session_copy.cmd_mod; Why3session_copy.cmd_copy;
+       Why3session_copy.cmd_archive; Why3session_rm.cmd; Why3session_output.cmd;
+       Why3session_run.cmd; *)
   ]
 
 let print_commands fmt =
-  let maxl = List.fold_left
-    (fun acc e -> max acc (String.length e.cmd_name)) 0 cmds in
+  let maxl =
+    List.fold_left (fun acc e -> max acc (String.length e.cmd_name)) 0 cmds
+  in
   Format.fprintf fmt "Available commands:@\n%a"
-    (Pp.print_list_suf Pp.newline
-       (fun fmt e -> Format.fprintf fmt "  %s   @[<hov>%s@]"
-         (Strings.pad_right ' ' e.cmd_name maxl) e.cmd_desc)) cmds
+    (Pp.print_list_suf Pp.newline (fun fmt e ->
+         Format.fprintf fmt "  %s   @[<hov>%s@]"
+           (Strings.pad_right ' ' e.cmd_name maxl)
+           e.cmd_desc))
+    cmds
 
 let usage_msg = "<command>\nExecute the given subcommand.\n"
 let extra_help = Format.asprintf "%t" print_commands
@@ -50,14 +48,14 @@ let () =
     match List.find (fun e -> e.cmd_name = cmd_name) cmds with
     | cmd -> cmd
     | exception Not_found ->
-        Format.eprintf "'%s' is not a why3session command.@\n@\n%t"
-          cmd_name print_commands;
-        exit 1 in
+      Format.eprintf "'%s' is not a why3session command.@\n@\n%t" cmd_name
+        print_commands;
+      exit 1
+  in
   Whyconf.Args.add_command cmd_name;
   let options = Whyconf.Args.all_options cmd.cmd_spec "" "" in
   Getopt.parse_all ~i:(i + 1) options anon_fun Sys.argv;
-  try
-    cmd.cmd_run ()
-  with e when not (Debug.test_flag Debug.stack_trace) ->
+  try cmd.cmd_run () with
+  | e when not (Debug.test_flag Debug.stack_trace) ->
     Format.eprintf "@.%a@." Exn_printer.exn_printer e;
     exit 1

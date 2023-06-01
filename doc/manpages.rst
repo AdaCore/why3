@@ -56,6 +56,11 @@ The following commands are available:
 :why3:tool:`wc`
     Give some token statistics about a WhyML file.
 
+:why3:tool:`bench`
+    Run provers on all proof attempts in the given session which have
+    not been run yet, or whose result is obsolete. Typically to be
+    used after `why3 session create` or `why3 session update`.
+
 The commands accept a common subset of command-line options. In
 particular, option :option:`--help` displays the usage and options.
 
@@ -1243,8 +1248,15 @@ The available subcommands are as follows:
 :why3:tool:`session update`
     Update session contents.
 
-The first three commands do not modify the sessions, whereas the last
-modify them.
+:why3:tool:`session create`
+
+    Create a new session containing the set of files given. In this
+    particular case, the given arguments must be a set of source files
+    and not session directories. The session directory name itself
+    must be given with option `-o`.
+
+The first three commands do not modify the sessions, whereas the fourth
+on modify them, and the last one creates a new session.
 
 .. why3:tool:: session info
 
@@ -1540,6 +1552,40 @@ contents, depending on the following specific options.
 .. option:: --filter-status=[valid|invalid|highfailure]
 
    select proofs attempts with the given status
+
+.. why3:tool:: session create
+
+Command ``create``
+~~~~~~~~~~~~~~~~~~
+
+.. program:: why3 session create
+
+The :program:`why3 session create` command creates a new session
+containing the source files specified as arguments. The transformation
+`split_vc` is systematically applied on the generated goals, and
+proofs attempts are added using provers specified using option
+below. But it does not run any of these provers. One should use the
+`why3 bench` command on the new session instead.
+
+.. option:: -P <prover1:prover2...>
+
+   Specify provers to use for proof attempts added to the session.
+
+.. option:: -o <output-dir>
+
+   Specify the session directory for the created session.
+
+.. option:: -t <sec>
+
+   Specify the timelimit for the added proof attempts.
+
+.. option:: -s <stepslimit>
+
+   Specify the stepslimit for the added proof attempts.
+
+.. option:: -m <MB>
+
+   Specify the memlimit for the added proof attempts.
 
 .. why3:tool:: doc
 .. _sec.why3doc:
@@ -1932,3 +1978,31 @@ Why3 can give some token statistics about WhyML source files.
 .. option:: -a, --do-not-skip-header
 
    Count heading comments as well.
+
+.. why3:tool:: bench
+.. _sec.why3bench:
+
+The ``bench`` Command
+----------------------
+
+.. program:: why3 bench
+
+The :program:`why3 bench` runs all proofs attempts of a session that have not
+been tried. It saves the session periodically so that it can be interrupted and
+resumed later.
+
+::
+
+    why3 bench [options] <session directory>
+
+The session file :file:`why3session.xml` stored in the given directory is
+loaded and all the proofs attempt nodes it contains are run.
+
+.. option:: -d
+
+   Set the delay between temporary session backups, in seconds. Default is 60.
+
+.. option:: -f
+
+   Force to rerun all proof attempt nodes, even the ones that have been run
+   before.

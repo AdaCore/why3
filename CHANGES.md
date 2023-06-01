@@ -33,6 +33,10 @@ Tools
   * `why3 session`: new options `--mark-obsolete` and `--remove-proofs`
     for subcommand `update`, together with selection of proof nodes via
     filters. See manual Section 5.5.4.
+    New option `create`, which generates a new session for the specified files.
+    See manual Section 5.5.5.
+  - New command `why3 bench` which runs all proofs attempts nodes that have not
+    been run before. See manual Section 5.13.
 
 Provers
   * support for Coq 8.17.0 (released Mar 23, 2023)
