@@ -633,7 +633,7 @@ let [@warning "-42"] rec json_of_concrete_term ct =
   | Const (Float { float_val; _ }) ->
     Record [
       "type", String "Float";
-      "val", Record [ "float_type", json_of_float_value float_val ]
+      "val", json_of_float_value float_val
     ]
 
   | Apply (ls, args) ->
