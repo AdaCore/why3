@@ -874,6 +874,41 @@ by :why3:tool:`why3 show transformations`.
 
       goal G : true
 
+.. why3:transform:: remove_unused
+
+   Removes from the context all logic symbols which are not used by the goal or the hypothesis.
+
+   The effect of that transformation can be expanded by adding dependency metas. Namely, with a declaration of the form
+
+   .. code-block:: whyml
+
+      meta "remove_unused:dependency" axiom a, function f
+
+   then occurences of `f` in axiom `a` are not counted as occurrences
+   for `f`. The intended meaning is that `a` is a definitional axiom
+   for `f`, so when `f` is not needed in the remainder, both the axiom
+   and the declaration of `f` can be removed.
+
+   When there are several such definitional axioms for `f`, a meta
+   must be declared for each axiom. When an axiom is definitional for
+   several symbols at the same time, several meta must be declared as
+   well. The rule of thumb is that an axiom is kept as soon as at
+   least one of the symbols it defines is needed in the remained,
+   otherzise it is discarded.
+
+.. why3:transform:: remove_unused_keep_constant
+
+   A variant of :why3:transform:`remove_unused` above, where the constant, i.e. the nullary function symbols, are always kept.
+
+   The effect of that transformation is controllable with an additional meta of the form
+
+   .. code-block:: whyml
+
+      meta "remove_unused:remove_constant" constant f
+
+   when in that case `f` is also tried to be removed, as if it was
+   with the full :why3:transform:`remove_unused` transformation.
+
 .. why3:transform:: replace
 
    Replace a term with another one in a hypothesis or in the goal. This

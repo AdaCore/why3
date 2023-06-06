@@ -104,20 +104,7 @@ end
 module ListTransforms = struct
 
   let run () =
-    let print_trans_desc fmt (x,r) =
-      Format.fprintf fmt "@[<hov 2>%s@\n@[<hov>%a@]@]" x Pp.formatted r in
-    Format.printf "@[<hov 2>Known non-splitting transformations:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline2 print_trans_desc)
-      (List.sort sort_pair (Trans.list_transforms ()));
-    Format.printf "@[<hov 2>Known splitting transformations:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline2 print_trans_desc)
-      (List.sort sort_pair (Trans.list_transforms_l ()));
-    let list_transform_with_arg =
-      Trans.list_transforms_with_args () @
-      Trans.list_transforms_with_args_l () in
-    Format.printf "@[<hov 2>Known transformations with arguments:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline2 print_trans_desc)
-      (List.sort sort_pair list_transform_with_arg)
+    Format.printf "%a@." Server_utils.print_list_transforms ()
 
   let cmd = {
       cmd_desc = "list transformations";

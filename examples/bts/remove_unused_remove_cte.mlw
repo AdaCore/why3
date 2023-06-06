@@ -1,0 +1,21 @@
+
+use int.Int
+
+constant x : int
+
+axiom x_spec: x >= 42
+
+meta "remove_unused:dependency" axiom x_spec, constant x
+
+constant y : int 
+
+axiom y_spec: y >= 31
+
+meta "remove_unused:dependency" axiom y_spec, constant y
+meta "remove_unused:remove_constant" constant y
+
+constant z : int 
+
+meta "remove_unused:remove_constant" constant z
+
+goal g : forall a. a + 8 < 50
