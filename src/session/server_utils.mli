@@ -47,6 +47,7 @@ val search_id: search_both:bool -> 'a -> Trans.naming_table -> string list -> st
 val list_strategies: Controller_itp.controller -> (string * string) list
 val list_provers: Controller_itp.controller -> _ -> string
 val list_transforms: unit -> (string * Pp.formatted) list
+val print_list_transforms: unit Pp.pp
 val list_transforms_query: _ -> _ -> string
 (* val help_on_queries: Format.formatter -> (string * string * 'a) list -> unit *)
 val load_strategies: Controller_itp.controller -> unit
