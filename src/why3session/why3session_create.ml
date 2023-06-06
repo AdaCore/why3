@@ -55,10 +55,10 @@ let run () =
         Whyconf.Args.exit_with_usage usage_msg
     | Some f ->
         (* for the moment, we forbid to exend an already existing session *)
-        if Sys.file_exists f then
+        if Sys.file_exists (Sysutil.concat f "why3session.xml") then
           begin
             (* FIXME: allow to extend an existing session *)
-            eprintf "session directory already exist, aborting.@.";
+            eprintf "session file already exist, aborting.@.";
             Whyconf.Args.exit_with_usage usage_msg
           end;
         let q = Queue.create () in
