@@ -1537,6 +1537,10 @@ contents, depending on the following specific options.
 
    removes all the proof attempts. If a filter is provided by the options below, then only the proof attempts that match the filters are affected.
 
+.. option:: --add-provers=<provers>
+
+   for each proof node of the session, add a new proof attempt for the specified provers.
+
 .. option:: --filter-prover=[<name>[,<version>[,<alternative>]]|<id>]
 
    selects proof attempts with this or these prover(s)
@@ -1547,7 +1551,13 @@ contents, depending on the following specific options.
 
 .. option:: --filter-proved[=[yes|no]]
 
-   select only proofs below (non-)proved goals
+   if yes (resp. no) selects only goals that are proved (resp. not proved)
+
+.. option:: --filter-is-leaf[=[yes|no]]
+
+   if yes (resp. no) selects only goals that are leaves of the proof
+   tree, i.e. do not have transformations (resp. do have
+   transformations)
 
 .. option:: --filter-status=[valid|invalid|highfailure]
 

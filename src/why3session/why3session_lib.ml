@@ -86,6 +86,7 @@ type filter_three = | FT_Yes | FT_No | FT_All
 
 let opt_filter_obsolete = ref FT_All
 let opt_filter_verified = ref FT_All
+let opt_filter_is_leaf = ref FT_All
 
 let add_filter_three r = function
   | Some "no" -> r := FT_No
@@ -115,6 +116,8 @@ let filter_spec =
     "[yes|no] select only (non-)obsolete proofs";
     KLong "filter-proved", opt_three opt_filter_verified,
     "[yes|no] select only proofs of (non-)proved goals";
+    KLong "filter-is-leaf", opt_three opt_filter_is_leaf,
+    "[yes|no] select only proofs of leaf goals, i.e., those without transformations";
     KLong "filter-status",
     Hnd1 (AList (',', ASymbol ["valid"; "invalid"; "highfailure"]),
           fun l -> opt_status := List.map status_filter l),
@@ -125,6 +128,7 @@ type filters =
     { provers : C.Sprover.t; (* if empty : every provers *)
       obsolete : filter_three;
       verified : filter_three;
+      is_leaf : filter_three;
       status : Call_provers.prover_answer list; (* if empty : any answer *)
     }
 
@@ -155,6 +159,7 @@ let read_filter_spec whyconf : filters * bool =
   {provers = !s;
    obsolete = !opt_filter_obsolete;
    verified = !opt_filter_verified;
+   is_leaf = !opt_filter_is_leaf;
    status = !opt_status;
   },!should_exit
 
@@ -200,6 +205,20 @@ let session_iter_proof_attempt_by_filter s filters f =
      S.session_iter_proof_attempt f)
     filters f s
 
+let session_iter_proof_node_id_by_filter s filters f =
+  let f pn =
+    match filters.verified with
+    | FT_All -> f pn
+    | FT_No -> if not (S.pn_proved s pn) then f pn
+    | FT_Yes -> if S.pn_proved s pn then f pn
+  in
+  let f pn =
+    match filters.is_leaf with
+    | FT_All -> f pn
+    | FT_No -> if S.get_transformations s pn <> [] then f pn
+    | FT_Yes -> if S.get_transformations s pn = [] then f pn
+  in
+  S.session_iter_proof_node_id f s
 
 let opt_force_obsolete = ref false
 
