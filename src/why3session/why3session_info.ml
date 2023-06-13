@@ -27,6 +27,7 @@ let opt_session_stats = ref false
 let opt_hist_print = ref false
 let opt_project_dir = ref false
 let opt_print0 = ref false
+let compare_provers = ref false
 
 let spec =
   let open Getopt in
@@ -43,6 +44,8 @@ let spec =
     " print the directory of the session";
     KLong "print0", Hnd0 (fun () -> opt_print0 := true),
     " use the null character instead of newline";
+    KLong "compare-provers", Hnd0 (fun () -> compare_provers := true),
+    " print pairwise comparison graphs for the provers in the session";
   ]
 
 type proof_stats =
@@ -59,7 +62,7 @@ type proof_stats =
       prover_max_time : float Hprover.t;
       prover_successful_proofs : int Hprover.t;
       prover_all_proofs : int Hprover.t;
-      (* prover_data : (string) Hprover.t *)
+      proof_node_proofs : float Mprover.t Hpn.t
     }
 
 let new_proof_stats () =
@@ -76,7 +79,7 @@ let new_proof_stats () =
     prover_max_time = Hprover.create 3;
     prover_successful_proofs =  Hprover.create 3;
     prover_all_proofs =  Hprover.create 3;
-    (* prover_data = Hprover.create 3  *)}
+    proof_node_proofs = Hpn.create 3}
 
 let apply_f_on_hashtbl_entry ~tbl ~f ~name  =
   try
@@ -158,14 +161,15 @@ let rec stats_of_goal ~root prefix_name stats ses goal =
             begin
               match result.Call_provers.pr_answer with
                 | Call_provers.Valid ->
-                  (pa.prover, result.Call_provers.pr_time) :: acc
+                  Mprover.add pa.prover result.Call_provers.pr_time acc
                 | _ ->
                   acc
             end
           | _ -> acc)
-      [] (get_proof_attempts ses goal)
+      Mprover.empty (get_proof_attempts ses goal)
   in
-  List.iter (update_perf_stats stats) proof_list;
+  Hpn.add stats.proof_node_proofs goal proof_list;
+  Mprover.iter (fun x y -> update_perf_stats stats (x,y)) proof_list;
   List.iter (stats_of_transf prefix_name stats ses) (get_transformations ses goal);
   let goal_name = prefix_name ^ (get_proof_name ses goal).Ident.id_string in
   if not (pn_proved ses goal) then
@@ -176,13 +180,12 @@ let rec stats_of_goal ~root prefix_name stats ses goal =
         stats.nb_proved_root_goals <- stats.nb_proved_root_goals + 1
       else
         stats.nb_proved_sub_goals <- stats.nb_proved_sub_goals + 1;
-      match proof_list with
-      | [ (prover, _) ] ->
+      if Mprover.cardinal proof_list = 1 then
+        let (prover, _) = Mprover.choose proof_list in
         stats.only_one_proof <-
           Sstr.add
           (goal_name ^ ": " ^ (string_of_prover prover))
           stats.only_one_proof
-      | _ -> ()
     end
 
 and stats_of_transf prefix_name stats ses transf =
@@ -199,11 +202,9 @@ let stats_of_file stats ses _ file =
   let theories = file_theories file in
   List.iter (stats_of_theory file stats ses) theories
 
-
-
 type goal_stat =
   | No of (transID * (proofNodeID * goal_stat) list) list
-  | Yes of (prover * float) list * (transID * (proofNodeID * goal_stat) list) list
+  | Yes of (float Mprover.t) * (transID * (proofNodeID * goal_stat) list) list
 
 let rec stats2_of_goal ~nb_proofs ses g : goal_stat =
   let proof_list =
@@ -214,12 +215,12 @@ let rec stats2_of_goal ~nb_proofs ses g : goal_stat =
             begin
               match result.Call_provers.pr_answer with
                 | Call_provers.Valid ->
-                  (proof_attempt.prover, result.Call_provers.pr_time) :: acc
+                  Mprover.add proof_attempt.prover result.Call_provers.pr_time acc
                 | _ ->
                   acc
             end
           | _ -> acc)
-      [] (get_proof_attempts ses g)
+      Mprover.empty (get_proof_attempts ses g)
   in
   let l =
     List.fold_left
@@ -231,7 +232,7 @@ let rec stats2_of_goal ~nb_proofs ses g : goal_stat =
   in
   if match nb_proofs with
     | 0 -> not (pn_proved ses g)
-    | 1 -> List.length proof_list = 1
+    | 1 -> Mprover.cardinal proof_list = 1
     | _ -> assert false
       then Yes(proof_list,l) else No(l)
 
@@ -255,6 +256,7 @@ let rec print_goal_stats ~time depth ses (g,l) =
       printf "@\n";
       List.iter (print_transf_stats ~time (depth+1) ses) l
     | Yes(pl,l) ->
+      let pl = Mprover.bindings pl in
       begin
         match pl with
           | [] -> printf "@\n"
@@ -439,6 +441,66 @@ let print_hist stats =
   else
     eprintf "See also results in file why3session.pdf@."
 
+(** Print comparison *)
+let print_compare stats =
+  let all_provers = 
+    Hpn.fold (fun _pn provers_and_times acc ->
+        List.fold_left
+        Sprover.add_left acc (Mprover.keys provers_and_times)
+    ) stats.proof_node_proofs Sprover.empty
+  in
+  let all_provers_pairs =
+      let (_, pairs) =
+      Sprover.fold (fun prover (visited, pairs) ->
+        (prover::visited, List.append pairs (List.map (fun x -> (x,prover)) visited))
+      ) all_provers ([],[])
+      in pairs
+  in
+  let comparison_datafiles = List.map (
+  fun (prover1, prover2) ->
+    let pf,ch = Filename.open_temp_file "why3session" ".data" in
+    let fmt = formatter_of_out_channel ch in
+    let empty = ref true in
+    let () = 
+      Hpn.iter (
+      fun _pn provers_and_times ->
+        try
+          let time1 = Mprover.find prover1 provers_and_times in
+          let time2 = Mprover.find prover2 provers_and_times in
+          fprintf fmt "%.2f %.2f@\n" time1 time2;
+          empty := false
+        with Not_found -> ()
+      ) stats.proof_node_proofs
+    in
+    let () =
+      fprintf fmt "@.";
+      close_out ch
+    in
+    if not !empty then pf else ""
+    ) all_provers_pairs
+  in
+  let main_file,main_ch = Filename.open_temp_file "why3session" ".gnuplot"
+  in
+  let main_fmt = formatter_of_out_channel main_ch in
+  fprintf main_fmt "set key off@\n";
+(*   fprintf main_fmt "set multiplot layout 8,1@\n"; *)
+  let print_plot (filename,provers_names) = 
+      if filename <> "" then
+        (fprintf main_fmt "set title \"%s vs %s\"@\n"
+                (string_of_prover (fst provers_names)) (string_of_prover (snd provers_names));
+        fprintf main_fmt "plot '%s' with points pt 7@\n" filename;
+        fprintf main_fmt "pause -1 \"Press any key\"@\n";
+        fprintf main_fmt "replot@.")
+  in
+  List.iter print_plot (List.combine comparison_datafiles all_provers_pairs);
+  close_out main_ch;
+  let cmd = "gnuplot " ^ main_file in
+  eprintf "Running command %s@." cmd;
+  let ret = Sys.command cmd in
+  if ret <> 0 then
+    eprintf "Command %s failed@." cmd
+  else
+    eprintf "See also results in file why3session.pdf@."
 (****** run on all files  ******)
 
 let run () =
@@ -449,9 +511,8 @@ let run () =
   printf "%d session(s) read, with a total of %d proof goals.@." !number_of_sessions
     (stats.nb_root_goals + stats.nb_sub_goals);
   if !opt_provers_stats then print_overall_stats stats;
-  if !opt_hist_print then print_hist stats
-
-
+  if !opt_hist_print then print_hist stats;
+  if !compare_provers then print_compare stats
 
 let cmd =
   { cmd_spec = spec;
