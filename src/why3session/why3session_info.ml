@@ -461,15 +461,19 @@ let print_compare stats =
     let pf,ch = Filename.open_temp_file "why3session" ".data" in
     let fmt = formatter_of_out_channel ch in
     let empty = ref true in
+    let max_time = max (Hprover.find stats.prover_max_time prover1)  (Hprover.find stats.prover_max_time prover2)
+    in
     let () = 
       Hpn.iter (
       fun _pn provers_and_times ->
-        try
-          let time1 = Mprover.find prover1 provers_and_times in
-          let time2 = Mprover.find prover2 provers_and_times in
-          fprintf fmt "%.2f %.2f@\n" time1 time2;
+        let time1 =
+        try Mprover.find prover1 provers_and_times
+        with Not_found -> max_time
+      in let time2 =
+        try Mprover.find prover2 provers_and_times
+      with Not_found -> max_time
+       in fprintf fmt "%.2f %.2f@\n" time1 time2;
           empty := false
-        with Not_found -> ()
       ) stats.proof_node_proofs
     in
     let () =
@@ -485,7 +489,7 @@ let print_compare stats =
   fprintf main_fmt "set key off@\n";
 (*   fprintf main_fmt "set multiplot layout 8,1@\n"; *)
   let print_plot (filename,(prover1, prover2)) = 
-    let max_time = max (Hprover.find stats.prover_max_time prover1) (Hprover.find stats.prover_max_time prover2) 
+    let max_time = max (Hprover.find stats.prover_max_time prover1) (Hprover.find stats.prover_max_time prover2)
     in
     let prover1_name = string_of_prover prover1 in
     let prover2_name = string_of_prover prover2 in
