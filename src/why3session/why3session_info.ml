@@ -484,11 +484,16 @@ let print_compare stats =
   let main_fmt = formatter_of_out_channel main_ch in
   fprintf main_fmt "set key off@\n";
 (*   fprintf main_fmt "set multiplot layout 8,1@\n"; *)
-  let print_plot (filename,provers_names) = 
+  let print_plot (filename,(prover1, prover2)) = 
+    let max_time = max (Hprover.find stats.prover_max_time prover1) (Hprover.find stats.prover_max_time prover2) 
+    in
+    let prover1_name = string_of_prover prover1 in
+    let prover2_name = string_of_prover prover2 in
       if filename <> "" then
-        (fprintf main_fmt "set title \"%s vs %s\"@\n"
-                (string_of_prover (fst provers_names)) (string_of_prover (snd provers_names));
-        fprintf main_fmt "plot '%s' with points pt 7@\n" filename;
+        (fprintf main_fmt "set title \"%s vs %s\"@\n" prover1_name prover2_name;
+        fprintf main_fmt "set xlabel \"%s\" @\n" prover1_name;
+        fprintf main_fmt "set ylabel \"%s\" @\n" prover2_name;
+        fprintf main_fmt "plot [0:%.2f] [0:%.2f] x, '%s' with points pt 7@\n" max_time max_time filename;
         fprintf main_fmt "pause -1 \"Press any key\"@\n";
         fprintf main_fmt "replot@.")
   in
@@ -499,8 +504,6 @@ let print_compare stats =
   let ret = Sys.command cmd in
   if ret <> 0 then
     eprintf "Command %s failed@." cmd
-  else
-    eprintf "See also results in file why3session.pdf@."
 (****** run on all files  ******)
 
 let run () =
