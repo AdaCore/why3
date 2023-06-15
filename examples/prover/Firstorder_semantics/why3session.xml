@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -106,7 +106,7 @@
  <proof prover="6"><result status="valid" time="0.14" steps="54"/></proof>
  </goal>
  <goal name="tableau_semantic_subst_commutation&#39;vc" expl="VC for tableau_semantic_subst_commutation" proved="true">
- <proof prover="6"><result status="valid" time="0.28" steps="1639"/></proof>
+ <proof prover="6"><result status="valid" time="0.28" steps="1616"/></proof>
  </goal>
  <goal name="tableau_semantic_term_subst_commutation&#39;vc" expl="VC for tableau_semantic_term_subst_commutation" proved="true">
  <proof prover="6"><result status="valid" time="0.14" steps="54"/></proof>
@@ -114,22 +114,22 @@
  <goal name="term_semantic_depend_only_free_var&#39;vc" expl="VC for term_semantic_depend_only_free_var" proved="true">
  <transf name="split_all_full" proved="true" >
   <goal name="term_semantic_depend_only_free_var&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="7"><result status="valid" time="0.73" steps="205635"/></proof>
+  <proof prover="7"><result status="valid" time="0.73" steps="204860"/></proof>
   </goal>
   <goal name="term_semantic_depend_only_free_var&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.71" steps="209079"/></proof>
+  <proof prover="7"><result status="valid" time="0.71" steps="208306"/></proof>
   </goal>
   <goal name="term_semantic_depend_only_free_var&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.71" steps="212271"/></proof>
+  <proof prover="7"><result status="valid" time="0.71" steps="211482"/></proof>
   </goal>
   <goal name="term_semantic_depend_only_free_var&#39;vc.3" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.72" steps="205801"/></proof>
+  <proof prover="7"><result status="valid" time="0.72" steps="205024"/></proof>
   </goal>
   <goal name="term_semantic_depend_only_free_var&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.71" steps="200636"/></proof>
+  <proof prover="7"><result status="valid" time="0.71" steps="199919"/></proof>
   </goal>
   <goal name="term_semantic_depend_only_free_var&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.68" steps="207334"/></proof>
+  <proof prover="7"><result status="valid" time="0.68" steps="206557"/></proof>
   </goal>
  </transf>
  </goal>
@@ -253,10 +253,10 @@
    <proof prover="6" timelimit="1"><result status="valid" time="0.10" steps="9"/></proof>
    </goal>
    <goal name="formula_semantic_depend_only_free_var&#39;vc.18.14" expl="postcondition" proved="true">
-   <proof prover="7" timelimit="5" memlimit="2000"><result status="valid" time="2.01" steps="467505"/></proof>
+   <proof prover="7" timelimit="5" memlimit="2000"><result status="valid" time="2.01" steps="466340"/></proof>
    </goal>
    <goal name="formula_semantic_depend_only_free_var&#39;vc.18.15" expl="postcondition" proved="true">
-   <proof prover="7" timelimit="5" memlimit="2000"><result status="valid" time="1.70" steps="467503"/></proof>
+   <proof prover="7" timelimit="5" memlimit="2000"><result status="valid" time="1.70" steps="466338"/></proof>
    </goal>
   </transf>
   </goal>
@@ -280,16 +280,16 @@
   <proof prover="6" timelimit="1"><result status="valid" time="0.10" steps="26"/></proof>
   </goal>
   <goal name="formula_list_conj_semantic_depend_only_free_var&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.73" steps="214218"/></proof>
+  <proof prover="7"><result status="valid" time="0.73" steps="213475"/></proof>
   </goal>
   <goal name="formula_list_conj_semantic_depend_only_free_var&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.78" steps="214255"/></proof>
+  <proof prover="7"><result status="valid" time="0.78" steps="213512"/></proof>
   </goal>
   <goal name="formula_list_conj_semantic_depend_only_free_var&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.59" steps="209982"/></proof>
+  <proof prover="7"><result status="valid" time="0.59" steps="209257"/></proof>
   </goal>
   <goal name="formula_list_conj_semantic_depend_only_free_var&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.62" steps="215083"/></proof>
+  <proof prover="7"><result status="valid" time="0.62" steps="214340"/></proof>
   </goal>
  </transf>
  </goal>
@@ -311,10 +311,10 @@
   <proof prover="6" timelimit="1"><result status="valid" time="0.10" steps="20"/></proof>
   </goal>
   <goal name="formula_list_disj_semantic_depend_only_free_var&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.62" steps="217250"/></proof>
+  <proof prover="7"><result status="valid" time="0.62" steps="216525"/></proof>
   </goal>
   <goal name="formula_list_disj_semantic_depend_only_free_var&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.66" steps="222190"/></proof>
+  <proof prover="7"><result status="valid" time="0.66" steps="221447"/></proof>
   </goal>
  </transf>
  </goal>
@@ -387,10 +387,9 @@
   </goal>
   <goal name="skolem_model_transformer&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="2.57"/></proof>
-  <proof prover="3"><result status="valid" time="0.63"/></proof>
   </goal>
   <goal name="skolem_model_transformer&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.58"/></proof>
+  <proof prover="0"><result status="valid" time="3.26" steps="839079"/></proof>
   </goal>
  </transf>
  </goal>

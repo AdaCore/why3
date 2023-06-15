@@ -30,6 +30,17 @@ module Int
     function (-_) = (-_), function (+) = (+),
     function (*) = (*), predicate (<=) = (<=)
 
+  meta "remove_unused:keep" function (+)
+  meta "remove_unused:keep" function (-)
+(* do not necessarily keep, to allow for linear arithmetic only
+  meta "remove_unused:keep" function (*)
+*)
+  meta "remove_unused:keep" function (-_)
+  meta "remove_unused:keep" predicate (<)
+  meta "remove_unused:keep" predicate (<=)
+  meta "remove_unused:keep" predicate (>)
+  meta "remove_unused:keep" predicate (>=)
+
 end
 
 (** {2 Absolute Value} *)

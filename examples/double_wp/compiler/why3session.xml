@@ -2,7 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Vampire" version="4.2.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Vampire" version="4.2.2" timelimit="15" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -382,12 +382,12 @@
    </transf>
    </goal>
    <goal name="loop_variant_acc.2.5" proved="true">
-   <proof prover="0"><result status="valid" time="2.90"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="2.90"/></proof>
    </goal>
    <goal name="loop_variant_acc.2.6" proved="true">
    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
     <goal name="loop_variant_acc.2.6.0" proved="true">
-    <proof prover="2"><result status="valid" time="0.09" steps="113"/></proof>
+    <proof prover="2"><result status="valid" time="0.09" steps="114"/></proof>
     </goal>
    </transf>
    </goal>
@@ -608,7 +608,7 @@
        <proof prover="2" timelimit="5"><result status="valid" time="0.07" steps="89"/></proof>
        </goal>
        <goal name="compile_com&#39;vc.5.4.0.0.0.16" expl="VC for compile_com" proved="true">
-       <proof prover="2" timelimit="5"><result status="valid" time="2.05" steps="1403"/></proof>
+       <proof prover="2" timelimit="5"><result status="valid" time="2.05" steps="1360"/></proof>
        </goal>
        <goal name="compile_com&#39;vc.5.4.0.0.0.17" expl="VC for compile_com" proved="true">
        <proof prover="2" timelimit="5"><result status="valid" time="0.08" steps="95"/></proof>
@@ -687,7 +687,7 @@
  </transf>
  </goal>
  <goal name="compile_program&#39;vc" expl="VC for compile_program" proved="true">
- <proof prover="0" timelimit="15"><result status="valid" time="14.06"/></proof>
+ <proof prover="0"><result status="valid" time="14.06"/></proof>
  </goal>
  <goal name="test&#39;vc" expl="VC for test" proved="true">
  <proof prover="1"><result status="valid" time="0.04" steps="14"/></proof>

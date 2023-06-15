@@ -5,32 +5,33 @@
 <prover id="0" name="Coq" version="8.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="3" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="MetiTarski" version="2.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="11" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="7" name="Alt-Ergo" version="2.4.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="8" name="Z3" version="4.8.10" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="lagrange_inequality.why"/>
 <theory name="LagrangeInequality" proved="true">
  <goal name="norm2_pos" proved="true">
  <proof prover="6"><result status="valid" time="0.02"/></proof>
- <proof prover="11"><result status="valid" time="0.00"/></proof>
+ <proof prover="8"><result status="valid" time="0.00" steps="225"/></proof>
  </goal>
  <goal name="Lagrange" proved="true">
  <proof prover="6"><result status="valid" time="0.01"/></proof>
- <proof prover="11"><result status="valid" time="0.00"/></proof>
+ <proof prover="8"><result status="valid" time="0.00" steps="536"/></proof>
  </goal>
 </theory>
 <theory name="CauchySchwarzInequality" proved="true">
  <goal name="CauchySchwarz_aux" proved="true">
  <proof prover="6"><result status="valid" time="0.02"/></proof>
- <proof prover="11"><result status="valid" time="0.01"/></proof>
+ <proof prover="8"><result status="valid" time="0.01" steps="1241"/></proof>
  </goal>
  <goal name="norm_pos" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.01"/></proof>
- <proof prover="11"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="sqr_le_sqrt" proved="true">
  <proof prover="6"><result status="valid" time="0.04"/></proof>
@@ -41,7 +42,20 @@
 </theory>
 <theory name="TriangleInequality" proved="true">
  <goal name="triangle_aux" proved="true">
- <proof prover="11"><result status="valid" time="0.01"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="triangle_aux.0" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="1342"/></proof>
+  </goal>
+  <goal name="triangle_aux.1" proved="true">
+  <proof prover="7"><result status="valid" time="0.00" steps="12"/></proof>
+  </goal>
+  <goal name="triangle_aux.2" proved="true">
+  <proof prover="7"><result status="valid" time="0.03" steps="419"/></proof>
+  </goal>
+  <goal name="triangle_aux.3" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="1671"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="sqr_sqrt_le" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="20"/></proof>

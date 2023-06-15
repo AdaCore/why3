@@ -120,6 +120,18 @@ theory ieee_float.Float32
      "(ite (= ((_ extract 128 128) ((_ fp.to_sbv 129) %1 %2)) #b0) (bv2int ((_ fp.to_sbv 129) %1 %2)) (- (bv2int ((_ fp.to_sbv 129) %1 %2)) (bv2int (bvshl (_ bv1 130) (_ bv129 130)))))"
 end
 
+theory real.Real
+(*
+  remove prop add_div
+  remove prop sub_div
+  remove prop neg_div
+  remove prop assoc_mul_div
+  remove prop assoc_div_mul
+  remove prop assoc_div_div
+*)
+  remove prop CompatOrderMult
+end
+
 theory real.Square
   remove allprops
 end

@@ -29,7 +29,19 @@ module Real
     function (-_) = (-_), function (+) = (+),
     function (*) = (*), predicate (<=) = (<=)
 
-  let (-) (x y : real)
+  meta "remove_unused:keep" function (+)
+  meta "remove_unused:keep" function (-)
+(* do not necessarily keep, to allow for linear arithmetic only
+  meta "remove_unused:keep" function (*)
+  meta "remove_unused:keep" function (/)
+*)
+  meta "remove_unused:keep" function (-_)
+  meta "remove_unused:keep" predicate (<)
+  meta "remove_unused:keep" predicate (<=)
+  meta "remove_unused:keep" predicate (>)
+  meta "remove_unused:keep" predicate (>=)
+
+ let (-) (x y : real)
     ensures { result = x - y }
   = x + -y
 
