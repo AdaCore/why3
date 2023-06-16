@@ -156,12 +156,12 @@ module Bits
 
   let empty () : t
     ensures { is_empty result.mdl }
-  = { bv = zeros; mdl = empty }
+  = { bv = 0x0; mdl = empty }
 
   let is_empty (x:t) : bool
     ensures { result  <-> is_empty x.mdl }
   = assert {is_empty x.mdl -> x.bv = zeros by x.bv == zeros};
-    BV32.eq x.bv zeros
+    BV32.eq x.bv 0x0
 
   let remove_singleton (a b: t) : t
     requires { b.mdl = singleton (min_elt b.mdl) }
@@ -232,7 +232,7 @@ module Bits
     requires { BV32.ule n (32:BV32.t) }
     ensures  { result.mdl = interval 0 (t'int n) }
   =
-    { bv = bw_not (lsl_bv ones n);
+    { bv = bw_not (lsl_bv 0xFFFF_FFFF n);
       mdl = ghost interval 0 (t'int n) }
 
 end

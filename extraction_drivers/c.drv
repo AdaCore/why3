@@ -357,9 +357,6 @@ blacklist "sub64_with_borrow" "mul64_double" "add64_3" "lsld64"
 module bv.BV32
   syntax type t      "uint32_t"
   syntax literal t   "%cu"
-  syntax val  zeros  "0u" prec 0
-  syntax val  one    "1u" prec 0
-  syntax val  ones   "0xFFFFFFFFu" prec 0
   syntax val  eq     "%1 == %2" prec 7 7 6
   syntax val  bw_and "%1 & %2" prec 8 7 7
   syntax val  bw_or  "%1 | %2" prec 10 10 9

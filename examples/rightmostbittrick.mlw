@@ -13,7 +13,7 @@ module Rmbt
     while ult !i (64:t) && not (nth_bv a !i) do
       variant {64 - t'int !i}
       invariant {eq_sub_bv a zeros zeros !i}
-      i := add !i one
+      i := add !i BV64.one
     done;
     !i
 

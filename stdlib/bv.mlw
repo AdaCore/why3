@@ -189,14 +189,14 @@ module BV_Gen
 
   axiom nth_out_of_bound: forall x n. n < 0 \/ n >= size -> nth x n = False
 
-  val constant zeros : t
+  constant zeros : t
   axiom Nth_zeros:
     forall n:int. nth zeros n = False
   meta "remove_unused:dependency" axiom Nth_zeros, function zeros
 
-  val constant one : t
+  constant one : t
 
-  val constant ones : t
+  constant ones : t
   axiom Nth_ones:
     forall n. 0 <= n < size -> nth ones n = True
   meta "remove_unused:dependency" axiom Nth_ones, function ones
@@ -591,12 +591,19 @@ module BV256
 
   type t = < range 0 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF >
 
+  constant zeros : t = 0x0
+  constant one : t = 0x1
+  constant ones : t = 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF
+
   clone export BV_Gen with
     type t = t,
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
     constant max_int = t'maxInt,
+    constant zeros = zeros,
+    constant one,
+    constant ones,
     goal size_pos,
     goal two_power_size_val,
     goal max_int_val,
@@ -612,12 +619,19 @@ module BV128
 
   type t = < range 0 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF >
 
+  constant zeros : t = 0x0
+  constant one : t = 0x1
+  constant ones : t = 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF
+
   clone export BV_Gen with
     type t = t,
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
     constant max_int = t'maxInt,
+    constant zeros,
+    constant one,
+    constant ones,
     goal size_pos,
     goal two_power_size_val,
     goal max_int_val,
@@ -633,12 +647,19 @@ module BV64
 
   type t = < range 0 0xFFFF_FFFF_FFFF_FFFF >
 
+  constant zeros : t = 0x0
+  constant one : t = 0x1
+  constant ones : t = 0xFFFF_FFFF_FFFF_FFFF
+
   clone export BV_Gen with
     type t = t,
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
     constant max_int = t'maxInt,
+    constant zeros,
+    constant one,
+    constant ones,
     goal size_pos,
     goal two_power_size_val,
     goal max_int_val,
@@ -654,12 +675,19 @@ module BV32
 
   type t = < range 0 0xFFFF_FFFF >
 
+  constant zeros : t = 0x0
+  constant one : t = 0x1
+  constant ones : t = 0xFFFF_FFFF
+
   clone export BV_Gen with
     type t = t,
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
     constant max_int = t'maxInt,
+    constant zeros,
+    constant one,
+    constant ones,
     goal size_pos,
     goal two_power_size_val,
     goal max_int_val,
@@ -675,12 +703,19 @@ module BV16
 
   type t = < range 0 0xFFFF >
 
+  constant zeros : t = 0x0
+  constant one : t = 0x1
+  constant ones : t = 0xFFFF
+
   clone export BV_Gen with
     type t = t,
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
     constant max_int = t'maxInt,
+    constant zeros,
+    constant one,
+    constant ones,
     goal size_pos,
     goal two_power_size_val,
     goal max_int_val,
@@ -696,12 +731,19 @@ module BV8
 
   type t = < range 0 0xFF >
 
+  constant zeros : t = 0x0
+  constant one : t = 0x1
+  constant ones : t = 0xFF
+
   clone export BV_Gen with
     type t = t,
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
     constant max_int = t'maxInt,
+    constant zeros,
+    constant one,
+    constant ones,
     goal size_pos,
     goal two_power_size_val,
     goal max_int_val,
