@@ -81,7 +81,7 @@
   <proof prover="3"><result status="valid" time="0.05" steps="25190"/></proof>
   </goal>
   <goal name="isqrt16&#39;vc.22" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.08" steps="62103"/></proof>
+  <proof prover="3"><result status="valid" time="0.19" steps="62103"/></proof>
   </goal>
   <goal name="isqrt16&#39;vc.23" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.06" steps="56452"/></proof>
@@ -365,7 +365,7 @@
   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="1.93" steps="270076"/></proof>
   </goal>
   <goal name="isqrt64&#39;vc.17" expl="assertion" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="1.58" steps="358664"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="1.93" steps="358664"/></proof>
   </goal>
   <goal name="isqrt64&#39;vc.18" expl="assertion" proved="true">
   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.54" steps="278421"/></proof>
@@ -428,7 +428,7 @@
   <proof prover="3"><result status="valid" time="0.51" steps="236292"/></proof>
   </goal>
   <goal name="isqrt64&#39;vc.33" expl="loop invariant preservation" proved="true">
-  <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.29" steps="709287"/></proof>
+  <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.87" steps="709287"/></proof>
   </goal>
   <goal name="isqrt64&#39;vc.34" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="1.24" steps="524869"/></proof>
@@ -476,7 +476,7 @@
            <proof prover="3"><result status="valid" time="0.01" steps="4748"/></proof>
            </goal>
            <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.0.1.1" expl="asserted formula" proved="true">
-           <proof prover="4"><result status="valid" time="0.14" steps="275"/></proof>
+           <proof prover="4"><result status="valid" time="0.14" steps="265"/></proof>
            </goal>
           </transf>
           </goal>
@@ -501,7 +501,7 @@
               <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0" expl="VC for isqrt64" proved="true">
               <transf name="assert" proved="true" arg1="(forall a b c. t&#39;int b + t&#39;int c &lt; two_power_size -&gt; ule a b -&gt; ule (add a c) (add b c))">
                <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.0" expl="asserted formula" proved="true">
-               <proof prover="5"><result status="valid" time="0.04" steps="609"/></proof>
+               <proof prover="5"><result status="valid" time="0.04" steps="581"/></proof>
                </goal>
                <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1" expl="VC for isqrt64" proved="true">
                <transf name="case" proved="true" arg1="(add (sqr res_g) (mul bits_g1 (add (mul (2:t) res_g) bits_g1)) = (0:t))">
@@ -542,7 +542,7 @@
                          <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.0.0.1.0.1.0" proved="true">
                          <transf name="assert" proved="true" arg1="(0 &lt;= t&#39;int b - t&#39;int (1:t))">
                           <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.0.0.1.0.1.0.0" expl="asserted formula" proved="true">
-                          <proof prover="5"><result status="valid" time="0.06" steps="221"/></proof>
+                          <proof prover="5"><result status="valid" time="0.06" steps="217"/></proof>
                           </goal>
                           <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.0.0.1.0.1.0.1" proved="true">
                           <proof prover="1" timelimit="1"><result status="valid" time="0.02" steps="12886"/></proof>
@@ -550,7 +550,7 @@
                          </transf>
                          </goal>
                          <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.0.0.1.0.1.1" proved="true">
-                         <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="221"/></proof>
+                         <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="217"/></proof>
                          </goal>
                         </transf>
                         </goal>
@@ -584,10 +584,10 @@
                             <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.0.0.1.0.0.0" expl="rewrite premises" proved="true">
                             <transf name="rewrite" proved="true" arg1="&lt;-" arg2="to_uint_add_bounded">
                              <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.0.0.1.0.0.0.0" expl="rewrite premises" proved="true">
-                             <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="3.44" steps="579"/></proof>
+                             <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="3.44" steps="544"/></proof>
                              </goal>
                              <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.0.0.1.0.0.0.1" expl="rewrite premises" proved="true">
-                             <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.76" steps="598241"/></proof>
+                             <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="3.14" steps="598241"/></proof>
                              </goal>
                             </transf>
                             </goal>
@@ -606,7 +606,7 @@
                         </transf>
                         </goal>
                         <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.0.1" expl="rewrite premises" proved="true">
-                        <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="221"/></proof>
+                        <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="217"/></proof>
                         </goal>
                        </transf>
                        </goal>
@@ -622,7 +622,7 @@
                         <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0" expl="rewrite premises" proved="true">
                         <transf name="assert" proved="true" arg1="(forall a b. a * ((2 * b) + a) = (a + b) * (a + b) - b * b)">
                          <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0.0" expl="asserted formula" proved="true">
-                         <proof prover="5"><result status="valid" time="0.02" steps="217"/></proof>
+                         <proof prover="5"><result status="valid" time="0.02" steps="213"/></proof>
                          </goal>
                          <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0.1" expl="rewrite premises" proved="true">
                          <transf name="replace" proved="true" arg1="(t&#39;int (2:t))" arg2="2">
@@ -643,7 +643,7 @@
                                <transf name="rewrite" proved="true" arg1="h1">
                                 <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0.1.0.0.0.0.0.1.0" expl="asserted formula" proved="true">
                                 <proof prover="3"><result status="timeout" time="1.00" steps="391308"/></proof>
-                                <proof prover="4"><result status="valid" time="0.02" steps="136"/></proof>
+                                <proof prover="4"><result status="valid" time="0.02" steps="134"/></proof>
                                 </goal>
                                </transf>
                                </goal>
@@ -660,7 +660,7 @@
                             </transf>
                             </goal>
                             <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0.1.0.0.1" expl="rewrite premises" proved="true">
-                            <proof prover="5"><result status="valid" time="0.18" steps="223"/></proof>
+                            <proof prover="5"><result status="valid" time="0.18" steps="219"/></proof>
                             </goal>
                            </transf>
                            </goal>
@@ -686,21 +686,21 @@
                      </transf>
                      </goal>
                      <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.1" expl="rewrite premises" proved="true">
-                     <proof prover="5"><result status="valid" time="0.02" steps="221"/></proof>
+                     <proof prover="5"><result status="valid" time="0.02" steps="217"/></proof>
                      </goal>
                     </transf>
                     </goal>
                    </transf>
                    </goal>
                    <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.1" expl="rewrite premises" proved="true">
-                   <proof prover="5"><result status="valid" time="0.77" steps="1004"/></proof>
+                   <proof prover="5"><result status="valid" time="1.02" steps="1058"/></proof>
                    </goal>
                   </transf>
                   </goal>
                   <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.1" expl="rewrite premises" proved="true">
                   <transf name="split_all_right" proved="true" >
                    <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.1.0" proved="true">
-                   <proof prover="5"><result status="valid" time="0.12" steps="565"/></proof>
+                   <proof prover="5"><result status="valid" time="0.12" steps="541"/></proof>
                    </goal>
                    <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.1.1" proved="true">
                    <proof prover="3" timelimit="5"><result status="valid" time="0.62" steps="366104"/></proof>
@@ -743,7 +743,7 @@
   </transf>
   </goal>
   <goal name="isqrt64&#39;vc.41" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.22" steps="178297"/></proof>
+  <proof prover="3"><result status="valid" time="0.35" steps="178297"/></proof>
   </goal>
   <goal name="isqrt64&#39;vc.42" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="4365"/></proof>
