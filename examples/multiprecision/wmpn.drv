@@ -192,6 +192,16 @@ module types.Types
   remove module
 end
 
+module types.Int32Eq
+  remove module
+  syntax val (=) "%1 == %2" prec 7 15 14
+end
+
+module types.UInt64Eq
+  remove module
+  syntax val (=) "%1 == %2" prec 7 15 14
+end
+
 module logical.LogicalUtil
   remove module
 end

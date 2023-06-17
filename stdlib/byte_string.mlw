@@ -11,7 +11,7 @@ module CString
   exception Break
 
   let (=) (s1 s2: cstring) : bool
-    ensures {result = True <-> array_eq s1 s2}
+    ensures {result <-> array_eq s1 s2}
   = if s1.length <> s2.length then false else
       try
         let ref i = 0 in
