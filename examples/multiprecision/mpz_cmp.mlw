@@ -38,6 +38,8 @@ let wmpz_cmp (u v:mpz_ptr) : int32
   return (if usize >= 0 then cmp else -cmp)
 
 use types.Types
+use types.Int32Eq
+use types.UInt64Eq
 
 let wmpz_cmp_ui (u: mpz_ptr) (v_digit:limb) : int32
   requires { mpz.readers[u] >= 0 }
