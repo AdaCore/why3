@@ -546,16 +546,16 @@ void send_msg_to_client(int key,
    int used;
    //len of id + F + 2 semicolon
    len += strlen(id) + 3;
-   // we assume a length of at most 9 for both exitcode and time, plus one for
+   // we assume a length of at most 13 for both exitcode and time, plus one for
    // the timeout boolean, plus three semicolons, makes 23 chars
-   len += 23;
+   len += 27;
    //len of file + newline + nul
    len+= strlen(outfile) + 1;
    msgbuf = (char*) malloc(sizeof(char) * len);
    if (msgbuf == NULL) {
      shutdown_with_msg("error when allocating buffer for client msg");
    }
-   used = snprintf(msgbuf, len, "F;%s;%lu;%.2f;%d;%s\n",
+   used = snprintf(msgbuf, len, "F;%s;%lu;%.6f;%d;%s\n",
                    id, exitcode, cpu_time, (timeout?1:0), outfile);
    if (used >= len) {
       shutdown_with_msg("message for client too long");
