@@ -27,7 +27,7 @@ module Int32Eq
   use int.Int
   use mach.int.Int32
 
-  let (=) (a:int32) (b:int32) : bool
+  let (=) [@extraction:inline] (a:int32) (b:int32) : bool
     ensures { to_int a = to_int b -> result }
     ensures { result -> a = b }
   = a = b
@@ -39,7 +39,7 @@ module UInt64Eq
   use int.Int
   use mach.int.UInt64GMP
 
-  let (=) (a:uint64) (b:uint64) : bool
+  let (=) [@extraction:inline] (a:uint64) (b:uint64) : bool
     ensures { to_int a = to_int b -> result }
     ensures { result -> a = b }
   = a = b
