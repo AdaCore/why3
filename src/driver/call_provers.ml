@@ -356,6 +356,8 @@ let parse_prover_run res_parser signaled time out exitcode limit get_model =
       | _ -> ans, time, steps
       else ans, time, steps
   in
+  (* We avoid times smaller than 1/1000000s*)
+  let time = max 0.000001 time in
   { pr_answer = ans;
     pr_status = if signaled then Unix.WSIGNALED int_exitcode else Unix.WEXITED int_exitcode;
     pr_output = out;

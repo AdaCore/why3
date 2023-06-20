@@ -2050,7 +2050,7 @@ let save_result fmt r =
               else
                 None
   in
-  fprintf fmt "<result@ status=\"%s\"@ time=\"%.2f\"%a/>"
+  fprintf fmt "<result@ status=\"%s\"@ time=\"%.6f\"%a/>"
     (match r.Call_provers.pr_answer with
        | Call_provers.Valid -> "valid"
        | Call_provers.Failure _ -> "failure"

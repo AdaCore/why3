@@ -1,5 +1,15 @@
 :x: marks a potential source of incompatibility
 
+Core
+  * time taken by solvers is now uniformly reported with the precision
+    of a microseconds, at least internally, in particular in session
+    files. The statistics with cumulated times computed e.g. by `why3
+    session info --provers-stats` are mopre precise. Additionally, the
+    computation time reported for Alt-Ergo is, as for any other
+    solvers, the one reported by the Why3 server, and not the one
+    reported by Alt-Ergo itself. The use of the `time` regexp in
+    driver files should be considered as deprecated.
+
 MLCFG language
   * `variant` clauses are supported with the `stackify` backend.
   * `invariant` names are now optional and depreated.
