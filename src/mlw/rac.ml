@@ -181,7 +181,7 @@ let task_of_term ?(vsenv=[]) metas (env: env) t =
       | Decl.{d_node = Dparam _} -> true
       | _ -> false in
     match rs.rs_logic with
-    | Expr.RLls ls when is_undefined_constant ls && Sls.mem ls free_sls  ->
+    | Expr.RLls ls when is_undefined_constant ls ->
         let pr = create_prsymbol (id_fresh (asprintf "def_%a" print_rs rs)) in
         let vsenv, t = term_of_value env [] (Lazy.force v) in
         let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
