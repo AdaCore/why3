@@ -40,7 +40,6 @@ Tools
 
 Provers
   * support for Coq 8.17.0 (released Mar 23, 2023)
-  * drop support for versions of Coq < 8.11
 
 Configuration
   * the `./configure` option `--disable-pp-sexp` is renamed into `--disable-sexp` :x:
