@@ -959,22 +959,23 @@ if test "$enable_coq_support" = yes; then
    AC_MSG_RESULT($COQVERSION)
 
    case $COQVERSION in
-      8.7*)
-         coq_compat_version="COQ87"
-         enable_coq_fp_libs=no
-         ;;
-      8.8*)
-         coq_compat_version="COQ88"
-         enable_coq_fp_libs=no
-         ;;
-      8.9*)
-         coq_compat_version="COQ89"
-         enable_coq_fp_libs=no
-         ;;
-      8.10*)
-         coq_compat_version="COQ810"
-         enable_coq_fp_libs=no
-         ;;
+dnl not supported anymore
+dnl       8.7*)
+dnl          coq_compat_version="COQ87"
+dnl          enable_coq_fp_libs=no
+dnl          ;;
+dnl       8.8*)
+dnl          coq_compat_version="COQ88"
+dnl          enable_coq_fp_libs=no
+dnl          ;;
+dnl       8.9*)
+dnl          coq_compat_version="COQ89"
+dnl          enable_coq_fp_libs=no
+dnl          ;;
+dnl       8.10*)
+dnl          coq_compat_version="COQ810"
+dnl          enable_coq_fp_libs=no
+dnl          ;;
       8.11*)
          coq_compat_version="COQ811"
          ;;
@@ -999,8 +1000,8 @@ if test "$enable_coq_support" = yes; then
          ;;
       *)
          enable_coq_support=no
-         AC_MSG_WARN([You need Coq 8.7 or later; Coq discarded.])
-         reason_coq_support=" (need version >= 8.7)"
+         AC_MSG_WARN([You need Coq 8.11 or later; Coq discarded.])
+         reason_coq_support=" (need version >= 8.11)"
          ;;
    esac
    if test "$enable_coq_fp_libs" = no; then
