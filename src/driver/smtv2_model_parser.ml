@@ -234,27 +234,39 @@ module FromSexpToModel = struct
       with _ -> (
         try constant_bv_bin sexp with _ -> error sexp "constant_bv"))
 
-  let constant_float = function
+  let constant_float sexp =
+    let const_float e s v =
+      {
+        const_float_exp_size = e;
+        const_float_significand_size = s;
+        const_float_val = v
+      }
+    in
+    match sexp with
     | List [ Atom "_"; Atom "+zero"; n1; n2 ] ->
-        ignore (bigint n1, bigint n2);
-        Fpluszero
+        const_float (int n1) (int n2) Fpluszero
     | List [ Atom "_"; Atom "-zero"; n1; n2 ] ->
-        ignore (bigint n1, bigint n2);
-        Fminuszero
+        const_float (int n1) (int n2) Fminuszero
     | List [ Atom "_"; Atom "+oo"; n1; n2 ] ->
-        ignore (bigint n1, bigint n2);
-        Fplusinfinity
+        const_float (int n1) (int n2) Fplusinfinity
     | List [ Atom "_"; Atom "-oo"; n1; n2 ] ->
-        ignore (bigint n1, bigint n2);
-        Fminusinfinity
+        const_float (int n1) (int n2) Fminusinfinity
     | List [ Atom "_"; Atom "NaN"; n1; n2 ] ->
-        ignore (bigint n1, bigint n2);
-        Fnan
+        const_float (int n1) (int n2) Fnan
     | List [ Atom "fp"; sign; exp; mant ] ->
-        let constant_float_sign = constant_bv sign
-        and constant_float_exp = constant_bv exp
-        and constant_float_mant = constant_bv mant in
-        Fnumber { constant_float_sign; constant_float_exp; constant_float_mant }
+        let constant_float_sign = constant_bv sign in
+        let constant_float_exp = constant_bv exp in
+        let constant_float_mant = constant_bv mant in
+        let v =
+          Fnumber
+            { constant_float_sign; constant_float_exp; constant_float_mant }
+        in
+        let exp_size = constant_float_exp.constant_bv_length in
+        let significand =
+          constant_float_mant.constant_bv_length +
+          constant_float_sign.constant_bv_length
+        in
+        const_float exp_size significand v
     | sexp -> error sexp "constant_float"
 
   let constant sexp : term =
@@ -379,7 +391,8 @@ module FromSexpToModel = struct
 
   and array sexp =
     match sexp with
-    (* "_ as-array" not supported because not associated to sorts for indices/values *)
+    | List [Atom "_"; Atom "as-array"; n] ->
+        Tasarray (term n)
     | List
         [ List [ Atom "as"; Atom "const"; List [ Atom "Array"; s1; s2 ] ]; t ]
       ->
@@ -401,7 +414,8 @@ module FromSexpToModel = struct
   let fun_def : sexp -> (string * function_def) option = function
     | List [ Atom "define-fun"; Atom n; args; res; body ] ->
         let res = sort res in
-        let args = list arg args and body = term body in
+        let args = list arg args in
+        let body = term body in
         Some (n, (args, res, body))
     | _ -> None
 
@@ -441,12 +455,12 @@ module FromModelToTerm = struct
   exception E_concrete_syntax of string
 
   exception NoArgConstructor
-  exception UnknownType
   exception NoBuiltinSymbol
   exception Float_MinusZero
   exception Float_PlusZero
   exception Float_NaN
-  exception Float_Infinity
+  exception Float_Plus_Infinity
+  exception Float_Minus_Infinity
   exception Float_Error
 
   let error fmt =
@@ -468,6 +482,8 @@ module FromModelToTerm = struct
     type_coercions : Term.Sls.t Ty.Mty.t;
     (* Function definiions from the SMT model
        that are not in [pinfo.Printer.queried_terms]. *)
+    type_sorts : Ty.ty Mstr.t;
+    (* Sorts defined in the smtv2 file output. *)
     mutable prover_fun_defs : (Term.term * concrete_syntax_term) Mstr.t;
     (* Prover variables, may have the same name if the sort is different. *)
     mutable prover_vars : vsymbol Ty.Mty.t Mstr.t;
@@ -486,48 +502,84 @@ module FromModelToTerm = struct
      TODO/FIXME It would be better to find a way to avoid using [env.inferred_types],
      maybe by searching in the theories? *)
   let rec smt_sort_to_ty ?(update_ty = None) env s =
-    try
-      match s with
-      | Sstring -> Ty.ty_str
-      | Sint -> Ty.ty_int
-      | Sreal -> Ty.ty_real
-      | Sbool -> Ty.ty_bool
-      | Sarray (s1, s2) -> (
-          match update_ty with
-          | None ->
-              Ty.ty_app Ty.ts_func
-                [ smt_sort_to_ty env s1; smt_sort_to_ty env s2 ]
-          | Some ty -> (
-              match ty.Ty.ty_node with
-              | Ty.Tyapp (ts, [ ty1; ty2 ]) when Ty.ts_equal ts Ty.ts_func ->
-                  Ty.ty_app Ty.ts_func
-                    [
-                      smt_sort_to_ty ~update_ty:(Some ty1) env s1;
-                      smt_sort_to_ty ~update_ty:(Some ty2) env s2;
-                    ]
-              | _ ->
-                  error "Inconsistent shapes for type %a and sort %a"
-                    Pretty.print_ty ty print_sort s))
-      | Sroundingmode | Sfloatingpoint _ | Sbitvec _ | Ssimple _ | Smultiple _
-        -> (
-          match
-            List.find_all (fun (s', _) -> sort_equal s s') env.inferred_types
-          with
-          | [] -> raise UnknownType
-          | [ (_, ty) ] -> ty
-          | _ ->
-              error "Multiple matches in inferred_types for sort %a@."
-                print_sort s)
-      | _ -> raise UnknownType
-    with UnknownType -> (
+    let optionally_update_sort s =
       match update_ty with
-      | None -> error "Cannot infer type from sort %a@." print_sort s
-      | Some ty ->
+        | None -> error "Cannot infer type from sort %a@." print_sort s
+        | Some ty ->
           Debug.dprintf debug
             "[smt_sort_to_ty] updating inferred_types with s = %a, ty = %a@."
             print_sort s Pretty.print_ty ty;
           env.inferred_types <- (s, ty) :: env.inferred_types;
-          ty)
+          ty
+    in
+    let find_in_inferred_types not_found s =
+      match
+        List.find_all (fun (s', _) -> sort_equal s s') env.inferred_types
+      with
+      | [] -> not_found s
+      | [ (_, ty) ] -> ty
+      | _ ->
+          error "Multiple matches in inferred_types for sort %a@."
+            print_sort s
+    in
+    match s with
+    | Sstring -> Ty.ty_str
+    | Sint -> Ty.ty_int
+    | Sreal -> Ty.ty_real
+    | Sbool -> Ty.ty_bool
+    | Sarray (s1, s2) -> (
+        match update_ty with
+        | None ->
+            Ty.ty_app Ty.ts_func
+              [ smt_sort_to_ty env s1; smt_sort_to_ty env s2 ]
+        | Some ty -> (
+            match ty.Ty.ty_node with
+            | Ty.Tyapp (ts, [ ty1; ty2 ]) when Ty.ts_equal ts Ty.ts_func ->
+                Ty.ty_app Ty.ts_func
+                  [
+                    smt_sort_to_ty ~update_ty:(Some ty1) env s1;
+                    smt_sort_to_ty ~update_ty:(Some ty2) env s2;
+                  ]
+            | _ ->
+                error "Inconsistent shapes for type %a and sort %a"
+                  Pretty.print_ty ty print_sort s))
+    | Ssimple i | Smultiple (i, _) ->
+        let not_found s =
+          let sort_name =
+            match i with
+            | Isymbol (S s | Sprover s) -> s
+            | Iindexedsymbol ((S s | Sprover s), _) -> s
+          in
+          (* Find the corresponding sorts among the ones printed in the
+            smtv2 file passed to the prover. *)
+          match Mstr.find_opt sort_name env.type_sorts with
+          | None -> optionally_update_sort s
+          | Some ty -> ty
+        in
+        find_in_inferred_types not_found s
+    | Sbitvec size ->
+      let find_builtin_bitvec s =
+        (* Find the corresponding sorts among the ones printed in the
+          smtv2 file passed to the prover. *)
+        let type_name = Format.sprintf "(_ BitVec %d)" size in
+        match Mstr.find_opt type_name env.type_sorts with
+        | None -> optionally_update_sort s
+        | Some ty -> ty
+      in
+      find_in_inferred_types find_builtin_bitvec s
+    | Sfloatingpoint (exp, significand) ->
+      let find_builtin_float s =
+        (* Currenlty, float types are translated as Float32 or Float64 in smtlib
+            drivers. *)
+        let type_name = Format.sprintf "Float%d" (exp + significand) in
+        match Mstr.find_opt type_name env.type_sorts with
+        | None -> optionally_update_sort s
+        | Some ty -> ty
+      in
+      find_in_inferred_types find_builtin_float s
+    | Sroundingmode ->
+      find_in_inferred_types optionally_update_sort s
+    | Sreglan -> optionally_update_sort s
 
   let qual_id_to_term env qid =
     (* Constructors without arguments should not be confused with variables. *)
@@ -624,7 +676,8 @@ module FromModelToTerm = struct
       }
     in
     match fp with
-    | Fplusinfinity | Fminusinfinity -> raise Float_Infinity
+    | Fplusinfinity -> raise Float_Plus_Infinity
+    | Fminusinfinity -> raise Float_Minus_Infinity
     | Fpluszero -> raise Float_PlusZero
     | Fminuszero -> raise Float_MinusZero
     | Fnan -> raise Float_NaN
@@ -687,7 +740,10 @@ module FromModelToTerm = struct
               fp_binary,
               fp_hex )
         else if BigInt.eq exp.bv_value exp_max (* infinities and NaN *) then
-          if BigInt.eq mant.bv_value BigInt.zero then raise Float_Infinity
+          if BigInt.eq mant.bv_value BigInt.zero then
+            if is_neg
+            then raise Float_Minus_Infinity
+            else raise Float_Plus_Infinity
           else raise Float_NaN
         else
           let exp = BigInt.sub exp.bv_value exp_bias in
@@ -730,54 +786,34 @@ module FromModelToTerm = struct
         with _ ->
           error "Could not interpret constant %a as a fraction@." print_constant
             c)
-    | Cbitvector { constant_bv_value; constant_bv_length; constant_bv_verbatim } -> (
-        try
-          let _, ty =
-            List.find
-              (function Sbitvec n', _ when constant_bv_length = n' -> true | _ -> false)
-              env.inferred_types
-          in
-          let t_concrete =
-            Const (BitVector {
-              bv_value= constant_bv_value;
-              bv_length= constant_bv_length;
-              bv_verbatim= constant_bv_verbatim
-            }) in
-          (t_const (Constant.int_const constant_bv_value) ty, t_concrete)
-        with Not_found ->
-          error
-            "No matching type found in inferred_type for bitvector constant \
-             %a@."
-            print_constant c)
-    | Cfloat fp -> (
-        let sort, ty =
-          match
-            List.find_all
-              (function Sfloatingpoint _, _ -> true | _ -> false)
-              env.inferred_types
-          with
-          | [] ->
-              error
-                "No matching type found in inferred_type for float constant \
-                 %a@."
-                print_constant c
-          | [ sort_ty ] -> sort_ty
-          | _ ->
-              (* FIXME we should use the size of bitvectors in [fp] to match more
-                 precisely with sorts [Sfloatingpoint _,_] *)
-              error
-                "Multiple matching types found in inferred_type for float \
-                 constant %a@."
-                print_constant c
+    | Cbitvector { constant_bv_value; constant_bv_length; constant_bv_verbatim } ->
+        let ty = smt_sort_to_ty env (Sbitvec constant_bv_length) in
+        let t_concrete =
+          Const (BitVector {
+            bv_value= constant_bv_value;
+            bv_length= constant_bv_length;
+            bv_verbatim= constant_bv_verbatim })
         in
-        let float_lib =
-          match sort with
-          | Sfloatingpoint (a, b) -> "Float" ^ string_of_int (a + b)
-          | _ -> assert false
+        (t_const (Constant.int_const constant_bv_value) ty, t_concrete)
+    | Cfloat fp -> (
+        let exp_size = fp.const_float_exp_size in
+        let significand_size = fp.const_float_significand_size in
+        let sort = Sfloatingpoint (exp_size, significand_size) in
+        let ty = smt_sort_to_ty env sort in
+        let float_lib = "Float" ^ string_of_int (exp_size + significand_size) in
+        let t_concrete_float_const v =
+          Const (
+            Float {
+              float_exp_size = exp_size;
+              float_significand_size = significand_size;
+              float_val = v
+            })
         in
         try
           (* general case *)
-          let neg, s1, s2, exp, (bv_sign,bv_exp,bv_mant), hex = float_of_binary fp in
+          let neg, s1, s2, exp, (bv_sign,bv_exp,bv_mant), hex =
+            float_of_binary fp.const_float_val
+          in
           let t =
             t_const
               (Constant.real_const_from_string ~radix:16 ~neg ~int:s1 ~frac:s2
@@ -785,12 +821,13 @@ module FromModelToTerm = struct
               ty
           in
           let t_concrete =
-            Const (Float (Float_number {
-              float_sign= bv_sign;
-              float_exp= bv_exp;
-              float_mant= bv_mant;
-              float_hex= hex
-            }))
+            t_concrete_float_const
+              (Float_number {
+                float_sign= bv_sign;
+                float_exp= bv_exp;
+                float_mant= bv_mant;
+                float_hex= hex
+              })
           in
           (t, t_concrete)
         with
@@ -802,7 +839,7 @@ module FromModelToTerm = struct
                  ~frac:"0" ~exp:None)
               ty
           in
-          (t, Const (Float Minus_zero))
+          (t, t_concrete_float_const Minus_zero)
         | Float_PlusZero ->
           let t =
             t_const
@@ -810,7 +847,7 @@ module FromModelToTerm = struct
                  ~frac:"0" ~exp:None)
               ty
           in
-          (t, Const (Float Plus_zero))
+          (t, t_concrete_float_const Plus_zero)
         | Float_NaN ->
             let is_nan_ls =
               try
@@ -822,19 +859,32 @@ module FromModelToTerm = struct
             in
             let x = create_vsymbol (Ident.id_fresh "x") ty in
             let f = t_app is_nan_ls [ t_var x ] None in
-            (t_eps_close x f, Const (Float NaN))
-        | Float_Infinity ->
-            let is_infinite_ls =
+            (t_eps_close x f, t_concrete_float_const NaN)
+        | Float_Plus_Infinity ->
+            let is_plus_infinite_ls =
               try
                 let th =
                   Env.read_theory env.why3_env [ "ieee_float" ] float_lib
                 in
-                Theory.ns_find_ls th.Theory.th_export [ "is_infinite" ]
-              with _ -> error "No lsymbol found in theory for is_infinite@."
+                Theory.ns_find_ls th.Theory.th_export [ "is_plus_infinity" ]
+              with _ -> error "No lsymbol found in theory for is_plus_infinity@."
             in
             let x = create_vsymbol (Ident.id_fresh "x") ty in
-            let f = t_app is_infinite_ls [ t_var x ] None in
-            (t_eps_close x f, Const (Float Infinity))
+            let f = t_app is_plus_infinite_ls [ t_var x ] None in
+            (t_eps_close x f, t_concrete_float_const Plus_infinity)
+        | Float_Minus_Infinity ->
+            let is_plus_infinite_ls =
+              try
+                let th =
+                  Env.read_theory env.why3_env [ "ieee_float" ] float_lib
+                in
+                Theory.ns_find_ls th.Theory.th_export [ "is_minus_infinity" ]
+              with _ ->
+                error "No lsymbol found in theory for is_minus_infinity@."
+            in
+            let x = create_vsymbol (Ident.id_fresh "x") ty in
+            let f = t_app is_plus_infinite_ls [ t_var x ] None in
+            (t_eps_close x f, t_concrete_float_const Minus_infinity)
         | Float_Error ->
             error "Error while interpreting float constant %a@." print_constant
               c)
@@ -897,6 +947,7 @@ module FromModelToTerm = struct
         (t_if b' t1' t2', If (b'_concrete, t1'_concrete, t2'_concrete))
     | Tapply (qid, ts) -> apply_to_term env qid ts
     | Tarray (s1, s2, a) -> array_to_term env s1 s2 a
+    | Tasarray t -> asarray_to_term env t
     | Tunparsed _ -> error "Could not interpret term %a@." print_term t
 
   and apply_to_term env qid ts =
@@ -1004,7 +1055,6 @@ module FromModelToTerm = struct
     let ty2 = smt_sort_to_ty env s2 in
     let vs_arg = create_vsymbol (Ident.id_fresh "x") ty1 in
     let vs_name = Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs_arg in
-    Pretty.forget_var vs_arg;
     let mk_case key value (t, t_concrete) =
       let key,key_concrete = term_to_term env key in
       let value,value_concrete = term_to_term env value in
@@ -1028,7 +1078,18 @@ module FromModelToTerm = struct
         (t_others, others_concrete)
         elts.array_indices
     in
+    Pretty.forget_var vs_arg;
     (t_lambda [ vs_arg ] [] a, Function {args=[vs_name]; body=a_concrete})
+
+  and asarray_to_term env elt =
+    match elt with
+    | Tvar (Qident (Isymbol (S n)) | Qident (Isymbol (Sprover n))) -> begin
+      match Mstr.find_opt n env.prover_fun_defs with
+      | Some (t, (Function { args = [ _ ]; _ } as t_concrete)) ->
+        t, t_concrete
+      | _ -> error "The function %s cannot be converted into an array type@." n
+    end
+    | _ -> error "Cannot interpret the 'as-array' term"
 
   (*  Interpreting function definitions from the SMT model to [t',t'_concrete].
       - [t'] is a Term.term
@@ -1074,10 +1135,11 @@ module FromModelToTerm = struct
     Debug.dprintf debug "[check_fun_def_type] ls.ls_value = %a@."
       (Pp.print_option_or_default "None" Pretty.print_ty_qualified)
       ls.ls_value;
-    List.iter
-      (Debug.dprintf debug "[check_fun_def_type] ls.ls_args = %a@."
-         Pretty.print_ty_qualified)
-      ls.ls_args;
+    if (Debug.test_flag debug) then
+      List.iter
+        (Debug.dprintf debug "[check_fun_def_type] ls.ls_args = %a@."
+           Pretty.print_ty_qualified)
+        ls.ls_args;
     let check_or_update_inferred_types s ty =
       Ty.ty_equal ty (smt_sort_to_ty ~update_ty:(Some ty) env s)
     in
@@ -1113,11 +1175,12 @@ module FromModelToTerm = struct
             let vs = create_vsymbol fresh_str (smt_sort_to_ty env sort) in
             env.bound_vars <- Mstr.add str vs env.bound_vars)
       args;
-    Mstr.iter
-      (fun key vs ->
-        Debug.dprintf debug "[interpret_fun_def_to_term] bound_var = (%s, %a)@."
-          key Pretty.print_vs vs)
-      env.bound_vars;
+    if (Debug.test_flag debug) then
+      Mstr.iter
+        (fun key vs ->
+          Debug.dprintf debug "[interpret_fun_def_to_term] bound_var = (%s, %a)@."
+            key Pretty.print_vs vs)
+        env.bound_vars;
     let (t_body, t_body_concrete) = smt_term_to_term ~fmla env body res in
     let (t,t_concrete) =
       if List.length (Mstr.values env.bound_vars) = 0 then
@@ -1135,9 +1198,9 @@ module FromModelToTerm = struct
           Function {args; body=t_body_concrete}
         )
     in
-    List.iter
+    (* List.iter
       Pretty.forget_var
-      (Mstr.values env.bound_vars);
+      (Mstr.values env.bound_vars); *)
     Debug.dprintf debug "[interpret_fun_def_to_term] t = %a@."
       Pretty.print_term t;
     Debug.dprintf debug "[interpret_fun_def_to_term] t_concrete = %a@."
@@ -1344,15 +1407,16 @@ module FromModelToTerm = struct
                (Sls.elements sls)))
         pinfo.Printer.type_coercions
     in
-    Ty.Mty.iter
-      (fun key elt ->
-        List.iter
-          (fun (str, (ls, t, t_concrete)) ->
-            Debug.dprintf debug
-              "[ty_coercions] ty = %a, str=%s, ls = %a, t=%a, t_concrete=%a@." Pretty.print_ty
-              key str Pretty.print_ls ls Pretty.print_term t print_concrete_term t_concrete)
-          elt)
-      ty_coercions;
+    if (Debug.test_flag debug) then
+      Ty.Mty.iter
+        (fun key elt ->
+          List.iter
+            (fun (str, (ls, t, t_concrete)) ->
+              Debug.dprintf debug
+                "[ty_coercions] ty = %a, str=%s, ls = %a, t=%a, t_concrete=%a@." Pretty.print_ty
+                key str Pretty.print_ls ls Pretty.print_term t print_concrete_term t_concrete)
+            elt)
+        ty_coercions;
     let ty_fields =
       Ty.Mty.map (* for each list of lsymbols associated to a type *)
         (fun lls ->
@@ -1372,14 +1436,15 @@ module FromModelToTerm = struct
                lls))
         pinfo.Printer.type_fields
     in
-    Ty.Mty.iter
-      (fun key elt ->
-        List.iter
-          (fun (str, (ls, t, t_concrete)) ->
-            Debug.dprintf debug "[ty_fields] ty = %a, str=%s, ls = %a, t=%a, t_concrete=%a@."
-              Pretty.print_ty key str Pretty.print_ls ls Pretty.print_term t print_concrete_term t_concrete)
-          elt)
-      ty_fields;
+    if (Debug.test_flag debug) then
+      Ty.Mty.iter
+        (fun key elt ->
+          List.iter
+            (fun (str, (ls, t, t_concrete)) ->
+              Debug.dprintf debug "[ty_fields] ty = %a, str=%s, ls = %a, t=%a, t_concrete=%a@."
+                Pretty.print_ty key str Pretty.print_ls ls Pretty.print_term t print_concrete_term t_concrete)
+            elt)
+        ty_fields;
     (* for each prover variable, we create an epsilon term using type coercions
        or record type fields for the type of the prover variable *)
     Mstr.iter
@@ -1387,12 +1452,10 @@ module FromModelToTerm = struct
         Ty.Mty.iter
           (fun ty vs ->
             let vs_name = Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs in
-            Pretty.forget_var vs;
             let create_epsilon_term ty l =
               (* create a fresh vsymbol for the variable bound by the epsilon term *)
               let x = create_vsymbol (Ident.id_fresh "x") ty in
               let x_name = Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified x in
-              Pretty.forget_var x;
               let aux (_, (ls', t', t'_concrete)) =
                 let vs_list', _, t' = t_open_lambda t' in
                 match t'_concrete with
@@ -1426,6 +1489,7 @@ module FromModelToTerm = struct
               let l', l'_concrete = List.split (List.map aux l) in
               let f = t_and_l l' in
               let f_concrete = t_and_l_concrete l'_concrete in
+              Pretty.forget_var x;
               (* replace [t] by [eps x. f] *)
               (t_eps_close x f, Epsilon (x_name, f_concrete))
             in
@@ -1447,7 +1511,8 @@ module FromModelToTerm = struct
               Pretty.print_term eval_var
               print_concrete_term eval_var_concrete;
             env.eval_prover_vars <-
-              Mvs.add vs (eval_var, eval_var_concrete) env.eval_prover_vars)
+              Mvs.add vs (eval_var, eval_var_concrete) env.eval_prover_vars;
+            Pretty.forget_var vs )
           value)
       env.prover_vars;
     (* we now call [eval_term] on each [(t,t_concrete)] in [terms] in order
@@ -1652,7 +1717,7 @@ module FromModelToTerm = struct
         let (elts, others) = unfold env (vs,vs_name) (t2,ct2) in
         let _,ct0' = maybe_convert_epsilon_terms env (t0,ct0) in
         let _,ct1' = maybe_convert_epsilon_terms env (t1,ct1) in
-        ((ct0',ct1')::elts, others)
+        ({ elts_index = ct0'; elts_value = ct1' } :: elts, others)
       | _ ->
         let _, t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in
         ([], t'_concrete)
@@ -1685,19 +1750,26 @@ module FromModelToTerm = struct
   let get_terms (pinfo : Printer.printing_info)
       (fun_defs : Smtv2_model_defs.function_def Mstr.t) =
     let qterms = pinfo.Printer.queried_terms in
-    Mstr.iter
-      (fun key _ -> Debug.dprintf debug "[fun_defs] name = %s@." key)
-      fun_defs;
-    Mstr.iter
-      (fun key (ls, _, _) ->
-        Debug.dprintf debug "[queried_terms] name = %s, ls = %a@." key
-          Pretty.print_ls ls)
-      qterms;
-    Mstr.iter
-      (fun key ls ->
-        Debug.dprintf debug "[constructors] name = %s, ls = %a/%d@." key
-          Pretty.print_ls ls (List.length ls.ls_args))
-      pinfo.Printer.constructors;
+    if (Debug.test_flag debug) then begin
+      Mstr.iter
+        (fun key _ -> Debug.dprintf debug "[fun_defs] name = %s@." key)
+        fun_defs;
+      Mstr.iter
+        (fun key (ls, _, _) ->
+          Debug.dprintf debug "[queried_terms] name = %s, ls = %a@." key
+            Pretty.print_ls ls)
+        qterms;
+      Mstr.iter
+        (fun key ls ->
+          Debug.dprintf debug "[constructors] name = %s, ls = %a/%d@." key
+            Pretty.print_ls ls (List.length ls.ls_args))
+        pinfo.Printer.constructors;
+      Mstr.iter
+        (fun key ty ->
+          Debug.dprintf debug "[types] name = %s, ty = %a@." key
+            Pretty.print_ty ty)
+        pinfo.Printer.type_sorts
+      end;
     let env =
       {
         why3_env = pinfo.Printer.why3_env;
@@ -1707,6 +1779,7 @@ module FromModelToTerm = struct
         record_fields = pinfo.Printer.record_fields;
         type_fields = pinfo.Printer.type_fields;
         type_coercions = pinfo.Printer.type_coercions;
+        type_sorts = pinfo.Printer.type_sorts;
         inferred_types = [];
         eval_prover_vars = Mvs.empty;
         prover_fun_defs = Mstr.empty;
@@ -1786,15 +1859,16 @@ module FromModelToTerm = struct
         queried_fun_defs
     in
     let debug_terms desc terms =
-      Mstr.iter
-        (fun n ((ls, oloc, _), (t, t_concrete)) ->
-          Debug.dprintf debug
-            "[TERMS %s] name = %s, ls = %a, oloc = %a, t = %a, t_concrete = %a@." desc n
-            Pretty.print_ls ls
-            (Pp.print_option Pretty.print_loc_as_attribute) oloc
-            Pretty.print_term t
-            print_concrete_term t_concrete)
-        terms
+      if (Debug.test_flag debug) then
+        Mstr.iter
+          (fun n ((ls, oloc, _), (t, t_concrete)) ->
+            Debug.dprintf debug
+              "[TERMS %s] name = %s, ls = %a, oloc = %a, t = %a, t_concrete = %a@." desc n
+              Pretty.print_ls ls
+              (Pp.print_option Pretty.print_loc_as_attribute) oloc
+              Pretty.print_term t
+              print_concrete_term t_concrete)
+          terms
     in
     (* 1st pass = interpret function definitions to terms *)
     debug_terms "FROM SMT MODEL" terms;

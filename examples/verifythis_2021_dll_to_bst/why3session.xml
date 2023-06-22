@@ -6,50 +6,51 @@
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.8.10" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.4.2" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="5" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_2021_dll_to_bst.mlw"/>
 <theory name="Top" proved="true">
  <goal name="I.eq&#39;refn&#39;vc" expl="VC for eq&#39;refn" proved="true">
- <proof prover="3"><result status="valid" time="0.05" steps="14956"/></proof>
+ <proof prover="3"><result status="valid" time="0.05" steps="14486"/></proof>
  </goal>
  <goal name="mixfix []&lt;-&#39;vc" expl="VC for mixfix []&lt;-" proved="true">
- <proof prover="3"><result status="valid" time="0.06" steps="15001"/></proof>
+ <proof prover="3"><result status="valid" time="0.06" steps="14486"/></proof>
  </goal>
  <goal name="tree_frame&#39;vc" expl="VC for tree_frame" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="tree_frame&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.10" steps="25844"/></proof>
+  <proof prover="3"><result status="valid" time="0.10" steps="24916"/></proof>
   </goal>
   <goal name="tree_frame&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.12" steps="25417"/></proof>
+  <proof prover="3"><result status="valid" time="0.12" steps="24531"/></proof>
   </goal>
   <goal name="tree_frame&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.06" steps="23393"/></proof>
+  <proof prover="3"><result status="valid" time="0.06" steps="22879"/></proof>
   </goal>
   <goal name="tree_frame&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.19" steps="25638"/></proof>
+  <proof prover="3"><result status="valid" time="0.19" steps="24940"/></proof>
   </goal>
   <goal name="tree_frame&#39;vc.4" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.10" steps="26102"/></proof>
+  <proof prover="3"><result status="valid" time="0.10" steps="25174"/></proof>
   </goal>
   <goal name="tree_frame&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.11" steps="25337"/></proof>
+  <proof prover="3"><result status="valid" time="0.11" steps="24639"/></proof>
   </goal>
   <goal name="tree_frame&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.06" steps="23452"/></proof>
+  <proof prover="3"><result status="valid" time="0.06" steps="22938"/></proof>
   </goal>
   <goal name="tree_frame&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.17" steps="25613"/></proof>
+  <proof prover="3"><result status="valid" time="0.17" steps="24915"/></proof>
   </goal>
   <goal name="tree_frame&#39;vc.8" expl="postcondition" proved="true">
   <transf name="unfold" proved="true" arg1="tree">
    <goal name="tree_frame&#39;vc.8.0" expl="VC for tree_frame" proved="true">
    <transf name="split_vc" proved="true" >
     <goal name="tree_frame&#39;vc.8.0.0" expl="VC for tree_frame" proved="true">
-    <proof prover="3"><result status="valid" time="0.06" steps="23654"/></proof>
+    <proof prover="3"><result status="valid" time="0.06" steps="23045"/></proof>
     </goal>
     <goal name="tree_frame&#39;vc.8.0.1" expl="VC for tree_frame" proved="true">
     <proof prover="2"><result status="valid" time="0.02" steps="6"/></proof>
@@ -67,19 +68,19 @@
     <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
     </goal>
     <goal name="tree_frame&#39;vc.8.0.6" expl="VC for tree_frame" proved="true">
-    <proof prover="3"><result status="valid" time="0.13" steps="25566"/></proof>
+    <proof prover="3"><result status="valid" time="0.13" steps="24559"/></proof>
     </goal>
     <goal name="tree_frame&#39;vc.8.0.7" expl="VC for tree_frame" proved="true">
-    <proof prover="3"><result status="valid" time="0.11" steps="25547"/></proof>
+    <proof prover="3"><result status="valid" time="0.11" steps="24554"/></proof>
     </goal>
     <goal name="tree_frame&#39;vc.8.0.8" expl="VC for tree_frame" proved="true">
-    <proof prover="3"><result status="valid" time="0.14" steps="25581"/></proof>
+    <proof prover="3"><result status="valid" time="0.14" steps="24590"/></proof>
     </goal>
     <goal name="tree_frame&#39;vc.8.0.9" expl="VC for tree_frame" proved="true">
-    <proof prover="3"><result status="valid" time="0.12" steps="27305"/></proof>
+    <proof prover="3"><result status="valid" time="0.12" steps="26275"/></proof>
     </goal>
     <goal name="tree_frame&#39;vc.8.0.10" expl="VC for tree_frame" proved="true">
-    <proof prover="3"><result status="valid" time="0.13" steps="27395"/></proof>
+    <proof prover="3"><result status="valid" time="0.13" steps="26365"/></proof>
     </goal>
    </transf>
    </goal>
@@ -90,147 +91,147 @@
  <goal name="dll_to_bst_rec&#39;vc" expl="VC for dll_to_bst_rec" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="dll_to_bst_rec&#39;vc.0" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.07" steps="27458"/></proof>
+  <proof prover="3"><result status="valid" time="0.07" steps="26935"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="12"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.11" steps="29504"/></proof>
+  <proof prover="3"><result status="valid" time="0.11" steps="28971"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.10" steps="29635"/></proof>
+  <proof prover="3"><result status="valid" time="0.10" steps="29102"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.07" steps="27222"/></proof>
+  <proof prover="3"><result status="valid" time="0.07" steps="26869"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.06" steps="27235"/></proof>
+  <proof prover="3"><result status="valid" time="0.06" steps="26882"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.07" steps="27224"/></proof>
+  <proof prover="3"><result status="valid" time="0.07" steps="26871"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.05" steps="27237"/></proof>
+  <proof prover="3"><result status="valid" time="0.05" steps="26884"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.08" steps="27364"/></proof>
+  <proof prover="3"><result status="valid" time="0.08" steps="27012"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.06" steps="21209"/></proof>
+  <proof prover="3"><result status="valid" time="0.06" steps="20856"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.10" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.10" steps="26183"/></proof>
+  <proof prover="3"><result status="valid" time="0.10" steps="25688"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.12" steps="33127"/></proof>
+  <proof prover="3"><result status="valid" time="0.12" steps="32632"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.18" steps="53071"/></proof>
+  <proof prover="3"><result status="valid" time="0.18" steps="52464"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.22" steps="54392"/></proof>
+  <proof prover="3"><result status="valid" time="0.22" steps="53781"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.14" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.11" steps="33494"/></proof>
+  <proof prover="3"><result status="valid" time="0.11" steps="32969"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.15" expl="precondition" proved="true">
   <transf name="unfold" proved="true" arg1="dll">
    <goal name="dll_to_bst_rec&#39;vc.15.0" expl="VC for dll_to_bst_rec" proved="true">
    <transf name="split_vc" proved="true" >
     <goal name="dll_to_bst_rec&#39;vc.15.0.0" expl="VC for dll_to_bst_rec" proved="true">
-    <proof prover="1"><result status="valid" time="2.76" steps="2066"/></proof>
+    <proof prover="1"><result status="valid" time="3.14" steps="2129"/></proof>
     </goal>
     <goal name="dll_to_bst_rec&#39;vc.15.0.1" expl="VC for dll_to_bst_rec" proved="true">
-    <proof prover="3"><result status="valid" time="0.10" steps="33533"/></proof>
+    <proof prover="3"><result status="valid" time="0.10" steps="33008"/></proof>
     </goal>
     <goal name="dll_to_bst_rec&#39;vc.15.0.2" expl="VC for dll_to_bst_rec" proved="true">
-    <proof prover="3"><result status="valid" time="0.15" steps="40668"/></proof>
+    <proof prover="3"><result status="valid" time="0.15" steps="38276"/></proof>
     </goal>
     <goal name="dll_to_bst_rec&#39;vc.15.0.3" expl="VC for dll_to_bst_rec" proved="true">
-    <proof prover="3"><result status="valid" time="0.12" steps="33511"/></proof>
+    <proof prover="3"><result status="valid" time="0.12" steps="32986"/></proof>
     </goal>
     <goal name="dll_to_bst_rec&#39;vc.15.0.4" expl="VC for dll_to_bst_rec" proved="true">
-    <proof prover="2"><result status="valid" time="0.15" steps="469"/></proof>
+    <proof prover="2"><result status="valid" time="0.15" steps="463"/></proof>
     </goal>
     <goal name="dll_to_bst_rec&#39;vc.15.0.5" expl="VC for dll_to_bst_rec" proved="true">
-    <proof prover="3"><result status="valid" time="0.16" steps="40430"/></proof>
+    <proof prover="3"><result status="valid" time="0.16" steps="39813"/></proof>
     </goal>
     <goal name="dll_to_bst_rec&#39;vc.15.0.6" expl="VC for dll_to_bst_rec" proved="true">
-    <proof prover="3"><result status="valid" time="0.74" steps="154789"/></proof>
+    <proof prover="3"><result status="valid" time="1.01" steps="154366"/></proof>
     </goal>
     <goal name="dll_to_bst_rec&#39;vc.15.0.7" expl="VC for dll_to_bst_rec" proved="true">
-    <proof prover="3"><result status="valid" time="0.14" steps="34164"/></proof>
+    <proof prover="3"><result status="valid" time="0.14" steps="33639"/></proof>
     </goal>
     <goal name="dll_to_bst_rec&#39;vc.15.0.8" expl="VC for dll_to_bst_rec" proved="true">
-    <proof prover="3"><result status="valid" time="0.69" steps="131530"/></proof>
+    <proof prover="3"><result status="valid" time="0.69" steps="131207"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.16" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.23" steps="70509"/></proof>
+  <proof prover="3"><result status="valid" time="0.37" steps="69984"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.17" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.08" steps="30473"/></proof>
+  <proof prover="3"><result status="valid" time="0.08" steps="30119"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.18" expl="postcondition" proved="true">
   <transf name="unfold" proved="true" arg1="tree">
    <goal name="dll_to_bst_rec&#39;vc.18.0" expl="VC for dll_to_bst_rec" proved="true">
    <transf name="split_vc" proved="true" >
     <goal name="dll_to_bst_rec&#39;vc.18.0.0" expl="VC for dll_to_bst_rec" proved="true">
-    <proof prover="1"><result status="valid" time="2.83" steps="2482"/></proof>
+    <proof prover="1"><result status="valid" time="2.83" steps="2481"/></proof>
     </goal>
     <goal name="dll_to_bst_rec&#39;vc.18.0.1" expl="VC for dll_to_bst_rec" proved="true">
-    <proof prover="3"><result status="valid" time="0.13" steps="35348"/></proof>
+    <proof prover="3"><result status="valid" time="0.13" steps="34823"/></proof>
     </goal>
     <goal name="dll_to_bst_rec&#39;vc.18.0.2" expl="VC for dll_to_bst_rec" proved="true">
-    <proof prover="3"><result status="valid" time="0.13" steps="35333"/></proof>
+    <proof prover="3"><result status="valid" time="0.13" steps="34808"/></proof>
     </goal>
     <goal name="dll_to_bst_rec&#39;vc.18.0.3" expl="VC for dll_to_bst_rec" proved="true">
-    <proof prover="3"><result status="valid" time="0.14" steps="35360"/></proof>
+    <proof prover="3"><result status="valid" time="0.14" steps="34835"/></proof>
     </goal>
     <goal name="dll_to_bst_rec&#39;vc.18.0.4" expl="VC for dll_to_bst_rec" proved="true">
-    <proof prover="3"><result status="valid" time="0.12" steps="35340"/></proof>
+    <proof prover="3"><result status="valid" time="0.12" steps="34815"/></proof>
     </goal>
     <goal name="dll_to_bst_rec&#39;vc.18.0.5" expl="VC for dll_to_bst_rec" proved="true">
-    <proof prover="3"><result status="valid" time="0.13" steps="45538"/></proof>
+    <proof prover="3"><result status="valid" time="0.13" steps="42845"/></proof>
     </goal>
     <goal name="dll_to_bst_rec&#39;vc.18.0.6" expl="VC for dll_to_bst_rec" proved="true">
-    <proof prover="3"><result status="valid" time="0.19" steps="45528"/></proof>
+    <proof prover="3"><result status="valid" time="0.19" steps="42847"/></proof>
     </goal>
     <goal name="dll_to_bst_rec&#39;vc.18.0.7" expl="VC for dll_to_bst_rec" proved="true">
     <transf name="apply" proved="true" arg1="tree_frame" arg2="with" arg3="prev2.to_fmap,next2.to_fmap">
      <goal name="dll_to_bst_rec&#39;vc.18.0.7.0" expl="apply premises" proved="true">
-     <proof prover="2"><result status="valid" time="0.06" steps="465"/></proof>
-     <proof prover="3"><result status="valid" time="0.15" steps="45324"/></proof>
+     <proof prover="2"><result status="valid" time="0.17" steps="594"/></proof>
+     <proof prover="3"><result status="valid" time="0.15" steps="42662"/></proof>
      </goal>
      <goal name="dll_to_bst_rec&#39;vc.18.0.7.1" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="2.74" steps="2482"/></proof>
+     <proof prover="1"><result status="valid" time="2.74" steps="2481"/></proof>
      </goal>
      <goal name="dll_to_bst_rec&#39;vc.18.0.7.2" expl="apply premises" proved="true">
-     <proof prover="8"><result status="valid" time="3.26" steps="294085"/></proof>
+     <proof prover="8"><result status="valid" time="4.22" steps="293700"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="dll_to_bst_rec&#39;vc.18.0.8" expl="VC for dll_to_bst_rec" proved="true">
     <transf name="apply" proved="true" arg1="tree_frame" arg2="with" arg3="prev.to_fmap,next1.to_fmap">
      <goal name="dll_to_bst_rec&#39;vc.18.0.8.0" expl="apply premises" proved="true">
-     <proof prover="2"><result status="valid" time="0.03" steps="81"/></proof>
-     <proof prover="3"><result status="valid" time="0.10" steps="31392"/></proof>
-     <proof prover="4"><result status="valid" time="0.04" steps="171044"/></proof>
+     <proof prover="2"><result status="valid" time="0.03" steps="79"/></proof>
+     <proof prover="3"><result status="valid" time="0.10" steps="30910"/></proof>
+     <proof prover="6"><result status="valid" time="0.03" steps="139829"/></proof>
      </goal>
      <goal name="dll_to_bst_rec&#39;vc.18.0.8.1" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="2.74" steps="2482"/></proof>
+     <proof prover="1"><result status="valid" time="2.74" steps="2481"/></proof>
      </goal>
      <goal name="dll_to_bst_rec&#39;vc.18.0.8.2" expl="apply premises" proved="true">
      <transf name="split_vc" proved="true" >
       <goal name="dll_to_bst_rec&#39;vc.18.0.8.2.0" expl="apply premises" proved="true">
-      <proof prover="5"><result status="valid" time="0.02" steps="30"/></proof>
+      <proof prover="5"><result status="valid" time="0.02" steps="28"/></proof>
       </goal>
       <goal name="dll_to_bst_rec&#39;vc.18.0.8.2.1" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="2.00" steps="345979"/></proof>
+      <proof prover="3"><result status="valid" time="2.00" steps="284564"/></proof>
       </goal>
      </transf>
      </goal>
@@ -241,24 +242,24 @@
   </transf>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.19" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.28" steps="79271"/></proof>
+  <proof prover="3"><result status="valid" time="0.44" steps="78740"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.20" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.36" steps="77437"/></proof>
+  <proof prover="3"><result status="valid" time="0.36" steps="76906"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.21" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="1.13" steps="218371"/></proof>
+  <proof prover="3"><result status="valid" time="1.41" steps="217834"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.22" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="1.09" steps="205196"/></proof>
+  <proof prover="3"><result status="valid" time="1.31" steps="204556"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.23" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="205819"/></proof>
+  <proof prover="6"><result status="valid" time="0.04" steps="161735"/></proof>
   </goal>
   <goal name="dll_to_bst_rec&#39;vc.24" expl="postcondition" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="dll_to_bst_rec&#39;vc.24.0" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="3.21" steps="406938"/></proof>
+   <proof prover="0"><result status="valid" time="4.06" steps="391963"/></proof>
    </goal>
   </transf>
   </goal>
@@ -267,10 +268,14 @@
    <goal name="dll_to_bst_rec&#39;vc.25.0" expl="postcondition" proved="true">
    <transf name="split_all_full" proved="true" >
     <goal name="dll_to_bst_rec&#39;vc.25.0.0" expl="VC for dll_to_bst_rec" proved="true">
-    <proof prover="8" timelimit="1"><result status="valid" time="0.40" steps="86585"/></proof>
+    <proof prover="8" timelimit="1"><result status="valid" time="0.40" steps="86082"/></proof>
     </goal>
     <goal name="dll_to_bst_rec&#39;vc.25.0.1" expl="VC for dll_to_bst_rec" proved="true">
-    <proof prover="5"><result status="valid" time="0.64" steps="7392"/></proof>
+    <transf name="split_vc" proved="true" >
+     <goal name="dll_to_bst_rec&#39;vc.25.0.1.0" expl="VC for dll_to_bst_rec" proved="true">
+     <proof prover="4"><result status="valid" time="1.72" steps="18983"/></proof>
+     </goal>
+    </transf>
     </goal>
    </transf>
    </goal>
@@ -279,60 +284,60 @@
  </transf>
  </goal>
  <goal name="tree_size&#39;vc" expl="VC for tree_size" proved="true">
- <proof prover="3"><result status="valid" time="0.10" steps="26803"/></proof>
+ <proof prover="3"><result status="valid" time="0.10" steps="26325"/></proof>
  </goal>
  <goal name="tree_inorder&#39;vc" expl="VC for tree_inorder" proved="true">
  <proof prover="2"><result status="valid" time="0.19" steps="1014"/></proof>
  </goal>
  <goal name="size&#39;vc" expl="VC for size" proved="true">
- <proof prover="3"><result status="valid" time="0.26" steps="56738"/></proof>
+ <proof prover="3"><result status="valid" time="0.26" steps="56242"/></proof>
  </goal>
  <goal name="dll_to_bst&#39;vc" expl="VC for dll_to_bst" proved="true">
- <proof prover="3"><result status="valid" time="0.17" steps="39354"/></proof>
+ <proof prover="3"><result status="valid" time="0.17" steps="36751"/></proof>
  <transf name="split_vc" proved="true" >
   <goal name="dll_to_bst&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.08" steps="25686"/></proof>
+  <proof prover="3"><result status="valid" time="0.08" steps="25360"/></proof>
   </goal>
   <goal name="dll_to_bst&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.07" steps="25722"/></proof>
+  <proof prover="3"><result status="valid" time="0.07" steps="25396"/></proof>
   </goal>
   <goal name="dll_to_bst&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.07" steps="28280"/></proof>
+  <proof prover="3"><result status="valid" time="0.07" steps="27954"/></proof>
   </goal>
   <goal name="dll_to_bst&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.12" steps="31694"/></proof>
+  <proof prover="3"><result status="valid" time="0.12" steps="31193"/></proof>
   </goal>
   <goal name="dll_to_bst&#39;vc.4" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.14" steps="326"/></proof>
   </goal>
   <goal name="dll_to_bst&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.08" steps="28516"/></proof>
+  <proof prover="3"><result status="valid" time="0.08" steps="28190"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="size_alt&#39;vc" expl="VC for size_alt" proved="true">
- <proof prover="3"><result status="valid" time="0.26" steps="59742"/></proof>
+ <proof prover="3"><result status="valid" time="0.26" steps="58295"/></proof>
  </goal>
  <goal name="dll_to_bst_alt&#39;vc" expl="VC for dll_to_bst_alt" proved="true">
- <proof prover="3"><result status="valid" time="0.17" steps="39340"/></proof>
+ <proof prover="3"><result status="valid" time="0.17" steps="36737"/></proof>
  <transf name="split_vc" proved="true" >
   <goal name="dll_to_bst_alt&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.08" steps="25686"/></proof>
+  <proof prover="3"><result status="valid" time="0.08" steps="25360"/></proof>
   </goal>
   <goal name="dll_to_bst_alt&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.09" steps="25715"/></proof>
+  <proof prover="3"><result status="valid" time="0.09" steps="25389"/></proof>
   </goal>
   <goal name="dll_to_bst_alt&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.08" steps="28273"/></proof>
+  <proof prover="3"><result status="valid" time="0.08" steps="27947"/></proof>
   </goal>
   <goal name="dll_to_bst_alt&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.14" steps="31687"/></proof>
+  <proof prover="3"><result status="valid" time="0.14" steps="31186"/></proof>
   </goal>
   <goal name="dll_to_bst_alt&#39;vc.4" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.13" steps="342"/></proof>
   </goal>
   <goal name="dll_to_bst_alt&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.08" steps="28479"/></proof>
+  <proof prover="3"><result status="valid" time="0.08" steps="28153"/></proof>
   </goal>
  </transf>
  </goal>

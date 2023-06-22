@@ -119,15 +119,12 @@ let set_debug_flags_gnatprove () =
      during parsing. In SPARK, these labels are inserted during transformations
      from Ada code.
   *)
-  let debug_no_auto_model =
-    Debug.register_flag ~desc:"When set, model labels are not added during parsing"
-      "no_auto_model" in
-  Debug.set_flag debug_no_auto_model;
   (* Set the vc_sp (fast_wp) everywhere. *)
   let debug_sp = Debug.register_flag "vc_sp"
     ~desc:"Use@ 'Efficient@ Weakest@ Preconditions'@ for@ verification." in
   Debug.set_flag debug_sp;
-  let debug_useless_at = Debug.register_flag "ignore_useless_at"
-    ~desc:"Remove@ warning@ for@ useless@ at/old." in
-  Debug.set_flag debug_useless_at;
-  Debug.set_flag Dterm.debug_ignore_unused_var
+  (* We should use Typing.warn_useless_at, but it is not exported*)
+  let warning_useless_at = Loc.register_warning "useless_at"
+    "Warning@ for@ useless@ at/old." in
+  Loc.disable_warning warning_useless_at;
+  Loc.disable_warning Dterm.warn_unused_variable

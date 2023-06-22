@@ -48,7 +48,7 @@ type constant_frac = {
   constant_frac_verbatim: string
 }
 
-type constant_float =
+type constant_float_value =
   | Fplusinfinity
   | Fminusinfinity
   | Fpluszero
@@ -59,6 +59,12 @@ type constant_float =
       constant_float_exp : constant_bv;
       constant_float_mant : constant_bv
     }
+
+type constant_float = {
+  const_float_exp_size : int;
+  const_float_significand_size : int;
+  const_float_val : constant_float_value
+}
 
 type constant =
   | Cint of constant_int
@@ -77,6 +83,7 @@ type term =
   | Tapply of qual_identifier * term list
   | Tite of term * term * term
   | Tarray of sort * sort * array_elements
+  | Tasarray of term
   | Tunparsed of string
 
 and var_binding = symbol * term
@@ -128,7 +135,7 @@ and idx_equal idx idx' =
 
 open Format
 
-let print_bigint fmt bigint = fprintf fmt "%s" (BigInt.to_string bigint)
+let print_bigint fmt bigint = pp_print_string fmt (BigInt.to_string bigint)
 
 let print_bv fmt { constant_bv_value; constant_bv_length; constant_bv_verbatim } =
   fprintf fmt "(Cbitvector {value=%a; length=%d; verbatim=%s})"
@@ -137,6 +144,18 @@ let print_bv fmt { constant_bv_value; constant_bv_length; constant_bv_verbatim }
 let print_real fmt { constant_real_value; constant_real_verbatim } =
   fprintf fmt "(Creal {value=%a; verbatim=%s})"
     Number.(print_real_constant full_support) constant_real_value constant_real_verbatim
+
+let print_float_constant fmt = function
+  | Fplusinfinity -> pp_print_string fmt "Fplusinfinity"
+  | Fminusinfinity -> pp_print_string fmt "Fminusinfinity"
+  | Fpluszero -> pp_print_string fmt "Fpluszero"
+  | Fminuszero -> pp_print_string fmt "Fminuszero"
+  | Fnan -> pp_print_string fmt "Fnan"
+  | Fnumber { constant_float_sign; constant_float_exp; constant_float_mant } ->
+    fprintf fmt "Fnumber {sign=%a; exp=%a; mant=%a}"
+      print_bv constant_float_sign
+      print_bv constant_float_exp
+      print_bv constant_float_mant
 
 let print_constant fmt = function
   | Cint {constant_int_value; constant_int_verbatim} ->
@@ -147,19 +166,18 @@ let print_constant fmt = function
       fprintf fmt "(Cfraction {num=%a; den=%a; verbatim=%s})"
         print_real constant_frac_num print_real constant_frac_den constant_frac_verbatim
   | Cbitvector bv -> print_bv fmt bv
-  | Cfloat Fplusinfinity -> fprintf fmt "(Cfloat Fplusinfinity)"
-  | Cfloat Fminusinfinity -> fprintf fmt "(Cfloat Fminusinfinity)"
-  | Cfloat Fpluszero -> fprintf fmt "(Cfloat Fpluszero)"
-  | Cfloat Fminuszero -> fprintf fmt "(Cfloat Fminuszero)"
-  | Cfloat Fnan -> fprintf fmt "(Cfloat Fnan)"
-  | Cfloat (Fnumber { constant_float_sign; constant_float_exp; constant_float_mant }) ->
-    fprintf fmt "(Cfloat Fnumber {sign=%a; exp=%a; mant=%a})"
-      print_bv constant_float_sign print_bv constant_float_exp print_bv constant_float_mant
+  | Cfloat
+      { const_float_exp_size; const_float_significand_size; const_float_val} ->
+    fprintf fmt
+      "(Cfloat { @[<hov>exp_size = %d;@ significand_side = %d;@ value = %a@] })"
+      const_float_exp_size
+      const_float_significand_size
+      print_float_constant const_float_val
   | Cbool b -> fprintf fmt "(Cbool %b)" b
   | Cstring s -> fprintf fmt "(Cstring %s)" s
 
 let print_symbol fmt = function
-  | S str -> fprintf fmt "%s" str
+  | S str -> pp_print_string fmt str
   | Sprover str -> fprintf fmt "(Sprover %s)" str
 
 let print_index fmt = function
@@ -167,12 +185,12 @@ let print_index fmt = function
   | Idxsymbol s -> fprintf fmt "(Idx %a)" print_symbol s
 
 let rec print_sort fmt = function
-  | Sstring -> fprintf fmt "(Sstring)"
-  | Sreglan -> fprintf fmt "(Sreglan)"
-  | Sint -> fprintf fmt "(Sint)"
-  | Sreal -> fprintf fmt "(Sreal)"
-  | Sroundingmode -> fprintf fmt "(Sroundingmode)"
-  | Sbool -> fprintf fmt "(Sbool)"
+  | Sstring -> pp_print_string fmt "(Sstring)"
+  | Sreglan -> pp_print_string fmt "(Sreglan)"
+  | Sint -> pp_print_string fmt "(Sint)"
+  | Sreal -> pp_print_string fmt "(Sreal)"
+  | Sroundingmode -> pp_print_string fmt "(Sroundingmode)"
+  | Sbool -> pp_print_string fmt "(Sbool)"
   | Sbitvec i -> fprintf fmt "(Sbitvec %d)" i
   | Sfloatingpoint (i1, i2) -> fprintf fmt "(Sfloatingpoint %d,%d)" i1 i2
   | Sarray (s1, s2) -> fprintf fmt "(Sarray %a %a)" print_sort s1 print_sort s2
@@ -207,6 +225,8 @@ let rec print_term fmt = function
   | Tarray (s1, s2, elts) ->
       fprintf fmt "@[<hv>(Array (%a -> %a) %a)@]" print_sort s1 print_sort s2
         print_array elts
+  | Tasarray t ->
+      fprintf fmt "@[<hv>(AsArray %a)@]" print_term t
   | Tunparsed s -> fprintf fmt "(UNPARSED %s)" s
 
 and print_var_binding fmt (s, t) =

@@ -487,9 +487,9 @@ goods bench/typing/x-good --parse-only
 bads bench/typing/x-good --type-only
 goods bench/programs/good
 goods bench/check-ce "-L bench/check-ce"
-goods src/trywhy3/examples/whyml "--debug=ignore_missing_diverges"
-goods src/trywhy3/examples/python "--debug=ignore_missing_diverges"
-goods src/trywhy3/examples/micro-c "--debug=ignore_missing_diverges"
+goods src/trywhy3/examples/whyml "--warn-off=missing_diverges"
+goods src/trywhy3/examples/python "--warn-off=missing_diverges"
+goods src/trywhy3/examples/micro-c "--warn-off=missing_diverges"
 goods examples/bts
 goods examples/tests
 goods examples/tests-provers
@@ -505,7 +505,7 @@ goods examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_201
 goods examples/double_wp "-L examples/double_wp"
 goods examples/ring_decision "-L examples/ring_decision"
 goods examples/multiprecision "-L examples/multiprecision"
-goods examples/prover "-L examples/prover --debug=ignore_unused_vars"
+goods examples/prover "-L examples/prover --warn-off=unused_variable"
 goods examples/python
 goods examples/micro-c
 goods bench/plugins/mlcfg
@@ -546,6 +546,7 @@ if enabled rac; then
 echo "=== Checking RAC ==="
 mlw="examples/tests/rac.mlw"
 output="examples/tests/rac.out"
+oracle="examples/tests/rac.oracle"
 (
     rac "$mlw" Local test1 test2 test3 test4 test5
     rac "$mlw" Global test1 test2
@@ -570,10 +571,11 @@ output="examples/tests/rac.out"
     rac "$mlw" FunctionVariant 'test1 2' 'test2 2' 'test3 2' 'test4 2' 'test5 2'
     rac "$mlw" ArrayList main
 ) > "$output"
-if git diff --exit-code --src-prefix=EXPECTED/ --dst-prefix=ACTUAL/ "$output"; then
+if diff "$oracle" "$output"; then
     echo "RAC: ok"
 else
-    echo "RAC: diff in output $output"
+    echo "RAC: differences detected as shown above"
+    echo "To validate the differences, please manually copy file $output to $oracle"
     exit 1
 fi
 echo ""
@@ -696,7 +698,7 @@ replay examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_20
 replay examples/double_wp "-L examples/double_wp --merging-only"
 #replay examples/ring_decision "-L examples/ring_decision --merging-only"
 replay examples/multiprecision "-L examples/multiprecision --merging-only"
-replay examples/prover "-L examples/prover --merging-only --debug=ignore_unused_vars"
+replay examples/prover "-L examples/prover --merging-only --warn-off=unused_variable"
 #replay examples/in_progress --merging-only
 replay examples/mlcfg --merging-only
 echo ""

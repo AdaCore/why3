@@ -63,13 +63,14 @@ let css =
   css_fname
 
 let do_file env fname =
-  try
+  let glob = Glob.drop fname in
+  begin try
     ignore (Env.read_file Env.base_language env fname)
   with e ->
-    eprintf "warning: could not read file '%s'@." fname;
-    eprintf "(%a)@." Exn_printer.exn_printer e
-
-let print_file fname =
+    eprintf "error: could not read file '%s'@." fname;
+    eprintf "(%a)@." Exn_printer.exn_printer e;
+    exit 1
+  end;
   let fhtml = Doc_def.output_file fname in
   let c = open_out fhtml in
   let fmt = formatter_of_out_channel c in
@@ -80,7 +81,10 @@ let print_file fname =
   Doc_lexer.do_file fmt fname;
   if not !opt_body then Doc_html.print_footer fmt ();
   pp_print_flush fmt ();
-  close_out c
+  close_out c;
+  (* all the identifiers associated to fname needs to be cleared,
+     as they might also be available through option -L *)
+  Glob.restore fname glob
 
 let () =
   Queue.iter Doc_def.add_local_file opt_queue;
@@ -88,7 +92,6 @@ let () =
     Doc_def.set_output_dir !opt_output;
     (* process files *)
     Queue.iter (do_file env) opt_queue;
-    Queue.iter print_file opt_queue;
     (* then generate the index *)
     if index then begin
       let fhtml = Doc_def.output_file "index.why" in

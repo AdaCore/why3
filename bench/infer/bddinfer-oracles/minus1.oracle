@@ -1,27 +1,18 @@
 Invariant for loop [anonymous_loop_0] is
-  (((0 <= j.contents /\ j.contents <= 18) /\
-    (j.contents + (i.contents * 2)) = 20) /\
-   o = 0) /\
-  o1 = 0
+  (((0 <= !j /\ !j <= 18) /\ (!j + (!i * 2)) = 20) /\ o = 0) /\ o1 = 0
 Domains for loop [anonymous_loop_0] are
   o1 = [0;0]; i = [1;10]; o = [0;0]; j = [0;18]
 Invariant for loop [anonymous_loop_0] is
-  (((0 <= j1.contents /\ j1.contents <= 18) /\
-    (j1.contents + (i1.contents * 2)) = 20) /\
-   o2 = 0) /\
-  o3 = 0
+  (((0 <= !j1 /\ !j1 <= 18) /\ (!j1 + (!i1 * 2)) = 20) /\ o2 = 0) /\ o3 = 0
 Domains for loop [anonymous_loop_0] are
   o3 = [0;0]; i1 = [1;10]; o2 = [0;0]; j1 = [0;18]
 Invariant for loop [anonymous_loop_0] is
-  (((0 <= j2.contents /\ j2.contents <= 18) /\
-    (j2.contents + (i2.contents * 2)) = 20) /\
-   o4 = 0) /\
-  o5 = 0
+  (((0 <= !j2 /\ !j2 <= 18) /\ (!j2 + (!i2 * 2)) = 20) /\ o4 = 0) /\ o5 = 0
 Domains for loop [anonymous_loop_0] are
   o5 = [0;0]; i2 = [1;10]; o4 = [0;0]; j2 = [0;18]
 File bench/infer/minus1.mlw:
 Goal b'vc.
-Prover result is: Valid (0.01s, 20 steps).
+Prover result is: Valid (0.00s, 20 steps).
 
 File bench/infer/minus1.mlw:
 Goal b2'vc.

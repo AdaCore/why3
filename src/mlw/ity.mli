@@ -319,7 +319,7 @@ type mask =
   | MaskVisible            (** fully non-ghost *)
   | MaskTuple of mask list (** decomposed ghst status for tuples *)
   | MaskGhost              (** fully ghost *)
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 val mask_ghost : mask -> bool
 

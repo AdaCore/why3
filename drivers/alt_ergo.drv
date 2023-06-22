@@ -4,6 +4,13 @@ prelude "(* this is the prelude for Alt-Ergo, version >= 2.4.0 *)"
 
 filename "%f-%t-%g.ae"
 
+(* Performed introductions depending on whether counterexamples are
+   requested, as said by the meta "get_counterexmp". When this meta
+   set, this transformation introduces the model variables that are
+   still embedded in the goal. When it is not set, it removes all
+   these unused-ce-related variables, even in the context.  *)
+transformation "counterexamples_dependent_intros"
+
 transformation "inline_trivial"
 transformation "eliminate_builtin"
 transformation "remove_unused_keep_constants"

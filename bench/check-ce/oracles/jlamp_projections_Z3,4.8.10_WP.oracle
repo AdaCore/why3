@@ -3,10 +3,10 @@ Sub-goal Precondition of goal p3'vc.
 Prover result is: Valid.
 
 <check_ce:categorization>Categorizations of models:
-- Checked model 0: BAD_CE
-  - Concrete RAC: NORMAL
-  - Abstract RAC: NORMAL
-- Selected model 1: NC
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18)
+- Checked model 1: NC
   - Concrete RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18)
   - Abstract RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18)
 File "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18:
@@ -23,30 +23,17 @@ File int.mlw:
     one = 1
 File jlamp_projections.mlw:
   Line 7:
-    to_int = fun (x!0:byte) ->
-              if (if x!0 = (epsilon x:byte. to_int x = 127) then epsilon x:
-                  byte. to_int x = 127 else epsilon x:byte. to_int x = 1) =
-                 (epsilon x:byte. to_int x = 1)
-              then 1
-              else if (if x!0 = (epsilon x:byte. to_int x = 127)
-                       then epsilon x:byte. to_int x = 127 else epsilon x:
-                       byte. to_int x = 1) =
-                      (epsilon x:byte. to_int x = 127)
-                   then 127 else 2
+    to_int = fun (x!06:byte) ->
+              if x!06 = (epsilon x:byte. to_int x = 1) then 1
+              else if x!06 = (epsilon x:byte. to_int x = 127) then 127 else 1
   Line 28:
     a = epsilon x:byte. to_int x = 127
     a = epsilon x:byte. to_int x = 127
     Execution of main function `p3` with env:
-      to_int = fun (x!0:byte) ->
-                if (if x!0 = (epsilon x:byte. to_int x = 127) then epsilon x:
-                    byte. to_int x = 127 else epsilon x:byte. to_int x = 1) =
-                   (epsilon x:byte. to_int x = 1)
-                then 1
-                else if (if x!0 = (epsilon x:byte. to_int x = 127)
-                         then epsilon x:byte. to_int x = 127 else epsilon x:
-                         byte. to_int x = 1) =
-                        (epsilon x:byte. to_int x = 127)
-                     then 127 else 2
+      to_int = fun (x!06:byte) ->
+                if x!06 = (epsilon x:byte. to_int x = 1) then 1
+                else if x!06 = (epsilon x:byte. to_int x = 127) then 127
+                     else 1
       a = epsilon x:byte. to_int x = 127
       zero = 0
       one = 1
@@ -66,10 +53,10 @@ Sub-goal Precondition of goal p3'vc.
 Prover result is: Valid.
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: NC
-  - Concrete RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24)
-  - Abstract RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24)
-- Checked model 1: NC
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
   - Concrete RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24)
   - Abstract RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24)
 File "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24:
@@ -86,17 +73,30 @@ File int.mlw:
     one = 1
 File jlamp_projections.mlw:
   Line 7:
-    to_int = fun (x!0:byte) ->
-              if x!0 = (epsilon x:byte. to_int x = 1) then 1
-              else if x!0 = (epsilon x:byte. to_int x = 127) then 127 else 1
+    to_int = fun (x!012:byte) ->
+              if (if x!012 = (epsilon x:byte. to_int x = 1) then epsilon x:
+                  byte. to_int x = 1 else epsilon x:byte. to_int x = 127) =
+                 (epsilon x:byte. to_int x = 1)
+              then 1
+              else if (if x!012 = (epsilon x:byte. to_int x = 1)
+                       then epsilon x:byte. to_int x = 1 else epsilon x:byte.
+                       to_int x = 127) =
+                      (epsilon x:byte. to_int x = 127)
+                   then 127 else 2
   Line 41:
     a = {contents= epsilon x:byte. to_int x = 127}
     a = {contents= epsilon x:byte. to_int x = 127}
     Execution of main function `p3` with env:
-      to_int = fun (x!0:byte) ->
-                if x!0 = (epsilon x:byte. to_int x = 1) then 1
-                else if x!0 = (epsilon x:byte. to_int x = 127) then 127
-                     else 1
+      to_int = fun (x!012:byte) ->
+                if (if x!012 = (epsilon x:byte. to_int x = 1) then epsilon x:
+                    byte. to_int x = 1 else epsilon x:byte. to_int x = 127) =
+                   (epsilon x:byte. to_int x = 1)
+                then 1
+                else if (if x!012 = (epsilon x:byte. to_int x = 1)
+                         then epsilon x:byte. to_int x = 1 else epsilon x:
+                         byte. to_int x = 127) =
+                        (epsilon x:byte. to_int x = 127)
+                     then 127 else 2
       a = {contents= epsilon x:byte. to_int x = 127}
       zero = 0
       one = 1
@@ -144,28 +144,28 @@ File int.mlw:
     one = 1
 File jlamp_projections.mlw:
   Line 7:
-    to_int = fun (x!0:byte) ->
-              if (if x!0 = (epsilon x:byte. to_int x = 127) then epsilon x:
-                  byte. to_int x = 127 else epsilon x:byte. to_int x = 1) =
+    to_int = fun (x!018:byte) ->
+              if (if x!018 = (epsilon x:byte. to_int x = 1) then epsilon x:
+                  byte. to_int x = 1 else epsilon x:byte. to_int x = 127) =
                  (epsilon x:byte. to_int x = 1)
               then 1
-              else if (if x!0 = (epsilon x:byte. to_int x = 127)
-                       then epsilon x:byte. to_int x = 127 else epsilon x:
-                       byte. to_int x = 1) =
+              else if (if x!018 = (epsilon x:byte. to_int x = 1)
+                       then epsilon x:byte. to_int x = 1 else epsilon x:byte.
+                       to_int x = 127) =
                       (epsilon x:byte. to_int x = 127)
                    then 127 else 3
   Line 53:
     b = {f= epsilon x:byte. to_int x = 127; g= true}
     b = {f= epsilon x:byte. to_int x = 127; g= true}
     Execution of main function `p4` with env:
-      to_int = fun (x!0:byte) ->
-                if (if x!0 = (epsilon x:byte. to_int x = 127) then epsilon x:
-                    byte. to_int x = 127 else epsilon x:byte. to_int x = 1) =
+      to_int = fun (x!018:byte) ->
+                if (if x!018 = (epsilon x:byte. to_int x = 1) then epsilon x:
+                    byte. to_int x = 1 else epsilon x:byte. to_int x = 127) =
                    (epsilon x:byte. to_int x = 1)
                 then 1
-                else if (if x!0 = (epsilon x:byte. to_int x = 127)
-                         then epsilon x:byte. to_int x = 127 else epsilon x:
-                         byte. to_int x = 1) =
+                else if (if x!018 = (epsilon x:byte. to_int x = 1)
+                         then epsilon x:byte. to_int x = 1 else epsilon x:
+                         byte. to_int x = 127) =
                         (epsilon x:byte. to_int x = 127)
                      then 127 else 3
       b = {f= epsilon x:byte. to_int x = 127; g= true}

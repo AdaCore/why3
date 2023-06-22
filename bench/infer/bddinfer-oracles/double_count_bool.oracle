@@ -1,0 +1,11 @@
+Invariant for loop [anonymous_loop_0] is
+  if x = True then if y = True then 20 <= t1 else 0 <= t1 /\ t1 <= 19
+  else y = False /\ t0 = 0 /\ t1 = 0
+Domains for loop [anonymous_loop_0] are
+  x = top; y = top; t0 = ]-oo;+oo[; t1 = [0;+oo[
+The generated invariant does not imply { (~y || (t0 + t1) >= 50) }
+
+File bench/infer/double_count_bool.mlw:
+Goal test'vc.
+Prover result is: Valid (0.01s, 76 steps).
+

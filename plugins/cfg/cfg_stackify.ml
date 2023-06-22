@@ -14,32 +14,18 @@ open Stackify
 open Cfg_ast
 open Ptree
 
+let warn_deprecated_named_invariant =
+    Loc.register_warning "deprecated_named_invariant" "Named invariants in MLCFG are deprecated. Use hyp_name: attribute to provide hypothesis names instead"
+
 let debug = Debug.register_flag "cfg" ~desc:"CFG plugin debug flag"
-let unit_type = PTtuple []
-                  [@@warning "-32"]
-
-let mk_id ~loc name =
-  { id_str = name; id_ats = []; id_loc = loc }
-
-let mk_expr ~loc d =
-  { expr_desc = d; expr_loc = loc }
-
-let mk_unit ~loc =
-  mk_expr ~loc (Etuple [])
-
-let mk_check ~loc t =
-  mk_expr ~loc (Eassert(Expr.Check,t))
-              [@@warning "-32"]
-
-let mk_assume ~loc t =
-  mk_expr ~loc (Eassert(Expr.Assume,t))
-              [@@warning "-32"]
-
-let mk_seq ~loc e1 e2 = mk_expr ~loc (Esequence(e1,e2))
-
-let mk_pat ~loc d =
-  { pat_desc = d; pat_loc = loc }
-
+let unit_type = PTtuple [] [@@warning "-32"]
+let mk_id ~loc name = { id_str = name; id_ats = []; id_loc = loc }
+let mk_expr ~loc d = { expr_desc = d; expr_loc = loc }
+let mk_unit ~loc = mk_expr ~loc (Etuple [])
+let mk_check ~loc t = mk_expr ~loc (Eassert (Expr.Check, t)) [@@warning "-32"]
+let mk_assume ~loc t = mk_expr ~loc (Eassert (Expr.Assume, t)) [@@warning "-32"]
+let mk_seq ~loc e1 e2 = mk_expr ~loc (Esequence (e1, e2))
+let mk_pat ~loc d = { pat_desc = d; pat_loc = loc }
 let pat_wild ~loc = mk_pat ~loc Pwild
 
 let empty_spec =
@@ -59,9 +45,7 @@ let empty_spec =
 let pp_id fmt id = Format.pp_print_string fmt id.id_str
 
 let rec pp_qid fmt qid =
-  match qid with
-  | Qident id -> pp_id fmt id
-  | Qdot (q, id) -> Format.fprintf fmt "%a.%a" pp_qid q pp_id id
+  match qid with Qident id -> pp_id fmt id | Qdot (q, id) -> Format.fprintf fmt "%a.%a" pp_qid q pp_id id
 
 let rec pp_pty fmt t =
   match t with
@@ -70,29 +54,42 @@ let rec pp_pty fmt t =
 
 let divergent_attr = ATstr Vc.nt_attr
 
-exception CFGError of string
-              [@@warning "-38"]
+exception CFGError of string [@@warning "-38"]
 
 let () =
   Exn_printer.register (fun fmt exn ->
-      match exn with
-      | CFGError msg -> Format.fprintf fmt "CFG translation error: %s" msg
-      | _ -> raise exn)
+      match exn with CFGError msg -> Format.fprintf fmt "CFG translation error: %s" msg | _ -> raise exn)
 
 let mk_loop_continue entry : Ptree.expr = mk_expr ~loc:entry.id_loc (Eraise (Qident entry, None))
 
-let mk_loop_expr entry invariants (e : Ptree.expr) : Ptree.expr =
+
+(* copied from ocaml stdlib implementation, as it's not available in 4.11 *)
+type ('a, 'b) either = Left of 'a | Right of 'b
+
+let partition_map p l =
+  let rec part left right = function
+  | [] -> (List.rev left, List.rev right)
+  | x :: l ->
+     begin match p x with
+       | Left v -> part (v :: left) right l
+       | Right v -> part left (v :: right) l
+     end
+  in
+  part [] [] l
+
+let mk_loop_expr entry (invariants : (loop_clause * ident option * term) list) (e : Ptree.expr) : Ptree.expr =
   let continue = mk_expr ~loc:Loc.dummy_position (Eoptexn (entry, Ity.MaskVisible, e)) in
-  let invariants =
-    List.map
-      (fun (id, t) ->
-        let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ id.id_str)) in
-        { term_loc = t.term_loc; term_desc = Tattr (attr, t) })
+  let invariants, variants =
+    partition_map
+      (fun (claus, id, t) ->
+        if id <> None then
+          Loc.warning ~loc:t.term_loc ~id:warn_deprecated_named_invariant  "Named invariants are deprecated. Please use the `hyp_name` attribute directly";
+
+        match claus with Invariant -> Left t | Variant -> Right (t, None))
       invariants
   in
   let infinite_loop =
-    mk_expr ~loc:entry.id_loc
-      (Ewhile (mk_expr ~loc:Loc.dummy_position Etrue, invariants, [], continue))
+    mk_expr ~loc:entry.id_loc (Ewhile (mk_expr ~loc:Loc.dummy_position Etrue, invariants, variants, continue))
   in
   (* adding a "absurd" after the infinite loop to avoid generation of
      meaningless VCs *)
@@ -102,14 +99,10 @@ let mk_loop_expr entry invariants (e : Ptree.expr) : Ptree.expr =
 let mk_scope_break entry ?(loc = entry.id_loc) () = mk_expr ~loc (Eraise (Qident entry, None))
 
 let mk_scope_expr entry inner outer =
-  mk_seq ~loc:Loc.dummy_position
-    (mk_expr ~loc:entry.id_loc (Eoptexn (entry, Ity.MaskVisible, inner)))
-    outer
+  mk_seq ~loc:Loc.dummy_position (mk_expr ~loc:entry.id_loc (Eoptexn (entry, Ity.MaskVisible, inner))) outer
 
 let translate_instr (i : Cfg_ast.cfg_instr) : Ptree.expr =
-  match i.cfg_instr_desc with
-  | CFGinvariant _inv -> mk_unit ~loc:Loc.dummy_position (* temporary *)
-  | CFGexpr e -> e
+  match i.cfg_instr_desc with CFGinvariant _inv -> mk_unit ~loc:Loc.dummy_position (* temporary *) | CFGexpr e -> e
 
 let rec translate_term subst (t : Cfg_ast.cfg_term) : Ptree.expr =
   match t.cfg_term_desc with
@@ -118,8 +111,7 @@ let rec translate_term subst (t : Cfg_ast.cfg_term) : Ptree.expr =
       | Some (_, e) -> e
       | _ -> mk_scope_break l ~loc:t.cfg_term_loc ()
     end
-  | CFGreturn e ->
-      mk_expr ~loc:t.cfg_term_loc (Eraise (Qident (mk_id ~loc:Loc.dummy_position "Return"), Some e))
+  | CFGreturn e -> mk_expr ~loc:t.cfg_term_loc (Eraise (Qident (mk_id ~loc:Loc.dummy_position "Return"), Some e))
   | CFGswitch (e, brs) ->
       (* TODO: why arent we using fall and can we remove it? *)
       let mk_switch _fall branches =
@@ -127,22 +119,16 @@ let rec translate_term subst (t : Cfg_ast.cfg_term) : Ptree.expr =
         mk_expr ~loc:t.cfg_term_loc (Ematch (e, branches, []))
       in
       let rec duplicates p xs =
-        match xs with
-        | x :: xs -> if List.exists (p x) xs then x :: duplicates p xs else duplicates p xs
-        | [] -> []
+        match xs with x :: xs -> if List.exists (p x) xs then x :: duplicates p xs else duplicates p xs | [] -> []
       in
       let dup_targets = duplicates (fun a b -> a.id_str = b.id_str) (targets t) in
-      let here, subst =
-        List.partition (fun (a, _) -> List.exists (fun b -> b.id_str = a.id_str) dup_targets) subst
-      in
+      let here, subst = List.partition (fun (a, _) -> List.exists (fun b -> b.id_str = a.id_str) dup_targets) subst in
 
       List.fold_left (fun acc (l, e) -> mk_scope_expr l acc e) (mk_switch subst brs) here
   | CFGabsurd -> mk_expr ~loc:t.cfg_term_loc Eabsurd
 
 let translate_block subst (instrs, term) : Ptree.expr =
-  List.fold_right
-    (fun i t -> mk_seq ~loc:Loc.dummy_position (translate_instr i) t)
-    instrs (translate_term subst term)
+  List.fold_right (fun i t -> mk_seq ~loc:Loc.dummy_position (translate_instr i) t) instrs (translate_term subst term)
 
 let rec translate_exp subst (es : Stackify.exp_tree) : Ptree.expr =
   match es with
@@ -178,8 +164,7 @@ let declare_local (ghost, id, ty, init) body =
   let e : expr =
     match init with
     | Some e -> e
-    | None ->
-        mk_expr ~loc (Eany ([], Expr.RKnone, Some ty, pat_wild ~loc, Ity.MaskVisible, empty_spec))
+    | None -> mk_expr ~loc (Eany ([], Expr.RKnone, Some ty, pat_wild ~loc, Ity.MaskVisible, empty_spec))
   in
   let e = mk_expr ~loc (Eapply (e_ref, e)) in
   let id = { id with id_ats = ATstr Pmodule.ref_attr :: id.id_ats } in
@@ -190,14 +175,12 @@ let translate_cfg_fundef cf =
   Debug.dprintf debug "return type is `%a`@." pp_pty cf.cf_retty;
   let body = translate_cfg cf.cf_block0 cf.cf_blocks in
   let loc = Loc.dummy_position in
-  let body =
-    List.fold_right declare_local cf.cf_locals body
-  in
+  let body = List.fold_right declare_local cf.cf_locals body in
   let body = mk_seq ~loc body (mk_expr ~loc Eabsurd) in
-  let body = mk_expr ~loc (Eoptexn(mk_id ~loc "Return", cf.cf_mask, body)) in
+  let body = mk_expr ~loc (Eoptexn (mk_id ~loc "Return", cf.cf_mask, body)) in
   (* ignore termination *)
-  let body = mk_expr ~loc (Eattr(divergent_attr,body)) in
-  let body = List.fold_right (fun a e -> mk_expr ~loc (Eattr(a, e))) cf.cf_attrs body in
+  let body = mk_expr ~loc (Eattr (divergent_attr, body)) in
+  let body = List.fold_right (fun a e -> mk_expr ~loc (Eattr (a, e))) cf.cf_attrs body in
   (cf.cf_name, false, Expr.RKnone, cf.cf_args, Some cf.cf_retty, cf.cf_pat, cf.cf_mask, cf.cf_spec, body)
 
 open Cfg_main

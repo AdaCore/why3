@@ -12,7 +12,10 @@
 open Why3
 open Why3session_lib
 
-type action = RenameFile of string * string
+type action =
+  | RenameFile of string * string
+  | MarkObsolete (* optionally with given prover filter *)
+  | RemoveProofs
 
 let actions = ref ([] : action list)
 
@@ -20,9 +23,16 @@ let spec_update =
   let open Getopt in
   [ KLong "rename-file", Hnd1 (APair (':', AString, AString),
       fun (src, dst) -> actions := RenameFile (src, dst) :: !actions),
-    "<old>:<new> rename file" ]
+    "<old>:<new> rename file";
+    KLong "mark-obsolete",
+    Hnd0 (fun () -> actions := MarkObsolete :: !actions),
+    " mark proofs (specified as filters below) as obsolete";
+    KLong "remove-proofs",
+    Hnd0 (fun () -> actions := RemoveProofs :: !actions),
+    " delete proofs (specified as filters below)";
+  ] @ Why3session_lib.filter_spec
 
-let do_action ~env ~session action =
+let do_action ~config ~env ~session action =
   ignore(env);
   match action with
   | RenameFile(src,dst) ->
@@ -34,13 +44,33 @@ let do_action ~env ~session action =
      assert (not (Sys.is_directory src));
      assert (not (Sys.file_exists dst));
      Sys.rename src dst
+  | MarkObsolete ->
+      let (f,e) = Why3session_lib.read_filter_spec config in
+      if e then exit 1;
+      Why3session_lib.session_iter_proof_attempt_by_filter
+        session f
+        (fun id _ ->
+(*           Format.eprintf "proof id %a marked as obsolete@."
+             Session_itp.print_proofAttemptID id;
+*)
+           Session_itp.mark_obsolete session id)
+  | RemoveProofs ->
+      let (f,e) = Why3session_lib.read_filter_spec config in
+      if e then exit 1;
+      Why3session_lib.session_iter_proof_attempt_by_filter
+        session f
+        (fun _ pa_node ->
+          let open Session_itp in
+          let parent =  pa_node.parent in
+          let prover = pa_node.prover in
+          remove_proof_attempt session parent prover)
 
 let run_update () =
-  let _,env = Whyconf.Args.complete_initialization () in
+  let config,env = Whyconf.Args.complete_initialization () in
   iter_files
     (fun fname ->
      let session = read_session fname in
-     List.iter (do_action ~env ~session) !actions;
+     List.iter (do_action ~config ~env ~session) !actions;
      Session_itp.save_session session)
 
 let cmd_update =

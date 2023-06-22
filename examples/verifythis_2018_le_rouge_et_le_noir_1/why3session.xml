@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="7" name="Z3" version="4.8.10" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_2018_le_rouge_et_le_noir_1.mlw"/>
 <theory name="ColoredTiles" proved="true">
@@ -20,7 +20,7 @@
   <proof prover="5"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="colo_0.2" proved="true">
-  <proof prover="6"><result status="valid" time="0.08" steps="21408"/></proof>
+  <proof prover="6"><result status="valid" time="0.08" steps="21030"/></proof>
   </goal>
  </transf>
  </goal>
@@ -36,7 +36,7 @@
   <proof prover="5"><result status="valid" time="0.02" steps="36"/></proof>
   </goal>
   <goal name="colo_1.3" proved="true">
-  <proof prover="6"><result status="valid" time="0.08" steps="21437"/></proof>
+  <proof prover="6"><result status="valid" time="0.08" steps="21003"/></proof>
   </goal>
  </transf>
  </goal>
@@ -55,10 +55,10 @@
   <proof prover="5"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
   <goal name="colo_2.4" proved="true">
-  <proof prover="5"><result status="valid" time="0.11" steps="966"/></proof>
+  <proof prover="5"><result status="valid" time="0.11" steps="922"/></proof>
   </goal>
   <goal name="colo_2.5" proved="true">
-  <proof prover="6"><result status="valid" time="0.09" steps="21988"/></proof>
+  <proof prover="6"><result status="valid" time="0.09" steps="21498"/></proof>
   </goal>
  </transf>
  </goal>
@@ -89,16 +89,16 @@
   <proof prover="5"><result status="valid" time="0.01" steps="33"/></proof>
   </goal>
   <goal name="colo_3.8" proved="true">
-  <proof prover="5"><result status="valid" time="0.17" steps="1387"/></proof>
+  <proof prover="5"><result status="valid" time="0.17" steps="1323"/></proof>
   </goal>
   <goal name="colo_3.9" proved="true">
   <proof prover="5"><result status="valid" time="0.02" steps="60"/></proof>
   </goal>
   <goal name="colo_3.10" proved="true">
-  <proof prover="5"><result status="valid" time="0.30" steps="1518"/></proof>
+  <proof prover="5"><result status="valid" time="0.30" steps="1278"/></proof>
   </goal>
   <goal name="colo_3.11" proved="true">
-  <proof prover="6"><result status="valid" time="0.21" steps="35162"/></proof>
+  <proof prover="6"><result status="valid" time="0.21" steps="34619"/></proof>
   </goal>
  </transf>
  </goal>
@@ -139,45 +139,45 @@
  <goal name="first_black_tile&#39;vc" expl="VC for first_black_tile" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="first_black_tile&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.02" steps="30"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="28"/></proof>
   </goal>
   <goal name="first_black_tile&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="first_black_tile&#39;vc.2" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.01" steps="24"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
   <goal name="first_black_tile&#39;vc.3" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="first_black_tile&#39;vc.3.0" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.02" steps="19"/></proof>
+   <proof prover="5"><result status="valid" time="0.02" steps="17"/></proof>
    </goal>
    <goal name="first_black_tile&#39;vc.3.1" expl="VC for first_black_tile" proved="true">
-   <proof prover="5"><result status="valid" time="0.04" steps="168"/></proof>
+   <proof prover="5"><result status="valid" time="0.04" steps="166"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="first_black_tile&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02" steps="66"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="54"/></proof>
   </goal>
   <goal name="first_black_tile&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02" steps="53"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="46"/></proof>
   </goal>
   <goal name="first_black_tile&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.04" steps="137"/></proof>
+  <proof prover="5"><result status="valid" time="0.04" steps="130"/></proof>
   </goal>
   <goal name="first_black_tile&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="91"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="78"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="addleft&#39;vc" expl="VC for addleft" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="addleft&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
   <goal name="addleft&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.01" steps="26"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
  </transf>
  </goal>
@@ -191,7 +191,7 @@
    <goal name="addleft_fb.0.1" expl="recursive case" proved="true">
    <transf name="split_all_full" proved="true" >
     <goal name="addleft_fb.0.1.0" expl="recursive case" proved="true">
-    <proof prover="7"><result status="valid" time="0.22" steps="362634"/></proof>
+    <proof prover="0"><result status="valid" time="0.05" steps="209178"/></proof>
     </goal>
    </transf>
    </goal>
@@ -237,38 +237,38 @@
  <goal name="addleft_result&#39;vc" expl="VC for addleft_result" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="addleft_result&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.06" steps="144"/></proof>
+  <proof prover="5"><result status="valid" time="0.06" steps="142"/></proof>
   </goal>
   <goal name="addleft_result&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="addleft_result&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="addleft_result&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.01" steps="14"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="addleft_result&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.01" steps="14"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="addleft_result&#39;vc.5" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.10" steps="25271"/></proof>
+  <proof prover="6"><result status="valid" time="0.10" steps="24452"/></proof>
   </goal>
   <goal name="addleft_result&#39;vc.6" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="addleft_result&#39;vc.6.0" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="2.00" steps="3241"/></proof>
+   <proof prover="5"><result status="valid" time="2.00" steps="3195"/></proof>
    </goal>
    <goal name="addleft_result&#39;vc.6.1" expl="VC for addleft_result" proved="true">
-   <proof prover="5"><result status="valid" time="0.02" steps="22"/></proof>
+   <proof prover="5"><result status="valid" time="0.02" steps="20"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="addleft_result&#39;vc.7" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.04" steps="100"/></proof>
+  <proof prover="5"><result status="valid" time="0.04" steps="98"/></proof>
   </goal>
   <goal name="addleft_result&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="3.45" steps="1529543"/></proof>
+  <proof prover="6"><result status="valid" time="4.06" steps="1647537"/></proof>
   </goal>
  </transf>
  </goal>
@@ -291,10 +291,10 @@
   <proof prover="5"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
   <goal name="mapaddleft_card&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="mapaddleft_card&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.01" steps="12"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
  </transf>
  </goal>
@@ -304,16 +304,16 @@
   <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="addleft_valid&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="1.79" steps="299979"/></proof>
+  <proof prover="6"><result status="valid" time="1.79" steps="299392"/></proof>
   </goal>
   <goal name="addleft_valid&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02" steps="14"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
   <goal name="addleft_valid&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02" steps="20"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
   <goal name="addleft_valid&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.12" steps="261"/></proof>
+  <proof prover="5"><result status="valid" time="0.12" steps="259"/></proof>
   </goal>
   <goal name="addleft_valid&#39;vc.5" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.01" steps="6"/></proof>
@@ -329,66 +329,66 @@
  <goal name="disjoint_union&#39;vc" expl="VC for disjoint_union" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="disjoint_union&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.02" steps="42"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="40"/></proof>
   </goal>
   <goal name="disjoint_union&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.01" steps="7"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
   <goal name="disjoint_union&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02" steps="33"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="31"/></proof>
   </goal>
   <goal name="disjoint_union&#39;vc.3" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="disjoint_union&#39;vc.3.0" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.01" steps="6"/></proof>
+   <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>
    </goal>
    <goal name="disjoint_union&#39;vc.3.1" expl="VC for disjoint_union" proved="true">
-   <proof prover="5"><result status="valid" time="0.02" steps="12"/></proof>
+   <proof prover="5"><result status="valid" time="0.02" steps="10"/></proof>
    </goal>
    <goal name="disjoint_union&#39;vc.3.2" expl="VC for disjoint_union" proved="true">
-   <proof prover="5"><result status="valid" time="0.02" steps="43"/></proof>
+   <proof prover="5"><result status="valid" time="0.02" steps="41"/></proof>
    </goal>
    <goal name="disjoint_union&#39;vc.3.3" expl="VC for disjoint_union" proved="true">
-   <proof prover="5"><result status="valid" time="0.02" steps="11"/></proof>
+   <proof prover="5"><result status="valid" time="0.02" steps="9"/></proof>
    </goal>
    <goal name="disjoint_union&#39;vc.3.4" expl="VC for disjoint_union" proved="true">
-   <proof prover="5"><result status="valid" time="0.01" steps="12"/></proof>
+   <proof prover="5"><result status="valid" time="0.01" steps="10"/></proof>
    </goal>
    <goal name="disjoint_union&#39;vc.3.5" expl="VC for disjoint_union" proved="true">
-   <proof prover="5"><result status="valid" time="0.01" steps="12"/></proof>
+   <proof prover="5"><result status="valid" time="0.01" steps="10"/></proof>
    </goal>
    <goal name="disjoint_union&#39;vc.3.6" expl="VC for disjoint_union" proved="true">
-   <proof prover="5"><result status="valid" time="0.01" steps="9"/></proof>
+   <proof prover="5"><result status="valid" time="0.01" steps="7"/></proof>
    </goal>
    <goal name="disjoint_union&#39;vc.3.7" expl="VC for disjoint_union" proved="true">
-   <proof prover="5"><result status="valid" time="0.01" steps="14"/></proof>
-   </goal>
-   <goal name="disjoint_union&#39;vc.3.8" expl="VC for disjoint_union" proved="true">
-   <proof prover="5"><result status="valid" time="0.02" steps="11"/></proof>
-   </goal>
-   <goal name="disjoint_union&#39;vc.3.9" expl="VC for disjoint_union" proved="true">
-   <proof prover="5"><result status="valid" time="0.01" steps="11"/></proof>
-   </goal>
-   <goal name="disjoint_union&#39;vc.3.10" expl="VC for disjoint_union" proved="true">
-   <proof prover="5"><result status="valid" time="0.01" steps="14"/></proof>
-   </goal>
-   <goal name="disjoint_union&#39;vc.3.11" expl="VC for disjoint_union" proved="true">
-   <proof prover="5"><result status="valid" time="0.01" steps="9"/></proof>
-   </goal>
-   <goal name="disjoint_union&#39;vc.3.12" expl="VC for disjoint_union" proved="true">
    <proof prover="5"><result status="valid" time="0.01" steps="12"/></proof>
    </goal>
+   <goal name="disjoint_union&#39;vc.3.8" expl="VC for disjoint_union" proved="true">
+   <proof prover="5"><result status="valid" time="0.02" steps="9"/></proof>
+   </goal>
+   <goal name="disjoint_union&#39;vc.3.9" expl="VC for disjoint_union" proved="true">
+   <proof prover="5"><result status="valid" time="0.01" steps="9"/></proof>
+   </goal>
+   <goal name="disjoint_union&#39;vc.3.10" expl="VC for disjoint_union" proved="true">
+   <proof prover="5"><result status="valid" time="0.01" steps="12"/></proof>
+   </goal>
+   <goal name="disjoint_union&#39;vc.3.11" expl="VC for disjoint_union" proved="true">
+   <proof prover="5"><result status="valid" time="0.01" steps="7"/></proof>
+   </goal>
+   <goal name="disjoint_union&#39;vc.3.12" expl="VC for disjoint_union" proved="true">
+   <proof prover="5"><result status="valid" time="0.01" steps="10"/></proof>
+   </goal>
    <goal name="disjoint_union&#39;vc.3.13" expl="VC for disjoint_union" proved="true">
-   <proof prover="5"><result status="valid" time="0.03" steps="58"/></proof>
+   <proof prover="5"><result status="valid" time="0.03" steps="56"/></proof>
    </goal>
    <goal name="disjoint_union&#39;vc.3.14" expl="VC for disjoint_union" proved="true">
-   <proof prover="5"><result status="valid" time="0.02" steps="59"/></proof>
+   <proof prover="5"><result status="valid" time="0.02" steps="57"/></proof>
    </goal>
    <goal name="disjoint_union&#39;vc.3.15" expl="VC for disjoint_union" proved="true">
-   <proof prover="5"><result status="valid" time="0.02" steps="56"/></proof>
+   <proof prover="5"><result status="valid" time="0.02" steps="54"/></proof>
    </goal>
    <goal name="disjoint_union&#39;vc.3.16" expl="VC for disjoint_union" proved="true">
-   <proof prover="5"><result status="valid" time="0.02" steps="10"/></proof>
+   <proof prover="5"><result status="valid" time="0.02" steps="8"/></proof>
    </goal>
   </transf>
   </goal>
@@ -396,7 +396,7 @@
   <proof prover="5"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
   <goal name="disjoint_union&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.05" steps="108"/></proof>
+  <proof prover="5"><result status="valid" time="0.05" steps="96"/></proof>
   </goal>
  </transf>
  </goal>
@@ -433,7 +433,7 @@
   <proof prover="5"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
   <goal name="enum&#39;vc.10" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.42" steps="68434"/></proof>
+  <proof prover="6"><result status="valid" time="0.42" steps="67696"/></proof>
   </goal>
   <goal name="enum&#39;vc.11" expl="index in array bounds" proved="true">
   <proof prover="5"><result status="valid" time="0.02" steps="40"/></proof>
@@ -442,7 +442,7 @@
   <proof prover="5"><result status="valid" time="0.02" steps="46"/></proof>
   </goal>
   <goal name="enum&#39;vc.13" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.19" steps="42839"/></proof>
+  <proof prover="6"><result status="valid" time="0.19" steps="42095"/></proof>
   </goal>
   <goal name="enum&#39;vc.14" expl="assertion" proved="true">
   <transf name="case" proved="true" arg1="i=3">
@@ -536,7 +536,7 @@
         </transf>
         </goal>
         <goal name="enum&#39;vc.18.1.0.3.0.0.1" expl="equality hypothesis" proved="true">
-        <proof prover="6"><result status="valid" time="0.20" steps="50857"/></proof>
+        <proof prover="6"><result status="valid" time="0.20" steps="50516"/></proof>
         </goal>
        </transf>
        </goal>

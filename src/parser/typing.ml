@@ -30,8 +30,9 @@ let debug_parse_only = Debug.register_flag "parse_only"
 let debug_type_only  = Debug.register_flag "type_only"
   ~desc:"Stop@ after@ type-checking."
 
-let debug_ignore_useless_at = Debug.register_flag "ignore_useless_at"
-  ~desc:"Remove@ warning@ for@ useless@ at/old."
+
+let warn_useless_at = Loc.register_warning "useless_at"
+  "Warn about `at'/`old' operators used in locations where they have no impact."
 
 (** symbol lookup *)
 
@@ -467,12 +468,6 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       let trl = List.map (List.map dterm) trl in
       let e1 = dterm e1 in
       DTquant (q, qvl, trl, e1)
-  | Ptree.Teps ((x, ty), e1) ->
-      let id = create_user_id x in
-      let dty = dty_of_ty (ty_of_pty ns ty) in
-      let denv = denv_add_quant denv [(Some id, dty, None)] in
-      let e1 = dterm ns km crcmap gvars at denv e1 in
-      DTeps (id, dty, e1)
   | Ptree.Trecord fl ->
       let get_val _cs pj = function
         | Some e -> dterm ns km crcmap gvars at denv e
@@ -502,8 +497,8 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       (* check if the label has actually been defined *)
       ignore (Loc.try2 ~loc gvars (Some l) (Qident id));
       let e1 = dterm ns km crcmap gvars (Some l) denv e1 in
-      if not (Hstr.find at_uses l) && Debug.test_noflag debug_ignore_useless_at then
-        Loc.warning ~loc "this `at'/`old' operator is never used";
+      if not (Hstr.find at_uses l) then
+        Loc.warning ~id:warn_useless_at ~loc "this `at'/`old' operator is never used";
       Hstr.remove at_uses l;
       DTattr (e1, Sattr.empty)
   | Ptree.Tscope (q, e1) ->
@@ -522,7 +517,13 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       DTconst (c, dty_of_pty ns pty)
   | Ptree.Tcast (e1, pty) ->
       let d1 = dterm ns km crcmap gvars at denv e1 in
-      DTcast (d1, dty_of_pty ns pty))
+      DTcast (d1, dty_of_pty ns pty)
+  | Ptree.Teps (x, pty, e) ->
+      let id = create_user_id x in
+      let pty = dty_of_pty ns pty in
+      let denv = denv_add_var denv id pty in
+      let e = dterm ns km crcmap gvars at denv e in
+      DTeps (id, pty, e))
 
 let no_gvars at q = match at with
   | Some _ -> Loc.errorm ~loc:(qloc q)
@@ -1160,10 +1161,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let gvars _at q = try match find_prog_symbol muc q with
         | PV v -> Some v | _ -> None with _ -> None in
       let get_dty pure_denv =
-        let nw = Debug.test_noflag debug_ignore_useless_at in
-        if nw then Debug.set_flag debug_ignore_useless_at;
-        let dt = dterm muc gvars None pure_denv t in
-        if nw then Debug.unset_flag debug_ignore_useless_at;
+        let dt = Loc.without_warning warn_useless_at (fun () -> dterm muc gvars None pure_denv t) in
         match dt.dt_dty with Some dty -> dty | None -> dty_bool in
       DEpure (get_term, denv_pure denv get_dty)
   | Ptree.Eassert (ak, f) ->
@@ -1467,7 +1465,7 @@ let tyl_of_params {muc_theory = tuc} pl =
   List.map ty_of_param pl
 
 (* Used to check unused variables in logic declarations *)
-let check_unused_vars ldl =
+let check_unused_variable ldl =
   List.iter
     (fun (_name, ld) ->
        let (vsl, t) = open_ls_defn ld in
@@ -1511,7 +1509,7 @@ let add_logics muc dl =
   let add_param muc s = add_decl muc (create_param_decl s) in
   let add_logic muc l =
     (* Check for unused vars in logic declaration *)
-    check_unused_vars l;
+    check_unused_variable l;
     add_decl muc (create_logic_decl l) in
   let muc = List.fold_left add_param muc abst in
   if defn = [] then muc else add_logic muc defn

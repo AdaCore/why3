@@ -10,23 +10,25 @@
 module Roberval
 
   use export int.Int
-  use export ref.Refint
 
   type outcome = Left | Equal | Right
     (** the side of the heaviest mass i.e. where the balance leans *)
 
-  val ghost counter: ref int
-   (** how many times can we use the balance *)
+  type counter = private { mutable v: int }
+  meta coercion function v
+
+  val ghost counter: counter
+    (** how many times can we use the balance *)
 
   val balance (left right: int) : outcome
-    requires { !counter > 0 }
+    requires { counter > 0 }
     ensures  { match result with
                | Left  -> left > right
                | Equal -> left = right
                | Right -> left < right
                end }
     writes   { counter }
-    ensures  { !counter = old !counter - 1 }
+    ensures  { counter = old counter - 1 }
 
 end
 
@@ -52,16 +54,16 @@ module Puzzle8
      which is smaller. *)
   predicate spec (balls: array int) (lo hi: int) (lb w: int) =
     0 <= lo <= lb < hi <= length balls &&
-    (forall i: int. lo <= i < hi -> i <> lb -> balls[i] = w) &&
+    (forall i. lo <= i < hi -> i <> lb -> balls[i] = w) &&
     balls[lb] < w
 
   (** Solve the problem for 3 balls, using exactly one weighing.
       The solution `lb` is passed as a ghost argument. *)
   let solve3 (balls: array int) (lo: int) (ghost lb: int) (ghost w: int) : int
-    requires { !counter >= 1 }
+    requires { counter >= 1 }
     requires { spec balls lo (lo + 3) lb w }
     ensures  { result = lb }
-    ensures  { !counter = old !counter - 1 }
+    ensures  { counter = old counter - 1 }
   =
     match balance balls[lo] balls[lo+1] with
     | Right -> lo
@@ -72,7 +74,7 @@ module Puzzle8
   (** Solve the problem for 8 balls, using exactly two weighings.
       The solution `lb` is passed as a ghost argument. *)
   let solve8 (balls: array int) (ghost lb: int) (ghost w: int) : int
-    requires { !counter = 2 }
+    requires { counter = 2 }
     requires { spec balls 0 8 lb w }
     ensures  { result = lb }
   =
@@ -82,13 +84,17 @@ module Puzzle8
     | Right -> solve3 balls 0 lb w
     | Left  -> solve3 balls 3 lb w
     (* 0,1,2 = 3,4,5 thus lb must be 6 or 7 *)
-    | Equal -> match balance balls[6] balls[7] with Right -> 6 | _ -> 7 end
+    | Equal -> match balance balls[6] balls[7] with
+               | Right -> 6
+               | Left  -> 7
+               | Equal -> absurd
+               end
     end
 
 end
 
 (** You are given 12 balls, all of the same weight except one
-    (for which you don't knwo whether it is lighter or heavier)
+    (for which you don't know whether it is lighter or heavier)
 
     Given a Roberval balance, you have to find the intruder, and
     determine whether it is lighter or heavier, using the balance at
@@ -104,9 +110,9 @@ module Puzzle12
       lighter or heavier), and the weight `w` of the other balls are
       all passed as ghost arguments. *)
  let solve12 (balls: array int) (ghost w j: int) (ghost b: bool) : (int, bool)
-    requires { !counter = 3 }
+    requires { counter = 3 }
     requires { 0 <= j < 12 = length balls }
-    requires { forall i: int. 0 <= i < 12 -> i <> j -> balls[i] = w }
+    requires { forall i. 0 <= i < 12 -> i <> j -> balls[i] = w }
     requires { if b then balls[j] < w else balls[j] > w }
     ensures  { result = (j, b) }
  =
@@ -119,14 +125,14 @@ module Puzzle12
          | Right -> 11, False | _ -> 11, True end
       | Right -> (* 0,8 < 9,10 *)
          match balance balls[9] balls[10] with
-         | Equal -> 8, True
-         | Right -> 10,  False
-         | Left  -> 9, False
+         | Equal ->  8, True
+         | Right -> 10, False
+         | Left  ->  9, False
          end
       | Left -> (* 0,8 > 9,10 *)
          match balance balls[9] balls[10] with
-         | Equal -> 8, False
-         | Right -> 9,  True
+         | Equal ->  8, False
+         | Right ->  9,  True
          | Left  -> 10, True
          end
       end
@@ -137,13 +143,13 @@ module Puzzle12
          match balance balls[6] balls[7] with
          | Equal -> 3, True
          | Right -> 7, False
-         | Left -> 6, False
+         | Left  -> 6, False
          end
       | Right -> (* 0,1,4 < 2,5,8 *)
          match balance balls[0] balls[1] with
          | Equal -> 5, False
          | Right -> 0, True
-         | Left -> 1, True
+         | Left  -> 1, True
          end
       | Left -> (* 0,1,4 > 2,5,8 *)
          match balance balls[4] balls[8] with
@@ -158,21 +164,115 @@ module Puzzle12
          match balance balls[6] balls[7] with
          | Equal -> 3, False
          | Right -> 6, True
-         | Left -> 7, True
+         | Left  -> 7, True
          end
       | Right -> (* 0,1,4 < 2,5,8 *)
          match balance balls[2] balls[5] with
          | Equal -> 4, True
          | Right -> 5, False
-         | Left -> 2, False
+         | Left  -> 2, False
          end
       | Left -> (* 0,1,4 > 2,5,8 *)
          match balance balls[0] balls[1] with
          | Equal -> 5, True
          | Right -> 1, False
-         | Left -> 0, False
+         | Left  -> 0, False
          end
       end
+    end
+
+end
+
+(** The solutions above are not perfect, as the code could cheat by
+  simply looking for the smallest value in array `balls`. Even if the
+  code is only using the balance to compare weights, nothing prevents
+  it from weighing several times the same balls e.g. `balance
+  (3*balls[0] + 5*balls[1]) ...`.
+
+  Below is a better approach where the weights of the balls are now
+  in a ghost array and where we indicate which subsets of the
+  balls are put on the balance, using Boolean maps (type `subset`).
+
+  Suggested by Martin Clochard (Adacore). *)
+
+module NoCheating
+
+  use int.Int
+  use array.Array
+
+  type outcome = Left | Equal | Right
+    (** the side of the heaviest mass i.e. where the balance leans *)
+
+  type counter = private { mutable v: int }
+  meta coercion function v
+
+  val ghost counter: counter
+    (** how many times can we use the balance *)
+
+  type subset = int -> bool
+
+  function sum (balls: array int) (s: subset) : int =
+    (if s 0 then balls[0] else 0) +
+    (if s 1 then balls[1] else 0) +
+    (if s 2 then balls[2] else 0) +
+    (if s 3 then balls[3] else 0) +
+    (if s 4 then balls[4] else 0) +
+    (if s 5 then balls[5] else 0) +
+    (if s 6 then balls[6] else 0) +
+    (if s 7 then balls[7] else 0)
+
+  val balance (ghost balls: array int) (left right: subset) : (o: outcome)
+    requires { counter > 0 }
+    requires { forall i. 0 <= i < 8 -> not (left i) \/ not (right i) }
+    ensures  { let left  = sum balls left  in
+               let right = sum balls right in
+               match o with
+               | Left  -> left > right
+               | Equal -> left = right
+               | Right -> left < right
+               end }
+    writes   { counter }
+    ensures  { counter = old counter - 1 }
+
+  (** All values in `balls[lo..hi-1]` are equal to `w`, apart from `balls[lb]`
+     which is smaller. *)
+  predicate spec (balls: array int) (lo hi: int) (lb w: int) =
+    0 <= lo <= lb < hi <= length balls = 8 &&
+    (forall i. lo <= i < hi -> i <> lb -> balls[i] = w) &&
+    balls[lb] < w
+
+  (** Solve the problem for 3 balls, using exactly one weighing.
+      The solution `lb` is passed as a ghost argument. *)
+  let solve3 (ghost balls: array int) (lo: int) (ghost lb w: int) : int
+    requires { counter >= 1 }
+    requires { spec balls lo (lo + 3) lb w }
+    ensures  { result = lb }
+    ensures  { counter = old counter - 1 }
+  =
+    match balance balls (fun i -> i=lo) (fun i -> i=lo+1) with
+    | Right -> lo
+    | Left  -> lo+1
+    | Equal -> lo+2
+    end
+
+  (** Solve the problem for 8 balls, using exactly two weighings.
+      The solution `lb` is passed as a ghost argument. *)
+  let solve8 (ghost balls: array int) (ghost lb w: int) : int
+    requires { counter = 2 }
+    requires { spec balls 0 8 lb w }
+    ensures  { result = lb }
+  =
+    (* first, compare balls 0,1,2 with balls 3,4,5 *)
+    match balance balls (fun i -> i=0 || i=1 || i=2)
+                        (fun i -> i=3 || i=4 || i=5) with
+    | Right -> solve3 balls 0 lb w
+    | Left  -> solve3 balls 3 lb w
+    (* 0,1,2 = 3,4,5 thus lb must be 6 or 7 *)
+    | Equal -> match balance balls (fun i -> i=6) (fun i -> i=7) with
+               | Right -> 6
+               | Left  -> 7
+               | Equal -> absurd
+               end
     end
 
 end

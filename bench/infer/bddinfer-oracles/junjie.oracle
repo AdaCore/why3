@@ -1,8 +1,5 @@
 Invariant for loop [anonymous_loop_0] is
-  (((0 <= ((y.contents * 52) + x.contents) /\ 0 <= (y.contents + 1)) /\
-    y.contents <= x.contents) /\
-   o = 0) /\
-  o1 = 0
+  (((0 <= ((!y * 52) + !x) /\ 0 <= (!y + 1)) /\ !y <= !x) /\ o = 0) /\ o1 = 0
 Domains for loop [anonymous_loop_0] are
   o1 = [0;0]; x = [0;+oo[; o = [0;0]; y = [-1;+oo[
 File bench/infer/junjie.mlw:

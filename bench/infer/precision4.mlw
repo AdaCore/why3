@@ -1,0 +1,21 @@
+
+use bool.Bool
+use int.Int
+
+val ref c : int
+val ref b : bool
+
+let f [@bddinfer] ()
+  diverges
+  requires { c = 0  }
+  =
+  while true do
+    (* expected to be found by infer:
+      invariant { c <= 100 } *)
+    if c >= 100 && b then break;
+    [@bddinfer:afterfirsttest]
+    if c >= 100 && notb b then break;
+    (* we should learn here than c < 100 *)
+    [@bddinfer:aftersecondtest]
+    c <- c + 1
+  done

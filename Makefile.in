@@ -63,6 +63,7 @@ OCAMLVERSION = @OCAMLVERSION@
 CC        = gcc
 COQC      = @COQC@
 COQDEP    = @COQDEP@
+COQFLAGS  = @COQFLAGS@
 FRAMAC_LIBDIR = $(DESTDIR)@FRAMAC_LIBDIR@
 MENHIR	  = @MENHIR@
 
@@ -274,6 +275,10 @@ LIB_EXTRACT = mltree compile mlinterp pdriver ml_printer \
 LIB_PARSER = ptree ptree_helpers glob typing \
 		parser_messages parser typing report lexer mlw_printer
 
+ifeq (@enable_sexp@,yes)
+LIB_PARSER += sexp_parser
+endif
+
 LIB_TRANSFORM = simplify_formula inlining split_goal \
 		args_wrapper reduction_engine compute \
 		remove_unused detect_polymorphism \
@@ -373,9 +378,9 @@ src/session/compress.ml: src/session/compress_none.ml Makefile
 	$(CMP_CP)
 endif
 
-# pp_sexp_conv
+# sexp_conv
 
-ifeq (@enable_pp_sexp@, yes)
+ifeq (@enable_sexp@, yes)
 src/util/mysexplib.ml: src/util/mysexplib-real.ml Makefile
 	$(CMP_CP)
 src/tools/why3pp_sexp.ml: src/tools/why3pp_sexp-real.ml Makefile
@@ -915,7 +920,7 @@ gallery-subs:
 	  echo "exporting examples/$$d"; \
 	  mkdir -p $(GALLERYDIR)/$$d; \
 	  cd examples/$$d; \
-	  WHY3CONFIG="" ../../bin/why3.@OCAMLBEST@ doc --no-stdlib --no-load-default-plugins -L ../../stdlib -L . --stdlib-url http://why3.lri.fr/stdlib/ --debug ignore_unused_vars *.mlw -o $(GALLERYDIR)/$$d; \
+	  WHY3CONFIG="" ../../bin/why3.@OCAMLBEST@ doc --no-stdlib --no-load-default-plugins -L ../../stdlib -L . --stdlib-url http://why3.lri.fr/stdlib/ --warn-off=unused_variable *.mlw -o $(GALLERYDIR)/$$d; \
 	  cd ..; \
 	  rm -f $(GALLERYDIR)/$$d/$$d.zip; \
 	  git archive --format=zip -o $(GALLERYDIR)/$$d/$$d.zip HEAD $$d; \
@@ -1185,7 +1190,7 @@ COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd lib/coq/WellFounded $(COQLIBS_IN
 
 %.vo: %.v
 	$(SHOW) 'Coqc     $<'
-	$(HIDE)$(COQC) -R lib/coq Why3 $<
+	$(HIDE)$(COQC) $(COQFLAGS) -R lib/coq Why3 $<
 
 %.vd: %.v
 	$(SHOW) 'Coqdep   $<'
@@ -1871,7 +1876,7 @@ APITESTS = \
 	logic \
 	mlw_expr \
 	mlw_tree \
-	transform \
+	transform
 
 ifeq (@enable_infer@,yes)
 	APITESTS += mlw_tree_infer_invs
@@ -1879,6 +1884,10 @@ endif
 
 ifeq (@enable_infer@,yes)
 	APITESTS += mlw_tree_bddinfer_invs
+endif
+
+ifeq (@enable_sexp@,yes)
+	APITESTS += epsilon
 endif
 
 bench-api: $(addprefix test-api-, $(APITESTS))
@@ -1909,7 +1918,7 @@ test-api-%.opt: examples/use_api/%.ml lib/why3/why3.cmxa
 test-api-%: test-api-%.@OCAMLBEST@
 	$(HIDE)mkdir -p examples/use_api/results
 	$(HIDE)(./$< | sed -e 's/^\(Versions of Alt-Ergo found: \).*$$/\1<hidden>/' \
-			   -e 's/0\.0[0-9]/0.0x/g;s/[0-9][0-9]* steps/xx steps/' \
+			   -e 's/0\.0[0-9]/<hidden>/g;s/[0-9]\+ steps/<hidden> steps/' \
 			    > examples/use_api/results/$@.stdout ) \
 		|| (printf "Execution failed for API test $<. Please fix it.\n"; exit 2)
 	$(HIDE)(diff -u examples/use_api/oracles/$@.stdout examples/use_api/results/$@.stdout) \
@@ -2111,7 +2120,8 @@ STDLIBS = \
 	ieee_float int io \
 	list \
 	map matrix \
-	null number option ocaml \
+	null number \
+	ocaml option \
 	pigeon pqueue \
 	queue \
 	random real ref regexp relations \
@@ -2122,7 +2132,6 @@ STDLIBS = \
 
 # NO NEED DOC:
 # debug: too basic, needs large improvement
-# io: too basic, needs large improvement
 # tptp: for TPTP provers ?
 # for_drivers: used only in drivers
 
@@ -2134,14 +2143,14 @@ stdlibdoc: $(STDLIBFILES) bin/why3.@OCAMLBEST@ bin/why3doc.$(SHAREDBEST)
 	sed -e "s/use Int/use int.Int/" stdlib/int.mlw > int.mlw
 	rm -f doc/stdlibdoc/style.css
 	WHY3CONFIG="" bin/why3.@OCAMLBEST@ doc $(LOCAL_STDLIB) \
-          -o doc/stdlibdoc --title="Why3 Standard Library" \
+	  -o doc/stdlibdoc --title="Why3 Standard Library" \
 	  $(subst stdlib/int.mlw,int.mlw,$(STDLIBFILES))
 	rm int.mlw
 	cd doc/stdlibdoc; \
 	  for f in stdlib.*.html; \
 	    do mv "$$f" "$${f#stdlib.}"; done
 	sed -i -e "s#stdlib.##g" doc/stdlibdoc/index.html
-	sed -i -e "s#int\.\(<a href=\"int\.html\)#\1#g" doc/stdlibdoc/int.html
+	sed -i -e "s#int\.\(<a href=\"\)int\.html#\1#g" doc/stdlibdoc/int.html
 
 clean::
 	rm -f doc/stdlibdoc/*

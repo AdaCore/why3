@@ -1,8 +1,38 @@
 <check_ce:categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `set` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to set at "bench/check-ce/manual_map.mlw", line 7, characters 5-18)
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/manual_map.mlw", line 5, characters 14-36)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/manual_map.mlw", line 5, characters 14-36)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/manual_map.mlw", line 5, characters 14-36)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/manual_map.mlw", line 5, characters 14-36)
 File "bench/check-ce/manual_map.mlw", line 5, characters 14-36:
 Sub-goal Postcondition of goal test_map'vc.
 Prover result is: Unknown (sat).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File manual_map.mlw:
+  Line 4:
+    x = fun (x!04:int) -> if x!04 = 1 then 3 else 2
+    x = fun (x!04:int) -> if x!04 = 1 then 3 else 2
+    Execution of main function `test_map` with env:
+      x = fun (x!04:int) -> if x!04 = 1 then 3 else 2
+      zero = 0
+      one = 1
+  Line 7:
+    Normal execution of function `set` with args:
+      f = fun (x!04:int) -> if x!04 = 1 then 3 else 2
+      x = 0
+      v = 3
+  Line 5:
+    Property failure at postcondition of `test_map` with:
+      result = (fun y -> if pure { if y = x then True else False } then v
+                  else f y) with f = fun (x!04:int) ->
+                                      if x!04 = 1 then 3 else 2, x = 0, v = 3
 

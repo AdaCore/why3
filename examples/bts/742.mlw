@@ -1,0 +1,4 @@
+let f (ref x : int) : unit
+  ensures { [@xxxx] [@expl:foo] let a = x in [@expl:bar] a = 0 }
+= x <- 0
+

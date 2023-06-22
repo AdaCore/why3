@@ -1,8 +1,6 @@
 Invariant for loop [anonymous_loop_0] is
-  ((((a.contents = True /\
-      z.contents = True /\ y.contents = True /\ x.contents = True \/
-      a.contents = False /\
-      z.contents = False /\ (y.contents = False \/ x.contents = False)) /\
+  ((((if !a = True then !z = True /\ !y = True /\ !x = True
+      else !z = False /\ (!y = False \/ !x = False)) /\
      o = True) /\
     o1 = True) /\
    o2 = True) /\

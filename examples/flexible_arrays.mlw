@@ -1,0 +1,208 @@
+
+(** Flexible arrays implemented with Braun trees.
+
+  References:
+  - W. Braun, M. Rem, A logarithmic implementation of flexible arrays.
+    Memorandum MR83/4. Eindhoven University of Technology. 1983.
+  - Hoogerwoord, R. R. A logarithmic implementation of flexible arrays.
+    Conference on Mathematics of Program Construction. 1992.
+  - Chris Okasaki. Three Algorithms on Braun Trees (Functional Pearl)
+    J. Functional Programming 7 (6) 661–666. 1997
+
+  See also braun_trees.mlw for an implementation of priority queues using
+  Braun trees (and a proof that a Braun tree has logarithmic height).
+
+  Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+(** First, we work on bare Braun trees *)
+
+module BraunTrees
+
+  use int.Int
+  use int.ComputerDivision
+  use export bintree.Tree
+  use export bintree.Size
+  use seq.Seq
+
+  predicate braun (t: tree 'a) = match t with
+  | Empty      -> true
+  | Node l _ r -> (size l = size r || size l = size r + 1) && braun l && braun r
+  end
+
+  let rec function get_tree (t: tree 'a) (i: int) : 'a
+    requires { 0 <= i < size t }
+    requires { braun t }
+    variant  { t }
+  = match t with
+    | Empty -> absurd
+    | Node l x r ->
+        if i = 0 then x else
+        if mod i 2 = 1 then get_tree l (div i 2) else get_tree r (div i 2 - 1)
+    end
+
+  let rec function set_tree (t: tree 'a) (i: int) (v: 'a) : (r: tree 'a)
+    requires { 0 <= i < size t }
+    requires { braun t }
+    variant  { t }
+    ensures  { size r = size t }
+    ensures  { braun r }
+    ensures  { get_tree r i = v }
+    ensures  { forall j. 0 <= j < t.size -> j<>i -> get_tree r j = get_tree t j }
+  = match t with
+    | Empty -> absurd
+    | Node l x r ->
+        if i = 0 then Node l v r else
+        if mod i 2 = 1 then Node (set_tree l (div i 2) v) x r
+                       else Node l x (set_tree r (div i 2 - 1) v)
+    end
+
+  let rec make_tree2 (n: int) (v: 'a) : (l: tree 'a, r: tree 'a)
+    requires { n >= 0}
+    variant { n }
+    ensures { size l = n+1 && size r = n }
+    ensures { braun l && braun r }
+    ensures { forall i. 0 <= i < size l -> get_tree l i = v }
+    ensures { forall i. 0 <= i < size r -> get_tree r i = v }
+  = if n = 0 then
+      Node Empty v Empty, Empty
+    else if mod n 2 = 1 then
+      let l, r = make_tree2 (div n 2) v in
+      Node l v r, Node r v r
+    else
+      let l, r = make_tree2 (div n 2 - 1) v in
+      Node l v l, Node l v r
+
+  let make_tree (n: int) (v: 'a) : (r: tree 'a)
+    requires { n >= 0}
+    ensures  { size r = n }
+    ensures  { braun r }
+    ensures  { forall i. 0 <= i < size r -> get_tree r i = v }
+  = let _, r = make_tree2 n v in r
+
+  (* left insertion/removal *)
+
+  let rec cons_tree (v: 'a) (t: tree 'a) : (r: tree 'a)
+    requires { braun t }
+    variant  { t }
+    ensures  { size r = size t + 1 }
+    ensures  { braun r }
+    ensures  { get_tree r 0 = v }
+    ensures  { forall i. 0 <= i < size t -> get_tree r (i+1) = get_tree t i }
+  = match t with
+    | Empty      -> Node Empty v Empty
+    | Node l x r -> Node (cons_tree x r) v l
+    end
+
+  let rec tail_tree (t: tree 'a) : (r: tree 'a)
+    requires { braun t }
+    requires { size t > 0 }
+    variant  { t }
+    ensures  { size r = size t - 1 }
+    ensures  { braun r }
+    ensures  { forall i. 0 < i < size t -> get_tree r (i-1) = get_tree t i }
+  = match t with
+    | Empty              -> absurd
+    | Node Empty _ Empty -> Empty
+    | Node l     _ r     -> Node r (get_tree l 0) (tail_tree l)
+    end
+
+  (* right insertion/removal *)
+
+  let rec snoc_tree (s: int) (t: tree 'a) (v: 'a) : (r: tree 'a)
+    requires { braun t }
+    requires { s = size t }
+    variant  { t }
+    ensures  { size r = size t + 1 }
+    ensures  { braun r }
+    ensures  { forall i. 0 <= i < size t -> get_tree r i = get_tree t i }
+    ensures  { get_tree r s = v }
+  = match t with
+  | Empty      -> Node Empty v Empty
+  | Node l x r -> if mod s 2 = 1 then Node (snoc_tree (div s 2) l v) x r
+                                 else Node l x (snoc_tree (div s 2 - 1) r v)
+  end
+
+  let rec liat_tree (s: int) (t: tree 'a) : (r: tree 'a)
+    requires { braun t }
+    requires { s = size t > 0 }
+    variant  { t }
+    ensures  { size r = size t - 1 }
+    ensures  { braun r }
+    ensures  { forall i. 0 <= i < size r -> get_tree r i = get_tree t i }
+  = match t with
+    | Empty -> absurd
+    | Node Empty _ Empty -> Empty
+    | Node l     x r     -> if mod s 2 = 0 then Node (liat_tree (div s 2) l) x r
+                                           else Node l x (liat_tree (div s 2) r)
+   end
+
+  (* TODO: Okasaki's of_list *)
+
+end
+
+(** Second, we encapsulate Braun trees in a record, together with its
+  size and suitable invariants. *)
+
+module FlexibleArrays
+
+  use int.Int
+  use BraunTrees as B
+
+  type t 'a = {
+    size: int;
+    tree: B.tree 'a;
+  }
+  invariant { B.braun tree }
+  invariant { B.size tree = size >= 0 }
+
+  let constant empty : t 'a
+  = { size = 0; tree = B.Empty }
+    ensures { result.size = 0 }
+
+  let function get (t: t 'a) (i: int) : 'a
+    requires { 0 <= i < t.size }
+  = B.get_tree t.tree i
+
+  let set (t: t 'a) (i: int) (v: 'a) : (r: t 'a)
+    requires { 0 <= i < t.size }
+    ensures  { r.size = t.size }
+    ensures  { get r i = v }
+    ensures  { forall j. 0 <= j < t.size -> j<>i -> get r j = get t j }
+  = { size = t.size; tree = B.set_tree t.tree i v }
+
+  let make_tree (n: int) (v: 'a) : (r: t 'a)
+    requires { n >= 0}
+    ensures  { r.size = n }
+    ensures  { forall i. 0 <= i < r.size -> get r i = v }
+  = { size = n; tree = B.make_tree n v }
+
+  (* left insertion/removal *)
+
+  let cons (v: 'a) (t: t 'a) : (r: t 'a)
+    ensures  { size r = size t + 1 }
+    ensures  { get r 0 = v }
+    ensures  { forall i. 0 <= i < t.size -> get r (i+1) = get t i }
+  = { size = t.size + 1; tree = B.cons_tree v t.tree }
+
+  let tail (t: t 'a) : (r: t 'a)
+    requires { t.size > 0 }
+    ensures  { r.size = t.size - 1 }
+    ensures  { forall i. 0 < i < size t -> get r (i-1) = get t i }
+  = { size = t.size - 1; tree = B.tail_tree t.tree }
+
+  (* right insertion/removal *)
+
+  let snoc (t: t 'a) (v: 'a) : (r: t 'a)
+    ensures  { r.size = t.size + 1 }
+    ensures  { forall i. 0 <= i < t.size -> get r i = get t i }
+    ensures  { get r t.size = v }
+  = { size = t.size + 1; tree = B.snoc_tree t.size t.tree v }
+
+  let liat (t: t 'a) : (r: t 'a)
+    requires { t.size > 0 }
+    ensures  { r.size = t.size - 1 }
+    ensures  { forall i. 0 <= i < r.size -> get r i = get t i }
+  = { size = t.size - 1; tree = B.liat_tree t.size t.tree }
+
+end

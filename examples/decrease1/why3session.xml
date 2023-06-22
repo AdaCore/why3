@@ -2,82 +2,81 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="1" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.11.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="decrease1.mlw"/>
 <theory name="Decrease1" proved="true">
  <goal name="decrease1_induction&#39;vc" expl="VC for decrease1_induction" proved="true">
- <proof prover="2"><result status="valid" time="0.02" steps="24"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="11497"/></proof>
  </goal>
  <goal name="search&#39;vc" expl="VC for search" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="search&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="743"/></proof>
   </goal>
   <goal name="search&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="1030"/></proof>
   </goal>
   <goal name="search&#39;vc.2" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="11477"/></proof>
   </goal>
   <goal name="search&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="13"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="13265"/></proof>
   </goal>
   <goal name="search&#39;vc.4" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="11592"/></proof>
   </goal>
   <goal name="search&#39;vc.5" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="11669"/></proof>
   </goal>
   <goal name="search&#39;vc.6" expl="loop variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="12394"/></proof>
   </goal>
   <goal name="search&#39;vc.7" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="11935"/></proof>
   </goal>
   <goal name="search&#39;vc.8" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="11157"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="13339"/></proof>
   </goal>
   <goal name="search&#39;vc.9" expl="loop variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="12324"/></proof>
   </goal>
   <goal name="search&#39;vc.10" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="11911"/></proof>
   </goal>
   <goal name="search&#39;vc.11" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="14"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="15484"/></proof>
   </goal>
   <goal name="search&#39;vc.12" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="9"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="12265"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="search_rec&#39;vc" expl="VC for search_rec" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="search_rec&#39;vc.0" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="9838"/></proof>
   </goal>
   <goal name="search_rec&#39;vc.1" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="10008"/></proof>
   </goal>
   <goal name="search_rec&#39;vc.2" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="10085"/></proof>
   </goal>
   <goal name="search_rec&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="10241"/></proof>
   </goal>
   <goal name="search_rec&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="10242"/></proof>
   </goal>
   <goal name="search_rec&#39;vc.5" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="10190"/></proof>
   </goal>
   <goal name="search_rec&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="10202"/></proof>
   </goal>
   <goal name="search_rec&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="18734"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="18651"/></proof>
   </goal>
  </transf>
  </goal>

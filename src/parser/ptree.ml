@@ -29,7 +29,7 @@ open Mysexplib.Std [@@warning "-33"]
 type attr =
   | ATstr of Ident.attribute
   | ATpos of Loc.position
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** identifiers, with attributes and a source location *)
 type ident = {
@@ -37,13 +37,13 @@ type ident = {
   id_ats : attr list;
   id_loc : Loc.position;
 }
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** qualified identifiers *)
 type qualid =
   | Qident of ident
   | Qdot of qualid * ident
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** {2 Types} *)
 
@@ -67,14 +67,14 @@ type pty =
   (** parenthesised type *)
   | PTpure  of pty
   (** purify a type *)
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 
 (** {2 Patterns} *)
 
 (** "ghost" modifier *)
 type ghost = bool
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** Patterns, equipped with a source location *)
 type pattern = {
@@ -105,7 +105,7 @@ and pat_desc =
   (** parenthesised pattern *)
   | Pghost of pattern
   (** explicitly ghost pattern *)
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 
 (** {2 Logical terms and formulas} *)
@@ -113,12 +113,12 @@ and pat_desc =
 (** binder as 4-uple [(loc,id,ghost,type)] to represent "ghost? id? :
    type?". [id] and [type] cannot be [None] at the same time *)
 type binder = Loc.position * ident option * ghost * pty option
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** parameter as 4-uple [(loc,id,ghost,type)] to represent
    "ghost? id? : type". *)
 type param  = Loc.position * ident option * ghost * pty
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** Terms, equipped with a source location *)
 type term = {
@@ -161,6 +161,12 @@ and term_desc =
   (** if-expression *)
   | Tquant of Dterm.dquant * binder list * term list list * term
   (** quantified formulas. The third argument is a list of triggers. *)
+  | Teps of ident * pty * term
+  (** [Teps(x,ty,f)] denotes the epsilon term "any [x] of type [ty]
+     that satisfies [f]".  Use with caution since if there is no such
+     [x] satisfying [f], then it acts like introducing an inconsistent
+     axiom. (As a matter of fact, this is the reason why there is no
+     concrete syntax for such epsilon-terms.) *)
   | Tattr of attr * term
   (** term annotated with an attribute *)
   | Tlet of ident * term * term
@@ -175,36 +181,36 @@ and term_desc =
   (** record expressions *)
   | Tupdate of term * (qualid * term) list
   (** record update expression *)
-  | Teps of (ident * pty) * term
   | Tscope of qualid * term
   (** local scope *)
   | Tat of term * ident
   (** "at" modifier. The "old" modifier is a particular case with
      the identifier [Dexpr.old_label]  *)
-[@@deriving sexp_of]
+
+[@@deriving sexp]
 
 (** {2 Program expressions} *)
 
 (** Loop invariant or type invariant *)
 type invariant = term list
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** Variant for both loops and recursive functions. The option
    identifier is an optional ordering predicate *)
 type variant = (term * qualid option) list
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** Precondition *)
 type pre = term
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** Normal postconditions *)
 type post = Loc.position * (pattern * term) list
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** Exceptional postconditions *)
 type xpost = Loc.position * (qualid * (pattern * term) option) list
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** Contract *)
 type spec = {
@@ -219,7 +225,7 @@ type spec = {
     sp_diverge : bool; (** may the function diverge? *)
     sp_partial : bool; (** is the function partial? *)
 }
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** Expressions, equipped with a source location *)
 type expr = {
@@ -325,7 +331,7 @@ and exn_branch = qualid * pattern option * expr
 (** Local function definition *)
 and fundef = ident * ghost * Expr.rs_kind *
                binder list * pty option * pattern * Ity.mask * spec * expr
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** {2 Declarations} *)
 
@@ -337,7 +343,7 @@ type field = {
   f_mutable : bool;
   f_ghost   : bool
 }
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** Type definition body *)
 type type_def =
@@ -351,11 +357,11 @@ type type_def =
   (** integer type in given range  *)
   | TDfloat     of int * int
   (** floating-point type with given exponent and precision *)
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** The different kinds of visibility *)
 type visibility = Public | Private | Abstract (** = Private + ghost fields *)
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** A type declaration *)
 type type_decl = {
@@ -368,7 +374,7 @@ type type_decl = {
   td_wit    : expr option;  (** witness for the invariant *)
   td_def    : type_def;
 }
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** A single declaration of a function or predicate *)
 type logic_decl = {
@@ -378,7 +384,7 @@ type logic_decl = {
   ld_type   : pty option;
   ld_def    : term option;
 }
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** A single declaration of an inductive predicate *)
 type ind_decl = {
@@ -387,7 +393,7 @@ type ind_decl = {
   in_params : param list;
   in_def    : (Loc.position * ident * term) list;
 }
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** Arguments of "meta" declarations *)
 type metarg =
@@ -400,7 +406,7 @@ type metarg =
   | Mval of qualid
   | Mstr of string
   | Mint of int
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** The possible "clone" substitution elements *)
 type clone_subst =
@@ -413,7 +419,7 @@ type clone_subst =
   | CSaxiom of qualid
   | CSlemma of qualid
   | CSgoal  of qualid
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 (** top-level declarations *)
 type decl =
@@ -445,11 +451,11 @@ type decl =
   (** "import" *)
   | Dscope of Loc.position * bool * ident * decl list
   (** "scope" *)
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 type mlw_file =
   | Modules of (ident * decl list) list
   (** a list of modules containing lists of declarations *)
   | Decls of decl list
   (** a list of declarations outside any module *)
-[@@deriving sexp_of]
+[@@deriving sexp]

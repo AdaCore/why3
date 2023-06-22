@@ -3,8 +3,7 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.11.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="mccarthy_vc_sp.mlw"/>
 <theory name="McCarthy91" proved="true">
@@ -12,10 +11,10 @@
  <proof prover="1"><result status="valid" time="0.00" steps="939"/></proof>
  </goal>
  <goal name="f91_nonrec&#39;vc" expl="VC for f91_nonrec" proved="true">
- <proof prover="4"><result status="valid" time="0.27" steps="532"/></proof>
+ <proof prover="2"><result status="valid" time="0.01" steps="10841"/></proof>
  </goal>
  <goal name="f91_pseudorec&#39;vc" expl="VC for f91_pseudorec" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="4682"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="4377"/></proof>
  </goal>
 </theory>
 <theory name="McCarthy91Mach" proved="true">
@@ -23,10 +22,10 @@
  <proof prover="1"><result status="valid" time="0.03" steps="4713"/></proof>
  </goal>
  <goal name="f91_nonrec&#39;vc" expl="VC for f91_nonrec" proved="true">
- <proof prover="3"><result status="valid" time="0.02" steps="19137"/></proof>
+ <proof prover="2"><result status="valid" time="0.02" steps="26834"/></proof>
  </goal>
  <goal name="f91_pseudorec&#39;vc" expl="VC for f91_pseudorec" proved="true">
- <proof prover="1"><result status="valid" time="0.07" steps="10975"/></proof>
+ <proof prover="1"><result status="valid" time="0.07" steps="10660"/></proof>
  </goal>
 </theory>
 </file>

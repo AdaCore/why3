@@ -18,7 +18,7 @@ type constant =
   | ConstInt  of int_constant
   | ConstReal of real_constant
   | ConstStr  of string
-[@@deriving sexp_of]
+[@@deriving sexp]
 
 let compare_const ?(structural=true) c1 c2 =
   match c1, c2 with

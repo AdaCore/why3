@@ -725,43 +725,33 @@ let print_namespace fmt name th =
 
 (* print task under the form of a sequent, with only local context, for the IDE *)
 
-(*
-let print_goal fmt d =
-   match d.d_node with
-   | Dprop (Pgoal,_pr,f) -> fprintf fmt "@[%a@]@\n" print_term f
-   | _ -> assert false
-*)
-
-let useful_decl d =
+let print_decl_filter_unused fmt d =
   match d.d_node with
-  | Dparam ls | Dlogic([ls,_]) ->
-    not (Sattr.mem Ident.unused_attr ls.ls_name.Ident.id_attrs)
-  | _ -> true
+  | (Dparam ls | Dlogic [ls,_]) when Sattr.mem Ident.unused_attr ls.ls_name.Ident.id_attrs ->
+      ()
+  | Ddata _ | Dtype _ | Dparam _ -> fprintf fmt "@[<v 0>%a@\n@\n@]" print_decl d
+  | Dlogic _ -> fprintf fmt "@[<v 0>%a@\n@\n@]" print_decl d  (* TODO filter d ? *)
+  | Dind _ -> fprintf fmt "@[<v 0>%a@\n@\n@]" print_decl d (* TODO filter d ? *)
+  | Dprop(k,pr,f) ->
+      let pol = match k with Pgoal -> true | Paxiom -> false | Plemma -> assert false in
+      let f = Term.remove_unused_in_term pol f in
+      fprintf fmt "@[<v 0>%a@\n@\n@]" print_prop_decl (k,pr,f)
+
+let rec print_decls_filter_unused fmt dl =
+  match dl with
+  | [] -> ()
+  | [g] ->
+      fprintf fmt "------------------------------- Goal --------------------------------@\n@\n";
+      print_decl_filter_unused fmt g
+  | h::rem ->
+      print_decl_filter_unused fmt h;
+      print_decls_filter_unused fmt rem
+
 
 let print_sequent fmt task =
   let ut = Task.used_symbols (Task.used_theories task) in
-  let ld = Task.local_decls task ut in
-  let rec aux fmt l =
-    match l with
-      | [] -> ()
-      | [_] -> ()
-      | d :: r ->
-         if useful_decl d then
-           fprintf fmt "@[%a@]@\n@\n" print_decl d;
-         aux fmt r
-  in
-  let rec last fmt l =
-    match l with
-      | [] -> ()
-      | [d] ->
-         fprintf fmt "@[%a@]@\n@\n" print_decl d
-      | _ :: r ->
-         last fmt r
-  in
   fprintf fmt "--------------------------- Local Context ---------------------------@\n@\n";
-  fprintf fmt "@[<v 0>%a@]" aux ld;
-  fprintf fmt "------------------------------- Goal --------------------------------@\n@\n";
-  fprintf fmt "@[<v 0>%a@]" last ld
+  print_decls_filter_unused fmt (Task.local_decls task ut)
 
 (* TODO this needs to be completed in the other cases *)
 let print_any fmt t =

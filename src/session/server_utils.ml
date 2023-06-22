@@ -72,12 +72,14 @@ let list_transforms () =
       (List.rev_append (Trans.list_transforms_with_args ()) (Trans.list_transforms_with_args_l ()))
   in List.sort sort_pair l
 
-let list_transforms_query _cont _args =
+let print_list_transforms fmt () =
   let l = list_transforms () in
   let print_trans_desc fmt (x,r) =
     Format.fprintf fmt "@[<hov 2>%s@\n@[<hov>%a@]@]" x Pp.formatted r
   in
-  Pp.string_of (Pp.print_list Pp.newline2 print_trans_desc) l
+  Pp.print_list Pp.newline2 print_trans_desc fmt l
+
+let list_transforms_query _ _ = Pp.string_of print_list_transforms ()
 
 let list_provers cont _args =
   let l =
@@ -269,7 +271,7 @@ let return_prover name config =
   (* all provers that have the name/version/altern name *)
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
-    Debug.dprintf debug "Prover corresponding to %s has not been found@." name;
+    Debug.dprintf debug "no prover name corresponding to `%s` was found@." name;
     None
   end else
     Some (snd (Whyconf.Mprover.choose provers))

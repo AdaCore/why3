@@ -1,16 +1,29 @@
 <check_ce:categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `t1'goal` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `t1'goal` cannot be evaluated)
-- Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `t1'goal1` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `t1'goal1` cannot be evaluated)
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/simple_array.mlw", line 6, characters 3-31)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/simple_array.mlw", line 6, characters 3-31)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/simple_array.mlw", line 6, characters 3-31)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/simple_array.mlw", line 6, characters 3-31)
 File "bench/check-ce/simple_array.mlw", line 6, characters 3-31:
 Goal t1.
 Prover result is: Unknown (sat).
-The following counterexample model could not be verified
-  (both RAC terminated because Postcondition of `t1'goal1` cannot be evaluated):
+The program does not comply to the verification goal, for example during the
+  following execution:
 File simple_array.mlw:
   Line 5:
-    i : int = 0
+    t = fun (x!04:int) -> if x!04 = 0 then 3 else 2
+    i = 0
+    t = fun (x!04:int) -> if x!04 = 0 then 3 else 2
+    i = 0
+    Execution of main function `t1'goal` with env:
+      i = 0
+      t = fun (x!04:int) -> if x!04 = 0 then 3 else 2
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File simple_array.mlw:
+  Line 6:
+    Property failure at postcondition of `t1'goal` with:
+      i = 0
+      t = fun (x!04:int) -> if x!04 = 0 then 3 else 2
 

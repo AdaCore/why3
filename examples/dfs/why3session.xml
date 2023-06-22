@@ -2,30 +2,31 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="1" name="Z3" version="4.6.0" timelimit="15" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Z3" version="4.11.2" timelimit="15" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="dfs.mlw"/>
 <theory name="DFS" proved="true">
  <goal name="set&#39;vc" expl="VC for set" proved="true">
- <proof prover="2"><result status="valid" time="0.00" steps="13"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="2345"/></proof>
  </goal>
  <goal name="dfs&#39;vc" expl="VC for dfs" proved="true">
- <proof prover="2"><result status="valid" time="0.12" steps="585"/></proof>
+ <proof prover="1"><result status="valid" time="0.09" steps="16420"/></proof>
  </goal>
  <goal name="reformulation" proved="true">
  <transf name="induction_pr" proved="true" >
   <goal name="reformulation.0" proved="true">
   <transf name="simplify_trivial_quantification" proved="true" >
    <goal name="reformulation.0.0" proved="true">
-   <proof prover="2" timelimit="6"><result status="valid" time="0.00" steps="4"/></proof>
+   <proof prover="0" timelimit="6"><result status="valid" time="0.01" steps="1004"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="reformulation.1" proved="true">
   <transf name="simplify_trivial_quantification" proved="true" >
    <goal name="reformulation.1.0" proved="true">
-   <proof prover="1"><result status="valid" time="0.00" steps="6509"/></proof>
+   <proof prover="0"><result status="valid" time="0.01" steps="3561"/></proof>
    <proof prover="2"><result status="valid" time="0.00" steps="16"/></proof>
    </goal>
   </transf>
@@ -33,7 +34,7 @@
  </transf>
  </goal>
  <goal name="traverse&#39;vc" expl="VC for traverse" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="50"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="9872"/></proof>
  </goal>
 </theory>
 </file>
