@@ -24,10 +24,20 @@ open Wstdlib
 let opt_print_provers = ref false
 let opt_provers_stats = ref false
 let opt_session_stats = ref false
-let opt_hist_print = ref false
 let opt_project_dir = ref false
 let opt_print0 = ref false
-let compare_provers = ref false
+let opt_graph_all = ref false
+let opt_graph_hist = ref false
+let opt_graph_scatter = ref false
+
+let set_opt_graph graph_type =
+    match graph_type with
+    | Some "scatter"  -> opt_graph_scatter := true
+    | Some "hist"     -> opt_graph_hist:= true
+    | Some "all"      -> opt_graph_all := true
+    | Some _          -> opt_graph_all := true;
+                         eprintf "Unknown graph style, using default: all@."
+    | None            -> opt_graph_all := true
 
 let spec =
   let open Getopt in
@@ -37,15 +47,13 @@ let spec =
     " print proofs statistics per sessions";
     KLong "provers-stats", Hnd0 (fun () -> opt_provers_stats := true),
     " print statistics of prover usage for all given sessions";
-    KLong "graph", Hnd0 (fun () -> opt_hist_print := true),
-    " print a graph of the total time needed by each prover\n\
-      depending on the number of goals";
     KLong "dir", Hnd0 (fun () -> opt_project_dir := true),
     " print the directory of the session";
     KLong "print0", Hnd0 (fun () -> opt_print0 := true),
     " use the null character instead of newline";
-    KLong "compare-provers", Hnd0 (fun () -> compare_provers := true),
-    " print pairwise comparison graphs for the provers in the session";
+    KLong "graph", HndOpt (AString, set_opt_graph),
+    "[all|hist|scatter] print graphs comparing the time used by different provers\n\
+      depending on the number of goals. Default: all";
   ]
 
 type proof_stats =
@@ -56,7 +64,7 @@ type proof_stats =
       mutable nb_proved_sub_goals : int;
       mutable no_proof : Sstr.t;
       mutable only_one_proof : Sstr.t;
-      prover_hist : int Mfloat.t Hprover.t;
+      graph_data : int Mfloat.t Hprover.t;
       prover_min_time : float Hprover.t;
       prover_sum_time : float Hprover.t;
       prover_max_time : float Hprover.t;
@@ -73,7 +81,7 @@ let new_proof_stats () =
     nb_proved_sub_goals = 0;
     no_proof = Sstr.empty;
     only_one_proof = Sstr.empty;
-    prover_hist = Hprover.create 3;
+    graph_data = Hprover.create 3;
     prover_min_time = Hprover.create 3;
     prover_sum_time = Hprover.create 3;
     prover_max_time = Hprover.create 3;
@@ -140,7 +148,7 @@ let update_perf_stats stats ((_,t) as prover_and_time) =
   update_max_time stats.prover_max_time prover_and_time;
   update_sum_time stats.prover_sum_time prover_and_time;
   update_count stats.prover_successful_proofs prover_and_time;
-  update_hist stats.prover_hist prover_and_time
+  update_hist stats.graph_data prover_and_time
 
 let string_of_prover p = Pp.string_of_wnl print_prover p
 
@@ -426,7 +434,7 @@ let print_hist stats =
       fprintf fmt "@.";
       close_out ch;
       acc+1)
-    stats.prover_hist 1
+    stats.graph_data 1
   in
   fprintf main_fmt "pause -1 \"Press any key\"@\n";
   fprintf main_fmt "set terminal pdfcairo@\n";
@@ -441,21 +449,25 @@ let print_hist stats =
   else
     eprintf "See also results in file why3session.pdf@."
 
-(** Print comparison *)
-let print_compare stats =
+(** Generate pairs of provers for the scatter and hist plots.*)
+let generate_provers_pairs  stats =
   let all_provers = 
     Hpn.fold (fun _pn provers_and_times acc ->
         List.fold_left
         Sprover.add_left acc (Mprover.keys provers_and_times)
     ) stats.proof_node_proofs Sprover.empty
   in
-  let all_provers_pairs =
-      let (_, pairs) =
-      Sprover.fold (fun prover (visited, pairs) ->
-        (prover::visited, List.append pairs (List.map (fun x -> (x,prover)) visited))
-      ) all_provers ([],[])
-      in pairs
+  let (_, pairs) =
+    Sprover.fold (fun prover (visited, pairs) ->
+      (prover::visited, List.append pairs (List.map (fun x -> (x,prover)) visited))
+    ) all_provers ([],[])
+    in pairs
+
+(** Print one comparison scatter plot for each pair of provers in the session*)
+let print_compare_scatter stats =
+  let all_provers_pairs = generate_provers_pairs stats
   in
+  if all_provers_pairs = [] then eprintf "Not enough provers in the session@\n";
   let comparison_datafiles = List.map (
   fun (prover1, prover2) ->
     let pf,ch = Filename.open_temp_file "why3session" ".data" in
@@ -508,6 +520,83 @@ let print_compare stats =
   let ret = Sys.command cmd in
   if ret <> 0 then
     eprintf "Command %s failed@." cmd
+
+(** Print one comparison histogram for each pair of provers in the session*)
+let print_compare_hist stats =
+  let all_provers_pairs = generate_provers_pairs stats
+  in
+  if all_provers_pairs = [] then eprintf "Not enough provers in the session@\n";
+  let build_ratio_list (prover1, prover2) =
+    let (x,_) =
+    Hpn.fold (
+      fun _pn provers_and_times (out_list,idx) ->
+      let time1 =
+        try Mprover.find prover1 provers_and_times
+        with Not_found -> Float.infinity
+      in let time2 =
+        try Mprover.find prover2 provers_and_times
+        with Not_found -> Float.infinity
+      in
+      (List.merge Float.compare out_list [time1/.time2], idx + 1)
+      ) stats.proof_node_proofs ([], 1)
+    in List.rev x
+    in
+  let print_ratio_list l =
+    let pf,ch = Filename.open_temp_file "why3session" ".data" in
+    let fmt = formatter_of_out_channel ch in
+    let maxratio = l |> List.filter (fun x -> not (Float.is_infinite x))
+                     |> List.fold_left max 0.0
+    in
+    let _ = List.fold_right (fun elem acc ->
+      let () =
+        if not (Float.is_nan elem) then
+        if Float.is_infinite elem then
+         fprintf fmt "%.2f@\n" maxratio
+        else
+         fprintf fmt "%.2f@\n" elem
+      in acc + 1) l 1
+    in
+    fprintf fmt "@.";
+    close_out ch;
+    pf
+  in
+  let comparison_datafiles =
+    all_provers_pairs |> List.map build_ratio_list |> List.map print_ratio_list
+  in
+  let main_file,main_ch = Filename.open_temp_file "why3session" ".gnuplot"
+  in
+  let main_fmt = formatter_of_out_channel main_ch in
+  fprintf main_fmt "set key off@\n";
+(*   fprintf main_fmt "set multiplot layout 8,1@\n"; *)
+  let print_plot (filename,(prover1, prover2)) = 
+    let prover1_name = string_of_prover prover1 in
+    let prover2_name = string_of_prover prover2 in
+      if filename <> "" then
+        (fprintf main_fmt "set key off@\n";
+        fprintf main_fmt "set xlabel \"Percentage of goals\" @\n";
+        fprintf main_fmt "stats '%s' using 1 nooutput@\n" filename;
+        fprintf main_fmt "set autoscale xfix@\n";
+        fprintf main_fmt "set logsc y@\n";
+        fprintf main_fmt "set ytics (1,1)@\n";
+        fprintf main_fmt "do for [i=1:5] {set ytics add (sprintf(\"1/%%.f\",10**i) 1./10**i)}@\n";
+        fprintf main_fmt "do for [i=1:5] {set ytics add (sprintf(\"%%.f\",10**i) 10**i)}@\n";
+        fprintf main_fmt "set xtics (0,0)@\n";
+        fprintf main_fmt "do for [i=1:10] {set xtics add (sprintf(\"%%d\",10*i) i*STATS_records/10)}@\n";
+        fprintf main_fmt "if (STATS_mean>1) {set ytics add (sprintf(\"Average: %%.2f\", STATS_mean) STATS_mean)}@\n";
+        fprintf main_fmt "else {set ytics add (sprintf(\"Average:\\n1/%%.2f\", 1/STATS_mean) STATS_mean)}@\n";
+        fprintf main_fmt "stats '%s' using ($1<1) nooutput prefix \"IMPROV\"@\n" filename;
+        fprintf main_fmt "set title sprintf(\"%s is faster than %s on %%.2f %%%% of %%d goals\", IMPROV_sum/STATS_records*100, STATS_records)@\n" prover1_name prover2_name;
+        fprintf main_fmt "plot '%s' with points pointtype 5 pointsize 0.5 linecolor rgb \"blue\", STATS_mean title \"Mean\"@\n" filename;
+        fprintf main_fmt "pause -1 \"Press any key\"@\n";
+        fprintf main_fmt "replot@.")
+  in
+  List.iter print_plot (List.combine comparison_datafiles all_provers_pairs);
+  close_out main_ch;
+  let cmd = "gnuplot " ^ main_file in
+  eprintf "Running command %s@." cmd;
+  let ret = Sys.command cmd in
+  if ret <> 0 then
+    eprintf "Command %s failed@." cmd
 (****** run on all files  ******)
 
 let run () =
@@ -518,8 +607,9 @@ let run () =
   printf "%d session(s) read, with a total of %d proof goals.@." !number_of_sessions
     (stats.nb_root_goals + stats.nb_sub_goals);
   if !opt_provers_stats then print_overall_stats stats;
-  if !opt_hist_print then print_hist stats;
-  if !compare_provers then print_compare stats
+  if !opt_graph_all then print_hist stats;
+  if !opt_graph_scatter then print_compare_scatter stats;
+  if !opt_graph_hist then print_compare_hist stats
 
 let cmd =
   { cmd_spec = spec;
