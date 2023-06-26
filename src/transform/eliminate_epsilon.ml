@@ -21,9 +21,12 @@ type canonical =
   | Partial of lsymbol * term list (* partial application
                                       (\(x_i). f (arguments) (x_i))
                                       (x_i not free in arguments)            *)
+  | Witness of term * term option  (* epsilon with explicit witness,
+                                      (epsilon x. x = ... /\ props)          *)
   | Nothing                        (* No canonical form found. *)
 
-let canonicalize x f =
+(* Look for the lambda-term canonical form. Raise Exit if none is found. *)
+let canonicalize_as_lambda x f =
   let vl,_,f = match f.t_node with
     | Tquant (Tforall,b) -> t_open_quant b
     | _ -> [],[],f in
@@ -63,9 +66,37 @@ let canonicalize x f =
   check_head hd rvl;
   canon
 
+(* Look for the Witness canonical form. Use leftmost if several exists. *)
+let rec canonicalize_as_witness x f =
+  match f.t_node with
+  | Tapp (ls, [l; r]) when ls_equal ls ps_equ ->
+    let test v t = vs_equal v x && not Mvs.(mem x (t_freevars empty t)) in
+    begin match l.t_node, r.t_node with
+    | Tvar y, _ when test y r -> Witness (r, None)
+    | _, Tvar y when test y l -> Witness (l, None)
+    | _ -> Nothing
+    end
+  | Tbinop (Tand, l, r) ->
+    let join w l r = Witness (w, Some (t_attr_copy f (t_and l r))) in
+    begin match canonicalize_as_witness x l with
+    | Witness (w, None) -> Witness (w, Some r)
+    | Witness (w, Some props) -> join w props r
+    | _ -> match canonicalize_as_witness x r with
+        | Witness (w, None) -> Witness (w, Some l)
+        | Witness (w, Some props) -> join w l props
+        | res -> res
+    end
+  | _ -> Nothing
+
+let is_SPARK_epsilon fb =
+  let x, f = t_open_bound fb in
+  match canonicalize_as_witness x f with
+  | Witness (_, _) -> true
+  | _ -> false
+
 let canonicalize x f =
-  try canonicalize x f
-  with Exit -> Nothing
+  try canonicalize_as_lambda x f
+  with Exit -> canonicalize_as_witness x f
 
 let get_canonical ls =
   let ty = Opt.get_def Ty.ty_bool ls.ls_value in
@@ -81,7 +112,7 @@ let get_canonical ls =
     then t_iff (t_equ t t_bool_true) e else t_equ t e in
   let nm = ls.ls_name.id_string ^ "_closure_def" in
   let pr = create_prsymbol (id_derive nm ls.ls_name) in
-  let ax = (pr, (t_forall_close vl [] f)) in
+  let ax = create_prop_decl Paxiom pr (t_forall_close vl [] f) in
   create_param_decl cs, ax, cs
 
 let id_canonical ty =
@@ -91,7 +122,7 @@ let id_canonical ty =
   let tvs = t_var vs in
   let eq = t_equ (t_func_app (fs_app cs [] tyf) tvs) tvs in
   let pr = create_prsymbol (id_fresh "identity_def") in
-  let ax = (pr, (t_forall_close [vs] [] eq)) in
+  let ax = create_prop_decl Paxiom pr (t_forall_close [vs] [] eq) in
   create_param_decl cs, ax, cs
 
 let get_canonical =
@@ -155,47 +186,39 @@ let rec lift_f el acc t0 =
         | Id ty ->
             let ld, ax, cs = if Ty.ty_closed ty then
               id_canonical ty else poly_id_canonical in
-            let abst, axml = acc in
-            (ld :: abst, ax :: axml), fs_app cs [] vs.vs_ty
-        | Eta t -> lift_f el acc t
+            let abst, axml, axml_for_SPARK = acc in
+            (ld :: abst, ax :: axml, axml_for_SPARK), fs_app cs [] vs.vs_ty
+        | Eta t | Witness (t, None) -> lift_f el acc t
         | Partial (ls, rargs) ->
             let ld, ax, cs = get_canonical ls in
             let args, ty, acc = List.fold_left (fun (args, ty, acc) x ->
                 let acc, y = lift_f el acc x in
                 y :: args, Ty.ty_func (t_type y) ty, acc
               ) ([], vs.vs_ty, acc) rargs in
-            let abst, axml = acc in
+            let abst, axml, axml_for_SPARK = acc in
             let apply f x = t_app_infer fs_func_app [f;x] in
             let ap = List.fold_left apply (fs_app cs [] ty) args in
-            (ld :: abst, ax :: axml), ap
+            (ld :: abst, ax :: axml, axml_for_SPARK), ap
+        | Witness (t, Some f) ->
+            let acc, f = lift_f el acc f in
+            let (abst, axml, axml_for_SPARK), t = lift_f el acc t in
+            let f = t_forall_close_merge vl (t_subst_single vs t f) in
+            let id = id_derive (vs.vs_name.id_string ^ "'def") vs.vs_name in
+            (abst, axml, (id, f) :: axml_for_SPARK), t
         | Nothing ->
-            (* case \x. x = t /\ f *)
-            (* do not generate a new name for x, use t instead *)
-            match f.t_node with
-              | Tbinop (Tand, {t_node = Tapp (ls, [{t_node = Tvar y}; t])}, f)
-	          when vs_equal y vs &&
-	          ls_equal ls ps_equ &&
-	          not (Mvs.mem vs (t_freevars Mvs.empty t)) ->
-	          let acc, f = lift_f el acc f in
-	          let (abst,axml), t = lift_f el acc t in
-                  let f = t_forall_close_merge vl (t_subst_single vs t f) in
-                  let id = id_derive (vs.vs_name.id_string ^ "'def") vs.vs_name
-		  in
-                  let ax = (create_prsymbol id, f) in
-                  (abst, ax :: axml), t
-	      | _ ->
-                  let (abst,axml), f = lift_f el acc f in
-                  let tyl = List.map (fun x -> x.vs_ty) vl in
-                  let ls = create_fsymbol (id_clone vs.vs_name) tyl vs.vs_ty in
-                  let t = fs_app ls (List.map t_var vl) vs.vs_ty in
-                  let f = t_forall_close_merge vl (t_subst_single vs t f) in
-                  let id = id_derive (vs.vs_name.id_string ^ "'def") vs.vs_name
-                  in
-                  let ax = (create_prsymbol id, f) in
-                  (create_param_decl ls :: abst, ax :: axml), t
+            let (abst, axml, axml_for_SPARK), f = lift_f el acc f in
+            let tyl = List.map (fun x -> x.vs_ty) vl in
+            let ls = create_fsymbol (id_clone vs.vs_name) tyl vs.vs_ty in
+            let t = fs_app ls (List.map t_var vl) vs.vs_ty in
+            let f = t_forall_close_merge vl (t_subst_single vs t f) in
+            let id = id_derive (vs.vs_name.id_string ^ "'def") vs.vs_name in
+            let ax = create_prop_decl Paxiom (create_prsymbol id) f in
+            let abst = create_param_decl ls :: abst in
+            (create_param_decl ls :: abst, ax :: axml, axml_for_SPARK), t
       in
       acc, t_attr_copy t0 t
   | Teps _ ->
+      (* Currently, the only non-eliminated epsilon must be lambda-terms. *)
       let vl,tr,t = t_open_lambda t0 in
       let acc, t = lift_f el acc t in
       let acc, tr = Lists.map_fold_left
@@ -208,27 +231,29 @@ let rec lift_f el acc t0 =
 
 let rec lift_q el pol acc t0 =
   let binop = if pol then Tand else Timplies in
+  let pack (abst, axml) = (abst, axml, []) in
   let acc, t = match t0.t_node with
   | Tquant (Tforall, _)
   | Tbinop (Tand, _, _)
   | Tbinop (Tor, _, _) -> t_map_fold (lift_q el pol) acc t0
   | Tbinop (Timplies, t1, t2) ->
-    let (abst, axml), t1 = lift_f el acc t1 in
-    let acc, t2 = lift_q el pol (abst, []) t2 in
-    let t = List.fold_left (fun t (_, ax) -> t_binary binop ax t)
-      (t_binary Timplies t1 t2) axml in
-    acc, t
+      let (abst, axml, axml_for_SPARK), t1 = lift_f el (pack acc) t1 in
+      let acc, t2 = lift_q el pol (abst, axml) t2 in
+      let t = List.fold_left (fun t (_, ax) -> t_binary binop ax t)
+        (t_binary Timplies t1 t2) axml_for_SPARK in
+      acc, t
   | Tlet (t1, bt2) ->
-    let (x, t2) = t_open_bound bt2 in
-    let (abst, axml), t1 = lift_f el acc t1 in
-    let acc, t2 = lift_q el pol (abst, []) t2 in
-    let t = List.fold_left (fun t (_, ax) -> t_binary binop ax t)
-      (t_let t1 (t_close_bound x t2)) axml in
-    acc, t
+      let (x, t2) = t_open_bound bt2 in
+      let (abst, axml, axml_for_SPARK), t1 = lift_f el (pack acc) t1 in
+      let acc, t2 = lift_q el pol (abst, axml) t2 in
+      let t = List.fold_left (fun t (_, ax) -> t_binary binop ax t)
+        (t_let t1 (t_close_bound x t2)) axml_for_SPARK in
+      acc, t
   | _ ->
-    let (abst, axml), t = lift_f el acc t0 in
-    let t = List.fold_left (fun t (_, ax) -> t_binary binop ax t) t axml in
-      (abst, []), t
+      let (abst, axml, axml_for_SPARK), t = lift_f el (pack acc) t0 in
+      let t = List.fold_left (fun t (_, ax) -> t_binary binop ax t)
+        t axml_for_SPARK in
+      (abst, axml), t
   in
   acc, t_attr_copy t0 t
 
@@ -237,49 +262,46 @@ let lift_l el (acc,dl) (ls,ld) =
   (* remove special case for function declaration to keep definitions when
      no new symbol is generated for fb *)
   match t.t_node with
-  (* For SPARK, this case is never taken in eliminate_epsilon but it simplifies
-     Coq proof for eliminate_non*epsilon *)
-  | Teps fb when (el = All && t_is_lambda t) || (el <> All && to_elim el t) ->
+    (* For SPARK, this case is never taken in eliminate_epsilon but it simplifies
+       Coq proof for eliminate_non*epsilon *)
+  | Teps fb when to_elim el t && (el <> All || not (is_SPARK_epsilon fb)) ->
       let vs, f = t_open_bound fb in
-      let (abst,axml), f = lift_f el acc f in
+      let (abst, axml, axml_for_SPARK), f = lift_f el acc f in
       let t = t_app ls (List.map t_var vl) t.t_ty in
       let f = t_forall_close_merge vl (t_subst_single vs t f) in
       let id = id_derive (ls.ls_name.id_string ^ "'def") ls.ls_name in
-      let ax = (create_prsymbol id, f) in
-      (create_param_decl ls :: abst, ax :: axml), dl
+      let ax = create_prop_decl Paxiom (create_prsymbol id) f in
+      (create_param_decl ls :: abst, ax :: axml, axml_for_SPARK), dl
   | _ ->
       let acc, t = lift_f el acc t in
       acc, close ls vl t :: dl
 
-let lift_d el d = match d.d_node with
+let lift_d el d =
+  (* If they escape top-level, merge SPARK-special axioms with regular ones. *)
+  let merge_SPARK_axioms ((abst, axml, axml_for_SPARK), dl) =
+    let wrap (id, f) = create_prop_decl Paxiom (create_prsymbol id) f in
+    let axml = List.rev_append (List.rev_map wrap axml_for_SPARK) axml in
+    (abst, axml), dl
+  in
+  let mk_decls ((abst, axml), d) =
+    List.rev_append abst (List.rev_append axml [d]) in
+  let seed = ([], [], []) in
+  match d.d_node with
   | Dlogic dl ->
-      let (abst,axml), dl = List.fold_left (lift_l el) (([],[]),[]) dl in
-      if dl = [] then List.rev_append abst
-        (List.rev_map (fun (id, f) -> create_prop_decl Paxiom id f) axml) else
+      let (abst, axml), dl =
+        merge_SPARK_axioms (List.fold_left (lift_l el) (seed, []) dl) in
+      if dl = [] then List.rev_append abst (List.rev axml) else
       let d = create_logic_decl (List.rev dl) in
-      let add_ax (axml1, axml2) (id, f) =
-        let ax = create_prop_decl Paxiom id f in
+      let add_ax (axml1, axml2) ax =
         if Sid.disjoint (get_used_syms_decl ax) d.d_news
         then ax :: axml1, axml2 else axml1, ax :: axml2 in
-      let axml1, axml2 = List.fold_left add_ax ([],[]) axml in
+      let axml1, axml2 = List.fold_left add_ax ([], []) axml in
       List.rev_append abst (axml1 @ d :: axml2)
-  (* for goals and axioms, introduce assumptions after top-level quantifier
-     and guards *)
-  | Dprop (Pgoal, _, _) ->
-      let (abst,axml), d = decl_map_fold (lift_q el false) ([],[]) d in
-      List.rev_append abst
-        (List.fold_left (fun l (id, f) ->
-                           (create_prop_decl Paxiom id f) :: l) [d] axml)
-  | Dprop (Paxiom, _, _) ->
-      let (abst,axml), d = decl_map_fold (lift_q el true) ([],[]) d in
-      List.rev_append abst
-        (List.fold_left (fun l (id, f) ->
-                           (create_prop_decl Paxiom id f) :: l) [d] axml)
-  | _ ->
-      let (abst,axml), d = decl_map_fold (lift_f el) ([],[]) d in
-      List.rev_append abst
-      (List.fold_left (fun l (id, f) ->
-			   (create_prop_decl Paxiom id f) :: l) [d] axml)
+  (* for goals and axioms, introduce SPARK-special assumptions
+     after top-level quantifier and guards *)
+  | Dprop (Pgoal, _, _) -> mk_decls (decl_map_fold (lift_q el false) ([],[]) d)
+  | Dprop (Paxiom, _, _) -> mk_decls (decl_map_fold (lift_q el true) ([],[]) d)
+  | _ -> mk_decls (merge_SPARK_axioms (decl_map_fold (lift_f el) seed d))
 
 let eliminate_epsilon     = Trans.decl (lift_d All) None
 let eliminate_nl_epsilon  = Trans.decl (lift_d NonLambda) None
