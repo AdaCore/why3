@@ -1186,8 +1186,6 @@ match pa.proof_state with
       let new_status =
         Proof_status_change (pa_status, pa.proof_obsolete, pa.limit)
       in
-      Debug.dprintf debug "callback_update_tree_proof: pa_status=%a@."
-        Controller_itp.print_status pa_status;
       P.notify (Node_change (node_id, new_status))
     with Return -> ()
 
