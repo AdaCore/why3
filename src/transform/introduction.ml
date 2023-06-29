@@ -306,7 +306,8 @@ let rec dequantify ht pos f =
       let vl,_,f1 = t_open_quant fq in
       List.iter2 (Hvs.replace ht) vl (t_peek_quant fq);
       dequantify pos f1
-  | Tquant _ | Tif _ | Tcase _ | Tbinop _ | Tnot _ ->
+  | Tquant _ -> f
+  | Tif _ | Tcase _ | Tbinop _ | Tnot _ ->
       t_map_sign dequantify pos f)
 
 let dequantify pos pr f =
