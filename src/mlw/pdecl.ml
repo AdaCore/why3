@@ -592,6 +592,10 @@ let pd_int, pd_real, pd_str, pd_equ = match builtin_theory.th_decls with
       mk_decl PDpure [de]
   | _ -> assert false
 
+let pd_ignore_term = match ignore_theory.th_decls with
+  | [{td_node = Decl di}] -> mk_decl PDpure [di]
+  | _ -> assert false
+
 let pd_func, pd_func_app = match highord_theory.th_decls with
   | [{td_node = Decl df}; {td_node = Decl da}] ->
       mk_decl (PDtype [mk_itd its_func [] [] [] None]) [df],

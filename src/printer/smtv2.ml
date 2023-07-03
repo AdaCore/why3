@@ -214,6 +214,7 @@ type info = {
   info_incremental: bool;
   info_set_incremental: bool;
   info_supports_reason_unknown : bool;
+  info_supports_minimize: bool;
   mutable info_labels: Sattr.t Mstr.t;
   mutable incr_list_axioms: (prsymbol * term) list;
   mutable incr_list_ldecls: (lsymbol * vsymbol list * term) list;
@@ -914,6 +915,33 @@ let print_sort_decl info fmt (ts,_) =
     (print_ident info) ts.ts_name
     (List.length ts.ts_args)
 
+let set_produce_models fmt info =
+  if info.info_cntexample then
+    fprintf fmt "(set-option :produce-models true)@\n"
+
+let set_incremental fmt info =
+  if info.info_set_incremental then
+    fprintf fmt "(set-option :incremental true)@\n"
+
+let meta_counterexmp_need_push =
+  Theory.register_meta_excl "counterexample_need_smtlib_push" []
+                            ~desc:"Internal@ use@ only"
+
+let meta_incremental =
+  Theory.register_meta_excl "meta_incremental" []
+                            ~desc:"Internal@ use@ only"
+
+let meta_supports_minimize =
+  Theory.register_meta_excl "supports_smtlib_minimize" []
+                            ~desc:"solver supports SMTLIB `(minimize term)`"
+
+let smtlib_minimize_attr = Ident.create_attribute "smtlib:minimize"
+
+let meta_supports_reason_unknown =
+  Theory.register_meta_excl "supports_smt_get_info_unknown_reason" []
+                            ~desc:"Internal@ use@ only"
+
+
 let print_decl vc_loc vc_attrs env printing_info info fmt d =
   match d.d_node with
   | Dtype ts ->
@@ -948,30 +976,14 @@ let print_decl vc_loc vc_attrs env printing_info info fmt d =
         end
     end
   | Dind _ -> unsupportedDecl d
-      "smtv2: inductive definitions are not supported"
+                "smtv2: inductive definitions are not supported"
+  | Dprop(Paxiom,_,({t_node = Tapp(_ps,[t]); t_attrs = a }))
+    when Sattr.mem smtlib_minimize_attr a ->
+      if info.info_supports_minimize then
+        fprintf fmt "@[<v2>(minimize %a)@]@\n@\n" (print_term info) t
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
       print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f
-
-let set_produce_models fmt info =
-  if info.info_cntexample then
-    fprintf fmt "(set-option :produce-models true)@\n"
-
-let set_incremental fmt info =
-  if info.info_set_incremental then
-    fprintf fmt "(set-option :incremental true)@\n"
-
-let meta_counterexmp_need_push =
-  Theory.register_meta_excl "counterexample_need_smtlib_push" []
-                            ~desc:"Internal@ use@ only"
-
-let meta_incremental =
-  Theory.register_meta_excl "meta_incremental" []
-                            ~desc:"Internal@ use@ only"
-
-let meta_supports_reason_unknown =
-  Theory.register_meta_excl "supports_smt_get_info_unknown_reason" []
-                            ~desc:"Internal@ use@ only"
 
 
 let print_task version args ?old:_ fmt task =
@@ -987,6 +999,10 @@ let print_task version args ?old:_ fmt task =
   in
   let supports_reason_unknown =
     let m = Task.find_meta_tds task meta_supports_reason_unknown in
+    not (Theory.Stdecl.is_empty m.Task.tds_set)
+  in
+  let supports_minimize =
+    let m = Task.find_meta_tds task meta_supports_minimize in
     not (Theory.Stdecl.is_empty m.Task.tds_set)
   in
   let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
@@ -1018,6 +1034,7 @@ let print_task version args ?old:_ fmt task =
     *)
     info_set_incremental = not need_push && incremental;
     info_supports_reason_unknown = supports_reason_unknown;
+    info_supports_minimize = supports_minimize;
     incr_list_axioms = [];
     incr_list_ldecls = [];
     }

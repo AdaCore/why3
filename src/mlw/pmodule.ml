@@ -384,6 +384,12 @@ let builtin_module =
   let m = close_module uc in
   { m with mod_theory = builtin_theory }
 
+let ignore_module =
+  let uc = empty_module dummy_env (id_fresh "Ignore") ["why3";"Ignore"] in
+  let uc = add_pdecl_no_logic uc pd_ignore_term in
+  let m = close_module uc in
+  { m with mod_theory = ignore_theory }
+
 let bool_module =
   let uc = empty_module dummy_env (id_fresh "Bool") ["why3";"Bool"] in
   let uc = add_pdecl_no_logic uc pd_bool in
@@ -1654,6 +1660,7 @@ let mlw_language_builtin =
     if s = unit_module.mod_theory.th_name.id_string then unit_module else
     if s = ref_module.mod_theory.th_name.id_string then ref_module else
     if s = builtin_theory.th_name.id_string then builtin_module else
+    if s = ignore_theory.th_name.id_string then ignore_module else
     if s = highord_theory.th_name.id_string then highord_module else
     if s = wf_module.mod_theory.th_name.id_string then wf_module else
     if s = bool_theory.th_name.id_string then bool_module else
