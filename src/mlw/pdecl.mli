@@ -116,6 +116,7 @@ val create_pure_decl : Decl.decl -> pdecl
 val pd_int : pdecl
 val pd_real : pdecl
 val pd_equ : pdecl
+val pd_ignore_term : pdecl
 val pd_bool : pdecl
 val pd_str : pdecl
 val pd_tuple : int -> pdecl

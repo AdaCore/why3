@@ -239,6 +239,8 @@ val clone_meta : tdecl -> theory -> symbol_map -> tdecl option
 
 val builtin_theory : theory
 
+val ignore_theory : theory
+
 val bool_theory : theory
 
 val highord_theory : theory

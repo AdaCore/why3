@@ -36,7 +36,10 @@ theory BuiltIn
   syntax type int   "Int"
   syntax type real  "Real"
   syntax predicate (=)  "(= %1 %2)"
+end
 
+theory Ignore
+  syntax predicate ignore'term  "true"
 end
 
 theory int.Int

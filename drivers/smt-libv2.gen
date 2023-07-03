@@ -31,6 +31,11 @@ theory BuiltIn
   meta "encoding:ignore_polymorphism_ls" predicate (=)
 end
 
+theory Ignore
+  syntax predicate ignore'term  "true"
+  meta "encoding:ignore_polymorphism_ls" predicate ignore'term
+end
+
 theory int.Int
 
   prelude ";;; SMT-LIB2: integer arithmetic"

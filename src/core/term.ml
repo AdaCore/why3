@@ -1014,6 +1014,10 @@ let ps_equ =
   let v = ty_var (create_tvsymbol (id_fresh "a")) in
   create_psymbol (id_fresh (op_infix "=")) [v; v]
 
+let ps_ignore =
+  let v = ty_var (create_tvsymbol (id_fresh "a")) in
+  create_psymbol (id_fresh "ignore'term") [v]
+
 let t_equ t1 t2 = ps_app ps_equ [t1; t2]
 let t_neq t1 t2 = t_not (ps_app ps_equ [t1; t2])
 

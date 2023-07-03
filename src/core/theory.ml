@@ -1013,6 +1013,11 @@ let builtin_theory =
 let create_theory ?(path=[]) n =
   use_export (empty_theory n path) builtin_theory
 
+let ignore_theory =
+  let uc = empty_theory (id_fresh "Ignore") ["why3";"Ignore"] in
+  let uc = add_param_decl uc ps_ignore in
+  close_theory uc
+
 let bool_theory =
   let uc = empty_theory (id_fresh "Bool") ["why3";"Bool"] in
   let uc = add_data_decl uc [ts_bool, [fs_bool_true,[]; fs_bool_false,[]]] in
