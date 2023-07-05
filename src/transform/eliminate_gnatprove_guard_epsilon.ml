@@ -48,52 +48,60 @@ let rec find_witness x f =
   | _ -> None
 
 (* Eliminate epsilon that have a witness, and accumulate the properties
-   stated over those witnesses in axml. *)
-let rec lift_f_acc axml t0 =
+   stated over those witnesses in axml.
+   Parameter topv lists variables that are to be treated as
+   top-level constants, and as such should not re-quantified in
+   generated axioms. *)
+let rec lift_f_acc topv axml t0 =
   match t0.t_node with
   | Teps fb ->
     let vs, f = t_open_bound fb in
     let axml, t = match find_witness vs f with
-      | Some { witness = w; props = None } -> lift_f_acc axml w
+      | Some { witness = w; props = None } -> lift_f_acc topv axml w
       | Some { witness = w; props = Some p } ->
-        let axml, p = lift_f_acc axml p in
-        let vl = Mvs.keys (t_vars t0) in
+        let axml, p = lift_f_acc topv axml p in
+        let vl = Mvs.keys (Mvs.set_diff (t_vars t0) topv) in
         let p = t_forall_close_merge vl (t_subst_single vs w p) in
         p :: axml, w
       | None ->
-        let axml, f = lift_f_acc axml f in
+        let axml, f = lift_f_acc topv axml f in
         axml, t_eps_close vs f
     in
     axml, t_attr_copy t0 t
-  | _ -> let axml, t = t_map_fold lift_f_acc axml t0 in
+  | _ -> let axml, t = t_map_fold (lift_f_acc topv) axml t0 in
     axml, t_attr_copy t0 t
 
-let lift_f = lift_f_acc []
+let lift_f topv = lift_f_acc topv []
 
 (* With pol giving polarity of formula, eliminate
    axioms and adds axioms as hypothesis/assumptions
-   as nested in resulting formula as possible. *)
-let rec lift_q pol t0 =
+   as nested in resulting formula as possible.
+   Top-level bound variables are aggregated in topv to avoid
+   re-quantifying over them in axiom formulas. *)
+let rec lift_q pol topv t0 =
   let binop = if pol then Tand else Timplies in
   let wrap = List.fold_left (fun t ax -> t_binary binop ax t) in
   let t = match t0.t_node with
   | Tquant (Tforall, tq) ->
     let vsl, tr, t, cb = t_open_quant_cb tq in
     let axml_tr, tr =
-      let ap = Lists.map_fold_left in ap (ap lift_f_acc) [] tr in
-    wrap (t_forall (cb vsl tr (lift_q pol t))) axml_tr
+      let ap = Lists.map_fold_left in ap (ap (lift_f_acc topv)) [] tr in
+    let topv = List.fold_left Svs.add_left topv vsl in
+    wrap (t_forall (cb vsl tr (lift_q pol topv t))) axml_tr
   | Tbinop (Tand, _, _)
-  | Tbinop (Tor, _, _) -> t_map (lift_q pol) t0
+  | Tbinop (Tor, _, _) -> t_map (lift_q pol topv) t0
   | Tbinop (Timplies, t1, t2) ->
-    let axml, t1 = lift_f t1 in
-    wrap (t_binary Timplies t1 (lift_q pol t2)) axml
+    let axml, t1 = lift_f topv t1 in
+    wrap (t_binary Timplies t1 (lift_q pol topv t2)) axml
   | Tlet (t1, bt2) ->
     let (x, t2) = t_open_bound bt2 in
-    let axml, t1 = lift_f t1 in
-    wrap (t_let t1 (t_close_bound x (lift_q pol t2))) axml
-  | _ -> let axml, t = lift_f t0 in wrap t axml
+    let axml, t1 = lift_f topv t1 in
+    wrap (t_let t1 (t_close_bound x (lift_q pol topv t2))) axml
+  | _ -> let axml, t = lift_f topv t0 in wrap t axml
   in
   t_attr_copy t0 t
+
+let lift_q pol = lift_q pol Svs.empty
 
 let lift_d d =
   [match d.d_node with
