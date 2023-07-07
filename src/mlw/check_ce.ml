@@ -352,7 +352,7 @@ let oracle_of_model pm model =
       (search_model_element_for_id model ?loc id) in
   let for_result env ?(check=fun _ _ -> ()) ~loc ~call_id ity =
     Opt.map (import check None (Some loc) env ity)
-      (search_model_element_call_result model call_id loc) in
+      (search_model_element_call_result model call_id) in
   { for_variable; for_result }
 
 (** Check and select solver counterexample models *)

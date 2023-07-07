@@ -224,9 +224,9 @@ val search_model_element_for_id :
     identifier [id], at the location [id.id_loc], or at [loc], when given. *)
 
 val search_model_element_call_result :
-  model -> int option -> Loc.position -> model_element option
-(** [search_model_element_call_result m oid loc] searches for a model element
-   that holds the return value for a call with id [oid] at location [loc]. *)
+  model -> Expr.expr_id option -> model_element option
+(** [search_model_element_call_result m oid] searches for a model element
+   that holds the return value for a call with id [oid]. *)
 
 (** {2 Printing the model} *)
 

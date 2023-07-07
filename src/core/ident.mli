@@ -177,6 +177,16 @@ val is_field_id_attr: attribute
   (** indicates that the related ident is a field name, and its applications
       should be printed in dotted notation *)
 
+val eid_attribute_prefix : string
+(** the prefix string for expression identifiers in attributes *)
+
+val is_eid_attr : attribute -> bool
+(** [is_eid_attr a] tells whether [a] is an expression identifier attribute. *)
+
+val get_eid_attr : Sattr.t -> int option
+(** [get_eid_attr s] searches in the set [s] an attribute defining an
+   expression identifier, as prefixed by [eid_attribute_prefix].  *)
+
 
 (** {2 Attributes for handling counterexamples} *)
 
@@ -217,15 +227,9 @@ val has_rac_assume : Sattr.t -> bool
    is a conjunction, conjuncts marked by this annotation are added to the
    preconditions when checking the programannotation during giant-step RAC. *)
 
-val create_call_id_attr_string : int -> string
-(** Create the string of an attribute of the form [[\@RAC:call_id:<id>]]. *)
-
-val get_call_id_value : attribute -> int option
-(** Get the call id of the form [[\@RAC:call_id:<id>]]. *)
-
 val search_attribute_value : (attribute -> 'a option) -> Sattr.t -> 'a option
 (** [search_attribute_value f attrs] applies f to the attributes in [attr] and
-    returns the first inhabitad result, if any, or [None] otherwise. *)
+    returns the first inhabited result, if any, or [None] otherwise. *)
 
 val remove_model_attrs : attrs:Sattr.t -> Sattr.t
 (** Remove the counter-example attributes from an attribute set *)
