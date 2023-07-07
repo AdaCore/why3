@@ -118,6 +118,12 @@ type variant = term * lsymbol option (** tau * (tau -> tau -> prop) *)
 
 type assign = pvsymbol * rsymbol * pvsymbol (* region * field * value *)
 
+type expr_id = int
+
+val create_eid_attr : expr_id -> Ident.attribute
+(** [create_eid_attr id] generates an attribute corresponding to the
+   given expression identifier [id] *)
+
 type expr = private {
   e_node   : expr_node;
   e_ity    : ity;
@@ -125,6 +131,7 @@ type expr = private {
   e_effect : effect;
   e_attrs  : Sattr.t;
   e_loc    : Loc.position option;
+  e_id     : expr_id;
 }
 
 and expr_node =

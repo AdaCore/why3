@@ -719,7 +719,7 @@ type oracle = {
   for_variable:
     env -> ?check:check_value -> loc:Loc.position option -> Ident.ident -> Ity.ity -> value option;
   for_result:
-    env -> ?check:check_value -> loc:Loc.position -> call_id:int option -> Ity.ity -> value option;
+    env -> ?check:check_value -> loc:Loc.position -> call_id:expr_id option -> Ity.ity -> value option;
 }
 
 let oracle_dummy = {

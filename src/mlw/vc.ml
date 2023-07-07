@@ -60,23 +60,6 @@ let _print_pv_attr fmt v =
 
 let model_trace_result_attribute = create_model_trace_attr "result"
 
-let explicit_result loc attrs ce ity =
-  let name = match ce.c_node with
-    | Capp (rs, _) ->
-       Format.asprintf "%s'result" rs.rs_name.id_string
-    | Cpur (ls, _) ->
-       Format.asprintf "%s'result" ls.ls_name.id_string
-    | Cfun _ -> "anonymous'result"
-    | Cany -> "any'result"
-  in
-  let attrs = Sattr.filter (fun a -> Ident.get_call_id_value a <> None) attrs in
-  let attrs = Sattr.add model_trace_result_attribute attrs in
-  let attrs = match loc with
-    | Some l -> Sattr.add (create_call_result_attr l) attrs
-    | None -> attrs in
-  create_pvsymbol (id_fresh ?loc ~attrs name) ity
-
-
 let res_of_post loc ity ql = create_pvsymbol (result_id ?loc ~ql ()) ity
 
 let res_of_cty loc cty = res_of_post loc cty.cty_result cty.cty_post
@@ -91,6 +74,24 @@ let wp_attr = Ident.create_attribute "vc:wp"
 let wb_attr = Ident.create_attribute "vc:white_box"
 let kp_attr = Ident.create_attribute "vc:keep_precondition"
 let nt_attr = Ident.create_attribute "vc:divergent"
+
+let explicit_result loc ce ity eid =
+  let name =
+    match ce.c_node with
+    | Capp (rs, _) -> Format.asprintf "%s'result" rs.rs_name.id_string
+    | Cpur (ls, _) -> Format.asprintf "%s'result" ls.ls_name.id_string
+    | Cfun _ -> "anonymous'result"
+    | Cany -> "any'result"
+  in
+  let attrs = Sattr.empty in
+  let attrs = Sattr.add model_trace_result_attribute attrs in
+  let attrs = Sattr.add (create_eid_attr eid) attrs in
+  let attrs =
+    match loc with
+    | Some l -> Sattr.add (create_call_result_attr l) attrs
+    | None -> attrs
+  in
+  create_pvsymbol (id_fresh ?loc ~attrs name) ity
 
 let do_not_keep_trace_attr = Ident.create_attribute "vc:do_not_keep_trace"
 let do_not_keep_trace_flag = Debug.register_flag "vc:do_not_keep_trace"
@@ -714,7 +715,7 @@ let rec k_expr env lps e res xmap =
                Klet (v, t_tag t, List.fold_right sp_and rinv sp)
             | None ->  Kval ([v], List.fold_right sp_and rinv sp) in
           if env.keep_trace && need_trace then
-            let vv = explicit_result loc e.e_attrs ce v.pv_ity in
+            let vv = explicit_result loc ce v.pv_ity e.e_id in
             Kseq(k v,0,Klet(vv, t_var v.pv_vs, t_true))
           else
             k v
@@ -1545,6 +1546,15 @@ let rec sp_expr env k rdm dst = match k with
       let sp = Mpv.fold update dst t_true in
       let sp = sp_exists (Mvs.keys fvs) sp in
       let sp = t_attr_set ?loc sp.t_attrs sp in
+      let sp =
+        Sattr.fold_left
+          (fun sp attr ->
+            if Ident.is_eid_attr attr then
+              t_attr_add attr sp
+            else
+              sp)
+          sp attrs
+      in
       let add_rhs _ rhs rd = match rhs with
         | Some v -> Spv.add v rd | None -> rd in
       let add_rhs _ = Mpv.fold add_rhs in

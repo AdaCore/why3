@@ -362,6 +362,10 @@ let is_model_trace_attr a =
 let is_written_attr a =
   Strings.has_prefix "vc:written:" a.attr_string
 
+let eid_attribute_prefix = "eid:"
+
+let is_eid_attr a = Strings.has_prefix eid_attribute_prefix a.attr_string
+
 let create_loc_attr prefix loc =
   let f,bl,bc,el,ec = Loc.get loc in
   (* The file comes last to permit filenames that contain colons *)
@@ -389,7 +393,7 @@ let get_written_loc = get_loc_attr "vc:written"
 
 let is_counterexample_attr a =
   is_model_trace_attr a || attr_equal a model_projected_attr ||
-  is_written_attr a
+  is_written_attr a || is_eid_attr a
 
 let has_a_model_attr id =
   Sattr.exists is_counterexample_attr id.id_attrs
@@ -407,15 +411,17 @@ let create_call_result_attr = create_loc_attr call_result_name
 
 let get_call_result_loc = get_loc_attr call_result_name
 
-let create_call_id_attr_string id = Format.sprintf "RAC:call_id:%d" id
-
-let get_call_id_value a =
-  match Strings.bounded_split ':' a.attr_string 3 with
-  | ["rac"; "call_id"; id] -> Some (int_of_string id)
-  | _ -> None
-
 let search_attribute_value f attrs =
   try Some (Lists.first f (Sattr.elements attrs)) with Not_found -> None
+
+let get_eid_attr =
+  search_attribute_value
+    (fun a ->
+      try
+        let i = Strings.remove_prefix eid_attribute_prefix a.attr_string in
+        Some (int_of_string i)
+      with Not_found -> None)
+
 
 let get_model_trace_attr ~attrs =
   Sattr.choose (Sattr.filter is_model_trace_attr attrs)

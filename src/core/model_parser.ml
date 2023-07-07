@@ -355,26 +355,26 @@ let search_model_element_for_id m ?loc id =
     then Some me else None in
   search_model_element m p
 
-let matching_call_id id attrs =
-  Opt.equal Int.equal (Some id)
-    (search_attribute_value get_call_id_value attrs)
-
-let matching_call_result_loc attrs loc =
-  Opt.equal Loc.equal (Some loc)
-    (search_attribute_value get_call_result_loc attrs)
-
-let search_model_element_call_result model call_id loc =
-  let p me = (* [@model_trace:result] [@call_result_loc:<loc>] [@RAC:call_id:<id>] *)
-    let has_model_trace_result attrs =
-      get_model_trace_string ~name:"" ~attrs = "result" in
-    if (match call_id with
-        | Some call_id ->
-            matching_call_id call_id me.me_attrs
-        | None ->
-            has_model_trace_result me.me_attrs &&
-            matching_call_result_loc me.me_attrs loc)
-    then Some me else None in
-  search_model_element model p
+let search_model_element_call_result model (call_id : Expr.expr_id option) =
+  match call_id with
+  | None -> None
+  | Some call_id ->
+      let matching_eid attrs =
+        match Ident.get_eid_attr attrs with
+        | Some i -> i = call_id
+        | _ -> false
+      in
+      let p me =
+        (* [@model_trace:result] [@eid:<eid>] *)
+        let has_model_trace_result attrs =
+          get_model_trace_string ~name:"" ~attrs = "result"
+        in
+        if has_model_trace_result me.me_attrs && matching_eid me.me_attrs then
+          Some me
+        else
+          None
+      in
+      search_model_element model p
 
 (*
 ***************************************************************

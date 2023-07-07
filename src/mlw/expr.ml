@@ -297,6 +297,11 @@ let create_prog_pattern pp ity mask =
 
 (** {2 Program expressions} *)
 
+type expr_id = int
+let next_expr_id = ref 0
+
+let create_eid_attr i = create_attribute (Ident.eid_attribute_prefix ^ string_of_int i)
+
 type assertion_kind = Assert | Assume | Check
 [@@deriving sexp]
 
@@ -318,6 +323,7 @@ type expr = {
   e_effect : effect;
   e_attrs  : Sattr.t;
   e_loc    : Loc.position option;
+  e_id     : expr_id;
 }
 
 and expr_node =
@@ -473,13 +479,17 @@ let try_effect el fn x y =
 
 (* smart constructors *)
 
-let mk_expr node ity mask eff = {
-  e_node   = node;
-  e_ity    = ity;
-  e_mask   = mask_adjust eff ity mask;
-  e_effect = eff;
-  e_attrs  = Sattr.empty;
-  e_loc    = None;
+let mk_expr node ity mask eff =
+  let e_id = !next_expr_id in
+  incr next_expr_id;
+  {
+    e_node   = node;
+    e_ity    = ity;
+    e_mask   = mask_adjust eff ity mask;
+    e_effect = eff;
+    e_attrs  = Sattr.empty;
+    e_loc    = None;
+    e_id;
 }
 
 let mk_cexp node cty = {
