@@ -1,35 +1,73 @@
 #!/bin/bash
 set -euo pipefail
 
-dir=`dirname $0`
+
+################################################################################
+# Global variables & utility functions
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+readonly SCRIPT_DIR
+
+# Currently the script only works if it is run in this directory.
+# TODO Change this dirty workaround.
+cd "$SCRIPT_DIR/.."
+
+# Suffix that is appened on the Why3 excecutable name
+SUFFIX=.opt
+
 updateoracle=false
-suffix=.opt
 removeoutfile=true
 files=""
 failed=""
-whydata=$(bin/why3"$suffix" --print-datadir)
-whylib=$(bin/why3"$suffix" --print-libdir)
+
+function usage() {
+  cat <<EOF
+Usage: $(basename "$0") [OPTIONS...] <files>"
+
+Run the check-ce tests on the given <files>.
+<files> must be given without the '.mlw' suffix.
+If <files> is empty, use all files from directory 'check-ce'.
+
+Options:
+  -h | -help | --help
+    Prints this help text.
+
+  --update-oracle
+    Update the oracles during the run of tests suite.
+
+  --keep-out-files
+    Remove out files.
+
+  --suffix <s>
+    The suffix <s> is appended on the Why3 executable name, e.g. '.opt'.
+    Default: $SUFFIX
+EOF
+}
+
+################################################################################
+# Parse options
 
 while test $# != 0; do
   case "$1" in
-    "--update-oracle")
+    -h | -help | --help)
+      usage
+      exit 0
+      ;;
+    --update-oracle)
       updateoracle=true
       shift 1
       ;;
-    "--keep-out-files")
+    --keep-out-files)
       removeoutfile=false
       shift 1
       ;;
-    "--suffix")
-      suffix="$2"
+    --suffix)
+      SUFFIX="$2"
       shift 2
       ;;
     "-"*)
-      printf "unknown option: %s\n" "$1"
-      printf "usage: check-ce-bench [--update-oracle] [--keep-out-files] [--suffix s] <files>\n"
-      printf "  <files> must be given without the '.mlw' suffix.\n"
-      printf "  If <files> is empty, use all files from directory 'check-ce'.\n"
-      printf "  The suffix <s> is appended on the Why3 executable name, e.g. '.opt'.\n"
+      echo "unknown option: $1"
+      usage
       exit 2
       ;;
     *)
@@ -38,9 +76,24 @@ while test $# != 0; do
   esac
 done
 
+# If files is empty, use all files from directory 'check-ce'.
 if test "$files" = "" ; then
-  files="$dir/check-ce/*.mlw"
+  files="$SCRIPT_DIR/check-ce/*.mlw"
 fi
+
+readonly SUFFIX
+readonly removeoutfile
+readonly updateoracle
+readonly files
+
+# Path to the why3 binary
+WHY3_BIN="$SCRIPT_DIR"/../bin/why3"$SUFFIX"
+whydata=$("$WHY3_BIN" --print-datadir)
+whylib=$("$WHY3_BIN" --print-libdir)
+readonly WHY3_BIN
+readonly whydata
+readonly whylib
+
 
 colorize() {
   if command -v pygmentize &> /dev/null; then
@@ -113,7 +166,7 @@ run () {
   # the debug flags below to test cont_invariant in reduction engine
   # (note that stack trace may be more detailed with bytecode)
   record_time
-  ($dir/../bin/why3"$suffix" prove -a split_vc -P $prover\
+  ("$WHY3_BIN" prove -a split_vc -P "$prover" \
       --stepslimit=$steps --timelimit=10 \
       --rac-steplimit=$steps --rac-timelimit=10 \
       --check-ce --rac-prover="$1" --ce-log-verbosity=5 \
@@ -152,7 +205,7 @@ run () {
 
 start=$(date +%s)
 for file in $files; do
-  filedir=`dirname $file`
+  filedir="$(realpath --relative-to="$PWD" $(dirname $file))"
   filebase=`basename $file .mlw`
   if [ "$filebase" = "maps_poly" -o "$filebase" = "maps_mono" ] ; then
     echo "Skipping tests on $filedir/$filebase.mlw";
