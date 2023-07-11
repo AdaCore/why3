@@ -45,9 +45,9 @@ Prover result is: Valid.
 - Selected model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Postcondition of `([]<-)` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `([]<-)` cannot be evaluated)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `f2` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `f2` cannot be evaluated)
+- Checked model 1: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `f2` at "bench/check-ce/array_mono.mlw", line 38, characters 6-8)
+  - Abstract RAC: STUCK (failure in precondition of `f2` at "bench/check-ce/array_mono.mlw", line 38, characters 6-8)
 File "bench/check-ce/array_mono.mlw", line 40, characters 14-26:
 Sub-goal Postcondition of goal f2'vc.
 Prover result is: Unknown or time/memory/step limit.
@@ -66,7 +66,7 @@ File array_mono.mlw:
       ->
       int
       ->
-      array = fun _arg_12 _arg_2 _arg_3 ->
+      array = fun _arg_11 _arg_2 _arg_3 ->
                {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
   Line 23:
     a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
