@@ -44,8 +44,8 @@ The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `T3'goal1` cannot be evaluated):
 File strings.mlw:
   Line 8:
-    s1 : string = "A"
-    s2 : string = "B"
+    s1 : string = "B"
+    s2 : string = "A"
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -166,21 +166,38 @@ File strings.mlw:
     x : string = "b{uohu{5c}x09i"
 
 <check_ce:categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `T11'goal` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `T11'goal` cannot be evaluated)
-- Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `T11'goal1` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `T11'goal1` cannot be evaluated)
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 16, characters 22-79)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 16, characters 22-79)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 16, characters 22-79)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 16, characters 22-79)
 File "bench/check-ce/strings.mlw", line 16, characters 60-79:
 Goal T11.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model could not be verified
-  (both RAC terminated because Postcondition of `T11'goal1` cannot be evaluated):
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
 File strings.mlw:
   Line 16:
-    s : string = ""
-    x : string = "b{uohu{5c}x09i"
+    s = ("":string)
+    s = ("":string)
+    Execution of main function `T11'goal` with env:
+      s = ("":string)
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File strings.mlw:
+  Line 16:
+    Property failure at postcondition of `T11'goal` with:
+      s = ("":string)
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE

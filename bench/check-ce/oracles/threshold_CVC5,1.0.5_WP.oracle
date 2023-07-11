@@ -152,10 +152,51 @@ File threshold.mlw:
       b = (4294967295:t)
 
 <check_ce:categorization>Categorizations of models:
-- Checked model 0: BAD_CE
-  - Concrete RAC: NORMAL
-  - Abstract RAC: NORMAL
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/threshold.mlw", line 27, characters 13-45)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/threshold.mlw", line 27, characters 13-45)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/threshold.mlw", line 27, characters 13-45)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/threshold.mlw", line 27, characters 13-45)
 File "bench/check-ce/threshold.mlw", line 27, characters 13-45:
 Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown or time/memory/step limit.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File threshold.mlw:
+  Line 26:
+    n = (4294967293:t)
+    min = (4294967294:t)
+    max = (1:t)
+    n = (4294967293:t)
+    min = (4294967294:t)
+    max = (1:t)
+    Execution of main function `f` with env:
+      n = (4294967293:t)
+      min = (4294967294:t)
+      max = (1:t)
+      zero = 0
+      one = 1
+  Line 30:
+    (giant-step) execution of unimplemented function `u_add`
+      a = (4294967294:t)
+      b = (1:t)
+    result of `u_add` = (4294967295:t)
+  Line 31:
+    (giant-step) execution of unimplemented function `u_lt`
+      a = (4294967293:t)
+      b = (4294967294:t)
+    result of `u_lt` = true
+  Line 27:
+    Property failure at postcondition of `f1` with:
+      min = (4294967294:t)
+      max = (1:t)
+      result = (4294967294:t)
 

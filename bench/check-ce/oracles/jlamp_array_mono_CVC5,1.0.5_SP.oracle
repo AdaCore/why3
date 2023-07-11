@@ -41,7 +41,7 @@ File jlamp_array_mono.mlw:
       ->
       t
       ->
-      array = fun bOUND_VARIABLE_566 bOUND_VARIABLE_567 bOUND_VARIABLE_568 ->
+      array = fun $x1 $x2 $x3 ->
                {Array.elts =
                 [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
                 Array.length = 0}
@@ -78,7 +78,7 @@ File jlamp_array_mono.mlw:
     to_int :
       t
       ->
-      int = fun _arg_110 -> if {Array.to_int => 3} = _arg_110 then 3 else 2
+      int = fun _arg_18 -> if {Array.to_int => 3} = _arg_18 then 3 else 2
   Line 11:
     two : t = {Array.to_int => 2}
   Line 14:
@@ -89,8 +89,8 @@ File jlamp_array_mono.mlw:
       ->
       int
       ->
-      t = fun _arg_113 ->
-           if {Array.elts = [|_ => {Array.to_int => 3}|]; Array.length = 0} = _arg_113
+      t = fun $x15 ->
+           if {Array.elts = [|_ => {Array.to_int => 3}|]; Array.length = 0} = $x15
            then [|_ => {Array.to_int => 3}|]
            else [|42 => {Array.to_int => 2}; _ => {Array.to_int => 3}|]
   Line 19:
@@ -103,10 +103,15 @@ File jlamp_array_mono.mlw:
       ->
       t
       ->
-      array = fun _arg_111 _arg_21 _arg_31 ->
-               {Array.elts =
-                [|42 => {Array.to_int => 2}; _ => {Array.to_int => 3}|];
-                Array.length = 0}
+      array = fun $x13 $x21 $x31 ->
+               if {Array.elts = [|_ => {Array.to_int => 3}|];
+                   Array.length = 0} = $x13 /\
+                  $x21 = 42 /\ {Array.to_int => 2} = $x31
+               then {Array.elts =
+                     [|42 => {Array.to_int => 2}; _ => {Array.to_int => 3}|];
+                     Array.length = 0}
+               else {Array.elts = [|_ => {Array.to_int => 3}|];
+                     Array.length = 0}
   Line 32:
     a : array = {Array.elts = [|_ => {Array.to_int => 3}|]; Array.length = 0}
   Line 34:
@@ -138,9 +143,9 @@ Prover result is: Valid.
 - Selected model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `g` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `g` cannot be evaluated)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `g` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `g` cannot be evaluated)
+- Checked model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
 File "bench/check-ce/jlamp_array_mono.mlw", line 53, characters 14-27:
 Sub-goal Postcondition of goal g'vc.
 Prover result is: Unknown or time/memory/step limit.
@@ -151,7 +156,7 @@ File jlamp_array_mono.mlw:
     to_int :
       t
       ->
-      int = fun _arg_114 -> if {Array.to_int => 3} = _arg_114 then 3 else 2
+      int = fun _arg_19 -> if {Array.to_int => 3} = _arg_19 then 3 else 2
   Line 11:
     two : t = {Array.to_int => 2}
   Line 14:
@@ -173,7 +178,7 @@ File jlamp_array_mono.mlw:
       ->
       t
       ->
-      array = fun _arg_115 _arg_22 _arg_32 ->
+      array = fun _arg_110 _arg_21 _arg_31 ->
                {Array.elts =
                 [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
                 Array.length = 43}
@@ -229,7 +234,7 @@ File jlamp_array_mono.mlw:
     to_int :
       t
       ->
-      int = fun _arg_122 -> if {Array.to_int => 3} = _arg_122 then 3 else 2
+      int = fun _arg_117 -> if {Array.to_int => 3} = _arg_117 then 3 else 2
   Line 11:
     two : t = {Array.to_int => 2}
   Line 14:
@@ -240,11 +245,11 @@ File jlamp_array_mono.mlw:
       ->
       int
       ->
-      t = fun _arg_125 ->
+      t = fun $x18 ->
            if {Array.elts =
                [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
                _ => {Array.to_int => 2}|];
-               Array.length = 43} = _arg_125
+               Array.length = 43} = $x18
            then [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
                 _ => {Array.to_int => 2}|]
            else [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|]
@@ -258,10 +263,19 @@ File jlamp_array_mono.mlw:
       ->
       t
       ->
-      array = fun _arg_123 _arg_24 _arg_34 ->
-               {Array.elts =
-                [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
-                Array.length = 43}
+      array = fun $x16 $x22 $x32 ->
+               if {Array.elts =
+                   [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+                   _ => {Array.to_int => 2}|];
+                   Array.length = 43} = $x16 /\
+                  $x22 = 17 /\ {Array.to_int => 2} = $x32
+               then {Array.elts =
+                     [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
+                     Array.length = 43}
+               else {Array.elts =
+                     [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+                     _ => {Array.to_int => 2}|];
+                     Array.length = 43}
   Line 32:
     a :
       array = {Array.elts =

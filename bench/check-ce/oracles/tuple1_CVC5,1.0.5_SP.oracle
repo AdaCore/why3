@@ -12,23 +12,17 @@ The following counterexample model could not be verified
   (both RAC terminated because missing value for return value of call at "WHY3DATA/stdlib/mach/int.mlw", line 432, character 22 to line 433, character 45):
 File int.mlw:
   Line 54:
-    in_bounds :
-      int
-      ->
-      bool = fun _arg_13 ->
-              _arg_13 = 4611686018427387903 \/ _arg_13 = -4611686018427387904 \/
-              _arg_13 = -2305843009213693952 \/
-              _arg_13 = -2305843009213693953
+    in_bounds : int -> bool = fun $x17 -> not $x17 = -4611686018427387905
   Line 416:
     int63'int :
       int63
       ->
-      int = fun _arg_12 ->
-             if {mach.int.Int63.int63'int => 4611686018427387903} = _arg_12
+      int = fun $x16 ->
+             if {mach.int.Int63.int63'int => 4611686018427387903} = $x16
              then 4611686018427387903
-             else if {mach.int.Int63.int63'int => -4611686018427387904} = _arg_12
+             else if {mach.int.Int63.int63'int => -4611686018427387904} = $x16
                   then -4611686018427387904
-                  else if {mach.int.Int63.int63'int => -2305843009213693953} = _arg_12
+                  else if {mach.int.Int63.int63'int => -2305843009213693953} = $x16
                        then -2305843009213693953 else -2305843009213693952
   Line 432:
     max_int : int63 = {mach.int.Int63.int63'int => 4611686018427387903}

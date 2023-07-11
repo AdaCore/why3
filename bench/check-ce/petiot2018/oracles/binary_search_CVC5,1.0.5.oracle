@@ -65,7 +65,7 @@ Sub-goal Postcondition of goal binary_search'vc.
 Prover result is: Valid.
 
 ** binary_search-B1
-bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B1.mlw --apply-transform=split_vc --prover=CVC5,1.0.0,counterexamples --timelimit=15 --check-ce --rac-prover=CVC5,1.0.0 --sub-goal=:15@loop variant decrease --stepslimit=10000
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B1.mlw --apply-transform=split_vc --prover=CVC5,1.0.5,counterexamples --timelimit=15 --check-ce --rac-prover=CVC5,1.0.5 --sub-goal=:15@loop variant decrease --stepslimit=10000
 File "bench/check-ce/petiot2018/experiments/binary_search-B1.mlw", line 15, characters 10-23:
 Sub-goal Loop variant decrease of goal binary_search'vc.
 Prover result is: Step limit exceeded.
@@ -75,7 +75,7 @@ File binary_search-B1.mlw:
   Line 3:
     Execution of main function `binary_search` with env:
       div = fun (_arg_11:int) (_arg_21:int) -> 0
-      mod = fun (bOUND_VARIABLE_8271:int) (bOUND_VARIABLE_8281:int) -> 0
+      mod = fun (bOUND_VARIABLE_8611:int) (bOUND_VARIABLE_8621:int) -> 0
       t = {length= 2; elts= fun (x:int) -> 0}
       x = (- 1)
       zero = 0
@@ -205,7 +205,7 @@ File binary_search-B1.mlw:
   Line 3:
     Execution of main function `binary_search` with env:
       div = fun (_arg_12:int) (_arg_22:int) -> 0
-      mod = fun (bOUND_VARIABLE_7661:int) (bOUND_VARIABLE_7671:int) -> 0
+      mod = fun (bOUND_VARIABLE_8001:int) (bOUND_VARIABLE_8011:int) -> 0
       t = {length= 2; elts= fun (x:int) -> 0}
       x = 0
       zero = 0
@@ -315,7 +315,7 @@ File binary_search-B1.mlw:
       t = {length= 2; elts= fun (x:int) -> 0}
 
 ** binary_search-B2
-bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B2.mlw --apply-transform=split_vc --prover=CVC5,1.0.0,counterexamples --timelimit=15 --check-ce --rac-prover=CVC5,1.0.0 --sub-goal=:15@loop variant decrease --stepslimit=10000
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B2.mlw --apply-transform=split_vc --prover=CVC5,1.0.5,counterexamples --timelimit=15 --check-ce --rac-prover=CVC5,1.0.5 --sub-goal=:15@loop variant decrease --stepslimit=10000
 File "bench/check-ce/petiot2018/experiments/binary_search-B2.mlw", line 15, characters 14-21:
 Sub-goal Loop variant decrease of goal binary_search'vc.
 Prover result is: Valid.
@@ -329,7 +329,7 @@ File binary_search-B2.mlw:
   Line 3:
     Execution of main function `binary_search` with env:
       div = fun (_arg_12:int) (_arg_22:int) -> 0
-      mod = fun (bOUND_VARIABLE_7771:int) (bOUND_VARIABLE_7781:int) -> 0
+      mod = fun (bOUND_VARIABLE_8111:int) (bOUND_VARIABLE_8121:int) -> 0
       t = {length= 2; elts= fun (x:int) -> 0}
       x = 0
       zero = 0
@@ -500,7 +500,7 @@ File binary_search-B2.mlw:
       l = {contents= 0}
 
 ** binary_search-B3
-bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B3.mlw --apply-transform=split_vc --prover=CVC5,1.0.0,counterexamples --timelimit=15 --check-ce --rac-prover=CVC5,1.0.0 --sub-goal=:14@loop invariant preservation --stepslimit=10000
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B3.mlw --apply-transform=split_vc --prover=CVC5,1.0.5,counterexamples --timelimit=15 --check-ce --rac-prover=CVC5,1.0.5 --sub-goal=:14@loop invariant preservation --stepslimit=10000
 File "bench/check-ce/petiot2018/experiments/binary_search-B3.mlw", line 14, characters 50-58:
 Sub-goal Loop invariant preservation of goal binary_search'vc.
 Prover result is: Step limit exceeded.
@@ -510,7 +510,7 @@ File binary_search-B3.mlw:
   Line 3:
     Execution of main function `binary_search` with env:
       div = fun (_arg_11:int) (_arg_21:int) -> 1
-      mod = fun (bOUND_VARIABLE_8961:int) (bOUND_VARIABLE_8971:int) -> 0
+      mod = fun (bOUND_VARIABLE_9301:int) (bOUND_VARIABLE_9311:int) -> 0
       t = {length= 3; elts= fun (x:int) -> if x = 1 then 1 else 0}
       x = 0
       zero = 0
@@ -635,7 +635,7 @@ Sub-goal Loop invariant preservation of goal binary_search'vc.
 Prover result is: Valid.
 
 ** binary_search-B4
-bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B4.mlw --apply-transform=split_vc --prover=CVC5,1.0.0,counterexamples --timelimit=15 --check-ce --rac-prover=CVC5,1.0.0 --sub-goal=:8@postcondition --stepslimit=10000
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B4.mlw --apply-transform=split_vc --prover=CVC5,1.0.5,counterexamples --timelimit=15 --check-ce --rac-prover=CVC5,1.0.5 --sub-goal=:8@postcondition --stepslimit=10000
 File "bench/check-ce/petiot2018/experiments/binary_search-B4.mlw", line 8, characters 50-58:
 Sub-goal Postcondition of goal binary_search'vc.
 Prover result is: Unknown (unknown + incomplete).
