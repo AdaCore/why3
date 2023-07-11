@@ -1,0 +1,328 @@
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `set` cannot be evaluated)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 45, characters 14-54)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 45, characters 14-54)
+File "bench/check-ce/maps_mono.mlw", line 45, characters 14-54:
+Sub-goal Postcondition of goal test_map'vc.
+Prover result is: Unknown or time/memory/step limit.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File maps_mono.mlw:
+  Line 44:
+    x = {contents= [|0 -> 3; 1 -> 3; _ -> 0|]}
+    x = {contents= [|0 -> 3; 1 -> 3; _ -> 0|]}
+    Execution of main function `test_map` with env:
+      x = {contents= [|0 -> 3; 1 -> 3; _ -> 0|]}
+      zero = 0
+      one = 1
+  Line 47:
+    Normal execution of function `(!)` with args:
+      r = {contents= [|0 -> 3; 1 -> 3; _ -> 0|]}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= [|0 -> 3; 1 -> 3; _ -> 0|]}
+File maps_mono.mlw:
+  Line 47:
+    Normal execution of function `set` with args:
+      f = [|0 -> 3; 1 -> 3; _ -> 0|]
+      x = 0
+      v = 3
+    Normal execution of function `(:=)` with args:
+      r = {contents= [|0 -> 3; 1 -> 3; _ -> 0|]}
+      v = (fun y -> if pure { if y = x then True else False } then v
+             else f y) with f = [|0 -> 3; 1 -> 3; _ -> 0|], x = 0, v = 3
+  Line 45:
+    Property failure at postcondition of `test_map` with:
+      x = {contents=
+           (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = [|0 -> 3; 1 -> 3; _ -> 0|], x = 0, v = 3}
+
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 51, characters 14-88)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `set1` cannot be evaluated)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 51, characters 14-88)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 51, characters 14-88)
+File "bench/check-ce/maps_mono.mlw", line 51, characters 14-88:
+Sub-goal Postcondition of goal test_map_multidim1'vc.
+Prover result is: Unknown or time/memory/step limit.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File maps_mono.mlw:
+  Line 50:
+    x = {contents= [|0 -> [|0 -> 0; _ -> 1|]; _ -> [|; _ -> 0|]|]}
+    x = {contents= [|0 -> [|0 -> 0; _ -> 1|]; _ -> [|; _ -> 0|]|]}
+    Execution of main function `test_map_multidim1` with env:
+      x = {contents= [|0 -> [|0 -> 0; _ -> 1|]; _ -> [|; _ -> 0|]|]}
+      zero = 0
+      one = 1
+  Line 53:
+    Normal execution of function `(!)` with args:
+      r = {contents= [|0 -> [|0 -> 0; _ -> 1|]; _ -> [|; _ -> 0|]|]}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= [|0 -> [|0 -> 0; _ -> 1|]; _ -> [|; _ -> 0|]|]}
+File maps_mono.mlw:
+  Line 53:
+    Normal execution of function `get` with args:
+      f = [|0 -> [|0 -> 0; _ -> 1|]; _ -> [|; _ -> 0|]|]
+      x = 1
+  Line 29:
+    Normal execution of function `(@)` with args:
+      u = [|0 -> [|0 -> 0; _ -> 1|]; _ -> [|; _ -> 0|]|]
+      u = 1
+  Line 53:
+    Normal execution of function `(!)` with args:
+      r = {contents= [|0 -> [|0 -> 0; _ -> 1|]; _ -> [|; _ -> 0|]|]}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= [|0 -> [|0 -> 0; _ -> 1|]; _ -> [|; _ -> 0|]|]}
+File maps_mono.mlw:
+  Line 53:
+    Normal execution of function `set` with args:
+      f = [|0 -> [|0 -> 0; _ -> 1|]; _ -> [|; _ -> 0|]|]
+      x = 0
+      v = [|; _ -> 0|]
+    Normal execution of function `(:=)` with args:
+      r = {contents= [|0 -> [|0 -> 0; _ -> 1|]; _ -> [|; _ -> 0|]|]}
+      v = (fun y1 -> if pure { if y1 = x1 then True else False } then v1
+             else f1 y1) with f1 = [|0 -> [|0 -> 0; _ -> 1|]; _ -> [|; _ -> 0|]|], x1 = 0, v1 = [|; _ -> 0|]
+  Line 51:
+    Property failure at postcondition of `test_map_multidim1` with:
+      x = {contents=
+           (fun y1 -> if pure { if y1 = x1 then True else False } then v1
+              else f1 y1) with f1 = [|0 -> [|0 -> 0; _ -> 1|]; _ -> [|; _ -> 0|]|], x1 = 0, v1 = [|; _ -> 0|]}
+
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `set` cannot be evaluated)
+- Selected model 1: NC_SW
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `(:=)` cannot be evaluated)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 56, characters 14-88)
+File "bench/check-ce/maps_mono.mlw", line 56, characters 14-88:
+Sub-goal Postcondition of goal test_map_multidim2'vc.
+Prover result is: Unknown or time/memory/step limit.
+The program does not comply to the verification goal, or the contracts of
+  some loop or function are too weak, for example during the following
+  execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File maps_mono.mlw:
+  Line 55:
+    x = {contents=
+         [|0 -> [|0 -> 3; _ -> 1|];
+         1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]}
+    x = {contents=
+         [|0 -> [|0 -> 3; _ -> 1|];
+         1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]}
+    Execution of main function `test_map_multidim2` with env:
+      x = {contents=
+           [|0 -> [|0 -> 3; _ -> 1|];
+           1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]}
+      zero = 0
+      one = 1
+  Line 58:
+    Giant-step execution of function `(!)` with args:
+      r = {contents=
+           [|0 -> [|0 -> 3; _ -> 1|];
+           1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]}
+    result of `(!)` = [|0 -> [|0 -> 3; _ -> 1|];
+                      1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]
+    Giant-step execution of function `get` with args:
+      f = [|0 -> [|0 -> 3; _ -> 1|];
+          1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]
+      x = 0
+    result of `get` = [|0 -> 3; _ -> 1|]
+  Line 59:
+    Giant-step execution of function `set` with args:
+      f = [|0 -> 3; _ -> 1|]
+      x = 0
+      v = 3
+    result of `set` = [|0 -> 3; _ -> 1|]
+  Line 60:
+    Giant-step execution of function `(!)` with args:
+      r = {contents=
+           [|0 -> [|0 -> 3; _ -> 1|];
+           1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]}
+    result of `(!)` = [|0 -> [|0 -> 3; _ -> 1|];
+                      1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]
+    Giant-step execution of function `set` with args:
+      f = [|0 -> [|0 -> 3; _ -> 1|];
+          1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]
+      x = 0
+      v = [|0 -> 3; _ -> 1|]
+    result of `set1` = [|0 -> [|0 -> 3; _ -> 1|];
+                       1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]
+    Giant-step execution of function `(:=)` with args:
+      r = {contents=
+           [|0 -> [|0 -> 3; _ -> 1|];
+           1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]}
+      v = [|0 -> [|0 -> 3; _ -> 1|];
+          1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]
+    x = {contents=
+         [|0 -> [|0 -> 3; _ -> 1|];
+         1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]}
+    result of `(:=)` = ()
+  Line 56:
+    Property failure at postcondition of `test_map_multidim2` with:
+      x = {contents=
+           [|0 -> [|0 -> 3; _ -> 1|];
+           1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]}
+
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `set` cannot be evaluated)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 63, characters 14-54)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 63, characters 14-54)
+File "bench/check-ce/maps_mono.mlw", line 63, characters 14-54:
+Sub-goal Postcondition of goal proj_map_test1'vc.
+Prover result is: Unknown or time/memory/step limit.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File maps_mono.mlw:
+  Line 62:
+    x = {contents= [|0 -> 3; 1 -> 3; _ -> 0|]}
+    x = {contents= [|0 -> 3; 1 -> 3; _ -> 0|]}
+    Execution of main function `proj_map_test1` with env:
+      x = {contents= [|0 -> 3; 1 -> 3; _ -> 0|]}
+      zero = 0
+      one = 1
+  Line 65:
+    Normal execution of function `(!)` with args:
+      r = {contents= [|0 -> 3; 1 -> 3; _ -> 0|]}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= [|0 -> 3; 1 -> 3; _ -> 0|]}
+File maps_mono.mlw:
+  Line 65:
+    Normal execution of function `set` with args:
+      f = [|0 -> 3; 1 -> 3; _ -> 0|]
+      x = 0
+      v = 3
+    Normal execution of function `(:=)` with args:
+      r = {contents= [|0 -> 3; 1 -> 3; _ -> 0|]}
+      v = (fun y -> if pure { if y = x then True else False } then v
+             else f y) with f = [|0 -> 3; 1 -> 3; _ -> 0|], x = 0, v = 3
+  Line 63:
+    Property failure at postcondition of `proj_map_test1` with:
+      x = {contents=
+           (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = [|0 -> 3; 1 -> 3; _ -> 0|], x = 0, v = 3}
+
+<check-ce-categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 68, characters 14-56)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 68, characters 14-56)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 68, characters 14-56)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 68, characters 14-56)
+File "bench/check-ce/maps_mono.mlw", line 68, characters 14-56:
+Sub-goal Postcondition of goal proj_map_test2'vc.
+Prover result is: Unknown or time/memory/step limit.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File maps_mono.mlw:
+  Line 67:
+    x = {contents= [|0 -> true; 1 -> true; _ -> false|]}
+    x = {contents= [|0 -> true; 1 -> true; _ -> false|]}
+    Execution of main function `proj_map_test2` with env:
+      x = {contents= [|0 -> true; 1 -> true; _ -> false|]}
+      zero = 0
+      one = 1
+  Line 70:
+    Normal execution of function `True` with args:
+    Normal execution of function `(!)` with args:
+      r = {contents= [|0 -> true; 1 -> true; _ -> false|]}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= [|0 -> true; 1 -> true; _ -> false|]}
+File maps_mono.mlw:
+  Line 70:
+    Normal execution of function `set` with args:
+      f = [|0 -> true; 1 -> true; _ -> false|]
+      x = 0
+      v = true
+    Normal execution of function `(:=)` with args:
+      r = {contents= [|0 -> true; 1 -> true; _ -> false|]}
+      v = (fun y2 -> if pure { if y2 = x2 then True else False } then v2
+             else f2 y2) with f2 = [|0 -> true; 1 -> true; _ -> false|], x2 = 0, v2 = true
+  Line 68:
+    Property failure at postcondition of `proj_map_test2` with:
+      x = {contents=
+           (fun y2 -> if pure { if y2 = x2 then True else False } then v2
+              else f2 y2) with f2 = [|0 -> true; 1 -> true; _ -> false|], x2 = 0, v2 = true}
+
+<check-ce-categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 79, characters 3-31)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 79, characters 3-31)
+File "bench/check-ce/maps_mono.mlw", line 79, characters 3-31:
+Goal t1.
+Prover result is: Unknown or time/memory/step limit.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File maps_mono.mlw:
+  Line 78:
+    t = [|0 -> 43; _ -> 0|]
+    i = 0
+    t = [|0 -> 43; _ -> 0|]
+    i = 0
+    Execution of main function `t1'goal` with env:
+      i = 0
+      t = [|0 -> 43; _ -> 0|]
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File maps_mono.mlw:
+  Line 79:
+    Property failure at postcondition of `t1'goal1` with:
+      i = 0
+      t = [|0 -> 43; _ -> 0|]
+
