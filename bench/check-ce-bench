@@ -256,8 +256,8 @@ for file in $files; do
     esac
     run CVC4,1.8    $filedir $filebase true  $cvc4steps
     run CVC4,1.8    $filedir $filebase false $cvc4steps
-    run CVC5,1.0.0  $filedir $filebase true  $cvc5steps
-    run CVC5,1.0.0  $filedir $filebase false $cvc5steps
+    run CVC5,1.0.5  $filedir $filebase true  $cvc5steps
+    run CVC5,1.0.5  $filedir $filebase false $cvc5steps
     run Z3,4.8.10   $filedir $filebase true  $z3steps
     run Z3,4.8.10   $filedir $filebase false $z3steps
   fi
@@ -282,7 +282,7 @@ if [ $? = 1 ]; then failed="${failed}Petiot experiments with $1.\n"; fi
 
 petiot Z3,4.8.10  500000
 petiot CVC4,1.8 10000
-petiot CVC5,1.0.0 10000
+petiot CVC5,1.0.5 10000
 
 end=$(date +%s)
 

@@ -3,63 +3,63 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC5" version="1.0.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="flexible_arrays.mlw"/>
 <theory name="BraunTrees" proved="true">
  <goal name="get_tree&#39;vc" expl="VC for get_tree" proved="true">
- <proof prover="0"><result status="valid" time="0.06" steps="55396"/></proof>
+ <proof prover="0"><result status="valid" time="0.060000" steps="55396"/></proof>
  </goal>
  <goal name="set_tree&#39;vc" expl="VC for set_tree" proved="true">
- <proof prover="3"><result status="valid" time="0.24" steps="34871"/></proof>
+ <proof prover="1"><result status="valid" time="0.113017" steps="34871"/></proof>
  </goal>
  <goal name="make_tree2&#39;vc" expl="VC for make_tree2" proved="true">
- <proof prover="3"><result status="valid" time="0.28" steps="26378"/></proof>
+ <proof prover="1"><result status="valid" time="0.085769" steps="26378"/></proof>
  </goal>
  <goal name="make_tree&#39;vc" expl="VC for make_tree" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="57472"/></proof>
+ <proof prover="0"><result status="valid" time="0.030000" steps="57472"/></proof>
  </goal>
  <goal name="cons_tree&#39;vc" expl="VC for cons_tree" proved="true">
- <proof prover="2"><result status="valid" time="0.15" steps="1832"/></proof>
+ <proof prover="2"><result status="valid" time="0.150000" steps="1832"/></proof>
  </goal>
  <goal name="tail_tree&#39;vc" expl="VC for tail_tree" proved="true">
- <proof prover="3"><result status="valid" time="1.38" steps="96535"/></proof>
+ <proof prover="1"><result status="valid" time="0.483502" steps="96535"/></proof>
  </goal>
  <goal name="snoc_tree&#39;vc" expl="VC for snoc_tree" proved="true">
- <proof prover="3"><result status="valid" time="0.22" steps="32742"/></proof>
+ <proof prover="1"><result status="valid" time="0.220000" steps="32742"/></proof>
  </goal>
  <goal name="liat_tree&#39;vc" expl="VC for liat_tree" proved="true">
- <proof prover="3"><result status="valid" time="0.53" steps="59293"/></proof>
+ <proof prover="1"><result status="valid" time="0.201565" steps="59293"/></proof>
  </goal>
 </theory>
 <theory name="FlexibleArrays" proved="true">
  <goal name="t&#39;vc" expl="VC for t" proved="true">
- <proof prover="3"><result status="valid" time="0.05" steps="8141"/></proof>
+ <proof prover="1"><result status="valid" time="0.050000" steps="8141"/></proof>
  </goal>
  <goal name="empty&#39;vc" expl="VC for empty" proved="true">
- <proof prover="3"><result status="valid" time="0.06" steps="8024"/></proof>
+ <proof prover="1"><result status="valid" time="0.060000" steps="8024"/></proof>
  </goal>
  <goal name="get&#39;vc" expl="VC for get" proved="true">
- <proof prover="0"><result status="valid" time="0.05" steps="52640"/></proof>
+ <proof prover="0"><result status="valid" time="0.050000" steps="52640"/></proof>
  </goal>
  <goal name="set&#39;vc" expl="VC for set" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="67685"/></proof>
+ <proof prover="0"><result status="valid" time="0.030000" steps="67685"/></proof>
  </goal>
  <goal name="make_tree&#39;vc" expl="VC for make_tree" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="56025"/></proof>
+ <proof prover="0"><result status="valid" time="0.030000" steps="56025"/></proof>
  </goal>
  <goal name="cons&#39;vc" expl="VC for cons" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="67251"/></proof>
+ <proof prover="0"><result status="valid" time="0.030000" steps="67251"/></proof>
  </goal>
  <goal name="tail&#39;vc" expl="VC for tail" proved="true">
- <proof prover="0"><result status="valid" time="0.05" steps="67001"/></proof>
+ <proof prover="0"><result status="valid" time="0.050000" steps="67001"/></proof>
  </goal>
  <goal name="snoc&#39;vc" expl="VC for snoc" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="67520"/></proof>
+ <proof prover="0"><result status="valid" time="0.040000" steps="67520"/></proof>
  </goal>
  <goal name="liat&#39;vc" expl="VC for liat" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="67025"/></proof>
+ <proof prover="0"><result status="valid" time="0.030000" steps="67025"/></proof>
  </goal>
 </theory>
 </file>

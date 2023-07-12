@@ -4,17 +4,17 @@
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.4.1" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC5" version="1.0.5" alternative="strings+counterexamples" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.12.1" alternative="counterexamples" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="8" name="CVC5" version="1.0.4" alternative="counterexamples" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="9" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="10" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="11" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="12" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="13" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="14" name="CVC4" version="1.8" alternative="counterexamples" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="15" name="CVC5" version="1.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="16" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="17" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml">
@@ -168,7 +168,7 @@
   <proof prover="10"><result status="valid" time="0.030000" steps="178"/></proof>
   </goal>
   <goal name="test&#39;vc.5" expl="assertion" proved="true">
-  <proof prover="15"><result status="valid" time="0.300000" steps="147815"/></proof>
+  <proof prover="2"><result status="valid" time="0.071822" steps="147200"/></proof>
   </goal>
   <goal name="test&#39;vc.6" expl="assertion" proved="true">
   <proof prover="9"><result status="valid" time="0.160000" steps="37136"/></proof>
@@ -223,8 +223,8 @@
 </theory>
 <theory name="Literals">
  <goal name="wrong">
+ <proof prover="4"><result status="unknown" time="0.080000" steps="16672"/></proof>
  <proof prover="7"><result status="unknown" time="0.010000" steps="2576"/></proof>
- <proof prover="8"><result status="unknown" time="0.080000" steps="16672"/></proof>
  <proof prover="11"><result status="timeout" time="1.000000"/></proof>
  <proof prover="14"><result status="unknown" time="0.060000" steps="9071"/></proof>
  </goal>
