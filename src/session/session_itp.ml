@@ -1616,19 +1616,19 @@ let add_registered_transformation s env old_tr goal_id =
     in
     graft_transf s goal_id old_tr.transf_name old_tr.transf_args subgoals
 
-let rec merge_goal env new_s old_s ~goal_obsolete old_goal new_goal_id =
+let rec merge_goal ~use_shapes env new_s old_s ~goal_obsolete old_goal new_goal_id =
   Hprover.iter (fun k pa ->
                 let pa = get_proof_attempt_node old_s pa in
                 merge_proof new_s ~goal_obsolete new_goal_id k pa)
                old_goal.proofn_attempts;
   List.iter
-    (merge_trans env old_s new_s new_goal_id)
+    (merge_trans ~use_shapes env old_s new_s new_goal_id)
     old_goal.proofn_transformations;
   let new_goal_node = get_proofNode new_s new_goal_id in
   new_goal_node.proofn_transformations <- List.rev new_goal_node.proofn_transformations;
   update_goal_node (fun _ -> ()) new_s new_goal_id
 
-and merge_trans env old_s new_s new_goal_id old_tr_id =
+and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
   let old_tr = get_transfNode old_s old_tr_id in
   let old_subtasks = List.map (fun id -> id,old_s)
       old_tr.transf_subtasks in
@@ -1651,7 +1651,7 @@ and merge_trans env old_s new_s new_goal_id old_tr_id =
     let new_subtasks = List.map (fun id -> id,new_s)
                                 new_tr.transf_subtasks in
     let associated,detached =
-      let use_shapes = old_s.shapes.has_shapes in
+      let use_shapes = use_shapes && old_s.shapes.has_shapes in
       if Termcode.is_bound_sum_shape_version old_s.shapes.shape_version then
         BoundAssoGoals.associate ~use_shapes old_subtasks new_subtasks
       else
@@ -1660,7 +1660,7 @@ and merge_trans env old_s new_s new_goal_id old_tr_id =
     List.iter
       (function
         | ((new_goal_id,_), Some ((old_goal_id,_), goal_obsolete)) ->
-           merge_goal env new_s old_s ~goal_obsolete
+           merge_goal ~use_shapes env new_s old_s ~goal_obsolete
                       (get_proofNode old_s old_goal_id) new_goal_id
         | ((id,s), None) ->
            Debug.dprintf debug "[merge_trans] missed new subgoal: %s@."
@@ -1688,7 +1688,7 @@ and merge_trans env old_s new_s new_goal_id old_tr_id =
     exit 2
 
 
-let merge_theory env old_s old_th s th : unit =
+let merge_theory ~ignore_shapes env old_s old_th s th : unit =
   let get_goal_name goal_node =
     let name = goal_node.proofn_name in
     try
@@ -1704,6 +1704,7 @@ let merge_theory env old_s old_th s th : unit =
     old_th.theory_goals;
   let new_goals = ref [] in
   (* merge goals *)
+  let use_shapes = not ignore_shapes in
   List.iter
     (fun ng_id ->
        try
@@ -1721,7 +1722,7 @@ let merge_theory env old_s old_th s th : unit =
          in
          if goal_obsolete then
            found_obsolete := true;
-         merge_goal env s old_s ~goal_obsolete old_goal ng_id
+         merge_goal ~use_shapes env s old_s ~goal_obsolete old_goal ng_id
        with
        | Not_found ->
          (* if no goal of matching name is found store it to look for
@@ -1733,14 +1734,14 @@ let merge_theory env old_s old_th s th : unit =
   let detached_goals = Hstr.fold (fun _key g tl -> (g,old_s) :: tl) old_goals_table [] in
   let associated,detached =
     if Termcode.is_bound_sum_shape_version old_s.shapes.shape_version then
-      BoundAssoGoals.associate ~use_shapes:true detached_goals !new_goals
+      BoundAssoGoals.associate ~use_shapes detached_goals !new_goals
     else
-      OldAssoGoals.associate ~use_shapes:true detached_goals !new_goals
+      OldAssoGoals.associate ~use_shapes detached_goals !new_goals
   in
   List.iter (function
       | ((new_goal_id,_), Some ((old_goal_id,_), goal_obsolete)) ->
         Debug.dprintf debug "[merge_theory] pairing paired one goal, yeah !@.";
-        merge_goal env s old_s ~goal_obsolete
+        merge_goal ~use_shapes env s old_s ~goal_obsolete
                    (get_proofNode old_s old_goal_id) new_goal_id
       | ((id,_), None) ->
          Debug.dprintf debug "[merge_theory] pairing found missed sub goal: %s@."
@@ -1770,8 +1771,8 @@ let make_theory_section ?merge ~detached (s:session) parent_name (th:Theory.theo
   List.iter2 (add_goal parent) tasks goalsID;
   begin
     match merge with
-    | Some (old_ses, old_th, env) ->
-       merge_theory env old_ses old_th s theory
+    | Some (ignore_shapes, old_ses, old_th, env) ->
+       merge_theory ~ignore_shapes env old_ses old_th s theory
     | _ -> if tasks <> [] then
              found_detached := true
                                  (* FIXME: should be found_new_goals instead of found_detached *)
@@ -1806,7 +1807,7 @@ let add_file_section (s:session) (fn:string) ~file_is_detached
 
 (* add a why file to a session and try to merge its theories with the
    provided ones with matching names *)
-let merge_file_section ~old_ses ~old_theories ~file_is_detached ~env
+let merge_file_section ~ignore_shapes ~old_ses ~old_theories ~file_is_detached ~env
     (s:session) (fn:string) (theories:Theory.theory list) format
     : unit =
   Debug.dprintf debug_merge "[Session_itp.merge_file_section] fn = %s@." fn;
@@ -1826,7 +1827,7 @@ let merge_file_section ~old_ses ~old_theories ~file_is_detached ~env
         Debug.dprintf debug_merge "[Session_itp.merge_file_section] theory found: %s@." theory_name;
         Hstr.remove old_th_table theory_name;
         make_theory_section ~detached:false
-                            ~merge:(old_ses,old_th,env) s fid th
+                            ~merge:(ignore_shapes,old_ses,old_th,env) s fid th
       with Not_found ->
         (* if no theory was found we make a new theory section *)
         Debug.dprintf debug_merge "[Session_itp.merge_file_section] theory NOT FOUND in old session: %s@." theory_name;
@@ -1862,29 +1863,29 @@ let read_file env ?format fn =
   in
   (List.map (fun (_,_,a) -> a) th), format
 
-let merge_file env (ses : session) (old_ses : session) file =
+let merge_file ~ignore_shapes env (ses : session) (old_ses : session) file =
   let format = file_format file in
   let old_theories = file_theories file in
   let file_name = Sysutil.system_dependent_absolute_path (get_dir old_ses) (file_path file) in
   Debug.dprintf debug "merging file %s@." file_name;
   try
     let new_theories, format = read_file env file_name ~format in
-    merge_file_section
+    merge_file_section ~ignore_shapes
       ses ~old_ses ~old_theories ~file_is_detached:false
       ~env file_name new_theories format;
     None
   with (Loc.Located _ as e) -> (* TODO: capture only syntax and typing errors *)
-    merge_file_section
+    merge_file_section ~ignore_shapes
       ses ~old_ses ~old_theories ~file_is_detached:true
       ~env file_name [] format;
     Some e
 
-let merge_files env (ses:session) (old_ses : session) =
+let merge_files ~ignore_shapes env (ses:session) (old_ses : session) =
   Debug.dprintf debug "merging files from old session@.";
   let errors =
     Hfile.fold
       (fun _ f acc ->
-       match merge_file env ses old_ses f with
+       match merge_file ~ignore_shapes env ses old_ses f with
        | None -> acc
        | Some e -> e :: acc)
       (get_files old_ses) []

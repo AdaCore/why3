@@ -684,7 +684,7 @@ end
     Pretty.forget_all ();
     capture_parse_or_type_errors
       (fun c ->
-        try let (_,_) = reload_files ~hard_reload c in [] with
+        try let (_,_) = reload_files ~hard_reload ~ignore_shapes:false c in [] with
         | Errors_list le -> le) cont
 
   let add_file cont ?format fname =

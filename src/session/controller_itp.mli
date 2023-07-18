@@ -122,56 +122,54 @@ val print_session : Format.formatter -> controller -> unit
 
 exception Errors_list of exn list
 
-val reload_files : ?hard_reload:bool -> controller -> bool * bool
+val reload_files : ?hard_reload:bool -> ignore_shapes:bool -> controller -> bool * bool
 (** [reload_files c] returns a pair [(o,d)]: [o] true means there are
-    obsolete goals, [d] means there are missed objects (goals,
-    transformations, theories or files) that are now detached in the
-    session returned.
+   obsolete goals, [d] means there are missed objects (goals,
+   transformations, theories or files) that are now detached in the
+   session returned.
 
   If parsing or typing errors occurs, a list of errors is raised
-  inside exception {!Errors_list}.
+   inside exception {!Errors_list}.
 
   The detailed process of reloading the files of the given session is
-  as follows.
+   as follows.
 
   - each file is parsed again and theories/goals extracted from it. If
-    some syntax error or parsing error occurs, then the corresponding
-    file is kept in the session, without any corresponding new theory,
-    that is as if it was an empty file (detached mode)
-    (those errors are returned as first component
+   some syntax error or parsing error occurs, then the corresponding
+   file is kept in the session, without any corresponding new theory,
+   that is as if it was an empty file (detached mode) (those errors
+   are returned as first component
 
   - each new theory is associated to a theory of the former session if
-    the names match exactly. In case of no match:
-    {ul {- a new theory and its goals appear without any proof attempts in
-         it in the new session}
-    {- an unmatched old theory is kept in the new session together with
-      its former goals, proof attempts and transformations, but
-      without any tasks associated to goals and subgoals.}}
+   the names match exactly. In case of no match: {ul {- a new theory
+   and its goals appear without any proof attempts in it in the new
+   session} {- an unmatched old theory is kept in the new session
+   together with its former goals, proof attempts and transformations,
+   but without any tasks associated to goals and subgoals.}}
 
   - within a new theory with a corresponding old theory, each goal is
-    in turn associated to a former goal if possible. the match is done
-    either on the goal name, or if no name match exactly, on the goal
-    shape.
-    {ul {- a new goal without match is added with an empty set of proof
-      attempts and transformations}
-    {- an old goal without match is kept with all its former proof
-      attempts and transformations, but no task is associated to it,
-      neither to its subgoals.}}
+   in turn associated to a former goal if possible. the match is done
+   either on the goal name, or if no name match exactly, on the goal
+   shape.  {ul {- a new goal without match is added with an empty set
+   of proof attempts and transformations} {- an old goal without match
+   is kept with all its former proof attempts and transformations, but
+   no task is associated to it, neither to its subgoals.}}
 
-  - on each new goal that has a matching old goal, old proof
-    attempts are attached, with the status obsolete if the task has
-    changed
+  - on each new goal that has a matching old goal, old proof attempts
+   are attached, with the status obsolete if the task has changed
 
-  - on each new goal that has a matching old goal, old
-    transformations are attached, and applied to the task, the
-    generated subgoals are in turn matched to the old sub-goals, in
-    the same manner as for goals in a theory
-    {ul {- an old sub-goals without a match is kept with all its former
-      proof attempts and transformations, but no task is associated to
-      it, neither to its subgoals.}}
+  - on each new goal that has a matching old goal, old transformations
+   are attached, and applied to the task, the generated subgoals are
+   in turn matched to the old sub-goals, in the same manner as for
+   goals in a theory {ul {- an old sub-goals without a match is kept
+   with all its former proof attempts and transformations, but no task
+   is associated to it, neither to its subgoals.}}
 
-  When the option [hard_reload] is true (false by default), libraries and
-  drivers are also reloaded.
+  When the option [hard_reload] is true (false by default), libraries
+   and drivers are also reloaded.
+
+  When the option [ignore_shapes] is true, the shapes are not taken
+   into account for merging with the old session.
 
  *)
 

@@ -197,7 +197,7 @@ val read_file :
    The second returned element is the format of the file that was read.
 *)
 
-val merge_files :
+val merge_files : ignore_shapes:bool ->
   Env.env -> session -> session -> exn list * bool * bool
 (** [merge_files env ses old_ses] merges the file sections
     of session [s] with file sections of the same name in old session
