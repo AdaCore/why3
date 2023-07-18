@@ -460,7 +460,7 @@ let get_model_element_name ~attrs =
       match splitted2 with
       | [el_name; _] -> el_name
       | [el_name] -> el_name
-      | _ -> raise Not_found
+      | _ -> assert false
     end;
   | [_] -> ""
   | _ -> assert false

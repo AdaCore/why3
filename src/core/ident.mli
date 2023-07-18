@@ -249,9 +249,10 @@ val append_to_model_element_name : attrs:Sattr.t -> to_append:string -> Sattr.t
     will be ["model_trace:*to_append@*"]. *)
 
 val get_model_element_name : attrs:Sattr.t -> string
-(** If attributes contain an attribute of the form ["model_trace:name@*"],
-    return ["name"]. Raises [Not_found] if there is no attribute of
-    the form ["model_trace:*"]. *)
+(** If attributes contain an attribute of the form
+   ["model_trace:name(@...)?"], return ["name"]. Everything after
+   ['@'] is ignored. Raises [Not_found] if there is no attribute of
+   the form ["model_trace:..."]. *)
 
 val get_model_trace_string : name:string -> attrs:Sattr.t -> string
 (** If attrs contain an attribute of the form ["model_trace:mt_string"],
