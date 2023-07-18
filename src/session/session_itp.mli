@@ -96,7 +96,6 @@ val get_task : session -> proofNodeID -> Task.task
 val get_task_name_table : session -> proofNodeID -> Task.task * Trans.naming_table
 
 val get_transformations : session -> proofNodeID -> transID list
-val get_transformation : session -> proofNodeID -> string -> string list -> transID
 
 val get_proof_attempt_ids :
   session -> proofNodeID -> proofAttemptID Whyconf.Hprover.t
@@ -127,10 +126,6 @@ val is_detached: session -> any -> bool
 (* get the parent theory/file of a proof node *)
 val get_encapsulating_theory: session -> any -> theory
 val get_encapsulating_file: session -> any -> file
-
-(* Check if a transformation already exists *)
-val check_if_already_exists:
-    session -> proofNodeID -> string -> string list -> bool
 
 (* true if the exception transformation is fatal (ie: caused by a bug in the
    code of the transformation) *)

@@ -255,7 +255,6 @@ val prepare_edition :
    [name] is the system-dependent absolute path of the file to edit,
    and [res] is the former result if any. *)
 
-exception TransAlreadyExists of string * string
 exception GoalNodeDetached of proofNodeID
 
 val schedule_transformation :
