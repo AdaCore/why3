@@ -33,11 +33,9 @@ let files = Queue.create ()
 let opt_stats = ref true
 let opt_force = ref false
 let opt_obsolete_only = ref false
+let opt_ignore_shapes = ref false
 let opt_use_steps = ref false
 let opt_merging_only = ref false
-(*
-let opt_bench = ref false
-*)
 let opt_provers = ref []
 let opt_verbose = ref true
 
@@ -70,6 +68,8 @@ let option_list =
     " replay using recorded number of proof steps (when\npossible)";
     KLong "obsolete-only", Hnd0 (fun () -> opt_obsolete_only := true),
     " replay only if session is obsolete";
+    KLong "ignore-shapes", Hnd0 (fun () -> opt_ignore_shapes := true),
+    " ignore shapes during session merging";
     KLong "merging-only", Hnd0 (fun () -> opt_merging_only := true),
     " check merging of session";
     Key ('P', "prover"),
@@ -381,7 +381,7 @@ let () =
     (* update the session *)
     let found_obs, found_detached =
       try
-        Controller_itp.reload_files cont
+        Controller_itp.reload_files ~ignore_shapes:!opt_ignore_shapes cont
       with
       | Controller_itp.Errors_list l ->
           List.iter (fun e -> Format.eprintf "%a@." Exn_printer.exn_printer e) l;

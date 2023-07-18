@@ -45,8 +45,10 @@ Tools
     nodes via filters. See manual Section 5.5.4.
     New option `create`, which generates a new session for the specified files.
     See manual Section 5.5.5.
-  - New command `why3 bench` which runs all proofs attempts nodes that have not
+  * New command `why3 bench` which runs all proofs attempts nodes that have not
     been run before. See manual Section 5.13.
+  * New option `--ignore-shapes` for `why3 replay`. It disables the use of shapes
+	when merging the session with the old one.
 
 Provers
   * support for Coq 8.17.0 (released Mar 23, 2023)

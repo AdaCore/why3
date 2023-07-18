@@ -56,7 +56,7 @@ let () =
   let session = load_session dir in
   let controller = create_controller config env session in
   let found_obs, found_detached =
-    try reload_files controller with
+    try reload_files ~ignore_shapes:true controller with
     | Errors_list l ->
       List.iter (fun e -> eprintf "%a@." Exn_printer.exn_printer e) l;
       exit 1
