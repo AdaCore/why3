@@ -787,7 +787,6 @@ let schedule_edition c id pr ~callback ~notification =
   Queue.add (callback panid,call,old_res) prover_tasks_edited;
   run_idle_handler ()
 
-exception TransAlreadyExists of string * string
 exception GoalNodeDetached of proofNodeID
 
 (*** { 2 transformations} *)
@@ -826,8 +825,6 @@ let schedule_transformation c id name args ~callback ~notification =
   in
   if Session_itp.is_detached c.controller_session (APn id) then
     raise (GoalNodeDetached id);
-  if Session_itp.check_if_already_exists c.controller_session id name args then
-    raise (TransAlreadyExists (name, List.fold_left (fun acc s -> s ^ " " ^ acc) "" args));
   S.idle ~prio:0 apply_trans;
   callback TSscheduled
 
@@ -906,11 +903,7 @@ let run_strategy_on_goal
                  S.idle ~prio:0 run_next)
                 (get_sub_tasks c.controller_session tid)
          in
-         begin match Session_itp.get_transformation c.controller_session g trname [] with
-         | tid -> callback (TSdone tid)
-         | exception Not_found ->
-             schedule_transformation c g trname [] ~callback ~notification
-         end
+         schedule_transformation c g trname [] ~callback ~notification
       | Igoto pc ->
          callback (STSgoto (g,pc));
          exec_strategy pc strat g
