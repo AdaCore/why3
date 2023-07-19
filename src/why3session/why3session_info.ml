@@ -323,6 +323,7 @@ let finalize_stats stats =
 *)
 
 let print_session_stats ses r0 r1 stats =
+  printf "= Statistics for session %s@\n@\n" (get_dir ses);
   printf "== Number of root goals ==@\n  total: %d  proved: %d@\n@\n"
     stats.nb_root_goals stats.nb_proved_root_goals;
 
@@ -360,21 +361,20 @@ let print_overall_stats stats =
     l;
   printf "@]@\n"
 
+let number_of_sessions = ref 0
 
 let run_one stats r0 r1 fname =
+  incr number_of_sessions;
   let ses = read_session fname in
   let sep = if !opt_print0 then Pp.print0 else Pp.newline in
   if !opt_print_provers then
     printf "%a@."
       (Pp.print_iter1 Sprover.iter sep print_prover)
       (get_used_provers ses);
-  if !opt_provers_stats || !opt_session_stats || !opt_hist_print then
-    begin
-      (* fill_prover_data stats session; *)
-      Hfile.iter (stats_of_file stats ses) (get_files ses);
-      r0 := stats2_of_session ~nb_proofs:0 ses !r0;
-      r1 := stats2_of_session ~nb_proofs:1 ses !r1
-    end;
+  (* fill_prover_data stats session; *)
+  Hfile.iter (stats_of_file stats ses) (get_files ses);
+  r0 := stats2_of_session ~nb_proofs:0 ses !r0;
+  r1 := stats2_of_session ~nb_proofs:1 ses !r1;
   if !opt_session_stats then
     begin
       (* finalize_stats stats; *)
@@ -445,9 +445,12 @@ let run () =
   let _,_ = Whyconf.Args.complete_initialization () in
   let stats = new_proof_stats () in
   let r0 = ref [] and r1 = ref [] in
-  iter_files (run_one stats r0 r1);
+  iter_session_files (run_one stats r0 r1);
+  printf "%d session(s) read, with a total of %d proof goals.@." !number_of_sessions
+    (stats.nb_root_goals + stats.nb_sub_goals);
   if !opt_provers_stats then print_overall_stats stats;
   if !opt_hist_print then print_hist stats
+
 
 
 let cmd =

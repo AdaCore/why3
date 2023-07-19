@@ -24,9 +24,10 @@ type cmd =
 
 
 
-(** {2 Anonymous argument} *)
-val iter_files : (string -> unit) -> unit
-val anon_fun : Arg.anon_fun
+(** {2 Anonymous argument are session files} *)
+val iter_session_files : (string -> unit) -> unit
+val add_session_file : Arg.anon_fun
+val no_session_file : unit -> bool
 
 val read_session : string -> Session_itp.session
 (** [read_session s] reads the session file [s] and returns a session structure (without

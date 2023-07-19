@@ -24,9 +24,10 @@ type cmd =
       cmd_run  : unit -> unit;
     }
 
-let files = Queue.create ()
-let iter_files f = Queue.iter f files
-let anon_fun (f:string) = Queue.add f files
+let session_files = Queue.create ()
+let iter_session_files f = Queue.iter f session_files
+let add_session_file (f:string) = Queue.add f session_files
+let no_session_file () = Queue.is_empty session_files
 
 let read_session fname =
   let q = Queue.create () in
