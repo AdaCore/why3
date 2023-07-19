@@ -391,7 +391,11 @@ let init_cont () =
      (nothing else). *)
   let is_new_session, session =
     if not Gnat_config.force && Sys.file_exists session_dir then
-      false, Session_itp.load_session session_dir
+      try false, Session_itp.load_session session_dir
+      with _ ->
+        Gnat_util.abort_with_message ~internal:false
+        (Pp.sprintf "error loading session located in %s, please delete the session and try again"
+         session_dir)
     else begin
       if not (Sys.file_exists session_dir) then Unix.mkdir session_dir 0o700;
       true, Session_itp.empty_session session_dir
