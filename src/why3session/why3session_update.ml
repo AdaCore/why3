@@ -94,7 +94,7 @@ let do_action ~config ~env ~session action =
 
 let run_update () =
   let config, env = Whyconf.Args.complete_initialization () in
-  iter_files (fun fname ->
+  iter_session_files (fun fname ->
       let session = read_session fname in
       List.iter (do_action ~config ~env ~session) !actions;
       save_session session)

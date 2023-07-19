@@ -35,7 +35,7 @@ let print_commands fmt =
            e.cmd_desc))
     cmds
 
-let usage_msg = "<command>\nExecute the given subcommand.\n"
+let usage_msg = "<command> session ...\nExecute the given subcommand on given sessions.\n"
 let extra_help = Format.asprintf "%t" print_commands
 
 let () =
@@ -54,7 +54,14 @@ let () =
   in
   Whyconf.Args.add_command cmd_name;
   let options = Whyconf.Args.all_options cmd.cmd_spec "" "" in
-  Getopt.parse_all ~i:(i + 1) options anon_fun Sys.argv;
+  Getopt.parse_all ~i:(i + 1) options add_session_file Sys.argv;
+  begin
+    if no_session_file () then
+      let extra_help =
+        Format.asprintf "Please provide at least one session as argument.@\n%s" extra_help
+      in
+      Whyconf.Args.exit_with_usage ~extra_help usage_msg;
+  end;
   try cmd.cmd_run () with
   | e when not (Debug.test_flag Debug.stack_trace) ->
     Format.eprintf "@.%a@." Exn_printer.exn_printer e;

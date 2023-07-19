@@ -451,7 +451,7 @@ let run_one fname =
 
 let run () =
   let _,_ = Whyconf.Args.complete_initialization () in
-  iter_files run_one
+  iter_session_files run_one
 
 
 let cmd =
