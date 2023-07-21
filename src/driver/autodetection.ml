@@ -515,7 +515,7 @@ let expand_partial env main (data:Prover_autodetection_data.data) provers (p:Par
           { prover = prover;
             command = c;
             command_steps = c_steps;
-            driver = data.prover_driver;
+            driver = (None, data.prover_driver);
             editor = data.prover_editor;
             in_place = data.prover_in_place;
             interactive = (match data.kind with ITP -> true | ATP -> false);
