@@ -56,7 +56,7 @@ let load_plugin dir (byte,nat) =
   let file = Filename.concat dir file in
   Dynlink.loadfile_private file
 
-let resolve_driver_name whyconf_main drivers_subdir ?extra_dir name =
+let resolve_driver_name whyconf_main drivers_subdir ~extra_dir name =
   let drivers_path = Filename.concat (Whyconf.datadir whyconf_main) drivers_subdir in
   if Filename.check_suffix name ".drv" then
     (* driver file with extension .drv are searched in the current
@@ -75,8 +75,8 @@ let resolve_driver_name whyconf_main drivers_subdir ?extra_dir name =
     let paths = [ drivers_path ] in
     Sysutil.resolve_from_paths paths (name ^ ".drv")
 
-let load_file whyconf_main ?extra_dir file =
-  let file = resolve_driver_name whyconf_main "drivers" ?extra_dir file in
+let load_file whyconf_main ~extra_dir file =
+  let file = resolve_driver_name whyconf_main "drivers" ~extra_dir file in
   let c = open_in file in
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
@@ -102,7 +102,7 @@ exception PSymExpected of lsymbol
 
 let load_driver_raw =
   let driver_tag = ref (-1) in
-  fun whyconf_main env file extra_files ->
+  fun whyconf_main env ~extra_dir file extra_files ->
   let prelude   = ref [] in
   let regexps   = ref [] in
   let exitcodes = ref [] in
@@ -146,7 +146,7 @@ let load_driver_raw =
     | Plugin files -> load_plugin (Filename.dirname file) files
     | Blacklist sl -> List.iter (fun s -> Queue.add s blacklist) sl
   in
-  let f = load_file whyconf_main file in
+  let f = load_file ~extra_dir whyconf_main file in
   List.iter add_global f.f_global;
 
   let thprelude     = ref Mid.empty in
@@ -250,7 +250,7 @@ let load_driver_raw =
   List.iter add_theory f.f_rules;
   List.iter (fun (d,l) ->
       List.iter (fun f ->
-          let c = load_file whyconf_main ~extra_dir:d f in
+          let c = load_file whyconf_main ~extra_dir:(Some d) f in
           List.iter add_global c.f_global;
           List.iter add_theory c.f_rules) l) extra_files;
   incr driver_tag;
@@ -279,7 +279,8 @@ let load_driver_raw =
 let load_driver_file_and_extras = load_driver_raw
 
 let load_driver_for_prover main env p =
-  load_driver_raw main env p.Whyconf.driver p.Whyconf.extra_drivers
+  let extra_dir, file = p.Whyconf.driver in
+  load_driver_raw main env ~extra_dir file p.Whyconf.extra_drivers
 
 
 let syntax_map drv =

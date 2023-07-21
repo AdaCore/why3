@@ -133,7 +133,7 @@ type config_prover = {
   prover  : prover;
   command : string;
   command_steps : string option;
-  driver  : string;
+  driver  : string option * string;
   in_place: bool;
   editor  : string;
   interactive : bool;
@@ -331,16 +331,19 @@ module RC_load = struct
     in
     prover
 
-  let load_prover (provers,shortcuts) section =
+  let load_prover ~config_dir (provers,shortcuts) section =
     try
       let prover = load_prover_id section in
       let info =
         match Mprover.find_opt prover provers with
         | None ->
-          { prover  = prover;
+            let driver = get_string section "driver" in
+            Debug.dprintf debug "Loading a new prover with config_dir = %a, driver = %s@."
+              (Pp.print_option Pp.print_string) config_dir driver;
+            { prover  = prover;
             command = get_string section "command";
 	    command_steps = get_stringo section "command_steps";
-            driver  = get_string section "driver";
+            driver  = (config_dir,driver);
             in_place = get_bool ~default:false section "in_place";
             editor  = get_string ~default:"" section "editor";
             interactive = get_bool ~default:false section "interactive";
@@ -348,13 +351,20 @@ module RC_load = struct
             extra_drivers = [];
           }
         | Some info ->
+            let driver =
+              match get_stringo section "driver" with
+                | None -> info.driver
+                | Some d -> (config_dir,d)
+            in
+            Debug.dprintf debug "Loading a prover extension with config_dir = %a, driver = %s@."
+              (Pp.print_option Pp.print_string) (fst driver) (snd driver);
           { prover  = prover;
             command = get_string ~default:info.command section "command";
             command_steps =
               begin match get_stringo section "command_steps" with
               | None -> info.command_steps
               | c -> c end;
-            driver  = get_string ~default:info.driver section "driver";
+            driver  = driver;
             in_place = get_bool ~default:info.in_place section "in_place";
             editor  = get_string ~default:info.editor section "editor";
             interactive = get_bool ~default:info.interactive section "interactive";
@@ -488,6 +498,7 @@ module RC_load = struct
     Filename.dirname (Sysutil.concat (Sys.getcwd ()) filename)
 
   let config_from_rc config filename rc =
+    Debug.dprintf debug "[Whyconf.config_from_rc] filename=%s@." filename;
     let dirname = get_dirname filename in
     let main =
       match get_section rc "main" with
@@ -495,7 +506,7 @@ module RC_load = struct
       | Some main -> load_main config.main dirname main
     in
     let provers = get_simple_family rc "prover" in
-    let provers,shortcuts = List.fold_left load_prover
+    let provers,shortcuts = List.fold_left (load_prover ~config_dir:None)
         (config.provers,config.prover_shortcuts) provers in
     let fam_shortcuts = get_simple_family rc "shortcut" in
     let shortcuts = List.fold_left load_shortcut shortcuts fam_shortcuts in
@@ -569,7 +580,7 @@ module RC_save = struct
     let section = prover_section prover.prover in
     let section = set_string section "command" prover.command in
     let section = set_stringo section "command_steps" prover.command_steps in
-    let section = set_string section "driver" prover.driver in
+    let section = set_string section "driver" (snd prover.driver) in
     let section = set_string section "editor" prover.editor in
     let section = set_bool section "interactive" prover.interactive in
     let section = set_bool section "in_place" prover.in_place in
@@ -693,10 +704,12 @@ let empty_config conf_file =
   }
 
 let default_config conf_file =
+  Debug.dprintf debug "[Whyconf.default_config] filename=%s@." conf_file;
   RC_load.config_from_rc (empty_config conf_file) conf_file empty_rc
 
 let read_config_aux config filename rc =
   try
+    Debug.dprintf debug "[Whyconf.read_config_aux] filename=%s@." filename;
     RC_load.config_from_rc config filename rc
   with e when not (Debug.test_flag Debug.stack_trace) ->
     let s = Format.asprintf "%a" Exn_printer.exn_printer e in
@@ -705,6 +718,7 @@ let read_config_aux config filename rc =
 let read_config conf_file =
   let filename,rc = read_config_rc conf_file in
   try
+    Debug.dprintf debug "[Whyconf.read_config] filename=%s@." filename;
     RC_load.config_from_rc (empty_config filename) filename rc
   with e when not (Debug.test_flag Debug.stack_trace) ->
     let s = Format.asprintf "%a" Exn_printer.exn_printer e in
@@ -808,7 +822,7 @@ let filter_one_prover whyconf fp =
 (** add extra config *)
 
 let add_extra_config config filename =
-  Debug.dprintf debug "reading extra configuration file %s@." filename;
+  Debug.dprintf debug "[Whyconf.add_extra_config] filename=%s@." filename;
   let dirname = RC_load.get_dirname filename in
   let rc = Rc.from_file filename in
   (* modify main *)
@@ -857,7 +871,7 @@ let add_extra_config config filename =
         provers
     ) config.provers prover_modifiers in
   let provers,shortcuts =
-    List.fold_left RC_load.load_prover
+    List.fold_left (RC_load.load_prover ~config_dir:(Some dirname))
       (provers,config.prover_shortcuts) (get_simple_family rc "prover") in
   (* modify editors *)
   let editor_modifiers = get_family rc "editor_modifiers" in
@@ -1085,6 +1099,8 @@ let init_config ?(extra_config=[]) ofile =
   (* Add the automatic provers, shortcuts, strategy, ... *)
   let config = add_builtin_provers config rc in
   (* Add extra-config *)
+  Debug.dprintf debug "@[[Whyconf.init_config] calling extra_configs on@ @[%a@]@]@."
+    (Pp.print_list Pp.semi Pp.print_string) extra_config;
   let config = List.fold_left add_extra_config config extra_config in
   config
 

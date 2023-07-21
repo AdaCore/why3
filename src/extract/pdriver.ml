@@ -49,7 +49,10 @@ type printer_args = {
 }
 
 let load_file whyconf_main file =
-  let file = Driver.resolve_driver_name whyconf_main "extraction_drivers" file in
+  let file =
+    Driver.resolve_driver_name whyconf_main "extraction_drivers"
+      ~extra_dir:None file
+  in
   let c = open_in file in
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
