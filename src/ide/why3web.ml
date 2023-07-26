@@ -106,7 +106,7 @@ let handler (addr,req) script cont fmt =
        eprintf "cont: `%s'@." cont;
        let ans = handle_script script cont in
        eprintf "answer: `%s'@." ans;
-       Wserver.http_header fmt "HTTP/1.0 200 OK";
+       Wserver.http_header fmt "";
        fprintf fmt "Access-Control-Allow-Origin: *\n";
        fprintf fmt "\n"; (* end of header *)
        pp_print_string fmt ans;
