@@ -163,7 +163,9 @@ let all_split_subp c subp =
    Gnat_objectives.clear ()
 
 let maybe_giant_step_rac ctr parent models =
-  if not Gnat_config.giant_step_rac then None else (
+  if not Gnat_config.giant_step_rac then
+    (match models with | [] -> None | ((_,a) :: _) -> Some (a, None))
+  else (
     Debug.dprintf Check_ce.debug_check_ce_categorization "Running giant-step RAC@.";
     let Controller_itp.{controller_config= cnf; controller_env= env} = ctr in
     let pm =
