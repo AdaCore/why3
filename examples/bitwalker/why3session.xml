@@ -3,9 +3,9 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Z3" version="4.11.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="2.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.1.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="12" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -190,7 +190,7 @@
   <proof prover="3"><result status="valid" time="0.100000" steps="17724"/></proof>
   </goal>
   <goal name="peek_64bit&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.473808" steps="871174"/></proof>
+  <proof prover="0"><result status="valid" time="0.650000" steps="871174"/></proof>
   </goal>
  </transf>
  </goal>
@@ -238,10 +238,10 @@
    <goal name="poke_8bit_array&#39;vc.5.0" expl="postcondition" proved="true">
    <transf name="case" proved="true" arg1="(div i 8 = o)">
     <goal name="poke_8bit_array&#39;vc.5.0.0" expl="true case (postcondition)" proved="true">
-    <proof prover="4"><result status="valid" time="0.600000" steps="906"/></proof>
+    <proof prover="1"><result status="valid" time="0.251854" steps="906"/></proof>
     </goal>
     <goal name="poke_8bit_array&#39;vc.5.0.1" expl="false case (postcondition)" proved="true">
-    <proof prover="4"><result status="valid" time="0.420000" steps="818"/></proof>
+    <proof prover="1"><result status="valid" time="0.184568" steps="818"/></proof>
     </goal>
    </transf>
    </goal>
