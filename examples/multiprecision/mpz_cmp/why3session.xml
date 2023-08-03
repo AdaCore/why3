@@ -5,9 +5,9 @@
 <prover id="0" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
-<prover id="3" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="4" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="5" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="6" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="2000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="mpz_cmp.mlw"/>
 <theory name="Zcmp" proved="true">
@@ -77,7 +77,7 @@
   <proof prover="4" timelimit="1" memlimit="1000"><result status="valid" time="0.170000" steps="393"/></proof>
   </goal>
   <goal name="wmpz_cmp&#39;vc.21" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.120000"/></proof>
+  <proof prover="6"><result status="valid" time="0.120000" steps="33999"/></proof>
   </goal>
   <goal name="wmpz_cmp&#39;vc.22" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.820000" steps="887"/></proof>
@@ -217,7 +217,7 @@
   <proof prover="4"><result status="valid" time="0.030000" steps="61"/></proof>
   </goal>
   <goal name="wmpz_cmp_si&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000"/></proof>
+  <proof prover="6"><result status="valid" time="0.060000" steps="9298"/></proof>
   </goal>
   <goal name="wmpz_cmp_si&#39;vc.14" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.100000" steps="62"/></proof>
@@ -250,7 +250,7 @@
   <proof prover="4"><result status="valid" time="0.100000" steps="250"/></proof>
   </goal>
   <goal name="wmpz_cmp_si&#39;vc.24" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000"/></proof>
+  <proof prover="6"><result status="valid" time="0.060000" steps="25762"/></proof>
   </goal>
   <goal name="wmpz_cmp_si&#39;vc.25" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.770000" steps="670"/></proof>

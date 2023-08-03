@@ -3,7 +3,6 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Eprover" version="1.9.1-001" timelimit="5" steplimit="0" memlimit="2000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
@@ -14,6 +13,7 @@
 <prover id="9" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="10" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="11" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="12" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="add_1.mlw"/>
 <theory name="Add_1" proved="true">
@@ -54,7 +54,7 @@
   <goal name="wmpn_add_1&#39;vc.10" expl="precondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="wmpn_add_1&#39;vc.10.0" expl="VC for wmpn_add_1" proved="true">
-   <proof prover="1" memlimit="2000"><result status="valid" time="0.050000"/></proof>
+   <proof prover="12" memlimit="2000"><result status="valid" time="0.050000" steps="18880"/></proof>
    </goal>
    <goal name="wmpn_add_1&#39;vc.10.1" expl="VC for wmpn_add_1" proved="true">
    <transf name="introduce_premises" proved="true" >
@@ -114,7 +114,7 @@
   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="2.240000" steps="491"/></proof>
   </goal>
   <goal name="wmpn_add_1&#39;vc.27" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.060000"/></proof>
+  <proof prover="12"><result status="valid" time="0.060000" steps="9396"/></proof>
   </goal>
   <goal name="wmpn_add_1&#39;vc.28" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.040000" steps="15878"/></proof>
