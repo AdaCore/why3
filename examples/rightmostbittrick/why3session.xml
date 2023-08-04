@@ -3,8 +3,8 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Z3" version="4.12.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="rightmostbittrick.mlw"/>
 <theory name="Rmbt" proved="true">
@@ -45,16 +45,16 @@
   <proof prover="0"><result status="valid" time="0.020000" steps="10515"/></proof>
   </goal>
   <goal name="rightmost_bit_trick&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.030000" steps="7113"/></proof>
+  <proof prover="1"><result status="valid" time="0.030000" steps="8153"/></proof>
   </goal>
   <goal name="rightmost_bit_trick&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.290000" steps="87549"/></proof>
+  <proof prover="1"><result status="valid" time="0.290000" steps="149187"/></proof>
   </goal>
   <goal name="rightmost_bit_trick&#39;vc.6" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.470000" steps="234959"/></proof>
   </goal>
   <goal name="rightmost_bit_trick&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.090000" steps="26654"/></proof>
+  <proof prover="1"><result status="valid" time="0.230851" steps="81613"/></proof>
   </goal>
  </transf>
  </goal>

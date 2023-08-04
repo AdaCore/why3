@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
-<prover id="2" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.7.1" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="4" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
@@ -1077,7 +1077,7 @@
    <goal name="wmpn_submul_1&#39;vc.38.0" expl="assertion" proved="true">
    <transf name="reflection_f" proved="true" arg1="mp_decision">
     <goal name="wmpn_submul_1&#39;vc.38.0.0" expl="assertion" proved="true">
-    <proof prover="6"><result status="valid" time="0.970567"/></proof>
+    <proof prover="6"><result status="valid" time="0.740000"/></proof>
     </goal>
     <goal name="wmpn_submul_1&#39;vc.38.0.1" proved="true">
     <proof prover="4"><result status="valid" time="0.320000" steps="69536"/></proof>
@@ -1715,10 +1715,10 @@
    <goal name="wmpn_mul_basecase&#39;vc.107.0" expl="assertion" proved="true">
    <transf name="replace" proved="true" arg1="rp1.offset" arg2="rp.offset">
     <goal name="wmpn_mul_basecase&#39;vc.107.0.0" expl="assertion" proved="true">
-    <proof prover="2"><result status="valid" time="0.160000" steps="34124"/></proof>
+    <proof prover="0"><result status="valid" time="0.160000" steps="36754"/></proof>
     </goal>
     <goal name="wmpn_mul_basecase&#39;vc.107.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="2"><result status="valid" time="0.060000" steps="17949"/></proof>
+    <proof prover="0"><result status="valid" time="0.060000" steps="9834"/></proof>
     </goal>
    </transf>
    </goal>

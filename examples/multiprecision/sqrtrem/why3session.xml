@@ -7,8 +7,8 @@
 <prover id="2" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="4" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.6" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="7" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="sqrtrem.mlw"/>
@@ -19,31 +19,31 @@
  <goal name="wmpn_sqrtrem2&#39;vc" expl="VC for wmpn_sqrtrem2" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="wmpn_sqrtrem2&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.100000" steps="21860"/></proof>
+  <proof prover="7"><result status="valid" time="0.100000" steps="17597"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.080000" steps="21860"/></proof>
+  <proof prover="7"><result status="valid" time="0.100000" steps="17612"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.100000" steps="21860"/></proof>
+  <proof prover="7"><result status="valid" time="0.080000" steps="17612"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.040000" steps="17524"/></proof>
+  <proof prover="7"><result status="valid" time="0.040000" steps="9328"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.150000" steps="22247"/></proof>
+  <proof prover="7"><result status="valid" time="0.150000" steps="17952"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.100000" steps="17169"/></proof>
+  <proof prover="7"><result status="valid" time="0.100000" steps="9050"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.090000" steps="23319"/></proof>
+  <proof prover="7"><result status="valid" time="0.090000" steps="18553"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.7" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.060000" steps="22508"/></proof>
+  <proof prover="7"><result status="valid" time="0.060000" steps="17931"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.8" expl="division by zero" proved="true">
-  <proof prover="5"><result status="valid" time="0.100000" steps="17475"/></proof>
+  <proof prover="7"><result status="valid" time="0.100000" steps="9351"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.9" expl="integer overflow" proved="true">
   <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.030000" steps="61"/></proof>
@@ -54,7 +54,7 @@
   <goal name="wmpn_sqrtrem2&#39;vc.11" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_sqrtrem2&#39;vc.11.0" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.040000" steps="18298"/></proof>
+   <proof prover="7"><result status="valid" time="0.040000" steps="11176"/></proof>
    </goal>
   </transf>
   </goal>
@@ -64,10 +64,10 @@
   <goal name="wmpn_sqrtrem2&#39;vc.13" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_sqrtrem2&#39;vc.13.0" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.080000" steps="18326"/></proof>
+   <proof prover="7"><result status="valid" time="0.080000" steps="11212"/></proof>
    </goal>
    <goal name="wmpn_sqrtrem2&#39;vc.13.1" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.160000" steps="23949"/></proof>
+   <proof prover="7"><result status="valid" time="0.160000" steps="21433"/></proof>
    </goal>
    <goal name="wmpn_sqrtrem2&#39;vc.13.2" expl="assertion" proved="true">
    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.020000" steps="64"/></proof>
@@ -81,7 +81,7 @@
   </transf>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.14" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.130000" steps="24175"/></proof>
+  <proof prover="7"><result status="valid" time="0.130000" steps="20576"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.15" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -135,7 +135,7 @@
   </transf>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.18" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.070000" steps="24270"/></proof>
+  <proof prover="7"><result status="valid" time="0.070000" steps="23239"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.19" expl="precondition" proved="true">
   <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.120000" steps="79"/></proof>
@@ -147,12 +147,12 @@
   <proof prover="3"><result status="valid" time="0.180000" steps="80"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.22" expl="division by zero" proved="true">
-  <proof prover="5"><result status="valid" time="0.110000" steps="24231"/></proof>
+  <proof prover="7"><result status="valid" time="0.110000" steps="22636"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.23" expl="integer overflow" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_sqrtrem2&#39;vc.23.0" expl="integer overflow" proved="true">
-   <proof prover="5"><result status="valid" time="0.050000" steps="24613"/></proof>
+   <proof prover="7"><result status="valid" time="0.175676" steps="22964"/></proof>
    </goal>
   </transf>
   </goal>
@@ -289,7 +289,7 @@
   <goal name="wmpn_sqrtrem2&#39;vc.34" expl="integer overflow" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_sqrtrem2&#39;vc.34.0" expl="integer overflow" proved="true">
-   <proof prover="5"><result status="valid" time="0.160000" steps="25251"/></proof>
+   <proof prover="7"><result status="valid" time="0.160000" steps="23558"/></proof>
    </goal>
   </transf>
   </goal>
@@ -297,13 +297,13 @@
   <proof prover="3"><result status="valid" time="0.070000" steps="95"/></proof>
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_sqrtrem2&#39;vc.35.0" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.040000" steps="18027"/></proof>
+   <proof prover="7"><result status="valid" time="0.040000" steps="10943"/></proof>
    </goal>
    <goal name="wmpn_sqrtrem2&#39;vc.35.1" expl="VC for wmpn_sqrtrem2" proved="true">
    <proof prover="3"><result status="valid" time="0.070000" steps="95"/></proof>
    </goal>
    <goal name="wmpn_sqrtrem2&#39;vc.35.2" expl="VC for wmpn_sqrtrem2" proved="true">
-   <proof prover="5"><result status="valid" time="0.070000" steps="18052"/></proof>
+   <proof prover="7"><result status="valid" time="0.070000" steps="10962"/></proof>
    </goal>
    <goal name="wmpn_sqrtrem2&#39;vc.35.3" expl="VC for wmpn_sqrtrem2" proved="true">
    <proof prover="6"><result status="valid" time="0.070000" steps="16116"/></proof>
@@ -355,19 +355,19 @@
   </transf>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.38" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.140000" steps="33421"/></proof>
+  <proof prover="7"><result status="valid" time="0.140000" steps="36570"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.39" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.180000" steps="25562"/></proof>
+  <proof prover="7"><result status="valid" time="0.180000" steps="24080"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.40" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.160000" steps="25860"/></proof>
+  <proof prover="7"><result status="valid" time="0.160000" steps="24708"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.41" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.140000" steps="20010"/></proof>
+  <proof prover="7"><result status="valid" time="0.140000" steps="15554"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.42" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.200000" steps="26247"/></proof>
+  <proof prover="7"><result status="valid" time="0.200000" steps="17625"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.43" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -383,13 +383,13 @@
   <proof prover="4" timelimit="1"><result status="valid" time="1.060000" steps="827076"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.45" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.180000" steps="38628"/></proof>
+  <proof prover="7"><result status="valid" time="0.365734" steps="45086"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.46" expl="integer overflow" proved="true">
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.190000" steps="25482"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.47" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.200000" steps="35425"/></proof>
+  <proof prover="7"><result status="valid" time="0.200000" steps="39072"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.48" expl="precondition" proved="true">
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.220000" steps="38848"/></proof>
@@ -428,10 +428,10 @@
   </transf>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.52" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.100000" steps="27553"/></proof>
+  <proof prover="7"><result status="valid" time="0.100000" steps="19171"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.53" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.250000" steps="36299"/></proof>
+  <proof prover="7"><result status="valid" time="0.250000" steps="39554"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.54" expl="integer overflow" proved="true">
   <proof prover="6"><result status="valid" time="0.600000" steps="71726"/></proof>
@@ -439,23 +439,23 @@
   <goal name="wmpn_sqrtrem2&#39;vc.55" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_sqrtrem2&#39;vc.55.0" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.100000" steps="18498"/></proof>
+   <proof prover="7"><result status="valid" time="0.100000" steps="11362"/></proof>
    </goal>
    <goal name="wmpn_sqrtrem2&#39;vc.55.1" expl="VC for wmpn_sqrtrem2" proved="true">
    <transf name="apply" proved="true" arg1="prod_compat_strict_lr">
     <goal name="wmpn_sqrtrem2&#39;vc.55.1.0" expl="apply premises" proved="true">
-    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.120000" steps="25404"/></proof>
+    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.110000" steps="25404"/></proof>
     </goal>
     <goal name="wmpn_sqrtrem2&#39;vc.55.1.1" expl="apply premises" proved="true">
-    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.110000" steps="25404"/></proof>
+    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.120000" steps="25404"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="wmpn_sqrtrem2&#39;vc.55.2" expl="VC for wmpn_sqrtrem2" proved="true">
-   <proof prover="5"><result status="valid" time="0.040000" steps="18502"/></proof>
+   <proof prover="7"><result status="valid" time="0.040000" steps="11367"/></proof>
    </goal>
    <goal name="wmpn_sqrtrem2&#39;vc.55.3" expl="VC for wmpn_sqrtrem2" proved="true">
-   <proof prover="5"><result status="valid" time="0.100000" steps="20434"/></proof>
+   <proof prover="7"><result status="valid" time="0.100000" steps="15485"/></proof>
    </goal>
   </transf>
   </goal>
@@ -468,7 +468,7 @@
    <proof prover="2"><result status="valid" time="0.020000"/></proof>
    </goal>
    <goal name="wmpn_sqrtrem2&#39;vc.57.1" expl="VC for wmpn_sqrtrem2" proved="true">
-   <proof prover="5"><result status="valid" time="0.200000" steps="27791"/></proof>
+   <proof prover="7"><result status="valid" time="0.200000" steps="28871"/></proof>
    </goal>
    <goal name="wmpn_sqrtrem2&#39;vc.57.2" expl="VC for wmpn_sqrtrem2" proved="true">
    <proof prover="2"><result status="valid" time="1.960000"/></proof>
@@ -508,15 +508,15 @@
    <proof prover="6"><result status="valid" time="0.150000" steps="19245"/></proof>
    </goal>
    <goal name="wmpn_sqrtrem2&#39;vc.58.1" expl="VC for wmpn_sqrtrem2" proved="true">
-   <proof prover="5"><result status="valid" time="0.080000" steps="20900"/></proof>
+   <proof prover="7"><result status="valid" time="0.080000" steps="16347"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.59" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.220000" steps="29193"/></proof>
+  <proof prover="7"><result status="valid" time="0.220000" steps="47195"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.60" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.160000" steps="29641"/></proof>
+  <proof prover="7"><result status="valid" time="0.160000" steps="28926"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.61" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.200000" steps="28001"/></proof>
@@ -585,7 +585,7 @@
   <goal name="wmpn_sqrtrem2&#39;vc.64" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_sqrtrem2&#39;vc.64.0" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.200000" steps="39050"/></proof>
+   <proof prover="7"><result status="valid" time="0.332778" steps="48019"/></proof>
    </goal>
   </transf>
   </goal>
@@ -624,34 +624,34 @@
   </transf>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.66" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.150000" steps="28150"/></proof>
+  <proof prover="7"><result status="valid" time="0.150000" steps="28590"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.67" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.350000" steps="40221"/></proof>
+  <proof prover="7"><result status="valid" time="0.172073" steps="29120"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.68" expl="postcondition" proved="true">
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.090000" steps="17029"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.69" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.260000" steps="47757"/></proof>
+  <proof prover="7"><result status="valid" time="0.260000" steps="29225"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.70" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.090000" steps="18888"/></proof>
+  <proof prover="7"><result status="valid" time="0.090000" steps="11726"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.71" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.160000" steps="28381"/></proof>
+  <proof prover="7"><result status="valid" time="0.160000" steps="28875"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.72" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.180000" steps="28781"/></proof>
+  <proof prover="7"><result status="valid" time="0.180000" steps="29203"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.73" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.160000" steps="30977"/></proof>
+  <proof prover="7"><result status="valid" time="0.160000" steps="33317"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.74" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.080000" steps="21380"/></proof>
+  <proof prover="7"><result status="valid" time="0.080000" steps="16348"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.75" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.260000" steps="30718"/></proof>
+  <proof prover="7"><result status="valid" time="0.260000" steps="29745"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.76" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.240000" steps="26955"/></proof>
@@ -673,33 +673,33 @@
   </transf>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.78" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.120000" steps="29479"/></proof>
+  <proof prover="7"><result status="valid" time="0.241279" steps="29967"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.79" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="18959"/></proof>
+  <proof prover="7" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="11863"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.80" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.180000" steps="29653"/></proof>
+  <proof prover="7"><result status="valid" time="0.180000" steps="30239"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.81" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.060000"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.82" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.620000" steps="79121"/></proof>
+  <proof prover="7"><result status="valid" time="0.620000" steps="80001"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.83" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.050000" steps="19350"/></proof>
+  <proof prover="7"><result status="valid" time="0.050000" steps="12085"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.84" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.090000"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.85" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.130000" steps="30840"/></proof>
+  <proof prover="7"><result status="valid" time="0.130000" steps="32431"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.86" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_sqrtrem2&#39;vc.86.0" expl="postcondition" proved="true">
-   <proof prover="5"><result status="valid" time="0.150000" steps="21861"/></proof>
+   <proof prover="7"><result status="valid" time="0.150000" steps="16586"/></proof>
    </goal>
    <goal name="wmpn_sqrtrem2&#39;vc.86.1" expl="postcondition" proved="true">
    <proof prover="6"><result status="valid" time="0.130000" steps="28306"/></proof>
@@ -717,7 +717,7 @@
   </transf>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.88" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.060000" steps="18741"/></proof>
+  <proof prover="7"><result status="valid" time="0.060000" steps="11641"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.89" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -730,10 +730,10 @@
   </transf>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.90" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.110000" steps="18943"/></proof>
+  <proof prover="7"><result status="valid" time="0.110000" steps="11775"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.91" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.540000" steps="71464"/></proof>
+  <proof prover="7"><result status="valid" time="0.540000" steps="78236"/></proof>
   </goal>
   <goal name="wmpn_sqrtrem2&#39;vc.92" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.060000" steps="17201"/></proof>
@@ -752,7 +752,7 @@
  <goal name="wmpn_dc_sqrtrem&#39;vc" expl="VC for wmpn_dc_sqrtrem" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="wmpn_dc_sqrtrem&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.090000" steps="23495"/></proof>
+  <proof prover="7"><result status="valid" time="0.090000" steps="17103"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.1" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.030000" steps="54"/></proof>
@@ -764,16 +764,16 @@
   <proof prover="3"><result status="valid" time="0.040000" steps="56"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.050000" steps="21912"/></proof>
+  <proof prover="7"><result status="valid" time="0.050000" steps="13439"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.200000" steps="28910"/></proof>
+  <proof prover="7"><result status="valid" time="0.200000" steps="24676"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.200000" steps="28898"/></proof>
+  <proof prover="7"><result status="valid" time="0.200000" steps="24626"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.040000" steps="22315"/></proof>
+  <proof prover="7"><result status="valid" time="0.040000" steps="13811"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.8" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="3.640000" steps="469"/></proof>
@@ -785,49 +785,49 @@
   <proof prover="3"><result status="valid" time="0.650000" steps="524"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.11" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.040000" steps="22695"/></proof>
+  <proof prover="7"><result status="valid" time="0.040000" steps="14067"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.12" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.040000" steps="22947"/></proof>
+  <proof prover="7"><result status="valid" time="0.040000" steps="14298"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.13" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.060000" steps="22950"/></proof>
+  <proof prover="7"><result status="valid" time="0.060000" steps="14299"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.14" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.160000" steps="24816"/></proof>
+  <proof prover="7"><result status="valid" time="0.160000" steps="18615"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.15" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.080000" steps="22978"/></proof>
+  <proof prover="7"><result status="valid" time="0.080000" steps="14314"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.16" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.040000" steps="22981"/></proof>
+  <proof prover="7"><result status="valid" time="0.040000" steps="14315"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.17" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.100000" steps="24871"/></proof>
+  <proof prover="7"><result status="valid" time="0.100000" steps="18673"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.18" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.110000" steps="23009"/></proof>
+  <proof prover="7"><result status="valid" time="0.110000" steps="14330"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.19" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.070000" steps="23012"/></proof>
+  <proof prover="7"><result status="valid" time="0.070000" steps="14331"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.20" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.110000" steps="24926"/></proof>
+  <proof prover="7"><result status="valid" time="0.110000" steps="18731"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.21" expl="division by zero" proved="true">
-  <proof prover="5"><result status="valid" time="0.040000" steps="21827"/></proof>
+  <proof prover="7"><result status="valid" time="0.040000" steps="13388"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.22" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.190000" steps="27021"/></proof>
+  <proof prover="7"><result status="valid" time="0.190000" steps="22575"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.23" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.140000" steps="40642"/></proof>
+  <proof prover="7"><result status="valid" time="0.140000" steps="40344"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.24" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.100000" steps="27168"/></proof>
+  <proof prover="7"><result status="valid" time="0.100000" steps="23065"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.25" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.130000" steps="27300"/></proof>
+  <proof prover="7"><result status="valid" time="0.130000" steps="23249"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.26" expl="integer overflow" proved="true">
   <proof prover="6"><result status="valid" time="0.150000" steps="26827"/></proof>
@@ -871,7 +871,7 @@
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.180000" steps="22347"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.37" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.130000" steps="31132"/></proof>
+  <proof prover="7"><result status="valid" time="0.130000" steps="28097"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.38" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -912,7 +912,7 @@
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.080000" steps="22249"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.42" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.210000" steps="31982"/></proof>
+  <proof prover="7"><result status="valid" time="0.210000" steps="28518"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.43" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -928,7 +928,7 @@
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.360000" steps="55625"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.46" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.270000" steps="53660"/></proof>
+  <proof prover="7"><result status="valid" time="0.270000" steps="54279"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.47" expl="precondition" proved="true">
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.370000" steps="48301"/></proof>
@@ -985,12 +985,12 @@
   <proof prover="1"><result status="valid" time="0.400000"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.55" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.080000" steps="25472"/></proof>
+  <proof prover="7"><result status="valid" time="0.080000" steps="18485"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.56" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_dc_sqrtrem&#39;vc.56.0" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="3.523012"/></proof>
+   <proof prover="2"><result status="valid" time="3.090000"/></proof>
    </goal>
    <goal name="wmpn_dc_sqrtrem&#39;vc.56.1" expl="assertion" proved="true">
    <proof prover="6"><result status="valid" time="0.100000" steps="21566"/></proof>
@@ -1024,16 +1024,16 @@
   <goal name="wmpn_dc_sqrtrem&#39;vc.57" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_dc_sqrtrem&#39;vc.57.0" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.330000" steps="61965"/></proof>
+   <proof prover="7"><result status="valid" time="0.330000" steps="63978"/></proof>
    </goal>
    <goal name="wmpn_dc_sqrtrem&#39;vc.57.1" expl="VC for wmpn_dc_sqrtrem" proved="true">
-   <proof prover="5"><result status="valid" time="0.060000" steps="23707"/></proof>
+   <proof prover="7"><result status="valid" time="0.060000" steps="14890"/></proof>
    </goal>
    <goal name="wmpn_dc_sqrtrem&#39;vc.57.2" expl="VC for wmpn_dc_sqrtrem" proved="true">
-   <proof prover="5"><result status="valid" time="0.090000" steps="25561"/></proof>
+   <proof prover="7"><result status="valid" time="0.090000" steps="18561"/></proof>
    </goal>
    <goal name="wmpn_dc_sqrtrem&#39;vc.57.3" expl="VC for wmpn_dc_sqrtrem" proved="true">
-   <proof prover="5"><result status="valid" time="0.150000" steps="34491"/></proof>
+   <proof prover="7"><result status="valid" time="0.150000" steps="34492"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1041,10 +1041,10 @@
   <proof prover="2"><result status="valid" time="0.030000"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.59" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.100000" steps="23500"/></proof>
+  <proof prover="7"><result status="valid" time="0.100000" steps="14707"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.60" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.140000" steps="25412"/></proof>
+  <proof prover="7"><result status="valid" time="0.140000" steps="18455"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.61" expl="assertion" proved="true">
   <proof prover="4" timelimit="1"><result status="valid" time="0.030000" steps="24834"/></proof>
@@ -1052,13 +1052,13 @@
   <goal name="wmpn_dc_sqrtrem&#39;vc.62" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_dc_sqrtrem&#39;vc.62.0" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.070000" steps="23614"/></proof>
+   <proof prover="7"><result status="valid" time="0.070000" steps="14788"/></proof>
    </goal>
    <goal name="wmpn_dc_sqrtrem&#39;vc.62.1" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.050000" steps="23600"/></proof>
+   <proof prover="7"><result status="valid" time="0.050000" steps="14780"/></proof>
    </goal>
    <goal name="wmpn_dc_sqrtrem&#39;vc.62.2" expl="VC for wmpn_dc_sqrtrem" proved="true">
-   <proof prover="5"><result status="valid" time="0.320000" steps="57470"/></proof>
+   <proof prover="7"><result status="valid" time="0.320000" steps="60518"/></proof>
    </goal>
    <goal name="wmpn_dc_sqrtrem&#39;vc.62.3" expl="VC for wmpn_dc_sqrtrem" proved="true">
    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.200000" steps="23779"/></proof>
@@ -1069,16 +1069,16 @@
   </transf>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.63" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.170000" steps="34021"/></proof>
+  <proof prover="7"><result status="valid" time="0.170000" steps="31608"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.64" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.330000" steps="59083"/></proof>
+  <proof prover="7"><result status="valid" time="0.330000" steps="62135"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.65" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.140000" steps="34674"/></proof>
+  <proof prover="7"><result status="valid" time="0.140000" steps="33574"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.66" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.110000" steps="23631"/></proof>
+  <proof prover="7"><result status="valid" time="0.110000" steps="14796"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.67" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.820000"/></proof>
@@ -1090,22 +1090,22 @@
   <proof prover="3"><result status="valid" time="0.240000" steps="213"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.70" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.150000" steps="25369"/></proof>
+  <proof prover="7"><result status="valid" time="0.150000" steps="18425"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.71" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.160000" steps="25533"/></proof>
+  <proof prover="7"><result status="valid" time="0.160000" steps="18580"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.72" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.080000" steps="25949"/></proof>
+  <proof prover="7"><result status="valid" time="0.080000" steps="19034"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.73" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.100000" steps="23701"/></proof>
+  <proof prover="7"><result status="valid" time="0.100000" steps="14965"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.74" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.450000" steps="64615"/></proof>
+  <proof prover="7"><result status="valid" time="0.450000" steps="66285"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.75" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.620000" steps="69544"/></proof>
+  <proof prover="7"><result status="valid" time="0.411488" steps="72020"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.76" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.880000"/></proof>
@@ -1114,7 +1114,7 @@
   <proof prover="3"><result status="valid" time="0.660000" steps="218"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.78" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.060000" steps="26150"/></proof>
+  <proof prover="7"><result status="valid" time="0.060000" steps="18981"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.79" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1134,8 +1134,8 @@
   </transf>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.81" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.150000" steps="28326"/></proof>
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.200000" steps="26830"/></proof>
+  <proof prover="7"><result status="valid" time="0.150000" steps="22747"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.82" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1157,7 +1157,7 @@
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.330000" steps="37029"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.86" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.450000" steps="73613"/></proof>
+  <proof prover="7"><result status="valid" time="0.450000" steps="78776"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.87" expl="precondition" proved="true">
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.550000" steps="79066"/></proof>
@@ -1264,7 +1264,7 @@
   </transf>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.95" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.490000" steps="84819"/></proof>
+  <proof prover="7"><result status="valid" time="0.490000" steps="84580"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.96" expl="integer overflow" proved="true">
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.250000" steps="41325"/></proof>
@@ -1276,7 +1276,7 @@
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_dc_sqrtrem&#39;vc.98.0" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.020000"/></proof>
-   <proof prover="5"><result status="valid" time="0.120000" steps="25948"/></proof>
+   <proof prover="7"><result status="valid" time="0.120000" steps="16930"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1316,7 +1316,7 @@
   <proof prover="1"><result status="valid" time="0.200000"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.104" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.520000" steps="84219"/></proof>
+  <proof prover="7"><result status="valid" time="0.520000" steps="81090"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.105" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1326,7 +1326,7 @@
   </transf>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.106" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.080000" steps="25573"/></proof>
+  <proof prover="7"><result status="valid" time="0.080000" steps="16571"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.107" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1354,7 +1354,7 @@
   </transf>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.108" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.590000" steps="84951"/></proof>
+  <proof prover="7"><result status="valid" time="0.590000" steps="94209"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.109" expl="precondition" proved="true">
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.360000" steps="42057"/></proof>
@@ -1362,10 +1362,10 @@
   <goal name="wmpn_dc_sqrtrem&#39;vc.110" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_dc_sqrtrem&#39;vc.110.0" expl="precondition" proved="true">
-   <proof prover="5"><result status="valid" time="0.120000" steps="25676"/></proof>
+   <proof prover="7"><result status="valid" time="0.120000" steps="16644"/></proof>
    </goal>
    <goal name="wmpn_dc_sqrtrem&#39;vc.110.1" expl="precondition" proved="true">
-   <proof prover="5"><result status="valid" time="0.080000" steps="25676"/></proof>
+   <proof prover="7"><result status="valid" time="0.080000" steps="16644"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1406,10 +1406,10 @@
   <proof prover="6"><result status="valid" time="0.230000" steps="42167"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.116" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.260000" steps="42873"/></proof>
+  <proof prover="7"><result status="valid" time="0.260000" steps="45736"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.117" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.200000" steps="28958"/></proof>
+  <proof prover="7"><result status="valid" time="0.200000" steps="21042"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.118" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.110000"/></proof>
@@ -1616,7 +1616,7 @@
   <proof prover="6"><result status="valid" time="0.160000" steps="25220"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.144" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.120000" steps="30905"/></proof>
+  <proof prover="7"><result status="valid" time="0.120000" steps="22599"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.145" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.200000"/></proof>
@@ -1627,7 +1627,7 @@
    <proof prover="1"><result status="valid" time="0.330000"/></proof>
    </goal>
    <goal name="wmpn_dc_sqrtrem&#39;vc.146.1" expl="postcondition" proved="true">
-   <proof prover="5"><result status="valid" time="0.210000" steps="31308"/></proof>
+   <proof prover="7"><result status="valid" time="0.210000" steps="23023"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1645,7 +1645,7 @@
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.190000" steps="29608"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.149" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.180000" steps="30622"/></proof>
+  <proof prover="7"><result status="valid" time="0.180000" steps="22456"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.150" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1725,7 +1725,7 @@
   <proof prover="6"><result status="valid" time="2.030000" steps="153941"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.158" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="2.472692" steps="162281"/></proof>
+  <proof prover="6"><result status="valid" time="2.140000" steps="162281"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.159" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1741,7 +1741,7 @@
   <proof prover="2"><result status="valid" time="0.040000"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.161" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.390000" steps="58122"/></proof>
+  <proof prover="7"><result status="valid" time="0.390000" steps="59256"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.162" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1773,7 +1773,7 @@
   </transf>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.164" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.380000" steps="59068"/></proof>
+  <proof prover="7" timelimit="5" memlimit="2000"><result status="valid" time="0.380000" steps="64923"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.165" expl="precondition" proved="true">
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.120000" steps="26182"/></proof>
@@ -1876,7 +1876,7 @@
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.560000" steps="64078"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.180" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.140000" steps="28916"/></proof>
+  <proof prover="7"><result status="valid" time="0.140000" steps="19387"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.181" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="1.880000" steps="176757"/></proof>
@@ -2099,7 +2099,7 @@
    <proof prover="6"><result status="valid" time="0.130000" steps="27753"/></proof>
    </goal>
    <goal name="wmpn_dc_sqrtrem&#39;vc.210.2" expl="VC for wmpn_dc_sqrtrem" proved="true">
-   <proof prover="6"><result status="valid" time="0.525160" steps="64526"/></proof>
+   <proof prover="6"><result status="valid" time="0.700000" steps="64526"/></proof>
    </goal>
    <goal name="wmpn_dc_sqrtrem&#39;vc.210.3" expl="VC for wmpn_dc_sqrtrem" proved="true">
    <proof prover="2"><result status="valid" time="0.500000"/></proof>
@@ -2163,7 +2163,7 @@
   </transf>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.213" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.090000" steps="29839"/></proof>
+  <proof prover="7"><result status="valid" time="0.090000" steps="20186"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.214" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -2253,10 +2253,10 @@
    <goal name="wmpn_dc_sqrtrem&#39;vc.217.3" expl="VC for wmpn_dc_sqrtrem" proved="true">
    <transf name="apply" proved="true" arg1="prod_compat_lr">
     <goal name="wmpn_dc_sqrtrem&#39;vc.217.3.0" expl="apply premises" proved="true">
-    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.680000" steps="64574"/></proof>
+    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.540000" steps="64574"/></proof>
     </goal>
     <goal name="wmpn_dc_sqrtrem&#39;vc.217.3.1" expl="apply premises" proved="true">
-    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.540000" steps="64574"/></proof>
+    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.680000" steps="64574"/></proof>
     </goal>
    </transf>
    </goal>
@@ -2402,7 +2402,7 @@
   </transf>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.239" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.240000" steps="36176"/></proof>
+  <proof prover="7"><result status="valid" time="0.240000" steps="26773"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.240" expl="integer overflow" proved="true">
   <proof prover="6"><result status="valid" time="0.660000" steps="72509"/></proof>
@@ -2466,7 +2466,7 @@
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.150000" steps="29994"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.251" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.180000" steps="31860"/></proof>
+  <proof prover="7"><result status="valid" time="0.180000" steps="21853"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.252" expl="assertion" proved="true">
   <proof prover="6"><result status="valid" time="2.970000" steps="245802"/></proof>
@@ -2494,7 +2494,7 @@
   </transf>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.254" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.610000" steps="76243"/></proof>
+  <proof prover="7"><result status="valid" time="0.610000" steps="83190"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.255" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
@@ -2527,8 +2527,8 @@
   </transf>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.258" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.260000" steps="37488"/></proof>
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.280000" steps="36173"/></proof>
+  <proof prover="7"><result status="valid" time="0.260000" steps="27462"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.259" expl="precondition" proved="true">
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.260000" steps="35948"/></proof>
@@ -2599,7 +2599,7 @@
    <proof prover="6"><result status="valid" time="0.180000" steps="31213"/></proof>
    </goal>
    <goal name="wmpn_dc_sqrtrem&#39;vc.270.6" expl="VC for wmpn_dc_sqrtrem" proved="true">
-   <proof prover="6"><result status="valid" time="3.100000" steps="275602"/></proof>
+   <proof prover="6"><result status="valid" time="3.100000" steps="275547"/></proof>
    </goal>
    <goal name="wmpn_dc_sqrtrem&#39;vc.270.7" expl="VC for wmpn_dc_sqrtrem" proved="true">
    <proof prover="6"><result status="valid" time="0.190000" steps="31271"/></proof>
@@ -2640,7 +2640,7 @@
   <proof prover="8" timelimit="1" memlimit="1000"><result status="valid" time="0.030000" steps="33849"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.273" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.170000" steps="38522"/></proof>
+  <proof prover="7"><result status="valid" time="0.170000" steps="28175"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.274" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.040000"/></proof>
@@ -2803,7 +2803,7 @@
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.250000" steps="33857"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.299" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.200000" steps="35002"/></proof>
+  <proof prover="7"><result status="valid" time="0.200000" steps="25802"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.300" expl="precondition" proved="true">
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.160000" steps="33894"/></proof>
@@ -2816,8 +2816,8 @@
   </transf>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.302" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.080000" steps="30595"/></proof>
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.120000" steps="28630"/></proof>
+  <proof prover="7"><result status="valid" time="0.080000" steps="20850"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.303" expl="precondition" proved="true">
   <transf name="inline_goal" proved="true" >
@@ -2858,10 +2858,10 @@
    <goal name="wmpn_dc_sqrtrem&#39;vc.311.2" expl="VC for wmpn_dc_sqrtrem" proved="true">
    <transf name="apply" proved="true" arg1="prod_compat_lr">
     <goal name="wmpn_dc_sqrtrem&#39;vc.311.2.0" expl="apply premises" proved="true">
-    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.170000" steps="35079"/></proof>
+    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.280000" steps="35079"/></proof>
     </goal>
     <goal name="wmpn_dc_sqrtrem&#39;vc.311.2.1" expl="apply premises" proved="true">
-    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.280000" steps="35079"/></proof>
+    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.170000" steps="35079"/></proof>
     </goal>
    </transf>
    </goal>
@@ -2917,7 +2917,7 @@
   </transf>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.312" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.100000" steps="31415"/></proof>
+  <proof prover="7"><result status="valid" time="0.100000" steps="21475"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.313" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -2933,17 +2933,17 @@
   <proof prover="2"><result status="valid" time="0.060000"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.316" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.140000" steps="36700"/></proof>
+  <proof prover="7"><result status="valid" time="0.140000" steps="27173"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.317" expl="postcondition" proved="true">
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.170000" steps="35381"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.318" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.150000" steps="36728"/></proof>
   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.210000" steps="35393"/></proof>
+  <proof prover="7"><result status="valid" time="0.150000" steps="27099"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.319" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.270000" steps="37710"/></proof>
+  <proof prover="7"><result status="valid" time="0.270000" steps="28825"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.320" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -2967,7 +2967,7 @@
   </transf>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.323" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.220000" steps="36793"/></proof>
+  <proof prover="7"><result status="valid" time="0.220000" steps="27144"/></proof>
   </goal>
   <goal name="wmpn_dc_sqrtrem&#39;vc.324" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.180000" steps="35475"/></proof>
@@ -2999,10 +2999,10 @@
    <goal name="sqrt_norm&#39;vc.1.3" expl="VC for sqrt_norm" proved="true">
    <transf name="apply" proved="true" arg1="prod_compat_lr">
     <goal name="sqrt_norm&#39;vc.1.3.0" expl="apply premises" proved="true">
-    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.030000" steps="52"/></proof>
+    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.040000" steps="52"/></proof>
     </goal>
     <goal name="sqrt_norm&#39;vc.1.3.1" expl="apply premises" proved="true">
-    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.040000" steps="52"/></proof>
+    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.030000" steps="52"/></proof>
     </goal>
    </transf>
    </goal>
@@ -3048,10 +3048,10 @@
    <goal name="sqrt_norm&#39;vc.1.17" expl="VC for sqrt_norm" proved="true">
    <transf name="apply" proved="true" arg1="prod_compat_lr">
     <goal name="sqrt_norm&#39;vc.1.17.0" expl="apply premises" proved="true">
-    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.100000" steps="21665"/></proof>
+    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.090000" steps="21665"/></proof>
     </goal>
     <goal name="sqrt_norm&#39;vc.1.17.1" expl="apply premises" proved="true">
-    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.090000" steps="21665"/></proof>
+    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.100000" steps="21665"/></proof>
     </goal>
    </transf>
    </goal>
@@ -4724,7 +4724,7 @@
   <goal name="wmpn_sqrtrem&#39;vc.281" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_sqrtrem&#39;vc.281.0" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="3.841373"/></proof>
+   <proof prover="2"><result status="valid" time="3.180000"/></proof>
    </goal>
    <goal name="wmpn_sqrtrem&#39;vc.281.1" expl="VC for wmpn_sqrtrem" proved="true">
    <proof prover="6"><result status="valid" time="0.180000" steps="26821"/></proof>

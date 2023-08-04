@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="6" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_2018_le_rouge_et_le_noir_1.mlw"/>
 <theory name="ColoredTiles" proved="true">
@@ -20,7 +20,7 @@
   <proof prover="5"><result status="valid" time="0.010000" steps="17"/></proof>
   </goal>
   <goal name="colo_0.2" proved="true">
-  <proof prover="6"><result status="valid" time="0.080000" steps="21030"/></proof>
+  <proof prover="0"><result status="valid" time="0.080000" steps="13935"/></proof>
   </goal>
  </transf>
  </goal>
@@ -36,7 +36,7 @@
   <proof prover="5"><result status="valid" time="0.020000" steps="36"/></proof>
   </goal>
   <goal name="colo_1.3" proved="true">
-  <proof prover="6"><result status="valid" time="0.080000" steps="21003"/></proof>
+  <proof prover="0"><result status="valid" time="0.080000" steps="13727"/></proof>
   </goal>
  </transf>
  </goal>
@@ -58,7 +58,7 @@
   <proof prover="5"><result status="valid" time="0.110000" steps="922"/></proof>
   </goal>
   <goal name="colo_2.5" proved="true">
-  <proof prover="6"><result status="valid" time="0.090000" steps="21498"/></proof>
+  <proof prover="0"><result status="valid" time="0.090000" steps="14036"/></proof>
   </goal>
  </transf>
  </goal>
@@ -98,7 +98,7 @@
   <proof prover="5"><result status="valid" time="0.300000" steps="1278"/></proof>
   </goal>
   <goal name="colo_3.11" proved="true">
-  <proof prover="6"><result status="valid" time="0.210000" steps="34619"/></proof>
+  <proof prover="0"><result status="valid" time="0.055959" steps="17677"/></proof>
   </goal>
  </transf>
  </goal>
@@ -252,7 +252,7 @@
   <proof prover="5"><result status="valid" time="0.010000" steps="12"/></proof>
   </goal>
   <goal name="addleft_result&#39;vc.5" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.100000" steps="24452"/></proof>
+  <proof prover="0"><result status="valid" time="0.100000" steps="16252"/></proof>
   </goal>
   <goal name="addleft_result&#39;vc.6" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -268,7 +268,7 @@
   <proof prover="5"><result status="valid" time="0.040000" steps="98"/></proof>
   </goal>
   <goal name="addleft_result&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="4.060000" steps="1647537"/></proof>
+  <proof prover="0"><result status="valid" time="0.045869" steps="16384"/></proof>
   </goal>
  </transf>
  </goal>
@@ -304,7 +304,7 @@
   <proof prover="5"><result status="valid" time="0.010000" steps="4"/></proof>
   </goal>
   <goal name="addleft_valid&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="1.790000" steps="299392"/></proof>
+  <proof prover="0"><result status="valid" time="1.047496" steps="326041"/></proof>
   </goal>
   <goal name="addleft_valid&#39;vc.2" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.020000" steps="12"/></proof>
@@ -433,7 +433,7 @@
   <proof prover="5"><result status="valid" time="0.010000" steps="34"/></proof>
   </goal>
   <goal name="enum&#39;vc.10" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.420000" steps="67696"/></proof>
+  <proof prover="0"><result status="valid" time="0.120722" steps="37577"/></proof>
   </goal>
   <goal name="enum&#39;vc.11" expl="index in array bounds" proved="true">
   <proof prover="5"><result status="valid" time="0.020000" steps="40"/></proof>
@@ -442,7 +442,7 @@
   <proof prover="5"><result status="valid" time="0.020000" steps="46"/></proof>
   </goal>
   <goal name="enum&#39;vc.13" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.190000" steps="42095"/></proof>
+  <proof prover="0"><result status="valid" time="0.190000" steps="27905"/></proof>
   </goal>
   <goal name="enum&#39;vc.14" expl="assertion" proved="true">
   <transf name="case" proved="true" arg1="i=3">
@@ -536,7 +536,7 @@
         </transf>
         </goal>
         <goal name="enum&#39;vc.18.1.0.3.0.0.1" expl="equality hypothesis" proved="true">
-        <proof prover="6"><result status="valid" time="0.200000" steps="50516"/></proof>
+        <proof prover="0"><result status="valid" time="0.200000" steps="40074"/></proof>
         </goal>
        </transf>
        </goal>

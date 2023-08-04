@@ -3,8 +3,8 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="8" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_2018_array_based_queuing_lock_2.mlw"/>
 <theory name="ABQL" proved="true">
@@ -81,7 +81,7 @@
   <proof prover="6"><result status="valid" time="0.400000" steps="1169"/></proof>
   </goal>
   <goal name="numof_add&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="8"><result status="valid" time="7.630000" steps="527769"/></proof>
+  <proof prover="1"><result status="valid" time="1.679777" steps="316251"/></proof>
   </goal>
  </transf>
  </goal>
@@ -193,7 +193,7 @@
   <goal name="main&#39;vc.25" expl="liveness" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="main&#39;vc.25.0" expl="liveness" proved="true">
-   <proof prover="8"><result status="valid" time="1.300000" steps="158949"/></proof>
+   <proof prover="1"><result status="valid" time="0.894401" steps="209730"/></proof>
    </goal>
    <goal name="main&#39;vc.25.1" expl="liveness" proved="true">
    <proof prover="6"><result status="valid" time="0.020000" steps="39"/></proof>
@@ -433,7 +433,7 @@
   <proof prover="6"><result status="valid" time="0.320000" steps="960"/></proof>
   </goal>
   <goal name="main&#39;vc.65" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.803148" steps="1933"/></proof>
+  <proof prover="6"><result status="valid" time="0.590000" steps="1933"/></proof>
   </goal>
   <goal name="main&#39;vc.66" expl="loop invariant preservation" proved="true">
   <proof prover="6"><result status="valid" time="0.060000" steps="112"/></proof>
@@ -445,7 +445,7 @@
   <proof prover="6"><result status="valid" time="0.910000" steps="1678"/></proof>
   </goal>
   <goal name="main&#39;vc.69" expl="loop invariant preservation" proved="true">
-  <proof prover="8"><result status="valid" time="0.680000" steps="100014"/></proof>
+  <proof prover="1"><result status="valid" time="0.399951" steps="93452"/></proof>
   </goal>
   <goal name="main&#39;vc.70" expl="loop invariant preservation" proved="true">
   <transf name="split_all_full" proved="true" >
@@ -453,10 +453,10 @@
    <proof prover="6"><result status="valid" time="0.860000" steps="1418"/></proof>
    </goal>
    <goal name="main&#39;vc.70.1" expl="VC for main" proved="true">
-   <proof prover="8"><result status="valid" time="1.220000" steps="134374"/></proof>
+   <proof prover="1"><result status="valid" time="2.472808" steps="448773"/></proof>
    </goal>
    <goal name="main&#39;vc.70.2" expl="VC for main" proved="true">
-   <proof prover="8"><result status="valid" time="1.510000" steps="133635"/></proof>
+   <proof prover="1"><result status="valid" time="4.383468" steps="603640"/></proof>
    </goal>
   </transf>
   </goal>
@@ -483,7 +483,7 @@
    <proof prover="6"><result status="valid" time="0.200000" steps="546"/></proof>
    </goal>
    <goal name="main&#39;vc.72.1" expl="VC for main" proved="true">
-   <proof prover="8"><result status="valid" time="0.490000" steps="78970"/></proof>
+   <proof prover="1"><result status="valid" time="0.272421" steps="67097"/></proof>
    </goal>
   </transf>
   </goal>
@@ -623,7 +623,7 @@
   <goal name="main&#39;vc.92" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="main&#39;vc.92.0" expl="assertion" proved="true">
-   <proof prover="8"><result status="valid" time="0.240000" steps="55461"/></proof>
+   <proof prover="1"><result status="valid" time="0.240000" steps="45991"/></proof>
    </goal>
    <goal name="main&#39;vc.92.1" expl="assertion" proved="true">
    <proof prover="6"><result status="valid" time="0.040000" steps="80"/></proof>
@@ -661,7 +661,7 @@
   <proof prover="6"><result status="valid" time="0.100000" steps="262"/></proof>
   </goal>
   <goal name="main&#39;vc.103" expl="loop invariant preservation" proved="true">
-  <proof prover="8"><result status="valid" time="0.220000" steps="53041"/></proof>
+  <proof prover="1"><result status="valid" time="0.220000" steps="40287"/></proof>
   </goal>
   <goal name="main&#39;vc.104" expl="loop invariant preservation" proved="true">
   <proof prover="6"><result status="valid" time="0.120000" steps="400"/></proof>
@@ -673,7 +673,7 @@
   <proof prover="6"><result status="valid" time="0.700000" steps="1379"/></proof>
   </goal>
   <goal name="main&#39;vc.107" expl="loop invariant preservation" proved="true">
-  <proof prover="8"><result status="valid" time="0.990000" steps="125337"/></proof>
+  <proof prover="1"><result status="valid" time="3.491541" steps="520055"/></proof>
   </goal>
   <goal name="main&#39;vc.108" expl="loop invariant preservation" proved="true">
   <proof prover="6"><result status="valid" time="0.240000" steps="849"/></proof>
@@ -1061,7 +1061,7 @@
      <proof prover="6"><result status="valid" time="0.200000" steps="417"/></proof>
      </goal>
      <goal name="main&#39;vc.217.1.0.2" expl="VC for main" proved="true">
-     <proof prover="6"><result status="valid" time="2.226507" steps="1260"/></proof>
+     <proof prover="6"><result status="valid" time="1.850000" steps="1260"/></proof>
      </goal>
      <goal name="main&#39;vc.217.1.0.3" expl="VC for main" proved="true">
      <transf name="assert" proved="true" arg1="(x1 &lt;&gt; th)">
@@ -1131,7 +1131,7 @@
   <proof prover="6"><result status="valid" time="0.230000" steps="537"/></proof>
   </goal>
   <goal name="main&#39;vc.226" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.746475" steps="941"/></proof>
+  <proof prover="6"><result status="valid" time="0.570000" steps="941"/></proof>
   </goal>
   <goal name="main&#39;vc.227" expl="loop invariant preservation" proved="true">
   <proof prover="6"><result status="valid" time="0.030000" steps="91"/></proof>

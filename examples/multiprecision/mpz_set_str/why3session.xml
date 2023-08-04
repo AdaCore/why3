@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="2" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
-<prover id="3" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="4" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.7.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -24,7 +24,7 @@
   <goal name="wmpz_set_str&#39;vc.3" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_set_str&#39;vc.3.0" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.190000" steps="41116"/></proof>
+   <proof prover="0"><result status="valid" time="0.190000" steps="33916"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.3.1" expl="VC for wmpz_set_str" proved="true">
    <proof prover="4"><result status="valid" time="0.050000" steps="256"/></proof>
@@ -151,7 +151,7 @@
   <proof prover="4"><result status="valid" time="0.080000" steps="180"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.32" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.100000" steps="38856"/></proof>
+  <proof prover="0"><result status="valid" time="0.100000" steps="27222"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.33" expl="integer overflow" proved="true">
   <proof prover="4"><result status="valid" time="0.120000" steps="198"/></proof>
@@ -165,10 +165,10 @@
    <proof prover="1"><result status="valid" time="3.530000"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.35.1" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.150000" steps="38772"/></proof>
+   <proof prover="0"><result status="valid" time="0.150000" steps="27169"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.35.2" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.250000" steps="42825"/></proof>
+   <proof prover="0"><result status="valid" time="0.113473" steps="34733"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.35.3" expl="VC for wmpz_set_str" proved="true">
    <proof prover="1"><result status="valid" time="0.140000"/></proof>
@@ -180,7 +180,7 @@
    <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.790000" steps="652"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.35.6" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.250000" steps="42628"/></proof>
+   <proof prover="0"><result status="valid" time="0.124207" steps="34605"/></proof>
    </goal>
   </transf>
   </goal>
@@ -217,10 +217,10 @@
    <proof prover="1"><result status="valid" time="2.550000"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.45.1" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.140000" steps="39019"/></proof>
+   <proof prover="0"><result status="valid" time="0.140000" steps="27395"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.45.2" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.260000" steps="43276"/></proof>
+   <proof prover="0"><result status="valid" time="0.129418" steps="35094"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.45.3" expl="VC for wmpz_set_str" proved="true">
    <proof prover="1"><result status="valid" time="0.230000"/></proof>
@@ -232,7 +232,7 @@
    <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.090000" steps="221"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.45.6" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.150000" steps="43069"/></proof>
+   <proof prover="0"><result status="valid" time="0.150000" steps="34964"/></proof>
    </goal>
   </transf>
   </goal>
@@ -240,7 +240,7 @@
   <proof prover="4"><result status="valid" time="0.090000" steps="216"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.47" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.160000" steps="39557"/></proof>
+  <proof prover="0"><result status="valid" time="0.160000" steps="27851"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.48" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.080000" steps="214"/></proof>
@@ -323,15 +323,15 @@
   <proof prover="4"><result status="valid" time="0.050000" steps="200"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.60" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.160000" steps="39536"/></proof>
+  <proof prover="0"><result status="valid" time="0.160000" steps="27836"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.61" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_set_str&#39;vc.61.0" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.160000" steps="42977"/></proof>
+   <proof prover="0"><result status="valid" time="0.160000" steps="34882"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.61.1" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.180000" steps="42901"/></proof>
+   <proof prover="0"><result status="valid" time="0.180000" steps="34806"/></proof>
    </goal>
   </transf>
   </goal>
@@ -347,10 +347,10 @@
    <proof prover="1"><result status="valid" time="3.680000"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.64.1" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.170000" steps="38776"/></proof>
+   <proof prover="0"><result status="valid" time="0.170000" steps="27171"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.64.2" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.250000" steps="42829"/></proof>
+   <proof prover="0"><result status="valid" time="0.250000" steps="34736"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.64.3" expl="VC for wmpz_set_str" proved="true">
    <proof prover="1"><result status="valid" time="0.230000"/></proof>
@@ -362,7 +362,7 @@
    <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.830000" steps="653"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.64.6" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.220000" steps="42622"/></proof>
+   <proof prover="0"><result status="valid" time="0.220000" steps="34601"/></proof>
    </goal>
   </transf>
   </goal>
@@ -370,10 +370,10 @@
   <proof prover="4"><result status="valid" time="0.530000" steps="645"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.66" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.170000" steps="39321"/></proof>
+  <proof prover="0"><result status="valid" time="0.170000" steps="27627"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.67" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.160000" steps="42577"/></proof>
+  <proof prover="0"><result status="valid" time="0.160000" steps="34563"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.68" expl="integer overflow" proved="true">
   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.120000" steps="209"/></proof>
@@ -391,19 +391,19 @@
   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.110000" steps="221"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.73" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.260000" steps="42790"/></proof>
+  <proof prover="0"><result status="valid" time="0.260000" steps="35226"/></proof>
   <proof prover="4"><result status="valid" time="0.070000" steps="211"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.74" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_set_str&#39;vc.74.0" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="2.370810"/></proof>
+   <proof prover="1"><result status="valid" time="2.050000"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.74.1" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.160000" steps="39023"/></proof>
+   <proof prover="0"><result status="valid" time="0.160000" steps="27397"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.74.2" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.160000" steps="43280"/></proof>
+   <proof prover="0"><result status="valid" time="0.160000" steps="35097"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.74.3" expl="VC for wmpz_set_str" proved="true">
    <proof prover="1"><result status="valid" time="0.260000"/></proof>
@@ -415,7 +415,7 @@
    <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.110000" steps="221"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.74.6" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.150000" steps="43073"/></proof>
+   <proof prover="0"><result status="valid" time="0.150000" steps="34968"/></proof>
    </goal>
   </transf>
   </goal>
@@ -426,7 +426,7 @@
   <proof prover="4"><result status="valid" time="0.060000" steps="216"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.77" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.150000" steps="43028"/></proof>
+  <proof prover="0"><result status="valid" time="0.150000" steps="34931"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.78" expl="integer overflow" proved="true">
   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.120000" steps="217"/></proof>
@@ -452,10 +452,10 @@
    <proof prover="1"><result status="valid" time="2.780000"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.84.1" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.160000" steps="39147"/></proof>
+   <proof prover="0"><result status="valid" time="0.160000" steps="27516"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.84.2" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.270000" steps="43521"/></proof>
+   <proof prover="0"><result status="valid" time="0.134731" steps="35296"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.84.3" expl="VC for wmpz_set_str" proved="true">
    <proof prover="1"><result status="valid" time="0.260000"/></proof>
@@ -464,10 +464,10 @@
    <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.760000" steps="887"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.84.5" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.250000" steps="44277"/></proof>
+   <proof prover="0"><result status="valid" time="0.250000" steps="35966"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.84.6" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.260000" steps="43314"/></proof>
+   <proof prover="0"><result status="valid" time="0.260000" steps="35168"/></proof>
    </goal>
   </transf>
   </goal>
@@ -475,10 +475,10 @@
   <proof prover="4"><result status="valid" time="0.050000" steps="222"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.86" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.210000" steps="39685"/></proof>
+  <proof prover="0"><result status="valid" time="0.083924" steps="27972"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.87" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.270000" steps="43269"/></proof>
+  <proof prover="0"><result status="valid" time="0.138583" steps="35131"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.88" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.160000"/></proof>
@@ -492,10 +492,10 @@
    <proof prover="1"><result status="valid" time="3.230000"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.90.1" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.150000" steps="39002"/></proof>
+   <proof prover="0"><result status="valid" time="0.150000" steps="27382"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.90.2" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.230000" steps="43284"/></proof>
+   <proof prover="0"><result status="valid" time="0.230000" steps="35069"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.90.3" expl="VC for wmpz_set_str" proved="true">
    <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.700000" steps="758"/></proof>
@@ -507,7 +507,7 @@
    <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.090000" steps="202"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.90.6" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.250000" steps="43080"/></proof>
+   <proof prover="0"><result status="valid" time="0.250000" steps="34928"/></proof>
    </goal>
   </transf>
   </goal>
@@ -515,7 +515,7 @@
   <proof prover="4"><result status="valid" time="0.090000" steps="200"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.92" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.200000" steps="39540"/></proof>
+  <proof prover="0"><result status="valid" time="0.200000" steps="27838"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.93" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.080000" steps="199"/></proof>
@@ -722,7 +722,7 @@
   <proof prover="4"><result status="valid" time="0.500000" steps="830"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.133" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.160000" steps="42239"/></proof>
+  <proof prover="0"><result status="valid" time="0.160000" steps="34677"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.134" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.050000" steps="179"/></proof>
@@ -847,7 +847,7 @@
   <goal name="wmpz_set_str&#39;vc.156" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_set_str&#39;vc.156.0" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.120000" steps="40642"/></proof>
+   <proof prover="0"><result status="valid" time="0.120000" steps="28551"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.156.1" expl="VC for wmpz_set_str" proved="true">
    <proof prover="1"><result status="valid" time="0.210000"/></proof>
@@ -892,7 +892,7 @@
    <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.830000" steps="267"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.158.4" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.180000" steps="45387"/></proof>
+   <proof prover="0"><result status="valid" time="0.180000" steps="36506"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.158.5" expl="VC for wmpz_set_str" proved="true">
    <proof prover="4"><result status="valid" time="0.080000" steps="253"/></proof>
@@ -922,7 +922,7 @@
     <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="262"/></proof>
     </goal>
     <goal name="wmpz_set_str&#39;vc.158.9.1" expl="false case" proved="true">
-    <proof prover="3"><result status="valid" time="0.260000" steps="46414"/></proof>
+    <proof prover="0"><result status="valid" time="0.260000" steps="37656"/></proof>
     </goal>
    </transf>
    </goal>
@@ -1057,7 +1057,7 @@
   <goal name="wmpz_set_str&#39;vc.186" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_set_str&#39;vc.186.0" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.190000" steps="42720"/></proof>
+   <proof prover="0"><result status="valid" time="0.190000" steps="34601"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.186.1" expl="VC for wmpz_set_str" proved="true">
    <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="1.240000" steps="1323980"/></proof>
@@ -1107,7 +1107,7 @@
      <proof prover="4"><result status="valid" time="0.090000" steps="249"/></proof>
      </goal>
      <goal name="wmpz_set_str&#39;vc.194.0.0.5" expl="precondition" proved="true">
-     <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.160000" steps="44102"/></proof>
+     <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.160000" steps="36540"/></proof>
      </goal>
     </transf>
     </goal>
@@ -1134,7 +1134,7 @@
   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="1.410000" steps="265"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.201" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.160000" steps="44133"/></proof>
+  <proof prover="0"><result status="valid" time="0.160000" steps="35561"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.202" expl="integer overflow" proved="true">
   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.310000" steps="269"/></proof>
@@ -1156,7 +1156,7 @@
   <proof prover="2"><result status="valid" time="0.070000"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.206" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.150000" steps="44814"/></proof>
+  <proof prover="0"><result status="valid" time="0.150000" steps="36585"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.207" expl="assertion" proved="true">
   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="261"/></proof>
@@ -1204,7 +1204,7 @@
    <proof prover="1"><result status="valid" time="3.280000"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.212.4" expl="VC for wmpz_set_str" proved="true">
-   <proof prover="3"><result status="valid" time="0.180000" steps="46147"/></proof>
+   <proof prover="0"><result status="valid" time="0.180000" steps="37078"/></proof>
    </goal>
    <goal name="wmpz_set_str&#39;vc.212.5" expl="VC for wmpz_set_str" proved="true">
    <proof prover="4"><result status="valid" time="0.200000" steps="273"/></proof>
@@ -1215,7 +1215,7 @@
     <proof prover="4"><result status="valid" time="0.190000" steps="277"/></proof>
     </goal>
     <goal name="wmpz_set_str&#39;vc.212.6.1" expl="apply premises" proved="true">
-    <proof prover="3" memlimit="1000"><result status="valid" time="2.020000" steps="230229"/></proof>
+    <proof prover="0" memlimit="1000"><result status="valid" time="1.434402" steps="256019"/></proof>
     </goal>
     <goal name="wmpz_set_str&#39;vc.212.6.2" expl="apply premises" proved="true">
     <proof prover="4"><result status="valid" time="0.200000" steps="277"/></proof>
@@ -1234,7 +1234,7 @@
     <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.180000" steps="277"/></proof>
     </goal>
     <goal name="wmpz_set_str&#39;vc.212.9.1" expl="false case" proved="true">
-    <proof prover="3"><result status="valid" time="0.260000" steps="47315"/></proof>
+    <proof prover="0"><result status="valid" time="0.128945" steps="38434"/></proof>
     </goal>
    </transf>
    </goal>
@@ -1253,7 +1253,7 @@
   <proof prover="4"><result status="valid" time="0.150000" steps="265"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.217" expl="precondition" proved="true">
-  <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.280000" steps="46423"/></proof>
+  <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.127911" steps="38412"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.218" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.310000"/></proof>
@@ -1274,7 +1274,7 @@
   <proof prover="4"><result status="valid" time="0.160000" steps="275"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.224" expl="precondition" proved="true">
-  <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.240000" steps="46811"/></proof>
+  <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.240000" steps="38687"/></proof>
   </goal>
   <goal name="wmpz_set_str&#39;vc.225" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.150000" steps="278"/></proof>

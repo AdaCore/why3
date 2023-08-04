@@ -8,7 +8,7 @@
 <prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="4" name="CVC4" version="1.6" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="5" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="6" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="7" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="2000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="set_str.mlw"/>
 <theory name="Set_str" proved="true">
@@ -221,7 +221,7 @@
   <proof prover="4" timelimit="1" memlimit="1000"><result status="valid" time="0.200000" steps="34955"/></proof>
   </goal>
   <goal name="wmpn_set_str_bits&#39;vc.29" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.130000" steps="35000"/></proof>
+  <proof prover="7"><result status="valid" time="0.130000" steps="28779"/></proof>
   </goal>
   <goal name="wmpn_set_str_bits&#39;vc.30" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.350000"/></proof>
@@ -375,7 +375,7 @@
    <proof prover="4"><result status="valid" time="0.090000" steps="32301"/></proof>
    </goal>
    <goal name="wmpn_set_str_bits&#39;vc.51.8" expl="VC for wmpn_set_str_bits" proved="true">
-   <proof prover="6"><result status="valid" time="0.140000" steps="35323"/></proof>
+   <proof prover="7"><result status="valid" time="0.140000" steps="28985"/></proof>
    </goal>
   </transf>
   </goal>
@@ -435,7 +435,7 @@
    <proof prover="2"><result status="valid" time="0.350000"/></proof>
    </goal>
    <goal name="wmpn_set_str_bits&#39;vc.55.4" expl="VC for wmpn_set_str_bits" proved="true">
-   <proof prover="2"><result status="valid" time="3.317018"/></proof>
+   <proof prover="2"><result status="valid" time="2.800000"/></proof>
    </goal>
    <goal name="wmpn_set_str_bits&#39;vc.55.5" expl="VC for wmpn_set_str_bits" proved="true">
    <proof prover="1"><result status="valid" time="0.160000"/></proof>
@@ -556,7 +556,7 @@
   <proof prover="4" timelimit="1" memlimit="1000"><result status="valid" time="0.130000" steps="36562"/></proof>
   </goal>
   <goal name="wmpn_set_str_bits&#39;vc.69" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.130000" steps="36547"/></proof>
+  <proof prover="7"><result status="valid" time="0.130000" steps="30045"/></proof>
   </goal>
   <goal name="wmpn_set_str_bits&#39;vc.70" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.460000"/></proof>
@@ -648,7 +648,7 @@
   <proof prover="4" timelimit="1" memlimit="1000"><result status="valid" time="0.240000" steps="35586"/></proof>
   </goal>
   <goal name="wmpn_set_str_bits&#39;vc.84" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.110000" steps="32450"/></proof>
+  <proof prover="7"><result status="valid" time="0.110000" steps="22305"/></proof>
   </goal>
   <goal name="wmpn_set_str_bits&#39;vc.85" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.360000"/></proof>
@@ -773,7 +773,7 @@
   <proof prover="4" timelimit="1" memlimit="1000"><result status="valid" time="0.240000" steps="35585"/></proof>
   </goal>
   <goal name="wmpn_set_str_bits&#39;vc.100" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.120000" steps="32427"/></proof>
+  <proof prover="7"><result status="valid" time="0.120000" steps="22298"/></proof>
   </goal>
   <goal name="wmpn_set_str_bits&#39;vc.101" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.400000"/></proof>
@@ -1215,7 +1215,7 @@
    <proof prover="4"><result status="valid" time="0.140000" steps="36889"/></proof>
    </goal>
    <goal name="wmpn_set_str_other&#39;vc.79.8" expl="VC for wmpn_set_str_other" proved="true">
-   <proof prover="6"><result status="valid" time="0.220000" steps="36936"/></proof>
+   <proof prover="7"><result status="valid" time="0.096799" steps="30242"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1244,7 +1244,7 @@
   <proof prover="4" timelimit="1" memlimit="1000"><result status="valid" time="0.170000" steps="33453"/></proof>
   </goal>
   <goal name="wmpn_set_str_other&#39;vc.88" expl="loop invariant preservation" proved="true">
-  <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.210000" steps="37370"/></proof>
+  <proof prover="7" timelimit="1" memlimit="1000"><result status="valid" time="0.210000" steps="30630"/></proof>
   </goal>
   <goal name="wmpn_set_str_other&#39;vc.89" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.500000" steps="899790"/></proof>
@@ -1312,10 +1312,10 @@
    <proof prover="4"><result status="valid" time="0.200000" steps="37172"/></proof>
    </goal>
    <goal name="wmpn_set_str_other&#39;vc.96.14" expl="VC for wmpn_set_str_other" proved="true">
-   <proof prover="4"><result status="valid" time="1.404150" steps="165037"/></proof>
+   <proof prover="4"><result status="valid" time="1.130000" steps="165037"/></proof>
    </goal>
    <goal name="wmpn_set_str_other&#39;vc.96.15" expl="VC for wmpn_set_str_other" proved="true">
-   <proof prover="4"><result status="valid" time="1.385635" steps="165244"/></proof>
+   <proof prover="4"><result status="valid" time="1.070000" steps="165244"/></proof>
    </goal>
    <goal name="wmpn_set_str_other&#39;vc.96.16" expl="VC for wmpn_set_str_other" proved="true">
    <proof prover="4"><result status="valid" time="0.130000" steps="34114"/></proof>
@@ -1350,7 +1350,7 @@
   <proof prover="4"><result status="valid" time="0.140000" steps="33302"/></proof>
   </goal>
   <goal name="wmpn_set_str_other&#39;vc.102" expl="loop invariant preservation" proved="true">
-  <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.140000" steps="33955"/></proof>
+  <proof prover="7" timelimit="1" memlimit="1000"><result status="valid" time="0.140000" steps="23473"/></proof>
   </goal>
   <goal name="wmpn_set_str_other&#39;vc.103" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.280000"/></proof>

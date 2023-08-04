@@ -2,12 +2,11 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="2000"/>
-<prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="4" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="5" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="2000"/>
-<prover id="6" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="7" name="Z3" version="4.7.1" timelimit="5" steplimit="0" memlimit="2000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="mpz_div2exp.mlw"/>
@@ -15,30 +14,30 @@
  <goal name="div_unique&#39;vc" expl="VC for div_unique" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="div_unique&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.080000" steps="12689"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.120000" steps="11543"/></proof>
   </goal>
   <goal name="div_unique&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.120000" steps="12689"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.080000" steps="11543"/></proof>
   </goal>
   <goal name="div_unique&#39;vc.2" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="div_unique&#39;vc.2.0" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.100000" steps="16968"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="16325"/></proof>
    </goal>
    <goal name="div_unique&#39;vc.2.1" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.080000" steps="11793"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.080000" steps="8459"/></proof>
    </goal>
    <goal name="div_unique&#39;vc.2.2" expl="VC for div_unique" proved="true">
-   <proof prover="2"><result status="valid" time="0.080000" steps="17115"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.080000" steps="16754"/></proof>
    </goal>
    <goal name="div_unique&#39;vc.2.3" expl="VC for div_unique" proved="true">
-   <proof prover="2"><result status="valid" time="0.100000" steps="18692"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="19561"/></proof>
    </goal>
    <goal name="div_unique&#39;vc.2.4" expl="VC for div_unique" proved="true">
-   <proof prover="2"><result status="valid" time="0.110000" steps="14543"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.110000" steps="12819"/></proof>
    </goal>
    <goal name="div_unique&#39;vc.2.5" expl="VC for div_unique" proved="true">
-   <proof prover="2"><result status="valid" time="0.100000" steps="14542"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="12819"/></proof>
    </goal>
    <goal name="div_unique&#39;vc.2.6" expl="VC for div_unique" proved="true">
    <proof prover="3"><result status="valid" time="0.030000"/></proof>
@@ -49,12 +48,12 @@
    <proof prover="4"><result status="valid" time="1.820000"/></proof>
    </goal>
    <goal name="div_unique&#39;vc.2.8" expl="VC for div_unique" proved="true">
-   <proof prover="2"><result status="valid" time="0.060000" steps="14658"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.060000" steps="12916"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="div_unique&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.050000" steps="13338"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.050000" steps="9588"/></proof>
   </goal>
  </transf>
  </goal>
@@ -68,13 +67,13 @@
  <goal name="wmpz_tdiv_q_2exp&#39;vc" expl="VC for wmpz_tdiv_q_2exp" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="wmpz_tdiv_q_2exp&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.060000" steps="13436"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.060000" steps="9471"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.1" expl="division by zero" proved="true">
-  <proof prover="2"><result status="valid" time="0.140000" steps="13814"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.140000" steps="9868"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.2" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.120000" steps="18822"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.120000" steps="17433"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.3" expl="precondition" proved="true">
   <proof prover="1" timelimit="1" memlimit="1000"><result status="valid" time="0.080000" steps="31"/></proof>
@@ -83,7 +82,7 @@
   <proof prover="5"><result status="valid" time="0.040000" steps="143"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.5" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.060000" steps="19478"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.060000" steps="18249"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.6" expl="precondition" proved="true">
   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.010000" steps="37"/></proof>
@@ -91,20 +90,20 @@
   <goal name="wmpz_tdiv_q_2exp&#39;vc.7" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_tdiv_q_2exp&#39;vc.7.0" expl="assertion" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.200000" steps="21533"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.200000" steps="26654"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.7.1" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="1"><result status="valid" time="0.270000" steps="293"/></proof>
    <proof prover="3"><result status="valid" time="0.130000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.7.2" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.160000" steps="19170"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.160000" steps="20343"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.7.3" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.160000" steps="19024"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.160000" steps="20152"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.7.4" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.140000" steps="18960"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.140000" steps="20175"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.7.5" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="1"><result status="valid" time="0.030000" steps="59"/></proof>
@@ -118,22 +117,22 @@
   <proof prover="5"><result status="valid" time="0.060000" steps="55"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.10" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.120000" steps="15534"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.120000" steps="13790"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.11" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.060000" steps="15134"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.060000" steps="13320"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.060000" steps="13548"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.060000" steps="9558"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.060000" steps="13551"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.060000" steps="9562"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.14" expl="division by zero" proved="true">
-  <proof prover="2"><result status="valid" time="0.050000" steps="14360"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.050000" steps="10237"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.15" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.110000" steps="23348"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.110000" steps="19444"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.16" expl="assertion" proved="true">
   <proof prover="1" timelimit="1" memlimit="1000"><result status="valid" time="0.070000" steps="65"/></proof>
@@ -148,7 +147,7 @@
   <proof prover="5"><result status="valid" time="2.040000" steps="391"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.20" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.140000" steps="20560"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.140000" steps="21889"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.21" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -170,24 +169,24 @@
   <proof prover="3"><result status="valid" time="0.310000"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.25" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.090000" steps="23002"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.090000" steps="24492"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.26" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.080000" steps="15120"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.080000" steps="10814"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.27" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.040000" steps="15117"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.040000" steps="10813"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.28" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.090000" steps="22671"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.090000" steps="23548"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.29" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.110000" steps="15569"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.110000" steps="11137"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.30" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_tdiv_q_2exp&#39;vc.30.0" expl="assertion" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.210000" steps="37700"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.210000" steps="42096"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.30.1" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="4"><result status="valid" time="0.340000"/></proof>
@@ -198,7 +197,7 @@
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.31" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.050000" steps="15625"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.050000" steps="11189"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.32" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -206,31 +205,31 @@
    <proof prover="3"><result status="valid" time="0.620000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.32.1" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2"><result status="valid" time="0.090000" steps="15664"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.090000" steps="11219"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.32.2" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.120000" steps="17465"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.120000" steps="14926"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.32.3" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2"><result status="valid" time="0.140000" steps="17468"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.140000" steps="14901"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.32.4" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <transf name="rewrite" proved="true" arg1="Mod_mult1">
     <goal name="wmpz_tdiv_q_2exp&#39;vc.32.4.0" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-    <proof prover="2"><result status="valid" time="0.210000" steps="23143"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.210000" steps="24488"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.32.4.1" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.100000" steps="15724"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="11253"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.32.5" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.210000" steps="23580"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.210000" steps="25574"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.33" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.080000" steps="17545"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.080000" steps="15303"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.34" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -245,51 +244,51 @@
   <goal name="wmpz_tdiv_q_2exp&#39;vc.35" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_tdiv_q_2exp&#39;vc.35.0" expl="assertion" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.180000" steps="23290"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.180000" steps="24772"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.35.1" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2"><result status="valid" time="0.100000" steps="15762"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="11335"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.35.2" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <transf name="apply" proved="true" arg1="prod_compat_strict_r">
     <goal name="wmpz_tdiv_q_2exp&#39;vc.35.2.0" expl="apply premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.200000" steps="23348"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.200000" steps="24909"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.35.2.1" expl="apply premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.180000" steps="23350"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.180000" steps="24850"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.35.3" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.140000" steps="17669"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.140000" steps="15078"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.35.4" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.110000" steps="15848"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.110000" steps="11392"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.35.5" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="7"><result status="valid" time="1.080000" steps="1187771"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.35.6" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2"><result status="valid" time="0.100000" steps="15902"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="11432"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.35.7" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="15893"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.100000" steps="11433"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.35.8" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="3"><result status="valid" time="0.220000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.35.9" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="15872"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.100000" steps="11424"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.35.10" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.150000" steps="17856"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.150000" steps="15225"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.36" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_tdiv_q_2exp&#39;vc.36.0" expl="assertion" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.130000" steps="17254"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.130000" steps="14983"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.36.1" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="3"><result status="valid" time="1.180000"/></proof>
@@ -302,40 +301,40 @@
    <proof prover="3"><result status="valid" time="0.150000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.36.4" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2"><result status="valid" time="0.150000" steps="17713"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.150000" steps="15105"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.36.5" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="15844"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.100000" steps="11400"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.36.6" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <transf name="apply" proved="true" arg1="div_unique">
     <goal name="wmpz_tdiv_q_2exp&#39;vc.36.6.0" expl="apply premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.140000" steps="17740"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.140000" steps="15126"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.36.6.1" expl="apply premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.180000" steps="22815"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.180000" steps="33766"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.36.6.2" expl="apply premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.110000" steps="17370"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.110000" steps="15033"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.36.7" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.090000" steps="17201"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.090000" steps="14617"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.37" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.200000" steps="24362"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.200000" steps="25502"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.38" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.160000" steps="17698"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.160000" steps="15110"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.39" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.140000" steps="25626"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.140000" steps="26199"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.40" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.100000" steps="18406"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="15942"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.41" expl="integer overflow" proved="true">
   <proof prover="4"><result status="valid" time="0.040000"/></proof>
@@ -366,7 +365,7 @@
    <proof prover="3"><result status="valid" time="0.200000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.43.4" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="1.120000" steps="117508"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="1.120000" steps="177682"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.43.5" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="3"><result status="valid" time="0.220000"/></proof>
@@ -381,21 +380,21 @@
    <proof prover="3"><result status="valid" time="0.140000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.43.9" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.160000" steps="19074"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.160000" steps="18416"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.43.10" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="7"><result status="valid" time="0.060000" steps="77531"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.43.11" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2"><result status="valid" time="0.150000" steps="18692"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.150000" steps="15875"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.43.12" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <transf name="apply" proved="true" arg1="simp_compat_strict_l" arg2="with" arg3="(power radix limb_cnt)">
     <goal name="wmpz_tdiv_q_2exp&#39;vc.43.12.0" expl="apply premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.210000" steps="27286"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.210000" steps="55476"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.43.12.1" expl="apply premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.230000" steps="28134"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.230000" steps="32588"/></proof>
     </goal>
    </transf>
    </goal>
@@ -403,13 +402,13 @@
    <proof prover="7" timelimit="1" memlimit="1000"><result status="valid" time="0.060000" steps="81887"/></proof>
    <transf name="rewrite" proved="true" arg1="&lt;-" arg2="Power_sum">
     <goal name="wmpz_tdiv_q_2exp&#39;vc.43.13.0" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-    <proof prover="2"><result status="valid" time="0.100000" steps="16556"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="11992"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.43.13.1" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.100000" steps="16542"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="11987"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.43.13.2" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.100000" steps="16535"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="11980"/></proof>
     </goal>
    </transf>
    </goal>
@@ -419,20 +418,20 @@
    <goal name="wmpz_tdiv_q_2exp&#39;vc.43.15" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <transf name="rewrite" proved="true" arg1="&lt;-" arg2="Power_sum">
     <goal name="wmpz_tdiv_q_2exp&#39;vc.43.15.0" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-    <proof prover="2"><result status="valid" time="0.090000" steps="16761"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.090000" steps="12289"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.43.15.1" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.360000" steps="50760"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.360000" steps="55139"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.43.15.2" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.230000" steps="27021"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.230000" steps="29678"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.43.16" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <transf name="assert" proved="true" arg1="(power 2 (64 - c) &gt;= 1)">
     <goal name="wmpz_tdiv_q_2exp&#39;vc.43.16.0" expl="asserted formula" proved="true">
-    <proof prover="2"><result status="valid" time="0.360000" steps="50730"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.360000" steps="55136"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.43.16.1" expl="VC for wmpz_tdiv_q_2exp" proved="true">
     <proof prover="3"><result status="valid" time="0.320000"/></proof>
@@ -440,26 +439,26 @@
    </transf>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.43.17" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.140000" steps="18938"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.140000" steps="16062"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.43.18" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="3"><result status="valid" time="0.340000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.43.19" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2"><result status="valid" time="0.100000" steps="16744"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="12152"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.43.20" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2"><result status="valid" time="0.160000" steps="19149"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.160000" steps="16196"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.44" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_tdiv_q_2exp&#39;vc.44.0" expl="precondition" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.080000" steps="17470"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.080000" steps="14796"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.44.1" expl="precondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.090000" steps="17523"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.090000" steps="14830"/></proof>
    </goal>
   </transf>
   </goal>
@@ -488,7 +487,7 @@
    <proof prover="4"><result status="valid" time="0.130000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.47.3" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.130000" steps="27267"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.130000" steps="29221"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.47.4" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="4"><result status="valid" time="0.110000"/></proof>
@@ -500,105 +499,105 @@
    <proof prover="4"><result status="valid" time="0.140000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.47.7" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.380000" steps="52112"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.380000" steps="58058"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.47.8" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2"><result status="valid" time="0.140000" steps="18161"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.140000" steps="15303"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.47.9" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <transf name="apply" proved="true" arg1="div_minus">
     <goal name="wmpz_tdiv_q_2exp&#39;vc.47.9.0" expl="apply premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.460000" steps="52101"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.460000" steps="58092"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.47.9.1" expl="apply premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.200000" steps="26339"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.200000" steps="38595"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.47.10" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2"><result status="valid" time="0.140000" steps="18700"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.140000" steps="16140"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.48" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.120000" steps="17986"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.120000" steps="15157"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.49" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.100000" steps="27047"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="29149"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.50" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.090000" steps="18355"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.090000" steps="15561"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.51" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.140000" steps="16024"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.140000" steps="11524"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.52" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.100000" steps="16922"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="12460"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.53" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.080000" steps="16940"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.080000" steps="12466"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.54" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.150000" steps="19012"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.150000" steps="15990"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.55" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.480000" steps="56118"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.480000" steps="65611"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.56" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.150000" steps="18452"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.150000" steps="15487"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.57" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5"><result status="valid" time="4.570000" steps="183806"/></proof>
+  <proof prover="0"><result status="valid" time="0.378516" steps="60594"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.58" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.120000" steps="18898"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.120000" steps="16026"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.59" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.080000" steps="18652"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.080000" steps="15717"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.60" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.140000"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.61" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.190000" steps="19449"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.063930" steps="16318"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.62" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.060000" steps="18672"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.060000" steps="15703"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.63" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.880000"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.64" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.170000" steps="29936"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.170000" steps="32449"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.65" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz1">
    <goal name="wmpz_tdiv_q_2exp&#39;vc.65.0" expl="apply premises" proved="true">
-   <proof prover="2"><result status="valid" time="0.320000" steps="33834"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.320000" steps="46187"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.65.1" expl="apply premises" proved="true">
    <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz2">
     <goal name="wmpz_tdiv_q_2exp&#39;vc.65.1.0" expl="apply premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.140000" steps="19767"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.140000" steps="17002"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.65.1.1" expl="apply premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.170000" steps="19767"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.170000" steps="17002"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.66" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.190000" steps="18819"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.190000" steps="15738"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.67" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.080000" steps="21681"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.080000" steps="22640"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.68" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.270000"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.69" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.120000" steps="22714"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.120000" steps="24304"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.70" expl="precondition" proved="true">
   <proof prover="7" timelimit="1" memlimit="1000"><result status="valid" time="0.060000" steps="2982"/></proof>
@@ -607,7 +606,7 @@
   <proof prover="5"><result status="valid" time="1.020000" steps="113"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.72" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.120000" steps="18217"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.120000" steps="15520"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.73" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="1.330000" steps="136"/></proof>
@@ -615,13 +614,13 @@
   <goal name="wmpz_tdiv_q_2exp&#39;vc.74" expl="assertion" proved="true">
   <transf name="rewrite" proved="true" arg1="div_unique" arg2="with" arg3="(value rp o2)">
    <goal name="wmpz_tdiv_q_2exp&#39;vc.74.0" expl="assertion" proved="true">
-   <proof prover="6" memlimit="1000"><result status="valid" time="0.080000" steps="15546"/></proof>
+   <proof prover="0"><result status="valid" time="0.080000" steps="11125"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.74.1" expl="rewrite premises" proved="true">
-   <proof prover="6" memlimit="1000"><result status="valid" time="0.100000" steps="23498"/></proof>
+   <proof prover="0"><result status="valid" time="0.100000" steps="24720"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.74.2" expl="rewrite premises" proved="true">
-   <proof prover="6" memlimit="1000"><result status="valid" time="0.100000" steps="22246"/></proof>
+   <proof prover="0"><result status="valid" time="0.100000" steps="32179"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.74.3" expl="rewrite premises" proved="true">
    <transf name="split_vc" proved="true" >
@@ -636,15 +635,15 @@
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.75" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.170000" steps="23363"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.170000" steps="25171"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.76" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_tdiv_q_2exp&#39;vc.76.0" expl="precondition" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.180000" steps="23508"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.180000" steps="24698"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.76.1" expl="precondition" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="17418"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.100000" steps="14941"/></proof>
    </goal>
   </transf>
   </goal>
@@ -660,21 +659,21 @@
    <proof prover="7" timelimit="1" memlimit="1000"><result status="valid" time="0.330000" steps="546812"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.77.3" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2"><result status="valid" time="0.080000" steps="15702"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.080000" steps="11268"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.77.4" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2"><result status="valid" time="0.170000" steps="18393"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.170000" steps="19258"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.77.5" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <transf name="rewrite" proved="true" arg1="&lt;-" arg2="Power_sum">
     <goal name="wmpz_tdiv_q_2exp&#39;vc.77.5.0" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-    <proof prover="2"><result status="valid" time="0.100000" steps="15786"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="11346"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.77.5.1" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.180000" steps="24783"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.180000" steps="25835"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.77.5.2" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.100000" steps="15751"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="11328"/></proof>
     </goal>
    </transf>
    </goal>
@@ -682,15 +681,15 @@
    <proof prover="3"><result status="valid" time="0.400000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.77.7" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2"><result status="valid" time="0.110000" steps="15844"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.110000" steps="11413"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.78" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.130000" steps="16937"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.130000" steps="14436"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.79" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.200000" steps="24668"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.200000" steps="25767"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.80" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -714,7 +713,7 @@
    <proof prover="4"><result status="valid" time="0.080000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.81.3" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2"><result status="valid" time="0.240000" steps="25594"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.240000" steps="26946"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.81.4" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="4"><result status="valid" time="0.120000"/></proof>
@@ -726,70 +725,70 @@
    <proof prover="4"><result status="valid" time="1.090000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.81.7" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2"><result status="valid" time="0.240000" steps="26462"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.240000" steps="28482"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.81.8" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2"><result status="valid" time="0.140000" steps="17453"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.140000" steps="14811"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.81.9" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <transf name="apply" proved="true" arg1="div_minus">
     <goal name="wmpz_tdiv_q_2exp&#39;vc.81.9.0" expl="apply premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.120000" steps="27125"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.120000" steps="29109"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.81.9.1" expl="apply premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.230000" steps="24953"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.230000" steps="35838"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.81.10" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2"><result status="valid" time="0.170000" steps="17904"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.170000" steps="15510"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.82" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.070000" steps="17288"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.070000" steps="14668"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.83" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.120000" steps="26536"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.120000" steps="27261"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.84" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.160000" steps="17662"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.160000" steps="15077"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.85" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.110000" steps="15532"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.110000" steps="11111"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.86" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.100000" steps="16425"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="12020"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.87" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.080000" steps="16443"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.080000" steps="12026"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.88" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.080000" steps="18754"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.080000" steps="16493"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.89" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.420000" steps="50478"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.420000" steps="52737"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.90" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.120000" steps="17789"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.120000" steps="15029"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.91" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.390000" steps="50994"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.218756" steps="38869"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.92" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.130000"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.93" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.140000" steps="17905"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.140000" steps="15170"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.94" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.070000" steps="16744"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.070000" steps="12236"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.95" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.110000" steps="19242"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.110000" steps="16857"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.96" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.100000" steps="17970"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="15208"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.97" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.340000"/></proof>
@@ -800,15 +799,15 @@
   <goal name="wmpz_tdiv_q_2exp&#39;vc.99" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz1">
    <goal name="wmpz_tdiv_q_2exp&#39;vc.99.0" expl="apply premises" proved="true">
-   <proof prover="2"><result status="valid" time="0.320000" steps="31540"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.187461" steps="36027"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.99.1" expl="apply premises" proved="true">
    <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz2">
     <goal name="wmpz_tdiv_q_2exp&#39;vc.99.1.0" expl="apply premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.160000" steps="18970"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.160000" steps="16364"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.99.1.1" expl="apply premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.160000" steps="18970"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.160000" steps="16364"/></proof>
     </goal>
    </transf>
    </goal>
@@ -817,15 +816,15 @@
   <goal name="wmpz_tdiv_q_2exp&#39;vc.100" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_tdiv_q_2exp&#39;vc.100.0" expl="postcondition" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="16064"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.100000" steps="11487"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.100.1" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.130000" steps="18100"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.130000" steps="15227"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.101" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.170000" steps="15734"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.170000" steps="13894"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.102" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.060000"/></proof>
@@ -838,19 +837,19 @@
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.104" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.110000" steps="22004"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.110000" steps="23135"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.105" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.200000" steps="22112"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.200000" steps="24338"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.106" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.210000" steps="22130"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.210000" steps="23448"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.107" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.180000"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.108" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.310000" steps="42911"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.310000" steps="53641"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.109" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="2.150000" steps="339"/></proof>
@@ -859,11 +858,10 @@
   <proof prover="7"><result status="valid" time="0.100000" steps="102944"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.111" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.050000" steps="15779"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.050000" steps="11284"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.112" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.070000" steps="15776"/></proof>
-  <proof prover="6"><result status="valid" time="0.060000" steps="15777"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.060000" steps="11283"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.113" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -875,7 +873,7 @@
   <goal name="wmpz_tdiv_q_2exp&#39;vc.114" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_tdiv_q_2exp&#39;vc.114.0" expl="assertion" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.870000" steps="111607"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.253684" steps="54157"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.114.1" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="4"><result status="valid" time="0.380000"/></proof>
@@ -886,7 +884,7 @@
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.115" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.060000" steps="15962"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.060000" steps="11435"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.116" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -894,31 +892,31 @@
    <proof prover="3"><result status="valid" time="0.780000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.116.1" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.090000" steps="16036"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.090000" steps="11500"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.116.2" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.140000" steps="17790"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.140000" steps="15081"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.116.3" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.150000" steps="17791"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.150000" steps="15053"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.116.4" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <transf name="rewrite" proved="true" arg1="Mod_mult1">
     <goal name="wmpz_tdiv_q_2exp&#39;vc.116.4.0" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-    <proof prover="2"><result status="valid" time="0.230000" steps="24333"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.230000" steps="26531"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.116.4.1" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.100000" steps="16096"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="11534"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.116.5" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.240000" steps="24798"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.240000" steps="27611"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.117" expl="assertion" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.090000" steps="17837"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.090000" steps="15435"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.118" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -942,35 +940,35 @@
    <proof prover="3"><result status="valid" time="0.340000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.119.3" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.190000" steps="17994"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.050737" steps="15233"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.119.4" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.110000" steps="16220"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.110000" steps="11673"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.119.5" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.320000" steps="46153"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.708261" steps="112547"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.119.6" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="16274"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.100000" steps="11713"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.119.7" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="16265"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.100000" steps="11714"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.119.8" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="3"><result status="valid" time="0.340000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.119.9" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.130000" steps="16244"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.130000" steps="11705"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.119.10" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.080000" steps="18181"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.080000" steps="15380"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.120" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_tdiv_q_2exp&#39;vc.120.0" expl="assertion" proved="true">
-   <proof prover="6"><result status="valid" time="0.140000" steps="17498"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.140000" steps="15104"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.120.1" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="7"><result status="valid" time="1.060000" steps="1298894"/></proof>
@@ -982,26 +980,26 @@
    <proof prover="3"><result status="valid" time="0.230000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.120.4" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="6"><result status="valid" time="0.140000" steps="18039"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.140000" steps="15259"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.120.5" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="6"><result status="valid" time="0.100000" steps="16217"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.100000" steps="11681"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.120.6" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <transf name="apply" proved="true" arg1="div_unique">
     <goal name="wmpz_tdiv_q_2exp&#39;vc.120.6.0" expl="apply premises" proved="true">
-    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.080000" steps="18066"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.080000" steps="15280"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.120.6.1" expl="apply premises" proved="true">
     <proof prover="7" timelimit="1" memlimit="1000"><result status="valid" time="0.030000" steps="67650"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.120.6.2" expl="apply premises" proved="true">
-    <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.090000" steps="17614"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.090000" steps="15154"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.120.7" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="6"><result status="valid" time="0.100000" steps="17397"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.100000" steps="14695"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1009,7 +1007,7 @@
   <proof prover="7"><result status="valid" time="0.050000" steps="70495"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.122" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.150000" steps="17986"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.150000" steps="15236"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.123" expl="integer overflow" proved="true">
   <proof prover="7"><result status="valid" time="0.070000" steps="72357"/></proof>
@@ -1020,10 +1018,10 @@
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.124" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.110000" steps="18719"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.110000" steps="16073"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.125" expl="integer overflow" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.240000" steps="26457"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.240000" steps="29149"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.126" expl="assertion" proved="true">
   <proof prover="4"><result status="valid" time="0.240000"/></proof>
@@ -1037,13 +1035,13 @@
    <proof prover="3"><result status="valid" time="0.200000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.127.2" expl="assertion" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.200000" steps="19533"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.200000" steps="19713"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.127.3" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="3"><result status="valid" time="0.130000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.127.4" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.370000" steps="52115"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.370000" steps="81048"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.127.5" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="3"><result status="valid" time="0.120000"/></proof>
@@ -1055,16 +1053,16 @@
    <proof prover="3"><result status="valid" time="0.200000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.127.8" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.120000" steps="16106"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.120000" steps="11562"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.127.9" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.210000" steps="19450"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.082936" steps="18723"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.127.10" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="7"><result status="valid" time="0.080000" steps="78722"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.127.11" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.190000" steps="19024"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.066630" steps="16039"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.127.12" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="3"><result status="valid" time="0.190000"/></proof>
@@ -1078,13 +1076,13 @@
    <goal name="wmpz_tdiv_q_2exp&#39;vc.127.15" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <transf name="rewrite" proved="true" arg1="&lt;-" arg2="Power_sum">
     <goal name="wmpz_tdiv_q_2exp&#39;vc.127.15.0" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-    <proof prover="2"><result status="valid" time="0.120000" steps="17091"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.120000" steps="12499"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.127.15.1" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.500000" steps="59434"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.500000" steps="66166"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.127.15.2" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.260000" steps="27812"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.260000" steps="32923"/></proof>
     </goal>
    </transf>
    </goal>
@@ -1094,59 +1092,59 @@
     <proof prover="7" timelimit="1" memlimit="1000"><result status="valid" time="0.140000" steps="164112"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.127.16.1" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.460000" steps="59434"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.460000" steps="66166"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.127.16.2" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.130000" steps="27812"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.130000" steps="32923"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.127.17" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.180000" steps="19270"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.180000" steps="16226"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.127.18" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="3"><result status="valid" time="0.980000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.127.19" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.120000" steps="17123"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.120000" steps="12437"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.127.20" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.080000" steps="19481"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.080000" steps="16355"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.128" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_tdiv_q_2exp&#39;vc.128.0" expl="precondition" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.110000" steps="16139"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.110000" steps="11695"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.128.1" expl="precondition" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.060000" steps="16186"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.060000" steps="11726"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.129" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.050000" steps="16064"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.050000" steps="11595"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.130" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.060000" steps="16785"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.060000" steps="12164"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.131" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.120000" steps="16820"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.120000" steps="12184"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.132" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.100000" steps="16242"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.100000" steps="11738"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.133" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.200000" steps="27611"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.200000" steps="30439"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.134" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_tdiv_q_2exp&#39;vc.134.0" expl="assertion" proved="true">
-   <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.160000" steps="32344"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.160000" steps="32104"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.134.1" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="6"><result status="valid" time="0.080000" steps="19698"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.080000" steps="18469"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1162,7 +1160,7 @@
    <proof prover="4"><result status="valid" time="0.090000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.135.3" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.150000" steps="29067"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.150000" steps="32116"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.135.4" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="4"><result status="valid" time="0.380000"/></proof>
@@ -1174,24 +1172,24 @@
    <proof prover="7"><result status="valid" time="0.100000" steps="128884"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.135.7" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.440000" steps="57606"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.440000" steps="66343"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.135.8" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.150000" steps="18654"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.150000" steps="15610"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.135.9" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="7"><result status="valid" time="0.070000" steps="76942"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.135.10" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.170000" steps="19242"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.170000" steps="16493"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.136" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="16487"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.100000" steps="11973"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.137" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.180000" steps="28618"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.180000" steps="31742"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.138" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.180000"/></proof>
@@ -1200,16 +1198,16 @@
   <proof prover="3"><result status="valid" time="0.110000"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.140" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.120000" steps="17486"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.120000" steps="12834"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.141" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.110000" steps="17504"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.110000" steps="12840"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.142" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.180000" steps="20206"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.180000" steps="17469"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.143" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.630000" steps="66354"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.630000" steps="71573"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.144" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.080000"/></proof>
@@ -1218,43 +1216,43 @@
   <proof prover="3"><result status="valid" time="0.210000"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.146" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.090000" steps="19429"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.090000" steps="16307"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.147" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.220000" steps="27798"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.220000" steps="35197"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.148" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.120000" steps="17758"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.120000" steps="13018"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.149" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.190000" steps="20569"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.190000" steps="17705"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.150" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.080000" steps="19050"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.080000" steps="15881"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.151" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.620000"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.152" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.150000" steps="31295"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.150000" steps="35213"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.153" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz1">
    <goal name="wmpz_tdiv_q_2exp&#39;vc.153.0" expl="apply premises" proved="true">
-   <proof prover="2"><result status="valid" time="0.340000" steps="37268"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.340000" steps="52595"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.153.1" expl="apply premises" proved="true">
    <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz2">
     <goal name="wmpz_tdiv_q_2exp&#39;vc.153.1.0" expl="apply premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.170000" steps="20284"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.170000" steps="17246"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.153.1.1" expl="apply premises" proved="true">
     <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz4">
      <goal name="wmpz_tdiv_q_2exp&#39;vc.153.1.1.0" expl="apply premises" proved="true">
-     <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.790000" steps="72861"/></proof>
+     <proof prover="0" memlimit="2000"><result status="valid" time="0.790000" steps="87900"/></proof>
      </goal>
      <goal name="wmpz_tdiv_q_2exp&#39;vc.153.1.1.1" expl="apply premises" proved="true">
-     <proof prover="2"><result status="valid" time="0.160000" steps="20284"/></proof>
+     <proof prover="0" timelimit="1"><result status="valid" time="0.160000" steps="17246"/></proof>
      </goal>
     </transf>
     </goal>
@@ -1263,13 +1261,13 @@
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.154" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.110000" steps="19674"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.110000" steps="16740"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.155" expl="assertion" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.130000" steps="23416"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.130000" steps="26167"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.156" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.280000" steps="41935"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.280000" steps="51469"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.157" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1286,7 +1284,7 @@
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.159" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="16893"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.100000" steps="12161"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.160" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="1.390000" steps="159"/></proof>
@@ -1294,13 +1292,13 @@
   <goal name="wmpz_tdiv_q_2exp&#39;vc.161" expl="assertion" proved="true">
   <transf name="rewrite" proved="true" arg1="div_unique" arg2="with" arg3="(value rp o2)">
    <goal name="wmpz_tdiv_q_2exp&#39;vc.161.0" expl="assertion" proved="true">
-   <proof prover="6" memlimit="1000"><result status="valid" time="0.050000" steps="16083"/></proof>
+   <proof prover="0"><result status="valid" time="0.050000" steps="11506"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.161.1" expl="rewrite premises" proved="true">
-   <proof prover="6" memlimit="1000"><result status="valid" time="0.120000" steps="24304"/></proof>
+   <proof prover="0"><result status="valid" time="0.120000" steps="28736"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.161.2" expl="rewrite premises" proved="true">
-   <proof prover="6" memlimit="1000"><result status="valid" time="0.210000" steps="41910"/></proof>
+   <proof prover="0"><result status="valid" time="0.210000" steps="41350"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.161.3" expl="rewrite premises" proved="true">
    <transf name="split_vc" proved="true" >
@@ -1315,15 +1313,15 @@
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.162" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.130000" steps="24859"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.130000" steps="28227"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.163" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpz_tdiv_q_2exp&#39;vc.163.0" expl="precondition" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.240000" steps="24697"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.108766" steps="26931"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.163.1" expl="precondition" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.080000" steps="18015"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.080000" steps="15298"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1339,10 +1337,10 @@
    <proof prover="7"><result status="valid" time="0.440000" steps="667190"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.164.3" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="6"><result status="valid" time="0.100000" steps="16275"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.100000" steps="11684"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.164.4" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="6"><result status="valid" time="0.090000" steps="18956"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.090000" steps="20854"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.164.5" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <transf name="rewrite" proved="true" arg1="&lt;-" arg2="Power_sum">
@@ -1358,13 +1356,13 @@
    </transf>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.164.6" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="6"><result status="valid" time="0.140000" steps="18381"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.140000" steps="15561"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.164.7" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="3"><result status="valid" time="0.090000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.164.8" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="6"><result status="valid" time="0.100000" steps="16459"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.100000" steps="11854"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1376,19 +1374,19 @@
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.166" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.060000" steps="15796"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.060000" steps="11350"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.167" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.050000" steps="16489"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.050000" steps="11886"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.168" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.110000" steps="16525"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.110000" steps="11906"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.169" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.120000" steps="15975"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.120000" steps="11493"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.170" expl="integer overflow" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.250000" steps="26665"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.250000" steps="28667"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.171" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1396,7 +1394,7 @@
    <proof prover="4"><result status="valid" time="0.280000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.171.1" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="6"><result status="valid" time="0.080000" steps="19134"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.080000" steps="18059"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1412,7 +1410,7 @@
    <proof prover="4"><result status="valid" time="0.080000"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.172.3" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.240000" steps="28223"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.240000" steps="30048"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.172.4" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="4"><result status="valid" time="0.150000"/></proof>
@@ -1424,36 +1422,36 @@
    <proof prover="7"><result status="valid" time="0.090000" steps="118556"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.172.7" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.250000" steps="29486"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.250000" steps="32024"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.172.8" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.160000" steps="18218"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.160000" steps="15323"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.172.9" expl="VC for wmpz_tdiv_q_2exp" proved="true">
    <proof prover="7"><result status="valid" time="0.060000" steps="72699"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.172.10" expl="VC for wmpz_tdiv_q_2exp" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.130000" steps="18721"/></proof>
+   <proof prover="0" memlimit="2000"><result status="valid" time="0.130000" steps="16071"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.173" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="16216"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.100000" steps="11724"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.174" expl="integer overflow" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.170000" steps="28054"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.170000" steps="30219"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.175" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.090000" steps="18630"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.090000" steps="15756"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.176" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.110000" steps="26676"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.110000" steps="30483"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.177" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="17215"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.100000" steps="12585"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.178" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.140000" steps="17233"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.140000" steps="12591"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.179" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.180000"/></proof>
@@ -1462,25 +1460,25 @@
   <proof prover="3"><result status="valid" time="0.300000"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.181" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.170000" steps="18726"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.170000" steps="15726"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.182" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="2.370000" steps="164556"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.273541" steps="52653"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.183" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.180000" steps="18954"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.055158" steps="15965"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.184" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.140000" steps="27233"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.140000" steps="33687"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.185" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.110000" steps="17488"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.110000" steps="12769"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.186" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.080000" steps="20126"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.080000" steps="17390"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.187" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.110000" steps="18610"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.110000" steps="15582"/></proof>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.188" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.400000"/></proof>
@@ -1491,20 +1489,20 @@
   <goal name="wmpz_tdiv_q_2exp&#39;vc.190" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz1">
    <goal name="wmpz_tdiv_q_2exp&#39;vc.190.0" expl="apply premises" proved="true">
-   <proof prover="2"><result status="valid" time="0.270000" steps="34415"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.270000" steps="41565"/></proof>
    </goal>
    <goal name="wmpz_tdiv_q_2exp&#39;vc.190.1" expl="apply premises" proved="true">
    <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz2">
     <goal name="wmpz_tdiv_q_2exp&#39;vc.190.1.0" expl="apply premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.170000" steps="19762"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.170000" steps="16817"/></proof>
     </goal>
     <goal name="wmpz_tdiv_q_2exp&#39;vc.190.1.1" expl="apply premises" proved="true">
     <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz4">
      <goal name="wmpz_tdiv_q_2exp&#39;vc.190.1.1.0" expl="apply premises" proved="true">
-     <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.840000" steps="77954"/></proof>
+     <proof prover="0" memlimit="2000"><result status="valid" time="0.516614" steps="90948"/></proof>
      </goal>
      <goal name="wmpz_tdiv_q_2exp&#39;vc.190.1.1.1" expl="apply premises" proved="true">
-     <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.180000" steps="19762"/></proof>
+     <proof prover="0" memlimit="2000"><result status="valid" time="0.180000" steps="16817"/></proof>
      </goal>
     </transf>
     </goal>
@@ -1513,7 +1511,7 @@
   </transf>
   </goal>
   <goal name="wmpz_tdiv_q_2exp&#39;vc.191" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.180000" steps="19135"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.180000" steps="16311"/></proof>
   </goal>
  </transf>
  </goal>
