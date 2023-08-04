@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Z3" version="4.11.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.1.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.12.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="8" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="sudoku.mlw"/>
@@ -20,7 +20,7 @@
 </theory>
 <theory name="TheClassicalSudokuGrid" proved="true">
  <goal name="classical_sudoku&#39;vc" expl="VC for classical_sudoku" proved="true">
- <proof prover="0"><result status="valid" time="0.950000" steps="1438219"/></proof>
+ <proof prover="2"><result status="valid" time="0.680627" steps="3203533"/></proof>
  </goal>
 </theory>
 <theory name="Solver" proved="true">
@@ -162,7 +162,7 @@
  <proof prover="8"><result status="valid" time="0.040000" steps="8888"/></proof>
  </goal>
  <goal name="valid_changed_chunks" proved="true">
- <proof prover="0"><result status="valid" time="0.010000" steps="30010"/></proof>
+ <proof prover="2"><result status="valid" time="0.010000" steps="27853"/></proof>
  </goal>
  <goal name="valid_up_to_change&#39;vc" expl="VC for valid_up_to_change" proved="true">
  <proof prover="8"><result status="valid" time="0.060000" steps="13228"/></proof>
@@ -470,7 +470,7 @@
  <proof prover="8"><result status="valid" time="0.030000" steps="7686"/></proof>
  </goal>
  <goal name="test1&#39;vc" expl="VC for test1" proved="true">
- <proof prover="0"><result status="valid" time="0.190000" steps="311571"/></proof>
+ <proof prover="2"><result status="valid" time="0.054448" steps="262594"/></proof>
  </goal>
  <goal name="test2&#39;vc" expl="VC for test2" proved="true">
  <proof prover="8"><result status="valid" time="0.030000" steps="7675"/></proof>

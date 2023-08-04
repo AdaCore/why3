@@ -5,7 +5,7 @@
 <prover id="0" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="ropes.mlw"/>
 <theory name="String" proved="true">
@@ -56,7 +56,7 @@
  <proof prover="0"><result status="valid" time="0.760000" steps="1053"/></proof>
  </goal>
  <goal name="string_of_array_concat_right&#39;vc" expl="VC for string_of_array_concat_right" proved="true">
- <proof prover="4"><result status="valid" time="0.010000" steps="29983"/></proof>
+ <proof prover="3"><result status="valid" time="0.010000" steps="31317"/></proof>
  </goal>
  <goal name="string_of_array_length&#39;vc" expl="VC for string_of_array_length" proved="true">
  <proof prover="0"><result status="valid" time="0.020000" steps="102"/></proof>
@@ -100,7 +100,7 @@
   <proof prover="0"><result status="valid" time="0.000000" steps="36"/></proof>
   </goal>
   <goal name="insert&#39;vc.9" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.030000" steps="140337"/></proof>
+  <proof prover="3"><result status="valid" time="0.030000" steps="286627"/></proof>
   </goal>
   <goal name="insert&#39;vc.10" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.940000" steps="464"/></proof>
@@ -128,7 +128,7 @@
     <proof prover="0"><result status="valid" time="1.040000" steps="573"/></proof>
     </goal>
     <goal name="insert&#39;vc.16.0.1" expl="assertion" proved="true">
-    <proof prover="4" timelimit="1"><result status="valid" time="0.020000" steps="50824"/></proof>
+    <proof prover="3" timelimit="1"><result status="valid" time="0.020000" steps="48771"/></proof>
     </goal>
    </transf>
    </goal>

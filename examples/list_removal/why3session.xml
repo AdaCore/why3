@@ -5,8 +5,8 @@
 <prover id="0" name="Eprover" version="2.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="list_removal.mlw"/>
 <theory name="Top" proved="true">
@@ -252,7 +252,7 @@
   <proof prover="4"><result status="valid" time="0.020000" steps="1412"/></proof>
   </goal>
   <goal name="remove1&#39;vc.27" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.010000" steps="8103"/></proof>
+  <proof prover="3"><result status="valid" time="0.010000" steps="7210"/></proof>
   </goal>
   <goal name="remove1&#39;vc.28" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.000000" steps="32"/></proof>
@@ -260,7 +260,7 @@
   <goal name="remove1&#39;vc.29" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="remove1&#39;vc.29.0" expl="precondition" proved="true">
-   <proof prover="5" timelimit="10"><result status="valid" time="0.010000" steps="560"/></proof>
+   <proof prover="3" timelimit="10"><result status="valid" time="0.010000" steps="560"/></proof>
    </goal>
   </transf>
   </goal>
@@ -318,7 +318,7 @@
   <proof prover="1"><result status="valid" time="0.000000" steps="26"/></proof>
   </goal>
   <goal name="remove2&#39;vc.15" expl="postcondition" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.010000" steps="13575"/></proof>
+  <proof prover="3" timelimit="1"><result status="valid" time="0.010000" steps="12894"/></proof>
   </goal>
  </transf>
  </goal>

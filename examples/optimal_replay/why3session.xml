@@ -4,9 +4,9 @@
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="optimal_replay.mlw"/>
@@ -70,8 +70,8 @@
   </goal>
   <goal name="distance&#39;vc.17" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.040000"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="20714"/></proof>
   <proof prover="3"><result status="valid" time="0.020000"/></proof>
-  <proof prover="6"><result status="valid" time="0.010000" steps="21242"/></proof>
   </goal>
   <goal name="distance&#39;vc.18" expl="loop invariant preservation" proved="true">
   <proof prover="1" timelimit="17"><result status="valid" time="0.780000"/></proof>

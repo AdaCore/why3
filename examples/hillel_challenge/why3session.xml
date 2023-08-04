@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="hillel_challenge.mlw"/>
 <theory name="Leftpad" proved="true">
@@ -101,8 +101,8 @@
   <proof prover="2"><result status="valid" time="0.070000" steps="11874"/></proof>
   </goal>
   <goal name="unique&#39;vc.18" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="63214"/></proof>
   <proof prover="2"><result status="valid" time="0.150000" steps="23928"/></proof>
+  <proof prover="3"><result status="valid" time="0.020000" steps="57831"/></proof>
   </goal>
   <goal name="unique&#39;vc.19" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.010000" steps="36"/></proof>
@@ -494,7 +494,7 @@
   </goal>
   <goal name="fulcrum&#39;vc.18" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.030000" steps="151"/></proof>
-  <proof prover="2"><result status="valid" time="0.080000" steps="11297"/></proof>
+  <proof prover="2"><result status="valid" time="0.080000" steps="11292"/></proof>
   </goal>
   <goal name="fulcrum&#39;vc.19" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.060000" steps="251"/></proof>

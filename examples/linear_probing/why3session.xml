@@ -3,10 +3,10 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.12.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -154,12 +154,12 @@
   <goal name="resize&#39;vc.11" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="resize&#39;vc.11.0" expl="loop invariant preservation" proved="true">
-   <proof prover="1" timelimit="1"><result status="valid" time="0.460000" steps="1389457"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.083030" steps="767255"/></proof>
    </goal>
    <goal name="resize&#39;vc.11.1" expl="loop invariant preservation" proved="true">
    <transf name="split_vc" proved="true" >
     <goal name="resize&#39;vc.11.1.0" expl="loop invariant preservation" proved="true">
-    <proof prover="1" memlimit="2000"><result status="valid" time="3.350000" steps="4932800"/></proof>
+    <proof prover="5" memlimit="2000"><result status="valid" time="0.174062" steps="1164322"/></proof>
     </goal>
    </transf>
    </goal>
