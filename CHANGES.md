@@ -53,6 +53,9 @@ Tools
 Provers
   * support for Coq 8.17.0 (released Mar 23, 2023)
   * drop support for versions of Coq < 8.11
+  * support for Alt-Ergo 2.4.3
+  * support for Z3 4.12.x
+  * support for CVC5 1.0.5
 
 Configuration
   * the `./configure` option `--disable-pp-sexp` is renamed into `--disable-sexp` :x:
@@ -143,7 +146,7 @@ Provers
   * support for Z3 4.9.0 and 4.9.1 (released Jul 6, 2022)
   * support for Z3 4.10.0, 4.10.1, and 4.10.2 (released Jul 30, 2022)
   * support for Z3 4.11.0 (released Aug 18, 2022)
-  * support for Coq 8.16.0 (release Sep 5, 2022)
+  * support for Coq 8.16.0 (released Sep 5, 2022)
   * support for Gappa 1.4.0 (released Apr 16, 2022)
 
 Version 1.5.0, April 29, 2022
