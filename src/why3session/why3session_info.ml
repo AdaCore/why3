@@ -450,18 +450,18 @@ let print_hist stats =
     eprintf "See also results in file why3session.pdf@."
 
 (** Generate pairs of provers for the scatter and hist plots.*)
-let generate_provers_pairs  stats =
+let generate_provers_pairs stats =
   let all_provers = 
     Hpn.fold (fun _pn provers_and_times acc ->
-        List.fold_left
-        Sprover.add_left acc (Mprover.keys provers_and_times)
+        (List.fold_left
+        Sprover.add_left acc (Mprover.keys provers_and_times))
     ) stats.proof_node_proofs Sprover.empty
   in
   let (_, pairs) =
     Sprover.fold (fun prover (visited, pairs) ->
       (prover::visited, List.append pairs (List.map (fun x -> (x,prover)) visited))
     ) all_provers ([],[])
-    in pairs
+  in pairs
 
 (** Print one comparison scatter plot for each pair of provers in the session*)
 let print_compare_scatter stats =
@@ -499,7 +499,6 @@ let print_compare_scatter stats =
   in
   let main_fmt = formatter_of_out_channel main_ch in
   fprintf main_fmt "set key off@\n";
-(*   fprintf main_fmt "set multiplot layout 8,1@\n"; *)
   let print_plot (filename,(prover1, prover2)) = 
     let max_time = max (Hprover.find stats.prover_max_time prover1) (Hprover.find stats.prover_max_time prover2)
     in
@@ -525,72 +524,73 @@ let print_compare_scatter stats =
 let print_compare_hist stats =
   let all_provers_pairs = generate_provers_pairs stats
   in
-  if all_provers_pairs = [] then eprintf "Not enough provers in the session@\n";
-  let build_ratio_list (prover1, prover2) =
-    let (x,_) =
-    Hpn.fold (
-      fun _pn provers_and_times (out_list,idx) ->
-      let time1 =
-        try Mprover.find prover1 provers_and_times
-        with Not_found -> Float.infinity
-      in let time2 =
-        try Mprover.find prover2 provers_and_times
-        with Not_found -> Float.infinity
-      in
-      (List.merge Float.compare out_list [time1/.time2], idx + 1)
-      ) stats.proof_node_proofs ([], 1)
-    in List.rev x
+  if all_provers_pairs = [] then eprintf "Not enough provers in the session. No graph will be produced.@\n";
+  let ratio_and_exclusives (prover1, prover2) =
+    let (out_list, p1_only, p2_only) =
+      Hpn.fold (
+         fun _pn provers_and_times (out_list, p1_only, p2_only) ->
+          match Mprover.find_opt prover1 provers_and_times, Mprover.find_opt prover2 provers_and_times with
+          | Some time1, Some time2 -> 
+          (* For some time, Alt-Ergo reported null times and this got stored in sessions.
+          Eventually this should be removed*)
+            (let time1 = if (time1 = Float.zero) then time1 +. 0.000001 else time1 in
+             let time2 = if (time2 = Float.zero) then time2 +. 0.000001 else time2 in
+              (time1/.time2 :: out_list), p1_only, p2_only)
+          | Some _    , None       -> (out_list, p1_only + 1, p2_only    )
+          | None      , Some _     -> (out_list, p1_only    , p2_only + 1)
+          | None      , None       -> (out_list, p1_only +1 , p2_only + 1)
+        ) stats.proof_node_proofs ([], 0, 0)
     in
-  let print_ratio_list l =
-    let pf,ch = Filename.open_temp_file "why3session" ".data" in
+    let p2_name = (string_of_prover prover2) in
+    let p1_name = (string_of_prover prover1) in
+    if out_list == [] then
+      eprintf "Not enough data points to compare %s and %s, graph will not be produced.@." p1_name p2_name;
+    ((p1_name, p2_name), out_list |> List.sort Float.compare,
+    p1_only, p2_only)
+  in
+  let print_ratio_list (pair, ratio_list, p1_only, p2_only) =
+    let datafile,ch = Filename.open_temp_file "why3session" ".data" in
     let fmt = formatter_of_out_channel ch in
-    let maxratio = l |> List.filter (fun x -> not (Float.is_infinite x))
-                     |> List.fold_left max 0.0
-    in
-    let _ = List.fold_right (fun elem acc ->
-      let () =
-        if not (Float.is_nan elem) then
-        if Float.is_infinite elem then
-         fprintf fmt "%.2f@\n" maxratio
-        else
-         fprintf fmt "%.2f@\n" elem
-      in acc + 1) l 1
-    in
+    List.iter (fprintf fmt "%.6f@.") ratio_list;
     fprintf fmt "@.";
     close_out ch;
-    pf
+    (pair, datafile, p1_only, p2_only)
   in
-  let comparison_datafiles =
-    all_provers_pairs |> List.map build_ratio_list |> List.map print_ratio_list
+  let datafiles_and_exclusives =
+    all_provers_pairs |> List.map ratio_and_exclusives |> List.filter (fun (_,l, _, _) -> l != []) |> List.map print_ratio_list
   in
   let main_file,main_ch = Filename.open_temp_file "why3session" ".gnuplot"
   in
   let main_fmt = formatter_of_out_channel main_ch in
   fprintf main_fmt "set key off@\n";
-(*   fprintf main_fmt "set multiplot layout 8,1@\n"; *)
-  let print_plot (filename,(prover1, prover2)) = 
-    let prover1_name = string_of_prover prover1 in
-    let prover2_name = string_of_prover prover2 in
-      if filename <> "" then
-        (fprintf main_fmt "set key off@\n";
-        fprintf main_fmt "set xlabel \"Percentage of goals\" @\n";
-        fprintf main_fmt "stats '%s' using 1 nooutput@\n" filename;
-        fprintf main_fmt "set autoscale xfix@\n";
-        fprintf main_fmt "set logsc y@\n";
-        fprintf main_fmt "set ytics (1,1)@\n";
-        fprintf main_fmt "do for [i=1:5] {set ytics add (sprintf(\"1/%%.f\",10**i) 1./10**i)}@\n";
-        fprintf main_fmt "do for [i=1:5] {set ytics add (sprintf(\"%%.f\",10**i) 10**i)}@\n";
-        fprintf main_fmt "set xtics (0,0)@\n";
-        fprintf main_fmt "do for [i=1:10] {set xtics add (sprintf(\"%%d\",10*i) i*STATS_records/10)}@\n";
-        fprintf main_fmt "if (STATS_mean>1) {set ytics add (sprintf(\"Average: %%.2f\", STATS_mean) STATS_mean)}@\n";
-        fprintf main_fmt "else {set ytics add (sprintf(\"Average:\\n1/%%.2f\", 1/STATS_mean) STATS_mean)}@\n";
-        fprintf main_fmt "stats '%s' using ($1<1) nooutput prefix \"IMPROV\"@\n" filename;
-        fprintf main_fmt "set title sprintf(\"%s is faster than %s on %%.2f %%%% of %%d goals\", IMPROV_sum/STATS_records*100, STATS_records)@\n" prover1_name prover2_name;
-        fprintf main_fmt "plot '%s' with points pointtype 5 pointsize 0.5 linecolor rgb \"blue\", STATS_mean title \"Mean\"@\n" filename;
-        fprintf main_fmt "pause -1 \"Press any key\"@\n";
-        fprintf main_fmt "replot@.")
+  let print_plot ((prover1_name, prover2_name), filename, p1_only, p2_only) = 
+        fprintf main_fmt {|prover1 = "%s"@.prover2 = "%s"@.|} prover1_name prover2_name;
+        fprintf main_fmt {|filename = "%s"@.|} filename;
+        fprintf main_fmt {|exclusives = "\n%d additional goals are only proved by ".prover1.", %d only by ".prover2@.|} p1_only p2_only;
+        fprintf main_fmt
+{|set key off
+stats filename using 1 nooutput
+set xlabel "Percentage of goals"
+set ylabel sprintf("Time ratio: %%s over %%s", prover1, prover2)
+set autoscale xfix
+set logsc y
+set ytics (1,1)
+do for [i=1:5] {set ytics add (sprintf("1/%%.d",10**i) 1./10**i)}
+do for [i=1:5] {set ytics add (sprintf("%%.d",10**i) 10**i)}
+set xtics (0,0)
+do for [i=1:10] {set xtics add (sprintf("%%d",10*i) i*STATS_records/10)}
+if (STATS_mean>1) {set ytics add (sprintf("Average: %%.2f", STATS_mean) STATS_mean)}
+else {if (STATS_mean != 0) {set ytics add (sprintf("Average:\n1/%%.2f", 1/STATS_mean) STATS_mean)}}
+stats filename using ($1<1) nooutput prefix "IMPROV"
+percent_improve = IMPROV_sum/STATS_records*100
+if (percent_improve > 50) {title_string = sprintf("%%s is faster than %%s on %%.2f %%%% of %%d goals", prover1, prover2, percent_improve, STATS_records)}
+else {title_string = sprintf("%%s is faster than %%s on %%.2f %%%% of %%d goals", prover2, prover1, 100-percent_improve, STATS_records)}
+set title title_string.exclusives
+plot filename with points pointtype 5 pointsize 0.5 linecolor rgb "blue", STATS_mean title "Mean", 1
+pause -1 "Press any key"
+replot@.|};
   in
-  List.iter print_plot (List.combine comparison_datafiles all_provers_pairs);
+  List.iter print_plot datafiles_and_exclusives;
   close_out main_ch;
   let cmd = "gnuplot " ^ main_file in
   eprintf "Running command %s@." cmd;
