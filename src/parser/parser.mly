@@ -11,29 +11,6 @@
 
 %{
 
-  open Ptree
-
-  let add_record_projections (d: Ptree.decl) =
-    let meta_id = {id_str = Theory.(meta_record.meta_name);
-                   id_ats = [];
-                   id_loc = Loc.dummy_position}
-    in
-    match d with
-    | Dtype dl ->
-        List.iter (fun td ->
-          match td.td_def with
-          | TDrecord fl ->
-              List.iter (fun field ->
-                let m = Dmeta (meta_id, [Mfs (Qident field.f_ident)]) in
-                Typing.add_decl field.f_loc m
-                )
-                fl
-          | _ -> ()
-          )
-          dl
-    | _ -> ()
-
-
 %}
 
 (* Entry points *)
@@ -118,9 +95,7 @@ module_decl:
 | IMPORT uqualid
     { Typing.add_decl (floc $startpos $endpos) (Dimport($2)) }
 | d = pure_decl | d = prog_decl | d = meta_decl
-    { Typing.add_decl (floc $startpos $endpos) d;
-      add_record_projections d
-    }
+    { Typing.add_decl (floc $startpos $endpos) d }
 | use_clone { () }
 
 module_decl_parsing_only:

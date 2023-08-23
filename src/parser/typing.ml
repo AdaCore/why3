@@ -1316,6 +1316,7 @@ let add_types muc tdl =
   let def = List.fold_left add Mstr.empty tdl in
   let hts = Hstr.create 5 in
   let htd = Hstr.create 5 in
+  let meta_records = ref [] in
   let rec visit ~alias ~alg x d = if not (Hstr.mem htd x) then
     let id = create_user_id d.td_ident and loc = d.td_loc in
     let args = List.map (fun id -> tv_of_string id.id_str) d.td_params in
@@ -1375,6 +1376,8 @@ let add_types muc tdl =
           let {id_str = nm; id_loc = loc} = fd.f_ident in
           (* add proper attribute for later printing in dotted notation `t.id` *)
           let id = add_is_field_attr fd.f_ident in
+          (* create metas for recovering record values from cex generation *)
+          meta_records := id :: !meta_records;
           let id = create_user_id id in
           let ity = parse ~loc ~alias ~alg fd.f_pty in
           let ghost = d.td_vis = Abstract || fd.f_ghost in
@@ -1450,7 +1453,12 @@ let add_types muc tdl =
   Mstr.iter (visit ~alias:Mstr.empty ~alg:Mstr.empty) def;
   let tdl = List.map (fun d -> Hstr.find htd d.td_ident.id_str) tdl in
   let add muc d = add_pdecl ~vc:true muc d in
-  List.fold_left add muc (create_type_decl tdl)
+  let muc = List.fold_left add muc (create_type_decl tdl) in
+  let add muc fid =
+    let ls = find_fsymbol muc.muc_theory (Qident fid) in
+    add_meta muc Theory.meta_record [MAls ls]
+  in
+  List.fold_left add muc !meta_records
 
 
 let tyl_of_params {muc_theory = tuc} pl =
