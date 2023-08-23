@@ -1305,6 +1305,27 @@ session, depending on the following specific options.
         why3 session info --edited-files --print0 vstte12_bfs.mlw | \
             xargs -0 git add
 
+.. option:: --graph=[all|hist|scatter]
+
+   Prepare `gnuplot` files containing graphs with various comparisons of the
+   provers in the session, and display them if `gnuplot` is present in the
+   system. If no option is specified, `all` is used.
+
+   - ``all``: Output a line graph with each line representing the cumulative
+     time taken by a prover on all goals, as function of the nuber of goals.
+     Goals are ordered by shortest to longest relative to the prover.
+
+   - ``hist``: For every pair of provers in the session, output a histogram
+     representing the ratio between the time taken by each prover on each goal,
+     sorted by ascending ratio. Also display the average ratio and the
+     percentage of goals where one prover was faster.
+
+   - ``scatter``: For every pair of provers in the session, output a graph where
+     the `x` and `y` coordinates of each goal represent the time the two provers
+     needed to prove it. Therefore, goals where the prover in the `x` axis was
+     faster appear above the bisecting line of the graph area, and goals where
+     the prover in the `y` axis was faster appear below the bisecting line.
+
 Session Statistics
 ^^^^^^^^^^^^^^^^^^
 

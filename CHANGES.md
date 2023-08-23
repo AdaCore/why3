@@ -45,6 +45,9 @@ Tools
     nodes via filters. See manual Section 5.5.4.
     New option `create`, which generates a new session for the specified files.
     See manual Section 5.5.5.
+    Option `graph` now takes parameter: `all|hist|scatter`. The old behaviour is
+    the same as the `all` parameter. `hist` and `scatter` provide finer graphs
+    for pairwise comparison of provers.
   * New command `why3 bench` which runs all proofs attempts nodes that have not
     been run before. See manual Section 5.13.
   * New option `--ignore-shapes` for `why3 replay`. It disables the use of shapes
