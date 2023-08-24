@@ -16,12 +16,15 @@
   let () =
     List.iter (fun (x,y) -> Hashtbl.add keywords x y) Keywords.keyword_tokens
 
+  let warn_inexistent_file =
+    Loc.register_warning "inexistent_file" "Warn about inexistent file in source location"
+
   let resolve_file orig_file file =
     try
       Sysutil.resolve_from_paths [Filename.dirname orig_file] file
     with
     | e ->
-       Loc.warning "inexistent file in source location: %a" Exn_printer.exn_printer e;
+       Loc.warning ~id:warn_inexistent_file "inexistent file in source location: %a" Exn_printer.exn_printer e;
        file
 }
 

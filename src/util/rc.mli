@@ -60,6 +60,7 @@ exception IntExpected of string * rc_value
 exception BoolExpected of string * rc_value
 (** [BoolExpected key value] is raised if a boolean was expected. *)
 
+val warn_missing_field: Loc.warning_id
 
 (** {2 RC API} *)
 

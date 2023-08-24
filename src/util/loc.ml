@@ -244,6 +244,11 @@ end
 
 (* user positions *)
 
+let warn_start_overflow =
+  register_warning "start_overflow" "Warn when the start location of a warning overflows into the next line"
+let warn_end_overflow =
+  register_warning "end_overflow" "Warn when the end location of a warning overflows into the next line"
+
 let warning_emitted = ref false
 
 let user_position f bl bc el ec =
@@ -255,7 +260,7 @@ let user_position f bl bc el ec =
                 string_of_int bc ^ "` out of bounds");
   if bc > mask_col && not !warning_emitted then
     begin
-      warning "Loc.user_position: start char number `%d` overflows on next line" bc;
+      warning ~id:warn_start_overflow "Loc.user_position: start char number `%d` overflows on next line" bc;
       warning_emitted := true;
     end;
   if el < 0 || el > max_line then
@@ -266,7 +271,7 @@ let user_position f bl bc el ec =
                 string_of_int ec ^ "` out of bounds");
   if ec >= mask_col  && not !warning_emitted then
     begin
-      warning "Loc.user_position: end char number `%d` overflows on next line" ec;
+      warning ~id:warn_end_overflow "Loc.user_position: end char number `%d` overflows on next line" ec;
       warning_emitted := true;
     end;
   let tag = FileTags.get_file_tag f in

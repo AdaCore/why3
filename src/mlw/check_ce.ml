@@ -388,6 +388,9 @@ let rec find_in_term loc t =
 
 type rs_or_term = RTrsymbol of rsymbol | RTterm of (Decl.prsymbol * term)
 
+let warn_cannot_check_ce = 
+  Loc.register_warning "cannot_check_ce" "Warn about uncheckable counterexamples"
+
 (** Identifies the rsymbol of the definition that contains the given
    position. *)
 let find_rs pm loc =
@@ -436,14 +439,14 @@ let find_rs pm loc =
          List.exists (find_in_term loc) td.itd_invariant ||
          Opt.exists in_e td.itd_witness in
        let find_td td = (* TODO *)
-         if in_tdef td then Loc.warning
+         if in_tdef td then Loc.warning ~id:warn_cannot_check_ce
              "Can't check CE for VC from type definitions :(";
          None in
        find_in_list find_td ds
     | PDlet ld ->
        (match ld with
         | LDvar (_, e) -> (* TODO *)
-            if in_e e then Loc.warning
+            if in_e e then Loc.warning ~id:warn_cannot_check_ce
                 "Can't check CE for VC from variable definitions :(";
            None
         | LDsym (rs, ce) -> maybe (in_cty rs.rs_cty || in_ce ce) rs
