@@ -300,6 +300,9 @@ let default_prelude_printer _ ?old:_ ?fname:_ ~deps:_ ~global_prelude
   Printer.print_prelude fmt global_prelude;
   Printer.print_prelude fmt prelude
 
+let dummy_prelude_printer _ ?old:_ ?fname:_ ~deps:_ ~global_prelude:_
+      ~prelude:_ _ _ = ()
+
 let dummy_border_printer _ ?old:_ ?fname:_ _ _ = ()
 
 let printers : printer Hstr.t = Hstr.create 17
