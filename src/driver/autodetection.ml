@@ -204,7 +204,7 @@ module Partial = struct
       let manual = get_bool ~default:false section "manual" in
       Some { name; path; version; shortcut; manual }
     with MissingField s ->
-      Loc.warning "cannot load a %s section: missing field '%s'@." section_name s;
+      Loc.warning ~id:warn_missing_field "cannot load a %s section: missing field '%s'@." section_name s;
       None
 
   let load_rc rc =

@@ -170,6 +170,9 @@
 
   let error_loc loc = Loc.error ~loc Error
 
+  let warn_redundant_import =
+    Loc.register_warning "redundant import" "Warn about redundant import"
+
   let () = Exn_printer.register (fun fmt exn -> match exn with
     | Error -> Format.fprintf fmt "syntax error %s" (Parser_messages.message 1)
     | _ -> raise exn)
@@ -391,12 +394,12 @@ See also `plugins/cfg/cfg_parser.mly`
 | USE boption(IMPORT) m_as_list = comma_list1(use_as)
     { let loc = floc $startpos $endpos in
       let exists_as = List.exists (fun (_, q) -> q <> None) m_as_list in
-      if $2 && not exists_as then Loc.warning ~loc
+      if $2 && not exists_as then Loc.warning ~loc ~id:warn_redundant_import
         "the keyword `import' is redundant here and can be omitted";
       (Duseimport (loc, $2, m_as_list)) }
 | CLONE boption(IMPORT) tqualid option(preceded(AS, uident)) clone_subst
     { let loc = floc $startpos $endpos in
-      if $2 && $4 = None then Loc.warning ~loc
+      if $2 && $4 = None then Loc.warning ~loc ~id:warn_redundant_import
         "the keyword `import' is redundant here and can be omitted";
       (Dcloneimport (loc, $2, $3, $4, $5)) }
 

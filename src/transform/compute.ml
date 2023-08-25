@@ -41,6 +41,9 @@ let meta_begin_compute_context =
 
 let rule_attr = Ident.create_attribute "rewrite"
 
+let warn_cannot_rewrite = 
+  Loc.register_warning "cannot_rewrite" "Warn that a proposition cannot be turned into a rewrite rule"
+
 let collect_rules p env km prs t =
   let acc = Task.task_fold
     (fun acc td -> match td.Theory.td_node with
@@ -56,7 +59,7 @@ let collect_rules p env km prs t =
     (fun e (pr,t) ->
       try add_rule t e
       with NotARewriteRule msg ->
-        Loc.warning "proposition %a cannot be turned into a rewrite rule: %s"
+        Loc.warning ~id:warn_cannot_rewrite "proposition %a cannot be turned into a rewrite rule: %s"
          Pretty.print_pr pr msg;
         e
     )
@@ -200,7 +203,7 @@ let simplify check_ls env : 'a Trans.trans =
       (fun e (pr,t) ->
         try add_rule t e
         with NotARewriteRule msg ->
-          Loc.warning "proposition %a cannot be turned into a rewrite rule: %s"
+          Loc.warning ~id:warn_cannot_rewrite "proposition %a cannot be turned into a rewrite rule: %s"
             Pretty.print_pr pr msg;
           e
       )

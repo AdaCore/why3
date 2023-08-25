@@ -33,6 +33,9 @@ type oracle_quant_var = env -> Term.vsymbol -> Value.value option
 
 let oracle_quant_var_dummy _ _ = None
 
+let warn_model_not_checked =
+  Loc.register_warning "model_not_checked" "Warn that the model for a quantified variable has not been checked"
+
 (* Get the value of a vsymbol with env.rac.get_value or a default value *)
 let oracle_quant_var
     ?(bind_univ_quant_vars=false) ?(bind_univ_quant_vars_default=false)
@@ -44,7 +47,7 @@ let oracle_quant_var
       let value =
         if bind_univ_quant_vars then
           let check _ _ =
-            Loc.warning "Model value for all-quantified variable not checked" in
+            Loc.warning ~id:warn_model_not_checked "Model value for all-quantified variable not checked" in
           oracle.for_variable env ~check ~loc:(Some loc) vs.vs_name (ity_of_ty vs.vs_ty)
         else None in
       let value =
