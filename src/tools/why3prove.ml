@@ -17,7 +17,7 @@ open Theory
 open Task
 
 let usage_msg =
-  "Usage: [[<file>|-] [-T <theory> [-G <goal>]...]...]...\n\
+  "[[<file>|-] [-T <theory> [-G <goal>]...]...]...\n\
    Run some transformation or prover on the given goals."
 
 let opt_queue = Queue.create ()
@@ -184,9 +184,9 @@ let option_list =
      reduction is insufficient, with optional, space-\n\
      separated time and memory limit (e.g. 'cvc4 2 1000')";
     KLong "rac-timelimit", Hnd1 (AInt, fun i -> opt_rac_timelimit := Some i),
-    "<seconds> Time limit in seconds for RAC (with --check-ce)";
+    "<sec> set the time limit for RAC (with --check-ce)";
     KLong "rac-steplimit", Hnd1 (AInt, fun i -> opt_rac_steplimit := Some i),
-    "<steps> Step limit for RAC (with --check-ce)";
+    "<steps> set the step limit for RAC (with --check-ce)";
     KLong "ce-log-verbosity", Hnd1(AInt, fun i -> opt_ce_log_verbosity := Some i),
     "<lvl> verbosity level for interpretation log of\n\
     counterexample solver model";

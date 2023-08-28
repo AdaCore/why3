@@ -277,6 +277,7 @@ let run () =
 let cmd =
   { cmd_spec = spec;
     cmd_desc = "output session in HTML format";
+    cmd_usage = "<session>\nOutput session in HTML format";
     cmd_name = "html";
     cmd_run  = run;
   }

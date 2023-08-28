@@ -14,8 +14,8 @@ open Why3session_lib
 open Session_itp
 
 let usage_msg =
-  "<files>\n\
-  \ Generate a fresh session containing the specified files."
+  "-o <dir> <files>\n\
+   Generate a fresh session containing the specified files."
 
 let provers = ref []
 let opt_outputdir = ref None
@@ -37,10 +37,10 @@ let spec =
   [
     ( Key ('P', "provers"),
       Hnd1 (AList (':', AString), fun p -> provers := p),
-      "<prover1:prover2...> Specify provers" );
+      "<prover1:prover2...> specify provers" );
     ( Key ('o', "output-dir"),
       Hnd1 (AString, fun s -> opt_outputdir := Some s),
-      "<dir> set the output dir" );
+      "<dir> set the output directory" );
     ( Key ('t', "timelimit"),
       Hnd1 (AFloat, fun i -> opt_timelimit := Some i),
       "<sec> set the prover's time limit" );
@@ -148,7 +148,8 @@ let run () =
 let cmd =
   {
     cmd_spec = spec;
-    cmd_desc = "Create a session, arguments are source files to add";
+    cmd_desc = "create a session";
+    cmd_usage = usage_msg;
     cmd_name = "create";
     cmd_run = run;
   }

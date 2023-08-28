@@ -174,7 +174,7 @@ let spec =
   ]
 
 let usage_str =
-  "[<file.why>|<project directory>]...\n\
+  "[<file>|<session directory>]...\n\
    Open a graphical interface for Why3."
 
 let env, gconfig =

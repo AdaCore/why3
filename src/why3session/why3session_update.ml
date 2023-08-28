@@ -103,6 +103,7 @@ let cmd_update =
   {
     cmd_spec = spec_update;
     cmd_desc = "update session from the command line";
+    cmd_usage = "<session>\nUpdate session from the command line.";
     cmd_name = "update";
     cmd_run = run_update;
   }
