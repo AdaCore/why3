@@ -70,11 +70,11 @@ let option_list =
      reduction is insufficient, with optional, space-\n\
      separated time and memory limit (e.g. 'cvc4 2 1000')";
     KLong "rac-timelimit", Hnd1 (AInt, fun i -> opt_rac_timelimit := Some i),
-    "<seconds> Time limit in seconds for RAC (with --rac)";
+    "<sec> set the time limit for RAC (with --rac)";
     KLong "rac-steplimit", Hnd1 (AInt, fun i -> opt_rac_steplimit := Some i),
-    "<steps> Step limit for RAC (with --rac)";
+    "<steps> set the step limit for RAC (with --rac)";
     KLong "rac-fail-cannot-check", Hnd0 (fun () -> opt_rac_ignore_incomplete := false),
-    " Fail RAC as incomplete when a assertion cannot be checked";
+    " Ffil RAC as incomplete when an assertion cannot be checked";
     KLong "use", Hnd1 (AString, fun m -> use_modules := m :: !use_modules),
     "<qualified_module> use module in the execution";
   ]

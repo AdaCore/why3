@@ -37,10 +37,10 @@ let spec =
   [
     ( Key ('P', "provers"),
       Hnd1 (AList (':', AString), fun p -> provers := p),
-      "<prover1:prover2...> Specify provers" );
+      "<prover1:prover2...> specify provers" );
     ( Key ('o', "output-dir"),
       Hnd1 (AString, fun s -> opt_outputdir := Some s),
-      "<dir> set the output dir" );
+      "<dir> set the output directory" );
     ( Key ('t', "timelimit"),
       Hnd1 (AFloat, fun i -> opt_timelimit := Some i),
       "<sec> set the prover's time limit" );
