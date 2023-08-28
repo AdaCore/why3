@@ -58,7 +58,9 @@ let set_opt_smoke = function
   | Some _ -> assert false
   | None -> opt_smoke := SD_Top
 
-let usage_msg = "<dir>\nReplay the session stored in the given directory."
+let usage_msg =
+  "<session directory>\n\
+   Replay the session stored in the given directory."
 
 let option_list =
   let open Getopt in

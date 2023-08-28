@@ -17,7 +17,7 @@ open Theory
 open Task
 
 let usage_msg =
-  "Usage: [[<file>|-] [-T <theory> [-G <goal>]...]...]...\n\
+  "[[<file>|-] [-T <theory> [-G <goal>]...]...]...\n\
    Run some transformation or prover on the given goals."
 
 let opt_queue = Queue.create ()

@@ -19,7 +19,7 @@ let force = ref false
 let save_interval = ref 60.0
 
 let usage_msg =
-  "<session-dir>\n\
+  "<session directory>\n\
   Run provers on all proof attempts missing a result in the specified session."
 
 let session_dir = Queue.create ()

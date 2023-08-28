@@ -319,7 +319,7 @@ and skip_until_nl = parse
 
   let usage () =
     Printf.eprintf
-      "Usage: %s [options] <file>...\n\
+      "Usage: %s wc [options] <file>...\n\
        Count tokens/lines in Why3 source files.\n\
        \n%s\n\
        Source files are assumed to be lexically well-formed.\n\

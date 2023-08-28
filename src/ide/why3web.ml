@@ -138,7 +138,7 @@ let spec =
   ]
 
 let usage_str =
-  "[<file.why>|<project directory>]...\n\
+  "[<file>|<session directory>]...\n\
    Launch a web server that provides a graphical interface for Why3."
 
 let config, env =
