@@ -18,6 +18,7 @@ type cmd =
     {
       cmd_spec : spec_list;
       cmd_desc : string;
+      cmd_usage: string;
       cmd_name : string;
       cmd_run  : unit -> unit;
     }

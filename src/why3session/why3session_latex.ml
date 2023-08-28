@@ -457,6 +457,7 @@ let run () =
 let cmd =
   { cmd_spec = spec;
     cmd_desc = "output session in LaTeX format";
+    cmd_usage = "<session>\nOutput session in LaTeX format.";
     cmd_name = "latex";
     cmd_run  = run;
   }

@@ -14,11 +14,11 @@ open Why3session_lib
 
 let cmds =
   [
+    Why3session_create.cmd;
     Why3session_info.cmd;
     Why3session_html.cmd;
     Why3session_latex.cmd;
     Why3session_update.cmd_update;
-    Why3session_create.cmd;
     (* Why3session_csv.cmd; Why3session_copy.cmd_mod; Why3session_copy.cmd_copy;
        Why3session_copy.cmd_archive; Why3session_rm.cmd; Why3session_output.cmd;
        Why3session_run.cmd; *)
@@ -35,7 +35,9 @@ let print_commands fmt =
            e.cmd_desc))
     cmds
 
-let usage_msg = "<command> session ...\nExecute the given subcommand on given sessions.\n"
+let usage_msg =
+  "<command> <session> ...\n\
+   Execute the given subcommand on the given sessions.\n"
 let extra_help = Format.asprintf "%t" print_commands
 
 let () =
@@ -53,7 +55,8 @@ let () =
       exit 1
   in
   Whyconf.Args.add_command cmd_name;
-  let options = Whyconf.Args.all_options cmd.cmd_spec "" "" in
+  let usage_msg = cmd.cmd_usage in
+  let options = Whyconf.Args.all_options cmd.cmd_spec usage_msg "" in
   Getopt.parse_all ~i:(i + 1) options add_session_file Sys.argv;
   begin
     if no_session_file () then

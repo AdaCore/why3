@@ -614,6 +614,7 @@ let run () =
 let cmd =
   { cmd_spec = spec;
     cmd_desc = "print informations and statistics about a session";
+    cmd_usage = "<session>\nPrint informations and statistics about the session.";
     cmd_name = "info";
     cmd_run  = run;
   }
