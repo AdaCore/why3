@@ -38,14 +38,13 @@ let tools_ext =
 
 let available_commands () =
   let commands = Sys.readdir command_path in
-  Array.sort String.compare commands;
   let re = Re.Str.regexp "^why3\\([^.]+\\)\\([.].*\\)" in
   let commands = Array.fold_left (fun acc v ->
     if Re.Str.string_match re v 0 then
       let w = Re.Str.matched_group 1 v in
       if Re.Str.matched_group 2 v = tools_ext then w :: acc else acc
     else acc) [] commands in
-  List.rev commands
+  List.sort String.compare ("help" :: commands)
 
 let do_usage () =
   Format.printf
