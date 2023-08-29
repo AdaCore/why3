@@ -37,7 +37,8 @@ void init_process_list () {
 void kill_processes(int key, char *id) {
   for (int i = 0; i < processes->len; i++) {
     pproc p = processes->data[i];
-    if (p->client_key == key && !strcmp(p->task_id, id)) {
+    if (p->client_key == key &&
+	(id == NULL || !strcmp(p->task_id, id))) {
       os_kill(p);
     }
   }

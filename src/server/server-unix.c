@@ -596,6 +596,10 @@ void shutdown_server() {
 }
 
 void close_client(pclient client) {
+  // we remove all pending requests for this client
+  remove_from_queue(client->fd, NULL, NULL);
+  // we remove and kill all running requests for this client
+  kill_processes(client->fd, NULL);
   list_remove(clients, client->fd);
   poll_list_remove(client->fd);
   free_readbuf(client->readbuf);
