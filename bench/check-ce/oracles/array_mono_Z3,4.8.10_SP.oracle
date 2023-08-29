@@ -1,6 +1,6 @@
 File bench/check-ce/array_mono.mlw:
 Goal array'vc.
-Prover result is: Valid.
+Prover result is: Valid (259 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -11,7 +11,7 @@ Prover result is: Valid.
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `([])` cannot be evaluated)
 File "bench/check-ce/array_mono.mlw", line 36, characters 4-8:
 Sub-goal Index in array bounds of goal f1'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (3000020 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -39,7 +39,7 @@ File array_mono.mlw:
 
 File "bench/check-ce/array_mono.mlw", line 41, characters 4-14:
 Sub-goal Index in array bounds of goal f2'vc.
-Prover result is: Valid.
+Prover result is: Valid (460 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -50,7 +50,7 @@ Prover result is: Valid.
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `f2` cannot be evaluated)
 File "bench/check-ce/array_mono.mlw", line 40, characters 14-26:
 Sub-goal Postcondition of goal f2'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (3000055 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `([]<-)` cannot be evaluated):
 File array_mono.mlw:

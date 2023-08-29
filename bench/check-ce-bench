@@ -17,6 +17,7 @@ SUFFIX=.opt
 
 updateoracle=false
 removeoutfile=true
+debug=false
 files=""
 failed=""
 
@@ -104,9 +105,10 @@ colorize() {
 }
 
 remove_solver_details () {
-  sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" \
-  | sed 's/ ([0-9.]\+\.[0-9]\+s, [0-9]\+ steps)\.$/\./' \
-  | sed 's/Prover result is: \(Timeout\.\|Unknown (\(unknown\|incomplete\|unknown + \(incomplete\|interrupted\)\))\.\|Out of memory.\|Step limit exceeded\.\|Step limit exceeded ([^)]*)\.\)$/Prover result is: Unknown or time\/memory\/step limit./'
+   sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" \
+   | sed 's/ ([0-9.]\+\.[0-9]\+s, / (/' \
+#  | sed 's/ ([0-9.]\+\.[0-9]\+s, [0-9]\+ steps)\.$/\./' \
+#  | sed 's/Prover result is: \(Timeout\.\|Unknown (\(unknown\|incomplete\|unknown + \(incomplete\|interrupted\)\))\.\|Out of memory.\|Step limit exceeded\.\|Step limit exceeded ([^)]*)\.\)$/Prover result is: Unknown or time\/memory\/step limit./'
 }
 
 
@@ -143,6 +145,7 @@ elapsed_time () {
 # $3 = filename
 # $4 = true for WP, false for SP
 # $5 = steps
+# $6 = racsteps
 run () {
   file_path="$2/$3"
   debug_vc_sp=""
@@ -157,6 +160,7 @@ run () {
     printf "${file_path},SP,$1... "
   fi
   steps=$5
+  racsteps=$6
   if [ "$3" = "strings" ] && [[ $1 == CVC* ]] ; then
     prover="$1,strings+counterexamples"
   else
@@ -166,13 +170,15 @@ run () {
   # the debug flags below to test cont_invariant in reduction engine
   # (note that stack trace may be more detailed with bytecode)
   record_time
-  ("$WHY3_BIN" prove -a split_vc -P "$prover" \
+  cmd="$WHY3_BIN prove -a split_vc -P $prover \
       --stepslimit=$steps --timelimit=10 \
       --rac-steplimit=$steps --rac-timelimit=10 \
-      --check-ce --rac-prover="$1" --ce-log-verbosity=5 \
-      --library="$2" "${file_path}.mlw" \
-      --debug=check_ce:categorization${debug_vc_sp} \
-    || true) 2>&1 \
+      --check-ce --rac-prover=$1 --ce-log-verbosity=5 \
+      --library=$2 ${file_path}.mlw \
+      --debug=check_ce:categorization${debug_vc_sp}"
+  record_time
+  if $debug; then echo $cmd ; fi
+  ($cmd || true) 2>&1 \
     | remove_solver_details \
 	  > "$f.out"
   elapsed_time
@@ -186,7 +192,7 @@ run () {
     echo "OK (in ${elapsed}s)"
   else
     if $updateoracle; then
-      echo "Updating oracle"
+      echo "Updating oracle (in ${elapsed}s)"
       cp "$f.out" "${oracle_file}"
     else
       echo "FAILED"
@@ -207,60 +213,68 @@ start=$(date +%s)
 for file in $files; do
   filedir="$(realpath --relative-to="$PWD" $(dirname $file))"
   filebase=`basename $file .mlw`
-  if [ "$filebase" = "maps_poly" -o "$filebase" = "maps_mono" ] ; then
-    echo "Skipping tests on $filedir/$filebase.mlw";
-  else
+  # if [ "$filebase" = "maps_poly" -o "$filebase" = "maps_mono" ] ; then
+  #   echo "Skipping tests on $filedir/$filebase.mlw";
+  # else
     printf "# Running provers on $filedir/$filebase.mlw\n";
     cvc4steps=150000
+    cvc4stepsrac=$cvc4steps
     cvc5steps=150000
+    cvc5stepsrac=$cvc5steps
     z3steps=3000000
+    z3stepsrac=$z3steps
     case "$filebase" in
       "640_no_loc_failure")
-        z3steps=500000
-        ;;
+          z3steps=500000
+          ;;
       "657")
-        z3steps=500000
-        ;;
+          z3steps=500000
+          ;;
       "668_projection")
-        z3steps=500000
-        ;;
+          z3steps=500000
+          ;;
+      "array_records_mono")
+          z3stepsrac=100
+          ;;
       "bv32")
-        z3steps=2500000
-        ;;
+          z3steps=2500000
+          ;;
       "bv32_mono")
-        z3steps=100000
-        ;;
+          z3steps=100000
+          ;;
       "bv32_toBig")
-        z3steps=100000
-        ;;
+          z3steps=100000
+          ;;
       "floats")
-        z3steps=400000
-        ;;
+          cvc5stepsrac=10000
+          z3steps=100000
+          z3stepsrac=10000
+          ;;
       "int_overflow")
-        z3steps=400000
-        ;;
+          z3steps=400000
+          ;;
       "loop_inv_real")
-        z3steps=1000000
-        ;;
+          z3steps=1000000
+          ;;
       "maps_poly")
-        cvc5steps=300000
-        ;;
+          cvc5steps=300000
+          ;;
       "strings")
-        z3steps=3000
-        ;;
+          z3steps=3000
+          ;;
       "threshold")
-        z3steps=500000
-        ;;
+          z3steps=500000
+          ;;
       *)
-        ;;
+          ;;
     esac
-    run CVC4,1.8    $filedir $filebase true  $cvc4steps
-    run CVC4,1.8    $filedir $filebase false $cvc4steps
-    run CVC5,1.0.5  $filedir $filebase true  $cvc5steps
-    run CVC5,1.0.5  $filedir $filebase false $cvc5steps
-    run Z3,4.8.10   $filedir $filebase true  $z3steps
-    run Z3,4.8.10   $filedir $filebase false $z3steps
-  fi
+    run CVC4,1.8    $filedir $filebase true  $cvc4steps $cvc4stepsrac
+    run CVC4,1.8    $filedir $filebase false $cvc4steps $cvc4stepsrac
+    run CVC5,1.0.5  $filedir $filebase true  $cvc5steps $cvc5stepsrac
+    run CVC5,1.0.5  $filedir $filebase false $cvc5steps $cvc5stepsrac
+    run Z3,4.8.10   $filedir $filebase true  $z3steps $z3stepsrac
+    run Z3,4.8.10   $filedir $filebase false $z3steps $z3stepsrac
+  # fi
 done
 
 # Check the reproduction of the experiments by Petiot (2018).
