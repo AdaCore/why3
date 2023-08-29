@@ -4,8 +4,8 @@
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.3.3" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.12.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.11.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_2021_lexicographic_permutations_1.mlw"/>
 <theory name="Top" proved="true">
@@ -79,7 +79,7 @@
   <proof prover="0"><result status="valid" time="0.620000" steps="126402"/></proof>
   </goal>
   <goal name="descending_is_last&#39;vc.5" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.020000" steps="77782"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="72163"/></proof>
   </goal>
   <goal name="descending_is_last&#39;vc.6" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.060000" steps="23188"/></proof>
@@ -113,7 +113,7 @@
   <proof prover="0"><result status="valid" time="0.880000" steps="140814"/></proof>
   </goal>
   <goal name="ascending_is_first&#39;vc.5" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.020000" steps="79506"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="73780"/></proof>
   </goal>
   <goal name="ascending_is_first&#39;vc.6" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.070000" steps="24113"/></proof>
@@ -132,13 +132,13 @@
  <goal name="swap&#39;vc" expl="VC for swap" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="swap&#39;vc.0" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.050000" steps="14060"/></proof>
+  <proof prover="0"><result status="valid" time="0.030000" steps="14060"/></proof>
   </goal>
   <goal name="swap&#39;vc.1" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.040000" steps="14060"/></proof>
   </goal>
   <goal name="swap&#39;vc.2" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000" steps="14060"/></proof>
+  <proof prover="0"><result status="valid" time="0.050000" steps="14060"/></proof>
   </goal>
   <goal name="swap&#39;vc.3" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.040000" steps="15249"/></proof>
@@ -401,7 +401,7 @@
   </transf>
   </goal>
   <goal name="next&#39;vc.44" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.760000" steps="130322"/></proof>
+  <proof prover="0"><result status="valid" time="0.760000" steps="130319"/></proof>
   </goal>
   <goal name="next&#39;vc.45" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.220000" steps="47739"/></proof>
@@ -441,7 +441,7 @@
   <proof prover="0"><result status="valid" time="0.520000" steps="82061"/></proof>
   </goal>
   <goal name="next&#39;vc.55" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="5"><result status="valid" time="1.430000" steps="3065641"/></proof>
+  <proof prover="2" timelimit="5"><result status="valid" time="0.213453" steps="975799"/></proof>
   </goal>
   <goal name="next&#39;vc.56" expl="loop invariant preservation" proved="true">
   <proof prover="0" timelimit="5"><result status="valid" time="0.100000" steps="25431"/></proof>
@@ -579,7 +579,7 @@
     <goal name="all_permutations&#39;vc.4.0.0" expl="true case (loop invariant preservation)" proved="true">
     <transf name="assert" proved="true" arg1="(mem p[1..] now)">
      <goal name="all_permutations&#39;vc.4.0.0.0" expl="asserted formula" proved="true">
-     <proof prover="3"><result status="valid" time="0.530000" steps="3053"/></proof>
+     <proof prover="3"><result status="valid" time="0.530000" steps="3065"/></proof>
      </goal>
      <goal name="all_permutations&#39;vc.4.0.0.1" expl="true case (loop invariant preservation)" proved="true">
      <transf name="assert" proved="true" arg1="(p ==&#39; cons s[j] p[1..])">

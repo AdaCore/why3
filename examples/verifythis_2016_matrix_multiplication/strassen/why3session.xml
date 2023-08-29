@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.8.15" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -773,10 +773,10 @@
   <proof prover="1"><result status="valid" time="0.080000" steps="142"/></proof>
   </goal>
   <goal name="strassen&#39;vc.145" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.440000" steps="127085"/></proof>
+  <proof prover="0"><result status="valid" time="0.440000" steps="123576"/></proof>
   </goal>
   <goal name="strassen&#39;vc.146" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.430000" steps="127238"/></proof>
+  <proof prover="0"><result status="valid" time="0.430000" steps="125814"/></proof>
   </goal>
   <goal name="strassen&#39;vc.147" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.160000" steps="245"/></proof>
@@ -998,7 +998,7 @@
     <goal name="strassen&#39;vc.175.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
      <goal name="strassen&#39;vc.175.0.0.0" expl="precondition" proved="true">
-     <proof prover="1" timelimit="5"><result status="valid" time="0.771949" steps="346"/></proof>
+     <proof prover="1" timelimit="5"><result status="valid" time="0.530000" steps="346"/></proof>
      </goal>
     </transf>
     </goal>
@@ -1016,7 +1016,7 @@
     <goal name="strassen&#39;vc.177.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
      <goal name="strassen&#39;vc.177.0.0.0" expl="precondition" proved="true">
-     <proof prover="1" timelimit="5"><result status="valid" time="0.752233" steps="353"/></proof>
+     <proof prover="1" timelimit="5"><result status="valid" time="0.580000" steps="353"/></proof>
      </goal>
     </transf>
     </goal>

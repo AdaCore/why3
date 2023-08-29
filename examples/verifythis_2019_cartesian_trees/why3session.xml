@@ -5,8 +5,7 @@
 <prover id="1" name="Alt-Ergo" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_2019_cartesian_trees.mlw"/>
 <theory name="Top" proved="true">
@@ -88,7 +87,7 @@
   <proof prover="3"><result status="valid" time="0.030000" steps="158"/></proof>
   </goal>
   <goal name="smaller_left&#39;vc.20" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.900000" steps="100842"/></proof>
+  <proof prover="5"><result status="valid" time="0.130774" steps="41324"/></proof>
   </goal>
   <goal name="smaller_left&#39;vc.21" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.030000" steps="143"/></proof>
@@ -163,7 +162,7 @@
   <proof prover="3"><result status="valid" time="0.180000" steps="830"/></proof>
   </goal>
   <goal name="smaller_left&#39;vc.45" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.390000" steps="62376"/></proof>
+  <proof prover="5"><result status="valid" time="0.169172" steps="53206"/></proof>
   </goal>
   <goal name="smaller_left&#39;vc.46" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="2.560000" steps="9394"/></proof>
@@ -231,7 +230,7 @@
   </transf>
   </goal>
   <goal name="construct_dirs&#39;vc.11" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.180000" steps="26913"/></proof>
+  <proof prover="5"><result status="valid" time="0.180000" steps="21987"/></proof>
   </goal>
   <goal name="construct_dirs&#39;vc.12" expl="loop invariant preservation" proved="true">
   <transf name="case" proved="true" arg1="(p = li)">
@@ -260,7 +259,7 @@
   </transf>
   </goal>
   <goal name="construct_dirs&#39;vc.16" expl="loop invariant preservation" proved="true">
-  <proof prover="5"><result status="valid" time="0.307235" steps="38279"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.082397" steps="38279"/></proof>
   </goal>
   <goal name="construct_dirs&#39;vc.17" expl="loop invariant preservation" proved="true">
   <transf name="case" proved="true" arg1="(p = ri)">
@@ -598,7 +597,7 @@
  <goal name="other_descendant" proved="true">
  <transf name="induction_pr" proved="true" >
   <goal name="other_descendant.0" proved="true">
-  <proof prover="4"><result status="valid" time="0.080000" steps="16263"/></proof>
+  <proof prover="5"><result status="valid" time="0.080000" steps="11977"/></proof>
   </goal>
   <goal name="other_descendant.1" proved="true">
   <proof prover="3"><result status="valid" time="0.010000" steps="18"/></proof>
@@ -707,7 +706,7 @@
    <goal name="traversal&#39;vc.7.1" expl="precondition" proved="true">
    <transf name="unfold" proved="true" arg1="parent" arg2="in" arg3="other_descendant">
     <goal name="traversal&#39;vc.7.1.0" expl="precondition" proved="true">
-    <proof prover="4"><result status="valid" time="0.140000" steps="23367"/></proof>
+    <proof prover="5"><result status="valid" time="0.140000" steps="14051"/></proof>
     </goal>
    </transf>
    </goal>
@@ -760,7 +759,7 @@
    <goal name="traversal&#39;vc.13.0" expl="precondition" proved="true">
    <transf name="unfold" proved="true" arg1="parent" arg2="in" arg3="other_descendant">
     <goal name="traversal&#39;vc.13.0.0" expl="precondition" proved="true">
-    <proof prover="4"><result status="valid" time="0.180000" steps="31402"/></proof>
+    <proof prover="5"><result status="valid" time="0.042923" steps="15994"/></proof>
     </goal>
    </transf>
    </goal>
@@ -817,7 +816,7 @@
   <goal name="traversal&#39;vc.15" expl="postcondition" proved="true">
   <transf name="destruct" proved="true" arg1="H">
    <goal name="traversal&#39;vc.15.0" expl="postcondition" proved="true">
-   <proof prover="4" timelimit="1"><result status="valid" time="0.080000" steps="20851"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.080000" steps="14450"/></proof>
    </goal>
    <goal name="traversal&#39;vc.15.1" expl="postcondition" proved="true">
    <proof prover="2"><result status="valid" time="0.500000" steps="3705"/></proof>

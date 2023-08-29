@@ -2,10 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Z3" version="4.12.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.11.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="sumrange.mlw"/>
 <theory name="ArraySum" proved="true">
@@ -37,7 +37,7 @@
    <goal name="sum_right.0.1" proved="true">
    <transf name="instantiate" proved="true" arg1="h" arg2="(j-i)">
     <goal name="sum_right.0.1.0" proved="true">
-    <proof prover="4"><result status="valid" time="0.070000" steps="538437"/></proof>
+    <proof prover="0"><result status="valid" time="0.070000" steps="12153"/></proof>
     </goal>
    </transf>
    </goal>
@@ -144,13 +144,13 @@
 </theory>
 <theory name="CumulativeArray" proved="true">
  <goal name="create&#39;vc" expl="VC for create" proved="true">
- <proof prover="4"><result status="valid" time="0.010000" steps="22848"/></proof>
+ <proof prover="0"><result status="valid" time="0.010000" steps="23220"/></proof>
  </goal>
  <goal name="query&#39;vc" expl="VC for query" proved="true">
  <proof prover="3"><result status="valid" time="0.060000" steps="12236"/></proof>
  </goal>
  <goal name="update&#39;vc" expl="VC for update" proved="true">
- <proof prover="4"><result status="valid" time="0.020000" steps="71868"/></proof>
+ <proof prover="0"><result status="valid" time="0.020000" steps="135813"/></proof>
  </goal>
 </theory>
 <theory name="CumulativeTree" proved="true">
@@ -197,7 +197,7 @@
  <goal name="is_tree_for_frame" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="is_tree_for_frame.0" proved="true">
-  <proof prover="0"><result status="valid" time="1.170000" steps="931"/></proof>
+  <proof prover="1"><result status="valid" time="3.542636" steps="3864"/></proof>
   </goal>
  </transf>
  </goal>
@@ -252,7 +252,7 @@
  </transf>
  </goal>
  <goal name="depth_is_log&#39;vc" expl="VC for depth_is_log" proved="true">
- <proof prover="0" timelimit="1"><result status="valid" time="0.770000" steps="1034"/></proof>
+ <proof prover="1" timelimit="1"><result status="valid" time="0.235644" steps="1280"/></proof>
  </goal>
  <goal name="update_aux_complexity&#39;vc" expl="VC for update_aux_complexity" proved="true">
  <transf name="split_goal_right" proved="true" >

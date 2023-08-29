@@ -2,56 +2,56 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="2" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="0" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="sf.mlw"/>
 <theory name="HoareLogic" proved="true">
  <goal name="slow_subtraction&#39;vc" expl="VC for slow_subtraction" proved="true">
- <proof prover="2"><result status="valid" time="0.02" steps="839"/></proof>
+ <proof prover="0"><result status="valid" time="0.020000" steps="732"/></proof>
  </goal>
  <goal name="reduce_to_zero&#39;vc" expl="VC for reduce_to_zero" proved="true">
- <proof prover="2"><result status="valid" time="0.02" steps="499"/></proof>
+ <proof prover="0"><result status="valid" time="0.020000" steps="444"/></proof>
  </goal>
  <goal name="slow_addition&#39;vc" expl="VC for slow_addition" proved="true">
- <proof prover="2"><result status="valid" time="0.03" steps="818"/></proof>
+ <proof prover="0"><result status="valid" time="0.030000" steps="712"/></proof>
  </goal>
  <goal name="even_noneg" proved="true">
  <transf name="induction_pr" proved="true" >
   <goal name="even_noneg.0" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="82"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="69"/></proof>
   </goal>
   <goal name="even_noneg.1" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="499"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="395"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="even_not_odd" proved="true">
  <transf name="induction_pr" proved="true" >
   <goal name="even_not_odd.0" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="716"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="688"/></proof>
   </goal>
   <goal name="even_not_odd.1" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="811"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="736"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="parity&#39;vc" expl="VC for parity" proved="true">
- <proof prover="2"><result status="valid" time="0.03" steps="3059"/></proof>
+ <proof prover="0"><result status="valid" time="0.030000" steps="7416"/></proof>
  </goal>
  <goal name="sqrt&#39;vc" expl="VC for sqrt" proved="true">
- <proof prover="2"><result status="valid" time="0.03" steps="1597"/></proof>
+ <proof prover="0"><result status="valid" time="0.030000" steps="1321"/></proof>
  </goal>
  <goal name="factorial&#39;vc" expl="VC for factorial" proved="true">
- <proof prover="3"><result status="valid" time="0.01" steps="242"/></proof>
+ <proof prover="3"><result status="valid" time="0.010000" steps="242"/></proof>
  </goal>
 </theory>
 <theory name="MoreHoareLogic" proved="true">
  <goal name="list_sum&#39;vc" expl="VC for list_sum" proved="true">
- <proof prover="3"><result status="valid" time="0.02" steps="224"/></proof>
+ <proof prover="3"><result status="valid" time="0.020000" steps="224"/></proof>
  </goal>
  <goal name="list_member&#39;vc" expl="VC for list_member" proved="true">
- <proof prover="3"><result status="valid" time="0.07" steps="850"/></proof>
+ <proof prover="3"><result status="valid" time="0.070000" steps="850"/></proof>
  </goal>
 </theory>
 </file>

@@ -2,73 +2,73 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.8.10" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.4.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="3.2" timelimit="10" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="neg_as_xor.why"/>
 <theory name="TestNegAsXOR" proved="true">
  <goal name="Nth_j" proved="true">
- <proof prover="0"><result status="valid" time="0.05" steps="79"/></proof>
+ <proof prover="4"><result status="valid" time="0.050000" steps="957"/></proof>
  </goal>
  <goal name="sign_of_j" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="75"/></proof>
- <proof prover="3"><result status="valid" time="0.10"/></proof>
+ <proof prover="3"><result status="valid" time="0.100000"/></proof>
+ <proof prover="4"><result status="valid" time="0.020000" steps="370"/></proof>
  </goal>
  <goal name="mantissa_of_j" proved="true">
- <proof prover="0"><result status="valid" time="0.16" steps="121"/></proof>
- <proof prover="2"><result status="valid" time="0.78" steps="1374852"/></proof>
- <proof prover="3"><result status="valid" time="0.08"/></proof>
- <proof prover="5"><result status="valid" time="3.81"/></proof>
+ <proof prover="2"><result status="valid" time="0.780000" steps="1374852"/></proof>
+ <proof prover="3"><result status="valid" time="0.080000"/></proof>
+ <proof prover="4"><result status="valid" time="0.160000" steps="841"/></proof>
+ <proof prover="5"><result status="valid" time="3.810000"/></proof>
  </goal>
  <goal name="exp_of_j" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="105"/></proof>
- <proof prover="2"><result status="valid" time="0.89" steps="1375278"/></proof>
- <proof prover="3"><result status="valid" time="0.10"/></proof>
- <proof prover="5" timelimit="11"><result status="valid" time="3.49"/></proof>
+ <proof prover="2"><result status="valid" time="0.890000" steps="1375278"/></proof>
+ <proof prover="3"><result status="valid" time="0.100000"/></proof>
+ <proof prover="4"><result status="valid" time="0.040000" steps="992"/></proof>
+ <proof prover="5" timelimit="11"><result status="valid" time="3.490000"/></proof>
  </goal>
  <goal name="int_of_bv" proved="true">
- <proof prover="0"><result status="valid" time="0.06" steps="95"/></proof>
- <proof prover="2"><result status="valid" time="0.11" steps="237212"/></proof>
- <proof prover="3"><result status="valid" time="0.05"/></proof>
- <proof prover="5" timelimit="5"><result status="valid" time="0.10"/></proof>
+ <proof prover="2"><result status="valid" time="0.110000" steps="237212"/></proof>
+ <proof prover="3"><result status="valid" time="0.050000"/></proof>
+ <proof prover="4"><result status="valid" time="0.060000" steps="436"/></proof>
+ <proof prover="5" timelimit="5"><result status="valid" time="0.100000"/></proof>
  </goal>
  <goal name="MainResultBits" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="104"/></proof>
- <proof prover="3"><result status="valid" time="0.10"/></proof>
+ <proof prover="3"><result status="valid" time="0.100000"/></proof>
+ <proof prover="4"><result status="valid" time="0.030000" steps="1012"/></proof>
  </goal>
  <goal name="MainResultSign" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="78"/></proof>
- <proof prover="3"><result status="valid" time="0.06"/></proof>
+ <proof prover="3"><result status="valid" time="0.060000"/></proof>
+ <proof prover="4"><result status="valid" time="0.040000" steps="423"/></proof>
  </goal>
  <goal name="Sign_of_xor_j" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="78"/></proof>
- <proof prover="2"><result status="valid" time="0.00" steps="4909"/></proof>
- <proof prover="3"><result status="valid" time="0.05"/></proof>
- <proof prover="5" timelimit="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.000000" steps="4909"/></proof>
+ <proof prover="3"><result status="valid" time="0.050000"/></proof>
+ <proof prover="4"><result status="valid" time="0.040000" steps="423"/></proof>
+ <proof prover="5" timelimit="5"><result status="valid" time="0.000000"/></proof>
  </goal>
  <goal name="Exp_of_xor_j" proved="true">
- <proof prover="0"><result status="valid" time="0.07" steps="128"/></proof>
- <proof prover="2"><result status="valid" time="0.95" steps="1378626"/></proof>
- <proof prover="3"><result status="valid" time="0.11"/></proof>
- <proof prover="5"><result status="valid" time="3.68"/></proof>
+ <proof prover="2"><result status="valid" time="0.950000" steps="1378626"/></proof>
+ <proof prover="3"><result status="valid" time="0.110000"/></proof>
+ <proof prover="4"><result status="valid" time="0.070000" steps="1340"/></proof>
+ <proof prover="5"><result status="valid" time="3.680000"/></proof>
  </goal>
  <goal name="Mantissa_of_xor_j" proved="true">
- <proof prover="2"><result status="valid" time="0.75" steps="1380352"/></proof>
- <proof prover="3"><result status="valid" time="0.12"/></proof>
- <proof prover="5"><result status="valid" time="3.45"/></proof>
+ <proof prover="2"><result status="valid" time="0.750000" steps="1380352"/></proof>
+ <proof prover="3"><result status="valid" time="0.120000"/></proof>
+ <proof prover="5"><result status="valid" time="3.450000"/></proof>
  </goal>
  <goal name="MainResultZero" proved="true">
- <proof prover="1"><result status="valid" time="0.15" steps="38727"/></proof>
+ <proof prover="1"><result status="valid" time="0.150000" steps="38727"/></proof>
  </goal>
  <goal name="sign_neg" proved="true">
- <proof prover="0"><result status="valid" time="0.07" steps="144"/></proof>
- <proof prover="3"><result status="valid" time="0.04"/></proof>
+ <proof prover="3"><result status="valid" time="0.040000"/></proof>
+ <proof prover="4"><result status="valid" time="0.070000" steps="1428"/></proof>
  </goal>
  <goal name="MainResult" proved="true">
- <proof prover="0"><result status="valid" time="1.34" steps="368"/></proof>
+ <proof prover="4"><result status="valid" time="0.299484" steps="5334"/></proof>
  </goal>
 </theory>
 </file>

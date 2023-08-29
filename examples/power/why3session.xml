@@ -2,16 +2,16 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Z3" version="4.12.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="power.mlw"/>
 <theory name="FastExponentiation" proved="true">
  <goal name="Power_even" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="Power_even.0" proved="true">
-  <proof prover="4"><result status="valid" time="0.030570" steps="12876"/></proof>
+  <proof prover="0"><result status="valid" time="0.030570" steps="11039"/></proof>
   </goal>
   <goal name="Power_even.1" proved="true">
   <proof prover="2"><result status="valid" time="0.139590" steps="1918"/></proof>
@@ -43,7 +43,7 @@
  <goal name="fast_exp_imperative&#39;vc" expl="VC for fast_exp_imperative" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="fast_exp_imperative&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.013857" steps="1203"/></proof>
+  <proof prover="0"><result status="valid" time="0.013857" steps="1217"/></proof>
   </goal>
   <goal name="fast_exp_imperative&#39;vc.1" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.020000" steps="3073"/></proof>
@@ -61,7 +61,7 @@
   <proof prover="3"><result status="valid" time="0.030000" steps="5380"/></proof>
   </goal>
   <goal name="fast_exp_imperative&#39;vc.6" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.022984" steps="16749"/></proof>
+  <proof prover="0"><result status="valid" time="0.022984" steps="13753"/></proof>
   </goal>
   <goal name="fast_exp_imperative&#39;vc.7" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.641666" steps="5777"/></proof>
@@ -76,7 +76,7 @@
   <proof prover="3"><result status="valid" time="0.030000" steps="5326"/></proof>
   </goal>
   <goal name="fast_exp_imperative&#39;vc.11" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.025509" steps="16306"/></proof>
+  <proof prover="0"><result status="valid" time="0.025509" steps="13689"/></proof>
   </goal>
   <goal name="fast_exp_imperative&#39;vc.12" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.325613" steps="3470"/></proof>

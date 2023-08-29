@@ -2,30 +2,30 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Z3" version="4.12.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.11.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="mccarthy_vc_sp.mlw"/>
 <theory name="McCarthy91" proved="true">
  <goal name="f91&#39;vc" expl="VC for f91" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="939"/></proof>
+ <proof prover="1"><result status="valid" time="0.000000" steps="939"/></proof>
  </goal>
  <goal name="f91_nonrec&#39;vc" expl="VC for f91_nonrec" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="9838"/></proof>
+ <proof prover="0"><result status="valid" time="0.010000" steps="9265"/></proof>
  </goal>
  <goal name="f91_pseudorec&#39;vc" expl="VC for f91_pseudorec" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="4377"/></proof>
+ <proof prover="1"><result status="valid" time="0.020000" steps="4377"/></proof>
  </goal>
 </theory>
 <theory name="McCarthy91Mach" proved="true">
  <goal name="f91&#39;vc" expl="VC for f91" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="4713"/></proof>
+ <proof prover="1"><result status="valid" time="0.030000" steps="4713"/></proof>
  </goal>
  <goal name="f91_nonrec&#39;vc" expl="VC for f91_nonrec" proved="true">
- <proof prover="2"><result status="valid" time="0.02" steps="28968"/></proof>
+ <proof prover="0"><result status="valid" time="0.020000" steps="14199"/></proof>
  </goal>
  <goal name="f91_pseudorec&#39;vc" expl="VC for f91_pseudorec" proved="true">
- <proof prover="1"><result status="valid" time="0.07" steps="10660"/></proof>
+ <proof prover="1"><result status="valid" time="0.070000" steps="10660"/></proof>
  </goal>
 </theory>
 </file>
