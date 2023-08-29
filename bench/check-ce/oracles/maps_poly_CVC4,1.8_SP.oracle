@@ -1,4 +1,4 @@
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 8, characters 14-28)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 8, characters 14-28)
@@ -7,7 +7,7 @@
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 8, characters 14-28)
 File "bench/check-ce/maps_poly.mlw", line 8, characters 14-28:
 Sub-goal Postcondition of goal test_map'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (unknown + incomplete) (1288 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -19,47 +19,48 @@ File int.mlw:
     one = 1
 File maps_poly.mlw:
   Line 7:
-    x = {contents= [|1 -> 3; _ -> 0|]}
-    x = {contents= [|1 -> 3; _ -> 0|]}
+    x = {contents= fun (x:int) -> if x = 1 then 3 else 0}
+    x = {contents= fun (x:int) -> if x = 1 then 3 else 0}
     Execution of main function `test_map` with env:
-      x = {contents= [|1 -> 3; _ -> 0|]}
+      x = {contents= fun (x:int) -> if x = 1 then 3 else 0}
       zero = 0
       one = 1
   Line 10:
     Normal execution of function `(!)` with args:
-      r = {contents= [|1 -> 3; _ -> 0|]}
+      r = {contents= fun (x:int) -> if x = 1 then 3 else 0}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= [|1 -> 3; _ -> 0|]}
+      arg = {contents= fun (x:int) -> if x = 1 then 3 else 0}
 File maps_poly.mlw:
   Line 10:
     Normal execution of function `set` with args:
-      f = [|1 -> 3; _ -> 0|]
+      f = fun (x:int) -> if x = 1 then 3 else 0
       x = 0
       v = 3
     Normal execution of function `(:=)` with args:
-      r = {contents= [|1 -> 3; _ -> 0|]}
+      r = {contents= fun (x:int) -> if x = 1 then 3 else 0}
       v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = [|1 -> 3; _ -> 0|], x = 0, v = 3
+             else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3
   Line 8:
     Property failure at postcondition of `test_map` with:
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = [|1 -> 3; _ -> 0|], x = 0, v = 3}
+              else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3}
 
-<check-ce-categorization>Categorizations of models:
-- Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 14, characters 14-34)
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC_SW
+  - Concrete RAC: INCOMPLETE (terminated because unexpected arguments passed to (@))
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 14, characters 14-34)
-- Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 14, characters 14-34)
+- Checked model 1: NC_SW
+  - Concrete RAC: INCOMPLETE (terminated because unexpected arguments passed to (@))
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 14, characters 14-34)
 File "bench/check-ce/maps_poly.mlw", line 14, characters 14-34:
 Sub-goal Postcondition of goal test_map_multidim1'vc.
-Prover result is: Unknown or time/memory/step limit.
-The program does not comply to the verification goal, for example during the
-  following execution:
+Prover result is: Unknown (unknown + incomplete) (1389 steps).
+The program does not comply to the verification goal, or the contracts of
+  some loop or function are too weak, for example during the following
+  execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
@@ -69,54 +70,38 @@ File int.mlw:
     one = 1
 File maps_poly.mlw:
   Line 13:
-    x = {contents= [|; _ -> [|; _ -> 0|]|]}
-    x = {contents= [|; _ -> [|; _ -> 0|]|]}
+    x = {contents= fun (x1:int) -> fun (x2:int) -> 0}
+    x = {contents= fun (x1:int) -> fun (x2:int) -> 0}
     Execution of main function `test_map_multidim1` with env:
-      x = {contents= [|; _ -> [|; _ -> 0|]|]}
+      x = {contents= fun (x1:int) -> fun (x2:int) -> 0}
       zero = 0
       one = 1
   Line 16:
-    Normal execution of function `(!)` with args:
-      r = {contents= [|; _ -> [|; _ -> 0|]|]}
-File ref.mlw:
-  Line 18:
-    Normal execution of function `contents` with args:
-      arg = {contents= [|; _ -> [|; _ -> 0|]|]}
-File maps_poly.mlw:
-  Line 16:
-    Normal execution of function `get` with args:
-      f = [|; _ -> [|; _ -> 0|]|]
+    Giant-step execution of function `(!)` with args:
+      r = {contents= fun (x1:int) -> fun (x2:int) -> 0}
+    result of `(!)` = fun (x1:int) -> fun (x2:int) -> 0
+    Giant-step execution of function `get` with args:
+      f = fun (x1:int) -> fun (x2:int) -> 0
       x = 1
-File map.mlw:
-  Line 11:
-    Normal execution of function `(@)` with args:
-      u = [|; _ -> [|; _ -> 0|]|]
-      u = 1
-File maps_poly.mlw:
-  Line 16:
-    Normal execution of function `(!)` with args:
-      r = {contents= [|; _ -> [|; _ -> 0|]|]}
-File ref.mlw:
-  Line 18:
-    Normal execution of function `contents` with args:
-      arg = {contents= [|; _ -> [|; _ -> 0|]|]}
-File maps_poly.mlw:
-  Line 16:
-    Normal execution of function `set` with args:
-      f = [|; _ -> [|; _ -> 0|]|]
+    result of `get` = fun (x1:int) -> 0
+    Giant-step execution of function `(!)` with args:
+      r = {contents= fun (x1:int) -> fun (x2:int) -> 0}
+    result of `(!)` = fun (x1:int) -> fun (x2:int) -> 0
+    Giant-step execution of function `set` with args:
+      f = fun (x1:int) -> fun (x2:int) -> 0
       x = 0
-      v = [|; _ -> 0|]
-    Normal execution of function `(:=)` with args:
-      r = {contents= [|; _ -> [|; _ -> 0|]|]}
-      v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = [|; _ -> [|; _ -> 0|]|], x = 0, v = [|; _ -> 0|]
+      v = fun (x1:int) -> 0
+    result of `set` = fun (x1:int) -> fun (x2:int) -> 0
+    Giant-step execution of function `(:=)` with args:
+      r = {contents= fun (x1:int) -> fun (x2:int) -> 0}
+      v = fun (x1:int) -> fun (x2:int) -> 0
+    x = {contents= fun (x1:int) -> fun (x2:int) -> 0}
+    result of `(:=)` = ()
   Line 14:
     Property failure at postcondition of `test_map_multidim1` with:
-      x = {contents=
-           (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = [|; _ -> [|; _ -> 0|]|], x = 0, v = [|; _ -> 0|]}
+      x = {contents= fun (x1:int) -> fun (x2:int) -> 0}
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 19, characters 14-34)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 19, characters 14-34)
@@ -125,7 +110,7 @@ File maps_poly.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 19, characters 14-34)
 File "bench/check-ce/maps_poly.mlw", line 19, characters 14-34:
 Sub-goal Postcondition of goal test_map_multidim2'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (unknown + incomplete) (1527 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -137,70 +122,113 @@ File int.mlw:
     one = 1
 File maps_poly.mlw:
   Line 18:
-    x = {contents= [|1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]}
-    x = {contents= [|1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]}
+    x = {contents=
+         fun (x1:int) ->
+          if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+          else fun (x2:int) -> 0}
+    x = {contents=
+         fun (x1:int) ->
+          if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+          else fun (x2:int) -> 0}
     Execution of main function `test_map_multidim2` with env:
-      x = {contents= [|1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]}
+      x = {contents=
+           fun (x1:int) ->
+            if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+            else fun (x2:int) -> 0}
       zero = 0
       one = 1
   Line 21:
     Normal execution of function `(!)` with args:
-      r = {contents= [|1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]}
+      r = {contents=
+           fun (x1:int) ->
+            if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+            else fun (x2:int) -> 0}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= [|1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]}
+      arg = {contents=
+             fun (x1:int) ->
+              if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+              else fun (x2:int) -> 0}
 File maps_poly.mlw:
   Line 21:
     Normal execution of function `get` with args:
-      f = [|1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]
+      f = fun (x1:int) ->
+           if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+           else fun (x2:int) -> 0
       x = 0
 File map.mlw:
   Line 11:
     Normal execution of function `(@)` with args:
-      u = [|1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]
+      u = fun (x1:int) ->
+           if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+           else fun (x2:int) -> 0
       u = 0
 File maps_poly.mlw:
   Line 22:
     Normal execution of function `set` with args:
-      f = [|; _ -> 0|]
+      f = fun (x1:int) -> 0
       x = 0
       v = 3
   Line 23:
     Normal execution of function `(!)` with args:
-      r = {contents= [|1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]}
+      r = {contents=
+           fun (x1:int) ->
+            if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+            else fun (x2:int) -> 0}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= [|1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]}
+      arg = {contents=
+             fun (x1:int) ->
+              if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+              else fun (x2:int) -> 0}
 File maps_poly.mlw:
   Line 23:
     Normal execution of function `set` with args:
-      f = [|1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]
+      f = fun (x1:int) ->
+           if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+           else fun (x2:int) -> 0
       x = 0
       v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = [|; _ -> 0|], x = 0, v = 3
+             else f y) with f = fun (x1:int) -> 0, x = 0, v = 3
     Normal execution of function `(:=)` with args:
-      r = {contents= [|1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|]}
+      r = {contents=
+           fun (x1:int) ->
+            if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+            else fun (x2:int) -> 0}
       v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = [|1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|], x = 0, v = (fun y -> if pure { 
+             else f y) with f = fun (x1:int) ->
+                                 if x1 = 1
+                                 then fun (x2:int) -> if x2 = 1 then 3 else 0
+                                 else fun (x2:int) -> 0, x = 0, v = (fun y -> if pure { 
                                                                     if 
                                                                     y = x
                                                                     then True
                                                                     else False } then v
-                                                                    else f y) with f = [|; _ -> 0|], x = 0, v = 3
+                                                                    else 
+                                                                    f y) with f = fun
+                                                                    (x1:
+                                                                    int) -> 0, x = 0, v = 3
   Line 19:
     Property failure at postcondition of `test_map_multidim2` with:
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = [|1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|], x = 0, v = (fun y -> if pure { 
+              else f y) with f = fun (x1:int) ->
+                                  if x1 = 1
+                                  then fun (x2:int) ->
+                                        if x2 = 1 then 3 else 0
+                                  else fun (x2:int) -> 0, x = 0, v = (fun y -> if pure { 
                                                                     if 
                                                                     y = x
                                                                     then True
                                                                     else False } then v
-                                                                    else f y) with f = [|; _ -> 0|], x = 0, v = 3}
+                                                                    else 
+                                                                    f y) with f = fun
+                                                                    (x1:
+                                                                    int) -> 0, x = 0, v = 3}
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 26, characters 14-28)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 26, characters 14-28)
@@ -209,7 +237,7 @@ File maps_poly.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 26, characters 14-28)
 File "bench/check-ce/maps_poly.mlw", line 26, characters 14-28:
 Sub-goal Postcondition of goal proj_map_test1'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (unknown + incomplete) (1288 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -221,36 +249,36 @@ File int.mlw:
     one = 1
 File maps_poly.mlw:
   Line 25:
-    x = {contents= [|1 -> 3; _ -> 0|]}
-    x = {contents= [|1 -> 3; _ -> 0|]}
+    x = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
+    x = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
     Execution of main function `proj_map_test1` with env:
-      x = {contents= [|1 -> 3; _ -> 0|]}
+      x = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
       zero = 0
       one = 1
   Line 28:
     Normal execution of function `(!)` with args:
-      r = {contents= [|1 -> 3; _ -> 0|]}
+      r = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= [|1 -> 3; _ -> 0|]}
+      arg = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
 File maps_poly.mlw:
   Line 28:
     Normal execution of function `set` with args:
-      f = [|1 -> 3; _ -> 0|]
+      f = fun (x1:int) -> if x1 = 1 then 3 else 0
       x = 0
       v = 3
     Normal execution of function `(:=)` with args:
-      r = {contents= [|1 -> 3; _ -> 0|]}
+      r = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
       v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = [|1 -> 3; _ -> 0|], x = 0, v = 3
+             else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3
   Line 26:
     Property failure at postcondition of `proj_map_test1` with:
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = [|1 -> 3; _ -> 0|], x = 0, v = 3}
+              else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3}
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 31, characters 14-28)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 31, characters 14-28)
@@ -259,7 +287,7 @@ File maps_poly.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 31, characters 14-28)
 File "bench/check-ce/maps_poly.mlw", line 31, characters 14-28:
 Sub-goal Postcondition of goal proj_map_test2'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (unknown + incomplete) (1309 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -271,37 +299,39 @@ File int.mlw:
     one = 1
 File maps_poly.mlw:
   Line 30:
-    x = {contents= [|1 -> true; _ -> false|]}
-    x = {contents= [|1 -> true; _ -> false|]}
+    x = {contents= fun (x1:int) -> if x1 = 1 then True else False}
+    x = {contents= fun (x1:int) -> if x1 = 1 then True else False}
     Execution of main function `proj_map_test2` with env:
-      x = {contents= [|1 -> true; _ -> false|]}
+      x = {contents= fun (x1:int) -> if x1 = 1 then True else False}
       zero = 0
       one = 1
   Line 33:
     Normal execution of function `True` with args:
     Normal execution of function `(!)` with args:
-      r = {contents= [|1 -> true; _ -> false|]}
+      r = {contents= fun (x1:int) -> if x1 = 1 then True else False}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= [|1 -> true; _ -> false|]}
+      arg = {contents= fun (x1:int) -> if x1 = 1 then True else False}
 File maps_poly.mlw:
   Line 33:
     Normal execution of function `set` with args:
-      f = [|1 -> true; _ -> false|]
+      f = fun (x1:int) -> if x1 = 1 then True else False
       x = 0
       v = true
     Normal execution of function `(:=)` with args:
-      r = {contents= [|1 -> true; _ -> false|]}
+      r = {contents= fun (x1:int) -> if x1 = 1 then True else False}
       v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = [|1 -> true; _ -> false|], x = 0, v = true
+             else f y) with f = fun (x1:int) ->
+                                 if x1 = 1 then True else False, x = 0, v = true
   Line 31:
     Property failure at postcondition of `proj_map_test2` with:
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = [|1 -> true; _ -> false|], x = 0, v = true}
+              else f y) with f = fun (x1:int) ->
+                                  if x1 = 1 then True else False, x = 0, v = true}
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 42, characters 3-31)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 42, characters 3-31)
@@ -310,39 +340,31 @@ File maps_poly.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 42, characters 3-31)
 File "bench/check-ce/maps_poly.mlw", line 42, characters 3-31:
 Goal t1.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (160 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File maps_poly.mlw:
   Line 41:
-    t = [|0 -> 43; _ -> 0|]
+    t = fun (x1:int) -> if x1 = 0 then 43 else 0
     i = 0
-    t = [|0 -> 43; _ -> 0|]
+    t = fun (x1:int) -> if x1 = 0 then 43 else 0
     i = 0
     Execution of main function `t1'goal` with env:
       i = 0
-      t = [|0 -> 43; _ -> 0|]
+      t = fun (x1:int) -> if x1 = 0 then 43 else 0
 Unknown location:
     Normal execution of function `Tuple0` with args:
 File maps_poly.mlw:
   Line 42:
     Property failure at postcondition of `t1'goal` with:
       i = 0
-      t = [|0 -> 43; _ -> 0|]
+      t = fun (x1:int) -> if x1 = 0 then 43 else 0
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value 1/10)
-  - Abstract RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value 1/10)
-- Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value 1/10)
-  - Abstract RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value 1/10)
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g'goal` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g'goal` cannot be evaluated)
 File "bench/check-ce/maps_poly.mlw", line 50, characters 36-64:
 Goal g.
-Prover result is: Unknown (sat).
-The following counterexample model could not be verified
-  (both RAC terminated because cannot import value from model: not implemented for value 1/10):
-File maps_poly.mlw:
-  Line 50:
-    m = (1/10 => -1.0, others => 0)
+Prover result is: Unknown (sat) (192 steps).
 

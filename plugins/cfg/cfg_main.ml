@@ -110,7 +110,7 @@ module Typing = struct
     let file =
       match mlw_file with
       | Ptree.Decls decls ->
-          type_module file env loc path ({ id_str = ""; id_ats = []; id_loc = loc }, decls)
+          type_module file env loc path (Ptree.{ id_str = ""; id_ats = []; id_loc = loc }, decls)
       | Ptree.Modules m_or_t ->
           let type_module_env_loc_path file (id, dl) = type_module file env loc path (id, dl) in
           List.fold_left type_module_env_loc_path file m_or_t

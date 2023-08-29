@@ -7,7 +7,7 @@
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 5, characters 40-52)
 File "bench/check-ce/floats.mlw", line 5, characters 40-52:
 Goal g1.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (1200 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -50,7 +50,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 7, characters 40-53)
 File "bench/check-ce/floats.mlw", line 7, characters 40-53:
 Goal g2.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (1242 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -93,7 +93,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 9, characters 24-42)
 File "bench/check-ce/floats.mlw", line 9, characters 24-42:
 Goal g3.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (564 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -136,7 +136,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 11, characters 24-43)
 File "bench/check-ce/floats.mlw", line 11, characters 24-43:
 Goal g4.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (456 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -179,7 +179,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 13, characters 24-43)
 File "bench/check-ce/floats.mlw", line 13, characters 24-43:
 Goal g5.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (1162 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -222,7 +222,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 15, characters 24-30)
 File "bench/check-ce/floats.mlw", line 15, characters 24-30:
 Goal g6.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (739 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -265,7 +265,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 17, characters 40-64)
 File "bench/check-ce/floats.mlw", line 17, characters 40-64:
 Goal g7.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (58478 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -309,7 +309,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 19, characters 24-60)
 File "bench/check-ce/floats.mlw", line 19, characters 24-60:
 Goal g8.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (397 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -350,52 +350,15 @@ File floats.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `g9'goal` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 21, characters 40-70:
 Goal g9.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (100018 steps).
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 24, characters 24-98)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 24, characters 24-98)
-- Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 24, characters 24-98)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 24, characters 24-98)
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g10'goal` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g10'goal` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 24, characters 24-98:
 Goal g10.
-Prover result is: Unknown (sat).
-The program does not comply to the verification goal, for example during the
-  following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
-File ieee_float.mlw:
-  Line 863:
-    Constant zeroF initialization
-  Line 63:
-    (giant-step) execution of unimplemented function with args:
-    result = UNDEFINED
-  Line 863:
-    zeroF = UNDEFINED
-File floats.mlw:
-  Line 24:
-    x = (0x1.99999Cp-4:t)
-    x = (0x1.99999Cp-4:t)
-    Execution of main function `g10'goal` with env:
-      x = (0x1.99999Cp-4:t)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
-Unknown location:
-    Normal execution of function `Tuple0` with args:
-File floats.mlw:
-  Line 24:
-    Property failure at postcondition of `g10'goal` with:
-      RNE = UNDEFINED
-      RTZ = UNDEFINED
-      x = (0x1.99999Cp-4:t)
+Prover result is: Step limit exceeded (100021 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -406,7 +369,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 26, characters 24-47)
 File "bench/check-ce/floats.mlw", line 26, characters 24-47:
 Goal g11.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (446 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -449,7 +412,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 29, characters 24-54)
 File "bench/check-ce/floats.mlw", line 29, characters 24-54:
 Goal g12.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (456 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -492,7 +455,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 32, characters 24-47)
 File "bench/check-ce/floats.mlw", line 32, characters 24-47:
 Goal g13.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (456 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -535,7 +498,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 41, characters 40-52)
 File "bench/check-ce/floats.mlw", line 41, characters 40-52:
 Goal g1.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (1904 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -578,7 +541,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 43, characters 40-53)
 File "bench/check-ce/floats.mlw", line 43, characters 40-53:
 Goal g2.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (1946 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -621,7 +584,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 45, characters 24-42)
 File "bench/check-ce/floats.mlw", line 45, characters 24-42:
 Goal g3.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (756 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -664,7 +627,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 47, characters 24-43)
 File "bench/check-ce/floats.mlw", line 47, characters 24-43:
 Goal g4.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (584 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -707,7 +670,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 49, characters 24-43)
 File "bench/check-ce/floats.mlw", line 49, characters 24-43:
 Goal g5.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (1868 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -750,7 +713,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 51, characters 24-30)
 File "bench/check-ce/floats.mlw", line 51, characters 24-30:
 Goal g6.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (1325 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -790,7 +753,7 @@ File floats.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `g7'goal2` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 53, characters 40-64:
 Goal g7.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (100028 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -801,7 +764,7 @@ Prover result is: Unknown or time/memory/step limit.
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 55, characters 24-60)
 File "bench/check-ce/floats.mlw", line 55, characters 24-60:
 Goal g8.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (525 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -842,52 +805,15 @@ File floats.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `g9'goal1` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 57, characters 40-70:
 Goal g9.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (100018 steps).
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 60, characters 24-98)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 60, characters 24-98)
-- Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 60, characters 24-98)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 60, characters 24-98)
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g10'goal1` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g10'goal1` cannot be evaluated)
 File "bench/check-ce/floats.mlw", line 60, characters 24-98:
 Goal g10.
-Prover result is: Unknown (sat).
-The program does not comply to the verification goal, for example during the
-  following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
-File ieee_float.mlw:
-  Line 905:
-    Constant zeroF initialization
-  Line 63:
-    (giant-step) execution of unimplemented function with args:
-    result = UNDEFINED
-  Line 905:
-    zeroF = UNDEFINED
-File floats.mlw:
-  Line 60:
-    x = (0x1.999999999999Bp-4:t1)
-    x = (0x1.999999999999Bp-4:t1)
-    Execution of main function `g10'goal` with env:
-      x = (0x1.999999999999Bp-4:t1)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
-Unknown location:
-    Normal execution of function `Tuple0` with args:
-File floats.mlw:
-  Line 60:
-    Property failure at postcondition of `g10'goal2` with:
-      RNE = UNDEFINED
-      RTZ = UNDEFINED
-      x = (0x1.999999999999Bp-4:t1)
+Prover result is: Step limit exceeded (100021 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -898,7 +824,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 62, characters 24-48)
 File "bench/check-ce/floats.mlw", line 62, characters 24-48:
 Goal g11.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (574 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -941,7 +867,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 65, characters 24-62)
 File "bench/check-ce/floats.mlw", line 65, characters 24-62:
 Goal g12.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (584 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -984,7 +910,7 @@ File floats.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 68, characters 24-48)
 File "bench/check-ce/floats.mlw", line 68, characters 24-48:
 Goal g13.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (584 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
