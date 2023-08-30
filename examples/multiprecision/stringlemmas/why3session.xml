@@ -5,6 +5,7 @@
 <prover id="0" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="6" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.8" alternative="strings" timelimit="5" steplimit="0" memlimit="2000"/>
@@ -12,7 +13,7 @@
 <path name=".."/><path name="stringlemmas.mlw"/>
 <theory name="String_lemmas" proved="true">
  <goal name="in_base_concat&#39;vc" expl="VC for in_base_concat" proved="true">
- <proof prover="6"><result status="valid" time="0.060000" steps="21385"/></proof>
+ <proof prover="6"><result status="valid" time="0.172904" steps="21385"/></proof>
  </goal>
  <goal name="svalue_le_sub&#39;vc" expl="VC for svalue_le_sub" proved="true">
  <proof prover="6"><result status="valid" time="0.040000" steps="15254"/></proof>
@@ -216,7 +217,7 @@
   <proof prover="1" memlimit="2000"><result status="valid" time="0.060000" steps="76608"/></proof>
   </goal>
   <goal name="svalue_le_sub_upper_bound&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.791482" steps="134095"/></proof>
+  <proof prover="6"><result status="valid" time="1.733291" steps="134095"/></proof>
   </goal>
  </transf>
  </goal>
@@ -241,13 +242,13 @@
   <proof prover="6"><result status="valid" time="0.170000" steps="17563"/></proof>
   </goal>
   <goal name="svalue_sub_upper_bound&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.115552" steps="28278"/></proof>
+  <proof prover="6"><result status="valid" time="0.234175" steps="28278"/></proof>
   </goal>
   <goal name="svalue_sub_upper_bound&#39;vc.7" expl="assertion" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.020000" steps="77392"/></proof>
   </goal>
   <goal name="svalue_sub_upper_bound&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="1.400789" steps="221092"/></proof>
+  <proof prover="3"><result status="valid" time="0.433412" steps="86632"/></proof>
   </goal>
  </transf>
  </goal>
@@ -297,14 +298,14 @@
     <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.120000" steps="12347"/></proof>
     </goal>
     <goal name="digits&#39;vc.1.0.1" expl="rewrite premises" proved="true">
-    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.230000" steps="73142"/></proof>
+    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.647952" steps="73142"/></proof>
     </goal>
     <goal name="digits&#39;vc.1.0.2" expl="rewrite premises" proved="true">
     <proof prover="2"><result status="valid" time="0.030000" steps="55"/></proof>
     <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.110000" steps="12335"/></proof>
     </goal>
     <goal name="digits&#39;vc.1.0.3" expl="rewrite premises" proved="true">
-    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.350000" steps="73126"/></proof>
+    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.638394" steps="73126"/></proof>
     </goal>
     <goal name="digits&#39;vc.1.0.4" expl="rewrite premises" proved="true">
     <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.120000" steps="12335"/></proof>
@@ -472,7 +473,7 @@
     <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.110000" steps="12905"/></proof>
     </goal>
     <goal name="tnt_up&#39;vc.1.1.1" expl="rewrite premises" proved="true">
-    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.346856" steps="99741"/></proof>
+    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.866407" steps="99741"/></proof>
     </goal>
     <goal name="tnt_up&#39;vc.1.1.2" expl="rewrite premises" proved="true">
     <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.090000" steps="12885"/></proof>
