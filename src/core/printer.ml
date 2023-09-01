@@ -434,6 +434,10 @@ let meta_remove_logic = register_meta "remove_logic" [MTlsymbol]
   ~desc:"Remove@ a@ function/predicate@ symbol@ from@ proof@ obligations.@ \
          Used@ in@ bisection."
 
+let meta_remove_def = register_meta "remove_def" [MTlsymbol]
+  ~desc:"Remove@ the@ definition@ of@ a@ function/predicate@ symbol@ but@ keep@
+         its@ declaration."
+
 let meta_realized_theory = register_meta "realized_theory" [MTstring; MTstring]
   ~desc:"Specify@ that@ a@ Why3@ theory@ is@ realized@ as@ a@ module@ \
          in@ an@ ITP."

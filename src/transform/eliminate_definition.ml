@@ -16,21 +16,21 @@ open Decl
 
 (** Discard definitions of built-in symbols *)
 
-let add_id undef_ls rem_ls (ls,ld) (abst,defn) =
+let add_id undef_ls rem_ls rem_ls_def (ls,ld) (abst,defn) =
   if Sls.mem ls rem_ls then
     abst,defn
-  else if Sls.mem ls undef_ls
+  else if Sls.mem ls undef_ls || Sls.mem ls rem_ls_def
   then create_param_decl ls :: abst, defn
   else abst, (ls,ld) :: defn
 
 (** TODO: go further? such as constructor that are removed? *)
 
-let elim_abstract undef_ls rem_pr rem_ls rem_ts d = match d.d_node with
+let elim_abstract undef_ls rem_pr rem_ls rem_ls_def rem_ts d = match d.d_node with
   | Dlogic l ->
-      let ld, id = List.fold_right (add_id undef_ls rem_ls) l ([],[]) in
+      let ld, id = List.fold_right (add_id undef_ls rem_ls rem_ls_def) l ([],[]) in
       ld @ (if id = [] then [] else [create_logic_decl id])
   | Dind (s, l) ->
-      let ld, id = List.fold_right (add_id undef_ls rem_ls) l ([],[]) in
+      let ld, id = List.fold_right (add_id undef_ls rem_ls rem_ls_def) l ([],[]) in
       ld @ (if id = [] then [] else [create_ind_decl s id])
   | Dprop (Paxiom,pr,_) when Spr.mem pr rem_pr -> []
   | Dtype ts when Sts.mem ts rem_ts -> []
@@ -44,8 +44,9 @@ let eliminate_builtin =
   Trans.on_tagged_ls Printer.meta_syntax_logic (fun undef_ls ->
   Trans.on_tagged_pr Printer.meta_remove_prop (fun rem_pr ->
   Trans.on_tagged_ls Printer.meta_remove_logic (fun rem_ls ->
+  Trans.on_tagged_ls Printer.meta_remove_def (fun rem_ls_def ->
   Trans.on_tagged_ts Printer.meta_remove_type (fun rem_ts ->
-    Trans.decl (elim_abstract undef_ls rem_pr rem_ls rem_ts) None))))
+    Trans.decl (elim_abstract undef_ls rem_pr rem_ls rem_ls_def rem_ts) None)))))
 
 let () = Trans.register_transform "eliminate_builtin" eliminate_builtin
   ~desc:"Eliminate@ propositions@ and@ definitions@ of@ symbols@ \
