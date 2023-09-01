@@ -127,6 +127,9 @@ val meta_remove_logic : meta
 val meta_remove_type : meta
 (** Meta used to mark in a task type that must be removed before printing *)
 
+val meta_remove_def : meta
+(** Meta used to mark in a task function that must be removed before printing *)
+
 val meta_realized_theory : meta
 (** Meta used for implementing modular realization of theories. The meta stores
     the association between a module and the name that should be used *)

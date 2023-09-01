@@ -1,0 +1,10 @@
+use int.Int
+
+let function g (x:int) = x + 1
+let function f (x:int) = g (g x)
+
+goal g_OK : f 3 > 3
+
+meta "remove_def" function f
+
+goal g_KO : f 4 > 4
