@@ -550,6 +550,7 @@ PLUG_PRINTER =
 PLUG_TRANSFORM =
 PLUG_STRATEGIES = forward_propagation
 PLUG_TPTP = tptp_parser tptp_typing tptp_lexer tptp_printer
+PLUG_COMA = coma_main
 PLUG_PYTHON = py_parser py_lexer py_main
 PLUG_MICROC = mc_parser mc_lexer mc_printer mc_main
 PLUG_CFG = cfg_parser cfg_lexer cfg_paths subregion_analysis cfg_main
@@ -559,15 +560,19 @@ endif
 
 PLUG_CMIONLY = tptp/tptp_ast python/py_ast microc/mc_ast cfg/cfg_ast
 
-PLUGINS = genequlin dimacs tptp python microc cfg forward_propagation
+PLUGINS = genequlin dimacs tptp python microc coma cfg forward_propagation
 
 TPTPMODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
+COMAMODULES = $(addprefix plugins/coma/, $(PLUG_COMA))
 PYTHONMODULES = $(addprefix plugins/python/, $(PLUG_PYTHON))
 MICROCMODULES = $(addprefix plugins/microc/, $(PLUG_MICROC))
 CFGMODULES = $(addprefix plugins/cfg/, $(PLUG_CFG))
 
 TPTPCMO = $(addsuffix .cmo, $(TPTPMODULES))
 TPTPCMX = $(addsuffix .cmx, $(TPTPMODULES))
+
+COMACMO = $(addsuffix .cmo, $(COMAMODULES))
+COMACMX = $(addsuffix .cmx, $(COMAMODULES))
 
 PYTHONCMO = $(addsuffix .cmo, $(PYTHONMODULES))
 PYTHONCMX = $(addsuffix .cmx, $(PYTHONMODULES))
@@ -593,15 +598,15 @@ PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(addprefix plugins/printer/, $(PLUG_PRINTER)) \
 	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
 	      $(addprefix plugins/strategies/, $(PLUG_STRATEGIES)) \
-	      $(TPTPMODULES) $(PYTHONMODULES) $(MICROCMODULES) \
-	      $(CFGMODULES)
+	      $(TPTPMODULES) $(COMAMODULES) \
+	      $(PYTHONMODULES) $(MICROCMODULES) $(CFGMODULES)
 
 PLUGDEP = $(addsuffix .dep, $(PLUGMODULES)) $(PLUG_CMIONLY:%=plugins/%.dep)
 PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
 PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
 PLUGCMI = $(addsuffix .cmi, $(PLUGMODULES)) $(PLUG_CMIONLY:%=plugins/%.cmi)
 
-PLUGDIRS = parser printer transform strategies tptp python microc cfg
+PLUGDIRS = parser printer transform strategies tptp coma python microc cfg
 PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
 
 ifeq (@enable_stackify@,yes)
@@ -648,6 +653,8 @@ $(PLUG_STRATEGIES:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/strategies/
 $(PLUG_STRATEGIES:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/strategies/%.cmo
 lib/plugins/tptp.cmxs: $(TPTPCMX)
 lib/plugins/tptp.cma: $(TPTPCMO)
+lib/plugins/coma.cmxs: $(COMACMX)
+lib/plugins/coma.cma: $(COMACMO)
 lib/plugins/python.cmxs: $(PYTHONCMX)
 lib/plugins/python.cma: $(PYTHONCMO)
 lib/plugins/microc.cmxs: $(MICROCCMX)
