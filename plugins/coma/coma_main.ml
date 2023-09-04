@@ -17,16 +17,7 @@ open Term
 
 type hsymbol = {
   hs_name : ident;
-  hs_eff  : vsymbol list;
-  hs_sig  : signature;
 }
-
-and signature =
-  | SGend
-  | SGtyp of tvsymbol * signature
-  | SGval of vsymbol * signature
-  | SGref of vsymbol * signature
-  | SGcnt of hsymbol * signature
 
 module Hsym = MakeMSHW (struct
   type t = hsymbol
@@ -44,45 +35,7 @@ let hs_hash hs = id_hash hs.hs_name
 let hs_compare hs1 hs2 = id_compare hs1.hs_name hs2.hs_name
 *)
 
-let create_hsymbol id eff sg = {
-  hs_name = id_register id;
-  hs_eff  = eff;
-  hs_sig  = sg;
-}
-
-type expr =
-  | Esym of hsymbol
-  | Etyp of expr * ty
-  | Eval of expr * term
-  | Eref of expr * vsymbol
-  | Ecnt of expr * expr
-  | Elam of signature * expr
-  | Edef of expr * hsymbol * expr
-  | Easr of term * expr
-  | Ebbx of expr
-  | Ewbx of expr
-  | Ehol
-
-type stack =
-  | STend
-  | STeff of vsymbol * term * stack
-  | STtyp of ty * stack
-  | STval of term * stack
-  | STref of term * stack
-  | STcnt of closure * stack
-
-and closure = stack -> bool -> term
-
-let rec invert acc = function
-  | STtyp (t,st) -> invert (STtyp (t,acc)) st
-  | STeff (v,t,st) -> invert (STeff (v,t,acc)) st
-  | STval (t,st) -> invert (STval (t,acc)) st
-  | STref (t,st) -> invert (STref (t,acc)) st
-  | STcnt (d,st) -> invert (STcnt (d,acc)) st
-  | STend -> acc
-
-let get_ref t = match t.t_node with
-  | Tvar v -> v | _ -> assert false
+let create_hsymbol id = { hs_name = id_register id }
 
 (*
 let t_and_simp = t_and
@@ -91,131 +44,205 @@ let t_implies_simp = t_implies
 let t_forall_close_simp = t_forall_close
 *)
 
-let rec fail tsb sbs sg st safe = match sg,st with
-  | SGtyp (v,sg), STtyp (t,st) ->
-      fail (Mtv.add v t tsb) sbs sg st safe
-  | sg, STeff (v,t,st)
-  | SGval (v,sg), STval (t,st)
-  | SGref (v,sg), STref (t,st) ->
-      fail tsb (Mvs.add v t sbs) sg st safe
-  | SGcnt (h,sg), STcnt (d,st) ->
-      let vcd _ _ _ st = d st true in
-      let lhs = havoc tsb sbs Mhs.empty h vcd safe in
-      t_and_simp lhs (fail tsb sbs sg st safe)
-  | SGend, STend ->
-      if safe then t_false else t_true
-  | _ -> assert false
+type param =
+  | Pt of tvsymbol
+  | Pv of vsymbol
+  | Pr of vsymbol
+  | Pc of hsymbol * vsymbol list * param list
 
-and havoc tsb sbs ctx h fn safe =
-  let rec link tsb sbs ctx vl st = function
-    | SGtyp (v,sg) ->
-        let t = ty_var (create_tvsymbol (id_clone v.tv_name)) in
-        link (Mtv.add v t tsb) sbs ctx vl (STtyp (t,st)) sg
-    | SGval (v,sg) ->
-        let ty = ty_inst tsb v.vs_ty in
-        let u = create_vsymbol (id_clone v.vs_name) ty in
-        let t = t_var u in
-        link tsb (Mvs.add v t sbs) ctx (u::vl) (STval (t,st)) sg
-    | SGref (v,sg) ->
-        let ty = ty_inst tsb v.vs_ty in
-        let u = create_vsymbol (id_clone v.vs_name) ty in
-        let t = t_var u in
-        link tsb (Mvs.add v t sbs) ctx (u::vl) (STref (t,st)) sg
-    | SGcnt (h,sg) ->
-        let f st safe0 = fail tsb sbs h.hs_sig st (safe && safe0) in
-        link tsb sbs (Mhs.add h f ctx) vl (STcnt (f,st)) sg
-    | SGend ->
-        let f = fn tsb sbs ctx (invert STend st) in
-        t_forall_close_simp (List.rev vl) [] f in
-  let rec prwr sbs vl st = function
-    | p::pl ->
-        let q = get_ref (Mvs.find p sbs) in
-        let r = create_vsymbol (id_clone q.vs_name) q.vs_ty in
-        let t = t_var r in
-        prwr (Mvs.add p t sbs) (r::vl) (STeff (q,t,st)) pl
-    | [] ->
-        link tsb sbs ctx vl st h.hs_sig in
-  prwr sbs [] STend h.hs_eff
+type expr =
+  | Esym of hsymbol
+  | Eapp of expr * argument
+  | Elam of param list * expr
+  | Edef of expr * hsymbol * vsymbol list * param list * expr
+  | Erec of expr * hsymbol * vsymbol list * param list * expr
+  | Easr of term * expr
+  | Ebox of expr
+  | Ewox of expr
+  | Eany
 
-let rec consume fn tsb sbs ctx full prot sg st = match sg,st with
-  | SGtyp (v,sg), STtyp (t,st) ->
-      consume fn (Mtv.add v t tsb) sbs ctx full prot sg st
-  | sg, STeff (v,t,st)
-  | SGval (v,sg), STval (t,st)
-  | SGref (v,sg), STref (t,st) ->
-      consume fn tsb (Mvs.add v t sbs) ctx full prot sg st
-  | SGcnt (h,sg), STcnt (d,st) ->
-      let prot = if full then prot else Shs.add h prot in
-      consume fn tsb sbs (Mhs.add h d ctx) full prot sg st
-  | SGend, st ->
-      fn tsb sbs ctx full prot st
-  | _ -> assert false
+and argument =
+  | At of ty
+  | Av of term
+  | Ar of vsymbol
+  | Ac of expr
 
-let rec vc stack pp dd tsb sbs ctx full prot = function
+let arg_of_param = function
+  | Pt u -> At (ty_var u)
+  | Pv v -> Av (t_var v)
+  | Pr r -> Ar r
+  | Pc (g,_,_) -> Ac (Esym g)
+
+let fail pl =
+  let add e = function
+    | Pc (h, wr, pl) ->
+        let app d p = Eapp (d, arg_of_param p) in
+        let d = List.fold_left app (Esym h) pl in
+        Edef (e, h, wr, pl, Ebox d)
+    | Pt _ | Pv _ | Pr _ -> e in
+  Elam (pl, List.fold_left add (Easr (t_false, Eany)) pl)
+
+type binding =
+  | Bt of ty
+  | Bv of term
+  | Br of term * vsymbol
+  | Bc of closure
+
+and closure = bool -> term Mvs.t -> binding list -> term
+
+type context = {
+  c_tv : ty Mtv.t;
+  c_vs : term Mvs.t;
+  c_hs : (vsymbol Mvs.t * closure) Mhs.t;
+  c_lc : Shs.t;
+  c_gl : bool;
+}
+
+let c_empty = {
+  c_tv = Mtv.empty;
+  c_vs = Mvs.empty;
+  c_hs = Mhs.empty;
+  c_lc = Shs.empty;
+  c_gl = true;
+}
+
+let t_inst c t = ty_inst c.c_tv t
+let v_inst c t = t_ty_subst c.c_tv c.c_vs t
+let r_inst c r = t_ty_subst c.c_tv c.c_vs (t_var r)
+
+let c_add_t u t c = { c with c_tv = Mtv.add u t c.c_tv }
+let c_add_v v t c = { c with c_vs = Mvs.add v t c.c_vs }
+
+let c_add_o h writes map vcd c =
+  let lc = if c.c_gl then Shs.empty else Shs.add h c.c_lc in
+  let set wr r = Mvs.add r (Mvs.find_def r r map) wr in
+  let wr = List.fold_left set Mvs.empty writes in
+  { c with c_hs = Mhs.add h (wr,vcd) c.c_hs; c_lc = lc }
+
+let c_add_h h w d c = c_add_o h w Mvs.empty d c
+
+let prepare c safe update = { c with
+  c_vs = Mvs.set_union update c.c_vs;
+  c_lc = if safe then c.c_lc else Shs.empty;
+  c_gl = safe && c.c_gl }
+
+let consume c pl bl =
+  let eat (c,m) p b = match p, b with
+    | Pt u, Bt t -> c_add_t u t c, m
+    | Pv v, Bv t -> c_add_v v t c, m
+    | Pr p, Br (q,r) -> c_add_v p q c, Mvs.add p r m
+    | Pc (h,w,_), Bc d -> c_add_o h w m d c, m
+    | _ -> assert false in
+  fst (List.fold_left2 eat (c, Mvs.empty) pl bl)
+
+let rec vc pp dd c bl = function
   | Esym h ->
-      let add st v = STeff (v, Mvs.find v sbs, st) in
-      let stack = List.fold_left add stack h.hs_eff in
-      Mhs.find h ctx stack (pp && (full || Shs.mem h prot))
-  | Etyp (e,t) ->
-      let stack = STtyp (ty_inst tsb t, stack) in
-      vc stack pp dd tsb sbs ctx full prot e
-  | Eval (e,t) ->
-      let stack = STval (t_ty_subst tsb sbs t, stack) in
-      vc stack pp dd tsb sbs ctx full prot e
-  | Eref (e,r) ->
-      let stack = STref (t_ty_subst tsb sbs (t_var r), stack) in
-      vc stack pp dd tsb sbs ctx full prot e
-  | Ecnt (e,d) ->
-      let vcd stack safe =
-        let prot = if safe then prot else Shs.empty in
-        vc stack pp dd tsb sbs ctx (safe && full) prot d in
-      vc (STcnt (vcd, stack)) pp dd tsb sbs ctx full prot e
-  | Elam (sg,e) ->
-      let vce tsb sbs ctx full prot stack =
-        assert (stack = STend);
-        let lhs = vc STend pp dd tsb sbs ctx full prot e in
-        let rec prot acc = function
-          | SGtyp (_,sg) | SGval (_,sg) | SGref (_,sg) -> prot acc sg
-          | SGcnt (h,sg) -> prot (Shs.add h acc) sg | SGend -> acc in
-        let prot = prot Shs.empty sg in
-        let rhs = vc STend (not pp) (not dd) tsb sbs ctx false prot e in
-        t_and_simp lhs rhs in
-      consume vce tsb sbs ctx full prot sg stack
-  | Edef (e,h,d) ->
-      assert (stack = STend);
-      let vcd stack safe =
-        let full = safe && full in
-        let prot = if safe then prot else Shs.empty in
-        let vcd tsb sbs ctx full prot stack =
-          assert (stack = STend);
-          let ctx = Mhs.add h (fail tsb sbs h.hs_sig) ctx in
-          vc STend true false tsb sbs ctx full prot d in
-        consume vcd tsb sbs ctx full prot h.hs_sig stack in
-      let ctx = Mhs.add h vcd ctx in
-      let lhs = vc stack pp dd tsb sbs ctx full prot e in
-      let vcd tsb sbs ctx _ =
-        vc STend false pp tsb sbs ctx full prot d in
-      t_and_simp lhs (havoc tsb sbs ctx h vcd true)
-  | Easr (f,e) ->
-      assert (stack = STend);
-      let f = t_ty_subst tsb sbs f in
-      (if pp && full then t_and_asym_simp else t_implies_simp)
-        f (vc stack pp dd tsb sbs ctx full prot e)
-  | Ebbx e -> vc stack dd dd tsb sbs ctx full prot e
-  | Ewbx e -> vc stack pp pp tsb sbs ctx full prot e
-  | Ehol -> t_true
+      let wr, vcd = Mhs.find h c.c_hs in
+      let lc = c.c_gl || Shs.mem h c.c_lc in
+      let conv p q up = Mvs.add q (r_inst c p) up in
+      vcd (pp && lc) (Mvs.fold conv wr Mvs.empty) bl
+  | Eapp (e, a) ->
+      let b = match a with
+        | At t -> Bt (t_inst c t)
+        | Av t -> Bv (v_inst c t)
+        | Ar r -> Br (r_inst c r, r)
+        | Ac d -> Bc (fun s u bl -> vc pp dd (prepare c s u) bl d) in
+      vc pp dd c (b::bl) e
+  | Elam (pl, e) ->
+      let c = consume c pl bl in
+      let get_hs s = function
+        | Pc (h,_,_) -> Shs.add h s
+        | Pt _ | Pv _ | Pr _ -> s in
+      let lc = List.fold_left get_hs Shs.empty pl in
+      let cw = { c with c_lc = lc; c_gl = false } in
+      t_and_simp (vc pp dd c [] e) (vc (not pp) (not dd) cw [] e)
+  | Edef (e, h, wr, pl, d) -> assert (bl = []);
+      let vcd s u bl =
+        let c = consume (prepare c s u) pl bl in
+        vc true false c [] d in
+      let cl = c_add_h h wr vcd c in
+      let lhs = vc pp dd cl [] e in
+      let cr,vl = havoc c wr pl in
+      let rhs = vc false pp cr [] d in
+      t_and_simp lhs (t_forall_close_simp vl [] rhs)
+  | Erec (e, h, wr, pl, d) -> assert (bl = []);
+      let vcd s u bl =
+        let c = consume (prepare c s u) pl bl in
+        let c,_ = havoc c [] [Pc (h, wr, pl)] in
+        vc true false c [] d in
+      let c = c_add_h h wr vcd c in
+      let lhs = vc pp dd c [] e in
+      let cr,vl = havoc c wr pl in
+      let rhs = vc false pp cr [] d in
+      t_and_simp lhs (t_forall_close_simp vl [] rhs)
+  | Easr (f, e) -> assert (bl = []);
+      (if pp && c.c_gl then t_and_asym_simp else t_implies_simp)
+        (v_inst c f) (vc pp dd c [] e)
+  | Ebox e -> assert (bl = []); vc dd dd c [] e
+  | Ewox e -> assert (bl = []); vc pp pp c [] e
+  | Eany -> assert (bl = []); t_true
 
-let vc e = vc STend true true Mtv.empty Mvs.empty Mhs.empty true Shs.empty e
+and havoc c wr pl =
+  let on_write (c,vl) p =
+    let q = Mvs.find p c.c_vs in
+    let id = id_clone (match q.t_node with
+      | Tvar v -> v | _ -> p).vs_name in
+    let r = create_vsymbol id (t_type q) in
+    c_add_v p (t_var r) c, r::vl in
+  let on_param (c,vl) = function
+    | Pt u ->
+        let v = create_tvsymbol (id_clone u.tv_name) in
+        c_add_t u (ty_var v) c, vl
+    | Pv v | Pr v ->
+        let ty = t_inst c v.vs_ty in
+        let u = create_vsymbol (id_clone v.vs_name) ty in
+        c_add_v v (t_var u) c, u::vl
+    | Pc (h,wr,pl) ->
+        let d = fail pl in
+        let vcd s u bl = vc true true (prepare c s u) bl d in
+        c_add_h h wr vcd c, vl in
+  let c,vl = List.fold_left on_write (c,[]) wr in
+  let c,vl = List.fold_left on_param (c,vl) pl in
+  c, List.rev vl
 
-let hs_halt = create_hsymbol (id_fresh "halt") [] SGend
-let hs_fail = create_hsymbol (id_fresh "fail") [] SGend
-let hs_then = create_hsymbol (id_fresh "then") [] SGend
-let hs_else = create_hsymbol (id_fresh "else") [] SGend
-let hs_the0 = create_hsymbol (id_fresh "the0") [] SGend
-let hs_els0 = create_hsymbol (id_fresh "els0") [] SGend
+let vc e = vc true true c_empty [] e
+
+let (!) h = Esym h
+
+let (--) e t = Eapp (e, At t)
+let (-+) e t = Eapp (e, Av t)
+let (-&) e r = Eapp (e, Ar r)
+let (-*) e d = Eapp (e, Ac d)
+
+let (>>) e (h,wr,pl,d) = Edef (e,h,wr,pl,d)
+let (<<) e (h,wr,pl,d) = Erec (e,h,wr,pl,d)
+
+let def h wr pl d = (h,wr,pl,d)
+let lam pl d = Elam (pl,d)
+
+let asrt f d = Easr (f,d)
+
+let hs_halt = create_hsymbol (id_fresh "halt")
+let hs_fail = create_hsymbol (id_fresh "fail")
+
+let hs_alloc = create_hsymbol (id_fresh "alloc")
+let hs_assign = create_hsymbol (id_fresh "assign")
+
+let hs_if = create_hsymbol (id_fresh "if")
+let hs_then = create_hsymbol (id_fresh "then")
+let hs_else = create_hsymbol (id_fresh "else")
+
+let hs_ret = create_hsymbol (id_fresh "ret")
+let hs_out = create_hsymbol (id_fresh "out")
+let hs_loop = create_hsymbol (id_fresh "loop")
 
 let vs_ii = create_vsymbol (id_fresh "i") ty_int
 let vs_ji = create_vsymbol (id_fresh "j") ty_int
+(*
+let vs_ki = create_vsymbol (id_fresh "k") ty_int
+let vs_li = create_vsymbol (id_fresh "l") ty_int
+let vs_mi = create_vsymbol (id_fresh "m") ty_int
+*)
 let vs_pi = create_vsymbol (id_fresh "p") ty_int
 let vs_qi = create_vsymbol (id_fresh "q") ty_int
 
@@ -232,59 +259,72 @@ let tv_c = tv_of_string "c"
 let vs_uc = create_vsymbol (id_fresh "u") (ty_var tv_c)
 let vs_vc = create_vsymbol (id_fresh "v") (ty_var tv_c)
 
-let hs_if = create_hsymbol (id_fresh "if") []
-  (SGval (vs_bb, SGcnt (hs_then, SGcnt (hs_else, SGend))))
-
-let hs_break = create_hsymbol (id_fresh "break") [vs_pi] (SGval (vs_ii, SGend))
-
-let hs_loop_ret = create_hsymbol (id_fresh "ret") [vs_pi] (SGval (vs_ia, SGend))
-let hs_loop_re0 = create_hsymbol (id_fresh "re0") [vs_pi] (SGval (vs_ja, SGend))
-let hs_loop = create_hsymbol (id_fresh "loop") [vs_pi]
-  (SGtyp (tv_a, SGval (vs_ia, SGcnt (hs_loop_ret,
-    SGval (vs_ka, SGval (vs_la, SGval (vs_ma, SGend)))))))
-
-let hs_alloc_ret = create_hsymbol (id_fresh "alloc_ret") [] (SGref (vs_vc, SGend))
-let hs_alloc_re0 = create_hsymbol (id_fresh "alloc_re0") [] (SGref (vs_uc, SGend))
-let hs_alloc = create_hsymbol (id_fresh "alloc") []
-  (SGtyp (tv_c, SGval (vs_vc, SGcnt (hs_alloc_ret, SGend))))
-
-let hs_assign_ret = create_hsymbol (id_fresh "assign_ret") [vs_uc] SGend
-let hs_assign_re0 = create_hsymbol (id_fresh "assign_re0") [vs_uc] SGend
-let hs_assign = create_hsymbol (id_fresh "assign") []
-  (SGtyp (tv_c, SGref (vs_uc, SGval (vs_vc, SGcnt (hs_assign_ret, SGend)))))
-
-
 let expr1 =
-  Edef (Edef (Edef (Edef (Edef (
+  !hs_alloc -- ty_int -+ t_nat_const 1 -* lam [Pr vs_pi] (
+    !hs_loop -- ty_int -+ t_var vs_pi -* !hs_out -+
+                              t_nat_const 3 -+ t_nat_const 0 -+ t_nat_const 5
+    << def hs_loop [vs_pi] [Pt tv_a; Pv vs_ia; Pc (hs_ret,[vs_pi],[Pv vs_ja]);
+                                                Pv vs_ka; Pv vs_la; Pv vs_ma]
+          (asrt (t_and (t_neq (t_var vs_ia) (t_var vs_ka))
+                   (t_neq (t_var vs_pi) (t_nat_const 9)))
+          (Ebox (!hs_if -+ (t_if (t_equ (t_var vs_ia) (t_var vs_la))
+                                t_bool_true t_bool_false) -*
+             lam [] (!hs_assign -- ty_int -& vs_pi -+ t_nat_const 2 -*
+                lam [] (!hs_loop -- ty_var tv_a -+ t_var vs_ia -* !hs_ret
+                  -+ t_var vs_la -+ t_var vs_ma -+ t_var vs_ka)) -*
+             lam [] (!hs_ret -+ t_var vs_ia)))
+        >> def hs_ret [vs_pi] [Pv vs_ja]
+          (asrt (t_and (t_equ (t_var vs_ma) (t_var vs_ja))
+                       (t_equ (t_nat_const 55) (t_var vs_pi)))
+                                   (Ebox (!hs_ret -+ t_var vs_ja))))
+    >> def hs_out [vs_pi] [Pv vs_ii]
+      (asrt (t_and (t_equ (t_var vs_ii) (t_nat_const 42))
+                   (t_equ (t_var vs_pi) (t_nat_const 37))) (Ebox !hs_halt)))
+  >> def hs_assign [] [Pt tv_c; Pr vs_uc; Pv vs_vc; Pc (hs_ret,[vs_uc],[])]
+      (Eany >> def hs_ret [vs_uc] [] (asrt (t_equ (t_var vs_uc) (t_var vs_vc))
+                                              (Ebox (!hs_ret))))
+  >> def hs_alloc [] [Pt tv_c; Pv vs_vc; Pc (hs_ret,[],[Pr vs_uc])]
+      (Eany >> def hs_ret [] [Pr vs_uc] (asrt (t_equ (t_var vs_uc) (t_var vs_vc))
+                                              (Ebox (!hs_ret -& vs_uc))))
+  >> def hs_if [] [Pv vs_bb; Pc (hs_then,[],[]); Pc (hs_else,[],[])]
+      (Eany >> def hs_then [] [] (asrt (t_equ (t_var vs_bb) t_bool_true) (Ebox !hs_then))
+            >> def hs_else [] [] (asrt (t_equ (t_var vs_bb) t_bool_false) (Ebox !hs_else)))
+  >> def hs_fail [] [] (asrt t_false Eany)
+  >> def hs_halt [] [] (Ewox Eany)
 
-    Ecnt (Eval (Etyp (Esym hs_alloc, ty_int), t_nat_const 17),
-    Elam (SGref (vs_pi, SGend), Edef (Edef (Eval (Eval (Eval (
-        Ecnt (Eval (Etyp (Esym hs_loop, ty_int), t_var vs_pi), Esym hs_break),
-          t_nat_const 3), t_nat_const 0), t_nat_const 5)
-    , hs_loop, Edef( Easr (t_and (t_neq (t_var vs_ia) (t_var vs_ka))
-                                 (t_neq (t_var vs_pi) (t_nat_const 9)),
-        Ebbx (Ecnt (Ecnt (Eval (Esym hs_if,
-            t_if (t_equ (t_var vs_ia) (t_var vs_la)) t_bool_true t_bool_false),
-          Ecnt (Eval (Eref (Etyp (Esym hs_assign, ty_int), vs_pi), t_nat_const 2),
-          Elam (SGend, Eval (Eval (Eval (
-            Ecnt (Eval (Etyp (Esym hs_loop, ty_var tv_a), t_var vs_ia), Esym hs_loop_re0),
-              t_var vs_la), t_var vs_ma), t_var vs_ka)))),
-          Eval (Esym hs_loop_re0, t_var vs_ia))))
-        , hs_loop_re0, Easr (t_and (t_equ (t_var vs_ma) (t_var vs_ja))
-                                   (t_equ (t_nat_const 55) (t_var vs_pi)),
-            Ebbx (Eval (Esym hs_loop_ret, t_var vs_ja)))))
-    , hs_break, Easr (
-        t_and (t_equ (t_var vs_ii) (t_nat_const 42))
-              (t_equ (t_var vs_pi) (t_nat_const 37)), Ebbx (Esym hs_halt)))))
-
-  , hs_if, Edef (Edef (Ehol, hs_the0, Easr (t_equ (t_var vs_bb) t_bool_true, Ebbx (Esym hs_then))),
-                             hs_els0, Easr (t_equ (t_var vs_bb) t_bool_false, Ebbx (Esym hs_else))))
-  , hs_assign, Edef (Ehol, hs_assign_re0, Easr (t_equ (t_var vs_uc) (t_var vs_vc),
-                Ebbx (Esym hs_assign_ret))))
-  , hs_alloc, Edef (Ehol, hs_alloc_re0, Easr (t_equ (t_var vs_uc) (t_var vs_vc),
-                Ebbx (Eref (Esym hs_alloc_ret, vs_uc)))))
-  , hs_halt, Ehol)
-  , hs_fail, Easr (t_false, Ehol))
+let expr2 =
+  !hs_alloc -- ty_int -+ t_nat_const 1 -* lam [Pr vs_qi] (
+    !hs_loop -& vs_qi -- ty_int -+ t_var vs_qi -*
+                          lam [Pv vs_ji] (!hs_out -& vs_qi -+ t_var vs_ji) -+
+                              t_nat_const 3 -+ t_nat_const 0 -+ t_nat_const 5)
+  << def hs_loop [] [Pr vs_pi; Pt tv_a; Pv vs_ia; Pc (hs_ret,[vs_pi],[Pv vs_ja]);
+                                              Pv vs_ka; Pv vs_la; Pv vs_ma]
+        (asrt (t_and (t_neq (t_var vs_ia) (t_var vs_ka))
+                  (t_neq (t_var vs_pi) (t_nat_const 9)))
+        (Ebox (!hs_if -+ (t_if (t_equ (t_var vs_ia) (t_var vs_la))
+                              t_bool_true t_bool_false) -*
+            lam [] (!hs_assign -- ty_int -& vs_pi -+ t_nat_const 2 -*
+              lam [] (!hs_loop -& vs_pi -- ty_var tv_a -+ t_var vs_ia -* !hs_ret
+                -+ t_var vs_la -+ t_var vs_ma -+ t_var vs_ka)) -*
+            lam [] (!hs_ret -+ t_var vs_ia)))
+      >> def hs_ret [vs_pi] [Pv vs_ja]
+        (asrt (t_and (t_equ (t_var vs_ma) (t_var vs_ja))
+                      (t_equ (t_nat_const 55) (t_var vs_pi)))
+                                  (Ebox (!hs_ret -+ t_var vs_ja))))
+  >> def hs_out [] [Pr vs_pi; Pv vs_ii]
+      (asrt (t_and (t_equ (t_var vs_ii) (t_nat_const 42))
+                   (t_equ (t_var vs_pi) (t_nat_const 37))) (Ebox !hs_halt))
+  >> def hs_assign [] [Pt tv_c; Pr vs_uc; Pv vs_vc; Pc (hs_ret,[vs_uc],[])]
+      (Eany >> def hs_ret [vs_uc] [] (asrt (t_equ (t_var vs_uc) (t_var vs_vc))
+                                              (Ebox (!hs_ret))))
+  >> def hs_alloc [] [Pt tv_c; Pv vs_vc; Pc (hs_ret,[],[Pr vs_uc])]
+      (Eany >> def hs_ret [] [Pr vs_uc] (asrt (t_equ (t_var vs_uc) (t_var vs_vc))
+                                              (Ebox (!hs_ret -& vs_uc))))
+  >> def hs_if [] [Pv vs_bb; Pc (hs_then,[],[]); Pc (hs_else,[],[])]
+      (Eany >> def hs_then [] [] (asrt (t_equ (t_var vs_bb) t_bool_true) (Ebox !hs_then))
+            >> def hs_else [] [] (asrt (t_equ (t_var vs_bb) t_bool_false) (Ebox !hs_else)))
+  >> def hs_fail [] [] (asrt t_false Eany)
+  >> def hs_halt [] [] (Ewox Eany)
 
 (*
 type env = {
@@ -308,9 +348,7 @@ let mk_env {Theory.th_export = ns_int} = {
 
 let mk_goal tuc s e =
   let prs = Decl.create_prsymbol (id_fresh ("vc_" ^ s)) in
-  let vcf = vc e in
-(*   Format.printf "@[%a@]@." Pretty.print_term vcf; *)
-  Theory.add_prop_decl tuc Decl.Pgoal prs vcf
+  Theory.add_prop_decl tuc Decl.Pgoal prs (vc e)
 
 let read_channel env path _file _c =
 (*
@@ -322,7 +360,8 @@ let read_channel env path _file _c =
   let tuc = Theory.create_theory ~path (id_fresh "Coma") in
   let tuc = Theory.use_export tuc Theory.bool_theory in
   let tuc = Theory.use_export tuc th_int in
-  let tuc = mk_goal tuc "e1" expr1 in
+  let tuc = mk_goal tuc "expr1" expr1 in
+  let tuc = mk_goal tuc "expr2" expr2 in
   Mstr.singleton "Coma" (Theory.close_theory tuc)
 
 let () = Env.register_format Env.base_language "coma" ["coma"] read_channel
