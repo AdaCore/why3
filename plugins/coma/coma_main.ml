@@ -56,6 +56,7 @@ type expr =
   | Eapp of expr * argument
   | Elam of param list * expr
   | Edef of expr * bool * defn list
+  | Eset of expr * (vsymbol * term) list
   | Ecut of term * expr
   | Ebox of expr
   | Ewox of expr
@@ -169,12 +170,15 @@ let rec vc pp dd c bl = function
         let c,vl = havoc (if flat then c else cl) wr pl in
         t_forall_close_simp vl [] (vc false pp c [] d) in
       t_and_simp_l (vc pp dd cl [] e :: List.map impl dfl)
+  | Eset (e, vtl) -> assert (bl = []);
+      let set cl (v,t) = c_add_v v (v_inst c t) cl in
+      vc pp dd (List.fold_left set c vtl) [] e
   | Ecut (f, e) -> assert (bl = []);
       (if pp && c.c_gl then t_and_asym_simp else t_implies_simp)
         (v_inst c f) (vc pp dd c [] e)
   | Ebox e -> assert (bl = []); vc dd dd c [] e
   | Ewox e -> assert (bl = []); vc pp pp c [] e
-  | Eany -> assert (bl = []); t_true
+  | Eany   -> assert (bl = []); t_true
 
 and havoc c wr pl =
   let on_write (c,vl) p =
@@ -208,6 +212,7 @@ let (-+) e t = Eapp (e, Av t)
 let (-&) e r = Eapp (e, Ar r)
 let (-*) e d = Eapp (e, Ac d)
 
+let (<>) e vtl         = Eset (e,vtl)
 let (>>) e (h,wr,pl,d) = Edef (e,true, [h,wr,pl,d])
 let (<<) e (h,wr,pl,d) = Edef (e,false,[h,wr,pl,d])
 
@@ -264,8 +269,10 @@ let expr1 =
           (Ebox (!hs_if -+ (t_if (t_equ (t_var vs_ia) (t_var vs_la))
                                 t_bool_true t_bool_false) -*
              lam [] (!hs_assign -- ty_int -& vs_pi -+ t_nat_const 2 -*
-                lam [] (!hs_loop -- ty_var tv_a -+ t_var vs_ia -* !hs_ret
-                  -+ t_var vs_la -+ t_var vs_ma -+ t_var vs_ka)) -*
+                lam [] (cut (t_neq (t_var vs_qi) (t_var vs_pi))
+                  (!hs_loop -- ty_var tv_a -+ t_var vs_ia -* !hs_ret
+                    -+ t_var vs_la -+ t_var vs_ma -+ t_var vs_ka))
+                <> [vs_qi, t_var vs_pi]) -*
              lam [] (!hs_ret -+ t_var vs_ia)))
         >> def hs_ret [vs_pi] [Pv vs_ja]
           (cut (t_and (t_equ (t_var vs_ma) (t_var vs_ja))
@@ -298,8 +305,10 @@ let expr2 =
         (Ebox (!hs_if -+ (t_if (t_equ (t_var vs_ia) (t_var vs_la))
                               t_bool_true t_bool_false) -*
             lam [] (!hs_assign -- ty_int -& vs_pi -+ t_nat_const 2 -*
-              lam [] (!hs_loop -& vs_pi -- ty_var tv_a -+ t_var vs_ia -* !hs_ret
-                -+ t_var vs_la -+ t_var vs_ma -+ t_var vs_ka)) -*
+              lam [] (cut (t_neq (t_var vs_qi) (t_var vs_pi))
+                (!hs_loop -& vs_pi -- ty_var tv_a -+ t_var vs_ia -* !hs_ret
+                  -+ t_var vs_la -+ t_var vs_ma -+ t_var vs_ka))
+              <> [vs_qi, t_var vs_pi]) -*
             lam [] (!hs_ret -+ t_var vs_ia)))
       >> def hs_ret [vs_pi] [Pv vs_ja]
         (cut (t_and (t_equ (t_var vs_ma) (t_var vs_ja))
