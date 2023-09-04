@@ -910,6 +910,37 @@ let run_strategy_on_goal
   in
   exec_strategy 0 strat id
 
+let run_strat_on_goal
+    c id strat ~callback_pa ~callback_tr ~callback ~notification =
+  let rec exec_strategy tree id =
+    match tree with
+    | Sdo_nothing -> ()
+    | Sapply_trans(trname,args,substrats) ->
+        let callback ntr =
+          callback_tr trname [] ntr;
+          match ntr with
+          | TSfatal(id, e) ->
+               callback (STSfatal (trname, id, e))
+          | TSfailed(id, e) -> (* transformation failed *)
+              callback (STSfatal (trname, id, e))
+          | TSscheduled -> ()
+          | TSdone tid ->
+              List.iter2
+                (fun s id ->
+                 let run_next () = exec_strategy s id; false in
+                 S.idle ~prio:0 run_next)
+                substrats
+                (get_sub_tasks c.controller_session tid)
+         in
+        schedule_transformation c id trname args ~callback ~notification
+  in
+  let t = get_task c.controller_session id in
+  let tree = strat t in
+  exec_strategy tree id;
+  callback STShalt
+
+
+
 let schedule_pa_with_same_arguments
     c (pa: proof_attempt_node) (pn: proofNodeID) ~callback ~notification =
   let prover = pa.prover in

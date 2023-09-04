@@ -284,6 +284,21 @@ val run_strategy_on_goal :
     [schedule_transformation]). [callback] is called on each step of
     execution of the strategy.  *)
 
+val run_strat_on_goal :
+  controller ->
+  proofNodeID ->
+  (Task.task -> Strategy.strat) ->
+  callback_pa:(proofAttemptID -> proof_attempt_status -> unit) ->
+  callback_tr:(string -> string list -> transformation_status -> unit) ->
+  callback:(strategy_status -> unit) ->
+  notification:notifier -> unit
+(** [run_strat_on_goal c id strat] executes asynchronously the
+    strategy [strat] on the goal [id].  [callback_pa] is called for
+    each proof attempted (as in [schedule_proof_attempt]) and
+    [callback_tr] is called for each transformation applied (as in
+    [schedule_transformation]). [callback] is called on each step of
+    execution of the strategy.  *)
+
 val clean: controller -> removed:notifier -> any option -> unit
 (** Remove each proof attempt or transformation that are below proved
     goals, that are either obsolete or not valid. The [removed]

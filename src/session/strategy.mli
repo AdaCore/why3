@@ -36,3 +36,11 @@ type instruction =
   | Igoto of int (** goto state *)
 
 type t = instruction array
+
+
+
+
+type strat = Sdo_nothing | Sapply_trans of string * string list * strat list
+
+
+val strat_test : Task.task -> strat
