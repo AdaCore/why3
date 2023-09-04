@@ -70,21 +70,6 @@ and argument =
 
 and defn = hsymbol * vsymbol list * param list * expr
 
-let arg_of_param = function
-  | Pt u -> At (ty_var u)
-  | Pv v -> Av (t_var v)
-  | Pr r -> Ar r
-  | Pc (g,_,_) -> Ac (Esym g)
-
-let fail pl =
-  let dfl = List.filter_map (function
-    | Pc (h,wr,pl) ->
-        let app d p = Eapp (d, arg_of_param p) in
-        let d = List.fold_left app (Esym h) pl in
-        Some (h, wr, pl, Ebox d)
-    | Pt _ | Pv _ | Pr _ -> None) pl in
-  Elam (pl, Edef (Ecut (t_false, Eany), true, dfl))
-
 type binding =
   | Bt of ty
   | Bv of term
@@ -153,10 +138,9 @@ let rec vc pp dd c bl = function
       vc pp dd c (b::bl) e
   | Elam (pl, e) ->
       let c = consume c pl bl in
-      let get_hs s = function
+      let lc = List.fold_left (fun s -> function
         | Pc (h,_,_) -> Shs.add h s
-        | Pt _ | Pv _ | Pr _ -> s in
-      let lc = List.fold_left get_hs Shs.empty pl in
+        | Pt _ | Pv _ | Pr _ -> s) Shs.empty pl in
       let cw = { c with c_lc = lc; c_gl = false } in
       t_and_simp (vc pp dd c [] e) (vc (not pp) (not dd) cw [] e)
   | Edef (e, flat, dfl) -> assert (bl = []);
@@ -181,26 +165,36 @@ let rec vc pp dd c bl = function
   | Eany   -> assert (bl = []); t_true
 
 and havoc c wr pl =
-  let on_write (c,vl) p =
+  let on_write (vl,c) p =
     let q = Mvs.find p c.c_vs in
     let id = id_clone (match q.t_node with
       | Tvar v -> v | _ -> p).vs_name in
     let r = create_vsymbol id (t_type q) in
-    c_add_v p (t_var r) c, r::vl in
-  let on_param (c,vl) = function
+    r::vl, c_add_v p (t_var r) c in
+  let on_param (vl,c) = function
     | Pt u ->
         let v = create_tvsymbol (id_clone u.tv_name) in
-        c_add_t u (ty_var v) c, vl
+        vl, c_add_t u (ty_var v) c
     | Pv v | Pr v ->
         let ty = t_inst c v.vs_ty in
         let u = create_vsymbol (id_clone v.vs_name) ty in
-        c_add_v v (t_var u) c, u::vl
+        u::vl, c_add_v v (t_var u) c
     | Pc (h,wr,pl) ->
-        let d = fail pl in
-        let vcd s u bl = vc true true (prepare c s u) bl d in
-        c_add_h h wr vcd c, vl in
-  let c,vl = List.fold_left on_write (c,[]) wr in
-  let c,vl = List.fold_left on_param (c,vl) pl in
+        let dfl = List.filter_map (function
+          | Pc (h,wr,pl) ->
+              let apply d p = Eapp (d, match p with
+                | Pt u -> At (ty_var u)
+                | Pv v -> Av (t_var v)
+                | Pr r -> Ar r
+                | Pc (g,_,_) -> Ac (Esym g)) in
+              let d = List.fold_left apply (Esym h) pl in
+              Some (h, wr, pl, Ebox d)
+          | Pt _ | Pv _ | Pr _ -> None) pl in
+        let d = Edef (Ecut (t_false, Eany), true, dfl) in
+        vl, c_add_h h wr (fun s u bl ->
+          vc true true (consume (prepare c s u) pl bl) [] d) c in
+  let vl,c = List.fold_left on_write ([],c) wr in
+  let vl,c = List.fold_left on_param (vl,c) pl in
   c, List.rev vl
 
 let vc e = vc true true c_empty [] e
