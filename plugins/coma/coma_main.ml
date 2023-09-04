@@ -39,6 +39,7 @@ let create_hsymbol id = { hs_name = id_register id }
 
 (*
 let t_and_simp = t_and
+let t_and_simp_l = t_and_l
 let t_and_asym_simp = t_and_asym
 let t_implies_simp = t_implies
 let t_forall_close_simp = t_forall_close
@@ -54,9 +55,8 @@ type expr =
   | Esym of hsymbol
   | Eapp of expr * argument
   | Elam of param list * expr
-  | Edef of expr * hsymbol * vsymbol list * param list * expr
-  | Erec of expr * hsymbol * vsymbol list * param list * expr
-  | Easr of term * expr
+  | Edef of expr * bool * defn list
+  | Ecut of term * expr
   | Ebox of expr
   | Ewox of expr
   | Eany
@@ -67,6 +67,8 @@ and argument =
   | Ar of vsymbol
   | Ac of expr
 
+and defn = hsymbol * vsymbol list * param list * expr
+
 let arg_of_param = function
   | Pt u -> At (ty_var u)
   | Pv v -> Av (t_var v)
@@ -74,13 +76,13 @@ let arg_of_param = function
   | Pc (g,_,_) -> Ac (Esym g)
 
 let fail pl =
-  let add e = function
-    | Pc (h, wr, pl) ->
+  let dfl = List.filter_map (function
+    | Pc (h,wr,pl) ->
         let app d p = Eapp (d, arg_of_param p) in
         let d = List.fold_left app (Esym h) pl in
-        Edef (e, h, wr, pl, Ebox d)
-    | Pt _ | Pv _ | Pr _ -> e in
-  Elam (pl, List.fold_left add (Easr (t_false, Eany)) pl)
+        Some (h, wr, pl, Ebox d)
+    | Pt _ | Pv _ | Pr _ -> None) pl in
+  Elam (pl, Edef (Ecut (t_false, Eany), true, dfl))
 
 type binding =
   | Bt of ty
@@ -156,26 +158,18 @@ let rec vc pp dd c bl = function
       let lc = List.fold_left get_hs Shs.empty pl in
       let cw = { c with c_lc = lc; c_gl = false } in
       t_and_simp (vc pp dd c [] e) (vc (not pp) (not dd) cw [] e)
-  | Edef (e, h, wr, pl, d) -> assert (bl = []);
-      let vcd s u bl =
-        let c = consume (prepare c s u) pl bl in
-        vc true false c [] d in
-      let cl = c_add_h h wr vcd c in
-      let lhs = vc pp dd cl [] e in
-      let cr,vl = havoc c wr pl in
-      let rhs = vc false pp cr [] d in
-      t_and_simp lhs (t_forall_close_simp vl [] rhs)
-  | Erec (e, h, wr, pl, d) -> assert (bl = []);
-      let vcd s u bl =
-        let c = consume (prepare c s u) pl bl in
-        let c,_ = havoc c [] [Pc (h, wr, pl)] in
-        vc true false c [] d in
-      let c = c_add_h h wr vcd c in
-      let lhs = vc pp dd c [] e in
-      let cr,vl = havoc c wr pl in
-      let rhs = vc false pp cr [] d in
-      t_and_simp lhs (t_forall_close_simp vl [] rhs)
-  | Easr (f, e) -> assert (bl = []);
+  | Edef (e, flat, dfl) -> assert (bl = []);
+      let cr = if flat then c else
+        let pc_of_def (h,wr,pl,_) = Pc (h,wr,pl) in
+        fst (havoc c [] (List.map pc_of_def dfl)) in
+      let spec c (h,wr,pl,d) = c_add_h h wr (fun s u bl ->
+        vc true false (consume (prepare cr s u) pl bl) [] d) c in
+      let cl = List.fold_left spec c dfl in
+      let impl (_,wr,pl,d) =
+        let c,vl = havoc (if flat then c else cl) wr pl in
+        t_forall_close_simp vl [] (vc false pp c [] d) in
+      t_and_simp_l (vc pp dd cl [] e :: List.map impl dfl)
+  | Ecut (f, e) -> assert (bl = []);
       (if pp && c.c_gl then t_and_asym_simp else t_implies_simp)
         (v_inst c f) (vc pp dd c [] e)
   | Ebox e -> assert (bl = []); vc dd dd c [] e
@@ -214,13 +208,13 @@ let (-+) e t = Eapp (e, Av t)
 let (-&) e r = Eapp (e, Ar r)
 let (-*) e d = Eapp (e, Ac d)
 
-let (>>) e (h,wr,pl,d) = Edef (e,h,wr,pl,d)
-let (<<) e (h,wr,pl,d) = Erec (e,h,wr,pl,d)
+let (>>) e (h,wr,pl,d) = Edef (e,true, [h,wr,pl,d])
+let (<<) e (h,wr,pl,d) = Edef (e,false,[h,wr,pl,d])
 
 let def h wr pl d = (h,wr,pl,d)
 let lam pl d = Elam (pl,d)
 
-let asrt f d = Easr (f,d)
+let cut f d = Ecut (f,d)
 
 let hs_halt = create_hsymbol (id_fresh "halt")
 let hs_fail = create_hsymbol (id_fresh "fail")
@@ -265,7 +259,7 @@ let expr1 =
                               t_nat_const 3 -+ t_nat_const 0 -+ t_nat_const 5
     << def hs_loop [vs_pi] [Pt tv_a; Pv vs_ia; Pc (hs_ret,[vs_pi],[Pv vs_ja]);
                                                 Pv vs_ka; Pv vs_la; Pv vs_ma]
-          (asrt (t_and (t_neq (t_var vs_ia) (t_var vs_ka))
+          (cut (t_and (t_neq (t_var vs_ia) (t_var vs_ka))
                    (t_neq (t_var vs_pi) (t_nat_const 9)))
           (Ebox (!hs_if -+ (t_if (t_equ (t_var vs_ia) (t_var vs_la))
                                 t_bool_true t_bool_false) -*
@@ -274,22 +268,22 @@ let expr1 =
                   -+ t_var vs_la -+ t_var vs_ma -+ t_var vs_ka)) -*
              lam [] (!hs_ret -+ t_var vs_ia)))
         >> def hs_ret [vs_pi] [Pv vs_ja]
-          (asrt (t_and (t_equ (t_var vs_ma) (t_var vs_ja))
+          (cut (t_and (t_equ (t_var vs_ma) (t_var vs_ja))
                        (t_equ (t_nat_const 55) (t_var vs_pi)))
                                    (Ebox (!hs_ret -+ t_var vs_ja))))
     >> def hs_out [vs_pi] [Pv vs_ii]
-      (asrt (t_and (t_equ (t_var vs_ii) (t_nat_const 42))
+      (cut (t_and (t_equ (t_var vs_ii) (t_nat_const 42))
                    (t_equ (t_var vs_pi) (t_nat_const 37))) (Ebox !hs_halt)))
   >> def hs_assign [] [Pt tv_c; Pr vs_uc; Pv vs_vc; Pc (hs_ret,[vs_uc],[])]
-      (Eany >> def hs_ret [vs_uc] [] (asrt (t_equ (t_var vs_uc) (t_var vs_vc))
+      (Eany >> def hs_ret [vs_uc] [] (cut (t_equ (t_var vs_uc) (t_var vs_vc))
                                               (Ebox (!hs_ret))))
   >> def hs_alloc [] [Pt tv_c; Pv vs_vc; Pc (hs_ret,[],[Pr vs_uc])]
-      (Eany >> def hs_ret [] [Pr vs_uc] (asrt (t_equ (t_var vs_uc) (t_var vs_vc))
+      (Eany >> def hs_ret [] [Pr vs_uc] (cut (t_equ (t_var vs_uc) (t_var vs_vc))
                                               (Ebox (!hs_ret -& vs_uc))))
   >> def hs_if [] [Pv vs_bb; Pc (hs_then,[],[]); Pc (hs_else,[],[])]
-      (Eany >> def hs_then [] [] (asrt (t_equ (t_var vs_bb) t_bool_true) (Ebox !hs_then))
-            >> def hs_else [] [] (asrt (t_equ (t_var vs_bb) t_bool_false) (Ebox !hs_else)))
-  >> def hs_fail [] [] (asrt t_false Eany)
+      (Eany >> def hs_then [] [] (cut (t_equ (t_var vs_bb) t_bool_true) (Ebox !hs_then))
+            >> def hs_else [] [] (cut (t_equ (t_var vs_bb) t_bool_false) (Ebox !hs_else)))
+  >> def hs_fail [] [] (cut t_false Eany)
   >> def hs_halt [] [] (Ewox Eany)
 
 let expr2 =
@@ -299,7 +293,7 @@ let expr2 =
                               t_nat_const 3 -+ t_nat_const 0 -+ t_nat_const 5)
   << def hs_loop [] [Pr vs_pi; Pt tv_a; Pv vs_ia; Pc (hs_ret,[vs_pi],[Pv vs_ja]);
                                               Pv vs_ka; Pv vs_la; Pv vs_ma]
-        (asrt (t_and (t_neq (t_var vs_ia) (t_var vs_ka))
+        (cut (t_and (t_neq (t_var vs_ia) (t_var vs_ka))
                   (t_neq (t_var vs_pi) (t_nat_const 9)))
         (Ebox (!hs_if -+ (t_if (t_equ (t_var vs_ia) (t_var vs_la))
                               t_bool_true t_bool_false) -*
@@ -308,22 +302,22 @@ let expr2 =
                 -+ t_var vs_la -+ t_var vs_ma -+ t_var vs_ka)) -*
             lam [] (!hs_ret -+ t_var vs_ia)))
       >> def hs_ret [vs_pi] [Pv vs_ja]
-        (asrt (t_and (t_equ (t_var vs_ma) (t_var vs_ja))
+        (cut (t_and (t_equ (t_var vs_ma) (t_var vs_ja))
                       (t_equ (t_nat_const 55) (t_var vs_pi)))
                                   (Ebox (!hs_ret -+ t_var vs_ja))))
   >> def hs_out [] [Pr vs_pi; Pv vs_ii]
-      (asrt (t_and (t_equ (t_var vs_ii) (t_nat_const 42))
+      (cut (t_and (t_equ (t_var vs_ii) (t_nat_const 42))
                    (t_equ (t_var vs_pi) (t_nat_const 37))) (Ebox !hs_halt))
   >> def hs_assign [] [Pt tv_c; Pr vs_uc; Pv vs_vc; Pc (hs_ret,[vs_uc],[])]
-      (Eany >> def hs_ret [vs_uc] [] (asrt (t_equ (t_var vs_uc) (t_var vs_vc))
+      (Eany >> def hs_ret [vs_uc] [] (cut (t_equ (t_var vs_uc) (t_var vs_vc))
                                               (Ebox (!hs_ret))))
   >> def hs_alloc [] [Pt tv_c; Pv vs_vc; Pc (hs_ret,[],[Pr vs_uc])]
-      (Eany >> def hs_ret [] [Pr vs_uc] (asrt (t_equ (t_var vs_uc) (t_var vs_vc))
+      (Eany >> def hs_ret [] [Pr vs_uc] (cut (t_equ (t_var vs_uc) (t_var vs_vc))
                                               (Ebox (!hs_ret -& vs_uc))))
   >> def hs_if [] [Pv vs_bb; Pc (hs_then,[],[]); Pc (hs_else,[],[])]
-      (Eany >> def hs_then [] [] (asrt (t_equ (t_var vs_bb) t_bool_true) (Ebox !hs_then))
-            >> def hs_else [] [] (asrt (t_equ (t_var vs_bb) t_bool_false) (Ebox !hs_else)))
-  >> def hs_fail [] [] (asrt t_false Eany)
+      (Eany >> def hs_then [] [] (cut (t_equ (t_var vs_bb) t_bool_true) (Ebox !hs_then))
+            >> def hs_else [] [] (cut (t_equ (t_var vs_bb) t_bool_false) (Ebox !hs_else)))
+  >> def hs_fail [] [] (cut t_false Eany)
   >> def hs_halt [] [] (Ewox Eany)
 
 (*
