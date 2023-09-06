@@ -99,6 +99,22 @@ and argument =
 
 and defn = hsymbol * vsymbol list * param list * expr
 
+let eta h pl =
+  let apply d p = Eapp (d, match p with
+    | Pt u -> At (ty_var u)
+    | Pv v -> Av (t_var v)
+    | Pr r -> Ar r
+    | Pc (g,_,_) -> Ac (Esym g)) in
+  List.fold_left apply (Esym h) pl
+
+let rec substantial pp dd = function
+  | Elam (_,e) | Eset (e,_) | Ecut (_,e) -> substantial pp dd e
+  | Edef (e,_,_) when not pp -> substantial pp dd e
+(*   | Ebox _ when not dd -> false *)
+  | Ewox _ when not pp -> false
+  | Eany -> false
+  | _ -> pp || dd
+
 type context = {
   c_tv : ty Mtv.t;
   c_vs : term Mvs.t;
@@ -110,7 +126,7 @@ type context = {
 and closure = (* Co for outcomes (= lambdas), Cd for definitions *)
   | Co of bool * bool * context * vsymbol Mvs.t *              expr
   | Cd of bool * bool * context * vsymbol Mvs.t * param list * expr
-  | Cz of               hsymbol * vsymbol Mvs.t * param list
+  | Cz of               hsymbol *    term Mvs.t * param list
 
 type binding =
   | Bt of ty
@@ -133,39 +149,27 @@ let r_inst c r = t_ty_subst c.c_tv c.c_vs (t_var r)
 let c_add_t c u t = { c with c_tv = Mtv.add u t c.c_tv }
 let c_add_v c v t = { c with c_vs = Mvs.add v t c.c_vs }
 
-let c_add_h out (c,zl,hl,map) h pp dd cc wr pl e =
-  let lc = if c.c_gl then Shs.empty else Shs.add h c.c_lc in
-  let rec solid = function
-    | Elam (_,e) | Eset (e,_) | Ecut (_,e) -> solid e
-    | Edef (e,_,_) when not pp -> solid e
-(*     | Ebox _ when not dd -> false *)
-    | Ewox _ when not pp -> false
-    | Eany -> false
-    | _ -> true in
-  if  (let s = h.hs_name.id_string in s <> "" && s.[0] = '_') &&
-      List.for_all (function Pv _ | Pr _ -> true | Pt _ | Pc _ -> false) pl &&
-      (cc.c_gl || not (Shs.is_empty cc.c_lc)) &&
-      solid e
-  then
+let c_add_h out (c,zl,hl,pm) h pp dd cc wr pl e =
+  let to_merge = (let s = h.hs_name.id_string in s <> "" && s.[0] = '_') &&
+    List.for_all (function Pv _ | Pr _ -> true | Pt _ | Pc _ -> false) pl &&
+    (cc.c_gl || not (Shs.is_empty cc.c_lc)) && substantial pp dd e in
+  let update up p = Mvs.add (Mvs.find_def p p pm) p up in
+  let up = List.fold_left update Mvs.empty wr in
+  let ce,zl,hl = if to_merge then
     let hc = create_hsymbol (id_clone h.hs_name) in
-    let clone v = create_vsymbol (id_clone v.vs_name) (t_inst c v.vs_ty) in
-    let zm = List.fold_left (fun zm v -> Mvs.add v (clone v) zm) Mvs.empty wr in
-    let zm = List.fold_left (fun zm -> function Pt _ | Pc _ -> assert false
-      | Pv v | Pr v -> Mvs.add v (clone v) zm) zm pl in
+    let dup v = create_vsymbol (id_clone v.vs_name) (t_inst c v.vs_ty) in
+    let dup (zl,zm) v = let z = dup v in z::zl, Mvs.add v (t_var z) zm in
+    let zl,zm = List.fold_left (fun acc -> function Pt _ | Pc _ -> assert false
+      | Pv v | Pr v -> dup acc v) (List.fold_left dup (zl, Mvs.empty) wr) pl in
     let bl = if out then List.map (function Pt _ | Pc _ -> assert false
-      | Pr v -> Br (t_var (Mvs.find v zm), v (* irrelevant *))
-      | Pv v -> Bv (t_var (Mvs.find v zm))) pl else [] in
-    let link up r = Mvs.add (Mvs.find_def r r map) (t_var (Mvs.find r zm)) up in
-    let up = if out then List.fold_left link Mvs.empty wr else Mvs.map t_var zm in
+      | Pr v -> Br (Mvs.find v zm,v) | Pv v -> Bv (Mvs.find v zm)) pl else [] in
+    let up = if out then Mvs.map (fun p -> Mvs.find p zm) up else zm in
     let cc = { cc with c_vs = Mvs.set_union up cc.c_vs } in
-    { c with c_hs = Mhs.add h (Cz (hc,zm,pl)) c.c_hs; c_lc = lc},
-    Mvs.fold (fun _ z zl -> z::zl) zm zl, (hc,pp,dd,cc,bl,e)::hl, map
-  else
-    let wr = List.fold_left (fun wr r ->
-      Mvs.add (Mvs.find_def r r map) r wr) Mvs.empty wr in
-    let cl = if out then Co (pp, dd, cc, wr, e)
-                    else Cd (pp, dd, cc, wr, pl, e) in
-    { c with c_hs = Mhs.add h cl c.c_hs; c_lc = lc },zl,hl,map
+    Cz (hc,zm,pl), zl, (hc,pp,dd,cc,bl,e)::hl
+  else if out then Co (pp,dd,cc,up,e), zl, hl
+              else Cd (pp,dd,cc,up,pl,e), zl, hl in
+  let lc = if c.c_gl then Shs.empty else Shs.add h c.c_lc in
+  { c with c_hs = Mhs.add h ce c.c_hs; c_lc = lc },zl,hl,pm
 
 let consume c pl bl =
   let eat (c,zl,hl,m as acc) p b = match p, b with
@@ -180,29 +184,29 @@ let rec vc pp dd c bl = function
   | Esym h ->
       let safe = pp && (c.c_gl || Shs.mem h c.c_lc) in
       let update cc wr = { cc with
-        c_gl = safe && cc.c_gl;
+        c_vs = Mvs.set_union (Mvs.map (r_inst c) wr) cc.c_vs;
         c_lc = if safe then cc.c_lc else Shs.empty;
-        c_vs = Mvs.set_union (Mvs.map (r_inst c) wr) cc.c_vs } in
-      begin match Mhs.find h c.c_hs with
-      | Co (pp, dd, cc, wr, d) ->
+        c_gl = safe && cc.c_gl } in
+      (match Mhs.find h c.c_hs with
+      | Co (pp,dd,cc,wr,d) ->
           vc pp dd (update cc wr) bl d
-      | Cd (pp, dd, cc, wr, pl, d) ->
+      | Cd (pp,dd,cc,wr,pl,d) ->
           let cc,zl,hl,_ = consume (update cc wr) pl bl in
           discharge (vc pp dd cc [] d) zl hl
-      | Cz (h, zm, pl) when safe ->
+      | Cz (h,zm,pl) when safe ->
           let c,_,_,_ = consume c pl bl in
-          let add v z f = t_and_simp (t_equ (t_var z) (r_inst c v)) f in
-          { wp = t_true; sp = Mhs.singleton h (Mvs.fold add zm t_true) }
-      | Cz _ -> w_true
-      end
-  | Eapp (e, a) ->
+          let add v z f = t_and_simp (t_equ z (r_inst c v)) f in
+          let sp = Mvs.fold_right add zm t_true in
+          { wp = t_true; sp = Mhs.singleton h sp }
+      | Cz _ -> w_true)
+  | Eapp (e,a) ->
       let b = match a with
         | At t -> Bt (t_inst c t)
         | Av t -> Bv (v_inst c t)
-        | Ar r -> Br (r_inst c r, r)
+        | Ar r -> Br (r_inst c r,r)
         | Ac d -> Bc (pp,dd,c,d) in
       vc pp dd c (b::bl) e
-  | Elam (pl, e) ->
+  | Elam (pl,e) ->
       let c,zl,hl,_ = consume c pl bl in
       let lc = List.fold_left (fun s -> function
         | Pc (h,_,_) -> Shs.add h s
@@ -210,7 +214,7 @@ let rec vc pp dd c bl = function
       let cw = { c with c_lc = lc; c_gl = false } in
       let w = w_and (vc pp dd c [] e) (vc (not pp) (not dd) cw [] e) in
       discharge w zl hl
-  | Edef (e, flat, dfl) -> assert (bl = []);
+  | Edef (e,flat,dfl) -> assert (bl = []);
       let cr = if flat then c else
         let pc_of_def (h,wr,pl,_) = Pc (h,wr,pl) in
         fst (havoc c [] (List.map pc_of_def dfl)) in
@@ -221,10 +225,10 @@ let rec vc pp dd c bl = function
         w_forall vl (vc false pp c [] d) in
       let wl = vc pp dd cl [] e :: List.map impl dfl in
       discharge (w_and_l wl) zl hl
-  | Eset (e, vtl) -> assert (bl = []);
+  | Eset (e,vtl) -> assert (bl = []);
       let set cl (v,t) = c_add_v cl v (v_inst c t) in
       vc pp dd (List.fold_left set c vtl) [] e
-  | Ecut (f, e) -> assert (bl = []);
+  | Ecut (f,e) -> assert (bl = []);
       (if pp && c.c_gl then w_and_asym else w_implies)
         (v_inst c f) (vc pp dd c [] e)
   | Ebox e -> assert (bl = []); vc dd dd c [] e
@@ -234,6 +238,7 @@ let rec vc pp dd c bl = function
 and discharge w zl hl =
   let wl = List.map (fun (h,pp,dd,c,bl,e) ->
     let sp = Mhs.find_def t_false h w.sp in
+    (* if is_false sp then w_true else *)
     w_implies sp (vc pp dd c bl e)) hl in
   let drop s (h,_,_,_,_,_) = Mhs.remove h s in
   let w = { w with sp = List.fold_left drop w.sp hl } in
@@ -257,19 +262,12 @@ and havoc c wr pl =
     | Pc (h,wr,pl) ->
         let d = Ecut (t_false, Eany) in
         let dl = List.filter_map (function
-          | Pc (h,wr,pl) ->
-              let apply d p = Eapp (d, match p with
-                | Pt u -> At (ty_var u)
-                | Pv v -> Av (t_var v)
-                | Pr r -> Ar r
-                | Pc (g,_,_) -> Ac (Esym g)) in
-              let d = List.fold_left apply (Esym h) pl in
-              Some (h, wr, pl, Ebox d)
+          | Pc (h,wr,pl) -> Some (h,wr,pl,Ebox (eta h pl))
           | Pt _ | Pv _ | Pr _ -> None) pl in
         let d = if dl = [] then d else Edef (d,true,dl) in
         let c,_,_,_ = c_add_h false (c,[],[],Mvs.empty)
                               h true true c wr pl d in
-        vl, c in
+        vl,c in
   let vl,c = List.fold_left on_write ([],c) wr in
   let vl,c = List.fold_left on_param (vl,c) pl in
   c, List.rev vl
@@ -421,13 +419,27 @@ let mk_env {Theory.th_export = ns_int} = {
 }
 *)
 
+open Ptree
+open Coma_syntax
+
+let vc tuc e = match e.pexpr_desc with
+  | PEcut (t, _) ->
+      Typing.type_fmla_in_namespace (Theory.get_namespace tuc) tuc.uc_known
+        tuc.uc_crcmap t
+  | _ ->
+      t_true (* FIXME *)
+
 let mk_goal tuc s e =
   let prs = Decl.create_prsymbol (id_fresh ("vc_" ^ s)) in
-  Theory.add_prop_decl tuc Decl.Pgoal prs (vc e)
+  Theory.add_prop_decl tuc Decl.Pgoal prs (vc tuc e)
 
-let read_channel env path _file _c =
+let add_vc tuc d =
+  let d = d.pdefn_desc in
+  mk_goal tuc d.pdefn_name.id_str d.pdefn_body
+
+let read_channel env path file c =
+  let ast = Coma_lexer.parse_channel file c in
 (*
-  let ast = Coma_lexer.parse file c in
   Format.printf "@[%a@]@." (fun fmt l ->
     List.iter (fun d -> Coma_syntax.print_decl fmt d) l) ast;
 *)
@@ -435,8 +447,9 @@ let read_channel env path _file _c =
   let tuc = Theory.create_theory ~path (id_fresh "Coma") in
   let tuc = Theory.use_export tuc Theory.bool_theory in
   let tuc = Theory.use_export tuc th_int in
-  let tuc = mk_goal tuc "expr1" expr1 in
-  let tuc = mk_goal tuc "expr2" expr2 in
+  let tuc = List.fold_left add_vc tuc ast in
+  (* let tuc = mk_goal tuc "expr1" expr1 in *)
+  (* let tuc = mk_goal tuc "expr2" expr2 in *)
   Mstr.singleton "Coma" (Theory.close_theory tuc)
 
 let () = Env.register_format Env.base_language "coma" ["coma"] read_channel

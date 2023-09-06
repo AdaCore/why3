@@ -537,6 +537,8 @@ endif
 PLUGGENERATED = \
 	plugins/tptp/tptp_lexer.ml \
 	plugins/tptp/tptp_parser.ml plugins/tptp/tptp_parser.mli \
+	plugins/coma/coma_lexer.ml \
+	plugins/coma/coma_parser.ml plugins/coma/coma_parser.mli \
 	plugins/python/py_lexer.ml \
 	plugins/python/py_parser.ml plugins/python/py_parser.mli \
 	plugins/microc/mc_lexer.ml \
@@ -550,7 +552,7 @@ PLUG_PRINTER =
 PLUG_TRANSFORM =
 PLUG_STRATEGIES = forward_propagation
 PLUG_TPTP = tptp_parser tptp_typing tptp_lexer tptp_printer
-PLUG_COMA = coma_main
+PLUG_COMA = coma_syntax coma_parser coma_lexer coma_main
 PLUG_PYTHON = py_parser py_lexer py_main
 PLUG_MICROC = mc_parser mc_lexer mc_printer mc_main
 PLUG_CFG = cfg_parser cfg_lexer cfg_paths subregion_analysis cfg_main
@@ -2113,6 +2115,11 @@ pl%gins/cfg/cfg_parser.ml pl%gins/cfg/cfg_parser.mli: src/parser/parser_common.m
 	$(SHOW) 'Menhir $^'
 	$(HIDE)$(MENHIR) --table --explain --strict --base plugins/cfg/cfg_parser $^
 	$(HIDE)for f in plugins/cfg/cfg_parser.mli plugins/cfg/cfg_parser.ml; do (echo "open Why3"; cat $$f) > $$f.new && mv $$f.new $$f; done
+
+pl%gins/coma/coma_parser.ml pl%gins/coma/coma_parser.mli: src/parser/parser_common.mly plugins/coma/coma_parser.mly
+	$(SHOW) 'Menhir $^'
+	$(HIDE)$(MENHIR) --table --explain --strict --base plugins/coma/coma_parser $^
+	$(HIDE)for f in plugins/coma/coma_parser.mli plugins/coma/coma_parser.ml; do (echo "open Why3"; cat $$f) > $$f.new && mv $$f.new $$f; done
 
 %.ml %.mli: %.mly
 	$(SHOW) 'Menhir $<'
