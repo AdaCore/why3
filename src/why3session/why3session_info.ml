@@ -56,6 +56,9 @@ let spec =
       depending on the number of goals. Default: all";
   ]
 
+let warn_no_data =
+  Loc.register_warning "no_graph_data" "Warn that not enough data is present for generating graphs or reports"
+
 type proof_stats =
     { mutable nb_root_goals : int;
       mutable nb_sub_goals : int;
@@ -70,7 +73,7 @@ type proof_stats =
       prover_max_time : float Hprover.t;
       prover_successful_proofs : int Hprover.t;
       prover_all_proofs : int Hprover.t;
-      proof_node_proofs : float Mprover.t Hpn.t
+      proof_node_proofs : (Ident.ident * float Mprover.t) Hpn.t
     }
 
 let new_proof_stats () =
@@ -176,7 +179,9 @@ let rec stats_of_goal ~root prefix_name stats ses goal =
           | _ -> acc)
       Mprover.empty (get_proof_attempts ses goal)
   in
-  Hpn.add stats.proof_node_proofs goal proof_list;
+  let goal_name = get_proof_name ses goal
+  in
+  Hpn.add stats.proof_node_proofs goal (goal_name,proof_list);
   Mprover.iter (fun x y -> update_perf_stats stats (x,y)) proof_list;
   List.iter (stats_of_transf prefix_name stats ses) (get_transformations ses goal);
   let goal_name = prefix_name ^ (get_proof_name ses goal).Ident.id_string in
@@ -452,7 +457,7 @@ let print_hist stats =
 (** Generate pairs of provers for the scatter and hist plots.*)
 let generate_provers_pairs stats =
   let all_provers = 
-    Hpn.fold (fun _pn provers_and_times acc ->
+    Hpn.fold (fun _pn (_, provers_and_times) acc ->
         (List.fold_left
         Sprover.add_left acc (Mprover.keys provers_and_times))
     ) stats.proof_node_proofs Sprover.empty
@@ -477,7 +482,7 @@ let print_compare_scatter stats =
     in
     let () = 
       Hpn.iter (
-      fun _pn provers_and_times ->
+      fun _pn (_,provers_and_times) ->
         let time1 =
         try Mprover.find prover1 provers_and_times
         with Not_found -> max_time
@@ -528,14 +533,14 @@ let print_compare_hist stats =
   let ratio_and_exclusives (prover1, prover2) =
     let (out_list, p1_only, p2_only) =
       Hpn.fold (
-         fun _pn provers_and_times (out_list, p1_only, p2_only) ->
+         fun _pn (ident,provers_and_times) (out_list, p1_only, p2_only) ->
           match Mprover.find_opt prover1 provers_and_times, Mprover.find_opt prover2 provers_and_times with
           | Some time1, Some time2 -> 
           (* For some time, Alt-Ergo reported null times and this got stored in sessions.
           Eventually this should be removed*)
-            (let time1 = if (time1 = Float.zero) then time1 +. 0.000001 else time1 in
-             let time2 = if (time2 = Float.zero) then time2 +. 0.000001 else time2 in
-              (time1/.time2 :: out_list), p1_only, p2_only)
+            let time1 = if (time1 = Float.zero) then time1 +. 0.000001 else time1 in
+            let time2 = if (time2 = Float.zero) then time2 +. 0.000001 else time2 in
+             ((time1, time2, ident.Ident.id_string) :: out_list), p1_only, p2_only
           | Some _    , None       -> (out_list, p1_only + 1, p2_only    )
           | None      , Some _     -> (out_list, p1_only    , p2_only + 1)
           | None      , None       -> (out_list, p1_only , p2_only)
@@ -544,14 +549,15 @@ let print_compare_hist stats =
     let p2_name = (string_of_prover prover2) in
     let p1_name = (string_of_prover prover1) in
     if out_list == [] then
-      eprintf "Not enough data points to compare %s and %s, graph will not be produced.@." p1_name p2_name;
-    ((p1_name, p2_name), out_list |> List.sort Float.compare,
+      Loc.warning warn_no_data
+      "Not enough data points to compare %s and %s, graph will not be produced.@." p1_name p2_name;
+    ((p1_name, p2_name), out_list |> List.sort (fun (t1a,t2a,_) (t1b,t2b,_) -> Float.compare (t1a/.t2a) (t1b/.t2b)),
     p1_only, p2_only)
   in
   let print_ratio_list (pair, ratio_list, p1_only, p2_only) =
     let datafile,ch = Filename.open_temp_file "why3session" ".data" in
     let fmt = formatter_of_out_channel ch in
-    List.iter (fprintf fmt "%.6f@.") ratio_list;
+    List.iter (fun (t1,t2,ident_name) -> fprintf fmt "%.6f %s %.6f %.6f@." (t1/.t2) ident_name t1 t2) ratio_list;
     fprintf fmt "@.";
     close_out ch;
     (pair, datafile, p1_only, p2_only)
@@ -569,6 +575,7 @@ let print_compare_hist stats =
         fprintf main_fmt {|exclusives = "\n%d additional goals are only proved by ".prover1.", %d only by ".prover2@.|} p1_only p2_only;
         fprintf main_fmt
 {|set key off
+Label(Ident,T1,T2) = sprintf("%%s\n%%s: %%.6f\n %%s: %%.6f", stringcolumn(Ident), prover1, column(T1), prover2, column(T2))
 stats filename using 1 nooutput
 set xlabel "Percentage of goals"
 set ylabel sprintf("Time ratio: %%s over %%s", prover1, prover2)
@@ -586,9 +593,10 @@ percent_improve = IMPROV_sum/STATS_records*100
 if (percent_improve > 50) {title_string = sprintf("%%s is faster than %%s on %%.2f %%%% of %%d goals", prover1, prover2, percent_improve, STATS_records)}
 else {title_string = sprintf("%%s is faster than %%s on %%.2f %%%% of %%d goals", prover2, prover1, 100-percent_improve, STATS_records)}
 set title title_string.exclusives
-plot filename with points pointtype 5 pointsize 0.5 linecolor rgb "blue", STATS_mean title "Mean", 1
+plot filename using 0:1:(Label(2,3,4)) with labels hypertext point pointsize 0.5 linecolor rgb "blue", STATS_mean title "Mean", 1
 pause -1 "Press any key\n"
 replot@.|};
+(*      filename using 0:1:2:(0.1) linecolor rgb "blue" with labels hypertext  *)
   in
   List.iter print_plot datafiles_and_exclusives;
   close_out main_ch;
