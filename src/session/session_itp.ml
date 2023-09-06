@@ -1538,6 +1538,9 @@ let save_detached_theory parent_name old_s detached_theory s =
 let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
   let old_pa = old_pa_n in
   let obsolete = goal_obsolete || old_pa.proof_obsolete in
+  if obsolete then
+    Debug.dprintf debug "set to obsolete: goal_obsolete=%b old_pa.proof_obsolete=%b@."
+      goal_obsolete old_pa.proof_obsolete;
   found_obsolete := obsolete || !found_obsolete;
   ignore (add_proof_attempt new_s old_pa.prover old_pa.limit
     old_pa.proof_state ~obsolete old_pa.proof_script
@@ -1644,6 +1647,8 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
     List.iter
       (function
         | ((new_goal_id,_), Some ((old_goal_id,_), goal_obsolete)) ->
+            if goal_obsolete then
+              Debug.dprintf debug "goal was seen as obsolete@.";
            merge_goal ~use_shapes env new_s old_s ~goal_obsolete
                       (get_proofNode old_s old_goal_id) new_goal_id
         | ((id,s), None) ->
@@ -1701,7 +1706,8 @@ let merge_theory ~ignore_shapes env old_s old_th s th : unit =
          let goal_obsolete =
              let s1 = Sshape.find_sum s ng_id in
              let s2 = Sshape.find_sum old_s old_id in
-             Debug.dprintf debug "[merge_theory] goal has checksum@.";
+             Debug.dprintf debug "[merge_theory] goal has checksums s1=%s s2=%s@."
+               (Termcode.string_of_checksum s1) (Termcode.string_of_checksum s2);
              not (Termcode.equal_checksum s1 s2)
          in
          if goal_obsolete then
@@ -1866,6 +1872,8 @@ let merge_file ~ignore_shapes env (ses : session) (old_ses : session) file =
 
 let merge_files ~ignore_shapes env (ses:session) (old_ses : session) =
   Debug.dprintf debug "merging files from old session@.";
+  found_obsolete := false;
+  found_detached := false;
   let errors =
     Hfile.fold
       (fun _ f acc ->
