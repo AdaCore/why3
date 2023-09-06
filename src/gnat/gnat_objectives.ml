@@ -773,31 +773,41 @@ let iter_subps c f =
 
 module Save_VCs = struct
 
-  exception Found of Whyconf.prover *  Call_provers.prover_result
-
   let find_successful_proof s goal =
-    let check_map_result prover paid =
+    let check_map_result acc prover paid =
       (* paid is a value of the map of proof attempt ids. If it represents a
          valid proof attempt, we raise the Found exception, otherwise we do
          nothing. *)
       let pa = Session_itp.get_proof_attempt_node s paid in
       match pa.Session_itp.proof_obsolete, pa.Session_itp.proof_state with
       | false, Some pr when pr.Call_provers.pr_answer = Call_provers.Valid ->
-        raise (Found (prover, pr))
-      | _ -> ()
+          begin match acc with
+          | None -> Some (prover, pr)
+          | Some (_, other_pr) ->
+              if pr.Call_provers.pr_time < other_pr.Call_provers.pr_time then
+                Some (prover, pr)
+              else acc
+          end
+      | _ -> acc
     in
-  (* given a goal, find a successful proof attempt for exactly this goal (not
-     counting transformations. Raise Exit if not found. *)
+    (* given a goal, find a successful proof attempt for exactly this goal (not
+       counting transformations. Raise Exit if not found. *)
     let proof_map = Session_itp.get_proof_attempt_ids s goal in
-    (* let's first try a successful proof attempt with the provided provers, in
-    the specified order *)
-    try
-      List.iter (fun p ->
-        try check_map_result p (Whyconf.Hprover.find proof_map p)
-        with Not_found -> ()) Gnat_config.provers;
-      Whyconf.Hprover.iter check_map_result proof_map;
-      raise Exit;
-    with Found (prover, pr) -> prover, pr
+    (* let's first try a successful proof attempt with the provided provers. We
+       want to find the fastest prover of the built-in ones. After that order
+       doesn't matter *)
+    let valid_proofs =
+      List.fold_left (fun acc p ->
+        try check_map_result acc p (Whyconf.Hprover.find proof_map p)
+        with Not_found -> acc) None Gnat_config.provers in
+    match valid_proofs with
+    | Some x -> x
+    | None ->
+      let valid_proofs = Whyconf.Hprover.fold (fun k v acc ->
+        check_map_result acc k v) proof_map None in
+      match valid_proofs with
+      | Some x -> x
+      | None -> raise Exit
 
   let add_to_prover_stat pr stat =
   (* add the result of the prover run to the statistics record for some prover
