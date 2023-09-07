@@ -51,6 +51,10 @@ specific output message when CVC4 reaches its resource limit
 *)
 steplimitexceeded "unknown (RESOURCEOUT)"
 
+theory int.Int
+  remove prop CompatOrderMult
+end
+
 theory real.Real
   remove prop add_div
   remove prop sub_div

@@ -68,6 +68,10 @@ theory BuiltIn
   meta "counterexample_need_smtlib_push" ""
 end
 
+theory int.Int
+  remove prop CompatOrderMult
+end
+
 (** Extra theories supported by Z3 *)
 
 (* div/mod of Z3 seems to be Euclidean Division *)
