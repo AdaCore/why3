@@ -1356,26 +1356,17 @@ match pa.proof_state with
     | Some any ->
     let unproven_goals = unproven_goals_below_id d.cont any in
     try
-      (*
       let (n,_,_,st) = Hstr.find d.cont.controller_strategies s in
       Debug.dprintf debug_strat "[strategy_exec] running strategy '%s'@." n;
-*)
       let callback sts =
         Debug.dprintf debug_strat "[strategy_exec] strategy status: %a@." print_strategy_status sts
       in
       let callback_pa = callback_update_tree_proof d.cont in
       let callback_tr tr args st = callback_update_tree_transform tr args st in
-(*      List.iter (fun id ->
+      List.iter (fun id ->
                  C.run_strategy_on_goal d.cont id st
                     ~callback_pa ~callback_tr ~callback ~notification:(notify_change_proved d.cont))
                 unproven_goals
-*)
-      List.iter (fun id ->
-        let strat = Strategy.lookup_strat "test" in
-                 C.run_strat_on_goal d.cont id strat
-                    ~callback_pa ~callback_tr ~callback ~notification:(notify_change_proved d.cont))
-                unproven_goals
-
     with
       Not_found ->
       Debug.dprintf debug_strat "[strategy_exec] strategy '%s' not found@." s
