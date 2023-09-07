@@ -3,11 +3,14 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Eprover" version="1.9.1-001" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Alt-Ergo" version="2.3.3" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="8" name="Alt-Ergo" version="2.4.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Alt-Ergo" version="2.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="10" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="11" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -3606,7 +3609,9 @@
    <proof prover="11"><result status="valid" time="3.651596" steps="370414"/></proof>
    </goal>
    <goal name="prop_ctx&#39;vc.75.8" expl="VC for prop_ctx" proved="true">
-   <proof prover="11" timelimit="1"><result status="valid" time="0.748586" steps="101728"/></proof>
+   <proof prover="1"><result status="valid" time="0.086282" steps="325406"/></proof>
+   <proof prover="5"><result status="valid" time="0.493714" steps="105097"/></proof>
+   <proof prover="8"><result status="valid" time="0.076910" steps="345"/></proof>
    </goal>
    <goal name="prop_ctx&#39;vc.75.9" expl="VC for prop_ctx" proved="true">
    <proof prover="12"><result status="valid" time="0.050000" steps="82"/></proof>
