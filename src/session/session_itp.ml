@@ -1770,9 +1770,9 @@ let make_theory_section ?merge ~detached (s:session) parent_name (th:Theory.theo
   theory
 
 (* add a why file to a session *)
-let add_file_section (s:session) (fn:string) ~file_is_detached
+let add_file_section (s:session) (fn:Sysutil.file_path) ~file_is_detached
     (theories:Theory.theory list) format : file =
-  let fn = Sysutil.relativize_filename s.session_dir fn in
+  (* let fn = Sysutil.relativize_filename s.session_dir fn in *)
   Debug.dprintf debug "[Session_itp.add_file_section] fn = %a@." Sysutil.print_file_path fn;
 (*
   if Hfile.mem s.session_files fn then
@@ -1798,9 +1798,10 @@ let add_file_section (s:session) (fn:string) ~file_is_detached
 (* add a why file to a session and try to merge its theories with the
    provided ones with matching names *)
 let merge_file_section ~ignore_shapes ~old_ses ~old_theories ~file_is_detached ~env
-    (s:session) (fn:string) (theories:Theory.theory list) format
+    (s:session) (fn:Sysutil.file_path) (theories:Theory.theory list) format
     : unit =
-  Debug.dprintf debug_merge "[Session_itp.merge_file_section] fn = %s@." fn;
+  Debug.dprintf debug_merge "[Session_itp.merge_file_section] file path = %a@."
+    Sysutil.print_file_path fn;
   let f = add_file_section s fn ~file_is_detached [] format in
   let fid = f.file_id in
   let theories,detached =
@@ -1853,31 +1854,30 @@ let read_file env ?format fn =
   in
   (List.map (fun (_,_,a) -> a) th), format
 
-let merge_file ~ignore_shapes env (ses : session) (old_ses : session) file =
-  let format = file_format file in
+let merge_file_gen ~ignore_shapes ~reparse_file_fun env (ses : session) (old_ses : session) file =
   let old_theories = file_theories file in
-  let file_name = Sysutil.system_dependent_absolute_path (get_dir old_ses) (file_path file) in
-  Debug.dprintf debug "merging file %s@." file_name;
+  let format = file_format file in
+  let fpath = file_path file in
   try
-    let new_theories, format = read_file env file_name ~format in
+    let new_theories = reparse_file_fun old_ses env file in
     merge_file_section ~ignore_shapes
       ses ~old_ses ~old_theories ~file_is_detached:false
-      ~env file_name new_theories format;
+      ~env fpath new_theories format;
     None
   with (Loc.Located _ as e) -> (* TODO: capture only syntax and typing errors *)
     merge_file_section ~ignore_shapes
       ses ~old_ses ~old_theories ~file_is_detached:true
-      ~env file_name [] format;
+      ~env fpath [] format;
     Some e
 
-let merge_files ~ignore_shapes env (ses:session) (old_ses : session) =
+let merge_files_gen ~ignore_shapes ~reparse_file_fun env (ses:session) (old_ses : session) =
   Debug.dprintf debug "merging files from old session@.";
   found_obsolete := false;
   found_detached := false;
   let errors =
     Hfile.fold
       (fun _ f acc ->
-       match merge_file ~ignore_shapes env ses old_ses f with
+       match merge_file_gen ~ignore_shapes ~reparse_file_fun env ses old_ses f with
        | None -> acc
        | Some e -> e :: acc)
       (get_files old_ses) []
@@ -1910,6 +1910,14 @@ let merge_files ~ignore_shapes env (ses:session) (old_ses : session) =
     end;
   (errors,!found_obsolete,!found_detached)
 
+let reparse_file old_ses env file =
+  let format = file_format file in
+  let fpath = file_path file in
+  let file_name = Sysutil.system_dependent_absolute_path (get_dir old_ses) fpath in
+  Debug.dprintf debug "merging file %s@." file_name;
+  fst (read_file env file_name ~format)
+
+let merge_files ~ignore_shapes = merge_files_gen ~ignore_shapes ~reparse_file_fun:reparse_file
 
 (************************)
 (* saving state on disk *)
