@@ -42,5 +42,12 @@ type t = instruction array
 
 type strat = Sdo_nothing | Sapply_trans of string * string list * strat list
 
+exception StratFailure of string * exn
+exception UnknownStrat of string
+exception KnownStrat of string
 
-val strat_test : Task.task -> strat
+val register_strat : desc:Pp.formatted -> string -> (Env.env -> Task.task -> strat) -> unit
+
+val lookup_strat  : string -> (Env.env -> Task.task -> strat)
+
+val list_strats : unit -> (string * Pp.formatted) list

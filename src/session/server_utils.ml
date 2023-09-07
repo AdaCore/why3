@@ -361,6 +361,7 @@ let split_args s =
 
 type command =
   | Transform    of string * Trans.gentrans * string list
+  | Strat        of string * (Env.env -> Task.task -> Strategy.strat)
   | Prove        of Whyconf.config_prover * Call_provers.resource_limit
   | Strategies   of string
   | Edit         of Whyconf.prover
@@ -462,6 +463,12 @@ let interp commands_table cont id s =
                | None   -> QError ("Please select a node in the task tree")
                | Some _ -> Strategies cmd
              else
+              try
+                let s = Strategy.lookup_strat s in
+                match id with
+                | Some (Session_itp.APn id) -> Strat(cmd, s)
+                | _ -> QError ("Please select a goal or trans node in the task tree")
+              with | Strategy.UnknownStrat _ ->
                match cmd, args with
                | "locate", args ->
                    begin match args with

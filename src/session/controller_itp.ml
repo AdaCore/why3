@@ -935,7 +935,7 @@ let run_strat_on_goal
         schedule_transformation c id trname args ~callback ~notification
   in
   let t = get_task c.controller_session id in
-  let tree = strat t in
+  let tree = strat c.controller_env t in
   exec_strategy tree id;
   callback STShalt
 

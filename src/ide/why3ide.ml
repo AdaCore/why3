@@ -2426,6 +2426,20 @@ let () =
     (fun (x,_) -> x >= "eliminatf" && x < "s");
   add_submenu_transform "Transformations (s-z)"
                         (fun (x,_) -> x >= "s");
+  tools_factory#add_separator ();
+  let strategies = Strategy.list_strats () in
+  let submenu = tools_factory#add_submenu "Strategies" in
+  let submenu = new menu_factory submenu
+    ~accel_path:("<Why3-Main>/Tools/Strategies/")
+    ~accel_group:tools_accel_group in
+  let iter ((name,_) as desc) =
+    let (_ : GMenu.menu_item) = submenu#add_item (Glib.Markup.escape_text name)
+      ~use_mnemonic:false
+      ~tooltip:(string_of_desc desc)
+      ~callback:(fun () -> interp name) in
+    ()
+  in
+  List.iter iter strategies;
   tools_factory#add_separator ()
 
 (* complete the tools menu *)

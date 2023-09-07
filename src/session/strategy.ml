@@ -11,6 +11,8 @@
 
 (** {2 User-defined strategies} *)
 
+open Wstdlib
+
 type instruction =
   | Icall_prover of (Whyconf.prover * float option * int option * int option) list
     (** timelimit (if none use default timelimit),
@@ -23,13 +25,32 @@ type instruction =
 type t = instruction array
 
 
+exception StratFailure of string * exn
+exception UnknownStrat of string
+exception KnownStrat of string
 
 type strat = Sdo_nothing | Sapply_trans of string * string list * strat list
 
+let named s f env (t : Task.task) =
+  try f env t with e -> raise (StratFailure (s,e))
+
+type reg_strat = Pp.formatted * (Env.env -> Task.task -> strat)
+let strats : reg_strat Hstr.t = Hstr.create 17
+
+let register_strat ~desc s p =
+  if Hstr.mem strats s then raise (KnownStrat s);
+  Hstr.replace strats s (desc, fun env task -> named s p env task)
+
+let lookup_strat s =
+  try snd (Hstr.find strats s)
+  with Not_found -> raise (UnknownStrat s)
+
+let list_strats () =
+  Hstr.fold (fun k (s,_) acc -> (k,s)::acc) strats []
 
 let meta_test = Theory.(register_meta "test_strategy" [MTlsymbol;MTprsymbol] ~desc:"")
 
-let strat_test task =
+let strat_test _ task =
   let decls = Task.find_meta_tds task meta_test in
   let open Ident in
   let open Term in
@@ -46,3 +67,7 @@ let strat_test task =
         | _ -> Sdo_nothing
       end
   | _ -> assert false
+
+let () =
+  register_strat "test" strat_test
+    ~desc:"Only@ for@ testing@ purposes."
