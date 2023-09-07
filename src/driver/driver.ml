@@ -59,15 +59,14 @@ let load_plugin dir (byte,nat) =
 let resolve_driver_name whyconf_main drivers_subdir ~extra_dir name =
   let drivers_path = Filename.concat (Whyconf.datadir whyconf_main) drivers_subdir in
   if Filename.check_suffix name ".drv" then
-    (* driver file with extension .drv are searched in the current
-       directory, the extra directory `extra_dir`, and finally in the
-       drivers path of Why3 *)
+    (* driver file with extension .drv are searched in the extra
+       directory `extra_dir` (in the current directory by default), and
+       finally in the drivers path of Why3 *)
     let paths = [ drivers_path ] in
     let paths = match extra_dir with
-        None -> paths
+        None -> Filename.current_dir_name :: paths
       | Some d -> d :: paths
     in
-    let paths = Filename.current_dir_name :: paths in
     Sysutil.resolve_from_paths paths name
   else
     (* driver names without extension are searched, with extension
