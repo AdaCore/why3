@@ -176,7 +176,7 @@ let () =
       (Rac.Why.mk_check_term_lit config env ~why_prover:"alt-ergo" ()) in
   let model, clsf = Opt.get_exn (Failure "No good model found")
       (Check_ce.select_model ~check_ce:true rac env pm models) in
-  printf "%a@." (Check_ce.print_model_classification
+  printf "%a@." (Check_ce.print_model_classification env
                    ~check_ce:true ?verb_lvl:None ?json:None) (model, clsf)
 (* END{check_ce} *)
 

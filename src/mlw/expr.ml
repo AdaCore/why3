@@ -172,7 +172,8 @@ let rs_dup ({rs_name = {id_loc = loc}} as s) c =
       mk_rs id c RLlemma None
 
 let create_projection proj s v =
-  let id = id_clone v.pv_vs.vs_name in
+  let attrs = Sattr.singleton Ident.proxy_attr in
+  let id = id_clone ~attrs v.pv_vs.vs_name in
   let eff = eff_ghostify v.pv_ghost eff_empty in
   let tyl = List.map ity_var s.its_ts.ts_args in
   let rgl = List.map ity_reg s.its_regions in

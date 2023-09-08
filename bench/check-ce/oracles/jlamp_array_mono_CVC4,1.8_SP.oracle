@@ -25,43 +25,6 @@ File jlamp_array_mono.mlw:
     two : t = {Array.to_int => 2}
   Line 14:
     three : t = {Array.to_int => 3}
-  Line 18:
-    elts :
-      array
-      ->
-      int
-      ->
-      t = [|_ => [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|]|]
-  Line 19:
-    length : array -> int = [|_ => 0|]
-  Line 28:
-    mixfix [<-] :
-      array
-      ->
-      int
-      ->
-      t
-      ->
-      array = fun bOUND_VARIABLE_4401 bOUND_VARIABLE_4411
-               bOUND_VARIABLE_4421 ->
-               {Array.elts =
-                [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-                Array.length = 0}
-  Line 33:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-               Array.length = 0}
-  Line 44:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-               Array.length = 0}
-  Line 48:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-               Array.length = 0}
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -86,53 +49,8 @@ File jlamp_array_mono.mlw:
     two : t = {Array.to_int => 2}
   Line 14:
     three : t = {Array.to_int => 3}
-  Line 18:
-    elts :
-      array
-      ->
-      int
-      ->
-      t = fun bOUND_VARIABLE_5101 ->
-           if {Array.elts = [|_ => {Array.to_int => 3}|]; Array.length = 0} = bOUND_VARIABLE_5101
-           then [|_ => {Array.to_int => 3}|]
-           else [|42 => {Array.to_int => 2}; _ => {Array.to_int => 3}|]
-  Line 19:
-    length : array -> int = [|_ => 0|]
-  Line 28:
-    mixfix [<-] :
-      array
-      ->
-      int
-      ->
-      t
-      ->
-      array = fun bOUND_VARIABLE_5321 bOUND_VARIABLE_5331
-               bOUND_VARIABLE_5341 ->
-               {Array.elts =
-                [|42 => {Array.to_int => 2}; _ => {Array.to_int => 3}|];
-                Array.length = 0}
-  Line 32:
-    a : array = {Array.elts = [|_ => {Array.to_int => 3}|]; Array.length = 0}
-  Line 34:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 3}|];
-               Array.length = 0}
-    old a :
-      array = {Array.elts = [|_ => {Array.to_int => 3}|]; Array.length = 0}
-  Line 44:
-    a : array = {Array.elts = [|_ => {Array.to_int => 3}|]; Array.length = 0}
   Line 47:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 3}|];
-               Array.length = 0}
     three : t = {Array.to_int => 3}
-  Line 48:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 3}|];
-               Array.length = 0}
 
 File "bench/check-ce/jlamp_array_mono.mlw", line 54, characters 4-16:
 Sub-goal Index in array bounds of goal g'vc.
@@ -164,58 +82,8 @@ File jlamp_array_mono.mlw:
     two : t = {Array.to_int => 2}
   Line 14:
     three : t = {Array.to_int => 3}
-  Line 18:
-    elts :
-      array
-      ->
-      int
-      ->
-      t = [|_ => [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|]|]
-  Line 19:
-    length : array -> int = [|_ => 43|]
-  Line 28:
-    mixfix [<-] :
-      array
-      ->
-      int
-      ->
-      t
-      ->
-      array = fun bOUND_VARIABLE_5081 bOUND_VARIABLE_5091
-               bOUND_VARIABLE_5103 ->
-               {Array.elts =
-                [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-                Array.length = 43}
-  Line 32:
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-               Array.length = 43}
-  Line 34:
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-               Array.length = 43}
-    old a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-               Array.length = 43}
-  Line 50:
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-               Array.length = 43}
   Line 53:
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-               Array.length = 43}
     three : t = {Array.to_int => 3}
-  Line 54:
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-               Array.length = 43}
 
 File "bench/check-ce/jlamp_array_mono.mlw", line 60, characters 4-16:
 Sub-goal Index in array bounds of goal h'vc.
@@ -244,66 +112,6 @@ File jlamp_array_mono.mlw:
     two : t = {Array.to_int => 2}
   Line 14:
     three : t = {Array.to_int => 3}
-  Line 18:
-    elts :
-      array
-      ->
-      int
-      ->
-      t = fun bOUND_VARIABLE_5343 ->
-           if {Array.elts =
-               [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
-               _ => {Array.to_int => 2}|];
-               Array.length = 43} = bOUND_VARIABLE_5343
-           then [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
-                _ => {Array.to_int => 2}|]
-           else [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|]
-  Line 19:
-    length : array -> int = [|_ => 43|]
-  Line 28:
-    mixfix [<-] :
-      array
-      ->
-      int
-      ->
-      t
-      ->
-      array = fun bOUND_VARIABLE_5561 bOUND_VARIABLE_5571
-               bOUND_VARIABLE_5581 ->
-               {Array.elts =
-                [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
-                Array.length = 43}
-  Line 32:
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
-               _ => {Array.to_int => 2}|];
-               Array.length = 43}
-  Line 34:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
-               Array.length = 43}
-    old a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
-               _ => {Array.to_int => 2}|];
-               Array.length = 43}
-  Line 56:
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
-               _ => {Array.to_int => 2}|];
-               Array.length = 43}
   Line 59:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
-               Array.length = 43}
     three : t = {Array.to_int => 3}
-  Line 60:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
-               Array.length = 43}
 

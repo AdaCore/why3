@@ -174,9 +174,12 @@ File maps_mono.mlw:
 File "bench/check-ce/maps_mono.mlw", line 56, characters 14-88:
 Sub-goal Postcondition of goal test_map_multidim2'vc.
 Prover result is: Unknown (unknown + incomplete) (1067 steps).
-The program does not comply to the verification goal, or the contracts of
-  some loop or function are too weak, for example during the following
-  execution:
+The program does not comply to the verification goal, or the contracts of the
+  following functions/loops are too weak :
+  - Function 'get' at "bench/check-ce/maps_mono.mlw", line 58, characters 13-30
+  - Function 'set' at "bench/check-ce/maps_mono.mlw", line 59, characters 13-33
+  - Function 'set1' at "bench/check-ce/maps_mono.mlw", line 60, characters 9-29
+, for example during the following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization

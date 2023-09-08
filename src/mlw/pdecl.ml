@@ -77,7 +77,8 @@ let create_semi_constructor id s fdl pjl invl =
 
 let create_plain_record_decl ~priv ~mut id args fdl invl witn =
   let exn = Invalid_argument "Pdecl.create_plain_record_decl" in
-  let cid = id_fresh ?loc:id.pre_loc (id.pre_name ^ "'mk") in
+  let attrs = Sattr.singleton builtin_attr in
+  let cid = id_fresh ~attrs ?loc:id.pre_loc (id.pre_name ^ "'mk") in
   let add_fd fds (mut, fd) = Mpv.add_new exn fd mut fds in
   let fds = List.fold_left add_fd Mpv.empty fdl in
   let fdl = List.map snd fdl in
@@ -104,7 +105,8 @@ let create_rec_record_decl s fdl =
   let exn = Invalid_argument "Pdecl.create_rec_record_decl" in
   if not (its_recursive s) then raise exn;
   let id = s.its_ts.ts_name in
-  let cid = id_fresh ?loc:id.id_loc (id.id_string ^ "'mk") in
+  let attrs = Sattr.singleton builtin_attr in
+  let cid = id_fresh ~attrs ?loc:id.id_loc (id.id_string ^ "'mk") in
   List.iter (check_field (Stv.of_list s.its_ts.ts_args)) fdl;
   let cs = create_constructor ~constr:1 cid s fdl in
   let pjl = List.map (create_projection true s) fdl in

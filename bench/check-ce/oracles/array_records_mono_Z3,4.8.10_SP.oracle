@@ -3,471 +3,118 @@ Goal array_of_records'vc.
 Prover result is: Valid (259 steps).
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: NC
-  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (3000036 steps).
-The program does not comply to the verification goal, for example during the
-  following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array_records_mono.mlw:
+  Line 23:
+    mixfix [] :
+      array_of_records
+      ->
+      int
+      ->
+      basic_record = fun x!03 x!1 ->
+                      {flag = true; first_val = 3; sec_val = 5}
+  Line 26:
+    i : int = -1
   Line 45:
-    a = {elts=
-         fun (x!05:int) ->
-          if x!05 = (- 1) then basic_record'mk True 3 5
-          else basic_record'mk True 3 5;
-         length= 0}
-    i = (- 1)
-    a = {elts=
-         fun (x!05:int) ->
-          if x!05 = (- 1) then basic_record'mk True 3 5
-          else basic_record'mk True 3 5;
-         length= 0}
-    i = (- 1)
-    Execution of main function `var_overwrite` with env:
-      a = {elts=
-           fun (x!05:int) ->
-            if x!05 = (- 1) then basic_record'mk True 3 5
-            else basic_record'mk True 3 5;
-           length= 0}
-      i = (- 1)
-      zero = 0
-      one = 1
+    i : int = -1
   Line 49:
-    (giant-step) execution of unimplemented function `([])`
-      a = {elts=
-           fun (x!05:int) ->
-            if x!05 = (- 1) then basic_record'mk True 3 5
-            else basic_record'mk True 3 5;
-           length= 0}
-      i = (- 1)
-    Property failure at precondition of `([])` with:
-      a = {elts=
-           fun (x!05:int) ->
-            if x!05 = (- 1) then basic_record'mk True 3 5
-            else basic_record'mk True 3 5;
-           length= 0}
-      i = (- 1)
+    i : int = -1
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: BAD_CE
-  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_mono.mlw", line 49, characters 21-25:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (3000056 steps).
-Sorry, we don't have a good counterexample for you :(
-
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array_records_mono.mlw:
+  Line 23:
+    mixfix [] :
+      array_of_records
+      ->
+      int
+      ->
+      basic_record = fun x!08 x!12 ->
+                      {flag = true; first_val = 3; sec_val = 5}
+  Line 26:
+    i : int = -1
+  Line 45:
+    i : int = -1
+  Line 49:
+    i : int = -1
+    result of call at line 49, characters 45-61 : int = 3
+    result of call at line 49, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: BAD_CE
-  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_mono.mlw", line 49, characters 5-81:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (3000089 steps).
-Sorry, we don't have a good counterexample for you :(
-
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array_records_mono.mlw:
+  Line 23:
+    mixfix [] :
+      array_of_records
+      ->
+      int
+      ->
+      basic_record = fun x!013 x!14 ->
+                      {flag = true; first_val = 3; sec_val = 5}
+  Line 27:
+    i : int = -1
+  Line 45:
+    i : int = -1
+  Line 49:
+    i : int = -1
+    result of call at line 49, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 49, characters 21-30 : bool = true
+    result of call at line 49, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 49, characters 45-61 : int = 3
+    result of call at line 49, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: BAD_CE
-  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_mono.mlw", line 50, characters 64-68:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (3000131 steps).
-Sorry, we don't have a good counterexample for you :(
-
-
-<check_ce:categorization>Categorizations of models:
-- Selected model 0: BAD_CE
-  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-File "bench/check-ce/array_records_mono.mlw", line 50, characters 21-25:
-Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Step limit exceeded (3000153 steps).
-Sorry, we don't have a good counterexample for you :(
-
-
-<check_ce:categorization>Categorizations of models:
-- Selected model 0: BAD_CE
-  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-File "bench/check-ce/array_records_mono.mlw", line 50, characters 5-82:
-Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Step limit exceeded (3000186 steps).
-Sorry, we don't have a good counterexample for you :(
-
-
-<check_ce:categorization>Categorizations of models:
-- Selected model 0: BAD_CE
-  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-File "bench/check-ce/array_records_mono.mlw", line 51, characters 64-68:
-Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Step limit exceeded (3000226 steps).
-Sorry, we don't have a good counterexample for you :(
-
-
-<check_ce:categorization>Categorizations of models:
-- Selected model 0: BAD_CE
-  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-File "bench/check-ce/array_records_mono.mlw", line 51, characters 21-25:
-Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Step limit exceeded (3000248 steps).
-Sorry, we don't have a good counterexample for you :(
-
-
-<check_ce:categorization>Categorizations of models:
-- Selected model 0: BAD_CE
-  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-File "bench/check-ce/array_records_mono.mlw", line 51, characters 5-82:
-Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Step limit exceeded (3000281 steps).
-Sorry, we don't have a good counterexample for you :(
-
-
-<check_ce:categorization>Categorizations of models:
-- Selected model 0: BAD_CE
-  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-File "bench/check-ce/array_records_mono.mlw", line 52, characters 74-78:
-Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Step limit exceeded (3000321 steps).
-Sorry, we don't have a good counterexample for you :(
-
-
-<check_ce:categorization>Categorizations of models:
-- Selected model 0: BAD_CE
-  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-File "bench/check-ce/array_records_mono.mlw", line 52, characters 41-45:
-Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Step limit exceeded (3000343 steps).
-Sorry, we don't have a good counterexample for you :(
-
-
-<check_ce:categorization>Categorizations of models:
-- Selected model 0: BAD_CE
-  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-File "bench/check-ce/array_records_mono.mlw", line 52, characters 5-92:
-Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Step limit exceeded (3000376 steps).
-Sorry, we don't have a good counterexample for you :(
-
-
-File "bench/check-ce/array_records_mono.mlw", line 53, characters 13-35:
-Sub-goal Assertion of goal var_overwrite'vc.
-Prover result is: Valid (3251 steps).
-
-<check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `([]<-)` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `([]<-)` cannot be evaluated)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-File "bench/check-ce/array_records_mono.mlw", line 47, characters 15-36:
-Sub-goal Postcondition of goal var_overwrite'vc.
-Prover result is: Step limit exceeded (3000427 steps).
 The following counterexample model could not be verified
-  (both RAC terminated because Postcondition of `([]<-)` cannot be evaluated):
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array_records_mono.mlw:
-  Line 19:
-    elts :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record = [|{ArrayRecords.elts =
-                        [|2 => {flag = true; first_val = 3; sec_val = 5};
-                        _ => {flag = false; first_val = 6; sec_val = 2}|];
-                        ArrayRecords.length = 4} =>
-                       [|2 => {flag = true; first_val = 3; sec_val = 5};
-                       _ => {flag = false; first_val = 6; sec_val = 2}|];
-                     {ArrayRecords.elts =
-                      [|2 => {flag = true; first_val = 3; sec_val = 69};
-                      _ => {flag = false; first_val = 6; sec_val = 2}|];
-                      ArrayRecords.length = 4} =>
-                     [|2 => {flag = true; first_val = 3; sec_val = 69};
-                     _ => {flag = false; first_val = 6; sec_val = 2}|];
-                     {ArrayRecords.elts =
-                      [|2 => {flag = true; first_val = 42; sec_val = 69};
-                      _ => {flag = false; first_val = 6; sec_val = 2}|];
-                      ArrayRecords.length = 4} =>
-                     [|2 => {flag = true; first_val = 42; sec_val = 69};
-                     _ => {flag = false; first_val = 6; sec_val = 2}|];
-                     {ArrayRecords.elts =
-                      [|2 => {flag = true; first_val = 23; sec_val = 69};
-                      _ => {flag = false; first_val = 6; sec_val = 2}|];
-                      ArrayRecords.length = 4} =>
-                     [|2 => {flag = true; first_val = 23; sec_val = 69};
-                     _ => {flag = false; first_val = 6; sec_val = 2}|];
-                     {ArrayRecords.elts =
-                      [|2 => {flag = false; first_val = 23; sec_val = 69};
-                      _ => {flag = false; first_val = 6; sec_val = 2}|];
-                      ArrayRecords.length = 4} =>
-                     [|2 => {flag = false; first_val = 23; sec_val = 69};
-                     _ => {flag = false; first_val = 6; sec_val = 2}|];
-                     _ =>
-                     [|2 => {flag = true; first_val = 3; sec_val = 5};
-                     _ => {flag = false; first_val = 6; sec_val = 2}|]|]
-  Line 20:
-    length :
-      array_of_records
-      ->
-      int = [|{ArrayRecords.elts =
-               [|2 => {flag = true; first_val = 3; sec_val = 69};
-               _ => {flag = false; first_val = 6; sec_val = 2}|];
-               ArrayRecords.length = 4} =>
-              4;
-            {ArrayRecords.elts =
-             [|2 => {flag = true; first_val = 3; sec_val = 5};
-             _ => {flag = false; first_val = 6; sec_val = 2}|];
-             ArrayRecords.length = 4} =>
-            4;
-            {ArrayRecords.elts =
-             [|2 => {flag = true; first_val = 42; sec_val = 69};
-             _ => {flag = false; first_val = 6; sec_val = 2}|];
-             ArrayRecords.length = 4} =>
-            4;
-            {ArrayRecords.elts =
-             [|2 => {flag = true; first_val = 23; sec_val = 69};
-             _ => {flag = false; first_val = 6; sec_val = 2}|];
-             ArrayRecords.length = 4} =>
-            4;
-            {ArrayRecords.elts =
-             [|2 => {flag = false; first_val = 23; sec_val = 69};
-             _ => {flag = false; first_val = 6; sec_val = 2}|];
-             ArrayRecords.length = 4} =>
-            4; _ => 4|]
-  Line 27:
-    a :
-      array_of_records = {ArrayRecords.elts =
-                          [|2 => {flag = true; first_val = 3; sec_val = 5};
-                          _ => {flag = false; first_val = 6; sec_val = 2}|];
-                          ArrayRecords.length = 4}
-    a :
-      array_of_records = {ArrayRecords.elts =
-                          [|2 => {flag = true; first_val = 3; sec_val = 69};
-                          _ => {flag = false; first_val = 6; sec_val = 2}|];
-                          ArrayRecords.length = 4}
-    a :
-      array_of_records = {ArrayRecords.elts =
-                          [|2 => {flag = true; first_val = 42; sec_val = 69};
-                          _ => {flag = false; first_val = 6; sec_val = 2}|];
-                          ArrayRecords.length = 4}
-    a :
-      array_of_records = {ArrayRecords.elts =
-                          [|2 => {flag = true; first_val = 23; sec_val = 69};
-                          _ => {flag = false; first_val = 6; sec_val = 2}|];
-                          ArrayRecords.length = 4}
-    i : int = 2
-  Line 29:
-    mixfix [<-] :
-      array_of_records
-      ->
-      int
-      ->
-      basic_record
-      ->
-      array_of_records = fun x!074 x!115 x!212 ->
-                          if x!074 = {ArrayRecords.elts =
-                                      [|2 =>
-                                        {flag = true;
-                                         first_val = 3;
-                                         sec_val = 5};
-                                      _ =>
-                                      {flag = false;
-                                       first_val = 6;
-                                       sec_val = 2}|];
-                                      ArrayRecords.length = 4} /\
-                             x!115 = 2 /\
-                             x!212 = {flag = true;
-                                      first_val = 3;
-                                      sec_val = 69}
-                          then {ArrayRecords.elts =
-                                [|2 =>
-                                  {flag = true; first_val = 3; sec_val = 69};
-                                _ =>
-                                {flag = false; first_val = 6; sec_val = 2}|];
-                                ArrayRecords.length = 4}
-                          else if x!074 = {ArrayRecords.elts =
-                                           [|2 =>
-                                             {flag = true;
-                                              first_val = 3;
-                                              sec_val = 69};
-                                           _ =>
-                                           {flag = false;
-                                            first_val = 6;
-                                            sec_val = 2}|];
-                                           ArrayRecords.length = 4} /\
-                                  x!115 = 2 /\
-                                  x!212 = {flag = true;
-                                           first_val = 42;
-                                           sec_val = 69}
-                               then {ArrayRecords.elts =
-                                     [|2 =>
-                                       {flag = true;
-                                        first_val = 42;
-                                        sec_val = 69};
-                                     _ =>
-                                     {flag = false;
-                                      first_val = 6;
-                                      sec_val = 2}|];
-                                     ArrayRecords.length = 4}
-                               else if x!074 = {ArrayRecords.elts =
-                                                [|2 =>
-                                                  {flag = true;
-                                                   first_val = 42;
-                                                   sec_val = 69};
-                                                _ =>
-                                                {flag = false;
-                                                 first_val = 6;
-                                                 sec_val = 2}|];
-                                                ArrayRecords.length = 4} /\
-                                       x!115 = 2 /\
-                                       x!212 = {flag = true;
-                                                first_val = 23;
-                                                sec_val = 69}
-                                    then {ArrayRecords.elts =
-                                          [|2 =>
-                                            {flag = true;
-                                             first_val = 23;
-                                             sec_val = 69};
-                                          _ =>
-                                          {flag = false;
-                                           first_val = 6;
-                                           sec_val = 2}|];
-                                          ArrayRecords.length = 4}
-                                    else if x!074 = {ArrayRecords.elts =
-                                                     [|2 =>
-                                                       {flag = true;
-                                                        first_val = 23;
-                                                        sec_val = 69};
-                                                     _ =>
-                                                     {flag = false;
-                                                      first_val = 6;
-                                                      sec_val = 2}|];
-                                                     ArrayRecords.length = 4} /\
-                                            x!115 = 2 /\
-                                            x!212 = {flag = false;
-                                                     first_val = 23;
-                                                     sec_val = 69}
-                                         then {ArrayRecords.elts =
-                                               [|2 =>
-                                                 {flag = false;
-                                                  first_val = 23;
-                                                  sec_val = 69};
-                                               _ =>
-                                               {flag = false;
-                                                first_val = 6;
-                                                sec_val = 2}|];
-                                               ArrayRecords.length = 4}
-                                         else {ArrayRecords.elts =
-                                               [|2 =>
-                                                 {flag = true;
-                                                  first_val = 3;
-                                                  sec_val = 69};
-                                               _ =>
-                                               {flag = false;
-                                                first_val = 6;
-                                                sec_val = 2}|];
-                                               ArrayRecords.length = 4}
-  Line 33:
-    a :
-      array_of_records = {ArrayRecords.elts =
-                          [|2 => {flag = true; first_val = 3; sec_val = 5};
-                          _ => {flag = false; first_val = 6; sec_val = 2}|];
-                          ArrayRecords.length = 4}
-    a :
-      array_of_records = {ArrayRecords.elts =
-                          [|2 => {flag = true; first_val = 3; sec_val = 69};
-                          _ => {flag = false; first_val = 6; sec_val = 2}|];
-                          ArrayRecords.length = 4}
-    a :
-      array_of_records = {ArrayRecords.elts =
-                          [|2 => {flag = true; first_val = 42; sec_val = 69};
-                          _ => {flag = false; first_val = 6; sec_val = 2}|];
-                          ArrayRecords.length = 4}
-    a :
-      array_of_records = {ArrayRecords.elts =
-                          [|2 => {flag = true; first_val = 23; sec_val = 69};
-                          _ => {flag = false; first_val = 6; sec_val = 2}|];
-                          ArrayRecords.length = 4}
-  Line 35:
-    a :
-      array_of_records = {ArrayRecords.elts =
-                          [|2 => {flag = false; first_val = 23; sec_val = 69};
-                          _ => {flag = false; first_val = 6; sec_val = 2}|];
-                          ArrayRecords.length = 4}
+  Line 26:
+    i : int = -1
   Line 45:
-    a :
-      array_of_records = {ArrayRecords.elts =
-                          [|2 => {flag = true; first_val = 3; sec_val = 5};
-                          _ => {flag = false; first_val = 6; sec_val = 2}|];
-                          ArrayRecords.length = 4}
-    i : int = 2
-  Line 47:
-    a :
-      array_of_records = {ArrayRecords.elts =
-                          [|2 => {flag = false; first_val = 23; sec_val = 69};
-                          _ => {flag = false; first_val = 6; sec_val = 2}|];
-                          ArrayRecords.length = 4}
-    i : int = 2
+    i : int = -1
   Line 49:
-    a :
-      array_of_records = {ArrayRecords.elts =
-                          [|2 => {flag = true; first_val = 3; sec_val = 69};
-                          _ => {flag = false; first_val = 6; sec_val = 2}|];
-                          ArrayRecords.length = 4}
     result of call at line 49, characters 13-81 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 49, characters 21-30 : bool = true
@@ -477,11 +124,104 @@ File array_records_mono.mlw:
     result of call at line 49, characters 45-49 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 50:
-    a :
-      array_of_records = {ArrayRecords.elts =
-                          [|2 => {flag = true; first_val = 42; sec_val = 69};
-                          _ => {flag = false; first_val = 6; sec_val = 2}|];
-                          ArrayRecords.length = 4}
+    i : int = -1
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_mono.mlw", line 50, characters 21-25:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Step limit exceeded (3000153 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array_records_mono.mlw:
+  Line 26:
+    i : int = -1
+  Line 45:
+    i : int = -1
+  Line 49:
+    result of call at line 49, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 49, characters 21-30 : bool = true
+    result of call at line 49, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 49, characters 45-61 : int = 3
+    result of call at line 49, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+  Line 50:
+    i : int = -1
+    result of call at line 50, characters 64-81 : int = 69
+    result of call at line 50, characters 64-68 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_mono.mlw", line 50, characters 5-82:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Step limit exceeded (3000186 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array_records_mono.mlw:
+  Line 27:
+    i : int = -1
+  Line 45:
+    i : int = -1
+  Line 49:
+    result of call at line 49, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 49, characters 21-30 : bool = true
+    result of call at line 49, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 49, characters 45-61 : int = 3
+    result of call at line 49, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+  Line 50:
+    i : int = -1
+    result of call at line 50, characters 13-82 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
+    result of call at line 50, characters 21-30 : bool = true
+    result of call at line 50, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 50, characters 64-81 : int = 69
+    result of call at line 50, characters 64-68 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_mono.mlw", line 51, characters 64-68:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Step limit exceeded (3000226 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array_records_mono.mlw:
+  Line 26:
+    i : int = -1
+  Line 45:
+    i : int = -1
+  Line 49:
+    result of call at line 49, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 49, characters 21-30 : bool = true
+    result of call at line 49, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 49, characters 45-61 : int = 3
+    result of call at line 49, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+  Line 50:
     result of call at line 50, characters 13-82 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 50, characters 21-30 : bool = true
@@ -491,11 +231,131 @@ File array_records_mono.mlw:
     result of call at line 50, characters 64-68 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
   Line 51:
-    a :
-      array_of_records = {ArrayRecords.elts =
-                          [|2 => {flag = true; first_val = 23; sec_val = 69};
-                          _ => {flag = false; first_val = 6; sec_val = 2}|];
-                          ArrayRecords.length = 4}
+    i : int = -1
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_mono.mlw", line 51, characters 21-25:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Step limit exceeded (3000248 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array_records_mono.mlw:
+  Line 26:
+    i : int = -1
+  Line 45:
+    i : int = -1
+  Line 49:
+    result of call at line 49, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 49, characters 21-30 : bool = true
+    result of call at line 49, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 49, characters 45-61 : int = 3
+    result of call at line 49, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+  Line 50:
+    result of call at line 50, characters 13-82 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
+    result of call at line 50, characters 21-30 : bool = true
+    result of call at line 50, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 50, characters 64-81 : int = 69
+    result of call at line 50, characters 64-68 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+  Line 51:
+    i : int = -1
+    result of call at line 51, characters 64-81 : int = 69
+    result of call at line 51, characters 64-68 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_mono.mlw", line 51, characters 5-82:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Step limit exceeded (3000281 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array_records_mono.mlw:
+  Line 27:
+    i : int = -1
+  Line 45:
+    i : int = -1
+  Line 49:
+    result of call at line 49, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 49, characters 21-30 : bool = true
+    result of call at line 49, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 49, characters 45-61 : int = 3
+    result of call at line 49, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+  Line 50:
+    result of call at line 50, characters 13-82 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
+    result of call at line 50, characters 21-30 : bool = true
+    result of call at line 50, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 50, characters 64-81 : int = 69
+    result of call at line 50, characters 64-68 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+  Line 51:
+    i : int = -1
+    result of call at line 51, characters 13-82 :
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
+    result of call at line 51, characters 21-30 : bool = true
+    result of call at line 51, characters 21-25 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
+    result of call at line 51, characters 64-81 : int = 69
+    result of call at line 51, characters 64-68 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_mono.mlw", line 52, characters 74-78:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Step limit exceeded (3000321 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array_records_mono.mlw:
+  Line 26:
+    i : int = -1
+  Line 45:
+    i : int = -1
+  Line 49:
+    result of call at line 49, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 49, characters 21-30 : bool = true
+    result of call at line 49, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 49, characters 45-61 : int = 3
+    result of call at line 49, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+  Line 50:
+    result of call at line 50, characters 13-82 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
+    result of call at line 50, characters 21-30 : bool = true
+    result of call at line 50, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 50, characters 64-81 : int = 69
+    result of call at line 50, characters 64-68 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+  Line 51:
     result of call at line 51, characters 13-82 :
       basic_record = {flag = true; first_val = 23; sec_val = 69}
     result of call at line 51, characters 21-30 : bool = true
@@ -505,11 +365,164 @@ File array_records_mono.mlw:
     result of call at line 51, characters 64-68 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
   Line 52:
-    a :
-      array_of_records = {ArrayRecords.elts =
-                          [|2 => {flag = false; first_val = 23; sec_val = 69};
-                          _ => {flag = false; first_val = 6; sec_val = 2}|];
-                          ArrayRecords.length = 4}
+    i : int = -1
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_mono.mlw", line 52, characters 41-45:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Step limit exceeded (3000343 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array_records_mono.mlw:
+  Line 26:
+    i : int = -1
+  Line 45:
+    i : int = -1
+  Line 49:
+    result of call at line 49, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 49, characters 21-30 : bool = true
+    result of call at line 49, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 49, characters 45-61 : int = 3
+    result of call at line 49, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+  Line 50:
+    result of call at line 50, characters 13-82 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
+    result of call at line 50, characters 21-30 : bool = true
+    result of call at line 50, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 50, characters 64-81 : int = 69
+    result of call at line 50, characters 64-68 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+  Line 51:
+    result of call at line 51, characters 13-82 :
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
+    result of call at line 51, characters 21-30 : bool = true
+    result of call at line 51, characters 21-25 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
+    result of call at line 51, characters 64-81 : int = 69
+    result of call at line 51, characters 64-68 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
+  Line 52:
+    i : int = -1
+    result of call at line 52, characters 74-91 : int = 69
+    result of call at line 52, characters 74-78 :
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_mono.mlw", line 52, characters 5-92:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Step limit exceeded (3000376 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array_records_mono.mlw:
+  Line 27:
+    i : int = -1
+  Line 45:
+    i : int = -1
+  Line 49:
+    result of call at line 49, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 49, characters 21-30 : bool = true
+    result of call at line 49, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 49, characters 45-61 : int = 3
+    result of call at line 49, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+  Line 50:
+    result of call at line 50, characters 13-82 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
+    result of call at line 50, characters 21-30 : bool = true
+    result of call at line 50, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 50, characters 64-81 : int = 69
+    result of call at line 50, characters 64-68 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+  Line 51:
+    result of call at line 51, characters 13-82 :
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
+    result of call at line 51, characters 21-30 : bool = true
+    result of call at line 51, characters 21-25 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
+    result of call at line 51, characters 64-81 : int = 69
+    result of call at line 51, characters 64-68 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
+  Line 52:
+    i : int = -1
+    result of call at line 52, characters 13-92 :
+      basic_record = {flag = false; first_val = 23; sec_val = 69}
+    result of call at line 52, characters 41-57 : int = 23
+    result of call at line 52, characters 41-45 :
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
+    result of call at line 52, characters 74-91 : int = 69
+    result of call at line 52, characters 74-78 :
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
+
+File "bench/check-ce/array_records_mono.mlw", line 53, characters 13-35:
+Sub-goal Assertion of goal var_overwrite'vc.
+Prover result is: Valid (3251 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_mono.mlw", line 47, characters 15-36:
+Sub-goal Postcondition of goal var_overwrite'vc.
+Prover result is: Step limit exceeded (3000427 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array_records_mono.mlw:
+  Line 27:
+    i : int = 2
+  Line 45:
+    i : int = 2
+  Line 47:
+    i : int = 2
+  Line 49:
+    result of call at line 49, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 49, characters 21-30 : bool = true
+    result of call at line 49, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 49, characters 45-61 : int = 3
+    result of call at line 49, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
+  Line 50:
+    result of call at line 50, characters 13-82 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
+    result of call at line 50, characters 21-30 : bool = true
+    result of call at line 50, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 50, characters 64-81 : int = 69
+    result of call at line 50, characters 64-68 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+  Line 51:
+    result of call at line 51, characters 13-82 :
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
+    result of call at line 51, characters 21-30 : bool = true
+    result of call at line 51, characters 21-25 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
+    result of call at line 51, characters 64-81 : int = 69
+    result of call at line 51, characters 64-68 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
+  Line 52:
     result of call at line 52, characters 13-92 :
       basic_record = {flag = false; first_val = 23; sec_val = 69}
     result of call at line 52, characters 41-57 : int = 23

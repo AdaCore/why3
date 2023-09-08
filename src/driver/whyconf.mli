@@ -103,6 +103,8 @@ val memlimit: main -> int
 val running_provers_max: main -> int
 val set_limits: main -> float -> int -> int -> main
 
+val stdlib_path : string ref
+
 val default_editor: main -> string
 (** Editor name used when no specific editor is known for a prover *)
 
