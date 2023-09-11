@@ -9,95 +9,100 @@
 (*                                                                  *)
 (********************************************************************)
 
-(*
-why3 prove --format=coma -
-why3 prove file.coma
-
-
-p [z] {x} (h) =
-  { 1=2 } any
-  / f {x} = g <(int,int)> {42} (h) {42}
-  / g < 'a > = any
-  / h (foo) = (fun {x} -> any) < int >
-  / h (foo [y z] {x} (bar )) = any
-
-q [z] =
-  any
-*)
-
 %{
 open Why3
-open Ptree
 open Coma_syntax
 
-let floc s e = Loc.extract (s,e)
-
-let mk_pexpr d b e = { pexpr_desc = d; pexpr_loc = floc b e }
-let mk_defn d b e = { pdefn_desc = d; pdefn_loc = floc b e }
+let mk_pexpr d loc = { pexpr_desc = d; pexpr_loc = Loc.extract loc }
+let mk_defn d loc = { pdefn_desc = d; pdefn_loc = Loc.extract loc }
 
 %}
 
-%token BANG QUESTION SLASH
+%token BANG QUESTION 
 
-%start <Coma_syntax.pdefn list> top_level
+%start <Coma_syntax.pfile> top_level
 %start <unit> dummy
 
 %%
 
 top_level:
-| defn* EOF   { $1 }
+| uses* defn* EOF
+  { $1, $2 }
+
+uses:
+| USE EXPORT tqualid
+    { Puseexport $3 }
+| USE boption(IMPORT) n = tqualid q = option(preceded(AS, uident))
+    { let loc = floc $startpos $endpos in
+      if $2 && q = None then Loc.warning ~loc ~id:warn_redundant_import
+        "the keyword `import' is redundant here and can be omitted";
+      (Puseimport ($2, n, q) ) }
 
 defn:
-| id=lident w=prewrites p=coma_params EQUAL e=coma_expr
+| LET id=lident w=prewrites p=coma_params EQUAL e=coma_prog
   { let d = { pdefn_name = id; pdefn_writes = w;
               pdefn_params = p; pdefn_body = e } in
-    mk_defn d $startpos $endpos }
+    mk_defn d $loc }
 
-local_defn:
-| id=lident w=prewrites p=coma_params EQUAL e=coma_expr1
+local_defn(X):
+| id=lident w=prewrites p=coma_params X e=coma_expr
   { let d = { pdefn_name = id; pdefn_writes = w;
               pdefn_params = p; pdefn_body = e } in
-    mk_defn d $startpos $endpos }
+    mk_defn d $loc }
+
+coma_prog:
+| e=coma_expr
+  { e }
+/* | e=coma_prog DOT dl=separated_nonempty_list(BAR, local_defn(EQUAL))
+  { mk_pexpr (PEdef (e, false, dl)) $startpos $endpos }
+| e=coma_prog DOT dl=separated_nonempty_list(BAR, local_defn(ARROW))
+  { mk_pexpr (PEdef (e, true, dl)) $startpos $endpos }
+| e=coma_prog DOT l=separated_nonempty_list(BAR, coma_alloc)
+  { mk_pexpr (PEset (e, l)) $startpos $endpos } */
+| e=coma_prog AS dl=separated_nonempty_list(BAR, local_defn(EQUAL))
+  { mk_pexpr (PEdef (e, false, dl)) $loc }
+| e=coma_prog AS dl=separated_nonempty_list(BAR, local_defn(ARROW))
+  { mk_pexpr (PEdef (e, true, dl)) $loc }
+| e=coma_prog AS l=separated_nonempty_list(BAR, coma_alloc)
+  { mk_pexpr (PEset (e, l)) $loc }
+
+coma_alloc:
+| AMP id=lident ty=oftyp EQUAL LEFTBRC t=term RIGHTBRC { id, t, ty }
 
 coma_expr:
-| e=coma_expr1 dl=loption(coma_slash)
-  { (* FIXME: parse REC keyword? *)
-    let e = if dl=[] then e.pexpr_desc else PEdef (e, false, dl) in
-    mk_pexpr e $startpos $endpos }
+| d = coma_desc
+  { mk_pexpr d $loc }
 
-coma_slash:
-| SLASH dl=separated_nonempty_list(SLASH, local_defn)
-  { dl }
-
-coma_expr1:
-| d = coma_desc1
-  { mk_pexpr d $startpos $endpos }
-
-coma_desc1:
-| LEFTBRC t=term RIGHTBRC e=coma_expr1
+coma_desc:
+| LEFTBRC t=term RIGHTBRC e=coma_expr
   { PEcut (t, e) }
-| BANG e=coma_expr1
+| BANG e=coma_expr
   { PEbox e }
-| QUESTION e=coma_expr1
+| QUESTION e=coma_expr
   { PEwox e }
 | e=coma_expr2 al=coma_arg*
-  { let app e a = mk_pexpr (PEapp (e, a)) $startpos $endpos in
+  { let app e a = mk_pexpr (PEapp (e, a)) $loc in
     let e = List.fold_left app e al in
     e.pexpr_desc }
 
 coma_expr2:
 | d = coma_desc2
-  { mk_pexpr d $startpos $endpos }
+  { mk_pexpr d $loc }
 
 coma_desc2:
 | x=lident
   { PEsym x }
 | ANY
   { PEany }
-| LEFTPAR FUN p=coma_params ARROW e=coma_expr RIGHTPAR
-  { PElam (p, e) }
-| LEFTPAR e=coma_expr RIGHTPAR
+| c=coma_closure
+  { c.pexpr_desc }
+| LEFTPAR e=coma_prog RIGHTPAR
   { e.pexpr_desc }
+
+coma_closure:
+| LEFTPAR FUN p=coma_params ARROW e=coma_prog RIGHTPAR
+  { let d = PElam (p, e) in
+    mk_pexpr d $loc }
 
 prewrites:
 | w = loption(prewrites_)
@@ -109,30 +114,36 @@ prewrites_:
 
 coma_arg:
 | LT ty=ty GT
-  { At ty }
+  { PAt ty }
 | LEFTBRC t=term RIGHTBRC
-  { Av t }
+  { PAv t }
 | AMP x=lident
-  { Ar x }
-| LEFTPAR e=coma_expr RIGHTPAR
-  { Ac e }
+  { PAr x }
+| LEFTPAR e=coma_prog RIGHTPAR
+  { PAc e }
+| c=coma_closure
+  { PAc c }
 
 coma_params:
-| tp=loption(tparam) pl=coma_param*
-  { tp @ pl }
+| pl=coma_param*
+  { (List.flatten pl) }
 
-tparam:
-| LT l=coma_tvar* GT
-  { l }
 coma_tvar:
 | x=QUOTE_LIDENT
   { PPt (mk_id x $startpos $endpos) }
 
 coma_param:
-| LEFTBRC id=lident RIGHTBRC
-  { PPv id }
+| LT l=coma_tvar* GT
+  { l }
+| LEFTPAR AMP lid=separated_nonempty_list(AMP, lident) t=oftyp RIGHTPAR
+  { List.map (fun id -> PPr (id, t)) lid }
+| LEFTBRC lid=lident+ t=oftyp RIGHTBRC
+  { List.map (fun id -> PPv (id, t)) lid }
 | LEFTPAR id=lident w=prewrites p=coma_params RIGHTPAR
-  { PPc (id, w, p) }
+  { [PPc (id, w, p)] }
+
+oftyp:
+| COLON t=ty { t }
 
 /* silent Menhir's errors about unreachable non terminal symbols */
 
