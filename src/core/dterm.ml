@@ -574,23 +574,23 @@ let attr_w_unused_var_no =
   Ident.create_attribute "W:unused_variable:N"
 
 let warn_unused_variable =
-  Loc.register_warning "unused_variable" "Warn about variables which are not used in any way."
+  Loc.register_warning "unused_variable" "Warn about variables which are not used in any way"
 
 let warn_exists_implies =
-  Loc.register_warning "exists_implies" "Warn about formulas of the form \"exists x. P -> Q\"."
+  Loc.register_warning "exists_implies" "Warn about formulas of the form \"exists x. P -> Q\""
 
 let check_used_var t vs =
   if not (Sattr.mem attr_w_unused_var_no vs.vs_name.id_attrs) then
     begin
       let s = vs.vs_name.id_string in
       if (s = "" || s.[0] <> '_') && t_v_occurs vs t = 0 then
-        Loc.warning ~id:warn_unused_variable ?loc:vs.vs_name.id_loc "unused variable %s" s
+        Loc.warning warn_unused_variable ?loc:vs.vs_name.id_loc "unused variable %s" s
     end
 
 let check_exists_implies f = match f.t_node with
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,f,{ t_node = Ttrue }) },_)
     when Sattr.mem Term.asym_split f.t_attrs -> ()
-  | Tbinop (Timplies,_,_) -> Loc.warning ~id:warn_exists_implies ?loc:f.t_loc
+  | Tbinop (Timplies,_,_) -> Loc.warning warn_exists_implies ?loc:f.t_loc
       "form \"exists x. P -> Q\" is likely an error (use \"not P \\/ Q\" if not)"
   | _ -> ()
 

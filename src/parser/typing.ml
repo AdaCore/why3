@@ -488,7 +488,7 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
             Dterm.dterm crcmap ~loc (DTapp (pj,[v])) in
       let cs, fl = parse_record ~loc ns km get_val fl in
       if not !used then
-        Loc.warning ~id:warn_unused_expression ~loc:e1_loc "unused expression (every field is overwritten)";
+        Loc.warning warn_unused_expression ~loc:e1_loc "unused expression (every field is overwritten)";
       let d = DTapp (cs, fl) in
       if re then d else mk_let crcmap ~loc "_q " e1 d
   | Ptree.Tat (e1, ({id_str = l; id_loc = loc} as id)) ->
@@ -498,7 +498,7 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       ignore (Loc.try2 ~loc gvars (Some l) (Qident id));
       let e1 = dterm ns km crcmap gvars (Some l) denv e1 in
       if not (Hstr.find at_uses l) then
-        Loc.warning ~id:warn_useless_at ~loc "this `at'/`old' operator is never used";
+        Loc.warning warn_useless_at ~loc "this `at'/`old' operator is never used";
       Hstr.remove at_uses l;
       DTattr (e1, Sattr.empty)
   | Ptree.Tscope (q, e1) ->
@@ -1045,7 +1045,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | Some e -> dexpr muc denv e in
       let cs,fl = parse_record ~loc muc get_val fl in
       if not !used then
-        Loc.warning ~id:warn_unused_expression ~loc:e1_loc "unused expression (every field is overwritten)";
+        Loc.warning warn_unused_expression ~loc:e1_loc "unused expression (every field is overwritten)";
       let d = expr_app loc (DEsym (RS cs)) fl in
       if re then d else mk_let ~loc "_q " e1 d
   | Ptree.Elet (id, gh, kind, e1, e2) ->

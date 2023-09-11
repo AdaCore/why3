@@ -47,7 +47,7 @@ let oracle_quant_var
       let value =
         if bind_univ_quant_vars then
           let check _ _ =
-            Loc.warning ~id:warn_model_not_checked "Model value for all-quantified variable not checked" in
+            Loc.warning warn_model_not_checked "Model value for all-quantified variable not checked" in
           oracle.for_variable env ~check ~loc:(Some loc) vs.vs_name (ity_of_ty vs.vs_ty)
         else None in
       let value =

@@ -1529,6 +1529,8 @@ let rec reconstruct c =
 
 
 (** iterated reductions *)
+let warn_reduction_aborted = Loc.register_warning "reduction_aborted"
+  "Warn when aborting term reduction"
 
 let normalize ?(max_growth=1000) ?step_limit ~limit engine sigma t0 =
   let n0 = Term.term_size t0 in
@@ -1544,7 +1546,7 @@ let normalize ?(max_growth=1000) ?step_limit ~limit engine sigma t0 =
       if n = limit then
         begin
           let t1 = reconstruct c in
-          Loc.warning "term reduction aborted (takes more than %d steps).@."
+          Loc.warning warn_reduction_aborted "term reduction aborted (takes more than %d steps).@."
             limit;
           t1
         end
@@ -1553,7 +1555,7 @@ let normalize ?(max_growth=1000) ?step_limit ~limit engine sigma t0 =
           let c' = reduce engine c in
           if cont_stack_size c'.config_cont_stack > cont_size_max then
             begin
-              Loc.warning "term reduction aborted (term size blows up from %d to %d, after %d steps).@."
+              Loc.warning warn_reduction_aborted "term reduction aborted (term size blows up from %d to %d, after %d steps).@."
                 cont_size_init (cont_stack_size c'.config_cont_stack) n;
               reconstruct c
             end

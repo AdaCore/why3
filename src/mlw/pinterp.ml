@@ -740,7 +740,7 @@ let get_and_register_param ctx id ity =
   register_used_value ctx.env id.id_loc id value;
   value
 
-(* For globals, RAC_Stuck exeptions that indicate invalid model values are
+(* For globals, RAC_Stuck exceptions that indicate invalid model values are
    referred lazily until their value is required in RAC or in the task. *)
 let get_and_register_global check_model_variable ctx exec_expr id oexp post ity =
   let ctx_desc = asprintf "global `%a`" print_decoded id.id_string in
@@ -1352,7 +1352,9 @@ and exec_match ctx t ebl =
   let rec iter ebl =
     match ebl with
     | [] ->
-        Loc.warning "[Exec] Pattern matching not exhaustive in evaluation@." ;
+        Loc.warning
+          (Loc.register_warning "non_exhaustive_eval" "Warn for non=exhaustive pattern matching in evaluation.@.")
+          "[Exec] Pattern matching not exhaustive in evaluation@." ;
         assert false
     | (p, e) :: rem -> (
       try
