@@ -88,7 +88,7 @@ val register_warning : string -> Pp.formatted -> warning_id
 (** [register_warning name desc] registers a new warning under the
    given [name] with the given [desc]ription. *)
 
-val warning: ?id:warning_id ->
+val warning: warning_id ->
   ?loc:position -> ('b, Format.formatter, unit, unit) format4 -> 'b
 (** [warning ~id ~loc fmt] emits a warning in the given formattter
    [fmt]. Adds the location [loc] if it is given. Emits nothing if the

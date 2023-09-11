@@ -610,7 +610,7 @@ let rec k_expr env lps e res xmap =
   let var_or_proxy = var_or_proxy_case xmap in
   let check_divergence k =
     if diverges eff.eff_oneway && not env.divergent then begin
-      Loc.warning ~id:warn_missing_diverges ?loc "termination@ of@ this@ expression@ \
+      Loc.warning warn_missing_diverges ?loc "termination@ of@ this@ expression@ \
         cannot@ be@ proved,@ but@ there@ is@ no@ `diverges'@ \
         clause@ in@ the@ outer@ specification";
       Kpar (Kstop (vc_expl loc attrs expl_divergent t_false), k)

@@ -122,7 +122,7 @@ let translate_cfg preconds block (blocks : (label * block) list) =
                       if k = Variant then
                         Loc.errorm ~loc:t.term_loc "`variant` clauses are not supported in the Paths backend";
                       if id <> None then
-                        Loc.warning ~loc:t.term_loc ~id:warn_deprecated_named_invariant
+                        Loc.warning ~loc:t.term_loc warn_deprecated_named_invariant
                           "Named invariants are deprecated. Please use the `hyp_name` attribute directly";
                       t)
                     l

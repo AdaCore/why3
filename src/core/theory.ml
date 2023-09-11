@@ -17,7 +17,7 @@ open Term
 open Decl
 
 let warning_clone_not_abstract =
-  Loc.register_warning "clone_not_abstract" "Warn about theories cloned without substituting any abstract symbols."
+  Loc.register_warning "clone_not_abstract" "Warn about theories cloned without substituting any abstract symbols"
 
 (** Namespace *)
 
@@ -505,7 +505,7 @@ let create_decl d = mk_tdecl (Decl d)
 let print_id fmt id = Ident.print_decoded fmt id.id_string
 
 let warn_axiom_abstract =
-  Loc.register_warning "axiom_abstract" "Warn about axioms that are free of abstract symbols."
+  Loc.register_warning "axiom_abstract" "Warn when some axiom does not contain any abstract symbol"
 
 let warn_dubious_axiom uc k p syms =
   match k with
@@ -519,7 +519,7 @@ let warn_dubious_axiom uc k p syms =
           | Dtype { ts_def = NoDef } | Dparam _ -> raise Exit
           | _ -> ())
         syms;
-      Loc.warning ~id:warn_axiom_abstract ?loc:p.id_loc
+      Loc.warning warn_axiom_abstract ?loc:p.id_loc
         "@[axiom %s does not contain any local abstract symbol@ \
           (contains: @[%a@])@]" p.id_string
         (Pp.print_list Pp.comma print_id) (Sid.elements syms)
@@ -874,7 +874,7 @@ let warn_clone_not_abstract loc th =
         end
       | _ -> ()
     ) th.th_decls;
-    Loc.warning ~id:warning_clone_not_abstract ~loc "cloned theory %a.%s does not contain \
+    Loc.warning warning_clone_not_abstract ~loc "cloned theory %a.%s does not contain \
         any abstract symbol; it should be used instead"
       (Pp.print_list (Pp.constant_string ".") Pp.string) th.th_path
       th.th_name.id_string

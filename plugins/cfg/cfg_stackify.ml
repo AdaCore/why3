@@ -68,7 +68,7 @@ let mk_loop_expr entry (invariants : (loop_clause * ident option * term * int op
     List.partition_map
       (fun (claus, id, t, _) ->
         if id <> None then
-          Loc.warning ~loc:t.term_loc ~id:warn_deprecated_named_invariant  "Named invariants are deprecated. Please use the `hyp_name` attribute directly";
+          Loc.warning ~loc:t.term_loc warn_deprecated_named_invariant  "Named invariants are deprecated. Please use the `hyp_name` attribute directly";
 
         match claus with Invariant -> Either.Left t | Variant -> Either.Right (t, None))
       invariants

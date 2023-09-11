@@ -1133,7 +1133,9 @@ let clone_type_record cl s d s' d' =
 let warn_constructors_mismatch loc d d' =
   let warn_cons c c' =
     if c.rs_name.id_string <> c'.rs_name.id_string
-    then Loc.warning ?loc
+    then Loc.warning
+        (Loc.register_warning "constructor_mismatch" "Warn for mismatched constructors in modules")
+        ?loc
         "trying to match constructor %a with %a, this is likely an error"
         print_rs c print_rs c' in
   if d.itd_its.its_ts.ts_name.id_string = d'.itd_its.its_ts.ts_name.id_string

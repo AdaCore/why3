@@ -301,6 +301,7 @@ let analyse_result exit_result res_parser get_model out =
             analyse saved_models saved_res (Answer (Unknown (s1 ^ " + " ^ s2)) :: tl)
          | _,_ -> (
             Loc.warning
+              (Loc.register_warning "consecutive_answers" "Warn when one of two consecutive prover answers is ignored.@.")
               "two consecutive answers returned by the prover, will ignore the first one.@.\
               First answer: %a@.Second answer: %a@."
               print_prover_answer res1 print_prover_answer res2;

@@ -163,12 +163,10 @@ let register_warning name (descr : Pp.formatted) =
   end
 
 let warn_unknown_warning =
-  register_warning "unknown_warning" "Warn about unknown warning flags."
+  register_warning "unknown_warning" "Warn when an unknown warning flag is invoked"
 
 let warning_active id =
-  match id with
-  | None -> true
-  | Some id -> (Hashtbl.find warning_table id).enabled
+  (Hashtbl.find warning_table id).enabled
 
 let disable_warning id = unset_flag (lookup_flag id)
 
@@ -185,7 +183,7 @@ let without_warning name inner =
       old.enabled <- true;
       raise e
 
-let warning ?id ?loc p =
+let warning id ?loc p =
     let open Format in
     let b = Buffer.create 100 in
     let fmt = formatter_of_buffer b in
@@ -236,7 +234,7 @@ module Args = struct
       | f -> unset_flag f
       | exception UnknownWarning _ when silent -> ()
       | exception UnknownWarning _ ->
-          warning ~id:warn_unknown_warning "unknown warning flag `%s'" flag in
+          warning warn_unknown_warning "unknown warning flag `%s'" flag in
     Queue.iter check opt_list_flags
 end
 
@@ -245,9 +243,10 @@ end
 (* user positions *)
 
 let warn_start_overflow =
-  register_warning "start_overflow" "Warn when the start location of a warning overflows into the next line"
+  register_warning "start_overflow" "Warn when the start character of a source location overflows into the next line"
+
 let warn_end_overflow =
-  register_warning "end_overflow" "Warn when the end location of a warning overflows into the next line"
+  register_warning "end_overflow" "Warn when the end character of a source location overflows into the next line"
 
 let warning_emitted = ref false
 
@@ -260,7 +259,7 @@ let user_position f bl bc el ec =
                 string_of_int bc ^ "` out of bounds");
   if bc > mask_col && not !warning_emitted then
     begin
-      warning ~id:warn_start_overflow "Loc.user_position: start char number `%d` overflows on next line" bc;
+      warning warn_start_overflow "Loc.user_position: start char number `%d` overflows on next line" bc;
       warning_emitted := true;
     end;
   if el < 0 || el > max_line then
@@ -271,7 +270,7 @@ let user_position f bl bc el ec =
                 string_of_int ec ^ "` out of bounds");
   if ec >= mask_col  && not !warning_emitted then
     begin
-      warning ~id:warn_end_overflow "Loc.user_position: end char number `%d` overflows on next line" ec;
+      warning warn_end_overflow "Loc.user_position: end char number `%d` overflows on next line" ec;
       warning_emitted := true;
     end;
   let tag = FileTags.get_file_tag f in
