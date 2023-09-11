@@ -436,7 +436,7 @@ let print_hist stats =
       acc+1)
     stats.graph_data 1
   in
-  fprintf main_fmt "pause -1 \"Press any key\"@\n";
+  fprintf main_fmt "pause -1 \"Press any key\\n\"@\n";
   fprintf main_fmt "set terminal pdfcairo@\n";
   fprintf main_fmt "set output \"why3session.pdf\"@\n";
   fprintf main_fmt "replot@.";
@@ -509,7 +509,7 @@ let print_compare_scatter stats =
         fprintf main_fmt "set xlabel \"%s\" @\n" prover1_name;
         fprintf main_fmt "set ylabel \"%s\" @\n" prover2_name;
         fprintf main_fmt "plot [0:%.2f] [0:%.2f] x, '%s' with points pt 7@\n" max_time max_time filename;
-        fprintf main_fmt "pause -1 \"Press any key\"@\n";
+        fprintf main_fmt "pause -1 \"Press any key\\n\"@\n";
         fprintf main_fmt "replot@.")
   in
   List.iter print_plot (List.combine comparison_datafiles all_provers_pairs);
@@ -538,7 +538,7 @@ let print_compare_hist stats =
               (time1/.time2 :: out_list), p1_only, p2_only)
           | Some _    , None       -> (out_list, p1_only + 1, p2_only    )
           | None      , Some _     -> (out_list, p1_only    , p2_only + 1)
-          | None      , None       -> (out_list, p1_only +1 , p2_only + 1)
+          | None      , None       -> (out_list, p1_only , p2_only)
         ) stats.proof_node_proofs ([], 0, 0)
     in
     let p2_name = (string_of_prover prover2) in
@@ -587,7 +587,7 @@ if (percent_improve > 50) {title_string = sprintf("%%s is faster than %%s on %%.
 else {title_string = sprintf("%%s is faster than %%s on %%.2f %%%% of %%d goals", prover2, prover1, 100-percent_improve, STATS_records)}
 set title title_string.exclusives
 plot filename with points pointtype 5 pointsize 0.5 linecolor rgb "blue", STATS_mean title "Mean", 1
-pause -1 "Press any key"
+pause -1 "Press any key\n"
 replot@.|};
   in
   List.iter print_plot datafiles_and_exclusives;
