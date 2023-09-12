@@ -841,17 +841,15 @@ let call_one_prover c (p, timelimit, memlimit, steplimit) ~callback ~notificatio
   let timelimit = Opt.get_def (Whyconf.timelimit main) timelimit in
   let memlimit = Opt.get_def (Whyconf.memlimit main) memlimit in
   let steplimit = Opt.get_def 0 steplimit in
-
   let limit = {
     Call_provers.limit_time = timelimit;
     limit_mem  = memlimit;
     limit_steps = steplimit;
   } in
-
   schedule_proof_attempt c g p ~limit ~callback ~notification
 
 let run_strategy_on_goal
-    c id strat ~callback_pa ~callback_tr ~callback ~notification =
+    c id strat ~callback_pa ~callback_tr ~callback ~notification ~removed =
   let rec exec_strategy pc strat g =
     if pc < 0 || pc >= Array.length strat then
       callback STShalt
@@ -866,7 +864,15 @@ let run_strategy_on_goal
            | UpgradeProver _ | Scheduled | Running -> (* nothing to do yet *) ()
            | Done { Call_provers.pr_answer = Call_provers.Valid } ->
               (* proof succeeded, nothing more to do *)
-              interrupt_proof_attempts_for_goal c g;
+               interrupt_proof_attempts_for_goal c g;
+               Hprover.iter (fun _pr pa ->
+                   let res = get_proof_attempt_node c.controller_session pa in
+                   match res.proof_state with
+                   | Some Call_provers.{ pr_answer = Valid } ->
+                       ()
+                   | _ ->
+                       remove_subtree ~notification ~removed c (APa pa))
+                 (get_proof_attempt_ids c.controller_session g);
               already_done := 0;
               callback STShalt
            | Interrupted ->
@@ -927,7 +933,6 @@ let schedule_tr_with_same_arguments
   let args = get_transf_args s tr in
   let name = get_transf_name s tr in
   let callback = callback name args in
-
   schedule_transformation c pn name args ~callback ~notification
 
 let proof_is_complete pa =
@@ -939,7 +944,6 @@ let proof_is_complete pa =
 
 
 let clean c ~removed nid =
-
   (* clean should not change proved status *)
   let notification any =
     Format.eprintf "Cleaning error: cleaning attempts to change status of node %a@." fprintf_any any

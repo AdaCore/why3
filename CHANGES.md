@@ -28,6 +28,8 @@ Input formats
 Tools
   * Strategies can now execute a group of provers simultaneously in a single
     `call` step. Each prover invocation is separated by a `|`.
+	Default strategies include some of this parallelism feature by calling
+	provers in parallel for timelimits larger than 1 second
   * New options have been added to enable warnings `--warn=WARNING` and
     disable them `--warn-off=WARNING`. Available warnings can be listed
     using `--list-warning-flags`.

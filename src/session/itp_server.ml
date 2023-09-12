@@ -1365,7 +1365,9 @@ match pa.proof_state with
       let callback_tr tr args st = callback_update_tree_transform tr args st in
       List.iter (fun id ->
                  C.run_strategy_on_goal d.cont id st
-                    ~callback_pa ~callback_tr ~callback ~notification:(notify_change_proved d.cont))
+                   ~callback_pa ~callback_tr ~callback
+                   ~notification:(notify_change_proved d.cont)
+                   ~removed)
                 unproven_goals
     with
       Not_found ->
