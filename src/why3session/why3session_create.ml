@@ -106,12 +106,14 @@ let run () =
   let session = load_session dir in
   let errors = ref [] in
   let add_file_and_vcs_to_session f =
-    let f = Sysutil.concat (Sys.getcwd ()) f in
+    let f = Filename.concat (Sys.getcwd()) f in
+    Format.eprintf "dir = %s, f = %s@." dir f;
+    let fp = Sysutil.relativize_filename dir f in
     let file_is_detached,(theories,format) =
       try false,(Session_itp.read_file env f)
       with e -> errors := e :: !errors; true,([], Env.get_format f)
     in
-    let file = add_file_section ~file_is_detached session f theories format in
+    let file = add_file_section ~file_is_detached session fp theories format in
     let theories = file_theories file in
 
     (* Apply all transformations and add proof attempts to the leafs *)

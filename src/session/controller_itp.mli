@@ -122,7 +122,9 @@ val print_session : Format.formatter -> controller -> unit
 
 exception Errors_list of exn list
 
-val reload_files : ?hard_reload:bool -> ignore_shapes:bool -> controller -> bool * bool
+val reload_files : ?hard_reload:bool ->
+  ?reparse_file_fun:(Session_itp.session -> Env.env -> Session_itp.file -> Theory.theory list) ->
+  ignore_shapes:bool -> controller -> bool * bool
 (** [reload_files c] returns a pair [(o,d)]: [o] true means there are
    obsolete goals, [d] means there are missed objects (goals,
    transformations, theories or files) that are now detached in the
@@ -170,6 +172,9 @@ val reload_files : ?hard_reload:bool -> ignore_shapes:bool -> controller -> bool
 
   When the option [ignore_shapes] is true, the shapes are not taken
    into account for merging with the old session.
+
+  When optional argument [reparse_file_fun] is an extra function
+  explained in [Session_itp.merge_files_gen]
 
  *)
 

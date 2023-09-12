@@ -244,7 +244,7 @@ let print_session fmt c =
     reloaded.
  *)
 
-let reload_files ?(hard_reload=false) ~ignore_shapes (c : controller) =
+let reload_files ?(hard_reload=false) ?reparse_file_fun ~ignore_shapes (c : controller) =
   let old_ses = c.controller_session in
   if hard_reload then begin
     c.controller_env <- Env.create_env (Env.get_loadpath c.controller_env);
@@ -255,12 +255,16 @@ let reload_files ?(hard_reload=false) ~ignore_shapes (c : controller) =
   (* FIXME: here we should compare [shape_version] with the version of shapes just loaded.
      OR: even better, this function has no reason to have a [shape_version] parameter
      and should always take the version from the file just loaded. *)
-  merge_files ~ignore_shapes c.controller_env c.controller_session old_ses
+  match reparse_file_fun with
+  | None ->
+      merge_files ~ignore_shapes c.controller_env c.controller_session old_ses
+  | Some reparse_file_fun ->
+      merge_files_gen ~ignore_shapes ~reparse_file_fun c.controller_env c.controller_session old_ses
 
 exception Errors_list of exn list
 
-let reload_files ?(hard_reload=false) ~ignore_shapes (c: controller) =
-  let errors, b1, b2 = reload_files c ~hard_reload ~ignore_shapes in
+let reload_files ?(hard_reload=false) ?reparse_file_fun ~ignore_shapes (c: controller) =
+  let errors, b1, b2 = reload_files ~hard_reload ?reparse_file_fun ~ignore_shapes c in
   match errors with
   | [] -> b1, b2
   | _ -> raise (Errors_list errors)
@@ -271,7 +275,8 @@ let add_file c ?format fname =
     try false,(Session_itp.read_file c.controller_env ~format fname), None
     with e -> true,([], format), Some e
   in
-  let (_ : file) = add_file_section c.controller_session fname ~file_is_detached theories format in
+  let fp = Sysutil.relativize_filename (get_dir c.controller_session) fname in
+  let (_ : file) = add_file_section c.controller_session fp ~file_is_detached theories format in
   errors
 
 let add_file c ?format fname =
