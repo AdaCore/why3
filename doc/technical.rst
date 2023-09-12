@@ -1453,6 +1453,10 @@ are:
    and memory limit *m*. On success, the strategy ends, it
    continues to next line otherwise.
 
+-  :samp:`c {p1} {t1} {m1} | ... | {pk} {tk} {mk}` calls the provers *p1* to *pk* in parallel.
+   On success on one prover, the other provers are interrupted, and the strategy ends. It
+   continues to next line if none of the provers succeed.
+
 -  :samp:`t {n} {lab}` applies the transformation *n*. On success, the
    strategy continues to label *lab*, and is applied to each
    generated sub-goals. It continues to next line otherwise.
@@ -1492,11 +1496,9 @@ Auto_level_1
 
     ::
 
-        c Z3,4.8.4, 5 1000
-        c Alt-Ergo,2.3.0, 5 1000
-        c CVC4,1.7, 5 1000
+        c Z3,4.8.4, 5 1000 | Alt-Ergo,2.3.0, 5 1000 | CVC4,1.7, 5 1000
 
-    Same as Auto_level_0 but with 5 seconds instead of 1.
+    Same as Auto_level_0 but with 5 seconds instead of 1, and in parallel.
 
 Auto_level_2
     is bound to
@@ -1508,15 +1510,13 @@ Auto_level_2
         c Alt-Ergo,2.3.0, 1 1000
         c CVC4,1.7, 1 1000
         t split_vc start
-        c Z3,4.8.4, 10 4000
-        c Alt-Ergo,2.3.0, 10 4000
-        c CVC4,1.7, 10 4000
+        c Z3,4.8.4, 10 4000 | Alt-Ergo,2.3.0, 10 4000 | CVC4,1.7, 10 4000
 
     The three provers are first tried for a time limit of 1 second and
     memory limit of 1 Gb, each in turn. If none of them succeed, a split
     is attempted. If the split works then the same strategy is retried
     on each sub-goals. If the split does not succeed, the provers are
-    tried again with larger limits.
+    tried again with larger limits, and in parallel.
 
 Auto level 3
     is bound to
@@ -1530,11 +1530,7 @@ Auto level 3
         c Alt-Ergo,2.3.0, 1 1000
         c CVC4,1.7, 1 1000
         t split_vc start
-        c Z3,4.8.4, 5 2000
-        c Eprover,2.0, 5 2000
-        c Spass,3.7, 5 2000
-        c Alt-Ergo,2.3.0, 5 2000
-        c CVC4,1.7, 5 2000
+        c Z3,4.8.4, 5 2000 | Eprover,2.0, 5 2000 | Spass,3.7, 5 2000 | Alt-Ergo,2.3.0, 5 2000 | CVC4,1.7, 5 2000
         t introduce_premises afterintro
         afterintro:
         t inline_goal afterinline
@@ -1542,22 +1538,19 @@ Auto level 3
         afterinline:
         t split_all_full start
         trylongertime:
-        c Z3,4.8.4, 30 4000
-        c Eprover,2.0, 30 4000
-        c Spass,3.7, 30 4000
-        c Alt-Ergo,2.3.0, 30 4000
-        c CVC4,1.7, 30 4000
+        c Z3,4.8.4, 30 4000 | Eprover,2.0, 30 4000 | Spass,3.7, 30 4000 | Alt-Ergo,2.3.0, 30 4000 | CVC4,1.7, 30 4000
 
-    Notice that now 5 provers are used. The provers are first tried for
-    a time limit of 1 second and memory limit of 1 Gb, each in turn. If
-    none of them succeed, a split is attempted. If the split works then
-    the same strategy is retried on each sub-goals. If the split does
-    not succeed, the prover are tried again with limits of 5 s and 2 Gb.
-    If all fail, we attempt the transformation of introduction of
-    premises in the context, followed by an inlining of the definitions
-    in the goals. We then attempt a split again, if the split succeeds,
-    we restart from the beginning, if it fails then provers are tried
-    again with 30s and 4 Gb.
+    Notice that now 5 provers are used. The provers are first tried
+    for a time limit of 1 second and memory limit of 1 Gb, each in
+    turn. If none of them succeed, a split is attempted. If the split
+    works then the same strategy is retried on each sub-goals. If the
+    split does not succeed, the prover are tried again with limits of
+    5 s and 2 Gb, and in parallel.  If all fail, we attempt the
+    transformation of introduction of premises in the context,
+    followed by an inlining of the definitions in the goals. We then
+    attempt a split again, if the split succeeds, we restart from the
+    beginning, if it fails then provers are tried again, in parallel, with 30s and 4
+    Gb.
 
 .. _sec.attributes:
 
