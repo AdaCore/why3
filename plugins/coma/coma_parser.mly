@@ -38,6 +38,11 @@ uses:
         "the keyword `import' is redundant here and can be omitted";
       (Puseimport ($2, n, q) ) }
 
+// | TYPE qualid ty_var* EQUAL ty {  }
+
+/* ty_var:
+| attrs(quote_lident) { $1 } */
+
 defn:
 | LET id=lident w=prewrites p=coma_params EQUAL e=coma_prog
   { let d = { pdefn_name = id; pdefn_writes = w;

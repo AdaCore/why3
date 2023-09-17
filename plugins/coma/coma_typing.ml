@@ -5,7 +5,7 @@ open Ty
 open Term
 open Coma_syntax
 
-type vr = Ref of vsymbol | Var of vsymbol
+type vr = Ref of vsymbol | Var of vsymbol | Typ of tvsymbol
 
 type ctx = {
   vars: vr Mstr.t;
@@ -33,8 +33,12 @@ let add_ref vs ctx =
   { ctx with vars = Mstr.add str (Ref vs) ctx.vars;
              denv = Mstr.add str (Dterm.DTgvar vs) ctx.denv }
 
+let add_typ ts ctx =
+  let str = ts.tv_name.id_string in
+  { ctx with vars = Mstr.add str (Typ ts) ctx.vars }
+
 let add_param ctx = function
-  | Pt _ -> assert false
+  | Pt ts -> add_typ ts ctx
   | Pv vs -> add_var vs ctx
   | Pr vs -> add_ref vs ctx
   | Pc (h, w, pl) -> add_hdl h w pl ctx
@@ -44,7 +48,8 @@ open Ptree
 let find_ref ctx (id: Ptree.ident) =
   try match Mstr.find id.id_str ctx.vars with
     | Ref v -> v
-    | Var _ -> Loc.errorm ~loc:id.id_loc "the variable %s is not a reference" id.id_str
+    | Var _
+    | Typ _ -> Loc.errorm ~loc:id.id_loc "the symbol %s is not a reference" id.id_str
   with Not_found -> Loc.errorm ~loc:id.id_loc "unbound variable %s" id.id_str
 
 let rec type_param0 tuc ctx = function
@@ -61,7 +66,9 @@ let rec type_param0 tuc ctx = function
       let w = List.map (find_ref ctx) w in
       let hs = create_hsymbol (id_fresh ~loc:id.id_loc id.id_str) in
       Pc (hs, w, params)
-  | PPt i -> Loc.errorm ~loc:i.id_loc "polymorphism is not supported yet"
+  | PPt id ->
+      let ts = create_tvsymbol (id_fresh ~loc:id.id_loc id.id_str) in
+      Pt ts
 
 and type_param tuc ctx p =
   let p = type_param0 tuc ctx p in
@@ -74,7 +81,7 @@ let type_fmla tuc ctx t =
   Typing.type_fmla_in_denv (Theory.get_namespace tuc) Theory.(tuc.uc_known) Theory.(tuc.uc_crcmap) ctx.denv t
 
 let rec check_param ~loc l r = match l,r with
-  | Pt _, Pt _ -> ()
+  | Pt _l, Pt _r -> ()
   | Pr l, Pr r
   | Pv l, Pv r  when ty_equal l.vs_ty r.vs_ty -> ()
   | Pc (_, _, l), Pc (_, _, r) -> check_params ~loc l r
@@ -83,6 +90,10 @@ let rec check_param ~loc l r = match l,r with
 and check_params ~loc l r =
   try List.iter2 (check_param ~loc) l r
   with Invalid_argument _ -> Loc.errorm ~loc "bad arity: %d argument(s) expected, %d given" (List.length l) (List.length r)
+
+(* let subs (tvs : tvsymbol) (pl : param list) =
+  List.map (fun e -> )
+    pl *)
 
 let rec type_expr tuc ctx { pexpr_desc=d; pexpr_loc=loc } =
   match d with
@@ -105,7 +116,7 @@ let rec type_expr tuc ctx { pexpr_desc=d; pexpr_loc=loc } =
            let s =
              try match Mstr.find id.id_str ctx.vars with
                | Ref v -> v
-               | Var _ -> Loc.errorm ~loc:id.id_loc "the variable %s is not a reference" id.id_str
+               | Var _ | Typ _ -> Loc.errorm ~loc:id.id_loc "the symbol %s is not a reference" id.id_str
              with Not_found -> Loc.errorm ~loc:id.id_loc "unbounded variable %s" id.id_str
            in
            if ty_equal rs.vs_ty s.vs_ty then Eapp (e, Ar s), tes
@@ -114,7 +125,9 @@ let rec type_expr tuc ctx { pexpr_desc=d; pexpr_loc=loc } =
            let ea, tea = type_expr tuc ctx ea in
            check_params ~loc pl tea;
            Eapp (e, Ac ea), tes
-       | Pt _ :: _tes, PAt _ -> Loc.errorm ~loc:loc "polymorphism is not supported yet"
+       | Pt _tv :: tes, PAt pty ->
+           let _ty = Typing.ty_of_pty tuc pty in
+           Loc.errorm ~loc:loc "polymorphism is not supported yet", tes
        | _ ->  Loc.errorm ~loc "type error with the application")
   | PEany -> Eany, []
   | PEbox e ->
