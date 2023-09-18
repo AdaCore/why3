@@ -288,7 +288,6 @@ val run_strat_on_goal :
   controller ->
   proofNodeID ->
   (Env.env -> Task.task -> Strategy.strat) ->
-  callback_pa:(proofAttemptID -> proof_attempt_status -> unit) ->
   callback_tr:(string -> string list -> transformation_status -> unit) ->
   callback:(strategy_status -> unit) ->
   notification:notifier -> unit

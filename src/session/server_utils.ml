@@ -466,7 +466,7 @@ let interp commands_table cont id s =
               try
                 let s = Strategy.lookup_strat s in
                 match id with
-                | Some (Session_itp.APn id) -> Strat(cmd, s)
+                | Some (Session_itp.APn _) -> Strat(cmd, s)
                 | _ -> QError ("Please select a goal or trans node in the task tree")
               with | Strategy.UnknownStrat _ ->
                match cmd, args with

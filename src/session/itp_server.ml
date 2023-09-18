@@ -1379,10 +1379,9 @@ match pa.proof_state with
       let callback sts =
         Debug.dprintf debug_strat "[strategy_exec] strategy status: %a@." print_strategy_status sts
       in
-      let callback_pa = callback_update_tree_proof d.cont in
       let callback_tr tr args st = callback_update_tree_transform tr args st in
       C.run_strat_on_goal d.cont id s
-        ~callback_pa ~callback_tr ~callback ~notification:(notify_change_proved d.cont)
+        ~callback_tr ~callback ~notification:(notify_change_proved d.cont)
     | _ -> P.notify (Message (Error "Please select a node id"))
 
 

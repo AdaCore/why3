@@ -911,7 +911,7 @@ let run_strategy_on_goal
   exec_strategy 0 strat id
 
 let run_strat_on_goal
-    c id strat ~callback_pa ~callback_tr ~callback ~notification =
+    c id strat ~callback_tr ~callback ~notification =
   let rec exec_strategy tree id =
     match tree with
     | Sdo_nothing -> ()

@@ -2383,7 +2383,14 @@ let init_completion provers transformations strategies commands =
   in
   List.iter add_completion_entry all_strings;
   List.iter (add_submenu_strategy strategies_factory context_factory) strategies;
-
+  (* Add goal oriented stategies in strategies menu *)
+  let strategies = Strategy.list_strats () in
+  let strategies = List.map (fun (strat, desc) ->
+                              let desc = string_of_desc (strat, desc) in
+                              (strat, desc)) strategies in
+  strategies_factory#add_separator();
+  context_factory#add_separator();
+  List.iter (add_submenu_strategy strategies_factory context_factory) strategies;
   command_entry_completion#set_text_column completion_col;
   (* Adding a column which contains the description of the
      prover/transformation/strategy. *)
@@ -2426,20 +2433,6 @@ let () =
     (fun (x,_) -> x >= "eliminatf" && x < "s");
   add_submenu_transform "Transformations (s-z)"
                         (fun (x,_) -> x >= "s");
-  tools_factory#add_separator ();
-  let strategies = Strategy.list_strats () in
-  let submenu = tools_factory#add_submenu "Strats" in
-  let submenu = new menu_factory submenu
-    ~accel_path:("<Why3-Main>/Tools/Strats/")
-    ~accel_group:tools_accel_group in
-  let iter ((name,_) as desc) =
-    let (_ : GMenu.menu_item) = submenu#add_item (Glib.Markup.escape_text name)
-      ~use_mnemonic:false
-      ~tooltip:(string_of_desc desc)
-      ~callback:(fun () -> interp name) in
-    ()
-  in
-  List.iter iter strategies;
   tools_factory#add_separator ()
 
 (* complete the tools menu *)
