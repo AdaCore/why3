@@ -801,14 +801,31 @@ module Float_BV_Converter
   use bv.BV64 as BV64
   use RoundingMode
 
-  (* with unsigned int as bitvector *)
-  type t                        (* float *)
+  type t (* the underlying float type, to be cloned *)
+  predicate is_finite t
+  predicate le t t
+  function to_real         t : real
+  function round   mode real : real
 
+  (* convert from signed bitvector *)
+  val function of_sbv8  mode BV8.t  : t
+  val function of_sbv16 mode BV16.t : t
+  val function of_sbv32 mode BV32.t : t
+  val function of_sbv64 mode BV64.t : t
+
+  (* convert to signed bitvector *)
+  val function to_sbv8  mode BV8.t  : t
+  val function to_sbv16 mode BV16.t : t
+  val function to_sbv32 mode BV32.t : t
+  val function to_sbv64 mode BV64.t : t
+
+  (* convert from unsigned bitvector *)
   val function of_ubv8  mode BV8.t  : t
   val function of_ubv16 mode BV16.t : t
   val function of_ubv32 mode BV32.t : t
   val function of_ubv64 mode BV64.t : t
 
+  (* convert to unsigned bitvector *)
   val function to_ubv8  mode t : BV8.t
   val function to_ubv16 mode t : BV16.t
   val function to_ubv32 mode t : BV32.t
@@ -816,11 +833,6 @@ module Float_BV_Converter
 
   use real.RealInfix
   use real.FromInt as FromInt
-
-  predicate is_finite t
-  predicate le t t
-  function to_real         t : real
-  function round   mode real : real
 
   (** of unsigned bv axioms  *)
   (* only true for big enough floats...  *)
