@@ -25,6 +25,10 @@ Input formats
     details of an implementation during a proof but use the implementation
     during extraction.
 
+Standard library
+  * library `ieee_float`: added conversions between floats and signed bitvectors, with
+	appropriate mappings to SMTLIB
+
 Tools
   * Strategies can now execute a group of provers simultaneously in a single
     `call` step. Each prover invocation is separated by a `|`.

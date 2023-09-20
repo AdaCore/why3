@@ -141,6 +141,11 @@ end
 
 theory ieee_float.Float_BV_Converter
   (* Part I *)
+   syntax function to_sbv8  "((_ fp.to_sbv 8) %1 %2)"
+   syntax function to_sbv16 "((_ fp.to_sbv 16) %1 %2)"
+   syntax function to_sbv32 "((_ fp.to_sbv 32) %1 %2)"
+   syntax function to_sbv64 "((_ fp.to_sbv 64) %1 %2)"
+
    syntax function to_ubv8  "((_ fp.to_ubv 8) %1 %2)"
    syntax function to_ubv16 "((_ fp.to_ubv 16) %1 %2)"
    syntax function to_ubv32 "((_ fp.to_ubv 32) %1 %2)"
@@ -151,6 +156,11 @@ end
 
 theory ieee_float.Float32_BV_Converter
   (* Part I *)
+  syntax function of_sbv8  "((_ to_fp 8 24) %1 %2)"
+  syntax function of_sbv16 "((_ to_fp 8 24) %1 %2)"
+  syntax function of_sbv32 "((_ to_fp 8 24) %1 %2)"
+  syntax function of_sbv64 "((_ to_fp 8 24) %1 %2)"
+
   syntax function of_ubv8  "((_ to_fp_unsigned 8 24) %1 %2)"
   syntax function of_ubv16 "((_ to_fp_unsigned 8 24) %1 %2)"
   syntax function of_ubv32 "((_ to_fp_unsigned 8 24) %1 %2)"
@@ -161,6 +171,11 @@ end
 
 theory ieee_float.Float64_BV_Converter
   (* Part I *)
+  syntax function of_sbv8  "((_ to_fp 11 53) %1 %2)"
+  syntax function of_sbv16 "((_ to_fp 11 53) %1 %2)"
+  syntax function of_sbv32 "((_ to_fp 11 53) %1 %2)"
+  syntax function of_sbv64 "((_ to_fp 11 53) %1 %2)"
+
   syntax function of_ubv8  "((_ to_fp_unsigned 11 53) %1 %2)"
   syntax function of_ubv16 "((_ to_fp_unsigned 11 53) %1 %2)"
   syntax function of_ubv32 "((_ to_fp_unsigned 11 53) %1 %2)"
