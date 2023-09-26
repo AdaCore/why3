@@ -464,6 +464,8 @@ let interp commands_table cont id s =
                | Some _ -> Strategies cmd
              else
               try
+                let s = List.hd (Strings.split ' ' s) in
+                let s = List.hd (Strings.split '\n' s) in
                 let s = Strategy.lookup_strat s in
                 match id with
                 | Some (Session_itp.APn _) -> Strat(cmd, s)

@@ -2391,6 +2391,7 @@ let init_completion provers transformations strategies commands =
   strategies_factory#add_separator();
   context_factory#add_separator();
   List.iter (add_submenu_strategy strategies_factory context_factory) strategies;
+  List.iter add_completion_entry strategies;
   command_entry_completion#set_text_column completion_col;
   (* Adding a column which contains the description of the
      prover/transformation/strategy. *)
