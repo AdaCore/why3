@@ -28,7 +28,8 @@ and pexpr_desc =
   | PEapp of pexpr * pargument (* e <ty>... t... | e... *)
   | PElam of pparam list * pexpr (* fun pl -> e *)
   | PEdef of pexpr * bool * pdefn list (* e / rec? h p = e and ... *)
-  | PEset of pexpr * (ident * term * pty) list (* assign ... *)
+  | PEset of pexpr * (ident * term) list
+  | PElet of pexpr * (ident * term * pty * bool) list
   | PEcut of term * pexpr (* { t } e *)
   | PEbox of pexpr (* ! e *)
   | PEwox of pexpr (* ? e *)
@@ -79,6 +80,7 @@ type expr =
   | Elam of param list * expr
   | Edef of expr * bool * defn list
   | Eset of expr * (vsymbol * term) list
+  | Elet of expr * (vsymbol * term * bool) list
   | Ecut of term * expr
   | Ebox of expr
   | Ewox of expr
@@ -101,57 +103,62 @@ let pp_sp_nl2 fmt ()     = pp_print_break fmt 1 2
 
 let pp_tv   fmt t = fprintf fmt "<%a>"        Pretty.print_tv t
 let pp_ty   fmt t = fprintf fmt "<%a>"        Pretty.print_ty t
-let pp_ref  fmt v = fprintf fmt "&%a"         Pretty.print_vs v
-let pp_hsym fmt h = fprintf fmt "%s"          (Ident.id_unique pr h.hs_name)
+let pp_hs   fmt h = fprintf fmt "%s"          (Ident.id_unique pr h.hs_name)
 let pp_term fmt t = fprintf fmt "{%a}"        Pretty.print_term t
 let pp_ofty fmt t = fprintf fmt ": @[<h>%a@]" Pretty.print_ty t
 let pp_pval fmt v = fprintf fmt "{%a%a}"      Pretty.print_vs v pp_ofty v.vs_ty
 let pp_eqto fmt d = fprintf fmt "%s"          (if d then "→" else "=")
+let pp_var mut fmt v = fprintf fmt "%s%a"     (if mut then "&" else "") Pretty.print_vs v
 
-let rec pp_hdl fmt (i, w, pl) = fprintf fmt "(%a @[<h>[%a]@]%a%a)" pp_hsym i pp_prew w pp_osp (pl <> []) pp_prms pl
+let rec pp_hdl fmt (i, w, pl) = fprintf fmt "(%a @[<h>[%a]@]%a%a)" pp_hs i pp_prew w pp_osp (pl <> []) pp_prms pl
 
 and pp_prew fmt w =
+  let pp_sep fmt () = fprintf fmt " " in
   let pp_v fmt s = fprintf fmt "%a" Pretty.print_vs s in
-  pp_print_list ~pp_sep:pp_print_space pp_v fmt w
+  pp_print_list ~pp_sep pp_v fmt w
 
 and pp_prms fmt pl =
   let pp_sep fmt () = fprintf fmt " " in
   pp_print_list ~pp_sep pp_param fmt pl
 
 and pp_param fmt = function
-  | Pt t -> fprintf fmt "%a" pp_tv   t
-  | Pv v -> fprintf fmt "%a" pp_pval v
-  | Pr r -> fprintf fmt "%a" pp_ref  r
-  | Pc h -> fprintf fmt "%a" pp_hdl  h
+  | Pt t -> fprintf fmt "%a"  pp_tv        t
+  | Pv v -> fprintf fmt "%a"  pp_pval      v
+  | Pr r -> fprintf fmt "%a" (pp_var true) r
+  | Pc h -> fprintf fmt "%a"  pp_hdl       h
 
 let pp_set fmt sl =
-  let pp_sep fmt () = fprintf fmt "@\n" in
-  let pp_v fmt (s, t) = fprintf fmt "/ %a =@ %a" pp_ref s pp_term t in
+  let pp_sep fmt () = fprintf fmt "@ |" in
+  let pp_v fmt (s, t) = fprintf fmt "@ %a <-@ %a" (pp_var true) s pp_term t in
+  pp_print_list ~pp_sep pp_v fmt sl
+
+let pp_let fmt sl =
+  let pp_sep fmt () = fprintf fmt "@ |" in
+  let pp_v fmt (s, t, mut) = fprintf fmt "@ %a =@ %a" (pp_var mut) s pp_term t in
   pp_print_list ~pp_sep pp_v fmt sl
 
 let rec pp_expr fmt = function
   | Eany           -> fprintf fmt "any"
-  | Esym i         -> fprintf fmt "%a"                  pp_hsym i
-  | Ebox e         -> fprintf fmt "↑@ @[%a@]"           pp_expr e
-  | Ewox e         -> fprintf fmt "↓@ @[%a@]"           pp_expr e
-  | Eset (e, l)    -> fprintf fmt "%a@\n%a"             pp_expr e pp_set l
-  | Eapp (e, arg)  -> fprintf fmt "@[%a%a@[%a@]@]"      pp_expr e pp_sp_nl2 () pp_arg arg
-  | Elam (p, e)    -> fprintf fmt "(fu@[n %a%a→@ @[%a@]@])" pp_prms p pp_osp (p <> []) pp_expr e
-  | Ecut (t, e)    -> fprintf fmt "%a@ %a"              pp_term t pp_expr e
-  | Edef (e, b, l) -> fprintf fmt "%a@\n%a"             pp_expr e (pp_defs b)  l
+  | Esym i         -> fprintf fmt "%a"             pp_hs i
+  | Ebox e         -> fprintf fmt "(↑@ @[%a@])"    pp_expr e
+  | Ewox e         -> fprintf fmt "(↓@ @[%a@])"    pp_expr e
+  | Eset (e, l)    -> fprintf fmt "%a@\n[%a]"      pp_expr e pp_set l
+  | Elet (e, l)    -> fprintf fmt "%a@\n[%a]"      pp_expr e pp_let l
+  | Eapp (e, arg)  -> fprintf fmt "@[%a%a@[%a@]@]" pp_expr e pp_sp_nl2 () pp_arg arg
+  | Ecut (t, e)    -> fprintf fmt "%a@ %a"         pp_term t pp_expr e
+  | Edef (e, b, l) -> fprintf fmt "%a@\n[%a]"      pp_expr e (pp_defs b)  l
+  | Elam (p, e)    -> fprintf fmt "(fu@[n %a%a→@ @[%a@]@])"  pp_prms p pp_osp (p <> []) pp_expr e
 
 and pp_arg fmt = function
-  | At t -> fprintf fmt "%a" pp_ty  t
-  | Av v -> fprintf fmt "%a" pp_term v
-  | Ar r -> fprintf fmt "%a" pp_ref r
-  | Ac e ->
-      match e with
-      | Esym i -> fprintf fmt "%a" pp_hsym i
-      | _ -> fprintf fmt "(%a)" pp_expr e
+  | At t        -> fprintf fmt "%a"   pp_ty  t
+  | Av v        -> fprintf fmt "%a"   pp_term v
+  | Ar r        -> fprintf fmt "%a"   (pp_var true) r
+  | Ac (Esym i) -> fprintf fmt "%a"   pp_hs i
+  | Ac e        -> fprintf fmt "(%a)" pp_expr e
 
 and pp_def direct fmt (h, w, pl, e) =
-  fprintf fmt "%a @[<h>[%a]@] %a%a%a%a@[%a@]"
-    pp_hsym h
+  fprintf fmt "%a [%a] %a%a%a%a@[%a@]"
+    pp_hs h
     pp_prew w
     pp_prms pl
     pp_osp (pl <> [])
@@ -160,6 +167,6 @@ and pp_def direct fmt (h, w, pl, e) =
     pp_expr e
 
 and pp_defs direct fmt l =
-  let pp_sep fmt () = fprintf fmt "@\n" in
-  let pp_v fmt d = fprintf fmt "/ %a" (pp_def direct) d in
+  let pp_sep fmt () = fprintf fmt "@\n|" in
+  let pp_v fmt d = fprintf fmt " %a" (pp_def direct) d in
   pp_print_list ~pp_sep pp_v fmt l

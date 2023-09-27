@@ -14,6 +14,8 @@ open Coma_typing
 open Coma_vc
 open Ptree
 
+let debug = Debug.register_flag "coma" ~desc:"coma plugin debug flag"
+
 let mk_goal tuc s e =
   let prs = Decl.create_prsymbol (Ident.id_fresh ("vc_" ^ s)) in
   Theory.add_prop_decl tuc Decl.Pgoal prs (vc e)
@@ -59,7 +61,7 @@ let read_channel env path file c =
 
   let astf = type_prog tuc ctx0 astf in
 
-  Format.printf "@[%a@]@." Coma_syntax.pp_expr astf;
+  Debug.dprintf debug "\n@.@[%a@]\n@." Coma_syntax.pp_expr astf;
 
   (* let _ctx, ast = Lists.map_fold_left (type_defn tuc) ctx0 ast in
      let ast = (create_hsymbol (id_fresh "dummy"), [], [], _expr2) :: ast in

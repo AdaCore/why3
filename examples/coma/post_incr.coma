@@ -1,0 +1,13 @@
+use int.Int
+
+let postIncr (&r: int) =
+    (fun {v: int} ->
+        (! [&r <- {r+1}] break)
+        [ break [r] -> { r = v+1 } (! return {v}) ]) {r}
+    [ return [r] {p: int} -> any]
+
+let postIncrLet (&r: int) =
+    (! [&r <- {r+1}] break)
+    [ break [r] -> { r = v+1 } (! return {v}) ]
+    [ v: int = {r} ]
+    [ return [r] {p: int} -> any]

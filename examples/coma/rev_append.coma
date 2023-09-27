@@ -1,0 +1,41 @@
+use int.Int
+use list.List
+use list.SortedInt
+use list.Permut
+use list.Reverse
+use list.Append
+
+-------------------------------------------------------------------------------
+
+let halt [] = (? any)
+let fail [] = { false } halt
+
+let if {b: bool} (then) (else) =
+    any [ then -> {b} (! then)
+        | else -> {not b} (! else) ]
+
+let unList {l: list int} (onCons [] {h: int} {t: list int}) (onNil []) =
+    any
+    [ oncons [] {h: int} {t: list int} -> { l = Cons h t } (! onCons {h} {t})
+    | onnil  []                        -> { l =  Nil } (! onNil) ]
+
+let assign_int (&r : int) {v: int} (out [r]) =
+    any [ ret [r] -> { r = v } (! out) ]
+
+let assign_list (&r : list int) {v: list int} (out [r]) = -- any [ ret [r] -> { r = v } (! out) ]
+     [ &r <- {v} ] ret
+     [ ret [r] = { r = v } (! out) ]
+
+-------------------------------------------------------------------------------
+
+let rev_append [] {l0 r0: list int} =
+  loop
+  [ loop = { reverse l ++ r = reverse l0 ++ r0 }
+      (! unList {l}
+           (fun {h: int} {t: list int} ->
+              [ &r <- {Cons h r} | &l <- {t} ] loop)
+           out
+      )]
+  [ out -> { r = reverse l0 ++ r0 } (? halt) ]
+  [ &r: list int = {r0}
+  | &l: list int = {l0} ]

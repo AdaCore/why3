@@ -22,12 +22,12 @@ let hs_hash hs = id_hash hs.hs_name
 let hs_compare hs1 hs2 = id_compare hs1.hs_name hs2.hs_name
 *)
 
-(*
-let t_and_simp = t_and
+
+(* let t_and_simp = t_and
 let t_and_asym_simp = t_and_asym
 let t_implies_simp = t_implies
-let t_forall_close_simp = t_forall_close
-*)
+let t_forall_close_simp = t_forall_close *)
+
 
 type wpsp = {
   wp: term;
@@ -131,6 +131,7 @@ let rec consume merge c pl bl =
   c, discharge zl hl
 
 and factorize merge c zl0 hl h wr pl kk =
+  if true then kk,zl0,hl else
   if not merge || List.exists (function
     | Pt _ | Pc _ -> true | Pv _ | Pr _ -> false) pl then kk,zl0,hl else
   let dup (l,m) v = let z = c_clone_vs c v in z::l, Mvs.add v (t_var z) m in
@@ -161,15 +162,16 @@ let rec havoc c wr pl =
     let u = c_clone_vs c v in
     c_add_vs c v (t_var u), u::vl in
   let on_param (c,vl as acc) = function
-    | Pc (h,_,pl) -> c_add_hs c h (undef c pl), vl
+    | Pc (h,_,pl) -> c_add_hs c h (undef h c pl), vl
     | Pt v -> c_add_tv c v (ty_var (c_clone_tv v)), vl
     | Pv v | Pr v -> on_write acc v in
   let c_vl = List.fold_left on_write (c,[]) wr in
   let c,vl = List.fold_left on_param (c_vl) pl in
   c, List.rev vl
 
-and undef c pl sf _ bl =
+and undef h c pl sf _ bl =
   let gl = sf && c.c_gl in
+  if gl then Loc.errorm ?loc:h.hs_name.id_loc "handler `%a' undefined" Coma_syntax.pp_hs h;
   (* if gl then w_false else *)
   w_and (if gl then w_false else w_true) (
   let lc = if sf then c.c_lc else Shs.empty in
@@ -220,6 +222,9 @@ let rec vc pp dd e c bl = match e with
               else close (w_and_l (w :: List.map impl dfl))
   | Eset (e,vtl) -> assert (bl = []);
       let add cc (v,s) = c_add_vs cc v (c_inst_t c s) in
+      vc pp dd e (List.fold_left add c vtl) bl
+  | Elet (e,vtl) -> assert (bl = []);
+      let add cc (v,s,_) = c_add_vs cc v (c_inst_t c s) in
       vc pp dd e (List.fold_left add c vtl) bl
   | Ecut (f,e) -> assert (bl = []);
       let f = t_attr_add stop_split f in

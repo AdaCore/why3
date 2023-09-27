@@ -1,0 +1,42 @@
+
+use int.Int
+use bintree.Tree
+use bintree.Occ
+
+let fail = { false } any
+
+let if {b: bool} (then) (else) =
+  any [ then -> {b}     (! then)
+      | else -> {not b} (! else) ]
+
+let unTree {t: tree int} (onNode [] {v: int} {l r: tree int}) (onLeaf) =
+  any
+  [ node {v: int} {l r: tree int} ->
+        { t = Node l v r } (! onNode {v} {l} {r})
+  |  leaf ->
+        { t = Empty } (! onLeaf) ]
+
+let remove_min {t: tree int} (return {m: int} {o: tree int}) =
+  { t <> Empty }
+  (! unTree {t} node fail
+     [ node {x: int} {l r: tree int} ->
+       if {l=Empty} (-> return {x} {r})
+                    (-> remove_min {l}
+                      (fun {m: int} {l': tree int} -> return {m} {Node l' x r}))
+     ])
+  [ return {m: int} {o: tree int} ->
+    { forall x. mem x t <-> (x = m || mem x o)}
+    (! return {m} {o}) ]
+
+let remove_root {t: tree int} (return {o: tree int}) =
+  unTree {t}
+  (fun {_x: int} {l r: tree int} ->
+    (! if {r=Empty} (-> return {l})
+                    (-> remove_min {r}
+                      (fun {m: int} {r': tree int} -> return {Node l m r'}))
+    )
+    [ return {o: tree int} ->
+      { forall x. mem x o <-> (mem x l || mem x r) }
+      (! return {o}) ]
+  )
+  fail

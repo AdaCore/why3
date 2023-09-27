@@ -1,0 +1,5 @@
+
+use list.List
+
+let assign < 'a > (&r : 'a) {v: 'a} (out [r]) =
+    any [ ret [r] -> { r = v } (! out) ]
