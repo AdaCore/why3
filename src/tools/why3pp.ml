@@ -503,7 +503,8 @@ let () =
             let f = Filename.(chop_extension (basename filename)) in
             deps_file std_formatter true f mlw_file
          | Sexp, None, 0 ->
-             Why3pp_sexp.why3pp_sexp stdout mlw_file
+             let sexp = Why3.Ptree.sexp_of_mlw_file mlw_file in
+             Mysexplib.output std_formatter sexp
          | _, _, _ ->
              Getopt.handle_exn "invalid arguments"
         )

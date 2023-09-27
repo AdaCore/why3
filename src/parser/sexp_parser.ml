@@ -1,23 +1,23 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-
-exception Parse_error of string
-
-let () = Exn_printer.register (fun fmt exn -> match exn with
-  | Parse_error msg -> Format.fprintf fmt "Sexp parser syntax error: %s" msg
-  | _ -> raise exn)
 
 let read_channel env path file c =
-  let sexp = Sexplib.Sexp.input_sexp c in
   try
+    let sexp = Mysexplib.input_sexp c in
     let ptree = Ptree.mlw_file_of_sexp sexp in
     Typing.type_mlw_file env path file ptree
-  with Sexplib.Conv.Of_sexp_error(e,_) ->
+  with e ->
     let loc = Loc.user_position (String.concat Filename.dir_sep (path@[file])) 0 0 0 0 in
-    match e with
-    | Failure msg ->
-        raise (Loc.Located(loc,Parse_error msg))
-    | _ ->
-        raise (Loc.Located(loc,e))
+    raise (Loc.Located(loc,e))
 
 let sexp_format = "sexp"
 

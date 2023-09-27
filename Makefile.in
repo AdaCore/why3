@@ -237,9 +237,9 @@ LIBGENERATED = \
 	src/session/compress.ml src/session/xml.ml \
 	src/session/strategy_parser.ml
 
-LIB_UTIL = mysexplib config bigInt mlmpfr_wrapper util opt lists strings \
+LIB_UTIL = exn_printer mysexplib config bigInt mlmpfr_wrapper util opt lists strings \
 	   pp extmap extset exthtbl weakhtbl diffmap \
-	   hashcons wstdlib exn_printer getopt \
+	   hashcons wstdlib getopt \
 	   json_base json_parser json_lexer \
 	   debug loc lexlib print_tree \
 	   cmdline sysutil rc plugin bigInt number constant vector pqueue
@@ -271,11 +271,8 @@ LIB_EXTRACT = mltree compile mlinterp pdriver ml_printer \
               c ocaml cakeml
 
 LIB_PARSER = ptree ptree_helpers glob typing \
-		parser_messages parser typing report lexer mlw_printer
-
-ifeq (@enable_sexp@,yes)
-LIB_PARSER += sexp_parser
-endif
+		parser_messages parser typing report lexer mlw_printer \
+		sexp_parser
 
 LIB_TRANSFORM = simplify_formula inlining split_goal \
 		args_wrapper reduction_engine compute \
@@ -377,12 +374,8 @@ endif
 ifeq (@enable_sexp@, yes)
 src/util/mysexplib.ml: src/util/mysexplib-real.ml Makefile
 	$(CMP_CP)
-src/tools/why3pp_sexp.ml: src/tools/why3pp_sexp-real.ml Makefile
-	$(CMP_CP)
 else
 src/util/mysexplib.ml: src/util/mysexplib-dummy.ml Makefile
-	$(CMP_CP)
-src/tools/why3pp_sexp.ml: src/tools/why3pp_sexp-dummy.ml Makefile
 	$(CMP_CP)
 endif
 
@@ -1545,7 +1538,7 @@ endif
 # Why3 pp
 ###############
 
-PRETTYPRINT_FILES = why3pp_sexp why3pp
+PRETTYPRINT_FILES = why3pp
 
 PRETTYPRINTMODULES = $(addprefix src/tools/, $(PRETTYPRINT_FILES))
 
@@ -1554,10 +1547,6 @@ PRETTYPRINTCMO = $(addsuffix .cmo, $(PRETTYPRINTMODULES))
 PRETTYPRINTCMX = $(addsuffix .cmx, $(PRETTYPRINTMODULES))
 
 $(PRETTYPRINTDEP) $(PRETTYPRINTCMO) $(PRETTYPRINTCMX): INCLUDES += -I src/tools
-
-PRETTYPRINTGENERATED = src/tools/why3pp_sexp.ml
-$(PRETTYPRINTDEP): $(PRETTYPRINTGENERATED)
-GENERATED += $(PRETTYPRINTGENERATED)
 
 # build targets
 

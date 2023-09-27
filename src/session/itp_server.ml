@@ -636,7 +636,19 @@ end
         let fn = Sysutil.absolutize_path
             (Session_itp.get_dir d.cont.controller_session) f in
  *)
-        let s = Sysutil.file_contents f in
+        let s, read_only = match file_format with
+          | "sexp" ->
+              let c = open_in f in
+              let s =
+                try
+                  let sexp = Mysexplib.input_sexp c in
+                  let ptree = Ptree.mlw_file_of_sexp sexp in
+                  close_in c;
+                  Format.asprintf "%a" (Mlw_printer.pp_mlw_file ~attr:false) ptree
+                with _ -> "<S-expression>"
+              in s,true
+          | _ -> Sysutil.file_contents f, read_only
+        in
         P.notify (File_contents (f, s, file_format, read_only))
     with Invalid_argument s ->
       P.notify (Message (Error s))
