@@ -911,7 +911,8 @@ let change_lang view lang =
       | ".ads" -> ada_lang ()
       | ".java" -> java_lang ()
       | ".c" -> c_lang ()
-      | _ -> why_lang ()
+      | ".mlw" | ".why" -> why_lang ()
+      | _ -> raise Exit
     in
     view#source_buffer#set_language (Some lang)
   with

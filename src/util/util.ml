@@ -116,16 +116,6 @@ let ansi_color_tags = Format.{
   print_close_stag = ignore;
 }
 
-let is_sexp_simple_token s =
-  let rec loop i =
-    i < 0 || (
-      match s.[i] with
-      | 'a'..'z' | 'A'..'Z' | '0'..'9' | '_' | '-' ->
-          (* Very conservative for compatiblity with python's sexpdata in bench/test_mlw_printer *)
-          loop (pred i)
-      | _ -> false ) in
-  String.length s > 0 && loop (pred (String.length s))
-
 let iter_first (type a) iter f =
   let exception Found of a in
   let f x = match f x with Some y -> raise (Found y) | None -> () in

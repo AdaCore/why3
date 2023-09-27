@@ -9,5 +9,19 @@
 (*                                                                  *)
 (********************************************************************)
 
+type sexp = unit
+
 module Std = struct end
 module Std_big_int = struct end
+
+exception Parse_error of string
+
+let () = Exn_printer.register (fun fmt exn -> match exn with
+  | Parse_error msg -> Format.fprintf fmt "Sexp parser syntax error: %s" msg
+  | _ -> raise exn)
+
+let input_sexp (_ : in_channel) : sexp =
+  raise (Parse_error "Not compiled with S-expression support")
+
+let output (_ : Format.formatter) (_ : sexp) : unit =
+  raise (Parse_error "Not compiled with S-expression support")
