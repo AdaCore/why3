@@ -265,6 +265,11 @@ and inner muc st regions e =
       let inv =
         List.map (fun i -> t_v_map (fun v -> t_var (FreshNames.pv st (restore_pv v) (restore_pv v)).pv_vs) i) inv
       in
+      let var =
+        List.map
+          (fun (i, l) -> (t_v_map (fun v -> t_var (FreshNames.pv st (restore_pv v) (restore_pv v)).pv_vs) i, l))
+          var
+      in
       let _, cond, regions = analyze muc st regions cond in
       let _, body, body_regions = analyze muc st Mpv.empty body in
 

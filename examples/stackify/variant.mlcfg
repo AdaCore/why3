@@ -1,0 +1,26 @@
+module Anders_Find
+  use int.Int
+  let rec cfg find [@cfg:stackify] [@cfg:subregion_analysis] (key : int) : int
+    
+   =
+   var cnt : int; 
+  {
+    cnt <- key;
+    goto BB0
+  }
+  BB0 {
+    variant { cnt };
+    switch (cnt > 0)
+    | True -> goto BB1
+    | False -> goto Exit
+    end
+  }
+  BB1 {
+    cnt <- cnt - 1;
+    goto BB0
+  }
+  Exit {
+    return 0
+  }
+  
+end
