@@ -56,3 +56,8 @@ let rec output fmt = function
   | Sexplib.Sexp.List l ->
       let pp_sep fmt () = fprintf fmt "@ " in
       fprintf fmt "@[<hv2>(%a)@]" (pp_print_list ~pp_sep output) l
+
+
+let sexp_of_string = Std.sexp_of_string
+
+let string_of_sexp = Std.string_of_sexp
