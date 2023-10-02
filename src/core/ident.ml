@@ -18,7 +18,6 @@ type attribute = {
   attr_string : string;
   attr_tag    : int;
 }
-[@@deriving sexp]
 
 module Attr = MakeMSH (struct
   type t = attribute
@@ -48,6 +47,14 @@ let list_attributes () =
 let attr_equal : attribute -> attribute -> bool = (==)
 let attr_hash a = a.attr_tag
 let attr_compare a1 a2 = Int.compare a1.attr_tag a2.attr_tag
+
+let sexp_of_attribute (a:attribute) =
+  Mysexplib.sexp_of_string a.attr_string
+[@@warning "-32"]
+
+let attribute_of_sexp (s : Mysexplib.sexp) =
+  create_attribute (Mysexplib.string_of_sexp s)
+[@@warning "-32"]
 
 (** Naming convention *)
 

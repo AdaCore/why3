@@ -20,8 +20,12 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | Parse_error msg -> Format.fprintf fmt "Sexp parser syntax error: %s" msg
   | _ -> raise exn)
 
-let input_sexp (_ : in_channel) : sexp =
-  raise (Parse_error "Not compiled with S-expression support")
+let error () = raise (Parse_error "Not compiled with S-expression support")
 
-let output (_ : Format.formatter) (_ : sexp) : unit =
-  raise (Parse_error "Not compiled with S-expression support")
+let input_sexp (_ : in_channel) : sexp = error ()
+
+let output (_ : Format.formatter) (_ : sexp) : unit = error ()
+
+let sexp_of_string (_ : string) : sexp = error ()
+
+let string_of_sexp (_ : sexp) : string = error ()
