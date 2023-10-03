@@ -378,6 +378,7 @@ module Why = struct
         ~limit driver task
     in
     let res = wait_on_call call in
+    Util.custom_timing "rac_prover" res.pr_time;
     Debug.dprintf debug_rac_check_sat "@[<h>Check term dispatch answer: %a@]@."
       print_prover_answer res.pr_answer;
     match res.pr_answer with

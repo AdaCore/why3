@@ -364,7 +364,7 @@ let prepare_task drv task =
   let lookup_transform t = lookup_transform t drv.drv_env, t in
   let transl = List.map lookup_transform drv.drv_transform in
   let apply task (tr,name) =
-    let task = Trans.apply tr task in
+    let task = Util.record_timing ("driver.trans." ^ name) Trans.apply tr task in
     Debug.dprintf driver_debug "Task after transformation: %s\n%a@."
       name Pretty.print_task task;
     task
