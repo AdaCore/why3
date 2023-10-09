@@ -22,11 +22,9 @@ let opt_outputdir = ref None
 let opt_timelimit = ref None
 let opt_stepslimit = ref None
 let opt_memlimit = ref None
-let opt_trans = ref [("split_vc",[])]
-let has_opt_trans = ref false
+let opt_trans = ref []
 
 let add_opt_trans x =
-  if not !has_opt_trans then (has_opt_trans := true; opt_trans := []);
   match String.split_on_char ' ' x with
   | [] -> assert false
   | name :: args ->
@@ -48,7 +46,7 @@ let spec =
       Hnd1 (AInt, fun i -> opt_stepslimit := Some i),
       "<steps> set the prover's step limit (no limit by default)" );
     ( Key ('a', "apply-transform"), Hnd1 (AString, add_opt_trans),
-    "<transf> apply a transformation to every task. Default: split_vc");
+    "<transf> apply a transformation to every task.");
     ( Key ('m', "memlimit"),
       Hnd1 (AInt, fun i -> opt_memlimit := Some i),
       "<MB> set the prover's memlimit" );
