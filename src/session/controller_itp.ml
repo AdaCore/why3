@@ -933,6 +933,29 @@ let run_strat_on_goal
                 (get_sub_tasks c.controller_session tid)
          in
         schedule_transformation c id trname args ~callback ~notification
+    | Scont (trname,args,strat) ->
+      let callback ntr =
+        callback_tr trname [] ntr;
+        match ntr with
+        | TSfatal(id, e) ->
+            callback (STSfatal (trname, id, e))
+        | TSfailed(_, NoProgress) -> (* The transformation had no effect, we apply the next strat *)
+          let t = get_task c.controller_session id in
+          let tree = strat c.controller_env t in
+          exec_strategy tree id;
+        | TSfailed(id, e) -> (* transformation failed *)
+            callback (STSfatal (trname, id, e))
+        | TSscheduled -> ()
+        | TSdone tid ->
+            List.iter
+              (fun id ->
+               let task = get_task c.controller_session id in
+               let tree = strat c.controller_env task in
+               let run_next () = exec_strategy tree id; false in
+               S.idle ~prio:0 run_next)
+              (get_sub_tasks c.controller_session tid)
+       in
+      schedule_transformation c id trname args ~callback ~notification
   in
   let t = get_task c.controller_session id in
   let tree = strat c.controller_env t in

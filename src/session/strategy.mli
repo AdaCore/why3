@@ -40,7 +40,10 @@ type t = instruction array
 
 
 
-type strat = Sdo_nothing | Sapply_trans of string * string list * strat list
+type strat =
+  | Sdo_nothing
+  | Sapply_trans of string * string list * strat list
+  | Scont of string * string list * (Env.env -> Task.task -> strat)
 
 exception StratFailure of string * exn
 exception UnknownStrat of string
