@@ -31,7 +31,7 @@ if [ -z "$(ls -A $BENCHDIR)" ]; then
 	SESPARENTDIR=$BENCHDIR/$(dirname $i)
         SESDIR=$SESPARENTDIR/$(basename $i .mlw)
 	mkdir -p $SESDIR
-	why3 session create $EX_LIB "$EXAMPLESDIR/$i" -o $SESDIR
+	why3 session create -a split_vc $EX_LIB "$EXAMPLESDIR/$i" -o $SESDIR
 	why3 session update $EX_LIB $EXTRACONF \
              --add-provers Z3,4.12.2,nombqi:Z3,4.12.2 $SESDIR
     done

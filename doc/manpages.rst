@@ -1591,12 +1591,15 @@ Command ``create``
 
 .. program:: why3 session create
 
-The :program:`why3 session create` command creates a new session
-containing the source files specified as arguments. The transformation
-`split_vc` is systematically applied on the generated goals, and
-proofs attempts are added using provers specified using option
-below. But it does not run any of these provers. One should use the
-`why3 bench` command on the new session instead.
+The :program:`why3 session create` command creates a new session containing the
+source files specified as arguments. Transformations and proofs attempts can be
+added using the options below. No prover is started with this command, and one
+should use the `why3 bench` command on the new session instead.
+
+.. option:: -a <transformation>
+
+   Specify a transformation to be applied before the proof nodes are added (can
+   be given several times to nest several transformations).
 
 .. option:: -P <prover1:prover2...>
 
