@@ -31,6 +31,8 @@ type strat =
   | Sdo_nothing
   | Sapply_trans of string * string list * strat list
   | Scont of string * string list * (Env.env -> Task.task -> strat)
+  | Scall_prover of
+      (Whyconf.prover * float option * int option * int option) list * strat
 
 let named s f env (t : Task.task) =
   try f env t with e -> raise (StratFailure (s,e))

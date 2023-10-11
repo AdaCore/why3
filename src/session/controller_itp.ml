@@ -911,7 +911,7 @@ let run_strategy_on_goal
   exec_strategy 0 strat id
 
 let run_strat_on_goal
-    c id strat ~callback_tr ~callback ~notification =
+    c id strat ~callback_pa ~callback_tr  ~callback ~notification =
   let rec exec_strategy tree id =
     match tree with
     | Sdo_nothing -> ()
@@ -956,6 +956,33 @@ let run_strat_on_goal
               (get_sub_tasks c.controller_session tid)
        in
       schedule_transformation c id trname args ~callback ~notification
+    | Scall_prover (is, strat) ->
+        let already_done = ref (List.length is) in
+        let callback panid res =
+           callback_pa panid res;
+           begin
+           match res with
+           | UpgradeProver _ | Scheduled | Running -> (* nothing to do yet *) ()
+           | Done { Call_provers.pr_answer = Call_provers.Valid } ->
+              (* proof succeeded, nothing more to do *)
+              interrupt_proof_attempts_for_goal c id;
+              already_done := 0;
+              callback STShalt
+           | Interrupted ->
+              already_done := 0;
+              callback STShalt
+           | Done _ | InternalFailure _ ->
+              already_done := !already_done - 1;
+              if !already_done = 0 then begin
+                (* proof did not succeed, goto to next step *)
+                let run_next () = exec_strategy strat id; false in
+                S.idle ~prio:0 run_next
+              end
+           (* should not happen *)
+           | Undone | Detached | Uninstalled _ | Removed _ -> assert false
+           end
+        in
+        List.iter (fun i -> call_one_prover c i ~callback ~notification id) is
   in
   let t = get_task c.controller_session id in
   let tree = strat c.controller_env t in
