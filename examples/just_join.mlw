@@ -23,6 +23,7 @@
 use int.Int
 use int.MinMax
 
+(** the type `elt` of elements, ordered with `lt` *)
 type elt
 
 val (=) (x y: elt) : bool
@@ -32,6 +33,8 @@ val predicate lt elt elt
 clone relations.TotalStrictOrder with
   type t = elt, predicate rel = lt, axiom .
 
+(** the type of AVL trees, with the height stored in the first component
+    so that we get the height in O(1) with function `ht` *)
 type tree = E | N int tree elt tree
 
 let function ht (t: tree) : int =
@@ -47,11 +50,14 @@ let rec ghost function height (t: tree) : int
   | N _ l _ r -> 1 + max (height l) (height r)
   end
 
+(** trees are well-formed i.e. the height stored in the nodes is correct *)
 predicate wf (t: tree) =
   match t with
   | E         -> true
   | N h l x r -> h = height t && wf l && wf r
   end
+
+(** AVL are binary search trees *)
 
 predicate mem (y: elt) (t: tree) =
   match t with
@@ -71,11 +77,18 @@ predicate bst (t: tree) =
   | N _ l x r -> bst l && tree_lt l x && bst r && lt_tree x r
   end
 
+(** AVL height invariant *)
 predicate avl (t: tree) =
   match t with
   | E         -> true
   | N _ l _ r -> avl l && avl r && -1 <= height l - height r <= 1
   end
+
+(** Code starts here
+
+  Note: It is a pity that the spec for `rotate_left` and `rotate_right` is
+  longer that the code, but we can't make them logical functions since
+  they are partial functions. *)
 
 let rotate_left (t: tree) : (r: tree)
   requires { wf t  } ensures { wf r  }
@@ -126,8 +139,9 @@ let rec join_right (l: tree) (x: elt) (r: tree) : tree
         let t = join_right lr x r in
         let t' = node ll lx t in
         if ht t <= ht ll + 1 then t' else rotate_left t'
-        (* The CRITICAL postcondition is used here, when `rotate_left`
-           is used, to show that the rotated tree is indeed an AVL. *)
+        (*                                ^^^^^^^^^^^^^^
+           The CRITICAL postcondition is used here
+           to show that the rotated tree is indeed an AVL. *)
   | E -> absurd
   end
 
@@ -154,6 +168,7 @@ let rec join_left (l: tree) (x: elt) (r: tree) : tree
         let t = join_left l x rl in
         let t' = node t rx rr in
         if ht t <= ht rr + 1 then t' else rotate_right t'
+        (*                                ^^^^^^^^^^^^^^^ *)
   | E -> absurd
   end
 
@@ -167,6 +182,8 @@ let join (l: tree) (x: elt) (r: tree) : tree
 =      if ht l > ht r + 1 then join_right l x r
   else if ht r > ht l + 1 then join_left  l x r
   else                         node       l x r
+
+(** The remaining is much simpler. *)
 
 let rec split (t: tree) (y: elt) : (l: tree, b: bool, r: tree)
   requires { wf t && bst t && avl t }
