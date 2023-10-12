@@ -193,7 +193,7 @@ let get_warnings () =
 let get_timings () =
   let l = Hashtbl.fold (fun k v acc -> (k,v)::acc) (Util.get_timings ()) [] in
   let get_name s = s in
-  "timings", Record (List.map (fun (k,v) -> get_name k, StandardFloat v) l)
+  "timings", Record (List.map (fun (k,(v,n)) -> get_name k, StandardFloat v) l)
 
 let get_session_dir () =
   "session_dir", String Gnat_config.session_dir
