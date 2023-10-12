@@ -254,10 +254,8 @@ let () = Debug.set_debug_formatter escape_formatter
 
 (* This is to be executed when scheduling ends *)
 let ending c () =
-  C.remove_all_valid_ce_attempt c.Controller_itp.controller_session;
-  Util.timing_step_completed "gnatwhy3.run_vcs";
-  C.save_session c;
-  Util.timing_step_completed "gnatwhy3.save_session";
+  Util.record_timing "gnatwhy3.run_vcs" C.remove_all_valid_ce_attempt c.Controller_itp.controller_session;
+  Util.record_timing "gnatwhy3.save_session" C.save_session c;
   Gnat_objectives.iter (report_messages c);
   let s = Buffer.contents escape_buffer in
   if s <> "" then
@@ -313,25 +311,21 @@ let _ =
       Format.fprintf fmt "@.@.===== %s@." Gnat_config.filename;
       Loc.set_warning_hook (fun ?loc:_ line -> Format.fprintf fmt "%s@." line)
     with Not_found -> () );
-  Util.init_timing ();
   try
-    let c = Gnat_objectives.init_cont () in
+    let c = Util.record_timing "gnatwhy3.init" Gnat_objectives.init_cont () in
     (* This has to be done after initialization of controller. Otherwise we
        don't have session. *)
     Sys.set_signal Sys.sigint (Sys.Signal_handle (save_session_and_exit c));
-    Util.timing_step_completed "gnatwhy3.init";
     begin match Gnat_config.proof_mode with
     | Gnat_config.Progressive
     | Gnat_config.Per_Path
     | Gnat_config.Per_Check ->
-        C.iter_subps c (normal_handle_one_subp c);
-        Util.timing_step_completed "gnatwhy3.register_vcs";
+        Util.record_timing "gnatwhy3.register_vcs" C.iter_subps c (normal_handle_one_subp c);
         if Gnat_config.replay then begin
           C.replay c (*;
           Gnat_objectives.do_scheduled_jobs (fun _ _ -> ());*)
         end else begin
-          Gnat_objectives.iter (handle_obj c);
-          Util.timing_step_completed "gnatwhy3.schedule_vcs";
+          Util.record_timing "gnatwhy3.schedule_vcs" Gnat_objectives.iter (handle_obj c);
         end;
      | Gnat_config.All_Split ->
         C.iter_subps c (all_split_subp c)

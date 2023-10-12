@@ -18,7 +18,6 @@ type attribute = {
   attr_string : string;
   attr_tag    : int;
 }
-[@@deriving sexp]
 
 module Attr = MakeMSH (struct
   type t = attribute
@@ -39,6 +38,9 @@ let create_attribute s = Hsattr.hashcons {
   attr_string = s;
   attr_tag    = -1
 }
+
+let sexp_of_attribute a = Mysexplib.Std.sexp_of_string a.attr_string
+let attribute_of_sexp s = create_attribute (Mysexplib.Std.string_of_sexp s)
 
 let list_attributes () =
   let acc = ref [] in

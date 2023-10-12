@@ -63,26 +63,6 @@ let anyd fold pr1 pr2 x =
 let ttrue _ = true
 let ffalse _ = false
 
-let last_timing = ref 0.
-
-let timing_map : (string, float) Hashtbl.t = Hashtbl.create 17
-
-let init_timing () =
-  last_timing := (Unix.times ()).Unix.tms_utime
-
-let timing_step_completed str =
-  let now = (Unix.times ()).Unix.tms_utime in
-  let consumed = now -. !last_timing in
-  last_timing := now;
-  try
-    let cur = Hashtbl.find timing_map str in
-    Hashtbl.replace timing_map str (cur +. consumed)
-  with Not_found ->
-    Hashtbl.add timing_map str consumed
-
-let get_timings () = timing_map
-
-
 type _ cmptr = Cmptr : {proj: 'a -> 'b; cmp: 'b -> 'b -> int} -> 'a cmptr
 
 type 'a compare = 'a -> 'a -> int
@@ -174,3 +154,23 @@ let split_version s =
           aux_num (i + 1) (String.sub s j (i - j)) (Char.code c - Char.code '0')
       | _ -> aux_str (i + 1) j in
   aux_str 0 0
+
+let timings_map = Hashtbl.create 42
+let get_timings () = timings_map
+let print_timings () =
+  Hashtbl.iter (fun tr_name (time, n) ->
+    Format.printf "[%f:%d:%s]@." time n tr_name
+    ) timings_map
+let record_timing name f arg = 
+  let begin_time = Unix.times () in
+  let result = f arg in
+  let end_time = Unix.times () in
+  let t = Unix.(end_time.tms_utime -. begin_time.tms_utime)
+  in let old_t, old_n = try Hashtbl.find timings_map name
+  with Not_found -> 0.0, 0
+  in Hashtbl.replace timings_map name (old_t +. t, old_n + 1);
+  result
+let custom_timing name time =
+  let old_t, old_n = try Hashtbl.find timings_map name
+  with Not_found -> 0.0, 0 in
+  Hashtbl.replace timings_map name (old_t +. time, old_n +1)

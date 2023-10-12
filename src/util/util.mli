@@ -71,22 +71,6 @@ val ffalse : 'a -> bool
 val ttrue : 'a -> bool
 (** Constant function [true] *)
 
-(* timing functions allow to measure CPU time consumption of parts of Why3 *)
-
-val init_timing : unit -> unit
-(* call this function to start measurements *)
-
-val timing_step_completed : string -> unit
-(* call this function to signal the completion of a processing step identified
-   by a string. The consumed CPU time since the last call of init_timing or
-   timing_step_completed will be considered as the time consumed by that
-   processing step. If the function is called more than once with the same
-   string argument, processing times will accumulate. *)
-
-val get_timings : unit -> (string, float) Hashtbl.t
-(* return the current timings obtained by calls to init_timing and
- * timing_step_completed *)
-
 (** [iter_first iter f] returns the first result of [f] that is inhabitated,
     when applied on the elements encountered by iterator [iter]. Generalisation
     of {!Lists.first}.
@@ -146,3 +130,14 @@ val split_version : string ->  (string * int) list
 (** Split a version string into its components. For example, ["2.1~beta3"] is
     split into ["",2;".",1;"~beta",3]. When compared lexicographically, the
     resulting list respects the traditional ordering on version strings. *)
+
+val record_timing : string -> ('a -> 'b) -> 'a -> 'b
+(** Wrap a function call with this function in order to record its execution
+    time in a global table. The cumulative timing and number of recordings for
+    each name is stored. Timings recorded here can be accessed via the
+    get_timings function or printed with print_timings. Timings obtained externally
+    (e.g. from provers output) can be added with custom_timings.*)
+
+val print_timings : unit -> unit
+val custom_timing : string -> float -> unit
+val get_timings :   unit -> (string, (float * int)) Hashtbl.t
