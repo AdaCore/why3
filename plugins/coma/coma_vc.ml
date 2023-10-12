@@ -171,7 +171,7 @@ let rec havoc c wr pl =
 
 and undef h c pl sf _ bl =
   let gl = sf && c.c_gl in
-  if gl then Loc.errorm ?loc:h.hs_name.id_loc "handler `%a' undefined" Coma_syntax.pp_hs h;
+  if gl then Loc.errorm ?loc:h.hs_name.id_loc "vc: handler `%a' undefined" Coma_syntax.pp_hs h;
   (* if gl then w_false else *)
   w_and (if gl then w_false else w_true) (
   let lc = if sf then c.c_lc else Shs.empty in
@@ -190,7 +190,9 @@ and undef h c pl sf _ bl =
     | Pc (h,wr,pl) -> Some (expand h wr pl)
     | Pt _ | Pv _ | Pr _ -> None) pl))
 
-let rec vc pp dd e c bl = match e with
+let rec vc pp dd e c bl =
+  if not pp && not dd && bl = [] then w_true else
+  match e with
   | Esym h ->
       callsym pp h c bl
   | Eapp (e, a) ->
@@ -205,6 +207,7 @@ let rec vc pp dd e c bl = match e with
       let lc = List.fold_left (fun s -> function
         | Pt _ | Pv _ | Pr _ -> s
         | Pc (h,_,_) -> Shs.add h s) Shs.empty pl in
+      if pp && dd || Shs.is_empty lc then close (vc pp dd e c []) else
       let cc = { c with c_lc = lc; c_gl = false } in
       close (w_and (vc pp dd e c []) (vc (not pp) (not dd) e cc []))
   | Edef (e,flat,dfl) -> assert (bl = []);

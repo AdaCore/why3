@@ -151,3 +151,46 @@ module Zipper
   end
 
 end
+
+(* monomorphic AVL trees, for the purpose of Coma tests *)
+module AVL
+
+  use int.Int
+  use int.MinMax
+
+  type elt
+
+  val predicate lt elt elt
+  clone relations.TotalStrictOrder with
+    type t = elt, predicate rel = lt, axiom .
+
+  (* binary trees with height stored in nodes *)
+  type tree = E | N int tree elt tree
+
+  let function ht (t: tree) : int =
+    match t with E -> 0 | N h _ _ _ -> h end
+
+  (* smart constructor *)
+  let function node (l: tree) (x: elt) (r: tree) : tree =
+    N (1 + max (ht l) (ht r)) l x r
+
+  let rec ghost function height (t: tree) : int
+    ensures { result >= 0 }
+  = match t with
+    | E         -> 0
+    | N _ l _ r -> 1 + max (height l) (height r)
+    end
+
+  predicate wf (t: tree) =
+    match t with
+    | E         -> true
+    | N h l _ r -> h = height t && wf l && wf r
+    end
+
+  predicate avl (t: tree) =
+    match t with
+    | E         -> true
+    | N _ l _ r -> avl l && avl r && -1 <= height l - height r <= 1
+    end
+
+end
