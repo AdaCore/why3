@@ -2,6 +2,9 @@
 - Selected model 0: NC
   - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_poly.mlw", line 8, characters 4-8)
   - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_poly.mlw", line 8, characters 4-8)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_poly.mlw", line 8, characters 4-8)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_poly.mlw", line 8, characters 4-8)
 File "bench/check-ce/array_poly.mlw", line 8, characters 4-8:
 Sub-goal Index in array bounds of goal f1'vc.
 Prover result is: Unknown (unknown + incomplete) (2440 steps).
@@ -63,6 +66,13 @@ Prover result is: Unknown (unknown + incomplete) (2664 steps).
 The following counterexample model could not be verified
   (both RAC terminated with uncaught exception):
 File array.mlw:
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_4661 bOUND_VARIABLE_4671 -> 2
   Line 232:
     sorted : array int -> bool = [|_ => false|]
 
@@ -79,6 +89,13 @@ Prover result is: Unknown (unknown + incomplete) (2690 steps).
 The following counterexample model could not be verified
   (both RAC terminated with uncaught exception):
 File array.mlw:
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_4701 bOUND_VARIABLE_4711 -> 2
   Line 232:
     sorted : array int -> bool = [|_ => false|]
 

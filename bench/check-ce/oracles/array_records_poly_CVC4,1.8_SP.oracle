@@ -11,6 +11,14 @@ Prover result is: Unknown (unknown + incomplete) (3379 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_5431 bOUND_VARIABLE_5441 -> 0
+    length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
@@ -56,6 +64,14 @@ Prover result is: Unknown (unknown + incomplete) (3436 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_5523 bOUND_VARIABLE_5531 -> 0
+    length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
@@ -104,6 +120,14 @@ Prover result is: Unknown (unknown + incomplete) (3617 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_5723 bOUND_VARIABLE_5731 -> 0
+    length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
@@ -160,6 +184,24 @@ Prover result is: Step limit exceeded (150291 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
+  Line 16:
+    elts :
+      array
+      basic_record
+      ->
+      int
+      ->
+      basic_record = [|_ =>
+                       [|_ =>
+                         {flag = true; first_value = 3; second_value = 0}|]|]
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_6881 bOUND_VARIABLE_6893 -> 0
+    length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
@@ -217,6 +259,24 @@ Prover result is: Step limit exceeded (150301 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
+  Line 16:
+    elts :
+      array
+      basic_record
+      ->
+      int
+      ->
+      basic_record = [|_ =>
+                       [|_ =>
+                         {flag = true; first_value = 3; second_value = 0}|]|]
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_7023 bOUND_VARIABLE_7035 -> 0
+    length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
@@ -277,6 +337,24 @@ Prover result is: Step limit exceeded (150309 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array.mlw:
+  Line 16:
+    elts :
+      array
+      basic_record
+      ->
+      int
+      ->
+      basic_record = [|_ =>
+                       [|_ =>
+                         {flag = true; first_value = 3; second_value = 0}|]|]
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_7391 bOUND_VARIABLE_7401 -> 0
+    length : array basic_record -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
@@ -341,6 +419,15 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (150585 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_8311 bOUND_VARIABLE_8321 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
@@ -391,6 +478,15 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (150599 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_8451 bOUND_VARIABLE_8461 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
@@ -444,6 +540,26 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (150060 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 16:
+    elts :
+      array
+      basic_record
+      ->
+      int
+      ->
+      basic_record = [|_ =>
+                       [|-1 =>
+                         {flag = false; first_value = 1; second_value = 2};
+                       _ => {flag = false; first_value = 1; second_value = 2}|]|]
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_8883 bOUND_VARIABLE_8891 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => false|]
@@ -497,6 +613,15 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (157573 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_9651 bOUND_VARIABLE_9661 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 17:
     first_val :
@@ -581,6 +706,15 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (157763 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_9793 bOUND_VARIABLE_9801 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 17:
     first_val :
@@ -669,6 +803,15 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (157794 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_9983 bOUND_VARIABLE_9993 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 17:
     first_val :
@@ -765,6 +908,15 @@ Sub-goal Postcondition of goal var_overwrite'vc.
 Prover result is: Unknown (unknown + incomplete) (10822 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_11281 bOUND_VARIABLE_11293 -> 0
+    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 17:
     first_val :

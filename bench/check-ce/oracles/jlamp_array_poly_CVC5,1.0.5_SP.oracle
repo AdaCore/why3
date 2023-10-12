@@ -10,6 +10,10 @@ Sub-goal Index in array bounds of goal f'vc.
 Prover result is: Unknown (unknown + incomplete) (2121 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : ty -> uni -> int = fun $x116 $x27 -> 2
+    length : array t -> int = [|_ => 0|]
 File jlamp_array_poly.mlw:
   Line 8:
     to_int :
@@ -33,6 +37,10 @@ Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown (unknown + incomplete) (2114 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : ty -> uni -> int = fun $x133 $x216 -> 2
+    length : array t -> int = [|_ => 0|]
 File jlamp_array_poly.mlw:
   Line 8:
     to_int :
@@ -63,6 +71,16 @@ Prover result is: Step limit exceeded (150208 steps).
 The following counterexample model could not be verified
   (both RAC terminated because index is out of bounds):
 File array.mlw:
+  Line 16:
+    elts : array t -> int -> t = [|_ => [|_ => {Array.to_int => 0}|]|]
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_6385 bOUND_VARIABLE_6386 -> 0
+    length : array t -> int = [|_ => 0|]
   Line 20:
     mixfix [] :
       array
