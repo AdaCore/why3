@@ -1033,7 +1033,8 @@ let tuple_theory = Hint.memo 17 (fun n ->
   let ts = ts_tuple n and fs = fs_tuple n in
   let pl = List.map (fun _ -> None) ts.ts_args in
   let nm = "Tuple" ^ string_of_int n in
-  let uc = empty_theory (id_fresh nm) ["why3";nm] in
+  let attrs = Sattr.singleton builtin_attr in
+  let uc = empty_theory (id_fresh ~attrs nm) ["why3";nm] in
   let uc = add_data_decl uc [ts, [fs,pl]] in
   close_theory uc)
 

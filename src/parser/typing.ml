@@ -1344,6 +1344,7 @@ let add_types muc tdl =
               let v = try Hstr.find hfd nm with Not_found ->
                 (* add proper attribute for later printing in dotted notation `t.id` *)
                 let id = add_is_field_attr id in
+                let id = { id with id_ats = ATstr builtin_attr :: id.id_ats } in
                 let v = create_pvsymbol (create_user_id id) ~ghost ity in
                 Hstr.add hfd nm v;
                 v in
@@ -1378,6 +1379,7 @@ let add_types muc tdl =
           let {id_str = nm; id_loc = loc} = fd.f_ident in
           (* add proper attribute for later printing in dotted notation `t.id` *)
           let id = add_is_field_attr fd.f_ident in
+          let id = { id with id_ats = ATstr builtin_attr :: id.id_ats } in
           (* create metas for recovering record values from cex generation *)
           meta_records := id :: !meta_records;
           let id = create_user_id id in

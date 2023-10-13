@@ -352,6 +352,8 @@ let sanitizer head rest n = sanitizer' head rest rest n
 
 let is_field_id_attr = create_attribute "is_field_id"
 
+let builtin_attr = create_attribute "builtin"
+
 let proxy_attr = create_attribute "mlw:proxy_symbol"
 
 let useraxiom_attr = create_attribute "useraxiom"

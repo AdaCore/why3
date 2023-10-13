@@ -1041,7 +1041,8 @@ let fs_tuple = Hint.memo 17 (fun n ->
   let ts = ts_tuple n in
   let tl = List.map ty_var ts.ts_args in
   let ty = ty_app ts tl in
-  let id = id_fresh ("Tuple" ^ string_of_int n) in
+  let attrs = Sattr.singleton builtin_attr in
+  let id = id_fresh ~attrs ("Tuple" ^ string_of_int n) in
   let fs = create_fsymbol ~constr:1 id tl ty in
   Hid.add fs_tuple_ids fs.ls_name n;
   fs)

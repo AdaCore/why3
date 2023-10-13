@@ -646,6 +646,24 @@ module Log = struct
     Mstr.map (Mint.map List.rev)
       (List.fold_right aux log Mstr.empty)
 
+  let get_exec_calls_and_loops env log =
+    let filter entry =
+      match entry.log_desc with
+      | Exec_call (Some rs, _, _) ->
+        let is_builtin = Sattr.mem builtin_attr rs.rs_name.id_attrs in
+        let is_stdlib =
+          try
+            let rs_path,_,_ = Pmodule.restore_path rs.rs_name in
+            let rs_path = Env.locate_library env rs_path in
+            Strings.has_prefix !Whyconf.stdlib_path rs_path
+          with
+          | Not_found | Env.LibraryNotFound _
+          | Env.AmbiguousPath _ | Invalid_argument _ -> false in
+        not (is_builtin || is_stdlib)
+      | Exec_call (None, _ , _) -> true
+      | Iter_loop _ -> true
+      | _ -> false in
+    List.filter filter log
 end
 
 type bunch = term list list ref

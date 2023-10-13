@@ -208,6 +208,8 @@ let datadir =
 
 let set_datadir m d = { m with datadir = d}
 
+let stdlib_path = ref ""
+
 let default_loadpath m =
   [ Filename.concat (datadir m) "stdlib" ]
 
@@ -218,9 +220,14 @@ let loadpath =
   in
   fun m ->
     match env_loadpath with
-    | Some l -> l
+    | Some l -> stdlib_path := List.hd l; l
     | None ->
-      let stdlib = if m.stdlib then default_loadpath m else [] in
+      let stdlib =
+        if m.stdlib then
+          let loadpath = default_loadpath m in
+          let () = stdlib_path := List.hd loadpath in
+          loadpath
+        else [] in
       m.loadpath@stdlib
 
 let set_loadpath m l = { m with loadpath = l}

@@ -357,7 +357,7 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
       (Call_provers.print_prover_result ~json:false) res;
     Opt.iter
       (Check_ce.print_model_classification ?json
-         ?verb_lvl:!opt_ce_log_verbosity ~check_ce:!opt_check_ce_model fmt)
+         ?verb_lvl:!opt_ce_log_verbosity ~check_ce:!opt_check_ce_model env fmt)
       ce;
     fprintf fmt "@\n"
 
