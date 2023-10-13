@@ -2578,7 +2578,15 @@ let init_completion provers transformations strategies commands =
   in
   List.iter add_completion_entry all_strings;
   List.iter (add_submenu_strategy strategies_factory context_factory) strategies;
-
+  (* Add goal oriented stategies in strategies menu *)
+  let strategies = Strategy.list_strats () in
+  let strategies = List.map (fun (strat, desc) ->
+                              let desc = string_of_desc (strat, desc) in
+                              (strat, desc)) strategies in
+  strategies_factory#add_separator();
+  context_factory#add_separator();
+  List.iter (add_submenu_strategy strategies_factory context_factory) strategies;
+  List.iter add_completion_entry strategies;
   command_entry_completion#set_text_column completion_col;
   (* Adding a column which contains the description of the
      prover/transformation/strategy. *)

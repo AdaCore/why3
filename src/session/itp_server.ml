@@ -1385,6 +1385,20 @@ match pa.proof_state with
       Not_found ->
       Debug.dprintf debug_strat "[strategy_exec] strategy '%s' not found@." s
 
+  let run_strat_on_task nid s =
+    let d = get_server_data () in
+    let any = any_from_node_ID nid in
+    match any with
+    | Some (Session_itp.APn id) ->
+      let callback sts =
+        Debug.dprintf debug_strat "[strategy_exec] strategy status: %a@." print_strategy_status sts
+      in
+      let callback_pa = callback_update_tree_proof d.cont in
+      let callback_tr tr args st = callback_update_tree_transform tr args st in
+      C.run_strat_on_goal d.cont id s
+        ~callback_tr ~callback_pa ~callback ~notification:(notify_change_proved d.cont)
+    | _ -> P.notify (Message (Error "Please select a node id"))
+
 
   (* ----------------- Clean session -------------------- *)
   let clean nid =
@@ -1695,6 +1709,7 @@ match pa.proof_state with
          | Transform (s, _t, args) ->
             apply_transform nid s args;
             session_needs_saving := true
+         | Strat (_, s) -> run_strat_on_task nid s
          | Query s                 ->
             P.notify (Message (Query_Info (nid, s)))
          | Prove (p, limit)        ->
