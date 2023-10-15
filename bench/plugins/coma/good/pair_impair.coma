@@ -1,0 +1,43 @@
+use int.Int
+use int.EuclideanDivision
+
+let halt [] = (? any)
+
+let if {b: bool} (then) (else) =
+  any [ then -> {b}     (! then)
+      | else -> {not b} (! else) ]
+
+-- let rec pair {n: int} (ret {o : int}) =
+--   {n >= 0}
+--   if {n = 0}
+--      (-> (! ret)
+--          [ ret -> { mod n 2 = 0 } (! ret {n})])
+--      (-> impair {n-2} ret)
+
+-- with impair {n: int} (ret {o : int}) =
+--   {n >= 0}
+--   if {n = 1}
+--      (-> (! ret)
+--          [ ret -> { mod n 2 = 1 } (! ret {n})])
+--      (-> pair {n-2} ret)
+
+let rec pair {n: int} (onp {o : int}) (oni {o : int}) =
+  {n >= 0}
+  (if {n = 0}
+     (-> (! ret {n}))
+     (-> impair {n-1} onp oni))
+  [ ret {r : int} -> { mod r 2 = 0 } (! onp {r})]
+
+with impair {n: int} (onp {o : int}) (oni {o : int}) =
+  {n >= 0}
+  (if {n = 1}
+     (-> (! ret {n}))
+     (-> pair {n-1} onp oni))
+  [ ret {r : int} -> { mod r 2 = 1 } (! oni {r})]
+
+
+-- let tester {n: int} (return) =
+--   pair {n}
+--      (fun {o:int} -> { mod o 2 = 0 } (! out))
+--      (fun {o:int} -> { mod o 2 = 1 } (! out))
+--   [ out -> (! return) ]

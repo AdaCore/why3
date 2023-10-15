@@ -26,7 +26,7 @@ let mk_defn d loc = { pdefn_desc = d; pdefn_loc = Loc.extract loc }
 %%
 
 top_level:
-| uses* letdefn(EQUAL)* EOF
+| uses* coma_top_lvl* EOF
   { $1, $2 }
 
 uses:
@@ -43,9 +43,13 @@ uses:
 /* ty_var:
 | attrs(quote_lident) { $1 } */
 
-letdefn(X):
-| LET d=defn(X)
-  { d }
+coma_top_lvl:
+| LET REC separated_nonempty_list(WITH, defn(EQUAL))
+  { Defs $3 }
+| LET defn(EQUAL)
+  { Defs [$2] }
+/* | LET coma_let*
+  { Lets $2 } */
 
 defn(X):
 | id=lident w=prewrites p=coma_params X e=coma_prog

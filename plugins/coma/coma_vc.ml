@@ -28,6 +28,10 @@ let t_and_asym_simp = t_and_asym
 let t_implies_simp = t_implies
 let t_forall_close_simp = t_forall_close *)
 
+let debug_slow = Debug.register_info_flag "coma_no_merge"
+  ~desc:"Disable@ subgoal@ factorization."
+
+exception BadUndef of hsymbol
 
 type wpsp = {
   wp: term;
@@ -92,6 +96,8 @@ let c_empty = {
   c_gl = true;
 }
 
+let c_glob = ref c_empty
+
 let c_find_tv c u = Mtv.find u c.c_tv
 let c_find_vs c v = Mvs.find v c.c_vs
 let c_find_hs c h = Mhs.find h c.c_hs
@@ -131,15 +137,15 @@ let rec consume merge c pl bl =
   c, discharge zl hl
 
 and factorize merge c zl0 hl h wr pl kk =
-  if true then kk,zl0,hl else
-  if not merge || List.exists (function
+  if not merge || Debug.test_flag debug_slow || List.exists (function
     | Pt _ | Pc _ -> true | Pv _ | Pr _ -> false) pl then kk,zl0,hl else
   let dup (l,m) v = let z = c_clone_vs c v in z::l, Mvs.add v (t_var z) m in
-  let zl,zm = List.fold_left (fun a -> function Pt _ | Pc _ -> assert false
+  let zl, zm = List.fold_left (fun a -> function Pt _ | Pc _ -> assert false
     | Pv v | Pr v -> dup a v) (List.fold_left dup (zl0, Mvs.empty) wr) pl in
+  let zc = { c_empty with c_vs = zm } in
   let bl = List.map (function Pt _ | Pc _ -> assert false
     | Pr v -> Br (Mvs.find v zm,v) | Pv v -> Bv (Mvs.find v zm)) pl in
-  let zw = kk true { c_empty with c_vs = zm } bl in
+  let zw = try kk true zc bl with BadUndef _ -> w_false in
   if is_true zw.wp || is_false zw.wp then kk,zl0,hl else
   let hc = create_hsymbol (id_clone h.hs_name) in
   let zk sf c bl = if not sf then w_true else
@@ -149,12 +155,12 @@ and factorize merge c zl0 hl h wr pl kk =
     { wp = t_true; sp = sp } in
   zk, zl, (hc,zw)::hl
 
-and discharge zl hl w =
-  if hl = [] then w else
+and discharge zl hl ws =
+  if hl = [] then ws else
   let wl,sp = List.fold_left (fun (wl,sp) (hc,zw) ->
     w_implies (Mhs.find_def t_false hc sp) zw :: wl,
-    Mhs.remove hc sp) ([], w.sp) hl in
-  let wl = { w with sp = sp } :: wl in
+    Mhs.remove hc sp) ([], ws.sp) hl in
+  let wl = { ws with sp = sp } :: wl in
   w_forall (List.rev zl) (w_and_l wl)
 
 let rec havoc c wr pl =
@@ -170,12 +176,9 @@ let rec havoc c wr pl =
   c, List.rev vl
 
 and undef h c pl sf _ bl =
-  let gl = sf && c.c_gl in
-  if gl then Loc.errorm ?loc:h.hs_name.id_loc "vc: handler `%a' undefined" Coma_syntax.pp_hs h;
-  (* if gl then w_false else *)
-  w_and (if gl then w_false else w_true) (
+  if sf && c.c_gl then raise (BadUndef h);
   let lc = if sf then c.c_lc else Shs.empty in
-  let c = { c with c_lc = lc; c_gl = gl } in
+  let c = { c with c_lc = lc; c_gl = false } in
   let c,_ = consume false c pl bl in
   let expand h wr pl =
     let h = c_find_hs c h in
@@ -188,10 +191,11 @@ and undef h c pl sf _ bl =
     w_forall vl (h true c (List.map mkb pl)) in
   w_and_l (List.filter_map (function
     | Pc (h,wr,pl) -> Some (expand h wr pl)
-    | Pt _ | Pv _ | Pr _ -> None) pl))
+    | Pt _ | Pv _ | Pr _ -> None) pl)
 
 let rec vc pp dd e c bl =
-  if not pp && not dd && bl = [] then w_true else
+  if ((not c.c_gl && Shs.is_empty c.c_lc) ||
+    not (pp || dd)) && bl = [] then w_true else
   match e with
   | Esym h ->
       callsym pp h c bl
@@ -207,22 +211,23 @@ let rec vc pp dd e c bl =
       let lc = List.fold_left (fun s -> function
         | Pt _ | Pv _ | Pr _ -> s
         | Pc (h,_,_) -> Shs.add h s) Shs.empty pl in
-      if pp && dd || Shs.is_empty lc then close (vc pp dd e c []) else
       let cc = { c with c_lc = lc; c_gl = false } in
-      close (w_and (vc pp dd e c []) (vc (not pp) (not dd) e cc []))
+      let ww = vc (not pp) (not dd) e cc [] in
+      close (w_and (vc pp dd e c []) ww)
   | Edef (e,flat,dfl) -> assert (bl = []);
       let pl = List.map (fun (h,w,pl,_) -> Pc (h,w,pl)) dfl in
       let c = if flat then c else fst (havoc c [] pl) in
-      let spec (_,_,pl,d) = Bc (c, fun c bl ->
+      let bl = List.map (fun (_,_,pl,d) -> Bc (c, fun c bl ->
         let c, close = consume true c pl bl in
-        close (vc true false d c [])) in
-      let cc, close = consume flat c pl (List.map spec dfl) in
-      let impl (_,wr,pl,d) =
-        let c,vl = havoc (if flat then c else cc) wr pl in
-        w_forall vl (vc false pp d c []) in
-      let w = vc pp dd e cc [] in
-      if flat then w_and_l ((close w :: List.map impl dfl))
-              else close (w_and_l (w :: List.map impl dfl))
+        close (vc true false d c []))) dfl in
+      let cc, close = consume flat c pl bl in
+      let wl = List.map (fun (_,w,pl,d) ->
+        let c, vl = havoc (if flat then c else cc) w pl in
+        w_forall vl (vc false pp d c [])) dfl in
+      (* VC(e) must be done after wl for c_glob *)
+      let ws = vc pp dd e cc [] in
+      if flat then w_and_l ((close ws :: wl))
+              else close (w_and_l (ws :: wl))
   | Eset (e,vtl) -> assert (bl = []);
       let add cc (v,s) = c_add_vs cc v (c_inst_t c s) in
       vc pp dd e (List.fold_left add c vtl) bl
@@ -235,7 +240,15 @@ let rec vc pp dd e c bl =
         (c_inst_t c f) (vc pp dd e c bl)
   | Ebox e -> assert (bl = []); vc dd dd e c bl
   | Ewox e -> assert (bl = []); vc pp pp e c bl
-  | Eany   -> assert (bl = []); w_true
+  | Eany   -> assert (bl = []); c_glob := c; w_true
 
-let vc e = (vc true true e c_empty []).wp
+let vc_expr c e = (vc true true e c []).wp
 
+let vc_defn c flat dfl =
+  let w = vc true true (Edef (Eany,flat,dfl)) c [] in
+  !c_glob, w.wp
+
+let () = Exn_printer.register (fun fmt -> function
+  | BadUndef h -> Format.fprintf fmt
+      "Handler %a is used in an illegal position" Coma_syntax.pp_hs h
+  | exn -> raise exn)

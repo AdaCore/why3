@@ -16,14 +16,6 @@ open Ptree
 
 let debug = Debug.register_flag "coma" ~desc:"coma plugin debug flag"
 
-let mk_goal tuc s e =
-  let prs = Decl.create_prsymbol (Ident.id_fresh ("vc_" ^ s)) in
-  Theory.add_prop_decl tuc Decl.Pgoal prs (vc e)
-
-(* let add_vc tuc (s, _, _, d) = mk_goal tuc s.hs_name.id_string d *)
-
-let add_vcf tuc name d = mk_goal tuc name d
-
 let qualid_last = function Qident x | Qdot (_, x) -> x
 let use_as q = function Some x -> x | None -> qualid_last q
 
@@ -43,35 +35,28 @@ let parse_simpl_use env tuc = function
       let tuc = Theory.use_export tuc th in
       Theory.close_scope ~import tuc
 
+let add_def (c,tuc) (s,flat,dfl) =
+  let c,f = vc_defn c flat dfl in
+  let prs = Decl.create_prsymbol (Ident.id_fresh ("vc_" ^ s)) in
+  c, Theory.add_prop_decl tuc Decl.Pgoal prs f
+
 let read_channel env path file c =
-
   let uses, ast = Coma_lexer.parse_channel file c in
-
   let tuc = Theory.create_theory ~path (Ident.id_fresh "Coma") in
   let tuc = Theory.use_export tuc Theory.bool_theory in
   let tuc = List.fold_left (parse_simpl_use env) tuc uses in
-
-  let factor def e = {
-    pexpr_desc = PEdef (e, false, [def]);
-    pexpr_loc  = def.pdefn_loc;
-  } in
-
-  let eany = { pexpr_loc = Loc.dummy_position ; pexpr_desc = PEany } in
-  let astf = List.fold_right factor ast eany in
-
-  let astf = type_prog tuc ctx0 astf in
-
-  Debug.dprintf debug "\n@.@[%a@]\n@." Coma_syntax.pp_expr astf;
-
-  (* let _ctx, ast = Lists.map_fold_left (type_defn tuc) ctx0 ast in
-     let ast = (create_hsymbol (id_fresh "dummy"), [], [], _expr2) :: ast in
-     let tuc = List.fold_left add_vc tuc ast in *)
-
-  let tuc = add_vcf tuc file astf in
-
-  (* let tuc = mk_goal tuc "expr1" expr1 in
-     let tuc = mk_goal tuc "expr2" expr2 in *)
-
+  let _, ast =
+    List.fold_left_map
+      (fun ctx (Defs d) -> type_defn_list tuc ctx false d)
+      ctx0 ast in
+  List.iter (Debug.dprintf debug "\n@[%a@]@." Coma_syntax.pp_def_block) ast;
+  let ast =
+    List.map
+      (fun d ->
+        let {hs_name}, _, _, _ = List.hd d in
+        hs_name.Ident.id_string, false, d)
+      ast in
+  let _,tuc = List.fold_left add_def (c_empty, tuc) ast in
   Wstdlib.Mstr.singleton "Coma" (Theory.close_theory tuc)
 
 let () = Env.register_format Env.base_language "coma" ["coma"] read_channel

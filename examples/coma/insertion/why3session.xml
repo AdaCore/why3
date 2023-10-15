@@ -3,22 +3,26 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.11.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="coma" proved="true">
 <path name=".."/><path name="insertion.coma"/>
 <theory name="Coma" proved="true">
- <goal name="vc_/Users/paulpatault/git/why3/examples/coma/insertion.coma" proved="true">
+ <goal name="vc_if" proved="true">
+ <proof prover="0"><result status="valid" time="0.015626" steps="2"/></proof>
+ </goal>
+ <goal name="vc_unList" proved="true">
+ <proof prover="0"><result status="valid" time="0.014338" steps="2"/></proof>
+ </goal>
+ <goal name="vc_insert" proved="true">
  <transf name="split_vc" proved="true" >
-  <goal name="vc_/Users/paulpatault/git/why3/examples/coma/insertion.coma.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.019717" steps="33"/></proof>
+  <goal name="vc_insert.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.013582" steps="17"/></proof>
   </goal>
-  <goal name="vc_/Users/paulpatault/git/why3/examples/coma/insertion.coma.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.013582" steps="11"/></proof>
-  </goal>
-  <goal name="vc_/Users/paulpatault/git/why3/examples/coma/insertion.coma.2" proved="true">
-  <proof prover="0"><result status="valid" time="0.222943" steps="4068"/></proof>
-  </goal>
-  <goal name="vc_/Users/paulpatault/git/why3/examples/coma/insertion.coma.3" proved="true">
-  <proof prover="0"><result status="valid" time="0.011109" steps="24"/></proof>
+  <goal name="vc_insert.1" proved="true">
+  <proof prover="0"><result status="timeout" time="1.000000"/></proof>
+  <proof prover="1"><result status="valid" time="0.365497" steps="82452"/></proof>
+  <proof prover="2"><result status="timeout" time="1.000000"/></proof>
   </goal>
  </transf>
  </goal>

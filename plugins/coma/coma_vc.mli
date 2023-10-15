@@ -1,4 +1,10 @@
 open Why3.Term
 open Coma_syntax
 
-val vc : expr -> term
+type context
+
+val c_empty : context
+
+val vc_expr : context -> expr -> term
+
+val vc_defn : context -> bool -> defn list -> context * term

@@ -29,7 +29,7 @@ and pexpr_desc =
   | PElam of pparam list * pexpr (* fun pl -> e *)
   | PEdef of pexpr * bool * pdefn list (* e / rec? h p = e and ... *)
   | PEset of pexpr * (ident * term) list
-  | PElet of pexpr * (ident * term * pty * bool) list
+  | PElet of pexpr * pvar list
   | PEcut of term * pexpr (* { t } e *)
   | PEbox of pexpr (* ! e *)
   | PEwox of pexpr (* ? e *)
@@ -40,6 +40,8 @@ and pargument =
   | PAv of term (* t *)
   | PAr of ident (* &r *)
   | PAc of pexpr (* (e) *)
+
+and pvar = ident * term * pty * bool
 
 and pdefn = {
   pdefn_desc   : pdefn_desc;
@@ -57,7 +59,11 @@ type use =
   | Puseexport of qualid
   | Puseimport of bool * qualid * ident option
 
-type pfile = use list * pdefn list
+type pdecl =
+  | Defs of pdefn list
+  (* | Lets of pvar  list *)
+
+type pfile = use list * pdecl list
 
 open Ty
 open Term
@@ -105,9 +111,8 @@ let pp_tv   fmt t = fprintf fmt "<%a>"        Pretty.print_tv t
 let pp_ty   fmt t = fprintf fmt "<%a>"        Pretty.print_ty t
 let pp_hs   fmt h = fprintf fmt "%s"          (Ident.id_unique pr h.hs_name)
 let pp_term fmt t = fprintf fmt "{%a}"        Pretty.print_term t
-let pp_ofty fmt t = fprintf fmt ": @[<h>%a@]" Pretty.print_ty t
+let pp_ofty fmt t = fprintf fmt ": @[%a@]" Pretty.print_ty t
 let pp_pval fmt v = fprintf fmt "{%a%a}"      Pretty.print_vs v pp_ofty v.vs_ty
-let pp_eqto fmt d = fprintf fmt "%s"          (if d then "→" else "=")
 let pp_var mut fmt v = fprintf fmt "%s%a"     (if mut then "&" else "") Pretty.print_vs v
 
 let rec pp_hdl fmt (i, w, pl) = fprintf fmt "(%a @[<h>[%a]@]%a%a)" pp_hs i pp_prew w pp_osp (pl <> []) pp_prms pl
@@ -146,7 +151,7 @@ let rec pp_expr fmt = function
   | Elet (e, l)    -> fprintf fmt "%a@\n[%a]"      pp_expr e pp_let l
   | Eapp (e, arg)  -> fprintf fmt "@[%a%a@[%a@]@]" pp_expr e pp_sp_nl2 () pp_arg arg
   | Ecut (t, e)    -> fprintf fmt "%a@ %a"         pp_term t pp_expr e
-  | Edef (e, b, l) -> fprintf fmt "%a@\n[%a]"      pp_expr e (pp_defs b)  l
+  | Edef (e, b, l) -> fprintf fmt "%a@\n[%a]"      pp_expr e (pp_local_defs_block b)  l
   | Elam (p, e)    -> fprintf fmt "(fu@[n %a%a→@ @[%a@]@])"  pp_prms p pp_osp (p <> []) pp_expr e
 
 and pp_arg fmt = function
@@ -157,16 +162,24 @@ and pp_arg fmt = function
   | Ac e        -> fprintf fmt "(%a)" pp_expr e
 
 and pp_def direct fmt (h, w, pl, e) =
-  fprintf fmt "%a [%a] %a%a%a%a@[%a@]"
+  fprintf fmt "%a [%a] %a%a%s%a@[%a@]"
     pp_hs h
     pp_prew w
     pp_prms pl
     pp_osp (pl <> [])
-    pp_eqto direct
+    (if direct then "→" else "=")
     pp_sp_nl2 ()
     pp_expr e
 
-and pp_defs direct fmt l =
+and pp_local_defs_block direct fmt l =
   let pp_sep fmt () = fprintf fmt "@\n|" in
   let pp_v fmt d = fprintf fmt " %a" (pp_def direct) d in
   pp_print_list ~pp_sep pp_v fmt l
+
+and pp_def_block fmt = function
+  | [d] -> fprintf fmt "let %a" (pp_def false) d
+  | l   ->
+      let pp_sep fmt () = fprintf fmt "@\nwith " in
+      let pp_v fmt d = fprintf fmt "%a" (pp_def false) d in
+      pp_print_string fmt "let rec ";
+      pp_print_list ~pp_sep pp_v fmt l

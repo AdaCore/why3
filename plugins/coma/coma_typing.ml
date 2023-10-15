@@ -49,8 +49,8 @@ let find_ref ctx (id: Ptree.ident) =
   try match Mstr.find id.id_str ctx.vars with
     | Ref v -> v
     | Var _
-    | Typ _ -> Loc.errorm ~loc:id.id_loc "the symbol %s is not a reference" id.id_str
-  with Not_found -> Loc.errorm ~loc:id.id_loc "unbound variable %s" id.id_str
+    | Typ _ -> Loc.errorm ~loc:id.id_loc "[coma typing] the symbol %s is not a reference" id.id_str
+  with Not_found -> Loc.errorm ~loc:id.id_loc "[coma typing] unbound variable %s" id.id_str
 
 let rec type_param0 tuc ctx = function
   | PPv (id, ty) ->
@@ -85,11 +85,11 @@ let rec check_param ~loc l r = match l,r with
   | Pr l, Pr r
   | Pv l, Pv r  when ty_equal l.vs_ty r.vs_ty -> ()
   | Pc (_, _, l), Pc (_, _, r) -> check_params ~loc l r
-  | _ -> Loc.errorm ~loc "type error"
+  | _ -> Loc.errorm ~loc "[coma typing] type error"
 
 and check_params ~loc l r =
   try List.iter2 (check_param ~loc) l r
-  with Invalid_argument _ -> Loc.errorm ~loc "bad arity: %d argument(s) expected, %d given" (List.length l) (List.length r)
+  with Invalid_argument _ -> Loc.errorm ~loc "[coma typing] bad arity: %d argument(s) expected, %d given" (List.length l) (List.length r)
 
 (* let subs (tvs : tvsymbol) (pl : param list) =
   List.map (fun e -> )
@@ -105,36 +105,36 @@ let rec type_expr tuc ctx { pexpr_desc=d; pexpr_loc=loc } =
       let h, _, pl =
         try
           Mstr.find id.id_str ctx.hdls
-        with Not_found -> Loc.errorm ~loc:id.id_loc "unbounded handler `%s'" id.id_str
+        with Not_found -> Loc.errorm ~loc:id.id_loc "[coma typing] unbounded handler `%s'" id.id_str
       in
       Esym h, pl
   | PEapp (pe, a) ->
       let e, te = type_expr tuc ctx pe in
       (match te, a with
-       | [], _ -> Loc.errorm ~loc:pe.pexpr_loc "the expression `%a' is already fully applied" pp_expr e
+       | [], _ -> Loc.errorm ~loc:pe.pexpr_loc "[coma typing] the expression `%a' is already fully applied" pp_expr e
        | Pv vs :: tes, PAv t ->
            let tt = type_term tuc ctx t in
            (match tt.t_ty with
             | Some ty when ty_equal ty vs.vs_ty -> ()
-            | _ -> Loc.errorm ~loc:t.term_loc "type error in application");
+            | _ -> Loc.errorm ~loc:t.term_loc "[coma typing] type error in application");
            Eapp (e, Av tt), tes
        | Pr rs :: tes, PAr id ->
            let s =
              try match Mstr.find id.id_str ctx.vars with
                | Ref v -> v
-               | Var _ | Typ _ -> Loc.errorm ~loc:id.id_loc "the symbol `%s' is not a reference" id.id_str
-             with Not_found -> Loc.errorm ~loc:id.id_loc "unbounded variable `%s'" id.id_str
+               | Var _ | Typ _ -> Loc.errorm ~loc:id.id_loc "[coma typing] the symbol `%s' is not a reference" id.id_str
+             with Not_found -> Loc.errorm ~loc:id.id_loc "[coma typing] unbounded variable `%s'" id.id_str
            in
            if ty_equal rs.vs_ty s.vs_ty then Eapp (e, Ar s), tes
-           else Loc.errorm ~loc "type error in application"
+           else Loc.errorm ~loc "[coma typing] type error in application"
        | Pc (_h, _vs, pl) :: tes, PAc ea ->
            let ea, tea = type_expr tuc ctx ea in
            check_params ~loc pl tea;
            Eapp (e, Ac ea), tes
        | Pt _tv :: tes, PAt pty ->
            let _ty = Typing.ty_of_pty tuc pty in
-           Loc.errorm ~loc:loc "polymorphism is not supported yet", tes
-       | _ -> Loc.errorm ~loc "type error with the application")
+           Loc.errorm ~loc:loc "[coma typing] polymorphism is not supported yet", tes
+       | _ -> Loc.errorm ~loc "[coma typing] type error with the application")
   | PElet (e, l) ->
       let ctx0 = ctx in
       let f ctx (id, t, pty, mut) =
@@ -142,7 +142,7 @@ let rec type_expr tuc ctx { pexpr_desc=d; pexpr_loc=loc } =
         let ty = Typing.ty_of_pty tuc pty in
         (match tt.t_ty with
          | Some tty when ty_equal tty ty -> ()
-         | _ -> Loc.errorm ~loc:id.id_loc "type error with `&%s' assignation" id.id_str);
+         | _ -> Loc.errorm ~loc:id.id_loc "[coma typing] type error with `&%s' assignation" id.id_str);
         let vs = create_vsymbol (id_fresh ~loc:id.id_loc id.id_str) ty in
         let ctx = if mut then add_ref vs ctx else add_var vs ctx in
         ctx, (vs,tt, mut)
@@ -156,9 +156,9 @@ let rec type_expr tuc ctx { pexpr_desc=d; pexpr_loc=loc } =
         let vs =
            try match Mstr.find id.id_str ctx.vars, tt.t_ty with
              | Ref v, Some tty when ty_equal tty v.vs_ty -> v
-             | (Var _ | Typ _),_ -> Loc.errorm ~loc:id.id_loc "the symbol `%s' is not a reference" id.id_str
-             | _ -> Loc.errorm ~loc:id.id_loc "type error with `&%s' assignation" id.id_str;
-           with Not_found -> Loc.errorm ~loc:id.id_loc "unbounded variable `%s'" id.id_str in
+             | (Var _ | Typ _),_ -> Loc.errorm ~loc:id.id_loc "[coma typing] the symbol `%s' is not a reference" id.id_str
+             | _ -> Loc.errorm ~loc:id.id_loc "[coma typing] type error with `&%s' assignation" id.id_str;
+           with Not_found -> Loc.errorm ~loc:id.id_loc "[coma typing] unbounded variable `%s'" id.id_str in
         (vs,tt)
       in
       let ll = List.map f l in
@@ -175,7 +175,7 @@ let rec type_expr tuc ctx { pexpr_desc=d; pexpr_loc=loc } =
 
 and type_prog ?loc tuc ctx d =
   let e, te = type_expr tuc ctx d in
-  if te <> [] then Loc.errorm ?loc "every programm must be box-typed";
+  if te <> [] then Loc.errorm ?loc "[coma typing] every programm must be box-typed";
   e
 
 and type_defn_list tuc ctx notrec dl =
