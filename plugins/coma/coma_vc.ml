@@ -22,11 +22,13 @@ let hs_hash hs = id_hash hs.hs_name
 let hs_compare hs1 hs2 = id_compare hs1.hs_name hs2.hs_name
 *)
 
-
 (* let t_and_simp = t_and
 let t_and_asym_simp = t_and_asym
 let t_implies_simp = t_implies
 let t_forall_close_simp = t_forall_close *)
+
+let case_split = Ident.create_attribute "case_split"
+let add_case t = t_attr_add case_split t
 
 let debug_slow = Debug.register_info_flag "coma_no_merge"
   ~desc:"Disable@ subgoal@ factorization."
@@ -47,9 +49,15 @@ let is_false f = match f.t_node with
 let w_true  = { wp = t_true;  sp = Mhs.empty }
 let w_false = { wp = t_false; sp = Mhs.empty }
 
+let sp_or _ sp1 sp2 = Some (
+  match sp1.t_node, sp2.t_node with
+  | Ttrue, _ | _, Tfalse -> sp1
+  | _, Ttrue | Tfalse, _ -> sp2
+  | _, _ -> add_case (t_or sp1 sp2))
+
 let w_and w1 w2 = {
   wp = t_and_simp w1.wp w2.wp;
-  sp = Mhs.union (fun _ f1 f2 -> Some (t_or_simp f1 f2)) w1.sp w2.sp
+  sp = Mhs.union sp_or w1.sp w2.sp
 }
 
 let rec w_and_l = function
