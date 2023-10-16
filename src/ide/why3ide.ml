@@ -911,7 +911,9 @@ let change_lang view lang =
       | ".ads" -> ada_lang ()
       | ".java" -> java_lang ()
       | ".c" -> c_lang ()
-      | ".mlw" | ".why" -> why_lang ()
+      | ".mlw"
+      | ".why" ->
+        why_lang ()
       | _ -> raise Exit
     in
     view#source_buffer#set_language (Some lang)
@@ -1178,32 +1180,34 @@ let completion_col = completion_cols#add Gobject.Data.string
 let completion_desc = completion_cols#add Gobject.Data.string
 let completion_model = GTree.tree_store completion_cols
 
-let null_entry_completion : GEdit.entry_completion =
-  GEdit.entry_completion ~entry:command_entry ()
-
 let command_entry_completion : GEdit.entry_completion =
   GEdit.entry_completion ~model:completion_model ()
-
-let activate_completion () =
-  command_entry#set_completion command_entry_completion
-
-let deactivate_completion () =
-  command_entry#set_completion null_entry_completion
 
 let add_completion_entry (s, desc) =
   let row = completion_model#append () in
   completion_model#set ~row ~column:completion_col s;
   completion_model#set ~row ~column:completion_desc desc
 
+(* We need to know when the completion popup is active for some shortcuts.
+   However, we didn't find a way to know it using LablGtk functions so we have
+   to use this little hack *)
+let completion_popup_is_active = ref false
+
 let match_function s iter =
-  if String.length s < 3 then false else
-  let candidate = completion_model#get ~row:iter ~column:completion_col in
-  try
-    ignore
-      (Re.Str.search_forward (Re.Str.regexp_string_case_fold s) candidate 0);
-    true
-  with
-  | Not_found -> false
+  if String.length s < 2 then (
+    completion_popup_is_active := false;
+    false
+  ) else
+    let candidate = completion_model#get ~row:iter ~column:completion_col in
+    try
+      ignore
+        (Re.Str.search_forward (Re.Str.regexp_string_case_fold s) candidate 0);
+      completion_popup_is_active := true;
+      true
+    with
+    | Not_found ->
+      completion_popup_is_active := false;
+      false
 
 (* see also init_completion below *)
 
@@ -1216,8 +1220,12 @@ let list_commands = create_history ()
 let _ =
   command_entry#event#connect#key_press ~callback:(fun (ev : 'a Gdk.event) ->
       match GdkEvent.Key.keyval ev with
-      | k when k = GdkKeysyms._Up || k = GdkKeysyms._Down -> (
-        (* Arrow up/down *)
+      (* Arrow up/down when the completion popup is not active *)
+      | k
+        when (k = GdkKeysyms._Up || k = GdkKeysyms._Down)
+             && not !completion_popup_is_active -> (
+        (* Set the text to the next/prev command in the command history. If
+           there is none, do nothing *)
         let s =
           if k = GdkKeysyms._Up then
             print_next_command list_commands
@@ -1225,31 +1233,32 @@ let _ =
             print_prev_command list_commands
         in
         match s with
-        | None -> false
+        | None -> true
         | Some s ->
           command_entry#set_text s;
-          deactivate_completion ();
           command_entry#misc#grab_focus ();
           true)
       | k when k = GdkKeysyms._Escape ->
+        (* Unfocus the command entry *)
         goals_view#misc#grab_focus ();
         true
-      | k when k = GdkKeysyms._Tab -> (
-        match command_entry#selection with
-        | Some (_, e) ->
-          command_entry#set_position e;
+      | k when k = GdkKeysyms._Tab ->
+        (* If the completion is active on a prefix, set the cursor to the end of
+           this prefix in the command entry. If no completion is active, do
+           nothing *)
+        if !completion_popup_is_active then
+          match command_entry#selection with
+          | Some (_, e) ->
+            command_entry#set_position e;
+            true
+          | _ -> true
+        else
           true
-        | _ -> false)
-      | k when k = GdkKeysyms._Return ->
-        deactivate_completion ();
-        false
-      | _ ->
-          activate_completion ();
-          false)
+      | _ -> false)
 
 (* Small hack to avoid pasting consecutive whitespaces and newlines in the
    command entry. We remove them from the clipboard before pasting, then restore
-   it*)
+   it *)
 let saved_clip = ref ""
 
 let _ =
@@ -2580,11 +2589,15 @@ let init_completion provers transformations strategies commands =
   List.iter (add_submenu_strategy strategies_factory context_factory) strategies;
   (* Add goal oriented stategies in strategies menu *)
   let strategies = Strategy.list_strats () in
-  let strategies = List.map (fun (strat, desc) ->
-                              let desc = string_of_desc (strat, desc) in
-                              (strat, desc)) strategies in
-  strategies_factory#add_separator();
-  context_factory#add_separator();
+  let strategies =
+    List.map
+      (fun (strat, desc) ->
+        let desc = string_of_desc (strat, desc) in
+        (strat, desc))
+      strategies
+  in
+  strategies_factory#add_separator ();
+  context_factory#add_separator ();
   List.iter (add_submenu_strategy strategies_factory context_factory) strategies;
   List.iter add_completion_entry strategies;
   command_entry_completion#set_text_column completion_col;
@@ -2596,9 +2609,8 @@ let init_completion provers transformations strategies commands =
   command_entry_completion#add_attribute name_renderer "text" completion_desc;
 
   command_entry_completion#set_match_func match_function;
-  command_entry_completion#misc#set_property "inline_completion" (`BOOL true);
-
-  command_entry#set_completion null_entry_completion
+  command_entry_completion#misc#set_property "inline_completion" (`BOOL false);
+  command_entry#set_completion command_entry_completion
 
 let () =
   let transformations = Server_utils.list_transforms () in
