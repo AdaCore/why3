@@ -64,7 +64,80 @@ let rec t_equ_simp t1 t2 = match t1.t_node, t2.t_node with
 let rec t_simp_equ f = match f.t_node with
   | Tapp (s,[t1;t2]) when ls_equal s ps_equ ->
       t_attr_copy f (t_equ_simp t1 t2)
+  | Tnot g ->
+      t_attr_copy f (t_not_simp (t_simp_equ g))
+  | Tbinop (Tand,g,h) ->
+      t_attr_copy f (t_and_simp (t_simp_equ g) (t_simp_equ h))
+  | Tbinop (Tor,g,h) ->
+      t_attr_copy f (t_or_simp (t_simp_equ g) (t_simp_equ h))
+  | Tbinop (Timplies,g,h) ->
+      t_attr_copy f (t_implies_simp (t_simp_equ g) (t_simp_equ h))
+  | Tquant (q,b) -> let vl,tl,g = t_open_quant b in
+      t_attr_copy f (t_quant_close_simp q vl tl (t_simp_equ g))
   | _ -> t_map t_simp_equ f
+
+let t_level vsl t =
+  Mvs.fold (fun v _ m -> max m (Mvs.find v vsl)) (t_vars t) 0
+
+let sbs_merge vsl _ t1 t2 =
+  if t_level vsl t2 < t_level vsl t1 then Some t2 else Some t1
+
+let rec propagate lvl vsl pvs nvs pol f = match f.t_node with
+  | Tapp (s,[{t_node = Tvar v};t])
+    when ls_equal s ps_equ &&
+         Svs.mem v (if pol then pvs else nvs) &&
+         Mvs.find v vsl > t_level vsl t ->
+      f, Mvs.singleton v t
+  | Tapp (s,[t;{t_node = Tvar v}])
+    when ls_equal s ps_equ &&
+         Svs.mem v (if pol then pvs else nvs) &&
+         Mvs.find v vsl > t_level vsl t ->
+      f, Mvs.singleton v t
+  | Tnot g ->
+      let g, sbs = propagate lvl vsl pvs nvs (not pol) g in
+      t_attr_copy f (t_not g), sbs
+  | Tbinop (Tand,g,h) ->
+      let g, sbg = propagate lvl vsl
+        (if pol then pvs else Svs.empty)
+        (if pol then Svs.empty else nvs) pol g in
+      let h, sbh = propagate lvl vsl
+        (if pol then pvs else Svs.empty)
+        (if pol then Svs.empty else nvs) pol h in
+      t_attr_copy f (t_and g h), Mvs.union (sbs_merge vsl) sbg sbh
+  | Tbinop (Tor,g,h) ->
+      let g, sbg = propagate lvl vsl
+        (if pol then Svs.empty else pvs)
+        (if pol then nvs else Svs.empty) pol g in
+      let h, sbh = propagate lvl vsl
+        (if pol then Svs.empty else pvs)
+        (if pol then nvs else Svs.empty) pol h in
+      t_attr_copy f (t_or g h), Mvs.union (sbs_merge vsl) sbg sbh
+  | Tbinop (Timplies,g,h) ->
+      let g, sbg = propagate lvl vsl
+        (if pol then Svs.empty else pvs)
+        (if pol then nvs else Svs.empty) (not pol) g in
+      let h, sbh = propagate lvl vsl
+        (if pol then Svs.empty else pvs)
+        (if pol then nvs else Svs.empty) pol h in
+      t_attr_copy f (t_implies g h), Mvs.union (sbs_merge vsl) sbg sbh
+  | Tquant (q,b) ->
+      let vl,tl,g = t_open_quant b in
+      let pos = (q = Texists) = pol in
+      let add v m k = Mvs.add k v m in
+      let vsl = List.fold_left (add lvl) vsl vl in
+      let avs = List.fold_left (add ()) Svs.empty vl in
+      let pvs = if pos then Svs.union pvs avs else pvs in
+      let nvs = if pos then nvs else Svs.union nvs avs in
+      let g, sbs = propagate (succ lvl) vsl pvs nvs pol g in
+      let g = t_subst (Mvs.set_inter sbs avs) g in
+      t_attr_copy f (t_quant_close q vl tl g), Mvs.set_diff sbs avs
+  | _ ->
+      f, Mvs.empty
+
+let vc_simp f =
+  t_simp_equ f
+  |> propagate 0 Mvs.empty Svs.empty Svs.empty false |> fst
+  |> t_simp_equ
 
 type wpsp = {
   wp: term;
@@ -281,11 +354,11 @@ let rec vc pp dd e c bl =
   | Ewox e -> assert (bl = []); vc pp pp e c bl
   | Eany   -> assert (bl = []); c_glob := c; w_true
 
-let vc_expr c e = t_simp_equ (vc true true e c []).wp
+let vc_expr c e = vc_simp (vc true true e c []).wp
 
 let vc_defn c flat dfl =
   let w = vc true true (Edef (Eany,flat,dfl)) c [] in
-  !c_glob, t_simp_equ w.wp
+  !c_glob, vc_simp w.wp
 
 let () = Exn_printer.register (fun fmt -> function
   | BadUndef h -> Format.fprintf fmt
