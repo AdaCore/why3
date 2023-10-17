@@ -92,7 +92,7 @@ let join {l: tree} {x: elt} {r: tree} (return {r: tree}) =
   )
   [return {r:tree} -> { wf r && avl r } (! return {r})]
 
-let split_last {t: tree} (return {r: tree} {m: elt}) =
+let rec split_last {t: tree} (return {r: tree} {m: elt}) =
   unTree {t}
     (fun {l: tree} {x: elt} {r: tree} ->
        { wf t && avl t } (!
@@ -111,7 +111,7 @@ let join2 {l r: tree} (return {t: tree}) =
            (-> split_last {l} (fun {l:tree} {k:elt} ->
                join {l} {k} {r} return))
 
-let split {t: tree} {y: elt} (return {l: tree} {b: bool} {r: tree}) =
+let rec split {t: tree} {y: elt} (return {l: tree} {b: bool} {r: tree}) =
   unTree {t}
     (fun {l:tree} {x:elt} {r:tree} ->
        { wf t && avl t }

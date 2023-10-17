@@ -16,7 +16,7 @@ let unTree {t: tree int} (onNode [] {v: int} {l r: tree int}) (onLeaf) =
   |  leaf ->
         { t = Empty } (! onLeaf) ]
 
-let remove_min {t: tree int} (return {m: int} {o: tree int}) =
+let rec remove_min {t: tree int} (return {m: int} {o: tree int}) =
   { t <> Empty }
   (! unTree {t} node fail
      [ node {x: int} {l r: tree int} ->
