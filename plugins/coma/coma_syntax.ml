@@ -60,7 +60,8 @@ type use =
   | Puseimport of bool * qualid * ident option
 
 type pdecl =
-  | Defs of pdefn list
+  | Def of pdefn
+  | Blo of pdefn list
   (* | Lets of pvar  list *)
 
 type pfile = use list * pdecl list

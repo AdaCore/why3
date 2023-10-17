@@ -45,9 +45,9 @@ uses:
 
 coma_top_lvl:
 | LET REC separated_nonempty_list(WITH, defn(EQUAL))
-  { Defs $3 }
+  { Blo $3 }
 | LET defn(EQUAL)
-  { Defs [$2] }
+  { Def $2 }
 /* | LET coma_let*
   { Lets $2 } */
 

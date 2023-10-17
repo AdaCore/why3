@@ -1,0 +1,28 @@
+module Tree
+
+  use list.List
+
+  type forest = list tree
+  with tree   = Node int forest
+
+end
+
+module Size
+
+  use Tree
+  use list.List
+  use int.Int
+
+  let rec function size_forest (f: forest) : int
+    ensures { result >= 0 }
+  = match f with
+    | Nil      -> 0
+    | Cons t f -> size_tree t + size_forest f
+    end
+  with function size_tree (t: tree) : int
+    ensures { result > 0 }
+  = match t with
+    | Node _ f -> 1 + size_forest f
+    end
+
+end

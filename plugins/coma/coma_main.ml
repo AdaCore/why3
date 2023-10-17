@@ -47,7 +47,9 @@ let read_channel env path file c =
   let tuc = List.fold_left (parse_simpl_use env) tuc uses in
   let _, ast =
     List.fold_left_map
-      (fun ctx (Defs d) -> type_defn_list tuc ctx false d)
+      (fun ctx ->
+         function Blo b -> type_defn_list tuc ctx false b
+                | Def d -> type_defn_list tuc ctx true [d])
       ctx0 ast in
   List.iter (Debug.dprintf debug "\n@[%a@]@." Coma_syntax.pp_def_block) ast;
   let ast =
