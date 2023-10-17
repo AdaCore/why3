@@ -26,3 +26,36 @@ module Size
     end
 
 end
+
+
+module Binom
+
+  use int.Int
+
+  let rec function comb (n k: int) : int
+    requires { 0 <= k <= n }
+    variant  { n }
+    ensures  { result >= 1 }
+  = if k = 0 || k = n then 1 else comb (n-1) k + comb (n-1) (k-1)
+
+
+  let rec lemma prop1 (n k: int)
+    requires { 0 <= k <= n }
+    ensures  { comb n (n - k) = comb n k }
+    variant  { n }
+  = if 0 < k < n then (prop1 (n-1) k; prop1 (n-1) (k-1))
+
+  let rec lemma prop2 (n k: int)
+    requires { 1 <= k <= n }
+    ensures  { k * comb n k = comb n (k - 1) * (n - k + 1) }
+    variant  { n }
+  = if k < n then prop2 (n-1) k;
+    if 1 < k then prop2 (n-1) (k-1)
+
+  let lemma prop3 (n : int)
+    requires { 0 <= n }
+    ensures  { comb n 0 = 1 }
+  = ()
+
+end
+

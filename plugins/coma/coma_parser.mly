@@ -34,7 +34,7 @@ uses:
   { Puseexport $3 }
 | USE boption(IMPORT) n = tqualid q = option(preceded(AS, uident))
   { let loc = floc $startpos $endpos in
-    if $2 && q = None then Loc.warning ~loc ~id:warn_redundant_import
+    if $2 && q = None then Loc.warning warn_redundant_import ~loc
       "the keyword `import' is redundant here and can be omitted";
     (Puseimport ($2, n, q) ) }
 

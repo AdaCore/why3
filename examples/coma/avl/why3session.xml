@@ -2,49 +2,50 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="1" name="Z3" version="4.11.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Z3" version="4.11.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="coma" proved="true">
 <path name=".."/><path name="avl.coma"/>
 <theory name="Coma" proved="true">
  <goal name="vc_fail" proved="true">
- <proof prover="2"><result status="valid" time="0.013371" steps="5"/></proof>
+ <proof prover="1"><result status="valid" time="0.013116" steps="5"/></proof>
  </goal>
  <goal name="vc_if" proved="true">
- <proof prover="2"><result status="valid" time="0.011789" steps="5"/></proof>
+ <proof prover="1"><result status="valid" time="0.011489" steps="5"/></proof>
  </goal>
  <goal name="vc_unTree" proved="true">
- <proof prover="2"><result status="valid" time="0.009598" steps="5"/></proof>
+ <proof prover="1"><result status="valid" time="0.009641" steps="5"/></proof>
  </goal>
  <goal name="vc_rotate_left" proved="true">
- <proof prover="2"><result status="valid" time="0.009016" steps="5"/></proof>
+ <proof prover="1"><result status="valid" time="0.009100" steps="5"/></proof>
  </goal>
  <goal name="vc_rotate_right" proved="true">
- <proof prover="2"><result status="valid" time="0.008152" steps="5"/></proof>
+ <proof prover="1"><result status="valid" time="0.008062" steps="5"/></proof>
  </goal>
  <goal name="vc_join_right" proved="true">
- <proof prover="2"><result status="valid" time="0.007773" steps="5"/></proof>
+ <proof prover="1"><result status="valid" time="0.007523" steps="5"/></proof>
  </goal>
  <goal name="vc_join_left" proved="true">
- <proof prover="2"><result status="valid" time="0.004646" steps="5"/></proof>
+ <proof prover="1"><result status="valid" time="0.004666" steps="5"/></proof>
  </goal>
  <goal name="vc_join" proved="true">
- <proof prover="1"><result status="valid" time="0.010890" steps="15326"/></proof>
+ <proof prover="0"><result status="valid" time="0.037827" steps="164354"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000"/></proof>
  </goal>
  <goal name="vc_split_last" proved="true">
- <proof prover="2"><result status="valid" time="0.009149" steps="112"/></proof>
+ <proof prover="1"><result status="valid" time="0.165620" steps="4964"/></proof>
  </goal>
  <goal name="vc_join2" proved="true">
- <proof prover="2"><result status="valid" time="0.004579" steps="5"/></proof>
+ <proof prover="1"><result status="valid" time="0.004593" steps="5"/></proof>
  </goal>
  <goal name="vc_split" proved="true">
- <proof prover="2"><result status="valid" time="0.019786" steps="385"/></proof>
+ <proof prover="1"><result status="valid" time="0.140676" steps="4277"/></proof>
  </goal>
  <goal name="vc_insert" proved="true">
- <proof prover="2"><result status="valid" time="0.006787" steps="31"/></proof>
+ <proof prover="1"><result status="valid" time="0.009601" steps="140"/></proof>
  </goal>
  <goal name="vc_delete" proved="true">
- <proof prover="2"><result status="valid" time="0.008679" steps="75"/></proof>
+ <proof prover="1"><result status="valid" time="0.067191" steps="1518"/></proof>
  </goal>
 </theory>
 </file>

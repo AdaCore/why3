@@ -16,7 +16,7 @@ let unList {l: list int} (onCons [] {h: int} {t: list int}) (onNil []) =
     | onnil  []                        -> { l = Nil }     (! onNil) ]
 
 
-let insert {x: int} {l: list int} (return {o: list int}) =
+let rec insert {x: int} {l: list int} (return {o: list int}) =
     { sorted l }
     (! unList {l}
              (fun {h: int} {t: list int} ->

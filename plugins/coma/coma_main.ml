@@ -14,7 +14,7 @@ open Coma_typing
 open Coma_vc
 open Ptree
 
-let debug = Debug.register_flag "coma" ~desc:"coma plugin debug flag"
+let debug = Debug.register_flag "coma" ~desc:"[coma] plugin debug flag"
 
 let qualid_last = function Qident x | Qdot (_, x) -> x
 let use_as q = function Some x -> x | None -> qualid_last q
@@ -40,7 +40,7 @@ let add_def (c,tuc) (s,flat,dfl) =
   let prs = Decl.create_prsymbol (Ident.id_fresh ("vc_" ^ s)) in
   c, Theory.add_prop_decl tuc Decl.Pgoal prs f
 
-let read_channel env path file c =
+let read_channel_coma env path file c =
   let uses, ast = Coma_lexer.parse_channel file c in
   let tuc = Theory.create_theory ~path (Ident.id_fresh "Coma") in
   let tuc = Theory.use_export tuc Theory.bool_theory in
@@ -51,15 +51,15 @@ let read_channel env path file c =
          function Blo b -> type_defn_list tuc ctx false b
                 | Def d -> type_defn_list tuc ctx true [d])
       ctx0 ast in
-  List.iter (Debug.dprintf debug "\n@[%a@]@." Coma_syntax.pp_def_block) ast;
+  List.iter (Debug.dprintf debug "\n@[%a@]@." Coma_syntax.PP.pp_def_block) ast;
   let ast =
     List.map
       (fun d ->
         let {hs_name}, _, _, _ = List.hd d in
         hs_name.Ident.id_string, false, d)
       ast in
-  let _,tuc = List.fold_left add_def (c_empty, tuc) ast in
+  let _, tuc = List.fold_left add_def (c_empty, tuc) ast in
   Wstdlib.Mstr.singleton "Coma" (Theory.close_theory tuc)
 
-let () = Env.register_format Env.base_language "coma" ["coma"] read_channel
+let () = Env.register_format Env.base_language "coma" ["coma"] read_channel_coma
   ~desc:"Continuation Machine language"

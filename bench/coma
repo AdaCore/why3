@@ -20,9 +20,9 @@ coma_good () {
     test -d $1 || exit 1
     rm -f bench_errors
     rm -f bench_error
-    for f in $1/*.coma ; do
+    for f in $1/*.$2 ; do
         printf "  $f... "
-        if ! $pgm $2 $f > /dev/null 2> bench_error; then
+        if ! $pgm $f > /dev/null 2> bench_error; then
             echo "failed!"
             echo "invocation: $pgm $opts $f" | tee -a bench_errors
             cat bench_error | tee -a bench_errors
@@ -45,11 +45,11 @@ simple_test() {
 }
 
 replay () {
-    pgm="bin/why3$suffix replay"
+    pgm="bin/why3 replay"
     test -d $1 || exit 1
     for f in $1/*/; do
         printf "  $f... "
-        simple_test $pgm $2 $f
+        simple_test $pgm $f
     done
 }
 
@@ -60,8 +60,8 @@ coma_bad ./bench/plugins/coma/bad
 echo ""
 
 echo "=== Checking good files (Coma) ==="
-coma_good ./examples/coma
-coma_good ./bench/plugins/coma/good
+coma_good ./examples/coma coma
+coma_good ./bench/plugins/coma/good coma
 echo ""
 
 echo "=== Checking replay (Coma) ==="

@@ -187,6 +187,24 @@ module AVL
     | N h l _ r -> h = height t && wf l && wf r
     end
 
+  predicate mem (y: elt) (t: tree) =
+    match t with
+    | E         -> false
+    | N _ l x r -> mem y l || y=x || mem y r
+    end
+
+  predicate tree_lt (t: tree) (y: elt) =
+    forall x. mem x t -> lt x y
+
+  predicate lt_tree (y: elt) (t: tree) =
+    forall x. mem x t -> lt y x
+
+  predicate bst (t: tree) =
+    match t with
+    | E         -> true
+    | N _ l x r -> bst l && tree_lt l x && bst r && lt_tree x r
+    end
+
   predicate avl (t: tree) =
     match t with
     | E         -> true

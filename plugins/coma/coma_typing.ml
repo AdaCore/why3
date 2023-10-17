@@ -111,7 +111,7 @@ let rec type_expr tuc ctx { pexpr_desc=d; pexpr_loc=loc } =
   | PEapp (pe, a) ->
       let e, te = type_expr tuc ctx pe in
       (match te, a with
-       | [], _ -> Loc.errorm ~loc:pe.pexpr_loc "[coma typing] the expression `%a' is already fully applied" pp_expr e
+       | [], _ -> Loc.errorm ~loc:pe.pexpr_loc "[coma typing] the expression `%a' is already fully applied" PP.pp_expr e
        | Pv vs :: tes, PAv t ->
            let tt = type_term tuc ctx t in
            (match tt.t_ty with

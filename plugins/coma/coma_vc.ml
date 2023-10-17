@@ -114,7 +114,8 @@ let rec propagate lvl vsl pvs nvs f = match f.t_node with
       let pvs = if q = Texists then Svs.union pvs avs else pvs in
       let nvs = if q = Texists then nvs else Svs.union nvs avs in
       let g, sbs = propagate (succ lvl) vsl pvs nvs g in
-      let g = t_subst (Mvs.set_inter sbs avs) g in
+      let inst = t_subst (Mvs.set_inter sbs avs) in
+      let g = inst g and tl = List.map (List.map inst) tl in
       t_attr_copy f (t_quant_close q vl tl g), Mvs.set_diff sbs avs
   | _ ->
       f, Mvs.empty
@@ -347,5 +348,5 @@ let vc_defn c flat dfl =
 
 let () = Exn_printer.register (fun fmt -> function
   | BadUndef h -> Format.fprintf fmt
-      "Handler %a is used in an illegal position" Coma_syntax.pp_hs h
+      "Handler `%a' is used in an illegal position" Coma_syntax.PP.pp_hs h
   | exn -> raise exn)
