@@ -22,11 +22,6 @@ let hs_hash hs = id_hash hs.hs_name
 let hs_compare hs1 hs2 = id_compare hs1.hs_name hs2.hs_name
 *)
 
-(* let t_and_simp = t_and
-let t_and_asym_simp = t_and_asym
-let t_implies_simp = t_implies
-let t_forall_close_simp = t_forall_close *)
-
 let case_split = Ident.create_attribute "case_split"
 let add_case t = t_attr_add case_split t
 
@@ -34,6 +29,33 @@ let debug_slow = Debug.register_info_flag "coma_no_merge"
   ~desc:"Disable@ subgoal@ factorization."
 
 exception BadUndef of hsymbol
+
+let t_and_simp f1 f2 = match f1.t_node, f2.t_node with
+  | _, Ttrue | Tfalse, _ -> t_attr_remove asym_split f1
+  | Ttrue, _ | _, Tfalse -> f2
+  | _, _ -> t_and f1 f2
+
+let t_and_asym_simp f1 f2 = t_and_simp (t_attr_add asym_split f1) f2
+
+let t_implies_simp f1 f2 = match f1.t_node, f2.t_node with
+  | Ttrue, _  | _, Ttrue  -> f2
+  | Tfalse, _ | _, Tfalse -> t_not_simp f1
+  | _, _ -> t_implies f1 f2
+
+let rec t_equ_simp t1 t2 = match t1.t_node, t2.t_node with
+  | Tvar v1, Tvar v2 when vs_equal v1 v2 -> t_true
+  | Tapp (s1,[]), Tapp (s2,[]) when ls_equal s1 s2 -> t_true
+  | Tapp (s1,_), Tapp (s2,_) when s1.ls_constr > 0 && s2.ls_constr > 0
+                                  && not (ls_equal s1 s2) -> t_false
+  | Tconst c1, Tconst c2 when Constant.compare_const c1 c2 = 0 -> t_true
+  | Tif (c,t1,e1), _ -> t_if_simp c (t_equ_simp t1 t2) (t_equ_simp e1 t2)
+  | _, Tif (c,t2,e2) -> t_if_simp c (t_equ_simp t1 t2) (t_equ_simp t1 e2)
+  | _, _ -> t_equ t1 t2
+
+let rec t_simp_equ f = match f.t_node with
+  | Tapp (s,[t1;t2]) when ls_equal s ps_equ ->
+      t_attr_copy f (t_equ_simp t1 t2)
+  | _ -> t_map t_simp_equ f
 
 type wpsp = {
   wp: term;
@@ -250,11 +272,11 @@ let rec vc pp dd e c bl =
   | Ewox e -> assert (bl = []); vc pp pp e c bl
   | Eany   -> assert (bl = []); c_glob := c; w_true
 
-let vc_expr c e = (vc true true e c []).wp
+let vc_expr c e = t_simp_equ (vc true true e c []).wp
 
 let vc_defn c flat dfl =
   let w = vc true true (Edef (Eany,flat,dfl)) c [] in
-  !c_glob, w.wp
+  !c_glob, t_simp_equ w.wp
 
 let () = Exn_printer.register (fun fmt -> function
   | BadUndef h -> Format.fprintf fmt
