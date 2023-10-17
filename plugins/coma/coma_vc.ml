@@ -79,56 +79,41 @@ let rec t_simp_equ f = match f.t_node with
 let t_level vsl t =
   Mvs.fold (fun v _ m -> max m (Mvs.find v vsl)) (t_vars t) 0
 
-let sbs_merge vsl _ t1 t2 =
-  if t_level vsl t2 < t_level vsl t1 then Some t2 else Some t1
+let sbs_merge vsl m1 m2 = Mvs.union (fun _ t1 t2 ->
+  Some (if t_level vsl t2 < t_level vsl t1 then t2 else t1)) m1 m2
 
-let rec propagate lvl vsl pvs nvs pol f = match f.t_node with
+let rec propagate lvl vsl pvs nvs f = match f.t_node with
   | Tapp (s,[{t_node = Tvar v};t])
-    when ls_equal s ps_equ &&
-         Svs.mem v (if pol then pvs else nvs) &&
+    when ls_equal s ps_equ && Svs.mem v pvs &&
          Mvs.find v vsl > t_level vsl t ->
       f, Mvs.singleton v t
   | Tapp (s,[t;{t_node = Tvar v}])
-    when ls_equal s ps_equ &&
-         Svs.mem v (if pol then pvs else nvs) &&
+    when ls_equal s ps_equ && Svs.mem v pvs &&
          Mvs.find v vsl > t_level vsl t ->
       f, Mvs.singleton v t
   | Tnot g ->
-      let g, sbs = propagate lvl vsl pvs nvs (not pol) g in
+      let g, sbs = propagate lvl vsl nvs pvs g in
       t_attr_copy f (t_not g), sbs
   | Tbinop (Tand,g,h) ->
-      let g, sbg = propagate lvl vsl
-        (if pol then pvs else Svs.empty)
-        (if pol then Svs.empty else nvs) pol g in
-      let h, sbh = propagate lvl vsl
-        (if pol then pvs else Svs.empty)
-        (if pol then Svs.empty else nvs) pol h in
-      t_attr_copy f (t_and g h), Mvs.union (sbs_merge vsl) sbg sbh
+      let g, sbg = propagate lvl vsl pvs Svs.empty g in
+      let h, sbh = propagate lvl vsl pvs Svs.empty h in
+      t_attr_copy f (t_and g h), sbs_merge vsl sbg sbh
   | Tbinop (Tor,g,h) ->
-      let g, sbg = propagate lvl vsl
-        (if pol then Svs.empty else pvs)
-        (if pol then nvs else Svs.empty) pol g in
-      let h, sbh = propagate lvl vsl
-        (if pol then Svs.empty else pvs)
-        (if pol then nvs else Svs.empty) pol h in
-      t_attr_copy f (t_or g h), Mvs.union (sbs_merge vsl) sbg sbh
+      let g, sbg = propagate lvl vsl Svs.empty nvs g in
+      let h, sbh = propagate lvl vsl Svs.empty nvs h in
+      t_attr_copy f (t_or g h), sbs_merge vsl sbg sbh
   | Tbinop (Timplies,g,h) ->
-      let g, sbg = propagate lvl vsl
-        (if pol then Svs.empty else pvs)
-        (if pol then nvs else Svs.empty) (not pol) g in
-      let h, sbh = propagate lvl vsl
-        (if pol then Svs.empty else pvs)
-        (if pol then nvs else Svs.empty) pol h in
-      t_attr_copy f (t_implies g h), Mvs.union (sbs_merge vsl) sbg sbh
+      let g, sbg = propagate lvl vsl nvs Svs.empty g in
+      let h, sbh = propagate lvl vsl Svs.empty nvs h in
+      t_attr_copy f (t_implies g h), sbs_merge vsl sbg sbh
   | Tquant (q,b) ->
       let vl,tl,g = t_open_quant b in
-      let pos = (q = Texists) = pol in
       let add v m k = Mvs.add k v m in
       let vsl = List.fold_left (add lvl) vsl vl in
       let avs = List.fold_left (add ()) Svs.empty vl in
-      let pvs = if pos then Svs.union pvs avs else pvs in
-      let nvs = if pos then nvs else Svs.union nvs avs in
-      let g, sbs = propagate (succ lvl) vsl pvs nvs pol g in
+      let pvs = if q = Texists then Svs.union pvs avs else pvs in
+      let nvs = if q = Texists then nvs else Svs.union nvs avs in
+      let g, sbs = propagate (succ lvl) vsl pvs nvs g in
       let g = t_subst (Mvs.set_inter sbs avs) g in
       t_attr_copy f (t_quant_close q vl tl g), Mvs.set_diff sbs avs
   | _ ->
@@ -136,7 +121,7 @@ let rec propagate lvl vsl pvs nvs pol f = match f.t_node with
 
 let vc_simp f =
   t_simp_equ f
-  |> propagate 0 Mvs.empty Svs.empty Svs.empty false |> fst
+  |> propagate 0 Mvs.empty Svs.empty Svs.empty |> fst
   |> t_simp_equ
 
 type wpsp = {
