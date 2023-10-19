@@ -1,4 +1,4 @@
-import "cvc4_16.drv"
+import "cvc5.drv"
 import "smt-libv2-gnatprove.gen"
 import "smt-libv2-floats-gnatprove.gen"
 import "smt-libv2-floats-int_via_real.gen"
@@ -20,4 +20,14 @@ theory int.ComputerDivision
   syntax function mod "(__cmod %1 %2)"
 
   remove allprops
+end
+
+theory real.Real
+  remove prop add_div
+  remove prop sub_div
+  remove prop neg_div
+  remove prop assoc_mul_div
+  remove prop assoc_div_mul
+  remove prop assoc_div_div
+  remove prop CompatOrderMult
 end
