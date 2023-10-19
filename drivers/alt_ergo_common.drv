@@ -85,11 +85,6 @@ theory int.EuclideanDivision
   syntax function div "(%1 / %2)"
   syntax function mod "(%1 % %2)"
 
-  (* These axioms trigger a soundness bug in various versions of alt-ergo. We
-     remove them. See S906-017 and U617-017 *)
-  remove prop Div_1_left
-  remove prop Div_minus1_left
-
 end
 
 theory int.ComputerDivision
