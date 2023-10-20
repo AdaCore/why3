@@ -9,7 +9,7 @@ type proof_mode =
   | Per_Path
   | Per_Check
 
-let builtin_provers = ["altergo"; "cvc4"; "z3"]
+let builtin_provers = ["altergo"; "colibri"; "cvc5"; "z3"]
 
 let is_builtin_prover =
   let builtin_provers_set =
@@ -42,7 +42,7 @@ let opt_ce_prover = ref "cvc5_ce"
 let opt_warn_prover = ref None
 let opt_giant_step_rac : bool ref = ref false
 let opt_rac_timelimit = ref (Some 120)
-let opt_rac_prover = ref (Some "cvc4")
+let opt_rac_prover = ref (Some "cvc5")
 let opt_logging = ref false
 
 let opt_limit_line : Gnat_expl.limit_mode option ref = ref None
@@ -582,9 +582,7 @@ module Steps_conversion : sig
 end = struct
 
   let convert_data =
-    ["cvc4",    { add = 15000;  mult = 35  };
-     "cvc4_ce", { add = 15000;  mult = 35  };
-     "cvc5",    { add = 15000;  mult = 35  };
+    ["cvc5",    { add = 15000;  mult = 35  };
      "cvc5_ce", { add = 15000;  mult = 35  };
      "z3",      { add = 450000; mult = 800 };
      "z3_ce",   { add = 450000; mult = 800 };
