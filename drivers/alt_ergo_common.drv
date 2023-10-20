@@ -85,46 +85,14 @@ theory int.EuclideanDivision
   syntax function div "(%1 / %2)"
   syntax function mod "(%1 % %2)"
 
-  (* These axioms trigger a soundness bug in various versions of alt-ergo. We
-     remove them. See S906-017 and U617-017 *)
-  remove prop Div_1_left
-  remove prop Div_minus1_left
-
 end
 
 theory int.ComputerDivision
 
   use for_drivers.ComputerOfEuclideanDivision
 
-  remove prop Div_sign_neg
 end
 
-theory int.Power
-
-  syntax function power "(%1 ** %2)"
-
-  remove prop Power_0
-  remove prop Power_s
-  remove prop Power_s_alt
-  remove prop Power_1
-  remove prop Power_sum
-  remove prop Power_mult
-  remove prop Power_comm1
-  remove prop Power_comm2
-  remove prop Unit_def_l
-  remove prop Unit_def_r
-  remove prop Power_non_neg
-  remove prop Power_pos
-  remove prop Power_monotonic
-  remove prop Assoc
-end
-
-theory for_drivers.ComputerOfEuclideanDivision
-
-  remove prop cdiv_cases_0
-  remove prop cdiv_cases_1
-
-end
 
 theory real.Real
 
@@ -168,7 +136,7 @@ theory real.Real
   remove prop Inverse
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
-  remove prop CompatOrderMult
+remove prop CompatOrderMult
   remove prop ZeroLessOne
 
 end
