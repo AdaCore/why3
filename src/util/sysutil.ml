@@ -74,7 +74,22 @@ let write_file_fmt f c =
        ~finally:(fun () ->
            Format.pp_print_flush fmt ();
            close_out oc)
-      (fun () -> c fmt) 
+      (fun () -> c fmt)
+
+
+let write_unique_file_fmt f c =
+  let dir = Filename.dirname f in
+  let base = Filename.basename f in
+  let prefix = Filename.remove_extension base in
+  let suffix = Filename.extension base in
+  let _,oc = Filename.open_temp_file ~temp_dir:dir prefix suffix in
+  let fmt = Format.formatter_of_out_channel oc in
+  Fun.protect
+    ~finally:(fun () ->
+        Format.pp_print_flush fmt ();
+        close_out oc)
+    (fun () -> c fmt) 
+    
 
 let open_temp_file ?(debug=false) filesuffix usefile =
   let file,cout = Filename.open_temp_file "why" filesuffix in

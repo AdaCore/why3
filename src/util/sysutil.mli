@@ -36,8 +36,14 @@ val file_contents_fmt : string -> Format.formatter -> unit
 (* [write_file f c] writes the content [c] into the file [f] *)
 val write_file : string -> string -> unit
 
-(* [write_file f c] writes the content given to [c] into the file [f] *)
+(* [write_file_fmt f c] writes the content given to the formatter [c] into the
+   file [f] *)
 val write_file_fmt : string -> (Format.formatter -> unit) -> unit
+
+(* [write_unique_file_fmt f c] writes the content given to the formatter [c]
+   into the uniquified file [f]. The uniquification is not specified except
+   it keeps the extension.  *)
+val write_unique_file_fmt : string -> (Format.formatter -> unit) -> unit
 
 val open_temp_file :
   ?debug:bool -> (* don't remove the file *)

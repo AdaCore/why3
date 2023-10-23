@@ -37,18 +37,17 @@ let run () =
   if e then exit 1;
   Why3session_lib.session_iter_proof_attempt_by_filter session f
    (fun _ pa_node ->
-        match Session_itp.get_task session pa_node.parent with
+        match Session_itp.get_task session pa_node.parent,
+        Whyconf.Hprover.find controller.controller_provers pa_node.prover with
         | exception Not_found -> ()
-        | task ->
-        let (_,driver) = Whyconf.Hprover.find controller.controller_provers pa_node.prover in
+        | (task,(_,driver)) ->
         let th = get_encapsulating_theory session (APn pa_node.parent) in
         let th_name = (Session_itp.theory_name th).Ident.id_string in
         let f = get_encapsulating_file session (ATh th) in
         let fn = Filename.chop_extension (Sysutil.basename (file_path f)) in      
         let file = Driver.file_of_task driver fn th_name task in
         let file = Sysutil.concat !output_dir file in
-        let file = Sysutil.uniquify file in
-        Sysutil.write_file_fmt file (fun fmt -> Driver.print_task driver fmt task)
+        Sysutil.write_unique_file_fmt file (fun fmt -> Driver.print_task driver fmt task)
       )
 )
 
