@@ -67,6 +67,15 @@ let write_file f c =
   output_string oc c;
   close_out oc
 
+let write_file_fmt f c =
+    let oc = open_out f in
+    let fmt = Format.formatter_of_out_channel oc in
+    Fun.protect
+       ~finally:(fun () ->
+           Format.pp_print_flush fmt ();
+           close_out oc)
+      (fun () -> c fmt) 
+
 let open_temp_file ?(debug=false) filesuffix usefile =
   let file,cout = Filename.open_temp_file "why" filesuffix in
   try
