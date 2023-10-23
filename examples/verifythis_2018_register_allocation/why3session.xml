@@ -3,6 +3,7 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_2018_register_allocation.mlw"/>
@@ -82,16 +83,16 @@
  <goal name="sym_merge" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="sym_merge.0" proved="true">
-  <proof prover="4"><result status="valid" time="0.010000" steps="22"/></proof>
+  <proof prover="0"><result status="valid" time="0.039980" steps="10692"/></proof>
   </goal>
   <goal name="sym_merge.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.339698" steps="34665"/></proof>
+  <proof prover="0"><result status="valid" time="0.461936" steps="42453"/></proof>
   </goal>
   <goal name="sym_merge.2" proved="true">
-  <proof prover="0"><result status="valid" time="1.508898" steps="122638"/></proof>
+  <proof prover="1"><result status="valid" time="0.343746" steps="48756"/></proof>
   </goal>
   <goal name="sym_merge.3" proved="true">
-  <proof prover="0"><result status="valid" time="0.316080" steps="34888"/></proof>
+  <proof prover="0"><result status="valid" time="0.339698" steps="43134"/></proof>
   </goal>
   <goal name="sym_merge.4" proved="true">
   <proof prover="4"><result status="valid" time="0.010000" steps="20"/></proof>
@@ -113,7 +114,7 @@
   <proof prover="4"><result status="valid" time="0.010000" steps="18"/></proof>
   </goal>
   <goal name="irc&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.010000" steps="24"/></proof>
+  <proof prover="0"><result status="valid" time="0.056376" steps="11958"/></proof>
   </goal>
   <goal name="irc&#39;vc.4" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.010000" steps="8"/></proof>
@@ -134,16 +135,30 @@
   <proof prover="4"><result status="valid" time="0.070000" steps="330"/></proof>
   </goal>
   <goal name="irc&#39;vc.10" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.040000" steps="188"/></proof>
+  <proof prover="4"><result status="valid" time="0.050000" steps="188"/></proof>
   </goal>
   <goal name="irc&#39;vc.11" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.040000" steps="237"/></proof>
+  <proof prover="4"><result status="valid" time="0.080000" steps="237"/></proof>
   </goal>
   <goal name="irc&#39;vc.12" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.020000" steps="107"/></proof>
+  <proof prover="4"><result status="valid" time="0.030000" steps="107"/></proof>
   </goal>
   <goal name="irc&#39;vc.13" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="2.726681" steps="163880"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="irc&#39;vc.13.0" expl="postcondition" proved="true">
+   <transf name="case" proved="true" arg1="(u = x1 \/ v = x1)">
+    <goal name="irc&#39;vc.13.0.0" expl="true case (postcondition)" proved="true">
+    <proof prover="4"><result status="valid" time="0.058565" steps="422"/></proof>
+    </goal>
+    <goal name="irc&#39;vc.13.0.1" expl="false case (postcondition)" proved="true">
+    <proof prover="0"><result status="valid" time="0.520760" steps="58507"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="irc&#39;vc.13.1" expl="VC for irc" proved="true">
+   <proof prover="4"><result status="valid" time="0.020000" steps="70"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="irc&#39;vc.14" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.030000" steps="135"/></proof>
@@ -155,7 +170,7 @@
   <proof prover="4"><result status="valid" time="0.020000" steps="98"/></proof>
   </goal>
   <goal name="irc&#39;vc.17" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="1.970430" steps="126195"/></proof>
+  <proof prover="1"><result status="valid" time="0.941472" steps="107405"/></proof>
   </goal>
   <goal name="irc&#39;vc.18" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.010000" steps="14"/></proof>
@@ -170,7 +185,7 @@
   <proof prover="4"><result status="valid" time="0.020000" steps="24"/></proof>
   </goal>
   <goal name="irc&#39;vc.22" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.271961" steps="32192"/></proof>
+  <proof prover="0"><result status="valid" time="0.271961" steps="35816"/></proof>
   </goal>
   <goal name="irc&#39;vc.23" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.020000" steps="24"/></proof>
@@ -179,30 +194,16 @@
   <proof prover="4"><result status="valid" time="0.020000" steps="24"/></proof>
   </goal>
   <goal name="irc&#39;vc.25" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.050000" steps="383"/></proof>
+  <proof prover="4"><result status="valid" time="0.040000" steps="383"/></proof>
   </goal>
   <goal name="irc&#39;vc.26" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.080000" steps="464"/></proof>
+  <proof prover="4"><result status="valid" time="0.040000" steps="464"/></proof>
   </goal>
   <goal name="irc&#39;vc.27" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.030000" steps="192"/></proof>
+  <proof prover="4"><result status="valid" time="0.020000" steps="192"/></proof>
   </goal>
   <goal name="irc&#39;vc.28" expl="postcondition" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="irc&#39;vc.28.0" expl="postcondition" proved="true">
-   <transf name="case" proved="true" arg1="(u = x1 \/ v = x1)">
-    <goal name="irc&#39;vc.28.0.0" expl="true case (postcondition)" proved="true">
-    <proof prover="4"><result status="valid" time="0.330000" steps="2278"/></proof>
-    </goal>
-    <goal name="irc&#39;vc.28.0.1" expl="false case (postcondition)" proved="true">
-    <proof prover="0"><result status="valid" time="2.485747" steps="205632"/></proof>
-    </goal>
-   </transf>
-   </goal>
-   <goal name="irc&#39;vc.28.1" expl="VC for irc" proved="true">
-   <proof prover="4"><result status="valid" time="0.020000" steps="120"/></proof>
-   </goal>
-  </transf>
+  <proof prover="0"><result status="valid" time="2.987636" steps="267465"/></proof>
   </goal>
  </transf>
  </goal>

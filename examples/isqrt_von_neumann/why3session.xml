@@ -362,13 +362,13 @@
   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="1.600000" steps="303299"/></proof>
   </goal>
   <goal name="isqrt64&#39;vc.16" expl="assertion" proved="true">
-  <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.241598" steps="270076"/></proof>
+  <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="1.685720" steps="270076"/></proof>
   </goal>
   <goal name="isqrt64&#39;vc.17" expl="assertion" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="1.598149" steps="358664"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="1.264693" steps="358664"/></proof>
   </goal>
   <goal name="isqrt64&#39;vc.18" expl="assertion" proved="true">
-  <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.540000" steps="278421"/></proof>
+  <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.045185" steps="278421"/></proof>
   </goal>
   <goal name="isqrt64&#39;vc.19" expl="loop variant decrease" proved="true">
   <proof prover="3" timelimit="5"><result status="valid" time="1.920000" steps="376729"/></proof>
@@ -383,7 +383,7 @@
   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="3.262483" steps="728912"/></proof>
   </goal>
   <goal name="isqrt64&#39;vc.23" expl="loop invariant preservation" proved="true">
-  <proof prover="3" timelimit="60"><result status="valid" time="2.734469" steps="622259"/></proof>
+  <proof prover="3" timelimit="60"><result status="valid" time="2.356394" steps="622259"/></proof>
   </goal>
   <goal name="isqrt64&#39;vc.24" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.490000" steps="242834"/></proof>
@@ -392,7 +392,7 @@
   <proof prover="3"><result status="valid" time="0.010000" steps="5214"/></proof>
   </goal>
   <goal name="isqrt64&#39;vc.26" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="1.130000" steps="285108"/></proof>
+  <proof prover="3"><result status="valid" time="0.913049" steps="285108"/></proof>
   </goal>
   <goal name="isqrt64&#39;vc.27" expl="loop invariant preservation" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -416,10 +416,10 @@
   <proof prover="3"><result status="valid" time="0.510000" steps="250549"/></proof>
   </goal>
   <goal name="isqrt64&#39;vc.29" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.926931" steps="279568"/></proof>
+  <proof prover="3"><result status="valid" time="0.675419" steps="279568"/></proof>
   </goal>
   <goal name="isqrt64&#39;vc.30" expl="loop variant decrease" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="1.868687" steps="395984"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="1.528492" steps="395984"/></proof>
   </goal>
   <goal name="isqrt64&#39;vc.31" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.450000" steps="234569"/></proof>
@@ -508,14 +508,14 @@
                 <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.0" expl="true case" proved="true">
                 <transf name="unfold" proved="true" arg1="sqr" arg2="in" arg3="h">
                  <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.0.0" expl="true case" proved="true">
-                 <proof prover="3" timelimit="5"><result status="valid" time="3.207455" steps="508053"/></proof>
+                 <proof prover="3" timelimit="5"><result status="valid" time="2.331951" steps="508053"/></proof>
                  </goal>
                 </transf>
                 </goal>
                 <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1" expl="false case" proved="true">
                 <transf name="case" proved="true" arg1="(res_g = (0:t))">
                  <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.0" expl="false case (true case)" proved="true">
-                 <proof prover="3" timelimit="5"><result status="valid" time="4.350000" steps="607235"/></proof>
+                 <proof prover="3" timelimit="5"><result status="valid" time="3.607718" steps="607235"/></proof>
                  </goal>
                  <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1" expl="false case" proved="true">
                  <transf name="rewrite" proved="true" arg1="to_uint_sub_bounded">
@@ -584,7 +584,7 @@
                             <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.0.0.1.0.0.0" expl="rewrite premises" proved="true">
                             <transf name="rewrite" proved="true" arg1="&lt;-" arg2="to_uint_add_bounded">
                              <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.0.0.1.0.0.0.0" expl="rewrite premises" proved="true">
-                             <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="3.440000" steps="544"/></proof>
+                             <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="2.916036" steps="544"/></proof>
                              </goal>
                              <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.0.0.1.0.0.0.1" expl="rewrite premises" proved="true">
                              <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="3.140000" steps="598241"/></proof>
@@ -674,7 +674,7 @@
                         </transf>
                         </goal>
                         <goal name="isqrt64&#39;vc.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.1" expl="rewrite premises" proved="true">
-                        <proof prover="3" timelimit="5"><result status="valid" time="2.087514" steps="562655"/></proof>
+                        <proof prover="3" timelimit="5"><result status="valid" time="1.721112" steps="562655"/></proof>
                         </goal>
                        </transf>
                        </goal>

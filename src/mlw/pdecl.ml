@@ -492,26 +492,37 @@ let create_let_decl ld =
     let f = t_forall_close_simp args [] f in
     let f = t_forall_close (Mvs.keys (t_vars f)) [] f in
     create_prop_decl Paxiom (create_prsymbol id) f :: axms in
+  let post_axioms id nm cty t axms =
+    let cnt = ref (-1) in
+    let fold f axms =
+      let nm =
+        if !cnt = -1 then nm else
+        Printf.sprintf "%s'%d" nm !cnt
+      in
+      incr cnt;
+      cty_axiom (id_derive ~attrs nm id) cty f axms
+    in
+    List.fold_right fold (conv_post t cty.cty_post) axms
+  in
   let add_rs sm s ({c_cty = cty} as c) (abst,defn,axms) =
     match s.rs_logic with
     | RLpv _ -> invalid_arg "Pdecl.create_let_decl"
     | RLnone -> abst, defn, axms
     | RLlemma ->
-        let f = if ity_equal cty.cty_result ity_unit then
-          t_and_simp_l (conv_post t_void cty.cty_post)
+        let axms = if ity_equal cty.cty_result ity_unit then
+          post_axioms s.rs_name s.rs_name.id_string cty t_void axms
         else match cty.cty_post with
           | q::ql ->
               let v, f = open_post q in
               let fl = f :: conv_post (t_var v) ql in
-              t_exists_close [v] [] (t_and_simp_l fl)
-          | [] -> t_true in
-        abst, defn, cty_axiom (id_clone ~attrs s.rs_name) cty f axms
+              let f = t_exists_close [v] [] (t_and_simp_l fl) in
+              cty_axiom (id_clone ~attrs s.rs_name) cty f axms
+          | [] -> axms in
+        abst, defn, axms
     | RLls ({ls_name = id} as ls) ->
         let vl = List.map (fun v -> v.pv_vs) cty.cty_args in
         let hd = t_app ls (List.map t_var vl) ls.ls_value in
-        let f = t_and_simp_l (conv_post hd cty.cty_post) in
-        let nm = id.id_string ^ "'spec" in
-        let axms = cty_axiom (id_derive ~attrs nm id) cty f axms in
+        let axms = post_axioms id (id.id_string ^ "'spec") cty hd axms in
         let c = if Mrs.is_empty sm then c else c_rs_subst sm c in
         begin match c.c_node with
         | Cany | Capp _ | Cpur _ ->

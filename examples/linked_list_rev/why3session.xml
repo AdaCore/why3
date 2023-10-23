@@ -168,7 +168,7 @@
   <proof prover="3"><result status="valid" time="0.010000" steps="28"/></proof>
   </goal>
   <goal name="mem_decomp&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="573"/></proof>
+  <proof prover="3"><result status="valid" time="0.080000" steps="506"/></proof>
   </goal>
  </transf>
  </goal>
@@ -234,7 +234,7 @@
   <proof prover="3"><result status="valid" time="0.000000" steps="8"/></proof>
   </goal>
   <goal name="list_seg_append&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="2.870000" steps="8193"/></proof>
+  <proof prover="3"><result status="valid" time="2.870000" steps="8402"/></proof>
   </goal>
  </transf>
  </goal>
@@ -259,7 +259,7 @@
   <proof prover="3"><result status="valid" time="0.020000" steps="55"/></proof>
   </goal>
   <goal name="list_seg_prefix&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.320000" steps="449170"/></proof>
+  <proof prover="1"><result status="valid" time="0.320000" steps="350513"/></proof>
   </goal>
  </transf>
  </goal>
@@ -352,7 +352,7 @@
   <proof prover="3"><result status="valid" time="0.010000" steps="9"/></proof>
   </goal>
   <goal name="list_seg_no_repet&#39;vc.9" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.690000" steps="72176"/></proof>
+  <proof prover="7"><result status="valid" time="0.690000" steps="73034"/></proof>
   </goal>
   <goal name="list_seg_no_repet&#39;vc.10" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.050000" steps="284"/></proof>
@@ -416,8 +416,8 @@
   <proof prover="0"><result status="valid" time="1.640000" steps="1068"/></proof>
   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),get1,set1,([]&#39;),([&lt;-]&#39;),(!),([]),singleton,cons,snoc,(++),reverse,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,length_nonnegative,create&#39;spec,empty&#39;def,set&#39;spec,set&#39;def,([&lt;-])&#39;def,singleton&#39;spec,cons&#39;spec,snoc&#39;spec,([..])&#39;def,([.._])&#39;def,mem_append,mem_tail,eq_loc&#39;spec,non_empty_seq,list_seg_frame_ext,list_seg_functional,list_seg_tail,list_seg_append,seq_tail_append,list_seg_prefix,list_seg_sublistl,get_tail,tail_suffix,Requires2,Requires1,Requires,Ensures11,H1,Ensures10,LoopInvariant8,LoopInvariant7,Ensures9,H,Assert,Ensures8,Ensures7,Ensures6,Ensures5,Ensures4,Ensures3,LoopInvariant3,LoopInvariant2,LoopInvariant1">
    <goal name="app&#39;vc.17.0" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.040000" steps="111"/></proof>
-   <proof prover="3"><result status="valid" time="0.050000" steps="183"/></proof>
+   <proof prover="0"><result status="valid" time="0.040000" steps="93"/></proof>
+   <proof prover="3"><result status="valid" time="0.050000" steps="182"/></proof>
    </goal>
   </transf>
   </goal>
@@ -431,14 +431,14 @@
   <proof prover="3"><result status="valid" time="0.070000" steps="280"/></proof>
   </goal>
   <goal name="app&#39;vc.21" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="2.060000" steps="5758"/></proof>
+  <proof prover="3"><result status="valid" time="2.060000" steps="5549"/></proof>
   </goal>
   <goal name="app&#39;vc.22" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="1.550000" steps="1631"/></proof>
   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),get1,set1,([]&#39;),([&lt;-]&#39;),(!),([]),singleton,cons,snoc,(++),mem,reverse,disjoint,no_repet,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,length_nonnegative,create&#39;spec,empty&#39;def,set&#39;spec,set&#39;def,([&lt;-])&#39;def,singleton&#39;spec,cons&#39;spec,snoc&#39;spec,([..])&#39;spec,([..])&#39;def,([_..])&#39;def,([.._])&#39;def,mem_append,mem_tail,eq_loc&#39;spec,non_empty_seq,list_seg_frame_ext,list_seg_functional,list_seg_tail,list_seg_append,seq_tail_append,list_seg_prefix,list_seg_sublistl,get_tail,tail_suffix,list_seg_no_repet,Requires1,Requires,Ensures3,H1,Ensures2,LoopInvariant4,LoopInvariant3,LoopInvariant">
    <goal name="app&#39;vc.22.0" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.940000" steps="1515"/></proof>
-   <proof prover="3"><result status="valid" time="5.190000" steps="6996"/></proof>
+   <proof prover="0"><result status="valid" time="0.940000" steps="1792"/></proof>
+   <proof prover="3"><result status="valid" time="4.135475" steps="5735"/></proof>
    </goal>
   </transf>
   </goal>
@@ -474,13 +474,13 @@
   <proof prover="3"><result status="valid" time="0.030000" steps="124"/></proof>
   </goal>
   <goal name="in_place_reverse&#39;vc.9" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.280000" steps="1090"/></proof>
+  <proof prover="3"><result status="valid" time="0.280000" steps="990"/></proof>
   </goal>
   <goal name="in_place_reverse&#39;vc.10" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="5.030000" steps="15268"/></proof>
+  <proof prover="3"><result status="valid" time="6.910909" steps="15264"/></proof>
   </goal>
   <goal name="in_place_reverse&#39;vc.11" expl="loop invariant preservation" proved="true">
-  <proof prover="7"><result status="valid" time="0.550000" steps="80547"/></proof>
+  <proof prover="7"><result status="valid" time="0.550000" steps="85814"/></proof>
   </goal>
   <goal name="in_place_reverse&#39;vc.12" expl="loop invariant preservation" proved="true">
   <transf name="assert" proved="true" arg1="(length pM1 &gt; 0)">
@@ -544,30 +544,30 @@
  </transf>
  </goal>
  <goal name="list_of_cells&#39;vc" expl="VC for list_of_cells" proved="true">
- <proof prover="2" timelimit="1"><result status="valid" time="1.735995" steps="3578800"/></proof>
+ <proof prover="2" timelimit="1"><result status="valid" time="1.175469" steps="4056904"/></proof>
  <transf name="split_vc" proved="true" >
   <goal name="list_of_cells&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.040000" steps="2191"/></proof>
+  <proof prover="9"><result status="valid" time="0.040000" steps="2313"/></proof>
   </goal>
   <goal name="list_of_cells&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="9"><result status="valid" time="0.040000" steps="1344"/></proof>
+  <proof prover="9"><result status="valid" time="0.040000" steps="1427"/></proof>
   </goal>
   <goal name="list_of_cells&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.030000" steps="1414"/></proof>
+  <proof prover="9"><result status="valid" time="0.030000" steps="1498"/></proof>
   </goal>
   <goal name="list_of_cells&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.080000" steps="3692"/></proof>
+  <proof prover="9"><result status="valid" time="0.080000" steps="3807"/></proof>
   </goal>
   <goal name="list_of_cells&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.100000" steps="4268"/></proof>
+  <proof prover="9"><result status="valid" time="0.100000" steps="4383"/></proof>
   </goal>
   <goal name="list_of_cells&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.244087" steps="27128"/></proof>
+  <proof prover="9"><result status="valid" time="0.244087" steps="19313"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="list_reversal_final&#39;vc" expl="VC for list_reversal_final" proved="true">
- <proof prover="5"><result status="valid" time="0.260000" steps="48199"/></proof>
+ <proof prover="5"><result status="valid" time="0.260000" steps="48676"/></proof>
  </goal>
 </theory>
 <theory name="Termination" proved="true">

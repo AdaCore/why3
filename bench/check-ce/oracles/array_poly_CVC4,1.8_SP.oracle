@@ -7,7 +7,7 @@
   - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_poly.mlw", line 8, characters 4-8)
 File "bench/check-ce/array_poly.mlw", line 8, characters 4-8:
 Sub-goal Index in array bounds of goal f1'vc.
-Prover result is: Unknown (unknown + incomplete) (2440 steps).
+Prover result is: Unknown (unknown + incomplete) (2061 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -35,7 +35,7 @@ File array_poly.mlw:
 
 File "bench/check-ce/array_poly.mlw", line 13, characters 4-14:
 Sub-goal Index in array bounds of goal f2'vc.
-Prover result is: Valid (2021 steps).
+Prover result is: Valid (1681 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -62,7 +62,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
 File "bench/check-ce/array_poly.mlw", line 27, characters 14-22:
 Sub-goal Postcondition of goal f1'vc.
-Prover result is: Unknown (unknown + incomplete) (2664 steps).
+Prover result is: Unknown (unknown + incomplete) (2617 steps).
 The following counterexample model could not be verified
   (both RAC terminated with uncaught exception):
 File array.mlw:
@@ -85,7 +85,7 @@ File array.mlw:
   - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
 File "bench/check-ce/array_poly.mlw", line 32, characters 14-27:
 Sub-goal Postcondition of goal f2'vc.
-Prover result is: Unknown (unknown + incomplete) (2690 steps).
+Prover result is: Unknown (unknown + incomplete) (2643 steps).
 The following counterexample model could not be verified
   (both RAC terminated with uncaught exception):
 File array.mlw:
@@ -95,7 +95,7 @@ File array.mlw:
       ->
       uni
       ->
-      int = fun bOUND_VARIABLE_4701 bOUND_VARIABLE_4711 -> 2
+      int = fun bOUND_VARIABLE_4703 bOUND_VARIABLE_4711 -> 2
   Line 232:
     sorted : array int -> bool = [|_ => false|]
 

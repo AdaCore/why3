@@ -2,8 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="CVC5" version="1.0.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.4.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="just_join.mlw"/>
 <theory name="Top" proved="true">
@@ -11,10 +13,10 @@
  <proof prover="1"><result status="valid" time="0.025206" steps="1973"/></proof>
  </goal>
  <goal name="rotate_left&#39;vc" expl="VC for rotate_left" proved="true">
- <proof prover="0"><result status="valid" time="0.444123" steps="37852"/></proof>
+ <proof prover="2"><result status="valid" time="0.070015" steps="178576"/></proof>
  </goal>
  <goal name="rotate_right&#39;vc" expl="VC for rotate_right" proved="true">
- <proof prover="0"><result status="valid" time="0.204276" steps="21686"/></proof>
+ <proof prover="2"><result status="valid" time="0.024635" steps="72026"/></proof>
  </goal>
  <goal name="join_right&#39;vc" expl="VC for join_right" proved="true">
  <transf name="split_vc" proved="true" >
@@ -31,7 +33,7 @@
   <proof prover="1"><result status="valid" time="0.037968" steps="19418"/></proof>
   </goal>
   <goal name="join_right&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.962162" steps="6071258"/></proof>
+  <proof prover="1"><result status="valid" time="0.681139" steps="6071258"/></proof>
   </goal>
   <goal name="join_right&#39;vc.5" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.012761" steps="1201"/></proof>
@@ -58,19 +60,19 @@
   <proof prover="1"><result status="valid" time="0.019310" steps="19193"/></proof>
   </goal>
   <goal name="join_right&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.295097" steps="29305"/></proof>
+  <proof prover="3"><result status="valid" time="0.282428" steps="31550"/></proof>
   </goal>
   <goal name="join_right&#39;vc.14" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.014451" steps="14590"/></proof>
   </goal>
   <goal name="join_right&#39;vc.15" expl="unreachable point" proved="true">
-  <proof prover="0"><result status="valid" time="0.048208" steps="5059"/></proof>
+  <proof prover="3"><result status="valid" time="0.020000" steps="4986"/></proof>
   </goal>
   <goal name="join_right&#39;vc.16" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.041924" steps="82640"/></proof>
   </goal>
   <goal name="join_right&#39;vc.17" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="1.071038" steps="74224"/></proof>
+  <proof prover="3"><result status="valid" time="0.323941" steps="34580"/></proof>
   </goal>
   <goal name="join_right&#39;vc.18" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.630636" steps="1991056"/></proof>
@@ -98,7 +100,7 @@
   <proof prover="1"><result status="valid" time="0.024128" steps="20622"/></proof>
   </goal>
   <goal name="join_left&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.240933" steps="20943"/></proof>
+  <proof prover="3"><result status="valid" time="0.046572" steps="15242"/></proof>
   </goal>
   <goal name="join_left&#39;vc.5" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.016621" steps="1201"/></proof>
@@ -125,13 +127,13 @@
   <proof prover="1"><result status="valid" time="0.024132" steps="21144"/></proof>
   </goal>
   <goal name="join_left&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.514920" steps="46891"/></proof>
+  <proof prover="3"><result status="valid" time="0.269407" steps="32864"/></proof>
   </goal>
   <goal name="join_left&#39;vc.14" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.024506" steps="14528"/></proof>
   </goal>
   <goal name="join_left&#39;vc.15" expl="unreachable point" proved="true">
-  <proof prover="0"><result status="valid" time="0.074884" steps="5059"/></proof>
+  <proof prover="4"><result status="valid" time="0.006888" steps="30"/></proof>
   </goal>
   <goal name="join_left&#39;vc.16" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.047740" steps="104897"/></proof>
@@ -140,7 +142,7 @@
   <proof prover="1"><result status="valid" time="0.461034" steps="1439780"/></proof>
   </goal>
   <goal name="join_left&#39;vc.18" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.273457" steps="24385"/></proof>
+  <proof prover="2"><result status="valid" time="0.054528" steps="233665"/></proof>
   </goal>
   <goal name="join_left&#39;vc.19" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.110656" steps="258753"/></proof>
@@ -163,7 +165,7 @@
  <proof prover="1"><result status="valid" time="0.314753" steps="581333"/></proof>
  </goal>
  <goal name="join2&#39;vc" expl="VC for join2" proved="true">
- <proof prover="1"><result status="valid" time="0.363785" steps="603568"/></proof>
+ <proof prover="1"><result status="valid" time="0.220032" steps="603568"/></proof>
  </goal>
  <goal name="delete&#39;vc" expl="VC for delete" proved="true">
  <proof prover="1"><result status="valid" time="0.045958" steps="9960"/></proof>
