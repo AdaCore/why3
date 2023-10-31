@@ -284,10 +284,17 @@ let replace_subst lp lv llet f1 f2 withed_terms t =
         in
         (* Catch any error from first_order_matching or with_terms. *)
         match matching_with_terms ~trans_name:"rewrite" lv llet_svs f1 t (Some withed_terms) with
-        | exception _e ->
-            Term.t_map_fold
-                (fun is_replaced t -> replace is_replaced f1 f2 t)
-                is_replaced t
+        | exception e ->
+            begin
+              match e with
+              | Arg_trans_missing _ -> raise e
+              | _ ->
+                  Debug.dprintf debug_matching "matching raised exception %a@."
+                    Exn_printer.exn_printer e;
+                  Term.t_map_fold
+                    (fun is_replaced t -> replace is_replaced f1 f2 t)
+                    is_replaced t
+            end
         | subst_ty, subst ->
               let sf1 = t_ty_subst subst_ty subst f1 in
               if (Term.t_equal sf1 t) then
