@@ -583,7 +583,8 @@ let print_compare_hist stats =
         fprintf main_fmt
 {|set key off
 Label(Ident,T1,T2) = sprintf("%%s\n%%s: %%.6f\n %%s: %%.6f", stringcolumn(Ident), prover1, column(T1), prover2, column(T2))
-stats filename using 1 nooutput
+stats filename using (log($1)) nooutput
+geometric_mean = exp(STATS_mean)
 set xlabel "Percentage of goals"
 set ylabel sprintf("Time ratio: %%s over %%s", prover1, prover2)
 set autoscale xfix
@@ -593,14 +594,14 @@ do for [i=1:5] {set ytics add (sprintf("1/%%.d",10**i) 1./10**i)}
 do for [i=1:5] {set ytics add (sprintf("%%.d",10**i) 10**i)}
 set xtics (0,0)
 do for [i=1:10] {set xtics add (sprintf("%%d",10*i) i*STATS_records/10)}
-if (STATS_mean>1) {set ytics add (sprintf("Average: %%.2f", STATS_mean) STATS_mean)}
-else {if (STATS_mean != 0) {set ytics add (sprintf("Average:\n1/%%.2f", 1/STATS_mean) STATS_mean)}}
+if (geometric_mean>1) {set ytics add (sprintf("Average: %%.2f", geometric_mean) geometric_mean)}
+else {if (geometric_mean != 0) {set ytics add (sprintf("Average:\n1/%%.2f", 1/geometric_mean) geometric_mean)}}
 stats filename using ($1<1) nooutput prefix "IMPROV"
 percent_improve = IMPROV_sum/STATS_records*100
 if (percent_improve > 50) {title_string = sprintf("%%s is faster than %%s on %%.2f %%%% of %%d goals", prover1, prover2, percent_improve, STATS_records)}
 else {title_string = sprintf("%%s is faster than %%s on %%.2f %%%% of %%d goals", prover2, prover1, 100-percent_improve, STATS_records)}
 set title title_string.exclusives
-plot filename using 0:1:(Label(2,3,4)) with labels hypertext point pointsize 0.5 linecolor rgb "blue", STATS_mean title "Mean", 1
+plot filename using 0:1:(Label(2,3,4)) with labels hypertext point pointsize 0.5 linecolor rgb "blue", geometric_mean title "Mean", 1
 pause -1 "Press any key\n"
 replot@.|};
 (*      filename using 0:1:2:(0.1) linecolor rgb "blue" with labels hypertext  *)
