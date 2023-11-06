@@ -73,7 +73,7 @@ type proof_stats =
       prover_max_time : float Hprover.t;
       prover_successful_proofs : int Hprover.t;
       prover_all_proofs : int Hprover.t;
-      proof_node_proofs : (Ident.ident * float Mprover.t) Hpn.t
+      mutable proof_node_proofs : (session * (Ident.ident * float Mprover.t) Hpn.t) list;
     }
 
 let new_proof_stats () =
@@ -90,7 +90,7 @@ let new_proof_stats () =
     prover_max_time = Hprover.create 3;
     prover_successful_proofs =  Hprover.create 3;
     prover_all_proofs =  Hprover.create 3;
-    proof_node_proofs = Hpn.create 3}
+    proof_node_proofs = []}
 
 let apply_f_on_hashtbl_entry ~tbl ~f ~name  =
   try
@@ -155,7 +155,7 @@ let update_perf_stats stats ((_,t) as prover_and_time) =
 
 let string_of_prover p = Pp.string_of_wnl print_prover p
 
-let rec stats_of_goal ~root prefix_name stats ses goal =
+let rec stats_of_goal ~root prefix_name stats hpn ses goal =
   if root
   then stats.nb_root_goals <- stats.nb_root_goals + 1
   else stats.nb_sub_goals <- stats.nb_sub_goals + 1;
@@ -179,11 +179,10 @@ let rec stats_of_goal ~root prefix_name stats ses goal =
           | _ -> acc)
       Mprover.empty (get_proof_attempts ses goal)
   in
-  let goal_name = get_proof_name ses goal
-  in
-  Hpn.add stats.proof_node_proofs goal (goal_name,proof_list);
+  let goal_name = get_proof_name ses goal in
+  Hpn.add hpn goal (goal_name,proof_list);
   Mprover.iter (fun x y -> update_perf_stats stats (x,y)) proof_list;
-  List.iter (stats_of_transf prefix_name stats ses) (get_transformations ses goal);
+  List.iter (stats_of_transf prefix_name stats hpn ses) (get_transformations ses goal);
   let goal_name = prefix_name ^ (get_proof_name ses goal).Ident.id_string in
   if not (pn_proved ses goal) then
     stats.no_proof <- Sstr.add goal_name stats.no_proof
@@ -201,19 +200,21 @@ let rec stats_of_goal ~root prefix_name stats ses goal =
           stats.only_one_proof
     end
 
-and stats_of_transf prefix_name stats ses transf =
+and stats_of_transf prefix_name stats hpn ses transf =
   let prefix_name = prefix_name ^ (get_transf_string ses transf) ^ " / " in
-  List.iter (stats_of_goal ~root:false prefix_name stats ses) (get_sub_tasks ses transf)
+  List.iter (stats_of_goal ~root:false prefix_name stats hpn ses) (get_sub_tasks ses transf)
 
-let stats_of_theory file stats ses theory =
+let stats_of_theory file stats hpn ses theory =
   let goals = theory_goals theory in
   let prefix_name = Pp.sprintf "%a" Sysutil.print_file_path (file_path file) ^ " / " ^
                       (theory_name theory).Ident.id_string ^  " / " in
-  List.iter (stats_of_goal ~root:true prefix_name stats ses) goals
+  List.iter (stats_of_goal ~root:true prefix_name stats hpn ses) goals
 
 let stats_of_file stats ses _ file =
+  let hpn = Hpn.create 3 in
   let theories = file_theories file in
-  List.iter (stats_of_theory file stats ses) theories
+  List.iter (stats_of_theory file stats hpn ses) theories;
+  stats.proof_node_proofs <- (ses,hpn) :: stats.proof_node_proofs
 
 type goal_stat =
   | No of (transID * (proofNodeID * goal_stat) list) list
@@ -303,13 +304,13 @@ let stats2_of_file ~nb_proofs ses file =
         | r -> (th,List.rev r)::acc)
     [] (file_theories file)
 
-let stats2_of_session ~nb_proofs ses acc =
+let stats2_of_session ~nb_proofs ses =
   Hfile.fold
     (fun _ f acc ->
-      match stats2_of_file ~nb_proofs ses f with
-        | [] -> acc
-        | r -> (f,List.rev r)::acc)
-    (get_files ses) acc
+       match stats2_of_file ~nb_proofs ses f with
+       | [] -> acc
+       | r -> (f,List.rev r)::acc)
+    (get_files ses) []
 
 let print_file_stats ~time ses (f,r) =
   printf "+-- file [%a]@\n" Sysutil.print_file_path (file_path f);
@@ -378,7 +379,7 @@ let print_overall_stats stats =
 
 let number_of_sessions = ref 0
 
-let run_one stats r0 r1 fname =
+let run_one stats fname =
   incr number_of_sessions;
   let ses = read_session fname in
   let sep = if !opt_print0 then Pp.print0 else Pp.newline in
@@ -388,12 +389,12 @@ let run_one stats r0 r1 fname =
       (get_used_provers ses);
   (* fill_prover_data stats session; *)
   Hfile.iter (stats_of_file stats ses) (get_files ses);
-  r0 := stats2_of_session ~nb_proofs:0 ses !r0;
-  r1 := stats2_of_session ~nb_proofs:1 ses !r1;
+  let r0 = stats2_of_session ~nb_proofs:0 ses in
+  let r1 = stats2_of_session ~nb_proofs:1 ses in
   if !opt_session_stats then
     begin
       (* finalize_stats stats; *)
-      print_session_stats ses !r0 !r1 stats
+      print_session_stats ses r0 r1 stats
     end
 
 (**** print histograms ******)
@@ -456,11 +457,13 @@ let print_hist stats =
 
 (** Generate pairs of provers for the scatter and hist plots.*)
 let generate_provers_pairs stats =
-  let all_provers = 
-    Hpn.fold (fun _pn (_, provers_and_times) acc ->
-        (List.fold_left
-        Sprover.add_left acc (Mprover.keys provers_and_times))
-    ) stats.proof_node_proofs Sprover.empty
+  let all_provers =
+    List.fold_left (fun acc (_ses,hpn) ->
+        Hpn.fold (fun _pn (_,provers_and_times) acc ->
+            (List.fold_left
+               Sprover.add_left acc (Mprover.keys provers_and_times))
+          ) hpn acc)
+       Sprover.empty stats.proof_node_proofs
   in
   let (_, pairs) =
     Sprover.fold (fun prover (visited, pairs) ->
@@ -480,18 +483,20 @@ let print_compare_scatter stats =
     let empty = ref true in
     let max_time = max (Hprover.find stats.prover_max_time prover1)  (Hprover.find stats.prover_max_time prover2)
     in
-    let () = 
-      Hpn.iter (
-      fun _pn (_,provers_and_times) ->
-        let time1 =
-        try Mprover.find prover1 provers_and_times
-        with Not_found -> max_time
-      in let time2 =
-        try Mprover.find prover2 provers_and_times
-      with Not_found -> max_time
-       in fprintf fmt "%.2f %.2f@\n" time1 time2;
-          empty := false
-      ) stats.proof_node_proofs
+    let () =
+      List.iter (fun (_ses, hpn) ->
+          Hpn.iter (
+            fun _pn (_,provers_and_times) ->
+              let time1 =
+                try Mprover.find prover1 provers_and_times
+                with Not_found -> max_time
+              in let time2 =
+                   try Mprover.find prover2 provers_and_times
+                   with Not_found -> max_time
+              in fprintf fmt "%.2f %.2f@\n" time1 time2;
+              empty := false
+          ) hpn)
+        stats.proof_node_proofs
     in
     let () =
       fprintf fmt "@.";
@@ -504,7 +509,7 @@ let print_compare_scatter stats =
   in
   let main_fmt = formatter_of_out_channel main_ch in
   fprintf main_fmt "set key off@\n";
-  let print_plot (filename,(prover1, prover2)) = 
+  let print_plot (filename,(prover1, prover2)) =
     let max_time = max (Hprover.find stats.prover_max_time prover1) (Hprover.find stats.prover_max_time prover2)
     in
     let prover1_name = string_of_prover prover1 in
@@ -532,10 +537,11 @@ let print_compare_hist stats =
   if all_provers_pairs = [] then eprintf "Not enough provers in the session. No graph will be produced.@\n";
   let ratio_and_exclusives (prover1, prover2) =
     let (out_list, p1_only, p2_only) =
-      Hpn.fold (
+      List.fold_left (fun acc (_ses,hpn) ->
+          Hpn.fold (
          fun _pn (ident,provers_and_times) (out_list, p1_only, p2_only) ->
-          match Mprover.find_opt prover1 provers_and_times, Mprover.find_opt prover2 provers_and_times with
-          | Some time1, Some time2 -> 
+      match Mprover.find_opt prover1 provers_and_times, Mprover.find_opt prover2 provers_and_times with
+          | Some time1, Some time2 ->
           (* For some time, Alt-Ergo reported null times and this got stored in sessions.
           Eventually this should be removed*)
             let time1 = if (time1 = Float.zero) then time1 +. 0.000001 else time1 in
@@ -544,7 +550,8 @@ let print_compare_hist stats =
           | Some _    , None       -> (out_list, p1_only + 1, p2_only    )
           | None      , Some _     -> (out_list, p1_only    , p2_only + 1)
           | None      , None       -> (out_list, p1_only , p2_only)
-        ) stats.proof_node_proofs ([], 0, 0)
+       ) hpn acc)
+        ([], 0, 0) stats.proof_node_proofs
     in
     let p2_name = (string_of_prover prover2) in
     let p1_name = (string_of_prover prover1) in
@@ -569,7 +576,7 @@ let print_compare_hist stats =
   in
   let main_fmt = formatter_of_out_channel main_ch in
   fprintf main_fmt "set key off@\n";
-  let print_plot ((prover1_name, prover2_name), filename, p1_only, p2_only) = 
+  let print_plot ((prover1_name, prover2_name), filename, p1_only, p2_only) =
         fprintf main_fmt {|prover1 = "%s"@.prover2 = "%s"@.|} prover1_name prover2_name;
         fprintf main_fmt {|filename = "%s"@.|} filename;
         fprintf main_fmt {|exclusives = "\n%d additional goals are only proved by ".prover1.", %d only by ".prover2@.|} p1_only p2_only;
@@ -610,8 +617,7 @@ replot@.|};
 let run () =
   let _,_ = Whyconf.Args.complete_initialization () in
   let stats = new_proof_stats () in
-  let r0 = ref [] and r1 = ref [] in
-  iter_session_files (run_one stats r0 r1);
+  iter_session_files (run_one stats);
   printf "%d session(s) read, with a total of %d proof goals.@." !number_of_sessions
     (stats.nb_root_goals + stats.nb_sub_goals);
   if !opt_provers_stats then print_overall_stats stats;
