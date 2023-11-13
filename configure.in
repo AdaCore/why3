@@ -998,6 +998,10 @@ dnl          ;;
          coq_compat_version="COQ817"
          COQFLAGS="-w deprecated-instance-without-locality,deprecated-hint-without-locality"
          ;;
+      8.18*)
+         coq_compat_version="COQ818"
+         COQFLAGS="-w deprecated-instance-without-locality,deprecated-hint-without-locality"
+         ;;
       *)
          enable_coq_support=no
          AC_MSG_WARN([You need Coq 8.11 or later; Coq discarded.])
