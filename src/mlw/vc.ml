@@ -849,6 +849,8 @@ let rec k_expr env lps e res xmap =
             let test = t_equ (t_var v.pv_vs) t_bool_true in
             (* with both branches simple, define a resulting term *)
             let t = t_if_simp test t1 t2 and f = sp_if test f1 f2 in
+            let dummy = t_attr_set ?loc:e.e_loc Sattr.empty t_true in
+            let t = t_attr_copy dummy t and f = t_attr_copy dummy f in
             Kseq (Ktag (SP, Kif (v, k1, k2)), 0, Klet (res, t, f))
           with Exit -> Ktag (SP, Kif (v, k1, k2))
           else Kif (v, k1, k2) in
