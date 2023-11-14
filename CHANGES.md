@@ -61,6 +61,7 @@ Tools
 
 Provers
   * support for Coq 8.17.0 (released Mar 23, 2023)
+  * support for Coq 8.18.0 (released Sep 7, 2023)
   * drop support for versions of Coq < 8.11
   * support for Alt-Ergo 2.4.3 and Alt-Ergo 2.5.1
   * support for Z3 4.12.x
