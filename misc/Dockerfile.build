@@ -71,11 +71,12 @@ RUN opam init -y --no-setup -j4 --bare --disable-sandboxing && \
     opam switch create full   ocaml-base-compiler.4.13.1 && \
     opam repository add coq-released https://coq.inria.fr/opam/released --all-switches && \
     opam install -y --switch=latest $OPAM_PACKAGES && \
-    opam install -y --switch=bench  $OPAM_PACKAGES zenon.0.8.5 coq.8.11.2 && \
+    opam install -y --switch=bench  $OPAM_PACKAGES zenon.0.8.5 coq.8.11.2 alt-ergo.2.5.2 && \
     opam install -y --switch=full   $OPAM_PACKAGES re coq.8.15.1 coq-flocq.4.1.0 js_of_ocaml-ppx alt-ergo.2.3.3 sexplib ppx_deriving ppx_sexp_conv ocamlgraph && \
     opam clean -a -c -r -s --logs
 
 USER root
 RUN cp /home/why3/.opam/full/bin/alt-ergo /usr/local/bin/alt-ergo-2.3.3
+RUN cp /home/why3/.opam/bench/bin/alt-ergo /usr/local/bin/alt-ergo-2.5.2
 
 USER why3
