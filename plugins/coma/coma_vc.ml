@@ -30,6 +30,9 @@ let debug_slow = Debug.register_info_flag "coma_no_merge"
 
 exception BadUndef of hsymbol
 
+let is_true f = match f.t_node with
+  | Ttrue -> true | _ -> false
+
 let t_and_simp f1 f2 = match f1.t_node, f2.t_node with
   | _, Ttrue | Tfalse, _ -> t_attr_remove asym_split f1
   | Ttrue, _ | _, Tfalse -> f2
@@ -130,14 +133,7 @@ type wpsp = {
   sp: term Mhs.t;
 }
 
-let is_true f = match f.t_node with
-  | Ttrue  -> true | _ -> false
-
-let is_false f = match f.t_node with
-  | Tfalse -> true | _ -> false
-
-let w_true  = { wp = t_true;  sp = Mhs.empty }
-let w_false = { wp = t_false; sp = Mhs.empty }
+let w_true = { wp = t_true; sp = Mhs.empty }
 
 let sp_or _ sp1 sp2 = Some (
   match sp1.t_node, sp2.t_node with
@@ -167,6 +163,11 @@ let w_implies f w = {
 let w_forall vl w = {
   wp = t_forall_close_simp vl [] w.wp;
   sp = Mhs.map (t_exists_close_simp vl []) w.sp
+}
+
+let w_subst s w = {
+  wp = t_subst s w.wp;
+  sp = Mhs.map (t_subst s) w.sp
 }
 
 type context = {
@@ -235,23 +236,30 @@ let rec consume merge c pl bl =
   c, discharge zl hl
 
 and factorize merge c zl0 hl h wr pl kk =
-  if not merge || Debug.test_flag debug_slow || List.exists (function
+  if Debug.test_flag debug_slow || List.exists (function
     | Pt _ | Pc _ -> true | Pv _ | Pr _ -> false) pl then kk,zl0,hl else
-  let dup (l,m) v = let z = c_clone_vs c v in z::l, Mvs.add v (t_var z) m in
-  let zl, zm = List.fold_left (fun a -> function Pt _ | Pc _ -> assert false
+  let dup (zl,zv) v = let z = c_clone_vs c v in z::zl, Mvs.add z v zv in
+  let zl, zv = List.fold_left (fun a -> function Pt _ | Pc _ -> assert false
     | Pv v | Pr v -> dup a v) (List.fold_left dup (zl0, Mvs.empty) wr) pl in
+  let zm = Mvs.fold (fun z v m -> Mvs.add v (t_var z) m) zv Mvs.empty in
   let zc = { c_empty with c_vs = zm } in
   let bl = List.map (function Pt _ | Pc _ -> assert false
     | Pr v -> Br (Mvs.find v zm,v) | Pv v -> Bv (Mvs.find v zm)) pl in
-  let zw = try kk true zc bl with BadUndef _ -> w_false in
-  if is_true zw.wp || is_false zw.wp then kk,zl0,hl else
-  let hc = create_hsymbol (id_clone h.hs_name) in
-  let zk sf c bl = if not sf then w_true else
-    let c,_ = consume false c pl bl in
-    let link v z f = t_and_simp (t_equ z (c_find_vs c v)) f in
-    let sp = Mhs.singleton hc (Mvs.fold_right link zm t_true) in
-    { wp = t_true; sp = sp } in
-  zk, zl, (hc,zw)::hl
+  match kk true zc bl with exception BadUndef _ -> kk,zl0,hl | zw ->
+  if not merge || is_true zw.wp then
+    let zk sf c bl = if not sf then w_true else
+      if Mvs.is_empty zv then zw else
+      let c,_ = consume false c pl bl in
+      w_subst (Mvs.map (c_find_vs c) zv) zw in
+    zk, zl0, hl
+  else
+    let hc = create_hsymbol (id_clone h.hs_name) in
+    let zk sf c bl = if not sf then w_true else
+      let c,_ = consume false c pl bl in
+      let link v z f = t_and_simp (t_equ z (c_find_vs c v)) f in
+      let sp = Mhs.singleton hc (Mvs.fold_right link zm t_true) in
+      { wp = t_true; sp = sp } in
+    zk, zl, (hc,zw)::hl
 
 and discharge zl hl ws =
   if hl = [] then ws else
