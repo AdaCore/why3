@@ -1,0 +1,22 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: STUCK (failure in assumption at "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to f at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to f at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5)
+- Checked model 2: BAD_CE
+  - Concrete RAC: STUCK (failure in assumption at "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
+  - Abstract RAC: STUCK (failure in postcondition of `f` at unknown location)
+File "bench/check-ce/anonymous4.mlw", line 8, characters 13-23:
+Sub-goal Postcondition of goal g'vc.
+Prover result is: Unknown (unknown) (8 steps).
+The following counterexample model could not be verified
+  (abstract RAC terminated because missing value for return value of call to f at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5):
+File anonymous4.mlw:
+  Line 6:
+    y : int = 1
+  Line 8:
+    result : int = 0
+    y : int = 1
+

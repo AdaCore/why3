@@ -1,0 +1,692 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 2: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_poly.mlw", line 27, characters 45-49:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown) (6 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : array 'a -> int = [|_ => 1|]
+File array_records_poly.mlw:
+  Line 14:
+    basic_record'mk :
+      bool
+      ->
+      int
+      ->
+      int
+      ->
+      basic_record = fun arg_05 arg_11 arg_21 ->
+                      {flag = true; first_value = 3; second_value = 5}
+  Line 16:
+    flag : basic_record -> bool = [|_ => true|]
+  Line 17:
+    first_val : basic_record -> int = [|_ => 3|]
+  Line 18:
+    sec_val : basic_record -> int = [|_ => 5|]
+  Line 23:
+    i : int = -2
+  Line 27:
+    i : int = -2
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 2: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_poly.mlw", line 27, characters 21-25:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown) (9 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : array 'a -> int = [|_ => 1|]
+File array_records_poly.mlw:
+  Line 14:
+    basic_record'mk :
+      bool
+      ->
+      int
+      ->
+      int
+      ->
+      basic_record = fun arg_012 arg_13 arg_23 ->
+                      {flag1 = true; first_value1 = 3; second_value1 = 5}
+  Line 16:
+    flag : basic_record -> bool = [|_ => true|]
+  Line 17:
+    first_val : basic_record -> int = [|_ => 3|]
+  Line 18:
+    sec_val : basic_record -> int = [|_ => 5|]
+  Line 23:
+    i : int = -2
+  Line 27:
+    i : int = -2
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 2: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_poly.mlw", line 27, characters 5-81:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown) (13 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : array 'a -> int = [|_ => 1|]
+File array_records_poly.mlw:
+  Line 14:
+    basic_record'mk :
+      bool
+      ->
+      int
+      ->
+      int
+      ->
+      basic_record = fun arg_020 arg_15 arg_25 ->
+                      if arg_020 = true /\ arg_15 = 3 /\ arg_25 = 69
+                      then {flag1 = true;
+                            first_value1 = 3;
+                            second_value1 = 69}
+                      else {flag1 = true;
+                            first_value1 = 3;
+                            second_value1 = 5}
+  Line 16:
+    flag : basic_record -> bool = [|_ => true|]
+  Line 17:
+    first_val : basic_record -> int = [|_ => 3|]
+  Line 18:
+    sec_val :
+      basic_record
+      ->
+      int = [|{flag1 = true; first_value1 = 3; second_value1 = 69} => 69;
+            _ => 5|]
+  Line 23:
+    i : int = -2
+  Line 27:
+    i : int = -2
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 2: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_poly.mlw", line 28, characters 64-68:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown) (20 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : array 'a -> int = [|_ => 1|]
+File array_records_poly.mlw:
+  Line 14:
+    basic_record'mk :
+      bool
+      ->
+      int
+      ->
+      int
+      ->
+      basic_record = fun arg_029 arg_17 arg_27 ->
+                      if arg_029 = true /\ arg_17 = 3 /\ arg_27 = 69
+                      then {flag1 = true;
+                            first_value1 = 3;
+                            second_value1 = 69}
+                      else {flag1 = true;
+                            first_value1 = 3;
+                            second_value1 = 5}
+  Line 16:
+    flag : basic_record -> bool = [|_ => true|]
+  Line 17:
+    first_val : basic_record -> int = [|_ => 3|]
+  Line 18:
+    sec_val :
+      basic_record
+      ->
+      int = [|{flag1 = true; first_value1 = 3; second_value1 = 69} => 69;
+            _ => 5|]
+  Line 23:
+    i : int = -2
+  Line 28:
+    i : int = -2
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 2: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_poly.mlw", line 28, characters 21-25:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown) (24 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : array 'a -> int = [|_ => 1|]
+File array_records_poly.mlw:
+  Line 14:
+    basic_record'mk :
+      bool
+      ->
+      int
+      ->
+      int
+      ->
+      basic_record = fun arg_039 arg_19 arg_29 ->
+                      if arg_039 = true /\ arg_19 = 3 /\ arg_29 = 69
+                      then {flag1 = true;
+                            first_value1 = 3;
+                            second_value1 = 69}
+                      else {flag1 = true;
+                            first_value1 = 3;
+                            second_value1 = 5}
+  Line 16:
+    flag : basic_record -> bool = [|_ => true|]
+  Line 17:
+    first_val : basic_record -> int = [|_ => 3|]
+  Line 18:
+    sec_val :
+      basic_record
+      ->
+      int = [|{flag1 = true; first_value1 = 3; second_value1 = 69} => 69;
+            _ => 5|]
+  Line 23:
+    i : int = -2
+  Line 28:
+    i : int = -2
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 2: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_poly.mlw", line 28, characters 5-82:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown) (27 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : array 'a -> int = [|_ => 1|]
+File array_records_poly.mlw:
+  Line 14:
+    basic_record'mk :
+      bool
+      ->
+      int
+      ->
+      int
+      ->
+      basic_record = fun arg_049 arg_111 arg_211 ->
+                      if arg_049 = true /\ arg_111 = 42 /\ arg_211 = 69
+                      then {flag1 = true;
+                            first_value1 = 42;
+                            second_value1 = 69}
+                      else if arg_049 = true /\ arg_111 = 3 /\ arg_211 = 69
+                           then {flag1 = true;
+                                 first_value1 = 3;
+                                 second_value1 = 69}
+                           else {flag1 = true;
+                                 first_value1 = 3;
+                                 second_value1 = 5}
+  Line 16:
+    flag : basic_record -> bool = [|_ => true|]
+  Line 17:
+    first_val :
+      basic_record
+      ->
+      int = [|{flag1 = true; first_value1 = 42; second_value1 = 69} => 42;
+            _ => 3|]
+  Line 18:
+    sec_val :
+      basic_record
+      ->
+      int = fun arg_045 ->
+             if arg_045 = {flag1 = true;
+                           first_value1 = 42;
+                           second_value1 = 69} \/
+                arg_045 = {flag1 = true;
+                           first_value1 = 3;
+                           second_value1 = 69}
+             then 69 else 5
+  Line 23:
+    i : int = -2
+  Line 28:
+    i : int = -2
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 2: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_poly.mlw", line 29, characters 64-68:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown) (34 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : array 'a -> int = [|_ => 1|]
+File array_records_poly.mlw:
+  Line 14:
+    basic_record'mk :
+      bool
+      ->
+      int
+      ->
+      int
+      ->
+      basic_record = fun arg_059 arg_113 arg_213 ->
+                      if arg_059 = true /\ arg_113 = 42 /\ arg_213 = 69
+                      then {flag1 = true;
+                            first_value1 = 42;
+                            second_value1 = 69}
+                      else if arg_059 = true /\ arg_113 = 3 /\ arg_213 = 69
+                           then {flag1 = true;
+                                 first_value1 = 3;
+                                 second_value1 = 69}
+                           else {flag1 = true;
+                                 first_value1 = 3;
+                                 second_value1 = 5}
+  Line 16:
+    flag : basic_record -> bool = [|_ => true|]
+  Line 17:
+    first_val :
+      basic_record
+      ->
+      int = [|{flag1 = true; first_value1 = 42; second_value1 = 69} => 42;
+            _ => 3|]
+  Line 18:
+    sec_val :
+      basic_record
+      ->
+      int = fun arg_055 ->
+             if arg_055 = {flag1 = true;
+                           first_value1 = 42;
+                           second_value1 = 69} \/
+                arg_055 = {flag1 = true;
+                           first_value1 = 3;
+                           second_value1 = 69}
+             then 69 else 5
+  Line 23:
+    i : int = -2
+  Line 29:
+    i : int = -2
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_poly.mlw", line 29, characters 21-25:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Step limit exceeded (38 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : array 'a -> int = [|_ => 0|]
+File array_records_poly.mlw:
+  Line 14:
+    basic_record'mk :
+      bool
+      ->
+      int
+      ->
+      int
+      ->
+      basic_record = fun arg_064 arg_114 arg_214 ->
+                      if arg_064 = false /\ arg_114 = 42 /\ arg_214 = 0
+                      then {flag1 = false;
+                            first_value1 = 0;
+                            second_value1 = 0}
+                      else if arg_064 = false /\ arg_114 = 0 /\ arg_214 = 69
+                           then {flag1 = false;
+                                 first_value1 = 0;
+                                 second_value1 = 0}
+                           else {flag1 = false;
+                                 first_value1 = 0;
+                                 second_value1 = 0}
+  Line 16:
+    flag : basic_record -> bool = [|_ => false|]
+  Line 17:
+    first_val : basic_record -> int = [|_ => 0|]
+  Line 18:
+    sec_val : basic_record -> int = [|_ => 0|]
+  Line 23:
+    i : int = -2
+  Line 29:
+    i : int = -2
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_poly.mlw", line 29, characters 5-82:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Step limit exceeded (42 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : array 'a -> int = [|_ => 0|]
+File array_records_poly.mlw:
+  Line 14:
+    basic_record'mk :
+      bool
+      ->
+      int
+      ->
+      int
+      ->
+      basic_record = fun arg_069 arg_115 arg_215 ->
+                      if arg_069 = false /\ arg_115 = 23 /\ arg_215 = 0
+                      then {flag1 = false;
+                            first_value1 = 0;
+                            second_value1 = 0}
+                      else if arg_069 = false /\ arg_115 = 42 /\ arg_215 = 0
+                           then {flag1 = false;
+                                 first_value1 = 0;
+                                 second_value1 = 0}
+                           else if arg_069 = false /\
+                                   arg_115 = 0 /\ arg_215 = 69
+                                then {flag1 = false;
+                                      first_value1 = 0;
+                                      second_value1 = 0}
+                                else {flag1 = false;
+                                      first_value1 = 0;
+                                      second_value1 = 0}
+  Line 16:
+    flag : basic_record -> bool = [|_ => false|]
+  Line 17:
+    first_val : basic_record -> int = [|_ => 0|]
+  Line 18:
+    sec_val : basic_record -> int = [|_ => 0|]
+  Line 23:
+    i : int = -2
+  Line 29:
+    i : int = -2
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_poly.mlw", line 30, characters 74-78:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Step limit exceeded (50 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : array 'a -> int = [|_ => 0|]
+File array_records_poly.mlw:
+  Line 14:
+    basic_record'mk :
+      bool
+      ->
+      int
+      ->
+      int
+      ->
+      basic_record = fun arg_074 arg_116 arg_216 ->
+                      if arg_074 = false /\ arg_116 = 23 /\ arg_216 = 0
+                      then {flag1 = false;
+                            first_value1 = 0;
+                            second_value1 = 0}
+                      else if arg_074 = false /\ arg_116 = 42 /\ arg_216 = 0
+                           then {flag1 = false;
+                                 first_value1 = 0;
+                                 second_value1 = 0}
+                           else if arg_074 = false /\
+                                   arg_116 = 0 /\ arg_216 = 69
+                                then {flag1 = false;
+                                      first_value1 = 0;
+                                      second_value1 = 0}
+                                else {flag1 = false;
+                                      first_value1 = 0;
+                                      second_value1 = 0}
+  Line 16:
+    flag : basic_record -> bool = [|_ => false|]
+  Line 17:
+    first_val : basic_record -> int = [|_ => 0|]
+  Line 18:
+    sec_val : basic_record -> int = [|_ => 0|]
+  Line 23:
+    i : int = -2
+  Line 30:
+    i : int = -2
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_poly.mlw", line 30, characters 41-45:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Step limit exceeded (54 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : array 'a -> int = [|_ => 0|]
+File array_records_poly.mlw:
+  Line 14:
+    basic_record'mk :
+      bool
+      ->
+      int
+      ->
+      int
+      ->
+      basic_record = fun arg_079 arg_117 arg_217 ->
+                      if arg_079 = false /\ arg_117 = 23 /\ arg_217 = 0
+                      then {flag1 = false;
+                            first_value1 = 0;
+                            second_value1 = 0}
+                      else if arg_079 = false /\ arg_117 = 42 /\ arg_217 = 0
+                           then {flag1 = false;
+                                 first_value1 = 0;
+                                 second_value1 = 0}
+                           else if arg_079 = false /\
+                                   arg_117 = 0 /\ arg_217 = 69
+                                then {flag1 = false;
+                                      first_value1 = 0;
+                                      second_value1 = 0}
+                                else {flag1 = false;
+                                      first_value1 = 0;
+                                      second_value1 = 0}
+  Line 16:
+    flag : basic_record -> bool = [|_ => false|]
+  Line 17:
+    first_val : basic_record -> int = [|_ => 0|]
+  Line 18:
+    sec_val : basic_record -> int = [|_ => 0|]
+  Line 23:
+    i : int = -2
+  Line 30:
+    i : int = -2
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_poly.mlw", line 30, characters 5-92:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Step limit exceeded (59 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : array 'a -> int = [|_ => 0|]
+File array_records_poly.mlw:
+  Line 14:
+    basic_record'mk :
+      bool
+      ->
+      int
+      ->
+      int
+      ->
+      basic_record = fun arg_084 arg_118 arg_218 ->
+                      if arg_084 = false /\ arg_118 = 0 /\ arg_218 = 0
+                      then {flag1 = false;
+                            first_value1 = 0;
+                            second_value1 = 0}
+                      else if arg_084 = false /\ arg_118 = 23 /\ arg_218 = 0
+                           then {flag1 = false;
+                                 first_value1 = 0;
+                                 second_value1 = 0}
+                           else if arg_084 = false /\
+                                   arg_118 = 42 /\ arg_218 = 0
+                                then {flag1 = false;
+                                      first_value1 = 0;
+                                      second_value1 = 0}
+                                else if arg_084 = false /\
+                                        arg_118 = 0 /\ arg_218 = 69
+                                     then {flag1 = false;
+                                           first_value1 = 0;
+                                           second_value1 = 0}
+                                     else {flag1 = false;
+                                           first_value1 = 0;
+                                           second_value1 = 0}
+  Line 16:
+    flag : basic_record -> bool = [|_ => false|]
+  Line 17:
+    first_val : basic_record -> int = [|_ => 0|]
+  Line 18:
+    sec_val : basic_record -> int = [|_ => 0|]
+  Line 23:
+    i : int = -2
+  Line 30:
+    i : int = -2
+
+File "bench/check-ce/array_records_poly.mlw", line 31, characters 13-35:
+Sub-goal Assertion of goal var_overwrite'vc.
+Prover result is: Valid (69 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
+File "bench/check-ce/array_records_poly.mlw", line 25, characters 15-36:
+Sub-goal Postcondition of goal var_overwrite'vc.
+Prover result is: Step limit exceeded (70 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : array 'a -> int = [|_ => 0|]
+File array_records_poly.mlw:
+  Line 14:
+    basic_record'mk :
+      bool
+      ->
+      int
+      ->
+      int
+      ->
+      basic_record = fun arg_094 arg_120 arg_220 ->
+                      if arg_094 = false /\ arg_120 = 0 /\ arg_220 = 0
+                      then {flag1 = false;
+                            first_value1 = 0;
+                            second_value1 = 69}
+                      else if arg_094 = false /\ arg_120 = 23 /\ arg_220 = 0
+                           then {flag1 = false;
+                                 first_value1 = 0;
+                                 second_value1 = 0}
+                           else if arg_094 = false /\
+                                   arg_120 = 42 /\ arg_220 = 0
+                                then {flag1 = false;
+                                      first_value1 = 0;
+                                      second_value1 = 0}
+                                else if arg_094 = false /\
+                                        arg_120 = 0 /\ arg_220 = 69
+                                     then {flag1 = false;
+                                           first_value1 = 0;
+                                           second_value1 = 0}
+                                     else {flag1 = false;
+                                           first_value1 = 0;
+                                           second_value1 = 69}
+  Line 16:
+    flag : basic_record -> bool = [|_ => false|]
+  Line 17:
+    first_val : basic_record -> int = [|_ => 0|]
+  Line 18:
+    sec_val :
+      basic_record
+      ->
+      int = fun arg_090 ->
+             if arg_090 = {flag1 = false;
+                           first_value1 = 0;
+                           second_value1 = 0} \/
+                arg_090 = {flag1 = false;
+                           first_value1 = 0;
+                           second_value1 = 0} \/
+                arg_090 = {flag1 = false;
+                           first_value1 = 0;
+                           second_value1 = 0}
+             then 0 else 69
+  Line 23:
+    i : int = 0
+  Line 25:
+    i : int = 0
+

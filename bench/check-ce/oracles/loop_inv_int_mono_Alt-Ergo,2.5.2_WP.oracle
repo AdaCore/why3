@@ -1,0 +1,223 @@
+File "bench/check-ce/loop_inv_int_mono.mlw", line 15, characters 16-29:
+Sub-goal Loop invariant init of goal f'vc.
+Prover result is: Valid (7 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int_mono.mlw", line 15, characters 16-29)
+  - Abstract RAC: STUCK (when reaching the end of a loop iteration at "bench/check-ce/loop_inv_int_mono.mlw", line 14, character 2 to line 17, character 6)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int_mono.mlw", line 15, characters 16-29)
+  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int_mono.mlw", line 15, characters 16-29)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int_mono.mlw", line 15, characters 16-29)
+  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int_mono.mlw", line 15, characters 16-29)
+File "bench/check-ce/loop_inv_int_mono.mlw", line 15, characters 16-29:
+Sub-goal Loop invariant preservation of goal f'vc.
+Prover result is: Unknown (unknown) (19 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+Unknown location:
+    _ = ()
+File loop_inv_int_mono.mlw:
+  Line 8:
+    _ = ()
+    Execution of main function `f` with env:
+      _ = ()
+      zero = 0
+      one = 1
+  Line 11:
+    Normal execution of function `t'mk` with args:
+      c = 0
+  Line 13:
+    Normal execution of function `t'mk` with args:
+      c = 2
+  Line 14:
+    Normal execution of function `c` with args:
+      arg = {c1= 2}
+    Normal execution of function `(<)` with args:
+      _ = 2
+      _ = 10
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `c` with args:
+      arg = {c1= 2}
+    Normal execution of function `c` with args:
+      arg = {c1= 1}
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 2
+  Line 14:
+    Normal execution of function `c` with args:
+      arg = {c1= 3}
+    Normal execution of function `(<)` with args:
+      _ = 3
+      _ = 10
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `c` with args:
+      arg = {c1= 3}
+    Normal execution of function `c` with args:
+      arg = {c1= 1}
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 3
+  Line 14:
+    Normal execution of function `c` with args:
+      arg = {c1= 4}
+    Normal execution of function `(<)` with args:
+      _ = 4
+      _ = 10
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `c` with args:
+      arg = {c1= 4}
+    Normal execution of function `c` with args:
+      arg = {c1= 1}
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 4
+  Line 14:
+    Normal execution of function `c` with args:
+      arg = {c1= 5}
+    Normal execution of function `(<)` with args:
+      _ = 5
+      _ = 10
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `c` with args:
+      arg = {c1= 5}
+    Normal execution of function `c` with args:
+      arg = {c1= 1}
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 5
+  Line 15:
+    Property failure at loop invariant preservation with:
+      a = {c1= 1}
+      b = {c1= 6}
+
+File "bench/check-ce/loop_inv_int_mono.mlw", line 38, characters 16-29:
+Sub-goal Loop invariant init of goal f'vc.
+Prover result is: Valid (6 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int_mono.mlw", line 38, characters 16-29)
+  - Abstract RAC: STUCK (when reaching the end of a loop iteration at "bench/check-ce/loop_inv_int_mono.mlw", line 37, character 2 to line 40, character 6)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int_mono.mlw", line 38, characters 16-29)
+  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int_mono.mlw", line 38, characters 16-29)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int_mono.mlw", line 38, characters 16-29)
+  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_inv_int_mono.mlw", line 38, characters 16-29)
+File "bench/check-ce/loop_inv_int_mono.mlw", line 38, characters 16-29:
+Sub-goal Loop invariant preservation of goal f'vc.
+Prover result is: Unknown (unknown) (18 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File loop_inv_int_mono.mlw:
+  Line 27:
+    Constant a initialization
+    (giant-step) execution of unimplemented function with args:
+    result = {c3= 0}
+    a = {c3= 0}
+  Line 29:
+    Constant b initialization
+    (giant-step) execution of unimplemented function with args:
+    result = {c3= 0}
+    b = {c3= 0}
+Unknown location:
+    _ = ()
+File loop_inv_int_mono.mlw:
+  Line 31:
+    _ = ()
+    Execution of main function `f` with env:
+      a = {c3= 0}
+      b = {c3= 0}
+      _ = ()
+      zero = 0
+      one = 1
+  Line 37:
+    Normal execution of function `c` with args:
+      arg = {c3= 2}
+    Normal execution of function `(<)` with args:
+      _ = 2
+      _ = 10
+    Normal iteration of loop
+  Line 39:
+    Normal execution of function `c` with args:
+      arg = {c3= 2}
+    Normal execution of function `c` with args:
+      arg = {c3= 1}
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 2
+  Line 37:
+    Normal execution of function `c` with args:
+      arg = {c3= 3}
+    Normal execution of function `(<)` with args:
+      _ = 3
+      _ = 10
+    Normal iteration of loop
+  Line 39:
+    Normal execution of function `c` with args:
+      arg = {c3= 3}
+    Normal execution of function `c` with args:
+      arg = {c3= 1}
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 3
+  Line 37:
+    Normal execution of function `c` with args:
+      arg = {c3= 4}
+    Normal execution of function `(<)` with args:
+      _ = 4
+      _ = 10
+    Normal iteration of loop
+  Line 39:
+    Normal execution of function `c` with args:
+      arg = {c3= 4}
+    Normal execution of function `c` with args:
+      arg = {c3= 1}
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 4
+  Line 37:
+    Normal execution of function `c` with args:
+      arg = {c3= 5}
+    Normal execution of function `(<)` with args:
+      _ = 5
+      _ = 10
+    Normal iteration of loop
+  Line 39:
+    Normal execution of function `c` with args:
+      arg = {c3= 5}
+    Normal execution of function `c` with args:
+      arg = {c3= 1}
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 5
+  Line 38:
+    Property failure at loop invariant preservation with:
+      a = {c3= 1}
+      b = {c3= 6}
+
+File "bench/check-ce/loop_inv_int_mono.mlw", line 33, characters 12-24:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Valid (8 steps).
+

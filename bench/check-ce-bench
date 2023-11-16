@@ -162,7 +162,7 @@ run () {
   steps=$5
   racsteps=$6
   if [ "$3" = "strings" ] && [[ $1 == CVC* ]] ; then
-    prover="$1,strings+counterexamples"
+      prover="$1,strings+counterexamples"
   else
     prover="$1,counterexamples"
   fi
@@ -213,10 +213,10 @@ start=$(date +%s)
 for file in $files; do
   filedir="$(realpath --relative-to="$PWD" $(dirname $file))"
   filebase=`basename $file .mlw`
-  # if [ "$filebase" = "maps_poly" -o "$filebase" = "maps_mono" ] ; then
-  #   echo "Skipping tests on $filedir/$filebase.mlw";
-  # else
     printf "# Running provers on $filedir/$filebase.mlw\n";
+    altergosteps=10000
+    altergostepsrac=$altergosteps
+    skipae=no
     cvc4steps=150000
     cvc4stepsrac=$cvc4steps
     cvc5steps=150000
@@ -232,6 +232,9 @@ for file in $files; do
           ;;
       "668_projection")
           z3steps=500000
+          ;;
+      "array_records_poly")
+          skipae=yes
           ;;
       "array_records_mono")
           z3stepsrac=100
@@ -253,6 +256,15 @@ for file in $files; do
       "int_overflow")
           z3steps=400000
           ;;
+      "jlamp0_mono")
+          skipae=yes
+          ;;
+      "jlamp0_poly")
+          skipae=yes
+          ;;
+      "loop_inv_int_mono")
+          skipae=yes
+          ;;
       "loop_inv_real")
           z3steps=1000000
           ;;
@@ -265,15 +277,24 @@ for file in $files; do
       "threshold")
           z3steps=500000
           ;;
+      "while_mono")
+          skipae=yes
+          ;;
       *)
           ;;
     esac
-    run CVC4,1.8    $filedir $filebase true  $cvc4steps $cvc4stepsrac
-    run CVC4,1.8    $filedir $filebase false $cvc4steps $cvc4stepsrac
-    run CVC5,1.0.5  $filedir $filebase true  $cvc5steps $cvc5stepsrac
-    run CVC5,1.0.5  $filedir $filebase false $cvc5steps $cvc5stepsrac
-    run Z3,4.8.10   $filedir $filebase true  $z3steps $z3stepsrac
-    run Z3,4.8.10   $filedir $filebase false $z3steps $z3stepsrac
+    if [ "$skipae" = "yes" ] ; then
+          echo "Skipping unreproducible run of Alt-Ergo 2.5.2 on $filedir/$filebase.mlw";
+    else
+      run Alt-Ergo,2.5.2 $filedir $filebase true  $altergosteps $altergostepsrac
+      run Alt-Ergo,2.5.2 $filedir $filebase false  $altergosteps $altergostepsrac
+    fi
+    run CVC4,1.8       $filedir $filebase true  $cvc4steps $cvc4stepsrac
+    run CVC4,1.8       $filedir $filebase false $cvc4steps $cvc4stepsrac
+    run CVC5,1.0.5     $filedir $filebase true  $cvc5steps $cvc5stepsrac
+    run CVC5,1.0.5     $filedir $filebase false $cvc5steps $cvc5stepsrac
+    run Z3,4.8.10      $filedir $filebase true  $z3steps $z3stepsrac
+    run Z3,4.8.10      $filedir $filebase false $z3steps $z3stepsrac
   # fi
 done
 
@@ -294,6 +315,7 @@ bench/check-ce/petiot2018/experiments.sh \
 if [ $? = 1 ]; then failed="${failed}Petiot experiments with $1.\n"; fi
 }
 
+petiot Alt-Ergo,2.5.2  10000
 petiot Z3,4.8.10  500000
 petiot CVC4,1.8 10000
 petiot CVC5,1.0.5 10000
