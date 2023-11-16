@@ -1,0 +1,520 @@
+Warning: term reduction aborted (term size blows up from 289 to 491721, after 278 steps).
+
+Warning: term reduction aborted (takes more than 1024 steps).
+
+Warning: term reduction aborted (term size blows up from 289 to 491721, after 278 steps).
+
+Warning: term reduction aborted (takes more than 1024 steps).
+
+Warning: term reduction aborted (term size blows up from 289 to 491721, after 278 steps).
+
+Warning: term reduction aborted (takes more than 1024 steps).
+
+Warning: term reduction aborted (term size blows up from 289 to 491721, after 278 steps).
+
+Warning: term reduction aborted (takes more than 1024 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `local` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `local` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `local` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `local` cannot be evaluated)
+File "bench/check-ce/703_reduce_term.mlw", line 391, characters 4-55:
+Sub-goal Precondition of goal def'vc.
+Prover result is: Step limit exceeded (68 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `local` cannot be evaluated):
+File bv.mlw:
+  Line 362:
+    size_bv : t = {bv.BV32.t'int => 32}
+  Line 676:
+    t'int :
+      t
+      ->
+      int = [|{bv.BV32.t'int => 2} => 2; {bv.BV32.t'int => 4} => 4;
+            {bv.BV32.t'int => 8} => 8; {bv.BV32.t'int => 16} => 16;
+            {bv.BV32.t'int => 64} => 64; {bv.BV32.t'int => 128} => 128;
+            {bv.BV32.t'int => 256} => 256; {bv.BV32.t'int => 512} => 512;
+            {bv.BV32.t'int => 1024} => 1024; {bv.BV32.t'int => 2048} => 2048;
+            {bv.BV32.t'int => 4096} => 4096; {bv.BV32.t'int => 8192} => 8192;
+            {bv.BV32.t'int => 16384} => 16384;
+            {bv.BV32.t'int => 32768} => 32768;
+            {bv.BV32.t'int => 65536} => 65536;
+            {bv.BV32.t'int => 131072} => 131072;
+            {bv.BV32.t'int => 262144} => 262144;
+            {bv.BV32.t'int => 524288} => 524288;
+            {bv.BV32.t'int => 1048576} => 1048576;
+            {bv.BV32.t'int => 2097152} => 2097152;
+            {bv.BV32.t'int => 4194304} => 4194304;
+            {bv.BV32.t'int => 8388608} => 8388608;
+            {bv.BV32.t'int => 16777216} => 16777216;
+            {bv.BV32.t'int => 0} => 0; {bv.BV32.t'int => 1} => 1; _ => 32|]
+File 703_reduce_term.mlw:
+  Line 5:
+    base : t = {bv.BV32.t'int => 32}
+  Line 13:
+    oor :
+      t
+      ->
+      t
+      ->
+      t = fun arg_02 arg_11 ->
+           if arg_02 = {bv.BV32.t'int => 32} /\
+              arg_11 = {bv.BV32.t'int => 32}
+           then {bv.BV32.t'int => 32}
+           else if arg_02 = {bv.BV32.t'int => 32} /\
+                   arg_11 = {bv.BV32.t'int => 32}
+                then {bv.BV32.t'int => 32}
+                else if arg_02 = {bv.BV32.t'int => 32} /\
+                        arg_11 = {bv.BV32.t'int => 32}
+                     then {bv.BV32.t'int => 32}
+                     else if arg_02 = {bv.BV32.t'int => 32} /\
+                             arg_11 = {bv.BV32.t'int => 32}
+                          then {bv.BV32.t'int => 32}
+                          else if arg_02 = {bv.BV32.t'int => 32} /\
+                                  arg_11 = {bv.BV32.t'int => 32}
+                               then {bv.BV32.t'int => 32}
+                               else if arg_02 = {bv.BV32.t'int => 32} /\
+                                       arg_11 = {bv.BV32.t'int => 32}
+                                    then {bv.BV32.t'int => 32}
+                                    else if arg_02 = {bv.BV32.t'int => 32} /\
+                                            arg_11 = {bv.BV32.t'int => 32}
+                                         then {bv.BV32.t'int => 32}
+                                         else if arg_02 = {bv.BV32.t'int =>
+                                                          32} /\
+                                                 arg_11 = {bv.BV32.t'int =>
+                                                          32}
+                                              then {bv.BV32.t'int => 32}
+                                              else if arg_02 = {bv.BV32.t'int =>
+                                                               32} /\
+                                                      arg_11 = {bv.BV32.t'int =>
+                                                               32}
+                                                   then {bv.BV32.t'int => 32}
+                                                   else if arg_02 = {bv.BV32.t'int =>
+                                                                    32} /\
+                                                           arg_11 = {bv.BV32.t'int =>
+                                                                    32}
+                                                        then {bv.BV32.t'int =>
+                                                             32}
+                                                        else if arg_02 = 
+                                                                {bv.BV32.t'int =>
+                                                                32} /\
+                                                                arg_11 = 
+                                                                {bv.BV32.t'int =>
+                                                                32}
+                                                             then {bv.BV32.t'int =>
+                                                                  32}
+                                                             else if 
+                                                                  arg_02 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_11 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_02 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_11 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_02 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_11 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_02 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_11 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_02 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_11 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_02 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_11 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_02 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_11 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_02 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_11 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_02 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_11 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_02 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_11 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_02 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_11 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_02 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_11 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_02 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_11 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+  Line 16:
+    oor__function_guard :
+      t
+      ->
+      t
+      ->
+      t
+      ->
+      t = fun arg_01 arg_1 arg_2 ->
+           if arg_01 = {bv.BV32.t'int => 32} /\
+              arg_1 = {bv.BV32.t'int => 32} /\ arg_2 = {bv.BV32.t'int => 32}
+           then {bv.BV32.t'int => 32}
+           else if arg_01 = {bv.BV32.t'int => 32} /\
+                   arg_1 = {bv.BV32.t'int => 32} /\
+                   arg_2 = {bv.BV32.t'int => 32}
+                then {bv.BV32.t'int => 32}
+                else if arg_01 = {bv.BV32.t'int => 32} /\
+                        arg_1 = {bv.BV32.t'int => 32} /\
+                        arg_2 = {bv.BV32.t'int => 32}
+                     then {bv.BV32.t'int => 32}
+                     else if arg_01 = {bv.BV32.t'int => 32} /\
+                             arg_1 = {bv.BV32.t'int => 32} /\
+                             arg_2 = {bv.BV32.t'int => 32}
+                          then {bv.BV32.t'int => 32}
+                          else if arg_01 = {bv.BV32.t'int => 32} /\
+                                  arg_1 = {bv.BV32.t'int => 32} /\
+                                  arg_2 = {bv.BV32.t'int => 32}
+                               then {bv.BV32.t'int => 32}
+                               else if arg_01 = {bv.BV32.t'int => 32} /\
+                                       arg_1 = {bv.BV32.t'int => 32} /\
+                                       arg_2 = {bv.BV32.t'int => 32}
+                                    then {bv.BV32.t'int => 32}
+                                    else if arg_01 = {bv.BV32.t'int => 32} /\
+                                            arg_1 = {bv.BV32.t'int => 32} /\
+                                            arg_2 = {bv.BV32.t'int => 32}
+                                         then {bv.BV32.t'int => 32}
+                                         else if arg_01 = {bv.BV32.t'int =>
+                                                          32} /\
+                                                 arg_1 = {bv.BV32.t'int =>
+                                                         32} /\
+                                                 arg_2 = {bv.BV32.t'int =>
+                                                         32}
+                                              then {bv.BV32.t'int => 32}
+                                              else if arg_01 = {bv.BV32.t'int =>
+                                                               32} /\
+                                                      arg_1 = {bv.BV32.t'int =>
+                                                              32} /\
+                                                      arg_2 = {bv.BV32.t'int =>
+                                                              32}
+                                                   then {bv.BV32.t'int => 32}
+                                                   else if arg_01 = {bv.BV32.t'int =>
+                                                                    32} /\
+                                                           arg_1 = {bv.BV32.t'int =>
+                                                                   32} /\
+                                                           arg_2 = {bv.BV32.t'int =>
+                                                                   32}
+                                                        then {bv.BV32.t'int =>
+                                                             32}
+                                                        else if arg_01 = 
+                                                                {bv.BV32.t'int =>
+                                                                32} /\
+                                                                arg_1 = 
+                                                                {bv.BV32.t'int =>
+                                                                32} /\
+                                                                arg_2 = 
+                                                                {bv.BV32.t'int =>
+                                                                32}
+                                                             then {bv.BV32.t'int =>
+                                                                  32}
+                                                             else if 
+                                                                  arg_01 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_1 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_2 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_01 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_1 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_2 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_01 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_1 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_2 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_01 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_1 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_2 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_01 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_1 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_2 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_01 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_1 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_2 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_01 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_1 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_2 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_01 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_1 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_2 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_01 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_1 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_2 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_01 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_1 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_2 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_01 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_1 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_2 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_01 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_1 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_2 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  if 
+                                                                  arg_01 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_1 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32} /\
+                                                                  arg_2 = 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  then 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+                                                                  else 
+                                                                  {bv.BV32.t'int =>
+                                                                  32}
+  Line 24:
+    oand : t -> t -> t = fun arg_04 arg_13 -> {bv.BV32.t'int => 32}
+  Line 27:
+    oand__function_guard :
+      t
+      ->
+      t
+      ->
+      t
+      ->
+      t = fun arg_03 arg_12 arg_21 -> {bv.BV32.t'int => 32}
+  Line 391:
+    base : t = {bv.BV32.t'int => 32}
+

@@ -16,7 +16,8 @@ prelude "(set-logic AUFNIRA)"
 
 *)
 
-filename "%f-%t-%g.smt2"
+(* cannot be here because case of psmt2 files: filename "%f-%t-%g.smt2" *)
+
 unknown "^\\(unknown\\|sat\\|Fail\\)$" "\\1"
 unknown "^(:reason-unknown \\([^)]*\\))$" "\\1"
 time "why3cpulimit time : %s s"

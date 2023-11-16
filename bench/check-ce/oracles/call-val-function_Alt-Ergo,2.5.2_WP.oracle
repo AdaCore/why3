@@ -1,0 +1,112 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to f at "bench/check-ce/call-val-function.mlw", line 11, characters 10-13)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to f at "bench/check-ce/call-val-function.mlw", line 11, characters 10-13)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to f at "bench/check-ce/call-val-function.mlw", line 11, characters 10-13)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to f at "bench/check-ce/call-val-function.mlw", line 11, characters 10-13)
+- Selected model 2: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to f at "bench/check-ce/call-val-function.mlw", line 11, characters 10-13)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to f at "bench/check-ce/call-val-function.mlw", line 11, characters 10-13)
+File "bench/check-ce/call-val-function.mlw", line 9, characters 12-24:
+Sub-goal Postcondition of goal main'vc.
+Prover result is: Unknown (unknown) (8 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because missing value for return value of call to f at "bench/check-ce/call-val-function.mlw", line 11, characters 10-13):
+File call-val-function.mlw:
+  Line 6:
+    y : int = 0
+    z : int = 43
+  Line 8:
+    y : int = 0
+  Line 9:
+    result : int = 44
+  Line 11:
+    z : int = 43
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to f1 at "bench/check-ce/call-val-function.mlw", line 30, characters 10-13)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to f1 at "bench/check-ce/call-val-function.mlw", line 30, characters 10-13)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 28, characters 12-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 28, characters 12-24)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 28, characters 12-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/call-val-function.mlw", line 28, characters 12-24)
+File "bench/check-ce/call-val-function.mlw", line 28, characters 12-24:
+Sub-goal Postcondition of goal main'vc.
+Prover result is: Unknown (unknown) (7 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File call-val-function.mlw:
+  Line 20:
+    f = fun (arg_02:int) -> 43
+  Line 27:
+    y = 0
+    y = 0
+    Execution of main function `main` with env:
+      f = fun (arg_02:int) -> 43
+      y = 0
+      zero = 0
+      one = 1
+  Line 30:
+    (giant-step) execution of unimplemented function `f1`
+      x = 0
+    result of `f1` = 43
+  Line 31:
+    Normal execution of function `(+)` with args:
+      _ = 43
+      _ = 1
+  Line 28:
+    Property failure at postcondition of `main1` with:
+      result = 44
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to f2 at "bench/check-ce/call-val-function.mlw", line 46, characters 10-13)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to f2 at "bench/check-ce/call-val-function.mlw", line 46, characters 10-13)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to f2 at "bench/check-ce/call-val-function.mlw", line 46, characters 10-13)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to f2 at "bench/check-ce/call-val-function.mlw", line 46, characters 10-13)
+- Selected model 2: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to f2 at "bench/check-ce/call-val-function.mlw", line 46, characters 10-13)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to f2 at "bench/check-ce/call-val-function.mlw", line 46, characters 10-13)
+File "bench/check-ce/call-val-function.mlw", line 44, characters 12-24:
+Sub-goal Postcondition of goal main'vc.
+Prover result is: Unknown (unknown) (7 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because missing value for return value of call to f2 at "bench/check-ce/call-val-function.mlw", line 46, characters 10-13):
+File call-val-function.mlw:
+  Line 39:
+    f :
+      int
+      ->
+      int = [|94 => 95; 93 => 94; 92 => 93; 91 => 92; 90 => 91; 89 => 90;
+            88 => 89; 87 => 88; 86 => 87; 85 => 86; 84 => 85; 40 => 41;
+            83 => 84; 82 => 83; 39 => 40; 38 => 39; 81 => 82; 80 => 81;
+            37 => 38; 36 => 37; 79 => 80; 78 => 79; 35 => 36; 34 => 35;
+            77 => 78; 76 => 77; 33 => 34; 32 => 33; 75 => 76; 74 => 75;
+            31 => 32; 30 => 31; 73 => 74; 72 => 73; 29 => 30; 28 => 29;
+            71 => 72; 70 => 71; 27 => 28; 26 => 27; 69 => 70; 68 => 69;
+            25 => 26; 24 => 25; 67 => 68; 66 => 67; 23 => 24; 22 => 23;
+            65 => 66; 64 => 65; 21 => 22; 20 => 21; 63 => 64; 62 => 63;
+            19 => 20; 18 => 19; 61 => 62; 60 => 61; 17 => 18; 16 => 17;
+            59 => 60; 58 => 59; 15 => 16; 14 => 15; 57 => 58; 56 => 57;
+            13 => 14; 12 => 13; 55 => 56; 54 => 55; 11 => 12; 10 => 11;
+            53 => 54; 52 => 53; 9 => 10; 8 => 9; 51 => 52; 50 => 51; 
+            7 => 8; 6 => 7; 49 => 50; 48 => 49; 5 => 6; 4 => 5; 47 => 48;
+            46 => 47; 3 => 4; 2 => 3; 45 => 46; 44 => 45; 1 => 2; 41 => 42;
+            42 => 43; _ => 44|]
+  Line 43:
+    y : int = 42
+  Line 44:
+    result : int = 44
+
