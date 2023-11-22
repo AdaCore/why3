@@ -113,17 +113,17 @@ let status_filter x =
 let filter_spec =
   let open Getopt in
   [ KLong "filter-prover", Hnd1 (AString, add_filter_prover),
-    "[<name>,[<version>[,<alternative>]]|<id>] select proof attempts with the given prover(s)";
+    "[<name>,[<version>[,<alternative>]]] select proof\nattempts with the given prover";
     KLong "filter-obsolete", opt_three opt_filter_obsolete,
     "[yes|no] select only (non-)obsolete proofs";
     KLong "filter-proved", opt_three opt_filter_verified,
     "[yes|no] select only proofs of (non-)proved goals";
     KLong "filter-is-leaf", opt_three opt_filter_is_leaf,
-    "[yes|no] select only proofs of leaf goals, i.e., those without transformations";
+    "[yes|no] select only proofs of leaf goals,\ni.e., those without transformations";
     KLong "filter-status",
     Hnd1 (AList (',', ASymbol ["valid"; "invalid"; "highfailure"]),
           fun l -> opt_status := List.map status_filter l),
-    "[valid|invalid|highfailure] select proofs attempts with the given status";
+    "[valid|invalid|highfailure] select proof attempts\nwith the given status";
   ]
 
 type filters =

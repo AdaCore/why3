@@ -74,7 +74,7 @@ let option_list =
     KLong "rac-steplimit", Hnd1 (AInt, fun i -> opt_rac_steplimit := Some i),
     "<steps> set the step limit for RAC (with --rac)";
     KLong "rac-fail-cannot-check", Hnd0 (fun () -> opt_rac_ignore_incomplete := false),
-    " Ffil RAC as incomplete when an assertion cannot be checked";
+    " fail RAC as incomplete when an assertion cannot\nbe checked";
     KLong "use", Hnd1 (AString, fun m -> use_modules := m :: !use_modules),
     "<qualified_module> use module in the execution";
   ]

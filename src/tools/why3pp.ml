@@ -423,7 +423,7 @@ let spec =
   let formats = List.map fst output_of_str in
   let format_help = String.concat "|" formats in
   [ KLong "output", Hnd1 (ASymbol formats, set_output),
-    "<format> select output format (" ^ format_help ^ "), default is " ^ List.hd formats;
+    "[" ^ format_help ^ "] select output format (default: " ^ List.hd formats ^ ")";
     KLong "kind", Hnd1 (ASymbol ["inductive"], set_kind),
     "<category> select syntactic category to be printed (only\n\
      \"inductive\" for --output=latex)";

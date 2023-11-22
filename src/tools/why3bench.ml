@@ -29,10 +29,10 @@ let opts =
   [
     ( Key ('d', "delay"),
       Hnd1 (AFloat, fun i -> save_interval := i),
-      "<time> set the interval (in seconds) between 2 sessions saves (default 60)" );
+      "<sec> set the interval between session saves (default: 60)" );
     ( Key ('f', "force"),
       Hnd0 (fun () -> force := true),
-      " force to replay all proof attempts (by default, only proof attempts with no result or obsolete result are played)" );
+      " replay all the proof attempts instead of just those\nwith obsolete results or no results" );
   ]
 
 let config, env =
