@@ -261,7 +261,7 @@ let max_real =
   real_value ~pow2:(BigInt.of_int 970) (BigInt.of_string "0x1FFFFFFFFFFFFF")
 
 let min_real = real_value ~pow2:(BigInt.of_int (-1024)) (BigInt.of_int 1)
-let max_int = BigInt.of_int 2147483648
+let max_int = BigInt.of_string "0x80000000"
 
 let constant_too_big t =
   match t.t_node with
