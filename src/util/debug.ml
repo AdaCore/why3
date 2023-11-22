@@ -148,29 +148,36 @@ type 'a stat = {
 }
 
 module Stats = struct
-  let max_name_size = ref 0
+
+let timing_map = Hashtbl.create 42
+
+let add_timing name time =
+  let old_t, old_n =
+    try Hashtbl.find timing_map name
+    with Not_found -> 0.0, 0 in
+  Hashtbl.replace timing_map name (old_t +. time, old_n + 1)
+
+let record_timing name f =
+  if test_flag stats then
+    let begin_time = Unix.gettimeofday () in
+    Fun.protect f
+      ~finally:(fun () -> add_timing name (Unix.gettimeofday () -. begin_time))
+  else f ()
 
   let registered_stats :  (Format.formatter -> unit) list ref = ref []
 
-  let rec print_nb_char fmt = function
-    | n when n <= 0 -> ()
-    | n -> Format.pp_print_char fmt ' '; print_nb_char fmt (n-1)
+  let print fmt =
+    List.iter (fun s -> Format.fprintf fmt "<stats>@[%t@]@." s) !registered_stats;
+    Hashtbl.iter (fun s (t, n) ->
+        Format.fprintf fmt "<stats>@[%s: %f, %d@]@." s t n)
+      timing_map
 
-
-  let print_stat fmt stat =
-    Format.fprintf fmt "@[%s%a: %a@]"
-      stat.name print_nb_char (!max_name_size - String.length stat.name)
-      stat.printer stat.value
-
-  let print () =
-    dprintf stats "@[%a@]@\n"
-      (Pp.print_list Pp.newline (fun fmt f -> f fmt))
-      !registered_stats
-
-
-  let () = at_exit (fun () ->
-    print ();
-    Format.pp_print_flush !formatter ())
+  let () =
+    at_exit (fun () ->
+        if test_flag stats then begin
+            print !formatter;
+            Format.pp_print_flush !formatter ()
+          end)
 
 (* top-level code disabled because issue #383 and nobody knows why this code was for
 
@@ -182,8 +189,9 @@ module Stats = struct
 
   let register ~print ~name ~init =
     let s = {name = name; printer = print; value = init} in
-    max_name_size := max !max_name_size (String.length name);
-    registered_stats := (fun fmt -> print_stat fmt s)::!registered_stats;
+    registered_stats :=
+      (fun fmt -> Format.fprintf fmt "%s: %a" s.name s.printer s.value)
+      :: !registered_stats;
     s
 
   let mod0 stat f =
