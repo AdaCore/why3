@@ -56,7 +56,7 @@ let format margin acc opt =
   | [] -> ()
   | l :: ls ->
       let n = margin - String.length key in
-      let n = if n < 2 then 2 else n in
+      let n = if n < 2 then 2 + (2 - n) mod 2 else n in
       for _i = 1 to n do Buffer.add_char acc ' ' done;
       Buffer.add_string acc l;
       Buffer.add_char acc '\n';

@@ -226,7 +226,7 @@ module Args = struct
 
   let desc_no_warn =
     KLong "warn-off", Hnd1 (AList (',', AString), fun l -> List.iter add_flag l),
-    "<flag>,... set some warning flags"
+    "<flag>,... disable some warnings"
 
   let set_flags_selected ?(silent=false) () =
     let check flag =

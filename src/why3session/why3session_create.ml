@@ -44,12 +44,12 @@ let spec =
       "<sec> set the prover's time limit" );
     ( Key ('s', "stepslimit"),
       Hnd1 (AInt, fun i -> opt_stepslimit := Some i),
-      "<steps> set the prover's step limit (no limit by default)" );
+      "<steps> set the prover's step limit (default: no limit)" );
     ( Key ('a', "apply-transform"), Hnd1 (AString, add_opt_trans),
     "<transf> apply a transformation to every task.");
     ( Key ('m', "memlimit"),
       Hnd1 (AInt, fun i -> opt_memlimit := Some i),
-      "<MB> set the prover's memlimit" );
+      "<MiB> set the prover's memory limit (default: no limit)" );
   ]
 
 open Format

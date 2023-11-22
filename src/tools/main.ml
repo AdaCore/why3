@@ -21,7 +21,7 @@ let option_list =
     KLong "print-datadir", Hnd0 (fun _ -> printf "%s@." Config.datadir; exit 0),
     " print location of non-binary data (modules, etc)";
     KLong "print-timings", Hnd0 (fun () -> at_exit Util.print_timings ),
-    " print timings of different operations at the end of execution";
+    " print timings of different operations";
     KLong "version",
     Hnd0 (fun _ -> printf "Why3 platform, version %s@." Config.version; exit 0),
     " print version information";

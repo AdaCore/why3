@@ -90,7 +90,7 @@ module Args = struct
     let opt_list_flags = ref false in
     let desc =
       KLong "list-debug-flags", Hnd0 (fun () -> opt_list_flags := true),
-      " list known flags ('*' marks those used by --debug-all)" in
+      " list known flags ('*' marks those for --debug-all)" in
     let list () =
       if !opt_list_flags then begin
         let list =

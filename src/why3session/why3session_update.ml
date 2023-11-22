@@ -41,8 +41,7 @@ let spec_update =
           fun pl ->
             actions := List.fold_left (fun l p -> AddProver p :: l) !actions pl
         ),
-      "<provers> Add a proof attempt with the specified provers for each proof \
-       node of the session" );
+      "<provers> add a proof attempt with the specified provers\nto every proof node of the session" );
   ]
   @ Why3session_lib.filter_spec
 

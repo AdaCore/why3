@@ -52,8 +52,7 @@ let spec =
     KLong "print0", Hnd0 (fun () -> opt_print0 := true),
     " use the null character instead of newline";
     KLong "graph", HndOpt (AString, set_opt_graph),
-    "[all|hist|scatter] print graphs comparing the time used by different provers\n\
-      depending on the number of goals. Default: all";
+    "[all|hist|scatter] print graphs comparing the time used\nby different provers (default: all)";
   ]
 
 let warn_no_data =
