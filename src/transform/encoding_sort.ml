@@ -77,7 +77,7 @@ let conv_ls tenv ls tyl tyv =
     | exception Not_found ->
       ignore (List.fold_left2 ty_match Mtv.empty (oty_cons ls.ls_args ls.ls_value) (oty_cons tyl tyv));
       let ls' =
-        if Opt.equal ty_equal ty_res ls.ls_value &&
+        if Option.equal ty_equal ty_res ls.ls_value &&
            List.for_all2 ty_equal ty_arg ls.ls_args then ls
         else create_lsymbol ~constr:ls.ls_constr ~proj:ls.ls_proj
                             (id_clone ls.ls_name) ty_arg ty_res
@@ -94,7 +94,7 @@ let rec rewrite vm tenv t =
       let tenv,tl = Lists.map_fold_left (rewrite vm) tenv tl in
       tenv,ps_app ps tl
   | Tapp (ls,tl) ->
-      let tenv,ls = conv_ls tenv ls (List.map (fun t -> Opt.get t.t_ty) tl) t.t_ty in
+      let tenv,ls = conv_ls tenv ls (List.map (fun t -> Option.get t.t_ty) tl) t.t_ty in
       let tenv,tl = Lists.map_fold_left (rewrite vm) tenv tl in
       tenv,t_app ls tl ls.ls_value
   | Tif (f, t1, t2) ->
@@ -123,7 +123,7 @@ let rec rewrite vm tenv t =
               | _ -> Printer.unsupportedTerm t "unsupported term"
             in
             let (tenv,vm),pl = Lists.map_fold_left add (tenv,vm) pl in
-            tenv,vm,pat_app ls pl (Opt.get ls.ls_value)
+            tenv,vm,pat_app ls pl (Option.get ls.ls_value)
           | _ -> Printer.unsupportedTerm t "unsupported term"
         in
         let tenv,tb = rewrite vm tenv tb in

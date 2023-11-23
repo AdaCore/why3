@@ -79,7 +79,7 @@ let add_opt_goal x =
         raise (Getopt.GetoptFailure msg)
     | None, Some _ ->
         add_opt_theory "Top";
-        Opt.get !opt_theory
+        Option.get !opt_theory
     | Some glist, _ -> glist in
   let l = Strings.split '.' x in
   Queue.push (x, l) glist
@@ -111,7 +111,7 @@ let add_sub_goal s =
     let f =
       try Re.Str.matched_group 1 s
       with Not_found ->
-      try Opt.get (fst (Queue.peek opt_queue))
+      try Option.get (fst (Queue.peek opt_queue))
       with _ -> failure "Missing file" in
     let l =
       try
@@ -275,7 +275,7 @@ let timelimit = match !opt_timelimit with
   | Some i when i <= 0. -> 0.
   | Some i -> i
 
-let stepslimit = Opt.get_def 0 !opt_stepslimit
+let stepslimit = Option.value ~default:0 !opt_stepslimit
 
 let memlimit = match !opt_memlimit with
   | None -> 0
@@ -355,7 +355,7 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
           expls goal_name );
     fprintf fmt "@\n@[<hov2>Prover result is: %a.@]"
       (Call_provers.print_prover_result ~json:false) res;
-    Opt.iter
+    Option.iter
       (Check_ce.print_model_classification ?json
          ?verb_lvl:!opt_ce_log_verbosity ~check_ce:!opt_check_ce_model env fmt)
       ce;
@@ -369,7 +369,7 @@ let select_ce env th models =
     | pm ->
         let rac = Pinterp.mk_rac ~ignore_incomplete:false
             (Rac.Why.mk_check_term_lit config env ?why_prover:!opt_rac_prover ()) in
-        let timelimit = Opt.map float_of_int !opt_rac_timelimit in
+        let timelimit = Option.map float_of_int !opt_rac_timelimit in
         Check_ce.select_model
           ?timelimit ?steplimit:!opt_rac_steplimit ?verb_lvl:!opt_ce_log_verbosity
           ~check_ce:!opt_check_ce_model rac env pm models
@@ -414,7 +414,7 @@ let do_task config env drv fname tname (th : Theory.theory) (task : Task.task) =
         let goal_name = (task_goal task).Decl.pr_name.Ident.id_string in
         printf "%a@." (print_result ?json:!opt_json)
           (fname, t.Term.t_loc, goal_name, expls, res, ce);
-        Opt.iter print_other_models ce;
+        Option.iter print_other_models ce;
         if res.pr_answer <> Valid then unproved := true
     | None, None ->
         Driver.print_task drv std_formatter task
@@ -448,7 +448,7 @@ let do_theory config env drv fname tname th glist elist =
       in
       Decl.Spr.add pr acc
     in
-    let drv = Opt.get drv in
+    let drv = Option.get drv in
     let prs = Queue.fold add Decl.Spr.empty glist in
     let sel = if Decl.Spr.is_empty prs then None else Some prs in
     let tasks = Task.split_theory th sel !opt_task in
@@ -523,7 +523,7 @@ let () =
       set_mark_tags true );
     let main = Whyconf.get_main config in
     let load (d,f,ef) = Driver.load_driver_file_and_extras main env ~extra_dir:d f ef in
-    let drv = Opt.map load !opt_driver in
+    let drv = Option.map load !opt_driver in
     Queue.iter (do_input main env drv) opt_queue;
     if !unproved then exit 2
   with e when not (Debug.test_flag Debug.stack_trace) ->

@@ -498,7 +498,7 @@ let get_locations (task: Task.task) =
   let get_goal_loc ~loc pr_loc =
     (* We get the task loc in priority. If it is not there, we take the pr
        ident loc. No loc can happen in completely ghost function. *)
-    let loc = Opt.fold (fun _ x -> Some x) pr_loc loc in
+    let loc = Option.fold ~some:(fun x -> Some x) ~none:pr_loc loc in
     match loc with
     | Some loc ->
         let (f,bl,bc,el,ec) = Loc.get loc in
@@ -506,7 +506,7 @@ let get_locations (task: Task.task) =
         goal_loc := Some loc
     | _ -> () in
   let rec color_locs ~color formula =
-    Opt.iter (fun loc -> color_loc ~color ~loc) formula.Term.t_loc;
+    Option.iter (fun loc -> color_loc ~color ~loc) formula.Term.t_loc;
     Term.t_iter (fun subf -> color_locs ~color subf) formula in
   let rec color_t_locs ~premise f =
     match f.Term.t_node with
@@ -1038,7 +1038,7 @@ match pa.proof_state with
    begin
      let open Call_provers in
      let result = Pp.string_of print_prover_answer res.pr_answer in
-     let selected_model = Opt.get_def Model_parser.empty_model
+     let selected_model = Option.value ~default:Model_parser.empty_model
          (Check_ce.select_model_last_non_empty res.pr_models) in
      let ce_result =
        Pp.string_of (Model_parser.print_model_human ~filter_similar:true ~print_attrs)

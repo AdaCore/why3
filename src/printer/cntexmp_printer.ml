@@ -115,7 +115,7 @@ let update_info_labels lsname cur_attrs t ls =
         if Strings.has_prefix "at:" attr.attr_string then
           let (f, l, _, _, _) =
             match t.t_loc with
-            | None -> Loc.get (Opt.get_def Loc.dummy_position ls.ls_name.id_loc)
+            | None -> Loc.get (Option.value ~default:Loc.dummy_position ls.ls_name.id_loc)
             | Some loc -> Loc.get loc
           in
           let attr = create_attribute (attr.attr_string ^ ":loc:" ^ f ^ ":" ^ (string_of_int l)) in

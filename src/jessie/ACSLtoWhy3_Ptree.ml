@@ -538,7 +538,7 @@ let create_lsymbol li =
   let id = Ident.id_fresh name in
   let args = List.map create_lvar li.l_profile in
   let targs = List.map (fun v -> v.Term.vs_ty) args in
-  let ret_ty = Opt.map logic_type li.l_type in
+  let ret_ty = Option.map logic_type li.l_type in
   let vs = Term.create_lsymbol id targs ret_ty in
   Self.result "creating logic symbol %d (%s)" li.l_var_info.lv_id name;
   Hashtbl.add logic_symbols li.l_var_info.lv_id vs;

@@ -269,7 +269,7 @@ let find_dobj ~loc denv env impl s =
     | _ -> assert false (* impossible *)
 
 let ty_check loc s ty1 t =
-  Loc.try3 ~loc ty_match s ty1 (Opt.get t.t_ty)
+  Loc.try3 ~loc ty_match s ty1 (Option.get t.t_ty)
 
 let rec ty denv env impl { e_loc = loc; e_node = n } = match n with
   | Eapp (aw,al) ->
@@ -310,7 +310,7 @@ let rec term denv env impl { e_loc = loc; e_node = n } = match n with
   | Enum (Nint s) -> t_int_const s
   | Enum (Nreal (i,f,e)) ->
       let real_lit = Number.(real_literal ~radix:10 ~neg:false ~int:i
-                               ~frac:(Opt.get_def "0" f) ~exp:e) in
+                               ~frac:(Option.value ~default:"0" f) ~exp:e) in
       t_const (Constant.ConstReal real_lit) ty_real
   | Enum (Nrat (n,d)) ->
       let n = t_int_const n and d = t_int_const d in
@@ -322,7 +322,7 @@ let rec term denv env impl { e_loc = loc; e_node = n } = match n with
       begin match Mstr.find s env with
         | SletF ([],_,[],t) ->
             let id = id_user s def.e_loc in
-            let vs = create_vsymbol id (Opt.get t.t_ty) in
+            let vs = create_vsymbol id (Option.get t.t_ty) in
             let env = Mstr.add s (SVar vs) env in
             let t1 = term denv env impl e in
             t_let_close vs t t1
@@ -353,7 +353,7 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
       begin match Mstr.find s env with
         | SletF ([],_,[],t) ->
             let id = id_user s def.e_loc in
-            let vs = create_vsymbol id (Opt.get t.t_ty) in
+            let vs = create_vsymbol id (Option.get t.t_ty) in
             let env = Mstr.add s (SVar vs) env in
             let f,b = fmla denv env impl pol tvl e in
             t_let_close vs t f, b
@@ -402,8 +402,8 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
       let f1,b1 = fmla denv env impl pol tvl e1 in
       let f2,b2 = fmla denv env impl pol tvl e2 in
       if b1 || b2 then
-        let g1,_ = fmla denv env impl (Opt.map not pol) tvl e1 in
-        let g2,_ = fmla denv env impl (Opt.map not pol) tvl e2 in
+        let g1,_ = fmla denv env impl (Option.map not pol) tvl e1 in
+        let g2,_ = fmla denv env impl (Option.map not pol) tvl e2 in
         t_and (t_implies g1 f2) (t_implies g2 f1), true
       else
         t_iff f1 f2, false
@@ -411,18 +411,18 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
       let f1,b1 = fmla denv env impl pol tvl e1 in
       let f2,b2 = fmla denv env impl pol tvl e2 in
       if b1 || b2 then
-        let g1,_ = fmla denv env impl (Opt.map not pol) tvl e1 in
-        let g2,_ = fmla denv env impl (Opt.map not pol) tvl e2 in
+        let g1,_ = fmla denv env impl (Option.map not pol) tvl e1 in
+        let g2,_ = fmla denv env impl (Option.map not pol) tvl e2 in
         t_not (t_and (t_implies f1 g2) (t_implies f2 g1)), true
       else
         t_not (t_iff f1 f2), false
   | Ebin (BOimp,e1,e2) ->
-      let f1,b1 = fmla denv env impl (Opt.map not pol) tvl e1 in
+      let f1,b1 = fmla denv env impl (Option.map not pol) tvl e1 in
       let f2,b2 = fmla denv env impl pol tvl e2 in
       t_implies f1 f2, b1 || b2
   | Ebin (BOpmi,e1,e2) ->
       let f1,b1 = fmla denv env impl pol tvl e1 in
-      let f2,b2 = fmla denv env impl (Opt.map not pol) tvl e2 in
+      let f2,b2 = fmla denv env impl (Option.map not pol) tvl e2 in
       t_implies f2 f1, b1 || b2
   | Ebin (BOand,e1,e2) ->
       let f1,b1 = fmla denv env impl pol tvl e1 in
@@ -433,15 +433,15 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
       let f2,b2 = fmla denv env impl pol tvl e2 in
       t_or f1 f2, b1 || b2
   | Ebin (BOnand,e1,e2) ->
-      let f1,b1 = fmla denv env impl (Opt.map not pol) tvl e1 in
-      let f2,b2 = fmla denv env impl (Opt.map not pol) tvl e2 in
+      let f1,b1 = fmla denv env impl (Option.map not pol) tvl e1 in
+      let f2,b2 = fmla denv env impl (Option.map not pol) tvl e2 in
       t_not (t_and f1 f2), b1 || b2
   | Ebin (BOnor,e1,e2) ->
-      let f1,b1 = fmla denv env impl (Opt.map not pol) tvl e1 in
-      let f2,b2 = fmla denv env impl (Opt.map not pol) tvl e2 in
+      let f1,b1 = fmla denv env impl (Option.map not pol) tvl e1 in
+      let f2,b2 = fmla denv env impl (Option.map not pol) tvl e2 in
       t_not (t_or f1 f2), b1 || b2
   | Enot e1 ->
-      let f1,b1 = fmla denv env impl (Opt.map not pol) tvl e1 in
+      let f1,b1 = fmla denv env impl (Option.map not pol) tvl e1 in
       t_not f1, b1
   | Eequ (e1,e2) ->
       let t1 = term denv env impl e1 in
@@ -506,7 +506,7 @@ and ls_args denv env impl loc fs tvl gl mvs al =
           fs_app denv.fs_ghost [] (ty_app denv.ts_ghost [Mtv.find v tvm]) in
         let tl = List.map ghost gl @ List.map (term denv env impl) al in
         let tvm = List.fold_left2 (ty_check loc) tvm fs.ls_args tl in
-        let ty = Opt.map (ty_inst tvm) fs.ls_value in
+        let ty = Option.map (ty_inst tvm) fs.ls_value in
         t_app fs tl ty
     | _ -> error ~loc BadArity
   in

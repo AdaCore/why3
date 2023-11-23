@@ -79,7 +79,7 @@ let normalize_hyp_or_goal ?pr_norm ?step_limit engine : Task.task Trans.tlist  =
             let d = Decl.create_prop_decl Pgoal pr t in
             [[d]]
         end
-    | Dprop (k, pr, t) when Opt.fold (fun _ -> pr_equal pr) false pr_norm ->
+    | Dprop (k, pr, t) when Option.fold ~some:(fun v -> pr_equal pr v) ~none:false pr_norm ->
       let t = normalize ?step_limit:step_limit ~limit:!compute_max_steps engine Mvs.empty t in
       let d = Decl.create_prop_decl k pr t in
       [[d]]

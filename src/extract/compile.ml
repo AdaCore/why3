@@ -146,14 +146,14 @@ module Translate = struct
     is_singleton (List.filter (fun v -> not v.pv_ghost) s.its_ofields)
 
   let is_optimizable_record_rs info rs =
-    Opt.fold (fun _ -> is_optimizable_record_itd) false (get_record_itd info rs)
+    Option.fold ~some:is_optimizable_record_itd ~none:false (get_record_itd info rs)
 
   let is_empty_record_itd itd = match itd.itd_constructors with
     | [cs] -> List.for_all (fun v -> v.pv_ghost) cs.rs_cty.cty_args
     | _ -> false
 
   let is_empty_record info rs =
-    Opt.fold (fun _ -> is_empty_record_itd) false (get_record_itd info rs)
+    Option.fold ~some:is_empty_record_itd ~none:false (get_record_itd info rs)
 
   (* individual types *)
   let mlty_of_ity mask t =

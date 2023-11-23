@@ -260,7 +260,7 @@ let analyse_result exit_result res_parser get_model out =
   let rec analyse saved_models saved_res l =
     match l with
     | [] ->
-        Opt.get_def HighFailure saved_res, List.rev saved_models
+        Option.value ~default:HighFailure saved_res, List.rev saved_models
     | Answer Valid :: _ ->
         (* answer Valid is always a priority *)
         Valid, []
@@ -355,8 +355,8 @@ let parse_prover_run res_parser signaled time out exitcode limit get_model =
     in analyse_result exit_result res_parser get_model out
   in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
-  let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
-  let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in
+  let time = Option.value ~default:(time) (grep_time out res_parser.prp_timeregexps) in
+  let steps = Option.value ~default:(-1) (grep_steps out res_parser.prp_stepregexps) in
   let tlimit = limit.limit_time in
   let stepslimit = limit.limit_steps in
   let ans, time, steps =

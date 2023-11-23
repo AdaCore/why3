@@ -218,7 +218,7 @@ let unambig_fs fs =
     | Tyvar u when not (lookup u) -> false
     | _ -> ty_all inspect ty
   in
-  inspect (Opt.get fs.ls_value)
+  inspect (Option.get fs.ls_value)
 
 (** Patterns, terms, and formulas *)
 

@@ -950,7 +950,7 @@ let remove_subtree ~(notification:notifier) ~(removed:notifier) s (n: any) =
   | _ ->
      let p = get_any_parent s n in
      fold_all_any s (fun _ x -> remove x; removed x) () n;
-     Opt.iter (update_any_node s notification) p
+     Option.iter (update_any_node s notification) p
 
 (****************************)
 (*     session opening      *)

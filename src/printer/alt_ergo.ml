@@ -138,7 +138,7 @@ let unambig_fs fs =
     | Tyvar u when not (lookup u) -> false
     | _ -> ty_all inspect ty
   in
-  inspect (Opt.get fs.ls_value)
+  inspect (Option.get fs.ls_value)
 
 let number_format = {
     Number.long_int_support = `Default;
@@ -411,7 +411,7 @@ let print_logic_decl info fmt ls ld =
         fprintf fmt "@[<hov 2>function %a(%a) : %a =@ %a@]@\n@\n"
           (print_ident info) ls.ls_name
           (print_list comma (print_logic_binder info)) vl
-          (print_type info) (Opt.get ls.ls_value)
+          (print_type info) (Option.get ls.ls_value)
           (print_term info) e
     | None ->
         fprintf fmt "@[<hov 2>predicate %a(%a) =@ %a@]@\n@\n"

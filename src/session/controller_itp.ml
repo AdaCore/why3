@@ -647,7 +647,7 @@ let schedule_proof_attempt ?proof_script_filename c id pr ~limit ~callback ~noti
       let limit = adapt_limits ~interactive ~use_steps limit a in
       let script =
         if proof_script_filename = None then
-          Opt.map (fun s ->
+          Option.map (fun s ->
               let s = Pp.sprintf "%a" Sysutil.print_file_path s in
               Debug.dprintf debug_sched "Script file = %s@." s;
               Filename.concat (get_dir ses) s) a.proof_script
@@ -719,7 +719,7 @@ let prepare_edition c ?file pn pr ~notification =
   in
   update_goal_node notification session pn;
   let pa = get_proof_attempt_node session panid in
-  let file = Opt.get pa.proof_script in
+  let file = Option.get pa.proof_script in
   let old_res = pa.proof_state in
   let session_dir = Session_itp.get_dir session in
   let file = Sysutil.system_dependent_absolute_path session_dir file in
@@ -740,7 +740,7 @@ let prepare_edition c ?file pn pr ~notification =
   let task = Session_itp.get_task session pn in
   let driver = snd (Hprover.find c.controller_provers pr) in
   Driver.print_task ?old driver fmt task;
-  Opt.iter close_in old;
+  Option.iter close_in old;
   close_out ch;
   panid,file,old_res
 
@@ -838,9 +838,9 @@ open Strategy
 
 let call_one_prover c (p, timelimit, memlimit, steplimit) ~callback ~notification g =
   let main = Whyconf.get_main c.controller_config in
-  let timelimit = Opt.get_def (Whyconf.timelimit main) timelimit in
-  let memlimit = Opt.get_def (Whyconf.memlimit main) memlimit in
-  let steplimit = Opt.get_def 0 steplimit in
+  let timelimit = Option.value ~default:(Whyconf.timelimit main) timelimit in
+  let memlimit = Option.value ~default:(Whyconf.memlimit main) memlimit in
+  let steplimit = Option.value ~default:0 steplimit in
   let limit = {
     Call_provers.limit_time = timelimit;
     limit_mem  = memlimit;

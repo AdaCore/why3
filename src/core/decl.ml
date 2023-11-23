@@ -343,7 +343,7 @@ module Hsdecl = Hashcons.Make (struct
   type t = decl
 
   let cs_equal (cs1,pl1) (cs2,pl2) =
-    ls_equal cs1 cs2 && Lists.equal (Opt.equal ls_equal) pl1 pl2
+    ls_equal cs1 cs2 && Lists.equal (Option.equal ls_equal) pl1 pl2
 
   let eq_td (ts1,td1) (ts2,td2) =
     ts_equal ts1 ts2 && Lists.equal cs_equal td1 td2
@@ -548,9 +548,9 @@ let rec f_pos_ps sps pol f = match f.t_node, pol with
   | Tbinop (Tiff, f, g), _ ->
       f_pos_ps sps None f && f_pos_ps sps None g
   | Tbinop (Timplies, f, g), _ ->
-      f_pos_ps sps (Opt.map not pol) f && f_pos_ps sps pol g
+      f_pos_ps sps (Option.map not pol) f && f_pos_ps sps pol g
   | Tnot f, _ ->
-      f_pos_ps sps (Opt.map not pol) f
+      f_pos_ps sps (Option.map not pol) f
   | Tif (f,g,h), _ ->
       f_pos_ps sps None f && f_pos_ps sps pol g && f_pos_ps sps pol h
   | _ -> TermTF.t_all (t_pos_ps sps) (f_pos_ps sps pol) f
@@ -870,9 +870,9 @@ let make_record_update kn t fll ty =
 
 let make_record_pattern kn fll ty =
   let cs,pjl,flm = parse_record kn fll in
-  let s = ty_match Mtv.empty (Opt.get cs.ls_value) ty in
+  let s = ty_match Mtv.empty (Option.get cs.ls_value) ty in
   let get_arg pj = match Mls.find_opt pj flm with
     | Some v -> v
-    | None -> pat_wild (ty_inst s (Opt.get pj.ls_value))
+    | None -> pat_wild (ty_inst s (Option.get pj.ls_value))
   in
   pat_app cs (List.map get_arg pjl) ty

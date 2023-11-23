@@ -348,7 +348,7 @@ let unambig_fs version fs =
   in
   match version with
   | V20 -> true
-  | V26 | V26Par ->  inspect (Opt.get fs.ls_value)
+  | V26 | V26Par ->  inspect (Option.get fs.ls_value)
 
 (** expr *)
 let rec print_term info fmt t =
@@ -884,7 +884,7 @@ let print_constructor_decl info is_record fmt (ls,args) =
     Mls.add ls (List.map (fun x -> x.field_name) field_names) info.constr_proj_id;
   if Strings.has_suffix "'mk" ls.ls_name.id_string then
     begin try
-      let args = List.map (Opt.get) args in
+      let args = List.map Option.get args in
       info.record_fields <- Mls.add ls args info.record_fields
     with _ -> ()
     end

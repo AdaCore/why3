@@ -175,7 +175,7 @@ let char_of_int i =
 
 let print_in_base radix digits fmt i =
   assert (BigInt.ge i BigInt.zero);
-  let digits = Opt.get_def 1 digits in
+  let digits = Option.value ~default:1 digits in
   let is_small_int = BigInt.is_int i in
   if is_small_int && radix = 8 then
     Format.fprintf fmt "%0*o" digits (BigInt.to_int i)
@@ -368,7 +368,7 @@ let print_hex_real support fmt k ({ rv_sig = i; rv_pow2 = p2; rv_pow5 = p5 } as 
       else Some (BigInt.to_string k) in
     custom fmt i f e in
   let default fmt i f e =
-    let e = Opt.get_def "0" e in
+    let e = Option.value ~default:"0" e in
     Format.fprintf fmt "0x%s.%sp%s" i f e in
   check_support support.hex_real_support do_it default
     (fun () -> print_dec_real support fmt (BigInt.min p2 p5) r)

@@ -121,7 +121,7 @@ let is_protected_vs kept vs =
   is_protected_id vs.vs_name && Sty.mem vs.vs_ty kept
 
 let is_protected_ls kept ls =
-  is_protected_id ls.ls_name && Sty.mem (Opt.get ls.ls_value) kept
+  is_protected_id ls.ls_name && Sty.mem (Option.get ls.ls_value) kept
 
 (* monomorphise modulo the set of kept types * and an lsymbol map *)
 
@@ -239,8 +239,8 @@ let lsmap ty_base kept = Hls.memo 63 (fun ls ->
   let neg ty = if prot_arg && Sty.mem ty kept then ty else ty_base in
   let pos ty = if prot_val && Sty.mem ty kept then ty else ty_base in
   let ty_arg = List.map neg ls.ls_args in
-  let ty_res = Opt.map pos ls.ls_value in
-  if Opt.equal ty_equal ty_res ls.ls_value &&
+  let ty_res = Option.map pos ls.ls_value in
+  if Option.equal ty_equal ty_res ls.ls_value &&
      List.for_all2 ty_equal ty_arg ls.ls_args then ls
   else ls_inst ls ty_arg ty_res)
 
