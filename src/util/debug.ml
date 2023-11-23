@@ -151,6 +151,8 @@ module Stats = struct
 
 let timing_map = Hashtbl.create 42
 
+let get_timings () = timing_map
+
 let add_timing name time =
   let old_t, old_n =
     try Hashtbl.find timing_map name
