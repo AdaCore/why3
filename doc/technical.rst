@@ -98,7 +98,7 @@ Drivers for User Theories
 -------------------------
 
 It is possible for the users to augment the system drivers with extra
-information for their own declared theories. The processus is
+information for their own declared theories. The process is
 described by the following example.
 
 First, we define a new theory in a file :file:`bvmisc.mlw`, containing
@@ -250,7 +250,7 @@ by :why3:tool:`why3 show transformations`.
 
 .. why3:transform:: case
 
-   Split a goal into two subgoal, using the *excluded middle* on a given
+   Split a goal into two subgoals, using the *excluded middle* on a given
    formula. On the task :math:`\Gamma \vdash G`, the transformation
    ``case f`` produces two tasks: :math:`\Gamma, h: f \vdash G` and
    :math:`\Gamma, h: \neg f \vdash G`.
@@ -390,7 +390,7 @@ by :why3:tool:`why3 show transformations`.
 
 .. why3:transform:: cut
 
-   Same as :why3:transform:`assert`, but the order of generated subgoals
+   Same as :why3:transform:`assert`, but the order of the generated subgoals
    is reversed.
 
 .. why3:transform:: destruct
@@ -876,7 +876,7 @@ by :why3:tool:`why3 show transformations`.
 
 .. why3:transform:: remove_unused
 
-   Removes from the context all logic symbols which are not used by the goal or the hypothesis.
+   Remove from the context all the logic symbols that are not used by the goal or the hypothesis.
 
    The effect of that transformation can be expanded by adding dependency metas. Namely, with a declaration of the form
 
@@ -893,8 +893,8 @@ by :why3:tool:`why3 show transformations`.
    must be declared for each axiom. When an axiom is definitional for
    several symbols at the same time, several meta must be declared as
    well. The rule of thumb is that an axiom is kept as soon as at
-   least one of the symbols it defines is needed in the remained,
-   otherzise it is discarded.
+   least one of the symbols it defines is needed in the remainder,
+   otherwise it is discarded.
 
 .. why3:transform:: remove_unused_keep_constant
 
@@ -1358,7 +1358,7 @@ by :why3:tool:`why3 show transformations`.
    automatic provers at all as they generally implement substitution
    rules in their logic.
 
-.. why3:transform: subst_all
+.. why3:transform:: subst_all
 
    Substitute all the variables that can be substituted.
 
