@@ -1307,12 +1307,12 @@ session, depending on the following specific options.
 
 .. option:: --graph=[all|hist|scatter]
 
-   Prepare `gnuplot` files containing graphs with various comparisons of the
-   provers in the session, and display them if `gnuplot` is present in the
+   Produce Gnuplot files containing graphs with various comparisons of the
+   provers in the session, and display them if :command:`gnuplot` is present in the
    system. If no option is specified, `all` is used.
 
    - ``all``: Output a line graph with each line representing the cumulative
-     time taken by a prover on all goals, as function of the nuber of goals.
+     time taken by a prover on all goals, as function of the number of goals.
      Goals are ordered by shortest to longest relative to the prover.
 
    - ``hist``: For every pair of provers in the session, output a histogram
@@ -1547,42 +1547,45 @@ contents, depending on the following specific options.
 
 .. option:: --rename-file=<src>:<dst>
 
-   rename the file *<src>* to *<dst>* in the session. The file *<src>*
-   itself is also renamed to *<dst>* in your filesystem.
+   Rename the file *<src>* to *<dst>* in the session. The file *<src>*
+   itself is also renamed to *<dst>* in the filesystem.
 
 .. option:: --mark-obsolete
 
-   marks as obsolete all the proof attempts of the session. If a filter is provided by the options below, then only the proof attempts that match the filters are affected.
+   Mark as obsolete all the proof attempts of the session. If a filter
+   is provided by the options below, then only the proof attempts that
+   match the filters are affected.
 
 .. option:: --remove-proofs
 
-   removes all the proof attempts. If a filter is provided by the options below, then only the proof attempts that match the filters are affected.
+   Remove all the proof attempts. If a filter is provided by the
+   options below, then only the proof attempts that match the filters
+   are affected.
 
 .. option:: --add-provers=<provers>
 
-   for each proof node of the session, add a new proof attempt for the specified provers.
+   For each proof node of the session, add a new proof attempt for the specified provers.
 
-.. option:: --filter-prover=[<name>[,<version>[,<alternative>]]|<id>]
+.. option:: --filter-prover=<name>[,<version>[,<alternative>]]
 
-   selects proof attempts with this or these prover(s)
+   Select proof attempts with the given provers.
 
 .. option:: --filter-obsolete[=[yes|no]]
 
-   select only (non-)obsolete proofs
+   Select only (non-)obsolete proofs.
 
 .. option:: --filter-proved[=[yes|no]]
 
-   if yes (resp. no) selects only goals that are proved (resp. not proved)
+   Selects only goals that are (not) proved.
 
 .. option:: --filter-is-leaf[=[yes|no]]
 
-   if yes (resp. no) selects only goals that are leaves of the proof
-   tree, i.e. do not have transformations (resp. do have
-   transformations)
+   Select only goals that are leaves of the proof tree, i.e., do not
+   have transformations, if yes.
 
 .. option:: --filter-status=[valid|invalid|highfailure]
 
-   select proofs attempts with the given status
+   Select proof attempts with the given status.
 
 .. why3:tool:: session create
 
@@ -1596,30 +1599,30 @@ source files specified as arguments. Transformations and proofs attempts can be
 added using the options below. No prover is started with this command, and one
 should use the `why3 bench` command on the new session instead.
 
-.. option:: -a <transformation>
+.. option:: -a <transformation>, --apply-transform=<transformation>
 
    Specify a transformation to be applied before the proof nodes are added (can
    be given several times to nest several transformations).
 
-.. option:: -P <prover1:prover2...>
+.. option:: -P <prover1:prover2...>, --prover=<prover1:prover2...>
 
    Specify provers to use for proof attempts added to the session.
 
-.. option:: -o <output-dir>
+.. option:: -o <output-dir>, --output-dir=<output-dir>
 
    Specify the session directory for the created session.
 
-.. option:: -t <sec>
+.. option:: -t <sec>, --timelimit=<sec>
 
-   Specify the timelimit for the added proof attempts.
+   Specify the time limit for the added proof attempts.
 
-.. option:: -s <stepslimit>
+.. option:: -s <steps>, --stepslimit=<steps>
 
-   Specify the stepslimit for the added proof attempts.
+   Specify the step limit for the added proof attempts.
 
-.. option:: -m <MB>
+.. option:: -m <MiB>, --memlimit=<MiB>
 
-   Specify the memlimit for the added proof attempts.
+   Specify the memory limit for the added proof attempts.
 
 .. why3:tool:: doc
 .. _sec.why3doc:
@@ -2030,13 +2033,13 @@ resumed later.
     why3 bench [options] <session directory>
 
 The session file :file:`why3session.xml` stored in the given directory is
-loaded and all the proofs attempt nodes it contains are run.
+loaded and all the proof attempt nodes it contains are run.
 
-.. option:: -d
+.. option:: -d <sec>, --delay=<sec>
 
    Set the delay between temporary session backups, in seconds. Default is 60.
 
-.. option:: -f
+.. option:: -f, --force
 
    Force to rerun all proof attempt nodes, even the ones that have been run
    before.

@@ -1466,9 +1466,9 @@ are:
 -  :samp:`{lab}:` declares the label *lab*. The default label ``exit``
    stops the program.
 
-To examplify this basic programming language, we give below the default
+To exemplify this basic programming language, we give below the default
 strategies that are attached to the default buttons of the IDE, assuming
-that the provers Alt-Ergo 2.3.0, CVC4 1.7 and Z3 4.8.4 were detected by
+that the provers Alt-Ergo 2.3.0, CVC4 1.7, and Z3 4.8.4 have been detected by
 the :why3:tool:`why3 config` command.
 
 Split_VC
@@ -1518,7 +1518,7 @@ Auto_level_2
     on each sub-goals. If the split does not succeed, the provers are
     tried again with larger limits, and in parallel.
 
-Auto level 3
+Auto_level_3
     is bound to
 
     ::
@@ -1548,8 +1548,8 @@ Auto level 3
     5 s and 2 Gb, and in parallel.  If all fail, we attempt the
     transformation of introduction of premises in the context,
     followed by an inlining of the definitions in the goals. We then
-    attempt a split again, if the split succeeds, we restart from the
-    beginning, if it fails then provers are tried again, in parallel, with 30s and 4
+    attempt a split again. If the split succeeds, we restart from the
+    beginning. Otherwise, provers are tried again, in parallel, with 30s and 4
     Gb.
 
 .. _sec.attributes:
@@ -1652,8 +1652,8 @@ Why3 Metas
 
 .. why3:meta:: vc:proved_wf
 
-  Declares an hypothesis as a proof of well-foundness of a binary
-  relation. See section :numref:`sec.custom_wf`.
+  Declare a hypothesis as a proof of well-foundedness of a binary
+  relation. See :numref:`sec.custom_wf`.
 
 .. _sec.debug:
 
