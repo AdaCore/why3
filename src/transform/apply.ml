@@ -469,7 +469,7 @@ let detect_prop_list pr k hl =
       ((List.exists (fun h -> Ident.id_equal pr.pr_name h.pr_name) hl)
          && (k = Paxiom || k = Pgoal))
 
-(* Replace occurences of t1 with t2 in h. When h is None, the default is to
+(* Replace occurrences of t1 with t2 in h. When h is None, the default is to
    replace in the goal.
 *)
 let replace t1 t2 hl =

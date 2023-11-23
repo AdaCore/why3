@@ -17,5 +17,5 @@ def concat(l1, l2):
         #@ invariant forall j. 0 <= j < i -> res[len(l1) + j] == l2[j]
         #@ invariant forall j. 0 <= j < len(l1) -> res[j] == l1[j]
         res[size1 + i] = l2[i]
-    
+
     return res

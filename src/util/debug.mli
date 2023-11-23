@@ -105,4 +105,6 @@ module Stats: sig
   val add_timing : string -> float -> unit
   (** Record a raw timing obtained externally, e.g., from prover execution. *)
 
+  val get_timings : unit -> (string, (float * int)) Hashtbl.t
+
 end

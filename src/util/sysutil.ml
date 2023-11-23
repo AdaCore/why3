@@ -88,8 +88,8 @@ let write_unique_file_fmt f c =
     ~finally:(fun () ->
         Format.pp_print_flush fmt ();
         close_out oc)
-    (fun () -> c fmt) 
-    
+    (fun () -> c fmt)
+
 
 let open_temp_file ?(debug=false) filesuffix usefile =
   let file,cout = Filename.open_temp_file "why" filesuffix in

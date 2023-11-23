@@ -139,7 +139,7 @@ module Translate = struct
     | _ -> None
 
   let is_optimizable_record_itd {itd_its = s; itd_constructors = cl} =
-    let id = s.its_ts.ts_name in 
+    let id = s.its_ts.ts_name in
     not (preserve_single_field id.id_attrs) &&
     is_singleton cl &&
     List.for_all (fun v -> v.pv_ghost) s.its_mfields &&
