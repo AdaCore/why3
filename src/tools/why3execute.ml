@@ -124,7 +124,7 @@ let do_input f =
   let pmod = Pmodule.close_module muc in
 
   (* execute expression *)
-  Opt.iter Pinterp.init_real !prec;
+  Option.iter Pinterp.init_real !prec;
   try
     let compute_term = Rac.Why.mk_compute_term_lit env () in
     let why_prover = !opt_rac_prover and metas = !opt_metas in
@@ -133,7 +133,7 @@ let do_input f =
     let env = Pinterp.mk_empty_env env pmod in
     let ctx = Pinterp.mk_ctx env ~do_rac:!opt_enable_rac ~rac ~giant_steps:false
         ~compute_term ?steplimit:!opt_rac_steplimit
-        ?timelimit:(Opt.map float_of_int !opt_rac_timelimit) () in
+        ?timelimit:(Option.map float_of_int !opt_rac_timelimit) () in
     let res = Pinterp.exec_global_fundef ctx [] None expr in
     printf "%a@." (Pinterp.report_eval_result expr) res;
     exit (match res with Pinterp.Normal _, _, _ -> 0 | _ -> 1);
@@ -154,7 +154,7 @@ let do_input f =
 
 let () =
   try
-    Opt.iter do_input !opt_file
+    Option.iter do_input !opt_file
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

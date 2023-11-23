@@ -202,7 +202,7 @@ let rec reify_term renv t rt =
                else (assert (t_v_occurs v f = 0);
                      renv, acc))
              (renv,None) la1 la2 in
-         renv, Opt.get rt
+         renv, Option.get rt
     | Pvar v, Tquant(Tforall, tq1), Tquant(Tforall, tq2)
       | Pvar v, Tquant(Texists, tq1), Tquant(Texists, tq2)
          when t_v_occurs v f = 1 ->
@@ -305,19 +305,19 @@ let rec reify_term renv t rt =
     else begin
         try
           let crc = Coercion.find renv.crc_map
-                                  (Opt.get t.t_ty) (Opt.get f.t_ty) in
+                                  (Option.get t.t_ty) (Option.get f.t_ty) in
           let apply_crc t ls = t_app_infer ls [t] in
           let crc_t = List.fold_left apply_crc t crc in
           assert (oty_equal f.t_ty crc_t.t_ty);
           invert_pat vl renv (p,f) crc_t
         with Not_found ->
           Debug.dprintf debug_reification "type mismatch between %a and %a@."
-            Pretty.print_ty (Opt.get f.t_ty)
-            Pretty.print_ty (Opt.get t.t_ty);
+            Pretty.print_ty (Option.get f.t_ty)
+            Pretty.print_ty (Option.get t.t_ty);
           raise NoReification
       end
   and invert_interp renv ls (t:term) =
-    let ld = try Opt.get (find_logic_definition renv.kn ls)
+    let ld = try Option.get (find_logic_definition renv.kn ls)
              with Invalid_argument _ | Not_found ->
                Debug.dprintf debug_reification
                  "did not find def of %a@."
@@ -354,7 +354,7 @@ let rec reify_term renv t rt =
            Debug.dprintf debug_reification "f: %a@." Pretty.print_term f;
            raise NoReification
   and invert_ctx_interp renv ls t l g =
-    let ld = try Opt.get (find_logic_definition renv.kn ls)
+    let ld = try Option.get (find_logic_definition renv.kn ls)
              with | Not_found ->
                Debug.dprintf debug_reification "did not find def of %a@."
                  Pretty.print_ls ls;
@@ -439,8 +439,8 @@ let rec reify_term renv t rt =
     Pretty.print_term t Pretty.print_term rt;
   if not (oty_equal t.t_ty rt.t_ty)
   then (Debug.dprintf debug_reification "reification type mismatch %a %a@."
-          Pretty.print_ty (Opt.get t.t_ty)
-          Pretty.print_ty (Opt.get rt.t_ty);
+          Pretty.print_ty (Option.get t.t_ty)
+          Pretty.print_ty (Option.get rt.t_ty);
         raise NoReification);
   match t.t_node, rt.t_node with
   | _, Tapp(interp, {t_node = Tvar vx}::vyl)

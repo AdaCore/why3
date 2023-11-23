@@ -172,7 +172,7 @@ let matching_with_terms ~trans_name lv llet_vs left_term right_term withed_terms
   Debug.dprintf debug_matching
     "subst after first first_order_matching:\n%a@." print_subst subst;
   let subst_ty, subst =
-    let withed_terms = Opt.get_def [] withed_terms in
+    let withed_terms = Option.value ~default:[] withed_terms in
     with_terms ~trans_name subst_ty subst lv withed_terms
   in
   subst_ty, subst

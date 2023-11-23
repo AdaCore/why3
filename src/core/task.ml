@@ -77,15 +77,15 @@ and task_hd = {
 
 let task_hd_equal t1 t2 = match t1.task_decl.td_node, t2.task_decl.td_node with
   | Decl {d_node = Dprop (Pgoal,p1,g1)}, Decl {d_node = Dprop (Pgoal,p2,g2)} ->
-      Opt.equal (==) t1.task_prev t2.task_prev &&
+      Option.equal (==) t1.task_prev t2.task_prev &&
       pr_equal p1 p2 && t_equal_strict g1 g2
   | _ -> t1 == t2
 
 let task_hd_hash t = Weakhtbl.tag_hash t.task_tag
 
-let task_equal t1 t2 = Opt.equal task_hd_equal t1 t2
+let task_equal t1 t2 = Option.equal task_hd_equal t1 t2
 
-let task_hash t = Opt.fold (fun _ t -> task_hd_hash t + 1) 0 t
+let task_hash t = Option.fold ~some:(fun t -> task_hd_hash t + 1) ~none:0 t
 
 module Hstask = Hashcons.Make (struct
   type t = task_hd
@@ -107,9 +107,9 @@ let mk_task decl prev known clone meta = Some (Hstask.hashcons {
   task_tag   = Weakhtbl.dummy_tag;
 })
 
-let task_known = Opt.fold (fun _ t -> t.task_known) Mid.empty
-let task_clone = Opt.fold (fun _ t -> t.task_clone) Mid.empty
-let task_meta  = Opt.fold (fun _ t -> t.task_meta) Mmeta.empty
+let task_known o = Option.fold ~some:(fun t -> t.task_known) ~none:Mid.empty   o
+let task_clone o = Option.fold ~some:(fun t -> t.task_clone) ~none:Mid.empty   o
+let task_meta  o = Option.fold ~some:(fun t -> t.task_meta)  ~none:Mmeta.empty o
 
 let find_clone_tds task (th : theory) = cm_find (task_clone task) th
 let find_meta_tds task (t : meta) = mm_find (task_meta task) t

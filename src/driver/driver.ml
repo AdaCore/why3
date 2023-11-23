@@ -391,7 +391,7 @@ let print_task_prepared ?old drv fmt task =
       printing_info = ref None;
     } in
   fprintf fmt "@[%a@]@?" (lookup_printer p ?old printer_args) task;
-  Opt.get_def (default_printing_info printer_args.env) !(printer_args.printing_info)
+  Option.value ~default:(default_printing_info printer_args.env) !(printer_args.printing_info)
 
 let print_task ?old drv fmt task =
   let task = prepare_task drv task in
@@ -447,10 +447,10 @@ let prove_task_prepared
       ~command ~config ~limit ?old ?inplace ?interactive drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
-  let old_channel = Opt.map open_in old in
+  let old_channel = Option.map open_in old in
   let printing_info = print_task_prepared ?old:old_channel drv fmt task in
   pp_print_flush fmt ();
-  Opt.iter close_in old_channel;
+  Option.iter close_in old_channel;
   let gen_new_file, filename =
     file_name_of_task ?old ?inplace ?interactive drv task in
   let get_model = if get_counterexmp task then Some printing_info else None in

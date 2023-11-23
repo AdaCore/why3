@@ -182,7 +182,7 @@
       before a letter. You can only use ' followed by _ or a number."
 
   let name_term id_opt def t =
-    let name = Opt.fold (fun _ id -> id.id_str) def id_opt in
+    let name = Option.fold ~some:(fun id -> id.id_str) ~none:def id_opt in
     let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name)) in
     { term_loc = t.term_loc; term_desc = Tattr (attr, t) }
 
@@ -242,7 +242,7 @@
       var_of_string ~id_ats:[proxy_atr] ("r'i" ^ i) e2.expr_loc in
     let el_proxies = List.mapi domain_ranga_vars el in
     let default_proxy =
-      Opt.map (fun d ->
+      Option.map (fun d ->
           var_of_string ~id_ats:[proxy_atr] "def'e" d.expr_loc) default in
     (* fun x -> if ... *)
     let fun_id_var = id (if el = [] then "_" else "x'x") loc_begin in

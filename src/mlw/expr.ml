@@ -848,7 +848,7 @@ let c_pur s vl ityl ity =
   if not ity.ity_pure then Loc.errorm "This expression must have pure type";
   let v_args = List.map (create_pvsymbol ~ghost:false (id_fresh "u")) ityl in
   let t_args = List.map (fun v -> t_var v.pv_vs) (vl @ v_args) in
-  let res = Opt.map (fun _ -> ty_of_ity ity) s.ls_value in
+  let res = Option.map (fun _ -> ty_of_ity ity) s.ls_value in
   let q = make_post (t_app s t_args res) in
   let eff = eff_ghostify true (eff_spoil eff_empty ity) in
   let cty = create_cty v_args [] [q] Mxs.empty Mpv.empty eff ity in
@@ -1107,7 +1107,7 @@ let e_exn xs e =
 (* snapshots, assertions, "any" *)
 
 let e_pure t =
-  let ity = Opt.fold (Util.const ity_of_ty_pure) ity_bool t.t_ty in
+  let ity = Option.fold ~some:ity_of_ty_pure ~none:ity_bool t.t_ty in
   let eff = eff_ghostify true (eff_read (t_freepvs Spv.empty t)) in
   let eff = match t.t_node with
     | Tvar _ -> eff (* no magic *)

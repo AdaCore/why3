@@ -39,7 +39,7 @@ let only_ids =
 
 let print_only_id loc =
   let f,l,_,_,_ = Loc.get loc in
-  f = dummy_filename && only_ids <> None && Wstdlib.Sint.mem l (Opt.get only_ids)
+  f = dummy_filename && only_ids <> None && Wstdlib.Sint.mem l (Option.get only_ids)
 
 let pp_loc_id fmt loc =
   if Debug.test_flag debug_print_ids || print_only_id loc then
@@ -347,12 +347,12 @@ let opt_ref_pty = function
   | pty -> "", pty
 
 let pp_binder ~attr fmt (loc, opt_id, ghost, opt_pty) =
-  let opt_ref, opt_pty = match Opt.map opt_ref_pty opt_pty with Some (ref, pty) -> ref, Some pty | None -> "", None in
+  let opt_ref, opt_pty = match Option.map opt_ref_pty opt_pty with Some (ref, pty) -> ref, Some pty | None -> "", None in
   let pp_opt_id fmt opt_id = match opt_id with
     | None -> pp_print_string fmt "_"
     | Some id -> pp_id ~attr fmt id in
   if ghost || opt_pty <> None then
-    let opt_id = Opt.map (remove_id_attr "mlw:reference_var") opt_id in
+    let opt_id = Option.map (remove_id_attr "mlw:reference_var") opt_id in
     fprintf fmt "%a(%a%s%a%a)" pp_maybe_marker loc pp_ghost ghost
       opt_ref pp_opt_id opt_id (pp_opt_pty ~attr) opt_pty
   else
@@ -362,7 +362,7 @@ let pp_binders ~attr fmt =
   pp_print_opt_list ~prefix:" " (pp_binder ~attr) fmt
 
 let pp_comma_binder ~attr fmt (loc, opt_id, ghost, opt_pty) =
-  let opt_ref, opt_pty = match Opt.map opt_ref_pty opt_pty with Some (ref, pty) -> ref, Some pty | None -> "", None in
+  let opt_ref, opt_pty = match Option.map opt_ref_pty opt_pty with Some (ref, pty) -> ref, Some pty | None -> "", None in
   fprintf fmt "%a%a%s%a%a" pp_maybe_marker loc pp_ghost ghost opt_ref (pp_opt ~def:"_" (pp_id ~attr)) opt_id
     (pp_opt ~prefix:" : " (pp_pty ~attr).marked) opt_pty
 
@@ -371,7 +371,7 @@ let pp_comma_binders ~attr fmt =
 
 let pp_param ~attr fmt (loc, opt_id, ghost, pty) =
   let opt_ref, pty, opt_id = match pty with
-    | PTref [pty] -> "ref ", pty, Opt.map (remove_id_attr "mlw:reference_var") opt_id
+    | PTref [pty] -> "ref ", pty, Option.map (remove_id_attr "mlw:reference_var") opt_id
     | _ -> "", pty, opt_id in
   if ghost || opt_id <> None || opt_ref <> "" then
     let pp_id fmt id = fprintf fmt "%a:" (pp_id ~attr) id in

@@ -89,7 +89,7 @@ let create_plain_record_decl ~priv ~mut id args fdl invl witn =
     [create_constructor ~constr:1 cid s fdl] in
   if witn <> None then begin
     let ty = Ty.ty_tuple @@ List.map (fun fd -> fd.pv_vs.vs_ty) fdl in
-    Opt.iter (fun ({e_loc = loc} as e) ->
+    Option.iter (fun ({e_loc = loc} as e) ->
       if diverges e.e_effect.eff_oneway then Loc.errorm ?loc
         "This expression may not terminate, it cannot be a witness";
       if partial e.e_effect.eff_oneway then Loc.errorm ?loc
@@ -444,7 +444,7 @@ let create_type_decl dl =
     | ((_,d,_),_) :: dl ->
         let add s f = Mpv.add (fd_of_rs f) f s in
         let mf = List.fold_left add Mpv.empty d.itd_fields in
-        let get_pj v = Opt.map ls_of_rs (Mpv.find_opt v mf) in
+        let get_pj v = Option.map ls_of_rs (Mpv.find_opt v mf) in
         let get_cs s = ls_of_rs s, List.map get_pj s.rs_cty.cty_args in
         let ld = d.itd_its.its_ts, List.map get_cs d.itd_constructors in
         mount pdl (d :: ddl) (ld :: ldl) dl
@@ -711,7 +711,7 @@ let check_match kn d =
   | PDtype dl ->
       List.iter (fun d ->
         List.iter check_term d.itd_invariant;
-        Opt.iter check_expr d.itd_witness) dl
+        Option.iter check_expr d.itd_witness) dl
   | PDlet ld -> check_let_defn ld
   | PDexn _ | PDpure -> ()
 

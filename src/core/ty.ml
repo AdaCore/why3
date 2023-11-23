@@ -298,17 +298,17 @@ exception UnexpectedProp
 
 let oty_type = function Some ty -> ty | None -> raise UnexpectedProp
 
-let oty_equal = Opt.equal ty_equal
-let oty_hash = Opt.fold (fun _ -> ty_hash) 1
+let oty_equal v1 v2 = Option.equal ty_equal v1 v2
+let oty_hash o = Option.fold ~some:ty_hash ~none:1 o
 
-let oty_compare o1 o2 = Opt.compare ty_compare o1 o2
+let oty_compare o1 o2 = Option.compare ty_compare o1 o2
 
 let oty_match m o1 o2 = match o1,o2 with
   | Some ty1, Some ty2 -> ty_match m ty1 ty2
   | None, None -> m
   | _ -> raise UnexpectedProp
 
-let oty_inst m = Opt.map (ty_inst m)
+let oty_inst m o = Option.map (ty_inst m) o
 let oty_freevars = Opt.fold ty_freevars
 let oty_cons = Opt.fold (fun tl t -> t::tl)
 

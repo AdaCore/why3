@@ -640,7 +640,7 @@ let denv_get denv n =
   mk_node n (Mstr.find_exn (Dterm.UnboundVar n) n denv.locals)
 
 let denv_get_opt denv n =
-  Opt.map (mk_node n) (Mstr.find_opt n denv.locals)
+  Option.map (mk_node n) (Mstr.find_opt n denv.locals)
 
 let mk_node_pure n = function
   | _, Some tvs, dvty, dref -> DEvar_pure (n, specialize_scheme tvs dvty, dref)
@@ -650,7 +650,7 @@ let denv_get_pure denv n =
   mk_node_pure n (Mstr.find_exn (Dterm.UnboundVar n) n denv.locals)
 
 let denv_get_pure_opt denv n =
-  Opt.map (mk_node_pure n) (Mstr.find_opt n denv.locals)
+  Option.map (mk_node_pure n) (Mstr.find_opt n denv.locals)
 
 exception UnboundExn of string
 
@@ -988,7 +988,7 @@ let effect_of_dspec dsp =
   let add_write (l,eff) t = match effect_of_term t with
     | v, {ity_node = Ityreg reg}, fd ->
         let fs = match fd with
-          | Some fd -> Spv.singleton (Opt.get fd.rs_field)
+          | Some fd -> Spv.singleton (Option.get fd.rs_field)
           | None -> Spv.of_list reg.reg_its.its_mfields in
         if not reg.reg_its.its_private && Spv.is_empty fs then
           Loc.errorm ?loc:t.t_loc "mutable expression expected";
@@ -1145,7 +1145,7 @@ let find_old pvm (ovm,old) v =
      so we return v and do not register an "oldie" for it. *)
   let ov = Mstr.find_opt n ovm in
   let pv = Mstr.find_opt n pvm in
-  if not (Opt.equal pv_equal ov pv) then v
+  if not (Option.equal pv_equal ov pv) then v
   else match MMpv.find_opt old v with
     | Some (_,o) -> o
     | None ->
@@ -1388,7 +1388,7 @@ let rec expr uloc env ({de_loc = loc} as de) =
   let uloc, attrs, de = strip uloc Sattr.empty de in
   let env = {env with lgh = false; cgh = false} in
   let e = Loc.try3 ?loc try_expr uloc env de in
-  let loc = Opt.get_def loc uloc in
+  let loc = Option.value ~default:loc uloc in
   if loc = None && Sattr.is_empty attrs
   then e else e_attr_push ?loc attrs e
 
@@ -1446,13 +1446,13 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
     (ghost,(LS ld)::ldl,v) *)
   in
   let c_pur ugh s lpl =
-    let loc = Opt.get_def de0.de_loc uloc in
+    let loc = Option.value ~default:de0.de_loc uloc in
     if not (ugh || env.ghs || env.lgh || env.ugh) then Loc.errorm ?loc
       "Logical symbol %a is used in a non-ghost context" Pretty.print_ls s;
     apply c_pur false true s (List.map Util.ttrue s.ls_args) lpl in
   let c_oop s lpl =
     let rs = Srs.choose s in
-    let loc = Opt.get_def de0.de_loc uloc in
+    let loc = Option.value ~default:de0.de_loc uloc in
     let app s vl al res =
       let nomatch s =
         let ty = match vl, al with
@@ -1496,7 +1496,7 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       let ld_of_lp = function LD ld -> ld | DA _ -> raise Exit in
       env.cgh, List.map ld_of_lp lpl, c
     with Exit ->
-      let loc = Opt.get_def de0.de_loc uloc in
+      let loc = Option.value ~default:de0.de_loc uloc in
       let id = id_fresh ?loc ~attrs:proxy_attrs "h" in
       let ld, s = let_sym id ~ghost:(env.ghs || env.lgh) c in
       c_app s (LD (LS ld) :: lpl) in
@@ -1520,7 +1520,7 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       check_fun env.inr None dsp c;
       proxy c
   | DEany (bl,dity,msk,dsp) ->
-      let loc = Opt.get_def de0.de_loc uloc in
+      let loc = Option.value ~default:de0.de_loc uloc in
       let env = {env with ghs = env.ghs || env.lgh} in
       proxy (c_any (cty_of_spec loc env bl msk dsp dity))
   | DElet ((_,_,_,{de_dvty = ([],_)}) as dldf,de) ->

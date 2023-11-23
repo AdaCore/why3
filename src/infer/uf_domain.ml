@@ -443,7 +443,7 @@ module Make(S:sig
                let open Ity in
                let open Expr in
                let its = restore_its ts in
-               Opt.iter (fun its2 -> assert (its_equal its its2)) ity;
+               Option.iter (fun its2 -> assert (its_equal its its2)) ity;
                let rsl = Pdecl.((find_its_defn mod_known its).itd_fields) in
                let inst_rs rs =
                  let ls = match (rs.rs_logic) with
@@ -451,7 +451,7 @@ module Make(S:sig
                    | _ -> assert false in
                  let this_ty = ty_of_ity rs.rs_cty.cty_result in
                  let ty = ty_inst vars this_ty in
-                 t_app ls [t] (Some ty), Opt.map (fun _ -> rs) ity
+                 t_app ls [t] (Some ty), Option.map (fun _ -> rs) ity
                in List.map inst_rs rsl
              with Not_found -> failwith "could not restore its"
            end
@@ -768,7 +768,7 @@ module Make(S:sig
             ensure_variable uf_man var t_pv;
             uf_man.apron_mapping <-
               Mterm.add t_pv var uf_man.apron_mapping;
-            let accessor = Opt.get (Opt.get rs).rs_field in
+            let accessor = Option.get (Option.get rs).rs_field in
             (accessor, t_pv) :: acc ) [] subv_r subv_pv in
         let old_projs, old_vars =
           try Mreg.find reg uf_man.region_mapping,
