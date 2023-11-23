@@ -8,7 +8,8 @@
   - `make trywhy3`
   - run `make detect-unused` and remove unused files
   - run `make update-doc-png` and check if some pictures need to be updated
-  - check `lib/why3/META.in`
+  - check `lib/why3/META.in` (e.g., against `EXTPKGS` in `Makefile.in`)
+  - check the gallery, especially the new examples (see below)
 
 * change version number `VERSION=1.3 RELEASE=1.3.0`
   - update the first line of `configure.in` using `$RELEASE`
@@ -18,7 +19,7 @@
 
 * check/update authors and copyright
   - update the content of the About dialog in `src/ide/gconfig.ml`
-    around lines 630-670
+    around lines 680-700
   - update the `copyright` field in `doc/conf.py` around line 50
   - update `doc/foreword.rst`
   - update `src/trywhy3/trywhy3.html`
