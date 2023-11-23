@@ -27,7 +27,7 @@ type t =
 
 exception Parse_error of string
 
-val from_file : 
+val from_file :
   ?fixattrs:(string -> attributes -> attributes) -> string -> t
   (** returns the list of XML elements from the given file.
       raise [Sys_error] if the file cannot be opened.

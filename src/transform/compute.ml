@@ -41,7 +41,7 @@ let meta_begin_compute_context =
 
 let rule_attr = Ident.create_attribute "rewrite"
 
-let warn_cannot_rewrite = 
+let warn_cannot_rewrite =
   Loc.register_warning "cannot_rewrite" "Warn that a proposition cannot be turned into a rewrite rule"
 
 let collect_rules p env km prs t =

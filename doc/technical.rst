@@ -1592,7 +1592,7 @@ WhyML Attributes
    then, by default, extraction engine considers the type ``t`` as an alias
    of type ``int``. If this attribute is applied to ``t``, then this
    optimization is disabled.
-   
+
 .. why3:attribute:: induction
 
 .. why3:attribute:: infer

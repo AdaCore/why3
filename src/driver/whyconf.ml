@@ -455,7 +455,7 @@ module RC_load = struct
 
   let warn_replaced_space =
     Loc.register_warning "replaced_space" "Warn that a space has been replaced by '_' in a strategy name"
-  
+
   let load_strategy strategies section =
     try
       let name = get_string section "name" in
