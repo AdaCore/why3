@@ -37,6 +37,13 @@ module Translate = struct
 
   module ML = Mltree
 
+  let preserve_single_field_attr =
+    create_attribute "extraction:preserve_single_field"
+
+
+  let preserve_single_field attrs =
+    Sattr.mem preserve_single_field_attr attrs
+
   let ht_rs = Hrs.create 7 (* rec_rsym -> rec_sym *)
 
   let debug_compile =
@@ -132,6 +139,8 @@ module Translate = struct
     | _ -> None
 
   let is_optimizable_record_itd {itd_its = s; itd_constructors = cl} =
+    let id = s.its_ts.ts_name in 
+    not (preserve_single_field id.id_attrs) &&
     is_singleton cl &&
     List.for_all (fun v -> v.pv_ghost) s.its_mfields &&
     is_singleton (List.filter (fun v -> not v.pv_ghost) s.its_ofields)

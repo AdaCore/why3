@@ -1592,6 +1592,14 @@ WhyML Attributes
    whether it is likely to be false. This is the opposite of
    :why3:attribute:`extraction:likely`.
 
+.. why3:attribute:: extraction:preserve_single_field
+
+   This attribute is applied to the declaration of a record type. If this
+   record contains only one field, for instance ``type t = { x : int }``,
+   then, by default, extraction engine considers the type ``t`` as an alias
+   of type ``int``. If this attribute is applied to ``t``, then this
+   optimization is disabled.
+   
 .. why3:attribute:: induction
 
 .. why3:attribute:: infer
