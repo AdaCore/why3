@@ -12,9 +12,9 @@
 
   In the proof below, we verify this lemma using Why3 (the AVL
   property, not the complexity). The paper skips the details regarding
-  the AVL property---``The resulting tree satisfies the AVL invariants
+  the AVL property---“The resulting tree satisfies the AVL invariants
   since rotations are used to restore the invariant (details left
-  out)''---but the proof happens to be subtle. See CRITICAL below.
+  out)”---but the proof happens to be subtle. See CRITICAL below.
 
   Authors: Jean-Christophe Filliâtre (CNRS)
            Paul Patault (Univ Paris-Saclay)
@@ -86,8 +86,8 @@ predicate avl (t: tree) =
 
 (** Code starts here
 
-  Note: It is a pity that the spec for `rotate_left` and `rotate_right` is
-  longer that the code, but we can't make them logical functions since
+  Note: It is a pity that the specification for `rotate_left` and `rotate_right` is
+  longer than the code, but we can't make them logical functions since
   they are partial functions. *)
 
 let rotate_left (t: tree) : (r: tree)
