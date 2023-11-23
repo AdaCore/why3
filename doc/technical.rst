@@ -429,7 +429,7 @@ by :why3:tool:`why3 show transformations`.
 
    Recursively call :why3:transform:`destruct` on the generated
    hypotheses. The recursion on implication and ``match`` stops after the
-   first occurence of a different symbol.
+   first occurrence of a different symbol.
 
    For example, applying ``destruct_rec H`` on the following goal
 
@@ -593,7 +593,7 @@ by :why3:tool:`why3 show transformations`.
 .. why3:transform:: hide
 
    Hide a given term, by creating a new constant equal to the term and
-   then replacing all occurences of the term in the context by this
+   then replacing all occurrences of the term in the context by this
    constant.
 
    For example, applying ``hide t (1 + 1)`` on the goal
@@ -884,7 +884,7 @@ by :why3:tool:`why3 show transformations`.
 
       meta "remove_unused:dependency" axiom a, function f
 
-   then occurences of `f` in axiom `a` are not counted as occurrences
+   then occurrences of `f` in axiom `a` are not counted as occurrences
    for `f`. The intended meaning is that `a` is a definitional axiom
    for `f`, so when `f` is not needed in the remainder, both the axiom
    and the declaration of `f` can be removed.

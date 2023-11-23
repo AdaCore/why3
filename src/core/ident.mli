@@ -271,7 +271,7 @@ val suffix_attr_name: attrs:Sattr.t -> string -> Sattr.t
 (** Add a suffix to all "name" attributes of [attrs] *)
 
 val compute_model_trace_field: ident option -> int -> Sattr.t
-(** Take an optional projection name and the depths of its occurence and return
+(** Take an optional projection name and the depths of its occurrence and return
     the built field attribute associated *)
 
 val extract_field: attribute -> (int * string) option
