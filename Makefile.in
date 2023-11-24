@@ -2174,7 +2174,7 @@ dist: $(MORE_DIST)
 	rm -f distrib/$(NAME).tar.gz
 	mkdir -p distrib/
 	git archive --format=tar --prefix=$(NAME)/ -o distrib/$(NAME).tar HEAD
-	tar rf distrib/$(NAME).tar --transform="s,^,$(NAME)/," --mtime="`git show -s --format=%ci`" --owner=0 --group=0 $(MORE_DIST)
+	tar rf distrib/$(NAME).tar --transform="s,^,$(NAME)/," --mtime="$$(date -Iseconds -d "`git show -s --format=%ci` +1 second")" --owner=0 --group=0 $(MORE_DIST)
 	gzip -n -f --best distrib/$(NAME).tar
 
 
