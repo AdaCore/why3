@@ -957,43 +957,24 @@ if test "$enable_coq_support" = yes; then
    AC_MSG_CHECKING(Coq version)
    COQVERSION=[`$COQC -v | sed -n -e 's|.*version  *\([^ ]*\).*|\1|p'`]
    AC_MSG_RESULT($COQVERSION)
-
-   case $COQVERSION in
-      8.11*)
-         coq_compat_version="COQ811"
-         ;;
-      8.12*)
-         coq_compat_version="COQ812"
-         ;;
-      8.13*)
-         coq_compat_version="COQ813"
-         ;;
-      8.14*)
-         coq_compat_version="COQ814"
-         ;;
-      8.15*)
-         coq_compat_version="COQ815"
-         ;;
-      8.16*)
-         coq_compat_version="COQ816"
-         ;;
-      8.17*)
-         coq_compat_version="COQ817"
+   COQNUMVERSION=[`echo $COQVERSION | awk -F. '{ printf("%d%02d\n", $1,$2); }'`]
+   if test "$COQNUMVERSION" -lt 811; then
+      if test "$enable_coq_libs" = yes; then
+         AC_MSG_ERROR([cannot build Coq libraries without Coq >= 8.11.])
+      fi
+      enable_coq_support=no
+      AC_MSG_WARN([cannot build Coq libraries without Coq >= 8.11.])
+      reason_coq_support=" (need version >= 8.11)"
+   else
+      if test "$COQNUMVERSION" -ge 817; then
          COQFLAGS="-w deprecated-instance-without-locality,deprecated-hint-without-locality"
-         ;;
-      8.18*)
-         coq_compat_version="COQ818"
-         COQFLAGS="-w deprecated-instance-without-locality,deprecated-hint-without-locality"
-         ;;
-      *)
-         if test "$enable_coq_libs" = yes; then
-            AC_MSG_ERROR([cannot build Coq libraries without Coq >= 8.11.])
-         fi
-         enable_coq_support=no
-         AC_MSG_WARN([cannot build Coq libraries without Coq >= 8.11.])
-         reason_coq_support=" (need version >= 8.11)"
-         ;;
-   esac
+      fi
+      if test "$COQNUMVERSION" -gt 818; then
+         AC_MSG_WARN([unrecognized Coq version, assuming Coq 8.18])
+         COQNUMVERSION=818
+      fi
+      coq_compat_version="COQ$COQNUMVERSION"
+   fi
    if test "$enable_coq_fp_libs" = no; then
       reason_coq_fp_libs= " (Coq < 8.11)"
    fi
