@@ -1050,6 +1050,10 @@ else
     if test "$PVS" = no ; then
         enable_pvs_support=no
         reason_pvs_support=" (pvs not found)"
+    elif $PVS --help 2> /dev/null | grep -q "physical volume"; then
+        AC_MSG_NOTICE([pvs does not seem to be the theorem prover])
+        enable_pvs_support=no
+        reason_pvs_support=" (pvs not found)"
     else
         PVSLIB=`$PVS -where`
         AC_MSG_CHECKING(PVS version)
