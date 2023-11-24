@@ -250,8 +250,8 @@ let find_module_path mm path m =
     | [] -> Mstr.find m mm
     | path -> let mm = Env.read_library Pmodule.mlw_language env path in
               mod_impl env (Mstr.find m mm)
-  with
-    Not_found -> raise (UnknownModule m)
+  with Not_found ->
+    raise (UnknownModule m)
 
 let find_module_id mm id =
   let (path, m, _) = Pmodule.restore_path id in find_module_path mm path m
@@ -347,7 +347,7 @@ let do_extract_module ?fname m =
       let m = find_module_path Mstr.empty path str_m in
       Ident.Hid.add visited_mod m.mod_theory.th_name ();
       Ident.Hid.add visited id ();
-    with Not_found -> () in
+    with UnknownModule _ | Not_found -> () in
   (* compute dependencies of current module [m] *)
   if recurs then begin try
     Ident.Hid.add visited_mod th_name ();
@@ -422,7 +422,7 @@ let rec visit ~recurs mm id =
         Ident.Hid.add visited id ();
         if recurs then Mltree.iter_deps (visit ~recurs mm) d;
         toextract := { info_rec = recurs; info_id = id } :: !toextract
-  with Not_found -> () end
+  with UnknownModule _ | Not_found -> () end
 
 let flat_extraction mm = function
   | File fname ->
@@ -435,7 +435,8 @@ let flat_extraction mm = function
         Mstr.add s m mm in
       Mstr.fold do_m mmf mm
   | Module (path, ms) ->
-      let m = find_module_path mm path ms in (* FIXME: catch Not_found here *)
+      let m = find_module_path mm path ms in
+      (* FIXME: catch UnknownModule here *)
       let m_t = translate_module m in
       let recurs = opt_rec_single = Recursive in
       Ident.Mid.iter (fun id _ -> visit ~recurs mm id) m_t.Mltree.mod_known;
@@ -478,7 +479,7 @@ let () =
           (try
              let m = find_module_id mm id in
              Ident.Sid.iter do_preludes m.mod_used
-           with Not_found -> ());
+           with UnknownModule _ | Not_found -> ());
           let pl = Ident.Mid.find_def [] id thprelude in
           let ipl = Ident.Mid.find_def [] id thexportpre in
           print_prelude pl;
