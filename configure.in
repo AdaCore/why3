@@ -103,7 +103,7 @@ AC_ARG_ENABLE(web_ide,
 
 AC_ARG_ENABLE(coq-libs,
     AS_HELP_STRING([--disable-coq-libs], [do not build Coq realizations]),,
-    enable_coq_libs=yes)
+    enable_coq_libs=check)
 
 # PVS libraries
 
@@ -959,23 +959,6 @@ if test "$enable_coq_support" = yes; then
    AC_MSG_RESULT($COQVERSION)
 
    case $COQVERSION in
-dnl not supported anymore
-dnl       8.7*)
-dnl          coq_compat_version="COQ87"
-dnl          enable_coq_fp_libs=no
-dnl          ;;
-dnl       8.8*)
-dnl          coq_compat_version="COQ88"
-dnl          enable_coq_fp_libs=no
-dnl          ;;
-dnl       8.9*)
-dnl          coq_compat_version="COQ89"
-dnl          enable_coq_fp_libs=no
-dnl          ;;
-dnl       8.10*)
-dnl          coq_compat_version="COQ810"
-dnl          enable_coq_fp_libs=no
-dnl          ;;
       8.11*)
          coq_compat_version="COQ811"
          ;;
@@ -1003,8 +986,11 @@ dnl          ;;
          COQFLAGS="-w deprecated-instance-without-locality,deprecated-hint-without-locality"
          ;;
       *)
+         if test "$enable_coq_libs" = yes; then
+            AC_MSG_ERROR([cannot build Coq libraries without Coq >= 8.11.])
+         fi
          enable_coq_support=no
-         AC_MSG_WARN([You need Coq 8.11 or later; Coq discarded.])
+         AC_MSG_WARN([cannot build Coq libraries without Coq >= 8.11.])
          reason_coq_support=" (need version >= 8.11)"
          ;;
    esac
@@ -1016,6 +1002,9 @@ fi
 if test "$enable_coq_support" = yes; then
    AC_CHECK_PROG(COQDEP,coqdep,coqdep,no)
    if test "$COQDEP" = no; then
+      if test "$enable_coq_libs" = yes; then
+         AC_MSG_ERROR([cannot build Coq libraries without Coqdep.])
+      fi
       enable_coq_support=no
       reason_coq_support=" (coqdep not found)"
    fi
@@ -1025,6 +1014,8 @@ if test "$enable_coq_support" = no; then
    enable_coq_libs=no
    enable_coq_fp_libs=no
    COQVERSION=
+else
+   enable_coq_libs=yes
 fi
 
 if test "$enable_coq_fp_libs" = yes; then
