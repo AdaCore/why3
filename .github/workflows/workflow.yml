@@ -33,43 +33,14 @@ jobs:
         with:
           python-version: "3.10"
 
-      # We need to provide an absolute path to the --prefix of configure. But
-      # we can't use a path outside of the github working area. So we simply
-      # use "current_dir/staging" (notice how the upload directive simply uses
-      # "staging"). The python script "cwd.py" returns a string of the form
-      # "STAGING_AREA=/full/path/to/cwd". On windows, the script replaces the
-      # backslash with fordward slash. The output of the script then needs to
-      # be piped to GITHUB_ENV. The way to do that is a bit different depending
-      # on the OS.
-
-      - name: Set Staging env var (Windows)
-        if: ${{matrix.os == 'windows-latest' }}
-        run: |
-          python cwd.py | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
-
-      - name: Set Staging env var (Non-Windows)
-        if: ${{matrix.os != 'windows-latest' }}
-        run: |
-          python cwd.py >> $GITHUB_ENV
-
-      - name: Check value of staging var
-        run: echo ${{env.STAGING_AREA}}
-
       - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
-      - name: Setup Packages
+      - name: Call build script
         run: |
-          opam depext zarith re seq why3
-          opam install dune dune-configurator menhir num ocamlgraph re seq yojson zarith sexplib ppx_sexp_conv ppx_deriving
-
-      - run: opam exec -- ./configure --prefix="${{env.STAGING_AREA}}/staging" --enable-relocation --disable-emacs-compilation --disable-hypothesis-selection --disable-js-of-ocaml --disable-zip
-
-      - run: opam exec -- make
-
-      - run: opam exec -- make install_spark2014
+          opam exec -- bash ./fsf_build.sh staging
 
       - name: Upload package
         uses: actions/upload-artifact@v3
