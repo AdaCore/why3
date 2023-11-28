@@ -21,7 +21,8 @@ let is_bool_false t =
   | _ -> false
 
 let rec split acc f =
-  match f.t_node with
+  if List.length acc > 20 then f :: acc else
+  begin match f.t_node with
   | Ttrue ->
       f :: acc
   | Tfalse | Tnot _ | Tquant (Texists, _) | Tbinop (Tor, _, _) ->
@@ -66,6 +67,7 @@ let rec split acc f =
       let fn f1 = t_attr_copy f (t_forall (close vsl trl f1)) in
       apply_append fn acc (split [] f1)
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
+  end
 
 and split_case forig c acc tl bl =
   let bl = List.rev_map t_open_branch_cb bl in
