@@ -116,16 +116,20 @@
   - make a pull request on github
 
 * produce the Why3 part of Toccata gallery
-  - have `GALLERYDIR` set to the sub-directory `gallery/` of the git sources
-    of the Toccata web site, e.g.,
-    `export GALLERYDIR=/users/vals/filliatr/toccata/web/gallery`
-  - in Why3 sources, do `make gallery`; it exports to `$GALLERYDIR` all
-    Why3 programs for which there is a session
-  - now move to the Toccata web site sources, and
-    - update `web/gallery/examples.rc` to include new examples
-    - `git add` the files for these new examples (those currently untracked
-      in git) or simply remove them if they should not go on-line
-    - do `make` in `web/gallery/`
-    - do `make install-gallery` in `web/`
+  - update the git repository of Toccata
+  - have `GALLERYDIR` point to the sub-directory `gallery` of that git repository,
+    e.g., `export GALLERYDIR=.../toccata/web/gallery`
+  - in Why3 sources, run `make gallery`;
+    it exports to `$GALLERYDIR` all the Why3 programs for which there is a session
+  - now move to the directory `$GALLERYDIR`
+  - check the examples that are currently untracked in the Toccata repository
+    and update `examples.rc` accordingly
+  - put the directories of the broken examples in `.gitignore`
+  - run `make`; this requires to have installed the newly released Why3;
+    the presence of `.prehtml.new` files means that something went wrong,
+    hopefully only for non-Why3 examples
+  - `git add` the new files
+    (except for the `.html` files, which should go in `web/gallery/.gitignore`)
+  - commit and push the modified files
 
 * announce the release using the features of `CHANGES.md`
