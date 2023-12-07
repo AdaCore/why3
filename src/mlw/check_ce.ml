@@ -24,6 +24,9 @@ let debug_check_ce_rac_results = Debug.register_info_flag "check_ce:rac_results"
 let debug_check_ce_categorization = Debug.register_info_flag "check_ce:categorization"
     ~desc:"Debug@ info@ about@ categorization@ of@ RAC@ results@ for@ --check-ce"
 
+let debug_check_ce_only_giant = Debug.register_info_flag "check_ce:only_giant"
+    ~desc:"Only@ run@ giant@ step@ RAC@ with@ --check-ce"
+
 (** Result of checking solvers' counterexample models *)
 
 type verdict = NC | SW | NC_SW | BAD_CE of string | INCOMPLETE of string
@@ -755,8 +758,9 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
 let select_model ?timelimit ?steplimit ?verb_lvl ?compute_term ~check_ce
     rac env pm models =
   if check_ce then
+    let only_giant_step = Debug.test_flag debug_check_ce_only_giant in
     let rac_results =
-      get_rac_results ?timelimit ?steplimit ?compute_term ?verb_lvl rac env pm models
+      get_rac_results ?timelimit ?steplimit ?compute_term ?verb_lvl rac env pm models ~only_giant_step
     in
     select_model_from_verdict rac_results
   else
