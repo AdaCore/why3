@@ -195,9 +195,6 @@ let get_timings () =
   let get_name s = s in
   "timings", Record (List.map (fun (k,(v,n)) -> get_name k, StandardFloat v) l)
 
-let get_session_dir () =
-  "session_dir", String Gnat_config.session_dir
-
 let get_entity () =
   "entity", Int Gnat_config.entity
 
@@ -207,7 +204,7 @@ let print_messages () =
   print_json Format.std_formatter (
     Record (
       List.concat [
-        [get_session_dir (); get_results (); get_timings (); get_entity ()];
+        [get_results (); get_timings (); get_entity ()];
         get_warnings ()
       ]
     )
