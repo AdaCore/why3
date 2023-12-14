@@ -6,10 +6,21 @@
 <prover id="1" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC5" version="1.0.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
-<file format="whyml">
+<file format="whyml" proved="true">
 <path name=".."/><path name="search.mlw"/>
-<theory name="Path">
- <goal name="path_inversion&#39;vc" expl="VC for path_inversion">
+<theory name="Path" proved="true">
+ <goal name="path_inversion&#39;vc" expl="VC for path_inversion" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="path_inversion&#39;vc.0" expl="VC for path_inversion" proved="true">
+  <proof prover="3"><result status="valid" time="0.032249" steps="50752"/></proof>
+  </goal>
+  <goal name="path_inversion&#39;vc.1" expl="VC for path_inversion" proved="true">
+  <proof prover="3"><result status="valid" time="0.044416" steps="52219"/></proof>
+  </goal>
+  <goal name="path_inversion&#39;vc.2" expl="VC for path_inversion" proved="true">
+  <proof prover="2"><result status="valid" time="0.167854" steps="10553"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="path_length&#39;vc" expl="VC for path_length" proved="true">
  <proof prover="3"><result status="valid" time="0.122809" steps="29952"/></proof>

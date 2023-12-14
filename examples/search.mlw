@@ -1,5 +1,8 @@
 
-(** Search Algorithms *)
+(** Search Algorithms
+
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
 
 module Path
 
@@ -13,26 +16,6 @@ module Path
   val constant start: state
 
   val predicate success (s: state)
-
-(*
-  predicate path (s t: state) (n: int) =
-    exists p: seq state.
-      length p >= 1 /\ s = p[0] /\ t = p[length p - 1] /\
-      forall i. 0 <= i < length p - 1 ->
-        exists j. 0 <= j < length (moves p[i]) /\ p[i+1] = (moves p[i])[j]
-
-  let lemma path0 (s: state)
-    ensures { path s s 0 }
-  = ()
-  let lemma path1 (s: state) (i: int)
-    requires { 0 <= i < length (moves s) }
-    ensures  { path s (moves s)[i] 1 }
-  = ()
-  let lemma patht (s t u: state) (n m: int)
-    requires { path s t n } requires { path t u m }
-    ensures  { path s u (n+m) }
-  = ()
-*)
 
   inductive path state state int =
   | Path0: forall s. path s s 0
@@ -48,7 +31,7 @@ module Path
     ensures  { n = 0 /\ s = t
             \/ n > 0 /\ exists i. 0 <= i < length (moves s) /\
                         path (moves s)[i] t (n-1) }
-  = () (* TODO *)
+  = () (* by induction_pr *)
 
   let lemma path_length (s t: state) (n: int)
     requires { path s t n } ensures { n >= 0 }
