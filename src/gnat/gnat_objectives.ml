@@ -484,8 +484,9 @@ let has_been_tried_by s (g: goal_id) (prover: Whyconf.prover) =
     (* only count non-obsolete proof attempts with identical
        options *)
     (not pa.Session_itp.proof_obsolete &&
-    pa.Session_itp.limit =
-      Gnat_config.limit ~prover ~warning:warn)
+     pa.Session_itp.proof_state <> None &&
+     pa.Session_itp.limit =
+       Gnat_config.limit ~prover ~warning:warn)
   with Not_found -> false
 
 let all_provers_tried s g =
