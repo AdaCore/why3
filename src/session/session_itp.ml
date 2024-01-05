@@ -999,16 +999,6 @@ let string_attribute field r =
     Loc.errorm "[Error] missing required attribute '%s' from element '%s'@."
       field r.Xml.name
 
-let default_unknown_result =
-     {
-       Call_provers.pr_answer = Call_provers.Failure "";
-       Call_provers.pr_time = 0.0;
-       Call_provers.pr_output = "";
-       Call_provers.pr_status = Unix.WEXITED 0;
-       Call_provers.pr_steps = -1;
-       Call_provers.pr_models = [];
-     }
-
 let warn_unexpected_session_element = Loc.register_warning "unexpected_session_element"
     "Warn for unexpected status, elements or goals during the loading of a session"
 
@@ -1117,10 +1107,6 @@ and load_proof_or_transf session old_provers pid a =
           let path,res =
             List.fold_left (load_result a) (Sysutil.empty_path,None) a.Xml.elements
           in
-          let res = match res with
-            | None -> default_unknown_result
-            | Some r -> r
-          in
           let edit =
             if Sysutil.is_empty_path path then
               match load_option "edited" a with
@@ -1137,7 +1123,7 @@ and load_proof_or_transf session old_provers pid a =
                         Call_provers.limit_mem   = memlimit;
                         Call_provers.limit_steps = steplimit; }
           in
-          ignore(add_proof_attempt session p limit (Some res) ~obsolete edit pid)
+          ignore(add_proof_attempt session p limit res ~obsolete edit pid)
         with Failure _ | Not_found ->
           Loc.error (LoadError (a, "prover " ^ prover ^ " not listing in header"))
       end
