@@ -45,6 +45,12 @@ outofmemory "(error \".*out of memory\")\\|Cannot allocate memory\\|Maximal allo
 timeout "interrupted by timeout"
 steps ":rlimit-count *\\([0-9]+\\)" 1
 
+theory int.Abs
+  syntax function abs "(abs %1)"
+
+  remove allprops
+end
+
 theory int.EuclideanDivision
   syntax function div "(div %1 %2)"
   syntax function mod "(mod %1 %2)"
