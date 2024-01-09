@@ -5,6 +5,12 @@ import "smt-libv2-floats-int_via_real.gen"
 
 steps "resource::resourceUnitsUsed = \\([0-9]+.?[0-9]*\\)" 1
 
+theory int.Abs
+  syntax function abs "(abs %1)"
+
+  remove allprops
+end
+
 theory int.EuclideanDivision
   syntax function div "(div %1 %2)"
   syntax function mod "(mod %1 %2)"
