@@ -170,6 +170,9 @@
 
   let error_loc loc = Loc.error ~loc Error
 
+  let warn_redundant_import =
+    Loc.register_warning "redundant import" "Warn about redundant import"
+
   let () = Exn_printer.register (fun fmt exn -> match exn with
     | Error -> Format.fprintf fmt "syntax error %s" (Parser_messages.message 1)
     | _ -> raise exn)
@@ -179,7 +182,7 @@
       before a letter. You can only use ' followed by _ or a number."
 
   let name_term id_opt def t =
-    let name = Opt.fold (fun _ id -> id.id_str) def id_opt in
+    let name = Option.fold ~some:(fun id -> id.id_str) ~none:def id_opt in
     let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name)) in
     { term_loc = t.term_loc; term_desc = Tattr (attr, t) }
 
@@ -239,7 +242,7 @@
       var_of_string ~id_ats:[proxy_atr] ("r'i" ^ i) e2.expr_loc in
     let el_proxies = List.mapi domain_ranga_vars el in
     let default_proxy =
-      Opt.map (fun d ->
+      Option.map (fun d ->
           var_of_string ~id_ats:[proxy_atr] "def'e" d.expr_loc) default in
     (* fun x -> if ... *)
     let fun_id_var = id (if el = [] then "_" else "x'x") loc_begin in
@@ -391,12 +394,12 @@ See also `plugins/cfg/cfg_parser.mly`
 | USE boption(IMPORT) m_as_list = comma_list1(use_as)
     { let loc = floc $startpos $endpos in
       let exists_as = List.exists (fun (_, q) -> q <> None) m_as_list in
-      if $2 && not exists_as then Loc.warning ~loc
+      if $2 && not exists_as then Loc.warning ~loc warn_redundant_import
         "the keyword `import' is redundant here and can be omitted";
       (Duseimport (loc, $2, m_as_list)) }
 | CLONE boption(IMPORT) tqualid option(preceded(AS, uident)) clone_subst
     { let loc = floc $startpos $endpos in
-      if $2 && $4 = None then Loc.warning ~loc
+      if $2 && $4 = None then Loc.warning ~loc warn_redundant_import
         "the keyword `import' is redundant here and can be omitted";
       (Dcloneimport (loc, $2, $3, $4, $5)) }
 

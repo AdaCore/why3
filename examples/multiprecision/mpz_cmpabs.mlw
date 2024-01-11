@@ -37,6 +37,8 @@ let wmpz_cmpabs (u v:mpz_ptr) : int32
   return cmp
 
 use types.Types
+use types.Int32Eq
+use types.UInt64Eq
 
 let wmpz_cmpabs_ui (u: mpz_ptr) (v_digit:limb) : int32
   requires { mpz.readers[u] >= 0 }

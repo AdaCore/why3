@@ -1,0 +1,39 @@
+(* Why3 driver for Alt-Ergo with SMT-lib V2 input format, including polymorphism *)
+
+prelude ";;; this is a prelude for Alt-Ergo, Dolmen frontend"
+prelude "(set-logic ALL)"
+prelude "(set-info :smt-lib-version 2.6)"
+
+import "smt-libv2.gen"
+filename "%f-%t-%g.psmt2"
+printer "smtv2.6par"
+
+valid "^; File \".*\", line [0-9]+, characters [0-9]+-[0-9]+: ?Valid"
+unknown "^; File \".*\", line [0-9]+, characters [0-9]+-[0-9]+: ?I don't know" ""
+steplimitexceeded "^\\[Error\\]; Fatal Error: Steps limit reached"
+
+steps "^; File \".*\", line [0-9]+, characters [0-9]+-[0-9]+:.*(\\([0-9]+.?[0-9]*\\) steps)" 1
+steps "^\\[Error\\]; Fatal Error: Steps limit reached: \\([0-9]+.?[0-9]*\\)" 1
+
+(* valid "^unsat" *)
+(* unknown "^\\(unknown\\|sat\\|Fail\\)" "" *)
+time "why3cpulimit time : %s s"
+
+(* Performed introductions depending on whether counterexamples are
+   requested, as said by the meta "get_counterexmp". When this meta
+   set, this transformation introduces the model variables that are
+   still embedded in the goal. When it is not set, it removes all
+   these unused-ce-related variables, even in the context.  *)
+transformation "counterexamples_dependent_intros"
+
+transformation "monomorphise_goal"
+transformation "inline_trivial"
+transformation "eliminate_builtin"
+transformation "remove_unused_keep_constants"
+transformation "eliminate_recursion"
+transformation "eliminate_inductive"
+transformation "eliminate_epsilon"
+transformation "eliminate_algebraic"
+transformation "eliminate_literal"
+transformation "split_premise_right"
+transformation "simplify_formula"

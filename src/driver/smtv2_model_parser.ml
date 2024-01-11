@@ -348,7 +348,7 @@ module FromSexpToModel = struct
         | [ ty; _; _ ] -> Some ty
         | _ -> None
     in
-    match FromStringToSexp.parse_string (Opt.get_def "" opt_name) with
+    match FromStringToSexp.parse_string (Option.value ~default:"" opt_name) with
     | [] -> atom_error name "get_type_from_prover_variable"
     | [ sexp ] -> sexp
     | sexps -> List sexps
@@ -986,7 +986,7 @@ module FromModelToTerm = struct
                 print_qualified_identifier qid
             | Some s ->
               let ts'_ty =
-                try List.map (fun t -> Opt.get t.t_ty) ts'
+                try List.map (fun t -> Option.get t.t_ty) ts'
                 with _ ->
                   error "Arguments of %a should have a type@."
                     print_qualified_identifier qid
@@ -1111,7 +1111,7 @@ module FromModelToTerm = struct
     let (t', t'_concrete) = term_to_term env t in
     (* convert t' to a formula if the expected type of the result is None (fmla=true) *)
     let t' = if fmla then Term.to_prop t' else t' in
-    if Opt.equal Ty.ty_equal ty_s t'.t_ty then (
+    if Option.equal Ty.ty_equal ty_s t'.t_ty then (
       Debug.dprintf debug "[smt_term_to_term] t' = %a, t'.t_ty = %a, t'_concrete = %a@."
         Pretty.print_term t'
         (Pp.print_option_or_default "None" Pretty.print_ty_qualified)
@@ -1537,7 +1537,7 @@ module FromModelToTerm = struct
           let fields = Mls.find ls env.record_fields in
           if
             List.for_all2
-              (fun ls t -> Opt.equal (Ty.ty_equal) ls.ls_value t.t_ty)
+              (fun ls t -> Option.equal (Ty.ty_equal) ls.ls_value t.t_ty)
               fields ts
           then
             let fields_values =
@@ -1845,7 +1845,7 @@ module FromModelToTerm = struct
               try
                 (* fmla = true if the interpreted term should be a formula (with type = None)
                    and not a term (with type = Some ty) *)
-                let fmla = not (Opt.inhabited ls.ls_value) in
+                let fmla = not (Option.is_some ls.ls_value) in
                 let (t, t_concrete) = interpret_fun_def_to_term ~fmla env def in
                 Some ((ls, oloc, attrs), (t, t_concrete))
               with

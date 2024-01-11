@@ -1,0 +1,44 @@
+File "bench/check-ce/multifile1.mlw", line 6, characters 14-24:
+Sub-goal Postcondition of goal decr'vc.
+Prover result is: Valid (150 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: SW
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+- Checked model 1: SW
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+File "bench/check-ce/multifile1.mlw", line 10, characters 14-24:
+Sub-goal Postcondition of goal incr'vc.
+Prover result is: Unknown (sat) (231 steps).
+The contracts of the following functions/loops are too weak :
+  - Function 'decr' at "bench/check-ce/multifile1.mlw", line 11, characters 4-10
+, for example during the following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File multifile1.mlw:
+  Line 9:
+    x = 0
+    x = 0
+    Execution of main function `incr` with env:
+      x = 0
+      zero = 0
+      one = 1
+  Line 11:
+    Giant-step execution of function `decr` with args:
+      x = 0
+    result of `decr` = (- 2)
+    Normal execution of function `(+)` with args:
+      _ = (- 2)
+      _ = 2
+  Line 10:
+    Property failure at postcondition of `incr` with:
+      x = 0
+      result = 0
+

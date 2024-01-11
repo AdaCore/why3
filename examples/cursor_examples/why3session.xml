@@ -2,40 +2,40 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="1" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="cursor_examples.mlw"/>
 <theory name="TestCursor" proved="true">
  <goal name="sum&#39;vc" expl="VC for sum" proved="true">
- <proof prover="4"><result status="valid" time="2.86" steps="904"/></proof>
+ <proof prover="4"><result status="valid" time="2.860000" steps="903"/></proof>
  </goal>
 </theory>
-<theory name="ListCursorImpl" proved="true">
+<theory name="ListCursorImpl&#39;impl" proved="true">
  <goal name="cursor&#39;vc" expl="VC for cursor" proved="true">
- <proof prover="4"><result status="valid" time="0.02" steps="33"/></proof>
+ <proof prover="4"><result status="valid" time="0.010000" steps="33"/></proof>
  </goal>
  <goal name="snoc_Cons&#39;vc" expl="VC for snoc_Cons" proved="true">
- <proof prover="4"><result status="valid" time="0.04" steps="99"/></proof>
+ <proof prover="4"><result status="valid" time="0.030000" steps="99"/></proof>
  </goal>
- <goal name="next&#39;vc" expl="VC for next" proved="true">
- <proof prover="4"><result status="valid" time="0.13" steps="476"/></proof>
+ <goal name="C.next&#39;vc" expl="VC for next" proved="true">
+ <proof prover="4"><result status="valid" time="0.100000" steps="476"/></proof>
  </goal>
- <goal name="has_next&#39;vc" expl="VC for has_next" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="66"/></proof>
+ <goal name="C.has_next&#39;vc" expl="VC for has_next" proved="true">
+ <proof prover="4"><result status="valid" time="0.020000" steps="66"/></proof>
  </goal>
  <goal name="create&#39;vc" expl="VC for create" proved="true">
- <proof prover="4"><result status="valid" time="0.02" steps="53"/></proof>
+ <proof prover="4"><result status="valid" time="0.020000" steps="53"/></proof>
  </goal>
- <goal name="ListCursor.create&#39;refn&#39;vc" expl="VC for create&#39;refn" proved="true">
- <proof prover="4"><result status="valid" time="0.02" steps="35"/></proof>
+ <goal name="ListCursor&#39;impl_of.create&#39;refn&#39;vc" expl="VC for create&#39;refn" proved="true">
+ <proof prover="4"><result status="valid" time="0.010000" steps="35"/></proof>
  </goal>
- <goal name="ListCursor.C.next&#39;refn&#39;vc" expl="VC for next&#39;refn" proved="true">
- <proof prover="4"><result status="valid" time="0.02" steps="68"/></proof>
+ <goal name="ListCursor&#39;impl_of.C.next&#39;refn&#39;vc" expl="VC for next&#39;refn" proved="true">
+ <proof prover="4"><result status="valid" time="0.020000" steps="68"/></proof>
  </goal>
- <goal name="ListCursor.C.has_next&#39;refn&#39;vc" expl="VC for has_next&#39;refn" proved="true">
- <proof prover="4"><result status="valid" time="0.02" steps="11"/></proof>
+ <goal name="ListCursor&#39;impl_of.C.has_next&#39;refn&#39;vc" expl="VC for has_next&#39;refn" proved="true">
+ <proof prover="4"><result status="valid" time="0.010000" steps="13"/></proof>
  </goal>
 </theory>
 <theory name="TestListCursor" proved="true">
@@ -44,10 +44,10 @@
   <goal name="sum_of_list.0" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="sum_of_list.0.0" proved="true">
-   <proof prover="4"><result status="valid" time="0.02" steps="19"/></proof>
+   <proof prover="4"><result status="valid" time="0.020000" steps="19"/></proof>
    </goal>
    <goal name="sum_of_list.0.1" proved="true">
-   <proof prover="4"><result status="valid" time="3.48" steps="1177"/></proof>
+   <proof prover="4"><result status="valid" time="3.390000" steps="1177"/></proof>
    </goal>
   </transf>
   </goal>
@@ -56,132 +56,96 @@
  <goal name="list_sum&#39;vc" expl="VC for list_sum" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="list_sum&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="18"/></proof>
+  <proof prover="4"><result status="valid" time="0.020000" steps="18"/></proof>
   </goal>
   <goal name="list_sum&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="4"><result status="valid" time="0.010000" steps="6"/></proof>
   </goal>
   <goal name="list_sum&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="4"><result status="valid" time="0.010000" steps="8"/></proof>
   </goal>
   <goal name="list_sum&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.00" steps="2"/></proof>
+  <proof prover="4"><result status="valid" time="0.000000" steps="2"/></proof>
   </goal>
   <goal name="list_sum&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="9"/></proof>
+  <proof prover="4"><result status="valid" time="0.020000" steps="9"/></proof>
   </goal>
   <goal name="list_sum&#39;vc.5" expl="loop variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="28"/></proof>
+  <proof prover="4"><result status="valid" time="0.020000" steps="28"/></proof>
   </goal>
   <goal name="list_sum&#39;vc.6" expl="loop invariant preservation" proved="true">
   <transf name="simplify_trivial_quantification" proved="true" >
    <goal name="list_sum&#39;vc.6.0" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="4.55" steps="1499"/></proof>
+   <proof prover="4"><result status="valid" time="4.570000" steps="1495"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="list_sum&#39;vc.7" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="14"/></proof>
+  <proof prover="4"><result status="valid" time="0.020000" steps="14"/></proof>
   </goal>
   <goal name="list_sum&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="1.08" steps="395"/></proof>
+  <proof prover="4"><result status="valid" time="1.060000" steps="343"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="TestListCursorLink" proved="true">
- <goal name="TestListCursor.ListCursor.create&#39;refn&#39;vc" expl="VC for create&#39;refn" proved="true">
- <proof prover="4"><result status="valid" time="0.02" steps="40"/></proof>
- </goal>
- <goal name="TestListCursor.ListCursor.C.next&#39;refn&#39;vc" expl="VC for next&#39;refn" proved="true">
- <proof prover="4"><result status="valid" time="0.03" steps="71"/></proof>
- </goal>
- <goal name="TestListCursor.ListCursor.C.has_next&#39;refn&#39;vc" expl="VC for has_next&#39;refn" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
- </goal>
-</theory>
-<theory name="ArrayCursorImpl" proved="true">
+<theory name="ArrayCursorImpl&#39;impl" proved="true">
  <goal name="cursor&#39;vc" expl="VC for cursor" proved="true">
- <proof prover="4"><result status="valid" time="0.02" steps="3"/></proof>
+ <proof prover="4"><result status="valid" time="0.010000" steps="3"/></proof>
  </goal>
  <goal name="create&#39;vc" expl="VC for create" proved="true">
- <proof prover="4"><result status="valid" time="0.02" steps="5"/></proof>
+ <proof prover="4"><result status="valid" time="0.010000" steps="5"/></proof>
  </goal>
- <goal name="has_next&#39;vc" expl="VC for has_next" proved="true">
- <proof prover="4"><result status="valid" time="0.02" steps="19"/></proof>
+ <goal name="C.has_next&#39;vc" expl="VC for has_next" proved="true">
+ <proof prover="4"><result status="valid" time="0.010000" steps="19"/></proof>
  </goal>
- <goal name="next&#39;vc" expl="VC for next" proved="true">
- <proof prover="4"><result status="valid" time="0.02" steps="75"/></proof>
+ <goal name="C.next&#39;vc" expl="VC for next" proved="true">
+ <proof prover="4"><result status="valid" time="0.020000" steps="75"/></proof>
  </goal>
- <goal name="ArrayCursor.create&#39;refn&#39;vc" expl="VC for create&#39;refn" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="29"/></proof>
+ <goal name="ArrayCursor&#39;impl_of.create&#39;refn&#39;vc" expl="VC for create&#39;refn" proved="true">
+ <proof prover="4"><result status="valid" time="0.010000" steps="29"/></proof>
  </goal>
- <goal name="ArrayCursor.C.next&#39;refn&#39;vc" expl="VC for next&#39;refn" proved="true">
- <transf name="split_goal_right" proved="true" >
-  <goal name="next&#39;refn&#39;vc.0" expl="precondition" proved="true">
-  <transf name="split_goal_right" proved="true" >
-   <goal name="next&#39;refn&#39;vc.0.0" expl="precondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.03" steps="7"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="next&#39;refn&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
-  </goal>
-  <goal name="next&#39;refn&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.00" steps="50"/></proof>
-  </goal>
- </transf>
+ <goal name="ArrayCursor&#39;impl_of.C.next&#39;refn&#39;vc" expl="VC for next&#39;refn" proved="true">
+ <proof prover="4"><result status="valid" time="0.010000" steps="46"/></proof>
  </goal>
- <goal name="ArrayCursor.C.has_next&#39;refn&#39;vc" expl="VC for has_next&#39;refn" proved="true">
- <proof prover="4"><result status="valid" time="0.02" steps="11"/></proof>
+ <goal name="ArrayCursor&#39;impl_of.C.has_next&#39;refn&#39;vc" expl="VC for has_next&#39;refn" proved="true">
+ <proof prover="4"><result status="valid" time="0.010000" steps="13"/></proof>
  </goal>
 </theory>
 <theory name="TestArrayCursor" proved="true">
  <goal name="array_sum&#39;vc" expl="VC for array_sum" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="array_sum&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="4"><result status="valid" time="0.020000" steps="17"/></proof>
   </goal>
   <goal name="array_sum&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.040000" steps="87290"/></proof>
   </goal>
   <goal name="array_sum&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
+  <proof prover="4"><result status="valid" time="0.020000" steps="7"/></proof>
   </goal>
   <goal name="array_sum&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="1"/></proof>
+  <proof prover="4"><result status="valid" time="0.010000" steps="1"/></proof>
   </goal>
   <goal name="array_sum&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="8"/></proof>
+  <proof prover="4"><result status="valid" time="0.020000" steps="8"/></proof>
   </goal>
   <goal name="array_sum&#39;vc.5" expl="loop variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="25"/></proof>
+  <proof prover="4"><result status="valid" time="0.010000" steps="25"/></proof>
   </goal>
   <goal name="array_sum&#39;vc.6" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="3.17" steps="1088"/></proof>
+  <proof prover="4"><result status="valid" time="2.970000" steps="1085"/></proof>
   </goal>
   <goal name="array_sum&#39;vc.7" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="13"/></proof>
+  <proof prover="4"><result status="valid" time="0.020000" steps="13"/></proof>
   </goal>
   <goal name="array_sum&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.04" steps="182070"/></proof>
+  <proof prover="4"><result status="valid" time="0.880000" steps="374"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="harness1&#39;vc" expl="VC for harness1" proved="true">
- <proof prover="5"><result status="valid" time="0.16" steps="25574"/></proof>
- </goal>
-</theory>
-<theory name="TestArrayCursorLink" proved="true">
- <goal name="TestArrayCursor.ArrayCursor.create&#39;refn&#39;vc" expl="VC for create&#39;refn" proved="true">
- <proof prover="4"><result status="valid" time="0.02" steps="29"/></proof>
- </goal>
- <goal name="TestArrayCursor.ArrayCursor.C.next&#39;refn&#39;vc" expl="VC for next&#39;refn" proved="true">
- <proof prover="4"><result status="valid" time="0.02" steps="46"/></proof>
- </goal>
- <goal name="TestArrayCursor.ArrayCursor.C.has_next&#39;refn&#39;vc" expl="VC for has_next&#39;refn" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="11"/></proof>
+ <proof prover="5"><result status="valid" time="0.160000" steps="25758"/></proof>
  </goal>
 </theory>
 </file>

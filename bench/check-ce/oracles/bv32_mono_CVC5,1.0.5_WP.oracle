@@ -1,0 +1,53 @@
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/bv32_mono.mlw", line 11, characters 14-31)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/bv32_mono.mlw", line 11, characters 14-31)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/bv32_mono.mlw", line 11, characters 14-31)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/bv32_mono.mlw", line 11, characters 14-31)
+File "bench/check-ce/bv32_mono.mlw", line 11, characters 14-31:
+Sub-goal Postcondition of goal dummy_update'vc.
+Prover result is: Unknown (unknown + incomplete) (110060 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File bv32_mono.mlw:
+  Line 9:
+    r = {c= (34:t)}
+    r = {c= (34:t)}
+    Execution of main function `dummy_update` with env:
+      r = {c= (34:t)}
+      zero = 0
+      one = 1
+  Line 13:
+    Normal execution of function `c` with args:
+      arg = {c= 66}
+    Normal execution of function `c` with args:
+      arg = {c= 66}
+    (giant-step) execution of unimplemented function `add`
+      v1 = 66
+      v2 = 66
+    result of `add` = (132:t)
+  Line 11:
+    Property failure at postcondition of `dummy_update` with:
+      r = {c= (132:t)}
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `dummy_update_with_int` at "bench/check-ce/bv32_mono.mlw", line 15, characters 5-26)
+  - Abstract RAC: STUCK (failure in precondition of `dummy_update_with_int` at "bench/check-ce/bv32_mono.mlw", line 15, characters 5-26)
+- Selected model 1: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `dummy_update_with_int` at "bench/check-ce/bv32_mono.mlw", line 15, characters 5-26)
+  - Abstract RAC: STUCK (failure in precondition of `dummy_update_with_int` at "bench/check-ce/bv32_mono.mlw", line 15, characters 5-26)
+File "bench/check-ce/bv32_mono.mlw", line 17, characters 14-30:
+Sub-goal Postcondition of goal dummy_update_with_int'vc.
+Prover result is: Step limit exceeded (150007 steps).
+Sorry, we don't have a good counterexample for you :(
+
+

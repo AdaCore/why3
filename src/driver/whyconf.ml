@@ -133,7 +133,7 @@ type config_prover = {
   prover  : prover;
   command : string;
   command_steps : string option;
-  driver  : string;
+  driver  : string option * string;
   in_place: bool;
   editor  : string;
   interactive : bool;
@@ -201,7 +201,7 @@ type main = {
 
 let libdir =
   let env_libdir = try Some (Sys.getenv "WHY3LIB") with Not_found -> None in
-  fun m -> Opt.get_def m.libdir env_libdir
+  fun m -> Option.value ~default:m.libdir env_libdir
 
 let libobjdir m =
   m.libobjdir
@@ -210,9 +210,11 @@ let set_libdir m d = { m with libdir = d}
 
 let datadir =
   let env_datadir = try Some (Sys.getenv "WHY3DATA") with Not_found -> None in
-  fun m -> Opt.get_def m.datadir env_datadir
+  fun m -> Option.value ~default:m.datadir env_datadir
 
 let set_datadir m d = { m with datadir = d}
+
+let stdlib_path = ref ""
 
 let default_loadpath m =
   [ Filename.concat (datadir m) "stdlib" ]
@@ -224,9 +226,14 @@ let loadpath =
   in
   fun m ->
     match env_loadpath with
-    | Some l -> l
+    | Some l -> stdlib_path := List.hd l; l
     | None ->
-      let stdlib = if m.stdlib then default_loadpath m else [] in
+      let stdlib =
+        if m.stdlib then
+          let loadpath = default_loadpath m in
+          let () = stdlib_path := List.hd loadpath in
+          loadpath
+        else [] in
       m.loadpath@stdlib
 
 let set_loadpath m l = { m with loadpath = l}
@@ -338,16 +345,19 @@ module RC_load = struct
     in
     prover
 
-  let load_prover (provers,shortcuts) section =
+  let load_prover ~config_dir (provers,shortcuts) section =
     try
       let prover = load_prover_id section in
       let info =
         match Mprover.find_opt prover provers with
         | None ->
-          { prover  = prover;
+            let driver = get_string section "driver" in
+            Debug.dprintf debug "Loading a new prover with config_dir = %a, driver = %s@."
+              (Pp.print_option Pp.print_string) config_dir driver;
+            { prover  = prover;
             command = get_string section "command";
 	    command_steps = get_stringo section "command_steps";
-            driver  = get_string section "driver";
+            driver  = (config_dir,driver);
             in_place = get_bool ~default:false section "in_place";
             editor  = get_string ~default:"" section "editor";
             interactive = get_bool ~default:false section "interactive";
@@ -357,13 +367,20 @@ module RC_load = struct
             build_commands = get_stringl section "build_commands";
           }
         | Some info ->
+            let driver =
+              match get_stringo section "driver" with
+                | None -> info.driver
+                | Some d -> (config_dir,d)
+            in
+            Debug.dprintf debug "Loading a prover extension with config_dir = %a, driver = %s@."
+              (Pp.print_option Pp.print_string) (fst driver) (snd driver);
           { prover  = prover;
             command = get_string ~default:info.command section "command";
             command_steps =
               begin match get_stringo section "command_steps" with
               | None -> info.command_steps
               | c -> c end;
-            driver  = get_string ~default:info.driver section "driver";
+            driver  = driver;
             in_place = get_bool ~default:info.in_place section "in_place";
             editor  = get_string ~default:info.editor section "editor";
             interactive = get_bool ~default:info.interactive section "interactive";
@@ -378,7 +395,7 @@ module RC_load = struct
       let shortcuts = add_prover_shortcuts shortcuts prover lshort in
       provers,shortcuts
     with MissingField s ->
-      Loc.warning "Missing field '%s' in [prover] section@." s;
+      Loc.warning warn_missing_field "Missing field '%s' in [prover] section@." s;
       provers,shortcuts
 
   let load_shortcut acc section =
@@ -387,7 +404,7 @@ module RC_load = struct
       let shortcuts = get_stringl section "shortcut" in
       add_prover_shortcuts acc prover shortcuts
     with MissingField s ->
-      Loc.warning "Missing field '%s' in [shortcut] section@." s;
+      Loc.warning warn_missing_field "Missing field '%s' in [shortcut] section@." s;
       acc
 
   let load_prover_editor acc section =
@@ -396,7 +413,7 @@ module RC_load = struct
       let editor = get_string section "editor" in
       Mprover.add prover editor acc
     with MissingField s ->
-      Loc.warning "Missing field '%s' in [prover_editor] section@." s;
+      Loc.warning warn_missing_field "Missing field '%s' in [prover_editor] section@." s;
       acc
 
   let load_editor editors (id, section) =
@@ -415,7 +432,7 @@ module RC_load = struct
       in
       Meditor.add id info editors
     with MissingField s ->
-      Loc.warning "Missing field '%s' in [editor] section@." s;
+      Loc.warning warn_missing_field "Missing field '%s' in [editor] section@." s;
       editors
 
   let load_policy acc (_,section) =
@@ -444,8 +461,11 @@ module RC_load = struct
         | _ -> raise Not_found
       with Not_found -> acc
     with MissingField s ->
-      Loc.warning "Missing field '%s' in [uninstalled_prover] section@." s;
+      Loc.warning warn_missing_field "Missing field '%s' in [uninstalled_prover] section@." s;
       acc
+
+  let warn_replaced_space =
+    Loc.register_warning "replaced_space" "Warn that a space has been replaced by '_' in a strategy name"
 
   let load_strategy strategies section =
     try
@@ -453,7 +473,7 @@ module RC_load = struct
       let name =
         try
           let (_:int) = String.index name ' ' in
-          Loc.warning "Found a space character in strategy name '%s', replaced by '_'@." name;
+          Loc.warning warn_replaced_space "Found a space character in strategy name '%s', replaced by '_'@." name;
           String.map (function ' ' -> '_' | c -> c) name
         with Not_found -> name
       in
@@ -470,7 +490,7 @@ module RC_load = struct
         strategies
     with
       MissingField s ->
-        Loc.warning "Missing field '%s' in [strategy] section@." s;
+        Loc.warning warn_missing_field "Missing field '%s' in [strategy] section@." s;
         strategies
 
   let load_main old dirname section =
@@ -500,6 +520,7 @@ module RC_load = struct
     Filename.dirname (Sysutil.concat (Sys.getcwd ()) filename)
 
   let config_from_rc config filename rc =
+    Debug.dprintf debug "[Whyconf.config_from_rc] filename=%s@." filename;
     let dirname = get_dirname filename in
     let main =
       match get_section rc "main" with
@@ -507,7 +528,7 @@ module RC_load = struct
       | Some main -> load_main config.main dirname main
     in
     let provers = get_simple_family rc "prover" in
-    let provers,shortcuts = List.fold_left load_prover
+    let provers,shortcuts = List.fold_left (load_prover ~config_dir:None)
         (config.provers,config.prover_shortcuts) provers in
     let fam_shortcuts = get_simple_family rc "shortcut" in
     let shortcuts = List.fold_left load_shortcut shortcuts fam_shortcuts in
@@ -581,7 +602,7 @@ module RC_save = struct
     let section = prover_section prover.prover in
     let section = set_string section "command" prover.command in
     let section = set_stringo section "command_steps" prover.command_steps in
-    let section = set_string section "driver" prover.driver in
+    let section = set_string section "driver" (snd prover.driver) in
     let section = set_string section "editor" prover.editor in
     let section = set_bool section "interactive" prover.interactive in
     let section = set_bool section "in_place" prover.in_place in
@@ -705,10 +726,12 @@ let empty_config conf_file =
   }
 
 let default_config conf_file =
+  Debug.dprintf debug "[Whyconf.default_config] filename=%s@." conf_file;
   RC_load.config_from_rc (empty_config conf_file) conf_file empty_rc
 
 let read_config_aux config filename rc =
   try
+    Debug.dprintf debug "[Whyconf.read_config_aux] filename=%s@." filename;
     RC_load.config_from_rc config filename rc
   with e when not (Debug.test_flag Debug.stack_trace) ->
     let s = Format.asprintf "%a" Exn_printer.exn_printer e in
@@ -717,6 +740,7 @@ let read_config_aux config filename rc =
 let read_config conf_file =
   let filename,rc = read_config_rc conf_file in
   try
+    Debug.dprintf debug "[Whyconf.read_config] filename=%s@." filename;
     RC_load.config_from_rc (empty_config filename) filename rc
   with e when not (Debug.test_flag Debug.stack_trace) ->
     let s = Format.asprintf "%a" Exn_printer.exn_printer e in
@@ -757,8 +781,8 @@ let mk_filter_prover ?version ?altern name =
   | Some "" -> invalid_arg "mk_filter_prover: version can't be an empty string"
   | _ -> () end;
   { filter_name    = mk_regexp name;
-    filter_version = Opt.map mk_regexp version;
-    filter_altern  = Opt.map mk_regexp altern;
+    filter_version = Option.map mk_regexp version;
+    filter_altern  = Option.map mk_regexp altern;
   }
 
 let filter_from_prover pr =
@@ -791,8 +815,8 @@ let parse_filter_prover s =
 let filter_prover fp p =
   let check s schema = Re.Str.string_match schema.reg s 0 in
   check p.prover_name fp.filter_name
-  && Opt.fold (fun _ -> check p.prover_version) true fp.filter_version
-  && Opt.fold (fun _ -> check p.prover_altern) true fp.filter_altern
+  && Option.fold ~some:(fun v -> check p.prover_version v) ~none:true fp.filter_version
+  && Option.fold ~some:(fun v -> check p.prover_altern v) ~none:true fp.filter_altern
 
 let filter_prover_with_shortcut whyconf fp =
   if fp.filter_version = None && fp.filter_altern = None then
@@ -820,7 +844,7 @@ let filter_one_prover whyconf fp =
 (** add extra config *)
 
 let add_extra_config config filename =
-  Debug.dprintf debug "reading extra configuration file %s@." filename;
+  Debug.dprintf debug "[Whyconf.add_extra_config] filename=%s@." filename;
   let dirname = RC_load.get_dirname filename in
   let rc = Rc.from_file filename in
   (* modify main *)
@@ -845,7 +869,7 @@ let add_extra_config config filename =
       let altern = get_stringo section "alternative" in
       mk_filter_prover ?version ?altern name
     with MissingField s ->
-      Loc.warning "Missing field '%s' in [prover_modifiers] section@." s;
+      Loc.warning warn_missing_field "Missing field '%s' in [prover_modifiers] section@." s;
       mk_filter_prover "none"
   in
   let prover_modifiers = get_simple_family rc "prover_modifiers" in
@@ -871,7 +895,7 @@ let add_extra_config config filename =
         provers
     ) config.provers prover_modifiers in
   let provers,shortcuts =
-    List.fold_left RC_load.load_prover
+    List.fold_left (RC_load.load_prover ~config_dir:(Some dirname))
       (provers,config.prover_shortcuts) (get_simple_family rc "prover") in
   (* modify editors *)
   let editor_modifiers = get_family rc "editor_modifiers" in
@@ -917,7 +941,7 @@ let get_prover_editor config prover =
 
 module User = struct
   let update_section rc section f =
-    Opt.get_def empty_section (Rc.get_section rc section)
+    Option.value ~default:empty_section (Rc.get_section rc section)
     |> f
     |> Rc.set_section rc section
 
@@ -983,7 +1007,7 @@ module User = struct
 end
 
 let set_provers config ?shortcuts provers =
-  let shortcuts = Opt.get_def config.prover_shortcuts shortcuts in
+  let shortcuts = Option.value ~default:config.prover_shortcuts shortcuts in
   {config with
    provers = provers;
    prover_shortcuts = shortcuts;
@@ -1099,6 +1123,8 @@ let init_config ?(extra_config=[]) ofile =
   (* Add the automatic provers, shortcuts, strategy, ... *)
   let config = add_builtin_provers config rc in
   (* Add extra-config *)
+  Debug.dprintf debug "@[[Whyconf.init_config] calling extra_configs on@ @[%a@]@]@."
+    (Pp.print_list Pp.semi Pp.print_string) extra_config;
   let config = List.fold_left add_extra_config config extra_config in
   config
 

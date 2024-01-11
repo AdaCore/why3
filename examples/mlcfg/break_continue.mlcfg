@@ -27,8 +27,8 @@ module BreakContinue
       goto Loop
     }
     Loop {
-      invariant I1 { 0 <= i <= 9 };
-      invariant I2 { 4 * x = if mod i 2 = 0 then i * i else (i + 1) * (i + 1) };
+      invariant { 0 <= i <= 9 };
+      invariant { 4 * x = if mod i 2 = 0 then i * i else (i + 1) * (i + 1) };
       switch (x > 20)
       | True  -> goto Break
       | False -> goto L1

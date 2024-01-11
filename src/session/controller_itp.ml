@@ -244,7 +244,7 @@ let print_session fmt c =
     reloaded.
  *)
 
-let reload_files ?(hard_reload=false) (c : controller) =
+let reload_files ?(hard_reload=false) ?reparse_file_fun ~ignore_shapes (c : controller) =
   let old_ses = c.controller_session in
   if hard_reload then begin
     c.controller_env <- Env.create_env (Env.get_loadpath c.controller_env);
@@ -255,12 +255,16 @@ let reload_files ?(hard_reload=false) (c : controller) =
   (* FIXME: here we should compare [shape_version] with the version of shapes just loaded.
      OR: even better, this function has no reason to have a [shape_version] parameter
      and should always take the version from the file just loaded. *)
-  merge_files c.controller_env c.controller_session old_ses
+  match reparse_file_fun with
+  | None ->
+      merge_files ~ignore_shapes c.controller_env c.controller_session old_ses
+  | Some reparse_file_fun ->
+      merge_files_gen ~ignore_shapes ~reparse_file_fun c.controller_env c.controller_session old_ses
 
 exception Errors_list of exn list
 
-let reload_files ?(hard_reload=false) (c: controller) =
-  let errors, b1, b2 = reload_files c ~hard_reload in
+let reload_files ?(hard_reload=false) ?reparse_file_fun ~ignore_shapes (c: controller) =
+  let errors, b1, b2 = reload_files ~hard_reload ?reparse_file_fun ~ignore_shapes c in
   match errors with
   | [] -> b1, b2
   | _ -> raise (Errors_list errors)
@@ -271,7 +275,8 @@ let add_file c ?format fname =
     try false,(Session_itp.read_file c.controller_env ~format fname), None
     with e -> true,([], format), Some e
   in
-  let (_ : file) = add_file_section c.controller_session fname ~file_is_detached theories format in
+  let fp = Sysutil.relativize_filename (get_dir c.controller_session) fname in
+  let (_ : file) = add_file_section c.controller_session fp ~file_is_detached theories format in
   errors
 
 let add_file c ?format fname =
@@ -621,7 +626,7 @@ let schedule_proof_attempt ?proof_script_filename c id pr ~limit ~callback ~noti
       let old_res = a.proof_state in
       let script =
         if proof_script_filename = None then
-          Opt.map (fun s ->
+          Option.map (fun s ->
               let s = Pp.sprintf "%a" Sysutil.print_file_path s in
               Debug.dprintf debug_sched "Script file = %s@." s;
               Filename.concat (get_dir ses) s) a.proof_script
@@ -693,7 +698,7 @@ let prepare_edition c ?file pn pr ~notification =
   in
   update_goal_node notification session pn;
   let pa = get_proof_attempt_node session panid in
-  let file = Opt.get pa.proof_script in
+  let file = Option.get pa.proof_script in
   let old_res = pa.proof_state in
   let session_dir = Session_itp.get_dir session in
   let file = Sysutil.system_dependent_absolute_path session_dir file in
@@ -714,7 +719,7 @@ let prepare_edition c ?file pn pr ~notification =
   let task = Session_itp.get_task session pn in
   let driver = snd (Hprover.find c.controller_provers pr) in
   Driver.print_task ?old driver fmt task;
-  Opt.iter close_in old;
+  Option.iter close_in old;
   close_out ch;
   panid,file,old_res
 
@@ -766,7 +771,6 @@ let schedule_edition c id pr ~callback ~notification =
   Queue.add (callback panid,call,old_res) prover_tasks_edited;
   run_idle_handler ()
 
-exception TransAlreadyExists of string * string
 exception GoalNodeDetached of proofNodeID
 
 (*** { 2 transformations} *)
@@ -805,8 +809,6 @@ let schedule_transformation c id name args ~callback ~notification =
   in
   if Session_itp.is_detached c.controller_session (APn id) then
     raise (GoalNodeDetached id);
-  if Session_itp.check_if_already_exists c.controller_session id name args then
-    raise (TransAlreadyExists (name, List.fold_left (fun acc s -> s ^ " " ^ acc) "" args));
   S.idle ~prio:0 apply_trans;
   callback TSscheduled
 
@@ -815,20 +817,18 @@ open Strategy
 
 let call_one_prover c (p, timelimit, memlimit, steplimit) ~callback ~notification g =
   let main = Whyconf.get_main c.controller_config in
-  let timelimit = Opt.get_def (Whyconf.timelimit main) timelimit in
-  let memlimit = Opt.get_def (Whyconf.memlimit main) memlimit in
-  let steplimit = Opt.get_def 0 steplimit in
-
+  let timelimit = Option.value ~default:(Whyconf.timelimit main) timelimit in
+  let memlimit = Option.value ~default:(Whyconf.memlimit main) memlimit in
+  let steplimit = Option.value ~default:0 steplimit in
   let limit = {
     Call_provers.limit_time = timelimit;
     limit_mem  = memlimit;
     limit_steps = steplimit;
   } in
-
   schedule_proof_attempt c g p ~limit ~callback ~notification
 
 let run_strategy_on_goal
-    c id strat ~callback_pa ~callback_tr ~callback ~notification =
+    c id strat ~callback_pa ~callback_tr ~callback ~notification ~removed =
   let rec exec_strategy pc strat g =
     if pc < 0 || pc >= Array.length strat then
       callback STShalt
@@ -843,7 +843,15 @@ let run_strategy_on_goal
            | UpgradeProver _ | Scheduled | Running -> (* nothing to do yet *) ()
            | Done { Call_provers.pr_answer = Call_provers.Valid } ->
               (* proof succeeded, nothing more to do *)
-              interrupt_proof_attempts_for_goal c g;
+               interrupt_proof_attempts_for_goal c g;
+               Hprover.iter (fun _pr pa ->
+                   let res = get_proof_attempt_node c.controller_session pa in
+                   match res.proof_state with
+                   | Some Call_provers.{ pr_answer = Valid } ->
+                       ()
+                   | _ ->
+                       remove_subtree ~notification ~removed c (APa pa))
+                 (get_proof_attempt_ids c.controller_session g);
               already_done := 0;
               callback STShalt
            | Interrupted ->
@@ -885,16 +893,93 @@ let run_strategy_on_goal
                  S.idle ~prio:0 run_next)
                 (get_sub_tasks c.controller_session tid)
          in
-         begin match Session_itp.get_transformation c.controller_session g trname [] with
-         | tid -> callback (TSdone tid)
-         | exception Not_found ->
-             schedule_transformation c g trname [] ~callback ~notification
-         end
+         schedule_transformation c g trname [] ~callback ~notification
       | Igoto pc ->
          callback (STSgoto (g,pc));
          exec_strategy pc strat g
   in
   exec_strategy 0 strat id
+
+let run_strat_on_goal
+    c id strat ~callback_pa ~callback_tr  ~callback ~notification =
+  let rec exec_strategy tree id =
+    match tree with
+    | Sdo_nothing -> ()
+    | Sapply_trans(trname,args,substrats) ->
+        let callback ntr =
+          callback_tr trname [] ntr;
+          match ntr with
+          | TSfatal(id, e) ->
+               callback (STSfatal (trname, id, e))
+          | TSfailed(id, e) -> (* transformation failed *)
+              callback (STSfatal (trname, id, e))
+          | TSscheduled -> ()
+          | TSdone tid ->
+              List.iter2
+                (fun s id ->
+                 let run_next () = exec_strategy s id; false in
+                 S.idle ~prio:0 run_next)
+                substrats
+                (get_sub_tasks c.controller_session tid)
+         in
+        schedule_transformation c id trname args ~callback ~notification
+    | Scont (trname,args,strat) ->
+      let callback ntr =
+        callback_tr trname [] ntr;
+        match ntr with
+        | TSfatal(id, e) ->
+            callback (STSfatal (trname, id, e))
+        | TSfailed(_, NoProgress) -> (* The transformation had no effect, we apply the next strat *)
+          let t = get_task c.controller_session id in
+          let tree = strat c.controller_env t in
+          exec_strategy tree id;
+        | TSfailed(id, e) -> (* transformation failed *)
+            callback (STSfatal (trname, id, e))
+        | TSscheduled -> ()
+        | TSdone tid ->
+            List.iter
+              (fun id ->
+               let task = get_task c.controller_session id in
+               let tree = strat c.controller_env task in
+               let run_next () = exec_strategy tree id; false in
+               S.idle ~prio:0 run_next)
+              (get_sub_tasks c.controller_session tid)
+       in
+      schedule_transformation c id trname args ~callback ~notification
+    | Scall_prover (is, strat) ->
+        let already_done = ref (List.length is) in
+        let callback panid res =
+           callback_pa panid res;
+           begin
+           match res with
+           | UpgradeProver _ | Scheduled | Running -> (* nothing to do yet *) ()
+           | Done { Call_provers.pr_answer = Call_provers.Valid } ->
+              (* proof succeeded, nothing more to do *)
+              interrupt_proof_attempts_for_goal c id;
+              already_done := 0;
+              callback STShalt
+           | Interrupted ->
+              already_done := 0;
+              callback STShalt
+           | Done _ | InternalFailure _ ->
+              already_done := !already_done - 1;
+              if !already_done = 0 then begin
+                (* proof did not succeed, goto to next step *)
+                let run_next () = exec_strategy strat id; false in
+                S.idle ~prio:0 run_next
+              end
+           (* should not happen *)
+           | Undone | Detached | Uninstalled _ | Removed _ -> assert false
+           end
+        in
+        List.iter (fun i -> call_one_prover c i ~callback ~notification id) is
+  in
+  let t = get_task c.controller_session id in
+  let tree = strat c.controller_env t in
+  exec_strategy tree id;
+  callback STShalt
+
+
 
 let schedule_pa_with_same_arguments
     c (pa: proof_attempt_node) (pn: proofNodeID) ~callback ~notification =
@@ -908,7 +993,6 @@ let schedule_tr_with_same_arguments
   let args = get_transf_args s tr in
   let name = get_transf_name s tr in
   let callback = callback name args in
-
   schedule_transformation c pn name args ~callback ~notification
 
 let proof_is_complete pa =
@@ -920,7 +1004,6 @@ let proof_is_complete pa =
 
 
 let clean c ~removed nid =
-
   (* clean should not change proved status *)
   let notification any =
     Format.eprintf "Cleaning error: cleaning attempts to change status of node %a@." fprintf_any any

@@ -9,7 +9,7 @@
 #                                                                  #
 ####################################################################
 
-AC_INIT([Why3], [1.6.0+git])
+AC_INIT([Why3], [1.7.0+git])
 
 # verbosemake
 
@@ -103,7 +103,7 @@ AC_ARG_ENABLE(web_ide,
 
 AC_ARG_ENABLE(coq-libs,
     AS_HELP_STRING([--disable-coq-libs], [do not build Coq realizations]),,
-    enable_coq_libs=yes)
+    enable_coq_libs=check)
 
 # PVS libraries
 
@@ -344,7 +344,7 @@ fi
 
 if test "$enable_ocamlfind" != no; then
    #if ocamlfind is used it gives the install path for ocaml library
-   OCAMLINSTALLLIB=$($OCAMLFIND printconf destdir)
+   OCAMLINSTALLLIB=$($OCAMLFIND printconf destdir | tr -d '\r')
    enable_ocamlfind=yes
 else
    OCAMLINSTALLLIB=$OCAMLLIB
@@ -359,7 +359,7 @@ else
    fi
    WHY3LIB=why3
    AC_MSG_CHECKING([for Why3 using ocamlfind])
-   DIR=$($OCAMLFIND query why3 2> /dev/null)
+   DIR=$($OCAMLFIND query why3 2> /dev/null | tr -d '\r')
    if test -n "$DIR"; then
       AC_MSG_RESULT([yes])
       WHY3INCLUDE="-I $DIR"
@@ -378,7 +378,7 @@ fi
 # ppx
 if test "$enable_ocamlfind" = yes; then
   AC_MSG_CHECKING([for compiler-libs using ocamlfind])
-  COMPILERLIBS=$($OCAMLFIND query compiler-libs 2> /dev/null)
+  COMPILERLIBS=$($OCAMLFIND query compiler-libs 2> /dev/null | tr -d '\r')
   if test -n "$COMPILERLIBS"; then
     AC_MSG_RESULT([yes])
     enable_ppx=yes
@@ -428,7 +428,7 @@ fi
 found_num=no
 if test "$enable_ocamlfind" = yes; then
    AC_MSG_CHECKING([for num using ocamlfind])
-   DIR=$($OCAMLFIND query num 2> /dev/null)
+   DIR=$($OCAMLFIND query num 2> /dev/null | tr -d '\r')
    if test -z "$DIR"; then
       AC_MSG_RESULT([no])
       AC_MSG_ERROR([cannot find library Num using ocamlfind.])
@@ -459,7 +459,7 @@ else
    found_zarith=yes
    if test "$enable_ocamlfind" = yes; then
       AC_MSG_CHECKING([for zarith using ocamlfind])
-      DIR=$($OCAMLFIND query zarith 2> /dev/null)
+      DIR=$($OCAMLFIND query zarith 2> /dev/null | tr -d '\r')
       if test -n "$DIR"; then
          AC_MSG_RESULT([yes])
          BIGINTINCLUDE="-I $DIR"
@@ -499,7 +499,7 @@ fi
 if test "$enable_bddinfer" = yes; then
    if test "$enable_ocamlfind" = yes; then
       # gmp is a dependency of apron
-      INFERINCLUDE=$($OCAMLFIND query -separator ' ' -i-format apron 2> /dev/null)
+      INFERINCLUDE=$($OCAMLFIND query -separator ' ' -i-format apron 2> /dev/null | tr -d '\r')
    fi
    if test -n "$INFERINCLUDE"; then
       echo "ocamlfind found apron in $INFERINCLUDE"
@@ -518,14 +518,14 @@ fi
 if test "$enable_infer" = yes; then
    if test "$enable_ocamlfind" = yes; then
       # gmp is a dependency of apron
-      INFERINCLUDE=$($OCAMLFIND query apron camllib 2> /dev/null)
+      INFERINCLUDE=$($OCAMLFIND query apron camllib 2> /dev/null | tr -d '\r')
    fi
    if test -n "$INFERINCLUDE"; then
       echo "ocamlfind found apron, camllib in $INFERINCLUDE"
-      INFERINCLUDE=$($OCAMLFIND query fixpoint 2> /dev/null)
+      INFERINCLUDE=$($OCAMLFIND query fixpoint 2> /dev/null | tr -d '\r')
       if test -n "$INFERINCLUDE"; then
          echo "ocamlfind found fixpoint in $INFERINCLUDE"
-         INFERINCLUDE="$($OCAMLFIND query -separator ' ' -i-format apron fixpoint camllib gmp 2> /dev/null)"
+         INFERINCLUDE="$($OCAMLFIND query -separator ' ' -i-format apron fixpoint camllib gmp 2> /dev/null | tr -d '\r')"
          INFERLIB="apron fixpoint"
          INFERPKG="apron fixpoint apron.boxMPQ apron.octMPQ apron.polkaMPQ"
       else
@@ -550,7 +550,7 @@ else
    found_zip=yes
    if test "$enable_ocamlfind" = yes; then
       AC_MSG_CHECKING([for camlzip using ocamlfind])
-      DIR=$($OCAMLFIND query zip 2> /dev/null)
+      DIR=$($OCAMLFIND query zip 2> /dev/null | tr -d '\r')
       if test -n "$DIR"; then
          AC_MSG_RESULT([yes])
          ZIPINCLUDE="-I $DIR"
@@ -589,7 +589,7 @@ found_menhirlib=yes
 DIR=
 if test "$enable_ocamlfind" = yes; then
    AC_MSG_CHECKING([for menhirLib using ocamlfind])
-   DIR=$($OCAMLFIND query menhirLib 2> /dev/null)
+   DIR=$($OCAMLFIND query menhirLib 2> /dev/null | tr -d '\r')
    if test -n "$DIR"; then
       AC_MSG_RESULT([yes])
       MENHIRINCLUDE="-I $DIR"
@@ -621,7 +621,7 @@ else
    DIR=
    if test "$enable_ocamlfind" = yes; then
       AC_MSG_CHECKING([for re using ocamlfind])
-      DIR=$($OCAMLFIND query re 2> /dev/null)
+      DIR=$($OCAMLFIND query re 2> /dev/null | tr -d '\r')
       if test -n "$DIR"; then
          AC_MSG_RESULT([yes])
          REINCLUDE="-I $DIR"
@@ -670,7 +670,7 @@ fi
 found_lablgtk=no
 if test "$enable_ide" != no; then
    AC_MSG_CHECKING([for lablgtk3 using ocamlfind])
-   DIR=$($OCAMLFIND query lablgtk3 2> /dev/null)
+   DIR=$($OCAMLFIND query lablgtk3 2> /dev/null | tr -d '\r')
    if test -n "$DIR"; then
       AC_MSG_RESULT([yes])
       found_lablgtk=yes
@@ -690,7 +690,7 @@ found_lablgtksourceview=no
 if test "$found_lablgtk" = yes; then
    for p in $PKGS_SOURCEVIEW; do
       AC_MSG_CHECKING([for $p using ocamlfind])
-      DIR=$($OCAMLFIND query $p 2> /dev/null)
+      DIR=$($OCAMLFIND query $p 2> /dev/null | tr -d '\r')
       if test -n "$DIR"; then
          AC_MSG_RESULT([yes])
          AC_CHECK_FILE($DIR/gSourceView$GTKVERSION.cmi,,p=)
@@ -735,7 +735,7 @@ if test "$enable_hypothesis_selection" != no -o "$enable_stackify" != no; then
    DIR=
    if test "$enable_ocamlfind" = yes; then
       AC_MSG_CHECKING([for ocamlgraph using ocamlfind])
-      DIR=$($OCAMLFIND query ocamlgraph 2> /dev/null)
+      DIR=$($OCAMLFIND query ocamlgraph 2> /dev/null | tr -d '\r')
       if test -n "$DIR"; then
          AC_MSG_RESULT([yes])
          OCAMLGRAPHLIB="$DIR"
@@ -805,14 +805,14 @@ elif test "$enable_js_of_ocaml" = yes -o "$enable_web_ide" = yes; then
 else
    found_mlmpfr=yes
    AC_MSG_CHECKING([for mlmpfr])
-   DIR=$($OCAMLFIND query mlmpfr 2> /dev/null)
+   DIR=$($OCAMLFIND query mlmpfr 2> /dev/null | tr -d '\r')
    if test -n "$DIR"; then
       AC_MSG_RESULT([yes])
       old_mpfr=no
       echo "ocamlfind found mlmpfr in $DIR"
       # Test that MPFR version is higher than 4.0.0 (because of
       # Faithful constructor incompatibility).
-      MPFRVERSION=$($OCAMLFIND query -format "%v" mlmpfr 2> /dev/null)
+      MPFRVERSION=$($OCAMLFIND query -format "%v" mlmpfr 2> /dev/null | tr -d '\r')
       AX_VERSION_GE([$MPFRVERSION], 4.0.0, [], [
          found_mlmpfr=no
          reason_mpfr=" (mlmpfr >= 4.0.0 not found)"])
@@ -851,7 +851,7 @@ else
    found_js_of_ocaml=yes
    for p in js_of_ocaml js_of_ocaml-ppx; do
       AC_MSG_CHECKING([for $p])
-      DIR=$($OCAMLFIND query $p 2> /dev/null)
+      DIR=$($OCAMLFIND query $p 2> /dev/null | tr -d '\r')
       if test -z "$DIR"; then
          AC_MSG_RESULT([no])
          found_js_of_ocaml=no
@@ -894,7 +894,7 @@ if test "$enable_statmemprof" = yes; then
       enable_statmemprof=no
       reason_statmemprof=" (ocamlfind not available)"
    else
-      DIR=$($OCAMLFIND query statmemprof-emacs 2> /dev/null)
+      DIR=$($OCAMLFIND query statmemprof-emacs 2> /dev/null | tr -d '\r')
       if test -z "$DIR"; then
          enable_statmemprof=no
          reason_statmemprof=" (statmemprof-emacs not found)"
@@ -918,7 +918,7 @@ else
     else
         for p in ppx_sexp_conv sexplib ppx_deriving; do
             AC_MSG_CHECKING([for $p using ocamlfind])
-            DIR=$($OCAMLFIND query $p 2> /dev/null)
+            DIR=$($OCAMLFIND query $p 2> /dev/null | tr -d '\r')
             if test -z "$DIR"; then
                AC_MSG_RESULT([no])
                enable_sexp=no
@@ -960,52 +960,24 @@ if test "$enable_coq_support" = yes; then
    AC_MSG_CHECKING(Coq version)
    COQVERSION=[`$COQC -v | sed -n -e 's|.*version  *\([^ ]*\).*|\1|p'`]
    AC_MSG_RESULT($COQVERSION)
-
-   case $COQVERSION in
-      8.7*)
-         coq_compat_version="COQ87"
-         enable_coq_fp_libs=no
-         ;;
-      8.8*)
-         coq_compat_version="COQ88"
-         enable_coq_fp_libs=no
-         ;;
-      8.9*)
-         coq_compat_version="COQ89"
-         enable_coq_fp_libs=no
-         ;;
-      8.10*)
-         coq_compat_version="COQ810"
-         enable_coq_fp_libs=no
-         ;;
-      8.11*)
-         coq_compat_version="COQ811"
-         ;;
-      8.12*)
-         coq_compat_version="COQ812"
-         ;;
-      8.13*)
-         coq_compat_version="COQ813"
-         ;;
-      8.14*)
-         coq_compat_version="COQ814"
-         ;;
-      8.15*)
-         coq_compat_version="COQ815"
-         ;;
-      8.16*)
-         coq_compat_version="COQ816"
-         ;;
-      8.17*)
-         coq_compat_version="COQ817"
+   COQNUMVERSION=[`echo $COQVERSION | awk -F. '{ printf("%d%02d\n", $1,$2); }'`]
+   if test "$COQNUMVERSION" -lt 811; then
+      if test "$enable_coq_libs" = yes; then
+         AC_MSG_ERROR([cannot build Coq libraries without Coq >= 8.11.])
+      fi
+      enable_coq_support=no
+      AC_MSG_WARN([cannot build Coq libraries without Coq >= 8.11.])
+      reason_coq_support=" (need version >= 8.11)"
+   else
+      if test "$COQNUMVERSION" -ge 817; then
          COQFLAGS="-w deprecated-instance-without-locality,deprecated-hint-without-locality"
-         ;;
-      *)
-         enable_coq_support=no
-         AC_MSG_WARN([You need Coq 8.7 or later; Coq discarded.])
-         reason_coq_support=" (need version >= 8.7)"
-         ;;
-   esac
+      fi
+      if test "$COQNUMVERSION" -gt 818; then
+         AC_MSG_WARN([unrecognized Coq version, assuming Coq 8.18])
+         COQNUMVERSION=818
+      fi
+      coq_compat_version="COQ$COQNUMVERSION"
+   fi
    if test "$enable_coq_fp_libs" = no; then
       reason_coq_fp_libs= " (Coq < 8.11)"
    fi
@@ -1014,6 +986,9 @@ fi
 if test "$enable_coq_support" = yes; then
    AC_CHECK_PROG(COQDEP,coqdep,coqdep,no)
    if test "$COQDEP" = no; then
+      if test "$enable_coq_libs" = yes; then
+         AC_MSG_ERROR([cannot build Coq libraries without Coqdep.])
+      fi
       enable_coq_support=no
       reason_coq_support=" (coqdep not found)"
    fi
@@ -1023,6 +998,8 @@ if test "$enable_coq_support" = no; then
    enable_coq_libs=no
    enable_coq_fp_libs=no
    COQVERSION=
+else
+   enable_coq_libs=yes
 fi
 
 if test "$enable_coq_fp_libs" = yes; then
@@ -1046,6 +1023,10 @@ if test "$enable_pvs_libs" = no; then
 else
     AC_CHECK_PROG(PVS,pvs,pvs,no)
     if test "$PVS" = no ; then
+        enable_pvs_support=no
+        reason_pvs_support=" (pvs not found)"
+    elif $PVS --help 2> /dev/null | grep -q "physical volume"; then
+        AC_MSG_NOTICE([pvs does not seem to be the theorem prover])
         enable_pvs_support=no
         reason_pvs_support=" (pvs not found)"
     else

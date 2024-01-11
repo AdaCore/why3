@@ -1,0 +1,53 @@
+File "bench/check-ce/int32_mono.mlw", line 11, characters 11-20:
+Sub-goal Integer overflow of goal dummy_update'vc.
+Prover result is: Valid (416 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/int32_mono.mlw", line 9, characters 14-32)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/int32_mono.mlw", line 9, characters 14-32)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/int32_mono.mlw", line 9, characters 14-32)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/int32_mono.mlw", line 9, characters 14-32)
+File "bench/check-ce/int32_mono.mlw", line 9, characters 14-32:
+Sub-goal Postcondition of goal dummy_update'vc.
+Prover result is: Unknown (unknown + incomplete) (736 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File int.mlw:
+  Line 258:
+    Constant min_int32 initialization
+    min_int32 = (-2147483648)
+  Line 259:
+    Constant max_int32 initialization
+    max_int32 = 2147483647
+File int32_mono.mlw:
+  Line 7:
+    r = {c= epsilon x:int32. int32'int x = 22}
+    r = {c= epsilon x:int32. int32'int x = 22}
+    Execution of main function `dummy_update` with env:
+      r = {c= epsilon x:int32. int32'int x = 22}
+      zero = 0
+      one = 1
+      min_int32 = (-2147483648)
+      max_int32 = 2147483647
+  Line 11:
+    Normal execution of function `c` with args:
+      arg = {c= 42}
+    Normal execution of function `c` with args:
+      arg = {c= 42}
+    (giant-step) execution of unimplemented function `(+)`
+      a = 42
+      b = 42
+    result of `(+)` = epsilon x:int32. int32'int x = 84
+  Line 9:
+    Property failure at postcondition of `dummy_update` with:
+      r = {c= epsilon x:int32. int32'int x = 84}
+

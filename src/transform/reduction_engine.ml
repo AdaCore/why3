@@ -1004,7 +1004,7 @@ and reduce_eval eng st t ~orig sigma rem =
         let aux vs t =
           (* Create ε fc. λ vs. fc @ vs = t to make the value from
              known_map compatible to reduce_func_app *)
-          let ty = Opt.get t.t_ty in
+          let ty = Option.get t.t_ty in
           let app_ty = Ty.ty_func vs.vs_ty ty in
           let fc = create_vsymbol (Ident.id_fresh "fc") app_ty in
           t_eps
@@ -1529,6 +1529,8 @@ let rec reconstruct c =
 
 
 (** iterated reductions *)
+let warn_reduction_aborted = Loc.register_warning "reduction_aborted"
+  "Warn when aborting term reduction"
 
 let normalize ?(max_growth=1000) ?step_limit ~limit engine sigma t0 =
   let n0 = Term.term_size t0 in
@@ -1544,9 +1546,8 @@ let normalize ?(max_growth=1000) ?step_limit ~limit engine sigma t0 =
       if n = limit then
         begin
           let t1 = reconstruct c in
-          (* Avoid polluting gnatprove output with warnings. *)
-          (* Loc.warning "term reduction aborted (takes more than %d steps).@."
-            limit; *)
+          Loc.warning warn_reduction_aborted "term reduction aborted (takes more than %d steps).@."
+            limit;
           t1
         end
       else begin
@@ -1554,9 +1555,8 @@ let normalize ?(max_growth=1000) ?step_limit ~limit engine sigma t0 =
           let c' = reduce engine c in
           if cont_stack_size c'.config_cont_stack > cont_size_max then
             begin
-              (* Avoid polluting gnatprove output with warnings. *)
-              (* Loc.warning "term reduction aborted (term size blows up from %d to %d, after %d steps).@."
-                cont_size_init (cont_stack_size c'.config_cont_stack) n; *)
+              Loc.warning warn_reduction_aborted "term reduction aborted (term size blows up from %d to %d, after %d steps).@."
+                cont_size_init (cont_stack_size c'.config_cont_stack) n;
               reconstruct c
             end
           else

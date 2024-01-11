@@ -8,7 +8,17 @@ theory bv.BV_Gen
   remove prop Nth_zeros
   remove prop Nth_ones
 
-  (** Bitwise operators *)
+  (** this meta seems somehow placed too early since we cannot give a
+     syntax rule for the literals yet, it is only possible in the
+     clones. Yet, this will prevent users who clone this module to
+     forget to add such a syntax rule in their driver. See also issue
+     https://gitlab.inria.fr/why3/why3/-/issues/759 *)
+  meta "literal:keep" type t
+
+  (* Note: the syntax rules given in this module are somehow given too
+     early, since they are only valid in each clones. Yet, it is
+     convenient to share those declarations once and for all. See also issue
+     https://gitlab.inria.fr/why3/why3/-/issues/759 *)
 
   syntax function bw_and "(bvand %1 %2)"
   syntax function bw_or "(bvor %1 %2)"
@@ -123,7 +133,6 @@ theory bv.BV_Gen
 end
 
 theory bv.BV256
-  meta "literal:keep" type t
 
   syntax literal t "#x%64x"
   syntax type t "(_ BitVec 256)"
@@ -140,7 +149,6 @@ theory bv.BV256
 end
 
 theory bv.BV128
-  meta "literal:keep" type t
 
   syntax literal t "#x%32x"
   syntax type t "(_ BitVec 128)"
@@ -157,7 +165,6 @@ theory bv.BV128
 end
 
 theory bv.BV64
-  meta "literal:keep" type t
 
   syntax literal t "#x%16x"
   syntax type t "(_ BitVec 64)"
@@ -174,7 +181,6 @@ theory bv.BV64
 end
 
 theory bv.BV32
-  meta "literal:keep" type t
 
   syntax literal t "#x%8x"
   syntax type t "(_ BitVec 32)"
@@ -191,7 +197,6 @@ theory bv.BV32
 end
 
 theory bv.BV16
-  meta "literal:keep" type t
 
   syntax literal t "#x%4x"
   syntax type t "(_ BitVec 16)"
@@ -208,7 +213,6 @@ theory bv.BV16
 end
 
 theory bv.BV8
-  meta "literal:keep" type t
 
   syntax literal t (* "#b%8b"  *) "#x%2x"
   syntax type t "(_ BitVec 8)"

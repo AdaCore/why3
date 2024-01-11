@@ -145,14 +145,14 @@ rule invok code = parse
   {
     let p = prover code p in
     let t = real "timelimit" t in
-    if t <> None && Opt.get t <= 0.0 then
-      error "timelimit %f is invalid" (Opt.get t);
+    if t <> None && Option.get t <= 0.0 then
+      error "timelimit %f is invalid" (Option.get t);
     let m = integer "memlimit" m in
-    if m <> None && Opt.get m <= 0 then
-      error "memlimit %d is invalid" (Opt.get m);
-    let s = integer "steplimit" (Opt.get_def "%s" s) in
-    if s <> None && Opt.get s < 0 then
-      error "steplimit %d is invalid" (Opt.get s);
+    if m <> None && Option.get m <= 0 then
+      error "memlimit %d is invalid" (Option.get m);
+    let s = integer "steplimit" (Option.value ~default:"%s" s) in
+    if s <> None && Option.get s < 0 then
+      error "steplimit %d is invalid" (Option.get s);
     if sep <> None then
       (p.Whyconf.prover, t, m, s) :: invok code lexbuf
     else

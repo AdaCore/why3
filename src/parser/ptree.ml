@@ -453,6 +453,11 @@ type decl =
   (** "scope" *)
 [@@deriving sexp]
 
+let sexp_of_mlw_file _ = assert false [@@warning "-32"]
+let mlw_file_of_sexp _ = assert false  [@@warning "-32"]
+(* default values if the line below does not produce anything, i.e.,
+   when ppx_sexp_conv is not installed *)
+
 type mlw_file =
   | Modules of (ident * decl list) list
   (** a list of modules containing lists of declarations *)

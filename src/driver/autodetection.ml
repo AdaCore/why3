@@ -204,7 +204,7 @@ module Partial = struct
       let manual = get_bool ~default:false section "manual" in
       Some { name; path; version; shortcut; manual }
     with MissingField s ->
-      Loc.warning "cannot load a %s section: missing field '%s'@." section_name s;
+      Loc.warning warn_missing_field "cannot load a %s section: missing field '%s'@." section_name s;
       None
 
   let load_rc rc =
@@ -394,7 +394,12 @@ let generate_auto_strategies env =
       strategy_shortcut = "0";
       strategy_code = code }
   in
-  List.iter (fun s -> fprintf str_formatter "c %s 5. 1000@\n" s) provers_level1;
+  let alt fmt () = fprintf fmt " | " in
+  if provers_level1 <> [] then
+    begin
+      fprintf str_formatter "c %a@\n"
+        (Pp.print_list alt (fun fmt s -> fprintf fmt "%s 5. 1000" s)) provers_level1;
+    end;
   let code = flush_str_formatter () in
   let auto1 = {
       strategy_name = "Auto_level_1";
@@ -405,7 +410,11 @@ let generate_auto_strategies env =
   fprintf str_formatter "start:@\n";
   List.iter (fun s -> fprintf str_formatter "c %s 1. 1000@\n" s) provers_level1;
   fprintf str_formatter "t split_vc start@\n";
-  List.iter (fun s -> fprintf str_formatter "c %s 10. 4000@\n" s) provers_level1;
+  if provers_level1 <> [] then
+    begin
+      fprintf str_formatter "c %a@\n"
+        (Pp.print_list alt (fun fmt s -> fprintf fmt "%s 10. 4000" s)) provers_level1;
+    end;
   let code = flush_str_formatter () in
   let auto2 = {
       strategy_name = "Auto_level_2";
@@ -424,7 +433,11 @@ let generate_auto_strategies env =
   fprintf str_formatter "start:@\n";
   List.iter (fun s -> fprintf str_formatter "c %s 1. 1000@\n" s) provers_level3;
   fprintf str_formatter "t split_vc start@\n";
-  List.iter (fun s -> fprintf str_formatter "c %s 5. 2000@\n" s) provers_level3;
+  if provers_level1 <> [] then
+    begin
+      fprintf str_formatter "c %a@\n"
+        (Pp.print_list alt (fun fmt s -> fprintf fmt "%s 5. 2000" s)) provers_level1;
+    end;
   fprintf str_formatter "t introduce_premises afterintro@\n";
   fprintf str_formatter "afterintro:@\n";
   fprintf str_formatter "t inline_goal afterinline@\n";
@@ -432,7 +445,11 @@ let generate_auto_strategies env =
   fprintf str_formatter "afterinline:@\n";
   fprintf str_formatter "t split_all_full start@\n";
   fprintf str_formatter "trylongertime:@\n";
-  List.iter (fun s -> fprintf str_formatter "c %s 30. 4000@\n" s) provers_level3;
+  if provers_level1 <> [] then
+    begin
+      fprintf str_formatter "c %a@\n"
+        (Pp.print_list alt (fun fmt s -> fprintf fmt "%s 30. 4000" s)) provers_level1;
+    end;
   let code = flush_str_formatter () in
   let auto3 = {
       strategy_name = "Auto_level_3";
@@ -485,7 +502,7 @@ let expand_partial env main (data:Prover_autodetection_data.data) provers (p:Par
   end else
     let good = List.exists (check_version p.version) data.versions_ok in
     let old  = List.exists (check_version p.version) data.versions_old in
-    let pp_shortcut fmt = Opt.iter (Format.fprintf fmt (" (manually added as %s)")) p.shortcut in
+    let pp_shortcut fmt = Option.iter (Format.fprintf fmt (" (manually added as %s)")) p.shortcut in
     match data.prover_command with
     | None ->
         (* an empty prover command is used for forbidding some versions:
@@ -497,7 +514,7 @@ let expand_partial env main (data:Prover_autodetection_data.data) provers (p:Par
             data.prover_name
             pp_shortcut
             p.version
-            (Opt.get_def
+            (Option.value ~default:
                ". This version of the prover is known to have problems."
                data.message);
           known_version env binary;
@@ -506,7 +523,7 @@ let expand_partial env main (data:Prover_autodetection_data.data) provers (p:Par
     | Some prover_command ->
         (* create the prover config *)
         let c = make_command binary prover_command in
-        let c_steps = Opt.map (make_command binary) data.prover_command_steps in
+        let c_steps = Option.map (make_command binary) data.prover_command_steps in
         let prover =
           { Wc.prover_name = data.prover_name;
             prover_version = p.version;
@@ -515,7 +532,7 @@ let expand_partial env main (data:Prover_autodetection_data.data) provers (p:Par
           { prover = prover;
             command = c;
             command_steps = c_steps;
-            driver = data.prover_driver;
+            driver = (None, data.prover_driver);
             editor = data.prover_editor;
             in_place = data.prover_in_place;
             interactive = (match data.kind with ITP -> true | ATP -> false);
@@ -524,7 +541,7 @@ let expand_partial env main (data:Prover_autodetection_data.data) provers (p:Par
       configure_build = "";
       build_commands = [];
           } in
-        let shortcut = Opt.get_def data.prover_id p.shortcut in
+        let shortcut = Option.value ~default:data.prover_id p.shortcut in
         if not (good || old) then begin
           (* Unknown, temporarily put the prover away *)
           let priority = next_priority () in
@@ -542,7 +559,7 @@ let expand_partial env main (data:Prover_autodetection_data.data) provers (p:Par
           let priority = next_priority () in
           print_info "Found prover %s%t version %s%s@."
             data.prover_name pp_shortcut p.version
-            (Opt.get_def
+            (Option.value ~default:
                (if old then
                   " (old version, please consider upgrading)."
                 else
@@ -726,7 +743,7 @@ let find_prover data name path =
     ) data.Prover_autodetection_data.skeletons;
   Hashtbl.fold
     (fun (switch, regexp) () acc ->
-      if Opt.inhabited acc then acc
+      if Option.is_some acc then acc
       else query_prover_version path switch regexp
     ) binaries None
 

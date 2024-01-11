@@ -4,75 +4,75 @@
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.8.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.12.2" timelimit="10" steplimit="0" memlimit="4000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="infinity_of_primes.mlw"/>
 <theory name="Top" proved="true">
  <goal name="prime_factor&#39;vc" expl="VC for prime_factor" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="prime_factor&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="9750"/></proof>
+  <proof prover="0"><result status="valid" time="0.040000" steps="9608"/></proof>
   </goal>
   <goal name="prime_factor&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="10562"/></proof>
+  <proof prover="0"><result status="valid" time="0.040000" steps="10363"/></proof>
   </goal>
   <goal name="prime_factor&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.09" steps="25225"/></proof>
+  <proof prover="0"><result status="valid" time="0.090000" steps="25009"/></proof>
   </goal>
   <goal name="prime_factor&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="10695"/></proof>
+  <proof prover="0"><result status="valid" time="0.040000" steps="10495"/></proof>
   </goal>
   <goal name="prime_factor&#39;vc.4" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="12768"/></proof>
+  <proof prover="0"><result status="valid" time="0.050000" steps="12562"/></proof>
   </goal>
   <goal name="prime_factor&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="11866"/></proof>
+  <proof prover="0"><result status="valid" time="0.030000" steps="11661"/></proof>
   </goal>
   <goal name="prime_factor&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="10866"/></proof>
+  <proof prover="0"><result status="valid" time="0.040000" steps="10661"/></proof>
   </goal>
   <goal name="prime_factor&#39;vc.7" expl="out of loop bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="10488"/></proof>
+  <proof prover="0"><result status="valid" time="0.030000" steps="10289"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="infinity_of_primes&#39;vc" expl="VC for infinity_of_primes" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="infinity_of_primes&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="11690"/></proof>
+  <proof prover="0"><result status="valid" time="0.040000" steps="11062"/></proof>
   </goal>
   <goal name="infinity_of_primes&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="14361"/></proof>
+  <proof prover="0"><result status="valid" time="0.060000" steps="13600"/></proof>
   </goal>
   <goal name="infinity_of_primes&#39;vc.2" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="16438"/></proof>
+  <proof prover="0"><result status="valid" time="0.050000" steps="15668"/></proof>
   </goal>
   <goal name="infinity_of_primes&#39;vc.3" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="16509"/></proof>
+  <proof prover="0"><result status="valid" time="0.060000" steps="15739"/></proof>
   </goal>
   <goal name="infinity_of_primes&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="15404"/></proof>
+  <proof prover="0"><result status="valid" time="0.050000" steps="14776"/></proof>
   </goal>
   <goal name="infinity_of_primes&#39;vc.5" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="18589"/></proof>
+  <proof prover="0"><result status="valid" time="0.070000" steps="17611"/></proof>
   </goal>
   <goal name="infinity_of_primes&#39;vc.6" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.16" steps="335123"/></proof>
+  <proof prover="3"><result status="valid" time="8.306695" steps="18009824"/></proof>
   </goal>
   <goal name="infinity_of_primes&#39;vc.7" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.09" steps="18738"/></proof>
+  <proof prover="0"><result status="valid" time="0.090000" steps="17971"/></proof>
   </goal>
   <goal name="infinity_of_primes&#39;vc.8" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.05" steps="1516"/></proof>
+  <proof prover="1"><result status="valid" time="0.050000" steps="1516"/></proof>
   </goal>
   <goal name="infinity_of_primes&#39;vc.9" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="15374"/></proof>
+  <proof prover="0"><result status="valid" time="0.050000" steps="14746"/></proof>
   </goal>
   <goal name="infinity_of_primes&#39;vc.10" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="16384"/></proof>
+  <proof prover="0"><result status="valid" time="0.070000" steps="15618"/></proof>
   </goal>
   <goal name="infinity_of_primes&#39;vc.11" expl="out of loop bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="15375"/></proof>
+  <proof prover="0"><result status="valid" time="0.040000" steps="14747"/></proof>
   </goal>
  </transf>
  </goal>

@@ -1,0 +1,66 @@
+Warning: term reduction aborted (term size blows up from 289 to 491721, after 278 steps).
+
+Warning: term reduction aborted (takes more than 1024 steps).
+
+Warning: term reduction aborted (term size blows up from 289 to 491721, after 278 steps).
+
+Warning: term reduction aborted (takes more than 1024 steps).
+
+Warning: term reduction aborted (term size blows up from 289 to 491721, after 278 steps).
+
+Warning: term reduction aborted (takes more than 1024 steps).
+
+Warning: term reduction aborted (term size blows up from 289 to 491721, after 278 steps).
+
+Warning: term reduction aborted (takes more than 1024 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `local` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `local` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `local` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `local` cannot be evaluated)
+File "bench/check-ce/703_reduce_term.mlw", line 391, characters 4-55:
+Sub-goal Precondition of goal def'vc.
+Prover result is: Unknown (unknown + incomplete) (111444 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `local` cannot be evaluated):
+File 703_reduce_term.mlw:
+  Line 5:
+    base : t = #b11111111111111111111111111111111
+  Line 13:
+    oor :
+      t
+      ->
+      t
+      ->
+      t = fun _arg_15 _arg_25 -> #b00000000000000000000000000000000
+  Line 16:
+    oor__function_guard :
+      t
+      ->
+      t
+      ->
+      t
+      ->
+      t = fun _arg_14 _arg_24 _arg_32 -> #b00000000000000000000000000000000
+  Line 24:
+    oand :
+      t
+      ->
+      t
+      ->
+      t = fun _arg_17 _arg_27 -> #b00000000000000000000000000000000
+  Line 27:
+    oand__function_guard :
+      t
+      ->
+      t
+      ->
+      t
+      ->
+      t = fun _arg_16 _arg_26 _arg_33 -> #b11111111111111111111111111111110
+  Line 391:
+    base : t = #b11111111111111111111111111111111
+

@@ -16,8 +16,8 @@ open Ty
 open Term
 open Decl
 
-let warn_clone_not_abstract =
-  Loc.register_warning "clone_not_abstract" "Warn about theories cloned without substituting any abstract symbols."
+let warning_clone_not_abstract =
+  Loc.register_warning "clone_not_abstract" "Warn about theories cloned without substituting any abstract symbols"
 
 (** Namespace *)
 
@@ -505,7 +505,7 @@ let create_decl d = mk_tdecl (Decl d)
 let print_id fmt id = Ident.print_decoded fmt id.id_string
 
 let warn_axiom_abstract =
-  Loc.register_warning "axiom_abstract" "Warn about axioms that are free of abstract symbols."
+  Loc.register_warning "axiom_abstract" "Warn when some axiom does not contain any abstract symbol"
 
 let warn_dubious_axiom uc k _ syms =
   match k with
@@ -519,8 +519,7 @@ let warn_dubious_axiom uc k _ syms =
           | Dtype { ts_def = NoDef } | Dparam _ -> raise Exit
           | _ -> ())
         syms;
-(*
-      Loc.warning ~id:warn_axiom_abstract ?loc:p.id_loc
+      Loc.warning warn_axiom_abstract ?loc:p.id_loc
         "@[axiom %s does not contain any local abstract symbol@ \
           (contains: @[%a@])@]" p.id_string
         (Pp.print_list Pp.comma print_id) (Sid.elements syms)
@@ -679,7 +678,7 @@ let cl_find_ls cl ls =
     let proj = ls.ls_proj in
     let id  = id_clone ls.ls_name in
     let ta' = List.map (cl_trans_ty cl) ls.ls_args in
-    let vt' = Opt.map (cl_trans_ty cl) ls.ls_value in
+    let vt' = Option.map (cl_trans_ty cl) ls.ls_value in
     let ls' = create_lsymbol ~proj ~constr id ta' vt' in
     cl.ls_table <- Mls.add ls ls' cl.ls_table;
     ls'
@@ -786,7 +785,7 @@ let cl_data cl inst tdl =
   let add_ls ls =
     if Mls.mem ls inst.inst_ls then raise (CannotInstantiate ls.ls_name);
     cl_find_ls cl ls in
-  let add_constr (ls,pl) = add_ls ls, List.map (Opt.map add_ls) pl in
+  let add_constr (ls,pl) = add_ls ls, List.map (Option.map add_ls) pl in
   let add_type ts' (_,csl) = ts', List.map add_constr csl in
   let get_type (ts,_) =
     if Mts.mem ts inst.inst_ts || Mts.mem ts inst.inst_ty then
@@ -876,7 +875,7 @@ let warn_clone_not_abstract loc th =
         end
       | _ -> ()
     ) th.th_decls;
-    Loc.warning ~id:warn_clone_not_abstract ~loc "cloned theory %a.%s does not contain \
+    Loc.warning warning_clone_not_abstract ~loc "cloned theory %a.%s does not contain \
         any abstract symbol; it should be used instead"
       (Pp.print_list (Pp.constant_string ".") Pp.string) th.th_path
       th.th_name.id_string
@@ -1015,6 +1014,11 @@ let builtin_theory =
 let create_theory ?(path=[]) n =
   use_export (empty_theory n path) builtin_theory
 
+let ignore_theory =
+  let uc = empty_theory (id_fresh "Ignore") ["why3";"Ignore"] in
+  let uc = add_param_decl uc ps_ignore in
+  close_theory uc
+
 let bool_theory =
   let uc = empty_theory (id_fresh "Bool") ["why3";"Bool"] in
   let uc = add_data_decl uc [ts_bool, [fs_bool_true,[]; fs_bool_false,[]]] in
@@ -1030,7 +1034,8 @@ let tuple_theory = Hint.memo 17 (fun n ->
   let ts = ts_tuple n and fs = fs_tuple n in
   let pl = List.map (fun _ -> None) ts.ts_args in
   let nm = "Tuple" ^ string_of_int n in
-  let uc = empty_theory (id_fresh nm) ["why3";nm] in
+  let attrs = Sattr.singleton builtin_attr in
+  let uc = empty_theory (id_fresh ~attrs nm) ["why3";nm] in
   let uc = add_data_decl uc [ts, [fs,pl]] in
   close_theory uc)
 

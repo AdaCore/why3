@@ -212,7 +212,7 @@ module PQueue
   }
 
   (** Conversion from sequences to bags:
-      from number of occurences. *)
+      from number of occurrences. *)
   use seq.Occ
 
   let ghost function to_bag (s:seq 'a) : 'a -> int =

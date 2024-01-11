@@ -173,7 +173,7 @@ let iter_deps_typedef f = function
   | Drange _ | Dfloat _ -> ()
 
 let iter_deps_its_defn f its_d =
-  Opt.iter (iter_deps_typedef f) its_d.its_def
+  Option.iter (iter_deps_typedef f) its_d.its_def
 
 let iter_deps_args f =
   List.iter (fun (_, ty_arg, _) -> iter_deps_ty f ty_arg)

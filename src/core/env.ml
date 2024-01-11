@@ -230,6 +230,7 @@ open Theory
 let base_language_builtin =
   let builtin s =
     if s = builtin_theory.th_name.id_string then builtin_theory else
+    if s = ignore_theory.th_name.id_string then ignore_theory else
     if s = bool_theory.th_name.id_string then bool_theory else
     if s = highord_theory.th_name.id_string then highord_theory else
     match tuple_theory_name s with

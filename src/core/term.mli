@@ -380,6 +380,10 @@ val t_neq : term -> term -> term
 val t_equ_simp : term -> term -> term
 val t_neq_simp : term -> term -> term
 
+(** {3 General-purpose 'ignore' predicate} *)
+
+val ps_ignore : lsymbol
+
 (** {3 Booleans} *)
 
 val fs_bool_true  : lsymbol

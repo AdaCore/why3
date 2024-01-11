@@ -1,0 +1,153 @@
+File "bench/check-ce/jlamp_projections.mlw", line 29, characters 8-18:
+Sub-goal Precondition of goal p3'vc.
+Prover result is: Valid (124 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18)
+File "bench/check-ce/jlamp_projections.mlw", line 29, characters 2-18:
+Sub-goal Integer overflow of goal p3'vc.
+Prover result is: Unknown (unknown + incomplete) (403 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File jlamp_projections.mlw:
+  Line 7:
+    to_int = fun ($x11:byte) ->
+              if (epsilon x:byte. to_int x = 1) = $x11 then 1 else 127
+  Line 28:
+    a = epsilon x:byte. to_int x = 127
+    a = epsilon x:byte. to_int x = 127
+    Execution of main function `p3` with env:
+      to_int = fun ($x11:byte) ->
+                if (epsilon x:byte. to_int x = 1) = $x11 then 1 else 127
+      a = epsilon x:byte. to_int x = 127
+      zero = 0
+      one = 1
+  Line 29:
+    (giant-step) execution of unimplemented function `of_int`
+      x = 1
+    result of `of_int` = epsilon x:byte. to_int x = 1
+    (giant-step) execution of unimplemented function `add`
+      x = epsilon x:byte. to_int x = 127
+      y = epsilon x:byte. to_int x = 1
+    Property failure at precondition of `add` with:
+      x = epsilon x:byte. to_int x = 127
+      y = epsilon x:byte. to_int x = 1
+
+File "bench/check-ce/jlamp_projections.mlw", line 42, characters 14-24:
+Sub-goal Precondition of goal p3'vc.
+Prover result is: Valid (124 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24)
+File "bench/check-ce/jlamp_projections.mlw", line 42, characters 7-24:
+Sub-goal Integer overflow of goal p3'vc.
+Prover result is: Unknown (unknown + incomplete) (421 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File jlamp_projections.mlw:
+  Line 7:
+    to_int = fun ($x12:byte) ->
+              if (epsilon x:byte. to_int x = 1) = $x12 then 1 else 127
+  Line 41:
+    a = {contents= epsilon x:byte. to_int x = 127}
+    a = {contents= epsilon x:byte. to_int x = 127}
+    Execution of main function `p3` with env:
+      to_int = fun ($x12:byte) ->
+                if (epsilon x:byte. to_int x = 1) = $x12 then 1 else 127
+      a = {contents= epsilon x:byte. to_int x = 127}
+      zero = 0
+      one = 1
+  Line 42:
+    (giant-step) execution of unimplemented function `of_int`
+      x = 1
+    result of `of_int` = epsilon x:byte. to_int x = 1
+    Normal execution of function `(!)` with args:
+      r = {contents= epsilon x:byte. to_int x = 127}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= epsilon x:byte. to_int x = 127}
+File jlamp_projections.mlw:
+  Line 42:
+    (giant-step) execution of unimplemented function `add`
+      x = epsilon x:byte. to_int x = 127
+      y = epsilon x:byte. to_int x = 1
+    Property failure at precondition of `add` with:
+      x = epsilon x:byte. to_int x = 127
+      y = epsilon x:byte. to_int x = 1
+
+File "bench/check-ce/jlamp_projections.mlw", line 54, characters 29-39:
+Sub-goal Precondition of goal p4'vc.
+Prover result is: Valid (134 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 54, characters 21-39)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/jlamp_projections.mlw", line 54, characters 21-39)
+File "bench/check-ce/jlamp_projections.mlw", line 54, characters 21-39:
+Sub-goal Integer overflow of goal p4'vc.
+Prover result is: Unknown (unknown + incomplete) (590 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File jlamp_projections.mlw:
+  Line 7:
+    to_int = fun ($x13:byte) ->
+              if (epsilon x:byte. to_int x = 1) = $x13 then 1 else 127
+  Line 53:
+    b = {f= epsilon x:byte. to_int x = 127; g= true}
+    b = {f= epsilon x:byte. to_int x = 127; g= true}
+    Execution of main function `p4` with env:
+      to_int = fun ($x13:byte) ->
+                if (epsilon x:byte. to_int x = 1) = $x13 then 1 else 127
+      b = {f= epsilon x:byte. to_int x = 127; g= true}
+      zero = 0
+      one = 1
+  Line 54:
+    Normal execution of function `g` with args:
+      arg = {f= epsilon x:byte. to_int x = 127; g= true}
+    (giant-step) execution of unimplemented function `of_int`
+      x = 1
+    result of `of_int` = epsilon x:byte. to_int x = 1
+    Normal execution of function `f` with args:
+      arg = {f= epsilon x:byte. to_int x = 127; g= true}
+    (giant-step) execution of unimplemented function `add`
+      x = epsilon x:byte. to_int x = 127
+      y = epsilon x:byte. to_int x = 1
+    Property failure at precondition of `add` with:
+      x = epsilon x:byte. to_int x = 127
+      y = epsilon x:byte. to_int x = 1
+

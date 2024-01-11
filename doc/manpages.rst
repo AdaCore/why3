@@ -56,6 +56,11 @@ The following commands are available:
 :why3:tool:`wc`
     Give some token statistics about a WhyML file.
 
+:why3:tool:`bench`
+    Run provers on all proof attempts in the given session which have
+    not been run yet, or whose result is obsolete. Typically to be
+    used after `why3 session create` or `why3 session update`.
+
 The commands accept a common subset of command-line options. In
 particular, option :option:`--help` displays the usage and options.
 
@@ -1243,8 +1248,15 @@ The available subcommands are as follows:
 :why3:tool:`session update`
     Update session contents.
 
-The first three commands do not modify the sessions, whereas the last
-modify them.
+:why3:tool:`session create`
+
+    Create a new session containing the set of files given. In this
+    particular case, the given arguments must be a set of source files
+    and not session directories. The session directory name itself
+    must be given with option `-o`.
+
+The first three commands do not modify the sessions, whereas the fourth
+on modify them, and the last one creates a new session.
 
 .. why3:tool:: session info
 
@@ -1292,6 +1304,27 @@ session, depending on the following specific options.
 
         why3 session info --edited-files --print0 vstte12_bfs.mlw | \
             xargs -0 git add
+
+.. option:: --graph=[all|hist|scatter]
+
+   Produce Gnuplot files containing graphs with various comparisons of the
+   provers in the session, and display them if :command:`gnuplot` is present in the
+   system. If no option is specified, `all` is used.
+
+   - ``all``: Output a line graph with each line representing the cumulative
+     time taken by a prover on all goals, as function of the number of goals.
+     Goals are ordered by shortest to longest relative to the prover.
+
+   - ``hist``: For every pair of provers in the session, output a histogram
+     representing the ratio between the time taken by each prover on each goal,
+     sorted by ascending ratio. Also display the average ratio and the
+     percentage of goals where one prover was faster.
+
+   - ``scatter``: For every pair of provers in the session, output a graph where
+     the `x` and `y` coordinates of each goal represent the time the two provers
+     needed to prove it. Therefore, goals where the prover in the `x` axis was
+     faster appear above the bisecting line of the graph area, and goals where
+     the prover in the `y` axis was faster appear below the bisecting line.
 
 Session Statistics
 ^^^^^^^^^^^^^^^^^^
@@ -1514,32 +1547,82 @@ contents, depending on the following specific options.
 
 .. option:: --rename-file=<src>:<dst>
 
-   rename the file *<src>* to *<dst>* in the session. The file *<src>*
-   itself is also renamed to *<dst>* in your filesystem.
+   Rename the file *<src>* to *<dst>* in the session. The file *<src>*
+   itself is also renamed to *<dst>* in the filesystem.
 
 .. option:: --mark-obsolete
 
-   marks as obsolete all the proof attempts of the session. If a filter is provided by the options below, then only the proof attempts that match the filters are affected.
+   Mark as obsolete all the proof attempts of the session. If a filter
+   is provided by the options below, then only the proof attempts that
+   match the filters are affected.
 
 .. option:: --remove-proofs
 
-   removes all the proof attempts. If a filter is provided by the options below, then only the proof attempts that match the filters are affected.
+   Remove all the proof attempts. If a filter is provided by the
+   options below, then only the proof attempts that match the filters
+   are affected.
 
-.. option:: --filter-prover=[<name>[,<version>[,<alternative>]]|<id>]
+.. option:: --add-provers=<provers>
 
-   selects proof attempts with this or these prover(s)
+   For each proof node of the session, add a new proof attempt for the specified provers.
+
+.. option:: --filter-prover=<name>[,<version>[,<alternative>]]
+
+   Select proof attempts with the given provers.
 
 .. option:: --filter-obsolete[=[yes|no]]
 
-   select only (non-)obsolete proofs
+   Select only (non-)obsolete proofs.
 
 .. option:: --filter-proved[=[yes|no]]
 
-   select only proofs below (non-)proved goals
+   Selects only goals that are (not) proved.
+
+.. option:: --filter-is-leaf[=[yes|no]]
+
+   Select only goals that are leaves of the proof tree, i.e., do not
+   have transformations, if yes.
 
 .. option:: --filter-status=[valid|invalid|highfailure]
 
-   select proofs attempts with the given status
+   Select proof attempts with the given status.
+
+.. why3:tool:: session create
+
+Command ``create``
+~~~~~~~~~~~~~~~~~~
+
+.. program:: why3 session create
+
+The :program:`why3 session create` command creates a new session containing the
+source files specified as arguments. Transformations and proofs attempts can be
+added using the options below. No prover is started with this command, and one
+should use the `why3 bench` command on the new session instead.
+
+.. option:: -a <transformation>, --apply-transform=<transformation>
+
+   Specify a transformation to be applied before the proof nodes are added (can
+   be given several times to nest several transformations).
+
+.. option:: -P <prover1:prover2...>, --prover=<prover1:prover2...>
+
+   Specify provers to use for proof attempts added to the session.
+
+.. option:: -o <output-dir>, --output-dir=<output-dir>
+
+   Specify the session directory for the created session.
+
+.. option:: -t <sec>, --timelimit=<sec>
+
+   Specify the time limit for the added proof attempts.
+
+.. option:: -s <steps>, --stepslimit=<steps>
+
+   Specify the step limit for the added proof attempts.
+
+.. option:: -m <MiB>, --memlimit=<MiB>
+
+   Specify the memory limit for the added proof attempts.
 
 .. why3:tool:: doc
 .. _sec.why3doc:
@@ -1932,3 +2015,31 @@ Why3 can give some token statistics about WhyML source files.
 .. option:: -a, --do-not-skip-header
 
    Count heading comments as well.
+
+.. why3:tool:: bench
+.. _sec.why3bench:
+
+The ``bench`` Command
+----------------------
+
+.. program:: why3 bench
+
+The :program:`why3 bench` runs all proofs attempts of a session that have not
+been tried. It saves the session periodically so that it can be interrupted and
+resumed later.
+
+::
+
+    why3 bench [options] <session directory>
+
+The session file :file:`why3session.xml` stored in the given directory is
+loaded and all the proof attempt nodes it contains are run.
+
+.. option:: -d <sec>, --delay=<sec>
+
+   Set the delay between temporary session backups, in seconds. Default is 60.
+
+.. option:: -f, --force
+
+   Force to rerun all proof attempt nodes, even the ones that have been run
+   before.

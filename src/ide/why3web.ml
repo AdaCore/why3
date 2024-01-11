@@ -69,8 +69,9 @@ let interp_request args =
       | _ -> invalid_arg ("Why3web.interp_request '" ^ args ^ "'"))
   | args when Strings.has_prefix "gettask_" args ->
      let c = false in
+     let show_uses_clones_metas = false in
      let loc = true in
-     Get_task (int_of_string (Strings.remove_prefix "gettask_" args),c,loc)
+     Get_task (int_of_string (Strings.remove_prefix "gettask_" args),c,show_uses_clones_metas,loc)
   | _ -> invalid_arg ("Why3web.interp_request '" ^ args ^ "'")
 
 let handle_script s args =
@@ -105,7 +106,7 @@ let handler (addr,req) script cont fmt =
        eprintf "cont: `%s'@." cont;
        let ans = handle_script script cont in
        eprintf "answer: `%s'@." ans;
-       Wserver.http_header fmt "HTTP/1.0 200 OK";
+       Wserver.http_header fmt "";
        fprintf fmt "Access-Control-Allow-Origin: *\n";
        fprintf fmt "\n"; (* end of header *)
        pp_print_string fmt ans;
@@ -137,7 +138,7 @@ let spec =
   ]
 
 let usage_str =
-  "[<file.why>|<project directory>]...\n\
+  "[<file>|<session directory>]...\n\
    Launch a web server that provides a graphical interface for Why3."
 
 let config, env =

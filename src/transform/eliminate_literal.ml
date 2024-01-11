@@ -36,7 +36,7 @@ let add_literal ((known_lit, decl) as acc) t c ls_proj fin =
       match ls_proj with
       | Some ls_proj ->
         let f = t_app ls_proj [ ls_t ] ls_proj.ls_value in
-        t_equ f (t_const c (Opt.get f.t_ty))
+        t_equ f (t_const c (Option.get f.t_ty))
       | None -> t_true
     in
     let f =
@@ -62,7 +62,7 @@ let rec abstract_terms kn range_metas float_metas type_kept acc t =
           ] ),
       _ )
     when (not (ts_equal ts ts_int || Sts.mem ts type_kept))
-         && Opt.equal ls_equal (Some ls) (Mts.find_opt ts range_metas) ->
+         && Option.equal ls_equal (Some ls) (Mts.find_opt ts range_metas) ->
     (acc, t_const c ty_int)
   | ( Tapp
         ( ls,
@@ -261,7 +261,7 @@ let max_real =
   real_value ~pow2:(BigInt.of_int 970) (BigInt.of_string "0x1FFFFFFFFFFFFF")
 
 let min_real = real_value ~pow2:(BigInt.of_int (-1024)) (BigInt.of_int 1)
-let max_int = BigInt.of_int 2147483648
+let max_int = BigInt.of_string "0x80000000"
 
 let constant_too_big t =
   match t.t_node with

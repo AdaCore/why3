@@ -181,6 +181,12 @@ module Log : sig
   val sort_log_by_loc : exec_log -> log_entry list Wstdlib.Mint.t Wstdlib.Mstr.t
   val json_log : exec_log -> Json_base.json
   val print_log : ?verb_lvl:int -> json:bool -> exec_log Pp.pp
+
+  (** Used for counterexamples.
+      Returns the list of function calls and loops that are executed in the log.
+      The mlw builtins and functions from the stdlib are filtered out since they
+      are not considered as suspects in the counterexamples. *)
+  val get_exec_calls_and_loops : Env.env -> exec_log -> log_entry list
 end
 
 (** {3 Premises} *)
@@ -278,7 +284,7 @@ type oracle = {
   for_variable:
     env -> ?check:check_value -> loc:Loc.position option -> Ident.ident -> Ity.ity -> value option;
   for_result:
-    env -> ?check:check_value -> loc:Loc.position -> call_id:int option -> Ity.ity -> value option;
+    env -> ?check:check_value -> loc:Loc.position -> call_id:Expr.expr_id option -> Ity.ity -> value option;
 }
 (** An oracle provides values during execution in {!Pinterp} for program
     parameters and during giant steps. The [check] is called on the value and

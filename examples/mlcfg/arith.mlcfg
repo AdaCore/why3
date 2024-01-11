@@ -17,8 +17,8 @@ module Fib
       goto L1
     }
     L1 {
-      invariant I1 { 0 <= i <= n };
-      invariant I2 { x = fib i /\ y = fib (i + 1) };
+      invariant { 0 <= i <= n };
+      invariant { x = fib i /\ y = fib (i + 1) };
       switch (i = n)
       | True  -> return x
       | False -> goto L2
@@ -48,8 +48,8 @@ module Fact
       goto L1
     }
     L1 {
-      invariant I1 { 0 <= x <= x0 };
-      invariant I2 { fact x * y = fact x0 };
+      invariant { 0 <= x <= x0 };
+      invariant { fact x * y = fact x0 };
       switch (x <= 0)
       | True  -> return y
       | False -> goto L2

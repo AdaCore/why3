@@ -77,7 +77,7 @@ let conv_arg tenv t aty =
 
 let conv_app tenv fs tl tty =
   let t = fs_app fs tl tty in
-  let vty = Opt.get fs.ls_value in
+  let vty = Option.get fs.ls_value in
   if ty_equal tty vty then t else
   match Mty.find tty tenv with
   | exception Not_found -> t

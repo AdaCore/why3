@@ -384,6 +384,12 @@ let builtin_module =
   let m = close_module uc in
   { m with mod_theory = builtin_theory }
 
+let ignore_module =
+  let uc = empty_module dummy_env (id_fresh "Ignore") ["why3";"Ignore"] in
+  let uc = add_pdecl_no_logic uc pd_ignore_term in
+  let m = close_module uc in
+  { m with mod_theory = ignore_theory }
+
 let bool_module =
   let uc = empty_module dummy_env (id_fresh "Bool") ["why3";"Bool"] in
   let uc = add_pdecl_no_logic uc pd_bool in
@@ -477,12 +483,14 @@ let unit_module =
   let uc = empty_module dummy_env (id_fresh "Unit") ["why3";"Unit"] in
   let uc = use_export uc (tuple_module 0) in
   let add uc d = add_pdecl_raw ~warn:false uc d in
-  let td = create_alias_decl (id_fresh "unit") [] ity_unit in
+  let attrs = Sattr.singleton builtin_attr in
+  let td = create_alias_decl (id_fresh ~attrs "unit") [] ity_unit in
   close_module (List.fold_left add uc (create_type_decl [td]))
 
 let itd_ref =
   let tv = create_tvsymbol (id_fresh "a") in
   let attrs = Sattr.singleton is_field_id_attr in
+  let attrs = Sattr.add builtin_attr attrs in
   let id_contents = id_fresh ~attrs "contents" in
   let pj = create_pvsymbol id_contents (ity_var tv) in
   create_plain_record_decl ~priv:false ~mut:true (id_fresh "ref")
@@ -499,7 +507,9 @@ let ls_ref_proj = ls_of_rs rs_ref_proj
 let rs_ref_ld, rs_ref =
   let cty = rs_ref_cons.rs_cty in
   let ityl = List.map (fun v -> v.pv_ity) cty.cty_args in
-  let_sym (id_fresh "ref") (c_app rs_ref_cons [] ityl cty.cty_result)
+  let attrs = Sattr.singleton builtin_attr in
+  let id = id_fresh ~attrs "ref" in
+  let_sym id (c_app rs_ref_cons [] ityl cty.cty_result)
 
 let ref_module =
   let add uc d = add_pdecl_raw ~warn:false uc d in
@@ -516,7 +526,11 @@ let create_module env ?(path=[]) n =
   m
 
 let add_use uc syms = Sid.fold (fun id uc ->
-  if id_equal id ts_func.ts_name then
+  if id_equal id ps_acc.ls_name then
+    use_export uc wf_module
+  else if id_equal id ps_wf.ls_name then
+    use_export uc wf_module
+  else if id_equal id ts_func.ts_name then
     use_export uc highord_module
   else if id_equal id ts_ref.ts_name then
     use_export uc ref_module
@@ -529,11 +543,8 @@ let mk_vc uc d = Vc.vc uc.muc_env uc.muc_known uc.muc_theory d
 let add_pdecl ?(warn=true) ~vc uc d =
   let uc = add_use uc d.pd_syms in
   let dl = if vc then mk_vc uc d else [] in
-  (* verification conditions must not add additional dependencies
-     on built-in theories like TupleN or HighOrd. Also, we expect
-     int.Int or any other library theory to be in the context:
-     importing them automatically seems to be too invasive. *)
-  add_pdecl_raw ~warn (List.fold_left (add_pdecl_raw ~warn) uc dl) d
+  let add uc d = add_pdecl_raw ~warn (add_use uc d.pd_syms) d in
+  add_pdecl_raw ~warn (List.fold_left add uc dl) d
 
 let syms_of_ts s ts = Sid.add ts.ts_name s
 let syms_of_ty s ty = ty_s_fold syms_of_ts s ty
@@ -554,7 +565,7 @@ let add_meta uc m al =
 (** {2 Cloning} *)
 
 type clones = {
-  cl_local : Sid.t;
+  mutable cl_local : Sid.t;
   mutable ty_table : ity Mts.t;
   mutable ts_table : itysymbol Mts.t;
   mutable ls_table : lsymbol Mls.t;
@@ -566,8 +577,8 @@ type clones = {
   mutable xs_table : xsymbol Mxs.t;
 }
 
-let empty_clones m = {
-  cl_local = m.mod_local;
+let empty_clones' local = {
+  cl_local = local;
   ty_table = Mts.empty;
   ts_table = Mts.empty;
   ls_table = Mls.empty;
@@ -578,6 +589,9 @@ let empty_clones m = {
   rs_table = Mrs.empty;
   xs_table = Mxs.empty;
 }
+
+let empty_clones m =
+  empty_clones' m.mod_local
 
 (* populate the clone structure *)
 
@@ -711,7 +725,7 @@ let clone_ls cl ls =
   let proj = ls.ls_proj in
   let id = id_clone ls.ls_name in
   let at = List.map (clone_ty cl) ls.ls_args in
-  let vt = Opt.map (clone_ty cl) ls.ls_value in
+  let vt = Option.map (clone_ty cl) ls.ls_value in
   let ls' = create_lsymbol ~proj ~constr id at vt in
   cl.ls_table <- Mls.add ls ls' cl.ls_table;
   ls'
@@ -756,7 +770,7 @@ let clone_decl inst cl uc d = match d.d_node with
         if Mls.mem ls inst.mi_ls then raise (CannotInstantiate ls.ls_name);
         ignore (clone_ls cl ls)) ldl;
       let get_logic (_,ld) =
-        Opt.get (ls_defn_of_axiom (clone_fmla cl (ls_defn_axiom ld))) in
+        Option.get (ls_defn_of_axiom (clone_fmla cl (ls_defn_axiom ld))) in
       let d = create_logic_decl (List.map get_logic ldl) in
       add_pdecl ~warn:false ~vc:false uc (create_pure_decl d)
   | Dind (s, ((ls, _) :: _ as idl)) when Mls.mem ls inst.mi_ls ->
@@ -877,7 +891,7 @@ let clone_invl cl sm invl =
   List.map (fun t -> clone_term cl sm.sm_vs t) invl
 
 let clone_varl cl sm varl = List.map (fun (t,r) ->
-  clone_term cl sm.sm_vs t, Opt.map (cl_find_ls cl) r) varl
+  clone_term cl sm.sm_vs t, Option.map (cl_find_ls cl) r) varl
 
 let clone_cty cl sm ?(drop_decr=false) cty =
   let res = clone_ity cl cty.cty_result in
@@ -1123,7 +1137,9 @@ let clone_type_record cl s d s' d' =
 let warn_constructors_mismatch loc d d' =
   let warn_cons c c' =
     if c.rs_name.id_string <> c'.rs_name.id_string
-    then Loc.warning ?loc
+    then Loc.warning
+        (Loc.register_warning "constructor_mismatch" "Warn for mismatched constructors in modules")
+        ?loc
         "trying to match constructor %a with %a, this is likely an error"
         print_rs c print_rs c' in
   if d.itd_its.its_ts.ts_name.id_string = d'.itd_its.its_ts.ts_name.id_string
@@ -1247,8 +1263,8 @@ let clone_type_decl loc inst cl tdl decl kn =
                           then raise (CannotInstantiate id)
               | None -> () in
             let eq_proj rs1 rs2 =
-              let f1 = Opt.get rs1.rs_field in
-              let f2 = Opt.get rs2.rs_field in
+              let f1 = Option.get rs1.rs_field in
+              let f2 = Option.get rs2.rs_field in
               eq_field f1 f2 in
             let eq_cons cs1 cs2 =
               if cs1.rs_name.id_string <> cs2.rs_name.id_string
@@ -1289,7 +1305,7 @@ let clone_type_decl loc inst cl tdl decl kn =
         let mv = List.fold_left2 add Mvs.empty pjl fdl in
         List.map (clone_term cl mv) d.itd_invariant in
       let clone_wit = clone_expr cl (sm_of_cl cl) in
-      let wit = Opt.map clone_wit d.itd_witness in
+      let wit = Option.map clone_wit d.itd_witness in
       let itd = create_plain_record_decl id' ts.ts_args
         ~priv:s.its_private ~mut:s.its_mutable fdl inv wit in
       cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
@@ -1305,7 +1321,7 @@ let clone_type_decl loc inst cl tdl decl kn =
             let id = id_clone s.its_ts.ts_name in
             let s' = create_rec_itysymbol id s.its_ts.ts_args in
             cl.ts_table <- Mts.add s.its_ts s' cl.ts_table
-          end else Opt.iter (visit alg s) (Mits.find_opt s def);
+          end else Option.iter (visit alg s) (Mits.find_opt s def);
           List.iter down tl
       | Ityvar _ -> () in
     down ity;
@@ -1453,6 +1469,10 @@ let clone_pdecl loc inst cl uc d = match d.pd_node with
       assert (d.pd_meta = []); (* pure decls do not produce metas *)
       uc
 
+let impl_cl = empty_clones' Sid.empty
+
+let mod_table = Hid.create 17
+
 let theory_add_clone = Theory.add_clone_internal ()
 
 let add_clone uc mi =
@@ -1469,8 +1489,90 @@ let add_clone uc mi =
       muc_theory = theory_add_clone uc.muc_theory mi.mi_mod.mod_theory sm;
       muc_units  = Uclone mi :: uc.muc_units }
 
-let clone_export ?loc uc m inst =
-  let cl = cl_init m inst in
+let decl_impl uc d =
+  match d.d_node with
+  | Dprop (Pgoal, pr, f) ->
+     (* when the prop is a Pgoal clone_pdecl do not copy it *)
+     let attr = Sattr.remove Ident.useraxiom_attr pr.pr_name.id_attrs in
+     let pr' = create_prsymbol (id_attr pr.pr_name attr) in
+     impl_cl.pr_table <- Mpr.add pr pr' impl_cl.pr_table;
+     let d = create_prop_decl Pgoal pr' (clone_fmla impl_cl f) in
+     add_pdecl ~warn:false ~vc:false uc (create_pure_decl d)
+  | _ -> uc
+
+let need_copy m =
+  Sid.exists (fun id -> Hid.mem mod_table id) m.mod_theory.th_used
+
+let pdecl_impl inst uc d =
+  let uc = clone_pdecl None inst impl_cl uc d in
+  match d.pd_node with
+  | PDpure ->
+     List.fold_left decl_impl uc d.pd_pure
+  | _ -> uc
+
+let rec mi_impl e mi =
+  let aux fold add empty findk findv m =
+    fold (fun k v m -> add (findk impl_cl k) (findv impl_cl v) m) m empty in
+  let mi_mod = mod_impl e mi.mi_mod in
+  {
+    mi_mod = mi_mod;
+    mi_ty = aux Mts.fold Mts.add Mts.empty cl_find_ts clone_ity mi.mi_ty;
+    mi_ts = aux Mts.fold Mts.add Mts.empty cl_find_ts cl_find_its mi.mi_ts;
+    mi_ls = aux Mls.fold Mls.add Mls.empty cl_find_ls cl_find_ls mi.mi_ls;
+    mi_pr = aux Mpr.fold Mpr.add Mpr.empty cl_find_pr cl_find_pr mi.mi_pr;
+    mi_pk = aux Mpr.fold Mpr.add Mpr.empty cl_find_pr (fun _ k -> k) mi.mi_pk;
+    mi_pv = Mvs.(aux fold add empty (fun cl vs -> (find vs cl.pv_table).pv_vs)
+                   cl_find_pv mi.mi_pv);
+    mi_rs = aux Mrs.fold Mrs.add Mrs.empty cl_find_rs cl_find_rs mi.mi_rs;
+    mi_xs = aux Mxs.fold Mxs.add Mxs.empty cl_find_xs cl_find_xs mi.mi_xs;
+    mi_df = mi.mi_df;
+  }
+
+and unit_impl e inst uc = function
+  | Udecl d -> pdecl_impl inst uc d
+  | Uuse m -> use_export uc (mod_impl e m)
+
+  | Umeta (m, al) ->
+     begin try add_meta uc m (List.map (function
+       | MAty ty -> MAty (clone_ty impl_cl ty)
+       | MAts ts -> MAts (cl_find_ts impl_cl ts)
+       | MAls ls -> MAls (cl_find_ls impl_cl ls)
+       | MApr pr -> MApr (cl_find_pr impl_cl pr)
+       | a -> a) al)
+     with Not_found -> uc end
+
+  | Uscope (n, ul) ->
+     let uc = open_scope uc n in
+     let uc = List.fold_left (unit_impl e inst) uc ul in
+     close_scope ~import:false uc
+
+  | Uclone mi ->
+     try add_clone uc (mi_impl e mi) with
+     | Not_found -> uc
+
+and mod_impl'' e m =
+  impl_cl.cl_local <- Sid.union impl_cl.cl_local m.mod_local;
+  let id = id_clone m.mod_theory.th_name in
+  let muc = empty_module e id m.mod_theory.th_path in
+  let muc = List.fold_left (unit_impl e (empty_mod_inst m)) muc m.mod_units in
+  muc
+
+and mod_impl' e m =
+  close_module (mod_impl'' e m)
+
+and mod_impl e m =
+  let id = m.mod_theory.th_name in
+  try Hid.find mod_table id with
+  | Not_found ->
+     if not (need_copy m)
+     then m
+     else begin
+         let m = mod_impl' e m in
+         Hid.add mod_table id m;
+         m
+       end
+
+let clone_export' ?loc uc m inst cl =
   let rec add_unit uc u = match u with
     | Udecl d -> clone_pdecl loc inst cl uc d
     | Uuse m -> use_export uc m
@@ -1499,18 +1601,44 @@ let clone_export ?loc uc m inst =
         let uc = List.fold_left add_unit uc ul in
         close_scope ~import:false uc in
   let uc = List.fold_left add_unit uc m.mod_units in
+  let local id _ = Sid.mem id m.mod_local in
   let mi = {
     mi_mod = m;
-    mi_ty  = cl.ty_table;
-    mi_ts  = cl.ts_table;
-    mi_ls  = cl.ls_table;
-    mi_pr  = cl.pr_table;
+    mi_ty  = Mts.filter (fun k -> local k.ts_name) cl.ty_table;
+    mi_ts  = Mts.filter (fun k -> local k.ts_name) cl.ts_table;
+    mi_ls  = Mls.filter (fun k -> local k.ls_name) cl.ls_table;
+    mi_pr  = Mpr.filter (fun k -> local k.pr_name) cl.pr_table;
     mi_pk  = inst.mi_pk;
-    mi_pv  = cl.pv_table;
-    mi_rs  = cl.rs_table;
-    mi_xs  = cl.xs_table;
+    mi_pv  = Mvs.filter (fun k -> local k.vs_name) cl.pv_table;
+    mi_rs  = Mrs.filter (fun k -> local k.rs_name) cl.rs_table;
+    mi_xs  = Mxs.filter (fun k -> local k.xs_name) cl.xs_table;
     mi_df  = inst.mi_df} in
   add_clone uc mi
+
+let clone_export ?loc uc m inst =
+  clone_export' ?loc uc m inst (cl_init m inst)
+
+let mod_impl_register e m mimpl inst =
+  let mimpl' = mod_impl'' e mimpl in
+  let mimpl' = open_scope mimpl' "some'scope" in
+  let inst = {
+      mi_mod = inst.mi_mod;
+      mi_ty = Mts.map (clone_ity impl_cl) inst.mi_ty;
+      mi_ts = Mts.map (cl_find_its impl_cl) inst.mi_ts;
+      mi_ls = Mls.map (cl_find_ls impl_cl) inst.mi_ls;
+      mi_pr = Mpr.map (cl_find_pr impl_cl) inst.mi_pr;
+      mi_pk = inst.mi_pk;
+      mi_pv = Mvs.map (cl_find_pv impl_cl) inst.mi_pv;
+      mi_rs = Mrs.map (cl_find_rs impl_cl) inst.mi_rs;
+      mi_xs = Mxs.map (cl_find_xs impl_cl) inst.mi_xs;
+      mi_df = inst.mi_df
+    } in
+  impl_cl.cl_local <- Sid.union impl_cl.cl_local m.mod_local;
+  let mimpl' = clone_export' mimpl' m inst impl_cl in
+  let mimpl' = close_scope mimpl' ~import:false in
+  let mimpl' = close_module mimpl' in
+  Hid.add mod_table mimpl.mod_theory.th_name mimpl';
+  Hid.add mod_table m.mod_theory.th_name mimpl'
 
 (** {2 WhyML language} *)
 
@@ -1538,6 +1666,7 @@ let mlw_language_builtin =
     if s = unit_module.mod_theory.th_name.id_string then unit_module else
     if s = ref_module.mod_theory.th_name.id_string then ref_module else
     if s = builtin_theory.th_name.id_string then builtin_module else
+    if s = ignore_theory.th_name.id_string then ignore_module else
     if s = highord_theory.th_name.id_string then highord_module else
     if s = wf_module.mod_theory.th_name.id_string then wf_module else
     if s = bool_theory.th_name.id_string then bool_module else

@@ -78,6 +78,9 @@ theory TriangleInequality
   lemma triangle_aux :
     forall x1 x2 y1 y2 : real.
       norm2 (x1+y1) (x2+y2) <= sqr (norm x1 x2 + norm y1 y2)
+      by norm2 (x1+y1) (x2+y2) = norm2 x1 x2 + 2.0 * dot x1 x2 y1 y2 + norm2 y1 y2
+        <= norm2 x1 x2 + 2.0 * norm x1 x2 * norm y1 y2 + norm2 y1 y2
+        = sqr (norm x1 x2 + norm y1 y2)
 
   (* lemma to help the next one *)
   lemma sqr_sqrt_le :

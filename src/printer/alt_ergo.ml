@@ -138,7 +138,7 @@ let unambig_fs fs =
     | Tyvar u when not (lookup u) -> false
     | _ -> ty_all inspect ty
   in
-  inspect (Opt.get fs.ls_value)
+  inspect (Option.get fs.ls_value)
 
 let number_format = {
     Number.long_int_support = `Default;
@@ -165,7 +165,17 @@ let rec print_term info fmt t =
 
   let () = match t.t_node with
   | Tconst c ->
-      Constant.(print number_format unsupported_escape) fmt c
+      let ts = match t.t_ty with
+        | Some { ty_node = Tyapp (ts, []) } ->
+            ts
+        | _ -> assert false (* impossible *)
+      in
+      if ts_equal ts ts_int || ts_equal ts ts_real || ts_equal ts ts_str then
+        Constant.(print number_format unsupported_escape) fmt c
+      else
+        unsupportedTerm t
+          "alt-ergo printer: don't know how to print this literal, consider adding a syntax rule in the driver"
+
   | Tvar { vs_name = id } ->
       print_ident info fmt id
   | Tapp (ls, tl) ->
@@ -401,7 +411,7 @@ let print_logic_decl info fmt ls ld =
         fprintf fmt "@[<hov 2>function %a(%a) : %a =@ %a@]@\n@\n"
           (print_ident info) ls.ls_name
           (print_list comma (print_logic_binder info)) vl
-          (print_type info) (Opt.get ls.ls_value)
+          (print_type info) (Option.get ls.ls_value)
           (print_term info) e
     | None ->
         fprintf fmt "@[<hov 2>predicate %a(%a) =@ %a@]@\n@\n"

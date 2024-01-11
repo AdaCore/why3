@@ -20,13 +20,15 @@ type cmd =
     {
       cmd_spec : spec_list;
       cmd_desc : string;
+      cmd_usage: string;
       cmd_name : string;
       cmd_run  : unit -> unit;
     }
 
-let files = Queue.create ()
-let iter_files f = Queue.iter f files
-let anon_fun (f:string) = Queue.add f files
+let session_files = Queue.create ()
+let iter_session_files f = Queue.iter f session_files
+let add_session_file (f:string) = Queue.add f session_files
+let no_session_file () = Queue.is_empty session_files
 
 let read_session fname =
   let q = Queue.create () in
@@ -47,7 +49,7 @@ let read_update_session ~allow_obsolete env config fname =
   let cont = Controller_itp.create_controller config env session in
   let found_obs, some_merge_miss =
     try
-      Controller_itp.reload_files cont
+      Controller_itp.reload_files ~ignore_shapes:true cont
     with
     | Controller_itp.Errors_list l ->
         List.iter (fun e -> Format.eprintf "%a@." Exn_printer.exn_printer e) l;
@@ -86,6 +88,7 @@ type filter_three = | FT_Yes | FT_No | FT_All
 
 let opt_filter_obsolete = ref FT_All
 let opt_filter_verified = ref FT_All
+let opt_filter_is_leaf = ref FT_All
 
 let add_filter_three r = function
   | Some "no" -> r := FT_No
@@ -110,21 +113,24 @@ let status_filter x =
 let filter_spec =
   let open Getopt in
   [ KLong "filter-prover", Hnd1 (AString, add_filter_prover),
-    "[<name>,[<version>[,<alternative>]]|<id>] select proof attempts with the given prover(s)";
+    "[<name>,[<version>[,<alternative>]]] select proof\nattempts with the given prover";
     KLong "filter-obsolete", opt_three opt_filter_obsolete,
     "[yes|no] select only (non-)obsolete proofs";
     KLong "filter-proved", opt_three opt_filter_verified,
     "[yes|no] select only proofs of (non-)proved goals";
+    KLong "filter-is-leaf", opt_three opt_filter_is_leaf,
+    "[yes|no] select only proofs of leaf goals,\ni.e., those without transformations";
     KLong "filter-status",
     Hnd1 (AList (',', ASymbol ["valid"; "invalid"; "highfailure"]),
           fun l -> opt_status := List.map status_filter l),
-    "[valid|invalid|highfailure] select proofs attempts with the given status";
+    "[valid|invalid|highfailure] select proof attempts\nwith the given status";
   ]
 
 type filters =
     { provers : C.Sprover.t; (* if empty : every provers *)
       obsolete : filter_three;
       verified : filter_three;
+      is_leaf : filter_three;
       status : Call_provers.prover_answer list; (* if empty : any answer *)
     }
 
@@ -155,6 +161,7 @@ let read_filter_spec whyconf : filters * bool =
   {provers = !s;
    obsolete = !opt_filter_obsolete;
    verified = !opt_filter_verified;
+   is_leaf = !opt_filter_is_leaf;
    status = !opt_status;
   },!should_exit
 
@@ -200,6 +207,20 @@ let session_iter_proof_attempt_by_filter s filters f =
      S.session_iter_proof_attempt f)
     filters f s
 
+let session_iter_proof_node_id_by_filter s filters f =
+  let f pn =
+    match filters.verified with
+    | FT_All -> f pn
+    | FT_No -> if not (S.pn_proved s pn) then f pn
+    | FT_Yes -> if S.pn_proved s pn then f pn
+  in
+  let f pn =
+    match filters.is_leaf with
+    | FT_All -> f pn
+    | FT_No -> if S.get_transformations s pn <> [] then f pn
+    | FT_Yes -> if S.get_transformations s pn = [] then f pn
+  in
+  S.session_iter_proof_node_id f s
 
 let opt_force_obsolete = ref false
 

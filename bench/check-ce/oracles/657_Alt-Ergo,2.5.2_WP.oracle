@@ -1,0 +1,124 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `u` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `u` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to toBig at "bench/check-ce/657.mlw", line 8, characters 29-40)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to toBig at "bench/check-ce/657.mlw", line 8, characters 29-40)
+File "bench/check-ce/657.mlw", line 8, characters 27-40:
+Sub-goal Precondition of goal ok'vc.
+Prover result is: Step limit exceeded (23 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because missing value for return value of call to toBig at "bench/check-ce/657.mlw", line 8, characters 29-40):
+File bv.mlw:
+  Line 320:
+    is_signed_positive :
+      t
+      ->
+      bool = [|{bv.BV64.t'int => 1} => false; _ => true|]
+  Line 362:
+    size_bv : t1 = {bv.BV32.t'int => 32}
+    size_bv : t = {bv.BV64.t'int => 1}
+  Line 648:
+    t'int :
+      t
+      ->
+      int = [|{bv.BV64.t'int => 10} => 10;
+            {bv.BV64.t'int => 4294967295} => 4294967295;
+            {bv.BV64.t'int => 64} => 64;
+            _ =>
+            if arg_0 = {bv.BV64.t'int => 0} \/ arg_0 = {bv.BV64.t'int => 0}
+            then 0 else 1|]
+  Line 676:
+    t'int :
+      t1
+      ->
+      int = [|{bv.BV32.t'int => 0} => 0; {bv.BV32.t'int => 1} => 1; _ => 32|]
+  Line 873:
+    toBig : t1 -> t = [|_ => {bv.BV64.t'int => 0}|]
+File 657.mlw:
+  Line 8:
+    i : t1 = {bv.BV32.t'int => 32}
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 10, characters 29-41)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 10, characters 29-41)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 10, characters 29-41)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 10, characters 29-41)
+File "bench/check-ce/657.mlw", line 10, characters 27-41:
+Sub-goal Precondition of goal ko'vc.
+Prover result is: Step limit exceeded (23 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 10, characters 29-41):
+File bv.mlw:
+  Line 320:
+    is_signed_positive :
+      t
+      ->
+      bool = [|{bv.BV64.t'int => 1} => false; _ => true|]
+  Line 362:
+    size_bv : t1 = {bv.BV32.t'int => 32}
+    size_bv : t = {bv.BV64.t'int => 1}
+  Line 648:
+    t'int :
+      t
+      ->
+      int = [|{bv.BV64.t'int => 10} => 10;
+            {bv.BV64.t'int => 4294967295} => 4294967295;
+            {bv.BV64.t'int => 64} => 64;
+            _ =>
+            if arg_04 = {bv.BV64.t'int => 0} \/ arg_04 = {bv.BV64.t'int => 0}
+            then 0 else 1|]
+  Line 676:
+    t'int :
+      t1
+      ->
+      int = [|{bv.BV32.t'int => 0} => 0; {bv.BV32.t'int => 1} => 1; _ => 32|]
+  Line 873:
+    stoBig : t1 -> t = [|_ => {bv.BV64.t'int => 0}|]
+File 657.mlw:
+  Line 10:
+    i : t1 = {bv.BV32.t'int => 32}
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 13, characters 45-55)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 13, characters 45-55)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 13, characters 45-55)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 13, characters 45-55)
+File "bench/check-ce/657.mlw", line 13, characters 14-40:
+Sub-goal Postcondition of goal ko2'vc.
+Prover result is: Step limit exceeded (23 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 13, characters 45-55):
+File bv.mlw:
+  Line 320:
+    is_signed_positive :
+      t
+      ->
+      bool = [|{bv.BV64.t'int => 1} => false; _ => true|]
+  Line 362:
+    size_bv : t1 = {bv.BV32.t'int => 32}
+    size_bv : t = {bv.BV64.t'int => 1}
+  Line 648:
+    t'int :
+      t
+      ->
+      int = [|{bv.BV64.t'int => -18446744073709551618} =>
+              -18446744073709551618;
+            {bv.BV64.t'int => 4294967295} => 4294967295;
+            {bv.BV64.t'int => 64} => 64; {bv.BV64.t'int => 0} => 0; _ => 1|]
+  Line 676:
+    t'int :
+      t1
+      ->
+      int = [|{bv.BV32.t'int => 0} => 0; {bv.BV32.t'int => 1} => 1; _ => 32|]
+  Line 873:
+    stoBig : t1 -> t = [|_ => {bv.BV64.t'int => -18446744073709551618}|]
+File 657.mlw:
+  Line 12:
+    i : t1 = {bv.BV32.t'int => 32}
+

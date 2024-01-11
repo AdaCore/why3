@@ -39,6 +39,7 @@ void free_process(pproc p);
 
 // kill all processes whose client_key is equal to key, and whose task_id is
 // equal to id
+// if id is NULL, then all processes for this client key are killed
 void kill_processes(int key, char *id);
 
 // initialize global list of processes

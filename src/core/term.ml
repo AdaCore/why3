@@ -327,7 +327,7 @@ let t_compare ~trigger ~attr ~loc ~const t1 t2 =
     if t1 != t2 || vml1 <> [] || vml2 <> [] then begin
       comp_raise (oty_compare t1.t_ty t2.t_ty);
       if attr then comp_raise (Sattr.compare t1.t_attrs t2.t_attrs);
-      if loc then comp_raise (Opt.compare Loc.compare t1.t_loc t2.t_loc);
+      if loc then comp_raise (Option.compare Loc.compare t1.t_loc t2.t_loc);
       match descend vml1 t1, descend vml2 t2 with
       | Bnd i1, Bnd i2 -> perv_compare i1 i2
       | Bnd _, Trm _ -> raise CompLT
@@ -1014,6 +1014,10 @@ let ps_equ =
   let v = ty_var (create_tvsymbol (id_fresh "a")) in
   create_psymbol (id_fresh (op_infix "=")) [v; v]
 
+let ps_ignore =
+  let v = ty_var (create_tvsymbol (id_fresh "a")) in
+  create_psymbol (id_fresh "ignore'term") [v]
+
 let t_equ t1 t2 = ps_app ps_equ [t1; t2]
 let t_neq t1 t2 = t_not (ps_app ps_equ [t1; t2])
 
@@ -1037,7 +1041,8 @@ let fs_tuple = Hint.memo 17 (fun n ->
   let ts = ts_tuple n in
   let tl = List.map ty_var ts.ts_args in
   let ty = ty_app ts tl in
-  let id = id_fresh ("Tuple" ^ string_of_int n) in
+  let attrs = Sattr.singleton builtin_attr in
+  let id = id_fresh ~attrs ("Tuple" ^ string_of_int n) in
   let fs = create_fsymbol ~constr:1 id tl ty in
   Hid.add fs_tuple_ids fs.ls_name n;
   fs)
@@ -1114,9 +1119,9 @@ let rec t_gen_map fnT fnL m t =
         ty_equal_check (fnT v.vs_ty) u.vs_ty;
         t_var u
     | Tconst c ->
-        t_const c (fnT (Opt.get t.t_ty))
+        t_const c (fnT (Option.get t.t_ty))
     | Tapp (fs, tl) ->
-        t_app (fnL fs) (List.map fn tl) (Opt.map fnT t.t_ty)
+        t_app (fnL fs) (List.map fn tl) (Option.map fnT t.t_ty)
     | Tif (f, t1, t2) ->
         t_if (fn f) (fn t1) (fn t2)
     | Tlet (t1, (u,b,t2)) ->
@@ -1477,7 +1482,7 @@ let t_replace t1 t2 t =
 (* lambdas *)
 
 let t_lambda vl trl t =
-  let ty = Opt.get_def ty_bool t.t_ty in
+  let ty = Option.value ~default:ty_bool t.t_ty in
   let add_ty v ty = ty_func v.vs_ty ty in
   let ty = List.fold_right add_ty vl ty in
   let fc = create_vsymbol (id_fresh "fc") ty in

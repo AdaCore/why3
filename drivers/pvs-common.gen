@@ -34,6 +34,10 @@ theory BuiltIn
   syntax predicate  (=)   "(%1 = %2)"
 end
 
+theory Ignore
+  syntax predicate ignore'term  "TRUE"
+end
+
 theory HighOrd
   syntax type (->) "[%1 -> %2]"
   syntax function (@) "%1(%2)"

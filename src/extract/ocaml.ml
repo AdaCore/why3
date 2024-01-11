@@ -151,8 +151,8 @@ module Print = struct
 
   let is_local_id info id =
     Sid.mem id info.info_current_th.th_local ||
-    Opt.fold (fun _ m -> Sid.mem id m.Pmodule.mod_local)
-      false info.info_current_mo
+    Option.fold ~some:(fun m -> Sid.mem id m.Pmodule.mod_local)
+      ~none:false info.info_current_mo
 
   exception Local
 
@@ -842,7 +842,7 @@ let print_decl =
       info_current_th   = th;
       info_current_mo   = Some m;
       info_mo_known_map = m.mod_known;
-      info_fname        = Opt.map Ml_printer.clean_name fname;
+      info_fname        = Option.map Ml_printer.clean_name fname;
       info_flat         = flat;
       info_prec         = pargs.Pdriver.prec;
       info_current_ph   = [];

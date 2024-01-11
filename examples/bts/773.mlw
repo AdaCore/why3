@@ -1,0 +1,9 @@
+use int.Int
+
+constant c : int
+
+axiom test:
+     forall x:int.
+     (let y = (not x = 42) in true)
+     
+goal foo: c <= 41

@@ -7,9 +7,10 @@
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 8, characters 12-26)
 File "bench/check-ce/multifile2.mlw", line 8, characters 12-26:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Unknown (sat).
-The contracts of some function or loop are too weak, for example during the
-  following execution:
+Prover result is: Unknown (sat) (230 steps).
+The contracts of the following functions/loops are too weak :
+  - Function 'incr' at "bench/check-ce/multifile2.mlw", line 9, characters 2-8
+, for example during the following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
@@ -43,7 +44,7 @@ File multifile2.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 13, characters 12-26)
 File "bench/check-ce/multifile2.mlw", line 13, characters 12-26:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (230 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -99,7 +100,7 @@ File multifile2.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 18, characters 12-26)
 File "bench/check-ce/multifile2.mlw", line 18, characters 12-26:
 Sub-goal Postcondition of goal h'vc.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (230 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

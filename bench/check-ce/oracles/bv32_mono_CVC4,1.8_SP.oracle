@@ -7,7 +7,7 @@
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/bv32_mono.mlw", line 11, characters 14-31)
 File "bench/check-ce/bv32_mono.mlw", line 11, characters 14-31:
 Sub-goal Postcondition of goal dummy_update'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (unknown + incomplete) (12519 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -17,45 +17,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 615:
-    Constant zeros initialization
-  Line 192:
-    (giant-step) execution of unimplemented function with args:
-    result = 0
-  Line 615:
-    zeros = 0
-    Constant one initialization
-  Line 197:
-    (giant-step) execution of unimplemented function with args:
-    result = 0
-  Line 615:
-    one = 0
-    Constant ones initialization
-  Line 199:
-    (giant-step) execution of unimplemented function with args:
-    result = 0
-  Line 615:
-    ones = 0
-  Line 657:
-    Constant zeros initialization
-  Line 192:
-    (giant-step) execution of unimplemented function with args:
-    result = 0
-  Line 657:
-    zeros = 0
-    Constant one initialization
-  Line 197:
-    (giant-step) execution of unimplemented function with args:
-    result = 0
-  Line 657:
-    one = 0
-    Constant ones initialization
-  Line 199:
-    (giant-step) execution of unimplemented function with args:
-    result = 0
-  Line 657:
-    ones = 0
 File bv32_mono.mlw:
   Line 9:
     r = {c= (34:t)}
@@ -64,12 +25,6 @@ File bv32_mono.mlw:
       r = {c= (34:t)}
       zero = 0
       one = 1
-      zeros = 0
-      one = 0
-      ones = 0
-      zeros = 0
-      one = 0
-      ones = 0
   Line 13:
     Normal execution of function `c` with args:
       arg = {c= 66}
@@ -89,5 +44,5 @@ File bv32_mono.mlw:
   - Abstract RAC: STUCK (failure in precondition of `dummy_update_with_int` at "bench/check-ce/bv32_mono.mlw", line 15, characters 5-26)
 File "bench/check-ce/bv32_mono.mlw", line 17, characters 14-30:
 Sub-goal Postcondition of goal dummy_update_with_int'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (150020 steps).
 

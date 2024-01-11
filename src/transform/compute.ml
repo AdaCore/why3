@@ -41,6 +41,9 @@ let meta_begin_compute_context =
 
 let rule_attr = Ident.create_attribute "rewrite"
 
+let warn_cannot_rewrite =
+  Loc.register_warning "cannot_rewrite" "Warn that a proposition cannot be turned into a rewrite rule"
+
 let collect_rules p env km prs t =
   let acc = Task.task_fold
     (fun acc td -> match td.Theory.td_node with
@@ -56,7 +59,7 @@ let collect_rules p env km prs t =
     (fun e (pr,t) ->
       try add_rule t e
       with NotARewriteRule msg ->
-        Loc.warning "proposition %a cannot be turned into a rewrite rule: %s"
+        Loc.warning warn_cannot_rewrite "proposition %a cannot be turned into a rewrite rule: %s"
          Pretty.print_pr pr msg;
         e
     )
@@ -76,7 +79,7 @@ let normalize_hyp_or_goal ?pr_norm ?step_limit engine : Task.task Trans.tlist  =
             let d = Decl.create_prop_decl Pgoal pr t in
             [[d]]
         end
-    | Dprop (k, pr, t) when Opt.fold (fun _ -> pr_equal pr) false pr_norm ->
+    | Dprop (k, pr, t) when Option.fold ~some:(fun v -> pr_equal pr v) ~none:false pr_norm ->
       let t = normalize ?step_limit:step_limit ~limit:!compute_max_steps engine Mvs.empty t in
       let d = Decl.create_prop_decl k pr t in
       [[d]]
@@ -200,7 +203,7 @@ let simplify check_ls env : 'a Trans.trans =
       (fun e (pr,t) ->
         try add_rule t e
         with NotARewriteRule msg ->
-          Loc.warning "proposition %a cannot be turned into a rewrite rule: %s"
+          Loc.warning warn_cannot_rewrite "proposition %a cannot be turned into a rewrite rule: %s"
             Pretty.print_pr pr msg;
           e
       )

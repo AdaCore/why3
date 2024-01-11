@@ -93,7 +93,8 @@ let print_type info fmt ty = try print_type info fmt ty
 
 let number_format = {
     Number.long_int_support = `Default;
-    Number.negative_int_support = `Default;
+    Number.negative_int_support =
+      `Custom (fun fmt f -> fprintf fmt "-%t" f);
     Number.dec_int_support = `Default;
     Number.hex_int_support = `Unsupported;
     Number.oct_int_support = `Unsupported;

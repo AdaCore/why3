@@ -1,14 +1,14 @@
 File "bench/check-ce/ref_mono.mlw", line 7, characters 39-55:
 Sub-goal Postcondition of goal ref1'vc.
-Prover result is: Valid.
+Prover result is: Valid (24 steps).
 
 File "bench/check-ce/ref_mono.mlw", line 9, characters 29-40:
 Sub-goal Postcondition of goal prefix !'vc.
-Prover result is: Valid.
+Prover result is: Valid (25 steps).
 
 File "bench/check-ce/ref_mono.mlw", line 11, characters 38-44:
 Sub-goal Postcondition of goal infix :='vc.
-Prover result is: Valid.
+Prover result is: Valid (52 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -19,7 +19,7 @@ Prover result is: Valid.
   - Abstract RAC: STUCK (failure in postcondition of `(:=)` at "bench/check-ce/ref_mono.mlw", line 11, characters 38-44)
 File "bench/check-ce/ref_mono.mlw", line 21, characters 14-25:
 Sub-goal Postcondition of goal test_post'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (3000047 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -79,7 +79,7 @@ File ref_mono.mlw:
   - Abstract RAC: STUCK (failure in precondition of `test_post2` at "bench/check-ce/ref_mono.mlw", line 25, characters 6-16)
 File "bench/check-ce/ref_mono.mlw", line 27, characters 14-29:
 Sub-goal Postcondition of goal test_post2'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (3000068 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -140,7 +140,7 @@ File ref_mono.mlw:
   - Abstract RAC: STUCK (failure in postcondition of `(:=)` at "bench/check-ce/ref_mono.mlw", line 11, characters 38-44)
 File "bench/check-ce/ref_mono.mlw", line 38, characters 12-36:
 Sub-goal Postcondition of goal incr'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (3000089 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -215,7 +215,7 @@ File ref_mono.mlw:
   - Abstract RAC: STUCK (failure in postcondition of `incr` at "bench/check-ce/ref_mono.mlw", line 38, characters 12-36)
 File "bench/check-ce/ref_mono.mlw", line 51, characters 14-36:
 Sub-goal Loop invariant init of goal test_loop'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (3000063 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -289,7 +289,7 @@ File ref_mono.mlw:
 
 File "bench/check-ce/ref_mono.mlw", line 52, characters 12-14:
 Sub-goal Loop variant decrease of goal test_loop'vc.
-Prover result is: Valid.
+Prover result is: Valid (3036 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -300,7 +300,7 @@ Prover result is: Valid.
   - Abstract RAC: STUCK (failure in postcondition of `incr` at "bench/check-ce/ref_mono.mlw", line 38, characters 12-36)
 File "bench/check-ce/ref_mono.mlw", line 51, characters 14-36:
 Sub-goal Loop invariant preservation of goal test_loop'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (3000123 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -381,7 +381,7 @@ File ref_mono.mlw:
   - Abstract RAC: STUCK (failure in postcondition of `incr` at "bench/check-ce/ref_mono.mlw", line 38, characters 12-36)
 File "bench/check-ce/ref_mono.mlw", line 45, characters 12-23:
 Sub-goal Postcondition of goal test_loop'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (3000098 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

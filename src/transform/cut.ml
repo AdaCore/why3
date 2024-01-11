@@ -221,6 +221,6 @@ let () = wrap_and_register
 let () = wrap_and_register
     ~desc:"hide_and_clear <name> <term>@ \
       adds@ a@ new constant@ <name>@ which@ replaces@ all@ \
-      occurences@ of@ <term>."
+      occurrences@ of@ <term>."
     "hide_and_clear"
     (Tstring (Tterm Ttrans)) (hide true)

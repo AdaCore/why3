@@ -172,7 +172,8 @@ let rs_dup ({rs_name = {id_loc = loc}} as s) c =
       mk_rs id c RLlemma None
 
 let create_projection proj s v =
-  let id = id_clone v.pv_vs.vs_name in
+  let attrs = Sattr.singleton builtin_attr in
+  let id = id_clone ~attrs v.pv_vs.vs_name in
   let eff = eff_ghostify v.pv_ghost eff_empty in
   let tyl = List.map ity_var s.its_ts.ts_args in
   let rgl = List.map ity_reg s.its_regions in
@@ -297,6 +298,11 @@ let create_prog_pattern pp ity mask =
 
 (** {2 Program expressions} *)
 
+type expr_id = int
+let next_expr_id = ref 0
+
+let create_eid_attr i = create_attribute (Ident.eid_attribute_prefix ^ string_of_int i)
+
 type assertion_kind = Assert | Assume | Check
 [@@deriving sexp]
 
@@ -318,6 +324,7 @@ type expr = {
   e_effect : effect;
   e_attrs  : Sattr.t;
   e_loc    : Loc.position option;
+  e_id     : expr_id;
 }
 
 and expr_node =
@@ -473,13 +480,17 @@ let try_effect el fn x y =
 
 (* smart constructors *)
 
-let mk_expr node ity mask eff = {
-  e_node   = node;
-  e_ity    = ity;
-  e_mask   = mask_adjust eff ity mask;
-  e_effect = eff;
-  e_attrs  = Sattr.empty;
-  e_loc    = None;
+let mk_expr node ity mask eff =
+  let e_id = !next_expr_id in
+  incr next_expr_id;
+  {
+    e_node   = node;
+    e_ity    = ity;
+    e_mask   = mask_adjust eff ity mask;
+    e_effect = eff;
+    e_attrs  = Sattr.empty;
+    e_loc    = None;
+    e_id;
 }
 
 let mk_cexp node cty = {
@@ -837,7 +848,7 @@ let c_pur s vl ityl ity =
   if not ity.ity_pure then Loc.errorm "This expression must have pure type";
   let v_args = List.map (create_pvsymbol ~ghost:false (id_fresh "u")) ityl in
   let t_args = List.map (fun v -> t_var v.pv_vs) (vl @ v_args) in
-  let res = Opt.map (fun _ -> ty_of_ity ity) s.ls_value in
+  let res = Option.map (fun _ -> ty_of_ity ity) s.ls_value in
   let q = make_post (t_app s t_args res) in
   let eff = eff_ghostify true (eff_spoil eff_empty ity) in
   let cty = create_cty v_args [] [q] Mxs.empty Mpv.empty eff ity in
@@ -1096,7 +1107,7 @@ let e_exn xs e =
 (* snapshots, assertions, "any" *)
 
 let e_pure t =
-  let ity = Opt.fold (Util.const ity_of_ty_pure) ity_bool t.t_ty in
+  let ity = Option.fold ~some:ity_of_ty_pure ~none:ity_bool t.t_ty in
   let eff = eff_ghostify true (eff_read (t_freepvs Spv.empty t)) in
   let eff = match t.t_node with
     | Tvar _ -> eff (* no magic *)

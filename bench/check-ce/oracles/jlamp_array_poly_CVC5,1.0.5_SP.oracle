@@ -1,0 +1,118 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
+File "bench/check-ce/jlamp_array_poly.mlw", line 22, characters 4-16:
+Sub-goal Index in array bounds of goal f'vc.
+Prover result is: Unknown (unknown + incomplete) (1923 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `f` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : ty -> uni -> int = fun $x116 $x27 -> 2
+    length : array t -> int = [|_ => 0|]
+File jlamp_array_poly.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = fun _arg_13 -> if {Array.to_int => 3} = _arg_13 then 3 else 2
+  Line 11:
+    two : t = {Array.to_int => 2}
+  Line 14:
+    three : t = {Array.to_int => 3}
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
+File "bench/check-ce/jlamp_array_poly.mlw", line 21, characters 14-27:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Unknown (unknown + incomplete) (1991 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `f` cannot be evaluated):
+File array.mlw:
+  Line 17:
+    length : ty -> uni -> int = fun $x133 $x216 -> 2
+    length : array t -> int = [|_ => 0|]
+File jlamp_array_poly.mlw:
+  Line 8:
+    to_int :
+      t
+      ->
+      int = fun _arg_17 -> if {Array.to_int => 3} = _arg_17 then 3 else 2
+  Line 11:
+    two : t = {Array.to_int => 2}
+  Line 14:
+    three : t = {Array.to_int => 3}
+  Line 21:
+    three : t = {Array.to_int => 3}
+
+File "bench/check-ce/jlamp_array_poly.mlw", line 28, characters 4-16:
+Sub-goal Index in array bounds of goal g'vc.
+Prover result is: Valid (1311 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `g` at "bench/check-ce/jlamp_array_poly.mlw", line 24, characters 6-7)
+  - Abstract RAC: STUCK (failure in precondition of `g` at "bench/check-ce/jlamp_array_poly.mlw", line 24, characters 6-7)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because index is out of bounds)
+  - Abstract RAC: INCOMPLETE (terminated because index is out of bounds)
+File "bench/check-ce/jlamp_array_poly.mlw", line 27, characters 14-27:
+Sub-goal Postcondition of goal g'vc.
+Prover result is: Step limit exceeded (150085 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because index is out of bounds):
+File array.mlw:
+  Line 16:
+    elts : array t -> int -> t = [|_ => [|_ => {Array.to_int => 0}|]|]
+  Line 17:
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_6342 bOUND_VARIABLE_6343 -> 0
+    length : array t -> int = [|_ => 0|]
+  Line 20:
+    mixfix [] :
+      array
+      t
+      ->
+      int
+      ->
+      t = fun bOUND_VARIABLE_6354 bOUND_VARIABLE_6355 -> {Array.to_int => 0}
+File jlamp_array_poly.mlw:
+  Line 8:
+    to_int : t -> int = [|_ => 0|]
+  Line 11:
+    two : t = {Array.to_int => 0}
+  Line 14:
+    three : t = {Array.to_int => 0}
+  Line 27:
+    three : t = {Array.to_int => 0}
+
+File "bench/check-ce/jlamp_array_poly.mlw", line 34, characters 4-16:
+Sub-goal Index in array bounds of goal h'vc.
+Prover result is: Valid (1376 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `h` at "bench/check-ce/jlamp_array_poly.mlw", line 30, characters 6-7)
+  - Abstract RAC: STUCK (failure in precondition of `h` at "bench/check-ce/jlamp_array_poly.mlw", line 30, characters 6-7)
+- Selected model 1: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `h` at "bench/check-ce/jlamp_array_poly.mlw", line 30, characters 6-7)
+  - Abstract RAC: STUCK (failure in precondition of `h` at "bench/check-ce/jlamp_array_poly.mlw", line 30, characters 6-7)
+File "bench/check-ce/jlamp_array_poly.mlw", line 33, characters 14-27:
+Sub-goal Postcondition of goal h'vc.
+Prover result is: Unknown (unknown + incomplete) (2440 steps).
+Sorry, we don't have a good counterexample for you :(
+
+

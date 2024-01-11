@@ -17,6 +17,8 @@ val debug_parse_only : Debug.flag
 
 val debug_type_only : Debug.flag
 
+val warn_useless_at : Loc.warning_id
+
 val type_mlw_file : Env.env -> string list -> string -> Ptree.mlw_file -> Pmodule.pmodule Wstdlib.Mstr.t
 
 (** {2 Incremental typing of parsed modules} *)
@@ -27,7 +29,7 @@ val close_file : unit -> Pmodule.pmodule Wstdlib.Mstr.t
 
 val discard_file : unit -> unit
 
-val open_module : Ptree.ident -> unit
+val open_module : ?intf:Ptree.qualid -> Ptree.ident -> unit
 
 val close_module : Loc.position -> unit
 

@@ -70,11 +70,11 @@ let option_list =
      reduction is insufficient, with optional, space-\n\
      separated time and memory limit (e.g. 'cvc4 2 1000')";
     KLong "rac-timelimit", Hnd1 (AInt, fun i -> opt_rac_timelimit := Some i),
-    "<seconds> Time limit in seconds for RAC (with --rac)";
+    "<sec> set the time limit for RAC (with --rac)";
     KLong "rac-steplimit", Hnd1 (AInt, fun i -> opt_rac_steplimit := Some i),
-    "<steps> Step limit for RAC (with --rac)";
+    "<steps> set the step limit for RAC (with --rac)";
     KLong "rac-fail-cannot-check", Hnd0 (fun () -> opt_rac_ignore_incomplete := false),
-    " Fail RAC as incomplete when a assertion cannot be checked";
+    " fail RAC as incomplete when an assertion cannot\nbe checked";
     KLong "use", Hnd1 (AString, fun m -> use_modules := m :: !use_modules),
     "<qualified_module> use module in the execution";
   ]
@@ -124,7 +124,7 @@ let do_input f =
   let pmod = Pmodule.close_module muc in
 
   (* execute expression *)
-  Opt.iter Pinterp.init_real !prec;
+  Option.iter Pinterp.init_real !prec;
   try
     let compute_term = Rac.Why.mk_compute_term_lit env () in
     let why_prover = !opt_rac_prover and metas = !opt_metas in
@@ -133,7 +133,7 @@ let do_input f =
     let env = Pinterp.mk_empty_env env pmod in
     let ctx = Pinterp.mk_ctx env ~do_rac:!opt_enable_rac ~rac ~giant_steps:false
         ~compute_term ?steplimit:!opt_rac_steplimit
-        ?timelimit:(Opt.map float_of_int !opt_rac_timelimit) () in
+        ?timelimit:(Option.map float_of_int !opt_rac_timelimit) () in
     let res = Pinterp.exec_global_fundef ctx [] None expr in
     printf "%a@." (Pinterp.report_eval_result expr) res;
     exit (match res with Pinterp.Normal _, _, _ -> 0 | _ -> 1);
@@ -154,7 +154,7 @@ let do_input f =
 
 let () =
   try
-    Opt.iter do_input !opt_file
+    Option.iter do_input !opt_file
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

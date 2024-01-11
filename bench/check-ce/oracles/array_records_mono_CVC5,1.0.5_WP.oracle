@@ -1,0 +1,222 @@
+File bench/check-ce/array_records_mono.mlw:
+Goal array_of_records'vc.
+Prover result is: Valid (54 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+File "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown + incomplete) (524 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File array_records_mono.mlw:
+  Line 45:
+    a = {elts=
+         fun (x:int) ->
+          if x = (- 1) then basic_record'mk True 3 5
+          else basic_record'mk False 0 0;
+         length= 0}
+    i = (- 1)
+    a = {elts=
+         fun (x:int) ->
+          if x = (- 1) then basic_record'mk True 3 5
+          else basic_record'mk False 0 0;
+         length= 0}
+    i = (- 1)
+    Execution of main function `var_overwrite` with env:
+      a = {elts=
+           fun (x:int) ->
+            if x = (- 1) then basic_record'mk True 3 5
+            else basic_record'mk False 0 0;
+           length= 0}
+      i = (- 1)
+      zero = 0
+      one = 1
+  Line 49:
+    (giant-step) execution of unimplemented function `([])`
+      a = {elts=
+           fun (x:int) ->
+            if x = (- 1) then basic_record'mk True 3 5
+            else basic_record'mk False 0 0;
+           length= 0}
+      i = (- 1)
+    Property failure at precondition of `([])` with:
+      a = {elts=
+           fun (x:int) ->
+            if x = (- 1) then basic_record'mk True 3 5
+            else basic_record'mk False 0 0;
+           length= 0}
+      i = (- 1)
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+File "bench/check-ce/array_records_mono.mlw", line 49, characters 21-25:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown + incomplete) (706 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+File "bench/check-ce/array_records_mono.mlw", line 49, characters 5-81:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown + incomplete) (837 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+File "bench/check-ce/array_records_mono.mlw", line 50, characters 64-68:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown + incomplete) (1752 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+File "bench/check-ce/array_records_mono.mlw", line 50, characters 21-25:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown + incomplete) (1838 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+File "bench/check-ce/array_records_mono.mlw", line 50, characters 5-82:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown + incomplete) (1936 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+File "bench/check-ce/array_records_mono.mlw", line 51, characters 64-68:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown + incomplete) (2843 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+File "bench/check-ce/array_records_mono.mlw", line 51, characters 21-25:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown + incomplete) (2935 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+File "bench/check-ce/array_records_mono.mlw", line 51, characters 5-82:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown + incomplete) (3033 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+File "bench/check-ce/array_records_mono.mlw", line 52, characters 74-78:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown + incomplete) (4648 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+File "bench/check-ce/array_records_mono.mlw", line 52, characters 41-45:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown + incomplete) (4746 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+File "bench/check-ce/array_records_mono.mlw", line 52, characters 5-92:
+Sub-goal Index in array bounds of goal var_overwrite'vc.
+Prover result is: Unknown (unknown + incomplete) (4843 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+File "bench/check-ce/array_records_mono.mlw", line 53, characters 13-35:
+Sub-goal Assertion of goal var_overwrite'vc.
+Prover result is: Valid (2292 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_records_mono.mlw", line 49, characters 45-49)
+File "bench/check-ce/array_records_mono.mlw", line 47, characters 15-36:
+Sub-goal Postcondition of goal var_overwrite'vc.
+Prover result is: Unknown (unknown + incomplete) (6425 steps).
+Sorry, we don't have a good counterexample for you :(
+
+

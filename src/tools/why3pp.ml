@@ -423,7 +423,7 @@ let spec =
   let formats = List.map fst output_of_str in
   let format_help = String.concat "|" formats in
   [ KLong "output", Hnd1 (ASymbol formats, set_output),
-    "<format> select output format (" ^ format_help ^ "), default is " ^ List.hd formats;
+    "[" ^ format_help ^ "] select output format (default: " ^ List.hd formats ^ ")";
     KLong "kind", Hnd1 (ASymbol ["inductive"], set_kind),
     "<category> select syntactic category to be printed (only\n\
      \"inductive\" for --output=latex)";
@@ -503,7 +503,8 @@ let () =
             let f = Filename.(chop_extension (basename filename)) in
             deps_file std_formatter true f mlw_file
          | Sexp, None, 0 ->
-             Why3pp_sexp.why3pp_sexp stdout mlw_file
+             let sexp = Why3.Ptree.sexp_of_mlw_file mlw_file in
+             Mysexplib.output std_formatter sexp
          | _, _, _ ->
              Getopt.handle_exn "invalid arguments"
         )

@@ -82,6 +82,8 @@ let _apply_subst ((prs,sigma) : (Spr.t * term Mls.t)) : Task.task Trans.trans =
 
 
 let apply_subst ((prs,sigma) : (Spr.t * term Mls.t)) (tdl:Theory.tdecl list) : Task.task =
+  let dom = Mls.fold (fun ls _ s -> Sid.add ls.ls_name s) sigma @@
+            Spr.fold (fun pr s -> Sid.add pr.pr_name s) prs Sid.empty in
   let rec aux urg tdl tuc postponed =
     match urg, tdl with
     | td::urg, rem ->
@@ -101,14 +103,20 @@ let apply_subst ((prs,sigma) : (Spr.t * term Mls.t)) (tdl:Theory.tdecl list) : T
               aux urg rem tuc (td::postponed)
         end
     | [], ({td_node = Decl d} as td) :: rem ->
+        let usd_syms = Decl.get_used_syms_decl d in
+        let skip = Mid.set_disjoint usd_syms dom &&
+                   Mid.set_disjoint d.d_news dom in
         begin
           match d.d_node with
           | Dprop (Pgoal,pr,t) ->
               if postponed <> [] then
                 raise (Arg_trans "apply_subst failed");
-              let t = subst_in_term sigma t in
-              let d = create_prop_decl Pgoal pr t in
+              let d = if skip then d else
+                let t = subst_in_term sigma t in
+                create_prop_decl Pgoal pr t in
               Task.add_decl tuc d
+          | _ when skip ->
+              aux (td::urg) rem tuc postponed
           | Dprop (_,pr,_) when Spr.mem pr prs ->
               aux urg rem tuc postponed
           | Dprop (k,pr,t) ->

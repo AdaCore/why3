@@ -18,15 +18,17 @@ type cmd =
     {
       cmd_spec : spec_list;
       cmd_desc : string;
+      cmd_usage: string;
       cmd_name : string;
       cmd_run  : unit -> unit;
     }
 
 
 
-(** {2 Anonymous argument} *)
-val iter_files : (string -> unit) -> unit
-val anon_fun : Arg.anon_fun
+(** {2 Anonymous argument are session files} *)
+val iter_session_files : (string -> unit) -> unit
+val add_session_file : Arg.anon_fun
+val no_session_file : unit -> bool
 
 val read_session : string -> Session_itp.session
 (** [read_session s] reads the session file [s] and returns a session structure (without
@@ -62,6 +64,11 @@ val session_iter_proof_attempt_by_filter :
   Session_itp.session ->
   filters ->
   (Session_itp.proofAttemptID -> Session_itp.proof_attempt_node -> unit) ->  unit
+
+val session_iter_proof_node_id_by_filter :
+  Session_itp.session ->
+  filters ->
+  (Session_itp.proofNodeID -> unit) ->  unit
 
 
 (* quite ad-hoc *)

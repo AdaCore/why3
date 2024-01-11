@@ -260,7 +260,7 @@ module String
   function indexof string string int : int
   (** `indexof s1 s2 i` is:
 
-      (1) the first occurence of `s2` in `s1` after `i`, if `0 <= i <=
+      (1) the first occurrence of `s2` in `s1` after `i`, if `0 <= i <=
           length s1` (note: the result is `i`, if `s2 = empty` and `0
           <= i <= length s1`);
 
@@ -331,7 +331,7 @@ module String
 
       (1) `s1`, if `s2 = empty`;
 
-      (2) the string obtained by replacing all occurences of `s2` by
+      (2) the string obtained by replacing all occurrences of `s2` by
           `s3` in `s1`. *)
 
   axiom replaceall_empty1: forall s1 s3.

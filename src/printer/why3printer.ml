@@ -30,7 +30,7 @@ let print_attr = Debug.lookup_flag "print_attributes"
 
 let print_tdecls =
   let print_tdecl sm fmt td =
-    Format.fprintf fmt "%a@\n\n" P.print_tdecl td;
+    Format.fprintf fmt "%a" P.print_tdecl td;
     sm, [] in
   let print_tdecl = Printer.sprint_tdecl print_tdecl in
   let print_tdecl task acc = print_tdecl task.Task.task_decl acc in
@@ -40,7 +40,7 @@ let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] IST STRENG VERBOTEN *)
   (* forget_all (); *)
   print_prelude fmt args.prelude;
-  fprintf fmt "theory Task@\n@\n";
+  fprintf fmt "@[<v 0>theory Task@\n";
   print_th_prelude task fmt args.th_prelude;
   let rec print = function
     | x :: r -> print r; Pp.string fmt x
@@ -49,7 +49,7 @@ let print_task args ?old:_ fmt task =
   Debug.set_flag print_attr;
   print (snd (Trans.apply print_tdecls task));
   if not fl then Debug.unset_flag print_attr;
-  fprintf fmt "end@."
+  fprintf fmt "@\nend@]@."
 
 let () = register_printer "why3" print_task
   ~desc:"Printer@ for@ the@ logical@ format@ of@ Why3.@ Used@ for@ debugging."

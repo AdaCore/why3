@@ -1,0 +1,28 @@
+File "bench/check-ce/multifile1.mlw", line 6, characters 14-24:
+Sub-goal Postcondition of goal decr'vc.
+Prover result is: Valid (4 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to decr at "bench/check-ce/multifile1.mlw", line 11, characters 4-10)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to decr at "bench/check-ce/multifile1.mlw", line 11, characters 4-10)
+- Selected model 2: INCOMPLETE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to decr at "bench/check-ce/multifile1.mlw", line 11, characters 4-10)
+File "bench/check-ce/multifile1.mlw", line 10, characters 14-24:
+Sub-goal Postcondition of goal incr'vc.
+Prover result is: Unknown (unknown) (10 steps).
+The following counterexample model could not be verified
+  (abstract RAC terminated because missing value for return value of call to decr at "bench/check-ce/multifile1.mlw", line 11, characters 4-10):
+File multifile1.mlw:
+  Line 6:
+    x : int = 0
+  Line 9:
+    x : int = 0
+  Line 10:
+    result : int = -1
+    x : int = 0
+

@@ -209,6 +209,10 @@ val empty_inst : th_inst
 
 val warn_clone_not_abstract : Loc.position -> theory -> unit
 
+val warning_clone_not_abstract : Loc.warning_id
+
+val warn_axiom_abstract : Loc.warning_id
+
 val clone_theory : ('a -> tdecl -> 'a) -> 'a -> theory -> th_inst -> 'a
 
 val clone_export : theory_uc -> theory -> th_inst -> theory_uc
@@ -234,6 +238,8 @@ val clone_meta : tdecl -> theory -> symbol_map -> tdecl option
 (** {2 Base theories} *)
 
 val builtin_theory : theory
+
+val ignore_theory : theory
 
 val bool_theory : theory
 

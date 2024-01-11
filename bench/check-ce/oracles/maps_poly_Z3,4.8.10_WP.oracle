@@ -1,13 +1,13 @@
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 8, characters 14-28)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 8, characters 14-28)
-- Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 8, characters 14-28)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 8, characters 14-28)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `set` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to set at "bench/check-ce/maps_poly.mlw", line 10, characters 9-23)
 File "bench/check-ce/maps_poly.mlw", line 8, characters 14-28:
 Sub-goal Postcondition of goal test_map'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (3000034 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -19,45 +19,46 @@ File int.mlw:
     one = 1
 File maps_poly.mlw:
   Line 7:
-    x = {contents= [|1 -> 3; _ -> 2|]}
-    x = {contents= [|1 -> 3; _ -> 2|]}
+    x = {contents= fun (x!010:int) -> if x!010 = 1 then 3 else 2}
+    x = {contents= fun (x!010:int) -> if x!010 = 1 then 3 else 2}
     Execution of main function `test_map` with env:
-      x = {contents= [|1 -> 3; _ -> 2|]}
+      x = {contents= fun (x!010:int) -> if x!010 = 1 then 3 else 2}
       zero = 0
       one = 1
   Line 10:
     Normal execution of function `(!)` with args:
-      r = {contents= [|1 -> 3; _ -> 2|]}
+      r = {contents= fun (x!010:int) -> if x!010 = 1 then 3 else 2}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= [|1 -> 3; _ -> 2|]}
+      arg = {contents= fun (x!010:int) -> if x!010 = 1 then 3 else 2}
 File maps_poly.mlw:
   Line 10:
     Normal execution of function `set` with args:
-      f = [|1 -> 3; _ -> 2|]
+      f = fun (x!010:int) -> if x!010 = 1 then 3 else 2
       x = 0
       v = 3
     Normal execution of function `(:=)` with args:
-      r = {contents= [|1 -> 3; _ -> 2|]}
+      r = {contents= fun (x!010:int) -> if x!010 = 1 then 3 else 2}
       v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = [|1 -> 3; _ -> 2|], x = 0, v = 3
+             else f y) with f = fun (x!010:int) -> if x!010 = 1 then 3 else 2, x = 0, v = 3
   Line 8:
     Property failure at postcondition of `test_map` with:
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = [|1 -> 3; _ -> 2|], x = 0, v = 3}
+              else f y) with f = fun (x!010:int) ->
+                                  if x!010 = 1 then 3 else 2, x = 0, v = 3}
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 14, characters 14-34)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 14, characters 14-34)
-- Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 14, characters 14-34)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 14, characters 14-34)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because an undefined argument was passed to (@))
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to get at "bench/check-ce/maps_poly.mlw", line 16, characters 22-36)
 File "bench/check-ce/maps_poly.mlw", line 14, characters 14-34:
 Sub-goal Postcondition of goal test_map_multidim1'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (3000053 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -70,89 +71,195 @@ File int.mlw:
 File maps_poly.mlw:
   Line 13:
     x = {contents=
-         [|0 -> [|6 -> 8; _ -> 5|];
-         1 -> [|0 -> 3; 1 -> 3; 6 -> 7; _ -> 2|]; _ -> [|; _ -> 4|]|]}
+         fun (x!023:int) ->
+          if x!023 = 0 then fun (x!024:int) -> if x!024 = 6 then 8 else 5
+          else if x!023 = 1
+               then fun (x!024:int) ->
+                     if x!024 = 0 then 3
+                     else if x!024 = 6 then 7 else if x!024 = 1 then 3 else 2
+               else fun (x!024:int) -> 4}
     x = {contents=
-         [|0 -> [|6 -> 8; _ -> 5|];
-         1 -> [|0 -> 3; 1 -> 3; 6 -> 7; _ -> 2|]; _ -> [|; _ -> 4|]|]}
+         fun (x!023:int) ->
+          if x!023 = 0 then fun (x!024:int) -> if x!024 = 6 then 8 else 5
+          else if x!023 = 1
+               then fun (x!024:int) ->
+                     if x!024 = 0 then 3
+                     else if x!024 = 6 then 7 else if x!024 = 1 then 3 else 2
+               else fun (x!024:int) -> 4}
     Execution of main function `test_map_multidim1` with env:
       x = {contents=
-           [|0 -> [|6 -> 8; _ -> 5|];
-           1 -> [|0 -> 3; 1 -> 3; 6 -> 7; _ -> 2|]; _ -> [|; _ -> 4|]|]}
+           fun (x!023:int) ->
+            if x!023 = 0 then fun (x!024:int) -> if x!024 = 6 then 8 else 5
+            else if x!023 = 1
+                 then fun (x!024:int) ->
+                       if x!024 = 0 then 3
+                       else if x!024 = 6 then 7
+                            else if x!024 = 1 then 3 else 2
+                 else fun (x!024:int) -> 4}
       zero = 0
       one = 1
   Line 16:
     Normal execution of function `(!)` with args:
       r = {contents=
-           [|0 -> [|6 -> 8; _ -> 5|];
-           1 -> [|0 -> 3; 1 -> 3; 6 -> 7; _ -> 2|]; _ -> [|; _ -> 4|]|]}
+           fun (x!023:int) ->
+            if x!023 = 0 then fun (x!024:int) -> if x!024 = 6 then 8 else 5
+            else if x!023 = 1
+                 then fun (x!024:int) ->
+                       if x!024 = 0 then 3
+                       else if x!024 = 6 then 7
+                            else if x!024 = 1 then 3 else 2
+                 else fun (x!024:int) -> 4}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
       arg = {contents=
-             [|0 -> [|6 -> 8; _ -> 5|];
-             1 -> [|0 -> 3; 1 -> 3; 6 -> 7; _ -> 2|]; _ -> [|; _ -> 4|]|]}
+             fun (x!023:int) ->
+              if x!023 = 0 then fun (x!024:int) -> if x!024 = 6 then 8 else 5
+              else if x!023 = 1
+                   then fun (x!024:int) ->
+                         if x!024 = 0 then 3
+                         else if x!024 = 6 then 7
+                              else if x!024 = 1 then 3 else 2
+                   else fun (x!024:int) -> 4}
 File maps_poly.mlw:
   Line 16:
     Normal execution of function `get` with args:
-      f = [|0 -> [|6 -> 8; _ -> 5|];
-          1 -> [|0 -> 3; 1 -> 3; 6 -> 7; _ -> 2|]; _ -> [|; _ -> 4|]|]
+      f = fun (x!023:int) ->
+           if x!023 = 0 then fun (x!024:int) -> if x!024 = 6 then 8 else 5
+           else if x!023 = 1
+                then fun (x!024:int) ->
+                      if x!024 = 0 then 3
+                      else if x!024 = 6 then 7
+                           else if x!024 = 1 then 3 else 2
+                else fun (x!024:int) -> 4
       x = 1
 File map.mlw:
   Line 11:
     Normal execution of function `(@)` with args:
-      u = [|0 -> [|6 -> 8; _ -> 5|];
-          1 -> [|0 -> 3; 1 -> 3; 6 -> 7; _ -> 2|]; _ -> [|; _ -> 4|]|]
+      u = fun (x!023:int) ->
+           if x!023 = 0 then fun (x!024:int) -> if x!024 = 6 then 8 else 5
+           else if x!023 = 1
+                then fun (x!024:int) ->
+                      if x!024 = 0 then 3
+                      else if x!024 = 6 then 7
+                           else if x!024 = 1 then 3 else 2
+                else fun (x!024:int) -> 4
       u = 1
 File maps_poly.mlw:
   Line 16:
     Normal execution of function `(!)` with args:
       r = {contents=
-           [|0 -> [|6 -> 8; _ -> 5|];
-           1 -> [|0 -> 3; 1 -> 3; 6 -> 7; _ -> 2|]; _ -> [|; _ -> 4|]|]}
+           fun (x!023:int) ->
+            if x!023 = 0 then fun (x!024:int) -> if x!024 = 6 then 8 else 5
+            else if x!023 = 1
+                 then fun (x!024:int) ->
+                       if x!024 = 0 then 3
+                       else if x!024 = 6 then 7
+                            else if x!024 = 1 then 3 else 2
+                 else fun (x!024:int) -> 4}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
       arg = {contents=
-             [|0 -> [|6 -> 8; _ -> 5|];
-             1 -> [|0 -> 3; 1 -> 3; 6 -> 7; _ -> 2|]; _ -> [|; _ -> 4|]|]}
+             fun (x!023:int) ->
+              if x!023 = 0 then fun (x!024:int) -> if x!024 = 6 then 8 else 5
+              else if x!023 = 1
+                   then fun (x!024:int) ->
+                         if x!024 = 0 then 3
+                         else if x!024 = 6 then 7
+                              else if x!024 = 1 then 3 else 2
+                   else fun (x!024:int) -> 4}
 File maps_poly.mlw:
   Line 16:
     Normal execution of function `set` with args:
-      f = [|0 -> [|6 -> 8; _ -> 5|];
-          1 -> [|0 -> 3; 1 -> 3; 6 -> 7; _ -> 2|]; _ -> [|; _ -> 4|]|]
+      f = fun (x!023:int) ->
+           if x!023 = 0 then fun (x!024:int) -> if x!024 = 6 then 8 else 5
+           else if x!023 = 1
+                then fun (x!024:int) ->
+                      if x!024 = 0 then 3
+                      else if x!024 = 6 then 7
+                           else if x!024 = 1 then 3 else 2
+                else fun (x!024:int) -> 4
       x = 0
-      v = [|0 -> 3; 1 -> 3; 6 -> 7; _ -> 2|]
+      v = fun (x!023:int) ->
+           if x!023 = 0 then 3
+           else if x!023 = 6 then 7 else if x!023 = 1 then 3 else 2
     Normal execution of function `(:=)` with args:
       r = {contents=
-           [|0 -> [|6 -> 8; _ -> 5|];
-           1 -> [|0 -> 3; 1 -> 3; 6 -> 7; _ -> 2|]; _ -> [|; _ -> 4|]|]}
+           fun (x!023:int) ->
+            if x!023 = 0 then fun (x!024:int) -> if x!024 = 6 then 8 else 5
+            else if x!023 = 1
+                 then fun (x!024:int) ->
+                       if x!024 = 0 then 3
+                       else if x!024 = 6 then 7
+                            else if x!024 = 1 then 3 else 2
+                 else fun (x!024:int) -> 4}
       v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = [|0 -> [|6 -> 8; _ -> 5|];
-                                1 -> [|0 -> 3; 1 -> 3; 6 -> 7; _ -> 2|]; _ -> 
-                                [|; _ -> 4|]|], x = 0, v = [|0 -> 3; 
-                                                           1 -> 3;
-                                                           6 -> 7; _ -> 2|]
+             else f y) with f = fun (x!023:int) ->
+                                 if x!023 = 0
+                                 then fun (x!024:int) ->
+                                       if x!024 = 6 then 8 else 5
+                                 else if x!023 = 1
+                                      then fun (x!024:int) ->
+                                            if x!024 = 0 then 3
+                                            else if x!024 = 6 then 7
+                                                 else if x!024 = 1 then 3
+                                                      else 2
+                                      else fun (x!024:int) -> 4, x = 0, v = fun
+                                                                    (x!023:
+                                                                    int) ->
+                                                                    if 
+                                                                    x!023 = 0
+                                                                    then 3
+                                                                    else 
+                                                                    if 
+                                                                    x!023 = 6
+                                                                    then 7
+                                                                    else 
+                                                                    if 
+                                                                    x!023 = 1
+                                                                    then 3
+                                                                    else 2
   Line 14:
     Property failure at postcondition of `test_map_multidim1` with:
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = [|0 -> [|6 -> 8; _ -> 5|];
-                                 1 -> [|0 -> 3; 1 -> 3; 6 -> 7; _ -> 2|]; _ -> 
-                                 [|; _ -> 4|]|], x = 0, v = [|0 -> 3; 
-                                                            1 -> 3;
-                                                            6 -> 7; _ -> 2|]}
+              else f y) with f = fun (x!023:int) ->
+                                  if x!023 = 0
+                                  then fun (x!024:int) ->
+                                        if x!024 = 6 then 8 else 5
+                                  else if x!023 = 1
+                                       then fun (x!024:int) ->
+                                             if x!024 = 0 then 3
+                                             else if x!024 = 6 then 7
+                                                  else if x!024 = 1 then 3
+                                                       else 2
+                                       else fun (x!024:int) -> 4, x = 0, v = fun
+                                                                    (x!023:
+                                                                    int) ->
+                                                                    if 
+                                                                    x!023 = 0
+                                                                    then 3
+                                                                    else 
+                                                                    if 
+                                                                    x!023 = 6
+                                                                    then 7
+                                                                    else 
+                                                                    if 
+                                                                    x!023 = 1
+                                                                    then 3
+                                                                    else 2}
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 19, characters 14-34)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 19, characters 14-34)
-- Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 19, characters 14-34)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 19, characters 14-34)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because an undefined argument was passed to (@))
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to get at "bench/check-ce/maps_poly.mlw", line 21, characters 13-25)
 File "bench/check-ce/maps_poly.mlw", line 19, characters 14-34:
 Sub-goal Postcondition of goal test_map_multidim2'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (3000062 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -165,101 +272,156 @@ File int.mlw:
 File maps_poly.mlw:
   Line 18:
     x = {contents=
-         [|0 -> [|0 -> 6; _ -> 5|];
-         1 -> [|1 -> 3; _ -> 2|]; _ -> [|; _ -> 4|]|]}
+         fun (x!037:int) ->
+          if x!037 = 0 then fun (x!038:int) -> if x!038 = 0 then 6 else 5
+          else if x!037 = 1
+               then fun (x!038:int) -> if x!038 = 1 then 3 else 2
+               else fun (x!038:int) -> 4}
     x = {contents=
-         [|0 -> [|0 -> 6; _ -> 5|];
-         1 -> [|1 -> 3; _ -> 2|]; _ -> [|; _ -> 4|]|]}
+         fun (x!037:int) ->
+          if x!037 = 0 then fun (x!038:int) -> if x!038 = 0 then 6 else 5
+          else if x!037 = 1
+               then fun (x!038:int) -> if x!038 = 1 then 3 else 2
+               else fun (x!038:int) -> 4}
     Execution of main function `test_map_multidim2` with env:
       x = {contents=
-           [|0 -> [|0 -> 6; _ -> 5|];
-           1 -> [|1 -> 3; _ -> 2|]; _ -> [|; _ -> 4|]|]}
+           fun (x!037:int) ->
+            if x!037 = 0 then fun (x!038:int) -> if x!038 = 0 then 6 else 5
+            else if x!037 = 1
+                 then fun (x!038:int) -> if x!038 = 1 then 3 else 2
+                 else fun (x!038:int) -> 4}
       zero = 0
       one = 1
   Line 21:
     Normal execution of function `(!)` with args:
       r = {contents=
-           [|0 -> [|0 -> 6; _ -> 5|];
-           1 -> [|1 -> 3; _ -> 2|]; _ -> [|; _ -> 4|]|]}
+           fun (x!037:int) ->
+            if x!037 = 0 then fun (x!038:int) -> if x!038 = 0 then 6 else 5
+            else if x!037 = 1
+                 then fun (x!038:int) -> if x!038 = 1 then 3 else 2
+                 else fun (x!038:int) -> 4}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
       arg = {contents=
-             [|0 -> [|0 -> 6; _ -> 5|];
-             1 -> [|1 -> 3; _ -> 2|]; _ -> [|; _ -> 4|]|]}
+             fun (x!037:int) ->
+              if x!037 = 0 then fun (x!038:int) -> if x!038 = 0 then 6 else 5
+              else if x!037 = 1
+                   then fun (x!038:int) -> if x!038 = 1 then 3 else 2
+                   else fun (x!038:int) -> 4}
 File maps_poly.mlw:
   Line 21:
     Normal execution of function `get` with args:
-      f = [|0 -> [|0 -> 6; _ -> 5|];
-          1 -> [|1 -> 3; _ -> 2|]; _ -> [|; _ -> 4|]|]
+      f = fun (x!037:int) ->
+           if x!037 = 0 then fun (x!038:int) -> if x!038 = 0 then 6 else 5
+           else if x!037 = 1
+                then fun (x!038:int) -> if x!038 = 1 then 3 else 2
+                else fun (x!038:int) -> 4
       x = 0
 File map.mlw:
   Line 11:
     Normal execution of function `(@)` with args:
-      u = [|0 -> [|0 -> 6; _ -> 5|];
-          1 -> [|1 -> 3; _ -> 2|]; _ -> [|; _ -> 4|]|]
+      u = fun (x!037:int) ->
+           if x!037 = 0 then fun (x!038:int) -> if x!038 = 0 then 6 else 5
+           else if x!037 = 1
+                then fun (x!038:int) -> if x!038 = 1 then 3 else 2
+                else fun (x!038:int) -> 4
       u = 0
 File maps_poly.mlw:
   Line 22:
     Normal execution of function `set` with args:
-      f = [|0 -> 6; _ -> 5|]
+      f = fun (x!037:int) -> if x!037 = 0 then 6 else 5
       x = 0
       v = 3
   Line 23:
     Normal execution of function `(!)` with args:
       r = {contents=
-           [|0 -> [|0 -> 6; _ -> 5|];
-           1 -> [|1 -> 3; _ -> 2|]; _ -> [|; _ -> 4|]|]}
+           fun (x!037:int) ->
+            if x!037 = 0 then fun (x!038:int) -> if x!038 = 0 then 6 else 5
+            else if x!037 = 1
+                 then fun (x!038:int) -> if x!038 = 1 then 3 else 2
+                 else fun (x!038:int) -> 4}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
       arg = {contents=
-             [|0 -> [|0 -> 6; _ -> 5|];
-             1 -> [|1 -> 3; _ -> 2|]; _ -> [|; _ -> 4|]|]}
+             fun (x!037:int) ->
+              if x!037 = 0 then fun (x!038:int) -> if x!038 = 0 then 6 else 5
+              else if x!037 = 1
+                   then fun (x!038:int) -> if x!038 = 1 then 3 else 2
+                   else fun (x!038:int) -> 4}
 File maps_poly.mlw:
   Line 23:
     Normal execution of function `set` with args:
-      f = [|0 -> [|0 -> 6; _ -> 5|];
-          1 -> [|1 -> 3; _ -> 2|]; _ -> [|; _ -> 4|]|]
+      f = fun (x!037:int) ->
+           if x!037 = 0 then fun (x!038:int) -> if x!038 = 0 then 6 else 5
+           else if x!037 = 1
+                then fun (x!038:int) -> if x!038 = 1 then 3 else 2
+                else fun (x!038:int) -> 4
       x = 0
       v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = [|0 -> 6; _ -> 5|], x = 0, v = 3
+             else f y) with f = fun (x!037:int) -> if x!037 = 0 then 6 else 5, x = 0, v = 3
     Normal execution of function `(:=)` with args:
       r = {contents=
-           [|0 -> [|0 -> 6; _ -> 5|];
-           1 -> [|1 -> 3; _ -> 2|]; _ -> [|; _ -> 4|]|]}
+           fun (x!037:int) ->
+            if x!037 = 0 then fun (x!038:int) -> if x!038 = 0 then 6 else 5
+            else if x!037 = 1
+                 then fun (x!038:int) -> if x!038 = 1 then 3 else 2
+                 else fun (x!038:int) -> 4}
       v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = [|0 -> [|0 -> 6; _ -> 5|];
-                                1 -> [|1 -> 3; _ -> 2|]; _ -> [|; _ -> 4|]|], x = 0, v = (fun y -> if pure { 
+             else f y) with f = fun (x!037:int) ->
+                                 if x!037 = 0
+                                 then fun (x!038:int) ->
+                                       if x!038 = 0 then 6 else 5
+                                 else if x!037 = 1
+                                      then fun (x!038:int) ->
+                                            if x!038 = 1 then 3 else 2
+                                      else fun (x!038:int) -> 4, x = 0, v = (fun y -> if pure { 
                                                                     if 
                                                                     y = x
                                                                     then True
                                                                     else False } then v
-                                                                    else f y) with f = [|
-                                                                    0 -> 6; _ -> 5|], x = 0, v = 3
+                                                                    else f y) with f = fun
+                                                                    (x!037:
+                                                                    int) ->
+                                                                    if 
+                                                                    x!037 = 0
+                                                                    then 6
+                                                                    else 5, x = 0, v = 3
   Line 19:
     Property failure at postcondition of `test_map_multidim2` with:
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = [|0 -> [|0 -> 6; _ -> 5|];
-                                 1 -> [|1 -> 3; _ -> 2|]; _ -> [|; _ -> 4|]|], x = 0, v = (fun y -> if pure { 
+              else f y) with f = fun (x!037:int) ->
+                                  if x!037 = 0
+                                  then fun (x!038:int) ->
+                                        if x!038 = 0 then 6 else 5
+                                  else if x!037 = 1
+                                       then fun (x!038:int) ->
+                                             if x!038 = 1 then 3 else 2
+                                       else fun (x!038:int) -> 4, x = 0, v = (fun y -> if pure { 
                                                                     if 
                                                                     y = x
                                                                     then True
                                                                     else False } then v
-                                                                    else f y) with f = [|
-                                                                    0 -> 6; _ -> 5|], x = 0, v = 3}
+                                                                    else f y) with f = fun
+                                                                    (x!037:
+                                                                    int) ->
+                                                                    if 
+                                                                    x!037 = 0
+                                                                    then 6
+                                                                    else 5, x = 0, v = 3}
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 26, characters 14-28)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 26, characters 14-28)
-- Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 26, characters 14-28)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 26, characters 14-28)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `set` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to set at "bench/check-ce/maps_poly.mlw", line 28, characters 9-23)
 File "bench/check-ce/maps_poly.mlw", line 26, characters 14-28:
 Sub-goal Postcondition of goal proj_map_test1'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (3000034 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -271,45 +433,46 @@ File int.mlw:
     one = 1
 File maps_poly.mlw:
   Line 25:
-    x = {contents= [|1 -> 3; _ -> 2|]}
-    x = {contents= [|1 -> 3; _ -> 2|]}
+    x = {contents= fun (x!047:int) -> if x!047 = 1 then 3 else 2}
+    x = {contents= fun (x!047:int) -> if x!047 = 1 then 3 else 2}
     Execution of main function `proj_map_test1` with env:
-      x = {contents= [|1 -> 3; _ -> 2|]}
+      x = {contents= fun (x!047:int) -> if x!047 = 1 then 3 else 2}
       zero = 0
       one = 1
   Line 28:
     Normal execution of function `(!)` with args:
-      r = {contents= [|1 -> 3; _ -> 2|]}
+      r = {contents= fun (x!047:int) -> if x!047 = 1 then 3 else 2}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= [|1 -> 3; _ -> 2|]}
+      arg = {contents= fun (x!047:int) -> if x!047 = 1 then 3 else 2}
 File maps_poly.mlw:
   Line 28:
     Normal execution of function `set` with args:
-      f = [|1 -> 3; _ -> 2|]
+      f = fun (x!047:int) -> if x!047 = 1 then 3 else 2
       x = 0
       v = 3
     Normal execution of function `(:=)` with args:
-      r = {contents= [|1 -> 3; _ -> 2|]}
+      r = {contents= fun (x!047:int) -> if x!047 = 1 then 3 else 2}
       v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = [|1 -> 3; _ -> 2|], x = 0, v = 3
+             else f y) with f = fun (x!047:int) -> if x!047 = 1 then 3 else 2, x = 0, v = 3
   Line 26:
     Property failure at postcondition of `proj_map_test1` with:
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = [|1 -> 3; _ -> 2|], x = 0, v = 3}
+              else f y) with f = fun (x!047:int) ->
+                                  if x!047 = 1 then 3 else 2, x = 0, v = 3}
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 31, characters 14-28)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 31, characters 14-28)
-- Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 31, characters 14-28)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 31, characters 14-28)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `set` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to set at "bench/check-ce/maps_poly.mlw", line 33, characters 9-26)
 File "bench/check-ce/maps_poly.mlw", line 31, characters 14-28:
 Sub-goal Postcondition of goal proj_map_test2'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (3000034 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -321,37 +484,39 @@ File int.mlw:
     one = 1
 File maps_poly.mlw:
   Line 30:
-    x = {contents= [|1 -> true; _ -> false|]}
-    x = {contents= [|1 -> true; _ -> false|]}
+    x = {contents= fun (x!057:int) -> if x!057 = 1 then True else False}
+    x = {contents= fun (x!057:int) -> if x!057 = 1 then True else False}
     Execution of main function `proj_map_test2` with env:
-      x = {contents= [|1 -> true; _ -> false|]}
+      x = {contents= fun (x!057:int) -> if x!057 = 1 then True else False}
       zero = 0
       one = 1
   Line 33:
     Normal execution of function `True` with args:
     Normal execution of function `(!)` with args:
-      r = {contents= [|1 -> true; _ -> false|]}
+      r = {contents= fun (x!057:int) -> if x!057 = 1 then True else False}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= [|1 -> true; _ -> false|]}
+      arg = {contents= fun (x!057:int) -> if x!057 = 1 then True else False}
 File maps_poly.mlw:
   Line 33:
     Normal execution of function `set` with args:
-      f = [|1 -> true; _ -> false|]
+      f = fun (x!057:int) -> if x!057 = 1 then True else False
       x = 0
       v = true
     Normal execution of function `(:=)` with args:
-      r = {contents= [|1 -> true; _ -> false|]}
+      r = {contents= fun (x!057:int) -> if x!057 = 1 then True else False}
       v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = [|1 -> true; _ -> false|], x = 0, v = true
+             else f y) with f = fun (x!057:int) ->
+                                 if x!057 = 1 then True else False, x = 0, v = true
   Line 31:
     Property failure at postcondition of `proj_map_test2` with:
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = [|1 -> true; _ -> false|], x = 0, v = true}
+              else f y) with f = fun (x!057:int) ->
+                                  if x!057 = 1 then True else False, x = 0, v = true}
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 42, characters 3-31)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 42, characters 3-31)
@@ -360,39 +525,39 @@ File maps_poly.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 42, characters 3-31)
 File "bench/check-ce/maps_poly.mlw", line 42, characters 3-31:
 Goal t1.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (147 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File maps_poly.mlw:
   Line 41:
-    t = [|0 -> 3; _ -> 2|]
+    t = fun (x!061:int) -> if x!061 = 0 then 3 else 2
     i = 0
-    t = [|0 -> 3; _ -> 2|]
+    t = fun (x!061:int) -> if x!061 = 0 then 3 else 2
     i = 0
     Execution of main function `t1'goal` with env:
       i = 0
-      t = [|0 -> 3; _ -> 2|]
+      t = fun (x!061:int) -> if x!061 = 0 then 3 else 2
 Unknown location:
     Normal execution of function `Tuple0` with args:
 File maps_poly.mlw:
   Line 42:
     Property failure at postcondition of `t1'goal` with:
       i = 0
-      t = [|0 -> 3; _ -> 2|]
+      t = fun (x!061:int) -> if x!061 = 0 then 3 else 2
 
-<check-ce-categorization>Categorizations of models:
+<check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value 1/10)
-  - Abstract RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value 1/10)
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
 - Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value 1/10)
-  - Abstract RAC: INCOMPLETE (terminated because cannot import value from model: not implemented for value 1/10)
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
 File "bench/check-ce/maps_poly.mlw", line 50, characters 36-64:
 Goal g.
-Prover result is: Unknown (sat).
+Prover result is: Unknown (sat) (166 steps).
 The following counterexample model could not be verified
-  (both RAC terminated because cannot import value from model: not implemented for value 1/10):
+  (both RAC terminated with uncaught exception):
 File maps_poly.mlw:
   Line 50:
-    m = (1/5 => 3.0, 1/10 => 2.0, others => 2.0)
+    m : real -> real = [|1.0/10.0 => 2.0; 1.0/5.0 => 3.0; _ => 2.0|]
 
