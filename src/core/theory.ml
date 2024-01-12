@@ -507,7 +507,7 @@ let print_id fmt id = Ident.print_decoded fmt id.id_string
 let warn_axiom_abstract =
   Loc.register_warning "axiom_abstract" "Warn when some axiom does not contain any abstract symbol"
 
-let warn_dubious_axiom uc k _ syms =
+let warn_dubious_axiom uc k p syms =
   match k with
   | Plemma | Pgoal -> ()
   | Paxiom ->
@@ -523,7 +523,6 @@ let warn_dubious_axiom uc k _ syms =
         "@[axiom %s does not contain any local abstract symbol@ \
           (contains: @[%a@])@]" p.id_string
         (Pp.print_list Pp.comma print_id) (Sid.elements syms)
-*)
     with Exit -> ()
 
 let attr_w_non_conservative_extension_no =

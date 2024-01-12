@@ -24,6 +24,8 @@ open Gnat_scheduler
 
 module C = Gnat_objectives.Make (Gnat_scheduler)
 
+let warn_gnat_rac_not_done = Loc.register_warning "gnat_rac_not_done" "Warn if RAC could not be completed"
+
 let rec is_trivial fml =
    let open Term in
    (* Check wether the formula is trivial.  *)
@@ -186,7 +188,7 @@ let maybe_giant_step_rac ctr parent models =
     | Some (m, _) when not Gnat_config.giant_step_rac ->
         Some (Gnat_counterexamples.post_clean#model m, None)
     | Some (m, Check_ce.RAC_not_done reason) -> (
-        if Gnat_config.debug then Loc.warning "%s@." reason;
+        if Gnat_config.debug then Loc.warning warn_gnat_rac_not_done "%s@." reason;
         Some (Gnat_counterexamples.post_clean#model m, None)
       )
     | Some (m, Check_ce.RAC_done (res_state, res_log)) -> (

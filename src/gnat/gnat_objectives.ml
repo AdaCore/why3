@@ -445,7 +445,7 @@ let init_cont () =
          ());
       try
         let (_ : bool), (_ : bool) =
-          Controller_itp.reload_files c in
+          Controller_itp.reload_files ~ignore_shapes:false c in
         c
       with
       | Controller_itp.Errors_list l ->

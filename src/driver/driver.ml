@@ -372,12 +372,11 @@ let update_task = let ht = Hint.create 5 in fun drv ->
 (* Apply driver's transformations to the task *)
 let prepare_task drv task =
   let lookup_transform t =
-    let stat_name = "gnatwhy3.transformations." ^ t in
-    stat_name, lookup_transform t drv.drv_env, t in
+    lookup_transform t drv.drv_env, t in
   let transl = List.map lookup_transform drv.drv_transform in
   let apply task (tr,name) =
     let task =
-      Debug.Stats.record_timing ("driver.trans." ^ name)
+      Debug.Stats.record_timing ("gnatwhy3.transformations." ^ name)
         (fun () -> Trans.apply tr task) in
     Debug.dprintf driver_debug "Task after transformation: %s\n%a@."
       name Pretty.print_task task;

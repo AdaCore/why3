@@ -1,0 +1,13 @@
+(* This is a encoding for int/float conversions via reals. *)
+
+theory ieee_float.GenericFloat
+  syntax function to_int "(to_int (fp.to_real (fp.roundToIntegral %1 %2)))"
+end
+
+theory ieee_float.Float32
+  syntax function of_int "((_ to_fp 8 24) %1 (to_real %2))"
+end
+
+theory ieee_float.Float64
+  syntax function of_int "((_ to_fp 11 53) %1 (to_real %2))"
+end
