@@ -751,7 +751,7 @@ let print_info_model info =
               let attrs' = Sattr.union attrs attrs' in
               let attrs' =
                 if oloc <> None then
-                  Sattr.add (Ident.create_written_attr (Opt.get oloc)) attrs'
+                  Sattr.add (Ident.create_written_attr (Option.get oloc)) attrs'
                 else
                   attrs' in
               Mstr.add s (ls,oloc,attrs') acc

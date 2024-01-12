@@ -142,7 +142,7 @@ module E = struct
     match expr with
     | Some e -> e ()
     | None ->
-        let pp_info fmt = Opt.iter (Format.fprintf fmt " %s") info in
+        let pp_info fmt = Option.iter (Format.fprintf fmt " %s") info in
         Format.kasprintf failwith "No translation from Gnat JSON node%t to Why3 expression" pp_info
 end
 
@@ -210,7 +210,7 @@ module T = struct
     match term with
     | Some t -> t ()
     | None ->
-        let pp_info fmt = Opt.iter (Format.fprintf fmt " %s") info in
+        let pp_info fmt = Option.iter (Format.fprintf fmt " %s") info in
         Format.kasprintf failwith "No translation from Gnat JSON node%t to Why3 term" pp_info
 end
 

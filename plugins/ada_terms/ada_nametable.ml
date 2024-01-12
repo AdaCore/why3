@@ -36,7 +36,7 @@ let convert_array (nt: Trans.naming_table) (a_str: string) =
               | None -> false
               | Some x -> x.Term.ls_name.Ident.id_string = elts_name) proj_names
       | _ -> raise Not_found in
-    (Opt.get elts).Term.ls_name
+    (Option.get elts).Term.ls_name
   in
   let get_string (id: Ident.ident) =
     Ident.(if known_id prls id then

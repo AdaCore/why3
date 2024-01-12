@@ -14,21 +14,9 @@ let conversion_error node_id message () = raise (Conversion_error {node_id; mess
 (** {1 Auxiliaries for conversion} *)
 
 module Opt = struct
-  let map f = function
-    | None -> None
-    | Some x -> Some (f x)
-
-  let get default = function
-    | Some x -> x
-    | None -> default
-
   let force err = function
     | Some x -> x
     | None -> err ()
-
-  let to_list = function
-    | None -> []
-    | Some x -> [x]
 end
 
 module List = struct
@@ -76,7 +64,7 @@ let mk_location = function
   | No_location -> None
 
 let mk_idents ~notation attrs =
-  let f = Opt.get (fun s -> s) notation in
+  let f = Option.value ~default:(fun s -> s) notation in
   List.map_and_last
     (mk_ident [])
     (fun s -> mk_ident attrs (f s))
@@ -94,7 +82,7 @@ let strings_of_name (node : name_id) =
     | _ -> None in
   let namespace_string = string_of_symbol r.namespace in
   let symb_string = string_of_symbol r.symb in
-  Opt.(to_list module_string @ to_list namespace_string @ to_list symb_string)
+  Option.(to_list module_string @ to_list namespace_string @ to_list symb_string)
 
 let name_of_identifier (node: identifier_id) =
   let Identifier r = node.desc in
@@ -106,8 +94,8 @@ let force_one err = function
 
 let mk_module_qident (node: module_id) =
   let Module m = node.desc in
-  let file = mk_idents ~notation:None [] (Opt.to_list (string_of_symbol m.file)) in
-  let name = mk_idents ~notation:None [] (Opt.to_list (string_of_symbol m.name)) in
+  let file = mk_idents ~notation:None [] (Option.to_list (string_of_symbol m.file)) in
+  let name = mk_idents ~notation:None [] (Option.to_list (string_of_symbol m.name)) in
   mk_qualid (file @ name)
 
 let mk_idents_of_name ~notation attrs (node: name_id) =
@@ -117,7 +105,7 @@ let mk_idents_of_identifier ~notation attrs (node: identifier_id) =
   mk_idents ~notation attrs (strings_of_name (name_of_identifier node))
 
 let mk_ident_of_symbol id ~notation attrs sym =
-  let notation = Opt.get (fun s -> s) notation in
+  let notation = Option.value ~default:(fun s -> s) notation in
   mk_ident attrs (notation (Opt.force (conversion_error id "empty symbol") (string_of_symbol sym)))
 
 let mk_idents_of_type (node: type_id) =
@@ -209,7 +197,7 @@ let unroll_name (node : name_id) =
   let aux (node: module_id) =
     let Module r = node.desc in
     string_of_symbol r.file, string_of_symbol r.name in
-  Opt.map aux module_, string_of_symbol symb
+  Option.map aux module_, string_of_symbol symb
 
 let is_infix_identifier (node : identifier_id) =
   let Identifier r = node.desc in
@@ -265,7 +253,7 @@ module Curr = struct
           match !marker_ref with
           | No_symbol -> r.filename
           | Symbol s -> "'@"^s^"@'"^r.filename in
-        Opt.(to_list (mk_location (Source_ptr {r with filename})))
+        Option.(to_list (mk_location (Source_ptr {r with filename})))
 end
 
 let is_true t = match t.term_desc with
@@ -482,7 +470,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
            let binders =
              List.map (mk_binder_of_identifier (curr_attrs @ List.filter_map mk_label r.labels) (mk_pty_of_type r.var_type))
                (list_of_nonempty r.variables) in
-           let triggers = Opt.(get [] (map for_triggers r.triggers)) in
+           let triggers = Option.value ~default:[] (Option.map for_triggers r.triggers) in
            let body = mk_term_of_pred r.pred  in
            T.mk_quant Dterm.DTforall binders triggers body)
 
@@ -530,7 +518,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
                 let left = mk_expr_of_expr r.left in
                 let right = mk_expr_of_expr r.right in
                 E.mk_binop left op right in
-              Opt.(get e1
+              Option.(value ~default:e1
                      (map (E.mk_binop e1 op)
                         (map (M.map mk_expr_of_expr (fun e -> E.mk_binop e op))
                            (M.mk_tree r.more_right)))))
@@ -540,7 +528,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
                 let left = mk_term_of_expr r.left in
                 let right = mk_term_of_expr r.right in
                 T.mk_binnop left op right in
-              Opt.(get t1
+              Option.(value ~default:t1
                      (map (T.mk_binnop t1 op)
                         (map (M.map mk_term_of_expr (fun t -> T.mk_binnop t op))
                            (M.mk_tree r.more_right))))) ()
@@ -638,8 +626,8 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
     | Conditional r ->
         let rec mk_elsifs = function
           | [] ->
-              let open Opt in
-              get (expr_or_term
+              let open Option in
+              value ~default:(expr_or_term
                      ~expr:(fun () -> E.mk_tuple [])
                      ~term:(fun () -> T.mk_truth true) ())
                 (map mk_of_expr r.else_part)
@@ -744,7 +732,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
            let value =
              let pty = mk_pty_of_type r.return_type in
              let spec =
-               let open Opt in
+               let open Option in
                let pre =
                  let curr_attrs = Curr.mk_attrs () in
                  to_list
@@ -757,7 +745,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
                    (map (ensures ?loc:None)
                       (map (T.mk_attrs curr_attrs)
                          (map mk_term_of_pred r.post))) in
-               let reads, writes, xpost = Opt.(get ([], [], []) (map mk_effects r.effects)) in
+               let reads, writes, xpost = Option.(value ~default:([], [], []) (map mk_effects r.effects)) in
                mk_spec ~pre ~post ~reads ~writes ~xpost () in
              let any = mk_any [] Expr.RKnone (Some pty) P.(mk_wild ()) Ity.MaskVisible spec in
              mk_attr (mk_call_id_str ()) any in
@@ -943,7 +931,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
              let aux (node: handler_id) =
                let Handler r = node.desc in
                mk_qualid (mk_idents_of_name ~notation:None [] r.name),
-               Opt.map mk_pattern_of_ident r.arg_id,
+               Option.map mk_pattern_of_ident r.arg_id,
                mk_expr_of_prog r.def in
              List.map aux (list_of_nonempty r.handler) in
            E.mk_match expr [] exn_handlers)
@@ -1024,15 +1012,15 @@ let mk_function_decl (node: function_decl_id) =
       (conversion_error r.name.info.id "quantified or empty function name")
       (mk_idents_of_identifier ~notation:None
          (List.filter_map mk_label r.labels @
-          Opt.(to_list (mk_location r.location)))
+          Option.(to_list (mk_location r.location)))
          r.name) in
   let res_pty =
-    Opt.map mk_pty_of_type r.return_type in
+    Option.map mk_pty_of_type r.return_type in
   let params =
     let aux (node: binder_id) : param =
       let Binder r = node.desc in
       get_pos (),
-      Opt.(map (force_one (conversion_error node.info.id "qualified or empty parameter name"))
+      Option.(map (force_one (conversion_error node.info.id "qualified or empty parameter name"))
              (map (mk_idents_of_identifier ~notation:None [])
                 r.name)),
       false,
@@ -1049,7 +1037,7 @@ let mk_function_decl (node: function_decl_id) =
   match node.info.domain with
   | Term ->
       (* function <id> <params> : <res_ty> <*)
-      [D.mk_logic [{decl with ld_def = Opt.map mk_term_of_expr r.def}]]
+      [D.mk_logic [{decl with ld_def = Option.map mk_term_of_expr r.def}]]
   | Pterm ->
       if params = [] then
         (* val constant <id> : <res_ty> [ensures {result = <def>}] *)
@@ -1063,7 +1051,7 @@ let mk_function_decl (node: function_decl_id) =
                mk_infix left op right) in
         let value =
           let pat = P.mk_wild () in
-          let spec = mk_spec ~post:Opt.(to_list (map mk_post r.def)) () in
+          let spec = mk_spec ~post:Option.(to_list (map mk_post r.def)) () in
           E.mk_any [] Expr.RKnone res_pty pat Ity.MaskVisible spec in
         [D.mk_let ident false Expr.RKfunc value]
       else if r.def = None then
@@ -1077,9 +1065,9 @@ let mk_function_decl (node: function_decl_id) =
         (* function <id> <params> : <res_ty> = <def>
            val <id> <params> : <res_typ> ensures { result = <id> <params> }*)
         let arg_for_param (_, id, _, pty) =
-          T.(mk_cast (mk_var (Qident (Opt.get (mk_ident [] "???") id))) pty) in
+          T.(mk_cast (mk_var (Qident (Option.value ~default:(mk_ident [] "???") id))) pty) in
         let logic_decl =
-          D.mk_logic [{decl with ld_def=Opt.map mk_term_of_expr r.def}] in
+          D.mk_logic [{decl with ld_def=Option.map mk_term_of_expr r.def}] in
         let let_decl =
           let value =
             let pat = P.mk_wild () in
@@ -1101,19 +1089,19 @@ let mk_function_decl (node: function_decl_id) =
       Curr.with_ (r.location, No_symbol)
         (fun () ->
            let spec =
-             let pre = let open Opt in
+             let pre = let open Option in
                let curr_attrs = Curr.mk_attrs () in
                to_list
                  (map requires
                     (map (T.mk_attrs curr_attrs)
                        (map mk_term_of_pred r.pre))) in
-             let post = let open Opt in
+             let post = let open Option in
                let curr_attrs = Curr.mk_attrs () in
                to_list
-                 (map (ensures ?loc:None)
+                 (Option.map (ensures ?loc:None)
                     (map (T.mk_attrs curr_attrs)
                        (map mk_term_of_pred r.post))) in
-             let reads, writes, xpost = Opt.(get ([], [], []) (map mk_effects r.effects)) in
+             let reads, writes, xpost = Option.(value ~default:([], [], []) (map mk_effects r.effects)) in
              (mk_spec ~pre ~post ~reads ~writes ~xpost ()) in
            let expr =
              match r.def with
@@ -1132,7 +1120,7 @@ let mk_function_decl (node: function_decl_id) =
            in
            [D.mk_let ident false Expr.RKnone expr])
   | Pred ->
-      let opt_def = Opt.map mk_term_of_expr r.def in
+      let opt_def = Option.map mk_term_of_expr r.def in
       begin match opt_def with
         | None ->
             (* val predicate <id> <params> *)
@@ -1146,7 +1134,7 @@ let mk_function_decl (node: function_decl_id) =
             let predicate_def =
               (* predicate <id> <params> = <def> *)
               let def =
-                Opt.(get def
+                Option.(value ~default:def
                        (map (fun pos -> T.mk_attr pos def)
                           (mk_location r.location))) in
               D.mk_logic [{decl with ld_type=None; ld_def=Some def}] in
@@ -1220,7 +1208,7 @@ let rec mk_declaration (node : declaration_id) =
       let ident =
         let labels =
           List.filter_map mk_label r.labels @
-          Opt.(to_list (mk_location r.location)) in
+          Option.(to_list (mk_location r.location)) in
         force_one (conversion_error r.name.info.id "quantified or empty name of global reference")
           (mk_idents_of_identifier ~notation:None labels r.name) in
       let pty =
@@ -1318,7 +1306,7 @@ let rec mk_declaration (node : declaration_id) =
       let id =
         force_one (conversion_error node.info.id "quantified or empty name in exception declaration")
           (mk_idents_of_name ~notation:None [] r.name) in
-      let pty = Opt.(get (Ty.mk_tuple []) (map mk_pty_of_type r.arg)) in
+      let pty = Option.(value ~default:(Ty.mk_tuple []) (map mk_pty_of_type r.arg)) in
       [D.mk_exn id pty Ity.MaskVisible]
 
 let mk_theory_declaration (node : theory_declaration_id) =
@@ -1326,7 +1314,7 @@ let mk_theory_declaration (node : theory_declaration_id) =
   | Theory_declaration r ->
       (* Ignore [r.kind], because theory and module is the same *)
       let name =
-        let curr_attrs = Opt.to_list (mk_comment_attr r.comment) in
+        let curr_attrs = Option.to_list (mk_comment_attr r.comment) in
         mk_ident_of_symbol node.info.id ~notation:None curr_attrs r.name in
       let include_vars = List.map Include_Decl.mk_include_variant r.includes in
       let includes, _ =

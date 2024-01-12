@@ -25,13 +25,13 @@ let html_of_string (d : Html.document Js.t) (s:string) =
       [node (d##createTextNode (Js.string s))]
 
 let replace_child p n =
-  Js.Opt.iter (p##.firstChild) (fun c -> Dom.removeChild p c);
+  Js.Option.iter (p##.firstChild) (fun c -> Dom.removeChild p c);
   Dom.appendChild p n
 
 let onload (_event : #Html.event Js.t) : bool Js.t =
   let d = Html.document in
   let body =
-    Js.Opt.get (d##getElementById(Js.string "test"))
+    Js.Option.get (d##getElementById(Js.string "test"))
       (fun () -> assert false) in
   let textbox = Html.createTextarea d in
   textbox##.rows := 20; textbox##.cols := 100;

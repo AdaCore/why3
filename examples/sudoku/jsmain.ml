@@ -178,22 +178,22 @@ module Dom_html = Js_of_ocaml.Dom_html
 
 let onload (_event : #Dom_html.event Js.t) : bool Js.t =
   let (rows, table) = make_board () in
-  let solve = Js.Opt.get (d##getElementById (Js.string "solve"))
+  let solve = Js.Option.get (d##getElementById (Js.string "solve"))
     (fun () -> assert false) in
   solve##.onclick := Dom_html.handler (solve_board rows);
-  let reset = Js.Opt.get (d##getElementById (Js.string "reset"))
+  let reset = Js.Option.get (d##getElementById (Js.string "reset"))
     (fun () -> assert false) in
   reset##.onclick := Dom_html.handler (reset_board rows);
-  let sample1 = Js.Opt.get (d##getElementById (Js.string "sample1"))
+  let sample1 = Js.Option.get (d##getElementById (Js.string "sample1"))
     (fun () -> assert false) in
   sample1##.onclick := Dom_html.handler (load_board rows test1);
-  let sample2 = Js.Opt.get (d##getElementById (Js.string "sample2"))
+  let sample2 = Js.Option.get (d##getElementById (Js.string "sample2"))
     (fun () -> assert false) in
   sample2##.onclick := Dom_html.handler (load_board rows test2);
-  let sample3= Js.Opt.get (d##getElementById (Js.string "sample3"))
+  let sample3= Js.Option.get (d##getElementById (Js.string "sample3"))
     (fun () -> assert false) in
   sample3##.onclick := Dom_html.handler (load_board rows test3);
-  let board = Js.Opt.get (d##getElementById (Js.string "board"))
+  let board = Js.Option.get (d##getElementById (Js.string "board"))
     (fun () -> assert false) in
   Dom.appendChild board table;
   board##.style##.padding := Js.string "40px";

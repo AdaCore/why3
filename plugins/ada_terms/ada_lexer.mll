@@ -127,13 +127,13 @@ rule token = parse
   | (dec+ as i)     ("" as f)    ['e' 'E'] (['-' '+']? dec+ as e)
   | (dec+ as i) '.' (dec* as f) (['e' 'E'] (['-' '+']? dec+ as e))?
   | (dec* as i) '.' (dec+ as f) (['e' 'E'] (['-' '+']? dec+ as e))?
-      { REAL (Number.real_literal ~radix:10 ~neg:false ~int:i ~frac:f ~exp:(Opt.map Lexlib.remove_leading_plus e)) }
+      { REAL (Number.real_literal ~radix:10 ~neg:false ~int:i ~frac:f ~exp:(Option.map Lexlib.remove_leading_plus e)) }
   | '0' ['x' 'X'] (hex+ as i) ("" as f) ['p' 'P'] (['-' '+']? dec+ as e)
   | '0' ['x' 'X'] (hex+ as i) '.' (hex* as f)
         (['p' 'P'] (['-' '+']? dec+ as e))?
   | '0' ['x' 'X'] (hex* as i) '.' (hex+ as f)
         (['p' 'P'] (['-' '+']? dec+ as e))?
-      { REAL (Number.real_literal ~radix:16 ~neg:false ~int:i ~frac:f ~exp:(Opt.map Lexlib.remove_leading_plus e)) }
+      { REAL (Number.real_literal ~radix:16 ~neg:false ~int:i ~frac:f ~exp:(Option.map Lexlib.remove_leading_plus e)) }
   | "(*)"
       { Lexlib.backjump lexbuf 2; LEFTPAR }
   | "(*"

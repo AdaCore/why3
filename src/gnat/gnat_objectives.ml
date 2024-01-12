@@ -343,7 +343,7 @@ let find_next_transformation s (goal: goal_id) =
      was applied *)
   let subtransf = Session_itp.get_transformations s goal in
   if subtransf = [] then
-    try next_transform (Opt.get (parent_transform_name s goal))
+    try next_transform (Option.get (parent_transform_name s goal))
     with Not_found ->
       Gnat_util.abort_with_message ~internal:true
         "unknown transformation found"
@@ -358,7 +358,7 @@ let is_full_split_goal ses (goal: goal_id) =
       applied to it (that we could follow) *)
   if not (Session_itp.get_transformations ses goal = []) then false
   else
-    let tr_name = Opt.get (parent_transform_name ses goal) in
+    let tr_name = Option.get (parent_transform_name ses goal) in
     not (List.mem tr_name strategy) || tr_name = last_transform
 
 let has_already_been_applied s trans (goal: goal_id) =
@@ -436,7 +436,7 @@ let init_cont () =
           files
       in
       (* This is not possible that no file is found *)
-      let file = (Opt.get !file) in
+      let file = (Option.get !file) in
       let abs_file = Session_itp.system_path ses file in
       (if abs_file != Gnat_config.filename then
          (* rename_file takes absolute filenames *)
@@ -968,7 +968,7 @@ let run_goal ?proof_script_filename ?limit ~callback c prover g =
         prover
     in
     let old_file =
-      Opt.get_def None (Opt.map
+      Option.value ~default:None (Option.map
         (fun x -> let pa_node = Session_itp.get_proof_attempt_node session x in
           pa_node.Session_itp.proof_script) old_paid)
     in
@@ -1026,7 +1026,7 @@ let schedule_goal ~callback c g =
   let warn = Gnat_expl.is_warning_reason (Gnat_expl.get_reason check) in
   if Gnat_config.parallel > 1 then begin
     let provers =
-      if warn then [Opt.get (Gnat_config.prover_warn)] else Gnat_config.provers
+      if warn then [Option.get (Gnat_config.prover_warn)] else Gnat_config.provers
     in
     let remaining = ref (List.length provers) in
     let callback pa pas =
@@ -1050,7 +1050,7 @@ let schedule_goal ~callback c g =
     in
     List.iter (fun p -> schedule_goal_with_prover ~callback c g p) provers
   end else begin
-    let p = if warn then Opt.get (Gnat_config.prover_warn)
+    let p = if warn then Option.get (Gnat_config.prover_warn)
       else find_best_untried_prover c.Controller_itp.controller_session g in
     schedule_goal_with_prover ~callback c g p
   end
@@ -1275,7 +1275,7 @@ and replay_goal c goal =
           ("could not replay goal due to missing prover " ^
             pa_prover.Whyconf.prover_name);
           None in
-      Opt.iter (fun prover ->
+      Option.iter (fun prover ->
           let pa_node = Session_itp.get_proof_attempt_node session pa in
           let limit =
             match pa_node.Session_itp.proof_state with
