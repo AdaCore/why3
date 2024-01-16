@@ -2258,10 +2258,11 @@ let export_as_zip s =
            | _ -> dir :: l
          in
          let f = String.concat Filename.dir_sep l in
-         acc ^ " " ^ f)
-      s.session_files dir
+         acc ^ " '" ^ f ^"'")
+      s.session_files ("'" ^ dir ^ "'")
   in
-  let cmd = "cd " ^ cd ^ " ; zip -r " ^ archive ^ " " ^ files in
+  let cmd = "cd '" ^ cd ^ "' ; zip -r '" ^ archive ^ "' " ^ files in
+  Format.eprintf "creating archive using@\n%s@." cmd;
   let n = Sys.command cmd in
   if n = 0 then archive else raise (Sys_error ("cannot produce archive " ^ archive))
 
