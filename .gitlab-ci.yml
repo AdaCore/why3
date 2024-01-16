@@ -63,6 +63,8 @@ build-latest:
   artifacts:
     paths:
       - doc/generated
+      - doc/stdlibdoc
+      - doc/apidoc
     expire_in: 1 day
   extends: .docker_template
 
@@ -159,6 +161,8 @@ doc:
     - build-latest
   script:
     - sphinx-build -W --keep-going -b html doc public
+    - cp -r doc/apidoc public/api
+    - cp -r doc/stdlibdoc public/stdlib
   artifacts:
     paths:
       - public
