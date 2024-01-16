@@ -900,6 +900,8 @@ let ada_lang = get_extra_lang "ada" "Ada"
 let java_lang = get_extra_lang "java" "Java"
 let c_lang = get_extra_lang "c" "C"
 
+let warn_unknown_format = Loc.register_warning "unk_format" "Unknown source format"
+
 let change_lang view lang =
   try
     let lang =
@@ -912,9 +914,11 @@ let change_lang view lang =
       | ".java" -> java_lang ()
       | ".c" -> c_lang ()
       | ".mlw"
-      | ".why" ->
-        why_lang ()
-      | _ -> raise Exit
+      | ".why"
+      | "whyml" ->  why_lang ()
+      | _ ->
+          Loc.warning warn_unknown_format "Unrecognized source format `%s`" lang;
+          raise Exit
     in
     view#source_buffer#set_language (Some lang)
   with
