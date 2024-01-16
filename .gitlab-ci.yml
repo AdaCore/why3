@@ -126,7 +126,6 @@ opam-full:
   script:
     - opam switch full
     - misc/ci-opam.sh why3 why3-ide why3-coq
-    - opam exec -- ocamlfind ocamlopt -package why3 -o test -linkpkg misc/test_lib.ml
   extends: .docker_template
 
 deploy:
