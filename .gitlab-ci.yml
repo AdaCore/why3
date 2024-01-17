@@ -178,7 +178,7 @@ doc:
   dependencies:
     - build-latest
   script:
-    - sphinx-build -W --keep-going -b html doc public
+    - sphinx-build -W --keep-going -b html -d doctrees doc public
     - cp -r doc/apidoc public/api
     - cp -r doc/stdlibdoc public/stdlib
   artifacts:
