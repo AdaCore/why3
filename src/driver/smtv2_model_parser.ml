@@ -480,7 +480,7 @@ module FromModelToTerm = struct
     type_fields : Term.lsymbol list Ty.Mty.t;
     (* Set of coercions for each type from [pinfo.Printer.type_coercions]. *)
     type_coercions : Term.Sls.t Ty.Mty.t;
-    (* Function definiions from the SMT model
+    (* Function definitions from the SMT model
        that are not in [pinfo.Printer.queried_terms]. *)
     type_sorts : Ty.ty Mstr.t;
     (* Sorts defined in the smtv2 file output. *)

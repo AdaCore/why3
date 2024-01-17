@@ -1,0 +1,23 @@
+
+use int.Int
+
+type t
+
+function to_map t : int -> int
+meta "model_projection" function to_map
+
+function get t int : int
+val get (m:t) (x:int) : int
+  ensures { result = get m x }
+
+function set t int int : t
+val set (m:t) (x:int) (y:int) : t
+  ensures { result = set m x y }
+
+type s = { mutable d : t }
+
+val y : s
+
+let g1 () : unit =
+  y.d <- set y.d 1 2 ;
+  assert { get y.d 13 < 41 \/ to_map y.d 14 < 42 }

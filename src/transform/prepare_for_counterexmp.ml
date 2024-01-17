@@ -31,8 +31,8 @@ let prepare_for_counterexmp2 env task =
            the source line of the VC. It should be investigated
            whether this should be made differently. *)
         Introduction.simplify_intros;
-        Intro_vc_vars_counterexmp.intro_vc_vars_counterexmp;
-        Intro_projections_counterexmp.intro_projections_counterexmp env
+        Intro_vc_vars_counterexmp.intro_vc_vars_counterexmp
+        (* Intro_projections_counterexmp.intro_projections_counterexmp env *)
       ]
     in
     Trans.apply comp_trans task
