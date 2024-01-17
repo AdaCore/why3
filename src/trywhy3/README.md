@@ -1,10 +1,22 @@
 Instructions to build TryWhy3
 -----------------------------
 
+  * Compile with
+
+        make trywhy3
+
+  * (Optional) Build a package with
+
+        make trywhy3.tar.gz
+
+    This creates a tarball that can be used if the following steps are
+    performed on a different machine or if only the Why3 components need
+    to be updated. Do not forget about `mode-why3.js` in that case (see below).
+
   * Install Ace
 
-      - put the sources of Ace in directory `src/trywhy3` and copy
-        the `mode-why3.js` file into them:
+      - download the Ace editor to directory `src/trywhy3` and
+        copy the file `mode-why3.js` there:
 
             cd src/trywhy3
             git clone --depth=1 git@github.com:ajaxorg/ace-builds.git
@@ -12,22 +24,16 @@ Instructions to build TryWhy3
 
   * Install Alt-Ergo
 
-      - put the sources of Alt-Ergo in directory `src/trywhy3` and
-        compile the JavaScript worker:
+      - download the sources of Alt-Ergo, compile the JavaScript worker,
+        and copy it to directory `src/trywhy3`:
 
-            cd src/trywhy3
             git clone git@github.com:OCamlPro/alt-ergo.git
             cd alt-ergo
             opam exec make js-worker
-            cp alt-ergo-worker.js ..
+            cp alt-ergo-worker.js .../why3/src/trywhy3/
 
       - alternatively, recover `alt-ergo-worker.js` from a GitHub workflow
         at https://github.com/OCamlPro/alt-ergo/actions/workflows/build_js.yml
-        and put it in directory `src/trywhy3`.
-
-  * Compile with
-
-        make trywhy3
 
   * Test by opening http://0.0.0.0:8080/trywhy3.html after starting a local server:
 
@@ -36,7 +42,7 @@ Instructions to build TryWhy3
 
   * (Optional) Build a package with
 
-        make trywhy3.tar.gz
+        make trywhy3-full.tar.gz
 
     This creates a tarball containing a directory `trywhy3/` which you
     can put on a web server. You may want to add a symbolic link from
