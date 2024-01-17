@@ -36,8 +36,9 @@ do
             bin/why3 config detect
             bench/ide-bench
             ;;
-        web_ide)
-            make web_ide trywhy3
+        trywhy3)
+            make -j2 web_ide
+            make -j2 trywhy3.tar.gz
             ;;
         doc)
             make predoc

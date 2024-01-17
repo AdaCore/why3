@@ -88,7 +88,11 @@ full:
   variables:
     COMPILER: full
   script:
-    - misc/ci-local.sh ide doc web_ide bench
+    - misc/ci-local.sh ide doc trywhy3 bench
+  artifacts:
+    paths:
+      - trywhy3.tar.gz
+    expire_in: 1 day
   extends: .docker_template
 
 nightly-bench:
