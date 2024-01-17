@@ -68,7 +68,7 @@ let introduce_constant ls t_rhs proj_name =
   (* We only allow projections to apply if they produce an element with a new
      model trace. In practice, we forbid proj_name that are not record (".") or
      array attributes like First and Last *)
-  if is_proj_for_array_attr proj_name then
+     (* Format.printf "Proj name is %s, test %b@." proj_name (is_proj_for_array_attr proj_name); *)
     (* introduce new constant c and axiom stating c = t_rhs  *)
     let const_attr = ls.ls_name.id_attrs in
     let const_attr = append_to_model_element_name ~attrs:const_attr ~to_append:proj_name in
@@ -78,8 +78,6 @@ let introduce_constant ls t_rhs proj_name =
     let axiom_name = ls.ls_name.id_string^"_proj_axiom_"^proj_name in
     let id_new = Ident.id_fresh ~attrs:const_attr ?loc:const_loc const_name in
     intro_const_equal_to_term ~term:t_rhs ~id_new:id_new ~axiom_name:axiom_name
-  else
-    []
 
 let get_record_field_suffix projection =
   try
@@ -100,7 +98,7 @@ let rec projections_for_term ls term proj_name applied_projs env map_projs =
      Parameter applied_proj_f is a set of projection functions already applied
      to the term *)
   match (Option.get term.t_ty).ty_node with
-  | Tyapp (ts, [_t_from; _t_to]) when ts.ts_name.id_string = "map" -> begin
+  | Tyapp (ts, [_t_from; _t_to]) when Ty.ts_equal ts Ty.ts_func -> begin
       let pfs = get_list_projs term map_projs in
       match pfs with
       | [] ->
@@ -125,6 +123,7 @@ let rec projections_for_term ls term proj_name applied_projs env map_projs =
       let pfs = get_list_projs term map_projs in
       match pfs with
       | [] ->
+        (* Format.printf "empty %a@." Pretty.print_ls ls; *)
           (* There is no projection function for the term
 	    -> the projection consists of definition of constant c and axiom  c = p
 	  *)
@@ -134,6 +133,7 @@ let rec projections_for_term ls term proj_name applied_projs env map_projs =
 	   f = pf_n .. pf_1 where pf_1 is an element of pfs *)
 	List.fold_left
 	  (fun l pf_1 ->
+        (* Format.printf "here %a, with projs %a@." Pretty.print_ls ls (Pp.print_list Pp.comma Pretty.print_ls) pfs; *)
 	    if Term.Sls.mem pf_1 applied_projs then
 	      (* Do not apply the same projection twice *)
 	      l @ introduce_constant ls term proj_name
@@ -167,18 +167,16 @@ let intro_proj_for_ls env map_projs ls_projected =
      @param map_projs maps types to projection function for these types
      @param ls_projected the attribute symbol that should be projected
   *)
-  if not (Sattr.mem Ident.model_projected_attr ls_projected.ls_name.id_attrs)
-  then
+  (* if not (Sattr.mem Ident.model_projected_attr ls_projected.ls_name.id_attrs)
+  then Format.printf "%a has no attribute [model projected]@." Pretty.print_ls ls_projected; *)
+  match ls_projected.ls_args, ls_projected.ls_value with
     (* ls_projected has not an attribute "model_projected" *)
-    []
-  else
-    match ls_projected.ls_value with
-    | None -> []
-    | Some _ ->
+    | [], Some _ ->
 
       (* Create term from ls_projected *)
       let t_projected = Term.t_app ls_projected [] ls_projected.ls_value in
       projections_for_term ls_projected t_projected "" Term.Sls.empty env map_projs
+    | _ -> []
 
 let introduce_projs env map_projs decl =
   match decl.d_node with
@@ -220,6 +218,7 @@ let meta_transform2 f : Task.task Trans.trans =
   Trans.bind list_decl (fun x -> Trans.add_decls x)
 
 let encapsulate env projs : Task.task Trans.trans =
+  (* Format.printf "Introducing projections for counterexamples @ %a@." (Pp.print_list Pp.semi Pretty.print_ls) (Sls.elements projs); *)
   let map_projs = build_projections_map projs in
   meta_transform2 (fun d -> introduce_projs env map_projs d.Task.task_decl.td_node)
 

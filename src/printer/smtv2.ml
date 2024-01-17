@@ -299,14 +299,14 @@ let collect_model_ls info ls =
     | [ty] ->
       let coercions = Sls.add ls (Mty.find_def Sls.empty ty info.type_coercions) in
       info.type_coercions <- Mty.add ty coercions info.type_coercions
-    | _ -> ()
+    | _ -> assert false
     end;
   if Sls.mem ls info.meta_record_def then
     begin match ls.ls_args with
     | [ty] ->
       let fields = ls :: (Mty.find_def [] ty info.type_fields) in
       info.type_fields <- Mty.add ty fields info.type_fields
-    | _ -> ()
+    | _ -> assert false
     end;
   if relevant_for_counterexample ls.ls_name then
     info.info_model <-

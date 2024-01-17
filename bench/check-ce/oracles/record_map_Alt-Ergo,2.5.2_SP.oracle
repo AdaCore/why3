@@ -3,16 +3,16 @@
   - Concrete RAC: INCOMPLETE (terminated because an undefined argument was passed to (@))
   - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to ([]) at "bench/check-ce/record_map.mlw", line 43, characters 2-15)
 - Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated with uncaught exception)
-  - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Ident f is not yet declared`)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Ident f is not yet declared`)
 - Selected model 2: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated with uncaught exception)
-  - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Ident f is not yet declared`)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Ident f is not yet declared`)
 File "bench/check-ce/record_map.mlw", line 41, characters 12-22:
 Sub-goal Postcondition of goal map_record_proj_test1'vc.
 Prover result is: Unknown (unknown) (6 steps).
 The following counterexample model could not be verified
-  (both RAC terminated with uncaught exception):
+  (both RAC terminated with uncaught exception `Ident f is not yet declared`):
 File record_map.mlw:
   Line 6:
     .field_f : r -> int = [|_ => -2|]
