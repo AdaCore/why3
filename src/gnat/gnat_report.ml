@@ -113,7 +113,7 @@ let get_cntexmp_model = function
       let rcd_only_cntexmp_model = [ "cntexmp", (Model_parser.json_model m) ] in
       match r with
       | None -> rcd_only_cntexmp_model
-      | Some (Check_ce.RAC_not_done s) -> rcd_only_cntexmp_model
+      | Some (Check_ce.RAC_not_done _) -> rcd_only_cntexmp_model
       | Some (Check_ce.RAC_done (state, _log)) ->
           List.append
             rcd_only_cntexmp_model
@@ -193,7 +193,7 @@ let get_warnings () =
 let get_timings () =
   let l = Hashtbl.fold (fun k v acc -> (k,v)::acc) (Util.get_timings ()) [] in
   let get_name s = s in
-  "timings", Record (List.map (fun (k,(v,n)) -> get_name k, StandardFloat v) l)
+  "timings", Record (List.map (fun (k,(v,_n)) -> get_name k, StandardFloat v) l)
 
 let get_entity () =
   "entity", Int Gnat_config.entity

@@ -131,8 +131,21 @@ let set_debug_flags_gnatprove () =
   let debug_sp = Debug.register_flag "vc_sp"
     ~desc:"Use@ 'Efficient@ Weakest@ Preconditions'@ for@ verification." in
   Debug.set_flag debug_sp;
-  (* We should use Typing.warn_useless_at, but it is not exported*)
+  (* Reduction_engine.warn_reduction_aborted *)
+  let warn_reduction_aborted = Loc.register_warning "reduction_aborted" "" in
+  (* We should use Typing.warn_useless_at and Typing.warn_unused_expression, but they are not exported*)
   let warning_useless_at = Loc.register_warning "useless_at"
     "Warning@ for@ useless@ at/old." in
+  let warn_unused_expression = Loc.register_warning "unused_expression"
+    "Warning@ for@ useless@ expression." in
+  (* Export from Session_itp *)
+  let warn_missing_shapes = Loc.register_warning "missing_shapes"
+    "Warn about missing shape file or missing compression support"
+  in
   Loc.disable_warning warning_useless_at;
+  Loc.disable_warning warn_unused_expression;
+  Loc.disable_warning warn_reduction_aborted;
+  Loc.disable_warning Theory.warn_axiom_abstract;
+  Loc.disable_warning warn_missing_shapes;
   Loc.disable_warning Dterm.warn_unused_variable
+

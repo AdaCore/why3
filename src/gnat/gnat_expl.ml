@@ -162,12 +162,12 @@ type limit_mode =
 
 
 let check_compare a b =
-  let c = Pervasives.compare a.id b.id in
+  let c = Stdlib.compare a.id b.id in
   if c <> 0 then c
-  else Pervasives.compare a.reason b.reason
+  else Stdlib.compare a.reason b.reason
 
 let check_equal a b =
-  Pervasives.(=) a.id b.id && Pervasives.(=) a.reason b.reason
+  Stdlib.(=) a.id b.id && Stdlib.(=) a.reason b.reason
 
 let check_hash e = Hashcons.combine (Hashtbl.hash e.id) (Hashtbl.hash e.reason)
 
