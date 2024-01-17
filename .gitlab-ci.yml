@@ -132,6 +132,20 @@ opam-full:
     - misc/ci-opam.sh why3 why3-ide why3-coq
   extends: .docker_template
 
+trywhy3:
+  stage: nightly
+  image: "debian:bullseye-slim"
+  dependencies:
+    - full
+  script:
+    - misc/ci-trywhy3.sh
+  when: manual
+  artifacts:
+    paths:
+      - trywhy3-full.tar.gz
+  tags:
+    - large
+
 deploy:
   stage: deploy
   image: docker
