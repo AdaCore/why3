@@ -1,0 +1,47 @@
+module SubstractionSingle
+  use real.RealInfix
+  use real.Abs
+  use ufloat.USingle
+
+  let ghost substraction_errors_basic (a b c : usingle)
+    ensures {
+      let exact = to_real a -. to_real b -. to_real c in
+      let exact_abs = abs (to_real a) +. abs (to_real b) +. abs (to_real c) in
+      abs (to_real result -. exact) <=. 2. *. eps *. exact_abs
+    }
+  = a --. b --. c
+
+  let ghost substraction_errors (a b c d e f : usingle)
+    ensures {
+      let exact = (to_real a -. to_real b -. to_real c) -. (to_real d -.
+                  (to_real e -. to_real f)) in
+      let exact_abs = abs (to_real a) +. abs (to_real b) +. abs (to_real c) +.
+                      abs (to_real d) +. abs (to_real e) +. abs (to_real f) in
+      abs (to_real result -. exact) <=. 5. *. eps *. exact_abs
+    }
+  = (a --. b --. c) --. (d --. (e --. f))
+end
+
+module SubstractionDouble
+  use real.RealInfix
+  use real.Abs
+  use ufloat.UDouble
+
+  let ghost substraction_errors_basic (a b c : udouble)
+    ensures {
+      let exact = to_real a -. to_real b -. to_real c in
+      let exact_abs = abs (to_real a) +. abs (to_real b) +. abs (to_real c) in
+      abs (to_real result -. exact) <=. 2. *. eps *. exact_abs
+    }
+  = a --. b --. c
+
+  let ghost substraction_errors (a b c d e f : udouble)
+    ensures {
+      let exact = (to_real a -. to_real b -. to_real c) -. (to_real d -.
+                  (to_real e -. to_real f)) in
+      let exact_abs = abs (to_real a) +. abs (to_real b) +. abs (to_real c) +.
+                      abs (to_real d) +. abs (to_real e) +. abs (to_real f) in
+      abs (to_real result -. exact) <=. 5. *. eps *. exact_abs
+    }
+  = (a --. b --. c) --. (d --. (e --. f))
+end
