@@ -1240,7 +1240,7 @@ argument of type ``int`` and thus can be used to build values such as
     type option 'a = None | Some 'a
 
 (This type is already part of Why3 standard library, in module
-`option.Option <http://why3.lri.fr/stdlib/option.html>`_.)
+`option.Option <https://www.why3.org/stdlib/option.html>`_.)
 
 A data type can be recursive. The archetypal example is the type of
 polymorphic lists:
@@ -1250,7 +1250,7 @@ polymorphic lists:
     type list 'a = Nil | Cons 'a (list 'a)
 
 (This type is already part of Why3 standard library, in module
-`list.List <http://why3.lri.fr/stdlib/list.html>`_.)
+`list.List <https://www.why3.org/stdlib/list.html>`_.)
 
 Mutually recursive type definitions are supported.
 
@@ -1774,7 +1774,7 @@ The Why3 Standard Library
 
 The Why3 standard library provides general-purpose modules, to be used
 in logic and/or programs. It can be browsed on-line at
-http://why3.lri.fr/stdlib/. Each file contains one or several modules.
+https://www.why3.org/stdlib/. Each file contains one or several modules.
 To ``use`` or ``clone`` a module ``M`` from file :file:`file.mlw`, use the
 syntax ``file.M``, since :file:`file.mlw` is available in Why3’s default load
 path. For instance, the module of integers and the module of arrays
@@ -1823,7 +1823,7 @@ proper pre-conditions, and with the usual infix syntax ``x / y`` and ``x
 % y``.
 
 The detailed documentation of the library is available on-line at
-http://why3.lri.fr/stdlib/int.html
+https://www.why3.org/stdlib/int.html.
 
 
 Library ``array``: array data structure
@@ -1844,4 +1844,4 @@ where ``l`` is the desired length and ``v`` is the initial value of each
 cell.
 
 The detailed documentation of the library is available on-line at
-http://why3.lri.fr/stdlib/array.html
+https://www.why3.org/stdlib/array.html.
