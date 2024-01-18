@@ -195,8 +195,6 @@ let c_empty = {
   c_gl = true;
 }
 
-let c_glob = ref c_empty
-
 let c_find_tv c u = Mtv.find u c.c_tv
 let c_find_vs c v = Mvs.find v c.c_vs
 let c_find_hs c h = Mhs.find h c.c_hs
@@ -321,19 +319,9 @@ let rec vc pp dd e c bl =
       let ww = vc (not pp) (not dd) e cc [] in
       close (w_and (vc pp dd e c []) ww)
   | Edef (e,flat,dfl) -> assert (bl = []);
-      let pl = List.map (fun (h,w,pl,_) -> Pc (h,w,pl)) dfl in
-      let c = if flat then c else fst (havoc c [] pl) in
-      let bl = List.map (fun (_,_,pl,d) -> Bc (c, fun c bl ->
-        let c, close = consume true c pl bl in
-        close (vc true false d c []))) dfl in
-      let cc, close = consume flat c pl bl in
-      let wl = List.map (fun (_,w,pl,d) ->
-        let c, vl = havoc (if flat then c else cc) w pl in
-        w_forall vl (vc false pp d c [])) dfl in
-      (* VC(e) must be done after wl for c_glob *)
-      let ws = vc pp dd e cc [] in
-      if flat then w_and_l ((close ws :: wl))
-              else close (w_and_l (ws :: wl))
+      let c, close, wl = vc_defn pp c flat dfl in
+      (* close is identity when flat is false *)
+      w_and_l (close (vc pp dd e c []) :: wl)
   | Eset (e,vtl) -> assert (bl = []);
       let add cc (v,s) = c_add_vs cc v (c_inst_t c s) in
       vc pp dd e (List.fold_left add c vtl) bl
@@ -346,13 +334,24 @@ let rec vc pp dd e c bl =
         (c_inst_t c f) (vc pp dd e c bl)
   | Ebox e -> assert (bl = []); vc dd dd e c bl
   | Ewox e -> assert (bl = []); vc pp pp e c bl
-  | Eany   -> assert (bl = []); c_glob := c; w_true
+  | Eany   -> assert (bl = []); w_true
+
+and vc_defn pp c flat dfl =
+  let pl = List.map (fun (h,w,pl,_) -> Pc (h,w,pl)) dfl in
+  let cc = if flat then c else fst (havoc c [] pl) in
+  let bl = List.map (fun (_,_,pl,d) -> Bc (cc, fun c bl ->
+    let c, close = consume true c pl bl in
+    close (vc true false d c []))) dfl in
+  let c, close = consume flat cc pl bl in
+  c, close, List.map (fun (_,w,pl,d) ->
+    let c, vl = havoc (if flat then cc else c) w pl in
+    w_forall vl (vc false pp d c [])) dfl
 
 let vc_expr c e = vc_simp (vc true true e c []).wp
 
 let vc_defn c flat dfl =
-  let w = vc true true (Edef (Eany,flat,dfl)) c [] in
-  !c_glob, vc_simp w.wp
+  let c,_,wl = vc_defn true c flat dfl in
+  c, List.map2 (fun (h,_,_,_) w -> h, vc_simp w.wp) dfl wl
 
 let () = Exn_printer.register (fun fmt -> function
   | BadUndef h -> Format.fprintf fmt

@@ -7,4 +7,4 @@ val c_empty : context
 
 val vc_expr : context -> expr -> term
 
-val vc_defn : context -> bool -> defn list -> context * term
+val vc_defn : context -> bool -> defn list -> context * (hsymbol * term) list

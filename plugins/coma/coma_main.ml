@@ -35,30 +35,24 @@ let parse_simpl_use env tuc = function
       let tuc = Theory.use_export tuc th in
       Theory.close_scope ~import tuc
 
-let add_def (c,tuc) (s,flat,dfl) =
-  let c,f = vc_defn c flat dfl in
-  let prs = Decl.create_prsymbol (Ident.id_fresh ("vc_" ^ s)) in
-  c, Theory.add_prop_decl tuc Decl.Pgoal prs f
+let add_def (ctx,c,tuc) b =
+  let flat, bl = match b with
+    | Blo b -> false, b
+    | Def d -> true, [d] in
+  let ctx, dfl = type_defn_list tuc ctx flat bl in
+  Debug.dprintf debug "\n@[%a@]@." Coma_syntax.PP.pp_def_block dfl;
+  let c, gl = vc_defn c flat dfl in
+  let add tuc ({hs_name = {Ident.id_string = s}},f) =
+    let pr = Decl.create_prsymbol (Ident.id_fresh ("vc_" ^ s)) in
+    Theory.add_prop_decl tuc Decl.Pgoal pr f in
+  ctx, c, List.fold_left add tuc gl
 
 let read_channel_coma env path file c =
   let uses, ast = Coma_lexer.parse_channel file c in
   let tuc = Theory.create_theory ~path (Ident.id_fresh "Coma") in
   let tuc = Theory.use_export tuc Theory.bool_theory in
   let tuc = List.fold_left (parse_simpl_use env) tuc uses in
-  let _, ast =
-    List.fold_left_map
-      (fun ctx ->
-         function Blo b -> type_defn_list tuc ctx false b
-                | Def d -> type_defn_list tuc ctx true [d])
-      ctx0 ast in
-  List.iter (Debug.dprintf debug "\n@[%a@]@." Coma_syntax.PP.pp_def_block) ast;
-  let ast =
-    List.map
-      (fun d ->
-        let {hs_name}, _, _, _ = List.hd d in
-        hs_name.Ident.id_string, false, d)
-      ast in
-  let _, tuc = List.fold_left add_def (c_empty, tuc) ast in
+  let _,_,tuc = List.fold_left add_def (ctx0,c_empty,tuc) ast in
   Wstdlib.Mstr.singleton "Coma" (Theory.close_theory tuc)
 
 let () = Env.register_format Env.base_language "coma" ["coma"] read_channel_coma
