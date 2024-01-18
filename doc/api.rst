@@ -7,7 +7,7 @@ This chapter is a tutorial for the users who want to link their own
 OCaml code with the Why3 library. We progressively introduce the way one
 can use the library to build terms, formulas, theories, proof tasks,
 call external provers on tasks, and apply transformations on tasks. The
-complete documentation for API calls is given at URL |apiurl|.
+complete documentation for API calls is given at URL https://www.why3.org/api/.
 
 We assume the reader has a fair knowledge of the OCaml language. Notice
 that the Why3 library must be installed, see :numref:`sec.installlib`.
@@ -519,8 +519,8 @@ trees, and finally the OCaml module ``Ptree_helpers`` which contains
 helpers for building those trees and a more concise and friendly
 manner than the low-level constructors. The latter two OCaml modules
 are documented in the online API documentation, respectively for
-`Ptree <http://why3.lri.fr/api/Ptree.html>`_ and
-`Ptree_helpers <http://why3.lri.fr/api/Ptree_helpers.html>`_.
+`Ptree <https://www.why3.org/api/Ptree.html>`_ and
+`Ptree_helpers <https://www.why3.org/api/Ptree_helpers.html>`_.
 
 .. literalinclude:: ../examples/use_api/mlw_tree.ml
    :language: ocaml
@@ -893,7 +893,7 @@ The structure of JSON output is described in :numref:`sec.jsonce`.
 
 In the code above, the variable ``m`` has type ``Model_parser.model``.
 This type is described in
-`Model_parser <http://why3.lri.fr/api/Model_parser.html>`_.
+`Model_parser <https://www.why3.org/api/Model_parser.html>`_.
 
 
 Checking counterexamples

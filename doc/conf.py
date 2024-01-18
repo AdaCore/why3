@@ -174,6 +174,4 @@ numfig = True
 
 rst_prolog = '''
 .. |whypath| replace:: ``why3-{v}``
-
-.. |apiurl| replace:: http://why3.lri.fr/api-{v}/
 '''.format(v=version)

@@ -2161,7 +2161,7 @@ let save fname shfname session =
   let chsh = Compress.Compress_z.open_out shfname in
   let fmt = formatter_of_out_channel ch in
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
-  fprintf fmt "<!DOCTYPE why3session PUBLIC \"-//Why3//proof session v5//EN\"@ \"http://why3.lri.fr/why3session.dtd\">@\n";
+  fprintf fmt "<!DOCTYPE why3session PUBLIC \"-//Why3//proof session v5//EN\"@ \"https://www.why3.org/why3session.dtd\">@\n";
   fprintf fmt "@[<v 0><why3session shape_version=\"%a\">"
     Termcode.pp_sum_shape_version session.shapes.shape_version;
   let prover_ids = session.session_prover_ids in

@@ -216,7 +216,7 @@ installed separately, and then Why3 needs to be configured to use them.
 There is no need to install automatic provers, e.g., SMT solvers, before
 compiling and installing Why3. For installation of external provers,
 please refer to the specific section about provers from
-http://why3.lri.fr/. (If you have installed Why3 via Opam, note that you can
+https://www.why3.org/. (If you have installed Why3 via Opam, note that you can
 install the SMT solver Alt-Ergo via Opam as well.)
 
 Once you have installed a prover, or a new version of a prover, you have

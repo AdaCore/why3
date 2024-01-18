@@ -16,10 +16,6 @@ Any Why3 tool (:why3:tool:`why3 prove`, :why3:tool:`why3 ide`, etc.)
 can be passed a file with a suffix :file:`.c`, :file:`.py` or
 :file:`.mlcfg`, which triggers the corresponding input format.
 
-The input formats for C and Python can also be used in on-line
-versions of Why3, at http://why3.lri.fr/micro-C/ and
-http://why3.lri.fr/python/, respectively.
-
 .. index:: micro-C
 .. _format.micro-C:
 
