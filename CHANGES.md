@@ -1,5 +1,16 @@
 :x: marks a potential source of incompatibility
 
+Standard library
+  * new library `ufloat`: unbounded floating-point numbers
+
+Core
+  * extended notion of strategies: goal-oriented strategies
+
+Plugins
+  * new goal-oriented strategy `forward_propagation` to automatically
+    propagate rounding errors in formulas involving unbounded
+    floats. See examples in `examples/numeric`
+
 Version 1.7.0, November 24, 2023
 --------------------------------
 
