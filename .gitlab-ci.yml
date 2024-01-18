@@ -88,7 +88,11 @@ full:
   variables:
     COMPILER: full
   script:
-    - misc/ci-local.sh ide doc web_ide bench
+    - misc/ci-local.sh ide doc trywhy3 bench
+  artifacts:
+    paths:
+      - trywhy3.tar.gz
+    expire_in: 1 day
   extends: .docker_template
 
 nightly-bench:
@@ -127,6 +131,20 @@ opam-full:
     - opam switch full
     - misc/ci-opam.sh why3 why3-ide why3-coq
   extends: .docker_template
+
+trywhy3:
+  stage: nightly
+  image: "debian:bullseye-slim"
+  dependencies:
+    - full
+  script:
+    - misc/ci-trywhy3.sh
+  when: manual
+  artifacts:
+    paths:
+      - trywhy3-full.tar.gz
+  tags:
+    - large
 
 deploy:
   stage: deploy
@@ -180,6 +198,6 @@ pages:
       - public
     expire_in: 1 day
   only:
-    - master
+    - stable
   tags:
     - small
