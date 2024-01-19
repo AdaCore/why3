@@ -214,6 +214,13 @@ let c_add_hs c h k = { c with c_hs = Mhs.add h k c.c_hs ;
 let callsym sf h c bl =
   c_find_hs c h (sf && (c.c_gl || Shs.mem h c.c_lc)) c bl
 
+let nasty check pl = List.exists (function
+  | Pv _ | Pr _ -> false | Pt _ -> true
+  | Pc (_,_,pl) -> check pl) pl
+
+let unmergeable = nasty Util.ttrue
+let unspeccable = nasty unmergeable
+
 let rec consume merge c pl bl =
   let eat (c,zl,hl,mr) p b = match p,b with
     | Pt u, Bt t -> c_add_tv c u t, zl, hl, mr
@@ -234,8 +241,7 @@ let rec consume merge c pl bl =
   c, discharge zl hl
 
 and factorize merge c zl0 hl h wr pl kk =
-  if Debug.test_flag debug_slow || List.exists (function
-    | Pt _ | Pc _ -> true | Pv _ | Pr _ -> false) pl then kk,zl0,hl else
+  if Debug.test_flag debug_slow || unmergeable pl then kk,zl0,hl else
   let dup (zl,zv) v = let z = c_clone_vs c v in z::zl, Mvs.add z v zv in
   let zl, zv = List.fold_left (fun a -> function Pt _ | Pc _ -> assert false
     | Pv v | Pr v -> dup a v) (List.fold_left dup (zl0, Mvs.empty) wr) pl in
@@ -352,6 +358,27 @@ let vc_expr c e = vc_simp (vc true true e c []).wp
 let vc_defn c flat dfl =
   let c,_,wl = vc_defn true c flat dfl in
   c, List.map2 (fun (h,_,_,_) w -> h, vc_simp w.wp) dfl wl
+
+let to_spec_attr = Ident.create_attribute "coma:to_spec"
+let hs_to_spec h = Ident.Sattr.mem to_spec_attr h.hs_name.id_attrs
+
+let vc_spec c h w pl =
+  if not (hs_to_spec h) || unspeccable pl then [] else
+  let id_pre = Ident.id_fresh (h.hs_name.id_string ^ "'pre") in
+  let on_write (ul,c) v =
+    let u = c_clone_vs c v in
+    u::ul, c_add_vs c v (t_var u) in
+  let ul, c = List.fold_left on_write ([],c) w in
+  let on_param ul = function
+    | Pt _ -> assert false
+    | Pv v -> let u = c_clone_vs c v in
+              u::ul, Bv (t_var u)
+    | Pr r -> let u = c_clone_vs c r in
+              u::ul, Br (t_var u, u)
+    | Pc _ -> ul, Bc (c, fun _ _ -> w_true) in
+  let ul,bl = Lists.map_fold_left on_param ul pl in
+  let w_pre = callsym true h c bl in
+  [id_pre, List.rev ul, vc_simp w_pre.wp]
 
 let () = Exn_printer.register (fun fmt -> function
   | BadUndef h -> Format.fprintf fmt

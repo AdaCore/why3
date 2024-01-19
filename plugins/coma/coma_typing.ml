@@ -52,19 +52,21 @@ let find_ref ctx (id: Ptree.ident) =
     | Typ _ -> Loc.errorm ~loc:id.id_loc "[coma typing] the symbol %s is not a reference" id.id_str
   with Not_found -> Loc.errorm ~loc:id.id_loc "[coma typing] unbound variable %s" id.id_str
 
+let create_user_id = Typing.Unsafe.create_user_prog_id
+
 let rec type_param0 tuc ctx = function
   | PPv (id, ty) ->
       let ty = Typing.ty_of_pty tuc ty in
-      let vs = create_vsymbol (id_fresh ~loc:id.id_loc id.id_str) ty in
+      let vs = create_vsymbol (create_user_id id) ty in
       Pv vs
   | PPr (id, ty) ->
       let ty = Typing.ty_of_pty tuc ty in
-      let vs = create_vsymbol (id_fresh ~loc:id.id_loc id.id_str) ty in
+      let vs = create_vsymbol (create_user_id id) ty in
       Pr vs
   | PPc (id, w, pl) ->
       let _ctx1, params = Lists.map_fold_left (type_param tuc) ctx pl in
       let w = List.map (find_ref ctx) w in
-      let hs = create_hsymbol (id_fresh ~loc:id.id_loc id.id_str) in
+      let hs = create_hsymbol (create_user_id id) in
       Pc (hs, w, params)
   | PPt id ->
       let ts = tv_of_string id.id_str in
@@ -143,7 +145,7 @@ let rec type_expr tuc ctx { pexpr_desc=d; pexpr_loc=loc } =
         (match tt.t_ty with
          | Some tty when ty_equal tty ty -> ()
          | _ -> Loc.errorm ~loc:id.id_loc "[coma typing] type error with `&%s' assignation" id.id_str);
-        let vs = create_vsymbol (id_fresh ~loc:id.id_loc id.id_str) ty in
+        let vs = create_vsymbol (create_user_id id) ty in
         let ctx = if mut then add_ref vs ctx else add_var vs ctx in
         ctx, (vs,tt, mut)
       in
@@ -183,7 +185,7 @@ and type_defn_list tuc ctx notrec dl =
     Lists.map_fold_left
       (fun acc { pdefn_desc = d; pdefn_loc=loc} ->
          let id, pl = d.pdefn_name, d.pdefn_params in
-         let h = create_hsymbol (id_fresh ~loc:id.id_loc id.id_str) in
+         let h = create_hsymbol (create_user_id id) in
          let _, params = Lists.map_fold_left (type_param tuc) ctx0 pl in
          let writes = List.map (find_ref ctx) d.pdefn_writes in
          add_hdl h writes params acc, (h, writes, params, loc, d.pdefn_body))

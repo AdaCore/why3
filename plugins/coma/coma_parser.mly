@@ -52,7 +52,7 @@ coma_top_lvl:
   { Lets $2 } */
 
 defn(X):
-| id=lident w=prewrites p=coma_params X e=coma_prog
+| id=attrs(lident_nq) w=prewrites p=coma_params X e=coma_prog
   { let d = { pdefn_name = id; pdefn_writes = w;
               pdefn_params = p; pdefn_body = e } in
     mk_defn d $loc }
@@ -70,8 +70,10 @@ coma_bloc:
   { fun e -> (mk_pexpr (PEdef (e, true, dl)) $loc) }
 
 coma_let:
-| AMP id=lident ty=oftyp EQUAL LEFTBRC t=term RIGHTBRC { id, t, ty, true }
-| id=lident ty=oftyp EQUAL LEFTBRC t=term RIGHTBRC { id, t, ty, false }
+| AMP id=attrs(lident_nq) ty=oftyp EQUAL LEFTBRC t=term RIGHTBRC
+  { id, t, ty, true }
+| id=attrs(lident_nq) ty=oftyp EQUAL LEFTBRC t=term RIGHTBRC
+  { id, t, ty, false }
 
 coma_set:
 | AMP id=lident LARROW LEFTBRC t=term RIGHTBRC { id, t }

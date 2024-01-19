@@ -9,6 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 open Why3
+open Term
 open Coma_syntax
 open Coma_typing
 open Coma_vc
@@ -45,7 +46,12 @@ let add_def (ctx,c,tuc) b =
   let add tuc ({hs_name = {Ident.id_string = s}},f) =
     let pr = Decl.create_prsymbol (Ident.id_fresh ("vc_" ^ s)) in
     Theory.add_prop_decl tuc Decl.Pgoal pr f in
-  ctx, c, List.fold_left add tuc gl
+  let tuc = List.fold_left add tuc gl in
+  let add tuc (id,vl,f) =
+    let ls = create_psymbol id (List.map (fun v -> v.vs_ty) vl) in
+    Theory.add_logic_decl tuc [Decl.make_ls_defn ls vl f] in
+  let add tuc (h,w,pl,_) = List.fold_left add tuc (vc_spec c h w pl) in
+  ctx, c, List.fold_left add tuc dfl
 
 let read_channel_coma env path file c =
   let uses, ast = Coma_lexer.parse_channel file c in
