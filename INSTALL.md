@@ -32,5 +32,5 @@ Detailed instructions
 ---------------------
 
 For detailed instructions and required dependencies, please see
-the manual [doc/latex/manual.pdf](http://why3.lri.fr/manual.pdf), Chapter 5
-[Compilation, Installation](http://why3.lri.fr/doc/install.html).
+the manual:
+[Compilation, Installation](https://www.why3.org/doc/install.html).
