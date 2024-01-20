@@ -1,5 +1,12 @@
 :x: marks a potential source of incompatibility
 
+Version 1.7.1, January 20, 2024
+-------------------------------
+
+Bug fixes
+  * restored syntax highlighting in IDE
+  * improved detection of Isabelle 2022 and Alt-Ergo 2.5
+
 Version 1.7.0, November 24, 2023
 --------------------------------
 
