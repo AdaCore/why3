@@ -375,8 +375,9 @@ and vc_defn pp c flat dfl =
 
 let vc_expr c e = vc_simp (vc true true e c []).wp
 
-let vc_defn c flat dfl =
-  let c,_,wl = vc_defn true c flat dfl in
+let vc_defn c _flat dfl =
+  (* top-level definitions are not flat *)
+  let c,_,wl = vc_defn true c false dfl in
   c, List.map2 (fun (h,_,_,_) w -> h, vc_simp w.wp) dfl wl
 
 let extspec_attr = create_attribute "coma:extspec"
