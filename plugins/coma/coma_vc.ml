@@ -345,8 +345,8 @@ let rec vc pp dd e c bl =
       let ww = vc (not pp) (not dd) e cc [] in
       close (w_and (vc pp dd e c []) ww)
   | Edef (e,flat,dfl) -> assert (bl = []);
-      let c, close, wl = vc_defn pp c flat dfl in
-      (* close is identity when flat is false *)
+      (* recursive definitions are not mergeable *)
+      let c, close, wl = vc_defn pp c flat true dfl in
       w_and_l (close (vc pp dd e c []) :: wl)
   | Eset (e,vtl) -> assert (bl = []);
       let add cc (v,s) = c_add_vs cc v (c_inst_t c s) in
@@ -362,22 +362,22 @@ let rec vc pp dd e c bl =
   | Ewox e -> assert (bl = []); vc pp pp e c bl
   | Eany   -> assert (bl = []); w_true
 
-and vc_defn pp c flat dfl =
+and vc_defn pp c flat merge dfl =
   let pl = List.map (fun (h,w,pl,_) -> Pc (h,w,pl)) dfl in
   let cc = if flat then c else fst (havoc c [] pl) in
   let bl = List.map (fun (_,_,pl,d) -> Bc (cc, fun c bl ->
     let c, close = consume true c pl bl in
     close (vc true false d c []))) dfl in
-  let c, close = consume flat cc pl bl in
+  let c, close = consume (flat && merge) cc pl bl in
   c, close, List.map (fun (_,w,pl,d) ->
     let c, vl = havoc (if flat then cc else c) w pl in
     w_forall vl (vc false pp d c [])) dfl
 
 let vc_expr c e = vc_simp (vc true true e c []).wp
 
-let vc_defn c _flat dfl =
-  (* top-level definitions are not flat *)
-  let c,_,wl = vc_defn true c false dfl in
+let vc_defn c flat dfl =
+  (* top-level definitions are not mergeable *)
+  let c,_,wl = vc_defn true c flat false dfl in
   c, List.map2 (fun (h,_,_,_) w -> h, vc_simp w.wp) dfl wl
 
 let extspec_attr = create_attribute "coma:extspec"
