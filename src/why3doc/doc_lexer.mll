@@ -273,6 +273,9 @@ and doc fmt block headings = parse
            { if not block then pp_print_string fmt "<p>";
              Pp.html_char fmt c;
              doc fmt true headings lexbuf }
+  | "(*)"  { if not block then pp_print_string fmt "<p>";
+             pp_print_string fmt "(*)" ;
+             doc fmt true headings lexbuf }
   | _ as c { if not block then pp_print_string fmt "<p>";
              pp_print_char fmt c;
              doc fmt true headings lexbuf }
