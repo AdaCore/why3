@@ -22,7 +22,7 @@ let hs_hash hs = id_hash hs.hs_name
 let hs_compare hs1 hs2 = id_compare hs1.hs_name hs2.hs_name
 *)
 
-let case_split = Ident.create_attribute "case_split"
+let case_split = create_attribute "case_split"
 let add_case t = t_attr_add case_split t
 
 let debug_slow = Debug.register_info_flag "coma_no_merge"
@@ -79,11 +79,27 @@ let rec t_simp_equ f = match f.t_node with
       t_attr_copy f (t_quant_close_simp q vl tl (t_simp_equ g))
   | _ -> t_map t_simp_equ f
 
+let rec t_neg f =
+  if Sattr.mem stop_split f.t_attrs then f
+  else t_attr_copy f (match f.t_node with
+    | Tnot g -> t_attr_copy f g
+    | Tbinop (Tand,g,h) -> t_or (t_neg g) (t_neg h)
+    | Tbinop (Tor,g,h) -> t_and (t_neg g) (t_neg h)
+    | Tbinop (Timplies,g,h) -> t_and g (t_neg h)
+    | Tquant (q,b) ->
+        let q = if q = Texists then
+                Tforall else Texists in
+        let vl,tl,g = t_open_quant b in
+        t_quant_close q vl tl (t_neg g)
+    | _ -> f)
+
 let t_level vsl t =
   Mvs.fold (fun v _ m -> max m (Mvs.find v vsl)) (t_vars t) 0
 
 let sbs_merge vsl m1 m2 = Mvs.union (fun _ t1 t2 ->
   Some (if t_level vsl t2 < t_level vsl t1 then t2 else t1)) m1 m2
+
+let add_vl vl t m = List.fold_left (fun m v -> Mvs.add v t m) m vl
 
 let rec propagate lvl vsl pvs nvs f = match f.t_node with
   | Tapp (s,[{t_node = Tvar v};t])
@@ -111,9 +127,8 @@ let rec propagate lvl vsl pvs nvs f = match f.t_node with
       t_attr_copy f (t_implies g h), sbs_merge vsl sbg sbh
   | Tquant (q,b) ->
       let vl,tl,g = t_open_quant b in
-      let add v m k = Mvs.add k v m in
-      let vsl = List.fold_left (add lvl) vsl vl in
-      let avs = List.fold_left (add ()) Svs.empty vl in
+      let vsl = add_vl vl lvl vsl in
+      let avs = add_vl vl () Svs.empty in
       let pvs = if q = Texists then Svs.union pvs avs else pvs in
       let nvs = if q = Texists then nvs else Svs.union nvs avs in
       let g, sbs = propagate (succ lvl) vsl pvs nvs g in
@@ -126,6 +141,11 @@ let rec propagate lvl vsl pvs nvs f = match f.t_node with
 let vc_simp f =
   t_simp_equ f
   |> propagate 0 Mvs.empty Svs.empty Svs.empty |> fst
+  |> t_simp_equ
+
+let spec_simp vl f =
+  t_simp_equ f
+  |> propagate 1 (add_vl vl 0 Mvs.empty) Svs.empty Svs.empty |> fst
   |> t_simp_equ
 
 type wpsp = {
@@ -359,26 +379,50 @@ let vc_defn c flat dfl =
   let c,_,wl = vc_defn true c flat dfl in
   c, List.map2 (fun (h,_,_,_) w -> h, vc_simp w.wp) dfl wl
 
-let to_spec_attr = Ident.create_attribute "coma:to_spec"
-let hs_to_spec h = Ident.Sattr.mem to_spec_attr h.hs_name.id_attrs
+let extspec_attr = create_attribute "coma:extspec"
+let hs_extspec h = Sattr.mem extspec_attr h.hs_name.id_attrs
 
-let vc_spec c h w pl =
-  if not (hs_to_spec h) || unspeccable pl then [] else
-  let id_pre = Ident.id_fresh (h.hs_name.id_string ^ "'pre") in
+let vc_spec c ({hs_name = {id_string = n}} as h) w pl =
+  if not (hs_extspec h) || unspeccable pl then [] else
+  let id_pre = id_fresh (n ^ "'pre") in
   let on_write (ul,c) v =
     let u = c_clone_vs c v in
     u::ul, c_add_vs c v (t_var u) in
   let ul, c = List.fold_left on_write ([],c) w in
-  let on_param ul = function
+  let hr = Hvs.create 7 in
+  let on_param (ul,bl,outs) = function
     | Pt _ -> assert false
-    | Pv v -> let u = c_clone_vs c v in
-              u::ul, Bv (t_var u)
-    | Pr r -> let u = c_clone_vs c r in
-              u::ul, Br (t_var u, u)
-    | Pc _ -> ul, Bc (c, fun _ _ -> w_true) in
-  let ul,bl = Lists.map_fold_left on_param ul pl in
-  let w_pre = callsym true h c bl in
-  [id_pre, List.rev ul, vc_simp w_pre.wp]
+    | Pv v ->
+        let u = c_clone_vs c v in
+        let b = Bv (t_var u) in
+        u::ul, b::bl, List.map (fun (id,ul,bl) -> id, u::ul, b::bl) outs
+    | Pr v ->
+        let u = c_clone_vs c v in
+        let b = Br (t_var u, u) in Hvs.add hr v u;
+        u::ul, b::bl, List.map (fun (id,ul,bl) -> id, u::ul, b::bl) outs
+    | Pc ({hs_name = {id_string = s}},w,pl) ->
+        let b = Bc (c, fun _ _ -> w_true) in
+        let add_var (ul,fl) v =
+          let u = c_clone_vs c v in
+          u::ul, t_equ (t_var u) (t_var v) :: fl in
+        let add_write acc v =
+          add_var acc (Hvs.find_def hr v v) in
+        let add_param acc = function
+          | Pt _ | Pc _ -> assert false
+          | Pv v | Pr v -> add_var acc v in
+        let zl,fl = List.fold_left add_write (ul,[]) w in
+        let zl,fl = List.fold_left add_param (zl,fl) pl in
+        let f = t_not_simp (t_and_l (List.rev fl)) in
+        let kk c bl =
+          let c,_ = consume false c pl bl in
+          { wp = c_inst_t c f; sp = Mhs.empty } in
+        let oo = id_fresh (n ^ "'post'" ^ s), zl, Bc (c, kk) :: bl in
+        ul, b::bl, oo :: List.map (fun (id,ul,bl) -> id, ul, b::bl) outs
+  in
+  let ul,bl,outs = List.fold_left on_param (ul,[],[]) pl in
+  let get pp ul bl = spec_simp ul (callsym pp h c (List.rev bl)).wp in
+  (id_pre, List.rev ul, get true ul bl) :: List.rev_map (fun (id,ul,bl) ->
+       id, List.rev ul, t_neg (get false ul bl)) outs
 
 let () = Exn_printer.register (fun fmt -> function
   | BadUndef h -> Format.fprintf fmt
