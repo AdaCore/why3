@@ -155,6 +155,9 @@ and scan_isolated fmt empty in_pre delayed = parse
   | space* "(**"
           { let d = asprintf "%s%a" delayed (fun fmt -> doc fmt false []) lexbuf in
             scan_isolated fmt false in_pre d lexbuf }
+  | space* "(*)"
+          { let d = asprintf "%s%a" delayed (fun fmt -> doc fmt false []) lexbuf in
+            scan_isolated fmt false in_pre d lexbuf }
   | eof   { if in_pre then pp_print_string fmt "</pre>\n";
             if delayed <> "" then pp_print_string fmt delayed }
   | space* '\n'
@@ -189,6 +192,8 @@ and scan_embedded fmt ldelim = parse
             scan_embedded fmt ldelim lexbuf }
 
 and comment fmt do_output = parse
+  | "(*)"  { if do_output then pp_print_string fmt "(*)";
+             comment fmt do_output lexbuf }
   | "(*"   { if do_output then pp_print_string fmt "(*";
              comment fmt do_output lexbuf;
              comment fmt do_output lexbuf }
@@ -293,14 +298,17 @@ and extract_header = parse
       { header }
   | space+ | "\n"
       { extract_header lexbuf }
+  | "(*)"
+      { extract_header lexbuf }
   | "(*"
       { skip_comment lexbuf; extract_header lexbuf }
   | eof | _
       { "" }
 
 and skip_comment = parse
-  | "*)" { () }
+  | "(*)" { skip_comment lexbuf }
   | "(*" { skip_comment lexbuf; skip_comment lexbuf }
+  | "*)" { () }
   | eof  { () }
   | _    { skip_comment lexbuf }
 
