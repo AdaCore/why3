@@ -26,8 +26,8 @@ let mk_defn d loc = { pdefn_desc = d; pdefn_loc = Loc.extract loc }
 %%
 
 top_level:
-| uses* coma_top_lvl* EOF
-  { $1, $2 }
+| coma_top_lvl* EOF
+  { $1 }
 
 uses:
 | USE EXPORT tqualid
@@ -50,6 +50,10 @@ coma_top_lvl:
   { Def $2 }
 /* | LET coma_let*
   { Lets $2 } */
+| pure_decl
+  { Pld $1 }
+| uses
+  { Use (Loc.extract $loc, $1) }
 
 defn(X):
 | id=attrs(lident_nq) w=prewrites p=coma_params X e=coma_prog

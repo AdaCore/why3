@@ -63,8 +63,10 @@ type pdecl =
   | Def of pdefn
   | Blo of pdefn list
   (* | Lets of pvar  list *)
+  | Pld of decl
+  | Use of Loc.position * use
 
-type pfile = use list * pdecl list
+type pfile = pdecl list
 
 open Ty
 open Term
