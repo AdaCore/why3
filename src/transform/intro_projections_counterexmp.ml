@@ -9,11 +9,17 @@
 (*                                                                  *)
 (********************************************************************)
 
+(*
 open Ident
+*)
 open Term
+(*
 open Decl
 open Theory
 open Ty
+*)
+
+(*
 
 let is_proj_for_array_attr proj_name =
   match Re.Str.search_forward (Re.Str.regexp "'First\\|'Last") proj_name 0 with
@@ -37,6 +43,8 @@ let debug_decl decl =
   Pretty.print_decl Format.str_formatter decl;
   let s = Format.flush_str_formatter () in
   Debug.dprintf debug "Declaration %s @." s
+*)
+
 *)
 
 let intro_const_equal_to_term
@@ -64,6 +72,7 @@ let intro_const_equal_to_term
   (* Return the declaration of new constant and the axiom *)
   decl_new_constant::decl_axiom::[]
 
+(*
 let introduce_constant ls t_rhs proj_name =
   (* We only allow projections to apply if they produce an element with a new
      model trace. In practice, we forbid proj_name that are not record (".") or
@@ -232,3 +241,4 @@ let () = Trans.register_env_transform "intro_projections_counterexmp"
          with@ attribute@ [%@model_projected]@ and@ projecting@ f@ \
          for@ p,@ create@ declaration@ of@ new@ constant@ c@ with@ \
          attribute@ [%@model]@ and@ an@ axiom@ c = f p."
+*)

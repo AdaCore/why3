@@ -13,7 +13,7 @@ let debug = Debug.register_info_flag "prepare_for_counterexmp"
   ~desc:"Print@ debugging@ messages@ about@ preparing@ the@ task@ \
     for@ getting@ counter-example."
 
-let prepare_for_counterexmp2 env task =
+let prepare_for_counterexmp2 _env task =
   if not (Driver.get_counterexmp task) then begin
     (* Counter-example will not be queried, do nothing *)
     Debug.dprintf debug "Not get ce@.";
