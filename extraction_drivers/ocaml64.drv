@@ -139,7 +139,7 @@ module stack.Stack
   syntax val       clear    "Stack.clear"
   syntax val       copy     "Stack.copy"
   syntax val       is_empty "Stack.is_empty"
-  syntax val       length   "Z.of_int (Stack.length %1)" prec 4 3
+  syntax val       length   "Stack.length"
 end
 
 module queue.Queue
@@ -154,7 +154,7 @@ module queue.Queue
   syntax val       clear     "Queue.clear"
   syntax val       copy      "Queue.copy"
   syntax val       is_empty  "Queue.is_empty"
-  syntax val       length    "Z.of_int (Queue.length %1)" prec 4 3
+  syntax val       length    "Queue.length"
   syntax val       transfer  "Queue.transfer"
 end
 
