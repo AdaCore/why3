@@ -428,7 +428,7 @@ let interp commands_table cont id s =
         interactive command.
       *)
    if id != None &&
-     Session_itp.is_detached cont.Controller_itp.controller_session (Opt.get id)
+     Session_itp.is_detached cont.Controller_itp.controller_session (Option.get id)
    then
       match cmd, args with
       | "help", _ ->
@@ -577,7 +577,7 @@ let get_first_unproven_goal_around
         else
           unproven_goals_below_node ~proved ~children ~is_goal [] parent
   in
-  let node = if is_pa node then Opt.get (get_parent node) else node in
+  let node = if is_pa node then Option.get (get_parent node) else node in
   let node_list = look_around node in
   (* We look into this list of brothers in case the original node is inside it.
      If it is inside the list, we want to get the first non proved node after

@@ -502,7 +502,7 @@ let expand_partial env main (data:Prover_autodetection_data.data) provers (p:Par
   end else
     let good = List.exists (check_version p.version) data.versions_ok in
     let old  = List.exists (check_version p.version) data.versions_old in
-    let pp_shortcut fmt = Opt.iter (Format.fprintf fmt (" (manually added as %s)")) p.shortcut in
+    let pp_shortcut fmt = Option.iter (Format.fprintf fmt (" (manually added as %s)")) p.shortcut in
     match data.prover_command with
     | None ->
         (* an empty prover command is used for forbidding some versions:
@@ -514,7 +514,7 @@ let expand_partial env main (data:Prover_autodetection_data.data) provers (p:Par
             data.prover_name
             pp_shortcut
             p.version
-            (Opt.get_def
+            (Option.value ~default:
                ". This version of the prover is known to have problems."
                data.message);
           known_version env binary;
@@ -523,7 +523,7 @@ let expand_partial env main (data:Prover_autodetection_data.data) provers (p:Par
     | Some prover_command ->
         (* create the prover config *)
         let c = make_command binary prover_command in
-        let c_steps = Opt.map (make_command binary) data.prover_command_steps in
+        let c_steps = Option.map (make_command binary) data.prover_command_steps in
         let prover =
           { Wc.prover_name = data.prover_name;
             prover_version = p.version;
@@ -539,7 +539,7 @@ let expand_partial env main (data:Prover_autodetection_data.data) provers (p:Par
             extra_options = [];
             extra_drivers = [];
           } in
-        let shortcut = Opt.get_def data.prover_id p.shortcut in
+        let shortcut = Option.value ~default:data.prover_id p.shortcut in
         if not (good || old) then begin
           (* Unknown, temporarily put the prover away *)
           let priority = next_priority () in
@@ -557,7 +557,7 @@ let expand_partial env main (data:Prover_autodetection_data.data) provers (p:Par
           let priority = next_priority () in
           print_info "Found prover %s%t version %s%s@."
             data.prover_name pp_shortcut p.version
-            (Opt.get_def
+            (Option.value ~default:
                (if old then
                   " (old version, please consider upgrading)."
                 else
@@ -741,7 +741,7 @@ let find_prover data name path =
     ) data.Prover_autodetection_data.skeletons;
   Hashtbl.fold
     (fun (switch, regexp) () acc ->
-      if Opt.inhabited acc then acc
+      if Option.is_some acc then acc
       else query_prover_version path switch regexp
     ) binaries None
 

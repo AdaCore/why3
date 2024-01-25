@@ -129,6 +129,7 @@ and concrete_syntax_term =
   | FunctionLiteral of concrete_syntax_funlit
   | Record of (string * concrete_syntax_term) list
   | Proj of (string * concrete_syntax_term)
+  | Let of (string * concrete_syntax_term) list * concrete_syntax_term
 
 
 (* Pretty printing of concrete terms *)
@@ -224,6 +225,9 @@ let rec print_concrete_term fmt ct =
       (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi print_field_value) fields_values
   | Proj (proj_name,proj_value) ->
     fprintf fmt "@[{%s =>@ %a}@]" proj_name print_concrete_term proj_value
+  | Let (ll, t) -> fprintf fmt "@[<hov 1>let %a@ in@ %a@]"
+                      (Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.semi ~sep:Pp.semi (Pp.print_pair Pp.print_string print_concrete_term)) ll
+                      print_concrete_term t
 
 (* Helper functions for concrete terms *)
 
@@ -268,6 +272,7 @@ let rec subst_concrete_term subst t =
     )
   | Proj (proj_name,proj_value) ->
     Proj (proj_name, subst_concrete_term subst proj_value)
+  | Let (ll, t) -> Let (ll, subst_concrete_term subst t) (* Do I need to substitute inside the bound terms as well? *)
 let rec t_and_l_concrete = function
   | [] -> concrete_const_bool true
   | [f] -> f
@@ -351,7 +356,7 @@ let search_model_element_for_id m ?loc id =
   let id_trace = trace_by_id id in
   let p me =
     if trace_by_name me = id_trace &&
-       Opt.equal Loc.equal me.me_location oloc
+       Option.equal Loc.equal me.me_location oloc
     then Some me else None in
   search_model_element m p
 
@@ -400,7 +405,7 @@ let model_element_equal n1 n2 =
   in
   me_kind_equal n1.me_kind n2.me_kind &&
   Term.t_equal n1.me_value n2.me_value &&
-  Opt.equal Loc.equal n1.me_location n2.me_location &&
+  Option.equal Loc.equal n1.me_location n2.me_location &&
   Sattr.equal n1.me_attrs n2.me_attrs &&
   Term.ls_equal n1.me_lsymbol n2.me_lsymbol
 
@@ -671,6 +676,7 @@ let [@warning "-42"] rec json_of_concrete_term ct =
         "quant_t", json_of_concrete_term quant_t
       ]
     ]
+  | Let _ -> Record [ "type", String "Let"; "val", String "UNSUPPORTED" ]
   | Binop (op,t1,t2) ->
     let op_string = match op with
       | And -> "And"
@@ -1001,7 +1007,7 @@ let while_loop_kind vc_attrs var_loc =
   else None
 
 let get_loop_kind vc_attrs oloc () =
-  Opt.bind oloc (while_loop_kind vc_attrs)
+  Option.bind oloc (while_loop_kind vc_attrs)
 
 let get_loc_kind oloc attrs () =
   match oloc with
@@ -1021,7 +1027,7 @@ let get_loc_kind oloc attrs () =
         Not_found -> None
 
 let get_call_result_kind attrs () =
-  Opt.map (fun l -> Call_result l)
+  Option.map (fun l -> Call_result l)
     (search_attribute_value get_call_result_loc attrs)
 
 let get_result_kind attrs () =
@@ -1164,15 +1170,15 @@ let map_filter_model_files f =
   Mstr.map_filter f_files
 
 let opt_bind_all os f =
-  if List.for_all Opt.inhabited os then
-    f (List.map Opt.get os)
+  if List.for_all Option.is_some os then
+    f (List.map Option.get os)
   else None
 
 class clean = object (self)
   method model m =
     {m with model_files= map_filter_model_files self#element m.model_files}
   method element me =
-    Opt.bind (self#value me.me_concrete_value) @@ fun me_concrete_value ->
+    Option.bind (self#value me.me_concrete_value) @@ fun me_concrete_value ->
     Some {me with me_concrete_value}
   method value v = match v with
     | Var v -> self#var v
@@ -1187,6 +1193,7 @@ class clean = object (self)
     | Proj (s,v) -> self#proj s v
     | Function {args;body} -> self#func args body
     | FunctionLiteral {elts;others} -> self#funliteral elts others
+    | Let (ll, tt) -> self#lett ll tt
   method var v = Some (Var v)
   method const c = match c with
     | String v -> self#string v
@@ -1204,45 +1211,49 @@ class clean = object (self)
   method boolean v = Some (Const (Boolean v))
   method bitvector v = Some (Const (BitVector v))
   method neg v =
-    Opt.bind (self#value v) @@ fun v ->
+    Option.bind (self#value v) @@ fun v ->
     Some (Not v)
   method apply s vs =
     opt_bind_all (List.map self#value vs) @@ fun vs ->
     Some (Apply (s, vs))
   method cond b t1 t2 =
-    Opt.bind (self#value b) @@ fun b ->
-    Opt.bind (self#value t1) @@ fun t1 ->
-    Opt.bind (self#value t2) @@ fun t2 ->
+    Option.bind (self#value b) @@ fun b ->
+    Option.bind (self#value t1) @@ fun t1 ->
+    Option.bind (self#value t2) @@ fun t2 ->
     Some (If (b,t1,t2))
   method epsilon x t =
-    Opt.bind (self#value t) @@ fun t ->
+    Option.bind (self#value t) @@ fun t ->
     Some (Epsilon (x,t))
+  method lett ll tt =
+    Option.bind (self#value tt) @@ fun tt ->
+    let ll' = List.filter_map (fun (v,t) -> Option.bind (self#value t) @@ fun t -> Some (v, t)) ll in
+    Some (Let (ll',tt))
   method quant q vars t =
-    Opt.bind (self#value t) @@ fun t ->
+    Option.bind (self#value t) @@ fun t ->
     Some (Quant (q,vars,t))
   method binop op t1 t2 =
-    Opt.bind (self#value t1) @@ fun t1 ->
-    Opt.bind (self#value t2) @@ fun t2 ->
+    Option.bind (self#value t1) @@ fun t1 ->
+    Option.bind (self#value t2) @@ fun t2 ->
     Some (Binop (op,t1,t2))
   method func args body =
-    Opt.bind (self#value body) @@ fun body ->
+    Option.bind (self#value body) @@ fun body ->
     Some (Function {args; body})
   method funliteral elts others =
     let clean_elt { elts_index = v1; elts_value = v2 } =
-      Opt.bind (self#value v1) @@ fun v1 ->
-      Opt.bind (self#value v2) @@ fun v2 ->
+      Option.bind (self#value v1) @@ fun v1 ->
+      Option.bind (self#value v2) @@ fun v2 ->
       Some { elts_index = v1; elts_value = v2 } in
     opt_bind_all (List.map clean_elt elts) @@ fun elts ->
-    Opt.bind (self#value others) @@ fun others ->
+    Option.bind (self#value others) @@ fun others ->
     Some (FunctionLiteral {elts; others})
   method record fs =
     let clean_field (f, v) =
-      Opt.bind (self#value v) @@ fun v ->
+      Option.bind (self#value v) @@ fun v ->
       Some (f, v) in
     opt_bind_all (List.map clean_field fs) @@ fun fs ->
     Some (Record fs)
   method proj s v =
-    Opt.bind (self#value v) @@ fun v ->
+    Option.bind (self#value v) @@ fun v ->
     Some (Proj (s,v))
 end
 

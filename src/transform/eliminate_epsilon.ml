@@ -68,7 +68,7 @@ let canonicalize x f =
   with Exit -> Nothing
 
 let get_canonical ls =
-  let ty = Opt.get_def Ty.ty_bool ls.ls_value in
+  let ty = Option.value ~default:Ty.ty_bool ls.ls_value in
   let ty = List.fold_right Ty.ty_func ls.ls_args ty in
   let nm = ls.ls_name.id_string ^ "_closure" in
   let cs = create_fsymbol (id_derive nm ls.ls_name) [] ty in

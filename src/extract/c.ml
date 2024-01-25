@@ -437,11 +437,11 @@ module Print = struct
   (* prints the c inline keyword *)
 
   let print_local_ident fmt id =
-    pp_print_string fmt (id_unique (Opt.get !local_printer) id)
+    pp_print_string fmt (id_unique (Option.get !local_printer) id)
   let print_global_ident fmt id =
-    pp_print_string fmt (id_unique (Opt.get !global_printer) id)
+    pp_print_string fmt (id_unique (Option.get !global_printer) id)
 
-  let clear_local_printer () = Ident.forget_all (Opt.get !local_printer)
+  let clear_local_printer () = Ident.forget_all (Option.get !local_printer)
 
   let space_nolinebreak fmt () = pp_print_string fmt " "
 
@@ -1343,7 +1343,7 @@ module MLToC = struct
        if var_escapes_from_expr env v e
        then raise (Unsupported "local variable escaping function");
        let t = ty_of_mlty info ev.e_mlty in
-       let scall = Opt.get (query_syntax info.syntax rs.rs_name) in
+       let scall = Option.get (query_syntax info.syntax rs.rs_name) in
        let p = Mid.find rs.rs_name info.prec in
        let ecall = C.(Esyntax(scall, Tnosyntax, [||], [], p)) in
        let d = C.Ddecl (t, [pv_name v, ecall]) in

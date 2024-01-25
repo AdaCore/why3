@@ -1051,7 +1051,7 @@ and k_rec envs lps rdl =
        for each function in the let-rec block *)
     let oldies, varl = oldify_variant varl in
     let add lps rd =
-      let decr = Opt.get (ls_decr_of_rec_defn rd) in
+      let decr = Option.get (ls_decr_of_rec_defn rd) in
       Mls.add decr (varl, List.map snd rd.rec_varl) lps in
     k_fun env (List.fold_left add lps rdl) ~oldies c.c_cty e in
   List.map2 k_rd envs rdl
@@ -1337,7 +1337,7 @@ let ht_written = Hvs.create 17
 let fresh_loc_attrs = Loc.dummy_position, Sattr.empty
 
 let wrt_mk_loc_attr loc attrs =
-  Opt.map (fun loc ->
+  Option.map (fun loc ->
       let a = create_written_attr loc in
       loc, Sattr.add a attrs) loc
 
@@ -1521,7 +1521,7 @@ let rec sp_expr env k rdm dst = match k with
       let wpl, spl, wrm, rds = List.fold_right branch bl
         ([], [], Mint.empty, Spv.empty) in
       let join p _ sp spl =
-        let spl, wr0 = Opt.get spl in
+        let spl, wr0 = Option.get spl in
         let sp = match sp with
           | Some (sp, wr) -> sp_complete sp wr wr0
           | None -> t_false in

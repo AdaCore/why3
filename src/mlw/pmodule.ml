@@ -725,7 +725,7 @@ let clone_ls cl ls =
   let proj = ls.ls_proj in
   let id = id_clone ls.ls_name in
   let at = List.map (clone_ty cl) ls.ls_args in
-  let vt = Opt.map (clone_ty cl) ls.ls_value in
+  let vt = Option.map (clone_ty cl) ls.ls_value in
   let ls' = create_lsymbol ~proj ~constr id at vt in
   cl.ls_table <- Mls.add ls ls' cl.ls_table;
   ls'
@@ -770,7 +770,7 @@ let clone_decl inst cl uc d = match d.d_node with
         if Mls.mem ls inst.mi_ls then raise (CannotInstantiate ls.ls_name);
         ignore (clone_ls cl ls)) ldl;
       let get_logic (_,ld) =
-        Opt.get (ls_defn_of_axiom (clone_fmla cl (ls_defn_axiom ld))) in
+        Option.get (ls_defn_of_axiom (clone_fmla cl (ls_defn_axiom ld))) in
       let d = create_logic_decl (List.map get_logic ldl) in
       add_pdecl ~warn:false ~vc:false uc (create_pure_decl d)
   | Dind (s, ((ls, _) :: _ as idl)) when Mls.mem ls inst.mi_ls ->
@@ -891,7 +891,7 @@ let clone_invl cl sm invl =
   List.map (fun t -> clone_term cl sm.sm_vs t) invl
 
 let clone_varl cl sm varl = List.map (fun (t,r) ->
-  clone_term cl sm.sm_vs t, Opt.map (cl_find_ls cl) r) varl
+  clone_term cl sm.sm_vs t, Option.map (cl_find_ls cl) r) varl
 
 let clone_cty cl sm ?(drop_decr=false) cty =
   let res = clone_ity cl cty.cty_result in
@@ -1263,8 +1263,8 @@ let clone_type_decl loc inst cl tdl decl kn =
                           then raise (CannotInstantiate id)
               | None -> () in
             let eq_proj rs1 rs2 =
-              let f1 = Opt.get rs1.rs_field in
-              let f2 = Opt.get rs2.rs_field in
+              let f1 = Option.get rs1.rs_field in
+              let f2 = Option.get rs2.rs_field in
               eq_field f1 f2 in
             let eq_cons cs1 cs2 =
               if cs1.rs_name.id_string <> cs2.rs_name.id_string
@@ -1305,7 +1305,7 @@ let clone_type_decl loc inst cl tdl decl kn =
         let mv = List.fold_left2 add Mvs.empty pjl fdl in
         List.map (clone_term cl mv) d.itd_invariant in
       let clone_wit = clone_expr cl (sm_of_cl cl) in
-      let wit = Opt.map clone_wit d.itd_witness in
+      let wit = Option.map clone_wit d.itd_witness in
       let itd = create_plain_record_decl id' ts.ts_args
         ~priv:s.its_private ~mut:s.its_mutable fdl inv wit in
       cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
@@ -1321,7 +1321,7 @@ let clone_type_decl loc inst cl tdl decl kn =
             let id = id_clone s.its_ts.ts_name in
             let s' = create_rec_itysymbol id s.its_ts.ts_args in
             cl.ts_table <- Mts.add s.its_ts s' cl.ts_table
-          end else Opt.iter (visit alg s) (Mits.find_opt s def);
+          end else Option.iter (visit alg s) (Mits.find_opt s def);
           List.iter down tl
       | Ityvar _ -> () in
     down ity;

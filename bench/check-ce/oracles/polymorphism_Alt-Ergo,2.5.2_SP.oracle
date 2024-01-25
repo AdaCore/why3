@@ -3,13 +3,13 @@
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
 - Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated with uncaught exception)
-  - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Ident B_proj_1 is not yet declared`)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Ident B_proj_1 is not yet declared`)
 File "bench/check-ce/polymorphism.mlw", line 7, characters 27-34:
 Goal gm.
 Prover result is: Unknown (unknown) (1 steps).
 The following counterexample model could not be verified
-  (both RAC terminated with uncaught exception):
+  (both RAC terminated with uncaught exception `Ident B_proj_1 is not yet declared`):
 File polymorphism.mlw:
   Line 5:
     B : int -> mono = [|0 => {B_proj_1 => 0}; _ => {B_proj_1 => 0}|]
@@ -22,13 +22,13 @@ File polymorphism.mlw:
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
 - Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated with uncaught exception)
-  - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Ident C_proj_1 is not yet declared`)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Ident C_proj_1 is not yet declared`)
 File "bench/check-ce/polymorphism.mlw", line 11, characters 22-35:
 Goal gm2.
 Prover result is: Unknown (unknown) (1 steps).
 The following counterexample model could not be verified
-  (both RAC terminated with uncaught exception):
+  (both RAC terminated with uncaught exception `Ident C_proj_1 is not yet declared`):
 File polymorphism.mlw:
   Line 9:
     C :

@@ -677,7 +677,7 @@ let cl_find_ls cl ls =
     let proj = ls.ls_proj in
     let id  = id_clone ls.ls_name in
     let ta' = List.map (cl_trans_ty cl) ls.ls_args in
-    let vt' = Opt.map (cl_trans_ty cl) ls.ls_value in
+    let vt' = Option.map (cl_trans_ty cl) ls.ls_value in
     let ls' = create_lsymbol ~proj ~constr id ta' vt' in
     cl.ls_table <- Mls.add ls ls' cl.ls_table;
     ls'
@@ -784,7 +784,7 @@ let cl_data cl inst tdl =
   let add_ls ls =
     if Mls.mem ls inst.inst_ls then raise (CannotInstantiate ls.ls_name);
     cl_find_ls cl ls in
-  let add_constr (ls,pl) = add_ls ls, List.map (Opt.map add_ls) pl in
+  let add_constr (ls,pl) = add_ls ls, List.map (Option.map add_ls) pl in
   let add_type ts' (_,csl) = ts', List.map add_constr csl in
   let get_type (ts,_) =
     if Mts.mem ts inst.inst_ts || Mts.mem ts inst.inst_ty then

@@ -36,7 +36,7 @@ let add_literal ((known_lit, decl) as acc) t c ls_proj fin =
       match ls_proj with
       | Some ls_proj ->
         let f = t_app ls_proj [ ls_t ] ls_proj.ls_value in
-        t_equ f (t_const c (Opt.get f.t_ty))
+        t_equ f (t_const c (Option.get f.t_ty))
       | None -> t_true
     in
     let f =
@@ -62,7 +62,7 @@ let rec abstract_terms kn range_metas float_metas type_kept acc t =
           ] ),
       _ )
     when (not (ts_equal ts ts_int || Sts.mem ts type_kept))
-         && Opt.equal ls_equal (Some ls) (Mts.find_opt ts range_metas) ->
+         && Option.equal ls_equal (Some ls) (Mts.find_opt ts range_metas) ->
     (acc, t_const c ty_int)
   | ( Tapp
         ( ls,

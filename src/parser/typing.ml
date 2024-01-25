@@ -97,7 +97,7 @@ let find_prop_ns     ns q =
 let find_tysymbol_ns ns q =
   find_qualid ~ty:Type (fun ts -> ts.ts_name) ns_find_ts ns q
 let find_lsymbol_ns ?ty ns q =
-  find_qualid ~ty:(Opt.get_def Fun_pre ty) (fun ls -> ls.ls_name) ns_find_ls ns q
+  find_qualid ~ty:(Option.value ~default:Fun_pre ty) (fun ls -> ls.ls_name) ns_find_ls ns q
 
 let find_fsymbol_ns ns q =
   let ls = find_lsymbol_ns ~ty:Fun ns q in
@@ -237,7 +237,7 @@ let rec dpattern ns km { pat_desc = desc; pat_loc = loc } =
 
 let quant_var ns (loc, id, gh, ty) =
   if gh then Loc.errorm ~loc "ghost variables are only allowed in programs";
-  Opt.map create_user_id id, dty_of_opt ns ty, Some loc
+  Option.map create_user_id id, dty_of_opt ns ty, Some loc
 
 (* [loc_cutoff loc13 loc23 loc2] computes a loc for the first part of
    a chain of operators of the form
@@ -279,7 +279,7 @@ let mk_closure crcmap loc ls =
   let mk dt = Dterm.dterm crcmap ~loc dt in
   let mk_v i _ =
     Some (id_user ("y" ^ string_of_int i) loc), dty_fresh (), None in
-  let mk_t (id, dty, _) = mk (DTvar ((Opt.get id).pre_name, dty)) in
+  let mk_t (id, dty, _) = mk (DTvar ((Option.get id).pre_name, dty)) in
   let vl = List.mapi mk_v ls.ls_args in
   DTquant (DTlambda, vl, [], mk (DTapp (ls, List.map mk_t vl)))
 
@@ -346,7 +346,7 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
     | Some v ->
         let attrs = match at with
           | Some l -> (* check for impact *)
-              let u = Opt.get (gvars None q) in
+              let u = Option.get (gvars None q) in
               if pv_equal v u then Sattr.empty else begin
                 let attr = create_attribute ("at:" ^ l) in
                 Hstr.replace at_uses l true;
@@ -701,7 +701,7 @@ let mk_gvars muc lvm old = fun at q ->
       (* normally, we have no reason to call "old" without
          a pvsymbol, but we make an exception for an empty
          ident to check if the label is valid at Tat *)
-      | Qident {id_str = ""} -> Opt.map (old l) None
+      | Qident {id_str = ""} -> Option.map (old l) None
       | _ -> None end
   | v, None -> v
 
@@ -805,7 +805,7 @@ let find_variant_ls muc q = match find_lsymbol muc.muc_theory q with
 
 let dvariant muc varl lvm _xsm old =
   let dvar t = type_term muc lvm old t in
-  let dvar (t,q) = dvar t, Opt.map (find_variant_ls muc) q in
+  let dvar (t,q) = dvar t, Option.map (find_variant_ls muc) q in
   List.map dvar varl
 
 let dspec muc ids sp lvm xsm old ity = {
@@ -839,10 +839,10 @@ let dinvariant muc f lvm _xsm old = dpre muc f lvm old
 (* abstract values *)
 
 let dparam muc (_,id,gh,pty) =
-  Opt.map create_user_prog_id id, gh, dity_of_pty muc pty
+  Option.map create_user_prog_id id, gh, dity_of_pty muc pty
 
 let dbinder muc (_,id,gh,opt) =
-  Opt.map create_user_prog_id id, gh, dity_of_opt muc opt
+  Option.map create_user_prog_id id, gh, dity_of_opt muc opt
 
 (* expressions *)
 
@@ -1405,7 +1405,7 @@ let add_types muc tdl =
             let gvars = List.fold_left add_fd Mstr.empty fl in
             let type_inv f = type_fmla_pure muc gvars Dterm.denv_empty f in
             let inv = List.map type_inv d.td_inv in
-            let wit = Opt.map (type_wit muc nms fl) d.td_wit in
+            let wit = Option.map (type_wit muc nms fl) d.td_wit in
             let itd = create_plain_record_decl ~priv ~mut id args fl inv wit in
             Hstr.add hts x itd.itd_its; Hstr.add htd x itd
         end
@@ -1486,7 +1486,7 @@ let add_logics muc dl =
   let create_symbol mkk d =
     let id = create_user_id d.ld_ident in
     let pl = tyl_of_params muc d.ld_params in
-    let ty = Opt.map (ty_of_pty muc.muc_theory) d.ld_type in
+    let ty = Option.map (ty_of_pty muc.muc_theory) d.ld_type in
     let ls = create_lsymbol id pl ty in
     Hstr.add lsymbols d.ld_ident.id_str ls;
     Loc.try2 ~loc:d.ld_loc add_decl mkk (create_param_decl ls) in
@@ -1541,7 +1541,7 @@ let add_inductives muc s dl =
       let f = type_fmla_pure mkk Mstr.empty Dterm.denv_empty f in
       create_prsymbol (create_user_id id), f in
     ps, List.map clause d.in_def in
-  let loc_of_id id = Opt.get id.Ident.id_loc in
+  let loc_of_id id = Option.get id.Ident.id_loc in
   try add_decl muc (create_ind_decl s (List.map type_decl dl))
   with
   | ClashSymbol s ->
@@ -1872,12 +1872,12 @@ let close_module loc =
   if Debug.test_noflag debug_parse_only then begin
     match slice.muc_intf with
     | None ->
-       let m = Loc.try1 ~loc close_module (Opt.get slice.muc) in
+       let m = Loc.try1 ~loc close_module (Option.get slice.muc) in
        if Debug.test_flag Glob.flag then
          Glob.def ~kind:"theory" m.mod_theory.th_name;
        slice.file <- Mstr.add m.mod_theory.th_name.id_string m slice.file
     | Some mintf ->
-       let muc = Opt.get slice.muc in
+       let muc = Option.get slice.muc in
        let inst =
          try intf_mod_inst muc mintf with
          | Invalid_unit -> Loc.errorm ~loc "Unsupported unit in interface"
@@ -1928,7 +1928,7 @@ let close_scope loc ~import =
   assert (not (Stack.is_empty state) && (Stack.top state).muc <> None);
   if Debug.test_noflag debug_parse_only then
     let slice = Stack.top state in
-    let muc = Loc.try1 ~loc (close_scope ~import) (Opt.get slice.muc) in
+    let muc = Loc.try1 ~loc (close_scope ~import) (Option.get slice.muc) in
     slice.muc <- Some muc
 
 let add_decl loc d =

@@ -8,9 +8,9 @@ authors: [
   "Andrei Paskevich"
 ]
 
-homepage: "http://why3.lri.fr/"
+homepage: "https://www.why3.org/"
 license: "LGPL-2.1-only"
-doc: "http://why3.lri.fr/doc/"
+doc: "https://www.why3.org/doc/"
 bug-reports: "https://gitlab.inria.fr/why3/why3/issues"
 dev-repo: "git+https://gitlab.inria.fr/why3/why3.git"
 
@@ -29,7 +29,8 @@ build: [
    "--disable-why3-lib"
    "--disable-frama-c"
    "--disable-ide"
-   "--disable-js-of-ocaml"]
+   "--disable-js-of-ocaml"
+   "--enable-coq-libs"]
   [make "-j%{jobs}%" "coq"]
 ]
 
@@ -37,7 +38,7 @@ install: [make "install-coq"]
 
 depends: [
   "conf-autoconf" {build & dev}
-  "coq" {>= "8.7"}
+  "coq" {>= "8.11"}
   "ocaml" {>= "4.08.0"}
   "ocamlfind" {build}
   "why3" {= version}

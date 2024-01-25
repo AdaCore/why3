@@ -176,7 +176,7 @@ let print_id_attrs fmt id =
       not (Sattr.is_empty id.id_attrs) then
     fprintf fmt "@ %a" print_attrs id.id_attrs;
   if Debug.test_flag debug_print_locs then
-    Opt.iter (fprintf fmt "@ %a" print_loc_as_attribute) id.id_loc
+    Option.iter (fprintf fmt "@ %a" print_loc_as_attribute) id.id_loc
 
 (* type variables always start with a quote *)
 let print_tv fmt tv =
@@ -298,7 +298,7 @@ let unambig_fs fs =
     | Tyvar u when not (lookup u) -> false
     | _ -> ty_all inspect ty
   in
-  Opt.fold (fun _ -> inspect) true fs.ls_value
+  Option.fold ~some:inspect ~none:true fs.ls_value
 
 (** Patterns, terms, and formulas *)
 

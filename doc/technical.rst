@@ -98,7 +98,7 @@ Drivers for User Theories
 -------------------------
 
 It is possible for the users to augment the system drivers with extra
-information for their own declared theories. The processus is
+information for their own declared theories. The process is
 described by the following example.
 
 First, we define a new theory in a file :file:`bvmisc.mlw`, containing
@@ -250,7 +250,7 @@ by :why3:tool:`why3 show transformations`.
 
 .. why3:transform:: case
 
-   Split a goal into two subgoal, using the *excluded middle* on a given
+   Split a goal into two subgoals, using the *excluded middle* on a given
    formula. On the task :math:`\Gamma \vdash G`, the transformation
    ``case f`` produces two tasks: :math:`\Gamma, h: f \vdash G` and
    :math:`\Gamma, h: \neg f \vdash G`.
@@ -390,7 +390,7 @@ by :why3:tool:`why3 show transformations`.
 
 .. why3:transform:: cut
 
-   Same as :why3:transform:`assert`, but the order of generated subgoals
+   Same as :why3:transform:`assert`, but the order of the generated subgoals
    is reversed.
 
 .. why3:transform:: destruct
@@ -429,7 +429,7 @@ by :why3:tool:`why3 show transformations`.
 
    Recursively call :why3:transform:`destruct` on the generated
    hypotheses. The recursion on implication and ``match`` stops after the
-   first occurence of a different symbol.
+   first occurrence of a different symbol.
 
    For example, applying ``destruct_rec H`` on the following goal
 
@@ -593,7 +593,7 @@ by :why3:tool:`why3 show transformations`.
 .. why3:transform:: hide
 
    Hide a given term, by creating a new constant equal to the term and
-   then replacing all occurences of the term in the context by this
+   then replacing all occurrences of the term in the context by this
    constant.
 
    For example, applying ``hide t (1 + 1)`` on the goal
@@ -876,7 +876,7 @@ by :why3:tool:`why3 show transformations`.
 
 .. why3:transform:: remove_unused
 
-   Removes from the context all logic symbols which are not used by the goal or the hypothesis.
+   Remove from the context all the logic symbols that are not used by the goal or the hypothesis.
 
    The effect of that transformation can be expanded by adding dependency metas. Namely, with a declaration of the form
 
@@ -884,7 +884,7 @@ by :why3:tool:`why3 show transformations`.
 
       meta "remove_unused:dependency" axiom a, function f
 
-   then occurences of `f` in axiom `a` are not counted as occurrences
+   then occurrences of `f` in axiom `a` are not counted as occurrences
    for `f`. The intended meaning is that `a` is a definitional axiom
    for `f`, so when `f` is not needed in the remainder, both the axiom
    and the declaration of `f` can be removed.
@@ -893,8 +893,8 @@ by :why3:tool:`why3 show transformations`.
    must be declared for each axiom. When an axiom is definitional for
    several symbols at the same time, several meta must be declared as
    well. The rule of thumb is that an axiom is kept as soon as at
-   least one of the symbols it defines is needed in the remained,
-   otherzise it is discarded.
+   least one of the symbols it defines is needed in the remainder,
+   otherwise it is discarded.
 
 .. why3:transform:: remove_unused_keep_constant
 
@@ -1358,7 +1358,7 @@ by :why3:tool:`why3 show transformations`.
    automatic provers at all as they generally implement substitution
    rules in their logic.
 
-.. why3:transform: subst_all
+.. why3:transform:: subst_all
 
    Substitute all the variables that can be substituted.
 
@@ -1592,7 +1592,7 @@ WhyML Attributes
    then, by default, extraction engine considers the type ``t`` as an alias
    of type ``int``. If this attribute is applied to ``t``, then this
    optimization is disabled.
-   
+
 .. why3:attribute:: induction
 
 .. why3:attribute:: infer

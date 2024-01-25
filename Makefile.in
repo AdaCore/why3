@@ -548,6 +548,7 @@ PLUGGENERATED = \
 PLUG_PARSER = genequlin dimacs
 PLUG_PRINTER =
 PLUG_TRANSFORM =
+PLUG_STRATEGIES = forward_propagation
 PLUG_TPTP = tptp_parser tptp_typing tptp_lexer tptp_printer
 PLUG_PYTHON = py_parser py_lexer py_main
 PLUG_MICROC = mc_parser mc_lexer mc_printer mc_main
@@ -558,7 +559,7 @@ endif
 
 PLUG_CMIONLY = tptp/tptp_ast python/py_ast microc/mc_ast cfg/cfg_ast
 
-PLUGINS = genequlin dimacs tptp python microc cfg
+PLUGINS = genequlin dimacs tptp python microc cfg forward_propagation
 
 TPTPMODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
 PYTHONMODULES = $(addprefix plugins/python/, $(PLUG_PYTHON))
@@ -591,6 +592,7 @@ endif
 PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(addprefix plugins/printer/, $(PLUG_PRINTER)) \
 	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
+	      $(addprefix plugins/strategies/, $(PLUG_STRATEGIES)) \
 	      $(TPTPMODULES) $(PYTHONMODULES) $(MICROCMODULES) \
 	      $(CFGMODULES)
 
@@ -599,7 +601,7 @@ PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
 PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
 PLUGCMI = $(addsuffix .cmi, $(PLUGMODULES)) $(PLUG_CMIONLY:%=plugins/%.cmi)
 
-PLUGDIRS = parser printer transform tptp python microc cfg
+PLUGDIRS = parser printer transform strategies tptp python microc cfg
 PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
 
 ifeq (@enable_stackify@,yes)
@@ -642,6 +644,8 @@ $(PLUG_PRINTER:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/printer/%.cmx
 $(PLUG_PRINTER:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/printer/%.cmo
 $(PLUG_TRANSFORM:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/transform/%.cmx
 $(PLUG_TRANSFORM:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/transform/%.cmo
+$(PLUG_STRATEGIES:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/strategies/%.cmx
+$(PLUG_STRATEGIES:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/strategies/%.cmo
 lib/plugins/tptp.cmxs: $(TPTPCMX)
 lib/plugins/tptp.cma: $(TPTPCMO)
 lib/plugins/python.cmxs: $(PYTHONCMX)
@@ -796,7 +800,7 @@ gallery-subs:
 	  echo "exporting examples/$$d"; \
 	  mkdir -p $(GALLERYDIR)/$$d; \
 	  cd examples/$$d; \
-	  WHY3CONFIG="" ../../bin/why3.@OCAMLBEST@ doc --no-stdlib --no-load-default-plugins -L ../../stdlib -L . --stdlib-url http://why3.lri.fr/stdlib/ --warn-off=unused_variable *.mlw -o $(GALLERYDIR)/$$d; \
+	  WHY3CONFIG="" ../../bin/why3.@OCAMLBEST@ doc --no-stdlib --no-load-default-plugins -L ../../stdlib -L . --stdlib-url https://www.why3.org/stdlib/ --warn-off=unused_variable *.mlw -o $(GALLERYDIR)/$$d; \
 	  cd ..; \
 	  rm -f $(GALLERYDIR)/$$d/$$d.zip; \
 	  git archive --format=zip -o $(GALLERYDIR)/$$d/$$d.zip HEAD $$d; \
@@ -1633,20 +1637,31 @@ TRYWHY3CMI = $(addsuffix .cmi, $(TRYWHY3MODULES))
 
 $(TRYWHY3DEP) $(TRYWHY3CMO) $(TRYWHY3CMI): INCLUDES += -I src/trywhy3
 
-TRYWHY3_PACK = \
-	trywhy3.js trywhy3.html trywhy3.css \
+TRYWHY3_COMMON_PACK = \
+	trywhy3.js trywhy3.html trywhy3.css trywhy3_custom.css \
 	help_whyml.html help_python.html help_micro-C.html \
-	why3_worker.js alt-ergo-worker.js \
-	README.md examples/ \
-	trywhy3_custom.css \
+	why3_worker.js \
+	examples/ \
+	 $(JS_MAPS)
+
+TRYWHY3_SMALL_PACK = \
+	$(TRYWHY3_COMMON_PACK) \
+	mode-why3.js
+
+TRYWHY3_FULL_PACK = \
+	$(TRYWHY3_COMMON_PACK) \
+	alt-ergo-worker.js \
 	ace-builds/src-min-noconflict/ace.js \
 	ace-builds/src-min-noconflict/mode-why3.js \
 	ace-builds/src-min-noconflict/mode-python.js \
 	ace-builds/src-min-noconflict/mode-c_cpp.js \
-	ace-builds/src-min-noconflict/theme-chrome.js $(JS_MAPS)
+	ace-builds/src-min-noconflict/theme-chrome.js
 
-trywhy3.tar.gz: $(addprefix src/trywhy3/, $(TRYWHY3_PACK))
-	tar czf trywhy3.tar.gz -C src $(addprefix trywhy3/, $(TRYWHY3_PACK))
+trywhy3.tar.gz: $(addprefix src/trywhy3/, $(TRYWHY3_SMALL_PACK))
+	tar czf $@ -C src $(addprefix trywhy3/, $(TRYWHY3_SMALL_PACK))
+
+trywhy3-full.tar.gz: $(addprefix src/trywhy3/, $(TRYWHY3_FULL_PACK))
+	tar czf $@ -C src $(addprefix trywhy3/, $(TRYWHY3_FULL_PACK))
 
 trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js
 
@@ -2174,7 +2189,7 @@ dist: $(MORE_DIST)
 	rm -f distrib/$(NAME).tar.gz
 	mkdir -p distrib/
 	git archive --format=tar --prefix=$(NAME)/ -o distrib/$(NAME).tar HEAD
-	tar rf distrib/$(NAME).tar --transform="s,^,$(NAME)/," --mtime="`git show -s --format=%ci`" --owner=0 --group=0 $(MORE_DIST)
+	tar rf distrib/$(NAME).tar --transform="s,^,$(NAME)/," --mtime="$$(date -Iseconds -d "`git show -s --format=%ci` +1 second")" --owner=0 --group=0 $(MORE_DIST)
 	gzip -n -f --best distrib/$(NAME).tar
 
 

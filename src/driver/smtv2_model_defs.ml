@@ -84,6 +84,7 @@ type term =
   | Tite of term * term * term
   | Tarray of sort * sort * array_elements
   | Tasarray of term
+  | Tlet of var_binding list * term
   | Tunparsed of string
 
 and var_binding = symbol * term
@@ -227,6 +228,8 @@ let rec print_term fmt = function
         print_array elts
   | Tasarray t ->
       fprintf fmt "@[<hv>(AsArray %a)@]" print_term t
+  | Tlet (bindings, t) ->
+      fprintf fmt "@[<hv>(Let (%a) %a)@]" (Pp.print_list Pp.comma print_var_binding) bindings print_term t
   | Tunparsed s -> fprintf fmt "(UNPARSED %s)" s
 
 and print_var_binding fmt (s, t) =

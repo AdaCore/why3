@@ -885,7 +885,7 @@ module Checksum = struct
 
   module DMid = Diffmap.MakeOfMap (Ident.Mid)
 
-  (* WARNING: The occurence of [Trans.fold] in [task_v3] needs to be executed
+  (* WARNING: The occurrence of [Trans.fold] in [task_v3] needs to be executed
      once at initialization in order for all the applications of this
      transformation to share the same Wtask ([h] created on first line of
      [Trans.fold]). In short, the closure is here just so that Trans.fold is

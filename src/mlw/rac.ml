@@ -55,7 +55,7 @@ let oracle_quant_var
         if bind_univ_quant_vars_default then
           Some (Pinterp_core.default_value_of_type env (ity_of_ty vs.vs_ty))
         else None in
-      Opt.iter (fun v ->
+      Option.iter (fun v ->
           register_used_value env (Some loc) vs.vs_name v) value;
       value
 
@@ -65,7 +65,7 @@ let oracle_quant_var
 
 (* Add declarations for additional term bindings in [vsenv] *)
 let bind_term (vs, t) (task, ls_mt, ls_mv) =
-  let ty = Opt.get t.t_ty in
+  let ty = Option.get t.t_ty in
   let ls = create_fsymbol (id_clone vs.vs_name) [] ty in
   let ls_mt = ty_match ls_mt vs.vs_ty ty in
   let ls_mv = Mvs.add vs (fs_app ls [] ty) ls_mv in
@@ -131,7 +131,6 @@ let bind_fun rs (cexp, _) (task, ls_mv) =
 
 let task_of_term ?(vsenv=[]) metas (env: env) t =
   let open Task in let open Decl in
-  let th = env.pmodule.Pmodule.mod_theory in
   let free_sls = t_app_fold (fun sls ls _ _ -> Sls.add ls sls) Sls.empty t in
   let lsenv =
     let aux rs v mls =
@@ -147,12 +146,29 @@ let task_of_term ?(vsenv=[]) metas (env: env) t =
     let open Theory in
     match td.td_node with
     | Use th ->
+        (* Format.eprintf "Rac.add_used Use %s@." th.th_name.id_string; *)
         Task.use_export task th
     | Clone (th, sm) ->
+        (* FIXME: this clone cannot be correct, the substitution cannot be done like this *)
+        (* Format.eprintf "Rac.add_used Clone %s@." th.th_name.id_string; *)
+        (* Format.eprintf "tdecl = %a@." Pretty.print_tdecl td; *)
         let inst_df = Decl.Paxiom in
         let inst_pr = Decl.Mpr.map (fun _ -> Decl.Paxiom) sm.sm_pr in
+        let inst_ts =
+          Ty.Mts.fold (fun ts v acc ->
+            if ts.ts_def = NoDef then Ty.Mts.add ts v acc else acc)
+            sm.sm_ts Ty.Mts.empty
+        in
+        let inst_ls =
+          Mls.fold (fun ls v acc ->
+              let do_add = match task with
+                | None -> false
+                | Some task_hd -> Mid.mem v.Term.ls_name task_hd.task_known
+              in
+              if do_add then Mls.add ls v acc else acc)
+            sm.sm_ls Mls.empty in
         let inst =
-          {inst_df; inst_pr; inst_ty= sm.sm_ty; inst_ts= sm.sm_ts; inst_ls= sm.sm_ls } in
+          {inst_df; inst_pr; inst_ty= sm.sm_ty; inst_ts; inst_ls } in
         Task.clone_export task th inst
     | _ -> task in
   let add_known _ decl (task, ls_mt, ls_mv) =
@@ -195,23 +211,33 @@ let task_of_term ?(vsenv=[]) metas (env: env) t =
   let add_premise task t =
     let pr = create_prsymbol (id_fresh "premise") in
     Task.add_prop_decl task Decl.Paxiom pr t in
+  (* building the task from scratch *)
   let task, ls_mt, ls_mv = None, Mtv.empty, Mvs.empty in
+  (* adds the theories used and cloned from the enclosing module *)
+  let th = env.pmodule.Pmodule.mod_theory in
   let task = List.fold_left add_used task th.Theory.th_decls in
+  (* adds the local symbols used (??) *)
   let used = Task.used_symbols (Task.used_theories task) in
   let known_local = Mid.filter (fun id _ -> not (Mid.mem id used)) th.Theory.th_known in
   let task, ls_mt, ls_mv = Mid.fold add_known known_local (task, ls_mt, ls_mv) in
+  (* adds the global program variables *)
   let task, ls_mt, ls_mv = Mrs.fold add_prog_const env.rsenv (task, ls_mt, ls_mv) in
+  (* adds the logic functions from the model (??) *)
   let task, ls_mv = Mrs.fold bind_fun env.funenv (task, ls_mv) in
+  (* adds the logic variables from the model (??) *)
   let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
   let task, ls_mt, ls_mv = Mvs.fold (bind_value env) env.vsenv (task, ls_mt, ls_mv) in
+  (* adds the premises from the model (??) *)
   let task = fold_premises add_premise env.premises task in
   let t = t_ty_subst ls_mt ls_mv t in
   let task = List.fold_left (fun t (m, a) -> Task.add_meta t m a) task metas in
+  (* adds the term to check as a goal *)
   let task =
     if t.t_ty = None then (* Add a formula as goal directly ... *)
       let prs = create_prsymbol (id_fresh "goal") in
       add_prop_decl task Pgoal prs t
     else (* ... and wrap a non-formula in a call to a predicate with no definition *)
+      (* FIXME: does this case really used? what for? *)
       let task = add_decl task undef_pred_decl in
       let prs = create_prsymbol (id_fresh "goal") in
       add_prop_decl task Pgoal prs (undef_pred_app t) in
@@ -259,7 +285,7 @@ module Why = struct
 
   let mk_config_lit config env ?(metas=[]) ?trans ?why_prover:why_prover_lit ?oracle_quant_var () =
     let metas = List.map mk_meta_lit metas in
-    let trans = Opt.map (mk_trans_lit env) trans in
+    let trans = Option.map (mk_trans_lit env) trans in
     let why_prover =
       let aux prover_string =
         let name, limit_time, limit_mem =
@@ -275,7 +301,7 @@ module Why = struct
         let driver = Driver.load_driver_for_prover (Whyconf.get_main config) env pr in
         let limit = Call_provers.{empty_limit with limit_time; limit_mem} in
         mk_why_prover ~command driver limit in
-      Opt.map aux why_prover_lit in
+      Option.map aux why_prover_lit in
     let elim_eps = Trans.lookup_transform "eliminate_epsilon" env in
     mk_config ~metas ?trans ?why_prover ?oracle_quant_var ~elim_eps config
 
@@ -314,7 +340,7 @@ module Why = struct
     let task = bind_univ_quant_vars get_quant_value env task in
     let tasks = Trans.apply trans task in
     let task_unchanged = match tasks with
-      | [task'] -> Opt.equal task_hd_equal task' task
+      | [task'] -> Option.equal task_hd_equal task' task
       | _ -> false in
     if task_unchanged then
       tasks
@@ -328,7 +354,7 @@ module Why = struct
     | Some trans ->
         let task, ls_mv = task_of_term metas env t in
         if t.t_ty = None then (* [t] is a formula *)
-          let oracle_quant_var = Opt.get_def oracle_quant_var_dummy oracle_quant_var in
+          let oracle_quant_var = Option.value ~default:oracle_quant_var_dummy oracle_quant_var in
           let tasks = trans_and_bind_quants oracle_quant_var env trans task in
           match List.map Task.task_goal_fmla tasks with
           | [] -> t_true
@@ -346,7 +372,7 @@ module Why = struct
           Mvs.fold reverse ls_mv t
 
   let mk_compute_term_lit env ?metas ?(trans="compute_in_goal") ?oracle_quant_var =
-    let metas = Opt.map (List.map mk_meta_lit) metas in
+    let metas = Option.map (List.map mk_meta_lit) metas in
     let trans = mk_trans_lit env trans in
     mk_compute_term ?metas ~trans ?oracle_quant_var
 
@@ -366,7 +392,7 @@ module Why = struct
           Some false
         else (
           List.iter (Debug.dprintf debug_rac_check_sat "- %a@." print_tdecl)
-            (List.filter_map (Opt.map (fun t -> t.Task.task_decl)) tasks);
+            (List.filter_map (Option.map (fun t -> t.Task.task_decl)) tasks);
           None )
 
   (** Check the validiy of a term that has been encoded in a task by dispatching it to a prover *)
@@ -400,7 +426,7 @@ module Why = struct
         Debug.dprintf debug_rac_check_sat "Try negation.@.";
         let task = negate_goal task in
         let res = check_term_dispatch rp cnf task in
-        Opt.map (fun b -> not b) res
+        Option.map (fun b -> not b) res
     | r -> r
 
   (* Replace (sub-)terms marked by {!Ident.has_rac_assume} by [t_true]. *)
@@ -435,15 +461,15 @@ module Why = struct
         let task' = List.fold_left for_assumption task' assumptions in
         Task.add_tdecl task' g in
     let res = (* Try checking the term using computation first ... *)
-      Opt.map (fun b -> Debug.dprintf debug_rac_check_sat "Computed %b.@." b; b)
-        (Opt.bind cnf.trans
+      Option.map (fun b -> Debug.dprintf debug_rac_check_sat "Computed %b.@." b; b)
+        (Option.bind cnf.trans
            (fun trans ->
               check_term_compute cnf.oracle_quant_var ctx.cntr_env trans task))
     in
     let res =
       if res = None then (* ... then try solving using a prover *)
-        Opt.map (fun b -> Debug.dprintf debug_rac_check_sat "Dispatched: %b.@." b; b)
-          (Opt.bind cnf.why_prover
+        Option.map (fun b -> Debug.dprintf debug_rac_check_sat "Dispatched: %b.@." b; b)
+          (Option.bind cnf.why_prover
              (fun rp ->
                check_term_dispatch ~try_negate:true rp cnf task))
       else res in
@@ -457,7 +483,7 @@ module Why = struct
           Some filename
       | _ -> None in
     let pp_task_filename fmt = if task_filename <> None then
-        fprintf fmt " (%s)" (Opt.get task_filename) in
+        fprintf fmt " (%s)" (Option.get task_filename) in
     match res with
     | Some true ->
         Debug.dprintf debug_rac_check_term_result "%a%t@."

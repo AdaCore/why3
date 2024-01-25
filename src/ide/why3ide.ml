@@ -900,6 +900,8 @@ let ada_lang = get_extra_lang "ada" "Ada"
 let java_lang = get_extra_lang "java" "Java"
 let c_lang = get_extra_lang "c" "C"
 
+let warn_unknown_format = Loc.register_warning "unk_format" "Unknown source format"
+
 let change_lang view lang =
   try
     let lang =
@@ -912,9 +914,11 @@ let change_lang view lang =
       | ".java" -> java_lang ()
       | ".c" -> c_lang ()
       | ".mlw"
-      | ".why" ->
-        why_lang ()
-      | _ -> raise Exit
+      | ".why"
+      | "whyml" ->  why_lang ()
+      | _ ->
+          Loc.warning warn_unknown_format "Unrecognized source format `%s`" lang;
+          raise Exit
     in
     view#source_buffer#set_language (Some lang)
   with
@@ -2065,12 +2069,12 @@ class menu_factory ~accel_path:menu_path ~accel_group:menu_group menu =
         if add_accel then GtkData.AccelMap.add_entry accel_path ?key ?modi;
         GtkBase.Widget.set_accel_path item#as_widget accel_path accel_group
       );
-      Opt.iter
+      Option.iter
         (fun callback ->
           let _ = item#connect#activate ~callback in
           ())
         callback;
-      Opt.iter item#misc#set_tooltip_markup tooltip;
+      Option.iter item#misc#set_tooltip_markup tooltip;
       item
 
     method add_separator () =
@@ -2205,7 +2209,7 @@ let (_ : GMenu.menu_item) =
     (* hide/show provers in contextual menu *)
     hide_context_provers ();
     (* Source view tags *)
-    Opt.iter (fun (_, v) -> update_tags gconfig v) (find_current_file_view ());
+    Option.iter (fun (_, v) -> update_tags gconfig v) (find_current_file_view ());
     (* Update message zone tags *)
     remove_all_tags gconfig message_zone;
     message_zone_error_tag := create_msg_zone_error_tag ();
@@ -2316,7 +2320,7 @@ let search_forward =
           let l2 = GtkText.Iter.get_line_index iter_end in
           let loc1 = Loc.user_position cur_file (n1 + 1) l1 (n2 + 1) l2 in
           color_loc ~color:Search_color loc1;
-          if not (Opt.equal Loc.equal !last_colored (Some loc1)) then
+          if not (Option.equal Loc.equal !last_colored (Some loc1)) then
             uncolor ~color:Search_color !last_colored;
           last_colored := Some loc1;
           (* Get to the line after to be able to call Ctrl+F on the same string
@@ -3007,7 +3011,7 @@ let treat_notification n =
     init_completion g_info.provers g_info.transformations g_info.strategies
       g_info.commands;
     complete_context_menu ();
-    Opt.iter select_iter goals_model#get_iter_first
+    Option.iter select_iter goals_model#get_iter_first
   | Saved ->
     print_message ~kind:1 ~notif_kind:"Saved action info" "Session saved.";
     if !quit_on_saved = true then exit_function_safe ()
@@ -3162,7 +3166,7 @@ let batch s =
                 | _ -> acc)
               source_view_table None
           in
-          Opt.iter pos_cursor_and_color v;
+          Option.iter pos_cursor_and_color v;
           interp cmd
         | [ "save" ] -> send_request Save_req
         | _ -> Printf.eprintf "Unrecognized batch command: %s\n%!" c);

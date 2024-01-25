@@ -950,7 +950,7 @@ let remove_subtree ~(notification:notifier) ~(removed:notifier) s (n: any) =
   | _ ->
      let p = get_any_parent s n in
      fold_all_any s (fun _ x -> remove x; removed x) () n;
-     Opt.iter (update_any_node s notification) p
+     Option.iter (update_any_node s notification) p
 
 (****************************)
 (*     session opening      *)
@@ -998,16 +998,6 @@ let string_attribute field r =
   with Not_found when not (Debug.test_flag Debug.stack_trace) ->
     Loc.errorm "[Error] missing required attribute '%s' from element '%s'@."
       field r.Xml.name
-
-let default_unknown_result =
-     {
-       Call_provers.pr_answer = Call_provers.Failure "";
-       Call_provers.pr_time = 0.0;
-       Call_provers.pr_output = "";
-       Call_provers.pr_status = Unix.WEXITED 0;
-       Call_provers.pr_steps = -1;
-       Call_provers.pr_models = [];
-     }
 
 let warn_unexpected_session_element = Loc.register_warning "unexpected_session_element"
     "Warn for unexpected status, elements or goals during the loading of a session"
@@ -1117,10 +1107,6 @@ and load_proof_or_transf session old_provers pid a =
           let path,res =
             List.fold_left (load_result a) (Sysutil.empty_path,None) a.Xml.elements
           in
-          let res = match res with
-            | None -> default_unknown_result
-            | Some r -> r
-          in
           let edit =
             if Sysutil.is_empty_path path then
               match load_option "edited" a with
@@ -1137,7 +1123,7 @@ and load_proof_or_transf session old_provers pid a =
                         Call_provers.limit_mem   = memlimit;
                         Call_provers.limit_steps = steplimit; }
           in
-          ignore(add_proof_attempt session p limit (Some res) ~obsolete edit pid)
+          ignore(add_proof_attempt session p limit res ~obsolete edit pid)
         with Failure _ | Not_found ->
           Loc.error (LoadError (a, "prover " ^ prover ^ " not listing in header"))
       end
@@ -2175,7 +2161,7 @@ let save fname shfname session =
   let chsh = Compress.Compress_z.open_out shfname in
   let fmt = formatter_of_out_channel ch in
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
-  fprintf fmt "<!DOCTYPE why3session PUBLIC \"-//Why3//proof session v5//EN\"@ \"http://why3.lri.fr/why3session.dtd\">@\n";
+  fprintf fmt "<!DOCTYPE why3session PUBLIC \"-//Why3//proof session v5//EN\"@ \"https://www.why3.org/why3session.dtd\">@\n";
   fprintf fmt "@[<v 0><why3session shape_version=\"%a\">"
     Termcode.pp_sum_shape_version session.shapes.shape_version;
   let prover_ids = session.session_prover_ids in
@@ -2258,10 +2244,11 @@ let export_as_zip s =
            | _ -> dir :: l
          in
          let f = String.concat Filename.dir_sep l in
-         acc ^ " " ^ f)
-      s.session_files dir
+         acc ^ " '" ^ f ^"'")
+      s.session_files ("'" ^ dir ^ "'")
   in
-  let cmd = "cd " ^ cd ^ " ; zip -r " ^ archive ^ " " ^ files in
+  let cmd = "cd '" ^ cd ^ "' ; zip -r '" ^ archive ^ "' " ^ files in
+  Format.eprintf "creating archive using@\n%s@." cmd;
   let n = Sys.command cmd in
   if n = 0 then archive else raise (Sys_error ("cannot produce archive " ^ archive))
 

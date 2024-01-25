@@ -198,13 +198,13 @@ type main = {
 
 let libdir =
   let env_libdir = try Some (Sys.getenv "WHY3LIB") with Not_found -> None in
-  fun m -> Opt.get_def m.libdir env_libdir
+  fun m -> Option.value ~default:m.libdir env_libdir
 
 let set_libdir m d = { m with libdir = d}
 
 let datadir =
   let env_datadir = try Some (Sys.getenv "WHY3DATA") with Not_found -> None in
-  fun m -> Opt.get_def m.datadir env_datadir
+  fun m -> Option.value ~default:m.datadir env_datadir
 
 let set_datadir m d = { m with datadir = d}
 
@@ -455,7 +455,7 @@ module RC_load = struct
 
   let warn_replaced_space =
     Loc.register_warning "replaced_space" "Warn that a space has been replaced by '_' in a strategy name"
-  
+
   let load_strategy strategies section =
     try
       let name = get_string section "name" in
@@ -769,8 +769,8 @@ let mk_filter_prover ?version ?altern name =
   | Some "" -> invalid_arg "mk_filter_prover: version can't be an empty string"
   | _ -> () end;
   { filter_name    = mk_regexp name;
-    filter_version = Opt.map mk_regexp version;
-    filter_altern  = Opt.map mk_regexp altern;
+    filter_version = Option.map mk_regexp version;
+    filter_altern  = Option.map mk_regexp altern;
   }
 
 let filter_from_prover pr =
@@ -803,8 +803,8 @@ let parse_filter_prover s =
 let filter_prover fp p =
   let check s schema = Re.Str.string_match schema.reg s 0 in
   check p.prover_name fp.filter_name
-  && Opt.fold (fun _ -> check p.prover_version) true fp.filter_version
-  && Opt.fold (fun _ -> check p.prover_altern) true fp.filter_altern
+  && Option.fold ~some:(fun v -> check p.prover_version v) ~none:true fp.filter_version
+  && Option.fold ~some:(fun v -> check p.prover_altern v) ~none:true fp.filter_altern
 
 let filter_prover_with_shortcut whyconf fp =
   if fp.filter_version = None && fp.filter_altern = None then
@@ -927,7 +927,7 @@ let get_prover_editor config prover =
 
 module User = struct
   let update_section rc section f =
-    Opt.get_def empty_section (Rc.get_section rc section)
+    Option.value ~default:empty_section (Rc.get_section rc section)
     |> f
     |> Rc.set_section rc section
 
@@ -993,7 +993,7 @@ module User = struct
 end
 
 let set_provers config ?shortcuts provers =
-  let shortcuts = Opt.get_def config.prover_shortcuts shortcuts in
+  let shortcuts = Option.value ~default:config.prover_shortcuts shortcuts in
   {config with
    provers = provers;
    prover_shortcuts = shortcuts;

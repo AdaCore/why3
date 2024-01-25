@@ -327,7 +327,7 @@ let t_compare ~trigger ~attr ~loc ~const t1 t2 =
     if t1 != t2 || vml1 <> [] || vml2 <> [] then begin
       comp_raise (oty_compare t1.t_ty t2.t_ty);
       if attr then comp_raise (Sattr.compare t1.t_attrs t2.t_attrs);
-      if loc then comp_raise (Opt.compare Loc.compare t1.t_loc t2.t_loc);
+      if loc then comp_raise (Option.compare Loc.compare t1.t_loc t2.t_loc);
       match descend vml1 t1, descend vml2 t2 with
       | Bnd i1, Bnd i2 -> perv_compare i1 i2
       | Bnd _, Trm _ -> raise CompLT
@@ -1119,9 +1119,9 @@ let rec t_gen_map fnT fnL m t =
         ty_equal_check (fnT v.vs_ty) u.vs_ty;
         t_var u
     | Tconst c ->
-        t_const c (fnT (Opt.get t.t_ty))
+        t_const c (fnT (Option.get t.t_ty))
     | Tapp (fs, tl) ->
-        t_app (fnL fs) (List.map fn tl) (Opt.map fnT t.t_ty)
+        t_app (fnL fs) (List.map fn tl) (Option.map fnT t.t_ty)
     | Tif (f, t1, t2) ->
         t_if (fn f) (fn t1) (fn t2)
     | Tlet (t1, (u,b,t2)) ->
@@ -1482,7 +1482,7 @@ let t_replace t1 t2 t =
 (* lambdas *)
 
 let t_lambda vl trl t =
-  let ty = Opt.get_def ty_bool t.t_ty in
+  let ty = Option.value ~default:ty_bool t.t_ty in
   let add_ty v ty = ty_func v.vs_ty ty in
   let ty = List.fold_right add_ty vl ty in
   let fc = create_vsymbol (id_fresh "fc") ty in

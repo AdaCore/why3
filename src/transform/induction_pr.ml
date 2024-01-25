@@ -188,7 +188,7 @@ let substitute_clause induct vsi ls argl goal c =
       let t2 () = introduce_equalities vsi paraml argl goal in
         if keepi then
           if induct && List.for_all2
-            (fun a b -> Opt.equal ty_equal a.t_ty b.t_ty) argl paraml
+            (fun a b -> Option.equal ty_equal a.t_ty b.t_ty) argl paraml
           then t_and t (t2 ())
           (* FIXME: in case of polymorphic recursion we do not generate IHs *)
           else t

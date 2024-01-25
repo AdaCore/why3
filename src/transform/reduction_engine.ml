@@ -1004,7 +1004,7 @@ and reduce_eval eng st t ~orig sigma rem =
         let aux vs t =
           (* Create ε fc. λ vs. fc @ vs = t to make the value from
              known_map compatible to reduce_func_app *)
-          let ty = Opt.get t.t_ty in
+          let ty = Option.get t.t_ty in
           let app_ty = Ty.ty_func vs.vs_ty ty in
           let fc = create_vsymbol (Ident.id_fresh "fc") app_ty in
           t_eps

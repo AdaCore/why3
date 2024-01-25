@@ -21,7 +21,7 @@ let cmds =
     Why3session_update.cmd_update;
     Why3session_output.cmd;
     (* Why3session_csv.cmd; Why3session_copy.cmd_mod; Why3session_copy.cmd_copy;
-       Why3session_copy.cmd_archive; Why3session_rm.cmd; 
+       Why3session_copy.cmd_archive; Why3session_rm.cmd;
        Why3session_run.cmd; *)
   ]
 

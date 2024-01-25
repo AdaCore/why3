@@ -182,7 +182,7 @@ File maps_mono.mlw:
             if x!091 = 3 then fun (x!092:int) -> if x!092 = 4 then 5 else 5
             else if x!091 = 1 then fun (x!092:int) -> 2
                  else fun (x!092:int) -> if x!092 = 4 then 5 else 5}
-      v = (fun y -> if pure { if y = x2 then True else False } then v1
+      v = (fun y -> if pure { if y = x3 then True else False } then v1
              else f1 y) with f1 = fun (x!091:int) ->
                                    if x!091 = 3
                                    then fun (x!092:int) ->
@@ -190,13 +190,13 @@ File maps_mono.mlw:
                                    else if x!091 = 1
                                         then fun (x!092:int) -> 2
                                         else fun (x!092:int) ->
-                                              if x!092 = 4 then 5 else 5, x2 = 0, v1 = fun
+                                              if x!092 = 4 then 5 else 5, x3 = 0, v1 = fun
                                                                     (x!091:
                                                                     int) -> 2
   Line 51:
     Property failure at postcondition of `test_map_multidim1` with:
       x = {contents=
-           (fun y -> if pure { if y = x2 then True else False } then v1
+           (fun y -> if pure { if y = x3 then True else False } then v1
               else f1 y) with f1 = fun (x!091:int) ->
                                     if x!091 = 3
                                     then fun (x!092:int) ->
@@ -204,7 +204,7 @@ File maps_mono.mlw:
                                     else if x!091 = 1
                                          then fun (x!092:int) -> 2
                                          else fun (x!092:int) ->
-                                               if x!092 = 4 then 5 else 5, x2 = 0, v1 = fun
+                                               if x!092 = 4 then 5 else 5, x3 = 0, v1 = fun
                                                                     (x!091:
                                                                     int) -> 2}
 
@@ -513,7 +513,7 @@ File maps_mono.mlw:
                                            else if x!0152 = 22 then 23
                                                 else if x!0152 = 2 then 7
                                                      else 8}
-      v = (fun y -> if pure { if y = x2 then True else False } then v1
+      v = (fun y -> if pure { if y = x3 then True else False } then v1
              else f1 y) with f1 = fun (x!0151:int) ->
                                    if x!0151 = 0
                                    then fun (x!0152:int) ->
@@ -551,7 +551,7 @@ File maps_mono.mlw:
                                                                   if 
                                                                   x!0152 = 2
                                                                   then 7
-                                                                  else 8, x2 = 0, v1 = (fun y1 -> if pure { 
+                                                                  else 8, x3 = 0, v1 = (fun y1 -> if pure { 
                                                                     if 
                                                                     y1 = x
                                                                     then True
@@ -589,7 +589,7 @@ File maps_mono.mlw:
   Line 56:
     Property failure at postcondition of `test_map_multidim2` with:
       x = {contents=
-           (fun y -> if pure { if y = x2 then True else False } then v1
+           (fun y -> if pure { if y = x3 then True else False } then v1
               else f1 y) with f1 = fun (x!0151:int) ->
                                     if x!0151 = 0
                                     then fun (x!0152:int) ->
@@ -628,7 +628,7 @@ File maps_mono.mlw:
                                                                    if 
                                                                    x!0152 = 2
                                                                    then 7
-                                                                   else 8, x2 = 0, v1 = (fun y1 -> if pure { 
+                                                                   else 8, x3 = 0, v1 = (fun y1 -> if pure { 
                                                                     if 
                                                                     y1 = x
                                                                     then True
@@ -826,23 +826,23 @@ File maps_mono.mlw:
             else if x!0229 = 5 then True
                  else if x!0229 = 4 then True
                       else if x!0229 = 1 then True else True}
-      v = (fun y -> if pure { if y = x4 then True else False } then v2
+      v = (fun y -> if pure { if y = x5 then True else False } then v2
              else f2 y) with f2 = fun (x!0229:int) ->
                                    if x!0229 = 0 then False
                                    else if x!0229 = 5 then True
                                         else if x!0229 = 4 then True
                                              else if x!0229 = 1 then True
-                                                  else True, x4 = 0, v2 = true
+                                                  else True, x5 = 0, v2 = true
   Line 68:
     Property failure at postcondition of `proj_map_test2` with:
       x = {contents=
-           (fun y -> if pure { if y = x4 then True else False } then v2
+           (fun y -> if pure { if y = x5 then True else False } then v2
               else f2 y) with f2 = fun (x!0229:int) ->
                                     if x!0229 = 0 then False
                                     else if x!0229 = 5 then True
                                          else if x!0229 = 4 then True
                                               else if x!0229 = 1 then True
-                                                   else True, x4 = 0, v2 = true}
+                                                   else True, x5 = 0, v2 = true}
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE

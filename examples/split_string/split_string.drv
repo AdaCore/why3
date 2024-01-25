@@ -1,0 +1,9 @@
+module split_string.SplitStringOCaml
+  syntax type char "char"
+  syntax val (=) "%1 = %2"   prec 11 11 10
+  syntax type string_ "string"
+  syntax val length "String.length %1" prec 4 3
+  syntax val ([]) "%1.[%2]" prec 2 1 18
+  syntax val sub "String.sub %1 %2 (%3 - %2)" prec 4 3
+  syntax val sub "String.sub %1 %2 (%3 - %2)" prec 4 3
+end

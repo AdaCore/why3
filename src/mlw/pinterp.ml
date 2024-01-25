@@ -140,23 +140,23 @@ let get_arg : type t. t vtype -> _ -> _ -> t = fun t rs v ->
   | _, Vundefined ->
       incomplete "an undefined argument was passed to builtin %a"
         Ident.print_decoded rs.rs_name.id_string
-  | VTint, Vterm vt when (Opt.equal Ty.ty_equal vt.t_ty (Some Ty.ty_int)) ->
+  | VTint, Vterm vt when (Option.equal Ty.ty_equal vt.t_ty (Some Ty.ty_int)) ->
       begin match vt.t_node with
       | Tconst (Constant.ConstInt c) -> BigInt.to_int c.Number.il_int
       | _ -> assert false
       end
-  | VTnum, Vterm vt when (Opt.equal Ty.ty_equal vt.t_ty (Some Ty.ty_int)) ->
+  | VTnum, Vterm vt when (Option.equal Ty.ty_equal vt.t_ty (Some Ty.ty_int)) ->
       begin match vt.t_node with
       | Tconst (Constant.ConstInt c) -> c.Number.il_int
       | _ -> assert false
       end
-  | VTbool, Vterm vt when (Opt.equal Ty.ty_equal vt.t_ty (Some Ty.ty_bool)) ->
+  | VTbool, Vterm vt when (Option.equal Ty.ty_equal vt.t_ty (Some Ty.ty_bool)) ->
       begin match vt.t_node with
       | Ttrue -> true
       | Tfalse -> false
       | _ -> assert false
       end
-  | VTstring, Vterm vt when (Opt.equal Ty.ty_equal vt.t_ty (Some Ty.ty_str)) ->
+  | VTstring, Vterm vt when (Option.equal Ty.ty_equal vt.t_ty (Some Ty.ty_str)) ->
       begin match vt.t_node with
       | Tconst (Constant.ConstStr s) -> s
       | _ -> assert false
@@ -546,7 +546,7 @@ let
         (* TODO A variable x binding the result of exec pure are used as (x = True) in
            subsequent terms, so we map true/false to True/False here. Is this reasonable? *)
         let t = fix_boolean_term t in
-        Normal (value (Opt.get_def ty_bool t.t_ty) (Vterm t))
+        Normal (value (Option.value ~default:ty_bool t.t_ty) (Vterm t))
     | None ->
         kasprintf failwith "No logic definition for %a" print_ls ls
 
@@ -631,7 +631,10 @@ let get_value : value_gen list -> string * value =
 (** Generate a value by querying the model for a variable. *)
 let gen_model_variable ?check ({giant_steps} as ctx) ?loc id ity : value_gen =
   "value from model", fun () ->
-    Opt.apply () check id;
+    begin match check with
+    | Some f -> f id
+    | None -> ()
+    end;
     try
       let check = check_assume_type_invs ctx.rac ?loc ~giant_steps ctx.env in
       ctx.oracle.for_variable ~loc ~check ctx.env id ity
@@ -644,7 +647,7 @@ let gen_model_result ({giant_steps} as ctx) (oid:expr_id option) loc ity : value
     then Some unit_value
     else
       let res = ctx.oracle.for_result ctx.env ~call_id:oid ~loc ity in
-      Opt.iter (check_assume_type_invs ctx.rac ~loc ~giant_steps ctx.env ity) res;
+      Option.iter (check_assume_type_invs ctx.rac ~loc ~giant_steps ctx.env ity) res;
       res
 
 (** Generator for a default value *)
@@ -667,7 +670,7 @@ let gen_type_default ~really ?posts ctx ity : value_gen =
     let v = default_value_of_type ctx.env ity in
     try
       let cntr_ctx = mk_cntr_ctx ctx ~desc:"type default value" Vc.expl_post in
-      Opt.iter (check_posts ctx.rac cntr_ctx v) posts;
+      Option.iter (check_posts ctx.rac cntr_ctx v) posts;
       Some v
     with Fail _ | Incomplete _ -> None
 
@@ -717,7 +720,7 @@ let get_and_register_variable ctx ?def ?loc id ity =
 
 let get_and_register_result ?def ?rs ctx posts (oid:expr_id option) loc ity =
   let ctx_desc = asprintf "return value of call%t at %a"
-      (fun fmt -> Opt.iter (fprintf fmt " to %a" print_rs) rs)
+      (fun fmt -> Option.iter (fprintf fmt " to %a" print_rs) rs)
       Loc.pp_position loc
   in
   let gens = [
@@ -827,7 +830,7 @@ let set_limits () =
 let reset_limits () =
   if !limits_state = None then failwith "reset_limits: limits not set";
   Debug.dprintf debug_trace_exec "Finished after %d steps@."
-    !(snd (Opt.get !limits_state));
+    !(snd (Option.get !limits_state));
   limits_state := None
 
 let with_limits f =
@@ -867,7 +870,7 @@ let add_premises ?post_res ?(vsenv=[]) ts env =
     let matching_vs rs _ = id_equal rs.rs_name vs.vs_name in
     match Mrs.choose (Mrs.filter matching_vs env.funenv) with
     | rs, ({ c_node= Cfun e }, _) ->
-        let t = Opt.get (term_of_expr ~prop:false e) in
+        let t = Option.get (term_of_expr ~prop:false e) in
         let t = t_ty_subst mt mv t in
         let vs_args = List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args in
         t_let_close vs (t_lambda vs_args [] t) sofar
@@ -906,13 +909,13 @@ let add_post_premises cty res env =
     | Normal v -> Some (cty.cty_post, v)
     | Excep (xs, v) -> Some (Mxs.find xs cty.cty_xpost, v)
     | Irred _ -> None in
-  Opt.iter (fun (post, res) ->
+  Option.iter (fun (post, res) ->
       let vsenv, t = term_of_value env [] res in
       add_premises ~post_res:t ~vsenv post env) post_res
 
 let rec exec_expr ctx e =
   check_limits ctx.limits;
-  let _,bl,bc,el,ec = Loc.get (Opt.get_def Loc.dummy_position e.e_loc) in
+  let _,bl,bc,el,ec = Loc.get (Option.value ~default:Loc.dummy_position e.e_loc) in
   Debug.dprintf debug_trace_exec "@[<h>%t%sEVAL EXPR %d,%d-%d,%d: %a@]@." pp_indent
     (if ctx.giant_steps then "G-s. " else "") bl bc el ec
     (pp_limited print_expr) e;
@@ -923,7 +926,7 @@ let rec exec_expr ctx e =
 (* abs = abstractly - do not execute loops and function calls - use
    instead invariants and function contracts to guide execution. *)
 and exec_expr' ctx e =
-  let loc_or_dummy = Opt.get_def Loc.dummy_position e.e_loc in
+  let loc_or_dummy = Option.value ~default:Loc.dummy_position e.e_loc in
   match e.e_node with
   | Evar pvs ->
       let v = get_pvs ctx.env pvs in
@@ -998,7 +1001,7 @@ and exec_expr' ctx e =
          else
            Normal (undefined_value ctx.env e.e_ity)
       | Capp (rs, pvsl) when
-          Opt.map is_prog_constant (Mid.find_opt rs.rs_name ctx.env.pmodule.Pmodule.mod_known)
+          Option.map is_prog_constant (Mid.find_opt rs.rs_name ctx.env.pmodule.Pmodule.mod_known)
           = Some true ->
           Debug.dprintf debug_trace_exec "@[<h>%tEVAL EXPR: EXEC CAPP %a@]@." pp_indent print_rs rs;
           if ctx.do_rac then (
@@ -1111,7 +1114,7 @@ and exec_expr' ctx e =
                    check_terms ctx.rac cntr_ctx inv );
                  add_premises inv ctx.env;
                  if ctx.do_rac && e.e_effect.eff_oneway = Total then (
-                   let oldified_varl = Opt.get opt_old_varl in
+                   let oldified_varl = Option.get opt_old_varl in
                    check_variant ctx.rac Vc.expl_loop_vari e.e_loc
                      ~giant_steps:ctx.giant_steps ctx.env oldified_varl varl );
                  (* the execution cannot continue from here *)
@@ -1152,7 +1155,7 @@ and exec_expr' ctx e =
                     check_terms ctx.rac cntr_ctx inv );
                   add_premises inv ctx.env;
                   if ctx.do_rac && e.e_effect.eff_oneway = Total then (
-                    let old_varl = Opt.get opt_old_varl in
+                    let old_varl = Option.get opt_old_varl in
                     check_variant ctx.rac Vc.expl_loop_vari e.e_loc
                       ~giant_steps:ctx.giant_steps ctx.env old_varl varl );
                   iter ()
@@ -1261,7 +1264,7 @@ and exec_expr' ctx e =
           Normal unit_value, None
       with NotNum -> failwith "Something's not a number@."
       ) in
-      Opt.iter (fun v -> add_premises inv (bind_vs i.pv_vs (int_value v) ctx.env)) v;
+      Option.iter (fun v -> add_premises inv (bind_vs i.pv_vs (int_value v) ctx.env)) v;
       res
     end
   | Efor (pvs, (pvs1, dir, pvs2), _i, inv, e1) ->
@@ -1296,7 +1299,7 @@ and exec_expr' ctx e =
       iter a
     with NotNum -> failwith "Something's not a number@."
     ) in
-    Opt.iter (fun i -> add_premises inv (bind_vs pvs.pv_vs (int_value i) ctx.env)) i;
+    Option.iter (fun i -> add_premises inv (bind_vs pvs.pv_vs (int_value i) ctx.env)) i;
     res
   | Ematch (e0, ebl, el) -> (
       let r = exec_expr ctx e0 in
@@ -1343,7 +1346,7 @@ and exec_expr' ctx e =
   | Epure t ->
       Debug.dprintf debug_trace_exec "@[<h>%tEVAL EXPR: PURE %a@]@." pp_indent print_term t;
       let t = ctx.compute_term ctx.env t in
-      Normal (value (Opt.get t.t_ty) (Vterm t))
+      Normal (value (Option.get t.t_ty) (Vterm t))
   | Eabsurd ->
       let cntr_ctx = mk_cntr_ctx ctx ?loc:e.e_loc Vc.expl_absurd in
       raise (Fail (cntr_ctx, t_false))
@@ -1394,7 +1397,7 @@ and exec_call ?(main_function=false) ?loc ?attrs (eid:expr_id option) ctx rs arg
           | exception Not_found ->
               match List.find (fun rd -> rs_equal rs rd.rec_rsym) rds with
               | rd -> (* Recursive call to recursive function *)
-                  let old_varl = Opt.get ctx.old_varl in
+                  let old_varl = Option.get ctx.old_varl in
                   check_variant ctx.rac Vc.expl_variant loc
                     ~giant_steps:ctx.giant_steps ctx.env old_varl rd.rec_varl;
                   {ctx with old_varl= Some (oldify_varl ctx.env rd.rec_varl)} )
@@ -1543,7 +1546,7 @@ and exec_call ?(main_function=false) ?loc ?attrs (eid:expr_id option) ctx rs arg
                     match List.find matching_name proj_def.Pdecl.itd_constructors with
                     | rs ->
                       let opt_constr_args = List.map (fun f -> Some f) rs.rs_cty.cty_args in
-                      let fields = List.map (fun f -> field (term_value (ity_of_ty (Opt.get f.t_ty)) f)) args in
+                      let fields = List.map (fun f -> field (term_value (ity_of_ty (Option.get f.t_ty)) f)) args in
                       search pv opt_constr_args fields v
                     | exception Not_found -> raise CannotProject
                   end
@@ -1652,9 +1655,9 @@ let bind_globals ?rs_main ctx =
   let is_before id d (known, found_rs) =
     let found_rs = found_rs || match d.pd_node with
       | PDlet (LDsym (rs, _)) ->
-          Opt.equal rs_equal (Some rs) rs_main
+          Option.equal rs_equal (Some rs) rs_main
       | PDlet (LDrec ds) ->
-          List.exists (fun d -> Opt.equal rs_equal (Some d.rec_sym) rs_main) ds
+          List.exists (fun d -> Option.equal rs_equal (Some d.rec_sym) rs_main) ds
       | _ -> false in
     let known = if found_rs then known else Mid.add id d known in
     known, found_rs in
@@ -1729,7 +1732,7 @@ let exec_rs ctx rs =
         (List.map (get_value ctx) rs.rs_cty.cty_args) ctx.env in
     {ctx with env} in
   register_exec_main ctx.env rs;
-  let loc = Opt.get_def Loc.dummy_position rs.rs_name.id_loc in
+  let loc = Option.value ~default:Loc.dummy_position rs.rs_name.id_loc in
   let res = exec_call ~main_function:true ~loc None ctx rs rs.rs_cty.cty_args
       rs.rs_cty.cty_result in
   register_ended ctx.env rs.rs_name.id_loc;

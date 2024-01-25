@@ -104,7 +104,7 @@ module FromSexpToModel = struct
         Format.fprintf fmt "@[@[<hv2>(%a@])@]" Pp.(print_list space pp_sexp) l
 
   let string_of_sexp = Format.asprintf "%a" pp_sexp
-  let atom f = function Atom s -> f s | sexp -> error sexp "atom"
+  let atom f = function Atom s -> (try f s with _ -> error (Atom s) "atom") | sexp -> error sexp "atom"
 
   let list f = function
     | List l -> List.map f l
@@ -272,18 +272,18 @@ module FromSexpToModel = struct
   let constant sexp : term =
     let cst =
       try Cint (constant_int sexp)
-      with _ -> (
+      with E _ -> (
         try Creal (constant_real sexp)
-        with _ -> (
+        with E _ -> (
           try Cfraction (constant_fraction sexp)
-          with _ -> (
+          with E _ -> (
             try Cbitvector (constant_bv sexp)
-            with _ -> (
+            with E _ -> (
               try Cfloat (constant_float sexp)
-              with _ -> (
+              with E _ -> (
                 try Cbool (bool sexp)
-                with _ -> (
-                  try Cstring (string sexp) with _ -> error sexp "constant"))))))
+                with E _ -> (
+                  try Cstring (string sexp) with E _ -> error sexp "constant"))))))
     in
     Tconst cst
 
@@ -348,13 +348,15 @@ module FromSexpToModel = struct
         | [ ty; _; _ ] -> Some ty
         | _ -> None
     in
-    match FromStringToSexp.parse_string (Opt.get_def "" opt_name) with
+    match FromStringToSexp.parse_string (Option.value ~default:"" opt_name) with
     | [] -> atom_error name "get_type_from_prover_variable"
     | [ sexp ] -> sexp
     | sexps -> List sexps
 
   let qualified_identifier sexp : qual_identifier =
     match sexp with
+    (* Z3 sometimes outputs its internal rule `array-ext`: this seems to be a bug in Z3 *)
+    | List [Atom "_"; Atom "array-ext"; _] -> Qident (Isymbol (S "z3-array-ext-placeholder"))
     | Atom _ -> (
         let id = identifier sexp in
         match id with
@@ -371,18 +373,29 @@ module FromSexpToModel = struct
 
   let rec term sexp =
     try constant sexp
-    with _ -> (
+    with E _ -> (
       try Tvar (qualified_identifier sexp)
-      with _ -> (
+      with E _ -> (
         try ite sexp
-        with _ -> (
+        with E _ -> (
+          try lett sexp
+        with E _ -> (
           try array sexp
-          with _ -> (
-            try application sexp with _ -> Tunparsed (string_of_sexp sexp)))))
+          with E _ -> (
+              try application sexp with exn -> raise exn)))))
 
   and ite = function
     | List [ Atom "ite"; t1; t2; t3 ] -> Tite (term t1, term t2, term t3)
     | sexp -> error sexp "ite"
+
+  and lett = function
+    | List [ Atom "let"; List bindings; t2 ] ->
+        let binding = (function
+        | (List [ n; t ]) -> (symbol n, term t)
+        | sexp -> error sexp "let binding") in
+        Tlet ((List.map binding bindings), (term t2))
+    | sexp -> error sexp "let"
+
 
   and application = function
     | List (qual_id :: ts) ->
@@ -480,7 +493,7 @@ module FromModelToTerm = struct
     type_fields : Term.lsymbol list Ty.Mty.t;
     (* Set of coercions for each type from [pinfo.Printer.type_coercions]. *)
     type_coercions : Term.Sls.t Ty.Mty.t;
-    (* Function definiions from the SMT model
+    (* Function definitions from the SMT model
        that are not in [pinfo.Printer.queried_terms]. *)
     type_sorts : Ty.ty Mstr.t;
     (* Sorts defined in the smtv2 file output. *)
@@ -934,6 +947,14 @@ module FromModelToTerm = struct
     let th = Env.read_theory env.why3_env [ path ] theory in
     Theory.ns_find_ls th.Theory.th_export [ ident ]
 
+  let symbol_to_ident = function
+    | S s -> Ident.id_fresh s
+    | Sprover s -> Ident.id_fresh s
+
+  (* let identifier_to_ident = function
+    | Isymbol s -> symbol_to_ident s
+    | Iindexedsymbol (s, _) -> symbol_to_ident s *)
+
   let rec term_to_term env t =
     match t with
     | Tconst c -> constant_to_term env c
@@ -948,6 +969,7 @@ module FromModelToTerm = struct
     | Tapply (qid, ts) -> apply_to_term env qid ts
     | Tarray (s1, s2, a) -> array_to_term env s1 s2 a
     | Tasarray t -> asarray_to_term env t
+    | Tlet (bindings, t) -> let_to_term env bindings t
     | Tunparsed _ -> error "Could not interpret term %a@." print_term t
 
   and apply_to_term env qid ts =
@@ -986,7 +1008,7 @@ module FromModelToTerm = struct
                 print_qualified_identifier qid
             | Some s ->
               let ts'_ty =
-                try List.map (fun t -> Opt.get t.t_ty) ts'
+                try List.map (fun t -> Option.get t.t_ty) ts'
                 with _ ->
                   error "Arguments of %a should have a type@."
                     print_qualified_identifier qid
@@ -1090,6 +1112,17 @@ module FromModelToTerm = struct
       | _ -> error "The function %s cannot be converted into an array type@." n
     end
     | _ -> error "Cannot interpret the 'as-array' term"
+  and let_to_term env bindings t =
+    let (t, t_concrete) = term_to_term env t in
+    let add_to_concrete_let v_concrete t_concrete = function
+      | (Let (l, b)) -> Let (((v_concrete, t_concrete) :: l), b)
+      | other -> Let ([v_concrete, t_concrete], other) in
+    List.fold_left (fun (t, t_concrete) (sym, tt) ->
+      let body, body_concrete = term_to_term env tt in
+      let vs = create_vsymbol (symbol_to_ident sym) (Option.get body.t_ty) in
+      t_let t (t_close_bound vs body), add_to_concrete_let vs.vs_name.Ident.id_string body_concrete t_concrete)
+      (* | _ -> error "Could not interpret let bindings %a@." print_bindings bindings *)
+    (t, t_concrete) bindings
 
   (*  Interpreting function definitions from the SMT model to [t',t'_concrete].
       - [t'] is a Term.term
@@ -1111,7 +1144,7 @@ module FromModelToTerm = struct
     let (t', t'_concrete) = term_to_term env t in
     (* convert t' to a formula if the expected type of the result is None (fmla=true) *)
     let t' = if fmla then Term.to_prop t' else t' in
-    if Opt.equal Ty.ty_equal ty_s t'.t_ty then (
+    if Option.equal Ty.ty_equal ty_s t'.t_ty then (
       Debug.dprintf debug "[smt_term_to_term] t' = %a, t'.t_ty = %a, t'_concrete = %a@."
         Pretty.print_term t'
         (Pp.print_option_or_default "None" Pretty.print_ty_qualified)
@@ -1537,7 +1570,7 @@ module FromModelToTerm = struct
           let fields = Mls.find ls env.record_fields in
           if
             List.for_all2
-              (fun ls t -> Opt.equal (Ty.ty_equal) ls.ls_value t.t_ty)
+              (fun ls t -> Option.equal (Ty.ty_equal) ls.ls_value t.t_ty)
               fields ts
           then
             let fields_values =
@@ -1845,7 +1878,7 @@ module FromModelToTerm = struct
               try
                 (* fmla = true if the interpreted term should be a formula (with type = None)
                    and not a term (with type = Some ty) *)
-                let fmla = not (Opt.inhabited ls.ls_value) in
+                let fmla = not (Option.is_some ls.ls_value) in
                 let (t, t_concrete) = interpret_fun_def_to_term ~fmla env def in
                 Some ((ls, oloc, attrs), (t, t_concrete))
               with

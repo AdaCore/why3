@@ -67,7 +67,7 @@ rule token = parse
   | "[##" space* ("\"" ([^ '\010' '\013' '"' ]* as file) "\"")?
     space* (dec+ as line) space* (dec+ as char) space* "]"
       { let file =
-          Opt.map (resolve_file Lexing.(lexbuf.lex_curr_p.pos_fname)) file
+          Option.map (resolve_file Lexing.(lexbuf.lex_curr_p.pos_fname)) file
         in
         Lexlib.update_loc lexbuf file (int_of_string line) (int_of_string char);
         token lexbuf }
@@ -109,13 +109,13 @@ rule token = parse
   | (dec+ as i)     ("" as f)    ['e' 'E'] (['-' '+']? dec+ as e)
   | (dec+ as i) '.' (dec* as f) (['e' 'E'] (['-' '+']? dec+ as e))?
   | (dec* as i) '.' (dec+ as f) (['e' 'E'] (['-' '+']? dec+ as e))?
-      { REAL (Number.real_literal ~radix:10 ~neg:false ~int:i ~frac:f ~exp:(Opt.map Lexlib.remove_leading_plus e)) }
+      { REAL (Number.real_literal ~radix:10 ~neg:false ~int:i ~frac:f ~exp:(Option.map Lexlib.remove_leading_plus e)) }
   | '0' ['x' 'X'] (hex+ as i) ("" as f) ['p' 'P'] (['-' '+']? dec+ as e)
   | '0' ['x' 'X'] (hex+ as i) '.' (hex* as f)
         (['p' 'P'] (['-' '+']? dec+ as e))?
   | '0' ['x' 'X'] (hex* as i) '.' (hex+ as f)
         (['p' 'P'] (['-' '+']? dec+ as e))?
-      { REAL (Number.real_literal ~radix:16 ~neg:false ~int:i ~frac:f ~exp:(Opt.map Lexlib.remove_leading_plus e)) }
+      { REAL (Number.real_literal ~radix:16 ~neg:false ~int:i ~frac:f ~exp:(Option.map Lexlib.remove_leading_plus e)) }
   | "(*)"
       { Lexlib.backjump lexbuf 2; LEFTPAR }
   | "(*"

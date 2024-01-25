@@ -172,7 +172,7 @@ let matching_with_terms ~trans_name lv llet_vs left_term right_term withed_terms
   Debug.dprintf debug_matching
     "subst after first first_order_matching:\n%a@." print_subst subst;
   let subst_ty, subst =
-    let withed_terms = Opt.get_def [] withed_terms in
+    let withed_terms = Option.value ~default:[] withed_terms in
     with_terms ~trans_name subst_ty subst lv withed_terms
   in
   subst_ty, subst
@@ -469,7 +469,7 @@ let detect_prop_list pr k hl =
       ((List.exists (fun h -> Ident.id_equal pr.pr_name h.pr_name) hl)
          && (k = Paxiom || k = Pgoal))
 
-(* Replace occurences of t1 with t2 in h. When h is None, the default is to
+(* Replace occurrences of t1 with t2 in h. When h is None, the default is to
    replace in the goal.
 *)
 let replace t1 t2 hl =
