@@ -139,165 +139,179 @@
  <goal name="split_string&#39;vc" expl="VC for split_string" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="split_string&#39;vc.0" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.025217" steps="81480"/></proof>
+  <proof prover="3"><result status="valid" time="0.025217" steps="84695"/></proof>
   </goal>
   <goal name="split_string&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.021791" steps="84121"/></proof>
+  <proof prover="3"><result status="valid" time="0.021791" steps="84816"/></proof>
   </goal>
   <goal name="split_string&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.021419" steps="84107"/></proof>
+  <proof prover="3"><result status="valid" time="0.021419" steps="88334"/></proof>
   </goal>
   <goal name="split_string&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.024941" steps="84354"/></proof>
+  <proof prover="3"><result status="valid" time="0.024941" steps="87903"/></proof>
   </goal>
   <goal name="split_string&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.047896" steps="92595"/></proof>
+  <proof prover="3"><result status="valid" time="0.047896" steps="106957"/></proof>
   </goal>
   <goal name="split_string&#39;vc.5" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.048853" steps="78412"/></proof>
+  <proof prover="3"><result status="valid" time="0.048853" steps="81474"/></proof>
   </goal>
   <goal name="split_string&#39;vc.6" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.031802" steps="63790"/></proof>
+  <proof prover="3"><result status="valid" time="0.031802" steps="67542"/></proof>
   </goal>
   <goal name="split_string&#39;vc.7" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.030768" steps="8362"/></proof>
+  <proof prover="3"><result status="valid" time="0.030768" steps="8380"/></proof>
   </goal>
   <goal name="split_string&#39;vc.8" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.062766" steps="123613"/></proof>
+  <proof prover="3"><result status="valid" time="0.062766" steps="123810"/></proof>
   </goal>
   <goal name="split_string&#39;vc.9" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.069983" steps="138242"/></proof>
+  <proof prover="3"><result status="valid" time="0.069983" steps="142747"/></proof>
   </goal>
   <goal name="split_string&#39;vc.10" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.609267" steps="648691"/></proof>
+  <proof prover="3"><result status="valid" time="0.609267" steps="671749"/></proof>
   </goal>
   <goal name="split_string&#39;vc.11" expl="index in string bounds" proved="true">
-  <proof prover="3"><result status="valid" time="0.067412" steps="120820"/></proof>
+  <proof prover="3"><result status="valid" time="0.067412" steps="125520"/></proof>
   </goal>
   <goal name="split_string&#39;vc.12" expl="index in string bounds" proved="true">
-  <proof prover="3"><result status="valid" time="0.039962" steps="12654"/></proof>
+  <proof prover="3"><result status="valid" time="0.039962" steps="12596"/></proof>
   </goal>
   <goal name="split_string&#39;vc.13" expl="assertion" proved="true">
-  <proof prover="0" timelimit="5"><result status="valid" time="3.757831" steps="19682"/></proof>
+  <proof prover="0" timelimit="60"><result status="valid" time="43.510530" steps="187684"/></proof>
   </goal>
   <goal name="split_string&#39;vc.14" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="0.068592" steps="128785"/></proof>
+  <proof prover="3"><result status="valid" time="0.066537" steps="132200"/></proof>
   </goal>
-  <goal name="split_string&#39;vc.15" expl="index in string bounds" proved="true">
-  <proof prover="3"><result status="valid" time="0.054222" steps="129944"/></proof>
+  <goal name="split_string&#39;vc.15" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.069413" steps="134174"/></proof>
   </goal>
-  <goal name="split_string&#39;vc.16" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.067993" steps="136996"/></proof>
+  <goal name="split_string&#39;vc.16" expl="index in string bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.054222" steps="135705"/></proof>
   </goal>
   <goal name="split_string&#39;vc.17" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.043007" steps="141249"/></proof>
+  <proof prover="3"><result status="valid" time="0.067993" steps="143133"/></proof>
   </goal>
   <goal name="split_string&#39;vc.18" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.043007" steps="143113"/></proof>
+  </goal>
+  <goal name="split_string&#39;vc.19" expl="postcondition" proved="true">
   <transf name="assert" proved="true" arg1="(j &lt; length ss1.seq)">
-   <goal name="split_string&#39;vc.18.0" expl="asserted formula" proved="true">
-   <proof prover="3"><result status="valid" time="0.072076" steps="137868"/></proof>
+   <goal name="split_string&#39;vc.19.0" expl="asserted formula" proved="true">
+   <proof prover="3"><result status="valid" time="0.072076" steps="144005"/></proof>
    </goal>
-   <goal name="split_string&#39;vc.18.1" expl="postcondition" proved="true">
+   <goal name="split_string&#39;vc.19.1" expl="postcondition" proved="true">
    <transf name="case" proved="true" arg1="(j = length ss2.seq)">
-    <goal name="split_string&#39;vc.18.1.0" expl="true case (postcondition)" proved="true">
-    <proof prover="3"><result status="valid" time="0.198406" steps="359268"/></proof>
+    <goal name="split_string&#39;vc.19.1.0" expl="true case (postcondition)" proved="true">
+    <proof prover="3"><result status="valid" time="0.198406" steps="365679"/></proof>
     </goal>
-    <goal name="split_string&#39;vc.18.1.1" expl="false case (postcondition)" proved="true">
-    <proof prover="0"><result status="valid" time="0.244248" steps="1150"/></proof>
+    <goal name="split_string&#39;vc.19.1.1" expl="false case (postcondition)" proved="true">
+    <proof prover="0"><result status="valid" time="0.244248" steps="1263"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="split_string&#39;vc.19" expl="postcondition" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.055591" steps="149097"/></proof>
-  </goal>
   <goal name="split_string&#39;vc.20" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="10" memlimit="4000"><result status="valid" time="6.384168" steps="345105"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.055591" steps="155093"/></proof>
   </goal>
-  <goal name="split_string&#39;vc.21" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="0.074191" steps="128264"/></proof>
+  <goal name="split_string&#39;vc.21" expl="postcondition" proved="true">
+  <proof prover="1" timelimit="10" memlimit="4000"><result status="valid" time="5.042077" steps="323492"/></proof>
   </goal>
-  <goal name="split_string&#39;vc.22" expl="index in string bounds" proved="true">
-  <proof prover="3"><result status="valid" time="0.056831" steps="129997"/></proof>
+  <goal name="split_string&#39;vc.22" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.056339" steps="134437"/></proof>
   </goal>
-  <goal name="split_string&#39;vc.23" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="0.056339" steps="129850"/></proof>
+  <goal name="split_string&#39;vc.23" expl="index in string bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.056831" steps="136898"/></proof>
   </goal>
-  <goal name="split_string&#39;vc.24" expl="loop variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.036479" steps="69634"/></proof>
+  <goal name="split_string&#39;vc.24" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.074191" steps="136479"/></proof>
   </goal>
-  <goal name="split_string&#39;vc.25" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.064336" steps="131249"/></proof>
+  <goal name="split_string&#39;vc.25" expl="loop variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.046044" steps="73876"/></proof>
   </goal>
   <goal name="split_string&#39;vc.26" expl="loop invariant preservation" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="split_string&#39;vc.26.0" expl="loop invariant preservation" proved="true">
-   <proof prover="0" timelimit="30"><result status="valid" time="10.850431" steps="44069"/></proof>
-   </goal>
-  </transf>
+  <proof prover="3"><result status="valid" time="0.064336" steps="138455"/></proof>
   </goal>
   <goal name="split_string&#39;vc.27" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.253610" steps="14342"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="split_string&#39;vc.27.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="30"><result status="valid" time="3.166643" steps="17505"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="split_string&#39;vc.28" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.030694" steps="142292"/></proof>
+  <proof prover="2"><result status="valid" time="0.194593" steps="14444"/></proof>
   </goal>
   <goal name="split_string&#39;vc.29" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.236847" steps="16984"/></proof>
+  <proof prover="3"><result status="valid" time="0.030694" steps="145723"/></proof>
   </goal>
   <goal name="split_string&#39;vc.30" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="1.784799" steps="127136"/></proof>
+  <proof prover="2"><result status="valid" time="0.236847" steps="17293"/></proof>
   </goal>
-  <goal name="split_string&#39;vc.31" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="0.069413" steps="121058"/></proof>
+  <goal name="split_string&#39;vc.31" expl="loop invariant preservation" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="split_string&#39;vc.31.0" expl="loop invariant preservation" proved="true">
+   <transf name="assert" proved="true" arg1="(concat (snoc (ss.seq) suffix) sep == concat ss.seq sep ++ cons sep suffix)">
+    <goal name="split_string&#39;vc.31.0.0" expl="asserted formula" proved="true">
+    <proof prover="3"><result status="valid" time="0.212630" steps="368776"/></proof>
+    </goal>
+    <goal name="split_string&#39;vc.31.0.1" expl="loop invariant preservation" proved="true">
+    <proof prover="2" timelimit="60"><result status="valid" time="42.630446" steps="1495606"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
-  <goal name="split_string&#39;vc.32" expl="loop variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.046044" steps="68438"/></proof>
+  <goal name="split_string&#39;vc.32" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.068592" steps="125789"/></proof>
   </goal>
-  <goal name="split_string&#39;vc.33" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.054686" steps="121874"/></proof>
+  <goal name="split_string&#39;vc.33" expl="loop variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.036479" steps="72336"/></proof>
   </goal>
   <goal name="split_string&#39;vc.34" expl="loop invariant preservation" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="split_string&#39;vc.34.0" expl="loop invariant preservation" proved="true">
-   <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="0.045440" steps="55"/></proof>
-   </goal>
-  </transf>
+  <proof prover="3"><result status="valid" time="0.054686" steps="126757"/></proof>
   </goal>
   <goal name="split_string&#39;vc.35" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.194593" steps="15466"/></proof>
-  </goal>
-  <goal name="split_string&#39;vc.36" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.056659" steps="12932"/></proof>
-  </goal>
-  <goal name="split_string&#39;vc.37" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.025464" steps="8685"/></proof>
-  </goal>
-  <goal name="split_string&#39;vc.38" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
-   <goal name="split_string&#39;vc.38.0" expl="loop invariant preservation" proved="true">
-   <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="0.198775" steps="13535"/></proof>
+   <goal name="split_string&#39;vc.35.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="0.045440" steps="68"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="split_string&#39;vc.39" expl="index in string bounds" proved="true">
-  <proof prover="3"><result status="valid" time="0.065305" steps="123543"/></proof>
+  <goal name="split_string&#39;vc.36" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.253610" steps="15600"/></proof>
   </goal>
-  <goal name="split_string&#39;vc.40" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.058935" steps="124600"/></proof>
+  <goal name="split_string&#39;vc.37" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.056659" steps="12874"/></proof>
+  </goal>
+  <goal name="split_string&#39;vc.38" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.025464" steps="8703"/></proof>
+  </goal>
+  <goal name="split_string&#39;vc.39" expl="loop invariant preservation" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="split_string&#39;vc.39.0" expl="loop invariant preservation" proved="true">
+   <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="0.198775" steps="13546"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="split_string&#39;vc.40" expl="index in string bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.065305" steps="127545"/></proof>
   </goal>
   <goal name="split_string&#39;vc.41" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.048567" steps="128709"/></proof>
+  <proof prover="3"><result status="valid" time="0.058935" steps="129509"/></proof>
   </goal>
   <goal name="split_string&#39;vc.42" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.140543" steps="180"/></proof>
+  <proof prover="3"><result status="valid" time="0.048567" steps="129834"/></proof>
   </goal>
   <goal name="split_string&#39;vc.43" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.127207" steps="803"/></proof>
+  <proof prover="0"><result status="valid" time="0.140543" steps="206"/></proof>
   </goal>
   <goal name="split_string&#39;vc.44" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.610531" steps="72689"/></proof>
+  <proof prover="0"><result status="valid" time="0.127207" steps="843"/></proof>
+  </goal>
+  <goal name="split_string&#39;vc.45" expl="postcondition" proved="true">
+  <proof prover="1" timelimit="1"><result status="valid" time="0.610531" steps="73438"/></proof>
   </goal>
  </transf>
  </goal>
