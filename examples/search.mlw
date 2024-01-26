@@ -1,0 +1,146 @@
+
+(** Search Algorithms
+
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+module Path
+
+  use export int.Int
+  use export seq.Seq
+
+  type state
+
+  val function moves (s: state) : seq state
+
+  val constant start: state
+
+  val predicate success (s: state)
+
+  inductive path state state int =
+  | Path0: forall s. path s s 0
+  | Path1: forall s i. 0 <= i < length (moves s) ->
+           path s (moves s)[i] 1
+  | Patht: forall s t u n m. path s t n -> path t u m -> path s u (n+m)
+
+  predicate move (s t: state) =
+    exists i. 0 <= i < length (moves s) /\ t = (moves s)[i]
+
+  let lemma path_inversion (s t: state) (n: int)
+    requires { path s t n }
+    ensures  { n = 0 /\ s = t
+            \/ n > 0 /\ exists i. 0 <= i < length (moves s) /\
+                        path (moves s)[i] t (n-1) }
+  = () (* by induction_pr *)
+
+  let lemma path_length (s t: state) (n: int)
+    requires { path s t n } ensures { n >= 0 }
+  = ()
+
+  let lemma path_first (s t: state) (n: int) : (s': state)
+    requires { path s t n } requires { n > 0 }
+    ensures  { move s s' }
+    ensures  { path s' t (n-1) }
+  = for i = 0 to length (moves s) - 1 do
+      invariant { forall j. 0 <= j < i -> not (path (moves s)[j] t (n-1)) }
+      let s' = (moves s)[i] in
+      if path s' t (n-1) then return s';
+    done;
+    absurd
+
+  let rec lemma path_inversion_right (s t: state) (n: int)
+    requires { path s t n }
+    ensures  { n = 0 /\ s = t
+            \/ n > 0 /\ exists s'. path s s' (n-1) /\ move s' t }
+    variant  { n }
+  = if n > 0 then path_inversion_right (path_first s t n) t (n-1)
+
+  let rec lemma path_last (s t: state) (n: int) : (t': state)
+    requires { path s t n } requires { n > 0 }
+    ensures  { path s t' (n-1) } ensures { move t' t }
+    variant  { n }
+  = if n = 1 then s else path_last (path_first s t n) t (n-1)
+
+  let rec lemma shorter_path (s t: state) (n m: int) : (r: state)
+    requires { path s t n } requires { 0 <= m <= n }
+    ensures  { path s r m }
+    variant  { n }
+  = if n = 0 || m = 0 then s else shorter_path (path_first s t n) t (n-1) (m-1)
+
+  type outcome =
+    | NoSolution
+    | Solution state int
+
+end
+
+module Bfs
+
+  use Path
+  use seq.Mem
+
+  let bfs () : (o: outcome)
+    ensures  { match o with
+               | NoSolution -> forall t n. success t -> not (path start t n)
+               | Solution t n -> path start t n
+               end }
+    diverges
+  = let ref cur = cons start empty in
+    let ref p = 0 in
+    while length cur > 0 do
+      invariant { p >= 0 }
+      invariant { forall i. 0 <= i < length cur -> path start cur[i] p }
+      invariant { forall t. path start t p -> mem t cur }
+      invariant { forall t n. path start t n -> success t -> n >= p }
+      let ref nxt = empty in
+      for i = 0 to length cur - 1 do
+        invariant { forall l. 0 <= l < length nxt ->
+                    exists j. 0 <= j < i /\ move cur[j] nxt[l] }
+        invariant { forall j k. 0 <= j < i -> 0 <= k < length (moves cur[j]) ->
+                    mem (moves cur[j])[k] nxt }
+        invariant { forall j. 0 <= j < i -> not (success cur[j]) }
+        let s = cur[i] in
+        if success s then return (Solution s p);
+        nxt <- moves s ++ nxt
+      done;
+      cur <- nxt;
+      p <- p+1
+    done;
+    return NoSolution
+
+end
+
+module Dfs
+
+  use Path
+
+  let rec dfs (m: int) (s: state) (p: int) : (o: outcome)
+    requires { 0 <= p <= m+1 }
+    ensures  { match o with
+               | NoSolution   -> forall t n.
+                                 0 <= n <= m-p -> success t -> not (path s t n)
+               | Solution t n -> path s t n /\ success t /\ 0 <= n <= m-p
+               end }
+    variant  { m - p }
+  = if p > m then return NoSolution;
+    if success s then return (Solution s 0);
+    let mv = moves s in
+    for i = 0 to length mv - 1 do
+      invariant { forall j t n. 0 <= j < i -> path mv[j] t n ->
+                  success t -> 0 <= n < m-p -> false }
+      match dfs m mv[i] (p+1) with
+        | Solution t n -> return (Solution t (n+1))
+        | NoSolution   -> ()
+      end
+    done;
+    return NoSolution
+
+  let dfs_max (m: int) : (o: outcome)
+    requires { 0 <= m }
+    ensures  { match o with
+               | NoSolution -> forall t n.
+                               0 <= n <= m -> success t -> not (path start t n)
+               | Solution t n -> path start t n /\ n <= m
+               end }
+  = dfs m start 0
+
+end

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Eprover" version="1.9.1-001" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
@@ -663,7 +663,7 @@
    <proof prover="7"><result status="valid" time="0.100000" steps="10245"/></proof>
    </goal>
    <goal name="wmpn_lshift&#39;vc.48.18" expl="VC for wmpn_lshift" proved="true">
-   <proof prover="4"><result status="valid" time="0.370000"/></proof>
+   <proof prover="4"><result status="valid" time="0.179154"/></proof>
    </goal>
    <goal name="wmpn_lshift&#39;vc.48.19" expl="VC for wmpn_lshift" proved="true">
    <proof prover="7"><result status="valid" time="0.100000" steps="14976"/></proof>
@@ -1222,7 +1222,7 @@
   <goal name="wmpn_rshift&#39;vc.84" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_rshift&#39;vc.84.0" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="2.490000"/></proof>
+   <proof prover="4"><result status="valid" time="3.238216"/></proof>
    </goal>
    <goal name="wmpn_rshift&#39;vc.84.1" expl="VC for wmpn_rshift" proved="true">
    <proof prover="7" timelimit="5" memlimit="2000"><result status="valid" time="0.130000" steps="13051"/></proof>
@@ -1408,7 +1408,11 @@
   <goal name="wmpn_lshift&#39;vc.6" expl="loop invariant init" proved="true">
   <transf name="introduce_premises" proved="true" >
    <goal name="wmpn_lshift&#39;vc.6.0" expl="loop invariant init" proved="true">
-   <proof prover="4" timelimit="30" memlimit="4000"><result status="valid" time="0.850000"/></proof>
+   <transf name="remove_unused_keep_constants" proved="true" >
+    <goal name="wmpn_lshift&#39;vc.6.0.0" expl="loop invariant init" proved="true">
+    <proof prover="4" timelimit="60" memlimit="1000"><result status="valid" time="0.621604"/></proof>
+    </goal>
+   </transf>
    </goal>
   </transf>
   </goal>
@@ -1643,7 +1647,7 @@
   <proof prover="7"><result status="valid" time="0.100000" steps="11491"/></proof>
   </goal>
   <goal name="wmpn_lshift&#39;vc.55" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="2.840000"/></proof>
+  <proof prover="4"><result status="valid" time="3.314907"/></proof>
   </goal>
  </transf>
  </goal>
@@ -2054,7 +2058,7 @@
   <proof prover="7" timelimit="5"><result status="valid" time="0.040000" steps="8487"/></proof>
   </goal>
   <goal name="wmpn_lshift_in_place&#39;vc.30" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="1.070000"/></proof>
+  <proof prover="0"><result status="valid" time="0.335026"/></proof>
   </goal>
   <goal name="wmpn_lshift_in_place&#39;vc.31" expl="precondition" proved="true">
   <proof prover="7" timelimit="5"><result status="valid" time="0.070000" steps="8527"/></proof>
@@ -2110,7 +2114,7 @@
   <goal name="wmpn_lshift_in_place&#39;vc.41" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_lshift_in_place&#39;vc.41.0" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.450000"/></proof>
+   <proof prover="4"><result status="valid" time="0.108356"/></proof>
    </goal>
    <goal name="wmpn_lshift_in_place&#39;vc.41.1" expl="assertion" proved="true">
    <proof prover="1"><result status="valid" time="0.070000"/></proof>
@@ -2166,7 +2170,7 @@
   <proof prover="7" timelimit="5"><result status="valid" time="0.120000" steps="13122"/></proof>
   </goal>
   <goal name="wmpn_lshift_in_place&#39;vc.48" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.510000"/></proof>
+  <proof prover="0"><result status="valid" time="0.739884"/></proof>
   </goal>
   <goal name="wmpn_lshift_in_place&#39;vc.49" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.080000"/></proof>

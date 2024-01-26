@@ -1,0 +1,473 @@
+
+
+(** {1 Unbounded floating-point numbers}
+
+
+See also {h <a href="https://inria.hal.science/hal-04343157">this report</a>}
+
+*)
+
+(* Helper lemmas to help the proof of propagation lemmas *)
+module RealLemmas
+  use real.RealInfix
+  use real.Abs
+
+  let ghost mult_err (x exact_x x' x_rel_err x_cst_err y:real)
+    requires { 0. <=. x_rel_err }
+    requires { 0. <=. x_cst_err }
+    requires { abs exact_x <=. x' }
+    requires { abs (x -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
+    ensures { abs (x *. y -. exact_x *. y) <=. x_rel_err *. abs (x' *. y) +. x_cst_err *. abs y }
+  =
+  assert {
+    y >=. 0. ->
+    abs (x *. y -. exact_x *. y) <=. abs (x_rel_err *. x' *. y) +. x_cst_err *. abs y
+    by
+      (exact_x -. x_rel_err *. x' -. x_cst_err) *. y <=. x *. y <=. (exact_x +. x_rel_err *. x' +. x_cst_err) *. y
+  };
+  assert {
+    y <. 0. ->
+    abs (x *. y -. exact_x *. y) <=. abs (x_rel_err *. x' *. y) +. x_cst_err *. abs y
+    by
+      (exact_x +. x_rel_err *. x' +. x_cst_err) *. y <=. x *. y <=. (exact_x -. x_rel_err *. x' -. x_cst_err) *. y
+  }
+
+  let ghost mult_err_combine (x exact_x x' x_rel_err x_cst_err y exact_y y' y_rel_err y_cst_err:real)
+    requires { 0. <=. x_rel_err }
+    requires { 0. <=. y_rel_err }
+    requires { 0. <=. x_cst_err }
+    requires { 0. <=. y_cst_err }
+    requires { abs exact_x <=. x' }
+    requires { abs exact_y <=. y' }
+    requires { abs (x -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
+    requires { abs (y -. exact_y) <=. y_rel_err *. y' +. y_cst_err }
+    ensures {
+      abs (x *. y -. exact_x *. exact_y)
+      <=. (x_rel_err +. y_rel_err +. x_rel_err *. y_rel_err) *. (x' *. y')
+        +. (y_cst_err +. y_cst_err *. x_rel_err) *. x'
+        +. (x_cst_err +. x_cst_err *. y_rel_err) *. y'
+        +. x_cst_err *. y_cst_err
+    }
+  =
+    mult_err x exact_x x' x_rel_err x_cst_err y;
+  mult_err y exact_y y' y_rel_err y_cst_err exact_x;
+  mult_err y exact_y y' y_rel_err y_cst_err x';
+  assert {
+    abs (x *. y -. exact_x *. exact_y) <=. (y_rel_err *. x' *. y') +. (y_cst_err *. x') +. (x_rel_err *. abs (x' *. y)) +. x_cst_err *. abs y
+  };
+  assert {
+    abs (x *. y -. exact_x *. exact_y) <=. (y_rel_err *. x' *. y') +. (x_rel_err *. (x' *. y' *. (1. +. y_rel_err) +. x' *. y_cst_err)) +. y_cst_err *. x' +. x_cst_err *. abs y
+    by
+      abs (x' *. y) <=. x' *. y' *. (1. +. y_rel_err) +. x' *. y_cst_err
+  };
+  assert {
+    x_cst_err *. abs y <=. x_cst_err *. (y' *. (1. +. y_rel_err) +. y_cst_err)
+  }
+end
+
+
+(** {2 Single-precision unbounded floats} *)
+
+module USingle
+  use real.RealInfix
+  use real.FromInt
+  use real.Abs
+  use mach.float.Single as IEEE
+  use ieee_float.RoundingMode
+
+  type usingle
+
+  function uround IEEE.mode real : usingle
+  function to_real usingle : real
+  function of_int int : usingle
+  axiom to_real_of_int : forall x [of_int x]. to_real (of_int x) = from_int x
+
+  constant eps:real = 0x1p-24 /. (1. +. 0x1p-24)
+  constant eta:real = 0x1p-150
+
+  (* To avoid "inline_trivial" to break the forward_propagation strategy *)
+  meta "inline:no" function eps
+  meta "inline:no" function eta
+
+  let ghost function uadd (x y:usingle) : usingle
+    (* TODO: Do we want the two first assertions in our context ?
+      We only use them to prove the addition lemma *)
+    ensures { abs (to_real result -. (to_real x +. to_real y)) <=. abs (to_real x) }
+    ensures { abs (to_real result -. (to_real x +. to_real y)) <=. abs (to_real y) }
+    ensures {
+      abs (to_real result -. (to_real x +. to_real y)) <=.
+        abs (to_real x +. to_real y) *. eps
+    }
+  = uround RNE (to_real x +. to_real y)
+
+  let ghost function usub (x y:usingle) : usingle
+    (* TODO: Do we want the two first assertions in our context ?
+      We only use them to prove the addition lemma *)
+    ensures { abs (to_real result -. (to_real x -. to_real y)) <=. abs (to_real x) }
+    ensures { abs (to_real result -. (to_real x -. to_real y)) <=. abs (to_real y) }
+    ensures {
+      abs (to_real result -. (to_real x -. to_real y)) <=.
+        abs (to_real x -. to_real y) *. eps
+    }
+  = uround RNE (to_real x -. to_real y)
+
+  let ghost function umul (x y:usingle) : usingle
+    ensures {
+      abs (to_real result -. (to_real x *. to_real y)) <=.
+        abs (to_real x *. to_real y) *. eps +. eta
+    }
+  = uround RNE (to_real x *. to_real y)
+
+  let ghost function udiv (x y:usingle) : usingle
+    requires { to_real y <> 0. }
+    ensures {
+      abs (to_real result -. (to_real x /. to_real y)) <=.
+        abs (to_real x /. to_real y) *. eps +. eta
+    }
+  = uround RNE (to_real x /. to_real y)
+
+  let ghost function uminus (x:usingle) : usingle
+    ensures { to_real result = -. (to_real x) }
+  = uround RNE (-. (to_real x))
+
+  (** Infix operators *)
+  let ghost function ( ++. ) (x:usingle) (y:usingle) : usingle = uadd x y
+  let ghost function ( --. ) (x:usingle) (y:usingle) : usingle = usub x y
+  let ghost function ( **. ) (x:usingle) (y:usingle) : usingle = umul x y
+  (* Why3 doesn't support abbreviations so we need to add the requires *)
+  let ghost function ( //. ) (x:usingle) (y:usingle) : usingle
+    requires { to_real y <> 0. }
+   = udiv x y
+  let ghost function ( --._ ) (x:usingle) : usingle = uminus x
+
+  (* Some constants *)
+  constant uzero:usingle
+  axiom to_real_uzero : to_real uzero = 0.0
+  constant uone:usingle
+  axiom to_real_uone : to_real uone = 1.0
+  constant utwo:usingle
+  axiom to_real_utwo : to_real utwo = 2.0
+
+  use real.RealInfix
+
+  (** {3 Propagation lemmas} *)
+
+  let lemma uadd_single_error_propagation (x_ud y_ud : usingle) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
+    requires {
+      abs (to_real x_ud -. x) <=. x_rel_err *. x' +. x_cst_err
+    }
+    requires {
+      abs (to_real y_ud -. y) <=. y_rel_err *. y' +. y_cst_err
+    }
+    requires { abs x <=. x' }
+    requires { abs y <=. y' }
+    (* TODO: Use (0 <=. x_rel_err \/ (x' = 0 /\ x_cst_err = 0)), same for y. *)
+    requires { 0. <=. x_rel_err }
+    requires { 0. <=. y_rel_err }
+    requires { 0. <=. x_cst_err }
+    requires { 0. <=. y_cst_err }
+    ensures {
+      abs (to_real (x_ud ++. y_ud) -. (x +. y)) <=.
+      (x_rel_err +. y_rel_err +. eps) *. (x' +. y')
+          +. ((1. +. eps +. y_rel_err) *. x_cst_err +. (1. +. eps +. x_rel_err) *. y_cst_err)
+    }
+  =
+  let ghost delta = abs (to_real (x_ud ++. y_ud) -. (to_real x_ud +. to_real y_ud)) in
+  assert {
+    0. <=. x_rel_err /\ 0. <=. y_rel_err ->
+    delta <=.
+      (eps +. y_rel_err) *. x' +. (eps +. x_rel_err) *. y'
+      +. (x_rel_err +. eps) *. y_cst_err +. (y_rel_err +. eps) *. x_cst_err
+    by
+      (delta <=. x' *. x_rel_err +. x_cst_err +. x'
+      so
+        x' +. x_cst_err <=. eps *. (y' +. y_cst_err) ->
+        delta <=. (eps +. x_rel_err) *. y'
+        +. (eps +. y_rel_err) *. x'
+        +. (y_rel_err +. eps) *. x_cst_err +. (x_rel_err +. eps) *. y_cst_err
+      by
+        delta <=. eps *. (y' +. y_cst_err) *. x_rel_err
+              +. (eps *. (y' +. y_cst_err)))
+      /\
+      (delta <=. y' *. y_rel_err +. y_cst_err +. y'
+      so
+      abs y' +. y_cst_err <=. eps *. (x' +. x_cst_err) ->
+      delta <=. (eps +. y_rel_err) *. x'
+        +. (eps +. x_rel_err) *. y'
+        +. (x_rel_err +. eps) *. y_cst_err +. (y_rel_err +. eps) *. x_cst_err
+      by
+        delta <=. eps *. (x' +. x_cst_err) *. y_rel_err
+              +. (eps *. (x' +. x_cst_err)))
+      /\
+      (
+       (eps *. (x' +. x_cst_err) <. abs y' +. y_cst_err /\
+       eps *. (y' +. y_cst_err) <. abs x' +. x_cst_err) ->
+       (delta <=.
+       (eps +. y_rel_err) *. x' +. (eps +. x_rel_err) *. y'
+      +. (x_rel_err +. eps) *. y_cst_err +. (y_rel_err +. eps) *. x_cst_err
+      by
+        abs (to_real x_ud +. to_real y_ud) <=.
+        abs (to_real x_ud -. x) +. x' +. (abs (to_real y_ud -. y) +. y')
+      so
+        x' *. x_rel_err <=. (y' +. y_cst_err) /. eps *. x_rel_err /\
+        y' *. y_rel_err <=. (x' +. x_cst_err) /. eps *. y_rel_err))
+  }
+
+  let lemma usub_single_error_propagation (x_ud y_ud : usingle) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
+    requires {
+      abs (to_real x_ud -. x) <=. x_rel_err *. x' +. x_cst_err
+    }
+    requires {
+      abs (to_real y_ud -. y) <=. y_rel_err *. y' +. y_cst_err
+    }
+    requires { abs x <=. x' }
+    requires { abs y <=. y' }
+    requires { 0. <=. x_cst_err }
+    requires { 0. <=. y_cst_err }
+    requires { 0. <=. x_rel_err }
+    requires { 0. <=. y_rel_err }
+    ensures {
+      abs (to_real (x_ud --. y_ud) -. (x -. y))
+      <=. (x_rel_err +. y_rel_err +. eps) *. (x' +. y')
+          +. ((1. +. eps +. y_rel_err) *. x_cst_err +. (1. +. eps +. x_rel_err) *. y_cst_err)
+    }
+  = uadd_single_error_propagation x_ud (--. y_ud) x x' x_rel_err x_cst_err (-. y) y' y_rel_err y_cst_err
+
+  use RealLemmas
+
+
+
+
+  let lemma umul_single_error_propagation (x_ud y_ud : usingle) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
+    requires {
+      abs (to_real x_ud -. x) <=. x_rel_err *. x' +. x_cst_err
+    }
+    requires {
+      abs (to_real y_ud -. y) <=. y_rel_err *. y' +. y_cst_err
+    }
+    requires { abs x <=. x' }
+    requires { abs y <=. y' }
+    requires { 0. <=. x_rel_err }
+    requires { 0. <=. y_rel_err }
+    requires { 0. <=. x_cst_err }
+    requires { 0. <=. y_cst_err }
+    ensures {
+      abs (to_real (x_ud **. y_ud) -. (x *. y)) <=.
+        (eps +. (x_rel_err +. y_rel_err +. x_rel_err *. y_rel_err) *. (1. +. eps)) *. (x' *. y')
+        +. (((y_cst_err +. y_cst_err *. x_rel_err) *. x'
+        +. (x_cst_err +. x_cst_err *. y_rel_err) *. y'
+        +. x_cst_err *. y_cst_err) *. (1. +. eps) +. eta)
+    }
+  =
+  assert {
+    to_real x_ud *. to_real y_ud -. abs (to_real x_ud *. to_real y_ud) *. eps -. eta
+    <=. to_real (x_ud **. y_ud)
+    <=. to_real x_ud *. to_real y_ud +. abs (to_real x_ud *. to_real y_ud) *. eps +. eta
+  };
+    assert { abs (x *. y) <=. x' *. y' by 
+       abs x *. abs y <=. x' *. abs y = abs y *. x' <=. y' *. x' };
+  mult_err_combine (to_real x_ud) x x' x_rel_err x_cst_err (to_real y_ud) y y' y_rel_err y_cst_err;
+
+end
+
+
+(** {2 Double-precision unbounded floats} *)
+
+
+module UDouble
+  use real.RealInfix
+  use real.FromInt
+  use real.Abs
+  use mach.float.Double as IEEE
+  use ieee_float.RoundingMode
+
+  type udouble
+
+  function uround IEEE.mode real : udouble
+  function to_real udouble : real
+  function of_int int : udouble
+  axiom to_real_of_int : forall x [of_int x]. to_real (of_int x) = from_int x
+
+  constant eps:real = 0x1p-53 /. (1. +. 0x1p-53)
+  constant eta:real = 0x1p-1075
+
+  (* To avoid "inline_trivial" to break the forward_propagation strategy *)
+  meta "inline:no" function eps
+  meta "inline:no" function eta
+
+  let ghost function uadd (x y:udouble) : udouble
+    (* TODO: Do we want the two first assertions in our context ?
+      We only use them to prove the addition lemma *)
+    ensures { abs (to_real result -. (to_real x +. to_real y)) <=. abs (to_real x) }
+    ensures { abs (to_real result -. (to_real x +. to_real y)) <=. abs (to_real y) }
+    ensures {
+      abs (to_real result -. (to_real x +. to_real y)) <=.
+        abs (to_real x +. to_real y) *. eps
+    }
+  = uround RNE (to_real x +. to_real y)
+
+  let ghost function usub (x y:udouble) : udouble
+    (* TODO: Do we want the two first assertions in our context ?
+      We only use them to prove the addition lemma *)
+    ensures { abs (to_real result -. (to_real x -. to_real y)) <=. abs (to_real x) }
+    ensures { abs (to_real result -. (to_real x -. to_real y)) <=. abs (to_real y) }
+    ensures {
+      abs (to_real result -. (to_real x -. to_real y)) <=.
+        abs (to_real x -. to_real y) *. eps
+    }
+  = uround RNE (to_real x -. to_real y)
+
+  let ghost function umul (x y:udouble) : udouble
+    ensures {
+      abs (to_real result -. (to_real x *. to_real y)) <=.
+        abs (to_real x *. to_real y) *. eps +. eta
+    }
+  = uround RNE (to_real x *. to_real y)
+
+  let ghost function udiv (x y:udouble) : udouble
+    requires { to_real y <> 0. }
+    ensures {
+      abs (to_real result -. (to_real x /. to_real y)) <=.
+        abs (to_real x /. to_real y) *. eps +. eta
+    }
+  = uround RNE (to_real x /. to_real y)
+
+  let ghost function uminus (x:udouble) : udouble
+    ensures { to_real result = -. (to_real x) }
+  = uround RNE (-. (to_real x))
+
+  (** Infix operators *)
+  let ghost function ( ++. ) (x:udouble) (y:udouble) : udouble = uadd x y
+  let ghost function ( --. ) (x:udouble) (y:udouble) : udouble = usub x y
+  let ghost function ( **. ) (x:udouble) (y:udouble) : udouble = umul x y
+  let ghost function ( //. ) (x:udouble) (y:udouble) : udouble
+    requires { to_real y <> 0. }
+   = udiv x y
+  let ghost function ( --._ ) (x:udouble) : udouble = uminus x
+
+  (** Some constants *)
+  constant uzero:udouble
+  axiom to_real_uzero : to_real uzero = 0.0
+  constant uone:udouble
+  axiom to_real_uone : to_real uone = 1.0
+  constant utwo:udouble
+  axiom to_real_utwo : to_real utwo = 2.0
+
+  use real.RealInfix
+
+  (** {3 Propagation lemmas} *)
+
+  let lemma uadd_double_error_propagation (x_ud y_ud : udouble) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
+    requires {
+      abs (to_real x_ud -. x) <=. x_rel_err *. x' +. x_cst_err
+    }
+    requires {
+      abs (to_real y_ud -. y) <=. y_rel_err *. y' +. y_cst_err
+    }
+    requires { abs x <=. x' }
+    requires { abs y <=. y' }
+    requires { 0. <=. x_rel_err }
+    requires { 0. <=. y_rel_err }
+    requires { 0. <=. x_cst_err }
+    requires { 0. <=. y_cst_err }
+    ensures {
+      abs (to_real (x_ud ++. y_ud) -. (x +. y)) <=.
+      (x_rel_err +. y_rel_err +. eps) *. (x' +. y')
+          +. ((1. +. eps +. y_rel_err) *. x_cst_err +. (1. +. eps +. x_rel_err) *. y_cst_err)
+    }
+  =
+  let ghost delta = abs (to_real (x_ud ++. y_ud) -. (to_real x_ud +. to_real y_ud)) in
+  assert {
+    0. <=. x_rel_err /\ 0. <=. y_rel_err ->
+    delta <=.
+      (eps +. y_rel_err) *. x' +. (eps +. x_rel_err) *. y'
+      +. (x_rel_err +. eps) *. y_cst_err +. (y_rel_err +. eps) *. x_cst_err
+    by
+      (delta <=. x' *. x_rel_err +. x_cst_err +. x'
+      so
+        x' +. x_cst_err <=. eps *. (y' +. y_cst_err) ->
+        delta <=. (eps +. x_rel_err) *. y'
+        +. (eps +. y_rel_err) *. x'
+        +. (y_rel_err +. eps) *. x_cst_err +. (x_rel_err +. eps) *. y_cst_err
+      by
+        delta <=. eps *. (y' +. y_cst_err) *. x_rel_err
+              +. (eps *. (y' +. y_cst_err)))
+      /\
+      (delta <=. y' *. y_rel_err +. y_cst_err +. y'
+      so
+      abs y' +. y_cst_err <=. eps *. (x' +. x_cst_err) ->
+      delta <=. (eps +. y_rel_err) *. x'
+        +. (eps +. x_rel_err) *. y'
+        +. (x_rel_err +. eps) *. y_cst_err +. (y_rel_err +. eps) *. x_cst_err
+      by
+        delta <=. eps *. (x' +. x_cst_err) *. y_rel_err
+              +. (eps *. (x' +. x_cst_err)))
+      /\
+      (
+       (eps *. (x' +. x_cst_err) <. y' +. y_cst_err /\
+       eps *. (y' +. y_cst_err) <. x' +. x_cst_err) ->
+       (delta <=.
+       (eps +. y_rel_err) *. x' +. (eps +. x_rel_err) *. y'
+      +. (x_rel_err +. eps) *. y_cst_err +. (y_rel_err +. eps) *. x_cst_err
+      by
+        abs (to_real x_ud +. to_real y_ud) <=.
+        abs (to_real x_ud -. x) +. x' +. (abs (to_real y_ud -. y) +. y')
+      so
+        x' *. x_rel_err <=. (y' +. y_cst_err) /. eps *. x_rel_err /\
+        y' *. y_rel_err <=. (x' +. x_cst_err) /. eps *. y_rel_err))
+  }
+
+  let lemma usub_double_error_propagation (x_ud y_ud : udouble) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
+    requires {
+      abs (to_real x_ud -. x) <=. x_rel_err *. x' +. x_cst_err
+    }
+    requires {
+      abs (to_real y_ud -. y) <=. y_rel_err *. y' +. y_cst_err
+    }
+    requires { abs x <=. x' }
+    requires { abs y <=. y' }
+    requires { 0. <=. x_cst_err }
+    requires { 0. <=. y_cst_err }
+    requires { 0. <=. x_rel_err }
+    requires { 0. <=. y_rel_err }
+    ensures {
+      abs (to_real (x_ud --. y_ud) -. (x -. y))
+      <=. (x_rel_err +. y_rel_err +. eps) *. (x' +. y')
+          +. ((1. +. eps +. y_rel_err) *. x_cst_err +. (1. +. eps +. x_rel_err) *. y_cst_err)
+    }
+  = uadd_double_error_propagation x_ud (--. y_ud) x x' x_rel_err x_cst_err (-. y) y' y_rel_err y_cst_err
+
+  use RealLemmas
+
+  let lemma umul_double_error_propagation (x_ud y_ud : udouble) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
+    requires {
+      abs (to_real x_ud -. x) <=. x_rel_err *. x' +. x_cst_err
+    }
+    requires {
+      abs (to_real y_ud -. y) <=. y_rel_err *. y' +. y_cst_err
+    }
+    requires { abs x <=. x' }
+    requires { abs y <=. y' }
+    requires { 0. <=. x_rel_err }
+    requires { 0. <=. y_rel_err }
+    requires { 0. <=. x_cst_err }
+    requires { 0. <=. y_cst_err }
+    ensures {
+      abs (to_real (x_ud **. y_ud) -. (x *. y)) <=.
+        (eps +. (x_rel_err +. y_rel_err +. x_rel_err *. y_rel_err) *. (1. +. eps)) *. (x' *. y')
+        +. (((y_cst_err +. y_cst_err *. x_rel_err) *. x'
+        +. (x_cst_err +. x_cst_err *. y_rel_err) *. y'
+        +. x_cst_err *. y_cst_err) *. (1. +. eps) +. eta)
+    }
+  =
+  assert {
+    to_real x_ud *. to_real y_ud -. abs (to_real x_ud *. to_real y_ud) *. eps -. eta
+    <=. to_real (x_ud **. y_ud)
+    <=. to_real x_ud *. to_real y_ud +. abs (to_real x_ud *. to_real y_ud) *. eps +. eta
+  };
+  mult_err_combine (to_real x_ud) x x' x_rel_err x_cst_err (to_real y_ud) y y' y_rel_err y_cst_err;
+  assert { abs (x *. y) <=. x' *. y' by 
+       abs x *. abs y <=. x' *. abs y = abs y *. x' <=. y' *. x' };
+
+
+end

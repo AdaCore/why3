@@ -522,8 +522,8 @@ let rac_execute ctx rs =
   | Incomplete reason ->
       let reason = sprintf "terminated because %s" reason in
       Res_incomplete reason, Log.empty_log
-  | _ ->
-      let reason = sprintf "terminated with uncaught exception" in
+  | x when not (Debug.test_flag Debug.stack_trace) ->
+      let reason = sprintf "terminated with uncaught exception `%s`" (Printexc.to_string x) in
       Res_incomplete reason, Log.empty_log
 
 let print_verdict_summary fmt (normal_state, giant_state, v) =

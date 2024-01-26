@@ -684,8 +684,8 @@ let show_about_window ~parent () =
                ]
       ~copyright:"Copyright 2010-2023 Inria, CNRS, Paris-Saclay University"
       ~license:("See file " ^ Filename.concat Config.datadir "LICENSE")
-      ~website:"http://why3.lri.fr/"
-      ~website_label:"http://why3.lri.fr/"
+      ~website:"https://www.why3.org/"
+      ~website_label:"https://www.why3.org/"
       ~version:Config.version
       ~icon:!why_icon
       ~logo:!why_icon

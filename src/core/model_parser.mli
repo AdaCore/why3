@@ -150,6 +150,8 @@ and concrete_syntax_term =
   (** Projections represent values that are defined by a type coercion:
      the value [eps x. ty'int x = 0] is represented by
      the concrete syntax term [Proj ty'int (Const (Integer 0))] *)
+  | Let of (string * concrete_syntax_term) list * concrete_syntax_term
+  (** A list of let bindings in a term *)
 
 val print_concrete_term : Format.formatter -> concrete_syntax_term -> unit
 
@@ -324,6 +326,7 @@ class clean : object
   method apply : string -> concrete_syntax_term list -> concrete_syntax_term option
   method cond : concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term option
   method epsilon : string -> concrete_syntax_term -> concrete_syntax_term option
+  method lett : (string * concrete_syntax_term) list -> concrete_syntax_term -> concrete_syntax_term option
   method neg : concrete_syntax_term -> concrete_syntax_term option
   method quant : concrete_syntax_quant -> string list -> concrete_syntax_term -> concrete_syntax_term option
   method binop : concrete_syntax_binop -> concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term option

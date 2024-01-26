@@ -82,16 +82,6 @@ module ref.Refint
   syntax val ( *= ) "(fun r v -> r := Z.mul !r v) %1 %2" prec 4 3 3
 end
 
-module null.Null
-
-  syntax type t           "%1"
-  syntax val  create_null "(fun () -> Obj.magic (ref 0))"
-  syntax val  eq_null     "(==)"
-  syntax val  create      "(fun x -> x)"
-  syntax val  get         "(fun x -> x)"
-
-end
-
 module int.Int
   syntax val zero "Z.zero"
   syntax val one  "Z.one"
@@ -139,7 +129,7 @@ module stack.Stack
   syntax val       clear    "Stack.clear"
   syntax val       copy     "Stack.copy"
   syntax val       is_empty "Stack.is_empty"
-  syntax val       length   "Z.of_int (Stack.length %1)" prec 4 3
+  syntax val       length   "Stack.length"
 end
 
 module queue.Queue
@@ -154,7 +144,7 @@ module queue.Queue
   syntax val       clear     "Queue.clear"
   syntax val       copy      "Queue.copy"
   syntax val       is_empty  "Queue.is_empty"
-  syntax val       length    "Z.of_int (Queue.length %1)" prec 4 3
+  syntax val       length    "Queue.length"
   syntax val       transfer  "Queue.transfer"
 end
 

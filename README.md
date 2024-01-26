@@ -24,25 +24,18 @@ language for the verification of C, Java, or Ada programs.
 PROJECT HOME
 ------------
 
-http://why3.lri.fr/
+https://www.why3.org/
 
 https://gitlab.inria.fr/why3/why3
 
 DOCUMENTATION
 -------------
 
-The documentation (a tutorial and a reference manual) is in the file
-[doc/manual.pdf](http://why3.lri.fr/manual.pdf) or online at
-http://why3.lri.fr/doc/.
+The documentation (a tutorial and a reference manual) is
+available [online](https://www.why3.org/doc/).
 
 Various examples can be found in the subdirectories [stdlib/](stdlib)
 and [examples/](examples).
-
-Mailing list (Why3 Club):
-  http://lists.gforge.inria.fr/mailman/listinfo/why3-club
-
-Bug Tracking System:
-  https://gitlab.inria.fr/why3/why3/issues
 
 COPYRIGHT
 ---------

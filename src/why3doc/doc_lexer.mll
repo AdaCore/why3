@@ -143,9 +143,11 @@ rule scan fmt empty delayed = parse
             string fmt true lexbuf;
             pp_print_string fmt "</span>";
             scan fmt false delayed lexbuf }
-  | "'\"'"
-  | _ as s
-          { pp_print_string fmt s;
+  | special as c
+          { Pp.html_char fmt c;
+            scan fmt false delayed lexbuf }
+  | _ as c
+          { pp_print_char fmt c;
             scan fmt false delayed lexbuf }
 
 and scan_isolated fmt empty in_pre delayed = parse
@@ -175,15 +177,16 @@ and scan_embedded fmt ldelim = parse
               pp_print_string fmt s;
               scan_embedded fmt ldelim lexbuf
             end }
+  | "(*"
   | "*)"  { backtrack lexbuf }
   | eof   { () }
   | "\n"  { new_line lexbuf;
             pp_print_char fmt '\n';
             scan_embedded fmt ldelim lexbuf }
-  | '"'   { pp_print_string fmt "&quot;";
-            string fmt true lexbuf;
+  | special as c
+          { Pp.html_char fmt c;
             scan_embedded fmt ldelim lexbuf }
-  | "'\"'"
+  | "(*)"
   | _ as s
           { pp_print_string fmt s;
             scan_embedded fmt ldelim lexbuf }
@@ -197,13 +200,10 @@ and comment fmt do_output = parse
   | "\n"   { new_line lexbuf;
              if do_output then pp_print_char fmt '\n';
              comment fmt do_output lexbuf }
-  | '"'    { if do_output then pp_print_string fmt "&quot;";
-             string fmt do_output lexbuf;
-             comment fmt do_output lexbuf }
   | special as c
            { if do_output then Pp.html_char fmt c;
              comment fmt do_output lexbuf }
-  | "'\"'"
+  | "(*)"
   | _ as s { if do_output then pp_print_string fmt s;
              comment fmt do_output lexbuf }
 
@@ -268,8 +268,13 @@ and doc fmt block headings = parse
            { if not block then pp_print_string fmt "<p>";
              Pp.html_char fmt c;
              doc fmt true headings lexbuf }
-  | _ as c { if not block then pp_print_string fmt "<p>";
-             pp_print_char fmt c;
+  | "(*"   { if not block then pp_print_string fmt "<p>";
+             pp_print_string fmt "(*";
+             comment fmt true lexbuf;
+             doc fmt true headings lexbuf }
+  | "(*)"
+  | _ as s { if not block then pp_print_string fmt "<p>";
+             pp_print_string fmt s;
              doc fmt true headings lexbuf }
 
 
@@ -293,14 +298,17 @@ and extract_header = parse
       { header }
   | space+ | "\n"
       { extract_header lexbuf }
+  | "(*)"
+      { extract_header lexbuf }
   | "(*"
       { skip_comment lexbuf; extract_header lexbuf }
   | eof | _
       { "" }
 
 and skip_comment = parse
-  | "*)" { () }
+  | "(*)" { skip_comment lexbuf }
   | "(*" { skip_comment lexbuf; skip_comment lexbuf }
+  | "*)" { () }
   | eof  { () }
   | _    { skip_comment lexbuf }
 
@@ -326,9 +334,3 @@ and skip_comment = parse
     h
 
 }
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3doc.opt"
-End:
-*)

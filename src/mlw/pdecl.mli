@@ -103,6 +103,8 @@ val axiom_of_invariant : its_defn -> term
 (** [axiom_of_invariant itd] returns a closed formula that postulates
     the type invariant of [itd] for all values of the type *)
 
+val meta_depends : Theory.meta
+
 val create_type_decl : its_defn list -> pdecl list
 
 val create_let_decl : let_defn -> pdecl

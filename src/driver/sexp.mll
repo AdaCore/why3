@@ -63,7 +63,9 @@
     | _ as c -> c
 }
 
-let atom  = [^'(' ')'' ''\t' '\n' '"' ';' '|']+
+(* FIXME: atom that start with @ may contain parenthesis. Only the case of one pair
+   is hardcoded here. More might be possible. *)
+let atom  = '@''('[^'\t' '\n' '"' ';' '|'')']+')''_'['0'-'9']+ | [^'(' ')'' ''\t' '\n' '"' ';' '|']+
 let space = [' ''\t''\n''\r']+
 let nopip = [^ '|']*
 let hex2  = ['0'-'9''a'-'f'] ['0'-'9''a'-'f']
