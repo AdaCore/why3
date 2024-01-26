@@ -238,12 +238,12 @@ File jlamp_array_mono.mlw:
       ->
       t
       ->
-      array = fun x!015 x!14 x!22 ->
+      array = fun x!015 x!15 x!22 ->
                if x!015 = {Array.elts =
                            [|17 => {Array.to_int => 3};
                            _ => {Array.to_int => 2}|];
                            Array.length = 43} /\
-                  x!14 = 42 /\ x!22 = {Array.to_int => 2}
+                  x!15 = 42 /\ x!22 = {Array.to_int => 2}
                then {Array.elts =
                      [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
                      _ => {Array.to_int => 2}|];
@@ -355,13 +355,13 @@ File jlamp_array_mono.mlw:
       ->
       t
       ->
-      array = fun x!021 x!15 x!23 ->
+      array = fun x!021 x!17 x!23 ->
                if x!021 = {Array.elts =
                            [|42 => {Array.to_int => 2};
                            17 => {Array.to_int => 3};
                            _ => {Array.to_int => 2}|];
                            Array.length = 43} /\
-                  x!15 = 17 /\ x!23 = {Array.to_int => 2}
+                  x!17 = 17 /\ x!23 = {Array.to_int => 2}
                then {Array.elts =
                      [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
                      _ => {Array.to_int => 2}|];

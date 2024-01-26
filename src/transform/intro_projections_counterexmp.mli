@@ -12,6 +12,7 @@
 
 (* Handling of attributes *)
 
+(*
 val intro_projections_counterexmp :  Env.env -> Task.task Trans.trans
  (**
     Transformation that for each declared abstract function or predicate
@@ -55,6 +56,7 @@ val intro_projections_counterexmp :  Env.env -> Task.task Trans.trans
     the projection. Also, it means that this transformation must be
     executed before this renaming.
  *)
+*)
 
 val intro_const_equal_to_term :
   term : Term.term ->

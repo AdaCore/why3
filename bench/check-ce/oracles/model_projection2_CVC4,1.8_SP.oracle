@@ -1,0 +1,44 @@
+File "bench/check-ce/model_projection2.mlw", line 13, characters 48-75:
+Goal keep_to_array.
+Prover result is: Valid (29 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/model_projection2.mlw", line 23, characters 10-23)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/model_projection2.mlw", line 23, characters 10-23)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/model_projection2.mlw", line 23, characters 10-23)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/model_projection2.mlw", line 23, characters 10-23)
+File "bench/check-ce/model_projection2.mlw", line 23, characters 10-23:
+Sub-goal Assertion of goal g2'vc.
+Prover result is: Unknown (sat) (145 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File model_projection2.mlw:
+  Line 11:
+    to_array = fun (bOUND_VARIABLE_3332:poly_map int int) -> fun (x:int) -> 0
+  Line 15:
+    get = fun (bOUND_VARIABLE_3402:poly_map int int) (bOUND_VARIABLE_3412:
+           int) -> 41
+  Line 22:
+    x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
+    x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
+    Execution of main function `g2` with env:
+      to_array = fun (bOUND_VARIABLE_3332:poly_map int int) ->
+                  fun (x:int) -> 0
+      get = fun (bOUND_VARIABLE_3402:poly_map int int) (bOUND_VARIABLE_3412:
+             int) -> 41
+      x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
+      zero = 0
+      one = 1
+  Line 23:
+    Property failure at assertion with:
+      x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
+

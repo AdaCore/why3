@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.4.2" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="1" name="Alt-Ergo" version="2.4.2" alternative="FPA" timelimit="5" steplimit="0" memlimit="2000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="multiplication.mlw"/>
+<theory name="MultiplicationSingle" proved="true">
+ <goal name="multiplication_errors_basic&#39;vc" expl="VC for multiplication_errors_basic" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="multiplication_errors_basic&#39;vc.0" expl="postcondition" proved="true">
+  <transf name="inline_trivial" proved="true" >
+   <goal name="multiplication_errors_basic&#39;vc.0.0" expl="postcondition" proved="true">
+   <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul (umul a b) c)) -&#39; (((to_real a) *&#39; (to_real
+b)) *&#39; (to_real
+c)))) &lt;=&#39; (((eps +&#39; (((eps +&#39; 0.0) +&#39; (eps *&#39; 0.0)) *&#39; (1.0 +&#39; eps))) *&#39; (abs1
+(((to_real a) *&#39; (to_real b)) *&#39; (to_real
+c)))) +&#39; ((((((0.0 +&#39; (0.0 *&#39; eps)) *&#39; (abs1 ((to_real a) *&#39; (to_real
+b)))) +&#39; ((eta +&#39; (eta *&#39; 0.0)) *&#39; (abs1 (to_real
+c)))) +&#39; (eta *&#39; 0.0)) *&#39; (1.0 +&#39; eps)) +&#39; eta)))">
+    <goal name="multiplication_errors_basic&#39;vc.0.0.0" expl="asserted formula" proved="true">
+    <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul (umul a b) c)) -&#39; (((to_real a) *&#39; (to_real
+b)) *&#39; (to_real
+c)))) &lt;=&#39; (((eps +&#39; (((eps +&#39; 0.0) +&#39; (eps *&#39; 0.0)) *&#39; (1.0 +&#39; eps))) *&#39; ((abs1
+((to_real a) *&#39; (to_real b))) *&#39; (abs1 (to_real
+c)))) +&#39; ((((((0.0 +&#39; (0.0 *&#39; eps)) *&#39; (abs1 ((to_real a) *&#39; (to_real
+b)))) +&#39; ((eta +&#39; (eta *&#39; 0.0)) *&#39; (abs1 (to_real
+c)))) +&#39; (eta *&#39; 0.0)) *&#39; (1.0 +&#39; eps)) +&#39; eta)))">
+     <goal name="multiplication_errors_basic&#39;vc.0.0.0.0" expl="asserted formula" proved="true">
+     <transf name="apply" proved="true" arg1="umul_single_error_propagation">
+      <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.0" expl="apply premises" proved="true">
+      <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul a b)) -&#39; ((to_real a) *&#39; (to_real
+b)))) &lt;=&#39; ((eps *&#39; (abs1 ((to_real a) *&#39; (to_real
+b)))) +&#39; eta))">
+       <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.0.0" expl="asserted formula" proved="true">
+       <proof prover="0"><result status="valid" time="0.044972" steps="396"/></proof>
+       </goal>
+       <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.0.1" expl="apply premises" proved="true">
+       <proof prover="0"><result status="valid" time="0.040519" steps="232"/></proof>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.069868" steps="522"/></proof>
+      </goal>
+      <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.2" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.037237" steps="231"/></proof>
+      </goal>
+      <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.3" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.034234" steps="231"/></proof>
+      </goal>
+      <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.4" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.042272" steps="231"/></proof>
+      </goal>
+      <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.5" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.042195" steps="231"/></proof>
+      </goal>
+      <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.6" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.045623" steps="231"/></proof>
+      </goal>
+      <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.7" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.037217" steps="231"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="multiplication_errors_basic&#39;vc.0.0.0.1" expl="asserted formula" proved="true">
+     <proof prover="0"><result status="valid" time="0.078585" steps="552"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="multiplication_errors_basic&#39;vc.0.0.1" expl="postcondition" proved="true">
+    <proof prover="0"><result status="valid" time="0.048123" steps="234"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="multiplication_errors&#39;vc" expl="VC for multiplication_errors" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="multiplication_errors&#39;vc.0" expl="postcondition" proved="true">
+  <transf name="inline_trivial" proved="true" >
+   <goal name="multiplication_errors&#39;vc.0.0" expl="postcondition" proved="true">
+   <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul (umul (umul a b) c) (umul d (umul e
+f)))) -&#39; ((((to_real a) *&#39; (to_real b)) *&#39; (to_real c)) *&#39; ((to_real
+d) *&#39; ((to_real e) *&#39; (to_real
+f)))))) &lt;=&#39; (((eps +&#39; ((((eps +&#39; (eps *&#39; (1.0 +&#39; eps))) +&#39; (eps +&#39; (eps *&#39; (1.0 +&#39; eps)))) +&#39; ((eps +&#39; (eps *&#39; (1.0 +&#39; eps))) *&#39; (eps +&#39; (eps *&#39; (1.0 +&#39; eps))))) *&#39; (1.0 +&#39; eps))) *&#39; (abs1
+((((to_real a) *&#39; (to_real b)) *&#39; (to_real c)) *&#39; ((to_real d) *&#39; ((to_real
+e) *&#39; (to_real f)))))) +&#39; ((((((((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1 (to_real
+d))) +&#39; eta) +&#39; (((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1 (to_real
+d))) +&#39; eta) *&#39; (eps +&#39; (eps *&#39; (1.0 +&#39; eps))))) *&#39; (abs1 (((to_real
+a) *&#39; (to_real b)) *&#39; (to_real c)))) +&#39; ((((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1
+(to_real c))) +&#39; eta) +&#39; (((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1 (to_real
+c))) +&#39; eta) *&#39; (eps +&#39; (eps *&#39; (1.0 +&#39; eps))))) *&#39; (abs1 ((to_real
+d) *&#39; ((to_real e) *&#39; (to_real f)))))) +&#39; (((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1
+(to_real c))) +&#39; eta) *&#39; ((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1 (to_real
+d))) +&#39; eta))) *&#39; (1.0 +&#39; eps)) +&#39; eta)))">
+    <goal name="multiplication_errors&#39;vc.0.0.0" expl="asserted formula" proved="true">
+    <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul (umul (umul a b) c) (umul d (umul e
+f)))) -&#39; ((((to_real a) *&#39; (to_real b)) *&#39; (to_real c)) *&#39; ((to_real
+d) *&#39; ((to_real e) *&#39; (to_real
+f)))))) &lt;=&#39; (((eps +&#39; ((((eps +&#39; (eps *&#39; (1.0 +&#39; eps))) +&#39; (eps +&#39; (eps *&#39; (1.0 +&#39; eps)))) +&#39; ((eps +&#39; (eps *&#39; (1.0 +&#39; eps))) *&#39; (eps +&#39; (eps *&#39; (1.0 +&#39; eps))))) *&#39; (1.0 +&#39; eps))) *&#39; ((abs1
+(((to_real a) *&#39; (to_real b)) *&#39; (to_real c))) *&#39; (abs1 ((to_real
+d) *&#39; ((to_real e) *&#39; (to_real
+f)))))) +&#39; ((((((((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1 (to_real
+d))) +&#39; eta) +&#39; (((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1 (to_real
+d))) +&#39; eta) *&#39; (eps +&#39; (eps *&#39; (1.0 +&#39; eps))))) *&#39; (abs1 (((to_real
+a) *&#39; (to_real b)) *&#39; (to_real c)))) +&#39; ((((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1
+(to_real c))) +&#39; eta) +&#39; (((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1 (to_real
+c))) +&#39; eta) *&#39; (eps +&#39; (eps *&#39; (1.0 +&#39; eps))))) *&#39; (abs1 ((to_real
+d) *&#39; ((to_real e) *&#39; (to_real f)))))) +&#39; (((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1
+(to_real c))) +&#39; eta) *&#39; ((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1 (to_real
+d))) +&#39; eta))) *&#39; (1.0 +&#39; eps)) +&#39; eta)))">
+     <goal name="multiplication_errors&#39;vc.0.0.0.0" expl="asserted formula" proved="true">
+     <transf name="apply" proved="true" arg1="umul_single_error_propagation">
+      <goal name="multiplication_errors&#39;vc.0.0.0.0.0" expl="apply premises" proved="true">
+      <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul (umul a b) c)) -&#39; (((to_real a) *&#39; (to_real
+b)) *&#39; (to_real
+c)))) &lt;=&#39; (((eps +&#39; (((eps +&#39; 0.0) +&#39; (eps *&#39; 0.0)) *&#39; (1.0 +&#39; eps))) *&#39; (abs1
+(((to_real a) *&#39; (to_real b)) *&#39; (to_real
+c)))) +&#39; ((((((0.0 +&#39; (0.0 *&#39; eps)) *&#39; (abs1 ((to_real a) *&#39; (to_real
+b)))) +&#39; ((eta +&#39; (eta *&#39; 0.0)) *&#39; (abs1 (to_real
+c)))) +&#39; (eta *&#39; 0.0)) *&#39; (1.0 +&#39; eps)) +&#39; eta)))">
+       <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0" expl="asserted formula" proved="true">
+       <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul (umul a b) c)) -&#39; (((to_real a) *&#39; (to_real
+b)) *&#39; (to_real
+c)))) &lt;=&#39; (((eps +&#39; (((eps +&#39; 0.0) +&#39; (eps *&#39; 0.0)) *&#39; (1.0 +&#39; eps))) *&#39; ((abs1
+((to_real a) *&#39; (to_real b))) *&#39; (abs1 (to_real
+c)))) +&#39; ((((((0.0 +&#39; (0.0 *&#39; eps)) *&#39; (abs1 ((to_real a) *&#39; (to_real
+b)))) +&#39; ((eta +&#39; (eta *&#39; 0.0)) *&#39; (abs1 (to_real
+c)))) +&#39; (eta *&#39; 0.0)) *&#39; (1.0 +&#39; eps)) +&#39; eta)))">
+        <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
+        <transf name="apply" proved="true" arg1="umul_single_error_propagation">
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.0" expl="apply premises" proved="true">
+         <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul a b)) -&#39; ((to_real a) *&#39; (to_real
+b)))) &lt;=&#39; ((eps *&#39; (abs1 ((to_real a) *&#39; (to_real
+b)))) +&#39; eta))">
+          <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
+          <proof prover="0"><result status="valid" time="0.087452" steps="396"/></proof>
+          </goal>
+          <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
+          <proof prover="0"><result status="valid" time="0.041625" steps="232"/></proof>
+          </goal>
+         </transf>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.068520" steps="522"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.043011" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.035547" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.035592" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.040081" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.038025" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.035419" steps="231"/></proof>
+         </goal>
+        </transf>
+        </goal>
+        <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.1" expl="asserted formula" proved="true">
+        <proof prover="0"><result status="valid" time="0.077449" steps="552"/></proof>
+        </goal>
+       </transf>
+       </goal>
+       <goal name="multiplication_errors&#39;vc.0.0.0.0.0.1" expl="apply premises" proved="true">
+       <proof prover="0"><result status="valid" time="0.036098" steps="235"/></proof>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="multiplication_errors&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
+      <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul d (umul e f))) -&#39; ((to_real d) *&#39; ((to_real
+e) *&#39; (to_real
+f))))) &lt;=&#39; (((eps +&#39; (((0.0 +&#39; eps) +&#39; (0.0 *&#39; eps)) *&#39; (1.0 +&#39; eps))) *&#39; (abs1
+((to_real d) *&#39; ((to_real e) *&#39; (to_real
+f))))) +&#39; ((((((eta +&#39; (eta *&#39; 0.0)) *&#39; (abs1 (to_real
+d))) +&#39; ((0.0 +&#39; (0.0 *&#39; eps)) *&#39; (abs1 ((to_real e) *&#39; (to_real
+f))))) +&#39; (0.0 *&#39; eta)) *&#39; (1.0 +&#39; eps)) +&#39; eta)))">
+       <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0" expl="asserted formula" proved="true">
+       <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul d (umul e f))) -&#39; ((to_real d) *&#39; ((to_real
+e) *&#39; (to_real
+f))))) &lt;=&#39; (((eps +&#39; (((0.0 +&#39; eps) +&#39; (0.0 *&#39; eps)) *&#39; (1.0 +&#39; eps))) *&#39; ((abs1
+(to_real d)) *&#39; (abs1 ((to_real e) *&#39; (to_real
+f))))) +&#39; ((((((eta +&#39; (eta *&#39; 0.0)) *&#39; (abs1 (to_real
+d))) +&#39; ((0.0 +&#39; (0.0 *&#39; eps)) *&#39; (abs1 ((to_real e) *&#39; (to_real
+f))))) +&#39; (0.0 *&#39; eta)) *&#39; (1.0 +&#39; eps)) +&#39; eta)))">
+        <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0" expl="asserted formula" proved="true">
+        <transf name="apply" proved="true" arg1="umul_single_error_propagation">
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.0" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.071244" steps="522"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.1" expl="apply premises" proved="true">
+         <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul e f)) -&#39; ((to_real e) *&#39; (to_real
+f)))) &lt;=&#39; ((eps *&#39; (abs1 ((to_real e) *&#39; (to_real
+f)))) +&#39; eta))">
+          <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.1.0" expl="asserted formula" proved="true">
+          <proof prover="0"><result status="valid" time="0.064817" steps="396"/></proof>
+          </goal>
+          <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.1.1" expl="apply premises" proved="true">
+          <proof prover="0"><result status="valid" time="0.038461" steps="232"/></proof>
+          </goal>
+         </transf>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.2" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.048153" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.3" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.034119" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.4" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.038082" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.5" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.035731" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.6" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.037737" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.7" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.031762" steps="231"/></proof>
+         </goal>
+        </transf>
+        </goal>
+        <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.1" expl="asserted formula" proved="true">
+        <proof prover="0"><result status="valid" time="0.090108" steps="580"/></proof>
+        </goal>
+       </transf>
+       </goal>
+       <goal name="multiplication_errors&#39;vc.0.0.0.0.1.1" expl="apply premises" proved="true">
+       <proof prover="0"><result status="valid" time="0.038573" steps="235"/></proof>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="multiplication_errors&#39;vc.0.0.0.0.2" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.037050" steps="231"/></proof>
+      </goal>
+      <goal name="multiplication_errors&#39;vc.0.0.0.0.3" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.038173" steps="231"/></proof>
+      </goal>
+      <goal name="multiplication_errors&#39;vc.0.0.0.0.4" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.040152" steps="231"/></proof>
+      </goal>
+      <goal name="multiplication_errors&#39;vc.0.0.0.0.5" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.029199" steps="231"/></proof>
+      </goal>
+      <goal name="multiplication_errors&#39;vc.0.0.0.0.6" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.062370" steps="402"/></proof>
+      </goal>
+      <goal name="multiplication_errors&#39;vc.0.0.0.0.7" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.055133" steps="402"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="multiplication_errors&#39;vc.0.0.0.1" expl="asserted formula" proved="true">
+     <proof prover="0"><result status="valid" time="0.120096" steps="598"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="multiplication_errors&#39;vc.0.0.1" expl="postcondition" proved="true">
+    <proof prover="1"><result status="valid" time="0.974305" steps="9184"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="MultiplicationDouble" proved="true">
+ <goal name="multiplication_errors_basic&#39;vc" expl="VC for multiplication_errors_basic" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="multiplication_errors_basic&#39;vc.0" expl="postcondition" proved="true">
+  <transf name="inline_trivial" proved="true" >
+   <goal name="multiplication_errors_basic&#39;vc.0.0" expl="postcondition" proved="true">
+   <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul (umul a b) c)) -&#39; (((to_real a) *&#39; (to_real
+b)) *&#39; (to_real
+c)))) &lt;=&#39; (((eps +&#39; (((eps +&#39; 0.0) +&#39; (eps *&#39; 0.0)) *&#39; (1.0 +&#39; eps))) *&#39; (abs1
+(((to_real a) *&#39; (to_real b)) *&#39; (to_real
+c)))) +&#39; ((((((0.0 +&#39; (0.0 *&#39; eps)) *&#39; (abs1 ((to_real a) *&#39; (to_real
+b)))) +&#39; ((eta +&#39; (eta *&#39; 0.0)) *&#39; (abs1 (to_real
+c)))) +&#39; (eta *&#39; 0.0)) *&#39; (1.0 +&#39; eps)) +&#39; eta)))">
+    <goal name="multiplication_errors_basic&#39;vc.0.0.0" expl="asserted formula" proved="true">
+    <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul (umul a b) c)) -&#39; (((to_real a) *&#39; (to_real
+b)) *&#39; (to_real
+c)))) &lt;=&#39; (((eps +&#39; (((eps +&#39; 0.0) +&#39; (eps *&#39; 0.0)) *&#39; (1.0 +&#39; eps))) *&#39; ((abs1
+((to_real a) *&#39; (to_real b))) *&#39; (abs1 (to_real
+c)))) +&#39; ((((((0.0 +&#39; (0.0 *&#39; eps)) *&#39; (abs1 ((to_real a) *&#39; (to_real
+b)))) +&#39; ((eta +&#39; (eta *&#39; 0.0)) *&#39; (abs1 (to_real
+c)))) +&#39; (eta *&#39; 0.0)) *&#39; (1.0 +&#39; eps)) +&#39; eta)))">
+     <goal name="multiplication_errors_basic&#39;vc.0.0.0.0" expl="asserted formula" proved="true">
+     <transf name="apply" proved="true" arg1="umul_double_error_propagation">
+      <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.0" expl="apply premises" proved="true">
+      <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul a b)) -&#39; ((to_real a) *&#39; (to_real
+b)))) &lt;=&#39; ((eps *&#39; (abs1 ((to_real a) *&#39; (to_real
+b)))) +&#39; eta))">
+       <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.0.0" expl="asserted formula" proved="true">
+       <proof prover="0"><result status="valid" time="0.089585" steps="396"/></proof>
+       </goal>
+       <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.0.1" expl="apply premises" proved="true">
+       <proof prover="0"><result status="valid" time="0.045689" steps="232"/></proof>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.060260" steps="522"/></proof>
+      </goal>
+      <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.2" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.042217" steps="231"/></proof>
+      </goal>
+      <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.3" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.045309" steps="231"/></proof>
+      </goal>
+      <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.4" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.040395" steps="231"/></proof>
+      </goal>
+      <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.5" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.032040" steps="231"/></proof>
+      </goal>
+      <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.6" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.038316" steps="231"/></proof>
+      </goal>
+      <goal name="multiplication_errors_basic&#39;vc.0.0.0.0.7" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.038231" steps="231"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="multiplication_errors_basic&#39;vc.0.0.0.1" expl="asserted formula" proved="true">
+     <proof prover="0"><result status="valid" time="0.075747" steps="552"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="multiplication_errors_basic&#39;vc.0.0.1" expl="postcondition" proved="true">
+    <proof prover="0"><result status="valid" time="0.036569" steps="234"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="multiplication_errors&#39;vc" expl="VC for multiplication_errors" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="multiplication_errors&#39;vc.0" expl="postcondition" proved="true">
+  <transf name="inline_trivial" proved="true" >
+   <goal name="multiplication_errors&#39;vc.0.0" expl="postcondition" proved="true">
+   <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul (umul (umul a b) c) (umul d (umul e
+f)))) -&#39; ((((to_real a) *&#39; (to_real b)) *&#39; (to_real c)) *&#39; ((to_real
+d) *&#39; ((to_real e) *&#39; (to_real
+f)))))) &lt;=&#39; (((eps +&#39; ((((eps +&#39; (eps *&#39; (1.0 +&#39; eps))) +&#39; (eps +&#39; (eps *&#39; (1.0 +&#39; eps)))) +&#39; ((eps +&#39; (eps *&#39; (1.0 +&#39; eps))) *&#39; (eps +&#39; (eps *&#39; (1.0 +&#39; eps))))) *&#39; (1.0 +&#39; eps))) *&#39; (abs1
+((((to_real a) *&#39; (to_real b)) *&#39; (to_real c)) *&#39; ((to_real d) *&#39; ((to_real
+e) *&#39; (to_real f)))))) +&#39; ((((((((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1 (to_real
+d))) +&#39; eta) +&#39; (((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1 (to_real
+d))) +&#39; eta) *&#39; (eps +&#39; (eps *&#39; (1.0 +&#39; eps))))) *&#39; (abs1 (((to_real
+a) *&#39; (to_real b)) *&#39; (to_real c)))) +&#39; ((((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1
+(to_real c))) +&#39; eta) +&#39; (((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1 (to_real
+c))) +&#39; eta) *&#39; (eps +&#39; (eps *&#39; (1.0 +&#39; eps))))) *&#39; (abs1 ((to_real
+d) *&#39; ((to_real e) *&#39; (to_real f)))))) +&#39; (((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1
+(to_real c))) +&#39; eta) *&#39; ((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1 (to_real
+d))) +&#39; eta))) *&#39; (1.0 +&#39; eps)) +&#39; eta)))">
+    <goal name="multiplication_errors&#39;vc.0.0.0" expl="asserted formula" proved="true">
+    <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul (umul (umul a b) c) (umul d (umul e
+f)))) -&#39; ((((to_real a) *&#39; (to_real b)) *&#39; (to_real c)) *&#39; ((to_real
+d) *&#39; ((to_real e) *&#39; (to_real
+f)))))) &lt;=&#39; (((eps +&#39; ((((eps +&#39; (eps *&#39; (1.0 +&#39; eps))) +&#39; (eps +&#39; (eps *&#39; (1.0 +&#39; eps)))) +&#39; ((eps +&#39; (eps *&#39; (1.0 +&#39; eps))) *&#39; (eps +&#39; (eps *&#39; (1.0 +&#39; eps))))) *&#39; (1.0 +&#39; eps))) *&#39; ((abs1
+(((to_real a) *&#39; (to_real b)) *&#39; (to_real c))) *&#39; (abs1 ((to_real
+d) *&#39; ((to_real e) *&#39; (to_real
+f)))))) +&#39; ((((((((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1 (to_real
+d))) +&#39; eta) +&#39; (((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1 (to_real
+d))) +&#39; eta) *&#39; (eps +&#39; (eps *&#39; (1.0 +&#39; eps))))) *&#39; (abs1 (((to_real
+a) *&#39; (to_real b)) *&#39; (to_real c)))) +&#39; ((((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1
+(to_real c))) +&#39; eta) +&#39; (((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1 (to_real
+c))) +&#39; eta) *&#39; (eps +&#39; (eps *&#39; (1.0 +&#39; eps))))) *&#39; (abs1 ((to_real
+d) *&#39; ((to_real e) *&#39; (to_real f)))))) +&#39; (((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1
+(to_real c))) +&#39; eta) *&#39; ((((1.0 +&#39; eps) *&#39; eta) *&#39; (abs1 (to_real
+d))) +&#39; eta))) *&#39; (1.0 +&#39; eps)) +&#39; eta)))">
+     <goal name="multiplication_errors&#39;vc.0.0.0.0" expl="asserted formula" proved="true">
+     <transf name="apply" proved="true" arg1="umul_double_error_propagation">
+      <goal name="multiplication_errors&#39;vc.0.0.0.0.0" expl="apply premises" proved="true">
+      <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul (umul a b) c)) -&#39; (((to_real a) *&#39; (to_real
+b)) *&#39; (to_real
+c)))) &lt;=&#39; (((eps +&#39; (((eps +&#39; 0.0) +&#39; (eps *&#39; 0.0)) *&#39; (1.0 +&#39; eps))) *&#39; (abs1
+(((to_real a) *&#39; (to_real b)) *&#39; (to_real
+c)))) +&#39; ((((((0.0 +&#39; (0.0 *&#39; eps)) *&#39; (abs1 ((to_real a) *&#39; (to_real
+b)))) +&#39; ((eta +&#39; (eta *&#39; 0.0)) *&#39; (abs1 (to_real
+c)))) +&#39; (eta *&#39; 0.0)) *&#39; (1.0 +&#39; eps)) +&#39; eta)))">
+       <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0" expl="asserted formula" proved="true">
+       <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul (umul a b) c)) -&#39; (((to_real a) *&#39; (to_real
+b)) *&#39; (to_real
+c)))) &lt;=&#39; (((eps +&#39; (((eps +&#39; 0.0) +&#39; (eps *&#39; 0.0)) *&#39; (1.0 +&#39; eps))) *&#39; ((abs1
+((to_real a) *&#39; (to_real b))) *&#39; (abs1 (to_real
+c)))) +&#39; ((((((0.0 +&#39; (0.0 *&#39; eps)) *&#39; (abs1 ((to_real a) *&#39; (to_real
+b)))) +&#39; ((eta +&#39; (eta *&#39; 0.0)) *&#39; (abs1 (to_real
+c)))) +&#39; (eta *&#39; 0.0)) *&#39; (1.0 +&#39; eps)) +&#39; eta)))">
+        <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
+        <transf name="apply" proved="true" arg1="umul_double_error_propagation">
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.0" expl="apply premises" proved="true">
+         <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul a b)) -&#39; ((to_real a) *&#39; (to_real
+b)))) &lt;=&#39; ((eps *&#39; (abs1 ((to_real a) *&#39; (to_real
+b)))) +&#39; eta))">
+          <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
+          <proof prover="0"><result status="valid" time="0.066831" steps="396"/></proof>
+          </goal>
+          <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
+          <proof prover="0"><result status="valid" time="0.041527" steps="232"/></proof>
+          </goal>
+         </transf>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.064050" steps="522"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.040816" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.046890" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.032692" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.035815" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.040713" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.027874" steps="231"/></proof>
+         </goal>
+        </transf>
+        </goal>
+        <goal name="multiplication_errors&#39;vc.0.0.0.0.0.0.1" expl="asserted formula" proved="true">
+        <proof prover="0"><result status="valid" time="0.081639" steps="552"/></proof>
+        </goal>
+       </transf>
+       </goal>
+       <goal name="multiplication_errors&#39;vc.0.0.0.0.0.1" expl="apply premises" proved="true">
+       <proof prover="0"><result status="valid" time="0.043798" steps="235"/></proof>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="multiplication_errors&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
+      <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul d (umul e f))) -&#39; ((to_real d) *&#39; ((to_real
+e) *&#39; (to_real
+f))))) &lt;=&#39; (((eps +&#39; (((0.0 +&#39; eps) +&#39; (0.0 *&#39; eps)) *&#39; (1.0 +&#39; eps))) *&#39; (abs1
+((to_real d) *&#39; ((to_real e) *&#39; (to_real
+f))))) +&#39; ((((((eta +&#39; (eta *&#39; 0.0)) *&#39; (abs1 (to_real
+d))) +&#39; ((0.0 +&#39; (0.0 *&#39; eps)) *&#39; (abs1 ((to_real e) *&#39; (to_real
+f))))) +&#39; (0.0 *&#39; eta)) *&#39; (1.0 +&#39; eps)) +&#39; eta)))">
+       <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0" expl="asserted formula" proved="true">
+       <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul d (umul e f))) -&#39; ((to_real d) *&#39; ((to_real
+e) *&#39; (to_real
+f))))) &lt;=&#39; (((eps +&#39; (((0.0 +&#39; eps) +&#39; (0.0 *&#39; eps)) *&#39; (1.0 +&#39; eps))) *&#39; ((abs1
+(to_real d)) *&#39; (abs1 ((to_real e) *&#39; (to_real
+f))))) +&#39; ((((((eta +&#39; (eta *&#39; 0.0)) *&#39; (abs1 (to_real
+d))) +&#39; ((0.0 +&#39; (0.0 *&#39; eps)) *&#39; (abs1 ((to_real e) *&#39; (to_real
+f))))) +&#39; (0.0 *&#39; eta)) *&#39; (1.0 +&#39; eps)) +&#39; eta)))">
+        <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0" expl="asserted formula" proved="true">
+        <transf name="apply" proved="true" arg1="umul_double_error_propagation">
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.0" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.059922" steps="522"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.1" expl="apply premises" proved="true">
+         <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul e f)) -&#39; ((to_real e) *&#39; (to_real
+f)))) &lt;=&#39; ((eps *&#39; (abs1 ((to_real e) *&#39; (to_real
+f)))) +&#39; eta))">
+          <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.1.0" expl="asserted formula" proved="true">
+          <proof prover="0"><result status="valid" time="0.059006" steps="396"/></proof>
+          </goal>
+          <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.1.1" expl="apply premises" proved="true">
+          <proof prover="0"><result status="valid" time="0.037631" steps="232"/></proof>
+          </goal>
+         </transf>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.2" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.041922" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.3" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.036546" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.4" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.037060" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.5" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.032777" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.6" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.038458" steps="231"/></proof>
+         </goal>
+         <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.0.7" expl="apply premises" proved="true">
+         <proof prover="0"><result status="valid" time="0.037118" steps="231"/></proof>
+         </goal>
+        </transf>
+        </goal>
+        <goal name="multiplication_errors&#39;vc.0.0.0.0.1.0.1" expl="asserted formula" proved="true">
+        <proof prover="0"><result status="valid" time="0.092904" steps="580"/></proof>
+        </goal>
+       </transf>
+       </goal>
+       <goal name="multiplication_errors&#39;vc.0.0.0.0.1.1" expl="apply premises" proved="true">
+       <proof prover="0"><result status="valid" time="0.045605" steps="235"/></proof>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="multiplication_errors&#39;vc.0.0.0.0.2" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.040543" steps="231"/></proof>
+      </goal>
+      <goal name="multiplication_errors&#39;vc.0.0.0.0.3" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.044342" steps="231"/></proof>
+      </goal>
+      <goal name="multiplication_errors&#39;vc.0.0.0.0.4" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.039696" steps="231"/></proof>
+      </goal>
+      <goal name="multiplication_errors&#39;vc.0.0.0.0.5" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.034189" steps="231"/></proof>
+      </goal>
+      <goal name="multiplication_errors&#39;vc.0.0.0.0.6" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.059139" steps="402"/></proof>
+      </goal>
+      <goal name="multiplication_errors&#39;vc.0.0.0.0.7" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.061383" steps="402"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="multiplication_errors&#39;vc.0.0.0.1" expl="asserted formula" proved="true">
+     <proof prover="0"><result status="valid" time="0.120530" steps="598"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="multiplication_errors&#39;vc.0.0.1" expl="postcondition" proved="true">
+    <proof prover="1"><result status="valid" time="1.124945" steps="9208"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

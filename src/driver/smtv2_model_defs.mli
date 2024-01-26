@@ -86,6 +86,7 @@ type term =
   | Tite of term * term * term
   | Tarray of sort * sort * array_elements
   | Tasarray of term
+  | Tlet of var_binding list * term
   | Tunparsed of string
 
 and var_binding = symbol * term

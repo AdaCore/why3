@@ -1,0 +1,61 @@
+module MultiplicationSingle
+  use real.RealInfix
+  use real.Abs
+  use ufloat.USingle
+
+  let ghost multiplication_errors_basic (a b c : usingle)
+    ensures {
+      let exact = to_real a *. to_real b *. to_real c in
+      abs (to_real result -. exact) <=.
+      (2. +. eps) *. eps *. abs exact +. eta *. (abs (to_real c) *. (1. +. eps) +. 1.)
+    }
+  = a **. b **. c
+
+  let ghost multiplication_errors (a b c d e f: usingle)
+    ensures {
+      let exact = (to_real a *. to_real b *. to_real c) *. (to_real d *. (to_real e *. to_real f)) in
+      abs (to_real result -. exact) <=.
+      5.1 *. eps *. abs exact +.
+      1.1 *. eta *.
+      (   abs (to_real a *. to_real b *. to_real c *. to_real d)
+       +. abs (to_real a *. to_real b *. to_real c)
+       +. abs (to_real c *. to_real d *. to_real e *. to_real f)
+       +. abs (to_real d *. to_real e *. to_real f)
+       +. abs (to_real c)
+       +. abs (to_real d) 
+       +. abs (to_real c *. to_real d)
+       +. 1.)
+    }
+  = (a **. b **. c) **. (d **. (e **. f))
+end
+
+module MultiplicationDouble
+  use real.RealInfix
+  use real.Abs
+  use ufloat.UDouble
+
+  let ghost multiplication_errors_basic (a b c : udouble)
+    ensures {
+      let exact = to_real a *. to_real b *. to_real c in
+      abs (to_real result -. exact) <=.
+      (2. +. eps) *. eps *. abs exact +. eta *. (abs (to_real c) *. (1. +. eps) +. 1.)
+    }
+  = a **. b **. c
+
+  let ghost multiplication_errors (a b c d e f: udouble)
+    ensures {
+      let exact = (to_real a *. to_real b *. to_real c) *. (to_real d *. (to_real e *. to_real f)) in
+      abs (to_real result -. exact) <=.
+      5.1 *. eps *. abs exact +.
+      1.1 *. eta *.
+      (   abs (to_real a *. to_real b *. to_real c *. to_real d)
+       +. abs (to_real a *. to_real b *. to_real c)
+       +. abs (to_real c *. to_real d *. to_real e *. to_real f)
+       +. abs (to_real d *. to_real e *. to_real f)
+       +. abs (to_real c)
+       +. abs (to_real d) 
+       +. abs (to_real c *. to_real d)
+       +. 1.)
+    }
+  = (a **. b **. c) **. (d **. (e **. f))
+end

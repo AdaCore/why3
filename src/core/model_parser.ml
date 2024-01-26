@@ -128,6 +128,7 @@ and concrete_syntax_term =
   | FunctionLiteral of concrete_syntax_funlit
   | Record of (string * concrete_syntax_term) list
   | Proj of (string * concrete_syntax_term)
+  | Let of (string * concrete_syntax_term) list * concrete_syntax_term
 
 
 (* Pretty printing of concrete terms *)
@@ -223,6 +224,9 @@ let rec print_concrete_term fmt ct =
       (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi print_field_value) fields_values
   | Proj (proj_name,proj_value) ->
     fprintf fmt "@[{%s =>@ %a}@]" proj_name print_concrete_term proj_value
+  | Let (ll, t) -> fprintf fmt "@[<hov 1>let %a@ in@ %a@]"
+                      (Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.semi ~sep:Pp.semi (Pp.print_pair Pp.print_string print_concrete_term)) ll
+                      print_concrete_term t
 
 (* Helper functions for concrete terms *)
 
@@ -267,6 +271,7 @@ let rec subst_concrete_term subst t =
     )
   | Proj (proj_name,proj_value) ->
     Proj (proj_name, subst_concrete_term subst proj_value)
+  | Let (ll, t) -> Let (ll, subst_concrete_term subst t) (* Do I need to substitute inside the bound terms as well? *)
 let rec t_and_l_concrete = function
   | [] -> concrete_const_bool true
   | [f] -> f
@@ -675,6 +680,7 @@ let [@warning "-42"] rec json_of_concrete_term ct =
         "quant_t", json_of_concrete_term quant_t
       ]
     ]
+  | Let _ -> Record [ "type", String "Let"; "val", String "UNSUPPORTED" ]
   | Binop (op,t1,t2) ->
     let op_string = match op with
       | And -> "And"
@@ -1193,6 +1199,7 @@ class clean = object (self)
     | Proj (s,v) -> self#proj s v
     | Function {args;body} -> self#func args body
     | FunctionLiteral {elts;others} -> self#funliteral elts others
+    | Let (ll, tt) -> self#lett ll tt
   method var v = Some (Var v)
   method const c = match c with
     | String v -> self#string v
@@ -1223,6 +1230,10 @@ class clean = object (self)
   method epsilon x t =
     Option.bind (self#value t) @@ fun t ->
     Some (Epsilon (x,t))
+  method lett ll tt =
+    Option.bind (self#value tt) @@ fun tt ->
+    let ll' = List.filter_map (fun (v,t) -> Option.bind (self#value t) @@ fun t -> Some (v, t)) ll in
+    Some (Let (ll',tt))
   method quant q vars t =
     Option.bind (self#value t) @@ fun t ->
     Some (Quant (q,vars,t))

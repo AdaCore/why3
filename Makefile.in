@@ -896,7 +896,7 @@ gallery-subs:
 	  echo "exporting examples/$$d"; \
 	  mkdir -p $(GALLERYDIR)/$$d; \
 	  cd examples/$$d; \
-	  WHY3CONFIG="" ../../bin/why3.@OCAMLBEST@ doc --no-stdlib --no-load-default-plugins -L ../../stdlib -L . --stdlib-url http://why3.lri.fr/stdlib/ --warn-off=unused_variable *.mlw -o $(GALLERYDIR)/$$d; \
+	  WHY3CONFIG="" ../../bin/why3.@OCAMLBEST@ doc --no-stdlib --no-load-default-plugins -L ../../stdlib -L . --stdlib-url https://www.why3.org/stdlib/ --warn-off=unused_variable *.mlw -o $(GALLERYDIR)/$$d; \
 	  cd ..; \
 	  rm -f $(GALLERYDIR)/$$d/$$d.zip; \
 	  git archive --format=zip -o $(GALLERYDIR)/$$d/$$d.zip HEAD $$d; \
@@ -1733,20 +1733,31 @@ TRYWHY3CMI = $(addsuffix .cmi, $(TRYWHY3MODULES))
 
 $(TRYWHY3DEP) $(TRYWHY3CMO) $(TRYWHY3CMI): INCLUDES += -I src/trywhy3
 
-TRYWHY3_PACK = \
-	trywhy3.js trywhy3.html trywhy3.css \
+TRYWHY3_COMMON_PACK = \
+	trywhy3.js trywhy3.html trywhy3.css trywhy3_custom.css \
 	help_whyml.html help_python.html help_micro-C.html \
-	why3_worker.js alt-ergo-worker.js \
-	README.md examples/ \
-	trywhy3_custom.css \
+	why3_worker.js \
+	examples/ \
+	 $(JS_MAPS)
+
+TRYWHY3_SMALL_PACK = \
+	$(TRYWHY3_COMMON_PACK) \
+	mode-why3.js
+
+TRYWHY3_FULL_PACK = \
+	$(TRYWHY3_COMMON_PACK) \
+	alt-ergo-worker.js \
 	ace-builds/src-min-noconflict/ace.js \
 	ace-builds/src-min-noconflict/mode-why3.js \
 	ace-builds/src-min-noconflict/mode-python.js \
 	ace-builds/src-min-noconflict/mode-c_cpp.js \
-	ace-builds/src-min-noconflict/theme-chrome.js $(JS_MAPS)
+	ace-builds/src-min-noconflict/theme-chrome.js
 
-trywhy3.tar.gz: $(addprefix src/trywhy3/, $(TRYWHY3_PACK))
-	tar czf trywhy3.tar.gz -C src $(addprefix trywhy3/, $(TRYWHY3_PACK))
+trywhy3.tar.gz: $(addprefix src/trywhy3/, $(TRYWHY3_SMALL_PACK))
+	tar czf $@ -C src $(addprefix trywhy3/, $(TRYWHY3_SMALL_PACK))
+
+trywhy3-full.tar.gz: $(addprefix src/trywhy3/, $(TRYWHY3_FULL_PACK))
+	tar czf $@ -C src $(addprefix trywhy3/, $(TRYWHY3_FULL_PACK))
 
 trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js
 
