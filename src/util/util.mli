@@ -120,9 +120,6 @@ val ansi_color_tags : Format.formatter_stag_functions
 
 (** {3 Miscellaneous} *)
 
-val is_sexp_simple_token : string -> bool
-(** Check if a non-empty string contains only characters [a-zA-Z0-9_-] *)
-
 val get_home_dir : unit -> string
 (** Return the home directory of the user. *)
 

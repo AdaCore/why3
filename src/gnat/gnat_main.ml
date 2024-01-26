@@ -24,6 +24,8 @@ open Gnat_scheduler
 
 module C = Gnat_objectives.Make (Gnat_scheduler)
 
+let warn_gnat_rac_not_done = Loc.register_warning "gnat_rac_not_done" "Warn if RAC could not be completed"
+
 let rec is_trivial fml =
    let open Term in
    (* Check wether the formula is trivial.  *)
@@ -84,7 +86,7 @@ let rec handle_vc_result c goal result =
        List.iter (create_manual_or_schedule c obj) (Gnat_objectives.next obj)
    | Gnat_objectives.Counter_Example ->
      (* In this case, counterexample prover and VC will be never None *)
-     let prover_ce = (Opt.get Gnat_config.prover_ce) in
+     let prover_ce = (Option.get Gnat_config.prover_ce) in
      match Gnat_objectives.ce_goal obj with
      | None -> assert false
      | Some g ->
@@ -176,7 +178,7 @@ let maybe_giant_step_rac ctr parent models =
         ?why_prover:Gnat_config.rac_prover () in
     let compute_term = Rac.Why.mk_compute_term_lit env () in
     let rac = Pinterp.mk_rac check_term in
-    let timelimit = Opt.map float_of_int Gnat_config.rac_timelimit in
+    let timelimit = Option.map float_of_int Gnat_config.rac_timelimit in
     let rac_results = Check_ce.get_rac_results ?timelimit ~compute_term
         ~only_giant_step:true rac env pm models in
     let strategy = Check_ce.best_non_empty_giant_step_rac_result in
@@ -186,7 +188,7 @@ let maybe_giant_step_rac ctr parent models =
     | Some (m, _) when not Gnat_config.giant_step_rac ->
         Some (Gnat_counterexamples.post_clean#model m, None)
     | Some (m, Check_ce.RAC_not_done reason) -> (
-        if Gnat_config.debug then Loc.warning "%s@." reason;
+        if Gnat_config.debug then Loc.warning warn_gnat_rac_not_done "%s@." reason;
         Some (Gnat_counterexamples.post_clean#model m, None)
       )
     | Some (m, Check_ce.RAC_done (res_state, res_log)) -> (

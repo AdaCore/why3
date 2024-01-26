@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="1" name="Z3" version="4.8.10" alternative="counterexamples" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.8" alternative="counterexamples" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.8.10" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC5" version="1.0.5" alternative="strings+counterexamples" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml">
+<path name=".."/><path name="ignore.mlw"/>
+<theory name="Top">
+ <goal name="f&#39;vc" expl="VC for f">
+ <transf name="split_vc" >
+  <goal name="f&#39;vc.0" expl="postcondition">
+  <proof prover="1"><result status="unknown" time="0.016365" steps="2452"/></proof>
+  <proof prover="2"><result status="unknown" time="0.032288" steps="112"/></proof>
+  <proof prover="4"><result status="unknown" time="0.045610" steps="107"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="g&#39;vc" expl="VC for g">
+ <transf name="split_vc" >
+  <goal name="g&#39;vc.0" expl="postcondition">
+  <proof prover="1"><result status="timeout" time="5.000000" steps="4816356"/></proof>
+  <proof prover="2"><result status="unknown" time="0.102910" steps="19327"/></proof>
+  <proof prover="4"><result status="unknown" time="0.351080" steps="110454"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="h&#39;vc" expl="VC for h">
+ <proof prover="1"><result status="timeout" time="5.000000" steps="125134016"/></proof>
+ </goal>
+ <goal name="i&#39;vc" expl="VC for i">
+ <transf name="split_vc" >
+  <goal name="i&#39;vc.0" expl="postcondition">
+  <transf name="split_vc" >
+   <goal name="i&#39;vc.0.0" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.009164" steps="774"/></proof>
+   </goal>
+   <goal name="i&#39;vc.0.1" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.009569" steps="778"/></proof>
+   </goal>
+   <goal name="i&#39;vc.0.2" expl="postcondition">
+   <proof prover="1"><result status="timeout" time="5.000000" steps="36083734"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

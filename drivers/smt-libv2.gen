@@ -16,7 +16,8 @@ prelude "(set-logic AUFNIRA)"
 
 *)
 
-filename "%f-%t-%g.smt2"
+(* cannot be here because case of psmt2 files: filename "%f-%t-%g.smt2" *)
+
 unknown "^\\(unknown\\|sat\\|Fail\\)$" "\\1"
 unknown "^(:reason-unknown \\([^)]*\\))$" "\\1"
 time "why3cpulimit time : %s s"
@@ -29,6 +30,11 @@ theory BuiltIn
 
   meta "encoding:kept" type int
   meta "encoding:ignore_polymorphism_ls" predicate (=)
+end
+
+theory Ignore
+  syntax predicate ignore'term  "true"
+  meta "encoding:ignore_polymorphism_ls" predicate ignore'term
 end
 
 theory int.Int

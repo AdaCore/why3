@@ -38,14 +38,13 @@ let tools_ext =
 
 let available_commands () =
   let commands = Sys.readdir command_path in
-  Array.sort String.compare commands;
   let re = Re.Str.regexp "^why3\\([^.]+\\)\\([.].*\\)" in
   let commands = Array.fold_left (fun acc v ->
     if Re.Str.string_match re v 0 then
       let w = Re.Str.matched_group 1 v in
       if Re.Str.matched_group 2 v = tools_ext then w :: acc else acc
     else acc) [] commands in
-  List.rev commands
+  List.sort String.compare ("help" :: commands)
 
 let do_usage () =
   Format.printf
@@ -64,20 +63,16 @@ let option_list =
   option_list
 
 let command cur =
-  let sscmd, args =
+  let sscmd =
     let nargs = Array.length Sys.argv in
     let sscmd = Sys.argv.(cur) in
-    let cur = cur + 1 in
-    if sscmd = "help" then begin
+    if sscmd <> "help" then sscmd
+    else begin
+      let cur = cur + 1 in
       if cur = nargs then do_usage ();
       let sscmd = Sys.argv.(cur) in
-      sscmd, ["--help"]
-    end else begin
-      let args = ref [] in
-      for i = 1 to nargs - 1 do
-        if i <> cur - 1 then args := Sys.argv.(i) :: !args;
-      done;
-      sscmd, List.rev !args
+      Sys.argv.(cur) <- "--help";
+      sscmd
     end in
   let cmd =
     let scmd = "why3" ^ sscmd ^ tools_ext in
@@ -89,11 +84,7 @@ let command cur =
         exit 1;
       end;
       cmd in
-  let args = Array.of_list args in
-  let argc = Array.length args in
-  let argi = Array.length Sys.argv - argc in
-  Array.blit args 0 Sys.argv argi argc;
-  Whyconf.Args.first_arg := argi;
+  Whyconf.Args.first_arg := cur + 1;
   Whyconf.Args.add_command sscmd;
   try
     Dynlink.allow_unsafe_modules true;

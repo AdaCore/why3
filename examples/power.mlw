@@ -1,5 +1,5 @@
 
-(* fast exponentiation *)
+(** {1 Fast exponentiation} *)
 
 module FastExponentiation
 
@@ -7,38 +7,56 @@ module FastExponentiation
   use int.Power
   use int.ComputerDivision
 
+  lemma Power_even:
+    forall x, n. n >= 0 -> mod n 2 = 0 ->
+    power x n = power (x*x) (div n 2)
+      by n = div n 2 + div n 2
+
   (* recursive implementation *)
 
-  let rec fast_exp x n variant { n }
+  let rec fast_exp (x n: int) : int
+    variant  { n }
     requires { 0 <= n }
-    ensures { result = power x n }
+    ensures  { result = power x n }
   = if n = 0 then
       1
-    else begin
+    else
       let r = fast_exp x (div n 2) in
       if mod n 2 = 0 then r * r else r * r * x
-    end
+
+  (* recursive implementation with an accumulator *)
+
+  let rec fast_exp_2 (x n acc: int) : int
+    variant  { n }
+    requires { 0 <= n }
+    ensures  { result = power x n * acc }
+  = if n = 0 then
+      acc
+    else if mod n 2 = 0 then
+      fast_exp_2 (x * x) (div n 2) acc
+    else
+      fast_exp_2 x (n - 1) (x * acc)
 
   (* non-recursive implementation using a while loop *)
 
   use ref.Ref
 
-  let fast_exp_imperative x n
+  let fast_exp_imperative (x n: int) : int
     requires { 0 <= n }
     ensures { result = power x n }
-  = let r = ref 1 in
-    let p = ref x in
-    let e = ref n in
-    while !e > 0 do
-      invariant { 0 <= !e /\ !r * power !p !e = power x n }
-      variant   { !e }
+  = let ref r = 1 in
+    let ref p = x in
+    let ref e = n in
+    while e > 0 do
+      invariant { 0 <= e }
+      invariant { r * power p e = power x n }
+      variant   { e }
       label L in
-      if mod !e 2 = 1 then r := !r * !p;
-      p := !p * !p;
-      e := div !e 2;
-      assert { power !p !e =
-               let x = power (!p at L) !e in x * x }
+      if mod e 2 = 1 then r := r * p;
+      p := p * p;
+      e := div e 2;
+      assert { power p e = let x = power (p at L) e in x * x }
     done;
-    !r
+    r
 
 end

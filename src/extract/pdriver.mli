@@ -84,6 +84,8 @@ type printer = {
 
 val default_prelude_printer : prelude_printer
 
+val dummy_prelude_printer : prelude_printer
+
 val dummy_border_printer : border_printer
 
 val register_printer : string -> printer -> unit

@@ -893,7 +893,7 @@ module Checksum = struct
 
   module DMid = Diffmap.MakeOfMap (Ident.Mid)
 
-  (* WARNING: The occurence of [Trans.fold] in [task_v3] needs to be executed
+  (* WARNING: The occurrence of [Trans.fold] in [task_v3] needs to be executed
      once at initialization in order for all the applications of this
      transformation to share the same Wtask ([h] created on first line of
      [Trans.fold]). In short, the closure is here just so that Trans.fold is
@@ -1166,7 +1166,14 @@ module Pairing (Old: S)(New: S) = struct
       match o,n with
         | old, [] -> acc,old
         | [], n :: rem_n -> aux ((n,None)::acc) [] rem_n
-        | o :: rem_o, n :: rem_n -> aux ((n,Some(o,true))::acc) rem_o rem_n
+        | o :: rem_o, n :: rem_n ->
+            let oc = Old.checksum o in
+            let nc = New.checksum n in
+            let obs = match (oc,nc) with
+              | Some oc, Some nc -> not (equal_checksum oc nc)
+              | _ -> true
+            in
+            aux ((n,Some(o,obs))::acc) rem_o rem_n
     in
     aux [] oldgoals newgoals
 

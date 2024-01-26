@@ -8,7 +8,8 @@
   - `make trywhy3`
   - run `make detect-unused` and remove unused files
   - run `make update-doc-png` and check if some pictures need to be updated
-  - check `lib/why3/META.in`
+  - check `lib/why3/META.in` (e.g., against `EXTPKGS` in `Makefile.in`)
+  - check the gallery, especially the new examples (see below)
 
 * change version number `VERSION=1.3 RELEASE=1.3.0`
   - update the first line of `configure.in` using `$RELEASE`
@@ -18,7 +19,7 @@
 
 * check/update authors and copyright
   - update the content of the About dialog in `src/ide/gconfig.ml`
-    around lines 630-670
+    around lines 680-700
   - update the `copyright` field in `doc/conf.py` around line 50
   - update `doc/foreword.rst`
   - update `src/trywhy3/trywhy3.html`
@@ -115,16 +116,20 @@
   - make a pull request on github
 
 * produce the Why3 part of Toccata gallery
-  - have `GALLERYDIR` set to the sub-directory `gallery/` of the git sources
-    of the Toccata web site, e.g.,
-    `export GALLERYDIR=/users/vals/filliatr/toccata/web/gallery`
-  - in Why3 sources, do `make gallery`; it exports to `$GALLERYDIR` all
-    Why3 programs for which there is a session
-  - now move to the Toccata web site sources, and
-    - update `web/gallery/examples.rc` to include new examples
-    - `git add` the files for these new examples (those currently untracked
-      in git) or simply remove them if they should not go on-line
-    - do `make` in `web/gallery/`
-    - do `make install-gallery` in `web/`
+  - update the git repository of Toccata
+  - have `GALLERYDIR` point to the sub-directory `gallery` of that git repository,
+    e.g., `export GALLERYDIR=.../toccata/web/gallery`
+  - in Why3 sources, run `make gallery`;
+    it exports to `$GALLERYDIR` all the Why3 programs for which there is a session
+  - now move to the directory `$GALLERYDIR`
+  - check the examples that are currently untracked in the Toccata repository
+    and update `examples.rc` accordingly
+  - put the directories of the broken examples in `.gitignore`
+  - run `make`; this requires to have installed the newly released Why3;
+    the presence of `.prehtml.new` files means that something went wrong,
+    hopefully only for non-Why3 examples
+  - `git add` the new files
+    (except for the `.html` files, which should go in `web/gallery/.gitignore`)
+  - commit and push the modified files
 
 * announce the release using the features of `CHANGES.md`

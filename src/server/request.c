@@ -177,9 +177,10 @@ void remove_from_queue(int key, char *id, void callback(prequest)) {
   pqueue tmp = init_queue(queue->capacity);
   while (!queue_is_empty(queue)) {
     prequest r = queue_pop(queue);
-    if (r->key != key || strcmp(r->id,id)) {
+    if (r->key != key ||
+	(id != NULL && strcmp(r->id,id))) {
       queue_push(tmp, r);
-    } else {
+    } else if (callback) {
       callback(r);
     }
   }

@@ -120,7 +120,7 @@ module Task =
       (* from why 3 ide *)
       let locs = ref [] in
       let rec get_locs kind f =
-        Opt.iter (fun loc ->
+        Option.iter (fun loc ->
             match mk_loc (Loc.get loc) with
               None -> ()
             | Some l -> locs := (kind, l) :: !locs) f.Term.t_loc;
@@ -298,7 +298,7 @@ let why3_parse_theories steps theories =
     Wstdlib.Mstr.fold
       (fun thname th acc ->
        let loc =
-         Opt.get_def Loc.dummy_position th.Theory.th_name.Ident.id_loc
+         Option.value ~default:Loc.dummy_position th.Theory.th_name.Ident.id_loc
        in
        (loc, (thname, th)) :: acc) theories []
   in
@@ -333,7 +333,7 @@ let why3_execute_one m rs =
         (Buffer.contents output)
     with Pinterp_core.Incomplete r ->
       asprintf "%s.main cannot compute (%s)" mod_name r in
-  let mod_loc = Opt.get_def Loc.dummy_position th.Ident.id_loc in
+  let mod_loc = Option.value ~default:Loc.dummy_position th.Ident.id_loc in
   (mod_loc, result)
 
 let why3_execute modules =

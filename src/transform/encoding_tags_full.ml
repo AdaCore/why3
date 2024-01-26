@@ -103,8 +103,8 @@ let lsmap kept = Hls.memo 63 (fun ls ->
   let neg ty = if prot_arg && Sty.mem ty kept then ty else ty_deco in
   let pos ty = if prot_val && Sty.mem ty kept then ty else ty_base in
   let tyl = List.map neg ls.ls_args in
-  let tyr = Opt.map pos ls.ls_value in
-  if Opt.equal ty_equal tyr ls.ls_value
+  let tyr = Option.map pos ls.ls_value in
+  if Option.equal ty_equal tyr ls.ls_value
      && List.for_all2 ty_equal tyl ls.ls_args then ls
   else create_lsymbol (id_clone ls.ls_name) tyl tyr)
 

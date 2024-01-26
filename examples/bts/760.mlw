@@ -1,0 +1,12 @@
+
+use int.Int
+
+predicate my_order (x y : int) =
+  x < y /\ x >= 0
+
+let rec f () =
+  let ref x = 10 in
+  while x > 0 do
+    variant { [@variant:x] x with my_order }
+    x <- x - 1
+  done

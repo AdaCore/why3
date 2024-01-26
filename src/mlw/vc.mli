@@ -24,6 +24,8 @@ val set_infer_invs :
    Ity.cty -> (Expr.expr * Term.term) list) -> unit
 (* adds a function to infer invariants during the VC generation *)
 
+val warn_missing_diverges : Loc.warning_id
+
 val vc : Env.env -> known_map -> Theory.theory_uc -> pdecl -> pdecl list
 
 (**/**)

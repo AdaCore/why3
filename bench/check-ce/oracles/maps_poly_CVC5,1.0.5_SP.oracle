@@ -1,0 +1,377 @@
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 8, characters 14-28)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 8, characters 14-28)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 8, characters 14-28)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 8, characters 14-28)
+File "bench/check-ce/maps_poly.mlw", line 8, characters 14-28:
+Sub-goal Postcondition of goal test_map'vc.
+Prover result is: Unknown (unknown + incomplete) (460 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File maps_poly.mlw:
+  Line 7:
+    x = {contents= fun (x:int) -> if x = 1 then 3 else 0}
+    x = {contents= fun (x:int) -> if x = 1 then 3 else 0}
+    Execution of main function `test_map` with env:
+      x = {contents= fun (x:int) -> if x = 1 then 3 else 0}
+      zero = 0
+      one = 1
+  Line 10:
+    Normal execution of function `(!)` with args:
+      r = {contents= fun (x:int) -> if x = 1 then 3 else 0}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= fun (x:int) -> if x = 1 then 3 else 0}
+File maps_poly.mlw:
+  Line 10:
+    Normal execution of function `set` with args:
+      f = fun (x:int) -> if x = 1 then 3 else 0
+      x = 0
+      v = 3
+    Normal execution of function `(:=)` with args:
+      r = {contents= fun (x:int) -> if x = 1 then 3 else 0}
+      v = (fun y -> if pure { if y = x then True else False } then v
+             else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3
+  Line 8:
+    Property failure at postcondition of `test_map` with:
+      x = {contents=
+           (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3}
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC_SW
+  - Concrete RAC: INCOMPLETE (terminated because unexpected arguments passed to (@))
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 14, characters 14-34)
+- Checked model 1: NC_SW
+  - Concrete RAC: INCOMPLETE (terminated because unexpected arguments passed to (@))
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 14, characters 14-34)
+File "bench/check-ce/maps_poly.mlw", line 14, characters 14-34:
+Sub-goal Postcondition of goal test_map_multidim1'vc.
+Prover result is: Unknown (unknown + incomplete) (553 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File maps_poly.mlw:
+  Line 13:
+    x = {contents= fun (x1:int) -> fun (x2:int) -> 0}
+    x = {contents= fun (x1:int) -> fun (x2:int) -> 0}
+    Execution of main function `test_map_multidim1` with env:
+      x = {contents= fun (x1:int) -> fun (x2:int) -> 0}
+      zero = 0
+      one = 1
+  Line 16:
+    Giant-step execution of function `(!)` with args:
+      r = {contents= fun (x1:int) -> fun (x2:int) -> 0}
+    result of `(!)` = fun (x1:int) -> fun (x2:int) -> 0
+    Giant-step execution of function `get` with args:
+      f = fun (x1:int) -> fun (x2:int) -> 0
+      x = 1
+    result of `get` = fun (x1:int) -> 0
+    Giant-step execution of function `(!)` with args:
+      r = {contents= fun (x1:int) -> fun (x2:int) -> 0}
+    result of `(!)` = fun (x1:int) -> fun (x2:int) -> 0
+    Giant-step execution of function `set` with args:
+      f = fun (x1:int) -> fun (x2:int) -> 0
+      x = 0
+      v = fun (x1:int) -> 0
+    result of `set` = fun (x1:int) -> fun (x2:int) -> 0
+    Giant-step execution of function `(:=)` with args:
+      r = {contents= fun (x1:int) -> fun (x2:int) -> 0}
+      v = fun (x1:int) -> fun (x2:int) -> 0
+    x = {contents= fun (x1:int) -> fun (x2:int) -> 0}
+    result of `(:=)` = ()
+  Line 14:
+    Property failure at postcondition of `test_map_multidim1` with:
+      x = {contents= fun (x1:int) -> fun (x2:int) -> 0}
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 19, characters 14-34)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 19, characters 14-34)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 19, characters 14-34)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 19, characters 14-34)
+File "bench/check-ce/maps_poly.mlw", line 19, characters 14-34:
+Sub-goal Postcondition of goal test_map_multidim2'vc.
+Prover result is: Unknown (unknown + incomplete) (647 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File maps_poly.mlw:
+  Line 18:
+    x = {contents=
+         fun (x1:int) ->
+          if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+          else fun (x2:int) -> 0}
+    x = {contents=
+         fun (x1:int) ->
+          if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+          else fun (x2:int) -> 0}
+    Execution of main function `test_map_multidim2` with env:
+      x = {contents=
+           fun (x1:int) ->
+            if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+            else fun (x2:int) -> 0}
+      zero = 0
+      one = 1
+  Line 21:
+    Normal execution of function `(!)` with args:
+      r = {contents=
+           fun (x1:int) ->
+            if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+            else fun (x2:int) -> 0}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents=
+             fun (x1:int) ->
+              if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+              else fun (x2:int) -> 0}
+File maps_poly.mlw:
+  Line 21:
+    Normal execution of function `get` with args:
+      f = fun (x1:int) ->
+           if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+           else fun (x2:int) -> 0
+      x = 0
+File map.mlw:
+  Line 11:
+    Normal execution of function `(@)` with args:
+      u = fun (x1:int) ->
+           if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+           else fun (x2:int) -> 0
+      u = 0
+File maps_poly.mlw:
+  Line 22:
+    Normal execution of function `set` with args:
+      f = fun (x1:int) -> 0
+      x = 0
+      v = 3
+  Line 23:
+    Normal execution of function `(!)` with args:
+      r = {contents=
+           fun (x1:int) ->
+            if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+            else fun (x2:int) -> 0}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents=
+             fun (x1:int) ->
+              if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+              else fun (x2:int) -> 0}
+File maps_poly.mlw:
+  Line 23:
+    Normal execution of function `set` with args:
+      f = fun (x1:int) ->
+           if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+           else fun (x2:int) -> 0
+      x = 0
+      v = (fun y -> if pure { if y = x then True else False } then v
+             else f y) with f = fun (x1:int) -> 0, x = 0, v = 3
+    Normal execution of function `(:=)` with args:
+      r = {contents=
+           fun (x1:int) ->
+            if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
+            else fun (x2:int) -> 0}
+      v = (fun y -> if pure { if y = x then True else False } then v
+             else f y) with f = fun (x1:int) ->
+                                 if x1 = 1
+                                 then fun (x2:int) -> if x2 = 1 then 3 else 0
+                                 else fun (x2:int) -> 0, x = 0, v = (fun y -> if pure { 
+                                                                    if 
+                                                                    y = x
+                                                                    then True
+                                                                    else False } then v
+                                                                    else 
+                                                                    f y) with f = fun
+                                                                    (x1:
+                                                                    int) -> 0, x = 0, v = 3
+  Line 19:
+    Property failure at postcondition of `test_map_multidim2` with:
+      x = {contents=
+           (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = fun (x1:int) ->
+                                  if x1 = 1
+                                  then fun (x2:int) ->
+                                        if x2 = 1 then 3 else 0
+                                  else fun (x2:int) -> 0, x = 0, v = (fun y -> if pure { 
+                                                                    if 
+                                                                    y = x
+                                                                    then True
+                                                                    else False } then v
+                                                                    else 
+                                                                    f y) with f = fun
+                                                                    (x1:
+                                                                    int) -> 0, x = 0, v = 3}
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 26, characters 14-28)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 26, characters 14-28)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 26, characters 14-28)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 26, characters 14-28)
+File "bench/check-ce/maps_poly.mlw", line 26, characters 14-28:
+Sub-goal Postcondition of goal proj_map_test1'vc.
+Prover result is: Unknown (unknown + incomplete) (460 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File maps_poly.mlw:
+  Line 25:
+    x = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
+    x = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
+    Execution of main function `proj_map_test1` with env:
+      x = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
+      zero = 0
+      one = 1
+  Line 28:
+    Normal execution of function `(!)` with args:
+      r = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
+File maps_poly.mlw:
+  Line 28:
+    Normal execution of function `set` with args:
+      f = fun (x1:int) -> if x1 = 1 then 3 else 0
+      x = 0
+      v = 3
+    Normal execution of function `(:=)` with args:
+      r = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
+      v = (fun y -> if pure { if y = x then True else False } then v
+             else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3
+  Line 26:
+    Property failure at postcondition of `proj_map_test1` with:
+      x = {contents=
+           (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3}
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 31, characters 14-28)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 31, characters 14-28)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 31, characters 14-28)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 31, characters 14-28)
+File "bench/check-ce/maps_poly.mlw", line 31, characters 14-28:
+Sub-goal Postcondition of goal proj_map_test2'vc.
+Prover result is: Unknown (unknown + incomplete) (441 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File maps_poly.mlw:
+  Line 30:
+    x = {contents= fun (x1:int) -> if x1 = 1 then True else False}
+    x = {contents= fun (x1:int) -> if x1 = 1 then True else False}
+    Execution of main function `proj_map_test2` with env:
+      x = {contents= fun (x1:int) -> if x1 = 1 then True else False}
+      zero = 0
+      one = 1
+  Line 33:
+    Normal execution of function `True` with args:
+    Normal execution of function `(!)` with args:
+      r = {contents= fun (x1:int) -> if x1 = 1 then True else False}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= fun (x1:int) -> if x1 = 1 then True else False}
+File maps_poly.mlw:
+  Line 33:
+    Normal execution of function `set` with args:
+      f = fun (x1:int) -> if x1 = 1 then True else False
+      x = 0
+      v = true
+    Normal execution of function `(:=)` with args:
+      r = {contents= fun (x1:int) -> if x1 = 1 then True else False}
+      v = (fun y -> if pure { if y = x then True else False } then v
+             else f y) with f = fun (x1:int) ->
+                                 if x1 = 1 then True else False, x = 0, v = true
+  Line 31:
+    Property failure at postcondition of `proj_map_test2` with:
+      x = {contents=
+           (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = fun (x1:int) ->
+                                  if x1 = 1 then True else False, x = 0, v = true}
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 42, characters 3-31)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 42, characters 3-31)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 42, characters 3-31)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 42, characters 3-31)
+File "bench/check-ce/maps_poly.mlw", line 42, characters 3-31:
+Goal t1.
+Prover result is: Unknown (sat) (190 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File maps_poly.mlw:
+  Line 41:
+    t = fun (x1:int) -> if x1 = 0 then 43 else 0
+    i = 0
+    t = fun (x1:int) -> if x1 = 0 then 43 else 0
+    i = 0
+    Execution of main function `t1'goal` with env:
+      i = 0
+      t = fun (x1:int) -> if x1 = 0 then 43 else 0
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File maps_poly.mlw:
+  Line 42:
+    Property failure at postcondition of `t1'goal` with:
+      i = 0
+      t = fun (x1:int) -> if x1 = 0 then 43 else 0
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
+File "bench/check-ce/maps_poly.mlw", line 50, characters 36-64:
+Goal g.
+Prover result is: Unknown (sat) (243 steps).
+The following counterexample model could not be verified
+  (both RAC terminated with uncaught exception):
+File maps_poly.mlw:
+  Line 50:
+    m : real -> real = [|1/10 => -1.0; _ => 0.0|]
+

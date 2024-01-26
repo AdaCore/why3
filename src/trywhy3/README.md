@@ -7,7 +7,7 @@ Instructions to build TryWhy3
         the `mode-why3.js` file into them:
 
             cd src/trywhy3
-            git clone git@github.com:ajaxorg/ace-builds.git
+            git clone --depth=1 git@github.com:ajaxorg/ace-builds.git
             cp mode-why3.js ace-builds/src-min-noconflict/
 
   * Install Alt-Ergo

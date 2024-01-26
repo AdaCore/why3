@@ -23,7 +23,7 @@ module XmlHttpRequest = Js_of_ocaml.XmlHttpRequest
 
 let log s = ignore (Firebug.console ## log (Js.string s))
 
-let get_opt o = Js.Opt.get o (fun () -> assert false)
+let get_opt o = Js.Option.get o (fun () -> assert false)
 
 let check_def s o =
   Js.Optdef.get o (fun () -> log ("ERROR in check_def(): object " ^ s ^ " is undefined or null");
@@ -60,7 +60,7 @@ let select e cls =
   Dom.list_of_nodeList (e ## querySelectorAll (Js.string cls))
 
 let getElement_exn cast id =
-  Js.Opt.get (cast (Dom_html.getElementById id)) (fun () -> raise Not_found)
+  Js.Option.get (cast (Dom_html.getElementById id)) (fun () -> raise Not_found)
 
 let getElement cast id =
   try

@@ -24,6 +24,9 @@ let debug_check_ce_rac_results = Debug.register_info_flag "check_ce:rac_results"
 let debug_check_ce_categorization = Debug.register_info_flag "check_ce:categorization"
     ~desc:"Debug@ info@ about@ categorization@ of@ RAC@ results@ for@ --check-ce"
 
+let debug_check_ce_only_giant = Debug.register_info_flag "check_ce:only_giant"
+    ~desc:"Only@ run@ giant@ step@ RAC@ with@ --check-ce"
+
 (** Result of checking solvers' counterexample models *)
 
 type verdict = NC | SW | NC_SW | BAD_CE of string | INCOMPLETE of string
@@ -35,18 +38,40 @@ let string_of_verdict = function
   | INCOMPLETE _ -> "INCOMPLETE"
   | BAD_CE _ -> "BAD_CE"
 
-let report_verdict ?check_ce fmt = function
+let print_call fmt call =
+  let print_oloc =
+    Pp.print_option_or_default "unknown location" Loc.pp_position in
+  match call.Log.log_desc with
+  | Log.Exec_call (Some rs,_,_)  ->
+    Format.fprintf fmt "  - Function '%a' at %a" print_rs rs print_oloc call.Log.log_loc
+  | Log.Exec_call (None,_,_) -> Format.fprintf fmt "  - Anonymous function at %a" print_oloc call.Log.log_loc
+  | Log.Iter_loop _ ->
+     Format.fprintf fmt "  - Loop at %a" print_oloc call.Log.log_loc
+  | _ -> ()
+
+let report_verdict ?check_ce env fmt (c,log) =
+  match c with
   | NC ->
      Format.fprintf fmt
        "The@ program@ does@ not@ comply@ to@ the@ verification@ goal"
   | SW ->
-     Format.fprintf fmt
-       "The@ contracts@ of@ some@ function@ or@ loop@ are@ too weak"
+    let calls = Pinterp_core.Log.get_exec_calls_and_loops env log in
+    Format.fprintf fmt
+      "The@ contracts@ of@ the@ following@ functions/loops@ are@ too@ weak :@.@[%a@]@."
+       (pp_print_list print_call) calls
   | NC_SW ->
-     Format.fprintf fmt
-       ("The@ program@ does@ not@ comply@ to@ the@ verification@ \
-         goal,@ or@ the@ contracts@ of@ some@ loop@ or@ function@ are@ \
-         too@ weak")
+    let calls = Pinterp_core.Log.get_exec_calls_and_loops env log in
+    if List.length calls = 0 then
+      (* In this case, either the contracts of the stdlib/builtin functions are
+         too weak or the program is non conforming. We make the assumption that
+         our functions are always correctly specified so we choose the latter. *)
+      Format.fprintf fmt
+       "The@ program@ does@ not@ comply@ to@ the@ verification@ goal"
+    else
+      Format.fprintf fmt
+      "The@ program@ does@ not@ comply@ to@ the@ verification@ goal,@ or@ the@ \
+        contracts@ of@ the@ following@ functions/loops@ are@ too@ weak :@.@[%a@]@."
+       (pp_print_list print_call) calls
   | BAD_CE _ ->
      Format.fprintf fmt
        "Sorry,@ we@ don't@ have@ a@ good@ counterexample@ for@ you@ :("
@@ -132,7 +157,7 @@ let is_vc_term ~vc_term_loc ~vc_term_attrs ctx t =
          the goal, so we search for the location of the VC term within the term
          [t] where the contradiction has been detected. *)
       let rec has_vc_term_loc t =
-        Opt.equal Loc.equal (Some vc_term_loc) t.t_loc || match t.t_node with
+        Option.equal Loc.equal (Some vc_term_loc) t.t_loc || match t.t_node with
         | Tbinop (Term.Timplies, _, t) -> has_vc_term_loc t
         | Tquant (_, tq) -> let _,_,t = t_open_quant tq in has_vc_term_loc t
         | Tlet (_, tb) -> let _,t = t_open_bound tb in has_vc_term_loc t
@@ -181,13 +206,13 @@ let classify ~vc_term_loc ~vc_term_attrs ~normal_result ~giant_step_result =
           BAD_CE giant_step_reason, giant_step_log
     end
 
-let print_model_classification ?verb_lvl ?json ?check_ce fmt (m, c) =
+let print_model_classification ?verb_lvl ?json ?check_ce env fmt (m, c) =
   fprintf fmt "@ @[<hov2>%a%t@]"
-    (report_verdict ?check_ce) (fst c)
+    (report_verdict ?check_ce env) c
     (fun fmt ->
        match fst c with
        | NC | SW | NC_SW ->
-           fprintf fmt ",@ for@ example@ during@ the@ following@ execution:"
+          fprintf fmt ",@ for@ example@ during@ the@ following@ execution:"
        | INCOMPLETE _ ->
            pp_print_string fmt ":"
        | _ -> ());
@@ -207,7 +232,7 @@ let rec import_model_value loc env check known ity t =
   Debug.dprintf debug_check_ce_rac_results "[import_model_value] expected type = %a@."
     Ity.print_ity ity;
   let res =
-    if Opt.equal Ty.ty_equal (Some (ty_of_ity ity)) t.t_ty then
+    if Option.equal Ty.ty_equal (Some (ty_of_ity ity)) t.t_ty then
       match t.t_node with
       | Tvar _ -> undefined_value env ity
       | Ttrue -> bool_value true
@@ -256,7 +281,7 @@ let rec import_model_value loc env check known ity t =
                   | ({ its_def = Ty.Range r; its_ts= ts }, _, _),
                     { t_node= Tconst (Constant.ConstInt c) }
                     when proj_ls.ls_name.id_string = ts.Ty.ts_name.id_string ^ "'int"
-                      && Opt.equal Ty.ty_equal proj_ls.ls_value (Some Ty.ty_int) -> (
+                      && Option.equal Ty.ty_equal proj_ls.ls_value (Some Ty.ty_int) -> (
                       try Number.(check_range c r); true
                       with Number.OutOfRange _ -> false )
                   | _ -> raise UnexpectedPattern
@@ -348,11 +373,11 @@ let oracle_of_model pm model =
         match oid with Some id -> id.id_loc | None -> None in
     import_model_value loc env check pm.Pmodule.mod_known ity me.me_value in
   let for_variable env ?(check=fun _ _ -> ()) ~loc id ity =
-    Opt.map (import check (Some id) loc env ity)
+    Option.map (import check (Some id) loc env ity)
       (search_model_element_for_id model ?loc id) in
   let for_result env ?(check=fun _ _ -> ()) ~loc ~call_id ity =
-    Opt.map (import check None (Some loc) env ity)
-      (search_model_element_call_result model call_id loc) in
+    Option.map (import check None (Some loc) env ity)
+      (search_model_element_call_result model call_id) in
   { for_variable; for_result }
 
 (** Check and select solver counterexample models *)
@@ -364,7 +389,7 @@ let rec find_in_list f = function
     | res -> res
 
 let rec find_in_term loc t =
-  Opt.equal Loc.equal (Some loc) t.t_loc || t_any (find_in_term loc) t
+  Option.equal Loc.equal (Some loc) t.t_loc || t_any (find_in_term loc) t
 
 (* let find_lemma_goal th loc =
  *   let open Theory in
@@ -372,7 +397,7 @@ let rec find_in_term loc t =
  *   let in_decl d =
  *     match d.d_node with
  *     | Dprop ((Plemma | Pgoal), pr, t) ->
- *         if Opt.equal Loc.equal (Some loc) t.t_loc then
+ *         if Option.equal Loc.equal (Some loc) t.t_loc then
  *           Some t
  *         else begin
  *           if find_in_term loc t then
@@ -388,6 +413,9 @@ let rec find_in_term loc t =
 
 type rs_or_term = RTrsymbol of rsymbol | RTterm of (Decl.prsymbol * term)
 
+let warn_cannot_check_ce =
+  Loc.register_warning "cannot_check_ce" "Warn about uncheckable counterexamples"
+
 (** Identifies the rsymbol of the definition that contains the given
    position. *)
 let find_rs pm loc =
@@ -398,7 +426,7 @@ let find_rs pm loc =
     List.exists (find_in_term loc) cty.cty_post ||
     Mxs.exists (fun _ -> List.exists (find_in_term loc)) cty.cty_xpost in
   let rec in_e e =
-    Opt.equal Loc.equal (Some loc) e.e_loc ||
+    Option.equal Loc.equal (Some loc) e.e_loc ||
     match e.e_node with
     | Evar _ | Econst _ | Eassign _ -> false
     | Eexec (ce, cty) -> in_ce ce || in_cty cty
@@ -434,16 +462,16 @@ let find_rs pm loc =
     | PDtype ds ->
        let in_tdef td =
          List.exists (find_in_term loc) td.itd_invariant ||
-         Opt.exists in_e td.itd_witness in
+         Option.fold ~some:in_e ~none:false td.itd_witness in
        let find_td td = (* TODO *)
-         if in_tdef td then Loc.warning
+         if in_tdef td then Loc.warning warn_cannot_check_ce
              "Can't check CE for VC from type definitions :(";
          None in
        find_in_list find_td ds
     | PDlet ld ->
        (match ld with
         | LDvar (_, e) -> (* TODO *)
-            if in_e e then Loc.warning
+            if in_e e then Loc.warning warn_cannot_check_ce
                 "Can't check CE for VC from variable definitions :(";
            None
         | LDsym (rs, ce) -> maybe (in_cty rs.rs_cty || in_ce ce) rs
@@ -457,7 +485,7 @@ let find_rs pm loc =
     Decl.(match d.d_node with
     | Dtype _ | Ddata _ | Dparam _ | Dlogic _ | Dind _ -> None
     | Dprop (_,pr,t) ->
-        if Opt.equal Loc.equal (Some loc) pr.pr_name.id_loc then Some (RTterm (pr,t)) else
+        if Option.equal Loc.equal (Some loc) pr.pr_name.id_loc then Some (RTterm (pr,t)) else
           maybe (find_in_term loc t) pr t)
   and find_mod_unit = function
     | Uuse _ | Uclone _ | Umeta _ -> None
@@ -603,7 +631,7 @@ let print_dbg_rac_result_model ~print_normal ~print_giant
           print_rac_result_state giant_state
 
 let select_model_from_giant_step_rac_results ?strategy models =
-  let strategy = Opt.get_def last_non_empty_model strategy in
+  let strategy = Option.value ~default:last_non_empty_model strategy in
   let selected, selected_ix =
     match List.nth_opt (strategy models) 0 with
     | None -> None, None
@@ -730,8 +758,9 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
 let select_model ?timelimit ?steplimit ?verb_lvl ?compute_term ~check_ce
     rac env pm models =
   if check_ce then
+    let only_giant_step = Debug.test_flag debug_check_ce_only_giant in
     let rac_results =
-      get_rac_results ?timelimit ?steplimit ?compute_term ?verb_lvl rac env pm models
+      get_rac_results ?timelimit ?steplimit ?compute_term ?verb_lvl rac env pm models ~only_giant_step
     in
     select_model_from_verdict rac_results
   else

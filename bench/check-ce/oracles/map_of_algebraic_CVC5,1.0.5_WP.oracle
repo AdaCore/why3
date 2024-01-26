@@ -1,0 +1,44 @@
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/map_of_algebraic.mlw", line 34, characters 4-16)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/map_of_algebraic.mlw", line 34, characters 4-16)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/map_of_algebraic.mlw", line 34, characters 4-16)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/map_of_algebraic.mlw", line 34, characters 4-16)
+File "bench/check-ce/map_of_algebraic.mlw", line 34, characters 4-16:
+Sub-goal Precondition of goal not_valid'vc.
+Prover result is: Unknown (unknown + incomplete) (110736 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File map_of_algebraic.mlw:
+  Line 33:
+    m = {block_size= fun (x:int) -> (0:t);
+         mem_access_address= fun (x:int) -> Freeable}
+    x = {base_addr= 0; offset= (0:t)}
+    m = {block_size= fun (x:int) -> (0:t);
+         mem_access_address= fun (x:int) -> Freeable}
+    x = {base_addr= 0; offset= (0:t)}
+    Execution of main function `not_valid` with env:
+      m = {block_size= fun (x:int) -> (0:t);
+           mem_access_address= fun (x:int) -> Freeable}
+      x = {base_addr= 0; offset= (0:t)}
+      zero = 0
+      one = 1
+  Line 34:
+    (giant-step) execution of unimplemented function `load_val`
+      m = {block_size= fun (x:int) -> (0:t);
+           mem_access_address= fun (x:int) -> Freeable}
+      x = {base_addr= 0; offset= (0:t)}
+    Property failure at precondition of `load_val` with:
+      Writable = UNDEFINED
+      m = {block_size= fun (x:int) -> (0:t);
+           mem_access_address= fun (x:int) -> Freeable}
+      x = {base_addr= 0; offset= (0:t)}
+

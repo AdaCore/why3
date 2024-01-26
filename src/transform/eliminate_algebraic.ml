@@ -113,7 +113,7 @@ let rec rewriteT kn state t = match t.t_node with
         | _ -> Printer.unsupportedTerm t uncompiled
       in
       let w,m = List.fold_left mk_br (None,Mls.empty) bl in
-      let find (cs,_) = try Mls.find cs m with Not_found -> Opt.get w in
+      let find (cs,_) = try Mls.find cs m with Not_found -> Option.get w in
       let ts = match t1.t_ty with
         | Some { ty_node = Tyapp (ts,_) } -> ts
         | _ -> Printer.unsupportedTerm t uncompiled
@@ -159,7 +159,7 @@ and rewriteF kn state av sign f =
         let vl,e = try Mls.find cs m with Not_found ->
           let var = create_vsymbol (id_fresh "w") in
           let get_var pj = var (t_type (t_app_infer pj [t1])) in
-          List.map get_var (Mls.find cs state.cp_map), Opt.get w
+          List.map get_var (Mls.find cs state.cp_map), Option.get w
         in
         let hd = t_app (Mls.find cs state.cc_map) (List.map t_var vl) t1.t_ty in
         match t1.t_node with
@@ -217,7 +217,7 @@ let add_selector (state,task) ts ty csl =
     let pr = create_prsymbol (id_derive id cs.ls_name) in
     let vl = List.rev_map (create_vsymbol (id_fresh "u")) cs.ls_args in
     let newcs = Mls.find cs state.cc_map in
-    let hd = fs_app newcs (List.rev_map t_var vl) (Opt.get cs.ls_value) in
+    let hd = fs_app newcs (List.rev_map t_var vl) (Option.get cs.ls_value) in
     let hd = fs_app mt_ls (hd::mt_tl) mt_ty in
     let vl = List.rev_append mt_vl (List.rev vl) in
     let ax = t_forall_close vl [] (t_equ hd t) in
@@ -243,7 +243,7 @@ let add_indexer (state,task) ts ty csl =
     let pr = create_prsymbol (id_derive id cs.ls_name) in
     let vl = List.rev_map (create_vsymbol (id_fresh "u")) cs.ls_args in
     let newcs = Mls.find cs state.cc_map in
-    let hd = fs_app newcs (List.rev_map t_var vl) (Opt.get cs.ls_value) in
+    let hd = fs_app newcs (List.rev_map t_var vl) (Option.get cs.ls_value) in
     let ax = t_equ (fs_app mt_ls [hd] ty_int) (t_nat_const !index) in
     let ax = t_forall_close (List.rev vl) [[hd]] ax in
     add_prop_decl tsk Paxiom pr ax
@@ -284,7 +284,7 @@ let complete_projections csl =
       | (None, ty) ->
          let id = Printf.sprintf "%s_proj_%d" c.ls_name.id_string (i+1) in
          let id = id_derive id c.ls_name in
-         Some (create_fsymbol ~proj:true id [Opt.get c.ls_value] ty)
+         Some (create_fsymbol ~proj:true id [Option.get c.ls_value] ty)
       | (pj, _) -> pj
     in
     (c, List.mapi conv_p (List.combine pjl c.ls_args))
@@ -303,9 +303,9 @@ let add_projections (state,task) _ts _ty csl =
   let pj_add (cp_map,pp_map,tsk) (cs,pl) =
     let vl = List.map (create_vsymbol (id_fresh "u")) cs.ls_args in
     let tl = List.map t_var vl in
-    let hd = fs_app (Mls.find cs state.cc_map) tl (Opt.get cs.ls_value) in
+    let hd = fs_app (Mls.find cs state.cc_map) tl (Option.get cs.ls_value) in
     let add (pjl,pp_map,tsk) t pj =
-      let pj = Opt.get pj in
+      let pj = Option.get pj in
       let ls,pp_map =
         match Mls.find pj pp_map with
         | pj -> pj,pp_map
@@ -368,7 +368,7 @@ let add_axioms used (state,task) ((ts,csl) as d) =
        always use the non-encoded projections and constructors *)
     let state =
       let fold_c state (c, pjs) =
-        let pjs = List.map Opt.get pjs in
+        let pjs = List.map Option.get pjs in
         let cc_map = Mls.add c c state.cc_map in
         let cp_map = Mls.add c pjs state.cp_map in
         let fold_pj pp_map pj = Mls.add pj pj pp_map in
@@ -479,7 +479,7 @@ let comp t (state,task) = match t.task_decl.td_node with
   | Decl d ->
       let rstate,rtask = ref state, ref task in
       let add _ (d,th) () =
-        let t = Opt.get (add_decl None d) in
+        let t = Option.get (add_decl None d) in
         let state,task = comp t (!rstate,!rtask) in
         let task = add_tdecl task (create_use th) in
         rstate := state ; rtask := task ; None
@@ -629,7 +629,7 @@ let elim_proj keep_rec t (map,task) = match t.task_decl.td_node with
       | [_] when keep_rec -> (map,task)
       | _ ->
          let (cs,pjl) = List.hd csl in
-         let ty = Opt.get cs.ls_value in
+         let ty = Option.get cs.ls_value in
          let vs = create_vsymbol (id_fresh "v") ty in
          let pjl = List.filter_map Fun.id pjl in
          List.fold_left (add vs csl) (map,task) pjl

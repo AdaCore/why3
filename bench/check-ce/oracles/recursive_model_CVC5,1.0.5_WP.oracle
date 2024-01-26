@@ -1,0 +1,36 @@
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/recursive_model.mlw", line 10, character 6 to line 11, character 26)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/recursive_model.mlw", line 10, character 6 to line 11, character 26)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/recursive_model.mlw", line 10, character 6 to line 11, character 26)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/recursive_model.mlw", line 10, character 6 to line 11, character 26)
+File "bench/check-ce/recursive_model.mlw", line 11, characters 21-26:
+Sub-goal Assertion of goal test'vc.
+Prover result is: Unknown (unknown + incomplete) (434 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File recursive_model.mlw:
+  Line 6:
+    global = (S Z)
+  Line 8:
+    i = (- 1)
+    i = (- 1)
+    Execution of main function `test` with env:
+      global = (S Z)
+      i = (- 1)
+      zero = 0
+      one = 1
+  Line 10:
+    Property failure at assertion with:
+      Z = UNDEFINED
+      global = (S Z)
+      i = (- 1)
+

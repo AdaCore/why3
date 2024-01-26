@@ -16,6 +16,9 @@ let debug = Debug.register_info_flag "call_prover"
   ~desc:"Print@ debugging@ messages@ about@ prover@ calls@ \
          and@ keep@ temporary@ files."
 
+let debug_analyse_result = Debug.register_info_flag "analyse_result"
+  ~desc:"Print@ debugging@ messages@ about@ analysis@ of@ answers@ of@ provers."
+
 let debug_attrs = Debug.register_info_flag "print_model_attrs"
     ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions@ in@ CE@ model."
 
@@ -244,40 +247,53 @@ let analyse_result exit_result res_parser get_model out =
       exit_result
   in
 
-  let merge_answers opt_ans1 opt_ans2 = match (opt_ans1,opt_ans2) with
-  | None, Some _ -> opt_ans2
-  | Some _, None -> opt_ans1
-  (* prefer any answer over HighFailure *)
-  | Some HighFailure, Some _ -> opt_ans2
-  | _ -> opt_ans1
+  let merge_answers ans1 opt_ans2 =
+    match opt_ans2 with
+    | None -> ans1
+    | Some ans2 ->
+        match ans1 with
+        (* prefer any answer over HighFailure *)
+        | HighFailure -> ans2
+        | _ -> ans1
   in
 
   let rec analyse saved_models saved_res l =
     match l with
     | [] ->
-        Opt.get_def HighFailure saved_res, List.rev saved_models
-    (* FIXME (see https://gitlab.inria.fr/why3/why3/-/issues/648)
-        The following case is a specific treatment for cases when Answer HighFailure
+        Option.value ~default:HighFailure saved_res, List.rev saved_models
+    | Answer Valid :: _ ->
+        (* answer Valid is always a priority *)
+        Valid, []
+    | Answer res :: (Answer HighFailure :: []) ->
+        Debug.dprintf debug_analyse_result
+          "@[[Call_provers.analyse_result] answer followed by HighFailure:@ @[%a@]@]@."
+          print_prover_answer res;
+        (* FIXME (see https://gitlab.inria.fr/why3/why3/-/issues/648)
+        This case is a specific treatment for cases when Answer HighFailure
         is appended at the end of result_list because signaled is true in the function
         parse_prover_run.
         Without this hack, if a regexp matches exactly the last line of the prover output
         and if Answer HighFailure has been appended at the end, we might end up with two
         consecutive answers in result_list that are ignored by the more general case
         Answer res1 :: (Answer res2 :: tl as tl1). *)
-    | Answer res :: (Answer HighFailure :: []) ->
-        Opt.get_def HighFailure (merge_answers (Some res) saved_res), List.rev saved_models
+        merge_answers res saved_res, List.rev saved_models
     | Answer res1 :: (Answer res2 :: tl as tl1) ->
-       Debug.dprintf debug "Call_provers: two consecutive answers: %a %a@."
+        Debug.dprintf debug_analyse_result
+          "@[[Call_provers.analyse_result] two consecutive answers:@ @[%a@] and @[%a@]@]@."
           print_prover_answer res1 print_prover_answer res2;
+        (* two consecutive answers may happen when one ask for (reason-unknown) *)
        begin
          match res1,res2 with
          | StepLimitExceeded, Unknown "resourceout"
          | Unknown _, Unknown "resourceout" ->
+             (* "resourceout" here is a reason given *)
             analyse saved_models saved_res (Answer StepLimitExceeded :: tl)
          | Timeout, Unknown "timeout"
          | Unknown _, Unknown "timeout" ->
+             (* "timeout" here is a reason given *)
             analyse saved_models saved_res (Answer Timeout :: tl)
          | (Unknown _, Unknown "")| (_, Unknown "(not unknown!)") ->
+             (* "(not unknown!)" is a reason given when previous answer was not unknown *)
             analyse saved_models saved_res (Answer res1 :: tl)
          | Unknown "", Unknown _ ->
             analyse saved_models saved_res tl1
@@ -285,33 +301,41 @@ let analyse_result exit_result res_parser get_model out =
             analyse saved_models saved_res (Answer (Unknown (s1 ^ " + " ^ s2)) :: tl)
          | _,_ -> (
             Loc.warning
+              (Loc.register_warning "consecutive_answers" "Warn when one of two consecutive prover answers is ignored.@.")
               "two consecutive answers returned by the prover, will ignore the first one.@.\
               First answer: %a@.Second answer: %a@."
               print_prover_answer res1 print_prover_answer res2;
             analyse saved_models saved_res tl1)
        end
     | Answer res :: Model model_str :: tl ->
-        if res = Valid then
-          (Valid, [])
-        else
-          begin
-            match get_model with
-            | Some printing_info ->
-                let m = res_parser.prp_model_parser printing_info model_str in
-                Debug.dprintf debug "Call_provers: model:@.";
-                debug_print_model ~print_attrs:false m;
-                analyse ((res, m) :: saved_models) (Some res) tl
-            | None ->
-                analyse saved_models (merge_answers (Some res) saved_res) tl
-          end
+        Debug.dprintf debug_analyse_result
+          "@[[Call_provers.analyse_result] answer followed by model:@ @[%a@]@]@."
+          print_prover_answer res;
+        assert (res <> Valid);
+        record_model saved_models saved_res res model_str tl
     | Answer res :: tl ->
-        if res = Valid then
-          (Valid, [])
-        else
-          analyse saved_models (merge_answers (Some res) saved_res) tl
-    | Model _fail :: tl -> analyse saved_models saved_res tl
+        Debug.dprintf debug_analyse_result
+          "@[[Call_provers.analyse_result] answer not followed by model:@ @[%a@]@]@."
+          print_prover_answer res;
+        assert (res <> Valid);
+        analyse saved_models (Some (merge_answers res saved_res)) tl
+    | Model model_str :: tl ->
+        Debug.dprintf debug_analyse_result
+          "@[[Call_provers.analyse_result] model NOT PRECEDED by answer!@]@.";
+        (* this is not supposed to happen, but it happens. Possibly because the driver is missing
+           a regexp for a possible answer. Let us assume the answer is equivalent to unknown
+        *)
+        record_model saved_models saved_res (Unknown "unrecognized prover answer") model_str tl
+  and record_model saved_models saved_res res model_str tl =
+    match get_model with
+    | Some printing_info ->
+        let m = res_parser.prp_model_parser printing_info model_str in
+        Debug.dprintf debug "Call_provers: model:@.";
+        debug_print_model ~print_attrs:false m;
+        analyse ((res, m) :: saved_models) (Some res) tl
+    | None ->
+        analyse saved_models (Some (merge_answers res saved_res)) tl
   in
-
   analyse [] None result_list
 
 let backup_file f = f ^ ".save"
@@ -331,8 +355,8 @@ let parse_prover_run res_parser signaled time out exitcode limit get_model =
     in analyse_result exit_result res_parser get_model out
   in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
-  let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
-  let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in
+  let time = Option.value ~default:(time) (grep_time out res_parser.prp_timeregexps) in
+  let steps = Option.value ~default:(-1) (grep_steps out res_parser.prp_stepregexps) in
   let tlimit = limit.limit_time in
   let stepslimit = limit.limit_steps in
   let ans, time, steps =
@@ -356,6 +380,8 @@ let parse_prover_run res_parser signaled time out exitcode limit get_model =
       | _ -> ans, time, steps
       else ans, time, steps
   in
+  (* We avoid times smaller than 1/1000000s*)
+  let time = max 0.000001 time in
   { pr_answer = ans;
     pr_status = if signaled then Unix.WSIGNALED int_exitcode else Unix.WEXITED int_exitcode;
     pr_output = out;

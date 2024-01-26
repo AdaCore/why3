@@ -29,7 +29,7 @@ let is_lsymbol t =
   | _ -> false
 
 let create_constant ?name ty =
-  let name = Opt.get_def "x" name in
+  let name = Option.value ~default:"x" name in
   let fresh_name = Ident.id_fresh name in
   let ls = create_lsymbol fresh_name [] (Some ty) in
   (ls, create_param_decl ls)
@@ -81,7 +81,7 @@ let rec compounds_of acc (t: term) =
    When replace is set to true, a susbtitution is done when x is an lsymbol.
  *)
 let destruct_term ?names replace (x: term) : Task.task tlist =
-  let names = Opt.get_def [] names in
+  let names = Option.value ~default:[] names in
   (* Shortcut function *)
   let add_decl_list task l =
     List.fold_left (fun task d -> Task.add_decl task d) task l in

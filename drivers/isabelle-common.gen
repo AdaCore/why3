@@ -22,6 +22,10 @@ theory BuiltIn
   syntax predicate  (=)   "<app><const name=\"HOL.eq\"/>%1%2</app>"
 end
 
+theory Ignore
+  syntax predicate ignore'term  "<const name=\"HOL.True\"/>"
+end
+
 theory HighOrd
   syntax type (->) "<fun>%1%2</fun>"
   syntax function (@) "<app>%1%2</app>"

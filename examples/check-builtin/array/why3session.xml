@@ -2,36 +2,36 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="3" steplimit="0" memlimit="0"/>
 <prover id="1" name="Alt-Ergo" version="2.2.0" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="2" name="Spass" version="3.9" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="3" name="Z3" version="4.11.2" timelimit="3" steplimit="0" memlimit="0"/>
+<prover id="4" name="CVC5" version="1.0.5" timelimit="3" steplimit="0" memlimit="0"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="array.why"/>
 <theory name="Test_simplify_array" proved="true">
  <goal name="G1" proved="true">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
- <proof prover="1"><result status="valid" time="0.01" steps="0"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.01" steps="26"/></proof>
+ <proof prover="1"><result status="valid" time="0.010000" steps="0"/></proof>
+ <proof prover="2"><result status="valid" time="0.020000"/></proof>
+ <proof prover="3"><result status="valid" time="0.010000" steps="26"/></proof>
+ <proof prover="4"><result status="valid" time="0.000000" steps="44"/></proof>
  </goal>
  <goal name="G2" proved="true">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
- <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- <proof prover="3"><result status="valid" time="0.01" steps="441"/></proof>
+ <proof prover="1"><result status="valid" time="0.010000" steps="4"/></proof>
+ <proof prover="2"><result status="valid" time="0.010000"/></proof>
+ <proof prover="3"><result status="valid" time="0.010000" steps="441"/></proof>
+ <proof prover="4"><result status="valid" time="0.000000" steps="181"/></proof>
  </goal>
  <goal name="G3" proved="true">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
- <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.01" steps="42"/></proof>
+ <proof prover="1"><result status="valid" time="0.000000" steps="2"/></proof>
+ <proof prover="2"><result status="valid" time="0.020000"/></proof>
+ <proof prover="3"><result status="valid" time="0.010000" steps="42"/></proof>
+ <proof prover="4"><result status="valid" time="0.000000" steps="60"/></proof>
  </goal>
  <goal name="G4" proved="true">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
- <proof prover="1"><result status="valid" time="0.01" steps="0"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.01" steps="34"/></proof>
+ <proof prover="1"><result status="valid" time="0.010000" steps="0"/></proof>
+ <proof prover="2"><result status="valid" time="0.020000"/></proof>
+ <proof prover="3"><result status="valid" time="0.010000" steps="34"/></proof>
+ <proof prover="4"><result status="valid" time="0.000000" steps="44"/></proof>
  </goal>
 </theory>
 </file>

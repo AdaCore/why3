@@ -1,0 +1,53 @@
+use why3.Ignore.Ignore
+
+use int.Int
+
+let f (x:int) : int
+  requires { [@smtlib:minimize] ignore'term x }
+  ensures { result < 42 }
+= x
+
+use bv.BV32
+
+let g (x:t) : t
+  (*requires { [@smtlib:minimize] ignore'term x }*)
+  ensures { ult result (0x42:t) }
+= x
+
+
+type tt = {
+  size : int;
+  values : int -> t;
+}
+
+val get (x:tt) (i:int) : t
+  requires { 0 <= i < x.size }
+  ensures { result = x.values i }
+
+let h (a : tt) : t
+  requires { [@smtlib:minimize] ignore'term (a.size) }
+  requires { a.size >= 1 }
+  ensures { ult result (0x42:t) }
+= get a 0
+
+
+
+type u = A | B int u
+
+function length (x:u) : int =
+  match x with
+  | A -> 0
+  | B _ y -> 1 + length y
+  end
+  
+let i (a : u) : int
+  requires { [@smtlib:minimize] ignore'term (length a) }
+  requires { length a >= 3 }
+  ensures { result >= 0 }
+= match a with
+  | A -> 0
+  | B _ A -> 0
+  | B x (B y _) -> x+y
+  end
+  
+

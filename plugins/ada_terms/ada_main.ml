@@ -173,7 +173,7 @@ let ada_ext_printer task =
                     (* Non recursive with only one constructor *)
                     List.fold_left (fun acc ls ->
                         if ls <> None then
-                          Sls.add (Opt.get ls) acc
+                          Sls.add (Option.get ls) acc
                         else
                           acc) acc fields
                 | _ -> acc

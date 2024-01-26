@@ -1,0 +1,97 @@
+module Set
+
+  use set.Fset
+
+  type t = abstract { contents : fset int }
+
+  meta coercion function contents
+
+  val empty () : t
+    ensures { result = empty }
+
+  val add (x : int) (s : t) : t
+    ensures { result = add x s }
+
+  val mem (x : int) (s : t) : bool
+    ensures { result <-> mem x s }
+
+end
+
+(* Implementation of integer sets using ordered lists *)
+
+module ListSet : Set
+
+  use int.Int
+  use set.Fset
+  use list.List
+  use list.Mem
+  use list.SortedInt
+
+  type elt = int
+
+  type t = { ghost contents : fset elt; list : list elt }
+  invariant { forall x. Fset.mem x contents <-> mem x list }
+  invariant { sorted list }
+  by { contents = empty; list = Nil }
+
+  meta coercion function contents
+
+  let empty () =
+    { contents = empty; list = Nil }
+
+  let rec add_list x ys
+    requires { sorted ys }
+    variant { ys }
+    ensures { forall y. mem y result <-> mem y ys \/ y = x }
+    ensures { sorted result }
+  =
+    match ys with
+    | Nil -> Cons x Nil
+    | Cons y ys' ->
+      if x < y
+      then Cons x ys
+      else if x = y
+      then ys
+      else Cons y (add_list x ys')
+    end
+
+  let add x s
+    ensures { result = add x s }
+  =
+    { contents = add x s.contents; list = add_list x s.list }
+
+  let rec mem_list x ys
+    requires { sorted ys }
+    variant { ys }
+    ensures { result <-> mem x ys }
+  =
+    match ys with
+    | Nil -> false
+    | Cons y ys ->
+      if x < y
+      then false
+      else if x = y
+      then true
+      else mem_list x ys
+    end
+
+  let mem x s =
+    mem_list x s.list
+
+end
+
+module Main
+
+  use ListSet
+
+  let main () =
+    let s = empty () in
+    let s = add 1 s in
+    let s = add 2 s in
+    let s = add 3 s in
+    let b1 = mem 3 s in
+    let b2 = mem 4 s in
+    assert { b1 = true /\ b2 = false };
+    (b1, b2)
+
+end

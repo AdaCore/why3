@@ -259,7 +259,7 @@ and copy_stmt_node n =
   match n with
   | Swhile(c,invs,b) -> Swhile(c,invs,copy_stmt b)
   | Sfcall(ret,lets,f,args,_,_,_,_,_) ->
-    let ret = Opt.map (fun (v,s,x) -> (v,copy_stmt s,x)) ret in
+    let ret = Option.map (fun (v,s,x) -> (v,copy_stmt s,x)) ret in
     Sfcall(ret,lets,f,args,ref None,ref None,ref None,ref None, ref None)
   | Site(c,s1,s2) -> Site(c,copy_stmt s1,copy_stmt s2)
   | Sblock sl -> Sblock(List.map copy_stmt sl)

@@ -158,24 +158,30 @@ module Field
 
   lemma add_div :
     forall x y z : t. z <> zero -> (x+y)/z = x/z + y/z
+  meta "remove_unused:dependency" lemma add_div, function (/)
 
   lemma sub_div :
     forall x y z : t. z <> zero -> (x-y)/z = x/z - y/z
+  meta "remove_unused:dependency" lemma sub_div, function (/)
 
   lemma neg_div :
     forall x y : t. y <> zero -> (-x)/y = -(x/y)
+  meta "remove_unused:dependency" lemma neg_div, function (/)
 
   lemma assoc_mul_div: forall x y z:t.
     (* todo: discard the hypothesis ? *)
      z <> zero -> (x*y)/z = x*(y/z)
+  meta "remove_unused:dependency" lemma assoc_mul_div, function (/)
 
   lemma assoc_div_mul: forall x y z:t.
     (* todo: discard the hypothesis ? *)
      y <> zero /\ z <> zero -> (x/y)/z = x/(y*z)
+  meta "remove_unused:dependency" lemma assoc_div_mul, function (/)
 
   lemma assoc_div_div: forall x y z:t.
     (* todo: discard the hypothesis ? *)
      y <> zero /\ z <> zero -> x/(y/z) = (x*z)/y
+  meta "remove_unused:dependency" lemma assoc_div_div, function (/)
 
 end
 

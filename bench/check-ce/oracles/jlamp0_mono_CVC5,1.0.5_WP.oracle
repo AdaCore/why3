@@ -1,0 +1,458 @@
+File "bench/check-ce/jlamp0_mono.mlw", line 9, characters 25-31:
+Sub-goal Postcondition of goal infix :='vc.
+Prover result is: Valid (52 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/jlamp0_mono.mlw", line 17, characters 13-26)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/jlamp0_mono.mlw", line 17, characters 13-26)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/jlamp0_mono.mlw", line 17, characters 13-26)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/jlamp0_mono.mlw", line 17, characters 13-26)
+File "bench/check-ce/jlamp0_mono.mlw", line 17, characters 13-26:
+Sub-goal Assertion of goal p1'vc.
+Prover result is: Unknown (sat) (424 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File jlamp0_mono.mlw:
+  Line 11:
+    a = {contents= 0}
+  Line 13:
+    b = {contents= 3}
+    b = {contents= 3}
+    Execution of main function `p1` with env:
+      a = {contents= 0}
+      b = {contents= 3}
+      zero = 0
+      one = 1
+  Line 16:
+    Normal execution of function `(!)` with args:
+      x = {contents= 3}
+  Line 7:
+    Normal execution of function `contents` with args:
+      arg = {contents= 3}
+  Line 16:
+    Normal execution of function `(!)` with args:
+      x = {contents= 0}
+  Line 7:
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = 3
+    Normal execution of function `(:=)` with args:
+      x = {contents= 0}
+      v = 3
+  Line 17:
+    Property failure at assertion with:
+      a = {contents= 3}
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/jlamp0_mono.mlw", line 15, characters 15-29)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/jlamp0_mono.mlw", line 15, characters 15-29)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/jlamp0_mono.mlw", line 15, characters 15-29)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/jlamp0_mono.mlw", line 15, characters 15-29)
+File "bench/check-ce/jlamp0_mono.mlw", line 15, characters 15-29:
+Sub-goal Postcondition of goal p1'vc.
+Prover result is: Unknown (sat) (660 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File jlamp0_mono.mlw:
+  Line 11:
+    a = {contents= 0}
+  Line 13:
+    b = {contents= 10}
+    b = {contents= 10}
+    Execution of main function `p1` with env:
+      a = {contents= 0}
+      b = {contents= 10}
+      zero = 0
+      one = 1
+  Line 16:
+    Normal execution of function `(!)` with args:
+      x = {contents= 10}
+  Line 7:
+    Normal execution of function `contents` with args:
+      arg = {contents= 10}
+  Line 16:
+    Normal execution of function `(!)` with args:
+      x = {contents= 0}
+  Line 7:
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = 10
+    Normal execution of function `(:=)` with args:
+      x = {contents= 0}
+      v = 10
+  Line 18:
+    Normal execution of function `(!)` with args:
+      x = {contents= 10}
+  Line 7:
+    Normal execution of function `contents` with args:
+      arg = {contents= 10}
+  Line 18:
+    Normal execution of function `(>=)` with args:
+      x = 10
+      y = 10
+    Normal execution of function `(!)` with args:
+      x = {contents= 10}
+  Line 7:
+    Normal execution of function `contents` with args:
+      arg = {contents= 10}
+  Line 18:
+    Normal execution of function `(-)` with args:
+      x = 10
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 10
+      _ = (-1)
+File jlamp0_mono.mlw:
+  Line 18:
+    Normal execution of function `(:=)` with args:
+      x = {contents= 10}
+      v = 9
+  Line 15:
+    Property failure at postcondition of `p1` with:
+      a = {contents= 9}
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/jlamp0_mono.mlw", line 15, characters 15-29)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/jlamp0_mono.mlw", line 15, characters 15-29)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/jlamp0_mono.mlw", line 15, characters 15-29)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/jlamp0_mono.mlw", line 15, characters 15-29)
+File "bench/check-ce/jlamp0_mono.mlw", line 15, characters 15-29:
+Sub-goal Postcondition of goal p1'vc.
+Prover result is: Unknown (sat) (544 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File jlamp0_mono.mlw:
+  Line 11:
+    a = {contents= 0}
+  Line 13:
+    b = {contents= 5}
+    b = {contents= 5}
+    Execution of main function `p1` with env:
+      a = {contents= 0}
+      b = {contents= 5}
+      zero = 0
+      one = 1
+  Line 16:
+    Normal execution of function `(!)` with args:
+      x = {contents= 5}
+  Line 7:
+    Normal execution of function `contents` with args:
+      arg = {contents= 5}
+  Line 16:
+    Normal execution of function `(!)` with args:
+      x = {contents= 0}
+  Line 7:
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = 5
+    Normal execution of function `(:=)` with args:
+      x = {contents= 0}
+      v = 5
+  Line 18:
+    Normal execution of function `(!)` with args:
+      x = {contents= 5}
+  Line 7:
+    Normal execution of function `contents` with args:
+      arg = {contents= 5}
+  Line 18:
+    Normal execution of function `(>=)` with args:
+      x = 5
+      y = 10
+    Normal execution of function `Tuple0` with args:
+  Line 15:
+    Property failure at postcondition of `p1` with:
+      a = {contents= 5}
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+File "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31:
+Sub-goal Loop invariant init of goal p2'vc.
+Prover result is: Unknown (sat) (205 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File jlamp0_mono.mlw:
+  Line 11:
+    a = {contents= 0}
+  Line 20:
+    Constant c initialization
+    (giant-step) execution of unimplemented function with args:
+    result = {contents= 0}
+    c = {contents= 0}
+Unknown location:
+    _ = ()
+File jlamp0_mono.mlw:
+  Line 22:
+    _ = ()
+    Execution of main function `p2` with env:
+      a = {contents= 0}
+      c = {contents= 0}
+      _ = ()
+      zero = 0
+      one = 1
+  Line 25:
+    Normal execution of function `(:=)` with args:
+      x = {contents= 0}
+      v = 1
+  Line 27:
+    Property failure at loop invariant init with:
+      c = {contents= 1}
+
+File "bench/check-ce/jlamp0_mono.mlw", line 28, characters 18-31:
+Sub-goal Loop invariant init of goal p2'vc.
+Prover result is: Valid (142 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+File "bench/check-ce/jlamp0_mono.mlw", line 29, characters 16-18:
+Sub-goal Loop variant decrease of goal p2'vc.
+Prover result is: Unknown (sat) (779 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+File "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31:
+Sub-goal Loop invariant preservation of goal p2'vc.
+Prover result is: Unknown (sat) (708 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File jlamp0_mono.mlw:
+  Line 11:
+    a = {contents= 0}
+  Line 20:
+    c = {contents= 10}
+Unknown location:
+    _ = ()
+File jlamp0_mono.mlw:
+  Line 22:
+    _ = ()
+    Execution of main function `p2` with env:
+      a = {contents= 0}
+      c = {contents= 10}
+      _ = ()
+      zero = 0
+      one = 1
+  Line 25:
+    Normal execution of function `(:=)` with args:
+      x = {contents= 10}
+      v = 1
+  Line 27:
+    Property failure at loop invariant init with:
+      c = {contents= 1}
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+File "bench/check-ce/jlamp0_mono.mlw", line 28, characters 18-31:
+Sub-goal Loop invariant preservation of goal p2'vc.
+Prover result is: Unknown (sat) (759 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 27, characters 18-31)
+File "bench/check-ce/jlamp0_mono.mlw", line 24, characters 15-28:
+Sub-goal Postcondition of goal p2'vc.
+Prover result is: Unknown (sat) (379 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+File "bench/check-ce/jlamp0_mono.mlw", line 40, characters 18-31:
+Sub-goal Loop invariant init of goal p3'vc.
+Prover result is: Valid (192 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+File "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31:
+Sub-goal Loop invariant init of goal p3'vc.
+Prover result is: Unknown (sat) (261 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File jlamp0_mono.mlw:
+  Line 11:
+    a = {contents= 0}
+  Line 20:
+    c = {contents= 3}
+Unknown location:
+    _ = ()
+File jlamp0_mono.mlw:
+  Line 34:
+    _ = ()
+    Execution of main function `p3` with env:
+      a = {contents= 0}
+      c = {contents= 3}
+      _ = ()
+      zero = 0
+      one = 1
+  Line 41:
+    Property failure at loop invariant init with:
+      a = {contents= 0}
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+File "bench/check-ce/jlamp0_mono.mlw", line 42, characters 16-18:
+Sub-goal Loop variant decrease of goal p3'vc.
+Prover result is: Unknown (sat) (796 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+File "bench/check-ce/jlamp0_mono.mlw", line 40, characters 18-31:
+Sub-goal Loop invariant preservation of goal p3'vc.
+Prover result is: Unknown (sat) (725 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+File "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31:
+Sub-goal Loop invariant preservation of goal p3'vc.
+Prover result is: Unknown (sat) (776 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File jlamp0_mono.mlw:
+  Line 11:
+    a = {contents= 0}
+  Line 20:
+    c = {contents= 3}
+Unknown location:
+    _ = ()
+File jlamp0_mono.mlw:
+  Line 34:
+    _ = ()
+    Execution of main function `p3` with env:
+      a = {contents= 0}
+      c = {contents= 3}
+      _ = ()
+      zero = 0
+      one = 1
+  Line 41:
+    Property failure at loop invariant init with:
+      a = {contents= 0}
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+- Selected model 1: BAD_CE
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_mono.mlw", line 41, characters 18-31)
+File "bench/check-ce/jlamp0_mono.mlw", line 37, characters 15-28:
+Sub-goal Postcondition of goal p3'vc.
+Prover result is: Unknown (sat) (396 steps).
+Sorry, we don't have a good counterexample for you :(
+
+

@@ -452,7 +452,7 @@ module Log = struct
     | Exec_any (rs,mvs) ->
          fprintf fmt
            "@[<h2>(giant-step) execution of unimplemented function%t%t%a@]"
-           (fun fmt -> Opt.iter (fprintf fmt " `%a`" print_rs) rs)
+           (fun fmt -> Option.iter (fprintf fmt " `%a`" print_rs) rs)
            (fun fmt -> if Mvs.is_empty mvs then fprintf fmt " with args:")
            (print_list vs2string) (Mvs.bindings mvs)
     | Iter_loop k ->
@@ -615,8 +615,8 @@ module Log = struct
                 Exec_main _ -> false | _ -> true) entry_log
         else entry_log in
       let entry_log =
-        let on_file e = Opt.map (fun (f,_,_,_,_) -> f) (Opt.map Loc.get e.log_loc) in
-        let on_line e = Opt.map (fun (_,l,_,_,_) -> l) (Opt.map Loc.get e.log_loc) in
+        let on_file e = Option.map (fun (f,_,_,_,_) -> f) (Option.map Loc.get e.log_loc) in
+        let on_line e = Option.map (fun (_,l,_,_,_) -> l) (Option.map Loc.get e.log_loc) in
         List.map (fun (f, es) -> f, consecutives on_line es)
           (consecutives on_file entry_log) in
       let pp_entries = Pp.(print_list newline print_log_entry_desc) in
@@ -631,10 +631,10 @@ module Log = struct
   let sort_log_by_loc log =
     let insert f l e sofar =
       let insert_line opt_l =
-        let l = Opt.get_def [] opt_l in
+        let l = Option.value ~default:[] opt_l in
         Some (e :: l) in
       let insert_file opt_mf =
-        let mf = Opt.get_def Mint.empty opt_mf in
+        let mf = Option.value ~default:Mint.empty opt_mf in
         let res = Mint.change insert_line l mf in
         Some res in
       Mstr.change insert_file f sofar in
@@ -646,6 +646,24 @@ module Log = struct
     Mstr.map (Mint.map List.rev)
       (List.fold_right aux log Mstr.empty)
 
+  let get_exec_calls_and_loops env log =
+    let filter entry =
+      match entry.log_desc with
+      | Exec_call (Some rs, _, _) ->
+        let is_builtin = Sattr.mem builtin_attr rs.rs_name.id_attrs in
+        let is_stdlib =
+          try
+            let rs_path,_,_ = Pmodule.restore_path rs.rs_name in
+            let rs_path = Env.locate_library env rs_path in
+            Strings.has_prefix !Whyconf.stdlib_path rs_path
+          with
+          | Not_found | Env.LibraryNotFound _
+          | Env.AmbiguousPath _ | Invalid_argument _ -> false in
+        not (is_builtin || is_stdlib)
+      | Exec_call (None, _ , _) -> true
+      | Iter_loop _ -> true
+      | _ -> false in
+    List.filter filter log
 end
 
 type bunch = term list list ref
@@ -707,7 +725,7 @@ let bind_rs rs v ctx = {ctx with rsenv= Mrs.add rs v ctx.rsenv}
 
 let bind_pvs ?register pv v_t ctx =
   let ctx = bind_vs pv.pv_vs v_t ctx in
-  Opt.iter (fun r -> r pv.pv_vs.vs_name v_t) register;
+  Option.iter (fun r -> r pv.pv_vs.vs_name v_t) register;
   ctx
 
 let multibind_pvs ?register l tl ctx =
@@ -719,7 +737,7 @@ type oracle = {
   for_variable:
     env -> ?check:check_value -> loc:Loc.position option -> Ident.ident -> Ity.ity -> value option;
   for_result:
-    env -> ?check:check_value -> loc:Loc.position -> call_id:int option -> Ity.ity -> value option;
+    env -> ?check:check_value -> loc:Loc.position -> call_id:expr_id option -> Ity.ity -> value option;
 }
 
 let oracle_dummy = {
@@ -844,16 +862,18 @@ let rac_dummy =
   mk_rac check_term_dummy
 
 (*************************************************************************)
+let warn_rac_incomplete =
+  Loc.register_warning "rac_incomplete" "Warn about incompleteness@ in runtime assertion checker"
 
 let check_term rac ?vsenv cntr_ctx t =
   try rac.check_term ?vsenv cntr_ctx t
   with Incomplete reason when rac.ignore_incomplete ->
-    Loc.warning "%s.@." reason
+    Loc.warning warn_rac_incomplete "%s.@." reason
 
 let check_terms rac ctx ts =
   try List.iter (rac.check_term ctx) ts
   with Incomplete reason when rac.ignore_incomplete ->
-    Loc.warning "%s.@." reason
+    Loc.warning warn_rac_incomplete "%s.@." reason
 
 (* Check a post-condition [t] by binding the result variable to
    the term [vt] representing the result value.
@@ -865,12 +885,12 @@ let check_post rac ctx v post =
   let ctx = {ctx with cntr_env= {ctx.cntr_env with vsenv}} in
   try rac.check_term ctx t
   with Incomplete reason when rac.ignore_incomplete ->
-    Loc.warning "%s.@." reason
+    Loc.warning warn_rac_incomplete "%s.@." reason
 
 let check_posts rac ctx v posts =
   try List.iter (check_post rac ctx v) posts
   with Incomplete reason when rac.ignore_incomplete ->
-    Loc.warning "%s.@." reason
+    Loc.warning warn_rac_incomplete "%s.@." reason
 
 let check_type_invs rac ?loc ~giant_steps env ity v =
   let ts = match ity.ity_node with
@@ -894,7 +914,7 @@ let check_type_invs rac ?loc ~giant_steps env ity v =
             print_ty v.v_ty;
       | _ -> failwith "check_type_invs: value is not record" in
     let bind_field env rs =
-      try bind_pvs (Opt.get rs.rs_field) (Mrs.find rs fs_vs) env
+      try bind_pvs (Option.get rs.rs_field) (Mrs.find rs fs_vs) env
       with Not_found -> env
     in
     let env = List.fold_left bind_field env def.Pdecl.itd_fields in
@@ -907,7 +927,7 @@ let opt_or o1 o2 = if o1 <> None then o1 else o2
 let value_of_free_vars ctx t =
   let get_value get get_ty env x =
     let def = value (get_ty x) Vundefined in
-    snapshot (Opt.get_def def (get x env))  in
+    snapshot (Option.value ~default:def (get x env))  in
   let mid = t_v_fold (fun mvs vs ->
     let get_ty vs = vs.vs_ty in
     let value = get_value Mvs.find_opt get_ty ctx.cntr_env.vsenv vs in
@@ -916,7 +936,7 @@ let value_of_free_vars ctx t =
       let get_ty rs = ty_of_ity rs.rs_cty.cty_result in
       if tyl = [] && ty <> None then
         try let rs = restore_rs ls in
-            let get x m = Opt.map Lazy.force (Mrs.find_opt x m) in
+            let get x m = Option.map Lazy.force (Mrs.find_opt x m) in
             let value = get_value get get_ty ctx.cntr_env.rsenv rs in
             Mid.add rs.rs_name value mrs
         with Not_found -> mrs
@@ -1081,7 +1101,7 @@ let rec term_of_value ?(ty_mt=Mtv.empty) (env: env) vsenv v : (vsymbol * term) l
       ty_equal_check ty ty_bool;
       vsenv, if b then t_bool_true else t_bool_false
   | Vterm t ->
-      Opt.iter (ty_equal_check ty) t.t_ty;
+      Option.iter (ty_equal_check ty) t.t_ty;
       vsenv, t
   | Vreal _ | Vfloat _ | Vfloat_mode _ -> (* TODO *)
       vsenv, t_undefined ty

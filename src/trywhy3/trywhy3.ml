@@ -35,7 +35,7 @@ let select e cls =
   Dom.list_of_nodeList (e ## querySelectorAll cls)
 
 let getElement_exn cast id =
-  Js.Opt.get (cast (Dom_html.getElementById id)) (fun () -> raise Not_found)
+  Js.Option.get (cast (Dom_html.getElementById id)) (fun () -> raise Not_found)
 
 let getElement cast id =
   try
@@ -71,7 +71,7 @@ module Session = struct
     localStorage ## setItem !!"why3-buffer-content" content
 
   let get_item s def =
-    Js.Opt.get (localStorage ## getItem s) (fun () -> def)
+    Js.Option.get (localStorage ## getItem s) (fun () -> def)
 
   let load_view_mode () =
     get_item !!"why3-view-mode" !!"wide"

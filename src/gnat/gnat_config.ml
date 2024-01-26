@@ -283,7 +283,7 @@ let check_config_for_builtin_provers config =
       try
         let _ = filter_one_prover config (mk_filter_prover prover) in
         Gnat_util.abort_with_message ~internal:false
-          (Format.sprintf "%s attempts to redefine built-in prover %s" (Opt.get !opt_why3_conf_file) prover)
+          (Format.sprintf "%s attempts to redefine built-in prover %s" (Option.get !opt_why3_conf_file) prover)
       with ProverNotFound _ -> ()) builtin_provers
 
 let computer_prover_str_list () =
@@ -399,10 +399,10 @@ let provers, prover_ce, prover_warn, config, env =
   let provers =
     List.map (fun x -> x.prover) base_provers in
   let prover_ce =
-    Opt.map (fun conf_prover -> conf_prover.prover) base_prover_ce
+    Option.map (fun conf_prover -> conf_prover.prover) base_prover_ce
   in
   let prover_warn =
-    Opt.map (fun conf_prover -> conf_prover.prover) base_prover_warn
+    Option.map (fun conf_prover -> conf_prover.prover) base_prover_warn
   in
   provers, prover_ce, prover_warn, config, env
 
@@ -568,7 +568,7 @@ let limit_time ~prover ~warning =
   else match prover_ce, !opt_timeout with
   | Some p, _ when prover = p.prover_name &&
                    !opt_ce_timeout <> None ->
-      float (Opt.get !opt_ce_timeout)
+      float (Option.get !opt_ce_timeout)
   | _, None -> Call_provers.empty_limit.Call_provers.limit_time
   | _, Some x -> float (x)
 

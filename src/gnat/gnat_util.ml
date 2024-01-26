@@ -58,12 +58,12 @@ let spark_loadpath =
     file_concat [spark_prefix; "share"; "spark"; "theories"]
   ]
 
-let find_driver_file ~conf_file ?extra_conf_file fn =
-  (* Here we search for the driver file. The argument [fn] is the driver path
-     as returned by the Why3 API. It simply returns the path as is in the
-     configuration file. We first check if the path as is points to a file.
-     Then we try to find the file relative to the why3.conf file. If that also
-     fails, we look into the SPARK drivers dir.
+let find_driver_file ~conf_file ?extra_conf_file (extra_dir,fn) =
+  (* Here we search for the driver file. The argument [fn] is the driver path as
+     returned by the Why3 API (as is in the configuration file), and [extra_dir]
+     optionally contains the subdir to which [fn] is relative. We first check if
+     the path as is points to a file.  Then we try to find the file relative to the
+     why3.conf file. If that also fails, we look into the SPARK drivers dir.
      If everything fails, we return an error message stating that we cannot find
      the driver: it also returns the configuration file [conf_file] used. *)
   (* In Why3, driver names are stored in the configuration file(s) without the
@@ -78,7 +78,15 @@ let find_driver_file ~conf_file ?extra_conf_file fn =
         let fn = Filename.concat dir fn in
         if Sys.file_exists fn then fn else raise Exit
     | None -> raise Exit
-  with Exit ->
+    with Exit ->
+    try begin match extra_dir with
+    | Some f ->
+        let dir = Filename.dirname f in
+        let fn = Filename.concat dir fn in
+        if Sys.file_exists fn then fn else raise Exit
+    | None -> raise Exit
+    end
+    with Exit ->
       let driver_file = Filename.basename fn in
       let full_path =
         file_concat [why3_prefix;"share";"why3";"drivers";driver_file] in
@@ -94,7 +102,7 @@ let get_gnatprove_config ?extra_conf_file config =
   let conf_file = Whyconf.get_conf_file config in
   let transform_driver (base_prover: Whyconf.config_prover) =
     {base_prover with Whyconf.driver =
-       find_driver_file ~conf_file ?extra_conf_file base_prover.Whyconf.driver}
+       None, find_driver_file ~conf_file ?extra_conf_file base_prover.Whyconf.driver}
   in
   Whyconf.set_provers config
     (Whyconf.Mprover.map transform_driver (Whyconf.get_provers config))
@@ -123,8 +131,21 @@ let set_debug_flags_gnatprove () =
   let debug_sp = Debug.register_flag "vc_sp"
     ~desc:"Use@ 'Efficient@ Weakest@ Preconditions'@ for@ verification." in
   Debug.set_flag debug_sp;
-  (* We should use Typing.warn_useless_at, but it is not exported*)
+  (* Reduction_engine.warn_reduction_aborted *)
+  let warn_reduction_aborted = Loc.register_warning "reduction_aborted" "" in
+  (* We should use Typing.warn_useless_at and Typing.warn_unused_expression, but they are not exported*)
   let warning_useless_at = Loc.register_warning "useless_at"
     "Warning@ for@ useless@ at/old." in
+  let warn_unused_expression = Loc.register_warning "unused_expression"
+    "Warning@ for@ useless@ expression." in
+  (* Export from Session_itp *)
+  let warn_missing_shapes = Loc.register_warning "missing_shapes"
+    "Warn about missing shape file or missing compression support"
+  in
   Loc.disable_warning warning_useless_at;
+  Loc.disable_warning warn_unused_expression;
+  Loc.disable_warning warn_reduction_aborted;
+  Loc.disable_warning Theory.warn_axiom_abstract;
+  Loc.disable_warning warn_missing_shapes;
   Loc.disable_warning Dterm.warn_unused_variable
+

@@ -11,29 +11,6 @@
 
 %{
 
-  open Ptree
-
-  let add_record_projections (d: Ptree.decl) =
-    let meta_id = {id_str = Theory.(meta_record.meta_name);
-                   id_ats = [];
-                   id_loc = Loc.dummy_position}
-    in
-    match d with
-    | Dtype dl ->
-        List.iter (fun td ->
-          match td.td_def with
-          | TDrecord fl ->
-              List.iter (fun field ->
-                let m = Dmeta (meta_id, [Mfs (Qident field.f_ident)]) in
-                Typing.add_decl field.f_loc m
-                )
-                fl
-          | _ -> ()
-          )
-          dl
-    | _ -> ()
-
-
 %}
 
 (* Entry points *)
@@ -105,7 +82,8 @@ mlw_module_parsing_only:
 
 module_head:
 | THEORY attrs(uident_nq)  { Typing.open_module $2 }
-| MODULE attrs(uident_nq)  { Typing.open_module $2 }
+| MODULE attrs(uident_nq) intf = option(preceded(COLON, tqualid))
+    { Typing.open_module ?intf $2 }
 
 scope_head:
 | SCOPE boption(IMPORT) attrs(uident_nq)
@@ -117,9 +95,7 @@ module_decl:
 | IMPORT uqualid
     { Typing.add_decl (floc $startpos $endpos) (Dimport($2)) }
 | d = pure_decl | d = prog_decl | d = meta_decl
-    { Typing.add_decl (floc $startpos $endpos) d;
-      add_record_projections d
-    }
+    { Typing.add_decl (floc $startpos $endpos) d }
 | use_clone { () }
 
 module_decl_parsing_only:
@@ -177,7 +153,7 @@ use_clone:
     { let loc = floc $startpos $endpos in
       let exists_as = List.exists (fun (_, q) -> q <> None) m_as_list in
       let import = $2 in
-      if import && not exists_as then Loc.warning ~loc
+      if import && not exists_as then Loc.warning ~loc warn_redundant_import
         "the keyword `import' is redundant here and can be omitted";
       let decl = Ptree.Duseimport(loc,import,m_as_list) in
       Typing.add_decl loc decl
@@ -186,7 +162,7 @@ use_clone:
     { let loc = floc $startpos $endpos in
       let import = $2 in
       let as_opt = $4 in
-      if import && as_opt = None then Loc.warning ~loc
+      if import && as_opt = None then Loc.warning ~loc warn_redundant_import
         "the keyword `import' is redundant here and can be omitted";
       let decl = Ptree.Dcloneimport(loc,import,$3,as_opt,$5) in
       Typing.add_decl loc decl

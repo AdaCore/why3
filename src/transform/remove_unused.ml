@@ -29,11 +29,19 @@ let meta_depends_remove_constant =
         "declares that a constant can be removed by the transformation `remove_unused_keep_constants`"
       "remove_unused:remove_constant" [ MTlsymbol ])
 
+let meta_remove_unused_keep =
+  Theory.(
+    register_meta
+      ~desc:
+        "declares that a symbol should never be removed by the transformation `remove_unused`"
+      "remove_unused:keep" [ MTlsymbol ])
+
 type used_symbols = {
   keep_constants : bool;
   depends : Ident.Sid.t Decl.Mpr.t;
   closure : Ident.Sid.t Ident.Mid.t;
   constants_to_remove : Ident.Sid.t;
+  symbols_to_keep : Ident.Sid.t;
   used_ids : Ident.Sid.t;
 }
 
@@ -87,6 +95,7 @@ let initial keep_constants =
     depends = Decl.Mpr.empty;
     closure = Ident.Mid.empty;
     constants_to_remove = Ident.Sid.empty;
+    symbols_to_keep = Ident.Sid.empty;
     used_ids }
 
 let add_dependency usymb l =
@@ -108,6 +117,13 @@ let add_removed_constant usymb l =
   | Theory.[ MAls ls ] ->
       let id = ls.Term.ls_name in
       { usymb with constants_to_remove = Ident.Sid.add id usymb.constants_to_remove }
+  | _ -> assert false (* wrongly typed meta, impossible *)
+
+let add_kept_symbol usymb l =
+  match l with
+  | Theory.[ MAls ls ] ->
+      let id = ls.Term.ls_name in
+      { usymb with symbols_to_keep = Ident.Sid.add id usymb.symbols_to_keep }
   | _ -> assert false (* wrongly typed meta, impossible *)
 
 (* The second step of the removal : transverse the task decls and keep
@@ -189,20 +205,26 @@ let rec compute_used_ids usymb task : used_symbols =
                     used_ids = Sid.add pr.pr_name usymb.used_ids;
                   })
             | Ddata _ | Dlogic _ | Dtype _ | Dparam _ | Dind _ ->
-                let keep_constant ls =
-                  ls.Term.ls_args = [] &&
-                  not (Ident.Sid.mem ls.Term.ls_name usymb.constants_to_remove)
+                let keep_symbol ls =
+                  (* a symbol is kept if either
+                     - it is explicitly marked with "remove_unused:keep", or
+                     - it is a constant and we want to keep constants, unless
+                       it is explicitly marked with "remove_unused:remove_constant"
+                  *)
+                  Ident.Sid.mem ls.Term.ls_name usymb.symbols_to_keep ||
+                  (ls.Term.ls_args = [] && usymb.keep_constants &&
+                   not (Ident.Sid.mem ls.Term.ls_name usymb.constants_to_remove))
                 in
-                let declares_a_needed_constant =
+                let declares_a_needed_symbol =
                   match d.d_node with
-                  | Dparam ls -> keep_constant ls
+                  | Dparam ls -> keep_symbol ls
                   | Dlogic dl ->
                       List.exists
-                        (fun (ls, _) -> keep_constant ls) dl
+                        (fun (ls, _) -> keep_symbol ls) dl
                   | Dprop _ | Ddata _ | Dtype _ | Dind _ -> false
                 in
                 let is_needed =
-                  (declares_a_needed_constant && usymb.keep_constants)
+                  declares_a_needed_symbol
                   || not (Sid.is_empty (Sid.inter d.d_news usymb.used_ids))
                 in
                 let ids = Decl.get_used_syms_decl d in
@@ -231,6 +253,9 @@ let remove_unused_wrapper keep_constants =
     in
     let usymb =
       Task.on_meta meta_depends_remove_constant add_removed_constant usymb t
+    in
+    let usymb =
+      Task.on_meta meta_remove_unused_keep add_kept_symbol usymb t
     in
     let usymb = compute_used_ids usymb t in
     let r = Trans.apply (do_removal_wrapper usymb) t in

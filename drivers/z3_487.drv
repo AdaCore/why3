@@ -8,6 +8,7 @@
 model_parser "smtv2"
 
 import "smt-libv2.gen"
+filename "%f-%t-%g.smt2"
 printer "smtv2.6"
 import "smt-libv2-bv.gen"
 import "z3_bv.gen"
@@ -68,6 +69,10 @@ theory BuiltIn
   meta "counterexample_need_smtlib_push" ""
 end
 
+theory int.Int
+  remove prop CompatOrderMult
+end
+
 (** Extra theories supported by Z3 *)
 
 (* div/mod of Z3 seems to be Euclidean Division *)
@@ -118,6 +123,16 @@ theory ieee_float.Float32
   (* check the sign bit; if pos |%1| else |%1| - 2^129 *)
    syntax function to_int
      "(ite (= ((_ extract 128 128) ((_ fp.to_sbv 129) %1 %2)) #b0) (bv2int ((_ fp.to_sbv 129) %1 %2)) (- (bv2int ((_ fp.to_sbv 129) %1 %2)) (bv2int (bvshl (_ bv1 130) (_ bv129 130)))))"
+end
+
+theory real.Real
+  remove prop add_div
+  remove prop sub_div
+  remove prop neg_div
+  remove prop assoc_mul_div
+  remove prop assoc_div_mul
+  remove prop assoc_div_div
+  remove prop CompatOrderMult
 end
 
 theory real.Square

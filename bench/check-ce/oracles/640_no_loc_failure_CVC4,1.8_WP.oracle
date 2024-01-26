@@ -7,7 +7,7 @@
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/640_no_loc_failure.mlw", line 5, characters 39-65)
 File "bench/check-ce/640_no_loc_failure.mlw", line 5, characters 39-65:
 Goal wrong.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (unknown + incomplete) (13375 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -17,26 +17,6 @@ File int.mlw:
   Line 14:
     Constant one initialization
     one = 1
-File bv.mlw:
-  Line 636:
-    Constant zeros initialization
-  Line 192:
-    (giant-step) execution of unimplemented function with args:
-    result = 0
-  Line 636:
-    zeros = 0
-    Constant one initialization
-  Line 197:
-    (giant-step) execution of unimplemented function with args:
-    result = 0
-  Line 636:
-    one = 0
-    Constant ones initialization
-  Line 199:
-    (giant-step) execution of unimplemented function with args:
-    result = 0
-  Line 636:
-    ones = 0
 File 640_no_loc_failure.mlw:
   Line 5:
     x = (4611686018427387904:t)
@@ -46,9 +26,6 @@ File 640_no_loc_failure.mlw:
       x = (4611686018427387904:t)
       zero = 0
       one = 1
-      zeros = 0
-      one = 0
-      ones = 0
 Unknown location:
     Normal execution of function `Tuple0` with args:
 File 640_no_loc_failure.mlw:
@@ -65,7 +42,7 @@ File 640_no_loc_failure.mlw:
   - Abstract RAC: NORMAL
 File "bench/check-ce/640_no_loc_failure.mlw", line 12, characters 39-65:
 Goal wrong.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (unknown + incomplete) (13375 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -78,7 +55,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: NORMAL
 File "bench/check-ce/640_no_loc_failure.mlw", line 19, characters 22-48:
 Goal wrong.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (unknown + incomplete) (13375 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

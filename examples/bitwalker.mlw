@@ -107,7 +107,7 @@ module Bitwalker
     let mask =
       BV32.lsl_bv (1:BV32.t) (BV32.u_sub (7:BV32.t) left)
     in
-    not (BV32.eq (BV32.bw_and (C8_32.toBig byte) mask) BV32.zeros)
+    not (BV32.eq (BV32.bw_and (C8_32.toBig byte) mask) 0x0)
     end
 
   (* return the bit of the `left`/8 element of `addr` at position mod `left` 8 starting from the left *)
@@ -135,11 +135,11 @@ module Bitwalker
   =
     if (BV32.to_uint (BV32.u_add start len) > ( 8 *length addr ))
     then
-      BV64.zeros
+      0x0
     else
 
-    let retval = ref BV64.zeros in
-    let i = ref BV32.zeros in
+    let retval = ref 0x0 in
+    let i = ref 0x0 in
     let lstart = BV32.u_sub (64:BV32.t) len in
 
     while BV32.ult !i len do variant{ BV32.t'int len - BV32.t'int !i }
@@ -173,7 +173,7 @@ module Bitwalker
                        (BV64.sub (63:BV64.t) (C32_64.toBig left))}
        let mask = BV64.lsl_bv (1:BV64.t)
                   (C32_64.toBig (BV32.u_sub (63:BV32.t) left)) in
-       not (BV64.eq (BV64.bw_and value mask) BV64.zeros)
+       not (BV64.eq (BV64.bw_and value mask) 0x0)
      end
 
 (*
@@ -252,7 +252,7 @@ module Bitwalker
     else
 
     let lstart = BV32.u_sub (64:BV32.t) len in
-    let i = ref BV32.zeros in
+    let i = ref 0x0 in
 
     while BV32.ult !i len do variant { BV32.t'int len - BV32.t'int !i }
     invariant {0 <= BV32.t'int !i <= BV32.t'int len}

@@ -98,7 +98,7 @@ Drivers for User Theories
 -------------------------
 
 It is possible for the users to augment the system drivers with extra
-information for their own declared theories. The processus is
+information for their own declared theories. The process is
 described by the following example.
 
 First, we define a new theory in a file :file:`bvmisc.mlw`, containing
@@ -250,7 +250,7 @@ by :why3:tool:`why3 show transformations`.
 
 .. why3:transform:: case
 
-   Split a goal into two subgoal, using the *excluded middle* on a given
+   Split a goal into two subgoals, using the *excluded middle* on a given
    formula. On the task :math:`\Gamma \vdash G`, the transformation
    ``case f`` produces two tasks: :math:`\Gamma, h: f \vdash G` and
    :math:`\Gamma, h: \neg f \vdash G`.
@@ -390,7 +390,7 @@ by :why3:tool:`why3 show transformations`.
 
 .. why3:transform:: cut
 
-   Same as :why3:transform:`assert`, but the order of generated subgoals
+   Same as :why3:transform:`assert`, but the order of the generated subgoals
    is reversed.
 
 .. why3:transform:: destruct
@@ -429,7 +429,7 @@ by :why3:tool:`why3 show transformations`.
 
    Recursively call :why3:transform:`destruct` on the generated
    hypotheses. The recursion on implication and ``match`` stops after the
-   first occurence of a different symbol.
+   first occurrence of a different symbol.
 
    For example, applying ``destruct_rec H`` on the following goal
 
@@ -593,7 +593,7 @@ by :why3:tool:`why3 show transformations`.
 .. why3:transform:: hide
 
    Hide a given term, by creating a new constant equal to the term and
-   then replacing all occurences of the term in the context by this
+   then replacing all occurrences of the term in the context by this
    constant.
 
    For example, applying ``hide t (1 + 1)`` on the goal
@@ -876,7 +876,7 @@ by :why3:tool:`why3 show transformations`.
 
 .. why3:transform:: remove_unused
 
-   Removes from the context all logic symbols which are not used by the goal or the hypothesis.
+   Remove from the context all the logic symbols that are not used by the goal or the hypothesis.
 
    The effect of that transformation can be expanded by adding dependency metas. Namely, with a declaration of the form
 
@@ -884,7 +884,7 @@ by :why3:tool:`why3 show transformations`.
 
       meta "remove_unused:dependency" axiom a, function f
 
-   then occurences of `f` in axiom `a` are not counted as occurrences
+   then occurrences of `f` in axiom `a` are not counted as occurrences
    for `f`. The intended meaning is that `a` is a definitional axiom
    for `f`, so when `f` is not needed in the remainder, both the axiom
    and the declaration of `f` can be removed.
@@ -893,8 +893,8 @@ by :why3:tool:`why3 show transformations`.
    must be declared for each axiom. When an axiom is definitional for
    several symbols at the same time, several meta must be declared as
    well. The rule of thumb is that an axiom is kept as soon as at
-   least one of the symbols it defines is needed in the remained,
-   otherzise it is discarded.
+   least one of the symbols it defines is needed in the remainder,
+   otherwise it is discarded.
 
 .. why3:transform:: remove_unused_keep_constant
 
@@ -1358,7 +1358,7 @@ by :why3:tool:`why3 show transformations`.
    automatic provers at all as they generally implement substitution
    rules in their logic.
 
-.. why3:transform: subst_all
+.. why3:transform:: subst_all
 
    Substitute all the variables that can be substituted.
 
@@ -1453,6 +1453,10 @@ are:
    and memory limit *m*. On success, the strategy ends, it
    continues to next line otherwise.
 
+-  :samp:`c {p1} {t1} {m1} | ... | {pk} {tk} {mk}` calls the provers *p1* to *pk* in parallel.
+   On success on one prover, the other provers are interrupted, and the strategy ends. It
+   continues to next line if none of the provers succeed.
+
 -  :samp:`t {n} {lab}` applies the transformation *n*. On success, the
    strategy continues to label *lab*, and is applied to each
    generated sub-goals. It continues to next line otherwise.
@@ -1462,9 +1466,9 @@ are:
 -  :samp:`{lab}:` declares the label *lab*. The default label ``exit``
    stops the program.
 
-To examplify this basic programming language, we give below the default
+To exemplify this basic programming language, we give below the default
 strategies that are attached to the default buttons of the IDE, assuming
-that the provers Alt-Ergo 2.3.0, CVC4 1.7 and Z3 4.8.4 were detected by
+that the provers Alt-Ergo 2.3.0, CVC4 1.7, and Z3 4.8.4 have been detected by
 the :why3:tool:`why3 config` command.
 
 Split_VC
@@ -1492,11 +1496,9 @@ Auto_level_1
 
     ::
 
-        c Z3,4.8.4, 5 1000
-        c Alt-Ergo,2.3.0, 5 1000
-        c CVC4,1.7, 5 1000
+        c Z3,4.8.4, 5 1000 | Alt-Ergo,2.3.0, 5 1000 | CVC4,1.7, 5 1000
 
-    Same as Auto_level_0 but with 5 seconds instead of 1.
+    Same as Auto_level_0 but with 5 seconds instead of 1, and in parallel.
 
 Auto_level_2
     is bound to
@@ -1508,17 +1510,15 @@ Auto_level_2
         c Alt-Ergo,2.3.0, 1 1000
         c CVC4,1.7, 1 1000
         t split_vc start
-        c Z3,4.8.4, 10 4000
-        c Alt-Ergo,2.3.0, 10 4000
-        c CVC4,1.7, 10 4000
+        c Z3,4.8.4, 10 4000 | Alt-Ergo,2.3.0, 10 4000 | CVC4,1.7, 10 4000
 
     The three provers are first tried for a time limit of 1 second and
     memory limit of 1 Gb, each in turn. If none of them succeed, a split
     is attempted. If the split works then the same strategy is retried
     on each sub-goals. If the split does not succeed, the provers are
-    tried again with larger limits.
+    tried again with larger limits, and in parallel.
 
-Auto level 3
+Auto_level_3
     is bound to
 
     ::
@@ -1530,11 +1530,7 @@ Auto level 3
         c Alt-Ergo,2.3.0, 1 1000
         c CVC4,1.7, 1 1000
         t split_vc start
-        c Z3,4.8.4, 5 2000
-        c Eprover,2.0, 5 2000
-        c Spass,3.7, 5 2000
-        c Alt-Ergo,2.3.0, 5 2000
-        c CVC4,1.7, 5 2000
+        c Z3,4.8.4, 5 2000 | Eprover,2.0, 5 2000 | Spass,3.7, 5 2000 | Alt-Ergo,2.3.0, 5 2000 | CVC4,1.7, 5 2000
         t introduce_premises afterintro
         afterintro:
         t inline_goal afterinline
@@ -1542,22 +1538,19 @@ Auto level 3
         afterinline:
         t split_all_full start
         trylongertime:
-        c Z3,4.8.4, 30 4000
-        c Eprover,2.0, 30 4000
-        c Spass,3.7, 30 4000
-        c Alt-Ergo,2.3.0, 30 4000
-        c CVC4,1.7, 30 4000
+        c Z3,4.8.4, 30 4000 | Eprover,2.0, 30 4000 | Spass,3.7, 30 4000 | Alt-Ergo,2.3.0, 30 4000 | CVC4,1.7, 30 4000
 
-    Notice that now 5 provers are used. The provers are first tried for
-    a time limit of 1 second and memory limit of 1 Gb, each in turn. If
-    none of them succeed, a split is attempted. If the split works then
-    the same strategy is retried on each sub-goals. If the split does
-    not succeed, the prover are tried again with limits of 5 s and 2 Gb.
-    If all fail, we attempt the transformation of introduction of
-    premises in the context, followed by an inlining of the definitions
-    in the goals. We then attempt a split again, if the split succeeds,
-    we restart from the beginning, if it fails then provers are tried
-    again with 30s and 4 Gb.
+    Notice that now 5 provers are used. The provers are first tried
+    for a time limit of 1 second and memory limit of 1 Gb, each in
+    turn. If none of them succeed, a split is attempted. If the split
+    works then the same strategy is retried on each sub-goals. If the
+    split does not succeed, the prover are tried again with limits of
+    5 s and 2 Gb, and in parallel.  If all fail, we attempt the
+    transformation of introduction of premises in the context,
+    followed by an inlining of the definitions in the goals. We then
+    attempt a split again. If the split succeeds, we restart from the
+    beginning. Otherwise, provers are tried again, in parallel, with 30s and 4
+    Gb.
 
 .. _sec.attributes:
 
@@ -1591,6 +1584,14 @@ WhyML Attributes
    This attribute can be applied to a Boolean expression to indicate
    whether it is likely to be false. This is the opposite of
    :why3:attribute:`extraction:likely`.
+
+.. why3:attribute:: extraction:preserve_single_field
+
+   This attribute is applied to the declaration of a record type. If this
+   record contains only one field, for instance ``type t = { x : int }``,
+   then, by default, extraction engine considers the type ``t`` as an alias
+   of type ``int``. If this attribute is applied to ``t``, then this
+   optimization is disabled.
 
 .. why3:attribute:: induction
 
@@ -1659,8 +1660,8 @@ Why3 Metas
 
 .. why3:meta:: vc:proved_wf
 
-  Declares an hypothesis as a proof of well-foundness of a binary
-  relation. See section :numref:`sec.custom_wf`.
+  Declare a hypothesis as a proof of well-foundedness of a binary
+  relation. See :numref:`sec.custom_wf`.
 
 .. _sec.debug:
 

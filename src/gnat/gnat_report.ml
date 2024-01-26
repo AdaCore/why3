@@ -68,13 +68,13 @@ let register check check_tree result =
   in
   if (Gnat_expl.HCheck.mem msg_set check) then assert false
   else begin
-    let stats_g = Opt.map (fun x -> let (stats, _) = x in stats) stats in
-    let stats_checker = Opt.map (fun x -> let (_, sc) = x in sc) stats in
+    let stats_g = Option.map (fun x -> let (stats, _) = x in stats) stats in
+    let stats_checker = Option.map (fun x -> let (_, sc) = x in sc) stats in
     let msg =
     { result        = valid;
       extra_info    = extra_info;
       stats         = adapt_stats stats_g;
-      stats_checker = Opt.get_def 0 stats_checker;
+      stats_checker = Option.value ~default:0 stats_checker;
       check_tree    = check_tree;
       cntexmp_model = model;
       manual_proof  = manual } in
@@ -113,7 +113,7 @@ let get_cntexmp_model = function
       let rcd_only_cntexmp_model = [ "cntexmp", (Model_parser.json_model m) ] in
       match r with
       | None -> rcd_only_cntexmp_model
-      | Some (Check_ce.RAC_not_done s) -> rcd_only_cntexmp_model
+      | Some (Check_ce.RAC_not_done _) -> rcd_only_cntexmp_model
       | Some (Check_ce.RAC_done (state, _log)) ->
           List.append
             rcd_only_cntexmp_model
@@ -150,7 +150,7 @@ let get_stats (stats, stat_checker) =
     [ "stats",
       Record (List.map (fun (k,v) -> get_name k, get_prover_stats v) kv_list) ]
 
-let opt_int i = Opt.get_def 0 i
+let opt_int i = Option.value ~default:0 i
 
 let get_extra_info i =
   match i with
@@ -193,7 +193,7 @@ let get_warnings () =
 let get_timings () =
   let l = Hashtbl.fold (fun k v acc -> (k,v)::acc) (Util.get_timings ()) [] in
   let get_name s = s in
-  "timings", Record (List.map (fun (k,(v,n)) -> get_name k, StandardFloat v) l)
+  "timings", Record (List.map (fun (k,(v,_n)) -> get_name k, StandardFloat v) l)
 
 let get_entity () =
   "entity", Int Gnat_config.entity

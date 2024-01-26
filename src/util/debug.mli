@@ -97,5 +97,14 @@ module Stats: sig
   val incr: int stat -> unit
   val decr: int stat -> unit
 
-  val print: unit -> unit
+  val record_timing : string -> (unit -> 'a) -> 'a
+  (** Wrap a function call with this function in order to record its execution
+    time in a global table. The cumulative timing and number of recordings for
+    each name is stored. *)
+
+  val add_timing : string -> float -> unit
+  (** Record a raw timing obtained externally, e.g., from prover execution. *)
+
+  val get_timings : unit -> (string, (float * int)) Hashtbl.t
+
 end

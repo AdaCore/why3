@@ -1,0 +1,104 @@
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/657.mlw", line 8, characters 27-40)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/657.mlw", line 8, characters 27-40)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/657.mlw", line 8, characters 27-40)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/657.mlw", line 8, characters 27-40)
+File "bench/check-ce/657.mlw", line 8, characters 27-40:
+Sub-goal Precondition of goal ok'vc.
+Prover result is: Unknown (unknown + incomplete) (110909 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File 657.mlw:
+  Line 8:
+    i = (11:t)
+    i = (11:t)
+    Execution of main function `ok` with env:
+      i = (11:t)
+      zero = 0
+      one = 1
+    (giant-step) execution of unimplemented function `toBig`
+      _ = (11:t)
+    result of `toBig` = (11:t1)
+    (giant-step) execution of unimplemented function `u`
+      i = (11:t1)
+    Property failure at precondition of `u` with:
+      i = (11:t1)
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/657.mlw", line 10, characters 27-41)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/657.mlw", line 10, characters 27-41)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/657.mlw", line 10, characters 27-41)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/657.mlw", line 10, characters 27-41)
+File "bench/check-ce/657.mlw", line 10, characters 27-41:
+Sub-goal Precondition of goal ko'vc.
+Prover result is: Unknown (unknown + incomplete) (110896 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File 657.mlw:
+  Line 10:
+    i = (11:t)
+    i = (11:t)
+    Execution of main function `ko` with env:
+      i = (11:t)
+      zero = 0
+      one = 1
+    (giant-step) execution of unimplemented function `stoBig`
+      _ = (11:t)
+    result of `stoBig` = (11:t1)
+    (giant-step) execution of unimplemented function `u`
+      i = (11:t1)
+    Property failure at precondition of `u` with:
+      i = (11:t1)
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/657.mlw", line 13, characters 14-40)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/657.mlw", line 13, characters 14-40)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/657.mlw", line 13, characters 14-40)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/657.mlw", line 13, characters 14-40)
+File "bench/check-ce/657.mlw", line 13, characters 14-40:
+Sub-goal Postcondition of goal ko2'vc.
+Prover result is: Unknown (unknown + incomplete) (110576 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File 657.mlw:
+  Line 12:
+    i = (2147483648:t)
+    i = (2147483648:t)
+    Execution of main function `ko2` with env:
+      i = (2147483648:t)
+      zero = 0
+      one = 1
+  Line 13:
+    (giant-step) execution of unimplemented function `stoBig`
+      _ = (2147483648:t)
+    result of `stoBig` = (18446744071562067968:t1)
+    Property failure at postcondition of `ko2` with:
+      result = (18446744071562067968:t1)
+

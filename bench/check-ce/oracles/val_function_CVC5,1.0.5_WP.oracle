@@ -1,0 +1,63 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `f` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `f` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `f` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `f` cannot be evaluated)
+File "bench/check-ce/val_function.mlw", line 7, characters 12-24:
+Sub-goal Postcondition of goal main_f'vc.
+Prover result is: Unknown (sat) (147 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Postcondition of `f` cannot be evaluated):
+File val_function.mlw:
+  Line 4:
+    f : int -> int = [|_ => 42|]
+  Line 6:
+    y : int = 0
+  Line 7:
+    result : int = 42
+    result : int = 42
+  Line 9:
+    result of call at line 9, characters 2-5 : int = 42
+    result : int = 42
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: STUCK (failure in postcondition of `g` at unknown location)
+  - Abstract RAC: STUCK (failure in postcondition of `g` at unknown location)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/val_function.mlw", line 16, characters 12-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/val_function.mlw", line 16, characters 12-24)
+File "bench/check-ce/val_function.mlw", line 16, characters 12-24:
+Sub-goal Postcondition of goal main_g'vc.
+Prover result is: Unknown (unknown + incomplete) (327 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File val_function.mlw:
+  Line 15:
+    y = 42
+    y = 42
+    Execution of main function `main_g` with env:
+      y = 42
+      zero = 0
+      one = 1
+  Line 18:
+    (giant-step) execution of unimplemented function `g`
+      x = 42
+    result of `g` = 43
+  Line 19:
+    Normal execution of function `(+)` with args:
+      _ = 43
+      _ = 1
+  Line 16:
+    Property failure at postcondition of `main_g` with:
+      result = 44
+

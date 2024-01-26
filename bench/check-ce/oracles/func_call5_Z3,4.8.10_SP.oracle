@@ -1,10 +1,10 @@
 File "bench/check-ce/func_call5.mlw", line 8, characters 12-24:
 Sub-goal Postcondition of goal g1'vc.
-Prover result is: Valid.
+Prover result is: Valid (41 steps).
 
 File "bench/check-ce/func_call5.mlw", line 14, characters 10-14:
 Sub-goal Precondition of goal f1'vc.
-Prover result is: Valid.
+Prover result is: Valid (51 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -15,7 +15,7 @@ Prover result is: Valid.
   - Abstract RAC: STUCK (failure in precondition of `f1` at "bench/check-ce/func_call5.mlw", line 11, characters 4-6)
 File "bench/check-ce/func_call5.mlw", line 15, characters 11-17:
 Sub-goal Assertion of goal f1'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (3000033 steps).
 The following counterexample model could not be verified
   (abstract RAC terminated because missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14):
 File func_call5.mlw:
@@ -39,7 +39,7 @@ File func_call5.mlw:
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
 File "bench/check-ce/func_call5.mlw", line 21, characters 11-17:
 Sub-goal Assertion of goal f2'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Step limit exceeded (3000026 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

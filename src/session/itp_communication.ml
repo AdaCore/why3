@@ -131,7 +131,7 @@ type ide_request =
   | Set_config_param        of config_param
   | Set_prover_policy       of Whyconf.prover * Whyconf.prover_upgrade_policy
   | Get_file_contents       of string
-  | Get_task                of node_ID * bool * bool
+  | Get_task                of node_ID * bool * bool * bool
   | Remove_subtree          of node_ID
   | Copy_paste              of node_ID * node_ID
   | Save_file_req           of string * string
@@ -169,7 +169,7 @@ let print_request fmt r =
   | Get_file_contents _f            -> pp_print_string fmt "get file contents"
   | Get_first_unproven_node (_,_nid)-> pp_print_string fmt "get first unproven node"
   | Find_ident_req _                -> pp_print_string fmt "find ident"
-  | Get_task(nid,b,loc)             -> fprintf fmt "get task(%d,%b,%b)" nid b loc
+  | Get_task(nid,full,show,loc)     -> fprintf fmt "get task(%d,%b,%b,%b)" nid full show loc
   | Remove_subtree _nid             -> pp_print_string fmt "remove subtree"
   | Copy_paste _                    -> pp_print_string fmt "copy paste"
   | Save_file_req _                 -> pp_print_string fmt "save file"

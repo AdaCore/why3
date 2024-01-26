@@ -1516,7 +1516,7 @@ let cty_exec_post_raw c =
           down h s el vl
       | el, [] ->
           let tyl = List.map (fun v -> v.vs_ty) al in
-          let ty = Opt.map (Util.const v.vs_ty) s.ls_value in
+          let ty = Option.map (Util.const v.vs_ty) s.ls_value in
           t_equ (t_var res) (t_app_partial s (List.rev el) tyl ty)
       | _ -> t_subst_single v res_al h in
     let rec conv h = t_attr_copy h (match h.t_node with

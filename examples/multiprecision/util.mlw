@@ -9,6 +9,8 @@ module Util
   use array.Array
   use map.Map
   use types.Types
+  use types.Int32Eq
+  use types.UInt64Eq
   use lemmas.Lemmas
 
    (* `wmpn_zero_p` checks if `x[0..sz-1]` is zero. It corresponds to `mpn_zero_p`. *)
@@ -181,6 +183,7 @@ module Util
     done
 
 end
+
 module UtilOld
 
   use int.Int
@@ -192,6 +195,8 @@ module UtilOld
   use array.Array
   use map.Map
   use types.Types
+  use types.Int32Eq
+  use types.UInt64Eq
   use lemmas.Lemmas
 
   let wmpn_copyi (r x:t) (sz:int32) : unit

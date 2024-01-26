@@ -39,7 +39,7 @@ module Hsdecl = Hashcons.Make (struct
         let pr_equal {pr_name = id1} {pr_name = id2} =
           id1.id_string = id2.id_string &&
           Sattr.equal id1.id_attrs id2.id_attrs &&
-          Opt.equal Loc.equal id1.id_loc id2.id_loc in
+          Option.equal Loc.equal id1.id_loc id2.id_loc in
         k1 = k2 && pr_equal pr1 pr2 && t_equal_strict f1 f2
     | _,_ -> d_equal d1 d2
 
@@ -109,8 +109,8 @@ let intro_attrs = Sattr.singleton Inlining.intro_attr
 
 let compat ls vs =
   ls.ls_args = [] &&
-  Opt.equal ty_equal ls.ls_value (Some vs.vs_ty) &&
-  Opt.equal Loc.equal ls.ls_name.id_loc vs.vs_name.id_loc &&
+  Option.equal ty_equal ls.ls_value (Some vs.vs_ty) &&
+  Option.equal Loc.equal ls.ls_name.id_loc vs.vs_name.id_loc &&
   Sattr.equal ls.ls_name.id_attrs
     (Sattr.add Inlining.intro_attr vs.vs_name.id_attrs)
 
@@ -188,7 +188,7 @@ let find_fresh_axiom = let wt = Wdecl.create 7 in fun knl d ->
 
 let pr_of_premise f =
   let nm = Ident.get_hyp_name ~attrs:f.t_attrs in
-  let nm = Opt.get_def "H" nm in
+  let nm = Option.value ~default:"H" nm in
   create_prsymbol (id_fresh nm ~attrs:intro_attrs)
 
 let rec intros kn knl pr mal old_pushed f =
@@ -254,7 +254,7 @@ let intros_in_goal kn mal pr f =
   let decls = Mtv.map create_ty_decl tvm in
   let subst = Mtv.map (fun ts -> ty_app ts []) tvm in
   let f = t_ty_subst subst Mvs.empty f in
-  let knl = Opt.get_def Mid.empty kn in
+  let knl = Option.value ~default:Mid.empty kn in
   let dl = intros kn knl pr mal Mstr.empty f in
   Mtv.values decls @ dl
 
@@ -306,7 +306,8 @@ let rec dequantify ht pos f =
       let vl,_,f1 = t_open_quant fq in
       List.iter2 (Hvs.replace ht) vl (t_peek_quant fq);
       dequantify pos f1
-  | Tquant _ | Tif _ | Tcase _ | Tbinop _ | Tnot _ ->
+  | Tquant _ -> f
+  | Tif _ | Tcase _ | Tbinop _ | Tnot _ ->
       t_map_sign dequantify pos f)
 
 let dequantify pos pr f =
@@ -389,7 +390,7 @@ let rec t_replace t1 t2 t =
 let vs_of_ls = Wls.memoize 7 (fun ({ls_name = id} as ls) ->
   let attrs = Sattr.remove Inlining.intro_attr id.id_attrs in
   let id = id_fresh ~attrs ?loc:id.id_loc id.id_string in
-  create_vsymbol id (Opt.get ls.ls_value))
+  create_vsymbol id (Option.get ls.ls_value))
 
 let rec generalize hd =
   match hd.Task.task_decl.Theory.td_node with

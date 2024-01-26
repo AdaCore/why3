@@ -275,7 +275,7 @@ let decl = function
     let d = { ld_loc = id.id_loc;
               ld_ident = id;
               ld_params = List.map logic_param idl;
-              ld_type = Opt.map (type_ id.id_loc) ty;
+              ld_type = Option.map (type_ id.id_loc) ty;
               ld_def = def } in
     Typing.add_decl id.id_loc (Dlogic [d])
   | Mc_ast.Dprop (pk, id, t) ->

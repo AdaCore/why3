@@ -33,7 +33,7 @@ let add loc idk =
       Hashtbl.add hash_f k idk
 
 let def ~kind id =
-  Opt.iter (fun loc -> add loc (id, Def, kind)) id.id_loc
+  Option.iter (fun loc -> add loc (id, Def, kind)) id.id_loc
 
 let use ~kind loc id =
   add loc (id, Use, kind)

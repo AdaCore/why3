@@ -4,6 +4,7 @@ prelude ";; produced by cvc4_16.drv"
 prelude "(set-info :smt-lib-version 2.6)"
 
 import "smt-libv2.gen"
+filename "%f-%t-%g.smt2"
 printer "smtv2.6"
 import "smt-libv2-bv.gen"
 import "cvc4_bv.gen"
@@ -52,6 +53,19 @@ specific output message when CVC4 reaches its resource limit
 *)
 steplimitexceeded "unknown (RESOURCEOUT)"
 
+theory int.Int
+  remove prop CompatOrderMult
+end
+
+theory real.Real
+  remove prop add_div
+  remove prop sub_div
+  remove prop neg_div
+  remove prop assoc_mul_div
+  remove prop assoc_div_mul
+  remove prop assoc_div_div
+  remove prop CompatOrderMult
+end
 
 (** Extra theories supported by CVC4 *)
 

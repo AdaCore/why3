@@ -77,7 +77,8 @@ let create_semi_constructor id s fdl pjl invl =
 
 let create_plain_record_decl ~priv ~mut id args fdl invl witn =
   let exn = Invalid_argument "Pdecl.create_plain_record_decl" in
-  let cid = id_fresh ?loc:id.pre_loc (id.pre_name ^ "'mk") in
+  let attrs = Sattr.singleton builtin_attr in
+  let cid = id_fresh ~attrs ?loc:id.pre_loc (id.pre_name ^ "'mk") in
   let add_fd fds (mut, fd) = Mpv.add_new exn fd mut fds in
   let fds = List.fold_left add_fd Mpv.empty fdl in
   let fdl = List.map snd fdl in
@@ -88,7 +89,7 @@ let create_plain_record_decl ~priv ~mut id args fdl invl witn =
     [create_constructor ~constr:1 cid s fdl] in
   if witn <> None then begin
     let ty = Ty.ty_tuple @@ List.map (fun fd -> fd.pv_vs.vs_ty) fdl in
-    Opt.iter (fun ({e_loc = loc} as e) ->
+    Option.iter (fun ({e_loc = loc} as e) ->
       if diverges e.e_effect.eff_oneway then Loc.errorm ?loc
         "This expression may not terminate, it cannot be a witness";
       if partial e.e_effect.eff_oneway then Loc.errorm ?loc
@@ -104,7 +105,8 @@ let create_rec_record_decl s fdl =
   let exn = Invalid_argument "Pdecl.create_rec_record_decl" in
   if not (its_recursive s) then raise exn;
   let id = s.its_ts.ts_name in
-  let cid = id_fresh ?loc:id.id_loc (id.id_string ^ "'mk") in
+  let attrs = Sattr.singleton builtin_attr in
+  let cid = id_fresh ~attrs ?loc:id.id_loc (id.id_string ^ "'mk") in
   List.iter (check_field (Stv.of_list s.its_ts.ts_args)) fdl;
   let cs = create_constructor ~constr:1 cid s fdl in
   let pjl = List.map (create_projection true s) fdl in
@@ -442,7 +444,7 @@ let create_type_decl dl =
     | ((_,d,_),_) :: dl ->
         let add s f = Mpv.add (fd_of_rs f) f s in
         let mf = List.fold_left add Mpv.empty d.itd_fields in
-        let get_pj v = Opt.map ls_of_rs (Mpv.find_opt v mf) in
+        let get_pj v = Option.map ls_of_rs (Mpv.find_opt v mf) in
         let get_cs s = ls_of_rs s, List.map get_pj s.rs_cty.cty_args in
         let ld = d.itd_its.its_ts, List.map get_cs d.itd_constructors in
         mount pdl (d :: ddl) (ld :: ldl) dl
@@ -490,26 +492,37 @@ let create_let_decl ld =
     let f = t_forall_close_simp args [] f in
     let f = t_forall_close (Mvs.keys (t_vars f)) [] f in
     create_prop_decl Paxiom (create_prsymbol id) f :: axms in
+  let post_axioms id nm cty t axms =
+    let cnt = ref (-1) in
+    let fold f axms =
+      let nm =
+        if !cnt = -1 then nm else
+        Printf.sprintf "%s'%d" nm !cnt
+      in
+      incr cnt;
+      cty_axiom (id_derive ~attrs nm id) cty f axms
+    in
+    List.fold_right fold (conv_post t cty.cty_post) axms
+  in
   let add_rs sm s ({c_cty = cty} as c) (abst,defn,axms) =
     match s.rs_logic with
     | RLpv _ -> invalid_arg "Pdecl.create_let_decl"
     | RLnone -> abst, defn, axms
     | RLlemma ->
-        let f = if ity_equal cty.cty_result ity_unit then
-          t_and_simp_l (conv_post t_void cty.cty_post)
+        let axms = if ity_equal cty.cty_result ity_unit then
+          post_axioms s.rs_name s.rs_name.id_string cty t_void axms
         else match cty.cty_post with
           | q::ql ->
               let v, f = open_post q in
               let fl = f :: conv_post (t_var v) ql in
-              t_exists_close [v] [] (t_and_simp_l fl)
-          | [] -> t_true in
-        abst, defn, cty_axiom (id_clone ~attrs s.rs_name) cty f axms
+              let f = t_exists_close [v] [] (t_and_simp_l fl) in
+              cty_axiom (id_clone ~attrs s.rs_name) cty f axms
+          | [] -> axms in
+        abst, defn, axms
     | RLls ({ls_name = id} as ls) ->
         let vl = List.map (fun v -> v.pv_vs) cty.cty_args in
         let hd = t_app ls (List.map t_var vl) ls.ls_value in
-        let f = t_and_simp_l (conv_post hd cty.cty_post) in
-        let nm = id.id_string ^ "'spec" in
-        let axms = cty_axiom (id_derive ~attrs nm id) cty f axms in
+        let axms = post_axioms id (id.id_string ^ "'spec") cty hd axms in
         let c = if Mrs.is_empty sm then c else c_rs_subst sm c in
         begin match c.c_node with
         | Cany | Capp _ | Cpur _ ->
@@ -590,6 +603,10 @@ let pd_int, pd_real, pd_str, pd_equ = match builtin_theory.th_decls with
       mk_decl (PDtype [mk_itd its_real [] [] [] None]) [dr],
       mk_decl (PDtype [mk_itd its_str  [] [] [] None]) [ds],
       mk_decl PDpure [de]
+  | _ -> assert false
+
+let pd_ignore_term = match ignore_theory.th_decls with
+  | [{td_node = Decl di}] -> mk_decl PDpure [di]
   | _ -> assert false
 
 let pd_func, pd_func_app = match highord_theory.th_decls with
@@ -694,7 +711,7 @@ let check_match kn d =
   | PDtype dl ->
       List.iter (fun d ->
         List.iter check_term d.itd_invariant;
-        Opt.iter check_expr d.itd_witness) dl
+        Option.iter check_expr d.itd_witness) dl
   | PDlet ld -> check_let_defn ld
   | PDexn _ | PDpure -> ()
 

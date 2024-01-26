@@ -21,3 +21,27 @@ module Types
   exception ReturnLimb limb
 
 end
+
+module Int32Eq
+
+  use int.Int
+  use mach.int.Int32
+
+  let (=) [@extraction:inline] (a:int32) (b:int32) : bool
+    ensures { to_int a = to_int b -> result }
+    ensures { result -> a = b }
+  = a = b
+
+end
+
+module UInt64Eq
+
+  use int.Int
+  use mach.int.UInt64GMP
+
+  let (=) [@extraction:inline] (a:uint64) (b:uint64) : bool
+    ensures { to_int a = to_int b -> result }
+    ensures { result -> a = b }
+  = a = b
+
+end

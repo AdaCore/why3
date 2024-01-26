@@ -20,6 +20,7 @@ type t =
       mutable current_tab : int;
       mutable verbose : int;
       mutable show_full_context : bool;
+      mutable show_uses_clones_metas : bool;
       mutable show_attributes : bool;
       mutable show_coercions : bool;
       mutable show_locs : bool;

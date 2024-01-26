@@ -150,7 +150,7 @@ let specialize_ls ls =
     | Tyapp (ts, tyl) -> Dapp (ts, List.map spec tyl)
     | Tyvar tv -> find_tv tv in
   let spec ty = if ty_closed ty then Duty ty else spec ty in
-  List.map spec ls.ls_args, Opt.map spec ls.ls_value
+  List.map spec ls.ls_args, Option.map spec ls.ls_value
 
 (* dead code
 let specialize_fs ls =
@@ -163,7 +163,7 @@ let specialize_fs ls =
 let specialize_cs ls =
   if ls.ls_constr = 0 then raise (ConstructorExpected ls);
   let dtyl, dty = specialize_ls ls in
-  dtyl, Opt.get dty
+  dtyl, Option.get dty
 
 (* dead code
 let specialize_ps ls =
@@ -274,7 +274,7 @@ let denv_get denv n = Mstr.find_exn (UnboundVar n) n denv
 
 let denv_get_opt denv n = Mstr.find_opt n denv
 
-let dty_of_dterm dt = Opt.get_def dty_bool dt.dt_dty
+let dty_of_dterm dt = Option.value ~default:dty_bool dt.dt_dty
 
 let denv_empty = Mstr.empty
 
@@ -301,7 +301,7 @@ let denv_add_pat denv dp dty =
   Mstr.set_union s denv
 
 let denv_add_term_pat denv dp dt =
-  denv_add_pat denv dp (Opt.get_def dty_bool dt.dt_dty)
+  denv_add_pat denv dp (Option.value ~default:dty_bool dt.dt_dty)
 
 (** Constructors *)
 
@@ -439,7 +439,7 @@ let dterm crcmap ?loc node =
     | DTapp (ls, dtl) when ls_equal ls ps_equ ->
        let dtyl, dty = specialize_ls ls in
        let max = max_dty crcmap dtl in
-       begin try dty_unify (Opt.get_def dty_bool max) (List.hd dtyl)
+       begin try dty_unify (Option.value ~default:dty_bool max) (List.hd dtyl)
              with Exit -> () end;
        let dtl = dty_unify_app_map ls
                    (dterm_expected_dterm crcmap) dtl dtyl in
@@ -484,7 +484,7 @@ let dterm crcmap ?loc node =
         dfmla_expected_type df;
         mk_dty (Some dty)
     | DTquant (DTlambda,vl,_,df) ->
-        let res = Opt.get_def dty_bool df.dt_dty in
+        let res = Option.value ~default:dty_bool df.dt_dty in
         let app (_,l,_) r = Dapp (ts_func,[l;r]) in
         mk_dty (Some (List.fold_right app vl res))
     | DTquant ((DTforall|DTexists),_,_,df) ->
@@ -574,24 +574,23 @@ let attr_w_unused_var_no =
   Ident.create_attribute "W:unused_variable:N"
 
 let warn_unused_variable =
-  Loc.register_warning "unused_variable" "Warn about variables which are not used in any way."
+  Loc.register_warning "unused_variable" "Warn about variables which are not used in any way"
 
 let warn_exists_implies =
-  Loc.register_warning "exists_implies" "Warn about formulas of the form \"exists x. P -> Q\"."
+  Loc.register_warning "exists_implies" "Warn about formulas of the form \"exists x. P -> Q\""
 
 let check_used_var t vs =
   if not (Sattr.mem attr_w_unused_var_no vs.vs_name.id_attrs) then
     begin
       let s = vs.vs_name.id_string in
       if (s = "" || s.[0] <> '_') && t_v_occurs vs t = 0 then
-        (* Loc.warning ~id:warn_unused_variable ?loc:vs.vs_name.id_loc "unused variable %s" s *)
-        ()
+        Loc.warning warn_unused_variable ?loc:vs.vs_name.id_loc "unused variable %s" s
     end
 
 let check_exists_implies f = match f.t_node with
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,f,{ t_node = Ttrue }) },_)
     when Sattr.mem Term.asym_split f.t_attrs -> ()
-  | Tbinop (Timplies,_,_) -> Loc.warning ~id:warn_exists_implies ?loc:f.t_loc
+  | Tbinop (Timplies,_,_) -> Loc.warning warn_exists_implies ?loc:f.t_loc
       "form \"exists x. P -> Q\" is likely an error (use \"not P \\/ Q\" if not)"
   | _ -> ()
 
@@ -639,7 +638,7 @@ and try_term strict keep_loc uloc env prop dty node =
       else t_equ (get env false dt1) (get env false dt2)
   | DTapp (ls,dtl) ->
       t_app ls (List.map (get env false) dtl)
-        (Opt.map (term_ty_of_dty ~strict) dty)
+        (Option.map (term_ty_of_dty ~strict) dty)
   | DTfapp (dt1,dt2) ->
       t_func_app (get env false dt1) (get env false dt2)
   | DTlet (dt,id,df) ->

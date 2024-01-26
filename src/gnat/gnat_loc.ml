@@ -42,7 +42,7 @@ let in_region r l =
   let l = List.hd l in
   l.file = r.rfile && r.first_line <= l.line && l.line <= r.last_line
 
-let compare_simple = Pervasives.compare
+let compare_simple = Stdlib.compare
 
 let rec compare_loc a b =
   match a, b with

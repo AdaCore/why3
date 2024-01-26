@@ -177,6 +177,22 @@ val is_field_id_attr: attribute
   (** indicates that the related ident is a field name, and its applications
       should be printed in dotted notation *)
 
+val builtin_attr : attribute
+(** indicates that the related ident comes from a builtin of the language, for
+    instance the builtin `ref` in WhyML.
+    This is useful when filtering functions that are listed as potential
+    culprits in counterexamples *)
+
+val eid_attribute_prefix : string
+(** the prefix string for expression identifiers in attributes *)
+
+val is_eid_attr : attribute -> bool
+(** [is_eid_attr a] tells whether [a] is an expression identifier attribute. *)
+
+val get_eid_attr : Sattr.t -> int option
+(** [get_eid_attr s] searches in the set [s] an attribute defining an
+   expression identifier, as prefixed by [eid_attribute_prefix].  *)
+
 
 (** {2 Attributes for handling counterexamples} *)
 
@@ -217,15 +233,9 @@ val has_rac_assume : Sattr.t -> bool
    is a conjunction, conjuncts marked by this annotation are added to the
    preconditions when checking the programannotation during giant-step RAC. *)
 
-val create_call_id_attr_string : int -> string
-(** Create the string of an attribute of the form [[\@RAC:call_id:<id>]]. *)
-
-val get_call_id_value : attribute -> int option
-(** Get the call id of the form [[\@RAC:call_id:<id>]]. *)
-
 val search_attribute_value : (attribute -> 'a option) -> Sattr.t -> 'a option
 (** [search_attribute_value f attrs] applies f to the attributes in [attr] and
-    returns the first inhabitad result, if any, or [None] otherwise. *)
+    returns the first inhabited result, if any, or [None] otherwise. *)
 
 val remove_model_attrs : attrs:Sattr.t -> Sattr.t
 (** Remove the counter-example attributes from an attribute set *)
@@ -245,9 +255,10 @@ val append_to_model_element_name : attrs:Sattr.t -> to_append:string -> Sattr.t
     will be ["model_trace:*to_append@*"]. *)
 
 val get_model_element_name : attrs:Sattr.t -> string
-(** If attributes contain an attribute of the form ["model_trace:name@*"],
-    return ["name"]. Raises [Not_found] if there is no attribute of
-    the form ["model_trace:*"]. *)
+(** If attributes contain an attribute of the form
+   ["model_trace:name(@...)?"], return ["name"]. Everything after
+   ['@'] is ignored. Raises [Not_found] if there is no attribute of
+   the form ["model_trace:..."]. *)
 
 val get_model_trace_string : name:string -> attrs:Sattr.t -> string
 (** If attrs contain an attribute of the form ["model_trace:mt_string"],
@@ -260,7 +271,7 @@ val suffix_attr_name: attrs:Sattr.t -> string -> Sattr.t
 (** Add a suffix to all "name" attributes of [attrs] *)
 
 val compute_model_trace_field: ident option -> int -> Sattr.t
-(** Take an optional projection name and the depths of its occurence and return
+(** Take an optional projection name and the depths of its occurrence and return
     the built field attribute associated *)
 
 val extract_field: attribute -> (int * string) option

@@ -11,7 +11,7 @@ let is_record_type kn ty =
   | _ -> false
 
 let is_record_constant kn ls =
-  ls.ls_args = [] && is_record_type kn (Opt.get ls.ls_value)
+  ls.ls_args = [] && is_record_type kn (Option.get ls.ls_value)
 
 let record_constructor kn ty =
   match ty.ty_node with
@@ -48,7 +48,7 @@ let rec explode_fields kn orig_symbol ty =
    *)
   if is_record_type kn ty then
     let c = record_constructor kn ty in
-    let s = ty_match Mtv.empty (Opt.get c.ls_value) ty in
+    let s = ty_match Mtv.empty (Option.get c.ls_value) ty in
     let args, lls =
       List.fold_right (fun ty (args, lls) ->
         let new_ty = ty_inst s ty in
@@ -63,7 +63,7 @@ let explode_fields kn ls =
   (* given a logic symbol [ls], return the list of all its record fields as
      fresh logic symbols, and a term that has been built out of these symbols.
      *)
-  explode_fields kn ls (Opt.get ls.ls_value)
+  explode_fields kn ls (Option.get ls.ls_value)
 
 let explode_record =
   Trans.fold_map (fun thd (env, task) ->

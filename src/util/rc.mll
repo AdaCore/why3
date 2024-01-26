@@ -47,6 +47,9 @@ let error ?loc e = match loc with
   | Some loc -> raise (Loc.Located (loc, e))
 *)
 
+let warn_missing_field =
+  Loc.register_warning "missing_field" "Warn about missing fields in configuration"
+
 (* conf files *)
 
 let escape_string s =

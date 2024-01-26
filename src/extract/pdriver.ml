@@ -49,7 +49,10 @@ type printer_args = {
 }
 
 let load_file whyconf_main file =
-  let file = Driver.resolve_driver_name whyconf_main "extraction_drivers" file in
+  let file =
+    Driver.resolve_driver_name whyconf_main "extraction_drivers"
+      ~extra_dir:None file
+  in
   let c = open_in file in
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
@@ -225,7 +228,8 @@ let load_driver whyconf_main env file extra_files =
   in
   let add_module { mor_name = (loc,q); mor_rules = mrl } =
     let f,id = let l = List.rev q in List.rev (List.tl l),List.hd l in
-    let m = Loc.try3 ~loc read_module env f id in
+    (* This should work if pdrivers are used only for extraction *)
+    let m = mod_impl env (Loc.try3 ~loc read_module env f id) in
     qualid := q;
     List.iter (add_local_module m) mrl
   in
@@ -295,6 +299,9 @@ let default_prelude_printer _ ?old:_ ?fname:_ ~deps:_ ~global_prelude
       ~prelude fmt _ =
   Printer.print_prelude fmt global_prelude;
   Printer.print_prelude fmt prelude
+
+let dummy_prelude_printer _ ?old:_ ?fname:_ ~deps:_ ~global_prelude:_
+      ~prelude:_ _ _ = ()
 
 let dummy_border_printer _ ?old:_ ?fname:_ _ _ = ()
 

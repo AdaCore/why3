@@ -1,0 +1,49 @@
+File "bench/check-ce/let_function_logic.mlw", line 8, characters 12-24:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Valid (243 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/let_function_logic.mlw", line 14, characters 10-13)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/let_function_logic.mlw", line 12, characters 12-24)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/let_function_logic.mlw", line 12, characters 12-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/let_function_logic.mlw", line 12, characters 12-24)
+File "bench/check-ce/let_function_logic.mlw", line 12, characters 12-24:
+Sub-goal Postcondition of goal main'vc.
+Prover result is: Unknown (unknown + incomplete) (327 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File let_function_logic.mlw:
+  Line 3:
+    g = fun ($x11:int) -> if $x11 = 42 then 43 else (- 1)
+  Line 11:
+    y = 42
+    y = 42
+    Execution of main function `main` with env:
+      g = fun ($x11:int) -> if $x11 = 42 then 43 else (- 1)
+      y = 42
+      zero = 0
+      one = 1
+  Line 14:
+    Normal execution of function `f` with args:
+      x = 42
+  Line 9:
+    Normal execution of function `(+)` with args:
+      _ = 42
+      _ = 1
+  Line 15:
+    Normal execution of function `(+)` with args:
+      _ = 43
+      _ = 1
+  Line 12:
+    Property failure at postcondition of `main` with:
+      result = 44
+

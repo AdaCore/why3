@@ -12,6 +12,9 @@ case "$1" in
   "--obsolete-only")
         REPLAYOPT="$REPLAYOPT --obsolete-only"
         ;;
+  "--ignore-shapes")
+        REPLAYOPT="$REPLAYOPT --ignore-shapes"
+        ;;
   "--prover")
         REPLAYOPT="$REPLAYOPT --prover $2"
         shift

@@ -361,6 +361,7 @@ let split_args s =
 
 type command =
   | Transform    of string * Trans.gentrans * string list
+  | Strat        of string * (Env.env -> Task.task -> Strategy.strat)
   | Prove        of Whyconf.config_prover * Call_provers.resource_limit
   | Strategies   of string
   | Edit         of Whyconf.prover
@@ -421,7 +422,7 @@ let interp commands_table cont id s =
         interactive command.
       *)
    if id != None &&
-     Session_itp.is_detached cont.Controller_itp.controller_session (Opt.get id)
+     Session_itp.is_detached cont.Controller_itp.controller_session (Option.get id)
    then
       match cmd, args with
       | "help", _ ->
@@ -456,6 +457,14 @@ let interp commands_table cont id s =
                | None   -> QError ("Please select a node in the task tree")
                | Some _ -> Strategies cmd
              else
+              try
+                let s = List.hd (Strings.split ' ' s) in
+                let s = List.hd (Strings.split '\n' s) in
+                let s = Strategy.lookup_strat s in
+                match id with
+                | Some (Session_itp.APn _) -> Strat(cmd, s)
+                | _ -> QError ("Please select a goal or trans node in the task tree")
+              with | Strategy.UnknownStrat _ ->
                match cmd, args with
                | "locate", args ->
                    begin match args with
@@ -562,7 +571,7 @@ let get_first_unproven_goal_around
         else
           unproven_goals_below_node ~proved ~children ~is_goal [] parent
   in
-  let node = if is_pa node then Opt.get (get_parent node) else node in
+  let node = if is_pa node then Option.get (get_parent node) else node in
   let node_list = look_around node in
   (* We look into this list of brothers in case the original node is inside it.
      If it is inside the list, we want to get the first non proved node after

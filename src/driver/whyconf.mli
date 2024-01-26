@@ -105,6 +105,8 @@ val memlimit: main -> int
 val running_provers_max: main -> int
 val set_limits: main -> float -> int -> int -> main
 
+val stdlib_path : string ref
+
 val default_editor: main -> string
 (** Editor name used when no specific editor is known for a prover *)
 
@@ -144,7 +146,7 @@ type config_prover = {
   prover       : prover;   (* unique name for session *)
   command      : string;   (* "exec why-limit %t %m alt-ergo %f" *)
   command_steps: string option; (* The command when the number of steps is limited "exec why-limit %t %m -steps-bound %S alt-ergo %f"  *)
-  driver       : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
+  driver       : string option * string;   (* dirname if any, driver name *)
   in_place     : bool;     (* verification should be performed in-place *)
   editor       : string;   (* Dedicated editor *)
   interactive  : bool; (* Interactive theorem prover *)

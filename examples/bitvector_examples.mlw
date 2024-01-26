@@ -10,7 +10,7 @@ module Test_proofinuse
   let shift_is_div ( x : t ) ( y : t ) : t
     requires { 0 <= t'int y < 32 }
   =
-    let res = lsr_bv x one in
+    let res = lsr_bv x 0x1 in
     assert { res = udiv x (2:t) };
     assert { t'int res = div (t'int x) 2 };
     let res : t = lsr_bv res (2:t) in
@@ -38,7 +38,7 @@ module Test_proofinuse
                 bw_and
                   (bw_or
                     (bw_and x (0xFFFF_FF00:t))
-                    one)
+                    0x1)
                   (0x0000_00FF:t))
     in res
 
@@ -161,11 +161,11 @@ module Hackers_delight_mod
 
   let dm3 (x : t) =
     ensures{ result = sub (bw_not x) one }
-    bw_not( add x one )
+    bw_not( add x 0x1 )
 
   let dm4 (x : t) =
     ensures{ result = add (bw_not x) one }
-    bw_not( sub x one )
+    bw_not( sub x 0x1 )
 
   let dm5 (x : t) =
     ensures{ result = sub x one }
@@ -185,7 +185,7 @@ module Hackers_delight_mod
 
   let dmtest (x : t) =
     ensures{ result = zeros }
-    bw_not( bw_or x (neg( add x one)))
+    bw_not( bw_or x (neg( add x 0x1)))
 
   (* inequality  *)
 
@@ -218,11 +218,11 @@ module Hackers_delight_mod
 
   let rs_left (x : t) =
   ensures{ result = rotate_left_bv x one }
-    bw_or (lsl_bv x one) (lsr_bv x (31:t))
+    bw_or (lsl_bv x 0x1) (lsr_bv x (31:t))
 
   let rs_right (x : t) =
   ensures{ result = rotate_right_bv x one }
-    bw_or (lsr_bv x one) (lsl_bv x (31:t))
+    bw_or (lsr_bv x 0x1) (lsl_bv x (31:t))
 
   (* bound propagation *)
 
@@ -291,7 +291,7 @@ module Test_imperial_violet
                 ult b[i] (0x8000_0000:t) }
     ensures{ forall i. 0 <= i < length result ->
                t'int result[i] = t'int a[i] + t'int b[i] }
-    let sum = make (length a) zeros in
+    let sum = make (length a) 0x0 in
     for i = 0 to length a - 1 do
       invariant{ forall j. 0 <= j < i -> sum[j] = add a[j] b[j] }
       invariant{ forall j. 0 <= j < i -> t'int sum[j] = t'int a[j] + t'int b[j] }
@@ -326,39 +326,39 @@ module Test_from_bitvector_example
 
   let lsr31 () =
     ensures{ result = one }
-    lsr_bv ones (31:t)
+    lsr_bv 0xFFFF_FFFF (31:t)
 
   let lsr30 () =
     ensures{ result = (3:t) }
-    lsr_bv ones (30:t)
+    lsr_bv 0xFFFF_FFFF (30:t)
 
   let lsr29 () =
     ensures{ t'int result = 7 }
-    lsr_bv ones (29:t)
+    lsr_bv 0xFFFF_FFFF (29:t)
 
   let lsr28 () =
     ensures{ t'int result = 15 }
-    lsr_bv ones (28:t)
+    lsr_bv 0xFFFF_FFFF (28:t)
 
   let lsr27 () =
     ensures{ t'int result = 31 }
-    lsr_bv ones (27:t)
+    lsr_bv 0xFFFF_FFFF (27:t)
 
   let lsr26 () =
     ensures{ t'int result = 63 }
-    lsr_bv ones (26:t)
+    lsr_bv 0xFFFF_FFFF (26:t)
 
   let lsr20 () =
     ensures{ t'int result = 4095 }
-    lsr_bv ones (20:t)
+    lsr_bv 0xFFFF_FFFF (20:t)
 
   let lsr13 () =
     ensures{ t'int result = 524287 }
-    lsr_bv ones (13:t)
+    lsr_bv 0xFFFF_FFFF (13:t)
 
   let lsr8 () =
     ensures{ t'int result = 16777215 }
-    lsr_bv ones (8:t)
+    lsr_bv 0xFFFF_FFFF (8:t)
 
   goal to_int_0x00000001:
     t'int (lsr_bv ones (31:t)) = 1

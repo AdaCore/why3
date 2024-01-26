@@ -174,9 +174,9 @@ let () = print_endline "\n== Check CE"
 let () =
   let rac = Pinterp.mk_rac ~ignore_incomplete:false
       (Rac.Why.mk_check_term_lit config env ~why_prover:"alt-ergo" ()) in
-  let model, clsf = Opt.get_exn (Failure "No good model found")
+  let model, clsf = Option.get_exn (Failure "No good model found")
       (Check_ce.select_model ~check_ce:true rac env pm models) in
-  printf "%a@." (Check_ce.print_model_classification
+  printf "%a@." (Check_ce.print_model_classification env
                    ~check_ce:true ?verb_lvl:None ?json:None) (model, clsf)
 (* END{check_ce} *)
 
@@ -189,7 +189,7 @@ let () =
   let rac_results = Check_ce.get_rac_results ~only_giant_step:true
     rac env pm models in
   let strategy = Check_ce.best_non_empty_giant_step_rac_result in
-  let _,res = Opt.get_exn (Failure "No good model found")
+  let _,res = Option.get_exn (Failure "No good model found")
     (Check_ce.select_model_from_giant_step_rac_results ~strategy rac_results) in
   printf "%a@." (Check_ce.print_rac_result ?verb_lvl:None) res
 (* END{check_ce_giant_step} *)

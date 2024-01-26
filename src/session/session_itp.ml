@@ -217,6 +217,9 @@ let theory_parent s th =
 let session_iter_proof_attempt f s =
   Hint.iter f s.proofAttempt_table
 
+let session_iter_proof_node_id f s =
+  Hpn.iter (fun id _ -> f id) s.proofNode_table
+
 (* This is not needed. Keeping it as information on the structure
 type tree = {
     tree_node_id : proofNodeID;
@@ -407,22 +410,6 @@ let get_encapsulating_file s any =
       let th = get_encapsulating_theory s any in
       theory_parent s th
 
-(*
-let set_obsolete s paid b =
-  let pa = get_proof_attempt_node s paid in
-  pa.proof_obsolete <- b
- *)
-
-let get_transformation s pid t args =
-  let sub_transfs = get_transformations s pid in
-  List.find (fun tr_id ->
-      get_transf_name s tr_id = t && get_transf_args s tr_id = args &&
-      not (is_detached s (ATn tr_id))) sub_transfs
-
-let check_if_already_exists s pid t args =
-  match get_transformation s pid t args with
-  | _ -> true
-  | exception Not_found -> false
 
 (* Iterations functions on the session tree *)
 
@@ -838,8 +825,7 @@ let update_theory_node notification s th =
       try let p = theory_parent s th in
           update_file_node notification s p
       with Not_found when not (Debug.test_flag Debug.stack_trace) ->
-        Loc.warning "[Fatal] Session_itp.update_theory_node: parent missing@.";
-        assert false
+        Loc.errorm "[Fatal] Session_itp.update_theory_node: parent missing@."
     end
 
 let rec update_goal_node notification s id =
@@ -866,7 +852,8 @@ let rec update_goal_node notification s id =
       | Trans trans_id -> update_trans_node notification s trans_id
       | Theory th -> update_theory_node notification s th
       | exception Not_found when not (Debug.test_flag Debug.stack_trace) ->
-                  Loc.warning "Session_itp.update_goal_node: parent missing@.";
+                  Loc.warning (Loc.register_warning "warn_missing_parent" "Warn for missing parents node in session")
+                  "Session_itp.update_goal_node: parent missing@.";
                   Printexc.print_backtrace stderr;
                   assert false
     end
@@ -965,7 +952,7 @@ let remove_subtree ~(notification:notifier) ~(removed:notifier) s (n: any) =
   | _ ->
      let p = get_any_parent s n in
      fold_all_any s (fun _ x -> remove x; removed x) () n;
-     Opt.iter (update_any_node s notification) p
+     Option.iter (update_any_node s notification) p
 
 (****************************)
 (*     session opening      *)
@@ -1010,11 +997,12 @@ let string_attribute_opt field r =
 let string_attribute field r =
   try
     List.assoc field r.Xml.attributes
-  with Not_found ->
-    Loc.warning "[Error] missing required attribute '%s' from element '%s'@."
-      field r.Xml.name;
-    assert false
+  with Not_found when not (Debug.test_flag Debug.stack_trace) ->
+    Loc.errorm "[Error] missing required attribute '%s' from element '%s'@."
+      field r.Xml.name
 
+let warn_unexpected_session_element = Loc.register_warning "unexpected_session_element"
+    "Warn for unexpected status, elements or goals during the loading of a session"
 
 let load_result a (path,acc) r =
   match r.Xml.name with
@@ -1022,8 +1010,7 @@ let load_result a (path,acc) r =
      begin
        match acc with
        | Some _ ->
-          Loc.warning "[Error] Too many result elements@.";
-          raise (LoadError (a,"too many result elements"))
+          Loc.error (LoadError (a,"too many result elements"))
        | None -> ()
      end;
      let status = string_attribute "status" r in
@@ -1039,7 +1026,7 @@ let load_result a (path,acc) r =
        | "steplimitexceeded" -> Call_provers.StepLimitExceeded
        | "stepslimitexceeded" -> Call_provers.StepLimitExceeded
        | s ->
-          Loc.warning "Session.load_result: unexpected status '%s'@." s;
+          Loc.warning warn_unexpected_session_element "Session.load_result: unexpected status '%s'@." s;
           Call_provers.HighFailure
      in
      let time =
@@ -1064,7 +1051,7 @@ let load_result a (path,acc) r =
      let fn = string_attribute "name" r in
      (Sysutil.add_to_path path fn,acc)
   | s ->
-    Loc.warning "Session.load_result: unexpected element '%s'@." s;
+    Loc.warning warn_unexpected_session_element "Session.load_result: unexpected element '%s'@." s;
     (path,acc)
 
 let load_option attr g =
@@ -1106,7 +1093,7 @@ let rec load_goal session old_provers parent g id =
     List.iter (load_proof_or_transf session old_provers id) g.Xml.elements;
   | "label" -> ()
   | s ->
-      Loc.warning "Session.load_goal: unexpected element '%s'@." s
+      Loc.warning warn_unexpected_session_element "Session.load_goal: unexpected element '%s'@." s
 
 (* [load_proof_or_transf s op pid a] load either a proof attempt or a
    transformation of parent id [pid] from the xml [a] into the session
@@ -1140,8 +1127,7 @@ and load_proof_or_transf session old_provers pid a =
           in
           ignore(add_proof_attempt session p limit res ~obsolete edit pid)
         with Failure _ | Not_found ->
-          Loc.warning "[Error] prover id not listed in header '%s'@." prover;
-          raise (LoadError (a,"prover not listing in header"))
+          Loc.error (LoadError (a, "prover " ^ prover ^ " not listing in header"))
       end
     | "transf" ->
       let trname = string_attribute "name" a in
@@ -1167,7 +1153,7 @@ and load_proof_or_transf session old_provers pid a =
     | "metas" -> ()
     | "label" -> ()
     | s ->
-      Loc.warning
+      Loc.warning warn_unexpected_session_element
         "[Warning] Session.load_proof_or_transf: unexpected element '%s'@."
         s
 
@@ -1193,7 +1179,7 @@ let load_theory session parent_name old_provers (path,acc) th =
      let fn = string_attribute "name" th in
      (Sysutil.add_to_path path fn,acc)
   | s ->
-    Loc.warning "Session.load_theory: unexpected element '%s'@." s;
+    Loc.warning warn_unexpected_session_element "Session.load_theory: unexpected element '%s'@." s;
     (path,acc)
 
 let load_file session old_provers f =
@@ -1247,11 +1233,11 @@ let load_file session old_provers f =
                  prover_altern = altern} in
         Mint.add id (p,timelimit,steplimit,memlimit) old_provers
       with Failure _ ->
-        Loc.warning "Session.load_file: unexpected non-numeric prover id '%s'@." id;
+        Loc.warning warn_unexpected_session_element "Session.load_file: unexpected non-numeric prover id '%s'@." id;
         old_provers
     end
   | s ->
-    Loc.warning "Session.load_file: unexpected element '%s'@." s;
+    Loc.warning warn_unexpected_session_element "Session.load_file: unexpected element '%s'@." s;
     old_provers
 
 
@@ -1269,6 +1255,9 @@ let get_version (xml: Xml.t) =
  *)
 
 module ReadShapes (C:Compress.S) = struct
+
+let warn_invalid_shapes = Loc.register_warning "invalid_shapes"
+  "Warn for errors in the shape file.@."
 
 let input_line =
   let shape = Buffer.create 97 in
@@ -1333,17 +1322,17 @@ let rec read_global_buffer gs ch =
                  try
                    read_global_buffer gs ch
                  with ShapesFileError msg ->
-                   Loc.warning "Error while reading shape file: %s. Continuing without shapes" msg;
+                   Loc.warning warn_invalid_shapes "Error while reading shape file: %s. Continuing without shapes" msg;
                    sum_shape_version := None
                end;
              attrs
            with
            | Termcode.InvalidShape ->
-              Loc.warning "Session file indicates an invalid shape version `%s`" sv;
+              Loc.warning warn_invalid_shapes "Session file indicates an invalid shape version `%s`" sv;
               attrs
          with
          | Not_found ->
-            Loc.warning "Session file does not indicate any shape version";
+            Loc.warning warn_invalid_shapes "Session file does not indicate any shape version";
             attrs
        end
     | "goal" when !sum_shape_version <> None ->
@@ -1355,17 +1344,17 @@ let rec read_global_buffer gs ch =
                let old_sum = List.assoc "sum" attrs in
                if sum <> old_sum then
                  begin
-                   Loc.warning "old sum = %s ; new sum = %s@." old_sum sum;
-                   raise
-                     (ShapesFileError
-                        "shapes files corrupted (sums do not correspond)")
+                   let message = asprintf "old sum = %s  ; new sum = %s @." old_sum sum
+                   in
+                   Loc.error
+                     (ShapesFileError ("shapes files corrupted (sums do not correspond)" ^ message))
                  end;
                attrs
              with Not_found -> ("sum", sum) :: attrs
            in
            ("shape",shape) :: attrs
          with ShapesFileError msg ->
-           Loc.warning "Error while reading shape file: %s. Continuing without shapes." msg;
+           Loc.warning warn_invalid_shapes "Error while reading shape file: %s. Continuing without shapes." msg;
            sum_shape_version := None; attrs
        end
     | _ -> attrs
@@ -1381,6 +1370,9 @@ let read_xml_and_shapes gs xml_fn compressed_fn =
     raise (ShapesFileError ("cannot open shapes file for reading: " ^ msg))
 end
 
+let warn_missing_shapes = Loc.register_warning "missing_shapes"
+    "Warn about missing shape file or missing compression support"
+
 let read_file_session_and_shapes gs dir xml_filename =
   let compressed_shape_filename =
     Filename.concat dir compressed_shape_filename in
@@ -1389,6 +1381,9 @@ let read_file_session_and_shapes gs dir xml_filename =
       let module RS = ReadShapes(Compress.Compress_z) in
       RS.read_xml_and_shapes gs xml_filename compressed_shape_filename
     else
+      let () =
+        Loc.warning warn_missing_shapes "Could not read goal shapes because \
+                      Why3 was not compiled with compress support@." in
       Xml.from_file xml_filename, None
   else
     let shape_filename = Filename.concat dir shape_filename in
@@ -1396,6 +1391,7 @@ let read_file_session_and_shapes gs dir xml_filename =
       let module RS = ReadShapes(Compress.Compress_none) in
       RS.read_xml_and_shapes gs xml_filename shape_filename
     else
+      let () = Loc.warning warn_missing_shapes "Could not find goal shapes file@." in
       Xml.from_file xml_filename, None
 
 let build_session ?sum_shape_version (s : session) xml : unit =
@@ -1422,7 +1418,7 @@ let build_session ?sum_shape_version (s : session) xml : unit =
       old_provers;
     Debug.dprintf debug "[Info] load_session: done@\n"
   | s ->
-    Loc.warning "Session.load_session: unexpected element '%s'@." s
+    Loc.warning warn_unexpected_session_element "Session.load_session: unexpected element '%s'@." s
 
 let load_session (dir : string) =
   let file = Filename.concat dir db_filename in
@@ -1439,8 +1435,7 @@ let load_session (dir : string) =
        (* xml does not exist yet *)
        raise (SessionFileError msg)
     | Xml.Parse_error s ->
-       Loc.warning "XML database corrupted, ignored (%s)@." s;
-       raise (SessionFileError "XML corrupted")
+       Loc.error (SessionFileError (asprintf "XML database corrupted, ignored (%s)@." s))
   else empty_session dir
 
 (* -------------------- merge/update session --------------------------- *)
@@ -1535,6 +1530,9 @@ let save_detached_theory parent_name old_s detached_theory s =
 let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
   let old_pa = old_pa_n in
   let obsolete = goal_obsolete || old_pa.proof_obsolete in
+  if obsolete then
+    Debug.dprintf debug "set to obsolete: goal_obsolete=%b old_pa.proof_obsolete=%b@."
+      goal_obsolete old_pa.proof_obsolete;
   found_obsolete := obsolete || !found_obsolete;
   ignore (add_proof_attempt new_s old_pa.prover old_pa.limit
     old_pa.proof_state ~obsolete old_pa.proof_script
@@ -1589,27 +1587,30 @@ let add_registered_transformation s env old_tr goal_id =
                                         old_tr.transf_args)
         goal.proofn_transformations in
     Printexc.print_backtrace stderr;
-    Loc.warning "[add_registered_transformation] FATAL transformation already present@.";
-    exit 2
+    Loc.errorm "[add_registered_transformation] FATAL transformation already present@."
   with Not_found ->
     let subgoals =
       apply_trans_to_goal ~allow_no_effect:true s env old_tr.transf_name old_tr.transf_args goal_id
     in
     graft_transf s goal_id old_tr.transf_name old_tr.transf_args subgoals
 
-let rec merge_goal env new_s old_s ~goal_obsolete old_goal new_goal_id =
+let warn_unexpected_trans =
+  Loc.register_warning "unexpected_exception_in_transformation"
+    "Warn for unexpected exceptions when loading transformations for a session"
+
+let rec merge_goal ~use_shapes env new_s old_s ~goal_obsolete old_goal new_goal_id =
   Hprover.iter (fun k pa ->
                 let pa = get_proof_attempt_node old_s pa in
                 merge_proof new_s ~goal_obsolete new_goal_id k pa)
                old_goal.proofn_attempts;
   List.iter
-    (merge_trans env old_s new_s new_goal_id)
+    (merge_trans ~use_shapes env old_s new_s new_goal_id)
     old_goal.proofn_transformations;
   let new_goal_node = get_proofNode new_s new_goal_id in
   new_goal_node.proofn_transformations <- List.rev new_goal_node.proofn_transformations;
   update_goal_node (fun _ -> ()) new_s new_goal_id
 
-and merge_trans env old_s new_s new_goal_id old_tr_id =
+and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
   let old_tr = get_transfNode old_s old_tr_id in
   let old_subtasks = List.map (fun id -> id,old_s)
       old_tr.transf_subtasks in
@@ -1621,7 +1622,7 @@ and merge_trans env old_s new_s new_goal_id old_tr_id =
     | e when not (Debug.test_flag Debug.stack_trace) ->
         (* Non fatal exception are silently ignored *)
         if is_fatal e then
-        Loc.warning "FATAL unexpected exception during application of %s: %a@. Please run gnatprove with option --clean.@."
+        Loc.warning warn_unexpected_trans "FATAL unexpected exception during application of %s: %a@."
           old_tr.transf_name Exn_printer.exn_printer e;
         (* Notify the user but still allow her to load why3 *)
         None
@@ -1632,7 +1633,7 @@ and merge_trans env old_s new_s new_goal_id old_tr_id =
     let new_subtasks = List.map (fun id -> id,new_s)
                                 new_tr.transf_subtasks in
     let associated,detached =
-      let use_shapes = old_s.shapes.has_shapes in
+      let use_shapes = use_shapes && old_s.shapes.has_shapes in
       if Termcode.is_bound_sum_shape_version old_s.shapes.shape_version then
         BoundAssoGoals.associate ~use_shapes old_subtasks new_subtasks
       else
@@ -1641,7 +1642,9 @@ and merge_trans env old_s new_s new_goal_id old_tr_id =
     List.iter
       (function
         | ((new_goal_id,_), Some ((old_goal_id,_), goal_obsolete)) ->
-           merge_goal env new_s old_s ~goal_obsolete
+            if goal_obsolete then
+              Debug.dprintf debug "goal was seen as obsolete@.";
+           merge_goal ~use_shapes env new_s old_s ~goal_obsolete
                       (get_proofNode old_s old_goal_id) new_goal_id
         | ((id,s), None) ->
            Debug.dprintf debug "[merge_trans] missed new subgoal: %s@."
@@ -1665,11 +1668,12 @@ and merge_trans env old_s new_s new_goal_id old_tr_id =
      found_detached := true
   with e when not (Debug.test_flag Debug.stack_trace) ->
     (* Printexc.print_backtrace stderr; (* Will appear with stack_trace *) *)
-    Loc.warning "[Session_itp.merge_trans] FATAL unexpected exception: %a@." Exn_printer.exn_printer e;
+    Loc.warning warn_unexpected_trans
+    "[Session_itp.merge_trans] FATAL unexpected exception: %a@." Exn_printer.exn_printer e;
     exit 2
 
 
-let merge_theory env old_s old_th s th : unit =
+let merge_theory ~ignore_shapes env old_s old_th s th : unit =
   let get_goal_name goal_node =
     let name = goal_node.proofn_name in
     try
@@ -1685,6 +1689,7 @@ let merge_theory env old_s old_th s th : unit =
     old_th.theory_goals;
   let new_goals = ref [] in
   (* merge goals *)
+  let use_shapes = not ignore_shapes in
   List.iter
     (fun ng_id ->
        try
@@ -1697,12 +1702,13 @@ let merge_theory env old_s old_th s th : unit =
          let goal_obsolete =
              let s1 = Sshape.find_sum s ng_id in
              let s2 = Sshape.find_sum old_s old_id in
-             Debug.dprintf debug "[merge_theory] goal has checksum@.";
+             Debug.dprintf debug "[merge_theory] goal has checksums s1=%s s2=%s@."
+               (Termcode.string_of_checksum s1) (Termcode.string_of_checksum s2);
              not (Termcode.equal_checksum s1 s2)
          in
          if goal_obsolete then
            found_obsolete := true;
-         merge_goal env s old_s ~goal_obsolete old_goal ng_id
+         merge_goal ~use_shapes env s old_s ~goal_obsolete old_goal ng_id
        with
        | Not_found ->
          (* if no goal of matching name is found store it to look for
@@ -1714,14 +1720,14 @@ let merge_theory env old_s old_th s th : unit =
   let detached_goals = Hstr.fold (fun _key g tl -> (g,old_s) :: tl) old_goals_table [] in
   let associated,detached =
     if Termcode.is_bound_sum_shape_version old_s.shapes.shape_version then
-      BoundAssoGoals.associate ~use_shapes:true detached_goals !new_goals
+      BoundAssoGoals.associate ~use_shapes detached_goals !new_goals
     else
-      OldAssoGoals.associate ~use_shapes:true detached_goals !new_goals
+      OldAssoGoals.associate ~use_shapes detached_goals !new_goals
   in
   List.iter (function
       | ((new_goal_id,_), Some ((old_goal_id,_), goal_obsolete)) ->
         Debug.dprintf debug "[merge_theory] pairing paired one goal, yeah !@.";
-        merge_goal env s old_s ~goal_obsolete
+        merge_goal ~use_shapes env s old_s ~goal_obsolete
                    (get_proofNode old_s old_goal_id) new_goal_id
       | ((id,_), None) ->
          Debug.dprintf debug "[merge_theory] pairing found missed sub goal: %s@."
@@ -1751,8 +1757,8 @@ let make_theory_section ?merge ~detached (s:session) parent_name (th:Theory.theo
   List.iter2 (add_goal parent) tasks goalsID;
   begin
     match merge with
-    | Some (old_ses, old_th, env) ->
-       merge_theory env old_ses old_th s theory
+    | Some (ignore_shapes, old_ses, old_th, env) ->
+       merge_theory ~ignore_shapes env old_ses old_th s theory
     | _ -> if tasks <> [] then
              found_detached := true
                                  (* FIXME: should be found_new_goals instead of found_detached *)
@@ -1760,9 +1766,9 @@ let make_theory_section ?merge ~detached (s:session) parent_name (th:Theory.theo
   theory
 
 (* add a why file to a session *)
-let add_file_section (s:session) (fn:string) ~file_is_detached
+let add_file_section (s:session) (fn:Sysutil.file_path) ~file_is_detached
     (theories:Theory.theory list) format : file =
-  let fn = Sysutil.relativize_filename s.session_dir fn in
+  (* let fn = Sysutil.relativize_filename s.session_dir fn in *)
   Debug.dprintf debug "[Session_itp.add_file_section] fn = %a@." Sysutil.print_file_path fn;
 (*
   if Hfile.mem s.session_files fn then
@@ -1787,10 +1793,11 @@ let add_file_section (s:session) (fn:string) ~file_is_detached
 
 (* add a why file to a session and try to merge its theories with the
    provided ones with matching names *)
-let merge_file_section ~old_ses ~old_theories ~file_is_detached ~env
-    (s:session) (fn:string) (theories:Theory.theory list) format
+let merge_file_section ~ignore_shapes ~old_ses ~old_theories ~file_is_detached ~env
+    (s:session) (fn:Sysutil.file_path) (theories:Theory.theory list) format
     : unit =
-  Debug.dprintf debug_merge "[Session_itp.merge_file_section] fn = %s@." fn;
+  Debug.dprintf debug_merge "[Session_itp.merge_file_section] file path = %a@."
+    Sysutil.print_file_path fn;
   let f = add_file_section s fn ~file_is_detached [] format in
   let fid = f.file_id in
   let theories,detached =
@@ -1807,7 +1814,7 @@ let merge_file_section ~old_ses ~old_theories ~file_is_detached ~env
         Debug.dprintf debug_merge "[Session_itp.merge_file_section] theory found: %s@." theory_name;
         Hstr.remove old_th_table theory_name;
         make_theory_section ~detached:false
-                            ~merge:(old_ses,old_th,env) s fid th
+                            ~merge:(ignore_shapes,old_ses,old_th,env) s fid th
       with Not_found ->
         (* if no theory was found we make a new theory section *)
         Debug.dprintf debug_merge "[Session_itp.merge_file_section] theory NOT FOUND in old session: %s@." theory_name;
@@ -1843,29 +1850,30 @@ let read_file env ?format fn =
   in
   (List.map (fun (_,_,a) -> a) th), format
 
-let merge_file env (ses : session) (old_ses : session) file =
-  let format = file_format file in
+let merge_file_gen ~ignore_shapes ~reparse_file_fun env (ses : session) (old_ses : session) file =
   let old_theories = file_theories file in
-  let file_name = Sysutil.system_dependent_absolute_path (get_dir old_ses) (file_path file) in
-  Debug.dprintf debug "merging file %s@." file_name;
+  let format = file_format file in
+  let fpath = file_path file in
   try
-    let new_theories, format = read_file env file_name ~format in
-    merge_file_section
+    let new_theories = reparse_file_fun old_ses env file in
+    merge_file_section ~ignore_shapes
       ses ~old_ses ~old_theories ~file_is_detached:false
-      ~env file_name new_theories format;
+      ~env fpath new_theories format;
     None
   with (Loc.Located _ as e) -> (* TODO: capture only syntax and typing errors *)
-    merge_file_section
+    merge_file_section ~ignore_shapes
       ses ~old_ses ~old_theories ~file_is_detached:true
-      ~env file_name [] format;
+      ~env fpath [] format;
     Some e
 
-let merge_files env (ses:session) (old_ses : session) =
+let merge_files_gen ~ignore_shapes ~reparse_file_fun env (ses:session) (old_ses : session) =
   Debug.dprintf debug "merging files from old session@.";
+  found_obsolete := false;
+  found_detached := false;
   let errors =
     Hfile.fold
       (fun _ f acc ->
-       match merge_file env ses old_ses f with
+       match merge_file_gen ~ignore_shapes ~reparse_file_fun env ses old_ses f with
        | None -> acc
        | Some e -> e :: acc)
       (get_files old_ses) []
@@ -1898,6 +1906,14 @@ let merge_files env (ses:session) (old_ses : session) =
     end;
   (errors,!found_obsolete,!found_detached)
 
+let reparse_file old_ses env file =
+  let format = file_format file in
+  let fpath = file_path file in
+  let file_name = Sysutil.system_dependent_absolute_path (get_dir old_ses) fpath in
+  Debug.dprintf debug "merging file %s@." file_name;
+  fst (read_file env file_name ~format)
+
+let merge_files ~ignore_shapes = merge_files_gen ~ignore_shapes ~reparse_file_fun:reparse_file
 
 (************************)
 (* saving state on disk *)

@@ -47,9 +47,9 @@ Lemma set'def {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
 Proof.
 intros f x v y.
 unfold set.
-case why_decidable_eq.
+case (why_decidable_eq x y).
 intros <-.
-split ; try easy ; intros H ; now elim H. (* TODO: replace by easy after 8.4 *)
+now split.
 intros H.
 split ; intros H'.
 now elim H.

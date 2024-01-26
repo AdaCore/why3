@@ -271,12 +271,13 @@ end
 let run () =
   let _,_ = Whyconf.Args.complete_initialization () in
   match !opt_style with
-    | Table -> iter_files (run_file Table.print_session)
-    | SimpleTree -> iter_files (run_file Simple.print_session)
+    | Table -> iter_session_files (run_file Table.print_session)
+    | SimpleTree -> iter_session_files (run_file Simple.print_session)
 
 let cmd =
   { cmd_spec = spec;
     cmd_desc = "output session in HTML format";
+    cmd_usage = "<session>\nOutput session in HTML format";
     cmd_name = "html";
     cmd_run  = run;
   }

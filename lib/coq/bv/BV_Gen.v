@@ -997,6 +997,7 @@ Lemma mod1_is_mod : forall x y, y > 0 -> mod1 x y = Zmod x y.
 Qed.
 
 Lemma mod1_succ_low : forall x y, y > 0 -> mod1 x y < (Z.pred y) -> mod1 (Z.succ x) y = Z.succ (mod1 x y).
+Proof.
   intros x y H.
   rewrite mod1_is_mod, mod1_is_mod by trivial.
   rewrite Z.mod_eq, Z.mod_eq by lia.
@@ -1006,7 +1007,8 @@ Lemma mod1_succ_low : forall x y, y > 0 -> mod1 x y < (Z.pred y) -> mod1 (Z.succ
   trivial.
   rewrite <- Z.mod_eq in H0 by lia.
   split; [apply Z.le_le_succ_r, Z_mod_lt; trivial|lia].
-  rewrite <- Zplus_assoc_reverse, <- Z_div_mod_eq by lia; lia.
+  rewrite <- Zplus_assoc_reverse.
+  now rewrite <- Z.div_mod by lia.
 Qed.
 
 Lemma mod1_succ_high : forall x y, y > 0 -> mod1 x y = (Z.pred y) -> mod1 (Z.succ x) y = 0.

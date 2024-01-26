@@ -28,7 +28,7 @@ let its_solid s =
 
 let is_trusted_constructor _kn ls =
   ls.ls_constr > 0 &&
-  match (Opt.get ls.ls_value).ty_node with
+  match (Option.get ls.ls_value).ty_node with
   | Tyapp (s,_) -> not (its_solid (restore_its s))
   | _ -> assert false
 
@@ -227,7 +227,7 @@ let inspect kn tl =
           match Mls.find_opt cs css with
           | Some fl -> add_branch fdl fl acc
           | None -> acc in
-        Opt.get (List.fold_right add_branch csl None)
+        Option.get (List.fold_right add_branch csl None)
     | R pjs, pj::pjl ->
         unwind (Mls.find pj pjs) pjl
   in
@@ -275,7 +275,7 @@ let inspect kn tl =
           let caps = add_pat caps c0 p in
           let c = down caps pjl t1 in
           Some (Opt.fold cap_join c cj) in
-        Opt.get (List.fold_right add_branch bl None)
+        Option.get (List.fold_right add_branch bl None)
     | Teps tb ->
         let v, f = t_open_bound tb in
         let caps = Mvs.add v V caps in
@@ -421,9 +421,9 @@ let cap_of_term kn uf pins caps t =
         let t = t_app pj [t] t0.t_ty in
         unwind (t_attr_copy t0 t) c pjl
     | C css, (pj,t0)::pjl ->
-        let ty = Opt.get t.t_ty in
+        let ty = Option.get t.t_ty in
         let sbs = Ty.ty_match_args ty in
-        let v0 = create_vsymbol (id_fresh "q") (Opt.get t0.t_ty) in
+        let v0 = create_vsymbol (id_fresh "q") (Option.get t0.t_ty) in
         let t0 = t_attr_copy t0 (t_var v0) and p0 = pat_var v0 in
         let add_branch cs fdl fl (bl, cj) =
           let mk_pat fd_ty fd = match fd with
@@ -445,7 +445,7 @@ let cap_of_term kn uf pins caps t =
               [t_close_branch (pat_var v) (unroll (t_var v) pjl0)]
           | _ -> [] in
         let bl, c = List.fold_right add_branch csl (bb, None) in
-        t_case t bl, Opt.get c
+        t_case t bl, Option.get c
     | R pjs, (pj,t0)::pjl ->
         let c = Mls.find pj pjs in
         let t = t_app pj [t] t0.t_ty in
@@ -498,7 +498,7 @@ let cap_of_term kn uf pins caps t =
           let b = t_close_branch p t1 in
           b::bl, Some (Opt.fold (cap_join uf) c cj) in
         let bl, c = List.fold_right add_branch bl ([], None) in
-        t_attr_copy t (t_case t0 bl), Opt.get c
+        t_attr_copy t (t_case t0 bl), Option.get c
     | Teps tb ->
         let v, f = t_open_bound tb in
         let f, _ = down caps [] f in
@@ -522,7 +522,7 @@ let cap_of_term kn uf pins caps t =
   down caps [] t
 
 let find_term_fields kn cs t =
-  let ty = Opt.get t.t_ty in
+  let ty = Option.get t.t_ty in
   let sbs = Ty.ty_match_args ty in
   let fdl = Eval_match.cs_fields kn cs in
   let add_pat ty (pl,pll) =
@@ -559,7 +559,7 @@ let cap_equality kn uf pins f t1 c1 t2 c2 =
         let add t c (fl, uf) = commit t c fl uf in
         List.fold_right2 add tl cl (fl, uf)
     | C css ->
-        let ty = Opt.get t.t_ty in
+        let ty = Option.get t.t_ty in
         let sbs = Ty.ty_match_args ty in
         let branch cs cl bl =
           let add ty c (pl,fl,uf) =
@@ -707,7 +707,7 @@ let rec inject kn uf pins caps pos f = match f.t_node with
         let b = t_close_branch p f1 in
         b::bl, Some (Opt.fold uf_inter uf1 ufj) in
       let bl, uf = List.fold_right add_branch bl ([], None) in
-      t_attr_copy f (t_case t0 bl), Opt.get uf
+      t_attr_copy f (t_case t0 bl), Option.get uf
   | Tquant (q,fq) ->
       let vl, tt, f0 = t_open_quant fq in
       let down t = fst (cap_of_term kn uf pins caps t) in

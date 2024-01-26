@@ -161,8 +161,8 @@ module MLPrinter (K: sig val keywords: string list end) = struct
 
   let is_local_id info id =
     Sid.mem id info.info_current_th.th_local ||
-    Opt.fold (fun _ m -> Sid.mem id m.Pmodule.mod_local)
-      false info.info_current_mo
+    Option.fold ~some:(fun m -> Sid.mem id m.Pmodule.mod_local)
+      ~none:false info.info_current_mo
 
   exception Local
 
