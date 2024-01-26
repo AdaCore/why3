@@ -959,7 +959,6 @@ let run_goal ?proof_script_filename ?limit ~callback c prover g =
      is now directly in the callback. *)
   let session = c.Controller_itp.controller_session in
   let config_prover = fst (Whyconf.Hprover.find c.Controller_itp.controller_provers prover) in
-  let callback _x _t = callback _x _t in
   let notification _x = () in
   if config_prover.Whyconf.interactive then
     let old_paid =
