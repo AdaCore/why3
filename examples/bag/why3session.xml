@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="7" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="bag.mlw"/>
 <theory name="Bag" proved="true">
@@ -27,153 +29,221 @@
 </theory>
 <theory name="BagImpl" proved="true">
  <goal name="t&#39;vc" expl="VC for t" proved="true">
- <proof prover="1"><result status="valid" time="0.000000" steps="10"/></proof>
+ <proof prover="0"><result status="valid" time="0.000000" steps="15"/></proof>
  </goal>
  <goal name="create&#39;vc" expl="VC for create" proved="true">
- <proof prover="1"><result status="valid" time="0.010000" steps="21"/></proof>
+ <proof prover="0"><result status="valid" time="0.010000" steps="40"/></proof>
+ </goal>
+ <goal name="length_&#39;vc" expl="VC for length_" proved="true">
+ <proof prover="7"><result status="valid" time="0.024215" steps="1462"/></proof>
  </goal>
  <goal name="clear&#39;vc" expl="VC for clear" proved="true">
- <proof prover="1"><result status="valid" time="0.010000" steps="48"/></proof>
+ <proof prover="0"><result status="valid" time="0.010000" steps="50"/></proof>
  </goal>
  <goal name="add&#39;vc" expl="VC for add" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="add&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.000000" steps="8"/></proof>
+  <proof prover="0"><result status="valid" time="0.000000" steps="8"/></proof>
   </goal>
   <goal name="add&#39;vc.1" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="add&#39;vc.1.0" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.010000" steps="28"/></proof>
+   <proof prover="0"><result status="valid" time="0.010000" steps="24"/></proof>
    </goal>
-   <goal name="add&#39;vc.1.1" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.010000" steps="22"/></proof>
-   </goal>
-   <goal name="add&#39;vc.1.2" expl="VC for add" proved="true">
-   <proof prover="4"><result status="valid" time="0.020000" steps="50154"/></proof>
+   <goal name="add&#39;vc.1.1" expl="VC for add" proved="true">
+   <proof prover="7"><result status="valid" time="0.046185" steps="65532"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="add&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.000000" steps="12"/></proof>
+  <proof prover="0"><result status="valid" time="0.000000" steps="23"/></proof>
   </goal>
   <goal name="add&#39;vc.3" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.240000" steps="401"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="add&#39;vc.3.0" expl="assertion" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="add&#39;vc.3.0.0" expl="assertion" proved="true">
+    <transf name="case" proved="true" arg1="(v=x)">
+     <goal name="add&#39;vc.3.0.0.0" expl="true case (assertion)" proved="true">
+     <transf name="assert" proved="true" arg1="(numof t_data v 0 n = numof t_data[n &lt;- v] v 0 n)">
+      <goal name="add&#39;vc.3.0.0.0.0" expl="asserted formula" proved="true">
+      <transf name="unfold" proved="true" arg1="numof">
+       <goal name="add&#39;vc.3.0.0.0.0.0" expl="asserted formula" proved="true">
+       <transf name="apply" proved="true" arg1="numof_change_equiv">
+        <goal name="add&#39;vc.3.0.0.0.0.0.0" expl="apply premises" proved="true">
+        <proof prover="2"><result status="valid" time="0.015946" steps="55"/></proof>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="add&#39;vc.3.0.0.0.1" expl="true case (assertion)" proved="true">
+      <proof prover="7"><result status="valid" time="0.035474" steps="33664"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="add&#39;vc.3.0.0.1" expl="false case (assertion)" proved="true">
+     <proof prover="2"><result status="valid" time="0.765780" steps="3803"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
   <goal name="add&#39;vc.4" expl="type invariant" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="19"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="29"/></proof>
   </goal>
   <goal name="add&#39;vc.5" expl="type invariant" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="47"/></proof>
+  <proof prover="0"><result status="valid" time="0.739306" steps="551"/></proof>
   </goal>
-  <goal name="add&#39;vc.6" expl="type invariant" proved="true">
-  <proof prover="1"><result status="valid" time="0.190000" steps="242"/></proof>
+  <goal name="add&#39;vc.6" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.000000" steps="24"/></proof>
   </goal>
   <goal name="add&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.000000" steps="21"/></proof>
-  </goal>
-  <goal name="add&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="23"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="50"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="get&#39;vc" expl="VC for get" proved="true">
- <proof prover="1"><result status="valid" time="0.010000" steps="16"/></proof>
+ <proof prover="0"><result status="valid" time="0.010000" steps="17"/></proof>
  </goal>
  <goal name="remove&#39;vc" expl="VC for remove" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="remove&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="8"/></proof>
+  <proof prover="0"><result status="valid" time="0.000000" steps="12"/></proof>
   </goal>
   <goal name="remove&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="16"/></proof>
   </goal>
   <goal name="remove&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="13"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="20"/></proof>
   </goal>
-  <goal name="remove&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.000000" steps="13"/></proof>
-  </goal>
-  <goal name="remove&#39;vc.4" expl="assertion" proved="true">
-  <transf name="split_goal_right" proved="true" >
-   <goal name="remove&#39;vc.4.0" expl="assertion" proved="true">
-   <proof prover="1" timelimit="15"><result status="valid" time="10.200000" steps="3605"/></proof>
+  <goal name="remove&#39;vc.3" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="remove&#39;vc.3.0" expl="assertion" proved="true">
+   <transf name="unfold" proved="true" arg1="numof">
+    <goal name="remove&#39;vc.3.0.0" expl="assertion" proved="true">
+    <transf name="apply" proved="true" arg1="numof_change_equiv">
+     <goal name="remove&#39;vc.3.0.0.0" expl="apply premises" proved="true">
+     <proof prover="2"><result status="valid" time="0.021962" steps="79"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
    </goal>
-   <goal name="remove&#39;vc.4.1" expl="VC for remove" proved="true">
-   <proof prover="1"><result status="valid" time="0.500000" steps="542"/></proof>
+   <goal name="remove&#39;vc.3.1" expl="VC for remove" proved="true">
+   <transf name="unfold" proved="true" arg1="numof">
+    <goal name="remove&#39;vc.3.1.0" expl="VC for remove" proved="true">
+    <transf name="apply" proved="true" arg1="numof_change_equiv">
+     <goal name="remove&#39;vc.3.1.0.0" expl="apply premises" proved="true">
+     <proof prover="2" timelimit="5"><result status="valid" time="0.031324" steps="132"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
    </goal>
-   <goal name="remove&#39;vc.4.2" expl="VC for remove" proved="true">
-   <proof prover="1"><result status="valid" time="1.310000" steps="580"/></proof>
+   <goal name="remove&#39;vc.3.2" expl="VC for remove" proved="true">
+   <proof prover="2" timelimit="5"><result status="valid" time="3.568616" steps="13976"/></proof>
    </goal>
-   <goal name="remove&#39;vc.4.3" expl="VC for remove" proved="true">
-   <proof prover="1"><result status="valid" time="0.070000" steps="163"/></proof>
+   <goal name="remove&#39;vc.3.3" expl="VC for remove" proved="true">
+   <proof prover="7"><result status="valid" time="0.022399" steps="38143"/></proof>
    </goal>
-   <goal name="remove&#39;vc.4.4" expl="VC for remove" proved="true">
-   <proof prover="4"><result status="valid" time="0.398708" steps="1016325"/></proof>
+   <goal name="remove&#39;vc.3.4" expl="VC for remove" proved="true">
+   <proof prover="7"><result status="valid" time="0.085451" steps="204648"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="remove&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="15"/></proof>
+  <goal name="remove&#39;vc.4" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.010000" steps="10"/></proof>
+  </goal>
+  <goal name="remove&#39;vc.5" expl="type invariant" proved="true">
+  <proof prover="0"><result status="valid" time="0.010000" steps="20"/></proof>
   </goal>
   <goal name="remove&#39;vc.6" expl="type invariant" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="21"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="remove&#39;vc.6.0" expl="type invariant" proved="true">
+   <proof prover="7"><result status="valid" time="0.237762" steps="564113"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="remove&#39;vc.7" expl="type invariant" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="87"/></proof>
+  <goal name="remove&#39;vc.7" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.010000" steps="26"/></proof>
   </goal>
-  <goal name="remove&#39;vc.8" expl="type invariant" proved="true">
-  <proof prover="4"><result status="valid" time="0.473112" steps="1124122"/></proof>
+  <goal name="remove&#39;vc.8" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.010000" steps="53"/></proof>
   </goal>
-  <goal name="remove&#39;vc.9" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="24"/></proof>
+  <goal name="remove&#39;vc.9" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.124449" steps="213"/></proof>
   </goal>
-  <goal name="remove&#39;vc.10" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="35"/></proof>
+  <goal name="remove&#39;vc.10" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.010000" steps="10"/></proof>
   </goal>
-  <goal name="remove&#39;vc.11" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.270000" steps="283"/></proof>
+  <goal name="remove&#39;vc.11" expl="type invariant" proved="true">
+  <proof prover="0"><result status="valid" time="0.000000" steps="18"/></proof>
   </goal>
-  <goal name="remove&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="11"/></proof>
+  <goal name="remove&#39;vc.12" expl="type invariant" proved="true">
+  <proof prover="7" timelimit="5"><result status="valid" time="0.436619" steps="823575"/></proof>
   </goal>
-  <goal name="remove&#39;vc.13" expl="type invariant" proved="true">
-  <proof prover="1"><result status="valid" time="0.000000" steps="17"/></proof>
+  <goal name="remove&#39;vc.13" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.010000" steps="24"/></proof>
   </goal>
-  <goal name="remove&#39;vc.14" expl="type invariant" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="49"/></proof>
-  </goal>
-  <goal name="remove&#39;vc.15" expl="type invariant" proved="true">
-  <proof prover="4"><result status="valid" time="0.040000" steps="169552"/></proof>
-  </goal>
-  <goal name="remove&#39;vc.16" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="20"/></proof>
-  </goal>
-  <goal name="remove&#39;vc.17" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="31"/></proof>
+  <goal name="remove&#39;vc.14" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.020000" steps="46"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="BagSpec.t&#39;refn&#39;vc" expl="VC for t" proved="true">
- <proof prover="1"><result status="valid" time="0.000000" steps="2"/></proof>
+ <proof prover="0"><result status="valid" time="0.000000" steps="2"/></proof>
  </goal>
  <goal name="BagSpec.create&#39;refn&#39;vc" expl="VC for create&#39;refn" proved="true">
- <proof prover="1"><result status="valid" time="0.010000" steps="12"/></proof>
+ <proof prover="0"><result status="valid" time="0.010000" steps="28"/></proof>
+ </goal>
+ <goal name="BagSpec.length&#39;refn&#39;vc" expl="VC for length&#39;refn" proved="true">
+ <proof prover="7"><result status="valid" time="0.052838" steps="1462"/></proof>
  </goal>
  <goal name="BagSpec.clear&#39;refn&#39;vc" expl="VC for clear&#39;refn" proved="true">
- <proof prover="1"><result status="valid" time="0.010000" steps="1"/></proof>
+ <proof prover="0"><result status="valid" time="0.010000" steps="0"/></proof>
  </goal>
  <goal name="BagSpec.add&#39;refn&#39;vc" expl="VC for add&#39;refn" proved="true">
- <proof prover="1"><result status="valid" time="0.010000" steps="1"/></proof>
+ <proof prover="0"><result status="valid" time="0.010000" steps="0"/></proof>
+ </goal>
+ <goal name="BagSpec.get&#39;refn&#39;vc" expl="VC for get&#39;refn" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="get&#39;refn&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="7"><result status="valid" time="0.025701" steps="2494"/></proof>
+  </goal>
+  <goal name="get&#39;refn&#39;vc.1" expl="postcondition" proved="true">
+  <transf name="assert" proved="true" arg1="((numof t.data result 0 t.size) &gt; 0)">
+   <goal name="get&#39;refn&#39;vc.1.0" expl="asserted formula" proved="true">
+   <transf name="assert" proved="true" arg1="((numof t.data result 0 t.size) = numof t.data result 0 i + numof t.data result i t.size)">
+    <goal name="get&#39;refn&#39;vc.1.0.0" expl="asserted formula" proved="true">
+    <proof prover="7"><result status="valid" time="0.033422" steps="31222"/></proof>
+    </goal>
+    <goal name="get&#39;refn&#39;vc.1.0.1" expl="asserted formula" proved="true">
+    <proof prover="7"><result status="valid" time="0.045287" steps="46972"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="get&#39;refn&#39;vc.1.1" expl="postcondition" proved="true">
+   <proof prover="7"><result status="valid" time="0.031076" steps="25479"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="BagSpec.remove&#39;refn&#39;vc" expl="VC for remove&#39;refn" proved="true">
+ <proof prover="7"><result status="valid" time="0.153780" steps="358564"/></proof>
  </goal>
 </theory>
 <theory name="Harness" proved="true">
  <goal name="test1&#39;vc" expl="VC for test1" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="test1&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.150000" steps="244"/></proof>
+  <proof prover="7"><result status="valid" time="0.040604" steps="42226"/></proof>
   </goal>
   <goal name="test1&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="1.103815" steps="484"/></proof>
+  <proof prover="7"><result status="valid" time="0.041386" steps="40933"/></proof>
   </goal>
  </transf>
  </goal>

@@ -29,9 +29,12 @@ module BagSpec
     ghost mutable contents: bag 'a;
   } invariant { 0 <= size }
 
-  val create () : t 'a
+  val create (dummy: 'a) : t 'a
     ensures { result.size = 0 }
     ensures { result.contents == Bag.empty }
+
+  val length (t: t 'a) : int
+    ensures { result = t.size }
 
   val clear (t: t 'a) : unit
     writes  { t.size, t.contents }
@@ -42,6 +45,16 @@ module BagSpec
     writes  { t.size, t.contents }
     ensures { t.size = old t.size + 1 }
     ensures { t.contents == Bag.add x (old t.contents) }
+
+  val get (t: t 'a) (i: int) : 'a
+    requires { 0 <= i < t.size }
+    ensures  { t.contents result > 0 }
+
+  val remove (t: t 'a) (i: int) : unit
+    requires { 0 <= i < t.size }
+    writes   { t.size, t.contents }
+    ensures  { t.size = old t.size - 1 }
+    ensures  { exists x: 'a. t.contents == Bag.remove x (old t.contents) }
 
 end
 
@@ -95,27 +108,28 @@ module BagImpl
   use import ResizableArraySpec as R
   use map.Map as Map
   use int.NumOf as NumOf
-  use null.Null as Null
 
-  function numof (r: rarray (Null.t 'a)) (x: 'a) (l u: int) : int =
-    NumOf.numof (fun i -> (Map.get r.R.data i).Null.v = Null.Value x) l u
+  function numof (r: rarray 'a) (x: 'a) (l u: int) : int =
+    NumOf.numof (fun i -> Map.get r.R.data i = x) l u
 
   type t 'a = {
     mutable       size:     int;
-                  data:     rarray (Null.t 'a);
+                  data:     rarray 'a;
     mutable ghost contents: bag 'a;
   }
     invariant { 0 <= size = data.len }
-    invariant { forall i: int. 0 <= i < size -> not (Null.is_null data[i]) }
     invariant { forall x: 'a. contents x = numof data x 0 size }
-    by { size = 0; data = R.make 0 (Null.create_null ()); contents = empty }
+    by { size = 0; data = R.make 0 (any 'a); contents = empty }
 
-  let create () : t 'a
+  let create (dummy: 'a) : t 'a
     ensures { result.size = 0 }
     ensures { result.contents == Bag.empty }
   =
-    let null = Null.create_null () : Null.t 'a in
-    { size = 0; data = make 0 null; contents = Bag.empty }
+    { size = 0; data = make 0 dummy; contents = Bag.empty }
+
+  let length_ (t: t 'a) : int
+    ensures { result = t.size }
+  = t.size
 
   let clear (t: t 'a) : unit
     ensures { t.size = 0 }
@@ -133,26 +147,24 @@ module BagImpl
     t.size <- n + 1;
     resize t.data (n + 1);
     assert { forall v: 'a. t.contents v = numof t.data v 0 n by
-      forall i: int. 0 <= i < n -> (t.data[i].Null.v = Null.Value v
-                          <-> (old t.data)[i].Null.v = Null.Value v) };
-    t.data[n] <- Null.create x;
+               forall i. 0 <= i < n -> t.data[i] = (old t.data)[i] };
+    t.data[n] <- x;
     assert { forall v: 'a. t.contents v = numof t.data v 0 n };
     t.contents <- Bag.add x t.contents
 
   let get (t: t 'a) (i: int) : 'a
     requires { 0 <= i < t.size }
-    ensures  { Null.Value result = t.data[i].Null.v }
-  =
-    Null.get t.data[i]
+    ensures  { result = t.data[i] }
+  = t.data[i]
 
   let remove (t: t 'a) (i: int) : unit
     requires { 0 <= i < t.size }
     ensures  { t.size = old t.size - 1 }
-    ensures  { forall x: 'a. Null.Value x = old t.data[i].Null.v ->
+    ensures  { forall x: 'a. x = old t.data[i] ->
                t.contents == Bag.remove x (old t.contents) }
   =
     let n = t.size - 1 in
-    let ghost x = Null.get t.data[i] in
+    let ghost x = t.data[i] in
     t.contents <- Bag.remove x t.contents;
     if i < n then t.data[i] <- t.data[n];
     assert { forall v: 'a. t.contents v = numof t.data v 0 n by
@@ -167,8 +179,11 @@ module BagImpl
   clone BagSpec with
     type t = t,
     val create = create,
+    val length = length_,
     val clear = clear,
-    val add = add
+    val add = add,
+    val get = get,
+    val remove = remove
 
 end
 
@@ -179,7 +194,7 @@ module Harness
   use BagImpl
 
   let test1 () =
-    let b = create () in
+    let b = create 0 in
     add b 17;
     add b 42;
     assert { b.contents 42 = 1 };
