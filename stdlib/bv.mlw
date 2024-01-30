@@ -423,6 +423,11 @@ let predicate sle (v1 v2 : t) =
       to_uint v1 + to_uint v2 < two_power_size ->
       to_uint (add v1 v2) = to_uint v1 + to_uint v2
   meta "remove_unused:dependency" lemma to_uint_add_bounded, function add
+  lemma to_uint_add_overflow:
+    forall v1 v2.
+      to_uint v1 + to_uint v2 >= two_power_size ->
+      to_uint (add v1 v2) = to_uint v1 + to_uint v2 - two_power_size
+  meta "remove_unused:dependency" lemma to_uint_add_overflow, function add
 
   val function sub (v1 v2 : t) : t
   axiom to_uint_sub:
@@ -430,15 +435,23 @@ let predicate sle (v1 v2 : t) =
   meta "remove_unused:dependency" axiom to_uint_sub  , function sub
   lemma to_uint_sub_bounded:
     forall v1 v2.
-      0 <= to_uint v1 - to_uint v2 < two_power_size ->
+      0 <= to_uint v1 - to_uint v2 ->
       to_uint (sub v1 v2) = to_uint v1 - to_uint v2
   meta "remove_unused:dependency" lemma to_uint_sub_bounded, function sub
-
+  lemma to_uint_sub_overflow:
+    forall v1 v2.
+      0 > to_uint v1 - to_uint v2 ->
+      to_uint (sub v1 v2) = to_uint v1 - to_uint v2 + two_power_size
+  meta "remove_unused:dependency" lemma to_uint_sub_overflow, function sub
 
   val function neg (v1 : t) : t
   axiom to_uint_neg:
     forall v. to_uint (neg v) = mod (Int.(-_) (to_uint v)) two_power_size
   meta "remove_unused:dependency" axiom to_uint_neg, function neg
+  lemma to_uint_neg_no_mod:
+    forall v. to_uint (neg v) =
+      if v = zeros then 0 else two_power_size - to_uint v
+  meta "remove_unused:dependency" lemma to_uint_neg_no_mod, function neg
 
   val function mul (v1 v2 : t) : t
   axiom to_uint_mul:
