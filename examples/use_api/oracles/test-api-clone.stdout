@@ -17,9 +17,15 @@ theory Test
   
   constant a'minInt : int = 22
   
+  predicate a'eq (a:a) (b:a) = a'int a = a'int b
+  
+  axiom a'inj : forall a:a, b:a. a'eq a b -> a = b
+  
   (* meta range_type type a, function a'int *)
   
   (* meta model_projection function a'int *)
+  
+  (* meta remove_unused:dependency prop a'inj, predicate a'eq *)
   
   goal f2'vc : let result'unused = True in false
   
@@ -48,12 +54,19 @@ theory Test1
   
   constant a'minInt1 : int = 22
   
+  predicate a'eq1 (a:a1) (b:a1) = a'int1 a = a'int1 b
+  
+  axiom a'inj1 : forall a:a1, b:a1. a'eq1 a b -> a = b
+  
   (* meta range_type type a1, function a'int1 *)
   
   (* meta model_projection function a'int1 *)
   
-  (* clone Test with type a = a1, constant a'minInt = a'minInt1,
-    constant a'maxInt = a'maxInt1, function a'int = a'int1,  *)
+  (* meta remove_unused:dependency prop a'inj1, predicate a'eq1 *)
+  
+  (* clone Test with type a = a1, predicate a'eq = a'eq1,
+    constant a'minInt = a'minInt1, constant a'maxInt = a'maxInt1,
+    function a'int = a'int1,  *)
   
 end
 
@@ -278,12 +291,19 @@ theory Task
   
   constant a'minInt : int = 22
   
+  predicate a'eq (a:a) (b:a) = a'int a = a'int b
+  
+  axiom a'inj : forall a:a, b:a. a'eq a b -> a = b
+  
   (* meta range_type type a, function a'int *)
   
   (* meta model_projection function a'int *)
   
-  (* clone Test with type a1 = a, constant a'minInt1 = a'minInt,
-    constant a'maxInt1 = a'maxInt, function a'int1 = a'int,  *)
+  (* meta remove_unused:dependency prop a'inj, predicate a'eq *)
+  
+  (* clone Test with type a1 = a, predicate a'eq1 = a'eq,
+    constant a'minInt1 = a'minInt, constant a'maxInt1 = a'maxInt,
+    function a'int1 = a'int, prop a'inj1 = a'inj,  *)
   
   type a1 = <range 22 46>
   
@@ -293,9 +313,15 @@ theory Task
   
   constant a'minInt1 : int = 22
   
+  predicate a'eq1 (a:a1) (b:a1) = a'int1 a = a'int1 b
+  
+  axiom a'inj1 : forall a:a1, b:a1. a'eq1 a b -> a = b
+  
   (* meta range_type type a1, function a'int1 *)
   
   (* meta model_projection function a'int1 *)
+  
+  (* meta remove_unused:dependency prop a'inj1, predicate a'eq1 *)
   
   goal f2'vc : let result'unused = True in false
   
@@ -521,12 +547,19 @@ theory Task
   
   constant a'minInt : int = 22
   
+  predicate a'eq (a:a) (b:a) = a'int a = a'int b
+  
+  axiom a'inj : forall a:a, b:a. a'eq a b -> a = b
+  
   (* meta range_type type a, function a'int *)
   
   (* meta model_projection function a'int *)
   
-  (* clone Test with type a1 = a, constant a'minInt1 = a'minInt,
-    constant a'maxInt1 = a'maxInt, function a'int1 = a'int,  *)
+  (* meta remove_unused:dependency prop a'inj, predicate a'eq *)
+  
+  (* clone Test with type a1 = a, predicate a'eq1 = a'eq,
+    constant a'minInt1 = a'minInt, constant a'maxInt1 = a'maxInt,
+    function a'int1 = a'int, prop a'inj1 = a'inj,  *)
   
   type a1 = <range 22 46>
   
@@ -536,9 +569,15 @@ theory Task
   
   constant a'minInt1 : int = 22
   
+  predicate a'eq1 (a:a1) (b:a1) = a'int1 a = a'int1 b
+  
+  axiom a'inj1 : forall a:a1, b:a1. a'eq1 a b -> a = b
+  
   (* meta range_type type a1, function a'int1 *)
   
   (* meta model_projection function a'int1 *)
+  
+  (* meta remove_unused:dependency prop a'inj1, predicate a'eq1 *)
   
   goal f3'vc : forall b:a1. let _result'unused = b in a'int1 b = 42
   
@@ -764,12 +803,19 @@ theory Task
   
   constant a'minInt : int = 22
   
+  predicate a'eq (a:a) (b:a) = a'int a = a'int b
+  
+  axiom a'inj : forall a:a, b:a. a'eq a b -> a = b
+  
   (* meta range_type type a, function a'int *)
   
   (* meta model_projection function a'int *)
   
-  (* clone Test with type a1 = a, constant a'minInt1 = a'minInt,
-    constant a'maxInt1 = a'maxInt, function a'int1 = a'int,  *)
+  (* meta remove_unused:dependency prop a'inj, predicate a'eq *)
+  
+  (* clone Test with type a1 = a, predicate a'eq1 = a'eq,
+    constant a'minInt1 = a'minInt, constant a'maxInt1 = a'maxInt,
+    function a'int1 = a'int, prop a'inj1 = a'inj,  *)
   
   type a1 = <range 22 46>
   
@@ -779,9 +825,15 @@ theory Task
   
   constant a'minInt1 : int = 22
   
+  predicate a'eq1 (a:a1) (b:a1) = a'int1 a = a'int1 b
+  
+  axiom a'inj1 : forall a:a1, b:a1. a'eq1 a b -> a = b
+  
   (* meta range_type type a1, function a'int1 *)
   
   (* meta model_projection function a'int1 *)
+  
+  (* meta remove_unused:dependency prop a'inj1, predicate a'eq1 *)
   
   goal f1'vc :
     forall b:a1.

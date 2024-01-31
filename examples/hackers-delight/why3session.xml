@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.12.2" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -11,36 +11,36 @@
 <path name=".."/><path name="hackers-delight.mlw"/>
 <theory name="Utils_Spec" proved="true">
  <goal name="countZero" proved="true">
- <proof prover="9"><result status="valid" time="0.010000" steps="8354"/></proof>
+ <proof prover="9"><result status="valid" time="0.010000" steps="8463"/></proof>
  </goal>
  <goal name="numOfZero" proved="true">
- <proof prover="9"><result status="valid" time="0.080000" steps="36313"/></proof>
+ <proof prover="9"><result status="valid" time="0.080000" steps="36422"/></proof>
  </goal>
  <goal name="countStep" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="countStep.0" proved="true">
-  <proof prover="9"><result status="valid" time="1.650000" steps="86516"/></proof>
+  <proof prover="9"><result status="valid" time="1.650000" steps="86625"/></proof>
   </goal>
   <goal name="countStep.1" proved="true">
-  <proof prover="9"><result status="valid" time="0.080000" steps="33439"/></proof>
+  <proof prover="9"><result status="valid" time="0.080000" steps="33548"/></proof>
   </goal>
   <goal name="countStep.2" proved="true">
-  <proof prover="9" timelimit="10" memlimit="4000"><result status="valid" time="2.070000" steps="89049"/></proof>
+  <proof prover="9" timelimit="10" memlimit="4000"><result status="valid" time="2.070000" steps="89158"/></proof>
   </goal>
   <goal name="countStep.3" proved="true">
-  <proof prover="9"><result status="valid" time="0.100000" steps="30581"/></proof>
+  <proof prover="9"><result status="valid" time="0.100000" steps="30690"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="numof_shift&#39;vc" expl="VC for numof_shift" proved="true">
- <proof prover="9"><result status="valid" time="0.070000" steps="23941"/></proof>
+ <proof prover="9"><result status="valid" time="0.070000" steps="24050"/></proof>
  </goal>
  <goal name="countSpec_Aux&#39;vc" expl="VC for countSpec_Aux" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="countSpec_Aux&#39;vc.0" expl="variant decrease" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="countSpec_Aux&#39;vc.0.0" expl="VC for countSpec_Aux" proved="true">
-   <proof prover="9"><result status="valid" time="0.020000" steps="8673"/></proof>
+   <proof prover="9"><result status="valid" time="0.020000" steps="8771"/></proof>
    </goal>
    <goal name="countSpec_Aux&#39;vc.0.1" expl="VC for countSpec_Aux" proved="true">
    <proof prover="0"><result status="valid" time="0.390000" steps="299"/></proof>
@@ -53,7 +53,7 @@
    <proof prover="0"><result status="valid" time="0.100000" steps="289"/></proof>
    </goal>
    <goal name="countSpec_Aux&#39;vc.1.1" expl="assertion" proved="true">
-   <proof prover="9"><result status="valid" time="0.100000" steps="27479"/></proof>
+   <proof prover="9"><result status="valid" time="0.100000" steps="27588"/></proof>
    </goal>
    <goal name="countSpec_Aux&#39;vc.1.2" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.240000" steps="364"/></proof>
@@ -69,12 +69,12 @@
  </transf>
  </goal>
  <goal name="countSpec" proved="true">
- <proof prover="9"><result status="valid" time="0.040000" steps="8504"/></proof>
+ <proof prover="9"><result status="valid" time="0.040000" steps="8602"/></proof>
  </goal>
  <goal name="hamming_spec&#39;vc" expl="VC for hamming_spec" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="hamming_spec&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="9"><result status="valid" time="0.040000" steps="26725"/></proof>
+  <proof prover="9"><result status="valid" time="0.040000" steps="26834"/></proof>
   </goal>
   <goal name="hamming_spec&#39;vc.1" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.153629" steps="135134"/></proof>
@@ -82,13 +82,13 @@
  </transf>
  </goal>
  <goal name="symmetric" proved="true">
- <proof prover="9"><result status="valid" time="0.020000" steps="10604"/></proof>
+ <proof prover="9"><result status="valid" time="0.020000" steps="10713"/></proof>
  </goal>
  <goal name="separation" proved="true">
- <proof prover="9"><result status="valid" time="0.030000" steps="31858"/></proof>
+ <proof prover="9"><result status="valid" time="0.030000" steps="31967"/></proof>
  </goal>
  <goal name="numof_or&#39;vc" expl="VC for numof_or" proved="true">
- <proof prover="9"><result status="valid" time="0.090000" steps="28763"/></proof>
+ <proof prover="9"><result status="valid" time="0.090000" steps="28872"/></proof>
  </goal>
  <goal name="triangleInequalityInt&#39;vc" expl="VC for triangleInequalityInt" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -113,121 +113,121 @@
 </theory>
 <theory name="Hackers_delight" proved="true">
  <goal name="ascii&#39;vc" expl="VC for ascii" proved="true">
- <proof prover="9"><result status="valid" time="0.030000" steps="19338"/></proof>
+ <proof prover="9"><result status="valid" time="0.030000" steps="19447"/></proof>
  </goal>
  <goal name="asciiProp" proved="true">
- <proof prover="9"><result status="valid" time="0.630000" steps="115045"/></proof>
+ <proof prover="9"><result status="valid" time="0.630000" steps="115154"/></proof>
  </goal>
  <goal name="iso" proved="true">
- <proof prover="9"><result status="valid" time="0.340000" steps="68678"/></proof>
+ <proof prover="9"><result status="valid" time="0.340000" steps="68787"/></proof>
  </goal>
  <goal name="grayIsGray" proved="true">
- <proof prover="9"><result status="valid" time="0.040000" steps="19622"/></proof>
+ <proof prover="9"><result status="valid" time="0.040000" steps="19731"/></proof>
  </goal>
  <goal name="nthGray" proved="true">
- <proof prover="9"><result status="valid" time="0.040000" steps="13413"/></proof>
+ <proof prover="9"><result status="valid" time="0.040000" steps="13522"/></proof>
  </goal>
  <goal name="lastNthGray" proved="true">
- <proof prover="9"><result status="valid" time="0.040000" steps="11705"/></proof>
+ <proof prover="9"><result status="valid" time="0.040000" steps="11814"/></proof>
  </goal>
  <goal name="nthBinary" proved="true">
- <proof prover="9"><result status="valid" time="0.430000" steps="58448"/></proof>
+ <proof prover="9"><result status="valid" time="0.430000" steps="58557"/></proof>
  </goal>
  <goal name="evenOdd" proved="true">
- <proof prover="9"><result status="valid" time="0.070000" steps="24063"/></proof>
+ <proof prover="9"><result status="valid" time="0.070000" steps="24172"/></proof>
  </goal>
  <goal name="DM1" proved="true">
- <proof prover="9"><result status="valid" time="0.030000" steps="10645"/></proof>
+ <proof prover="9"><result status="valid" time="0.030000" steps="10743"/></proof>
  </goal>
  <goal name="DM2" proved="true">
- <proof prover="9"><result status="valid" time="0.030000" steps="10827"/></proof>
+ <proof prover="9"><result status="valid" time="0.030000" steps="10925"/></proof>
  </goal>
  <goal name="DM3" proved="true">
- <proof prover="9"><result status="valid" time="0.030000" steps="11500"/></proof>
+ <proof prover="9"><result status="valid" time="0.030000" steps="11598"/></proof>
  </goal>
  <goal name="DM4" proved="true">
- <proof prover="9"><result status="valid" time="0.040000" steps="11382"/></proof>
+ <proof prover="9"><result status="valid" time="0.040000" steps="11480"/></proof>
  </goal>
  <goal name="DM5" proved="true">
- <proof prover="9"><result status="valid" time="0.030000" steps="11423"/></proof>
+ <proof prover="9"><result status="valid" time="0.030000" steps="11521"/></proof>
  </goal>
  <goal name="DM6" proved="true">
- <proof prover="9"><result status="valid" time="0.050000" steps="10997"/></proof>
+ <proof prover="9"><result status="valid" time="0.050000" steps="11095"/></proof>
  </goal>
  <goal name="DM7" proved="true">
- <proof prover="9"><result status="valid" time="0.040000" steps="17363"/></proof>
+ <proof prover="9"><result status="valid" time="0.040000" steps="17461"/></proof>
  </goal>
  <goal name="DM8" proved="true">
- <proof prover="9"><result status="valid" time="0.040000" steps="19689"/></proof>
+ <proof prover="9"><result status="valid" time="0.040000" steps="19787"/></proof>
  </goal>
  <goal name="DMtest" proved="true">
- <proof prover="9"><result status="valid" time="0.040000" steps="11408"/></proof>
+ <proof prover="9"><result status="valid" time="0.040000" steps="11506"/></proof>
  </goal>
  <goal name="Aa" proved="true">
- <proof prover="9"><result status="valid" time="0.040000" steps="10323"/></proof>
+ <proof prover="9"><result status="valid" time="0.040000" steps="10421"/></proof>
  </goal>
  <goal name="Ac" proved="true">
- <proof prover="9"><result status="valid" time="0.040000" steps="11540"/></proof>
+ <proof prover="9"><result status="valid" time="0.040000" steps="11638"/></proof>
  </goal>
  <goal name="Ad" proved="true">
- <proof prover="9"><result status="valid" time="0.040000" steps="10537"/></proof>
+ <proof prover="9"><result status="valid" time="0.040000" steps="10635"/></proof>
  </goal>
  <goal name="Ae" proved="true">
- <proof prover="9"><result status="valid" time="0.030000" steps="9372"/></proof>
+ <proof prover="9"><result status="valid" time="0.030000" steps="9470"/></proof>
  </goal>
  <goal name="Af" proved="true">
- <proof prover="9"><result status="valid" time="0.050000" steps="11712"/></proof>
+ <proof prover="9"><result status="valid" time="0.050000" steps="11810"/></proof>
  </goal>
  <goal name="Aj" proved="true">
- <proof prover="9"><result status="valid" time="0.030000" steps="9525"/></proof>
+ <proof prover="9"><result status="valid" time="0.030000" steps="9623"/></proof>
  </goal>
  <goal name="An" proved="true">
- <proof prover="9"><result status="valid" time="0.040000" steps="16238"/></proof>
+ <proof prover="9"><result status="valid" time="0.040000" steps="16336"/></proof>
  </goal>
  <goal name="Ao" proved="true">
- <proof prover="9"><result status="valid" time="0.060000" steps="14052"/></proof>
+ <proof prover="9"><result status="valid" time="0.060000" steps="14150"/></proof>
  </goal>
  <goal name="Aq" proved="true">
- <proof prover="9"><result status="valid" time="0.100000" steps="26400"/></proof>
+ <proof prover="9"><result status="valid" time="0.100000" steps="26498"/></proof>
  </goal>
  <goal name="At" proved="true">
- <proof prover="9"><result status="valid" time="0.060000" steps="11653"/></proof>
+ <proof prover="9"><result status="valid" time="0.060000" steps="11751"/></proof>
  </goal>
  <goal name="Au" proved="true">
- <proof prover="9"><result status="valid" time="0.040000" steps="12255"/></proof>
+ <proof prover="9"><result status="valid" time="0.040000" steps="12353"/></proof>
  </goal>
  <goal name="Av" proved="true">
- <proof prover="9"><result status="valid" time="0.040000" steps="14767"/></proof>
+ <proof prover="9"><result status="valid" time="0.040000" steps="14865"/></proof>
  </goal>
  <goal name="IE1" proved="true">
- <proof prover="9"><result status="valid" time="0.050000" steps="12219"/></proof>
+ <proof prover="9"><result status="valid" time="0.050000" steps="12317"/></proof>
  </goal>
  <goal name="IE2" proved="true">
- <proof prover="9"><result status="valid" time="0.040000" steps="12476"/></proof>
+ <proof prover="9"><result status="valid" time="0.040000" steps="12574"/></proof>
  </goal>
  <goal name="IEa" proved="true">
- <proof prover="9"><result status="valid" time="0.430000" steps="291175"/></proof>
+ <proof prover="9"><result status="valid" time="0.430000" steps="258492"/></proof>
  </goal>
  <goal name="IEb" proved="true">
- <proof prover="9"><result status="valid" time="0.380000" steps="245210"/></proof>
+ <proof prover="9"><result status="valid" time="0.380000" steps="251641"/></proof>
  </goal>
  <goal name="IE3" proved="true">
- <proof prover="9"><result status="valid" time="0.040000" steps="15822"/></proof>
+ <proof prover="9"><result status="valid" time="0.040000" steps="15920"/></proof>
  </goal>
  <goal name="IE4" proved="true">
- <proof prover="9"><result status="valid" time="0.050000" steps="16628"/></proof>
+ <proof prover="9"><result status="valid" time="0.050000" steps="16726"/></proof>
  </goal>
  <goal name="SR1" proved="true">
- <proof prover="9"><result status="valid" time="0.060000" steps="21038"/></proof>
+ <proof prover="9"><result status="valid" time="0.060000" steps="21136"/></proof>
  </goal>
  <goal name="RS_left" proved="true">
- <proof prover="9"><result status="valid" time="0.020000" steps="9824"/></proof>
+ <proof prover="9"><result status="valid" time="0.020000" steps="9922"/></proof>
  </goal>
  <goal name="RS_right" proved="true">
- <proof prover="9"><result status="valid" time="0.020000" steps="9894"/></proof>
+ <proof prover="9"><result status="valid" time="0.020000" steps="9992"/></proof>
  </goal>
  <goal name="BP" proved="true">
- <proof prover="9"><result status="valid" time="0.600000" steps="429553"/></proof>
+ <proof prover="9"><result status="valid" time="0.600000" steps="429686"/></proof>
  </goal>
 </theory>
 </file>

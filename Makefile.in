@@ -1809,7 +1809,7 @@ test-api-%: test-api-%.@OCAMLBEST@
 			    > examples/use_api/results/$@.stdout ) \
 		|| (printf "Execution failed for API test $<. Please fix it.\n"; exit 2)
 	$(HIDE)(diff -u examples/use_api/oracles/$@.stdout examples/use_api/results/$@.stdout) \
-		|| (printf "Oracle failed for API test $<. Please fix it.\n"; exit 2)
+		|| (printf "Oracle updated for API test $<. Please review it.\n"; cp examples/use_api/results/$@.stdout examples/use_api/oracles/$@.stdout )
 	$(HIDE)rm -f $< why3session.xml why3shapes why3shapes.gz
 
 

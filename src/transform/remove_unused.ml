@@ -14,14 +14,6 @@ let _debug =
     ~desc:
       "Print@ debugging@ messages@ of@ the@ 'remove_unused'@ transformation."
 
-let meta_depends =
-  Theory.(
-    register_meta
-      ~desc:
-        "declares an dependency between a proposition and a logic symbol. Used \
-         by the transformation `remove_unused`"
-      "remove_unused:dependency" [ MTprsymbol; MTlsymbol ])
-
 let meta_depends_remove_constant =
   Theory.(
     register_meta
@@ -112,7 +104,7 @@ let do_removal_unused_decl usymb (td : Theory.tdecl) : Theory.tdecl option =
   let open Decl in
   let open Theory in
   match td.td_node with
-  | Meta (mt, [ MApr pr; MAls _ls ]) when meta_equal mt meta_depends ->
+  | Meta (mt, [ MApr pr; MAls _ls ]) when meta_equal mt Pdecl.meta_depends ->
       if Sid.mem pr.pr_name usymb.used_ids then Some td else None
   | Meta (mt, margs) ->
       let kept_arg at_least_one = function
@@ -213,7 +205,7 @@ let do_removal_wrapper usymb : Task.task Trans.trans =
 let remove_unused_wrapper keep_constants =
   let o t =
     let usymb =
-      Task.on_meta meta_depends add_dependency (initial keep_constants) t
+      Task.on_meta Pdecl.meta_depends add_dependency (initial keep_constants) t
     in
     let usymb =
       Task.on_meta meta_depends_remove_constant add_removed_constant usymb t
