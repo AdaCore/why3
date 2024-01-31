@@ -1217,6 +1217,25 @@ Record types can be recursive, e.g,
 Recursive record types cannot have invariants, cannot have mutable
 fields, and cannot be private.
 
+.. rubric:: Record injectivity
+
+Records should be identified by their fields, which is a kind of injectivity
+property: provided ``a.f = b.f`` for all fields, then ``a = b``. Plain record
+types without invariant are encoded as algebraic data types with a unique
+constructor (see below), hence the injectivity property automatically holds.
+However, for records with invariant, there is no such constructor.
+
+Actually, record injectivity only holds for non-private types, since all fields
+in the record must be statically known. Hence, for any non-private record ``r``
+with invariants, the following declarations are automatically generated:
+
+.. code-block:: whyml
+
+    predicate r'eq (a b : r) = a.f = b.f /\ ...
+    axiom r'inj: forall a b : r. r'eq a b -> a = b
+
+The recommended way to trigger the injectivity property in your proofs is to introduce an extra ``by r'eq a b`` on a formula, or an ``assert { r'eq a b }`` statement in a program.
+
 .. index:: algebraic data type
 
 Algebraic data types
@@ -1331,6 +1350,14 @@ range type :math:`r` automatically introduces the following:
 The function ``r'int`` projects a term of type ``r`` to its integer
 value. The two constants represent the high bound and low bound of the
 range respectively.
+
+Projection ``r'int`` is also defined to be injective, thanks to the following
+definitions automatically introduced by Why3:
+
+.. code-block:: whyml
+
+    predicate r'eq (x y : r) = (r'int x = r'int y)
+    axiom r'inj: forall x y : r. r'eq x y -> x = y
 
 Unless specified otherwise with the meta :why3:meta:`keep:literal` on ``r``, the
 transformation :why3:transform:`eliminate_literal` introduces an axiom
