@@ -81,7 +81,8 @@ end
   Time O(N) and space O(1). The argument for a linear time complexity is as
   follows: whenever we do not advance, we swap the element to its place,
   which is further and did not contain that element; so we can do this only
-  N times.
+  N times. Note that the variant below is bounded by 2N and thus shows
+  the linear complexity.
 
   Surprinsingly, proving that N is the answer whenever array A contains a
   permutation of 0..N-1 is now easy (no need for a pigeon hole
@@ -111,15 +112,13 @@ module MexArrayInPlace
       invariant { 0 <= !i <= n }
       invariant { forall x. mem x a <-> mem x (old a) }
       invariant { forall j. 0 <= j < !i -> 0 <= a[j] < n -> a[a[j]] = a[j] }
-      variant   { n - !i, n - numof (placed a) 0 n }
+      variant   { n - !i + n - numof (placed a) 0 n }
       let x = a[!i] in
-      if x < 0 || x >= n then
+      if x < 0 || x >= n || a[x] = x then
         incr i
       else if x < !i then begin
         swap a !i x; incr i
-      end else if a[x] = x then
-        incr i
-      else
+      end else
         swap a !i x
     done;
     assert { forall j. 0 <= j < n -> let x = (old a)[j] in
