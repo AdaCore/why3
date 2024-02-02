@@ -1,0 +1,64 @@
+
+(** Turning a list into an array.
+
+  This is a small program to illustrate the use of Why3's Peano
+  numbers (see module mach.peano.Peano).
+
+  It turns a list into an array. The point is that we use machine
+  integers (for the list length and for array indices) but we avoid
+  having to prove the absence of arithmetic overflow.
+
+  Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+use int.Int
+use option.Option
+use list.List
+use seq.Seq
+use mach.peano.Peano
+use mach.peano.Int63
+use mach.int.Int63
+use mach.array.Array63 as A
+use list.NthLength
+
+(** The length of a list computed with Peano numbers. *)
+let rec length (l: list 'a) : Peano.t
+  variant { l } ensures { result = length l }
+= match l with
+  | Nil      -> Peano.zero
+  | Cons _ l -> Peano.succ (length l)
+  end
+
+(** To turn a list into an array, we first compute the length of the
+    list with the function above, then we build an array of that size,
+    and finally we fill it with the elements from the list.
+
+    Note: `Array.make` requires a value of type 'a, so the code below
+    requires a non-empty list. (In OCaml, we would return the empty
+    array [||] when the list is empty, but there is no such empty
+    array in Why3's library.)
+*)
+let array_of_list (l: list 'a) : (a: A.array 'a)
+  requires { l <> Nil }
+  ensures  { A.length a = length l }
+  ensures  { forall i. 0 <= i < length l -> Some a[i] = nth i l }
+= let n = to_int63 (length l) in
+  match l with Nil -> absurd | Cons x ll ->
+  let a = A.make n x in
+  let rec fill (i: int63) (ll: list 'a) : unit
+    requires { i >= 1 && n - i = length ll }
+    requires { forall j. 0 <= j < i -> Some a[j] = nth j l }
+    requires { forall j. i <= j < n -> nth (j-i) ll = nth j l }
+    variant  { n - i }
+    ensures  { forall j. 0 <= j < n -> Some a[j] = nth j l }
+  = match ll with Nil -> ()
+    | Cons x ll -> A.(a[i] <- x); fill (i+1) ll
+    end in
+  fill 1 ll;
+  return a
+  end
+
+
+
+
+
