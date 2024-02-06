@@ -256,8 +256,9 @@ let () = Debug.set_debug_formatter escape_formatter
 
 (* This is to be executed when scheduling ends *)
 let ending c () =
-  Util.record_timing "gnatwhy3.run_vcs" C.remove_all_valid_ce_attempt c.Controller_itp.controller_session;
-  Util.record_timing "gnatwhy3.save_session" C.save_session c;
+  Debug.Stats.record_timing "gnatwhy3.run_vcs"
+    (fun () -> C.remove_all_valid_ce_attempt c.Controller_itp.controller_session);
+  Debug.Stats.record_timing "gnatwhy3.save_session" (fun () -> C.save_session c);
   Gnat_objectives.iter (report_messages c);
   let s = Buffer.contents escape_buffer in
   if s <> "" then
@@ -302,6 +303,7 @@ let save_session_and_exit c signum =
 let _ =
   if Gnat_config.debug then Debug.(set_flag (lookup_flag "gnat_ast"));
   Debug.set_flag Pinterp.debug_disable_builtin_mach;
+  Debug.set_flag Debug.stats;
   List.iter Introduction.add_unique_prefix
     ["GP_Check:"; "GP_Pretty_Ada:"; "GP_Shape:"; "GP_Sloc:";
      "GP_Already_Proved"; "GP_Inline"; "GP_Inlined"];
@@ -314,7 +316,7 @@ let _ =
       Loc.set_warning_hook (fun ?loc:_ line -> Format.fprintf fmt "%s@." line)
     with Not_found -> () );
   try
-    let c = Util.record_timing "gnatwhy3.init" Gnat_objectives.init_cont () in
+    let c = Debug.Stats.record_timing "gnatwhy3.init" Gnat_objectives.init_cont in
     (* This has to be done after initialization of controller. Otherwise we
        don't have session. *)
     Sys.set_signal Sys.sigint (Sys.Signal_handle (save_session_and_exit c));
@@ -322,12 +324,14 @@ let _ =
     | Gnat_config.Progressive
     | Gnat_config.Per_Path
     | Gnat_config.Per_Check ->
-        Util.record_timing "gnatwhy3.register_vcs" C.iter_subps c (normal_handle_one_subp c);
+        Debug.Stats.record_timing "gnatwhy3.register_vcs"
+         (fun () -> C.iter_subps c (normal_handle_one_subp c));
         if Gnat_config.replay then begin
           C.replay c (*;
           Gnat_objectives.do_scheduled_jobs (fun _ _ -> ());*)
         end else begin
-          Util.record_timing "gnatwhy3.schedule_vcs" Gnat_objectives.iter (handle_obj c);
+          Debug.Stats.record_timing "gnatwhy3.schedule_vcs"
+           (fun () -> Gnat_objectives.iter (handle_obj c));
         end;
      | Gnat_config.All_Split ->
         C.iter_subps c (all_split_subp c)

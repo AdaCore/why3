@@ -144,23 +144,3 @@ let split_version s =
           aux_num (i + 1) (String.sub s j (i - j)) (Char.code c - Char.code '0')
       | _ -> aux_str (i + 1) j in
   aux_str 0 0
-
-let timings_map = Hashtbl.create 42
-let get_timings () = timings_map
-let print_timings () =
-  Hashtbl.iter (fun tr_name (time, n) ->
-    Format.printf "[%f:%d:%s]@." time n tr_name
-    ) timings_map
-let record_timing name f arg = 
-  let begin_time = Unix.times () in
-  let result = f arg in
-  let end_time = Unix.times () in
-  let t = Unix.(end_time.tms_utime -. begin_time.tms_utime)
-  in let old_t, old_n = try Hashtbl.find timings_map name
-  with Not_found -> 0.0, 0
-  in Hashtbl.replace timings_map name (old_t +. t, old_n + 1);
-  result
-let custom_timing name time =
-  let old_t, old_n = try Hashtbl.find timings_map name
-  with Not_found -> 0.0, 0 in
-  Hashtbl.replace timings_map name (old_t +. time, old_n +1)
