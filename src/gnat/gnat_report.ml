@@ -191,7 +191,7 @@ let get_warnings () =
   | l -> [("warnings", List (List.map (fun elem -> String elem) l))]
 
 let get_timings () =
-  let l = Hashtbl.fold (fun k v acc -> (k,v)::acc) (Util.get_timings ()) [] in
+  let l = Hashtbl.fold (fun k v acc -> (k,v)::acc) (Debug.Stats.get_timings ()) [] in
   let get_name s = s in
   "timings", Record (List.map (fun (k,(v,_n)) -> get_name k, StandardFloat v) l)
 

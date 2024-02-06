@@ -127,14 +127,3 @@ val split_version : string ->  (string * int) list
 (** Split a version string into its components. For example, ["2.1~beta3"] is
     split into ["",2;".",1;"~beta",3]. When compared lexicographically, the
     resulting list respects the traditional ordering on version strings. *)
-
-val record_timing : string -> ('a -> 'b) -> 'a -> 'b
-(** Wrap a function call with this function in order to record its execution
-    time in a global table. The cumulative timing and number of recordings for
-    each name is stored. Timings recorded here can be accessed via the
-    get_timings function or printed with print_timings. Timings obtained externally
-    (e.g. from provers output) can be added with custom_timings.*)
-
-val print_timings : unit -> unit
-val custom_timing : string -> float -> unit
-val get_timings :   unit -> (string, (float * int)) Hashtbl.t
