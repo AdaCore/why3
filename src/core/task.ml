@@ -19,25 +19,33 @@ open Theory
 
 type tdecl_set = {
   tds_set : Stdecl.t;
+  tds_xor : int;
   tds_tag : Weakhtbl.tag;
 }
 
 module Hstds = Hashcons.Make (struct
   type t = tdecl_set
+  let hash s = s.tds_xor
   let equal s1 s2 = Stdecl.equal s1.tds_set s2.tds_set
-  let hs_td td acc = Hashcons.combine acc (td_hash td)
-  let hash s = Stdecl.fold hs_td s.tds_set 0
   let tag n s = { s with tds_tag = Weakhtbl.create_tag n }
 end)
 
 let mk_tds s = Hstds.hashcons {
   tds_set = s;
+  tds_xor = Stdecl.fold (fun td acc -> td_hash td lxor acc) s 0;
   tds_tag = Weakhtbl.dummy_tag;
 }
 
 let tds_empty = mk_tds Stdecl.empty
-let tds_add td s = mk_tds (Stdecl.add td s.tds_set)
 let tds_singleton td = mk_tds (Stdecl.singleton td)
+
+let tds_add td s =
+  if Stdecl.mem td s.tds_set then s else
+  Hstds.hashcons {
+    tds_set = Stdecl.add td s.tds_set;
+    tds_xor = td_hash td lxor s.tds_xor;
+    tds_tag = Weakhtbl.dummy_tag;
+  }
 
 let tds_equal : tdecl_set -> tdecl_set -> bool = (==)
 let tds_hash tds = Weakhtbl.tag_hash tds.tds_tag
