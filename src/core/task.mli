@@ -19,6 +19,7 @@ open Theory
 
 type tdecl_set = private {
   tds_set : Stdecl.t;
+  tds_xor : int;
   tds_tag : Weakhtbl.tag;
 }
 
