@@ -1,0 +1,33 @@
+module Record
+
+  type a
+  type b
+  predicate p a b
+  val constant a0: a
+  val constant b0: b
+  axiom p0: p a0 b0
+
+  type r = { f : a ; g : b } invariant { p f g } by { f = a0 ; g = b0 }
+
+  goal byEq: forall x y. x.f = y.f -> x.g = y.g -> x = y by r'eq x y
+
+  let lemma (==) (x y : r)
+    requires { x.f = y.f }
+    requires { x.g = y.g }
+    ensures { x = y }
+    = assert { r'eq x y }
+
+end
+
+module Range
+
+  type a = < range 0 10 >
+
+  goal byEq: forall x y. a'int x = a'int y -> x = y by a'eq x y
+
+  let lemma (==) (x y : a)
+    requires { a'int x = a'int y }
+    ensures { x = y }
+    = assert { a'eq x y }
+
+end

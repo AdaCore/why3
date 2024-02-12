@@ -398,7 +398,7 @@ void run_request (prequest r) {
                      NULL,
                      NULL,
                      TRUE,
-                     CREATE_SUSPENDED | CREATE_BREAKAWAY_FROM_JOB,
+                     CREATE_SUSPENDED,
                      NULL,
                      NULL,
                      &si,

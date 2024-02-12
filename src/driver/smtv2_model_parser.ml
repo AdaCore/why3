@@ -304,7 +304,8 @@ module FromSexpToModel = struct
     match sexp with
     | Atom s when List.mem s builtins -> Isymbol (S s)
     | Atom _ -> Isymbol (symbol sexp)
-    | List [ Atom "_"; s; List idx ] ->
+    (* Avoid a spurious indexed identifier present in Z3's output *)
+    | List ( Atom "_" :: s ::  idx)  when not (s = Atom "as-array") ->
         Iindexedsymbol (symbol s, List.map index idx)
     | sexp -> error sexp "identifier"
 
@@ -355,17 +356,16 @@ module FromSexpToModel = struct
 
   let qualified_identifier sexp : qual_identifier =
     match sexp with
-    (* Z3 sometimes outputs its internal rule `array-ext`: this seems to be a bug in Z3 *)
-    | List [Atom "_"; Atom "array-ext"; _] -> Qident (Isymbol (S "z3-array-ext-placeholder"))
-    | Atom _ -> (
+    (* An actual qualified identifier *)
+    | List [ Atom "as"; id; s ] -> Qannotident (identifier id, sort s)
+    (* A non-qualified, possibly indexed, identifier *)
+    | sexp -> (
         let id = identifier sexp in
         match id with
         | Isymbol (Sprover n') | Iindexedsymbol (Sprover n', _) ->
             let ty_sexp = get_type_from_prover_variable n' in
             Qannotident (id, sort ty_sexp)
         | Isymbol _ | Iindexedsymbol _ -> Qident id)
-    | List [ Atom "as"; id; s ] -> Qannotident (identifier id, sort s)
-    | sexp -> error sexp "qualified_identifier"
 
   let arg = function
     | List [ n; s ] -> (symbol n, sort s)
@@ -375,14 +375,16 @@ module FromSexpToModel = struct
     try constant sexp
     with E _ -> (
       try Tvar (qualified_identifier sexp)
-      with E _ -> (
-        try ite sexp
-        with E _ -> (
-          try lett sexp
-        with E _ -> (
-          try array sexp
-          with E _ -> (
-              try application sexp with exn -> raise exn)))))
+    with E _ -> (
+      try ite sexp
+    with E _ -> (
+      try lett sexp
+    with E _ -> (
+      try forall sexp
+    with E _ -> (
+      try array sexp
+    with E _ -> (
+      try application sexp with exn -> raise exn))))))
 
   and ite = function
     | List [ Atom "ite"; t1; t2; t3 ] -> Tite (term t1, term t2, term t3)
@@ -396,6 +398,13 @@ module FromSexpToModel = struct
         Tlet ((List.map binding bindings), (term t2))
     | sexp -> error sexp "let"
 
+  and forall = function
+  | List (Atom "forall" :: List bindings :: t :: []) ->
+      let binding = (function
+      | (List [ n; s ]) -> (symbol n, sort s)
+      | sexp -> error sexp "forall binding") in
+      Tforall ((List.map binding bindings), (term t))
+  | sexp -> error sexp "forall"
 
   and application = function
     | List (qual_id :: ts) ->
@@ -495,9 +504,9 @@ module FromModelToTerm = struct
     type_coercions : Term.Sls.t Ty.Mty.t;
     (* Function definitions from the SMT model
        that are not in [pinfo.Printer.queried_terms]. *)
-    type_sorts : Ty.ty Mstr.t;
-    (* Sorts defined in the smtv2 file output. *)
     mutable prover_fun_defs : (Term.term * concrete_syntax_term) Mstr.t;
+    (* Sorts defined in the smtv2 file output. *)
+    type_sorts : Ty.ty Mstr.t;
     (* Prover variables, may have the same name if the sort is different. *)
     mutable prover_vars : vsymbol Ty.Mty.t Mstr.t;
     (* Bound variables in the body of a function or in a let construction. *)
@@ -947,14 +956,6 @@ module FromModelToTerm = struct
     let th = Env.read_theory env.why3_env [ path ] theory in
     Theory.ns_find_ls th.Theory.th_export [ ident ]
 
-  let symbol_to_ident = function
-    | S s -> Ident.id_fresh s
-    | Sprover s -> Ident.id_fresh s
-
-  (* let identifier_to_ident = function
-    | Isymbol s -> symbol_to_ident s
-    | Iindexedsymbol (s, _) -> symbol_to_ident s *)
-
   let rec term_to_term env t =
     match t with
     | Tconst c -> constant_to_term env c
@@ -970,6 +971,7 @@ module FromModelToTerm = struct
     | Tarray (s1, s2, a) -> array_to_term env s1 s2 a
     | Tasarray t -> asarray_to_term env t
     | Tlet (bindings, t) -> let_to_term env bindings t
+    | Tforall (bindings, t) -> forall_to_term env bindings t
     | Tunparsed _ -> error "Could not interpret term %a@." print_term t
 
   and apply_to_term env qid ts =
@@ -1112,17 +1114,36 @@ module FromModelToTerm = struct
       | _ -> error "The function %s cannot be converted into an array type@." n
     end
     | _ -> error "Cannot interpret the 'as-array' term"
+
   and let_to_term env bindings t =
-    let (t, t_concrete) = term_to_term env t in
-    let add_to_concrete_let v_concrete t_concrete = function
-      | (Let (l, b)) -> Let (((v_concrete, t_concrete) :: l), b)
-      | other -> Let ([v_concrete, t_concrete], other) in
-    List.fold_left (fun (t, t_concrete) (sym, tt) ->
+    (* Recursively consume let bindings *)
+    match bindings with
+    | [] -> term_to_term env t
+    | (sym,tt)::bindings -> 
       let body, body_concrete = term_to_term env tt in
-      let vs = create_vsymbol (symbol_to_ident sym) (Option.get body.t_ty) in
-      t_let t (t_close_bound vs body), add_to_concrete_let vs.vs_name.Ident.id_string body_concrete t_concrete)
-      (* | _ -> error "Could not interpret let bindings %a@." print_bindings bindings *)
-    (t, t_concrete) bindings
+      match sym with | S str | Sprover str ->
+      let vs = create_vsymbol (Ident.id_fresh str) (Option.get body.t_ty)
+      in
+      env.bound_vars <- Mstr.add str vs env.bound_vars;
+      let (t, t_concrete) = let_to_term env bindings t in
+      let add_to_concrete_let v_concrete t_concrete = function
+        | (Let (l, b)) -> Let (((v_concrete, t_concrete) :: l), b)
+        | other -> Let ([v_concrete, t_concrete], other) in
+      t_let t (t_close_bound vs body), add_to_concrete_let vs.vs_name.Ident.id_string body_concrete t_concrete
+  and forall_to_term env bindings t =
+    match bindings with
+    | [] -> term_to_term env t
+    | (sym,sort)::bindings -> 
+      match sym with | S str | Sprover str ->
+      let vs = create_vsymbol (Ident.id_fresh str) (smt_sort_to_ty env sort)
+      in
+      env.bound_vars <- Mstr.add str vs env.bound_vars;
+      let (t, t_concrete) = forall_to_term env bindings t
+      in
+      let add_to_concrete_forall v_concrete = function
+        | Quant (Forall, l, b) -> Quant (Forall, (v_concrete :: l), b)
+        | other -> Quant (Forall, [v_concrete], other) in
+      t_forall_close [vs] [] t, add_to_concrete_forall vs.vs_name.Ident.id_string t_concrete
 
   (*  Interpreting function definitions from the SMT model to [t',t'_concrete].
       - [t'] is a Term.term
@@ -1199,15 +1220,20 @@ module FromModelToTerm = struct
     Debug.dprintf debug "-----------------------------@.";
     Debug.dprintf debug "[interpret_fun_def_to_term] fun_def = %a@."
       print_function_def (args, res, body);
-    env.bound_vars <- Mstr.empty;
-    List.iter
-      (fun (symbol, sort) ->
+      (* env.bound_vars <- Mstr.empty;
+      List.iter (fun (symbol, sort) -> *)
+    let bound_vars = List.fold_left (fun bound_vars (symbol, sort) ->
         match symbol with
         | S str | Sprover str ->
             let fresh_str = Ident.id_fresh str in
             let vs = create_vsymbol fresh_str (smt_sort_to_ty env sort) in
-            env.bound_vars <- Mstr.add str vs env.bound_vars)
-      args;
+            Mstr.add str vs bound_vars)
+            (* env.bound_vars <- Mstr.add str vs env.bound_vars) *)
+      Mstr.empty (* I don't know why this is an empty map and not env.bound_vars, but it was like this before *)
+      (* env.bound_vars *)
+      args
+    in
+    env.bound_vars <- bound_vars;
     if (Debug.test_flag debug) then
       Mstr.iter
         (fun key vs ->

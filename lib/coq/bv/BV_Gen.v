@@ -964,6 +964,20 @@ Lemma mod1_out : forall x y, 0 <= x < y -> mod1 x y = x.
   rewrite Div_inf; lia.
 Qed.
 
+Lemma mod1_next_out : forall x y, 0 < y <= x /\ x < y+y -> mod1 x y = x - y.
+  intros; unfold mod1.
+  assert (div x y = 1).
+  apply Div_unique; lia.
+  lia.
+Qed.
+
+Lemma mod1_prev_out : forall x y, 0 < y /\ -y <= x < 0 -> mod1 x y = x + y.
+  intros; unfold mod1.
+  assert (div x y = -1).
+  apply Div_unique; lia.
+  lia.
+Qed.
+
 Lemma mod_mod_mult: forall a b c, b > 0 -> c > 0 -> ((a mod (c * b)) mod b) = a mod b.
   intros.
   rewrite Z.mul_comm.
@@ -1207,6 +1221,8 @@ Lemma max_int_S : (two_power_size = max_int + 1)%Z.
   rewrite max_int_val; auto with zarith.
 Qed.
 
+
+
 (* Why3 goal *)
 Definition of_int : Numbers.BinNums.Z -> t.
   exact (fun x => nat_to_bvec size_nat (Z.to_nat x)).
@@ -1261,6 +1277,31 @@ Qed.
 (* Why3 assumption *)
 Definition uint_in_range (i:Numbers.BinNums.Z) : Prop :=
   (0%Z <= i)%Z /\ (i <= max_int)%Z.
+
+Lemma in_range_1 : uint_in_range 1.
+  split; auto with zarith.
+  change (Z.succ 0 <= max_int)%Z; apply Zlt_le_succ.
+  unfold max_int, size, size.
+  apply Zlt_succ_pred.
+  apply Z.le_lt_trans with (m := Z.of_nat (S last_bit)).
+  rewrite Nat2Z.inj_succ; auto with zarith.
+  apply id_lt_pow2.
+Qed.
+
+Lemma two_power_size_bound: 1 < two_power_size.
+  rewrite max_int_S, Z.add_1_r.
+  apply Zle_lt_succ, in_range_1.
+Qed.
+
+Lemma in_range_1' : 0 <= 1 < two_power_size.
+  split; auto with zarith.
+  now apply two_power_size_bound.
+Qed.
+
+Lemma max_int_neq_1 : max_int + 1 <> 0.
+  intro; symmetry in H; revert H.
+  apply Z.lt_neq, Zle_lt_succ, max_int_nat.
+Qed.
 
 (* Why3 goal *)
 Lemma to_uint_bounds :
@@ -1686,6 +1727,25 @@ Lemma to_uint_add_bounded :
 Qed.
 
 (* Why3 goal *)
+Lemma to_uint_add_overflow :
+  forall (v1:t) (v2:t),
+  (two_power_size <= ((to_uint v1) + (to_uint v2))%Z)%Z ->
+  ((to_uint (add v1 v2)) =
+   (((to_uint v1) + (to_uint v2))%Z - two_power_size)%Z).
+Proof.
+intros v1 v2 h1.
+rewrite <-(mod1_next_out (to_uint v1 + to_uint v2) two_power_size).
+apply to_uint_add.
+split.
+split.
+generalize two_power_size_bound; lia.
+trivial.
+generalize (to_uint_bounds v1).
+generalize (to_uint_bounds v2).
+lia.
+Qed.
+
+(* Why3 goal *)
 Definition sub : t -> t -> t.
   exact (fun v v' => of_int (mod1 (to_uint v - to_uint v') two_power_size)).
 Defined.
@@ -1702,13 +1762,32 @@ Qed.
 
 (* Why3 goal *)
 Lemma to_uint_sub_bounded :
-  forall (v1:t) (v2:t),
-  (0%Z <= ((to_uint v1) - (to_uint v2))%Z)%Z /\
-  (((to_uint v1) - (to_uint v2))%Z < two_power_size)%Z ->
+  forall (v1:t) (v2:t), (0%Z <= ((to_uint v1) - (to_uint v2))%Z)%Z ->
   ((to_uint (sub v1 v2)) = ((to_uint v1) - (to_uint v2))%Z).
-  intros v1 v2 (h1,h2).
-  rewrite <-(mod1_out (to_uint v1 - to_uint v2) two_power_size) by auto.
+  intros v1 v2 h1.
+  rewrite <- (mod1_out (to_uint v1 - to_uint v2) two_power_size).
   apply to_uint_sub.
+  split.
+  trivial.
+  generalize (to_uint_bounds v1).
+  generalize (to_uint_bounds v2).
+  lia.
+Qed.
+
+(* Why3 goal *)
+Lemma to_uint_sub_overflow :
+  forall (v1:t) (v2:t), (((to_uint v1) - (to_uint v2))%Z < 0%Z)%Z ->
+  ((to_uint (sub v1 v2)) =
+   (((to_uint v1) - (to_uint v2))%Z + two_power_size)%Z).
+Proof.
+intros v1 v2 h1.
+rewrite <- (mod1_prev_out (to_uint v1 - to_uint v2) two_power_size).
+apply to_uint_sub.
+split.
+generalize two_power_size_bound; lia.
+generalize (to_uint_bounds v1).
+generalize (to_uint_bounds v2).
+lia.
 Qed.
 
 (* Why3 goal *)
@@ -1724,6 +1803,31 @@ Lemma to_uint_neg :
   intros v.
   apply to_uint_of_int, mod1_in_range2.
 Qed.
+
+(* Why3 goal *)
+Lemma to_uint_neg_no_mod :
+  forall (v:t),
+  ((v = zeros) -> ((to_uint (neg v)) = 0%Z)) /\
+  (~ (v = zeros) -> ((to_uint (neg v)) = (two_power_size - (to_uint v))%Z)).
+Proof.
+intros v.
+generalize (two_power_size_bound); intro h0.
+split; intro h.
+ - subst v.
+   rewrite to_uint_neg.
+   rewrite to_uint_zeros.
+   replace (-0) with 0 by lia.
+   apply Mod_0.
+   lia.
+ - rewrite to_uint_neg.
+   rewrite (mod1_prev_out (- to_uint v) two_power_size).
+   lia.
+   split.
+   lia.
+   generalize (to_uint_bounds v); intro.
+   split.
+   lia.
+Admitted.
 
 (* Why3 goal *)
 Definition mul : t -> t -> t.
@@ -2006,27 +2110,6 @@ Definition eq_sub (a:t) (b:t) (i:Numbers.BinNums.Z) (n:Numbers.BinNums.Z) :
     Prop :=
   forall (j:Numbers.BinNums.Z), (i <= j)%Z /\ (j < (i + n)%Z)%Z ->
   ((nth a j) = (nth b j)).
-
-Lemma in_range_1 : uint_in_range 1.
-  split; auto with zarith.
-  change (Z.succ 0 <= max_int)%Z; apply Zlt_le_succ.
-  unfold max_int, size, size.
-  apply Zlt_succ_pred.
-  apply Z.le_lt_trans with (m := Z.of_nat (S last_bit)).
-  rewrite Nat2Z.inj_succ; auto with zarith.
-  apply id_lt_pow2.
-Qed.
-
-Lemma in_range_1' : 0 <= 1 < two_power_size.
-  split; auto with zarith.
-  rewrite max_int_S, Z.add_1_r.
-  apply Zle_lt_succ, in_range_1.
-Qed.
-
-Lemma max_int_neq_1 : max_int + 1 <> 0.
-  intro; symmetry in H; revert H.
-  apply Z.lt_neq, Zle_lt_succ, max_int_nat.
-Qed.
 
 (* mask (S n) = lsl (mask n) 1 + 1 *)
 Lemma mask_succ :

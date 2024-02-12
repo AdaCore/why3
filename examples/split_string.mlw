@@ -122,6 +122,7 @@ module SplitStringOCaml
   use seq.Mem
   use mach.int.Int63
   use mach.peano.Peano
+  use mach.peano.Int63
   use queue.Queue as Q
 
   (** Characters and strings *)
@@ -162,7 +163,7 @@ module SplitStringOCaml
     requires { [@expl:index in string bounds] 0 <= i < length s }
     ensures  { result = s[i] }
 
-  let split_string (s: string_) (sep: char) (limit: Peano.t) : (ss: Q.t string_)
+  let split_string (s: string_) (sep: char) (limit: int63) : (ss: Q.t string_)
     requires { limit = -1 || limit >= 1 }
     ensures  { length ss >= 1 }
     ensures  { limit = -1 || length ss <= limit }
@@ -170,7 +171,7 @@ module SplitStringOCaml
     ensures  { length ss = limit || notin sep ss[length ss - 1] }
     ensures  { concat ss sep == s }
   = let ref ss = Q.create () in
-    if Peano.eq limit Peano.one then (Q.push s ss; return ss);
+    if limit = (1:int63) then (Q.push s ss; return ss);
     let ref i = 0: int63 in
     let ref b = 0: int63 in
     let ghost ref suffix = s in
@@ -185,7 +186,7 @@ module SplitStringOCaml
       if s[i] = sep then (
         Q.push (sub s b i) ss;
         assert { s[b..] == s[b..i] ++ cons sep s[i+1..] };
-        if Peano.eq (Q.length ss) (Peano.pred limit) then
+        if to_int63 (Q.length ss) = limit - (1:int63) then
           (Q.push (sub s (i+1) (length s)) ss; return ss);
         b <- i+1;
         suffix <- sub s b (length s)

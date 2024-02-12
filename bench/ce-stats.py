@@ -42,7 +42,7 @@ list_of_verdicts = [
     "SW",
 ]
 
-rx_filepath = re.compile(r"bench/check-ce/oracles/(?P<f>[a-zA-Z0-9-_]*)_(?P<p>[A-Z0-9,.]*)_[W|S]P.oracle")
+rx_filepath = re.compile(r"bench/check-ce/oracles/(?P<f>[a-zA-Z0-9-_]*)_(?P<p>[a-zA-Z0-9,.\-]*)_[W|S]P.oracle")
 
 def _parse_line(line,rx):
     match = rx.search(line)
@@ -69,6 +69,7 @@ def _add_reason(res, reason, rx_dict):
 
 
 def parse_file(filepath, data, date):
+    print("entering parse_file with filepath=" + filepath)
     with open(filepath, "r") as file_object:
         filepath = _parse_line(filepath,rx_filepath)
         if filepath is not None:

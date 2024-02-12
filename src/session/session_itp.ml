@@ -1566,7 +1566,10 @@ let () = Exn_printer.register
 let apply_trans_to_goal ~allow_no_effect s env name args id =
   let task,table = get_task_name_table s id in
   let lang = (get_encapsulating_file s (APn id)).file_format in
-  let subtasks = Trans.apply_transform_args name env args table lang task in
+  let stat_name = "gnatwhy3.transformations." ^ name in
+  let subtasks =
+    Debug.Stats.record_timing stat_name
+      (fun () -> Trans.apply_transform_args name env args table lang task) in
   (* If any generated task is equal to the former task, then we made no
      progress because we need to prove more lemmas than before *)
   match subtasks with
@@ -1574,7 +1577,6 @@ let apply_trans_to_goal ~allow_no_effect s env name args id =
      Debug.dprintf debug "[apply_trans_to_goal] apply_transform made no progress@.";
      raise NoProgress
   | _ -> subtasks
-
 
 let add_registered_transformation s env old_tr goal_id =
   let goal = get_proofNode s goal_id in

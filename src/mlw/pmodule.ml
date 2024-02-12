@@ -1145,10 +1145,12 @@ let warn_constructors_mismatch loc d d' =
   if d.itd_its.its_ts.ts_name.id_string = d'.itd_its.its_ts.ts_name.id_string
   then List.iter2 warn_cons d.itd_constructors d'.itd_constructors
 
-let save_special_ls cl d d' = match d.d_node, d'.d_node with
+let save_special_ls cl d d' =
+  match d.d_node, d'.d_node with
   | Dparam ls, Dparam ls' | Dlogic [ls,_], Dlogic [ls',_] ->
       cl.ls_table <- Mls.add ls ls' cl.ls_table;
   | Dtype _, Dtype _ -> ()
+  | Dprop _, Dprop _ -> ()
   | _ -> assert false
 
 let clone_type_decl loc inst cl tdl decl kn =

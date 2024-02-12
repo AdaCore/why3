@@ -515,7 +515,6 @@ let timeout_handler () =
   if !need_update then update_observer ();
   true
 
-
 let idle_handler () =
 
   (* if the number of prover tasks is less than S.multiplier times the maximum

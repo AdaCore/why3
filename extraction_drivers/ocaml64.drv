@@ -82,16 +82,6 @@ module ref.Refint
   syntax val ( *= ) "(fun r v -> r := Z.mul !r v) %1 %2" prec 4 3 3
 end
 
-module null.Null
-
-  syntax type t           "%1"
-  syntax val  create_null "(fun () -> Obj.magic (ref 0))"
-  syntax val  eq_null     "(==)"
-  syntax val  create      "(fun x -> x)"
-  syntax val  get         "(fun x -> x)"
-
-end
-
 module int.Int
   syntax val zero "Z.zero"
   syntax val one  "Z.one"
