@@ -203,22 +203,26 @@ let add_meta task t al = new_meta task t (create_meta t al)
 
 (* split theory *)
 
-let split_theory th names init =
-  let facts = ref Spr.empty in
-  let named pr = match names with Some s -> Spr.mem pr s | _ -> true in
-  let split (task, acc) td = flat_tdecl task td, match td.td_node with
+let theory_goals th names =
+  if Opt.fold (fun _ s -> Spr.is_empty s) false names then Spr.empty else
+  let named pr = match names with Some gs -> Spr.mem pr gs | _ -> true in
+  let collect prs td = match td.td_node with
     | Clone (th, sm) -> (* do not reprove instantiations of lemmas *)
-        Mpr.iter (fun o n -> match find_prop_decl th.th_known o with
-          | (Plemma|Pgoal), _ -> facts := Spr.add n !facts
-          | _ -> ()) sm.sm_pr;
-        acc
-    | Decl { d_node = Dprop ((Plemma|Pgoal),pr,f) } when named pr ->
-        (pr, add_prop_decl task Pgoal pr f) :: acc
+        Mpr.fold (fun o n prs -> match find_prop_decl th.th_known o with
+          | (Plemma|Pgoal),_ -> Spr.remove n prs | _ -> prs) sm.sm_pr prs
+    | Decl { d_node = Dprop ((Plemma|Pgoal),pr,_) } when named pr ->
+        Spr.add pr prs
+    | _ -> prs in
+  List.fold_left collect Spr.empty th.th_decls
+
+let split_theory th names init =
+  let prs = theory_goals th names in
+  if Spr.is_empty prs then [] else
+  let split (task, acc) td = flat_tdecl task td, match td.td_node with
+    | Decl { d_node = Dprop ((Plemma|Pgoal),pr,f) } when Spr.mem pr prs ->
+        add_prop_decl task Pgoal pr f :: acc
     | _ -> acc in
-  let _, tasks = List.fold_left split (init, []) th.th_decls in
-  let filter acc (pr, task) =
-    if Spr.mem pr !facts then acc else task :: acc in
-  List.fold_left filter [] tasks
+  List.rev (snd (List.fold_left split (init, []) th.th_decls))
 
 (* Generic utilities *)
 
