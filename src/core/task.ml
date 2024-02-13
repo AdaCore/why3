@@ -30,9 +30,11 @@ module Hstds = Hashcons.Make (struct
   let tag n s = { s with tds_tag = Weakhtbl.create_tag n }
 end)
 
+let add_hash td acc = ((td_hash td + 1) * acc) mod 1000000007
+
 let mk_tds s = Hstds.hashcons {
   tds_set = s;
-  tds_xor = Stdecl.fold (fun td acc -> td_hash td lxor acc) s 0;
+  tds_xor = Stdecl.fold add_hash s 1;
   tds_tag = Weakhtbl.dummy_tag;
 }
 
@@ -43,7 +45,7 @@ let tds_add td s =
   if Stdecl.mem td s.tds_set then s else
   Hstds.hashcons {
     tds_set = Stdecl.add td s.tds_set;
-    tds_xor = td_hash td lxor s.tds_xor;
+    tds_xor = add_hash td s.tds_xor;
     tds_tag = Weakhtbl.dummy_tag;
   }
 
