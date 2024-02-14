@@ -99,3 +99,60 @@ struct
   module H = Exthtbl.Make(T)
   module W = Weakhtbl.Make(X)
 end
+
+module MakeSCC (H : Exthtbl.S) =
+struct
+  type index = int
+  type vertex = H.key
+  type 'a source = 'a -> vertex
+  type 'a visit = index -> 'a -> index
+  type 'a adjacency = vertex visit -> 'a visit
+
+  type 'a store = {
+    mutable index : int;
+    element : 'a;
+  }
+
+  let scc source adjacency el =
+    let ht = H.create 7 in
+    let init e = H.add ht (source e) {index = 0; element = e} in
+    List.iter init el;
+
+    let tick = ref 0 in
+    let sccl = ref [] in
+    let path = Stack.create () in
+
+    let mark st =
+      tick := !tick + 2;
+      st.index <- !tick;
+      !tick in
+
+    let pop_single v =
+      H.remove ht v;
+      sccl := (false, [Stack.pop path]) :: !sccl in
+
+    let rec pop_group v scc =
+      let e = Stack.pop path in
+      let scc = e :: scc in
+      let w = source e in
+      H.remove ht w;
+      if w = v then scc else pop_group v scc in
+
+    let pop_group v =
+      sccl := (true, pop_group v []) :: !sccl in
+
+    let rec visit o v = match H.find ht v with
+      | {index = 0; element = e} as st ->
+          Stack.push e path;
+          let i = mark st in
+          let j = adjacency visit (i + 1) e in
+          if j = i + 1 then pop_single v else
+          if j = i then pop_group v;
+          Stdlib.min o j
+      | st -> Stdlib.min o st.index
+      | exception Not_found -> o in
+
+    let visit e = ignore (visit 0 (source e)) in
+    List.iter visit el;
+    !sccl
+end
