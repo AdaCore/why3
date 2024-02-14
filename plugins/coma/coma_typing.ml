@@ -97,6 +97,22 @@ and check_params ~loc l r =
   List.map (fun e -> )
     pl *)
 
+module SCC = MakeSCC(Hid)
+
+let defn_fold fn acc (_,_,_,d) =
+  (* we assume no collisions *)
+  let rec inspect acc = function
+    | Esym h -> fn acc h.hs_name
+    | Edef (e,_,dl) ->
+        let check_def acc (_,_,_,d) = inspect acc d in
+        List.fold_left check_def (inspect acc e) dl
+    | Eapp (e, Ac d) -> inspect (inspect acc d) e
+    | Elet (e,_) | Ecut (_,e) | Ebox e
+    | Eset (e,_) | Elam (_,e) | Ewox e
+    | Eapp (e,_) -> inspect acc e
+    | Eany -> acc in
+  inspect acc d
+
 let rec type_expr tuc ctx { pexpr_desc=d; pexpr_loc=loc } =
   match d with
   | PEbox e     -> let e = type_prog ~loc tuc ctx e in Ebox e, []
@@ -173,7 +189,11 @@ let rec type_expr tuc ctx { pexpr_desc=d; pexpr_loc=loc } =
   | PEdef (e, notrec, d) ->
       let ctx, dl = type_defn_list tuc ctx notrec d in
       let e = type_prog ~loc:(e.pexpr_loc) tuc ctx e in
-      Edef (e, notrec, dl), []
+      if notrec then Edef (e, notrec, dl), [] else
+      let defn_head (h,_,_,_) = h.hs_name in
+      let dll = SCC.scc defn_head defn_fold dl in
+      let add_def e (r,dl) = Edef (e, not r, dl) in
+      List.fold_left add_def e dll, []
 
 and type_prog ?loc tuc ctx d =
   let e, te = type_expr tuc ctx d in
