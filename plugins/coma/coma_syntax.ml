@@ -77,6 +77,8 @@ type hsymbol = {
 
 let create_hsymbol id = { hs_name = Ident.id_register id }
 
+let hs_to_merge = (Ident.Wid.create 256 : unit Ident.Wid.t)
+
 type param =
   | Pt of tvsymbol
   | Pv of vsymbol
