@@ -100,59 +100,39 @@ struct
   module W = Weakhtbl.Make(X)
 end
 
+let fold_of_iter iter f k e =
+  let r = ref k in iter (fun v -> r := f !r v) e; !r
+
 module MakeSCC (H : Exthtbl.S) =
 struct
-  type index = int
   type vertex = H.key
   type 'a source = 'a -> vertex
-  type 'a visit = index -> 'a -> index
-  type 'a adjacency = vertex visit -> 'a visit
-
-  type 'a store = {
-    mutable index : int;
-    element : 'a;
-  }
+  type 'a adjacency = (vertex -> unit) -> 'a -> unit
+  type 'a register = { elt: 'a; mutable index: int }
 
   let scc source adjacency el =
+    let st = Stack.create () in
     let ht = H.create 7 in
-    let init e = H.add ht (source e) {index = 0; element = e} in
-    List.iter init el;
+    let cl = ref [] in
 
-    let tick = ref 0 in
-    let sccl = ref [] in
-    let path = Stack.create () in
-
-    let mark st =
-      tick := !tick + 2;
-      st.index <- !tick;
-      !tick in
-
-    let pop_single v =
-      H.remove ht v;
-      sccl := (false, [Stack.pop path]) :: !sccl in
-
-    let rec pop_group v scc =
-      let e = Stack.pop path in
+    let rec evict v scc =
+      let e = Stack.pop st in
       let scc = e :: scc in
       let w = source e in
       H.remove ht w;
-      if w = v then scc else pop_group v scc in
-
-    let pop_group v =
-      sccl := (true, pop_group v []) :: !sccl in
+      if w = v then scc else evict v scc in
 
     let rec visit o v = match H.find ht v with
-      | {index = 0; element = e} as st ->
-          Stack.push e path;
-          let i = mark st in
-          let j = adjacency visit (i + 1) e in
-          if j = i + 1 then pop_single v else
-          if j = i then pop_group v;
+      | {elt = e; index = 0} as r ->
+          Stack.push e st;
+          let i = r.index <- 2 * Stack.length st; r.index in
+          let j = fold_of_iter adjacency visit (i + 1) e in
+          if j >= i then cl := (j = i, evict v []) :: !cl;
           Stdlib.min o j
-      | st -> Stdlib.min o st.index
+      | r -> Stdlib.min o r.index
       | exception Not_found -> o in
 
-    let visit e = ignore (visit 0 (source e)) in
-    List.iter visit el;
-    !sccl
+    List.iter (fun e -> H.add ht (source e) {elt = e; index = 0}) el;
+    List.iter (fun e -> ignore (visit 0 (source e))) el;
+    !cl
 end

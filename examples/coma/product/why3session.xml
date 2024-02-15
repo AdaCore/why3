@@ -2,34 +2,43 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Z3" version="4.11.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.9.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.4.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="coma" proved="true">
 <path name=".."/><path name="product.coma"/>
 <theory name="Coma" proved="true">
  <goal name="vc_halt" proved="true">
- <proof prover="1"><result status="valid" time="0.014280" steps="0"/></proof>
+ <proof prover="4"><result status="valid" time="0.006921" steps="0"/></proof>
  </goal>
  <goal name="vc_if" proved="true">
- <proof prover="1"><result status="valid" time="0.013034" steps="0"/></proof>
+ <proof prover="4"><result status="valid" time="0.004721" steps="0"/></proof>
  </goal>
  <goal name="vc_product" proved="true">
+ <proof prover="2"><result status="valid" time="0.017303" steps="13905"/></proof>
+ <proof prover="3"><result status="valid" time="0.161912" steps="19583"/></proof>
  <transf name="split_vc" proved="true" >
   <goal name="vc_product.0" proved="true">
-  <proof prover="1"><result status="valid" time="0.014532" steps="2"/></proof>
+  <proof prover="4"><result status="valid" time="0.007063" steps="2"/></proof>
   </goal>
   <goal name="vc_product.1" proved="true">
-  <proof prover="1"><result status="valid" time="0.012065" steps="2"/></proof>
+  <proof prover="4"><result status="valid" time="0.004193" steps="2"/></proof>
   </goal>
   <goal name="vc_product.2" proved="true">
-  <proof prover="1"><result status="valid" time="0.013544" steps="144"/></proof>
+  <proof prover="4"><result status="valid" time="0.015190" steps="153"/></proof>
   </goal>
   <goal name="vc_product.3" proved="true">
-  <proof prover="0"><result status="valid" time="0.010330" steps="17351"/></proof>
-  <proof prover="1"><result status="timeout" time="1.000000"/></proof>
+  <proof prover="4"><result status="valid" time="0.023492" steps="183"/></proof>
   </goal>
   <goal name="vc_product.4" proved="true">
-  <proof prover="1"><result status="valid" time="0.005882" steps="23"/></proof>
+  <proof prover="4"><result status="valid" time="0.013158" steps="135"/></proof>
+  </goal>
+  <goal name="vc_product.5" proved="true">
+  <proof prover="2"><result status="valid" time="0.020465" steps="12265"/></proof>
+  <proof prover="3"><result status="valid" time="0.123231" steps="14927"/></proof>
+  </goal>
+  <goal name="vc_product.6" proved="true">
+  <proof prover="4"><result status="valid" time="0.003952" steps="23"/></proof>
   </goal>
  </transf>
  </goal>

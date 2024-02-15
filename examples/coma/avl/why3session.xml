@@ -2,50 +2,312 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Z3" version="4.11.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.4.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="coma" proved="true">
 <path name=".."/><path name="avl.coma"/>
 <theory name="Coma" proved="true">
  <goal name="vc_fail" proved="true">
- <proof prover="1"><result status="valid" time="0.013116" steps="5"/></proof>
+ <proof prover="3"><result status="valid" time="0.007233" steps="5"/></proof>
  </goal>
  <goal name="vc_if" proved="true">
- <proof prover="1"><result status="valid" time="0.011489" steps="5"/></proof>
+ <proof prover="3"><result status="valid" time="0.003216" steps="5"/></proof>
  </goal>
  <goal name="vc_unTree" proved="true">
- <proof prover="1"><result status="valid" time="0.009641" steps="5"/></proof>
+ <proof prover="3"><result status="valid" time="0.003583" steps="5"/></proof>
  </goal>
  <goal name="vc_rotate_left" proved="true">
- <proof prover="1"><result status="valid" time="0.009100" steps="5"/></proof>
+ <proof prover="3"><result status="valid" time="0.006824" steps="5"/></proof>
  </goal>
  <goal name="vc_rotate_right" proved="true">
- <proof prover="1"><result status="valid" time="0.008062" steps="5"/></proof>
+ <proof prover="3"><result status="valid" time="0.004847" steps="5"/></proof>
  </goal>
  <goal name="vc_join_right" proved="true">
- <proof prover="1"><result status="valid" time="0.007523" steps="5"/></proof>
+ <proof prover="3"><result status="valid" time="0.009271" steps="5"/></proof>
  </goal>
  <goal name="vc_join_left" proved="true">
- <proof prover="1"><result status="valid" time="0.004666" steps="5"/></proof>
+ <proof prover="3"><result status="valid" time="0.004264" steps="5"/></proof>
  </goal>
  <goal name="vc_join" proved="true">
- <proof prover="0"><result status="valid" time="0.037827" steps="164354"/></proof>
- <proof prover="1"><result status="timeout" time="1.000000"/></proof>
+ <proof prover="2"><result status="valid" time="0.127629" steps="17166"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="vc_join.0" proved="true">
+  <proof prover="3"><result status="valid" time="0.008931" steps="28"/></proof>
+  </goal>
+  <goal name="vc_join.1" proved="true">
+  <proof prover="3"><result status="valid" time="0.010426" steps="28"/></proof>
+  </goal>
+  <goal name="vc_join.2" proved="true">
+  <proof prover="3"><result status="valid" time="0.007879" steps="28"/></proof>
+  </goal>
+  <goal name="vc_join.3" proved="true">
+  <proof prover="3"><result status="valid" time="0.005495" steps="28"/></proof>
+  </goal>
+  <goal name="vc_join.4" proved="true">
+  <proof prover="3"><result status="valid" time="0.022205" steps="154"/></proof>
+  </goal>
+  <goal name="vc_join.5" proved="true">
+  <proof prover="3"><result status="valid" time="0.008445" steps="34"/></proof>
+  </goal>
+  <goal name="vc_join.6" proved="true">
+  <proof prover="3"><result status="valid" time="0.003984" steps="34"/></proof>
+  </goal>
+  <goal name="vc_join.7" proved="true">
+  <proof prover="3"><result status="valid" time="0.014267" steps="39"/></proof>
+  </goal>
+  <goal name="vc_join.8" proved="true">
+  <proof prover="3"><result status="valid" time="0.004018" steps="30"/></proof>
+  </goal>
+  <goal name="vc_join.9" proved="true">
+  <proof prover="3"><result status="valid" time="0.005250" steps="30"/></proof>
+  </goal>
+  <goal name="vc_join.10" proved="true">
+  <proof prover="3"><result status="valid" time="0.005727" steps="30"/></proof>
+  </goal>
+  <goal name="vc_join.11" proved="true">
+  <proof prover="3"><result status="valid" time="0.004628" steps="30"/></proof>
+  </goal>
+  <goal name="vc_join.12" proved="true">
+  <proof prover="3"><result status="valid" time="0.028910" steps="165"/></proof>
+  </goal>
+  <goal name="vc_join.13" proved="true">
+  <proof prover="3"><result status="valid" time="0.004136" steps="36"/></proof>
+  </goal>
+  <goal name="vc_join.14" proved="true">
+  <proof prover="3"><result status="valid" time="0.012236" steps="36"/></proof>
+  </goal>
+  <goal name="vc_join.15" proved="true">
+  <proof prover="3"><result status="valid" time="0.010307" steps="41"/></proof>
+  </goal>
+  <goal name="vc_join.16" proved="true">
+  <proof prover="2"><result status="valid" time="0.067443" steps="7574"/></proof>
+  </goal>
+  <goal name="vc_join.17" proved="true">
+  <proof prover="3"><result status="valid" time="0.007900" steps="54"/></proof>
+  </goal>
+  <goal name="vc_join.18" proved="true">
+  <proof prover="3"><result status="valid" time="0.014710" steps="105"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="vc_split_last" proved="true">
- <proof prover="1"><result status="valid" time="0.463259" steps="4969"/></proof>
+ <proof prover="2"><result status="valid" time="0.220519" steps="31033"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="vc_split_last.0" proved="true">
+  <proof prover="3"><result status="valid" time="0.008701" steps="35"/></proof>
+  </goal>
+  <goal name="vc_split_last.1" proved="true">
+  <proof prover="3"><result status="valid" time="0.020700" steps="205"/></proof>
+  </goal>
+  <goal name="vc_split_last.2" proved="true">
+  <proof prover="3"><result status="valid" time="0.008722" steps="36"/></proof>
+  </goal>
+  <goal name="vc_split_last.3" proved="true">
+  <proof prover="3"><result status="valid" time="0.013328" steps="28"/></proof>
+  </goal>
+  <goal name="vc_split_last.4" proved="true">
+  <proof prover="3"><result status="valid" time="0.007427" steps="32"/></proof>
+  </goal>
+  <goal name="vc_split_last.5" proved="true">
+  <proof prover="3"><result status="valid" time="0.024175" steps="209"/></proof>
+  </goal>
+  <goal name="vc_split_last.6" proved="true">
+  <proof prover="3"><result status="valid" time="0.003818" steps="38"/></proof>
+  </goal>
+  <goal name="vc_split_last.7" proved="true">
+  <proof prover="3"><result status="valid" time="0.007874" steps="40"/></proof>
+  </goal>
+  <goal name="vc_split_last.8" proved="true">
+  <proof prover="3"><result status="valid" time="0.008270" steps="36"/></proof>
+  </goal>
+  <goal name="vc_split_last.9" proved="true">
+  <proof prover="3"><result status="valid" time="0.213724" steps="2806"/></proof>
+  </goal>
+  <goal name="vc_split_last.10" proved="true">
+  <proof prover="3"><result status="valid" time="0.051480" steps="585"/></proof>
+  </goal>
+  <goal name="vc_split_last.11" proved="true">
+  <proof prover="3"><result status="valid" time="0.007217" steps="20"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="vc_join2" proved="true">
- <proof prover="1"><result status="valid" time="0.004593" steps="5"/></proof>
+ <proof prover="3"><result status="valid" time="0.000001" steps="5"/></proof>
  </goal>
  <goal name="vc_split" proved="true">
- <proof prover="1"><result status="valid" time="0.292675" steps="4302"/></proof>
+ <proof prover="2"><result status="valid" time="0.730183" steps="102985"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="vc_split.0" proved="true">
+  <proof prover="3"><result status="valid" time="0.004445" steps="21"/></proof>
+  </goal>
+  <goal name="vc_split.1" proved="true">
+  <proof prover="3"><result status="valid" time="0.004225" steps="27"/></proof>
+  </goal>
+  <goal name="vc_split.2" proved="true">
+  <proof prover="3"><result status="valid" time="0.006970" steps="34"/></proof>
+  </goal>
+  <goal name="vc_split.3" proved="true">
+  <proof prover="3"><result status="valid" time="0.012607" steps="36"/></proof>
+  </goal>
+  <goal name="vc_split.4" proved="true">
+  <proof prover="3"><result status="valid" time="0.008079" steps="85"/></proof>
+  </goal>
+  <goal name="vc_split.5" proved="true">
+  <proof prover="3"><result status="valid" time="0.010946" steps="28"/></proof>
+  </goal>
+  <goal name="vc_split.6" proved="true">
+  <proof prover="3"><result status="valid" time="0.026453" steps="220"/></proof>
+  </goal>
+  <goal name="vc_split.7" proved="true">
+  <proof prover="3"><result status="valid" time="0.007950" steps="43"/></proof>
+  </goal>
+  <goal name="vc_split.8" proved="true">
+  <proof prover="3"><result status="valid" time="0.012357" steps="48"/></proof>
+  </goal>
+  <goal name="vc_split.9" proved="true">
+  <proof prover="3"><result status="valid" time="0.008252" steps="50"/></proof>
+  </goal>
+  <goal name="vc_split.10" proved="true">
+  <proof prover="3"><result status="valid" time="0.005819" steps="46"/></proof>
+  </goal>
+  <goal name="vc_split.11" proved="true">
+  <proof prover="3"><result status="valid" time="0.006436" steps="46"/></proof>
+  </goal>
+  <goal name="vc_split.12" proved="true">
+  <proof prover="3"><result status="valid" time="0.008503" steps="46"/></proof>
+  </goal>
+  <goal name="vc_split.13" proved="true">
+  <proof prover="3"><result status="valid" time="0.018025" steps="222"/></proof>
+  </goal>
+  <goal name="vc_split.14" proved="true">
+  <proof prover="3"><result status="valid" time="0.018123" steps="88"/></proof>
+  </goal>
+  <goal name="vc_split.15" proved="true">
+  <proof prover="3"><result status="valid" time="0.010546" steps="37"/></proof>
+  </goal>
+  <goal name="vc_split.16" proved="true">
+  <proof prover="3"><result status="valid" time="0.005040" steps="37"/></proof>
+  </goal>
+  <goal name="vc_split.17" proved="true">
+  <proof prover="3"><result status="valid" time="0.009449" steps="41"/></proof>
+  </goal>
+  <goal name="vc_split.18" proved="true">
+  <proof prover="3"><result status="valid" time="0.009215" steps="41"/></proof>
+  </goal>
+  <goal name="vc_split.19" proved="true">
+  <proof prover="3"><result status="valid" time="0.007836" steps="30"/></proof>
+  </goal>
+  <goal name="vc_split.20" proved="true">
+  <proof prover="3"><result status="valid" time="0.007843" steps="30"/></proof>
+  </goal>
+  <goal name="vc_split.21" proved="true">
+  <proof prover="3"><result status="valid" time="0.019191" steps="90"/></proof>
+  </goal>
+  <goal name="vc_split.22" proved="true">
+  <proof prover="3"><result status="valid" time="0.024403" steps="205"/></proof>
+  </goal>
+  <goal name="vc_split.23" proved="true">
+  <proof prover="3"><result status="valid" time="0.018727" steps="114"/></proof>
+  </goal>
+  <goal name="vc_split.24" proved="true">
+  <proof prover="3"><result status="valid" time="0.009397" steps="28"/></proof>
+  </goal>
+  <goal name="vc_split.25" proved="true">
+  <proof prover="3"><result status="valid" time="0.016636" steps="41"/></proof>
+  </goal>
+  <goal name="vc_split.26" proved="true">
+  <proof prover="3"><result status="valid" time="0.028800" steps="221"/></proof>
+  </goal>
+  <goal name="vc_split.27" proved="true">
+  <proof prover="3"><result status="valid" time="0.009783" steps="48"/></proof>
+  </goal>
+  <goal name="vc_split.28" proved="true">
+  <proof prover="3"><result status="valid" time="0.016774" steps="50"/></proof>
+  </goal>
+  <goal name="vc_split.29" proved="true">
+  <proof prover="3"><result status="valid" time="0.006373" steps="46"/></proof>
+  </goal>
+  <goal name="vc_split.30" proved="true">
+  <proof prover="3"><result status="valid" time="0.004264" steps="46"/></proof>
+  </goal>
+  <goal name="vc_split.31" proved="true">
+  <proof prover="3"><result status="valid" time="0.028963" steps="223"/></proof>
+  </goal>
+  <goal name="vc_split.32" proved="true">
+  <proof prover="3"><result status="valid" time="0.009201" steps="48"/></proof>
+  </goal>
+  <goal name="vc_split.33" proved="true">
+  <proof prover="3"><result status="valid" time="0.019455" steps="88"/></proof>
+  </goal>
+  <goal name="vc_split.34" proved="true">
+  <proof prover="3"><result status="valid" time="0.007603" steps="36"/></proof>
+  </goal>
+  <goal name="vc_split.35" proved="true">
+  <proof prover="3"><result status="valid" time="0.007527" steps="38"/></proof>
+  </goal>
+  <goal name="vc_split.36" proved="true">
+  <proof prover="3"><result status="valid" time="0.011208" steps="41"/></proof>
+  </goal>
+  <goal name="vc_split.37" proved="true">
+  <proof prover="3"><result status="valid" time="0.007821" steps="41"/></proof>
+  </goal>
+  <goal name="vc_split.38" proved="true">
+  <proof prover="3"><result status="valid" time="0.008069" steps="30"/></proof>
+  </goal>
+  <goal name="vc_split.39" proved="true">
+  <proof prover="3"><result status="valid" time="0.003967" steps="30"/></proof>
+  </goal>
+  <goal name="vc_split.40" proved="true">
+  <proof prover="3"><result status="valid" time="0.019671" steps="140"/></proof>
+  </goal>
+  <goal name="vc_split.41" proved="true">
+  <proof prover="3"><result status="valid" time="0.007517" steps="92"/></proof>
+  </goal>
+  <goal name="vc_split.42" proved="true">
+  <proof prover="3"><result status="valid" time="0.008199" steps="114"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="vc_insert" proved="true">
- <proof prover="1"><result status="valid" time="0.009601" steps="140"/></proof>
+ <proof prover="3"><result status="valid" time="0.012958" steps="100"/></proof>
  </goal>
  <goal name="vc_delete" proved="true">
- <proof prover="1"><result status="valid" time="0.067191" steps="1516"/></proof>
+ <proof prover="2"><result status="valid" time="0.390365" steps="50075"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="vc_delete.0" proved="true">
+  <proof prover="3"><result status="valid" time="0.003864" steps="18"/></proof>
+  </goal>
+  <goal name="vc_delete.1" proved="true">
+  <proof prover="3"><result status="valid" time="0.007981" steps="27"/></proof>
+  </goal>
+  <goal name="vc_delete.2" proved="true">
+  <proof prover="3"><result status="valid" time="0.029707" steps="266"/></proof>
+  </goal>
+  <goal name="vc_delete.3" proved="true">
+  <proof prover="3"><result status="valid" time="0.004174" steps="23"/></proof>
+  </goal>
+  <goal name="vc_delete.4" proved="true">
+  <proof prover="3"><result status="valid" time="0.003944" steps="30"/></proof>
+  </goal>
+  <goal name="vc_delete.5" proved="true">
+  <proof prover="3"><result status="valid" time="0.190722" steps="2850"/></proof>
+  </goal>
+  <goal name="vc_delete.6" proved="true">
+  <proof prover="3"><result status="valid" time="0.009341" steps="36"/></proof>
+  </goal>
+  <goal name="vc_delete.7" proved="true">
+  <proof prover="3"><result status="valid" time="0.007577" steps="38"/></proof>
+  </goal>
+  <goal name="vc_delete.8" proved="true">
+  <proof prover="3"><result status="valid" time="0.012070" steps="36"/></proof>
+  </goal>
+  <goal name="vc_delete.9" proved="true">
+  <proof prover="3"><result status="valid" time="0.058091" steps="840"/></proof>
+  </goal>
+  <goal name="vc_delete.10" proved="true">
+  <proof prover="3"><result status="valid" time="0.003782" steps="20"/></proof>
+  </goal>
+ </transf>
  </goal>
 </theory>
 </file>

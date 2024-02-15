@@ -30,7 +30,7 @@ let debug_slow = Debug.register_info_flag "coma_no_merge"
 
 exception BadUndef of hsymbol
 
-let is_true f = match f.t_node with
+let _is_true f = match f.t_node with
   | Ttrue -> true | _ -> false
 
 let t_and_simp f1 f2 = match f1.t_node, f2.t_node with
@@ -190,6 +190,26 @@ let w_subst s w = {
   sp = Mhs.map (t_subst s) w.sp
 }
 
+let splits_under c w =
+  let rec count p c f =
+    if c = 0 then raise Exit else
+    if Sattr.mem stop_split f.t_attrs then c else
+    match f.t_node with
+    | Tnot g -> count (not p) c g
+    | Tbinop (Tand,g,h) when p ->
+        if Sattr.mem asym_split g.t_attrs then count p c h
+        else count p (count p (c - 1) g) h
+(*  | Tbinop (Tand,g,h) when p -> count p (count p (c - 1) g) h *)
+    | Tbinop (Tor,g,h) when not p -> count p (count p (c - 1) g) h
+    | Tbinop (Timplies,_,h) when p -> count p c h
+    | Tquant (q,b) when p = (q = Tforall) ->
+        let _,_,g = t_open_quant b in count p c g
+    | _ -> c in
+  try let _ = count true c w.wp in
+      let spc _ f c = count false c f in
+      ignore (Mhs.fold spc w.sp 1); true
+  with Exit -> false
+
 type context = {
   c_tv : ty Mtv.t;
   c_vs : term Mvs.t;
@@ -271,7 +291,7 @@ and factorize merge c zl0 hl h wr pl kk =
   let bl = List.map (function Pt _ | Pc _ -> assert false
     | Pr v -> Br (Mvs.find v zm,v) | Pv v -> Bv (Mvs.find v zm)) pl in
   match kk true zc bl with exception BadUndef _ -> kk,zl0,hl | zw ->
-  if not merge || is_true zw.wp then
+  if not merge || splits_under 3 zw then
     let zk sf c bl = if not sf then w_true else
       if Mvs.is_empty zv then zw else
       let c,_ = consume false c pl bl in
