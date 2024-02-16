@@ -214,7 +214,7 @@ module PPp = struct
 
   let pp_set fmt sl =
     let pp_sep fmt () = fprintf fmt "@ |" in
-    let pp_v fmt (s, t) = fprintf fmt "@ %a <-@ {}" (pp_var true) s in
+    let pp_v fmt (s, _t) = fprintf fmt "@ %a <-@ {}" (pp_var true) s in
     pp_print_list ~pp_sep pp_v fmt sl
 
   let pp_let fmt sl =
@@ -230,7 +230,7 @@ module PPp = struct
     | PEset (e, l)    -> fprintf fmt "%a@\n[%a]"      pp_expr e pp_set l
     | PElet (e, l)    -> fprintf fmt "%a@\n[%a]"      pp_expr e pp_let l
     | PEapp (e, arg)  -> fprintf fmt "@[%a%a@[%a@]@]" pp_expr e pp_sp_nl2 () pp_arg arg
-    | PEcut (t, e)    -> fprintf fmt "assert {}@ %a"  pp_expr e
+    | PEcut (_t, e)   -> fprintf fmt "assert {}@ %a"  pp_expr e
     | PEdef (e, b, l) -> fprintf fmt "%a@\n[%a]"      pp_expr e (pp_local_defs_block b)  l
     | PElam (p, e)    -> fprintf fmt "(fu@[n %a%a→@ @[%a@]@])"  (pp_print_list pp_param) p pp_osp (p <> []) pp_expr e
 
