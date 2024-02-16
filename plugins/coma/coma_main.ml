@@ -10,6 +10,7 @@
 (********************************************************************)
 open Why3
 open Term
+open Coma_logic
 open Coma_syntax
 open Coma_typing
 open Coma_vc

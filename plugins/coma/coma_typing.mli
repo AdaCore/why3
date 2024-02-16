@@ -1,4 +1,5 @@
 open Why3
+open Coma_logic
 open Coma_syntax
 
 type ctx

@@ -1,5 +1,5 @@
 open Why3.Term
-open Coma_syntax
+open Coma_logic
 
 type context
 

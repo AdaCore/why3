@@ -4,8 +4,8 @@ open Ident
 open Ty
 open Term
 open Ptree
+open Coma_logic
 open Coma_syntax
-
 
 type vr = Ref of vsymbol | Var of vsymbol | Typ of tvsymbol
 

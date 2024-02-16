@@ -1,16 +1,20 @@
 open Why3
+open Wstdlib
 open Ident
 open Ty
 open Term
-open Coma_logic
+
+(* First-order logic *)
 
 let case_split = create_attribute "case_split"
-let add_case t = t_attr_add case_split t
 
+let add_case_split t = t_attr_add case_split t
+let add_stop_split t = t_attr_add stop_split t
+
+(*
 let debug_slow = Debug.register_info_flag "coma_no_merge"
   ~desc:"Disable@ subgoal@ factorization."
-
-exception BadUndef of hsymbol
+*)
 
 let _is_true f = match f.t_node with
   | Ttrue -> true | _ -> false
@@ -60,6 +64,18 @@ let rec t_simp_equ f = match f.t_node with
   | Tquant (q,b) -> let vl,tl,g = t_open_quant b in
       t_attr_copy f (t_quant_close_simp q vl tl (t_simp_equ g))
   | _ -> t_map t_simp_equ f
+
+let rec t_solid p f =
+  Sattr.mem stop_split f.t_attrs ||
+  match f.t_node with
+  | Tbinop (Tor,_,_) -> p
+  | Tbinop (Tand,g,h) when p ->
+      Sattr.mem asym_split g.t_attrs && t_solid p h
+  | Tbinop (Timplies,_,h) when p -> t_solid p h
+  | Tquant (q,b) when p = (q = Tforall) ->
+      let _,_,h = t_open_quant b in t_solid p h
+  | Tnot g -> t_solid (not p) g
+  | _ -> true
 
 let rec t_neg f =
   if Sattr.mem stop_split f.t_attrs then f
@@ -130,6 +146,28 @@ let spec_simp vl f =
   |> propagate 1 (add_vl vl 0 Mvs.empty) Svs.empty Svs.empty |> fst
   |> t_simp_equ
 
+(* Coma logic *)
+
+type hsymbol = {
+  hs_name : ident;
+}
+
+module Hsym = MakeMSHW (struct
+  type t = hsymbol
+  let tag hs = hs.hs_name.id_tag
+end)
+
+module Shs = Hsym.S
+module Mhs = Hsym.M
+module Hhs = Hsym.H
+module Whs = Hsym.W
+
+let hs_equal : hsymbol -> hsymbol -> bool = (==)
+let hs_hash hs = id_hash hs.hs_name
+let hs_compare hs1 hs2 = id_compare hs1.hs_name hs2.hs_name
+
+let create_hsymbol id = { hs_name = Ident.id_register id }
+
 type wpsp = {
   wp: term;
   sp: term Mhs.t;
@@ -141,7 +179,7 @@ let sp_or _ sp1 sp2 = Some (
   match sp1.t_node, sp2.t_node with
   | Ttrue, _ | _, Tfalse -> sp1
   | _, Ttrue | Tfalse, _ -> sp2
-  | _, _ -> add_case (t_or sp1 sp2))
+  | _ -> add_case_split (t_or sp1 sp2))
 
 let w_and w1 w2 = {
   wp = t_and_simp w1.wp w2.wp;
@@ -172,49 +210,71 @@ let w_subst s w = {
   sp = Mhs.map (t_subst s) w.sp
 }
 
-let splits_under c w =
-  let rec count p c f =
-    if c = 0 then raise Exit else
-    if Sattr.mem stop_split f.t_attrs then c else
-    match f.t_node with
-    | Tnot g -> count (not p) c g
-    | Tbinop (Tand,g,h) when p ->
-        if Sattr.mem asym_split g.t_attrs then count p c h
-        else count p (count p (c - 1) g) h
-(*  | Tbinop (Tand,g,h) when p -> count p (count p (c - 1) g) h *)
-    | Tbinop (Tor,g,h) when not p -> count p (count p (c - 1) g) h
-    | Tbinop (Timplies,_,h) when p -> count p c h
-    | Tquant (q,b) when p = (q = Tforall) ->
-        let _,_,g = t_open_quant b in count p c g
-    | _ -> c in
-  try let _ = count true c w.wp in
-      let spc _ f c = count false c f in
-      ignore (Mhs.fold spc w.sp 1); true
-  with Exit -> false
+let w_solid w =
+  t_solid true w.wp &&
+  Mhs.for_all (fun _ f -> t_solid false f) w.sp
+
+(* Coma expressions *)
+
+type param =
+  | Pt of tvsymbol
+  | Pv of vsymbol
+  | Pr of vsymbol
+  | Pc of hsymbol * vsymbol list * param list
+
+type expr =
+  | Esym of hsymbol
+  | Eapp of expr * argument
+  | Elam of param list * expr
+  | Edef of expr * bool * defn list
+  | Eset of expr * (vsymbol * term) list
+  | Elet of expr * (vsymbol * term * bool) list
+  | Ecut of term * expr
+  | Ebox of expr
+  | Ewox of expr
+  | Eany
+
+and argument =
+  | At of ty
+  | Av of term
+  | Ar of vsymbol
+  | Ac of expr
+
+and defn = hsymbol * vsymbol list * param list * expr
+
+(* VC formulas *)
+
+type formula =
+  | Fsym of hsymbol
+  | Fneu of formula
+  | Fagt of formula * ty
+  | Fagv of formula * term
+  | Fagr of formula * vsymbol
+  | Fagc of formula * formula
+  | Fand of formula * formula
+  | Fcut of term * bool * formula
+  | Flam of param list * bool * formula
+  | Fall of param list * formula
 
 type context = {
   c_tv : ty Mtv.t;
   c_vs : term Mvs.t;
   c_hs : handler Mhs.t;
-  c_lc : Shs.t;
-  c_gl : bool;
 }
 
-and handler = bool -> context -> closure
-and closure = binding list -> wpsp
+and handler = int * vsymbol list * closure
+and closure = int -> binding list -> wpsp
 
 and binding =
   | Bt of ty
   | Bv of term
-  | Br of term * vsymbol
-  | Bc of context * (context -> closure)
+  | Bc of int * closure
+  | Bu
 
 let c_empty = {
   c_tv = Mtv.empty;
   c_vs = Mvs.empty;
   c_hs = Mhs.empty;
-  c_lc = Shs.empty;
-  c_gl = true;
 }
 
 let c_find_tv c u = Mtv.find u c.c_tv
@@ -230,11 +290,10 @@ let c_clone_vs c v =
 
 let c_add_tv c u t = { c with c_tv = Mtv.add u t c.c_tv }
 let c_add_vs c v s = { c with c_vs = Mvs.add v s c.c_vs }
-let c_add_hs c h k = { c with c_hs = Mhs.add h k c.c_hs ;
-  c_lc = if c.c_gl then Shs.empty else Shs.add h c.c_lc }
+let c_add_hs c h d = { c with c_hs = Mhs.add h d c.c_hs }
 
-let callsym sf h c bl =
-  c_find_hs c h (sf && (c.c_gl || Shs.mem h c.c_lc)) c bl
+let rev_map_append fn l1 l2 =
+  List.fold_left (fun l x -> fn x :: l) l2 l1
 
 let nasty check pl = List.exists (function
   | Pv _ | Pr _ -> false | Pt _ -> true
@@ -243,13 +302,72 @@ let nasty check pl = List.exists (function
 let unmergeable = nasty Util.ttrue
 let unspeccable = nasty unmergeable
 
+exception BadUndef of hsymbol
+
+let rec joker_stack i rl pl =
+  let bl = List.map (function
+    | Pt u -> Bt (ty_var (c_clone_tv u))
+    | Pc (h,_,pl) -> Bc (i, joker h pl)
+    | Pv _ | Pr _ -> Bu) pl in
+  List.fold_left (fun l _ -> Bu::l) bl rl
+
+and joker h pl i bl =
+  if i = 0 then raise (BadUndef h);
+  (* we only care about Pc and Bc *)
+  let rec consume pl bl = match pl,bl with
+    | [], [] -> w_true
+    | (Pt _ | Pv _ | Pr _) :: pl, bl
+    | pl, (Bt _ | Bv _ | Bu) :: bl ->
+        consume pl bl
+    | Pc (_,rl,ql)::pl, Bc (j,k)::bl ->
+        let jj = joker_stack i rl ql in
+        w_and (k j jj) (consume pl bl)
+    | _ -> assert false in
+  consume pl bl
+
+let rec f_eval c a i bl = match a with
+  | Fsym h ->
+      let j,rl,k = c_find_hs c h in
+      let conv r = Bv (c_find_vs c r) in
+      k (i + j) (rev_map_append conv rl bl)
+  | Fcut (s, pp, f) ->
+      (if pp && i = 0 then w_and_asym else w_implies)
+        (add_stop_split (c_inst_t c s)) (f_eval c f i bl)
+  | Fneu f ->
+      if bl = [] then w_true else f_eval c f (i + 1) bl
+  | Fagt (f, t) -> f_eval c f i (Bt (c_inst_ty c t) :: bl)
+  | Fagv (f, s) -> f_eval c f i (Bv (c_inst_t  c s) :: bl)
+  | Fagr (f, r) -> f_eval c f i (Bv (c_find_vs c r) :: bl)
+  | Fagc (f, g) -> f_eval c f i (Bc (i, f_eval c g) :: bl)
+  | Fand (f, g) -> w_and (f_eval c f i bl) (f_eval c g i bl)
+  | Fall (pl,f) -> assert (bl = []);
+      f_eval c (Flam (pl, false, f)) i (joker_stack i [] pl)
+  | Flam (pl, _merge, f) ->
+      let link (c,vl,hl) p b = match p,b with
+        | Pt u, Bt t -> c_add_tv c u t, vl, hl
+        | (Pv v | Pr v), Bv s -> c_add_vs c v s, vl, hl
+        | (Pv v | Pr v), Bu -> let u = c_clone_vs c v in
+                               c_add_vs c v (t_var u), u::vl, hl
+        | Pc (h,rl,_pl), Bc (j,k) ->
+            c_add_hs c h (j - i, rl, k), vl, hl
+        | _ -> assert false in
+      let rec consume acc pl bl = match pl,bl with
+        | p::pl, b::bl -> consume (link acc p b) pl bl
+        | [], bl -> acc, bl | _, [] -> assert false in
+      let (c,vl,_hl), bl = consume (c,[],[]) pl bl in
+      w_forall (List.rev vl) (f_eval c f i bl)
+
+(*
+let callsym sf h c bl =
+  c_find_hs c h (sf && (c.c_gl || Shs.mem h c.c_lc)) c bl
+
 let rec consume merge c pl bl =
   let eat (c,zl,hl,mr) p b = match p,b with
     | Pt u, Bt t -> c_add_tv c u t, zl, hl, mr
     | Pv v, Bv s -> c_add_vs c v s, zl, hl, mr
     | Pr p, Br (s,r) -> c_add_vs c p s, zl, hl, Mvs.add p r mr
     | Pc (h,wr,pl), Bc (cc,kk) ->
-        let merge = merge && Wid.mem Coma_syntax.hs_to_merge h.hs_name in
+        let merge = merge && Wid.mem hs_to_merge h.hs_name in
         let link up p = Mvs.add (Mvs.find_def p p mr) p up in
         let up = List.fold_left link Mvs.empty wr in
         let kk sf c bl = (* handler of closure *)
@@ -273,7 +391,7 @@ and factorize merge c zl0 hl h wr pl kk =
   let bl = List.map (function Pt _ | Pc _ -> assert false
     | Pr v -> Br (Mvs.find v zm,v) | Pv v -> Bv (Mvs.find v zm)) pl in
   match kk true zc bl with exception BadUndef _ -> kk,zl0,hl | zw ->
-  if not merge || splits_under 1 zw then
+  if not merge || w_solid zw then
     let zk sf c bl = if not sf then w_true else
       if Mvs.is_empty zv then zw else
       let c,_ = consume false c pl bl in
@@ -432,3 +550,6 @@ let () = Exn_printer.register (fun fmt -> function
   | BadUndef h -> Format.fprintf fmt
       "Handler `%a' is used in an illegal position" Coma_syntax.PP.pp_hs h
   | exn -> raise exn)
+
+*)
+

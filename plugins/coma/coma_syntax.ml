@@ -68,46 +68,12 @@ type pdecl =
 
 type pfile = pdecl list
 
-open Ty
-open Term
-
-type hsymbol = {
-  hs_name : Ident.ident;
-}
-
-let create_hsymbol id = { hs_name = Ident.id_register id }
-
 let hs_to_merge = (Ident.Wid.create 256 : unit Ident.Wid.t)
-
-type param =
-  | Pt of tvsymbol
-  | Pv of vsymbol
-  | Pr of vsymbol
-  | Pc of (hsymbol * vsymbol list * param list)
-
-type expr =
-  | Esym of hsymbol
-  | Eapp of expr * argument
-  | Elam of param list * expr
-  | Edef of expr * bool * defn list
-  | Eset of expr * (vsymbol * term) list
-  | Elet of expr * (vsymbol * term * bool) list
-  | Ecut of term * expr
-  | Ebox of expr
-  | Ewox of expr
-  | Eany
-
-and argument =
-  | At of ty
-  | Av of term
-  | Ar of vsymbol
-  | Ac of expr
-
-and defn = hsymbol * vsymbol list * param list * expr
 
 (* typed ast printer *)
 module PP = struct
   open Format
+  open Coma_logic
 
   let pr = Ident.create_ident_printer []
 
@@ -119,7 +85,7 @@ module PP = struct
   let pp_hs   fmt h = fprintf fmt "%s"          (Ident.id_unique pr h.hs_name)
   let pp_term fmt t = fprintf fmt "{%a}"        Pretty.print_term t
   let pp_ofty fmt t = fprintf fmt ": @[%a@]" Pretty.print_ty t
-  let pp_pval fmt v = fprintf fmt "{%a%a}"      Pretty.print_vs v pp_ofty v.vs_ty
+  let pp_pval fmt v = fprintf fmt "{%a%a}"      Pretty.print_vs v pp_ofty v.Term.vs_ty
   let pp_var mut fmt v = fprintf fmt "%s%a"     (if mut then "&" else "") Pretty.print_vs v
 
   let rec pp_hdl fmt (i, w, pl) = fprintf fmt "(%a @[<h>[%a]@]%a%a)" pp_hs i pp_prew w pp_osp (pl <> []) pp_prms pl
@@ -137,7 +103,7 @@ module PP = struct
     | Pt t -> fprintf fmt "%a"  pp_tv        t
     | Pv v -> fprintf fmt "%a"  pp_pval      v
     | Pr r -> fprintf fmt "%a" (pp_var true) r
-    | Pc h -> fprintf fmt "%a"  pp_hdl       h
+    | Pc (h,l,p) -> fprintf fmt "%a"  pp_hdl (h,l,p)
 
   let pp_set fmt sl =
     let pp_sep fmt () = fprintf fmt "@ |" in
