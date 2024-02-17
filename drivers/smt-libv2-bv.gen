@@ -81,13 +81,16 @@ theory bv.BV_Gen
   syntax function add "(bvadd %1 %2)"
   remove prop to_uint_add
   remove prop to_uint_add_bounded
+  remove prop to_uint_add_overflow
 
   syntax function sub "(bvsub %1 %2)"
   remove prop to_uint_sub
   remove prop to_uint_sub_bounded
+  remove prop to_uint_sub_overflow
 
   syntax function neg "(bvneg %1)"
   remove prop to_uint_neg
+  remove prop to_uint_neg_no_mod
 
   syntax function mul "(bvmul %1 %2)"
   remove prop to_uint_mul
