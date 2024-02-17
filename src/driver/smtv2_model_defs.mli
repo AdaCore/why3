@@ -87,12 +87,14 @@ type term =
   | Tarray of sort * sort * array_elements
   | Tasarray of term
   | Tlet of var_binding list * term
+  | Tforall of var_signature list * term
   | Tunparsed of string
 
 and var_binding = symbol * term
+and var_signature = symbol * sort
 and array_elements = { array_indices : (term * term) list; array_others : term }
 
-type function_def = (symbol * sort) list * sort * term
+type function_def = var_signature list * sort * term
 
 val sort_equal : sort -> sort -> bool
 val print_index : Format.formatter -> index -> unit
