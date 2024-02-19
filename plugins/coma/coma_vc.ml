@@ -7,9 +7,6 @@ open Coma_logic
 let case_split = create_attribute "case_split"
 let add_case t = t_attr_add case_split t
 
-let debug_slow = Debug.register_info_flag "coma_no_merge"
-  ~desc:"Disable@ subgoal@ factorization."
-
 exception BadUndef of hsymbol
 
 let _is_true f = match f.t_node with

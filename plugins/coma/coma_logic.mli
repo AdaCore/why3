@@ -44,3 +44,16 @@ and argument =
 
 and defn = hsymbol * vsymbol list * param list * expr
 
+type formula =
+  | Fsym of hsymbol
+  | Fagt of formula * ty
+  | Fagv of formula * term
+  | Fagr of formula * vsymbol
+  | Fagc of formula * formula
+  | Fand of formula * formula
+  | Fcut of term * bool * formula
+  | Flam of param list * Shs.t * formula
+  | Fall of param list * formula
+  | Fneu of formula * Shs.t
+
+val debug_slow : Debug.flag

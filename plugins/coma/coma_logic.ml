@@ -11,10 +11,8 @@ let case_split = create_attribute "case_split"
 let add_case_split t = t_attr_add case_split t
 let add_stop_split t = t_attr_add stop_split t
 
-(*
 let debug_slow = Debug.register_info_flag "coma_no_merge"
   ~desc:"Disable@ subgoal@ factorization."
-*)
 
 let _is_true f = match f.t_node with
   | Ttrue -> true | _ -> false
@@ -205,6 +203,9 @@ let w_forall vl w = {
   sp = Mhs.map (t_exists_close_simp vl []) w.sp
 }
 
+let w_forall vl w =
+  if vl = [] then w else w_forall vl w
+
 let w_subst s w = {
   wp = t_subst s w.wp;
   sp = Mhs.map (t_subst s) w.sp
@@ -246,15 +247,15 @@ and defn = hsymbol * vsymbol list * param list * expr
 
 type formula =
   | Fsym of hsymbol
-  | Fneu of formula
   | Fagt of formula * ty
   | Fagv of formula * term
   | Fagr of formula * vsymbol
   | Fagc of formula * formula
   | Fand of formula * formula
   | Fcut of term * bool * formula
-  | Flam of param list * bool * formula
+  | Flam of param list * Shs.t * formula
   | Fall of param list * formula
+  | Fneu of formula * Shs.t
 
 type context = {
   c_tv : ty Mtv.t;
@@ -262,13 +263,12 @@ type context = {
   c_hs : handler Mhs.t;
 }
 
-and handler = int * vsymbol list * closure
-and closure = int -> binding list -> wpsp
+and handler = int * (int -> binding list -> wpsp)
 
 and binding =
   | Bt of ty
   | Bv of term
-  | Bc of int * closure
+  | Bc of handler
   | Bu
 
 let c_empty = {
@@ -314,48 +314,92 @@ let rec joker_stack i rl pl =
 and joker h pl i bl =
   if i = 0 then raise (BadUndef h);
   (* we only care about Pc and Bc *)
-  let rec consume pl bl = match pl,bl with
+  let rec link pl bl = match pl,bl with
     | [], [] -> w_true
     | (Pt _ | Pv _ | Pr _) :: pl, bl
     | pl, (Bt _ | Bv _ | Bu) :: bl ->
-        consume pl bl
+        link pl bl
     | Pc (_,rl,ql)::pl, Bc (j,k)::bl ->
         let jj = joker_stack i rl ql in
-        w_and (k j jj) (consume pl bl)
+        w_and (k j jj) (link pl bl)
     | _ -> assert false in
-  consume pl bl
+  link pl bl
+
+let rec consume mm c i pl bl =
+  let link (c,vl,hl) p b = match p,b with
+    | Pt u, Bt t -> c_add_tv c u t, vl, hl
+    | (Pv v | Pr v), Bv s -> c_add_vs c v s, vl, hl
+    | (Pv v | Pr v), Bu -> let u = c_clone_vs c v in
+                           c_add_vs c v (t_var u), u::vl, hl
+    | Pc (h,wr,pl), Bc (j,kk) -> let merge = Shs.mem h mm in
+        let kk,vl,hl = factorize merge c vl hl h wr pl kk in
+        c_add_hs c h (i - j, kk), vl, hl
+    | _ -> assert false in
+  let rec fold acc pl bl = match pl,bl with
+    | p::pl, b::bl -> fold (link acc p b) pl bl
+    | [], bl -> acc, bl | _, [] -> assert false in
+  fold (c,[],[]) pl bl
+
+and factorize merge c vl hl h wr pl kk =
+  if Debug.test_flag debug_slow ||
+     unmergeable pl then kk,vl,hl else
+  let dup v (zl,zv,zm,bl) =
+    let z = c_clone_vs c v in let t = t_var z in
+    z::zl, Mvs.add z v zv, Mvs.add v t zm, Bv t::bl in
+  let param p acc = match p with
+    | Pv v | Pr v -> dup v acc | _ -> assert false in
+  let zl,zv,zm,bl = List.fold_right dup wr
+    (List.fold_right param pl ([],Mvs.empty,Mvs.empty,[])) in
+  match kk 0 bl with exception BadUndef _ -> kk,vl,hl | zw ->
+  let pl = List.fold_right (fun r pl -> Pr r :: pl) wr pl in
+  if not merge || w_solid zw then
+    let zk i bl = if i > 0 then w_true else
+      if Mvs.is_empty zv then zw else
+      let (c,ul,_),_ = consume Shs.empty c i pl bl in
+      let w = w_subst (Mvs.map (c_find_vs c) zv) zw in
+      w_forall (List.rev ul) w in
+    zk, vl, hl
+  else
+    let hc = create_hsymbol (id_clone h.hs_name) in
+    let zk i bl = if i > 0 then w_true else
+      let (c,ul,_),_ = consume Shs.empty c i pl bl in
+      let link v z f = t_and_simp (t_equ z (c_find_vs c v)) f in
+      let sp = Mhs.singleton hc (Mvs.fold_right link zm t_true) in
+      w_forall (List.rev ul) { wp = t_true; sp = sp } in
+    zk, List.rev_append zl vl, (hc,zw)::hl
+
+let close vl hl w =
+  if hl = [] then w_forall (List.rev vl) w else
+  let wl,sp = List.fold_left (fun (wl,sp) (hc,zw) ->
+    w_implies (Mhs.find_def t_false hc sp) zw :: wl,
+    Mhs.remove hc sp) ([], w.sp) hl in
+  let wl = { w with sp = sp } :: wl in
+  w_forall (List.rev vl) (w_and_l wl)
 
 let rec f_eval c a i bl = match a with
-  | Fsym h ->
-      let j,rl,k = c_find_hs c h in
-      let conv r = Bv (c_find_vs c r) in
-      k (i + j) (rev_map_append conv rl bl)
+  | Fsym h -> let j,k = c_find_hs c h in k (i - j) bl
   | Fcut (s, pp, f) ->
       (if pp && i = 0 then w_and_asym else w_implies)
         (add_stop_split (c_inst_t c s)) (f_eval c f i bl)
-  | Fneu f ->
-      if bl = [] then w_true else f_eval c f (i + 1) bl
   | Fagt (f, t) -> f_eval c f i (Bt (c_inst_ty c t) :: bl)
   | Fagv (f, s) -> f_eval c f i (Bv (c_inst_t  c s) :: bl)
   | Fagr (f, r) -> f_eval c f i (Bv (c_find_vs c r) :: bl)
   | Fagc (f, g) -> f_eval c f i (Bc (i, f_eval c g) :: bl)
   | Fand (f, g) -> w_and (f_eval c f i bl) (f_eval c g i bl)
   | Fall (pl,f) -> assert (bl = []);
-      f_eval c (Flam (pl, false, f)) i (joker_stack i [] pl)
-  | Flam (pl, _merge, f) ->
-      let link (c,vl,hl) p b = match p,b with
-        | Pt u, Bt t -> c_add_tv c u t, vl, hl
-        | (Pv v | Pr v), Bv s -> c_add_vs c v s, vl, hl
-        | (Pv v | Pr v), Bu -> let u = c_clone_vs c v in
-                               c_add_vs c v (t_var u), u::vl, hl
-        | Pc (h,rl,_pl), Bc (j,k) ->
-            c_add_hs c h (j - i, rl, k), vl, hl
-        | _ -> assert false in
-      let rec consume acc pl bl = match pl,bl with
-        | p::pl, b::bl -> consume (link acc p b) pl bl
-        | [], bl -> acc, bl | _, [] -> assert false in
-      let (c,vl,_hl), bl = consume (c,[],[]) pl bl in
-      w_forall (List.rev vl) (f_eval c f i bl)
+      f_eval c (Flam (pl, Shs.empty, f)) i (joker_stack i [] pl)
+  | Fneu (f,ss) when Shs.is_empty ss ->
+      if bl = [] then w_true else f_eval c f (i + 1) bl
+  | Fneu (f,ss) ->
+      let trivial = ref (bl = []) in
+      let m = Mhs.diff (fun _ (j,k) _ ->
+        if i = j then trivial := false;
+        Some (j + 1, k)) c.c_hs ss in
+      if !trivial then w_true else
+      f_eval {c with c_hs = m} f (i + 1) bl
+  | Flam (pl, mm, f) ->
+      let (c,vl,hl), bl = consume mm c i pl bl in
+      close vl hl (f_eval c f i bl)
 
 (*
 let callsym sf h c bl =
