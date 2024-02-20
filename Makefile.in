@@ -1666,13 +1666,13 @@ trywhy3-full.tar.gz: $(addprefix src/trywhy3/, $(TRYWHY3_FULL_PACK))
 trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js
 
 src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
-	js_of_ocaml $(JSOO_DEBUG) $<
+	js_of_ocaml $(JSOO_DEBUG) --Werror $<
 
 src/trywhy3/trywhy3.byte: $(addprefix src/trywhy3/, json_base.cmo json_parser.cmo json_lexer.cmo bindings.cmo worker_proto.cmo shortener.cmo trywhy3.cmo)
 	$(OCAMLFIND) ocamlc -o $@ -package js_of_ocaml -package menhirLib -linkpkg $^
 
 src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/trywhy3.conf src/trywhy3/try_alt_ergo.drv
-	js_of_ocaml $(JSOO_DEBUG) --extern-fs -I . -I src/trywhy3 \
+	js_of_ocaml $(JSOO_DEBUG) --Werror --extern-fs -I . -I src/trywhy3 \
 		--file=trywhy3.conf:/ \
 		--file=try_alt_ergo.drv:/ \
 	  `find stdlib -name "*.mlw" -exec printf " --file=%s:/%s" {} {} ";"` \
