@@ -194,8 +194,8 @@ let rec type_expr tuc ctx { pexpr_desc=d; pexpr_loc=loc } =
       let e = type_prog ~loc tuc ctx e in
       Eset (e, ll), []
   | PElam (pl, e) ->
-      let ctx1, params = Lists.map_fold_left (type_param tuc) ctx pl in
-      let e = type_prog ~loc:(e.pexpr_loc) tuc ctx1 e in
+      let ctx, params = Lists.map_fold_left (type_param tuc) ctx pl in
+      let e = type_prog ~loc:(e.pexpr_loc) tuc ctx e in
       List.iter (oc_param ctx) params;
       Elam (params, e), params
   | PEdef (e, notrec, d) ->

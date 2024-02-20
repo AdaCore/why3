@@ -896,6 +896,7 @@ let task_view =
 
 let () = create_colors gconfig task_view
 let why_lang = get_extra_lang "why3" "Why3"
+let coma_lang = get_extra_lang "coma" "Coma"
 let why3py_lang = get_extra_lang "why3py" "Why3python"
 let why3c_lang = get_extra_lang "why3c" "Why3c"
 let rust_lang = get_extra_lang "rust" "Rust"
@@ -904,23 +905,28 @@ let java_lang = get_extra_lang "java" "Java"
 let c_lang = get_extra_lang "c" "C"
 
 let change_lang view lang =
-  let lang =
-    match lang with
-    | "python" -> why3py_lang ()
-    | "micro-C" -> why3c_lang ()
-    | ".rs" -> rust_lang ()
-    | ".adb" -> ada_lang ()
-    | ".ads" -> ada_lang ()
-    | ".java" -> java_lang ()
-    | ".c" -> c_lang ()
-    | ".mlw"
-    | ".why"
-    | "whyml" ->  why_lang ()
-    | _ ->
-        Loc.warning warn_unknown_format "Unrecognized source format `%s`" lang;
-        None
-  in
-    view#source_buffer#set_language lang
+  try
+    let lang =
+      match lang with
+      | "python" -> why3py_lang ()
+      | "micro-C" -> why3c_lang ()
+      | ".rs" -> rust_lang ()
+      | ".adb" -> ada_lang ()
+      | ".ads" -> ada_lang ()
+      | ".java" -> java_lang ()
+      | ".c" -> c_lang ()
+      | ".mlw"
+      | ".why"
+      | "whyml" -> why_lang ()
+      | ".coma"
+      | "coma" -> coma_lang ()
+      | _ ->
+          Loc.warning warn_unknown_format "Unrecognized source format `%s`" lang;
+          raise Exit
+    in
+    view#source_buffer#set_language (Some lang)
+  with
+  | Exit -> ()
 
 (* Create an eventbox for the title label of the notebook tab *)
 let create_eventbox ~read_only file =
