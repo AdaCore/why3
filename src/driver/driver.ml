@@ -31,7 +31,7 @@ let meta_get_counterexmp =
 
 let get_counterexmp task =
   let ce_meta = Task.find_meta_tds task meta_get_counterexmp in
-  not (Theory.Stdecl.is_empty ce_meta.tds_set)
+  not (Task.HStdecl.is_empty ce_meta)
 
 (** drivers *)
 
@@ -322,8 +322,8 @@ let update_task = let ht = Hint.create 5 in fun drv ->
     let update task0 =
       (* add requested theorie *)
       let task0 = Mid.fold (fun _ (th,th') task ->
-          let tdcs = (Task.find_clone_tds task0 th).tds_set in
-          Stdecl.fold (fun tdc task -> match tdc.td_node with
+          let tdcs = Task.find_clone_tds task0 th in
+          HStdecl.fold (fun tdc task -> match tdc.td_node with
               | Use _ -> Task.use_export task th'
               | Clone (_,_) ->
                   (* We do nothing in case of clone *)
@@ -334,8 +334,8 @@ let update_task = let ht = Hint.create 5 in fun drv ->
       in
       (* apply metas *)
       let task0 = Mid.fold (fun _ (th,tdms) task ->
-          let tdcs = (Task.find_clone_tds task0 th).tds_set in
-          Stdecl.fold (fun tdc task ->
+          let tdcs = Task.find_clone_tds task0 th in
+          HStdecl.fold (fun tdc task ->
               Stdecl.fold (fun tdm task -> match tdc.td_node with
                   | Use _ -> add_tdecl task tdm
                   | Clone (_,sm) ->
