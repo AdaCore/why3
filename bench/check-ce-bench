@@ -19,6 +19,7 @@ updateoracle=false
 removeoutfile=true
 debug=false
 files=""
+petiot=true
 failed=""
 
 function usage() {
@@ -72,7 +73,8 @@ while test $# != 0; do
       exit 2
       ;;
     *)
-      files="$files $1"
+	files="$files $1"
+	petiot=false
       shift 1
   esac
 done
@@ -86,6 +88,7 @@ readonly SUFFIX
 readonly removeoutfile
 readonly updateoracle
 readonly files
+readonly petiot
 
 # Path to the why3 binary
 WHY3_BIN="$SCRIPT_DIR"/../bin/why3"$SUFFIX"
@@ -322,10 +325,12 @@ bench/check-ce/petiot2018/experiments.sh \
 if [ $? = 1 ]; then failed="${failed}Petiot experiments with $1.\n"; fi
 }
 
-petiot Alt-Ergo,2.5.2  10000
-petiot Z3,4.8.10  500000
-petiot CVC4,1.8 10000
-petiot CVC5,1.0.5 10000
+if $petiot; then
+    petiot Alt-Ergo,2.5.2  10000
+    petiot Z3,4.8.10  500000
+    petiot CVC4,1.8 10000
+    petiot CVC5,1.0.5 10000
+fi
 
 end=$(date +%s)
 
