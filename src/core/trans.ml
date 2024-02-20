@@ -228,11 +228,6 @@ let add_tdecls = gen_add_decl add_tdecl
 
 (** dependent transformations *)
 
-module Wtds = Weakhtbl.Make (struct
-  type t = tdecl_set
-  let tag s = s.tds_tag
-end)
-
 let on_theory_tds th fn =
   let fn = Wtds.memoize 17 fn in
   fun task -> fn (find_clone_tds task th) task
@@ -247,14 +242,14 @@ let on_cloned_theory th fn =
     | Clone (_,sm) -> sm::acc
     | _ -> assert false
   in
-  on_theory_tds th (fun tds -> fn (Stdecl.fold add tds.tds_set []))
+  on_theory_tds th (fun tds -> fn (HStdecl.fold add tds []))
 
 let on_meta t fn =
   let add td acc = match td.td_node with
     | Meta (_,ma) -> ma::acc
     | _ -> assert false
   in
-  on_meta_tds t (fun tds -> fn (Stdecl.fold add tds.tds_set []))
+  on_meta_tds t (fun tds -> fn (HStdecl.fold add tds []))
 
 let on_used_theory th fn =
   let check td = match td.td_node with
@@ -262,7 +257,7 @@ let on_used_theory th fn =
     | Clone _ -> false
     | _ -> assert false
   in
-  on_theory_tds th (fun tds -> fn (Stdecl.exists check tds.tds_set))
+  on_theory_tds th (fun tds -> fn (HStdecl.exists check tds))
 
 let on_meta_excl t fn =
   if not t.meta_excl then raise (NotExclusiveMeta t);
@@ -270,7 +265,7 @@ let on_meta_excl t fn =
     | Meta (_,ma) -> Some ma
     | _ -> assert false
   in
-  on_meta_tds t (fun tds -> fn (Stdecl.fold add tds.tds_set None))
+  on_meta_tds t (fun tds -> fn (HStdecl.fold add tds None))
 
 let on_tagged_ty t fn =
   begin match t.meta_type with
@@ -281,7 +276,7 @@ let on_tagged_ty t fn =
     | Meta (_, MAty ty :: _) -> Sty.add ty acc
     | _ -> assert false
   in
-  on_meta_tds t (fun tds -> fn (Stdecl.fold add tds.tds_set Sty.empty))
+  on_meta_tds t (fun tds -> fn (HStdecl.fold add tds Sty.empty))
 
 let on_tagged_ts t fn =
   begin match t.meta_type with
@@ -292,7 +287,7 @@ let on_tagged_ts t fn =
     | Meta (_, MAts ts :: _) -> Sts.add ts acc
     | _ -> assert false
   in
-  on_meta_tds t (fun tds -> fn (Stdecl.fold add tds.tds_set Sts.empty))
+  on_meta_tds t (fun tds -> fn (HStdecl.fold add tds Sts.empty))
 
 let on_tagged_ls t fn =
   begin match t.meta_type with
@@ -303,7 +298,7 @@ let on_tagged_ls t fn =
     | Meta (_, MAls ls :: _) -> Sls.add ls acc
     | _ -> assert false
   in
-  on_meta_tds t (fun tds -> fn (Stdecl.fold add tds.tds_set Sls.empty))
+  on_meta_tds t (fun tds -> fn (HStdecl.fold add tds Sls.empty))
 
 let on_tagged_pr t fn =
   begin match t.meta_type with
@@ -314,13 +309,13 @@ let on_tagged_pr t fn =
     | Meta (_, MApr pr :: _) -> Spr.add pr acc
     | _ -> assert false
   in
-  on_meta_tds t (fun tds -> fn (Stdecl.fold add tds.tds_set Spr.empty))
+  on_meta_tds t (fun tds -> fn (HStdecl.fold add tds Spr.empty))
 
 (** debug *)
 let print_meta f m task =
   let print_tds fmt m =
-    Pp.print_iter1 Stdecl.iter Pp.newline Pretty.print_tdecl fmt
-      (find_meta_tds task m).tds_set
+    Pp.print_iter1 HStdecl.iter Pp.newline Pretty.print_tdecl fmt
+      (find_meta_tds task m)
   in
   Debug.dprintf f "@[<hov 2>meta %s :@\n%a@]@." m.Theory.meta_name print_tds m;
   task
