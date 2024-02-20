@@ -42,7 +42,7 @@ build: [
    "--disable-stackify" {!ocamlgraph:installed}
    "--enable-stackify" {ocamlgraph:installed}
    "--disable-ide"]
-  [make "-j%{jobs}%" "all" "opt" "byte"]
+  [make "-j%{jobs}%" "all" "byte"]
   [make "doc" "stdlibdoc" "apidoc"] {with-doc}
 ]
 
