@@ -711,9 +711,9 @@ install-bin::
 	$(MKDIR_P) $(TOOLDIR)
 	$(INSTALL_DATA) $(TOOLS_BIN:%=bin/%.$(SHAREDBEST)) $(TOOLDIR)
 
-install_local:: bin/why3 $(TOOLS_BIN:%=bin/%.$(SHAREDBEST))
+install_local:: bin/why3$(EXE) $(TOOLS_BIN:%=bin/%.$(SHAREDBEST))
 
-bin/%:	bin/%.@OCAMLBEST@
+bin/why3$(EXE): bin/why3.@OCAMLBEST@
 	ln -sf $(notdir $<) $@
 
 install_local:: share/drivers share/extraction_drivers share/stdlib
