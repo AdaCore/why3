@@ -115,19 +115,21 @@ struct
     let ht = H.create 7 in
     let cl = ref [] in
 
-    let rec evict v scc =
+    let rec evict n scc =
       let e = Stack.pop st in
       let scc = e :: scc in
-      let w = source e in
-      H.remove ht w;
-      if w = v then scc else evict v scc in
+      H.remove ht (source e);
+      if n = 0 then scc else
+        evict (n - 1) scc in
+
+    let evict i = evict (Stack.length st - i) [] in
 
     let rec visit o v = match H.find ht v with
       | {elt = e; index = 0} as r ->
           Stack.push e st;
-          let i = r.index <- 2 * Stack.length st; r.index in
+          let i = r.index <- Stack.length st; r.index in
           let j = fold_of_iter adjacency visit (i + 1) e in
-          if j >= i then cl := (j = i, evict v []) :: !cl;
+          if j >= i then cl := (j = i, evict i) :: !cl;
           Stdlib.min o j
       | r -> Stdlib.min o r.index
       | exception Not_found -> o in
