@@ -95,4 +95,6 @@ module Regexp
     | mems2:
         forall w1 w2: word, r: regexp.
         mem w1 r -> mem w2 (Star r) -> mem (w1 ++ w2) (Star r)
+
+  axiom xxx : forall w: word. forall i: int. w[i..i] = empty
 end

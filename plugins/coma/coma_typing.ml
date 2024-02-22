@@ -210,7 +210,7 @@ let rec type_expr tuc ctx { pexpr_desc=d; pexpr_loc=loc } =
 
 and type_prog ?loc tuc ctx d =
   let e, te = type_expr tuc ctx d in
-  if te <> [] then Loc.errorm ?loc "[coma typing] every programm must be box-typed";
+  if te <> [] then Loc.errorm ?loc "[coma typing] every program must be box-typed";
   e
 
 and type_defn_list tuc ctx notrec dl =
