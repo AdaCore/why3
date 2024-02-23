@@ -751,19 +751,19 @@ let entity =
   | Some x -> x
 
 let limit_lines =
-  if !opt_limit_lines = "" then []
+  let init =
+    match limit_line with
+    | None -> []
+    | Some x -> [x]
+  in
+  if !opt_limit_lines = "" then init
   else if not (Sys.file_exists !opt_limit_lines) then
     let msg = "file provided to --limit-lines not found: " ^ !opt_limit_lines in
     Gnat_util.abort_with_message ~internal:true msg
   else
     let cin = open_in !opt_limit_lines in
     let rec read_line acc =
-      try read_line (Gnat_expl.parse_line_spec (input_line cin) :: acc)
+      try read_line (Gnat_expl.parse_line_spec (String.trim (input_line cin)) :: acc)
       with End_of_file -> acc
-    in
-    let init =
-      match limit_line with
-      | None -> []
-      | Some x -> [x]
     in
     List.rev (read_line init)

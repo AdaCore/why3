@@ -210,7 +210,7 @@ let add_to_objective ~toplevel ex go =
   (* add a goal to an objective.
    * A goal can be "top-level", that is a direct goal coming from WP, or not
    * top-level, that is obtained by transformation. *)
-   let filter_line = Gnat_config.limit_lines = [] or List.exists (function
+   let filter_line = Gnat_config.limit_lines = [] || List.exists (function
       | Gnat_expl.Limit_Line l ->
          Gnat_loc.equal_line l (Gnat_expl.get_loc check)
       | Gnat_expl.Limit_Check c ->
