@@ -46,6 +46,7 @@ let opt_rac_prover = ref (Some "cvc5")
 let opt_logging = ref false
 
 let opt_limit_line : Gnat_expl.limit_mode option ref = ref None
+let opt_limit_lines : string ref = ref ""
 let opt_limit_region : Gnat_loc.region option ref = ref None
 let opt_socket_name : string ref = ref ""
 let opt_standalone = ref false
@@ -204,6 +205,8 @@ let options = Arg.align [
    "--limit-line", Arg.String set_limit_line,
           " Limit proof to a file and line, given \
            by \"file:line[:column:checkkind]\"";
+   "--limit-lines", Arg.Set_string opt_limit_lines,
+          "Same as --limit-line, but provide a file with one line spec per line";
    "--limit-region", Arg.String set_limit_region,
           " Limit proof to a file and range of lines, given \
            by \"file:first_line:last_line\"";
@@ -746,3 +749,21 @@ let entity =
     Gnat_util.abort_with_message ~internal:true
        "option --entity was not given"
   | Some x -> x
+
+let limit_lines =
+  if !opt_limit_lines = "" then []
+  else if not (Sys.file_exists !opt_limit_lines) then
+    let msg = "file provided to --limit-lines not found: " ^ !opt_limit_lines in
+    Gnat_util.abort_with_message ~internal:true msg
+  else
+    let cin = open_in !opt_limit_lines in
+    let rec read_line acc =
+      try read_line (Gnat_expl.parse_line_spec (input_line cin) :: acc)
+      with End_of_file -> acc
+    in
+    let init =
+      match limit_line with
+      | None -> []
+      | Some x -> [x]
+    in
+    List.rev (read_line init)

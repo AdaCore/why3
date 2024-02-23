@@ -96,8 +96,8 @@ val filename : string
 val unit_name : string
 (* the name of the Ada unit to which the input file corresponds *)
 
-val limit_line : Gnat_expl.limit_mode option
-(* set if option --limit-line was given; we only prove VCs from that line *)
+val limit_lines : Gnat_expl.limit_mode list
+(* contains the line specs provided by --limit-line and --limit-lines *)
 
 val limit_region : Gnat_loc.region option
 (* set if option --limit-region was given; we only prove VCs in the region *)
