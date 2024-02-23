@@ -7,6 +7,7 @@ open Term
 (* First-order logic *)
 
 let case_split = create_attribute "case_split"
+let coma_solid = create_attribute "coma_solid"
 
 let add_case_split t = t_attr_add case_split t
 let add_stop_split t = t_attr_add stop_split t
@@ -70,10 +71,14 @@ let rec t_solid p f =
   | Tbinop (Tand,g,h) when p ->
       Sattr.mem asym_split g.t_attrs && t_solid p h
   | Tbinop (Timplies,_,h) when p -> t_solid p h
-  | Tquant (q,b) when p = (q = Tforall) ->
-      let _,_,h = t_open_quant b in t_solid p h
+  | Tquant _ -> Sattr.mem coma_solid f.t_attrs
   | Tnot g -> t_solid (not p) g
   | _ -> true
+
+let t_coma_quant q vl f =
+  let g = t_quant_close_simp q vl [] f in
+  if t_solid (q = Tforall) f then
+    t_attr_add coma_solid g else g
 
 let rec t_neg f =
   if Sattr.mem stop_split f.t_attrs then f
@@ -130,6 +135,7 @@ let rec propagate lvl vsl pvs nvs f = match f.t_node with
       let g, sbs = propagate (succ lvl) vsl pvs nvs g in
       let inst = t_subst (Mvs.set_inter sbs avs) in
       let g = inst g and tl = List.map (List.map inst) tl in
+      let f = t_attr_remove coma_solid f (* no more useful *) in
       t_attr_copy f (t_quant_close q vl tl g), Mvs.set_diff sbs avs
   | _ ->
       f, Mvs.empty
@@ -199,8 +205,8 @@ let w_implies f w = {
 }
 
 let w_forall vl w = {
-  wp = t_forall_close_simp vl [] w.wp;
-  sp = Mhs.map (t_exists_close_simp vl []) w.sp
+  wp = t_coma_quant Tforall vl w.wp;
+  sp = Mhs.map (t_coma_quant Texists vl) w.sp
 }
 
 let w_forall vl w =
