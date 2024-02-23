@@ -9,6 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 open Why3
+open Wstdlib
 open Term
 open Coma_logic
 open Coma_syntax
@@ -21,21 +22,19 @@ let debug = Debug.register_flag "coma" ~desc:"[coma] plugin debug flag"
 let qualid_last = function Qident x | Qdot (_, x) -> x
 let use_as q = function Some x -> x | None -> qualid_last q
 
-let read_thy env qualid = match qualid with
-  | Qdot (q, id) ->
-      Env.read_theory env (Typing.string_list_of_qualid q) id.id_str
-  | Qident id ->
-      Env.read_theory env [] id.id_str
+let read_thy env lenv qualid = match qualid with
+  | Qdot (q, {id_str = n}) ->
+      Env.read_theory env (Typing.string_list_of_qualid q) n
+  | Qident {id_str = n} ->
+      try Mstr.find n lenv with Not_found -> Env.read_theory env [] n
 
-let parse_simpl_use env tuc = function
+let parse_simpl_use env lenv tuc = function
   | Puseexport q ->
-      let th = read_thy env q in
-      Theory.use_export tuc th
+      Theory.use_export tuc (read_thy env lenv q)
   | Puseimport (import, q, idas) ->
       let import = import || idas = None in
       let tuc = Theory.open_scope tuc (use_as q idas).id_str in
-      let th = read_thy env q in
-      let tuc = Theory.use_export tuc th in
+      let tuc = Theory.use_export tuc (read_thy env lenv q) in
       Theory.close_scope ~import tuc
 
 let add_def ctx c tuc muc flat bl =
@@ -52,12 +51,12 @@ let add_def ctx c tuc muc flat bl =
   let add tuc (h,w,pl,_) = List.fold_left add tuc (vc_spec c h w pl) in
   ctx, c, List.fold_left add tuc dfl, muc
 
-let add_top env (ctx,c,tuc,muc) = function
+let add_top env lenv menv (ctx,c,tuc,muc) = function
   | Blo b -> add_def ctx c tuc muc false b
   | Def d -> add_def ctx c tuc muc true [d]
   | Pld d ->
       let td0 = muc.Pmodule.muc_theory.Theory.uc_decls in
-      let muc = Typing.Unsafe.add_decl muc env Wstdlib.Mstr.empty d in
+      let muc = Typing.Unsafe.add_decl muc env menv d in
       let rec catch tuc tdl = if tdl == td0 then tuc else match tdl with
         | {Theory.td_node = Theory.Decl d}::tdl ->
             Theory.add_decl ~warn:false (catch tuc tdl) d
@@ -72,15 +71,21 @@ let add_top env (ctx,c,tuc,muc) = function
       let d = match u with
         | Puseexport q -> Ptree.Duseexport q
         | Puseimport (i,q,a) -> Ptree.Duseimport (loc,i,[q,a]) in
-      let muc = Typing.Unsafe.add_decl muc env Wstdlib.Mstr.empty d in
-      ctx, c, parse_simpl_use env tuc u, muc
+      let muc = Typing.Unsafe.add_decl muc env menv d in
+      ctx, c, parse_simpl_use env lenv tuc u, muc
+
+let read_module env path (lenv,menv) (nm,dl) =
+  let id = Typing.Unsafe.create_user_id nm in
+  let muc = Pmodule.create_module env ~path id in
+  let ini = ctx0, c_empty, muc.Pmodule.muc_theory, muc in
+  let _,_,tuc,muc = List.fold_left (add_top env lenv menv) ini dl in
+  Mstr.add nm.id_str (Theory.close_theory tuc) lenv,
+  Mstr.add nm.id_str (Pmodule.close_module muc) menv
 
 let read_channel_coma env path file c =
+  let ini = Mstr.empty, Mstr.empty in
   let ast = Coma_lexer.parse_channel file c in
-  let muc = Pmodule.create_module env ~path (Ident.id_fresh "Coma") in
-  let ini = ctx0, c_empty, muc.Pmodule.muc_theory, muc in
-  let _,_,tuc,_ = List.fold_left (add_top env) ini ast in
-  Wstdlib.Mstr.singleton "Coma" (Theory.close_theory tuc)
+  fst (List.fold_left (read_module env path) ini ast)
 
 let () = Env.register_format Env.base_language "coma" ["coma"] read_channel_coma
   ~desc:"Continuation Machine language"

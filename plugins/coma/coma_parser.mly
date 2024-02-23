@@ -27,7 +27,14 @@ let mk_defn d loc = { pdefn_desc = d; pdefn_loc = Loc.extract loc }
 
 top_level:
 | coma_top_lvl* EOF
+  { let loc = floc $startpos $startpos in
+    [{id_str = "Coma"; id_ats = []; id_loc = loc}, $1] }
+| coma_module+ EOF
   { $1 }
+
+coma_module:
+| MODULE attrs(uident_nq) coma_top_lvl* END
+  { $2, $3 }
 
 uses:
 | USE EXPORT tqualid

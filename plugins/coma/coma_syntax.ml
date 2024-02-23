@@ -66,7 +66,7 @@ type pdecl =
   | Pld of decl
   | Use of Loc.position * use
 
-type pfile = pdecl list
+type pfile = (ident * pdecl list) list
 
 let hs_to_merge = (Ident.Wid.create 256 : unit Ident.Wid.t)
 
