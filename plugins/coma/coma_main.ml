@@ -14,7 +14,6 @@ open Term
 open Coma_logic
 open Coma_syntax
 open Coma_typing
-open Coma_vc
 open Ptree
 
 let debug = Debug.register_flag "coma" ~desc:"[coma] plugin debug flag"
