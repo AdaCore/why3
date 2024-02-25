@@ -566,6 +566,12 @@ type context = (vsymbol list * param list) Mhs.t * cache
 
 let c_empty = Mhs.empty, c_empty
 
+let c_merge (hco,co) (hcn,cn) =
+  Mhs.set_union hcn hco,
+  { c_tv = Mtv.set_union cn.c_tv co.c_tv;
+    c_vs = Mvs.set_union cn.c_vs co.c_vs;
+    c_hs = Mhs.set_union cn.c_hs co.c_hs }
+
 let vc_expr (hc,c) e =
   let e = wox_expr e in
   let f = of_tt (vc true hc e []) in

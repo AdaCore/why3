@@ -50,6 +50,8 @@ type context
 
 val c_empty : context
 
+val c_merge : context -> context -> context (* c_merge old new *)
+
 val vc_expr : context -> expr -> term
 
 val vc_defn : context -> bool -> defn list -> context * (hsymbol * term) list
