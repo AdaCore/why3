@@ -538,6 +538,28 @@ and vc_defn hc flat dfl =
     let ll = f_lambda ~mm:(mm_of_pl pl) pl tb :: ll in
     xx, ll, f_all pl bt :: fl) dfl (pl,[],[])
 
+let rec fill_wox rb = function
+  | Esym _ as o -> o
+  | Elam (pl, e) -> Elam (pl, fill_wox rb e)
+  | Edef (e, flat, dfl) ->
+      Edef (fill_wox rb e, flat, wox_defn dfl)
+  | Eset (e, vtl) -> Eset (fill_wox rb e, vtl)
+  | Elet (e, vtl) -> Elet (fill_wox rb e, vtl)
+  | Ecut (f, (*b,*) e) -> Ecut (f, (*b,*) fill_wox rb e)
+  | Eapp (e, Ac d) -> Eapp (fill_wox rb e, Ac (fill_wox rb d))
+  | Eapp (e, (At _|Av _|Ar _ as a)) -> Eapp (fill_wox rb e, a)
+  | Ebox e -> rb := true; Ebox (fill_wox rb e)
+  | Ewox e -> Ewox (fill_wox (ref false) e)
+  | Eany -> Eany
+
+and wox_defn dfl =
+  List.map (fun (h,wr,pl,d) -> h, wr, pl, wox_expr d) dfl
+
+and wox_expr e =
+  let rb = ref false in
+  let e = fill_wox rb e in
+  if !rb then e else Ewox e
+
 (* Top-level Coma definitions *)
 
 type context = (vsymbol list * param list) Mhs.t * cache
@@ -545,11 +567,12 @@ type context = (vsymbol list * param list) Mhs.t * cache
 let c_empty = Mhs.empty, c_empty
 
 let vc_expr (hc,c) e =
+  let e = wox_expr e in
   let f = of_tt (vc true hc e []) in
   vc_simp (top_eval c f 0 []).wp
 
 let vc_defn (hc,c) flat dfl =
-  let pl,ll,fl = vc_defn hc flat dfl in
+  let pl,ll,fl = vc_defn hc flat (wox_defn dfl) in
   let ctx bl = let c,_,_,_ = consume Shs.empty c 0 pl bl in c in
   let cc = if flat then c else ctx (jack 0 [] pl) in
   let c = ctx (List.map (fun g -> Bc (0, top_eval cc g)) ll) in
