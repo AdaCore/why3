@@ -1,11 +1,15 @@
 use int.Int
 
-let postIncr [@coma:extspec] (&r: int) (return [r] {p: int}) =
-    (fun {v: int} ->
+let postIncr [@coma:extspec] (&r: int) (return [r] (p: int)) =
+    (fun (v: int) ->
         (! [&r <- {r+1}] break)
         [ break [r] -> { r = v+1 } (! return {v}) ]) {r}
 
-let postIncrLet [@coma:extspec] (&r: int) (return [r] {p: int}) =
+let postIncrLet [@coma:extspec] (&r: int) (return [r] (p: int)) =
     (! [&r <- {r+1}] break)
     [ break [r] -> { r = v+1 } (! return {v}) ]
     [ v: int = {r} ]
+
+let postIncrPro [@coma:extspec] (&r: int) [v: int = {r}] {}
+                (return [r] (p: int) {r = v + 1} {p = v}) =
+    [&r <- {r+1}] return {v}

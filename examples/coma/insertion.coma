@@ -1,27 +1,19 @@
-
 use int.Int
 use list.List
 use list.SortedInt
 use list.Permut
 
+let if (b: bool) (then {b}) (else {not b}) = any
 
-let if {b: bool} (then) (else) =
-    any [ then -> {b} (! then)
-        | else -> {not b} (! else) ]
+let unList (l: list int)
+  (onCons (h: int) (t: list int) {l = Cons h t})
+  (onNil {l = Nil})
+  = any
 
-
-let unList {l: list int} (onCons [] {h: int} {t: list int}) (onNil []) =
-    any
-    [ oncons [] {h: int} {t: list int} -> { l = Cons h t } (! onCons {h} {t})
-    | onnil  []                        -> { l = Nil }     (! onNil) ]
-
-
-let rec insert {x: int} {l: list int} (return {o: list int}) =
-    { sorted l }
-    (! unList {l}
-             (fun {h: int} {t: list int} ->
-                if {x < h}
-                   (-> break {Cons x l})
-                   (-> insert {x} {t} (fun {r: list int} -> break {Cons h r})))
-             (-> break {Cons x Nil}))
-    [ break {r: list int} -> { sorted r && permut r (Cons x l) } (! return {r})]
+let rec insert (x: int) (l: list int) {sorted l}
+                (return (r: list int) {sorted r && permut r (Cons x l)})
+  = unList {l} (fun (h: int) (t: list int) ->
+                 if {x < h}
+                   (-> return {Cons x l})
+                   (-> insert {x} {t} (fun (r: list int) -> return {Cons h r})))
+               (-> return {Cons x Nil})

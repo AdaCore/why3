@@ -81,6 +81,8 @@ let rec type_param0 tuc ctx = function
   | PPt id ->
       let ts = tv_of_string id.id_str in
       Pt ts
+  | PPa _ | PPo | PPb | PPl _ ->
+      assert false
 
 and type_param tuc ctx p =
   let p = type_param0 tuc ctx p in
@@ -106,6 +108,49 @@ and check_params ~loc l r =
 (* let subs (tvs : tvsymbol) (pl : param list) =
   List.map (fun e -> )
     pl *)
+
+let rec sink_spec o bb dd al = function
+  | PPb :: pl -> sink_spec o true dd al pl
+  | PPo :: pl -> sink_spec o bb true al pl
+  | (PPc _ as p) :: pl -> p :: sink_spec o bb dd al pl
+  | (PPa _ as a) :: pl -> sink_spec o true dd (a::al) pl
+  | p::pl -> List.rev_append al (p :: sink_spec o bb dd [] pl)
+  | [] -> if bb && not dd then
+            List.rev_append al [PPb] else if o then List.rev al else
+          Loc.errorm "this outcome must have a closed specification"
+
+let rec param_spec o pl e =
+  let attach e dl = if dl = [] then e else
+    { e with pexpr_desc = PEdef (e,true,dl) } in
+  let rec clean = function
+    | PPc (_,_,ql) -> List.for_all clean ql
+    | PPa _ | PPl _ | PPo | PPb -> false
+    | PPt _ | PPv _ | PPr _ -> true in
+  let param p (o,pl,e,dl) = match p with
+    | PPo -> o, pl, e, dl
+    | PPt _ | PPv _ | PPr _  -> o, p::pl, e, dl
+    | PPb -> false, pl, { e with pexpr_desc = PEbox (attach e dl) }, []
+    | PPa (f,b) -> o, pl, { e with pexpr_desc = PEcut (f, b, attach e dl) }, []
+    | PPl vtl -> o, pl, { e with pexpr_desc = PElet (attach e dl, vtl) }, []
+    | PPc (_,_,ql) when o && List.for_all clean ql -> o, p::pl, e, dl
+    | PPc (h,wr,ql) ->
+        let mkt d i = { term_desc = d; term_loc = i.id_loc } in
+        let mke d i = { pexpr_desc = d; pexpr_loc = i.id_loc } in
+        let apply d = function
+          | PPt a -> mke (PEapp (d, PAt (PTtyvar a))) a
+          | PPc (g,_,_) -> mke (PEapp (d, PAc (mke (PEsym g) g))) g
+          | PPv (v,_) -> mke (PEapp (d, PAv (mkt (Tident (Qident v)) v))) v
+          | PPr (r,_) -> mke (PEapp (d, PAr r)) r
+          | PPa _ | PPl _ | PPo | PPb -> d in
+        let d = List.fold_left apply (mke (PEsym h) h) ql in
+        let ql,d = Loc.try3 ~loc:h.id_loc param_spec o ql d in
+        let d = { pdefn_name = h; pdefn_writes = wr;
+                  pdefn_params = ql; pdefn_body = d } in
+        let d = { pdefn_desc = d; pdefn_loc = h.id_loc } in
+        o, PPc (h,wr,ql) :: pl, e, d::dl in
+  let pl = sink_spec o false false [] pl in
+  let _,pl,e,dl = List.fold_right param pl (true,[],e,[]) in
+  pl, attach e dl
 
 module SCC = MakeSCC(Hid)
 
@@ -194,6 +239,7 @@ let rec type_expr tuc ctx { pexpr_desc=d; pexpr_loc=loc } =
       let e = type_prog ~loc tuc ctx e in
       Eset (e, ll), []
   | PElam (pl, e) ->
+      let pl, e = param_spec true pl e in
       let ctx, params = Lists.map_fold_left (type_param tuc) ctx pl in
       let e = type_prog ~loc:(e.pexpr_loc) tuc ctx e in
       List.iter (oc_param ctx) params;
@@ -219,9 +265,10 @@ and type_defn_list tuc ctx notrec dl =
       (fun acc { pdefn_desc = d; pdefn_loc=loc} ->
          let id, pl = d.pdefn_name, d.pdefn_params in
          let h = create_hsymbol (create_user_id id) in
+         let pl, e = param_spec true pl d.pdefn_body in
          let _, params = Lists.map_fold_left (type_param tuc) ctx0 pl in
          let writes = List.map (find_ref ctx) d.pdefn_writes in
-         add_hdl h writes params acc, (h, writes, params, loc, d.pdefn_body))
+         add_hdl h writes params acc, (h, writes, params, loc, e))
       ctx dl in
   let ctx = if notrec then ctx else ctx_full in
   let dl =

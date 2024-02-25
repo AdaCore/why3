@@ -18,7 +18,7 @@ let mk_defn d loc = { pdefn_desc = d; pdefn_loc = Loc.extract loc }
 
 %}
 
-%token BANG QUESTION
+%token BANG QUESTION LEFTMINBRC RIGHTMINBRC
 
 %start <Coma_syntax.pfile> top_level
 %start <unit> dummy
@@ -96,7 +96,7 @@ coma_expr:
 coma_desc:
 | LEFTBRC t=term RIGHTBRC e=coma_expr
   { PEcut (t, true, e) }
-| ASSUME LEFTBRC t=term RIGHTBRC e=coma_expr
+| LEFTMINBRC t=term RIGHTMINBRC e=coma_expr
   { PEcut (t, false, e) }
 | LEFTSQ l=separated_nonempty_list(BAR, coma_set) RIGHTSQ e=coma_expr
   { PEset (e, l) }
@@ -131,13 +131,11 @@ coma_closure:
   { let d = PElam ([], e) in
     mk_pexpr d $loc }
 
-prewrites:
-| w = loption(prewrites_)
-  { w }
-
-prewrites_:
+%inline prewrites:
 | LEFTSQ w=lident* RIGHTSQ
   { w }
+| (* epsilon *)
+  { [] }
 
 coma_arg:
 | LT ty=ty GT
@@ -165,12 +163,26 @@ coma_tvar:
 coma_param:
 | LT l=coma_tvar* GT
   { l }
-| LEFTPAR AMP lid=separated_nonempty_list(AMP, lident) t=oftyp RIGHTPAR
-  { List.map (fun id -> PPr (id, t)) lid }
-| LEFTBRC lid=lident+ t=oftyp RIGHTBRC
-  { List.map (fun id -> PPv (id, t)) lid }
-| LEFTPAR id=lident w=prewrites p=coma_params RIGHTPAR
+| LEFTPAR lid=coma_binder+ t=oftyp RIGHTPAR
+  { List.map (fun (b,id) -> if b then PPr (id,t) else PPv (id,t)) lid }
+| LEFTPAR id=attrs(lident_nq) w=prewrites p=coma_params RIGHTPAR
   { [PPc (id, w, p)] }
+| LEFTBRC t=term RIGHTBRC
+  { [PPa (t,true)] }
+| LEFTMINBRC t=term RIGHTMINBRC
+  { [PPa (t,false)] }
+| LEFTBRC DOTDOT RIGHTBRC | LEFTMINBRC DOTDOT RIGHTMINBRC
+  { [PPo] }
+| LEFTBRC RIGHTBRC | LEFTMINBRC RIGHTMINBRC
+  { [PPb] }
+| LEFTSQ l=separated_nonempty_list(BAR, coma_let) RIGHTSQ
+  { [PPl l] }
+
+coma_binder:
+| id=attrs(lident_nq)
+  { false, id }
+| AMP id=attrs(lident_nq)
+  { true, id }
 
 oftyp:
 | COLON t=ty { t }

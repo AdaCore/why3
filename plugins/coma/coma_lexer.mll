@@ -256,6 +256,10 @@ rule token = parse
       { LEFTSQBAR }
   | "|]"
       { BARRIGHTSQ }
+  | "-{"
+      { LEFTMINBRC }
+  | "}-"
+      { RIGHTMINBRC }
 (* begin coma *)
   | "!"
       { BANG }

@@ -12,11 +12,17 @@
 open Why3
 open Ptree
 
+type pvar = ident * term * pty * bool
+
 type pparam =
-  | PPt of ident (* < 'a > *)
-  | PPv of ident * pty (* x *)
-  | PPr of ident * pty (* &r *)
+  | PPt of ident        (* <'a> *)
+  | PPv of ident * pty  (* x *)
+  | PPr of ident * pty  (* &r *)
   | PPc of ident * ident list * pparam list (* x [x...] p... *)
+  | PPa of term * bool  (* {f} or <{f}> -- precondition (assumed) *)
+  | PPo                 (* {..} -- open spec (no barrier) *)
+  | PPb                 (* {} -- empty precondition (barrier) *)
+  | PPl of pvar list    (* [v = t | u = s] -- spec-local let *)
 
 type pexpr = {
   pexpr_desc : pexpr_desc;
@@ -40,8 +46,6 @@ and pargument =
   | PAv of term (* t *)
   | PAr of ident (* &r *)
   | PAc of pexpr (* (e) *)
-
-and pvar = ident * term * pty * bool
 
 and pdefn = {
   pdefn_desc   : pdefn_desc;
@@ -116,7 +120,7 @@ module PP = struct
     pp_print_list ~pp_sep pp_v fmt sl
 
   let pp_annot b fmt f =
-    if b then pp_term fmt f else fprintf fmt "assume@ %a" pp_term f
+    if b then pp_term fmt f else fprintf fmt "-%a-" pp_term f
 
   let rec pp_expr fmt = function
     | Eany           -> fprintf fmt "any"
@@ -180,6 +184,11 @@ module PPp = struct
     | PPr (i,_)
     | PPv (i,_) -> fprintf fmt "%s" i.id_str
     | PPc (i, idl, pl) -> fprintf fmt "(%s [%a] %a)" i.id_str pp_prew idl (pp_print_list pp_param) pl
+    | PPl _ -> pp_print_string fmt "[??]"
+    | PPa (_,true) -> pp_print_string fmt "{??}"
+    | PPa (_,false) -> pp_print_string fmt "-{??}-"
+    | PPo -> pp_print_string fmt "{..}"
+    | PPb -> pp_print_string fmt "{}"
 
   let pp_set fmt sl =
     let pp_sep fmt () = fprintf fmt "@ |" in
