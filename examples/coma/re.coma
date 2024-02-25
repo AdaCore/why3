@@ -4,31 +4,32 @@ use int.Int
 let halt = (? any)
 let fail = { false } any
 
-let if (b: bool) (then) (else) =
-  any [ then -> {b}     (! then)
-      | else -> {not b} (! else) ]
+let if (b: bool) (then {b}) (else {not b}) = any
+
 
 let unRe (r: regexp)
-    (empty) (eps) (char (c: char)) (alt (r1 r2: regexp))
-    (cat (r1 r2: regexp)) (star (r1: regexp))
-= any [ empty               -> { r = Empty } (! empty)
-      | eps                 -> { r = Epsilon } (! eps)
-      | char (c: char)      -> { r = Char c } (! char {c})
-      | alt (r1 r2: regexp) -> { r = Alt r1 r2 } (! alt {r1} {r2})
-      | cat (r1 r2: regexp) -> { r = Concat r1 r2 } (! cat {r1} {r2})
-      | star (r1: regexp)   -> { r = Star r1 } (! star {r1}) ]
+    (empty { r = Empty })
+    (eps { r = Epsilon })
+    (char { r = Char c } (c: char))
+    (alt { r = Alt r1 r2 } (r1 r2: regexp))
+    (cat { r = Concat r1 r2 } (r1 r2: regexp))
+    (star { r = Star r1 } (r1: regexp))
+= any
 
-let accept (r: regexp) (w: word) (ret (b: bool))
+let accept (r: regexp) (w: word) (ret { b <-> mem w r } (b: bool))
 = (! a {r} {0} {Epsilon} (fun (i: int) (h (b: bool)) -> h {i=n}) ret
    [ a (r: regexp) (i : int) (rk: regexp)
-       (k (j: int) (h (b: bool))) (o (b: bool))
+       (k { mem w[i..j] r } { i <= j <= n }
+          (j: int)
+          (h { b <-> mem w[j..] rk } (b: bool)))
+       (o { b <-> mem w[i..] (Concat r rk) } (b: bool))
      = {0 <= i <= n} ((!
          unRe {r} empty eps char alt cat star
          [ empty -> o {false}
-         | eps   -> {mem empty r} k {i} o
+         | eps   -> { mem empty r } k {i} o
          | char (c: char) ->
              if {i < n}
-                (-> if {w[i] = c} (-> k {i+1} o) (o {false}))
+                (-> if { w[i] = c } (-> k {i+1} o) (o {false}))
                 (o {false})
          | alt (r1 r2: regexp) ->
              a {r1} {i} {rk} k
@@ -46,13 +47,6 @@ let accept (r: regexp) (w: word) (ret (b: bool))
                    (! if {i < j} (-> a {r} {j} {rk} k ho) (ho {false})))
                  o) ]
        ))
-       [ o (b: bool) -> { b <-> mem w[i..] (Concat r rk) } (! o {b})
-       | k (j: int) (h (b: bool)) ->
-           { mem w[i..j] r } { i <= j <= n }
-           (! k {j} h)
-           [ h (b: bool) -> {b <-> mem w[j..] rk} (! h {b})]
-       ]
    ])
   [ n: int = length w ]
-  [ ret (b:bool) -> { b <-> mem w r } (! ret {b}) ]
 
