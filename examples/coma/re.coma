@@ -18,45 +18,40 @@ let unRe {r: regexp}
       | cat {r1 r2: regexp} -> { r = Concat r1 r2 } (! cat {r1} {r2})
       | star {r1: regexp}   -> { r = Star r1 } (! star {r1}) ]
 
-
 let accept {r: regexp} {w: word} (ret {b: bool})
 = (! a {r} {0} {Epsilon} (fun {i: int} (h {b: bool}) -> h {i=n}) ret
-     [ a {r: regexp} {i : int} {rk: regexp}
-         (k {j: int} (h {b: bool})) (o {b: bool})
-       = {0 <= i <= n} (! unRe {r} empty eps char alt cat star
-           [ empty -> o {false}
-           | eps   -> k {i} o
-           | char {c: char} ->
-               if {i >= n} (o {false})
-                  (-> if {w[i] = c} (-> k {i+1} o) (o {false}))
-           | alt {r1 r2: regexp} ->
-               a {r1} {i} {rk} k
-                 (fun {b: bool} ->
-                    if {b}
-                       (o {true})
-                       -- (-> { not (mem w[i..] r1) }
-                       (-> 
-                            a {r2} {i} {rk} k o))
-           | cat {r1 r2: regexp} ->
-               a {r1} {i} {Concat r2 rk}
-                 (fun {j: int} (h {b: bool}) -> a {r2} {j} {rk} k h)
-                 o
-           | star {r1: regexp} ->
-               k {i} (fun {b: bool} ->
-                 a {r1} {i} {Concat r rk}
-                   (fun {j: int} (ho {b: bool}) ->
-                     -- { mem w[i..j] r1 } (!
-                                        (!
-                     if {i < j} (-> a {r} {j} {rk} k ho) (ho {false})))
-                   o) ])
-         -- [ o {b: bool} = { b <-> mem w[i..] (Concat r rk) } (! o {b})
-         [ o {b: bool} -> (! o {b})
-         | k {j: int} (h {b: bool}) ->
-             -- { mem w[i..j] r } (! k {j} h)
-             { i <= j <= n } (! k {j} h)
-             [ h {b: bool} -> (! h {b})]
-             -- [ h {b: bool} -> {b <-> mem w[j..] rk} (! h {b})]
-         ]
-     ]
-     [ n: int = {length w} ])
-  [ ret {b:bool} -> (! ret {b}) ]
+   [ a {r: regexp} {i : int} {rk: regexp}
+       (k {j: int} (h {b: bool})) (o {b: bool})
+     = {0 <= i <= n} ((!
+         unRe {r} empty eps char alt cat star
+         [ empty -> o {false}
+         | eps   -> {mem empty r} k {i} o
+         | char {c: char} ->
+             if {i < n}
+                (-> if {w[i] = c} (-> k {i+1} o) (o {false}))
+                (o {false})
+         | alt {r1 r2: regexp} ->
+             a {r1} {i} {rk} k
+               (fun {b: bool} ->
+                  if {b} (o {true})
+                     (-> a {r2} {i} {rk} k o))
+         | cat {r1 r2: regexp} ->
+             a {r1} {i} {Concat r2 rk}
+               (fun {j: int} (h {b: bool}) -> a {r2} {j} {rk} k h)
+               o
+         | star {r1: regexp} ->
+             k {i} (fun {b: bool} ->
+               a {r1} {i} {Concat r rk}
+                 (fun {j: int} (ho {b: bool}) ->
+                   (! if {i < j} (-> a {r} {j} {rk} k ho) (ho {false})))
+                 o) ]
+       ))
+       [ o {b: bool} -> { b <-> mem w[i..] (Concat r rk) } (! o {b})
+       | k {j: int} (h {b: bool}) ->
+           { mem w[i..j] r } { i <= j <= n }
+           (! k {j} h)
+           [ h {b: bool} -> {b <-> mem w[j..] rk} (! h {b})]
+       ]
+   ])
+  [ n: int = {length w} ]
+  [ ret {b:bool} -> { b <-> mem w r } (! ret {b}) ]

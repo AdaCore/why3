@@ -4,175 +4,170 @@
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.5.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
-<file format="coma">
+<file format="coma" proved="true">
 <path name=".."/><path name="re.coma"/>
-<theory name="Coma">
+<theory name="Coma" proved="true">
  <goal name="vc_halt" proved="true">
- <proof prover="0"><result status="valid" time="0.017395" steps="1"/></proof>
+ <proof prover="0"><result status="valid" time="0.017395" steps="7"/></proof>
  </goal>
  <goal name="vc_fail" proved="true">
- <proof prover="0"><result status="valid" time="0.009166" steps="1"/></proof>
+ <proof prover="0"><result status="valid" time="0.009166" steps="7"/></proof>
  </goal>
  <goal name="vc_if" proved="true">
- <proof prover="0"><result status="valid" time="0.008865" steps="1"/></proof>
+ <proof prover="0"><result status="valid" time="0.008865" steps="7"/></proof>
  </goal>
  <goal name="vc_unRe" proved="true">
- <proof prover="0"><result status="valid" time="0.008694" steps="1"/></proof>
- </goal>
- <goal name="vc_f">
- <proof prover="0"><result status="timeout" time="1.000000" steps="21020"/></proof>
- <proof prover="1"><result status="unknown" time="0.020683" steps="6404"/></proof>
- </goal>
- <goal name="vc_f&#39;" proved="true">
- <proof prover="0"><result status="valid" time="0.010039" steps="1"/></proof>
+ <proof prover="0"><result status="valid" time="0.008694" steps="7"/></proof>
  </goal>
  <goal name="vc_accept" proved="true">
- <transf name="split_vc" proved="true" >
+ <transf name="eliminate_inductive" proved="true" >
   <goal name="vc_accept.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.006399" steps="2"/></proof>
-  </goal>
-  <goal name="vc_accept.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.015508" steps="10"/></proof>
-  </goal>
-  <goal name="vc_accept.2" proved="true">
-  <proof prover="0"><result status="valid" time="0.013801" steps="12"/></proof>
-  </goal>
-  <goal name="vc_accept.3" proved="true">
-  <proof prover="0"><result status="valid" time="0.006348" steps="10"/></proof>
-  </goal>
-  <goal name="vc_accept.4" proved="true">
-  <proof prover="0"><result status="valid" time="0.013408" steps="12"/></proof>
-  </goal>
-  <goal name="vc_accept.5" proved="true">
-  <proof prover="0"><result status="valid" time="0.014545" steps="16"/></proof>
-  </goal>
-  <goal name="vc_accept.6" proved="true">
-  <proof prover="0"><result status="valid" time="0.011943" steps="14"/></proof>
-  </goal>
-  <goal name="vc_accept.7" proved="true">
-  <proof prover="0"><result status="valid" time="0.010080" steps="10"/></proof>
-  </goal>
-  <goal name="vc_accept.8" proved="true">
-  <proof prover="0"><result status="valid" time="0.014337" steps="14"/></proof>
-  </goal>
-  <goal name="vc_accept.9" proved="true">
-  <proof prover="0"><result status="valid" time="0.018506" steps="18"/></proof>
-  </goal>
-  <goal name="vc_accept.10" proved="true">
-  <proof prover="0"><result status="valid" time="0.010798" steps="10"/></proof>
-  </goal>
-  <goal name="vc_accept.11" proved="true">
-  <proof prover="0"><result status="valid" time="0.014611" steps="10"/></proof>
-  </goal>
-  <goal name="vc_accept.12" proved="true">
-  <proof prover="0"><result status="valid" time="0.014334" steps="14"/></proof>
-  </goal>
-  <goal name="vc_accept.13" proved="true">
-  <proof prover="0"><result status="valid" time="0.014391" steps="18"/></proof>
-  </goal>
-  <goal name="vc_accept.21">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.18">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.1">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.35">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.34">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.25">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.28">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.39">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.33">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.17">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.20">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.27">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.38">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.30">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.4">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.12">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.10">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.6">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.2">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.23">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.9">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.5">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.15">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.32">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.8">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
-  </goal>
-  <goal name="vc_accept.13">
-  <proof prover="0"><undone/></proof>
-  <proof prover="1"><undone/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="vc_accept.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.013659" steps="9"/></proof>
+   </goal>
+   <goal name="vc_accept.0.1" proved="true">
+   <proof prover="0"><result status="valid" time="0.015883" steps="16"/></proof>
+   <transf name="assert" proved="true" arg1="(mem w[0..] r &lt;-&gt; mem w r)">
+    <goal name="vc_accept.0.1.0" expl="asserted formula" proved="true">
+    <proof prover="0"><result status="valid" time="0.013704" steps="18"/></proof>
+    </goal>
+    <goal name="vc_accept.0.1.1" proved="true">
+    <proof prover="0"><result status="valid" time="0.016708" steps="18"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="vc_accept.0.2" proved="true">
+   <proof prover="0"><result status="valid" time="0.133928" steps="1641"/></proof>
+   </goal>
+   <goal name="vc_accept.0.3" proved="true">
+   <proof prover="1"><result status="valid" time="0.131222" steps="65539"/></proof>
+   </goal>
+   <goal name="vc_accept.0.4" proved="true">
+   <proof prover="0"><result status="valid" time="0.015939" steps="12"/></proof>
+   </goal>
+   <goal name="vc_accept.0.5" proved="true">
+   <proof prover="0"><result status="valid" time="0.014360" steps="16"/></proof>
+   </goal>
+   <goal name="vc_accept.0.6" proved="true">
+   <proof prover="0"><result status="valid" time="0.009959" steps="15"/></proof>
+   </goal>
+   <goal name="vc_accept.0.7" proved="true">
+   <proof prover="0"><result status="valid" time="0.009837" steps="30"/></proof>
+   </goal>
+   <goal name="vc_accept.0.8" proved="true">
+   <proof prover="0"><result status="valid" time="0.013279" steps="20"/></proof>
+   </goal>
+   <goal name="vc_accept.0.9" proved="true">
+   <proof prover="0"><result status="valid" time="0.019233" steps="18"/></proof>
+   </goal>
+   <goal name="vc_accept.0.10" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="vc_accept.0.10.0" proved="true">
+    <proof prover="0"><result status="valid" time="0.019317" steps="28"/></proof>
+    </goal>
+    <goal name="vc_accept.0.10.1" proved="true">
+    <proof prover="0"><result status="valid" time="0.007374" steps="27"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="vc_accept.0.11" proved="true">
+   <proof prover="0"><result status="valid" time="0.025878" steps="65"/></proof>
+   </goal>
+   <goal name="vc_accept.0.12" proved="true">
+   <proof prover="1"><result status="valid" time="0.282728" steps="119869"/></proof>
+   </goal>
+   <goal name="vc_accept.0.13" proved="true">
+   <proof prover="0"><result status="valid" time="0.006886" steps="12"/></proof>
+   </goal>
+   <goal name="vc_accept.0.14" proved="true">
+   <proof prover="0"><result status="valid" time="0.370422" steps="5820"/></proof>
+   </goal>
+   <goal name="vc_accept.0.15" proved="true">
+   <proof prover="0"><result status="valid" time="0.012845" steps="16"/></proof>
+   </goal>
+   <goal name="vc_accept.0.16" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="vc_accept.0.16.0" proved="true">
+    <proof prover="0"><result status="valid" time="0.545021" steps="9425"/></proof>
+    </goal>
+    <goal name="vc_accept.0.16.1" proved="true">
+    <proof prover="1"><result status="valid" time="0.054870" steps="29910"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="vc_accept.0.17" proved="true">
+   <proof prover="0"><result status="valid" time="0.013567" steps="25"/></proof>
+   </goal>
+   <goal name="vc_accept.0.18" proved="true">
+   <proof prover="0"><result status="valid" time="0.015423" steps="24"/></proof>
+   </goal>
+   <goal name="vc_accept.0.19" proved="true">
+   <proof prover="0"><result status="valid" time="0.009790" steps="22"/></proof>
+   </goal>
+   <goal name="vc_accept.0.20" proved="true">
+   <proof prover="0"><result status="valid" time="0.013013" steps="20"/></proof>
+   </goal>
+   <goal name="vc_accept.0.21" proved="true">
+   <proof prover="0"><result status="valid" time="0.011010" steps="20"/></proof>
+   </goal>
+   <goal name="vc_accept.0.22" proved="true">
+   <proof prover="0"><result status="valid" time="0.010247" steps="18"/></proof>
+   </goal>
+   <goal name="vc_accept.0.23" proved="true">
+   <proof prover="0"><result status="valid" time="0.015198" steps="12"/></proof>
+   </goal>
+   <goal name="vc_accept.0.24" proved="true">
+   <proof prover="0"><result status="valid" time="0.011966" steps="39"/></proof>
+   </goal>
+   <goal name="vc_accept.0.25" proved="true">
+   <proof prover="0"><result status="valid" time="0.007123" steps="18"/></proof>
+   </goal>
+   <goal name="vc_accept.0.26" proved="true">
+   <proof prover="0"><result status="valid" time="0.013511" steps="18"/></proof>
+   </goal>
+   <goal name="vc_accept.0.27" proved="true">
+   <proof prover="0"><result status="valid" time="0.012090" steps="28"/></proof>
+   </goal>
+   <goal name="vc_accept.0.28" proved="true">
+   <proof prover="0"><result status="valid" time="0.012284" steps="26"/></proof>
+   </goal>
+   <goal name="vc_accept.0.29" proved="true">
+   <proof prover="0"><result status="valid" time="0.007593" steps="24"/></proof>
+   </goal>
+   <goal name="vc_accept.0.30" proved="true">
+   <proof prover="0"><result status="valid" time="0.009176" steps="19"/></proof>
+   </goal>
+   <goal name="vc_accept.0.31" proved="true">
+   <proof prover="0"><result status="valid" time="0.013257" steps="14"/></proof>
+   </goal>
+   <goal name="vc_accept.0.32" proved="true">
+   <proof prover="0"><result status="valid" time="0.011512" steps="12"/></proof>
+   </goal>
+   <goal name="vc_accept.0.33" proved="true">
+   <proof prover="0"><result status="valid" time="0.014833" steps="64"/></proof>
+   </goal>
+   <goal name="vc_accept.0.34" proved="true">
+   <proof prover="0"><result status="valid" time="0.011522" steps="18"/></proof>
+   </goal>
+   <goal name="vc_accept.0.35" proved="true">
+   <proof prover="0"><result status="valid" time="0.056038" steps="614"/></proof>
+   </goal>
+   <goal name="vc_accept.0.36" proved="true">
+   <proof prover="0"><result status="valid" time="0.011812" steps="26"/></proof>
+   </goal>
+   <goal name="vc_accept.0.37" proved="true">
+   <proof prover="0"><result status="valid" time="0.011057" steps="24"/></proof>
+   </goal>
+   <goal name="vc_accept.0.39">
+   <proof prover="0"><undone/></proof>
+   <proof prover="1"><undone/></proof>
+   </goal>
+   <goal name="vc_accept.0.35">
+   <proof prover="0"><undone/></proof>
+   <proof prover="1"><undone/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
