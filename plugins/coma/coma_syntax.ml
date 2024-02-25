@@ -72,8 +72,6 @@ type pdecl =
 
 type pfile = (ident * pdecl list) list
 
-let hs_to_merge = (Ident.Wid.create 256 : unit Ident.Wid.t)
-
 (* typed ast printer *)
 module PP = struct
   open Format

@@ -246,7 +246,6 @@ let rec consume merge c pl bl =
     | Pv v, Bv s -> c_add_vs c v s, zl, hl, mr
     | Pr p, Br (s,r) -> c_add_vs c p s, zl, hl, Mvs.add p r mr
     | Pc (h,wr,pl), Bc (cc,kk) ->
-        let merge = merge && Wid.mem Coma_syntax.hs_to_merge h.hs_name in
         let link up p = Mvs.add (Mvs.find_def p p mr) p up in
         let up = List.fold_left link Mvs.empty wr in
         let kk sf c bl = (* handler of closure *)

@@ -12,7 +12,7 @@ type vr = Ref of vsymbol | Var of vsymbol | Typ of tvsymbol
 type ctx = {
   vars: vr Mstr.t;
   denv: Dterm.denv;
-  hdls: (hsymbol * vsymbol list * param list * int ref) Mstr.t;
+  hdls: (hsymbol * vsymbol list * param list) Mstr.t;
 }
 
 let ctx0 = {
@@ -23,7 +23,7 @@ let ctx0 = {
 
 let add_hdl hs w pl ctx =
   let str = hs.hs_name.id_string in
-  { ctx with hdls = Mstr.add str (hs, w, pl, ref 0) ctx.hdls }
+  { ctx with hdls = Mstr.add str (hs, w, pl) ctx.hdls }
 
 let add_var vs ctx =
   let str = vs.vs_name.id_string in
@@ -44,16 +44,6 @@ let add_param ctx = function
   | Pv vs -> add_var vs ctx
   | Pr vs -> add_ref vs ctx
   | Pc (h, w, pl) -> add_hdl h w pl ctx
-
-let oc_hsymbol ctx {hs_name = id} =
-  let h,_,_,oc = Mstr.find id.id_string ctx.hdls in
-  assert (id_equal id h.hs_name);
-  assert (not (Wid.mem hs_to_merge id));
-  if !oc > 1 then Wid.set hs_to_merge id ()
-
-let oc_param ctx = function
-  | Pc (h, _, _) -> oc_hsymbol ctx h
-  | Pt _ | Pv _ | Pr _ -> ()
 
 let find_ref ctx (id: Ptree.ident) =
   try match Mstr.find id.id_str ctx.vars with
@@ -175,12 +165,11 @@ let rec type_expr tuc ctx { pexpr_desc=d; pexpr_loc=loc } =
   | PEcut (t,b,e) -> let e = type_prog ~loc tuc ctx e in Ecut (type_fmla tuc ctx t, b, e), []
   | PEany         -> Eany, []
   | PEsym id ->
-      let h, _, pl, oc =
+      let h, _, pl =
         try
           Mstr.find id.id_str ctx.hdls
         with Not_found -> Loc.errorm ~loc:id.id_loc "[coma typing] unbounded handler `%s'" id.id_str
       in
-      incr oc;
       Esym h, pl
   | PEapp (pe, a) ->
       let e, te = type_expr tuc ctx pe in
@@ -242,12 +231,10 @@ let rec type_expr tuc ctx { pexpr_desc=d; pexpr_loc=loc } =
       let pl, e = param_spec true pl e in
       let ctx, params = Lists.map_fold_left (type_param tuc) ctx pl in
       let e = type_prog ~loc:(e.pexpr_loc) tuc ctx e in
-      List.iter (oc_param ctx) params;
       Elam (params, e), params
   | PEdef (e, notrec, d) ->
       let ctx, dl = type_defn_list tuc ctx notrec d in
       let e = type_prog ~loc:(e.pexpr_loc) tuc ctx e in
-      List.iter (fun (h,_,_,_) -> oc_hsymbol ctx h) dl;
       if notrec then Edef (e, notrec, dl), [] else
       let defn_head (h,_,_,_) = h.hs_name in
       let dll = SCC.scc defn_head defn_hs_iter dl in
@@ -276,7 +263,6 @@ and type_defn_list tuc ctx notrec dl =
       (fun (h, writes, params, loc, b) ->
          let ctx = List.fold_left add_param ctx params in
          let d = type_prog ~loc tuc ctx b in
-         List.iter (oc_param ctx) params;
          h, writes, params, d)
       dl in
   ctx_full, dl
