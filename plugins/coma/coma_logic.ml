@@ -469,21 +469,22 @@ let vc_map2 fn v w = match v,w with
 let hs_any = create_hsymbol (Ident.id_fresh "any")
 let vc_any = Fneu (Fsym hs_any, Shs.empty)
 
-let rec vc tt hc e al =
+let rec vc tt hc o al =
   let rec apply w mr pl al = match pl,al with
     | (Pt _)::pl, (At t)::al ->
         apply (vc_map (fun f -> Fagt (f,t)) w) mr pl al
     | (Pv _)::pl, (Av s)::al ->
         apply (vc_map (fun f -> Fagv (f,s)) w) mr pl al
     | (Pr p)::pl, (Ar r)::al ->
-        apply (vc_map (fun f -> Fagr (f,r)) w) (Mvs.add p r mr) pl al
+        let mr = Mvs.add p r mr in
+        apply (vc_map (fun f -> Fagr (f,r)) w) mr pl al
     | (Pc (_,wr,_))::pl, (Ac d)::al ->
-        let wr = List.map (fun r -> Pr (Mvs.find_def r r mr)) wr in
-        let agc f g = Fagc (f, f_lambda wr g) in
-        apply (vc_map2 agc w (vc tt hc d [])) mr pl al
-    | _, [] -> w | _ -> assert false
-  in
-  match e with
+        let param r = Pr (Mvs.find_def r r mr) in
+        let wr = List.map param wr in
+        let alam f g = Fagc (f, f_lambda wr g) in
+        apply (vc_map2 alam w (vc tt hc d [])) mr pl al
+    | _, [] -> w | _ -> assert false in
+  match o with
   | Eapp (e,a) ->
       vc tt hc e (a::al)
   | Esym h ->
@@ -492,17 +493,16 @@ let rec vc tt hc e al =
       let w = if tt then TT f else TB (f, Fneu (f, Shs.empty)) in
       apply w Mvs.empty pl al
   | Elam (pl,e) ->
+      let lh = lh_of_pl pl and mm = mm_of_pl pl in
       let w = match vc tt (hc_of_pl hc pl) e [] with
-              | TB (f,g) -> let lh = lh_of_pl pl in
-                            TB (Fand (f, Fneu (g,lh)),
-                                Fand (Fneu (f,lh), g))
-              | w -> w in
-      let w = vc_map (f_lambda ~mm:(mm_of_pl pl) pl) w in
-      apply w Mvs.empty pl al
+        | TB (f,g) when not (Shs.is_empty lh) ->
+            TB (Fand(f,Fneu(g,lh)), Fand(Fneu(f,lh),g))
+        | w -> w in
+      apply (vc_map (f_lambda ~mm pl) w) Mvs.empty pl al
   | Edef (e,flat,dfl) ->
       let agc f g = Fagc (f,g) in
       let pl,ll,fl = vc_defn hc flat dfl in
-      let mm = if flat then Shs.empty else mm_of_pl pl in
+      let mm = if flat then mm_of_pl pl else Shs.empty in
       let make f fl =
         let f = if flat then f else f_and_l f fl in
         let f = List.fold_left agc (f_lambda ~mm pl f) ll in
@@ -586,12 +586,12 @@ let hs_extspec h = Sattr.mem extspec_attr h.hs_name.id_attrs
 let vc_spec (_,c) ({hs_name = {id_string = n}} as h) wr pl =
   if not (hs_extspec h) || unspeccable pl then [] else
   let id_pre = id_fresh (n ^ "'pre") in
+  let y = Bc (1, fun _ _ -> w_true) in
   let param (ul,bl,outs) = function
     | Pt _ -> assert false
     | Pv v | Pr v -> let u = c_clone_vs c v in let b = Bv (t_var u) in
         u::ul, b::bl, List.map (fun (id,ul,bl) -> id, u::ul, b::bl) outs
     | Pc ({hs_name = {id_string = s}},wr,pl) ->
-        let b = Bc (1, fun _ _ -> w_true) in
         let pl = wr_to_pl wr pl in
         let [@warning "-8"] add (zl,fl) (Pv v|Pr v) =
           let z = c_clone_vs c v in
@@ -602,7 +602,7 @@ let vc_spec (_,c) ({hs_name = {id_string = n}} as h) wr pl =
           let c,_,_,_ = consume Shs.empty c 0 pl bl in
           { wp = c_inst_t c f; sp = Mhs.empty } in
         let oo = id_fresh (n ^ "'post'" ^ s), zl, Bc (0, kk) :: bl in
-        ul, b::bl, oo :: List.map (fun (id,ul,bl) -> id, ul, b::bl) outs
+        ul, y::bl, oo :: List.map (fun (id,ul,bl) -> id, ul, y::bl) outs
   in
   let ul,bl,outs = List.fold_left param ([],[],[]) (wr_to_pl wr pl) in
   let callsym i bl = let j,k = c_find_hs c h in k (i - j) bl in
