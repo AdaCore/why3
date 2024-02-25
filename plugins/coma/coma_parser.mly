@@ -171,9 +171,9 @@ coma_param:
   { [PPa (t,true)] }
 | LEFTMINBRC t=term RIGHTMINBRC
   { [PPa (t,false)] }
-| LEFTBRC DOTDOT RIGHTBRC | LEFTMINBRC DOTDOT RIGHTMINBRC
+| LEFTBRC DOTDOT RIGHTBRC
   { [PPo] }
-| LEFTBRC RIGHTBRC | LEFTMINBRC RIGHTMINBRC
+| LEFTBRC RIGHTBRC
   { [PPb] }
 | LEFTSQ l=separated_nonempty_list(BAR, coma_let) RIGHTSQ
   { [PPl l] }
