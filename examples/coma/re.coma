@@ -16,15 +16,14 @@ let unRe (r: regexp)
     (star { r = Star r1 } (r1: regexp))
 = any
 
-let accept (r: regexp) (w: word) (ret { b <-> mem w r } (b: bool))
-= (! a {r} {0} {Epsilon} (fun (i: int) (h (b: bool)) -> h {i=n}) ret
-   [ a (r: regexp) (i : int) (rk: regexp)
+let accept (r: regexp) (w: word) {} (ret { b <-> mem w r } (b: bool))
+ = a {r} {0} {Epsilon} (fun (i: int) (h (b: bool)) -> h {i=n}) ret
+   [ a (r: regexp) (i : int) (rk: regexp) {0 <= i <= n}
        (k { mem w[i..j] r } { i <= j <= n }
           (j: int)
           (h { b <-> mem w[j..] rk } (b: bool)))
        (o { b <-> mem w[i..] (Concat r rk) } (b: bool))
-     = {0 <= i <= n} ((!
-         unRe {r} empty eps char alt cat star
+     = unRe {r} empty eps char alt cat star
          [ empty -> o {false}
          | eps   -> { mem empty r } k {i} o
          | char (c: char) ->
@@ -46,7 +45,6 @@ let accept (r: regexp) (w: word) (ret { b <-> mem w r } (b: bool))
                  (fun (j: int) (ho (b: bool)) ->
                    (! if {i < j} (-> a {r} {j} {rk} k ho) (ho {false})))
                  o) ]
-       ))
-   ])
-  [ n: int = length w ]
+   ]
+   [ n: int = length w ]
 
