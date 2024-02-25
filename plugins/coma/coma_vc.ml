@@ -354,9 +354,9 @@ let rec vc pp dd e c bl =
   | Elet (e,vtl) -> assert (bl = []);
       let add cc (v,s,_) = c_add_vs cc v (c_inst_t c s) in
       vc pp dd e (List.fold_left add c vtl) bl
-  | Ecut (f,e) -> assert (bl = []);
+  | Ecut (f,b,e) -> assert (bl = []);
       let f = t_attr_add stop_split f in
-      (if pp && c.c_gl then w_and_asym else w_implies)
+      (if b && pp && c.c_gl then w_and_asym else w_implies)
         (c_inst_t c f) (vc pp dd e c bl)
   | Ebox e -> assert (bl = []); vc dd dd e c bl
   | Ewox e -> assert (bl = []); vc pp pp e c bl

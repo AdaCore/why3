@@ -117,7 +117,7 @@ let defn_hs_iter fn (_,_,_,d) =
         let check (_,_,_,d) = inspect d
         in List.iter check dl; inspect e
     | Eapp (e, Ac d) -> inspect d; inspect e
-    | Elet (e,_) | Ecut (_,e) | Ebox e
+    | Elet (e,_) | Ecut (_,_,e) | Ebox e
     | Eset (e,_) | Elam (_,e) | Ewox e
     | Eapp (e,_) -> inspect e
     | Eany -> () in
@@ -125,10 +125,10 @@ let defn_hs_iter fn (_,_,_,d) =
 
 let rec type_expr tuc ctx { pexpr_desc=d; pexpr_loc=loc } =
   match d with
-  | PEbox e     -> let e = type_prog ~loc tuc ctx e in Ebox e, []
-  | PEwox e     -> let e = type_prog ~loc tuc ctx e in Ewox e, []
-  | PEcut (t,e) -> let e = type_prog ~loc tuc ctx e in Ecut (type_fmla tuc ctx t, e), []
-  | PEany       -> Eany, []
+  | PEbox e       -> let e = type_prog ~loc tuc ctx e in Ebox e, []
+  | PEwox e       -> let e = type_prog ~loc tuc ctx e in Ewox e, []
+  | PEcut (t,b,e) -> let e = type_prog ~loc tuc ctx e in Ecut (type_fmla tuc ctx t, b, e), []
+  | PEany         -> Eany, []
   | PEsym id ->
       let h, _, pl, oc =
         try

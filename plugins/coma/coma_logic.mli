@@ -31,7 +31,7 @@ type expr =
   | Edef of expr * bool * defn list
   | Eset of expr * (vsymbol * term) list
   | Elet of expr * (vsymbol * term * bool) list
-  | Ecut of term * expr
+  | Ecut of term * bool * expr
   | Ebox of expr
   | Ewox of expr
   | Eany

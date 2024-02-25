@@ -30,7 +30,7 @@ and pexpr_desc =
   | PEdef of pexpr * bool * pdefn list (* e / rec? h p = e and ... *)
   | PEset of pexpr * (ident * term) list
   | PElet of pexpr * pvar list
-  | PEcut of term * pexpr (* { t } e *)
+  | PEcut of term * bool * pexpr (* { t } e *)
   | PEbox of pexpr (* ! e *)
   | PEwox of pexpr (* ? e *)
   | PEany (* any *)
@@ -115,6 +115,9 @@ module PP = struct
     let pp_v fmt (s, t, mut) = fprintf fmt "@ %a =@ %a" (pp_var mut) s pp_term t in
     pp_print_list ~pp_sep pp_v fmt sl
 
+  let pp_annot b fmt f =
+    if b then pp_term fmt f else fprintf fmt "assume@ %a" pp_term f
+
   let rec pp_expr fmt = function
     | Eany           -> fprintf fmt "any"
     | Esym i         -> fprintf fmt "%a"             pp_hs i
@@ -123,7 +126,7 @@ module PP = struct
     | Eset (e, l)    -> fprintf fmt "%a@\n[%a]"      pp_expr e pp_set l
     | Elet (e, l)    -> fprintf fmt "%a@\n[%a]"      pp_expr e pp_let l
     | Eapp (e, arg)  -> fprintf fmt "@[%a%a@[%a@]@]" pp_expr e pp_sp_nl2 () pp_arg arg
-    | Ecut (t, e)    -> fprintf fmt "%a@ %a"         pp_term t pp_expr e
+    | Ecut (t, b, e) -> fprintf fmt "%a@ %a"         (pp_annot b) t pp_expr e
     | Edef (e, b, l) -> fprintf fmt "%a@\n[%a]"      pp_expr e (pp_local_defs_block b)  l
     | Elam (p, e)    -> fprintf fmt "(fu@[n %a%a→@ @[%a@]@])"  pp_prms p pp_osp (p <> []) pp_expr e
 
@@ -188,6 +191,9 @@ module PPp = struct
     let pp_v fmt (s, _, _, mut) = fprintf fmt "@ %a =@ {}" (pp_var mut) s in
     pp_print_list ~pp_sep pp_v fmt sl
 
+  let pp_annot b fmt _f =
+    pp_print_string fmt (if b then "assert {}" else "assume {}")
+
   let rec pp_expr fmt e = match e.pexpr_desc with
     | PEany           -> fprintf fmt "any"
     | PEsym i         -> fprintf fmt "%s"             i.id_str
@@ -196,7 +202,7 @@ module PPp = struct
     | PEset (e, l)    -> fprintf fmt "%a@\n[%a]"      pp_expr e pp_set l
     | PElet (e, l)    -> fprintf fmt "%a@\n[%a]"      pp_expr e pp_let l
     | PEapp (e, arg)  -> fprintf fmt "@[%a%a@[%a@]@]" pp_expr e pp_sp_nl2 () pp_arg arg
-    | PEcut (_t, e)   -> fprintf fmt "assert {}@ %a"  pp_expr e
+    | PEcut (t, b, e) -> fprintf fmt "%a@ %a"         (pp_annot b) t pp_expr e
     | PEdef (e, b, l) -> fprintf fmt "%a@\n[%a]"      pp_expr e (pp_local_defs_block b)  l
     | PElam (p, e)    -> fprintf fmt "(fu@[n %a%a→@ @[%a@]@])"  (pp_print_list pp_param) p pp_osp (p <> []) pp_expr e
 

@@ -238,7 +238,7 @@ type expr =
   | Edef of expr * bool * defn list
   | Eset of expr * (vsymbol * term) list
   | Elet of expr * (vsymbol * term * bool) list
-  | Ecut of term * expr
+  | Ecut of term * bool * expr
   | Ebox of expr
   | Ewox of expr
   | Eany
@@ -521,7 +521,7 @@ let rec vc tt hc e al =
       let pl = List.map (fun (v,_,_) -> Pv v) vtl in
       let agv f = List.fold_left agv (f_lambda pl f) vtl in
       vc_map agv (vc tt hc e [])
-  | Ecut (f, (*b,*) e) -> (*REMOVE:*) let b = true in
+  | Ecut (f,b,e) ->
       (match vc tt hc e [] with TT g -> TT (Fcut (f,b,g))
         | TB (g,h) -> TB (Fcut (f,b,g), Fcut (f,false,h)))
   | (Ebox e | Ewox e) when tt -> vc true hc e []
@@ -545,7 +545,7 @@ let rec fill_wox rb = function
       Edef (fill_wox rb e, flat, wox_defn dfl)
   | Eset (e, vtl) -> Eset (fill_wox rb e, vtl)
   | Elet (e, vtl) -> Elet (fill_wox rb e, vtl)
-  | Ecut (f, (*b,*) e) -> Ecut (f, (*b,*) fill_wox rb e)
+  | Ecut (f, b, e) -> Ecut (f, b, fill_wox rb e)
   | Eapp (e, Ac d) -> Eapp (fill_wox rb e, Ac (fill_wox rb d))
   | Eapp (e, (At _|Av _|Ar _ as a)) -> Eapp (fill_wox rb e, a)
   | Ebox e -> rb := true; Ebox (fill_wox rb e)

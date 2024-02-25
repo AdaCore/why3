@@ -95,7 +95,9 @@ coma_expr:
 
 coma_desc:
 | LEFTBRC t=term RIGHTBRC e=coma_expr
-  { PEcut (t, e) }
+  { PEcut (t, true, e) }
+| ASSUME LEFTBRC t=term RIGHTBRC e=coma_expr
+  { PEcut (t, false, e) }
 | LEFTSQ l=separated_nonempty_list(BAR, coma_set) RIGHTSQ e=coma_expr
   { PEset (e, l) }
 | LEFTPAR BANG e=coma_prog RIGHTPAR
