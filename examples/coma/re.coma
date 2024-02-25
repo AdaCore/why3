@@ -53,6 +53,6 @@ let accept (r: regexp) (w: word) (ret (b: bool))
            [ h (b: bool) -> {b <-> mem w[j..] rk} (! h {b})]
        ]
    ])
-  [ n: int = {length w} ]
+  [ n: int = length w ]
   [ ret (b:bool) -> { b <-> mem w r } (! ret {b}) ]
 

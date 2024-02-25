@@ -81,13 +81,13 @@ coma_bloc:
   { fun e -> (mk_pexpr (PEdef (e, true, dl)) $loc) }
 
 coma_let:
-| AMP id=attrs(lident_nq) ty=oftyp EQUAL LEFTBRC t=term RIGHTBRC
+| AMP id=attrs(lident_nq) ty=oftyp EQUAL t=term
   { id, t, ty, true }
-| id=attrs(lident_nq) ty=oftyp EQUAL LEFTBRC t=term RIGHTBRC
+| id=attrs(lident_nq) ty=oftyp EQUAL t=term
   { id, t, ty, false }
 
 coma_set:
-| AMP id=lident LARROW LEFTBRC t=term RIGHTBRC { id, t }
+| AMP id=lident LARROW t=term { id, t }
 
 coma_expr:
 | d = coma_desc

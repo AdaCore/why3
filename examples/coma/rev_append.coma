@@ -15,7 +15,7 @@ let unList (l: list int)
 let assign_int (&r v: int) (out [r] {r = v}) = any
 
 let assign_list (&r v: list int) {} (out [r] {r = v})
-  = [ &r <- {v} ] out
+  = [ &r <- v ] out
 
 -------------------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ let rev_append (l0 r0: list int) {}
   [ loop [r l] { reverse l ++ r = reverse l0 ++ r0 }
     = unList {l}
         (fun (h: int) (t: list int) ->
-          [ &r <- {Cons h r} | &l <- {t} ] loop)
+          [ &r <- Cons h r | &l <- t ] loop)
         (-> out {r})
   ]
-  [ &r: list int = {r0} | &l: list int = {l0} ]
+  [ &r: list int = r0 | &l: list int = l0 ]
