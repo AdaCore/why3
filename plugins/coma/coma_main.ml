@@ -84,6 +84,7 @@ let read_module env path (lenv,menv) (nm,dl) =
 let read_channel_coma env path file c =
   let ini = Mstr.empty, Mstr.empty in
   let ast = Coma_lexer.parse_channel file c in
+  if Debug.test_flag Typing.debug_parse_only then Mstr.empty else
   fst (List.fold_left (read_module env path) ini ast)
 
 let () = Env.register_format Env.base_language "coma" ["coma"] read_channel_coma
