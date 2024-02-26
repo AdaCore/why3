@@ -45,28 +45,22 @@ uses:
       "the keyword `import' is redundant here and can be omitted";
     (Puseimport ($2, n, q) ) }
 
-// | TYPE qualid ty_var* EQUAL ty {  }
-
-/* ty_var:
-| attrs(quote_lident) { $1 } */
-
 coma_top_lvl:
 | LET REC separated_nonempty_list(WITH, defn(EQUAL))
   { Blo $3 }
 | LET defn(EQUAL)
   { Def $2 }
-/* | LET coma_let*
-  { Lets $2 } */
 | pure_decl
-  { Pld $1 }
+  { Mlw $1 }
+| meta_decl
+  { Mlw $1 }
 | uses
   { Use $1 }
 
 defn(X):
 | id=attrs(lword_nq) w=prewrites p=coma_params X e=coma_prog
-  { let d = { pdefn_name = id; pdefn_writes = w;
-              pdefn_params = p; pdefn_body = e } in
-    mk_defn d $loc }
+  { mk_defn { pdefn_name = id; pdefn_writes = w;
+              pdefn_params = p; pdefn_body = e } $loc }
 
 coma_prog:
 | e=coma_expr bl=coma_bloc*
@@ -245,7 +239,7 @@ lkeyword:
 (* | LEMMA { "lemma" } *)
 (* | LET { "let" } *)
 | MATCH { "match" }
-| META { "meta" }
+(* | META { "meta" } *)
 (* | MODULE { "module" } *)
 | MUTABLE { "mutable" }
 | NOT { "not" }

@@ -66,8 +66,7 @@ type use =
 type pdecl =
   | Def of pdefn
   | Blo of pdefn list
-  (* | Lets of pvar  list *)
-  | Pld of decl
+  | Mlw of Ptree.decl
   | Use of use
 
 type pfile = (ident * pdecl list) list
