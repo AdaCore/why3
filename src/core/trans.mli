@@ -50,6 +50,7 @@ val par : task trans list -> task tlist
     this new task the corresponding transformation in [l] *)
 
 (** {2 Iterating transformations} *)
+
 val fold   : (task_hd -> 'a -> 'a     ) -> 'a -> 'a trans
 val fold_l : (task_hd -> 'a -> 'a list) -> 'a -> 'a tlist
 val fold_decl : (decl -> 'a -> 'a     ) -> 'a -> 'a trans
@@ -250,7 +251,7 @@ val list_transforms_with_args_l : unit -> (string * Pp.formatted) list
 val register_transform_with_args   : desc:Pp.formatted -> string -> trans_with_args -> unit
 val register_transform_with_args_l : desc:Pp.formatted -> string -> trans_with_args_l -> unit
 
-(** {2 handling of all forms of transformations} *)
+(** {2 Handling of all forms of transformations} *)
 
 type gentrans =
   | Trans_one of Task.task trans
