@@ -63,7 +63,7 @@ coma_top_lvl:
   { Use $1 }
 
 defn(X):
-| id=attrs(lident_nq) w=prewrites p=coma_params X e=coma_prog
+| id=attrs(lword_nq) w=prewrites p=coma_params X e=coma_prog
   { let d = { pdefn_name = id; pdefn_writes = w;
               pdefn_params = p; pdefn_body = e } in
     mk_defn d $loc }
@@ -81,13 +81,13 @@ coma_bloc:
   { fun e -> (mk_pexpr (PEdef (e, true, dl)) $loc) }
 
 coma_let:
-| AMP id=attrs(lident_nq) ty=oftyp EQUAL t=term
+| AMP id=attrs(lword_nq) ty=oftyp EQUAL t=term
   { id, t, ty, true }
-| id=attrs(lident_nq) ty=oftyp EQUAL t=term
+| id=attrs(lword_nq) ty=oftyp EQUAL t=term
   { id, t, ty, false }
 
 coma_set:
-| AMP id=lident LARROW t=term { id, t }
+| AMP id=lword LARROW t=term { id, t }
 
 coma_expr:
 | d = coma_desc
@@ -114,7 +114,7 @@ coma_expr2:
   { mk_pexpr d $loc }
 
 coma_desc2:
-| x=lqualid
+| x=lqword
   { PEsym x }
 | ANY
   { PEany }
@@ -132,7 +132,7 @@ coma_closure:
     mk_pexpr d $loc }
 
 %inline prewrites:
-| LEFTSQ w=lident* RIGHTSQ
+| LEFTSQ w=lword* RIGHTSQ
   { w }
 | (* epsilon *)
   { [] }
@@ -142,11 +142,11 @@ coma_arg:
   { PAt ty }
 | LEFTBRC t=term RIGHTBRC
   { PAv t }
-| AMP x=lident
+| AMP x=lword
   { PAr x }
 | LEFTPAR e=coma_prog RIGHTPAR
   { PAc e }
-| li=lqualid
+| li=lqword
   { let d = mk_pexpr (PEsym li) $loc in
     PAc d }
 | c=coma_closure
@@ -165,7 +165,7 @@ coma_param:
   { l }
 | LEFTPAR lid=coma_binder+ t=oftyp RIGHTPAR
   { List.map (fun (b,id) -> if b then PPr (id,t) else PPv (id,t)) lid }
-| LEFTPAR id=attrs(lident_nq) w=prewrites p=coma_params RIGHTPAR
+| LEFTPAR id=attrs(lword_nq) w=prewrites p=coma_params RIGHTPAR
   { [PPc (id, w, p)] }
 | LEFTBRC t=term RIGHTBRC
   { [PPa (t,true)] }
@@ -179,13 +179,101 @@ coma_param:
   { [PPl l] }
 
 coma_binder:
-| id=attrs(lident_nq)
+| id=attrs(lword_nq)
   { false, id }
-| AMP id=attrs(lident_nq)
+| AMP id=attrs(lword_nq)
   { true, id }
 
 oftyp:
 | COLON t=ty { t }
+
+lqword:
+| lword                  { Qident $1 }
+| uqualid DOT lword      { Qdot ($1, $3) }
+
+lword:
+| lident    { $1 }
+| lkeyword  { mk_id $1 $startpos $endpos }
+
+lword_nq:
+| lident_nq { $1 }
+| lkeyword  { mk_id $1 $startpos $endpos }
+
+lkeyword:
+| ABSURD { "absurd" }
+| RETURN { "return" }
+| ABSTRACT { "abstract" }
+| ALIAS { "alias" }
+(* | ANY { "any" } *)
+| AS { "as" }
+| ASSERT { "assert" }
+| ASSUME { "assume" }
+| AT { "at" }
+(* | AXIOM { "axiom" } *)
+| BEGIN { "begin" }
+| BREAK { "break" }
+| BY { "by" }
+| CHECK { "check" }
+| CLONE { "clone" }
+(* | COINDUCTIVE { "coinductive" } *)
+(* | CONSTANT { "constant" } *)
+| CONTINUE { "continue" }
+| DIVERGES { "diverges" }
+| DO { "do" }
+| DONE { "done" }
+| DOWNTO { "downto" }
+| ELSE { "else" }
+(* | END { "end" } *)
+| ENSURES { "ensures" }
+| EPSILON { "epsilon" }
+| EXCEPTION { "exception" }
+| EXISTS { "exists" }
+| EXPORT { "export" }
+| FALSE { "false" }
+| FOR { "for" }
+| FORALL { "forall" }
+(* | FUN { "fun" } *)
+(* | FUNCTION { "function" } *)
+| GHOST { "ghost" }
+(* | GOAL { "goal" } *)
+| IF { "if" }
+| IMPORT { "import" }
+| IN { "in" }
+(* | INDUCTIVE { "inductive" } *)
+| INVARIANT { "invariant" }
+| LABEL { "label" }
+(* | LEMMA { "lemma" } *)
+(* | LET { "let" } *)
+| MATCH { "match" }
+| META { "meta" }
+(* | MODULE { "module" } *)
+| MUTABLE { "mutable" }
+| NOT { "not" }
+| OLD { "old" }
+| PARTIAL { "partial" }
+(* | PREDICATE { "predicate" } *)
+| PRIVATE { "private" }
+| PURE { "pure" }
+| RAISE { "raise" }
+| RAISES { "raises" }
+| READS { "reads" }
+| REC { "rec" }
+| REQUIRES { "requires" }
+| RETURNS { "returns" }
+| SCOPE { "scope" }
+| SO { "so" }
+| THEN { "then" }
+| THEORY { "theory" }
+| TO { "to" }
+| TRUE { "true" }
+| TRY { "try" }
+(* | TYPE { "type" } *)
+(* | USE { "use" } *)
+| VAL { "val" }
+| VARIANT { "variant" }
+| WHILE { "while" }
+(* | WITH { "with" } *)
+| WRITES { "writes" }
 
 /* silent Menhir's errors about unreachable non terminal symbols */
 

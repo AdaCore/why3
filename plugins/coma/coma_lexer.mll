@@ -25,7 +25,7 @@
       (fun (x,y) -> Hashtbl.add keywords x y)
       [
         "absurd", ABSURD;
-        (* "return", RETURN; *)
+        "return", RETURN;
         "abstract", ABSTRACT;
         "alias", ALIAS;
         "any", ANY;
@@ -35,7 +35,7 @@
         "at", AT;
         "axiom", AXIOM;
         "begin", BEGIN;
-        (* "break", BREAK; *)
+        "break", BREAK;
         "by", BY;
         "check", CHECK;
         "clone", CLONE;
@@ -46,7 +46,7 @@
         "do", DO;
         "done", DONE;
         "downto", DOWNTO;
-        (* "else", ELSE; *)
+        "else", ELSE;
         "end", END;
         "ensures", ENSURES;
         "epsilon", EPSILON;
@@ -61,7 +61,7 @@
         "function", FUNCTION;
         "ghost", GHOST;
         "goal", GOAL;
-        (* "if", IF; *)
+        "if", IF;
         "import", IMPORT;
         "in", IN;
         "inductive", INDUCTIVE;
@@ -89,7 +89,7 @@
         "returns", RETURNS;
         "scope", SCOPE;
         "so", SO;
-        (* "then", THEN; *)
+        "then", THEN;
         "theory", THEORY;
         "to", TO;
         "true", TRUE;
