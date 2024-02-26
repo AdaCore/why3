@@ -112,18 +112,27 @@ let rec param_spec o pl e =
     | PPc (_,_,ql) -> List.for_all clean ql
     | PPa _ | PPl _ | PPo | PPb -> false
     | PPt _ | PPv _ | PPr _ -> true in
-  let param p (o,pl,e,dl) = match p with
-    | PPo -> o, pl, e, dl
-    | PPt _ | PPv _ | PPr _  -> o, p::pl, e, dl
-    | PPb -> false, pl, { e with pexpr_desc = PEbox (attach e dl) }, []
-    | PPa (f,b) -> o, pl, { e with pexpr_desc = PEcut (f, b, attach e dl) }, []
-    | PPl vtl -> o, pl, { e with pexpr_desc = PElet (attach e dl, vtl) }, []
-    | PPc (_,_,ql) when o && List.for_all clean ql -> o, p::pl, e, dl
+  let param p (o,a,pl,e,dl) = match p with
+    | PPo -> o, a, pl, e, dl
+    | PPt _ | PPv _ | PPr _  -> o, true, p::pl, e, dl
+    | PPb -> false, a, pl, { e with pexpr_desc = PEbox (attach e dl) }, []
+    | PPa (f,b) ->
+        if a then Loc.errorm ~loc:f.term_loc "[coma typing] \
+          specification clauses cannot appear before type or data parameters";
+        o, a, pl, { e with pexpr_desc = PEcut (f, b, attach e dl) }, []
+    | PPl vtl ->
+        List.iter (fun ({id_loc=loc},_,_,b) ->
+          if a then Loc.errorm ~loc "[coma typing] \
+            variable bindings cannot appear before type or data parameters";
+          if b then Loc.errorm ~loc "[coma typing] \
+            illegal reference binding") vtl;
+        o, a, pl, { e with pexpr_desc = PElet (attach e dl, vtl) }, []
+    | PPc (_,_,ql) when o && List.for_all clean ql -> o, a, p::pl, e, dl
     | PPc (h,wr,ql) ->
         let mkt d i = { term_desc = d; term_loc = i.id_loc } in
         let mke d i = { pexpr_desc = d; pexpr_loc = i.id_loc } in
         let apply d = function
-          | PPt a -> mke (PEapp (d, PAt (PTtyvar a))) a
+          | PPt u -> mke (PEapp (d, PAt (PTtyvar u))) u
           | PPc (g,_,_) -> mke (PEapp (d, PAc (mke (PEsym (Qident g)) g))) g
           | PPv (v,_) -> mke (PEapp (d, PAv (mkt (Tident (Qident v)) v))) v
           | PPr (r,_) -> mke (PEapp (d, PAr r)) r
@@ -133,9 +142,9 @@ let rec param_spec o pl e =
         let d = { pdefn_name = h; pdefn_writes = wr;
                   pdefn_params = ql; pdefn_body = d } in
         let d = { pdefn_desc = d; pdefn_loc = h.id_loc } in
-        o, PPc (h,wr,ql) :: pl, e, d::dl in
+        o, a, PPc (h,wr,ql) :: pl, e, d::dl in
   let pl = sink_spec o false false [] pl in
-  let _,pl,e,dl = List.fold_right param pl (true,[],e,[]) in
+  let _,_,pl,e,dl = List.fold_right param pl (true,false,[],e,[]) in
   pl, attach e dl
 
 module SCC = MakeSCC(Hid)

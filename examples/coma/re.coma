@@ -6,23 +6,21 @@ let fail = { false } any
 
 let if (b: bool) (then {b}) (else {not b}) = any
 
-
 let unRe (r: regexp)
     (empty { r = Empty })
     (eps { r = Epsilon })
-    (char { r = Char c } (c: char))
-    (alt { r = Alt r1 r2 } (r1 r2: regexp))
-    (cat { r = Concat r1 r2 } (r1 r2: regexp))
-    (star { r = Star r1 } (r1: regexp))
+    (char (c: char) { r = Char c })
+    (alt (r1 r2: regexp) { r = Alt r1 r2 })
+    (cat (r1 r2: regexp) { r = Concat r1 r2 })
+    (star (r1: regexp) { r = Star r1 })
 = any
 
-let accept (r: regexp) (w: word) {} (ret { b <-> mem w r } (b: bool))
+let accept (r: regexp) (w: word) {} (ret (b: bool) { b <-> mem w r })
  = a {r} {0} {Epsilon} (fun (i: int) (h (b: bool)) -> h {i=n}) ret
    [ a (r: regexp) (i : int) (rk: regexp) {0 <= i <= n}
-       (k { mem w[i..j] r } { i <= j <= n }
-          (j: int)
-          (h { b <-> mem w[j..] rk } (b: bool)))
-       (o { b <-> mem w[i..] (Concat r rk) } (b: bool))
+       (k (j: int) { mem w[i..j] r } { i <= j <= n }
+          (h (b: bool) { b <-> mem w[j..] rk }))
+       (o (b: bool) { b <-> mem w[i..] (Concat r rk) })
      = unRe {r} empty eps char alt cat star
          [ empty -> o {false}
          | eps   -> { mem empty r } k {i} o
@@ -47,4 +45,3 @@ let accept (r: regexp) (w: word) {} (ret { b <-> mem w r } (b: bool))
                  o) ]
    ]
    [ n: int = length w ]
-
