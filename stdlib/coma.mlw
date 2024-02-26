@@ -96,49 +96,61 @@ module Regexp
         forall w1 w2: word, r: regexp.
         mem w1 r -> mem w2 (Star r) -> mem (w1 ++ w2) (Star r)
 
-  axiom nul_interval : forall w: word. forall i: int. forall r:regexp.
-    mem w[i..i] r <-> mem empty r
-
-  axiom mem_concat_eps : forall w: word. forall r: regexp.
-    mem w (Concat Epsilon r) <-> mem w r <-> mem w (Concat r Epsilon)
-
-  axiom w0 : forall w: word. forall r:regexp. mem w r <-> mem w[0..] r
-
   use int.Int
-  axiom mem_char_ax : forall w: word. forall c: char. forall i:int.
+
+  lemma nul_interval : forall w: word. forall i: int.
+    0 <= i <= length w -> w[i..i] == empty
+
+  val predicate (===) (r1 r2: regexp)
+    ensures { result <-> forall w: word. mem w r1 = mem w r2 }
+
+  lemma mem_concat_eps : forall r: regexp.
+    Concat Epsilon r === r === Concat r Epsilon
+
+  lemma w0 : forall w: word. w == w[0..]
+
+  lemma w1 : forall w: word. forall i: int.
+    0 <= i < length w -> w[i..i+1] == singleton w[i]
+
+  lemma unfold_star : forall r1 r2: regexp. forall w: word.
+    mem w (Concat (Concat r1 (Star r1)) r2) ->
+    mem w (Concat (Star r1) r2)
+
+  (* lemma mem_char_ax2 : forall w: word. forall c: char. forall i:int.
+    not w[i] = c <-> not (mem w[i..(i + 1)] (Char c)) *)
+
+  (* lemma mem_cat_ax : forall w: word. forall i:int. forall r1 r2: regexp.
+    0 <= i <= length w ->
+    mem w[i..] (Concat r1 r2) ->
+    exists j: int. i <= j <= length w /\ mem w[i..j] r1 *)
+
+  (* lemma mem_cat_ax2 : forall w: word. forall r1 r2: regexp. forall i j:int.
+    0 <= i <= j <= length w ->
+    mem w[i..j] r1 ->
+    mem w[j..]  r2 ->
+    mem w[i..] (Concat r1 r2) *)
+
+  lemma mem_stat_concat : forall w: word. forall r rk: regexp.
+    mem w (Concat (Star r) rk) <->
+      (mem w rk \/
+       exists w1 w2: word.
+         w1 <> empty   /\
+         w1 ++ w2 = w  /\
+         mem w1 r      /\
+         mem w2 (Concat (Star r) rk))
+
+  lemma mem_cat_char_ax : forall w: word. forall i: int. forall c: char. forall r: regexp.
     0 <= i < length w ->
-    w[i] = c <-> (mem w[i..(i + 1)] (Char c))
+    mem w[i..i+1] (Char c) ->
+    mem w[i+1..]  r <->
+      mem w[i..] (Concat (Char c) r)
 
-  axiom mem_char_ax2 : forall w: word. forall c: char. forall i:int.
-    not w[i] = c <-> not (mem w[i..(i + 1)] (Char c))
+  lemma concat_assoc : forall r1 r2 r3: regexp.
+    Concat r1 (Concat r2 r3) === Concat (Concat r1 r2) r3
 
-  axiom mem_char_ax3 :
-  forall w: word. forall i j:int. forall r: regexp.
-    not mem w[i..j] r
-    -> not exists r2: regexp. mem w[i..] (Concat r r2)
-
-  axiom mem_cat_ax : forall w: word. forall r1 r2: regexp. forall i j:int.
-  i <= j -> mem w[i..j] r1 ->
-  mem w[j..]  r2 <->
-    mem w[i..] (Concat r1 r2)
-
-  axiom mem_cat_char_ax :
-  forall w: word. forall i :int. forall c: char. forall r: regexp.
-  mem w[i..(i+1)] (Char c) ->
-  mem w[(i+1)..]  r <->
-    mem w[i..] (Concat (Char c) r)
-
-  axiom concat_assoc : forall r1 r2 r3: regexp. forall w: word.
-    mem w (Concat r1 (Concat r2 r3)) <-> mem w (Concat (Concat r1 r2) r3)
-
-  axiom concat_split :
-    forall w: word. forall r1 r2: regexp. forall i j j1: int.
-    0 <= i <= j1 <= j <= length w ->
-      (mem w[i..j1] r1 /\ mem w[j1..j] r2)
-      <-> (mem w[i..j] (Concat r1 r2))
-
-  axiom unfold_star : forall r1 r2 r': regexp. forall w: word.
-    r1 = Star r' ->
-      mem w (Concat (Concat r' r1) r2) <-> mem w (Concat r1 r2)
-
+  lemma concat_split : forall w: word. forall r1 r2: regexp. forall i j k: int.
+    0 <= i <= k <= j <= length w ->
+      mem w[i..k] r1 ->
+      mem w[k..j] r2 ->
+      mem w[i..j] (Concat r1 r2)
 end

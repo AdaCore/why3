@@ -1,9 +1,6 @@
 use coma.Regexp
 use int.Int
 
-let halt = (? any)
-let fail = { false } any
-
 let if (b: bool) (then {b}) (else {not b}) = any
 
 let unRe (r: regexp)
@@ -20,6 +17,9 @@ let accept (r: regexp) (w: word) {} (ret (b: bool) { b <-> mem w r })
    [ a (r: regexp) (i : int) (rk: regexp) {0 <= i <= n}
        (k (j: int) { mem w[i..j] r } { i <= j <= n }
           (h (b: bool) { b <-> mem w[j..] rk }))
+                         -- (b -> (mem w[j..] rk)) /\
+                         -- (not b -> (not mem w[j..] rk) \/
+                         --           (mem w[i..] (Concat r rk) -> exists j':int . i < j' <= n /\ j <> j' /\ mem w[i..j'] r /\ mem w[j'..] rk)) }))
        (o (b: bool) { b <-> mem w[i..] (Concat r rk) })
      = unRe {r} empty eps char alt cat star
          [ empty -> o {false}
@@ -39,9 +39,11 @@ let accept (r: regexp) (w: word) {} (ret (b: bool) { b <-> mem w r })
                o
          | star (r1: regexp) ->
              k {i} (fun (b: bool) ->
-               a {r1} {i} {Concat r rk}
-                 (fun (j: int) (ho (b: bool)) ->
-                   (! if {i < j} (-> a {r} {j} {rk} k ho) (ho {false})))
-                 o) ]
+               if {b} (o {true})
+                  (-> a {r1} {i} {Concat r rk}
+                        (fun (j: int) (ho (b: bool)) ->
+                          if {i < j} (-> a {r} {j} {rk} k ho) (ho {false}))
+                        o))
+             ]
    ]
    [ n: int = length w ]
