@@ -1468,11 +1468,11 @@ ref_binder: (* let ref and val ref *)
 | uident                  { Qident $1 }
 | uqualid DOT uident      { Qdot ($1, $3) }
 
-lqualid:
+%public lqualid:
 | lident                  { Qident $1 }
 | uqualid DOT lident      { Qdot ($1, $3) }
 
-lqualid_rich:
+%public lqualid_rich:
 | lident                  { Qident $1 }
 | lident_op               { Qident $1 }
 | uqualid DOT lident      { Qdot ($1, $3) }
@@ -1536,7 +1536,7 @@ sident:
 | STRING          { mk_id $1 $startpos $endpos }
 (* TODO: we can add all keywords and save on quotes *)
 
-quote_lident:
+%public quote_lident:
 | QUOTE_LIDENT    { mk_id $1 $startpos $endpos }
 
 (* Symbolic operation names *)

@@ -30,7 +30,7 @@ type pexpr = {
 }
 
 and pexpr_desc =
-  | PEsym of ident (* x *)
+  | PEsym of qualid (* x *)
   | PEapp of pexpr * pargument (* e <ty>... t... | e... *)
   | PElam of pparam list * pexpr (* fun pl -> e *)
   | PEdef of pexpr * bool * pdefn list (* e / rec? h p = e and ... *)
@@ -68,7 +68,7 @@ type pdecl =
   | Blo of pdefn list
   (* | Lets of pvar  list *)
   | Pld of decl
-  | Use of Loc.position * use
+  | Use of use
 
 type pfile = (ident * pdecl list) list
 
@@ -203,7 +203,7 @@ module PPp = struct
 
   let rec pp_expr fmt e = match e.pexpr_desc with
     | PEany           -> fprintf fmt "any"
-    | PEsym i         -> fprintf fmt "%s"             i.id_str
+    | PEsym q         -> fprintf fmt "%a"             Typing.print_qualid q
     | PEbox e         -> fprintf fmt "(↑@ @[%a@])"    pp_expr e
     | PEwox e         -> fprintf fmt "(↓@ @[%a@])"    pp_expr e
     | PEset (e, l)    -> fprintf fmt "%a@\n[%a]"      pp_expr e pp_set l

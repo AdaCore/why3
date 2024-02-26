@@ -60,7 +60,7 @@ coma_top_lvl:
 | pure_decl
   { Pld $1 }
 | uses
-  { Use (Loc.extract $loc, $1) }
+  { Use $1 }
 
 defn(X):
 | id=attrs(lident_nq) w=prewrites p=coma_params X e=coma_prog
@@ -114,7 +114,7 @@ coma_expr2:
   { mk_pexpr d $loc }
 
 coma_desc2:
-| x=lident
+| x=lqualid
   { PEsym x }
 | ANY
   { PEany }
@@ -146,7 +146,7 @@ coma_arg:
   { PAr x }
 | LEFTPAR e=coma_prog RIGHTPAR
   { PAc e }
-| li=lident
+| li=lqualid
   { let d = mk_pexpr (PEsym li) $loc in
     PAc d }
 | c=coma_closure
@@ -157,8 +157,8 @@ coma_params:
   { (List.flatten pl) }
 
 coma_tvar:
-| x=QUOTE_LIDENT
-  { PPt (mk_id x $startpos $endpos) }
+| x=quote_lident
+  { PPt x }
 
 coma_param:
 | LT l=coma_tvar* GT
