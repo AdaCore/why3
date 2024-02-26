@@ -17,11 +17,11 @@ open Term
 open Decl
 open Theory
 
-type tdecl_set = private {
-  tds_set : Stdecl.t;
-  tds_xor : int;
-  tds_tag : Weakhtbl.tag;
-}
+module HStdecl : Hcpt.S with type elt = tdecl
+
+type tdecl_set = HStdecl.t
+
+module Wtds: Weakhtbl.S with type key = tdecl_set
 
 val tds_equal : tdecl_set -> tdecl_set -> bool
 val tds_hash : tdecl_set -> int

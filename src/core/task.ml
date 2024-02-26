@@ -17,42 +17,31 @@ open Theory
 
 (** Clone and meta history *)
 
-type tdecl_set = {
-  tds_set : Stdecl.t;
-  tds_xor : int;
-  tds_tag : Weakhtbl.tag;
-}
+module Stdecl = Hcpt.MakeSet(struct
+  type t = tdecl
+  let id td = td.td_tag
+end)
+module HStdecl = Stdecl
 
-module Hstds = Hashcons.Make (struct
+type tdecl_set = Stdecl.t
+
+module Wtds = Weakhtbl.Make(struct
   type t = tdecl_set
-  let hash s = s.tds_xor
-  let equal s1 s2 = Stdecl.equal s1.tds_set s2.tds_set
-  let tag n s = { s with tds_tag = Weakhtbl.create_tag n }
+  let tag s = Weakhtbl.create_tag (Stdecl.id s)
 end)
 
-let add_hash td acc = ((td_hash td + 1) * acc) mod 1000000007
 
-let mk_tds s = Hstds.hashcons {
-  tds_set = s;
-  tds_xor = Stdecl.fold add_hash s 1;
-  tds_tag = Weakhtbl.dummy_tag;
-}
+let mk_tds s =
+  Theory.Stdecl.fold Stdecl.add s Stdecl.empty
 
-let tds_empty = mk_tds Stdecl.empty
-let tds_singleton td = mk_tds (Stdecl.singleton td)
+let tds_empty = Stdecl.empty
+let tds_singleton td = Stdecl.singleton td
 
-let tds_add td s =
-  if Stdecl.mem td s.tds_set then s else
-  Hstds.hashcons {
-    tds_set = Stdecl.add td s.tds_set;
-    tds_xor = add_hash td s.tds_xor;
-    tds_tag = Weakhtbl.dummy_tag;
-  }
+let tds_add = Stdecl.add
 
-let tds_equal : tdecl_set -> tdecl_set -> bool = (==)
-let tds_hash tds = Weakhtbl.tag_hash tds.tds_tag
-let tds_compare tds1 tds2 = compare
-  (Weakhtbl.tag_hash tds1.tds_tag) (Weakhtbl.tag_hash tds2.tds_tag)
+let tds_equal = Stdecl.equal
+let tds_hash = Stdecl.hash
+let tds_compare = Stdecl.compare
 
 type clone_map = tdecl_set Mid.t
 type meta_map = tdecl_set Mmeta.t
@@ -187,7 +176,7 @@ let add_prop_decl tk k p f = add_decl tk (create_prop_decl k p f)
 let add_tdecl task td = match td.td_node with
   | Decl d -> new_decl task d td
   | Use th ->
-      if Stdecl.mem td (find_clone_tds task th).tds_set then task else
+      if Stdecl.mem td (find_clone_tds task th) then task else
       new_clone task th td
   | Clone (th,_) -> new_clone task th td
   | Meta (t,_) -> new_meta task t td
@@ -201,7 +190,7 @@ let rec flat_tdecl task td = match td.td_node with
   | Meta (t,_) -> new_meta task t td
 
 and use_export task th td =
-  if Stdecl.mem td (find_clone_tds task th).tds_set then task else
+  if Stdecl.mem td (find_clone_tds task th) then task else
   let task = List.fold_left flat_tdecl task th.th_decls in
   new_clone task th td
 
@@ -257,7 +246,7 @@ let check_use td = match td.td_node with
   | _ -> assert false
 
 let used_theories task =
-  let used { tds_set = s } =
+  let used s =
     let th = match (Stdecl.choose s).td_node with
       | Use th
       | Clone (th, _) -> th
@@ -300,7 +289,7 @@ let on_meta t fn acc task =
     | _ -> assert false
   in
   let tds = find_meta_tds task t in
-  Stdecl.fold add tds.tds_set acc
+  Stdecl.fold add tds acc
 
 let on_cloned_theory th fn acc task =
   let add td acc = match td.td_node with
@@ -309,7 +298,7 @@ let on_cloned_theory th fn acc task =
     | _ -> assert false
   in
   let tds = find_clone_tds task th in
-  Stdecl.fold add tds.tds_set acc
+  Stdecl.fold add tds acc
 
 let on_meta_excl t task =
   if not t.meta_excl then raise (NotExclusiveMeta t);
@@ -318,11 +307,11 @@ let on_meta_excl t task =
     | _ -> assert false
   in
   let tds = find_meta_tds task t in
-  Stdecl.fold add tds.tds_set None
+  Stdecl.fold add tds None
 
 let on_used_theory th task =
   let tds = find_clone_tds task th in
-  Stdecl.exists check_use tds.tds_set
+  Stdecl.exists check_use tds
 
 let on_tagged_ty t task =
   begin match t.meta_type with
@@ -334,7 +323,7 @@ let on_tagged_ty t task =
     | _ -> assert false
   in
   let tds = find_meta_tds task t in
-  Stdecl.fold add tds.tds_set Sty.empty
+  Stdecl.fold add tds Sty.empty
 
 let on_tagged_ts t task =
   begin match t.meta_type with
@@ -346,7 +335,7 @@ let on_tagged_ts t task =
     | _ -> assert false
   in
   let tds = find_meta_tds task t in
-  Stdecl.fold add tds.tds_set Sts.empty
+  Stdecl.fold add tds Sts.empty
 
 let on_tagged_ls t task =
   begin match t.meta_type with
@@ -358,7 +347,7 @@ let on_tagged_ls t task =
     | _ -> assert false
   in
   let tds = find_meta_tds task t in
-  Stdecl.fold add tds.tds_set Sls.empty
+  Stdecl.fold add tds Sls.empty
 
 let on_tagged_pr t task =
   begin match t.meta_type with
@@ -370,7 +359,7 @@ let on_tagged_pr t task =
     | _ -> assert false
   in
   let tds = find_meta_tds task t in
-  Stdecl.fold add tds.tds_set Spr.empty
+  Stdecl.fold add tds Spr.empty
 
 
 (* Exception reporting *)
