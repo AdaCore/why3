@@ -16,10 +16,7 @@ let accept (r: regexp) (w: word) {} (ret (b: bool) { b <-> mem w r })
  = a {r} {0} {Epsilon} (fun (i: int) (h (b: bool)) -> h {i=n}) ret
    [ a (r: regexp) (i : int) (rk: regexp) {0 <= i <= n}
        (k (j: int) { mem w[i..j] r } { i <= j <= n }
-          (h (b: bool) { b <-> mem w[j..] rk }))
-                         -- (b -> (mem w[j..] rk)) /\
-                         -- (not b -> (not mem w[j..] rk) \/
-                         --           (mem w[i..] (Concat r rk) -> exists j':int . i < j' <= n /\ j <> j' /\ mem w[i..j'] r /\ mem w[j'..] rk)) }))
+          (h (b: bool) { b <-> mem w[j..] rk /\ forall r1. r = Star r1 -> i < j }))
        (o (b: bool) { b <-> mem w[i..] (Concat r rk) })
      = unRe {r} empty eps char alt cat star
          [ empty -> o {false}
