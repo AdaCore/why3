@@ -49,7 +49,7 @@ let add_def c muc flat bl =
     let d = Decl.create_logic_decl [Decl.make_ls_defn ls vl f] in
     let d = Pdecl.create_pure_decl d in
     Pmodule.add_pdecl ~vc:false muc d in
-  let add muc (h,w,pl,_) = List.fold_left add muc (vc_spec c h w pl) in
+  let add muc (h,_,_,_) = List.fold_left add muc (vc_spec c h) in
   c, List.fold_left add muc dfl
 
 let add_top env cenv menv (c,muc) = function

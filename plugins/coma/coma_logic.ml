@@ -560,6 +560,103 @@ and wox_expr e =
   let e = fill_wox rb e in
   if !rb then e else Ewox e
 
+(* Effect inference *)
+
+exception CollisionHs of hsymbol
+exception CollisionRs of vsymbol
+
+let rec fill_wr hc lh lr wm o al =
+  let join_writes wr wmd =
+    let wrs = Svs.of_list wr in
+    let wmd = Mhs.map (Svs.union wrs) wmd in
+    let add _ s1 s2 = Some (Svs.union s1 s2) in
+    wm := Mhs.union add !wm wmd in
+  let prewrite wr d =
+    let wmd = ref Mhs.empty in
+    let d = fill_wr hc lh lr wmd d [] in
+    join_writes wr !wmd; d in
+  let rec apply w mr pl al = match pl,al with
+    | (Pt _ | Pv _)::pl, (At _ | Av _ as a)::al ->
+        apply (Eapp (w, a)) mr pl al
+    | (Pr p)::pl, (Ar r as a)::al ->
+        apply (Eapp (w, a)) (Mvs.add p r mr) pl al
+    | (Pc (_,wr,_))::pl, (Ac d)::al ->
+        let inst r = Mvs.find_def r r mr in
+        let d = prewrite (List.map inst wr) d in
+        apply (Eapp (w, Ac d)) mr pl al
+    | _, [] -> w | _ -> assert false in
+  match o with
+  | Eapp (e,a) ->
+      fill_wr hc lh lr wm e (a::al)
+  | Esym h ->
+      let lc,(_,pl) = try true, Mhs.find h lh
+        with Not_found -> false, Mhs.find h hc in
+      if lc then wm := Mhs.add h Svs.empty !wm;
+      apply o Mvs.empty pl al
+  | Elam (pl, e) ->
+      let pl, e = wr_lambda hc lh lr wm pl e in
+      apply (Elam (pl, e)) Mvs.empty pl al
+  | Edef (e, flat, dfl) ->
+      let dfl = wr_defn hc lh lr flat dfl in
+      let mkp ((h,wr,ql,_),_) = Pc (h,wr,ql) in
+      let pl,e = wr_lambda hc lh lr wm (List.map mkp dfl) e in
+      let [@warning "-8"] move (Pc (_,wr,_)) ((h,_,ql,d), wmd) =
+        join_writes wr wmd; h,wr,ql,d in
+      Edef (e, flat, List.map2 move pl dfl)
+  | Eset (e, vtl) ->
+      Eset (prewrite (List.map fst vtl) e, vtl)
+  | Elet (e, vtl) ->
+      let add lr (r,_,b) =
+        if b then Svs.add r lr else lr in
+      let lr = List.fold_left add lr vtl in
+      Elet (fill_wr hc lh lr wm e al, vtl)
+  | Ecut (phi, b, e) ->
+      Ecut (phi, b, fill_wr hc lh lr wm e al)
+  | Ebox e -> Ebox (fill_wr hc lh lr wm e al)
+  | Ewox e -> Ewox (fill_wr hc lh lr wm e al)
+  | Eany -> Eany
+
+and wr_lambda hc lh lr wm pl e =
+  let llr = List.fold_left (fun lr -> function
+    | Pr r -> Svs.add_new (CollisionRs r) r lr
+    | Pt _ | Pv _ | Pc _ -> lr) lr pl in
+  let sh = List.fold_left (fun sh -> function
+    | Pc (h,_,ql) -> Mhs.add h ([],ql) sh
+    | Pt _ | Pv _ | Pr _ -> sh) Mhs.empty pl in
+  let die h _ _ = raise (CollisionHs h) in
+  let lh = Mhs.union die lh sh in
+  let e = fill_wr hc lh llr wm e [] in
+  let update lr = function
+    | Pt _ | Pv _ as p -> lr, p
+    | Pr r as p -> Svs.add r lr, p
+    | Pc (h,_wr,ql) -> (* TODO: warning? *)
+        let wr = Mhs.find_def Svs.empty h !wm in
+        let wr = Svs.elements (Svs.inter wr lr) in
+        lr, Pc (h, wr, ql) in
+  let _,pl = List.fold_left_map update lr pl in
+  wm := Mhs.set_diff !wm sh;
+  pl, e
+
+and wr_defn hc lh lr flat dfl =
+  let llh = if flat then lh else
+    List.fold_left (fun lh (h,wr,pl,_) ->
+      let pl = List.map (function
+        | Pc (h,_,ql) -> Pc (h,[],ql)
+        | Pt _ | Pv _ | Pr _ as p -> p) pl in
+      Mhs.add_new (CollisionHs h) h (wr,pl) lh) lh dfl in
+  (* TODO: fixpoint *)
+  if not flat then List.map (fun d -> d, Mhs.empty) dfl else
+  List.map (fun (h,wr,pl,d) ->
+    let wmd = ref Mhs.empty in
+    let pl, d = wr_lambda hc llh lr wmd pl d in
+    (h,wr,pl,d), !wmd) dfl
+
+let wr_expr hc e =
+  fill_wr hc Mhs.empty Svs.empty (ref Mhs.empty) e []
+
+let wr_defn hc flat dfl =
+  List.map fst (wr_defn hc Mhs.empty Svs.empty flat dfl)
+
 (* Top-level Coma definitions *)
 
 type context = (vsymbol list * param list) Mhs.t * cache
@@ -573,12 +670,11 @@ let c_merge (hco,co) (hcn,cn) =
     c_hs = Mhs.set_union cn.c_hs co.c_hs }
 
 let vc_expr (hc,c) e =
-  let e = wox_expr e in
-  let f = of_tt (vc true hc e []) in
-  vc_simp (top_eval c f 0 []).wp
+  let w = vc true hc (wox_expr (wr_expr hc e)) [] in
+  vc_simp (top_eval c (of_tt w) 0 []).wp
 
 let vc_defn (hc,c) flat dfl =
-  let pl,ll,fl = vc_defn hc flat (wox_defn dfl) in
+  let pl,ll,fl = vc_defn hc flat (wox_defn (wr_defn hc flat dfl)) in
   let ctx bl = let c,_,_,_ = consume Shs.empty c 0 pl bl in c in
   let cc = if flat then c else ctx (jack 0 [] pl) in
   let c = ctx (List.map (fun g -> Bc (0, top_eval cc g)) ll) in
@@ -589,8 +685,11 @@ let vc_defn (hc,c) flat dfl =
 let extspec_attr = create_attribute "coma:extspec"
 let hs_extspec h = Sattr.mem extspec_attr h.hs_name.id_attrs
 
-let vc_spec (_,c) ({hs_name = {id_string = n}} as h) wr pl =
-  if not (hs_extspec h) || unspeccable pl then [] else
+let vc_spec (hc,c) h =
+  if not (hs_extspec h) then [] else
+  let wr, pl = Mhs.find h hc in
+  if unspeccable pl then [] else
+  let n = h.hs_name.id_string in
   let id_pre = id_fresh (n ^ "'pre") in
   let y = Bc (1, fun _ _ -> w_true) in
   let param (ul,bl,outs) = function
@@ -619,4 +718,8 @@ let vc_spec (_,c) ({hs_name = {id_string = n}} as h) wr pl =
 let () = Exn_printer.register (fun fmt -> function
   | BadUndef h -> Format.fprintf fmt
       "Handler `%s' is used in an illegal position" h.hs_name.id_string
+  | CollisionHs h -> Format.fprintf fmt
+      "Handler `%s' is introduced twice in an expression" h.hs_name.id_string
+  | CollisionRs r -> Format.fprintf fmt
+      "Reference `%s' is introduced twice in an expression" r.vs_name.id_string
   | exn -> raise exn)

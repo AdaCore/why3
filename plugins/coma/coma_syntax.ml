@@ -119,6 +119,20 @@ module PP = struct
   let pp_annot b fmt f =
     if b then pp_term fmt f else fprintf fmt "-%a-" pp_term f
 
+(*
+  let rec pp_fmla fmt = function
+    | Fsym i         -> fprintf fmt "%a"             pp_hs i
+    | Fneu (e, _)    -> fprintf fmt "(↑@ @[%a@])"    pp_fmla e
+    | Fagt (e, _)    -> fprintf fmt "@[%a%a@[<_>@]@]" pp_fmla e pp_sp_nl2 ()
+    | Fagv (e, arg)  -> fprintf fmt "@[%a%a@[%a@]@]" pp_fmla e pp_sp_nl2 () pp_term arg
+    | Fagr (e, arg)  -> fprintf fmt "@[%a%a@[%a@]@]" pp_fmla e pp_sp_nl2 () (pp_var true) arg
+    | Fagc (e, arg)  -> fprintf fmt "@[%a%a@[%a@]@]" pp_fmla e pp_sp_nl2 () pp_fmla arg
+    | Fand (e, arg)  -> fprintf fmt "@[%a%a@[%a@]@]" pp_fmla e pp_sp_nl2 () pp_fmla arg
+    | Fcut (t, b, e) -> fprintf fmt "%a@ %a"         (pp_annot b) t pp_fmla e
+    | Flam (p, _, e) -> fprintf fmt "(fu@[n %a%a→@ @[%a@]@])" pp_prms p pp_osp (p <> []) pp_fmla e
+    | Fall (p, e)    -> fprintf fmt "(al@[l %a%a→@ @[%a@]@])" pp_prms p pp_osp (p <> []) pp_fmla e
+*)
+
   let rec pp_expr fmt = function
     | Eany           -> fprintf fmt "any"
     | Esym i         -> fprintf fmt "%a"             pp_hs i
