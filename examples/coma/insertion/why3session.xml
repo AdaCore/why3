@@ -1,33 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="3" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="2.4.3" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.5.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="coma" proved="true">
 <path name=".."/><path name="insertion.coma"/>
 <theory name="Coma" proved="true">
  <goal name="vc_if" proved="true">
- <proof prover="4"><result status="valid" time="0.005453" steps="2"/></proof>
+ <proof prover="4"><result status="valid" time="0.010948" steps="2"/></proof>
  </goal>
  <goal name="vc_unList" proved="true">
- <proof prover="4"><result status="valid" time="0.010575" steps="2"/></proof>
+ <proof prover="4"><result status="valid" time="0.010651" steps="2"/></proof>
  </goal>
  <goal name="vc_insert" proved="true">
- <proof prover="3"><result status="valid" time="0.719122" steps="85755"/></proof>
  <transf name="split_vc" proved="true" >
   <goal name="vc_insert.0" proved="true">
-  <proof prover="4"><result status="valid" time="0.012544" steps="33"/></proof>
+  <proof prover="4"><result status="valid" time="0.008059" steps="51"/></proof>
   </goal>
   <goal name="vc_insert.1" proved="true">
-  <proof prover="4"><result status="valid" time="0.008624" steps="11"/></proof>
+  <proof prover="4"><result status="valid" time="0.017192" steps="11"/></proof>
   </goal>
   <goal name="vc_insert.2" proved="true">
-  <proof prover="3"><result status="valid" time="0.333767" steps="48454"/></proof>
-  <proof prover="4"><result status="valid" time="0.414596" steps="4064"/></proof>
+  <proof prover="4"><result status="valid" time="0.196551" steps="3342"/></proof>
   </goal>
   <goal name="vc_insert.3" proved="true">
-  <proof prover="4"><result status="valid" time="0.010700" steps="24"/></proof>
+  <proof prover="4"><result status="valid" time="0.012466" steps="36"/></proof>
   </goal>
  </transf>
  </goal>

@@ -578,8 +578,8 @@ exception CollisionRs of vsymbol
 
 let rec fill_wr hc lh lr wm o al =
   let join_writes wr wmd =
-    let wrs = Svs.of_list wr in
-    let wmd = Mhs.map (Svs.union wrs) wmd in
+    let wmd = if wr = [] then wmd else
+      Mhs.map (Svs.union (Svs.of_list wr)) wmd in
     let add _ s1 s2 = Some (Svs.union s1 s2) in
     wm := Mhs.union add !wm wmd in
   let prewrite wr d =
