@@ -448,6 +448,12 @@ let rec fill_mm lh = function
 
 let top_eval c f = f_eval c (fill_mm Mhs.empty f)
 
+let rec drop_attr at = function
+  | Fcut (s,pp,f) ->  let s = if pp then t_attr_remove at s else s in
+                      Fcut (s, pp, drop_attr at f)
+  | Flam (pl,mm,f) -> Flam (pl, mm, drop_attr at f)
+  | o -> o
+
 (* VC generation *)
 
 type vc = TT of formula | TB of formula * formula
@@ -502,12 +508,17 @@ let rec vc tt hc o al =
   | Edef (e,flat,dfl) ->
       let agc f g = Fagc (f,g) in
       let pl,ll,fl = vc_defn hc flat dfl in
-      let mm = if flat then mm_of_pl pl else Shs.empty in
-      let make f fl =
-        let f = if flat then f else f_and_l f fl in
-        let f = List.fold_left agc (f_lambda ~mm pl f) ll in
-        let f = if flat then f_and_l f fl else f in
-        if flat then f else f_all pl f in
+      let loop = not (flat || unspeccable pl) in
+      let mm = if flat then mm_of_pl pl else
+               if loop then lh_of_pl pl else Shs.empty in
+      let bind f ll = List.fold_left agc (f_lambda ~mm pl f) ll in
+      let make f fl = match fl with
+        | h::hl when loop ->
+            let ip = List.map (drop_attr Vc.expl_loop_init) ll in
+            let ii = List.map (drop_attr Vc.expl_loop_keep) ll in
+            f_all pl (Fand (bind f ii, bind (f_and_l h hl) ip))
+        | _ when flat -> f_and_l (bind f ll) fl
+        | _ -> f_all pl (bind (f_and_l f fl) ll) in
       (match vc tt (hc_of_pl hc pl) e [] with
        | TB (f,g) -> TB (make f fl, make g [])
        | TT f -> TT (make f fl))
@@ -591,14 +602,16 @@ let rec fill_wr hc lh lr wm o al =
   | Esym h ->
       let lc,(_,pl) = try true, Mhs.find h lh
         with Not_found -> false, Mhs.find h hc in
-      if lc then wm := Mhs.add h Svs.empty !wm;
+      if lc && not (Mhs.mem h !wm) then
+        wm := Mhs.add h Svs.empty !wm;
       apply o Mvs.empty pl al
   | Elam (pl, e) ->
       let pl, e = wr_lambda hc lh lr wm pl e in
       apply (Elam (pl, e)) Mvs.empty pl al
   | Edef (e, flat, dfl) ->
       let dfl = wr_defn hc lh lr flat dfl in
-      let mkp ((h,wr,ql,_),_) = Pc (h,wr,ql) in
+      let mkp ((h,wr,ql,_), wmd) =
+        if not flat then join_writes [] wmd; Pc (h,wr,ql) in
       let pl,e = wr_lambda hc lh lr wm (List.map mkp dfl) e in
       let [@warning "-8"] move (Pc (_,wr,_)) ((h,_,ql,d), wmd) =
         join_writes wr wmd; h,wr,ql,d in
@@ -645,7 +658,6 @@ and wr_defn hc lh lr flat dfl =
         | Pt _ | Pv _ | Pr _ as p -> p) pl in
       Mhs.add_new (CollisionHs h) h (wr,pl) lh) lh dfl in
   (* TODO: fixpoint *)
-  if not flat then List.map (fun d -> d, Mhs.empty) dfl else
   List.map (fun (h,wr,pl,d) ->
     let wmd = ref Mhs.empty in
     let pl, d = wr_lambda hc llh lr wmd pl d in
