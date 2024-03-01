@@ -6,29 +6,29 @@ let fail = { false } any
 
 let if (b: bool) (then {b}) (else {not b}) = any
 
-let unTree (t: tree int)
-  (onNode (v: int) (l r: tree int) {t = Node l v r})
+let unTree < 'elt > (t: tree 'elt)
+  (onNode (v: 'elt) (l r: tree 'elt) {t = Node l v r})
   (onLeaf {t = Empty})
   = any
 
-let rec remove_min (t: tree int) {t <> Empty}
-      (return (m: int) (o: tree int)
+let rec remove_min (t: tree 'a) {t <> Empty}
+      (return (m: 'a) (o: tree 'a)
         { forall x. mem x t <-> (x = m || mem x o) })
-  = unTree {t} node fail
-     [ node (x: int) (l r: tree int) ->
+  = unTree < 'a> {t} node fail
+     [ node (x: 'a) (l r: tree 'a) ->
        if {l=Empty} (-> return {x} {r})
                     (-> remove_min {l}
-                      (fun (m: int) (l': tree int) -> return {m} {Node l' x r}))
+                      (fun (m: 'a) (l': tree 'a) -> return {m} {Node l' x r}))
      ]
 
-let remove_root (t: tree int) (return (o: tree int)) =
-  unTree {t}
-  (fun (_x: int) (l r: tree int) ->
+let remove_root (t: tree 'a) (return (o: tree 'a)) =
+  unTree < 'a > {t}
+  (fun (_x: 'a) (l r: tree 'a) ->
     (! if {r=Empty} (-> return {l})
                     (-> remove_min {r}
-                      (fun (m: int) (r': tree int) -> return {Node l m r'}))
+                      (fun (m: 'a) (r': tree 'a) -> return {Node l m r'}))
     )
-    [ return (o: tree int) ->
+    [ return (o: tree 'a) ->
       { forall x. mem x o <-> (mem x l || mem x r) }
       (! return {o}) ]
   )
@@ -36,7 +36,7 @@ let remove_root (t: tree int) (return (o: tree int)) =
 
 function cl (tree 'a) : int
 
-let rec count_leaf (&c: int) (t: tree int) [old_c: int = c] {}
+let rec count_leaf (&c: int) (t: tree 'a) [old_c: int = c] {}
   (return { c = old_c + cl t })
-= unTree {t} (fun (_x: int) (l r: tree int) ->
+= unTree < 'a > {t} (fun (_x: 'a) (l r: tree 'a) ->
     count_leaf &c {l} (-> count_leaf &c {r} return)) (-> [&c <- c + 1] return)

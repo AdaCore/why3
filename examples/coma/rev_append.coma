@@ -7,25 +7,25 @@ use list.Reverse
 
 let if (b: bool) (then {b}) (else {not b}) = any
 
-let unList (l: list int)
-  (onCons (h: int) (t: list int) {l = Cons h t})
+let unList < 'a > (l: list 'a)
+  (onCons (h: 'a) (t: list 'a) {l = Cons h t})
   (onNil {l = Nil})
   = any
 
-let assign_int (&r v: int) (out [r] {r = v}) = any
+let assign_int < 'a > (&r v: 'a) (out [r] {r = v}) = any
 
-let assign_list (&r v: list int) {} (out [r] {r = v})
+let assign_list < 'a > (&r v: list 'a) {} (out [r] {r = v})
   = [ &r <- v ] out
 
 -------------------------------------------------------------------------------
 
-let rev_append (l0 r0: list int) {}
-      (out (r: list int) { r = reverse l0 ++ r0 }) =
+let rev_append < 'a > (l0 r0: list 'a) {}
+      (out (r: list 'a) { r = reverse l0 ++ r0 }) =
   loop
   [ loop { reverse l ++ r = reverse l0 ++ r0 }
-    = unList {l}
-        (fun (h: int) (t: list int) ->
+    = unList < 'a > {l}
+        (fun (h: 'a) (t: list 'a) ->
           [ &r <- Cons h r | &l <- t ] loop)
         (-> out {r})
   ]
-  [ &r: list int = r0 | &l: list int = l0 ]
+  [ &r: list 'a = r0 | &l: list 'a = l0 ]
