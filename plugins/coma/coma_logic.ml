@@ -651,17 +651,24 @@ and wr_lambda hc lh lr wm pl e =
   pl, e
 
 and wr_defn hc lh lr flat dfl =
-  let llh = if flat then lh else
+  let same_pl pl ql = List.for_all2 (fun p q -> match p,q with
+    | Pc (_,wr,_), Pc (_,vr,_) -> List.for_all2 (vs_equal) wr vr
+    | _, _ -> true) pl ql in
+  let rec fixpoint lh dfl =
+    let same = ref true in
+    let lh, dfl = List.fold_left_map (fun lh ((h,wr,pl,d),wmd) ->
+      let wmd = ref wmd in
+      let pl, d = wr_lambda hc lh lr wmd pl d in
+      same := flat || !same && same_pl (snd (Mhs.find h lh)) pl;
+      Mhs.add h (wr,pl) lh, ((h,wr,pl,d),!wmd)) lh dfl in
+    if !same then dfl else fixpoint lh dfl in
+  let lh = if flat then lh else
     List.fold_left (fun lh (h,wr,pl,_) ->
       let pl = List.map (function
         | Pc (h,_,ql) -> Pc (h,[],ql)
         | Pt _ | Pv _ | Pr _ as p -> p) pl in
       Mhs.add_new (CollisionHs h) h (wr,pl) lh) lh dfl in
-  (* TODO: fixpoint *)
-  List.map (fun (h,wr,pl,d) ->
-    let wmd = ref Mhs.empty in
-    let pl, d = wr_lambda hc llh lr wmd pl d in
-    (h,wr,pl,d), !wmd) dfl
+  fixpoint lh (List.map (fun d -> d, Mhs.empty) dfl)
 
 let wr_expr hc e =
   fill_wr hc Mhs.empty Svs.empty (ref Mhs.empty) e []
