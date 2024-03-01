@@ -652,7 +652,7 @@ and wr_lambda hc lh lr wm pl e =
 
 and wr_defn hc lh lr flat dfl =
   let same_pl pl ql = List.for_all2 (fun p q -> match p,q with
-    | Pc (_,wr,_), Pc (_,vr,_) -> List.for_all2 (vs_equal) wr vr
+    | Pc (_,wr,_), Pc (_,vr,_) -> List.equal vs_equal wr vr
     | _, _ -> true) pl ql in
   let rec fixpoint lh dfl =
     let same = ref true in

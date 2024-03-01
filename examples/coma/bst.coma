@@ -33,3 +33,10 @@ let remove_root (t: tree int) (return (o: tree int)) =
       (! return {o}) ]
   )
   fail
+
+function cl (tree 'a) : int
+
+let rec count_leaf (&c: int) (t: tree int) [old_c: int = c] {}
+  (return { c = old_c + cl t })
+= unTree {t} (fun (_x: int) (l r: tree int) ->
+    count_leaf &c {l} (-> count_leaf &c {r} return)) (-> [&c <- c + 1] return)
