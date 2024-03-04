@@ -122,8 +122,8 @@ type result_info =
      subgoals proven by transformations. *)
   | Not_Proved of
       Gnat_expl.extra_info *     (* VC Info for the unproved goal *)
-      (Model_parser.model * Check_ce.rac_result option) option *
-                                 (* counterexample model and result from
+      (Model_parser.model * Check_ce.rac_result option) list *
+                                 (* counterexample models and their
                                     giant-step RAC result *)
       (string * string) option   (* for manual provers, pair of
                                     (vc_file, editor_cmd) *)
