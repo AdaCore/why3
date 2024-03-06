@@ -2,6 +2,7 @@ module AddSubMulSingle
   use real.RealInfix
   use real.Abs
   use ufloat.USingle
+  use ufloat.USingleLemmas
 
   let ghost mix (a b c d : usingle)
     ensures {
@@ -12,3 +13,17 @@ module AddSubMulSingle
   = (a ++. b --. c) **. d
 end
 
+module AddSubMulDouble
+  use real.RealInfix
+  use real.Abs
+  use ufloat.UDouble
+  use ufloat.UDoubleLemmas
+
+  let ghost mix (a b c d : udouble)
+    ensures {
+      let exact = (to_real a +. to_real b -. to_real c) *. to_real d in
+      let exact_abs = abs ((abs (to_real a +. to_real b) +. abs (to_real c)) *. to_real d) in
+      abs (to_real result -. exact) <=. 3.1 *. eps *. exact_abs +. eta
+    }
+  = (a ++. b --. c) **. d
+end

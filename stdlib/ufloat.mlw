@@ -5,8 +5,152 @@ See also {h <a href="https://inria.hal.science/hal-04343157">this report</a>}
 
 *)
 
+module UFloat
+  use real.RealInfix
+  use real.FromInt
+  use real.Abs
+  use ieee_float.RoundingMode
+
+  type t
+
+  function uround mode real : t
+  function to_real t : real
+  function of_int int : t
+  axiom to_real_of_int : forall x [of_int x]. to_real (of_int x) = from_int x
+
+  constant eps:real
+  constant eta:real
+  axiom eps_bounds : 0. <. eps <. 1.
+  axiom eta_bounds : 0. <. eta <. 1.
+
+  (* To avoid "inline_trivial" to break the forward_propagation strategy *)
+  meta "inline:no" function eps
+  meta "inline:no" function eta
+
+  let ghost function uadd (x y:t) : t
+    (* TODO: Do we want the two first assertions in our context ?
+      We only use them to prove the addition lemma *)
+    ensures { abs (to_real result -. (to_real x +. to_real y)) <=. abs (to_real x) }
+    ensures { abs (to_real result -. (to_real x +. to_real y)) <=. abs (to_real y) }
+    ensures {
+      abs (to_real result -. (to_real x +. to_real y))
+      <=. abs (to_real x +. to_real y) *. eps
+    }
+  = uround RNE (to_real x +. to_real y)
+
+  let ghost function usub (x y:t) : t
+    (* TODO: Do we want the two first assertions in our context ?
+      We only use them to prove the addition lemma *)
+    ensures { abs (to_real result -. (to_real x -. to_real y)) <=. abs (to_real x) }
+    ensures { abs (to_real result -. (to_real x -. to_real y)) <=. abs (to_real y) }
+    ensures {
+      abs (to_real result -. (to_real x -. to_real y))
+      <=. abs (to_real x -. to_real y) *. eps
+    }
+  = uround RNE (to_real x -. to_real y)
+
+  let ghost function umul (x y:t) : t
+    ensures {
+      abs (to_real result -. (to_real x *. to_real y))
+        <=. abs (to_real x *. to_real y) *. eps +. eta
+    }
+  = uround RNE (to_real x *. to_real y)
+
+  let ghost function udiv (x y:t) : t
+    requires { to_real y <> 0. }
+    ensures {
+      abs (to_real result -. (to_real x /. to_real y))
+        <=. abs (to_real x /. to_real y) *. eps +. eta
+    }
+  = uround RNE (to_real x /. to_real y)
+
+  let ghost function uminus (x:t) : t
+    ensures { to_real result = -. (to_real x) }
+  = uround RNE (-. (to_real x))
+
+  (** Infix operators *)
+  let ghost function ( ++. ) (x:t) (y:t) : t = uadd x y
+  let ghost function ( --. ) (x:t) (y:t) : t = usub x y
+  let ghost function ( **. ) (x:t) (y:t) : t = umul x y
+  (* Why3 doesn't support abbreviations so we need to add the requires *)
+  let ghost function ( //. ) (x:t) (y:t) : t
+    requires { to_real y <> 0. }
+  = udiv x y
+  let ghost function ( --._ ) (x:t) : t = uminus x
+
+  (* Some constants *)
+  constant u0:t
+  axiom to_real_u0 : to_real u0 = 0.0
+  constant u1:t
+  axiom to_real_u1 : to_real u1 = 1.0
+  constant u2:t
+  axiom to_real_u2 : to_real u2 = 2.0
+  constant u4:t
+  axiom to_real_u4 : to_real u4 = 4.0
+  constant u8:t
+  axiom to_real_u8 : to_real u8 = 8.0
+  constant u16:t
+  axiom to_real_u16 : to_real u16 = 16.0
+  constant u32:t
+  axiom to_real_u32 : to_real u32 = 32.0
+  constant u64:t
+  axiom to_real_u64 : to_real u64 = 64.0
+  constant u128:t
+  axiom to_real_u128 : to_real u128 = 128.0
+  constant u256:t
+  axiom to_real_u256 : to_real u256 = 256.0
+  constant u512:t
+  axiom to_real_u512 : to_real u512 = 512.0
+  constant u1024:t
+  axiom to_real_u1024 : to_real u1024 = 1024.0
+  constant u2048:t
+  axiom to_real_u2048 : to_real u2048 = 2048.0
+  constant u4096:t
+  axiom to_real_u4096 : to_real u4096 = 4096.0
+  constant u8192:t
+  axiom to_real_u8192 : to_real u8192 = 8192.0
+  constant u16384:t
+  axiom to_real_u16384 : to_real u16384 = 16384.0
+  constant u32768:t
+  axiom to_real_u32768 : to_real u32768 = 32768.0
+  constant u65536:t
+  axiom to_real_u65536 : to_real u65536 = 65536.0
+end
+
+(** {2 Single-precision unbounded floats} *)
+module USingle
+  use real.RealInfix
+
+  type usingle
+
+  constant eps:real = 0x1p-24 /. (1. +. 0x1p-24)
+  constant eta:real = 0x1p-150
+
+  clone export UFloat with
+    type t = usingle,
+    constant eps = eps,
+    constant eta = eta,
+    axiom.
+end
+
+
+(** {3 Double-precision unbounded floats} *)
+module UDouble
+  use real.RealInfix
+  type udouble
+
+  constant eps:real = 0x1p-53 /. (1. +. 0x1p-53)
+  constant eta:real = 0x1p-1075
+
+  clone export UFloat with
+    type t = udouble,
+    constant eps = eps,
+    constant eta = eta,
+    axiom.
+end
+
 (* Helper lemmas to help the proof of propagation lemmas *)
-module RealLemmas
+module HelperLemmas
   use real.RealInfix
   use real.Abs
 
@@ -69,6 +213,19 @@ module RealLemmas
   }
 
   use real.ExpLog
+
+  let lemma exp_sum_opposite (x : real)
+    ensures { forall x. exp(x) +. exp(-.x) >=. 2. }
+  =
+  assert {
+    exp(x) -. 2. +. exp(-.x)
+    = exp(x) *. (1. -. 2. *. exp(-.x) +. (exp(-.x) *. exp(-.x)))
+    = exp(x) *. (1. -. exp(-.x)) *. (1. -. exp(-.x))
+    by
+      exp(x) *. (1. -. exp(-.x)) *. (1. -. exp(-.x))
+      = 1. -. exp (x) -. exp (-.x) +. (exp(-.x) *. exp(-.x))
+      = (1. -. 2. *. exp(-.x) +. (exp(-.x) *. exp(-.x)))
+  }
 
   let ghost exp_approx_err (x x_approx x' a b :real)
     requires { abs (x_approx -. x) <=. x' *. a +. b }
@@ -191,122 +348,12 @@ module RealLemmas
 
 end
 
-
-(** {2 Single-precision unbounded floats} *)
-
-module USingle
+(** {4 Single propagation lemmas} *)
+module USingleLemmas
   use real.RealInfix
   use real.FromInt
   use real.Abs
-  use mach.float.Single as IEEE
-  use ieee_float.RoundingMode
-
-  type usingle
-
-  function uround IEEE.mode real : usingle
-  function to_real usingle : real
-  function of_int int : usingle
-  axiom to_real_of_int : forall x [of_int x]. to_real (of_int x) = from_int x
-
-  constant eps:real = 0x1p-24 /. (1. +. 0x1p-24)
-  constant eta:real = 0x1p-150
-
-  (* To avoid "inline_trivial" to break the forward_propagation strategy *)
-  meta "inline:no" function eps
-  meta "inline:no" function eta
-
-  let ghost function uadd (x y:usingle) : usingle
-    (* TODO: Do we want the two first assertions in our context ?
-      We only use them to prove the addition lemma *)
-    ensures { abs (to_real result -. (to_real x +. to_real y)) <=. abs (to_real x) }
-    ensures { abs (to_real result -. (to_real x +. to_real y)) <=. abs (to_real y) }
-    ensures {
-      abs (to_real result -. (to_real x +. to_real y)) <=.
-        abs (to_real x +. to_real y) *. eps
-    }
-  = uround RNE (to_real x +. to_real y)
-
-  let ghost function usub (x y:usingle) : usingle
-    (* TODO: Do we want the two first assertions in our context ?
-      We only use them to prove the addition lemma *)
-    ensures { abs (to_real result -. (to_real x -. to_real y)) <=. abs (to_real x) }
-    ensures { abs (to_real result -. (to_real x -. to_real y)) <=. abs (to_real y) }
-    ensures {
-      abs (to_real result -. (to_real x -. to_real y)) <=.
-        abs (to_real x -. to_real y) *. eps
-    }
-  = uround RNE (to_real x -. to_real y)
-
-  let ghost function umul (x y:usingle) : usingle
-    ensures {
-      abs (to_real result -. (to_real x *. to_real y)) <=.
-        abs (to_real x *. to_real y) *. eps +. eta
-    }
-  = uround RNE (to_real x *. to_real y)
-
-  let ghost function udiv (x y:usingle) : usingle
-    requires { to_real y <> 0. }
-    ensures {
-      abs (to_real result -. (to_real x /. to_real y)) <=.
-        abs (to_real x /. to_real y) *. eps +. eta
-    }
-  = uround RNE (to_real x /. to_real y)
-
-  let ghost function uminus (x:usingle) : usingle
-    ensures { to_real result = -. (to_real x) }
-  = uround RNE (-. (to_real x))
-
-  (** Infix operators *)
-  let ghost function ( ++. ) (x:usingle) (y:usingle) : usingle = uadd x y
-  let ghost function ( --. ) (x:usingle) (y:usingle) : usingle = usub x y
-  let ghost function ( **. ) (x:usingle) (y:usingle) : usingle = umul x y
-  (* Why3 doesn't support abbreviations so we need to add the requires *)
-  let ghost function ( //. ) (x:usingle) (y:usingle) : usingle
-    requires { to_real y <> 0. }
-   = udiv x y
-  let ghost function ( --._ ) (x:usingle) : usingle = uminus x
-
-  (* Some constants *)
-  constant u0:usingle
-  axiom to_real_u0 : to_real u0 = 0.0
-  constant u1:usingle
-  axiom to_real_u1 : to_real u1 = 1.0
-  constant u2:usingle
-  axiom to_real_u2 : to_real u2 = 2.0
-  constant u4:usingle
-  axiom to_real_u4 : to_real u4 = 4.0
-  constant u8:usingle
-  axiom to_real_u8 : to_real u8 = 8.0
-  constant u16:usingle
-  axiom to_real_u16 : to_real u16 = 16.0
-  constant u32:usingle
-  axiom to_real_u32 : to_real u32 = 32.0
-  constant u64:usingle
-  axiom to_real_u64 : to_real u64 = 64.0
-  constant u128:usingle
-  axiom to_real_u128 : to_real u128 = 128.0
-  constant u256:usingle
-  axiom to_real_u256 : to_real u256 = 256.0
-  constant u512:usingle
-  axiom to_real_u512 : to_real u512 = 512.0
-  constant u1024:usingle
-  axiom to_real_u1024 : to_real u1024 = 1024.0
-  constant u2048:usingle
-  axiom to_real_u2048 : to_real u2048 = 2048.0
-  constant u4096:usingle
-  axiom to_real_u4096 : to_real u4096 = 4096.0
-  constant u8192:usingle
-  axiom to_real_u8192 : to_real u8192 = 8192.0
-  constant u16384:usingle
-  axiom to_real_u16384 : to_real u16384 = 16384.0
-  constant u32768:usingle
-  axiom to_real_u32768 : to_real u32768 = 32768.0
-  constant u65536:usingle
-  axiom to_real_u65536 : to_real u65536 = 65536.0
-
-  use real.RealInfix
-
-  (** {3 Propagation lemmas} *)
+  use USingle
 
   let lemma uadd_single_error_propagation (x_uf y_uf : usingle) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
     requires {
@@ -389,7 +436,7 @@ module USingle
     }
   = uadd_single_error_propagation x_uf (--. y_uf) x x' x_rel_err x_cst_err (-. y) y' y_rel_err y_cst_err
 
-  use RealLemmas
+  use HelperLemmas
 
   let lemma umul_single_error_propagation (x_uf y_uf : usingle) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
     requires {
@@ -593,125 +640,15 @@ module USingle
   =
   div_order_compat (to_real x_uf) (x +. x_rel_err *. x' +. x_cst_err) (to_real y_uf);
   div_order_compat (x -. x_rel_err *. x' -. x_cst_err) (to_real x_uf) (to_real y_uf);
+
 end
 
-
-(** {2 Double-precision unbounded floats} *)
-
-
-module UDouble
+(** {5 Double propagation lemmas} *)
+module UDoubleLemmas
   use real.RealInfix
   use real.FromInt
   use real.Abs
-  use mach.float.Double as IEEE
-  use ieee_float.RoundingMode
-
-  type udouble
-
-  function uround IEEE.mode real : udouble
-  function to_real udouble : real
-  function of_int int : udouble
-  axiom to_real_of_int : forall x [of_int x]. to_real (of_int x) = from_int x
-
-  constant eps:real = 0x1p-24 /. (1. +. 0x1p-24)
-  constant eta:real = 0x1p-150
-
-  (* To avoid "inline_trivial" to break the forward_propagation strategy *)
-  meta "inline:no" function eps
-  meta "inline:no" function eta
-
-  let ghost function uadd (x y:udouble) : udouble
-    (* TODO: Do we want the two first assertions in our context ?
-      We only use them to prove the addition lemma *)
-    ensures { abs (to_real result -. (to_real x +. to_real y)) <=. abs (to_real x) }
-    ensures { abs (to_real result -. (to_real x +. to_real y)) <=. abs (to_real y) }
-    ensures {
-      abs (to_real result -. (to_real x +. to_real y)) <=.
-        abs (to_real x +. to_real y) *. eps
-    }
-  = uround RNE (to_real x +. to_real y)
-
-  let ghost function usub (x y:udouble) : udouble
-    (* TODO: Do we want the two first assertions in our context ?
-      We only use them to prove the addition lemma *)
-    ensures { abs (to_real result -. (to_real x -. to_real y)) <=. abs (to_real x) }
-    ensures { abs (to_real result -. (to_real x -. to_real y)) <=. abs (to_real y) }
-    ensures {
-      abs (to_real result -. (to_real x -. to_real y)) <=.
-        abs (to_real x -. to_real y) *. eps
-    }
-  = uround RNE (to_real x -. to_real y)
-
-  let ghost function umul (x y:udouble) : udouble
-    ensures {
-      abs (to_real result -. (to_real x *. to_real y)) <=.
-        abs (to_real x *. to_real y) *. eps +. eta
-    }
-  = uround RNE (to_real x *. to_real y)
-
-  let ghost function udiv (x y:udouble) : udouble
-    requires { to_real y <> 0. }
-    ensures {
-      abs (to_real result -. (to_real x /. to_real y)) <=.
-        abs (to_real x /. to_real y) *. eps +. eta
-    }
-  = uround RNE (to_real x /. to_real y)
-
-  let ghost function uminus (x:udouble) : udouble
-    ensures { to_real result = -. (to_real x) }
-  = uround RNE (-. (to_real x))
-
-  (** Infix operators *)
-  let ghost function ( ++. ) (x:udouble) (y:udouble) : udouble = uadd x y
-  let ghost function ( --. ) (x:udouble) (y:udouble) : udouble = usub x y
-  let ghost function ( **. ) (x:udouble) (y:udouble) : udouble = umul x y
-  (* Why3 doesn't support abbreviations so we need to add the requires *)
-  let ghost function ( //. ) (x:udouble) (y:udouble) : udouble
-    requires { to_real y <> 0. }
-   = udiv x y
-  let ghost function ( --._ ) (x:udouble) : udouble = uminus x
-
-  (* Some constants *)
-  constant u0:udouble
-  axiom to_real_u0 : to_real u0 = 0.0
-  constant u1:udouble
-  axiom to_real_u1 : to_real u1 = 1.0
-  constant u2:udouble
-  axiom to_real_u2 : to_real u2 = 2.0
-  constant u4:udouble
-  axiom to_real_u4 : to_real u4 = 4.0
-  constant u8:udouble
-  axiom to_real_u8 : to_real u8 = 8.0
-  constant u16:udouble
-  axiom to_real_u16 : to_real u16 = 16.0
-  constant u32:udouble
-  axiom to_real_u32 : to_real u32 = 32.0
-  constant u64:udouble
-  axiom to_real_u64 : to_real u64 = 64.0
-  constant u128:udouble
-  axiom to_real_u128 : to_real u128 = 128.0
-  constant u256:udouble
-  axiom to_real_u256 : to_real u256 = 256.0
-  constant u512:udouble
-  axiom to_real_u512 : to_real u512 = 512.0
-  constant u1024:udouble
-  axiom to_real_u1024 : to_real u1024 = 1024.0
-  constant u2048:udouble
-  axiom to_real_u2048 : to_real u2048 = 2048.0
-  constant u4096:udouble
-  axiom to_real_u4096 : to_real u4096 = 4096.0
-  constant u8192:udouble
-  axiom to_real_u8192 : to_real u8192 = 8192.0
-  constant u16384:udouble
-  axiom to_real_u16384 : to_real u16384 = 16384.0
-  constant u32768:udouble
-  axiom to_real_u32768 : to_real u32768 = 32768.0
-  constant u65536:udouble
-  axiom to_real_u65536 : to_real u65536 = 65536.0
-
-  use real.RealInfix
-
-  (** {3 Propagation lemmas} *)
+  use UDouble
 
   let lemma uadd_double_error_propagation (x_uf y_uf : udouble) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
     requires {
@@ -794,7 +731,7 @@ module UDouble
     }
   = uadd_double_error_propagation x_uf (--. y_uf) x x' x_rel_err x_cst_err (-. y) y' y_rel_err y_cst_err
 
-  use RealLemmas
+  use HelperLemmas
 
   let lemma umul_double_error_propagation (x_uf y_uf : udouble) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
     requires {
@@ -855,8 +792,8 @@ module UDouble
         (exact_x x' log_rel_err log_cst_err x_rel_err x_cst_err : real)
     requires { abs (to_real x_uf -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
     requires {
-      abs (to_real (log2_approx x_uf) -. log2 (to_real x_uf))
-        <=. log_rel_err *. abs (log2 (to_real x_uf)) +. log_cst_err
+      abs (to_real (log2_approx x_uf) -. log2(to_real x_uf))
+       <=. log_rel_err *. abs (log2 (to_real x_uf)) +. log_cst_err
     }
     requires { 0. <. exact_x <=. x' }
     requires { 0. <. (exact_x -. x_rel_err *. x' -. x_cst_err) }
@@ -870,7 +807,7 @@ module UDouble
   =
   log2_approx_err exact_x (to_real x_uf) x' x_rel_err x_cst_err;
   assert {
-    abs (log2 (to_real x_uf)) *. log_rel_err
+   abs (log2 (to_real x_uf)) *. log_rel_err
     <=. (abs (log2 (exact_x)) -. log2 (1.0 -. (((x_rel_err *. x') +. x_cst_err) /. exact_x))) *. log_rel_err
   }
 
@@ -920,7 +857,7 @@ module UDouble
     };
     assert {
       to_real (exp_approx x_uf) >=.
-       exp(exact_x) -.
+       exp(exact_x) -. 
         exp(exact_x)*.(exp_rel_err +. ((exp(x_rel_err *. x' +. x_cst_err) -. 1.) *. (1. +. exp_rel_err))) -. exp_cst_err
       by
         to_real (exp_approx x_uf) >=. exp(to_real x_uf) *. (1. -. exp_rel_err) -. exp_cst_err
@@ -972,7 +909,7 @@ module UDouble
     sum_rel_err *. sum f'' 0 n <=.
     sum_rel_err *. (sum f' 0 n +. ((f_rel_err *. sum f' 0 n) +. (f_cst_err *. from_int n)))
   }
-
+  
   predicate is_positive_power_of_2 (x:udouble) =
     x = u1 \/ x = u2 || x = u4 || x = u8 || x = u16 || x = u32 || x = u64
     || x = u128 \/ x = u256 || x = u4096 || x = u8192 || x = u16384 || x = u32768
@@ -998,4 +935,5 @@ module UDouble
   =
   div_order_compat (to_real x_uf) (x +. x_rel_err *. x' +. x_cst_err) (to_real y_uf);
   div_order_compat (x -. x_rel_err *. x' -. x_cst_err) (to_real x_uf) (to_real y_uf);
+
 end

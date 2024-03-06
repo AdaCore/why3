@@ -2,6 +2,7 @@ module MultiplicationSingle
   use real.RealInfix
   use real.Abs
   use ufloat.USingle
+  use ufloat.USingleLemmas
 
   let ghost multiplication_errors_basic (a b c : usingle)
     ensures {
@@ -33,6 +34,7 @@ module MultiplicationDouble
   use real.RealInfix
   use real.Abs
   use ufloat.UDouble
+  use ufloat.UDoubleLemmas
 
   let ghost multiplication_errors_basic (a b c : udouble)
     ensures {

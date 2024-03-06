@@ -1443,8 +1443,26 @@ by :why3:tool:`why3 show transformations`.
 Proof Strategies
 ----------------
 
+In the context of Why3, proof strategies are mechanisms that automate
+the application of transformations and provers on proof tasks. These
+strategies are mainly meant to be invoked in the IDE.
+
+Strategies come into two flavours: first the so-called basic
+strategies, and second a more complex mechanism allowing one to
+program strategies in OCaml. Such strategies are supposed to be
+programmed on top of the module `Strategy` of the Why3 API. Such
+strategies can also by called goal-oriented, since programming them in
+OCaml provides a way to inspect the formulas in the goal or hypothesis of the task, and apply
+transformations depending on their shapes.
+
+Below we document one of such strategy: a strategy for error
+propagation in floating-point computations.
+
+Basic Strategies
+~~~~~~~~~~~~~~~~
+
 As seen in :numref:`sec.ideref`, the IDE provides a few buttons that
-trigger the run of simple proof strategies on the selected goals. Proof
+trigger the run of basic proof strategies on the selected goals. Such proof
 strategies can be defined using a basic assembly-style language, and put
 into the Why3 configuration file. The commands of this basic language
 are:
@@ -1551,6 +1569,94 @@ Auto_level_3
     attempt a split again. If the split succeeds, we restart from the
     beginning. Otherwise, provers are tried again, in parallel, with 30s and 4
     Gb.
+
+Forward propagation in floating-point computations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The specialized strategy ``forward_propagation`` can be used for
+automatically computing and proving a rounding error on a term of type
+``ufloat`` which is the type of unbounded floats as defined in the
+theory `ufloat` of the standard library.  More background on
+forward error propagation will be available soon in an incoming research report.
+
+The only transformations used are :
+
+- ``assert``, to assert the existence of a forward error.
+- ``apply``, to apply one of the forward propagation lemmas.
+
+The strategy uses the following process:
+
+1. Look at the form of the goal. If the goal has the form
+   ``abs (to_real x -. exact_x) <=. C``, it goes to step 2, else it does nothing.
+2. Look at term ``x``. There are 2 cases :
+
+  * 2.1. : ``x`` is either the result of a supported ufloat operation
+    (e.g. addition, multiplication) on some arguments or
+    the result of the application of an approximation of a supported
+    function (e.g. exponential) to some arguments. Then the strategy
+    applies recursively step 2 for each argument of the ufloat
+    operation/function approximation to compute their forward
+    error. For each forward error computed, the strategy also
+    generates a proof tree containing the steps to prove it. If at
+    least one forward error is computed, then the propagation lemma
+    corresponding to the ufloat operation/approximated function is
+    used to compute the forward error for ``x`` and ``exact_x``, and a corresponding
+    proof tree is generated. The root of the proof tree consists of an
+    assertion of the forward error computed for ``x``, and the child
+    node will generally be the application of the transformation
+    ``apply`` with the propagation lemma as an argument. The
+    propagation lemma contains hypotheses about forward errors for the
+    arguments, therefore the proof trees computed for them recursively
+    are attached as nodes to the corresponding nodes of the tree.
+
+  * 2.2. : ``x`` is something else. Then no forward error is computed
+    and no proof tree is generated.
+
+Currently, propagation lemmas exist for the following functions :
+
+* ufloat addition, subtraction, multiplication and negation.
+* ufloat approximations of ``log`` and ``exp`` functions.
+* ufloat approximations of the iterated sum function (defined in stdlib module ``real.Sum``).
+
+
+The following excerpt is an example of a program that can be proved using the strategy :
+
+    ::
+
+      use real.RealInfix
+      use real.Abs
+      use ufloat.USingle
+
+      let ghost addition_errors_basic (a b c : usingle)
+        ensures {
+          let exact = to_real a +. to_real b +. to_real c in
+          let exact_abs = abs (to_real a) +. abs (to_real b) +. abs (to_real c) in
+          abs (to_real result -. exact) <=. 2. *. eps *. exact_abs
+        }
+      = a ++. b ++. c
+
+To use the strategy within Why3 IDE in order to prove the program, one
+must perform the following steps :
+
+1. Apply the ``split_vc`` transformation to generate the subgoals.
+2. Select the proof node of the postcondition and apply the
+   ``forward_propagation`` strategy, either by typing the name of the
+   strategy in the command line or by right clicking on the proof node
+   and selecting the strategy.
+3. The strategy will generate a proof tree. The nodes of the tree
+   should be easily proved using one of the ``auto`` strategies.
+
+Note that the ``forward_propagation`` strategy can also be used when
+the user has no specific forward error in mind as a way to propose a
+provable bound. For instance in the example above, one could have
+replaced the term ``2. *. eps *. exact_abs`` by anything in the
+postcondition. The strategy would still have worked and it would have
+generated an assertion about a forward error that it can prove. One
+could then use this forward error in the postcondition.
+
+For more examples of the use of the strategy, see the directory
+``examples/numeric`` of the examples repository.
+
 
 .. _sec.attributes:
 
