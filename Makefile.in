@@ -1925,7 +1925,8 @@ MODULESTODOC = \
 	mlw/ity mlw/expr mlw/pdecl mlw/pmodule mlw/vc \
 	mlw/pinterp_core mlw/rac mlw/pinterp mlw/check_ce \
 	session/session_itp session/controller_itp \
-	session/itp_communication session/itp_server
+	session/itp_communication session/itp_server \
+	session/strategy
 
 ifeq (@enable_bddinfer@,yes)
 	MODULESTODOC +=	bddinfer/why3infer
@@ -2016,6 +2017,7 @@ STDLIBS = \
 	random real ref regexp relations \
 	seq set stack string \
 	tree \
+	ufloat \
 	witness \
 	$(addprefix mach/, $(STDMACHLIBS))
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.4.2" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="1" name="Alt-Ergo" version="2.5.2" alternative="FPA" timelimit="5" steplimit="0" memlimit="2000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="add_sub_mul.mlw"/>
 <theory name="AddSubMulSingle" proved="true">
@@ -11,88 +11,192 @@
   <goal name="mix&#39;vc.0" expl="postcondition" proved="true">
   <transf name="inline_trivial" proved="true" >
    <goal name="mix&#39;vc.0.0" expl="postcondition" proved="true">
-   <transf name="assert" proved="true" arg1="((abs1 ((to_real (umul (usub (uadd a b) c) d)) -&#39; ((((to_real a) +&#39; (to_real
-b)) -&#39; (to_real c)) *&#39; (to_real
-d)))) &lt;=&#39; (((eps +&#39; ((((eps +&#39; eps) +&#39; 0.0) +&#39; ((eps +&#39; eps) *&#39; 0.0)) *&#39; (1.0 +&#39; eps))) *&#39; (((abs1
-((to_real a) +&#39; (to_real b))) +&#39; (abs1 (to_real c))) *&#39; (abs1 (to_real
-d)))) +&#39; ((((((0.0 +&#39; (0.0 *&#39; (eps +&#39; eps))) *&#39; ((abs1 ((to_real
-a) +&#39; (to_real b))) +&#39; (abs1 (to_real
-c)))) +&#39; ((0.0 +&#39; (0.0 *&#39; 0.0)) *&#39; (abs1 (to_real
-d)))) +&#39; (0.0 *&#39; 0.0)) *&#39; (1.0 +&#39; eps)) +&#39; eta)))">
+   <transf name="assert" proved="true" arg1="abs
+(to_real (umul (usub (uadd a b) c) d)
+ -&#39; (((to_real a +&#39; to_real b) -&#39; to_real c) *&#39; to_real d))
+&lt;=&#39; (((eps
+       +&#39; ((((eps +&#39; eps) +&#39; 0.0) +&#39; ((eps +&#39; eps) *&#39; 0.0)) *&#39; (1.0 +&#39; eps)))
+      *&#39; ((abs (to_real a +&#39; to_real b) +&#39; abs (to_real c))
+          *&#39; abs (to_real d)))
+     +&#39; ((((((0.0 +&#39; (0.0 *&#39; (eps +&#39; eps)))
+             *&#39; (abs (to_real a +&#39; to_real b) +&#39; abs (to_real c)))
+            +&#39; ((0.0 +&#39; (0.0 *&#39; 0.0)) *&#39; abs (to_real d)))
+           +&#39; (0.0 *&#39; 0.0))
+          *&#39; (1.0 +&#39; eps))
+         +&#39; eta))">
     <goal name="mix&#39;vc.0.0.0" expl="asserted formula" proved="true">
     <transf name="apply" proved="true" arg1="umul_single_error_propagation">
      <goal name="mix&#39;vc.0.0.0.0" expl="apply premises" proved="true">
-     <transf name="assert" proved="true" arg1="((abs1 ((to_real (usub (uadd a b) c)) -&#39; (((to_real a) +&#39; (to_real
-b)) -&#39; (to_real c)))) &lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps) *&#39; ((abs1 ((to_real
-a) +&#39; (to_real b))) +&#39; (abs1 (to_real
-c)))) +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0))))">
+     <transf name="assert" proved="true" arg1="abs (to_real (usub (uadd a b) c) -&#39; ((to_real a +&#39; to_real b) -&#39; to_real c))
+&lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps)
+      *&#39; (abs (to_real a +&#39; to_real b) +&#39; abs (to_real c)))
+     +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0)))">
       <goal name="mix&#39;vc.0.0.0.0.0" expl="asserted formula" proved="true">
       <transf name="apply" proved="true" arg1="usub_single_error_propagation">
        <goal name="mix&#39;vc.0.0.0.0.0.0" expl="apply premises" proved="true">
-       <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd a b)) -&#39; ((to_real a) +&#39; (to_real
-b)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real a) +&#39; (to_real
-b)))))">
+       <transf name="assert" proved="true" arg1="abs (to_real (uadd a b) -&#39; (to_real a +&#39; to_real b))
+&lt;=&#39; (eps *&#39; abs (to_real a +&#39; to_real b))">
         <goal name="mix&#39;vc.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
-        <proof prover="0"><result status="valid" time="0.057253" steps="393"/></proof>
+        <proof prover="1"><result status="valid" time="0.055975" steps="169"/></proof>
         </goal>
         <goal name="mix&#39;vc.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.035358" steps="232"/></proof>
+        <proof prover="1"><result status="valid" time="0.052234" steps="100"/></proof>
         </goal>
        </transf>
        </goal>
        <goal name="mix&#39;vc.0.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.067423" steps="522"/></proof>
+       <proof prover="1"><result status="valid" time="0.033547" steps="75"/></proof>
        </goal>
        <goal name="mix&#39;vc.0.0.0.0.0.2" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.037012" steps="231"/></proof>
+       <proof prover="1"><result status="valid" time="0.060650" steps="79"/></proof>
        </goal>
        <goal name="mix&#39;vc.0.0.0.0.0.3" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.035823" steps="231"/></proof>
+       <proof prover="1"><result status="valid" time="0.034797" steps="77"/></proof>
        </goal>
        <goal name="mix&#39;vc.0.0.0.0.0.4" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.042316" steps="231"/></proof>
+       <proof prover="1"><result status="valid" time="0.033695" steps="70"/></proof>
        </goal>
        <goal name="mix&#39;vc.0.0.0.0.0.5" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.037654" steps="231"/></proof>
+       <proof prover="1"><result status="valid" time="0.027172" steps="70"/></proof>
        </goal>
        <goal name="mix&#39;vc.0.0.0.0.0.6" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.035108" steps="231"/></proof>
+       <proof prover="1"><result status="valid" time="0.036930" steps="70"/></proof>
        </goal>
        <goal name="mix&#39;vc.0.0.0.0.0.7" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.043394" steps="231"/></proof>
+       <proof prover="1"><result status="valid" time="0.041622" steps="70"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="mix&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.036584" steps="233"/></proof>
+      <proof prover="1"><result status="valid" time="0.050072" steps="136"/></proof>
       </goal>
      </transf>
      </goal>
      <goal name="mix&#39;vc.0.0.0.1" expl="apply premises" proved="true">
-     <proof prover="0"><result status="valid" time="0.076049" steps="522"/></proof>
+     <proof prover="1"><result status="valid" time="0.039159" steps="75"/></proof>
      </goal>
      <goal name="mix&#39;vc.0.0.0.2" expl="apply premises" proved="true">
-     <proof prover="0"><result status="valid" time="0.085731" steps="631"/></proof>
+     <proof prover="1"><result status="valid" time="0.052864" steps="107"/></proof>
      </goal>
      <goal name="mix&#39;vc.0.0.0.3" expl="apply premises" proved="true">
-     <proof prover="0"><result status="valid" time="0.051340" steps="231"/></proof>
+     <proof prover="1"><result status="valid" time="0.047934" steps="77"/></proof>
      </goal>
      <goal name="mix&#39;vc.0.0.0.4" expl="apply premises" proved="true">
-     <proof prover="0"><result status="valid" time="0.041333" steps="231"/></proof>
+     <proof prover="1"><result status="valid" time="0.040349" steps="70"/></proof>
      </goal>
      <goal name="mix&#39;vc.0.0.0.5" expl="apply premises" proved="true">
-     <proof prover="0"><result status="valid" time="0.041339" steps="231"/></proof>
+     <proof prover="1"><result status="valid" time="0.041918" steps="70"/></proof>
      </goal>
      <goal name="mix&#39;vc.0.0.0.6" expl="apply premises" proved="true">
-     <proof prover="0"><result status="valid" time="0.035722" steps="231"/></proof>
+     <proof prover="1"><result status="valid" time="0.036982" steps="70"/></proof>
      </goal>
      <goal name="mix&#39;vc.0.0.0.7" expl="apply premises" proved="true">
-     <proof prover="0"><result status="valid" time="0.039562" steps="231"/></proof>
+     <proof prover="1"><result status="valid" time="0.030125" steps="70"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="mix&#39;vc.0.0.1" expl="postcondition" proved="true">
-    <proof prover="0"><result status="valid" time="1.450953" steps="7529"/></proof>
+    <proof prover="1"><result status="valid" time="0.203247" steps="1207"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="AddSubMulDouble" proved="true">
+ <goal name="mix&#39;vc" expl="VC for mix" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="mix&#39;vc.0" expl="postcondition" proved="true">
+  <transf name="inline_trivial" proved="true" >
+   <goal name="mix&#39;vc.0.0" expl="postcondition" proved="true">
+   <transf name="assert" proved="true" arg1="abs
+(to_real (umul (usub (uadd a b) c) d)
+ -&#39; (((to_real a +&#39; to_real b) -&#39; to_real c) *&#39; to_real d))
+&lt;=&#39; (((eps
+       +&#39; ((((eps +&#39; eps) +&#39; 0.0) +&#39; ((eps +&#39; eps) *&#39; 0.0)) *&#39; (1.0 +&#39; eps)))
+      *&#39; ((abs (to_real a +&#39; to_real b) +&#39; abs (to_real c))
+          *&#39; abs (to_real d)))
+     +&#39; ((((((0.0 +&#39; (0.0 *&#39; (eps +&#39; eps)))
+             *&#39; (abs (to_real a +&#39; to_real b) +&#39; abs (to_real c)))
+            +&#39; ((0.0 +&#39; (0.0 *&#39; 0.0)) *&#39; abs (to_real d)))
+           +&#39; (0.0 *&#39; 0.0))
+          *&#39; (1.0 +&#39; eps))
+         +&#39; eta))">
+    <goal name="mix&#39;vc.0.0.0" expl="asserted formula" proved="true">
+    <transf name="apply" proved="true" arg1="umul_double_error_propagation">
+     <goal name="mix&#39;vc.0.0.0.0" expl="apply premises" proved="true">
+     <transf name="assert" proved="true" arg1="abs (to_real (usub (uadd a b) c) -&#39; ((to_real a +&#39; to_real b) -&#39; to_real c))
+&lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps)
+      *&#39; (abs (to_real a +&#39; to_real b) +&#39; abs (to_real c)))
+     +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0)))">
+      <goal name="mix&#39;vc.0.0.0.0.0" expl="asserted formula" proved="true">
+      <transf name="apply" proved="true" arg1="usub_double_error_propagation">
+       <goal name="mix&#39;vc.0.0.0.0.0.0" expl="apply premises" proved="true">
+       <transf name="assert" proved="true" arg1="abs (to_real (uadd a b) -&#39; (to_real a +&#39; to_real b))
+&lt;=&#39; (eps *&#39; abs (to_real a +&#39; to_real b))">
+        <goal name="mix&#39;vc.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
+        <proof prover="1"><result status="valid" time="0.045833" steps="169"/></proof>
+        </goal>
+        <goal name="mix&#39;vc.0.0.0.0.0.0.1" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.034943" steps="100"/></proof>
+        </goal>
+       </transf>
+       </goal>
+       <goal name="mix&#39;vc.0.0.0.0.0.1" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.037730" steps="75"/></proof>
+       </goal>
+       <goal name="mix&#39;vc.0.0.0.0.0.2" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.061325" steps="79"/></proof>
+       </goal>
+       <goal name="mix&#39;vc.0.0.0.0.0.3" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.040116" steps="77"/></proof>
+       </goal>
+       <goal name="mix&#39;vc.0.0.0.0.0.4" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.037369" steps="70"/></proof>
+       </goal>
+       <goal name="mix&#39;vc.0.0.0.0.0.5" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.038046" steps="70"/></proof>
+       </goal>
+       <goal name="mix&#39;vc.0.0.0.0.0.6" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.032959" steps="70"/></proof>
+       </goal>
+       <goal name="mix&#39;vc.0.0.0.0.0.7" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.059167" steps="70"/></proof>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="mix&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
+      <proof prover="1"><result status="valid" time="0.068896" steps="136"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="mix&#39;vc.0.0.0.1" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.030321" steps="75"/></proof>
+     </goal>
+     <goal name="mix&#39;vc.0.0.0.2" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.046028" steps="107"/></proof>
+     </goal>
+     <goal name="mix&#39;vc.0.0.0.3" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.032751" steps="77"/></proof>
+     </goal>
+     <goal name="mix&#39;vc.0.0.0.4" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.047942" steps="70"/></proof>
+     </goal>
+     <goal name="mix&#39;vc.0.0.0.5" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.042177" steps="70"/></proof>
+     </goal>
+     <goal name="mix&#39;vc.0.0.0.6" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.037653" steps="70"/></proof>
+     </goal>
+     <goal name="mix&#39;vc.0.0.0.7" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.032096" steps="70"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="mix&#39;vc.0.0.1" expl="postcondition" proved="true">
+    <proof prover="1"><result status="valid" time="0.176054" steps="1205"/></proof>
     </goal>
    </transf>
    </goal>

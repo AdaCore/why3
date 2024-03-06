@@ -63,7 +63,6 @@ Lemma exp_positive :
 Proof.
 intros x.
 apply exp_pos.
-
 Qed.
 
 (* Why3 goal *)
@@ -140,18 +139,31 @@ Definition log10 (x:Reals.Rdefinitions.R) : Reals.Rdefinitions.R :=
 
 (* Why3 goal *)
 Lemma log2_increasing :
-  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R), (0%R < x)%R ->
-  (x <= y)%R -> ((log2 x) <= (log2 y))%R.
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
+  (0%R < x)%R /\ (x <= y)%R -> ((log2 x) <= (log2 y))%R.
 Proof.
-intros x y h1 h2.
-assert (x = y \/ x < y)%R.
 Admitted.
 
 (* Why3 goal *)
 Lemma log10_increasing :
-  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R), (0%R < x)%R ->
-  (x <= y)%R -> ((log10 x) <= (log10 y))%R.
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
+  (0%R < x)%R /\ (x <= y)%R -> ((log10 x) <= (log10 y))%R.
 Proof.
-intros x y h1 h2.
 Admitted.
 
+(* Unused content named one_le_two
+Proof.
+lra.
+Qed.
+ *)
+(* Unused content named one_le_ten
+Proof.
+lra.
+
+Qed.
+ *)
+(* Unused content named exp_sum_opposite
+Proof.
+intros x.
+Admitted.
+ *)

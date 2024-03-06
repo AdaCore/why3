@@ -244,19 +244,7 @@ module ExpLog
   axiom exp_increasing : forall x y. x <= y -> exp(x) <= exp(y)
   axiom exp_positive : forall x. exp(x) > 0.0
   axiom exp_inv : forall x. exp (-x) = inv (exp x)
-
-  let lemma exp_sum_opposite (x : real)
-    ensures { forall x. exp(x) + exp(-x) >= 2. }
-  =
-  assert {
-    exp(x) - 2. + exp(-x)
-    = exp(x) * (1. - 2. * exp(-x) + (exp(-x) * exp(-x)))
-    = exp(x) * (1. - exp(-x)) * (1. - exp(-x))
-    by
-      exp(x) * (1. - exp(-x)) * (1. - exp(-x))
-      = 1. - exp (x) - exp (-x) + (exp(-x) * exp(-x))
-      = (1. - 2. * exp(-x) + (exp(-x) * exp(-x)))
-  }
+  lemma exp_sum_opposite: forall x : real. exp(x) + exp(-x) >= 2.0
 
   constant e : real = exp 1.0
 
@@ -273,17 +261,9 @@ module ExpLog
   function log2 (x : real) : real = log x / log 2.0
   function log10 (x : real) : real = log x / log 10.0
 
-  let lemma log2_increasing (x y :real)
-    requires { 0. < x }
-    requires { x <= y }
-    ensures { log2(x) <= log2(y) }
-  = assert { 1. <= 2. }
+  lemma log2_increasing : forall x y. 0. < x <= y -> log2(x) <= log2(y)
+  lemma log10_increasing : forall x y. 0. < x <= y -> log10(x) <= log10(y)
 
-  let lemma log10_increasing (x y :real)
-    requires { 0. < x }
-    requires { x <= y }
-    ensures { log10(x) <= log10(y) }
-  = assert { 1. <= 10. }
 end
 
 (** {2 Power of a real to an integer} *)

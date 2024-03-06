@@ -9,117 +9,122 @@
 <path name=".."/><path name="sum.mlw"/>
 <theory name="SumSingle" proved="true">
  <goal name="sum_of_fun_le_sum_of_abs_fun&#39;vc" expl="VC for sum_of_fun_le_sum_of_abs_fun" proved="true">
- <proof prover="0"><result status="valid" time="1.353482" steps="102013"/></proof>
+ <proof prover="0"><result status="valid" time="0.875008" steps="101735"/></proof>
  </goal>
  <goal name="usum&#39;vc" expl="VC for usum" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="usum&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.204893" steps="1281"/></proof>
+  <proof prover="2"><result status="valid" time="0.034162" steps="130"/></proof>
   </goal>
   <goal name="usum&#39;vc.1" expl="loop invariant preservation" proved="true">
   <transf name="inline_trivial" proved="true" >
    <goal name="usum&#39;vc.1.0" expl="loop invariant preservation" proved="true">
-   <transf name="assert" proved="true" arg1="abs1 (to_real (uadd s1 (f @ i)) - (sum (real_fun f) 0 i + to_real (f @ i)))
+   <transf name="assert" proved="true" arg1="abs (to_real (uadd s1 (f @ i)) - (sum (real_fun f) 0 i + to_real (f @ i)))
 &lt;= (((((eps * from_int i) + 0.0) + eps)
-     * (sum (abs_real_fun f) 0 i + abs1 (to_real (f @ i))))
+     * (sum (abs_real_fun f) 0 i + abs (to_real (f @ i))))
     + ((((1.0 + eps) + 0.0) * 0.0)
        + (((1.0 + eps) + (eps * from_int i)) * 0.0)))">
     <goal name="usum&#39;vc.1.0.0" expl="asserted formula" proved="true">
     <transf name="apply" proved="true" arg1="uadd_single_error_propagation">
      <goal name="usum&#39;vc.1.0.0.0" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.056781" steps="295"/></proof>
+     <proof prover="3"><result status="valid" time="0.054739" steps="85"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.1" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.178077" steps="293"/></proof>
+     <proof prover="3"><result status="valid" time="0.047464" steps="83"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.2" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.248282" steps="1802"/></proof>
+     <proof prover="3"><result status="valid" time="0.053865" steps="209"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.3" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.061533" steps="294"/></proof>
+     <proof prover="3"><result status="valid" time="0.054301" steps="85"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.4" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.237131" steps="792"/></proof>
+     <proof prover="3"><result status="valid" time="0.041449" steps="127"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.5" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.053631" steps="287"/></proof>
+     <proof prover="3"><result status="valid" time="0.033146" steps="77"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.6" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.065105" steps="287"/></proof>
+     <proof prover="3"><result status="valid" time="0.025093" steps="77"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.7" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.055286" steps="287"/></proof>
+     <proof prover="3"><result status="valid" time="0.039854" steps="77"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="usum&#39;vc.1.0.1" expl="loop invariant preservation" proved="true">
-    <proof prover="3"><result status="valid" time="0.453171" steps="3089"/></proof>
+    <proof prover="3"><result status="valid" time="0.089201" steps="575"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="usum&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.053225" steps="319"/></proof>
+  <proof prover="3"><result status="valid" time="0.053225" steps="112"/></proof>
   </goal>
   <goal name="usum&#39;vc.3" expl="VC for usum" proved="true">
-  <proof prover="3"><result status="valid" time="0.062505" steps="280"/></proof>
+  <proof prover="3"><result status="valid" time="0.062505" steps="71"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="usum&#39;vc.3.0" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.048376" steps="71"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
  <goal name="usum_rec&#39;vc" expl="VC for usum_rec" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="usum_rec&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.051186" steps="283"/></proof>
+  <proof prover="3"><result status="valid" time="0.051186" steps="73"/></proof>
   </goal>
   <goal name="usum_rec&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.051579" steps="283"/></proof>
+  <proof prover="3"><result status="valid" time="0.051579" steps="73"/></proof>
   </goal>
   <goal name="usum_rec&#39;vc.2" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="usum_rec&#39;vc.2.0" expl="postcondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.260487" steps="1195"/></proof>
+   <proof prover="2"><result status="valid" time="0.031844" steps="138"/></proof>
    </goal>
    <goal name="usum_rec&#39;vc.2.1" expl="postcondition" proved="true">
    <transf name="inline_trivial" proved="true" >
     <goal name="usum_rec&#39;vc.2.1.0" expl="postcondition" proved="true">
-    <transf name="assert" proved="true" arg1="abs1
+    <transf name="assert" proved="true" arg1="abs
 (to_real (uadd o (f @ (n -&#39; 1)))
  - (sum (real_fun f) 0 (n -&#39; 1) + to_real (f @ (n -&#39; 1))))
 &lt;= (((((eps * from_int (n -&#39; 1)) + 0.0) + eps)
-     * (sum (abs_real_fun f) 0 (n -&#39; 1) + abs1 (to_real (f @ (n -&#39; 1)))))
+     * (sum (abs_real_fun f) 0 (n -&#39; 1) + abs (to_real (f @ (n -&#39; 1)))))
     + ((((1.0 + eps) + 0.0) * 0.0)
        + (((1.0 + eps) + (eps * from_int (n -&#39; 1))) * 0.0)))">
      <goal name="usum_rec&#39;vc.2.1.0.0" expl="asserted formula" proved="true">
      <transf name="apply" proved="true" arg1="uadd_single_error_propagation">
       <goal name="usum_rec&#39;vc.2.1.0.0.0" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.061196" steps="293"/></proof>
+      <proof prover="3"><result status="valid" time="0.039368" steps="84"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.1" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.049712" steps="292"/></proof>
+      <proof prover="3"><result status="valid" time="0.032785" steps="82"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.2" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.252907" steps="1337"/></proof>
+      <proof prover="3"><result status="valid" time="0.048571" steps="146"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.3" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.059659" steps="295"/></proof>
+      <proof prover="3"><result status="valid" time="0.055806" steps="86"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.4" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.256446" steps="760"/></proof>
+      <proof prover="3"><result status="valid" time="0.047893" steps="124"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.5" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.155889" steps="288"/></proof>
+      <proof prover="3"><result status="valid" time="0.030337" steps="77"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.6" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.080929" steps="288"/></proof>
+      <proof prover="3"><result status="valid" time="0.040233" steps="77"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.7" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.089232" steps="288"/></proof>
+      <proof prover="3"><result status="valid" time="0.031148" steps="77"/></proof>
       </goal>
      </transf>
      </goal>
      <goal name="usum_rec&#39;vc.2.1.0.1" expl="postcondition" proved="true">
-     <proof prover="3"><result status="valid" time="0.312724" steps="3014"/></proof>
+     <proof prover="3"><result status="valid" time="0.084396" steps="537"/></proof>
      </goal>
     </transf>
     </goal>
@@ -132,52 +137,52 @@
  <goal name="example1&#39;vc" expl="VC for example1" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="example1&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.051935" steps="280"/></proof>
+  <proof prover="3"><result status="valid" time="0.051935" steps="71"/></proof>
   </goal>
   <goal name="example1&#39;vc.1" expl="postcondition" proved="true">
   <transf name="inline_trivial" proved="true" >
    <goal name="example1&#39;vc.1.0" expl="postcondition" proved="true">
-   <transf name="assert" proved="true" arg1="abs1 (to_real result - sum exact_f 0 n)
+   <transf name="assert" proved="true" arg1="abs (to_real result - sum exact_f 0 n)
 &lt;= (sum f&#39; 0 n * (f_rel_err + ((eps * from_int n) * (1.0 + f_rel_err))))">
     <goal name="example1&#39;vc.1.0.0" expl="asserted formula" proved="true">
-    <transf name="assert" proved="true" arg1="abs1 (to_real result - sum exact_f 0 n)
+    <transf name="assert" proved="true" arg1="abs (to_real result - sum exact_f 0 n)
 &lt;= (((f_rel_err + ((eps * from_int n) * (1.0 + f_rel_err))) * sum f&#39; 0 n)
     + (((0.0 * from_int n) * (1.0 + (eps * from_int n))) + 0.0))">
      <goal name="example1&#39;vc.1.0.0.0" expl="asserted formula" proved="true">
-     <transf name="assert" proved="true" arg1="abs1 (to_real result - sum exact_f 0 n)
+     <transf name="assert" proved="true" arg1="abs (to_real result - sum exact_f 0 n)
 &lt;= (((f_rel_err + ((eps * from_int n) * (1.0 + f_rel_err))) * sum f&#39; 0 n)
     + (((0.0 * from_int n) * (1.0 + (eps * from_int n))) + 0.0))">
       <goal name="example1&#39;vc.1.0.0.0.0" expl="asserted formula" proved="true">
       <transf name="apply" proved="true" arg1="sum_single_error_propagation" arg2="with" arg3="f, abs_real_fun f">
        <goal name="example1&#39;vc.1.0.0.0.0.0" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.248953" steps="1734"/></proof>
+       <proof prover="3"><result status="valid" time="0.061286" steps="190"/></proof>
        </goal>
        <goal name="example1&#39;vc.1.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.366764" steps="2249"/></proof>
+       <proof prover="3"><result status="valid" time="0.092140" steps="407"/></proof>
        </goal>
        <goal name="example1&#39;vc.1.0.0.0.0.2" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.071897" steps="291"/></proof>
+       <proof prover="3"><result status="valid" time="0.068011" steps="82"/></proof>
        </goal>
        <goal name="example1&#39;vc.1.0.0.0.0.3" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.213710" steps="715"/></proof>
+       <proof prover="3"><result status="valid" time="0.064263" steps="109"/></proof>
        </goal>
        <goal name="example1&#39;vc.1.0.0.0.0.4" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.075901" steps="283"/></proof>
+       <proof prover="3"><result status="valid" time="0.043990" steps="74"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="example1&#39;vc.1.0.0.0.1" expl="asserted formula" proved="true">
-      <proof prover="3"><result status="valid" time="0.068128" steps="295"/></proof>
+      <proof prover="3"><result status="valid" time="0.031842" steps="86"/></proof>
       </goal>
      </transf>
      </goal>
      <goal name="example1&#39;vc.1.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="3"><result status="valid" time="0.080535" steps="295"/></proof>
+     <proof prover="3"><result status="valid" time="0.044346" steps="86"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="example1&#39;vc.1.0.1" expl="postcondition" proved="true">
-    <proof prover="3"><result status="valid" time="0.056928" steps="295"/></proof>
+    <proof prover="3"><result status="valid" time="0.040926" steps="87"/></proof>
     </goal>
    </transf>
    </goal>
@@ -188,117 +193,117 @@
 </theory>
 <theory name="SumDouble" proved="true">
  <goal name="sum_of_fun_le_sum_of_abs_fun&#39;vc" expl="VC for sum_of_fun_le_sum_of_abs_fun" proved="true">
- <proof prover="3"><result status="valid" time="0.351373" steps="3570"/></proof>
+ <proof prover="3"><result status="valid" time="0.117471" steps="803"/></proof>
  </goal>
  <goal name="usum&#39;vc" expl="VC for usum" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="usum&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.165503" steps="1325"/></proof>
+  <proof prover="3"><result status="valid" time="0.044292" steps="132"/></proof>
   </goal>
   <goal name="usum&#39;vc.1" expl="loop invariant preservation" proved="true">
   <transf name="inline_trivial" proved="true" >
    <goal name="usum&#39;vc.1.0" expl="loop invariant preservation" proved="true">
-   <transf name="assert" proved="true" arg1="abs1 (to_real (uadd s1 (f @ i)) - (sum (real_fun f) 0 i + to_real (f @ i)))
+   <transf name="assert" proved="true" arg1="abs (to_real (uadd s1 (f @ i)) - (sum (real_fun f) 0 i + to_real (f @ i)))
 &lt;= (((((eps * from_int i) + 0.0) + eps)
-     * (sum (abs_real_fun f) 0 i + abs1 (to_real (f @ i))))
+     * (sum (abs_real_fun f) 0 i + abs (to_real (f @ i))))
     + ((((1.0 + eps) + 0.0) * 0.0)
        + (((1.0 + eps) + (eps * from_int i)) * 0.0)))">
     <goal name="usum&#39;vc.1.0.0" expl="asserted formula" proved="true">
     <transf name="apply" proved="true" arg1="uadd_double_error_propagation">
      <goal name="usum&#39;vc.1.0.0.0" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.075169" steps="295"/></proof>
+     <proof prover="3"><result status="valid" time="0.036751" steps="85"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.1" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.076707" steps="293"/></proof>
+     <proof prover="3"><result status="valid" time="0.029023" steps="83"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.2" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.257352" steps="1847"/></proof>
+     <proof prover="3"><result status="valid" time="0.060061" steps="209"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.3" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.072447" steps="294"/></proof>
+     <proof prover="3"><result status="valid" time="0.058687" steps="85"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.4" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.197364" steps="793"/></proof>
+     <proof prover="3"><result status="valid" time="0.056944" steps="127"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.5" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.123961" steps="287"/></proof>
+     <proof prover="3"><result status="valid" time="0.043508" steps="77"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.6" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.083275" steps="287"/></proof>
+     <proof prover="3"><result status="valid" time="0.040529" steps="77"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.7" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.078452" steps="287"/></proof>
+     <proof prover="3"><result status="valid" time="0.042754" steps="77"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="usum&#39;vc.1.0.1" expl="loop invariant preservation" proved="true">
-    <proof prover="3"><result status="valid" time="0.327312" steps="3052"/></proof>
+    <proof prover="3"><result status="valid" time="0.102394" steps="576"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="usum&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.080165" steps="319"/></proof>
+  <proof prover="3"><result status="valid" time="0.080165" steps="110"/></proof>
   </goal>
   <goal name="usum&#39;vc.3" expl="VC for usum" proved="true">
-  <proof prover="3"><result status="valid" time="0.059429" steps="280"/></proof>
+  <proof prover="3"><result status="valid" time="0.059429" steps="71"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="usum_rec&#39;vc" expl="VC for usum_rec" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="usum_rec&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.071763" steps="283"/></proof>
+  <proof prover="3"><result status="valid" time="0.071763" steps="73"/></proof>
   </goal>
   <goal name="usum_rec&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060039" steps="283"/></proof>
+  <proof prover="3"><result status="valid" time="0.060039" steps="73"/></proof>
   </goal>
   <goal name="usum_rec&#39;vc.2" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="usum_rec&#39;vc.2.0" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.120517" steps="1250"/></proof>
+   <proof prover="3"><result status="valid" time="0.120517" steps="142"/></proof>
    </goal>
    <goal name="usum_rec&#39;vc.2.1" expl="postcondition" proved="true">
    <transf name="inline_trivial" proved="true" >
     <goal name="usum_rec&#39;vc.2.1.0" expl="postcondition" proved="true">
-    <transf name="assert" proved="true" arg1="abs1
+    <transf name="assert" proved="true" arg1="abs
 (to_real (uadd o (f @ (n -&#39; 1)))
  - (sum (real_fun f) 0 (n -&#39; 1) + to_real (f @ (n -&#39; 1))))
 &lt;= (((((eps * from_int (n -&#39; 1)) + 0.0) + eps)
-     * (sum (abs_real_fun f) 0 (n -&#39; 1) + abs1 (to_real (f @ (n -&#39; 1)))))
+     * (sum (abs_real_fun f) 0 (n -&#39; 1) + abs (to_real (f @ (n -&#39; 1)))))
     + ((((1.0 + eps) + 0.0) * 0.0)
        + (((1.0 + eps) + (eps * from_int (n -&#39; 1))) * 0.0)))">
      <goal name="usum_rec&#39;vc.2.1.0.0" expl="asserted formula" proved="true">
      <transf name="apply" proved="true" arg1="uadd_double_error_propagation">
       <goal name="usum_rec&#39;vc.2.1.0.0.0" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.070796" steps="293"/></proof>
+      <proof prover="3"><result status="valid" time="0.033492" steps="84"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.1" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.070771" steps="292"/></proof>
+      <proof prover="3"><result status="valid" time="0.047058" steps="82"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.2" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.197130" steps="1313"/></proof>
+      <proof prover="3"><result status="valid" time="0.067492" steps="146"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.3" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.076997" steps="295"/></proof>
+      <proof prover="3"><result status="valid" time="0.059592" steps="86"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.4" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.159107" steps="761"/></proof>
+      <proof prover="3"><result status="valid" time="0.052394" steps="124"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.5" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.108108" steps="288"/></proof>
+      <proof prover="3"><result status="valid" time="0.053396" steps="77"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.6" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.096251" steps="288"/></proof>
+      <proof prover="3"><result status="valid" time="0.040189" steps="77"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.7" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.068701" steps="288"/></proof>
+      <proof prover="3"><result status="valid" time="0.038228" steps="77"/></proof>
       </goal>
      </transf>
      </goal>
      <goal name="usum_rec&#39;vc.2.1.0.1" expl="postcondition" proved="true">
-     <proof prover="3"><result status="valid" time="0.326398" steps="3028"/></proof>
+     <proof prover="3"><result status="valid" time="0.102372" steps="539"/></proof>
      </goal>
     </transf>
     </goal>
@@ -311,52 +316,52 @@
  <goal name="example1&#39;vc" expl="VC for example1" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="example1&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.057153" steps="280"/></proof>
+  <proof prover="3"><result status="valid" time="0.057153" steps="71"/></proof>
   </goal>
   <goal name="example1&#39;vc.1" expl="postcondition" proved="true">
   <transf name="inline_trivial" proved="true" >
    <goal name="example1&#39;vc.1.0" expl="postcondition" proved="true">
-   <transf name="assert" proved="true" arg1="abs1 (to_real result - sum exact_f 0 n)
+   <transf name="assert" proved="true" arg1="abs (to_real result - sum exact_f 0 n)
 &lt;= (sum f&#39; 0 n * (f_rel_err + ((eps * from_int n) * (1.0 + f_rel_err))))">
     <goal name="example1&#39;vc.1.0.0" expl="asserted formula" proved="true">
-    <transf name="assert" proved="true" arg1="abs1 (to_real result - sum exact_f 0 n)
+    <transf name="assert" proved="true" arg1="abs (to_real result - sum exact_f 0 n)
 &lt;= (((f_rel_err + ((eps * from_int n) * (1.0 + f_rel_err))) * sum f&#39; 0 n)
     + (((0.0 * from_int n) * (1.0 + (eps * from_int n))) + 0.0))">
      <goal name="example1&#39;vc.1.0.0.0" expl="asserted formula" proved="true">
-     <transf name="assert" proved="true" arg1="abs1 (to_real result - sum exact_f 0 n)
+     <transf name="assert" proved="true" arg1="abs (to_real result - sum exact_f 0 n)
 &lt;= (((f_rel_err + ((eps * from_int n) * (1.0 + f_rel_err))) * sum f&#39; 0 n)
     + (((0.0 * from_int n) * (1.0 + (eps * from_int n))) + 0.0))">
       <goal name="example1&#39;vc.1.0.0.0.0" expl="asserted formula" proved="true">
       <transf name="apply" proved="true" arg1="sum_double_error_propagation" arg2="with" arg3="f, abs_real_fun f">
        <goal name="example1&#39;vc.1.0.0.0.0.0" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.236976" steps="1734"/></proof>
+       <proof prover="3"><result status="valid" time="0.061058" steps="190"/></proof>
        </goal>
        <goal name="example1&#39;vc.1.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.364095" steps="2200"/></proof>
+       <proof prover="3"><result status="valid" time="0.089933" steps="406"/></proof>
        </goal>
        <goal name="example1&#39;vc.1.0.0.0.0.2" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.077992" steps="291"/></proof>
+       <proof prover="3"><result status="valid" time="0.063734" steps="82"/></proof>
        </goal>
        <goal name="example1&#39;vc.1.0.0.0.0.3" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.223930" steps="715"/></proof>
+       <proof prover="3"><result status="valid" time="0.071667" steps="109"/></proof>
        </goal>
        <goal name="example1&#39;vc.1.0.0.0.0.4" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.076738" steps="283"/></proof>
+       <proof prover="3"><result status="valid" time="0.049998" steps="74"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="example1&#39;vc.1.0.0.0.1" expl="asserted formula" proved="true">
-      <proof prover="3"><result status="valid" time="0.073210" steps="295"/></proof>
+      <proof prover="3"><result status="valid" time="0.037307" steps="86"/></proof>
       </goal>
      </transf>
      </goal>
      <goal name="example1&#39;vc.1.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="3"><result status="valid" time="0.079536" steps="295"/></proof>
+     <proof prover="3"><result status="valid" time="0.035820" steps="86"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="example1&#39;vc.1.0.1" expl="postcondition" proved="true">
-    <proof prover="3"><result status="valid" time="0.060271" steps="295"/></proof>
+    <proof prover="3"><result status="valid" time="0.037716" steps="87"/></proof>
     </goal>
    </transf>
    </goal>

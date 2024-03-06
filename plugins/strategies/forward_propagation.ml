@@ -510,9 +510,7 @@ let rec apply_higher_order_sym ls_defs t =
   | Tapp (ls, l) ->
     let tys = List.map (fun t -> Option.get t.t_ty) l in
     let t1 = t_app_partial ls [] tys (Some (Option.get t.t_ty)) in
-    List.fold_left
-      (fun t' t -> t_app_infer fs_func_app [ t'; t ])
-      t1 (List.tl l)
+    List.fold_left (fun t' t -> t_app_infer fs_func_app [ t'; t ]) t1 l
   | _ -> t
 
 (* Returns None if the function is unsupported by the strategy. Otherwise,
@@ -537,7 +535,6 @@ let get_known_fn_and_args t x =
     match fn.t_node with
     | Tapp (ls, [ fn ]) when ls_equal ls real_fun -> Some (sum_ls, [ fn; i; j ])
     | Tapp (ls, _) when ls_equal ls real_fun -> None
-    | Tapp (ls, _) -> None
     | _ -> None)
   | _ -> None
 
@@ -646,13 +643,13 @@ let apply_fn_thm info fn app_approx arg_approx strat =
 
 (* Returns the forward error formula and the strat associated with the
    application of the propagation lemma for the sum. *)
-let apply_sum_thm info sum_approx fn_approx (fn, i, j) =
+let apply_sum_thm info sum_approx _fn_approx (fn, i, j) =
   let _, sum_rel_err, sum'', sum_cst_err =
     Option.get (get_info info.terms_info sum_approx).error
   in
   let f'' =
     match sum''.t_node with
-    | Tapp (ls, [ f''; _; _ ]) -> f''
+    | Tapp (_, [ f''; _; _ ]) -> f''
     | _ -> assert false
   in
   let _, _, exact_fn, fn_rel_err, fn', fn_cst_err = Mls.find fn info.fns_info in
@@ -891,7 +888,7 @@ let parse_fn_error i exact_fn c =
     match t.t_node with
     | Tapp (ls, [ t' ]) when is_abs_ls ls && is_match t' -> true
     | Tapp (fn', l) -> (
-      let fn, args = extract_fn_and_args fn' l in
+      let _, args = extract_fn_and_args fn' l in
       match args with
       | [ i' ] when t_equal i i' -> true
       | _ -> false)
@@ -1008,7 +1005,7 @@ let rec collect info f =
   | Tbinop (Tand, f1, f2) ->
     let info = collect info f1 in
     collect info f2
-  | Tapp (ls, [ t; c ]) when is_ineq_ls ls -> (
+  | Tapp (ls, [ _; _ ]) when is_ineq_ls ls -> (
     match parse_ineq f with
     | Some (x, exact_x, c) ->
       let error_fmla = parse_error exact_x c in
@@ -1089,28 +1086,33 @@ let init_symbols env printer =
   let log10 = ns_find_ls exp_log_th.th_export [ "log10" ] in
   let usingle = Env.read_theory env [ "ufloat" ] "USingle" in
   let udouble = Env.read_theory env [ "ufloat" ] "UDouble" in
-  let mk_ufloat_symbols th ty =
-    let f s = ns_find_ls th.th_export [ s ] in
+  let usingle_lemmas = Env.read_theory env [ "ufloat" ] "USingleLemmas" in
+  let udouble_lemmas = Env.read_theory env [ "ufloat" ] "UDoubleLemmas" in
+  let mk_ufloat_symbols th th_lemmas ty =
+    let f th s =
+      try ns_find_ls th.th_export [ s ] with
+      | Not_found -> failwith (Format.sprintf "Symbol %s not found" s)
+    in
     {
       ufloat_type = ns_find_ts th.th_export [ ty ];
-      to_real = f "to_real";
-      uadd = f "uadd";
-      usub = f "usub";
-      umul = f "umul";
-      udiv = f "udiv";
-      uminus = f "uminus";
-      uadd_infix = f (Ident.op_infix "++.");
-      usub_infix = f (Ident.op_infix "--.");
-      umul_infix = f (Ident.op_infix "**.");
-      udiv_infix = f (Ident.op_infix "//.");
-      uminus_prefix = f (Ident.op_prefix "--.");
-      eps = fs_app (f "eps") [] ty_real;
-      eta = fs_app (f "eta") [] ty_real;
-      real_fun = f "real_fun";
+      to_real = f th "to_real";
+      uadd = f th "uadd";
+      usub = f th "usub";
+      umul = f th "umul";
+      udiv = f th "udiv";
+      uminus = f th "uminus";
+      uadd_infix = f th (Ident.op_infix "++.");
+      usub_infix = f th (Ident.op_infix "--.");
+      umul_infix = f th (Ident.op_infix "**.");
+      udiv_infix = f th (Ident.op_infix "//.");
+      uminus_prefix = f th (Ident.op_prefix "--.");
+      eps = fs_app (f th "eps") [] ty_real;
+      eta = fs_app (f th "eta") [] ty_real;
+      real_fun = f th_lemmas "real_fun";
     }
   in
-  let usingle_symbols = mk_ufloat_symbols usingle "usingle" in
-  let udouble_symbols = mk_ufloat_symbols udouble "udouble" in
+  let usingle_symbols = mk_ufloat_symbols usingle usingle_lemmas "usingle" in
+  let udouble_symbols = mk_ufloat_symbols udouble udouble_lemmas "udouble" in
   symbols :=
     Some
       {

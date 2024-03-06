@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.4.2" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="1" name="Alt-Ergo" version="2.5.2" alternative="FPA" timelimit="5" steplimit="0" memlimit="2000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="addition.mlw"/>
 <theory name="AdditionSingle" proved="true">
@@ -11,67 +11,48 @@
   <goal name="addition_errors_basic&#39;vc.0" expl="postcondition" proved="true">
   <transf name="inline_trivial" proved="true" >
    <goal name="addition_errors_basic&#39;vc.0.0" expl="postcondition" proved="true">
-   <transf name="assert" proved="true" arg1="(((abs1 ((to_real (uadd (uadd a b) c)) -&#39; (((to_real a) +&#39; (to_real
-b)) +&#39; (to_real c)))) &lt;=&#39; ((eps +&#39; eps) *&#39; ((abs1 ((to_real a) +&#39; (to_real
-b))) +&#39; (abs1 (to_real c))))) /\ ((abs1 ((to_real (uadd a b)) -&#39; ((to_real
-a) +&#39; (to_real b)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real a) +&#39; (to_real
-b))))))">
+   <transf name="assert" proved="true" arg1="abs (to_real (uadd (uadd a b) c) -&#39; ((to_real a +&#39; to_real b) +&#39; to_real c))
+&lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps)
+      *&#39; (abs (to_real a +&#39; to_real b) +&#39; abs (to_real c)))
+     +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0)))">
     <goal name="addition_errors_basic&#39;vc.0.0.0" expl="asserted formula" proved="true">
-    <transf name="split_vc" proved="true" >
-     <goal name="addition_errors_basic&#39;vc.0.0.0.0" expl="asserted formula" proved="true">
-     <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd (uadd a b) c)) -&#39; (((to_real a) +&#39; (to_real
-b)) +&#39; (to_real c)))) &lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps) *&#39; ((abs1 ((to_real
-a) +&#39; (to_real b))) +&#39; (abs1 (to_real
-c)))) +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0))))">
+    <transf name="apply" proved="true" arg1="uadd_single_error_propagation">
+     <goal name="addition_errors_basic&#39;vc.0.0.0.0" expl="apply premises" proved="true">
+     <transf name="assert" proved="true" arg1="abs (to_real (uadd a b) -&#39; (to_real a +&#39; to_real b))
+&lt;=&#39; (eps *&#39; abs (to_real a +&#39; to_real b))">
       <goal name="addition_errors_basic&#39;vc.0.0.0.0.0" expl="asserted formula" proved="true">
-      <transf name="apply" proved="true" arg1="uadd_single_error_propagation">
-       <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.0" expl="apply premises" proved="true">
-       <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd a b)) -&#39; ((to_real a) +&#39; (to_real
-b)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real a) +&#39; (to_real
-b)))))">
-        <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
-        <proof prover="0"><result status="valid" time="0.059860" steps="393"/></proof>
-        </goal>
-        <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.046819" steps="232"/></proof>
-        </goal>
-       </transf>
-       </goal>
-       <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.073916" steps="522"/></proof>
-       </goal>
-       <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.2" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.036755" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.3" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.047700" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.4" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.037963" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.5" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.036202" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.6" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.045489" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.7" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.032250" steps="231"/></proof>
-       </goal>
-      </transf>
+      <proof prover="1"><result status="valid" time="0.060411" steps="169"/></proof>
       </goal>
-      <goal name="addition_errors_basic&#39;vc.0.0.0.0.1" expl="asserted formula" proved="true">
-      <proof prover="0"><result status="valid" time="0.035547" steps="233"/></proof>
+      <goal name="addition_errors_basic&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
+      <proof prover="1"><result status="valid" time="0.050153" steps="100"/></proof>
       </goal>
      </transf>
      </goal>
-     <goal name="addition_errors_basic&#39;vc.0.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.054016" steps="393"/></proof>
+     <goal name="addition_errors_basic&#39;vc.0.0.0.1" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.054111" steps="75"/></proof>
+     </goal>
+     <goal name="addition_errors_basic&#39;vc.0.0.0.2" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.040994" steps="79"/></proof>
+     </goal>
+     <goal name="addition_errors_basic&#39;vc.0.0.0.3" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.062165" steps="77"/></proof>
+     </goal>
+     <goal name="addition_errors_basic&#39;vc.0.0.0.4" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.038262" steps="70"/></proof>
+     </goal>
+     <goal name="addition_errors_basic&#39;vc.0.0.0.5" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.041005" steps="70"/></proof>
+     </goal>
+     <goal name="addition_errors_basic&#39;vc.0.0.0.6" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.046481" steps="70"/></proof>
+     </goal>
+     <goal name="addition_errors_basic&#39;vc.0.0.0.7" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.037007" steps="70"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="addition_errors_basic&#39;vc.0.0.1" expl="postcondition" proved="true">
-    <proof prover="0"><result status="valid" time="0.065052" steps="583"/></proof>
+    <proof prover="1"><result status="valid" time="0.058319" steps="268"/></proof>
     </goal>
    </transf>
    </goal>
@@ -84,276 +65,131 @@ b)))))">
   <goal name="addition_errors&#39;vc.0" expl="postcondition" proved="true">
   <transf name="inline_trivial" proved="true" >
    <goal name="addition_errors&#39;vc.0.0" expl="postcondition" proved="true">
-   <transf name="assert" proved="true" arg1="((((((abs1 ((to_real (uadd (uadd (uadd a b) c) (uadd d (uadd e
-f)))) -&#39; ((((to_real a) +&#39; (to_real b)) +&#39; (to_real c)) +&#39; ((to_real
-d) +&#39; ((to_real e) +&#39; (to_real
-f)))))) &lt;=&#39; ((((eps +&#39; eps) +&#39; (eps +&#39; eps)) +&#39; eps) *&#39; (((abs1 ((to_real
-a) +&#39; (to_real b))) +&#39; (abs1 (to_real c))) +&#39; ((abs1 (to_real d)) +&#39; (abs1
-((to_real e) +&#39; (to_real f))))))) /\ ((abs1 ((to_real (uadd (uadd a b)
-c)) -&#39; (((to_real a) +&#39; (to_real b)) +&#39; (to_real
-c)))) &lt;=&#39; ((eps +&#39; eps) *&#39; ((abs1 ((to_real a) +&#39; (to_real b))) +&#39; (abs1
-(to_real c)))))) /\ ((abs1 ((to_real (uadd a b)) -&#39; ((to_real a) +&#39; (to_real
-b)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real a) +&#39; (to_real b)))))) /\ ((abs1 ((to_real
-(uadd d (uadd e f))) -&#39; ((to_real d) +&#39; ((to_real e) +&#39; (to_real
-f))))) &lt;=&#39; ((eps +&#39; eps) *&#39; ((abs1 (to_real d)) +&#39; (abs1 ((to_real
-e) +&#39; (to_real f))))))) /\ ((abs1 ((to_real (uadd e f)) -&#39; ((to_real
-e) +&#39; (to_real f)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real e) +&#39; (to_real
-f))))))">
+   <transf name="assert" proved="true" arg1="abs
+(to_real (uadd (uadd (uadd a b) c) (uadd d (uadd e f)))
+ -&#39; (((to_real a +&#39; to_real b) +&#39; to_real c)
+     +&#39; (to_real d +&#39; (to_real e +&#39; to_real f))))
+&lt;=&#39; (((((eps +&#39; eps) +&#39; (eps +&#39; eps)) +&#39; eps)
+      *&#39; ((abs (to_real a +&#39; to_real b) +&#39; abs (to_real c))
+          +&#39; (abs (to_real d) +&#39; abs (to_real e +&#39; to_real f))))
+     +&#39; ((((1.0 +&#39; eps) +&#39; (eps +&#39; eps)) *&#39; 0.0)
+         +&#39; (((1.0 +&#39; eps) +&#39; (eps +&#39; eps)) *&#39; 0.0)))">
     <goal name="addition_errors&#39;vc.0.0.0" expl="asserted formula" proved="true">
-    <transf name="split_vc" proved="true" >
-     <goal name="addition_errors&#39;vc.0.0.0.0" expl="asserted formula" proved="true">
-     <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd (uadd (uadd a b) c) (uadd d (uadd e
-f)))) -&#39; ((((to_real a) +&#39; (to_real b)) +&#39; (to_real c)) +&#39; ((to_real
-d) +&#39; ((to_real e) +&#39; (to_real
-f)))))) &lt;=&#39; (((((eps +&#39; eps) +&#39; (eps +&#39; eps)) +&#39; eps) *&#39; (((abs1 ((to_real
-a) +&#39; (to_real b))) +&#39; (abs1 (to_real c))) +&#39; ((abs1 (to_real d)) +&#39; (abs1
-((to_real e) +&#39; (to_real
-f)))))) +&#39; ((((1.0 +&#39; eps) +&#39; (eps +&#39; eps)) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; (eps +&#39; eps)) *&#39; 0.0))))">
+    <transf name="apply" proved="true" arg1="uadd_single_error_propagation">
+     <goal name="addition_errors&#39;vc.0.0.0.0" expl="apply premises" proved="true">
+     <transf name="assert" proved="true" arg1="abs (to_real (uadd (uadd a b) c) -&#39; ((to_real a +&#39; to_real b) +&#39; to_real c))
+&lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps)
+      *&#39; (abs (to_real a +&#39; to_real b) +&#39; abs (to_real c)))
+     +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0)))">
       <goal name="addition_errors&#39;vc.0.0.0.0.0" expl="asserted formula" proved="true">
       <transf name="apply" proved="true" arg1="uadd_single_error_propagation">
        <goal name="addition_errors&#39;vc.0.0.0.0.0.0" expl="apply premises" proved="true">
-       <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd (uadd a b) c)) -&#39; (((to_real a) +&#39; (to_real
-b)) +&#39; (to_real c)))) &lt;=&#39; ((eps +&#39; eps) *&#39; ((abs1 ((to_real a) +&#39; (to_real
-b))) +&#39; (abs1 (to_real
-c)))))">
+       <transf name="assert" proved="true" arg1="abs (to_real (uadd a b) -&#39; (to_real a +&#39; to_real b))
+&lt;=&#39; (eps *&#39; abs (to_real a +&#39; to_real b))">
         <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
-        <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd (uadd a b) c)) -&#39; (((to_real a) +&#39; (to_real
-b)) +&#39; (to_real c)))) &lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps) *&#39; ((abs1 ((to_real
-a) +&#39; (to_real b))) +&#39; (abs1 (to_real
-c)))) +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0))))">
-         <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
-         <transf name="apply" proved="true" arg1="uadd_single_error_propagation">
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.0" expl="apply premises" proved="true">
-          <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd a b)) -&#39; ((to_real a) +&#39; (to_real
-b)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real a) +&#39; (to_real
-b)))))">
-           <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
-           <proof prover="0"><result status="valid" time="0.061650" steps="393"/></proof>
-           </goal>
-           <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-           <proof prover="0"><result status="valid" time="0.045594" steps="232"/></proof>
-           </goal>
-          </transf>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.073828" steps="522"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.038165" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.045843" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.044804" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.041764" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.043681" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.034570" steps="231"/></proof>
-          </goal>
-         </transf>
-         </goal>
-         <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.1" expl="asserted formula" proved="true">
-         <proof prover="0"><result status="valid" time="0.042670" steps="233"/></proof>
-         </goal>
-        </transf>
+        <proof prover="1"><result status="valid" time="0.051836" steps="169"/></proof>
         </goal>
         <goal name="addition_errors&#39;vc.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.041361" steps="233"/></proof>
+        <proof prover="1"><result status="valid" time="0.033549" steps="100"/></proof>
         </goal>
        </transf>
        </goal>
        <goal name="addition_errors&#39;vc.0.0.0.0.0.1" expl="apply premises" proved="true">
-       <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd d (uadd e f))) -&#39; ((to_real d) +&#39; ((to_real
-e) +&#39; (to_real f))))) &lt;=&#39; ((eps +&#39; eps) *&#39; ((abs1 (to_real d)) +&#39; (abs1
-((to_real e) +&#39; (to_real
-f))))))">
-        <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0" expl="asserted formula" proved="true">
-        <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd d (uadd e f))) -&#39; ((to_real d) +&#39; ((to_real
-e) +&#39; (to_real f))))) &lt;=&#39; ((((0.0 +&#39; eps) +&#39; eps) *&#39; ((abs1 (to_real
-d)) +&#39; (abs1 ((to_real e) +&#39; (to_real
-f))))) +&#39; ((((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0))))">
-         <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0" expl="asserted formula" proved="true">
-         <transf name="apply" proved="true" arg1="uadd_single_error_propagation">
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.0" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.069597" steps="522"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.1" expl="apply premises" proved="true">
-          <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd e f)) -&#39; ((to_real e) +&#39; (to_real
-f)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real e) +&#39; (to_real
-f)))))">
-           <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.1.0" expl="asserted formula" proved="true">
-           <proof prover="0"><result status="valid" time="0.054302" steps="393"/></proof>
-           </goal>
-           <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.1.1" expl="apply premises" proved="true">
-           <proof prover="0"><result status="valid" time="0.046520" steps="232"/></proof>
-           </goal>
-          </transf>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.2" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.032379" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.3" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.035371" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.4" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.035803" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.5" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.038525" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.6" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.032483" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.7" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.043443" steps="231"/></proof>
-          </goal>
-         </transf>
-         </goal>
-         <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.1" expl="asserted formula" proved="true">
-         <proof prover="0"><result status="valid" time="0.036850" steps="233"/></proof>
-         </goal>
-        </transf>
-        </goal>
-        <goal name="addition_errors&#39;vc.0.0.0.0.0.1.1" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.032180" steps="233"/></proof>
-        </goal>
-       </transf>
+       <proof prover="1"><result status="valid" time="0.056002" steps="75"/></proof>
        </goal>
        <goal name="addition_errors&#39;vc.0.0.0.0.0.2" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.077983" steps="631"/></proof>
+       <proof prover="1"><result status="valid" time="0.051313" steps="79"/></proof>
        </goal>
        <goal name="addition_errors&#39;vc.0.0.0.0.0.3" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.089890" steps="631"/></proof>
+       <proof prover="1"><result status="valid" time="0.036805" steps="77"/></proof>
        </goal>
        <goal name="addition_errors&#39;vc.0.0.0.0.0.4" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.033291" steps="231"/></proof>
+       <proof prover="1"><result status="valid" time="0.035376" steps="70"/></proof>
        </goal>
        <goal name="addition_errors&#39;vc.0.0.0.0.0.5" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.039847" steps="231"/></proof>
+       <proof prover="1"><result status="valid" time="0.040486" steps="70"/></proof>
        </goal>
        <goal name="addition_errors&#39;vc.0.0.0.0.0.6" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.039181" steps="231"/></proof>
+       <proof prover="1"><result status="valid" time="0.052391" steps="70"/></proof>
        </goal>
        <goal name="addition_errors&#39;vc.0.0.0.0.0.7" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.043670" steps="231"/></proof>
+       <proof prover="1"><result status="valid" time="0.058467" steps="70"/></proof>
        </goal>
       </transf>
       </goal>
-      <goal name="addition_errors&#39;vc.0.0.0.0.1" expl="asserted formula" proved="true">
-      <proof prover="0"><result status="valid" time="0.035266" steps="234"/></proof>
+      <goal name="addition_errors&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
+      <proof prover="1"><result status="valid" time="0.044088" steps="136"/></proof>
       </goal>
      </transf>
      </goal>
-     <goal name="addition_errors&#39;vc.0.0.0.1" expl="asserted formula" proved="true">
-     <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd (uadd a b) c)) -&#39; (((to_real a) +&#39; (to_real
-b)) +&#39; (to_real c)))) &lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps) *&#39; ((abs1 ((to_real
-a) +&#39; (to_real b))) +&#39; (abs1 (to_real
-c)))) +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0))))">
+     <goal name="addition_errors&#39;vc.0.0.0.1" expl="apply premises" proved="true">
+     <transf name="assert" proved="true" arg1="abs (to_real (uadd d (uadd e f)) -&#39; (to_real d +&#39; (to_real e +&#39; to_real f)))
+&lt;=&#39; ((((0.0 +&#39; eps) +&#39; eps)
+      *&#39; (abs (to_real d) +&#39; abs (to_real e +&#39; to_real f)))
+     +&#39; ((((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0)))">
       <goal name="addition_errors&#39;vc.0.0.0.1.0" expl="asserted formula" proved="true">
       <transf name="apply" proved="true" arg1="uadd_single_error_propagation">
        <goal name="addition_errors&#39;vc.0.0.0.1.0.0" expl="apply premises" proved="true">
-       <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd a b)) -&#39; ((to_real a) +&#39; (to_real
-b)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real a) +&#39; (to_real
-b)))))">
-        <goal name="addition_errors&#39;vc.0.0.0.1.0.0.0" expl="asserted formula" proved="true">
-        <proof prover="0"><result status="valid" time="0.058332" steps="393"/></proof>
-        </goal>
-        <goal name="addition_errors&#39;vc.0.0.0.1.0.0.1" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.046804" steps="232"/></proof>
-        </goal>
-       </transf>
+       <proof prover="1"><result status="valid" time="0.049293" steps="75"/></proof>
        </goal>
        <goal name="addition_errors&#39;vc.0.0.0.1.0.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.065664" steps="522"/></proof>
-       </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.1.0.2" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.043458" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.1.0.3" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.031611" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.1.0.4" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.041286" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.1.0.5" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.038657" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.1.0.6" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.036092" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.1.0.7" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.039316" steps="231"/></proof>
-       </goal>
-      </transf>
-      </goal>
-      <goal name="addition_errors&#39;vc.0.0.0.1.1" expl="asserted formula" proved="true">
-      <proof prover="0"><result status="valid" time="0.040097" steps="233"/></proof>
-      </goal>
-     </transf>
-     </goal>
-     <goal name="addition_errors&#39;vc.0.0.0.2" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.057289" steps="393"/></proof>
-     </goal>
-     <goal name="addition_errors&#39;vc.0.0.0.3" expl="asserted formula" proved="true">
-     <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd d (uadd e f))) -&#39; ((to_real d) +&#39; ((to_real
-e) +&#39; (to_real f))))) &lt;=&#39; ((((0.0 +&#39; eps) +&#39; eps) *&#39; ((abs1 (to_real
-d)) +&#39; (abs1 ((to_real e) +&#39; (to_real
-f))))) +&#39; ((((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0))))">
-      <goal name="addition_errors&#39;vc.0.0.0.3.0" expl="asserted formula" proved="true">
-      <transf name="apply" proved="true" arg1="uadd_single_error_propagation">
-       <goal name="addition_errors&#39;vc.0.0.0.3.0.0" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.063894" steps="522"/></proof>
-       </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.3.0.1" expl="apply premises" proved="true">
-       <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd e f)) -&#39; ((to_real e) +&#39; (to_real
-f)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real e) +&#39; (to_real
-f)))))">
-        <goal name="addition_errors&#39;vc.0.0.0.3.0.1.0" expl="asserted formula" proved="true">
-        <proof prover="0"><result status="valid" time="0.062252" steps="393"/></proof>
+       <transf name="assert" proved="true" arg1="abs (to_real (uadd e f) -&#39; (to_real e +&#39; to_real f))
+&lt;=&#39; (eps *&#39; abs (to_real e +&#39; to_real f))">
+        <goal name="addition_errors&#39;vc.0.0.0.1.0.1.0" expl="asserted formula" proved="true">
+        <proof prover="1"><result status="valid" time="0.063358" steps="169"/></proof>
         </goal>
-        <goal name="addition_errors&#39;vc.0.0.0.3.0.1.1" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.037419" steps="232"/></proof>
+        <goal name="addition_errors&#39;vc.0.0.0.1.0.1.1" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.052474" steps="100"/></proof>
         </goal>
        </transf>
        </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.3.0.2" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.038042" steps="231"/></proof>
+       <goal name="addition_errors&#39;vc.0.0.0.1.0.2" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.032151" steps="77"/></proof>
        </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.3.0.3" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.045351" steps="231"/></proof>
+       <goal name="addition_errors&#39;vc.0.0.0.1.0.3" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.049898" steps="79"/></proof>
        </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.3.0.4" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.037589" steps="231"/></proof>
+       <goal name="addition_errors&#39;vc.0.0.0.1.0.4" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.062763" steps="70"/></proof>
        </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.3.0.5" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.034289" steps="231"/></proof>
+       <goal name="addition_errors&#39;vc.0.0.0.1.0.5" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.044367" steps="70"/></proof>
        </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.3.0.6" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.039161" steps="231"/></proof>
+       <goal name="addition_errors&#39;vc.0.0.0.1.0.6" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.052402" steps="70"/></proof>
        </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.3.0.7" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.042393" steps="231"/></proof>
+       <goal name="addition_errors&#39;vc.0.0.0.1.0.7" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.047240" steps="70"/></proof>
        </goal>
       </transf>
       </goal>
-      <goal name="addition_errors&#39;vc.0.0.0.3.1" expl="asserted formula" proved="true">
-      <proof prover="0"><result status="valid" time="0.043334" steps="233"/></proof>
+      <goal name="addition_errors&#39;vc.0.0.0.1.1" expl="apply premises" proved="true">
+      <proof prover="1"><result status="valid" time="0.055468" steps="136"/></proof>
       </goal>
      </transf>
      </goal>
-     <goal name="addition_errors&#39;vc.0.0.0.4" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.056463" steps="393"/></proof>
+     <goal name="addition_errors&#39;vc.0.0.0.2" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.043796" steps="102"/></proof>
+     </goal>
+     <goal name="addition_errors&#39;vc.0.0.0.3" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.055716" steps="102"/></proof>
+     </goal>
+     <goal name="addition_errors&#39;vc.0.0.0.4" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.052231" steps="70"/></proof>
+     </goal>
+     <goal name="addition_errors&#39;vc.0.0.0.5" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.036939" steps="70"/></proof>
+     </goal>
+     <goal name="addition_errors&#39;vc.0.0.0.6" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.039085" steps="70"/></proof>
+     </goal>
+     <goal name="addition_errors&#39;vc.0.0.0.7" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.036979" steps="70"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="addition_errors&#39;vc.0.0.1" expl="postcondition" proved="true">
-    <proof prover="0"><result status="valid" time="0.082309" steps="638"/></proof>
+    <proof prover="1"><result status="valid" time="0.636917" steps="2699"/></proof>
     </goal>
    </transf>
    </goal>
@@ -368,67 +204,48 @@ f)))))">
   <goal name="addition_errors_basic&#39;vc.0" expl="postcondition" proved="true">
   <transf name="inline_trivial" proved="true" >
    <goal name="addition_errors_basic&#39;vc.0.0" expl="postcondition" proved="true">
-   <transf name="assert" proved="true" arg1="(((abs1 ((to_real (uadd (uadd a b) c)) -&#39; (((to_real a) +&#39; (to_real
-b)) +&#39; (to_real c)))) &lt;=&#39; ((eps +&#39; eps) *&#39; ((abs1 ((to_real a) +&#39; (to_real
-b))) +&#39; (abs1 (to_real c))))) /\ ((abs1 ((to_real (uadd a b)) -&#39; ((to_real
-a) +&#39; (to_real b)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real a) +&#39; (to_real
-b))))))">
+   <transf name="assert" proved="true" arg1="abs (to_real (uadd (uadd a b) c) -&#39; ((to_real a +&#39; to_real b) +&#39; to_real c))
+&lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps)
+      *&#39; (abs (to_real a +&#39; to_real b) +&#39; abs (to_real c)))
+     +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0)))">
     <goal name="addition_errors_basic&#39;vc.0.0.0" expl="asserted formula" proved="true">
-    <transf name="split_vc" proved="true" >
-     <goal name="addition_errors_basic&#39;vc.0.0.0.0" expl="asserted formula" proved="true">
-     <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd (uadd a b) c)) -&#39; (((to_real a) +&#39; (to_real
-b)) +&#39; (to_real c)))) &lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps) *&#39; ((abs1 ((to_real
-a) +&#39; (to_real b))) +&#39; (abs1 (to_real
-c)))) +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0))))">
+    <transf name="apply" proved="true" arg1="uadd_double_error_propagation">
+     <goal name="addition_errors_basic&#39;vc.0.0.0.0" expl="apply premises" proved="true">
+     <transf name="assert" proved="true" arg1="abs (to_real (uadd a b) -&#39; (to_real a +&#39; to_real b))
+&lt;=&#39; (eps *&#39; abs (to_real a +&#39; to_real b))">
       <goal name="addition_errors_basic&#39;vc.0.0.0.0.0" expl="asserted formula" proved="true">
-      <transf name="apply" proved="true" arg1="uadd_double_error_propagation">
-       <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.0" expl="apply premises" proved="true">
-       <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd a b)) -&#39; ((to_real a) +&#39; (to_real
-b)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real a) +&#39; (to_real
-b)))))">
-        <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
-        <proof prover="0"><result status="valid" time="0.059289" steps="393"/></proof>
-        </goal>
-        <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.040191" steps="232"/></proof>
-        </goal>
-       </transf>
-       </goal>
-       <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.076775" steps="522"/></proof>
-       </goal>
-       <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.2" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.048067" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.3" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.040849" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.4" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.033506" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.5" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.036962" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.6" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.074473" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors_basic&#39;vc.0.0.0.0.0.7" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.039040" steps="231"/></proof>
-       </goal>
-      </transf>
+      <proof prover="1"><result status="valid" time="0.074253" steps="169"/></proof>
       </goal>
-      <goal name="addition_errors_basic&#39;vc.0.0.0.0.1" expl="asserted formula" proved="true">
-      <proof prover="0"><result status="valid" time="0.042722" steps="233"/></proof>
+      <goal name="addition_errors_basic&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
+      <proof prover="1"><result status="valid" time="0.039675" steps="100"/></proof>
       </goal>
      </transf>
      </goal>
-     <goal name="addition_errors_basic&#39;vc.0.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.064015" steps="393"/></proof>
+     <goal name="addition_errors_basic&#39;vc.0.0.0.1" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.036249" steps="75"/></proof>
+     </goal>
+     <goal name="addition_errors_basic&#39;vc.0.0.0.2" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.052739" steps="79"/></proof>
+     </goal>
+     <goal name="addition_errors_basic&#39;vc.0.0.0.3" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.039588" steps="77"/></proof>
+     </goal>
+     <goal name="addition_errors_basic&#39;vc.0.0.0.4" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.057876" steps="70"/></proof>
+     </goal>
+     <goal name="addition_errors_basic&#39;vc.0.0.0.5" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.049465" steps="70"/></proof>
+     </goal>
+     <goal name="addition_errors_basic&#39;vc.0.0.0.6" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.033114" steps="70"/></proof>
+     </goal>
+     <goal name="addition_errors_basic&#39;vc.0.0.0.7" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.040449" steps="70"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="addition_errors_basic&#39;vc.0.0.1" expl="postcondition" proved="true">
-    <proof prover="0"><result status="valid" time="0.082742" steps="583"/></proof>
+    <proof prover="1"><result status="valid" time="0.071539" steps="271"/></proof>
     </goal>
    </transf>
    </goal>
@@ -441,276 +258,131 @@ b)))))">
   <goal name="addition_errors&#39;vc.0" expl="postcondition" proved="true">
   <transf name="inline_trivial" proved="true" >
    <goal name="addition_errors&#39;vc.0.0" expl="postcondition" proved="true">
-   <transf name="assert" proved="true" arg1="((((((abs1 ((to_real (uadd (uadd (uadd a b) c) (uadd d (uadd e
-f)))) -&#39; ((((to_real a) +&#39; (to_real b)) +&#39; (to_real c)) +&#39; ((to_real
-d) +&#39; ((to_real e) +&#39; (to_real
-f)))))) &lt;=&#39; ((((eps +&#39; eps) +&#39; (eps +&#39; eps)) +&#39; eps) *&#39; (((abs1 ((to_real
-a) +&#39; (to_real b))) +&#39; (abs1 (to_real c))) +&#39; ((abs1 (to_real d)) +&#39; (abs1
-((to_real e) +&#39; (to_real f))))))) /\ ((abs1 ((to_real (uadd (uadd a b)
-c)) -&#39; (((to_real a) +&#39; (to_real b)) +&#39; (to_real
-c)))) &lt;=&#39; ((eps +&#39; eps) *&#39; ((abs1 ((to_real a) +&#39; (to_real b))) +&#39; (abs1
-(to_real c)))))) /\ ((abs1 ((to_real (uadd a b)) -&#39; ((to_real a) +&#39; (to_real
-b)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real a) +&#39; (to_real b)))))) /\ ((abs1 ((to_real
-(uadd d (uadd e f))) -&#39; ((to_real d) +&#39; ((to_real e) +&#39; (to_real
-f))))) &lt;=&#39; ((eps +&#39; eps) *&#39; ((abs1 (to_real d)) +&#39; (abs1 ((to_real
-e) +&#39; (to_real f))))))) /\ ((abs1 ((to_real (uadd e f)) -&#39; ((to_real
-e) +&#39; (to_real f)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real e) +&#39; (to_real
-f))))))">
+   <transf name="assert" proved="true" arg1="abs
+(to_real (uadd (uadd (uadd a b) c) (uadd d (uadd e f)))
+ -&#39; (((to_real a +&#39; to_real b) +&#39; to_real c)
+     +&#39; (to_real d +&#39; (to_real e +&#39; to_real f))))
+&lt;=&#39; (((((eps +&#39; eps) +&#39; (eps +&#39; eps)) +&#39; eps)
+      *&#39; ((abs (to_real a +&#39; to_real b) +&#39; abs (to_real c))
+          +&#39; (abs (to_real d) +&#39; abs (to_real e +&#39; to_real f))))
+     +&#39; ((((1.0 +&#39; eps) +&#39; (eps +&#39; eps)) *&#39; 0.0)
+         +&#39; (((1.0 +&#39; eps) +&#39; (eps +&#39; eps)) *&#39; 0.0)))">
     <goal name="addition_errors&#39;vc.0.0.0" expl="asserted formula" proved="true">
-    <transf name="split_vc" proved="true" >
-     <goal name="addition_errors&#39;vc.0.0.0.0" expl="asserted formula" proved="true">
-     <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd (uadd (uadd a b) c) (uadd d (uadd e
-f)))) -&#39; ((((to_real a) +&#39; (to_real b)) +&#39; (to_real c)) +&#39; ((to_real
-d) +&#39; ((to_real e) +&#39; (to_real
-f)))))) &lt;=&#39; (((((eps +&#39; eps) +&#39; (eps +&#39; eps)) +&#39; eps) *&#39; (((abs1 ((to_real
-a) +&#39; (to_real b))) +&#39; (abs1 (to_real c))) +&#39; ((abs1 (to_real d)) +&#39; (abs1
-((to_real e) +&#39; (to_real
-f)))))) +&#39; ((((1.0 +&#39; eps) +&#39; (eps +&#39; eps)) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; (eps +&#39; eps)) *&#39; 0.0))))">
+    <transf name="apply" proved="true" arg1="uadd_double_error_propagation">
+     <goal name="addition_errors&#39;vc.0.0.0.0" expl="apply premises" proved="true">
+     <transf name="assert" proved="true" arg1="abs (to_real (uadd (uadd a b) c) -&#39; ((to_real a +&#39; to_real b) +&#39; to_real c))
+&lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps)
+      *&#39; (abs (to_real a +&#39; to_real b) +&#39; abs (to_real c)))
+     +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0)))">
       <goal name="addition_errors&#39;vc.0.0.0.0.0" expl="asserted formula" proved="true">
       <transf name="apply" proved="true" arg1="uadd_double_error_propagation">
        <goal name="addition_errors&#39;vc.0.0.0.0.0.0" expl="apply premises" proved="true">
-       <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd (uadd a b) c)) -&#39; (((to_real a) +&#39; (to_real
-b)) +&#39; (to_real c)))) &lt;=&#39; ((eps +&#39; eps) *&#39; ((abs1 ((to_real a) +&#39; (to_real
-b))) +&#39; (abs1 (to_real
-c)))))">
+       <transf name="assert" proved="true" arg1="abs (to_real (uadd a b) -&#39; (to_real a +&#39; to_real b))
+&lt;=&#39; (eps *&#39; abs (to_real a +&#39; to_real b))">
         <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
-        <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd (uadd a b) c)) -&#39; (((to_real a) +&#39; (to_real
-b)) +&#39; (to_real c)))) &lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps) *&#39; ((abs1 ((to_real
-a) +&#39; (to_real b))) +&#39; (abs1 (to_real
-c)))) +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0))))">
-         <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
-         <transf name="apply" proved="true" arg1="uadd_double_error_propagation">
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.0" expl="apply premises" proved="true">
-          <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd a b)) -&#39; ((to_real a) +&#39; (to_real
-b)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real a) +&#39; (to_real
-b)))))">
-           <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
-           <proof prover="0"><result status="valid" time="0.053016" steps="393"/></proof>
-           </goal>
-           <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-           <proof prover="0"><result status="valid" time="0.042316" steps="232"/></proof>
-           </goal>
-          </transf>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.075020" steps="522"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.046237" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.039426" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.031571" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.036046" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.041679" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.039332" steps="231"/></proof>
-          </goal>
-         </transf>
-         </goal>
-         <goal name="addition_errors&#39;vc.0.0.0.0.0.0.0.1" expl="asserted formula" proved="true">
-         <proof prover="0"><result status="valid" time="0.036046" steps="233"/></proof>
-         </goal>
-        </transf>
+        <proof prover="1"><result status="valid" time="0.053050" steps="169"/></proof>
         </goal>
         <goal name="addition_errors&#39;vc.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.038878" steps="233"/></proof>
+        <proof prover="1"><result status="valid" time="0.051030" steps="100"/></proof>
         </goal>
        </transf>
        </goal>
        <goal name="addition_errors&#39;vc.0.0.0.0.0.1" expl="apply premises" proved="true">
-       <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd d (uadd e f))) -&#39; ((to_real d) +&#39; ((to_real
-e) +&#39; (to_real f))))) &lt;=&#39; ((eps +&#39; eps) *&#39; ((abs1 (to_real d)) +&#39; (abs1
-((to_real e) +&#39; (to_real
-f))))))">
-        <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0" expl="asserted formula" proved="true">
-        <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd d (uadd e f))) -&#39; ((to_real d) +&#39; ((to_real
-e) +&#39; (to_real f))))) &lt;=&#39; ((((0.0 +&#39; eps) +&#39; eps) *&#39; ((abs1 (to_real
-d)) +&#39; (abs1 ((to_real e) +&#39; (to_real
-f))))) +&#39; ((((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0))))">
-         <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0" expl="asserted formula" proved="true">
-         <transf name="apply" proved="true" arg1="uadd_double_error_propagation">
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.0" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.067482" steps="522"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.1" expl="apply premises" proved="true">
-          <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd e f)) -&#39; ((to_real e) +&#39; (to_real
-f)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real e) +&#39; (to_real
-f)))))">
-           <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.1.0" expl="asserted formula" proved="true">
-           <proof prover="0"><result status="valid" time="0.061357" steps="393"/></proof>
-           </goal>
-           <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.1.1" expl="apply premises" proved="true">
-           <proof prover="0"><result status="valid" time="0.041215" steps="232"/></proof>
-           </goal>
-          </transf>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.2" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.034147" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.3" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.033356" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.4" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.028947" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.5" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.025736" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.6" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.040612" steps="231"/></proof>
-          </goal>
-          <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.0.7" expl="apply premises" proved="true">
-          <proof prover="0"><result status="valid" time="0.043185" steps="231"/></proof>
-          </goal>
-         </transf>
-         </goal>
-         <goal name="addition_errors&#39;vc.0.0.0.0.0.1.0.1" expl="asserted formula" proved="true">
-         <proof prover="0"><result status="valid" time="0.045998" steps="233"/></proof>
-         </goal>
-        </transf>
-        </goal>
-        <goal name="addition_errors&#39;vc.0.0.0.0.0.1.1" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.044776" steps="233"/></proof>
-        </goal>
-       </transf>
+       <proof prover="1"><result status="valid" time="0.047623" steps="75"/></proof>
        </goal>
        <goal name="addition_errors&#39;vc.0.0.0.0.0.2" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.077362" steps="632"/></proof>
+       <proof prover="1"><result status="valid" time="0.058183" steps="79"/></proof>
        </goal>
        <goal name="addition_errors&#39;vc.0.0.0.0.0.3" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.071334" steps="632"/></proof>
+       <proof prover="1"><result status="valid" time="0.035772" steps="77"/></proof>
        </goal>
        <goal name="addition_errors&#39;vc.0.0.0.0.0.4" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.041601" steps="231"/></proof>
+       <proof prover="1"><result status="valid" time="0.028737" steps="70"/></proof>
        </goal>
        <goal name="addition_errors&#39;vc.0.0.0.0.0.5" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.038935" steps="231"/></proof>
+       <proof prover="1"><result status="valid" time="0.032023" steps="70"/></proof>
        </goal>
        <goal name="addition_errors&#39;vc.0.0.0.0.0.6" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.031680" steps="231"/></proof>
+       <proof prover="1"><result status="valid" time="0.036757" steps="70"/></proof>
        </goal>
        <goal name="addition_errors&#39;vc.0.0.0.0.0.7" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.033231" steps="231"/></proof>
+       <proof prover="1"><result status="valid" time="0.056274" steps="70"/></proof>
        </goal>
       </transf>
       </goal>
-      <goal name="addition_errors&#39;vc.0.0.0.0.1" expl="asserted formula" proved="true">
-      <proof prover="0"><result status="valid" time="0.044444" steps="234"/></proof>
+      <goal name="addition_errors&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
+      <proof prover="1"><result status="valid" time="0.059245" steps="136"/></proof>
       </goal>
      </transf>
      </goal>
-     <goal name="addition_errors&#39;vc.0.0.0.1" expl="asserted formula" proved="true">
-     <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd (uadd a b) c)) -&#39; (((to_real a) +&#39; (to_real
-b)) +&#39; (to_real c)))) &lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps) *&#39; ((abs1 ((to_real
-a) +&#39; (to_real b))) +&#39; (abs1 (to_real
-c)))) +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0))))">
+     <goal name="addition_errors&#39;vc.0.0.0.1" expl="apply premises" proved="true">
+     <transf name="assert" proved="true" arg1="abs (to_real (uadd d (uadd e f)) -&#39; (to_real d +&#39; (to_real e +&#39; to_real f)))
+&lt;=&#39; ((((0.0 +&#39; eps) +&#39; eps)
+      *&#39; (abs (to_real d) +&#39; abs (to_real e +&#39; to_real f)))
+     +&#39; ((((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0)))">
       <goal name="addition_errors&#39;vc.0.0.0.1.0" expl="asserted formula" proved="true">
       <transf name="apply" proved="true" arg1="uadd_double_error_propagation">
        <goal name="addition_errors&#39;vc.0.0.0.1.0.0" expl="apply premises" proved="true">
-       <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd a b)) -&#39; ((to_real a) +&#39; (to_real
-b)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real a) +&#39; (to_real
-b)))))">
-        <goal name="addition_errors&#39;vc.0.0.0.1.0.0.0" expl="asserted formula" proved="true">
-        <proof prover="0"><result status="valid" time="0.066243" steps="393"/></proof>
-        </goal>
-        <goal name="addition_errors&#39;vc.0.0.0.1.0.0.1" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.039591" steps="232"/></proof>
-        </goal>
-       </transf>
+       <proof prover="1"><result status="valid" time="0.023750" steps="75"/></proof>
        </goal>
        <goal name="addition_errors&#39;vc.0.0.0.1.0.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.065739" steps="522"/></proof>
-       </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.1.0.2" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.036206" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.1.0.3" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.040915" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.1.0.4" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.040344" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.1.0.5" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.038630" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.1.0.6" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.042532" steps="231"/></proof>
-       </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.1.0.7" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.040273" steps="231"/></proof>
-       </goal>
-      </transf>
-      </goal>
-      <goal name="addition_errors&#39;vc.0.0.0.1.1" expl="asserted formula" proved="true">
-      <proof prover="0"><result status="valid" time="0.037310" steps="233"/></proof>
-      </goal>
-     </transf>
-     </goal>
-     <goal name="addition_errors&#39;vc.0.0.0.2" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.068415" steps="393"/></proof>
-     </goal>
-     <goal name="addition_errors&#39;vc.0.0.0.3" expl="asserted formula" proved="true">
-     <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd d (uadd e f))) -&#39; ((to_real d) +&#39; ((to_real
-e) +&#39; (to_real f))))) &lt;=&#39; ((((0.0 +&#39; eps) +&#39; eps) *&#39; ((abs1 (to_real
-d)) +&#39; (abs1 ((to_real e) +&#39; (to_real
-f))))) +&#39; ((((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0))))">
-      <goal name="addition_errors&#39;vc.0.0.0.3.0" expl="asserted formula" proved="true">
-      <transf name="apply" proved="true" arg1="uadd_double_error_propagation">
-       <goal name="addition_errors&#39;vc.0.0.0.3.0.0" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.066339" steps="522"/></proof>
-       </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.3.0.1" expl="apply premises" proved="true">
-       <transf name="assert" proved="true" arg1="((abs1 ((to_real (uadd e f)) -&#39; ((to_real e) +&#39; (to_real
-f)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real e) +&#39; (to_real
-f)))))">
-        <goal name="addition_errors&#39;vc.0.0.0.3.0.1.0" expl="asserted formula" proved="true">
-        <proof prover="0"><result status="valid" time="0.061619" steps="393"/></proof>
+       <transf name="assert" proved="true" arg1="abs (to_real (uadd e f) -&#39; (to_real e +&#39; to_real f))
+&lt;=&#39; (eps *&#39; abs (to_real e +&#39; to_real f))">
+        <goal name="addition_errors&#39;vc.0.0.0.1.0.1.0" expl="asserted formula" proved="true">
+        <proof prover="1"><result status="valid" time="0.074945" steps="169"/></proof>
         </goal>
-        <goal name="addition_errors&#39;vc.0.0.0.3.0.1.1" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.040073" steps="232"/></proof>
+        <goal name="addition_errors&#39;vc.0.0.0.1.0.1.1" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.059726" steps="100"/></proof>
         </goal>
        </transf>
        </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.3.0.2" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.042019" steps="231"/></proof>
+       <goal name="addition_errors&#39;vc.0.0.0.1.0.2" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.037185" steps="77"/></proof>
        </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.3.0.3" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.036342" steps="231"/></proof>
+       <goal name="addition_errors&#39;vc.0.0.0.1.0.3" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.061874" steps="79"/></proof>
        </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.3.0.4" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.035052" steps="231"/></proof>
+       <goal name="addition_errors&#39;vc.0.0.0.1.0.4" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.036983" steps="70"/></proof>
        </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.3.0.5" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.033204" steps="231"/></proof>
+       <goal name="addition_errors&#39;vc.0.0.0.1.0.5" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.049897" steps="70"/></proof>
        </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.3.0.6" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.033576" steps="231"/></proof>
+       <goal name="addition_errors&#39;vc.0.0.0.1.0.6" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.047719" steps="70"/></proof>
        </goal>
-       <goal name="addition_errors&#39;vc.0.0.0.3.0.7" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.031176" steps="231"/></proof>
+       <goal name="addition_errors&#39;vc.0.0.0.1.0.7" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.048453" steps="70"/></proof>
        </goal>
       </transf>
       </goal>
-      <goal name="addition_errors&#39;vc.0.0.0.3.1" expl="asserted formula" proved="true">
-      <proof prover="0"><result status="valid" time="0.035512" steps="233"/></proof>
+      <goal name="addition_errors&#39;vc.0.0.0.1.1" expl="apply premises" proved="true">
+      <proof prover="1"><result status="valid" time="0.043913" steps="136"/></proof>
       </goal>
      </transf>
      </goal>
-     <goal name="addition_errors&#39;vc.0.0.0.4" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.056277" steps="393"/></proof>
+     <goal name="addition_errors&#39;vc.0.0.0.2" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.063215" steps="102"/></proof>
+     </goal>
+     <goal name="addition_errors&#39;vc.0.0.0.3" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.051442" steps="102"/></proof>
+     </goal>
+     <goal name="addition_errors&#39;vc.0.0.0.4" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.049341" steps="70"/></proof>
+     </goal>
+     <goal name="addition_errors&#39;vc.0.0.0.5" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.043668" steps="70"/></proof>
+     </goal>
+     <goal name="addition_errors&#39;vc.0.0.0.6" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.050178" steps="70"/></proof>
+     </goal>
+     <goal name="addition_errors&#39;vc.0.0.0.7" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.032766" steps="70"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="addition_errors&#39;vc.0.0.1" expl="postcondition" proved="true">
-    <proof prover="0"><result status="valid" time="0.077899" steps="638"/></proof>
+    <proof prover="1"><result status="valid" time="0.703924" steps="2696"/></proof>
     </goal>
    </transf>
    </goal>

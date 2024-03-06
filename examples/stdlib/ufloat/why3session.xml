@@ -3,87 +3,146 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="2000"/>
-<prover id="1" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Alt-Ergo" version="2.5.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.5.2" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="2" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="6" name="Z3" version="4.8.15" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="7" name="Alt-Ergo" version="2.5.2" alternative="FPA" timelimit="5" steplimit="0" memlimit="2000"/>
 <file format="whyml">
 <path name=".."/><path name=".."/><path name=".."/><path name="stdlib"/>
 <path name="ufloat.mlw"/>
-<theory name="RealLemmas" proved="true">
+<theory name="UFloat">
+ <goal name="uadd&#39;vc" expl="VC for uadd">
+ </goal>
+ <goal name="usub&#39;vc" expl="VC for usub">
+ </goal>
+ <goal name="umul&#39;vc" expl="VC for umul">
+ </goal>
+ <goal name="udiv&#39;vc" expl="VC for udiv">
+ </goal>
+ <goal name="uminus&#39;vc" expl="VC for uminus">
+ </goal>
+ <goal name="infix ++.&#39;vc" expl="VC for infix ++." proved="true">
+ <proof prover="7"><result status="valid" time="0.028081" steps="18"/></proof>
+ </goal>
+ <goal name="infix --.&#39;vc" expl="VC for infix --." proved="true">
+ <proof prover="7"><result status="valid" time="0.027549" steps="18"/></proof>
+ </goal>
+ <goal name="infix **.&#39;vc" expl="VC for infix **." proved="true">
+ <proof prover="7"><result status="valid" time="0.039752" steps="18"/></proof>
+ </goal>
+ <goal name="infix //.&#39;vc" expl="VC for infix //." proved="true">
+ <proof prover="7"><result status="valid" time="0.028234" steps="18"/></proof>
+ </goal>
+ <goal name="prefix --.&#39;vc" expl="VC for prefix --." proved="true">
+ <proof prover="7"><result status="valid" time="0.028329" steps="18"/></proof>
+ </goal>
+</theory>
+<theory name="HelperLemmas">
  <goal name="div_order_compat&#39;vc" expl="VC for div_order_compat" proved="true">
- <proof prover="2" memlimit="2000"><result status="valid" time="0.087280" steps="11620"/></proof>
+ <proof prover="2"><result status="valid" time="0.056952" steps="11620"/></proof>
  </goal>
  <goal name="mult_err&#39;vc" expl="VC for mult_err" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="mult_err&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.511388" steps="60517"/></proof>
+  <proof prover="6"><result status="valid" time="0.025179" steps="5247"/></proof>
   </goal>
   <goal name="mult_err&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.305259" steps="35435"/></proof>
+  <proof prover="6"><result status="valid" time="0.022272" steps="4234"/></proof>
   </goal>
   <goal name="mult_err&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.040419" steps="437"/></proof>
+  <proof prover="7"><result status="valid" time="0.060416" steps="437"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="mult_err_combine&#39;vc" expl="VC for mult_err_combine" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="mult_err_combine&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.003570" steps="16"/></proof>
+  <proof prover="7"><result status="valid" time="0.034251" steps="16"/></proof>
   </goal>
   <goal name="mult_err_combine&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.006610" steps="16"/></proof>
+  <proof prover="7"><result status="valid" time="0.029119" steps="16"/></proof>
   </goal>
   <goal name="mult_err_combine&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.009237" steps="21"/></proof>
+  <proof prover="7"><result status="valid" time="0.035031" steps="21"/></proof>
   </goal>
   <goal name="mult_err_combine&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.007409" steps="24"/></proof>
+  <proof prover="7"><result status="valid" time="0.044134" steps="24"/></proof>
   </goal>
   <goal name="mult_err_combine&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.012350" steps="28"/></proof>
+  <proof prover="7"><result status="valid" time="0.038750" steps="28"/></proof>
   </goal>
   <goal name="mult_err_combine&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.002971" steps="28"/></proof>
+  <proof prover="7"><result status="valid" time="0.026271" steps="28"/></proof>
   </goal>
   <goal name="mult_err_combine&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.006493" steps="33"/></proof>
+  <proof prover="7"><result status="valid" time="0.028817" steps="33"/></proof>
   </goal>
   <goal name="mult_err_combine&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.012756" steps="36"/></proof>
+  <proof prover="7"><result status="valid" time="0.030542" steps="36"/></proof>
   </goal>
   <goal name="mult_err_combine&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.006590" steps="39"/></proof>
+  <proof prover="7"><result status="valid" time="0.045189" steps="39"/></proof>
   </goal>
   <goal name="mult_err_combine&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.006526" steps="39"/></proof>
+  <proof prover="7"><result status="valid" time="0.025654" steps="39"/></proof>
   </goal>
   <goal name="mult_err_combine&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.003388" steps="45"/></proof>
+  <proof prover="7"><result status="valid" time="0.038581" steps="45"/></proof>
   </goal>
   <goal name="mult_err_combine&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.009682" steps="48"/></proof>
+  <proof prover="7"><result status="valid" time="0.040024" steps="48"/></proof>
   </goal>
   <goal name="mult_err_combine&#39;vc.12" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="1.163257" steps="99417"/></proof>
+  <proof prover="2"><result status="valid" time="0.757582" steps="99417"/></proof>
   </goal>
   <goal name="mult_err_combine&#39;vc.13" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="mult_err_combine&#39;vc.13.0" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.421707" steps="78001"/></proof>
+   <proof prover="2"><result status="valid" time="0.535137" steps="86765"/></proof>
    </goal>
    <goal name="mult_err_combine&#39;vc.13.1" expl="VC for mult_err_combine" proved="true">
-   <proof prover="2" memlimit="2000"><result status="valid" time="1.206831" steps="126530"/></proof>
+   <proof prover="7"><result status="valid" time="4.316790" steps="18523"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="mult_err_combine&#39;vc.14" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.879688" steps="99000"/></proof>
+  <proof prover="7"><result status="valid" time="4.141064" steps="14036"/></proof>
   </goal>
   <goal name="mult_err_combine&#39;vc.15" expl="postcondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.013021" steps="172"/></proof>
+  <proof prover="7"><result status="valid" time="0.098892" steps="172"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="exp_sum_opposite&#39;vc" expl="VC for exp_sum_opposite">
+ <transf name="split_vc" >
+  <goal name="exp_sum_opposite&#39;vc.0" expl="assertion">
+  <transf name="split_vc" >
+   <goal name="exp_sum_opposite&#39;vc.0.0" expl="assertion">
+   <proof prover="0"><result status="timeout" time="5.000000" steps="499099"/></proof>
+   <proof prover="2"><result status="timeout" time="5.000000" steps="427018"/></proof>
+   <proof prover="6"><result status="timeout" time="5.000000"/></proof>
+   <proof prover="7"><result status="timeout" time="5.000000" steps="65030"/></proof>
+   </goal>
+   <goal name="exp_sum_opposite&#39;vc.0.1" expl="assertion">
+   <proof prover="1"><result status="timeout" time="5.000000" steps="178175"/></proof>
+   <proof prover="2"><result status="timeout" time="5.000000" steps="384827"/></proof>
+   <proof prover="6"><result status="timeout" time="5.000000"/></proof>
+   <proof prover="7"><result status="timeout" time="5.000000" steps="231529"/></proof>
+   </goal>
+   <goal name="exp_sum_opposite&#39;vc.0.2" expl="VC for exp_sum_opposite" proved="true">
+   <proof prover="7"><result status="valid" time="0.047779" steps="154"/></proof>
+   </goal>
+   <goal name="exp_sum_opposite&#39;vc.0.3" expl="VC for exp_sum_opposite" proved="true">
+   <proof prover="7"><result status="valid" time="0.036146" steps="29"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="exp_sum_opposite&#39;vc.1" expl="postcondition">
+  <proof prover="0"><result status="timeout" time="5.000000" steps="522093"/></proof>
+  <proof prover="1"><undone/></proof>
+  <proof prover="2"><result status="timeout" time="5.000000" steps="398264"/></proof>
+  <proof prover="6"><result status="timeout" time="5.000000"/></proof>
+  <proof prover="7"><result status="timeout" time="5.000000" steps="110686"/></proof>
   </goal>
  </transf>
  </goal>
@@ -92,690 +151,639 @@
   <goal name="exp_approx_err&#39;vc.0" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="exp_approx_err&#39;vc.0.0" expl="assertion" proved="true">
-   <proof prover="7"><result status="valid" time="0.184765" steps="1467"/></proof>
+   <proof prover="7"><result status="valid" time="0.062346" steps="1467"/></proof>
    </goal>
    <goal name="exp_approx_err&#39;vc.0.1" expl="VC for exp_approx_err" proved="true">
-   <proof prover="7"><result status="valid" time="0.021437" steps="11"/></proof>
+   <proof prover="7"><result status="valid" time="0.018819" steps="11"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="exp_approx_err&#39;vc.1" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="exp_approx_err&#39;vc.1.0" expl="assertion" proved="true">
-   <proof prover="7"><result status="valid" time="0.192739" steps="2402"/></proof>
+   <proof prover="7"><result status="valid" time="0.142400" steps="2402"/></proof>
    </goal>
    <goal name="exp_approx_err&#39;vc.1.1" expl="VC for exp_approx_err" proved="true">
-   <proof prover="7"><result status="valid" time="0.021256" steps="13"/></proof>
+   <proof prover="7"><result status="valid" time="0.020912" steps="13"/></proof>
    </goal>
    <goal name="exp_approx_err&#39;vc.1.2" expl="VC for exp_approx_err" proved="true">
-   <proof prover="7"><result status="valid" time="0.053778" steps="96"/></proof>
+   <proof prover="7"><result status="valid" time="0.038064" steps="96"/></proof>
    </goal>
    <goal name="exp_approx_err&#39;vc.1.3" expl="VC for exp_approx_err" proved="true">
-   <proof prover="7"><result status="valid" time="0.029154" steps="15"/></proof>
+   <proof prover="7"><result status="valid" time="0.046036" steps="15"/></proof>
    </goal>
    <goal name="exp_approx_err&#39;vc.1.4" expl="VC for exp_approx_err" proved="true">
-   <proof prover="7"><result status="valid" time="0.849326" steps="11264"/></proof>
+   <proof prover="7"><result status="valid" time="1.021932" steps="11264"/></proof>
    </goal>
    <goal name="exp_approx_err&#39;vc.1.5" expl="VC for exp_approx_err" proved="true">
-   <proof prover="7"><result status="valid" time="0.030408" steps="18"/></proof>
+   <proof prover="7"><result status="valid" time="0.028641" steps="18"/></proof>
    </goal>
    <goal name="exp_approx_err&#39;vc.1.6" expl="VC for exp_approx_err" proved="true">
-   <proof prover="7"><result status="valid" time="0.032356" steps="19"/></proof>
+   <proof prover="7"><result status="valid" time="0.023987" steps="19"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="exp_approx_err&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.036013" steps="18"/></proof>
+  <proof prover="7"><result status="valid" time="0.019842" steps="18"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="log_1_minus_x&#39;vc" expl="VC for log_1_minus_x" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="log_1_minus_x&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.054787" steps="14084"/></proof>
+  <proof prover="7"><result status="valid" time="0.663597" steps="13933"/></proof>
   </goal>
   <goal name="log_1_minus_x&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.031270" steps="7940"/></proof>
+  <proof prover="2"><result status="valid" time="0.071981" steps="5498"/></proof>
   </goal>
   <goal name="log_1_minus_x&#39;vc.2" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.032277" steps="115"/></proof>
+  <proof prover="7"><result status="valid" time="0.031199" steps="115"/></proof>
   </goal>
   <goal name="log_1_minus_x&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.069403" steps="435"/></proof>
+  <proof prover="7"><result status="valid" time="0.047651" steps="435"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="log2_1_minus_x&#39;vc" expl="VC for log2_1_minus_x" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="log2_1_minus_x&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.027524" steps="63"/></proof>
+  <proof prover="7"><result status="valid" time="0.034886" steps="63"/></proof>
   </goal>
   <goal name="log2_1_minus_x&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.032278" steps="61"/></proof>
+  <proof prover="7"><result status="valid" time="0.031263" steps="61"/></proof>
   </goal>
   <goal name="log2_1_minus_x&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.024493" steps="49"/></proof>
+  <proof prover="7"><result status="valid" time="0.032803" steps="49"/></proof>
   </goal>
   <goal name="log2_1_minus_x&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.077146" steps="156"/></proof>
+  <proof prover="7"><result status="valid" time="0.030379" steps="156"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="log10_1_minus_x&#39;vc" expl="VC for log10_1_minus_x" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="log10_1_minus_x&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.046321" steps="63"/></proof>
+  <proof prover="7"><result status="valid" time="0.033498" steps="63"/></proof>
   </goal>
   <goal name="log10_1_minus_x&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.024969" steps="28770"/></proof>
+  <proof prover="7"><result status="valid" time="0.031009" steps="54"/></proof>
   </goal>
   <goal name="log10_1_minus_x&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.021293" steps="49"/></proof>
+  <proof prover="7"><result status="valid" time="0.032477" steps="49"/></proof>
   </goal>
   <goal name="log10_1_minus_x&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.026106" steps="135"/></proof>
+  <proof prover="7"><result status="valid" time="0.033661" steps="135"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="log_approx_err&#39;vc" expl="VC for log_approx_err" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="log_approx_err&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.017864" steps="9039"/></proof>
+  <proof prover="7"><result status="valid" time="1.124342" steps="22347"/></proof>
   </goal>
   <goal name="log_approx_err&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.056043" steps="582"/></proof>
+  <proof prover="7"><result status="valid" time="0.091371" steps="582"/></proof>
   </goal>
   <goal name="log_approx_err&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.030399" steps="52"/></proof>
+  <proof prover="7"><result status="valid" time="0.025026" steps="52"/></proof>
   </goal>
   <goal name="log_approx_err&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.065932" steps="421"/></proof>
+  <proof prover="7"><result status="valid" time="0.077947" steps="421"/></proof>
   </goal>
   <goal name="log_approx_err&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.069506" steps="819"/></proof>
+  <proof prover="7"><result status="valid" time="0.077798" steps="819"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="log2_approx_err&#39;vc" expl="VC for log2_approx_err" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="log2_approx_err&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.015859" steps="9039"/></proof>
+  <proof prover="7"><result status="valid" time="1.312992" steps="22347"/></proof>
   </goal>
   <goal name="log2_approx_err&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.062967" steps="520"/></proof>
+  <proof prover="7"><result status="valid" time="0.054623" steps="521"/></proof>
   </goal>
   <goal name="log2_approx_err&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.042341" steps="52"/></proof>
+  <proof prover="7"><result status="valid" time="0.037547" steps="52"/></proof>
   </goal>
   <goal name="log2_approx_err&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.061951" steps="407"/></proof>
+  <proof prover="7"><result status="valid" time="0.068944" steps="407"/></proof>
   </goal>
   <goal name="log2_approx_err&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="2.085059" steps="31552"/></proof>
+  <proof prover="7"><result status="valid" time="4.339906" steps="31552"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="log10_approx_err&#39;vc" expl="VC for log10_approx_err" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="log10_approx_err&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.020255" steps="9039"/></proof>
+  <proof prover="7"><result status="valid" time="1.521638" steps="22347"/></proof>
   </goal>
   <goal name="log10_approx_err&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.072297" steps="520"/></proof>
+  <proof prover="7"><result status="valid" time="0.054493" steps="521"/></proof>
   </goal>
   <goal name="log10_approx_err&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.039236" steps="52"/></proof>
+  <proof prover="7"><result status="valid" time="0.038213" steps="52"/></proof>
   </goal>
   <goal name="log10_approx_err&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.063416" steps="407"/></proof>
+  <proof prover="7"><result status="valid" time="0.059677" steps="407"/></proof>
   </goal>
   <goal name="log10_approx_err&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="5.055074" steps="32075"/></proof>
+  <proof prover="7"><result status="valid" time="3.561814" steps="32074"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="sum_approx_err&#39;vc" expl="VC for sum_approx_err" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="sum_approx_err&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.024443" steps="8"/></proof>
+  <proof prover="7"><result status="valid" time="0.023473" steps="8"/></proof>
   </goal>
   <goal name="sum_approx_err&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.022642" steps="8"/></proof>
+  <proof prover="7"><result status="valid" time="0.023039" steps="8"/></proof>
   </goal>
   <goal name="sum_approx_err&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.030270" steps="10775"/></proof>
+  <proof prover="7"><result status="valid" time="0.023202" steps="40"/></proof>
   </goal>
   <goal name="sum_approx_err&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.156315" steps="673"/></proof>
+  <proof prover="7"><result status="valid" time="0.101686" steps="673"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="USingle">
- <goal name="uadd&#39;vc" expl="VC for uadd">
- </goal>
- <goal name="usub&#39;vc" expl="VC for usub">
- </goal>
- <goal name="umul&#39;vc" expl="VC for umul">
- </goal>
- <goal name="udiv&#39;vc" expl="VC for udiv">
- </goal>
- <goal name="uminus&#39;vc" expl="VC for uminus">
- </goal>
- <goal name="infix ++.&#39;vc" expl="VC for infix ++." proved="true">
- <proof prover="5"><result status="valid" time="0.062818" steps="229"/></proof>
- </goal>
- <goal name="infix --.&#39;vc" expl="VC for infix --." proved="true">
- <proof prover="5"><result status="valid" time="0.032864" steps="229"/></proof>
- </goal>
- <goal name="infix **.&#39;vc" expl="VC for infix **." proved="true">
- <proof prover="5"><result status="valid" time="0.039345" steps="229"/></proof>
- </goal>
- <goal name="infix //.&#39;vc" expl="VC for infix //." proved="true">
- <proof prover="5" timelimit="5"><result status="valid" time="0.025073" steps="229"/></proof>
- </goal>
- <goal name="prefix --.&#39;vc" expl="VC for prefix --." proved="true">
- <proof prover="5"><result status="valid" time="0.042917" steps="229"/></proof>
- </goal>
+<theory name="USingleLemmas" proved="true">
  <goal name="uadd_single_error_propagation&#39;vc" expl="VC for uadd_single_error_propagation" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="uadd_single_error_propagation&#39;vc.0" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="uadd_single_error_propagation&#39;vc.0.0" expl="assertion" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.445642" steps="2309"/></proof>
+   <proof prover="7"><result status="valid" time="0.141252" steps="473"/></proof>
    </goal>
    <goal name="uadd_single_error_propagation&#39;vc.0.1" expl="assertion" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.493149" steps="2839"/></proof>
+   <proof prover="7"><result status="valid" time="0.138352" steps="552"/></proof>
    </goal>
    <goal name="uadd_single_error_propagation&#39;vc.0.2" expl="assertion" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.133601" steps="543"/></proof>
+   <proof prover="7"><result status="valid" time="0.143177" steps="335"/></proof>
    </goal>
    <goal name="uadd_single_error_propagation&#39;vc.0.3" expl="VC for uadd_single_error_propagation" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.371210" steps="1998"/></proof>
+   <proof prover="7"><result status="valid" time="0.107246" steps="250"/></proof>
    </goal>
    <goal name="uadd_single_error_propagation&#39;vc.0.4" expl="VC for uadd_single_error_propagation" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.211626" steps="344"/></proof>
+   <proof prover="7"><result status="valid" time="0.097988" steps="135"/></proof>
    </goal>
    <goal name="uadd_single_error_propagation&#39;vc.0.5" expl="VC for uadd_single_error_propagation" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.386900" steps="1882"/></proof>
+   <proof prover="7"><result status="valid" time="0.075312" steps="214"/></proof>
    </goal>
    <goal name="uadd_single_error_propagation&#39;vc.0.6" expl="VC for uadd_single_error_propagation" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.171612" steps="362"/></proof>
+   <proof prover="7"><result status="valid" time="0.091400" steps="152"/></proof>
    </goal>
    <goal name="uadd_single_error_propagation&#39;vc.0.7" expl="VC for uadd_single_error_propagation" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.223017" steps="2148"/></proof>
+   <proof prover="7"><result status="valid" time="0.076207" steps="241"/></proof>
    </goal>
    <goal name="uadd_single_error_propagation&#39;vc.0.8" expl="VC for uadd_single_error_propagation" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.294139" steps="2156"/></proof>
+   <proof prover="7"><result status="valid" time="0.066005" steps="250"/></proof>
    </goal>
    <goal name="uadd_single_error_propagation&#39;vc.0.9" expl="VC for uadd_single_error_propagation" proved="true">
-   <proof prover="2" memlimit="2000"><result status="valid" time="1.206442" steps="102067"/></proof>
+   <proof prover="2"><result status="valid" time="1.399842" steps="101794"/></proof>
    </goal>
    <goal name="uadd_single_error_propagation&#39;vc.0.10" expl="VC for uadd_single_error_propagation" proved="true">
-   <proof prover="0"><result status="valid" time="0.153253" steps="4526"/></proof>
+   <proof prover="7"><result status="valid" time="0.092246" steps="193"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="uadd_single_error_propagation&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.136008" steps="450"/></proof>
+  <proof prover="7"><result status="valid" time="0.093641" steps="242"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="usub_single_error_propagation&#39;vc" expl="VC for usub_single_error_propagation" proved="true">
- <proof prover="5"><result status="valid" time="0.880560" steps="5474"/></proof>
+ <proof prover="7"><result status="valid" time="0.203377" steps="549"/></proof>
  </goal>
  <goal name="umul_single_error_propagation&#39;vc" expl="VC for umul_single_error_propagation" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="umul_single_error_propagation&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="1.361741" steps="5286"/></proof>
+  <proof prover="7"><result status="valid" time="0.291000" steps="1250"/></proof>
   </goal>
   <goal name="umul_single_error_propagation&#39;vc.1" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="umul_single_error_propagation&#39;vc.1.0" expl="assertion" proved="true">
-   <proof prover="7"><result status="valid" time="0.715920" steps="3599"/></proof>
+   <proof prover="7"><result status="valid" time="0.182043" steps="526"/></proof>
    </goal>
    <goal name="umul_single_error_propagation&#39;vc.1.1" expl="assertion" proved="true">
-   <proof prover="7"><result status="valid" time="0.067929" steps="317"/></proof>
+   <proof prover="7"><result status="valid" time="0.076595" steps="106"/></proof>
    </goal>
    <goal name="umul_single_error_propagation&#39;vc.1.2" expl="assertion" proved="true">
-   <proof prover="7"><result status="valid" time="0.507491" steps="2631"/></proof>
+   <proof prover="7"><result status="valid" time="0.153914" steps="419"/></proof>
    </goal>
    <goal name="umul_single_error_propagation&#39;vc.1.3" expl="VC for umul_single_error_propagation" proved="true">
-   <proof prover="7"><result status="valid" time="0.096073" steps="523"/></proof>
+   <proof prover="7"><result status="valid" time="0.093761" steps="312"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="umul_single_error_propagation&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.073354" steps="312"/></proof>
+  <proof prover="7"><result status="valid" time="0.095426" steps="102"/></proof>
   </goal>
   <goal name="umul_single_error_propagation&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.084476" steps="312"/></proof>
+  <proof prover="7"><result status="valid" time="0.104388" steps="102"/></proof>
   </goal>
   <goal name="umul_single_error_propagation&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.077386" steps="312"/></proof>
+  <proof prover="7"><result status="valid" time="0.116590" steps="102"/></proof>
   </goal>
   <goal name="umul_single_error_propagation&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.047100" steps="312"/></proof>
+  <proof prover="7"><result status="valid" time="0.091348" steps="102"/></proof>
   </goal>
   <goal name="umul_single_error_propagation&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.049247" steps="319"/></proof>
+  <proof prover="7"><result status="valid" time="0.138153" steps="109"/></proof>
   </goal>
   <goal name="umul_single_error_propagation&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.087762" steps="321"/></proof>
+  <proof prover="7"><result status="valid" time="0.122870" steps="112"/></proof>
   </goal>
   <goal name="umul_single_error_propagation&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.058715" steps="324"/></proof>
+  <proof prover="7"><result status="valid" time="0.138408" steps="117"/></proof>
   </goal>
   <goal name="umul_single_error_propagation&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.052911" steps="327"/></proof>
+  <proof prover="7"><result status="valid" time="0.093455" steps="120"/></proof>
   </goal>
   <goal name="umul_single_error_propagation&#39;vc.10" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.315250" steps="611"/></proof>
+  <proof prover="7"><result status="valid" time="0.181347" steps="400"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="log_single_error_propagation&#39;vc" expl="VC for log_single_error_propagation" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="log_single_error_propagation&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.058493" steps="299"/></proof>
+  <proof prover="7"><result status="valid" time="0.110168" steps="90"/></proof>
   </goal>
   <goal name="log_single_error_propagation&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.057746" steps="295"/></proof>
+  <proof prover="7"><result status="valid" time="0.086342" steps="85"/></proof>
   </goal>
   <goal name="log_single_error_propagation&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.063178" steps="295"/></proof>
+  <proof prover="7"><result status="valid" time="0.073420" steps="85"/></proof>
   </goal>
   <goal name="log_single_error_propagation&#39;vc.3" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.649675" steps="3435"/></proof>
+  <proof prover="7"><result status="valid" time="0.133839" steps="375"/></proof>
   </goal>
   <goal name="log_single_error_propagation&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.117760" steps="589"/></proof>
+  <proof prover="7"><result status="valid" time="0.224499" steps="379"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="log2_single_error_propagation&#39;vc" expl="VC for log2_single_error_propagation" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="log2_single_error_propagation&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.078061" steps="299"/></proof>
+  <proof prover="7"><result status="valid" time="0.067337" steps="90"/></proof>
   </goal>
   <goal name="log2_single_error_propagation&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.063536" steps="295"/></proof>
+  <proof prover="7"><result status="valid" time="0.076016" steps="85"/></proof>
   </goal>
   <goal name="log2_single_error_propagation&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.069745" steps="295"/></proof>
+  <proof prover="7"><result status="valid" time="0.064987" steps="85"/></proof>
   </goal>
   <goal name="log2_single_error_propagation&#39;vc.3" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.473607" steps="3473"/></proof>
+  <proof prover="7"><result status="valid" time="0.107289" steps="404"/></proof>
   </goal>
   <goal name="log2_single_error_propagation&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.243094" steps="588"/></proof>
+  <proof prover="7"><result status="valid" time="0.109365" steps="379"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="log10_single_error_propagation&#39;vc" expl="VC for log10_single_error_propagation" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="log10_single_error_propagation&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.068263" steps="299"/></proof>
+  <proof prover="7"><result status="valid" time="0.076095" steps="90"/></proof>
   </goal>
   <goal name="log10_single_error_propagation&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.070894" steps="295"/></proof>
+  <proof prover="7"><result status="valid" time="0.062042" steps="85"/></proof>
   </goal>
   <goal name="log10_single_error_propagation&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.066481" steps="295"/></proof>
+  <proof prover="7"><result status="valid" time="0.067127" steps="85"/></proof>
   </goal>
   <goal name="log10_single_error_propagation&#39;vc.3" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.571580" steps="3473"/></proof>
+  <proof prover="7"><result status="valid" time="0.087264" steps="405"/></proof>
   </goal>
   <goal name="log10_single_error_propagation&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.231387" steps="588"/></proof>
+  <proof prover="7"><result status="valid" time="0.122385" steps="379"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="exp_single_error_propagation&#39;vc" expl="VC for exp_single_error_propagation" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="exp_single_error_propagation&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.067733" steps="296"/></proof>
+  <proof prover="7"><result status="valid" time="0.061114" steps="87"/></proof>
   </goal>
   <goal name="exp_single_error_propagation&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.065544" steps="292"/></proof>
+  <proof prover="7"><result status="valid" time="0.061771" steps="82"/></proof>
   </goal>
   <goal name="exp_single_error_propagation&#39;vc.2" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="exp_single_error_propagation&#39;vc.2.0" expl="assertion" proved="true">
-   <proof prover="7"><result status="valid" time="0.070965" steps="311"/></proof>
+   <proof prover="7"><result status="valid" time="0.066406" steps="102"/></proof>
    </goal>
    <goal name="exp_single_error_propagation&#39;vc.2.1" expl="VC for exp_single_error_propagation" proved="true">
-   <proof prover="7"><result status="valid" time="0.648592" steps="2822"/></proof>
+   <proof prover="7"><result status="valid" time="0.085668" steps="422"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="exp_single_error_propagation&#39;vc.3" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="exp_single_error_propagation&#39;vc.3.0" expl="assertion" proved="true">
-   <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.060438" steps="314"/></proof>
-   <proof prover="7"><result status="valid" time="0.064796" steps="314"/></proof>
+   <proof prover="7"><result status="valid" time="0.082207" steps="105"/></proof>
    </goal>
    <goal name="exp_single_error_propagation&#39;vc.3.1" expl="VC for exp_single_error_propagation" proved="true">
-   <proof prover="7"><result status="valid" time="0.071996" steps="302"/></proof>
+   <proof prover="7"><result status="valid" time="0.081035" steps="92"/></proof>
    </goal>
    <goal name="exp_single_error_propagation&#39;vc.3.2" expl="VC for exp_single_error_propagation" proved="true">
-   <proof prover="7"><result status="valid" time="0.280698" steps="1646"/></proof>
+   <proof prover="7"><result status="valid" time="0.066647" steps="233"/></proof>
    </goal>
    <goal name="exp_single_error_propagation&#39;vc.3.3" expl="VC for exp_single_error_propagation" proved="true">
-   <proof prover="7"><result status="valid" time="0.414784" steps="1831"/></proof>
+   <proof prover="7"><result status="valid" time="0.083641" steps="311"/></proof>
    </goal>
    <goal name="exp_single_error_propagation&#39;vc.3.4" expl="VC for exp_single_error_propagation" proved="true">
-   <proof prover="7"><result status="valid" time="5.379381" steps="29538"/></proof>
+   <proof prover="7"><result status="valid" time="3.279595" steps="21673"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="exp_single_error_propagation&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.059459" steps="301"/></proof>
+  <proof prover="7"><result status="valid" time="0.072477" steps="92"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="sum_single_error_propagation&#39;vc" expl="VC for sum_single_error_propagation" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="sum_single_error_propagation&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.037441" steps="284"/></proof>
+  <proof prover="7"><result status="valid" time="0.060020" steps="75"/></proof>
   </goal>
   <goal name="sum_single_error_propagation&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.410967" steps="1771"/></proof>
+  <proof prover="7"><result status="valid" time="0.085942" steps="177"/></proof>
   </goal>
   <goal name="sum_single_error_propagation&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.072847" steps="288"/></proof>
+  <proof prover="7"><result status="valid" time="0.069512" steps="79"/></proof>
   </goal>
   <goal name="sum_single_error_propagation&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.186280" steps="1315"/></proof>
+  <proof prover="7"><result status="valid" time="0.058646" steps="156"/></proof>
   </goal>
   <goal name="sum_single_error_propagation&#39;vc.4" expl="assertion" proved="true">
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.382639" steps="1614"/></proof>
+  <proof prover="7"><result status="valid" time="0.088137" steps="251"/></proof>
   </goal>
   <goal name="sum_single_error_propagation&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.079177" steps="375"/></proof>
+  <proof prover="7"><result status="valid" time="0.118142" steps="166"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="udiv_pow_of_2_single_error_propagation&#39;vc" expl="VC for udiv_pow_of_2_single_error_propagation" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="udiv_pow_of_2_single_error_propagation&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.065857" steps="298"/></proof>
+  <proof prover="7"><result status="valid" time="0.039140" steps="88"/></proof>
   </goal>
   <goal name="udiv_pow_of_2_single_error_propagation&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.162812" steps="1395"/></proof>
+  <proof prover="7"><result status="valid" time="0.048401" steps="131"/></proof>
   </goal>
   <goal name="udiv_pow_of_2_single_error_propagation&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.072041" steps="323"/></proof>
+  <proof prover="7"><result status="valid" time="0.034562" steps="113"/></proof>
   </goal>
   <goal name="udiv_pow_of_2_single_error_propagation&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.320967" steps="2255"/></proof>
+  <proof prover="7"><result status="valid" time="0.047015" steps="222"/></proof>
   </goal>
   <goal name="udiv_pow_of_2_single_error_propagation&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.898975" steps="13121"/></proof>
+  <proof prover="7"><result status="valid" time="0.246962" steps="4565"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="UDouble">
- <goal name="uadd&#39;vc" expl="VC for uadd">
- </goal>
- <goal name="usub&#39;vc" expl="VC for usub">
- </goal>
- <goal name="umul&#39;vc" expl="VC for umul">
- </goal>
- <goal name="udiv&#39;vc" expl="VC for udiv">
- </goal>
- <goal name="uminus&#39;vc" expl="VC for uminus">
- </goal>
- <goal name="infix ++.&#39;vc" expl="VC for infix ++." proved="true">
- <proof prover="5"><result status="valid" time="0.040797" steps="229"/></proof>
- </goal>
- <goal name="infix --.&#39;vc" expl="VC for infix --." proved="true">
- <proof prover="5"><result status="valid" time="0.041995" steps="229"/></proof>
- </goal>
- <goal name="infix **.&#39;vc" expl="VC for infix **." proved="true">
- <proof prover="5"><result status="valid" time="0.047986" steps="229"/></proof>
- </goal>
- <goal name="infix //.&#39;vc" expl="VC for infix //." proved="true">
- <proof prover="5" timelimit="5"><result status="valid" time="0.019452" steps="229"/></proof>
- </goal>
- <goal name="prefix --.&#39;vc" expl="VC for prefix --." proved="true">
- <proof prover="5" timelimit="5"><result status="valid" time="0.035050" steps="229"/></proof>
- </goal>
+<theory name="UDoubleLemmas" proved="true">
  <goal name="uadd_double_error_propagation&#39;vc" expl="VC for uadd_double_error_propagation" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="uadd_double_error_propagation&#39;vc.0" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="uadd_double_error_propagation&#39;vc.0.0" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.304790" steps="2312"/></proof>
+   <proof prover="7"><result status="valid" time="0.102114" steps="472"/></proof>
    </goal>
    <goal name="uadd_double_error_propagation&#39;vc.0.1" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.373409" steps="2841"/></proof>
+   <proof prover="7"><result status="valid" time="0.200159" steps="552"/></proof>
    </goal>
    <goal name="uadd_double_error_propagation&#39;vc.0.2" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.145458" steps="544"/></proof>
+   <proof prover="7"><result status="valid" time="0.206614" steps="334"/></proof>
    </goal>
    <goal name="uadd_double_error_propagation&#39;vc.0.3" expl="VC for uadd_double_error_propagation" proved="true">
-   <proof prover="5"><result status="valid" time="0.316100" steps="1988"/></proof>
+   <proof prover="7"><result status="valid" time="0.127348" steps="250"/></proof>
    </goal>
    <goal name="uadd_double_error_propagation&#39;vc.0.4" expl="VC for uadd_double_error_propagation" proved="true">
-   <proof prover="5"><result status="valid" time="0.118363" steps="344"/></proof>
+   <proof prover="7"><result status="valid" time="0.141166" steps="135"/></proof>
    </goal>
    <goal name="uadd_double_error_propagation&#39;vc.0.5" expl="VC for uadd_double_error_propagation" proved="true">
-   <proof prover="5"><result status="valid" time="0.477756" steps="1890"/></proof>
+   <proof prover="7"><result status="valid" time="0.077231" steps="214"/></proof>
    </goal>
    <goal name="uadd_double_error_propagation&#39;vc.0.6" expl="VC for uadd_double_error_propagation" proved="true">
-   <proof prover="5"><result status="valid" time="0.075563" steps="362"/></proof>
+   <proof prover="7"><result status="valid" time="0.113486" steps="152"/></proof>
    </goal>
    <goal name="uadd_double_error_propagation&#39;vc.0.7" expl="VC for uadd_double_error_propagation" proved="true">
-   <proof prover="5"><result status="valid" time="0.338519" steps="2146"/></proof>
+   <proof prover="7"><result status="valid" time="0.075706" steps="241"/></proof>
    </goal>
    <goal name="uadd_double_error_propagation&#39;vc.0.8" expl="VC for uadd_double_error_propagation" proved="true">
-   <proof prover="5"><result status="valid" time="0.331131" steps="2156"/></proof>
+   <proof prover="7"><result status="valid" time="0.058852" steps="250"/></proof>
    </goal>
    <goal name="uadd_double_error_propagation&#39;vc.0.9" expl="VC for uadd_double_error_propagation" proved="true">
-   <proof prover="2" memlimit="2000"><result status="valid" time="1.650102" steps="102067"/></proof>
+   <proof prover="2"><result status="valid" time="0.925919" steps="101794"/></proof>
    </goal>
    <goal name="uadd_double_error_propagation&#39;vc.0.10" expl="VC for uadd_double_error_propagation" proved="true">
-   <proof prover="0"><result status="valid" time="0.139548" steps="4526"/></proof>
+   <proof prover="7"><result status="valid" time="0.097549" steps="193"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="uadd_double_error_propagation&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.201092" steps="450"/></proof>
+  <proof prover="7"><result status="valid" time="0.108313" steps="242"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="usub_double_error_propagation&#39;vc" expl="VC for usub_double_error_propagation" proved="true">
- <proof prover="5"><result status="valid" time="0.778239" steps="5472"/></proof>
+ <proof prover="7"><result status="valid" time="0.228551" steps="549"/></proof>
  </goal>
  <goal name="umul_double_error_propagation&#39;vc" expl="VC for umul_double_error_propagation" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="umul_double_error_propagation&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="1.303616" steps="5260"/></proof>
+  <proof prover="7"><result status="valid" time="0.516073" steps="1251"/></proof>
   </goal>
   <goal name="umul_double_error_propagation&#39;vc.1" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="umul_double_error_propagation&#39;vc.1.0" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.523399" steps="3550"/></proof>
+   <proof prover="7"><result status="valid" time="0.164598" steps="527"/></proof>
    </goal>
    <goal name="umul_double_error_propagation&#39;vc.1.1" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.044021" steps="317"/></proof>
+   <proof prover="7"><result status="valid" time="0.057340" steps="106"/></proof>
    </goal>
    <goal name="umul_double_error_propagation&#39;vc.1.2" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.575552" steps="2663"/></proof>
+   <proof prover="7"><result status="valid" time="0.183872" steps="419"/></proof>
    </goal>
    <goal name="umul_double_error_propagation&#39;vc.1.3" expl="VC for umul_double_error_propagation" proved="true">
-   <proof prover="5"><result status="valid" time="0.057189" steps="523"/></proof>
+   <proof prover="7"><result status="valid" time="0.104414" steps="312"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="umul_double_error_propagation&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.042911" steps="312"/></proof>
+  <proof prover="7"><result status="valid" time="0.114463" steps="102"/></proof>
   </goal>
   <goal name="umul_double_error_propagation&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.050305" steps="312"/></proof>
+  <proof prover="7"><result status="valid" time="0.116305" steps="102"/></proof>
   </goal>
   <goal name="umul_double_error_propagation&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.039403" steps="312"/></proof>
+  <proof prover="7"><result status="valid" time="0.123224" steps="102"/></proof>
   </goal>
   <goal name="umul_double_error_propagation&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.058492" steps="312"/></proof>
+  <proof prover="7"><result status="valid" time="0.079998" steps="102"/></proof>
   </goal>
   <goal name="umul_double_error_propagation&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.054374" steps="319"/></proof>
+  <proof prover="7"><result status="valid" time="0.138131" steps="109"/></proof>
   </goal>
   <goal name="umul_double_error_propagation&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.044815" steps="321"/></proof>
+  <proof prover="7"><result status="valid" time="0.131501" steps="112"/></proof>
   </goal>
   <goal name="umul_double_error_propagation&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.047434" steps="326"/></proof>
+  <proof prover="7"><result status="valid" time="0.134992" steps="117"/></proof>
   </goal>
   <goal name="umul_double_error_propagation&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.044432" steps="327"/></proof>
+  <proof prover="7"><result status="valid" time="0.082538" steps="120"/></proof>
   </goal>
   <goal name="umul_double_error_propagation&#39;vc.10" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.154112" steps="611"/></proof>
+  <proof prover="7"><result status="valid" time="0.163149" steps="400"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="log_double_error_propagation&#39;vc" expl="VC for log_double_error_propagation" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="log_double_error_propagation&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.067128" steps="299"/></proof>
+  <proof prover="7"><result status="valid" time="0.060523" steps="90"/></proof>
   </goal>
   <goal name="log_double_error_propagation&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.077907" steps="295"/></proof>
+  <proof prover="7"><result status="valid" time="0.063105" steps="85"/></proof>
   </goal>
   <goal name="log_double_error_propagation&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.059724" steps="295"/></proof>
+  <proof prover="7"><result status="valid" time="0.068456" steps="85"/></proof>
   </goal>
   <goal name="log_double_error_propagation&#39;vc.3" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.556515" steps="3439"/></proof>
+  <proof prover="7"><result status="valid" time="0.102186" steps="375"/></proof>
   </goal>
   <goal name="log_double_error_propagation&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.138604" steps="589"/></proof>
+  <proof prover="7"><result status="valid" time="0.125083" steps="382"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="log2_double_error_propagation&#39;vc" expl="VC for log2_double_error_propagation" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="log2_double_error_propagation&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.061128" steps="299"/></proof>
+  <proof prover="7"><result status="valid" time="0.074440" steps="90"/></proof>
   </goal>
   <goal name="log2_double_error_propagation&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.073401" steps="295"/></proof>
+  <proof prover="7"><result status="valid" time="0.070811" steps="85"/></proof>
   </goal>
   <goal name="log2_double_error_propagation&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.064584" steps="295"/></proof>
+  <proof prover="7"><result status="valid" time="0.068496" steps="85"/></proof>
   </goal>
   <goal name="log2_double_error_propagation&#39;vc.3" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.565589" steps="3473"/></proof>
+  <proof prover="7"><result status="valid" time="0.115863" steps="404"/></proof>
   </goal>
   <goal name="log2_double_error_propagation&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.249671" steps="591"/></proof>
+  <proof prover="7"><result status="valid" time="0.124103" steps="379"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="log10_double_error_propagation&#39;vc" expl="VC for log10_double_error_propagation" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="log10_double_error_propagation&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.073933" steps="299"/></proof>
+  <proof prover="7"><result status="valid" time="0.070957" steps="90"/></proof>
   </goal>
   <goal name="log10_double_error_propagation&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.067675" steps="295"/></proof>
+  <proof prover="7"><result status="valid" time="0.074263" steps="85"/></proof>
   </goal>
   <goal name="log10_double_error_propagation&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.065799" steps="295"/></proof>
+  <proof prover="7"><result status="valid" time="0.073729" steps="85"/></proof>
   </goal>
   <goal name="log10_double_error_propagation&#39;vc.3" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.429985" steps="3476"/></proof>
+  <proof prover="7"><result status="valid" time="0.079424" steps="405"/></proof>
   </goal>
   <goal name="log10_double_error_propagation&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.246455" steps="588"/></proof>
+  <proof prover="7"><result status="valid" time="0.117240" steps="379"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="exp_double_error_propagation&#39;vc" expl="VC for exp_double_error_propagation" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="exp_double_error_propagation&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.063908" steps="296"/></proof>
+  <proof prover="7"><result status="valid" time="0.068329" steps="87"/></proof>
   </goal>
   <goal name="exp_double_error_propagation&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.072264" steps="292"/></proof>
+  <proof prover="7"><result status="valid" time="0.065457" steps="82"/></proof>
   </goal>
   <goal name="exp_double_error_propagation&#39;vc.2" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="exp_double_error_propagation&#39;vc.2.0" expl="assertion" proved="true">
-   <proof prover="7"><result status="valid" time="0.076227" steps="311"/></proof>
+   <proof prover="7"><result status="valid" time="0.068168" steps="102"/></proof>
    </goal>
    <goal name="exp_double_error_propagation&#39;vc.2.1" expl="VC for exp_double_error_propagation" proved="true">
-   <proof prover="7"><result status="valid" time="0.772170" steps="2826"/></proof>
+   <proof prover="7"><result status="valid" time="0.084687" steps="422"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="exp_double_error_propagation&#39;vc.3" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="exp_double_error_propagation&#39;vc.3.0" expl="assertion" proved="true">
-   <proof prover="7"><result status="valid" time="0.073841" steps="314"/></proof>
+   <proof prover="7"><result status="valid" time="0.070876" steps="105"/></proof>
    </goal>
    <goal name="exp_double_error_propagation&#39;vc.3.1" expl="VC for exp_double_error_propagation" proved="true">
-   <proof prover="7"><result status="valid" time="0.068983" steps="302"/></proof>
+   <proof prover="7"><result status="valid" time="0.079733" steps="92"/></proof>
    </goal>
    <goal name="exp_double_error_propagation&#39;vc.3.2" expl="VC for exp_double_error_propagation" proved="true">
-   <proof prover="7"><result status="valid" time="0.251155" steps="1646"/></proof>
+   <proof prover="7"><result status="valid" time="0.076420" steps="233"/></proof>
    </goal>
    <goal name="exp_double_error_propagation&#39;vc.3.3" expl="VC for exp_double_error_propagation" proved="true">
-   <proof prover="7"><result status="valid" time="0.334552" steps="1805"/></proof>
+   <proof prover="7"><result status="valid" time="0.082006" steps="311"/></proof>
    </goal>
    <goal name="exp_double_error_propagation&#39;vc.3.4" expl="VC for exp_double_error_propagation" proved="true">
-   <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="1.732909" steps="15142"/></proof>
+   <proof prover="7"><result status="valid" time="2.114183" steps="19949"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="exp_double_error_propagation&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.077159" steps="301"/></proof>
+  <proof prover="7"><result status="valid" time="0.091349" steps="92"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="sum_double_error_propagation&#39;vc" expl="VC for sum_double_error_propagation" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="sum_double_error_propagation&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.072431" steps="284"/></proof>
+  <proof prover="7"><result status="valid" time="0.061366" steps="75"/></proof>
   </goal>
   <goal name="sum_double_error_propagation&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.395151" steps="1762"/></proof>
+  <proof prover="7"><result status="valid" time="0.083008" steps="177"/></proof>
   </goal>
   <goal name="sum_double_error_propagation&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.076527" steps="288"/></proof>
+  <proof prover="7"><result status="valid" time="0.123453" steps="79"/></proof>
   </goal>
   <goal name="sum_double_error_propagation&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.211303" steps="1315"/></proof>
+  <proof prover="7"><result status="valid" time="0.069174" steps="156"/></proof>
   </goal>
   <goal name="sum_double_error_propagation&#39;vc.4" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.254564" steps="1613"/></proof>
+  <proof prover="7"><result status="valid" time="0.096094" steps="251"/></proof>
   </goal>
   <goal name="sum_double_error_propagation&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.090382" steps="375"/></proof>
+  <proof prover="7"><result status="valid" time="0.116391" steps="166"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="udiv_pow_of_2_double_error_propagation&#39;vc" expl="VC for udiv_pow_of_2_double_error_propagation" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="udiv_pow_of_2_double_error_propagation&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.073169" steps="298"/></proof>
+  <proof prover="7"><result status="valid" time="0.075121" steps="88"/></proof>
   </goal>
   <goal name="udiv_pow_of_2_double_error_propagation&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.209624" steps="1301"/></proof>
+  <proof prover="7"><result status="valid" time="0.163390" steps="131"/></proof>
   </goal>
   <goal name="udiv_pow_of_2_double_error_propagation&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.076445" steps="323"/></proof>
+  <proof prover="7"><result status="valid" time="0.080265" steps="113"/></proof>
   </goal>
   <goal name="udiv_pow_of_2_double_error_propagation&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.197405" steps="2203"/></proof>
+  <proof prover="7"><result status="valid" time="0.056630" steps="222"/></proof>
   </goal>
   <goal name="udiv_pow_of_2_double_error_propagation&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.582198" steps="13210"/></proof>
+  <proof prover="7"><result status="valid" time="0.234052" steps="4765"/></proof>
   </goal>
  </transf>
  </goal>
