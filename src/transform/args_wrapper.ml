@@ -162,11 +162,11 @@ let add_meta_id_args (al: meta_arg list) (tables: naming_table): naming_table =
 let build_coercion_map km_meta =
   try
     let crc_set = Theory.Mmeta.find Theory.meta_coercion km_meta in
-    let crc_map = Stdecl.fold (fun elem crc_map ->
+    let crc_map = Task.HStdecl.fold (fun elem crc_map ->
       match elem.Theory.td_node with
       | Meta (m,([MAls ls] as _al)) when meta_equal m Theory.meta_coercion ->
         Coercion.add crc_map ls
-      | _ -> crc_map) crc_set.tds_set Coercion.empty in
+      | _ -> crc_map) crc_set Coercion.empty in
     crc_map
   with
   | Not_found -> Coercion.empty

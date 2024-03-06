@@ -166,7 +166,7 @@ let all_split_subp c subp =
 
 let maybe_giant_step_rac ctr parent models =
   if not Gnat_config.giant_step_rac then
-    (match models with | [] -> None | ((_,a) :: _) -> Some (a, None))
+    List.map (fun (_,a)-> (a, None)) models
   else (
     Debug.dprintf Check_ce.debug_check_ce_categorization "Running giant-step RAC@.";
     let Controller_itp.{controller_config= cnf; controller_env= env} = ctr in
@@ -181,22 +181,21 @@ let maybe_giant_step_rac ctr parent models =
     let timelimit = Option.map float_of_int Gnat_config.rac_timelimit in
     let rac_results = Check_ce.get_rac_results ?timelimit ~compute_term
         ~only_giant_step:true rac env pm models in
-    let strategy = Check_ce.best_non_empty_giant_step_rac_result in
-    let model = Check_ce.select_model_from_giant_step_rac_results ~strategy rac_results in
+    let models = List.map (fun (_,_,m,_,s) -> (m,s)) rac_results in
+    List.map (fun model ->
     match model with
-    | None -> None
-    | Some (m, _) when not Gnat_config.giant_step_rac ->
-        Some (Gnat_counterexamples.post_clean#model m, None)
-    | Some (m, Check_ce.RAC_not_done reason) -> (
+    | (m, _) when not Gnat_config.giant_step_rac ->
+        (Gnat_counterexamples.post_clean#model m, None)
+    | (m, Check_ce.RAC_not_done reason) -> (
         if Gnat_config.debug then Loc.warning warn_gnat_rac_not_done "%s@." reason;
-        Some (Gnat_counterexamples.post_clean#model m, None)
+        (Gnat_counterexamples.post_clean#model m, None)
       )
-    | Some (m, Check_ce.RAC_done (res_state, res_log)) -> (
+    | (m, Check_ce.RAC_done (res_state, res_log)) -> (
         let res = Check_ce.RAC_done (res_state, res_log) in
         Debug.dprintf Check_ce.debug_check_ce_rac_results "%a@."
           (Check_ce.print_rac_result ?verb_lvl:None) res;
-        Some (Gnat_counterexamples.post_clean#model m, Some res))
-  )
+        (Gnat_counterexamples.post_clean#model m, Some res))
+  ) models)
 
 let report_messages c obj =
   let s = c.Controller_itp.controller_session in
@@ -205,14 +204,14 @@ let report_messages c obj =
       let (stats, stat_checker) = C.Save_VCs.extract_stats c obj in
       Gnat_report.Proved (stats, stat_checker)
     else
-      let model =
+      let models =
         let ce_pa = C.session_find_ce_pa c obj in
         match ce_pa with
-        | None -> None
+        | None -> []
         | Some pa ->
           let ce_pan = Session_itp.get_proof_attempt_node s pa in
           match ce_pan.Session_itp.proof_state with
-          | None -> None
+          | None -> []
           | Some pr ->
             let not_step_limit (pa,_) = pa <> Call_provers.StepLimitExceeded in
             let models = List.filter not_step_limit pr.Call_provers.pr_models in
@@ -246,7 +245,7 @@ let report_messages c obj =
                   with Not_found -> default
               else { Gnat_expl.pretty_node = None; inlined = None }
       in
-      Gnat_report.Not_Proved (extra_info, model, manual_info) in
+      Gnat_report.Not_Proved (extra_info, models, manual_info) in
   Gnat_report.register obj (C.Save_VCs.check_to_json s obj) result
 
 (* Escaping all debug printings *)

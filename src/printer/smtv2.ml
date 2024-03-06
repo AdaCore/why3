@@ -1005,20 +1005,20 @@ let print_task version args ?old:_ fmt task =
   let cntexample = Driver.get_counterexmp task in
   let incremental =
     let incr_meta = Task.find_meta_tds task meta_incremental in
-    not (Theory.Stdecl.is_empty incr_meta.Task.tds_set)
+    not (Task.HStdecl.is_empty incr_meta)
   in
   let incremental = Debug.test_flag debug_incremental || incremental in
   let need_push =
     let need_push_meta = Task.find_meta_tds task meta_counterexmp_need_push in
-    not (Theory.Stdecl.is_empty need_push_meta.Task.tds_set)
+    not (Task.HStdecl.is_empty need_push_meta)
   in
   let supports_reason_unknown =
     let m = Task.find_meta_tds task meta_supports_reason_unknown in
-    not (Theory.Stdecl.is_empty m.Task.tds_set)
+    not (Task.HStdecl.is_empty m)
   in
   let supports_minimize =
     let m = Task.find_meta_tds task meta_supports_minimize in
-    not (Theory.Stdecl.is_empty m.Task.tds_set)
+    not (Task.HStdecl.is_empty m)
   in
   let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
   let vc_attrs = (Task.task_goal_fmla task).t_attrs in
