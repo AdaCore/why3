@@ -14,17 +14,17 @@ type result_info =
   | Proved of stats * int
   | Not_Proved of
        Gnat_expl.extra_info *
-       (Model_parser.model * Check_ce.rac_result option) option *
+       (Model_parser.model * Check_ce.rac_result option) list *
        (string * string) option
 
 type msg =
-  { result        : bool;
-    stats         : stats option;
-    stats_checker : int;
-    check_tree    : Json_base.json;
-    extra_info    : Gnat_expl.extra_info;
-    cntexmp_model : (Model_parser.model * Check_ce.rac_result option) option;
-    manual_proof  : (string * string) option
+  { result         : bool;
+    stats          : stats option;
+    stats_checker  : int;
+    check_tree     : Json_base.json;
+    extra_info     : Gnat_expl.extra_info;
+    cntexmp_models : (Model_parser.model * Check_ce.rac_result option) list;
+    manual_proof   : (string * string) option
   }
 
 let msg_set : msg Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
@@ -55,35 +55,35 @@ let adapt_stats statsopt =
       Some newstats
 
 let register check check_tree result =
-  let valid, extra_info, stats, model, manual =
+  let valid, extra_info, stats, models, manual =
     match result with
     | Proved (stats, stats_checker) ->
         true,
         {Gnat_expl.pretty_node = None; inlined = None},
         Some (stats, stats_checker),
-        None,
+        [],
         None
-    | Not_Proved (extra_info, model, manual) ->
-        false, extra_info, None, model, manual
+    | Not_Proved (extra_info, models, manual) ->
+        false, extra_info, None, models, manual
   in
   if (Gnat_expl.HCheck.mem msg_set check) then assert false
   else begin
     let stats_g = Option.map (fun x -> let (stats, _) = x in stats) stats in
     let stats_checker = Option.map (fun x -> let (_, sc) = x in sc) stats in
     let msg =
-    { result        = valid;
-      extra_info    = extra_info;
-      stats         = adapt_stats stats_g;
-      stats_checker = Option.value ~default:0 stats_checker;
-      check_tree    = check_tree;
-      cntexmp_model = model;
-      manual_proof  = manual } in
+    { result         = valid;
+      extra_info     = extra_info;
+      stats          = adapt_stats stats_g;
+      stats_checker  = Option.value ~default:0 stats_checker;
+      check_tree     = check_tree;
+      cntexmp_models = models;
+      manual_proof   = manual } in
     Gnat_expl.HCheck.add msg_set check msg
   end
 
-let get_cntexmp_model = function
-  | None -> []
-  | Some (m, r) ->
+let get_cntexmp_models = 
+  List.map (function
+  (m, r) ->
       let json_result_state (state, _log) =
         let more = match state with
           | Check_ce.Res_fail (ctx, t) ->
@@ -112,12 +112,13 @@ let get_cntexmp_model = function
         Record (state @ more) in
       let rcd_only_cntexmp_model = [ "cntexmp", (Model_parser.json_model m) ] in
       match r with
-      | None -> rcd_only_cntexmp_model
-      | Some (Check_ce.RAC_not_done _) -> rcd_only_cntexmp_model
+      | None -> Record rcd_only_cntexmp_model
+      | Some (Check_ce.RAC_not_done _) -> Record rcd_only_cntexmp_model
       | Some (Check_ce.RAC_done (state, _log)) ->
-          List.append
+          Record (List.append
             rcd_only_cntexmp_model
-            [ "giant_step_rac_result", (json_result_state (state, _log)) ]
+            [ "giant_step_rac_result", (json_result_state (state, _log)) ])
+    )
 
 let get_manual_proof_info info =
   match info with
@@ -170,7 +171,7 @@ let get_msg (check, m) =
         "extra_info", get_extra_info m.extra_info
       ] ;
       get_stats (m.stats, m.stats_checker);
-      get_cntexmp_model m.cntexmp_model ;
+      ["cntexmps", List (get_cntexmp_models m.cntexmp_models)];
       get_manual_proof_info m.manual_proof
     ]
   )
