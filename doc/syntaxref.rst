@@ -1217,6 +1217,25 @@ Record types can be recursive, e.g,
 Recursive record types cannot have invariants, cannot have mutable
 fields, and cannot be private.
 
+.. rubric:: Record injectivity
+
+Records should be identified by their fields, which is a kind of injectivity
+property: provided ``a.f = b.f`` for all fields, then ``a = b``. Plain record
+types without invariant are encoded as algebraic data types with a unique
+constructor (see below), hence the injectivity property automatically holds.
+However, for records with invariant, there is no such constructor.
+
+Actually, record injectivity only holds for non-private types, since all fields
+in the record must be statically known. Hence, for any non-private record ``r``
+with invariants, the following declarations are automatically generated:
+
+.. code-block:: whyml
+
+    predicate r'eq (a b : r) = a.f = b.f /\ ...
+    axiom r'inj: forall a b : r. r'eq a b -> a = b
+
+The recommended way to trigger the injectivity property in your proofs is to introduce an extra ``by r'eq a b`` on a formula, or an ``assert { r'eq a b }`` statement in a program.
+
 .. index:: algebraic data type
 
 Algebraic data types
@@ -1240,7 +1259,7 @@ argument of type ``int`` and thus can be used to build values such as
     type option 'a = None | Some 'a
 
 (This type is already part of Why3 standard library, in module
-`option.Option <http://why3.lri.fr/stdlib/option.html>`_.)
+`option.Option <https://www.why3.org/stdlib/option.html>`_.)
 
 A data type can be recursive. The archetypal example is the type of
 polymorphic lists:
@@ -1250,7 +1269,7 @@ polymorphic lists:
     type list 'a = Nil | Cons 'a (list 'a)
 
 (This type is already part of Why3 standard library, in module
-`list.List <http://why3.lri.fr/stdlib/list.html>`_.)
+`list.List <https://www.why3.org/stdlib/list.html>`_.)
 
 Mutually recursive type definitions are supported.
 
@@ -1331,6 +1350,14 @@ range type :math:`r` automatically introduces the following:
 The function ``r'int`` projects a term of type ``r`` to its integer
 value. The two constants represent the high bound and low bound of the
 range respectively.
+
+Projection ``r'int`` is also defined to be injective, thanks to the following
+definitions automatically introduced by Why3:
+
+.. code-block:: whyml
+
+    predicate r'eq (x y : r) = (r'int x = r'int y)
+    axiom r'inj: forall x y : r. r'eq x y -> x = y
 
 Unless specified otherwise with the meta :why3:meta:`keep:literal` on ``r``, the
 transformation :why3:transform:`eliminate_literal` introduces an axiom
@@ -1774,7 +1801,7 @@ The Why3 Standard Library
 
 The Why3 standard library provides general-purpose modules, to be used
 in logic and/or programs. It can be browsed on-line at
-http://why3.lri.fr/stdlib/. Each file contains one or several modules.
+https://www.why3.org/stdlib/. Each file contains one or several modules.
 To ``use`` or ``clone`` a module ``M`` from file :file:`file.mlw`, use the
 syntax ``file.M``, since :file:`file.mlw` is available in Why3’s default load
 path. For instance, the module of integers and the module of arrays
@@ -1823,7 +1850,7 @@ proper pre-conditions, and with the usual infix syntax ``x / y`` and ``x
 % y``.
 
 The detailed documentation of the library is available on-line at
-http://why3.lri.fr/stdlib/int.html
+https://www.why3.org/stdlib/int.html.
 
 
 Library ``array``: array data structure
@@ -1844,4 +1871,4 @@ where ``l`` is the desired length and ``v`` is the initial value of each
 cell.
 
 The detailed documentation of the library is available on-line at
-http://why3.lri.fr/stdlib/array.html
+https://www.why3.org/stdlib/array.html.

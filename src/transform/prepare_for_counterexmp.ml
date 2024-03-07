@@ -13,7 +13,7 @@ let debug = Debug.register_info_flag "prepare_for_counterexmp"
   ~desc:"Print@ debugging@ messages@ about@ preparing@ the@ task@ \
     for@ getting@ counter-example."
 
-let prepare_for_counterexmp2 env task =
+let prepare_for_counterexmp2 _env task =
   if not (Driver.get_counterexmp task) then begin
     (* Counter-example will not be queried, do nothing *)
     Debug.dprintf debug "Not get ce@.";
@@ -31,8 +31,8 @@ let prepare_for_counterexmp2 env task =
            the source line of the VC. It should be investigated
            whether this should be made differently. *)
         Introduction.simplify_intros;
-        Intro_vc_vars_counterexmp.intro_vc_vars_counterexmp;
-        Intro_projections_counterexmp.intro_projections_counterexmp env
+        Intro_vc_vars_counterexmp.intro_vc_vars_counterexmp
+        (* Intro_projections_counterexmp.intro_projections_counterexmp env *)
       ]
     in
     Trans.apply comp_trans task

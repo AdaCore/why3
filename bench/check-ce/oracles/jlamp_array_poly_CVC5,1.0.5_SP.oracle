@@ -12,7 +12,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : ty -> uni -> int = fun $x116 $x27 -> 2
+    length : ty -> uni -> int = fun $x118 $x28 -> 2
     length : array t -> int = [|_ => 0|]
 File jlamp_array_poly.mlw:
   Line 8:
@@ -39,14 +39,14 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File array.mlw:
   Line 17:
-    length : ty -> uni -> int = fun $x133 $x216 -> 2
+    length : ty -> uni -> int = fun $x138 $x219 -> 2
     length : array t -> int = [|_ => 0|]
 File jlamp_array_poly.mlw:
   Line 8:
     to_int :
       t
       ->
-      int = fun _arg_17 -> if {Array.to_int => 3} = _arg_17 then 3 else 2
+      int = fun _arg_19 -> if {Array.to_int => 3} = _arg_19 then 3 else 2
   Line 11:
     two : t = {Array.to_int => 2}
   Line 14:

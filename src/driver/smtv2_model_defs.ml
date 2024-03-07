@@ -84,12 +84,15 @@ type term =
   | Tite of term * term * term
   | Tarray of sort * sort * array_elements
   | Tasarray of term
+  | Tlet of var_binding list * term
+  | Tforall of var_signature list * term
   | Tunparsed of string
 
 and var_binding = symbol * term
+and var_signature = symbol * sort
 and array_elements = { array_indices : (term * term) list; array_others : term }
 
-type function_def = (symbol * sort) list * sort * term
+type function_def = var_signature list * sort * term
 
 let rec sort_equal s s' =
   match (s, s') with
@@ -227,10 +230,17 @@ let rec print_term fmt = function
         print_array elts
   | Tasarray t ->
       fprintf fmt "@[<hv>(AsArray %a)@]" print_term t
+  | Tlet (bindings, t) ->
+      fprintf fmt "@[<hv>(Let (%a) %a)@]" (Pp.print_list Pp.comma print_var_binding) bindings print_term t
+  | Tforall (bindings, t) ->
+      fprintf fmt "@[<hv>(Forall (%a) %a)@]" (Pp.print_list Pp.comma print_var_signature) bindings print_term t
   | Tunparsed s -> fprintf fmt "(UNPARSED %s)" s
 
 and print_var_binding fmt (s, t) =
   fprintf fmt "(%a %a)" print_symbol s print_term t
+
+and print_var_signature fmt (s, t) =
+  fprintf fmt "(%a %a)" print_symbol s print_sort t
 
 and print_array_elem fmt (t1, t2) =
   fprintf fmt "@[<hv>(%a -> %a)@]" print_term t1 print_term t2

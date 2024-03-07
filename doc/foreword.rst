@@ -23,7 +23,7 @@ formalizations or to add support for a new external prover if wanted.
 Availability
 ~~~~~~~~~~~~
 
-Why3 project page is http://why3.lri.fr/. The last distribution is
+Why3 project page is https://www.why3.org/. The latest release is
 available there, in source format, together with this documentation and
 several examples.
 

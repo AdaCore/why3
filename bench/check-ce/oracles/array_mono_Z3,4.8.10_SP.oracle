@@ -11,7 +11,7 @@ Prover result is: Valid (259 steps).
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `([])` cannot be evaluated)
 File "bench/check-ce/array_mono.mlw", line 36, characters 4-8:
 Sub-goal Index in array bounds of goal f1'vc.
-Prover result is: Step limit exceeded (3000020 steps).
+Prover result is: Step limit exceeded (100020 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -50,7 +50,7 @@ Prover result is: Valid (468 steps).
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `f2` cannot be evaluated)
 File "bench/check-ce/array_mono.mlw", line 40, characters 14-26:
 Sub-goal Postcondition of goal f2'vc.
-Prover result is: Step limit exceeded (3000055 steps).
+Prover result is: Step limit exceeded (100055 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `([]<-)` cannot be evaluated):
 File array_mono.mlw:
@@ -79,8 +79,8 @@ File array_mono.mlw:
       ->
       int
       ->
-      array = fun x!05 x!11 x!21 ->
-               if x!05 = {Array.elts = [|1 => 42; _ => 3|]; Array.length = 2} /\
+      array = fun x!06 x!11 x!21 ->
+               if x!06 = {Array.elts = [|1 => 42; _ => 3|]; Array.length = 2} /\
                   x!11 = 0 /\ x!21 = 42
                then {Array.elts = [|0 => 42; 1 => 42; _ => 3|];
                      Array.length = 2}

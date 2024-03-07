@@ -547,16 +547,16 @@ File maps_poly.mlw:
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated with uncaught exception)
-  - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Ident (/) is not yet declared`)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Ident (/) is not yet declared`)
 - Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated with uncaught exception)
-  - Abstract RAC: INCOMPLETE (terminated with uncaught exception)
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Ident (/) is not yet declared`)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Ident (/) is not yet declared`)
 File "bench/check-ce/maps_poly.mlw", line 50, characters 36-64:
 Goal g.
 Prover result is: Unknown (sat) (166 steps).
 The following counterexample model could not be verified
-  (both RAC terminated with uncaught exception):
+  (both RAC terminated with uncaught exception `Ident (/) is not yet declared`):
 File maps_poly.mlw:
   Line 50:
     m : real -> real = [|1.0/10.0 => 2.0; 1.0/5.0 => 3.0; _ => 2.0|]

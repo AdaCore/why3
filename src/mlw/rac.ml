@@ -131,7 +131,6 @@ let bind_fun rs (cexp, _) (task, ls_mv) =
 
 let task_of_term ?(vsenv=[]) metas (env: env) t =
   let open Task in let open Decl in
-  let th = env.pmodule.Pmodule.mod_theory in
   let free_sls = t_app_fold (fun sls ls _ _ -> Sls.add ls sls) Sls.empty t in
   let lsenv =
     let aux rs v mls =
@@ -147,12 +146,29 @@ let task_of_term ?(vsenv=[]) metas (env: env) t =
     let open Theory in
     match td.td_node with
     | Use th ->
+        (* Format.eprintf "Rac.add_used Use %s@." th.th_name.id_string; *)
         Task.use_export task th
     | Clone (th, sm) ->
+        (* FIXME: this clone cannot be correct, the substitution cannot be done like this *)
+        (* Format.eprintf "Rac.add_used Clone %s@." th.th_name.id_string; *)
+        (* Format.eprintf "tdecl = %a@." Pretty.print_tdecl td; *)
         let inst_df = Decl.Paxiom in
         let inst_pr = Decl.Mpr.map (fun _ -> Decl.Paxiom) sm.sm_pr in
+        let inst_ts =
+          Ty.Mts.fold (fun ts v acc ->
+            if ts.ts_def = NoDef then Ty.Mts.add ts v acc else acc)
+            sm.sm_ts Ty.Mts.empty
+        in
+        let inst_ls =
+          Mls.fold (fun ls v acc ->
+              let do_add = match task with
+                | None -> false
+                | Some task_hd -> Mid.mem v.Term.ls_name task_hd.task_known
+              in
+              if do_add then Mls.add ls v acc else acc)
+            sm.sm_ls Mls.empty in
         let inst =
-          {inst_df; inst_pr; inst_ty= sm.sm_ty; inst_ts= sm.sm_ts; inst_ls= sm.sm_ls } in
+          {inst_df; inst_pr; inst_ty= sm.sm_ty; inst_ts; inst_ls } in
         Task.clone_export task th inst
     | _ -> task in
   let add_known _ decl (task, ls_mt, ls_mv) =
@@ -195,23 +211,33 @@ let task_of_term ?(vsenv=[]) metas (env: env) t =
   let add_premise task t =
     let pr = create_prsymbol (id_fresh "premise") in
     Task.add_prop_decl task Decl.Paxiom pr t in
+  (* building the task from scratch *)
   let task, ls_mt, ls_mv = None, Mtv.empty, Mvs.empty in
+  (* adds the theories used and cloned from the enclosing module *)
+  let th = env.pmodule.Pmodule.mod_theory in
   let task = List.fold_left add_used task th.Theory.th_decls in
+  (* adds the local symbols used (??) *)
   let used = Task.used_symbols (Task.used_theories task) in
   let known_local = Mid.filter (fun id _ -> not (Mid.mem id used)) th.Theory.th_known in
   let task, ls_mt, ls_mv = Mid.fold add_known known_local (task, ls_mt, ls_mv) in
+  (* adds the global program variables *)
   let task, ls_mt, ls_mv = Mrs.fold add_prog_const env.rsenv (task, ls_mt, ls_mv) in
+  (* adds the logic functions from the model (??) *)
   let task, ls_mv = Mrs.fold bind_fun env.funenv (task, ls_mv) in
+  (* adds the logic variables from the model (??) *)
   let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
   let task, ls_mt, ls_mv = Mvs.fold (bind_value env) env.vsenv (task, ls_mt, ls_mv) in
+  (* adds the premises from the model (??) *)
   let task = fold_premises add_premise env.premises task in
   let t = t_ty_subst ls_mt ls_mv t in
   let task = List.fold_left (fun t (m, a) -> Task.add_meta t m a) task metas in
+  (* adds the term to check as a goal *)
   let task =
     if t.t_ty = None then (* Add a formula as goal directly ... *)
       let prs = create_prsymbol (id_fresh "goal") in
       add_prop_decl task Pgoal prs t
     else (* ... and wrap a non-formula in a call to a predicate with no definition *)
+      (* FIXME: does this case really used? what for? *)
       let task = add_decl task undef_pred_decl in
       let prs = create_prsymbol (id_fresh "goal") in
       add_prop_decl task Pgoal prs (undef_pred_app t) in
