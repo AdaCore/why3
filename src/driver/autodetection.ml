@@ -280,7 +280,7 @@ let make_command =
   let cmd_regexp = Re.Str.regexp "%\\(.\\)" in
   fun exec com ->
     let replace s = match Re.Str.matched_group 1 s with
-      | "e" -> exec
+      | "e" -> Filename.quote exec
       | c -> "%"^c
     in
     Re.Str.global_substitute cmd_regexp replace com
@@ -674,8 +674,8 @@ let list_binaries () =
 
 let query_prover_version path version_switch version_regexp =
   let out = Filename.temp_file "out" "" in
-  let cmd = sprintf "%s %s" path version_switch in
-  let c = sprintf "(%s) > %s 2>&1" cmd out in
+  let cmd = sprintf "%s %s" (Filename.quote path) version_switch in
+  let c = sprintf "(%s) > %s 2>&1" cmd (Filename.quote out) in
   Debug.dprintf debug "Run: %s@." c;
   try
     let ret = Sys.command c in
