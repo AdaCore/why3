@@ -15,7 +15,10 @@ let add_stop_split t = t_attr_add stop_split t
 let debug_slow = Debug.register_info_flag "coma_no_merge"
   ~desc:"Disable@ subgoal@ factorization."
 
-let _is_true f = match f.t_node with
+let debug_triv = Debug.register_info_flag "coma_no_trivial"
+  ~desc:"Discard@ trivial@ proof@ obligations."
+
+let is_true f = match f.t_node with
   | Ttrue -> true | _ -> false
 
 let t_and_simp f1 f2 = match f1.t_node, f2.t_node with
@@ -702,7 +705,8 @@ let vc_defn (hc,c) flat dfl =
   let c = ctx (List.map (fun g -> Bc (0, top_eval cc g)) ll) in
   let eval (h,_,_,_) f =
     h, vc_simp (top_eval (if flat then cc else c) f 0 []).wp in
-  (hc_of_pl hc pl, c), List.map2 eval dfl fl
+  let keep (_,f) = not (Debug.test_flag debug_triv && is_true f) in
+  (hc_of_pl hc pl, c), List.filter keep (List.map2 eval dfl fl)
 
 let extspec_attr = create_attribute "coma:extspec"
 let hs_extspec h = Sattr.mem extspec_attr h.hs_name.id_attrs
