@@ -46,10 +46,8 @@ uses:
     (Puseimport ($2, n, q) ) }
 
 coma_top_lvl:
-| LET REC separated_nonempty_list(WITH, defn(EQUAL))
+| LET ioption(REC) separated_nonempty_list(WITH, defn(EQUAL))
   { Blo $3 }
-| LET defn(EQUAL)
-  { Def $2 }
 | pure_decl
   { Mlw $1 }
 | meta_decl

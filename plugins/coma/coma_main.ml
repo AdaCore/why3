@@ -34,8 +34,7 @@ let find_module env cenv q = match q with
   | Qdot (p, {id_str = nm}) ->
       read_module env (Typing.string_list_of_qualid p) nm
 
-let add_def c muc flat bl =
-  let muc,dfl = type_defn_list muc flat bl in
+let add_def (c,muc) (flat,dfl) =
   Debug.dprintf debug "\n@[%a@]@." Coma_syntax.PP.pp_def_block dfl;
   let c, gl = vc_defn c flat dfl in
   let add muc ({hs_name = {Ident.id_string = s}},f) =
@@ -51,6 +50,10 @@ let add_def c muc flat bl =
     Pmodule.add_pdecl ~vc:false muc d in
   let add muc (h,_,_,_) = List.fold_left add muc (vc_spec c h) in
   c, List.fold_left add muc dfl
+
+let add_def c muc flat bl =
+  let muc, dfl = type_defn_list muc flat bl in
+  List.fold_left add_def (c,muc) dfl
 
 let add_top env cenv menv (c,muc) = function
   | Blo b -> add_def c muc false b

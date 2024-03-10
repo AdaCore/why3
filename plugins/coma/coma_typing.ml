@@ -324,13 +324,11 @@ let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_
   | PEdef (e, flat, d) ->
       let ctx, dl = type_defn_list muc ctx flat d in
       let e = type_prog ~loc:(e.pexpr_loc) muc ctx e in
-      if flat then
-        Edef (e, flat, dl), []
-      else
-        let defn_head (h,_,_,_) = h.hs_name in
-        let dll = SCC.scc defn_head defn_hs_iter dl in
-        let add_def e (r,dl) = Edef (e, not r, dl) in
-        List.fold_left add_def e dll, []
+      if flat then Edef (e, flat, dl), [] else
+      let defn_head (h,_,_,_) = h.hs_name in
+      let dll = SCC.scc defn_head defn_hs_iter dl in
+      let add_def e (r,dl) = Edef (e, not r, dl) in
+      List.fold_left add_def e dll, []
 
 and type_prog ?loc muc ctx d =
   let e, te = type_expr muc ctx d in
@@ -360,7 +358,12 @@ and type_defn_list muc ctx flat dl =
       dl in
   ctx_full, dl
 
-let type_defn_list muc notrec dl =
-  let _, dl = type_defn_list muc ctx0 notrec dl in
+let type_defn_list muc flat dl =
+  let _, dl = type_defn_list muc ctx0 flat dl in
   let add_hs muc (h,wr,pl,_) = Pmodule.add_pdecl ~vc:false muc (hs_register (h,wr,pl)) in
-  List.fold_left add_hs muc dl, dl
+  let uc = List.fold_left add_hs muc dl in
+  if flat then uc, [flat, dl] else
+  let defn_head (h,_,_,_) = h.hs_name in
+  let dll = SCC.scc defn_head defn_hs_iter dl in
+  let add_def dll (r,dl) = (not r, dl) :: dll in
+  uc, List.fold_left add_def [] dll
