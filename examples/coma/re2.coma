@@ -1,0 +1,62 @@
+use coma.Regexp
+use seq.Seq
+use int.Int
+
+let if (b: bool) (then {b}) (else {not b}) = any
+
+let unRe (r: regexp)
+    (empty {r = Empty})
+    (eps {r = Epsilon})
+    (char (c: char) {r = Char c})
+    (alt (r1 r2: regexp) {r = Alt r1 r2})
+    (cat (r1 r2: regexp) {r = Concat r1 r2})
+    (star (r1: regexp) {r = Star r1})
+= any
+
+
+let accept (r: regexp) (w: word) {} (ret (b: bool) {b <-> mem w r})
+ = a {r} {0} {fun j -> j = n} (fun (i: int) (h (b: bool)) -> h {i=n}) ret
+   [ a (r: regexp) (i: int) (ck: int  -> bool) {0 <= i <= n}
+       (k (j: int) {mem w[i..j] r} {i <= j <= n}
+          (h (b: bool) {b <-> ck j}))
+       (o (b: bool) {b <-> exists j.
+                              i <= j <= length w /\
+                              mem w[i..j] r      /\
+                              ck j})
+     = unRe {r} empty eps char alt cat star
+         [ empty -> o {false}
+         | eps   -> k {i} o
+         | char (c: char) ->
+             if {i < n}
+                (if {w[i] = c} (k {i+1} o) (o {false}))
+                (o {false})
+         | alt (r1 r2: regexp) ->
+             a {r1} {i} {ck} k
+               (fun (b: bool) ->
+                  if {b} (o {true})
+                         (a {r2} {i} {ck} k o))
+         | cat (r1 r2: regexp) ->
+             a {r1} {i}
+               {fun j -> exists j'.
+                  j <= j' <= length w /\
+                  mem w[j..j'] r2     /\
+                  ck j'}
+               (fun (j: int) (h (b: bool)) ->
+                  a {r2} {j} {ck} k h)
+               o
+         | star (r1: regexp) ->
+             k {i} (fun (b: bool) ->
+              if {b} (o {true})
+                 (a {r1} {i}
+                    {fun j -> i < j /\ exists j'.
+                       j <= j' <= length w /\
+                       mem w[j..j'] r          /\
+                       ck j'}
+                    (fun (j: int) (ho (b: bool)) ->
+                      if {i < j}
+                         (a {r} {j} {ck} k ho)
+                         (ho {false}))
+                    o))
+         ]
+   ]
+   [ n: int = length w ]

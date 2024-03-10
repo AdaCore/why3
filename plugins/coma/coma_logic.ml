@@ -50,7 +50,7 @@ let rec t_equ_simp t1 t2 = match t1.t_node, t2.t_node with
   | Tconst c1, Tconst c2 when Constant.compare_const c1 c2 = 0 -> t_true
   | Tif (c,t1,e1), _ -> t_if_simp c (t_equ_simp t1 t2) (t_equ_simp e1 t2)
   | _, Tif (c,t2,e2) -> t_if_simp c (t_equ_simp t1 t2) (t_equ_simp t1 e2)
-  | _, _ -> t_equ t1 t2
+  | _, _ -> if Term.t_equal t1 t2 then t_true else Term.t_equ t1 t2
 
 let rec t_simp_equ f = match f.t_node with
   | Tapp (s,[t1;t2]) when ls_equal s ps_equ ->
