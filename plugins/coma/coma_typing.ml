@@ -137,7 +137,7 @@ let rec sink_spec o bb dd al = function
             List.rev_append al [PPb] else if o then List.rev al else
           Loc.errorm "this outcome must have a closed specification"
 
-let rec param_spec o pl e =
+let rec param_spec o a pl e =
   let attach e dl = if dl = [] then e else
     { e with pexpr_desc = PEdef (e,true,dl) } in
   let rec clean = function
@@ -170,13 +170,13 @@ let rec param_spec o pl e =
           | PPr (r,_) -> mke (PEapp (d, PAr r)) r
           | PPa _ | PPl _ | PPo | PPb -> d in
         let d = List.fold_left apply (mke (PEsym (Qident h)) h) ql in
-        let ql,d = Loc.try3 ~loc:h.id_loc param_spec o ql d in
+        let ql,d = Loc.try4 ~loc:h.id_loc param_spec o a ql d in
         let d = { pdefn_name = h; pdefn_writes = wr;
                   pdefn_params = ql; pdefn_body = d } in
         let d = { pdefn_desc = d; pdefn_loc = h.id_loc } in
         o, a, PPc (h,wr,ql) :: pl, e, d::dl in
   let pl = sink_spec o false false [] pl in
-  let _,_,pl,e,dl = List.fold_right param pl (true,false,[],e,[]) in
+  let _,_,pl,e,dl = List.fold_right param pl (true,a,[],e,[]) in
   pl, attach e dl
 
 module SCC = MakeSCC(Hid)
@@ -317,7 +317,7 @@ let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_
       let e = type_prog ~loc muc ctx e in
       Eset (e, ll), []
   | PElam (pl, e) ->
-      let pl, e = param_spec true pl e in
+      let pl, e = param_spec true false pl e in
       let ctx, params = List.fold_left_map (type_param tuc) ctx pl in
       let e = type_prog ~loc:(e.pexpr_loc) muc ctx e in
       Elam (params, e), params
@@ -343,7 +343,7 @@ and type_defn_list muc ctx flat dl =
       (fun acc { pdefn_desc = d; pdefn_loc=loc} ->
          let id, pl = d.pdefn_name, d.pdefn_params in
          let h = create_hsymbol (create_user_id id) in
-         let pl, e = param_spec true pl d.pdefn_body in
+         let pl, e = param_spec true false pl d.pdefn_body in
          let _, params = Lists.map_fold_left (type_param tuc) ctx pl in
          let writes = List.map (find_ref ctx) d.pdefn_writes in
          add_hdl h writes params acc, (h, writes, params, loc, e))
