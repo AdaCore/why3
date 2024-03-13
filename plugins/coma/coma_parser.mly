@@ -96,9 +96,10 @@ coma_desc:
   { PEbox e }
 | LEFTPAR QUESTION e=coma_prog RIGHTPAR
   { PEwox e }
-| e=coma_expr2 al=coma_arg*
+| e=coma_expr2 al=coma_arg* at=coma_dot
   { let app e a = mk_pexpr (PEapp (e, a)) $loc in
     let e = List.fold_left app e al in
+    let e = List.fold_left app e at in
     e.pexpr_desc }
 
 coma_expr2:
@@ -110,16 +111,16 @@ coma_desc2:
   { PEsym x }
 | ANY
   { PEany }
-| c=coma_closure
+| LEFTPAR c=coma_closure(coma_prog) RIGHTPAR
   { c.pexpr_desc }
 | LEFTPAR e=coma_prog RIGHTPAR
   { e.pexpr_desc }
 
-coma_closure:
-| LEFTPAR FUN p=coma_param+ ARROW e=coma_prog RIGHTPAR
+coma_closure(X):
+| FUN p=coma_param+ ARROW e=X
   { let d = PElam (List.flatten p, e) in
     mk_pexpr d $loc }
-| LEFTPAR ARROW e=coma_prog RIGHTPAR
+| ARROW e=X
   { let d = PElam ([], e) in
     mk_pexpr d $loc }
 
@@ -141,8 +142,13 @@ coma_arg:
 | li=lqword
   { let d = mk_pexpr (PEsym li) $loc in
     PAc d }
-| c=coma_closure
+| LEFTPAR c=coma_closure(coma_prog) RIGHTPAR
   { PAc c }
+
+coma_dot:
+| (* epsilon *)               { [] }
+| DOT coma_expr               { [PAc $2] }
+| DOT coma_closure(coma_expr) { [PAc $2] }
 
 coma_params:
 | pl=coma_param*
