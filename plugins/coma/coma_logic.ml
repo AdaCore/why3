@@ -45,8 +45,9 @@ let t_if_simp f1 f2 f3 = match f1.t_node, f2.t_node, f3.t_node with
 let rec t_equ_simp t1 t2 = match t1.t_node, t2.t_node with
   | Tvar v1, Tvar v2 when vs_equal v1 v2 -> t_true
   | Tapp (s1,[]), Tapp (s2,[]) when ls_equal s1 s2 -> t_true
-  | Tapp (s1,_), Tapp (s2,_) when s1.ls_constr > 0 && s2.ls_constr > 0
-                                  && not (ls_equal s1 s2) -> t_false
+  | Tapp (s1,l1), Tapp (s2,l2) when s1.ls_constr > 0 && s2.ls_constr > 0 ->
+      if ls_equal s1 s2 then List.fold_right2 (fun t1 t2 f ->
+        t_and_simp (t_equ_simp t1 t2) f) l1 l2 t_true else t_false
   | Tconst c1, Tconst c2 when Constant.compare_const c1 c2 = 0 -> t_true
   | Tif (c,t1,e1), _ -> t_if_simp c (t_equ_simp t1 t2) (t_equ_simp e1 t2)
   | _, Tif (c,t2,e2) -> t_if_simp c (t_equ_simp t1 t2) (t_equ_simp t1 e2)
