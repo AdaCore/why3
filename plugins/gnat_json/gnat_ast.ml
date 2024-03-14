@@ -12,7 +12,6 @@ type ureal = Ureal of { numerator : uint ; denominator : uint; base : int; negat
 type source_ptr =
   | No_location
   | Source_ptr of { filename: string; line: int }
-type node_id = Node_id
 
 (* GNATCOLL.Symbols *)
 type symbol = No_symbol | Symbol of string
@@ -347,7 +346,7 @@ type any_node_tag = [
 
 type 'a why_node = { info : why_node_info ; desc: 'a why_node_desc }
 
-and why_node_info = {id: int; node: node_id; domain: domain; checked: bool}
+and why_node_info = {id: int; domain: domain}
 
 and 'a why_node_desc =
   | Type : {type_kind: type_; name: name_id; is_mutable: bool; relaxed_init: bool} -> [> type_tag] why_node_desc
@@ -1357,10 +1356,6 @@ module From_json = struct
       Source_ptr {filename; line}
     | json -> unexpected_json "source_ptr" json
 
-  let node_id_from_json : node_id from_json = function
-    | `String "<Node_Id>" -> Node_id
-    | json -> unexpected_json "node_id" json
-
   let why_node_set_from_json : why_node_set from_json = function
     | `String "<Why_Node_Set>" -> ()
     | json -> unexpected_json "why_node_set" json
@@ -1439,12 +1434,10 @@ module From_json = struct
     | json -> unexpected_json "axiom_dep_kind" json
 
   let rec why_node_from_json : 'a why_node from_json = function
-    | `List [`String "W_TYPE"; id; node; domain; checked; type_kind; name; is_mutable; relaxed_init] ->
+    | `List [`String "W_TYPE"; id; domain; type_kind; name; is_mutable; relaxed_init] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Type {
         type_kind = type_from_json type_kind;
@@ -1453,12 +1446,10 @@ module From_json = struct
         relaxed_init = boolean_from_json relaxed_init;
       } in
       {info; desc}
-    | `List [`String "W_NAME"; id; node; domain; checked; symb; namespace; module_; infix] ->
+    | `List [`String "W_NAME"; id; domain; symb; namespace; module_; infix] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Name {
         symb = symbol_from_json symb;
@@ -1467,12 +1458,10 @@ module From_json = struct
         infix = boolean_from_json infix;
       } in
       {info; desc}
-    | `List [`String "W_EFFECTS"; id; node; domain; checked; reads; writes; raises] ->
+    | `List [`String "W_EFFECTS"; id; domain; reads; writes; raises] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Effects {
         reads = identifier_opaque_olist_from_json reads;
@@ -1480,12 +1469,10 @@ module From_json = struct
         raises = raise_effect_opaque_olist_from_json raises;
       } in
       {info; desc}
-    | `List [`String "W_RAISE_EFFECT"; id; node; domain; checked; name; arg_id; post] ->
+    | `List [`String "W_RAISE_EFFECT"; id; domain; name; arg_id; post] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Raise_effect {
         name = name_opaque_id_from_json name;
@@ -1493,35 +1480,29 @@ module From_json = struct
         post = pred_opaque_oid_from_json post;
       } in
       {info; desc}
-    | `List [`String "W_BINDER"; id; node; domain; checked; name; arg_type] ->
+    | `List [`String "W_BINDER"; id; domain; name; arg_type] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Binder {
         name = identifier_opaque_oid_from_json name;
         arg_type = type_opaque_id_from_json arg_type;
       } in
       {info; desc}
-    | `List [`String "W_TRANSPARENT_TYPE_DEFINITION"; id; node; domain; checked; type_definition] ->
+    | `List [`String "W_TRANSPARENT_TYPE_DEFINITION"; id; domain; type_definition] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Transparent_type_definition {
         type_definition = type_opaque_id_from_json type_definition;
       } in
       {info; desc}
-    | `List [`String "W_RECORD_BINDER"; id; node; domain; checked; name; arg_type; labels; is_mutable] ->
+    | `List [`String "W_RECORD_BINDER"; id; domain; name; arg_type; labels; is_mutable] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Record_binder {
         name = identifier_opaque_oid_from_json name;
@@ -1530,69 +1511,57 @@ module From_json = struct
         is_mutable = boolean_from_json is_mutable;
       } in
       {info; desc}
-    | `List [`String "W_RECORD_DEFINITION"; id; node; domain; checked; fields] ->
+    | `List [`String "W_RECORD_DEFINITION"; id; domain; fields] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Record_definition {
         fields = record_binder_opaque_list_from_json fields;
       } in
       {info; desc}
-    | `List [`String "W_RANGE_TYPE_DEFINITION"; id; node; domain; checked; first; last] ->
+    | `List [`String "W_RANGE_TYPE_DEFINITION"; id; domain; first; last] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Range_type_definition {
         first = uint_from_json first;
         last = uint_from_json last;
       } in
       {info; desc}
-    | `List [`String "W_TRIGGERS"; id; node; domain; checked; triggers] ->
+    | `List [`String "W_TRIGGERS"; id; domain; triggers] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Triggers {
         triggers = trigger_opaque_list_from_json triggers;
       } in
       {info; desc}
-    | `List [`String "W_TRIGGER"; id; node; domain; checked; terms] ->
+    | `List [`String "W_TRIGGER"; id; domain; terms] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Trigger {
         terms = expr_opaque_list_from_json terms;
       } in
       {info; desc}
-    | `List [`String "W_AXIOM_DEP"; id; node; domain; checked; name; kind] ->
+    | `List [`String "W_AXIOM_DEP"; id; domain; name; kind] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Axiom_dep {
         name = identifier_opaque_id_from_json name;
         kind = axiom_dep_kind_from_json kind;
       } in
       {info; desc}
-    | `List [`String "W_HANDLER"; id; node; domain; checked; name; arg_id; def] ->
+    | `List [`String "W_HANDLER"; id; domain; name; arg_id; def] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Handler {
         name = name_opaque_id_from_json name;
@@ -1600,24 +1569,20 @@ module From_json = struct
         def = prog_opaque_id_from_json def;
       } in
       {info; desc}
-    | `List [`String "W_FIELD_ASSOCIATION"; id; node; domain; checked; field; value] ->
+    | `List [`String "W_FIELD_ASSOCIATION"; id; domain; field; value] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Field_association {
         field = identifier_opaque_id_from_json field;
         value = expr_opaque_id_from_json value;
       } in
       {info; desc}
-    | `List [`String "W_VARIANT"; id; node; domain; checked; cmp_op; labels; expr] ->
+    | `List [`String "W_VARIANT"; id; domain; cmp_op; labels; expr] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Variant {
         cmp_op = identifier_opaque_id_from_json cmp_op;
@@ -1625,23 +1590,19 @@ module From_json = struct
         expr = term_opaque_id_from_json expr;
       } in
       {info; desc}
-    | `List [`String "W_VARIANTS"; id; node; domain; checked; variants] ->
+    | `List [`String "W_VARIANTS"; id; domain; variants] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Variants {
         variants = variant_opaque_list_from_json variants;
       } in
       {info; desc}
-    | `List [`String "W_UNIVERSAL_QUANTIF"; id; node; domain; checked; variables; labels; var_type; triggers; pred] ->
+    | `List [`String "W_UNIVERSAL_QUANTIF"; id; domain; variables; labels; var_type; triggers; pred] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Universal_quantif {
         variables = identifier_opaque_list_from_json variables;
@@ -1651,12 +1612,10 @@ module From_json = struct
         pred = pred_opaque_id_from_json pred;
       } in
       {info; desc}
-    | `List [`String "W_EXISTENTIAL_QUANTIF"; id; node; domain; checked; variables; labels; var_type; pred] ->
+    | `List [`String "W_EXISTENTIAL_QUANTIF"; id; domain; variables; labels; var_type; pred] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Existential_quantif {
         variables = identifier_opaque_list_from_json variables;
@@ -1665,23 +1624,19 @@ module From_json = struct
         pred = pred_opaque_id_from_json pred;
       } in
       {info; desc}
-    | `List [`String "W_NOT"; id; node; domain; checked; right] ->
+    | `List [`String "W_NOT"; id; domain; right] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Not {
         right = expr_opaque_id_from_json right;
       } in
       {info; desc}
-    | `List [`String "W_CONNECTION"; id; node; domain; checked; left; op; right; more_right] ->
+    | `List [`String "W_CONNECTION"; id; domain; left; op; right; more_right] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Connection {
         left = expr_opaque_id_from_json left;
@@ -1690,12 +1645,10 @@ module From_json = struct
         more_right = expr_opaque_olist_from_json more_right;
       } in
       {info; desc}
-    | `List [`String "W_LABEL"; id; node; domain; checked; labels; def; typ] ->
+    | `List [`String "W_LABEL"; id; domain; labels; def; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Label {
         labels = symbol_set_from_json labels;
@@ -1703,12 +1656,10 @@ module From_json = struct
         typ = type_opaque_oid_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_LOC_LABEL"; id; node; domain; checked; sloc; def; marker] ->
+    | `List [`String "W_LOC_LABEL"; id; domain; sloc; def; marker] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Loc_label {
         sloc = source_ptr_from_json sloc;
@@ -1716,12 +1667,10 @@ module From_json = struct
         marker = symbol_from_json marker;
       } in
       {info; desc}
-    | `List [`String "W_IDENTIFIER"; id; node; domain; checked; name; typ; labels] ->
+    | `List [`String "W_IDENTIFIER"; id; domain; name; typ; labels] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Identifier {
         name = name_opaque_id_from_json name;
@@ -1729,12 +1678,10 @@ module From_json = struct
         labels = string_sets_set_from_json labels;
       } in
       {info; desc}
-    | `List [`String "W_TAGGED"; id; node; domain; checked; tag; def; typ] ->
+    | `List [`String "W_TAGGED"; id; domain; tag; def; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Tagged {
         tag = symbol_from_json tag;
@@ -1742,12 +1689,10 @@ module From_json = struct
         typ = type_opaque_oid_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_CALL"; id; node; domain; checked; name; args; typ] ->
+    | `List [`String "W_CALL"; id; domain; name; args; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Call {
         name = identifier_opaque_id_from_json name;
@@ -1755,24 +1700,20 @@ module From_json = struct
         typ = type_opaque_oid_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_LITERAL"; id; node; domain; checked; value; typ] ->
+    | `List [`String "W_LITERAL"; id; domain; value; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Literal {
         value = literal_from_json value;
         typ = type_opaque_oid_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_BINDING"; id; node; domain; checked; name; def; context; typ] ->
+    | `List [`String "W_BINDING"; id; domain; name; def; context; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Binding {
         name = identifier_opaque_id_from_json name;
@@ -1781,12 +1722,10 @@ module From_json = struct
         typ = type_opaque_oid_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_ELSIF"; id; node; domain; checked; condition; then_part; typ] ->
+    | `List [`String "W_ELSIF"; id; domain; condition; then_part; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Elsif {
         condition = expr_opaque_id_from_json condition;
@@ -1794,12 +1733,10 @@ module From_json = struct
         typ = type_opaque_oid_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_EPSILON"; id; node; domain; checked; name; typ; pred] ->
+    | `List [`String "W_EPSILON"; id; domain; name; typ; pred] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Epsilon {
         name = identifier_opaque_id_from_json name;
@@ -1807,12 +1744,10 @@ module From_json = struct
         pred = pred_opaque_id_from_json pred;
       } in
       {info; desc}
-    | `List [`String "W_CONDITIONAL"; id; node; domain; checked; condition; then_part; elsif_parts; else_part; typ] ->
+    | `List [`String "W_CONDITIONAL"; id; domain; condition; then_part; elsif_parts; else_part; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Conditional {
         condition = expr_opaque_id_from_json condition;
@@ -1822,105 +1757,87 @@ module From_json = struct
         typ = type_opaque_oid_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_INTEGER_CONSTANT"; id; node; domain; checked; value] ->
+    | `List [`String "W_INTEGER_CONSTANT"; id; domain; value] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Integer_constant {
         value = uint_from_json value;
       } in
       {info; desc}
-    | `List [`String "W_RANGE_CONSTANT"; id; node; domain; checked; value; typ] ->
+    | `List [`String "W_RANGE_CONSTANT"; id; domain; value; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Range_constant {
         value = uint_from_json value;
         typ = type_opaque_id_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_MODULAR_CONSTANT"; id; node; domain; checked; value; typ] ->
+    | `List [`String "W_MODULAR_CONSTANT"; id; domain; value; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Modular_constant {
         value = uint_from_json value;
         typ = type_opaque_id_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_FIXED_CONSTANT"; id; node; domain; checked; value; typ] ->
+    | `List [`String "W_FIXED_CONSTANT"; id; domain; value; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Fixed_constant {
         value = uint_from_json value;
         typ = type_opaque_id_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_REAL_CONSTANT"; id; node; domain; checked; value] ->
+    | `List [`String "W_REAL_CONSTANT"; id; domain; value] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Real_constant {
         value = ureal_from_json value;
       } in
       {info; desc}
-    | `List [`String "W_FLOAT_CONSTANT"; id; node; domain; checked; value; typ] ->
+    | `List [`String "W_FLOAT_CONSTANT"; id; domain; value; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Float_constant {
         value = ureal_from_json value;
         typ = type_opaque_id_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_COMMENT"; id; node; domain; checked; comment] ->
+    | `List [`String "W_COMMENT"; id; domain; comment] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Comment {
         comment = symbol_from_json comment;
       } in
       {info; desc}
-    | `List [`String "W_DEREF"; id; node; domain; checked; right; typ] ->
+    | `List [`String "W_DEREF"; id; domain; right; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Deref {
         right = identifier_opaque_id_from_json right;
         typ = type_opaque_id_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_RECORD_ACCESS"; id; node; domain; checked; name; field; typ] ->
+    | `List [`String "W_RECORD_ACCESS"; id; domain; name; field; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Record_access {
         name = expr_opaque_id_from_json name;
@@ -1928,12 +1845,10 @@ module From_json = struct
         typ = type_opaque_oid_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_RECORD_UPDATE"; id; node; domain; checked; name; updates; typ] ->
+    | `List [`String "W_RECORD_UPDATE"; id; domain; name; updates; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Record_update {
         name = expr_opaque_id_from_json name;
@@ -1941,24 +1856,20 @@ module From_json = struct
         typ = type_opaque_oid_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_RECORD_AGGREGATE"; id; node; domain; checked; associations; typ] ->
+    | `List [`String "W_RECORD_AGGREGATE"; id; domain; associations; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Record_aggregate {
         associations = field_association_opaque_list_from_json associations;
         typ = type_opaque_oid_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_ANY_EXPR"; id; node; domain; checked; effects; pre; post; return_type; labels] ->
+    | `List [`String "W_ANY_EXPR"; id; domain; effects; pre; post; return_type; labels] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Any_expr {
         effects = effects_opaque_oid_from_json effects;
@@ -1968,12 +1879,10 @@ module From_json = struct
         labels = symbol_set_from_json labels;
       } in
       {info; desc}
-    | `List [`String "W_ASSIGNMENT"; id; node; domain; checked; name; value; typ; labels] ->
+    | `List [`String "W_ASSIGNMENT"; id; domain; name; value; typ; labels] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Assignment {
         name = identifier_opaque_id_from_json name;
@@ -1982,12 +1891,10 @@ module From_json = struct
         labels = symbol_set_from_json labels;
       } in
       {info; desc}
-    | `List [`String "W_BINDING_REF"; id; node; domain; checked; name; def; context; typ] ->
+    | `List [`String "W_BINDING_REF"; id; domain; name; def; context; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Binding_ref {
         name = identifier_opaque_id_from_json name;
@@ -1996,12 +1903,10 @@ module From_json = struct
         typ = type_opaque_id_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_LOOP"; id; node; domain; checked; code_before; invariants; variants; code_after] ->
+    | `List [`String "W_LOOP"; id; domain; code_before; invariants; variants; code_after] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Loop {
         code_before = prog_opaque_id_from_json code_before;
@@ -2010,23 +1915,19 @@ module From_json = struct
         code_after = prog_opaque_id_from_json code_after;
       } in
       {info; desc}
-    | `List [`String "W_STATEMENT_SEQUENCE"; id; node; domain; checked; statements] ->
+    | `List [`String "W_STATEMENT_SEQUENCE"; id; domain; statements] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Statement_sequence {
         statements = prog_opaque_list_from_json statements;
       } in
       {info; desc}
-    | `List [`String "W_ABSTRACT_EXPR"; id; node; domain; checked; expr; post; typ] ->
+    | `List [`String "W_ABSTRACT_EXPR"; id; domain; expr; post; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Abstract_expr {
         expr = prog_opaque_id_from_json expr;
@@ -2034,24 +1935,20 @@ module From_json = struct
         typ = type_opaque_oid_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_ASSERT"; id; node; domain; checked; pred; assert_kind] ->
+    | `List [`String "W_ASSERT"; id; domain; pred; assert_kind] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Assert {
         pred = pred_opaque_id_from_json pred;
         assert_kind = assert_kind_from_json assert_kind;
       } in
       {info; desc}
-    | `List [`String "W_RAISE"; id; node; domain; checked; name; arg; typ] ->
+    | `List [`String "W_RAISE"; id; domain; name; arg; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Raise {
         name = name_opaque_id_from_json name;
@@ -2059,12 +1956,10 @@ module From_json = struct
         typ = type_opaque_oid_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_TRY_BLOCK"; id; node; domain; checked; prog; handler; typ] ->
+    | `List [`String "W_TRY_BLOCK"; id; domain; prog; handler; typ] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Try_block {
         prog = prog_opaque_id_from_json prog;
@@ -2072,12 +1967,10 @@ module From_json = struct
         typ = type_opaque_oid_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_FUNCTION_DECL"; id; node; domain; checked; name; binders; effects; pre; post; return_type; def; labels; location] ->
+    | `List [`String "W_FUNCTION_DECL"; id; domain; name; binders; effects; pre; post; return_type; def; labels; location] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Function_decl {
         name = identifier_opaque_id_from_json name;
@@ -2091,12 +1984,10 @@ module From_json = struct
         location = source_ptr_from_json location;
       } in
       {info; desc}
-    | `List [`String "W_AXIOM"; id; node; domain; checked; name; def; dep] ->
+    | `List [`String "W_AXIOM"; id; domain; name; def; dep] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Axiom {
         name = symbol_from_json name;
@@ -2104,24 +1995,20 @@ module From_json = struct
         dep = axiom_dep_opaque_oid_from_json dep;
       } in
       {info; desc}
-    | `List [`String "W_GOAL"; id; node; domain; checked; name; def] ->
+    | `List [`String "W_GOAL"; id; domain; name; def] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Goal {
         name = symbol_from_json name;
         def = pred_opaque_id_from_json def;
       } in
       {info; desc}
-    | `List [`String "W_TYPE_DECL"; id; node; domain; checked; args; name; labels; definition] ->
+    | `List [`String "W_TYPE_DECL"; id; domain; args; name; labels; definition] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Type_decl {
         args = identifier_opaque_olist_from_json args;
@@ -2130,12 +2017,10 @@ module From_json = struct
         definition = type_definition_opaque_oid_from_json definition;
       } in
       {info; desc}
-    | `List [`String "W_GLOBAL_REF_DECLARATION"; id; node; domain; checked; name; ref_type; labels; location] ->
+    | `List [`String "W_GLOBAL_REF_DECLARATION"; id; domain; name; ref_type; labels; location] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Global_ref_declaration {
         name = identifier_opaque_id_from_json name;
@@ -2144,48 +2029,40 @@ module From_json = struct
         location = source_ptr_from_json location;
       } in
       {info; desc}
-    | `List [`String "W_NAMESPACE_DECLARATION"; id; node; domain; checked; declarations; name] ->
+    | `List [`String "W_NAMESPACE_DECLARATION"; id; domain; declarations; name] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Namespace_declaration {
         declarations = declaration_opaque_olist_from_json declarations;
         name = symbol_from_json name;
       } in
       {info; desc}
-    | `List [`String "W_EXCEPTION_DECLARATION"; id; node; domain; checked; name; arg] ->
+    | `List [`String "W_EXCEPTION_DECLARATION"; id; domain; name; arg] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Exception_declaration {
         name = name_opaque_id_from_json name;
         arg = type_opaque_oid_from_json arg;
       } in
       {info; desc}
-    | `List [`String "W_META_DECLARATION"; id; node; domain; checked; name; parameter] ->
+    | `List [`String "W_META_DECLARATION"; id; domain; name; parameter] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Meta_declaration {
         name = symbol_from_json name;
         parameter = symbol_from_json parameter;
       } in
       {info; desc}
-    | `List [`String "W_CLONE_DECLARATION"; id; node; domain; checked; origin; as_name; clone_kind; substitutions; theory_kind] ->
+    | `List [`String "W_CLONE_DECLARATION"; id; domain; origin; as_name; clone_kind; substitutions; theory_kind] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Clone_declaration {
         origin = module_opaque_id_from_json origin;
@@ -2195,12 +2072,10 @@ module From_json = struct
         theory_kind = theory_type_from_json theory_kind;
       } in
       {info; desc}
-    | `List [`String "W_CLONE_SUBSTITUTION"; id; node; domain; checked; kind; orig_name; image] ->
+    | `List [`String "W_CLONE_SUBSTITUTION"; id; domain; kind; orig_name; image] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Clone_substitution {
         kind = subst_type_from_json kind;
@@ -2208,12 +2083,10 @@ module From_json = struct
         image = name_opaque_id_from_json image;
       } in
       {info; desc}
-    | `List [`String "W_INCLUDE_DECLARATION"; id; node; domain; checked; module_; kind; use_kind] ->
+    | `List [`String "W_INCLUDE_DECLARATION"; id; domain; module_; kind; use_kind] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Include_declaration {
         module_ = module_opaque_id_from_json module_;
@@ -2221,12 +2094,10 @@ module From_json = struct
         use_kind = clone_type_from_json use_kind;
       } in
       {info; desc}
-    | `List [`String "W_THEORY_DECLARATION"; id; node; domain; checked; declarations; name; kind; includes; comment] ->
+    | `List [`String "W_THEORY_DECLARATION"; id; domain; declarations; name; kind; includes; comment] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Theory_declaration {
         declarations = declaration_opaque_olist_from_json declarations;
@@ -2236,12 +2107,10 @@ module From_json = struct
         comment = symbol_from_json comment;
       } in
       {info; desc}
-    | `List [`String "W_MODULE"; id; node; domain; checked; file; name] ->
+    | `List [`String "W_MODULE"; id; domain; file; name] ->
       let info = {
         id = int_from_json id;
-        node = node_id_from_json node;
         domain = domain_from_json domain;
-        checked = boolean_from_json checked;
       } in
       let desc = Module {
         file = symbol_from_json file;
