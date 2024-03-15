@@ -63,9 +63,7 @@
     | _ as c -> c
 }
 
-(* FIXME: atom that start with @ may contain parenthesis. Only the case of one pair
-   is hardcoded here. More might be possible. *)
-let atom  = '@''('[^'\t' '\n' '"' ';' '|'')']+')''_'['0'-'9']+ | [^'(' ')'' ''\t' '\n' '"' ';' '|']+
+let atom  = [^'(' ')'' ''\t' '\n' '"' ';' '|']+
 let space = [' ''\t''\n''\r']+
 let nopip = [^ '|']*
 let hex2  = ['0'-'9''a'-'f'] ['0'-'9''a'-'f']
@@ -78,8 +76,23 @@ rule read st = parse
   | ')'                { read (end_list st) lexbuf }
   | "\""               { read_string st (Buffer.create 17) lexbuf }
   | '|' nopip '|' as s { read (add (Atom s) st) lexbuf }
+  | '@'                { read_longatom st 0 (Buffer.create 17) lexbuf }
   | atom as s          { read (add (Atom s) st) lexbuf }
   | _                  { raise Error }
+
+ and read_longatom st n buf = 
+ parse
+  | eof                { raise Error }
+  | '('                { read_longatom st (n+1) buf lexbuf }
+  | ')'                { (Buffer.add_char buf ')';
+                         read_longatom st (n-1) buf lexbuf) }
+  | space              { if n = 0 then 
+                          let s = "@"^Buffer.contents buf in
+                          read (add (Atom s) st) lexbuf
+                          else (Buffer.add_char buf ' ';
+                         read_longatom st n buf lexbuf) }
+  | _ as c             { Buffer.add_char buf c;
+                         read_longatom st n buf lexbuf }
 
 and read_comment st = parse
   | eof                { st }
