@@ -1191,6 +1191,13 @@ let clone_type_decl loc inst cl tdl decl kn =
               if not (Number.float_format_equal ff ff')
               then raise (CannotInstantiate id);
               s'
+          | Alias ity, Some ({ its_def = Alias ity'; _ } as s') ->
+              (* Apply the substitution on the def of the cloned symbol *)
+              let ity = conv_ity alg ity in
+              (* Check equality with the cloning symbol modulo type variables *)
+              let isb = its_match_args s' (List.map ity_var s.its_ts.ts_args) in
+              ity_equal_check ity (ity_full_inst isb ity');
+              s'
           | _ -> raise (CannotInstantiate id) in
         cl.ts_table <- Mts.add ts s' cl.ts_table;
         let decl' = Mid.find s'.its_ts.ts_name kn in

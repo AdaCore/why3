@@ -1,0 +1,11 @@
+module M
+
+  type t 'a = 'a -> int
+
+end
+
+module N : M
+
+  type t 'a = 'a -> int
+
+end
