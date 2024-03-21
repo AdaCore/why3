@@ -1,0 +1,51 @@
+module A
+
+  use int.Int
+  use int.ComputerDivision
+
+  predicate positive (x : int) =
+    x >= 0
+
+  lemma greater_than_42_is_positive : forall x. x >= 42 -> positive x
+
+  inductive even int =
+  | even_zero : even 0
+  | even_succ : forall n. odd n -> even (n + 1)
+  with odd int =
+  | odd_succ : forall n. even n -> odd (n + 1)
+
+  exception Exn
+
+  val div (x y : int) : int
+    raises { Exn -> y = 0 }
+    ensures { y = 0 -> false }
+    ensures { result = div x y }
+
+end
+
+module B : A
+
+  use int.Int
+  use int.ComputerDivision
+
+  predicate positive (x : int) =
+    x >= 0
+
+  inductive even int =
+  | even_zero : even 0
+  | even_succ : forall n. odd n -> even (n + 1)
+  with odd int =
+  | odd_succ : forall n. even n -> odd (n + 1)
+
+  exception Exn
+
+  let div (x y : int)
+    raises { Exn -> y = 0 }
+    ensures { y = 0 -> false }
+    ensures { result = div x y }
+  =
+    if y = 0
+    then raise Exn
+    else div x y
+
+end
