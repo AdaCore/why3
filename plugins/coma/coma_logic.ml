@@ -382,35 +382,31 @@ let rec consume mm c i pl bl =
   fold (c,[],[]) pl bl
 
 and factorize merge c vl hl h wr pl kk =
-  if Debug.test_flag debug_slow ||
-     unmergeable pl then kk,vl,hl else
+  if Debug.test_flag debug_slow || unmergeable pl then kk,vl,hl else
+  let hc = if merge then create_hsymbol (id_clone h.hs_name) else h in
   let pl = wr_to_pl wr pl in
   let [@warning "-8"] dup (Pv v|Pr v) (zl,zv,zm,bl) =
     let z = c_clone_vs c v in let t = t_var z in
     z::zl, Mvs.add z v zv, Mvs.add v t zm, Bv t::bl in
   let zl,zv,zm,bl =
     List.fold_right dup pl ([],Mvs.empty,Mvs.empty,[]) in
-  match kk 0 bl with exception BadUndef _ -> kk,vl,hl | zw ->
-  if not merge || w_solid zw then
-    let zk i bl = if i > 0 then w_true else
-      if Mvs.is_empty zv then zw else
-      let c,ul,_,_ = consume Shs.empty c i pl bl in
-      let w = w_subst (Mvs.map (c_find_vs c) zv) zw in
-      w_forall ul w in
-    zk, vl, hl
-  else
-    let hc = create_hsymbol (id_clone h.hs_name) in
-    let zk i bl = if i > 0 then w_true else
-      let c,ul,_,_ = consume Shs.empty c i pl bl in
-      let link v z f = t_and_simp (t_equ z (c_find_vs c v)) f in
-      let sp = Mhs.singleton hc (Mvs.fold_right link zm t_true) in
-      w_forall ul {wp = t_true; sp = sp} in
-    zk, List.rev_append zl vl, (hc,zw)::hl
+  let zw = lazy (kk 0 bl) in
+  let nm = lazy (not merge || w_solid (Lazy.force zw)) in
+  let sph f = { wp = t_true; sp = Mhs.singleton hc f } in
+  let zk i bl = if i > 0 then w_true else
+    let zw = Lazy.force zw and nm = Lazy.force nm in
+    if zl = [] then if nm then zw else sph t_true else
+    let c,ul,_,_ = consume Shs.empty c i pl bl in
+    let link v z f = t_and_simp (t_equ z (c_find_vs c v)) f in
+    w_forall ul (if nm then w_subst (Mvs.map (c_find_vs c) zv) zw
+                       else sph (Mvs.fold_right link zm t_true)) in
+  zk, List.rev_append zl vl, (hc,nm,zw)::hl
 
 let close vl hl w =
   if hl = [] then w_forall vl w else
-  let wl,sp = List.fold_left (fun (wl,sp) (hc,zw) ->
-    w_implies (Mhs.find_def t_false hc sp) zw :: wl,
+  let wl,sp = List.fold_left (fun (wl,sp as acc) (hc,nm,zw) ->
+    if not (Lazy.is_val zw) || Lazy.force nm then acc else
+    w_implies (Mhs.find_def t_false hc sp) (Lazy.force zw) :: wl,
     Mhs.remove hc sp) ([], w.sp) hl in
   w_forall vl (w_and_l {w with sp = sp} wl)
 
