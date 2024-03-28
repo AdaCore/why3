@@ -214,19 +214,6 @@ module HelperLemmas
 
   use real.ExpLog
 
-  let lemma exp_sum_opposite (x : real)
-    ensures { forall x. exp(x) +. exp(-.x) >=. 2. }
-  =
-  assert {
-    exp(x) -. 2. +. exp(-.x)
-    = exp(x) *. (1. -. 2. *. exp(-.x) +. (exp(-.x) *. exp(-.x)))
-    = exp(x) *. (1. -. exp(-.x)) *. (1. -. exp(-.x))
-    by
-      exp(x) *. (1. -. exp(-.x)) *. (1. -. exp(-.x))
-      = 1. -. exp (x) -. exp (-.x) +. (exp(-.x) *. exp(-.x))
-      = (1. -. 2. *. exp(-.x) +. (exp(-.x) *. exp(-.x)))
-  }
-
   let ghost exp_approx_err (x x_approx x' a b :real)
     requires { abs (x_approx -. x) <=. x' *. a +. b }
     requires { x <=. x' }
@@ -330,6 +317,11 @@ module HelperLemmas
         0. <.  (x -. (a *. x' +. b)) <=. x_approx
     };
     log10_1_minus_x ((a *. x' +. b) /. x)
+
+  use real.Trigonometry
+
+  lemma sin_of_approx : forall x y. abs (sin x -. sin y) <=. abs (x -. y)
+  lemma cos_of_approx : forall x y. abs (cos x -. cos y) <=. abs (x -. y)
 
   use real.Sum
   use int.Int
@@ -568,16 +560,58 @@ module USingleLemmas
         to_real (exp_approx x_uf) >=. exp(to_real x_uf) *. (1. -. exp_rel_err) -. exp_cst_err
       so
         exp (to_real x_uf) >=. exp exact_x -.
-          (exp exact_x *. (exp ((x_rel_err *. x') +. x_cst_err) -. 1.0))
+          (exp exact_x *. (exp ((x_rel_err *. x') +. x_cst_err) -. 1.))
       so
         to_real (exp_approx x_uf) >=.
         (exp exact_x -.
-          (exp exact_x *. (exp ((x_rel_err *. x') +. x_cst_err) -. 1.0)))
+          (exp exact_x *. (exp ((x_rel_err *. x') +. x_cst_err) -. 1.)))
         *. (1. -. exp_rel_err) -. exp_cst_err
        so
           -.(exp(x_rel_err *. x' +. x_cst_err) -. 1.)*. (1. -. exp_rel_err)
           <=. (exp(x_rel_err *. x' +. x_cst_err) -. 1.)*. (1. +. exp_rel_err)
     };
+
+  use real.Trigonometry
+
+  let lemma sin_single_error_propagation (sin_approx : usingle -> usingle) (x_uf : usingle)
+        (exact_x x' sin_rel_err sin_cst_err x_rel_err x_cst_err : real)
+    requires { abs (to_real x_uf -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
+    requires {
+      abs (to_real (sin_approx x_uf) -. sin(to_real x_uf))
+        <=. sin_rel_err *. abs (sin (to_real x_uf)) +. sin_cst_err
+    }
+    requires { exact_x <=. x' }
+    requires { 0. <=. sin_rel_err }
+    ensures {
+      abs (to_real (sin_approx x_uf) -. sin (exact_x))
+      <=. sin_rel_err *. abs(sin(exact_x))
+          +. (((x_rel_err *. x' +. x_cst_err) *. (1. +. sin_rel_err)) +. sin_cst_err)
+    }
+  =
+  assert {
+  abs (sin (to_real x_uf)) *. sin_rel_err
+  <=. (abs (sin exact_x) +. (x_rel_err *. x' +. x_cst_err)) *. sin_rel_err
+  }
+
+  let lemma cos_single_error_propagation (cos_approx : usingle -> usingle) (x_uf : usingle)
+        (exact_x x' cos_rel_err cos_cst_err x_rel_err x_cst_err : real)
+    requires { abs (to_real x_uf -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
+    requires {
+      abs (to_real (cos_approx x_uf) -. cos(to_real x_uf))
+        <=. cos_rel_err *. abs (cos (to_real x_uf)) +. cos_cst_err
+    }
+    requires { exact_x <=. x' }
+    requires { 0. <=. cos_rel_err }
+    ensures {
+      abs (to_real (cos_approx x_uf) -. cos (exact_x))
+      <=. cos_rel_err *. abs(cos(exact_x))
+          +. (((x_rel_err *. x' +. x_cst_err) *. (1. +. cos_rel_err)) +. cos_cst_err)
+    }
+  =
+  assert {
+  abs (cos (to_real x_uf)) *. cos_rel_err
+  <=. (abs (cos exact_x) +. (x_rel_err *. x' +. x_cst_err)) *. cos_rel_err
+  }
 
   use real.Sum
   use int.Int
@@ -874,6 +908,48 @@ module UDoubleLemmas
           <=. (exp(x_rel_err *. x' +. x_cst_err) -. 1.)*. (1. +. exp_rel_err)
     };
 
+  use real.Trigonometry
+
+  let lemma sin_double_error_propagation (sin_approx : udouble -> udouble) (x_uf : udouble)
+        (exact_x x' sin_rel_err sin_cst_err x_rel_err x_cst_err : real)
+    requires { abs (to_real x_uf -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
+    requires {
+      abs (to_real (sin_approx x_uf) -. sin(to_real x_uf))
+        <=. sin_rel_err *. abs (sin (to_real x_uf)) +. sin_cst_err
+    }
+    requires { exact_x <=. x' }
+    requires { 0. <=. sin_rel_err }
+    ensures {
+      abs (to_real (sin_approx x_uf) -. sin (exact_x))
+      <=. sin_rel_err *. abs(sin(exact_x))
+          +. (((x_rel_err *. x' +. x_cst_err) *. (1. +. sin_rel_err)) +. sin_cst_err)
+    }
+  =
+  assert {
+  abs (sin (to_real x_uf)) *. sin_rel_err
+  <=. (abs (sin exact_x) +. (x_rel_err *. x' +. x_cst_err)) *. sin_rel_err
+  }
+
+  let lemma cos_double_error_propagation (cos_approx : udouble -> udouble) (x_uf : udouble)
+        (exact_x x' cos_rel_err cos_cst_err x_rel_err x_cst_err : real)
+    requires { abs (to_real x_uf -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
+    requires {
+      abs (to_real (cos_approx x_uf) -. cos(to_real x_uf))
+        <=. cos_rel_err *. abs (cos (to_real x_uf)) +. cos_cst_err
+    }
+    requires { exact_x <=. x' }
+    requires { 0. <=. cos_rel_err }
+    ensures {
+      abs (to_real (cos_approx x_uf) -. cos (exact_x))
+      <=. cos_rel_err *. abs(cos(exact_x))
+          +. (((x_rel_err *. x' +. x_cst_err) *. (1. +. cos_rel_err)) +. cos_cst_err)
+    }
+  =
+  assert {
+  abs (cos (to_real x_uf)) *. cos_rel_err
+  <=. (abs (cos exact_x) +. (x_rel_err *. x' +. x_cst_err)) *. cos_rel_err
+  }
+
   use real.Sum
   use int.Int
   use real.FromInt
@@ -909,7 +985,7 @@ module UDoubleLemmas
     sum_rel_err *. sum f'' 0 n <=.
     sum_rel_err *. (sum f' 0 n +. ((f_rel_err *. sum f' 0 n) +. (f_cst_err *. from_int n)))
   }
-  
+
   predicate is_positive_power_of_2 (x:udouble) =
     x = u1 \/ x = u2 || x = u4 || x = u8 || x = u16 || x = u32 || x = u64
     || x = u128 \/ x = u256 || x = u4096 || x = u8192 || x = u16384 || x = u32768
