@@ -57,6 +57,8 @@ type symbols = {
   log : lsymbol;
   log2 : lsymbol;
   log10 : lsymbol;
+  sin : lsymbol;
+  cos : lsymbol;
   from_int : lsymbol;
   usingle_symbols : ufloat_symbols;
   udouble_symbols : ufloat_symbols;
@@ -520,7 +522,8 @@ let get_known_fn_and_args t x =
   | Tapp (ls, args)
     when ls_equal ls !!symbols.log || ls_equal ls !!symbols.exp
          || ls_equal ls !!symbols.log2
-         || ls_equal ls !!symbols.log10 ->
+         || ls_equal ls !!symbols.log10
+         || ls_equal ls !!symbols.sin || ls_equal ls !!symbols.cos ->
     let args =
       List.map
         (fun arg ->
@@ -586,13 +589,28 @@ let get_fn_errs info fn app_approx arg_approx =
       (minus_simp a_simp **. (one ++. fn_rel_err)) ++. fn_cst_err
     in
     let rel_err = fn_rel_err in
-    let rel_err_simp = fn_rel_err in
     ( rel_err,
-      rel_err_simp,
+      rel_err,
       cst_err,
       cst_err_simp,
       abs (fs_app fn [ exact_arg ] ty_real),
       4 )
+  else if ls_equal fn !!symbols.sin || ls_equal fn !!symbols.cos then
+    let cst_err =
+      (((arg_rel_err *. arg') +. arg_cst_err) *. (one +. fn_rel_err))
+      +. fn_cst_err
+    in
+    let cst_err_simp =
+      (((arg_rel_err **. arg') ++. arg_cst_err) **. (one ++. fn_rel_err))
+      ++. fn_cst_err
+    in
+    let rel_err = fn_rel_err in
+    ( rel_err,
+      rel_err,
+      cst_err,
+      cst_err_simp,
+      abs (fs_app fn [ exact_arg ] ty_real),
+      3 )
   else
     assert false
 
@@ -715,6 +733,7 @@ let use_known_thm info app_approx fn args strats =
     ls_equal fn !!symbols.exp || ls_equal fn !!symbols.log
     || ls_equal fn !!symbols.log2
     || ls_equal fn !!symbols.log10
+    || ls_equal fn !!symbols.sin || ls_equal fn !!symbols.cos
   then
     apply_fn_thm info fn app_approx (List.hd args) (List.hd strats)
   else
@@ -1084,6 +1103,9 @@ let init_symbols env printer =
   let log = ns_find_ls exp_log_th.th_export [ "log" ] in
   let log2 = ns_find_ls exp_log_th.th_export [ "log2" ] in
   let log10 = ns_find_ls exp_log_th.th_export [ "log10" ] in
+  let trigo_th = Env.read_theory env [ "real" ] "Trigonometry" in
+  let sin = ns_find_ls trigo_th.th_export [ "sin" ] in
+  let cos = ns_find_ls trigo_th.th_export [ "cos" ] in
   let usingle = Env.read_theory env [ "ufloat" ] "USingle" in
   let udouble = Env.read_theory env [ "ufloat" ] "UDouble" in
   let usingle_lemmas = Env.read_theory env [ "ufloat" ] "USingleLemmas" in
@@ -1135,6 +1157,8 @@ let init_symbols env printer =
         log;
         log2;
         log10;
+        sin;
+        cos;
         from_int;
         usingle_symbols;
         udouble_symbols;

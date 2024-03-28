@@ -151,19 +151,3 @@ Lemma log10_increasing :
 Proof.
 Admitted.
 
-(* Unused content named one_le_two
-Proof.
-lra.
-Qed.
- *)
-(* Unused content named one_le_ten
-Proof.
-lra.
-
-Qed.
- *)
-(* Unused content named exp_sum_opposite
-Proof.
-intros x.
-Admitted.
- *)
