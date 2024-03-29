@@ -1,0 +1,48 @@
+
+(* verification of assembly code; a proof of concept *)
+
+use int.Int
+
+constant a: int -> int
+constant n: int
+
+(*
+main:
+  i <- 0
+  goto L
+T:
+  invariant { 0 <= i < n }
+  a[i] > m ?
+  jle I
+L:
+  m <- a[i]
+I:
+  i <- i+1
+  invariant { forall 0 <= j < i, a[j] <= m }
+  i = n ?
+  jne T
+  assert { i = n }
+
+*)
+
+let ifEq (x y: int) (eq {x=y}) (neq {x<>y}) =
+  any
+let ifGt (x y: int) (gt {x>y}) (le {x<=y}) =
+  any
+
+let main (&i &m: int) {n>0} (exit {i=n}) =
+  [&i <- 0] labL
+  [labL =
+    [&m <- a i] labI
+    [labI =
+      [&i <- i+1]
+      { forall j. 0 <= j < i -> a j <= m } (!
+      ifEq {i} {n} exit labT
+      [labT ->
+        { 0 <= i < n }
+        ifGt {a i} {m} labL labI
+      ]
+      )
+    ]
+  ]
+
