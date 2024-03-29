@@ -216,7 +216,7 @@ let w_forall vl w = {
 }
 
 let w_forall vl w =
-  if vl = [] then w else w_forall vl w
+  if vl = [] then w else w_forall (List.rev vl) w
 
 let w_subst s w = {
   wp = t_subst s w.wp;
@@ -371,44 +371,42 @@ let rec consume mm c i pl bl =
     | (Pv v | Pr v), Bv s -> c_add_vs c v s, vl, hl
     | (Pv v | Pr v), Bu -> let u = c_clone_vs c v in
                            c_add_vs c v (t_var u), u::vl, hl
-    | Pc (h,wr,pl), Bc (j,kk) -> let merge = Shs.mem h mm in
-        let kk,vl,hl = factorize merge c vl hl h wr pl kk in
+    | Pc (h,wr,pl), Bc (j,kk) ->
+        let hl,kk = factorize mm c hl h wr pl kk in
         c_add_hs c h (i - j, kk), vl, hl
     | _ -> assert false in
   let rec fold (c,vl,hl as acc) pl bl = match pl,bl with
     | p::pl, b::bl -> fold (link acc p b) pl bl
-    | [], bl -> c, List.rev vl, hl, bl
-    | _, [] -> assert false in
+    | [], bl -> c, vl, hl, bl
+    | _ -> assert false in
   fold (c,[],[]) pl bl
 
-and factorize merge c vl hl h wr pl kk =
-  if Debug.test_flag debug_slow || unmergeable pl then kk,vl,hl else
-  let hc = if merge then create_hsymbol (id_clone h.hs_name) else h in
-  let pl = wr_to_pl wr pl in
-  let [@warning "-8"] dup (Pv v|Pr v) (zl,zv,zm,bl) =
-    let z = c_clone_vs c v in let t = t_var z in
-    z::zl, Mvs.add z v zv, Mvs.add v t zm, Bv t::bl in
-  let zl,zv,zm,bl =
-    List.fold_right dup pl ([],Mvs.empty,Mvs.empty,[]) in
-  let zw = lazy (kk 0 bl) in
-  let nm = lazy (not merge || w_solid (Lazy.force zw)) in
-  let sph f = { wp = t_true; sp = Mhs.singleton hc f } in
-  let zk i bl = if i > 0 then w_true else
-    let zw = Lazy.force zw and nm = Lazy.force nm in
-    if zl = [] then if nm then zw else sph t_true else
-    let c,ul,_,_ = consume Shs.empty c i pl bl in
-    let link v z f = t_and_simp (t_equ z (c_find_vs c v)) f in
-    w_forall ul (if nm then w_subst (Mvs.map (c_find_vs c) zv) zw
-                       else sph (Mvs.fold_right link zm t_true)) in
-  zk, List.rev_append zl vl, (hc,nm,zw)::hl
+and factorize mm c hl h wr pl kk =
+  if Debug.test_flag debug_slow || unmergeable pl then hl,kk else
+  let lz = lazy (let pl = wr_to_pl wr pl in
+    let [@warning "-8"] dup (Pv v|Pr v) (zl,zv,vt,bl) =
+      let z = c_clone_vs c v in  let t = t_var z in
+      z::zl, Mvs.add z v zv, (v,t)::vt, Bv t::bl in
+    let zl,zv,vt,bl = List.fold_right dup pl ([],Mvs.empty,[],[]) in
+    let zw = kk 0 bl in let nm = not (Shs.mem h mm) || w_solid zw in
+    let h = if nm then h else create_hsymbol (id_clone h.hs_name) in
+    h, zl, zw, fun bl ->
+      let sph f = {wp = t_true; sp = Mhs.singleton h f} in
+      if pl = [] then if nm then zw else sph t_true else
+      let c,ul,_,_ = consume Shs.empty c 0 pl bl in
+      let link (v,t) = t_equ t (c_find_vs c v) in
+      w_forall ul (if nm then w_subst (Mvs.map (c_find_vs c) zv) zw
+                         else sph (t_and_l (List.map link vt)))) in
+  lz::hl, fun i bl ->
+    if i > 0 then w_true else let lazy (_,_,_,zk) = lz in zk bl
 
-let close vl hl w =
-  if hl = [] then w_forall vl w else
-  let wl,sp = List.fold_left (fun (wl,sp as acc) (hc,nm,zw) ->
-    if not (Lazy.is_val zw) || Lazy.force nm then acc else
-    w_implies (Mhs.find_def t_false hc sp) (Lazy.force zw) :: wl,
-    Mhs.remove hc sp) ([], w.sp) hl in
-  w_forall vl (w_and_l {w with sp = sp} wl)
+let close vl hl {wp;sp} =
+  let pile (vl,wl,sh) (lazy (h,zl,zw,_)) =  match Mhs.find h sp with
+    | f -> List.rev_append zl vl, w_implies f zw :: wl, Shs.add h sh
+    | exception Not_found -> vl,wl,sh in
+  let pile a lz = if Lazy.is_val lz then pile a lz else a in
+  let vl,wl,sh = List.fold_left pile (vl,[],Shs.empty) hl in
+  w_forall vl @@ w_and_l {wp; sp = Mhs.set_diff sp sh} wl
 
 let rec f_eval c o i bl = match o with
   | Fsym h -> let j,k = c_find_hs c h in k (i - j) bl
