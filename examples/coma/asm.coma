@@ -32,17 +32,11 @@ let ifGt (x y: int) (gt {x>y}) (le {x<=y}) =
 
 let main (&i &m: int) {n>0} (exit {i=n}) =
   [&i <- 0] labL
-  [labL =
-    [&m <- a i] labI
-    [labI =
+  [labL = [&m <- a i] labI
+  |labI =
       [&i <- i+1]
-      { forall j. 0 <= j < i -> a j <= m } (!
-      ifEq {i} {n} exit labT
-      [labT ->
-        { 0 <= i < n }
-        ifGt {a i} {m} labL labI
-      ]
-      )
-    ]
-  ]
-
+      { forall j. 0 <= j < i -> a j <= m }
+      (! ifEq {i} {n} exit labT )
+  |labT =
+      { 0 <= i < n }
+      ifGt {a i} {m} labL labI ]
