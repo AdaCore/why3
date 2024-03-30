@@ -431,6 +431,7 @@ let rec fill_mm lh = function
   | Fsym h as f ->
       (try incr (Mhs.find h lh) with Not_found -> ()); f
   | Flam (pl, mm, f) ->
+      let mm = Shs.inter mm (lh_of_pl pl) in
       let mm = Mhs.map (fun _ -> ref 0) mm in
       let f = fill_mm (Mhs.set_union mm lh) f in
       let check r = if !r > 1 then Some () else None in
@@ -473,6 +474,22 @@ let vc_map2 fn v w = match v,w with
 let hs_any = create_hsymbol (Ident.id_fresh "any")
 let vc_any = Fneu (Fsym hs_any, Shs.empty)
 
+let dl_split flat pl dl =
+  if flat || List.length dl = 1 then [pl,dl] else
+  let [@warning "-8"] head (Pc (h,_,_),_) = h in
+  let iter fn (_,g) =
+    let rec inspect sh = function
+      | Fsym h -> if not (Shs.mem h sh) then fn h
+      | Flam (pl,_,f) | Fall (pl,f) ->
+          inspect (Shs.union sh (lh_of_pl pl)) f
+      | Fcut (_,_,f) | Fneu (f,_) | Fagt (f,_)
+      | Fagv (f,_) | Fagr (f,_) -> inspect sh f
+      | Fagc (f,g) | Fand (f,g) -> inspect sh f; inspect sh g
+    in inspect Shs.empty g in
+  let module SCC = MakeSCC(Hhs) in
+  List.map (fun (_,dl) -> List.split dl) @@
+    SCC.scc head iter @@ List.combine pl dl
+
 let rec vc tt hc o al =
   let rec apply w mr pl al = match pl,al with
     | (Pt _)::pl, (At t)::al ->
@@ -504,19 +521,21 @@ let rec vc tt hc o al =
         | w -> w in
       apply (vc_map (f_lambda ~mm pl) w) Mvs.empty pl al
   | Edef (e,flat,dfl) ->
-      let agc f g = Fagc (f,g) in
+      let agc f g      = Fagc (f, g) in
+      let agc_init f g = Fagc (f, drop_attr Vc.expl_loop_keep g) in
+      let agc_keep f g = Fagc (f, drop_attr Vc.expl_loop_init g) in
       let pl,ll,fl = vc_defn hc flat dfl in
       let loop = not (flat || unspeccable pl) in
       let mm = if flat then mm_of_pl pl else
                if loop then lh_of_pl pl else Shs.empty in
-      let bind f ll = List.fold_left agc (f_lambda ~mm pl f) ll in
+      let bind agc f = List.fold_left (fun f (pl,gl) ->
+        List.fold_left agc (f_lambda ~mm pl f) gl) f ll in
       let make f fl = match fl with
         | h::hl when loop ->
-            let ip = List.map (drop_attr Vc.expl_loop_init) ll in
-            let ii = List.map (drop_attr Vc.expl_loop_keep) ll in
-            f_all pl (Fand (bind f ii, bind (f_and_l h hl) ip))
-        | _ when flat -> f_and_l (bind f ll) fl
-        | _ -> f_all pl (bind (f_and_l f fl) ll) in
+            let ip = bind agc_keep (f_and_l h hl) in
+            f_all pl (Fand (bind agc_init f, ip))
+        | _ when flat -> f_and_l (bind agc f) fl
+        | _ -> f_all pl (bind agc (f_and_l f fl)) in
       (match vc tt (hc_of_pl hc pl) e [] with
        | TB (f,g) -> TB (make f fl, make g [])
        | TT f -> TT (make f fl))
@@ -541,11 +560,11 @@ let rec vc tt hc o al =
 and vc_defn hc flat dfl =
   let pl = List.map (fun (h,wr,pl,_) -> Pc (h,wr,pl)) dfl in
   let hc = if flat then hc else hc_of_pl hc pl in
-  List.fold_right (fun (_,wr,pl,d) (xx,ll,fl) ->
-    let pl = wr_to_pl wr pl in
+  let ll,fl = List.fold_right (fun (_,wr,pl,d) (ll,fl) ->
+    let pl = wr_to_pl wr pl in let mm = mm_of_pl pl in
     let tb,bt = of_tb (vc false (hc_of_pl hc pl) d []) in
-    let ll = f_lambda ~mm:(mm_of_pl pl) pl tb :: ll in
-    xx, ll, f_all pl bt :: fl) dfl (pl,[],[])
+    f_lambda ~mm pl tb :: ll, f_all pl bt :: fl) dfl ([],[]) in
+  pl, dl_split flat pl ll, fl
 
 let rec fill_wox rb = function
   | Esym _ as o -> o
@@ -695,9 +714,11 @@ let vc_expr (hc,c) e =
 
 let vc_defn (hc,c) flat dfl =
   let pl,ll,fl = vc_defn hc flat (wox_defn (wr_defn hc flat dfl)) in
-  let ctx bl = let c,_,_,_ = consume Shs.empty c 0 pl bl in c in
-  let cc = if flat then c else ctx (jack 0 [] pl) in
-  let c = ctx (List.map (fun g -> Bc (0, top_eval cc g)) ll) in
+  let ctx c pl bl = let c,_,_,_ = consume Shs.empty c 0 pl bl in c in
+  let bl_of_gl c gl = List.map (fun g -> Bc (0, top_eval c g)) gl in
+  let cc = if flat then c else ctx c pl (jack 0 [] pl) in
+  let add_dl (pl,gl) c = ctx c pl (bl_of_gl c gl) in
+  let c = List.fold_right add_dl ll cc in
   let eval (h,_,_,_) f =
     h, vc_simp (top_eval (if flat then cc else c) f 0 []).wp in
   let keep (_,f) = not (Debug.test_flag debug_triv && is_true f) in

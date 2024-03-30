@@ -179,21 +179,23 @@ let rec param_spec o a pl e =
   let _,_,pl,e,dl = List.fold_right param pl (true,a,[],e,[]) in
   pl, attach e dl
 
-module SCC = MakeSCC(Hid)
-
-let defn_hs_iter fn (_,_,_,d) =
-  (* we assume no collisions *)
-  let rec inspect = function
-    | Esym h -> fn h.hs_name
-    | Edef (e,_,dl) ->
-        let check (_,_,_,d) = inspect d
-        in List.iter check dl; inspect e
-    | Eapp (e, Ac d) -> inspect d; inspect e
-    | Elet (e,_) | Ecut (_,_,e) | Ebox e
-    | Eset (e,_) | Elam (_,e) | Ewox e
-    | Eapp (e,_) -> inspect e
-    | Eany -> () in
-  inspect d
+let dl_split flat dl =
+  if flat then [false, dl] else
+  let head (h,_,_,_) = h in
+  let iter fn (_,_,_,d) =
+    (* we assume no collisions *)
+    let rec inspect = function
+      | Esym h -> fn h
+      | Edef (e,_,dl) ->
+          let check (_,_,_,d) = inspect d
+          in List.iter check dl; inspect e
+      | Eapp (e, Ac d) -> inspect d; inspect e
+      | Elet (e,_) | Ecut (_,_,e) | Ebox e
+      | Eset (e,_) | Elam (_,e) | Ewox e
+      | Eapp (e,_) -> inspect e
+      | Eany -> () in inspect d in
+  let module SCC = MakeSCC(Hhs) in
+  SCC.scc head iter dl
 
 let rec qloc = function
   | Qdot (p, id) -> Loc.join (qloc p) id.id_loc
@@ -207,7 +209,6 @@ let hs_register (hs,_,_ as reg) =
   let xs = Ity.create_xsymbol (id_clone hs.hs_name) Ity.ity_unit in
   Wid.set hs_db xs.Ity.xs_name reg;
   Pdecl.create_exn_decl xs
-
 
 let rec subs_param (mty, mvs as acc) = function
   | Pt _ as p -> acc, p
@@ -324,11 +325,8 @@ let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_
   | PEdef (e, flat, d) ->
       let ctx, dl = type_defn_list muc ctx flat d in
       let e = type_prog ~loc:(e.pexpr_loc) muc ctx e in
-      if flat then Edef (e, flat, dl), [] else
-      let defn_head (h,_,_,_) = h.hs_name in
-      let dll = SCC.scc defn_head defn_hs_iter dl in
       let add_def e (r,dl) = Edef (e, not r, dl) in
-      List.fold_left add_def e dll, []
+      List.fold_left add_def e (dl_split flat dl), []
 
 and type_prog ?loc muc ctx d =
   let e, te = type_expr muc ctx d in
@@ -360,10 +358,8 @@ and type_defn_list muc ctx flat dl =
 
 let type_defn_list muc flat dl =
   let _, dl = type_defn_list muc ctx0 flat dl in
-  let add_hs muc (h,wr,pl,_) = Pmodule.add_pdecl ~vc:false muc (hs_register (h,wr,pl)) in
+  let add_hs muc (h,wr,pl,_) =
+    Pmodule.add_pdecl ~vc:false muc (hs_register (h,wr,pl)) in
   let uc = List.fold_left add_hs muc dl in
-  if flat then uc, [flat, dl] else
-  let defn_head (h,_,_,_) = h.hs_name in
-  let dll = SCC.scc defn_head defn_hs_iter dl in
   let add_def dll (r,dl) = (not r, dl) :: dll in
-  uc, List.fold_left add_def [] dll
+  uc, List.fold_left add_def [] (dl_split flat dl)
