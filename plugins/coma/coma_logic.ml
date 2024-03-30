@@ -626,13 +626,24 @@ let rec fill_wr hc lh lr wm o al =
       let pl, e = wr_lambda hc lh lr wm pl e in
       apply (Elam (pl, e)) Mvs.empty pl al
   | Edef (e, flat, dfl) ->
-      let dfl = wr_defn hc lh lr flat dfl in
-      let mkp ((h,wr,ql,_), wmd) =
-        if not flat then join_writes [] wmd; Pc (h,wr,ql) in
-      let pl,e = wr_lambda hc lh lr wm (List.map mkp dfl) e in
+      let dwl = wr_defn hc lh lr flat dfl in
+      let mkp ((h,wr,ql,_), _) = Pc (h,wr,ql) in
+      let pl,e = wr_lambda hc lh lr wm (List.map mkp dwl) e in
       let [@warning "-8"] move (Pc (_,wr,_)) ((h,_,ql,d), wmd) =
         join_writes wr wmd; h,wr,ql,d in
-      Edef (e, flat, List.map2 move pl dfl)
+      let dfl = List.map2 move pl dwl in
+      let rec fixpoint dfl =
+        let same = ref true in
+        let on_def (h,ur,pl,d as df) (_,wmd) =
+          let wr = Svs.inter lr (Mhs.find_def Svs.empty h !wm)
+          and ur = Svs.of_list ur in
+          if Svs.subset wr ur then df else
+          let wr = Svs.elements (Svs.union wr ur) in
+          join_writes wr wmd; same := false; h,wr,pl,d in
+        let dfl = List.map2 on_def dfl dwl in
+        if not !same then fixpoint dfl else begin
+        wm := Mhs.set_diff !wm (lh_of_pl pl); dfl end in
+      Edef (e, flat, if flat then dfl else fixpoint dfl)
   | Eset (e, vtl) ->
       Eset (prewrite (List.map fst vtl) e, vtl)
   | Elet (e, vtl) ->
