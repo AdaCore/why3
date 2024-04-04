@@ -18,7 +18,8 @@ open Term
 (* First-order logic *)
 
 let case_split = create_attribute "case_split"
-let coma_solid = create_attribute "coma_solid"
+let coma_solid = create_attribute "coma:solid"
+let coma_weird = create_attribute "coma:weird"
 
 let add_case_split t = t_attr_add case_split t
 let add_stop_split t = t_attr_add stop_split t
@@ -186,6 +187,8 @@ let hs_hash hs = id_hash hs.hs_name
 let hs_compare hs1 hs2 = id_compare hs1.hs_name hs2.hs_name
 
 let create_hsymbol id = { hs_name = Ident.id_register id }
+
+let hs_tagged a h = Sattr.mem a h.hs_name.id_attrs
 
 type wpsp = {
   wp: term;
@@ -535,7 +538,7 @@ let rec vc tt hc o al =
       let agc f g      = Fagc (f, g) in
       let agc_init f g = Fagc (f, drop_attr Vc.expl_loop_keep g) in
       let agc_keep f g = Fagc (f, drop_attr Vc.expl_loop_init g) in
-      let pl,ll,fl = vc_defn hc flat dfl in
+      let pl,ll,fl,gl = vc_defn tt hc flat dfl in
       let loop = not (flat || unspeccable pl) in
       let mm = if flat then mm_of_pl pl else
                if loop then lh_of_pl pl else Shs.empty in
@@ -548,7 +551,7 @@ let rec vc tt hc o al =
         | _ when flat -> f_and_l (bind agc f) fl
         | _ -> f_all pl (bind agc (f_and_l f fl)) in
       (match vc tt (hc_of_pl hc pl) e [] with
-       | TB (f,g) -> TB (make f fl, make g [])
+       | TB (f,g) -> TB (make f fl, make g gl)
        | TT f -> TT (make f fl))
   | Eset (e,vtl) ->
       let agv f (_,s) = Fagv (f, s) in
@@ -568,20 +571,28 @@ let rec vc tt hc o al =
   | Ewox e -> TB (of_tt (vc true hc e []), vc_any)
   | Eany -> if tt then TT vc_any else TB (vc_any, vc_any)
 
-and vc_defn hc flat dfl =
+and vc_defn tt hc flat dfl =
   let pl = List.map (fun (h,wr,pl,_) -> Pc (h,wr,pl)) dfl in
   let hc = if flat then hc else hc_of_pl hc pl in
-  let ll,fl = List.fold_right (fun (_,wr,pl,d) (ll,fl) ->
+  let ll,fl,gl = List.fold_right (fun (h,wr,pl,d) (ll,fl,gl) ->
+    let weird = not tt && hs_tagged coma_weird h in
     let pl = wr_to_pl wr pl in let mm = mm_of_pl pl in
     let tb,bt = of_tb (vc false (hc_of_pl hc pl) d []) in
-    f_lambda ~mm pl tb :: ll, f_all pl bt :: fl) dfl ([],[]) in
-  pl, dl_split flat pl ll, fl
+    let fl = if weird then fl else f_all pl bt :: fl in
+    let gl = if weird then f_all pl bt :: gl else gl in
+    f_lambda ~mm pl tb :: ll, fl, gl) dfl ([],[],[]) in
+  pl, dl_split flat pl ll, fl, gl
 
 let rec fill_wox rb = function
   | Esym _ as o -> o
   | Elam (pl, e) -> Elam (pl, fill_wox rb e)
   | Edef (e, flat, dfl) ->
-      Edef (fill_wox rb e, flat, wox_defn dfl)
+      let dfl = wox_defn dfl in
+      let wd = List.exists (fun (h,_,_,d) ->
+        hs_tagged coma_weird h && match d with
+          | Ewox _ -> false | _ -> true) dfl in
+      Edef ((if wd then (rb := true; wox_expr e)
+                  else fill_wox rb e), flat, dfl)
   | Eset (e, vtl) -> Eset (fill_wox rb e, vtl)
   | Elet (e, vtl) -> Elet (fill_wox rb e, vtl)
   | Ecut (f, b, e) -> Ecut (f, b, fill_wox rb e)
@@ -735,7 +746,8 @@ let vc_expr (hc,c) e =
   vc_simp (top_eval c (of_tt w) 0 []).wp
 
 let vc_defn (hc,c) flat dfl =
-  let pl,ll,fl = vc_defn hc flat (wox_defn (wr_defn hc flat dfl)) in
+  let dfl = wox_defn (wr_defn hc flat dfl) in
+  let pl,ll,fl,_ = vc_defn true hc flat dfl in
   let ctx c pl bl = let c,_,_,_ = consume Shs.empty c 0 pl bl in c in
   let bl_of_gl c gl = List.map (fun g -> Bc (0, top_eval c g)) gl in
   let cc = if flat then c else ctx c pl (jack 0 [] pl) in
@@ -747,10 +759,9 @@ let vc_defn (hc,c) flat dfl =
   (hc_of_pl hc pl, c), List.filter keep (List.map2 eval dfl fl)
 
 let extspec_attr = create_attribute "coma:extspec"
-let hs_extspec h = Sattr.mem extspec_attr h.hs_name.id_attrs
 
 let vc_spec (hc,c) h =
-  if not (hs_extspec h) then [] else
+  if not (hs_tagged extspec_attr h) then [] else
   let wr, pl = Mhs.find h hc in
   if unspeccable pl then [] else
   let n = h.hs_name.id_string in

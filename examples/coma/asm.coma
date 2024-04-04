@@ -40,3 +40,14 @@ let main (&i &m: int) {n>0} (exit {i=n}) =
   |labT =
       { 0 <= i < n }
       ifGt {a i} {m} labL labI ]
+
+let main_weird (&i &m: int) {n>0} (exit {i=n}) =
+  [&i <- 0] (labL
+  [labL = [&m <- a i] (labI
+    [labI [@coma:weird] = [&i <- i+1]
+            { forall j. 0 <= j < i -> a j <= m }
+            (! ifEq {i} {n} exit labT
+               [labT = { 0 <= i < n }
+                       ifGt {a i} {m} labL labI ])
+    ])
+  ])
