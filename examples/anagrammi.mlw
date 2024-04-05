@@ -1,8 +1,10 @@
 
-(** In Umberto Eco's "Foucault's Pendulum" (Il pendolo di Foucault,
+(** {1 Anagrammi}
+
+  In Umberto Eco's "Foucault's Pendulum" (Il pendolo di Foucault,
   1988), there is a short BASIC program that computes the 24
   permutations of four letters. It is as follows:
-
+  {h<pre>
     10 REM anagrammi
     20 INPUT LS(1), LS(2), LS(3), LS(4)
     30 PRINT
@@ -18,7 +20,7 @@
    130 NEXT I2
    140 NEXT I1
    150 END
-
+  </pre>}
   Note: In the French edition (Grasset, 2013), there is a typo
   on line 80, with `=11` instead of `=I1`.
 
@@ -75,9 +77,9 @@ function pr2 (i1 i2: int) : line->bool = fun s ->
 function pr3 (i1 i2 i3: int) : line->bool = fun s ->
   pr2 i1 i2 s || s[0]=i1 && s[1]=i2 && s[2]<i3
 
-(* The output of the program is modeled with the
-   following global variable that contains a sequence
-   of lines. *)
+(** The output of the program is modeled with the
+    following global variable that contains a sequence
+    of lines. *)
 val ref output: seq line
 
 let anagrammi () : unit
