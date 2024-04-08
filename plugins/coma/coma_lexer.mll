@@ -20,6 +20,7 @@
   open Coma_parser
 
   let keywords = Hashtbl.create 97
+  let attribute_aliases = Hashtbl.create 16
   let () =
     List.iter
       (fun (x,y) -> Hashtbl.add keywords x y)
@@ -144,12 +145,32 @@ rule token = parse
     space* (dec+ as line) space* (dec+ as char) space* "]"
       { Lexlib.update_loc lexbuf file (int_of_string line) (int_of_string char);
         token lexbuf }
+  | "[%#" space* (lident as lid) space*
+    (dec+ as bline) space* (dec+ as bchar) space*
+    (dec+ as eline) space* (dec+ as echar) space* "]"
+      { try
+          let file = Hashtbl.find attribute_aliases lid in
+          POSITION (Loc.user_position file
+                      (int_of_string bline) (int_of_string bchar)
+                      (int_of_string eline) (int_of_string echar))
+        with Not_found -> Loc.errorm "Attribute alias unknown." }
   | "[#" space* "\"" ([^ '\010' '\013' '"' ]* as file) "\"" space*
     (dec+ as bline) space* (dec+ as bchar) space*
     (dec+ as eline) space* (dec+ as echar) space* "]"
       { POSITION (Loc.user_position file
                     (int_of_string bline) (int_of_string bchar)
                     (int_of_string eline) (int_of_string echar)) }
+
+  | "let%file" space+ (lident as lid) space* "=" space* "\"" ([^ '\010' '\013' '"' ]* as file) "\""
+      { Hashtbl.replace attribute_aliases lid file;
+        token lexbuf }
+  | "let%attr" space+ (lident as lid) space* "=" space* ([^ '\n']+ as cattr)
+      { Hashtbl.replace attribute_aliases lid cattr;
+        token lexbuf }
+  | "[%@" space* (lident (' '+ [^ ' ' '\n' ']']+ as lid)) space* ']'
+      { try
+          ATTRIBUTE (Hashtbl.find attribute_aliases lid)
+        with Not_found -> Loc.errorm "Attribute alias unknown." }
   | "[@" space* ([^ ' ' '\n' ']']+ (' '+ [^ ' ' '\n' ']']+)* as lbl) space* ']'
       { ATTRIBUTE lbl }
   | '\n'
