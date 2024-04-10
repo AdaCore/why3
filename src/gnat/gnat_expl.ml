@@ -48,6 +48,7 @@ type reason =
    | VC_Feasible_Post
    | VC_Inline_Check
    | VC_Container_Aggr_Check
+   | VC_Reclamation_Check
    | VC_UC_No_Holes
    | VC_UC_Same_Size
    (* VC_LSP_Kind - Liskov Substitution Principle *)
@@ -113,6 +114,7 @@ let is_warning_reason r =
    | VC_Feasible_Post
    | VC_Inline_Check
    | VC_Container_Aggr_Check
+   | VC_Reclamation_Check
    | VC_UC_No_Holes
    | VC_UC_Same_Size
    (* VC_LSP_Kind - Liskov Substitution Principle *)
@@ -227,6 +229,7 @@ let reason_from_string s =
    | "VC_FEASIBLE_POST"             -> VC_Feasible_Post
    | "VC_INLINE_CHECK"              -> VC_Inline_Check
    | "VC_CONTAINER_AGGR_CHECK"      -> VC_Container_Aggr_Check
+   | "VC_RECLAMATION_CHECK"         -> VC_Reclamation_Check
    | "VC_UC_NO_HOLES"               -> VC_UC_No_Holes
    | "VC_UC_SAME_SIZE"              -> VC_UC_Same_Size
    (* VC_LSP_Kind - Liskov Substitution Principle *)
@@ -297,6 +300,7 @@ let reason_to_ada reason =
    | VC_Feasible_Post             -> "VC_FEASIBLE_POST"
    | VC_Inline_Check              -> "VC_INLINE_CHECK"
    | VC_Container_Aggr_Check      -> "VC_CONTAINER_AGGR_CHECK"
+   | VC_Reclamation_Check         -> "VC_RECLAMATION_CHECK"
    | VC_UC_No_Holes               -> "VC_UC_NO_HOLES"
    | VC_UC_Same_Size              -> "VC_UC_SAME_SIZE"
    (* VC_LSP_Kind - Liskov Substitution Principle *)
@@ -362,6 +366,7 @@ let reason_to_string reason =
    | VC_Feasible_Post             -> "feasible_post"
    | VC_Inline_Check              -> "inline_check"
    | VC_Container_Aggr_Check      -> "container_aggr_check"
+   | VC_Reclamation_Check         -> "reclamation_check"
    | VC_UC_No_Holes               -> "uc_no_holes"
    | VC_UC_Same_Size              -> "uc_same_size"
    (* VC_LSP_Kind - Liskov Substitution Principle *)

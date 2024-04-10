@@ -52,6 +52,7 @@ type reason =
    | VC_Feasible_Post
    | VC_Inline_Check
    | VC_Container_Aggr_Check
+   | VC_Reclamation_Check
    | VC_UC_No_Holes
    | VC_UC_Same_Size
    (* VC_LSP_Kind - Liskov Substitution Principle *)
