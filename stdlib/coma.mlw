@@ -38,7 +38,6 @@ module Binom
     ensures  { result >= 1 }
   = if k = 0 || k = n then 1 else comb (n-1) k + comb (n-1) (k-1)
 
-
   let rec lemma prop1 (n k: int)
     requires { 0 <= k <= n }
     ensures  { comb n (n - k) = comb n k }

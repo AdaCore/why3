@@ -58,7 +58,6 @@ let add_def c muc flat bl =
 
 let add_top env cenv menv (c,muc) = function
   | Blo b -> add_def c muc false b
-  | Def d -> add_def c muc true [d]
   | Mlw d ->
       c, Typing.Unsafe.add_decl muc env menv d
   | Use (Puseexport q) ->

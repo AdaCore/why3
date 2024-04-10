@@ -162,7 +162,7 @@ let rec param_spec o a pl e =
     | PPa (f,b) ->
         if a then Loc.errorm ~loc:f.term_loc "[coma typing] \
           specification clauses cannot appear before type or data parameters";
-        o, a, pl, { e with pexpr_desc = PEcut (f, b, attach e dl) }, []
+        o, a, pl, { e with pexpr_desc = PEcut ([f, b], attach e dl) }, []
     | PPl vtl ->
         List.iter (fun ({id_loc=loc},_,_,b) ->
           if a then Loc.errorm ~loc "[coma typing] \
@@ -242,9 +242,12 @@ let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_
   | PEany -> Eany, []
   | PEbox e -> let e = type_prog ~loc muc ctx e in Ebox e, []
   | PEwox e -> let e = type_prog ~loc muc ctx e in Ewox e, []
-  | PEcut (t,b,e) ->
+  | PEcut (l,e) ->
       let e = type_prog ~loc muc ctx e in
-      Ecut (type_fmla tuc ctx t, b, e), []
+      let ll = List.fold_left
+        (fun acc (t,b) -> Ecut (type_fmla tuc ctx t, b, acc))
+        e (List.rev l) in
+      ll, []
   | PEsym q ->
       let h, _, pl =
         try let nm = match q with

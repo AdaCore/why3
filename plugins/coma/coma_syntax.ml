@@ -36,7 +36,7 @@ and pexpr_desc =
   | PEdef of pexpr * bool * pdefn list (* e / rec? h p = e and ... *)
   | PEset of pexpr * (ident * term) list
   | PElet of pexpr * pvar list
-  | PEcut of term * bool * pexpr (* { t } e *)
+  | PEcut of (term * bool) list * pexpr (* { t } e *)
   | PEbox of pexpr (* ! e *)
   | PEwox of pexpr (* ? e *)
   | PEany (* any *)
@@ -64,7 +64,6 @@ type use =
   | Puseimport of bool * qualid * ident option
 
 type pdecl =
-  | Def of pdefn
   | Blo of pdefn list
   | Mlw of Ptree.decl
   | Use of use
@@ -222,7 +221,7 @@ module PPp = struct
     | PEset (e, l)    -> fprintf fmt "%a@\n[%a]"      pp_expr e pp_set l
     | PElet (e, l)    -> fprintf fmt "%a@\n[%a]"      pp_expr e pp_let l
     | PEapp (e, arg)  -> fprintf fmt "@[%a%a@[%a@]@]" pp_expr e pp_sp_nl2 () pp_arg arg
-    | PEcut (t, b, e) -> fprintf fmt "%a@ %a"         (pp_annot b) t pp_expr e
+    | PEcut (_, e)    -> fprintf fmt "assert/@ %a"    pp_expr e
     | PEdef (e, b, l) -> fprintf fmt "%a@\n[%a]"      pp_expr e (pp_local_defs_block b)  l
     | PElam (p, e)    -> fprintf fmt "(fu@[n %a%a→@ @[%a@]@])"  (pp_print_list pp_param) p pp_osp (p <> []) pp_expr e
 

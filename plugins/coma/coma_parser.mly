@@ -11,10 +11,16 @@
 
 %{
 open Why3
+open Ptree
 open Coma_syntax
 
 let mk_pexpr d loc = { pexpr_desc = d; pexpr_loc = Loc.extract loc }
 let mk_defn d loc = { pdefn_desc = d; pdefn_loc = Loc.extract loc }
+
+let pre         = ATstr (Ident.create_attribute "expl:precondition")
+let pre_assume  = ATstr (Ident.create_attribute "expl:preassumption")
+let post_assume = ATstr (Ident.create_attribute "expl:postassumption")
+let post        = ATstr (Ident.create_attribute "expl:postcondition")
 
 %}
 
@@ -65,11 +71,11 @@ coma_prog:
   { List.fold_left (fun acc b -> (b acc)) e bl }
 
 coma_bloc:
-| LEFTSQ l=separated_nonempty_list(BAR, coma_let) RIGHTSQ
+| LEFTSQ option(BAR) l=separated_nonempty_list(BAR, coma_let) RIGHTSQ
   { fun e -> (mk_pexpr (PElet (e, l)) $loc) }
-| LEFTSQ dl=separated_nonempty_list(BAR, defn(EQUAL)) RIGHTSQ
+| LEFTSQ option(BAR) dl=separated_nonempty_list(BAR, defn(EQUAL)) RIGHTSQ
   { fun e -> (mk_pexpr (PEdef (e, false, dl)) $loc) }
-| LEFTSQ dl=separated_nonempty_list(BAR, defn(ARROW)) RIGHTSQ
+| LEFTSQ option(BAR) dl=separated_nonempty_list(BAR, defn(ARROW)) RIGHTSQ
   { fun e -> (mk_pexpr (PEdef (e, true, dl)) $loc) }
 
 coma_let:
@@ -85,11 +91,11 @@ coma_expr:
 | d = coma_desc
   { mk_pexpr d $loc }
 
-coma_desc:
-| LEFTBRC t=term RIGHTBRC e=coma_expr
-  { PEcut (t, true, e) }
-| LEFTMINBRC t=term RIGHTMINBRC e=coma_expr
-  { PEcut (t, false, e) }
+coma_expr_no_assert:
+| d = coma_desc_no_assert
+  { mk_pexpr d $loc }
+
+coma_desc_no_assert:
 | LEFTSQ l=separated_nonempty_list(BAR, coma_set) RIGHTSQ e=coma_expr
   { PEset (e, l) }
 | LEFTPAR BANG e=coma_prog RIGHTPAR
@@ -101,6 +107,18 @@ coma_desc:
     let e = List.fold_left app e al in
     let e = List.fold_left app e at in
     e.pexpr_desc }
+
+coma_assert_assume:
+| LEFTBRC t=term RIGHTBRC
+  { t, true }
+| LEFTMINBRC t=term RIGHTMINBRC
+  { t, false }
+
+coma_desc:
+| l=nonempty_list(coma_assert_assume) e=coma_expr_no_assert
+  { PEcut (l, e) }
+| coma_desc_no_assert
+  { $1 }
 
 coma_expr2:
 | d = coma_desc2
@@ -154,27 +172,45 @@ coma_params:
 | pl=coma_param*
   { (List.flatten pl) }
 
+coma_params_depth:
+| pl=coma_param_depth*
+  { (List.flatten pl) }
+
 coma_tvar:
 | x=quote_lident
   { PPt x }
 
-coma_param:
+coma_param_common:
 | LT l=coma_tvar* GT
   { l }
 | LEFTPAR lid=coma_binder+ t=oftyp RIGHTPAR
   { List.map (fun (b,id) -> if b then PPr (id,t) else PPv (id,t)) lid }
-| LEFTPAR id=attrs(lword_nq) w=prewrites p=coma_params RIGHTPAR
+| LEFTPAR id=attrs(lword_nq) w=prewrites p=coma_params_depth RIGHTPAR
   { [PPc (id, w, p)] }
-| LEFTBRC t=term RIGHTBRC
-  { [PPa (t,true)] }
-| LEFTMINBRC t=term RIGHTMINBRC
-  { [PPa (t,false)] }
 | LEFTBRC DOTDOT RIGHTBRC
   { [PPo] }
 | LEFTBRC RIGHTBRC
   { [PPb] }
 | LEFTSQ l=separated_nonempty_list(BAR, coma_let) RIGHTSQ
   { [PPl l] }
+
+coma_param:
+| coma_param_common { $1 }
+| LEFTBRC t=term RIGHTBRC
+  { let t = { term_desc = Tattr (pre, t); term_loc = t.term_loc } in
+    [PPa (t,true)] }
+| LEFTMINBRC t=term RIGHTMINBRC
+  { let t = { term_desc = Tattr (pre_assume, t); term_loc = t.term_loc } in
+    [PPa (t,false)] }
+
+coma_param_depth:
+| coma_param_common { $1 }
+| LEFTBRC t=term RIGHTBRC
+  { let t = { term_desc = Tattr (post, t); term_loc = t.term_loc } in
+    [PPa (t,true)] }
+| LEFTMINBRC t=term RIGHTMINBRC
+  { let t = { term_desc = Tattr (post_assume, t); term_loc = t.term_loc } in
+    [PPa (t,false)] }
 
 coma_binder:
 | id=attrs(lword_nq)
