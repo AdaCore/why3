@@ -117,6 +117,7 @@ let rec add_quant kn d (vl,tl,f) ({vs_ty = ty} as v) =
         | Tcase (t, _) | Tbinop (Timplies, _, t) -> lookup_names t
         | Tbinop (Tand, t1, t2) -> lookup_names t1; lookup_names t2
         | Tquant (_, qf) -> let _,_,f = t_open_quant qf in lookup_names f
+        | Tlet (_, bf) -> let _, f = t_open_bound bf in lookup_names f
         | _ -> () in
       let idl = try lookup_names f;
                     clone v.vs_name d
