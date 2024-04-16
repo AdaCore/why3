@@ -138,17 +138,24 @@ and check_params ~loc l r =
       "[coma typing] bad arity: %d argument(s) expected, %d given"
       (List.length l) (List.length r) *)
 
-let rec sink_spec o bb dd al = function
-  | PPb :: pl -> sink_spec o true dd al pl
-  | PPo :: pl -> sink_spec o bb true al pl
-  | PPc _ as p :: pl -> p :: sink_spec o bb dd al pl
-  | PPa _ as a :: pl -> sink_spec o true dd (a::al) pl
-  | p::pl -> List.rev_append al (p :: sink_spec o bb dd [] pl)
+let has_attr t = match t.term_desc with
+  | Tattr ((ATstr _), _) -> true
+  | _ -> false
+
+let rec sink_spec attr o bb dd al = function
+  | PPb :: pl -> sink_spec attr o true dd al pl
+  | PPo :: pl -> sink_spec attr o bb true al pl
+  | PPc _ as p :: pl -> p :: sink_spec attr o bb dd al pl
+  | PPa (t, true) :: pl when not (has_attr t) ->
+      let a = PPa ({ t with term_desc = Tattr (attr, t)}, true) in
+      sink_spec attr o true dd (a::al) pl
+  | PPa _ as a :: pl -> sink_spec attr o true dd (a::al) pl
+  | p::pl -> List.rev_append al (p :: sink_spec attr o bb dd [] pl)
   | [] -> if bb && not dd then
             List.rev_append al [PPb] else if o then List.rev al else
           Loc.errorm "this outcome must have a closed specification"
 
-let rec param_spec o a pl e =
+let rec param_spec (pre,name) o a pl e =
   let attach e dl = if dl = [] then e else
     { e with pexpr_desc = PEdef (e,true,dl) } in
   let rec clean = function
@@ -181,12 +188,15 @@ let rec param_spec o a pl e =
           | PPr (r,_) -> mke (PEapp (d, PAr r)) r
           | PPa _ | PPl _ | PPo | PPb -> d in
         let d = List.fold_left apply (mke (PEsym (Qident h)) h) ql in
-        let ql,d = Loc.try4 ~loc:h.id_loc param_spec o a ql d in
+        let post = false, name ^ "'" ^ h.id_str in
+        let ql,d = Loc.try4 ~loc:h.id_loc param_spec post o a ql d in
         let d = { pdefn_name = h; pdefn_writes = wr;
                   pdefn_params = ql; pdefn_body = d } in
         let d = { pdefn_desc = d; pdefn_loc = h.id_loc } in
         o, a, PPc (h,wr,ql) :: pl, e, d::dl in
-  let pl = sink_spec o false false [] pl in
+  let expl = if pre then "expl:precondition " else "expl:postcondition " in
+  let attr = ATstr (Ident.create_attribute (expl^name)) in
+  let pl = sink_spec attr o false false [] pl in
   let _,_,pl,e,dl = List.fold_right param pl (true,a,[],e,[]) in
   pl, attach e dl
 
@@ -332,7 +342,7 @@ let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_
       let e = type_prog ~loc muc ctx e in
       Eset (e, ll), []
   | PElam (pl, e) ->
-      let pl, e = param_spec true false pl e in
+      let pl, e = param_spec (true, "<lambda>") true false pl e in
       let ctx, params = List.fold_left_map (type_param tuc) ctx pl in
       let e = type_prog ~loc:(e.pexpr_loc) muc ctx e in
       Elam (params, e), params
@@ -355,7 +365,7 @@ and type_defn_list muc ctx flat dl =
       (fun acc { pdefn_desc = d; pdefn_loc=loc} ->
          let id, pl = d.pdefn_name, d.pdefn_params in
          let h = create_hsymbol (create_user_id id) in
-         let pl, e = param_spec true false pl d.pdefn_body in
+         let pl, e = param_spec (true, id.id_str) true false pl d.pdefn_body in
          let _, params = Lists.map_fold_left (type_param tuc) ctx pl in
          let writes = List.map (find_ref ctx) d.pdefn_writes in
          add_hdl h writes params acc, (h, writes, params, loc, e))

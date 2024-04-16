@@ -11,16 +11,10 @@
 
 %{
 open Why3
-open Ptree
 open Coma_syntax
 
 let mk_pexpr d loc = { pexpr_desc = d; pexpr_loc = Loc.extract loc }
 let mk_defn d loc = { pdefn_desc = d; pdefn_loc = Loc.extract loc }
-
-let pre         = ATstr (Ident.create_attribute "expl:precondition")
-let pre_assume  = ATstr (Ident.create_attribute "expl:preassumption")
-let post_assume = ATstr (Ident.create_attribute "expl:postassumption")
-let post        = ATstr (Ident.create_attribute "expl:postcondition")
 
 %}
 
@@ -108,10 +102,14 @@ coma_desc_no_assert:
     let e = List.fold_left app e at in
     e.pexpr_desc }
 
+coma_named_term:
+| s=STRING BAR t=term { name_term (Some (mk_id s $startpos(s) $endpos(s))) "Assert" t }
+| t=term { name_term None "Assert" t }
+
 coma_assert_assume:
-| LEFTBRC t=term RIGHTBRC
+| LEFTBRC t=coma_named_term RIGHTBRC
   { t, true }
-| LEFTMINBRC t=term RIGHTMINBRC
+| LEFTMINBRC t=coma_named_term RIGHTMINBRC
   { t, false }
 
 coma_desc:
@@ -196,21 +194,17 @@ coma_param_common:
 
 coma_param:
 | coma_param_common { $1 }
-| LEFTBRC t=term RIGHTBRC
-  { let t = { term_desc = Tattr (pre, t); term_loc = t.term_loc } in
-    [PPa (t,true)] }
-| LEFTMINBRC t=term RIGHTMINBRC
-  { let t = { term_desc = Tattr (pre_assume, t); term_loc = t.term_loc } in
-    [PPa (t,false)] }
+| LEFTBRC t=coma_named_term RIGHTBRC
+  { [PPa (t,true)] }
+| LEFTMINBRC t=coma_named_term RIGHTMINBRC
+  { [PPa (t,false)] }
 
 coma_param_depth:
 | coma_param_common { $1 }
-| LEFTBRC t=term RIGHTBRC
-  { let t = { term_desc = Tattr (post, t); term_loc = t.term_loc } in
-    [PPa (t,true)] }
-| LEFTMINBRC t=term RIGHTMINBRC
-  { let t = { term_desc = Tattr (post_assume, t); term_loc = t.term_loc } in
-    [PPa (t,false)] }
+| LEFTBRC t=coma_named_term RIGHTBRC
+  { [PPa (t,true)] }
+| LEFTMINBRC t=coma_named_term RIGHTMINBRC
+  { [PPa (t,false)] }
 
 coma_binder:
 | id=attrs(lword_nq)
