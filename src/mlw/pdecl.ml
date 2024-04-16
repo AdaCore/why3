@@ -391,8 +391,8 @@ let create_type_decl dl =
         let ty = ty_app ts [] in
         let pj_ls = create_fsymbol pj_id [ty] ty_int in
         let pj_decl = create_param_decl pj_ls in
-        (* Create the projection meta for pj_decl *)
-        let meta_proj_pj = (Theory.meta_projection, [Theory.MAls pj_ls]) in
+        (* Create the model projection meta for pj_decl *)
+        let meta_proj_pj = (Theory.meta_model_projection, [Theory.MAls pj_ls]) in
         (* create max attribute *)
         let max_id =
           let attrs = suffix_attr_name ~attrs:id.id_attrs "'maxInt" in
@@ -422,8 +422,8 @@ let create_type_decl dl =
         let ty = ty_app ts [] in
         let pj_ls = create_fsymbol pj_id [ty] ty_real in
         let pj_decl = create_param_decl pj_ls in
-        (* Create the projection meta for pj_decl *)
-        let meta_proj_pj = (Theory.meta_projection, [Theory.MAls pj_ls]) in
+        (* Create the model projection meta for pj_decl *)
+        let meta_proj_pj = (Theory.meta_model_projection, [Theory.MAls pj_ls]) in
         (* create finiteness predicate *)
         let iF_id =
           let attrs = suffix_attr_name ~attrs:id.id_attrs "'isFinite" in
