@@ -295,8 +295,8 @@ let complete_projections csl =
    counterexample projection. This allow counterexamples to appear for
    these values.
 *)
-let add_meta_cnt tsk ls =
-  add_meta tsk meta_projection [MAls ls]
+let add_meta_model_projection tsk ls =
+  add_meta tsk meta_model_projection [MAls ls]
 
 let add_projections (state,task) _ts _ty csl =
   (* declare and define the projection functions *)
@@ -320,7 +320,7 @@ let add_projections (state,task) _ts _ty csl =
       let hh = t_app ls [hd] t.t_ty in
       let ax = t_forall_close vl [] (t_equ hh t) in
       let tsk = add_prop_decl tsk Paxiom pr ax in
-      let tsk = add_meta_cnt tsk ls in
+      let tsk = add_meta_model_projection tsk ls in
       ls::pjl,pp_map,tsk
     in
     let pjl,pp_map,tsk = List.fold_left2 add ([],pp_map,tsk) tl pl in

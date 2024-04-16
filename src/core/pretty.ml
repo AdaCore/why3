@@ -1101,6 +1101,9 @@ let () = Exn_printer.register
       Format.fprintf fmt
         "meta \"vc:proved_wf\" requires that proposition %a has the form (well_founded %a)"
         print_pr pr print_ls ls
+  | IllFormedMeta(m,s) ->
+      Format.fprintf fmt
+        "Ill formed meta \"%sf\": %s" m.meta_name s
   | _ -> raise exn
   end
 

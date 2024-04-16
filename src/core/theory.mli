@@ -84,7 +84,12 @@ val list_metas  : unit -> meta list
 
 val meta_range : meta
 val meta_float : meta
-val meta_projection : meta
+val meta_model_projection : meta
+(** meta declaring a function symbol [p] of type [t1 -> t2] as a model
+    projection for type `t1`, meaning that when a counterexample value
+    is requested for a variable [x] of type [t1], then a value for [p
+    x] is queried *)
+
 val meta_record : meta
 val meta_proved_wf: meta
 (** meta used to declare than a given predicate symbol is proved well-founded *)
@@ -302,6 +307,7 @@ exception KnownMeta of meta
 exception UnknownMeta of string
 exception BadMetaArity of meta * int
 exception MetaTypeMismatch of meta * meta_arg_type * meta_arg_type
+exception IllFormedMeta of meta * string
 
 exception RangeConflict of tysymbol
 exception FloatConflict of tysymbol

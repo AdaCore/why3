@@ -129,6 +129,7 @@ exception KnownMeta of meta
 exception UnknownMeta of string
 exception BadMetaArity of meta * int
 exception MetaTypeMismatch of meta * meta_arg_type * meta_arg_type
+exception IllFormedMeta of meta * string
 
 let meta_table = Hstr.create 17
 
@@ -169,7 +170,7 @@ let meta_proved_wf =
   register_meta "vc:proved_wf" [MTlsymbol; MTprsymbol]
     ~desc:"Declares that the given predicate is proved well-founded by the given goal"
 
-let meta_projection = register_meta "model_projection" [MTlsymbol]
+let meta_model_projection = register_meta "model_projection" [MTlsymbol]
   ~desc:"Declare@ the@ projection."
 
 let meta_record = register_meta "model_record" [MTlsymbol]
@@ -448,6 +449,21 @@ let add_tdecl uc td = match td.td_node with
       known_meta uc.uc_known al;
       { uc with uc_proved_wf = Mls.add ls (pr,p) uc.uc_proved_wf;
                 uc_decls = td :: uc.uc_decls }
+  | Meta (m, ([MAls ls] as al)) when meta_equal m meta_model_projection ->
+    begin match ls.ls_args with
+      | [ty] ->
+          begin
+            match ty.ty_node with
+            | Tyvar _ ->
+                raise (IllFormedMeta(m,"the given lsymbol should not be polymorphic"))
+            | Tyapp ({ ts_def = Ty.Alias _; _},_) ->
+                raise (IllFormedMeta(m,"the type of the given lsymbol should not be an alias type"))
+            | _ -> ()
+          end
+      | _ -> raise (IllFormedMeta(m,"the given lsymbol should have exactly one argument"))
+    end;
+    known_meta uc.uc_known al;
+    { uc with uc_decls = td :: uc.uc_decls }
   | Meta (_,al) ->
       known_meta uc.uc_known al;
       { uc with uc_decls = td :: uc.uc_decls }

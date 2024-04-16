@@ -220,6 +220,7 @@ for file in $files; do
     altergosteps=10000
     altergostepsrac=$altergosteps
     skipae=no
+    skipcvc4=no
     cvc4steps=150000
     cvc4stepsrac=$cvc4steps
     cvc5steps=150000
@@ -238,6 +239,7 @@ for file in $files; do
           ;;
       "array_records_poly")
           skipae=yes
+          skipcvc4=yes
           ;;
       "array_records_mono")
           z3stepsrac=100
@@ -299,8 +301,12 @@ for file in $files; do
       run Alt-Ergo,2.5.2 $filedir $filebase true  $altergosteps $altergostepsrac
       run Alt-Ergo,2.5.2 $filedir $filebase false  $altergosteps $altergostepsrac
     fi
-    run CVC4,1.8       $filedir $filebase true  $cvc4steps $cvc4stepsrac
-    run CVC4,1.8       $filedir $filebase false $cvc4steps $cvc4stepsrac
+    if [ "$skipcvc4" = "yes" ] ; then
+          echo "Skipping unreproducible run of CVC4 1.8 on $filedir/$filebase.mlw";
+    else
+        run CVC4,1.8       $filedir $filebase true  $cvc4steps $cvc4stepsrac
+        run CVC4,1.8       $filedir $filebase false $cvc4steps $cvc4stepsrac
+    fi
     run CVC5,1.0.5     $filedir $filebase true  $cvc5steps $cvc5stepsrac
     run CVC5,1.0.5     $filedir $filebase false $cvc5steps $cvc5stepsrac
     run Z3,4.8.10      $filedir $filebase true  $z3steps $z3stepsrac

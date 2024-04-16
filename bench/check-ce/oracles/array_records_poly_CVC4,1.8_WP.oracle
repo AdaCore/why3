@@ -43,9 +43,9 @@ File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = [|_ => 3|]
+    first_value : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val : basic_record -> int = [|_ => 5|]
+    second_value : basic_record -> int = [|_ => 5|]
   Line 23:
     i : int = -1
   Line 27:
@@ -96,9 +96,9 @@ File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = [|_ => 3|]
+    first_value : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val : basic_record -> int = [|_ => 5|]
+    second_value : basic_record -> int = [|_ => 5|]
   Line 23:
     i : int = -1
   Line 27:
@@ -152,9 +152,9 @@ File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = [|_ => 3|]
+    first_value : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val : basic_record -> int = [|_ => 5|]
+    second_value : basic_record -> int = [|_ => 5|]
   Line 23:
     i : int = -1
   Line 27:
@@ -226,9 +226,9 @@ File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = [|_ => 3|]
+    first_value : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val : basic_record -> int = [|_ => 0|]
+    second_value : basic_record -> int = [|_ => 0|]
   Line 23:
     i : int = -1
   Line 27:
@@ -301,9 +301,9 @@ File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = [|_ => 3|]
+    first_value : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val : basic_record -> int = [|_ => 0|]
+    second_value : basic_record -> int = [|_ => 0|]
   Line 23:
     i : int = -1
   Line 27:
@@ -379,9 +379,9 @@ File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = [|_ => 3|]
+    first_value : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val : basic_record -> int = [|_ => 0|]
+    second_value : basic_record -> int = [|_ => 0|]
   Line 23:
     i : int = -1
   Line 27:
@@ -432,9 +432,9 @@ File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = [|_ => 3|]
+    first_value : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val :
+    second_value :
       basic_record
       ->
       int = fun bOUND_VARIABLE_10362 ->
@@ -491,9 +491,9 @@ File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => true|]
   Line 17:
-    first_val : basic_record -> int = [|_ => 3|]
+    first_value : basic_record -> int = [|_ => 3|]
   Line 18:
-    sec_val :
+    second_value :
       basic_record
       ->
       int = fun bOUND_VARIABLE_10502 ->
@@ -564,9 +564,9 @@ File array_records_poly.mlw:
   Line 16:
     flag : basic_record -> bool = [|_ => false|]
   Line 17:
-    first_val : basic_record -> int = [|_ => 1|]
+    first_value : basic_record -> int = [|_ => 1|]
   Line 18:
-    sec_val : basic_record -> int = [|_ => 2|]
+    second_value : basic_record -> int = [|_ => 2|]
   Line 23:
     i : int = -1
   Line 27:
@@ -624,7 +624,7 @@ File array.mlw:
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 17:
-    first_val :
+    first_value :
       basic_record
       ->
       int = [|epsilon x. (second_value x) = 69 /\ (first_value x) = 42 => 42;
@@ -636,7 +636,7 @@ File array_records_poly.mlw:
                  (second_value x) = 69 /\ (first_value x) = 23 = bOUND_VARIABLE_11953
                  then 23 else 3|]
   Line 18:
-    sec_val :
+    second_value :
       basic_record
       ->
       int = [|epsilon x. (second_value x) = 69 /\ (first_value x) = 42 => 69;
@@ -717,7 +717,7 @@ File array.mlw:
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 17:
-    first_val :
+    first_value :
       basic_record
       ->
       int = [|epsilon x. (second_value x) = 69 /\ (first_value x) = 42 => 42;
@@ -729,7 +729,7 @@ File array_records_poly.mlw:
                  (second_value x) = 69 /\ (first_value x) = 23 = bOUND_VARIABLE_12093
                  then 23 else 3|]
   Line 18:
-    sec_val :
+    second_value :
       basic_record
       ->
       int = [|epsilon x. (second_value x) = 69 /\ (first_value x) = 42 => 69;
@@ -814,7 +814,7 @@ File array.mlw:
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 17:
-    first_val :
+    first_value :
       basic_record
       ->
       int = [|epsilon x. (second_value x) = 69 /\ (first_value x) = 42 => 42;
@@ -826,7 +826,7 @@ File array_records_poly.mlw:
                  (second_value x) = 69 /\ (first_value x) = 23 = bOUND_VARIABLE_12283
                  then 23 else 3|]
   Line 18:
-    sec_val :
+    second_value :
       basic_record
       ->
       int = [|epsilon x. (second_value x) = 69 /\ (first_value x) = 42 => 69;
@@ -919,7 +919,7 @@ File array.mlw:
     length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 17:
-    first_val :
+    first_value :
       basic_record
       ->
       int = fun bOUND_VARIABLE_14033 ->
@@ -933,7 +933,7 @@ File array_records_poly.mlw:
                        (second_value x) = 69 /\ (first_value x) = 23 = bOUND_VARIABLE_14033
                        then 23 else 3
   Line 18:
-    sec_val :
+    second_value :
       basic_record
       ->
       int = fun bOUND_VARIABLE_14032 ->
