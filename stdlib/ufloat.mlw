@@ -274,7 +274,7 @@ module HelperLemmas
   =
     assert { a *. x' +. b  = x *. ((a *. x' +. b) /. x) };
     assert {
-      log (x *. (1. -. (a *. x' +. b) /. x)) 
+      log (x *. (1. -. (a *. x' +. b) /. x))
       <=. log x_approx
       <=. log (x *. (1. +. (a *. x' +. b) /.x))
       by
@@ -310,7 +310,7 @@ module HelperLemmas
   =
     assert { a *. x' +. b  = x *. ((a *. x' +. b) /. x) };
     assert {
-      log10 (x *. (1. -. (a *. x' +. b) /. x)) 
+      log10 (x *. (1. -. (a *. x' +. b) /. x))
       <=. log10 x_approx
       <=. log10 (x *. (1. +. (a *. x' +. b) /.x))
       by
@@ -554,7 +554,7 @@ module USingleLemmas
     };
     assert {
       to_real (exp_approx x_uf) >=.
-       exp(exact_x) -. 
+       exp(exact_x) -.
         exp(exact_x)*.(exp_rel_err +. ((exp(x_rel_err *. x' +. x_cst_err) -. 1.) *. (1. +. exp_rel_err))) -. exp_cst_err
       by
         to_real (exp_approx x_uf) >=. exp(to_real x_uf) *. (1. -. exp_rel_err) -. exp_cst_err
@@ -566,9 +566,6 @@ module USingleLemmas
         (exp exact_x -.
           (exp exact_x *. (exp ((x_rel_err *. x') +. x_cst_err) -. 1.)))
         *. (1. -. exp_rel_err) -. exp_cst_err
-       so
-          -.(exp(x_rel_err *. x' +. x_cst_err) -. 1.)*. (1. -. exp_rel_err)
-          <=. (exp(x_rel_err *. x' +. x_cst_err) -. 1.)*. (1. +. exp_rel_err)
     };
 
   use real.Trigonometry
@@ -648,7 +645,7 @@ module USingleLemmas
     sum_rel_err *. sum f'' 0 n <=.
     sum_rel_err *. (sum f' 0 n +. ((f_rel_err *. sum f' 0 n) +. (f_cst_err *. from_int n)))
   }
-  
+
   predicate is_positive_power_of_2 (x:usingle) =
     x = u1 \/ x = u2 || x = u4 || x = u8 || x = u16 || x = u32 || x = u64
     || x = u128 \/ x = u256 || x = u4096 || x = u8192 || x = u16384 || x = u32768
@@ -903,9 +900,6 @@ module UDoubleLemmas
         (exp exact_x -.
           (exp exact_x *. (exp ((x_rel_err *. x') +. x_cst_err) -. 1.0)))
         *. (1. -. exp_rel_err) -. exp_cst_err
-       so
-          -.(exp(x_rel_err *. x' +. x_cst_err) -. 1.)*. (1. -. exp_rel_err)
-          <=. (exp(x_rel_err *. x' +. x_cst_err) -. 1.)*. (1. +. exp_rel_err)
     };
 
   use real.Trigonometry
