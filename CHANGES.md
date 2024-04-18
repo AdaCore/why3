@@ -11,6 +11,15 @@ Plugins
     propagate rounding errors in formulas involving unbounded
     floats. See examples in `examples/numeric`
 
+Version 1.7.2, April 18, 2024
+-----------------------------
+
+Bug fixes
+  * restored the legacy shortcut for Alt-Ergo 2.5
+  * fixed various bugs in the lexer of `why3 doc`
+  * made prover detection more reliable when paths need escaping
+
+
 Version 1.7.1, January 20, 2024
 -------------------------------
 
