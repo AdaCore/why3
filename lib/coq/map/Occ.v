@@ -48,10 +48,10 @@ simpl.
 assert (exists n, Pos.to_nat p = S n) as [n ->].
   exists (Z.to_nat (Z.pred (Zpos p))).
   rewrite Z2Nat.inj_pred.
-  apply (S_pred _ O).
+  apply eq_sym, (Nat.lt_succ_pred O).
   apply Pos2Nat.is_pos.
 simpl.
-now rewrite <- minus_n_O, Nat2Z.id.
+now rewrite Nat.sub_0_r, Nat2Z.id.
 Qed.
 
 Require Import Zwf.
@@ -261,14 +261,14 @@ Lemma occ_exists {a:Type} {a_WT:WhyType a} :
 Proof.
 intros v m l u h1.
 assert (h: (u < l \/ 0 <= u - l)%Z) by lia. destruct h.
-rewrite occ_empty in h1. elimtype False; lia. lia.
+rewrite occ_empty in h1. exfalso; lia. lia.
 generalize h1.
 replace u with (l + (u - l))%Z. 2:ring.
 generalize H.
 pattern (u - l)%Z; apply Z_lt_induction. 2: lia.
 clear H; intros.
 assert (h: (x = 0 \/ x <> 0)%Z) by lia. destruct h.
-rewrite occ_empty in h0. elimtype False; lia. lia.
+rewrite occ_empty in h0. exfalso; lia. lia.
 destruct (why_decidable_eq (m (l + (x-1))%Z) v).
 exists (l+(x-1))%Z. split. lia. now trivial.
 destruct (H (x-1))%Z as (i,(hi1,hi2)). lia. lia.

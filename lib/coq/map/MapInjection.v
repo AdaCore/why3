@@ -43,7 +43,7 @@ Proof.
 induction n.
 (* case n = 0 *)
 unfold surjection; intros.
-elimtype False; lia.
+exfalso; lia.
 (* case n > 0 *)
 intros f Hinto Hinj.
 pose (k := f n).
@@ -62,14 +62,14 @@ assert (Ginto: into n g).
   (* f i = n *)
   assert (h : k < n \/ k = n) by lia.
   destruct h; auto.
-  elimtype False.
+  exfalso.
   clear g trans; subst.
   assert (f i = i) by (apply Hinj; auto with * ).
   lia.
   (* f i <> n *)
   destruct (eq_nat_dec (f i) k).
   (* f i = k *)
-  elimtype False.
+  exfalso.
   assert (i = n) by (apply Hinj; auto with * ).
   lia.
   (* f i <> k *)
@@ -250,7 +250,7 @@ intros.
 assert (h: (i0 = j \/ i0 <> j)%Z) by lia.
 destruct h; auto.
 red in h1.
-elimtype False; apply h1 with i0 j; clear h1; auto.
+exfalso; apply h1 with i0 j; clear h1; auto.
 Qed.
 
 Import Occ.
