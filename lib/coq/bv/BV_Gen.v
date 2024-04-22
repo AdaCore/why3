@@ -204,7 +204,7 @@ simpl; auto.
 simpl.
 intros.
 case Z.eq_dec.
-intros; elimtype False; destruct H.
+intros; exfalso; destruct H.
 lia.
 subst n0.
 auto with zarith.
@@ -726,7 +726,7 @@ Lemma bvec_to_nat_range : forall {n} v, bvec_to_nat n v < Z.to_nat (Pow2int.pow2
   rewrite Nat2Z.inj_succ, <- Z.add_1_r, Pow2int.Power_s by lia.
   rewrite Z2Nat.inj_mul.
   assert (Z.to_nat 2 = 2) by easy; rewrite H.
-  rewrite mult_comm.
+  rewrite Nat.mul_comm.
   apply lem_time2.
   easy.
   easy.

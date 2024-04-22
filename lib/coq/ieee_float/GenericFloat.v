@@ -2249,9 +2249,7 @@ Proof.
     now rewrite is_finite_build_nan in h1.
   split; [easy|].
   assert (0 <= to_real x).
-  { destruct x ; try destruct s; try easy.
-    apply Rle_refl.
-    apply Rle_refl.
+  { destruct x ; try destruct s; try easy; try apply Rle_refl.
     now apply F2R_ge_0. }
   split; [easy| apply sqrt_finite; auto].
 Qed.

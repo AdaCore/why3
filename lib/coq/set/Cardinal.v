@@ -808,7 +808,7 @@ specialize (a0 i). specialize (a1 i0).
 destruct a0, a1.
 assert (List.length x <= List.length x0).
 {
-  eapply le_trans with (List.length (List.map f x0)).
+  eapply Nat.le_trans with (List.length (List.map f x0)).
   - assert (List.incl x (List.map f x0)).
     { intro. intros. eapply H1 in H4. rewrite set.Set.map'def in H4.
       destruct H4. destruct H4. subst.
