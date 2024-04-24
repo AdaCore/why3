@@ -347,7 +347,7 @@ module USingleLemmas
   use real.Abs
   use USingle
 
-  let lemma uadd_single_error_propagation (x_uf y_uf : usingle) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
+  let lemma uadd_single_error_propagation (x_uf y_uf r: usingle) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
     requires {
       abs (to_real x_uf -. x) <=. x_rel_err *. x' +. x_cst_err
     }
@@ -361,8 +361,9 @@ module USingleLemmas
     requires { 0. <=. y_rel_err }
     requires { 0. <=. x_cst_err }
     requires { 0. <=. y_cst_err }
+    requires { r = (x_uf ++. y_uf) }
     ensures {
-      abs (to_real (x_uf ++. y_uf) -. (x +. y)) <=.
+      abs (to_real r -. (x +. y)) <=.
       (x_rel_err +. y_rel_err +. eps) *. (x' +. y')
           +. ((1. +. eps +. y_rel_err) *. x_cst_err +. (1. +. eps +. x_rel_err) *. y_cst_err)
     }
@@ -408,7 +409,7 @@ module USingleLemmas
         y' *. y_rel_err <=. (x' +. x_cst_err) /. eps *. y_rel_err))
   }
 
-  let lemma usub_single_error_propagation (x_uf y_uf : usingle) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
+  let lemma usub_single_error_propagation (x_uf y_uf r : usingle) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
     requires {
       abs (to_real x_uf -. x) <=. x_rel_err *. x' +. x_cst_err
     }
@@ -421,16 +422,17 @@ module USingleLemmas
     requires { 0. <=. y_cst_err }
     requires { 0. <=. x_rel_err }
     requires { 0. <=. y_rel_err }
+    requires { r = x_uf --. y_uf }
     ensures {
-      abs (to_real (x_uf --. y_uf) -. (x -. y))
+      abs (to_real r -. (x -. y))
       <=. (x_rel_err +. y_rel_err +. eps) *. (x' +. y')
           +. ((1. +. eps +. y_rel_err) *. x_cst_err +. (1. +. eps +. x_rel_err) *. y_cst_err)
     }
-  = uadd_single_error_propagation x_uf (--. y_uf) x x' x_rel_err x_cst_err (-. y) y' y_rel_err y_cst_err
+  = uadd_single_error_propagation x_uf (--. y_uf) r x x' x_rel_err x_cst_err (-. y) y' y_rel_err y_cst_err
 
   use HelperLemmas
 
-  let lemma umul_single_error_propagation (x_uf y_uf : usingle) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
+  let lemma umul_single_error_propagation (x_uf y_uf r : usingle) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
     requires {
       abs (to_real x_uf -. x) <=. x_rel_err *. x' +. x_cst_err
     }
@@ -443,8 +445,9 @@ module USingleLemmas
     requires { 0. <=. y_rel_err }
     requires { 0. <=. x_cst_err }
     requires { 0. <=. y_cst_err }
+    requires { r = x_uf **. y_uf }
     ensures {
-      abs (to_real (x_uf **. y_uf) -. (x *. y)) <=.
+      abs (to_real r -. (x *. y)) <=.
         (eps +. (x_rel_err +. y_rel_err +. x_rel_err *. y_rel_err) *. (1. +. eps)) *. (x' *. y')
         +. (((y_cst_err +. y_cst_err *. x_rel_err) *. x'
         +. (x_cst_err +. x_cst_err *. y_rel_err) *. y'
@@ -681,7 +684,7 @@ module UDoubleLemmas
   use real.Abs
   use UDouble
 
-  let lemma uadd_double_error_propagation (x_uf y_uf : udouble) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
+  let lemma uadd_double_error_propagation (x_uf y_uf r : udouble) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
     requires {
       abs (to_real x_uf -. x) <=. x_rel_err *. x' +. x_cst_err
     }
@@ -695,8 +698,9 @@ module UDoubleLemmas
     requires { 0. <=. y_rel_err }
     requires { 0. <=. x_cst_err }
     requires { 0. <=. y_cst_err }
+    requires { r = x_uf ++. y_uf }
     ensures {
-      abs (to_real (x_uf ++. y_uf) -. (x +. y)) <=.
+      abs (to_real r -. (x +. y)) <=.
       (x_rel_err +. y_rel_err +. eps) *. (x' +. y')
           +. ((1. +. eps +. y_rel_err) *. x_cst_err +. (1. +. eps +. x_rel_err) *. y_cst_err)
     }
@@ -742,7 +746,7 @@ module UDoubleLemmas
         y' *. y_rel_err <=. (x' +. x_cst_err) /. eps *. y_rel_err))
   }
 
-  let lemma usub_double_error_propagation (x_uf y_uf : udouble) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
+  let lemma usub_double_error_propagation (x_uf y_uf r : udouble) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
     requires {
       abs (to_real x_uf -. x) <=. x_rel_err *. x' +. x_cst_err
     }
@@ -755,16 +759,17 @@ module UDoubleLemmas
     requires { 0. <=. y_cst_err }
     requires { 0. <=. x_rel_err }
     requires { 0. <=. y_rel_err }
+    requires { r = x_uf --. y_uf }
     ensures {
-      abs (to_real (x_uf --. y_uf) -. (x -. y))
+      abs (to_real r -. (x -. y))
       <=. (x_rel_err +. y_rel_err +. eps) *. (x' +. y')
           +. ((1. +. eps +. y_rel_err) *. x_cst_err +. (1. +. eps +. x_rel_err) *. y_cst_err)
     }
-  = uadd_double_error_propagation x_uf (--. y_uf) x x' x_rel_err x_cst_err (-. y) y' y_rel_err y_cst_err
+  = uadd_double_error_propagation x_uf (--. y_uf) r x x' x_rel_err x_cst_err (-. y) y' y_rel_err y_cst_err
 
   use HelperLemmas
 
-  let lemma umul_double_error_propagation (x_uf y_uf : udouble) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
+  let lemma umul_double_error_propagation (x_uf y_uf r : udouble) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
     requires {
       abs (to_real x_uf -. x) <=. x_rel_err *. x' +. x_cst_err
     }
@@ -777,8 +782,9 @@ module UDoubleLemmas
     requires { 0. <=. y_rel_err }
     requires { 0. <=. x_cst_err }
     requires { 0. <=. y_cst_err }
+    requires { r = x_uf **. y_uf }
     ensures {
-      abs (to_real (x_uf **. y_uf) -. (x *. y)) <=.
+      abs (to_real r -. (x *. y)) <=.
         (eps +. (x_rel_err +. y_rel_err +. x_rel_err *. y_rel_err) *. (1. +. eps)) *. (x' *. y')
         +. (((y_cst_err +. y_cst_err *. x_rel_err) *. x'
         +. (x_cst_err +. x_cst_err *. y_rel_err) *. y'
