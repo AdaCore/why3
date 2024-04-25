@@ -449,10 +449,15 @@ module FromSexpToModel = struct
       let model, rest =
         match sexps with
         | List (Atom "model" :: model) :: rest -> (model, rest)
+        | List [] :: rest -> ([], rest)
         | List model :: rest when List.exists (Sexp.exists is_model_decl) model
           ->
-            (model, rest)
-        | _ -> failwith "Cannot read S-expression as model: model not first"
+           (model, rest)
+        | [] ->
+           failwith "Cannot read S-expression as model: empty list"
+        | se :: _ ->
+           Format.eprintf "se = %a@." pp_sexp se;
+           failwith "Cannot read the S-expression above as model."
       in
       if List.exists (Sexp.exists is_model_decl) rest then
         failwith
@@ -463,6 +468,7 @@ module FromSexpToModel = struct
   let get_fun_defs model =
     let fun_defs = List.filter_map fun_def model in
     Mstr.of_list fun_defs
+
 end
 
 (*
@@ -1119,7 +1125,7 @@ module FromModelToTerm = struct
     (* Recursively consume let bindings *)
     match bindings with
     | [] -> term_to_term env t
-    | (sym,tt)::bindings -> 
+    | (sym,tt)::bindings ->
       let body, body_concrete = term_to_term env tt in
       match sym with | S str | Sprover str ->
       let vs = create_vsymbol (Ident.id_fresh str) (Option.get body.t_ty)
@@ -1133,7 +1139,7 @@ module FromModelToTerm = struct
   and forall_to_term env bindings t =
     match bindings with
     | [] -> term_to_term env t
-    | (sym,sort)::bindings -> 
+    | (sym,sort)::bindings ->
       match sym with | S str | Sprover str ->
       let vs = create_vsymbol (Ident.id_fresh str) (smt_sort_to_ty env sort)
       in
