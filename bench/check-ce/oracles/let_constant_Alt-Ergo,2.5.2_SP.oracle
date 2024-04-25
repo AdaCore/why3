@@ -1,1 +1,30 @@
-anomaly: Failure("Cannot read S-expression as model: model not first")
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/let_constant.mlw", line 9, characters 13-24)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/let_constant.mlw", line 9, characters 13-24)
+File "bench/check-ce/let_constant.mlw", line 9, characters 13-24:
+Sub-goal Assertion of goal dummy'vc.
+Prover result is: Unknown (unknown) (3 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+Unknown location:
+    _ = ()
+File let_constant.mlw:
+  Line 5:
+    _ = ()
+    Execution of main function `dummy` with env:
+      _ = ()
+      zero = 0
+      one = 1
+  Line 9:
+    Property failure at assertion with:
+      a = 25
+      b = 65
+
