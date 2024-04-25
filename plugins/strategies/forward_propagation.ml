@@ -73,13 +73,13 @@ let ( !! ) s = Option.get !s
 (* This type corresponds to the numeric info we have on a real/float term *)
 type term_info = {
   (*
-   * Forward error associated to a real term "exact_t"
+   * Forward error associated to a float term "t"
    * "Some (exact_t, rel_err, t', cst_err)" stands for
    * "|t - exact_t| <= rel_err * t' + cst_err", where |exact_t| <= t'
    *)
   error : (term * term * term * term) option;
   (*
-   * "Some (op, [x; y])" means that the term is the result of the FP operation
+   * "Some (op, [x; y])" means that the term "t" is the result of the FP operation
    * "op" on "x" and "y"
    *)
   ieee_op : (lsymbol * term list) option;
@@ -870,6 +870,7 @@ let parse_error is_match exact t =
           if is_zero factor then
             (abs_err, false)
           else
+            (* FIXME: we should combine the factor of t1 and factor of t2 *)
             ((a, factor, a', cst ++. t1), false)
         else
           ((a, factor, a', cst ++. t2), false)
@@ -1031,7 +1032,11 @@ let rec collect info f =
   | Tbinop (Tand, f1, f2) ->
     let info = collect info f1 in
     collect info f2
-  | Tapp (ls, [ _; _ ]) when is_ineq_ls ls -> (
+  | Tapp (ls, [ _; _ ]) when is_ineq_ls ls ->
+      (* term of the form x op y where op is an inequality "<" or "<=" over reals
+         FIXME: we should handle ">" and ">=" as well
+      *)
+      (
     match parse_ineq f with
     | Some (x, exact_x, c) ->
       let error_fmla = parse_error exact_x c in
@@ -1187,8 +1192,7 @@ let numeric env task =
         ident_printer = printer.Trans.printer;
         tv_printer = printer.Trans.aprinter;
       };
-  let goal = task_goal_fmla task in
-  let floats = get_floats goal in
+  (* We start by collecting infos from the hypotheses of the task *)
   let info =
     List.fold_left collect_info
       { terms_info = Mterm.empty; fns_info = Mls.empty; ls_defs = Mls.empty }
@@ -1200,6 +1204,8 @@ let numeric env task =
      error propagation is performed using propagation lemmas of the ufloat
      stdlib with the data contained in `info`. For each new formula created, a
      proof tree is generated with the necessary steps to prove it. *)
+  let goal = task_goal_fmla task in
+  let floats = get_floats goal in
   let f, strats =
     List.fold_left
       (fun (f, l) t ->

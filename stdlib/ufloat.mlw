@@ -894,7 +894,7 @@ module UDoubleLemmas
     };
     assert {
       to_real (exp_approx x_uf) >=.
-       exp(exact_x) -. 
+       exp(exact_x) -.
         exp(exact_x)*.(exp_rel_err +. ((exp(x_rel_err *. x' +. x_cst_err) -. 1.) *. (1. +. exp_rel_err))) -. exp_cst_err
       by
         to_real (exp_approx x_uf) >=. exp(to_real x_uf) *. (1. -. exp_rel_err) -. exp_cst_err
