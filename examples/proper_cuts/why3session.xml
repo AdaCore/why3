@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Eprover" version="2.0" timelimit="30" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="proper_cuts.mlw"/>
+<theory name="ProperCut" proved="true">
+ <goal name="map&#39;vc" expl="VC for map" proved="true">
+ <proof prover="1"><result status="valid" time="0.359301" steps="22501"/></proof>
+ </goal>
+ <goal name="Ge" proved="true">
+ <proof prover="1"><result status="valid" time="0.202015" steps="15650"/></proof>
+ </goal>
+ <goal name="G3" proved="true">
+ <proof prover="1"><result status="valid" time="0.324294" steps="29107"/></proof>
+ </goal>
+ <goal name="cons&#39;vc" expl="VC for cons" proved="true">
+ <proof prover="2"><result status="valid" time="0.216445" steps="291233"/></proof>
+ </goal>
+ <goal name="proper_cuts&#39;vc" expl="VC for proper_cuts" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="proper_cuts&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.038265" steps="9973"/></proof>
+  </goal>
+  <goal name="proper_cuts&#39;vc.1" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="proper_cuts&#39;vc.1.0" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.224602" steps="17485"/></proof>
+   </goal>
+   <goal name="proper_cuts&#39;vc.1.1" expl="postcondition" proved="true">
+   <transf name="unfold" proved="true" arg1="proper_cuts">
+    <goal name="proper_cuts&#39;vc.1.1.0" expl="VC for proper_cuts" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="proper_cuts&#39;vc.1.1.0.0" expl="VC for proper_cuts" proved="true">
+     <proof prover="2"><result status="valid" time="0.059026" steps="70301"/></proof>
+     </goal>
+     <goal name="proper_cuts&#39;vc.1.1.0.1" expl="VC for proper_cuts" proved="true">
+     <proof prover="1"><result status="valid" time="0.253669" steps="23366"/></proof>
+     </goal>
+     <goal name="proper_cuts&#39;vc.1.1.0.2" expl="VC for proper_cuts" proved="true">
+     <proof prover="0"><result status="valid" time="1.312744"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
