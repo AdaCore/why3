@@ -1,0 +1,86 @@
+
+(** {1 Proper Cuts}
+
+    This is a small functional programming exercise.
+    Given a list `l`, build the list of all cuts of `l`,
+    a cut being a pair of lists `(l1, l2)` such that `l`
+    is the concatenation of `l1` and `l2`.
+
+    Author: Mário Pereira (NOVA LINCS)
+    with slight modifications by Jean-Christophe Filliâtre (CNRS)
+*)
+
+module ProperCut
+
+  use list.List, list.Append
+  use list.Mem, list.Distinct
+
+  predicate injective (f: 'a -> 'b) =
+    forall x x'. x <> x' -> f x <> f x'
+
+  (** A `map` function in the style of OCaml `List.map`. Other than just
+      specifying that `map f l` is the point-wise projection of the elements in
+      `l`, we also state that an injective function `f` preserves the
+      property of no repeated elements in the result list `r`. *)
+
+  let rec function map (f: 'a -> 'b) (l: list 'a) : (r: list 'b)
+    ensures  { forall y. mem y r <-> (exists x. mem x l && y = f x) }
+    ensures  { distinct l -> injective f -> distinct r }
+    variant  { l }
+  = match l with
+    | Nil      -> Nil
+    | Cons x s -> Cons (f x) (map f s)
+    end
+
+  predicate cut (l1 l2: list 'a) (l: list 'a) =
+    l1 ++ l2 = l
+
+  type cut_list 'a = list (list 'a, list 'a)
+
+  (** The list of all cuts for a list `l` must respect two conditions:
+        1. there are no duplicate elements in the list;
+        2. a pair `(l1, l2)` belongs to the cut list if is a valid cut
+           of `l` (soundness);
+        3. if a pair `(l1, l2)` is a cut of `l`, then it belongs to the list `l`
+           (completness). *)
+  predicate proper_cuts (c: cut_list 'a) (l: list 'a) =
+    distinct c && (forall l1 l2. mem (l1, l2) c <-> cut l1 l2 l)
+
+  scope Harness
+
+    constant le : list int = Nil
+    constant ce : cut_list int = (Cons (Nil, Nil) Nil)
+    goal Ge : proper_cuts ce le
+
+    constant l3 : list int = Cons 3 Nil
+    constant c3 : list (list int, list int) =
+      Cons (Nil, Cons 3 Nil) (Cons (Cons 3 Nil, Nil) Nil)
+    goal G3 : proper_cuts c3 l3
+
+  end
+
+  (** A specialized function `cons` to be used as the argument of `map`. For any
+      pair `(l1, l2)` it returns `(x::l1, l2)`.  *)
+  let function cons (x: 'a) : (f: (list 'a, list 'a) -> (list 'a, list 'a))
+    ensures { injective f }
+    ensures { forall l l1 l2. mem (l1, l2) (map f l) <->
+              exists s1. l1 = Cons x s1 && mem (s1, l2) l }
+  = fun l -> let (l1,l2) = l in (Cons x l1, l2)
+
+  (** The main function `proper_cuts` *)
+  let rec proper_cuts (l: list 'a) : (r: cut_list 'a)
+    variant { l }
+    ensures { proper_cuts r l }
+  = match l with
+    | Nil ->
+        Cons (Nil, Nil) Nil
+    | Cons x r ->
+        (* First, compute the cuts of the tail list `r` *)
+        let pr = proper_cuts r in
+        (* Then, inject `x` in `pr` using `map` and `cons` defined before *)
+        let r  = map (cons x) pr in
+        (* Finally, add the `(Nil, r)` as the remaining cut of `l` *)
+        Cons (Nil, l) r
+    end
+
+end
