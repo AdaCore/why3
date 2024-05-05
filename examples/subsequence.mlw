@@ -30,7 +30,7 @@ val eq (x y: char) : bool ensures { result <-> x = y }
 
 let is_subsequence (v u: word) : bool
   ensures { result <-> exists f. subsequence v u f }
-= let rec aux i j (ghost f)
+= let rec aux (i j: int) (ghost f: int -> int) : bool
     requires { 0 <= i <= length v }
     requires { 0 <= j <= length u }
     requires { subsequence v[0..i] u[0..j] f }

@@ -1,0 +1,97 @@
+
+(** {1 Longest Increasing Subsequence}
+
+  A subsequence is a sequence that can be derived from another
+  sequence by deleting some or no elements without changing the order
+  of the remaining elements.  The longest increasing subsequence
+  problem aims to find a subsequence of a given sequence in which the
+  subsequence's elements are sorted in an ascending order and in which
+  the subsequence is as long as possible. (Wikipedia)
+
+  In the following, we verify a simple backtracking algorithm to find
+  out the length of a longest increasing subsequence, inspired by Jeff
+  Erickson's Algorithms, section 2.7.
+  See {h <a href="https://jeffe.cs.illinois.edu/teaching/algorithms/">here</a>}.
+
+  Note: There are more efficient algorithms to solve this problem.
+  See {h <a href="https://en.wikipedia.org/wiki/Longest_increasing_subsequence">Wikipedia</a>}.
+
+  Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+module Spec
+
+  use int.Int
+  use seq.Seq
+
+  type elt
+
+  val predicate lt elt elt
+
+  clone relations.TotalStrictOrder with
+    type t = elt, predicate rel = lt, axiom .
+
+  type word = seq elt
+
+  (** [s] describes an increasing subsequence of [w] *)
+  predicate iss (s: seq int) (w: word) =
+    (* s maps 0..|s| to w's characters *)
+    (forall i. 0 <= i < length s -> 0 <= s[i] < length w) &&
+    (* in a strictly increasing way *)
+    (forall i j. 0 <= i < j < length s -> s[i] < s[j] && lt w[s[i]] w[s[j]])
+
+  (** [s] is a longest increasing subsequence of [w] *)
+  predicate liss (s: seq int) (w: word) =
+    iss s w &&
+    forall s'. iss s' w -> length s' <= length s
+
+end
+
+module Backtracking
+
+  use int.Int
+  use seq.Seq
+  use seq.FreeMonoid
+  use Spec
+
+  let liss (w: word) : (len: int, ghost s: seq int)
+    ensures { len = length s }
+    ensures { liss s w }
+  = let rec liss_from (i: int) : (len: int, ghost s: seq int)
+      requires { 0 <= i < length w }
+      variant  { length w - i }
+      ensures  { len = length s > 0 }
+      ensures  { s[0] = i }
+      ensures  { iss s w }
+      ensures  { forall s'. iss s' w -> length s' >= 1 ->
+                   s'[0] = i -> length s' <= length s }
+    = let ref len = 1 in
+      let ghost ref s = singleton i in
+      for j = i + 1 to length w - 1 do
+        invariant { len = length s > 0 }
+        invariant { s[0] = i }
+        invariant { iss s w }
+        invariant { forall s' k. iss s' w -> length s' >= 2 ->
+                      s'[0] = i < s'[1] = k < j -> length s' <= length s }
+        if lt w[i] w[j] then
+          let lenj, sj = liss_from j in
+          if 1 + lenj > len then
+            len, s <- 1 + lenj, cons i sj
+      done;
+      (len, s)
+    in
+    let ref len = 0 in
+    let ghost ref s = empty in
+    for i = 0 to length w - 1 do
+      invariant { len = length s }
+      invariant { iss s w }
+      invariant { forall s' j. iss s' w -> length s' >= 1 ->
+                   s'[0] = j < i -> length s' <= length s }
+     let leni, si = liss_from i in
+      if leni > len then
+        len, s <- leni, si
+    done;
+    (len, s)
+
+end
+
