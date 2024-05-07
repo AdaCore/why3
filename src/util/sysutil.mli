@@ -116,3 +116,9 @@ val resolve_from_paths : string list -> string -> string
    name as argument.
 
  *)
+
+val deep_mkdir: string -> unit
+(** Ensure the existence of directories all along the given `path`. If a
+    directory does not exist, it is created with permission 755.
+    @raise Sys_error if a part of the path exists but is not a directory
+ *)
