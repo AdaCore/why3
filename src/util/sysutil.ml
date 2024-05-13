@@ -154,7 +154,7 @@ let system_independent_path_of_file f =
       b::acc
     else if f=d then
       (* we are at the root *)
-      acc
+      (d::acc)
     else
       let b = Filename.basename f in
       aux (b::acc) d
