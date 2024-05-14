@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.5.2" alternative="FPA" timelimit="5" steplimit="0" memlimit="2000"/>
+<file format="whyml">
+<path name=".."/><path name="add_sqrt.mlw"/>
+<theory name="AdditionSqrtSingle">
+ <goal name="usqrt&#39;vc" expl="VC for usqrt">
+ </goal>
+ <goal name="add_sqrt&#39;vc" expl="VC for add_sqrt" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="add_sqrt&#39;vc.0" expl="postcondition" proved="true">
+  <transf name="assert" proved="true" arg1="abs (to_real result -. (to_real a +. sqrt (to_real b)))
+&lt;=. ((((0.0 +. eps) +. eps) *. (abs (to_real a) +. abs (sqrt (to_real b))))
+     +. ((((1.0 +. eps) +. eps) *. 0.0) +. (((1.0 +. eps) +. 0.0) *. 0.0)))">
+   <goal name="add_sqrt&#39;vc.0.0" expl="asserted formula" proved="true">
+   <transf name="apply" proved="true" arg1="uadd_single_error_propagation" arg2="with" arg3="a,usqrt b">
+    <goal name="add_sqrt&#39;vc.0.0.0" expl="apply premises" proved="true">
+    <proof prover="0"><result status="valid" time="0.042198" steps="101"/></proof>
+    </goal>
+    <goal name="add_sqrt&#39;vc.0.0.1" expl="apply premises" proved="true">
+    <proof prover="0"><result status="valid" time="0.054765" steps="120"/></proof>
+    </goal>
+    <goal name="add_sqrt&#39;vc.0.0.2" expl="apply premises" proved="true">
+    <proof prover="0"><result status="valid" time="0.046111" steps="103"/></proof>
+    </goal>
+    <goal name="add_sqrt&#39;vc.0.0.3" expl="apply premises" proved="true">
+    <proof prover="0"><result status="valid" time="0.043436" steps="104"/></proof>
+    </goal>
+    <goal name="add_sqrt&#39;vc.0.0.4" expl="apply premises" proved="true">
+    <proof prover="0"><result status="valid" time="0.039912" steps="95"/></proof>
+    </goal>
+    <goal name="add_sqrt&#39;vc.0.0.5" expl="apply premises" proved="true">
+    <proof prover="0"><result status="valid" time="0.044066" steps="95"/></proof>
+    </goal>
+    <goal name="add_sqrt&#39;vc.0.0.6" expl="apply premises" proved="true">
+    <proof prover="0"><result status="valid" time="0.048716" steps="95"/></proof>
+    </goal>
+    <goal name="add_sqrt&#39;vc.0.0.7" expl="apply premises" proved="true">
+    <proof prover="0"><result status="valid" time="0.043243" steps="95"/></proof>
+    </goal>
+    <goal name="add_sqrt&#39;vc.0.0.8" expl="apply premises" proved="true">
+    <proof prover="0"><result status="valid" time="0.037120" steps="95"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="add_sqrt&#39;vc.0.1" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.044798" steps="166"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
