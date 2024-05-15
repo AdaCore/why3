@@ -1,0 +1,43 @@
+
+module Threshold
+
+use int.Int
+use int.EuclideanDivision
+use mach.int.Int16
+
+
+end
+
+
+
+module BCD
+
+use int.Int
+use int.EuclideanDivision
+use mach.int.UInt16
+
+function bcd_log (src : int) : int =
+  let dig1 = div src 1000 in
+  let r1 = mod src 1000 in
+  let dig2 = div r1 100 in
+  let r2 = mod r1 100 in
+  let dig3 = div r2 10 in
+  let dig4 = mod r2 10 in
+  dig1*4096 + dig2*256 + dig3*16 + dig4
+
+
+let bcd_compute (src : uint16) : uint16
+  requires {  0 <= src <= 9999 }
+  ensures { uint16'int result = bcd_log (uint16'int src) }
+=
+  let dig1 = src / 1000 in
+  let r1 = src % 1000 in
+  let dig2 = r1 / 100 in
+  let r2 = r1 % 100 in
+  let dig3 = r2 / 10 in
+  let dig4 = r2 % 10 in
+  dig1*4096 + dig2*256 + dig3*16 + dig4
+
+
+
+end

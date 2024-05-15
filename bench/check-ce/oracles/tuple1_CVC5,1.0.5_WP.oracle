@@ -1,19 +1,19 @@
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call at "WHY3DATA/stdlib/mach/int.mlw", line 432, character 22 to line 433, character 45)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "WHY3DATA/stdlib/mach/int.mlw", line 432, character 22 to line 433, character 45)
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call at "WHY3DATA/stdlib/mach/int.mlw", line 475, character 22 to line 476, character 45)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "WHY3DATA/stdlib/mach/int.mlw", line 475, character 22 to line 476, character 45)
 - Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call at "WHY3DATA/stdlib/mach/int.mlw", line 432, character 22 to line 433, character 45)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "WHY3DATA/stdlib/mach/int.mlw", line 432, character 22 to line 433, character 45)
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call at "WHY3DATA/stdlib/mach/int.mlw", line 475, character 22 to line 476, character 45)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "WHY3DATA/stdlib/mach/int.mlw", line 475, character 22 to line 476, character 45)
 File "bench/check-ce/tuple1.mlw", line 7, characters 14-19:
 Sub-goal Integer overflow of goal swap'vc.
 Prover result is: Unknown (unknown + incomplete) (1604 steps).
 The following counterexample model could not be verified
-  (both RAC terminated because missing value for return value of call at "WHY3DATA/stdlib/mach/int.mlw", line 432, character 22 to line 433, character 45):
+  (both RAC terminated because missing value for return value of call at "WHY3DATA/stdlib/mach/int.mlw", line 475, character 22 to line 476, character 45):
 File int.mlw:
   Line 54:
     in_bounds : int -> bool = fun $x17 -> not $x17 = -4611686018427387905
-  Line 416:
+  Line 459:
     int63'int :
       int63
       ->
@@ -24,9 +24,9 @@ File int.mlw:
                   then -4611686018427387904
                   else if {mach.int.Int63.int63'int => -2305843009213693953} = $x16
                        then -2305843009213693953 else -2305843009213693952
-  Line 432:
+  Line 475:
     max_int : int63 = {mach.int.Int63.int63'int => 4611686018427387903}
-  Line 434:
+  Line 477:
     min_int : int63 = {mach.int.Int63.int63'int => -4611686018427387904}
 File tuple1.mlw:
   Line 6:

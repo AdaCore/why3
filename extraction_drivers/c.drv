@@ -15,6 +15,29 @@ module mach.int.Bounded_int
   syntax val of_int "%1"         prec 0
 end
 
+module mach.int.Int16
+
+  prelude export "#include <stdint.h>"
+  interface export "#include <stdint.h>"
+  syntax type int16  "int16_t"
+  syntax literal int16 "%c"
+
+  syntax val (+)     "%1 + %2"   prec 4 4 3
+  syntax val (-)     "%1 - %2"   prec 4 4 3
+  syntax val (-_)    "-%1"       prec 2 1
+  syntax val ( * )   "%1 * %2"   prec 3 3 2
+  syntax val (/)     "%1 / %2"   prec 3 3 2
+  syntax val (%)     "%1 % %2"   prec 3 3 2
+  syntax val (=)     "%1 == %2"  prec 7 7 6
+  syntax val (<=)    "%1 <= %2"  prec 6 6 5
+  syntax val (<)     "%1 < %2"   prec 6 6 5
+  syntax val (>=)    "%1 >= %2"  prec 6 6 5
+  syntax val (>)     "%1 > %2"   prec 6 6 5
+
+  remove module
+
+end
+
 module mach.int.Int32
 
   prelude export "#include <stdint.h>"
@@ -59,6 +82,29 @@ module mach.int.UInt32Gen
 
   syntax val max_uint32 "0xffffffff" prec 0
   syntax val length "32"             prec 0
+
+  remove module
+
+end
+
+module mach.int.UInt16
+
+  prelude export "#include <stdint.h>"
+  interface export "#include <stdint.h>"
+  syntax type uint16 "uint16_t"
+  syntax literal uint16 "%cu"
+
+  syntax val (+)     "%1 + %2"   prec 4 4 3
+  syntax val (-)     "%1 - %2"   prec 4 4 3
+  syntax val (-_)    "-%1"       prec 2 1
+  syntax val ( * )   "%1 * %2"   prec 3 3 2
+  syntax val (/)     "%1 / %2"   prec 3 3 2
+  syntax val (%)     "%1 % %2"   prec 3 3 2
+  syntax val (=)     "%1 == %2"  prec 7 7 6
+  syntax val (<=)    "%1 <= %2"  prec 6 6 5
+  syntax val (<)     "%1 < %2"   prec 6 6 5
+  syntax val (>=)    "%1 >= %2"  prec 6 6 5
+  syntax val (>)     "%1 > %2"   prec 6 6 5
 
   remove module
 

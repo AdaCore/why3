@@ -229,6 +229,29 @@ module UnsignedGMP
 
 end
 
+module Int16
+
+  use int.Int
+
+  type int16 = < range -0x8000 0x7fff >
+
+(*
+  let constant min_int16 : int = - 0x8000
+  let constant max_int16 : int =   0x7fff
+  function to_int (x : int16) : int = int16'int x
+*)
+
+  clone export Bounded_int with
+    type t = int16,
+    constant min = int16'minInt,
+    constant max = int16'maxInt,
+    function to_int = int16'int,
+    lemma to_int_in_bounds,
+    lemma extensionality
+
+end
+
+
 module Int31
 
   use int.Int
@@ -295,6 +318,26 @@ module Int32GMP
     ensures { (x < 0 /\ y >= 0) \/ (x >= 0 /\ y < 0) -> result < 0 }
 
 end
+
+module UInt16
+
+  use int.Int
+
+  type uint16 = < range 0 0xffff >
+  constant radix : int = uint16'maxInt + 1
+
+  clone export Unsigned with
+    type t = uint16,
+    constant max = uint16'maxInt,
+    constant radix = radix,
+    goal radix_def,
+    function to_int = uint16'int,
+    lemma zero_unsigned_is_zero,
+    lemma to_int_in_bounds,
+    lemma extensionality
+
+end
+
 
 module UInt32Gen
 
