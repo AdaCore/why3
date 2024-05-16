@@ -38,7 +38,3 @@ val intro_vc_vars_counterexmp : Task.task Trans.trans
     VC for counterexample cannot be done before the task is processed.
     It is done by this transformation.
 *)
-
-val get_location_of_vc : Task.task -> Loc.position option
-(** Gets the location of the term that triggers vc.
-    This location is collected by transformation intro_vc_vars_counterexmp. *)
