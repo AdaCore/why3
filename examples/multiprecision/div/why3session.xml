@@ -8,6 +8,7 @@
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Spass" version="3.9" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="9" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -227,7 +228,7 @@
   <proof prover="3"><result status="valid" time="0.050000" steps="38852"/></proof>
   </goal>
   <goal name="div2by1_inv&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.040000" steps="41124"/></proof>
+  <proof prover="3"><result status="valid" time="0.040000" steps="40903"/></proof>
   </goal>
   <goal name="div2by1_inv&#39;vc.13" expl="precondition" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -566,10 +567,10 @@
   <proof prover="1"><result status="valid" time="0.240000"/></proof>
   </goal>
   <goal name="div2by1_inv&#39;vc.32" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="50059"/></proof>
+  <proof prover="3"><result status="valid" time="0.010000" steps="51217"/></proof>
   </goal>
   <goal name="div2by1_inv&#39;vc.33" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="49919"/></proof>
+  <proof prover="3"><result status="valid" time="0.010000" steps="50638"/></proof>
   </goal>
   <goal name="div2by1_inv&#39;vc.34" expl="assertion" proved="true">
   <proof prover="9" timelimit="5" memlimit="2000"><result status="valid" time="0.140000" steps="23850"/></proof>
@@ -632,7 +633,7 @@
   <proof prover="1"><result status="valid" time="0.170000"/></proof>
   </goal>
   <goal name="div2by1_inv&#39;vc.49" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="0.040000" steps="44954"/></proof>
+  <proof prover="3"><result status="valid" time="0.040000" steps="44632"/></proof>
   </goal>
   <goal name="div2by1_inv&#39;vc.50" expl="integer overflow" proved="true">
   <proof prover="9" timelimit="5" memlimit="2000"><result status="valid" time="0.200000" steps="23327"/></proof>
@@ -946,7 +947,7 @@
   <goal name="wmpn_divrem_1&#39;vc.31" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_divrem_1&#39;vc.31.0" expl="precondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.060000" steps="15222"/></proof>
+   <proof prover="2"><result status="valid" time="0.060000" steps="15245"/></proof>
    </goal>
   </transf>
   </goal>
@@ -971,10 +972,10 @@
   <goal name="wmpn_divrem_1&#39;vc.38" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_divrem_1&#39;vc.38.0" expl="VC for wmpn_divrem_1" proved="true">
-   <proof prover="9" timelimit="5" memlimit="2000"><result status="valid" time="0.090000" steps="13401"/></proof>
+   <proof prover="9" timelimit="5" memlimit="2000"><result status="valid" time="0.090000" steps="13440"/></proof>
    </goal>
    <goal name="wmpn_divrem_1&#39;vc.38.1" expl="VC for wmpn_divrem_1" proved="true">
-   <proof prover="9" timelimit="5" memlimit="2000"><result status="valid" time="0.110000" steps="16161"/></proof>
+   <proof prover="9" timelimit="5" memlimit="2000"><result status="valid" time="0.110000" steps="16217"/></proof>
    </goal>
    <goal name="wmpn_divrem_1&#39;vc.38.2" expl="VC for wmpn_divrem_1" proved="true">
    <proof prover="1"><result status="valid" time="0.210000"/></proof>
@@ -984,10 +985,10 @@
   <goal name="wmpn_divrem_1&#39;vc.39" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_divrem_1&#39;vc.39.0" expl="VC for wmpn_divrem_1" proved="true">
-   <proof prover="9" timelimit="5" memlimit="2000"><result status="valid" time="0.080000" steps="12697"/></proof>
+   <proof prover="9" timelimit="5" memlimit="2000"><result status="valid" time="0.080000" steps="13465"/></proof>
    </goal>
    <goal name="wmpn_divrem_1&#39;vc.39.1" expl="VC for wmpn_divrem_1" proved="true">
-   <proof prover="9" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="13427"/></proof>
+   <proof prover="9" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="16269"/></proof>
    </goal>
    <goal name="wmpn_divrem_1&#39;vc.39.2" expl="VC for wmpn_divrem_1" proved="true">
    <proof prover="1"><result status="valid" time="0.180000"/></proof>
@@ -1565,7 +1566,7 @@
     <goal name="div3by2_inv&#39;vc.15.64.0" expl="VC for div3by2_inv" proved="true">
     <transf name="apply" proved="true" arg1="prod_compat_r">
      <goal name="div3by2_inv&#39;vc.15.64.0.0" expl="apply premises" proved="true">
-     <proof prover="9"><result status="valid" time="0.230000" steps="19622"/></proof>
+     <proof prover="9"><result status="valid" time="0.091660" steps="19622"/></proof>
      </goal>
      <goal name="div3by2_inv&#39;vc.15.64.0.1" expl="apply premises" proved="true">
      <proof prover="9"><result status="valid" time="0.090000" steps="15925"/></proof>
@@ -2653,7 +2654,7 @@
    <proof prover="5"><result status="valid" time="0.110000" steps="30"/></proof>
    </goal>
    <goal name="reciprocal_word_3by2&#39;vc.65.1" expl="integer overflow" proved="true">
-   <proof prover="3"><result status="valid" time="0.040000" steps="34597"/></proof>
+   <proof prover="3"><result status="valid" time="0.040000" steps="34875"/></proof>
    </goal>
   </transf>
   </goal>
@@ -4094,556 +4095,556 @@
      <proof prover="1"><result status="valid" time="0.880000"/></proof>
      <transf name="apply" proved="true" arg1="HR">
       <goal name="div_sb_qr&#39;vc.160.0.0.0.0" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.182913" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.182913" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.210000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.210000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.2" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.180000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.180000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.3" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.4" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.5" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.6" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.180000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.180000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.7" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.250000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.250000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.8" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.9" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.185825" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.185825" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.10" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.165126" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.165126" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.11" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.181659" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.181659" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.12" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.13" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.14" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.149140" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.149140" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.15" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.16" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.260000" steps="72868"/></proof>
+      <proof prover="9"><result status="valid" time="0.260000" steps="73592"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.17" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.180000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.180000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.18" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.19" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.20" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.21" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.143262" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.143262" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.22" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.180000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.180000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.23" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.270000" steps="72868"/></proof>
+      <proof prover="9"><result status="valid" time="0.270000" steps="73592"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.24" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72868"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73592"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.25" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.26" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72868"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73592"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.27" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.149956" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.149956" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.28" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.29" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.141509" steps="72868"/></proof>
+      <proof prover="9"><result status="valid" time="0.141509" steps="73592"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.30" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.178055" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.178055" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.31" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.146732" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.146732" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.32" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.129376" steps="73071"/></proof>
+      <proof prover="9"><result status="valid" time="0.129376" steps="73795"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.33" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.180000" steps="73061"/></proof>
+      <proof prover="9"><result status="valid" time="0.180000" steps="73785"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.34" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="73080"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73804"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.35" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="73080"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73804"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.36" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.250000" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.250000" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.37" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.180000" steps="73071"/></proof>
+      <proof prover="9"><result status="valid" time="0.180000" steps="73795"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.38" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.136694" steps="73061"/></proof>
+      <proof prover="9"><result status="valid" time="0.136694" steps="73785"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.39" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="73080"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73804"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.40" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.140156" steps="73080"/></proof>
+      <proof prover="9"><result status="valid" time="0.140156" steps="73804"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.41" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.42" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.138915" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.138915" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.43" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.146957" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.146957" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.44" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.45" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.131430" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.131430" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.46" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.180000" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.180000" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.47" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.136847" steps="73071"/></proof>
+      <proof prover="9"><result status="valid" time="0.136847" steps="73795"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.48" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.310000" steps="73064"/></proof>
+      <proof prover="9"><result status="valid" time="0.310000" steps="73788"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.49" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.260000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.260000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.50" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.178765" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.178765" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.51" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.134637" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.134637" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.52" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.168032" steps="72868"/></proof>
+      <proof prover="9"><result status="valid" time="0.168032" steps="73592"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.53" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.170000" steps="73159"/></proof>
+      <proof prover="9"><result status="valid" time="0.170000" steps="73883"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.54" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="73071"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73795"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.55" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.144770" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.144770" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.56" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.57" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.129697" steps="73159"/></proof>
+      <proof prover="9"><result status="valid" time="0.129697" steps="73883"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.58" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.127895" steps="73071"/></proof>
+      <proof prover="9"><result status="valid" time="0.127895" steps="73795"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.59" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.131074" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.131074" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.60" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.61" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.260000" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.260000" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.62" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="73162"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73886"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.63" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.260000" steps="73071"/></proof>
+      <proof prover="9"><result status="valid" time="0.260000" steps="73795"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.64" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.65" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.250000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.250000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.66" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.260000" steps="73159"/></proof>
+      <proof prover="9"><result status="valid" time="0.260000" steps="73883"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.67" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.130171" steps="73071"/></proof>
+      <proof prover="9"><result status="valid" time="0.130171" steps="73795"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.68" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.210000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.210000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.69" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.250000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.250000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.70" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="73071"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73795"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.71" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.133758" steps="73071"/></proof>
+      <proof prover="9"><result status="valid" time="0.133758" steps="73795"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.72" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.136543" steps="73061"/></proof>
+      <proof prover="9"><result status="valid" time="0.136543" steps="73785"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.73" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.136707" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.136707" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.74" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.180000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.180000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.75" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.240000" steps="73061"/></proof>
+      <proof prover="9"><result status="valid" time="0.240000" steps="73785"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.76" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.77" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.180000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.180000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.78" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.137679" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.137679" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.79" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.180000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.180000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.80" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.136859" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.136859" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.81" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.280000" steps="76627"/></proof>
+      <proof prover="9"><result status="valid" time="0.280000" steps="77351"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.82" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.83" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.240000" steps="73071"/></proof>
+      <proof prover="9"><result status="valid" time="0.240000" steps="73795"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.84" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="73064"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73788"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.85" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.140470" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.140470" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.86" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.87" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="73071"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73795"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.88" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="73061"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73785"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.89" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.220000" steps="73080"/></proof>
+      <proof prover="9"><result status="valid" time="0.220000" steps="73804"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.90" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="73080"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73804"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.91" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.128906" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.128906" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.92" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.93" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.127339" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.127339" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.94" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.180000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.180000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.95" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.180000" steps="74760"/></proof>
+      <proof prover="9"><result status="valid" time="0.180000" steps="75484"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.96" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.118477" steps="74760"/></proof>
+      <proof prover="9"><result status="valid" time="0.118477" steps="75484"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.97" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.141008" steps="76627"/></proof>
+      <proof prover="9"><result status="valid" time="0.141008" steps="77351"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.98" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="76627"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="77351"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.99" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.250000" steps="76627"/></proof>
+      <proof prover="9"><result status="valid" time="0.250000" steps="77351"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.100" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.101" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.102" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.133576" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.133576" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.103" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="74760"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="75484"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.104" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="73162"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73886"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.105" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.135682" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.135682" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.106" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.107" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.250000" steps="74731"/></proof>
+      <proof prover="9"><result status="valid" time="0.250000" steps="75455"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.108" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.220000" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.220000" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.109" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.180000" steps="73159"/></proof>
+      <proof prover="9"><result status="valid" time="0.180000" steps="73883"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.110" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.131283" steps="73071"/></proof>
+      <proof prover="9"><result status="valid" time="0.131283" steps="73795"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.111" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.112" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.250000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.250000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.113" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="73159"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73883"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.114" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.230000" steps="73071"/></proof>
+      <proof prover="9"><result status="valid" time="0.230000" steps="73795"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.115" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.134620" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.134620" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.116" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.117" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.260000" steps="73162"/></proof>
+      <proof prover="9"><result status="valid" time="0.260000" steps="73886"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.118" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="73071"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73795"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.119" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.240000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.240000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.120" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.139916" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.139916" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.121" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.122" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72868"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73592"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.123" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.136037" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.136037" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.124" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.210000" steps="76627"/></proof>
+      <proof prover="9"><result status="valid" time="0.210000" steps="77351"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.125" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.138277" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.138277" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.126" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.149210" steps="76627"/></proof>
+      <proof prover="9"><result status="valid" time="0.149210" steps="77351"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.127" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.128" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.260000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.260000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.129" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.142750" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.142750" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.130" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="74760"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="75484"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.131" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.250000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.250000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.132" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.133" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.230000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.230000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.134" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.240000" steps="74760"/></proof>
+      <proof prover="9"><result status="valid" time="0.240000" steps="75484"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.135" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.180000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.180000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.136" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.270000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.270000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.137" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.140739" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.140739" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.138" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.132552" steps="74760"/></proof>
+      <proof prover="9"><result status="valid" time="0.132552" steps="75484"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.139" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="73159"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73883"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.140" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="73071"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73795"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.141" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.260000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.260000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.142" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.180000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.180000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.143" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.138118" steps="73159"/></proof>
+      <proof prover="9"><result status="valid" time="0.138118" steps="73883"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.144" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="73071"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73795"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.145" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.280000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.280000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.146" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.180000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.180000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.147" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.180000" steps="73159"/></proof>
+      <proof prover="9"><result status="valid" time="0.180000" steps="73883"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.148" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="73071"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73795"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.149" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.260000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.260000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.150" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.151" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.180000" steps="73162"/></proof>
+      <proof prover="9"><result status="valid" time="0.180000" steps="73886"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.152" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.142244" steps="73071"/></proof>
+      <proof prover="9"><result status="valid" time="0.142244" steps="73795"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.153" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.280000" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.280000" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.154" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.144414" steps="73083"/></proof>
+      <proof prover="9"><result status="valid" time="0.144414" steps="73807"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.155" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.138391" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.138391" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.156" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.310000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.310000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.157" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.136337" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.136337" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.158" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.220000" steps="74760"/></proof>
+      <proof prover="9"><result status="valid" time="0.220000" steps="75484"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.159" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.210000" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.210000" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.160" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.161" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.260000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.260000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.162" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="74760"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="75484"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.163" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.132941" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.132941" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.164" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.250000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.250000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.165" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="74760"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="75484"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.166" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.129721" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.129721" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.167" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.129517" steps="74760"/></proof>
+      <proof prover="9"><result status="valid" time="0.129517" steps="75484"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.168" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.190000" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.190000" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.169" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.170" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.250000" steps="74760"/></proof>
+      <proof prover="9"><result status="valid" time="0.250000" steps="75484"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.171" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="74760"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="75484"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.172" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.220000" steps="74760"/></proof>
+      <proof prover="9"><result status="valid" time="0.220000" steps="75484"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.173" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.127299" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.127299" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.174" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72868"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73592"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.175" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.240000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.240000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.176" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.177" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.210000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.210000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.178" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.135457" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.135457" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.179" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.180" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.120947" steps="72869"/></proof>
+      <proof prover="9"><result status="valid" time="0.120947" steps="73593"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.181" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.220000" steps="72868"/></proof>
+      <proof prover="9"><result status="valid" time="0.220000" steps="73592"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.182" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.240000" steps="72871"/></proof>
+      <proof prover="9"><result status="valid" time="0.240000" steps="73595"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.160.0.0.0.183" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.200000" steps="77889"/></proof>
+      <proof prover="9"><result status="valid" time="0.200000" steps="78613"/></proof>
       </goal>
      </transf>
      </goal>
@@ -4651,7 +4652,7 @@
      <proof prover="1"><result status="valid" time="0.790000"/></proof>
      </goal>
      <goal name="div_sb_qr&#39;vc.160.0.0.2" proved="true">
-     <proof prover="9"><result status="valid" time="0.350000" steps="80250"/></proof>
+     <proof prover="9"><result status="valid" time="0.350000" steps="81066"/></proof>
      </goal>
     </transf>
     </goal>
@@ -4746,7 +4747,7 @@
   </transf>
   </goal>
   <goal name="div_sb_qr&#39;vc.165" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="5"><result status="valid" time="0.424140" steps="92032"/></proof>
+  <proof prover="2" timelimit="5"><result status="valid" time="0.273573" steps="92032"/></proof>
   </goal>
   <goal name="div_sb_qr&#39;vc.166" expl="assertion" proved="true">
   <proof prover="2" timelimit="5"><result status="valid" time="0.268205" steps="86822"/></proof>
@@ -5610,7 +5611,7 @@
     <proof prover="9" timelimit="5" memlimit="2000"><result status="valid" time="0.050000" steps="17668"/></proof>
     </goal>
     <goal name="div_sb_qr&#39;vc.229.1.1" expl="equality hypothesis" proved="true">
-    <proof prover="4"><result status="valid" time="1.844338"/></proof>
+    <proof prover="4"><result status="valid" time="1.489342"/></proof>
     </goal>
    </transf>
    </goal>
@@ -5705,658 +5706,658 @@
     <goal name="div_sb_qr&#39;vc.242.0.0" expl="assertion" proved="true">
     <transf name="assert" proved="true" arg1="(int32&#39;int (1:int32) = 1)">
      <goal name="div_sb_qr&#39;vc.242.0.0.0" expl="asserted formula" proved="true">
-     <proof prover="9"><result status="valid" time="0.166706" steps="69940"/></proof>
+     <proof prover="9"><result status="valid" time="0.166706" steps="70665"/></proof>
      </goal>
      <goal name="div_sb_qr&#39;vc.242.0.0.1" expl="assertion" proved="true">
      <transf name="reflection_f" proved="true" arg1="prop_mp_decision">
       <goal name="div_sb_qr&#39;vc.242.0.0.1.0" expl="assertion" proved="true">
       <transf name="apply" proved="true" arg1="HR">
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.0" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.270000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.270000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.1" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.330000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.330000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.2" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.270000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.270000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.3" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.200000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.200000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.4" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.5" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.300000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.300000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.6" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.330000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.330000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.7" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.240000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.240000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.8" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.9" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.340000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.340000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.10" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.11" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.250000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.250000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.12" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.13" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.250000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.250000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.14" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.15" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.270000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.270000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.16" expl="apply premises" proved="true">
-       <proof prover="9" timelimit="5" memlimit="2000"><result status="valid" time="0.210000" steps="81965"/></proof>
+       <proof prover="9" timelimit="5" memlimit="2000"><result status="valid" time="0.210000" steps="82689"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.17" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.151696" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.151696" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.18" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.19" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.150602" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.150602" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.20" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.145599" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.145599" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.21" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.145770" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.145770" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.22" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.240000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.240000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.23" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.142010" steps="81965"/></proof>
+       <proof prover="9"><result status="valid" time="0.142010" steps="82689"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.24" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.142429" steps="81965"/></proof>
+       <proof prover="9"><result status="valid" time="0.142429" steps="82689"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.25" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.141679" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.141679" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.26" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="81965"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="82689"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.27" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.151677" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.151677" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.28" expl="apply premises" proved="true">
-       <proof prover="9" timelimit="5" memlimit="2000"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9" timelimit="5" memlimit="2000"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.29" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.152847" steps="81965"/></proof>
+       <proof prover="9"><result status="valid" time="0.152847" steps="82689"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.30" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.152580" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.152580" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.31" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.150480" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.150480" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.32" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.33" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82155"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82879"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.34" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="82165"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82889"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.35" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.129264" steps="82165"/></proof>
+       <proof prover="9"><result status="valid" time="0.129264" steps="82889"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.36" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.126990" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.126990" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.37" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.38" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.140643" steps="82155"/></proof>
+       <proof prover="9"><result status="valid" time="0.140643" steps="82879"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.39" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="82165"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82889"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.40" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.143595" steps="82165"/></proof>
+       <proof prover="9"><result status="valid" time="0.143595" steps="82889"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.41" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.138147" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.138147" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.42" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.43" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.137416" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.137416" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.44" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.45" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.240000" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.240000" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.46" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.134778" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.134778" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.47" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.136781" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.136781" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.48" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.138571" steps="82158"/></proof>
+       <proof prover="9"><result status="valid" time="0.138571" steps="82882"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.49" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.139765" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.139765" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.50" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.51" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.145398" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.145398" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.52" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="81965"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="82689"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.53" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="82219"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82943"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.54" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.55" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.140661" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.140661" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.56" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.143422" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.143422" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.57" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="82219"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="82943"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.58" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.59" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.145105" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.145105" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.60" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.61" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.151156" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.151156" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.62" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.150241" steps="82222"/></proof>
+       <proof prover="9"><result status="valid" time="0.150241" steps="82946"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.63" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.64" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.65" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.66" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.250000" steps="82219"/></proof>
+       <proof prover="9"><result status="valid" time="0.250000" steps="82943"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.67" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.148832" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.148832" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.68" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.145250" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.145250" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.69" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.70" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.71" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.72" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.200000" steps="82155"/></proof>
+       <proof prover="9"><result status="valid" time="0.200000" steps="82879"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.73" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.240000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.240000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.74" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.151483" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.151483" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.75" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82155"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82879"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.76" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.77" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.78" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.79" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.80" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.81" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="86207"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="86931"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.82" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.83" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.147802" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.147802" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.84" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82158"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82882"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.85" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.203069" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.203069" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.86" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.147894" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.147894" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.87" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.88" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.146403" steps="82155"/></proof>
+       <proof prover="9"><result status="valid" time="0.146403" steps="82879"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.89" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.149214" steps="82165"/></proof>
+       <proof prover="9"><result status="valid" time="0.149214" steps="82889"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.90" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.147138" steps="82165"/></proof>
+       <proof prover="9"><result status="valid" time="0.147138" steps="82889"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.91" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.149839" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.149839" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.92" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.147030" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.147030" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.93" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.94" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.200000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.200000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.95" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.134188" steps="83813"/></proof>
+       <proof prover="9"><result status="valid" time="0.134188" steps="84537"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.96" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="83813"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="84537"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.97" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.158372" steps="86207"/></proof>
+       <proof prover="9"><result status="valid" time="0.158372" steps="86931"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.98" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.250000" steps="86207"/></proof>
+       <proof prover="9"><result status="valid" time="0.250000" steps="86931"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.99" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.250000" steps="86207"/></proof>
+       <proof prover="9"><result status="valid" time="0.250000" steps="86931"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.100" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.101" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.200000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.200000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.102" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.103" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.200000" steps="83813"/></proof>
+       <proof prover="9"><result status="valid" time="0.200000" steps="84537"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.104" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.145435" steps="82222"/></proof>
+       <proof prover="9"><result status="valid" time="0.145435" steps="82946"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.105" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.106" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.152267" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.152267" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.107" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.240000" steps="83784"/></proof>
+       <proof prover="9"><result status="valid" time="0.240000" steps="84508"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.108" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.152085" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.152085" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.109" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.151711" steps="82219"/></proof>
+       <proof prover="9"><result status="valid" time="0.151711" steps="82943"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.110" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.111" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.200000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.200000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.112" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.113" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.240000" steps="82219"/></proof>
+       <proof prover="9"><result status="valid" time="0.240000" steps="82943"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.114" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.150452" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.150452" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.115" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.116" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.149803" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.149803" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.117" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.153419" steps="82222"/></proof>
+       <proof prover="9"><result status="valid" time="0.153419" steps="82946"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.118" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.148119" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.148119" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.119" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.250000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.250000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.120" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.121" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.149379" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.149379" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.122" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81965"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82689"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.123" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.146919" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.146919" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.124" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="86207"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="86931"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.125" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.126" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="86207"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="86931"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.127" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.200000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.200000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.128" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.149321" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.149321" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.129" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.200000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.200000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.130" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="83813"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="84537"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.131" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.155751" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.155751" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.132" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.133" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.134" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="83813"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="84537"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.135" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.136" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.137" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.141843" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.141843" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.138" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.141925" steps="83813"/></proof>
+       <proof prover="9"><result status="valid" time="0.141925" steps="84537"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.139" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="82219"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82943"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.140" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.141" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.142" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.151402" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.151402" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.143" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.141951" steps="82219"/></proof>
+       <proof prover="9"><result status="valid" time="0.141951" steps="82943"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.144" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.240000" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.240000" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.145" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.200000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.200000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.146" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.200000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.200000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.147" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.200000" steps="82219"/></proof>
+       <proof prover="9"><result status="valid" time="0.200000" steps="82943"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.148" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.240000" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.240000" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.149" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.240000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.240000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.150" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.151" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.148912" steps="82222"/></proof>
+       <proof prover="9"><result status="valid" time="0.148912" steps="82946"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.152" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.153" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.151261" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.151261" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.154" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.260000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.260000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.155" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.156" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.157" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.260000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.260000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.158" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.200000" steps="83813"/></proof>
+       <proof prover="9"><result status="valid" time="0.200000" steps="84537"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.159" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.145362" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.145362" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.160" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.161" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.250000" steps="82158"/></proof>
+       <proof prover="9"><result status="valid" time="0.250000" steps="82882"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.162" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.141490" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.141490" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.163" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.164" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.143156" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.143156" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.165" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.166" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.167" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.141234" steps="83813"/></proof>
+       <proof prover="9"><result status="valid" time="0.141234" steps="84537"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.168" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.142804" steps="82219"/></proof>
+       <proof prover="9"><result status="valid" time="0.142804" steps="82943"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.169" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.170" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82165"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82889"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.171" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="82165"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82889"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.172" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="82219"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82943"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.173" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.137627" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.137627" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.174" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="82165"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82889"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.175" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="82165"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82889"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.176" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="82222"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82946"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.177" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.200000" steps="82156"/></proof>
+       <proof prover="9"><result status="valid" time="0.200000" steps="82880"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.178" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.140021" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.140021" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.179" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="82168"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="82892"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.180" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.181" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.141239" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.141239" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.182" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.200000" steps="83813"/></proof>
+       <proof prover="9"><result status="valid" time="0.200000" steps="84537"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.183" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="83813"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="84537"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.184" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.200000" steps="83813"/></proof>
+       <proof prover="9"><result status="valid" time="0.200000" steps="84537"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.185" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.186" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.138144" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.138144" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.187" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.147657" steps="83813"/></proof>
+       <proof prover="9"><result status="valid" time="0.147657" steps="84537"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.188" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.189" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.149698" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.149698" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.190" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.191" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.139134" steps="83813"/></proof>
+       <proof prover="9"><result status="valid" time="0.139134" steps="84537"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.192" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="81965"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82689"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.193" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.194" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.240000" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.240000" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.195" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.196" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.197" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.198" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.138375" steps="83813"/></proof>
+       <proof prover="9"><result status="valid" time="0.138375" steps="84537"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.199" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.200" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.201" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.147313" steps="81965"/></proof>
+       <proof prover="9"><result status="valid" time="0.147313" steps="82689"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.202" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.203" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.204" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.220000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.220000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.205" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.206" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.161362" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.161362" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.207" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.230000" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.230000" steps="82690"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.208" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.149064" steps="81965"/></proof>
+       <proof prover="9"><result status="valid" time="0.149064" steps="82689"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.209" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.210000" steps="81968"/></proof>
+       <proof prover="9"><result status="valid" time="0.210000" steps="82692"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.210" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.240000" steps="87147"/></proof>
+       <proof prover="9"><result status="valid" time="0.240000" steps="87871"/></proof>
        </goal>
        <goal name="div_sb_qr&#39;vc.242.0.0.1.0.211" expl="apply premises" proved="true">
-       <proof prover="9"><result status="valid" time="0.151222" steps="81966"/></proof>
+       <proof prover="9"><result status="valid" time="0.151222" steps="82690"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="div_sb_qr&#39;vc.242.0.0.1.1" proved="true">
-      <proof prover="9"><result status="valid" time="0.220000" steps="77368"/></proof>
+      <proof prover="9"><result status="valid" time="0.220000" steps="78092"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.242.0.0.1.2" proved="true">
-      <proof prover="9"><result status="valid" time="0.340000" steps="88547"/></proof>
+      <proof prover="9"><result status="valid" time="0.340000" steps="89383"/></proof>
       </goal>
       <goal name="div_sb_qr&#39;vc.242.0.0.1.3" proved="true">
-      <proof prover="9"><result status="valid" time="0.350000" steps="90180"/></proof>
+      <proof prover="9"><result status="valid" time="0.350000" steps="90996"/></proof>
       </goal>
      </transf>
      </goal>
@@ -6668,7 +6669,7 @@
    </transf>
    </goal>
    <goal name="div_sb_qr&#39;vc.272.1" expl="VC for div_sb_qr" proved="true">
-   <proof prover="4" timelimit="20"><result status="valid" time="15.404208"/></proof>
+   <proof prover="4" timelimit="20"><result status="valid" time="17.629940"/></proof>
    </goal>
   </transf>
   </goal>
@@ -6776,25 +6777,25 @@
   <goal name="wmpn_divrem_2&#39;vc.15" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_divrem_2&#39;vc.15.0" expl="VC for wmpn_divrem_2" proved="true">
-   <proof prover="9"><result status="valid" time="0.120000" steps="20643"/></proof>
+   <proof prover="9"><result status="valid" time="0.120000" steps="20728"/></proof>
    </goal>
    <goal name="wmpn_divrem_2&#39;vc.15.1" expl="VC for wmpn_divrem_2" proved="true">
    <proof prover="4"><result status="valid" time="0.030000"/></proof>
    </goal>
    <goal name="wmpn_divrem_2&#39;vc.15.2" expl="VC for wmpn_divrem_2" proved="true">
-   <proof prover="7"><result status="valid" time="0.080000" steps="78"/></proof>
+   <proof prover="7"><result status="valid" time="0.080000" steps="84"/></proof>
    </goal>
    <goal name="wmpn_divrem_2&#39;vc.15.3" expl="VC for wmpn_divrem_2" proved="true">
-   <proof prover="7"><result status="valid" time="0.140000" steps="78"/></proof>
+   <proof prover="7"><result status="valid" time="0.140000" steps="84"/></proof>
    </goal>
    <goal name="wmpn_divrem_2&#39;vc.15.4" expl="VC for wmpn_divrem_2" proved="true">
    <proof prover="1"><result status="valid" time="0.160000"/></proof>
    </goal>
    <goal name="wmpn_divrem_2&#39;vc.15.5" expl="VC for wmpn_divrem_2" proved="true">
-   <proof prover="1"><result status="valid" time="0.380000"/></proof>
+   <proof prover="1"><result status="valid" time="0.858939"/></proof>
    </goal>
    <goal name="wmpn_divrem_2&#39;vc.15.6" expl="VC for wmpn_divrem_2" proved="true">
-   <proof prover="9"><result status="valid" time="0.120000" steps="14998"/></proof>
+   <proof prover="9"><result status="valid" time="0.120000" steps="15090"/></proof>
    </goal>
   </transf>
   </goal>
@@ -6907,10 +6908,10 @@
   <goal name="wmpn_divrem_2&#39;vc.43" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_divrem_2&#39;vc.43.0" expl="precondition" proved="true">
-   <proof prover="9"><result status="valid" time="0.100000" steps="15137"/></proof>
+   <proof prover="9"><result status="valid" time="0.100000" steps="15307"/></proof>
    </goal>
    <goal name="wmpn_divrem_2&#39;vc.43.1" expl="precondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.070000" steps="17902"/></proof>
+   <proof prover="2"><result status="valid" time="0.070000" steps="18069"/></proof>
    </goal>
   </transf>
   </goal>
@@ -6929,7 +6930,7 @@
    <proof prover="1"><result status="valid" time="0.130000"/></proof>
    </goal>
    <goal name="wmpn_divrem_2&#39;vc.44.4" expl="VC for wmpn_divrem_2" proved="true">
-   <proof prover="9"><result status="valid" time="0.230000" steps="25454"/></proof>
+   <proof prover="9"><result status="valid" time="0.230000" steps="25679"/></proof>
    </goal>
    <goal name="wmpn_divrem_2&#39;vc.44.5" expl="VC for wmpn_divrem_2" proved="true">
    <proof prover="4"><result status="valid" time="0.030000"/></proof>
@@ -6941,31 +6942,31 @@
    <proof prover="4"><result status="valid" time="0.070000"/></proof>
    </goal>
    <goal name="wmpn_divrem_2&#39;vc.44.8" expl="VC for wmpn_divrem_2" proved="true">
-   <proof prover="9"><result status="valid" time="0.150000" steps="16521"/></proof>
+   <proof prover="9"><result status="valid" time="0.150000" steps="16752"/></proof>
    </goal>
    <goal name="wmpn_divrem_2&#39;vc.44.9" expl="VC for wmpn_divrem_2" proved="true">
-   <proof prover="9"><result status="valid" time="0.100000" steps="14395"/></proof>
+   <proof prover="9"><result status="valid" time="0.100000" steps="14457"/></proof>
    </goal>
    <goal name="wmpn_divrem_2&#39;vc.44.10" expl="VC for wmpn_divrem_2" proved="true">
-   <proof prover="9"><result status="valid" time="0.090000" steps="14402"/></proof>
+   <proof prover="9"><result status="valid" time="0.090000" steps="14476"/></proof>
    </goal>
    <goal name="wmpn_divrem_2&#39;vc.44.11" expl="VC for wmpn_divrem_2" proved="true">
    <proof prover="4"><result status="valid" time="0.030000"/></proof>
    </goal>
    <goal name="wmpn_divrem_2&#39;vc.44.12" expl="VC for wmpn_divrem_2" proved="true">
-   <proof prover="9"><result status="valid" time="0.100000" steps="14409"/></proof>
+   <proof prover="9"><result status="valid" time="0.100000" steps="14449"/></proof>
    </goal>
    <goal name="wmpn_divrem_2&#39;vc.44.13" expl="VC for wmpn_divrem_2" proved="true">
-   <proof prover="9"><result status="valid" time="0.090000" steps="14405"/></proof>
+   <proof prover="9"><result status="valid" time="0.090000" steps="14445"/></proof>
    </goal>
    <goal name="wmpn_divrem_2&#39;vc.44.14" expl="VC for wmpn_divrem_2" proved="true">
-   <proof prover="4"><result status="valid" time="0.311964"/></proof>
+   <proof prover="6"><result status="valid" time="0.320211"/></proof>
    </goal>
    <goal name="wmpn_divrem_2&#39;vc.44.15" expl="VC for wmpn_divrem_2" proved="true">
    <proof prover="1"><result status="valid" time="0.140000"/></proof>
    </goal>
    <goal name="wmpn_divrem_2&#39;vc.44.16" expl="VC for wmpn_divrem_2" proved="true">
-   <proof prover="9"><result status="valid" time="0.150000" steps="16708"/></proof>
+   <proof prover="9"><result status="valid" time="0.150000" steps="16928"/></proof>
    </goal>
   </transf>
   </goal>
@@ -8730,7 +8731,7 @@
   <goal name="div_qr_in_place&#39;vc.10" expl="postcondition" proved="true">
   <transf name="introduce_premises" proved="true" >
    <goal name="div_qr_in_place&#39;vc.10.0" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="3.650421"/></proof>
+   <proof prover="4"><result status="valid" time="4.170639"/></proof>
    </goal>
   </transf>
   </goal>
@@ -9069,7 +9070,7 @@
    <proof prover="9"><result status="valid" time="0.050000" steps="13595"/></proof>
    </goal>
    <goal name="div_qr_in_place&#39;vc.46.22" expl="VC for div_qr_in_place" proved="true">
-   <proof prover="8" timelimit="5" memlimit="2000"><result status="valid" time="3.224973" steps="5342123"/></proof>
+   <proof prover="8" timelimit="5" memlimit="2000"><result status="valid" time="3.677145" steps="5342123"/></proof>
    </goal>
    <goal name="div_qr_in_place&#39;vc.46.23" expl="VC for div_qr_in_place" proved="true">
    <proof prover="9"><result status="valid" time="0.060000" steps="12869"/></proof>
@@ -9752,7 +9753,7 @@
    <proof prover="3" timelimit="1"><result status="valid" time="0.060000" steps="38153"/></proof>
    </goal>
    <goal name="div_qr_in_place&#39;vc.127.13" expl="VC for div_qr_in_place" proved="true">
-   <proof prover="1"><result status="valid" time="1.251659"/></proof>
+   <proof prover="1"><result status="valid" time="1.017822"/></proof>
    </goal>
    <goal name="div_qr_in_place&#39;vc.127.14" expl="VC for div_qr_in_place" proved="true">
    <proof prover="9" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="13963"/></proof>
