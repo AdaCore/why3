@@ -29,10 +29,10 @@ let prepare_for_counterexmp2 _env task =
            but used by the Spark front-end to display short versions
            of counterexamples, with only the values of variables at
            the source line of the VC. It should be investigated
-           whether this should be made differently. *)
+           whether this should be made differently. 
         Introduction.simplify_intros;
+        Intro_projections_counterexmp.intro_projections_counterexmp env *)
         Intro_vc_vars_counterexmp.intro_vc_vars_counterexmp
-        (* Intro_projections_counterexmp.intro_projections_counterexmp env *)
       ]
     in
     Trans.apply comp_trans task

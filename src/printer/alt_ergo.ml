@@ -499,7 +499,12 @@ let print_task args ?old:_ fmt task =
   let show,cast = Task.on_meta meta_printer_option
     check_options (false,true) task in
   let cntexample = Driver.get_counterexmp task in
-  let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
+  let g,_ = Task.task_separate_goal task in
+  let vc_loc =
+    Theory.(match g.td_node with
+        | Decl { d_node = Dprop (_,_,t) } -> t.t_loc
+        | _ -> None)
+  in
   let vc_attrs = (Task.task_goal_fmla task).t_attrs in
   let vc_info = {vc_inside = false; vc_loc; vc_func_name = None} in
   let info = {

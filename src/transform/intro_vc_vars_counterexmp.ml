@@ -18,10 +18,6 @@ open Intro_projections_counterexmp
 (** For see intro_vc_vars_counterexmp.mli for detailed description
     of this transformation. *)
 
-let meta_vc_location =
-  Theory.register_meta_excl "vc_location" [Theory.MTstring]
-  ~desc:"Location@ of@ the@ term@ that@ triggers@ vc@ in@ the@ form@ file:line:col."
-
 (* Information about the term that triggers VC.  *)
 type vc_term_info = {
   mutable vc_inside : bool;
@@ -302,43 +298,10 @@ let intro_vc_vars_counterexmp2 task =
   } in
   (* Do introduction and find location of term triggering VC *)
   let do_intro_trans = Trans.goal (do_intro_vc_vars_counterexmp info) in
-  let task = (Trans.apply do_intro_trans) task in
-
-  (* Pass meta with location of the term triggering VC to printer  *)
-  let vc_loc_meta = Theory.lookup_meta "vc_location" in
-  let g,task = Task.task_separate_goal task in
-  let pos_str = match info.vc_loc with
-    | None -> ""
-    | Some loc ->
-      let (file, line1, col1, line2, col2) = Loc.get loc in
-      Printf.sprintf "%s:%d:%d:%d:%d" file line1 col1 line2 col2
-  in
-  let task = Task.add_meta task vc_loc_meta [Theory.MAstr pos_str] in
-  Task.add_tdecl task g
+  Trans.apply do_intro_trans task
 
 let intro_vc_vars_counterexmp = Trans.store intro_vc_vars_counterexmp2
 
 let () = Trans.register_transform "intro_vc_vars_counterexmp"
   intro_vc_vars_counterexmp
   ~desc:"Introduce."
-
-let get_location_of_vc task =
-  let meta_args = Task.on_meta_excl meta_vc_location task in
-  match meta_args with
-  | Some [Theory.MAstr loc_str] ->
-    (* There may be colons in the file name. We still split on the colon, look at
-       the last three elements, and put the remaining ones back together to form the
-       file name. We may lose colons at the beginning or end of the filename, but
-       even on windows that's not allowed. *)
-    let split = Strings.rev_split ':' loc_str in
-    let loc =  match split with
-      | col2 :: line2 :: col1 :: line1 :: ((_ :: _) as rest) ->
-        let line1 = int_of_string line1 in
-        let col1 = int_of_string col1 in
-        let line2 = int_of_string line2 in
-        let col2 = int_of_string col2 in
-        let filename = Strings.join ":" (List.rev rest) in
-        Some (Loc.user_position filename line1 col1 line2 col2)
-      | _ -> None in
-    loc
-  | _ -> None
