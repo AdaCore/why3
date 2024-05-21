@@ -55,6 +55,7 @@ type reason =
    | VC_Reclamation_Check
    | VC_UC_No_Holes
    | VC_UC_Same_Size
+   | VC_UC_Alignment
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre
@@ -86,7 +87,7 @@ type check =
    A check can be proved already (e.g. by CodePeer).
    *)
 
-type extra_info = 
+type extra_info =
   { pretty_node : int option;
     inlined     : int option;
   }

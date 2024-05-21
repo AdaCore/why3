@@ -51,6 +51,7 @@ type reason =
    | VC_Reclamation_Check
    | VC_UC_No_Holes
    | VC_UC_Same_Size
+   | VC_UC_Alignment
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre
@@ -117,6 +118,7 @@ let is_warning_reason r =
    | VC_Reclamation_Check
    | VC_UC_No_Holes
    | VC_UC_Same_Size
+   | VC_UC_Alignment
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre
@@ -232,6 +234,7 @@ let reason_from_string s =
    | "VC_RECLAMATION_CHECK"         -> VC_Reclamation_Check
    | "VC_UC_NO_HOLES"               -> VC_UC_No_Holes
    | "VC_UC_SAME_SIZE"              -> VC_UC_Same_Size
+   | "VC_UC_ALIGNMENT"              -> VC_UC_Alignment
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | "VC_WEAKER_PRE"                -> VC_Weaker_Pre
    | "VC_TRIVIAL_WEAKER_PRE"        -> VC_Trivial_Weaker_Pre
@@ -303,6 +306,7 @@ let reason_to_ada reason =
    | VC_Reclamation_Check         -> "VC_RECLAMATION_CHECK"
    | VC_UC_No_Holes               -> "VC_UC_NO_HOLES"
    | VC_UC_Same_Size              -> "VC_UC_SAME_SIZE"
+   | VC_UC_Alignment              -> "VC_UC_ALIGNMENT"
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre                -> "VC_WEAKER_PRE"
    | VC_Trivial_Weaker_Pre        -> "VC_TRIVIAL_WEAKER_PRE"
@@ -369,6 +373,7 @@ let reason_to_string reason =
    | VC_Reclamation_Check         -> "reclamation_check"
    | VC_UC_No_Holes               -> "uc_no_holes"
    | VC_UC_Same_Size              -> "uc_same_size"
+   | VC_UC_Alignment              -> "alignment_check"
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre                -> "weaker_pre"
    | VC_Trivial_Weaker_Pre        -> "trivial_weaker_pre"
