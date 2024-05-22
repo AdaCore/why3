@@ -68,28 +68,12 @@ Prover result is: Valid (3 steps).
 - Checked model 1: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
-- Selected model 2: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to of_int at "bench/check-ce/jlamp_projections.mlw", line 54, characters 29-39)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to of_int at "bench/check-ce/jlamp_projections.mlw", line 54, characters 29-39)
+- Selected model 2: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
 File "bench/check-ce/jlamp_projections.mlw", line 54, characters 21-39:
 Sub-goal Integer overflow of goal p4'vc.
 Prover result is: Unknown (unknown) (8 steps).
-The following counterexample model could not be verified
-  (both RAC terminated because missing value for return value of call to of_int at "bench/check-ce/jlamp_projections.mlw", line 54, characters 29-39):
-File jlamp_projections.mlw:
-  Line 7:
-    to_int : byte -> int = [|{Abstract.to_int => 127} => 127; _ => 1|]
-  Line 51:
-    f : r -> byte = [|_ => {Abstract.to_int => 127}|]
-    g : r -> bool = [|_ => true|]
-    r'mk :
-      byte
-      ->
-      bool
-      ->
-      r = fun arg_08 arg_1 -> {f = {Abstract.to_int => 127}; g = true}
-  Line 53:
-    b : r = {f = {Abstract.to_int => 127}; g = true}
-  Line 54:
-    b : r = {f = {Abstract.to_int => 127}; g = true}
+Sorry, we don't have a good counterexample for you :(
+
 

@@ -5,29 +5,14 @@
 - Checked model 1: BAD_CE
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 6, characters 32-67)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 6, characters 32-67)
-- Selected model 2: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Ident Integer_proj_1 is not yet declared`)
-  - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Ident Integer_proj_1 is not yet declared`)
+- Selected model 2: BAD_CE
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 6, characters 32-67)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 6, characters 32-67)
 File "bench/check-ce/algebraic_types_mono.mlw", line 6, characters 58-63:
 Goal G.
 Prover result is: Unknown (unknown) (2 steps).
-The following counterexample model could not be verified
-  (both RAC terminated with uncaught exception `Ident Integer_proj_1 is not yet declared`):
-File algebraic_types_mono.mlw:
-  Line 4:
-    Integer :
-      int
-      ->
-      int_type = [|-2 => {Integer_proj_1 => -2}; 0 => {Integer_proj_1 => 0};
-                 1 => {Integer_proj_1 => 1}; _ => {Integer_proj_1 => 0}|]
-    Integer_proj_1 :
-      int_type
-      ->
-      int = [|{Integer_proj_1 => -2} => -2; {Integer_proj_1 => -1} => -1;
-            {Integer_proj_1 => 1} => 1; _ => 0|]
-  Line 6:
-    x : int_type = {Integer_proj_1 => 0}
-    x : int = -1
+Sorry, we don't have a good counterexample for you :(
+
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -52,8 +37,8 @@ File algebraic_types_mono.mlw:
     index_t :
       t
       ->
-      int = fun arg_04 ->
-             if arg_04 = {B_proj_1 => 1} \/ arg_04 = {B_proj_1 => 0} then 1
+      int = fun arg_01 ->
+             if arg_01 = {B_proj_1 => 1} \/ arg_01 = {B_proj_1 => 0} then 1
              else 0
   Line 10:
     x : t = {B_proj_1 => 0}
@@ -99,33 +84,9 @@ File algebraic_types_mono.mlw:
 - Checked model 0: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
-- Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Ident Au_proj_1 is not yet declared`)
-  - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Ident Au_proj_1 is not yet declared`)
 File "bench/check-ce/algebraic_types_mono.mlw", line 16, characters 21-31:
 Goal g5.
-Prover result is: Unknown (unknown) (1 steps).
-The following counterexample model could not be verified
-  (both RAC terminated with uncaught exception `Ident Au_proj_1 is not yet declared`):
-File algebraic_types_mono.mlw:
-  Line 14:
-    Au :
-      int
-      ->
-      int
-      ->
-      u = fun arg_015 arg_11 ->
-           if arg_015 = 0 /\ arg_11 = 0 then epsilon x.
-           (Au_proj_1 x) = 0 /\ (Au_proj_2 x) = 0 else epsilon x.
-           (Au_proj_1 x) = 0 /\ (Au_proj_2 x) = 0
-    Au_proj_1 : u -> int = [|_ => 0|]
-    Au_proj_2 :
-      u
-      ->
-      int = [|epsilon x. (Au_proj_1 x) = 0 /\ (Au_proj_2 x) = -2 => -2;
-            _ => 0|]
-  Line 16:
-    x : u = epsilon x. (Au_proj_1 x) = 0 /\ (Au_proj_2 x) = 0
+Prover result is: Unknown (unknown) (7 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE

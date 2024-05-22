@@ -4,7 +4,7 @@ Prover result is: Valid (7 steps).
 
 File "bench/check-ce/loop_ce_mono.mlw", line 17, characters 14-22:
 Sub-goal Loop variant decrease of goal f'vc.
-Prover result is: Valid (18 steps).
+Prover result is: Valid (19 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -18,7 +18,7 @@ Prover result is: Valid (18 steps).
   - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/loop_ce_mono.mlw", line 18, characters 16-29)
 File "bench/check-ce/loop_ce_mono.mlw", line 18, characters 16-29:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Unknown (unknown) (19 steps).
+Prover result is: Unknown (unknown) (23 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -33,87 +33,87 @@ File loop_ce_mono.mlw:
     Constant a initialization
     Normal execution of function `t'mk` with args:
       c = 0
-    a = {c1= 0}
+    a = {c= 0}
   Line 10:
     Constant b initialization
     Normal execution of function `t'mk` with args:
       c = 0
-    b = {c1= 0}
+    b = {c= 0}
 Unknown location:
     _ = ()
 File loop_ce_mono.mlw:
   Line 12:
     _ = ()
     Execution of main function `f` with env:
-      a = {c1= 0}
-      b = {c1= 0}
+      a = {c= 0}
+      b = {c= 0}
       _ = ()
       zero = 0
       one = 1
   Line 16:
     Normal execution of function `c` with args:
-      arg = {c1= 2}
+      arg = {c= 2}
     Normal execution of function `(<)` with args:
       _ = 2
       _ = 10
     Normal iteration of loop
   Line 19:
     Normal execution of function `c` with args:
-      arg = {c1= 1}
+      arg = {c= 1}
     Normal execution of function `c` with args:
-      arg = {c1= 2}
+      arg = {c= 2}
     Normal execution of function `(+)` with args:
       _ = 2
       _ = 1
   Line 16:
     Normal execution of function `c` with args:
-      arg = {c1= 3}
+      arg = {c= 3}
     Normal execution of function `(<)` with args:
       _ = 3
       _ = 10
     Normal iteration of loop
   Line 19:
     Normal execution of function `c` with args:
-      arg = {c1= 1}
+      arg = {c= 1}
     Normal execution of function `c` with args:
-      arg = {c1= 3}
+      arg = {c= 3}
     Normal execution of function `(+)` with args:
       _ = 3
       _ = 1
   Line 16:
     Normal execution of function `c` with args:
-      arg = {c1= 4}
+      arg = {c= 4}
     Normal execution of function `(<)` with args:
       _ = 4
       _ = 10
     Normal iteration of loop
   Line 19:
     Normal execution of function `c` with args:
-      arg = {c1= 1}
+      arg = {c= 1}
     Normal execution of function `c` with args:
-      arg = {c1= 4}
+      arg = {c= 4}
     Normal execution of function `(+)` with args:
       _ = 4
       _ = 1
   Line 16:
     Normal execution of function `c` with args:
-      arg = {c1= 5}
+      arg = {c= 5}
     Normal execution of function `(<)` with args:
       _ = 5
       _ = 10
     Normal iteration of loop
   Line 19:
     Normal execution of function `c` with args:
-      arg = {c1= 1}
+      arg = {c= 1}
     Normal execution of function `c` with args:
-      arg = {c1= 5}
+      arg = {c= 5}
     Normal execution of function `(+)` with args:
       _ = 5
       _ = 1
   Line 18:
     Property failure at loop invariant preservation with:
-      a = {c1= 1}
-      b = {c1= 6}
+      a = {c= 1}
+      b = {c= 6}
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -127,7 +127,7 @@ File loop_ce_mono.mlw:
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/loop_ce_mono.mlw", line 35, characters 11-25)
 File "bench/check-ce/loop_ce_mono.mlw", line 35, characters 11-25:
 Sub-goal Assertion of goal g'vc.
-Prover result is: Unknown (unknown) (33 steps).
+Prover result is: Unknown (unknown) (36 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -139,15 +139,15 @@ File int.mlw:
     one = 1
 File loop_ce_mono.mlw:
   Line 30:
-    a = {c3= 0}
-    a = {c3= 0}
+    a = {c1= 0}
+    a = {c1= 0}
     Execution of main function `g` with env:
-      a = {c3= 0}
+      a = {c1= 0}
       zero = 0
       one = 1
   Line 34:
     Normal execution of function `c` with args:
-      arg = {c3= 0}
+      arg = {c1= 0}
     Normal execution of function `(=)` with args:
       x = 0
       y = 10
@@ -156,13 +156,13 @@ Unknown location:
 File loop_ce_mono.mlw:
   Line 34:
     Normal execution of function `c` with args:
-      arg = {c3= 0}
+      arg = {c1= 0}
     Normal execution of function `(+)` with args:
       _ = 0
       _ = 1
   Line 35:
     Property failure at assertion with:
-      a = {c3= 1}
+      a = {c1= 1}
       a = t'mk1 0
 
 <check_ce:categorization>Categorizations of models:
@@ -177,7 +177,7 @@ File loop_ce_mono.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/loop_ce_mono.mlw", line 31, characters 12-29)
 File "bench/check-ce/loop_ce_mono.mlw", line 31, characters 12-29:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Unknown (unknown) (27 steps).
+Prover result is: Unknown (unknown) (29 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -189,15 +189,15 @@ File int.mlw:
     one = 1
 File loop_ce_mono.mlw:
   Line 30:
-    a = {c3= 10}
-    a = {c3= 10}
+    a = {c1= 10}
+    a = {c1= 10}
     Execution of main function `g` with env:
-      a = {c3= 10}
+      a = {c1= 10}
       zero = 0
       one = 1
   Line 34:
     Normal execution of function `c` with args:
-      arg = {c3= 10}
+      arg = {c1= 10}
     Normal execution of function `(=)` with args:
       x = 10
       y = 10
@@ -208,6 +208,6 @@ File loop_ce_mono.mlw:
     Normal execution of function `Tuple0` with args:
   Line 31:
     Property failure at postcondition of `g` with:
-      a = {c3= 10}
-      a = {c3= 10}
+      a = {c1= 10}
+      a = {c1= 10}
 

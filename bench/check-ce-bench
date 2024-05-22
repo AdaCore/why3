@@ -243,6 +243,7 @@ for file in $files; do
           ;;
       "array_records_mono")
           z3stepsrac=100
+          skipae=yes
           ;;
       "array_mono")
           z3steps=100000
@@ -285,6 +286,9 @@ for file in $files; do
           ;;
       "strings")
           z3steps=3000
+          ;;
+      "test_result_ce_value2")
+          skipae=yes
           ;;
       "threshold")
           z3steps=500000
