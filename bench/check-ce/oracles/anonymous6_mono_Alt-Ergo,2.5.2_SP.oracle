@@ -14,7 +14,7 @@ Prover result is: Valid (4 steps).
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/anonymous6_mono.mlw", line 10, characters 10-17)
 File "bench/check-ce/anonymous6_mono.mlw", line 10, characters 10-17:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Unknown (unknown) (9 steps).
+Prover result is: Unknown (unknown) (11 steps).
 The contracts of the following functions/loops are too weak :
   - Anonymous function at "bench/check-ce/anonymous6_mono.mlw", line 9, characters 2-44
 , for example during the following execution:
@@ -39,10 +39,10 @@ File anonymous6_mono.mlw:
       c = 0
   Line 9:
     Giant-step execution of anonymous function with args:
-      z = {c1= 0}
-    z = {c1= 3}
+      z = {c= 0}
+    z = {c= 3}
     result = ()
   Line 10:
     Property failure at assertion with:
-      z = {c1= 3}
+      z = {c= 3}
 

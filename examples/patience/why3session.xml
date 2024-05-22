@@ -1,92 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.12.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.5.3" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="patience.mlw"/>
 <theory name="PigeonHole" proved="true">
  <goal name="pigeon_hole&#39;vc" expl="VC for pigeon_hole" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="pigeon_hole&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="7"/></proof>
+  <proof prover="3"><result status="valid" time="0.011794" steps="12"/></proof>
   </goal>
   <goal name="pigeon_hole&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="26"/></proof>
+  <proof prover="3"><result status="valid" time="0.008836" steps="28"/></proof>
   </goal>
   <goal name="pigeon_hole&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="45"/></proof>
+  <proof prover="3"><result status="valid" time="0.009397" steps="47"/></proof>
   </goal>
   <goal name="pigeon_hole&#39;vc.3" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="44"/></proof>
+  <proof prover="3"><result status="valid" time="0.012138" steps="46"/></proof>
   </goal>
   <goal name="pigeon_hole&#39;vc.4" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.010000" steps="61"/></proof>
+  <proof prover="3"><result status="valid" time="0.020621" steps="71"/></proof>
   </goal>
   <goal name="pigeon_hole&#39;vc.5" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="12"/></proof>
+  <proof prover="3"><result status="valid" time="0.009005" steps="14"/></proof>
   </goal>
   <goal name="pigeon_hole&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="0"/></proof>
+  <proof prover="3"><result status="valid" time="0.011566" steps="1"/></proof>
   </goal>
   <goal name="pigeon_hole&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.010000" steps="3603"/></proof>
+  <proof prover="3"><result status="valid" time="0.008238" steps="46"/></proof>
   </goal>
   <goal name="pigeon_hole&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.010000" steps="105"/></proof>
+  <proof prover="3"><result status="valid" time="0.025557" steps="104"/></proof>
   </goal>
   <goal name="pigeon_hole&#39;vc.9" expl="out of loop bounds" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="12"/></proof>
+  <proof prover="3"><result status="valid" time="0.018987" steps="15"/></proof>
   </goal>
   <goal name="pigeon_hole&#39;vc.10" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="28"/></proof>
+  <proof prover="3"><result status="valid" time="0.015187" steps="30"/></proof>
   </goal>
   <goal name="pigeon_hole&#39;vc.11" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="26"/></proof>
+  <proof prover="3"><result status="valid" time="0.009166" steps="27"/></proof>
   </goal>
   <goal name="pigeon_hole&#39;vc.12" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="6"/></proof>
+  <proof prover="3"><result status="valid" time="0.004011" steps="4"/></proof>
   </goal>
   <goal name="pigeon_hole&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="0"/></proof>
+  <proof prover="3"><result status="valid" time="0.009178" steps="1"/></proof>
   </goal>
   <goal name="pigeon_hole&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="37"/></proof>
+  <proof prover="3"><result status="valid" time="0.008402" steps="55"/></proof>
   </goal>
   <goal name="pigeon_hole&#39;vc.15" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="0"/></proof>
+  <proof prover="3"><result status="valid" time="0.003698" steps="1"/></proof>
   </goal>
   <goal name="pigeon_hole&#39;vc.16" expl="out of loop bounds" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="6"/></proof>
+  <proof prover="3"><result status="valid" time="0.007545" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="PatienceCode" proved="true">
  <goal name="wf_rev_append_stacks&#39;vc" expl="VC for wf_rev_append_stacks" proved="true">
- <proof prover="4"><result status="valid" time="0.030000" steps="391"/></proof>
+ <proof prover="3"><result status="valid" time="0.033155" steps="216"/></proof>
  </goal>
  <goal name="push_card&#39;vc" expl="VC for push_card" proved="true">
- <proof prover="4"><result status="valid" time="0.070000" steps="426"/></proof>
+ <proof prover="3"><result status="valid" time="0.034191" steps="215"/></proof>
  </goal>
  <goal name="play_cards&#39;vc" expl="VC for play_cards" proved="true">
- <proof prover="4"><result status="valid" time="0.010000" steps="60"/></proof>
+ <proof prover="3"><result status="valid" time="0.017079" steps="76"/></proof>
  </goal>
  <goal name="play_game&#39;vc" expl="VC for play_game" proved="true">
- <proof prover="4"><result status="valid" time="0.000000" steps="2"/></proof>
+ <proof prover="3"><result status="valid" time="0.013847" steps="2"/></proof>
  </goal>
  <goal name="test&#39;vc" expl="VC for test" proved="true">
- <proof prover="4" timelimit="1"><result status="valid" time="0.000000" steps="2"/></proof>
+ <proof prover="3"><result status="valid" time="0.008828" steps="2"/></proof>
  </goal>
 </theory>
 <theory name="PatienceAbstract" proved="true">
  <goal name="play_card&#39;vc" expl="VC for play_card" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="play_card&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="0"/></proof>
+  <proof prover="3"><result status="valid" time="0.004986" steps="1"/></proof>
   </goal>
   <goal name="play_card&#39;vc.1" expl="postcondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -95,67 +95,67 @@
     <goal name="play_card&#39;vc.1.0.0" expl="postcondition" proved="true">
     <transf name="split_goal_right" proved="true" >
      <goal name="play_card&#39;vc.1.0.0.0" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.040000" steps="94"/></proof>
+     <proof prover="3"><result status="valid" time="0.036021" steps="228"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.1" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.040000" steps="98"/></proof>
+     <proof prover="3"><result status="valid" time="0.045586" steps="238"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.2" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.040000" steps="96"/></proof>
+     <proof prover="3"><result status="valid" time="0.031797" steps="229"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.3" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.050000" steps="172"/></proof>
+     <proof prover="3"><result status="valid" time="0.061406" steps="359"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.4" expl="VC for play_card" proved="true">
-     <proof prover="2" timelimit="1"><result status="valid" time="0.020000" steps="60950"/></proof>
+     <proof prover="1"><result status="valid" time="0.182718" steps="28891"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.5" expl="VC for play_card" proved="true">
-     <proof prover="2" timelimit="1"><result status="valid" time="0.020000" steps="62862"/></proof>
+     <proof prover="1"><result status="valid" time="0.207022" steps="30807"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.6" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.060000" steps="264"/></proof>
+     <proof prover="3"><result status="valid" time="0.096065" steps="558"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.7" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.060000" steps="264"/></proof>
+     <proof prover="3"><result status="valid" time="0.097067" steps="560"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.8" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.060000" steps="299"/></proof>
+     <proof prover="3"><result status="valid" time="0.108726" steps="639"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.9" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.080000" steps="316"/></proof>
+     <proof prover="3"><result status="valid" time="0.121371" steps="740"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.10" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.080000" steps="317"/></proof>
+     <proof prover="3"><result status="valid" time="0.119582" steps="750"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.11" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.260000" steps="537"/></proof>
+     <proof prover="3"><result status="valid" time="0.271750" steps="1823"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.12" expl="VC for play_card" proved="true">
-     <proof prover="2" timelimit="1"><result status="valid" time="0.020000" steps="84551"/></proof>
+     <proof prover="2"><result status="valid" time="0.020000" steps="84551"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.13" expl="VC for play_card" proved="true">
-     <proof prover="2" timelimit="1"><result status="valid" time="0.030000" steps="151146"/></proof>
+     <proof prover="6"><result status="valid" time="0.816585" steps="76219"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.14" expl="VC for play_card" proved="true">
-     <proof prover="2"><result status="valid" time="0.020000" steps="53274"/></proof>
+     <proof prover="3"><result status="valid" time="0.067419" steps="401"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.15" expl="VC for play_card" proved="true">
-     <proof prover="2"><result status="valid" time="0.020000" steps="48522"/></proof>
+     <proof prover="3"><result status="valid" time="0.072750" steps="402"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.16" expl="VC for play_card" proved="true">
-     <proof prover="2"><result status="valid" time="0.020000" steps="45449"/></proof>
+     <proof prover="3"><result status="valid" time="0.077376" steps="415"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.17" expl="VC for play_card" proved="true">
-     <proof prover="2"><result status="valid" time="0.020000" steps="39291"/></proof>
+     <proof prover="3"><result status="valid" time="0.125833" steps="824"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.18" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.210000" steps="583"/></proof>
+     <proof prover="3"><result status="valid" time="0.217533" steps="1393"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.19" expl="VC for play_card" proved="true">
-     <proof prover="2"><result status="valid" time="0.020000" steps="43945"/></proof>
+     <proof prover="3"><result status="valid" time="0.142985" steps="841"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.20" expl="VC for play_card" proved="true">
-     <proof prover="2"><result status="valid" time="0.020000" steps="86051"/></proof>
+     <proof prover="3"><result status="valid" time="0.387438" steps="2436"/></proof>
      </goal>
     </transf>
     </goal>
@@ -164,19 +164,19 @@
   </transf>
   </goal>
   <goal name="play_card&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.020000" steps="100"/></proof>
+  <proof prover="3"><result status="valid" time="0.033314" steps="158"/></proof>
   </goal>
   <goal name="play_card&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.020000" steps="100"/></proof>
+  <proof prover="3"><result status="valid" time="0.044985" steps="164"/></proof>
   </goal>
   <goal name="play_card&#39;vc.4" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.010000" steps="73"/></proof>
+  <proof prover="3"><result status="valid" time="0.023802" steps="86"/></proof>
   </goal>
   <goal name="play_card&#39;vc.5" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.040000" steps="205"/></proof>
+  <proof prover="3"><result status="valid" time="0.039876" steps="166"/></proof>
   </goal>
   <goal name="play_card&#39;vc.6" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="57"/></proof>
+  <proof prover="3"><result status="valid" time="0.015794" steps="55"/></proof>
   </goal>
   <goal name="play_card&#39;vc.7" expl="postcondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -185,67 +185,67 @@
     <goal name="play_card&#39;vc.7.0.0" expl="postcondition" proved="true">
     <transf name="split_goal_right" proved="true" >
      <goal name="play_card&#39;vc.7.0.0.0" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.050000" steps="102"/></proof>
+     <proof prover="3"><result status="valid" time="0.032338" steps="165"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.1" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.050000" steps="106"/></proof>
+     <proof prover="3"><result status="valid" time="0.042428" steps="176"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.2" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.050000" steps="104"/></proof>
+     <proof prover="3"><result status="valid" time="0.037117" steps="166"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.3" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.050000" steps="179"/></proof>
+     <proof prover="3"><result status="valid" time="0.063461" steps="293"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.4" expl="VC for play_card" proved="true">
-     <proof prover="2" timelimit="1"><result status="valid" time="0.020000" steps="43891"/></proof>
+     <proof prover="1"><result status="valid" time="0.163078" steps="28847"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.5" expl="VC for play_card" proved="true">
-     <proof prover="2" timelimit="1"><result status="valid" time="0.020000" steps="43674"/></proof>
+     <proof prover="1"><result status="valid" time="0.281819" steps="42517"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.6" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.090000" steps="197"/></proof>
+     <proof prover="3"><result status="valid" time="0.068260" steps="399"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.7" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.090000" steps="194"/></proof>
+     <proof prover="3"><result status="valid" time="0.069961" steps="387"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.8" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.090000" steps="201"/></proof>
+     <proof prover="3"><result status="valid" time="0.066780" steps="413"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.9" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.160000" steps="227"/></proof>
+     <proof prover="3"><result status="valid" time="0.091000" steps="528"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.10" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.090000" steps="226"/></proof>
+     <proof prover="3"><result status="valid" time="0.095381" steps="575"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.11" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.230000" steps="243"/></proof>
+     <proof prover="3"><result status="valid" time="0.109449" steps="678"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.12" expl="VC for play_card" proved="true">
-     <proof prover="2" timelimit="1"><result status="valid" time="0.020000" steps="55059"/></proof>
+     <proof prover="6"><result status="valid" time="0.144303" steps="15468"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.13" expl="VC for play_card" proved="true">
-     <proof prover="2" timelimit="1"><result status="valid" time="0.020000" steps="51407"/></proof>
+     <proof prover="2"><result status="valid" time="0.020000" steps="51407"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.14" expl="VC for play_card" proved="true">
-     <proof prover="2"><result status="valid" time="0.020000" steps="44977"/></proof>
+     <proof prover="3"><result status="valid" time="0.053972" steps="308"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.15" expl="VC for play_card" proved="true">
-     <proof prover="2"><result status="valid" time="0.020000" steps="43855"/></proof>
+     <proof prover="3"><result status="valid" time="0.060002" steps="307"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.16" expl="VC for play_card" proved="true">
-     <proof prover="2"><result status="valid" time="0.020000" steps="51695"/></proof>
+     <proof prover="3"><result status="valid" time="0.068156" steps="316"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.17" expl="VC for play_card" proved="true">
-     <proof prover="2"><result status="valid" time="0.020000" steps="41727"/></proof>
+     <proof prover="3"><result status="valid" time="0.076224" steps="485"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.18" expl="VC for play_card" proved="true">
-     <proof prover="4"><result status="valid" time="0.210000" steps="293"/></proof>
+     <proof prover="3"><result status="valid" time="0.114541" steps="833"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.19" expl="VC for play_card" proved="true">
-     <proof prover="2"><result status="valid" time="0.020000" steps="45872"/></proof>
+     <proof prover="3"><result status="valid" time="0.085363" steps="495"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.20" expl="VC for play_card" proved="true">
-     <proof prover="2"><result status="valid" time="0.020000" steps="61909"/></proof>
+     <proof prover="3"><result status="valid" time="0.194016" steps="1226"/></proof>
      </goal>
     </transf>
     </goal>
@@ -254,97 +254,97 @@
   </transf>
   </goal>
   <goal name="play_card&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.020000" steps="110"/></proof>
+  <proof prover="3"><result status="valid" time="0.045270" steps="130"/></proof>
   </goal>
   <goal name="play_card&#39;vc.9" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.020000" steps="110"/></proof>
+  <proof prover="3"><result status="valid" time="0.037332" steps="135"/></proof>
   </goal>
   <goal name="play_card&#39;vc.10" expl="out of loop bounds" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="121"/></proof>
+  <proof prover="3"><result status="valid" time="0.036667" steps="149"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="play_cards&#39;vc" expl="VC for play_cards" proved="true">
- <proof prover="4"><result status="valid" time="0.040000" steps="555"/></proof>
+ <proof prover="3"><result status="valid" time="0.100392" steps="704"/></proof>
  </goal>
  <goal name="play_game&#39;vc" expl="VC for play_game" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="play_game&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.010000" steps="19"/></proof>
+  <proof prover="3"><result status="valid" time="0.020100" steps="83"/></proof>
   </goal>
   <goal name="play_game&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.010000" steps="8"/></proof>
+  <proof prover="3"><result status="valid" time="0.012665" steps="19"/></proof>
   </goal>
   <goal name="play_game&#39;vc.2" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="44"/></proof>
+  <proof prover="3"><result status="valid" time="0.020323" steps="52"/></proof>
   </goal>
   <goal name="play_game&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="10"/></proof>
+  <proof prover="3"><result status="valid" time="0.013972" steps="21"/></proof>
   </goal>
   <goal name="play_game&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.080000" steps="20"/></proof>
+  <proof prover="3"><result status="valid" time="0.016897" steps="32"/></proof>
   </goal>
   <goal name="play_game&#39;vc.5" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.010000" steps="56"/></proof>
+  <proof prover="3"><result status="valid" time="0.020520" steps="60"/></proof>
   </goal>
   <goal name="play_game&#39;vc.6" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.010000" steps="68"/></proof>
+  <proof prover="3"><result status="valid" time="0.012108" steps="72"/></proof>
   </goal>
   <goal name="play_game&#39;vc.7" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="4"/></proof>
+  <proof prover="3"><result status="valid" time="0.003980" steps="12"/></proof>
   </goal>
   <goal name="play_game&#39;vc.8" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="4"/></proof>
+  <proof prover="3"><result status="valid" time="0.008177" steps="14"/></proof>
   </goal>
   <goal name="play_game&#39;vc.9" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="22"/></proof>
+  <proof prover="3"><result status="valid" time="0.017703" steps="28"/></proof>
   </goal>
   <goal name="play_game&#39;vc.10" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.010000" steps="24"/></proof>
+  <proof prover="3"><result status="valid" time="0.004465" steps="29"/></proof>
   </goal>
   <goal name="play_game&#39;vc.11" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.010000" steps="26"/></proof>
+  <proof prover="3"><result status="valid" time="0.013554" steps="30"/></proof>
   </goal>
   <goal name="play_game&#39;vc.12" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.010000" steps="63"/></proof>
+  <proof prover="3"><result status="valid" time="0.030837" steps="67"/></proof>
   </goal>
   <goal name="play_game&#39;vc.13" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="185"/></proof>
+  <proof prover="3"><result status="valid" time="0.041912" steps="184"/></proof>
   </goal>
   <goal name="play_game&#39;vc.14" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.010000" steps="65"/></proof>
+  <proof prover="3"><result status="valid" time="0.021315" steps="76"/></proof>
   </goal>
   <goal name="play_game&#39;vc.15" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.020000" steps="34752"/></proof>
+  <proof prover="3"><result status="valid" time="0.033194" steps="156"/></proof>
   </goal>
   <goal name="play_game&#39;vc.16" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.020000" steps="136"/></proof>
+  <proof prover="3"><result status="valid" time="0.060513" steps="293"/></proof>
   </goal>
   <goal name="play_game&#39;vc.17" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.020000" steps="179"/></proof>
+  <proof prover="3"><result status="valid" time="0.087585" steps="466"/></proof>
   </goal>
   <goal name="play_game&#39;vc.18" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.410000" steps="786"/></proof>
+  <proof prover="3"><result status="valid" time="0.417761" steps="2283"/></proof>
   </goal>
   <goal name="play_game&#39;vc.19" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.010000" steps="33"/></proof>
+  <proof prover="3"><result status="valid" time="0.014937" steps="39"/></proof>
   </goal>
   <goal name="play_game&#39;vc.20" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.080000" steps="104"/></proof>
+  <proof prover="3"><result status="valid" time="0.052693" steps="304"/></proof>
   </goal>
   <goal name="play_game&#39;vc.21" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="play_game&#39;vc.21.0" expl="assertion" proved="true">
-   <proof prover="4" timelimit="1"><result status="valid" time="0.010000" steps="70"/></proof>
+   <proof prover="3"><result status="valid" time="0.019767" steps="70"/></proof>
    </goal>
    <goal name="play_game&#39;vc.21.1" expl="assertion" proved="true">
-   <proof prover="4" timelimit="1"><result status="valid" time="0.010000" steps="70"/></proof>
+   <proof prover="3"><result status="valid" time="0.024417" steps="70"/></proof>
    </goal>
    <goal name="play_game&#39;vc.21.2" expl="assertion" proved="true">
-   <proof prover="4" timelimit="1"><result status="valid" time="0.010000" steps="85"/></proof>
+   <proof prover="3"><result status="valid" time="0.031506" steps="85"/></proof>
    </goal>
    <goal name="play_game&#39;vc.21.3" expl="assertion" proved="true">
-   <proof prover="4" timelimit="1"><result status="valid" time="0.010000" steps="85"/></proof>
+   <proof prover="3"><result status="valid" time="0.029595" steps="85"/></proof>
    </goal>
    <goal name="play_game&#39;vc.21.4" expl="VC for play_game" proved="true">
    <transf name="unfold" proved="true" arg1="range">
@@ -355,15 +355,15 @@
       <goal name="play_game&#39;vc.21.4.0.0.0" expl="VC for play_game" proved="true">
       <transf name="destruct_rec" proved="true" arg1="Hinst">
        <goal name="play_game&#39;vc.21.4.0.0.0.0" expl="destruct premise" proved="true">
-       <proof prover="4"><result status="valid" time="0.010000" steps="25"/></proof>
+       <proof prover="3"><result status="valid" time="0.013777" steps="25"/></proof>
        </goal>
        <goal name="play_game&#39;vc.21.4.0.0.0.1" expl="VC for play_game" proved="true">
        <transf name="replace" proved="true" arg1="(f i)" arg2="(match (positions s)[(seqval sigma)[i]] with x,_ -&gt; x end)">
         <goal name="play_game&#39;vc.21.4.0.0.0.1.0" expl="VC for play_game" proved="true">
-        <proof prover="5"><result status="valid" time="0.090000"/></proof>
+        <proof prover="1"><result status="valid" time="0.077910" steps="16523"/></proof>
         </goal>
         <goal name="play_game&#39;vc.21.4.0.0.0.1.1" expl="equality hypothesis" proved="true">
-        <proof prover="4"><result status="valid" time="0.010000" steps="31"/></proof>
+        <proof prover="3"><result status="valid" time="0.024493" steps="32"/></proof>
         </goal>
        </transf>
        </goal>
@@ -376,29 +376,29 @@
    </transf>
    </goal>
    <goal name="play_game&#39;vc.21.5" expl="VC for play_game" proved="true">
-   <proof prover="4" timelimit="1"><result status="valid" time="0.010000" steps="25"/></proof>
+   <proof prover="3"><result status="valid" time="0.018959" steps="27"/></proof>
    </goal>
    <goal name="play_game&#39;vc.21.6" expl="VC for play_game" proved="true">
-   <proof prover="4" timelimit="1"><result status="valid" time="0.020000" steps="124"/></proof>
+   <proof prover="3"><result status="valid" time="0.031785" steps="125"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="play_game&#39;vc.22" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.130000" steps="434"/></proof>
+  <proof prover="3"><result status="valid" time="0.109250" steps="574"/></proof>
   </goal>
   <goal name="play_game&#39;vc.23" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.010000" steps="35"/></proof>
+  <proof prover="3"><result status="valid" time="0.016511" steps="39"/></proof>
   </goal>
   <goal name="play_game&#39;vc.24" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.110000" steps="920"/></proof>
+  <proof prover="3"><result status="valid" time="0.158675" steps="930"/></proof>
   </goal>
   <goal name="play_game&#39;vc.25" expl="out of loop bounds" proved="true">
-  <proof prover="4"><result status="valid" time="0.000000" steps="11"/></proof>
+  <proof prover="3"><result status="valid" time="0.018863" steps="19"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="test&#39;vc" expl="VC for test" proved="true">
- <proof prover="4" timelimit="1"><result status="valid" time="0.000000" steps="0"/></proof>
+ <proof prover="3"><result status="valid" time="0.008309" steps="1"/></proof>
  </goal>
 </theory>
 </file>

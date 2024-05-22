@@ -17,7 +17,7 @@ File model_projection.mlw:
   Line 6:
     to_map : t -> int -> int = [|_ => [|14 => 43; _ => 0|]|]
   Line 9:
-    get : t -> int -> int = fun arg_07 arg_13 -> 42
+    get : t -> int -> int = fun arg_05 arg_13 -> 42
   Line 13:
     set :
       t
@@ -26,20 +26,7 @@ File model_projection.mlw:
       ->
       int
       ->
-      t = fun arg_06 arg_12 arg_21 -> {Top.to_map => [|14 => 43; _ => 0|]}
-  Line 17:
-    d :
-      s
-      ->
-      t = [|{d = {Top.to_map => [|14 => 43; _ => 0|]}} =>
-            {Top.to_map => [|14 => 43; _ => 0|]};
-          _ => {Top.to_map => [|14 => 43; _ => 0|]}|]
-    s'mk :
-      t
-      ->
-      s = [|{Top.to_map => [|14 => 43; _ => 0|]} =>
-            {d = {Top.to_map => [|14 => 43; _ => 0|]}};
-          _ => {d = {Top.to_map => [|14 => 43; _ => 0|]}}|]
+      t = fun arg_04 arg_12 arg_21 -> {Top.to_map => [|14 => 43; _ => 0|]}
   Line 19:
     y : t = {Top.to_map => [|14 => 43; _ => 0|]}
   Line 22:

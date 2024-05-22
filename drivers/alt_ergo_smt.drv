@@ -37,3 +37,11 @@ transformation "eliminate_algebraic"
 transformation "eliminate_literal"
 transformation "split_premise_right"
 transformation "simplify_formula"
+
+
+theory BuiltIn
+
+  meta "eliminate_algebraic" "keep_enums"
+  meta "eliminate_algebraic" "keep_recs"
+
+end
