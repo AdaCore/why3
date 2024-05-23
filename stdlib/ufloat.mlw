@@ -654,7 +654,7 @@ module USingleLemmas
     || x = u128 \/ x = u256 || x = u4096 || x = u8192 || x = u16384 || x = u32768
     || x = u65536
 
-  axiom div_by_positive_power_of_2 : forall x y. is_positive_power_of_2 y ->
+  lemma div_by_positive_power_of_2 : forall x y. is_positive_power_of_2 y ->
     abs (to_real (x //. y) -. to_real x /. to_real y) <=. eta
 
   let lemma udiv_pow_of_2_single_error_propagation (x_uf y_uf : usingle) (x x' x_rel_err x_cst_err : real)
@@ -991,7 +991,7 @@ module UDoubleLemmas
     || x = u128 \/ x = u256 || x = u4096 || x = u8192 || x = u16384 || x = u32768
     || x = u65536
 
-  axiom div_by_positive_power_of_2 : forall x y. is_positive_power_of_2 y ->
+  lemma div_by_positive_power_of_2 : forall x y. is_positive_power_of_2 y ->
     abs (to_real (x //. y) -. to_real x /. to_real y) <=. eta
 
   let lemma udiv_pow_of_2_double_error_propagation (x_uf y_uf : udouble) (x x' x_rel_err x_cst_err : real)
