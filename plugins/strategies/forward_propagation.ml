@@ -70,22 +70,13 @@ type symbols = {
 let symbols = ref None
 let ( !! ) s = Option.get !s
 
-(* This type is used in order to keep a real formula with and without
-   simplifications *)
-type real_fmla = {
-  full : term;
-  simplified : term;
-}
-
-let rf t = { full = t; simplified = t }
-
 (* A term 't' having a forward error 'e' means "|t - e.exact| <= e.rel *
    e.factor + e.cst", where |exact_t| <= t' *)
 type forward_error = {
-  exact : real_fmla;
-  factor : real_fmla;
-  rel : real_fmla;
-  cst : real_fmla;
+  exact : term;
+  factor : term;
+  rel : term;
+  cst : term;
 }
 
 (* This type corresponds to the numeric info we have on a real/float term *)
@@ -108,29 +99,28 @@ type info = {
 
 let default_strat () = Sdo_nothing
 
-let zero_term =
+let zero =
   t_const
     (Constant.ConstReal
        (Number.real_literal ~radix:10 ~neg:false ~int:"0" ~frac:"0" ~exp:None))
     ty_real
 
-let one_term =
+let one =
   t_const
     (Constant.ConstReal
        (Number.real_literal ~radix:10 ~neg:false ~int:"1" ~frac:"0" ~exp:None))
     ty_real
 
-let is_zero t = t_equal zero_term t
-let is_one t = t_equal one_term t
+let is_zero t = t_equal zero t
+let is_one t = t_equal one t
 
-let abs_term t =
+let abs t =
   match t.t_node with
   (* Don't add an abs symbol on top of another *)
   | Tapp (ls, [ _ ]) when ls_equal !!symbols.abs ls -> t
   | _ -> fs_app !!symbols.abs [ t ] ty_real
 
-let abs t = { full = abs_term t.full; simplified = abs_term t.simplified }
-let from_int_term t = fs_app !!symbols.from_int [ t ] ty_real
+let from_int t = fs_app !!symbols.from_int [ t ] ty_real
 
 let is_ineq_ls ls =
   let symbols = !!symbols in
@@ -217,7 +207,7 @@ let div t1 t2 = fs_app !!symbols.div_infix [ t1; t2 ] ty_real
 
 let mul_simp t1 t2 =
   if is_zero t1 || is_zero t2 then
-    zero_term
+    zero
   else if is_one t1 then
     t2
   else if is_one t2 then
@@ -226,12 +216,12 @@ let mul_simp t1 t2 =
     match (t1.t_node, t2.t_node) with
     | Tapp (ls1, [ t1 ]), Tapp (ls2, [ t2 ]) when is_abs_ls ls1 && is_abs_ls ls2
       ->
-      abs_term (mul t1 t2)
+      abs (mul t1 t2)
     | _ -> mul t1 t2
 
 let div_simp t1 t2 =
   if is_zero t1 then
-    zero_term
+    zero
   else if is_one t2 then
     t1
   else
@@ -247,19 +237,6 @@ let ( **. ) x y = mul_simp x y
 let ( //. ) x y = div_simp x y
 let ( <=. ) x y = ps_app !!symbols.le_infix [ x; y ]
 
-let compose_fmla op op_simp x y =
-  { full = op x.full y.full; simplified = op_simp x.simplified y.simplified }
-
-let add_fmla x y = compose_fmla add add_simp x y
-let sub_fmla x y = compose_fmla sub sub_simp x y
-let mul_fmla x y = compose_fmla mul mul_simp x y
-let div_fmla x y = compose_fmla div div_simp x y
-let ( ++ ) x y = add_fmla x y
-let ( -- ) x y = sub_fmla x y
-let ( ** ) x y = mul_fmla x y
-let ( // ) x y = div_fmla x y
-let minus x = { full = minus x.full; simplified = minus_simp x.simplified }
-
 let is_ty_float ty =
   match ty.ty_node with
   | Tyapp (v, []) ->
@@ -272,7 +249,7 @@ let is_ty_float ty =
       false
   | _ -> false
 
-let eps_term ieee_type =
+let eps ieee_type =
   if ts_equal ieee_type !!symbols.usingle_symbols.ufloat_type then
     !!symbols.usingle_symbols.eps
   else if ts_equal ieee_type !!symbols.udouble_symbols.ufloat_type then
@@ -280,7 +257,7 @@ let eps_term ieee_type =
   else
     failwith (asprintf "Unsupported type %a" Pretty.print_ts ieee_type)
 
-let eta_term ieee_type =
+let eta ieee_type =
   if ts_equal ieee_type !!symbols.usingle_symbols.ufloat_type then
     !!symbols.usingle_symbols.eta
   else if ts_equal ieee_type !!symbols.udouble_symbols.ufloat_type then
@@ -288,18 +265,7 @@ let eta_term ieee_type =
   else
     failwith (asprintf "Unsupported type %a" Pretty.print_ts ieee_type)
 
-let zero = rf zero_term
-let one = rf one_term
-let eps ieee_type = rf (eps_term ieee_type)
-let eta ieee_type = rf (eta_term ieee_type)
-
-let fs_app_fmla fs t ty =
-  {
-    full = fs_app fs (List.map (fun x -> x.full) t) ty;
-    simplified = fs_app fs (List.map (fun x -> x.simplified) t) ty;
-  }
-
-let to_real_term ieee_type t =
+let to_real ieee_type t =
   let to_real =
     if ts_equal ieee_type !!symbols.usingle_symbols.ufloat_type then
       !!symbols.usingle_symbols.to_real
@@ -309,15 +275,6 @@ let to_real_term ieee_type t =
       failwith (asprintf "Unsupported type %a" Pretty.print_ts ieee_type)
   in
   fs_app to_real [ t ] ty_real
-
-let to_real ieee_type t =
-  {
-    full = to_real_term ieee_type t.full;
-    simplified = to_real_term ieee_type t.simplified;
-  }
-
-let from_int t =
-  { full = from_int_term t.full; simplified = from_int_term t.simplified }
 
 let real_fun ieee_type =
   if ts_equal ieee_type !!symbols.usingle_symbols.ufloat_type then
@@ -395,57 +352,65 @@ let term_to_str t =
   in
   Format.asprintf "%a" P.print_term t
 
-let generate_final info e r strat to_real =
-  let total_err = (e.rel.full *. e.factor.full) +. e.cst.full in
-  let total_err_simp =
-    (e.rel.simplified **. e.factor.simplified) ++. e.cst.simplified
-  in
-  let f = abs_term (to_real r -. e.exact.full) <=. total_err in
-  if t_equal total_err total_err_simp then
-    (info, f, strat)
-  else
-    let f_simp = abs_term (to_real r -. e.exact.full) <=. total_err_simp in
-    ( info,
-      f_simp,
-      Sapply_trans ("assert", [ term_to_str f ], [ strat; default_strat () ]) )
-
-let generate_add e1 e2 eps =
-  let rel = e1.rel ++ e2.rel ++ eps in
-  let cst =
-    ((one ++ eps ++ e2.rel) ** e1.cst) ++ ((one ++ eps ++ e1.rel) ** e2.cst)
-  in
-  { exact = e1.exact ++ e2.exact; factor = e1.factor ++ e2.factor; rel; cst }
-
-let generate_mul e1 e2 eps eta =
-  let rel = eps ++ ((e1.rel ++ e2.rel ++ (e1.rel ** e2.rel)) ** (one ++ eps)) in
-  let cst =
-    (((e2.cst ++ (e2.cst ** e1.rel)) ** e1.factor)
-    ++ ((e1.cst ++ (e1.cst ** e2.rel)) ** e2.factor)
-    ++ (e1.cst ** e2.cst))
-    ** (one ++ eps)
-    ++ eta
-  in
-  { exact = e1.exact ** e2.exact; factor = e1.factor ** e2.factor; rel; cst }
-
 (* Error on an IEEE op when propagation is needed (eg. we have a forward error
    on t1 and/or on t2) *)
-let generate_uop info uop t1 e1 t2 e2 r strat_for_t1 strat_for_t2 =
+let combine_uop_errors info uop t1 e1 t2 e2 r strat_for_t1 strat_for_t2 =
   let ts = get_ts r in
   let eps = eps ts in
   let eta = eta ts in
-  let to_real = to_real_term ts in
-  let e =
-    if is_uadd_ls uop then
-      generate_add e1 e2 eps
-    else if is_usub_ls uop then
-      let e = generate_add e1 e2 eps in
-      { e with exact = e1.exact -- e2.exact }
-    else if is_umul_ls uop then
-      generate_mul e1 e2 eps eta
+  let to_real = to_real ts in
+  let rel_err, rel_err_simp =
+    if is_uadd_ls uop || is_usub_ls uop then
+      (* Relative error for addition and sustraction *)
+      (e1.rel +. e2.rel +. eps, e1.rel ++. e2.rel ++. eps)
     else
-      assert false
+      (* Relative error for multiplication *)
+      ( eps +. ((e1.rel +. e2.rel +. (e1.rel *. e2.rel)) *. (one +. eps)),
+        eps ++. ((e1.rel ++. e2.rel ++. (e1.rel **. e2.rel)) **. (one ++. eps))
+      )
   in
-  let info = add_fw_error info r e in
+  let cst_err, cst_err_simp =
+    if is_uadd_ls uop || is_usub_ls uop then
+      (* Constant error for addition and sustraction *)
+      ( ((one +. eps +. e2.rel) *. e1.cst) +. ((one +. eps +. e1.rel) *. e2.cst),
+        ((one ++. eps ++. e2.rel) **. e1.cst)
+        ++. ((one ++. eps ++. e1.rel) **. e2.cst) )
+    else
+      (* Constant error for multiplication *)
+      ( (((e2.cst +. (e2.cst *. e1.rel)) *. e1.factor)
+        +. ((e1.cst +. (e1.cst *. e2.rel)) *. e2.factor)
+        +. (e1.cst *. e2.cst))
+        *. (one +. eps)
+        +. eta,
+        (((one ++. eps) **. (e2.cst ++. (e2.cst **. e1.rel))) **. e1.factor)
+        ++. (((one ++. eps) **. (e1.cst ++. (e1.cst **. e2.rel))) **. e2.factor)
+        ++. ((one ++. eps) **. e1.cst **. e2.cst)
+        ++. eta )
+  in
+  let total_err =
+    if is_uadd_ls uop || is_usub_ls uop then
+      (rel_err *. (e1.factor +. e2.factor)) +. cst_err
+    else
+      (rel_err *. (e1.factor *. e2.factor)) +. cst_err
+  in
+  let total_err_simp =
+    if is_uadd_ls uop || is_usub_ls uop then
+      (rel_err **. (e1.factor ++. e2.factor)) ++. cst_err
+    else
+      (rel_err **. e1.factor **. e2.factor) ++. cst_err
+  in
+  let exact, exact' =
+    if is_uadd_ls uop then
+      (e1.exact +. e2.exact, e1.factor ++. e2.factor)
+    else if is_usub_ls uop then
+      (e1.exact -. e2.exact, e1.factor ++. e2.factor)
+    else
+      (e1.exact *. e2.exact, e1.factor **. e2.factor)
+  in
+  let info =
+    add_fw_error info r
+      { exact; rel = rel_err_simp; factor = exact'; cst = cst_err_simp }
+  in
   let str = string_of_ufloat_type_and_op ts uop in
   let strat =
     Sapply_trans
@@ -455,10 +420,26 @@ let generate_uop info uop t1 e1 t2 e2 r strat_for_t1 strat_for_t2 =
           "with";
           sprintf "%s,%s" (term_to_str t1) (term_to_str t2);
         ],
-        [ strat_for_t1; strat_for_t2 ] @ List.init 7 (fun _ -> default_strat ())
-      )
+        [
+          strat_for_t1;
+          strat_for_t2;
+          default_strat ();
+          default_strat ();
+          default_strat ();
+          default_strat ();
+          default_strat ();
+          default_strat ();
+          default_strat ();
+        ] )
   in
-  generate_final info e r strat to_real
+  let f = abs (to_real r -. exact) <=. total_err in
+  if t_equal total_err total_err_simp then
+    (info, f, strat)
+  else
+    let f_simp = abs (to_real r -. exact) <=. total_err_simp in
+    ( info,
+      f_simp,
+      Sapply_trans ("assert", [ term_to_str f ], [ strat; default_strat () ]) )
 
 (* Error on a IEEE op when no propagation is needed (eg. we don't have a forward
    error on t1 nor t2) *)
@@ -467,29 +448,25 @@ let basic_uop_error info uop r t1 t2 =
   let eps = eps ts in
   let eta = eta ts in
   let to_real = to_real ts in
-  let t1 = rf t1 in
-  let t2 = rf t2 in
   let exact =
     if is_uadd_ls uop then
-      to_real t1 ++ to_real t2
+      to_real t1 +. to_real t2
     else if is_usub_ls uop then
-      to_real t1 -- to_real t2
+      to_real t1 -. to_real t2
     else
-      to_real t1 ** to_real t2
+      to_real t1 *. to_real t2
   in
-  let cst =
+  let cst_err =
     if is_umul_ls uop then
       eta
     else
       zero
   in
-  let total_err = (eps ** abs exact) ++ cst in
+  let total_err = (eps *. abs exact) ++. cst_err in
   let info =
-    add_fw_error info r { exact; rel = eps; factor = abs exact; cst }
+    add_fw_error info r { exact; rel = eps; factor = abs exact; cst = cst_err }
   in
-  let f =
-    abs_term (to_real_term ts r -. exact.simplified) <=. total_err.simplified
-  in
+  let f = abs (to_real r -. exact) <=. total_err in
   (info, f, default_strat ())
 
 (* Generates the formula and the strat for the forward error of `r = uop t1
@@ -506,17 +483,12 @@ let use_ieee_thms info uop r t1 t2 strat_for_t1 strat_for_t2 =
     let get_err_or_default t t_info =
       match t_info.error with
       | None ->
-        {
-          exact = to_real (rf t);
-          rel = zero;
-          factor = abs (to_real (rf t));
-          cst = zero;
-        }
+        { exact = to_real t; rel = zero; factor = abs (to_real t); cst = zero }
       | Some e -> e
     in
     let e1 = get_err_or_default t1 t1_info in
     let e2 = get_err_or_default t2 t2_info in
-    generate_uop info uop t1 e1 t2 e2 r strat_for_t1 strat_for_t2
+    combine_uop_errors info uop t1 e1 t2 e2 r strat_for_t1 strat_for_t2
 
 (* The lemmas for error propagation on known functions use the higher order
    symbol '@'. To apply these lemmas, we need to transform terms of the form `fn
@@ -561,64 +533,83 @@ let get_known_fn_and_args t x =
     | _ -> None)
   | _ -> None
 
-let generate_sin_cos exact_fn exact e_arg e_app =
-  let cst =
-    (((e_arg.rel ** e_arg.factor) ++ e_arg.cst) ** (one ++ e_app.rel))
-    ++ e_app.cst
-  in
-  let factor = abs (fs_app_fmla exact_fn [ e_arg.exact ] ty_real) in
-  ({ exact; rel = e_app.rel; cst; factor }, 3)
-
-let generate_exp exact_fn exact e_arg e_app =
-  let a =
-    fs_app_fmla exact_fn [ (e_arg.rel ** e_arg.factor) ++ e_arg.cst ] ty_real
-  in
-  let rel = e_app.rel ++ ((a -- one) ** (one ++ e_app.rel)) in
-  let factor = fs_app_fmla exact_fn [ e_arg.exact ] ty_real in
-  ({ exact; rel; cst = e_app.cst; factor }, 3)
-
-let generate_log exact_fn exact e_arg e_app =
-  let a =
-    fs_app_fmla exact_fn
-      [ one -- (((e_arg.rel ** e_arg.factor) ++ e_arg.cst) // e_arg.exact) ]
-      ty_real
-  in
-  let a =
-    if
-      t_equal e_arg.exact.simplified e_arg.factor.simplified
-      || t_equal (abs_term e_arg.exact.simplified) e_arg.factor.simplified
-    then
-      {
-        a with
-        simplified =
-          fs_app exact_fn
-            [
-              one_term
-              --. (e_arg.rel.simplified
-                  ++. (e_arg.cst.simplified //. e_arg.exact.simplified));
-            ]
-            ty_real;
-      }
-    else
-      a
-  in
-  let cst = (minus a ** (one ++ e_app.rel)) ++ e_app.cst in
-  let factor = abs (fs_app_fmla exact_fn [ e_arg.exact ] ty_real) in
-  ({ exact; rel = e_app.rel; cst; factor }, 4)
-
 (* Returns the forward error formula associated with the propagation lemma of
    the function `exact_fn`. `app_approx` *)
-let get_fn_errs info exact_fn exact e_arg e_app =
-  if ls_equal exact_fn !!symbols.sin || ls_equal exact_fn !!symbols.cos then
-    generate_sin_cos exact_fn exact e_arg e_app
-  else if ls_equal exact_fn !!symbols.exp then
-    generate_exp exact_fn exact e_arg e_app
+let get_fn_errs info exact_fn app_approx arg_approx =
+  let e_arg = Option.get (get_info info.terms_info arg_approx).error in
+  let e_app = Option.get (get_info info.terms_info app_approx).error in
+  if ls_equal exact_fn !!symbols.exp then
+    let cst_err = e_app.cst in
+    let a =
+      fs_app exact_fn [ (e_arg.rel *. e_arg.factor) +. e_arg.cst ] ty_real
+    in
+    let a_simp =
+      fs_app exact_fn [ (e_arg.rel **. e_arg.factor) ++. e_arg.cst ] ty_real
+    in
+    let rel_err = e_app.rel +. ((a -. one) *. (one +. e_app.rel)) in
+    let rel_err_simp =
+      e_app.rel ++. ((a_simp --. one) **. (one ++. e_app.rel))
+    in
+    ( rel_err,
+      rel_err_simp,
+      cst_err,
+      cst_err,
+      fs_app exact_fn [ e_arg.exact ] ty_real,
+      3 )
   else if
     ls_equal exact_fn !!symbols.log
     || ls_equal exact_fn !!symbols.log2
     || ls_equal exact_fn !!symbols.log10
   then
-    generate_log exact_fn exact e_arg e_app
+    let a =
+      fs_app exact_fn
+        [ one -. (((e_arg.rel *. e_arg.factor) +. e_arg.cst) /. e_arg.exact) ]
+        ty_real
+    in
+    let a_simp =
+      if
+        t_equal e_arg.exact e_arg.factor
+        || t_equal (abs e_arg.exact) e_arg.factor
+      then
+        fs_app exact_fn
+          [ one --. (e_arg.rel ++. (e_arg.cst //. e_arg.exact)) ]
+          ty_real
+      else
+        fs_app exact_fn
+          [
+            one
+            --. (((e_arg.rel **. e_arg.factor) ++. e_arg.cst) //. e_arg.exact);
+          ]
+          ty_real
+    in
+    let cst_err = (minus a *. (one +. e_app.rel)) +. e_app.cst in
+    let cst_err_simp =
+      (minus_simp a_simp **. (one ++. e_app.rel)) ++. e_app.cst
+    in
+    let rel_err = e_app.rel in
+    ( rel_err,
+      rel_err,
+      cst_err,
+      cst_err_simp,
+      abs (fs_app exact_fn [ e_arg.exact ] ty_real),
+      4 )
+  else if ls_equal exact_fn !!symbols.sin || ls_equal exact_fn !!symbols.cos
+  then
+    let cst_err =
+      (((e_arg.rel *. e_arg.factor) +. e_arg.cst) *. (one +. e_app.rel))
+      +. e_app.cst
+    in
+    let cst_err_simp =
+      (((e_arg.rel **. e_arg.factor) ++. e_arg.cst) **. (one ++. e_app.rel))
+      ++. e_app.cst
+    in
+    let rel_err = e_app.rel in
+    ( rel_err,
+      rel_err,
+      cst_err,
+      cst_err_simp,
+      abs (fs_app exact_fn [ e_arg.exact ] ty_real),
+      3 )
   else
     assert false
 
@@ -628,32 +619,34 @@ let get_fn_errs info exact_fn exact e_arg e_app =
    argument of the function) *)
 let apply_fn_thm info fn app_approx arg_approx strat =
   let e_arg = Option.get (get_info info.terms_info arg_approx).error in
-  let to_real = to_real_term (get_ts app_approx) in
-  let exact = fs_app_fmla fn [ e_arg.exact ] ty_real in
+  let to_real = to_real (get_ts app_approx) in
+  let exact = fs_app fn [ e_arg.exact ] ty_real in
   let fn_str = fn.ls_name.id_string in
   let ty_str = string_of_ufloat_type (get_ts app_approx) in
-  let e_app = Option.get (get_info info.terms_info app_approx).error in
-  let e, nb = get_fn_errs info fn exact e_arg e_app in
+  let rel_err, rel_err_simp, cst_err, cst_err_simp, app', nb =
+    get_fn_errs info fn app_approx arg_approx
+  in
   let strat =
     Sapply_trans
       ( "apply",
         [ sprintf "%s_%s_error_propagation" fn_str ty_str ],
         [ strat ] @ List.init nb (fun _ -> Sdo_nothing) )
   in
-  let term_info = add_fw_error info.terms_info app_approx e in
-  let t_func_app = apply_higher_order_sym info.ls_defs app_approx in
-  let left = abs_term (to_real t_func_app -. exact.simplified) in
-  let total_err = (e.rel.full *. e.factor.full) +. e.cst.full in
-  let total_err_simp =
-    (e.rel.simplified *. e.factor.simplified) +. e.cst.simplified
+  let total_err = (rel_err *. app') +. cst_err in
+  let total_err_simp = (app' **. rel_err_simp) ++. cst_err_simp in
+  let term_info =
+    add_fw_error info.terms_info app_approx
+      { exact; rel = rel_err_simp; factor = app'; cst = cst_err_simp }
   in
+  let t_func_app = apply_higher_order_sym info.ls_defs app_approx in
+  let left = abs (to_real t_func_app -. exact) in
   let s =
     Sapply_trans
       ( "assert",
         [ term_to_str (left <=. total_err) ],
         [ strat; default_strat () ] )
   in
-  let left = abs_term (to_real app_approx -. exact.simplified) in
+  let left = abs (to_real app_approx -. exact) in
   if t_equal total_err total_err_simp then
     (term_info, Some (left <=. total_err), s)
   else
@@ -668,17 +661,21 @@ let apply_fn_thm info fn app_approx arg_approx strat =
 let apply_sum_thm info sum_approx _fn_approx (fn, i, j) =
   let e_sum = Option.get (get_info info.terms_info sum_approx).error in
   let f' =
-    match e_sum.factor.full.t_node with
+    match e_sum.factor.t_node with
     | Tapp (_, [ f'; _; _ ]) -> f'
     | _ -> assert false
   in
   let e_fn = Mls.find fn info.fns_info in
-  let to_real = to_real_term (get_ts sum_approx) in
-  let exact = fs_app_fmla !!symbols.sum [ e_fn.exact; i; j ] ty_real in
-  let factor = fs_app_fmla !!symbols.sum [ e_fn.factor; i; j ] ty_real in
+  let to_real = to_real (get_ts sum_approx) in
+  let exact_sum = fs_app !!symbols.sum [ e_fn.exact; i; j ] ty_real in
+  let sum' = fs_app !!symbols.sum [ e_fn.factor; i; j ] ty_real in
   let ty_str = string_of_ufloat_type (get_ts sum_approx) in
-  let rel = e_fn.rel ++ (e_sum.rel ** (one ++ e_fn.rel)) in
-  let cst = (e_fn.cst ** from_int j ** (one ++ e_sum.rel)) ++ e_sum.cst in
+  let rel_err = e_fn.rel +. (e_sum.rel *. (one +. e_fn.rel)) in
+  let rel_err_simp = e_fn.rel ++. (e_sum.rel **. (one ++. e_fn.rel)) in
+  let cst_err = (e_fn.cst *. from_int j *. (one +. e_sum.rel)) +. e_sum.cst in
+  let cst_err_simp =
+    (e_fn.cst **. from_int j **. (one ++. e_sum.rel)) ++. e_sum.cst
+  in
   let strat =
     Sapply_trans
       ( "apply",
@@ -689,25 +686,31 @@ let apply_sum_thm info sum_approx _fn_approx (fn, i, j) =
         ],
         List.init 5 (fun _ -> Sdo_nothing) )
   in
+  let total_err = (rel_err *. sum') +. cst_err in
+  let total_err_simp = (sum' **. rel_err_simp) ++. cst_err_simp in
   let term_info =
-    add_fw_error info.terms_info sum_approx { exact; rel; factor; cst }
+    add_fw_error info.terms_info sum_approx
+      {
+        exact = exact_sum;
+        rel = rel_err_simp;
+        factor = sum';
+        cst = cst_err_simp;
+      }
   in
   let t_func_app = apply_higher_order_sym info.ls_defs sum_approx in
-  let left = abs_term (to_real t_func_app -. exact.full) in
-  let total_err = (rel.full *. factor.full) +. cst.full in
+  let left = abs (to_real t_func_app -. exact_sum) in
   let s =
     Sapply_trans
       ( "assert",
         [ term_to_str (left <=. total_err) ],
         [ strat; default_strat () ] )
   in
-  let total_err_simp = (factor ** rel) ++ cst in
-  let left = abs_term (to_real sum_approx -. exact.full) in
-  if t_equal total_err total_err_simp.simplified then
+  let left = abs (to_real sum_approx -. exact_sum) in
+  if t_equal total_err total_err_simp then
     (term_info, Some (left <=. total_err), s)
   else
     ( term_info,
-      Some (left <=. total_err_simp.simplified),
+      Some (left <=. total_err_simp),
       Sapply_trans
         ("assert", [ term_to_str (left <=. total_err) ], [ s; default_strat () ])
     )
@@ -779,7 +782,7 @@ let rec get_error_fmlas info t =
     let terms_info, fmla, strat_for_x = get_error_fmlas info x in
     let strat = get_strat fmla strat_for_x in
     let ts = get_ts t in
-    let to_real = to_real_term ts in
+    let to_real = to_real ts in
     let x_info = get_info terms_info x in
     match x_info.error with
     (* No propagation needed *)
@@ -788,10 +791,7 @@ let rec get_error_fmlas info t =
       (* The error doesn't change since the float minus operation is exact *)
     | Some { exact; rel; factor; cst } ->
       let exact = minus exact in
-      let f =
-        abs_term (to_real t -. exact.full)
-        <=. ((rel ** factor) ++ cst).simplified
-      in
+      let f = abs (to_real t -. exact) <=. (rel **. factor) ++. cst in
       let terms_info = add_fw_error terms_info t { exact; rel; factor; cst } in
       (terms_info, Some f, strat))
   (* `t` is the result of an IEEE addition/sustraction/multiplication *)
@@ -815,12 +815,12 @@ let rec get_error_fmlas info t =
        of a known function, in which case we use the function's propagation
        lemma to compute an error bound *)
     | Some e -> (
-      match get_known_fn_and_args t e.exact.full with
+      match get_known_fn_and_args t e.exact with
       | Some (ls, [ fn; i; j ]) when ls_equal ls !!symbols.sum -> (
         match fn.t_node with
         | Tapp (fn, []) ->
           if Mls.mem fn info.fns_info then
-            apply_sum_thm info t ls (fn, rf i, rf j)
+            apply_sum_thm info t ls (fn, i, j)
           else
             (info.terms_info, None, default_strat ())
         | _ -> (info.terms_info, None, default_strat ()))
@@ -846,45 +846,44 @@ let rec get_error_fmlas info t =
 
 let parse_error is_match exact t =
   (* If it we don't find a "relative" error we have an absolute error of `t` *)
-  let exact = rf exact in
-  let e_default = { exact; rel = zero; factor = zero; cst = rf t } in
+  let e_default = { exact; rel = zero; factor = zero; cst = t } in
   let rec parse t =
     if is_match t then
-      ({ exact; rel = one; factor = rf t; cst = zero }, true)
+      ({ exact; rel = one; factor = t; cst = zero }, true)
     else
       match t.t_node with
       | Tapp (ls, [ t1; t2 ]) when is_add_ls ls ->
         let e1, _ = parse t1 in
-        if is_zero e1.rel.simplified then
+        if is_zero e1.rel then
           let e2, _ = parse t2 in
-          if is_zero e2.rel.simplified then
+          if is_zero e2.rel then
             (e_default, false)
           else
             (* FIXME: we should combine the factor of t1 and factor of t2 *)
-            ({ e2 with cst = e2.cst ++ rf t1 }, false)
+            ({ e2 with cst = e2.cst ++. t1 }, false)
         else
-          ({ e1 with cst = e1.cst ++ rf t2 }, false)
+          ({ e1 with cst = e1.cst ++. t2 }, false)
       | Tapp (ls, [ t1; t2 ]) when is_sub_ls ls ->
         (* FIXME : should be the same as for addition *)
         let e1, _ = parse t1 in
-        if is_zero e1.rel.simplified then
+        if is_zero e1.rel then
           (e_default, false)
         else
-          ({ e1 with cst = e1.cst -- rf t2 }, false)
+          ({ e1 with cst = e1.cst --. t2 }, false)
       | Tapp (ls, [ t1; t2 ]) when is_mul_ls ls ->
         let e1, is_factor = parse t1 in
-        if is_zero e1.rel.simplified then
+        if is_zero e1.rel then
           let e2, is_factor = parse t2 in
-          if is_zero e2.rel.simplified then
+          if is_zero e2.rel then
             (e_default, false)
           else if is_factor then
-            ({ e2 with rel = e2.rel ** rf t1 }, true)
+            ({ e2 with rel = e2.rel **. t1 }, true)
           else
-            ({ e2 with cst = e2.cst ** rf t1 }, false)
+            ({ e2 with cst = e2.cst **. t1 }, false)
         else if is_factor then
-          ({ e1 with rel = e1.rel ** rf t2 }, true)
+          ({ e1 with rel = e1.rel **. t2 }, true)
         else
-          ({ e1 with cst = e1.cst ** rf t2 }, false)
+          ({ e1 with cst = e1.cst **. t2 }, false)
       | _ -> (e_default, false)
   in
   fst (parse t)
@@ -998,13 +997,11 @@ let collect_in_quant info q =
         match (args, args') with
         | [ i' ], [ i'' ] when is_var_equal i' i && is_var_equal i'' i -> (
           let e = parse_fn_error i' (t_app_infer exact_fn []) c in
-          match e.factor.simplified.t_node with
+          match e.factor.t_node with
           | Tapp (fn'', args) ->
             let fn' = fst (extract_fn_and_args fn'' args) in
             let fns_info =
-              Mls.add fn
-                { e with factor = rf (t_app_infer fn' []) }
-                info.fns_info
+              Mls.add fn { e with factor = t_app_infer fn' [] } info.fns_info
             in
             { info with fns_info }
           | _ -> info)
