@@ -1,0 +1,21 @@
+module AdditionSqrtSingle
+  use real.RealInfix
+  use real.Abs
+  use ufloat.USingle
+  use ufloat.USingleLemmas
+  use ieee_float.RoundingMode
+  use real.Square
+
+  let ghost function usqrt (x:usingle) : usingle
+    ensures { abs (to_real result -. sqrt (to_real x)) <=. abs (sqrt (to_real x)) *. eps }
+  = uround RNE (sqrt (to_real x))
+
+  let ghost add_sqrt (a b : usingle)
+    ensures {
+      let exact = to_real a +. sqrt (to_real b) in
+      let exact_abs = abs (to_real a) +. abs (sqrt (to_real b)) in
+      abs (to_real result -. exact) <=. 2. *. eps *. exact_abs
+    }
+  = a ++. usqrt b
+  
+end
