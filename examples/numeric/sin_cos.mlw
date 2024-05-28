@@ -44,74 +44,50 @@ axiom twopoint5_val : to_real twopoint5 = 2.5
 
 let ghost kinematics (theta1 theta2:usingle)
   ensures {
-    let exact = 0.5 *. sin (to_real theta1) +. 2.5 *. sin (to_real theta1 +. to_real theta2) in
+    let t = to_real theta1 in
+    let t2 = 1.0 +. eps in
+    let t3 = t +. to_real theta2 in
+    let t4 = 0.5 *. sin t in
+    let t5 = eps +. (sin_error *. t2) in
+    let t6 = 2.5 *. sin t3 in
+    let t7 = t2 +. t5 in
+    let exact = t4 +. t6 in
     abs (to_real result -. exact)
     <=.
     (* Relative part of the error *)
-    (3. *. (eps +. (sin_error *. (1.0 +. eps))))
-      *. (0.5 *. abs (sin (to_real theta1)) +. 2.5 *. (abs (sin (to_real theta1 +. to_real theta2))))
+    (((t5 +. t5) +. eps) *. (abs t4 +. abs t6)) +.
     (* Absolute part of the error *)
-    +. ((((1.0 +. eps) +. (eps +. (sin_error *. (1.0 +. eps)))) *. eta)
-           +. (((1.0 +. eps) +. (eps +. (sin_error *. (1.0 +. eps))))
-               *. ((((1.0 +. eps)
-                     *. ((eps *. abs (to_real theta1 +. to_real theta2))
-                         *. (1.0 +. sin_error)))
-                    *. 2.5)
-                   +. eta)))
+    t7 *. eta +.
+    t7 *. (2.5 *. t2 *. eps *. abs t3 *. (1.0 +. sin_error) +. eta)
+
   }
 = zeropointfive **. sin_approx (theta1) ++. twopoint5 **. sin_approx(theta1 ++. theta2)
 
 let ghost raytracer (theta phi nx ny nz:usingle)
   ensures {
-    let exact = to_real nx *. cos (to_real theta) *. cos (to_real phi) +.
-    to_real ny *. sin (to_real theta) +.
-    to_real nz *. cos (to_real theta) *. sin (to_real phi) in
-    abs (to_real result -. exact)
+    let t = to_real phi in
+    let t1 = to_real theta in
+    let t2 = sin t in
+    let t3 = cos t in
+    let t4 = cos t1 in
+    let t5 = 1.0 +. eps in
+    let t6 = to_real ny *. sin t1 in
+    let t7 = eps +. (cos_error *. t5) in
+    let t8 = eps +. (sin_error *. t5) in
+    let t9 = (to_real nz *. t4) *. t2 in
+    let t10 = (to_real nx *. t4) *. t3 in
+    let t11 = eps +. (((t7 +. cos_error) +. (t7 *. cos_error)) *. t5) in
+    let t12 = eps +. (((t7 +. sin_error) +. (t7 *. sin_error)) *. t5) in
+    let t13 = (t11 +. t8) +. eps in
+    abs (to_real result -. ((t10 +. t6) +. t9))
     <=.
     (* Relative part of the error *)
-    ((
-    (((eps +. ((((eps +. (cos_error *. (1.0 +. eps))) +. cos_error)
-                  +. ((eps +. (cos_error *. (1.0 +. eps))) *. cos_error))
-                 *. (1.0 +. eps)))
-            +. (eps +. (sin_error *. (1.0 +. eps))))
-           +. eps)
-          +. (eps
-              +. ((((eps +. (cos_error *. (1.0 +. eps))) +. sin_error)
-                   +. ((eps +. (cos_error *. (1.0 +. eps))) *. sin_error))
-                  *. (1.0 +. eps))))
-         +. eps)
-        *. (abs (to_real nx *. cos (to_real theta) *. cos (to_real phi))
-             +. abs (to_real ny *. sin (to_real theta))
-            +. abs (to_real nz *. cos (to_real theta) *. sin (to_real phi)))
+    (t13 +. t12 +. eps) *. (abs t10 +. abs t6 +. abs t9) +.
     (* Absolute part of the error *)
-       +. (((1.0 +. eps)
-             +. (eps
-                 +. ((((eps +. (cos_error *. (1.0 +. eps))) +. sin_error)
-                      +. ((eps +. (cos_error *. (1.0 +. eps))) *. sin_error))
-                     *. (1.0 +. eps))))
-            *. ((((1.0 +. eps) +. (eps +. (sin_error *. (1.0 +. eps))))
-                 *. ((((1.0 +. eps) *. (eta +. (eta *. cos_error)))
-                      *. abs (cos (to_real phi)))
-                     +. eta))
-                +. (((1.0 +. eps)
-                     +. (eps
-                         +. ((((eps +. (cos_error *. (1.0 +. eps)))
-                               +. cos_error)
-                              +. ((eps +. (cos_error *. (1.0 +. eps)))
-                                  *. cos_error))
-                             *. (1.0 +. eps))))
-                    *. eta)))
-           +. (((1.0 +. eps)
-                +. (((eps
-                      +. ((((eps +. (cos_error *. (1.0 +. eps))) +. cos_error)
-                           +. ((eps +. (cos_error *. (1.0 +. eps)))
-                               *. cos_error))
-                          *. (1.0 +. eps)))
-                     +. (eps +. (sin_error *. (1.0 +. eps))))
-                    +. eps))
-               *. ((((1.0 +. eps) *. (eta +. (eta *. sin_error)))
-                    *. abs (sin (to_real phi)))
-                   +. eta))
+    (t5 +. t12) *. 
+      ((t5 +. t8) *. (t5 *. (eta +. eta *. cos_error) *. abs t3 +. eta)
+      +. (t5 +. t11) *. eta) +.
+    (t5 +. t13) *. ((t5 *. (eta +. eta *. sin_error) *. abs t2) +. eta)
   }
 =
   nx **. cos_approx theta **. cos_approx phi
@@ -165,77 +141,54 @@ axiom twopoint5_val : to_real twopoint5 = 2.5
 
 let ghost kinematics (theta1 theta2:udouble)
   ensures {
-    let exact = 0.5 *. sin (to_real theta1) +. 2.5 *. sin (to_real theta1 +. to_real theta2) in
+    let t = to_real theta1 in
+    let t2 = 1.0 +. eps in
+    let t3 = t +. to_real theta2 in
+    let t4 = 0.5 *. sin t in
+    let t5 = eps +. (sin_error *. t2) in
+    let t6 = 2.5 *. sin t3 in
+    let t7 = t2 +. t5 in
+    let exact = t4 +. t6 in
     abs (to_real result -. exact)
     <=.
     (* Relative part of the error *)
-    (3. *. (eps +. (sin_error *. (1.0 +. eps))))
-      *. (0.5 *. abs (sin (to_real theta1)) +. 2.5 *. (abs (sin (to_real theta1 +. to_real theta2))))
+    (((t5 +. t5) +. eps) *. (abs t4 +. abs t6)) +.
     (* Absolute part of the error *)
-    +. ((((1.0 +. eps) +. (eps +. (sin_error *. (1.0 +. eps)))) *. eta)
-           +. (((1.0 +. eps) +. (eps +. (sin_error *. (1.0 +. eps))))
-               *. ((((1.0 +. eps)
-                     *. ((eps *. abs (to_real theta1 +. to_real theta2))
-                         *. (1.0 +. sin_error)))
-                    *. 2.5)
-                   +. eta)))
+    t7 *. eta +.
+    t7 *. (2.5 *. t2 *. eps *. abs t3 *. (1.0 +. sin_error) +. eta)
+
   }
 = zeropointfive **. sin_approx (theta1) ++. twopoint5 **. sin_approx(theta1 ++. theta2)
 
 let ghost raytracer (theta phi nx ny nz:udouble)
   ensures {
-    let exact = to_real nx *. cos (to_real theta) *. cos (to_real phi) +.
-    to_real ny *. sin (to_real theta) +.
-    to_real nz *. cos (to_real theta) *. sin (to_real phi) in
-    abs (to_real result -. exact)
+    let t = to_real phi in
+    let t1 = to_real theta in
+    let t2 = sin t in
+    let t3 = cos t in
+    let t4 = cos t1 in
+    let t5 = 1.0 +. eps in
+    let t6 = to_real ny *. sin t1 in
+    let t7 = eps +. (cos_error *. t5) in
+    let t8 = eps +. (sin_error *. t5) in
+    let t9 = (to_real nz *. t4) *. t2 in
+    let t10 = (to_real nx *. t4) *. t3 in
+    let t11 = eps +. (((t7 +. cos_error) +. (t7 *. cos_error)) *. t5) in
+    let t12 = eps +. (((t7 +. sin_error) +. (t7 *. sin_error)) *. t5) in
+    let t13 = (t11 +. t8) +. eps in
+    abs (to_real result -. ((t10 +. t6) +. t9))
     <=.
     (* Relative part of the error *)
-    ((
-    (((eps +. ((((eps +. (cos_error *. (1.0 +. eps))) +. cos_error)
-                  +. ((eps +. (cos_error *. (1.0 +. eps))) *. cos_error))
-                 *. (1.0 +. eps)))
-            +. (eps +. (sin_error *. (1.0 +. eps))))
-           +. eps)
-          +. (eps
-              +. ((((eps +. (cos_error *. (1.0 +. eps))) +. sin_error)
-                   +. ((eps +. (cos_error *. (1.0 +. eps))) *. sin_error))
-                  *. (1.0 +. eps))))
-         +. eps)
-        *. (abs (to_real nx *. cos (to_real theta) *. cos (to_real phi))
-             +. abs (to_real ny *. sin (to_real theta))
-            +. abs (to_real nz *. cos (to_real theta) *. sin (to_real phi)))
+    (t13 +. t12 +. eps) *. (abs t10 +. abs t6 +. abs t9) +.
     (* Absolute part of the error *)
-       +. (((1.0 +. eps)
-             +. (eps
-                 +. ((((eps +. (cos_error *. (1.0 +. eps))) +. sin_error)
-                      +. ((eps +. (cos_error *. (1.0 +. eps))) *. sin_error))
-                     *. (1.0 +. eps))))
-            *. ((((1.0 +. eps) +. (eps +. (sin_error *. (1.0 +. eps))))
-                 *. ((((1.0 +. eps) *. (eta +. (eta *. cos_error)))
-                      *. abs (cos (to_real phi)))
-                     +. eta))
-                +. (((1.0 +. eps)
-                     +. (eps
-                         +. ((((eps +. (cos_error *. (1.0 +. eps)))
-                               +. cos_error)
-                              +. ((eps +. (cos_error *. (1.0 +. eps)))
-                                  *. cos_error))
-                             *. (1.0 +. eps))))
-                    *. eta)))
-           +. (((1.0 +. eps)
-                +. (((eps
-                      +. ((((eps +. (cos_error *. (1.0 +. eps))) +. cos_error)
-                           +. ((eps +. (cos_error *. (1.0 +. eps)))
-                               *. cos_error))
-                          *. (1.0 +. eps)))
-                     +. (eps +. (sin_error *. (1.0 +. eps))))
-                    +. eps))
-               *. ((((1.0 +. eps) *. (eta +. (eta *. sin_error)))
-                    *. abs (sin (to_real phi)))
-                   +. eta))
+    (t5 +. t12) *. 
+      ((t5 +. t8) *. (t5 *. (eta +. eta *. cos_error) *. abs t3 +. eta)
+      +. (t5 +. t11) *. eta) +.
+    (t5 +. t13) *. ((t5 *. (eta +. eta *. sin_error) *. abs t2) +. eta)
   }
 =
   nx **. cos_approx theta **. cos_approx phi
   ++. ny **. sin_approx theta
   ++. nz **. cos_approx theta **. sin_approx phi
+
 end

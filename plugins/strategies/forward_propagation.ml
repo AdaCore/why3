@@ -1161,6 +1161,61 @@ let init_symbols env printer =
         tv_printer = printer.Trans.aprinter;
       }
 
+(*** letify **)
+
+let letify f =
+  let rec compute_subterms (acc : int Mterm.t) f : int Mterm.t =
+    match f.t_node with
+    | Ttrue
+    | Tfalse
+    | Tconst _
+    | Tvar _
+    | Tapp (_, []) ->
+      acc
+    | _ -> (
+      match f.t_ty with
+      | None -> t_fold compute_subterms acc f
+      | Some _ -> (
+        try
+          let n = Mterm.find f acc in
+          Mterm.add f (n + 1) acc
+        with
+        | Not_found ->
+          let acc = t_fold compute_subterms acc f in
+          Mterm.add f 1 acc))
+  in
+  let m = compute_subterms Mterm.empty f in
+  let m =
+    Mterm.fold
+      (fun t n acc ->
+        if n <= 1 then
+          acc
+        else
+          let id = Ident.id_fresh ?loc:t.t_loc "t" in
+          let vs = create_vsymbol id (Option.get t.t_ty) in
+          Mterm.add t vs acc)
+      m Mterm.empty
+  in
+  let rec letify_rec f =
+    try
+      let vs = Mterm.find f m in
+      t_var vs
+    with
+    | Not_found -> t_map letify_rec f
+  in
+  let letified_f = letify_rec f in
+  let l = Mterm.bindings m in
+  let l =
+    List.sort (fun (t1, _) (t2, _) -> compare (term_size t2) (term_size t1)) l
+  in
+  List.fold_left
+    (fun acc (t, vs) ->
+      let t = t_map letify_rec t in
+      t_let_close vs t acc)
+    letified_f l
+
+(*** complete strategy *)
+
 let fw_propagation env task =
   let naming_table = Args_wrapper.build_naming_tables task in
   init_symbols env naming_table;
@@ -1195,18 +1250,26 @@ let fw_propagation env task =
         | _, Some f', s -> (t_and_simp f f', s :: l))
       (t_true, []) floats
   in
+  let f' = letify f in
   if List.length strats = 0 then
+    (* Nothing to do *)
     default_strat ()
   else if List.length strats = 1 then
     (* We only have an assertion on one float so no need to use split *)
-    Sapply_trans ("assert", [ term_to_str f ], strats @ [ default_strat () ])
+    let f_strat =
+      Sapply_trans ("assert", [ term_to_str f ], strats @ [ default_strat () ])
+    in
+    Sapply_trans ("assert", [ term_to_str f' ], [ f_strat ])
   else
     (* We assert a conjunction of formulas, one for each float in the goal for
        which we can use propagation lemmas. We have one strat for each of this
        goal so we split our assertions and prove each subgoal with the
        corresponding strat *)
     let s = Sapply_trans ("split_vc", [], List.rev strats) in
-    Sapply_trans ("assert", [ term_to_str f ], [ s; default_strat () ])
+    let f_strat =
+      Sapply_trans ("assert", [ term_to_str f ], [ s; default_strat () ])
+    in
+    Sapply_trans ("assert", [ term_to_str f' ], [ f_strat ])
 
 let () =
   register_strat "forward_propagation" fw_propagation

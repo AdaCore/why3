@@ -13,21 +13,24 @@ module MultiplicationSingle
   = a **. b **. c
 
   let ghost multiplication_errors (a b c d e f: usingle)
-    ensures {
-      let exact = (to_real a *. to_real b *. to_real c) *. (to_real d *. (to_real e *. to_real f)) in
-      abs (to_real result -. exact) <=.
-      5.1 *. eps *. abs exact +.
-      1.1 *. eta *.
-      (   abs (to_real a *. to_real b *. to_real c *. to_real d)
-       +. abs (to_real a *. to_real b *. to_real c)
-       +. abs (to_real c *. to_real d *. to_real e *. to_real f)
-       +. abs (to_real d *. to_real e *. to_real f)
-       +. abs (to_real c)
-       +. abs (to_real d) 
-       +. abs (to_real c *. to_real d)
-       +. 1.)
+  ensures {
+    let t = 1.0 +. eps in
+    let t3 = eps +. (eps *. t) in
+    let t4 = to_real d *. (to_real e *. to_real f) in
+    let t5 = (to_real a *. to_real b) *. to_real c in
+    let t6 = ((eta *. abs (to_real d)) *. t) +. eta in
+    let t7 = ((eta *. abs (to_real c)) *. t) +. eta in
+    let exact = t5 *. t4 in
+    abs (to_real result -. exact) <=.
+      (* Relative part of the error *)
+      (eps +. (t3 +. t3 +. (t3 *. t3)) *. t) *. abs exact +.
+      (* Absolute part of the error *)
+      ((t6 +. t6 *. t3) *. abs t5 +.
+       (t7 +. t7 *. t3) *. abs t4 +. t7 *. t6)
+        *. t +. eta
     }
   = (a **. b **. c) **. (d **. (e **. f))
+
 end
 
 module MultiplicationDouble
@@ -45,19 +48,21 @@ module MultiplicationDouble
   = a **. b **. c
 
   let ghost multiplication_errors (a b c d e f: udouble)
-    ensures {
-      let exact = (to_real a *. to_real b *. to_real c) *. (to_real d *. (to_real e *. to_real f)) in
-      abs (to_real result -. exact) <=.
-      5.1 *. eps *. abs exact +.
-      1.1 *. eta *.
-      (   abs (to_real a *. to_real b *. to_real c *. to_real d)
-       +. abs (to_real a *. to_real b *. to_real c)
-       +. abs (to_real c *. to_real d *. to_real e *. to_real f)
-       +. abs (to_real d *. to_real e *. to_real f)
-       +. abs (to_real c)
-       +. abs (to_real d) 
-       +. abs (to_real c *. to_real d)
-       +. 1.)
+  ensures {
+    let t = 1.0 +. eps in
+    let t3 = eps +. (eps *. t) in
+    let t4 = to_real d *. (to_real e *. to_real f) in
+    let t5 = (to_real a *. to_real b) *. to_real c in
+    let t6 = ((eta *. abs (to_real d)) *. t) +. eta in
+    let t7 = ((eta *. abs (to_real c)) *. t) +. eta in
+    let exact = t5 *. t4 in
+    abs (to_real result -. exact) <=.
+      (* Relative part of the error *)
+      (eps +. (t3 +. t3 +. (t3 *. t3)) *. t) *. abs exact +.
+      (* Absolute part of the error *)
+      ((t6 +. t6 *. t3) *. abs t5 +.
+       (t7 +. t7 *. t3) *. abs t4 +. t7 *. t6)
+        *. t +. eta
     }
   = (a **. b **. c) **. (d **. (e **. f))
 end
