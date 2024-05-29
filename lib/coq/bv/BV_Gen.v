@@ -618,13 +618,13 @@ exact (match Bsign _ v with
        end).
 Defined.
 
-Require Arith.Div2.
+Require Nat.
 
 Fixpoint nat_to_bvec (length val : nat) {struct length} : Bvector length :=
   match length as x return Bvector x with
     | O => Bnil
     | S length =>
-      Bcons (Z.odd (Z.of_nat val)) length (nat_to_bvec length (Div2.div2 val))
+      Bcons (Z.odd (Z.of_nat val)) length (nat_to_bvec length (Nat.div2 val))
   end.
 
 Lemma Nat_to_bvec_zeros : forall {n}, Vector.const false n = nat_to_bvec n 0.
@@ -805,9 +805,9 @@ Qed.
 
 (* even / odd helper lemmas *)
 
-Lemma odd_is_odd : forall n : nat, Even.odd n <-> Z.odd (Z.of_nat n) = true.
+Lemma odd_is_odd : forall n : nat, Nat.Odd n <-> Z.odd (Z.of_nat n) = true.
   intro.
-  rewrite Zodd_bool_iff, Zodd_ex_iff, Even.odd_equiv.
+  rewrite Zodd_bool_iff, Zodd_ex_iff.
   unfold Nat.Odd.
   split; intro; destruct H.
   exists (Z.of_nat x); lia.
@@ -815,13 +815,13 @@ Lemma odd_is_odd : forall n : nat, Even.odd n <-> Z.odd (Z.of_nat n) = true.
   exists (Z.to_nat x); lia.
 Qed.
 
-Lemma even_not_odd : forall n : nat, Even.even n <-> not (Even.odd n).
+Lemma even_not_odd : forall n : nat, Nat.Even n <-> not (Nat.Odd n).
   intro; split; intro.
-  intro; apply Even.not_even_and_odd with (n := n); easy.
-  case (Even.even_or_odd n); easy.
+  intro; apply Nat.Even_Odd_False with (x := n); easy.
+  case (Nat.Even_or_Odd n); easy.
 Qed.
 
-Lemma even_is_even : forall n : nat, Even.even n <-> Z.even (Z.of_nat n) = true.
+Lemma even_is_even : forall n : nat, Nat.Even n <-> Z.even (Z.of_nat n) = true.
   intro.
   rewrite even_not_odd, odd_is_odd, Zeven.Zeven_odd_bool, negb_true_iff, not_true_iff_false; easy.
 Qed.
@@ -866,29 +866,29 @@ Lemma bvec_to_nat_nat_to_bvec : forall {n} i, (Z.of_nat i <= Pow2int.pow2 (Z.of_
   rewrite <- Nat_to_bvec_zeros, bvec_to_nat_zeros; trivial.
   unfold nat_to_bvec, Bcons, bvec_to_nat.
   case (case_odd (S i)); intro.
-  assert (Even.even i).
+  assert (Nat.Even i).
   rewrite even_not_odd, odd_is_odd.
   rewrite Nat2Z.inj_succ, Z.odd_succ, <- Z.negb_odd, negb_true_iff in e.
   rewrite e; easy.
   rewrite e.
   apply Nat.succ_inj_wd.
-  change (2 * bvec_to_nat n (nat_to_bvec n (Div2.div2 (S i))) = i).
+  change (2 * bvec_to_nat n (nat_to_bvec n (Nat.div2 (S i))) = i).
   rewrite IHn.
-  rewrite <- Div2.even_div2, <- Nat.double_twice, <- Div2.even_double by easy; trivial.
+  rewrite <- Nat.Even_div2, <- Nat.double_twice, <- Nat.Even_double by easy; trivial.
   rewrite Z.mul_le_mono_pos_l with (p := 2%Z) by easy.
   rewrite Z.add_le_mono_l with (p := 1%Z) by easy.
   apply Z.le_trans with (m := Z.of_nat (S i)).
-  rewrite <- Div2.even_div2, <- Nat2Z.inj_mul with (n:= 2), <- Nat.double_twice, <- Div2.even_double, Nat2Z.inj_succ by trivial; lia.
+  rewrite <- Nat.Even_div2, <- Nat2Z.inj_mul with (n:= 2), <- Nat.double_twice, <- Nat.Even_double, Nat2Z.inj_succ by trivial; lia.
   apply Z.le_trans with (m := (Pow2int.pow2 (Z.of_nat (S n)) - 1)%Z); trivial.
   rewrite Nat2Z.inj_succ, <- Z.add_1_r, Pow2int.Power_s; lia.
   rewrite e.
-  change (2 * bvec_to_nat n (nat_to_bvec n (Div2.div2 (S i))) = S i).
+  change (2 * bvec_to_nat n (nat_to_bvec n (Nat.div2 (S i))) = S i).
   rewrite IHn.
-  rewrite  <- Nat.double_twice, <- Div2.even_double; trivial.
+  rewrite  <- Nat.double_twice, <- Nat.Even_double; trivial.
   rewrite even_not_odd, odd_is_odd, e; auto.
   rewrite Z.mul_le_mono_pos_l with (p := 2%Z) by easy.
   apply Z.le_trans with (m := Z.of_nat (S i)).
-  rewrite <- Nat2Z.inj_mul with (n := 2), <- Nat.double_twice, <- Div2.even_double.
+  rewrite <- Nat2Z.inj_mul with (n := 2), <- Nat.double_twice, <- Nat.Even_double.
   lia.
   rewrite even_not_odd, odd_is_odd, not_true_iff_false; trivial.
   apply odd_even_le, Z.lt_le_pred in H.
@@ -908,13 +908,13 @@ Lemma Nat_to_bvec_ones : forall {n}, Vector.const true n = nat_to_bvec n (Z.to_n
   rewrite Z2Nat.id by (apply max_int_nat).
   rewrite max_int_is_odd by easy.
   fold nat_to_bvec.
-  assert ((Div2.div2 (Z.to_nat (Pow2int.pow2 (Z.of_nat (S n)) - 1))) = (Z.to_nat (Pow2int.pow2 (Z.of_nat n) - 1))).
+  assert ((Nat.div2 (Z.to_nat (Pow2int.pow2 (Z.of_nat (S n)) - 1))) = (Z.to_nat (Pow2int.pow2 (Z.of_nat n) - 1))).
   apply eq_add_S.
-  rewrite Div2.odd_div2.
+  rewrite Nat.Odd_div2.
   rewrite <- Z2Nat.inj_succ by (apply max_int_nat).
   rewrite Z.sub_1_r, <- Zsucc_pred, Nat2Z.inj_succ, <- Z.add_1_r.
   rewrite Pow2int.Power_s by lia.
-  rewrite Z2Nat.inj_mul, Div2.div2_double.
+  rewrite Z2Nat.inj_mul, Nat.div2_double.
   rewrite <- Z2Nat.inj_succ by (apply max_int_nat).
   rewrite Z.sub_1_r, <- Zsucc_pred; trivial.
   easy.
@@ -2180,7 +2180,7 @@ Lemma mask_succ_tmp :
         rewrite Int.Comm1, (mod_mod_mult _ 2 _)by auto with zarith.
         rewrite <-Zodd_mod, Int.Comm, Nat2Z.inj_mul, Z.odd_add_mul_2; trivial.
       rewrite H0.
-      cut (nat_to_bvec n0 (Div2.div2 (Z.to_nat z))
+      cut (nat_to_bvec n0 (Nat.div2 (Z.to_nat z))
            = Vector.map2 (fun x y : bool => x || y) v (Vector.const false n0)).
       intro t; rewrite t; trivial.
       case (Z_lt_le_dec (Z.of_nat (2 * bvec_to_nat n0 v) + 1) (Pow2int.pow2 (Z.of_nat (S n0)))); intro.
@@ -2191,7 +2191,7 @@ Lemma mask_succ_tmp :
       intro.
       rewrite <-Nat2Z.inj_succ, Nat2Z.id.
       rewrite Z.odd_succ, <-even_is_even in H0.
-      rewrite <-(Div2.even_div2 _ H0), Div2.div2_double.
+      rewrite <-(Nat.Even_div2 _ H0), Nat.div2_double.
       assert (nat_to_bvec_bvec_to_nat:
         forall {l} v, nat_to_bvec l (bvec_to_nat l v) = v).
         intros; apply bvec_to_nat_extensionality.
@@ -2286,15 +2286,15 @@ Qed.
     nat_to_bvec (S l) 1
     = Vector.cons bool true l (Vector.const false _).
     intro.
-    change (Bcons (Z.odd (Z.of_nat 1)) l (nat_to_bvec l (Div2.div2 1)) = true :: Vector.const false l).
+    change (Bcons (Z.odd (Z.of_nat 1)) l (nat_to_bvec l (Nat.div2 1)) = true :: Vector.const false l).
     assert (Z.odd (Z.of_nat 1) = true) by auto with zarith.
     rewrite H.
-    assert (Div2.div2 1 = 0%nat) by auto with zarith.
+    assert (Nat.div2 1 = 0%nat) by auto with zarith.
     rewrite H0.
     assert (nat_to_bvec l 0 = Vector.const false l).
     induction l.
     auto.
-    change (Bcons (Z.odd (Z.of_nat 0)) l (nat_to_bvec l (Div2.div2 0)) = false :: Vector.const false l).
+    change (Bcons (Z.odd (Z.of_nat 0)) l (nat_to_bvec l (Nat.div2 0)) = false :: Vector.const false l).
     rewrite <-IHl; auto.
     rewrite H1; trivial.
   Qed.
