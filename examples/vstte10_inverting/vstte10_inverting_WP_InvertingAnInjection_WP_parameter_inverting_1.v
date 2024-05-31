@@ -32,16 +32,20 @@ Parameter mixfix_lblsmnrb:
   forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a ->
   array a.
 
+Axiom mixfix_lblsmnrb'spec'0 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
+  ((length (mixfix_lblsmnrb a1 i v)) = (length a1)).
+
 Axiom mixfix_lblsmnrb'spec :
   forall {a:Type} {a_WT:WhyType a},
   forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
-  ((length (mixfix_lblsmnrb a1 i v)) = (length a1)) /\
   ((elts (mixfix_lblsmnrb a1 i v)) = (map.Map.set (elts a1) i v)).
 
 Parameter make:
   forall {a:Type} {a_WT:WhyType a}, Numbers.BinNums.Z -> a -> array a.
 
-Axiom make'spec :
+Axiom make_spec :
   forall {a:Type} {a_WT:WhyType a},
   forall (n:Numbers.BinNums.Z) (v:a), (0%Z <= n)%Z ->
   (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
@@ -73,6 +77,7 @@ Theorem inverting'vc :
   (forall (j:Numbers.BinNums.Z), (0%Z <= j)%Z /\ (j < (o + 1%Z)%Z)%Z ->
    ((mixfix_lbrb b1 (mixfix_lbrb a j)) = j)) ->
   injective b1 n.
+(* Why3 intros a b n ((h1,h2),(h3,h4)) o h5 b1 h6 h7. *)
 Proof.
 intros a b n ((h1,h2),(h3,h4)) o h5 b1 h6 h7.
 assert (MapInjection.surjective (elts a) n).
@@ -81,9 +86,10 @@ intros i j h8 h9.
 destruct (H i h8) as (i1,(Hi1,<-)).
 destruct (H j h9) as (j1,(Hj1,<-)).
 unfold o, mixfix_lbrb in h7.
-rewrite h7 by omega.
-rewrite h7 by omega.
+rewrite h7 by auto with zarith.
+rewrite h7 by auto with zarith.
 intro h10.
 contradict h10.
 now rewrite h10.
 Qed.
+

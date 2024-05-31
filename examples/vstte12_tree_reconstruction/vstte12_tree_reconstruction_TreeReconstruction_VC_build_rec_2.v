@@ -70,6 +70,7 @@ Theorem build_rec'vc :
    ~ ((Init.Datatypes.app (depths (d + 1%Z)%Z t) s') = s)) ->
   forall (t:tree) (s':Init.Datatypes.list Numbers.BinNums.Z),
   ~ ((Init.Datatypes.app (depths d t) s') = s).
+(* Why3 intros d s x x1 h1 h2 h3 h4 t s'. *)
 Proof.
 intros d s x x1 h1 h2 h3 h4 t s'.
 subst.
@@ -78,10 +79,11 @@ destruct t as [_|t1 t2].
 (* t = Leaf *)
 simpl in H.
 injection H.
-omega.
+auto with zarith.
 (* t = Node t1 t2 *)
 simpl in H.
 rewrite <- Append.Append_assoc in H.
 apply (h4 _ _ H).
 
 Qed.
+
