@@ -10,18 +10,23 @@ theory DivModHints
   use int.Int
   use int.ComputerDivision
 
-  lemma mod_div_unique :
-    forall x y q r:int. x >= 0 /\ y > 0 /\ x = q*y + r /\ 0 <= r < y ->
-      q = div x y /\ r = mod x y
-
-  lemma mod_succ_1 :
-    forall x y:int. x >= 0 /\ y > 0 ->
-      mod (x+1) y <> 0 -> mod (x+1) y = (mod x y) + 1
-
-  lemma mod_succ_2 :
-    forall x y:int. x >= 0 /\ y > 0 ->
-      mod (x+1) y = 0 -> mod x y = y-1
-
+  let lemma mod_div_unique (x y q r:int)
+     requires { x >= 0 /\ y > 0 /\ x = q*y + r /\ 0 <= r < y }
+     ensures { q = div x y /\ r = mod x y }
+  = ()
+  
+  let lemma mod_succ_1 (x y:int)
+    requires { x >= 0 /\ y > 0 }
+    requires { mod (x+1) y <> 0 }
+    ensures { mod (x+1) y = (mod x y) + 1 }
+  = mod_div_unique x y (div (x+1) y) (mod (x+1) y - 1)
+ 
+  let lemma mod_succ_2 (x y:int)
+     requires { x >= 0 /\ y > 0 }
+     requires { mod (x+1) y = 0 }
+     ensures { mod x y = y-1 }
+  = mod_div_unique x y (div (x + 1) y - 1) (0 + y - 1)
+  
   lemma div_succ_1 :
     forall x y:int. x >= 0 /\ y > 0 ->
       mod (x+1) y = 0 -> div (x+1) y = (div x y) + 1
