@@ -71,5 +71,8 @@ val ty_of_pty : Theory.theory_uc -> Ptree.pty -> Ty.ty
 val type_term_in_denv :
   Theory.namespace -> Decl.known_map -> Coercion.t -> Dterm.denv -> Ptree.term -> Term.term
 
+val check_term_in_denv :
+  Theory.namespace -> Decl.known_map -> Coercion.t -> Dterm.denv -> Ptree.term -> Ty.ty -> Term.term
+
 val type_fmla_in_denv :
   Theory.namespace -> Decl.known_map -> Coercion.t -> Dterm.denv -> Ptree.term -> Term.term

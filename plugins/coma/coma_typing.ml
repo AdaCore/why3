@@ -97,6 +97,11 @@ let type_term tuc ctx t =
   Typing.type_term_in_denv
     (get_namespace tuc) tuc.uc_known tuc.uc_crcmap ctx.denv t
 
+let check_term tuc ctx t ty =
+  let open Theory in
+  Typing.check_term_in_denv
+    (get_namespace tuc) tuc.uc_known tuc.uc_crcmap ctx.denv t ty
+
 let type_fmla tuc ctx t =
   let open Theory in
   Typing.type_fmla_in_denv
@@ -244,7 +249,7 @@ let rec subs_param (mty, mvs as acc) = function
       (mty, mvs), Pr v'
   | Pc (h, ws, pl) ->
       let ws = List.map (fun v -> Mvs.find_def v v mvs) ws in
-      let _, pl = List.fold_left_map subs_param acc pl in
+      let _, pl = Lists.map_fold_left subs_param acc pl in
       acc, Pc (h, ws, pl)
 
 let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_loc=loc } =
@@ -292,7 +297,7 @@ let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_
                  Loc.errorm ~loc:id.id_loc "[coma typing] \
                    unbound variable `%s'" id.id_str in
            let m = Mvs.singleton rs s in
-           let _, tes = List.fold_left_map subs_param (Mtv.empty, m) tes in
+           let _, tes = Lists.map_fold_left subs_param (Mtv.empty, m) tes in
            Eapp (e, Ar s), tes
        | Pc (_h, _vs, pl) :: tes, PAc ea ->
            let ea, tea = type_expr muc ctx ea in
@@ -301,7 +306,7 @@ let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_
        | Pt tv :: tes, PAt pty ->
            let ty = Typing.ty_of_pty tuc pty in
            let m = Mtv.singleton tv ty in
-           let _, tes = List.fold_left_map subs_param (m, Mvs.empty) tes in
+           let _, tes = Lists.map_fold_left subs_param (m, Mvs.empty) tes in
            Eapp (e, At ty), tes
        | [], _ ->
           Loc.errorm ~loc:pe.pexpr_loc "[coma typing] \
@@ -309,41 +314,35 @@ let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_
        | _ -> Loc.errorm ~loc "[coma typing] type error with the application")
   | PElet (e, l) ->
       let ctx0 = ctx in
-      let typ_let ctx ({ id_str=str; id_loc=loc } as id, t, pty, mut) =
-        let tt = type_term tuc ctx0 t in
+      let typ_let ctx (id, t, pty, mut) =
         let ty = Typing.ty_of_pty tuc pty in
-        let () = match tt.t_ty with
-          | Some tty when ty_equal tty ty -> ()
-          | _ -> Loc.errorm ~loc "[coma typing] \
-                   type error with `&%s' assignation" str in
+        let tt = check_term tuc ctx0 t ty in
         let vs = create_vsymbol (create_user_id id) ty in
         let ctx = if mut then add_ref vs ctx else add_var vs ctx in
         ctx, (vs,tt,mut)
       in
-      let ctx, ll = List.fold_left_map typ_let ctx l in
+      let ctx, ll = Lists.map_fold_left typ_let ctx l in
       let e = type_prog ~loc muc ctx e in
       Elet (e, ll), []
   | PEset (e, l) ->
       let typ_set ({ id_str=id; id_loc=loc }, t) =
-        let tt = type_term tuc ctx t in
-        match Mstr.find id ctx.vars, tt.t_ty with
-        | Ref v, Some tty when ty_equal tty v.vs_ty -> v, tt
-        | Var _, _
-        | Typ _, _ ->
+        match Mstr.find id ctx.vars with
+        | Ref v ->
+          let tt = check_term tuc ctx t v.vs_ty in
+          (v, tt)
+        | Var _
+        | Typ _ ->
             Loc.errorm ~loc "[coma typing] \
               the symbol `%s' is not a reference" id
         | exception Not_found ->
             Loc.errorm ~loc "[coma typing] \
-              unbound variable `%s'" id
-        | _ ->
-            Loc.errorm ~loc "[coma typing] \
-              type error with `&%s' assignation" id in
+              unbound variable `%s'" id in
       let ll = List.map typ_set l in
       let e = type_prog ~loc muc ctx e in
       Eset (e, ll), []
   | PElam (pl, e) ->
       let pl, e = param_spec (true, "<lambda>") true false pl e in
-      let ctx, params = List.fold_left_map (type_param tuc) ctx pl in
+      let ctx, params = Lists.map_fold_left (type_param tuc) ctx pl in
       let e = type_prog ~loc:(e.pexpr_loc) muc ctx e in
       Elam (params, e), params
   | PEdef (e, flat, d) ->

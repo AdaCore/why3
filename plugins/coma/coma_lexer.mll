@@ -20,6 +20,7 @@
   open Coma_parser
 
   let keywords = Hashtbl.create 97
+  let span_aliases = Hashtbl.create 16
   let attribute_aliases = Hashtbl.create 16
   let () =
     List.iter
@@ -145,15 +146,11 @@ rule token = parse
     space* (dec+ as line) space* (dec+ as char) space* "]"
       { Lexlib.update_loc lexbuf file (int_of_string line) (int_of_string char);
         token lexbuf }
-  | "[%#" space* (lident as lid) space*
-    (dec+ as bline) space* (dec+ as bchar) space*
-    (dec+ as eline) space* (dec+ as echar) space* "]"
+  | "[%#" space* (lident as lid) space* "]"
       { try
-          let file = Hashtbl.find attribute_aliases lid in
-          POSITION (Loc.user_position file
-                      (int_of_string bline) (int_of_string bchar)
-                      (int_of_string eline) (int_of_string echar))
-        with Not_found -> Loc.errorm "Attribute alias unknown." }
+          let (file, bline, bchar, eline, echar) = Hashtbl.find span_aliases lid in
+          POSITION (Loc.user_position file bline bchar eline echar)
+        with Not_found -> Loc.errorm "File alias unknown." }
   | "[#" space* "\"" ([^ '\010' '\013' '"' ]* as file) "\"" space*
     (dec+ as bline) space* (dec+ as bchar) space*
     (dec+ as eline) space* (dec+ as echar) space* "]"
@@ -161,8 +158,9 @@ rule token = parse
                     (int_of_string bline) (int_of_string bchar)
                     (int_of_string eline) (int_of_string echar)) }
 
-  | "let%file" space+ (lident as lid) space* "=" space* "\"" ([^ '\010' '\013' '"' ]* as file) "\""
-      { Hashtbl.replace attribute_aliases lid file;
+  | "let%span" space+ (lident as lid) space* "=" space* "\"" ([^ '\010' '\013' '"' ]* as file) "\""
+      space* (dec+ as bline) space* (dec+ as bchar) space* (dec+ as eline) space* (dec+ as echar) space*
+      { Hashtbl.replace span_aliases lid (file, int_of_string bline, int_of_string bchar, int_of_string eline, int_of_string echar);
         token lexbuf }
   | "let%attr" space+ (lident as lid) space* "=" space* ([^ '\n']+ as cattr)
       { Hashtbl.replace attribute_aliases lid cattr;

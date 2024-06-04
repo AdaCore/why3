@@ -1,7 +1,8 @@
 -- Compile command:
 -- why3 ide examples_in_progress/heapsort_generic.coma -L examples_in_progress/ 
 
-let%file ord = "../../../../creusot-contracts/src/logic/ord.rs"
+let%span ord1 = "../../../../creusot-contracts/src/logic/ord.rs" 70 23 70 24
+let%span ord2 = "../../../../creusot-contracts/src/logic/ord.rs" 70 14 70 15
 
 
 module Core_Cmp_Ordering_Type
@@ -36,92 +37,92 @@ module HeapsortGeneric_HeapFragMax_Impl
     [ return' (result:Core_Cmp_Ordering_Type.t_ordering)-> {result = cmp_log0 self _2} (! return' {result}) ]
 
   function eq_cmp0 (x : t) (y : t) : ()
-  let rec eq_cmp0 (x:t) (y:t) (return'  (ret:()))= {[%#ord 70 23 70 24] inv1 y}
-    {[%#ord 70 14 70 15] inv1 x}
+  let rec eq_cmp0 (x:t) (y:t) (return'  (ret:()))= {[%#ord1] inv1 y}
+    {[%#ord2] inv1 x}
     any [ return' (result:())-> {result = eq_cmp0 x y} (! return' {result}) ]
-  axiom eq_cmp0_spec : forall x : t, y : t . ([%#ord 70 14 70 15] inv1 x)
-   -> ([%#ord 70 23 70 24] inv1 y)
-   -> ([%#ord 69 14 69 59] (x = y) = (cmp_log0 x y = Core_Cmp_Ordering_Type.C_Equal))
+  axiom eq_cmp0_spec : forall x : t, y : t . ([%#ord2] inv1 x)
+   -> ([%#ord1] inv1 y)
+   -> ( (x = y) = (cmp_log0 x y = Core_Cmp_Ordering_Type.C_Equal))
   function antisym20 (x : t) (y : t) : ()
-  let rec antisym20 (x:t) (y:t) (return'  (ret:()))= {[%#ord 66 25 66 26] inv1 y}
-    {[%#ord 66 16 66 17] inv1 x}
-    {[%#ord 64 15 64 48] cmp_log0 x y = Core_Cmp_Ordering_Type.C_Greater}
+  let rec antisym20 (x:t) (y:t) (return'  (ret:()))= { inv1 y}
+    { inv1 x}
+    { cmp_log0 x y = Core_Cmp_Ordering_Type.C_Greater}
     any [ return' (result:())-> {result = antisym20 x y} (! return' {result}) ]
-  axiom antisym20_spec : forall x : t, y : t . ([%#ord 64 15 64 48] cmp_log0 x y = Core_Cmp_Ordering_Type.C_Greater)
-   -> ([%#ord 66 16 66 17] inv1 x)
-   -> ([%#ord 66 25 66 26] inv1 y)
-   -> ([%#ord 65 14 65 44] cmp_log0 y x = Core_Cmp_Ordering_Type.C_Less)
+  axiom antisym20_spec : forall x : t, y : t . ( cmp_log0 x y = Core_Cmp_Ordering_Type.C_Greater)
+   -> ( inv1 x)
+   -> ( inv1 y)
+   -> ( cmp_log0 y x = Core_Cmp_Ordering_Type.C_Less)
   function antisym10 (x : t) (y : t) : ()
-  let rec antisym10 (x:t) (y:t) (return'  (ret:()))= {[%#ord 61 25 61 26] inv1 y}
-    {[%#ord 61 16 61 17] inv1 x}
-    {[%#ord 59 15 59 45] cmp_log0 x y = Core_Cmp_Ordering_Type.C_Less}
+  let rec antisym10 (x:t) (y:t) (return'  (ret:()))= { inv1 y}
+    { inv1 x}
+    { cmp_log0 x y = Core_Cmp_Ordering_Type.C_Less}
     any [ return' (result:())-> {result = antisym10 x y} (! return' {result}) ]
-  axiom antisym10_spec : forall x : t, y : t . ([%#ord 59 15 59 45] cmp_log0 x y = Core_Cmp_Ordering_Type.C_Less)
-   -> ([%#ord 61 16 61 17] inv1 x)
-   -> ([%#ord 61 25 61 26] inv1 y)
-   -> ([%#ord 60 14 60 47] cmp_log0 y x = Core_Cmp_Ordering_Type.C_Greater)
+  axiom antisym10_spec : forall x : t, y : t . ( cmp_log0 x y = Core_Cmp_Ordering_Type.C_Less)
+   -> ( inv1 x)
+   -> ( inv1 y)
+   -> ( cmp_log0 y x = Core_Cmp_Ordering_Type.C_Greater)
   function trans0 (x : t) (y : t) (z : t) (o : Core_Cmp_Ordering_Type.t_ordering) : ()
-  let rec trans0 (x:t) (y:t) (z:t) (o:Core_Cmp_Ordering_Type.t_ordering) (return'  (ret:()))= {[%#ord 56 31 56 32] inv1 z}
-    {[%#ord 56 22 56 23] inv1 y}
-    {[%#ord 56 13 56 14] inv1 x}
-    {[%#ord 54 15 54 32] cmp_log0 y z = o}
-    {[%#ord 53 15 53 32] cmp_log0 x y = o}
+  let rec trans0 (x:t) (y:t) (z:t) (o:Core_Cmp_Ordering_Type.t_ordering) (return'  (ret:()))= { inv1 z}
+    { inv1 y}
+    { inv1 x}
+    { cmp_log0 y z = o}
+    { cmp_log0 x y = o}
     any [ return' (result:())-> {result = trans0 x y z o} (! return' {result}) ]
-  axiom trans0_spec : forall x : t, y : t, z : t, o : Core_Cmp_Ordering_Type.t_ordering . ([%#ord 53 15 53 32] cmp_log0 x y = o)
-   -> ([%#ord 54 15 54 32] cmp_log0 y z = o)
-   -> ([%#ord 56 13 56 14] inv1 x)
-   -> ([%#ord 56 22 56 23] inv1 y)
-   -> ([%#ord 56 31 56 32] inv1 z)
-   -> ([%#ord 55 14 55 31] cmp_log0 x z = o)
+  axiom trans0_spec : forall x : t, y : t, z : t, o : Core_Cmp_Ordering_Type.t_ordering . ( cmp_log0 x y = o)
+   -> ( cmp_log0 y z = o)
+   -> ( inv1 x)
+   -> ( inv1 y)
+   -> ( inv1 z)
+   -> ( cmp_log0 x z = o)
   function refl0 (x : t) : ()
-  let rec refl0 (x:t) (return'  (ret:()))= {[%#ord 50 12 50 13] inv1 x}
+  let rec refl0 (x:t) (return'  (ret:()))= { inv1 x}
     any [ return' (result:())-> {result = refl0 x} (! return' {result}) ]
-  axiom refl0_spec : forall x : t . ([%#ord 50 12 50 13] inv1 x)
-   -> ([%#ord 49 14 49 45] cmp_log0 x x = Core_Cmp_Ordering_Type.C_Equal)
+  axiom refl0_spec : forall x : t . ( inv1 x)
+   -> ( cmp_log0 x x = Core_Cmp_Ordering_Type.C_Equal)
   function gt_log0 (self : t) (o : t) : bool
   let rec gt_log0 (self:t) (o:t) (return'  (ret:bool))= any
     [ return' (result:bool)-> {result = gt_log0 self o} (! return' {result}) ]
 
   function cmp_gt_log0 (x : t) (y : t) : ()
-  let rec cmp_gt_log0 (x:t) (y:t) (return'  (ret:()))= {[%#ord 46 27 46 28] inv1 y}
-    {[%#ord 46 18 46 19] inv1 x}
+  let rec cmp_gt_log0 (x:t) (y:t) (return'  (ret:()))= { inv1 y}
+    { inv1 x}
     any [ return' (result:())-> {result = cmp_gt_log0 x y} (! return' {result}) ]
-  axiom cmp_gt_log0_spec : forall x : t, y : t . ([%#ord 46 18 46 19] inv1 x)
-   -> ([%#ord 46 27 46 28] inv1 y)
-   -> ([%#ord 45 14 45 64] gt_log0 x y = (cmp_log0 x y = Core_Cmp_Ordering_Type.C_Greater))
+  axiom cmp_gt_log0_spec : forall x : t, y : t . ( inv1 x)
+   -> ( inv1 y)
+   -> ( gt_log0 x y = (cmp_log0 x y = Core_Cmp_Ordering_Type.C_Greater))
   function ge_log0 (self : t) (o : t) : bool
   let rec ge_log0 (self:t) (o:t) (return'  (ret:bool))= any
     [ return' (result:bool)-> {result = ge_log0 self o} (! return' {result}) ]
 
   function cmp_ge_log0 (x : t) (y : t) : ()
-  let rec cmp_ge_log0 (x:t) (y:t) (return'  (ret:()))= {[%#ord 36 27 36 28] inv1 y}
-    {[%#ord 36 18 36 19] inv1 x}
+  let rec cmp_ge_log0 (x:t) (y:t) (return'  (ret:()))= { inv1 y}
+    { inv1 x}
     any [ return' (result:())-> {result = cmp_ge_log0 x y} (! return' {result}) ]
-  axiom cmp_ge_log0_spec : forall x : t, y : t . ([%#ord 36 18 36 19] inv1 x)
-   -> ([%#ord 36 27 36 28] inv1 y)
-   -> ([%#ord 35 14 35 61] ge_log0 x y = (cmp_log0 x y <> Core_Cmp_Ordering_Type.C_Less))
+  axiom cmp_ge_log0_spec : forall x : t, y : t . ( inv1 x)
+   -> ( inv1 y)
+   -> ( ge_log0 x y = (cmp_log0 x y <> Core_Cmp_Ordering_Type.C_Less))
   function lt_log0 (self : t) (o : t) : bool
   let rec lt_log0 (self:t) (o:t) (return'  (ret:bool))= any
     [ return' (result:bool)-> {result = lt_log0 self o} (! return' {result}) ]
 
   function cmp_lt_log0 (x : t) (y : t) : ()
-  let rec cmp_lt_log0 (x:t) (y:t) (return'  (ret:()))= {[%#ord 26 27 26 28] inv1 y}
-    {[%#ord 26 18 26 19] inv1 x}
+  let rec cmp_lt_log0 (x:t) (y:t) (return'  (ret:()))= { inv1 y}
+    { inv1 x}
     any [ return' (result:())-> {result = cmp_lt_log0 x y} (! return' {result}) ]
-  axiom cmp_lt_log0_spec : forall x : t, y : t . ([%#ord 26 18 26 19] inv1 x)
-   -> ([%#ord 26 27 26 28] inv1 y)
-   -> ([%#ord 25 14 25 61] lt_log0 x y = (cmp_log0 x y = Core_Cmp_Ordering_Type.C_Less))
+  axiom cmp_lt_log0_spec : forall x : t, y : t . ( inv1 x)
+   -> ( inv1 y)
+   -> ( lt_log0 x y = (cmp_log0 x y = Core_Cmp_Ordering_Type.C_Less))
   function le_log0 (self : t) (o : t) : bool
   let rec le_log0 (self:t) (o:t) (return'  (ret:bool))= any
     [ return' (result:bool)-> {result = le_log0 self o} (! return' {result}) ]
 
   function cmp_le_log0 (x : t) (y : t) : ()
-  let rec cmp_le_log0 (x:t) (y:t) (return'  (ret:()))= {[%#ord 16 27 16 28] inv1 y}
-    {[%#ord 16 18 16 19] inv1 x}
+  let rec cmp_le_log0 (x:t) (y:t) (return'  (ret:()))= { inv1 y}
+    { inv1 x}
     any [ return' (result:())-> {result = cmp_le_log0 x y} (! return' {result}) ]
-  axiom cmp_le_log0_spec : forall x : t, y : t . ([%#ord 16 18 16 19] inv1 x)
-   -> ([%#ord 16 27 16 28] inv1 y)
-   -> ([%#ord 15 14 15 64] le_log0 x y = (cmp_log0 x y <> Core_Cmp_Ordering_Type.C_Greater))
+  axiom cmp_le_log0_spec : forall x : t, y : t . ( inv1 x)
+   -> ( inv1 y)
+   -> ( le_log0 x y = (cmp_log0 x y <> Core_Cmp_Ordering_Type.C_Greater))
   use seq.Seq
   predicate invariant0 (self : Seq.seq t)
   let rec invariant0 (self:Seq.seq t) (return'  (ret:bool))= any
@@ -317,93 +318,93 @@ module HeapsortGeneric_SiftDown
     [ return' (result:bool)-> {result = inv5 _x} (! return' {result}) ]
 
   function eq_cmp0 (x : deep_model_ty0) (y : deep_model_ty0) : ()
-  let rec eq_cmp0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= {[%#ord 70 23 70 24] inv5 y}
-    {[%#ord 70 14 70 15] inv5 x}
+  let rec eq_cmp0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= {[%#ord1] inv5 y}
+    {[%#ord2] inv5 x}
     any [ return' (result:())-> {result = eq_cmp0 x y} (! return' {result}) ]
-  axiom eq_cmp0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ([%#ord 70 14 70 15] inv5 x)
-   -> ([%#ord 70 23 70 24] inv5 y)
-   -> ([%#ord 69 14 69 59] (x = y) = (cmp_log0 x y = Core_Cmp_Ordering_Type.C_Equal))
+  axiom eq_cmp0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ([%#ord2] inv5 x)
+   -> ([%#ord1] inv5 y)
+   -> ( (x = y) = (cmp_log0 x y = Core_Cmp_Ordering_Type.C_Equal))
   function antisym20 (x : deep_model_ty0) (y : deep_model_ty0) : ()
-  let rec antisym20 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= {[%#ord 66 25 66 26] inv5 y}
-    {[%#ord 66 16 66 17] inv5 x}
-    {[%#ord 64 15 64 48] cmp_log0 x y = Core_Cmp_Ordering_Type.C_Greater}
+  let rec antisym20 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= { inv5 y}
+    { inv5 x}
+    { cmp_log0 x y = Core_Cmp_Ordering_Type.C_Greater}
     any [ return' (result:())-> {result = antisym20 x y} (! return' {result}) ]
-  axiom antisym20_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ([%#ord 64 15 64 48] cmp_log0 x y = Core_Cmp_Ordering_Type.C_Greater)
-   -> ([%#ord 66 16 66 17] inv5 x)
-   -> ([%#ord 66 25 66 26] inv5 y)
-   -> ([%#ord 65 14 65 44] cmp_log0 y x = Core_Cmp_Ordering_Type.C_Less)
+  axiom antisym20_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ( cmp_log0 x y = Core_Cmp_Ordering_Type.C_Greater)
+   -> ( inv5 x)
+   -> ( inv5 y)
+   -> ( cmp_log0 y x = Core_Cmp_Ordering_Type.C_Less)
   function antisym10 (x : deep_model_ty0) (y : deep_model_ty0) : ()
-  let rec antisym10 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= {[%#ord 61 25 61 26] inv5 y}
-    {[%#ord 61 16 61 17] inv5 x}
-    {[%#ord 59 15 59 45] cmp_log0 x y = Core_Cmp_Ordering_Type.C_Less}
+  let rec antisym10 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= { inv5 y}
+    { inv5 x}
+    { cmp_log0 x y = Core_Cmp_Ordering_Type.C_Less}
     any [ return' (result:())-> {result = antisym10 x y} (! return' {result}) ]
-  axiom antisym10_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ([%#ord 59 15 59 45] cmp_log0 x y = Core_Cmp_Ordering_Type.C_Less)
-   -> ([%#ord 61 16 61 17] inv5 x)
-   -> ([%#ord 61 25 61 26] inv5 y)
-   -> ([%#ord 60 14 60 47] cmp_log0 y x = Core_Cmp_Ordering_Type.C_Greater)
+  axiom antisym10_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ( cmp_log0 x y = Core_Cmp_Ordering_Type.C_Less)
+   -> ( inv5 x)
+   -> ( inv5 y)
+   -> ( cmp_log0 y x = Core_Cmp_Ordering_Type.C_Greater)
   function trans0 (x : deep_model_ty0) (y : deep_model_ty0) (z : deep_model_ty0) (o : Core_Cmp_Ordering_Type.t_ordering) : ()
 
-  let rec trans0 (x:deep_model_ty0) (y:deep_model_ty0) (z:deep_model_ty0) (o:Core_Cmp_Ordering_Type.t_ordering) (return'  (ret:()))= {[%#ord 56 31 56 32] inv5 z}
-    {[%#ord 56 22 56 23] inv5 y}
-    {[%#ord 56 13 56 14] inv5 x}
-    {[%#ord 54 15 54 32] cmp_log0 y z = o}
-    {[%#ord 53 15 53 32] cmp_log0 x y = o}
+  let rec trans0 (x:deep_model_ty0) (y:deep_model_ty0) (z:deep_model_ty0) (o:Core_Cmp_Ordering_Type.t_ordering) (return'  (ret:()))= { inv5 z}
+    { inv5 y}
+    { inv5 x}
+    { cmp_log0 y z = o}
+    { cmp_log0 x y = o}
     any [ return' (result:())-> {result = trans0 x y z o} (! return' {result}) ]
-  axiom trans0_spec : forall x : deep_model_ty0, y : deep_model_ty0, z : deep_model_ty0, o : Core_Cmp_Ordering_Type.t_ordering . ([%#ord 53 15 53 32] cmp_log0 x y = o)
-   -> ([%#ord 54 15 54 32] cmp_log0 y z = o)
-   -> ([%#ord 56 13 56 14] inv5 x)
-   -> ([%#ord 56 22 56 23] inv5 y)
-   -> ([%#ord 56 31 56 32] inv5 z)
-   -> ([%#ord 55 14 55 31] cmp_log0 x z = o)
+  axiom trans0_spec : forall x : deep_model_ty0, y : deep_model_ty0, z : deep_model_ty0, o : Core_Cmp_Ordering_Type.t_ordering . ( cmp_log0 x y = o)
+   -> ( cmp_log0 y z = o)
+   -> ( inv5 x)
+   -> ( inv5 y)
+   -> ( inv5 z)
+   -> ( cmp_log0 x z = o)
   function refl0 (x : deep_model_ty0) : ()
-  let rec refl0 (x:deep_model_ty0) (return'  (ret:()))= {[%#ord 50 12 50 13] inv5 x}
+  let rec refl0 (x:deep_model_ty0) (return'  (ret:()))= { inv5 x}
     any [ return' (result:())-> {result = refl0 x} (! return' {result}) ]
-  axiom refl0_spec : forall x : deep_model_ty0 . ([%#ord 50 12 50 13] inv5 x)
-   -> ([%#ord 49 14 49 45] cmp_log0 x x = Core_Cmp_Ordering_Type.C_Equal)
+  axiom refl0_spec : forall x : deep_model_ty0 . ( inv5 x)
+   -> ( cmp_log0 x x = Core_Cmp_Ordering_Type.C_Equal)
   function gt_log0 (self : deep_model_ty0) (o : deep_model_ty0) : bool
   let rec gt_log0 (self:deep_model_ty0) (o:deep_model_ty0) (return'  (ret:bool))= any
     [ return' (result:bool)-> {result = gt_log0 self o} (! return' {result}) ]
 
   function cmp_gt_log0 (x : deep_model_ty0) (y : deep_model_ty0) : ()
-  let rec cmp_gt_log0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= {[%#ord 46 27 46 28] inv5 y}
-    {[%#ord 46 18 46 19] inv5 x}
+  let rec cmp_gt_log0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= { inv5 y}
+    { inv5 x}
     any [ return' (result:())-> {result = cmp_gt_log0 x y} (! return' {result}) ]
-  axiom cmp_gt_log0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ([%#ord 46 18 46 19] inv5 x)
-   -> ([%#ord 46 27 46 28] inv5 y)
-   -> ([%#ord 45 14 45 64] gt_log0 x y = (cmp_log0 x y = Core_Cmp_Ordering_Type.C_Greater))
+  axiom cmp_gt_log0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ( inv5 x)
+   -> ( inv5 y)
+   -> ( gt_log0 x y = (cmp_log0 x y = Core_Cmp_Ordering_Type.C_Greater))
   function ge_log0 (self : deep_model_ty0) (o : deep_model_ty0) : bool
   let rec ge_log0 (self:deep_model_ty0) (o:deep_model_ty0) (return'  (ret:bool))= any
     [ return' (result:bool)-> {result = ge_log0 self o} (! return' {result}) ]
 
   function cmp_ge_log0 (x : deep_model_ty0) (y : deep_model_ty0) : ()
-  let rec cmp_ge_log0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= {[%#ord 36 27 36 28] inv5 y}
-    {[%#ord 36 18 36 19] inv5 x}
+  let rec cmp_ge_log0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= { inv5 y}
+    { inv5 x}
     any [ return' (result:())-> {result = cmp_ge_log0 x y} (! return' {result}) ]
-  axiom cmp_ge_log0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ([%#ord 36 18 36 19] inv5 x)
-   -> ([%#ord 36 27 36 28] inv5 y)
-   -> ([%#ord 35 14 35 61] ge_log0 x y = (cmp_log0 x y <> Core_Cmp_Ordering_Type.C_Less))
+  axiom cmp_ge_log0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ( inv5 x)
+   -> ( inv5 y)
+   -> ( ge_log0 x y = (cmp_log0 x y <> Core_Cmp_Ordering_Type.C_Less))
   function lt_log0 (self : deep_model_ty0) (o : deep_model_ty0) : bool
   let rec lt_log0 (self:deep_model_ty0) (o:deep_model_ty0) (return'  (ret:bool))= any
     [ return' (result:bool)-> {result = lt_log0 self o} (! return' {result}) ]
 
   function cmp_lt_log0 (x : deep_model_ty0) (y : deep_model_ty0) : ()
-  let rec cmp_lt_log0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= {[%#ord 26 27 26 28] inv5 y}
-    {[%#ord 26 18 26 19] inv5 x}
+  let rec cmp_lt_log0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= { inv5 y}
+    { inv5 x}
     any [ return' (result:())-> {result = cmp_lt_log0 x y} (! return' {result}) ]
-  axiom cmp_lt_log0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ([%#ord 26 18 26 19] inv5 x)
-   -> ([%#ord 26 27 26 28] inv5 y)
-   -> ([%#ord 25 14 25 61] lt_log0 x y = (cmp_log0 x y = Core_Cmp_Ordering_Type.C_Less))
+  axiom cmp_lt_log0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ( inv5 x)
+   -> ( inv5 y)
+   -> ( lt_log0 x y = (cmp_log0 x y = Core_Cmp_Ordering_Type.C_Less))
   function le_log0 (self : deep_model_ty0) (o : deep_model_ty0) : bool
   let rec le_log0 (self:deep_model_ty0) (o:deep_model_ty0) (return'  (ret:bool))= any
     [ return' (result:bool)-> {result = le_log0 self o} (! return' {result}) ]
 
   function cmp_le_log0 (x : deep_model_ty0) (y : deep_model_ty0) : ()
-  let rec cmp_le_log0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= {[%#ord 16 27 16 28] inv5 y}
-    {[%#ord 16 18 16 19] inv5 x}
+  let rec cmp_le_log0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= { inv5 y}
+    { inv5 x}
     any [ return' (result:())-> {result = cmp_le_log0 x y} (! return' {result}) ]
-  axiom cmp_le_log0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ([%#ord 16 18 16 19] inv5 x)
-   -> ([%#ord 16 27 16 28] inv5 y)
-   -> ([%#ord 15 14 15 64] le_log0 x y = (cmp_log0 x y <> Core_Cmp_Ordering_Type.C_Greater))
+  axiom cmp_le_log0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ( inv5 x)
+   -> ( inv5 y)
+   -> ( le_log0 x y = (cmp_log0 x y <> Core_Cmp_Ordering_Type.C_Greater))
   predicate invariant5 (self : deep_model_ty0)
   let rec invariant5 (self:deep_model_ty0) (return'  (ret:bool))= any
     [ return' (result:bool)-> {result = invariant5 self} (! return' {result}) ]
@@ -795,93 +796,93 @@ module HeapsortGeneric_HeapSort
     [ return' (result:Core_Cmp_Ordering_Type.t_ordering)-> {result = cmp_log0 self _2} (! return' {result}) ]
 
   function eq_cmp0 (x : deep_model_ty0) (y : deep_model_ty0) : ()
-  let rec eq_cmp0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= {[%#ord 70 23 70 24] inv6 y}
-    {[%#ord 70 14 70 15] inv6 x}
+  let rec eq_cmp0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= {[%#ord1] inv6 y}
+    {[%#ord2] inv6 x}
     any [ return' (result:())-> {result = eq_cmp0 x y} (! return' {result}) ]
-  axiom eq_cmp0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ([%#ord 70 14 70 15] inv6 x)
-   -> ([%#ord 70 23 70 24] inv6 y)
-   -> ([%#ord 69 14 69 59] (x = y) = (cmp_log0 x y = Core_Cmp_Ordering_Type.C_Equal))
+  axiom eq_cmp0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ([%#ord2] inv6 x)
+   -> ([%#ord1] inv6 y)
+   -> ( (x = y) = (cmp_log0 x y = Core_Cmp_Ordering_Type.C_Equal))
   function antisym20 (x : deep_model_ty0) (y : deep_model_ty0) : ()
-  let rec antisym20 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= {[%#ord 66 25 66 26] inv6 y}
-    {[%#ord 66 16 66 17] inv6 x}
-    {[%#ord 64 15 64 48] cmp_log0 x y = Core_Cmp_Ordering_Type.C_Greater}
+  let rec antisym20 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= { inv6 y}
+    { inv6 x}
+    { cmp_log0 x y = Core_Cmp_Ordering_Type.C_Greater}
     any [ return' (result:())-> {result = antisym20 x y} (! return' {result}) ]
-  axiom antisym20_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ([%#ord 64 15 64 48] cmp_log0 x y = Core_Cmp_Ordering_Type.C_Greater)
-   -> ([%#ord 66 16 66 17] inv6 x)
-   -> ([%#ord 66 25 66 26] inv6 y)
-   -> ([%#ord 65 14 65 44] cmp_log0 y x = Core_Cmp_Ordering_Type.C_Less)
+  axiom antisym20_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ( cmp_log0 x y = Core_Cmp_Ordering_Type.C_Greater)
+   -> ( inv6 x)
+   -> ( inv6 y)
+   -> ( cmp_log0 y x = Core_Cmp_Ordering_Type.C_Less)
   function antisym10 (x : deep_model_ty0) (y : deep_model_ty0) : ()
-  let rec antisym10 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= {[%#ord 61 25 61 26] inv6 y}
-    {[%#ord 61 16 61 17] inv6 x}
-    {[%#ord 59 15 59 45] cmp_log0 x y = Core_Cmp_Ordering_Type.C_Less}
+  let rec antisym10 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= { inv6 y}
+    { inv6 x}
+    { cmp_log0 x y = Core_Cmp_Ordering_Type.C_Less}
     any [ return' (result:())-> {result = antisym10 x y} (! return' {result}) ]
-  axiom antisym10_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ([%#ord 59 15 59 45] cmp_log0 x y = Core_Cmp_Ordering_Type.C_Less)
-   -> ([%#ord 61 16 61 17] inv6 x)
-   -> ([%#ord 61 25 61 26] inv6 y)
-   -> ([%#ord 60 14 60 47] cmp_log0 y x = Core_Cmp_Ordering_Type.C_Greater)
+  axiom antisym10_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ( cmp_log0 x y = Core_Cmp_Ordering_Type.C_Less)
+   -> ( inv6 x)
+   -> ( inv6 y)
+   -> ( cmp_log0 y x = Core_Cmp_Ordering_Type.C_Greater)
   function trans0 (x : deep_model_ty0) (y : deep_model_ty0) (z : deep_model_ty0) (o : Core_Cmp_Ordering_Type.t_ordering) : ()
 
-  let rec trans0 (x:deep_model_ty0) (y:deep_model_ty0) (z:deep_model_ty0) (o:Core_Cmp_Ordering_Type.t_ordering) (return'  (ret:()))= {[%#ord 56 31 56 32] inv6 z}
-    {[%#ord 56 22 56 23] inv6 y}
-    {[%#ord 56 13 56 14] inv6 x}
-    {[%#ord 54 15 54 32] cmp_log0 y z = o}
-    {[%#ord 53 15 53 32] cmp_log0 x y = o}
+  let rec trans0 (x:deep_model_ty0) (y:deep_model_ty0) (z:deep_model_ty0) (o:Core_Cmp_Ordering_Type.t_ordering) (return'  (ret:()))= { inv6 z}
+    { inv6 y}
+    { inv6 x}
+    { cmp_log0 y z = o}
+    { cmp_log0 x y = o}
     any [ return' (result:())-> {result = trans0 x y z o} (! return' {result}) ]
-  axiom trans0_spec : forall x : deep_model_ty0, y : deep_model_ty0, z : deep_model_ty0, o : Core_Cmp_Ordering_Type.t_ordering . ([%#ord 53 15 53 32] cmp_log0 x y = o)
-   -> ([%#ord 54 15 54 32] cmp_log0 y z = o)
-   -> ([%#ord 56 13 56 14] inv6 x)
-   -> ([%#ord 56 22 56 23] inv6 y)
-   -> ([%#ord 56 31 56 32] inv6 z)
-   -> ([%#ord 55 14 55 31] cmp_log0 x z = o)
+  axiom trans0_spec : forall x : deep_model_ty0, y : deep_model_ty0, z : deep_model_ty0, o : Core_Cmp_Ordering_Type.t_ordering . ( cmp_log0 x y = o)
+   -> ( cmp_log0 y z = o)
+   -> ( inv6 x)
+   -> ( inv6 y)
+   -> ( inv6 z)
+   -> ( cmp_log0 x z = o)
   function refl0 (x : deep_model_ty0) : ()
-  let rec refl0 (x:deep_model_ty0) (return'  (ret:()))= {[%#ord 50 12 50 13] inv6 x}
+  let rec refl0 (x:deep_model_ty0) (return'  (ret:()))= { inv6 x}
     any [ return' (result:())-> {result = refl0 x} (! return' {result}) ]
-  axiom refl0_spec : forall x : deep_model_ty0 . ([%#ord 50 12 50 13] inv6 x)
-   -> ([%#ord 49 14 49 45] cmp_log0 x x = Core_Cmp_Ordering_Type.C_Equal)
+  axiom refl0_spec : forall x : deep_model_ty0 . ( inv6 x)
+   -> ( cmp_log0 x x = Core_Cmp_Ordering_Type.C_Equal)
   function gt_log0 (self : deep_model_ty0) (o : deep_model_ty0) : bool
   let rec gt_log0 (self:deep_model_ty0) (o:deep_model_ty0) (return'  (ret:bool))= any
     [ return' (result:bool)-> {result = gt_log0 self o} (! return' {result}) ]
 
   function cmp_gt_log0 (x : deep_model_ty0) (y : deep_model_ty0) : ()
-  let rec cmp_gt_log0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= {[%#ord 46 27 46 28] inv6 y}
-    {[%#ord 46 18 46 19] inv6 x}
+  let rec cmp_gt_log0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= { inv6 y}
+    { inv6 x}
     any [ return' (result:())-> {result = cmp_gt_log0 x y} (! return' {result}) ]
-  axiom cmp_gt_log0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ([%#ord 46 18 46 19] inv6 x)
-   -> ([%#ord 46 27 46 28] inv6 y)
-   -> ([%#ord 45 14 45 64] gt_log0 x y = (cmp_log0 x y = Core_Cmp_Ordering_Type.C_Greater))
+  axiom cmp_gt_log0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ( inv6 x)
+   -> ( inv6 y)
+   -> ( gt_log0 x y = (cmp_log0 x y = Core_Cmp_Ordering_Type.C_Greater))
   function ge_log0 (self : deep_model_ty0) (o : deep_model_ty0) : bool
   let rec ge_log0 (self:deep_model_ty0) (o:deep_model_ty0) (return'  (ret:bool))= any
     [ return' (result:bool)-> {result = ge_log0 self o} (! return' {result}) ]
 
   function cmp_ge_log0 (x : deep_model_ty0) (y : deep_model_ty0) : ()
-  let rec cmp_ge_log0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= {[%#ord 36 27 36 28] inv6 y}
-    {[%#ord 36 18 36 19] inv6 x}
+  let rec cmp_ge_log0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= { inv6 y}
+    { inv6 x}
     any [ return' (result:())-> {result = cmp_ge_log0 x y} (! return' {result}) ]
-  axiom cmp_ge_log0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ([%#ord 36 18 36 19] inv6 x)
-   -> ([%#ord 36 27 36 28] inv6 y)
-   -> ([%#ord 35 14 35 61] ge_log0 x y = (cmp_log0 x y <> Core_Cmp_Ordering_Type.C_Less))
+  axiom cmp_ge_log0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ( inv6 x)
+   -> ( inv6 y)
+   -> ( ge_log0 x y = (cmp_log0 x y <> Core_Cmp_Ordering_Type.C_Less))
   function lt_log0 (self : deep_model_ty0) (o : deep_model_ty0) : bool
   let rec lt_log0 (self:deep_model_ty0) (o:deep_model_ty0) (return'  (ret:bool))= any
     [ return' (result:bool)-> {result = lt_log0 self o} (! return' {result}) ]
 
   function cmp_lt_log0 (x : deep_model_ty0) (y : deep_model_ty0) : ()
-  let rec cmp_lt_log0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= {[%#ord 26 27 26 28] inv6 y}
-    {[%#ord 26 18 26 19] inv6 x}
+  let rec cmp_lt_log0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= { inv6 y}
+    { inv6 x}
     any [ return' (result:())-> {result = cmp_lt_log0 x y} (! return' {result}) ]
-  axiom cmp_lt_log0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ([%#ord 26 18 26 19] inv6 x)
-   -> ([%#ord 26 27 26 28] inv6 y)
-   -> ([%#ord 25 14 25 61] lt_log0 x y = (cmp_log0 x y = Core_Cmp_Ordering_Type.C_Less))
+  axiom cmp_lt_log0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ( inv6 x)
+   -> ( inv6 y)
+   -> ( lt_log0 x y = (cmp_log0 x y = Core_Cmp_Ordering_Type.C_Less))
   function le_log0 (self : deep_model_ty0) (o : deep_model_ty0) : bool
   let rec le_log0 (self:deep_model_ty0) (o:deep_model_ty0) (return'  (ret:bool))= any
     [ return' (result:bool)-> {result = le_log0 self o} (! return' {result}) ]
 
   function cmp_le_log0 (x : deep_model_ty0) (y : deep_model_ty0) : ()
-  let rec cmp_le_log0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= {[%#ord 16 27 16 28] inv6 y}
-    {[%#ord 16 18 16 19] inv6 x}
+  let rec cmp_le_log0 (x:deep_model_ty0) (y:deep_model_ty0) (return'  (ret:()))= { inv6 y}
+    { inv6 x}
     any [ return' (result:())-> {result = cmp_le_log0 x y} (! return' {result}) ]
-  axiom cmp_le_log0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ([%#ord 16 18 16 19] inv6 x)
-   -> ([%#ord 16 27 16 28] inv6 y)
-   -> ([%#ord 15 14 15 64] le_log0 x y = (cmp_log0 x y <> Core_Cmp_Ordering_Type.C_Greater))
+  axiom cmp_le_log0_spec : forall x : deep_model_ty0, y : deep_model_ty0 . ( inv6 x)
+   -> ( inv6 y)
+   -> ( le_log0 x y = (cmp_log0 x y <> Core_Cmp_Ordering_Type.C_Greater))
   predicate invariant2 (self : slice t)
   let rec invariant2 (self:slice t) (return'  (ret:bool))= any
     [ return' (result:bool)-> {result = invariant2 self} (! return' {result}) ]

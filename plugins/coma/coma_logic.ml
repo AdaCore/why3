@@ -696,7 +696,7 @@ and wr_lambda hc lh lr wm pl e =
         let wr = Mhs.find_def Svs.empty h !wm in
         let wr = Svs.elements (Svs.inter wr lr) in
         lr, Pc (h, wr, ql) in
-  let _,pl = List.fold_left_map update lr pl in
+  let _,pl = Lists.map_fold_left update lr pl in
   wm := Mhs.set_diff !wm sh;
   pl, e
 
@@ -707,10 +707,10 @@ and wr_defn hc lh lr flat dfl =
       | Pc (h,_,l) -> Pc (h,[],l)) pl in
     Mhs.add h (wr,pl) lh, (h,wr,pl,d) in
   let lh, dfl = if flat then lh, dfl else
-    List.fold_left_map on_def lh dfl in
+    Lists.map_fold_left on_def lh dfl in
   let same_p p q = match p,q with
     | Pc (_,wr,_), Pc (_,vr,_) ->
-        List.equal vs_equal wr vr
+        Lists.equal vs_equal wr vr
     | _, _ -> true in
   let rec fixpoint lh dfl =
     let same = ref true in
@@ -719,7 +719,7 @@ and wr_defn hc lh lr flat dfl =
       let pl, d = wr_lambda hc lh lr wmd ql d in
       same := !same && List.for_all2 same_p pl ql;
       Mhs.add h (wr,pl) lh, ((h,wr,pl,d),!wmd) in
-    let lh, dfl = List.fold_left_map on_def lh dfl in
+    let lh, dfl = Lists.map_fold_left on_def lh dfl in
     if flat || !same then dfl else fixpoint lh dfl in
   fixpoint lh (List.map (fun d -> d,Mhs.empty) dfl)
 

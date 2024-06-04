@@ -479,6 +479,7 @@ install-data::
 	$(INSTALL_DATA) share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
 	$(INSTALL_DATA) share/lang/why3c.lang $(DATADIR)/why3/lang/why3c.lang
 	$(INSTALL_DATA) share/lang/why3py.lang $(DATADIR)/why3/lang/why3py.lang
+	$(INSTALL_DATA) share/lang/coma.lang $(DATADIR)/why3/lang/coma.lang
 
 ifeq (@enable_local@,yes)
 else
@@ -552,7 +553,7 @@ PLUG_PRINTER =
 PLUG_TRANSFORM =
 PLUG_STRATEGIES = forward_propagation
 PLUG_TPTP = tptp_parser tptp_typing tptp_lexer tptp_printer
-PLUG_COMA = coma_logic coma_syntax coma_parser coma_lexer coma_typing coma_vc coma_main
+PLUG_COMA = coma_logic coma_syntax coma_parser coma_lexer coma_typing coma_main
 PLUG_PYTHON = py_parser py_lexer py_main
 PLUG_MICROC = mc_parser mc_lexer mc_printer mc_main
 PLUG_CFG = cfg_parser cfg_lexer cfg_paths subregion_analysis cfg_main

@@ -5,7 +5,7 @@
 <prover id="0" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC5" version="1.1.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.12.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="2.5.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.5.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="coma" proved="true">
 <path name=".."/><path name="re2.coma"/>
 <theory name="Coma" proved="true">
@@ -26,10 +26,10 @@
   <goal name="vc_accept.2" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="vc_accept.2.0" proved="true">
-   <proof prover="3"><result status="valid" time="0.032586" steps="342"/></proof>
+   <proof prover="3"><result status="valid" time="0.041183" steps="342"/></proof>
    </goal>
    <goal name="vc_accept.2.1" proved="true">
-   <proof prover="3"><result status="valid" time="0.518288" steps="8224"/></proof>
+   <proof prover="3"><result status="valid" time="0.495985" steps="8225"/></proof>
    </goal>
   </transf>
   </goal>
@@ -41,31 +41,37 @@
   </goal>
   <goal name="vc_accept.5" proved="true">
   <proof prover="2"><result status="valid" time="0.013163" steps="5525"/></proof>
+  <proof prover="3"><result status="valid" time="0.020723" steps="14"/></proof>
   </goal>
   <goal name="vc_accept.6" proved="true">
   <proof prover="3"><result status="valid" time="0.030945" steps="311"/></proof>
   </goal>
   <goal name="vc_accept.7" proved="true">
   <proof prover="2"><result status="valid" time="0.022616" steps="88408"/></proof>
+  <proof prover="3"><result status="valid" time="0.025260" steps="395"/></proof>
   </goal>
   <goal name="vc_accept.8" proved="true">
   <proof prover="2"><result status="valid" time="0.029831" steps="68332"/></proof>
+  <proof prover="3"><result status="valid" time="0.010436" steps="18"/></proof>
   </goal>
   <goal name="vc_accept.9" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="vc_accept.9.0" proved="true">
-   <proof prover="2"><result status="valid" time="0.021101" steps="97817"/></proof>
+   <proof prover="2" timelimit="1"><result status="valid" time="0.021101" steps="97817"/></proof>
    </goal>
    <goal name="vc_accept.9.1" proved="true">
    <proof prover="2"><result status="valid" time="0.020660" steps="86866"/></proof>
+   <proof prover="3"><result status="valid" time="0.023529" steps="229"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="vc_accept.10" proved="true">
   <proof prover="2"><result status="valid" time="0.027413" steps="88811"/></proof>
+  <proof prover="3"><result status="valid" time="0.028231" steps="268"/></proof>
   </goal>
   <goal name="vc_accept.11" proved="true">
   <proof prover="2"><result status="valid" time="0.029630" steps="75954"/></proof>
+  <proof prover="3"><result status="valid" time="0.021414" steps="244"/></proof>
   </goal>
   <goal name="vc_accept.12" proved="true">
   <proof prover="3"><result status="valid" time="0.014274" steps="12"/></proof>
@@ -75,30 +81,37 @@
   </goal>
   <goal name="vc_accept.14" proved="true">
   <proof prover="0"><result status="valid" time="0.019660" steps="15605"/></proof>
+  <proof prover="3"><result status="valid" time="0.014154" steps="20"/></proof>
   </goal>
   <goal name="vc_accept.15" proved="true">
   <proof prover="1"><result status="valid" time="0.036080" steps="10963"/></proof>
+  <proof prover="3"><result status="valid" time="0.014631" steps="18"/></proof>
   </goal>
   <goal name="vc_accept.16" proved="true">
   <proof prover="3"><result status="valid" time="0.016484" steps="45"/></proof>
   </goal>
   <goal name="vc_accept.17" proved="true">
   <proof prover="2"><result status="valid" time="0.024006" steps="8895"/></proof>
+  <proof prover="3"><result status="valid" time="0.014359" steps="16"/></proof>
   </goal>
   <goal name="vc_accept.18" proved="true">
   <proof prover="2"><result status="valid" time="0.027086" steps="75484"/></proof>
+  <proof prover="3"><result status="valid" time="0.014422" steps="24"/></proof>
   </goal>
   <goal name="vc_accept.19" proved="true">
   <proof prover="1"><result status="valid" time="0.019103" steps="11070"/></proof>
+  <proof prover="3"><result status="valid" time="0.018029" steps="24"/></proof>
   </goal>
   <goal name="vc_accept.20" proved="true">
   <proof prover="2"><result status="valid" time="0.014696" steps="6142"/></proof>
+  <proof prover="3"><result status="valid" time="0.006862" steps="22"/></proof>
   </goal>
   <goal name="vc_accept.21" proved="true">
   <proof prover="3"><result status="valid" time="0.027488" steps="251"/></proof>
   </goal>
   <goal name="vc_accept.22" proved="true">
   <proof prover="2"><result status="valid" time="0.010410" steps="8094"/></proof>
+  <proof prover="3"><result status="valid" time="0.014716" steps="12"/></proof>
   </goal>
   <goal name="vc_accept.23" proved="true">
   <proof prover="3"><result status="valid" time="0.007036" steps="18"/></proof>
@@ -108,39 +121,54 @@
   </goal>
   <goal name="vc_accept.25" proved="true">
   <proof prover="2"><result status="valid" time="0.029528" steps="65642"/></proof>
+  <proof prover="3"><result status="valid" time="0.020700" steps="26"/></proof>
   </goal>
   <goal name="vc_accept.26" proved="true">
   <proof prover="3"><result status="valid" time="0.020001" steps="24"/></proof>
   </goal>
   <goal name="vc_accept.27" proved="true">
   <proof prover="1"><result status="valid" time="0.034064" steps="12081"/></proof>
+  <proof prover="3"><result status="valid" time="0.024799" steps="88"/></proof>
   </goal>
   <goal name="vc_accept.28" proved="true">
-  <proof prover="3"><result status="valid" time="1.768073" steps="29819"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="vc_accept.28.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.054288" steps="22432"/></proof>
+   </goal>
+   <goal name="vc_accept.28.1" proved="true">
+   <proof prover="3" timelimit="5"><result status="valid" time="0.473469" steps="10372"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="vc_accept.29" proved="true">
-  <proof prover="3"><result status="valid" time="0.020566" steps="36"/></proof>
+  <proof prover="3"><result status="valid" time="0.020566" steps="37"/></proof>
   </goal>
   <goal name="vc_accept.30" proved="true">
   <proof prover="2"><result status="valid" time="0.010503" steps="5529"/></proof>
+  <proof prover="3"><result status="valid" time="0.010051" steps="14"/></proof>
   </goal>
   <goal name="vc_accept.31" proved="true">
   <proof prover="0"><result status="valid" time="0.044652" steps="19745"/></proof>
+  <proof prover="3"><result status="valid" time="0.028566" steps="278"/></proof>
   </goal>
   <goal name="vc_accept.32" proved="true">
   <proof prover="2"><result status="valid" time="0.020828" steps="8897"/></proof>
+  <proof prover="3"><result status="valid" time="0.013177" steps="16"/></proof>
   </goal>
   <goal name="vc_accept.33" proved="true">
   <proof prover="1"><result status="valid" time="0.047513" steps="11238"/></proof>
+  <proof prover="3"><result status="valid" time="0.019834" steps="24"/></proof>
   </goal>
   <goal name="vc_accept.34" proved="true">
-  <proof prover="1"><result status="valid" time="0.055733" steps="18176"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.055733" steps="16872"/></proof>
   </goal>
   <goal name="vc_accept.35" proved="true">
   <proof prover="2"><result status="valid" time="0.023512" steps="77419"/></proof>
+  <proof prover="3"><result status="valid" time="0.009352" steps="32"/></proof>
   </goal>
   <goal name="vc_accept.36" proved="true">
   <proof prover="1"><result status="valid" time="0.024676" steps="11059"/></proof>
+  <proof prover="3"><result status="valid" time="0.013950" steps="30"/></proof>
   </goal>
   <goal name="vc_accept.37" proved="true">
   <proof prover="3"><result status="valid" time="0.016519" steps="90"/></proof>
@@ -151,10 +179,10 @@
   <goal name="vc_accept.39" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="vc_accept.39.0" proved="true">
-   <proof prover="1"><result status="valid" time="0.475584" steps="124896"/></proof>
+   <proof prover="1" timelimit="1"><result status="valid" time="0.475584" steps="123543"/></proof>
    </goal>
    <goal name="vc_accept.39.1" proved="true">
-   <proof prover="3"><result status="valid" time="2.532683" steps="34646"/></proof>
+   <proof prover="3" timelimit="5"><result status="valid" time="3.108847" steps="44588"/></proof>
    </goal>
   </transf>
   </goal>
