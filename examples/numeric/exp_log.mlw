@@ -7,10 +7,12 @@ module ExpLogSingle
 
   constant log_error:real
   axiom log_error_bounds : 0. <=. log_error <=. 1.
+  constant log_cst_error:real
+  axiom log_cst_error_bounds : 0. <=. log_cst_error <=. 1.
   val function log_approx (x:usingle) : usingle
     requires { 0. <. to_real x }
     ensures {
-      abs (to_real result -. log (to_real x)) <=. abs (log (to_real x)) *. log_error
+      abs (to_real result -. log (to_real x)) <=. abs (log (to_real x)) *. log_error +. log_cst_error
     }
 
   constant log2_error:real
@@ -30,7 +32,7 @@ module ExpLogSingle
     }
 
   constant exp_error:real
-  axiom exp_error_bounds : 0. <=. exp_error <=. 0x1p-3
+  axiom exp_error_bounds : 0. <=. exp_error <=. 0x1p-2
   val function exp_approx (x:usingle) : usingle
     ensures {
       abs (to_real result -. exp (to_real x)) <=. exp_error *. exp (to_real x)
@@ -38,13 +40,16 @@ module ExpLogSingle
 
   let ghost example1 (x y : usingle)
     ensures {
-      let exact = log(exp(to_real x)) +. log(exp(to_real y)) in
-      abs (to_real result -. exact)
-      <=. 
-      (2. *. log_error +. eps) *. (abs (to_real x) +. abs (to_real y)) +.
-      (((1.0 +. eps) +. log_error) *. ((-. log (1.0 -. exp_error)) *. (1.0 +. log_error)))
-       +. (((1.0 +. eps) +. log_error)
-         *. ((-. log (1.0 -. exp_error)) *. (1.0 +. log_error)))
+    let t = log (exp (to_real y)) in
+    let t1 = log (exp (to_real x)) in
+    let t2 =
+      ((1.0 +. eps) +. log_error)
+      *. (((-. log (1.0 -. exp_error)) *. (1.0 +. log_error))
+          +. log_cst_error)
+    in
+    abs (to_real result -. (t1 +. t))
+    <=. ((((log_error +. log_error) +. eps) *. (abs t1 +. abs t))
+         +. (t2 +. t2))
     }
   = log_approx (exp_approx(x)) ++. log_approx (exp_approx(y))
 
@@ -53,7 +58,7 @@ module ExpLogSingle
       let exact = log(exp(to_real x) +. exp (to_real y)) in
       abs (to_real result -. exact)
       <=. abs exact *. log_error
-         +. ((-. log (1.0 -. ((2. *. exp_error) +. eps))) *. (1.0 +. log_error))
+         +. ((-. log (1.0 -. ((2. *. exp_error) +. eps))) *. (1.0 +. log_error)) +. log_cst_error
     }
   = log_approx (exp_approx(x) ++. exp_approx(y))
 
@@ -90,10 +95,12 @@ module ExpLogDouble
 
   constant log_error:real
   axiom log_error_bounds : 0. <=. log_error <=. 1.
+  constant log_cst_error:real
+  axiom log_cst_error_bounds : 0. <=. log_cst_error <=. 1.
   val function log_approx (x:udouble) : udouble
     requires { 0. <. to_real x }
     ensures {
-      abs (to_real result -. log (to_real x)) <=. abs (log (to_real x)) *. log_error
+      abs (to_real result -. log (to_real x)) <=. abs (log (to_real x)) *. log_error +. log_cst_error
     }
 
   constant log2_error:real
@@ -121,13 +128,16 @@ module ExpLogDouble
 
   let ghost example1 (x y : udouble)
     ensures {
-      let exact = log(exp(to_real x)) +. log(exp(to_real y)) in
-      abs (to_real result -. exact)
-      <=. 
-      (2. *. log_error +. eps) *. (abs (to_real x) +. abs (to_real y)) +.
-      (((1.0 +. eps) +. log_error) *. ((-. log (1.0 -. exp_error)) *. (1.0 +. log_error)))
-       +. (((1.0 +. eps) +. log_error)
-         *. ((-. log (1.0 -. exp_error)) *. (1.0 +. log_error)))
+    let t = log (exp (to_real y)) in
+    let t1 = log (exp (to_real x)) in
+    let t2 =
+      ((1.0 +. eps) +. log_error)
+      *. (((-. log (1.0 -. exp_error)) *. (1.0 +. log_error))
+          +. log_cst_error)
+    in
+    abs (to_real result -. (t1 +. t))
+    <=. ((((log_error +. log_error) +. eps) *. (abs t1 +. abs t))
+         +. (t2 +. t2))
     }
   = log_approx (exp_approx(x)) ++. log_approx (exp_approx(y))
 
@@ -136,7 +146,7 @@ module ExpLogDouble
       let exact = log(exp(to_real x) +. exp (to_real y)) in
       abs (to_real result -. exact)
       <=. abs exact *. log_error
-         +. ((-. log (1.0 -. ((2. *. exp_error) +. eps))) *. (1.0 +. log_error))
+         +. ((-. log (1.0 -. ((2. *. exp_error) +. eps))) *. (1.0 +. log_error)) +. log_cst_error
     }
   = log_approx (exp_approx(x) ++. exp_approx(y))
 

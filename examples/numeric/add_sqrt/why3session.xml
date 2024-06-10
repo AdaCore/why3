@@ -3,62 +3,52 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="1" name="Alt-Ergo" version="2.5.4" alternative="FPA" timelimit="5" steplimit="0" memlimit="2000"/>
-<file format="whyml">
+<file format="whyml" proved="true">
 <path name=".."/><path name="add_sqrt.mlw"/>
-<theory name="AdditionSqrtSingle">
- <goal name="usqrt&#39;vc" expl="VC for usqrt">
- </goal>
+<theory name="AdditionSqrtSingle" proved="true">
  <goal name="add_sqrt&#39;vc" expl="VC for add_sqrt" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="add_sqrt&#39;vc.0" expl="postcondition" proved="true">
-  <transf name="assert" proved="true" arg1="let t = to_real a in
-let t1 = sqrt (to_real b) in
-let t2 = 1.0 +. eps in
-abs (to_real result -. (t +. t1))
-&lt;=. ((((0.0 +. eps) +. eps) *. (abs t +. abs t1))
-     +. (((t2 +. eps) *. 0.0) +. ((t2 +. 0.0) *. 0.0)))">
+  <transf name="assert" proved="true" arg1="let t = to_real a +. to_real (usqrt b) in
+abs (to_real result -. t) &lt;=. (eps *. abs t)">
    <goal name="add_sqrt&#39;vc.0.0" expl="asserted formula" proved="true">
-   <transf name="assert" proved="true" arg1="abs (to_real result -. (to_real a +. sqrt (to_real b)))
-&lt;=. ((((0.0 +. eps) +. eps) *. (abs (to_real a) +. abs (sqrt (to_real b))))
-     +. ((((1.0 +. eps) +. eps) *. 0.0) +. (((1.0 +. eps) +. 0.0) *. 0.0)))">
+   <transf name="assert" proved="true" arg1="abs (to_real result -. (to_real a +. to_real (usqrt b)))
+&lt;=. (eps *. abs (to_real a +. to_real (usqrt b)))">
     <goal name="add_sqrt&#39;vc.0.0.0" expl="asserted formula" proved="true">
-    <transf name="apply" proved="true" arg1="uadd_single_error_propagation" arg2="with" arg3="a,usqrt b">
-     <goal name="add_sqrt&#39;vc.0.0.0.0" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.044745" steps="88"/></proof>
-     </goal>
-     <goal name="add_sqrt&#39;vc.0.0.0.1" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.034945" steps="106"/></proof>
-     </goal>
-     <goal name="add_sqrt&#39;vc.0.0.0.2" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.046156" steps="91"/></proof>
-     </goal>
-     <goal name="add_sqrt&#39;vc.0.0.0.3" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.067575" steps="91"/></proof>
-     </goal>
-     <goal name="add_sqrt&#39;vc.0.0.0.4" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.048471" steps="83"/></proof>
-     </goal>
-     <goal name="add_sqrt&#39;vc.0.0.0.5" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.039450" steps="83"/></proof>
-     </goal>
-     <goal name="add_sqrt&#39;vc.0.0.0.6" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.059424" steps="83"/></proof>
-     </goal>
-     <goal name="add_sqrt&#39;vc.0.0.0.7" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.051722" steps="83"/></proof>
-     </goal>
-     <goal name="add_sqrt&#39;vc.0.0.0.8" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.043087" steps="83"/></proof>
-     </goal>
-    </transf>
+    <proof prover="1"><result status="valid" time="0.086509" steps="735"/></proof>
     </goal>
     <goal name="add_sqrt&#39;vc.0.0.1" expl="asserted formula" proved="true">
-    <proof prover="1"><result status="valid" time="0.062817" steps="213"/></proof>
+    <proof prover="1"><result status="valid" time="0.048223" steps="134"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="add_sqrt&#39;vc.0.1" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.055936" steps="204"/></proof>
+   <proof prover="1"><result status="valid" time="0.048860" steps="123"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="AdditionSqrtDouble" proved="true">
+ <goal name="add_sqrt&#39;vc" expl="VC for add_sqrt" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="add_sqrt&#39;vc.0" expl="postcondition" proved="true">
+  <transf name="assert" proved="true" arg1="let t = to_real a +. to_real (usqrt b) in
+abs (to_real result -. t) &lt;=. (eps *. abs t)">
+   <goal name="add_sqrt&#39;vc.0.0" expl="asserted formula" proved="true">
+   <transf name="assert" proved="true" arg1="abs (to_real result -. (to_real a +. to_real (usqrt b)))
+&lt;=. (eps *. abs (to_real a +. to_real (usqrt b)))">
+    <goal name="add_sqrt&#39;vc.0.0.0" expl="asserted formula" proved="true">
+    <proof prover="1"><result status="valid" time="0.091382" steps="737"/></proof>
+    </goal>
+    <goal name="add_sqrt&#39;vc.0.0.1" expl="asserted formula" proved="true">
+    <proof prover="1"><result status="valid" time="0.046502" steps="135"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="add_sqrt&#39;vc.0.1" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.042929" steps="123"/></proof>
    </goal>
   </transf>
   </goal>

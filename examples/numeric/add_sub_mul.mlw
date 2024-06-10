@@ -4,13 +4,35 @@ module AddSubMulSingle
   use ufloat.USingle
   use ufloat.USingleLemmas
 
-  let ghost mix (a b c d : usingle)
+  let ghost example1 (a b c d : usingle)
     ensures {
       let exact = (to_real a +. to_real b -. to_real c) *. to_real d in
       let exact_abs = abs ((abs (to_real a +. to_real b) +. abs (to_real c)) *. to_real d) in
       abs (to_real result -. exact) <=. 3.1 *. eps *. exact_abs +. eta
     }
   = (a ++. b --. c) **. d
+
+  let ghost determinant (a b c d : usingle)
+    ensures {
+      let t1 = to_real a *. to_real d in
+      let t2 = to_real b *. to_real c in
+      abs (to_real result -. (t1 -. t2))
+      <=. 3. *. eps *. (abs t1 +. abs t2) +. 2. *. eta *. (1. +. 2. *. eps)
+    }
+  = (a **. d --. b **. c)
+
+  let ghost square_norm (a b c : usingle)
+    ensures {
+      let t1 = to_real a *. to_real a in
+      let t2 = to_real b *. to_real b in
+      let t3 = to_real c *. to_real c in
+      abs (to_real result -. (t1 +. t2 +. t3))
+      <=. (5. *. eps) *. (t1 +. t2 +. t3)
+           +. eta *.
+               (2. *. (1. +. 2. *. eps) *. (1. +. 2. *. eps) +.
+                1. +. 4. *. eps)
+    }
+  = (a **. a ++. b **. b ++. c **. c)
 end
 
 module AddSubMulDouble
@@ -19,11 +41,33 @@ module AddSubMulDouble
   use ufloat.UDouble
   use ufloat.UDoubleLemmas
 
-  let ghost mix (a b c d : udouble)
+  let ghost example1 (a b c d : udouble)
     ensures {
       let exact = (to_real a +. to_real b -. to_real c) *. to_real d in
       let exact_abs = abs ((abs (to_real a +. to_real b) +. abs (to_real c)) *. to_real d) in
       abs (to_real result -. exact) <=. 3.1 *. eps *. exact_abs +. eta
     }
   = (a ++. b --. c) **. d
+
+  let ghost determinant (a b c d : udouble)
+    ensures {
+      let t1 = to_real a *. to_real d in
+      let t2 = to_real b *. to_real c in
+      abs (to_real result -. (t1 -. t2))
+      <=. 3. *. eps *. (abs t1 +. abs t2) +. 2. *. eta *. (1. +. 2. *. eps)
+    }
+  = (a **. d --. b **. c)
+
+  let ghost square_norm (a b c : udouble)
+    ensures {
+      let t1 = to_real a *. to_real a in
+      let t2 = to_real b *. to_real b in
+      let t3 = to_real c *. to_real c in
+      abs (to_real result -. (t1 +. t2 +. t3))
+      <=. (5. *. eps) *. (t1 +. t2 +. t3)
+           +. eta *.
+               (2. *. (1. +. 2. *. eps) *. (1. +. 2. *. eps) +.
+                1. +. 4. *. eps)
+    }
+  = (a **. a ++. b **. b ++. c **. c)
 end

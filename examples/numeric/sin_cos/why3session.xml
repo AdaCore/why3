@@ -4,6 +4,7 @@
 <why3session shape_version="6">
 <prover id="0" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="1" name="Alt-Ergo" version="2.5.4" alternative="FPA" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="4" name="Z3" version="4.8.10" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="sin_cos.mlw"/>
 <theory name="SinCosSingle" proved="true">
@@ -29,37 +30,42 @@ abs (to_real result -. t1)
       <goal name="sin_simple_example&#39;vc.0.0.0.0.0" expl="apply premises" proved="true">
       <transf name="assert" proved="true" arg1="abs (to_real (x ++. y) -. (to_real x +. to_real y))
 &lt;=. (eps *. abs (to_real x +. to_real y))">
-       <goal name="sin_simple_example&#39;vc.0.0.0.0.0.0" expl="asserted formula" proved="true">
-       <proof prover="1"><result status="valid" time="0.149308" steps="1024"/></proof>
+        <goal name="sin_simple_example&#39;vc.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
+        <proof prover="1"><result status="valid" time="0.170096" steps="981"/></proof>
+        </goal>
+        <goal name="sin_simple_example&#39;vc.0.0.0.0.0.0.1" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.059402" steps="116"/></proof>
+        </goal>
+       </transf>
        </goal>
        <goal name="sin_simple_example&#39;vc.0.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="1"><result status="valid" time="0.044091" steps="118"/></proof>
+       <proof prover="1"><result status="valid" time="0.199376" steps="1383"/></proof>
+       </goal>
+       <goal name="sin_simple_example&#39;vc.0.0.0.0.0.2" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.061148" steps="91"/></proof>
+       </goal>
+       <goal name="sin_simple_example&#39;vc.0.0.0.0.0.3" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.069858" steps="85"/></proof>
        </goal>
       </transf>
       </goal>
-      <goal name="sin_simple_example&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="1"><result status="valid" time="0.053883" steps="110"/></proof>
-      </goal>
-      <goal name="sin_simple_example&#39;vc.0.0.0.0.2" expl="apply premises" proved="true">
-      <proof prover="1"><result status="valid" time="0.079057" steps="93"/></proof>
-      </goal>
-      <goal name="sin_simple_example&#39;vc.0.0.0.0.3" expl="apply premises" proved="true">
-      <proof prover="1"><result status="valid" time="0.042776" steps="86"/></proof>
+      <goal name="sin_simple_example&#39;vc.0.0.0.0.1" expl="asserted formula" proved="true">
+      <proof prover="1"><result status="valid" time="1.503053" steps="7419"/></proof>
       </goal>
      </transf>
      </goal>
      <goal name="sin_simple_example&#39;vc.0.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="1"><result status="valid" time="0.080002" steps="156"/></proof>
+     <proof prover="1"><result status="valid" time="0.073611" steps="153"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="sin_simple_example&#39;vc.0.0.1" expl="asserted formula" proved="true">
-    <proof prover="1"><result status="valid" time="0.089498" steps="226"/></proof>
+    <proof prover="1"><result status="valid" time="0.122115" steps="224"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="sin_simple_example&#39;vc.0.1" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.070304" steps="225"/></proof>
+   <proof prover="1"><result status="valid" time="0.072747" steps="224"/></proof>
    </goal>
   </transf>
   </goal>
@@ -87,37 +93,258 @@ abs (to_real result -. t1)
       <goal name="cos_simple_example&#39;vc.0.0.0.0.0" expl="apply premises" proved="true">
       <transf name="assert" proved="true" arg1="abs (to_real (x --. y) -. (to_real x -. to_real y))
 &lt;=. (eps *. abs (to_real x -. to_real y))">
-       <goal name="cos_simple_example&#39;vc.0.0.0.0.0.0" expl="asserted formula" proved="true">
-       <proof prover="1"><result status="valid" time="0.185540" steps="1036"/></proof>
+        <goal name="cos_simple_example&#39;vc.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
+        <proof prover="1"><result status="valid" time="0.157239" steps="982"/></proof>
+        </goal>
+        <goal name="cos_simple_example&#39;vc.0.0.0.0.0.0.1" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.045712" steps="116"/></proof>
+        </goal>
+       </transf>
        </goal>
        <goal name="cos_simple_example&#39;vc.0.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="1"><result status="valid" time="0.066626" steps="118"/></proof>
+       <proof prover="1"><result status="valid" time="0.227652" steps="1401"/></proof>
+       </goal>
+       <goal name="cos_simple_example&#39;vc.0.0.0.0.0.2" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.081635" steps="91"/></proof>
+       </goal>
+       <goal name="cos_simple_example&#39;vc.0.0.0.0.0.3" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.053882" steps="85"/></proof>
        </goal>
       </transf>
       </goal>
-      <goal name="cos_simple_example&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="1"><result status="valid" time="0.046303" steps="110"/></proof>
-      </goal>
-      <goal name="cos_simple_example&#39;vc.0.0.0.0.2" expl="apply premises" proved="true">
-      <proof prover="1"><result status="valid" time="0.077615" steps="93"/></proof>
-      </goal>
-      <goal name="cos_simple_example&#39;vc.0.0.0.0.3" expl="apply premises" proved="true">
-      <proof prover="1"><result status="valid" time="0.055899" steps="86"/></proof>
+      <goal name="cos_simple_example&#39;vc.0.0.0.0.1" expl="asserted formula" proved="true">
+      <proof prover="1"><result status="valid" time="1.186515" steps="5091"/></proof>
       </goal>
      </transf>
      </goal>
      <goal name="cos_simple_example&#39;vc.0.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="1"><result status="valid" time="0.063848" steps="156"/></proof>
+     <proof prover="1"><result status="valid" time="0.074177" steps="153"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="cos_simple_example&#39;vc.0.0.1" expl="asserted formula" proved="true">
-    <proof prover="1"><result status="valid" time="0.085346" steps="226"/></proof>
+    <proof prover="1"><result status="valid" time="0.092653" steps="224"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="cos_simple_example&#39;vc.0.1" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.080404" steps="225"/></proof>
+   <proof prover="1"><result status="valid" time="0.078860" steps="223"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="cos_square_plus_sine_square" proved="true">
+ <proof prover="4"><result status="valid" time="0.012163" steps="7351"/></proof>
+ </goal>
+ <goal name="cos_and_sine_example&#39;vc" expl="VC for cos_and_sine_example" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="cos_and_sine_example&#39;vc.0" expl="postcondition" proved="true">
+  <transf name="assert" proved="true" arg1="let t1 = to_real a in
+let t2 = sin t1 in
+let t3 = cos t1 in
+let t4 = 1.0 +. eps in
+let t5 = t2 *. t2 in
+let t6 = t3 *. t3 in
+let t7 =
+  eps +. (((cos_error +. cos_error) +. (cos_error *. cos_error)) *. t4)
+in
+let t8 =
+  eps +. (((sin_error +. sin_error) +. (sin_error *. sin_error)) *. t4)
+in
+abs (to_real result -. (t6 +. t5))
+&lt;=. ((((t7 +. t8) +. eps) *. (abs t6 +. abs t5))
+     +. (((t4 +. t8) *. eta) +. ((t4 +. t7) *. eta)))">
+   <goal name="cos_and_sine_example&#39;vc.0.0" expl="asserted formula" proved="true">
+   <transf name="assert" proved="true" arg1="abs
+(to_real result
+ -. ((cos (to_real a) *. cos (to_real a))
+     +. (sin (to_real a) *. sin (to_real a))))
+&lt;=. (((((eps
+         +. (((cos_error +. cos_error) +. (cos_error *. cos_error))
+             *. (1.0 +. eps)))
+        +. (eps
+            +. (((sin_error +. sin_error) +. (sin_error *. sin_error))
+                *. (1.0 +. eps))))
+       +. eps)
+      *. (abs (cos (to_real a) *. cos (to_real a))
+          +. abs (sin (to_real a) *. sin (to_real a))))
+     +. ((((1.0 +. eps)
+           +. (eps
+               +. (((sin_error +. sin_error) +. (sin_error *. sin_error))
+                   *. (1.0 +. eps))))
+          *. eta)
+         +. (((1.0 +. eps)
+              +. (eps
+                  +. (((cos_error +. cos_error) +. (cos_error *. cos_error))
+                      *. (1.0 +. eps))))
+             *. eta)))">
+    <goal name="cos_and_sine_example&#39;vc.0.0.0" expl="asserted formula" proved="true">
+    <transf name="apply" proved="true" arg1="uadd_single_error_propagation" arg2="with" arg3="cos_approx a **. cos_approx a,sin_approx a **. sin_approx a">
+     <goal name="cos_and_sine_example&#39;vc.0.0.0.0" expl="apply premises" proved="true">
+     <transf name="assert" proved="true" arg1="abs
+(to_real (cos_approx a **. cos_approx a)
+ -. (cos (to_real a) *. cos (to_real a)))
+&lt;=. (((eps
+       +. (((cos_error +. cos_error) +. (cos_error *. cos_error))
+           *. (1.0 +. eps)))
+      *. abs (cos (to_real a) *. cos (to_real a)))
+     +. ((((((0.0 +. (0.0 *. cos_error)) *. abs (cos (to_real a)))
+            +. ((0.0 +. (0.0 *. cos_error)) *. abs (cos (to_real a))))
+           +. (0.0 *. 0.0))
+          *. (1.0 +. eps))
+         +. eta))">
+      <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0" expl="asserted formula" proved="true">
+      <transf name="assert" proved="true" arg1="abs
+(to_real (cos_approx a **. cos_approx a)
+ -. (cos (to_real a) *. cos (to_real a)))
+&lt;=. (((eps
+       +. (((cos_error +. cos_error) +. (cos_error *. cos_error))
+           *. (1.0 +. eps)))
+      *. (abs (cos (to_real a)) *. abs (cos (to_real a))))
+     +. ((((((0.0 +. (0.0 *. cos_error)) *. abs (cos (to_real a)))
+            +. ((0.0 +. (0.0 *. cos_error)) *. abs (cos (to_real a))))
+           +. (0.0 *. 0.0))
+          *. (1.0 +. eps))
+         +. eta))">
+       <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0" expl="asserted formula" proved="true">
+       <transf name="apply" proved="true" arg1="umul_single_error_propagation" arg2="with" arg3="cos_approx a,cos_approx a">
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0.0" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.076010" steps="130"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0.1" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.054580" steps="130"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0.2" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.047999" steps="108"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0.3" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.061030" steps="108"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0.4" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.045089" steps="98"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0.5" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.051886" steps="98"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0.6" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.048389" steps="98"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0.7" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.053792" steps="98"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0.8" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.056177" steps="98"/></proof>
+        </goal>
+       </transf>
+       </goal>
+       <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.1" expl="asserted formula" proved="true">
+       <proof prover="1"><result status="valid" time="0.076850" steps="228"/></proof>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="cos_and_sine_example&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
+      <proof prover="1"><result status="valid" time="0.056707" steps="145"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="cos_and_sine_example&#39;vc.0.0.0.1" expl="apply premises" proved="true">
+     <transf name="assert" proved="true" arg1="abs
+(to_real (sin_approx a **. sin_approx a)
+ -. (sin (to_real a) *. sin (to_real a)))
+&lt;=. (((eps
+       +. (((sin_error +. sin_error) +. (sin_error *. sin_error))
+           *. (1.0 +. eps)))
+      *. abs (sin (to_real a) *. sin (to_real a)))
+     +. ((((((0.0 +. (0.0 *. sin_error)) *. abs (sin (to_real a)))
+            +. ((0.0 +. (0.0 *. sin_error)) *. abs (sin (to_real a))))
+           +. (0.0 *. 0.0))
+          *. (1.0 +. eps))
+         +. eta))">
+      <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0" expl="asserted formula" proved="true">
+      <transf name="assert" proved="true" arg1="abs
+(to_real (sin_approx a **. sin_approx a)
+ -. (sin (to_real a) *. sin (to_real a)))
+&lt;=. (((eps
+       +. (((sin_error +. sin_error) +. (sin_error *. sin_error))
+           *. (1.0 +. eps)))
+      *. (abs (sin (to_real a)) *. abs (sin (to_real a))))
+     +. ((((((0.0 +. (0.0 *. sin_error)) *. abs (sin (to_real a)))
+            +. ((0.0 +. (0.0 *. sin_error)) *. abs (sin (to_real a))))
+           +. (0.0 *. 0.0))
+          *. (1.0 +. eps))
+         +. eta))">
+       <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0" expl="asserted formula" proved="true">
+       <transf name="apply" proved="true" arg1="umul_single_error_propagation" arg2="with" arg3="sin_approx a,sin_approx a">
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0.0" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.051027" steps="131"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0.1" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.082302" steps="131"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0.2" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.081417" steps="108"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0.3" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.063200" steps="108"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0.4" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.056869" steps="98"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0.5" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.058289" steps="98"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0.6" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.051749" steps="98"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0.7" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.052558" steps="98"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0.8" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.048699" steps="98"/></proof>
+        </goal>
+       </transf>
+       </goal>
+       <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.1" expl="asserted formula" proved="true">
+       <proof prover="1"><result status="valid" time="0.077564" steps="228"/></proof>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="cos_and_sine_example&#39;vc.0.0.0.1.1" expl="apply premises" proved="true">
+      <proof prover="1"><result status="valid" time="0.064396" steps="145"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="cos_and_sine_example&#39;vc.0.0.0.2" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.072236" steps="110"/></proof>
+     </goal>
+     <goal name="cos_and_sine_example&#39;vc.0.0.0.3" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.079694" steps="110"/></proof>
+     </goal>
+     <goal name="cos_and_sine_example&#39;vc.0.0.0.4" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.053258" steps="98"/></proof>
+     </goal>
+     <goal name="cos_and_sine_example&#39;vc.0.0.0.5" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.089997" steps="98"/></proof>
+     </goal>
+     <goal name="cos_and_sine_example&#39;vc.0.0.0.6" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.072084" steps="98"/></proof>
+     </goal>
+     <goal name="cos_and_sine_example&#39;vc.0.0.0.7" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.066735" steps="98"/></proof>
+     </goal>
+     <goal name="cos_and_sine_example&#39;vc.0.0.0.8" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.049816" steps="98"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="cos_and_sine_example&#39;vc.0.0.1" expl="asserted formula" proved="true">
+    <proof prover="1"><result status="valid" time="0.122976" steps="429"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="cos_and_sine_example&#39;vc.0.1" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.849804" steps="17980"/></proof>
    </goal>
   </transf>
   </goal>
@@ -185,41 +412,41 @@ abs (to_real result -. (t11 +. t13))
        <goal name="kinematics&#39;vc.0.0.0.0.0.0" expl="asserted formula" proved="true">
        <transf name="apply" proved="true" arg1="umul_single_error_propagation" arg2="with" arg3="zeropointfive,sin_approx theta1">
         <goal name="kinematics&#39;vc.0.0.0.0.0.0.0" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.044506" steps="109"/></proof>
+        <proof prover="1"><result status="valid" time="0.047822" steps="104"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.073383" steps="128"/></proof>
+        <proof prover="1"><result status="valid" time="0.069700" steps="125"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.0.0.0.2" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.052346" steps="107"/></proof>
+        <proof prover="1"><result status="valid" time="0.054233" steps="104"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.063278" steps="110"/></proof>
+        <proof prover="1"><result status="valid" time="0.072426" steps="107"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.0.0.0.4" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.048989" steps="103"/></proof>
+        <proof prover="1"><result status="valid" time="0.053408" steps="98"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.061158" steps="103"/></proof>
+        <proof prover="1"><result status="valid" time="0.051960" steps="98"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.068512" steps="103"/></proof>
+        <proof prover="1"><result status="valid" time="0.064101" steps="98"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.050710" steps="103"/></proof>
+        <proof prover="1"><result status="valid" time="0.051763" steps="98"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.071956" steps="102"/></proof>
+        <proof prover="1"><result status="valid" time="0.060439" steps="98"/></proof>
         </goal>
        </transf>
        </goal>
        <goal name="kinematics&#39;vc.0.0.0.0.0.1" expl="asserted formula" proved="true">
-       <proof prover="1"><result status="valid" time="0.073618" steps="191"/></proof>
+       <proof prover="1"><result status="valid" time="0.107852" steps="186"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="kinematics&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="1"><result status="valid" time="0.061696" steps="146"/></proof>
+      <proof prover="1"><result status="valid" time="0.043450" steps="144"/></proof>
       </goal>
      </transf>
      </goal>
@@ -265,7 +492,7 @@ abs (to_real result -. (t11 +. t13))
        <goal name="kinematics&#39;vc.0.0.0.1.0.0" expl="asserted formula" proved="true">
        <transf name="apply" proved="true" arg1="umul_single_error_propagation" arg2="with" arg3="twopoint5,sin_approx (theta1 ++. theta2)">
         <goal name="kinematics&#39;vc.0.0.0.1.0.0.0" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.063972" steps="109"/></proof>
+        <proof prover="1"><result status="valid" time="0.082837" steps="104"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.1.0.0.1" expl="apply premises" proved="true">
         <transf name="assert" proved="true" arg1="abs
@@ -287,98 +514,103 @@ abs (to_real result -. (t11 +. t13))
            <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.0" expl="apply premises" proved="true">
            <transf name="assert" proved="true" arg1="abs (to_real (theta1 ++. theta2) -. (to_real theta1 +. to_real theta2))
 &lt;=. (eps *. abs (to_real theta1 +. to_real theta2))">
-            <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.0.0" expl="asserted formula" proved="true">
-            <proof prover="1"><result status="valid" time="0.202159" steps="1200"/></proof>
+             <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.0.0.0" expl="asserted formula" proved="true">
+             <proof prover="1"><result status="valid" time="0.189567" steps="1687"/></proof>
+             </goal>
+             <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.0.0.1" expl="apply premises" proved="true">
+             <proof prover="1"><result status="valid" time="0.072572" steps="131"/></proof>
+             </goal>
+            </transf>
             </goal>
             <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.0.1" expl="apply premises" proved="true">
-            <proof prover="1"><result status="valid" time="0.065883" steps="135"/></proof>
+            <proof prover="1"><result status="valid" time="0.282984" steps="2779"/></proof>
+            </goal>
+            <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.0.2" expl="apply premises" proved="true">
+            <proof prover="1"><result status="valid" time="0.059660" steps="104"/></proof>
+            </goal>
+            <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.0.3" expl="apply premises" proved="true">
+            <proof prover="1"><result status="valid" time="0.067390" steps="98"/></proof>
             </goal>
            </transf>
            </goal>
-           <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.1" expl="apply premises" proved="true">
-           <proof prover="1"><result status="valid" time="0.066114" steps="129"/></proof>
-           </goal>
-           <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.2" expl="apply premises" proved="true">
-           <proof prover="1"><result status="valid" time="0.080581" steps="108"/></proof>
-           </goal>
-           <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.3" expl="apply premises" proved="true">
-           <proof prover="1"><result status="valid" time="0.047109" steps="103"/></proof>
+           <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.1" expl="asserted formula" proved="true">
+           <proof prover="1"><result status="valid" time="1.436816" steps="18186"/></proof>
            </goal>
           </transf>
           </goal>
           <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.1" expl="asserted formula" proved="true">
-          <proof prover="1"><result status="valid" time="0.091503" steps="172"/></proof>
+          <proof prover="1"><result status="valid" time="0.070170" steps="166"/></proof>
           </goal>
          </transf>
          </goal>
          <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.1" expl="apply premises" proved="true">
-         <proof prover="1"><result status="valid" time="0.080526" steps="169"/></proof>
+         <proof prover="1"><result status="valid" time="0.095478" steps="167"/></proof>
          </goal>
         </transf>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.1.0.0.2" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.052525" steps="107"/></proof>
+        <proof prover="1"><result status="valid" time="0.066555" steps="104"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.1.0.0.3" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.057478" steps="111"/></proof>
+        <proof prover="1"><result status="valid" time="0.060494" steps="107"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.1.0.0.4" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.048157" steps="103"/></proof>
+        <proof prover="1"><result status="valid" time="0.080211" steps="98"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.1.0.0.5" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.055488" steps="103"/></proof>
+        <proof prover="1"><result status="valid" time="0.046207" steps="98"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.1.0.0.6" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.039220" steps="103"/></proof>
+        <proof prover="1"><result status="valid" time="0.053745" steps="98"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.1.0.0.7" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.043457" steps="110"/></proof>
+        <proof prover="1"><result status="valid" time="0.058072" steps="106"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.1.0.0.8" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.043326" steps="102"/></proof>
+        <proof prover="1"><result status="valid" time="0.052515" steps="98"/></proof>
         </goal>
        </transf>
        </goal>
        <goal name="kinematics&#39;vc.0.0.0.1.0.1" expl="asserted formula" proved="true">
-       <proof prover="1"><result status="valid" time="0.169860" steps="342"/></proof>
+       <proof prover="1"><result status="valid" time="0.224590" steps="337"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="kinematics&#39;vc.0.0.0.1.1" expl="apply premises" proved="true">
-      <proof prover="1"><result status="valid" time="0.108030" steps="238"/></proof>
+      <proof prover="1"><result status="valid" time="0.104502" steps="233"/></proof>
       </goal>
      </transf>
      </goal>
      <goal name="kinematics&#39;vc.0.0.0.2" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.074750" steps="111"/></proof>
+     <proof prover="1"><result status="valid" time="0.053401" steps="107"/></proof>
      </goal>
      <goal name="kinematics&#39;vc.0.0.0.3" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.083805" steps="111"/></proof>
+     <proof prover="1"><result status="valid" time="0.066545" steps="108"/></proof>
      </goal>
      <goal name="kinematics&#39;vc.0.0.0.4" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.070014" steps="103"/></proof>
+     <proof prover="1"><result status="valid" time="0.048382" steps="99"/></proof>
      </goal>
      <goal name="kinematics&#39;vc.0.0.0.5" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.066067" steps="103"/></proof>
+     <proof prover="1"><result status="valid" time="0.044066" steps="99"/></proof>
      </goal>
      <goal name="kinematics&#39;vc.0.0.0.6" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.049309" steps="103"/></proof>
+     <proof prover="1"><result status="valid" time="0.044776" steps="98"/></proof>
      </goal>
      <goal name="kinematics&#39;vc.0.0.0.7" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.069309" steps="119"/></proof>
+     <proof prover="1"><result status="valid" time="0.052311" steps="114"/></proof>
      </goal>
      <goal name="kinematics&#39;vc.0.0.0.8" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.053391" steps="102"/></proof>
+     <proof prover="1"><result status="valid" time="0.043839" steps="98"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="kinematics&#39;vc.0.0.1" expl="asserted formula" proved="true">
-    <proof prover="1"><result status="valid" time="0.270766" steps="497"/></proof>
+    <proof prover="1"><result status="valid" time="0.277404" steps="492"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="kinematics&#39;vc.0.1" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.248928" steps="484"/></proof>
+   <proof prover="1"><result status="valid" time="0.339464" steps="512"/></proof>
    </goal>
   </transf>
   </goal>
@@ -541,72 +773,72 @@ abs (to_real result -. ((t24 +. t20) +. t23))
             <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
             <transf name="apply" proved="true" arg1="umul_single_error_propagation" arg2="with" arg3="nx,cos_approx theta">
              <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.0.0.0.0" expl="apply premises" proved="true">
-             <proof prover="1"><result status="valid" time="0.056158" steps="123"/></proof>
+             <proof prover="1"><result status="valid" time="0.053662" steps="118"/></proof>
              </goal>
              <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-             <proof prover="1"><result status="valid" time="0.066121" steps="151"/></proof>
+             <proof prover="1"><result status="valid" time="0.052804" steps="146"/></proof>
              </goal>
              <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
-             <proof prover="1"><result status="valid" time="0.062089" steps="126"/></proof>
+             <proof prover="1"><result status="valid" time="0.053824" steps="123"/></proof>
              </goal>
              <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-             <proof prover="1"><result status="valid" time="0.068813" steps="127"/></proof>
+             <proof prover="1"><result status="valid" time="0.055943" steps="124"/></proof>
              </goal>
              <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
-             <proof prover="1"><result status="valid" time="0.059077" steps="118"/></proof>
+             <proof prover="1"><result status="valid" time="0.044861" steps="113"/></proof>
              </goal>
              <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-             <proof prover="1"><result status="valid" time="0.071518" steps="117"/></proof>
+             <proof prover="1"><result status="valid" time="0.058195" steps="113"/></proof>
              </goal>
              <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-             <proof prover="1"><result status="valid" time="0.091005" steps="118"/></proof>
+             <proof prover="1"><result status="valid" time="0.059485" steps="113"/></proof>
              </goal>
              <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-             <proof prover="1"><result status="valid" time="0.059260" steps="118"/></proof>
+             <proof prover="1"><result status="valid" time="0.054013" steps="113"/></proof>
              </goal>
              <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-             <proof prover="1"><result status="valid" time="0.051976" steps="117"/></proof>
+             <proof prover="1"><result status="valid" time="0.045234" steps="113"/></proof>
              </goal>
             </transf>
             </goal>
             <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.0.0.1" expl="asserted formula" proved="true">
-            <proof prover="1"><result status="valid" time="0.123970" steps="498"/></proof>
+            <proof prover="1"><result status="valid" time="0.108657" steps="494"/></proof>
             </goal>
            </transf>
            </goal>
            <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-           <proof prover="1"><result status="valid" time="0.099025" steps="184"/></proof>
+           <proof prover="1"><result status="valid" time="0.059505" steps="181"/></proof>
            </goal>
           </transf>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.071961" steps="142"/></proof>
+          <proof prover="1"><result status="valid" time="0.074397" steps="139"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.089523" steps="136"/></proof>
+          <proof prover="1"><result status="valid" time="0.073930" steps="132"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.062211" steps="126"/></proof>
+          <proof prover="1"><result status="valid" time="0.056796" steps="123"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.048357" steps="118"/></proof>
+          <proof prover="1"><result status="valid" time="0.065219" steps="113"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.056124" steps="117"/></proof>
+          <proof prover="1"><result status="valid" time="0.061311" steps="113"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.060122" steps="118"/></proof>
+          <proof prover="1"><result status="valid" time="0.056546" steps="113"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.065385" steps="118"/></proof>
+          <proof prover="1"><result status="valid" time="0.052163" steps="113"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.063626" steps="117"/></proof>
+          <proof prover="1"><result status="valid" time="0.055885" steps="113"/></proof>
           </goal>
          </transf>
          </goal>
          <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.1" expl="asserted formula" proved="true">
-         <proof prover="1"><result status="valid" time="0.253808" steps="644"/></proof>
+         <proof prover="1"><result status="valid" time="0.240247" steps="688"/></proof>
          </goal>
         </transf>
         </goal>
@@ -638,69 +870,69 @@ abs (to_real result -. ((t24 +. t20) +. t23))
          <goal name="raytracer&#39;vc.0.0.0.0.0.1.0.0" expl="asserted formula" proved="true">
          <transf name="apply" proved="true" arg1="umul_single_error_propagation" arg2="with" arg3="ny,sin_approx theta">
           <goal name="raytracer&#39;vc.0.0.0.0.0.1.0.0.0" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.081342" steps="123"/></proof>
+          <proof prover="1"><result status="valid" time="0.085213" steps="118"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.1.0.0.1" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.073915" steps="142"/></proof>
+          <proof prover="1"><result status="valid" time="0.081534" steps="139"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.1.0.0.2" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.065446" steps="126"/></proof>
+          <proof prover="1"><result status="valid" time="0.069205" steps="123"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.1.0.0.3" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.085866" steps="126"/></proof>
+          <proof prover="1"><result status="valid" time="0.084265" steps="123"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.1.0.0.4" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.084271" steps="118"/></proof>
+          <proof prover="1"><result status="valid" time="0.075358" steps="113"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.1.0.0.5" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.081071" steps="117"/></proof>
+          <proof prover="1"><result status="valid" time="0.077498" steps="113"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.1.0.0.6" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.052843" steps="118"/></proof>
+          <proof prover="1"><result status="valid" time="0.059021" steps="113"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.1.0.0.7" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.064350" steps="118"/></proof>
+          <proof prover="1"><result status="valid" time="0.067831" steps="113"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.1.0.0.8" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.080755" steps="117"/></proof>
+          <proof prover="1"><result status="valid" time="0.062380" steps="113"/></proof>
           </goal>
          </transf>
          </goal>
          <goal name="raytracer&#39;vc.0.0.0.0.0.1.0.1" expl="asserted formula" proved="true">
-         <proof prover="1"><result status="valid" time="0.129111" steps="462"/></proof>
+         <proof prover="1"><result status="valid" time="0.112702" steps="459"/></proof>
          </goal>
         </transf>
         </goal>
         <goal name="raytracer&#39;vc.0.0.0.0.0.1.1" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.064937" steps="184"/></proof>
+        <proof prover="1"><result status="valid" time="0.079588" steps="181"/></proof>
         </goal>
        </transf>
        </goal>
        <goal name="raytracer&#39;vc.0.0.0.0.0.2" expl="apply premises" proved="true">
-       <proof prover="1"><result status="valid" time="0.055124" steps="135"/></proof>
+       <proof prover="1"><result status="valid" time="0.064487" steps="133"/></proof>
        </goal>
        <goal name="raytracer&#39;vc.0.0.0.0.0.3" expl="apply premises" proved="true">
-       <proof prover="1"><result status="valid" time="0.085059" steps="136"/></proof>
+       <proof prover="1"><result status="valid" time="0.099894" steps="132"/></proof>
        </goal>
        <goal name="raytracer&#39;vc.0.0.0.0.0.4" expl="apply premises" proved="true">
-       <proof prover="1"><result status="valid" time="0.052698" steps="119"/></proof>
+       <proof prover="1"><result status="valid" time="0.061403" steps="113"/></proof>
        </goal>
        <goal name="raytracer&#39;vc.0.0.0.0.0.5" expl="apply premises" proved="true">
-       <proof prover="1"><result status="valid" time="0.080447" steps="118"/></proof>
+       <proof prover="1"><result status="valid" time="0.073042" steps="113"/></proof>
        </goal>
        <goal name="raytracer&#39;vc.0.0.0.0.0.6" expl="apply premises" proved="true">
-       <proof prover="1"><result status="valid" time="0.062676" steps="130"/></proof>
+       <proof prover="1"><result status="valid" time="0.053439" steps="126"/></proof>
        </goal>
        <goal name="raytracer&#39;vc.0.0.0.0.0.7" expl="apply premises" proved="true">
-       <proof prover="1"><result status="valid" time="0.047963" steps="118"/></proof>
+       <proof prover="1"><result status="valid" time="0.057157" steps="113"/></proof>
        </goal>
        <goal name="raytracer&#39;vc.0.0.0.0.0.8" expl="apply premises" proved="true">
-       <proof prover="1"><result status="valid" time="0.053742" steps="117"/></proof>
+       <proof prover="1"><result status="valid" time="0.051961" steps="113"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="raytracer&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="1"><result status="valid" time="0.531553" steps="650"/></proof>
+      <proof prover="1"><result status="valid" time="0.484138" steps="646"/></proof>
       </goal>
      </transf>
      </goal>
@@ -759,110 +991,110 @@ abs (to_real result -. ((t24 +. t20) +. t23))
           <goal name="raytracer&#39;vc.0.0.0.1.0.0.0.0.0" expl="asserted formula" proved="true">
           <transf name="apply" proved="true" arg1="umul_single_error_propagation" arg2="with" arg3="nz,cos_approx theta">
            <goal name="raytracer&#39;vc.0.0.0.1.0.0.0.0.0.0" expl="apply premises" proved="true">
-           <proof prover="1"><result status="valid" time="0.056367" steps="123"/></proof>
+           <proof prover="1"><result status="valid" time="0.051715" steps="118"/></proof>
            </goal>
            <goal name="raytracer&#39;vc.0.0.0.1.0.0.0.0.0.1" expl="apply premises" proved="true">
-           <proof prover="1"><result status="valid" time="0.062844" steps="151"/></proof>
+           <proof prover="1"><result status="valid" time="0.064410" steps="146"/></proof>
            </goal>
            <goal name="raytracer&#39;vc.0.0.0.1.0.0.0.0.0.2" expl="apply premises" proved="true">
-           <proof prover="1"><result status="valid" time="0.054862" steps="126"/></proof>
+           <proof prover="1"><result status="valid" time="0.085554" steps="123"/></proof>
            </goal>
            <goal name="raytracer&#39;vc.0.0.0.1.0.0.0.0.0.3" expl="apply premises" proved="true">
-           <proof prover="1"><result status="valid" time="0.084870" steps="127"/></proof>
+           <proof prover="1"><result status="valid" time="0.064064" steps="124"/></proof>
            </goal>
            <goal name="raytracer&#39;vc.0.0.0.1.0.0.0.0.0.4" expl="apply premises" proved="true">
-           <proof prover="1"><result status="valid" time="0.081406" steps="118"/></proof>
+           <proof prover="1"><result status="valid" time="0.060086" steps="113"/></proof>
            </goal>
            <goal name="raytracer&#39;vc.0.0.0.1.0.0.0.0.0.5" expl="apply premises" proved="true">
-           <proof prover="1"><result status="valid" time="0.063215" steps="117"/></proof>
+           <proof prover="1"><result status="valid" time="0.056225" steps="113"/></proof>
            </goal>
            <goal name="raytracer&#39;vc.0.0.0.1.0.0.0.0.0.6" expl="apply premises" proved="true">
-           <proof prover="1"><result status="valid" time="0.056131" steps="118"/></proof>
+           <proof prover="1"><result status="valid" time="0.074713" steps="113"/></proof>
            </goal>
            <goal name="raytracer&#39;vc.0.0.0.1.0.0.0.0.0.7" expl="apply premises" proved="true">
-           <proof prover="1"><result status="valid" time="0.085786" steps="118"/></proof>
+           <proof prover="1"><result status="valid" time="0.063419" steps="113"/></proof>
            </goal>
            <goal name="raytracer&#39;vc.0.0.0.1.0.0.0.0.0.8" expl="apply premises" proved="true">
-           <proof prover="1"><result status="valid" time="0.074234" steps="117"/></proof>
+           <proof prover="1"><result status="valid" time="0.072038" steps="113"/></proof>
            </goal>
           </transf>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.1.0.0.0.0.1" expl="asserted formula" proved="true">
-          <proof prover="1"><result status="valid" time="0.165102" steps="498"/></proof>
+          <proof prover="1"><result status="valid" time="0.121860" steps="494"/></proof>
           </goal>
          </transf>
          </goal>
          <goal name="raytracer&#39;vc.0.0.0.1.0.0.0.1" expl="apply premises" proved="true">
-         <proof prover="1"><result status="valid" time="0.091983" steps="184"/></proof>
+         <proof prover="1"><result status="valid" time="0.090270" steps="181"/></proof>
          </goal>
         </transf>
         </goal>
         <goal name="raytracer&#39;vc.0.0.0.1.0.0.1" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.061144" steps="142"/></proof>
+        <proof prover="1"><result status="valid" time="0.072151" steps="139"/></proof>
         </goal>
         <goal name="raytracer&#39;vc.0.0.0.1.0.0.2" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.079889" steps="136"/></proof>
+        <proof prover="1"><result status="valid" time="0.045438" steps="132"/></proof>
         </goal>
         <goal name="raytracer&#39;vc.0.0.0.1.0.0.3" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.069055" steps="126"/></proof>
+        <proof prover="1"><result status="valid" time="0.075955" steps="123"/></proof>
         </goal>
         <goal name="raytracer&#39;vc.0.0.0.1.0.0.4" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.071188" steps="118"/></proof>
+        <proof prover="1"><result status="valid" time="0.069077" steps="113"/></proof>
         </goal>
         <goal name="raytracer&#39;vc.0.0.0.1.0.0.5" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.083587" steps="117"/></proof>
+        <proof prover="1"><result status="valid" time="0.073201" steps="113"/></proof>
         </goal>
         <goal name="raytracer&#39;vc.0.0.0.1.0.0.6" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.061165" steps="118"/></proof>
+        <proof prover="1"><result status="valid" time="0.051753" steps="113"/></proof>
         </goal>
         <goal name="raytracer&#39;vc.0.0.0.1.0.0.7" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.082203" steps="118"/></proof>
+        <proof prover="1"><result status="valid" time="0.055206" steps="113"/></proof>
         </goal>
         <goal name="raytracer&#39;vc.0.0.0.1.0.0.8" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.055879" steps="117"/></proof>
+        <proof prover="1"><result status="valid" time="0.044215" steps="113"/></proof>
         </goal>
        </transf>
        </goal>
        <goal name="raytracer&#39;vc.0.0.0.1.0.1" expl="asserted formula" proved="true">
-       <proof prover="1"><result status="valid" time="0.387182" steps="696"/></proof>
+       <proof prover="1"><result status="valid" time="0.306863" steps="692"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="raytracer&#39;vc.0.0.0.1.1" expl="apply premises" proved="true">
-      <proof prover="1"><result status="valid" time="0.220102" steps="307"/></proof>
+      <proof prover="1"><result status="valid" time="0.172300" steps="303"/></proof>
       </goal>
      </transf>
      </goal>
      <goal name="raytracer&#39;vc.0.0.0.2" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.076875" steps="201"/></proof>
+     <proof prover="1"><result status="valid" time="0.061143" steps="197"/></proof>
      </goal>
      <goal name="raytracer&#39;vc.0.0.0.3" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.058339" steps="135"/></proof>
+     <proof prover="1"><result status="valid" time="0.091462" steps="133"/></proof>
      </goal>
      <goal name="raytracer&#39;vc.0.0.0.4" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.066391" steps="120"/></proof>
+     <proof prover="1"><result status="valid" time="0.069153" steps="116"/></proof>
      </goal>
      <goal name="raytracer&#39;vc.0.0.0.5" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.066055" steps="120"/></proof>
+     <proof prover="1"><result status="valid" time="0.059350" steps="116"/></proof>
      </goal>
      <goal name="raytracer&#39;vc.0.0.0.6" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.102943" steps="140"/></proof>
+     <proof prover="1"><result status="valid" time="0.107839" steps="136"/></proof>
      </goal>
      <goal name="raytracer&#39;vc.0.0.0.7" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.063648" steps="130"/></proof>
+     <proof prover="1"><result status="valid" time="0.079028" steps="126"/></proof>
      </goal>
      <goal name="raytracer&#39;vc.0.0.0.8" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.061472" steps="117"/></proof>
+     <proof prover="1"><result status="valid" time="0.049068" steps="113"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="raytracer&#39;vc.0.0.1" expl="asserted formula" proved="true">
-    <proof prover="0"><result status="valid" time="0.119277" steps="13719"/></proof>
+    <proof prover="0"><result status="valid" time="0.098213" steps="13756"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="raytracer&#39;vc.0.1" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.122143" steps="13723"/></proof>
+   <proof prover="0"><result status="valid" time="0.116338" steps="13760"/></proof>
    </goal>
   </transf>
   </goal>
@@ -986,6 +1218,222 @@ abs (to_real result -. t1)
   </goal>
  </transf>
  </goal>
+ <goal name="cos_square_plus_sine_square" proved="true">
+ <proof prover="1"><result status="valid" time="1.536715" steps="21770"/></proof>
+ </goal>
+ <goal name="cos_and_sine_example&#39;vc" expl="VC for cos_and_sine_example" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="cos_and_sine_example&#39;vc.0" expl="postcondition" proved="true">
+  <transf name="assert" proved="true" arg1="let t1 = to_real a in
+let t2 = sin t1 in
+let t3 = cos t1 in
+let t4 = 1.0 +. eps in
+let t5 = t2 *. t2 in
+let t6 = t3 *. t3 in
+let t7 =
+  eps +. (((cos_error +. cos_error) +. (cos_error *. cos_error)) *. t4)
+in
+let t8 =
+  eps +. (((sin_error +. sin_error) +. (sin_error *. sin_error)) *. t4)
+in
+abs (to_real result -. (t6 +. t5))
+&lt;=. ((((t7 +. t8) +. eps) *. (abs t6 +. abs t5))
+     +. (((t4 +. t8) *. eta) +. ((t4 +. t7) *. eta)))">
+   <goal name="cos_and_sine_example&#39;vc.0.0" expl="asserted formula" proved="true">
+   <transf name="assert" proved="true" arg1="abs
+(to_real result
+ -. ((cos (to_real a) *. cos (to_real a))
+     +. (sin (to_real a) *. sin (to_real a))))
+&lt;=. (((((eps
+         +. (((cos_error +. cos_error) +. (cos_error *. cos_error))
+             *. (1.0 +. eps)))
+        +. (eps
+            +. (((sin_error +. sin_error) +. (sin_error *. sin_error))
+                *. (1.0 +. eps))))
+       +. eps)
+      *. (abs (cos (to_real a) *. cos (to_real a))
+          +. abs (sin (to_real a) *. sin (to_real a))))
+     +. ((((1.0 +. eps)
+           +. (eps
+               +. (((sin_error +. sin_error) +. (sin_error *. sin_error))
+                   *. (1.0 +. eps))))
+          *. eta)
+         +. (((1.0 +. eps)
+              +. (eps
+                  +. (((cos_error +. cos_error) +. (cos_error *. cos_error))
+                      *. (1.0 +. eps))))
+             *. eta)))">
+    <goal name="cos_and_sine_example&#39;vc.0.0.0" expl="asserted formula" proved="true">
+    <transf name="apply" proved="true" arg1="uadd_double_error_propagation" arg2="with" arg3="cos_approx a **. cos_approx a,sin_approx a **. sin_approx a">
+     <goal name="cos_and_sine_example&#39;vc.0.0.0.0" expl="apply premises" proved="true">
+     <transf name="assert" proved="true" arg1="abs
+(to_real (cos_approx a **. cos_approx a)
+ -. (cos (to_real a) *. cos (to_real a)))
+&lt;=. (((eps
+       +. (((cos_error +. cos_error) +. (cos_error *. cos_error))
+           *. (1.0 +. eps)))
+      *. abs (cos (to_real a) *. cos (to_real a)))
+     +. ((((((0.0 +. (0.0 *. cos_error)) *. abs (cos (to_real a)))
+            +. ((0.0 +. (0.0 *. cos_error)) *. abs (cos (to_real a))))
+           +. (0.0 *. 0.0))
+          *. (1.0 +. eps))
+         +. eta))">
+      <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0" expl="asserted formula" proved="true">
+      <transf name="assert" proved="true" arg1="abs
+(to_real (cos_approx a **. cos_approx a)
+ -. (cos (to_real a) *. cos (to_real a)))
+&lt;=. (((eps
+       +. (((cos_error +. cos_error) +. (cos_error *. cos_error))
+           *. (1.0 +. eps)))
+      *. (abs (cos (to_real a)) *. abs (cos (to_real a))))
+     +. ((((((0.0 +. (0.0 *. cos_error)) *. abs (cos (to_real a)))
+            +. ((0.0 +. (0.0 *. cos_error)) *. abs (cos (to_real a))))
+           +. (0.0 *. 0.0))
+          *. (1.0 +. eps))
+         +. eta))">
+       <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0" expl="asserted formula" proved="true">
+       <transf name="apply" proved="true" arg1="umul_double_error_propagation" arg2="with" arg3="cos_approx a,cos_approx a">
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0.0" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.055241" steps="133"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0.1" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.056423" steps="133"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0.2" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.040037" steps="109"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0.3" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.077656" steps="109"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0.4" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.044370" steps="100"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0.5" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.044086" steps="100"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0.6" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.048898" steps="100"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0.7" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.055771" steps="100"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.0.8" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.059556" steps="100"/></proof>
+        </goal>
+       </transf>
+       </goal>
+       <goal name="cos_and_sine_example&#39;vc.0.0.0.0.0.1" expl="asserted formula" proved="true">
+       <proof prover="1"><result status="valid" time="0.075609" steps="229"/></proof>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="cos_and_sine_example&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
+      <proof prover="1"><result status="valid" time="0.087697" steps="147"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="cos_and_sine_example&#39;vc.0.0.0.1" expl="apply premises" proved="true">
+     <transf name="assert" proved="true" arg1="abs
+(to_real (sin_approx a **. sin_approx a)
+ -. (sin (to_real a) *. sin (to_real a)))
+&lt;=. (((eps
+       +. (((sin_error +. sin_error) +. (sin_error *. sin_error))
+           *. (1.0 +. eps)))
+      *. abs (sin (to_real a) *. sin (to_real a)))
+     +. ((((((0.0 +. (0.0 *. sin_error)) *. abs (sin (to_real a)))
+            +. ((0.0 +. (0.0 *. sin_error)) *. abs (sin (to_real a))))
+           +. (0.0 *. 0.0))
+          *. (1.0 +. eps))
+         +. eta))">
+      <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0" expl="asserted formula" proved="true">
+      <transf name="assert" proved="true" arg1="abs
+(to_real (sin_approx a **. sin_approx a)
+ -. (sin (to_real a) *. sin (to_real a)))
+&lt;=. (((eps
+       +. (((sin_error +. sin_error) +. (sin_error *. sin_error))
+           *. (1.0 +. eps)))
+      *. (abs (sin (to_real a)) *. abs (sin (to_real a))))
+     +. ((((((0.0 +. (0.0 *. sin_error)) *. abs (sin (to_real a)))
+            +. ((0.0 +. (0.0 *. sin_error)) *. abs (sin (to_real a))))
+           +. (0.0 *. 0.0))
+          *. (1.0 +. eps))
+         +. eta))">
+       <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0" expl="asserted formula" proved="true">
+       <transf name="apply" proved="true" arg1="umul_double_error_propagation" arg2="with" arg3="sin_approx a,sin_approx a">
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0.0" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.086117" steps="131"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0.1" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.051740" steps="131"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0.2" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.072143" steps="109"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0.3" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.074774" steps="109"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0.4" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.059996" steps="100"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0.5" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.053496" steps="100"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0.6" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.074616" steps="100"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0.7" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.052761" steps="100"/></proof>
+        </goal>
+        <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.0.8" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.050767" steps="100"/></proof>
+        </goal>
+       </transf>
+       </goal>
+       <goal name="cos_and_sine_example&#39;vc.0.0.0.1.0.1" expl="asserted formula" proved="true">
+       <proof prover="1"><result status="valid" time="0.077806" steps="229"/></proof>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="cos_and_sine_example&#39;vc.0.0.0.1.1" expl="apply premises" proved="true">
+      <proof prover="1"><result status="valid" time="0.076919" steps="147"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="cos_and_sine_example&#39;vc.0.0.0.2" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.059833" steps="111"/></proof>
+     </goal>
+     <goal name="cos_and_sine_example&#39;vc.0.0.0.3" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.061459" steps="111"/></proof>
+     </goal>
+     <goal name="cos_and_sine_example&#39;vc.0.0.0.4" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.065745" steps="101"/></proof>
+     </goal>
+     <goal name="cos_and_sine_example&#39;vc.0.0.0.5" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.052364" steps="101"/></proof>
+     </goal>
+     <goal name="cos_and_sine_example&#39;vc.0.0.0.6" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.055285" steps="100"/></proof>
+     </goal>
+     <goal name="cos_and_sine_example&#39;vc.0.0.0.7" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.050371" steps="100"/></proof>
+     </goal>
+     <goal name="cos_and_sine_example&#39;vc.0.0.0.8" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.060163" steps="100"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="cos_and_sine_example&#39;vc.0.0.1" expl="asserted formula" proved="true">
+    <proof prover="1"><result status="valid" time="0.147670" steps="431"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="cos_and_sine_example&#39;vc.0.1" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="1.058506" steps="18721"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
  <goal name="kinematics&#39;vc" expl="VC for kinematics" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="kinematics&#39;vc.0" expl="postcondition" proved="true">
@@ -1060,7 +1508,7 @@ abs (to_real result -. (t11 +. t13))
         <proof prover="1"><result status="valid" time="0.059781" steps="110"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.0.0.0.4" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.044366" steps="103"/></proof>
+        <proof prover="1"><result status="valid" time="0.048548" steps="103"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.0.0.0.5" expl="apply premises" proved="true">
         <proof prover="1"><result status="valid" time="0.072638" steps="102"/></proof>
@@ -1069,7 +1517,7 @@ abs (to_real result -. (t11 +. t13))
         <proof prover="1"><result status="valid" time="0.070330" steps="103"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.059850" steps="103"/></proof>
+        <proof prover="1"><result status="valid" time="0.039595" steps="103"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.0.0.0.8" expl="apply premises" proved="true">
         <proof prover="1"><result status="valid" time="0.055982" steps="103"/></proof>
@@ -1150,22 +1598,27 @@ abs (to_real result -. (t11 +. t13))
            <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.0" expl="apply premises" proved="true">
            <transf name="assert" proved="true" arg1="abs (to_real (theta1 ++. theta2) -. (to_real theta1 +. to_real theta2))
 &lt;=. (eps *. abs (to_real theta1 +. to_real theta2))">
-            <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.0.0" expl="asserted formula" proved="true">
-            <proof prover="1"><result status="valid" time="0.219165" steps="1200"/></proof>
+             <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.0.0.0" expl="asserted formula" proved="true">
+             <proof prover="1"><result status="valid" time="0.388586" steps="1729"/></proof>
+             </goal>
+             <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.0.0.1" expl="apply premises" proved="true">
+             <proof prover="1"><result status="valid" time="0.064310" steps="135"/></proof>
+             </goal>
+            </transf>
             </goal>
             <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.0.1" expl="apply premises" proved="true">
-            <proof prover="1"><result status="valid" time="0.046238" steps="135"/></proof>
+            <proof prover="1"><result status="valid" time="0.392270" steps="2805"/></proof>
+            </goal>
+            <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.0.2" expl="apply premises" proved="true">
+            <proof prover="1"><result status="valid" time="0.058896" steps="108"/></proof>
+            </goal>
+            <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.0.3" expl="apply premises" proved="true">
+            <proof prover="1"><result status="valid" time="0.070120" steps="102"/></proof>
             </goal>
            </transf>
            </goal>
-           <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.1" expl="apply premises" proved="true">
-           <proof prover="1"><result status="valid" time="0.081498" steps="129"/></proof>
-           </goal>
-           <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.2" expl="apply premises" proved="true">
-           <proof prover="1"><result status="valid" time="0.049591" steps="108"/></proof>
-           </goal>
-           <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.3" expl="apply premises" proved="true">
-           <proof prover="1"><result status="valid" time="0.048749" steps="102"/></proof>
+           <goal name="kinematics&#39;vc.0.0.0.1.0.0.1.0.0.1" expl="asserted formula" proved="true">
+           <proof prover="1"><result status="valid" time="1.408643" steps="18312"/></proof>
            </goal>
           </transf>
           </goal>
@@ -1186,13 +1639,13 @@ abs (to_real result -. (t11 +. t13))
         <proof prover="1"><result status="valid" time="0.056296" steps="111"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.1.0.0.4" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.072742" steps="103"/></proof>
+        <proof prover="1"><result status="valid" time="0.058377" steps="103"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.1.0.0.5" expl="apply premises" proved="true">
         <proof prover="1"><result status="valid" time="0.063625" steps="102"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.1.0.0.6" expl="apply premises" proved="true">
-        <proof prover="1"><result status="valid" time="0.044076" steps="103"/></proof>
+        <proof prover="1"><result status="valid" time="0.072818" steps="103"/></proof>
         </goal>
         <goal name="kinematics&#39;vc.0.0.0.1.0.0.7" expl="apply premises" proved="true">
         <proof prover="1"><result status="valid" time="0.052382" steps="110"/></proof>
@@ -1203,7 +1656,7 @@ abs (to_real result -. (t11 +. t13))
        </transf>
        </goal>
        <goal name="kinematics&#39;vc.0.0.0.1.0.1" expl="asserted formula" proved="true">
-       <proof prover="1"><result status="valid" time="0.151474" steps="342"/></proof>
+       <proof prover="1"><result status="valid" time="0.244804" steps="336"/></proof>
        </goal>
       </transf>
       </goal>
@@ -1219,10 +1672,10 @@ abs (to_real result -. (t11 +. t13))
      <proof prover="1"><result status="valid" time="0.072595" steps="111"/></proof>
      </goal>
      <goal name="kinematics&#39;vc.0.0.0.4" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.083292" steps="103"/></proof>
+     <proof prover="1"><result status="valid" time="0.052306" steps="103"/></proof>
      </goal>
      <goal name="kinematics&#39;vc.0.0.0.5" expl="apply premises" proved="true">
-     <proof prover="1"><result status="valid" time="0.050955" steps="103"/></proof>
+     <proof prover="1"><result status="valid" time="0.043944" steps="103"/></proof>
      </goal>
      <goal name="kinematics&#39;vc.0.0.0.6" expl="apply premises" proved="true">
      <proof prover="1"><result status="valid" time="0.052357" steps="103"/></proof>
@@ -1236,12 +1689,12 @@ abs (to_real result -. (t11 +. t13))
     </transf>
     </goal>
     <goal name="kinematics&#39;vc.0.0.1" expl="asserted formula" proved="true">
-    <proof prover="1"><result status="valid" time="0.263032" steps="491"/></proof>
+    <proof prover="1"><result status="valid" time="0.274921" steps="499"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="kinematics&#39;vc.0.1" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.265833" steps="532"/></proof>
+   <proof prover="1"><result status="valid" time="0.255204" steps="529"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1416,7 +1869,7 @@ abs (to_real result -. ((t24 +. t20) +. t23))
              <proof prover="1"><result status="valid" time="0.059780" steps="127"/></proof>
              </goal>
              <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
-             <proof prover="1"><result status="valid" time="0.049215" steps="118"/></proof>
+             <proof prover="1"><result status="valid" time="0.057201" steps="118"/></proof>
              </goal>
              <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
              <proof prover="1"><result status="valid" time="0.057879" steps="117"/></proof>
@@ -1425,7 +1878,7 @@ abs (to_real result -. ((t24 +. t20) +. t23))
              <proof prover="1"><result status="valid" time="0.058306" steps="118"/></proof>
              </goal>
              <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-             <proof prover="1"><result status="valid" time="0.082701" steps="118"/></proof>
+             <proof prover="1"><result status="valid" time="0.047474" steps="118"/></proof>
              </goal>
              <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
              <proof prover="1"><result status="valid" time="0.074469" steps="117"/></proof>
@@ -1433,7 +1886,7 @@ abs (to_real result -. ((t24 +. t20) +. t23))
             </transf>
             </goal>
             <goal name="raytracer&#39;vc.0.0.0.0.0.0.0.0.0.0.1" expl="asserted formula" proved="true">
-            <proof prover="1"><result status="valid" time="0.107638" steps="498"/></proof>
+            <proof prover="1"><result status="valid" time="0.098645" steps="520"/></proof>
             </goal>
            </transf>
            </goal>
@@ -1513,7 +1966,7 @@ abs (to_real result -. ((t24 +. t20) +. t23))
           <proof prover="1"><result status="valid" time="0.065506" steps="126"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.1.0.0.4" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.051866" steps="118"/></proof>
+          <proof prover="1"><result status="valid" time="0.054581" steps="118"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.1.0.0.5" expl="apply premises" proved="true">
           <proof prover="1"><result status="valid" time="0.068351" steps="117"/></proof>
@@ -1522,7 +1975,7 @@ abs (to_real result -. ((t24 +. t20) +. t23))
           <proof prover="1"><result status="valid" time="0.068312" steps="118"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.1.0.0.7" expl="apply premises" proved="true">
-          <proof prover="1"><result status="valid" time="0.061977" steps="118"/></proof>
+          <proof prover="1"><result status="valid" time="0.075085" steps="118"/></proof>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.0.0.1.0.0.8" expl="apply premises" proved="true">
           <proof prover="1"><result status="valid" time="0.076757" steps="117"/></proof>
@@ -1530,7 +1983,7 @@ abs (to_real result -. ((t24 +. t20) +. t23))
          </transf>
          </goal>
          <goal name="raytracer&#39;vc.0.0.0.0.0.1.0.1" expl="asserted formula" proved="true">
-         <proof prover="1"><result status="valid" time="0.124816" steps="462"/></proof>
+         <proof prover="1"><result status="valid" time="0.113242" steps="462"/></proof>
          </goal>
         </transf>
         </goal>
@@ -1634,7 +2087,7 @@ abs (to_real result -. ((t24 +. t20) +. t23))
            <proof prover="1"><result status="valid" time="0.060682" steps="127"/></proof>
            </goal>
            <goal name="raytracer&#39;vc.0.0.0.1.0.0.0.0.0.4" expl="apply premises" proved="true">
-           <proof prover="1"><result status="valid" time="0.087449" steps="118"/></proof>
+           <proof prover="1"><result status="valid" time="0.056101" steps="118"/></proof>
            </goal>
            <goal name="raytracer&#39;vc.0.0.0.1.0.0.0.0.0.5" expl="apply premises" proved="true">
            <proof prover="1"><result status="valid" time="0.087840" steps="117"/></proof>
@@ -1643,7 +2096,7 @@ abs (to_real result -. ((t24 +. t20) +. t23))
            <proof prover="1"><result status="valid" time="0.057819" steps="118"/></proof>
            </goal>
            <goal name="raytracer&#39;vc.0.0.0.1.0.0.0.0.0.7" expl="apply premises" proved="true">
-           <proof prover="1"><result status="valid" time="0.075935" steps="118"/></proof>
+           <proof prover="1"><result status="valid" time="0.072437" steps="118"/></proof>
            </goal>
            <goal name="raytracer&#39;vc.0.0.0.1.0.0.0.0.0.8" expl="apply premises" proved="true">
            <proof prover="1"><result status="valid" time="0.048351" steps="117"/></proof>
@@ -1651,7 +2104,7 @@ abs (to_real result -. ((t24 +. t20) +. t23))
           </transf>
           </goal>
           <goal name="raytracer&#39;vc.0.0.0.1.0.0.0.0.1" expl="asserted formula" proved="true">
-          <proof prover="1"><result status="valid" time="0.115209" steps="498"/></proof>
+          <proof prover="1"><result status="valid" time="0.113336" steps="520"/></proof>
           </goal>
          </transf>
          </goal>
@@ -1687,7 +2140,7 @@ abs (to_real result -. ((t24 +. t20) +. t23))
        </transf>
        </goal>
        <goal name="raytracer&#39;vc.0.0.0.1.0.1" expl="asserted formula" proved="true">
-       <proof prover="1"><result status="valid" time="0.347720" steps="696"/></proof>
+       <proof prover="1"><result status="valid" time="0.336754" steps="708"/></proof>
        </goal>
       </transf>
       </goal>
@@ -1720,12 +2173,12 @@ abs (to_real result -. ((t24 +. t20) +. t23))
     </transf>
     </goal>
     <goal name="raytracer&#39;vc.0.0.1" expl="asserted formula" proved="true">
-    <proof prover="0"><result status="valid" time="0.232064" steps="13719"/></proof>
+    <proof prover="0"><result status="valid" time="0.274964" steps="13796"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="raytracer&#39;vc.0.1" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.297291" steps="13723"/></proof>
+   <proof prover="0"><result status="valid" time="0.377288" steps="13800"/></proof>
    </goal>
   </transf>
   </goal>
