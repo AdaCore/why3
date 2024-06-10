@@ -232,8 +232,8 @@ abs (to_real result -. t)
  <goal name="compat_order_mult2" proved="true">
  <proof prover="6"><result status="valid" time="1.765993" steps="13384"/></proof>
  </goal>
- <goal name="g&#39;vc" expl="VC for g">
- <transf name="split_vc" >
+ <goal name="g&#39;vc" expl="VC for g" proved="true">
+ <transf name="split_vc" proved="true" >
   <goal name="g&#39;vc.0" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.055604" steps="121"/></proof>
   </goal>
@@ -384,38 +384,44 @@ abs (to_real r -. (-. (t3 *. t3)))
   <goal name="g&#39;vc.7" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.408487" steps="36213"/></proof>
   </goal>
-  <goal name="g&#39;vc.8" expl="postcondition">
-  <transf name="assert" arg1="let t1 = exp ((-. (tt *. tt)) /. 2.0) in
+  <goal name="g&#39;vc.8" expl="postcondition" proved="true">
+  <transf name="assert" proved="true" arg1="let t1 = exp ((-. (tt *. tt)) /. 2.0) in
 abs (to_real result -. t1)
 &lt;=. (t1
      *. (exp_error
          +. ((exp (((a_eps *. t&#39;) *. t&#39;) +. (1.5 *. eta)) -. 1.0)
              *. (1.0 +. exp_error))))">
-   <goal name="g&#39;vc.8.0" expl="asserted formula">
-   <transf name="assert" arg1="abs (to_real result -. exp ((-. (tt *. tt)) /. 2.0))
+   <goal name="g&#39;vc.8.0" expl="asserted formula" proved="true">
+   <transf name="assert" proved="true" arg1="abs (to_real result -. exp ((-. (tt *. tt)) /. 2.0))
 &lt;=. (exp ((-. (tt *. tt)) /. 2.0)
      *. (exp_error
          +. ((exp (((a_eps *. t&#39;) *. t&#39;) +. (1.5 *. eta)) -. 1.0)
              *. (1.0 +. exp_error))))">
-    <goal name="g&#39;vc.8.0.0" expl="asserted formula">
-    <transf name="assert" arg1="abs (to_real result -. exp ((-. (tt *. tt)) /. 2.0))
+    <goal name="g&#39;vc.8.0.0" expl="asserted formula" proved="true">
+    <transf name="assert" proved="true" arg1="abs (to_real result -. exp ((-. (tt *. tt)) /. 2.0))
 &lt;=. (((exp_error
        +. ((exp ((0.0 *. 0.0) +. (((a_eps *. t&#39;) *. t&#39;) +. (1.5 *. eta)))
             -. 1.0)
            *. (1.0 +. exp_error)))
       *. exp ((-. (tt *. tt)) /. 2.0))
      +. 0.0)">
-     <goal name="g&#39;vc.8.0.0.0" expl="asserted formula">
-     <transf name="apply" arg1="exp_single_error_propagation" arg2="with" arg3="r&#39;">
+     <goal name="g&#39;vc.8.0.0.0" expl="asserted formula" proved="true">
+     <transf name="apply" proved="true" arg1="exp_single_error_propagation" arg2="with" arg3="r&#39;">
       <goal name="g&#39;vc.8.0.0.0.0" expl="apply premises" proved="true">
       <proof prover="6"><result status="valid" time="0.080979" steps="153"/></proof>
       </goal>
       <goal name="g&#39;vc.8.0.0.0.1" expl="apply premises" proved="true">
       <proof prover="6"><result status="valid" time="0.102985" steps="142"/></proof>
       </goal>
-      <goal name="g&#39;vc.8.0.0.0.2" expl="apply premises">
-      <proof prover="3" memlimit="2000"><result status="timeout" time="5.000000" steps="42872"/></proof>
-      <proof prover="6"><result status="timeout" time="5.000000" steps="43148"/></proof>
+      <goal name="g&#39;vc.8.0.0.0.2" expl="apply premises" proved="true">
+      <transf name="assert" proved="true" arg1="(forall x. x *. x &gt;=. 0.)">
+       <goal name="g&#39;vc.8.0.0.0.2.0" expl="asserted formula" proved="true">
+       <proof prover="6"><result status="valid" time="0.080264" steps="136"/></proof>
+       </goal>
+       <goal name="g&#39;vc.8.0.0.0.2.1" expl="apply premises" proved="true">
+       <proof prover="6"><result status="valid" time="0.211039" steps="732"/></proof>
+       </goal>
+      </transf>
       </goal>
       <goal name="g&#39;vc.8.0.0.0.3" expl="apply premises" proved="true">
       <proof prover="6"><result status="valid" time="0.109519" steps="135"/></proof>
@@ -513,11 +519,18 @@ abs (to_real result -. t1)
    <proof prover="6"><result status="valid" time="2.294922" steps="6079"/></proof>
    </goal>
    <goal name="f&#39;vc.13.2" expl="VC for f">
-   <proof prover="0" memlimit="1000"><result status="timeout" time="5.000000" steps="396937"/></proof>
-   <proof prover="1"><result status="timeout" time="5.000000" steps="5585515"/></proof>
-   <proof prover="3"><result status="timeout" time="5.000000" steps="25346"/></proof>
-   <proof prover="4"><result status="timeout" time="5.000000" steps="503302"/></proof>
-   <proof prover="6"><result status="timeout" time="6.699814" steps="38817"/></proof>
+   <transf name="assert" arg1="(forall x y z. 0. &lt;=. z -&gt; x &lt;. y -&gt; z *. x &lt;. z *. y)">
+    <goal name="f&#39;vc.13.2.0" expl="asserted formula">
+    <proof prover="0" memlimit="1000"><result status="timeout" time="5.000000" steps="437230"/></proof>
+    <proof prover="1"><result status="outofmemory" time="3.931315"/></proof>
+    <proof prover="3"><result status="timeout" time="5.000000" steps="26078"/></proof>
+    <proof prover="4"><result status="timeout" time="5.000000" steps="503511"/></proof>
+    <proof prover="6"><result status="timeout" time="5.000000" steps="39580"/></proof>
+    </goal>
+    <goal name="f&#39;vc.13.2.1" expl="VC for f" proved="true">
+    <proof prover="0" memlimit="1000"><result status="valid" time="0.290744" steps="35906"/></proof>
+    </goal>
+   </transf>
    </goal>
   </transf>
   </goal>
