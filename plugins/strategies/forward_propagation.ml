@@ -795,7 +795,8 @@ let rec get_error_fmlas info t =
       let terms_info = add_fw_error terms_info t { exact; rel; factor; cst } in
       (terms_info, Some f, strat))
   (* `t` is the result of an IEEE addition/sustraction/multiplication *)
-  | Some (ieee_op, [ t1; t2 ]) ->
+  | Some (ieee_op, [ t1; t2 ])
+    when is_uadd_ls ieee_op || is_usub_ls ieee_op || is_umul_ls ieee_op ->
     (* Get error formulas on subterms `t1` and `t2` *)
     let terms_info, fmla1, strat_for_t1 = get_error_fmlas info t1 in
     let terms_info, fmla2, strat_for_t2 =
@@ -816,14 +817,14 @@ let rec get_error_fmlas info t =
        lemma to compute an error bound *)
     | Some e -> (
       match get_known_fn_and_args t e.exact with
-      | Some (ls, [ fn; i; j ]) when ls_equal ls !!symbols.sum -> (
-        match fn.t_node with
-        | Tapp (fn, []) ->
-          if Mls.mem fn info.fns_info then
-            apply_sum_thm info t ls (fn, i, j)
-          else
-            (info.terms_info, None, default_strat ())
-        | _ -> (info.terms_info, None, default_strat ()))
+      (* | Some (ls, [ fn; i; j ]) when ls_equal ls !!symbols.sum -> ( *)
+      (*   match fn.t_node with *)
+      (*   | Tapp (fn, []) -> *)
+      (*     if Mls.mem fn info.fns_info then *)
+      (*       apply_sum_thm info t ls (fn, i, j) *)
+      (*     else *)
+      (*       (info.terms_info, None, default_strat ()) *)
+      (*   | _ -> (info.terms_info, None, default_strat ())) *)
       | Some (fn, args) ->
         (* First we compute the potential forward errors of the function args *)
         let info, strats =
