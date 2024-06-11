@@ -34,7 +34,6 @@ type ufloat_symbols = {
   uminus_prefix : lsymbol;
   eps : term;
   eta : term;
-  real_fun : lsymbol;
 }
 
 type symbols = {
@@ -53,14 +52,12 @@ type symbols = {
   le : lsymbol;
   le_infix : lsymbol;
   abs : lsymbol;
-  sum : lsymbol;
   exp : lsymbol;
   log : lsymbol;
   log2 : lsymbol;
   log10 : lsymbol;
   sin : lsymbol;
   cos : lsymbol;
-  from_int : lsymbol;
   usingle_symbols : ufloat_symbols;
   udouble_symbols : ufloat_symbols;
   ident_printer : ident_printer;
@@ -119,8 +116,6 @@ let abs t =
   (* Don't add an abs symbol on top of another *)
   | Tapp (ls, [ _ ]) when ls_equal !!symbols.abs ls -> t
   | _ -> fs_app !!symbols.abs [ t ] ty_real
-
-let from_int t = fs_app !!symbols.from_int [ t ] ty_real
 
 let is_ineq_ls ls =
   let symbols = !!symbols in
@@ -275,14 +270,6 @@ let to_real ieee_type t =
       failwith (asprintf "Unsupported type %a" Pretty.print_ts ieee_type)
   in
   fs_app to_real [ t ] ty_real
-
-let real_fun ieee_type =
-  if ts_equal ieee_type !!symbols.usingle_symbols.ufloat_type then
-    !!symbols.usingle_symbols.real_fun
-  else if ts_equal ieee_type !!symbols.udouble_symbols.ufloat_type then
-    !!symbols.udouble_symbols.real_fun
-  else
-    failwith (asprintf "Unsupported type %a" Pretty.print_ts ieee_type)
 
 let get_info info t =
   try Mterm.find t info with
@@ -490,26 +477,9 @@ let use_ieee_thms info uop r t1 t2 strat_for_t1 strat_for_t2 =
     let e2 = get_err_or_default t2 t2_info in
     combine_uop_errors info uop t1 e1 t2 e2 r strat_for_t1 strat_for_t2
 
-(* The lemmas for error propagation on known functions use the higher order
-   symbol '@'. To apply these lemmas, we need to transform terms of the form `fn
-   a b c ...` into terms of the form `(...(((fn @ a) @ b) @ c) @ ...)` *)
-let rec apply_higher_order_sym ls_defs t =
-  match t.t_node with
-  | Tapp (ls, []) -> (
-    try
-      let t = Mls.find ls ls_defs in
-      apply_higher_order_sym ls_defs t
-    with
-    | Not_found -> t)
-  | Tapp (ls, l) ->
-    let tys = List.map (fun t -> Option.get t.t_ty) l in
-    let t1 = t_app_partial ls [] tys (Some (Option.get t.t_ty)) in
-    List.fold_left (fun t' t -> t_app_infer fs_func_app [ t'; t ]) t1 l
-  | _ -> t
-
 (* Returns None if the function is unsupported by the strategy. Otherwise,
    returns its symbol as well as its arguments. *)
-let get_known_fn_and_args t x =
+let get_known_fn_and_args _t x =
   match x.t_node with
   | Tapp (ls, args)
     when ls_equal ls !!symbols.log || ls_equal ls !!symbols.exp
@@ -525,12 +495,6 @@ let get_known_fn_and_args t x =
         args
     in
     Some (ls, args)
-  | Tapp (sum_ls, [ fn; i; j ]) when ls_equal sum_ls !!symbols.sum -> (
-    let real_fun = real_fun (get_ts t) in
-    match fn.t_node with
-    | Tapp (ls, [ fn ]) when ls_equal ls real_fun -> Some (sum_ls, [ fn; i; j ])
-    | Tapp (ls, _) when ls_equal ls real_fun -> None
-    | _ -> None)
   | _ -> None
 
 (* Returns the forward error formula associated with the propagation lemma of
@@ -653,64 +617,8 @@ let apply_fn_thm info fn app_approx arg_approx strat =
           [ term_to_str (left <=. total_err) ],
           [ strat; default_strat () ] ) )
 
-(* Returns the forward error formula and the strat associated with the
-   application of the propagation lemma for the sum. *)
-let apply_sum_thm info sum_approx _fn_approx (fn, i, j) =
-  let e_sum = Option.get (get_info info.terms_info sum_approx).error in
-  let f' =
-    match e_sum.factor.t_node with
-    | Tapp (_, [ f'; _; _ ]) -> f'
-    | _ -> assert false
-  in
-  let e_fn = Mls.find fn info.fns_info in
-  let to_real = to_real (get_ts sum_approx) in
-  let exact_sum = fs_app !!symbols.sum [ e_fn.exact; i; j ] ty_real in
-  let sum' = fs_app !!symbols.sum [ e_fn.factor; i; j ] ty_real in
-  let ty_str = string_of_ufloat_type (get_ts sum_approx) in
-  let rel_err = e_fn.rel +. (e_sum.rel *. (one +. e_fn.rel)) in
-  let rel_err_simp = e_fn.rel ++. (e_sum.rel **. (one ++. e_fn.rel)) in
-  let cst_err = (e_fn.cst *. from_int j *. (one +. e_sum.rel)) +. e_sum.cst in
-  let cst_err_simp =
-    (e_fn.cst **. from_int j **. (one ++. e_sum.rel)) ++. e_sum.cst
-  in
-  let strat =
-    Sapply_trans
-      ( "apply",
-        [
-          sprintf "sum_%s_error_propagation" ty_str;
-          "with";
-          sprintf "%s, %s" fn.ls_name.id_string (term_to_str f');
-        ],
-        List.init 5 (fun _ -> Sdo_nothing) )
-  in
-  let total_err = (rel_err *. sum') +. cst_err in
-  let total_err_simp = (sum' **. rel_err_simp) ++. cst_err_simp in
-  let term_info =
-    add_fw_error info.terms_info sum_approx
-      {
-        exact = exact_sum;
-        rel = rel_err_simp;
-        factor = sum';
-        cst = cst_err_simp;
-      }
-  in
-  let t_func_app = apply_higher_order_sym info.ls_defs sum_approx in
-  let left = abs (to_real t_func_app -. exact_sum) in
-  let s =
-    Sapply_trans
-      ( "assert",
-        [ term_to_str (left <=. total_err) ],
-        [ strat; default_strat () ] )
-  in
-  let left = abs (to_real sum_approx -. exact_sum) in
-  if t_equal total_err total_err_simp then
-    (term_info, Some (left <=. total_err), s)
-  else
-    ( term_info,
-      Some (left <=. total_err_simp),
-      Sapply_trans
-        ("assert", [ term_to_str (left <=. total_err) ], [ s; default_strat () ])
-    )
+
+
 
 let use_known_thm info app_approx fn args strats =
   if
@@ -814,14 +722,6 @@ let rec get_error_fmlas info t =
        lemma to compute an error bound *)
     | Some e -> (
       match get_known_fn_and_args t e.exact with
-      (* | Some (ls, [ fn; i; j ]) when ls_equal ls !!symbols.sum -> ( *)
-      (*   match fn.t_node with *)
-      (*   | Tapp (fn, []) -> *)
-      (*     if Mls.mem fn info.fns_info then *)
-      (*       apply_sum_thm info t ls (fn, i, j) *)
-      (*     else *)
-      (*       (info.terms_info, None, default_strat ()) *)
-      (*   | _ -> (info.terms_info, None, default_strat ())) *)
       | Some (fn, args) ->
         (* First we compute the potential forward errors of the function args *)
         let info, strats =
@@ -915,10 +815,8 @@ let parse_fn_error i exact c =
 (* Parse `|x_approx - x| <= C`.
  * We try to decompose `C` to see if it has the form `Ax' + B` where |x| <= x' *)
 let parse_error x c =
-  let is_sum, _f, i, j =
+  let _is_sum, _f, _i, _j =
     match x.t_node with
-    | Tapp (ls, [ f; i; j ]) when ls_equal ls !!symbols.sum ->
-      (true, Some f, Some i, Some j)
     | _ -> (false, None, None, None)
   in
   let is_match t =
@@ -930,17 +828,7 @@ let parse_error x c =
         true
       else
         match t'.t_node with
-        | Tapp (ls, [ _f'; i'; j' ])
-          when ls_equal ls !!symbols.sum && is_sum
-               && t_equal i' (Option.get i)
-               && t_equal j' (Option.get j) ->
-          true
         | _ -> false)
-    | Tapp (ls, [ _f'; i'; j' ])
-      when ls_equal ls !!symbols.sum && is_sum
-           && t_equal i' (Option.get i)
-           && t_equal j' (Option.get j) ->
-      true
     | _ -> false
   in
   parse_error is_match x c
@@ -1087,10 +975,6 @@ let init_symbols env printer =
   let minus_infix = ns_find_ls real_infix.th_export [ Ident.op_prefix "-." ] in
   let real_abs = Env.read_theory env [ "real" ] "Abs" in
   let abs = ns_find_ls real_abs.th_export [ "abs" ] in
-  let real_from_int = Env.read_theory env [ "real" ] "FromInt" in
-  let from_int = ns_find_ls real_from_int.th_export [ "from_int" ] in
-  let sum_th = Env.read_theory env [ "real" ] "Sum" in
-  let sum = ns_find_ls sum_th.th_export [ "sum" ] in
   let exp_log_th = Env.read_theory env [ "real" ] "ExpLog" in
   let exp = ns_find_ls exp_log_th.th_export [ "exp" ] in
   let log = ns_find_ls exp_log_th.th_export [ "log" ] in
@@ -1103,7 +987,7 @@ let init_symbols env printer =
   let udouble = Env.read_theory env [ "ufloat" ] "UDouble" in
   let usingle_lemmas = Env.read_theory env [ "ufloat" ] "USingleLemmas" in
   let udouble_lemmas = Env.read_theory env [ "ufloat" ] "UDoubleLemmas" in
-  let mk_ufloat_symbols th th_lemmas ty =
+  let mk_ufloat_symbols th _th_lemmas ty =
     let f th s =
       try ns_find_ls th.th_export [ s ] with
       | Not_found -> failwith (Format.sprintf "Symbol %s not found" s)
@@ -1123,7 +1007,6 @@ let init_symbols env printer =
       uminus_prefix = f th (Ident.op_prefix "--.");
       eps = fs_app (f th "eps") [] ty_real;
       eta = fs_app (f th "eta") [] ty_real;
-      real_fun = f th_lemmas "real_fun";
     }
   in
   let usingle_symbols = mk_ufloat_symbols usingle usingle_lemmas "usingle" in
@@ -1136,7 +1019,6 @@ let init_symbols env printer =
         mul;
         _div;
         minus;
-        sum;
         add_infix;
         sub_infix;
         mul_infix;
@@ -1153,7 +1035,6 @@ let init_symbols env printer =
         log10;
         sin;
         cos;
-        from_int;
         usingle_symbols;
         udouble_symbols;
         ident_printer = printer.Trans.printer;
