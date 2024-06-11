@@ -629,7 +629,11 @@ let apply_fn_thm info fn app_approx arg_approx strat =
   let strat =
     Sapply_trans
       ( "apply",
-        [ sprintf "%s_%s_error_propagation" fn_str ty_str ],
+        [
+          sprintf "%s_%s_error_propagation" fn_str ty_str;
+          "with";
+          sprintf "%s" (term_to_str arg_approx);
+        ],
         [ strat ] @ List.init nb (fun _ -> Sdo_nothing) )
   in
   let total_err = (rel_err *. app') +. cst_err in
@@ -638,23 +642,16 @@ let apply_fn_thm info fn app_approx arg_approx strat =
     add_fw_error info.terms_info app_approx
       { exact; rel = rel_err_simp; factor = app'; cst = cst_err_simp }
   in
-  let t_func_app = apply_higher_order_sym info.ls_defs app_approx in
-  let left = abs (to_real t_func_app -. exact) in
-  let s =
-    Sapply_trans
-      ( "assert",
-        [ term_to_str (left <=. total_err) ],
-        [ strat; default_strat () ] )
-  in
   let left = abs (to_real app_approx -. exact) in
   if t_equal total_err total_err_simp then
-    (term_info, Some (left <=. total_err), s)
+    (term_info, Some (left <=. total_err), strat)
   else
     ( term_info,
       Some (left <=. total_err_simp),
       Sapply_trans
-        ("assert", [ term_to_str (left <=. total_err) ], [ s; default_strat () ])
-    )
+        ( "assert",
+          [ term_to_str (left <=. total_err) ],
+          [ strat; default_strat () ] ) )
 
 (* Returns the forward error formula and the strat associated with the
    application of the propagation lemma for the sum. *)
@@ -891,7 +888,8 @@ let parse_error is_match exact t =
 
 (* Parse `|f i - exact_f i| <= C`.
  * We try to decompose `C` to see if it has the form `A (f' i) + B` where
- * |f i| <= f' i for i in a given range
+ * |f i| <= f' i for i in a given range.
+ * Used for sum error propagation.
  *)
 let parse_fn_error i exact c =
   let rec is_match t =

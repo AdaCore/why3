@@ -7,11 +7,11 @@
 <prover id="3" name="Alt-Ergo" version="2.5.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.5.4" alternative="FPA" timelimit="5" steplimit="0" memlimit="2000"/>
-<file format="whyml" proved="true">
+<file format="whyml">
 <path name=".."/><path name="lse.mlw"/>
 <theory name="Helpers" proved="true">
  <goal name="sum_of_fun_le_sum_of_abs_fun&#39;vc" expl="VC for sum_of_fun_le_sum_of_abs_fun" proved="true">
- <proof prover="6"><result status="valid" time="2.925459" steps="24355"/></proof>
+ <proof prover="6"><result status="valid" time="2.925459" steps="24222"/></proof>
  </goal>
  <goal name="usum_rec&#39;vc" expl="VC for usum_rec" proved="true">
  <transf name="split_vc" proved="true" >
@@ -24,12 +24,12 @@
   <goal name="usum_rec&#39;vc.2" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="usum_rec&#39;vc.2.0" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.065051" steps="465"/></proof>
+   <proof prover="6"><result status="valid" time="0.065051" steps="463"/></proof>
    </goal>
    <goal name="usum_rec&#39;vc.2.1" expl="postcondition" proved="true">
    <transf name="split_vc" proved="true" >
     <goal name="usum_rec&#39;vc.2.1.0" expl="postcondition" proved="true">
-    <proof prover="6"><result status="valid" time="1.734578" steps="14579"/></proof>
+    <proof prover="6"><result status="valid" time="2.841889" steps="14578"/></proof>
     </goal>
     <goal name="usum_rec&#39;vc.2.1.1" expl="postcondition" proved="true">
     <transf name="assert" proved="true" arg1="abs (to_real result -. (sum (real_fun f) a (b - 1) +. to_real (f @ (b - 1))))
@@ -46,7 +46,7 @@
       <proof prover="6"><result status="valid" time="0.036430" steps="95"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.1.0.2" expl="apply premises" proved="true">
-      <proof prover="6"><result status="valid" time="0.090702" steps="488"/></proof>
+      <proof prover="6"><result status="valid" time="0.090702" steps="487"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.1.0.3" expl="apply premises" proved="true">
       <proof prover="6"><result status="valid" time="0.035039" steps="98"/></proof>
@@ -55,13 +55,13 @@
       <proof prover="6"><result status="valid" time="0.117020" steps="300"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.1.0.5" expl="apply premises" proved="true">
-      <proof prover="6"><result status="valid" time="0.068030" steps="90"/></proof>
+      <proof prover="6"><result status="valid" time="0.044969" steps="90"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.1.0.6" expl="apply premises" proved="true">
       <proof prover="6"><result status="valid" time="0.067337" steps="90"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.1.0.7" expl="apply premises" proved="true">
-      <proof prover="6"><result status="valid" time="0.044969" steps="90"/></proof>
+      <proof prover="6"><result status="valid" time="0.068030" steps="90"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.1.0.8" expl="apply premises" proved="true">
       <proof prover="6"><result status="valid" time="0.050071" steps="90"/></proof>
@@ -71,7 +71,7 @@
      <goal name="usum_rec&#39;vc.2.1.1.1" expl="postcondition" proved="true">
      <transf name="simplify_computations" proved="true" >
       <goal name="usum_rec&#39;vc.2.1.1.1.0" expl="postcondition" proved="true">
-      <proof prover="6"><result status="valid" time="2.672211" steps="11476"/></proof>
+      <proof prover="6"><result status="valid" time="3.250643" steps="13206"/></proof>
       </goal>
      </transf>
      </goal>
@@ -84,7 +84,7 @@
  </transf>
  </goal>
  <goal name="exp_approx_pos" proved="true">
- <proof prover="6"><result status="valid" time="1.968107" steps="10903"/></proof>
+ <proof prover="6"><result status="valid" time="1.299815" steps="10786"/></proof>
  </goal>
  <goal name="sum_strictly_pos&#39;vc" expl="VC for sum_strictly_pos" proved="true">
  <transf name="split_vc" proved="true" >
@@ -95,40 +95,47 @@
   <proof prover="6"><result status="valid" time="0.040957" steps="85"/></proof>
   </goal>
   <goal name="sum_strictly_pos&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.066159" steps="355"/></proof>
+  <proof prover="6"><result status="valid" time="0.066159" steps="357"/></proof>
   </goal>
   <goal name="sum_strictly_pos&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="1.482694" steps="17077"/></proof>
+  <proof prover="6"><result status="valid" time="2.086750" steps="17194"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="usum_strictly_pos&#39;vc" expl="VC for usum_strictly_pos" proved="true">
- <proof prover="6"><result status="valid" time="3.178369" steps="19008"/></proof>
+ <proof prover="6"><result status="valid" time="3.721160" steps="19061"/></proof>
  </goal>
 </theory>
-<theory name="LSE" proved="true">
+<theory name="LSE">
  <goal name="exp_of_f&#39;vc" expl="VC for exp_of_f" proved="true">
  <proof prover="6"><result status="valid" time="0.034104" steps="83"/></proof>
+ </goal>
+ <goal name="compat_order_mult">
+ <proof prover="0" memlimit="1000"><result status="timeout" time="5.000000" steps="382122"/></proof>
+ <proof prover="1"><result status="outofmemory" time="3.564792"/></proof>
+ <proof prover="3"><result status="timeout" time="5.000000" steps="56905"/></proof>
+ <proof prover="4"><result status="timeout" time="5.000000" steps="481226"/></proof>
+ <proof prover="6"><result status="timeout" time="5.000000" steps="49101"/></proof>
  </goal>
  <goal name="lse&#39;vc" expl="VC for lse" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="lse&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="3.503970" steps="28093"/></proof>
+  <proof prover="6"><result status="valid" time="3.503970" steps="29193"/></proof>
   </goal>
   <goal name="lse&#39;vc.1" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.050662" steps="86"/></proof>
   </goal>
   <goal name="lse&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.124979" steps="871"/></proof>
+  <proof prover="6"><result status="valid" time="0.124979" steps="870"/></proof>
   </goal>
   <goal name="lse&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.842105" steps="124165"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.842105" steps="124350"/></proof>
   </goal>
   <goal name="lse&#39;vc.4" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.039907" steps="106"/></proof>
   </goal>
   <goal name="lse&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.123882" steps="423"/></proof>
+  <proof prover="6"><result status="valid" time="0.123882" steps="429"/></proof>
   </goal>
   <goal name="lse&#39;vc.6" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.047416" steps="102"/></proof>
@@ -140,13 +147,13 @@
   <proof prover="6"><result status="valid" time="0.049418" steps="109"/></proof>
   </goal>
   <goal name="lse&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.885146" steps="3619"/></proof>
+  <proof prover="0"><result status="valid" time="0.223517" steps="31869"/></proof>
   </goal>
   <goal name="lse&#39;vc.10" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.059057" steps="110"/></proof>
   </goal>
   <goal name="lse&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.817248" steps="7315"/></proof>
+  <proof prover="0"><result status="valid" time="0.278499" steps="31416"/></proof>
   </goal>
   <goal name="lse&#39;vc.12" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.044836" steps="121"/></proof>
@@ -179,69 +186,51 @@ abs (to_real result -. t)
           *. (1.0 +. log_error))
          +. 0.0))">
      <goal name="lse&#39;vc.13.0.0.0" expl="asserted formula" proved="true">
-     <transf name="assert" proved="true" arg1="abs
-(to_real ((fun (y0:usingle) -&gt; log_approx y0) @ s) -. log (sum exact_f&#39; 0 n))
-&lt;=. ((log_error *. abs (log (sum exact_f&#39; 0 n)))
-     +. (((-. log
-              (1.0
-               -. ((((exp_error
-                      +. ((from_int n *. eps) *. (1.0 +. exp_error)))
-                     *. sum exact_f&#39; 0 n)
-                    +. 0.0)
-                   /. sum exact_f&#39; 0 n)))
-          *. (1.0 +. log_error))
-         +. 0.0))">
-      <goal name="lse&#39;vc.13.0.0.0.0" expl="asserted formula" proved="true">
-      <transf name="apply" proved="true" arg1="log_single_error_propagation">
-       <goal name="lse&#39;vc.13.0.0.0.0.0" expl="apply premises" proved="true">
-       <proof prover="6"><result status="valid" time="0.053966" steps="135"/></proof>
-       </goal>
-       <goal name="lse&#39;vc.13.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="6"><result status="valid" time="0.301596" steps="1765"/></proof>
-       </goal>
-       <goal name="lse&#39;vc.13.0.0.0.0.2" expl="apply premises" proved="true">
-       <proof prover="6"><result status="valid" time="0.089065" steps="127"/></proof>
-       </goal>
-       <goal name="lse&#39;vc.13.0.0.0.0.3" expl="apply premises" proved="true">
-       <proof prover="6"><result status="valid" time="2.183020" steps="12921"/></proof>
-       </goal>
-       <goal name="lse&#39;vc.13.0.0.0.0.4" expl="apply premises" proved="true">
-       <proof prover="6"><result status="valid" time="0.083416" steps="126"/></proof>
-       </goal>
-      </transf>
+     <transf name="apply" proved="true" arg1="log_single_error_propagation" arg2="with" arg3="s">
+      <goal name="lse&#39;vc.13.0.0.0.0" expl="apply premises" proved="true">
+      <proof prover="6"><result status="valid" time="0.080788" steps="135"/></proof>
       </goal>
-      <goal name="lse&#39;vc.13.0.0.0.1" expl="asserted formula" proved="true">
-      <proof prover="6"><result status="valid" time="0.532156" steps="3158"/></proof>
+      <goal name="lse&#39;vc.13.0.0.0.1" expl="apply premises" proved="true">
+      <proof prover="6"><result status="valid" time="0.076997" steps="151"/></proof>
+      </goal>
+      <goal name="lse&#39;vc.13.0.0.0.2" expl="apply premises" proved="true">
+      <proof prover="6"><result status="valid" time="0.072168" steps="127"/></proof>
+      </goal>
+      <goal name="lse&#39;vc.13.0.0.0.3" expl="apply premises" proved="true">
+      <proof prover="3" memlimit="2000"><result status="valid" time="3.779085" steps="25638"/></proof>
+      </goal>
+      <goal name="lse&#39;vc.13.0.0.0.4" expl="apply premises" proved="true">
+      <proof prover="6"><result status="valid" time="0.051829" steps="126"/></proof>
       </goal>
      </transf>
      </goal>
      <goal name="lse&#39;vc.13.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="3" memlimit="2000"><result status="valid" time="0.307033" steps="3206"/></proof>
+     <proof prover="3" memlimit="2000"><result status="valid" time="6.812939" steps="28150"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="lse&#39;vc.13.0.1" expl="asserted formula" proved="true">
-    <proof prover="6"><result status="valid" time="0.067828" steps="182"/></proof>
+    <proof prover="6"><result status="valid" time="0.081766" steps="181"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="lse&#39;vc.13.1" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.068845" steps="204"/></proof>
+   <proof prover="6"><result status="valid" time="0.089013" steps="204"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="SLSE" proved="true">
+<theory name="SLSE">
  <goal name="exact_g&#39;vc" expl="VC for exact_g" proved="true">
  <proof prover="6"><result status="valid" time="0.087981" steps="87"/></proof>
  </goal>
  <goal name="compat_order_mult1" proved="true">
- <proof prover="6"><result status="valid" time="0.082538" steps="417"/></proof>
+ <proof prover="6"><result status="valid" time="0.082538" steps="418"/></proof>
  </goal>
  <goal name="compat_order_mult2" proved="true">
- <proof prover="6"><result status="valid" time="1.305774" steps="13447"/></proof>
+ <proof prover="6"><result status="valid" time="1.765993" steps="13384"/></proof>
  </goal>
  <goal name="g&#39;vc" expl="VC for g" proved="true">
  <transf name="split_vc" proved="true" >
@@ -297,74 +286,74 @@ abs (to_real r -. (-. (t3 *. t3)))
      <goal name="g&#39;vc.4.0.0.0" expl="asserted formula" proved="true">
      <transf name="apply" proved="true" arg1="umul_single_error_propagation" arg2="with" arg3="(x ++. mu) --. y,(x ++. mu) --. y">
       <goal name="g&#39;vc.4.0.0.0.0" expl="apply premises" proved="true">
+      <proof prover="6"><result status="valid" time="3.742346" steps="20770"/></proof>
+      </goal>
+      <goal name="g&#39;vc.4.0.0.0.1" expl="apply premises" proved="true">
       <transf name="assert" proved="true" arg1="abs (to_real ((x ++. mu) --. y) -. ((to_real x +. to_real mu) -. to_real y))
 &lt;=. ((((eps +. 0.0) +. eps)
       *. (abs (to_real x +. to_real mu) +. abs (to_real y)))
      +. ((((1.0 +. eps) +. 0.0) *. 0.0) +. (((1.0 +. eps) +. eps) *. 0.0)))">
-       <goal name="g&#39;vc.4.0.0.0.0.0" expl="asserted formula" proved="true">
+       <goal name="g&#39;vc.4.0.0.0.1.0" expl="asserted formula" proved="true">
        <transf name="apply" proved="true" arg1="usub_single_error_propagation" arg2="with" arg3="x ++. mu,y">
-        <goal name="g&#39;vc.4.0.0.0.0.0.0" expl="apply premises" proved="true">
+        <goal name="g&#39;vc.4.0.0.0.1.0.0" expl="apply premises" proved="true">
         <transf name="assert" proved="true" arg1="abs (to_real (x ++. mu) -. (to_real x +. to_real mu))
 &lt;=. (eps *. abs (to_real x +. to_real mu))">
-         <goal name="g&#39;vc.4.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
-         <proof prover="6"><result status="valid" time="0.780318" steps="2394"/></proof>
+         <goal name="g&#39;vc.4.0.0.0.1.0.0.0" expl="asserted formula" proved="true">
+         <proof prover="6"><result status="valid" time="0.780318" steps="2658"/></proof>
          </goal>
-         <goal name="g&#39;vc.4.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-         <proof prover="6"><result status="valid" time="0.193850" steps="158"/></proof>
+         <goal name="g&#39;vc.4.0.0.0.1.0.0.1" expl="apply premises" proved="true">
+         <proof prover="6"><result status="valid" time="0.193850" steps="159"/></proof>
          </goal>
         </transf>
         </goal>
-        <goal name="g&#39;vc.4.0.0.0.0.0.1" expl="apply premises" proved="true">
+        <goal name="g&#39;vc.4.0.0.0.1.0.1" expl="apply premises" proved="true">
         <proof prover="6"><result status="valid" time="0.064217" steps="117"/></proof>
         </goal>
-        <goal name="g&#39;vc.4.0.0.0.0.0.2" expl="apply premises" proved="true">
+        <goal name="g&#39;vc.4.0.0.0.1.0.2" expl="apply premises" proved="true">
         <proof prover="6"><result status="valid" time="0.105600" steps="124"/></proof>
         </goal>
-        <goal name="g&#39;vc.4.0.0.0.0.0.3" expl="apply premises" proved="true">
+        <goal name="g&#39;vc.4.0.0.0.1.0.3" expl="apply premises" proved="true">
         <proof prover="6"><result status="valid" time="0.058223" steps="125"/></proof>
         </goal>
-        <goal name="g&#39;vc.4.0.0.0.0.0.4" expl="apply premises" proved="true">
-        <proof prover="6"><result status="valid" time="0.068985" steps="111"/></proof>
-        </goal>
-        <goal name="g&#39;vc.4.0.0.0.0.0.5" expl="apply premises" proved="true">
-        <proof prover="6"><result status="valid" time="0.102902" steps="111"/></proof>
-        </goal>
-        <goal name="g&#39;vc.4.0.0.0.0.0.6" expl="apply premises" proved="true">
-        <proof prover="6"><result status="valid" time="0.080201" steps="111"/></proof>
-        </goal>
-        <goal name="g&#39;vc.4.0.0.0.0.0.7" expl="apply premises" proved="true">
+        <goal name="g&#39;vc.4.0.0.0.1.0.4" expl="apply premises" proved="true">
         <proof prover="6"><result status="valid" time="0.066305" steps="111"/></proof>
         </goal>
-        <goal name="g&#39;vc.4.0.0.0.0.0.8" expl="apply premises" proved="true">
+        <goal name="g&#39;vc.4.0.0.0.1.0.5" expl="apply premises" proved="true">
+        <proof prover="6"><result status="valid" time="0.102902" steps="111"/></proof>
+        </goal>
+        <goal name="g&#39;vc.4.0.0.0.1.0.6" expl="apply premises" proved="true">
+        <proof prover="6"><result status="valid" time="0.080201" steps="111"/></proof>
+        </goal>
+        <goal name="g&#39;vc.4.0.0.0.1.0.7" expl="apply premises" proved="true">
+        <proof prover="6"><result status="valid" time="0.068985" steps="111"/></proof>
+        </goal>
+        <goal name="g&#39;vc.4.0.0.0.1.0.8" expl="apply premises" proved="true">
         <proof prover="6"><result status="valid" time="0.073474" steps="111"/></proof>
         </goal>
        </transf>
        </goal>
-       <goal name="g&#39;vc.4.0.0.0.0.1" expl="apply premises" proved="true">
+       <goal name="g&#39;vc.4.0.0.0.1.1" expl="apply premises" proved="true">
        <proof prover="6"><result status="valid" time="0.129753" steps="229"/></proof>
        </goal>
       </transf>
       </goal>
-      <goal name="g&#39;vc.4.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="6"><result status="valid" time="3.742346" steps="21966"/></proof>
-      </goal>
       <goal name="g&#39;vc.4.0.0.0.2" expl="apply premises" proved="true">
-      <proof prover="6"><result status="valid" time="0.202963" steps="208"/></proof>
-      </goal>
-      <goal name="g&#39;vc.4.0.0.0.3" expl="apply premises" proved="true">
       <proof prover="6"><result status="valid" time="0.176685" steps="208"/></proof>
       </goal>
-      <goal name="g&#39;vc.4.0.0.0.4" expl="apply premises" proved="true">
-      <proof prover="6"><result status="valid" time="0.167771" steps="111"/></proof>
+      <goal name="g&#39;vc.4.0.0.0.3" expl="apply premises" proved="true">
+      <proof prover="6"><result status="valid" time="0.202963" steps="208"/></proof>
       </goal>
-      <goal name="g&#39;vc.4.0.0.0.5" expl="apply premises" proved="true">
+      <goal name="g&#39;vc.4.0.0.0.4" expl="apply premises" proved="true">
       <proof prover="6"><result status="valid" time="0.089433" steps="111"/></proof>
       </goal>
+      <goal name="g&#39;vc.4.0.0.0.5" expl="apply premises" proved="true">
+      <proof prover="6"><result status="valid" time="0.167771" steps="111"/></proof>
+      </goal>
       <goal name="g&#39;vc.4.0.0.0.6" expl="apply premises" proved="true">
-      <proof prover="6"><result status="valid" time="0.089957" steps="111"/></proof>
+      <proof prover="6"><result status="valid" time="0.061538" steps="111"/></proof>
       </goal>
       <goal name="g&#39;vc.4.0.0.0.7" expl="apply premises" proved="true">
-      <proof prover="6"><result status="valid" time="0.061538" steps="111"/></proof>
+      <proof prover="6"><result status="valid" time="0.089957" steps="111"/></proof>
       </goal>
       <goal name="g&#39;vc.4.0.0.0.8" expl="apply premises" proved="true">
       <proof prover="6"><result status="valid" time="0.071696" steps="111"/></proof>
@@ -372,17 +361,17 @@ abs (to_real r -. (-. (t3 *. t3)))
      </transf>
      </goal>
      <goal name="g&#39;vc.4.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="4"><result status="valid" time="1.104810" steps="137480"/></proof>
+     <proof prover="4"><result status="valid" time="1.104810" steps="137434"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="g&#39;vc.4.0.1" expl="asserted formula" proved="true">
-    <proof prover="6"><result status="valid" time="0.592285" steps="617"/></proof>
+    <proof prover="6"><result status="valid" time="0.592285" steps="615"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="g&#39;vc.4.1" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.604713" steps="823"/></proof>
+   <proof prover="3"><result status="valid" time="1.007816" steps="823"/></proof>
    </goal>
   </transf>
   </goal>
@@ -390,10 +379,10 @@ abs (to_real r -. (-. (t3 *. t3)))
   <proof prover="6"><result status="valid" time="0.055939" steps="120"/></proof>
   </goal>
   <goal name="g&#39;vc.6" expl="assertion" proved="true">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.270899" steps="35029"/></proof>
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.270899" steps="35005"/></proof>
   </goal>
   <goal name="g&#39;vc.7" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.408487" steps="36237"/></proof>
+  <proof prover="0"><result status="valid" time="0.408487" steps="36213"/></proof>
   </goal>
   <goal name="g&#39;vc.8" expl="postcondition" proved="true">
   <transf name="assert" proved="true" arg1="let t1 = exp ((-. (tt *. tt)) /. 2.0) in
@@ -417,73 +406,58 @@ abs (to_real result -. t1)
       *. exp ((-. (tt *. tt)) /. 2.0))
      +. 0.0)">
      <goal name="g&#39;vc.8.0.0.0" expl="asserted formula" proved="true">
-     <transf name="assert" proved="true" arg1="abs
-(to_real ((fun (y0:usingle) -&gt; exp_approx y0) @ r&#39;)
- -. exp ((-. (tt *. tt)) /. 2.0))
-&lt;=. (((exp_error
-       +. ((exp ((0.0 *. 0.0) +. (((a_eps *. t&#39;) *. t&#39;) +. (1.5 *. eta)))
-            -. 1.0)
-           *. (1.0 +. exp_error)))
-      *. exp ((-. (tt *. tt)) /. 2.0))
-     +. 0.0)">
-      <goal name="g&#39;vc.8.0.0.0.0" expl="asserted formula" proved="true">
-      <transf name="apply" proved="true" arg1="exp_single_error_propagation">
-       <goal name="g&#39;vc.8.0.0.0.0.0" expl="apply premises" proved="true">
-       <proof prover="6"><result status="valid" time="0.086407" steps="153"/></proof>
+     <transf name="apply" proved="true" arg1="exp_single_error_propagation" arg2="with" arg3="r&#39;">
+      <goal name="g&#39;vc.8.0.0.0.0" expl="apply premises" proved="true">
+      <proof prover="6"><result status="valid" time="0.080979" steps="153"/></proof>
+      </goal>
+      <goal name="g&#39;vc.8.0.0.0.1" expl="apply premises" proved="true">
+      <proof prover="6"><result status="valid" time="0.102985" steps="142"/></proof>
+      </goal>
+      <goal name="g&#39;vc.8.0.0.0.2" expl="apply premises" proved="true">
+      <transf name="assert" proved="true" arg1="(forall x. x *. x &gt;=. 0.)">
+       <goal name="g&#39;vc.8.0.0.0.2.0" expl="asserted formula" proved="true">
+       <proof prover="6"><result status="valid" time="0.080264" steps="136"/></proof>
        </goal>
-       <goal name="g&#39;vc.8.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="6"><result status="valid" time="0.687526" steps="3699"/></proof>
-       </goal>
-       <goal name="g&#39;vc.8.0.0.0.0.2" expl="apply premises" proved="true">
-       <transf name="assert" proved="true" arg1="(forall x. x *. x &gt;=. 0.)">
-        <goal name="g&#39;vc.8.0.0.0.0.2.0" expl="asserted formula" proved="true">
-        <proof prover="6"><result status="valid" time="0.071126" steps="136"/></proof>
-        </goal>
-        <goal name="g&#39;vc.8.0.0.0.0.2.1" expl="apply premises" proved="true">
-        <proof prover="6"><result status="valid" time="0.276081" steps="732"/></proof>
-        </goal>
-       </transf>
-       </goal>
-       <goal name="g&#39;vc.8.0.0.0.0.3" expl="apply premises" proved="true">
-       <proof prover="6"><result status="valid" time="0.124198" steps="135"/></proof>
+       <goal name="g&#39;vc.8.0.0.0.2.1" expl="apply premises" proved="true">
+       <proof prover="6"><result status="valid" time="0.211039" steps="732"/></proof>
        </goal>
       </transf>
       </goal>
-      <goal name="g&#39;vc.8.0.0.0.1" expl="asserted formula" proved="true">
-      <proof prover="6"><result status="valid" time="0.886950" steps="4367"/></proof>
+      <goal name="g&#39;vc.8.0.0.0.3" expl="apply premises" proved="true">
+      <proof prover="6"><result status="valid" time="0.109519" steps="135"/></proof>
       </goal>
      </transf>
      </goal>
      <goal name="g&#39;vc.8.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="6"><result status="valid" time="0.103241" steps="180"/></proof>
+     <proof prover="6"><result status="valid" time="0.142527" steps="180"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="g&#39;vc.8.0.1" expl="asserted formula" proved="true">
-    <proof prover="6"><result status="valid" time="0.095114" steps="175"/></proof>
+    <proof prover="6"><result status="valid" time="0.117628" steps="175"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="g&#39;vc.8.1" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.798095" steps="3740"/></proof>
+   <proof prover="6"><result status="valid" time="0.611258" steps="3746"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="g&#39;vc.9" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.363005" steps="752"/></proof>
+  <proof prover="6"><result status="valid" time="0.363005" steps="753"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="exact_f&#39;vc" expl="VC for exact_f" proved="true">
  <proof prover="6"><result status="valid" time="0.040584" steps="87"/></proof>
  </goal>
- <goal name="f&#39;vc" expl="VC for f" proved="true">
- <transf name="split_vc" proved="true" >
+ <goal name="f&#39;vc" expl="VC for f">
+ <transf name="split_vc" >
   <goal name="f&#39;vc.0" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.177839" steps="1385"/></proof>
   </goal>
   <goal name="f&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.227294" steps="1430"/></proof>
+  <proof prover="6"><result status="valid" time="0.227294" steps="1432"/></proof>
   </goal>
   <goal name="f&#39;vc.2" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.049745" steps="101"/></proof>
@@ -497,12 +471,12 @@ abs (to_real result -. t1)
    <proof prover="6"><result status="valid" time="0.091393" steps="620"/></proof>
    </goal>
    <goal name="f&#39;vc.4.1" expl="precondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.194655" steps="1906"/></proof>
+   <proof prover="6"><result status="valid" time="0.194655" steps="1898"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="f&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="1.577782" steps="160060"/></proof>
+  <proof prover="0"><result status="valid" time="1.887386" steps="160036"/></proof>
   </goal>
   <goal name="f&#39;vc.6" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.068996" steps="113"/></proof>
@@ -517,7 +491,7 @@ abs (to_real result -. t1)
   <proof prover="6"><result status="valid" time="0.053661" steps="111"/></proof>
   </goal>
   <goal name="f&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="2.119349" steps="130563"/></proof>
+  <proof prover="0"><result status="valid" time="2.119349" steps="130539"/></proof>
   </goal>
   <goal name="f&#39;vc.11" expl="assertion" proved="true">
   <transf name="unfold" proved="true" arg1="exact_f">
@@ -527,30 +501,41 @@ abs (to_real result -. t1)
     <proof prover="6"><result status="valid" time="0.051147" steps="112"/></proof>
     </goal>
     <goal name="f&#39;vc.11.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="1"><result status="valid" time="0.021354" steps="9634"/></proof>
+    <proof prover="1"><result status="valid" time="0.021354" steps="9604"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="f&#39;vc.12" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.066996" steps="129"/></proof>
+  <proof prover="6"><result status="valid" time="0.066996" steps="128"/></proof>
   </goal>
-  <goal name="f&#39;vc.13" expl="assertion" proved="true">
-  <transf name="split_vc" proved="true" >
+  <goal name="f&#39;vc.13" expl="assertion">
+  <transf name="split_vc" >
    <goal name="f&#39;vc.13.0" expl="assertion" proved="true">
-   <proof prover="6"><result status="valid" time="0.169293" steps="934"/></proof>
+   <proof prover="6"><result status="valid" time="1.678087" steps="6022"/></proof>
    </goal>
    <goal name="f&#39;vc.13.1" expl="VC for f" proved="true">
-   <proof prover="6"><result status="valid" time="0.170570" steps="941"/></proof>
+   <proof prover="6"><result status="valid" time="2.294922" steps="6079"/></proof>
    </goal>
-   <goal name="f&#39;vc.13.2" expl="VC for f" proved="true">
-   <proof prover="6"><result status="valid" time="2.849907" steps="20531"/></proof>
+   <goal name="f&#39;vc.13.2" expl="VC for f">
+   <transf name="assert" arg1="(forall x y z. 0. &lt;=. z -&gt; x &lt;. y -&gt; z *. x &lt;. z *. y)">
+    <goal name="f&#39;vc.13.2.0" expl="asserted formula">
+    <proof prover="0" memlimit="1000"><result status="timeout" time="5.000000" steps="437230"/></proof>
+    <proof prover="1"><result status="outofmemory" time="3.931315"/></proof>
+    <proof prover="3"><result status="timeout" time="5.000000" steps="26078"/></proof>
+    <proof prover="4"><result status="timeout" time="5.000000" steps="503511"/></proof>
+    <proof prover="6"><result status="timeout" time="5.000000" steps="39580"/></proof>
+    </goal>
+    <goal name="f&#39;vc.13.2.1" expl="VC for f" proved="true">
+    <proof prover="0" memlimit="1000"><result status="valid" time="0.290744" steps="35906"/></proof>
+    </goal>
+   </transf>
    </goal>
   </transf>
   </goal>
   <goal name="f&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.017614" steps="9774"/></proof>
+  <proof prover="1"><result status="valid" time="0.017614" steps="9744"/></proof>
   </goal>
   <goal name="f&#39;vc.15" expl="postcondition" proved="true">
   <transf name="assert" proved="true" arg1="let t = from_int n in
@@ -587,55 +572,36 @@ abs (to_real result -. t3)
           *. (1.0 +. log2_error))
          +. 0.0))">
      <goal name="f&#39;vc.15.0.0.0" expl="asserted formula" proved="true">
-     <transf name="assert" proved="true" arg1="abs
-(to_real ((fun (y0:usingle) -&gt; log2_approx y0) @ s)
- -. log2 (sum exact_g&#39; 0 n))
-&lt;=. ((log2_error *. abs (log2 (sum exact_g&#39; 0 n)))
-     +. (((-. log2
-              (1.0
-               -. ((((g_error +. ((eps *. from_int n) *. (1.0 +. g_error)))
-                     *. sum exact_g&#39; 0 n)
-                    +. (((0.0 *. from_int n) *. (1.0 +. (eps *. from_int n)))
-                        +. 0.0))
-                   /. sum exact_g&#39; 0 n)))
-          *. (1.0 +. log2_error))
-         +. 0.0))">
-      <goal name="f&#39;vc.15.0.0.0.0" expl="asserted formula" proved="true">
-      <transf name="apply" proved="true" arg1="log2_single_error_propagation">
-       <goal name="f&#39;vc.15.0.0.0.0.0" expl="apply premises" proved="true">
-       <proof prover="6"><result status="valid" time="0.073530" steps="130"/></proof>
-       </goal>
-       <goal name="f&#39;vc.15.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="6"><result status="valid" time="0.511079" steps="4121"/></proof>
-       </goal>
-       <goal name="f&#39;vc.15.0.0.0.0.2" expl="apply premises" proved="true">
-       <proof prover="6"><result status="valid" time="0.077742" steps="133"/></proof>
-       </goal>
-       <goal name="f&#39;vc.15.0.0.0.0.3" expl="apply premises" proved="true">
-       <proof prover="6"><result status="valid" time="0.110993" steps="124"/></proof>
-       </goal>
-       <goal name="f&#39;vc.15.0.0.0.0.4" expl="apply premises" proved="true">
-       <proof prover="6"><result status="valid" time="0.062356" steps="124"/></proof>
-       </goal>
-      </transf>
+     <transf name="apply" proved="true" arg1="log2_single_error_propagation" arg2="with" arg3="s">
+      <goal name="f&#39;vc.15.0.0.0.0" expl="apply premises" proved="true">
+      <proof prover="6"><result status="valid" time="0.063664" steps="130"/></proof>
       </goal>
-      <goal name="f&#39;vc.15.0.0.0.1" expl="asserted formula" proved="true">
-      <proof prover="6"><result status="valid" time="0.970663" steps="8786"/></proof>
+      <goal name="f&#39;vc.15.0.0.0.1" expl="apply premises" proved="true">
+      <proof prover="6"><result status="valid" time="0.071470" steps="147"/></proof>
+      </goal>
+      <goal name="f&#39;vc.15.0.0.0.2" expl="apply premises" proved="true">
+      <proof prover="6"><result status="valid" time="0.067747" steps="133"/></proof>
+      </goal>
+      <goal name="f&#39;vc.15.0.0.0.3" expl="apply premises" proved="true">
+      <proof prover="6"><result status="valid" time="0.092696" steps="124"/></proof>
+      </goal>
+      <goal name="f&#39;vc.15.0.0.0.4" expl="apply premises" proved="true">
+      <proof prover="6"><result status="valid" time="0.063031" steps="124"/></proof>
       </goal>
      </transf>
      </goal>
      <goal name="f&#39;vc.15.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="6"><result status="valid" time="0.935824" steps="7530"/></proof>
+     <proof prover="6"><result status="valid" time="3.152743" steps="17400"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="f&#39;vc.15.0.1" expl="asserted formula" proved="true">
-    <proof prover="6"><result status="valid" time="0.127985" steps="255"/></proof>
+    <proof prover="6"><result status="valid" time="0.097393" steps="258"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="f&#39;vc.15.1" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.121523" steps="245"/></proof>
+   <proof prover="6"><result status="valid" time="0.093138" steps="246"/></proof>
    </goal>
   </transf>
   </goal>
@@ -664,7 +630,7 @@ abs (to_real result -. t3)
       <proof prover="6"><result status="valid" time="0.063444" steps="94"/></proof>
       </goal>
       <goal name="slse&#39;vc.3.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="6"><result status="valid" time="0.193182" steps="1423"/></proof>
+      <proof prover="6"><result status="valid" time="0.193182" steps="1430"/></proof>
       </goal>
       <goal name="slse&#39;vc.3.0.0.0.2" expl="apply premises" proved="true">
       <proof prover="6"><result status="valid" time="0.060061" steps="94"/></proof>
@@ -672,17 +638,17 @@ abs (to_real result -. t3)
      </transf>
      </goal>
      <goal name="slse&#39;vc.3.0.0.1" expl="equality hypothesis" proved="true">
-     <proof prover="6"><result status="valid" time="0.261927" steps="1374"/></proof>
+     <proof prover="6"><result status="valid" time="0.261927" steps="1339"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="slse&#39;vc.3.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="6"><result status="valid" time="0.087808" steps="472"/></proof>
+    <proof prover="6"><result status="valid" time="0.087808" steps="473"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="slse&#39;vc.3.1" expl="equality hypothesis" proved="true">
-   <proof prover="6"><result status="valid" time="0.111161" steps="598"/></proof>
+   <proof prover="6"><result status="valid" time="0.111161" steps="596"/></proof>
    </goal>
   </transf>
   </goal>
@@ -690,7 +656,7 @@ abs (to_real result -. t3)
   <proof prover="6"><result status="valid" time="0.089071" steps="92"/></proof>
   </goal>
   <goal name="slse&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.380918" steps="1708"/></proof>
+  <proof prover="6"><result status="valid" time="0.380918" steps="1709"/></proof>
   </goal>
   <goal name="slse&#39;vc.6" expl="precondition" proved="true">
   <transf name="rewrite" proved="true" arg1="H2">
@@ -702,7 +668,7 @@ abs (to_real result -. t3)
      <proof prover="6"><result status="valid" time="0.054284" steps="99"/></proof>
      </goal>
      <goal name="slse&#39;vc.6.0.0.1" expl="apply premises" proved="true">
-     <proof prover="6"><result status="valid" time="0.171944" steps="1493"/></proof>
+     <proof prover="6"><result status="valid" time="0.301326" steps="1514"/></proof>
      </goal>
      <goal name="slse&#39;vc.6.0.0.2" expl="apply premises" proved="true">
      <proof prover="6"><result status="valid" time="0.051309" steps="99"/></proof>
@@ -710,7 +676,7 @@ abs (to_real result -. t3)
     </transf>
     </goal>
     <goal name="slse&#39;vc.6.0.1" expl="precondition" proved="true">
-    <proof prover="4"><result status="valid" time="0.916481" steps="143806"/></proof>
+    <proof prover="4"><result status="valid" time="0.916481" steps="143760"/></proof>
     </goal>
    </transf>
    </goal>
@@ -720,7 +686,7 @@ abs (to_real result -. t3)
   <proof prover="6"><result status="valid" time="0.045184" steps="113"/></proof>
   </goal>
   <goal name="slse&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.152561" steps="509"/></proof>
+  <proof prover="6"><result status="valid" time="0.152561" steps="510"/></proof>
   </goal>
   <goal name="slse&#39;vc.9" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.065748" steps="110"/></proof>
@@ -744,7 +710,7 @@ abs (to_real result -. t3)
     </transf>
     </goal>
     <goal name="slse&#39;vc.10.1.1" expl="equality hypothesis" proved="true">
-    <proof prover="6"><result status="valid" time="0.405030" steps="1622"/></proof>
+    <proof prover="6"><result status="valid" time="0.405030" steps="1624"/></proof>
     </goal>
    </transf>
    </goal>

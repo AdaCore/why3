@@ -40,7 +40,6 @@ module SinCosSingle
 
   let ghost cos_and_sine_example (a :usingle)
     ensures {
-      let a = to_real a in
       let t = 1. +. eps in
       abs (to_real result -. 1.)
       <=. (3. *. eps +. t *.
@@ -152,7 +151,6 @@ module SinCosDouble
 
   let ghost cos_and_sine_example (a :udouble)
     ensures {
-      let a = to_real a in
       let t = 1. +. eps in
       abs (to_real result -. 1.)
       <=. (3. *. eps +. t *.

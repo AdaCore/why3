@@ -88,6 +88,8 @@ module LSE
 
   let ghost function exp_of_f (f: int -> usingle) = (fun i -> exp ((real_fun f) i))
 
+  lemma compat_order_mult : forall x y z. 0. <=. z -> x <. y -> z *. x <. z *. y
+
   let ghost lse (f : int -> usingle) (n:int) : usingle
     requires { 0 < n < 8388608 }
     ensures {
