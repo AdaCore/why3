@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Gappa" version="1.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.8.10" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Coq" version="8.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="4000"/>
+<prover id="9" name="Coq" version="8.16.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="11" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="double_of_int.why"/>
@@ -90,7 +90,7 @@
  <proof prover="7"><result status="valid" time="0.030000" steps="155"/></proof>
  </goal>
  <goal name="exp_const" proved="true">
- <proof prover="5" timelimit="30"><path name="double_of_int_DoubleOfInt_exp_const_1.v"/><result status="valid" time="0.690000"/></proof>
+ <proof prover="9" timelimit="30"><path name="double_of_int_DoubleOfInt_exp_const_1.v"/><result status="valid" time="0.456123"/></proof>
  </goal>
  <goal name="to_nat_mantissa_1" proved="true">
  <proof prover="1"><result status="valid" time="0.773130" steps="1093155"/></proof>
@@ -165,7 +165,7 @@
  <proof prover="7"><result status="valid" time="0.272401" steps="175"/></proof>
  </goal>
  <goal name="from_int2c_to_nat_sub_pos" proved="true">
- <proof prover="5" timelimit="60"><path name="double_of_int_DoubleOfInt_from_int2c_to_nat_sub_pos_1.v"/><result status="valid" time="0.820000"/></proof>
+ <proof prover="9" timelimit="60"><path name="double_of_int_DoubleOfInt_from_int2c_to_nat_sub_pos_1.v"/><result status="valid" time="0.451225"/></proof>
  </goal>
  <goal name="lemma1_pos" proved="true">
  <transf name="split_all_full" proved="true" >
@@ -181,7 +181,7 @@
  <proof prover="6"><result status="valid" time="0.130000"/></proof>
  </goal>
  <goal name="from_int2c_to_nat_sub_neg" proved="true">
- <proof prover="5"><path name="double_of_int_DoubleOfInt_from_int2c_to_nat_sub_neg_1.v"/><result status="valid" time="0.820000"/></proof>
+ <proof prover="9"><path name="double_of_int_DoubleOfInt_from_int2c_to_nat_sub_neg_1.v"/><result status="valid" time="0.512619"/></proof>
  </goal>
  <goal name="lemma1_neg" proved="true">
  <transf name="split_all_full" proved="true" >

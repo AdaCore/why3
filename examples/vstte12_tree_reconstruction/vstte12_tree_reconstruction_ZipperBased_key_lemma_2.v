@@ -133,13 +133,13 @@ intros.
 generalize (depths_head t1 d1).
 destruct (depths d1 t1); intuition.
 simpl in H3. injection H3.
-intros; omega.
+intros; lia.
 (* t = Node _ _ *)
 rename t1 into left, IHt1 into IHleft,
        t2 into right, IHt2 into IHright.
 destruct l.
 (* l = Nil *)
-simpl; intros; omega.
+simpl; intros; lia.
 (* l = Cons _ *)
 destruct p as (d2, t2).
 intros d d1 t1 s hdd1 hlen hg.
@@ -150,21 +150,21 @@ assert (hg12: g (app (cons (d2, t2) nil) (cons (d1, t1) nil))).
   apply g_tail with (List.rev l); assumption.
 inversion hg12. subst. clear H5.
 assert (ineq: (d1 <> d2)).
-  destruct t2; simpl in H1; omega.
+  destruct t2; simpl in H1; lia.
 intros eq.
-assert (case: (d2 < d1 \/ d1 < d2)%Z) by omega. destruct case as [case|case].
+assert (case: (d2 < d1 \/ d1 < d2)%Z) by lia. destruct case as [case|case].
 (* d2 < d1 *)
 assert (L0: (forall t2 d1 d2, greedy d1 d2 t2 -> d2 < d1 ->
    match depths d2 t2 with cons x _ => x < d1 | Nil  => False end)%Z).
   induction t0.
-  simpl; intros; omega.
+  simpl; intros; lia.
   simpl.
   clear IHt0_2.
   intros d0 d3 (diseq, gr) lt.
   assert (d0 <> d3+1)%Z. 
-    destruct t0_1; simpl in gr; omega.
+    destruct t0_1; simpl in gr; lia.
   assert (d3+1 < d0)%Z.
-    omega.
+    lia.
   generalize (IHt0_1 d0 (d3+1)%Z gr H0).
   destruct (depths (d3 + 1) t0_1).
   intuition.
@@ -180,16 +180,16 @@ assert (L1: forall t d1 t1 l s d, (d < d1)%Z ->
   destruct (depths d1 t1).
   intuition.
   destruct l; auto.
-  simpl in H0. injection H0; intros; omega.
+  simpl in H0. injection H0; intros; lia.
   intros.
-  assert (case2: (d+1 = d1 \/ d+1 < d1)%Z) by omega. destruct case2.
+  assert (case2: (d+1 = d1 \/ d+1 < d1)%Z) by lia. destruct case2.
   rewrite H1 in *.
   assert (l = app (depths d1 t2) s).
     rewrite <- Append.Append_assoc in H0.
     generalize (depths_unique _ _ _ _ _ H0); intros; intuition.
   generalize (depths_head t2 d1).
   subst l. destruct (depths d1 t2).
-  intuition. simpl. omega. 
+  intuition. simpl. lia. 
   clear IHt2.
   apply (IHt1 d1 t0 l (app (depths (d+1) t2) s) (d+1))%Z; auto.
   rewrite Append.Append_assoc; assumption.
@@ -203,10 +203,10 @@ subst l0.
 destruct (depths d2 t2).
 intuition.
 simpl.
-intros; omega.
+intros; lia.
 
 (* d1 < d2 *)
-assert (case2: (d+1 = d1 \/ d+1 < d1)%Z) by omega. destruct case2.
+assert (case2: (d+1 = d1 \/ d+1 < d1)%Z) by lia. destruct case2.
 (* d+1 = d1 *)
 rewrite H in *.
 assert (t1 = left).
@@ -222,14 +222,14 @@ destruct l.
 simpl in H0.
 assert (d1 >= d2)%Z.
   rewrite Append.Append_l_nil in H0. symmetry in H0.
-  generalize (depths_subtree _ _ _ _ _ H0); omega.
-omega.
+  generalize (depths_subtree _ _ _ _ _ H0); lia.
+lia.
 (* l = Cons _ _ *)
 clear IHleft.
 apply (IHright (cons p l) d1 d2 t2 s); auto.
 replace (Length.length (p::l)) with (1+Length.length l)%Z.
   generalize (Length.Length_nonnegative l).
-  omega.
+  lia.
   trivial.
 (* d+1 < d1 *)
 clear IHright.

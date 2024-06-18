@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Zenon" version="0.8.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Coq" version="8.16.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="4" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="0"/>
 <prover id="6" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC3" version="2.2" timelimit="5" steplimit="0" memlimit="0"/>
@@ -28,7 +29,6 @@
 <prover id="40" name="Alt-Ergo" version="2.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="45" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="46" name="Alt-Ergo" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="47" name="Coq" version="8.11.2" timelimit="5" steplimit="0" memlimit="4000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="genealogy.why"/>
 <theory name="Genealogy" proved="true">
@@ -36,6 +36,7 @@
  <proof prover="0" timelimit="1"><result status="valid" time="0.010000" steps="1150"/></proof>
  <proof prover="1"><result status="valid" time="0.000000" steps="9"/></proof>
  <proof prover="2"><result status="valid" time="0.020000"/></proof>
+ <proof prover="3"><path name="genealogy_Genealogy_Child_is_son_or_daughter_1.v"/><result status="valid" time="0.240000"/></proof>
  <proof prover="4"><result status="valid" time="0.000000" steps="271"/></proof>
  <proof prover="6"><result status="valid" time="0.000000"/></proof>
  <proof prover="7"><result status="valid" time="0.000000"/></proof>
@@ -58,7 +59,6 @@
  <proof prover="40"><result status="valid" time="0.010000" steps="5"/></proof>
  <proof prover="45"><result status="valid" time="0.020000" steps="319"/></proof>
  <proof prover="46"><result status="valid" time="0.000000" steps="5"/></proof>
- <proof prover="47"><path name="genealogy_Genealogy_Child_is_son_or_daughter_1.v"/><result status="valid" time="0.240000"/></proof>
  </goal>
  <goal name="Sibling_sym" proved="true">
  <proof prover="0"><result status="valid" time="0.010000" steps="1276"/></proof>
