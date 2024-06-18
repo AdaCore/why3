@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Coq" version="8.16.1" timelimit="3" steplimit="0" memlimit="0"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="3" steplimit="0" memlimit="0"/>
-<prover id="2" name="Coq" version="8.18.0" timelimit="3" steplimit="0" memlimit="0"/>
 <prover id="3" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="imp_n.why"/>
@@ -30,13 +30,13 @@
  <proof prover="3"><result status="valid" time="0.130000" steps="448"/></proof>
  </goal>
  <goal name="progress" proved="true">
- <proof prover="2"><path name="imp_n_Imp_progress_1.v"/><result status="valid" time="0.300000"/></proof>
+ <proof prover="0"><path name="imp_n_Imp_progress_1.v"/><result status="valid" time="0.463288"/></proof>
  </goal>
  <goal name="steps_non_neg" proved="true">
- <proof prover="2"><path name="imp_n_Imp_steps_non_neg_1.v"/><result status="valid" time="0.280000"/></proof>
+ <proof prover="0"><path name="imp_n_Imp_steps_non_neg_1.v"/><result status="valid" time="0.280000"/></proof>
  </goal>
  <goal name="many_steps_seq" proved="true">
- <proof prover="2"><path name="imp_n_Imp_many_steps_seq_1.v"/><result status="valid" time="0.279444"/></proof>
+ <proof prover="0"><path name="imp_n_Imp_many_steps_seq_1.v"/><result status="valid" time="0.279444"/></proof>
  </goal>
  <goal name="eval_subst_expr" proved="true">
  <transf name="induction_ty_lex" proved="true" >
@@ -46,7 +46,7 @@
  </transf>
  </goal>
  <goal name="eval_subst" proved="true">
- <proof prover="2"><path name="imp_n_Imp_eval_subst_1.v"/><result status="valid" time="0.330000"/></proof>
+ <proof prover="0"><path name="imp_n_Imp_eval_subst_1.v"/><result status="valid" time="0.480060"/></proof>
  </goal>
  <goal name="skip_rule" proved="true">
  <proof prover="3"><result status="valid" time="0.040000" steps="226"/></proof>
@@ -58,10 +58,10 @@
  <proof prover="3"><result status="valid" time="0.020000" steps="94"/></proof>
  </goal>
  <goal name="if_rule" proved="true">
- <proof prover="2"><path name="imp_n_Imp_if_rule_1.v"/><result status="valid" time="0.340000"/></proof>
+ <proof prover="0"><path name="imp_n_Imp_if_rule_1.v"/><result status="valid" time="0.340000"/></proof>
  </goal>
  <goal name="while_rule" proved="true">
- <proof prover="2"><path name="imp_n_Imp_while_rule_1.v"/><result status="valid" time="0.370000"/></proof>
+ <proof prover="0"><path name="imp_n_Imp_while_rule_1.v"/><result status="valid" time="0.370000"/></proof>
  </goal>
  <goal name="consequence_rule" proved="true">
  <proof prover="1"><result status="valid" time="0.050000"/></proof>

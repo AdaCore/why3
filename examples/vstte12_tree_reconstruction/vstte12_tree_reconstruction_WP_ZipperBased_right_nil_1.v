@@ -123,7 +123,7 @@ generalize (List.rev l). clear l.
 destruct l.
 (* l = Nil => contradiction *)
 intros.
-simpl in H. omega.
+simpl in H. lia.
 (* l = Cons *)
 intros. destruct p as (d1, t1).
 intros eq.
@@ -139,14 +139,14 @@ assert (d < d1)%Z.
   assert (forest_depths l = nil). rewrite H1 in eq at 2.
     generalize (depths_unique _ _ _ _ _ eq). intuition.
   simpl in H.
-  destruct l. simpl in H. omega.
+  destruct l. simpl in H. lia.
   assert (cons p l = nil).
   destruct (cons p l); auto.
   simpl in H2. destruct p0. 
     generalize (depths_head t z). destruct (depths z t). intuition.
     simpl in H2. discriminate H2.
   discriminate H3.
-  omega.
+  lia.
 generalize eq; clear eq.
 replace (depths d t) with (app (depths d t) nil).
    2:rewrite Append.Append_l_nil; trivial.
@@ -154,5 +154,5 @@ apply key_lemma; auto.
 simpl in H. 
 rewrite Append.Append_length in H.
 rewrite Reverse.Reverse_length in H. simpl in H.
-omega.
+lia.
 Qed.

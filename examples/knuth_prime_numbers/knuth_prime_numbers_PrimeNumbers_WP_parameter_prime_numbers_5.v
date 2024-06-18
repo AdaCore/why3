@@ -75,16 +75,20 @@ Parameter mixfix_lblsmnrb:
   forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a ->
   array a.
 
+Axiom mixfix_lblsmnrb'spec'0 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
+  ((length (mixfix_lblsmnrb a1 i v)) = (length a1)).
+
 Axiom mixfix_lblsmnrb'spec :
   forall {a:Type} {a_WT:WhyType a},
   forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
-  ((length (mixfix_lblsmnrb a1 i v)) = (length a1)) /\
   ((elts (mixfix_lblsmnrb a1 i v)) = (map.Map.set (elts a1) i v)).
 
 Parameter make:
   forall {a:Type} {a_WT:WhyType a}, Numbers.BinNums.Z -> a -> array a.
 
-Axiom make'spec :
+Axiom make_spec :
   forall {a:Type} {a_WT:WhyType a},
   forall (n:Numbers.BinNums.Z) (v:a), (0%Z <= n)%Z ->
   (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
@@ -93,10 +97,12 @@ Axiom make'spec :
 
 Import Zquot.
 
+Require Import Lia.
+
 (* Why3 goal *)
 Theorem prime_numbers'vc :
   forall (m:Numbers.BinNums.Z), (2%Z <= m)%Z ->
-  let p := make m 0%Z in
+  forall (p:array Numbers.BinNums.Z),
   (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < m)%Z ->
    ((mixfix_lbrb p i) = 0%Z)) /\
   ((length p) = m) -> forall (p1:array Numbers.BinNums.Z),
@@ -128,27 +134,31 @@ Theorem prime_numbers'vc :
   ~ ((ZArith.BinInt.Z.rem n1 (mixfix_lbrb p4 k)) = 0%Z) ->
   ((mixfix_lbrb p4 k) < (ZArith.BinInt.Z.quot n1 (mixfix_lbrb p4 k)))%Z ->
   ((k + 1%Z)%Z < j)%Z.
+(* Why3 intros m h1 p (h2,h3) p1 h4 (h5,h6) p2 h7 (h8,h9) o h10 n p3 h11 j
+        ((h12,h13),(h14,((h15,h16),(h17,h18)))) n1 p4 h19 k
+        ((h20,h21),(h22,((h23,h24),(h25,(h26,h27))))) h28 h29. *)
 Proof.
 intros m h1 p (h2,h3) p1 h4 h5 p2 h6 h7 o h8 n p3 h9 j
 ((h10,h11),(h12,((h13,h14),(h15,h16)))) n1 p4 h17 k
 ((h18,h19),(h20,((h21,h22),(h23,(h24,h25))))) h26 h27.
-cut (k <> j - 1)%Z. omega.
+cut (k <> j - 1)%Z. lia.
 intros ->.
 assert (2 < elts p4 (j-1))%Z.
 destruct h20 as (hh1, (hh2, _)).
-rewrite <- hh1. apply hh2; omega.
+rewrite <- hh1. apply hh2; lia.
 generalize (Z_quot_rem_eq n1 (elts p4 (j-1))%Z). intro div.
-assert (ne1: (0 <= n1 /\ elts p4 (j-1) <> 0)%Z) by omega.
+assert (ne1: (0 <= n1 /\ elts p4 (j-1) <> 0)%Z) by lia.
 assert (mod_: (0 <= Z.rem n1 (elts p4 (j-1)))%Z).
 destruct (not_Zeq_inf _ _ (proj2 ne1)) as [Zm|Zm].
 now apply Zrem_lt_pos_neg.
 now apply Zrem_lt_pos_pos.
 assert (elts p4 (j - 1) * elts p4 (j - 1) < elts p4 (j - 1) * (Z.quot n1 (elts p4 (j - 1))))%Z.
 apply Zmult_lt_compat_l.
-omega.
+lia.
 assumption.
 assert (2 * elts p4 (j - 1) < elts p4 (j - 1) * elts p4 (j - 1))%Z.
-apply Zmult_lt_compat_r; omega.
+apply Zmult_lt_compat_r; lia.
 unfold mixfix_lbrb in h22.
-omega.
+lia.
 Qed.
+
