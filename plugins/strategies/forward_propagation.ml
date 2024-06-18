@@ -27,11 +27,13 @@ type ufloat_symbols = {
   umul : lsymbol;
   udiv : lsymbol;
   uminus : lsymbol;
+  udiv_exact : lsymbol;
   uadd_infix : lsymbol;
   usub_infix : lsymbol;
   umul_infix : lsymbol;
   udiv_infix : lsymbol;
   uminus_prefix : lsymbol;
+  udiv_exact_infix : lsymbol;
   eps : term;
   eta : term;
 }
@@ -166,9 +168,15 @@ let is_uminus_ls ls =
   || ls_equal ls !!symbols.udouble_symbols.uminus
   || ls_equal ls !!symbols.udouble_symbols.uminus_prefix
 
+let is_uexact_div_ls ls =
+  ls_equal ls !!symbols.usingle_symbols.udiv_exact
+  || ls_equal ls !!symbols.usingle_symbols.udiv_exact_infix
+  || ls_equal ls !!symbols.udouble_symbols.udiv_exact
+  || ls_equal ls !!symbols.udouble_symbols.udiv_exact_infix
+
 let is_uop ls =
   is_uadd_ls ls || is_usub_ls ls || is_umul_ls ls || is_udiv_ls ls
-  || is_uminus_ls ls
+  || is_uminus_ls ls || is_uexact_div_ls ls
 
 let minus t = fs_app !!symbols.minus_infix [ t ] ty_real
 
@@ -325,6 +333,8 @@ let string_of_ufloat_type_and_op ts uop =
     else if is_usub_ls uop then
       "usub"
     else if is_umul_ls uop then
+      "umul"
+    else if is_uexact_div_ls uop then
       "umul"
     else
       failwith (asprintf "Unsupported uop '%a'" Pretty.print_ls uop)
@@ -714,6 +724,62 @@ let rec get_error_fmlas info t =
     in
     (terms_info, Some f, strats)
   (* `t` is the result of an other IEEE operation *)
+  | Some (ieee_op, [ t1; t2 ]) when is_uexact_div_ls ieee_op ->
+    let ts = get_ts t2 in
+    let eta = eta ts in
+    let to_real = to_real ts in
+    let terms_info, fmla1, strat_for_t1 = get_error_fmlas info t1 in
+    let strat_for_t1 = get_strat fmla1 strat_for_t1 in
+    let t1_info = get_info terms_info t1 in
+    let e1 = Option.get t1_info.error in
+    let fe =
+      {
+        exact = e1.exact //. to_real t2;
+        rel = e1.rel;
+        factor = e1.factor //. abs (to_real t2);
+        cst = (e1.cst //. abs (to_real t2)) ++. eta;
+      }
+    in
+    let err =
+      (e1.rel *. (e1.factor /. abs (to_real t2)))
+      +. ((e1.cst /. abs (to_real t2)) +. eta)
+    in
+    let err_simp =
+      (e1.rel **. (e1.factor //. abs (to_real t2)))
+      ++. ((e1.cst //. abs (to_real t2)) ++. eta)
+    in
+    let left = abs (to_real t -. (e1.exact //. to_real t2)) in
+    let s = string_of_ufloat_type ts in
+    let strat =
+      Sapply_trans
+        ( "apply",
+          [
+            "udiv_exact_" ^ s ^ "_error_propagation";
+            "with";
+            sprintf "%s" (term_to_str t1);
+          ],
+          [
+            strat_for_t1;
+            default_strat ();
+            default_strat ();
+            default_strat ();
+            default_strat ();
+            default_strat ();
+            default_strat ();
+          ] )
+    in
+    let s =
+      Sapply_trans
+        ("assert", [ term_to_str (left <=. err) ], [ strat; default_strat () ])
+    in
+    let term_info = add_fw_error terms_info t fe in
+    if t_equal err err_simp then
+      (term_info, Some (left <=. err), s)
+    else
+      ( term_info,
+        Some (left <=. err_simp),
+        Sapply_trans
+          ("assert", [ term_to_str (left <=. err) ], [ s; default_strat () ]) )
   | Some _ -> (info.terms_info, None, default_strat ())
   | None -> (
     match t_info.error with
@@ -1000,11 +1066,13 @@ let init_symbols env printer =
       umul = f th "umul";
       udiv = f th "udiv";
       uminus = f th "uminus";
+      udiv_exact = f th "udiv_exact";
       uadd_infix = f th (Ident.op_infix "++.");
       usub_infix = f th (Ident.op_infix "--.");
       umul_infix = f th (Ident.op_infix "**.");
       udiv_infix = f th (Ident.op_infix "//.");
       uminus_prefix = f th (Ident.op_prefix "--.");
+      udiv_exact_infix = f th (Ident.op_infix "///.");
       eps = fs_app (f th "eps") [] ty_real;
       eta = fs_app (f th "eta") [] ty_real;
     }
