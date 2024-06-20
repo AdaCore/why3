@@ -17,7 +17,7 @@ RUN apt-get update -yq && \
 RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.0.5/cvc5-Linux -O /usr/local/bin/cvc5-1.0.5 && \
     chmod a+x /usr/local/bin/cvc5-1.0.5
 ## CVC4 1.8
-RUN wget --quiet https://github.com/CVC4/CVC4/releases/download/1.8/cvc4-1.8-x86_64-linux-opt -O /usr/local/bin/cvc4-1.8 && \
+RUN wget --quiet https://github.com/CVC4/CVC4-archived/releases/download/1.8/cvc4-1.8-x86_64-linux-opt -O /usr/local/bin/cvc4-1.8 && \
     chmod a+x /usr/local/bin/cvc4-1.8
 ## CVC4 1.7
 RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.7-x86_64-linux-opt -O /usr/local/bin/cvc4-1.7 && \
@@ -67,16 +67,16 @@ WORKDIR /home/why3
 ENV OPAM_PACKAGES="num menhir mlmpfr.4.1.0+bugfix2 lablgtk3-sourceview3 zarith camlzip conf-autoconf"
 RUN opam init -y --no-setup -j4 --bare --disable-sandboxing && \
     opam switch create latest ocaml-base-compiler.5.0.0 && \
-    opam switch create bench  ocaml-base-compiler.4.08.1 && \
+    opam switch create bench  ocaml-base-compiler.4.09.1 && \
     opam switch create full   ocaml-base-compiler.4.13.1 && \
     opam repository add coq-released https://coq.inria.fr/opam/released --all-switches && \
     opam install -y --switch=latest $OPAM_PACKAGES && \
-    opam install -y --switch=bench  $OPAM_PACKAGES zenon.0.8.5 coq.8.11.2 alt-ergo.2.5.2 && \
-    opam install -y --switch=full   $OPAM_PACKAGES re coq.8.15.1 coq-flocq.4.1.0 js_of_ocaml-ppx alt-ergo.2.3.3 sexplib ppx_deriving ppx_sexp_conv ocamlgraph && \
+    opam install -y --switch=bench  $OPAM_PACKAGES zenon.0.8.5 coq.8.16.1 alt-ergo.2.5.4 && \
+    opam install -y --switch=full   $OPAM_PACKAGES re coq.8.18.0 coq-flocq js_of_ocaml-ppx alt-ergo.2.5.4 sexplib ppx_deriving ppx_sexp_conv ocamlgraph && \
     opam clean -a -c -r -s --logs
 
 USER root
-RUN cp /home/why3/.opam/full/bin/alt-ergo /usr/local/bin/alt-ergo-2.3.3
-RUN cp /home/why3/.opam/bench/bin/alt-ergo /usr/local/bin/alt-ergo-2.5.2
+RUN cp /home/why3/.opam/full/bin/alt-ergo /usr/local/bin/alt-ergo-2.5.4
+RUN cp /home/why3/.opam/bench/bin/alt-ergo /usr/local/bin/alt-ergo-2.5.4
 
 USER why3
