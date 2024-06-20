@@ -124,46 +124,39 @@ let ghost raytracer (theta phi nx ny nz:usingle)
     let nx = to_real nx in
     let phi = to_real phi in
     let theta = to_real theta in
-    let sphi = sin phi in
-    let cphi = cos phi in
-    let ctheta = cos theta in
-    let stheta = sin theta in
-    let nz_ctheta = nz *. ctheta in
-    let ny_stheta = ny *. stheta in
-    let nx_ctheta = nx *. ctheta in
-    let nz_ctheta_sphi = nz_ctheta *. sphi in
-    let nx_ctheta_cphi = nx_ctheta *. cphi in
-    let t = 1.0 +. eps in
-    let tccerr = t *. cos_cst_error in
-    let t25 = eps +. cos_rel_error *. t in
-    let t26 = eps +. sin_rel_error *. t in
-    let t29 = tccerr *. abs nz +. eta in
-    let t30 = tccerr *. abs nx +. eta in
-    let t31 = eps +. (t25 +. cos_rel_error +. t25 *. cos_rel_error) *. t in
-    let t32 = eps +. (t25 +. sin_rel_error +. t25 *. sin_rel_error) *. t in
-    let t33 = t31 +. t26 +. eps in
-    abs (to_real result -. (nx_ctheta_cphi +. ny_stheta +. nz_ctheta_sphi))
+    let t1 = 1.0 +. eps in
+    let t2c = eps +. cos_rel_error *. t1 in
+    let t2s = eps +. sin_rel_error *. t1 in
+    let t3c = eps +. (t2c +. cos_rel_error +. t2c *. cos_rel_error) *. t1 in
+    let t3s = eps +. (t2c +. sin_rel_error +. t2c *. sin_rel_error) *. t1 in
+    let t4 = t3c +. t2s +. eps in
+    abs (to_real result -.
+         (nx *. cos theta *. cos phi +. ny *. sin theta +. nz *. cos theta *. sin phi))
     <=.
         (* Relative part of the error *)
-        (t33 +. t32 +. eps) *. (abs nx_ctheta_cphi +. abs ny_stheta +. abs nz_ctheta_sphi)
+        (t4 +. t3s +. eps) *.
+        (abs (nx *. cos theta *. cos phi) +.
+                    abs (ny *. sin theta) +. abs (nz *. cos theta *. sin phi))
         (* Absolute part of the error *)
-        +. (t +. t32)
-            *. ((t +. t26)
-                 *. (t *. cos_cst_error *. (1.0 +. t25) *. abs nx_ctheta
-                     +. t *. t30 *. (1.0 +. cos_rel_error) *. abs cphi
-                     +. t *. t30 *. cos_cst_error
+        +. (t1 +. t3s)
+            *. ((t1 +. t2s)
+                 *. (t1 *. (cos_cst_error *. (1.0 +. t2c) *. abs (nx *. cos theta)
+                            +. (t1 *. cos_cst_error *. abs nx +. eta) *.
+                               ((1.0 +. cos_rel_error) *. abs (cos phi) +. cos_cst_error))
                      +. eta)
-                +. (t +. t31) *. (t *. sin_cst_error *. abs ny +. eta))
-         +. (t +. t33)
-            *. (t *. sin_cst_error *. (1.0 +. t25) *. abs nz_ctheta
-                +. t *. t29 *. (1.0 +. sin_rel_error) *. abs sphi
-                +. t *. t29 *. sin_cst_error
+                +. (t1 +. t3c) *. (t1 *. sin_cst_error *. abs ny +. eta))
+         +. (t1 +. t4)
+            *. (t1 *. (sin_cst_error *. (1.0 +. t2c) *. abs (nz *. cos theta)
+                       +. (t1 *. cos_cst_error *. abs nz +. eta) *.
+                          ((1.0 +. sin_rel_error) *. abs (sin phi) +. sin_cst_error))
                 +. eta)
   }
 =
   nx **. cos_approx theta **. cos_approx phi
   ++. ny **. sin_approx theta
   ++. nz **. cos_approx theta **. sin_approx phi
+
+
 end
 
 module SinCosDouble
@@ -208,7 +201,6 @@ module SinCosDouble
 
   let ghost cos_and_sine_example (a :udouble)
     ensures {
-      let a = to_real a in
       let t = 1. +. eps in
       abs (to_real result -. 1.)
       <=. (3. *. eps +. t *.
