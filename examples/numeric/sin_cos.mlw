@@ -11,10 +11,10 @@ module SinCosSingle
   axiom sin_cst_error_range : 0. <=. sin_cst_error
   constant sin_max:real
   axiom sin_max_range : 0.0 <=. sin_max
-  val function sin_approx (x:usingle) : usingle
+  val sin_approx (x:usingle) : usingle
     requires { abs (to_real x) <=. sin_max }
     ensures {
-      abs (to_real result -. sin (to_real x)) <=. 
+      abs (to_real result -. sin (to_real x)) <=.
          sin_rel_error *. abs (sin (to_real x)) +. sin_cst_error
     }
 
@@ -24,11 +24,11 @@ module SinCosSingle
   axiom cos_cst_error_range : 0. <=. cos_cst_error
   constant cos_max:real
   axiom cos_max_range : 0.0 <=. cos_max
-  
-  val function cos_approx (x:usingle) : usingle
+
+  val cos_approx (x:usingle) : usingle
     requires { abs (to_real x) <=. cos_max }
     ensures {
-      abs (to_real result -. cos (to_real x)) <=. 
+      abs (to_real result -. cos (to_real x)) <=.
         cos_rel_error *. abs (cos (to_real x))  +. cos_cst_error
     }
 
@@ -81,11 +81,10 @@ module SinCosSingle
       }
   = cos_approx a **. cos_approx a ++. sin_approx a **. sin_approx a
 
-constant zeropointfive:usingle
-axiom zeropointfive_val : to_real zeropointfive = 0.5
+val exact_cte (x:real) : usingle
+  ensures { to_real result = x }
 
-constant twopoint5:usingle
-axiom twopoint5_val : to_real twopoint5 = 2.5
+(* Kinemactics example *)
 
 let ghost kinematics (theta1 theta2:usingle)
   requires { abs (to_real theta1) <=. 0.25 *. sin_max }
@@ -93,28 +92,26 @@ let ghost kinematics (theta1 theta2:usingle)
   ensures {
     let theta1 = to_real theta1 in
     let theta2 = to_real theta2 in
-    let t = 1.0 +. eps in
-    let t10 = theta1 +. theta2 in
-    let t11 = 0.5 *. sin theta1 in
-    let t12 = eps +. sin_rel_error *. t in
-    let t13 = 2.5 *. sin t10 in
-    let t14 = t +. t12 in
-    abs (to_real result -. (t11 +. t13)) <=. 
-      (* Relative part of the error *)
-      (2.0 *. t12 +. eps) *. (abs t11 +. abs t13)
-      (* Absolute part of the error *)
-      +. ((t14 *. ((t *. sin_cst_error *. 0.5) +. eta))
-             +. (t14
-                 *. ((t
-                       *. (eps *. abs t10 *. (1.0 +. sin_rel_error)
-                           +. sin_cst_error)
-                      *. 2.5)
-                     +. eta)))
+    let t1 = 1.0 +. eps in
+    let t2 = eps +. sin_rel_error *. t1 in
+    abs (to_real result -.
+         (0.5 *. sin theta1 +. 2.5 *. sin (theta1 +. theta2)))
+    <=.
+    (* Relative part of the error *)
+    (2.0 *. t2 +. eps) *.
+       (0.5 *. abs (sin theta1) +. 2.5 *. abs (sin (theta1 +. theta2)))
+    (* Absolute part of the error *)
+    +. (t1 +. t2) *.
+         (t1 *. (0.5 *. sin_cst_error
+                 +. 2.5 *. (eps *. abs (theta1 +. theta2) *. (1.0 +. sin_rel_error)
+                            +. sin_cst_error))
+          +. 2.0 *. eta)
   }
-= zeropointfive **. sin_approx (theta1) ++. twopoint5 **. sin_approx(theta1 ++. theta2)
+= exact_cte 0.5 **. sin_approx (theta1)
+  ++. exact_cte 2.5 **. sin_approx(theta1 ++. theta2)
 
 
-
+(* Raytracer example *)
 
 let ghost raytracer (theta phi nx ny nz:usingle)
   requires { abs (to_real phi) <=. sin_max }
@@ -217,8 +214,8 @@ module SinCosDouble
       <=. (3. *. eps +. t *.
              (2. *. sin_error +. sin_error *. sin_error +.
               2. *. cos_error +. cos_error *. cos_error))
-       +. eta *. 
-          (2. +. 4. *. eps +. 
+       +. eta *.
+          (2. +. 4. *. eps +.
            t *.
              (2. *. sin_error +. sin_error *. sin_error +.
               2. *. cos_error +. cos_error *. cos_error)
