@@ -1828,6 +1828,12 @@ let intf_mod_inst muc intf =
         { inst with mi_ls = Mls.add ls ls' inst.mi_ls }
       with Not_found -> raise (Symbol_not_found ls.ls_name) in
 
+    let add_exn inst xs =
+      try
+        let xs' = ns_find_xs ns_muc [xs.xs_name.id_string] in
+        { inst with mi_xs = Mxs.add xs xs' inst.mi_xs }
+      with Not_found -> raise (Symbol_not_found xs.xs_name) in
+
     let add_routine inst rs =
       try
         let rs' = ns_find_rs ns_muc [rs.rs_name.id_string] in
@@ -1840,16 +1846,21 @@ let intf_mod_inst muc intf =
     let aux_pure inst = function
       | { d_node = Dtype tys } -> add_type inst tys
       | { d_node = Dparam ls } -> add_logic inst ls
-      | { d_node = Dprop _ | Dlogic _ } -> inst
-      | _ -> raise Invalid_unit in
+      | { d_node = Dprop _ } -> inst
+      | { d_node = Dlogic lds } ->
+          List.fold_left (fun inst (ls, _) -> add_logic inst ls) inst lds
+      | { d_node = Dind (_, ids) } ->
+          List.fold_left (fun inst (ls, _) -> add_logic inst ls) inst ids
+      | { d_node = Ddata _ } -> assert false (* does not appear as PDpure *) in
 
     let aux_unit inst = function
       | Udecl { pd_node = PDtype its_defn; _ } ->
          List.fold_left (fun i d  -> add_type i d.itd_its.its_ts) inst its_defn
-      | Udecl { pd_node = PDlet (LDsym (rs, _)); _ } -> add_routine inst rs
+      | Udecl { pd_node = PDexn xs; _ } -> add_exn inst xs
       | Udecl { pd_node = PDpure; pd_pure; _ } ->
          List.fold_left aux_pure inst pd_pure
-      | Udecl _ -> raise Invalid_unit
+      | Udecl { pd_node = PDlet (LDsym (rs, _)); _ } -> add_routine inst rs
+      | Udecl { pd_node = PDlet (LDvar _ | LDrec _); _ } -> raise Invalid_unit
       | Uuse _ | Uscope (_, [Uuse _]) | Umeta _-> inst (* Nothing to do on use or meta ? *)
       | Uscope (s, ul) ->
          let ns_muc = try ns_find_ns ns_muc [s] with Not_found -> empty_ns in
