@@ -13,6 +13,7 @@ Plugins
 
 Provers
   * Alt-Ergo FPA requires Alt-Ergo version at least 2.5.4
+  * support for Coq 8.19
 
 Version 1.7.2, April 18, 2024
 -----------------------------
