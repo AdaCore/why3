@@ -180,93 +180,93 @@ module HelperLemmas
     requires { 0. <. z }
     ensures { x /. z <=. y /. z }
     = ()
-    
+
   let ghost div_order_compat2 (x y z:real)
     requires { x <=. y }
     requires { 0. >. z }
     ensures { y /. z <=. x /. z }
-    = ()  
+    = ()
 
-  let ghost mult_err (x exact_x x' x_rel_err x_cst_err y:real)
-    requires { 0. <=. x_rel_err }
-    requires { 0. <=. x_cst_err }
-    requires { abs exact_x <=. x' }
-    requires { abs (x -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
-    ensures { abs (x *. y -. exact_x *. y) <=. x_rel_err *. abs (x' *. y) +. x_cst_err *. abs y }
+  let ghost mult_err (x x_exact x_factor x_rel x_abs y:real)
+    requires { 0. <=. x_rel }
+    requires { 0. <=. x_abs }
+    requires { abs x_exact <=. x_factor }
+    requires { abs (x -. x_exact) <=. x_rel *. x_factor +. x_abs }
+    ensures { abs (x *. y -. x_exact *. y) <=. x_rel *. abs (x_factor *. y) +. x_abs *. abs y }
   =
   assert {
     y >=. 0. ->
-    abs (x *. y -. exact_x *. y) <=. abs (x_rel_err *. x' *. y) +. x_cst_err *. abs y
+    abs (x *. y -. x_exact *. y) <=. abs (x_rel *. x_factor *. y) +. x_abs *. abs y
     by
-      (exact_x -. x_rel_err *. x' -. x_cst_err) *. y <=. x *. y <=. (exact_x +. x_rel_err *. x' +. x_cst_err) *. y
+      (x_exact -. x_rel *. x_factor -. x_abs) *. y <=. x *. y <=. (x_exact +. x_rel *. x_factor +. x_abs) *. y
   };
   assert {
     y <. 0. ->
-    abs (x *. y -. exact_x *. y) <=. abs (x_rel_err *. x' *. y) +. x_cst_err *. abs y
+    abs (x *. y -. x_exact *. y) <=. abs (x_rel *. x_factor *. y) +. x_abs *. abs y
     by
-      (exact_x +. x_rel_err *. x' +. x_cst_err) *. y <=. x *. y <=. (exact_x -. x_rel_err *. x' -. x_cst_err) *. y
+      (x_exact +. x_rel *. x_factor +. x_abs) *. y <=. x *. y <=. (x_exact -. x_rel *. x_factor -. x_abs) *. y
   }
 
-  let ghost mult_err_combine (x exact_x x' x_rel_err x_cst_err y exact_y y' y_rel_err y_cst_err:real)
-    requires { 0. <=. x_rel_err }
-    requires { 0. <=. y_rel_err }
-    requires { 0. <=. x_cst_err }
-    requires { 0. <=. y_cst_err }
-    requires { abs exact_x <=. x' }
-    requires { abs exact_y <=. y' }
-    requires { abs (x -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
-    requires { abs (y -. exact_y) <=. y_rel_err *. y' +. y_cst_err }
+  let ghost mult_err_combine (x x_exact x_factor x_rel x_abs y exact_y y_factor y_rel y_abs:real)
+    requires { 0. <=. x_rel }
+    requires { 0. <=. y_rel }
+    requires { 0. <=. x_abs }
+    requires { 0. <=. y_abs }
+    requires { abs x_exact <=. x_factor }
+    requires { abs exact_y <=. y_factor }
+    requires { abs (x -. x_exact) <=. x_rel *. x_factor +. x_abs }
+    requires { abs (y -. exact_y) <=. y_rel *. y_factor +. y_abs }
     ensures {
-      abs (x *. y -. exact_x *. exact_y)
-      <=. (x_rel_err +. y_rel_err +. x_rel_err *. y_rel_err) *. (x' *. y')
-        +. (y_cst_err +. y_cst_err *. x_rel_err) *. x'
-        +. (x_cst_err +. x_cst_err *. y_rel_err) *. y'
-        +. x_cst_err *. y_cst_err
+      abs (x *. y -. x_exact *. exact_y)
+      <=. (x_rel +. y_rel +. x_rel *. y_rel) *. (x_factor *. y_factor)
+        +. (y_abs +. y_abs *. x_rel) *. x_factor
+        +. (x_abs +. x_abs *. y_rel) *. y_factor
+        +. x_abs *. y_abs
     }
   =
-  mult_err x exact_x x' x_rel_err x_cst_err y;
-  mult_err y exact_y y' y_rel_err y_cst_err exact_x;
-  mult_err y exact_y y' y_rel_err y_cst_err x';
+  mult_err x x_exact x_factor x_rel x_abs y;
+  mult_err y exact_y y_factor y_rel y_abs x_exact;
+  mult_err y exact_y y_factor y_rel y_abs x_factor;
   assert {
-    abs (x *. y -. exact_x *. exact_y) <=. (y_rel_err *. x' *. y') +. (y_cst_err *. x') +. (x_rel_err *. abs (x' *. y)) +. x_cst_err *. abs y
+    abs (x *. y -. x_exact *. exact_y) <=. (y_rel *. x_factor *. y_factor) +. (y_abs *. x_factor) +. (x_rel *. abs (x_factor *. y)) +. x_abs *. abs y
   };
   assert {
-    abs (x *. y -. exact_x *. exact_y) <=. (y_rel_err *. x' *. y') +. (x_rel_err *. (x' *. y' *. (1. +. y_rel_err) +. x' *. y_cst_err)) +. y_cst_err *. x' +. x_cst_err *. abs y
+    abs (x *. y -. x_exact *. exact_y) <=. (y_rel *. x_factor *. y_factor) +. (x_rel *. (x_factor *. y_factor *. (1. +. y_rel) +. x_factor *. y_abs)) +. y_abs *. x_factor +. x_abs *. abs y
     by
-      abs (x' *. y) <=. x' *. y' *. (1. +. y_rel_err) +. x' *. y_cst_err
+      abs (x_factor *. y) <=. x_factor *. y_factor *. (1. +. y_rel) +. x_factor *. y_abs
   };
   assert {
-    x_cst_err *. abs y <=. x_cst_err *. (y' *. (1. +. y_rel_err) +. y_cst_err)
+    x_abs *. abs y <=. x_abs *. (y_factor *. (1. +. y_rel) +. y_abs)
   }
 
   use real.ExpLog
 
-  let ghost exp_approx_err (x x_approx x' a b :real)
-    requires { abs (x_approx -. x) <=. x' *. a +. b }
-    requires { x <=. x' }
+  let ghost exp_approx_err (x x_approx x_factor a b :real)
+    requires { abs (x_approx -. x) <=. x_factor *. a +. b }
+    requires { x <=. x_factor }
     ensures {
-      abs (exp(x_approx) -. exp(x)) <=. exp(x) *. (exp(a *. x' +. b) -. 1.)
+      abs (exp(x_approx) -. exp(x)) <=. exp(x) *. (exp(a *. x_factor +. b) -. 1.)
     }
   =
   assert {
-    exp(x_approx) <=. exp(x) +. exp(x) *. (exp(a *. x' +. b) -. 1.)
+    exp(x_approx) <=. exp(x) +. exp(x) *. (exp(a *. x_factor +. b) -. 1.)
     by
-      exp (x_approx) <=. exp(x) *. exp (a *. x' +. b)
+      exp (x_approx) <=. exp(x) *. exp (a *. x_factor +. b)
   };
   assert {
-    exp(x_approx) >=. exp(x) -. exp(x) *. (exp(a *. x' +. b) -. 1.)
+    exp(x_approx) >=. exp(x) -. exp(x) *. (exp(a *. x_factor +. b) -. 1.)
     by
-      exp (x_approx) >=. exp(x) *. exp (-. a *. x' -. b)
+      exp (x_approx) >=. exp(x) *. exp (-. a *. x_factor -. b)
     so
-      exp(x_approx) -. exp(x) >=. exp(x) *. (exp (-. a *. x' -. b) -. 1.)
+      exp(x_approx) -. exp(x) >=. exp(x) *. (exp (-. a *. x_factor -. b) -. 1.)
     so
-      exp(a *. x' +. b) +. exp(-.a *. x' -. b) >=. 2.
+      exp(a *. x_factor +. b) +. exp(-.a *. x_factor -. b) >=. 2.
     so
-      -. exp(a *. x' +. b) +. 1. <=. exp(-.a *. x' -. b) -. 1.
+      -. exp(a *. x_factor +. b) +. 1. <=. exp(-.a *. x_factor -. b) -. 1.
     so
-      exp(x) *. ((-. exp(a *. x' +. b)) +. 1.) <=. exp(x) *. (exp(-. a *. x' -. b) -. 1.)
+      exp(x) *. ((-. exp(a *. x_factor +. b)) +. 1.) <=. exp(x) *. (exp(-. a *. x_factor -. b) -. 1.)
     so
-      -. exp(x) *. (exp(a *. x' +. b) -. 1.) <=. exp(x) *. (exp(-. a *. x' -. b) -. 1.)
+      -. exp(x) *. (exp(a *. x_factor +. b) -. 1.) <=. exp(x) *. (exp(-. a *. x_factor -. b) -. 1.)
   }
 
   let lemma log_1_minus_x (x:real)
@@ -291,59 +291,59 @@ module HelperLemmas
   div_order_compat (log (1. +. x)) (-. log (1. -. x)) (log 10.);
   log_1_minus_x x
 
-  let ghost log_approx_err (x x_approx x' a b :real)
-    requires { abs (x_approx -. x) <=. x' *. a +. b }
-    requires { 0. <. (x -. a *. x' -. b) }
-    requires { 0. <. x <=. x' }
+  let ghost log_approx_err (x x_approx x_factor a b :real)
+    requires { abs (x_approx -. x) <=. x_factor *. a +. b }
+    requires { 0. <. (x -. a *. x_factor -. b) }
+    requires { 0. <. x <=. x_factor }
     ensures {
-      abs (log x_approx -. log x) <=. -. log(1. -. ((a *. x' +. b) /. x))
+      abs (log x_approx -. log x) <=. -. log(1. -. ((a *. x_factor +. b) /. x))
     }
   =
-    assert { a *. x' +. b  = x *. ((a *. x' +. b) /. x) };
+    assert { a *. x_factor +. b  = x *. ((a *. x_factor +. b) /. x) };
     assert {
-      log (x *. (1. -. (a *. x' +. b) /. x))
+      log (x *. (1. -. (a *. x_factor +. b) /. x))
       <=. log x_approx
-      <=. log (x *. (1. +. (a *. x' +. b) /.x))
+      <=. log (x *. (1. +. (a *. x_factor +. b) /.x))
       by
-        0. <.  (x -. (a *. x' +. b)) <=. x_approx
+        0. <.  (x -. (a *. x_factor +. b)) <=. x_approx
     };
-    log_1_minus_x ((a *. x' +. b) /. x)
+    log_1_minus_x ((a *. x_factor +. b) /. x)
 
-  let ghost log2_approx_err (x x_approx x' a b :real)
-    requires { abs (x_approx -. x) <=. x' *. a +. b }
-    requires { 0. <. (x -. a *. x' -. b) }
-    requires { 0. <. x <=. x' }
+  let ghost log2_approx_err (x x_approx x_factor a b :real)
+    requires { abs (x_approx -. x) <=. x_factor *. a +. b }
+    requires { 0. <. (x -. a *. x_factor -. b) }
+    requires { 0. <. x <=. x_factor }
     ensures {
-      abs (log2 x_approx -. log2 x) <=. -. log2(1. -. ((a *. x' +. b) /. x))
+      abs (log2 x_approx -. log2 x) <=. -. log2(1. -. ((a *. x_factor +. b) /. x))
     }
   =
-    assert { a *. x' +. b  = x *. ((a *. x' +. b) /. x) };
+    assert { a *. x_factor +. b  = x *. ((a *. x_factor +. b) /. x) };
     assert {
-      log2 (x *. (1. -. (a *. x' +. b) /. x))
+      log2 (x *. (1. -. (a *. x_factor +. b) /. x))
       <=. log2 x_approx
-      <=. log2 (x *. (1. +. (a *. x' +. b) /.x))
+      <=. log2 (x *. (1. +. (a *. x_factor +. b) /.x))
       by
-        0. <.  (x -. (a *. x' +. b)) <=. x_approx
+        0. <.  (x -. (a *. x_factor +. b)) <=. x_approx
     };
-    log2_1_minus_x ((a *. x' +. b) /. x)
+    log2_1_minus_x ((a *. x_factor +. b) /. x)
 
-  let ghost log10_approx_err (x x_approx x' a b :real)
-    requires { abs (x_approx -. x) <=. x' *. a +. b }
-    requires { 0. <. (x -. a *. x' -. b) }
-    requires { 0. <. x <=. x' }
+  let ghost log10_approx_err (x x_approx x_factor a b :real)
+    requires { abs (x_approx -. x) <=. x_factor *. a +. b }
+    requires { 0. <. (x -. a *. x_factor -. b) }
+    requires { 0. <. x <=. x_factor }
     ensures {
-      abs (log10 x_approx -. log10 x) <=. -. log10(1. -. ((a *. x' +. b) /. x))
+      abs (log10 x_approx -. log10 x) <=. -. log10(1. -. ((a *. x_factor +. b) /. x))
     }
   =
-    assert { a *. x' +. b  = x *. ((a *. x' +. b) /. x) };
+    assert { a *. x_factor +. b  = x *. ((a *. x_factor +. b) /. x) };
     assert {
-      log10 (x *. (1. -. (a *. x' +. b) /. x))
+      log10 (x *. (1. -. (a *. x_factor +. b) /. x))
       <=. log10 x_approx
-      <=. log10 (x *. (1. +. (a *. x' +. b) /.x))
+      <=. log10 (x *. (1. +. (a *. x_factor +. b) /.x))
       by
-        0. <.  (x -. (a *. x' +. b)) <=. x_approx
+        0. <.  (x -. (a *. x_factor +. b)) <=. x_approx
     };
-    log10_1_minus_x ((a *. x' +. b) /. x)
+    log10_1_minus_x ((a *. x_factor +. b) /. x)
 
   use real.Trigonometry
 
@@ -354,15 +354,15 @@ module HelperLemmas
   use int.Int
   use real.FromInt
 
-  let rec ghost sum_approx_err (rel_err cst_err:real) (f exact_f f' : int -> real) (a b:int)
+  let rec ghost sum_approx_err (fi_rel fi_abs:real) (f f_exact f_factor : int -> real) (a b:int)
     requires { a <= b }
-    requires { forall i. a <= i < b -> abs (f i -. exact_f i) <=. f' i *. rel_err +. cst_err }
+    requires { forall i. a <= i < b -> abs (f i -. f_exact i) <=. f_factor i *. fi_rel +. fi_abs }
     variant { b - a }
-    ensures { abs (sum f a b -. sum exact_f a b) <=. rel_err *. sum f' a b +. cst_err *. from_int (b-a) }
+    ensures { abs (sum f a b -. sum f_exact a b) <=. fi_rel *. sum f_factor a b +. fi_abs *. from_int (b-a) }
   =
   if (a < b) then
     begin
-      sum_approx_err rel_err cst_err f exact_f f' a (b - 1)
+      sum_approx_err fi_rel fi_abs f f_exact f_factor a (b - 1)
     end
 
 end
@@ -374,267 +374,267 @@ module USingleLemmas
   use real.Abs
   use USingle
 
-  let lemma uadd_single_error_propagation (x_uf y_uf r: usingle) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
+  let lemma uadd_single_error_propagation (x_f y_f r: usingle) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
     requires {
-      abs (to_real x_uf -. x) <=. x_rel_err *. x' +. x_cst_err
+      abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
     requires {
-      abs (to_real y_uf -. y) <=. y_rel_err *. y' +. y_cst_err
+      abs (to_real y_f -. y) <=. y_rel *. y_factor +. y_abs
     }
-    requires { abs x <=. x' }
-    requires { abs y <=. y' }
-    (* TODO: Use (0 <=. x_rel_err \/ (x' = 0 /\ x_cst_err = 0)), same for y. *)
-    requires { 0. <=. x_rel_err }
-    requires { 0. <=. y_rel_err }
-    requires { 0. <=. x_cst_err }
-    requires { 0. <=. y_cst_err }
-    requires { r = (x_uf ++. y_uf) }
+    requires { abs x <=. x_factor }
+    requires { abs y <=. y_factor }
+    (* TODO: Use (0 <=. x_rel \/ (x_factor = 0 /\ x_abs = 0)), same for y. *)
+    requires { 0. <=. x_rel }
+    requires { 0. <=. y_rel }
+    requires { 0. <=. x_abs }
+    requires { 0. <=. y_abs }
+    requires { r = (x_f ++. y_f) }
     ensures {
       abs (to_real r -. (x +. y)) <=.
-      (x_rel_err +. y_rel_err +. eps) *. (x' +. y')
-          +. ((1. +. eps +. y_rel_err) *. x_cst_err +. (1. +. eps +. x_rel_err) *. y_cst_err)
+      (x_rel +. y_rel +. eps) *. (x_factor +. y_factor)
+          +. ((1. +. eps +. y_rel) *. x_abs +. (1. +. eps +. x_rel) *. y_abs)
     }
   =
-  let ghost delta = abs (to_real (x_uf ++. y_uf) -. (to_real x_uf +. to_real y_uf)) in
+  let ghost delta = abs (to_real (x_f ++. y_f) -. (to_real x_f +. to_real y_f)) in
   assert {
-    0. <=. x_rel_err /\ 0. <=. y_rel_err ->
+    0. <=. x_rel /\ 0. <=. y_rel ->
     delta <=.
-      (eps +. y_rel_err) *. x' +. (eps +. x_rel_err) *. y'
-      +. (x_rel_err +. eps) *. y_cst_err +. (y_rel_err +. eps) *. x_cst_err
+      (eps +. y_rel) *. x_factor +. (eps +. x_rel) *. y_factor
+      +. (x_rel +. eps) *. y_abs +. (y_rel +. eps) *. x_abs
     by
-      (delta <=. x' *. x_rel_err +. x_cst_err +. x'
+      (delta <=. x_factor *. x_rel +. x_abs +. x_factor
       so
-        x' +. x_cst_err <=. eps *. (y' +. y_cst_err) ->
-        delta <=. (eps +. x_rel_err) *. y'
-        +. (eps +. y_rel_err) *. x'
-        +. (y_rel_err +. eps) *. x_cst_err +. (x_rel_err +. eps) *. y_cst_err
+        x_factor +. x_abs <=. eps *. (y_factor +. y_abs) ->
+        delta <=. (eps +. x_rel) *. y_factor
+        +. (eps +. y_rel) *. x_factor
+        +. (y_rel +. eps) *. x_abs +. (x_rel +. eps) *. y_abs
       by
-        delta <=. eps *. (y' +. y_cst_err) *. x_rel_err
-              +. (eps *. (y' +. y_cst_err)))
+        delta <=. eps *. (y_factor +. y_abs) *. x_rel
+              +. (eps *. (y_factor +. y_abs)))
       /\
-      (delta <=. y' *. y_rel_err +. y_cst_err +. y'
+      (delta <=. y_factor *. y_rel +. y_abs +. y_factor
       so
-      abs y' +. y_cst_err <=. eps *. (x' +. x_cst_err) ->
-      delta <=. (eps +. y_rel_err) *. x'
-        +. (eps +. x_rel_err) *. y'
-        +. (x_rel_err +. eps) *. y_cst_err +. (y_rel_err +. eps) *. x_cst_err
+      abs y_factor +. y_abs <=. eps *. (x_factor +. x_abs) ->
+      delta <=. (eps +. y_rel) *. x_factor
+        +. (eps +. x_rel) *. y_factor
+        +. (x_rel +. eps) *. y_abs +. (y_rel +. eps) *. x_abs
       by
-        delta <=. eps *. (x' +. x_cst_err) *. y_rel_err
-              +. (eps *. (x' +. x_cst_err)))
+        delta <=. eps *. (x_factor +. x_abs) *. y_rel
+              +. (eps *. (x_factor +. x_abs)))
       /\
       (
-       (eps *. (x' +. x_cst_err) <. abs y' +. y_cst_err /\
-       eps *. (y' +. y_cst_err) <. abs x' +. x_cst_err) ->
+       (eps *. (x_factor +. x_abs) <. abs y_factor +. y_abs /\
+       eps *. (y_factor +. y_abs) <. abs x_factor +. x_abs) ->
        (delta <=.
-       (eps +. y_rel_err) *. x' +. (eps +. x_rel_err) *. y'
-      +. (x_rel_err +. eps) *. y_cst_err +. (y_rel_err +. eps) *. x_cst_err
+       (eps +. y_rel) *. x_factor +. (eps +. x_rel) *. y_factor
+      +. (x_rel +. eps) *. y_abs +. (y_rel +. eps) *. x_abs
       by
-        abs (to_real x_uf +. to_real y_uf) <=.
-        abs (to_real x_uf -. x) +. x' +. (abs (to_real y_uf -. y) +. y')
+        abs (to_real x_f +. to_real y_f) <=.
+        abs (to_real x_f -. x) +. x_factor +. (abs (to_real y_f -. y) +. y_factor)
       so
-        x' *. x_rel_err <=. (y' +. y_cst_err) /. eps *. x_rel_err /\
-        y' *. y_rel_err <=. (x' +. x_cst_err) /. eps *. y_rel_err))
+        x_factor *. x_rel <=. (y_factor +. y_abs) /. eps *. x_rel /\
+        y_factor *. y_rel <=. (x_factor +. x_abs) /. eps *. y_rel))
   }
 
-  let lemma usub_single_error_propagation (x_uf y_uf r : usingle) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
+  let lemma usub_single_error_propagation (x_f y_f r : usingle) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
     requires {
-      abs (to_real x_uf -. x) <=. x_rel_err *. x' +. x_cst_err
+      abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
     requires {
-      abs (to_real y_uf -. y) <=. y_rel_err *. y' +. y_cst_err
+      abs (to_real y_f -. y) <=. y_rel *. y_factor +. y_abs
     }
-    requires { abs x <=. x' }
-    requires { abs y <=. y' }
-    requires { 0. <=. x_cst_err }
-    requires { 0. <=. y_cst_err }
-    requires { 0. <=. x_rel_err }
-    requires { 0. <=. y_rel_err }
-    requires { r = x_uf --. y_uf }
+    requires { abs x <=. x_factor }
+    requires { abs y <=. y_factor }
+    requires { 0. <=. x_abs }
+    requires { 0. <=. y_abs }
+    requires { 0. <=. x_rel }
+    requires { 0. <=. y_rel }
+    requires { r = x_f --. y_f }
     ensures {
       abs (to_real r -. (x -. y))
-      <=. (x_rel_err +. y_rel_err +. eps) *. (x' +. y')
-          +. ((1. +. eps +. y_rel_err) *. x_cst_err +. (1. +. eps +. x_rel_err) *. y_cst_err)
+      <=. (x_rel +. y_rel +. eps) *. (x_factor +. y_factor)
+          +. ((1. +. eps +. y_rel) *. x_abs +. (1. +. eps +. x_rel) *. y_abs)
     }
-  = uadd_single_error_propagation x_uf (--. y_uf) r x x' x_rel_err x_cst_err (-. y) y' y_rel_err y_cst_err
+  = uadd_single_error_propagation x_f (--. y_f) r x x_factor x_rel x_abs (-. y) y_factor y_rel y_abs
 
   use HelperLemmas
 
-  let lemma umul_single_error_propagation (x_uf y_uf r : usingle) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
+  let lemma umul_single_error_propagation (x_f y_f r : usingle) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
     requires {
-      abs (to_real x_uf -. x) <=. x_rel_err *. x' +. x_cst_err
+      abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
     requires {
-      abs (to_real y_uf -. y) <=. y_rel_err *. y' +. y_cst_err
+      abs (to_real y_f -. y) <=. y_rel *. y_factor +. y_abs
     }
-    requires { abs x <=. x' }
-    requires { abs y <=. y' }
-    requires { 0. <=. x_rel_err }
-    requires { 0. <=. y_rel_err }
-    requires { 0. <=. x_cst_err }
-    requires { 0. <=. y_cst_err }
-    requires { r = x_uf **. y_uf }
+    requires { abs x <=. x_factor }
+    requires { abs y <=. y_factor }
+    requires { 0. <=. x_rel }
+    requires { 0. <=. y_rel }
+    requires { 0. <=. x_abs }
+    requires { 0. <=. y_abs }
+    requires { r = x_f **. y_f }
     ensures {
       abs (to_real r -. (x *. y)) <=.
-        (eps +. (x_rel_err +. y_rel_err +. x_rel_err *. y_rel_err) *. (1. +. eps)) *. (x' *. y')
-        +. (((y_cst_err +. y_cst_err *. x_rel_err) *. x'
-        +. (x_cst_err +. x_cst_err *. y_rel_err) *. y'
-        +. x_cst_err *. y_cst_err) *. (1. +. eps) +. eta)
+        (eps +. (x_rel +. y_rel +. x_rel *. y_rel) *. (1. +. eps)) *. (x_factor *. y_factor)
+        +. (((y_abs +. y_abs *. x_rel) *. x_factor
+        +. (x_abs +. x_abs *. y_rel) *. y_factor
+        +. x_abs *. y_abs) *. (1. +. eps) +. eta)
     }
   =
   assert {
-    to_real x_uf *. to_real y_uf -. abs (to_real x_uf *. to_real y_uf) *. eps -. eta
-    <=. to_real (x_uf **. y_uf)
-    <=. to_real x_uf *. to_real y_uf +. abs (to_real x_uf *. to_real y_uf) *. eps +. eta
+    to_real x_f *. to_real y_f -. abs (to_real x_f *. to_real y_f) *. eps -. eta
+    <=. to_real (x_f **. y_f)
+    <=. to_real x_f *. to_real y_f +. abs (to_real x_f *. to_real y_f) *. eps +. eta
   };
-    assert { abs (x *. y) <=. x' *. y' by
-       abs x *. abs y <=. x' *. abs y = abs y *. x' <=. y' *. x' };
-  mult_err_combine (to_real x_uf) x x' x_rel_err x_cst_err (to_real y_uf) y y' y_rel_err y_cst_err
+    assert { abs (x *. y) <=. x_factor *. y_factor by
+       abs x *. abs y <=. x_factor *. abs y = abs y *. x_factor <=. y_factor *. x_factor };
+  mult_err_combine (to_real x_f) x x_factor x_rel x_abs (to_real y_f) y y_factor y_rel y_abs
 
   use real.ExpLog
 
-  let lemma log_single_error_propagation (logx_uf x_uf : usingle)
-        (exact_x x' log_rel_err log_cst_err x_rel_err x_cst_err : real)
-    requires { abs (to_real x_uf -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
+  let lemma log_single_error_propagation (logx_f x_f : usingle)
+        (x_exact x_factor log_rel log_abs x_rel x_abs : real)
+    requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
-      abs (to_real logx_uf -. log(to_real x_uf))
-       <=. log_rel_err *. abs (log (to_real x_uf)) +. log_cst_err
+      abs (to_real logx_f -. log(to_real x_f))
+       <=. log_rel *. abs (log (to_real x_f)) +. log_abs
     }
-    requires { 0. <. exact_x <=. x' }
-    requires { 0. <. (exact_x -. x_rel_err *. x' -. x_cst_err) }
-    requires { 0. <=. log_rel_err }
+    requires { 0. <. x_exact <=. x_factor }
+    requires { 0. <. (x_exact -. x_rel *. x_factor -. x_abs) }
+    requires { 0. <=. log_rel }
     ensures {
-      abs (to_real logx_uf -. log (exact_x))
-        <=. log_rel_err *. abs (log (exact_x)) +.
-          (-. log (1. -. ((x_rel_err *. x' +. x_cst_err) /. exact_x)) *. (1. +. log_rel_err)
-          +. log_cst_err)
+      abs (to_real logx_f -. log (x_exact))
+        <=. log_rel *. abs (log (x_exact)) +.
+          (-. log (1. -. ((x_rel *. x_factor +. x_abs) /. x_exact)) *. (1. +. log_rel)
+          +. log_abs)
     }
   =
-  log_approx_err exact_x (to_real x_uf) x' x_rel_err x_cst_err;
+  log_approx_err x_exact (to_real x_f) x_factor x_rel x_abs;
   assert {
-   abs (log (to_real x_uf)) *. log_rel_err
-    <=. (abs (log (exact_x)) -. log (1.0 -. (((x_rel_err *. x') +. x_cst_err) /. exact_x))) *. log_rel_err
+   abs (log (to_real x_f)) *. log_rel
+    <=. (abs (log (x_exact)) -. log (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let lemma log2_single_error_propagation (log2x_uf x_uf : usingle)
-        (exact_x x' log_rel_err log_cst_err x_rel_err x_cst_err : real)
-    requires { abs (to_real x_uf -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
+  let lemma log2_single_error_propagation (log2x_f x_f : usingle)
+        (x_exact x_factor log_rel log_abs x_rel x_abs : real)
+    requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
-      abs (to_real log2x_uf -. log2(to_real x_uf))
-       <=. log_rel_err *. abs (log2 (to_real x_uf)) +. log_cst_err
+      abs (to_real log2x_f -. log2(to_real x_f))
+       <=. log_rel *. abs (log2 (to_real x_f)) +. log_abs
     }
-    requires { 0. <. exact_x <=. x' }
-    requires { 0. <. (exact_x -. x_rel_err *. x' -. x_cst_err) }
-    requires { 0. <=. log_rel_err }
+    requires { 0. <. x_exact <=. x_factor }
+    requires { 0. <. (x_exact -. x_rel *. x_factor -. x_abs) }
+    requires { 0. <=. log_rel }
     ensures {
-      abs (to_real log2x_uf -. log2 (exact_x))
-        <=. log_rel_err *. abs (log2 (exact_x)) +.
-          (-. log2 (1. -. ((x_rel_err *. x' +. x_cst_err) /. exact_x)) *. (1. +. log_rel_err)
-          +. log_cst_err)
+      abs (to_real log2x_f -. log2 (x_exact))
+        <=. log_rel *. abs (log2 (x_exact)) +.
+          (-. log2 (1. -. ((x_rel *. x_factor +. x_abs) /. x_exact)) *. (1. +. log_rel)
+          +. log_abs)
     }
   =
-  log2_approx_err exact_x (to_real x_uf) x' x_rel_err x_cst_err;
+  log2_approx_err x_exact (to_real x_f) x_factor x_rel x_abs;
   assert {
-   abs (log2 (to_real x_uf)) *. log_rel_err
-    <=. (abs (log2 (exact_x)) -. log2 (1.0 -. (((x_rel_err *. x') +. x_cst_err) /. exact_x))) *. log_rel_err
+   abs (log2 (to_real x_f)) *. log_rel
+    <=. (abs (log2 (x_exact)) -. log2 (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let lemma log10_single_error_propagation (log10x_uf x_uf : usingle)
-        (exact_x x' log_rel_err log_cst_err x_rel_err x_cst_err : real)
-    requires { abs (to_real x_uf -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
+  let lemma log10_single_error_propagation (log10x_f x_f : usingle)
+        (x_exact x_factor log_rel log_abs x_rel x_abs : real)
+    requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
-      abs (to_real log10x_uf -. log10(to_real x_uf))
-       <=. log_rel_err *. abs (log10 (to_real x_uf)) +. log_cst_err
+      abs (to_real log10x_f -. log10(to_real x_f))
+       <=. log_rel *. abs (log10 (to_real x_f)) +. log_abs
     }
-    requires { 0. <. exact_x <=. x' }
-    requires { 0. <. (exact_x -. x_rel_err *. x' -. x_cst_err) }
-    requires { 0. <=. log_rel_err }
+    requires { 0. <. x_exact <=. x_factor }
+    requires { 0. <. (x_exact -. x_rel *. x_factor -. x_abs) }
+    requires { 0. <=. log_rel }
     ensures {
-      abs (to_real log10x_uf -. log10 (exact_x))
-        <=. log_rel_err *. abs (log10 (exact_x)) +.
-          (-. log10 (1. -. ((x_rel_err *. x' +. x_cst_err) /. exact_x)) *. (1. +. log_rel_err)
-          +. log_cst_err)
+      abs (to_real log10x_f -. log10 (x_exact))
+        <=. log_rel *. abs (log10 (x_exact)) +.
+          (-. log10 (1. -. ((x_rel *. x_factor +. x_abs) /. x_exact)) *. (1. +. log_rel)
+          +. log_abs)
     }
   =
-  log10_approx_err exact_x (to_real x_uf) x' x_rel_err x_cst_err;
+  log10_approx_err x_exact (to_real x_f) x_factor x_rel x_abs;
   assert {
-   abs (log10 (to_real x_uf)) *. log_rel_err
-    <=. (abs (log10 (exact_x)) -. log10 (1.0 -. (((x_rel_err *. x') +. x_cst_err) /. exact_x))) *. log_rel_err
+   abs (log10 (to_real x_f)) *. log_rel
+    <=. (abs (log10 (x_exact)) -. log10 (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let lemma exp_single_error_propagation (expx_uf x_uf : usingle)
-        (exact_x x' exp_rel_err exp_cst_err x_rel_err x_cst_err : real)
-    requires { abs (to_real x_uf -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
+  let lemma exp_single_error_propagation (expx_f x_f : usingle)
+        (x_exact x_factor exp_rel exp_abs x_rel x_abs : real)
+    requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
-      abs (to_real expx_uf -. exp(to_real x_uf))
-        <=. exp_rel_err *. exp (to_real x_uf) +. exp_cst_err
+      abs (to_real expx_f -. exp(to_real x_f))
+        <=. exp_rel *. exp (to_real x_f) +. exp_abs
     }
-    requires { exact_x <=. x' }
-    requires { 0. <=. exp_rel_err <=. 1. }
+    requires { x_exact <=. x_factor }
+    requires { 0. <=. exp_rel <=. 1. }
     ensures {
-      abs (to_real expx_uf -. exp (exact_x))
-      <=. (exp_rel_err +. (exp(x_rel_err *. x' +. x_cst_err) -. 1.) *. (1. +. exp_rel_err)) *. exp(exact_x)
-        +. exp_cst_err
+      abs (to_real expx_f -. exp (x_exact))
+      <=. (exp_rel +. (exp(x_rel *. x_factor +. x_abs) -. 1.) *. (1. +. exp_rel)) *. exp(x_exact)
+        +. exp_abs
     }
   =
-    exp_approx_err exact_x (to_real x_uf) x' x_rel_err x_cst_err;
+    exp_approx_err x_exact (to_real x_f) x_factor x_rel x_abs;
     assert {
-      exp exact_x *. (1. -. exp_rel_err) -. 
-      exp exact_x *. (exp (x_rel_err *. x' +. x_cst_err) -. 1.) *. (1. -. exp_rel_err)
-      -. exp_cst_err
-      <=. to_real expx_uf
+      exp x_exact *. (1. -. exp_rel) -.
+      exp x_exact *. (exp (x_rel *. x_factor +. x_abs) -. 1.) *. (1. -. exp_rel)
+      -. exp_abs
+      <=. to_real expx_f
       by
-        (exp exact_x -. exp exact_x *. (exp (x_rel_err *. x' +. x_cst_err) -. 1.))
-         *. (1. -. exp_rel_err) -. exp_cst_err
-        <=. exp (to_real x_uf) *. (1. -. exp_rel_err) -. exp_cst_err
-        <=. to_real expx_uf
+        (exp x_exact -. exp x_exact *. (exp (x_rel *. x_factor +. x_abs) -. 1.))
+         *. (1. -. exp_rel) -. exp_abs
+        <=. exp (to_real x_f) *. (1. -. exp_rel) -. exp_abs
+        <=. to_real expx_f
     };
     assert {
-      to_real expx_uf <=. (exp(exact_x) +. exp(exact_x)*.(exp(x_rel_err *. x' +. x_cst_err) -. 1.))*. (1. +. exp_rel_err) +. exp_cst_err
+      to_real expx_f <=. (exp(x_exact) +. exp(x_exact)*.(exp(x_rel *. x_factor +. x_abs) -. 1.))*. (1. +. exp_rel) +. exp_abs
       by
-        to_real expx_uf <=. exp(to_real x_uf) *. (1. +. exp_rel_err) +. exp_cst_err
+        to_real expx_f <=. exp(to_real x_f) *. (1. +. exp_rel) +. exp_abs
     };
 
 
   use real.Trigonometry
 
-  let lemma sin_single_error_propagation (sinx_uf x_uf : usingle)
-        (exact_x x' sin_rel_err sin_cst_err x_rel_err x_cst_err : real)
-    requires { abs (to_real x_uf -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
+  let lemma sin_single_error_propagation (sinx_f x_f : usingle)
+        (x_exact x_factor sin_rel sin_abs x_rel x_abs : real)
+    requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
-      abs (to_real sinx_uf -. sin(to_real x_uf))
-        <=. sin_rel_err *. abs (sin (to_real x_uf)) +. sin_cst_err
+      abs (to_real sinx_f -. sin(to_real x_f))
+        <=. sin_rel *. abs (sin (to_real x_f)) +. sin_abs
     }
-    requires { exact_x <=. x' }
-    requires { 0. <=. sin_rel_err }
+    requires { x_exact <=. x_factor }
+    requires { 0. <=. sin_rel }
     ensures {
-      abs (to_real sinx_uf -. sin (exact_x))
-      <=. sin_rel_err *. abs(sin(exact_x))
-          +. (((x_rel_err *. x' +. x_cst_err) *. (1. +. sin_rel_err)) +. sin_cst_err)
+      abs (to_real sinx_f -. sin (x_exact))
+      <=. sin_rel *. abs(sin(x_exact))
+          +. (((x_rel *. x_factor +. x_abs) *. (1. +. sin_rel)) +. sin_abs)
     }
   =
   assert {
-  abs (sin (to_real x_uf)) *. sin_rel_err
-  <=. (abs (sin exact_x) +. (x_rel_err *. x' +. x_cst_err)) *. sin_rel_err
+  abs (sin (to_real x_f)) *. sin_rel
+  <=. (abs (sin x_exact) +. (x_rel *. x_factor +. x_abs)) *. sin_rel
   }
 
-  let lemma cos_single_error_propagation (cosx_uf x_uf : usingle)
-        (exact_x x' cos_rel_err cos_cst_err x_rel_err x_cst_err : real)
-    requires { abs (to_real x_uf -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
+  let lemma cos_single_error_propagation (cosx_f x_f : usingle)
+        (x_exact x_factor cos_rel cos_abs x_rel x_abs : real)
+    requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
-      abs (to_real cosx_uf -. cos(to_real x_uf))
-        <=. cos_rel_err *. abs (cos (to_real x_uf)) +. cos_cst_err
+      abs (to_real cosx_f -. cos(to_real x_f))
+        <=. cos_rel *. abs (cos (to_real x_f)) +. cos_abs
     }
-    requires { exact_x <=. x' }
-    requires { 0. <=. cos_rel_err }
+    requires { x_exact <=. x_factor }
+    requires { 0. <=. cos_rel }
     ensures {
-      abs (to_real cosx_uf -. cos (exact_x))
-      <=. cos_rel_err *. abs(cos(exact_x))
-          +. (((x_rel_err *. x' +. x_cst_err) *. (1. +. cos_rel_err)) +. cos_cst_err)
+      abs (to_real cosx_f -. cos (x_exact))
+      <=. cos_rel *. abs(cos(x_exact))
+          +. (((x_rel *. x_factor +. x_abs) *. (1. +. cos_rel)) +. cos_abs)
     }
   =
   assert {
-  abs (cos (to_real x_uf)) *. cos_rel_err
-  <=. (abs (cos exact_x) +. (x_rel_err *. x' +. x_cst_err)) *. cos_rel_err
+  abs (cos (to_real x_f)) *. cos_rel
+  <=. (abs (cos x_exact) +. (x_rel *. x_factor +. x_abs)) *. cos_rel
   }
 
   use real.Sum
@@ -644,81 +644,81 @@ module USingleLemmas
   function real_fun (f:int -> usingle) : int -> real = fun i -> to_real (f i)
 
   let lemma sum_single_error_propagation (x : usingle)
-                (f : int -> usingle) (exact_f f' f'' : int -> real) (n:int)
-                (sum_rel_err sum_cst_err f_rel_err f_cst_err : real)
+                (f : int -> usingle) (f_exact f_factor f_factor' : int -> real) (n:int)
+                (sum_rel sum_abs f_rel f_abs : real)
     requires {
       forall i. 0 <= i < n ->
-        abs ((real_fun f) i -. exact_f i) <=. f_rel_err *. f' i +. f_cst_err
+        abs ((real_fun f) i -. f_exact i) <=. f_rel *. f_factor i +. f_abs
     }
     requires {
       forall i. 0 <= i < n ->
-      f' i -. f_rel_err *. f' i -. f_cst_err <=. f'' i <=. f' i +. f_rel_err *. f' i +. f_cst_err
+      f_factor i -. f_rel *. f_factor i -. f_abs <=. f_factor' i <=. f_factor i +. f_rel *. f_factor i +. f_abs
     }
     requires {
       abs (to_real x -. (sum (real_fun f) 0 n))
-        <=. sum_rel_err *. (sum f'' 0 n) +. sum_cst_err
+        <=. sum_rel *. (sum f_factor' 0 n) +. sum_abs
     }
-    requires { 0. <=. sum_rel_err }
+    requires { 0. <=. sum_rel }
     requires { 0 <= n }
     ensures {
-      abs (to_real x -. sum exact_f 0 n)
-      <=. (f_rel_err +. (sum_rel_err *. (1. +. f_rel_err))) *. sum f' 0 n +.
-        ((f_cst_err *. from_int n *.(1. +. sum_rel_err)) +. sum_cst_err)
+      abs (to_real x -. sum f_exact 0 n)
+      <=. (f_rel +. (sum_rel *. (1. +. f_rel))) *. sum f_factor 0 n +.
+        ((f_abs *. from_int n *.(1. +. sum_rel)) +. sum_abs)
     }
   =
-  sum_approx_err f_rel_err f_cst_err (real_fun f) exact_f f' 0 n;
-  sum_approx_err f_rel_err f_cst_err f'' f' f' 0 n;
+  sum_approx_err f_rel f_abs (real_fun f) f_exact f_factor 0 n;
+  sum_approx_err f_rel f_abs f_factor' f_factor f_factor 0 n;
   assert {
-    sum_rel_err *. sum f'' 0 n <=.
-    sum_rel_err *. (sum f' 0 n +. ((f_rel_err *. sum f' 0 n) +. (f_cst_err *. from_int n)))
+    sum_rel *. sum f_factor' 0 n <=.
+    sum_rel *. (sum f_factor 0 n +. ((f_rel *. sum f_factor 0 n) +. (f_abs *. from_int n)))
   }
 
-  (* We don't have an error on y_uf because in practice we won't have an exact division with an approximate divisor *)
-  let lemma udiv_exact_single_error_propagation (x_uf y_uf r: usingle) (x x' x_rel_err x_cst_err : real)
+  (* We don't have an error on y_f because in practice we won't have an exact division with an approximate divisor *)
+  let lemma udiv_exact_single_error_propagation (x_f y_f r: usingle) (x x_factor x_rel x_abs : real)
     requires {
-      abs (to_real x_uf -. x) <=. x_rel_err *. x' +. x_cst_err
+      abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
-    requires { abs x <=. x' }
-    requires { 0. <=. x_rel_err }
-    requires { 0. <=. x_cst_err }
-    requires { 0. <> to_real y_uf }
-    requires { is_exact udiv x_uf y_uf }
-    requires { r = x_uf ///. y_uf }
+    requires { abs x <=. x_factor }
+    requires { 0. <=. x_rel }
+    requires { 0. <=. x_abs }
+    requires { 0. <> to_real y_f }
+    requires { is_exact udiv x_f y_f }
+    requires { r = x_f ///. y_f }
     ensures {
-      abs (to_real r -. (x /. (to_real y_uf))) <=.
-        x_rel_err *. (x' /. abs (to_real y_uf)) +. ((x_cst_err /. abs (to_real y_uf)) +. eta)
+      abs (to_real r -. (x /. (to_real y_f))) <=.
+        x_rel *. (x_factor /. abs (to_real y_f)) +. ((x_abs /. abs (to_real y_f)) +. eta)
     }
   =
-  let lemma y_uf_pos ()
-    requires { 0. <. to_real y_uf }
+  let lemma y_f_pos ()
+    requires { 0. <. to_real y_f }
     ensures {
-      abs (to_real r -. (x /. (to_real y_uf))) <=.
-        x_rel_err *. (x' /. to_real y_uf) +. ((x_cst_err /. to_real y_uf) +. eta)
+      abs (to_real r -. (x /. (to_real y_f))) <=.
+        x_rel *. (x_factor /. to_real y_f) +. ((x_abs /. to_real y_f) +. eta)
     }
     =
-    div_order_compat (to_real x_uf) (x +. x_rel_err *. x' +. x_cst_err) (to_real y_uf);
-    div_order_compat (x -. x_rel_err *. x' -. x_cst_err) (to_real x_uf) (to_real y_uf) in
-  let lemma y_uf_neg ()
-    requires { to_real y_uf <. 0. }
+    div_order_compat (to_real x_f) (x +. x_rel *. x_factor +. x_abs) (to_real y_f);
+    div_order_compat (x -. x_rel *. x_factor -. x_abs) (to_real x_f) (to_real y_f) in
+  let lemma y_f_neg ()
+    requires { to_real y_f <. 0. }
     ensures {
-      abs (to_real r -. (x /. (to_real y_uf))) <=.
-        x_rel_err *. (x' /. abs (to_real y_uf)) +. ((x_cst_err /. abs (to_real y_uf)) +. eta)
+      abs (to_real r -. (x /. (to_real y_f))) <=.
+        x_rel *. (x_factor /. abs (to_real y_f)) +. ((x_abs /. abs (to_real y_f)) +. eta)
     }
     =
-    div_order_compat2 (to_real x_uf) (x +. x_rel_err *. x' +. x_cst_err) (to_real y_uf);
+    div_order_compat2 (to_real x_f) (x +. x_rel *. x_factor +. x_abs) (to_real y_f);
     (* TODO: Prove this somehow *)
     assert {
       forall x y. x /. y <=. abs x /. abs y
     };
     assert {
-      (x -. x_rel_err *. x' -. x_cst_err) /. to_real y_uf
-      <=. x /. (to_real y_uf) +. ((x_rel_err *. x') +. x_cst_err) /. abs (to_real y_uf)
+      (x -. x_rel *. x_factor -. x_abs) /. to_real y_f
+      <=. x /. (to_real y_f) +. ((x_rel *. x_factor) +. x_abs) /. abs (to_real y_f)
       by
-        (-. x_rel_err *. x' -. x_cst_err) /. to_real y_uf
-        <=. (x_rel_err *. x' +. x_cst_err) /. abs (to_real y_uf)
+        (-. x_rel *. x_factor -. x_abs) /. to_real y_f
+        <=. (x_rel *. x_factor +. x_abs) /. abs (to_real y_f)
     };
-    div_order_compat2 (x -. x_rel_err *. x' -. x_cst_err) (to_real x_uf) (to_real y_uf);
-  in ()  
+    div_order_compat2 (x -. x_rel *. x_factor -. x_abs) (to_real x_f) (to_real y_f);
+  in ()
 end
 
 (** {5 Double propagation lemmas} *)
@@ -728,267 +728,267 @@ module UDoubleLemmas
   use real.Abs
   use UDouble
 
-  let lemma uadd_double_error_propagation (x_uf y_uf r : udouble) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
+  let lemma uadd_double_error_propagation (x_f y_f r : udouble) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
     requires {
-      abs (to_real x_uf -. x) <=. x_rel_err *. x' +. x_cst_err
+      abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
     requires {
-      abs (to_real y_uf -. y) <=. y_rel_err *. y' +. y_cst_err
+      abs (to_real y_f -. y) <=. y_rel *. y_factor +. y_abs
     }
-    requires { abs x <=. x' }
-    requires { abs y <=. y' }
-    (* TODO: Use (0 <=. x_rel_err \/ (x' = 0 /\ x_cst_err = 0)), same for y. *)
-    requires { 0. <=. x_rel_err }
-    requires { 0. <=. y_rel_err }
-    requires { 0. <=. x_cst_err }
-    requires { 0. <=. y_cst_err }
-    requires { r = x_uf ++. y_uf }
+    requires { abs x <=. x_factor }
+    requires { abs y <=. y_factor }
+    (* TODO: Use (0 <=. x_rel \/ (x_factor = 0 /\ x_abs = 0)), same for y. *)
+    requires { 0. <=. x_rel }
+    requires { 0. <=. y_rel }
+    requires { 0. <=. x_abs }
+    requires { 0. <=. y_abs }
+    requires { r = x_f ++. y_f }
     ensures {
       abs (to_real r -. (x +. y)) <=.
-      (x_rel_err +. y_rel_err +. eps) *. (x' +. y')
-          +. ((1. +. eps +. y_rel_err) *. x_cst_err +. (1. +. eps +. x_rel_err) *. y_cst_err)
+      (x_rel +. y_rel +. eps) *. (x_factor +. y_factor)
+          +. ((1. +. eps +. y_rel) *. x_abs +. (1. +. eps +. x_rel) *. y_abs)
     }
   =
-  let ghost delta = abs (to_real (x_uf ++. y_uf) -. (to_real x_uf +. to_real y_uf)) in
+  let ghost delta = abs (to_real (x_f ++. y_f) -. (to_real x_f +. to_real y_f)) in
   assert {
-    0. <=. x_rel_err /\ 0. <=. y_rel_err ->
+    0. <=. x_rel /\ 0. <=. y_rel ->
     delta <=.
-      (eps +. y_rel_err) *. x' +. (eps +. x_rel_err) *. y'
-      +. (x_rel_err +. eps) *. y_cst_err +. (y_rel_err +. eps) *. x_cst_err
+      (eps +. y_rel) *. x_factor +. (eps +. x_rel) *. y_factor
+      +. (x_rel +. eps) *. y_abs +. (y_rel +. eps) *. x_abs
     by
-      (delta <=. x' *. x_rel_err +. x_cst_err +. x'
+      (delta <=. x_factor *. x_rel +. x_abs +. x_factor
       so
-        x' +. x_cst_err <=. eps *. (y' +. y_cst_err) ->
-        delta <=. (eps +. x_rel_err) *. y'
-        +. (eps +. y_rel_err) *. x'
-        +. (y_rel_err +. eps) *. x_cst_err +. (x_rel_err +. eps) *. y_cst_err
+        x_factor +. x_abs <=. eps *. (y_factor +. y_abs) ->
+        delta <=. (eps +. x_rel) *. y_factor
+        +. (eps +. y_rel) *. x_factor
+        +. (y_rel +. eps) *. x_abs +. (x_rel +. eps) *. y_abs
       by
-        delta <=. eps *. (y' +. y_cst_err) *. x_rel_err
-              +. (eps *. (y' +. y_cst_err)))
+        delta <=. eps *. (y_factor +. y_abs) *. x_rel
+              +. (eps *. (y_factor +. y_abs)))
       /\
-      (delta <=. y' *. y_rel_err +. y_cst_err +. y'
+      (delta <=. y_factor *. y_rel +. y_abs +. y_factor
       so
-      abs y' +. y_cst_err <=. eps *. (x' +. x_cst_err) ->
-      delta <=. (eps +. y_rel_err) *. x'
-        +. (eps +. x_rel_err) *. y'
-        +. (x_rel_err +. eps) *. y_cst_err +. (y_rel_err +. eps) *. x_cst_err
+      abs y_factor +. y_abs <=. eps *. (x_factor +. x_abs) ->
+      delta <=. (eps +. y_rel) *. x_factor
+        +. (eps +. x_rel) *. y_factor
+        +. (x_rel +. eps) *. y_abs +. (y_rel +. eps) *. x_abs
       by
-        delta <=. eps *. (x' +. x_cst_err) *. y_rel_err
-              +. (eps *. (x' +. x_cst_err)))
+        delta <=. eps *. (x_factor +. x_abs) *. y_rel
+              +. (eps *. (x_factor +. x_abs)))
       /\
       (
-       (eps *. (x' +. x_cst_err) <. abs y' +. y_cst_err /\
-       eps *. (y' +. y_cst_err) <. abs x' +. x_cst_err) ->
+       (eps *. (x_factor +. x_abs) <. abs y_factor +. y_abs /\
+       eps *. (y_factor +. y_abs) <. abs x_factor +. x_abs) ->
        (delta <=.
-       (eps +. y_rel_err) *. x' +. (eps +. x_rel_err) *. y'
-      +. (x_rel_err +. eps) *. y_cst_err +. (y_rel_err +. eps) *. x_cst_err
+       (eps +. y_rel) *. x_factor +. (eps +. x_rel) *. y_factor
+      +. (x_rel +. eps) *. y_abs +. (y_rel +. eps) *. x_abs
       by
-        abs (to_real x_uf +. to_real y_uf) <=.
-        abs (to_real x_uf -. x) +. x' +. (abs (to_real y_uf -. y) +. y')
+        abs (to_real x_f +. to_real y_f) <=.
+        abs (to_real x_f -. x) +. x_factor +. (abs (to_real y_f -. y) +. y_factor)
       so
-        x' *. x_rel_err <=. (y' +. y_cst_err) /. eps *. x_rel_err /\
-        y' *. y_rel_err <=. (x' +. x_cst_err) /. eps *. y_rel_err))
+        x_factor *. x_rel <=. (y_factor +. y_abs) /. eps *. x_rel /\
+        y_factor *. y_rel <=. (x_factor +. x_abs) /. eps *. y_rel))
   }
 
-  let lemma usub_double_error_propagation (x_uf y_uf r : udouble) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
+  let lemma usub_double_error_propagation (x_f y_f r : udouble) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
     requires {
-      abs (to_real x_uf -. x) <=. x_rel_err *. x' +. x_cst_err
+      abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
     requires {
-      abs (to_real y_uf -. y) <=. y_rel_err *. y' +. y_cst_err
+      abs (to_real y_f -. y) <=. y_rel *. y_factor +. y_abs
     }
-    requires { abs x <=. x' }
-    requires { abs y <=. y' }
-    requires { 0. <=. x_cst_err }
-    requires { 0. <=. y_cst_err }
-    requires { 0. <=. x_rel_err }
-    requires { 0. <=. y_rel_err }
-    requires { r = x_uf --. y_uf }
+    requires { abs x <=. x_factor }
+    requires { abs y <=. y_factor }
+    requires { 0. <=. x_abs }
+    requires { 0. <=. y_abs }
+    requires { 0. <=. x_rel }
+    requires { 0. <=. y_rel }
+    requires { r = x_f --. y_f }
     ensures {
       abs (to_real r -. (x -. y))
-      <=. (x_rel_err +. y_rel_err +. eps) *. (x' +. y')
-          +. ((1. +. eps +. y_rel_err) *. x_cst_err +. (1. +. eps +. x_rel_err) *. y_cst_err)
+      <=. (x_rel +. y_rel +. eps) *. (x_factor +. y_factor)
+          +. ((1. +. eps +. y_rel) *. x_abs +. (1. +. eps +. x_rel) *. y_abs)
     }
-  = uadd_double_error_propagation x_uf (--. y_uf) r x x' x_rel_err x_cst_err (-. y) y' y_rel_err y_cst_err
+  = uadd_double_error_propagation x_f (--. y_f) r x x_factor x_rel x_abs (-. y) y_factor y_rel y_abs
 
   use HelperLemmas
 
-  let lemma umul_double_error_propagation (x_uf y_uf r : udouble) (x x' x_rel_err x_cst_err y y' y_rel_err y_cst_err : real)
+  let lemma umul_double_error_propagation (x_f y_f r : udouble) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
     requires {
-      abs (to_real x_uf -. x) <=. x_rel_err *. x' +. x_cst_err
+      abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
     requires {
-      abs (to_real y_uf -. y) <=. y_rel_err *. y' +. y_cst_err
+      abs (to_real y_f -. y) <=. y_rel *. y_factor +. y_abs
     }
-    requires { abs x <=. x' }
-    requires { abs y <=. y' }
-    requires { 0. <=. x_rel_err }
-    requires { 0. <=. y_rel_err }
-    requires { 0. <=. x_cst_err }
-    requires { 0. <=. y_cst_err }
-    requires { r = x_uf **. y_uf }
+    requires { abs x <=. x_factor }
+    requires { abs y <=. y_factor }
+    requires { 0. <=. x_rel }
+    requires { 0. <=. y_rel }
+    requires { 0. <=. x_abs }
+    requires { 0. <=. y_abs }
+    requires { r = x_f **. y_f }
     ensures {
       abs (to_real r -. (x *. y)) <=.
-        (eps +. (x_rel_err +. y_rel_err +. x_rel_err *. y_rel_err) *. (1. +. eps)) *. (x' *. y')
-        +. (((y_cst_err +. y_cst_err *. x_rel_err) *. x'
-        +. (x_cst_err +. x_cst_err *. y_rel_err) *. y'
-        +. x_cst_err *. y_cst_err) *. (1. +. eps) +. eta)
+        (eps +. (x_rel +. y_rel +. x_rel *. y_rel) *. (1. +. eps)) *. (x_factor *. y_factor)
+        +. (((y_abs +. y_abs *. x_rel) *. x_factor
+        +. (x_abs +. x_abs *. y_rel) *. y_factor
+        +. x_abs *. y_abs) *. (1. +. eps) +. eta)
     }
   =
   assert {
-    to_real x_uf *. to_real y_uf -. abs (to_real x_uf *. to_real y_uf) *. eps -. eta
-    <=. to_real (x_uf **. y_uf)
-    <=. to_real x_uf *. to_real y_uf +. abs (to_real x_uf *. to_real y_uf) *. eps +. eta
+    to_real x_f *. to_real y_f -. abs (to_real x_f *. to_real y_f) *. eps -. eta
+    <=. to_real (x_f **. y_f)
+    <=. to_real x_f *. to_real y_f +. abs (to_real x_f *. to_real y_f) *. eps +. eta
   };
-    assert { abs (x *. y) <=. x' *. y' by
-       abs x *. abs y <=. x' *. abs y = abs y *. x' <=. y' *. x' };
-  mult_err_combine (to_real x_uf) x x' x_rel_err x_cst_err (to_real y_uf) y y' y_rel_err y_cst_err
+    assert { abs (x *. y) <=. x_factor *. y_factor by
+       abs x *. abs y <=. x_factor *. abs y = abs y *. x_factor <=. y_factor *. x_factor };
+  mult_err_combine (to_real x_f) x x_factor x_rel x_abs (to_real y_f) y y_factor y_rel y_abs
 
   use real.ExpLog
 
-  let lemma log_double_error_propagation (logx_uf x_uf : udouble)
-        (exact_x x' log_rel_err log_cst_err x_rel_err x_cst_err : real)
-    requires { abs (to_real x_uf -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
+  let lemma log_double_error_propagation (logx_f x_f : udouble)
+        (x_exact x_factor log_rel log_abs x_rel x_abs : real)
+    requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
-      abs (to_real logx_uf -. log(to_real x_uf))
-       <=. log_rel_err *. abs (log (to_real x_uf)) +. log_cst_err
+      abs (to_real logx_f -. log(to_real x_f))
+       <=. log_rel *. abs (log (to_real x_f)) +. log_abs
     }
-    requires { 0. <. exact_x <=. x' }
-    requires { 0. <. (exact_x -. x_rel_err *. x' -. x_cst_err) }
-    requires { 0. <=. log_rel_err }
+    requires { 0. <. x_exact <=. x_factor }
+    requires { 0. <. (x_exact -. x_rel *. x_factor -. x_abs) }
+    requires { 0. <=. log_rel }
     ensures {
-      abs (to_real logx_uf -. log (exact_x))
-        <=. log_rel_err *. abs (log (exact_x)) +.
-          (-. log (1. -. ((x_rel_err *. x' +. x_cst_err) /. exact_x)) *. (1. +. log_rel_err)
-          +. log_cst_err)
+      abs (to_real logx_f -. log (x_exact))
+        <=. log_rel *. abs (log (x_exact)) +.
+          (-. log (1. -. ((x_rel *. x_factor +. x_abs) /. x_exact)) *. (1. +. log_rel)
+          +. log_abs)
     }
   =
-  log_approx_err exact_x (to_real x_uf) x' x_rel_err x_cst_err;
+  log_approx_err x_exact (to_real x_f) x_factor x_rel x_abs;
   assert {
-   abs (log (to_real x_uf)) *. log_rel_err
-    <=. (abs (log (exact_x)) -. log (1.0 -. (((x_rel_err *. x') +. x_cst_err) /. exact_x))) *. log_rel_err
+   abs (log (to_real x_f)) *. log_rel
+    <=. (abs (log (x_exact)) -. log (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let lemma log2_double_error_propagation (log2x_uf x_uf : udouble)
-        (exact_x x' log_rel_err log_cst_err x_rel_err x_cst_err : real)
-    requires { abs (to_real x_uf -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
+  let lemma log2_double_error_propagation (log2x_f x_f : udouble)
+        (x_exact x_factor log_rel log_abs x_rel x_abs : real)
+    requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
-      abs (to_real log2x_uf -. log2(to_real x_uf))
-       <=. log_rel_err *. abs (log2 (to_real x_uf)) +. log_cst_err
+      abs (to_real log2x_f -. log2(to_real x_f))
+       <=. log_rel *. abs (log2 (to_real x_f)) +. log_abs
     }
-    requires { 0. <. exact_x <=. x' }
-    requires { 0. <. (exact_x -. x_rel_err *. x' -. x_cst_err) }
-    requires { 0. <=. log_rel_err }
+    requires { 0. <. x_exact <=. x_factor }
+    requires { 0. <. (x_exact -. x_rel *. x_factor -. x_abs) }
+    requires { 0. <=. log_rel }
     ensures {
-      abs (to_real log2x_uf -. log2 (exact_x))
-        <=. log_rel_err *. abs (log2 (exact_x)) +.
-          (-. log2 (1. -. ((x_rel_err *. x' +. x_cst_err) /. exact_x)) *. (1. +. log_rel_err)
-          +. log_cst_err)
+      abs (to_real log2x_f -. log2 (x_exact))
+        <=. log_rel *. abs (log2 (x_exact)) +.
+          (-. log2 (1. -. ((x_rel *. x_factor +. x_abs) /. x_exact)) *. (1. +. log_rel)
+          +. log_abs)
     }
   =
-  log2_approx_err exact_x (to_real x_uf) x' x_rel_err x_cst_err;
+  log2_approx_err x_exact (to_real x_f) x_factor x_rel x_abs;
   assert {
-   abs (log2 (to_real x_uf)) *. log_rel_err
-    <=. (abs (log2 (exact_x)) -. log2 (1.0 -. (((x_rel_err *. x') +. x_cst_err) /. exact_x))) *. log_rel_err
+   abs (log2 (to_real x_f)) *. log_rel
+    <=. (abs (log2 (x_exact)) -. log2 (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let lemma log10_double_error_propagation (log10x_uf x_uf : udouble)
-        (exact_x x' log_rel_err log_cst_err x_rel_err x_cst_err : real)
-    requires { abs (to_real x_uf -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
+  let lemma log10_double_error_propagation (log10x_f x_f : udouble)
+        (x_exact x_factor log_rel log_abs x_rel x_abs : real)
+    requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
-      abs (to_real log10x_uf -. log10(to_real x_uf))
-       <=. log_rel_err *. abs (log10 (to_real x_uf)) +. log_cst_err
+      abs (to_real log10x_f -. log10(to_real x_f))
+       <=. log_rel *. abs (log10 (to_real x_f)) +. log_abs
     }
-    requires { 0. <. exact_x <=. x' }
-    requires { 0. <. (exact_x -. x_rel_err *. x' -. x_cst_err) }
-    requires { 0. <=. log_rel_err }
+    requires { 0. <. x_exact <=. x_factor }
+    requires { 0. <. (x_exact -. x_rel *. x_factor -. x_abs) }
+    requires { 0. <=. log_rel }
     ensures {
-      abs (to_real log10x_uf -. log10 (exact_x))
-        <=. log_rel_err *. abs (log10 (exact_x)) +.
-          (-. log10 (1. -. ((x_rel_err *. x' +. x_cst_err) /. exact_x)) *. (1. +. log_rel_err)
-          +. log_cst_err)
+      abs (to_real log10x_f -. log10 (x_exact))
+        <=. log_rel *. abs (log10 (x_exact)) +.
+          (-. log10 (1. -. ((x_rel *. x_factor +. x_abs) /. x_exact)) *. (1. +. log_rel)
+          +. log_abs)
     }
   =
-  log10_approx_err exact_x (to_real x_uf) x' x_rel_err x_cst_err;
+  log10_approx_err x_exact (to_real x_f) x_factor x_rel x_abs;
   assert {
-   abs (log10 (to_real x_uf)) *. log_rel_err
-    <=. (abs (log10 (exact_x)) -. log10 (1.0 -. (((x_rel_err *. x') +. x_cst_err) /. exact_x))) *. log_rel_err
+   abs (log10 (to_real x_f)) *. log_rel
+    <=. (abs (log10 (x_exact)) -. log10 (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let lemma exp_double_error_propagation (expx_uf x_uf : udouble)
-        (exact_x x' exp_rel_err exp_cst_err x_rel_err x_cst_err : real)
-    requires { abs (to_real x_uf -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
+  let lemma exp_double_error_propagation (expx_f x_f : udouble)
+        (x_exact x_factor exp_rel exp_abs x_rel x_abs : real)
+    requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
-      abs (to_real expx_uf -. exp(to_real x_uf))
-        <=. exp_rel_err *. exp (to_real x_uf) +. exp_cst_err
+      abs (to_real expx_f -. exp(to_real x_f))
+        <=. exp_rel *. exp (to_real x_f) +. exp_abs
     }
-    requires { exact_x <=. x' }
-    requires { 0. <=. exp_rel_err <=. 1. }
+    requires { x_exact <=. x_factor }
+    requires { 0. <=. exp_rel <=. 1. }
     ensures {
-      abs (to_real expx_uf -. exp (exact_x))
-      <=. (exp_rel_err +. (exp(x_rel_err *. x' +. x_cst_err) -. 1.) *. (1. +. exp_rel_err)) *. exp(exact_x)
-        +. exp_cst_err
+      abs (to_real expx_f -. exp (x_exact))
+      <=. (exp_rel +. (exp(x_rel *. x_factor +. x_abs) -. 1.) *. (1. +. exp_rel)) *. exp(x_exact)
+        +. exp_abs
     }
   =
-    exp_approx_err exact_x (to_real x_uf) x' x_rel_err x_cst_err;
+    exp_approx_err x_exact (to_real x_f) x_factor x_rel x_abs;
     assert {
-      exp exact_x *. (1. -. exp_rel_err) -. 
-      exp exact_x *. (exp (x_rel_err *. x' +. x_cst_err) -. 1.) *. (1. -. exp_rel_err)
-      -. exp_cst_err
-      <=. to_real expx_uf
+      exp x_exact *. (1. -. exp_rel) -.
+      exp x_exact *. (exp (x_rel *. x_factor +. x_abs) -. 1.) *. (1. -. exp_rel)
+      -. exp_abs
+      <=. to_real expx_f
       by
-        (exp exact_x -. exp exact_x *. (exp (x_rel_err *. x' +. x_cst_err) -. 1.))
-         *. (1. -. exp_rel_err) -. exp_cst_err
-        <=. exp (to_real x_uf) *. (1. -. exp_rel_err) -. exp_cst_err
-        <=. to_real expx_uf
+        (exp x_exact -. exp x_exact *. (exp (x_rel *. x_factor +. x_abs) -. 1.))
+         *. (1. -. exp_rel) -. exp_abs
+        <=. exp (to_real x_f) *. (1. -. exp_rel) -. exp_abs
+        <=. to_real expx_f
     };
     assert {
-      to_real expx_uf <=. (exp(exact_x) +. exp(exact_x)*.(exp(x_rel_err *. x' +. x_cst_err) -. 1.))*. (1. +. exp_rel_err) +. exp_cst_err
+      to_real expx_f <=. (exp(x_exact) +. exp(x_exact)*.(exp(x_rel *. x_factor +. x_abs) -. 1.))*. (1. +. exp_rel) +. exp_abs
       by
-        to_real expx_uf <=. exp(to_real x_uf) *. (1. +. exp_rel_err) +. exp_cst_err
+        to_real expx_f <=. exp(to_real x_f) *. (1. +. exp_rel) +. exp_abs
     };
 
 
   use real.Trigonometry
 
-  let lemma sin_double_error_propagation (sinx_uf x_uf : udouble)
-        (exact_x x' sin_rel_err sin_cst_err x_rel_err x_cst_err : real)
-    requires { abs (to_real x_uf -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
+  let lemma sin_double_error_propagation (sinx_f x_f : udouble)
+        (x_exact x_factor sin_rel sin_abs x_rel x_abs : real)
+    requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
-      abs (to_real sinx_uf -. sin(to_real x_uf))
-        <=. sin_rel_err *. abs (sin (to_real x_uf)) +. sin_cst_err
+      abs (to_real sinx_f -. sin(to_real x_f))
+        <=. sin_rel *. abs (sin (to_real x_f)) +. sin_abs
     }
-    requires { exact_x <=. x' }
-    requires { 0. <=. sin_rel_err }
+    requires { x_exact <=. x_factor }
+    requires { 0. <=. sin_rel }
     ensures {
-      abs (to_real sinx_uf -. sin (exact_x))
-      <=. sin_rel_err *. abs(sin(exact_x))
-          +. (((x_rel_err *. x' +. x_cst_err) *. (1. +. sin_rel_err)) +. sin_cst_err)
+      abs (to_real sinx_f -. sin (x_exact))
+      <=. sin_rel *. abs(sin(x_exact))
+          +. (((x_rel *. x_factor +. x_abs) *. (1. +. sin_rel)) +. sin_abs)
     }
   =
   assert {
-  abs (sin (to_real x_uf)) *. sin_rel_err
-  <=. (abs (sin exact_x) +. (x_rel_err *. x' +. x_cst_err)) *. sin_rel_err
+  abs (sin (to_real x_f)) *. sin_rel
+  <=. (abs (sin x_exact) +. (x_rel *. x_factor +. x_abs)) *. sin_rel
   }
 
-  let lemma cos_double_error_propagation (cosx_uf x_uf : udouble)
-        (exact_x x' cos_rel_err cos_cst_err x_rel_err x_cst_err : real)
-    requires { abs (to_real x_uf -. exact_x) <=. x_rel_err *. x' +. x_cst_err }
+  let lemma cos_double_error_propagation (cosx_f x_f : udouble)
+        (x_exact x_factor cos_rel cos_abs x_rel x_abs : real)
+    requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
-      abs (to_real cosx_uf -. cos(to_real x_uf))
-        <=. cos_rel_err *. abs (cos (to_real x_uf)) +. cos_cst_err
+      abs (to_real cosx_f -. cos(to_real x_f))
+        <=. cos_rel *. abs (cos (to_real x_f)) +. cos_abs
     }
-    requires { exact_x <=. x' }
-    requires { 0. <=. cos_rel_err }
+    requires { x_exact <=. x_factor }
+    requires { 0. <=. cos_rel }
     ensures {
-      abs (to_real cosx_uf -. cos (exact_x))
-      <=. cos_rel_err *. abs(cos(exact_x))
-          +. (((x_rel_err *. x' +. x_cst_err) *. (1. +. cos_rel_err)) +. cos_cst_err)
+      abs (to_real cosx_f -. cos (x_exact))
+      <=. cos_rel *. abs(cos(x_exact))
+          +. (((x_rel *. x_factor +. x_abs) *. (1. +. cos_rel)) +. cos_abs)
     }
   =
   assert {
-  abs (cos (to_real x_uf)) *. cos_rel_err
-  <=. (abs (cos exact_x) +. (x_rel_err *. x' +. x_cst_err)) *. cos_rel_err
+  abs (cos (to_real x_f)) *. cos_rel
+  <=. (abs (cos x_exact) +. (x_rel *. x_factor +. x_abs)) *. cos_rel
   }
 
   use real.Sum
@@ -998,79 +998,79 @@ module UDoubleLemmas
   function real_fun (f:int -> udouble) : int -> real = fun i -> to_real (f i)
 
   let lemma sum_double_error_propagation (x : udouble)
-                (f : int -> udouble) (exact_f f' f'' : int -> real) (n:int)
-                (sum_rel_err sum_cst_err f_rel_err f_cst_err : real)
+                (f : int -> udouble) (f_exact f_factor f_factor' : int -> real) (n:int)
+                (sum_rel sum_abs f_rel f_abs : real)
     requires {
       forall i. 0 <= i < n ->
-        abs ((real_fun f) i -. exact_f i) <=. f_rel_err *. f' i +. f_cst_err
+        abs ((real_fun f) i -. f_exact i) <=. f_rel *. f_factor i +. f_abs
     }
     requires {
       forall i. 0 <= i < n ->
-      f' i -. f_rel_err *. f' i -. f_cst_err <=. f'' i <=. f' i +. f_rel_err *. f' i +. f_cst_err
+      f_factor i -. f_rel *. f_factor i -. f_abs <=. f_factor' i <=. f_factor i +. f_rel *. f_factor i +. f_abs
     }
     requires {
       abs (to_real x -. (sum (real_fun f) 0 n))
-        <=. sum_rel_err *. (sum f'' 0 n) +. sum_cst_err
+        <=. sum_rel *. (sum f_factor' 0 n) +. sum_abs
     }
-    requires { 0. <=. sum_rel_err }
+    requires { 0. <=. sum_rel }
     requires { 0 <= n }
     ensures {
-      abs (to_real x -. sum exact_f 0 n)
-      <=. (f_rel_err +. (sum_rel_err *. (1. +. f_rel_err))) *. sum f' 0 n +.
-        ((f_cst_err *. from_int n *.(1. +. sum_rel_err)) +. sum_cst_err)
+      abs (to_real x -. sum f_exact 0 n)
+      <=. (f_rel +. (sum_rel *. (1. +. f_rel))) *. sum f_factor 0 n +.
+        ((f_abs *. from_int n *.(1. +. sum_rel)) +. sum_abs)
     }
   =
-  sum_approx_err f_rel_err f_cst_err (real_fun f) exact_f f' 0 n;
-  sum_approx_err f_rel_err f_cst_err f'' f' f' 0 n;
+  sum_approx_err f_rel f_abs (real_fun f) f_exact f_factor 0 n;
+  sum_approx_err f_rel f_abs f_factor' f_factor f_factor 0 n;
   assert {
-    sum_rel_err *. sum f'' 0 n <=.
-    sum_rel_err *. (sum f' 0 n +. ((f_rel_err *. sum f' 0 n) +. (f_cst_err *. from_int n)))
+    sum_rel *. sum f_factor' 0 n <=.
+    sum_rel *. (sum f_factor 0 n +. ((f_rel *. sum f_factor 0 n) +. (f_abs *. from_int n)))
   }
 
-  (* We don't have an error on y_uf because in practice we won't have an exact division with an approximate divisor *)
-  let lemma udiv_exact_single_error_propagation (x_uf y_uf r: udouble) (x x' x_rel_err x_cst_err : real)
+  (* We don't have an error on y_f because in practice we won't have an exact division with an approximate divisor *)
+  let lemma udiv_exact_single_error_propagation (x_f y_f r: udouble) (x x_factor x_rel x_abs : real)
     requires {
-      abs (to_real x_uf -. x) <=. x_rel_err *. x' +. x_cst_err
+      abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
-    requires { abs x <=. x' }
-    requires { 0. <=. x_rel_err }
-    requires { 0. <=. x_cst_err }
-    requires { 0. <> to_real y_uf }
-    requires { is_exact udiv x_uf y_uf }
-    requires { r = x_uf ///. y_uf }
+    requires { abs x <=. x_factor }
+    requires { 0. <=. x_rel }
+    requires { 0. <=. x_abs }
+    requires { 0. <> to_real y_f }
+    requires { is_exact udiv x_f y_f }
+    requires { r = x_f ///. y_f }
     ensures {
-      abs (to_real r -. (x /. (to_real y_uf))) <=.
-        x_rel_err *. (x' /. abs (to_real y_uf)) +. ((x_cst_err /. abs (to_real y_uf)) +. eta)
+      abs (to_real r -. (x /. (to_real y_f))) <=.
+        x_rel *. (x_factor /. abs (to_real y_f)) +. ((x_abs /. abs (to_real y_f)) +. eta)
     }
   =
-  let lemma y_uf_pos ()
-    requires { 0. <. to_real y_uf }
+  let lemma y_f_pos ()
+    requires { 0. <. to_real y_f }
     ensures {
-      abs (to_real r -. (x /. (to_real y_uf))) <=.
-        x_rel_err *. (x' /. to_real y_uf) +. ((x_cst_err /. to_real y_uf) +. eta)
+      abs (to_real r -. (x /. (to_real y_f))) <=.
+        x_rel *. (x_factor /. to_real y_f) +. ((x_abs /. to_real y_f) +. eta)
     }
     =
-    div_order_compat (to_real x_uf) (x +. x_rel_err *. x' +. x_cst_err) (to_real y_uf);
-    div_order_compat (x -. x_rel_err *. x' -. x_cst_err) (to_real x_uf) (to_real y_uf) in
-  let lemma y_uf_neg ()
-    requires { to_real y_uf <. 0. }
+    div_order_compat (to_real x_f) (x +. x_rel *. x_factor +. x_abs) (to_real y_f);
+    div_order_compat (x -. x_rel *. x_factor -. x_abs) (to_real x_f) (to_real y_f) in
+  let lemma y_f_neg ()
+    requires { to_real y_f <. 0. }
     ensures {
-      abs (to_real r -. (x /. (to_real y_uf))) <=.
-        x_rel_err *. (x' /. abs (to_real y_uf)) +. ((x_cst_err /. abs (to_real y_uf)) +. eta)
+      abs (to_real r -. (x /. (to_real y_f))) <=.
+        x_rel *. (x_factor /. abs (to_real y_f)) +. ((x_abs /. abs (to_real y_f)) +. eta)
     }
     =
-    div_order_compat2 (to_real x_uf) (x +. x_rel_err *. x' +. x_cst_err) (to_real y_uf);
+    div_order_compat2 (to_real x_f) (x +. x_rel *. x_factor +. x_abs) (to_real y_f);
     (* TODO: Prove this somehow *)
     assert {
       forall x y. x /. y <=. abs x /. abs y
     };
     assert {
-      (x -. x_rel_err *. x' -. x_cst_err) /. to_real y_uf
-      <=. x /. (to_real y_uf) +. ((x_rel_err *. x') +. x_cst_err) /. abs (to_real y_uf)
+      (x -. x_rel *. x_factor -. x_abs) /. to_real y_f
+      <=. x /. (to_real y_f) +. ((x_rel *. x_factor) +. x_abs) /. abs (to_real y_f)
       by
-        (-. x_rel_err *. x' -. x_cst_err) /. to_real y_uf
-        <=. (x_rel_err *. x' +. x_cst_err) /. abs (to_real y_uf)
+        (-. x_rel *. x_factor -. x_abs) /. to_real y_f
+        <=. (x_rel *. x_factor +. x_abs) /. abs (to_real y_f)
     };
-    div_order_compat2 (x -. x_rel_err *. x' -. x_cst_err) (to_real x_uf) (to_real y_uf);
-  in ()  
+    div_order_compat2 (x -. x_rel *. x_factor -. x_abs) (to_real x_f) (to_real y_f);
+  in ()
 end
