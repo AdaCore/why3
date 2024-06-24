@@ -309,6 +309,7 @@ let get_ts t =
 
 (* Return the float terms inside `t`. Note that if `t` is an application of type
    float we don't return the floats that it potentially contains *)
+(* TODO: Don't put duplicates in list !!! *)
 let rec get_floats t =
   match t.t_ty with
   | Some ty when is_ty_float ty -> [ t ]
@@ -626,9 +627,6 @@ let apply_fn_thm info fn app_approx arg_approx strat =
         ( "assert",
           [ term_to_str (left <=. total_err) ],
           [ strat; default_strat () ] ) )
-
-
-
 
 let use_known_thm info app_approx fn args strats =
   if
@@ -1164,8 +1162,8 @@ let letify f =
 
 (*** complete strategy *)
 
-let fw_propagation env task =
-  let naming_table = Args_wrapper.build_naming_tables task in
+let fw_propagation args env naming_table lang task =
+  (* let naming_table = Args_wrapper.build_naming_tables task in *)
   init_symbols env naming_table;
   let printer = Args_wrapper.build_naming_tables task in
   (* Update the printer at each call, but not the symbols *)
@@ -1182,14 +1180,23 @@ let fw_propagation env task =
       { terms_info = Mterm.empty; fns_info = Mls.empty; ls_defs = Mls.empty }
       (task_decls task)
   in
-  (* For each float `x` of the goal, we try to compute a formula of the form `|x
-     - exact_x| <= A x' + B` where `exact_x` is the real value which is
-     approximated by the float `x` and `|exact_x| <= x'`. For this, forward
-     error propagation is performed using propagation lemmas of the ufloat
-     stdlib with the data contained in `info`. For each new formula created, a
-     proof tree is generated with the necessary steps to prove it. *)
-  let goal = task_goal_fmla task in
-  let floats = get_floats goal in
+  let floats =
+    match args with
+    (* If no argument is given, then we perform forward error propagation for
+       every ufloat term of the goal. *)
+    | [] ->
+      let goal = task_goal_fmla task in get_floats goal
+    | [floats] ->
+        Args_wrapper.parse_and_type_list ~lang ~as_fmla:false floats naming_table
+    | _ -> raise (Args_wrapper.Arg_error
+                    "this strategy expects an optional comma-separated list of terms as argument")
+  in
+  (* For each float `x`, we try to compute a formula of the form `|x - exact_x|
+     <= A x' + B` where `exact_x` is the real value which is approximated by the
+     float `x` and `|exact_x| <= x'`. For this, forward error propagation is
+     performed using propagation lemmas of the ufloat stdlib with the data
+     contained in `info`. For each new formula created, a proof tree is
+     generated with the necessary steps to prove it. *)
   let f, strats =
     List.fold_left
       (fun (f, l) t ->
@@ -1220,5 +1227,5 @@ let fw_propagation env task =
     Sapply_trans ("assert", [ term_to_str f' ], [ f_strat ])
 
 let () =
-  register_strat "forward_propagation" fw_propagation
+  register_strat_with_args "forward_propagation" fw_propagation
     ~desc:"Compute@ forward@ error@ of@ float@ computations."

@@ -59,7 +59,7 @@ val return_prover: string -> Whyconf.config -> Whyconf.config_prover option
 
 type command =
   | Transform    of string * Trans.gentrans * string list
-  | Strat        of string * (Env.env -> Task.task -> Strategy.strat)
+  | Strat        of string * Strategy.gen_strat * string list
   | Prove        of Whyconf.config_prover * Call_provers.resource_limit
   | Strategies   of string
   | Edit         of Whyconf.prover
