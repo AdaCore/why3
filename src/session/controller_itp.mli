@@ -292,12 +292,14 @@ val run_strategy_on_goal :
 val run_strat_on_goal :
   controller ->
   proofNodeID ->
-  (Env.env -> Task.task -> Strategy.strat) ->
+  string ->
+  Strategy.gen_strat ->
+  string list ->
   callback_pa:(proofAttemptID -> proof_attempt_status -> unit) ->
   callback_tr:(string -> string list -> transformation_status -> unit) ->
   callback:(strategy_status -> unit) ->
   notification:notifier -> unit
-(** [run_strat_on_goal c id strat] executes asynchronously the
+(** [run_strat_on_goal c id strat_name strat] executes asynchronously the
     strategy [strat] on the goal [id].  [callback_pa] is called for
     each proof attempted (as in [schedule_proof_attempt]) and
     [callback_tr] is called for each transformation applied (as in

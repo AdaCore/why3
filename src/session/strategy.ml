@@ -27,23 +27,46 @@ exception StratFailure of string * exn
 exception UnknownStrat of string
 exception KnownStrat of string
 
-type strat =
+let () = Exn_printer.register
+    (fun fmt e ->
+      match e with
+      | StratFailure(s,e) ->
+          Format.fprintf fmt "@[Strategy `%s` failure:@ @[%a@]@]" s Exn_printer.exn_printer e
+      | UnknownStrat(s) ->
+          Format.fprintf fmt "Strategy `%s` not known" s
+      | KnownStrat(s) ->
+          Format.fprintf fmt "Strategy `%s` already known" s
+      | _ -> raise e)
+
+type proof_tree =
   | Sdo_nothing
-  | Sapply_trans of string * string list * strat list
-  | Scont of string * string list * (Env.env -> Task.task -> strat)
+  | Sapply_trans of string * string list * proof_tree list
+  | Scont of string * string list * (Env.env -> Task.task -> proof_tree)
   | Scall_prover of
-      (Whyconf.prover * float option * int option * int option) list * strat
+      (Whyconf.prover * float option * int option * int option) list * proof_tree
 
 let named s f env (t : Task.task) =
   try f env t with e -> raise (StratFailure (s,e))
 
-type reg_strat = Pp.formatted * (Env.env -> Task.task -> strat)
+let named_args s f args env naming_table ff (t : Task.task) =
+  try f args env naming_table ff t with e -> raise (StratFailure (s,e))
+
+type strat = Env.env -> Task.task -> proof_tree
+type strat_with_args = string list -> Env.env -> Trans.naming_table -> Env.fformat -> Task.task -> proof_tree
+
+type gen_strat = Strat of strat | StratWithArgs of strat_with_args
+
+type reg_strat = Pp.formatted * gen_strat
 
 let strats : reg_strat Hstr.t = Hstr.create 17
 
-let register_strat ~desc s p =
+let register_strat ~desc s strat =
   if Hstr.mem strats s then raise (KnownStrat s);
-  Hstr.replace strats s (desc, fun env task -> named s p env task)
+  Hstr.replace strats s (desc, Strat (fun env task -> named s strat env task))
+
+let register_strat_with_args ~desc s strat =
+  if Hstr.mem strats s then raise (KnownStrat s);
+  Hstr.replace strats s (desc, StratWithArgs (fun args env naming_table ff task -> named_args s strat args env naming_table ff task))
 
 let lookup_strat s =
   try snd (Hstr.find strats s) with
