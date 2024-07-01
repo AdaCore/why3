@@ -196,6 +196,9 @@ let env, gconfig =
 (* Source language highlighting *)
 (********************************)
 
+let warn_unknown_format = Loc.register_warning "unk_format" "Unknown source format"
+
+
 let get_extra_lang =
   let main = Whyconf.get_main gconfig.config in
   let load_path = Filename.concat (Whyconf.datadir main) "lang" in
@@ -205,16 +208,16 @@ let get_extra_lang =
     let ll = ref None in
     fun () ->
       match !ll with
-      | Some l -> l
+      | Some _ as l -> l
       | None -> (
         match languages_manager#language shortcut with
         | None ->
-          eprintf "language file for '%s' not found in directory %s@." name
+            Loc.warning warn_unknown_format "Language file for '%s' not found in directory %s" name
             load_path;
-          exit 1
-        | Some x as l ->
+          None
+        | Some _ as l ->
           ll := l;
-          x)
+          l)
 
 (* Borrowed from Frama-C src/gui/source_manager.ml: Try to convert a source file
    either as UTF-8 or as locale. *)
@@ -900,29 +903,24 @@ let ada_lang = get_extra_lang "ada" "Ada"
 let java_lang = get_extra_lang "java" "Java"
 let c_lang = get_extra_lang "c" "C"
 
-let warn_unknown_format = Loc.register_warning "unk_format" "Unknown source format"
-
 let change_lang view lang =
-  try
-    let lang =
-      match lang with
-      | "python" -> why3py_lang ()
-      | "micro-C" -> why3c_lang ()
-      | ".rs" -> rust_lang ()
-      | ".adb" -> ada_lang ()
-      | ".ads" -> ada_lang ()
-      | ".java" -> java_lang ()
-      | ".c" -> c_lang ()
-      | ".mlw"
-      | ".why"
-      | "whyml" ->  why_lang ()
-      | _ ->
-          Loc.warning warn_unknown_format "Unrecognized source format `%s`" lang;
-          raise Exit
-    in
-    view#source_buffer#set_language (Some lang)
-  with
-  | Exit -> ()
+  let lang =
+    match lang with
+    | "python" -> why3py_lang ()
+    | "micro-C" -> why3c_lang ()
+    | ".rs" -> rust_lang ()
+    | ".adb" -> ada_lang ()
+    | ".ads" -> ada_lang ()
+    | ".java" -> java_lang ()
+    | ".c" -> c_lang ()
+    | ".mlw"
+    | ".why"
+    | "whyml" ->  why_lang ()
+    | _ ->
+        Loc.warning warn_unknown_format "Unrecognized source format `%s`" lang;
+        None
+  in
+    view#source_buffer#set_language lang
 
 (* Create an eventbox for the title label of the notebook tab *)
 let create_eventbox ~read_only file =
@@ -1410,8 +1408,8 @@ let () =
   Gconfig.add_modifiable_mono_font_view counterexample_view#misc;
   Gconfig.add_modifiable_mono_font_view command_entry#misc;
   Gconfig.add_modifiable_mono_font_view message_zone#misc;
-  task_view#source_buffer#set_language (Some (why_lang ()));
-  counterexample_view#source_buffer#set_language (Some (why_lang ()));
+  task_view#source_buffer#set_language (why_lang ());
+  counterexample_view#source_buffer#set_language (why_lang ());
   Gconfig.set_fonts ()
 
 (******************)
