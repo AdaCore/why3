@@ -33,6 +33,18 @@ module AddSubMulSingle
                 1. +. 4. *. eps)
     }
   = (a **. a ++. b **. b ++. c **. c)
+
+  let ghost example2 (a b c : usingle)
+    ensures {
+      let t = 1.0 +. eps in
+      let t1 = eps +. (eps *. t) in
+      let t2 = (to_real a +. to_real b) *. to_real c in
+      let t3 = abs t2 in
+      let t4 = (t +. t1) *. eta in
+      abs (to_real result -. (t2 +. t2))
+      <=. ((((t1 +. t1) +. eps) *. (t3 +. t3)) +. (t4 +. t4))
+    }
+  = ((a ++. b) **. c) ++. ((a ++. b) **. c)
 end
 
 module AddSubMulDouble
@@ -70,4 +82,16 @@ module AddSubMulDouble
                 1. +. 4. *. eps)
     }
   = (a **. a ++. b **. b ++. c **. c)
+
+  let ghost example2 (a b c : udouble)
+    ensures {
+      let t = 1.0 +. eps in
+      let t1 = eps +. (eps *. t) in
+      let t2 = (to_real a +. to_real b) *. to_real c in
+      let t3 = abs t2 in
+      let t4 = (t +. t1) *. eta in
+      abs (to_real result -. (t2 +. t2))
+      <=. ((((t1 +. t1) +. eps) *. (t3 +. t3)) +. (t4 +. t4))
+    }
+  = ((a ++. b) **. c) ++. ((a ++. b) **. c)
 end

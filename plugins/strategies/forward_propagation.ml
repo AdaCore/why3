@@ -81,6 +81,7 @@ type forward_error = {
 (* This type corresponds to the numeric info we have on a real/float term *)
 type term_info = {
   error : forward_error option;
+  computed_error : (forward_error * term * proof_tree) option;
   (*
    * "Some (op, [x; y])" means that the term "t" is the result of the FP operation
    * "op" on "x" and "y"
@@ -281,7 +282,7 @@ let to_real ieee_type t =
 
 let get_info info t =
   try Mterm.find t info with
-  | Not_found -> { error = None; ieee_op = None }
+  | Not_found -> { error = None; computed_error = None; ieee_op = None }
 
 let add_fw_error info t error =
   let t =
@@ -291,6 +292,16 @@ let add_fw_error info t error =
   in
   let t_info = get_info info t in
   let t_info = { t_info with error = Some error } in
+  Mterm.add t t_info info
+
+let add_computed_fw_error info t ((fe, _, _) as error) =
+  let t =
+    match t.t_node with
+    | Tapp (ls, [ t ]) when is_to_real_ls ls -> t
+    | _ -> t
+  in
+  let t_info = get_info info t in
+  let t_info = { t_info with computed_error = Some error; error = Some fe } in
   Mterm.add t t_info info
 
 let add_ieee_op info ls t args =
@@ -397,17 +408,13 @@ let combine_uop_errors info uop t1 e1 t2 e2 r strat_for_t1 strat_for_t2 =
     else
       (rel_err **. e1.factor **. e2.factor) ++. cst_err
   in
-  let exact, exact' =
+  let exact, exact_simp =
     if is_uadd_ls uop then
       (e1.exact +. e2.exact, e1.factor ++. e2.factor)
     else if is_usub_ls uop then
       (e1.exact -. e2.exact, e1.factor ++. e2.factor)
     else
       (e1.exact *. e2.exact, e1.factor **. e2.factor)
-  in
-  let info =
-    add_fw_error info r
-      { exact; rel = rel_err_simp; factor = exact'; cst = cst_err_simp }
   in
   let str = string_of_ufloat_type_and_op ts uop in
   let strat =
@@ -431,13 +438,20 @@ let combine_uop_errors info uop t1 e1 t2 e2 r strat_for_t1 strat_for_t2 =
         ] )
   in
   let f = abs (to_real r -. exact) <=. total_err in
-  if t_equal total_err total_err_simp then
-    (info, f, strat)
-  else
-    let f_simp = abs (to_real r -. exact) <=. total_err_simp in
-    ( info,
-      f_simp,
-      Sapply_trans ("assert", [ term_to_str f ], [ strat; default_strat () ]) )
+  let fw_err =
+    { exact; rel = rel_err_simp; factor = exact_simp; cst = cst_err_simp }
+  in
+  let f, strat =
+    if t_equal total_err total_err_simp then
+      (f, strat)
+    else
+      let f_simp = abs (to_real r -. exact) <=. total_err_simp in
+      ( f_simp,
+        Sapply_trans ("assert", [ term_to_str f ], [ strat; default_strat () ])
+      )
+  in
+  let info = add_computed_fw_error info r (fw_err, f, strat) in
+  (info, f, strat)
 
 (* Error on a IEEE op when no propagation is needed (eg. we don't have a forward
    error on t1 nor t2) *)
@@ -613,20 +627,24 @@ let apply_fn_thm info fn app_approx arg_approx strat =
   in
   let total_err = (rel_err *. app') +. cst_err in
   let total_err_simp = (app' **. rel_err_simp) ++. cst_err_simp in
-  let term_info =
-    add_fw_error info.terms_info app_approx
-      { exact; rel = rel_err_simp; factor = app'; cst = cst_err_simp }
-  in
   let left = abs (to_real app_approx -. exact) in
-  if t_equal total_err total_err_simp then
-    (term_info, Some (left <=. total_err), strat)
-  else
-    ( term_info,
-      Some (left <=. total_err_simp),
-      Sapply_trans
-        ( "assert",
-          [ term_to_str (left <=. total_err) ],
-          [ strat; default_strat () ] ) )
+  let f, strat =
+    if t_equal total_err total_err_simp then
+      (left <=. total_err, strat)
+    else
+      ( left <=. total_err_simp,
+        Sapply_trans
+          ( "assert",
+            [ term_to_str (left <=. total_err) ],
+            [ strat; default_strat () ] ) )
+  in
+  let term_info =
+    add_computed_fw_error info.terms_info app_approx
+      ( { exact; rel = rel_err_simp; factor = app'; cst = cst_err_simp },
+        f,
+        strat )
+  in
+  (term_info, Some f, strat)
 
 let use_known_thm info app_approx fn args strats =
   if
@@ -689,126 +707,136 @@ let rec get_error_fmlas info t =
       Sapply_trans ("assert", [ term_to_str f ], [ s; default_strat () ])
     | None -> s
   in
-  match t_info.ieee_op with
-  (* `t` is the result of the IEEE minus operation *)
-  | Some (ieee_op, [ x ]) when is_uminus_ls ieee_op -> (
-    let terms_info, fmla, strat_for_x = get_error_fmlas info x in
-    let strat = get_strat fmla strat_for_x in
-    let ts = get_ts t in
-    let to_real = to_real ts in
-    let x_info = get_info terms_info x in
-    match x_info.error with
-    (* No propagation needed *)
-    | None ->
-      (terms_info, None, strat)
-      (* The error doesn't change since the float minus operation is exact *)
-    | Some { exact; rel; factor; cst } ->
-      let exact = minus exact in
-      let f = abs (to_real t -. exact) <=. (rel **. factor) ++. cst in
-      let terms_info = add_fw_error terms_info t { exact; rel; factor; cst } in
-      (terms_info, Some f, strat))
-  (* `t` is the result of an IEEE addition/sustraction/multiplication *)
-  | Some (ieee_op, [ t1; t2 ])
-    when is_uadd_ls ieee_op || is_usub_ls ieee_op || is_umul_ls ieee_op ->
-    (* Get error formulas on subterms `t1` and `t2` *)
-    let terms_info, fmla1, strat_for_t1 = get_error_fmlas info t1 in
-    let terms_info, fmla2, strat_for_t2 =
-      get_error_fmlas { info with terms_info } t2
-    in
-    let strat_for_t1 = get_strat fmla1 strat_for_t1 in
-    let strat_for_t2 = get_strat fmla2 strat_for_t2 in
-    let terms_info, f, strats =
-      use_ieee_thms terms_info ieee_op t t1 t2 strat_for_t1 strat_for_t2
-    in
-    (terms_info, Some f, strats)
-  (* `t` is the result of an other IEEE operation *)
-  | Some (ieee_op, [ t1; t2 ]) when is_uexact_div_ls ieee_op ->
-    let ts = get_ts t2 in
-    let eta = eta ts in
-    let to_real = to_real ts in
-    let terms_info, fmla1, strat_for_t1 = get_error_fmlas info t1 in
-    let strat_for_t1 = get_strat fmla1 strat_for_t1 in
-    let t1_info = get_info terms_info t1 in
-    let e1 = Option.get t1_info.error in
-    let fe =
-      {
-        exact = e1.exact //. to_real t2;
-        rel = e1.rel;
-        factor = e1.factor //. abs (to_real t2);
-        cst = (e1.cst //. abs (to_real t2)) ++. eta;
-      }
-    in
-    let err =
-      (e1.rel *. (e1.factor /. abs (to_real t2)))
-      +. ((e1.cst /. abs (to_real t2)) +. eta)
-    in
-    let err_simp =
-      (e1.rel **. (e1.factor //. abs (to_real t2)))
-      ++. ((e1.cst //. abs (to_real t2)) ++. eta)
-    in
-    let left = abs (to_real t -. (e1.exact //. to_real t2)) in
-    let s = string_of_ufloat_type ts in
-    let strat =
-      Sapply_trans
-        ( "apply",
-          [
-            "udiv_exact_" ^ s ^ "_error_propagation";
-            "with";
-            sprintf "%s" (term_to_str t1);
-          ],
-          [
-            strat_for_t1;
-            default_strat ();
-            default_strat ();
-            default_strat ();
-            default_strat ();
-            default_strat ();
-            default_strat ();
-          ] )
-    in
-    let s =
-      Sapply_trans
-        ("assert", [ term_to_str (left <=. err) ], [ strat; default_strat () ])
-    in
-    let term_info = add_fw_error terms_info t fe in
-    if t_equal err err_simp then
-      (term_info, Some (left <=. err), s)
-    else
-      ( term_info,
-        Some (left <=. err_simp),
-        Sapply_trans
-          ("assert", [ term_to_str (left <=. err) ], [ s; default_strat () ]) )
-  | Some _ -> (info.terms_info, None, default_strat ())
+  match t_info.computed_error with
+  | Some (_, f, strat) -> (info.terms_info, Some f, strat)
   | None -> (
-    match t_info.error with
-    (* `t` has a forward error, we look if it is the result of the approximation
-       of a known function, in which case we use the function's propagation
-       lemma to compute an error bound *)
-    | Some e -> (
-      match get_known_fn_and_args t e.exact with
-      | Some (fn, args) ->
-        (* First we compute the potential forward errors of the function args *)
-        let info, strats =
-          List.fold_left
-            (fun (info, l) t ->
-              let terms_info, f, s = get_error_fmlas info t in
-              let s =
-                match f with
-                | None -> s
-                | Some f ->
-                  Sapply_trans
-                    ("assert", [ term_to_str f ], [ s; default_strat () ])
-              in
-              ({ info with terms_info }, s :: l))
-            (info, []) args
+    match t_info.ieee_op with
+    (* `t` is the result of the IEEE minus operation *)
+    | Some (ieee_op, [ x ]) when is_uminus_ls ieee_op -> (
+      let terms_info, fmla, strat_for_x = get_error_fmlas info x in
+      let strat = get_strat fmla strat_for_x in
+      let ts = get_ts t in
+      let to_real = to_real ts in
+      let x_info = get_info terms_info x in
+      match x_info.error with
+      (* No propagation needed *)
+      | None ->
+        (terms_info, None, strat)
+        (* The error doesn't change since the float minus operation is exact *)
+      | Some { exact; rel; factor; cst } ->
+        let exact = minus exact in
+        let f = abs (to_real t -. exact) <=. (rel **. factor) ++. cst in
+        let terms_info =
+          add_computed_fw_error terms_info t
+            ({ exact; rel; factor; cst }, f, strat)
         in
-        use_known_thm info t fn args (List.rev strats)
-      | None -> (info.terms_info, None, default_strat ()))
-    | None -> (info.terms_info, None, default_strat ()))
+        (terms_info, Some f, strat))
+    (* `t` is the result of an IEEE addition/sustraction/multiplication *)
+    | Some (ieee_op, [ t1; t2 ])
+      when is_uadd_ls ieee_op || is_usub_ls ieee_op || is_umul_ls ieee_op ->
+      (* Get error formulas on subterms `t1` and `t2` *)
+      let terms_info, fmla1, strat_for_t1 = get_error_fmlas info t1 in
+      let terms_info, fmla2, strat_for_t2 =
+        get_error_fmlas { info with terms_info } t2
+      in
+      let strat_for_t1 = get_strat fmla1 strat_for_t1 in
+      let strat_for_t2 = get_strat fmla2 strat_for_t2 in
+      let terms_info, f, strats =
+        use_ieee_thms terms_info ieee_op t t1 t2 strat_for_t1 strat_for_t2
+      in
+      (terms_info, Some f, strats)
+    (* `t` is the result of an other IEEE operation *)
+    | Some (ieee_op, [ t1; t2 ]) when is_uexact_div_ls ieee_op ->
+      let ts = get_ts t2 in
+      let eta = eta ts in
+      let to_real = to_real ts in
+      let terms_info, fmla1, strat_for_t1 = get_error_fmlas info t1 in
+      let strat_for_t1 = get_strat fmla1 strat_for_t1 in
+      let t1_info = get_info terms_info t1 in
+      let e1 = Option.get t1_info.error in
+      let fe =
+        {
+          exact = e1.exact //. to_real t2;
+          rel = e1.rel;
+          factor = e1.factor //. abs (to_real t2);
+          cst = (e1.cst //. abs (to_real t2)) ++. eta;
+        }
+      in
+      let err =
+        (e1.rel *. (e1.factor /. abs (to_real t2)))
+        +. ((e1.cst /. abs (to_real t2)) +. eta)
+      in
+      let err_simp =
+        (e1.rel **. (e1.factor //. abs (to_real t2)))
+        ++. ((e1.cst //. abs (to_real t2)) ++. eta)
+      in
+      let left = abs (to_real t -. (e1.exact //. to_real t2)) in
+      let s = string_of_ufloat_type ts in
+      let strat =
+        Sapply_trans
+          ( "apply",
+            [
+              "udiv_exact_" ^ s ^ "_error_propagation";
+              "with";
+              sprintf "%s" (term_to_str t1);
+            ],
+            [
+              strat_for_t1;
+              default_strat ();
+              default_strat ();
+              default_strat ();
+              default_strat ();
+              default_strat ();
+              default_strat ();
+            ] )
+      in
+      let s =
+        Sapply_trans
+          ("assert", [ term_to_str (left <=. err) ], [ strat; default_strat () ])
+      in
+      let f, strat =
+        if t_equal err err_simp then
+          (left <=. err, s)
+        else
+          ( left <=. err_simp,
+            Sapply_trans
+              ("assert", [ term_to_str (left <=. err) ], [ s; default_strat () ])
+          )
+      in
+      let term_info = add_computed_fw_error terms_info t (fe, f, strat) in
+      (term_info, Some f, strat)
+    | Some _ -> (info.terms_info, None, default_strat ())
+    | None -> (
+      match t_info.error with
+      (* `t` has a forward error, we look if it is the result of the
+         approximation of a known function, in which case we use the function's
+         propagation lemma to compute an error bound *)
+      | Some e -> (
+        match get_known_fn_and_args t e.exact with
+        | Some (fn, args) ->
+          (* First we compute the potential forward errors of the function
+             args *)
+          let info, strats =
+            List.fold_left
+              (fun (info, l) t ->
+                let terms_info, f, s = get_error_fmlas info t in
+                let s =
+                  match f with
+                  | None -> s
+                  | Some f ->
+                    Sapply_trans
+                      ("assert", [ term_to_str f ], [ s; default_strat () ])
+                in
+                ({ info with terms_info }, s :: l))
+              (info, []) args
+          in
+          use_known_thm info t fn args (List.rev strats)
+        | None -> (info.terms_info, None, default_strat ()))
+      | None -> (info.terms_info, None, default_strat ())))
 
 let parse_error is_match exact t =
   (* If it we don't find a "relative" error we have an absolute error of `t` *)
-  let e_default = { exact; rel = zero; factor = zero; cst = t } in
+  let e_default = { exact; rel = zero; factor = abs exact; cst = t } in
   let rec parse t =
     if is_match t then
       ({ exact; rel = one; factor = t; cst = zero }, true)
@@ -1185,11 +1213,15 @@ let fw_propagation args env naming_table lang task =
     (* If no argument is given, then we perform forward error propagation for
        every ufloat term of the goal. *)
     | [] ->
-      let goal = task_goal_fmla task in get_floats goal
-    | [floats] ->
-        Args_wrapper.parse_and_type_list ~lang ~as_fmla:false floats naming_table
-    | _ -> raise (Args_wrapper.Arg_error
-                    "this strategy expects an optional comma-separated list of terms as argument")
+      let goal = task_goal_fmla task in
+      get_floats goal
+    | [ floats ] ->
+      Args_wrapper.parse_and_type_list ~lang ~as_fmla:false floats naming_table
+    | _ ->
+      raise
+        (Args_wrapper.Arg_error
+           "this strategy expects an optional comma-separated list of terms as \
+            argument")
   in
   (* For each float `x`, we try to compute a formula of the form `|x - exact_x|
      <= A x' + B` where `exact_x` is the real value which is approximated by the
@@ -1214,7 +1246,7 @@ let fw_propagation args env naming_table lang task =
     let f_strat =
       Sapply_trans ("assert", [ term_to_str f ], strats @ [ default_strat () ])
     in
-    Sapply_trans ("assert", [ term_to_str f' ], [ f_strat ])
+    Sapply_trans ("assert", [ term_to_str f' ], [ f_strat; default_strat () ])
   else
     (* We assert a conjunction of formulas, one for each float in the goal for
        which we can use propagation lemmas. We have one strat for each of this
@@ -1224,7 +1256,7 @@ let fw_propagation args env naming_table lang task =
     let f_strat =
       Sapply_trans ("assert", [ term_to_str f ], [ s; default_strat () ])
     in
-    Sapply_trans ("assert", [ term_to_str f' ], [ f_strat ])
+    Sapply_trans ("assert", [ term_to_str f' ], [ f_strat; default_strat () ])
 
 let () =
   register_strat_with_args "forward_propagation" fw_propagation
