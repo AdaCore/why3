@@ -970,8 +970,17 @@ module MLToC = struct
        ([], expr_or_return env e)
     | Mltree.Econst (Constant.ConstStr s) ->
        C.([], expr_or_return env (Econst (Cstring s)))
-    | Mltree.Econst (Constant.ConstReal _) ->
-       raise (Unsupported "real constant")
+    | Mltree.Econst (Constant.ConstReal c) ->
+        let id = match e.e_mlty with
+          | Tapp (tname, _) -> tname
+          | _ -> assert false in
+        let print fmt c =
+          Number.print_real_constant Number.full_support fmt c in
+        let s =
+          match query_syntax info.literal id with
+          | Some s -> Format.asprintf "%a" (syntax_arguments s print) [c]
+          | None -> Format.asprintf "%a" print c in
+        ([], expr_or_return env C.(Econst (Cfloat s)))
     | Mltree.Econst (Constant.ConstInt ic) ->
        let open Number in
        let print fmt ic =

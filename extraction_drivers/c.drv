@@ -137,6 +137,30 @@ module mach.int.UInt32
 
 end
 
+module ieee_float.Float64
+
+  syntax type t "double"
+
+  syntax val (.+)     "%1 + %2"   prec 4 4 3
+  syntax val (.-)     "%1 - %2"   prec 4 4 3
+  syntax val (.-_)    "-%1"       prec 2 1
+  syntax val (.*)     "%1 * %2"   prec 3 3 2
+  syntax val (./)     "%1 / %2"   prec 3 3 2
+  syntax val (.=)     "%1 == %2"  prec 7 7 6
+  syntax val (.<=)    "%1 <= %2"  prec 6 6 5
+  syntax val (.<)     "%1 < %2"   prec 6 6 5
+  syntax val (.>=)    "%1 >= %2"  prec 6 6 5
+  syntax val (.>)     "%1 > %2"   prec 6 6 5
+  syntax val eq       "%1 == %2"  prec 7 7 6
+  syntax val le       "%1 <= %2"  prec 6 6 5
+  syntax val lt       "%1 < %2"   prec 6 6 5
+  syntax val ge       "%1 >= %2"  prec 6 6 5
+  syntax val gt       "%1 > %2"   prec 6 6 5
+
+  remove module
+
+end
+
 module mach.int.UInt32GMP
 
   interface "\
