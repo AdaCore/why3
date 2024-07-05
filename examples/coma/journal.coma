@@ -6,13 +6,9 @@ use seq.Seq
 use seq.FreeMonoid
 use seq.Mem as S
 
+use coma.Std
 
 -------------------------------------------------------------------------------
-
-let halt = any
-let fail { false } = halt
-
-let if (b: bool) (then {b}) (else {not b}) = any
 
 let unTree < 'a > (t: tree 'a)
   (onNode (x: 'a) (l r: tree 'a) {t = Node l x r})

@@ -2,106 +2,85 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.5.2" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC5" version="1.1.1" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.12.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.5.3" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.13.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="coma">
 <path name=".."/><path name="journal.coma"/>
 <theory name="Coma">
- <goal name="vc_halt" proved="true">
- <proof prover="0"><result status="valid" time="0.016430" steps="3"/></proof>
- </goal>
- <goal name="vc_fail" proved="true">
- <proof prover="0"><result status="valid" time="0.007706" steps="3"/></proof>
- </goal>
- <goal name="vc_if" proved="true">
- <proof prover="0"><result status="valid" time="0.010028" steps="3"/></proof>
- </goal>
  <goal name="vc_unTree" proved="true">
- <proof prover="0"><result status="valid" time="0.013031" steps="3"/></proof>
+ <proof prover="5"><result status="valid" time="0.013914" steps="3361"/></proof>
  </goal>
  <goal name="vc_get" proved="true">
- <proof prover="0"><result status="valid" time="0.016402" steps="3"/></proof>
+ <proof prover="5"><result status="valid" time="0.011011" steps="3361"/></proof>
  </goal>
  <goal name="vc_factorial" proved="true">
- <proof prover="0"><result status="valid" time="0.013987" steps="219"/></proof>
+ <proof prover="4"><result status="valid" time="0.024566" steps="219"/></proof>
  </goal>
  <goal name="vc_mergeTree" proved="true">
- <proof prover="0"><result status="valid" time="0.012930" steps="3"/></proof>
+ <proof prover="5"><result status="valid" time="0.008946" steps="3361"/></proof>
  </goal>
  <goal name="vc_remove_root" proved="true">
- <proof prover="0"><result status="valid" time="0.007763" steps="3"/></proof>
+ <proof prover="5"><result status="valid" time="0.005889" steps="3361"/></proof>
  </goal>
  <goal name="vc_remove_root_nobar" proved="true">
- <proof prover="0"><result status="valid" time="0.010484" steps="3"/></proof>
+ <proof prover="5"><result status="valid" time="0.014801" steps="3361"/></proof>
  </goal>
  <goal name="vc_client_1" proved="true">
- <proof prover="0"><result status="valid" time="0.009118" steps="3"/></proof>
+ <proof prover="5"><result status="valid" time="0.003715" steps="3361"/></proof>
  </goal>
  <goal name="vc_client_2" proved="true">
- <proof prover="0"><result status="valid" time="0.015138" steps="3"/></proof>
+ <proof prover="5"><result status="valid" time="0.010410" steps="3361"/></proof>
  </goal>
  <goal name="vc_client_non_provable">
- <proof prover="0"><result status="timeout" time="1.000000" steps="9687"/></proof>
- <proof prover="1" timelimit="1"><result status="timeout" time="1.000000" steps="250280"/></proof>
- <proof prover="2"><result status="unknown" time="0.036804" steps="11530"/></proof>
- <proof prover="3"><result status="timeout" time="1.000000" steps="1554110"/></proof>
  </goal>
  <goal name="vc_find_0" proved="true">
- <proof prover="0"><result status="valid" time="0.016247" steps="3"/></proof>
+ <proof prover="5"><result status="valid" time="0.010485" steps="3361"/></proof>
  </goal>
  <goal name="vc_find_1" proved="true">
- <proof prover="0"><result status="valid" time="0.027112" steps="353"/></proof>
+ <proof prover="4"><result status="valid" time="0.030123" steps="353"/></proof>
  </goal>
  <goal name="vc_find_2" proved="true">
- <proof prover="0"><result status="valid" time="0.030807" steps="470"/></proof>
+ <proof prover="4"><result status="valid" time="0.031966" steps="470"/></proof>
  </goal>
  <goal name="vc_find_3" proved="true">
- <proof prover="0"><result status="valid" time="0.033439" steps="578"/></proof>
- </goal>
- <goal name="vc_fclient_0" proved="true">
- <proof prover="0"><result status="valid" time="0.010054" steps="3"/></proof>
+ <proof prover="4"><result status="valid" time="0.039805" steps="577"/></proof>
  </goal>
  <goal name="vc_fclient_1" proved="true">
- <proof prover="1"><result status="valid" time="0.014074" steps="9169"/></proof>
  <transf name="split_vc" proved="true" >
   <goal name="vc_fclient_1.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.010521" steps="6"/></proof>
+  <proof prover="5"><result status="valid" time="0.017155" steps="8082"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="vc_fclient_2" proved="true">
- <proof prover="0"><result status="valid" time="0.013286" steps="61"/></proof>
  <transf name="split_vc" proved="true" >
   <goal name="vc_fclient_2.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.006503" steps="6"/></proof>
+  <proof prover="5"><result status="valid" time="0.010317" steps="8082"/></proof>
   </goal>
   <goal name="vc_fclient_2.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.011649" steps="57"/></proof>
+  <proof prover="5"><result status="valid" time="0.014792" steps="79330"/></proof>
   </goal>
   <goal name="vc_fclient_2.2" proved="true">
-  <proof prover="0"><result status="valid" time="0.009807" steps="8"/></proof>
+  <proof prover="5"><result status="valid" time="0.027197" steps="60093"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="vc_fclient_3" proved="true">
- <proof prover="0"><result status="valid" time="0.010617" steps="62"/></proof>
  <transf name="split_vc" proved="true" >
   <goal name="vc_fclient_3.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.017199" steps="6"/></proof>
+  <proof prover="5"><result status="valid" time="0.017805" steps="8082"/></proof>
   </goal>
   <goal name="vc_fclient_3.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.023725" steps="57"/></proof>
+  <proof prover="5"><result status="valid" time="0.021690" steps="79330"/></proof>
   </goal>
   <goal name="vc_fclient_3.2" proved="true">
-  <proof prover="0"><result status="valid" time="0.020686" steps="8"/></proof>
+  <proof prover="5"><result status="valid" time="0.019662" steps="60093"/></proof>
   </goal>
   <goal name="vc_fclient_3.3" proved="true">
-  <proof prover="0"><result status="valid" time="0.018725" steps="10"/></proof>
+  <proof prover="5"><result status="valid" time="0.021759" steps="68789"/></proof>
   </goal>
   <goal name="vc_fclient_3.4" proved="true">
-  <proof prover="0"><result status="valid" time="0.011181" steps="12"/></proof>
+  <proof prover="5"><result status="valid" time="0.008957" steps="5897"/></proof>
   </goal>
  </transf>
  </goal>

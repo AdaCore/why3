@@ -3,14 +3,10 @@ use list.List
 use list.Append
 use list.Reverse
 
+use coma.Std
+use coma.List
+
 -------------------------------------------------------------------------------
-
-let if (b: bool) (then {b}) (else {not b}) = any
-
-let unList < 'a > (l: list 'a)
-  (onCons (h: 'a) (t: list 'a) {l = Cons h t})
-  (onNil {l = Nil})
-  = any
 
 let assign_int < 'a > (&r v: 'a) (out [r] {r = v}) = any
 
@@ -20,12 +16,11 @@ let assign_list < 'a > (&r v: list 'a) {} (out [r] {r = v})
 -------------------------------------------------------------------------------
 
 let rev_append < 'a > (l0 r0: list 'a) {}
-      (out (r: list 'a) { r = reverse l0 ++ r0 }) =
-  loop
+      (out (r: list 'a) { r = reverse l0 ++ r0 })
+= loop
   [ loop { reverse l ++ r = reverse l0 ++ r0 }
     = unList < 'a > {l}
         (fun (h: 'a) (t: list 'a) ->
           [ &r <- Cons h r | &l <- t ] loop)
-        (-> out {r})
-  ]
+        (-> out {r}) ]
   [ &r: list 'a = r0 | &l: list 'a = l0 ]

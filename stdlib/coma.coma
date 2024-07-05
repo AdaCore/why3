@@ -1,0 +1,21 @@
+
+module Std
+
+  let halt = any
+
+  let fail { false } = any
+
+  let if (b: bool) (then {b}) (else {not b}) = any
+
+end
+
+module List
+
+  use list.List
+
+  let unList < 'a > (l: list 'a)
+    (onCons (h: 'a) (t: list 'a) {l = Cons h t})
+    (onNil {l = Nil})
+  = any
+
+end
