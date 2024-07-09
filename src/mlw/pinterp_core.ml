@@ -41,12 +41,12 @@ let pp_env pp_key pp_value fmt l =
     let delims = Pp.nothing, Pp.nothing in
     pp_bindings ~delims ~sep:Pp.comma pp_key pp_value fmt l
 
-exception Incomplete of string
+exception Cannot_evaluate of string
 
-let incomplete f =
+let cannot_evaluate f =
   kasprintf (fun reason ->
-      Debug.dprintf debug_trace_exec "Incomplete: %s@." reason;
-      raise (Incomplete reason)) f
+      Debug.dprintf debug_trace_exec "Cannot evaluate: %s@." reason;
+      raise (Cannot_evaluate reason)) f
 
 let ity_components ity = match ity.ity_node with
   | Ityapp (ts, l1, l2)
@@ -104,9 +104,9 @@ end = struct
 
   let rec compare_values v1 v2 =
     if v1.v_desc = Vundefined then
-      incomplete "undefined value of type %a cannot be compared" print_ty v1.v_ty;
+      cannot_evaluate "undefined value of type %a cannot be compared" print_ty v1.v_ty;
     if v2.v_desc = Vundefined then
-      incomplete "undefined value of type %a cannot be compared" print_ty v2.v_ty;
+      cannot_evaluate "undefined value of type %a cannot be compared" print_ty v2.v_ty;
     let v_ty v = v.v_ty and v_desc v = v.v_desc in
     cmp [cmptr v_ty ty_compare; cmptr v_desc compare_desc] v1 v2
   and compare_desc d1 d2 =
@@ -209,7 +209,7 @@ let range_value ity n =
       begin try
           Number.(check_range { il_kind = ILitUnk; il_int = n } r)
         with Number.OutOfRange _ ->
-          raise (Incomplete "value out of range")
+          cannot_evaluate "value out of range"
       end
   | _ -> ()
   end;
@@ -839,6 +839,8 @@ exception Fail of cntr_ctx * Term.term
 
 exception Stuck of cntr_ctx * Loc.position option * string
 
+exception Cannot_decide of cntr_ctx * Term.term list * string
+
 let stuck ?loc ctx f =
   kasprintf (fun reason ->
       Debug.dprintf debug_trace_exec "Stuck: %s@." reason;
@@ -847,8 +849,8 @@ let stuck ?loc ctx f =
 type check_term =
   ?vsenv:(Term.vsymbol * Term.term) list -> cntr_ctx -> Term.term -> unit
 
-let check_term_dummy ?vsenv:_ _ _ =
-  incomplete "check_term_dummy"
+let check_term_dummy ?vsenv:_ ctx t =
+  raise (Cannot_decide (ctx, [t], "check_term_dummy"))
 
 type rac = {
   check_term        : check_term;
@@ -867,13 +869,19 @@ let warn_rac_incomplete =
 
 let check_term rac ?vsenv cntr_ctx t =
   try rac.check_term ?vsenv cntr_ctx t
-  with Incomplete reason when rac.ignore_incomplete ->
+  with Cannot_evaluate reason when rac.ignore_incomplete ->
     Loc.warning warn_rac_incomplete "%s.@." reason
+  | Cannot_decide (_,_,reason) when rac.ignore_incomplete ->
+    Loc.warning warn_rac_incomplete "%s.@." reason
+  | Cannot_evaluate reason -> Printexc.(raise_with_backtrace (Cannot_decide (cntr_ctx, [t], reason)) (get_raw_backtrace ()))
 
 let check_terms rac ctx ts =
   try List.iter (rac.check_term ctx) ts
-  with Incomplete reason when rac.ignore_incomplete ->
+  with Cannot_evaluate reason when rac.ignore_incomplete ->
     Loc.warning warn_rac_incomplete "%s.@." reason
+  | Cannot_decide (_,_,reason) when rac.ignore_incomplete ->
+    Loc.warning warn_rac_incomplete "%s.@." reason
+  | Cannot_evaluate reason -> Printexc.(raise_with_backtrace (Cannot_decide (ctx, ts, reason)) (get_raw_backtrace ()))
 
 (* Check a post-condition [t] by binding the result variable to
    the term [vt] representing the result value.
@@ -884,13 +892,17 @@ let check_post rac ctx v post =
   let vsenv = Mvs.add vs v ctx.cntr_env.vsenv in
   let ctx = {ctx with cntr_env= {ctx.cntr_env with vsenv}} in
   try rac.check_term ctx t
-  with Incomplete reason when rac.ignore_incomplete ->
+  with
+  | Cannot_decide (_,_,reason) when rac.ignore_incomplete ->
     Loc.warning warn_rac_incomplete "%s.@." reason
+  | Cannot_evaluate reason -> Printexc.(raise_with_backtrace (Cannot_decide (ctx, [post], reason)) (get_raw_backtrace ()))
 
 let check_posts rac ctx v posts =
   try List.iter (check_post rac ctx v) posts
-  with Incomplete reason when rac.ignore_incomplete ->
+  with
+  | Cannot_evaluate reason when rac.ignore_incomplete ->
     Loc.warning warn_rac_incomplete "%s.@." reason
+  | Cannot_evaluate reason -> Printexc.(raise_with_backtrace (Cannot_decide (ctx, posts, reason)) (get_raw_backtrace ()))
 
 let check_type_invs rac ?loc ~giant_steps env ity v =
   let ts = match ity.ity_node with
@@ -910,8 +922,10 @@ let check_type_invs rac ?loc ~giant_steps env ity v =
       | Vconstr (_, fs, vs) ->
           List.fold_right2 Mrs.add fs (List.map field_get vs) Mrs.empty
       | Vundefined ->
-          incomplete "type invariant for undefined value of type %a cannot be checked"
-            print_ty v.v_ty;
+          let desc = asprintf "of type %a" print_ity ity in
+          let ctx = mk_cntr_ctx env ?loc:loc ~desc ~giant_steps:(Some giant_steps) Vc.expl_type_inv in
+          let reason = asprintf "type invariant for undefined value of type %a cannot be checked" print_ty v.v_ty in
+          raise (Cannot_decide (ctx, def.Pdecl.itd_invariant, reason))
       | _ -> failwith "check_type_invs: value is not record" in
     let bind_field env rs =
       try bind_pvs (Option.get rs.rs_field) (Mrs.find rs fs_vs) env

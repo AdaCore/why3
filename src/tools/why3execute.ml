@@ -148,7 +148,7 @@ let do_input f =
       eprintf "RAC got stuck %s after %a@." reason
         (Pp.print_option_or_default "unknown location" Loc.pp_position) l;
       exit 2
-  | Pinterp_core.Incomplete reason ->
+  | Pinterp_core.Cannot_decide (_,_,reason) ->
       eprintf "Execution terminated because %s@." reason;
       exit 2
 

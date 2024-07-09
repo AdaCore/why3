@@ -223,7 +223,7 @@ let print_model_classification ?verb_lvl ?json ?check_ce env fmt (m, c) =
 (** Import values from SMT solver models to interpreter values. *)
 
 let cannot_import f =
-  incomplete ("cannot import value from model: " ^^ f)
+  cannot_evaluate ("cannot import value from model: " ^^ f)
 
 let rec import_model_value loc env check known ity t =
   Debug.dprintf debug_check_ce_rac_results "[import_model_value] importing term %a with type %a@."
@@ -519,9 +519,12 @@ let rac_execute ctx rs =
         Pp.print_option_or_default "unknown location" Loc.pp_position in
       let reason = asprintf "%s at %a" reason print_oloc l in
       Res_stuck reason, Log.flush_log ctx.cntr_env.log_uc
-  | Incomplete reason ->
+  | Cannot_evaluate reason ->
       let reason = sprintf "terminated because %s" reason in
       Res_incomplete reason, Log.empty_log
+  | Cannot_decide (ctx,terms,reason) ->
+      let reason = sprintf "terminated because %s" reason in
+      Res_incomplete reason, Log.flush_log ctx.cntr_env.log_uc
   | x when not (Debug.test_flag Debug.stack_trace) ->
       let reason = sprintf "terminated with uncaught exception `%s`" (Printexc.to_string x) in
       Res_incomplete reason, Log.empty_log

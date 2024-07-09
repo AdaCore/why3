@@ -331,7 +331,7 @@ let why3_execute_one m rs =
       asprintf "@[<v>%s.main produces@,%a@,output:@,%s@]"
         mod_name (Pinterp.report_eval_result expr) res
         (Buffer.contents output)
-    with Pinterp_core.Incomplete r ->
+    with Pinterp_core.Cannot_decide (_,_,r) ->
       asprintf "%s.main cannot compute (%s)" mod_name r in
   let mod_loc = Option.value ~default:Loc.dummy_position th.Ident.id_loc in
   (mod_loc, result)

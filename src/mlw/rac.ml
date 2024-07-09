@@ -496,7 +496,8 @@ module Why = struct
         let msg = "cannot be evaluated" in
         Debug.dprintf debug_rac_check_term_result "%a%t@."
           report_cntr_head (ctx, msg, t) pp_task_filename;
-        incomplete "%a" report_cntr_title (ctx, msg)
+        let reason = asprintf "%a" report_cntr_title (ctx, msg) in
+        raise (Cannot_decide (ctx, [t], reason))
 
   let mk_check_term
         ?metas ?trans ?why_prover ?oracle_quant_var ~config ~elim_eps () =

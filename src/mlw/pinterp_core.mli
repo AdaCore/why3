@@ -150,7 +150,7 @@ module Log : sig
     log_loc  : Loc.position option;
   }
 
-  type exec_log
+  type exec_log = log_entry list
   type log_uc
 
   val log_val : log_uc -> Ident.ident -> value -> Loc.position option -> unit
@@ -245,12 +245,12 @@ val multibind_pvs : ?register:(Ident.ident -> value -> unit) ->
 
 (** {3 Exception for incomplete execution (and RAC)} *)
 
-exception Incomplete of string
+exception Cannot_evaluate of string
 (** Raised when the execution in {!Pinterp} is incomplete (not implemented or not
-    possible), or when a check cannot be decided during the RAC. *)
+    possible) *)
 
-(** @raise Incomplete with the formatted string as reason *)
-val incomplete : ('a, Format.formatter, unit, 'b) format4 -> 'a
+(** @raise Cannot_evaluate with the formatted string as reason *)
+val cannot_evaluate : ('a, Format.formatter, unit, 'b) format4 -> 'a
 
 (** {3 Term of value} *)
 
@@ -362,6 +362,10 @@ exception Fail of cntr_ctx * Term.term
 
 exception Stuck of cntr_ctx * Loc.position option * string
 (** Caused by invalid assumptions *)
+
+exception Cannot_decide of cntr_ctx * Term.term list * string
+(** The check cannot be decided (for example, because the execution is
+    incomplete *)
 
 val stuck : ?loc:Loc.position -> cntr_ctx ->
   ('a, Format.formatter, unit, 'b) format4 -> 'a
