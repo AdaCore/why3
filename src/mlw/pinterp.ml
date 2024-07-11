@@ -138,7 +138,7 @@ let get_arg : type t. t vtype -> _ -> _ -> t = fun t rs v ->
   | VTarray, Varray v -> v
   | VTint, Vnum x -> BigInt.to_int x
   | _, Vundefined ->
-      incomplete "an undefined argument was passed to builtin %a"
+      cannot_evaluate "an undefined argument was passed to builtin %a"
         Ident.print_decoded rs.rs_name.id_string
   | VTint, Vterm vt when (Option.equal Ty.ty_equal vt.t_ty (Some Ty.ty_int)) ->
       begin match vt.t_node with
@@ -185,11 +185,11 @@ let eval t f rs l =
   try
     eval t f rs l
   with
-  | Division_by_zero -> incomplete "division by zero"
-  | Failure "int_of_big_int" -> incomplete "index is out of bounds"
-  | Invalid_argument "index out of bounds" -> incomplete "index is out of bounds"
-  | Big_real.Undetermined -> incomplete "computation on real numbers is undetermined"
-  | Mlmpfr_wrapper.Not_Implemented -> incomplete "mlmpfr not available"
+  | Division_by_zero -> cannot_evaluate "division by zero"
+  | Failure "int_of_big_int" -> cannot_evaluate "index is out of bounds"
+  | Invalid_argument "index out of bounds" -> cannot_evaluate "index is out of bounds"
+  | Big_real.Undetermined -> cannot_evaluate "computation on real numbers is undetermined"
+  | Mlmpfr_wrapper.Not_Implemented -> cannot_evaluate "mlmpfr not available"
 
 let (^->) a b = VTfun (a, b)
 
@@ -223,7 +223,7 @@ let use_float_format (float_format : int) =
   match float_format with
   | 32 -> initialize_float32 ()
   | 64 -> initialize_float64 ()
-  | _ -> incomplete "float format is unknown: %d" float_format
+  | _ -> cannot_evaluate "float format is unknown: %d" float_format
 
 let eval_float tys_result float_format arity op rs l =
   let ity_result = ity_of_ty (ty_app tys_result []) in
@@ -371,7 +371,7 @@ let built_in_modules () =
               try
                 let ty = ty_app ts [def.v_ty] in
                 value ty (Varray (Array.make n def))
-              with e -> incomplete "array could not be made: %a" Exn_printer.exn_printer e);
+              with e -> cannot_evaluate "array could not be made: %a" Exn_printer.exn_printer e);
       "empty", eval (VTunit ^-> VTany) (fun () ->
               let ty = ty_app ts [ty_var (tv_of_string "a")] in
               value ty (Varray [||]));
@@ -611,7 +611,7 @@ let try_eval_ensures ctx posts =
     | {t_node= Teps tb} -> let vs, t = t_open_bound tb in loop vs t
     | _ -> None in
   try Some (Lists.first is_ensures_result posts)
-  with Not_found | Incomplete _ -> None
+  with Not_found | Cannot_decide _ | Cannot_evaluate _ -> None
 
 (******************************************************************************)
 (*            GET AND REGISTER VALUES FOR VARIABLES AND CALL RESULTS          *)
@@ -672,7 +672,7 @@ let gen_type_default ~really ?posts ctx ity : value_gen =
       let cntr_ctx = mk_cntr_ctx ctx ~desc:"type default value" Vc.expl_post in
       Option.iter (check_posts ctx.rac cntr_ctx v) posts;
       Some v
-    with Fail _ | Incomplete _ -> None
+    with Fail _ | Cannot_decide _ | Cannot_evaluate _ -> None
 
 (** Generate a value by evaluating an optional expression, if that is not [None]
    *)
@@ -686,7 +686,7 @@ let gen_eval_expr cnf exec_expr id oexp =
         match exec_expr cnf' e with
         | Normal v -> Some v
         | Excep _ ->
-            incomplete "initialization of global variable `%a` raised an \
+            cannot_evaluate "initialization of global variable `%a` raised an \
                             exception" print_decoded id.id_string
         | Irred _ -> None
 
@@ -696,7 +696,7 @@ let get_value' ctx_desc oloc gens =
   let desc, value = try get_value gens with Not_found ->
     Debug.dprintf debug_rac_values "@[<h>No value for %s at %a@]@." ctx_desc
       (Pp.print_option_or_default "NO LOC" Loc.pp_position) oloc;
-    incomplete "missing value for %s" ctx_desc
+    cannot_evaluate "missing value for %s" ctx_desc
       (Pp.print_option_or_default "NO LOC" Loc.pp_position) oloc in
   Debug.dprintf debug_rac_values "@[<h>%s for %s at %a: %a@]@."
     (String.capitalize_ascii desc) ctx_desc
@@ -759,7 +759,7 @@ let get_and_register_global check_model_variable ctx exec_expr id oexp post ity 
       let cntr_ctx = mk_cntr_ctx ctx ~desc Vc.expl_post in
       check_assume_posts ctx.rac cntr_ctx value post );
     lazy value
-  with Incomplete _ | Stuck _ as e ->
+  with Cannot_evaluate _ | Stuck _ as e ->
     (* We should not need to capture these exceptions if this function was not
        executed on logic constants and logic functions. *)
     lazy Printexc.(raise_with_backtrace e (get_raw_backtrace ()))
@@ -804,13 +804,13 @@ let check_timelimit time0 = function
   | None -> ()
   | Some timelimit ->
       if Sys.time () -. time0 >= timelimit then
-        incomplete "RAC timelimit reached"
+        cannot_evaluate "RAC timelimit reached"
 
 let check_steplimit (steps: int) = function
   | None -> ()
   | Some steplimit ->
       if steps >= steplimit then
-        incomplete "RAC steplimit reached"
+        cannot_evaluate "RAC steplimit reached"
 
 (* State for checking limits (start time and current step count) *)
 let limits_state = ref None
@@ -874,7 +874,7 @@ let add_premises ?post_res ?(vsenv=[]) ts env =
         let t = t_ty_subst mt mv t in
         let vs_args = List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args in
         t_let_close vs (t_lambda vs_args [] t) sofar
-    | _ -> incomplete "anonymous function not cfun"
+    | _ -> cannot_evaluate "anonymous function not cfun"
     | exception Not_found ->
         kasprintf failwith "add_premises: function %a not found" print_vs vs in
   let close_term t =
@@ -942,7 +942,7 @@ and exec_expr' ctx e =
         let sp, sq = BigInt.to_string p, BigInt.to_string q in
         try Normal (value ty_real (Vreal (Big_real.real_from_fraction sp sq)))
         with Mlmpfr_wrapper.Not_Implemented ->
-          incomplete "mlmpfr wrapper is not implemented"
+          cannot_evaluate "mlmpfr wrapper is not implemented"
       else
         let c = Constant.ConstReal r in
         let s = Format.asprintf "%a" Constant.print_def c in
@@ -989,10 +989,10 @@ and exec_expr' ctx e =
               let mt = Spv.fold match_free cty.cty_effect.eff_reads Mtv.empty in
               let ty = ty_inst mt (ty_of_ity e.e_ity) in
               if cty.cty_pre <> [] then
-                incomplete "anonymous function with precondition not supported (%a)"
+                cannot_evaluate "anonymous function with precondition not supported (%a)"
                   Pp.(print_option_or_default "unknown location" Loc.pp_position) e.e_loc;
               Normal (value ty (Vfun (cl, arg.pv_vs, e')))
-          | _ -> incomplete "many args for exec fun" (* TODO *) )
+          | _ -> cannot_evaluate "many args for exec fun" (* TODO *) )
       | Cany ->
          register_any_call ctx.env e.e_loc None Mvs.empty;
          if ctx.do_rac then
@@ -1022,7 +1022,7 @@ and exec_expr' ctx e =
           Normal v
       | Capp (rs, pvsl) ->
           if ce.c_cty.cty_args <> [] then
-            incomplete "no support for partial function applications (%a)"
+            cannot_evaluate "no support for partial function applications (%a)"
               (Pp.print_option_or_default "unknown location" Loc.pp_position)
               e.e_loc;
           exec_call ?loc:e.e_loc ~attrs:e.e_attrs (Some e.e_id) ctx rs pvsl e.e_ity
@@ -1449,7 +1449,7 @@ and exec_call ?(main_function=false) ?loc ?attrs (eid:expr_id option) ctx rs arg
                     begin match (ctx.compute_term ctx.env t1).t_node with
                     | Ttrue -> exec_expr ctx (e_pure (ctx.compute_term ctx.env t2))
                     | Tfalse ->  exec_expr ctx (e_pure (ctx.compute_term ctx.env t3))
-                    | _ -> incomplete "could not reduce %a" print_term t'
+                    | _ -> cannot_evaluate "could not reduce %a" print_term t'
                     end
                   (* special case when [t] is a constant function *)
                   | Tconst _ ->
@@ -1460,13 +1460,13 @@ and exec_call ?(main_function=false) ?loc ?attrs (eid:expr_id option) ctx rs arg
                 | _ -> raise UnexpectedArgs
                 end
             | [{v_desc= Vundefined }; _] ->
-                incomplete "an undefined argument was passed to %a"
+                cannot_evaluate "an undefined argument was passed to %a"
                   Ident.print_decoded rs.rs_name.id_string
             | _ -> raise UnexpectedArgs
             end
           with
           | UnexpectedArgs ->
-            incomplete "unexpected arguments passed to %a"
+            cannot_evaluate "unexpected arguments passed to %a"
               Ident.print_decoded rs.rs_name.id_string
           end
         else
@@ -1495,7 +1495,7 @@ and exec_call ?(main_function=false) ?loc ?attrs (eid:expr_id option) ctx rs arg
                       check_pre_and_register_call ~any_function:true Log.Exec_giant_steps;
                       exec_call_abstract ?loc ?attrs ~rs eid ctx rs.rs_cty arg_pvs ity_result )
                     else (* We can't check the postcondition *)
-                      incomplete "cannot apply an any-function %a with RAC disabled"
+                      cannot_evaluate "cannot apply an any-function %a with RAC disabled"
                         print_rs rs
                 | Cpur _ -> assert false (* TODO ? *) )
             | Builtin f ->
@@ -1551,7 +1551,7 @@ and exec_call ?(main_function=false) ?loc ?attrs (eid:expr_id option) ctx rs arg
                     | exception Not_found -> raise CannotProject
                   end
                 | _, [{v_desc= Vundefined}] ->
-                    incomplete "cannot project undefined by %a" print_rs rs
+                    cannot_evaluate "cannot project undefined by %a" print_rs rs
                 | _ -> raise CannotProject
                 end
               with CannotProject ->
@@ -1559,7 +1559,7 @@ and exec_call ?(main_function=false) ?loc ?attrs (eid:expr_id option) ctx rs arg
                   Pp.(print_list comma print_value) arg_vs
                   print_rs rs )
             | exception Not_found ->
-                incomplete "definition of routine %s could not be found"
+                cannot_evaluate "definition of routine %s could not be found"
                   rs.rs_name.id_string in
       if ctx.do_rac then (
         let desc = asprintf "of `%a`" print_rs rs in
@@ -1590,8 +1590,11 @@ and exec_call_abstract ?snapshot ?loc ?attrs ?rs (eid:expr_id option) ctx cty ar
      (postcondition does not hold with the values obtained
      from the counterexample)
    *)
-  let exn = Incomplete "Giant-step call without location" in
-  let loc = Opt.get_exn exn loc in
+  let loc =
+    match loc with
+    | None -> cannot_evaluate "Giant-step call without location"
+    | Some loc -> loc
+  in
   let ctx = match snapshot with
     | Some oldies ->
         let vsenv = snapshot_oldies oldies ctx.env.vsenv in
