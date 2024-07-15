@@ -16,7 +16,7 @@ module BVCheck_Gen
   type t
 
   constant size : int
-  constant bv_size : t
+  constant size_bv : t
 
   (* Overflow checks are performed using bitvectors of size 128. Thus
      this module cannot be cloned with a [size] > 64. *)
@@ -124,7 +124,7 @@ module BVCheck_Gen
       This function corresponds to the left shifting [<<] of unsigned ints in C or Java *)
   val u_lsl (a b:t) : t
     requires { [@expl:out-of-bounds shifting]
-                ult b bv_size \/ to_uint b < size }
+                ult b size_bv \/ to_uint b < size }
     ensures  { result = lsl_bv a b }
     ensures  { result = lsl a (to_uint b) }
 
@@ -133,7 +133,7 @@ module BVCheck_Gen
       This function corresponds to the left shifting [<<] of signed ints in C or Java *)
   val s_lsl (a b:t) : t
     requires { [@expl:out-of-bounds shifting]
-                ult b bv_size \/ to_uint b < size }
+                ult b size_bv \/ to_uint b < size }
     requires { [@expl:out-of-bounds shifting]
                 sle zeros a \/ to_int a >= 0 }
     requires { [@expl:arithmetic overflow]
@@ -149,7 +149,7 @@ module BVCheck_Gen
       or Java. *)
   val u_lsr (a b:t) : t
     requires { [@expl:out-of-bounds shifting]
-                ult b bv_size \/ to_uint b < size }
+                ult b size_bv \/ to_uint b < size }
     ensures  { result = lsr_bv a b }
     ensures  { result = lsr a (to_uint b) }
 
@@ -159,7 +159,7 @@ module BVCheck_Gen
       ints in Java, that does not exist in C. *)
   val s_asr (a b:t) : t
     requires { [@expl:out-of-bounds shifting]
-                ult b bv_size \/ to_uint b < size }
+                ult b size_bv \/ to_uint b < size }
     ensures  { result = asr_bv a b }
     ensures  { result = asr a (to_uint b) }
 
@@ -168,7 +168,7 @@ module BVCheck_Gen
       This function corresponds to the right shifting [>>] of signed ints in C. *)
   val s_asr_strict (a b:t) : t
     requires { [@expl:out-of-bounds shifting]
-                ult b bv_size \/ to_uint b < size }
+                ult b size_bv \/ to_uint b < size }
     requires { [@expl:out-of-bounds shifting]
                 sge a zeros \/ to_int a >= 0 }
     ensures  { result = asr_bv a b }
@@ -251,7 +251,6 @@ end
 module BVCheck8
   use export bv.BV8
 
-  constant bv_size : t = 8
   constant two_power_size_minus_one : int = 0x80
   constant minus_one : t = 0xFF
   constant min_sint : t = 0x80
@@ -263,7 +262,7 @@ module BVCheck8
   clone export BVCheck_Gen with
     type t = t,
     constant size = size,
-    constant bv_size = bv_size,
+    constant size_bv = size_bv,
     function two_power_size = two_power_size,
     function two_power_size_minus_one = two_power_size_minus_one,
     function zeros = zeros,
@@ -303,7 +302,6 @@ end
 module BVCheck16
   use export bv.BV16
 
-  constant bv_size : t = 16
   constant two_power_size_minus_one : int = 0x8000
   constant minus_one : t = 0xFFFF
   constant min_sint : t = 0x8000
@@ -315,7 +313,7 @@ module BVCheck16
   clone export BVCheck_Gen with
     type t = t,
     constant size = size,
-    constant bv_size = bv_size,
+    constant size_bv = size_bv,
     function two_power_size = two_power_size,
     function two_power_size_minus_one = two_power_size_minus_one,
     function zeros = zeros,
@@ -354,7 +352,6 @@ end
 module BVCheck32
   use export bv.BV32
 
-  constant bv_size : t = 32
   constant two_power_size_minus_one : int = 0x8000_0000
   constant minus_one : t = 0xFFFF_FFFF
   constant min_sint : t = 0x8000_0000
@@ -366,7 +363,7 @@ module BVCheck32
   clone export BVCheck_Gen with
     type t = t,
     constant size = size,
-    constant bv_size = bv_size,
+    constant size_bv = size_bv,
     function two_power_size = two_power_size,
     function two_power_size_minus_one = two_power_size_minus_one,
     function zeros = zeros,
@@ -405,7 +402,6 @@ end
 module BVCheck64
   use export bv.BV64
 
-  constant bv_size : t = 64
   constant two_power_size_minus_one : int = 0x8000_0000_0000_0000
   constant minus_one : t = 0xFFFF_FFFF_FFFF_FFFF
   constant min_sint : t = 0x8000_0000_0000_0000
@@ -417,7 +413,7 @@ module BVCheck64
   clone export BVCheck_Gen with
     type t = t,
     constant size = size,
-    constant bv_size = bv_size,
+    constant size_bv = size_bv,
     function two_power_size = two_power_size,
     function two_power_size_minus_one = two_power_size_minus_one,
     function zeros = zeros,
