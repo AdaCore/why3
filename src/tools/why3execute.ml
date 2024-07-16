@@ -13,6 +13,9 @@ open Format
 open Why3
 open Pmodule
 
+module Main : functor () -> sig end
+ = functor () -> struct
+
 let usage_msg =
   "<file> <expr>\n\
    Execute the expression in the given file (and --use the necessary modules)."
@@ -158,6 +161,10 @@ let () =
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
+
+end
+
+let () = Whyconf.Args.register_main (module Main)
 
 (*
 Local Variables:

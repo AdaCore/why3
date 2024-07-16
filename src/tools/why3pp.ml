@@ -381,6 +381,9 @@ end
 open Format
 open Why3
 
+module Main : functor () -> sig end
+ = functor () -> struct
+
 let filename = ref None
 
 let paths = Queue.create ()
@@ -510,3 +513,7 @@ let () =
         )
     | None ->
         Getopt.handle_exn "missing filename"
+
+end
+
+let () = Whyconf.Args.register_main (module Main)

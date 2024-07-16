@@ -15,6 +15,9 @@ open Session_itp
 open Controller_itp
 open Format
 
+module Main : functor () -> sig end
+ = functor () -> struct
+
 let force = ref false
 let save_interval = ref 60.0
 
@@ -100,3 +103,7 @@ let () =
       exit 0)
     ~any:None;
   Unix_scheduler.Unix_scheduler.main_loop ~prompt:"" (fun _ -> ())
+
+end
+
+let () = Whyconf.Args.register_main (module Main)

@@ -12,6 +12,9 @@
 open Format
 open Why3
 
+module Main : functor () -> sig end
+ = functor () -> struct
+
 (** {2 Warnings} *)
 
 (* warnings are shown on standard output instead of standard error:
@@ -431,6 +434,9 @@ let () =
       eprintf "Aborting...@.";
       exit 1
 
+end
+
+let () = Whyconf.Args.register_main (module Main)
 
 (*
 Local Variables:
