@@ -48,7 +48,7 @@ let opt_logging = ref false
 let opt_limit_line : Gnat_expl.limit_mode option ref = ref None
 let opt_limit_lines : string ref = ref ""
 let opt_limit_region : Gnat_loc.region option ref = ref None
-let opt_socket_name : string ref = ref ""
+let opt_socket_name : string ref = ref (match Sys.getenv_opt "GNATPROVE_SOCKET" with | Some s -> s | None -> "")
 let opt_standalone = ref false
 let opt_replay = ref false
 
