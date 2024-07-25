@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Z3" version="4.13.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="coma" proved="true">
+<path name=".."/><path name="fact.coma"/>
+<theory name="Fact" proved="true">
+ <goal name="vc_factorial" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="vc_factorial.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.023740" steps="76"/></proof>
+  </goal>
+  <goal name="vc_factorial.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.015879" steps="87"/></proof>
+  </goal>
+  <goal name="vc_factorial.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.029623" steps="1493"/></proof>
+  </goal>
+  <goal name="vc_factorial.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.928810" steps="10535108"/></proof>
+  </goal>
+  <goal name="vc_factorial.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.034116" steps="1286"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="vc_test" proved="true">
+ <proof prover="0"><result status="valid" time="0.013393" steps="59"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

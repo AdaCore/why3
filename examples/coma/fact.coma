@@ -1,0 +1,18 @@
+module Fact
+
+  use int.Int
+  use int.Fact
+  use coma.Std
+
+  let factorial (n: int) { n >= 0 } (return (m: int) { m = fact n })
+  = loop {1} {n}
+    [ loop (r: int) (k: int) =
+      { 0 <= k <= n }
+      { r * fact k = fact n }
+      (! if {k > 0} (-> loop {r * k} {k - 1})
+                    (-> return {r}) )]
+
+  let test (n: int) {} (o (m: int) { m = fact n })
+  = if {n >= 0 } (-> factorial {n} o)
+                 (-> halt)
+end
