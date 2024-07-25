@@ -16,6 +16,9 @@ open Pmodule
 open Compile
 open Theory
 
+module Main : functor () -> sig end
+ = functor () -> struct
+
 let usage_msg =
   "-D <driver> [<file>.<Module>*.<symbol>?|-]\n\
    Extract some WhyML code to the target language."
@@ -508,3 +511,7 @@ let () =
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
+
+end
+
+let () = Whyconf.Args.register_main (module Main)

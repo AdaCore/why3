@@ -89,6 +89,7 @@ let command cur =
   try
     Dynlink.allow_unsafe_modules true;
     Dynlink.loadfile cmd;
+    let open (val !Args.main) () in ();
     exit 0
   with
   | Dynlink.Error (Dynlink.Library's_module_initializers_failed e) ->

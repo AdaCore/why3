@@ -12,6 +12,9 @@
 open Format
 open Why3
 
+module Main : functor () -> sig end
+ = functor () -> struct
+
 let usage_msg =
   "-D <driver> -o <dir> -T <theory> ...\n\
    Output realization skeletons for the given theories or update them."
@@ -100,6 +103,10 @@ let () =
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
+
+end
+
+let () = Whyconf.Args.register_main (module Main)
 
 (*
 Local Variables:

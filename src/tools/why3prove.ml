@@ -16,6 +16,9 @@ open Whyconf
 open Theory
 open Task
 
+module Main : functor () -> sig end
+ = functor () -> struct
+
 let usage_msg =
   "[[<file>|-] [-T <theory> [-G <goal>]...]...]...\n\
    Run some transformation or prover on the given goals."
@@ -529,6 +532,11 @@ let () =
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
+
+end
+
+let () = Whyconf.Args.register_main (module Main)
+
 
 (*
 Local Variables:
