@@ -2,14 +2,22 @@
 
 Standard library
   * new library `ufloat`: unbounded floating-point numbers
+  * new library `coma`: standard library of the plugin Coma
 
 Core
   * extended notion of strategies: goal-oriented strategies
+  * coma purposes
+    + parser_common: some non terminals `public`
+    + typing: added functions to type `term` in `denv`
+    + extmap: added `fold_right`
+    + extset: added `fold_right`
+    + wstdlib: added strongly connected component computation module
 
 Plugins
   * new goal-oriented strategy `forward_propagation` to automatically
     propagate rounding errors in formulas involving unbounded
     floats. See examples in `examples/numeric`
+  * new Coma plugin
 
 Provers
   * Alt-Ergo FPA requires Alt-Ergo version at least 2.5.4
