@@ -202,7 +202,7 @@ let get_entity () =
 (* The main function, where we build the final Record to be printed using
 Why3.Json_base.print_json function. *)
 let print_messages () =
-  print_json Format.std_formatter (
+  print_json_single_line Format.std_formatter (
     Record (
       List.concat [
         [get_results (); get_timings (); get_entity ()];
