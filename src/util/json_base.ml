@@ -88,17 +88,15 @@ and map_bindings fmt l =
   fprintf fmt "{";
   begin match l with
   | [] -> ()
-  | [x] -> map_binding fmt x
   | x :: xs ->
-      List.iter (fun elt -> map_binding fmt elt; fprintf fmt ",") xs;
-      map_binding fmt x
+      map_binding fmt x;
+      List.iter (fun elt -> fprintf fmt ","; map_binding fmt elt) xs
   end;
   fprintf fmt "}"
 and no_formatting_list fmt l =
   fprintf fmt "[";
   begin match l with
   | [] -> ()
-  | [x] -> print_json_single_line fmt x
   | x :: xs ->
       print_json_single_line fmt x;
       List.iter (fun elt -> fprintf fmt ","; print_json_single_line fmt elt) xs;
