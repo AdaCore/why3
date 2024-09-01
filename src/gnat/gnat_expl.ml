@@ -1,7 +1,7 @@
 open Why3
 open Term
 
-type reason =
+type check_kind =
    (* VC_RTE_Kind - run-time checks *)
    | VC_Division_Check
    | VC_Index_Check
@@ -67,7 +67,7 @@ type reason =
    | VC_Unreachable_Branch
    | VC_Dead_Code
 
-let is_warning_reason r =
+let is_warning_kind r =
   match r with
    (* VC_RTE_Kind - run-time checks *)
    | VC_Division_Check
@@ -141,7 +141,7 @@ type subp_entity = Gnat_loc.loc
 type id = int
 type check =
   { id             : id;
-    reason         : reason;
+    check_kind     : check_kind;
     sloc           : Gnat_loc.loc;
     shape          : string;
     already_proved : bool
@@ -168,20 +168,20 @@ type limit_mode =
 let check_compare a b =
   let c = Stdlib.compare a.id b.id in
   if c <> 0 then c
-  else Stdlib.compare a.reason b.reason
+  else Stdlib.compare a.check_kind b.check_kind
 
 let check_equal a b =
-  Stdlib.(=) a.id b.id && Stdlib.(=) a.reason b.reason
+  Stdlib.(=) a.id b.id && Stdlib.(=) a.check_kind b.check_kind
 
-let check_hash e = Hashcons.combine (Hashtbl.hash e.id) (Hashtbl.hash e.reason)
+let check_hash e = Hashcons.combine (Hashtbl.hash e.id) (Hashtbl.hash e.check_kind)
 
-let mk_check ?shape:shape reason id sloc ap =
-  { reason = reason; id = id ; sloc = sloc ; already_proved = ap;
+let mk_check ?shape:shape check_kind id sloc ap =
+  { check_kind = check_kind; id = id ; sloc = sloc ; already_proved = ap;
     shape = match shape with None -> "" | Some s -> s }
 
 let get_loc c = c.sloc
-let get_reason c = c.reason
-let reason_from_string s =
+let get_check_kind c = c.check_kind
+let check_kind_from_string s =
    match s with
    (* VC_RTE_Kind - run-time checks *)
    | "VC_DIVISION_CHECK"            -> VC_Division_Check
@@ -250,11 +250,11 @@ let reason_from_string s =
    | "VC_UNREACHABLE_BRANCH"        -> VC_Unreachable_Branch
    | "VC_DEAD_CODE"                 -> VC_Dead_Code
    | _                              ->
-       let s = Format.sprintf "unknown VC reason: %s@." s in
+       let s = Format.sprintf "unknown VC kind: %s@." s in
        Gnat_util.abort_with_message ~internal:true s
 
-let reason_to_ada reason =
-   match reason with
+let check_kind_to_ada kind =
+   match kind with
    (* VC_RTE_Kind - run-time checks *)
    | VC_Division_Check            -> "VC_DIVISION_CHECK"
    | VC_Index_Check               -> "VC_INDEX_CHECK"
@@ -322,8 +322,8 @@ let reason_to_ada reason =
    | VC_Unreachable_Branch        -> "VC_UNREACHABLE_BRANCH"
    | VC_Dead_Code                 -> "VC_DEAD_CODE"
 
-let reason_to_string reason =
-   match reason with
+let check_kind_to_string kind =
+   match kind with
    (* VC_RTE_Kind - run-time checks *)
    | VC_Division_Check            -> "division_check"
    | VC_Index_Check               -> "index_check"
@@ -390,7 +390,7 @@ let reason_to_string reason =
    | VC_Dead_Code                 -> "dead_code"
 
 type gp_label =
-  | Gp_Check of int * reason * Gnat_loc.loc
+  | Gp_Check of int * check_kind * Gnat_loc.loc
   | Gp_Pretty_Ada of int
   | Gp_Shape of string
   | Gp_Already_Proved
@@ -398,9 +398,9 @@ type gp_label =
 
 let parse_check_string s l =
   match l with
-  | id::reason_string::sloc_rest ->
+  | id::check_kind_string::sloc_rest ->
     begin try
-      Gp_Check (int_of_string id, reason_from_string reason_string, Gnat_loc.parse_loc sloc_rest)
+      Gp_Check (int_of_string id, check_kind_from_string check_kind_string, Gnat_loc.parse_loc sloc_rest)
     with e when Debug.test_flag Debug.stack_trace -> raise e
     | Failure _ ->
        let s =
@@ -447,7 +447,7 @@ let read_label s =
 
 type my_expl =
    { mutable check_id       : int option;
-     mutable check_reason   : reason option;
+     mutable check_kind     : check_kind option;
      mutable extra_node     : int option;
      mutable check_sloc     : Gnat_loc.loc option;
      mutable shape          : string option;
@@ -459,13 +459,14 @@ type my_expl =
 
 let default_expl =
    { check_id       = None;
-     check_reason   = None;
+     check_kind     = None;
      check_sloc     = None;
      extra_node     = None;
      shape          = None;
      already_proved = false;
      inline         = None;
    }
+
 let read_vc_labels acc s =
    (* This function takes a set of labels and extracts a "node_info" from that
       set. We start with an empty record; We fill it up by iterating over all
@@ -475,8 +476,8 @@ let read_vc_labels acc s =
      (fun x ->
         let s = x.Ident.attr_string in
         match read_label s with
-        | Some Gp_Check (id, reason, sloc) ->
-            b.check_reason <- Some reason;
+        | Some Gp_Check (id, kind, sloc) ->
+            b.check_kind <- Some kind;
             b.check_id <- Some id;
             b.check_sloc <- Some sloc;
         | Some Gp_Pretty_Ada node ->
@@ -493,14 +494,14 @@ let read_vc_labels acc s =
      ) s;
      (* We potentially need to rectify in the case of loop invariants: We need
         to check whether the VC is for initialization or preservation *)
-     if b.check_reason = Some VC_Loop_Invariant then begin
+     if b.check_kind = Some VC_Loop_Invariant then begin
         Ident.Sattr.iter (fun x ->
            let s = x.Ident.attr_string in
            if Strings.has_prefix "expl:" s then
               if s = "expl:loop invariant init" then
-                 b.check_reason <- Some VC_Loop_Invariant_Init
+                 b.check_kind <- Some VC_Loop_Invariant_Init
               else
-                 b.check_reason <- Some VC_Loop_Invariant_Preserv) s
+                 b.check_kind <- Some VC_Loop_Invariant_Preserv) s
      end;
      b
 
@@ -508,11 +509,11 @@ let read_vc_labels acc s =
 let extract_check b =
      match b with
      | { check_id = Some id ;
-         check_reason = Some reason;
+         check_kind = Some check_kind;
          check_sloc = Some sloc;
          shape = shape;
          already_proved = ap; } ->
-           Some (mk_check ?shape reason id sloc ap)
+           Some (mk_check ?shape check_kind id sloc ap)
      | _ -> None
 
 (* Copied from Termcode and modified to use an accumulator. Traverse the
@@ -550,7 +551,7 @@ let to_filename fmt check =
       let file, line, col = Gnat_loc.explode x in
       Format.fprintf fmt "%s_%d_%d_" file line col;
   ) check.sloc;
-  Format.fprintf fmt "%s" (reason_to_string check.reason)
+  Format.fprintf fmt "%s" (check_kind_to_string check.check_kind)
 
 let parse_line_spec s =
    try
@@ -565,7 +566,7 @@ let parse_line_spec s =
      | [fn;line;col;check] ->
          let line = int_of_string line in
          let col = int_of_string col in
-         let check = reason_from_string check in
+         let check = check_kind_from_string check in
          let loc = Gnat_loc.mk_loc fn line col None in
          Limit_Check (mk_check check 0 loc false)
      | _ ->

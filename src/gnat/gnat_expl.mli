@@ -5,7 +5,7 @@ open Why3
 
 type id = int
 
-type reason =
+type check_kind =
    (* VC_RTE_Kind - run-time checks *)
    | VC_Division_Check
    | VC_Index_Check
@@ -71,20 +71,22 @@ type reason =
    | VC_Unreachable_Branch
    | VC_Dead_Code
 
-val is_warning_reason : reason -> bool
+val is_warning_kind : check_kind -> bool
 (* returns whether a VC is generated to issue possibly a warning *)
 
 type check =
   { id             : id;
-    reason         : reason;
+    check_kind     : check_kind;
     sloc           : Gnat_loc.loc;
     shape          : string;
     already_proved : bool
   }
-(* A check is equal to a check ID as provided by gnat2why, as well as a reason.
-   We need the reason because in the case of a loop invariant, there is a
-   single check id, but in fact two checks (initialization and preservation).
-   A check can be proved already (e.g. by CodePeer).
+(* A check is equal to a check ID as provided by gnat2why, as well as a check kind.
+   We need the check kind even though gnat2why already knows it, because in the
+   case of a loop invariant, there is a single check id (VC_Loop_Invariant),
+   but in fact two checks (VC_Loop_Invariant_Init and
+   VC_Loop_Invariant_Preserv).  A check can be proved already (e.g. by
+   CodePeer).
    *)
 
 type extra_info =
@@ -108,7 +110,7 @@ type subp_entity = Gnat_loc.loc
 
 (* the type of labels that are used by gnatprove and recognized by gnatwhy3 *)
 type gp_label =
-  | Gp_Check of int * reason * Gnat_loc.loc
+  | Gp_Check of int * check_kind * Gnat_loc.loc
   (* used to indicate the ID, VC Kind and sloc of a VC *)
   | Gp_Pretty_Ada of int
   (* label "GP_Pretty_Ada" used to give an Ada source node for some
@@ -130,22 +132,22 @@ val read_label : string -> gp_label option
 val check_compare : check -> check -> int
 
 val get_loc : check -> Gnat_loc.loc
-val get_reason : check -> reason
+val get_check_kind : check -> check_kind
 
-(* Conversion functions between a reason string and the OCaml type are
+(* Conversion functions between a check_kind string and the OCaml type are
    used only for debugging. The actual message tag is set by gnat2why directly.
  *)
-val reason_from_string : string -> reason
-(* parse a reason string from Ada into the OCaml type *)
-val reason_to_ada : reason -> string
-(* print a reason from the OCaml type into the Ada representation *)
+val check_kind_from_string : string -> check_kind
+(* parse a check string from Ada into the OCaml type *)
+val check_kind_to_ada : check_kind -> string
+(* print a check from the OCaml type into the Ada representation *)
 
 val to_filename : Format.formatter -> check -> unit
 (* print a representation of a check that could serve as a filename *)
 
-val mk_check : ?shape:string -> reason -> id -> Gnat_loc.loc -> bool -> check
-(* [mk_expl reason id sloc already_proved]
-     reason           - the kind of check for this VC
+val mk_check : ?shape:string -> check_kind -> id -> Gnat_loc.loc -> bool -> check
+(* [mk_expl check id sloc already_proved]
+     check            - the kind of check for this VC
      id               - the id of the VC
      sloc             - the sloc of the VC
      already_proved   - if the VC needs proof or not

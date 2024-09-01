@@ -2,7 +2,7 @@
    better part of scheduling of VCs.
 
    An objective is something to be proved in Ada, say, a range check. An
-   objective is defined by an explanation (reason + Ada location).
+   objective is defined by an explanation (check kind + Ada location).
 
    A goal is a VC that will be sent to Alt-Ergo. In general, there will be many
    goals for each objective. Each goal has a trace (list of locations).

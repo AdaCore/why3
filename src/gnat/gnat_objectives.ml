@@ -214,7 +214,7 @@ let add_to_objective ~toplevel ex go =
       | Gnat_expl.Limit_Line l ->
          Gnat_loc.equal_line l (Gnat_expl.get_loc check)
       | Gnat_expl.Limit_Check c ->
-         (c.Gnat_expl.reason = Gnat_expl.get_reason check)
+         (c.Gnat_expl.check_kind = Gnat_expl.get_check_kind check)
          && (Gnat_loc.equal_orig_loc c.Gnat_expl.sloc (Gnat_expl.get_loc check))
    ) Gnat_config.limit_lines
    in
@@ -479,7 +479,7 @@ let has_been_tried_by s (g: goal_id) (prover: Whyconf.prover) =
   try
     let paid = Whyconf.Hprover.find proof_attempt_set prover in
     let pa = Session_itp.get_proof_attempt_node s paid in
-    let warn = Gnat_expl.is_warning_reason (Gnat_expl.get_reason (get_objective g)) in
+    let warn = Gnat_expl.is_warning_kind (Gnat_expl.get_check_kind (get_objective g)) in
     (* only count non-obsolete proof attempts with identical
        options *)
     (not pa.Session_itp.proof_obsolete &&
@@ -609,7 +609,7 @@ let register_result c goal result : 'a * 'b =
      (* The prover run was scheduled just to get counterexample *)
      obj, Not_Proved
    else
-     let warn = Gnat_expl.is_warning_reason (Gnat_expl.get_reason obj) in
+     let warn = Gnat_expl.is_warning_kind (Gnat_expl.get_check_kind obj) in
      if not warn then begin
        (* We first remove the goal from the list of goals to be tried. It may be
         * put back later, see below *)
@@ -991,7 +991,7 @@ let run_goal ?proof_script_filename ?limit ~callback c prover g =
     end
   else
     let check = get_objective g in
-    let warn = Gnat_expl.is_warning_reason (Gnat_expl.get_reason check) in
+    let warn = Gnat_expl.is_warning_kind (Gnat_expl.get_check_kind check) in
     let limit =
       match limit with
       | None -> Gnat_config.limit ~prover ~warning:warn
@@ -1021,7 +1021,7 @@ let schedule_goal ~callback c g =
       immediately. *)
   let check = get_objective g in
   let s = c.Controller_itp.controller_session in
-  let warn = Gnat_expl.is_warning_reason (Gnat_expl.get_reason check) in
+  let warn = Gnat_expl.is_warning_kind (Gnat_expl.get_check_kind check) in
   if Gnat_config.parallel > 1 then begin
     let provers =
       if warn then [Option.get (Gnat_config.prover_warn)] else Gnat_config.provers
