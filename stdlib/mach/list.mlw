@@ -1,0 +1,21 @@
+
+(** {1 extra list functions dedicated to OCaml extraction} *)
+
+module OCaml
+
+use list.List
+use list.Length
+use mach.int.Int63
+
+(** return the length of a list as an machine integer.  in principle
+    this function is not realizable, but with the "Peano" implicit
+    assumption one can admit that nobody can ever built a list with
+    more than 2^63 elements
+
+    See also library `mach.peano`
+*)
+
+val length (l: list 'a) : int63
+  ensures { result = Length.length l }
+
+end
