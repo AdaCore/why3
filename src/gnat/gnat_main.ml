@@ -22,7 +22,7 @@
 open Why3
 open Gnat_scheduler
 
-module C = Gnat_objectives.Make (Gnat_scheduler)
+module C = Gnat_checks.Make (Gnat_scheduler)
 
 let warn_gnat_rac_not_done = Loc.register_warning "gnat_rac_not_done" "Warn if RAC could not be completed"
 
@@ -53,10 +53,10 @@ let register_goal cont goal_id =
   let task = Session_itp.get_task s goal_id in
   let fml = Task.task_goal_fmla task in
   let is_trivial = is_trivial fml in
-  if is_trivial then Gnat_objectives.add_trivial_proof s goal_id;
+  if is_trivial then Gnat_checks.add_trivial_proof s goal_id;
   match is_trivial, Gnat_expl.search_labels fml with
   | true, None ->
-      Gnat_objectives.set_not_interesting goal_id
+      Gnat_checks.set_not_interesting goal_id
   | false, None ->
       let base_msg = "Task has no tracability label" in
       let msg =
@@ -67,9 +67,9 @@ let register_goal cont goal_id =
   | _, Some c ->
       begin
         if c.Gnat_expl.check.Gnat_expl.already_proved then
-          Gnat_objectives.set_not_interesting goal_id
+          Gnat_checks.set_not_interesting goal_id
         else
-          Gnat_objectives.add_to_check c goal_id
+          Gnat_checks.add_to_check c goal_id
       end
 
 let rec handle_vc_result c goal result =
@@ -80,14 +80,14 @@ let rec handle_vc_result c goal result =
    *)
    let check, status = C.register_result c goal result in
    match status with
-   | Gnat_objectives.Proved -> ()
-   | Gnat_objectives.Not_Proved -> ()
-   | Gnat_objectives.Work_Left ->
-       List.iter (create_manual_or_schedule c check) (Gnat_objectives.next check)
-   | Gnat_objectives.Counter_Example ->
+   | Gnat_checks.Proved -> ()
+   | Gnat_checks.Not_Proved -> ()
+   | Gnat_checks.Work_Left ->
+       List.iter (create_manual_or_schedule c check) (Gnat_checks.next check)
+   | Gnat_checks.Counter_Example ->
      (* In this case, counterexample prover and VC will be never None *)
      let prover_ce = (Option.get Gnat_config.prover_ce) in
-     match Gnat_objectives.ce_goal check with
+     match Gnat_checks.ce_goal check with
      | None -> assert false
      | Some g ->
        C.schedule_goal_with_prover c ~callback:(interpret_result c) g prover_ce
@@ -138,7 +138,7 @@ and schedule_goal (c: Controller_itp.controller) (g : Session_itp.proofNodeID) =
       if Session_itp.pn_proved c.Controller_itp.controller_session g then begin
          handle_vc_result c g true
       (* Maybe there was a previous proof attempt with identical parameters *)
-      end else if Gnat_objectives.all_provers_tried c.Controller_itp.controller_session g then begin
+      end else if Gnat_checks.all_provers_tried c.Controller_itp.controller_session g then begin
          (* the proof attempt was necessarily false *)
          handle_vc_result c g false
       end else begin
@@ -150,8 +150,8 @@ and actually_schedule_goal c g =
   C.schedule_goal ~callback:(interpret_result c) c g
 
 let handle_obj c check =
-   if Gnat_objectives.check_status check <> Gnat_objectives.Proved then begin
-     match Gnat_objectives.next check with
+   if Gnat_checks.check_status check <> Gnat_checks.Proved then begin
+     match Gnat_checks.next check with
       | [] -> ()
       | l ->
          List.iter (create_manual_or_schedule c check) l
@@ -160,9 +160,9 @@ let handle_obj c check =
 let all_split_subp c subp =
   let s = c.Controller_itp.controller_session in
    C.init_subp_vcs c subp;
-   Gnat_objectives.iter_leaf_goals s subp (register_goal c);
+   Gnat_checks.iter_leaf_goals s subp (register_goal c);
    C.all_split_leaf_goals ();
-   Gnat_objectives.clear ()
+   Gnat_checks.clear ()
 
 let maybe_giant_step_rac ctr parent models =
   if not Gnat_config.giant_step_rac then
@@ -235,13 +235,13 @@ let report_messages c check =
                properly registered. In that case, we attempt to find a parent
                goal that is registered. *)
             try
-              Gnat_objectives.get_extra_info g
+              Gnat_checks.get_extra_info g
             with Not_found ->
               if C.is_ce_goal s g then
                 match Session_itp.get_proof_parent s g with
                 | Session_itp.Theory _ -> default
                 | Session_itp.Trans t ->
-                  try Gnat_objectives.get_extra_info (Session_itp.get_trans_parent s t)
+                  try Gnat_checks.get_extra_info (Session_itp.get_trans_parent s t)
                   with Not_found -> default
               else { Gnat_expl.pretty_node = None; inlined = None }
       in
@@ -258,7 +258,7 @@ let ending c () =
   Debug.Stats.record_timing "gnatwhy3.run_vcs"
     (fun () -> C.remove_all_valid_ce_attempt c.Controller_itp.controller_session);
   Debug.Stats.record_timing "gnatwhy3.save_session" (fun () -> C.save_session c);
-  Gnat_objectives.iter (report_messages c);
+  Gnat_checks.iter (report_messages c);
   let s = Buffer.contents escape_buffer in
   if s <> "" then
     Gnat_report.add_warning s;
@@ -278,7 +278,7 @@ let ending c () =
 let normal_handle_one_subp c subp =
    C.init_subp_vcs c subp;
    let s = c.Controller_itp.controller_session in
-   Gnat_objectives.iter_leaf_goals s subp (register_goal c)
+   Gnat_checks.iter_leaf_goals s subp (register_goal c)
 
 (* save session on interrupt initiated by the user *)
 let save_session_and_exit c signum =
@@ -315,7 +315,7 @@ let _ =
       Loc.set_warning_hook (fun ?loc:_ line -> Format.fprintf fmt "%s@." line)
     with Not_found -> () );
   try
-    let c = Debug.Stats.record_timing "gnatwhy3.init" Gnat_objectives.init_cont in
+    let c = Debug.Stats.record_timing "gnatwhy3.init" Gnat_checks.init_cont in
     (* This has to be done after initialization of controller. Otherwise we
        don't have session. *)
     Sys.set_signal Sys.sigint (Sys.Signal_handle (save_session_and_exit c));
@@ -327,10 +327,10 @@ let _ =
          (fun () -> C.iter_subps c (normal_handle_one_subp c));
         if Gnat_config.replay then begin
           C.replay c (*;
-          Gnat_objectives.do_scheduled_jobs (fun _ _ -> ());*)
+          Gnat_checks.do_scheduled_jobs (fun _ _ -> ());*)
         end else begin
           Debug.Stats.record_timing "gnatwhy3.schedule_vcs"
-           (fun () -> Gnat_objectives.iter (handle_obj c));
+           (fun () -> Gnat_checks.iter (handle_obj c));
         end;
      | Gnat_config.All_Split ->
         C.iter_subps c (all_split_subp c)
