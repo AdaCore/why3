@@ -385,6 +385,13 @@ module mach.onetime.OneTime
   syntax val split    "(%1-%2, %2)" prec 0 13 13
 end
 
+module mach.list.OCaml
+
+  syntax val length "List.length %1"
+
+end
+
+
 module string.Char
   syntax type char "char"
 end
