@@ -9,10 +9,6 @@ type subp = { subp_goal : goal_id }
    correctness formula for a subp). We use a different type to avoid confusion
    with regular goals. *)
 
-type objective = Gnat_expl.check
-(* an objective is identified by its explanation, which contains the source
-   location and the kind of the check *)
-
 type status =
    | Proved
    | Not_Proved
@@ -154,23 +150,23 @@ struct
       with Found k -> k
 end
 
-type objective_rec =
+type check_rec =
    { to_be_scheduled    : GoalSet.t;
      (* when a goal is scheduled, it is removed from this set *)
      to_be_proved       : GoalSet.t;
      (* when a goal is proved (or unproved), it is removed from this set *)
      toplevel           : GoalSet.t;
      (* the set of top-level goals, that is not obtained by transformation.
-      * They are "entry points" of the objective into the Why3 session *)
+      * They are "entry points" of the check into the Why3 session *)
      mutable not_proved : bool;
-   (* when a goal is not proved, the objective is marked "not proved" by
+   (* when a goal is not proved, the check is marked "not proved" by
     * setting this boolean to "true" *)
      mutable counter_example : goal_id option;
    (* when a goal is not proved, store the counterexample VC in this field *)
    }
-(* an objective consists of to be scheduled and to be proved goals *)
+(* a check consists of to be scheduled and to be proved goals *)
 
-let empty_objective () =
+let empty_check () =
    { to_be_scheduled = GoalSet.empty ();
      to_be_proved    = GoalSet.empty ();
      toplevel        = GoalSet.empty ();
@@ -179,14 +175,14 @@ let empty_objective () =
    }
 
 (* The state of the module consists of these mutable structures *)
-let explmap : objective_rec Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
-(* maps proof objectives to goals *)
+let explmap : check_rec Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
+(* maps proof checks to goals *)
 
 let goalmap : Gnat_expl.vc_info GoalMap.t = GoalMap.create 17
-(* maps goals to their objectives *)
+(* maps goals to their checks *)
 
 let total_nb_goals : int ref = ref 0
-let nb_objectives : int ref = ref 0
+let nb_checks : int ref = ref 0
 
 let not_interesting : GoalSet.t = GoalSet.empty ()
 
@@ -195,19 +191,19 @@ let clear () =
    GoalMap.clear goalmap;
    GoalSet.reset not_interesting;
    total_nb_goals := 0;
-   nb_objectives := 0
+   nb_checks := 0
 
 let find e =
    try Gnat_expl.HCheck.find explmap e
    with Not_found ->
-      let r = empty_objective () in
+      let r = empty_check () in
       Gnat_expl.HCheck.add explmap e r;
-      incr nb_objectives;
+      incr nb_checks;
       r
 
-let add_to_objective ~toplevel ex go =
+let add_to_check ~toplevel ex go =
   let check = ex.Gnat_expl.check in
-  (* add a goal to an objective.
+  (* add a goal to a check.
    * A goal can be "top-level", that is a direct goal coming from WP, or not
    * top-level, that is obtained by transformation. *)
    let filter_line = Gnat_config.limit_lines = [] || List.exists (function
@@ -227,19 +223,19 @@ let add_to_objective ~toplevel ex go =
    if filter_line && filter_region then begin
       incr total_nb_goals;
       GoalMap.add goalmap go ex;
-      let obj = find check in
-      GoalSet.add obj.to_be_scheduled go;
-      GoalSet.add obj.to_be_proved go;
-      if toplevel then GoalSet.add obj.toplevel go;
+      let cr = find check in
+      GoalSet.add cr.to_be_scheduled go;
+      GoalSet.add cr.to_be_proved go;
+      if toplevel then GoalSet.add cr.toplevel go;
    end
 
 let get_vc_info goal = GoalMap.find goalmap goal
-let get_objective goal = (get_vc_info goal).Gnat_expl.check
+let get_check_of_goal goal = (get_vc_info goal).Gnat_expl.check
 let get_extra_info goal = (get_vc_info goal).Gnat_expl.extra_info
 
 let add_clone derive goal =
-   let obj = get_vc_info derive in
-   add_to_objective ~toplevel:false obj goal
+   let check = get_vc_info derive in
+   add_to_check ~toplevel:false check goal
 
 let trivial_prover =
   { Whyconf.prover_name = "Trivial";
@@ -268,21 +264,21 @@ let add_trivial_proof s goal_id =
   Session_itp.update_goal_node (fun _ -> ()) s goal_id
 
 
-let add_to_objective = add_to_objective ~toplevel:true
-(* we mask the add_to_objective function here and fix it's toplevel argument to
+let add_to_check = add_to_check ~toplevel:true
+(* we mask the add_to_check function here and fix it's toplevel argument to
    "true", so that outside calls always set toplevel to true *)
 
 let set_not_interesting x = GoalSet.add not_interesting x
 let is_not_interesting x = GoalSet.mem not_interesting x
 let is_interesting x = not (is_not_interesting x)
 
-let next objective =
+let next check =
    (* this lookup should always succeed, otherwise it would mean we have a
       corrupt database *)
-   let obj_rec = Gnat_expl.HCheck.find explmap objective in
+   let check_rec = Gnat_expl.HCheck.find explmap check in
    try
-     let goal = GoalSet.choose obj_rec.to_be_scheduled in
-     GoalSet.remove obj_rec.to_be_scheduled goal;
+     let goal = GoalSet.choose check_rec.to_be_scheduled in
+     GoalSet.remove check_rec.to_be_scheduled goal;
      [goal]
    with Not_found -> []
 
@@ -459,19 +455,19 @@ let init_cont () =
              (Pp.print_list Pp.space Exn_printer.exn_printer) l)
     end
 
-let objective_status obj =
-   let obj_rec = Gnat_expl.HCheck.find explmap obj in
-   if obj_rec.counter_example <> None then Counter_Example
-   else if GoalSet.is_empty obj_rec.to_be_proved then
-     if obj_rec.not_proved then Not_Proved else Proved
-   else if GoalSet.is_empty obj_rec.to_be_scheduled then
+let check_status check =
+   let check_rec = Gnat_expl.HCheck.find explmap check in
+   if check_rec.counter_example <> None then Counter_Example
+   else if GoalSet.is_empty check_rec.to_be_proved then
+     if check_rec.not_proved then Not_Proved else Proved
+   else if GoalSet.is_empty check_rec.to_be_scheduled then
       Not_Proved
    else
       Work_Left
 
-let ce_goal obj =
-   let obj_rec = Gnat_expl.HCheck.find explmap obj in
-   obj_rec.counter_example
+let ce_goal check =
+   let check_rec = Gnat_expl.HCheck.find explmap check in
+   check_rec.counter_example
 
 let has_been_tried_by s (g: goal_id) (prover: Whyconf.prover) =
   (* Check whether the goal has been tried already *)
@@ -479,7 +475,7 @@ let has_been_tried_by s (g: goal_id) (prover: Whyconf.prover) =
   try
     let paid = Whyconf.Hprover.find proof_attempt_set prover in
     let pa = Session_itp.get_proof_attempt_node s paid in
-    let warn = Gnat_expl.is_warning_kind (Gnat_expl.get_check_kind (get_objective g)) in
+    let warn = Gnat_expl.is_warning_kind (Gnat_expl.get_check_kind (get_check_of_goal g)) in
     (* only count non-obsolete proof attempts with identical
        options *)
     (not pa.Session_itp.proof_obsolete &&
@@ -512,19 +508,19 @@ let iter_leaf_goals s subp f =
   iter_leafs s subp.subp_goal f
 
 let iter f =
-   let obj = Gnat_expl.HCheck.fold (fun k _ acc -> k :: acc) explmap [] in
-   List.iter f obj
+   let check = Gnat_expl.HCheck.fold (fun k _ acc -> k :: acc) explmap [] in
+   List.iter f check
 
-let unproved_vc_continue obj obj_rec =
+let unproved_vc_continue check check_rec =
   (* This function checks whether proof should continue even though we have an
      unproved VC. This function raises Exit when:
      * lazy mode is on (default)
      * no more VCs left
-     otherwise it returns obj, Work_Left *)
-  obj_rec.not_proved <- true;
+     otherwise it returns check, Work_Left *)
+  check_rec.not_proved <- true;
   if Gnat_config.lazy_ then raise Exit;
-  if GoalSet.is_empty obj_rec.to_be_proved then raise Exit;
-  obj, Work_Left
+  if GoalSet.is_empty check_rec.to_be_proved then raise Exit;
+  check, Work_Left
 
 (* This function only gets the subgoals of the gnat_split transformation. It is
    part of a code that should not be used when other transformations (manual
@@ -603,71 +599,71 @@ let add_ce_goal c goal =
     with Not_found -> goal
 
 let register_result c goal result : 'a * 'b =
-   let obj = get_objective goal in
-   let obj_rec = Gnat_expl.HCheck.find explmap obj in
-   if obj_rec.counter_example <> None then
+   let check = get_check_of_goal goal in
+   let check_rec = Gnat_expl.HCheck.find explmap check in
+   if check_rec.counter_example <> None then
      (* The prover run was scheduled just to get counterexample *)
-     obj, Not_Proved
+     check, Not_Proved
    else
-     let warn = Gnat_expl.is_warning_kind (Gnat_expl.get_check_kind obj) in
+     let warn = Gnat_expl.is_warning_kind (Gnat_expl.get_check_kind check) in
      if not warn then begin
        (* We first remove the goal from the list of goals to be tried. It may be
         * put back later, see below *)
-       GoalSet.remove obj_rec.to_be_proved goal;
+       GoalSet.remove check_rec.to_be_proved goal;
        if result then
          (* goal has been proved, we only need to store that info *)
-         if not (GoalSet.is_empty obj_rec.to_be_proved) then
-           obj, Work_Left
+         if not (GoalSet.is_empty check_rec.to_be_proved) then
+           check, Work_Left
          else
-           if obj_rec.not_proved then
-             obj, Not_Proved
-           else obj, Proved
+           if check_rec.not_proved then
+             check, Not_Proved
+           else check, Proved
        else begin try
          (* the goal was not proved. *)
          (* We first check whether another prover may apply *)
          if Gnat_config.parallel = 1 && Gnat_config.manual_prover = None &&
            not (all_provers_tried c.Controller_itp.controller_session goal) then begin
              (* put the goal back to be scheduled and proved *)
-             GoalSet.add obj_rec.to_be_scheduled goal;
-             GoalSet.add obj_rec.to_be_proved goal;
-             obj, Work_Left
+             GoalSet.add check_rec.to_be_scheduled goal;
+             GoalSet.add check_rec.to_be_proved goal;
+             check, Work_Left
            end else begin
              (* This particular goal has been tried with all provers. But maybe
                 we can split/apply transformations. *)
              if is_full_split_goal c.Controller_itp.controller_session goal then
-               unproved_vc_continue obj obj_rec
+               unproved_vc_continue check check_rec
              else
                let new_goals =
                  further_split c goal;
                  subsubgoals c.Controller_itp.controller_session goal
                in
-               if new_goals = [] then unproved_vc_continue obj obj_rec
+               if new_goals = [] then unproved_vc_continue check check_rec
                else begin
                  (* if we are here, it means we have simplified the goal. We add the
                     new goals to the set of goals to be proved/scheduled. *)
                  List.iter (add_clone goal) new_goals;
-                 obj, Work_Left
+                 check, Work_Left
                end
            end
        with Exit ->
-         (* if we cannot simplify, the objective has been disproved *)
-         GoalSet.reset obj_rec.to_be_scheduled;
+         (* if we cannot simplify, the check has been disproved *)
+         GoalSet.reset check_rec.to_be_scheduled;
 
          if Gnat_config.counterexamples then begin
            (* The goal will be scheduled to get a counterexample *)
-           obj_rec.not_proved <- true;
+           check_rec.not_proved <- true;
            let ce_goal = add_ce_goal c goal in
-           obj_rec.counter_example <- Some ce_goal;
+           check_rec.counter_example <- Some ce_goal;
            GoalMap.add goalmap ce_goal (get_vc_info goal);
            (* The goal will be scheduled manually in Gnat_main.handle_result
-              so it is not put to the obj_rec.to_be_scheduled *)
-           obj, Counter_Example
+              so it is not put to the check_rec.to_be_scheduled *)
+           check, Counter_Example
          end else
-           obj, Not_Proved
+           check, Not_Proved
        end
      end
      else
-       obj, (if result then Proved else Not_Proved)
+       check, (if result then Proved else Not_Proved)
 
 let iter_main_goals s fu =
   (* Main goals are at the following point in the theory:
@@ -858,13 +854,13 @@ module Save_VCs = struct
         (Session_itp.get_transformations ses goal);
     with Exit -> ()
 
-  let extract_stats c (obj : objective) =
+  let extract_stats c (check : Gnat_expl.check) =
     (* Hold the stats for provers *)
     let stats = Whyconf.Hprover.create 5 in
     (* stat_checker = number of goal proved by a transformation *)
     let stat_checkers = ref 0 in
-    let obj_rec = Gnat_expl.HCheck.find explmap obj in
-    GoalSet.iter (extract_stat_goal c stats stat_checkers) obj_rec.toplevel;
+    let check_rec = Gnat_expl.HCheck.find explmap check in
+    GoalSet.iter (extract_stat_goal c stats stat_checkers) check_rec.toplevel;
     (stats, !stat_checkers)
 
   let count_map : (int ref) Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
@@ -892,7 +888,7 @@ module Save_VCs = struct
     Pp.sprintf "%a%s%s" Gnat_expl.to_filename check count_str ext
 
   let save_vc c goal (prover: Whyconf.prover) =
-    let check = get_objective goal in
+    let check = get_check_of_goal goal in
     let driver =
       snd (Whyconf.Hprover.find c.Controller_itp.controller_provers prover) in
     (* Reusing a filename to get several prover files with the same name is
@@ -907,10 +903,10 @@ module Save_VCs = struct
      More precisely a session forest, because we start with a list of
      goals for a given check. See gnat_report.mli for the JSON
      structure that we use here. *)
-  let rec check_to_json session obj =
-    let obj_rec = Gnat_expl.HCheck.find explmap obj in
+  let rec check_to_json session check =
+    let check_rec = Gnat_expl.HCheck.find explmap check in
     let l = ref [] in
-    GoalSet.iter (fun x -> l := goal_to_json session x :: !l) obj_rec.toplevel;
+    GoalSet.iter (fun x -> l := goal_to_json session x :: !l) check_rec.toplevel;
     Json_base.List !l
   and goal_to_json session g =
     Json_base.Record [
@@ -973,7 +969,7 @@ let run_goal ?proof_script_filename ?limit ~callback c prover g =
     begin
       match old_file with
       | None ->
-        let check = get_objective g in
+        let check = get_check_of_goal g in
         let new_file = Sysutil.system_independent_path_of_file
             (Gnat_manual.create_prover_file c g check prover) in
         let _paid, _file, _ores = C.prepare_edition c ~file:new_file
@@ -990,7 +986,7 @@ let run_goal ?proof_script_filename ?limit ~callback c prover g =
           ~limit:Call_provers.empty_limit ~callback ~notification
     end
   else
-    let check = get_objective g in
+    let check = get_check_of_goal g in
     let warn = Gnat_expl.is_warning_kind (Gnat_expl.get_check_kind check) in
     let limit =
       match limit with
@@ -1019,7 +1015,7 @@ let schedule_goal_with_prover ~callback c g p =
 let schedule_goal ~callback c g =
    (* actually schedule the goal, ie call the prover. This function returns
       immediately. *)
-  let check = get_objective g in
+  let check = get_check_of_goal g in
   let s = c.Controller_itp.controller_session in
   let warn = Gnat_expl.is_warning_kind (Gnat_expl.get_check_kind check) in
   if Gnat_config.parallel > 1 then begin
@@ -1061,7 +1057,7 @@ let all_split_leaf_goals () =
     iter_leafs g
      (fun goal ->
       let is_registered =
-         try ignore (get_objective goal); true
+         try ignore (get_check_of_goal goal); true
          with Not_found -> false in
       if is_registered then
          if is_full_split_goal goal then begin Save_VCs.save_vc goal end
@@ -1091,10 +1087,10 @@ let is_valid_not_ce session g =
                        transformations_list in
   (b || b')
 
-let session_proved_status c obj =
-   let obj_rec = Gnat_expl.HCheck.find explmap obj in
+let session_proved_status c check =
+   let check_rec = Gnat_expl.HCheck.find explmap check in
    let session = c.Controller_itp.controller_session in
-   GoalSet.for_all (fun x -> is_valid_not_ce session x) obj_rec.toplevel
+   GoalSet.for_all (fun x -> is_valid_not_ce session x) check_rec.toplevel
 
 let finished_but_not_valid_or_unedited pa =
   (* return true if the proof attempt in argument has terminated, but did not
@@ -1138,8 +1134,8 @@ let select_appropriate_proof_attempt pa =
       finished_but_not_valid_or_unedited pa &&
         List.exists (fun p -> p = pa.Session_itp.prover) Gnat_config.provers
 
-let session_find_unproved_pa c obj =
-  let obj_rec = Gnat_expl.HCheck.find explmap obj in
+let session_find_unproved_pa c check =
+  let check_rec = Gnat_expl.HCheck.find explmap check in
   let session = c.Controller_itp.controller_session in
   let traversal_function () g =
     match g with
@@ -1158,15 +1154,15 @@ let session_find_unproved_pa c obj =
     Session_itp.fold_all_any session traversal_function () (Session_itp.APn g) in
 
   try
-    GoalSet.iter iter_on_sub_goal obj_rec.toplevel;
+    GoalSet.iter iter_on_sub_goal check_rec.toplevel;
     None
   with PA_Found p ->
     Some p
 
-let session_find_ce_pa c obj =
-  let obj_rec = Gnat_expl.HCheck.find explmap obj in
+let session_find_ce_pa c check =
+  let check_rec = Gnat_expl.HCheck.find explmap check in
   let session = c.Controller_itp.controller_session in
-  match obj_rec.counter_example with
+  match check_rec.counter_example with
   | None ->
   None
   | Some g ->
@@ -1183,9 +1179,9 @@ let is_ce_goal s g =
   | Some tr when tr = ce_transform -> true
   | _ -> false
 
-let session_find_unproved_goal c obj =
+let session_find_unproved_goal c check =
 
-  let obj_rec = Gnat_expl.HCheck.find explmap obj in
+  let check_rec = Gnat_expl.HCheck.find explmap check in
   let session = c.Controller_itp.controller_session in
   let traversal_function () g =
     match g with
@@ -1199,7 +1195,7 @@ let session_find_unproved_goal c obj =
     Session_itp.fold_all_any session traversal_function () (Session_itp.APn g) in
 
   try
-    GoalSet.iter iter_on_sub_goal obj_rec.toplevel;
+    GoalSet.iter iter_on_sub_goal check_rec.toplevel;
     None
   with Found_goal_id p ->
     Some p
@@ -1286,12 +1282,12 @@ and replay_goal c goal =
             ~notification:(fun _ -> ())) prover
 
 
-let replay_obj session obj =
-  let obj_rec = Gnat_expl.HCheck.find explmap obj in
-  GoalSet.iter (replay_goal session) obj_rec.toplevel
+let replay_check session check =
+  let check_rec = Gnat_expl.HCheck.find explmap check in
+  GoalSet.iter (replay_goal session) check_rec.toplevel
 
 let replay session =
-  iter (replay_obj session)
+  iter (replay_check session)
 
 (* This register an observer that can monitor the number of provers
    waiting/scheduled/running *)

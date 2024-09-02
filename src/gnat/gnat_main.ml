@@ -7,14 +7,14 @@
    - it generates a summary of what was proved and not proved in JSON format
  and outputs this JSON format to stdout (for gnat2why to read).
 
-   See gnat_objectives.mli for the notion of objective and goal.
+   See gnat_objectives.mli for the notion of check and goal.
 
    See gnat_report.mli for the JSON format
 
    gnat_main can be seen as the "driver" for gnatwhy3. Much of the
    functionality is elsewhere.
    Specifically, this file does:
-      - compute the objective that belongs to a goal/VC
+      - compute the check that belongs to a goal/VC
       - drive the scheduling of VCs, and handling of results
       - output the messages
 *)
@@ -69,7 +69,7 @@ let register_goal cont goal_id =
         if c.Gnat_expl.check.Gnat_expl.already_proved then
           Gnat_objectives.set_not_interesting goal_id
         else
-          Gnat_objectives.add_to_objective c goal_id
+          Gnat_objectives.add_to_check c goal_id
       end
 
 let rec handle_vc_result c goal result =
@@ -78,16 +78,16 @@ let rec handle_vc_result c goal result =
        result         a boolean, true if the prover has proved the VC
        prover_result  the actual proof result, to extract statistics
    *)
-   let obj, status = C.register_result c goal result in
+   let check, status = C.register_result c goal result in
    match status with
    | Gnat_objectives.Proved -> ()
    | Gnat_objectives.Not_Proved -> ()
    | Gnat_objectives.Work_Left ->
-       List.iter (create_manual_or_schedule c obj) (Gnat_objectives.next obj)
+       List.iter (create_manual_or_schedule c check) (Gnat_objectives.next check)
    | Gnat_objectives.Counter_Example ->
      (* In this case, counterexample prover and VC will be never None *)
      let prover_ce = (Option.get Gnat_config.prover_ce) in
-     match Gnat_objectives.ce_goal obj with
+     match Gnat_objectives.ce_goal check with
      | None -> assert false
      | Some g ->
        C.schedule_goal_with_prover c ~callback:(interpret_result c) g prover_ce
@@ -149,12 +149,12 @@ and schedule_goal (c: Controller_itp.controller) (g : Session_itp.proofNodeID) =
 and actually_schedule_goal c g =
   C.schedule_goal ~callback:(interpret_result c) c g
 
-let handle_obj c obj =
-   if Gnat_objectives.objective_status obj <> Gnat_objectives.Proved then begin
-     match Gnat_objectives.next obj with
+let handle_obj c check =
+   if Gnat_objectives.check_status check <> Gnat_objectives.Proved then begin
+     match Gnat_objectives.next check with
       | [] -> ()
       | l ->
-         List.iter (create_manual_or_schedule c obj) l
+         List.iter (create_manual_or_schedule c check) l
    end
 
 let all_split_subp c subp =
@@ -197,15 +197,15 @@ let maybe_giant_step_rac ctr parent models =
         (Gnat_counterexamples.post_clean#model m, Some res))
   ) models)
 
-let report_messages c obj =
+let report_messages c check =
   let s = c.Controller_itp.controller_session in
   let result =
-    if C.session_proved_status c obj then
-      let (stats, stat_checker) = C.Save_VCs.extract_stats c obj in
+    if C.session_proved_status c check then
+      let (stats, stat_checker) = C.Save_VCs.extract_stats c check in
       Gnat_report.Proved (stats, stat_checker)
     else
       let models =
-        let ce_pa = C.session_find_ce_pa c obj in
+        let ce_pa = C.session_find_ce_pa c check in
         match ce_pa with
         | None -> []
         | Some pa ->
@@ -217,13 +217,13 @@ let report_messages c obj =
             let models = List.filter not_step_limit pr.Call_provers.pr_models in
             maybe_giant_step_rac c ce_pan.Session_itp.parent models
       in
-      let unproved_pa = C.session_find_unproved_pa c obj in
+      let unproved_pa = C.session_find_unproved_pa c check in
       let manual_info = Opt.bind unproved_pa (Gnat_manual.manual_proof_info s) in
       let unproved_goal =
         (* In some cases (replay) no proofattempt proves the goal but we still
            want a task to be able to extract the expl from it. *)
         match unproved_pa with
-        | None -> C.session_find_unproved_goal c obj
+        | None -> C.session_find_unproved_goal c check
         | Some pa -> Some (Session_itp.get_proof_attempt_parent s pa)
       in
       let extra_info =
@@ -246,7 +246,7 @@ let report_messages c obj =
               else { Gnat_expl.pretty_node = None; inlined = None }
       in
       Gnat_report.Not_Proved (extra_info, models, manual_info) in
-  Gnat_report.register obj (C.Save_VCs.check_to_json s obj) result
+  Gnat_report.register check (C.Save_VCs.check_to_json s check) result
 
 (* Escaping all debug printings *)
 let escape_buffer = Buffer.create 42
@@ -296,7 +296,7 @@ let save_session_and_exit c signum =
 
  (* This is the main code. We read the file into the session if not already
     done, we apply the split_goal transformation when needed, and we schedule
-    the first VC of all objectives. When done, we save the session.
+    the first VC of all check. When done, we save the session.
  *)
 
 let _ =
