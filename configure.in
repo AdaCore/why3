@@ -868,6 +868,13 @@ if test "$enable_js_of_ocaml" != no -a "$found_js_of_ocaml" = no; then
 fi
 
 if test "$enable_js_of_ocaml" != no; then
+   JSOFOCAMLVERSION=$($OCAMLFIND query -format "%v" js_of_ocaml 2> /dev/null | tr -d '\r')
+   AX_VERSION_GE([$JSOFOCAMLVERSION], 5.6.0, [], [
+      enable_js_of_ocaml=no
+      reason_js_of_ocaml=" (js_of_ocaml >= 5.6.0 not found)"])
+fi
+
+if test "$enable_js_of_ocaml" != no; then
    enable_js_of_ocaml=yes
    JSOFOCAMLPKG="js_of_ocaml js_of_ocaml-ppx"
 fi
