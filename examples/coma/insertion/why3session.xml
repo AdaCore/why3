@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.5.3" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.13.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="coma" proved="true">
+<path name=".."/><path name="insertion.coma"/>
+<theory name="Coma" proved="true">
+ <goal name="vc_insert" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="vc_insert.0" proved="true">
+  <proof prover="1"><result status="valid" time="0.027441" steps="68487"/></proof>
+  </goal>
+  <goal name="vc_insert.1" proved="true">
+  <proof prover="1"><result status="valid" time="0.016801" steps="32844"/></proof>
+  </goal>
+  <goal name="vc_insert.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.199767" steps="3312"/></proof>
+  </goal>
+  <goal name="vc_insert.3" proved="true">
+  <proof prover="1"><result status="valid" time="0.022473" steps="40726"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

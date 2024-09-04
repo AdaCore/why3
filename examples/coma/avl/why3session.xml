@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.5.3" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="coma" proved="true">
+<path name=".."/><path name="avl.coma"/>
+<theory name="Coma" proved="true">
+ <goal name="vc_unTree" proved="true">
+ <proof prover="2"><result status="valid" time="0.013233" steps="5"/></proof>
+ </goal>
+ <goal name="vc_rotate_left" proved="true">
+ <proof prover="2"><result status="valid" time="0.011190" steps="5"/></proof>
+ </goal>
+ <goal name="vc_rotate_right" proved="true">
+ <proof prover="2"><result status="valid" time="0.005784" steps="5"/></proof>
+ </goal>
+ <goal name="vc_join_right" proved="true">
+ <proof prover="2"><result status="valid" time="0.009236" steps="5"/></proof>
+ </goal>
+ <goal name="vc_join_left" proved="true">
+ <proof prover="2"><result status="valid" time="0.009787" steps="5"/></proof>
+ </goal>
+ <goal name="vc_join" proved="true">
+ <proof prover="0"><result status="valid" time="0.061374" steps="21013"/></proof>
+ </goal>
+ <goal name="vc_split_last" proved="true">
+ <proof prover="2"><result status="valid" time="0.178155" steps="4277"/></proof>
+ </goal>
+ <goal name="vc_join2" proved="true">
+ <proof prover="2"><result status="valid" time="0.007126" steps="5"/></proof>
+ </goal>
+ <goal name="vc_split" proved="true">
+ <proof prover="0"><result status="valid" time="0.198001" steps="50009"/></proof>
+ </goal>
+ <goal name="vc_insert" proved="true">
+ <proof prover="2"><result status="valid" time="0.021330" steps="127"/></proof>
+ </goal>
+ <goal name="vc_delete" proved="true">
+ <proof prover="2"><result status="valid" time="0.203758" steps="4571"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

@@ -1,0 +1,19 @@
+use int.Int
+use bintree.Tree
+use list.List
+
+-------------------------------------------------------------------------------
+
+let fail = { false } any
+let halt = ? any
+
+let unTree {t: tree int} (onNode [] {v: int} {l r: tree int}) (onLeaf) =
+  any as node {v: int} {l r: tree int} ->
+           { t = Node l v r } ! onNode {v} {l} {r}
+      |  leaf -> { t = Empty } ! onLeaf
+
+let tree_left {t: tree int} (return {t: tree int}) =
+  unTree {t} (fun {v: int} {l r: tree int} ->
+                ! return {l}
+                as return {o: tree int} -> { o = l } ! return {o})
+             (fail)

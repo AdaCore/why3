@@ -898,6 +898,7 @@ let () = create_colors gconfig task_view
 let why_lang = get_extra_lang "why3" "Why3"
 let why3py_lang = get_extra_lang "why3py" "Why3python"
 let why3c_lang = get_extra_lang "why3c" "Why3c"
+let coma_lang = get_extra_lang "coma" "Coma"
 let rust_lang = get_extra_lang "rust" "Rust"
 let ada_lang = get_extra_lang "ada" "Ada"
 let java_lang = get_extra_lang "java" "Java"
@@ -906,16 +907,18 @@ let c_lang = get_extra_lang "c" "C"
 let change_lang view lang =
   let lang =
     match lang with
-    | "python" -> why3py_lang ()
+    | "python"  -> why3py_lang ()
     | "micro-C" -> why3c_lang ()
-    | ".rs" -> rust_lang ()
-    | ".adb" -> ada_lang ()
-    | ".ads" -> ada_lang ()
-    | ".java" -> java_lang ()
-    | ".c" -> c_lang ()
+    | ".rs"     -> rust_lang ()
+    | ".adb"    -> ada_lang ()
+    | ".ads"    -> ada_lang ()
+    | ".java"   -> java_lang ()
+    | ".c"      -> c_lang ()
+    | "coma"
+    | ".coma"   -> coma_lang ()
     | ".mlw"
     | ".why"
-    | "whyml" ->  why_lang ()
+    | "whyml"   ->  why_lang ()
     | _ ->
         Loc.warning warn_unknown_format "Unrecognized source format `%s`" lang;
         None

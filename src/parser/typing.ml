@@ -538,6 +538,19 @@ let type_fmla_in_namespace ns km crcmap f =
   let f = dterm ns km crcmap no_gvars None Dterm.denv_empty f in
   Dterm.fmla ~strict:true ~keep_loc:true f
 
+let type_term_in_denv ns km crcmap denv t =
+  let t = dterm ns km crcmap no_gvars None denv t in
+  Dterm.term ~strict:true ~keep_loc:true t
+
+let check_term_in_denv ns km crcmap denv t ty =
+  let t = dterm ns km crcmap no_gvars None denv t in
+  let t_assert = Dterm.dterm crcmap (DTcast (t, Dterm.dty_of_ty ty)) in
+  Dterm.term ~strict:true ~keep_loc:true t_assert
+
+let type_fmla_in_denv ns km crcmap denv f =
+  let f = dterm ns km crcmap no_gvars None denv f in
+  Dterm.fmla ~strict:true ~keep_loc:true f
+
 
 (** typing program expressions *)
 

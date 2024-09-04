@@ -479,6 +479,7 @@ install-data::
 	$(INSTALL_DATA) share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
 	$(INSTALL_DATA) share/lang/why3c.lang $(DATADIR)/why3/lang/why3c.lang
 	$(INSTALL_DATA) share/lang/why3py.lang $(DATADIR)/why3/lang/why3py.lang
+	$(INSTALL_DATA) share/lang/coma.lang $(DATADIR)/why3/lang/coma.lang
 
 ifeq (@enable_local@,yes)
 else
@@ -537,6 +538,8 @@ endif
 PLUGGENERATED = \
 	plugins/tptp/tptp_lexer.ml \
 	plugins/tptp/tptp_parser.ml plugins/tptp/tptp_parser.mli \
+	plugins/coma/coma_lexer.ml \
+	plugins/coma/coma_parser.ml plugins/coma/coma_parser.mli \
 	plugins/python/py_lexer.ml \
 	plugins/python/py_parser.ml plugins/python/py_parser.mli \
 	plugins/microc/mc_lexer.ml \
@@ -550,6 +553,7 @@ PLUG_PRINTER =
 PLUG_TRANSFORM =
 PLUG_STRATEGIES = forward_propagation
 PLUG_TPTP = tptp_parser tptp_typing tptp_lexer tptp_printer
+PLUG_COMA = coma_logic coma_syntax coma_parser coma_lexer coma_typing coma_main
 PLUG_PYTHON = py_parser py_lexer py_main
 PLUG_MICROC = mc_parser mc_lexer mc_printer mc_main
 PLUG_CFG = cfg_parser cfg_lexer cfg_paths subregion_analysis cfg_main
@@ -559,15 +563,19 @@ endif
 
 PLUG_CMIONLY = tptp/tptp_ast python/py_ast microc/mc_ast cfg/cfg_ast
 
-PLUGINS = genequlin dimacs tptp python microc cfg forward_propagation
+PLUGINS = genequlin dimacs tptp python microc coma cfg forward_propagation
 
 TPTPMODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
+COMAMODULES = $(addprefix plugins/coma/, $(PLUG_COMA))
 PYTHONMODULES = $(addprefix plugins/python/, $(PLUG_PYTHON))
 MICROCMODULES = $(addprefix plugins/microc/, $(PLUG_MICROC))
 CFGMODULES = $(addprefix plugins/cfg/, $(PLUG_CFG))
 
 TPTPCMO = $(addsuffix .cmo, $(TPTPMODULES))
 TPTPCMX = $(addsuffix .cmx, $(TPTPMODULES))
+
+COMACMO = $(addsuffix .cmo, $(COMAMODULES))
+COMACMX = $(addsuffix .cmx, $(COMAMODULES))
 
 PYTHONCMO = $(addsuffix .cmo, $(PYTHONMODULES))
 PYTHONCMX = $(addsuffix .cmx, $(PYTHONMODULES))
@@ -593,15 +601,15 @@ PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(addprefix plugins/printer/, $(PLUG_PRINTER)) \
 	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
 	      $(addprefix plugins/strategies/, $(PLUG_STRATEGIES)) \
-	      $(TPTPMODULES) $(PYTHONMODULES) $(MICROCMODULES) \
-	      $(CFGMODULES)
+	      $(TPTPMODULES) $(COMAMODULES) \
+	      $(PYTHONMODULES) $(MICROCMODULES) $(CFGMODULES)
 
 PLUGDEP = $(addsuffix .dep, $(PLUGMODULES)) $(PLUG_CMIONLY:%=plugins/%.dep)
 PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
 PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
 PLUGCMI = $(addsuffix .cmi, $(PLUGMODULES)) $(PLUG_CMIONLY:%=plugins/%.cmi)
 
-PLUGDIRS = parser printer transform strategies tptp python microc cfg
+PLUGDIRS = parser printer transform strategies tptp coma python microc cfg
 PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
 
 ifeq (@enable_stackify@,yes)
@@ -648,6 +656,8 @@ $(PLUG_STRATEGIES:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/strategies/
 $(PLUG_STRATEGIES:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/strategies/%.cmo
 lib/plugins/tptp.cmxs: $(TPTPCMX)
 lib/plugins/tptp.cma: $(TPTPCMO)
+lib/plugins/coma.cmxs: $(COMACMX)
+lib/plugins/coma.cma: $(COMACMO)
 lib/plugins/python.cmxs: $(PYTHONCMX)
 lib/plugins/python.cma: $(PYTHONCMO)
 lib/plugins/microc.cmxs: $(MICROCCMX)
@@ -2106,6 +2116,11 @@ pl%gins/cfg/cfg_parser.ml pl%gins/cfg/cfg_parser.mli: src/parser/parser_common.m
 	$(SHOW) 'Menhir $^'
 	$(HIDE)$(MENHIR) --table --explain --strict --base plugins/cfg/cfg_parser $^
 	$(HIDE)for f in plugins/cfg/cfg_parser.mli plugins/cfg/cfg_parser.ml; do (echo "open Why3"; cat $$f) > $$f.new && mv $$f.new $$f; done
+
+pl%gins/coma/coma_parser.ml pl%gins/coma/coma_parser.mli: src/parser/parser_common.mly plugins/coma/coma_parser.mly
+	$(SHOW) 'Menhir $^'
+	$(HIDE)$(MENHIR) --table --explain --strict --base plugins/coma/coma_parser $^
+	$(HIDE)for f in plugins/coma/coma_parser.mli plugins/coma/coma_parser.ml; do (echo "open Why3"; cat $$f) > $$f.new && mv $$f.new $$f; done
 
 %.ml %.mli: %.mly
 	$(SHOW) 'Menhir $<'

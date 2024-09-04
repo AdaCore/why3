@@ -71,6 +71,7 @@ module type S =
     val mapi_filter_fold:
       (key -> 'a -> 'acc -> 'acc * 'b option) -> 'a t -> 'acc -> 'acc * 'b t
     val fold_left : ('b -> key -> 'a -> 'b) -> 'b -> 'a t -> 'b
+    val fold_right : (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
     val fold2_inter: (key -> 'a -> 'b -> 'c -> 'c) -> 'a t -> 'b t -> 'c -> 'c
     val fold2_union:
       (key -> 'a option -> 'b option -> 'c -> 'c) -> 'a t -> 'b t -> 'c -> 'c
@@ -640,6 +641,12 @@ module Make(Ord: OrderedType) = struct
         Empty -> accu
       | Node(l, v, d, r, _) ->
           fold_left f (f (fold_left f accu l) v d) r
+
+    let rec fold_right f m accu =
+      match m with
+        Empty -> accu
+      | Node(l, v, d, r, _) ->
+          fold_right f l (f v d (fold_right f r accu))
 
     let of_list l =
       List.fold_left (fun acc (k,d) -> add k d acc) empty l

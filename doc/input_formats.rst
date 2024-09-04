@@ -12,8 +12,12 @@ Why3 also supports the format MLCFG, which is an extension of WhyML
 allowing to define function bodies in an unstructured style, with goto
 statements.
 
+Why3 also supports the format Coma (which stands for Continuation Machine).
+Coma is an Intermediate Verification Language implemented as a plugin in the
+Why3 platform.
+
 Any Why3 tool (:why3:tool:`why3 prove`, :why3:tool:`why3 ide`, etc.)
-can be passed a file with a suffix :file:`.c`, :file:`.py` or
+can be passed a file with a suffix :file:`.c`, :file:`.py`, :file:`.coma` or
 :file:`.mlcfg`, which triggers the corresponding input format.
 
 .. index:: micro-C
@@ -570,3 +574,11 @@ Concerning the use of Why3 as an intermediate language, via the
 syntax is recommended since the printing and re-parsing of parse trees
 is automatically generated, hence the result is guaranteed to
 faithfully mirror the internal Ptree representation.
+
+.. index:: Coma
+.. _format.Coma:
+
+Coma
+-----
+
+The Coma documentation is described in https://coma-ivl.codeberg.page/.
