@@ -1,0 +1,19 @@
+
+module R
+
+  use mach.int.Int32
+  type r = { x : int32; y : int32 }
+  let swap (a : r) : r = { x = a.y ; y = a.x }
+
+end
+
+module S
+
+  use mach.int.UInt32
+  use mach.c.String
+
+  let hello () : string = "hello"
+
+  let hello_len () : uint32 = length "hello"
+
+end

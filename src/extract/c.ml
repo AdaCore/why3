@@ -1528,9 +1528,9 @@ module MLToC = struct
                 if header || flat
                 then [C.Dstruct sd]
                 else [C.Dstruct_decl id.id_string]
-             | Some Ddata _ -> raise (Unsupported "Ddata@.")
+             | Some Ddata _ -> raise (Unsupported "Ddata")
              | Some (Drange _) | Some (Dfloat _) ->
-                raise (Unsupported "Drange/Dfloat@.")
+                raise (Unsupported "Drange/Dfloat")
              | None -> raise (Unsupported
                                 ("type declaration without syntax or alias: "
                                  ^id.id_string))
