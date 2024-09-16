@@ -1881,7 +1881,7 @@ let image_of_pa_status ~obsolete pa =
         !image_failure_obs
       else
         !image_failure
-    | Call_provers.HighFailure ->
+    | Call_provers.HighFailure _ ->
       if obsolete then
         !image_failure_obs
       else

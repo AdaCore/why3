@@ -522,7 +522,7 @@ let rac_execute ctx rs =
   | Cannot_evaluate reason ->
       let reason = sprintf "terminated because %s" reason in
       Res_incomplete reason, Log.empty_log
-  | Cannot_decide (ctx,terms,reason) ->
+  | Cannot_decide (ctx,_terms,reason) ->
       let reason = sprintf "terminated because %s" reason in
       Res_incomplete reason, Log.flush_log ctx.cntr_env.log_uc
   | x when not (Debug.test_flag Debug.stack_trace) ->

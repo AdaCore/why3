@@ -383,7 +383,7 @@ let adapt_limits ~interactive ~use_steps limits a =
          | Call_provers.StepLimitExceeded
          | Call_provers.Invalid -> increased_time, increased_mem, steplimit
          | Call_provers.Failure _
-         | Call_provers.HighFailure ->
+         | Call_provers.HighFailure _ ->
             (* correct ? failures are supposed to appear quickly anyway... *)
             timelimit, memlimit, steplimit
        end

@@ -89,7 +89,7 @@ let () =
     | Some pa ->
       match pa.pr_answer with
         (* Cases where no proof attempt has been made *)
-        | HighFailure | Failure "" -> true
+        | HighFailure _ | Failure "" -> true
         | Valid | Invalid | Timeout | OutOfMemory | StepLimitExceeded
         | Unknown _ | Failure _ -> false
   in

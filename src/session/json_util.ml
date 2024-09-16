@@ -55,7 +55,7 @@ let convert_prover_answer (pa: prover_answer) =
   | StepLimitExceeded -> "StepLimitExceeded",""
   | Unknown s         -> "Unknown",s
   | Failure s         -> "Failure",s
-  | HighFailure       -> "HighFailure",""
+  | HighFailure s     -> "HighFailure",s
 
 let convert_limit (l: Call_provers.resource_limit) =
   Record
@@ -567,8 +567,8 @@ let parse_prover_answer a d =
   | "StepLimitExceeded" -> StepLimitExceeded
   | "Unknown"           -> Unknown d
   | "Failure"           -> Failure d
-  | "HighFailure"       -> HighFailure
-  | _                   -> HighFailure
+  | "HighFailure"       -> HighFailure d
+  | _                   -> HighFailure d
 
 let parse_unix_process j arg =
   match j with
@@ -584,7 +584,7 @@ let parse_prover_result j =
       with Not_found -> ""
     in
     try parse_prover_answer (get_string_field j "pr_answer") arg
-    with Not_found -> HighFailure
+    with Not_found -> HighFailure "unparsed prover answer (JSON)"
   in
   let pr_status_unix =
     let arg =

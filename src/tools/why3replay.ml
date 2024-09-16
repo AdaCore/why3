@@ -185,7 +185,7 @@ let same_result r1 r2 =
     | StepLimitExceeded, StepLimitExceeded
     | Unknown _, Unknown _
     | Failure _, Failure _
-    | HighFailure, HighFailure
+    | HighFailure _, HighFailure _
       -> true
     | Valid, _ | _, Valid
     | Invalid, _ | _, Invalid
