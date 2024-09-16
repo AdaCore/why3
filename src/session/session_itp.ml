@@ -1020,12 +1020,12 @@ let load_result a (path,acc) r =
        | "timeout" -> Call_provers.Timeout
        | "outofmemory" -> Call_provers.OutOfMemory
        | "failure" -> Call_provers.Failure ""
-       | "highfailure" -> Call_provers.HighFailure
+       | "highfailure" -> Call_provers.HighFailure ""
        | "steplimitexceeded" -> Call_provers.StepLimitExceeded
        | "stepslimitexceeded" -> Call_provers.StepLimitExceeded
        | s ->
           Loc.warning warn_unexpected_session_element "Session.load_result: unexpected status '%s'@." s;
-          Call_provers.HighFailure
+          Call_provers.HighFailure "unexpected result from load_result"
      in
      let time =
        try float_of_string (List.assoc "time" r.Xml.attributes)
@@ -2050,7 +2050,7 @@ let save_result fmt r =
        | Call_provers.Valid -> "valid"
        | Call_provers.Failure _ -> "failure"
        | Call_provers.Unknown _ -> "unknown"
-       | Call_provers.HighFailure -> "highfailure"
+       | Call_provers.HighFailure _ -> "highfailure"
        | Call_provers.Timeout -> "timeout"
        | Call_provers.OutOfMemory -> "outofmemory"
        | Call_provers.StepLimitExceeded -> "steplimitexceeded"

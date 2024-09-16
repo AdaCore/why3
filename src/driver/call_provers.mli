@@ -30,7 +30,7 @@ type prover_answer =
       (** The prover can't determine if the task is valid *)
   | Failure of string
       (** The prover reports a failure *)
-  | HighFailure
+  | HighFailure of string
       (** An error occured during the call to the prover or none
           of the given regexps match the output of the prover *)
 

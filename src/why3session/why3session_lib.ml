@@ -107,7 +107,7 @@ let status_filter x =
   match x with
   | "valid" -> Valid
   | "invalid" -> Invalid
-  | "highfailure" -> HighFailure
+  | "highfailure" -> HighFailure ""
   | _ -> assert false
 
 let filter_spec =
