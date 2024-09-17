@@ -17,58 +17,69 @@ Axiom tree_WhyType : WhyType tree.
 Existing Instance tree_WhyType.
 
 (* Why3 assumption *)
-Fixpoint depths (d:Z) (t:tree) {struct t}: (list Z) :=
+Fixpoint depths (d:Numbers.BinNums.Z)
+  (t:tree) {struct t}: Init.Datatypes.list Numbers.BinNums.Z :=
   match t with
-  | Leaf => (Init.Datatypes.cons d Init.Datatypes.nil)
+  | Leaf => Init.Datatypes.cons d Init.Datatypes.nil
   | Node l r =>
-      (Init.Datatypes.app (depths (d + 1%Z)%Z l) (depths (d + 1%Z)%Z r))
+      Init.Datatypes.app (depths (d + 1%Z)%Z l) (depths (d + 1%Z)%Z r)
   end.
 
 Axiom depths_head :
-  forall (t:tree) (d:Z),
+  forall (t:tree) (d:Numbers.BinNums.Z),
   match depths d t with
-  | (Init.Datatypes.cons x _) => (d <= x)%Z
+  | Init.Datatypes.cons x _ => (d <= x)%Z
   | Init.Datatypes.nil => False
   end.
 
 Axiom depths_unique :
-  forall (t1:tree) (t2:tree) (d:Z) (s1:(list Z)) (s2:(list Z)),
+  forall (t1:tree) (t2:tree) (d:Numbers.BinNums.Z)
+    (s1:Init.Datatypes.list Numbers.BinNums.Z)
+    (s2:Init.Datatypes.list Numbers.BinNums.Z),
   ((Init.Datatypes.app (depths d t1) s1) =
    (Init.Datatypes.app (depths d t2) s2)) ->
   (t1 = t2) /\ (s1 = s2).
 
 Axiom depths_prefix :
-  forall (t:tree) (d1:Z) (d2:Z) (s1:(list Z)) (s2:(list Z)),
+  forall (t:tree) (d1:Numbers.BinNums.Z) (d2:Numbers.BinNums.Z)
+    (s1:Init.Datatypes.list Numbers.BinNums.Z)
+    (s2:Init.Datatypes.list Numbers.BinNums.Z),
   ((Init.Datatypes.app (depths d1 t) s1) =
    (Init.Datatypes.app (depths d2 t) s2)) ->
   (d1 = d2).
 
 Axiom depths_prefix_simple :
-  forall (t:tree) (d1:Z) (d2:Z), ((depths d1 t) = (depths d2 t)) -> (d1 = d2).
+  forall (t:tree) (d1:Numbers.BinNums.Z) (d2:Numbers.BinNums.Z),
+  ((depths d1 t) = (depths d2 t)) -> (d1 = d2).
 
 Axiom depths_subtree :
-  forall (t1:tree) (t2:tree) (d1:Z) (d2:Z) (s1:(list Z)),
+  forall (t1:tree) (t2:tree) (d1:Numbers.BinNums.Z) (d2:Numbers.BinNums.Z)
+    (s1:Init.Datatypes.list Numbers.BinNums.Z),
   ((Init.Datatypes.app (depths d1 t1) s1) = (depths d2 t2)) -> (d2 <= d1)%Z.
 
 Axiom depths_unique2 :
-  forall (t1:tree) (t2:tree) (d1:Z) (d2:Z),
+  forall (t1:tree) (t2:tree) (d1:Numbers.BinNums.Z) (d2:Numbers.BinNums.Z),
   ((depths d1 t1) = (depths d2 t2)) -> (d1 = d2) /\ (t1 = t2).
 
 (* Why3 assumption *)
-Fixpoint forest_depths (f:(list (Z* tree)%type)) {struct f}: (list Z) :=
+Fixpoint forest_depths
+  (f:Init.Datatypes.list (Numbers.BinNums.Z* tree)%type) {struct f}: 
+  Init.Datatypes.list Numbers.BinNums.Z :=
   match f with
   | Init.Datatypes.nil => Init.Datatypes.nil
-  | (Init.Datatypes.cons (d, t) r) =>
-      (Init.Datatypes.app (depths d t) (forest_depths r))
+  | Init.Datatypes.cons (d, t) r =>
+      Init.Datatypes.app (depths d t) (forest_depths r)
   end.
 
 Axiom forest_depths_append :
-  forall (f1:(list (Z* tree)%type)) (f2:(list (Z* tree)%type)),
+  forall (f1:Init.Datatypes.list (Numbers.BinNums.Z* tree)%type)
+    (f2:Init.Datatypes.list (Numbers.BinNums.Z* tree)%type),
   ((forest_depths (Init.Datatypes.app f1 f2)) =
    (Init.Datatypes.app (forest_depths f1) (forest_depths f2))).
 
 (* Why3 assumption *)
-Fixpoint greedy (d:Z) (d1:Z) (t1:tree) {struct t1}: Prop :=
+Fixpoint greedy (d:Numbers.BinNums.Z) (d1:Numbers.BinNums.Z)
+  (t1:tree) {struct t1}: Prop :=
   ~ (d = d1) /\
   match t1 with
   | Leaf => True
@@ -76,43 +87,52 @@ Fixpoint greedy (d:Z) (d1:Z) (t1:tree) {struct t1}: Prop :=
   end.
 
 (* Why3 assumption *)
-Inductive g: (list (Z* tree)%type) -> Prop :=
+Inductive g: Init.Datatypes.list (Numbers.BinNums.Z* tree)%type -> Prop :=
   | Gnil : g Init.Datatypes.nil
   | Gone :
-      forall (d:Z) (t:tree),
+      forall (d:Numbers.BinNums.Z) (t:tree),
       g (Init.Datatypes.cons (d, t) Init.Datatypes.nil)
   | Gtwo :
-      forall (d1:Z) (d2:Z) (t1:tree) (t2:tree) (l:(list (Z* tree)%type)),
-      (greedy d1 d2 t2) -> (g (Init.Datatypes.cons (d1, t1) l)) ->
+      forall (d1:Numbers.BinNums.Z) (d2:Numbers.BinNums.Z) (t1:tree)
+        (t2:tree) (l:Init.Datatypes.list (Numbers.BinNums.Z* tree)%type),
+      greedy d1 d2 t2 -> g (Init.Datatypes.cons (d1, t1) l) ->
       g (Init.Datatypes.cons (d2, t2) (Init.Datatypes.cons (d1, t1) l)).
 
 Axiom g_append :
-  forall (l1:(list (Z* tree)%type)) (l2:(list (Z* tree)%type)),
-  (g (Init.Datatypes.app l1 l2)) -> g l1.
+  forall (l1:Init.Datatypes.list (Numbers.BinNums.Z* tree)%type)
+    (l2:Init.Datatypes.list (Numbers.BinNums.Z* tree)%type),
+  g (Init.Datatypes.app l1 l2) -> g l1.
 
 Axiom depths_length :
-  forall (t:tree) (d:Z), (1%Z <= (list.Length.length (depths d t)))%Z.
+  forall (t:tree) (d:Numbers.BinNums.Z),
+  (1%Z <= (list.Length.length (depths d t)))%Z.
 
 Axiom forest_depths_length :
-  forall (l:(list (Z* tree)%type)),
+  forall (l:Init.Datatypes.list (Numbers.BinNums.Z* tree)%type),
   (0%Z <= (list.Length.length (forest_depths l)))%Z.
 
 Axiom g_tail :
-  forall (l1:(list (Z* tree)%type)) (l2:(list (Z* tree)%type)),
-  (g (Init.Datatypes.app l1 l2)) -> g l2.
+  forall (l1:Init.Datatypes.list (Numbers.BinNums.Z* tree)%type)
+    (l2:Init.Datatypes.list (Numbers.BinNums.Z* tree)%type),
+  g (Init.Datatypes.app l1 l2) -> g l2.
 
 Axiom key_lemma :
-  forall (t:tree) (l:(list (Z* tree)%type)) (d:Z) (d1:Z) (t1:tree)
-    (s:(list Z)),
+  forall (t:tree) (l:Init.Datatypes.list (Numbers.BinNums.Z* tree)%type)
+    (d:Numbers.BinNums.Z) (d1:Numbers.BinNums.Z) (t1:tree)
+    (s:Init.Datatypes.list Numbers.BinNums.Z),
   (d < d1)%Z -> (1%Z <= (list.Length.length l))%Z ->
-  (g (Lists.List.rev (Init.Datatypes.cons (d1, t1) l))) ->
+  g (Lists.List.rev (Init.Datatypes.cons (d1, t1) l)) ->
   ~ ((forest_depths (Init.Datatypes.cons (d1, t1) l)) =
      (Init.Datatypes.app (depths d t) s)).
 
+
+Require Import Lia.
+
 (* Why3 goal *)
 Theorem right_nil :
-  forall (l:(list (Z* tree)%type)), (2%Z <= (list.Length.length l))%Z ->
-  (g l) -> forall (t:tree) (d:Z),
+  forall (l:Init.Datatypes.list (Numbers.BinNums.Z* tree)%type),
+  (2%Z <= (list.Length.length l))%Z -> g l ->
+  forall (t:tree) (d:Numbers.BinNums.Z),
   ~ ((forest_depths (Lists.List.rev l)) = (depths d t)).
 (* Why3 intros l h1 h2 t d. *)
 intros l H hg.
@@ -156,3 +176,4 @@ rewrite Append.Append_length in H.
 rewrite Reverse.Reverse_length in H. simpl in H.
 lia.
 Qed.
+
