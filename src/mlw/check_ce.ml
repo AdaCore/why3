@@ -92,29 +92,23 @@ let report_verdict ?check_ce env fmt (c,log) =
 
 type classification = verdict * Log.exec_log
 
-let print_classification_log_or_model ?verb_lvl ?json ~print_attrs
+let print_classification_log_or_model ?verb_lvl ~json ~print_attrs
     fmt (model, (c, log)) =
   let open Json_base in
-  match json with
-  | None | Some `Values -> (
-      match c with
-      | NC | SW | NC_SW ->
-          fprintf fmt "@[%a@]" (Log.print_log ?verb_lvl ~json:false) log
-      | INCOMPLETE _ ->
-          let print_model fmt m =
-            if json = None then print_model_human fmt m
-            else print_model (* json values *) fmt m in
-          fprintf fmt "@[%a@]" (print_model ~print_attrs) model
-      | BAD_CE _ -> ()
-    )
-  | Some `All -> (
-      match c with
-      | NC | SW | NC_SW ->
-          print_json fmt (Record ["model", json_model model; "log", Log.json_log log])
-      | INCOMPLETE _ ->
-          print_json fmt (Record ["model", json_model model])
-      | BAD_CE _ -> ()
-    )
+  if json then
+    match c with
+    | NC | SW | NC_SW ->
+        print_json fmt (Record ["model", json_model model; "log", Log.json_log log])
+    | INCOMPLETE _ ->
+        print_json fmt (Record ["model", json_model model])
+    | BAD_CE _ -> ()
+  else
+    match c with
+    | NC | SW | NC_SW ->
+        fprintf fmt "@[%a@]" (Log.print_log ?verb_lvl) log
+    | INCOMPLETE _ ->
+          fprintf fmt "@[%a@]" (print_model_human ~print_attrs ~filter_similar:true) model
+    | BAD_CE _ -> ()
 
 type rac_result_state =
   | Res_normal
@@ -147,7 +141,7 @@ let print_rac_result ?verb_lvl fmt result =
   | RAC_not_done reason -> fprintf fmt "RAC not done (%s)" reason
   | RAC_done (st,log) ->
     fprintf fmt "%a@,%a" print_rac_result_state st
-      (Log.print_log ?verb_lvl ~json:false) log
+      (Log.print_log ?verb_lvl) log
 
 let is_vc_term ~vc_term_loc ~vc_term_attrs ctx t =
   match vc_term_loc with
@@ -206,7 +200,7 @@ let classify ~vc_term_loc ~vc_term_attrs ~normal_result ~giant_step_result =
           BAD_CE giant_step_reason, giant_step_log
     end
 
-let print_model_classification ?verb_lvl ?json ?check_ce env fmt (m, c) =
+let print_model_classification ?verb_lvl ~json ?check_ce env fmt (m, c) =
   fprintf fmt "@ @[<hov2>%a%t@]"
     (report_verdict ?check_ce env) c
     (fun fmt ->
@@ -218,7 +212,7 @@ let print_model_classification ?verb_lvl ?json ?check_ce env fmt (m, c) =
        | _ -> ());
   let print_attrs = Debug.test_flag Call_provers.debug_attrs in
   fprintf fmt "@ %a"
-    (print_classification_log_or_model ?verb_lvl ~print_attrs ?json) (m, c)
+    (print_classification_log_or_model ?verb_lvl ~print_attrs ~json) (m, c)
 
 (** Import values from SMT solver models to interpreter values. *)
 

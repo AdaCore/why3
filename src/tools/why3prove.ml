@@ -30,7 +30,7 @@ let opt_theory = ref None
 let opt_trans = ref []
 let opt_metas = ref []
 (* Option for printing counterexamples with JSON formatting *)
-let opt_json : [< `All | `Values ] option ref = ref None
+let opt_json = ref false
 let opt_check_ce_model = ref false
 let opt_rac_prover = ref None
 let opt_rac_timelimit = ref None
@@ -193,11 +193,8 @@ let option_list =
     KLong "ce-log-verbosity", Hnd1(AInt, fun i -> opt_ce_log_verbosity := Some i),
     "<lvl> verbosity level for interpretation log of\n\
     counterexample solver model";
-    KLong "json", Hnd0 (fun () -> opt_json := Some `All),
+    KLong "json", Hnd0 (fun () -> opt_json := true),
     " print output in JSON format";
-    KLong "json-model-values", Hnd0 (fun () -> opt_json := Some `Values),
-    " print values of prover model in JSON format (back-\n\
-     wards compatiblity with --json)";
     KLong "color", Hnd0 (fun () -> opt_color := true),
     " print output with colors";
   ]
@@ -318,51 +315,54 @@ let output_task drv fname _tname th task dir =
   Driver.print_task drv (formatter_of_out_channel cout) task;
   close_out cout
 
-let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
-  match json with
-  | Some `All ->
-    let open Json_base in
-    let loc =
-      match loc with
-      | None -> Record ["file-name", String fname]
-      | Some loc ->
-          let f, bl, bc, el, ec = Loc.get loc in
-          Record [
-              "file-name", String f;
-              "start-line", Int bl;
-              "start-char", Int bc;
-              "end-line", Int el;
-              "end-char", Int ec
-            ] in
-    let term =
-      Record [
-          "loc", loc;
-          "goal_name", String goal_name;
-          "explanations", List (List.map (fun s -> String s) expls)
-        ] in
-    print_json fmt
-      (Record [
-           "term", term;
-           "prover-result", Call_provers.json_prover_result res
-         ])
-  | None | Some `Values as json ->
-    ( match loc with
-      | None -> fprintf fmt "File %s:@\n" fname
-      | Some loc -> fprintf fmt "File %a:@\n" Loc.pp_position loc );
-    ( if expls = [] then
-        fprintf fmt "@[<hov>Goal@ @{<bold>%s@}.@]" goal_name
-      else
-        let expls = String.capitalize_ascii (String.concat ", " expls) in
-        fprintf fmt
-          "@[<hov>Sub-goal@ @{<bold>%s@}@ of@ goal@ @{<bold>%s@}.@]"
-          expls goal_name );
-    fprintf fmt "@\n@[<hov2>Prover result is: %a.@]"
-      (Call_provers.print_prover_result ~json:false) res;
-    Option.iter
-      (Check_ce.print_model_classification ?json
-         ?verb_lvl:!opt_ce_log_verbosity ~check_ce:!opt_check_ce_model env fmt)
-      ce;
-    fprintf fmt "@\n"
+let print_result json fmt (fname, loc, goal_name, expls, res, ce) =
+  if json then
+    begin
+      let open Json_base in
+      let loc =
+        match loc with
+        | None -> Record ["file-name", String fname]
+        | Some loc ->
+            let f, bl, bc, el, ec = Loc.get loc in
+            Record [
+                "file-name", String f;
+                "start-line", Int bl;
+                "start-char", Int bc;
+                "end-line", Int el;
+                "end-char", Int ec
+              ] in
+      let term =
+        Record [
+            "loc", loc;
+            "goal_name", String goal_name;
+            "explanations", List (List.map (fun s -> String s) expls)
+          ] in
+      print_json fmt
+        (Record [
+             "term", term;
+             "prover-result", Call_provers.json_prover_result res
+           ])
+    end
+  else
+    begin
+      ( match loc with
+        | None -> fprintf fmt "File %s:@\n" fname
+        | Some loc -> fprintf fmt "File %a:@\n" Loc.pp_position loc );
+      ( if expls = [] then
+          fprintf fmt "@[<hov>Goal@ @{<bold>%s@}.@]" goal_name
+        else
+          let expls = String.capitalize_ascii (String.concat ", " expls) in
+          fprintf fmt
+            "@[<hov>Sub-goal@ @{<bold>%s@}@ of@ goal@ @{<bold>%s@}.@]"
+            expls goal_name );
+      fprintf fmt "@\n@[<hov2>Prover result is: %a.@]"
+        (Call_provers.print_prover_result ~json:false) res;
+      Option.iter
+        (Check_ce.print_model_classification ~json
+           ?verb_lvl:!opt_ce_log_verbosity ~check_ce:!opt_check_ce_model env fmt)
+        ce;
+      fprintf fmt "@\n"
+    end
 
 let unproved = ref false
 
@@ -384,7 +384,7 @@ let debug_print_model_attrs = Debug.lookup_flag "print_model_attrs"
 let print_other_models (m, (c, log)) =
   let print_model fmt m =
     let print_attrs = Debug.test_flag debug_print_model_attrs in
-    if !opt_json = None then Model_parser.print_model_human fmt m ~print_attrs
+    if !opt_json = false then Model_parser.print_model_human fmt m ~print_attrs
     else Model_parser.print_model (* json values *) fmt m ~print_attrs in
   ( match c with
     | Check_ce.(NC | SW | NC_SW | BAD_CE _) ->
@@ -415,7 +415,7 @@ let do_task config env drv fname tname (th : Theory.theory) (task : Task.task) =
         let t = task_goal_fmla task in
         let expls = Termcode.get_expls_fmla t in
         let goal_name = (task_goal task).Decl.pr_name.Ident.id_string in
-        printf "%a@." (print_result ?json:!opt_json)
+        printf "%a@." (print_result !opt_json)
           (fname, t.Term.t_loc, goal_name, expls, res, ce);
         Option.iter print_other_models ce;
         if res.pr_answer <> Valid then unproved := true

@@ -494,11 +494,6 @@ Options
 
    Print output in JSON format.
 
-.. option:: --json-model-values
-
-   Print values of prover model in JSON format
-   (backwards compatibility with :option:`--json`).
-
 .. option:: --color
 
    Print output with colors.

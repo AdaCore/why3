@@ -106,14 +106,12 @@ val report_verdict : ?check_ce:bool -> Env.env -> classification Pp.pp
 (** Describe a verdict in a short sentence. *)
 
 val print_classification_log_or_model :
-  ?verb_lvl:int -> ?json:[< `All | `Values ] ->
+  ?verb_lvl:int -> json:bool ->
   print_attrs:bool -> (model * classification) Pp.pp
-(** Print classification log or the model, when the model is bad or incomplete
-    (When the prover model is printed and [~json:`Values] is given, only the
-    values are printed as JSON.) *)
+(** Print classification log or the model when the model is bad or incomplete *)
 
 val print_model_classification :
-  ?verb_lvl:int -> ?json:[< `All | `Values ] -> ?check_ce:bool -> Env.env ->
+  ?verb_lvl:int -> json:bool -> ?check_ce:bool -> Env.env ->
   (model * classification) Pp.pp
 (** Print the classification with the classification log or model. *)
 

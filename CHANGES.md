@@ -24,6 +24,9 @@ Provers
   * support for Coq 8.19 (released Jan 24, 2024)
   * drop support for versions of Coq < 8.16
 
+Tools
+  * `why3 prove`: drop the option `--json-model-values` :x:
+
 Version 1.7.2, April 18, 2024
 -----------------------------
 

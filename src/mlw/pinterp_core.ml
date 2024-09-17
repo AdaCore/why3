@@ -594,39 +594,36 @@ module Log = struct
      4 : + termination of execution
      5 : + log information about initialization of global vars
    *)
-  let print_log ?(verb_lvl=4) ~json fmt entry_log =
-    if json then
-      Json_base.print_json fmt (json_log entry_log)
-    else
-      let entry_log = List.filter (fun le ->
+  let print_log ?(verb_lvl=4) fmt entry_log =
+    let entry_log = List.filter (fun le ->
+          match le.log_desc with
+          | Val_assumed _ | Res_assumed _ | Const_init _ | Exec_main _ -> true
+          | Exec_call _ | Exec_pure _ | Exec_any _
+               when verb_lvl > 1 -> true
+          | Iter_loop _ when verb_lvl > 2 -> true
+          | Exec_failed _ | Exec_stucked _ | Exec_ended
+               when verb_lvl > 3 -> true
+          | _ -> false) entry_log in
+    (* if verb_lvl < 5 remove log about initialization of global vars *)
+    let entry_log =
+      if verb_lvl < 5 then
+        Lists.drop_while (fun le ->
             match le.log_desc with
-            | Val_assumed _ | Res_assumed _ | Const_init _ | Exec_main _ -> true
-            | Exec_call _ | Exec_pure _ | Exec_any _
-                 when verb_lvl > 1 -> true
-            | Iter_loop _ when verb_lvl > 2 -> true
-            | Exec_failed _ | Exec_stucked _ | Exec_ended
-                 when verb_lvl > 3 -> true
-            | _ -> false) entry_log in
-      (* if verb_lvl < 5 remove log about initialization of global vars *)
-      let entry_log =
-        if verb_lvl < 5 then
-          Lists.drop_while (fun le ->
-              match le.log_desc with
-                Exec_main _ -> false | _ -> true) entry_log
-        else entry_log in
-      let entry_log =
-        let on_file e = Option.map (fun (f,_,_,_,_) -> f) (Option.map Loc.get e.log_loc) in
-        let on_line e = Option.map (fun (_,l,_,_,_) -> l) (Option.map Loc.get e.log_loc) in
-        List.map (fun (f, es) -> f, consecutives on_line es)
-          (consecutives on_file entry_log) in
-      let pp_entries = Pp.(print_list newline print_log_entry_desc) in
-      let pp_lines fmt (opt_line, entries) = match opt_line with
-        | Some line -> fprintf fmt "@[<v2>Line %d:@\n%a@]" line pp_entries entries
-        | None -> pp_entries fmt entries in
-      let pp_files fmt (opt_file, l) = match opt_file with
-        | Some file -> fprintf fmt "@[<v2>File %s:@\n%a@]" (Filename.basename file) Pp.(print_list newline pp_lines) l
-        | None -> fprintf fmt "@[<v4>Unknown location:@\n%a@]" Pp.(print_list newline pp_lines) l in
-      Pp.(print_list newline pp_files) fmt entry_log
+              Exec_main _ -> false | _ -> true) entry_log
+      else entry_log in
+    let entry_log =
+      let on_file e = Option.map (fun (f,_,_,_,_) -> f) (Option.map Loc.get e.log_loc) in
+      let on_line e = Option.map (fun (_,l,_,_,_) -> l) (Option.map Loc.get e.log_loc) in
+      List.map (fun (f, es) -> f, consecutives on_line es)
+        (consecutives on_file entry_log) in
+    let pp_entries = Pp.(print_list newline print_log_entry_desc) in
+    let pp_lines fmt (opt_line, entries) = match opt_line with
+      | Some line -> fprintf fmt "@[<v2>Line %d:@\n%a@]" line pp_entries entries
+      | None -> pp_entries fmt entries in
+    let pp_files fmt (opt_file, l) = match opt_file with
+      | Some file -> fprintf fmt "@[<v2>File %s:@\n%a@]" (Filename.basename file) Pp.(print_list newline pp_lines) l
+      | None -> fprintf fmt "@[<v4>Unknown location:@\n%a@]" Pp.(print_list newline pp_lines) l in
+    Pp.(print_list newline pp_files) fmt entry_log
 
   let sort_log_by_loc log =
     let insert f l e sofar =
