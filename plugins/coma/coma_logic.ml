@@ -93,22 +93,22 @@ let rec t_solid p f =
 
 let t_coma_quant q vl f =
   let g = t_quant_close_simp q vl [] f in
-  if t_solid (q = Tforall) f then
-    t_attr_add coma_solid g else g
+  if t_solid (q = Tforall) f then t_attr_add coma_solid g else g
 
 let rec t_neg f =
-  if Sattr.mem stop_split f.t_attrs then f
-  else t_attr_copy f (match f.t_node with
-    | Tnot g -> t_attr_copy f g
-    | Tbinop (Tand,g,h) -> t_or (t_neg g) (t_neg h)
-    | Tbinop (Tor,g,h) -> t_and (t_neg g) (t_neg h)
-    | Tbinop (Timplies,g,h) -> t_and g (t_neg h)
+  if Sattr.mem stop_split f.t_attrs then t_not_simp f
+  else let tac = t_attr_copy f in match f.t_node with
+    | Tnot g -> tac g
+    | Tbinop (Tand,g,h) when Sattr.mem asym_split g.t_attrs ->
+                              tac @@ t_implies g (t_neg h)
+    | Tbinop (Tand,g,h) -> tac @@ t_or (t_neg g) (t_neg h)
+    | Tbinop (Tor,g,h) -> tac @@ t_and (t_neg g) (t_neg h)
+    | Tbinop (Timplies,g,h) ->    tac @@ t_and g (t_neg h)
     | Tquant (q,b) ->
-        let q = if q = Texists then
-                Tforall else Texists in
+        let q = if q = Texists then Tforall else Texists in
         let vl,tl,g = t_open_quant b in
-        t_quant_close q vl tl (t_neg g)
-    | _ -> f)
+        tac @@ t_quant_close q vl tl (t_neg g)
+    | _ -> t_not_simp f
 
 let t_level vsl t =
   Mvs.fold (fun v _ m -> max m (Mvs.find v vsl)) (t_vars t) 0
@@ -355,6 +355,37 @@ let f_all pl f =
     | Fall (ql,f) -> Fall (pl @ ql, f)
     | _ -> Fall (pl,f)
 
+(* Pretty-printing (debug only) *)
+
+let _print_formula fmt e =
+  let pp_p fmt = function
+    | Pt tv -> Format.pp_print_char fmt '\''; Format.pp_print_string fmt tv.tv_name.id_string
+    | Pv vs -> Format.pp_print_string fmt vs.vs_name.id_string
+    | Pr vs -> Format.pp_print_char fmt '&'; Format.pp_print_string fmt vs.vs_name.id_string
+    | Pc (hs,_,_) -> Format.pp_print_string fmt hs.hs_name.id_string in
+  let rec pp fmt = function
+    | Fsym h -> Format.pp_print_string fmt h.hs_name.id_string
+    | Flam (pl,_,f) -> Format.fprintf fmt "@[<hov 2>(lambda %a .@ %a)@]"
+        (Pp.print_list Pp.space pp_p) pl pp f
+    | Fcut (s,true,f) -> Format.fprintf fmt "@[<hov 2>{ %a }@ %a@]"
+        Pretty.print_term s pp f
+    | Fcut (s,false,f) -> Format.fprintf fmt "@[<hov 2>-{ %a }-@ %a@]"
+        Pretty.print_term s pp f
+    | Fall (pl,f) -> Format.fprintf fmt "@[<hov 2>(forall %a .@ %a)@]"
+        (Pp.print_list Pp.space pp_p) pl pp f
+    | Fagt (f,t) -> Format.fprintf fmt "%a@ [%a]" pp f Pretty.print_ty t
+    | Fagv (f,s) -> Format.fprintf fmt "%a@ [%a]" pp f Pretty.print_term s
+    | Fagr (f,r) -> Format.fprintf fmt "%a@ [&%s]" pp f r.vs_name.id_string
+    | Fagc (f,g) -> Format.fprintf fmt "%a@ (%a)" pp f pp g
+    | Fand (f,g) -> Format.fprintf fmt "%a@ AND@ %a" pp f pp g
+    | Fneu (Fsym {hs_name = {id_string = "any"}}, ss) when Shs.is_empty ss ->
+        Format.pp_print_string fmt "TOP"
+    | Fneu (f,ss) when Shs.is_empty ss -> Format.fprintf fmt "# (%a)" pp f
+    | Fneu (f,ss) -> Format.fprintf fmt "#{%a} (%a)"
+        (Pp.print_list Pp.space Format.pp_print_string)
+        (List.map (fun hs -> hs.hs_name.id_string) (Shs.elements ss)) pp f in
+  pp fmt e
+
 (* Formula evaluation *)
 
 exception BadUndef of hsymbol
@@ -386,7 +417,7 @@ let rec consume mm c i pl bl =
     | (Pv v | Pr v), Bu -> let u = c_clone_vs c v in
                            c_add_vs c v (t_var u), u::vl, hl
     | Pc (h,wr,pl), Bc (j,kk) ->
-        let hl,kk = factorize mm c hl h wr pl kk in
+        let hl,kk = factorize mm c hl h wr pl j kk in
         c_add_hs c h (i - j, kk), vl, hl
     | _ -> assert false in
   let rec fold (c,vl,hl as acc) pl bl = match pl,bl with
@@ -395,24 +426,24 @@ let rec consume mm c i pl bl =
     | _ -> assert false in
   fold (c,[],[]) pl bl
 
-and factorize mm c hl h wr pl kk =
+and factorize mm c hl h wr pl j kk =
   if Debug.test_flag debug_slow || unmergeable pl then hl,kk else
   let lz = lazy (let pl = wr_to_pl wr pl in
     let [@warning "-8"] dup (Pv v|Pr v) (zl,zv,vt,bl) =
       let z = c_clone_vs c v in  let t = t_var z in
       z::zl, Mvs.add z v zv, (v,t)::vt, Bv t::bl in
     let zl,zv,vt,bl = List.fold_right dup pl ([],Mvs.empty,[],[]) in
-    let zw = kk 0 bl in let nm = not (Shs.mem h mm) || w_solid zw in
+    let zw = kk j bl in let nm = not (Shs.mem h mm) || w_solid zw in
     let h = if nm then h else create_hsymbol (id_clone h.hs_name) in
     h, zl, zw, fun bl ->
       let sph f = {wp = t_true; sp = Mhs.singleton h f} in
       if pl = [] then if nm then zw else sph t_true else
-      let c,ul,_,_ = consume Shs.empty c 0 pl bl in
+      let c,ul,_,_ = consume Shs.empty c j pl bl in
       let link (v,t) = t_equ t (c_find_vs c v) in
       w_forall ul (if nm then w_subst (Mvs.map (c_find_vs c) zv) zw
                          else sph (t_and_l (List.map link vt)))) in
   lz::hl, fun i bl ->
-    if i > 0 then w_true else let lazy (_,_,_,zk) = lz in zk bl
+    if i > j then w_true else let lazy (_,_,_,zk) = lz in zk bl
 
 let close vl hl {wp;sp} =
   let pile (vl,wl,sh) (lazy (h,zl,zw,_)) =  match Mhs.find h sp with
@@ -422,8 +453,10 @@ let close vl hl {wp;sp} =
   let vl,wl,sh = List.fold_left pile (vl,[],Shs.empty) hl in
   w_forall vl @@ w_and_l {wp; sp = Mhs.set_diff sp sh} wl
 
+let callsym c h i bl = let j,k = c_find_hs c h in k (i - j) bl
+
 let rec f_eval c o i bl = match o with
-  | Fsym h -> let j,k = c_find_hs c h in k (i - j) bl
+  | Fsym h -> callsym c h i bl
   | Flam (pl, mm, f) ->
       let c,vl,hl,bl = consume mm c i pl bl in
       close vl hl (f_eval c f i bl)
@@ -459,7 +492,8 @@ let rec fill_mm lh = function
   | Fand (f, g) -> Fand (fill_mm lh f, fill_mm lh g)
   | Fneu (f,ss) -> Fneu (fill_mm (Mhs.set_inter lh ss) f, ss)
 
-let top_eval c f = f_eval c (fill_mm Mhs.empty f)
+let fmm_eval c f = f_eval c (fill_mm Mhs.empty f)
+let top_eval c f = vc_simp (fmm_eval c f 0 []).wp
 
 let rec drop_attr at = function
   | Fcut (s,pp,f) ->  let s = if pp then t_attr_remove at s else s in
@@ -742,19 +776,17 @@ let c_merge (hco,co) (hcn,cn) =
     c_hs = Mhs.set_union cn.c_hs co.c_hs }
 
 let vc_expr (hc,c) e =
-  let w = vc true hc (wox_expr (wr_expr hc e)) [] in
-  vc_simp (top_eval c (of_tt w) 0 []).wp
+  top_eval c @@ of_tt @@ vc true hc (wox_expr (wr_expr hc e)) []
 
 let vc_defn (hc,c) flat dfl =
   let dfl = wox_defn (wr_defn hc flat dfl) in
   let pl,ll,fl,_ = vc_defn true hc flat dfl in
   let ctx c pl bl = let c,_,_,_ = consume Shs.empty c 0 pl bl in c in
-  let bl_of_gl c gl = List.map (fun g -> Bc (0, top_eval c g)) gl in
+  let bl_of_gl c gl = List.map (fun g -> Bc (0, fmm_eval c g)) gl in
   let cc = if flat then c else ctx c pl (jack 0 [] pl) in
   let add_dl (pl,gl) c = ctx c pl (bl_of_gl c gl) in
   let c = List.fold_right add_dl ll cc in
-  let eval (h,_,_,_) f =
-    h, vc_simp (top_eval (if flat then cc else c) f 0 []).wp in
+  let eval (h,_,_,_) f = h, top_eval (if flat then cc else c) f in
   let keep (_,f) = not (Debug.test_flag debug_triv && is_true f) in
   (hc_of_pl hc pl, c), List.filter keep (List.map2 eval dfl fl)
 
@@ -785,8 +817,7 @@ let vc_spec (hc,c) h =
         ul, y::bl, oo :: List.map (fun (id,ul,bl) -> id, ul, y::bl) outs
   in
   let ul,bl,outs = List.fold_left param ([],[],[]) (wr_to_pl wr pl) in
-  let callsym i bl = let j,k = c_find_hs c h in k (i - j) bl in
-  let get i ul bl = spec_simp ul (callsym i (List.rev bl)).wp in
+  let get i ul bl = spec_simp ul (callsym c h i (List.rev bl)).wp in
   (id_pre, List.rev ul, get 0 ul bl) :: List.rev_map (fun (id,ul,bl) ->
        id, List.rev ul, t_neg (get 1 ul bl)) outs
 
