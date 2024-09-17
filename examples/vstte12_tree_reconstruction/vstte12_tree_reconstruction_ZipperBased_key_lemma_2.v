@@ -116,6 +116,8 @@ Axiom g_tail :
     (l2:Init.Datatypes.list (Numbers.BinNums.Z* tree)%type),
   g (Init.Datatypes.app l1 l2) -> g l2.
 
+Require Import Lia.
+
 (* Why3 goal *)
 Theorem key_lemma :
   forall (t:tree) (l:Init.Datatypes.list (Numbers.BinNums.Z* tree)%type)
