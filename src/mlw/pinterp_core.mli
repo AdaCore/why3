@@ -180,7 +180,7 @@ module Log : sig
 
   val sort_log_by_loc : exec_log -> log_entry list Wstdlib.Mint.t Wstdlib.Mstr.t
   val json_log : exec_log -> Json_base.json
-  val print_log : ?verb_lvl:int -> json:bool -> exec_log Pp.pp
+  val print_log : ?verb_lvl:int -> exec_log Pp.pp
 
   (** Used for counterexamples.
       Returns the list of function calls and loops that are executed in the log.

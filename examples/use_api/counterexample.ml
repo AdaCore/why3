@@ -177,7 +177,7 @@ let () =
   let model, clsf = Opt.get_exn (Failure "No good model found")
       (Check_ce.select_model ~check_ce:true rac env pm models) in
   printf "%a@." (Check_ce.print_model_classification env
-                   ~check_ce:true ?verb_lvl:None ?json:None) (model, clsf)
+                   ~check_ce:true ?verb_lvl:None ~json:false) (model, clsf)
 (* END{check_ce} *)
 
 let () = print_endline "\n== RAC execute giant steps\n"
