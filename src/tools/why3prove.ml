@@ -384,8 +384,8 @@ let debug_print_model_attrs = Debug.lookup_flag "print_model_attrs"
 let print_other_models (m, (c, log)) =
   let print_model fmt m =
     let print_attrs = Debug.test_flag debug_print_model_attrs in
-    if !opt_json = false then Model_parser.print_model_human fmt m ~print_attrs
-    else Model_parser.print_model (* json values *) fmt m ~print_attrs in
+    Model_parser.print_model fmt m ~print_attrs
+  in
   ( match c with
     | Check_ce.(NC | SW | NC_SW | BAD_CE _) ->
         if Debug.test_flag debug_print_original_model then

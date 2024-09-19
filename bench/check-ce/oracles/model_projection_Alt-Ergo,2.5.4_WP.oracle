@@ -16,7 +16,9 @@ The following counterexample model could not be verified
 File model_projection.mlw:
   Line 6:
     to_map : t -> int -> int = [|_ => [|14 => 43; _ => 0|]|]
+    to_map : t -> int -> int = [|_ => [|14 => 43; _ => 0|]|]
   Line 9:
+    get : t -> int -> int = fun arg_05 arg_13 -> 42
     get : t -> int -> int = fun arg_05 arg_13 -> 42
   Line 13:
     set :
@@ -27,10 +29,21 @@ File model_projection.mlw:
       int
       ->
       t = fun arg_04 arg_12 arg_21 -> {Top.to_map => [|14 => 43; _ => 0|]}
+    set :
+      t
+      ->
+      int
+      ->
+      int
+      ->
+      t = fun arg_04 arg_12 arg_21 -> {Top.to_map => [|14 => 43; _ => 0|]}
   Line 19:
+    y : t = {Top.to_map => [|14 => 43; _ => 0|]}
     y : t = {Top.to_map => [|14 => 43; _ => 0|]}
   Line 22:
     y : t = {Top.to_map => [|14 => 43; _ => 0|]}
+    y : t = {Top.to_map => [|14 => 43; _ => 0|]}
   Line 23:
+    y : t = {Top.to_map => [|14 => 43; _ => 0|]}
     y : t = {Top.to_map => [|14 => 43; _ => 0|]}
 

@@ -13,12 +13,16 @@ The following counterexample model could not be verified
 File val_function.mlw:
   Line 4:
     f : int -> int = [|2 => 42; _ => 42|]
+    f : int -> int = [|2 => 42; _ => 42|]
   Line 6:
+    y : int = 2
     y : int = 2
   Line 7:
     result : int = 42
     result : int = 42
+    result : int = 42
   Line 9:
+    result of call at line 9, characters 2-5 : int = 42
     result of call at line 9, characters 2-5 : int = 42
     result : int = 42
 

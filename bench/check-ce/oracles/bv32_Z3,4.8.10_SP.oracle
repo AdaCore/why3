@@ -53,15 +53,20 @@ The following counterexample model could not be verified
 File bv.mlw:
   Line 695:
     of_int : int -> t = [|_ => #x00000000|]
+    of_int : int -> t = [|_ => #x00000000|]
 File bv32.mlw:
   Line 13:
+    r : t = #x00000022
     r : t = #x00000022
   Line 15:
     r : t = #x00000084
     r : t = #x00000084
+    r : t = #x00000084
   Line 16:
+    r : t = #x00000042
     r : t = #x00000042
   Line 17:
     r : t = #x00000084
+    result of call at line 17, characters 9-16 : t = #x00000084
     result of call at line 17, characters 9-16 : t = #x00000084
 

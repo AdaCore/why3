@@ -71,7 +71,6 @@ let convert_unix_process (ps: Unix.process_status) =
 
 let convert_model (m: Model_parser.model) =
   String (Pp.string_of
-            (* By default, we print attributes in JSON *)
             (fun fmt m -> Model_parser.print_model ~print_attrs:true fmt m) m)
 
 let convert_models (ml: Model_parser.model list) =

@@ -20,11 +20,13 @@ The following counterexample model could not be verified
 File jlamp_projections.mlw:
   Line 7:
     to_int : byte -> int = [|{Abstract.to_int => 127} => 127; _ => 1|]
+    to_int : byte -> int = [|{Abstract.to_int => 127} => 127; _ => 1|]
   Line 18:
     a : byte = {Abstract.to_int => 1}
   Line 28:
     a : byte = {Abstract.to_int => 1}
   Line 29:
+    a : byte = {Abstract.to_int => 1}
     a : byte = {Abstract.to_int => 1}
 
 File "bench/check-ce/jlamp_projections.mlw", line 42, characters 14-24:
@@ -52,9 +54,11 @@ File ref.mlw:
 File jlamp_projections.mlw:
   Line 7:
     to_int : byte -> int = [|{Abstract.to_int => 127} => 127; _ => 1|]
+    to_int : byte -> int = [|{Abstract.to_int => 127} => 127; _ => 1|]
   Line 41:
     a : byte = {Abstract.to_int => 1}
   Line 42:
+    a : byte = {Abstract.to_int => 1}
     a : byte = {Abstract.to_int => 1}
 
 File "bench/check-ce/jlamp_projections.mlw", line 54, characters 29-39:

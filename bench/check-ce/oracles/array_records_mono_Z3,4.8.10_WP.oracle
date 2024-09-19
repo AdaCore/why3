@@ -259,7 +259,73 @@ File array_records_mono.mlw:
                      _ =>
                      [|2 => {flag = true; first_val = 3; sec_val = 5};
                      _ => {flag = false; first_val = 6; sec_val = 2}|]|]
+    elts :
+      array_of_records
+      ->
+      int
+      ->
+      basic_record = [|{ArrayRecords.elts =
+                        [|2 => {flag = true; first_val = 3; sec_val = 5};
+                        _ => {flag = false; first_val = 6; sec_val = 2}|];
+                        ArrayRecords.length = 4} =>
+                       [|2 => {flag = true; first_val = 3; sec_val = 5};
+                       _ => {flag = false; first_val = 6; sec_val = 2}|];
+                     {ArrayRecords.elts =
+                      [|2 => {flag = true; first_val = 3; sec_val = 69};
+                      _ => {flag = false; first_val = 6; sec_val = 2}|];
+                      ArrayRecords.length = 4} =>
+                     [|2 => {flag = true; first_val = 3; sec_val = 69};
+                     _ => {flag = false; first_val = 6; sec_val = 2}|];
+                     {ArrayRecords.elts =
+                      [|2 => {flag = true; first_val = 42; sec_val = 69};
+                      _ => {flag = false; first_val = 6; sec_val = 2}|];
+                      ArrayRecords.length = 4} =>
+                     [|2 => {flag = true; first_val = 42; sec_val = 69};
+                     _ => {flag = false; first_val = 6; sec_val = 2}|];
+                     {ArrayRecords.elts =
+                      [|2 => {flag = true; first_val = 23; sec_val = 69};
+                      _ => {flag = false; first_val = 6; sec_val = 2}|];
+                      ArrayRecords.length = 4} =>
+                     [|2 => {flag = true; first_val = 23; sec_val = 69};
+                     _ => {flag = false; first_val = 6; sec_val = 2}|];
+                     {ArrayRecords.elts =
+                      [|2 => {flag = false; first_val = 23; sec_val = 69};
+                      _ => {flag = false; first_val = 6; sec_val = 2}|];
+                      ArrayRecords.length = 4} =>
+                     [|2 => {flag = false; first_val = 23; sec_val = 69};
+                     _ => {flag = false; first_val = 6; sec_val = 2}|];
+                     _ =>
+                     [|2 => {flag = true; first_val = 3; sec_val = 5};
+                     _ => {flag = false; first_val = 6; sec_val = 2}|]|]
   Line 20:
+    length :
+      array_of_records
+      ->
+      int = [|{ArrayRecords.elts =
+               [|2 => {flag = true; first_val = 3; sec_val = 69};
+               _ => {flag = false; first_val = 6; sec_val = 2}|];
+               ArrayRecords.length = 4} =>
+              4;
+            {ArrayRecords.elts =
+             [|2 => {flag = true; first_val = 3; sec_val = 5};
+             _ => {flag = false; first_val = 6; sec_val = 2}|];
+             ArrayRecords.length = 4} =>
+            4;
+            {ArrayRecords.elts =
+             [|2 => {flag = true; first_val = 42; sec_val = 69};
+             _ => {flag = false; first_val = 6; sec_val = 2}|];
+             ArrayRecords.length = 4} =>
+            4;
+            {ArrayRecords.elts =
+             [|2 => {flag = true; first_val = 23; sec_val = 69};
+             _ => {flag = false; first_val = 6; sec_val = 2}|];
+             ArrayRecords.length = 4} =>
+            4;
+            {ArrayRecords.elts =
+             [|2 => {flag = false; first_val = 23; sec_val = 69};
+             _ => {flag = false; first_val = 6; sec_val = 2}|];
+             ArrayRecords.length = 4} =>
+            4; _ => 4|]
     length :
       array_of_records
       ->
@@ -421,7 +487,122 @@ File array_records_mono.mlw:
                                                 first_val = 6;
                                                 sec_val = 2}|];
                                                ArrayRecords.length = 4}
+    mixfix [<-] :
+      array_of_records
+      ->
+      int
+      ->
+      basic_record
+      ->
+      array_of_records = fun x!084 x!115 x!212 ->
+                          if x!084 = {ArrayRecords.elts =
+                                      [|2 =>
+                                        {flag = true;
+                                         first_val = 3;
+                                         sec_val = 5};
+                                      _ =>
+                                      {flag = false;
+                                       first_val = 6;
+                                       sec_val = 2}|];
+                                      ArrayRecords.length = 4} /\
+                             x!115 = 2 /\
+                             x!212 = {flag = true;
+                                      first_val = 3;
+                                      sec_val = 69}
+                          then {ArrayRecords.elts =
+                                [|2 =>
+                                  {flag = true; first_val = 3; sec_val = 69};
+                                _ =>
+                                {flag = false; first_val = 6; sec_val = 2}|];
+                                ArrayRecords.length = 4}
+                          else if x!084 = {ArrayRecords.elts =
+                                           [|2 =>
+                                             {flag = true;
+                                              first_val = 3;
+                                              sec_val = 69};
+                                           _ =>
+                                           {flag = false;
+                                            first_val = 6;
+                                            sec_val = 2}|];
+                                           ArrayRecords.length = 4} /\
+                                  x!115 = 2 /\
+                                  x!212 = {flag = true;
+                                           first_val = 42;
+                                           sec_val = 69}
+                               then {ArrayRecords.elts =
+                                     [|2 =>
+                                       {flag = true;
+                                        first_val = 42;
+                                        sec_val = 69};
+                                     _ =>
+                                     {flag = false;
+                                      first_val = 6;
+                                      sec_val = 2}|];
+                                     ArrayRecords.length = 4}
+                               else if x!084 = {ArrayRecords.elts =
+                                                [|2 =>
+                                                  {flag = true;
+                                                   first_val = 42;
+                                                   sec_val = 69};
+                                                _ =>
+                                                {flag = false;
+                                                 first_val = 6;
+                                                 sec_val = 2}|];
+                                                ArrayRecords.length = 4} /\
+                                       x!115 = 2 /\
+                                       x!212 = {flag = true;
+                                                first_val = 23;
+                                                sec_val = 69}
+                                    then {ArrayRecords.elts =
+                                          [|2 =>
+                                            {flag = true;
+                                             first_val = 23;
+                                             sec_val = 69};
+                                          _ =>
+                                          {flag = false;
+                                           first_val = 6;
+                                           sec_val = 2}|];
+                                          ArrayRecords.length = 4}
+                                    else if x!084 = {ArrayRecords.elts =
+                                                     [|2 =>
+                                                       {flag = true;
+                                                        first_val = 23;
+                                                        sec_val = 69};
+                                                     _ =>
+                                                     {flag = false;
+                                                      first_val = 6;
+                                                      sec_val = 2}|];
+                                                     ArrayRecords.length = 4} /\
+                                            x!115 = 2 /\
+                                            x!212 = {flag = false;
+                                                     first_val = 23;
+                                                     sec_val = 69}
+                                         then {ArrayRecords.elts =
+                                               [|2 =>
+                                                 {flag = false;
+                                                  first_val = 23;
+                                                  sec_val = 69};
+                                               _ =>
+                                               {flag = false;
+                                                first_val = 6;
+                                                sec_val = 2}|];
+                                               ArrayRecords.length = 4}
+                                         else {ArrayRecords.elts =
+                                               [|2 =>
+                                                 {flag = true;
+                                                  first_val = 3;
+                                                  sec_val = 69};
+                                               _ =>
+                                               {flag = false;
+                                                first_val = 6;
+                                                sec_val = 2}|];
+                                               ArrayRecords.length = 4}
   Line 33:
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = true; first_val = 3; sec_val = 5};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
     a :
       array_of_records = {ArrayRecords.elts =
                           [|2 => {flag = true; first_val = 3; sec_val = 5};
@@ -434,7 +615,22 @@ File array_records_mono.mlw:
                           ArrayRecords.length = 4}
     a :
       array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = true; first_val = 3; sec_val = 69};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
+    a :
+      array_of_records = {ArrayRecords.elts =
                           [|2 => {flag = true; first_val = 42; sec_val = 69};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = true; first_val = 42; sec_val = 69};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = true; first_val = 23; sec_val = 69};
                           _ => {flag = false; first_val = 6; sec_val = 2}|];
                           ArrayRecords.length = 4}
     a :
@@ -461,6 +657,12 @@ File array_records_mono.mlw:
                           [|2 => {flag = false; first_val = 23; sec_val = 69};
                           _ => {flag = false; first_val = 6; sec_val = 2}|];
                           ArrayRecords.length = 4}
+    a :
+      array_of_records = {ArrayRecords.elts =
+                          [|2 => {flag = false; first_val = 23; sec_val = 69};
+                          _ => {flag = false; first_val = 6; sec_val = 2}|];
+                          ArrayRecords.length = 4}
+    i : int = 2
     i : int = 2
   Line 49:
     a :
@@ -470,10 +672,18 @@ File array_records_mono.mlw:
                           ArrayRecords.length = 4}
     result of call at line 49, characters 13-81 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 49, characters 13-81 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-30 : bool = true
     result of call at line 49, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
+    result of call at line 49, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-61 : int = 3
+    result of call at line 49, characters 45-61 : int = 3
+    result of call at line 49, characters 45-49 :
+      basic_record = {flag = true; first_val = 3; sec_val = 5}
     result of call at line 49, characters 45-49 :
       basic_record = {flag = true; first_val = 3; sec_val = 5}
   Line 50:
@@ -484,10 +694,18 @@ File array_records_mono.mlw:
                           ArrayRecords.length = 4}
     result of call at line 50, characters 13-82 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
+    result of call at line 50, characters 13-82 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
+    result of call at line 50, characters 21-30 : bool = true
     result of call at line 50, characters 21-30 : bool = true
     result of call at line 50, characters 21-25 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
+    result of call at line 50, characters 21-25 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-81 : int = 69
+    result of call at line 50, characters 64-81 : int = 69
+    result of call at line 50, characters 64-68 :
+      basic_record = {flag = true; first_val = 3; sec_val = 69}
     result of call at line 50, characters 64-68 :
       basic_record = {flag = true; first_val = 3; sec_val = 69}
   Line 51:
@@ -498,10 +716,18 @@ File array_records_mono.mlw:
                           ArrayRecords.length = 4}
     result of call at line 51, characters 13-82 :
       basic_record = {flag = true; first_val = 23; sec_val = 69}
+    result of call at line 51, characters 13-82 :
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
+    result of call at line 51, characters 21-30 : bool = true
     result of call at line 51, characters 21-30 : bool = true
     result of call at line 51, characters 21-25 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
+    result of call at line 51, characters 21-25 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 51, characters 64-81 : int = 69
+    result of call at line 51, characters 64-81 : int = 69
+    result of call at line 51, characters 64-68 :
+      basic_record = {flag = true; first_val = 42; sec_val = 69}
     result of call at line 51, characters 64-68 :
       basic_record = {flag = true; first_val = 42; sec_val = 69}
   Line 52:
@@ -512,10 +738,18 @@ File array_records_mono.mlw:
                           ArrayRecords.length = 4}
     result of call at line 52, characters 13-92 :
       basic_record = {flag = false; first_val = 23; sec_val = 69}
+    result of call at line 52, characters 13-92 :
+      basic_record = {flag = false; first_val = 23; sec_val = 69}
+    result of call at line 52, characters 41-57 : int = 23
     result of call at line 52, characters 41-57 : int = 23
     result of call at line 52, characters 41-45 :
       basic_record = {flag = true; first_val = 23; sec_val = 69}
+    result of call at line 52, characters 41-45 :
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
     result of call at line 52, characters 74-91 : int = 69
+    result of call at line 52, characters 74-91 : int = 69
+    result of call at line 52, characters 74-78 :
+      basic_record = {flag = true; first_val = 23; sec_val = 69}
     result of call at line 52, characters 74-78 :
       basic_record = {flag = true; first_val = 23; sec_val = 69}
 

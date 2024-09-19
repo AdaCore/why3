@@ -22,7 +22,26 @@ File model_projection2.mlw:
       int = fun x!05 x!11 ->
              if x!05 = {G.to_array => [|2 => 3; _ => 3|]} /\ x!11 = 2 then 4
              else 4
+    get :
+      poly_map
+      int
+      int
+      ->
+      int
+      ->
+      int = fun x!05 x!11 ->
+             if x!05 = {G.to_array => [|2 => 3; _ => 3|]} /\ x!11 = 2 then 4
+             else 4
   Line 14:
+    to_array :
+      poly_map
+      int
+      int
+      ->
+      int
+      ->
+      int = [|{G.to_array => [|2 => 3; _ => 3|]} => [|2 => 3; _ => 3|];
+            _ => [|2 => 3; _ => 3|]|]
     to_array :
       poly_map
       int
@@ -34,6 +53,8 @@ File model_projection2.mlw:
             _ => [|2 => 3; _ => 3|]|]
   Line 16:
     i : int = 2
+    i : int = 2
+    x : poly_map int int = {G.to_array => [|2 => 3; _ => 3|]}
     x : poly_map int int = {G.to_array => [|2 => 3; _ => 3|]}
 
 <check_ce:categorization>Categorizations of models:
@@ -51,8 +72,11 @@ The following counterexample model could not be verified
 File model_projection2.mlw:
   Line 14:
     to_array : poly_map int int -> int -> int = [|_ => [|_ => 41|]|]
+    to_array : poly_map int int -> int -> int = [|_ => [|_ => 41|]|]
   Line 25:
     x : poly_map int int = {G.to_array => [|_ => 41|]}
+    x : poly_map int int = {G.to_array => [|_ => 41|]}
   Line 26:
+    x : poly_map int int = {G.to_array => [|_ => 41|]}
     x : poly_map int int = {G.to_array => [|_ => 41|]}
 

@@ -16,15 +16,26 @@ File double_projection.mlw:
       t
       ->
       int = [|epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1 => 0; _ => 0|]
+    d :
+      t
+      ->
+      int = [|epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1 => 0; _ => 0|]
   Line 12:
+    c :
+      t
+      ->
+      int = [|epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1 => 1; _ => 1|]
     c :
       t
       ->
       int = [|epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1 => 1; _ => 1|]
   Line 17:
     x : t = epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1
+    x : t = epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1
   Line 19:
     x : t = epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1
+    x : t = epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1
   Line 21:
+    _t : t = epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1
     _t : t = epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1
 

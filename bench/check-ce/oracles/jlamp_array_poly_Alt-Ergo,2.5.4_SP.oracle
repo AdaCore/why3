@@ -16,12 +16,16 @@ The following counterexample model could not be verified
 File array.mlw:
   Line 17:
     length : array 'a -> int = [|_ => 0|]
+    length : array 'a -> int = [|_ => 0|]
 File jlamp_array_poly.mlw:
   Line 8:
     to_int : t -> int = [|{Array.to_int => 3} => 3; _ => 2|]
+    to_int : t -> int = [|{Array.to_int => 3} => 3; _ => 2|]
   Line 11:
     two : t = {Array.to_int => 2}
+    two : t = {Array.to_int => 2}
   Line 14:
+    three : t = {Array.to_int => 2}
     three : t = {Array.to_int => 2}
 
 <check_ce:categorization>Categorizations of models:
@@ -42,14 +46,19 @@ The following counterexample model could not be verified
 File array.mlw:
   Line 17:
     length : array 'a -> int = [|_ => 1|]
+    length : array 'a -> int = [|_ => 1|]
 File jlamp_array_poly.mlw:
   Line 8:
     to_int : t -> int = [|{Array.to_int => 3} => 3; _ => 2|]
+    to_int : t -> int = [|{Array.to_int => 3} => 3; _ => 2|]
   Line 11:
+    two : t = {Array.to_int => 2}
     two : t = {Array.to_int => 2}
   Line 14:
     three : t = {Array.to_int => 2}
+    three : t = {Array.to_int => 2}
   Line 21:
+    three : t = {Array.to_int => 2}
     three : t = {Array.to_int => 2}
 
 File "bench/check-ce/jlamp_array_poly.mlw", line 28, characters 4-16:
@@ -74,14 +83,19 @@ The following counterexample model could not be verified
 File array.mlw:
   Line 17:
     length : array 'a -> int = [|_ => 44|]
+    length : array 'a -> int = [|_ => 44|]
 File jlamp_array_poly.mlw:
   Line 8:
     to_int : t -> int = [|{Array.to_int => 3} => 3; _ => 2|]
+    to_int : t -> int = [|{Array.to_int => 3} => 3; _ => 2|]
   Line 11:
+    two : t = {Array.to_int => 2}
     two : t = {Array.to_int => 2}
   Line 14:
     three : t = {Array.to_int => 2}
+    three : t = {Array.to_int => 2}
   Line 27:
+    three : t = {Array.to_int => 2}
     three : t = {Array.to_int => 2}
 
 File "bench/check-ce/jlamp_array_poly.mlw", line 34, characters 4-16:
@@ -106,13 +120,18 @@ The following counterexample model could not be verified
 File array.mlw:
   Line 17:
     length : array 'a -> int = [|_ => 44|]
+    length : array 'a -> int = [|_ => 44|]
 File jlamp_array_poly.mlw:
   Line 8:
     to_int : t -> int = [|{Array.to_int => 3} => 3; _ => 2|]
+    to_int : t -> int = [|{Array.to_int => 3} => 3; _ => 2|]
   Line 11:
+    two : t = {Array.to_int => 2}
     two : t = {Array.to_int => 2}
   Line 14:
     three : t = {Array.to_int => 2}
+    three : t = {Array.to_int => 2}
   Line 33:
+    three : t = {Array.to_int => 2}
     three : t = {Array.to_int => 2}
 

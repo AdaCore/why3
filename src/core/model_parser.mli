@@ -237,7 +237,6 @@ val json_model : model -> Json_base.json
     The format is documented in [share/ce-models.json]. *)
 
 val print_model :
-  ?filter_similar:bool ->
   print_attrs:bool ->
   Format.formatter ->
   model ->
@@ -247,14 +246,6 @@ val print_model :
     @param print_attrs when set to true, each element is printed together with the
     attrs associated to it.
 *)
-
-val print_model_human :
-  ?filter_similar:bool ->
-  Format.formatter ->
-  model ->
-  print_attrs:bool ->
-  unit
-(** Same as print_model but is intended to be human readable.*)
 
 (** {2 Interleaving source code and model} *)
 

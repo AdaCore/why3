@@ -69,7 +69,14 @@ The following counterexample model could not be verified
 File maps_poly.mlw:
   Line 13:
     x : int -> int -> int = [|_ => [|_ => 0|]|]
+    x : int -> int -> int = [|_ => [|_ => 0|]|]
   Line 14:
+    x :
+      int
+      ->
+      int
+      ->
+      int = [|1 => [|_ => 0|]; 0 => [|_ => 0|]; _ => [|_ => 0|]|]
     x :
       int
       ->
@@ -112,6 +119,12 @@ File maps_poly.mlw:
   Line 18:
     x : int -> int -> int = [|_ => [|_ => 0|]|]
   Line 19:
+    x :
+      int
+      ->
+      int
+      ->
+      int = [|0 => [|_ => 0|]; 1 => [|_ => 0|]; _ => [|_ => 0|]|]
     x :
       int
       ->

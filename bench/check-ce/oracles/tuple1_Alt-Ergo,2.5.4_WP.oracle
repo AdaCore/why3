@@ -23,16 +23,30 @@ File int.mlw:
             {mach.int.Int63.int63'int => 2} => 2;
             {mach.int.Int63.int63'int => -4611686018427387904} =>
             -4611686018427387904; _ => 4611686018427387903|]
+    int63'int :
+      int63
+      ->
+      int = [|{mach.int.Int63.int63'int => 4611686018427387902} =>
+              4611686018427387902;
+            {mach.int.Int63.int63'int => 2} => 2;
+            {mach.int.Int63.int63'int => -4611686018427387904} =>
+            -4611686018427387904; _ => 4611686018427387903|]
   Line 475:
     max_int : int63 = {mach.int.Int63.int63'int => 4611686018427387903}
+    max_int : int63 = {mach.int.Int63.int63'int => 4611686018427387903}
   Line 477:
+    min_int : int63 = {mach.int.Int63.int63'int => 4611686018427387903}
     min_int : int63 = {mach.int.Int63.int63'int => 4611686018427387903}
 File tuple1.mlw:
   Line 6:
     a : int63 = {mach.int.Int63.int63'int => 4611686018427387903}
+    a : int63 = {mach.int.Int63.int63'int => 4611686018427387903}
+    b : int63 = {mach.int.Int63.int63'int => 4611686018427387903}
     b : int63 = {mach.int.Int63.int63'int => 4611686018427387903}
   Line 7:
     a : int63 = {mach.int.Int63.int63'int => 4611686018427387903}
+    a : int63 = {mach.int.Int63.int63'int => 4611686018427387903}
+    b : int63 = {mach.int.Int63.int63'int => 4611686018427387903}
     b : int63 = {mach.int.Int63.int63'int => 4611686018427387903}
 
 File "bench/check-ce/tuple1.mlw", line 7, characters 14-23:

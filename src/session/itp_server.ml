@@ -1041,7 +1041,7 @@ match pa.proof_state with
      let selected_model = Option.value ~default:Model_parser.empty_model
          (Check_ce.select_model_last_non_empty res.pr_models) in
      let ce_result =
-       Pp.string_of (Model_parser.print_model_human ~filter_similar:true ~print_attrs)
+       Pp.string_of (Model_parser.print_model ~print_attrs)
          selected_model in
      if ce_result = "" then
        let result_pr =

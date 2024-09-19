@@ -227,8 +227,7 @@ let craft_efficient_re l =
   Re.Str.regexp s
 
 let debug_print_model ~print_attrs model =
-  Debug.dprintf debug "Call_provers: %a@."
-    (print_model ~filter_similar:false ~print_attrs) model
+  Debug.dprintf debug "Call_provers: %a@." (print_model ~print_attrs) model
 
 type answer_or_model = Answer of prover_answer | Model of string
 

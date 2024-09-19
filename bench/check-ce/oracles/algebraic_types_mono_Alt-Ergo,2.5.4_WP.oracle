@@ -32,7 +32,10 @@ The following counterexample model could not be verified
 File algebraic_types_mono.mlw:
   Line 8:
     A : t = {B_proj_1 => 0}
+    A : t = {B_proj_1 => 0}
     B : int -> t = [|1 => {B_proj_1 => 1}; _ => {B_proj_1 => 0}|]
+    B : int -> t = [|1 => {B_proj_1 => 1}; _ => {B_proj_1 => 0}|]
+    B_proj_1 : t -> int = [|{B_proj_1 => 1} => 1; _ => 0|]
     B_proj_1 : t -> int = [|{B_proj_1 => 1} => 1; _ => 0|]
     index_t :
       t
@@ -40,7 +43,14 @@ File algebraic_types_mono.mlw:
       int = fun arg_01 ->
              if arg_01 = {B_proj_1 => 1} \/ arg_01 = {B_proj_1 => 0} then 1
              else 0
+    index_t :
+      t
+      ->
+      int = fun arg_01 ->
+             if arg_01 = {B_proj_1 => 1} \/ arg_01 = {B_proj_1 => 0} then 1
+             else 0
   Line 10:
+    x : t = {B_proj_1 => 0}
     x : t = {B_proj_1 => 0}
 
 <check_ce:categorization>Categorizations of models:
