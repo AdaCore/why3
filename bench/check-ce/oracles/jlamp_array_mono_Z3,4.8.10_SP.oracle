@@ -20,11 +20,27 @@ File jlamp_array_mono.mlw:
       t
       ->
       int = [|{Array.to_int => 2} => 2; {Array.to_int => 3} => 3; _ => 2|]
+    to_int :
+      t
+      ->
+      int = [|{Array.to_int => 2} => 2; {Array.to_int => 3} => 3; _ => 2|]
   Line 11:
+    two : t = {Array.to_int => 2}
     two : t = {Array.to_int => 2}
   Line 14:
     three : t = {Array.to_int => 3}
+    three : t = {Array.to_int => 3}
   Line 18:
+    elts :
+      array
+      ->
+      int
+      ->
+      t = [|{Array.elts =
+             [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
+             Array.length = 0} =>
+            [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
+          _ => [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|]|]
     elts :
       array
       ->
@@ -44,9 +60,29 @@ File jlamp_array_mono.mlw:
                Array.length = 0} =>
               0;
             _ => 0|]
+    length :
+      array
+      ->
+      int = [|{Array.elts =
+               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
+               Array.length = 0} =>
+              0;
+            _ => 0|]
   Line 22:
     mixfix [] : array -> int -> t = fun x!02 x!1 -> {Array.to_int => 3}
+    mixfix [] : array -> int -> t = fun x!02 x!1 -> {Array.to_int => 3}
   Line 28:
+    mixfix [<-] :
+      array
+      ->
+      int
+      ->
+      t
+      ->
+      array = fun x!03 x!11 x!2 ->
+               {Array.elts =
+                [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
+                Array.length = 0}
     mixfix [<-] :
       array
       ->
@@ -73,6 +109,10 @@ File jlamp_array_mono.mlw:
       array = {Array.elts =
                [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
                Array.length = 0}
+    a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
+               Array.length = 0}
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -92,9 +132,15 @@ File jlamp_array_mono.mlw:
       t
       ->
       int = [|{Array.to_int => 2} => 2; {Array.to_int => 3} => 3; _ => 2|]
+    to_int :
+      t
+      ->
+      int = [|{Array.to_int => 2} => 2; {Array.to_int => 3} => 3; _ => 2|]
   Line 11:
     two : t = {Array.to_int => 2}
+    two : t = {Array.to_int => 2}
   Line 14:
+    three : t = {Array.to_int => 3}
     three : t = {Array.to_int => 3}
   Line 18:
     elts :
@@ -111,7 +157,32 @@ File jlamp_array_mono.mlw:
            Array.length = 4} =>
           [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
           _ => [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|]|]
+    elts :
+      array
+      ->
+      int
+      ->
+      t = [|{Array.elts =
+             [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+             Array.length = 4} =>
+            [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+          {Array.elts =
+           [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
+           Array.length = 4} =>
+          [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
+          _ => [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|]|]
   Line 19:
+    length :
+      array
+      ->
+      int = [|{Array.elts =
+               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
+               Array.length = 4} =>
+              4;
+            {Array.elts =
+             [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+             Array.length = 4} =>
+            4; _ => 4|]
     length :
       array
       ->
@@ -143,7 +214,30 @@ File jlamp_array_mono.mlw:
                else {Array.elts =
                      [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
                      Array.length = 4}
+    mixfix [<-] :
+      array
+      ->
+      int
+      ->
+      t
+      ->
+      array = fun x!09 x!13 x!21 ->
+               if x!09 = {Array.elts =
+                          [|42 => {Array.to_int => 3};
+                          _ => {Array.to_int => 2}|];
+                          Array.length = 4} /\
+                  x!13 = 42 /\ x!21 = {Array.to_int => 2}
+               then {Array.elts =
+                     [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
+                     Array.length = 4}
+               else {Array.elts =
+                     [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
+                     Array.length = 4}
   Line 32:
+    a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+               Array.length = 4}
     a :
       array = {Array.elts =
                [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
@@ -167,6 +261,11 @@ File jlamp_array_mono.mlw:
       array = {Array.elts =
                [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
                Array.length = 4}
+    a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
+               Array.length = 4}
+    three : t = {Array.to_int => 3}
     three : t = {Array.to_int => 3}
   Line 48:
     a :
@@ -196,9 +295,15 @@ File jlamp_array_mono.mlw:
       t
       ->
       int = [|{Array.to_int => 2} => 2; {Array.to_int => 3} => 3; _ => 2|]
+    to_int :
+      t
+      ->
+      int = [|{Array.to_int => 2} => 2; {Array.to_int => 3} => 3; _ => 2|]
   Line 11:
     two : t = {Array.to_int => 2}
+    two : t = {Array.to_int => 2}
   Line 14:
+    three : t = {Array.to_int => 3}
     three : t = {Array.to_int => 3}
   Line 18:
     elts :
@@ -217,7 +322,35 @@ File jlamp_array_mono.mlw:
           [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
           _ => {Array.to_int => 2}|];
           _ => [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|]|]
+    elts :
+      array
+      ->
+      int
+      ->
+      t = [|{Array.elts =
+             [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+             Array.length = 43} =>
+            [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+          {Array.elts =
+           [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+           _ => {Array.to_int => 2}|];
+           Array.length = 43} =>
+          [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+          _ => {Array.to_int => 2}|];
+          _ => [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|]|]
   Line 19:
+    length :
+      array
+      ->
+      int = [|{Array.elts =
+               [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+               Array.length = 43} =>
+              43;
+            {Array.elts =
+             [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+             _ => {Array.to_int => 2}|];
+             Array.length = 43} =>
+            43; _ => 43|]
     length :
       array
       ->
@@ -252,7 +385,32 @@ File jlamp_array_mono.mlw:
                      [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
                      _ => {Array.to_int => 2}|];
                      Array.length = 43}
+    mixfix [<-] :
+      array
+      ->
+      int
+      ->
+      t
+      ->
+      array = fun x!016 x!14 x!22 ->
+               if x!016 = {Array.elts =
+                           [|17 => {Array.to_int => 3};
+                           _ => {Array.to_int => 2}|];
+                           Array.length = 43} /\
+                  x!14 = 42 /\ x!22 = {Array.to_int => 2}
+               then {Array.elts =
+                     [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+                     _ => {Array.to_int => 2}|];
+                     Array.length = 43}
+               else {Array.elts =
+                     [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+                     _ => {Array.to_int => 2}|];
+                     Array.length = 43}
   Line 32:
+    a :
+      array = {Array.elts =
+               [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+               Array.length = 43}
     a :
       array = {Array.elts =
                [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
@@ -278,6 +436,12 @@ File jlamp_array_mono.mlw:
                [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
                _ => {Array.to_int => 2}|];
                Array.length = 43}
+    a :
+      array = {Array.elts =
+               [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+               _ => {Array.to_int => 2}|];
+               Array.length = 43}
+    three : t = {Array.to_int => 3}
     three : t = {Array.to_int => 3}
   Line 54:
     a :
@@ -308,9 +472,15 @@ File jlamp_array_mono.mlw:
       t
       ->
       int = [|{Array.to_int => 2} => 2; {Array.to_int => 3} => 3; _ => 2|]
+    to_int :
+      t
+      ->
+      int = [|{Array.to_int => 2} => 2; {Array.to_int => 3} => 3; _ => 2|]
   Line 11:
     two : t = {Array.to_int => 2}
+    two : t = {Array.to_int => 2}
   Line 14:
+    three : t = {Array.to_int => 3}
     three : t = {Array.to_int => 3}
   Line 18:
     elts :
@@ -333,7 +503,40 @@ File jlamp_array_mono.mlw:
           _ =>
           [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
           _ => {Array.to_int => 2}|]|]
+    elts :
+      array
+      ->
+      int
+      ->
+      t = [|{Array.elts =
+             [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
+             _ => {Array.to_int => 2}|];
+             Array.length = 43} =>
+            [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
+            _ => {Array.to_int => 2}|];
+          {Array.elts =
+           [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
+           _ => {Array.to_int => 2}|];
+           Array.length = 43} =>
+          [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
+          _ => {Array.to_int => 2}|];
+          _ =>
+          [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
+          _ => {Array.to_int => 2}|]|]
   Line 19:
+    length :
+      array
+      ->
+      int = [|{Array.elts =
+               [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
+               _ => {Array.to_int => 2}|];
+               Array.length = 43} =>
+              43;
+            {Array.elts =
+             [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
+             _ => {Array.to_int => 2}|];
+             Array.length = 43} =>
+            43; _ => 43|]
     length :
       array
       ->
@@ -370,7 +573,34 @@ File jlamp_array_mono.mlw:
                      [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
                      _ => {Array.to_int => 2}|];
                      Array.length = 43}
+    mixfix [<-] :
+      array
+      ->
+      int
+      ->
+      t
+      ->
+      array = fun x!023 x!15 x!23 ->
+               if x!023 = {Array.elts =
+                           [|42 => {Array.to_int => 2};
+                           17 => {Array.to_int => 3};
+                           _ => {Array.to_int => 2}|];
+                           Array.length = 43} /\
+                  x!15 = 17 /\ x!23 = {Array.to_int => 2}
+               then {Array.elts =
+                     [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
+                     _ => {Array.to_int => 2}|];
+                     Array.length = 43}
+               else {Array.elts =
+                     [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
+                     _ => {Array.to_int => 2}|];
+                     Array.length = 43}
   Line 32:
+    a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
+               _ => {Array.to_int => 2}|];
+               Array.length = 43}
     a :
       array = {Array.elts =
                [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
@@ -399,6 +629,12 @@ File jlamp_array_mono.mlw:
                [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
                _ => {Array.to_int => 2}|];
                Array.length = 43}
+    a :
+      array = {Array.elts =
+               [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
+               _ => {Array.to_int => 2}|];
+               Array.length = 43}
+    three : t = {Array.to_int => 3}
     three : t = {Array.to_int => 3}
   Line 60:
     a :

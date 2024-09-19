@@ -390,6 +390,7 @@ let search_model_element_call_result model (call_id : Expr.expr_id option) =
 let cmp_attrs a1 a2 =
   String.compare a1.attr_string a2.attr_string
 
+(*
 let model_element_equal n1 n2 =
   let me_kind_equal k1 k2 = match k1,k2 with
   | Result, Result
@@ -408,8 +409,10 @@ let model_element_equal n1 n2 =
   Option.equal Loc.equal n1.me_location n2.me_location &&
   Sattr.equal n1.me_attrs n2.me_attrs &&
   Term.ls_equal n1.me_lsymbol n2.me_lsymbol
+*)
 
 (* FIXME: understand why some elements are duplicated *)
+(*
 let rec filter_duplicated l =
   let is_duplicated a l =
     List.exists (fun x -> model_element_equal a x) l in
@@ -417,6 +420,7 @@ let rec filter_duplicated l =
   | [] | [_] -> l
   | me :: l when is_duplicated me l -> filter_duplicated l
   | me :: l -> me :: filter_duplicated l
+*)
 
 let json_attrs attrs =
   let open Json_base in
@@ -767,7 +771,6 @@ let json_model_element me =
     ]
 
 let json_model_elements model_elements =
-  let model_elements = filter_duplicated model_elements in
   Json_base.List (List.map json_model_element model_elements)
 
 let json_model_elements_on_lines vc_term_loc (file_name, model_file) =
@@ -837,16 +840,13 @@ let print_model_element ?(print_locs=false) ~print_attrs fmt m_element =
         (Pp.print_option (Pretty.print_ty)) m_element.me_value.t_ty
         print_concrete_term m_element.me_concrete_value
 
-let print_model_elements ~filter_similar ~print_attrs ?(sep = Pp.newline)
-    fmt m_elements =
-  let m_elements =
-    if filter_similar then filter_duplicated m_elements else m_elements in
+let print_model_elements ~print_attrs ?(sep = Pp.newline) fmt m_elements =
   fprintf fmt "@[%a@]"
     (Pp.print_list sep
        (print_model_element ?print_locs:None ~print_attrs))
     m_elements
 
-let print_model_file ~filter_similar ~print_attrs fmt (filename, model_file) =
+let print_model_file ~print_attrs fmt (filename, model_file) =
   (* Relativize does not work on nighly bench: using basename instead. It
      hides the local paths. *)
   let filename = Filename.basename filename in
@@ -860,21 +860,14 @@ let print_model_file ~filter_similar ~print_attrs fmt (filename, model_file) =
       if n = 0 then Sattr.compare me1.me_attrs me2.me_attrs else n in
     let m_elements = List.sort cmp m_elements in
     fprintf fmt "  @[<v 2>Line %d:@ %a@]" line
-      (print_model_elements ~filter_similar ?sep:None ~print_attrs)
+      (print_model_elements ?sep:None ~print_attrs)
       m_elements in
   fprintf fmt "@[<v 0>File %s:@ %a@]" filename
     Pp.(print_list space pp) (Mint.bindings model_file)
 
-let print_model ~filter_similar ~print_attrs
-    fmt model =
-  Pp.print_list Pp.newline (print_model_file ~filter_similar ~print_attrs)
+let print_model ~print_attrs fmt model =
+  Pp.print_list Pp.newline (print_model_file ~print_attrs)
     fmt (Mstr.bindings model.model_files)
-
-let print_model_human ?(filter_similar = true) fmt model =
-  print_model ~filter_similar fmt model
-
-let print_model ?(filter_similar = true) ~print_attrs fmt model =
-  print_model ~filter_similar ~print_attrs fmt model
 
 let get_model_file model filename =
   Mstr.find_def empty_model_file filename model
@@ -924,7 +917,7 @@ let interleave_line ~filename:_ ~print_attrs start_comment end_comment
     let model_elements = Mint.find line_number model_file in
     let cntexmp_line =
       asprintf "@[<h 0>%s%s%a%s@]" (get_padding line) start_comment
-        (print_model_elements ~filter_similar:true ~sep:Pp.semi ~print_attrs)
+        (print_model_elements ~sep:Pp.semi ~print_attrs)
         model_elements end_comment in
     (* We need to know how many lines will be taken by the counterexample. This
        is ad hoc as we don't really know how the lines are split in IDE. *)
@@ -1272,13 +1265,12 @@ type model_parser = printing_info -> string -> model
 type raw_model_parser = printing_info -> string -> model_element list
 
 let debug_elements elts =
-  let print_elements = print_model_elements ~sep:Pp.semi ~print_attrs:true
-    ~filter_similar:false in
+  let print_elements = print_model_elements ~sep:Pp.semi ~print_attrs:true in
   Debug.dprintf debug "@[<v>Elements:@ %a@]@." print_elements elts;
   elts
 
 let debug_files files =
-  let print_file = print_model_file ~filter_similar:false ~print_attrs:true in
+  let print_file = print_model_file ~print_attrs:true in
    Debug.dprintf debug "@[<v>Files:@ %a@]@."
      (Pp.print_list Pp.newline print_file) (Mstr.bindings files);
    files

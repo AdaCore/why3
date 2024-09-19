@@ -24,13 +24,21 @@ File int.mlw:
       ->
       int = [|{mach.int.Int32.int32'int => 84} => 84;
             {mach.int.Int32.int32'int => 42} => 42; _ => 22|]
+    int32'int :
+      int32
+      ->
+      int = [|{mach.int.Int32.int32'int => 84} => 84;
+            {mach.int.Int32.int32'int => 42} => 42; _ => 22|]
 File int32.mlw:
   Line 5:
+    r : int32 = {mach.int.Int32.int32'int => 22}
     r : int32 = {mach.int.Int32.int32'int => 22}
   Line 7:
     r : int32 = {mach.int.Int32.int32'int => 22}
     r : int32 = {mach.int.Int32.int32'int => 22}
+    r : int32 = {mach.int.Int32.int32'int => 22}
   Line 8:
+    r : int32 = {mach.int.Int32.int32'int => 22}
     r : int32 = {mach.int.Int32.int32'int => 22}
   Line 9:
     r : int32 = {mach.int.Int32.int32'int => 22}

@@ -13,7 +13,9 @@ The following counterexample model could not be verified
 File array_records_poly.mlw:
   Line 23:
     i : int = -1
+    i : int = -1
   Line 27:
+    i : int = -1
     i : int = -1
 
 <check_ce:categorization>Categorizations of models:
@@ -31,9 +33,14 @@ The following counterexample model could not be verified
 File array_records_poly.mlw:
   Line 23:
     i : int = -1
+    i : int = -1
   Line 27:
     i : int = -1
+    i : int = -1
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
 
@@ -52,14 +59,24 @@ The following counterexample model could not be verified
 File array_records_poly.mlw:
   Line 23:
     i : int = -1
+    i : int = -1
   Line 27:
+    i : int = -1
     i : int = -1
     result of call at line 27, characters 13-81 :
       basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
 
@@ -78,19 +95,30 @@ The following counterexample model could not be verified
 File array.mlw:
   Line 17:
     length : ty -> uni -> int = fun x!0269 x!193 -> 0
+    length : ty -> uni -> int = fun x!0269 x!193 -> 0
 File array_records_poly.mlw:
   Line 23:
+    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
+    result of call at line 27, characters 45-61 : int = 3
     result of call at line 27, characters 45-61 : int = 3
     result of call at line 27, characters 45-49 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
   Line 28:
+    i : int = -1
     i : int = -1
 
 <check_ce:categorization>Categorizations of models:
@@ -108,21 +136,35 @@ The following counterexample model could not be verified
 File array.mlw:
   Line 17:
     length : ty -> uni -> int = fun x!0292 x!1104 -> 0
+    length : ty -> uni -> int = fun x!0292 x!1104 -> 0
 File array_records_poly.mlw:
   Line 23:
+    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
   Line 28:
     i : int = -1
+    i : int = -1
     result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-68 :
+      basic_record = {flag = false; first_value = 4; second_value = 2}
     result of call at line 28, characters 64-68 :
       basic_record = {flag = false; first_value = 4; second_value = 2}
 
@@ -141,26 +183,45 @@ The following counterexample model could not be verified
 File array.mlw:
   Line 17:
     length : ty -> uni -> int = fun x!0315 x!1115 -> 0
+    length : ty -> uni -> int = fun x!0315 x!1115 -> 0
 File array_records_poly.mlw:
   Line 23:
+    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
   Line 28:
     i : int = -1
+    i : int = -1
+    result of call at line 28, characters 13-82 :
+      basic_record = {flag = false; first_value = 42; second_value = 2}
     result of call at line 28, characters 13-82 :
       basic_record = {flag = false; first_value = 42; second_value = 2}
     result of call at line 28, characters 21-30 : bool = false
+    result of call at line 28, characters 21-30 : bool = false
+    result of call at line 28, characters 21-25 :
+      basic_record = {flag = false; first_value = 4; second_value = 2}
     result of call at line 28, characters 21-25 :
       basic_record = {flag = false; first_value = 4; second_value = 2}
     result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-68 :
+      basic_record = {flag = false; first_value = 4; second_value = 2}
     result of call at line 28, characters 64-68 :
       basic_record = {flag = false; first_value = 4; second_value = 2}
 
@@ -179,28 +240,47 @@ The following counterexample model could not be verified
 File array.mlw:
   Line 17:
     length : ty -> uni -> int = fun x!0339 x!1126 -> 0
+    length : ty -> uni -> int = fun x!0339 x!1126 -> 0
 File array_records_poly.mlw:
   Line 23:
+    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
   Line 28:
     result of call at line 28, characters 13-82 :
       basic_record = {flag = false; first_value = 42; second_value = 2}
+    result of call at line 28, characters 13-82 :
+      basic_record = {flag = false; first_value = 42; second_value = 2}
+    result of call at line 28, characters 21-30 : bool = false
     result of call at line 28, characters 21-30 : bool = false
     result of call at line 28, characters 21-25 :
       basic_record = {flag = false; first_value = 4; second_value = 2}
+    result of call at line 28, characters 21-25 :
+      basic_record = {flag = false; first_value = 4; second_value = 2}
+    result of call at line 28, characters 64-81 : int = 2
     result of call at line 28, characters 64-81 : int = 2
     result of call at line 28, characters 64-68 :
       basic_record = {flag = false; first_value = 4; second_value = 2}
+    result of call at line 28, characters 64-68 :
+      basic_record = {flag = false; first_value = 4; second_value = 2}
   Line 29:
+    i : int = -1
     i : int = -1
 
 <check_ce:categorization>Categorizations of models:
@@ -218,30 +298,52 @@ The following counterexample model could not be verified
 File array.mlw:
   Line 17:
     length : ty -> uni -> int = fun x!0363 x!1137 -> 0
+    length : ty -> uni -> int = fun x!0363 x!1137 -> 0
 File array_records_poly.mlw:
   Line 23:
+    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
   Line 28:
     result of call at line 28, characters 13-82 :
       basic_record = {flag = false; first_value = 42; second_value = 2}
+    result of call at line 28, characters 13-82 :
+      basic_record = {flag = false; first_value = 42; second_value = 2}
+    result of call at line 28, characters 21-30 : bool = false
     result of call at line 28, characters 21-30 : bool = false
     result of call at line 28, characters 21-25 :
       basic_record = {flag = false; first_value = 4; second_value = 2}
+    result of call at line 28, characters 21-25 :
+      basic_record = {flag = false; first_value = 4; second_value = 2}
     result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-68 :
+      basic_record = {flag = false; first_value = 4; second_value = 2}
     result of call at line 28, characters 64-68 :
       basic_record = {flag = false; first_value = 4; second_value = 2}
   Line 29:
     i : int = -1
+    i : int = -1
     result of call at line 29, characters 64-81 : int = 6
+    result of call at line 29, characters 64-81 : int = 6
+    result of call at line 29, characters 64-68 :
+      basic_record = {flag = false; first_value = 7; second_value = 6}
     result of call at line 29, characters 64-68 :
       basic_record = {flag = false; first_value = 7; second_value = 6}
 
@@ -260,35 +362,62 @@ The following counterexample model could not be verified
 File array.mlw:
   Line 17:
     length : ty -> uni -> int = fun x!0387 x!1148 -> 0
+    length : ty -> uni -> int = fun x!0387 x!1148 -> 0
 File array_records_poly.mlw:
   Line 23:
+    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
   Line 28:
     result of call at line 28, characters 13-82 :
       basic_record = {flag = false; first_value = 42; second_value = 2}
+    result of call at line 28, characters 13-82 :
+      basic_record = {flag = false; first_value = 42; second_value = 2}
+    result of call at line 28, characters 21-30 : bool = false
     result of call at line 28, characters 21-30 : bool = false
     result of call at line 28, characters 21-25 :
       basic_record = {flag = false; first_value = 4; second_value = 2}
+    result of call at line 28, characters 21-25 :
+      basic_record = {flag = false; first_value = 4; second_value = 2}
     result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-68 :
+      basic_record = {flag = false; first_value = 4; second_value = 2}
     result of call at line 28, characters 64-68 :
       basic_record = {flag = false; first_value = 4; second_value = 2}
   Line 29:
     i : int = -1
+    i : int = -1
+    result of call at line 29, characters 13-82 :
+      basic_record = {flag = false; first_value = 23; second_value = 6}
     result of call at line 29, characters 13-82 :
       basic_record = {flag = false; first_value = 23; second_value = 6}
     result of call at line 29, characters 21-30 : bool = false
+    result of call at line 29, characters 21-30 : bool = false
+    result of call at line 29, characters 21-25 :
+      basic_record = {flag = false; first_value = 7; second_value = 6}
     result of call at line 29, characters 21-25 :
       basic_record = {flag = false; first_value = 7; second_value = 6}
     result of call at line 29, characters 64-81 : int = 6
+    result of call at line 29, characters 64-81 : int = 6
+    result of call at line 29, characters 64-68 :
+      basic_record = {flag = false; first_value = 7; second_value = 6}
     result of call at line 29, characters 64-68 :
       basic_record = {flag = false; first_value = 7; second_value = 6}
 
@@ -307,37 +436,64 @@ The following counterexample model could not be verified
 File array.mlw:
   Line 17:
     length : ty -> uni -> int = fun x!0412 x!1159 -> 0
+    length : ty -> uni -> int = fun x!0412 x!1159 -> 0
 File array_records_poly.mlw:
   Line 23:
+    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
   Line 28:
     result of call at line 28, characters 13-82 :
       basic_record = {flag = false; first_value = 42; second_value = 2}
+    result of call at line 28, characters 13-82 :
+      basic_record = {flag = false; first_value = 42; second_value = 2}
+    result of call at line 28, characters 21-30 : bool = false
     result of call at line 28, characters 21-30 : bool = false
     result of call at line 28, characters 21-25 :
       basic_record = {flag = false; first_value = 4; second_value = 2}
+    result of call at line 28, characters 21-25 :
+      basic_record = {flag = false; first_value = 4; second_value = 2}
     result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-68 :
+      basic_record = {flag = false; first_value = 4; second_value = 2}
     result of call at line 28, characters 64-68 :
       basic_record = {flag = false; first_value = 4; second_value = 2}
   Line 29:
     result of call at line 29, characters 13-82 :
       basic_record = {flag = false; first_value = 23; second_value = 6}
+    result of call at line 29, characters 13-82 :
+      basic_record = {flag = false; first_value = 23; second_value = 6}
+    result of call at line 29, characters 21-30 : bool = false
     result of call at line 29, characters 21-30 : bool = false
     result of call at line 29, characters 21-25 :
       basic_record = {flag = false; first_value = 7; second_value = 6}
+    result of call at line 29, characters 21-25 :
+      basic_record = {flag = false; first_value = 7; second_value = 6}
+    result of call at line 29, characters 64-81 : int = 6
     result of call at line 29, characters 64-81 : int = 6
     result of call at line 29, characters 64-68 :
       basic_record = {flag = false; first_value = 7; second_value = 6}
+    result of call at line 29, characters 64-68 :
+      basic_record = {flag = false; first_value = 7; second_value = 6}
   Line 30:
+    i : int = -1
     i : int = -1
 
 <check_ce:categorization>Categorizations of models:
@@ -355,39 +511,69 @@ The following counterexample model could not be verified
 File array.mlw:
   Line 17:
     length : ty -> uni -> int = fun x!0437 x!1170 -> 0
+    length : ty -> uni -> int = fun x!0437 x!1170 -> 0
 File array_records_poly.mlw:
   Line 23:
+    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
   Line 28:
     result of call at line 28, characters 13-82 :
       basic_record = {flag = false; first_value = 42; second_value = 2}
+    result of call at line 28, characters 13-82 :
+      basic_record = {flag = false; first_value = 42; second_value = 2}
+    result of call at line 28, characters 21-30 : bool = false
     result of call at line 28, characters 21-30 : bool = false
     result of call at line 28, characters 21-25 :
       basic_record = {flag = false; first_value = 4; second_value = 2}
+    result of call at line 28, characters 21-25 :
+      basic_record = {flag = false; first_value = 4; second_value = 2}
     result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-68 :
+      basic_record = {flag = false; first_value = 4; second_value = 2}
     result of call at line 28, characters 64-68 :
       basic_record = {flag = false; first_value = 4; second_value = 2}
   Line 29:
     result of call at line 29, characters 13-82 :
       basic_record = {flag = false; first_value = 23; second_value = 6}
+    result of call at line 29, characters 13-82 :
+      basic_record = {flag = false; first_value = 23; second_value = 6}
+    result of call at line 29, characters 21-30 : bool = false
     result of call at line 29, characters 21-30 : bool = false
     result of call at line 29, characters 21-25 :
       basic_record = {flag = false; first_value = 7; second_value = 6}
+    result of call at line 29, characters 21-25 :
+      basic_record = {flag = false; first_value = 7; second_value = 6}
     result of call at line 29, characters 64-81 : int = 6
+    result of call at line 29, characters 64-81 : int = 6
+    result of call at line 29, characters 64-68 :
+      basic_record = {flag = false; first_value = 7; second_value = 6}
     result of call at line 29, characters 64-68 :
       basic_record = {flag = false; first_value = 7; second_value = 6}
   Line 30:
     i : int = -1
+    i : int = -1
     result of call at line 30, characters 74-91 : int = 8
+    result of call at line 30, characters 74-91 : int = 8
+    result of call at line 30, characters 74-78 :
+      basic_record = {flag = false; first_value = 9; second_value = 8}
     result of call at line 30, characters 74-78 :
       basic_record = {flag = false; first_value = 9; second_value = 8}
 
@@ -406,44 +592,79 @@ The following counterexample model could not be verified
 File array.mlw:
   Line 17:
     length : ty -> uni -> int = fun x!0462 x!1181 -> 0
+    length : ty -> uni -> int = fun x!0462 x!1181 -> 0
 File array_records_poly.mlw:
   Line 23:
+    i : int = -1
     i : int = -1
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
   Line 28:
     result of call at line 28, characters 13-82 :
       basic_record = {flag = false; first_value = 42; second_value = 2}
+    result of call at line 28, characters 13-82 :
+      basic_record = {flag = false; first_value = 42; second_value = 2}
+    result of call at line 28, characters 21-30 : bool = false
     result of call at line 28, characters 21-30 : bool = false
     result of call at line 28, characters 21-25 :
       basic_record = {flag = false; first_value = 4; second_value = 2}
+    result of call at line 28, characters 21-25 :
+      basic_record = {flag = false; first_value = 4; second_value = 2}
     result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-81 : int = 2
+    result of call at line 28, characters 64-68 :
+      basic_record = {flag = false; first_value = 4; second_value = 2}
     result of call at line 28, characters 64-68 :
       basic_record = {flag = false; first_value = 4; second_value = 2}
   Line 29:
     result of call at line 29, characters 13-82 :
       basic_record = {flag = false; first_value = 23; second_value = 6}
+    result of call at line 29, characters 13-82 :
+      basic_record = {flag = false; first_value = 23; second_value = 6}
+    result of call at line 29, characters 21-30 : bool = false
     result of call at line 29, characters 21-30 : bool = false
     result of call at line 29, characters 21-25 :
       basic_record = {flag = false; first_value = 7; second_value = 6}
+    result of call at line 29, characters 21-25 :
+      basic_record = {flag = false; first_value = 7; second_value = 6}
     result of call at line 29, characters 64-81 : int = 6
+    result of call at line 29, characters 64-81 : int = 6
+    result of call at line 29, characters 64-68 :
+      basic_record = {flag = false; first_value = 7; second_value = 6}
     result of call at line 29, characters 64-68 :
       basic_record = {flag = false; first_value = 7; second_value = 6}
   Line 30:
     i : int = -1
+    i : int = -1
+    result of call at line 30, characters 13-92 :
+      basic_record = {flag = false; first_value = 9; second_value = 8}
     result of call at line 30, characters 13-92 :
       basic_record = {flag = false; first_value = 9; second_value = 8}
     result of call at line 30, characters 41-57 : int = 9
+    result of call at line 30, characters 41-57 : int = 9
+    result of call at line 30, characters 41-45 :
+      basic_record = {flag = false; first_value = 9; second_value = 8}
     result of call at line 30, characters 41-45 :
       basic_record = {flag = false; first_value = 9; second_value = 8}
     result of call at line 30, characters 74-91 : int = 8
+    result of call at line 30, characters 74-91 : int = 8
+    result of call at line 30, characters 74-78 :
+      basic_record = {flag = false; first_value = 9; second_value = 8}
     result of call at line 30, characters 74-78 :
       basic_record = {flag = false; first_value = 9; second_value = 8}
 
@@ -466,45 +687,80 @@ The following counterexample model could not be verified
 File array.mlw:
   Line 17:
     length : ty -> uni -> int = fun x!0514 x!1203 -> 0
+    length : ty -> uni -> int = fun x!0514 x!1203 -> 0
 File array_records_poly.mlw:
   Line 23:
     i : int = 2
+    i : int = 2
   Line 25:
+    i : int = 2
     i : int = 2
   Line 27:
     result of call at line 27, characters 13-81 :
       basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 13-81 :
+      basic_record = {flag = true; first_value = 3; second_value = 69}
+    result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-30 : bool = true
     result of call at line 27, characters 21-25 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
+    result of call at line 27, characters 21-25 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-61 : int = 3
+    result of call at line 27, characters 45-49 :
+      basic_record = {flag = true; first_value = 3; second_value = 5}
     result of call at line 27, characters 45-49 :
       basic_record = {flag = true; first_value = 3; second_value = 5}
   Line 28:
     result of call at line 28, characters 13-82 :
       basic_record = {flag = false; first_value = 42; second_value = 6}
+    result of call at line 28, characters 13-82 :
+      basic_record = {flag = false; first_value = 42; second_value = 6}
+    result of call at line 28, characters 21-30 : bool = false
     result of call at line 28, characters 21-30 : bool = false
     result of call at line 28, characters 21-25 :
       basic_record = {flag = false; first_value = 7; second_value = 6}
+    result of call at line 28, characters 21-25 :
+      basic_record = {flag = false; first_value = 7; second_value = 6}
     result of call at line 28, characters 64-81 : int = 6
+    result of call at line 28, characters 64-81 : int = 6
+    result of call at line 28, characters 64-68 :
+      basic_record = {flag = false; first_value = 7; second_value = 6}
     result of call at line 28, characters 64-68 :
       basic_record = {flag = false; first_value = 7; second_value = 6}
   Line 29:
     result of call at line 29, characters 13-82 :
       basic_record = {flag = false; first_value = 23; second_value = 8}
+    result of call at line 29, characters 13-82 :
+      basic_record = {flag = false; first_value = 23; second_value = 8}
+    result of call at line 29, characters 21-30 : bool = false
     result of call at line 29, characters 21-30 : bool = false
     result of call at line 29, characters 21-25 :
       basic_record = {flag = false; first_value = 9; second_value = 8}
+    result of call at line 29, characters 21-25 :
+      basic_record = {flag = false; first_value = 9; second_value = 8}
     result of call at line 29, characters 64-81 : int = 8
+    result of call at line 29, characters 64-81 : int = 8
+    result of call at line 29, characters 64-68 :
+      basic_record = {flag = false; first_value = 9; second_value = 8}
     result of call at line 29, characters 64-68 :
       basic_record = {flag = false; first_value = 9; second_value = 8}
   Line 30:
     result of call at line 30, characters 13-92 :
       basic_record = {flag = false; first_value = 11; second_value = 10}
+    result of call at line 30, characters 13-92 :
+      basic_record = {flag = false; first_value = 11; second_value = 10}
+    result of call at line 30, characters 41-57 : int = 11
     result of call at line 30, characters 41-57 : int = 11
     result of call at line 30, characters 41-45 :
       basic_record = {flag = false; first_value = 11; second_value = 10}
+    result of call at line 30, characters 41-45 :
+      basic_record = {flag = false; first_value = 11; second_value = 10}
     result of call at line 30, characters 74-91 : int = 10
+    result of call at line 30, characters 74-91 : int = 10
+    result of call at line 30, characters 74-78 :
+      basic_record = {flag = false; first_value = 11; second_value = 10}
     result of call at line 30, characters 74-78 :
       basic_record = {flag = false; first_value = 11; second_value = 10}
 

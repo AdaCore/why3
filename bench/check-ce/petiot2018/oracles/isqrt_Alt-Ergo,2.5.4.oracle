@@ -338,25 +338,35 @@ The following counterexample model could not be verified
 File isqrt-S5.mlw:
   Line 3:
     n : int = 2
+    n : int = 2
   Line 6:
+    r : int = 2
     r : int = 2
   Line 7:
     y : int = 4
+    y : int = 4
   Line 8:
+    z : int = -3
     z : int = -3
   Line 9:
     [before iteration] r : int = 2
+    [before iteration] r : int = 2
     [before iteration] y : int = 4
+    [before iteration] y : int = 4
+    [before iteration] z : int = -5
     [before iteration] z : int = -5
   Line 10:
     [current iteration] r : int = 1
   Line 11:
     [current iteration] r : int = 1
+    [current iteration] r : int = 1
+    [current iteration] y : int = -1
     [current iteration] y : int = -1
     [current iteration] y : int = -1
   Line 15:
     [current iteration] y : int = -1
   Line 16:
+    [current iteration] z : int = -3
     [current iteration] z : int = -3
   Line 17:
     [current iteration] r : int = 1
@@ -523,18 +533,27 @@ The following counterexample model could not be verified
 File isqrt-S7.mlw:
   Line 3:
     n : int = 1
+    n : int = 1
   Line 5:
     n : int = 1
+    n : int = 1
+    r : int = 0
     r : int = 0
   Line 6:
     r : int = 1
+    r : int = 1
   Line 7:
+    y : int = 1
     y : int = 1
   Line 8:
     z : int = -1
+    z : int = -1
   Line 9:
     r : int = 0
+    r : int = 0
     y : int = 0
+    y : int = 0
+    z : int = 1
     z : int = 1
 
 ** isqrt-S8
@@ -833,23 +852,34 @@ The following counterexample model could not be verified
 File isqrt-S10.mlw:
   Line 3:
     n : int = 1
+    n : int = 1
   Line 6:
+    r : int = 1
     r : int = 1
   Line 7:
     y : int = 1
+    y : int = 1
   Line 8:
+    z : int = -1
     z : int = -1
   Line 9:
     [before iteration] r : int = -4
+    [before iteration] r : int = -4
     [before iteration] y : int = 16
+    [before iteration] y : int = 16
+    [before iteration] z : int = 9
     [before iteration] z : int = 9
   Line 14:
     [current iteration] r : int = -5
     [current iteration] r : int = -4
+    [current iteration] r : int = -4
+    [current iteration] r : int = -5
     [current iteration] r : int = -5
   Line 15:
     [current iteration] y : int = 25
+    [current iteration] y : int = 25
   Line 16:
+    [current iteration] z : int = 11
     [current iteration] z : int = 11
   Line 17:
     [current iteration] r : int = -5

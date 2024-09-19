@@ -16,9 +16,15 @@ File jlamp_array_poly.mlw:
       t
       ->
       int = [|{Array.to_int => 2} => 2; {Array.to_int => 3} => 3; _ => 2|]
+    to_int :
+      t
+      ->
+      int = [|{Array.to_int => 2} => 2; {Array.to_int => 3} => 3; _ => 2|]
   Line 11:
     two : t = {Array.to_int => 2}
+    two : t = {Array.to_int => 2}
   Line 14:
+    three : t = {Array.to_int => 3}
     three : t = {Array.to_int => 3}
 
 <check_ce:categorization>Categorizations of models:
@@ -36,17 +42,25 @@ The following counterexample model could not be verified
 File array.mlw:
   Line 17:
     length : ty -> uni -> int = fun x!0102 x!137 -> 0
+    length : ty -> uni -> int = fun x!0102 x!137 -> 0
 File jlamp_array_poly.mlw:
   Line 8:
     to_int :
       t
       ->
       int = [|{Array.to_int => 2} => 2; {Array.to_int => 3} => 3; _ => 2|]
+    to_int :
+      t
+      ->
+      int = [|{Array.to_int => 2} => 2; {Array.to_int => 3} => 3; _ => 2|]
   Line 11:
+    two : t = {Array.to_int => 2}
     two : t = {Array.to_int => 2}
   Line 14:
     three : t = {Array.to_int => 3}
+    three : t = {Array.to_int => 3}
   Line 21:
+    three : t = {Array.to_int => 3}
     three : t = {Array.to_int => 3}
 
 File "bench/check-ce/jlamp_array_poly.mlw", line 28, characters 4-16:

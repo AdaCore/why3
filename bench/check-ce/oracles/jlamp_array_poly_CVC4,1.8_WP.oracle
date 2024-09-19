@@ -18,8 +18,22 @@ File array.mlw:
       uni
       ->
       int = fun bOUND_VARIABLE_5551 bOUND_VARIABLE_5561 -> 0
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_5551 bOUND_VARIABLE_5561 -> 0
+    length : array t -> int = [|_ => 0|]
     length : array t -> int = [|_ => 0|]
   Line 20:
+    mixfix [] :
+      array
+      t
+      ->
+      int
+      ->
+      t = fun bOUND_VARIABLE_5891 bOUND_VARIABLE_5901 -> {Array.to_int => 3}
     mixfix [] :
       array
       t
@@ -34,9 +48,16 @@ File jlamp_array_poly.mlw:
       ->
       int = fun bOUND_VARIABLE_6981 ->
              if {Array.to_int => 3} = bOUND_VARIABLE_6981 then 3 else 2
+    to_int :
+      t
+      ->
+      int = fun bOUND_VARIABLE_6981 ->
+             if {Array.to_int => 3} = bOUND_VARIABLE_6981 then 3 else 2
   Line 11:
     two : t = {Array.to_int => 2}
+    two : t = {Array.to_int => 2}
   Line 14:
+    three : t = {Array.to_int => 3}
     three : t = {Array.to_int => 3}
 
 <check_ce:categorization>Categorizations of models:
@@ -59,6 +80,13 @@ File array.mlw:
       uni
       ->
       int = fun bOUND_VARIABLE_6221 bOUND_VARIABLE_6231 -> 0
+    length :
+      ty
+      ->
+      uni
+      ->
+      int = fun bOUND_VARIABLE_6221 bOUND_VARIABLE_6231 -> 0
+    length : array t -> int = [|_ => 0|]
     length : array t -> int = [|_ => 0|]
 File jlamp_array_poly.mlw:
   Line 8:
@@ -67,11 +95,19 @@ File jlamp_array_poly.mlw:
       ->
       int = fun bOUND_VARIABLE_7731 ->
              if {Array.to_int => 3} = bOUND_VARIABLE_7731 then 3 else 2
+    to_int :
+      t
+      ->
+      int = fun bOUND_VARIABLE_7731 ->
+             if {Array.to_int => 3} = bOUND_VARIABLE_7731 then 3 else 2
   Line 11:
+    two : t = {Array.to_int => 2}
     two : t = {Array.to_int => 2}
   Line 14:
     three : t = {Array.to_int => 3}
+    three : t = {Array.to_int => 3}
   Line 21:
+    three : t = {Array.to_int => 3}
     three : t = {Array.to_int => 3}
 
 File "bench/check-ce/jlamp_array_poly.mlw", line 28, characters 4-16:

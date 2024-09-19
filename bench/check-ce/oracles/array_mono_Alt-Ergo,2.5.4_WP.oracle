@@ -69,9 +69,27 @@ File array_mono.mlw:
       int = [|{Array.elts = [|0 => 0; 1 => 42; _ => 0|]; Array.length = 3} =>
               [|0 => 0; 1 => 42; _ => 0|];
             _ => [|0 => 42; 1 => 42; _ => 0|]|]
+    elts :
+      array
+      ->
+      int
+      ->
+      int = [|{Array.elts = [|0 => 0; 1 => 42; _ => 0|]; Array.length = 3} =>
+              [|0 => 0; 1 => 42; _ => 0|];
+            _ => [|0 => 42; 1 => 42; _ => 0|]|]
   Line 10:
     length : array -> int = [|_ => 3|]
+    length : array -> int = [|_ => 3|]
   Line 19:
+    mixfix [<-] :
+      array
+      ->
+      int
+      ->
+      int
+      ->
+      array = fun arg_05 arg_11 arg_21 ->
+               {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 3}
     mixfix [<-] :
       array
       ->
@@ -88,6 +106,7 @@ File array_mono.mlw:
   Line 38:
     a : array = {Array.elts = [|0 => 0; 1 => 42; _ => 0|]; Array.length = 3}
   Line 40:
+    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 3}
     a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 3}
   Line 41:
     a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 3}

@@ -21,9 +21,16 @@ File jlamp_array_mono.mlw:
       ->
       int = fun bOUND_VARIABLE_4061 ->
              if {Array.to_int => 3} = bOUND_VARIABLE_4061 then 3 else 2
+    to_int :
+      t
+      ->
+      int = fun bOUND_VARIABLE_4061 ->
+             if {Array.to_int => 3} = bOUND_VARIABLE_4061 then 3 else 2
   Line 11:
     two : t = {Array.to_int => 2}
+    two : t = {Array.to_int => 2}
   Line 14:
+    three : t = {Array.to_int => 3}
     three : t = {Array.to_int => 3}
   Line 18:
     elts :
@@ -32,9 +39,28 @@ File jlamp_array_mono.mlw:
       int
       ->
       t = [|_ => [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|]|]
+    elts :
+      array
+      ->
+      int
+      ->
+      t = [|_ => [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|]|]
   Line 19:
     length : array -> int = [|_ => 0|]
+    length : array -> int = [|_ => 0|]
   Line 28:
+    mixfix [<-] :
+      array
+      ->
+      int
+      ->
+      t
+      ->
+      array = fun bOUND_VARIABLE_4401 bOUND_VARIABLE_4411
+               bOUND_VARIABLE_4421 ->
+               {Array.elts =
+                [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+                Array.length = 0}
     mixfix [<-] :
       array
       ->
@@ -62,6 +88,10 @@ File jlamp_array_mono.mlw:
       array = {Array.elts =
                [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
                Array.length = 0}
+    a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+               Array.length = 0}
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -82,9 +112,16 @@ File jlamp_array_mono.mlw:
       ->
       int = fun bOUND_VARIABLE_4951 ->
              if {Array.to_int => 3} = bOUND_VARIABLE_4951 then 3 else 2
+    to_int :
+      t
+      ->
+      int = fun bOUND_VARIABLE_4951 ->
+             if {Array.to_int => 3} = bOUND_VARIABLE_4951 then 3 else 2
   Line 11:
     two : t = {Array.to_int => 2}
+    two : t = {Array.to_int => 2}
   Line 14:
+    three : t = {Array.to_int => 3}
     three : t = {Array.to_int => 3}
   Line 18:
     elts :
@@ -96,7 +133,17 @@ File jlamp_array_mono.mlw:
            if {Array.elts = [|_ => {Array.to_int => 3}|]; Array.length = 0} = bOUND_VARIABLE_5101
            then [|_ => {Array.to_int => 3}|]
            else [|42 => {Array.to_int => 2}; _ => {Array.to_int => 3}|]
+    elts :
+      array
+      ->
+      int
+      ->
+      t = fun bOUND_VARIABLE_5101 ->
+           if {Array.elts = [|_ => {Array.to_int => 3}|]; Array.length = 0} = bOUND_VARIABLE_5101
+           then [|_ => {Array.to_int => 3}|]
+           else [|42 => {Array.to_int => 2}; _ => {Array.to_int => 3}|]
   Line 19:
+    length : array -> int = [|_ => 0|]
     length : array -> int = [|_ => 0|]
   Line 28:
     mixfix [<-] :
@@ -111,7 +158,20 @@ File jlamp_array_mono.mlw:
                {Array.elts =
                 [|42 => {Array.to_int => 2}; _ => {Array.to_int => 3}|];
                 Array.length = 0}
+    mixfix [<-] :
+      array
+      ->
+      int
+      ->
+      t
+      ->
+      array = fun bOUND_VARIABLE_5321 bOUND_VARIABLE_5331
+               bOUND_VARIABLE_5341 ->
+               {Array.elts =
+                [|42 => {Array.to_int => 2}; _ => {Array.to_int => 3}|];
+                Array.length = 0}
   Line 32:
+    a : array = {Array.elts = [|_ => {Array.to_int => 3}|]; Array.length = 0}
     a : array = {Array.elts = [|_ => {Array.to_int => 3}|]; Array.length = 0}
   Line 34:
     a :
@@ -127,6 +187,11 @@ File jlamp_array_mono.mlw:
       array = {Array.elts =
                [|42 => {Array.to_int => 2}; _ => {Array.to_int => 3}|];
                Array.length = 0}
+    a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 3}|];
+               Array.length = 0}
+    three : t = {Array.to_int => 3}
     three : t = {Array.to_int => 3}
   Line 48:
     a :
@@ -160,9 +225,16 @@ File jlamp_array_mono.mlw:
       ->
       int = fun bOUND_VARIABLE_4791 ->
              if {Array.to_int => 3} = bOUND_VARIABLE_4791 then 3 else 2
+    to_int :
+      t
+      ->
+      int = fun bOUND_VARIABLE_4791 ->
+             if {Array.to_int => 3} = bOUND_VARIABLE_4791 then 3 else 2
   Line 11:
     two : t = {Array.to_int => 2}
+    two : t = {Array.to_int => 2}
   Line 14:
+    three : t = {Array.to_int => 3}
     three : t = {Array.to_int => 3}
   Line 18:
     elts :
@@ -171,7 +243,14 @@ File jlamp_array_mono.mlw:
       int
       ->
       t = [|_ => [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|]|]
+    elts :
+      array
+      ->
+      int
+      ->
+      t = [|_ => [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|]|]
   Line 19:
+    length : array -> int = [|_ => 43|]
     length : array -> int = [|_ => 43|]
   Line 28:
     mixfix [<-] :
@@ -186,7 +265,23 @@ File jlamp_array_mono.mlw:
                {Array.elts =
                 [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
                 Array.length = 43}
+    mixfix [<-] :
+      array
+      ->
+      int
+      ->
+      t
+      ->
+      array = fun bOUND_VARIABLE_5081 bOUND_VARIABLE_5091
+               bOUND_VARIABLE_5103 ->
+               {Array.elts =
+                [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+                Array.length = 43}
   Line 32:
+    a :
+      array = {Array.elts =
+               [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+               Array.length = 43}
     a :
       array = {Array.elts =
                [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
@@ -210,6 +305,11 @@ File jlamp_array_mono.mlw:
       array = {Array.elts =
                [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
                Array.length = 43}
+    a :
+      array = {Array.elts =
+               [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
+               Array.length = 43}
+    three : t = {Array.to_int => 3}
     three : t = {Array.to_int => 3}
   Line 54:
     a :
@@ -240,9 +340,16 @@ File jlamp_array_mono.mlw:
       ->
       int = fun bOUND_VARIABLE_5193 ->
              if {Array.to_int => 3} = bOUND_VARIABLE_5193 then 3 else 2
+    to_int :
+      t
+      ->
+      int = fun bOUND_VARIABLE_5193 ->
+             if {Array.to_int => 3} = bOUND_VARIABLE_5193 then 3 else 2
   Line 11:
     two : t = {Array.to_int => 2}
+    two : t = {Array.to_int => 2}
   Line 14:
+    three : t = {Array.to_int => 3}
     three : t = {Array.to_int => 3}
   Line 18:
     elts :
@@ -258,7 +365,21 @@ File jlamp_array_mono.mlw:
            then [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
                 _ => {Array.to_int => 2}|]
            else [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|]
+    elts :
+      array
+      ->
+      int
+      ->
+      t = fun bOUND_VARIABLE_5343 ->
+           if {Array.elts =
+               [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+               _ => {Array.to_int => 2}|];
+               Array.length = 43} = bOUND_VARIABLE_5343
+           then [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+                _ => {Array.to_int => 2}|]
+           else [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|]
   Line 19:
+    length : array -> int = [|_ => 43|]
     length : array -> int = [|_ => 43|]
   Line 28:
     mixfix [<-] :
@@ -273,7 +394,24 @@ File jlamp_array_mono.mlw:
                {Array.elts =
                 [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
                 Array.length = 43}
+    mixfix [<-] :
+      array
+      ->
+      int
+      ->
+      t
+      ->
+      array = fun bOUND_VARIABLE_5561 bOUND_VARIABLE_5571
+               bOUND_VARIABLE_5581 ->
+               {Array.elts =
+                [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
+                Array.length = 43}
   Line 32:
+    a :
+      array = {Array.elts =
+               [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
+               _ => {Array.to_int => 2}|];
+               Array.length = 43}
     a :
       array = {Array.elts =
                [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
@@ -300,6 +438,11 @@ File jlamp_array_mono.mlw:
       array = {Array.elts =
                [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
                Array.length = 43}
+    a :
+      array = {Array.elts =
+               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
+               Array.length = 43}
+    three : t = {Array.to_int => 3}
     three : t = {Array.to_int => 3}
   Line 60:
     a :

@@ -97,9 +97,34 @@ File maps_mono.mlw:
       ->
       int = fun arg_03 arg_13 arg_23 ->
              [|1 => [|_ => 0|]; 0 => [|_ => 0|]; _ => [|_ => 0|]|]
+    set :
+      (int
+      ->
+      int
+      ->
+      int)
+      ->
+      int
+      ->
+      (int
+      ->
+      int)
+      ->
+      int
+      ->
+      int
+      ->
+      int = fun arg_03 arg_13 arg_23 ->
+             [|1 => [|_ => 0|]; 0 => [|_ => 0|]; _ => [|_ => 0|]|]
   Line 50:
     x : int -> int -> int = [|_ => [|_ => 0|]|]
   Line 51:
+    x :
+      int
+      ->
+      int
+      ->
+      int = [|1 => [|_ => 0|]; 0 => [|_ => 0|]; _ => [|_ => 0|]|]
     x :
       int
       ->
@@ -153,7 +178,38 @@ File maps_mono.mlw:
       int
       ->
       int = fun arg_07 arg_17 arg_27 -> [|_ => 0|]
+    set :
+      (int
+      ->
+      int)
+      ->
+      int
+      ->
+      int
+      ->
+      int
+      ->
+      int = fun arg_07 arg_17 arg_27 -> [|_ => 0|]
   Line 31:
+    set :
+      (int
+      ->
+      int
+      ->
+      int)
+      ->
+      int
+      ->
+      (int
+      ->
+      int)
+      ->
+      int
+      ->
+      int
+      ->
+      int = fun arg_06 arg_16 arg_26 ->
+             [|0 => [|_ => 0|]; 1 => [|_ => 0|]; _ => [|_ => 0|]|]
     set :
       (int
       ->
@@ -176,6 +232,12 @@ File maps_mono.mlw:
   Line 55:
     x : int -> int -> int = [|_ => [|_ => 0|]|]
   Line 56:
+    x :
+      int
+      ->
+      int
+      ->
+      int = [|0 => [|_ => 0|]; 1 => [|_ => 0|]; _ => [|_ => 0|]|]
     x :
       int
       ->
