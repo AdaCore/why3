@@ -64,11 +64,18 @@ let overload_of_rs {rs_cty = cty} =
       if ity_closed res && res.ity_pure then FixedRes res else NoOver
   | _ -> NoOver
 
+let overload_of_oo srs =
+  match overload_of_rs (Srs.min_elt srs) with
+  | FixedRes _ as o -> o
+  | _ -> overload_of_rs (Srs.max_elt srs)
+
 let same_overload r1 r2 =
   List.length r1.rs_cty.cty_args = List.length r2.rs_cty.cty_args &&
   match overload_of_rs r1, overload_of_rs r2 with
   | SameType, SameType -> true
   | FixedRes t1, FixedRes t2 -> ity_equal t1 t2
+  | SameType, FixedRes t2 -> ity_equal r1.rs_cty.cty_result t2
+  | FixedRes t1, SameType -> ity_equal t1 r2.rs_cty.cty_result
   | _ -> false (* two NoOver's are not the same *)
 
 let ref_attr = Ident.create_attribute "mlw:reference_var"

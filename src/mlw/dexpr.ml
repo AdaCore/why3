@@ -794,7 +794,7 @@ let dexpr ?loc node =
     | DEsym (OO ss) ->
         let dt = dity_fresh () in
         let rs = Srs.choose ss in
-        let ot = overload_of_rs rs in
+        let ot = overload_of_oo ss in
         let res = match ot with
           | SameType -> dt
           | FixedRes ity -> dity_of_ity ity

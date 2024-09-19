@@ -35,6 +35,8 @@ module Bool
     | True -> y
     end
 
+  val (=) (x y : bool) : bool ensures { result <-> x = y }
+
 end
 
 (** {2 Operator if-then-else} *)

@@ -32,6 +32,7 @@ end
 module bool.Bool
   syntax val andb  "%1 && %2"      prec 12 11 12
   syntax val orb   "%1 || %2"      prec 13 12 13
+  syntax val (=)   "%1 = %2"       prec 11 11 10
   syntax val xorb  "%1 <> %2"      prec 11 11 10
   syntax val notb  "not %1"        prec 4 3
   syntax val implb "not %1 || %2"  prec 13 3 13
