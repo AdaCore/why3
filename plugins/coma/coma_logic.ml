@@ -282,6 +282,7 @@ type formula =
   | Flam of param list * Shs.t * formula
   | Fall of param list * formula
   | Fneu of formula * Shs.t
+  | Fany
 
 type cache = {
   c_tv : ty Mtv.t;
@@ -391,12 +392,11 @@ let _print_formula fmt e =
     | Fagr (f,r) -> Format.fprintf fmt "%a@ [&%s]" pp f r.vs_name.id_string
     | Fagc (f,g) -> Format.fprintf fmt "%a@ (%a)" pp f pp g
     | Fand (f,g) -> Format.fprintf fmt "%a@ AND@ %a" pp f pp g
-    | Fneu (Fsym {hs_name = {id_string = "any"}}, ss) when Shs.is_empty ss ->
-        Format.pp_print_string fmt "TOP"
     | Fneu (f,ss) when Shs.is_empty ss -> Format.fprintf fmt "# (%a)" pp f
     | Fneu (f,ss) -> Format.fprintf fmt "#{%a} (%a)"
         (Pp.print_list Pp.space Format.pp_print_string)
-        (List.map (fun hs -> hs.hs_name.id_string) (Shs.elements ss)) pp f in
+        (List.map (fun hs -> hs.hs_name.id_string) (Shs.elements ss)) pp f
+    | Fany -> Format.pp_print_string fmt "TOP" in
   pp fmt e
 
 (* Formula evaluation *)
@@ -481,6 +481,7 @@ let rec f_eval c o bl = match o with
   | Fagr (f, r) -> f_eval c f (Bv (c_find_vs c r) :: bl)
   | Fagc (f, g) -> f_eval c f (Bc (f_handler c g) :: bl)
   | Fneu (f,ss) -> f_pass (c_neutralize c ss) f bl
+  | Fany -> w_true
 
 and f_pass ({c_go = go; c_ph = ph} as c) o bl =
   if not go && Shs.is_empty ph && no_bc bl then w_true
@@ -506,6 +507,7 @@ let rec fill_mm lh = function
   | Fagc (f, g) -> Fagc (fill_mm lh f, fill_mm lh g)
   | Fand (f, g) -> Fand (fill_mm lh f, fill_mm lh g)
   | Fneu (f,ss) -> Fneu (fill_mm (Mhs.set_inter lh ss) f, ss)
+  | Fany -> Fany
 
 let top_eval c f = vc_simp (f_eval c (fill_mm Mhs.empty f) []).wp
 
@@ -535,9 +537,6 @@ let vc_map2 fn v w = match v,w with
   | TB (vf,vg), TB(wf,wg)  -> TB (fn vf wf, fn vg wg)
   | _ -> invalid_arg "vc_map2"
 
-let hs_any = create_hsymbol (Ident.id_fresh "any")
-let vc_any = Fneu (Fsym hs_any, Shs.empty)
-
 let dl_split flat pl dl =
   if flat || List.length dl = 1 then [pl,dl] else
   let [@warning "-8"] head (Pc (h,_,_),_) = h in
@@ -549,7 +548,8 @@ let dl_split flat pl dl =
       | Fcut (_,_,f) | Fneu (f,_) | Fagt (f,_)
       | Fagv (f,_) | Fagr (f,_) -> inspect sh f
       | Fagc (f,g) | Fand (f,g) -> inspect sh f; inspect sh g
-    in inspect Shs.empty g in
+      | Fany -> () in
+    inspect Shs.empty g in
   let module SCC = MakeSCC(Hhs) in
   List.map (fun (_,dl) -> List.split dl) @@
     SCC.scc head iter @@ List.combine pl dl
@@ -617,9 +617,9 @@ let rec vc tt hc o al =
       (match vc tt hc e [] with TT g -> TT (Fcut (f,b,g))
         | TB (g,h) -> TB (Fcut (f,b,g), Fcut (f,false,h)))
   | (Ebox e | Ewox e) when tt -> vc true hc e []
-  | Ebox e -> TB (vc_any, of_tt (vc true hc e []))
-  | Ewox e -> TB (of_tt (vc true hc e []), vc_any)
-  | Eany -> if tt then TT vc_any else TB (vc_any, vc_any)
+  | Ebox e -> TB (Fany, of_tt (vc true hc e []))
+  | Ewox e -> TB (of_tt (vc true hc e []), Fany)
+  | Eany -> if tt then TT Fany else TB (Fany, Fany)
 
 and vc_defn tt hc flat dfl =
   let pl = List.map (fun (h,wr,pl,_) -> Pc (h,wr,pl)) dfl in
