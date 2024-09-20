@@ -12,15 +12,15 @@ Prover result is: Valid (2 steps).
   - Abstract RAC: STUCK (failure in precondition of `f1` at "bench/check-ce/func_call5_mono.mlw", line 12, characters 4-6)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to g1 at "bench/check-ce/func_call5_mono.mlw", line 15, characters 10-14)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to g1 at "bench/check-ce/func_call5_mono.mlw", line 15, characters 10-14)
 - Selected model 2: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to g1 at "bench/check-ce/func_call5_mono.mlw", line 15, characters 10-14)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to g1 at "bench/check-ce/func_call5_mono.mlw", line 15, characters 10-14)
 File "bench/check-ce/func_call5_mono.mlw", line 16, characters 11-18:
 Sub-goal Assertion of goal f1'vc.
 Prover result is: Unknown (unknown) (10 steps).
 The following counterexample model could not be verified
-  (abstract RAC terminated because missing value for return value of call to g1 at "bench/check-ce/func_call5_mono.mlw", line 15, characters 10-14):
+  (abstract RAC fatal rac error: missing value for return value of call to g1 at "bench/check-ce/func_call5_mono.mlw", line 15, characters 10-14):
 File func_call5_mono.mlw:
   Line 9:
     x : int = 2

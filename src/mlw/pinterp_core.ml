@@ -838,6 +838,13 @@ exception Stuck of cntr_ctx * Loc.position option * string
 
 exception Cannot_decide of cntr_ctx * Term.term list * string
 
+exception FatalRACError of Log.log_uc * string
+
+let fatal_rac_error l f =
+  kasprintf (fun reason ->
+      Debug.dprintf debug_trace_exec "RAC fatal error: %s@." reason;
+      raise (FatalRACError (l,reason))) f
+
 let stuck ?loc ctx f =
   kasprintf (fun reason ->
       Debug.dprintf debug_trace_exec "Stuck: %s@." reason;

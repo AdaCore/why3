@@ -7,16 +7,16 @@ Prover result is: Valid (8 steps).
   - Concrete RAC: STUCK (failure in precondition of `dummy_update` at "bench/check-ce/int32_mono.mlw", line 7, characters 6-18)
   - Abstract RAC: STUCK (failure in precondition of `dummy_update` at "bench/check-ce/int32_mono.mlw", line 7, characters 6-18)
 - Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to (+) at "bench/check-ce/int32_mono.mlw", line 11, characters 11-20)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to (+) at "bench/check-ce/int32_mono.mlw", line 11, characters 11-20)
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for return value of call to (+) at "bench/check-ce/int32_mono.mlw", line 11, characters 11-20)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to (+) at "bench/check-ce/int32_mono.mlw", line 11, characters 11-20)
 - Selected model 2: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to (+) at "bench/check-ce/int32_mono.mlw", line 11, characters 11-20)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to (+) at "bench/check-ce/int32_mono.mlw", line 11, characters 11-20)
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for return value of call to (+) at "bench/check-ce/int32_mono.mlw", line 11, characters 11-20)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to (+) at "bench/check-ce/int32_mono.mlw", line 11, characters 11-20)
 File "bench/check-ce/int32_mono.mlw", line 9, characters 14-32:
 Sub-goal Postcondition of goal dummy_update'vc.
 Prover result is: Unknown (unknown) (11 steps).
 The following counterexample model could not be verified
-  (both RAC terminated because missing value for return value of call to (+) at "bench/check-ce/int32_mono.mlw", line 11, characters 11-20):
+  (both RAC fatal rac error: missing value for return value of call to (+) at "bench/check-ce/int32_mono.mlw", line 11, characters 11-20):
 File int.mlw:
   Line 279:
     int32'int :

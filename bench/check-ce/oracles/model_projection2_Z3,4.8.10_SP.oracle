@@ -62,13 +62,13 @@ File model_projection2.mlw:
   - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Ident to_array is not yet declared`)
   - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Ident to_array is not yet declared`)
 - Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because missing value for global `get`)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for global `get`)
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for global `get`)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for global `get`)
 File "bench/check-ce/model_projection2.mlw", line 26, characters 10-23:
 Sub-goal Assertion of goal g2'vc.
 Prover result is: Unknown (sat) (339 steps).
 The following counterexample model could not be verified
-  (both RAC terminated because missing value for global `get`):
+  (both RAC fatal rac error: missing value for global `get`):
 File model_projection2.mlw:
   Line 14:
     to_array : poly_map int int -> int -> int = [|_ => [|_ => 41|]|]
