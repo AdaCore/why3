@@ -72,13 +72,13 @@ Sorry, we don't have a good counterexample for you :(
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
 - Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to u_add at "bench/check-ce/threshold.mlw", line 30, characters 11-24)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to u_add at "bench/check-ce/threshold.mlw", line 30, characters 11-24)
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for return value of call to u_add at "bench/check-ce/threshold.mlw", line 30, characters 11-24)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to u_add at "bench/check-ce/threshold.mlw", line 30, characters 11-24)
 File "bench/check-ce/threshold.mlw", line 30, characters 11-24:
 Sub-goal Arithmetic overflow of goal f'vc.
 Prover result is: Step limit exceeded (18 steps).
 The following counterexample model could not be verified
-  (both RAC terminated because missing value for return value of call to u_add at "bench/check-ce/threshold.mlw", line 30, characters 11-24):
+  (both RAC fatal rac error: missing value for return value of call to u_add at "bench/check-ce/threshold.mlw", line 30, characters 11-24):
 File bv.mlw:
   Line 362:
     size_bv : t1 = {bv.BV32.t'int => 32}
@@ -156,13 +156,13 @@ File threshold.mlw:
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
 - Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to u_add at "bench/check-ce/threshold.mlw", line 30, characters 11-24)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to u_add at "bench/check-ce/threshold.mlw", line 30, characters 11-24)
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for return value of call to u_add at "bench/check-ce/threshold.mlw", line 30, characters 11-24)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to u_add at "bench/check-ce/threshold.mlw", line 30, characters 11-24)
 File "bench/check-ce/threshold.mlw", line 27, characters 13-45:
 Sub-goal Postcondition of goal f'vc.
 Prover result is: Step limit exceeded (38 steps).
 The following counterexample model could not be verified
-  (both RAC terminated because missing value for return value of call to u_add at "bench/check-ce/threshold.mlw", line 30, characters 11-24):
+  (both RAC fatal rac error: missing value for return value of call to u_add at "bench/check-ce/threshold.mlw", line 30, characters 11-24):
 File bv.mlw:
   Line 362:
     size_bv : t1 = {bv.BV32.t'int => 32}

@@ -3,16 +3,16 @@
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
 - Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because index is out of bounds)
-  - Abstract RAC: INCOMPLETE (terminated because index is out of bounds)
+  - Concrete RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds)
+  - Abstract RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds)
 - Selected model 2: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because index is out of bounds)
-  - Abstract RAC: INCOMPLETE (terminated because index is out of bounds)
+  - Concrete RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds)
+  - Abstract RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds)
 File "bench/check-ce/jlamp_array_poly.mlw", line 22, characters 4-16:
 Sub-goal Index in array bounds of goal f'vc.
 Prover result is: Unknown (unknown) (6 steps).
 The following counterexample model could not be verified
-  (both RAC terminated because index is out of bounds):
+  (both RAC fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds):
 File array.mlw:
   Line 17:
     length : array 'a -> int = [|_ => 0|]
@@ -33,16 +33,16 @@ File jlamp_array_poly.mlw:
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
 - Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because index is out of bounds)
-  - Abstract RAC: INCOMPLETE (terminated because index is out of bounds)
+  - Concrete RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds)
+  - Abstract RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds)
 - Selected model 2: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because index is out of bounds)
-  - Abstract RAC: INCOMPLETE (terminated because index is out of bounds)
+  - Concrete RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds)
+  - Abstract RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds)
 File "bench/check-ce/jlamp_array_poly.mlw", line 21, characters 14-27:
 Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown (unknown) (12 steps).
 The following counterexample model could not be verified
-  (both RAC terminated because index is out of bounds):
+  (both RAC fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds):
 File array.mlw:
   Line 17:
     length : array 'a -> int = [|_ => 1|]
@@ -70,16 +70,16 @@ Prover result is: Valid (5 steps).
   - Concrete RAC: STUCK (failure in precondition of `g` at "bench/check-ce/jlamp_array_poly.mlw", line 24, characters 6-7)
   - Abstract RAC: STUCK (failure in precondition of `g` at "bench/check-ce/jlamp_array_poly.mlw", line 24, characters 6-7)
 - Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because index is out of bounds)
-  - Abstract RAC: INCOMPLETE (terminated because index is out of bounds)
+  - Concrete RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds)
+  - Abstract RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds)
 - Selected model 2: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because index is out of bounds)
-  - Abstract RAC: INCOMPLETE (terminated because index is out of bounds)
+  - Concrete RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds)
+  - Abstract RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds)
 File "bench/check-ce/jlamp_array_poly.mlw", line 27, characters 14-27:
 Sub-goal Postcondition of goal g'vc.
 Prover result is: Unknown (unknown) (16 steps).
 The following counterexample model could not be verified
-  (both RAC terminated because index is out of bounds):
+  (both RAC fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds):
 File array.mlw:
   Line 17:
     length : array 'a -> int = [|_ => 44|]
@@ -107,16 +107,16 @@ Prover result is: Valid (5 steps).
   - Concrete RAC: STUCK (failure in precondition of `h` at "bench/check-ce/jlamp_array_poly.mlw", line 30, characters 6-7)
   - Abstract RAC: STUCK (failure in precondition of `h` at "bench/check-ce/jlamp_array_poly.mlw", line 30, characters 6-7)
 - Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because index is out of bounds)
-  - Abstract RAC: INCOMPLETE (terminated because index is out of bounds)
+  - Concrete RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds)
+  - Abstract RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds)
 - Selected model 2: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because index is out of bounds)
-  - Abstract RAC: INCOMPLETE (terminated because index is out of bounds)
+  - Concrete RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds)
+  - Abstract RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds)
 File "bench/check-ce/jlamp_array_poly.mlw", line 33, characters 14-27:
 Sub-goal Postcondition of goal h'vc.
 Prover result is: Unknown (unknown) (17 steps).
 The following counterexample model could not be verified
-  (both RAC terminated because index is out of bounds):
+  (both RAC fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds):
 File array.mlw:
   Line 17:
     length : array 'a -> int = [|_ => 44|]

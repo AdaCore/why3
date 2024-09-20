@@ -514,12 +514,12 @@ let rac_execute ctx rs =
         Pp.print_option_or_default "unknown location" Loc.pp_position in
       let reason = asprintf "%s at %a" reason print_oloc l in
       Res_stuck reason, Log.flush_log ctx.cntr_env.log_uc
-  | Cannot_evaluate reason ->
-      let reason = sprintf "terminated because %s" reason in
-      Res_incomplete reason, Log.empty_log
-  | Cannot_decide (ctx,_terms,reason) ->
+  | Cannot_decide (ctx,terms,reason) ->
       let reason = sprintf "terminated because %s" reason in
       Res_incomplete reason, Log.flush_log ctx.cntr_env.log_uc
+  | FatalRACError (log, x) when not (Debug.test_flag Debug.stack_trace) ->
+      let reason = sprintf "fatal rac error: %s" x in
+      Res_incomplete reason, Log.flush_log log
   | x when not (Debug.test_flag Debug.stack_trace) ->
       let reason = sprintf "terminated with uncaught exception `%s`" (Printexc.to_string x) in
       Res_incomplete reason, Log.empty_log

@@ -367,6 +367,12 @@ exception Cannot_decide of cntr_ctx * Term.term list * string
 (** The check cannot be decided (for example, because the execution is
     incomplete *)
 
+exception FatalRACError of Log.log_uc * string
+(** The RAC couldn't continue execution because of a fatal error *)
+
+val fatal_rac_error : Log.log_uc -> ('a, Format.formatter, unit, 'b) format4 -> 'a
+(** Raise a {!FatalRACError} with a formatted string. *)
+
 val stuck : ?loc:Loc.position -> cntr_ctx ->
   ('a, Format.formatter, unit, 'b) format4 -> 'a
 (** Raise an exception {!Stuck} with a formatted string. *)

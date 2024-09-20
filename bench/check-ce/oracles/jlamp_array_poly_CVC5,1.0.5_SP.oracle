@@ -80,13 +80,13 @@ Prover result is: Valid (1311 steps).
   - Concrete RAC: STUCK (failure in precondition of `g` at "bench/check-ce/jlamp_array_poly.mlw", line 24, characters 6-7)
   - Abstract RAC: STUCK (failure in precondition of `g` at "bench/check-ce/jlamp_array_poly.mlw", line 24, characters 6-7)
 - Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because index is out of bounds)
-  - Abstract RAC: INCOMPLETE (terminated because index is out of bounds)
+  - Concrete RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds)
+  - Abstract RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds)
 File "bench/check-ce/jlamp_array_poly.mlw", line 27, characters 14-27:
 Sub-goal Postcondition of goal g'vc.
 Prover result is: Step limit exceeded (150085 steps).
 The following counterexample model could not be verified
-  (both RAC terminated because index is out of bounds):
+  (both RAC fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds):
 File array.mlw:
   Line 16:
     elts : array t -> int -> t = [|_ => [|_ => {Array.to_int => 0}|]|]

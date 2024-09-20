@@ -1,13 +1,13 @@
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Postcondition of `set` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to set at "bench/check-ce/maps_poly.mlw", line 10, characters 9-23)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to set at "bench/check-ce/maps_poly.mlw", line 10, characters 9-23)
 - Selected model 1: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 8, characters 14-28)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 10, characters 17-19)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 10, characters 17-19)
 - Checked model 2: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 8, characters 14-28)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 10, characters 17-19)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 10, characters 17-19)
 File "bench/check-ce/maps_poly.mlw", line 8, characters 14-28:
 Sub-goal Postcondition of goal test_map'vc.
 Prover result is: Unknown (unknown) (11 steps).
@@ -53,19 +53,19 @@ File maps_poly.mlw:
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because an undefined argument was passed to (@))
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to get at "bench/check-ce/maps_poly.mlw", line 16, characters 22-36)
+  - Concrete RAC: INCOMPLETE (fatal rac error: an undefined argument was passed to (@))
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to get at "bench/check-ce/maps_poly.mlw", line 16, characters 22-36)
 - Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because unexpected arguments passed to (@))
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 16, characters 31-33)
+  - Concrete RAC: INCOMPLETE (fatal rac error: unexpected arguments passed to (@))
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 16, characters 31-33)
 - Selected model 2: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because unexpected arguments passed to (@))
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 16, characters 31-33)
+  - Concrete RAC: INCOMPLETE (fatal rac error: unexpected arguments passed to (@))
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 16, characters 31-33)
 File "bench/check-ce/maps_poly.mlw", line 14, characters 14-34:
 Sub-goal Postcondition of goal test_map_multidim1'vc.
 Prover result is: Unknown (unknown) (10 steps).
 The following counterexample model could not be verified
-  (concrete RAC terminated because unexpected arguments passed to (@), abstract RAC terminated because missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 16, characters 31-33):
+  (concrete RAC fatal rac error: unexpected arguments passed to (@), abstract RAC fatal rac error: missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 16, characters 31-33):
 File maps_poly.mlw:
   Line 13:
     x : int -> int -> int = [|_ => [|_ => 0|]|]
@@ -99,19 +99,19 @@ File maps_poly.mlw:
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because an undefined argument was passed to (@))
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to get at "bench/check-ce/maps_poly.mlw", line 21, characters 13-25)
+  - Concrete RAC: INCOMPLETE (fatal rac error: an undefined argument was passed to (@))
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to get at "bench/check-ce/maps_poly.mlw", line 21, characters 13-25)
 - Checked model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because unexpected arguments passed to (@))
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 21, characters 21-23)
+  - Concrete RAC: INCOMPLETE (fatal rac error: unexpected arguments passed to (@))
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 21, characters 21-23)
 - Selected model 2: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because unexpected arguments passed to (@))
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 21, characters 21-23)
+  - Concrete RAC: INCOMPLETE (fatal rac error: unexpected arguments passed to (@))
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 21, characters 21-23)
 File "bench/check-ce/maps_poly.mlw", line 19, characters 14-34:
 Sub-goal Postcondition of goal test_map_multidim2'vc.
 Prover result is: Unknown (unknown) (15 steps).
 The following counterexample model could not be verified
-  (concrete RAC terminated because unexpected arguments passed to (@), abstract RAC terminated because missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 21, characters 21-23):
+  (concrete RAC fatal rac error: unexpected arguments passed to (@), abstract RAC fatal rac error: missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 21, characters 21-23):
 File ref.mlw:
   Line 18:
     x : int -> int -> int = [|_ => [|_ => 0|]|]
@@ -148,13 +148,13 @@ File maps_poly.mlw:
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Postcondition of `set` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to set at "bench/check-ce/maps_poly.mlw", line 28, characters 9-23)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to set at "bench/check-ce/maps_poly.mlw", line 28, characters 9-23)
 - Selected model 1: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 26, characters 14-28)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 28, characters 17-19)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 28, characters 17-19)
 - Checked model 2: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 26, characters 14-28)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 28, characters 17-19)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 28, characters 17-19)
 File "bench/check-ce/maps_poly.mlw", line 26, characters 14-28:
 Sub-goal Postcondition of goal proj_map_test1'vc.
 Prover result is: Unknown (unknown) (11 steps).
@@ -201,13 +201,13 @@ File maps_poly.mlw:
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Postcondition of `set` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to set at "bench/check-ce/maps_poly.mlw", line 33, characters 9-26)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to set at "bench/check-ce/maps_poly.mlw", line 33, characters 9-26)
 - Selected model 1: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 31, characters 14-28)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 33, characters 17-19)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 33, characters 17-19)
 - Checked model 2: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 31, characters 14-28)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 33, characters 17-19)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 33, characters 17-19)
 File "bench/check-ce/maps_poly.mlw", line 31, characters 14-28:
 Sub-goal Postcondition of goal proj_map_test2'vc.
 Prover result is: Unknown (unknown) (8 steps).
