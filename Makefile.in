@@ -1849,16 +1849,22 @@ DRVDOT = $(patsubst %,doc/generated/drivers-%.dot, smt tptp coq isabelle pvs)
 
 DOC = index zebibliography genindex \
   foreword starting whyml api install manpages syntaxref vcgen \
-  input_formats exec itp technical changes
+  input_formats exec itp technical changes 
 
-DOCRST = $(DOC:%=doc/%.rst) doc/manual.bib
+DOCRST = $(DOC:%=doc/%.rst) doc/whyml2java.inc doc/manual.bib
 
 LIBDOT = $(patsubst %,doc/generated/library-%.dot, int array)
 
 doc/generated/library-%.dot: stdlib/%.mlw
 	bin/why3 pp --output=dep $< | tred > $@
 
-predoc: $(DRVDOT) $(LIBDOT)
+predoc: $(DRVDOT) $(LIBDOT) java-examples
+
+java-examples:
+	${MAKE} -C doc/javaexamples all
+
+clean-java-examples:
+	${MAKE} -C doc/javaexamples clean
 
 update-doc-png:
 	export UBUNTU_MENUPROXY=0; \
@@ -1874,10 +1880,10 @@ doc: doc/html/index.html
 
 TESTSAPIDOC = $(addsuffix .ml, $(addprefix examples/use_api/, $(APITESTS)))
 
-doc/html/index.html: $(DOCRST) $(DRVDOT) $(LIBDOT) $(TESTSAPIDOC) doc/conf.py
+doc/html/index.html: $(DOCRST) $(DRVDOT) $(LIBDOT) $(TESTSAPIDOC) java-examples doc/conf.py
 	$(SPHINX) -b html -d doc/.doctrees doc doc/html
 
-doc/latex/manual.tex: $(DOCRST) $(DRVDOT) $(LIBDOT) $(TESTSAPIDOC) doc/conf.py
+doc/latex/manual.tex: $(DOCRST) $(DRVDOT) $(LIBDOT) $(TESTSAPIDOC) java-examples doc/conf.py
 	$(SPHINX) -b latex -d doc/.doctrees doc doc/latex
 
 ifeq (@enable_pdf_doc@,yes)
@@ -1907,7 +1913,7 @@ doc:
 
 endif
 
-clean-doc:
+clean-doc: clean-java-examples
 	rm -rf doc/html doc/latex
 	rm -rf doc/generated/*.dot
 
