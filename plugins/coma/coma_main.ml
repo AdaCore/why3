@@ -16,6 +16,7 @@ open Coma_logic
 open Coma_syntax
 open Coma_typing
 open Ptree
+open Pmodule
 
 let debug = Debug.register_flag "coma" ~desc:"[coma] plugin debug flag"
 
@@ -40,12 +41,14 @@ let add_def (c,muc) (flat,dfl) =
   let c, gl = vc_defn c flat dfl in
   let add muc ({hs_name = {Ident.id_string = s}},f) =
     let pr = Decl.create_prsymbol (Ident.id_fresh ("vc_" ^ s)) in
+    let f = Eval_match.eval_match ~keep_trace:false muc.muc_known f in
     let d = Decl.create_prop_decl Decl.Pgoal pr f in
     let d = Pdecl.create_pure_decl d in
     Pmodule.add_pdecl ~vc:false muc d in
   let muc = List.fold_left add muc gl in
   let add muc (id,vl,f) =
     let ls = create_psymbol id (List.map (fun v -> v.vs_ty) vl) in
+    let f = Eval_match.eval_match ~keep_trace:false muc.muc_known f in
     let d = Decl.create_logic_decl [Decl.make_ls_defn ls vl f] in
     let d = Pdecl.create_pure_decl d in
     Pmodule.add_pdecl ~vc:false muc d in
