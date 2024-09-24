@@ -55,6 +55,29 @@ module SinCosSingle
     }
   = cos_approx(a --. b)
 
+  (* Example from the report *)
+  let ghost r_cos_theta (r theta : usingle)
+     (ghost r_exact theta_exact r_err theta_err :real)
+     requires { cos_max >=. 3.1416 }
+     requires { 0.0 <=. to_real r <=. 1.0 }
+     requires { 0.0 <=. r_exact <=. 1.0 }
+     requires { -3.1416 <=. to_real theta <=. 3.1416 }
+     requires { -3.1416 <=. theta_exact <=. 3.1416 }
+     requires { abs(to_real r -. r_exact) <=. r_err }
+     requires { abs(to_real theta -. theta_exact) <=. theta_err }
+     ensures {
+       let t1 = 1.0 +. eps in
+       let t3 = theta_err *. (1.0 +. cos_rel_err) +. cos_abs_err in
+       abs (to_real result -. r_exact *. cos theta_exact) <=.
+          (* relative error *)
+          (eps +. cos_rel_err *. t1) *. abs (r_exact *. cos theta_exact) +.
+          (* absolute error *)
+           (t3 *. abs r_exact
+            +. (r_err +. r_err *. cos_rel_err) *. abs (cos theta_exact)
+            +. r_err *. t3)  *. t1
+           +. eta }
+   = r **. cos_approx theta
+
   lemma cos_square_plus_sine_square : forall x. cos x *. cos x +. sin x *. sin x = 1.
 
   let ghost cos_and_sine_example (a :usingle)

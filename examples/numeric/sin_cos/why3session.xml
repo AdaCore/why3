@@ -136,6 +136,128 @@ abs (to_real result -. t1)
   </goal>
  </transf>
  </goal>
+ <goal name="r_cos_theta&#39;vc" expl="VC for r_cos_theta" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="r_cos_theta&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.075687" steps="18382"/></proof>
+  </goal>
+  <goal name="r_cos_theta&#39;vc.1" expl="postcondition" proved="true">
+  <transf name="assert" proved="true" arg1="let t = cos theta_exact in
+let t1 = 1.0 +. eps in
+let t2 = r_exact *. t in
+let t3 = (theta_err *. (1.0 +. cos_rel_err)) +. cos_abs_err in
+abs (to_real result -. t2)
+&lt;=. (((eps +. (((0.0 +. cos_rel_err) +. (0.0 *. cos_rel_err)) *. t1))
+      *. abs t2)
+     +. ((((((t3 +. (t3 *. 0.0)) *. abs r_exact)
+            +. ((r_err +. (r_err *. cos_rel_err)) *. abs t))
+           +. (r_err *. t3))
+          *. t1)
+         +. eta))">
+   <goal name="r_cos_theta&#39;vc.1.0" expl="asserted formula" proved="true">
+   <transf name="assert" proved="true" arg1="abs (to_real result -. (r_exact *. cos theta_exact))
+&lt;=. (((eps
+       +. (((0.0 +. cos_rel_err) +. (0.0 *. cos_rel_err)) *. (1.0 +. eps)))
+      *. abs (r_exact *. cos theta_exact))
+     +. ((((((((theta_err *. (1.0 +. cos_rel_err)) +. cos_abs_err)
+              +. (((theta_err *. (1.0 +. cos_rel_err)) +. cos_abs_err) *. 0.0))
+             *. abs r_exact)
+            +. ((r_err +. (r_err *. cos_rel_err)) *. abs (cos theta_exact)))
+           +. (r_err *. ((theta_err *. (1.0 +. cos_rel_err)) +. cos_abs_err)))
+          *. (1.0 +. eps))
+         +. eta))">
+    <goal name="r_cos_theta&#39;vc.1.0.0" expl="asserted formula" proved="true">
+    <transf name="assert" proved="true" arg1="abs (to_real result -. (r_exact *. cos theta_exact))
+&lt;=. (((eps
+       +. (((0.0 +. cos_rel_err) +. (0.0 *. cos_rel_err)) *. (1.0 +. eps)))
+      *. (abs r_exact *. abs (cos theta_exact)))
+     +. ((((((((theta_err *. (1.0 +. cos_rel_err)) +. cos_abs_err)
+              +. (((theta_err *. (1.0 +. cos_rel_err)) +. cos_abs_err) *. 0.0))
+             *. abs r_exact)
+            +. ((r_err +. (r_err *. cos_rel_err)) *. abs (cos theta_exact)))
+           +. (r_err *. ((theta_err *. (1.0 +. cos_rel_err)) +. cos_abs_err)))
+          *. (1.0 +. eps))
+         +. eta))">
+     <goal name="r_cos_theta&#39;vc.1.0.0.0" expl="asserted formula" proved="true">
+     <transf name="apply" proved="true" arg1="umul_single_error_propagation" arg2="with" arg3="r,o">
+      <goal name="r_cos_theta&#39;vc.1.0.0.0.0" expl="apply premises" proved="true">
+      <proof prover="2"><result status="valid" time="0.034440" steps="10455"/></proof>
+      </goal>
+      <goal name="r_cos_theta&#39;vc.1.0.0.0.1" expl="apply premises" proved="true">
+      <transf name="assert" proved="true" arg1="abs (to_real o -. cos theta_exact)
+&lt;=. ((abs (cos theta_exact) *. cos_rel_err)
+     +. ((theta_err *. (1.0 +. cos_rel_err)) +. cos_abs_err))">
+       <goal name="r_cos_theta&#39;vc.1.0.0.0.1.0" expl="asserted formula" proved="true">
+       <transf name="assert" proved="true" arg1="abs (to_real o -. cos theta_exact)
+&lt;=. ((cos_rel_err *. abs (cos theta_exact))
+     +. ((((0.0 *. abs theta_exact) +. theta_err) *. (1.0 +. cos_rel_err))
+         +. cos_abs_err))">
+        <goal name="r_cos_theta&#39;vc.1.0.0.0.1.0.0" expl="asserted formula" proved="true">
+        <transf name="apply" proved="true" arg1="cos_single_error_propagation" arg2="with" arg3="theta">
+         <goal name="r_cos_theta&#39;vc.1.0.0.0.1.0.0.0" expl="apply premises" proved="true">
+         <proof prover="3"><result status="valid" time="0.046310" steps="115"/></proof>
+         </goal>
+         <goal name="r_cos_theta&#39;vc.1.0.0.0.1.0.0.1" expl="apply premises" proved="true">
+         <proof prover="1"><result status="valid" time="0.094868" steps="11544"/></proof>
+         </goal>
+         <goal name="r_cos_theta&#39;vc.1.0.0.0.1.0.0.2" expl="apply premises" proved="true">
+         <proof prover="1"><result status="valid" time="0.098224" steps="12330"/></proof>
+         </goal>
+         <goal name="r_cos_theta&#39;vc.1.0.0.0.1.0.0.3" expl="apply premises" proved="true">
+         <proof prover="2"><result status="valid" time="0.023216" steps="10427"/></proof>
+         </goal>
+        </transf>
+        </goal>
+        <goal name="r_cos_theta&#39;vc.1.0.0.0.1.0.1" expl="asserted formula" proved="true">
+        <proof prover="4"><result status="valid" time="0.064401" steps="18114"/></proof>
+        </goal>
+       </transf>
+       </goal>
+       <goal name="r_cos_theta&#39;vc.1.0.0.0.1.1" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.079626" steps="11675"/></proof>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="r_cos_theta&#39;vc.1.0.0.0.2" expl="apply premises" proved="true">
+      <proof prover="4"><result status="valid" time="0.061767" steps="17920"/></proof>
+      </goal>
+      <goal name="r_cos_theta&#39;vc.1.0.0.0.3" expl="apply premises" proved="true">
+      <proof prover="1"><result status="valid" time="0.086744" steps="11541"/></proof>
+      </goal>
+      <goal name="r_cos_theta&#39;vc.1.0.0.0.4" expl="apply premises" proved="true">
+      <proof prover="2"><result status="valid" time="0.022957" steps="10427"/></proof>
+      </goal>
+      <goal name="r_cos_theta&#39;vc.1.0.0.0.5" expl="apply premises" proved="true">
+      <proof prover="1"><result status="valid" time="0.079607" steps="11544"/></proof>
+      </goal>
+      <goal name="r_cos_theta&#39;vc.1.0.0.0.6" expl="apply premises" proved="true">
+      <proof prover="1"><result status="valid" time="0.153593" steps="12234"/></proof>
+      </goal>
+      <goal name="r_cos_theta&#39;vc.1.0.0.0.7" expl="apply premises" proved="true">
+      <proof prover="3"><result status="valid" time="0.051416" steps="116"/></proof>
+      </goal>
+      <goal name="r_cos_theta&#39;vc.1.0.0.0.8" expl="apply premises" proved="true">
+      <proof prover="4"><result status="valid" time="0.065793" steps="17891"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="r_cos_theta&#39;vc.1.0.0.1" expl="asserted formula" proved="true">
+     <proof prover="3"><result status="valid" time="0.133010" steps="319"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="r_cos_theta&#39;vc.1.0.1" expl="asserted formula" proved="true">
+    <proof prover="1"><result status="valid" time="0.075931" steps="11882"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="r_cos_theta&#39;vc.1.1" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.021558" steps="10802"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
  <goal name="cos_square_plus_sine_square" proved="true">
  <proof prover="0"><result status="valid" time="1.733453" steps="19033"/></proof>
  </goal>
