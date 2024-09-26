@@ -590,7 +590,8 @@ let first_good_model: strategy_from_verdict = fun classified_models ->
         cmptr (fun (i,_,_,_,_,_) -> -i) (-);
       ] in
     let not_empty (_,_,m,_,_,_) = not (Model_parser.is_model_empty m) in
-    List.sort compare (List.filter not_empty other_models)
+    let non_empty_models = (List.filter not_empty other_models) in
+        List.sort compare non_empty_models
   else
     let classification_index = function
       | NC -> 0 | SW -> 1 | NC_SW -> 2
@@ -753,7 +754,12 @@ let get_rac_results ~limits ?verb_lvl ?compute_term
     i,r,m,normal_res,giant_res in
   List.map add_rac_result models
 
-let dummy_concrete_term = Epsilon ("_", Const (Boolean true))
+let model_element_of_unmatched_log_entry ?loc id me_concrete_value ty =
+  if id.id_string <> "zero" && id.id_string <> "one" then
+    let dummy_term = Term.t_true in
+    let dummy_ls = create_lsymbol (Ident.id_clone id) [] (Some ty) in
+    Some {me_concrete_value; me_lsymbol = dummy_ls; me_kind = Other; me_value = dummy_term; me_location = None; me_attrs = Sattr.empty}
+  else None 
 
 let id_name {id_string= name; id_attrs= attrs} =
   Ident.(get_model_trace_string ~name ~attrs)
@@ -762,13 +768,48 @@ let id_name {id_string= name; id_attrs= attrs} =
 let concrete_string_from_vs vs =
   Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs
 
-let rec concrete_term_of_term (m : concrete_syntax_term Mvs.t) =
+let concrete_of_constant c = (match c with
+| Constant.ConstInt { il_kind; il_int } ->
+  Const (Integer {int_value={il_kind; il_int};
+                  int_verbatim= BigInt.to_string il_int })
+| Constant.ConstReal rconst ->
+  Const (Real
+  {real_value = rconst;
+   real_verbatim = (asprintf
+                    "%a" (Number.(print_real_constant full_support)) rconst)})
+| Constant.ConstStr s -> Const (String s))
+
+let rec concrete_of_cexp (mpv : concrete_syntax_term Mpv.t) (mv : concrete_syntax_term Mvs.t) (c:cexp) : concrete_syntax_term =
+  match c.c_node with
+| Capp (rs, pvsymbols) ->
+  let get_pv pv = Mpv.find_def (Var (concrete_string_from_vs pv.pv_vs)) pv mpv in
+  Apply (id_name rs.rs_name, List.map get_pv pvsymbols)
+| Cpur (_, _) -> failwith "Cannot convert Cpur to model value"
+| Cfun e -> concrete_of_expr mpv mv e
+| Cany -> failwith "Cannot convert Cany to model value"
+
+and concrete_of_expr (mpv : concrete_syntax_term Mpv.t) (mv : concrete_syntax_term Mvs.t) (e: expr) =
+  match e.e_node with
+| Econst c -> concrete_of_constant c
+| Evar v -> (Mpv.find_def (Var (concrete_string_from_vs v.pv_vs)) v mpv)
+| Eexec (cexp, _) -> concrete_of_cexp mpv mv cexp
+| Eassign _ -> failwith "Cannot convert assign expr to model value"
+| Elet (_, _) -> failwith "Cannot convert let expr to model value"
+| Eif (e, e1, e2) -> If (concrete_of_expr mpv mv e, concrete_of_expr mpv mv e1, concrete_of_expr mpv mv e2)
+| Ematch (_, _, _) -> failwith "Cannot convert match expr to model value"
+| Ewhile (_, _, _, _) -> failwith "Cannot convert while expr to model value"
+| Efor (_, _, _, _, _) -> failwith "Cannot convert for expr to model value"
+| Eraise (_, _) ->  failwith "Cannot convert raise expr to model value"
+| Eexn (_, _) -> failwith "Cannot convert exn expr to model value"
+| Eassert (_, _) -> failwith "Cannot convert assert expr to model value"
+| Eghost _ -> failwith "Cannot convert ghost expr to model value"
+| Epure t -> concrete_term_of_term mv t
+| Eabsurd -> failwith "Cannot convert absurd expr to model value"
+
+and concrete_term_of_term (m : concrete_syntax_term Mvs.t) =
   function tm ->
     match tm.t_node with
-    | Term.Tconst c -> (match c with
-    | Constant.ConstInt { il_kind; il_int } -> Const (Integer { int_value={il_kind; il_int}; int_verbatim= BigInt.to_string il_int })
-    | Constant.ConstReal rconst -> Const (Real { real_value=rconst; real_verbatim= (Format.asprintf "%a" (Number.print_real_constant Number.full_support) rconst ) })
-    | Constant.ConstStr s -> Const (String s))
+    | Term.Tconst c -> concrete_of_constant c
     | Term.Tvar v -> (try Mvs.find v m with Not_found -> concrete_var_from_vs v)
     | Term.Tapp (lsymb, ts) -> Apply (id_name lsymb.ls_name, List.map (concrete_term_of_term m) ts)
     | Term.Tif (tif, t1, t2) -> If (concrete_term_of_term m tif, concrete_term_of_term m t1, concrete_term_of_term m t2)
@@ -779,36 +820,33 @@ let rec concrete_term_of_term (m : concrete_syntax_term Mvs.t) =
       Let ([(vstring, concrete_term_of_term updated_m bo)], concrete_term_of_term updated_m t)
     | Term.Teps t -> let v, bo = t_open_bound t in
       (match bo.t_node with
-      | Tapp (ls, [{t_node = Tapp (ls',[{t_node = Tvar v'}])};u]) when ls_equal ls ps_equ && vs_equal v v' ->
-        Proj ((id_name ls'.ls_name), concrete_term_of_term m u)
-      | _  when (let vs,_,_ = t_open_lambda tm in (match vs with [_] -> true | _ -> false)) ->
-    (* Format.printf "How do I convert the function %a to a record?@." Pretty.print_term tm; *)
-          let rec unfold env vs t' =
-            match t'.t_node with
-            | Tif ({t_node = Tapp (ls, [x;t0])}, t1, t2)
-            (* , If (Apply ("=", [Var x'; ct0]), ct1, ct2)  &&  x'=vs_name*)
-                when t_equal (t_var vs) x && ls_equal ls ps_equ ->
-              let (elts, others) = unfold env vs t2 in
-              let ct0' = concrete_term_of_term m t0 in
-              let ct1' = concrete_term_of_term m t1 in
-              ({ elts_index = ct0'; elts_value = ct1' } :: elts, others)
-            | _ ->
-              let t'_concrete = concrete_term_of_term m t' in
-              ([], t'_concrete)
-          in
-          let elts,others =
-            let vs,_,t = t_open_lambda tm in
-            begin match vs with
-            | [v] -> unfold m v t
-            | _ -> assert false
-            end
-          (* if t_v_occurs vs t' = 0 then
-            let _,t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in
-            Some ([],t'_concrete)
-          else *)
-          in  
-          (* Format.printf "Sure it is %a@." print_concrete_term (FunctionLiteral {elts; others}); *)
-         FunctionLiteral {elts; others}
+      (* eps x. proj x = u : value u projected with proj *)
+      | Tapp (ls, [{t_node = Tapp (proj,[{t_node = Tvar v'}])};u]) when ls_equal ls ps_equ && vs_equal v v' ->
+        Proj ((id_name proj.ls_name), concrete_term_of_term m u)
+      (* the term is a lambda function. In case it has a single argument, it is an array *)
+      | _  when (let vs,_,_ = t_open_lambda tm in vs <> []) ->
+        let rec get_array env vs t' =
+          match t'.t_node with
+          | Tif ({t_node = Tapp (ls, [x;t0])}, t1, t2)
+              when t_equal (t_var vs) x && ls_equal ls ps_equ ->
+            let (elts, others) = get_array env vs t2 in
+            let ct0' = concrete_term_of_term m t0 in
+            let ct1' = concrete_term_of_term m t1 in
+            ({ elts_index = ct0'; elts_value = ct1' } :: elts, others)
+          | _ ->
+            let t'_concrete = concrete_term_of_term m t' in
+            ([], t'_concrete)
+        in
+          let vs,_,t = t_open_lambda tm in
+          begin match vs with
+          | [v] -> let elts, others = get_array m v t in FunctionLiteral {elts; others}
+          | (v::_) as vs ->
+            let concrete_vars = List.map concrete_string_from_vs vs in
+            let updated_map = List.fold_left (fun acc v -> Mvs.add v (Var (concrete_string_from_vs v)) acc) m vs in
+            let function_body = concrete_term_of_term updated_map t in
+            Function {args= concrete_vars; body= function_body}
+          | [] -> assert false
+          end
       | _ ->
       let vstring = concrete_string_from_vs v in
       Epsilon (vstring, concrete_term_of_term (Mvs.add v (Var vstring) m) bo))
@@ -827,38 +865,45 @@ let rec concrete_term_of_term (m : concrete_syntax_term Mvs.t) =
 
 let rec model_value v =
   let open Value in
-    match v_desc v with
-    | Vnum i -> Const (Integer { int_value={il_kind = ILitUnk;  il_int = i}; int_verbatim= BigInt.to_string i })
-    | Vstring s -> Const (String s)
-    | Vbool b -> Const (Boolean b)
-    | Vproj (ls, v) -> Proj ((id_name ls.ls_name), model_value v)
-    | Varray a ->
-      let aux i v = {
+  match v_desc v with
+  | Vnum i -> concrete_of_constant (Constant.ConstInt { il_kind = ILitUnk; il_int = i })
+  | Vstring s -> Const (String s)
+  | Vbool b -> Const (Boolean b)
+  | Vproj (ls, v) -> Proj ((id_name ls.ls_name), model_value v)
+  | Varray a ->
+    let aux i v = {
       elts_index= Const (Integer {
-      int_value= {il_kind = ILitUnk; il_int = BigInt.of_int i};
-      int_verbatim= string_of_int i
-      });
-      elts_value= model_value v
-      } in
-      FunctionLiteral {
-      elts= List.mapi aux (Array.to_list a);
-      (* Others is not handled *)
-      others= Epsilon ("_", Const (Boolean true));
-      }
-      | Vconstr (Some rs, frs, fs) -> (
-      let vs = List.map (fun f -> model_value (field_get f)) fs in
-      if Strings.has_suffix "'mk" rs.rs_name.id_string then
-        (* same test for record-ness as in smtv2.ml *)
-        let ns = List.map (fun rs -> id_name rs.rs_name) frs in
-        Record (List.combine ns vs)
-      else
-        Apply (id_name rs.rs_name, vs) )
-        (* | Vreal _ | Vfloat _ | Vfloat_mode _ -> failwith "Cannot convert real to model value"
-        | Vfun _ | Vpurefun _  -> failwith "Cannot convert fun to model value"
-        | Vconstr (None, _,_) -> failwith "Cannot convert vconstr without rsymbol to model value" *)
-        | Vundefined -> dummy_concrete_term
-        | Vterm t -> concrete_term_of_term Mvs.empty t
-        | _ -> Format.eprintf "INCOMPLETE model_value@."; failwith "Cannot convert value to model value"
+                  int_value= {il_kind = ILitUnk; il_int = BigInt.of_int i};
+                  int_verbatim= string_of_int i });
+      elts_value= model_value v }
+    in
+    FunctionLiteral {
+    elts= List.mapi aux (Array.to_list a);
+    (* Others is not handled *)
+    others= Epsilon ("_", Const (Boolean true));
+    }
+  | Vconstr (Some rs, frs, fs) -> (
+    let vs = List.map (fun f -> model_value (field_get f)) fs in
+    if Strings.has_suffix "'mk" rs.rs_name.id_string then
+      (* same test for record-ness as in smtv2.ml *)
+      let ns = List.map (fun rs -> id_name rs.rs_name) frs in
+      Record (List.combine ns vs)
+    else
+      Apply (id_name rs.rs_name, vs) )
+  | Vconstr (None, frs,fs) -> (* TODO if I understand correctly, this is a record as well *)
+    let vs = List.map (fun f -> model_value (field_get f)) fs in
+    let ns = List.map (fun rs -> id_name rs.rs_name) frs in
+    Record (List.combine ns vs)
+  (* Why does the Vfun case happen? Also, I didn't see these values show up in the end *)
+  | Vfun (vars, bvar, e) -> concrete_of_expr Mpv.empty (Mvs.of_list [bvar, Var (concrete_string_from_vs bvar)]) e
+  | Vpurefun _  -> failwith "Cannot convert pure fun to model value"
+  | Vundefined -> (Const (String "undefined"))
+  | Vterm t -> concrete_term_of_term Mvs.empty t
+  | Vreal r -> 
+    let dummy_real = Number.real_literal ~radix:10 ~neg:false ~int:"42" ~frac:"" ~exp:None in
+    Const (Real {real_value = dummy_real ; real_verbatim = (asprintf "%a" Big_real.print_real r)})
+  | Vfloat _ | Vfloat_mode _ -> failwith "Cannot convert real to model value"
+  (* | _ -> Format.eprintf "INCOMPLETE model_value@."; failwith "Cannot convert value to model value" *)
 
 (* let model_value v =
   Format.printf ">>>> value: %a@." print_value v;
@@ -869,20 +914,28 @@ let rec model_value v =
 (** Transform an interpretation log into a prover model.
     TODO fail if the log doesn't fail at the location of the original model *)
 let model_of_exec_log ~original_model log =
+  (* Format.printf "The full rac log (in json) is@ %a@." Json_base.print_json (Log.json_log log);
+  Format.printf "And the original model is@ %a@." Json_base.print_json (Model_parser.json_model original_model); *)
   let me loc id value =
-  Option.map (fun me ->
+  (* Format.eprintf "haben sie ein %s at loc %a?@."
+    id.id_string
+    Loc.pp_position loc; *)
+ let result = (search_model_element_for_id original_model ~loc id) in
+  (* (match result with None -> Format.eprintf "no@." | Some _ -> Format.eprintf "yes@."); *)
+  (match result with
+  | Some me ->
     (* let name = asprintf "%a" print_decoded id.id_string in
     let me_name = get_model_trace_string ~name ~attrs:id.id_attrs in *)
     (* Format.printf "the concrete value was %a@." print_concrete_term me.me_concrete_value;
     Format.printf "the incoming value is %a@." print_value value;
     Format.printf "so why not put %a in the model?@." print_concrete_term (model_value value); *)
     (* Format.printf "loc %a concrete value @[%a@]. to @[%a@]@." Loc.pp_position loc print_concrete_term me.me_concrete_value print_concrete_term (model_value value); *)
-    {me with me_concrete_value = model_value value}
+    Some {me with me_concrete_value = model_value value}
     (* This is only used for display. AFAIK nobody uses Why3 terms for display, so let's just return a useless term *)
     (* let me_value = Term.t_bool_false in
     Some { me_name;me_kind;me_attrs;me_value; me_location = loc; me_concrete_value; me_lsymbol} *)
+  | None -> model_element_of_unmatched_log_entry ~loc id (model_value value) value.v_ty
   )
- (search_model_element_for_id original_model ~loc id)
   in
   let aux (e: Log.log_entry) = match e.Log.log_loc with
     | Some loc when not Loc.(equal loc dummy_position) -> (
@@ -891,6 +944,8 @@ let model_of_exec_log ~original_model log =
             Option.to_list (me loc id v)
         | Log.Exec_failed (_, mid) ->
             Mid.fold (fun id v l -> Option.to_list (me loc id v) @ l) mid []
+        | Log.Res_assumed (ors,v) -> (* Results are expected to have the special name "result"? TODO: make this match the model element kind *)
+            Option.to_list (Option.bind ors (fun rs -> (me loc (Ident.id_register (Ident.id_derive "result" rs.rs_name)) v)))
         | _ -> [])
     | _ -> [] in
   let aux_l e =
@@ -905,6 +960,7 @@ let model_of_exec_log ~original_model log =
 let select_model_from_verdict models =
   let classified_models =
     let add_verdict_and_rac_model (i,r,prover_model,normal_res,giant_res) =
+      (* Format.eprintf "The prover model is %a@." Json_base.print_json (Model_parser.json_model prover_model); *)
       let model,verdict = match normal_res,giant_res with
       | RAC_not_done reason, _ | _, RAC_not_done reason ->
           prover_model, (INCOMPLETE reason, Log.empty_log)
@@ -915,7 +971,8 @@ let select_model_from_verdict models =
           classify ~vc_term_loc ~vc_term_attrs
             ~normal_result:(normal_state,normal_log)
             ~giant_step_result:(giant_state,giant_log)
-          in (model_of_exec_log ~original_model:prover_model giant_log), verdict
+          in (model_of_exec_log ~original_model:prover_model normal_log), verdict
+          (* in prover_model, verdict *)
       in
       i,r,model,normal_res,giant_res,verdict in
     List.map add_verdict_and_rac_model models in
@@ -923,6 +980,7 @@ let select_model_from_verdict models =
     match List.nth_opt (first_good_model classified_models) 0 with
     | None -> None, None
     | Some (i,_,m,_,_,s) -> Some (m, s), Some i in
+    (* Format.printf "Selected index: %a@." (Pp.print_option_or_default "None" Pp.int) selected_ix; *)
   if classified_models <> [] then
     Debug.dprintf debug_check_ce_categorization "Categorizations of models:@ %a@."
       Pp.(print_list newline (print_dbg_classified_model selected_ix)) classified_models;
@@ -935,7 +993,9 @@ let select_model ~limits ?verb_lvl ?compute_term ~check_ce
     let rac_results =
       get_rac_results ~limits ?compute_term ?verb_lvl rac env pm models ~only_giant_step
     in
-    select_model_from_verdict rac_results
+    let result = select_model_from_verdict rac_results in
+    (* Format.printf "The selected model is %a@." (fun fmt o -> fprintf fmt (match o with | None -> "no" | Some _ -> "sì")) result; result *)
+    result
   else
     match select_model_last_non_empty models with
     | None -> None
