@@ -634,7 +634,7 @@ and vc_defn tt hc flat dfl =
   pl, dl_split flat pl ll, fl, gl
 
 let rec fill_wox rb = function
-  | Esym _ as o -> o
+  | Esym _ | Eany as o -> o
   | Elam (pl, e) -> Elam (pl, fill_wox rb e)
   | Edef (e, flat, dfl) ->
       let dfl = wox_defn dfl in
@@ -650,7 +650,6 @@ let rec fill_wox rb = function
   | Eapp (e, (At _|Av _|Ar _ as a)) -> Eapp (fill_wox rb e, a)
   | Ebox e -> rb := true; Ebox (fill_wox rb e)
   | Ewox e -> Ewox (fill_wox (ref false) e)
-  | Eany -> Eany
 
 and wox_defn dfl =
   List.map (fun (h,wr,pl,d) -> h, wr, pl, wox_expr d) dfl
