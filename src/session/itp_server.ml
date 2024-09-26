@@ -532,9 +532,10 @@ let get_locations (task: Task.task) =
     | None ->
       (* This case can happen when after some transformations: for example, in
          an assert, the new goal asserted is not tagged with locations *)
-      (* This error is harmless but we want to detect it when debugging. *)
-      if Debug.test_flag Debug.stack_trace then
-        raise No_loc_on_goal
+        (* This error is harmless but we want to detect it when debugging. *)
+        (* UPDATE: this is an annoying behavior when stack_trace is enabled *)
+      () (* if Debug.test_flag Debug.stack_trace then
+            raise No_loc_on_goal *)
     | Some loc -> color_loc ~color:Goal_color ~loc in
   let goal_id : Ident.ident = (Task.task_goal task).Decl.pr_name in
   color_goal goal_id.Ident.id_loc;
