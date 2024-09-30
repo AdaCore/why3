@@ -754,13 +754,6 @@ let get_rac_results ~limits ?verb_lvl ?compute_term
     i,r,m,normal_res,giant_res in
   List.map add_rac_result models
 
-let model_element_of_unmatched_log_entry ?loc id me_concrete_value ty =
-  if id.id_string <> "zero" && id.id_string <> "one" then
-    let dummy_term = Term.t_true in
-    let dummy_ls = create_lsymbol (Ident.id_clone id) [] (Some ty) in
-    Some {me_concrete_value; me_lsymbol = dummy_ls; me_kind = Other; me_value = dummy_term; me_location = None; me_attrs = Sattr.empty}
-  else None 
-
 let id_name {id_string= name; id_attrs= attrs} =
   Ident.(get_model_trace_string ~name ~attrs)
   (* Ident.get_model_trace_string ~name ~attrs *)
@@ -911,33 +904,42 @@ let rec model_value v =
   Format.printf "<<<< concrete_term: %a@." print_concrete_term the_concrete_term;
   the_concrete_term *)
 
+(** In case there is no model element in the smt2 model at a LOC that is present in the RAC log,
+    this function fills the missing information to create a model element *)
+let model_element_of_unmatched_log_entry ?loc id me_concrete_value ty =
+  if id.id_string <> "zero" && id.id_string <> "one" then
+    let dummy_term = Term.t_true in
+    let dummy_ls = create_lsymbol (Ident.id_clone id) [] (Some ty) in
+    Some {me_concrete_value; me_lsymbol = dummy_ls; me_kind = Other; me_value = dummy_term; me_location = None; me_attrs = Sattr.empty}
+  else None 
+
+
 (** Transform an interpretation log into a prover model.
     TODO fail if the log doesn't fail at the location of the original model *)
 let model_of_exec_log ~original_model log =
-  (* Format.printf "The full rac log (in json) is@ %a@." Json_base.print_json (Log.json_log log);
-  Format.printf "And the original model is@ %a@." Json_base.print_json (Model_parser.json_model original_model); *)
   let me loc id value =
-  (* Format.eprintf "haben sie ein %s at loc %a?@."
-    id.id_string
-    Loc.pp_position loc; *)
  let result = (search_model_element_for_id original_model ~loc id) in
-  (* (match result with None -> Format.eprintf "no@." | Some _ -> Format.eprintf "yes@."); *)
+  (* If the log entry corresponds to an element that is present in the model
+  log, we reuse that element and substitute the concrete value (this is not
+  great, we should at least check that the symbols correspond; nevertheless, if
+  they are at the same LOC we can bet they are at leas related? TODO anyways).
+  If there is no model element in the prover model, we fabricate a minimal model
+  element with the information we can extract from the log entry (in particular,
+  we have no term and no lsymbol!)*)
   (match result with
   | Some me ->
-    (* let name = asprintf "%a" print_decoded id.id_string in
-    let me_name = get_model_trace_string ~name ~attrs:id.id_attrs in *)
-    (* Format.printf "the concrete value was %a@." print_concrete_term me.me_concrete_value;
-    Format.printf "the incoming value is %a@." print_value value;
-    Format.printf "so why not put %a in the model?@." print_concrete_term (model_value value); *)
-    (* Format.printf "loc %a concrete value @[%a@]. to @[%a@]@." Loc.pp_position loc print_concrete_term me.me_concrete_value print_concrete_term (model_value value); *)
-    Some {me with me_concrete_value = model_value value}
+    (*
+    let name = asprintf "%a" print_decoded id.id_string in
+    let me_name = get_model_trace_string ~name ~attrs:id.id_attrs in
+    Format.printf "loc %a concrete value @[%a@]. to @[%a@]@." Loc.pp_position loc print_concrete_term me.me_concrete_value print_concrete_term (model_value value);
     (* This is only used for display. AFAIK nobody uses Why3 terms for display, so let's just return a useless term *)
-    (* let me_value = Term.t_bool_false in
+    let me_value = Term.t_bool_false in
     Some { me_name;me_kind;me_attrs;me_value; me_location = loc; me_concrete_value; me_lsymbol} *)
+    Some {me with me_concrete_value = model_value value}
   | None -> model_element_of_unmatched_log_entry ~loc id (model_value value) value.v_ty
   )
   in
-  let aux (e: Log.log_entry) = match e.Log.log_loc with
+  let me_of_log_entry e = match e.Log.log_loc with
     | Some loc when not Loc.(equal loc dummy_position) -> (
         match e.Log.log_desc with
         | Log.Val_assumed (id, v) ->
@@ -948,13 +950,13 @@ let model_of_exec_log ~original_model log =
             Option.to_list (Option.bind ors (fun rs -> (me loc (Ident.id_register (Ident.id_derive "result" rs.rs_name)) v)))
         | _ -> [])
     | _ -> [] in
-  let aux_l e =
-    let res = List.concat (List.map aux e) in
+  let me_of_log_line e =
+    let res = List.concat (List.map me_of_log_entry e) in
     if res = [] then None else Some res in
-  let aux_mint mint =
-    let res = Wstdlib.Mint.map_filter aux_l mint in
+  let me_of_log_lines mint =
+    let res = Wstdlib.Mint.map_filter me_of_log_line mint in
     if Wstdlib.Mint.is_empty res then None else Some res in
-  let model_files = (Wstdlib.Mstr.map_filter aux_mint (Log.sort_log_by_loc log)) in
+  let model_files = (Wstdlib.Mstr.map_filter me_of_log_lines (Log.sort_log_by_loc log)) in
   set_model_files original_model model_files
 
 let select_model_from_verdict models =
