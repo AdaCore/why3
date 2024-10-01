@@ -6,9 +6,9 @@ module AdditionSqrtSingle
   use ieee_float.RoundingMode
   use real.Square
 
-  function usqrt (x:usingle) : usingle
+  val function usqrt (x:usingle) : usingle
 
-  let ghost add_sqrt (a b : usingle)
+  let add_sqrt (a b : usingle)
     ensures {
       let exact = (to_real a +. to_real (usqrt b)) in
       abs (to_real result -. exact) <=. eps *. abs exact
@@ -24,9 +24,9 @@ module AdditionSqrtDouble
   use ieee_float.RoundingMode
   use real.Square
 
-  function usqrt (x:udouble) : udouble
+  val function usqrt (x:udouble) : udouble
 
-  let ghost add_sqrt (a b : udouble)
+  let add_sqrt (a b : udouble)
     ensures {
       let exact = (to_real a +. to_real (usqrt b)) in
       abs (to_real result -. exact) <=. eps *. abs exact

@@ -4,7 +4,7 @@ module SubstractionSingle
   use ufloat.USingle
   use ufloat.USingleLemmas
 
-  let ghost substraction_errors_basic (a b c : usingle)
+  let substraction_errors_basic (a b c : usingle)
     ensures {
       let exact = to_real a -. to_real b -. to_real c in
       let exact_abs = abs (to_real a) +. abs (to_real b) +. abs (to_real c) in
@@ -12,7 +12,7 @@ module SubstractionSingle
     }
   = a --. b --. c
 
-  let ghost substraction_errors (a b c d e f : usingle)
+  let substraction_errors (a b c d e f : usingle)
     ensures {
       let exact = (to_real a -. to_real b -. to_real c) -. (to_real d -.
                   (to_real e -. to_real f)) in
@@ -29,7 +29,7 @@ module SubstractionDouble
   use ufloat.UDouble
   use ufloat.UDoubleLemmas
 
-  let ghost substraction_errors_basic (a b c : udouble)
+  let substraction_errors_basic (a b c : udouble)
     ensures {
       let exact = to_real a -. to_real b -. to_real c in
       let exact_abs = abs (to_real a) +. abs (to_real b) +. abs (to_real c) in
@@ -37,7 +37,7 @@ module SubstractionDouble
     }
   = a --. b --. c
 
-  let ghost substraction_errors (a b c d e f : udouble)
+  let substraction_errors (a b c d e f : udouble)
     ensures {
       let exact = (to_real a -. to_real b -. to_real c) -. (to_real d -.
                   (to_real e -. to_real f)) in

@@ -23,14 +23,14 @@ module Helpers
     ensures { abs (sum (real_fun f) a b) <=. sum (abs_real_fun f) a b }
   = if b-a > 0 then sum_of_fun_le_sum_of_abs_fun f a (b-1)
 
-  let rec ghost function usum_rec (f : int -> usingle) (a b:int) : usingle
+  let rec function usum_rec (f : int -> usingle) (a b:int) : usingle
     requires { 0 <= b - a }
     variant { b - a }
     ensures {
       abs (to_real result -. sum (real_fun f) a b)
        <=. sum (abs_real_fun f) a b *. (eps *. from_int (b-a))
     }
-  = if b - a <= 0 then u0 else if b - a = 1 then f (b-1) else usum_rec f a (b-1) ++. f (b-1)
+  = if b - a <= 0 then uzero else if b - a = 1 then f (b-1) else usum_rec f a (b-1) ++. f (b-1)
 
   constant log_error:real
   axiom log_error_bounds : 0. <=. log_error <=. 1.
@@ -92,7 +92,7 @@ module LSE
   let ghost function exp_of_f (f: int -> usingle) = (fun i -> exp ((real_fun f) i))
 
 
-  let ghost lse (f : int -> usingle) (n:int) : usingle
+  let lse (f : int -> usingle) (n:int) : usingle
     requires { 0 < n < 8388608 }
     ensures {
       let exact = log(sum (exp_of_f f) 0 n) in
@@ -110,7 +110,7 @@ module LSE
   sum_single_error_propagation s f' exact_f' exact_f' (abs_real_fun f') n (eps *. from_int n) 0. exp_error 0.;
   assert {
     abs (to_real s -. sum (exact_f') 0 n)
-    <=. (exp_error +. (from_int n *. eps) *. (1.0 +. exp_error)) *. 
+    <=. (exp_error +. (from_int n *. eps) *. (1.0 +. exp_error)) *.
       (sum (exact_f') 0 n)
   };
   usum_strictly_pos f' 0 n;
@@ -139,7 +139,7 @@ module SLSE
   constant g_error:real = exp_error +. (exp (a_eps *. ((2. *. a_max +. 1.) *. (2. *. a_max +. 1.)) +. 1.5 *. eta) -. 1.)
      *. (1. +. exp_error)
   (* TODO: Instead bound a_max and prove a lemma on g_error_bound *)
-  axiom g_error_bound : g_error <=. 0x1p-2
+  lemma g_error_bound : g_error <=. 0x1p-2
 
   let ghost function exact_g (x y mu:usingle) : real
   =
@@ -148,10 +148,10 @@ module SLSE
   lemma compat_order_mult1 : forall x y z. 0. <=. z -> x <=. y -> x *. z <=. y *. z
   lemma compat_order_mult2 : forall x y z. 0. <=. z -> x <=. y -> z *. x <=. z *. y
 
-  let ghost function g (x y mu : usingle) =
-    exp_approx ((--.((x ++. mu --. y) **. (x ++. mu --. y))) ///. u2)
+  let function g (x y mu : usingle) =
+    exp_approx ((--.((x ++. mu --. y) **. (x ++. mu --. y))) ///. utwo)
 
-  lemma g_pos : 
+  lemma g_pos :
     forall x y mu. 0. <. to_real (g x y mu)
 
   let lemma error_of_g (x y mu : usingle)
@@ -167,7 +167,7 @@ module SLSE
   let t' = 2. *. a_max +. 1. in
   let lemma err ()
   ensures {
-    exact_g x y mu *. (exp_error +. (exp((eps +. (4. *. (eps +. eps *. eps)) *. (1. +. eps)) 
+    exact_g x y mu *. (exp_error +. (exp((eps +. (4. *. (eps +. eps *. eps)) *. (1. +. eps))
       *. ((t *. t) /. (to_real u2)) +. (eta /. to_real u2 +. eta)) -. 1.) *. (1. +. exp_error))
     <=. exact_g x y mu *. (exp_error +. (exp(a_eps *. (t' *. t') +. 1.5 *. eta) -. 1.) *. (1. +. exp_error))
   }
@@ -175,12 +175,12 @@ module SLSE
   compat_order_mult1 t t' t;
   compat_order_mult2 t t' t';
   assert {
-    exp((eps +. (4. *. (eps +. eps *. eps)) *. (1. +. eps)) 
+    exp((eps +. (4. *. (eps +. eps *. eps)) *. (1. +. eps))
       *. ((t *. t) /. (to_real u2)) +. (eta /. to_real u2 +. eta))
      <=. exp(a_eps *. (t' *. t') +. 1.5 *. eta)
   };
-  compat_order_mult2 
-     (exp_error +. (exp((eps +. (4. *. (eps +. eps *. eps)) *. (1. +. eps)) 
+  compat_order_mult2
+     (exp_error +. (exp((eps +. (4. *. (eps +. eps *. eps)) *. (1. +. eps))
        *. ((t *. t) /. (to_real u2)) +. (eta /. to_real u2 +. eta)) -. 1.) *. (1. +. exp_error))
      (exp_error +. (exp(a_eps *. (t' *. t') +. 1.5 *. eta) -. 1.) *. (1. +. exp_error))
      (exact_g x y mu);
@@ -195,12 +195,12 @@ module SLSE
   };
   (* We call the strategy on the following assertion *)
   assert { abs (to_real ret -. exact_g x y mu) <=. (exact_g x y mu) *. g_error }
-  
+
 
   let ghost function exact_f (a:int -> usingle) (mu : usingle) (n i : int) : real =
     log2(sum (fun j -> exact_g (a i) (a j) mu) 0 n)
 
-  let ghost function f (a:int -> usingle) (mu : usingle) (n i : int) : usingle
+  let function f (a:int -> usingle) (mu : usingle) (n i : int) : usingle
     requires { 0 <= i < n <= max_size }
     requires { forall k. 0 <= k < n -> abs (to_real (a k)) <=. a_max }
     requires { 0. <=. to_real mu <=. 1. }
@@ -210,7 +210,7 @@ module SLSE
         -. log2 (1. -. (g_error +. from_int n *. eps *. (1. +. g_error))) *. (1. +. log2_error)
     }
   =
-  let ghost function g' = (fun j -> if 0 <= j < n then g (a i) (a j) mu else u1) in
+  let function g' = (fun j -> if 0 <= j < n then g (a i) (a j) mu else uone) in
   let ghost function exact_g' = (fun j -> exact_g (a i) (a j) mu) in
   let s = usum_rec g' 0 n in
   sum_single_error_propagation s g' exact_g' exact_g' (abs_real_fun g') n (eps *. from_int n) 0. g_error 0.;
@@ -224,7 +224,7 @@ module SLSE
   lt_compat_order_mult_l (g_error +. (eps *. from_int n) *. (1.0 +. g_error)) 1. (sum exact_g' 0 n);
   log2_approx (s)
 
-  let ghost function slse (a:int -> usingle) (mu : usingle) (n : int) : usingle
+  let function slse (a:int -> usingle) (mu : usingle) (n : int) : usingle
     requires { 0 < n <= max_size }
     requires { forall i. 0 <= i < n -> abs (to_real (a i)) <=. a_max }
     requires { 0. <=. to_real mu <=. 1. }
@@ -237,7 +237,7 @@ module SLSE
            *. from_int n *. (1. +. eps *. from_int n)
     }
   =
-  let function f' = (fun i -> if 0 <= i < n then f a mu n i else u0) in
+  let function f' = (fun i -> if 0 <= i < n then f a mu n i else uzero) in
   let function exact_f' = (fun i -> exact_f a mu n i) in
   let function exact_f'' = (fun i -> abs (exact_f a mu n i)) in
   assert {

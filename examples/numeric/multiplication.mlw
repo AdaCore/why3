@@ -4,7 +4,7 @@ module MultiplicationSingle
   use ufloat.USingle
   use ufloat.USingleLemmas
 
-  let ghost multiplication_errors_basic (a b c : usingle)
+  let multiplication_errors_basic (a b c : usingle)
     ensures {
       let exact = to_real a *. to_real b *. to_real c in
       abs (to_real result -. exact) <=.
@@ -12,7 +12,7 @@ module MultiplicationSingle
     }
   = a **. b **. c
 
-  let ghost multiplication_errors (a b c d e f: usingle)
+  let multiplication_errors (a b c d e f: usingle)
   ensures {
     let t = 1.0 +. eps in
     let t3 = eps +. (eps *. t) in
@@ -39,7 +39,7 @@ module MultiplicationDouble
   use ufloat.UDouble
   use ufloat.UDoubleLemmas
 
-  let ghost multiplication_errors_basic (a b c : udouble)
+  let multiplication_errors_basic (a b c : udouble)
     ensures {
       let exact = to_real a *. to_real b *. to_real c in
       abs (to_real result -. exact) <=.
@@ -47,7 +47,7 @@ module MultiplicationDouble
     }
   = a **. b **. c
 
-  let ghost multiplication_errors (a b c d e f: udouble)
+  let multiplication_errors (a b c d e f: udouble)
   ensures {
     let t = 1.0 +. eps in
     let t3 = eps +. (eps *. t) in

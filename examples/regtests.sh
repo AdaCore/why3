@@ -94,6 +94,7 @@ run_dir verifythis_2016_matrix_multiplication "-L verifythis_2016_matrix_multipl
 run_dir WP_revisited ""
 run_dir prover "-L prover --warn-off=unused_variable"
 run_dir multiprecision "-L multiprecision"
+run_dir numeric ""
 echo ""
 
 echo "Score on ported programs : $success/$total"

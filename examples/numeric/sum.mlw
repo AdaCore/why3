@@ -34,13 +34,13 @@ module SumSingle
   !s
 
   (* We use the propagation lemma on IEEE addition to prove the postcondition *)
-  let rec ghost usum_rec (f : int -> usingle) (n:int) : usingle
+  let rec usum_rec (f : int -> usingle) (n:int) : usingle
     requires { 0 <= n }
     variant { n }
     ensures {
       abs (to_real result -. sum (real_fun f) 0 n) <=. sum (abs_real_fun f) 0 n *. (eps *. from_int n)
     }
-  = if n = 0 then u0 else usum_rec f (n-1) ++. f (n-1)
+  = if n = 0 then uzero else usum_rec f (n-1) ++. f (n-1)
 
   function exact_f : int -> real
   function f' : int -> real
@@ -49,7 +49,7 @@ module SumSingle
   constant f_cst_err:real
 
   (* We use the propagation on sum to prove the postcondition *)
-  let ghost function example1 (f : int -> usingle) (n : int) : usingle
+  let function example1 (f : int -> usingle) (n : int) : usingle
     requires { 0 <= n }
     requires { forall i. abs (to_real (f i) -. exact_f i) <=. f' i *. f_rel_err }
     ensures {
@@ -95,13 +95,13 @@ module SumDouble
   !s
 
   (* We use the propagation lemma on IEEE addition to prove the postcondition *)
-  let rec ghost usum_rec (f : int -> udouble) (n:int) : udouble
+  let rec usum_rec (f : int -> udouble) (n:int) : udouble
     requires { 0 <= n }
     variant { n }
     ensures {
       abs (to_real result -. sum (real_fun f) 0 n) <=. sum (abs_real_fun f) 0 n *. (eps *. from_int n)
     }
-  = if n = 0 then u0 else usum_rec f (n-1) ++. f (n-1)
+  = if n = 0 then uzero else usum_rec f (n-1) ++. f (n-1)
 
   function exact_f : int -> real
   function f' : int -> real
@@ -110,7 +110,7 @@ module SumDouble
   constant f_cst_err:real
 
   (* We use the propagation on sum to prove the postcondition *)
-  let ghost function example1 (f : int -> udouble) (n : int) : udouble
+  let function example1 (f : int -> udouble) (n : int) : udouble
     requires { 0 <= n }
     requires { forall i. abs (to_real (f i) -. exact_f i) <=. f' i *. f_rel_err }
     ensures {

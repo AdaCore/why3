@@ -13,10 +13,19 @@ module UFloat
 
   type t
 
-  function uround mode real : t
-  function to_real t : real
-  function of_int int : t
+  val function uround mode real : t
+  val function to_real t : real
+  val function of_int int : t
   axiom to_real_of_int : forall x [of_int x]. to_real (of_int x) = from_int x
+
+  val function uzero : t
+  axiom uzero_spec : to_real uzero = 0.0
+
+  val function uone : t
+  axiom uone_spec : to_real uone = 1.0
+
+  val function utwo : t
+  axiom utwo_spec : to_real utwo = 2.0
 
   constant eps:real
   constant eta:real
@@ -27,7 +36,7 @@ module UFloat
   meta "inline:no" function eps
   meta "inline:no" function eta
 
-  let ghost function uadd (x y:t) : t
+  let function uadd (x y:t) : t
     (* TODO: Do we want the two first assertions in our context ?
       We only use them to prove the addition lemma *)
     ensures { abs (to_real result -. (to_real x +. to_real y)) <=. abs (to_real x) }
@@ -38,7 +47,7 @@ module UFloat
     }
   = uround RNE (to_real x +. to_real y)
 
-  let ghost function usub (x y:t) : t
+  let function usub (x y:t) : t
     (* TODO: Do we want the two first assertions in our context ?
       We only use them to prove the addition lemma *)
     ensures { abs (to_real result -. (to_real x -. to_real y)) <=. abs (to_real x) }
@@ -49,14 +58,14 @@ module UFloat
     }
   = uround RNE (to_real x -. to_real y)
 
-  let ghost function umul (x y:t) : t
+  let function umul (x y:t) : t
     ensures {
       abs (to_real result -. (to_real x *. to_real y))
         <=. abs (to_real x *. to_real y) *. eps +. eta
     }
   = uround RNE (to_real x *. to_real y)
 
-  let ghost function udiv (x y:t) : t
+  let function udiv (x y:t) : t
     requires { to_real y <> 0. }
     ensures {
       abs (to_real result -. (to_real x /. to_real y))
@@ -64,29 +73,29 @@ module UFloat
     }
   = uround RNE (to_real x /. to_real y)
 
-  let ghost function uminus (x:t) : t
+  let function uminus (x:t) : t
     ensures { to_real result = -. (to_real x) }
   = uround RNE (-. (to_real x))
 
   predicate is_exact (uop : t -> t -> t) (x y :t)
 
   (* Exact division but can still underflow, giving eta as error *)
-  let ghost function udiv_exact (x y:t) : t
+  let function udiv_exact (x y:t) : t
     requires { to_real y <> 0. }
     requires { is_exact udiv x y }
     ensures { abs (to_real result -. (to_real x /. to_real y)) <=. eta }
   = uround RNE (to_real x /. to_real y)
 
   (** Infix operators *)
-  let ghost function ( ++. ) (x:t) (y:t) : t = uadd x y
-  let ghost function ( --. ) (x:t) (y:t) : t = usub x y
-  let ghost function ( **. ) (x:t) (y:t) : t = umul x y
+  let function ( ++. ) (x:t) (y:t) : t = uadd x y
+  let function ( --. ) (x:t) (y:t) : t = usub x y
+  let function ( **. ) (x:t) (y:t) : t = umul x y
   (* Why3 doesn't support abbreviations so we need to add the requires *)
-  let ghost function ( //. ) (x:t) (y:t) : t
+  let function ( //. ) (x:t) (y:t) : t
     requires { to_real y <> 0. }
   = udiv x y
-  let ghost function ( --._ ) (x:t) : t = uminus x
-  let ghost function ( ///. ) (x:t) (y:t) : t
+  let function ( --._ ) (x:t) : t = uminus x
+  let function ( ///. ) (x:t) (y:t) : t
     requires { to_real y <> 0. }
     requires { is_exact udiv x y }
   = udiv_exact x y
@@ -708,7 +717,8 @@ module USingleLemmas
     div_order_compat2 (to_real x_f) (x +. x_rel *. x_factor +. x_abs) (to_real y_f);
     (* TODO: Prove this somehow *)
     assert {
-      forall x y. x /. y <=. abs x /. abs y
+      forall x y. y <> 0.0 -> x /. y <=. abs x /. abs y
+      by abs (x /. y) = abs (x *. inv y) = abs x *. abs (inv y) = abs x *. inv (abs y) = abs x /. abs y
     };
     assert {
       (x -. x_rel *. x_factor -. x_abs) /. to_real y_f
