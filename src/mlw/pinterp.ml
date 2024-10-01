@@ -81,6 +81,9 @@ type ctx = {
 }
 (** The evaluation context of Pinterp *)
 
+let pp_ctx fmt ctx =
+  Format.fprintf fmt "@[{ vsenv = %a }@]" (pp_env print_vsty print_value) (Mvs.bindings ctx.env.vsenv)
+
 let get_env ctx = ctx.env
 
 let get_do_rac ctx = ctx.do_rac
@@ -813,7 +816,7 @@ let check_limits ctx =
     | Some timelimit ->
         if Sys.time () -. time0 >= timelimit then
           raise Timelimit
-  in      
+  in
   let check_steplimit (steps: int) = function
     | None -> ()
     | Some steplimit ->
@@ -994,7 +997,7 @@ and exec_expr' ctx e =
               let match_free pv mt =
                 let v = Mvs.find pv.pv_vs ctx.env.vsenv in
                 ty_match mt pv.pv_vs.vs_ty v.v_ty in
-              let mt = Spv.fold match_free cty.cty_effect.eff_reads Mtv.empty in
+              let mt = Spv.fold match_free cty.cty_effect.eff_reads ctx.env.tvenv in
               let ty = ty_inst mt (ty_of_ity e.e_ity) in
               if cty.cty_pre <> [] then
                 fatal_rac_error ctx.env.log_uc "anonymous function with precondition not supported (%a)"
@@ -1493,11 +1496,17 @@ and exec_call ?(main_function=false) ?loc ?attrs (eid:expr_id option) ctx rs arg
                     check_pre_and_register_call Log.Exec_normal;
                     exec_call ?loc ?attrs eid ctx rs' (pvl @ arg_pvs) ity_result
                 | Cfun body ->
-                    Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: FUN/%d %a@]@."
+                    Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: Cfun/%d %a@]@."
                       pp_indent print_rs rs (List.length ce.c_cty.cty_args) (pp_limited print_expr) body;
-                    let ctx = {ctx with env= multibind_pvs ce.c_cty.cty_args arg_vs ctx.env} in
+                    let ctx = { ctx with env = multibind_pvs ce.c_cty.cty_args arg_vs ctx.env } in
+                    Debug.dprintf debug_trace_exec "@[<hv2>%tctx = %a@]@." pp_indent pp_ctx ctx;
                     check_pre_and_register_call Log.Exec_normal;
-                    exec_expr ctx body
+                    begin
+                      match exec_expr ctx body with
+                      | Normal v -> Normal (v_inst v ctx.env.tvenv)
+                      | Excep(xs,v) -> Excep (xs, v_inst v ctx.env.tvenv)
+                      | Irred _ as v -> v
+                    end
                 | Cany ->
                     if ctx.do_rac then (
                       check_pre_and_register_call ~any_function:true Log.Exec_giant_steps;
@@ -1518,7 +1527,7 @@ and exec_call ?(main_function=false) ?loc ?attrs (eid:expr_id option) ctx rs arg
                 let aux mt pv v =
                   ty_match mt pv.pv_vs.vs_ty (ty_inst mt (v_ty v)) in
                 let mt =
-                  List.fold_left2 aux Mtv.empty rs.rs_cty.cty_args arg_vs in
+                  List.fold_left2 aux ctx.env.tvenv rs.rs_cty.cty_args arg_vs in
                 let ty = ty_inst mt (ty_of_ity ity_result) in
                 let vs = List.map field arg_vs in
                 let v = value ty (Vconstr (Some rs, its_def.Pdecl.itd_fields, vs)) in

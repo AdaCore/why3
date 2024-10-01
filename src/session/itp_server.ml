@@ -456,8 +456,6 @@ let () =
 
 (* This section is used to get colored source as a function of the task *)
 
-exception No_loc_on_goal
-
 let get_locations (task: Task.task) =
   let list = ref [] in
   let goal_loc = ref None in
