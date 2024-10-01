@@ -1,0 +1,17 @@
+
+module Issue
+  use bintree.Tree
+  use bintree.Inorder
+  use list.List
+
+  let issue () =
+   let l = inorder Empty in
+   assert { l = Nil }
+
+(* run this using
+
+   why3 execute 842.mlw --use=Issue 'issue ()'
+
+*)
+
+end

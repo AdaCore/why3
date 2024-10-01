@@ -89,6 +89,8 @@ val field : value -> field
 val field_get : field -> value
 val field_set : field -> value -> unit
 
+val v_inst : value -> Ty.ty Ty.Mtv.t -> value
+
 (** {4 Constructors}
 
     Non defensive API for building [value]s: there are no checks that
@@ -213,6 +215,8 @@ type env = {
   pmodule  : Pmodule.pmodule;
   funenv   : (Expr.cexp * Expr.rec_defn list option) Expr.Mrs.t;
   (** local functions *)
+  tvenv    : Ty.ty Ty.Mtv.t;
+  (** current instances of type variables *)
   vsenv    : value Term.Mvs.t;
   (** local variables *)
   lsenv    : value Lazy.t Term.Mls.t;
