@@ -38,7 +38,7 @@ module ExpLogSingle
       abs (to_real result -. exp (to_real x)) <=. exp_error *. exp (to_real x)
     }
 
-  let ghost example1 (x y : usingle)
+  let example1 (x y : usingle)
     ensures {
     let t = log (exp (to_real y)) in
     let t1 = log (exp (to_real x)) in
@@ -53,7 +53,7 @@ module ExpLogSingle
     }
   = log_approx (exp_approx(x)) ++. log_approx (exp_approx(y))
 
-  let ghost example2 (x y : usingle)
+  let example2 (x y : usingle)
     ensures {
       let exact = log(exp(to_real x) +. exp (to_real y)) in
       abs (to_real result -. exact)
@@ -62,7 +62,7 @@ module ExpLogSingle
     }
   = log_approx (exp_approx(x) ++. exp_approx(y))
 
-  let ghost example3 (x y : usingle)
+  let example3 (x y : usingle)
     requires { 0. <. to_real x }
     requires { 0. <. to_real y }
     ensures {
@@ -73,7 +73,7 @@ module ExpLogSingle
     }
   = log2_approx (x ++. y)
 
-  let ghost example4 (x y : usingle)
+  let example4 (x y : usingle)
     requires { 0. <. to_real x }
     requires { 0. <. to_real y }
     ensures {
@@ -126,7 +126,7 @@ module ExpLogDouble
       abs (to_real result -. exp (to_real x)) <=. exp_error *. exp (to_real x)
     }
 
-  let ghost example1 (x y : udouble)
+  let example1 (x y : udouble)
     ensures {
     let t = log (exp (to_real y)) in
     let t1 = log (exp (to_real x)) in
@@ -141,7 +141,7 @@ module ExpLogDouble
     }
   = log_approx (exp_approx(x)) ++. log_approx (exp_approx(y))
 
-  let ghost example2 (x y : udouble)
+  let example2 (x y : udouble)
     ensures {
       let exact = log(exp(to_real x) +. exp (to_real y)) in
       abs (to_real result -. exact)
@@ -150,7 +150,7 @@ module ExpLogDouble
     }
   = log_approx (exp_approx(x) ++. exp_approx(y))
 
-  let ghost example3 (x y : udouble)
+  let example3 (x y : udouble)
     requires { 0. <. to_real x }
     requires { 0. <. to_real y }
     ensures {
@@ -161,7 +161,7 @@ module ExpLogDouble
     }
   = log2_approx (x ++. y)
 
-  let ghost example4 (x y : udouble)
+  let example4 (x y : udouble)
     requires { 0. <. to_real x }
     requires { 0. <. to_real y }
     ensures {

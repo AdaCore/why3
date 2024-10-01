@@ -91,7 +91,7 @@ module Abs
 
   use Real
 
-  function abs(x : real) : real = if x >= 0.0 then x else -x
+  let function abs(x : real) : real = if x >= 0.0 then x else -x
 
   lemma Abs_le: forall x y:real. abs x <= y <-> -y <= x <= y
 

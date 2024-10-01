@@ -33,7 +33,7 @@ module SinCosSingle
     }
 
 
-  let ghost sin_simple_example (a b :usingle)
+  let sin_simple_example (a b :usingle)
     requires { abs (to_real a) <=. 0.25 *. sin_max }
     requires { abs (to_real b) <=. 0.25 *. sin_max }
     ensures {
@@ -44,7 +44,7 @@ module SinCosSingle
     }
   = sin_approx(a ++. b)
 
-  let ghost cos_simple_example (a b :usingle)
+  let cos_simple_example (a b :usingle)
    requires { abs (to_real a) <=. 0.25 *. cos_max }
    requires { abs (to_real b) <=. 0.25 *. cos_max }
    ensures {
@@ -56,7 +56,7 @@ module SinCosSingle
   = cos_approx(a --. b)
 
   (* Example from the report *)
-  let ghost r_cos_theta (r theta : usingle)
+  let r_cos_theta (r theta : usingle)
      (ghost r_exact theta_exact r_err theta_err :real)
      requires { cos_max >=. 3.1416 }
      requires { 0.0 <=. to_real r <=. 1.0 }
@@ -80,7 +80,7 @@ module SinCosSingle
 
   lemma cos_square_plus_sine_square : forall x. cos x *. cos x +. sin x *. sin x = 1.
 
-  let ghost cos_and_sine_example (a :usingle)
+  let cos_and_sine_example (a :usingle)
     requires { abs (to_real a) <=. sin_max }
     requires { abs (to_real a) <=. cos_max }
     ensures {
@@ -109,7 +109,7 @@ val exact_cte (x:real) : usingle
 
 (* Kinematics example *)
 
-let ghost kinematics (theta1 theta2:usingle)
+let kinematics (theta1 theta2:usingle)
   requires { abs (to_real theta1) <=. 0.25 *. sin_max }
   requires { abs (to_real theta2) <=. 0.25 *. sin_max }
   ensures {
@@ -136,7 +136,7 @@ let ghost kinematics (theta1 theta2:usingle)
 
 (* Raytracer example *)
 
-let ghost raytracer (theta phi nx ny nz:usingle)
+let raytracer (theta phi nx ny nz:usingle)
   requires { abs (to_real phi) <=. sin_max }
   requires { abs (to_real phi) <=. cos_max }
   requires { abs (to_real theta) <=. sin_max }
@@ -218,7 +218,7 @@ module SinCosDouble
     }
 
 
-  let ghost sin_simple_example (a b :udouble)
+  let sin_simple_example (a b :udouble)
     requires { abs (to_real a) <=. 0.25 *. sin_max }
     requires { abs (to_real b) <=. 0.25 *. sin_max }
     ensures {
@@ -229,7 +229,7 @@ module SinCosDouble
     }
   = sin_approx(a ++. b)
 
-  let ghost cos_simple_example (a b :udouble)
+  let cos_simple_example (a b :udouble)
    requires { abs (to_real a) <=. 0.25 *. cos_max }
    requires { abs (to_real b) <=. 0.25 *. cos_max }
    ensures {
@@ -240,7 +240,7 @@ module SinCosDouble
     }
   = cos_approx(a --. b)
 
-  let ghost cos_and_sine_example (a :udouble)
+  let cos_and_sine_example (a :udouble)
     requires { abs (to_real a) <=. sin_max }
     requires { abs (to_real a) <=. cos_max }
     ensures {
@@ -268,7 +268,7 @@ val exact_cte (x:real) : udouble
 
 (* Kinematics example *)
 
-let ghost kinematics (theta1 theta2:udouble)
+let kinematics (theta1 theta2:udouble)
   requires { abs (to_real theta1) <=. 0.25 *. sin_max }
   requires { abs (to_real theta2) <=. 0.25 *. sin_max }
   ensures {
@@ -295,7 +295,7 @@ let ghost kinematics (theta1 theta2:udouble)
 
 (* Raytracer example *)
 
-let ghost raytracer (theta phi nx ny nz:udouble)
+let raytracer (theta phi nx ny nz:udouble)
   requires { abs (to_real phi) <=. sin_max }
   requires { abs (to_real phi) <=. cos_max }
   requires { abs (to_real theta) <=. sin_max }
