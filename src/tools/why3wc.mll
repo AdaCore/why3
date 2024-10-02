@@ -263,6 +263,8 @@ and skip_until_nl = parse
 
 {
 
+module Main () = struct
+
   (** printing results *)
 
   let legend =
@@ -345,5 +347,9 @@ and skip_until_nl = parse
     if n = 0 then begin process_channel stdin; print_file current_file end
     else if n = 1 then process_file (Queue.pop files)
     else begin Queue.iter process_file files; print_totals () end
+
+end
+
+let () = Why3.Whyconf.register_command "wc" (module Main)
 
 }

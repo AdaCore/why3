@@ -18,6 +18,8 @@ open History
 open Itp_communication
 module GSourceView = GSourceView3
 
+module Main () = struct
+
 let debug = Debug.lookup_flag "ide_info"
 
 let () =
@@ -3196,3 +3198,7 @@ let () =
     ()
   | None -> ());
   GMain.main ()
+
+end
+
+let () = Whyconf.register_command "ide" (module Main)

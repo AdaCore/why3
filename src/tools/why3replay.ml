@@ -436,10 +436,4 @@ let () =
 
 end
 
-let () = Whyconf.Args.register_main (module Main)
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3replay.opt"
-End:
-*)
+let () = Whyconf.register_command "replay" (module Main)

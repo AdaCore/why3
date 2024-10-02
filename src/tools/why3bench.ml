@@ -106,4 +106,4 @@ let () =
 
 end
 
-let () = Whyconf.Args.register_main (module Main)
+let () = Whyconf.register_command "bench" (module Main)

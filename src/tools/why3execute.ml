@@ -178,10 +178,4 @@ let () =
 
 end
 
-let () = Whyconf.Args.register_main (module Main)
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. byte"
-End:
-*)
+let () = Whyconf.register_command "execute" (module Main)

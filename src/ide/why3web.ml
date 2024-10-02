@@ -11,6 +11,8 @@
 
 open Why3
 
+module Main () = struct
+
 module P = struct
 
  let notifications = ref []
@@ -157,3 +159,7 @@ let () =
     S.init_server config env dir;
     Queue.iter (fun f -> P.push_request (Add_file_req f)) files;
     Wserver.main_loop None 6789 handler stdin_handler
+
+end
+
+let () = Whyconf.register_command "web" (module Main)
