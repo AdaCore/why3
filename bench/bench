@@ -16,7 +16,7 @@ shopt -s nullglob
 
 suffix=
 
-categories="badfiles bddinfer drivers execution extraction goodfiles inferloop invalidgoals list mlwprinter rac realizations replay replay-without-shapes stdlib steplimit memlimit validgoals validsplitgoals stackify"
+categories="badfiles bddinfer drivers execution extraction_ocaml extraction_c goodfiles inferloop invalidgoals list mlwprinter rac realizations replay replay-without-shapes stdlib steplimit memlimit validgoals validsplitgoals stackify"
 
 enabled_categories=""
 
@@ -374,6 +374,25 @@ extract_and_run () {
     echo "ok"
 }
 
+extract_c () {
+    printf "  $1: extract... "
+    if bin/why3$suffix extract -D c "$1" -o bench/tmp.c; then
+        printf "compile... ";
+        if gcc -c bench/tmp.c; then
+            rm -f bench/tmp.c
+            printf " OK.\n"
+        else
+            rm -f bench/tmp.c
+            printf " failed.\n"
+            exit 1
+        fi
+    else
+        rm -f bench/tmp.c
+        printf " failed.\n"
+        exit 1
+    fi
+}
+
 extract_and_test_c () {
     dir=$1
     shift
@@ -655,7 +674,7 @@ fi
 echo ""
 fi
 
-if enabled extraction; then
+if enabled extraction_ocaml; then
 echo "=== Checking extraction to OCaml ==="
 extract bench/extraction cmo
 extract_and_run bench/extraction/test
@@ -672,8 +691,11 @@ if test -n "$has_ocamlfind"; then
     extract_and_run examples/prover
 fi
 echo ""
+fi
 
+if enabled extraction_c; then
 echo "=== Checking extraction to C ==="
+extract_c examples/tests/c_extraction.mlw
 extract_and_test_c examples/multiprecision
 extract_and_test_c examples/c_cursor
 extract_and_test_c bench/extraction/852_int16

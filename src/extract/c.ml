@@ -1396,6 +1396,23 @@ module MLToC = struct
        | Lany _ -> raise (Unsupported "Lany")
        end
 
+  let translate_body info rs ret_regs boxed e =
+    let env = { computes_return_value = true;
+                in_unguarded_loop = false;
+                current_function = rs;
+                ret_regs = ret_regs;
+                returns = Sid.empty;
+                breaks = Sid.empty;
+                array_sizes = Mid.empty;
+                boxed = boxed;
+              } in
+    let d,s = expr info env e in
+    let d,s = C.flatten_defs d s in
+    let d = C.group_defs_by_type d in
+    let s = C.elim_nop s in
+    d, C.elim_empty_blocks s
+
+
   let translate_decl (info:info) (d:decl) ~flat ~header : C.definition list =
     current_decl_name := "";
     let translate_fun rs mlty vl e =
@@ -1471,20 +1488,7 @@ module MLToC = struct
           then sdecls@[C.Dextern (rtype, rs.rs_name)]
           else sdecls@[C.Dproto (rs.rs_name, (rtype, params))]
         else
-          let env = { computes_return_value = true;
-                      in_unguarded_loop = false;
-                      current_function = rs;
-                      ret_regs = ret_regs;
-                      returns = Sid.empty;
-                      breaks = Sid.empty;
-                      array_sizes = Mid.empty;
-                      boxed = boxed;
-                    } in
-          let d,s = expr info env e in
-          let d,s = C.flatten_defs d s in
-          let d = C.group_defs_by_type d in
-          let s = C.elim_nop s in
-          let s = C.elim_empty_blocks s in
+          let d,s = translate_body info rs ret_regs boxed e in
           match s with
           | Sreturn r when rs.rs_cty.cty_args = [] ->
              Debug.dprintf debug_c_extraction
@@ -1556,13 +1560,34 @@ module MLToC = struct
              | _ -> [] in
            let protos = List.flatten (List.map proto_of_fun defs) in
            protos@defs
-      | _ -> [] (*TODO exn ? *) end
+      | Dlet(Lvar(pv,e)) ->
+          current_decl_name := pv.pv_vs.vs_name.id_string;
+          let uns s =
+            raise (Unsupported ("too complex initializer ("^s^")"))
+          in
+          let d,s = translate_body info Expr.rs_void Mreg.empty (Hreg.create 7) e in
+          begin
+            match d,s with
+            | [],Sreturn ce ->
+                let cty = ty_of_mlty info e.e_mlty in
+                [C.Ddecl (cty,[pv.pv_vs.vs_name,ce])]
+            | [],Sif _ -> uns "conditional statement"
+            | [],Sseq _ -> uns "sequence of statements"
+            | [],_ -> assert false
+            | _ :: _ ,_ -> uns "local variables"
+          end
+      | Dlet(Lany _) -> raise (Unsupported "[C.translate_decl] Dlet(Lany _)")
+      | Dtype _ -> raise (Unsupported "[C.translate_decl] Dtype _")
+      | Dval _ -> raise (Unsupported "[C.translate_decl] Dval _")
+      | Dexn _ -> raise (Unsupported "[C.translate_decl] Dexn _")
+      | Dmodule _ -> raise (Unsupported "[C.translate_decl] Dmodule _")
+      end
     with
       Unsupported s ->
        if Debug.test_noflag debug_c_no_error_msgs
        then
          Format.eprintf
-           "Could not translate declaration of %s. Unsupported: %s@."
+           "Could not translate declaration of `%s`. Unsupported: %s@."
            !current_decl_name s;
        []
 

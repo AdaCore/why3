@@ -26,3 +26,11 @@ module S
   let hello_len () : uint32 = length "hello"
 
 end
+
+module Glob
+
+  use mach.int.Int32
+  let g : int32 = 42
+  let main () : int32 = return g
+
+end
