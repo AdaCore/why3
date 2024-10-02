@@ -7,6 +7,15 @@ module R
 
 end
 
+module Rmut
+
+  use mach.int.Int32
+  type rm = { mutable x : int32; mutable y : int32 }
+  let swap (a : rm) : unit =
+     let tmp = a.y in a.y <- a.x; a.x <- tmp
+
+end
+
 module S
 
   use mach.int.UInt32

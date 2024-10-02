@@ -387,12 +387,13 @@ Not any WhyML code can be extracted to C. Here is a list of supported features a
 * Basic datatypes
 
    * Integer types declared in ``mach.int`` library are supported for
-     sizes 16, 32 and 64 bits.
+     sizes 16, 32 and 64 bits. They are translated into C types of
+     appropriate size and sign, say ``int32_t``, ``uint64_t``, etc.
 
    * The mathematical integer type ``int`` is not supported.
 
-   * The Boolean type and bitwise operators from ``bool.Bool`` are
-     supported
+   * The Boolean type is translated to C type ``int``. The bitwise operators from ``bool.Bool`` are
+     supported.
 
    * Character and strings are partially supported via the functions
      declared in ``mach.c.String`` library
@@ -401,9 +402,8 @@ Not any WhyML code can be extracted to C. Here is a list of supported features a
 
 * Compound datatypes
 
-   * Record types are supported and translated to C structs.
-
-     Beware that records as such are passed by value and returned by
+   * Record types are supported. When they have no mutable fields,
+     they are translated into C structs, and as such are passed by value and returned by
      value. For example the WhyML code
 
      .. code-block:: whyml
@@ -428,6 +428,32 @@ Not any WhyML code can be extracted to C. Here is a list of supported features a
           r.x = a.y;
           r.y = a.x;
           return r;
+        }
+
+     On the other hand, records with mutable fields are interpreted as
+     pointers to structs, and are thus passed by reference. For example the WhyML code
+
+     .. code-block:: whyml
+
+        use mach.int.Int32
+        type r = { mutable x : int32; mutable y : int32 }
+        let swap (a : r) : unit =
+           let tmp = a.y in a.y <- a.x; a.x <- tmp
+
+     is extracted as
+
+     .. code-block:: c
+
+        struct r {
+          int32_t x;
+          int32_t y;
+        };
+
+        void swap(struct r * a) {
+          int32_t tmp;
+          tmp = a->y;
+          a->y = a->x;
+          a->x = tmp;
         }
 
    * WhyML arrays are not supported
