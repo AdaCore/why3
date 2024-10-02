@@ -263,9 +263,6 @@ module Translate = struct
         ML.e_unit
     | Econst c -> Debug.dprintf debug_compile "compiling constant@.";
         assert (mask = MaskVisible);
-        let c = match c with
-          | Constant.ConstInt _ | Constant.ConstStr _ -> c
-          | _ -> assert false in
         ML.e_const c (ML.I e.e_ity) mask (mlty_of_ity mask e.e_ity) eff attrs
     | Evar pv ->
         Debug.dprintf debug_compile "compiling variable %a@." print_pv pv;

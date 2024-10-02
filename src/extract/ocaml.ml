@@ -377,16 +377,6 @@ module Print = struct
         query_syntax info.info_syn ts.ts_name = Some "int"
     | _ -> false
 
-  let print_constant fmt e = begin match e.e_node with
-    | Econst (Constant.ConstInt c) ->
-        let v = c.Number.il_int in
-        let s = BigInt.to_string v in
-        if BigInt.lt v BigInt.zero then fprintf fmt "(%s)" s
-        else pp_print_string fmt s
-    | Econst (Constant.ConstStr s) ->
-       Constant.print_string_def fmt s
-    | _ -> assert false end
-
   let print_for_direction fmt = function
     | To     -> pp_print_string fmt "to"
     | DownTo -> pp_print_string fmt "downto"
@@ -536,19 +526,30 @@ module Print = struct
     let protect_on ?(boxed=false) b s = protect_on ~boxed ~be b s in
     match e.e_node with
     | Econst (Constant.ConstInt c) ->
-        let n = c.Number.il_int in
-        let n = BigInt.to_string n in
+        let n = BigInt.to_string c.Number.il_int in
         let id = match e.e_mlty with
           | Tapp (tname, _) -> tname
           | _ -> assert false in
+        let print fmt (v, n) =
+          if BigInt.lt v BigInt.zero then fprintf fmt "(%s)" n
+          else pp_print_string fmt n in
         (match query_syntax info.info_literal id with
-         | Some s -> syntax_arguments s print_constant fmt [e]
+         | Some s -> syntax_arguments s print fmt [(c.Number.il_int, n)]
          | None when n = "0" -> pp_print_string fmt "Z.zero"
          | None when n = "1" -> pp_print_string fmt "Z.one"
          | None   -> fprintf fmt (protect_on (prec < 4) "Z.of_string \"%s\"") n)
     | Econst (Constant.ConstStr s) ->
         Constant.print_string_def fmt s
-    | Econst (Constant.ConstReal _) -> assert false (* TODO *)
+    | Econst (Constant.ConstReal c) ->
+        let id = match e.e_mlty with
+          | Tapp (tname, _) -> tname
+          | _ -> assert false in
+        let print fmt c =
+          Number.print_real_constant Number.full_support fmt c in
+        begin match query_syntax info.info_literal id with
+        | Some s -> syntax_arguments s print fmt [c]
+        | None -> print fmt c
+        end
     | Evar pvs ->
         (print_lident info) fmt (pv_name pvs)
     | Elet (let_def, e) ->
