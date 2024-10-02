@@ -23,6 +23,8 @@ Provers
   * Alt-Ergo FPA requires Alt-Ergo version at least 2.5.4
   * support for Coq 8.19 (released Jan 24, 2024)
   * drop support for versions of Coq < 8.16
+  * support for Z3 up to 4.13.2
+  * support for cvc5 up to 1.1.2
 
 Tools
   * `why3 prove`: drop the option `--json-model-values` :x:
