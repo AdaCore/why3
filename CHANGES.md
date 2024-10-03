@@ -25,6 +25,7 @@ Provers
   * drop support for versions of Coq < 8.16
   * support for Z3 up to 4.13.2
   * support for cvc5 up to 1.1.2
+  * support for Alt-Ergo 2.6
 
 Tools
   * `why3 prove`: drop the option `--json-model-values` :x:
