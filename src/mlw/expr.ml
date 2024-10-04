@@ -321,7 +321,7 @@ type expr = {
   e_node   : expr_node;
   e_ity    : ity;
   e_mask   : mask;
-  e_effect : effect;
+  e_effect : effekt;
   e_attrs  : Sattr.t;
   e_loc    : Loc.position option;
   e_id     : expr_id;

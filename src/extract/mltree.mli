@@ -43,7 +43,7 @@ type expr = {
   e_node : expr_node;
   e_ity : ity;
   e_mlty : ty;
-  e_effect : Ity.effect;
+  e_effect : Ity.effekt;
   e_attrs : Ident.Sattr.t;
 }
 and expr_node =
@@ -121,7 +121,7 @@ val iter_deps : (Ident.ident -> unit) -> decl -> unit
 
 val ity_unit : ity
 
-val mk_expr : expr_node -> ity -> Ity.mask -> ty -> Ity.effect -> Ident.Sattr.t -> expr
+val mk_expr : expr_node -> ity -> Ity.mask -> ty -> Ity.effekt -> Ident.Sattr.t -> expr
 
 val tunit : ty
 
@@ -147,37 +147,37 @@ val e_dummy_unit : expr
 
 val e_unit : expr
 
-val e_const : Constant.constant -> ity -> Ity.mask -> ty -> Ity.effect -> Ident.Sattr.t -> expr
+val e_const : Constant.constant -> ity -> Ity.mask -> ty -> Ity.effekt -> Ident.Sattr.t -> expr
 
-val e_var : Ity.pvsymbol -> ity -> Ity.mask -> ty -> Ity.effect -> Ident.Sattr.t -> expr
+val e_var : Ity.pvsymbol -> ity -> Ity.mask -> ty -> Ity.effekt -> Ident.Sattr.t -> expr
 
 val var_defn : Ity.pvsymbol -> expr -> let_def
 
 val sym_defn : Expr.rsymbol -> Ty.Stv.t -> ty -> var list -> expr -> let_def
 
-val e_let : let_def -> expr -> ity -> Ity.mask -> ty -> Ity.effect -> Ident.Sattr.t -> expr
+val e_let : let_def -> expr -> ity -> Ity.mask -> ty -> Ity.effekt -> Ident.Sattr.t -> expr
 
-val e_app : Expr.rsymbol -> expr list -> is_partial -> ity -> Ity.mask -> ty -> Ity.effect -> Ident.Sattr.t -> expr
+val e_app : Expr.rsymbol -> expr list -> is_partial -> ity -> Ity.mask -> ty -> Ity.effekt -> Ident.Sattr.t -> expr
 
-val e_fun : var list -> expr -> ity -> Ity.mask -> ty -> Ity.effect -> Ident.Sattr.t -> expr
+val e_fun : var list -> expr -> ity -> Ity.mask -> ty -> Ity.effekt -> Ident.Sattr.t -> expr
 
 val e_ignore : expr -> expr
 
-val e_if : expr -> expr -> expr -> Ity.mask -> ty -> Ity.effect -> Ident.Sattr.t -> expr
+val e_if : expr -> expr -> expr -> Ity.mask -> ty -> Ity.effekt -> Ident.Sattr.t -> expr
 
-val e_while : expr -> expr -> Ity.mask -> ty -> Ity.effect -> Ident.Sattr.t -> expr
+val e_while : expr -> expr -> Ity.mask -> ty -> Ity.effekt -> Ident.Sattr.t -> expr
 
-val e_for : Ity.pvsymbol -> ty -> Ity.pvsymbol -> for_direction -> Ity.pvsymbol -> expr -> Ity.mask -> ty -> Ity.effect -> Ident.Sattr.t -> expr
+val e_for : Ity.pvsymbol -> ty -> Ity.pvsymbol -> for_direction -> Ity.pvsymbol -> expr -> Ity.mask -> ty -> Ity.effekt -> Ident.Sattr.t -> expr
 
-val e_match : expr -> reg_branch list -> exn_branch list -> ity -> Ity.mask -> ty -> Ity.effect -> Ident.Sattr.t -> expr
+val e_match : expr -> reg_branch list -> exn_branch list -> ity -> Ity.mask -> ty -> Ity.effekt -> Ident.Sattr.t -> expr
 
-val e_assign : (expr * ty * Expr.rsymbol * expr) list -> ity -> Ity.mask -> Ity.effect -> Ident.Sattr.t -> expr
+val e_assign : (expr * ty * Expr.rsymbol * expr) list -> ity -> Ity.mask -> Ity.effekt -> Ident.Sattr.t -> expr
 
-val e_absurd : ity -> Ity.mask -> ty -> Ity.effect -> Ident.Sattr.t -> expr
+val e_absurd : ity -> Ity.mask -> ty -> Ity.effekt -> Ident.Sattr.t -> expr
 
-val e_seq : expr -> expr -> ity -> Ity.mask -> ty -> Ity.effect -> Ident.Sattr.t -> expr
+val e_seq : expr -> expr -> ity -> Ity.mask -> ty -> Ity.effekt -> Ident.Sattr.t -> expr
 
-val e_coerce : expr -> ity -> Ity.mask -> ty -> Ity.effect -> Ident.Sattr.t -> expr
+val e_coerce : expr -> ity -> Ity.mask -> ty -> Ity.effekt -> Ident.Sattr.t -> expr
 
 val var_list_of_pv_list : Ity.pvsymbol list -> ty list -> expr list
 

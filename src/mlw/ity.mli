@@ -371,7 +371,7 @@ val total : oneway -> bool
 val partial : oneway -> bool
 val diverges : oneway -> bool
 
-type effect = private {
+type effekt = private {
   eff_reads  : Spv.t;         (* known variables *)
   eff_writes : Spv.t Mreg.t;  (* writes to fields *)
   eff_taints : Sreg.t;        (* ghost code writes *)
@@ -383,46 +383,46 @@ type effect = private {
   eff_ghost  : bool;          (* ghost status *)
 }
 
-val eff_empty : effect
+val eff_empty : effekt
 (** Effect of a non-ghost total function without any observational effect of any
     kinds *)
 
-val eff_equal : effect -> effect -> bool
-val eff_pure : effect -> bool
+val eff_equal : effekt -> effekt -> bool
+val eff_pure : effekt -> bool
 
-val eff_read : Spv.t -> effect
-val eff_write : Spv.t -> Spv.t Mreg.t -> effect (* drops writes outside reads *)
-val eff_assign : (pvsymbol * pvsymbol * pvsymbol) list -> effect (* r,field,v *)
+val eff_read : Spv.t -> effekt
+val eff_write : Spv.t -> Spv.t Mreg.t -> effekt (* drops writes outside reads *)
+val eff_assign : (pvsymbol * pvsymbol * pvsymbol) list -> effekt (* r,field,v *)
 
-val eff_read_pre  : Spv.t -> effect -> effect (* no stale-variable check *)
-val eff_read_post : effect -> Spv.t -> effect (* checks for stale variables *)
-val eff_bind      : Spv.t -> effect -> effect (* removes variables from reads *)
+val eff_read_pre  : Spv.t -> effekt -> effekt (* no stale-variable check *)
+val eff_read_post : effekt -> Spv.t -> effekt (* checks for stale variables *)
+val eff_bind      : Spv.t -> effekt -> effekt (* removes variables from reads *)
 
-val eff_read_single      : pvsymbol -> effect
-val eff_read_single_pre  : pvsymbol -> effect -> effect
-val eff_read_single_post : effect -> pvsymbol -> effect
-val eff_bind_single      : pvsymbol -> effect -> effect
+val eff_read_single      : pvsymbol -> effekt
+val eff_read_single_pre  : pvsymbol -> effekt -> effekt
+val eff_read_single_post : effekt -> pvsymbol -> effekt
+val eff_bind_single      : pvsymbol -> effekt -> effekt
 
-val eff_reset : effect -> Sreg.t -> effect    (* confine to an empty cover *)
-val eff_reset_overwritten : effect -> effect  (* confine regions under writes *)
+val eff_reset : effekt -> Sreg.t -> effekt    (* confine to an empty cover *)
+val eff_reset_overwritten : effekt -> effekt  (* confine regions under writes *)
 
-val eff_raise : effect -> xsymbol -> effect
-val eff_catch : effect -> xsymbol -> effect
+val eff_raise : effekt -> xsymbol -> effekt
+val eff_catch : effekt -> xsymbol -> effekt
 
-val eff_spoil : effect -> ity -> effect
+val eff_spoil : effekt -> ity -> effekt
 
-val eff_partial : effect -> effect                      (* forbidden if ghost *)
-val eff_diverge : effect -> effect                      (* forbidden if ghost *)
-val eff_ghostify : bool -> effect -> effect (* forbidden if fails or diverges *)
-val eff_ghostify_weak : bool -> effect -> effect     (* only if has no effect *)
+val eff_partial : effekt -> effekt                      (* forbidden if ghost *)
+val eff_diverge : effekt -> effekt                      (* forbidden if ghost *)
+val eff_ghostify : bool -> effekt -> effekt (* forbidden if fails or diverges *)
+val eff_ghostify_weak : bool -> effekt -> effekt     (* only if has no effect *)
 
-val eff_union_seq : effect -> effect -> effect  (* checks for stale variables *)
-val eff_union_par : effect -> effect -> effect  (* no stale-variable check *)
-val eff_fusion    : effect -> effect -> effect  (* drop invalidated writes *)
+val eff_union_seq : effekt -> effekt -> effekt  (* checks for stale variables *)
+val eff_union_par : effekt -> effekt -> effekt  (* no stale-variable check *)
+val eff_fusion    : effekt -> effekt -> effekt  (* drop invalidated writes *)
 
-val mask_adjust : effect -> ity -> mask -> mask
+val mask_adjust : effekt -> ity -> mask -> mask
 
-val eff_escape : effect -> ity -> Sity.t
+val eff_escape : effekt -> ity -> Sity.t
 
 val ity_affected : 'a Mreg.t -> ity -> bool
 (** [ity_affected wr ity] returns [true] if the regions of [ity] are contained
@@ -463,7 +463,7 @@ type cty = private {
   cty_post   : post list;
   cty_xpost  : post list Mxs.t;
   cty_oldies : pvsymbol Mpv.t;
-  cty_effect : effect;
+  cty_effect : effekt;
   cty_result : ity;
   cty_mask   : mask;
   cty_freeze : ity_subst;
@@ -471,7 +471,7 @@ type cty = private {
 
 val create_cty : ?mask:mask -> pvsymbol list ->
   pre list -> post list -> post list Mxs.t ->
-  pvsymbol Mpv.t -> effect -> ity -> cty
+  pvsymbol Mpv.t -> effekt -> ity -> cty
 (** [create_cty ?mask ?defensive args pre post xpost oldies effect result]
     creates a new cty. [post] and [mask] must be consistent with [result].
     The [cty_xpost] field does not have to cover all raised exceptions.
@@ -486,7 +486,7 @@ val create_cty : ?mask:mask -> pvsymbol list ->
 
 val create_cty_defensive : ?mask:mask -> pvsymbol list ->
   pre list -> post list -> post list Mxs.t ->
-  pvsymbol Mpv.t -> effect -> ity -> cty
+  pvsymbol Mpv.t -> effekt -> ity -> cty
 (** same as [create_cty], except that type variables in the result
     and exceptional results are spoiled and fresh regions in the
     result and exceptional results are reset. *)
@@ -565,4 +565,4 @@ val print_cty  : Format.formatter -> cty -> unit      (* computation type *)
 
 val print_spec :
   pvsymbol list -> pre list -> post list -> post list Mxs.t -> pvsymbol Mpv.t
-    -> effect -> Format.formatter -> ity option -> unit (* piecemeal cty *)
+    -> effekt -> Format.formatter -> ity option -> unit (* piecemeal cty *)

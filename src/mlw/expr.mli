@@ -128,7 +128,7 @@ type expr = private {
   e_node   : expr_node;
   e_ity    : ity;
   e_mask   : mask;
-  e_effect : effect;
+  e_effect : effekt;
   e_attrs  : Sattr.t;
   e_loc    : Loc.position option;
   e_id     : expr_id;
@@ -281,7 +281,7 @@ val e_absurd : ity -> expr
 val e_fold : ('a -> expr -> 'a) -> 'a -> expr -> 'a
 (** [e_fold] does not descend into Cfun *)
 
-val e_locate_effect : (effect -> bool) -> expr -> Loc.position option
+val e_locate_effect : (effekt -> bool) -> expr -> Loc.position option
 (** [e_locate_effect pr e] looks for a minimal sub-expression of
     [e] whose effect satisfies [pr] and returns its location *)
 
