@@ -361,12 +361,12 @@ let lemma all_subsegments_perm (src dst: array elt)
     ) in
   let lemma pinvp (i: int) requires { start <= i < start+m }
     ensures { p[invp[i]] = i }
-  = let j, r = decompose1 i in
+  = let j, _r = decompose1 i in
     assert { copy_subsegment src dst s k l j sigma tau p invp }
   in
   let lemma copy_i (i: int) requires { start <= i < start+m }
     ensures { dst[i] = src[p[i]] }
-  = let j, r = decompose2 i in
+  = let j, _r = decompose2 i in
     assert { copy_subsegment src dst s k l j sigma tau p invp };
     pi_good i
   in

@@ -33,7 +33,7 @@ let rec function to_str (r: rope) : str =
     stored in `Node` is indeed the length of the left subrope. *)
 predicate valid (r: rope) =
   match r with
-  | Leaf s        -> true
+  | Leaf _s       -> true
   | Node wl rl rr -> wl = length (to_str rl) && valid rl && valid rr
   end
 
@@ -151,5 +151,3 @@ let test_insert (r: rope) : rope
   requires { to_str r = str_lard }
   ensures  { to_str result == str_lizard }
 = insert r 1 str_iz
-
-
