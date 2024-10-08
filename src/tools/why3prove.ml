@@ -34,6 +34,7 @@ let opt_json = ref false
 let opt_check_ce_model = ref false
 let opt_rac_prover = ref None
 let opt_rac_timelimit = ref None
+let opt_rac_memlimit = ref None
 let opt_rac_steplimit = ref None
 let opt_ce_log_verbosity = ref None
 let opt_sub_goals = ref []
@@ -186,8 +187,10 @@ let option_list =
     "<prover> use <prover> to check assertions in RAC when term\n\
      reduction is insufficient, with optional, space-\n\
      separated time and memory limit (e.g. 'cvc4 2 1000')";
-    KLong "rac-timelimit", Hnd1 (AInt, fun i -> opt_rac_timelimit := Some i),
+    KLong "rac-timelimit", Hnd1 (AFloat, fun i -> opt_rac_timelimit := Some i),
     "<sec> set the time limit for RAC (with --check-ce)";
+    KLong "rac-memlimit", Hnd1 (AInt, fun i -> opt_rac_memlimit := Some i),
+    "<steps> set the memory limit for RAC (with --check-ce)";
     KLong "rac-steplimit", Hnd1 (AInt, fun i -> opt_rac_steplimit := Some i),
     "<steps> set the step limit for RAC (with --check-ce)";
     KLong "ce-log-verbosity", Hnd1(AInt, fun i -> opt_ce_log_verbosity := Some i),
@@ -370,11 +373,21 @@ let select_ce env th models =
   if models <> [] then
     match Pmodule.restore_module th with
     | pm ->
+        let main = Whyconf.get_main config in
+        let limit_time = Whyconf.timelimit main in
+        let limit_time = Opt.fold (fun _ s -> s) limit_time !opt_rac_timelimit in
+        let limit_mem = Whyconf.memlimit main in
+        let limit_mem = Opt.fold (fun _ s -> s) limit_mem !opt_rac_memlimit in
+        let limit_steps = Opt.fold (fun _ s -> s) 0 !opt_rac_steplimit in
+        let limits = Call_provers.{ limit_time ; limit_mem ; limit_steps } in
+        let why_prover =
+          match !opt_rac_prover with
+          | None -> None
+          | Some p -> Some(p,limits)
+        in
         let rac = Pinterp.mk_rac ~ignore_incomplete:false
-            (Rac.Why.mk_check_term_lit config env ?why_prover:!opt_rac_prover ()) in
-        let timelimit = Option.map float_of_int !opt_rac_timelimit in
-        Check_ce.select_model
-          ?timelimit ?steplimit:!opt_rac_steplimit ?verb_lvl:!opt_ce_log_verbosity
+            (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
+        Check_ce.select_model ~limits ?verb_lvl:!opt_ce_log_verbosity
           ~check_ce:!opt_check_ce_model rac env pm models
     | exception Not_found -> None
   else None
@@ -401,14 +414,14 @@ let print_other_models (m, (c, log)) =
 let do_task config env drv fname tname (th : Theory.theory) (task : Task.task) =
   if really_do_task task then
   let open Call_provers in
-  let limit =
+  let limits =
     { limit_time = timelimit;
       limit_mem = memlimit;
       limit_steps = stepslimit } in
   match !opt_output, !opt_command with
     | None, Some command ->
         let call =
-          Driver.prove_task ~command ~config ~limit drv task
+          Driver.prove_task ~command ~config ~limits drv task
         in
         let res = wait_on_call call in
         let ce = select_ce env th res.pr_models in

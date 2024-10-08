@@ -23,12 +23,21 @@ Provers
   * Alt-Ergo FPA requires Alt-Ergo version at least 2.5.4
   * support for Coq 8.19 (released Jan 24, 2024)
   * drop support for versions of Coq < 8.16
-  * support for Z3 up to 4.13.2
-  * support for cvc5 up to 1.1.2
-  * support for Alt-Ergo 2.6
+  * support for Z3 up to 4.13.x
+  * support for cvc5 up to 1.2.x
+  * support for Alt-Ergo 2.6.x
 
 Tools
   * `why3 prove`: drop the option `--json-model-values` :x:
+  * `why3 execute`: added option `--rac-memlimit`.
+  * `why3 execute`: the `--rac-prover` option does not anymore support
+    specification of a time limit and memory limit :x:
+
+API
+  * a few changes about how to specify resource limits in particular
+    some renaming of `limit` into `limits` where appropriate. See also
+    issue #877, and the changes in the examples of the documentation
+    in Section "The Why3 API" :x:
 
 Version 1.7.2, April 18, 2024
 -----------------------------

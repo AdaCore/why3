@@ -444,7 +444,7 @@ let file_name_of_task ?old ?inplace ?interactive drv task =
           ~goal_name:pr.pr_name.id_string
 
 let prove_task_prepared
-      ~command ~config ~limit ?old ?inplace ?interactive drv task =
+      ~command ~config ~limits ?old ?inplace ?interactive drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
   let old_channel = Option.map open_in old in
@@ -456,7 +456,7 @@ let prove_task_prepared
   let get_model = if get_counterexmp task then Some printing_info else None in
   let res =
     Call_provers.call_on_buffer
-      ~command ~config ~limit ~gen_new_file ?inplace ~filename
+      ~command ~config ~limits ~gen_new_file ?inplace ~filename
       ~res_parser:drv.drv_res_parser
       ~get_model buf
   in
@@ -464,7 +464,7 @@ let prove_task_prepared
   res
 
 let prove_buffer_prepared
-    ~command ~config ~limit
+    ~command ~config ~limits
     ?(input_file="f")
     ?(theory_name="T")
     ?(goal_name="vc")
@@ -472,16 +472,16 @@ let prove_buffer_prepared
     drv buffer =
   let filename = get_filename drv ~input_file ~theory_name ~goal_name in
   Call_provers.call_on_buffer
-    ~command ~config ~limit
+    ~command ~config ~limits
     ~gen_new_file:true ~filename
     ~res_parser:drv.drv_res_parser
     ~get_model buffer
 
 let prove_task
-      ~command ~config ~limit ?old ?inplace ?interactive drv task =
+      ~command ~config ~limits ?old ?inplace ?interactive drv task =
   let task = prepare_task drv task in
   prove_task_prepared
-    ~command ~config ~limit ?interactive ?old ?inplace drv task
+    ~command ~config ~limits ?interactive ?old ?inplace drv task
 
 (* exception report *)
 

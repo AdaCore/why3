@@ -45,7 +45,7 @@ type proof_parent = Trans of transID | Theory of theory
 type proof_attempt_node = {
   parent                 : proofNodeID;
   mutable prover         : Whyconf.prover;
-  limit                  : Call_provers.resource_limit;
+  limits                 : Call_provers.resource_limits;
   mutable proof_state    : Call_provers.prover_result option;
   (* None means that the call was not done or never returned *)
   mutable proof_obsolete : bool;
@@ -538,7 +538,7 @@ open Ident
 let print_proof_attempt fmt pa =
   fprintf fmt "@[<h>%a tl=%g %a@]"
           Whyconf.print_prover pa.prover
-          pa.limit.Call_provers.limit_time
+          pa.limits.Call_provers.limit_time
           (Pp.print_option (Call_provers.print_prover_result ~json:false))
           pa.proof_state
 
@@ -641,7 +641,7 @@ let empty_session ?sum_shape_version ?from dir =
 
 exception AlreadyExist
 
-let add_proof_attempt session prover limit state ~obsolete (edit : Sysutil.file_path option) parentID =
+let add_proof_attempt session prover limits state ~obsolete (edit : Sysutil.file_path option) parentID =
   let pn = get_proofNode session parentID in
   try
     let _ = Hprover.find pn.proofn_attempts prover in
@@ -649,8 +649,8 @@ let add_proof_attempt session prover limit state ~obsolete (edit : Sysutil.file_
   with Not_found ->
     let id = gen_proofAttemptID session in
     let pa = { parent = parentID;
-               prover = prover;
-               limit = limit;
+               prover;
+               limits;
                proof_state = state;
                proof_obsolete = obsolete;
                proof_script = edit } in
@@ -659,19 +659,19 @@ let add_proof_attempt session prover limit state ~obsolete (edit : Sysutil.file_
     id
 
 let graft_proof_attempt ?file (s : session) (id : proofNodeID) (pr : Whyconf.prover)
-    ~limit =
+    ~limits =
   let pn = get_proofNode s id in
   try
     let id = Hprover.find pn.proofn_attempts pr in
     let pa = Hint.find s.proofAttempt_table id in
-    let pa = { pa with limit = limit;
+    let pa = { pa with limits;
                proof_state = None;
                proof_obsolete = false} in
     (* Hprover.replace pn.proofn_attempts pr id; useless *)
     Hint.replace s.proofAttempt_table id pa;
     id
   with Not_found ->
-    add_proof_attempt s pr limit None ~obsolete:false file id
+    add_proof_attempt s pr limits None ~obsolete:false file id
 
 (* [mk_proof_node s n t p id] register in the session [s] a proof node
    of proofNodeID [id] of parent [p] of task [t] *)
@@ -1479,7 +1479,7 @@ let found_detached = ref false
 
 let save_detached_proof s parent old_pa_n =
   let old_pa = old_pa_n in
-  ignore (add_proof_attempt s old_pa.prover old_pa.limit
+  ignore (add_proof_attempt s old_pa.prover old_pa.limits
                             old_pa.proof_state ~obsolete:old_pa.proof_obsolete old_pa.proof_script
                             parent)
 
@@ -1532,7 +1532,7 @@ let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
     Debug.dprintf debug "set to obsolete: goal_obsolete=%b old_pa.proof_obsolete=%b@."
       goal_obsolete old_pa.proof_obsolete;
   found_obsolete := obsolete || !found_obsolete;
-  ignore (add_proof_attempt new_s old_pa.prover old_pa.limit
+  ignore (add_proof_attempt new_s old_pa.prover old_pa.limits
     old_pa.proof_state ~obsolete old_pa.proof_script
     new_goal)
 
@@ -1950,9 +1950,9 @@ let get_used_provers_with_stats session =
           PHprover.add prover_table prover x;
           x
       in
-      let lim_time = pa.limit.Call_provers.limit_time in
-      let lim_mem = pa.limit.Call_provers.limit_mem in
-      let lim_steps = pa.limit.Call_provers.limit_steps in
+      let lim_time = pa.limits.Call_provers.limit_time in
+      let lim_mem = pa.limits.Call_provers.limit_mem in
+      let lim_steps = pa.limits.Call_provers.limit_steps in
       let tf = try Hashtbl.find timelimits lim_time with Not_found -> 0 in
       let sf = try Hashtbl.find steplimits lim_steps with Not_found -> 0 in
       let mf = try Hashtbl.find memlimits lim_mem with Not_found -> 0 in
@@ -2072,9 +2072,9 @@ let save_proof_attempt fmt ((id,tl,sl,ml),a) =
   fprintf fmt
     "@\n@[<h><proof@ prover=\"%i\"%a%a%a%a>"
     id
-    (save_float_def "timelimit" tl) (a.limit.Call_provers.limit_time)
-    (save_int_def "steplimit" sl) (a.limit.Call_provers.limit_steps)
-    (save_int_def "memlimit" ml) (a.limit.Call_provers.limit_mem)
+    (save_float_def "timelimit" tl) (a.limits.Call_provers.limit_time)
+    (save_int_def "steplimit" sl) (a.limits.Call_provers.limit_steps)
+    (save_int_def "memlimit" ml) (a.limits.Call_provers.limit_mem)
     (save_bool_def "obsolete" false) a.proof_obsolete;
   begin match a.proof_script with
   | None -> ()

@@ -223,7 +223,7 @@ val schedule_proof_attempt :
   controller ->
   proofNodeID ->
   Whyconf.prover ->
-  limit:Call_provers.resource_limit ->
+  limits:Call_provers.resource_limits ->
   callback:(proofAttemptID -> proof_attempt_status -> unit) ->
   notification:notifier -> unit
 (** [schedule_proof_attempt ?proof_script_filename c id p ~timelimit
@@ -348,7 +348,7 @@ type report =
    TODO to be removed when we have a better way to print the result of replay *)
 val replay_print:
     Format.formatter ->
-      (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list ->
+      (proofNodeID * Whyconf.prover * Call_provers.resource_limits * report) list ->
         unit
 
 val replay:
@@ -361,7 +361,7 @@ val replay:
     notification:notifier ->
     final_callback:
       (bool ->
-       (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list
+       (proofNodeID * Whyconf.prover * Call_provers.resource_limits * report) list
        -> unit) -> any: Session_itp.any option ->
     unit
 (** This function reruns all the proofs of the session under the given any (None

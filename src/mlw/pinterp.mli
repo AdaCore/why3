@@ -34,8 +34,7 @@ val mk_rac : ?ignore_incomplete:bool -> check_term -> rac
 
 val mk_ctx :
   Pinterp_core.env ->
-  ?timelimit:float ->
-  ?steplimit:int ->
+  limits:Call_provers.resource_limits ->
   ?giant_steps:bool ->
   ?do_rac:bool ->
   ?rac:rac ->

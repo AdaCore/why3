@@ -181,8 +181,8 @@ run () {
   # (note that stack trace may be more detailed with bytecode)
   record_time
   cmd="$WHY3_BIN prove -a split_vc -P $prover \
-      --stepslimit=$steps --timelimit=10 \
-      --rac-steplimit=$steps --rac-timelimit=10 \
+      --stepslimit=$steps --timelimit=5 \
+      --rac-steplimit=$racsteps --rac-timelimit=2 \
       --check-ce --rac-prover=$1 --ce-log-verbosity=5 \
       --library=$2 ${file_path}.mlw \
       --debug=check_ce:categorization${debug_vc_sp}"
@@ -237,12 +237,23 @@ for file in $files; do
     case "$filebase" in
       "640_no_loc_failure")
           z3steps=500000
+          z3stepsrac=$z3steps
           ;;
       "657")
           z3steps=500000
+          z3stepsrac=$z3steps
           ;;
       "668_projection")
           z3steps=500000
+          z3stepsrac=$z3steps
+          ;;
+      "703_reduce_term")
+          z3steps=500000
+          z3stepsrac=$z3steps
+          ;;
+      "anonymous5")
+          z3steps=500000
+          z3stepsrac=$z3steps
           ;;
       "array_records_poly")
           skipae=yes
@@ -250,19 +261,24 @@ for file in $files; do
           ;;
       "array_records_mono")
           z3stepsrac=100
+          z3stepsrac=$z3steps
           skipae=yes
           ;;
       "array_mono")
           z3steps=100000
+          z3stepsrac=$z3steps
           ;;
       "bv32")
           z3steps=2500000
+          z3stepsrac=$z3steps
           ;;
       "bv32_mono")
           z3steps=100000
+          z3stepsrac=$z3steps
           ;;
       "bv32_toBig")
           z3steps=100000
+          z3stepsrac=$z3steps
           ;;
       "floats")
           cvc5stepsrac=10000
@@ -271,6 +287,7 @@ for file in $files; do
           ;;
       "int_overflow")
           z3steps=400000
+          z3stepsrac=$z3steps
           ;;
       "jlamp0_mono")
           skipae=yes
@@ -283,22 +300,32 @@ for file in $files; do
           ;;
       "loop_inv_real")
           z3steps=1000000
+          z3stepsrac=$z3steps
+          ;;
+      "map_of_algebraic")
+          z3steps=50000
+          z3stepsrac=$z3steps
           ;;
       "maps_mono")
           altergosteps=100
           altergostepsrac=$altergosteps
+          cvc5steps=15000
+          cvc5stepsrac=$cvc5steps
           ;;
       "maps_poly")
-          cvc5steps=300000
+          cvc5steps=15000
+          cvc5stepsrac=$cvc5steps
           ;;
       "strings")
           z3steps=3000
+          z3stepsrac=$z3steps
           ;;
       "test_result_ce_value2")
           skipae=yes
           ;;
       "threshold")
           z3steps=500000
+          z3stepsrac=$z3steps
           ;;
       "while_mono")
           skipae=yes

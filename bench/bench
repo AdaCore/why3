@@ -300,7 +300,7 @@ replay_without_shape () {
 }
 
 execute () {
-    pgm="bin/why3$suffix execute"
+    pgm="bin/why3$suffix execute --rac-timelimit=60"
     printf "  $1... "
     if $pgm "$@" > /dev/null; then
         echo "ok"
