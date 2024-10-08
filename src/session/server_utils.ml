@@ -279,7 +279,7 @@ let return_prover name config =
 type command_prover =
   | Bad_Arguments of Whyconf.prover
   | Not_Prover
-  | Prover of (Whyconf.config_prover * Call_provers.resource_limit)
+  | Prover of (Whyconf.config_prover * Call_provers.resource_limits)
 
 (* Parses the Other command. If it fails to parse it, it answers None otherwise
    it returns the config of the prover together with the ressource_limit *)
@@ -295,18 +295,17 @@ let parse_prover_name config name args : command_prover =
         | [] ->
             let limit_time = Whyconf.timelimit (Whyconf.get_main config) in
             let limit_mem = Whyconf.memlimit (Whyconf.get_main config) in
-            let default_limit = Call_provers.{empty_limit with
-                                              limit_time = limit_time;
-                                              limit_mem = limit_mem} in
+            let default_limit = Call_provers.{empty_limits with
+                                              limit_time ; limit_mem} in
             Prover (prover_config, default_limit)
         | [timeout] ->
             let limit_mem = Whyconf.memlimit (Whyconf.get_main config) in
             Prover (prover_config,
-                    Call_provers.{empty_limit with
+                    Call_provers.{empty_limits with
                                   limit_time = float_of_string timeout;
-                                  limit_mem = limit_mem})
+                                  limit_mem })
         | [timeout; oom ] ->
-            Prover (prover_config, Call_provers.{empty_limit with
+            Prover (prover_config, Call_provers.{empty_limits with
                                                  limit_time = float_of_string timeout;
                                                  limit_mem = int_of_string oom})
         | _ -> Bad_Arguments prover
@@ -362,7 +361,7 @@ let split_args s =
 type command =
   | Transform    of string * Trans.gentrans * string list
   | Strat        of string * Strategy.gen_strat * string list
-  | Prove        of Whyconf.config_prover * Call_provers.resource_limit
+  | Prove        of Whyconf.config_prover * Call_provers.resource_limits
   | Strategies   of string
   | Edit         of Whyconf.prover
   | Get_ce

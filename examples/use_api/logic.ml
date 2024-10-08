@@ -85,6 +85,11 @@ let main : Whyconf.main = Whyconf.get_main config
 (* all the provers detected, from the config file *)
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
+(* default resource limits *)
+let limits =
+  Call_provers.{empty_limits with
+                limit_time = Whyconf.timelimit main;
+                limit_mem = Whyconf.memlimit main }
 (* END{getconf} *)
 
 (* BEGIN{getanyaltergo} *)
@@ -106,12 +111,12 @@ let alt_ergo : Whyconf.config_prover =
 (* END{getanyaltergo} *)
 
 (* BEGIN{getaltergo200} *)
-(* Specific version 2.3.3 of Alt-Ergo in the config file *)
+(* Specific version 2.5.4 of Alt-Ergo in the config file *)
 let _ : Whyconf.config_prover =
-  let fp = Whyconf.parse_filter_prover "Alt-Ergo,2.3.3" in
+  let fp = Whyconf.parse_filter_prover "Alt-Ergo,2.5.4" in
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
-      eprintf "Prover Alt-Ergo 2.3.3 not installed or not configured, using version %s instead@."
+      eprintf "Prover Alt-Ergo 2.5.4 not installed or not configured, using version %s instead@."
         Whyconf.(alt_ergo.prover.prover_version) ;
     alt_ergo (* we don't want to fail this time *)
   end else
@@ -137,7 +142,7 @@ let alt_ergo_driver : Driver.driver =
 let result1 : Call_provers.prover_result =
   Call_provers.wait_on_call
     (Driver.prove_task
-       ~limit:Call_provers.empty_limit
+       ~limits
        ~config:main
        ~command:alt_ergo.Whyconf.command
        alt_ergo_driver
@@ -154,7 +159,7 @@ let result2 : Call_provers.prover_result =
     (Driver.prove_task
        ~command:alt_ergo.Whyconf.command
        ~config:main
-       ~limit:{Call_provers.empty_limit with Call_provers.limit_time = 10.}
+       ~limits:{ limits with Call_provers.limit_time = 10. }
        alt_ergo_driver
        task2)
 
@@ -201,7 +206,7 @@ let () = printf "@[task 3 created@]@."
 let result3 =
   Call_provers.wait_on_call
     (Driver.prove_task
-       ~limit:Call_provers.empty_limit
+       ~limits
        ~config:main
        ~command:alt_ergo.Whyconf.command
        alt_ergo_driver
@@ -242,7 +247,7 @@ let task4 = Task.add_prop_decl task4 Decl.Pgoal goal_id4 fmla4
 let result4 =
   Call_provers.wait_on_call
     (Driver.prove_task
-       ~limit:Call_provers.empty_limit
+       ~limits
        ~config:main
        ~command:alt_ergo.Whyconf.command
        alt_ergo_driver

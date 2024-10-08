@@ -46,14 +46,14 @@ type prover_result = {
 (* END{proverresult} anchor for automatic documentation, do not remove *)
 
 (* BEGIN{resourcelimit} anchor for automatic documentation, do not remove *)
-type resource_limit = {
+type resource_limits = {
   limit_time  : float;
   limit_mem   : int;
   limit_steps : int;
 }
 (* END{resourcelimit} anchor for automatic documentation, do not remove *)
 
-let empty_limit = { limit_time = 0. ; limit_mem = 0; limit_steps = 0 }
+let empty_limits = { limit_time = 0. ; limit_mem = 0; limit_steps = 0 }
 
 let limit_max =
   let single_limit_max a b = if a = 0 || b = 0 then 0 else max a b in
@@ -446,11 +446,11 @@ let actualcommand ~cleanup ~inplace ~config command limit file =
     raise e
 
 let adapt_limits limit on_timelimit =
-  if limit.limit_time = empty_limit.limit_time then limit
+  if limit.limit_time = empty_limits.limit_time then limit
   else
     { limit with limit_time =
       (* for steps limit use 2 * t + 1 time *)
-      if limit.limit_steps <> empty_limit.limit_steps
+      if limit.limit_steps <> empty_limits.limit_steps
       then (2. *. limit.limit_time +. 1.)
       (* if prover implements time limit, use 4t + 1 *)
       else if on_timelimit then 4. *. limit.limit_time +. 1.
@@ -468,7 +468,7 @@ let gen_id =
 type save_data = {
   vc_file         : string;
   inplace         : bool;
-  limit           : resource_limit;
+  limits          : resource_limits;
   res_parser      : prover_result_parser;
   get_model       : Printer.printing_info option;
 }
@@ -491,7 +491,7 @@ let handle_answer answer =
         if save.inplace then Sys.rename (backup_file save.vc_file) save.vc_file
       end;
       let ans = parse_prover_run save.res_parser timeout time out_file exit_code
-          save.limit save.get_model in
+          save.limits save.get_model in
       id, Some ans
   | Started id ->
       id, None
@@ -504,29 +504,29 @@ type prover_call =
   | EditorCall of int
 
 let call_on_file
-      ~config ~command ~limit ~res_parser ~get_model ?(inplace=false) fin =
+      ~config ~command ~limits ~res_parser ~get_model ?(inplace=false) fin =
   let id = gen_id () in
   let cmd, use_stdin, on_timelimit =
-    actualcommand ~cleanup:true ~inplace ~config command limit fin in
+    actualcommand ~cleanup:true ~inplace ~config command limits fin in
   let save = {
     vc_file         = fin;
     inplace         = inplace;
-    limit           = limit;
+    limits          = limits;
     res_parser      = res_parser;
     get_model       = get_model;
   } in
   Hashtbl.add saved_data id save;
-  let limit = adapt_limits limit on_timelimit in
+  let limits = adapt_limits limits on_timelimit in
   let use_stdin = if use_stdin then Some fin else None in
   Debug.dprintf
     debug
     "Request sent to prove_client:@ timelimit=%.2f@ memlimit=%d@ cmd=@[[%a]@]@."
-    limit.limit_time limit.limit_mem
+    limits.limit_time limits.limit_mem
     (Pp.print_list Pp.comma Pp.string) cmd;
   let libdir = Whyconf.libdir config in
   send_request ~libdir ~use_stdin ~id
-                            ~timelimit:limit.limit_time
-                            ~memlimit:limit.limit_mem
+                            ~timelimit:limits.limit_time
+                            ~memlimit:limits.limit_mem
                             ~cmd;
   ServerCall id
 
@@ -600,7 +600,7 @@ let rec wait_on_call = function
       let _, ret = Unix.waitpid [] pid in
       editor_result ret
 
-let call_on_buffer ~command ~config ~limit ~res_parser ~filename ~get_model
+let call_on_buffer ~command ~config ~limits ~res_parser ~filename ~get_model
     ~gen_new_file ?(inplace=false) buffer =
   let fin,cin =
     if gen_new_file then
@@ -614,12 +614,12 @@ let call_on_buffer ~command ~config ~limit ~res_parser ~filename ~get_model
       end
   in
   Buffer.output_buffer cin buffer; close_out cin;
-  call_on_file ~command ~config ~limit ~res_parser ~get_model ~inplace fin
+  call_on_file ~command ~config ~limits ~res_parser ~get_model ~inplace fin
 
 let call_editor ~config ~command fin =
   let command, use_stdin, _ =
     actualcommand
-      ~cleanup:false ~inplace:false ~config command empty_limit fin
+      ~cleanup:false ~inplace:false ~config command empty_limits fin
   in
   let exec = List.hd command in
   let argarray = Array.of_list command in

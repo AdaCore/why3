@@ -60,7 +60,7 @@ val return_prover: string -> Whyconf.config -> Whyconf.config_prover option
 type command =
   | Transform    of string * Trans.gentrans * string list
   | Strat        of string * Strategy.gen_strat * string list
-  | Prove        of Whyconf.config_prover * Call_provers.resource_limit
+  | Prove        of Whyconf.config_prover * Call_provers.resource_limits
   | Strategies   of string
   | Edit         of Whyconf.prover
   | Get_ce

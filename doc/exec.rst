@@ -15,8 +15,8 @@ Consider the program of :numref:`sec.maxandsum` that computes the
 maximum and the sum of an array of integers.
 Let us assume it is contained in a file :file:`maxsum.mlw`.
 
-To test function ``max_sum``, we can introduce a WhyML test function in
-module ``MaxAndSum``
+To test function ``max_sum``, we can introduce a WhyML test function
+in module ``MaxAndSum``
 
 .. code-block:: whyml
 
@@ -27,8 +27,8 @@ module ``MaxAndSum``
         a[5] <- 3; a[6] <- 2; a[7] <- 1; a[8] <- 10; a[9] <- 6;
         max_sum a n
 
-and then we use the :why3:tool:`execute` command to interpret this function, as
-follows:
+and then we use the :why3:tool:`execute` command to interpret this
+function, as follows:
 
 .. code-block:: console
 
@@ -37,6 +37,10 @@ follows:
     globals:
 
 We get the expected output, namely the pair ``(45, 10)``.
+
+Notice that the WhyML interpreter optionally supports Runtime
+Assertion Checking (RAC). This is detailed in
+:numref:`sec.why3execute`.
 
 .. _sec.extract:
 

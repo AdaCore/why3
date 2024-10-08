@@ -665,7 +665,7 @@ let select_model_from_verdict models =
       Pp.(print_list newline (print_dbg_classified_model selected_ix)) classified_models;
   selected
 
-let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
+let get_rac_results ~limits ?verb_lvl ?compute_term
     ?only_giant_step rac env pm models =
   if rac.ignore_incomplete then
     failwith "ignore incomplete must not be true for selecting models";
@@ -704,7 +704,7 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
                 let rac_execute ~giant_steps rs model =
                   let ctx = Pinterp.mk_ctx env ~do_rac:true ~giant_steps ~rac
                         ~oracle:(oracle_of_model env.pmodule model) ~compute_term
-                        ?timelimit ?steplimit () in
+                        ~limits () in
                   rac_execute ctx rs
                 in
                 let print_attrs = Debug.test_flag Call_provers.debug_attrs in
@@ -731,7 +731,7 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
                 let rac_execute ~giant_steps rs model =
                   let ctx = Pinterp.mk_ctx env ~do_rac:true ~giant_steps ~rac
                         ~oracle:(oracle_of_model env.pmodule model) ~compute_term
-                        ?timelimit ?steplimit () in
+                        ~limits () in
                   rac_execute ctx rs
                 in
                 let print_attrs = Debug.test_flag Call_provers.debug_attrs in
@@ -753,12 +753,12 @@ let get_rac_results ?timelimit ?steplimit ?verb_lvl ?compute_term
     i,r,m,normal_res,giant_res in
   List.map add_rac_result models
 
-let select_model ?timelimit ?steplimit ?verb_lvl ?compute_term ~check_ce
+let select_model ~limits ?verb_lvl ?compute_term ~check_ce
     rac env pm models =
   if check_ce then
     let only_giant_step = Debug.test_flag debug_check_ce_only_giant in
     let rac_results =
-      get_rac_results ?timelimit ?steplimit ?compute_term ?verb_lvl rac env pm models ~only_giant_step
+      get_rac_results ~limits ?compute_term ?verb_lvl rac env pm models ~only_giant_step
     in
     select_model_from_verdict rac_results
   else

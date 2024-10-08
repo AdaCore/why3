@@ -322,9 +322,10 @@ let why3_execute_one m rs =
   Sys_js.set_channel_flusher stdout (fun v -> Buffer.add_string output v);
   let {Theory.th_name = th} = m.Pmodule.mod_theory in
   let mod_name = th.Ident.id_string in
+  let limits = Call_provers.empty_limits in
   let result =
     try
-      let ctx = Pinterp.mk_ctx (Pinterp.mk_empty_env env m)
+      let ctx = Pinterp.mk_ctx ~limits (Pinterp.mk_empty_env env m)
           ~do_rac:false ~giant_steps:false () in
       let res = Pinterp.exec_global_fundef ctx [] None expr in
       Format.print_flush ();
