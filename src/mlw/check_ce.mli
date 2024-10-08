@@ -152,7 +152,7 @@ val last_non_empty_model : strategy_from_rac
 (** Select the last non empty model. *)
 
 val get_rac_results :
-  ?timelimit:float -> ?steplimit:int -> ?verb_lvl:int ->
+  limits:Call_provers.resource_limits -> ?verb_lvl:int ->
   ?compute_term:compute_term ->
   ?only_giant_step:bool ->
   rac -> Env.env -> Pmodule.pmodule ->
@@ -177,7 +177,7 @@ val select_model_from_giant_step_rac_results :
     By default, the strategy is [last_non_empty_model]. *)
 
 val select_model :
-  ?timelimit:float -> ?steplimit:int -> ?verb_lvl:int ->
+  limits:Call_provers.resource_limits -> ?verb_lvl:int ->
   ?compute_term:compute_term ->
   check_ce:bool ->
   rac -> Env.env -> Pmodule.pmodule ->

@@ -125,6 +125,11 @@ let () =
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
 
+let limits =
+  Call_provers.{empty_limits with
+                limit_time = Whyconf.timelimit main;
+                limit_mem = Whyconf.memlimit main }
+
 let alt_ergo : Whyconf.config_prover =
   let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
   (* all provers that have the name "Alt-Ergo" *)
@@ -150,7 +155,7 @@ let () =
        let r =
          Call_provers.wait_on_call
            (Driver.prove_task
-              ~limit:Call_provers.empty_limit
+              ~limits
               ~config:main
               ~command:alt_ergo.Whyconf.command
               alt_ergo_driver

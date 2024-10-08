@@ -72,7 +72,7 @@ val print_theory :
 val prove_task :
   command      : string ->
   config       : Whyconf.main ->
-  limit        : Call_provers.resource_limit ->
+  limits       : Call_provers.resource_limits ->
   ?old         : string ->
   ?inplace     : bool ->
   ?interactive : bool ->
@@ -91,7 +91,7 @@ val print_task_prepared :
 val prove_task_prepared :
   command      : string ->
   config       : Whyconf.main ->
-  limit        : Call_provers.resource_limit ->
+  limits       : Call_provers.resource_limits ->
   ?old         : string ->
   ?inplace     : bool ->
   ?interactive : bool ->
@@ -113,7 +113,7 @@ val prove_task_prepared :
 val prove_buffer_prepared :
   command      : string ->
   config       : Whyconf.main ->
-  limit        : Call_provers.resource_limit ->
+  limits       : Call_provers.resource_limits ->
   ?input_file  : string ->
   ?theory_name : string ->
   ?goal_name   : string ->

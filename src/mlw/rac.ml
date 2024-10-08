@@ -252,11 +252,11 @@ module Why = struct
   type why_prover = {
     command: string;
     driver: Driver.driver;
-    limit: Call_provers.resource_limit;
+    limits: Call_provers.resource_limits;
   }
 
-  let mk_why_prover ~command driver limit =
-    {command; driver; limit}
+  let mk_why_prover ~command driver limits =
+    {command; driver; limits}
 
   type config = {
     metas             : (Theory.meta * Theory.meta_arg list) list;
@@ -283,25 +283,16 @@ module Why = struct
 
   let mk_trans_lit env s = Trans.lookup_transform_l s env
 
-  let mk_config_lit config env ?(metas=[]) ?trans ?why_prover:why_prover_lit ?oracle_quant_var () =
+  let mk_config_lit config env ?(metas=[]) ?trans ~why_prover ?oracle_quant_var () =
     let metas = List.map mk_meta_lit metas in
     let trans = Option.map (mk_trans_lit env) trans in
     let why_prover =
-      let aux prover_string =
-        let name, limit_time, limit_mem =
-          match Strings.split ' ' prover_string with
-          | [name; limit_time; limit_mem] ->
-              name, float_of_string limit_time, int_of_string limit_mem
-          | [name; limit_time] ->
-              name, float_of_string limit_time, 1000
-          | [name] -> name, 1., 1000
-          | _ -> failwith "RAC reduce prover config must have format <prover>[ <time limit>[ <mem limit>]]" in
+      let aux (name,limits) =
         let pr = Whyconf.filter_one_prover config (Whyconf.parse_filter_prover name) in
         let command = String.concat " " (pr.Whyconf.command :: pr.Whyconf.extra_options) in
         let driver = Driver.load_driver_for_prover (Whyconf.get_main config) env pr in
-        let limit = Call_provers.{empty_limit with limit_time; limit_mem} in
-        mk_why_prover ~command driver limit in
-      Option.map aux why_prover_lit in
+        mk_why_prover ~command driver limits in
+      Option.map aux why_prover in
     let elim_eps = Trans.lookup_transform "eliminate_epsilon" env in
     mk_config ~metas ?trans ?why_prover ?oracle_quant_var ~elim_eps config
 
@@ -396,12 +387,13 @@ module Why = struct
           None )
 
   (** Check the validiy of a term that has been encoded in a task by dispatching it to a prover *)
-  let check_term_dispatch {command; driver; limit} cnf task =
+  let check_term_dispatch {command; driver; limits} cnf task =
     let open Call_provers in
+    (* Format.eprintf "@[<h>Calling prove_task with steps limit = %d@]@." limits.limit_steps; *)
     let call =
       Driver.prove_task
         ~command ~config:cnf.main_config
-        ~limit driver task
+        ~limits driver task
     in
     let res = wait_on_call call in
     Debug.Stats.add_timing "rac_prover" res.pr_time;
@@ -502,6 +494,6 @@ module Why = struct
         ?metas ?trans ?why_prover ?oracle_quant_var ~config ~elim_eps () =
     check_term (mk_config ?metas ?trans ?why_prover ?oracle_quant_var ~elim_eps config)
 
-  let mk_check_term_lit cnf env ?metas ?(trans="compute_in_goal") ?why_prover ?oracle_quant_var () =
-    check_term (mk_config_lit cnf env ?metas ~trans ?why_prover ?oracle_quant_var ())
+  let mk_check_term_lit cnf env ?metas ?(trans="compute_in_goal") ~why_prover ?oracle_quant_var () =
+    check_term (mk_config_lit cnf env ?metas ~trans ~why_prover ?oracle_quant_var ())
 end

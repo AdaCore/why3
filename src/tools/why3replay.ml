@@ -327,7 +327,7 @@ let transform_smoke cont tr_name =
            let _new_paid =
              Session_itp.graft_proof_attempt
                session new_pn pa.Session_itp.prover
-               ~limit:pa.Session_itp.limit in
+               ~limits:pa.Session_itp.limits in
            ())
           paids
      | _ -> assert false)

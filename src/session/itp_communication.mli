@@ -86,7 +86,7 @@ type update_info =
   | Proof_status_change of
       Controller_itp.proof_attempt_status
       * bool   (* obsolete or not *)
-      * Call_provers.resource_limit
+      * Call_provers.resource_limits
 
 type notification =
   | Reset_whole_tree

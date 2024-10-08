@@ -174,12 +174,17 @@ let maybe_giant_step_rac ctr parent models =
       parent |> Session_itp.find_th ctr.Controller_itp.controller_session |>
       Session_itp.theory_name |> Theory.restore_theory |> Pmodule.restore_module
     in
-    let check_term = Rac.Why.mk_check_term_lit cnf env
-        ?why_prover:Gnat_config.rac_prover () in
+    let rac_limits = Call_provers.empty_limits in
+    let rac_limits =
+      match Option.map float_of_int Gnat_config.rac_timelimit with
+      | None -> rac_limits
+      | Some t -> {rac_limits with limit_time = t}
+    in
+    let why_prover = Option.map (fun p -> (p, rac_limits)) Gnat_config.rac_prover in
+    let check_term = Rac.Why.mk_check_term_lit cnf env ~why_prover () in
     let compute_term = Rac.Why.mk_compute_term_lit env () in
     let rac = Pinterp.mk_rac check_term in
-    let timelimit = Option.map float_of_int Gnat_config.rac_timelimit in
-    let rac_results = Check_ce.get_rac_results ?timelimit ~compute_term
+    let rac_results = Check_ce.get_rac_results  ~limits:rac_limits ~compute_term
         ~only_giant_step:true rac env pm models in
     let models = List.map (fun (_,_,m,_,s) -> (m,s)) rac_results in
     List.map (fun model ->

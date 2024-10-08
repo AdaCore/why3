@@ -601,7 +601,7 @@ type pa_status =
   * bool
     (* obsolete or not *)
     (* TODO *)
-  * Call_provers.resource_limit
+  * Call_provers.resource_limits
 
 let node_id_type : node_type Hint.t = Hint.create 17
 let node_id_proved : bool Hint.t = Hint.create 17

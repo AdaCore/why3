@@ -57,7 +57,7 @@ let convert_prover_answer (pa: prover_answer) =
   | Failure s         -> "Failure",s
   | HighFailure       -> "HighFailure",""
 
-let convert_limit (l: Call_provers.resource_limit) =
+let convert_limit (l: Call_provers.resource_limits) =
   Record
     ["limit_time", Float l.Call_provers.limit_time;
      "limit_mem", Int l.Call_provers.limit_mem;

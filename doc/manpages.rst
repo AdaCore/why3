@@ -430,7 +430,7 @@ Options
 
 .. option:: --memlimit=<MiB>
 
-   Set the prover's memory limit.
+   Set the prover's memory limit, in megabytes
    By default, there is no limit.
 
 .. option:: --meta=<meta>[=<string>]
@@ -1622,7 +1622,7 @@ should use the `why3 bench` command on the new session instead.
 
 .. option:: -m <MiB>, --memlimit=<MiB>
 
-   Specify the memory limit for the added proof attempts.
+   Specify the memory limit, in megabytes, for the added proof attempts.
 
 .. why3:tool:: doc
 .. _sec.why3doc:
@@ -1781,7 +1781,7 @@ Runtime assertion checking (RAC)
 The execution can be instructed using option :option:`--rac` to check the
 validity of the program annotations that are encountered during the execution.
 This includes the validation of assertions, function contracts, and loop
-invariants [#no-function-invars]_.
+invariants [#no-type-invars]_.
 
 There are two strategies to check the validity of an annotation: First, the term
 is reduced using the Why3 transformation ``compute_in_goal``. The annotation is
@@ -1810,7 +1810,8 @@ Options
    exponent, and the number of bits of mantissa. For example, the
    standard single-precision binary representation (32 bits) is set by
    parameters -148,128,24. The default is using long double-precision
-   (128-bits) with parameters -16493,16384,113.
+   (128-bits) with parameters -16493,16384,113. Note that this feature
+   is only available when Why3 has been compiled with MPFR support.
 
 .. option:: --rac
 
@@ -1820,12 +1821,16 @@ Options
 
    Use prover *p* for the checking formulas, when term reduction is
    insufficient (which is always tried first). The prover *p* is the
-   name or shortcut of a prover, with optional, comma-separated time
-   limit and memory limit, e.g. ``cvc4,2,1000``.
+   name of a prover, with optional, comma-separated version number and
+   alternative, e.g. ``Alt-Ergo,2.6.0``.
 
 .. option:: --rac-timelimit=<sec>
 
    Time limit in seconds for RAC prover.
+
+.. option:: --rac-memlimit=<MiB>
+
+   Memory limit in megabytes for RAC prover.
 
 .. option:: --rac-steplimit=<steps>
 
@@ -1843,7 +1848,7 @@ Options
    Normally the execution continues normally when an annotation cannot be
    checked.
 
-.. [#no-function-invars] RAC for function invariants aren't supported yet.
+.. [#no-type-invars] RAC for type invariants aren't supported yet.
 
 .. why3:tool:: extract
 .. _sec.why3extract:

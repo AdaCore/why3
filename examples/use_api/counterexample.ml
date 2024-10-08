@@ -80,6 +80,11 @@ let main : Whyconf.main = Whyconf.get_main config
 (* all the provers detected, from the config file *)
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
+(* default resource limits *)
+let limits =
+  Call_provers.{empty_limits with
+                limit_time = Whyconf.timelimit main;
+                limit_mem = Whyconf.memlimit main }
 
 (* BEGIN{ce_get_cvc4ce} *)
 (* One alternative for CVC4 with counterexamples in the config file *)
@@ -110,7 +115,7 @@ let cvc4_driver : Driver.driver =
 let result1 : Call_provers.prover_result =
   Call_provers.wait_on_call
     (Driver.prove_task
-       ~limit:Call_provers.empty_limit
+       ~limits
        ~config:main
        ~command:(Whyconf.get_complete_command cvc4 ~with_steps:false)
     cvc4_driver task2)
@@ -163,7 +168,7 @@ let task =
 
 let {Call_provers.pr_models= models} =
   Call_provers.wait_on_call
-    (Driver.prove_task ~limit:Call_provers.empty_limit
+    (Driver.prove_task ~limits
        ~config:main
        ~command:(Whyconf.get_complete_command cvc4 ~with_steps:false)
        cvc4_driver task)
@@ -172,10 +177,11 @@ let () = print_endline "\n== Check CE"
 
 (* BEGIN{check_ce} *)
 let () =
+  let why_prover = Some ("Alt-Ergo,2.5.4",limits) in
   let rac = Pinterp.mk_rac ~ignore_incomplete:false
-      (Rac.Why.mk_check_term_lit config env ~why_prover:"alt-ergo" ()) in
+      (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
   let model, clsf = Option.get_exn (Failure "No good model found")
-      (Check_ce.select_model ~check_ce:true rac env pm models) in
+      (Check_ce.select_model ~limits ~check_ce:true rac env pm models) in
   printf "%a@." (Check_ce.print_model_classification env
                    ~check_ce:true ?verb_lvl:None ?json:None) (model, clsf)
 (* END{check_ce} *)
@@ -184,9 +190,10 @@ let () = print_endline "\n== RAC execute giant steps\n"
 
 (* BEGIN{check_ce_giant_step} *)
 let () =
+  let why_prover = Some ("Alt-Ergo,2.5.4",limits) in
   let rac = Pinterp.mk_rac ~ignore_incomplete:false
-    (Rac.Why.mk_check_term_lit config env ~why_prover:"alt-ergo" ()) in
-  let rac_results = Check_ce.get_rac_results ~only_giant_step:true
+    (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
+  let rac_results = Check_ce.get_rac_results ~limits ~only_giant_step:true
     rac env pm models in
   let strategy = Check_ce.best_non_empty_giant_step_rac_result in
   let _,res = Option.get_exn (Failure "No good model found")

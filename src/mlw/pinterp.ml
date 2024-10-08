@@ -76,7 +76,7 @@ type ctx = {
   rac          : rac;
   oracle    : oracle;
   compute_term : compute_term;
-  limits       : float option * int option;
+  limits       : Call_provers.resource_limits;
   old_varl     : ((term * lsymbol option) list * value Mvs.t) option;
 }
 (** The evaluation context of Pinterp *)
@@ -96,11 +96,11 @@ let mk_cntr_ctx ctx =
 
 let mk_rac = Pinterp_core.mk_rac
 
-let mk_ctx env ?timelimit ?steplimit ?(giant_steps=false)
+let mk_ctx env ~limits ?(giant_steps=false)
     ?(do_rac=false) ?(rac=rac_dummy) ?(oracle=oracle_dummy)
     ?(compute_term=compute_term_dummy) () =
   {env; do_rac; compute_term; giant_steps; rac; oracle;
-   limits=(timelimit, steplimit); old_varl= None }
+   limits; old_varl= None }
 
 let add_local_funs locals rdl ctx =
   let add acc (rs, ce) = Mrs.add rs (ce, rdl) acc in
@@ -800,28 +800,33 @@ let assign_written_vars ?(vars_map=Mpv.empty) wrt loc ctx vs =
 (*                           TIME AND STEP LIMITS                             *)
 (******************************************************************************)
 
-let check_timelimit time0 = function
-  | None -> ()
-  | Some timelimit ->
-      if Sys.time () -. time0 >= timelimit then
-        incomplete "RAC timelimit reached"
-
-let check_steplimit (steps: int) = function
-  | None -> ()
-  | Some steplimit ->
-      if steps >= steplimit then
-        incomplete "RAC steplimit reached"
 
 (* State for checking limits (start time and current step count) *)
 let limits_state = ref None
 
-let check_limits (timelimit, steplimit) =
+let check_limits ctx =
+  let timelimit = ctx.limits.Call_provers.limit_time in
+  let steplimit = ctx.limits.Call_provers.limit_steps in
+  let exception Timelimit in
+  let exception Steplimit in
+  let check_timelimit time0 timelimit =
+        if timelimit > 0.0 && Sys.time () -. time0 >= timelimit then
+          raise Timelimit
+  in
+  let check_steplimit (steps: int) steplimit =
+        if steplimit > 0 && steps >= steplimit then
+          raise Steplimit
+  in
   match !limits_state with
   | None -> failwith "check_limits: called outside with_limits"
   | Some (time0, steps) ->
       incr steps;
-      check_timelimit time0 timelimit;
-      check_steplimit !steps steplimit
+      try
+        check_timelimit time0 timelimit;
+        check_steplimit !steps steplimit
+      with
+      | Timelimit -> incomplete "RAC timelimit reached"
+      | Steplimit -> incomplete "RAC steplimit reached"
 
 let set_limits () =
   if !limits_state <> None then failwith "set_limits: limits already set";
@@ -914,7 +919,7 @@ let add_post_premises cty res env =
       add_premises ~post_res:t ~vsenv post env) post_res
 
 let rec exec_expr ctx e =
-  check_limits ctx.limits;
+  check_limits ctx;
   let _,bl,bc,el,ec = Loc.get (Option.value ~default:Loc.dummy_position e.e_loc) in
   Debug.dprintf debug_trace_exec "@[<h>%t%sEVAL EXPR %d,%d-%d,%d: %a@]@." pp_indent
     (if ctx.giant_steps then "G-s. " else "") bl bc el ec
