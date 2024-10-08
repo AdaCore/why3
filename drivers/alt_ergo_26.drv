@@ -1,0 +1,58 @@
+
+import "alt_ergo_smt.drv"
+
+(* Support for IEEE theory of floats in Alt-Ergo 2.6.0 *)
+
+theory ieee_float.GenericFloat
+
+  syntax type t "Real"
+  syntax function to_real "%1"
+  remove prop Round_monotonic
+  remove prop Round_idempotent
+end
+
+theory ieee_float.RoundingMode
+   syntax type mode "RoundingMode"
+   syntax function RNE "RNE"
+   syntax function RNA "RNA"
+   syntax function RTP "RTP"
+   syntax function RTN "RTN"
+   syntax function RTZ "RTZ"
+
+   syntax predicate to_nearest "(or (= %1 RNE) (= %1 RNA))"
+end
+
+
+theory ieee_float.Float32
+
+  syntax function round "ae.float32 %1 %2"
+
+  syntax function add  "ae.float32 %1 (+ %2 %3)"
+  syntax function sub  "ae.float32 %1 (- %2 %3)"
+  syntax function mul  "ae.float32 %1 (* %2 %3)"
+  syntax function div  "ae.float32 %1 (/ %2 %3)"
+  syntax function fma  "ae.float32 %1 (+ (* %2 %3) %4)"
+
+  syntax predicate le  "(<= %1 %2)"
+  syntax predicate lt  "(< %1 %2)"
+  syntax predicate ge  "(>= %1 %2)"
+  syntax predicate gt  "(> %1 %2)"
+
+end
+
+theory ieee_float.Float64
+
+  syntax function round "ae.float64 %1 %2"
+
+  syntax function add  "ae.float64 %1 (+ %2 %3)"
+  syntax function sub  "ae.float64 %1 (- %2 %3)"
+  syntax function mul  "ae.float64 %1 (* %2 %3)"
+  syntax function div  "ae.float64 %1 (/ %2 %3)"
+  syntax function fma  "ae.float64 %1 (+ (* %2 %3) %4)"
+
+  syntax predicate le  "(<= %1 %2)"
+  syntax predicate lt  "(< %1 %2)"
+  syntax predicate ge  "(>= %1 %2)"
+  syntax predicate gt  "(> %1 %2)"
+
+end
