@@ -1,0 +1,94 @@
+
+(** Examples for testing a new form of presentation of counterexamples
+
+    This file concerns the presentation of CE for a logic goal
+
+*)
+
+use int.Int
+
+constant a : int
+
+goal g1 : a <= 42
+
+(** Expected form of answer:
+
+Goal `g1` is not valid. A counterexample is given by the following logic context
+--
+constant a : int = 43
+--
+(or any value larger than 43)
+*)
+
+
+constant b : int
+
+goal g2 : a <= b+1
+(** Expected form of answer:
+
+Goal `g2` is not valid. A counterexample is given by the following logic context
+--
+constant a : int = 2
+constant b : int = 0
+--
+
+*)
+
+goal g3 : forall x:int. a <= x+1
+(** Expected form of answer:
+
+Goal `g3` is not valid. A counterexample is given by the following logic context
+--
+constant a : int = 2
+--
+and the locally quantified variables
+--
+x : int = 0
+--
+
+*)
+
+function f int : int
+
+goal g4 : f a <= 42
+(** Expected form of answer:
+
+Goal `g4` is not valid. A counterexample is given by the following logic context
+--
+constant a : int = 0
+function f : int -> int = fun _ -> 43
+--
+
+*)
+
+predicate p int
+
+axiom p_spec:  p 0
+
+goal g5 : p a
+(** Expected form of answer:
+
+Goal `g5` is not valid. A counterexample is given by the following logic context
+--
+constant a : int = 1
+predicate p : int -> bool = fun x -> x = 0
+--
+
+*)
+
+
+goal g6 : forall x:int. a + b + x + f x <= 42
+(** Expected form of answer:
+
+Goal `g6` is not valid. A counterexample is given by the following logic context
+--
+constant a : int = 43
+constant b : int = 0
+function f : int -> int = fun _ -> 0
+--
+and the locally quantified variables
+--
+x : int = 0
+--
+
+*)
