@@ -13,7 +13,7 @@ let binary_search (s: seq int) (v: int)
      (notfound { forall i. 0 <= i < length s -> s[i] <> v })
 = loop {0} {length s}
   [ loop (lo: int) (hi: int)
-     { 0 <= lo } { hi <= length s }
+     { 0 <= lo <= hi <= length s }
      { forall i. 0 <= i < lo -> s[i] <> v }
      { forall i. hi <= i < length s -> s[i] <> v }
     = if { lo >= hi } notfound
@@ -30,7 +30,7 @@ let binary_search2 (s: seq int) (v: int)
      (notfound { forall i. 0 <= i < length s -> s[i] <> v })
 = loop {0} {length s}
   [ loop (lo: int) (hi: int)
-     { 0 <= lo } { hi <= length s }
+     { 0 <= lo <= hi <= length s }
      { forall i. 0 <= i < lo -> s[i] <> v }
      { forall i. hi <= i < length s -> s[i] <> v }
     = body {lo + div (hi - lo) 2}
