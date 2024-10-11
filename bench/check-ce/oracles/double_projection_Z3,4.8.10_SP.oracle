@@ -7,7 +7,7 @@
   - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Cannot prove termination for c`)
 File "bench/check-ce/double_projection.mlw", line 19, characters 15-22:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Unknown (sat) (205 steps).
+Prover result is: Unknown (sat) (179 steps).
 The following counterexample model could not be verified
   (both RAC terminated with uncaught exception `Cannot prove termination for c`):
 File double_projection.mlw:
@@ -30,9 +30,6 @@ File double_projection.mlw:
       ->
       int = [|epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1 => 1; _ => 1|]
   Line 17:
-    x : t = epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1
-    x : t = epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1
-  Line 19:
     x : t = epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1
     x : t = epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1
   Line 21:

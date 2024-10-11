@@ -7,7 +7,7 @@
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `load_val` cannot be evaluated)
 File "bench/check-ce/map_of_algebraic.mlw", line 34, characters 4-16:
 Sub-goal Precondition of goal not_valid'vc.
-Prover result is: Step limit exceeded (17 steps).
+Prover result is: Step limit exceeded (15 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `load_val` cannot be evaluated):
 File bv.mlw:
@@ -27,10 +27,5 @@ File map_of_algebraic.mlw:
   Line 27:
     x : loc = {base_addr = 0; offset = {bv.BV32.t'int => 32}}
   Line 33:
-    x : loc = {base_addr = 0; offset = {bv.BV32.t'int => 32}}
-  Line 34:
-    Writable : p = Mem.Writable
-    Writable : p = Mem.Writable
-    x : loc = {base_addr = 0; offset = {bv.BV32.t'int => 32}}
     x : loc = {base_addr = 0; offset = {bv.BV32.t'int => 32}}
 

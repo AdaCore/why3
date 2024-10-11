@@ -7,7 +7,7 @@
   - Abstract RAC: STUCK (failure in postcondition of `(:=)` at "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
 File "bench/check-ce/if_assign.mlw", line 10, characters 12-23:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Step limit exceeded (3000024 steps).
+Prover result is: Step limit exceeded (3000021 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -56,7 +56,7 @@ File if_assign.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 16, characters 12-23)
 File "bench/check-ce/if_assign.mlw", line 16, characters 12-23:
 Sub-goal Postcondition of goal fTest1'vc.
-Prover result is: Step limit exceeded (3000037 steps).
+Prover result is: Step limit exceeded (3000034 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -73,28 +73,32 @@ File if_assign.mlw:
     result = {contents= 0}
     x = {contents= 0}
   Line 15:
-    a = 0
-    a = 0
+    a = 2
+    a = 2
     Execution of main function `fTest1` with env:
       x = {contents= 0}
-      a = 0
+      a = 2
       zero = 0
       one = 1
   Line 18:
     Normal execution of function `(=)` with args:
-      x = 0
+      x = 2
       y = 0
+  Line 21:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 0}
+      v = 18
   Line 22:
     Normal execution of function `(!)` with args:
-      r = {contents= 42}
+      r = {contents= 18}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 42}
+      arg = {contents= 18}
 File if_assign.mlw:
   Line 16:
     Property failure at postcondition of `fTest1` with:
-      result = 42
+      result = 18
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC

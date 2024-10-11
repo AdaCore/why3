@@ -11,7 +11,7 @@ Prover result is: Valid (355 steps).
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
 File "bench/check-ce/jlamp_array_mono.mlw", line 48, characters 4-16:
 Sub-goal Index in array bounds of goal f'vc.
-Prover result is: Step limit exceeded (3000041 steps).
+Prover result is: Step limit exceeded (3000038 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_mono.mlw:
@@ -104,15 +104,6 @@ File jlamp_array_mono.mlw:
       array = {Array.elts =
                [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
                Array.length = 0}
-  Line 48:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
-               Array.length = 0}
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
-               Array.length = 0}
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -123,7 +114,7 @@ File jlamp_array_mono.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
 File "bench/check-ce/jlamp_array_mono.mlw", line 47, characters 14-27:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Step limit exceeded (3000066 steps).
+Prover result is: Step limit exceeded (3000060 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_mono.mlw:
@@ -256,17 +247,6 @@ File jlamp_array_mono.mlw:
       array = {Array.elts =
                [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
                Array.length = 4}
-  Line 47:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
-               Array.length = 4}
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
-               Array.length = 4}
-    three : t = {Array.to_int => 3}
-    three : t = {Array.to_int => 3}
   Line 48:
     a :
       array = {Array.elts =
@@ -275,7 +255,7 @@ File jlamp_array_mono.mlw:
 
 File "bench/check-ce/jlamp_array_mono.mlw", line 54, characters 4-16:
 Sub-goal Index in array bounds of goal g'vc.
-Prover result is: Valid (614 steps).
+Prover result is: Valid (588 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -286,7 +266,7 @@ Prover result is: Valid (614 steps).
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `g` cannot be evaluated)
 File "bench/check-ce/jlamp_array_mono.mlw", line 53, characters 14-27:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Step limit exceeded (3000071 steps).
+Prover result is: Step limit exceeded (3000065 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `g` cannot be evaluated):
 File jlamp_array_mono.mlw:
@@ -430,19 +410,6 @@ File jlamp_array_mono.mlw:
       array = {Array.elts =
                [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
                Array.length = 43}
-  Line 53:
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
-               _ => {Array.to_int => 2}|];
-               Array.length = 43}
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
-               _ => {Array.to_int => 2}|];
-               Array.length = 43}
-    three : t = {Array.to_int => 3}
-    three : t = {Array.to_int => 3}
   Line 54:
     a :
       array = {Array.elts =
@@ -452,7 +419,7 @@ File jlamp_array_mono.mlw:
 
 File "bench/check-ce/jlamp_array_mono.mlw", line 60, characters 4-16:
 Sub-goal Index in array bounds of goal h'vc.
-Prover result is: Valid (614 steps).
+Prover result is: Valid (588 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -463,7 +430,7 @@ Prover result is: Valid (614 steps).
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `h` cannot be evaluated)
 File "bench/check-ce/jlamp_array_mono.mlw", line 59, characters 14-27:
 Sub-goal Postcondition of goal h'vc.
-Prover result is: Step limit exceeded (3000071 steps).
+Prover result is: Step limit exceeded (3000065 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `h` cannot be evaluated):
 File jlamp_array_mono.mlw:
@@ -623,19 +590,6 @@ File jlamp_array_mono.mlw:
                [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
                _ => {Array.to_int => 2}|];
                Array.length = 43}
-  Line 59:
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
-               _ => {Array.to_int => 2}|];
-               Array.length = 43}
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
-               _ => {Array.to_int => 2}|];
-               Array.length = 43}
-    three : t = {Array.to_int => 3}
-    three : t = {Array.to_int => 3}
   Line 60:
     a :
       array = {Array.elts =

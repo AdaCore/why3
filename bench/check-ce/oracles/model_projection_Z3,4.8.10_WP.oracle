@@ -7,7 +7,7 @@
   - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Cannot prove termination for to_map`)
 File "bench/check-ce/model_projection.mlw", line 23, characters 11-48:
 Sub-goal Assertion of goal g1'vc.
-Prover result is: Unknown (sat) (402 steps).
+Prover result is: Unknown (sat) (369 steps).
 The following counterexample model could not be verified
   (both RAC terminated with uncaught exception `Cannot prove termination for to_map`):
 File model_projection.mlw:
@@ -82,9 +82,6 @@ File model_projection.mlw:
       t = {Top.to_map => [|14 => 42; _ => 42|]}
     y : s = {d = {Top.to_map => [|14 => 42; _ => 42|]}}
     y : s = {d = {Top.to_map => [|14 => 42; _ => 42|]}}
-    y : t = {Top.to_map => [|14 => 42; _ => 42|]}
-    y : t = {Top.to_map => [|14 => 42; _ => 42|]}
-  Line 23:
     y : t = {Top.to_map => [|14 => 42; _ => 42|]}
     y : t = {Top.to_map => [|14 => 42; _ => 42|]}
 

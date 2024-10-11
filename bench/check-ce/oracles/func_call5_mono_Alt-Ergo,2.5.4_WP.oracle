@@ -1,10 +1,10 @@
 File "bench/check-ce/func_call5_mono.mlw", line 9, characters 12-25:
 Sub-goal Postcondition of goal g1'vc.
-Prover result is: Valid (4 steps).
+Prover result is: Valid (3 steps).
 
 File "bench/check-ce/func_call5_mono.mlw", line 15, characters 10-14:
 Sub-goal Precondition of goal f1'vc.
-Prover result is: Valid (2 steps).
+Prover result is: Valid (1 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -18,7 +18,7 @@ Prover result is: Valid (2 steps).
   - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to g1 at "bench/check-ce/func_call5_mono.mlw", line 15, characters 10-14)
 File "bench/check-ce/func_call5_mono.mlw", line 16, characters 11-18:
 Sub-goal Assertion of goal f1'vc.
-Prover result is: Unknown (unknown) (10 steps).
+Prover result is: Unknown (unknown) (6 steps).
 The following counterexample model could not be verified
   (abstract RAC fatal rac error: missing value for return value of call to g1 at "bench/check-ce/func_call5_mono.mlw", line 15, characters 10-14):
 File func_call5_mono.mlw:
@@ -28,11 +28,6 @@ File func_call5_mono.mlw:
   Line 12:
     x : int = 2
   Line 15:
-    z : int = 4
-  Line 16:
-    x : int = 2
-    x : int = 2
-    z : int = 4
     z : int = 4
 
 <check_ce:categorization>Categorizations of models:

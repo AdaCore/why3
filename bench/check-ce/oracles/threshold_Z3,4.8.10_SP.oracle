@@ -1,13 +1,13 @@
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
-  - Concrete RAC: STUCK (for range projection int32 at "bench/check-ce/threshold.mlw", line 8, characters 9-12)
-  - Abstract RAC: STUCK (for range projection int32 at "bench/check-ce/threshold.mlw", line 8, characters 9-12)
+  - Concrete RAC: STUCK (for range projection int32 at "bench/check-ce/threshold.mlw", line 8, characters 7-8)
+  - Abstract RAC: STUCK (for range projection int32 at "bench/check-ce/threshold.mlw", line 8, characters 7-8)
 - Selected model 1: NC
   - Concrete RAC: FAILURE (precondition at "bench/check-ce/threshold.mlw", line 11, characters 11-20)
   - Abstract RAC: FAILURE (precondition at "bench/check-ce/threshold.mlw", line 11, characters 11-20)
 File "bench/check-ce/threshold.mlw", line 11, characters 11-20:
 Sub-goal Integer overflow of goal f'vc.
-Prover result is: Unknown (sat) (1287 steps).
+Prover result is: Unknown (sat) (1231 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -26,27 +26,27 @@ File int.mlw:
     max_int32 = 2147483647
 File threshold.mlw:
   Line 8:
-    n = epsilon x:int32. int32'int x = 1
-    min = epsilon x:int32. int32'int x = 2147483647
-    max = epsilon x:int32. int32'int x = 1
-    n = epsilon x:int32. int32'int x = 1
-    min = epsilon x:int32. int32'int x = 2147483647
-    max = epsilon x:int32. int32'int x = 1
+    n = epsilon x:int32. int32'int x = (- 2147483648)
+    min = epsilon x:int32. int32'int x = (- 2147483648)
+    max = epsilon x:int32. int32'int x = (- 1)
+    n = epsilon x:int32. int32'int x = (- 2147483648)
+    min = epsilon x:int32. int32'int x = (- 2147483648)
+    max = epsilon x:int32. int32'int x = (- 1)
     Execution of main function `f` with env:
-      n = epsilon x:int32. int32'int x = 1
-      min = epsilon x:int32. int32'int x = 2147483647
-      max = epsilon x:int32. int32'int x = 1
+      n = epsilon x:int32. int32'int x = (- 2147483648)
+      min = epsilon x:int32. int32'int x = (- 2147483648)
+      max = epsilon x:int32. int32'int x = (- 1)
       zero = 0
       one = 1
       min_int32 = (-2147483648)
       max_int32 = 2147483647
   Line 11:
     (giant-step) execution of unimplemented function `(+)`
-      a = epsilon x:int32. int32'int x = 2147483647
-      b = epsilon x:int32. int32'int x = 1
+      a = epsilon x:int32. int32'int x = (- 2147483648)
+      b = epsilon x:int32. int32'int x = (- 1)
     Property failure at precondition of `(+)` with:
-      a = epsilon x:int32. int32'int x = 2147483647
-      b = epsilon x:int32. int32'int x = 1
+      a = epsilon x:int32. int32'int x = (- 2147483648)
+      b = epsilon x:int32. int32'int x = (- 1)
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -57,7 +57,7 @@ File threshold.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/threshold.mlw", line 9, characters 13-33)
 File "bench/check-ce/threshold.mlw", line 9, characters 13-33:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Unknown (sat) (2912 steps).
+Prover result is: Unknown (sat) (2687 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -115,7 +115,7 @@ File threshold.mlw:
   - Abstract RAC: NORMAL
 File "bench/check-ce/threshold.mlw", line 30, characters 11-24:
 Sub-goal Arithmetic overflow of goal f'vc.
-Prover result is: Step limit exceeded (500064 steps).
+Prover result is: Step limit exceeded (500058 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -128,24 +128,24 @@ File int.mlw:
 File threshold.mlw:
   Line 26:
     n = (0:t)
-    min = (2147516419:t)
-    max = (2147524228:t)
+    min = (2147745792:t)
+    max = (2147745792:t)
     n = (0:t)
-    min = (2147516419:t)
-    max = (2147524228:t)
+    min = (2147745792:t)
+    max = (2147745792:t)
     Execution of main function `f` with env:
       n = (0:t)
-      min = (2147516419:t)
-      max = (2147524228:t)
+      min = (2147745792:t)
+      max = (2147745792:t)
       zero = 0
       one = 1
   Line 30:
     (giant-step) execution of unimplemented function `u_add`
-      a = (2147516419:t)
-      b = (2147524228:t)
+      a = (2147745792:t)
+      b = (2147745792:t)
     Property failure at precondition of `u_add` with:
-      a = (2147516419:t)
-      b = (2147524228:t)
+      a = (2147745792:t)
+      b = (2147745792:t)
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -156,7 +156,7 @@ File threshold.mlw:
   - Abstract RAC: NORMAL
 File "bench/check-ce/threshold.mlw", line 27, characters 13-45:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Step limit exceeded (500105 steps).
+Prover result is: Step limit exceeded (500096 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -169,30 +169,30 @@ File int.mlw:
 File threshold.mlw:
   Line 26:
     n = (2:t)
-    min = (268435459:t)
+    min = (41943169:t)
     max = (0:t)
     n = (2:t)
-    min = (268435459:t)
+    min = (41943169:t)
     max = (0:t)
     Execution of main function `f` with env:
       n = (2:t)
-      min = (268435459:t)
+      min = (41943169:t)
       max = (0:t)
       zero = 0
       one = 1
   Line 30:
     (giant-step) execution of unimplemented function `u_add`
-      a = (268435459:t)
+      a = (41943169:t)
       b = (0:t)
-    result of `u_add` = (268435459:t)
+    result of `u_add` = (41943169:t)
   Line 31:
     (giant-step) execution of unimplemented function `u_lt`
       a = (2:t)
-      b = (268435459:t)
+      b = (41943169:t)
     result of `u_lt` = true
   Line 27:
     Property failure at postcondition of `f1` with:
-      min = (268435459:t)
+      min = (41943169:t)
       max = (0:t)
-      result = (268435459:t)
+      result = (41943169:t)
 
