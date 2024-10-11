@@ -11,7 +11,7 @@ Prover result is: Valid (259 steps).
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `([])` cannot be evaluated)
 File "bench/check-ce/array_mono.mlw", line 36, characters 4-8:
 Sub-goal Index in array bounds of goal f1'vc.
-Prover result is: Step limit exceeded (100020 steps).
+Prover result is: Step limit exceeded (100017 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -39,7 +39,7 @@ File array_mono.mlw:
 
 File "bench/check-ce/array_mono.mlw", line 41, characters 4-14:
 Sub-goal Index in array bounds of goal f2'vc.
-Prover result is: Valid (468 steps).
+Prover result is: Valid (442 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -50,7 +50,7 @@ Prover result is: Valid (468 steps).
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `f2` cannot be evaluated)
 File "bench/check-ce/array_mono.mlw", line 40, characters 14-26:
 Sub-goal Postcondition of goal f2'vc.
-Prover result is: Step limit exceeded (100055 steps).
+Prover result is: Step limit exceeded (100052 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `([]<-)` cannot be evaluated):
 File array_mono.mlw:
@@ -123,9 +123,6 @@ File array_mono.mlw:
     old a : array = {Array.elts = [|1 => 42; _ => 3|]; Array.length = 2}
   Line 38:
     a : array = {Array.elts = [|1 => 42; _ => 3|]; Array.length = 2}
-  Line 40:
-    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 3|]; Array.length = 2}
-    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 3|]; Array.length = 2}
   Line 41:
     a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 3|]; Array.length = 2}
 

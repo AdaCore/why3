@@ -10,7 +10,7 @@
   - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to f at "bench/check-ce/call-val-function.mlw", line 11, characters 10-13)
 File "bench/check-ce/call-val-function.mlw", line 9, characters 12-24:
 Sub-goal Postcondition of goal main'vc.
-Prover result is: Unknown (unknown) (8 steps).
+Prover result is: Unknown (unknown) (6 steps).
 The following counterexample model could not be verified
   (both RAC fatal rac error: missing value for return value of call to f at "bench/check-ce/call-val-function.mlw", line 11, characters 10-13):
 File call-val-function.mlw:
@@ -19,9 +19,6 @@ File call-val-function.mlw:
     z : int = 43
   Line 8:
     y : int = 0
-  Line 9:
-    result : int = 44
-    result : int = 44
   Line 11:
     z : int = 43
 
@@ -128,7 +125,4 @@ File call-val-function.mlw:
   Line 43:
     y : int = 42
     y : int = 42
-  Line 44:
-    result : int = 44
-    result : int = 44
 

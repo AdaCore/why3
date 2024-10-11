@@ -23,7 +23,7 @@ Warning: term reduction aborted (takes more than 1024 steps).
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `local` cannot be evaluated)
 File "bench/check-ce/703_reduce_term.mlw", line 391, characters 4-55:
 Sub-goal Precondition of goal def'vc.
-Prover result is: Step limit exceeded (500114 steps).
+Prover result is: Step limit exceeded (500111 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `local` cannot be evaluated):
 File 703_reduce_term.mlw:
@@ -528,7 +528,4 @@ File 703_reduce_term.mlw:
       t = fun x!02 x!12 x!21 ->
            if x!02 = #x00000000 /\ x!12 = #x00000001 /\ x!21 = #x00000000
            then #x00000000 else #x00000000
-  Line 391:
-    base : t = #x00000001
-    base : t = #x00000001
 

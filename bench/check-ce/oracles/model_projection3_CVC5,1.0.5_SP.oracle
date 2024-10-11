@@ -1,0 +1,35 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Cannot prove termination for g`)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Cannot prove termination for g`)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Cannot prove termination for g`)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Cannot prove termination for g`)
+File "bench/check-ce/model_projection3.mlw", line 18, characters 12-56:
+Sub-goal Assertion of goal test'vc.
+Prover result is: Unknown (sat) (200 steps).
+The following counterexample model could not be verified
+  (both RAC terminated with uncaught exception `Cannot prove termination for g`):
+File model_projection3.mlw:
+  Line 8:
+    f : t -> int = [|_ => 0|]
+    f : t -> int = [|_ => 0|]
+  Line 12:
+    g :
+      t
+      ->
+      int = fun _arg_12 ->
+             if epsilon x. (M.f x) = 0 /\ (M.g x) = 23 = _arg_12 then 23
+             else 41
+    g :
+      t
+      ->
+      int = fun _arg_12 ->
+             if epsilon x. (M.f x) = 0 /\ (M.g x) = 23 = _arg_12 then 23
+             else 41
+  Line 17:
+    x : t = epsilon x. (M.f x) = 0 /\ (M.g x) = 23
+    x : t = epsilon x. (M.f x) = 0 /\ (M.g x) = 23
+    y : t = epsilon x. (M.f x) = 0 /\ (M.g x) = 41
+    y : t = epsilon x. (M.f x) = 0 /\ (M.g x) = 41
+

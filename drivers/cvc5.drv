@@ -45,12 +45,6 @@ transformation "eliminate_epsilon"
 transformation "eliminate_literal"
 transformation "simplify_formula"
 
-(* Prepare for counter-example query: get rid of some quantifiers
-   (makes it possible to query model values of the variables in
-   premises) and introduce counter-example projections.  Note: does
-   nothing if meta get_counterexmp is not set *)
-transformation "prepare_for_counterexmp"
-
 transformation "eliminate_projections_sums"
 transformation "discriminate_if_poly"
 transformation "eliminate_algebraic_if_poly"

@@ -1,6 +1,6 @@
 File "bench/check-ce/func_call3.mlw", line 8, characters 12-21:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Valid (388 steps).
+Prover result is: Valid (324 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -11,7 +11,7 @@ Prover result is: Valid (388 steps).
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/func_call3.mlw", line 9, characters 17-26)
 File "bench/check-ce/func_call3.mlw", line 9, characters 17-26:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Unknown (unknown + incomplete) (499 steps).
+Prover result is: Unknown (unknown + incomplete) (435 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -25,11 +25,11 @@ File func_call3.mlw:
   Line 4:
     z = {contents= (- 1)}
   Line 6:
-    x = 0
-    x = 0
+    x = (- 1)
+    x = (- 1)
     Execution of main function `g` with env:
       z = {contents= (- 1)}
-      x = 0
+      x = (- 1)
       zero = 0
       one = 1
   Line 10:
@@ -40,10 +40,10 @@ File func_call3.mlw:
       _ = 1
   Line 11:
     Normal execution of function `(+)` with args:
-      _ = 0
+      _ = (- 1)
       _ = 1
   Line 9:
     Property failure at postcondition of `g` with:
-      x = 0
-      r = 1
+      x = (- 1)
+      r = 0
 

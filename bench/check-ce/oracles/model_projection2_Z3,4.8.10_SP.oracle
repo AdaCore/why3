@@ -66,7 +66,7 @@ File model_projection2.mlw:
   - Abstract RAC: INCOMPLETE (fatal rac error: missing value for global `get`)
 File "bench/check-ce/model_projection2.mlw", line 26, characters 10-23:
 Sub-goal Assertion of goal g2'vc.
-Prover result is: Unknown (sat) (339 steps).
+Prover result is: Unknown (sat) (311 steps).
 The following counterexample model could not be verified
   (both RAC fatal rac error: missing value for global `get`):
 File model_projection2.mlw:
@@ -74,9 +74,6 @@ File model_projection2.mlw:
     to_array : poly_map int int -> int -> int = [|_ => [|_ => 41|]|]
     to_array : poly_map int int -> int -> int = [|_ => [|_ => 41|]|]
   Line 25:
-    x : poly_map int int = {G.to_array => [|_ => 41|]}
-    x : poly_map int int = {G.to_array => [|_ => 41|]}
-  Line 26:
     x : poly_map int int = {G.to_array => [|_ => 41|]}
     x : poly_map int int = {G.to_array => [|_ => 41|]}
 

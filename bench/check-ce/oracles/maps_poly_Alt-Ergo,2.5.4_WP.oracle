@@ -10,7 +10,7 @@
   - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 10, characters 17-19)
 File "bench/check-ce/maps_poly.mlw", line 8, characters 14-28:
 Sub-goal Postcondition of goal test_map'vc.
-Prover result is: Unknown (unknown) (11 steps).
+Prover result is: Unknown (unknown) (10 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -77,18 +77,6 @@ File maps_poly.mlw:
       int
       ->
       int = [|1 => [|_ => 0|]; 0 => [|_ => 0|]; _ => [|_ => 0|]|]
-    x :
-      int
-      ->
-      int
-      ->
-      int = [|1 => [|_ => 0|]; 0 => [|_ => 0|]; _ => [|_ => 0|]|]
-    x :
-      int
-      ->
-      int
-      ->
-      int = [|1 => [|_ => 0|]; 0 => [|_ => 0|]; _ => [|_ => 0|]|]
   Line 16:
     x :
       int
@@ -109,7 +97,7 @@ File maps_poly.mlw:
   - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 21, characters 21-23)
 File "bench/check-ce/maps_poly.mlw", line 19, characters 14-34:
 Sub-goal Postcondition of goal test_map_multidim2'vc.
-Prover result is: Unknown (unknown) (15 steps).
+Prover result is: Unknown (unknown) (14 steps).
 The following counterexample model could not be verified
   (concrete RAC fatal rac error: unexpected arguments passed to (@), abstract RAC fatal rac error: missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 21, characters 21-23):
 File ref.mlw:
@@ -119,18 +107,6 @@ File maps_poly.mlw:
   Line 18:
     x : int -> int -> int = [|_ => [|_ => 0|]|]
   Line 19:
-    x :
-      int
-      ->
-      int
-      ->
-      int = [|0 => [|_ => 0|]; 1 => [|_ => 0|]; _ => [|_ => 0|]|]
-    x :
-      int
-      ->
-      int
-      ->
-      int = [|0 => [|_ => 0|]; 1 => [|_ => 0|]; _ => [|_ => 0|]|]
     x :
       int
       ->
@@ -157,7 +133,7 @@ File maps_poly.mlw:
   - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 28, characters 17-19)
 File "bench/check-ce/maps_poly.mlw", line 26, characters 14-28:
 Sub-goal Postcondition of goal proj_map_test1'vc.
-Prover result is: Unknown (unknown) (11 steps).
+Prover result is: Unknown (unknown) (10 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
