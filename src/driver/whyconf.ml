@@ -1114,15 +1114,14 @@ let init_config ?(extra_config=[]) ofile =
   let config = List.fold_left add_extra_config config extra_config in
   config
 
+module type Command = functor () -> sig end
+
+let commands : (module Command) Hstr.t = Hstr.create 1
+
+let register_command s f = Hstr.add commands s f
+
 module Args = struct
 
-  module type Main = functor () -> sig end
-
-  let main : (module Main) ref =
-    let module M = functor () -> struct end
-    in ref (module M : Main)
-
-  let register_main = fun f ->  main := f
   let first_arg = ref 1
   let opt_config = ref None
   let opt_extra = ref []

@@ -333,15 +333,17 @@ module User: sig
 
 end
 
+
+module type Command = functor () -> sig end
+
+val commands : (module Command) Hstr.t
+
+val register_command : string -> (module Command) -> unit
+
+
 module Args : sig
 
   val first_arg : int ref
-
-  module type Main = functor () -> sig end
-
-  val main : (module Main) ref
-
-  val register_main : (module Main) -> unit
 
   val opt_config : string option ref
 
