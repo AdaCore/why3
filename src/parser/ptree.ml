@@ -441,7 +441,7 @@ type decl =
   (** Declaration of a "meta" *)
   | Dcloneexport of Loc.position * qualid * clone_subst list
   (** "clone export" *)
-  | Duseexport of qualid
+  | Duseexport of Loc.position * qualid
   (** "use export" *)
   | Dcloneimport of Loc.position * bool * qualid * ident option * clone_subst list
   (** "clone import ... as ..." *)

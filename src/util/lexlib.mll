@@ -157,6 +157,17 @@ and string_skip_spaces buf = parse
           pos_bol = pos.pos_cnum - chars;
       }
 
+  let warn_inexistent_file =
+    Loc.register_warning "inexistent_file" "Warn about inexistent file in source location"
+
+  let resolve_file orig_file file =
+    try
+      Sysutil.resolve_from_paths [Filename.dirname orig_file] file
+    with
+    | e ->
+       Loc.warning warn_inexistent_file "inexistent file in source location: %a" Exn_printer.exn_printer e;
+       file
+
   let backjump lexbuf chars =
     if chars < 0 || chars > lexbuf.lex_curr_pos - lexbuf.lex_start_pos then
       invalid_arg "Lexlib.backjump";

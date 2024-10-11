@@ -17,6 +17,10 @@ val string : Lexing.lexbuf -> string
 
 val update_loc : Lexing.lexbuf -> string option -> int -> int -> unit
 
+val resolve_file : string -> string -> string
+(** [resolve_file orig src] resolves the file name [src], a path name
+    relative to the directory name of [orig] *)
+
 val backjump : Lexing.lexbuf -> int -> unit
 (** [backjump lexbuf n] rewinds the lexing buffer by [n] bytes, thus
     making it possible to tokenize the current buffer in a different way,

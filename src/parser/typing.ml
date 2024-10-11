@@ -1711,24 +1711,24 @@ let rec add_decl muc env file d =
       let ity = ity_of_pty muc pty in
       let xs = create_xsymbol (create_user_id id) ~mask ity in
       add_pdecl ~vc muc (create_exn_decl xs)
-  | Ptree.Duseexport use ->
-      use_export muc (find_module env file use)
+  | Ptree.Duseexport (loc, use) ->
+      use_export muc (Loc.try3 ~loc find_module env file use)
   | Ptree.Dcloneexport (loc, use, inst) ->
-      let m = find_module env file use in
+      let m = Loc.try3 ~loc find_module env file use in
       warn_clone_not_abstract (qloc use) m.mod_theory;
       clone_export ~loc muc m (type_inst muc m inst)
-  | Ptree.Duseimport (_loc,import,uses) ->
+  | Ptree.Duseimport (loc,import,uses) ->
       let add_import muc (m, q) =
         let import = import || q = None in
         let muc = open_scope muc (use_as m q).id_str in
-        let m = find_module env file m in
+        let m = Loc.try3 ~loc find_module env file m in
         let muc = use_export muc m in
         close_scope muc ~import in
       List.fold_left add_import muc uses
   | Ptree.Dcloneimport (loc,import,qid,as_opt,inst) ->
       let import = import || as_opt = None in
       let muc = open_scope muc (use_as qid as_opt).id_str in
-      let m = find_module env file qid in
+      let m = Loc.try3 ~loc find_module env file qid in
       warn_clone_not_abstract (qloc qid) m.mod_theory;
       let muc = clone_export ~loc muc m (type_inst muc m inst) in
       let muc = close_scope muc ~import in

@@ -59,7 +59,6 @@ module Typing = struct
   open Theory
   open Pmodule
   open Typing
-  open Unsafe
   open Wstdlib
   open Ident
 
@@ -74,7 +73,7 @@ module Typing = struct
     match d with
     | Ptree.Dlet (id, gh, kind, e) ->
         let e = update_any kind e in
-        let ld = (create_user_prog_id id, gh, kind, dexpr muc Dexpr.denv_empty e) in
+        let ld = (Unsafe.create_user_prog_id id, gh, kind, Unsafe.dexpr muc Dexpr.denv_empty e) in
         let ld = Dexpr.let_defn ~keep_loc:true ld in
         let ld =
           if has_attr id subregion_attr then Subregion_analysis.transform_letdefn muc ld else ld
@@ -83,16 +82,16 @@ module Typing = struct
     | Ptree.Drec fdl ->
         let fst = List.hd fdl in
         let (id, _, _ ,_ , _, _, _ , _ , _) = fst in
-        let _, rd = drec_defn muc Dexpr.denv_empty fdl in
+        let _, rd = Unsafe.drec_defn muc Dexpr.denv_empty fdl in
         let rd = Dexpr.rec_defn ~keep_loc:true rd in
         let rd =
           if has_attr id subregion_attr then Subregion_analysis.transform_letdefn muc rd else rd
         in
         add_pdecl ~vc muc (Pdecl.create_let_decl rd)
-    | _ -> add_decl muc env file d
+    | _ -> Unsafe.add_decl muc env file d
 
   let type_module file env loc path (id, dl) =
-    let muc = create_module env ~path (create_user_id id) in
+    let muc = create_module env ~path (Unsafe.create_user_id id) in
     (* Technically, `add_pdecl` will do this, but if we don't do it upfront it breaks
          the sub-region analysis (name tbd) as we won't have imported ref. Since mlcfg always
        uses refs, we just import it straight up *)

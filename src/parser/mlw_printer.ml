@@ -1201,8 +1201,9 @@ and pp_decl ?(attr=true) fmt = function
   | Dcloneexport (_, qid, substs) ->
       fprintf fmt "@[<hv2>clone export %a%a@]"
         (pp_qualid ~attr) qid (pp_substs ~attr) substs
-  | Duseexport qid ->
-      fprintf fmt "@[<hv2>use export %a@]" (pp_qualid ~attr) qid
+  | Duseexport (loc, qid) ->
+      fprintf fmt "@[<hv2>%ause export %a@]" pp_maybe_marker loc
+        (pp_qualid ~attr) qid
   | Dcloneimport (loc, import, qid, as_id, substs) ->
       fprintf fmt "@[<hv2>%aclone%a %a%a%a@]" pp_maybe_marker loc
         pp_import import (pp_qualid ~attr) qid

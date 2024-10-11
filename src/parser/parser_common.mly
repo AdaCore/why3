@@ -387,7 +387,8 @@ See also `plugins/cfg/cfg_parser.mly`
 
 %public use_clone_parsing_only:
 | USE EXPORT tqualid
-    { (Duseexport $3) }
+    { let loc = floc $startpos $endpos in
+      (Duseexport (loc,$3)) }
 | CLONE EXPORT tqualid clone_subst
     { let loc = floc $startpos $endpos in
       (Dcloneexport (loc,$3, $4)) }

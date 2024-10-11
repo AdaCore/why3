@@ -153,12 +153,16 @@ let op_char_pref = ['!' '?']
 rule token = parse
   | "[##" space* ("\"" ([^ '\010' '\013' '"' ]* as file) "\"")?
     space* (dec+ as line) space* (dec+ as char) space* "]"
-      { Lexlib.update_loc lexbuf file (int_of_string line) (int_of_string char);
+      { let file =
+          Option.map (Lexlib.resolve_file Lexing.(lexbuf.lex_curr_p.pos_fname)) file
+        in
+        Lexlib.update_loc lexbuf file (int_of_string line) (int_of_string char);
         token lexbuf }
   | "[#" space* "\"" ([^ '\010' '\013' '"' ]* as file) "\"" space*
     (dec+ as bline) space* (dec+ as bchar) space*
     (dec+ as eline) space* (dec+ as echar) space* "]"
-      { POSITION (Loc.user_position file
+      { let file = Lexlib.resolve_file Lexing.(lexbuf.lex_curr_p.pos_fname) file in
+        POSITION (Loc.user_position file
                     (int_of_string bline) (int_of_string bchar)
                     (int_of_string eline) (int_of_string echar)) }
   | "[@" space* ([^ ' ' '\n' ']']+ (' '+ [^ ' ' '\n' ']']+)* as lbl) space* ']'
@@ -287,7 +291,7 @@ rule token = parse
 {
 
   let () = Exn_printer.register (fun fmt exn -> match exn with
-  | Cfg_parser.Error -> Format.pp_print_string fmt "syntax error"
+  | Cfg_parser.Error -> Format.pp_print_string fmt "MLCFG syntax error"
   | _ -> raise exn)
 
   let parse_channel file c =
