@@ -16,16 +16,6 @@
   let () =
     List.iter (fun (x,y) -> Hashtbl.add keywords x y) Keywords.keyword_tokens
 
-  let warn_inexistent_file =
-    Loc.register_warning "inexistent_file" "Warn about inexistent file in source location"
-
-  let resolve_file orig_file file =
-    try
-      Sysutil.resolve_from_paths [Filename.dirname orig_file] file
-    with
-    | e ->
-       Loc.warning warn_inexistent_file "inexistent file in source location: %a" Exn_printer.exn_printer e;
-       file
 }
 
 let space = [' ' '\t' '\r']
@@ -67,14 +57,14 @@ rule token = parse
   | "[##" space* ("\"" ([^ '\010' '\013' '"' ]* as file) "\"")?
     space* (dec+ as line) space* (dec+ as char) space* "]"
       { let file =
-          Option.map (resolve_file Lexing.(lexbuf.lex_curr_p.pos_fname)) file
+          Option.map (Lexlib.resolve_file Lexing.(lexbuf.lex_curr_p.pos_fname)) file
         in
         Lexlib.update_loc lexbuf file (int_of_string line) (int_of_string char);
         token lexbuf }
   | "[#" space* "\"" ([^ '\010' '\013' '"' ]* as file) "\""
     space* (dec+ as bline) space* (dec+ as bchar) space*
     space* (dec+ as eline) space* (dec+ as echar) space* "]"
-      { let file = resolve_file Lexing.(lexbuf.lex_curr_p.pos_fname) file in
+      { let file = Lexlib.resolve_file Lexing.(lexbuf.lex_curr_p.pos_fname) file in
         POSITION (Loc.user_position file (int_of_string bline)
                     (int_of_string bchar) (int_of_string eline) (int_of_string echar)) }
   | "[@" space* ([^ ' ' '\n' ']']+ (' '+ [^ ' ' '\n' ']']+)* as lbl) space* ']'

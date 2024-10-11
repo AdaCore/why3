@@ -141,7 +141,7 @@ module_decl_no_head_parsing_only:
 use_clone:
 | USE EXPORT tqualid
     { let loc = floc $startpos $endpos in
-      let decl = Ptree.Duseexport $3 in
+      let decl = Ptree.Duseexport (loc, $3) in
       Typing.add_decl loc decl
     }
 | CLONE EXPORT tqualid clone_subst
