@@ -289,7 +289,8 @@ module Why = struct
     let why_prover =
       let aux (name,limits) =
         let pr = Whyconf.filter_one_prover config (Whyconf.parse_filter_prover name) in
-        let command = String.concat " " (pr.Whyconf.command :: pr.Whyconf.extra_options) in
+        let with_steps = limits.Call_provers.limit_steps > 0 in
+        let command = Whyconf.get_complete_command pr ~with_steps in
         let driver = Driver.load_driver_for_prover (Whyconf.get_main config) env pr in
         mk_why_prover ~command driver limits in
       Option.map aux why_prover in
