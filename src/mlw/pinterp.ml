@@ -809,24 +809,25 @@ let check_limits ctx =
   let steplimit = ctx.limits.Call_provers.limit_steps in
   let exception Timelimit in
   let exception Steplimit in
-  let check_timelimit time0 timelimit =
-        if timelimit > 0.0 && Sys.time () -. time0 >= timelimit then
-          raise Timelimit
-  in
   let check_steplimit (steps: int) steplimit =
         if steplimit > 0 && steps >= steplimit then
           raise Steplimit
+  in
+  let check_timelimit time0 timelimit =
+    if timelimit > 0.0 && Sys.time () -. time0 >= timelimit then
+          raise Timelimit
   in
   match !limits_state with
   | None -> failwith "check_limits: called outside with_limits"
   | Some (time0, steps) ->
       incr steps;
       try
-        check_timelimit time0 timelimit;
-        check_steplimit !steps steplimit
+        (* check steps first, as it has priority on time limit *)
+        check_steplimit !steps steplimit;
+        check_timelimit time0 timelimit
       with
-      | Timelimit -> incomplete "RAC timelimit reached"
       | Steplimit -> incomplete "RAC steplimit reached"
+      | Timelimit -> incomplete "RAC timelimit reached"
 
 let set_limits () =
   if !limits_state <> None then failwith "set_limits: limits already set";

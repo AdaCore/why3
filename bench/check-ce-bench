@@ -66,6 +66,10 @@ while test $# != 0; do
       SUFFIX="$2"
       shift 2
       ;;
+    --debug)
+      debug=true
+      shift 1
+      ;;
     "-"*)
       echo "unknown option: $1"
       usage
@@ -257,7 +261,7 @@ for file in $files; do
           z3stepsrac=$z3steps
           ;;
       "bv32")
-          z3steps=2500000
+          z3steps=500000
           z3stepsrac=$z3steps
           ;;
       "bv32_mono")
@@ -295,9 +299,9 @@ for file in $files; do
           z3stepsrac=$z3steps
           ;;
       "maps_mono")
-          altergosteps=100
+          altergosteps=1000
           altergostepsrac=$altergosteps
-          cvc5steps=15000
+          cvc5steps=5000
           cvc5stepsrac=$cvc5steps
           ;;
       "maps_poly")
