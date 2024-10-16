@@ -1,0 +1,45 @@
+use int.Int
+use int.ComputerDivision
+use seq.Seq
+use coma.Std
+
+let get < 'a > (s: seq 'a) (i: int) { 0 <= i < length s }
+    (ret (v: 'a) { v = s[i] })
+= any
+
+let binary_search (s: seq int) (v: int)
+     { forall i j. 0 <= i <= j < length s -> s[i] <= s[j] }
+     (ret (i: int) { 0 <= i < length s /\ s[i] = v})
+     (notfound { forall i. 0 <= i < length s -> s[i] <> v })
+= loop {0} {length s}
+  [ loop (lo: int) (hi: int)
+     { 0 <= lo <= hi <= length s }
+     { forall i. 0 <= i < lo -> s[i] <> v }
+     { forall i. hi <= i < length s -> s[i] <> v }
+    = if { lo >= hi } notfound
+      (-> get <int> {s} {mid} (fun (x:int) ->
+          if { v < x } (loop {lo} {mid}) .
+          if { v > x } (loop {mid+1} {hi}) .
+          (ret {mid}))
+     [ mid: int = lo + div (hi - lo) 2])
+  ]
+
+let binary_search2 (s: seq int) (v: int)
+     { forall i j. 0 <= i <= j < length s -> s[i] <= s[j] }
+     (ret (i: int) { 0 <= i < length s /\ s[i] = v})
+     (notfound { forall i. 0 <= i < length s -> s[i] <> v })
+= loop {0} {length s}
+  [ loop (lo: int) (hi: int)
+     { 0 <= lo <= hi <= length s }
+     { forall i. 0 <= i < lo -> s[i] <> v }
+     { forall i. hi <= i < length s -> s[i] <> v }
+    = body {lo + div (hi - lo) 2}
+      [ body (mid: int) =
+         if { lo >= hi } notfound
+         (-> get <int> {s} {mid} (fun (x:int) ->
+             if { v < x } (loop {lo} {mid}) .
+             if { v > x } (loop {mid+1} {hi}) .
+             (ret {mid})))
+      ]
+  ]
+
