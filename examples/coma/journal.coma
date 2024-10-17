@@ -1,5 +1,6 @@
 use int.Int
 use int.Fact
+use int.ComputerDivision
 use bintree.Tree
 use bintree.Occ as T
 use seq.Seq
@@ -26,6 +27,16 @@ let factorial (n: int) {n >= 0} (return (r: int) { r = fact n }) =
     = if {k > 0} ((! loop {r * k} {k - 1}))
                  (return {r})
   ]
+
+-------------------------------------------------------------------------------
+
+let product (a b: int) {b >= 0} (return (c: int) { c = a * b })
+= loop {a} {b} {0}
+  [ loop (p q r: int) { p * q + r = a * b } {q >= 0}
+   = if {q > 0} (-> if {mod q 2 = 1}
+                  (-> loop {p+p} {div q 2} {r+p})
+                  (-> loop {p+p} {div q 2} {r}))
+                (-> return {r}) ]
 
 -------------------------------------------------------------------------------
 
@@ -104,3 +115,20 @@ let fclient_3 (x: int) (w: seq int) (i: int) {0 <= i <= length w} (found (ii: in
 = find_3 {x} {w} {i} found notfound
 
 -------------------------------------------------------------------------------
+
+let binary_search (s: seq int) (v: int)
+  { forall i j. 0 <= i <= j < length s -> s[i] <= s[j] }
+    (ret (i: int) { 0 <= i < length s /\ s[i] = v })
+    (notfound { forall i. 0 <= i < length s -> s[i] <> v })
+= loop {0} {length s}
+  [ loop (lo: int) (hi: int)
+    { 0 <= lo } { hi <= length s }
+    { forall i. 0 <= i < lo -> s[i] <> v }
+    { forall i. hi <= i < length s -> s[i] <> v }
+    = body {lo + div (hi - lo) 2}
+    [ body (mid: int) =
+      if {lo >= hi} notfound (-> get {s} {mid} (fun (x: int) ->
+      if {v < x} (loop {lo} {mid}) (->
+      if {v > x} (loop {mid+1} {hi}) (-> ret {mid}))))
+    ]
+  ]

@@ -14,6 +14,24 @@ type regexp =
   | Concat  regexp regexp
   | Star    regexp
 
+
+predicate re_g (r r1: regexp)
+
+axiom re_g_alt :
+  forall r r1 r2: regexp.
+  r = Alt r1 r2 -> re_g r r1 /\ re_g r r2
+
+axiom re_g_concat :
+  forall r r1 r2: regexp.
+  r = Concat r1 r2 -> re_g r r1 /\ re_g r r2
+
+axiom re_g_star :
+  forall r r1: regexp.
+  r = Star r1 -> re_g r r1
+
+-- lemma re_g_trans :
+--   forall r1 r2 r3: regexp. re_g r1 r2 -> re_g r2 r3 -> re_g r1 r3
+
 type word = seq char
 
 inductive mem (w: word) (r: regexp) =
@@ -54,6 +72,8 @@ lemma concat_split: forall w: word. forall r1 r2: regexp. forall i j k: int.
     mem w[k..j] r2 ->
     mem w[i..j] (Concat r1 r2)
 
+lemma extseq: forall w: word. w[0..length w] = w
+
 (** {Coma Part} *)
 use coma.Std
 
@@ -70,10 +90,10 @@ predicate cons (w: word) (r: regexp) (ck: int -> bool) (i: int) =
   [@inline:trivial]
   exists j. i <= j <= length w /\ mem w[i..j] r /\ ck j
 
-let accept (r: regexp) (w: word) {} (ret (b: bool) {b <-> mem w r})
+let accept_nonterm (r: regexp) (w: word) {} (ret (b: bool) {b <-> mem w r})
 = a {r} {0} {fun j -> j = n}
     (fun (i: int) (h) -> if {i = n} (ret {true}) h)
-    ({not mem w[0..n] r} ret {false})
+    (ret {false})
   [ a (r: regexp) (i: int) (ck: int -> bool) {0 <= i <= n}
       (k (j: int) {mem w[i..j] r} {i <= j <= n} (h {not ck j}))
       (o {not cons w r ck i})
@@ -83,13 +103,46 @@ let accept (r: regexp) (w: word) {} (ret (b: bool) {b <-> mem w r})
       | char (c: char) ->
           if {i < n && w[i] = c} (k {i+1} o) o
       | alt (r1 r2: regexp) ->
-          a {r1} {i} {ck} k (a {r2} {i} {ck} k o)
+          a {r1} {i} {ck} k (-> a {r2} {i} {ck} k o)
       | cat (r1 r2: regexp) ->
-          a {r1} {i} {cons w r2 ck} (fun (j: int) (h) -> a {r2} {j} {ck} k h) o
+          a {r1} {i} {cons w r2 ck}
+          (fun (j: int) (h) -> a {r2} {j} {ck} k h) o
       | star (r1: regexp) ->
-          k {i} (a {r1} {i} {fun j -> i < j && cons w r ck j}
-                   (fun (j: int) (h) -> if {i < j} (a {r} {j} {ck} k h) h)
-                   o)
+          k {i} (-> a {r1} {i} {fun j -> i < j && cons w r ck j}
+                     (fun (j: int) (h) -> if {i < j} (-> a {r} {j} {ck} k h) h)
+                     o)
       ]
+  ]
+  [ n: int = length w ]
+
+predicate v (n old_i i: int) (old_r r: regexp) =
+  (n-i) < (n-old_i) || (old_i=i /\ re_g old_r r)
+
+-- variant lexico : n-i, r
+let accept_terminates (r: regexp) (w: word) {} (ret (b: bool) {b <-> mem w r})
+= a {r} {0} {fun j -> j = n}
+    (fun (i: int) (h) -> if {i = n} (ret {true}) h)
+    ({not mem w[0..n] r} ret {false})
+  [ a (r: regexp) (i: int) (ck: int -> bool) {0 <= i <= n}
+      (k (j: int) {mem w[i..j] r} {i <= j <= n} (h {not ck j}))
+      (o {not cons w r ck i})
+    = (fun (r__: regexp) (i__: int) ->
+        unRe {r} empty eps char alt cat star
+        [ empty -> o
+        | eps   -> k {i} o
+        | char (c: char) ->
+            if {i < n && w[i] = c} (k {i+1} o) o
+        | alt (r1 r2: regexp) ->
+            arec {r1} {i} {ck} k (-> arec {r2} {i} {ck} k o)
+        | cat (r1 r2: regexp) ->
+            arec {r1} {i} {cons w r2 ck}
+            (fun (j: int) (h) -> arec {r2} {j} {ck} k h) o
+        | star (r1: regexp) ->
+            k {i} (-> arec {r1} {i} {fun j -> i < j && cons w r ck j}
+                       (fun (j: int) (h) -> if {i < j} (-> arec {r} {j} {ck} k h) h)
+                       o)
+        ]
+        [ arec (r_: regexp) (i_: int) (ck_: int -> bool) (k_ (j: int) (h)) (o_)
+        -> { v n i__ i_ r__ r_ } a {r_} {i_} {ck_} k_ o_ ]) {r} {i}
   ]
   [ n: int = length w ]

@@ -1,0 +1,12 @@
+use coma.Std
+use int.Int
+use int.ComputerDivision
+
+let product (a b: int) {b >= 0} (return (c: int) { c = a * b })
+= loop {a} {b} {0}
+  [ loop (p q r: int) { p * q + r = a * b } {q >= 0}
+   = if {q > 0} (-> if {mod q 2 = 1}
+                  (-> loop {p+p} {div q 2} {r+p})
+                  (-> loop {p+p} {div q 2} {r}))
+                (-> return {r})
+  ]

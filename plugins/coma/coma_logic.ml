@@ -48,9 +48,9 @@ let t_implies_simp f1 f2 = match f1.t_node, f2.t_node with
 let t_if_simp f1 f2 f3 = match f1.t_node, f2.t_node, f3.t_node with
   | Ttrue, _, _  -> f2
   | Tfalse, _, _ -> f3
-  | _, Ttrue, _  -> t_implies_simp (t_not_simp f1) f3
+  | _, Ttrue, _  -> t_implies_simp  (t_not_simp f1) f3
   | _, Tfalse, _ -> t_and_asym_simp (t_not_simp f1) f3
-  | _, _, Ttrue  -> t_implies_simp f1 f2
+  | _, _, Ttrue  -> t_implies_simp  f1 f2
   | _, _, Tfalse -> t_and_asym_simp f1 f2
   | _, _, _ -> t_if f1 f2 f3
 

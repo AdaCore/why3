@@ -1,5 +1,6 @@
 use seq.Seq
 use int.Int
+use coma.Std
 
 type char
 type word = seq char
@@ -20,10 +21,6 @@ constant c_7: char
 constant c_8: char
 constant c_9: char
 
-
-let fail {false} = any
-let if (b: bool) (then {b}) (else {not b}) = any
-
 let caseNum (c: char)
   (case0 { c = c_0 })
   (case1 { c = c_1 })
@@ -35,9 +32,10 @@ let caseNum (c: char)
   (case7 { c = c_7 })
   (case8 { c = c_8 })
   (case9 { c = c_9 })
-  (no  { c <> c_0 && c <> c_1 && c <> c_2 &&
-         c <> c_3 && c <> c_4 && c <> c_5 &&
-         c <> c_6 && c <> c_7 && c <> c_8 && c <> c_9 })
+  (no    { c <> c_0 /\ c <> c_1 /\ c <> c_2 /\
+           c <> c_3 /\ c <> c_4 /\ c <> c_5 /\
+           c <> c_6 /\ c <> c_7 /\ c <> c_8 /\
+           c <> c_9 })
 = any
 
 let atoi (c: char) (ok (i:int)) (err) =
@@ -46,15 +44,14 @@ let atoi (c: char) (ok (i:int)) (err) =
     (ok {5}) (ok {6}) (ok {7}) (ok {8}) (ok {9})
     (err)
 
-let unSpace (c: char) (space) (else) =
-  if { c = space } space else
+let unSpace (c: char) (space) (else) = if {c = space} space else
 
 let rec next (w: word) (i: int) {..} (k (c: char) {c <> space})
 = unSpace {w[i]}
     (-> {0 <= i < length w} (! next {w} {i+1} k))
     (-> k {w[i]})
 
-let rec lit (w: word) (i: int) (v : int) (k (kv: int) (c: char) {c <> space})
+let rec lit (w: word) (i v: int) (k (kv: int) (c: char) {c <> space})
 = atoi {w[i]}
        (fun (i: int) -> lit {w} {i} {10 * v + i} k)
        (-> unSpace {w[i]}
@@ -62,20 +59,20 @@ let rec lit (w: word) (i: int) (v : int) (k (kv: int) (c: char) {c <> space})
             (-> k {v} {w[i]}))
 
 let rec atom (w: word) (i: int) {..} (k (kv: int) (c: char))
-= next {w} {i} (fun (c:char) ->
-    if { c = lpar }
-       (-> sum {w} {i+1} (fun (kv: int) (c: char) ->
-                            if {c <> rpar} fail
-                               (-> next {w} {i+1} (k {kv}))))
-       (-> atoi {c} (fun (n:int) -> lit {w} {i+1} {n} k) fail))
+= next {w} {i} . fun (c: char) ->
+    if {c = lpar}
+       (-> sum {w} {i+1} .
+             fun (kv: int) (c: char) -> if {c <> rpar}
+                                           fail
+                                           (-> next {w} {i+1} (k {kv})))
+       (-> atoi {c} (fun (n:int) -> lit {w} {i+1} {n} k) fail)
 
 with term (w: word) (i: int) (k (kv: int) (c: char)) =
-  atom {w} {i} (fun (k (kv: int) (c: char)) ->
+  atom {w} {i} . fun (kv: int) (c: char) ->
     if { c = times }
-       (-> term (fun (v': int) (c: char) -> k {v*v'} c))
+       (-> term {w} {kv} (fun (v': int) (c: char) -> k {v*v'} c))
        (-> k {kv} {c})
-  )
 
 with sum (w: word) (i: int) (k (kv: int) (c: char)) = any
 
-let count (w: word) {} (ret (r: int){}) = any
+let count (w: word) {} (ret (r: int) {}) = any

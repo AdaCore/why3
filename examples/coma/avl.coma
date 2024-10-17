@@ -10,15 +10,6 @@ let unTree (t: tree) (onNode [] (l:tree) (x: elt) (r:tree)) (onLeaf) =
   | leaf ->
         { t = E } (! onLeaf) ]
 
-(*
-   let rotate_left (t: tree) (return (r: tree)) =
-     unTree {t} (fun (a:tree) (x:elt) (r:tree) ->
-     unTree {r} (fun (b:tree) (y:elt) (c:tree) ->
-     { wf t } { bst t } (! return {node (node a x b) y c})
-     [ return (r: tree) -> { wf r } { bst r } (! return {r}) ])
-     fail) fail
-*)
-
 let rotate_left (t: tree) (return (r: tree)) =
   unTree {t} (fun (a:tree) (x:elt) (r:tree) ->
   unTree {r} (fun (b:tree) (y:elt) (c:tree) ->
@@ -90,21 +81,20 @@ let join_left (l: tree) (x: elt) (r: tree) (return (t: tree)) =
         if ht t <= ht rr + 1 then t' else rotate_right t'
   | E -> absurd
   end
-
  *)
 
 let join (l: tree) (x: elt) (r: tree) (return (r: tree)) =
   { bst l && tree_lt l x } { bst r && lt_tree x r }
   { wf l && wf r } { avl l && avl r } (!
-  if { ht l > ht r + 1 } (-> join_right {l} {x} {r} return)
-                         (-> if { ht r > ht l + 1 } (-> join_left {l} {x} {r} return)
-                                                    (-> return {node l x r}))
-  )
-  [return (t:tree) ->
+  if { ht l > ht r + 1 }
+     (-> join_right {l} {x} {r} return)
+     (-> if { ht r > ht l + 1 } (-> join_left {l} {x} {r} return)
+                                (-> return {node l x r})))
+  [ return (t:tree)
       { wf t && avl t }
       { bst t }
       { forall y. mem y t <-> (mem y l || y=x || mem y r) }
-      (! return {t})]
+    -> return {t} ]
 
 let rec split_last (t: tree) (return (r: tree) (m: elt)) =
   unTree {t}
@@ -113,14 +103,12 @@ let rec split_last (t: tree) (return (r: tree) (m: elt)) =
        if {r=E} (-> return {l} {x})
                 (-> split_last {r} (fun (r':tree) (m:elt) ->
                     join {l} {x} {r'} (fun (r:tree) ->
-                    return {r} {m})))
-       )
-       [ return (r: tree) (m: elt) ->
+                    return {r} {m}))))
+       [ return (r: tree) (m: elt)
          { wf r && bst r && avl r }
          { forall x. mem x t <-> (mem x r && lt x m || x=m) }
          { tree_lt r m }
-         (! return {r} {m}) ]
-    )
+         -> return {r} {m} ])
     fail
 
 (* no need for a spec here => join2 is fully inlined *)
