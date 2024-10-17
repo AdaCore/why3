@@ -8,9 +8,7 @@ let product (a b: int) {b >= 0} (return (c: int) {c = a * b}) =
     = if {q > 0} next (-> return {r})
       [ next ->
           if {mod q 2 = 1} (-> [&r <- r + p] step) step
-          [ step -> [&p <- p + p | &q <- div q 2] loop ]
-      ]
-  ]
+          [ step -> [&p <- p + p | &q <- div q 2] loop ] ] ]
   [ &p: int = a | &q: int = b | &r: int = 0 ]
 
 let product_pure (a b: int) {b >= 0} (return (c: int) {c = a * b}) =
