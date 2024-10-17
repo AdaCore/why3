@@ -33,8 +33,7 @@ The following commands are available:
     and transformations on them.
 
 :why3:tool:`pp`
-    Pretty-print WhyML definitions (formatting :file:`.mlw` files
-    or printing inductive definitions to LaTeX).
+    Pretty-print WhyML definitions in various output formats.
 
 :why3:tool:`prove`
     Read a WhyML input file and call provers, on the command-line.
@@ -1703,8 +1702,8 @@ specified using the ``--output`` option.
 
 ::
 
-    why3 pp [--output=mlw|sexp|latex|dep] [--kind=inductive] [--prefix=<prefix>] \
-      <filename> <file>[[.<Module>].<ind_type>] ...
+    why3 pp [--output=mlw|sexp|latex|dep] [--prefix=<prefix>] \
+      <filename> <file>[[.<Module>].<object>] ...
 
 .. option:: --output=<output>
 
@@ -1716,17 +1715,15 @@ specified using the ``--output`` option.
      ``Ptree``) as a S-expression (enabled only when package ``ppx_sexp_conv`` is
      available at configuration time of Why3).
 
-   - ``latex``: currently can be used to print WhyML inductive definitions
-     to LaTeX, using the ``mathpartir`` package.
+   - ``latex``: can be used to print some fragment of WhyML
+     declarations. These include algebraic type definitions,
+     direct definitions of logic symbols, and inductive definitions of
+     logic predicates. Inductive definitions are formatted under the form of
+     deduction rules, using the ``mathpartir`` package.
 
    - ``dep``: display module dependencies, under the form of a digraph
-     using the ``dot`` syntax from the `GraphViz <https://www.graphviz.org/>`_ visualisation software.
-
-.. option:: --kind=<kind>
-
-   Set the syntactic kind to be pretty printed. Currently, the only
-   supported kind are inductive types (``--kind=inductive``) when using
-   the LaTeX output (``--output=latex``).
+     using the ``dot`` syntax from the `GraphViz
+     <https://www.graphviz.org/>`_ visualisation software.
 
 .. option:: --prefix=<prefix>
 

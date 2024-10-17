@@ -5,7 +5,7 @@ Standard library
   * new library `coma`: standard library of the plugin Coma
 
 Core
-  * extended notion of strategies: goal-oriented strategies
+  * extended notion of strategies: task-oriented strategies
   * coma purposes
     + parser_common: some non terminals `public`
     + typing: added functions to type `term` in `denv`
@@ -14,7 +14,7 @@ Core
     + wstdlib: added strongly connected component computation module
 
 Plugins
-  * new goal-oriented strategy `forward_propagation` to automatically
+  * new task-oriented strategy `forward_propagation` to automatically
     propagate rounding errors in formulas involving unbounded
     floats. See examples in `examples/numeric`
   * new Coma plugin
@@ -32,6 +32,9 @@ Tools
   * `why3 execute`: added option `--rac-memlimit`.
   * `why3 execute`: the `--rac-prover` option does not anymore support
     specification of a time limit and memory limit :x:
+  * `why3 pp`: in LaTeX output, now also prints algebraic type
+    definitions and logic definition
+  * `why3 pp`: the ``--kind`` option does not exist anymore :x:
 
 API
   * a few changes about how to specify resource limits in particular
