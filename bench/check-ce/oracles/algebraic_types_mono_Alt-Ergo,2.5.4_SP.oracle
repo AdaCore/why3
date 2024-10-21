@@ -18,40 +18,17 @@ Sorry, we don't have a good counterexample for you :(
 - Checked model 0: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
-- Checked model 1: BAD_CE
+- Selected model 1: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
-- Selected model 2: INCOMPLETE
+- Checked model 2: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Ident B_proj_1 is not yet declared`)
   - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Ident B_proj_1 is not yet declared`)
 File "bench/check-ce/algebraic_types_mono.mlw", line 10, characters 21-26:
 Goal g2.
 Prover result is: Unknown (unknown) (2 steps).
-The following counterexample model could not be verified
-  (both RAC terminated with uncaught exception `Ident B_proj_1 is not yet declared`):
-File algebraic_types_mono.mlw:
-  Line 8:
-    A : t = {B_proj_1 => 0}
-    A : t = {B_proj_1 => 0}
-    B : int -> t = [|1 => {B_proj_1 => 1}; _ => {B_proj_1 => 0}|]
-    B : int -> t = [|1 => {B_proj_1 => 1}; _ => {B_proj_1 => 0}|]
-    B_proj_1 : t -> int = [|{B_proj_1 => 1} => 1; _ => 0|]
-    B_proj_1 : t -> int = [|{B_proj_1 => 1} => 1; _ => 0|]
-    index_t :
-      t
-      ->
-      int = fun arg_01 ->
-             if arg_01 = {B_proj_1 => 1} \/ arg_01 = {B_proj_1 => 0} then 1
-             else 0
-    index_t :
-      t
-      ->
-      int = fun arg_01 ->
-             if arg_01 = {B_proj_1 => 1} \/ arg_01 = {B_proj_1 => 0} then 1
-             else 0
-  Line 10:
-    x : t = {B_proj_1 => 0}
-    x : t = {B_proj_1 => 0}
+Sorry, we don't have a good counterexample for you :(
+
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -91,12 +68,14 @@ File algebraic_types_mono.mlw:
       x = A
 
 <check_ce:categorization>Categorizations of models:
-- Checked model 0: BAD_CE
+- Selected model 0: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
 File "bench/check-ce/algebraic_types_mono.mlw", line 16, characters 21-31:
 Goal g5.
 Prover result is: Unknown (unknown) (7 steps).
+Sorry, we don't have a good counterexample for you :(
+
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE

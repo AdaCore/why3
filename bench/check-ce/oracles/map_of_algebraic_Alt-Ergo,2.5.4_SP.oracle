@@ -12,20 +12,11 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `load_val` cannot be evaluated):
 File bv.mlw:
   Line 362:
-    size_bv : t = {bv.BV32.t'int => 32}
-    size_bv : t = {bv.BV32.t'int => 32}
-  Line 689:
-    t'int :
-      t
-      ->
-      int = [|{bv.BV32.t'int => 0} => 0; {bv.BV32.t'int => 1} => 1; _ => 32|]
-    t'int :
-      t
-      ->
-      int = [|{bv.BV32.t'int => 0} => 0; {bv.BV32.t'int => 1} => 1; _ => 32|]
+    size_bv : t = {t'int => 32}
 File map_of_algebraic.mlw:
-  Line 27:
-    x : loc = {base_addr = 0; offset = {bv.BV32.t'int => 32}}
   Line 33:
-    x : loc = {base_addr = 0; offset = {bv.BV32.t'int => 32}}
+    m :  = {block_size = "undefined"; mem_access_address = "undefined"}
+    m :  = {block_size = "undefined"; mem_access_address = "undefined"}
+    x :  = {base_addr = 0; offset = {t'int => 32}}
+    x : loc = {base_addr = 0; offset = {t'int => 32}}
 

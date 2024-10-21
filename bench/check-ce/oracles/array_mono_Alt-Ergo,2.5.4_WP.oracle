@@ -60,51 +60,10 @@ Prover result is: Unknown (unknown) (19 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `([]<-)` cannot be evaluated):
 File array_mono.mlw:
-  Line 9:
-    elts :
-      array
-      ->
-      int
-      ->
-      int = [|{Array.elts = [|0 => 0; 1 => 42; _ => 0|]; Array.length = 3} =>
-              [|0 => 0; 1 => 42; _ => 0|];
-            _ => [|0 => 42; 1 => 42; _ => 0|]|]
-    elts :
-      array
-      ->
-      int
-      ->
-      int = [|{Array.elts = [|0 => 0; 1 => 42; _ => 0|]; Array.length = 3} =>
-              [|0 => 0; 1 => 42; _ => 0|];
-            _ => [|0 => 42; 1 => 42; _ => 0|]|]
-  Line 10:
-    length : array -> int = [|_ => 3|]
-    length : array -> int = [|_ => 3|]
-  Line 19:
-    mixfix [<-] :
-      array
-      ->
-      int
-      ->
-      int
-      ->
-      array = fun arg_05 arg_11 arg_21 ->
-               {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 3}
-    mixfix [<-] :
-      array
-      ->
-      int
-      ->
-      int
-      ->
-      array = fun arg_05 arg_11 arg_21 ->
-               {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 3}
-  Line 25:
-    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 3}
-    old a :
-      array = {Array.elts = [|0 => 0; 1 => 42; _ => 0|]; Array.length = 3}
   Line 38:
-    a : array = {Array.elts = [|0 => 0; 1 => 42; _ => 0|]; Array.length = 3}
+    a :  = {elts = [|0 => 0; 1 => 42; _ => 0|]; length = 3}
+    a : array = {elts = [|0 => 0; 1 => 42; _ => 0|]; length = 3}
   Line 41:
-    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 3}
+    a : array = {elts = [|0 => 42; 1 => 42; _ => 0|]; length = 3}
+    result :  = Tuple0
 

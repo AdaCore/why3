@@ -12,7 +12,9 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array_records_poly.mlw:
   Line 23:
-    i : int = -1
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
+    i :  = -1
     i : int = -1
 
 <check_ce:categorization>Categorizations of models:
@@ -29,15 +31,10 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array_records_poly.mlw:
   Line 23:
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
+    i :  = -1
     i : int = -1
-    i : int = -1
-  Line 27:
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -53,31 +50,16 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
 File array_records_poly.mlw:
   Line 23:
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
+    i :  = -1
     i : int = -1
-    i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 28, characters 64-68:
@@ -85,37 +67,18 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (3000077 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun x!0269 x!193 -> 0
-    length : ty -> uni -> int = fun x!0269 x!193 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i : int = -1
-    i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
+    i :  = 0
+    i :  = 0
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 28, characters 21-25:
@@ -123,44 +86,18 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (3000089 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun x!0292 x!1104 -> 0
-    length : ty -> uni -> int = fun x!0292 x!1104 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i : int = -1
-    i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-  Line 28:
-    result of call at line 28, characters 64-81 : int = 2
-    result of call at line 28, characters 64-81 : int = 2
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
+    i :  = 0
+    i :  = 0
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 28, characters 5-82:
@@ -168,54 +105,18 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (3000106 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun x!0315 x!1115 -> 0
-    length : ty -> uni -> int = fun x!0315 x!1115 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i : int = -1
-    i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-  Line 28:
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = false; first_value = 42; second_value = 2}
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = false; first_value = 42; second_value = 2}
-    result of call at line 28, characters 21-30 : bool = false
-    result of call at line 28, characters 21-30 : bool = false
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 64-81 : int = 2
-    result of call at line 28, characters 64-81 : int = 2
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
+    i :  = 0
+    i :  = 0
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 29, characters 64-68:
@@ -223,54 +124,18 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (3000132 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun x!0339 x!1126 -> 0
-    length : ty -> uni -> int = fun x!0339 x!1126 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i : int = -1
-    i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-  Line 28:
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = false; first_value = 42; second_value = 2}
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = false; first_value = 42; second_value = 2}
-    result of call at line 28, characters 21-30 : bool = false
-    result of call at line 28, characters 21-30 : bool = false
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 64-81 : int = 2
-    result of call at line 28, characters 64-81 : int = 2
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
+    i :  = 0
+    i :  = 0
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 29, characters 21-25:
@@ -278,61 +143,18 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (3000144 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun x!0363 x!1137 -> 0
-    length : ty -> uni -> int = fun x!0363 x!1137 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i : int = -1
-    i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-  Line 28:
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = false; first_value = 42; second_value = 2}
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = false; first_value = 42; second_value = 2}
-    result of call at line 28, characters 21-30 : bool = false
-    result of call at line 28, characters 21-30 : bool = false
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 64-81 : int = 2
-    result of call at line 28, characters 64-81 : int = 2
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-  Line 29:
-    result of call at line 29, characters 64-81 : int = 6
-    result of call at line 29, characters 64-81 : int = 6
-    result of call at line 29, characters 64-68 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-    result of call at line 29, characters 64-68 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
+    i :  = 0
+    i :  = 0
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 29, characters 5-82:
@@ -340,71 +162,18 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (3000161 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun x!0387 x!1148 -> 0
-    length : ty -> uni -> int = fun x!0387 x!1148 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i : int = -1
-    i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-  Line 28:
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = false; first_value = 42; second_value = 2}
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = false; first_value = 42; second_value = 2}
-    result of call at line 28, characters 21-30 : bool = false
-    result of call at line 28, characters 21-30 : bool = false
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 64-81 : int = 2
-    result of call at line 28, characters 64-81 : int = 2
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-  Line 29:
-    result of call at line 29, characters 13-82 :
-      basic_record = {flag = false; first_value = 23; second_value = 6}
-    result of call at line 29, characters 13-82 :
-      basic_record = {flag = false; first_value = 23; second_value = 6}
-    result of call at line 29, characters 21-30 : bool = false
-    result of call at line 29, characters 21-30 : bool = false
-    result of call at line 29, characters 21-25 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-    result of call at line 29, characters 21-25 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-    result of call at line 29, characters 64-81 : int = 6
-    result of call at line 29, characters 64-81 : int = 6
-    result of call at line 29, characters 64-68 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-    result of call at line 29, characters 64-68 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
+    i :  = 0
+    i :  = 0
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 30, characters 74-78:
@@ -412,71 +181,18 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (3000187 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun x!0412 x!1159 -> 0
-    length : ty -> uni -> int = fun x!0412 x!1159 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i : int = -1
-    i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-  Line 28:
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = false; first_value = 42; second_value = 2}
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = false; first_value = 42; second_value = 2}
-    result of call at line 28, characters 21-30 : bool = false
-    result of call at line 28, characters 21-30 : bool = false
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 64-81 : int = 2
-    result of call at line 28, characters 64-81 : int = 2
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-  Line 29:
-    result of call at line 29, characters 13-82 :
-      basic_record = {flag = false; first_value = 23; second_value = 6}
-    result of call at line 29, characters 13-82 :
-      basic_record = {flag = false; first_value = 23; second_value = 6}
-    result of call at line 29, characters 21-30 : bool = false
-    result of call at line 29, characters 21-30 : bool = false
-    result of call at line 29, characters 21-25 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-    result of call at line 29, characters 21-25 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-    result of call at line 29, characters 64-81 : int = 6
-    result of call at line 29, characters 64-81 : int = 6
-    result of call at line 29, characters 64-68 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-    result of call at line 29, characters 64-68 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
+    i :  = 0
+    i :  = 0
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 30, characters 41-45:
@@ -484,78 +200,18 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (3000199 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun x!0437 x!1170 -> 0
-    length : ty -> uni -> int = fun x!0437 x!1170 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i : int = -1
-    i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-  Line 28:
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = false; first_value = 42; second_value = 2}
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = false; first_value = 42; second_value = 2}
-    result of call at line 28, characters 21-30 : bool = false
-    result of call at line 28, characters 21-30 : bool = false
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 64-81 : int = 2
-    result of call at line 28, characters 64-81 : int = 2
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-  Line 29:
-    result of call at line 29, characters 13-82 :
-      basic_record = {flag = false; first_value = 23; second_value = 6}
-    result of call at line 29, characters 13-82 :
-      basic_record = {flag = false; first_value = 23; second_value = 6}
-    result of call at line 29, characters 21-30 : bool = false
-    result of call at line 29, characters 21-30 : bool = false
-    result of call at line 29, characters 21-25 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-    result of call at line 29, characters 21-25 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-    result of call at line 29, characters 64-81 : int = 6
-    result of call at line 29, characters 64-81 : int = 6
-    result of call at line 29, characters 64-68 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-    result of call at line 29, characters 64-68 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-  Line 30:
-    result of call at line 30, characters 74-91 : int = 8
-    result of call at line 30, characters 74-91 : int = 8
-    result of call at line 30, characters 74-78 :
-      basic_record = {flag = false; first_value = 9; second_value = 8}
-    result of call at line 30, characters 74-78 :
-      basic_record = {flag = false; first_value = 9; second_value = 8}
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
+    i :  = 0
+    i :  = 0
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 30, characters 5-92:
@@ -563,92 +219,22 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (3000216 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun x!0462 x!1181 -> 0
-    length : ty -> uni -> int = fun x!0462 x!1181 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i : int = -1
-    i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-  Line 28:
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = false; first_value = 42; second_value = 2}
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = false; first_value = 42; second_value = 2}
-    result of call at line 28, characters 21-30 : bool = false
-    result of call at line 28, characters 21-30 : bool = false
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 64-81 : int = 2
-    result of call at line 28, characters 64-81 : int = 2
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = false; first_value = 4; second_value = 2}
-  Line 29:
-    result of call at line 29, characters 13-82 :
-      basic_record = {flag = false; first_value = 23; second_value = 6}
-    result of call at line 29, characters 13-82 :
-      basic_record = {flag = false; first_value = 23; second_value = 6}
-    result of call at line 29, characters 21-30 : bool = false
-    result of call at line 29, characters 21-30 : bool = false
-    result of call at line 29, characters 21-25 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-    result of call at line 29, characters 21-25 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-    result of call at line 29, characters 64-81 : int = 6
-    result of call at line 29, characters 64-81 : int = 6
-    result of call at line 29, characters 64-68 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-    result of call at line 29, characters 64-68 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-  Line 30:
-    result of call at line 30, characters 13-92 :
-      basic_record = {flag = false; first_value = 9; second_value = 8}
-    result of call at line 30, characters 13-92 :
-      basic_record = {flag = false; first_value = 9; second_value = 8}
-    result of call at line 30, characters 41-57 : int = 9
-    result of call at line 30, characters 41-57 : int = 9
-    result of call at line 30, characters 41-45 :
-      basic_record = {flag = false; first_value = 9; second_value = 8}
-    result of call at line 30, characters 41-45 :
-      basic_record = {flag = false; first_value = 9; second_value = 8}
-    result of call at line 30, characters 74-91 : int = 8
-    result of call at line 30, characters 74-91 : int = 8
-    result of call at line 30, characters 74-78 :
-      basic_record = {flag = false; first_value = 9; second_value = 8}
-    result of call at line 30, characters 74-78 :
-      basic_record = {flag = false; first_value = 9; second_value = 8}
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
+    i :  = 0
+    i :  = 0
 
 File "bench/check-ce/array_records_poly.mlw", line 31, characters 13-35:
 Sub-goal Assertion of goal var_overwrite'vc.
 Prover result is: Valid (6866 steps).
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 25, characters 15-36:
@@ -656,80 +242,10 @@ Sub-goal Postcondition of goal var_overwrite'vc.
 Prover result is: Step limit exceeded (3000243 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun x!0514 x!1203 -> 0
-    length : ty -> uni -> int = fun x!0514 x!1203 -> 0
 File array_records_poly.mlw:
   Line 23:
-    i : int = 2
-    i : int = 2
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_value = 3; second_value = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_value = 3; second_value = 5}
-  Line 28:
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = false; first_value = 42; second_value = 6}
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = false; first_value = 42; second_value = 6}
-    result of call at line 28, characters 21-30 : bool = false
-    result of call at line 28, characters 21-30 : bool = false
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-    result of call at line 28, characters 64-81 : int = 6
-    result of call at line 28, characters 64-81 : int = 6
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = false; first_value = 7; second_value = 6}
-  Line 29:
-    result of call at line 29, characters 13-82 :
-      basic_record = {flag = false; first_value = 23; second_value = 8}
-    result of call at line 29, characters 13-82 :
-      basic_record = {flag = false; first_value = 23; second_value = 8}
-    result of call at line 29, characters 21-30 : bool = false
-    result of call at line 29, characters 21-30 : bool = false
-    result of call at line 29, characters 21-25 :
-      basic_record = {flag = false; first_value = 9; second_value = 8}
-    result of call at line 29, characters 21-25 :
-      basic_record = {flag = false; first_value = 9; second_value = 8}
-    result of call at line 29, characters 64-81 : int = 8
-    result of call at line 29, characters 64-81 : int = 8
-    result of call at line 29, characters 64-68 :
-      basic_record = {flag = false; first_value = 9; second_value = 8}
-    result of call at line 29, characters 64-68 :
-      basic_record = {flag = false; first_value = 9; second_value = 8}
-  Line 30:
-    result of call at line 30, characters 13-92 :
-      basic_record = {flag = false; first_value = 11; second_value = 10}
-    result of call at line 30, characters 13-92 :
-      basic_record = {flag = false; first_value = 11; second_value = 10}
-    result of call at line 30, characters 41-57 : int = 11
-    result of call at line 30, characters 41-57 : int = 11
-    result of call at line 30, characters 41-45 :
-      basic_record = {flag = false; first_value = 11; second_value = 10}
-    result of call at line 30, characters 41-45 :
-      basic_record = {flag = false; first_value = 11; second_value = 10}
-    result of call at line 30, characters 74-91 : int = 10
-    result of call at line 30, characters 74-91 : int = 10
-    result of call at line 30, characters 74-78 :
-      basic_record = {flag = false; first_value = 11; second_value = 10}
-    result of call at line 30, characters 74-78 :
-      basic_record = {flag = false; first_value = 11; second_value = 10}
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
+    i :  = 0
+    i :  = 0
 

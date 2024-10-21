@@ -74,11 +74,11 @@ The program does not comply to the verification goal, for example during the
 File binary_search-B1.mlw:
   Line 3:
     Execution of main function `binary_search` with env:
-      div = fun (x!04:int) (x!13:int) ->
-             if x!04 = 0 /\ x!13 = 2 then (- 47924) else (- 47924)
-      mod = fun (x!04:int) (x!13:int) -> 0
+      div = fun (x!06:int) (x!15:int) ->
+             if x!06 = 0 /\ x!15 = 2 then (- 47924) else (- 47924)
+      mod = fun (x!06:int) (x!15:int) -> 0
       t = {length= 1;
-           elts= fun (x!04:int) -> if x!04 = (- 47924) then 401 else 401}
+           elts= fun (x!06:int) -> if x!06 = (- 47924) then 401 else 401}
       x = 400
       zero = 0
       one = 1
@@ -93,7 +93,7 @@ File binary_search-B1.mlw:
   Line 10:
     Normal execution of function `length` with args:
       arg = {length= 1;
-             elts= fun (x!04:int) -> if x!04 = (- 47924) then 401 else 401}
+             elts= fun (x!06:int) -> if x!06 = (- 47924) then 401 else 401}
     Normal execution of function `(-)` with args:
       x = 1
       y = 1
@@ -163,15 +163,15 @@ File binary_search-B1.mlw:
   Line 17:
     Normal execution of function `([])` with args:
       a = {length= 1;
-           elts= fun (x!04:int) -> if x!04 = (- 47924) then 401 else 401}
+           elts= fun (x!06:int) -> if x!06 = (- 47924) then 401 else 401}
       i = 0
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
       arg = {length= 1;
-             elts= fun (x!04:int) -> if x!04 = (- 47924) then 401 else 401}
+             elts= fun (x!06:int) -> if x!06 = (- 47924) then 401 else 401}
     Normal execution of function `(@)` with args:
-      u = fun (x!04:int) -> if x!04 = (- 47924) then 401 else 401
+      u = fun (x!06:int) -> if x!06 = (- 47924) then 401 else 401
       u = 0
 File binary_search-B1.mlw:
   Line 17:
@@ -197,11 +197,11 @@ File binary_search-B1.mlw:
   Line 15:
     Property failure at loop variant decrease with:
       t = {length= 1;
-           elts= fun (x!04:int) -> if x!04 = (- 47924) then 401 else 401}
+           elts= fun (x!06:int) -> if x!06 = (- 47924) then 401 else 401}
       r = {contents= (-1)}
       r = {contents= 0}
       t = {length= 1;
-           elts= fun (x!04:int) -> if x!04 = (- 47924) then 401 else 401}
+           elts= fun (x!06:int) -> if x!06 = (- 47924) then 401 else 401}
 
 File "bench/check-ce/petiot2018/experiments/binary_search-B1.mlw", line 15, characters 10-23:
 Sub-goal Loop variant decrease of goal binary_search'vc.
@@ -211,11 +211,11 @@ The program does not comply to the verification goal, for example during the
 File binary_search-B1.mlw:
   Line 3:
     Execution of main function `binary_search` with env:
-      div = fun (x!08:int) (x!16:int) ->
-             if x!08 = 0 /\ x!16 = 2 then 8 else 8
-      mod = fun (x!08:int) (x!16:int) -> 0
+      div = fun (x!012:int) (x!110:int) ->
+             if x!012 = 0 /\ x!110 = 2 then 8 else 8
+      mod = fun (x!012:int) (x!110:int) -> 0
       t = {length= 1;
-           elts= fun (x!08:int) -> if x!08 = 8 then (- 175) else (- 175)}
+           elts= fun (x!012:int) -> if x!012 = 8 then (- 175) else (- 175)}
       x = 0
       zero = 0
       one = 1
@@ -230,7 +230,7 @@ File binary_search-B1.mlw:
   Line 10:
     Normal execution of function `length` with args:
       arg = {length= 1;
-             elts= fun (x!08:int) -> if x!08 = 8 then (- 175) else (- 175)}
+             elts= fun (x!012:int) -> if x!012 = 8 then (- 175) else (- 175)}
     Normal execution of function `(-)` with args:
       x = 1
       y = 1
@@ -300,15 +300,15 @@ File binary_search-B1.mlw:
   Line 17:
     Normal execution of function `([])` with args:
       a = {length= 1;
-           elts= fun (x!08:int) -> if x!08 = 8 then (- 175) else (- 175)}
+           elts= fun (x!012:int) -> if x!012 = 8 then (- 175) else (- 175)}
       i = 0
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
       arg = {length= 1;
-             elts= fun (x!08:int) -> if x!08 = 8 then (- 175) else (- 175)}
+             elts= fun (x!012:int) -> if x!012 = 8 then (- 175) else (- 175)}
     Normal execution of function `(@)` with args:
-      u = fun (x!08:int) -> if x!08 = 8 then (- 175) else (- 175)
+      u = fun (x!012:int) -> if x!012 = 8 then (- 175) else (- 175)
       u = 0
 File binary_search-B1.mlw:
   Line 17:
@@ -322,11 +322,11 @@ File binary_search-B1.mlw:
   Line 15:
     Property failure at loop variant decrease with:
       t = {length= 1;
-           elts= fun (x!08:int) -> if x!08 = 8 then (- 175) else (- 175)}
+           elts= fun (x!012:int) -> if x!012 = 8 then (- 175) else (- 175)}
       r = {contents= 0}
       r = {contents= 0}
       t = {length= 1;
-           elts= fun (x!08:int) -> if x!08 = 8 then (- 175) else (- 175)}
+           elts= fun (x!012:int) -> if x!012 = 8 then (- 175) else (- 175)}
 
 ** binary_search-B2
 bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B2.mlw --apply-transform=split_vc --prover=Z3,4.8.10,counterexamples --timelimit=15 --check-ce --rac-prover=Z3,4.8.10 --sub-goal=:15@loop variant decrease --stepslimit=500000
@@ -342,13 +342,13 @@ The program does not comply to the verification goal, for example during the
 File binary_search-B2.mlw:
   Line 3:
     Execution of main function `binary_search` with env:
-      div = fun (x!08:int) (x!16:int) ->
-             if x!08 = 801 /\ x!16 = 2 then (- 30056) else (- 30056)
-      mod = fun (x!08:int) (x!16:int) -> 0
+      div = fun (x!010:int) (x!18:int) ->
+             if x!010 = 801 /\ x!18 = 2 then (- 30056) else (- 30056)
+      mod = fun (x!010:int) (x!18:int) -> 0
       t = {length= 402;
            elts=
-           fun (x!08:int) ->
-            if x!08 = (- 30056) then (- 17869) else (- 17869)}
+           fun (x!010:int) ->
+            if x!010 = (- 30056) then (- 17869) else (- 17869)}
       x = 0
       zero = 0
       one = 1
@@ -364,8 +364,8 @@ File binary_search-B2.mlw:
     Normal execution of function `length` with args:
       arg = {length= 402;
              elts=
-             fun (x!08:int) ->
-              if x!08 = (- 30056) then (- 17869) else (- 17869)}
+             fun (x!010:int) ->
+              if x!010 = (- 30056) then (- 17869) else (- 17869)}
     Normal execution of function `(-)` with args:
       x = 402
       y = 1
@@ -433,18 +433,19 @@ File binary_search-B2.mlw:
     Normal execution of function `([])` with args:
       a = {length= 402;
            elts=
-           fun (x!08:int) ->
-            if x!08 = (- 30056) then (- 17869) else (- 17869)}
+           fun (x!010:int) ->
+            if x!010 = (- 30056) then (- 17869) else (- 17869)}
       i = 200
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
       arg = {length= 402;
              elts=
-             fun (x!08:int) ->
-              if x!08 = (- 30056) then (- 17869) else (- 17869)}
+             fun (x!010:int) ->
+              if x!010 = (- 30056) then (- 17869) else (- 17869)}
     Normal execution of function `(@)` with args:
-      u = fun (x!08:int) -> if x!08 = (- 30056) then (- 17869) else (- 17869)
+      u = fun (x!010:int) ->
+           if x!010 = (- 30056) then (- 17869) else (- 17869)
       u = 200
 File binary_search-B2.mlw:
   Line 17:
@@ -503,18 +504,19 @@ File binary_search-B2.mlw:
     Normal execution of function `([])` with args:
       a = {length= 402;
            elts=
-           fun (x!08:int) ->
-            if x!08 = (- 30056) then (- 17869) else (- 17869)}
+           fun (x!010:int) ->
+            if x!010 = (- 30056) then (- 17869) else (- 17869)}
       i = 300
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
       arg = {length= 402;
              elts=
-             fun (x!08:int) ->
-              if x!08 = (- 30056) then (- 17869) else (- 17869)}
+             fun (x!010:int) ->
+              if x!010 = (- 30056) then (- 17869) else (- 17869)}
     Normal execution of function `(@)` with args:
-      u = fun (x!08:int) -> if x!08 = (- 30056) then (- 17869) else (- 17869)
+      u = fun (x!010:int) ->
+           if x!010 = (- 30056) then (- 17869) else (- 17869)
       u = 300
 File binary_search-B2.mlw:
   Line 17:
@@ -573,18 +575,19 @@ File binary_search-B2.mlw:
     Normal execution of function `([])` with args:
       a = {length= 402;
            elts=
-           fun (x!08:int) ->
-            if x!08 = (- 30056) then (- 17869) else (- 17869)}
+           fun (x!010:int) ->
+            if x!010 = (- 30056) then (- 17869) else (- 17869)}
       i = 350
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
       arg = {length= 402;
              elts=
-             fun (x!08:int) ->
-              if x!08 = (- 30056) then (- 17869) else (- 17869)}
+             fun (x!010:int) ->
+              if x!010 = (- 30056) then (- 17869) else (- 17869)}
     Normal execution of function `(@)` with args:
-      u = fun (x!08:int) -> if x!08 = (- 30056) then (- 17869) else (- 17869)
+      u = fun (x!010:int) ->
+           if x!010 = (- 30056) then (- 17869) else (- 17869)
       u = 350
 File binary_search-B2.mlw:
   Line 17:
@@ -643,18 +646,19 @@ File binary_search-B2.mlw:
     Normal execution of function `([])` with args:
       a = {length= 402;
            elts=
-           fun (x!08:int) ->
-            if x!08 = (- 30056) then (- 17869) else (- 17869)}
+           fun (x!010:int) ->
+            if x!010 = (- 30056) then (- 17869) else (- 17869)}
       i = 375
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
       arg = {length= 402;
              elts=
-             fun (x!08:int) ->
-              if x!08 = (- 30056) then (- 17869) else (- 17869)}
+             fun (x!010:int) ->
+              if x!010 = (- 30056) then (- 17869) else (- 17869)}
     Normal execution of function `(@)` with args:
-      u = fun (x!08:int) -> if x!08 = (- 30056) then (- 17869) else (- 17869)
+      u = fun (x!010:int) ->
+           if x!010 = (- 30056) then (- 17869) else (- 17869)
       u = 375
 File binary_search-B2.mlw:
   Line 17:
@@ -713,18 +717,19 @@ File binary_search-B2.mlw:
     Normal execution of function `([])` with args:
       a = {length= 402;
            elts=
-           fun (x!08:int) ->
-            if x!08 = (- 30056) then (- 17869) else (- 17869)}
+           fun (x!010:int) ->
+            if x!010 = (- 30056) then (- 17869) else (- 17869)}
       i = 388
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
       arg = {length= 402;
              elts=
-             fun (x!08:int) ->
-              if x!08 = (- 30056) then (- 17869) else (- 17869)}
+             fun (x!010:int) ->
+              if x!010 = (- 30056) then (- 17869) else (- 17869)}
     Normal execution of function `(@)` with args:
-      u = fun (x!08:int) -> if x!08 = (- 30056) then (- 17869) else (- 17869)
+      u = fun (x!010:int) ->
+           if x!010 = (- 30056) then (- 17869) else (- 17869)
       u = 388
 File binary_search-B2.mlw:
   Line 17:
@@ -783,18 +788,19 @@ File binary_search-B2.mlw:
     Normal execution of function `([])` with args:
       a = {length= 402;
            elts=
-           fun (x!08:int) ->
-            if x!08 = (- 30056) then (- 17869) else (- 17869)}
+           fun (x!010:int) ->
+            if x!010 = (- 30056) then (- 17869) else (- 17869)}
       i = 394
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
       arg = {length= 402;
              elts=
-             fun (x!08:int) ->
-              if x!08 = (- 30056) then (- 17869) else (- 17869)}
+             fun (x!010:int) ->
+              if x!010 = (- 30056) then (- 17869) else (- 17869)}
     Normal execution of function `(@)` with args:
-      u = fun (x!08:int) -> if x!08 = (- 30056) then (- 17869) else (- 17869)
+      u = fun (x!010:int) ->
+           if x!010 = (- 30056) then (- 17869) else (- 17869)
       u = 394
 File binary_search-B2.mlw:
   Line 17:
@@ -853,18 +859,19 @@ File binary_search-B2.mlw:
     Normal execution of function `([])` with args:
       a = {length= 402;
            elts=
-           fun (x!08:int) ->
-            if x!08 = (- 30056) then (- 17869) else (- 17869)}
+           fun (x!010:int) ->
+            if x!010 = (- 30056) then (- 17869) else (- 17869)}
       i = 397
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
       arg = {length= 402;
              elts=
-             fun (x!08:int) ->
-              if x!08 = (- 30056) then (- 17869) else (- 17869)}
+             fun (x!010:int) ->
+              if x!010 = (- 30056) then (- 17869) else (- 17869)}
     Normal execution of function `(@)` with args:
-      u = fun (x!08:int) -> if x!08 = (- 30056) then (- 17869) else (- 17869)
+      u = fun (x!010:int) ->
+           if x!010 = (- 30056) then (- 17869) else (- 17869)
       u = 397
 File binary_search-B2.mlw:
   Line 17:
@@ -923,18 +930,19 @@ File binary_search-B2.mlw:
     Normal execution of function `([])` with args:
       a = {length= 402;
            elts=
-           fun (x!08:int) ->
-            if x!08 = (- 30056) then (- 17869) else (- 17869)}
+           fun (x!010:int) ->
+            if x!010 = (- 30056) then (- 17869) else (- 17869)}
       i = 399
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
       arg = {length= 402;
              elts=
-             fun (x!08:int) ->
-              if x!08 = (- 30056) then (- 17869) else (- 17869)}
+             fun (x!010:int) ->
+              if x!010 = (- 30056) then (- 17869) else (- 17869)}
     Normal execution of function `(@)` with args:
-      u = fun (x!08:int) -> if x!08 = (- 30056) then (- 17869) else (- 17869)
+      u = fun (x!010:int) ->
+           if x!010 = (- 30056) then (- 17869) else (- 17869)
       u = 399
 File binary_search-B2.mlw:
   Line 17:
@@ -993,18 +1001,19 @@ File binary_search-B2.mlw:
     Normal execution of function `([])` with args:
       a = {length= 402;
            elts=
-           fun (x!08:int) ->
-            if x!08 = (- 30056) then (- 17869) else (- 17869)}
+           fun (x!010:int) ->
+            if x!010 = (- 30056) then (- 17869) else (- 17869)}
       i = 400
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
       arg = {length= 402;
              elts=
-             fun (x!08:int) ->
-              if x!08 = (- 30056) then (- 17869) else (- 17869)}
+             fun (x!010:int) ->
+              if x!010 = (- 30056) then (- 17869) else (- 17869)}
     Normal execution of function `(@)` with args:
-      u = fun (x!08:int) -> if x!08 = (- 30056) then (- 17869) else (- 17869)
+      u = fun (x!010:int) ->
+           if x!010 = (- 30056) then (- 17869) else (- 17869)
       u = 400
 File binary_search-B2.mlw:
   Line 17:
@@ -1063,18 +1072,19 @@ File binary_search-B2.mlw:
     Normal execution of function `([])` with args:
       a = {length= 402;
            elts=
-           fun (x!08:int) ->
-            if x!08 = (- 30056) then (- 17869) else (- 17869)}
+           fun (x!010:int) ->
+            if x!010 = (- 30056) then (- 17869) else (- 17869)}
       i = 400
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
       arg = {length= 402;
              elts=
-             fun (x!08:int) ->
-              if x!08 = (- 30056) then (- 17869) else (- 17869)}
+             fun (x!010:int) ->
+              if x!010 = (- 30056) then (- 17869) else (- 17869)}
     Normal execution of function `(@)` with args:
-      u = fun (x!08:int) -> if x!08 = (- 30056) then (- 17869) else (- 17869)
+      u = fun (x!010:int) ->
+           if x!010 = (- 30056) then (- 17869) else (- 17869)
       u = 400
 File binary_search-B2.mlw:
   Line 17:
@@ -1102,13 +1112,13 @@ The program does not comply to the verification goal, for example during the
 File binary_search-B3.mlw:
   Line 3:
     Execution of main function `binary_search` with env:
-      div = fun (x!04:int) (x!13:int) ->
-             if x!04 = 7118 /\ x!13 = 2 then 0 else 0
-      mod = fun (x!04:int) (x!13:int) -> 0
+      div = fun (x!06:int) (x!15:int) ->
+             if x!06 = 7118 /\ x!15 = 2 then 0 else 0
+      mod = fun (x!06:int) (x!15:int) -> 0
       t = {length= 7120;
            elts=
-           fun (x!04:int) ->
-            if x!04 = 0 then 402 else if x!04 = 7119 then 401 else 402}
+           fun (x!06:int) ->
+            if x!06 = 0 then 402 else if x!06 = 7119 then 401 else 402}
       x = 401
       zero = 0
       one = 1
@@ -1124,8 +1134,8 @@ File binary_search-B3.mlw:
     Normal execution of function `length` with args:
       arg = {length= 7120;
              elts=
-             fun (x!04:int) ->
-              if x!04 = 0 then 402 else if x!04 = 7119 then 401 else 402}
+             fun (x!06:int) ->
+              if x!06 = 0 then 402 else if x!06 = 7119 then 401 else 402}
     Normal execution of function `(-)` with args:
       x = 7120
       y = 1
@@ -1196,19 +1206,19 @@ File binary_search-B3.mlw:
     Normal execution of function `([])` with args:
       a = {length= 7120;
            elts=
-           fun (x!04:int) ->
-            if x!04 = 0 then 402 else if x!04 = 7119 then 401 else 402}
+           fun (x!06:int) ->
+            if x!06 = 0 then 402 else if x!06 = 7119 then 401 else 402}
       i = 3559
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
       arg = {length= 7120;
              elts=
-             fun (x!04:int) ->
-              if x!04 = 0 then 402 else if x!04 = 7119 then 401 else 402}
+             fun (x!06:int) ->
+              if x!06 = 0 then 402 else if x!06 = 7119 then 401 else 402}
     Normal execution of function `(@)` with args:
-      u = fun (x!04:int) ->
-           if x!04 = 0 then 402 else if x!04 = 7119 then 401 else 402
+      u = fun (x!06:int) ->
+           if x!06 = 0 then 402 else if x!06 = 7119 then 401 else 402
       u = 3559
 File binary_search-B3.mlw:
   Line 17:
@@ -1235,8 +1245,8 @@ File binary_search-B3.mlw:
     Property failure at loop invariant preservation with:
       t = {length= 7120;
            elts=
-           fun (x!04:int) ->
-            if x!04 = 0 then 402 else if x!04 = 7119 then 401 else 402}
+           fun (x!06:int) ->
+            if x!06 = 0 then 402 else if x!06 = 7119 then 401 else 402}
       x = 401
       r = {contents= 3558}
 

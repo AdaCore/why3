@@ -337,35 +337,8 @@ The following counterexample model could not be verified
   (abstract RAC fatal rac error: missing value for return value of call to int_ref at "bench/check-ce/petiot2018/experiments/isqrt-S5.mlw", line 6, characters 10-19):
 File isqrt-S5.mlw:
   Line 3:
+    n :  = 2
     n : int = 2
-    n : int = 2
-  Line 6:
-    r : int = 2
-    r : int = 2
-  Line 7:
-    y : int = 4
-    y : int = 4
-  Line 8:
-    z : int = -3
-    z : int = -3
-  Line 9:
-    [before iteration] r : int = 2
-    [before iteration] r : int = 2
-    [before iteration] y : int = 4
-    [before iteration] y : int = 4
-    [before iteration] z : int = -5
-    [before iteration] z : int = -5
-  Line 10:
-    [current iteration] r : int = 1
-  Line 11:
-    [current iteration] y : int = -1
-  Line 15:
-    [current iteration] y : int = -1
-  Line 16:
-    [current iteration] z : int = -3
-    [current iteration] z : int = -3
-  Line 17:
-    [current iteration] r : int = 1
 
 ** isqrt-S6
 bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/isqrt-S6.mlw --apply-transform=split_vc --prover=Alt-Ergo,2.5.4,counterexamples --timelimit=15 --check-ce --rac-prover=Alt-Ergo,2.5.4 --sub-goal=:5@postcondition --stepslimit=10000
@@ -528,24 +501,8 @@ The following counterexample model could not be verified
   (abstract RAC fatal rac error: missing value for return value of call to int_ref at "bench/check-ce/petiot2018/experiments/isqrt-S7.mlw", line 6, characters 10-19):
 File isqrt-S7.mlw:
   Line 3:
+    n :  = 1
     n : int = 1
-    n : int = 1
-  Line 6:
-    r : int = 1
-    r : int = 1
-  Line 7:
-    y : int = 1
-    y : int = 1
-  Line 8:
-    z : int = -1
-    z : int = -1
-  Line 9:
-    r : int = 0
-    r : int = 0
-    y : int = 0
-    y : int = 0
-    z : int = 1
-    z : int = 1
 
 ** isqrt-S8
 bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/isqrt-S8.mlw --apply-transform=split_vc --prover=Alt-Ergo,2.5.4,counterexamples --timelimit=15 --check-ce --rac-prover=Alt-Ergo,2.5.4 --sub-goal=:5@postcondition --stepslimit=10000
@@ -842,32 +799,6 @@ The following counterexample model could not be verified
   (abstract RAC fatal rac error: missing value for return value of call to int_ref at "bench/check-ce/petiot2018/experiments/isqrt-S10.mlw", line 6, characters 10-19):
 File isqrt-S10.mlw:
   Line 3:
+    n :  = 1
     n : int = 1
-    n : int = 1
-  Line 6:
-    r : int = 1
-    r : int = 1
-  Line 7:
-    y : int = 1
-    y : int = 1
-  Line 8:
-    z : int = -1
-    z : int = -1
-  Line 9:
-    [before iteration] r : int = -4
-    [before iteration] r : int = -4
-    [before iteration] y : int = 16
-    [before iteration] y : int = 16
-    [before iteration] z : int = 9
-    [before iteration] z : int = 9
-  Line 14:
-    [current iteration] r : int = -5
-  Line 15:
-    [current iteration] y : int = 25
-    [current iteration] y : int = 25
-  Line 16:
-    [current iteration] z : int = 11
-    [current iteration] z : int = 11
-  Line 17:
-    [current iteration] r : int = -5
 
