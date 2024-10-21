@@ -391,7 +391,7 @@ and print_app pri ls fmt tl =
         (print_lterm 7) t1 print_term t2 s
   | Ident.SNword s, [t] when Sattr.mem is_field_id_attr ls.ls_name.id_attrs ->
      fprintf fmt (protect_on (pri > 6) "@[%a.%s@]")
-       print_term t s
+       (print_lterm 7) t s
   | Ident.SNword s, tl ->
       fprintf fmt (protect_on (pri > 6) "@[%s@ %a@]")
         s (print_list space (print_lterm 7)) tl
