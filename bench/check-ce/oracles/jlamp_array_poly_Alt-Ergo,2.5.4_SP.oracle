@@ -13,20 +13,16 @@ Sub-goal Index in array bounds of goal f'vc.
 Prover result is: Unknown (unknown) (5 steps).
 The following counterexample model could not be verified
   (both RAC fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds):
-File array.mlw:
-  Line 17:
-    length : array 'a -> int = [|_ => 0|]
-    length : array 'a -> int = [|_ => 0|]
 File jlamp_array_poly.mlw:
   Line 8:
-    to_int : t -> int = [|{Array.to_int => 3} => 3; _ => 2|]
-    to_int : t -> int = [|{Array.to_int => 3} => 3; _ => 2|]
+    to_int : t -> int = [|{to_int => 3} => 3; _ => 2|]
   Line 11:
-    two : t = {Array.to_int => 2}
-    two : t = {Array.to_int => 2}
+    two : t = {to_int => 2}
   Line 14:
-    three : t = {Array.to_int => 2}
-    three : t = {Array.to_int => 2}
+    three : t = {to_int => 2}
+  Line 18:
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -43,20 +39,16 @@ Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown (unknown) (10 steps).
 The following counterexample model could not be verified
   (both RAC fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds):
-File array.mlw:
-  Line 17:
-    length : array 'a -> int = [|_ => 1|]
-    length : array 'a -> int = [|_ => 1|]
 File jlamp_array_poly.mlw:
   Line 8:
-    to_int : t -> int = [|{Array.to_int => 3} => 3; _ => 2|]
-    to_int : t -> int = [|{Array.to_int => 3} => 3; _ => 2|]
+    to_int : t -> int = [|{to_int => 3} => 3; _ => 2|]
   Line 11:
-    two : t = {Array.to_int => 2}
-    two : t = {Array.to_int => 2}
+    two : t = {to_int => 2}
   Line 14:
-    three : t = {Array.to_int => 2}
-    three : t = {Array.to_int => 2}
+    three : t = {to_int => 2}
+  Line 18:
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
 
 File "bench/check-ce/jlamp_array_poly.mlw", line 28, characters 4-16:
 Sub-goal Index in array bounds of goal g'vc.
@@ -77,20 +69,16 @@ Sub-goal Postcondition of goal g'vc.
 Prover result is: Unknown (unknown) (15 steps).
 The following counterexample model could not be verified
   (both RAC fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds):
-File array.mlw:
-  Line 17:
-    length : array 'a -> int = [|_ => 44|]
-    length : array 'a -> int = [|_ => 44|]
 File jlamp_array_poly.mlw:
   Line 8:
-    to_int : t -> int = [|{Array.to_int => 3} => 3; _ => 2|]
-    to_int : t -> int = [|{Array.to_int => 3} => 3; _ => 2|]
+    to_int : t -> int = [|{to_int => 3} => 3; _ => 2|]
   Line 11:
-    two : t = {Array.to_int => 2}
-    two : t = {Array.to_int => 2}
+    two : t = {to_int => 2}
   Line 14:
-    three : t = {Array.to_int => 2}
-    three : t = {Array.to_int => 2}
+    three : t = {to_int => 2}
+  Line 24:
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
 
 File "bench/check-ce/jlamp_array_poly.mlw", line 34, characters 4-16:
 Sub-goal Index in array bounds of goal h'vc.
@@ -111,18 +99,14 @@ Sub-goal Postcondition of goal h'vc.
 Prover result is: Unknown (unknown) (16 steps).
 The following counterexample model could not be verified
   (both RAC fatal rac error: cannot evaluate builtin ([]<-) because index is out of bounds):
-File array.mlw:
-  Line 17:
-    length : array 'a -> int = [|_ => 44|]
-    length : array 'a -> int = [|_ => 44|]
 File jlamp_array_poly.mlw:
   Line 8:
-    to_int : t -> int = [|{Array.to_int => 3} => 3; _ => 2|]
-    to_int : t -> int = [|{Array.to_int => 3} => 3; _ => 2|]
+    to_int : t -> int = [|{to_int => 3} => 3; _ => 2|]
   Line 11:
-    two : t = {Array.to_int => 2}
-    two : t = {Array.to_int => 2}
+    two : t = {to_int => 2}
   Line 14:
-    three : t = {Array.to_int => 2}
-    three : t = {Array.to_int => 2}
+    three : t = {to_int => 2}
+  Line 30:
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
 

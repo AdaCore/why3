@@ -1,0 +1,55 @@
+(** Examples for testing a new form of presentation of counterexamples
+
+    This file concerns the presentation of CE for simple functions
+    with no conditional, no loop, no function call
+
+    This case is for conditionals
+
+*)
+
+use int.Int
+
+constant a : int
+
+val ref b : int
+
+let f1 (x:int) (ref y:int) : unit
+  requires { x >= 0 /\ y >= 0 /\ b >= 0}
+= y <- y + x;
+  [@eid:If1] if y <= 42 then
+     begin
+       b <- b + y;
+       assert A2 { a + b + x + y <= 42 }
+     end
+  else
+    begin
+     b <- x + y;
+     assert A3 { b >= 0 }
+   end
+
+(** Expected form of answer:
+
+Function `f1` does not conform with its specification at assertion `A2`
+on line `...`. A counterexamples given by the following logic context
+--
+a : int = ...
+--
+and the execution of `f1` in the initial global context
+--
+b : ref int = ....
+--
+the parameters
+--
+x : int = ...
+y : ref int = ....
+---
+that takes the `then` branch of the conditional `If1` on line `...`
+and
+that reaches the assertion `A2` with the context
+---
+b : ref int = ...
+x : int = ...
+y : ref int = ...
+---
+
+*)

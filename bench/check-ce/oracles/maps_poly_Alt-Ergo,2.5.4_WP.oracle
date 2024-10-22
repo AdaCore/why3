@@ -22,27 +22,27 @@ File int.mlw:
     one = 1
 File maps_poly.mlw:
   Line 7:
-    x = {contents= fun (x:int) -> if x = 1 then 3 else 0}
-    x = {contents= fun (x:int) -> if x = 1 then 3 else 0}
+    x = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
+    x = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
     Execution of main function `test_map` with env:
-      x = {contents= fun (x:int) -> if x = 1 then 3 else 0}
+      x = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
       zero = 0
       one = 1
   Line 10:
     Normal execution of function `(!)` with args:
-      r = {contents= fun (x:int) -> if x = 1 then 3 else 0}
+      r = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= fun (x:int) -> if x = 1 then 3 else 0}
+      arg = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
 File maps_poly.mlw:
   Line 10:
     Normal execution of function `set` with args:
-      f = fun (x:int) -> if x = 1 then 3 else 0
+      f = fun (x1:int) -> if x1 = 1 then 3 else 0
       x = 0
       v = 3
     Normal execution of function `(:=)` with args:
-      r = {contents= fun (x:int) -> if x = 1 then 3 else 0}
+      r = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
       v = (fun y -> if pure { if y = x then True else False } then v
              else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3
   Line 8:
@@ -68,22 +68,8 @@ The following counterexample model could not be verified
   (concrete RAC fatal rac error: unexpected arguments passed to (@), abstract RAC fatal rac error: missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 16, characters 31-33):
 File maps_poly.mlw:
   Line 13:
-    x : int -> int -> int = [|_ => [|_ => 0|]|]
-    x : int -> int -> int = [|_ => [|_ => 0|]|]
-  Line 14:
-    x :
-      int
-      ->
-      int
-      ->
-      int = [|1 => [|_ => 0|]; 0 => [|_ => 0|]; _ => [|_ => 0|]|]
-  Line 16:
-    x :
-      int
-      ->
-      int
-      ->
-      int = [|1 => [|_ => 0|]; 0 => [|_ => 0|]; _ => [|_ => 0|]|]
+    x :  = {contents = [|_ => [|_ => 0|]|]}
+    x : int -> int -> int = {contents = [|_ => [|_ => 0|]|]}
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -100,26 +86,10 @@ Sub-goal Postcondition of goal test_map_multidim2'vc.
 Prover result is: Unknown (unknown) (14 steps).
 The following counterexample model could not be verified
   (concrete RAC fatal rac error: unexpected arguments passed to (@), abstract RAC fatal rac error: missing value for return value of call to (!) at "bench/check-ce/maps_poly.mlw", line 21, characters 21-23):
-File ref.mlw:
-  Line 18:
-    x : int -> int -> int = [|_ => [|_ => 0|]|]
 File maps_poly.mlw:
   Line 18:
-    x : int -> int -> int = [|_ => [|_ => 0|]|]
-  Line 19:
-    x :
-      int
-      ->
-      int
-      ->
-      int = [|0 => [|_ => 0|]; 1 => [|_ => 0|]; _ => [|_ => 0|]|]
-  Line 23:
-    x :
-      int
-      ->
-      int
-      ->
-      int = [|0 => [|_ => 0|]; 1 => [|_ => 0|]; _ => [|_ => 0|]|]
+    x :  = {contents = [|_ => [|_ => 0|]|]}
+    x : int -> int -> int = {contents = [|_ => [|_ => 0|]|]}
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -263,10 +233,16 @@ File maps_poly.mlw:
       t = fun (x1:int) -> if x1 = 0 then 0 else 0
 
 <check_ce:categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
+- Selected model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g'goal` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g'goal` cannot be evaluated)
 File "bench/check-ce/maps_poly.mlw", line 50, characters 36-64:
 Goal g.
 Prover result is: Unknown (unknown) (5 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Postcondition of `g'goal` cannot be evaluated):
+File maps_poly.mlw:
+  Line 50:
+    m :  = "undefined"
+    m :  = "undefined"
 

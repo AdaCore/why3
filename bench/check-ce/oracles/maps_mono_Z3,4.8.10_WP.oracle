@@ -481,15 +481,15 @@ File maps_mono.mlw:
                                                else if x!0152 = 2 then 7
                                                     else 8
       x = 0
-      v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = fun (x!0151:int) ->
-                                 if x!0151 = 0 then 8
-                                 else if x!0151 = 9 then 11
-                                      else if x!0151 = 16 then 18
-                                           else if x!0151 = 25 then 26
-                                                else if x!0151 = 22 then 23
-                                                     else if x!0151 = 2
-                                                          then 7 else 8, x = 0, v = 3
+      v = (fun y1 -> if pure { if y1 = x then True else False } then v
+             else f y1) with f = fun (x!0151:int) ->
+                                  if x!0151 = 0 then 8
+                                  else if x!0151 = 9 then 11
+                                       else if x!0151 = 16 then 18
+                                            else if x!0151 = 25 then 26
+                                                 else if x!0151 = 22 then 23
+                                                      else if x!0151 = 2
+                                                           then 7 else 8, x = 0, v = 3
     Normal execution of function `(:=)` with args:
       r = {contents=
            fun (x!0151:int) ->

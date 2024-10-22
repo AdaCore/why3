@@ -27,12 +27,17 @@ rx_concrete_RAC = re.compile(r"Concrete RAC: (?P<c>[A-Z_]*)(?P<cr>.*)\n")
 rx_abstract_RAC = re.compile(r"Abstract RAC: (?P<a>[A-Z_]*)(?P<ar>.*)\n")
 
 rx_dict_incomplete = {
+    "cannot decide post": re.compile(r"(.*)Postcondition of (.*) cannot be evaluated(.*)"),
+    "cannot decide pre": re.compile(r"(.*)Precondition of (.*) cannot be evaluated(.*)"),
     "cannot decide": re.compile(r"(.*)cannot be evaluated(.*)"),
     "cannot import": re.compile(r"(.*)cannot import value(.*)"),
+    "cannot evaluate builtin": re.compile(r"(.*)cannot evaluate builtin(.*)"),
     "missing return value": re.compile(r"(.*)missing value for return value(.*)"),
     "many args for exec": re.compile(r"(.*)many args for exec fun(.*)"),
     "uncaught exception": re.compile(r"(.*)uncaught exception(.*)"),
     "undefined argument": re.compile(r"(.*)undefined argument(.*)"),
+    "unexpected arguments": re.compile(r"(.*)unexpected arguments(.*)"),
+    "missing global": re.compile(r"(.*)missing value for global(.*)"),
 }
 list_of_verdicts = [
     "INCOMPLETE",
@@ -69,7 +74,7 @@ def _add_reason(res, reason, rx_dict):
 
 
 def parse_file(filepath, data, date):
-    print("entering parse_file with filepath=" + filepath)
+    # print("entering parse_file with filepath=" + filepath)
     with open(filepath, "r") as file_object:
         filepath = _parse_line(filepath,rx_filepath)
         if filepath is not None:
