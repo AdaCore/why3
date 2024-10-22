@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-let _debug =
+let debug =
   Debug.register_info_flag "remove_unused"
     ~desc:
       "Print@ debugging@ messages@ of@ the@ 'remove_unused'@ transformation."
@@ -37,12 +37,22 @@ type used_symbols = {
   used_ids : Ident.Sid.t;
 }
 
+let pp_id fmt id =
+  Format.fprintf fmt "%s" id.Ident.id_string
+
+let pp_sid fmt s =
+  Format.fprintf fmt "@[%a@]"  (Pp.print_list Pp.comma pp_id) (Ident.Sid.elements s)
+
+
 let rec add_used_ids used_symbols ids =
+  Debug.dprintf debug "Adding used symbols %a@." pp_sid ids;
   let uids = Ident.Sid.union used_symbols.used_ids ids in
   let new_ids, closure =
     Ident.Sid.fold (fun x ((new_ids, closure) as acc) ->
       try
         let new_ids = Ident.Sid.union new_ids (Ident.Mid.find x closure) in
+        Debug.dprintf debug "Found closure for symbol %a@." pp_id x;
+        Debug.dprintf debug "Adding symbols %a@." pp_sid new_ids;
         new_ids, Ident.Mid.remove x closure
       with Not_found -> acc) ids (Ident.Sid.empty, used_symbols.closure)
   in
@@ -63,6 +73,8 @@ let initial keep_constants =
 let add_dependency usymb l =
   match l with
   | Theory.[ MApr pr; MAls ls ] ->
+      (* records in `usymb.depends` the declared dependency between
+         hypothesis `pr` and symbol `ls` *)
       let id = ls.Term.ls_name in
       let d =
         Decl.Mpr.change
@@ -150,10 +162,27 @@ let rec compute_used_ids usymb task : used_symbols =
             | Dprop (_, pr, _t) -> (
                 try
                   let s = Mpr.find pr usymb.depends in
-                  if Sid.is_empty (Sid.inter s usymb.used_ids) then
-                  let ids = Sid.add pr.pr_name (Decl.get_used_syms_decl d) in
-                  { usymb with closure = Sid.fold (fun x acc -> Mid.add x ids acc) s usymb.closure }
-                  else raise Not_found
+                  Debug.dprintf debug "@[checking if hypothesis %a is needed:@\n"
+                    pp_id pr.pr_name;
+                  Debug.dprintf debug "  declared dependencies: %a@\n"
+                    pp_sid s;
+                  Debug.dprintf debug "  current needed symbols: %a@\n"
+                    pp_sid usymb.used_ids;
+                  let b = Sid.is_empty (Sid.inter s usymb.used_ids) in
+                  Debug.dprintf debug "  -> removing? %b@]@." b;
+                  if b then
+                    let ids = Sid.add pr.pr_name (Decl.get_used_syms_decl d) in
+                    { usymb with closure =
+                                   Sid.fold (fun x acc ->
+                                       let ids = try
+                                           Sid.union (Mid.find x acc) ids
+                                         with Not_found -> ids
+                                       in
+                                       Debug.dprintf debug "Recording closure for symbol %a -> %a@."
+                                         pp_id x pp_sid ids;
+                                       Mid.add x ids acc) s usymb.closure }
+                  else
+                    raise Not_found
                 with Not_found ->
                   let ids = Decl.get_used_syms_decl d in
                   let usymb = add_used_ids usymb ids in
