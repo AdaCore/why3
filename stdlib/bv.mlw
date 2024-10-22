@@ -188,6 +188,7 @@ module BV_Gen
   val function nth t int : bool
 
   axiom nth_out_of_bound: forall x n. n < 0 \/ n >= size -> nth x n = False
+  meta "remove_unused:dependency" axiom nth_out_of_bound, function nth
 
   constant zeros : t
   axiom Nth_zeros:
