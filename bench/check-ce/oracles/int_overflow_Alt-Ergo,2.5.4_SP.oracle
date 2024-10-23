@@ -67,12 +67,15 @@ Prover result is: Valid (4 steps).
 - Checked model 0: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
-- Selected model 1: BAD_CE
+- Checked model 1: BAD_CE
+  - Concrete RAC: FAILURE (postcondition at unknown location)
+  - Abstract RAC: FAILURE (postcondition at unknown location)
+- Selected model 2: BAD_CE
   - Concrete RAC: FAILURE (postcondition at unknown location)
   - Abstract RAC: FAILURE (postcondition at unknown location)
 File "bench/check-ce/int_overflow.mlw", line 19, characters 48-62:
 Goal test_overflow.
-Prover result is: Step limit exceeded (8 steps).
+Prover result is: Unknown (unknown) (8 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -80,12 +83,15 @@ Sorry, we don't have a good counterexample for you :(
 - Checked model 0: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
-- Selected model 1: BAD_CE
+- Checked model 1: BAD_CE
+  - Concrete RAC: FAILURE (postcondition at unknown location)
+  - Abstract RAC: FAILURE (postcondition at unknown location)
+- Selected model 2: BAD_CE
   - Concrete RAC: FAILURE (postcondition at unknown location)
   - Abstract RAC: FAILURE (postcondition at unknown location)
 File "bench/check-ce/int_overflow.mlw", line 24, characters 45-56:
 Goal test_overflow2.
-Prover result is: Step limit exceeded (8 steps).
+Prover result is: Unknown (unknown) (8 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -93,12 +99,15 @@ Sorry, we don't have a good counterexample for you :(
 - Checked model 0: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
-- Selected model 1: BAD_CE
+- Checked model 1: BAD_CE
+  - Concrete RAC: FAILURE (postcondition at unknown location)
+  - Abstract RAC: FAILURE (postcondition at unknown location)
+- Selected model 2: BAD_CE
   - Concrete RAC: FAILURE (postcondition at unknown location)
   - Abstract RAC: FAILURE (postcondition at unknown location)
 File "bench/check-ce/int_overflow.mlw", line 24, characters 51-65:
 Goal test_overflow2.
-Prover result is: Step limit exceeded (8 steps).
+Prover result is: Unknown (unknown) (8 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -109,9 +118,12 @@ Sorry, we don't have a good counterexample for you :(
 - Selected model 1: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 31, characters 33-49)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 31, characters 33-49)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 31, characters 33-49)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 31, characters 33-49)
 File "bench/check-ce/int_overflow.mlw", line 31, characters 33-49:
 Goal test_overflow_int16.
-Prover result is: Step limit exceeded (23 steps).
+Prover result is: Unknown (unknown) (23 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -145,12 +157,15 @@ File int_overflow.mlw:
 - Checked model 0: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
-- Selected model 1: BAD_CE
+- Checked model 1: BAD_CE
+  - Concrete RAC: FAILURE (postcondition at unknown location)
+  - Abstract RAC: FAILURE (postcondition at unknown location)
+- Selected model 2: BAD_CE
   - Concrete RAC: FAILURE (postcondition at unknown location)
   - Abstract RAC: FAILURE (postcondition at unknown location)
 File "bench/check-ce/int_overflow.mlw", line 36, characters 54-67:
 Goal test_overflow_int16_alt.
-Prover result is: Step limit exceeded (8 steps).
+Prover result is: Unknown (unknown) (8 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -158,12 +173,15 @@ Sorry, we don't have a good counterexample for you :(
 - Checked model 0: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
-- Selected model 1: BAD_CE
+- Checked model 1: BAD_CE
+  - Concrete RAC: FAILURE (postcondition at unknown location)
+  - Abstract RAC: FAILURE (postcondition at unknown location)
+- Selected model 2: BAD_CE
   - Concrete RAC: FAILURE (postcondition at unknown location)
   - Abstract RAC: FAILURE (postcondition at unknown location)
 File "bench/check-ce/int_overflow.mlw", line 36, characters 64-76:
 Goal test_overflow_int16_alt.
-Prover result is: Step limit exceeded (8 steps).
+Prover result is: Unknown (unknown) (8 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -174,9 +192,12 @@ Sorry, we don't have a good counterexample for you :(
 - Selected model 1: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 42, characters 29-45)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 42, characters 29-45)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 42, characters 29-45)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 42, characters 29-45)
 File "bench/check-ce/int_overflow.mlw", line 42, characters 29-45:
 Goal test_overflow_int16_bis.
-Prover result is: Step limit exceeded (16 steps).
+Prover result is: Unknown (unknown) (16 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -213,9 +234,12 @@ File int_overflow.mlw:
 - Selected model 1: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 49, characters 33-49)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 49, characters 33-49)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 49, characters 33-49)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 49, characters 33-49)
 File "bench/check-ce/int_overflow.mlw", line 49, characters 33-49:
 Goal test_overflow_int32.
-Prover result is: Step limit exceeded (15 steps).
+Prover result is: Unknown (unknown) (15 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -252,9 +276,12 @@ File int_overflow.mlw:
 - Selected model 1: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 54, characters 48-64)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 54, characters 48-64)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 54, characters 48-64)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 54, characters 48-64)
 File "bench/check-ce/int_overflow.mlw", line 54, characters 48-64:
 Goal test_overflow_int32_bis.
-Prover result is: Step limit exceeded (16 steps).
+Prover result is: Unknown (unknown) (16 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -292,12 +319,15 @@ Prover result is: Valid (6 steps).
 - Checked model 0: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
-- Selected model 1: BAD_CE
+- Checked model 1: BAD_CE
+  - Concrete RAC: FAILURE (postcondition at unknown location)
+  - Abstract RAC: FAILURE (postcondition at unknown location)
+- Selected model 2: BAD_CE
   - Concrete RAC: FAILURE (postcondition at unknown location)
   - Abstract RAC: FAILURE (postcondition at unknown location)
 File "bench/check-ce/int_overflow.mlw", line 59, characters 103-122:
 Goal test_overflow_int32_bis_inline.
-Prover result is: Step limit exceeded (7 steps).
+Prover result is: Unknown (unknown) (7 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
