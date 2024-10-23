@@ -115,41 +115,57 @@ module EuclideanDivision
 
   axiom Div_mod:
     forall x y:int. y <> 0 -> x = y * div x y + mod x y
+  meta "remove_unused:dependency" axiom Div_mod, function div
+  meta "remove_unused:dependency" axiom Div_mod, function mod
 
   axiom Mod_bound:
     forall x y:int. y <> 0 -> 0 <= mod x y < abs y
+  meta "remove_unused:dependency" axiom Mod_bound, function mod
 
   lemma Div_unique:
     forall x y q:int. y > 0 -> q * y <= x < q * y + y -> div x y = q
+  meta "remove_unused:dependency" lemma Div_unique, function div
 
   lemma Div_bound:
     forall x y:int. x >= 0 /\ y > 0 -> 0 <= div x y <= x
+  meta "remove_unused:dependency" lemma Div_bound, function div
 
   lemma Mod_1: forall x:int. mod x 1 = 0
+  meta "remove_unused:dependency" lemma Mod_1, function mod
 
   lemma Div_1: forall x:int. div x 1 = x
+  meta "remove_unused:dependency" lemma Div_1, function div
 
   lemma Div_inf: forall x y:int. 0 <= x < y -> div x y = 0
+  meta "remove_unused:dependency" lemma Div_inf, function div
 
   lemma Div_inf_neg: forall x y:int. 0 < x <= y -> div (-x) y = -1
+  meta "remove_unused:dependency" lemma Div_inf_neg, function div
 
   lemma Mod_0: forall y:int. y <> 0 -> mod 0 y = 0
+  meta "remove_unused:dependency" lemma Mod_0, function mod
 
   lemma Div_1_left: forall y:int. y > 1 -> div 1 y = 0
+  meta "remove_unused:dependency" lemma Div_1_left, function div
 
   lemma Div_minus1_left: forall y:int. y > 1 -> div (-1) y = -1
+  meta "remove_unused:dependency" lemma Div_minus1_left, function div
 
   lemma Mod_1_left: forall y:int. y > 1 -> mod 1 y = 1
+  meta "remove_unused:dependency" lemma Mod_1_left, function mod
 
   lemma Mod_minus1_left: forall y:int. y > 1 -> mod (-1) y = y - 1
+  meta "remove_unused:dependency" lemma Mod_minus1_left, function mod
 
   lemma Div_mult: forall x y z:int [div (x * y + z) x].
           x > 0 ->
           div (x * y + z) x = y + div z x
+  meta "remove_unused:dependency" lemma Div_mult, function div
 
   lemma Mod_mult: forall x y z:int [mod (x * y + z) x].
           x > 0 ->
           mod (x * y + z) x = mod z x
+  meta "remove_unused:dependency" lemma Mod_mult, function mod
 
   val div (x y:int) : int
     requires { y <> 0 }
