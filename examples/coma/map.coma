@@ -1,0 +1,96 @@
+
+module Map
+
+  use int.Int
+  use list.List
+  use list.Map
+  use coma.Std
+  use coma.List
+
+  let case (l: list int) (cons (h: int) (t: list int)) (nil)
+  = unList <int> {l} cons nil
+
+  let map3 (l: list int) (f: int -> int) (return (r: list int))
+  = loop {l} return
+    [ loop (l: list int) {} (ret (r: list int) {r = map f l}) =
+        case {l}
+          (fun (h: int) (t: list int) ->
+            (! loop {t} . fun (r: list int) ->
+               ret {Cons (f h) r}))
+          (ret {Nil: list int})
+    ]
+
+  let map2 (l: list int) (f: int -> int) {} (return (r: list int) {r = map f l})
+  = loop {l} return
+    [ loop (l: list int) {} (ret (r: list int) {r = map f l}) =
+        case {l}
+          (fun (h: int) (t: list int) ->
+            (! loop {t} . fun (r: list int) ->
+               ret {Cons (f h) r}))
+          (ret {Nil: list int})
+    ]
+
+  let test2 {} (return (r: list int) {r = Cons 1 (Cons 1 (Cons 1 Nil))})
+  = map2 {Cons 0 (Cons 0 (Cons 0 Nil))}
+         {fun (x:int) -> x + 1}
+         return
+
+  let test3 {} (return (r: list int) {r = Cons 1 (Cons 1 (Cons 1 Nil))})
+  = map3 {Cons 0 (Cons 0 (Cons 0 Nil))}
+         {fun (x:int) -> x + 1}
+         return
+
+  -- let test4 (l: list int) (f : int -> int) (return (r: list int))
+  -- =
+  --   -{ f 0 = 1 }-
+  --   -{ for_all (fun x -> x = 0) l }-
+  --   (! map2 {l} {f} ret)
+  --    [ ret (r: list int) -> { for_all (fun x -> x = 1) r } (! return {r})]
+
+end
+
+module MapS
+
+  use int.Int
+  use seq.Seq
+  use seq.FreeMonoid
+  use coma.Std
+
+  predicate is_map (f: int -> int) (l1 l2: seq int) =
+    length l1 = length l2 /\
+    forall i. 0 <= i < length l1 -> (f l1[i]) = l2[i]
+
+  let map2 (l: seq int) (f: int -> int) {} (return (r: seq int) {is_map f l r})
+  = loop {0}
+    [ loop (i: int)
+        { 0 <= i <= length l }
+        { length l = length res }
+        { forall j. 0 <= j < i -> (f l[j]) = res[j] } =
+        if {i = length l}
+           (-> return {res})
+           (-> [ &res <- set res i (f l[i]) ] loop {i+1})
+    ]
+    [ &res: seq int = create (length l) (fun x -> 0) ]
+
+  -- predicate pre_f (x: int)
+
+  -- let map (l: seq int) {} (f [ext...] (x: int) {pre_f x} (ret (xx: int) {})) (return (r: seq int) {}) --{is_map f l r})
+  -- = loop {0}
+  --   [ loop (i: int)
+  --       { 0 <= i <= length l }
+  --       { length l = length res } =
+  --       -- { forall j. 0 <= j < i -> (f l[j]) = res[j] } =
+  --       if {i = length l}
+  --          (-> return {res})
+  --          (-> f {l[i]} (fun (r: int) -> [ &res <- set res i r ] loop {i+1}))
+  --   ]
+  --   [ &res: seq int = create (length l) (fun x -> 0) ]
+
+  let test4 (l: seq int) (f : int -> int) (return (r: seq int))
+  =
+    -{ f 0 = 1 }-
+    -{ forall i. 0 <= i < length l -> l[i] = 0 }-
+    (! map2 {l} {f} ret)
+     [ ret (r: seq int) -> {  forall i. 0 <= i < length r -> r[i] = 1  } (! return {r})]
+
+end

@@ -1,17 +1,26 @@
-File "bench/check-ce/model_projection2.mlw", line 13, characters 48-75:
-Goal keep_to_array.
-Prover result is: Valid (28 steps).
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: STUCK (failure in postcondition of `to_array_get'lemma` at "bench/check-ce/model_projection2.mlw", line 16, characters 38-60)
+  - Abstract RAC: STUCK (failure in postcondition of `to_array_get'lemma` at "bench/check-ce/model_projection2.mlw", line 16, characters 38-60)
+- Selected model 1: BAD_CE
+  - Concrete RAC: STUCK (failure in postcondition of `to_array_get'lemma` at "bench/check-ce/model_projection2.mlw", line 16, characters 38-60)
+  - Abstract RAC: STUCK (failure in postcondition of `to_array_get'lemma` at "bench/check-ce/model_projection2.mlw", line 16, characters 38-60)
+File "bench/check-ce/model_projection2.mlw", line 16, characters 38-60:
+Goal to_array_get.
+Prover result is: Unknown (sat) (143 steps).
+Sorry, we don't have a good counterexample for you :(
+
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
-  - Concrete RAC: FAILURE (assertion at "bench/check-ce/model_projection2.mlw", line 23, characters 10-23)
-  - Abstract RAC: FAILURE (assertion at "bench/check-ce/model_projection2.mlw", line 23, characters 10-23)
-- Checked model 1: NC
-  - Concrete RAC: FAILURE (assertion at "bench/check-ce/model_projection2.mlw", line 23, characters 10-23)
-  - Abstract RAC: FAILURE (assertion at "bench/check-ce/model_projection2.mlw", line 23, characters 10-23)
-File "bench/check-ce/model_projection2.mlw", line 23, characters 10-23:
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/model_projection2.mlw", line 26, characters 10-23)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/model_projection2.mlw", line 26, characters 10-23)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Ident to_array is not yet declared`)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Ident to_array is not yet declared`)
+File "bench/check-ce/model_projection2.mlw", line 26, characters 10-23:
 Sub-goal Assertion of goal g2'vc.
-Prover result is: Unknown (sat) (99 steps).
+Prover result is: Unknown (unknown + incomplete) (204 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -22,21 +31,21 @@ File int.mlw:
     Constant one initialization
     one = 1
 File model_projection2.mlw:
-  Line 11:
-    to_array = fun (bOUND_VARIABLE_3991:poly_map int int) -> fun (x:int) -> 0
-  Line 15:
-    get = fun (_arg_12:poly_map int int) (_arg_22:int) -> 41
-  Line 22:
+  Line 12:
+    get = fun (_arg_15:poly_map int int) (_arg_23:int) -> 41
+  Line 14:
+    to_array = fun (bOUND_VARIABLE_3891:poly_map int int) -> fun (x:int) -> 0
+  Line 25:
     x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
     x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
     Execution of main function `g2` with env:
-      to_array = fun (bOUND_VARIABLE_3991:poly_map int int) ->
+      get = fun (_arg_15:poly_map int int) (_arg_23:int) -> 41
+      to_array = fun (bOUND_VARIABLE_3891:poly_map int int) ->
                   fun (x:int) -> 0
-      get = fun (_arg_12:poly_map int int) (_arg_22:int) -> 41
       x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
       zero = 0
       one = 1
-  Line 23:
+  Line 26:
     Property failure at assertion with:
       x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
 

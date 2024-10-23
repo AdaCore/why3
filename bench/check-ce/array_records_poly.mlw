@@ -13,9 +13,9 @@ module Array_records
 
    type basic_record =
    {
-      flag [@model_trace:flag] : bool;
-      first_value [@model_trace:first_val] : value;
-      second_value [@model_trace:sec_val] : value;
+      flag : bool;
+      first_value : value;
+      second_value : value;
    }
 
    type array_of_records = array basic_record
@@ -25,9 +25,9 @@ module Array_records
      ensures { a[i].first_value = 42 }
    =
      a[i] <- {flag = a[i].flag; first_value= a[i].first_value; second_value = 69};
-     a[i] <- {flag = a[i].flag; first_value= 42; second_value = a[i].second_value};     
-     a[i] <- {flag = a[i].flag; first_value= 23; second_value = a[i].second_value};     
-     a[i] <- {flag = false; first_value= a[i].first_value; second_value = a[i].second_value};     
+     a[i] <- {flag = a[i].flag; first_value= 42; second_value = a[i].second_value};
+     a[i] <- {flag = a[i].flag; first_value= 23; second_value = a[i].second_value};
+     a[i] <- {flag = false; first_value= a[i].first_value; second_value = a[i].second_value};
      assert {a[i].second_value = 69};
 
 end

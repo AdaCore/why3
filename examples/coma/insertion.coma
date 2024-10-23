@@ -1,0 +1,15 @@
+use int.Int
+use list.List
+use list.SortedInt
+use list.Permut
+use coma.Std
+use coma.List
+
+let rec insert (x: int) (l: list int) {sorted l}
+               (return  (r: list int) {sorted r && permut r (Cons x l)})
+= unList <int> {l}
+    (fun (h: int) (t: list int) ->
+      if {x < h} (-> return {Cons x l}) .
+      insert {x} {t} . fun (r: list int) ->
+      return {Cons h r})
+    (return {Cons x Nil})

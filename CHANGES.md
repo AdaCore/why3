@@ -2,14 +2,54 @@
 
 Standard library
   * new library `ufloat`: unbounded floating-point numbers
+  * new library `coma`: standard library of the plugin Coma
 
 Core
-  * extended notion of strategies: goal-oriented strategies
+  * extended notion of strategies: task-oriented strategies
+  * coma purposes
+    + parser_common: some non terminals `public`
+    + typing: added functions to type `term` in `denv`
+    + extmap: added `fold_right`
+    + extset: added `fold_right`
+    + wstdlib: added strongly connected component computation module
 
 Plugins
-  * new goal-oriented strategy `forward_propagation` to automatically
+  * new task-oriented strategy `forward_propagation` to automatically
     propagate rounding errors in formulas involving unbounded
     floats. See examples in `examples/numeric`
+  * new Coma plugin
+
+Provers
+  * Alt-Ergo FPA requires Alt-Ergo version at least 2.5.4
+  * support for Coq 8.19 (released Jan 24, 2024)
+  * drop support for versions of Coq < 8.16
+  * support for Z3 up to 4.13.x
+  * support for cvc5 up to 1.2.x
+  * support for Alt-Ergo 2.6.x
+
+Tools
+  * `why3 prove`: drop the option `--json-model-values` :x:
+  * `why3 execute`: added option `--rac-memlimit`.
+  * `why3 execute`: the `--rac-prover` option does not anymore support
+    specification of a time limit and memory limit :x:
+  * `why3 pp`: in LaTeX output, now also prints algebraic type
+    definitions and logic definition
+  * `why3 pp`: the ``--kind`` option does not exist anymore :x:
+
+API
+  * a few changes about how to specify resource limits in particular
+    some renaming of `limit` into `limits` where appropriate. See also
+    issue #877, and the changes in the examples of the documentation
+    in Section "The Why3 API" :x:
+
+Version 1.7.2, April 18, 2024
+-----------------------------
+
+Bug fixes
+  * restored the legacy shortcut for Alt-Ergo 2.5
+  * fixed various bugs in the lexer of `why3 doc`
+  * made prover detection more reliable when paths need escaping
+
 
 Version 1.7.1, January 20, 2024
 -------------------------------

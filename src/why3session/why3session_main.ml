@@ -12,6 +12,8 @@
 open Why3
 open Why3session_lib
 
+module Main () = struct
+
 let cmds =
   [
     Why3session_create.cmd;
@@ -70,3 +72,7 @@ let () =
   | e when not (Debug.test_flag Debug.stack_trace) ->
     Format.eprintf "@.%a@." Exn_printer.exn_printer e;
     exit 1
+
+end
+
+let () = Whyconf.register_command "session" (module Main)

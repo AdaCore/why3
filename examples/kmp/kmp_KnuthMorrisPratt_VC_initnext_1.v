@@ -43,16 +43,20 @@ Parameter mixfix_lblsmnrb:
   forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a ->
   array a.
 
+Axiom mixfix_lblsmnrb'spec'0 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
+  ((length (mixfix_lblsmnrb a1 i v)) = (length a1)).
+
 Axiom mixfix_lblsmnrb'spec :
   forall {a:Type} {a_WT:WhyType a},
   forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
-  ((length (mixfix_lblsmnrb a1 i v)) = (length a1)) /\
   ((elts (mixfix_lblsmnrb a1 i v)) = (map.Map.set (elts a1) i v)).
 
 Parameter make:
   forall {a:Type} {a_WT:WhyType a}, Numbers.BinNums.Z -> a -> array a.
 
-Axiom make'spec :
+Axiom make_spec :
   forall {a:Type} {a_WT:WhyType a},
   forall (n:Numbers.BinNums.Z) (v:a), (0%Z <= n)%Z ->
   (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
@@ -144,11 +148,13 @@ Axiom next_is_maximal :
 Axiom next_1_0 :
   forall (p:array char), (1%Z <= (length p))%Z -> is_next p 1%Z 0%Z.
 
+Require Import Lia.
+
 (* Why3 goal *)
 Theorem initnext'vc :
   forall (p:array char), (1%Z <= (length p))%Z ->
   let m := length p in
-  let next := make m 0%Z in
+  forall (next:array Numbers.BinNums.Z),
   (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < m)%Z ->
    ((mixfix_lbrb next i) = 0%Z)) /\
   ((length next) = m) -> (1%Z < m)%Z ->
@@ -175,6 +181,9 @@ Theorem initnext'vc :
   matches p (i1 - j)%Z p 0%Z j -> forall (z:Numbers.BinNums.Z),
   ((j + 1%Z)%Z < z)%Z /\ (z < (i1 + 1%Z)%Z)%Z ->
   ~ matches p ((i1 + 1%Z)%Z - z)%Z p 0%Z z.
+(* Why3 intros p h1 m next (h2,h3) h4 next1 h5 (h6,h7) j i next2 h8
+        ((h9,(h10,h11)),(h12,(h13,h14))) h15 h16 h17 i1 h18 next3 h19
+        (h20,h21) (h22,(h23,h24)) h25 z (h26,h27). *)
 Proof.
 intros p h1 m next (h2,h3) h4 next1 h5 h6 j i next2 h7
 ((h8,(h9,h10)),(h11,(h12,h13))) h14 h15 h16 i1 h17 next3 h18 h19
@@ -191,7 +200,7 @@ intros _ _ _ z hz.
 red; intro h. unfold matches in h. simpl in h.
 destruct h as (hy1, (hy2, hy3)).
 
-assert (case: (z = 2 \/ 2 < z)%Z) by omega. destruct case.
+assert (case: (z = 2 \/ 2 < z)%Z) by lia. destruct case.
 subst.
 absurd (elts p i = elts p 0%Z); auto.
 generalize (hy3 0%Z).
@@ -199,11 +208,12 @@ ring_simplify (i + 1 + 1 - 2 + 0)%Z.
 intuition.
 
 apply h12 with (z-1)%Z.
-omega.
+lia.
 red; simpl.
-repeat split; try omega.
+repeat split; try lia.
 intros; subst i1.
-replace (i + 1 - (z - 1) + i0)%Z with (i + 1 + 1 - z + i0)%Z by omega.
+replace (i + 1 - (z - 1) + i0)%Z with (i + 1 + 1 - z + i0)%Z by lia.
 apply hy3.
-omega.
+lia.
 Qed.
+

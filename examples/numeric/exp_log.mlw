@@ -1,0 +1,175 @@
+module ExpLogSingle
+  use real.RealInfix
+  use real.Abs
+  use real.ExpLog
+  use ufloat.USingle
+  use ufloat.USingleLemmas
+
+  constant log_error:real
+  axiom log_error_bounds : 0. <=. log_error <=. 1.
+  constant log_cst_error:real
+  axiom log_cst_error_bounds : 0. <=. log_cst_error <=. 1.
+  val function log_approx (x:usingle) : usingle
+    requires { 0. <. to_real x }
+    ensures {
+      abs (to_real result -. log (to_real x)) <=. abs (log (to_real x)) *. log_error +. log_cst_error
+    }
+
+  constant log2_error:real
+  axiom log2_error_bounds : 0. <=. log2_error <=. 1.
+  val function log2_approx (x:usingle) : usingle
+    requires { 0. <. to_real x }
+    ensures {
+      abs (to_real result -. log2 (to_real x)) <=. abs (log2 (to_real x)) *. log2_error
+    }
+
+  constant log10_error:real
+  axiom log10_error_bounds : 0. <=. log10_error <=. 1.
+  val function log10_approx (x:usingle) : usingle
+    requires { 0. <. to_real x }
+    ensures {
+      abs (to_real result -. log10 (to_real x)) <=. abs (log10 (to_real x)) *. log10_error
+    }
+
+  constant exp_error:real
+  axiom exp_error_bounds : 0. <=. exp_error <=. 0x1p-2
+  val function exp_approx (x:usingle) : usingle
+    ensures {
+      abs (to_real result -. exp (to_real x)) <=. exp_error *. exp (to_real x)
+    }
+
+  let example1 (x y : usingle)
+    ensures {
+    let t = log (exp (to_real y)) in
+    let t1 = log (exp (to_real x)) in
+    let t2 =
+      ((1.0 +. eps) +. log_error)
+      *. (((-. log (1.0 -. exp_error)) *. (1.0 +. log_error))
+          +. log_cst_error)
+    in
+    abs (to_real result -. (t1 +. t))
+    <=. ((((log_error +. log_error) +. eps) *. (abs t1 +. abs t))
+         +. (t2 +. t2))
+    }
+  = log_approx (exp_approx(x)) ++. log_approx (exp_approx(y))
+
+  let example2 (x y : usingle)
+    ensures {
+      let exact = log(exp(to_real x) +. exp (to_real y)) in
+      abs (to_real result -. exact)
+      <=. abs exact *. log_error
+         +. ((-. log (1.0 -. ((2. *. exp_error) +. eps))) *. (1.0 +. log_error)) +. log_cst_error
+    }
+  = log_approx (exp_approx(x) ++. exp_approx(y))
+
+  let example3 (x y : usingle)
+    requires { 0. <. to_real x }
+    requires { 0. <. to_real y }
+    ensures {
+      let exact = log2(to_real x +. to_real y) in
+      abs (to_real result -. exact)
+      <=. abs exact *. log2_error
+         +. ((-. log2 (1.0 -. (eps))) *. (1.0 +. log2_error))
+    }
+  = log2_approx (x ++. y)
+
+  let example4 (x y : usingle)
+    requires { 0. <. to_real x }
+    requires { 0. <. to_real y }
+    ensures {
+      let exact = log10(to_real x +. to_real y) in
+      abs (to_real result -. exact)
+      <=. abs exact *. log10_error
+         +. ((-. log10 (1.0 -. (eps))) *. (1.0 +. log10_error))
+    }
+  = log10_approx (x ++. y)
+
+end
+
+module ExpLogDouble
+  use real.RealInfix
+  use real.Abs
+  use real.ExpLog
+  use ufloat.UDouble
+  use ufloat.UDoubleLemmas
+
+  constant log_error:real
+  axiom log_error_bounds : 0. <=. log_error <=. 1.
+  constant log_cst_error:real
+  axiom log_cst_error_bounds : 0. <=. log_cst_error <=. 1.
+  val function log_approx (x:udouble) : udouble
+    requires { 0. <. to_real x }
+    ensures {
+      abs (to_real result -. log (to_real x)) <=. abs (log (to_real x)) *. log_error +. log_cst_error
+    }
+
+  constant log2_error:real
+  axiom log2_error_bounds : 0. <=. log2_error <=. 1.
+  val function log2_approx (x:udouble) : udouble
+    requires { 0. <. to_real x }
+    ensures {
+      abs (to_real result -. log2 (to_real x)) <=. abs (log2 (to_real x)) *. log2_error
+    }
+
+  constant log10_error:real
+  axiom log10_error_bounds : 0. <=. log10_error <=. 1.
+  val function log10_approx (x:udouble) : udouble
+    requires { 0. <. to_real x }
+    ensures {
+      abs (to_real result -. log10 (to_real x)) <=. abs (log10 (to_real x)) *. log10_error
+    }
+
+  constant exp_error:real
+  axiom exp_error_bounds : 0. <=. exp_error <=. 0x1p-3
+  val function exp_approx (x:udouble) : udouble
+    ensures {
+      abs (to_real result -. exp (to_real x)) <=. exp_error *. exp (to_real x)
+    }
+
+  let example1 (x y : udouble)
+    ensures {
+    let t = log (exp (to_real y)) in
+    let t1 = log (exp (to_real x)) in
+    let t2 =
+      ((1.0 +. eps) +. log_error)
+      *. (((-. log (1.0 -. exp_error)) *. (1.0 +. log_error))
+          +. log_cst_error)
+    in
+    abs (to_real result -. (t1 +. t))
+    <=. ((((log_error +. log_error) +. eps) *. (abs t1 +. abs t))
+         +. (t2 +. t2))
+    }
+  = log_approx (exp_approx(x)) ++. log_approx (exp_approx(y))
+
+  let example2 (x y : udouble)
+    ensures {
+      let exact = log(exp(to_real x) +. exp (to_real y)) in
+      abs (to_real result -. exact)
+      <=. abs exact *. log_error
+         +. ((-. log (1.0 -. ((2. *. exp_error) +. eps))) *. (1.0 +. log_error)) +. log_cst_error
+    }
+  = log_approx (exp_approx(x) ++. exp_approx(y))
+
+  let example3 (x y : udouble)
+    requires { 0. <. to_real x }
+    requires { 0. <. to_real y }
+    ensures {
+      let exact = log2(to_real x +. to_real y) in
+      abs (to_real result -. exact)
+      <=. abs exact *. log2_error
+         +. ((-. log2 (1.0 -. (eps))) *. (1.0 +. log2_error))
+    }
+  = log2_approx (x ++. y)
+
+  let example4 (x y : udouble)
+    requires { 0. <. to_real x }
+    requires { 0. <. to_real y }
+    ensures {
+      let exact = log10(to_real x +. to_real y) in
+      abs (to_real result -. exact)
+      <=. abs exact *. log10_error
+         +. ((-. log10 (1.0 -. (eps))) *. (1.0 +. log10_error))
+    }
+  = log10_approx (x ++. y)
+
+end

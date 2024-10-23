@@ -81,6 +81,9 @@ type ctx = {
 }
 (** The evaluation context of Pinterp *)
 
+let pp_ctx fmt ctx =
+  Format.fprintf fmt "@[{ vsenv = %a }@]" (pp_env print_vsty print_value) (Mvs.bindings ctx.env.vsenv)
+
 let get_env ctx = ctx.env
 
 let get_do_rac ctx = ctx.do_rac
@@ -138,7 +141,7 @@ let get_arg : type t. t vtype -> _ -> _ -> t = fun t rs v ->
   | VTarray, Varray v -> v
   | VTint, Vnum x -> BigInt.to_int x
   | _, Vundefined ->
-      incomplete "an undefined argument was passed to builtin %a"
+      Pinterp_core.cannot_evaluate "an undefined argument was passed to builtin %a"
         Ident.print_decoded rs.rs_name.id_string
   | VTint, Vterm vt when (Option.equal Ty.ty_equal vt.t_ty (Some Ty.ty_int)) ->
       begin match vt.t_node with
@@ -185,11 +188,11 @@ let eval t f rs l =
   try
     eval t f rs l
   with
-  | Division_by_zero -> incomplete "division by zero"
-  | Failure "int_of_big_int" -> incomplete "index is out of bounds"
-  | Invalid_argument "index out of bounds" -> incomplete "index is out of bounds"
-  | Big_real.Undetermined -> incomplete "computation on real numbers is undetermined"
-  | Mlmpfr_wrapper.Not_Implemented -> incomplete "mlmpfr not available"
+  | Division_by_zero -> Pinterp_core.cannot_evaluate "division by zero"
+  | Failure "int_of_big_int" -> Pinterp_core.cannot_evaluate "integer overflow"
+  | Invalid_argument "index out of bounds" -> Pinterp_core.cannot_evaluate "index is out of bounds"
+  | Big_real.Undetermined -> Pinterp_core.cannot_evaluate "computation on real numbers is undetermined"
+  | Mlmpfr_wrapper.Not_Implemented -> Pinterp_core.cannot_evaluate "mlmpfr not available"
 
 let (^->) a b = VTfun (a, b)
 
@@ -223,7 +226,7 @@ let use_float_format (float_format : int) =
   match float_format with
   | 32 -> initialize_float32 ()
   | 64 -> initialize_float64 ()
-  | _ -> incomplete "float format is unknown: %d" float_format
+  | _ -> Pinterp_core.cannot_evaluate "float format is unknown: %d" float_format
 
 let eval_float tys_result float_format arity op rs l =
   let ity_result = ity_of_ty (ty_app tys_result []) in
@@ -371,7 +374,7 @@ let built_in_modules () =
               try
                 let ty = ty_app ts [def.v_ty] in
                 value ty (Varray (Array.make n def))
-              with e -> incomplete "array could not be made: %a" Exn_printer.exn_printer e);
+              with e -> Pinterp_core.cannot_evaluate "array could not be made: %a" Exn_printer.exn_printer e);
       "empty", eval (VTunit ^-> VTany) (fun () ->
               let ty = ty_app ts [ty_var (tv_of_string "a")] in
               value ty (Varray [||]));
@@ -611,7 +614,7 @@ let try_eval_ensures ctx posts =
     | {t_node= Teps tb} -> let vs, t = t_open_bound tb in loop vs t
     | _ -> None in
   try Some (Lists.first is_ensures_result posts)
-  with Not_found | Incomplete _ -> None
+  with Not_found | Cannot_decide _ | Cannot_evaluate _ -> None
 
 (******************************************************************************)
 (*            GET AND REGISTER VALUES FOR VARIABLES AND CALL RESULTS          *)
@@ -672,7 +675,7 @@ let gen_type_default ~really ?posts ctx ity : value_gen =
       let cntr_ctx = mk_cntr_ctx ctx ~desc:"type default value" Vc.expl_post in
       Option.iter (check_posts ctx.rac cntr_ctx v) posts;
       Some v
-    with Fail _ | Incomplete _ -> None
+    with Fail _ | Cannot_decide _ | Cannot_evaluate _ | FatalRACError _ -> None
 
 (** Generate a value by evaluating an optional expression, if that is not [None]
    *)
@@ -686,17 +689,17 @@ let gen_eval_expr cnf exec_expr id oexp =
         match exec_expr cnf' e with
         | Normal v -> Some v
         | Excep _ ->
-            incomplete "initialization of global variable `%a` raised an \
+            fatal_rac_error cnf.env.log_uc "initialization of global variable `%a` raised an \
                             exception" print_decoded id.id_string
         | Irred _ -> None
 
 (** Get a value from a list of generators and print debugging messages or fail,
     if no value is generated. *)
-let get_value' ctx_desc oloc gens =
+let get_value' log ctx_desc oloc gens =
   let desc, value = try get_value gens with Not_found ->
     Debug.dprintf debug_rac_values "@[<h>No value for %s at %a@]@." ctx_desc
       (Pp.print_option_or_default "NO LOC" Loc.pp_position) oloc;
-    incomplete "missing value for %s" ctx_desc
+    fatal_rac_error log "missing value for %s" ctx_desc
       (Pp.print_option_or_default "NO LOC" Loc.pp_position) oloc in
   Debug.dprintf debug_rac_values "@[<h>%s for %s at %a: %a@]@."
     (String.capitalize_ascii desc) ctx_desc
@@ -714,7 +717,7 @@ let get_and_register_variable ctx ?def ?loc id ity =
     gen_default ity def;
     gen_type_default ~really:true (* (is_ignore_id id) *) ctx ity;
   ] in
-  let value = get_value' ctx_desc oloc gens in
+  let value = get_value' ctx.env.log_uc ctx_desc oloc gens in
   register_used_value ctx.env oloc id value;
   value
 
@@ -729,7 +732,7 @@ let get_and_register_result ?def ?rs ctx posts (oid:expr_id option) loc ity =
     gen_from_post ctx posts;
     gen_type_default ~really:true ~posts ctx ity;
   ] in
-  let value = get_value' ctx_desc (Some loc) gens in
+  let value = get_value' ctx.env.log_uc ctx_desc (Some loc) gens in
   register_res_value ctx.env loc rs value;
   value
 
@@ -739,7 +742,7 @@ let get_and_register_param ctx id ity =
     gen_model_variable ctx id ity;
     gen_type_default ~really:true (* (is_ignore_id id) *) ctx ity;
   ] in
-  let value = get_value' ctx_desc id.id_loc gens in
+  let value = get_value' ctx.env.log_uc ctx_desc id.id_loc gens in
   register_used_value ctx.env id.id_loc id value;
   value
 
@@ -752,14 +755,14 @@ let get_and_register_global check_model_variable ctx exec_expr id oexp post ity 
     gen_eval_expr ctx exec_expr id oexp;
   ] in
   try
-    let value = get_value' ctx_desc id.id_loc gens in
+    let value = get_value' ctx.env.log_uc ctx_desc id.id_loc gens in
     register_used_value ctx.env id.id_loc id value;
     if ctx.do_rac then (
       let desc = asprintf "of global variable `%a`" print_decoded id.id_string in
       let cntr_ctx = mk_cntr_ctx ctx ~desc Vc.expl_post in
       check_assume_posts ctx.rac cntr_ctx value post );
     lazy value
-  with Incomplete _ | Stuck _ as e ->
+  with FatalRACError _ | Cannot_evaluate _ | Stuck _ as e ->
     (* We should not need to capture these exceptions if this function was not
        executed on logic constants and logic functions. *)
     lazy Printexc.(raise_with_backtrace e (get_raw_backtrace ()))
@@ -810,7 +813,7 @@ let check_limits ctx =
   let exception Timelimit in
   let exception Steplimit in
   let check_steplimit (steps: int) steplimit =
-        if steplimit > 0 && steps >= steplimit then
+    if steplimit > 0 && steps >= steplimit then
           raise Steplimit
   in
   let check_timelimit time0 timelimit =
@@ -826,8 +829,8 @@ let check_limits ctx =
         check_steplimit !steps steplimit;
         check_timelimit time0 timelimit
       with
-      | Steplimit -> incomplete "RAC steplimit reached"
-      | Timelimit -> incomplete "RAC timelimit reached"
+      | Steplimit -> fatal_rac_error ctx.env.log_uc "RAC steplimit reached"
+      | Timelimit -> fatal_rac_error ctx.env.log_uc "RAC timelimit reached"
 
 let set_limits () =
   if !limits_state <> None then failwith "set_limits: limits already set";
@@ -880,7 +883,7 @@ let add_premises ?post_res ?(vsenv=[]) ts env =
         let t = t_ty_subst mt mv t in
         let vs_args = List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args in
         t_let_close vs (t_lambda vs_args [] t) sofar
-    | _ -> incomplete "anonymous function not cfun"
+    | _ -> fatal_rac_error env.log_uc "anonymous function not cfun"
     | exception Not_found ->
         kasprintf failwith "add_premises: function %a not found" print_vs vs in
   let close_term t =
@@ -948,7 +951,7 @@ and exec_expr' ctx e =
         let sp, sq = BigInt.to_string p, BigInt.to_string q in
         try Normal (value ty_real (Vreal (Big_real.real_from_fraction sp sq)))
         with Mlmpfr_wrapper.Not_Implemented ->
-          incomplete "mlmpfr wrapper is not implemented"
+          fatal_rac_error ctx.env.log_uc "mlmpfr wrapper is not implemented"
       else
         let c = Constant.ConstReal r in
         let s = Format.asprintf "%a" Constant.print_def c in
@@ -992,13 +995,13 @@ and exec_expr' ctx e =
               let match_free pv mt =
                 let v = Mvs.find pv.pv_vs ctx.env.vsenv in
                 ty_match mt pv.pv_vs.vs_ty v.v_ty in
-              let mt = Spv.fold match_free cty.cty_effect.eff_reads Mtv.empty in
+              let mt = Spv.fold match_free cty.cty_effect.eff_reads ctx.env.tvenv in
               let ty = ty_inst mt (ty_of_ity e.e_ity) in
               if cty.cty_pre <> [] then
-                incomplete "anonymous function with precondition not supported (%a)"
+                fatal_rac_error ctx.env.log_uc "anonymous function with precondition not supported (%a)"
                   Pp.(print_option_or_default "unknown location" Loc.pp_position) e.e_loc;
               Normal (value ty (Vfun (cl, arg.pv_vs, e')))
-          | _ -> incomplete "many args for exec fun" (* TODO *) )
+          | _ -> fatal_rac_error ctx.env.log_uc "many args for exec fun" (* TODO *))
       | Cany ->
          register_any_call ctx.env e.e_loc None Mvs.empty;
          if ctx.do_rac then
@@ -1028,7 +1031,7 @@ and exec_expr' ctx e =
           Normal v
       | Capp (rs, pvsl) ->
           if ce.c_cty.cty_args <> [] then
-            incomplete "no support for partial function applications (%a)"
+            fatal_rac_error ctx.env.log_uc "no support for partial function applications (%a)"
               (Pp.print_option_or_default "unknown location" Loc.pp_position)
               e.e_loc;
           exec_call ?loc:e.e_loc ~attrs:e.e_attrs (Some e.e_id) ctx rs pvsl e.e_ity
@@ -1455,7 +1458,7 @@ and exec_call ?(main_function=false) ?loc ?attrs (eid:expr_id option) ctx rs arg
                     begin match (ctx.compute_term ctx.env t1).t_node with
                     | Ttrue -> exec_expr ctx (e_pure (ctx.compute_term ctx.env t2))
                     | Tfalse ->  exec_expr ctx (e_pure (ctx.compute_term ctx.env t3))
-                    | _ -> incomplete "could not reduce %a" print_term t'
+                    | _ -> fatal_rac_error ctx.env.log_uc "could not reduce %a" print_term t'
                     end
                   (* special case when [t] is a constant function *)
                   | Tconst _ ->
@@ -1466,13 +1469,13 @@ and exec_call ?(main_function=false) ?loc ?attrs (eid:expr_id option) ctx rs arg
                 | _ -> raise UnexpectedArgs
                 end
             | [{v_desc= Vundefined }; _] ->
-                incomplete "an undefined argument was passed to %a"
+                fatal_rac_error ctx.env.log_uc "an undefined argument was passed to %a"
                   Ident.print_decoded rs.rs_name.id_string
             | _ -> raise UnexpectedArgs
             end
           with
           | UnexpectedArgs ->
-            incomplete "unexpected arguments passed to %a"
+            fatal_rac_error ctx.env.log_uc "unexpected arguments passed to %a"
               Ident.print_decoded rs.rs_name.id_string
           end
         else
@@ -1491,30 +1494,38 @@ and exec_call ?(main_function=false) ?loc ?attrs (eid:expr_id option) ctx rs arg
                     check_pre_and_register_call Log.Exec_normal;
                     exec_call ?loc ?attrs eid ctx rs' (pvl @ arg_pvs) ity_result
                 | Cfun body ->
-                    Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: FUN/%d %a@]@."
+                    Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: Cfun/%d %a@]@."
                       pp_indent print_rs rs (List.length ce.c_cty.cty_args) (pp_limited print_expr) body;
-                    let ctx = {ctx with env= multibind_pvs ce.c_cty.cty_args arg_vs ctx.env} in
+                    let ctx = { ctx with env = multibind_pvs ce.c_cty.cty_args arg_vs ctx.env } in
+                    Debug.dprintf debug_trace_exec "@[<hv2>%tctx = %a@]@." pp_indent pp_ctx ctx;
                     check_pre_and_register_call Log.Exec_normal;
-                    exec_expr ctx body
+                    begin
+                      match exec_expr ctx body with
+                      | Normal v -> Normal (v_inst v ctx.env.tvenv)
+                      | Excep(xs,v) -> Excep (xs, v_inst v ctx.env.tvenv)
+                      | Irred _ as v -> v
+                    end
                 | Cany ->
                     if ctx.do_rac then (
                       check_pre_and_register_call ~any_function:true Log.Exec_giant_steps;
                       exec_call_abstract ?loc ?attrs ~rs eid ctx rs.rs_cty arg_pvs ity_result )
                     else (* We can't check the postcondition *)
-                      incomplete "cannot apply an any-function %a with RAC disabled"
+                      fatal_rac_error ctx.env.log_uc "cannot apply an any-function %a with RAC disabled"
                         print_rs rs
                 | Cpur _ -> assert false (* TODO ? *) )
             | Builtin f ->
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;
                 check_pre_and_register_call Log.Exec_normal;
+                (try
                 Normal (f rs arg_vs)
+                with Cannot_evaluate s -> fatal_rac_error ctx.env.log_uc "cannot evaluate builtin %a because %s" print_rs rs s)
             | Constructor its_def ->
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: CONSTRUCTOR@]@." pp_indent print_rs rs;
                 check_pre_and_register_call Log.Exec_normal;
                 let aux mt pv v =
                   ty_match mt pv.pv_vs.vs_ty (ty_inst mt (v_ty v)) in
                 let mt =
-                  List.fold_left2 aux Mtv.empty rs.rs_cty.cty_args arg_vs in
+                  List.fold_left2 aux ctx.env.tvenv rs.rs_cty.cty_args arg_vs in
                 let ty = ty_inst mt (ty_of_ity ity_result) in
                 let vs = List.map field arg_vs in
                 let v = value ty (Vconstr (Some rs, its_def.Pdecl.itd_fields, vs)) in
@@ -1557,7 +1568,7 @@ and exec_call ?(main_function=false) ?loc ?attrs (eid:expr_id option) ctx rs arg
                     | exception Not_found -> raise CannotProject
                   end
                 | _, [{v_desc= Vundefined}] ->
-                    incomplete "cannot project undefined by %a" print_rs rs
+                    fatal_rac_error ctx.env.log_uc "cannot project undefined by %a" print_rs rs
                 | _ -> raise CannotProject
                 end
               with CannotProject ->
@@ -1565,7 +1576,7 @@ and exec_call ?(main_function=false) ?loc ?attrs (eid:expr_id option) ctx rs arg
                   Pp.(print_list comma print_value) arg_vs
                   print_rs rs )
             | exception Not_found ->
-                incomplete "definition of routine %s could not be found"
+                fatal_rac_error ctx.env.log_uc "definition of routine %s could not be found"
                   rs.rs_name.id_string in
       if ctx.do_rac then (
         let desc = asprintf "of `%a`" print_rs rs in
@@ -1596,8 +1607,11 @@ and exec_call_abstract ?snapshot ?loc ?attrs ?rs (eid:expr_id option) ctx cty ar
      (postcondition does not hold with the values obtained
      from the counterexample)
    *)
-  let exn = Incomplete "Giant-step call without location" in
-  let loc = Opt.get_exn exn loc in
+  let loc =
+    match loc with
+    | None -> fatal_rac_error ctx.env.log_uc "Giant-step call without location"
+    | Some loc -> loc
+  in
   let ctx = match snapshot with
     | Some oldies ->
         let vsenv = snapshot_oldies oldies ctx.env.vsenv in

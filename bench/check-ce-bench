@@ -19,6 +19,7 @@ updateoracle=false
 removeoutfile=true
 debug=false
 files=""
+petiot=1
 failed=""
 
 function usage() {
@@ -75,8 +76,16 @@ while test $# != 0; do
       usage
       exit 2
       ;;
+    "petiot")
+        files="$files "
+        petiot=2
+        shift 1
+        ;;
     *)
-      files="$files $1"
+	files="$files $1"
+	if test "$petiot" = 1; then
+            petiot=0
+        fi
       shift 1
   esac
 done
@@ -90,6 +99,7 @@ readonly SUFFIX
 readonly removeoutfile
 readonly updateoracle
 readonly files
+readonly petiot
 
 # Path to the why3 binary
 WHY3_BIN="$SCRIPT_DIR"/../bin/why3"$SUFFIX"
@@ -221,6 +231,7 @@ for file in $files; do
     altergosteps=10000
     altergostepsrac=$altergosteps
     skipae=no
+    skipcvc4=no
     cvc4steps=150000
     cvc4stepsrac=$cvc4steps
     cvc5steps=150000
@@ -250,6 +261,7 @@ for file in $files; do
           ;;
       "array_records_poly")
           skipae=yes
+          skipcvc4=yes
           ;;
       "array_records_mono")
           z3stepsrac=100
@@ -310,6 +322,10 @@ for file in $files; do
           ;;
       "strings")
           z3steps=3000
+          z3stepsrac=$z3steps
+          ;;
+      "test_result_ce_value2")
+          skipae=yes
           ;;
       "test_result_ce_value2")
           skipae=yes
@@ -325,13 +341,17 @@ for file in $files; do
           ;;
     esac
     if [ "$skipae" = "yes" ] ; then
-          echo "Skipping unreproducible run of Alt-Ergo 2.5.2 on $filedir/$filebase.mlw";
+          echo "Skipping unreproducible run of Alt-Ergo 2.5.4 on $filedir/$filebase.mlw";
     else
-      run Alt-Ergo,2.5.2 $filedir $filebase true  $altergosteps $altergostepsrac
-      run Alt-Ergo,2.5.2 $filedir $filebase false  $altergosteps $altergostepsrac
+      run Alt-Ergo,2.5.4 $filedir $filebase true  $altergosteps $altergostepsrac
+      run Alt-Ergo,2.5.4 $filedir $filebase false  $altergosteps $altergostepsrac
     fi
-    run CVC4,1.8       $filedir $filebase true  $cvc4steps $cvc4stepsrac
-    run CVC4,1.8       $filedir $filebase false $cvc4steps $cvc4stepsrac
+    if [ "$skipcvc4" = "yes" ] ; then
+          echo "Skipping unreproducible run of CVC4 1.8 on $filedir/$filebase.mlw";
+    else
+        run CVC4,1.8       $filedir $filebase true  $cvc4steps $cvc4stepsrac
+        run CVC4,1.8       $filedir $filebase false $cvc4steps $cvc4stepsrac
+    fi
     run CVC5,1.0.5     $filedir $filebase true  $cvc5steps $cvc5stepsrac
     run CVC5,1.0.5     $filedir $filebase false $cvc5steps $cvc5stepsrac
     run Z3,4.8.10      $filedir $filebase true  $z3steps $z3stepsrac
@@ -339,13 +359,13 @@ for file in $files; do
   # fi
 done
 
-# Check the reproduction of the experiments by Petiot (2018).
 if $updateoracle; then
   updatearg="--updateoracle"
 else
   updatearg=""
 fi
 
+# Check the reproduction of the experiments by Petiot (2018).
 # $1 = prover
 # $2 = stepslimit
 petiot () {
@@ -356,10 +376,12 @@ bench/check-ce/petiot2018/experiments.sh \
 if [ $? = 1 ]; then failed="${failed}Petiot experiments with $1.\n"; fi
 }
 
-petiot Alt-Ergo,2.5.2  10000
-petiot Z3,4.8.10  500000
-petiot CVC4,1.8 10000
-petiot CVC5,1.0.5 10000
+if test "$petiot" -gt 0; then
+    petiot Alt-Ergo,2.5.4  10000
+    petiot Z3,4.8.10  500000
+    petiot CVC4,1.8 10000
+    petiot CVC5,1.0.5 10000
+fi
 
 end=$(date +%s)
 

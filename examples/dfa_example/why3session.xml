@@ -1,62 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Coq" version="8.11.2" timelimit="8" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="9" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC5" version="1.0.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="dfa_example.mlw"/>
 <theory name="DfaExample" proved="true">
- <goal name="nil_notin_r1" proved="true">
- <proof prover="0"><path name="dfa_example_DfaExample_nil_notin_r1_1.v"/><result status="valid" time="0.290000"/></proof>
- <proof prover="1" memlimit="4000"><result status="valid" time="0.010000" steps="26334"/></proof>
+ <goal name="empty_notin_r1" proved="true">
+ <proof prover="0"><result status="valid" time="0.320290" steps="794"/></proof>
  </goal>
  <goal name="all_in_r0&#39;vc" expl="VC for all_in_r0" proved="true">
- <proof prover="5"><result status="valid" time="0.020000" steps="368"/></proof>
+ <proof prover="1"><result status="valid" time="0.303616" steps="19355"/></proof>
  </goal>
  <goal name="words_in_r1_end_with_one" proved="true">
- <proof prover="1"><result status="valid" time="0.020000" steps="35481"/></proof>
+ <proof prover="1"><result status="valid" time="0.309377" steps="20925"/></proof>
  </goal>
- <goal name="words_in_r1_suffix_in_r1&#39;vc" expl="VC for words_in_r1_suffix_in_r1" proved="true">
- <proof prover="9"><result status="valid" time="0.524696" steps="111492"/></proof>
- </goal>
- <goal name="zero_w_in_r1&#39;vc" expl="VC for zero_w_in_r1" proved="true">
+ <goal name="words_in_r1_suffix_in_r1" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="zero_w_in_r1&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="26326"/></proof>
-  </goal>
-  <goal name="zero_w_in_r1&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.540000" steps="1214948"/></proof>
+  <goal name="words_in_r1_suffix_in_r1.0" proved="true">
+  <proof prover="3"><result status="valid" time="0.335022" steps="335734"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="one_w_in_r1&#39;vc" expl="VC for one_w_in_r1" proved="true">
+ <goal name="zero_w_in_r1" proved="true">
  <transf name="split_vc" proved="true" >
-  <goal name="one_w_in_r1&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.110000" steps="17533"/></proof>
+  <goal name="zero_w_in_r1.0" proved="true">
+  <proof prover="3"><result status="valid" time="0.152411" steps="153593"/></proof>
   </goal>
-  <goal name="one_w_in_r1&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.040000" steps="7242"/></proof>
-  </goal>
-  <goal name="one_w_in_r1&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.320000" steps="54372"/></proof>
+  <goal name="zero_w_in_r1.1" proved="true">
+  <proof prover="1"><result status="valid" time="0.351671" steps="28336"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="zero_w_in_r2" proved="true">
- <proof prover="3"><result status="valid" time="0.060000" steps="8741"/></proof>
+ <proof prover="1"><result status="valid" time="0.204293" steps="10543"/></proof>
+ </goal>
+ <goal name="one_w_in_r1&#39;vc" expl="VC for one_w_in_r1" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="one_w_in_r1&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.050616" steps="72856"/></proof>
+  </goal>
+  <goal name="one_w_in_r1&#39;vc.1" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.254641" steps="15146"/></proof>
+  </goal>
+  <goal name="one_w_in_r1&#39;vc.2" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.150339" steps="191264"/></proof>
+  </goal>
+  <goal name="one_w_in_r1&#39;vc.3" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="one_w_in_r1&#39;vc.3.0" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.845764" steps="3585"/></proof>
+   </goal>
+   <goal name="one_w_in_r1&#39;vc.3.1" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.225386" steps="11718"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
  <goal name="one_w_in_r2" proved="true">
- <proof prover="3"><result status="valid" time="0.060000" steps="8761"/></proof>
+ <proof prover="0"><result status="valid" time="0.033052" steps="85"/></proof>
  </goal>
  <goal name="astate1&#39;vc" expl="VC for astate1" proved="true">
- <proof prover="5"><result status="valid" time="0.070000" steps="786"/></proof>
+ <proof prover="0"><result status="valid" time="0.201324" steps="804"/></proof>
  </goal>
  <goal name="astate2&#39;vc" expl="VC for astate2" proved="true">
- <proof prover="5"><result status="valid" time="0.060000" steps="752"/></proof>
+ <proof prover="0"><result status="valid" time="0.229203" steps="913"/></proof>
  </goal>
 </theory>
 </file>

@@ -1,0 +1,177 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
+File "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20:
+Sub-goal Assertion of goal test2'vc.
+Prover result is: Unknown (unknown) (11 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File test_result_ce_value2.mlw:
+  Line 3:
+    Constant a initialization
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+    Normal execution of function `ref` with args:
+      contents = 0
+    Normal execution of function `ref'mk` with args:
+      contents = 0
+    a = {contents= 0}
+  Line 10:
+    x = (- 2)
+    x = (- 2)
+    Execution of main function `test2` with env:
+      a = {contents= 0}
+      x = (- 2)
+      zero = 0
+      one = 1
+  Line 12:
+    (giant-step) execution of unimplemented function `id`
+      x = (- 2)
+    a = {contents= (- 2)}
+    result of `id` = 0
+    Normal execution of function `(<)` with args:
+      _ = 0
+      _ = 10
+  Line 13:
+    Property failure at assertion with:
+      a = {contents= (- 2)}
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9)
+- Selected model 2: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9)
+File "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20:
+Sub-goal Assertion of goal test2'vc.
+Prover result is: Unknown (unknown) (11 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9):
+File test_result_ce_value2.mlw:
+  Line 7:
+    x : int = 0
+  Line 8:
+    a : int = 43
+  Line 10:
+    x : int = 0
+  Line 12:
+    a : int = 43
+  Line 15:
+    a : int = 43
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23)
+- Selected model 2: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23)
+File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
+Sub-goal Postcondition of goal test3'vc.
+Prover result is: Unknown (unknown) (24 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23):
+File test_result_ce_value2.mlw:
+  Line 7:
+    x : int = -2
+  Line 8:
+    a : int = -2
+    a : int = 41
+  Line 17:
+    x : int = -2
+  Line 18:
+    a : int = 42
+    a : int = 42
+  Line 21:
+    a : int = -2
+    a : int = 41
+  Line 22:
+    a : int = 42
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23)
+- Selected model 2: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23)
+File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
+Sub-goal Postcondition of goal test3'vc.
+Prover result is: Unknown (unknown) (23 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23):
+File test_result_ce_value2.mlw:
+  Line 7:
+    x : int = -2
+  Line 8:
+    a : int = -2
+    a : int = 40
+  Line 17:
+    x : int = -2
+  Line 18:
+    a : int = 42
+    a : int = 42
+  Line 21:
+    a : int = -2
+    a : int = 40
+  Line 24:
+    a : int = 42
+
+File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
+Sub-goal Postcondition of goal test3'vc.
+Prover result is: Valid (6 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+- Selected model 2: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
+Sub-goal Postcondition of goal test3'vc.
+Prover result is: Unknown (unknown) (15 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9):
+File test_result_ce_value2.mlw:
+  Line 7:
+    x : int = 0
+  Line 8:
+    a : int = 40
+  Line 17:
+    x : int = 0
+  Line 18:
+    a : int = 42
+    a : int = 42
+  Line 21:
+    a : int = 40
+  Line 24:
+    a : int = 42
+

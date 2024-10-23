@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="1" name="Coq" version="8.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.5.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -68,7 +68,19 @@
   <proof prover="2"><result status="valid" time="0.000000" steps="18"/></proof>
   </goal>
   <goal name="palindrome_rec&#39;vc.12" expl="exceptional postcondition" proved="true">
-  <proof prover="1"><path name="there_and_back_again_Palindrome_VC_palindrome_rec_1.v"/><result status="valid" time="0.440000"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="palindrome_rec&#39;vc.12.0" expl="exceptional postcondition" proved="true">
+   <transf name="destruct" proved="true" arg1="H">
+    <goal name="palindrome_rec&#39;vc.12.0.0" expl="exceptional postcondition" proved="true">
+    <transf name="exists" proved="true" arg1="(i+1)">
+     <goal name="palindrome_rec&#39;vc.12.0.0.0" proved="true">
+     <proof prover="1"><result status="valid" time="0.018976" steps="92"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
   <goal name="palindrome_rec&#39;vc.13" expl="unreachable point" proved="true">
   <proof prover="2"><result status="valid" time="0.000000" steps="34"/></proof>

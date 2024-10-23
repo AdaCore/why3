@@ -31,7 +31,7 @@ type prover_answer =
   | StepLimitExceeded
   | Unknown of string
   | Failure of string
-  | HighFailure
+  | HighFailure of string
 (* END{proveranswer} anchor for automatic documentation, do not remove *)
 
 (* BEGIN{proverresult} anchor for automatic documentation, do not remove *)
@@ -156,7 +156,7 @@ let print_prover_answer fmt = function
   | StepLimitExceeded -> fprintf fmt "Step@ limit@ exceeded"
   | Unknown s -> fprintf fmt "Unknown@ (%s)" s
   | Failure s -> fprintf fmt "Failure@ (%s)" s
-  | HighFailure -> pp_print_string fmt "High failure"
+  | HighFailure s -> fprintf fmt "High failure (%s)" s
 
 let print_prover_status fmt = function
   | Unix.WSTOPPED n -> fprintf fmt "stopped by signal %d" n
@@ -197,13 +197,14 @@ let print_prover_result ?(json=false) fmt r =
     let color = match r.pr_answer with | Valid -> "green" | Invalid -> "red" | _ -> "cyan" in
     fprintf fmt "@{<bold %s>%a@}@ (%.2fs%a)"
       color print_prover_answer r.pr_answer r.pr_time print_steps r.pr_steps;
-    if r.pr_answer == HighFailure then
-      fprintf fmt ",@\nProver@ exit@ status:@ %a@\nprover@ output:@\n%s@\n"
-        print_prover_status r.pr_status r.pr_output
+    match r.pr_answer with
+    | HighFailure s ->
+      fprintf fmt "HighFailure (%s),@\nProver@ exit@ status:@ %a@\nprover@ output:@\n%s@\n"
+        s print_prover_status r.pr_status r.pr_output
+    | _ -> ()
 
 let rec grep out l = match l with
-  | [] ->
-      HighFailure
+  | [] -> HighFailure "no match found from given regexps"
   | (re,pa) :: l ->
       begin try
         ignore (Re.Str.search_forward re out 0);
@@ -211,7 +212,7 @@ let rec grep out l = match l with
         | Valid | Invalid | Timeout | OutOfMemory | StepLimitExceeded -> pa
         | Unknown s -> Unknown (Re.Str.replace_matched s out)
         | Failure s -> Failure (Re.Str.replace_matched s out)
-        | HighFailure -> assert false
+        | HighFailure _ -> assert false
       with Not_found -> grep out l end
 
 (* Create a regexp matching the same as the union of all regexp of the list. *)
@@ -226,8 +227,7 @@ let craft_efficient_re l =
   Re.Str.regexp s
 
 let debug_print_model ~print_attrs model =
-  Debug.dprintf debug "Call_provers: %a@."
-    (print_model ~filter_similar:false ~print_attrs) model
+  Debug.dprintf debug "Call_provers: %a@." (print_model ~print_attrs) model
 
 type answer_or_model = Answer of prover_answer | Model of string
 
@@ -253,20 +253,20 @@ let analyse_result exit_result res_parser get_model out =
     | Some ans2 ->
         match ans1 with
         (* prefer any answer over HighFailure *)
-        | HighFailure -> ans2
+        | HighFailure _ -> ans2
         | _ -> ans1
   in
 
   let rec analyse saved_models saved_res l =
     match l with
     | [] ->
-        Option.value ~default:HighFailure saved_res, List.rev saved_models
+        Option.value ~default:(HighFailure "default answer") saved_res, List.rev saved_models
     | Answer Valid :: _ ->
         (* answer Valid is always a priority *)
         Valid, []
-    | Answer res :: (Answer HighFailure :: []) ->
+    | Answer res :: (Answer (HighFailure s) :: []) ->
         Debug.dprintf debug_analyse_result
-          "@[[Call_provers.analyse_result] answer followed by HighFailure:@ @[%a@]@]@."
+          "@[[Call_provers.analyse_result] answer followed by HighFailure (%s):@ @[%a@]@]@." s
           print_prover_answer res;
         (* FIXME (see https://gitlab.inria.fr/why3/why3/-/issues/648)
         This case is a specific treatment for cases when Answer HighFailure
@@ -325,7 +325,7 @@ let analyse_result exit_result res_parser get_model out =
         (* this is not supposed to happen, but it happens. Possibly because the driver is missing
            a regexp for a possible answer. Let us assume the answer is equivalent to unknown
         *)
-        record_model saved_models saved_res (Unknown "unrecognized prover answer") model_str tl
+        record_model saved_models saved_res (HighFailure "unrecognized prover answer") model_str tl
   and record_model saved_models saved_res res model_str tl =
     match get_model with
     | Some printing_info ->
@@ -349,7 +349,7 @@ let parse_prover_run res_parser signaled time out exitcode limit get_model =
   let int_exitcode = Int64.to_int exitcode in
   let ans, models =
     let exit_result =
-      if signaled then [Answer HighFailure] else
+      if signaled then [Answer (HighFailure "signaled")] else
       try [Answer (List.assoc int_exitcode res_parser.prp_exitcodes)]
       with Not_found -> []
     in analyse_result exit_result res_parser get_model out
@@ -364,7 +364,7 @@ let parse_prover_run res_parser signaled time out exitcode limit get_model =
     (* HighFailure or Unknown close to time limit are assumed to be timeouts *)
     if tlimit > 0.0 && time >= 0.9 *. tlimit -. 0.1 then
     match ans with
-    | HighFailure | Unknown _ | Timeout ->
+    | HighFailure _ | Unknown _ | Timeout ->
        Debug.dprintf debug
          "[Call_provers.parse_prover_run] answer after %f >= 0.9 * timelimit - 0.1 -> Timeout@." time;
        Timeout, tlimit, steps
@@ -373,7 +373,7 @@ let parse_prover_run res_parser signaled time out exitcode limit get_model =
       (* HighFailure or Unknown when steps >= stepslimit are assumed to be StepLimitExceeded *)
       if stepslimit > 0 && steps >= stepslimit then
       match ans with
-      | HighFailure | Unknown _ | StepLimitExceeded ->
+      | HighFailure _ | Unknown _ | StepLimitExceeded ->
         Debug.dprintf debug
           "[Call_provers.parse_prover_run] answer after %d steps >= stepslimit -> StepLimitExceeded@." steps;
         StepLimitExceeded, time, steps

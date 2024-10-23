@@ -93,7 +93,7 @@ struct
             | StepLimitExceeded -> "steplimitexceeded"
             | Unknown _ -> "unknown"
             | Failure _ -> "failure"
-            | HighFailure -> "highfailure"
+            | HighFailure _ -> "highfailure"
           in
           [("answer", String answer); ("time", StandardFloat time)]
       | _ -> []

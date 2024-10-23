@@ -131,6 +131,9 @@ let print_commands fmt =
        (fun fmt e -> Format.fprintf fmt "  %s   @[<hov>%s@]"
          (Strings.pad_right ' ' e.cmd_name maxl) e.cmd_desc)) cmds
 
+module Main : functor () -> sig end
+ = functor () -> struct
+
 let anon_file x = raise (Getopt.GetoptFailure (Printf.sprintf "unexpected argument: %s" x))
 
 let usage_msg = "<command>\nExecute the given subcommand.\n"
@@ -158,3 +161,7 @@ let () =
   with e when not (Debug.test_flag Debug.stack_trace) ->
     Format.eprintf "@.%a@." Exn_printer.exn_printer e;
     exit 1
+
+end
+
+let () = Whyconf.register_command "show" (module Main)

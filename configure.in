@@ -9,7 +9,7 @@
 #                                                                  #
 ####################################################################
 
-AC_INIT([Why3], [1.7.1+git])
+AC_INIT([Why3], [1.7.2+git])
 
 # verbosemake
 
@@ -871,6 +871,20 @@ if test "$enable_js_of_ocaml" != no -a "$found_js_of_ocaml" = no; then
 fi
 
 if test "$enable_js_of_ocaml" != no; then
+   JSOFOCAMLVERSION=$($OCAMLFIND query -format "%v" js_of_ocaml 2> /dev/null | tr -d '\r')
+   AX_VERSION_GE([$JSOFOCAMLVERSION], 5.6.0, [], [
+      found_js_of_ocaml=no
+      reason_js_of_ocaml=" (js_of_ocaml >= 5.6.0 not found)"])
+fi
+
+if test "$enable_js_of_ocaml" != no -a "$found_js_of_ocaml" = no; then
+   if test "$enable_js_of_ocaml" = yes; then
+      AC_MSG_ERROR([cannot enable Javascript support without js_of_ocaml >= 5.6.0 (found $JSOFOCAMLVERSION).])
+   fi
+   enable_js_of_ocaml=no
+fi
+
+if test "$enable_js_of_ocaml" != no; then
    enable_js_of_ocaml=yes
    JSOFOCAMLPKG="js_of_ocaml js_of_ocaml-ppx"
 fi
@@ -961,20 +975,20 @@ if test "$enable_coq_support" = yes; then
    COQVERSION=[`$COQC -v | sed -n -e 's|.*version  *\([^ ]*\).*|\1|p'`]
    AC_MSG_RESULT($COQVERSION)
    COQNUMVERSION=[`echo $COQVERSION | awk -F. '{ printf("%d%02d\n", $1,$2); }'`]
-   if test "$COQNUMVERSION" -lt 811; then
+   if test "$COQNUMVERSION" -lt 816; then
       if test "$enable_coq_libs" = yes; then
-         AC_MSG_ERROR([cannot build Coq libraries without Coq >= 8.11.])
+         AC_MSG_ERROR([cannot build Coq libraries without Coq >= 8.16.])
       fi
       enable_coq_support=no
-      AC_MSG_WARN([cannot build Coq libraries without Coq >= 8.11.])
-      reason_coq_support=" (need version >= 8.11)"
+      AC_MSG_WARN([cannot build Coq libraries without Coq >= 8.16.])
+      reason_coq_support=" (need version >= 8.16)"
    else
       if test "$COQNUMVERSION" -ge 817; then
          COQFLAGS="-w deprecated-instance-without-locality,deprecated-hint-without-locality"
       fi
-      if test "$COQNUMVERSION" -gt 818; then
-         AC_MSG_WARN([unrecognized Coq version, assuming Coq 8.18])
-         COQNUMVERSION=818
+      if test "$COQNUMVERSION" -gt 820; then
+         AC_MSG_WARN([unrecognized Coq version, assuming Coq 8.20])
+         COQNUMVERSION=820
       fi
       coq_compat_version="COQ$COQNUMVERSION"
    fi

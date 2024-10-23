@@ -9,6 +9,7 @@
 <prover id="4" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.1.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="9" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="binary_search.mlw"/>
 <theory name="BinarySearch" proved="true">
@@ -168,6 +169,11 @@
   <proof prover="3"><result status="valid" time="0.020000" steps="16"/></proof>
   </goal>
  </transf>
+ </goal>
+</theory>
+<theory name="TwoDimensional" proved="true">
+ <goal name="search&#39;vc" expl="VC for search" proved="true">
+ <proof prover="9"><result status="valid" time="0.037675" steps="36548"/></proof>
  </goal>
 </theory>
 </file>

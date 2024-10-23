@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC5" version="1.0.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="anagrammi.mlw"/>
+<theory name="Top" proved="true">
+ <goal name="lt_trans" proved="true">
+ <proof prover="4"><result status="valid" time="0.328340" steps="533605"/></proof>
+ </goal>
+ <goal name="anagrammi&#39;vc" expl="VC for anagrammi" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="anagrammi&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.051891" steps="80516"/></proof>
+  </goal>
+  <goal name="anagrammi&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.026561" steps="70027"/></proof>
+  </goal>
+  <goal name="anagrammi&#39;vc.2" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.038658" steps="174"/></proof>
+  </goal>
+  <goal name="anagrammi&#39;vc.3" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.022029" steps="76137"/></proof>
+  </goal>
+  <goal name="anagrammi&#39;vc.4" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.049751" steps="239"/></proof>
+  </goal>
+  <goal name="anagrammi&#39;vc.5" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.049688" steps="263"/></proof>
+  </goal>
+  <goal name="anagrammi&#39;vc.6" expl="assertion" proved="true">
+  <proof prover="4"><result status="valid" time="0.086579" steps="189134"/></proof>
+  </goal>
+  <goal name="anagrammi&#39;vc.7" expl="assertion" proved="true">
+  <proof prover="0" timelimit="30"><result status="valid" time="0.534562" steps="3661"/></proof>
+  </goal>
+  <goal name="anagrammi&#39;vc.8" expl="loop invariant preservation" proved="true">
+  <transf name="unfold" proved="true" arg1="below">
+   <goal name="anagrammi&#39;vc.8.0" expl="VC for anagrammi" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="anagrammi&#39;vc.8.0.0" expl="VC for anagrammi" proved="true">
+    <transf name="unfold" proved="true" arg1="sorted">
+     <goal name="anagrammi&#39;vc.8.0.0.0" expl="VC for anagrammi" proved="true">
+     <transf name="split_vc" proved="true" >
+      <goal name="anagrammi&#39;vc.8.0.0.0.0" expl="VC for anagrammi" proved="true">
+      <proof prover="3"><result status="valid" time="0.306035" steps="22307"/></proof>
+      </goal>
+      <goal name="anagrammi&#39;vc.8.0.0.0.1" expl="VC for anagrammi" proved="true">
+      <transf name="case" proved="true" arg1="(length output = 1)">
+       <goal name="anagrammi&#39;vc.8.0.0.0.1.0" expl="true case" proved="true">
+       <proof prover="4"><result status="valid" time="0.065086" steps="130997"/></proof>
+       </goal>
+       <goal name="anagrammi&#39;vc.8.0.0.0.1.1" expl="false case" proved="true">
+       <transf name="case" proved="true" arg1="(j2 = length output - 1)">
+        <goal name="anagrammi&#39;vc.8.0.0.0.1.1.0" expl="false case (true case)" proved="true">
+        <transf name="case" proved="true" arg1="(pr1 i1 output[j1])">
+         <goal name="anagrammi&#39;vc.8.0.0.0.1.1.0.0" expl="false case (true case)" proved="true">
+         <transf name="unfold" proved="true" arg1="lt">
+          <goal name="anagrammi&#39;vc.8.0.0.0.1.1.0.0.0" expl="VC for anagrammi" proved="true">
+          <transf name="exists" proved="true" arg1="0">
+           <goal name="anagrammi&#39;vc.8.0.0.0.1.1.0.0.0.0" proved="true">
+           <proof prover="3"><result status="valid" time="0.195917" steps="15192"/></proof>
+           </goal>
+          </transf>
+          </goal>
+         </transf>
+         </goal>
+         <goal name="anagrammi&#39;vc.8.0.0.0.1.1.0.1" expl="false case (true case)" proved="true">
+         <transf name="case" proved="true" arg1="(pr2 i1 i2 output[j1])">
+          <goal name="anagrammi&#39;vc.8.0.0.0.1.1.0.1.0" expl="false case (true case)" proved="true">
+          <proof prover="3"><result status="valid" time="0.234350" steps="19659"/></proof>
+          </goal>
+          <goal name="anagrammi&#39;vc.8.0.0.0.1.1.0.1.1" expl="false case (true case)" proved="true">
+          <proof prover="3"><result status="valid" time="0.280317" steps="24635"/></proof>
+          </goal>
+         </transf>
+         </goal>
+        </transf>
+        </goal>
+        <goal name="anagrammi&#39;vc.8.0.0.0.1.1.1" expl="false case" proved="true">
+        <proof prover="3" timelimit="5"><result status="valid" time="0.248785" steps="24258"/></proof>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="anagrammi&#39;vc.8.0.1" expl="VC for anagrammi" proved="true">
+    <proof prover="3"><result status="valid" time="0.248341" steps="22520"/></proof>
+    </goal>
+    <goal name="anagrammi&#39;vc.8.0.2" expl="VC for anagrammi" proved="true">
+    <transf name="case" proved="true" arg1="(s[2] = i3)">
+     <goal name="anagrammi&#39;vc.8.0.2.0" expl="true case" proved="true">
+     <transf name="case" proved="true" arg1="(s[1] = i2)">
+      <goal name="anagrammi&#39;vc.8.0.2.0.0" expl="true case" proved="true">
+      <transf name="case" proved="true" arg1="(s[0] = i1)">
+       <goal name="anagrammi&#39;vc.8.0.2.0.0.0" expl="true case" proved="true">
+       <transf name="assert" proved="true" arg1="(s[3] = i4)">
+        <goal name="anagrammi&#39;vc.8.0.2.0.0.0.0" expl="asserted formula" proved="true">
+        <proof prover="3"><result status="valid" time="0.564475" steps="62552"/></proof>
+        </goal>
+        <goal name="anagrammi&#39;vc.8.0.2.0.0.0.1" expl="true case" proved="true">
+        <transf name="assert" proved="true" arg1="(s == line)">
+         <goal name="anagrammi&#39;vc.8.0.2.0.0.0.1.0" expl="asserted formula" proved="true">
+         <proof prover="3"><result status="valid" time="0.299594" steps="29472"/></proof>
+         </goal>
+         <goal name="anagrammi&#39;vc.8.0.2.0.0.0.1.1" expl="true case" proved="true">
+         <proof prover="4"><result status="valid" time="0.094400" steps="138135"/></proof>
+         </goal>
+        </transf>
+        </goal>
+       </transf>
+       </goal>
+       <goal name="anagrammi&#39;vc.8.0.2.0.0.1" expl="false case (true case)" proved="true">
+       <proof prover="4"><result status="valid" time="0.133097" steps="295600"/></proof>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="anagrammi&#39;vc.8.0.2.0.1" expl="false case (true case)" proved="true">
+      <proof prover="3"><result status="valid" time="0.424861" steps="45466"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="anagrammi&#39;vc.8.0.2.1" expl="false case" proved="true">
+     <proof prover="3" timelimit="5"><result status="valid" time="0.449080" steps="45355"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="anagrammi&#39;vc.9" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.073489" steps="159154"/></proof>
+  </goal>
+  <goal name="anagrammi&#39;vc.10" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.055839" steps="18"/></proof>
+  </goal>
+  <goal name="anagrammi&#39;vc.11" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.078927" steps="79250"/></proof>
+  </goal>
+  <goal name="anagrammi&#39;vc.12" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.084005" steps="5091"/></proof>
+  <proof prover="4"><result status="valid" time="0.027696" steps="3187"/></proof>
+  </goal>
+  <goal name="anagrammi&#39;vc.13" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.054907" steps="69004"/></proof>
+  </goal>
+  <goal name="anagrammi&#39;vc.14" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.036127" steps="3113"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

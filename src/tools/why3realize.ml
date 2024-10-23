@@ -12,6 +12,9 @@
 open Format
 open Why3
 
+module Main : functor () -> sig end
+ = functor () -> struct
+
 let usage_msg =
   "-D <driver> -o <dir> -T <theory> ...\n\
    Output realization skeletons for the given theories or update them."
@@ -101,8 +104,6 @@ let () =
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. byte"
-End:
-*)
+end
+
+let () = Whyconf.register_command "realize" (module Main)

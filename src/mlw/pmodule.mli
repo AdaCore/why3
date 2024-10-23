@@ -51,6 +51,7 @@ type overload =
   | NoOver          (* neither *)
 
 val overload_of_rs : rsymbol -> overload
+val overload_of_oo : Srs.t -> overload
 
 val ref_attr : Ident.attribute
 

@@ -3,12 +3,6 @@ prelude ";; produced by alt_ergo_counterexample.drv ;;"
 
 import "alt_ergo_smt.drv"
 
-(* Prepare for counter-example query: get rid of some quantifiers
-   (makes it possible to query model values of the variables in
-   premises) and introduce counter-example projections.  Note: does
-   nothing if meta get_counterexmp is not set *)
-transformation "prepare_for_counterexmp"
-
 (* Counterexamples: set model parser *)
 model_parser "smtv2"
 

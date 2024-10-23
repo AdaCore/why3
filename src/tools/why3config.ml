@@ -11,6 +11,9 @@
 
 open Why3
 
+module Main : functor () -> sig end
+ = functor () -> struct
+
 let exec_name = Filename.basename Sys.argv.(0)
 
 let load_config () =
@@ -198,3 +201,7 @@ let () =
   with e when not (Debug.test_flag Debug.stack_trace) ->
     Format.eprintf "@.%a@." Exn_printer.exn_printer e;
     exit 1
+
+end
+
+let () = Whyconf.register_command "config" (module Main)

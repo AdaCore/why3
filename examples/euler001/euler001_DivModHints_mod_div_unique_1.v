@@ -7,17 +7,16 @@ Require int.Abs.
 Require int.ComputerDivision.
 
 (* Why3 goal *)
-Theorem mod_div_unique :
+Theorem mod_div_unique'vc :
   forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z) (q:Numbers.BinNums.Z)
     (r:Numbers.BinNums.Z),
   (0%Z <= x)%Z /\
   (0%Z < y)%Z /\ (x = ((q * y)%Z + r)%Z) /\ (0%Z <= r)%Z /\ (r < y)%Z ->
   (q = (ZArith.BinInt.Z.quot x y)) /\ (r = (ZArith.BinInt.Z.rem x y)).
-(* Why3 intros x y q r (h1,(h2,(h3,(h4,h5)))). *)
 Proof.
-intros x y q r (H1,(H2,(H3,(H4,H5)))).
+intros x y q r (h1,(h2,(h3,(h4,h5)))).
 apply Zquot.Zquot_mod_unique_full.
-2: rewrite H3; ring.
+2: rewrite h3; ring.
 red.
 left.
 rewrite Z.abs_eq; auto with zarith.

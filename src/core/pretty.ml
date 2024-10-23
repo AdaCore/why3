@@ -391,7 +391,7 @@ and print_app pri ls fmt tl =
         (print_lterm 7) t1 print_term t2 s
   | Ident.SNword s, [t] when Sattr.mem is_field_id_attr ls.ls_name.id_attrs ->
      fprintf fmt (protect_on (pri > 6) "@[%a.%s@]")
-       print_term t s
+       (print_lterm 7) t s
   | Ident.SNword s, tl ->
       fprintf fmt (protect_on (pri > 6) "@[%s@ %a@]")
         s (print_list space (print_lterm 7)) tl
@@ -1101,6 +1101,9 @@ let () = Exn_printer.register
       Format.fprintf fmt
         "meta \"vc:proved_wf\" requires that proposition %a has the form (well_founded %a)"
         print_pr pr print_ls ls
+  | IllFormedMeta(m,s) ->
+      Format.fprintf fmt
+        "Ill formed meta \"%sf\": %s" m.meta_name s
   | _ -> raise exn
   end
 

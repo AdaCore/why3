@@ -99,3 +99,42 @@ struct
   module H = Exthtbl.Make(T)
   module W = Weakhtbl.Make(X)
 end
+
+let fold_of_iter iter f k e =
+  let r = ref k in iter (fun v -> r := f !r v) e; !r
+
+module MakeSCC (H : Exthtbl.S) =
+struct
+  type vertex = H.key
+  type 'a source = 'a -> vertex
+  type 'a adjacency = (vertex -> unit) -> 'a -> unit
+  type 'a register = { elt: 'a; mutable index: int }
+
+  let scc source adjacency el =
+    let st = Stack.create () in
+    let ht = H.create 7 in
+    let cl = ref [] in
+
+    let rec evict n scc =
+      let e = Stack.pop st in
+      let scc = e :: scc in
+      H.remove ht (source e);
+      if n = 0 then scc else
+        evict (n - 1) scc in
+
+    let evict i = evict (Stack.length st - i) [] in
+
+    let rec visit o v = match H.find ht v with
+      | {elt = e; index = 0} as r ->
+          Stack.push e st;
+          let i = r.index <- Stack.length st; r.index in
+          let j = fold_of_iter adjacency visit (i + 1) e in
+          if j >= i then cl := (j = i, evict i) :: !cl;
+          Stdlib.min o j
+      | r -> Stdlib.min o r.index
+      | exception Not_found -> o in
+
+    List.iter (fun e -> H.add ht (source e) {elt = e; index = 0}) el;
+    List.iter (fun e -> ignore (visit 0 (source e))) el;
+    !cl
+end

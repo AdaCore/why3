@@ -1,23 +1,23 @@
 File "bench/check-ce/func_call5.mlw", line 8, characters 12-24:
 Sub-goal Postcondition of goal g1'vc.
-Prover result is: Valid (232 steps).
+Prover result is: Valid (221 steps).
 
 File "bench/check-ce/func_call5.mlw", line 14, characters 10-14:
 Sub-goal Precondition of goal f1'vc.
-Prover result is: Valid (58 steps).
+Prover result is: Valid (47 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
 - Selected model 1: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
 File "bench/check-ce/func_call5.mlw", line 15, characters 11-17:
 Sub-goal Assertion of goal f1'vc.
-Prover result is: Unknown (unknown + incomplete) (383 steps).
+Prover result is: Unknown (unknown + incomplete) (307 steps).
 The following counterexample model could not be verified
-  (abstract RAC terminated because missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14):
+  (abstract RAC fatal rac error: missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14):
 File func_call5.mlw:
   Line 8:
     x : int = 1
@@ -25,9 +25,6 @@ File func_call5.mlw:
   Line 11:
     x : int = 1
   Line 14:
-    z : int = 2
-  Line 15:
-    x : int = 1
     z : int = 2
 
 <check_ce:categorization>Categorizations of models:
@@ -39,7 +36,7 @@ File func_call5.mlw:
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
 File "bench/check-ce/func_call5.mlw", line 21, characters 11-17:
 Sub-goal Assertion of goal f2'vc.
-Prover result is: Unknown (unknown + incomplete) (291 steps).
+Prover result is: Unknown (unknown + incomplete) (272 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

@@ -12,6 +12,9 @@
 open Format
 open Why3
 
+module Main : functor () -> sig end
+ = functor () -> struct
+
 (** {2 Warnings} *)
 
 (* warnings are shown on standard output instead of standard error:
@@ -182,7 +185,7 @@ let same_result r1 r2 =
     | StepLimitExceeded, StepLimitExceeded
     | Unknown _, Unknown _
     | Failure _, Failure _
-    | HighFailure, HighFailure
+    | HighFailure _, HighFailure _
       -> true
     | Valid, _ | _, Valid
     | Invalid, _ | _, Invalid
@@ -431,9 +434,6 @@ let () =
       eprintf "Aborting...@.";
       exit 1
 
+end
 
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3replay.opt"
-End:
-*)
+let () = Whyconf.register_command "replay" (module Main)

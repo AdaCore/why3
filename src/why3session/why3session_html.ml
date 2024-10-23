@@ -121,7 +121,7 @@ let print_results fmt s provers proofs =
                   fprintf fmt "FF8000\">%.2f" res.Call_provers.pr_time
 		| Call_provers.Failure _ ->
                   pp_print_string fmt "FF8000\">Failure"
-		| Call_provers.HighFailure ->
+		| Call_provers.HighFailure _ ->
                   pp_print_string fmt "FF8000\">High Failure"
 	    end
 	  | None -> pp_print_string fmt "E0E0E0\">result missing"

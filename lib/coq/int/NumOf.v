@@ -51,7 +51,7 @@ split ; intros h1.
   rewrite <-Z.le_sub_0.
   now destruct (b - a)%Z.
   now rewrite H.
-- rewrite S_pred with (m := 0) (n := Z.to_nat (b - a)).
+- rewrite <- Nat.lt_succ_pred with (z := 0) (n := Z.to_nat (b - a)).
   2: apply (Z2Nat.inj_lt 0); lia.
   rewrite <- Z2Nat.inj_pred.
   simpl numof_aux.

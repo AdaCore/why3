@@ -13,6 +13,9 @@ open Format
 open Why3
 open Pmodule
 
+module Main : functor () -> sig end
+ = functor () -> struct
+
 let usage_msg =
   "<file> <expr>\n\
    Execute the expression in the given file (and --use the necessary modules)."
@@ -162,7 +165,7 @@ let do_input f =
       eprintf "RAC got stuck %s after %a@." reason
         (Pp.print_option_or_default "unknown location" Loc.pp_position) l;
       exit 2
-  | Pinterp_core.Incomplete reason ->
+  | Pinterp_core.Cannot_decide (_,_,reason) ->
       eprintf "Execution terminated because %s@." reason;
       exit 2
 
@@ -173,8 +176,6 @@ let () =
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. byte"
-End:
-*)
+end
+
+let () = Whyconf.register_command "execute" (module Main)

@@ -11,7 +11,7 @@ Prover result is: Valid (61 steps).
   - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_mono.mlw", line 36, characters 4-8)
 File "bench/check-ce/array_mono.mlw", line 36, characters 4-8:
 Sub-goal Index in array bounds of goal f1'vc.
-Prover result is: Unknown (unknown + incomplete) (388 steps).
+Prover result is: Unknown (unknown + incomplete) (358 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -39,7 +39,7 @@ File array_mono.mlw:
 
 File "bench/check-ce/array_mono.mlw", line 41, characters 4-14:
 Sub-goal Index in array bounds of goal f2'vc.
-Prover result is: Valid (292 steps).
+Prover result is: Valid (259 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -53,13 +53,15 @@ Prover result is: Valid (292 steps).
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `f2` cannot be evaluated)
 File "bench/check-ce/array_mono.mlw", line 40, characters 14-26:
 Sub-goal Postcondition of goal f2'vc.
-Prover result is: Step limit exceeded (150043 steps).
+Prover result is: Step limit exceeded (150042 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `([]<-)` cannot be evaluated):
 File array_mono.mlw:
   Line 9:
     elts : array -> int -> int = [|_ => [|0 => 42; 1 => 42; _ => 0|]|]
+    elts : array -> int -> int = [|_ => [|0 => 42; 1 => 42; _ => 0|]|]
   Line 10:
+    length : array -> int = [|_ => 2|]
     length : array -> int = [|_ => 2|]
   Line 19:
     mixfix [<-] :
@@ -69,18 +71,27 @@ File array_mono.mlw:
       ->
       int
       ->
-      array = fun bOUND_VARIABLE_4501 bOUND_VARIABLE_4511
-               bOUND_VARIABLE_4521 ->
+      array = fun bOUND_VARIABLE_4451 bOUND_VARIABLE_4461
+               bOUND_VARIABLE_4471 ->
+               {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
+    mixfix [<-] :
+      array
+      ->
+      int
+      ->
+      int
+      ->
+      array = fun bOUND_VARIABLE_4451 bOUND_VARIABLE_4461
+               bOUND_VARIABLE_4471 ->
                {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
   Line 23:
+    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
     a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
   Line 25:
     a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
     old a :
       array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
   Line 38:
-    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
-  Line 40:
     a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
   Line 41:
     a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}

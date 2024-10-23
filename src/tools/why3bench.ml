@@ -15,6 +15,9 @@ open Session_itp
 open Controller_itp
 open Format
 
+module Main : functor () -> sig end
+ = functor () -> struct
+
 let force = ref false
 let save_interval = ref 60.0
 
@@ -86,7 +89,7 @@ let () =
     | Some pa ->
       match pa.pr_answer with
         (* Cases where no proof attempt has been made *)
-        | HighFailure | Failure "" -> true
+        | HighFailure _ | Failure "" -> true
         | Valid | Invalid | Timeout | OutOfMemory | StepLimitExceeded
         | Unknown _ | Failure _ -> false
   in
@@ -100,3 +103,7 @@ let () =
       exit 0)
     ~any:None;
   Unix_scheduler.Unix_scheduler.main_loop ~prompt:"" (fun _ -> ())
+
+end
+
+let () = Whyconf.register_command "bench" (module Main)

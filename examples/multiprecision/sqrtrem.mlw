@@ -27,8 +27,15 @@ module Sqrt
   use ptralias.Alias
 
   use real.ExpLog (* have to use real to be able to remove log2/log10... *)
+  meta remove_prop lemma log10_increasing
+  meta remove_prop lemma log2_increasing
   meta remove_logic function log10 (* kills CVC3 *)
   meta remove_logic function log2  (* same *)
+  meta remove_prop axiom log_increasing
+  meta remove_prop lemma exp_sum_opposite
+  meta remove_prop axiom exp_increasing
+  meta remove_prop axiom exp_positive
+  meta remove_prop axiom exp_inv
 
   let lemma same_mod (a b:int)
     requires { 0 <= a }

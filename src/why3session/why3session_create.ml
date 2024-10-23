@@ -105,7 +105,6 @@ let run () =
   let errors = ref [] in
   let add_file_and_vcs_to_session f =
     let f = Filename.concat (Sys.getcwd()) f in
-    Format.eprintf "dir = %s, f = %s@." dir f;
     let fp = Sysutil.relativize_filename dir f in
     let file_is_detached,(theories,format) =
       try false,(Session_itp.read_file env f)

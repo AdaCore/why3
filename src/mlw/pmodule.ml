@@ -64,11 +64,18 @@ let overload_of_rs {rs_cty = cty} =
       if ity_closed res && res.ity_pure then FixedRes res else NoOver
   | _ -> NoOver
 
+let overload_of_oo srs =
+  match overload_of_rs (Srs.min_elt srs) with
+  | FixedRes _ as o -> o
+  | _ -> overload_of_rs (Srs.max_elt srs)
+
 let same_overload r1 r2 =
   List.length r1.rs_cty.cty_args = List.length r2.rs_cty.cty_args &&
   match overload_of_rs r1, overload_of_rs r2 with
   | SameType, SameType -> true
   | FixedRes t1, FixedRes t2 -> ity_equal t1 t2
+  | SameType, FixedRes t2 -> ity_equal r1.rs_cty.cty_result t2
+  | FixedRes t1, SameType -> ity_equal t1 r2.rs_cty.cty_result
   | _ -> false (* two NoOver's are not the same *)
 
 let ref_attr = Ident.create_attribute "mlw:reference_var"
@@ -1190,6 +1197,13 @@ let clone_type_decl loc inst cl tdl decl kn =
           | Float ff, Some ({ its_def = Float ff'; _ } as s') ->
               if not (Number.float_format_equal ff ff')
               then raise (CannotInstantiate id);
+              s'
+          | Alias ity, Some ({ its_def = Alias ity'; _ } as s') ->
+              (* Apply the substitution on the def of the cloned symbol *)
+              let ity = conv_ity alg ity in
+              (* Check equality with the cloning symbol modulo type variables *)
+              let isb = its_match_args s' (List.map ity_var s.its_ts.ts_args) in
+              ity_equal_check ity (ity_full_inst isb ity');
               s'
           | _ -> raise (CannotInstantiate id) in
         cl.ts_table <- Mts.add ts s' cl.ts_table;

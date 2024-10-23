@@ -3056,7 +3056,7 @@
    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.310000" steps="38575"/></proof>
    </goal>
    <goal name="wmpn_toom22_mul&#39;vc.424.3" expl="VC for wmpn_toom22_mul" proved="true">
-   <proof prover="7"><result status="valid" time="0.710000"/></proof>
+   <proof prover="7"><result status="valid" time="0.943035"/></proof>
    </goal>
   </transf>
   </goal>
@@ -3605,7 +3605,7 @@
   <proof prover="2" timelimit="1"><result status="valid" time="0.080000" steps="13098"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul_rec&#39;vc.47" expl="precondition" proved="true">
-  <proof prover="2" timelimit="1"><result status="valid" time="0.040000" steps="16487"/></proof>
+  <proof prover="2" timelimit="1"><result status="valid" time="0.148357" steps="16487"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul_rec&#39;vc.48" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.020000" steps="32011"/></proof>
@@ -5023,7 +5023,7 @@
   <goal name="wmpn_toom32_mul&#39;vc.267" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.267.0" expl="assertion" proved="true">
-   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="1.192707" steps="91707"/></proof>
+   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.940192" steps="91707"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.267.1" expl="assertion" proved="true">
    <proof prover="11"><result status="valid" time="0.240000" steps="491834"/></proof>
@@ -5299,7 +5299,7 @@
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.283.0" expl="integer overflow" proved="true">
    <proof prover="0"><result status="valid" time="0.030000"/></proof>
-   <proof prover="2" memlimit="2000"><result status="valid" time="0.200000" steps="23494"/></proof>
+   <proof prover="2" memlimit="2000"><result status="valid" time="0.200000" steps="23587"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.283.1" expl="integer overflow" proved="true">
    <proof prover="4"><result status="valid" time="0.300000"/></proof>
@@ -5307,32 +5307,32 @@
   </transf>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.284" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.170000" steps="23219"/></proof>
+  <proof prover="2"><result status="valid" time="0.120000" steps="23317"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.285" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.285.0" expl="assertion" proved="true">
    <transf name="replace" proved="true" arg1="(m*m)" arg2="(power radix (2*n))">
     <goal name="wmpn_toom32_mul&#39;vc.285.0.0" expl="assertion" proved="true">
-    <proof prover="7"><result status="valid" time="0.040000"/></proof>
+    <proof prover="7"><result status="valid" time="0.030000"/></proof>
     </goal>
     <goal name="wmpn_toom32_mul&#39;vc.285.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="6"><result status="valid" time="0.510000" steps="46992"/></proof>
+    <proof prover="6"><result status="valid" time="0.500000" steps="47081"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.285.1" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.220000" steps="30666"/></proof>
+   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.130000" steps="30724"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.286" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.070000" steps="19085"/></proof>
+  <proof prover="2"><result status="valid" time="0.070000" steps="19096"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.287" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.287.0" expl="postcondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.100000" steps="19069"/></proof>
+   <proof prover="2"><result status="valid" time="0.100000" steps="19080"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.287.1" expl="postcondition" proved="true">
    <proof prover="0"><result status="valid" time="0.030000"/></proof>
@@ -5511,38 +5511,38 @@
   <goal name="wmpn_toom32_mul&#39;vc.301" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.301.0" expl="assertion" proved="true">
-   <proof prover="11" timelimit="5" memlimit="2000"><result status="valid" time="0.440000" steps="1037477"/></proof>
+   <proof prover="11" timelimit="5" memlimit="2000"><result status="valid" time="0.440000" steps="940897"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.302" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.160000" steps="23589"/></proof>
+  <proof prover="2"><result status="valid" time="0.160000" steps="23687"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.303" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.120000" steps="23223"/></proof>
+  <proof prover="2"><result status="valid" time="0.170000" steps="23321"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.304" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.304.0" expl="assertion" proved="true">
    <transf name="replace" proved="true" arg1="(m*m)" arg2="(power radix (2*n))">
     <goal name="wmpn_toom32_mul&#39;vc.304.0.0" expl="assertion" proved="true">
-    <proof prover="7"><result status="valid" time="0.030000"/></proof>
+    <proof prover="7"><result status="valid" time="0.040000"/></proof>
     </goal>
     <goal name="wmpn_toom32_mul&#39;vc.304.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="6"><result status="valid" time="0.500000" steps="47000"/></proof>
+    <proof prover="6"><result status="valid" time="0.510000" steps="47089"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.304.1" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.130000" steps="30674"/></proof>
+   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.220000" steps="30732"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.305" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.060000" steps="19088"/></proof>
+  <proof prover="2"><result status="valid" time="0.060000" steps="19099"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.306" expl="postcondition" proved="true">
-  <proof prover="2" memlimit="2000"><result status="valid" time="0.120000" steps="19127"/></proof>
+  <proof prover="2" memlimit="2000"><result status="valid" time="0.120000" steps="19138"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.307" expl="integer overflow" proved="true">
   <transf name="inline_goal" proved="true" >
@@ -5825,7 +5825,7 @@
   <proof prover="2"><result status="valid" time="0.140000" steps="20581"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.357" expl="precondition" proved="true">
-  <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="1.510000" steps="128227"/></proof>
+  <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="1.794192" steps="128227"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.358" expl="precondition" proved="true">
   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.670000" steps="51676"/></proof>
@@ -6184,7 +6184,7 @@
   <goal name="wmpn_toom32_mul&#39;vc.427" expl="precondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.427.0" expl="precondition" proved="true">
-   <proof prover="2" timelimit="1"><result status="valid" time="0.130000" steps="24586"/></proof>
+   <proof prover="2" timelimit="1"><result status="valid" time="0.244221" steps="24586"/></proof>
    </goal>
   </transf>
   </goal>
@@ -6204,7 +6204,7 @@
   <proof prover="4"><result status="valid" time="0.400000"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.433" expl="variant decrease" proved="true">
-  <proof prover="2" timelimit="1"><result status="valid" time="0.120000" steps="24008"/></proof>
+  <proof prover="2" timelimit="1"><result status="valid" time="0.236205" steps="24008"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.434" expl="precondition" proved="true">
   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="1.140000" steps="108858"/></proof>
@@ -6282,7 +6282,7 @@
    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="1.620000" steps="111489"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.446.4" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="1.300000" steps="110356"/></proof>
+   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="1.541695" steps="110356"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.446.5" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="1.850000" steps="114577"/></proof>
@@ -7412,7 +7412,7 @@
       <goal name="wmpn_toom32_mul&#39;vc.575.9.1.0.0" expl="VC for wmpn_toom32_mul" proved="true">
       <transf name="split_vc" proved="true" >
        <goal name="wmpn_toom32_mul&#39;vc.575.9.1.0.0.0" expl="VC for wmpn_toom32_mul" proved="true">
-       <proof prover="7" timelimit="30" memlimit="4000"><result status="valid" time="3.705470"/></proof>
+       <proof prover="7" timelimit="30" memlimit="4000"><result status="valid" time="17.942380"/></proof>
        </goal>
       </transf>
       </goal>
@@ -7495,7 +7495,7 @@
   </transf>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.576" expl="postcondition" proved="true">
-  <proof prover="7" timelimit="20"><result status="valid" time="6.100164"/></proof>
+  <proof prover="7" timelimit="20"><result status="valid" time="7.214447"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.577" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.285202" steps="30395"/></proof>
@@ -8484,7 +8484,7 @@
   <proof prover="2" timelimit="1"><result status="valid" time="0.150000" steps="15358"/></proof>
   </goal>
   <goal name="wmpn_mul&#39;vc.175" expl="precondition" proved="true">
-  <proof prover="2" timelimit="1"><result status="valid" time="0.076305" steps="19898"/></proof>
+  <proof prover="2" timelimit="1"><result status="valid" time="0.183949" steps="19898"/></proof>
   </goal>
   <goal name="wmpn_mul&#39;vc.176" expl="precondition" proved="true">
   <proof prover="2" timelimit="1"><result status="valid" time="0.180000" steps="19251"/></proof>

@@ -7,7 +7,7 @@
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/blackbox.mlw", line 17, characters 11-16)
 File "bench/check-ce/blackbox.mlw", line 15, characters 13-14:
 Sub-goal Assertion of goal main'vc.
-Prover result is: Unknown (sat) (115 steps).
+Prover result is: Unknown (sat) (102 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -55,14 +55,14 @@ Prover result is: Valid (44 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC_SW
-  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to f at "bench/check-ce/blackbox.mlw", line 14, characters 12-15)
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for global `g`)
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/blackbox.mlw", line 17, characters 11-16)
 - Checked model 1: NC_SW
-  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to f at "bench/check-ce/blackbox.mlw", line 14, characters 12-15)
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for global `g`)
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/blackbox.mlw", line 17, characters 11-16)
 File "bench/check-ce/blackbox.mlw", line 17, characters 11-16:
 Sub-goal Assertion of goal main'vc.
-Prover result is: Unknown (sat) (99 steps).
+Prover result is: Unknown (sat) (79 steps).
 The program does not comply to the verification goal, or the contracts of the
   following functions/loops are too weak :
   - Anonymous function at "bench/check-ce/blackbox.mlw", line 12, character 2 to line 16, character 5

@@ -47,12 +47,12 @@ why3.conf
 /src/jessie/.merlin
 /_build
 /public
-/bench/z3_nombqi/sessions
-/bench/alt_ergo_smt/sessions
 
 # /bench/
 /bench/extraction/test/test.*
 /bench/extraction/test/main.opt
+/bench/extraction/interface1/interface1.*
+/bench/extraction/interface1/main.opt
 /bench/programs/good/booleans/
 /bench/programs/good/exceptions/
 /bench/programs/good/for/
@@ -68,6 +68,12 @@ why3.conf
 /bench/check-ce/petiot2018/*.out
 /bench/check-ce/petiot2018/experiments/
 /bench/parsing/bad/*.out
+#/bench/alt_ergo_smt/sessions
+/bench/alt_ergo_smt2/sessions
+/bench_z3_computerdiv
+/bench/z3_nombqi/bench_z3_nombqi/sessions
+
+
 /examples/tests/*.out
 
 # /bin/
@@ -217,6 +223,11 @@ pvsbin/
 /plugins/ada_terms/ada_lexer.ml
 /plugins/ada_terms/ada_parser.ml
 /plugins/ada_terms/ada_parser.mli
+# /plugins/coma/
+/plugins/coma/coma_lexer.ml
+/plugins/coma/coma_parser.ml
+/plugins/coma/coma_parser.mli
+/plugins/coma/coma_parser.conflicts
 
 # /plugins/cfg/
 /plugins/cfg/cfg_lexer.ml
@@ -270,6 +281,7 @@ pvsbin/
 /examples/*/*/*.tex
 /examples/*/*/*/*.tex
 /examples/split_string/split_string.ml
+/examples/residual/residual.ml
 /examples/vstte10_max_sum/vstte10_max_sum.ml
 /examples/euler001/euler001.ml
 /examples/sudoku/sudoku.ml

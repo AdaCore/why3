@@ -167,7 +167,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
   let rec pp_pattern fmt p =
     match p.pat_desc with
     | Pwild ->
-        pp_print_string fmt "\\texttt{anything}"
+        pp_print_string fmt "~\\_~"
     | Pvar id ->
         pp_var ~arity:0 fmt id
     | Papp (qid, ps) ->
@@ -200,6 +200,15 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
          | Some (qid, ts) -> Some (qid, ts@[t2])
          | None -> None)
     | _ -> None
+
+  let pp_quant fmt q =
+    Dterm.(match q with
+    | DTforall -> fprintf fmt "\\forall"
+    | DTexists -> fprintf fmt "\\exists"
+    | DTlambda -> fprintf fmt "\\lambda")
+
+  let pp_binder fmt (_loc,id,_ghost,_type) =
+    Pp.print_option (pp_var ~arity:0) fmt id
 
   let rec pp_term fmt t =
     match t.term_desc with
@@ -283,13 +292,17 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     | Tlet (id, t1, t2) ->
         fprintf fmt "\\textbf{let}~%a = %a~\\textbf{in}~%a" (pp_var ~arity:0) id
           pp_term t1 pp_term t2
-    | Tquant (_, _, _, t) ->
-        pp_term fmt t
+    | Tquant (q, bl, _, t) ->
+        fprintf fmt "%a~%a.~%a"
+          pp_quant q
+          (Pp.print_list Pp.comma pp_binder) bl
+          pp_term t
     | Tcase (t, bs) ->
-        let pp_sep = pp_str " \\texttt{|} " in
-        let pp_branch fmt (p, t') = fprintf fmt "%a \\rightarrow %a" pp_pattern p pp_term t' in
-        fprintf fmt "\\texttt{match}~%a~\\texttt{with}~%a" pp_term t
-          (pp_print_list ~pp_sep pp_branch) bs
+        let pp_sep = pp_str "\\\\@\n\\mid~ " in
+        let pp_branch fmt (p, t') = fprintf fmt "%a \\rightarrow \\\\ \\qquad %a" pp_pattern p pp_term t' in
+        fprintf fmt "\\begin{array}[t]{l}\\texttt{match}~%a~\\texttt{with}~%a" pp_term t
+          (Pp.print_list_delim ~start:pp_sep ~stop:(pp_str"") ~sep:pp_sep pp_branch) bs;
+        fprintf fmt "\\\\\\end{array}@\n"
     | Tcast (t, ty) ->
         fprintf fmt "%a \\texttt{:} %a" pp_term t pp_type ty
     | Ttuple ts ->
@@ -322,28 +335,37 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     List.iter (pp_rule fmt) defs;
     fprintf fmt "\\end{mathparpagebreakable}@."
 
-  exception Found of ind_decl
 
-  (** Search an inductive type in mlw file by path (module.Theory.type or module.type) *)
-  let search_inductive (path: string list) (mlw_file: mlw_file) : ind_decl =
+  (** Search a declaration in mlw file by path (module.Theory.type or module.type) *)
+  let search_decl (path: string list) (mlw_file: mlw_file) : decl list =
     let name, decls =
       match path, mlw_file with
       | [name], Decls decls -> name, decls
       | [module_name; name], Modules modules ->
           let aux (id, _) = String.compare id.id_str module_name = 0 in
           name, snd (List.find aux modules)
-      | _ -> raise Not_found in
-    try
-      let aux = function
-        | Dind (Decl.Ind, ind_decls) ->
-            let aux decl =
-              if String.compare decl.in_ident.id_str name = 0 then
-                raise (Found decl) in
-            List.iter aux ind_decls
-        | _ -> () in
-      List.iter aux decls;
-      raise Not_found
-    with Found decl -> decl
+      | _ -> raise Not_found
+    in
+    let aux acc = function
+      | Dind (ind_kind, ind_decls) ->
+          let aux acc decl =
+            if String.compare decl.in_ident.id_str name = 0 then
+              (Dind (ind_kind, [decl])) :: acc else acc
+          in
+          List.fold_left aux acc ind_decls
+      | Dlogic dl ->
+          let aux acc decl =
+            if String.compare decl.ld_ident.id_str name = 0 then
+              (Dlogic [decl]) :: acc else acc in
+          List.fold_left aux acc dl
+      | Dtype dl ->
+          let aux acc decl =
+            if String.compare decl.td_ident.id_str name = 0 then
+              (Dtype [decl]) :: acc else acc in
+          List.fold_left aux acc dl
+      | _ -> acc
+    in
+    List.fold_left aux [] decls
 
   (** Flatten toplevel implies, let bindings, and universal quantifications *)
   let rec flatten_implies (t: term) : term list =
@@ -361,16 +383,69 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
         flatten_implies t2
     | _ -> [t]
 
+  let pp_param fmt (_loc,_id,_ghost,typ) =
+    pp_type fmt typ
+
+  let pp_def fmt path id params body =
+    let arity = List.length params in
+    fprintf fmt "\\begin{displaymath} %% %s@." (String.concat "." path);
+    fprintf fmt "\\begin{array}{l}@.";
+    fprintf fmt "%a%a \\quad ::= \\\\ \\qquad %a@." (pp_var ~arity) id
+      (pp_print_list ~pp_sep:(pp_str "") (pp_arg pp_binder)) params
+         (Pp.print_option pp_term) body;
+    fprintf fmt "\\end{array}@.";
+    fprintf fmt "\\end{displaymath}@."
+
+  let pp_type_def fmt d =
+    match d with
+    | TDalgebraic dl ->
+        let pp_sep = pp_str "\\\\@\n & \\mid & " in
+        let pp_constr fmt (_loc,id,params) =
+          let arity = List.length params in
+          fprintf fmt "%a%a & %a" (pp_var ~arity) id
+            (pp_print_list ~pp_sep:(pp_str "") (pp_arg pp_param)) params
+            (pp_var' ~arity:0) ("comment" ^ id.id_str)
+        in
+        fprintf fmt "%a" (Pp.print_list pp_sep pp_constr) dl
+    | _ -> ()
+
+  let pp_type_decl fmt path id params type_def =
+    let arity = List.length params in
+    fprintf fmt "\\begin{displaymath} %% %s@." (String.concat "." path);
+    fprintf fmt "\\begin{array}{rcll}@.";
+    fprintf fmt "%a%a & ::= & %a@." (pp_var ~arity) id
+      (pp_print_list ~pp_sep:(pp_str "") (pp_var ~arity:0)) params
+         pp_type_def type_def;
+    fprintf fmt "\\end{array}@.";
+    fprintf fmt "\\end{displaymath}@."
+
+  let pp_decl fmt path d : unit =
+    match d with
+    | Dind(_k, dl) ->
+        List.iter (fun d ->
+            let defs = List.map (fun (_, id, t) -> id, flatten_implies t) d.in_def in
+            pp_rules fmt path defs) dl
+    | Dlogic dl ->
+        List.iter (fun d ->
+            pp_def fmt path d.ld_ident d.ld_params d.ld_def) dl
+    | Dtype dl ->
+        List.iter (fun d ->
+            pp_type_decl fmt path d.td_ident d.td_params d.td_def) dl
+    | _ -> ()
+
+  let path_not_found = Loc.register_warning "path_not_found"
+      "Path given to `why3 pp` is not found"
+
   let main fmt mlw_file paths =
     let buf = Buffer.create 42 in
     let fmt' = formatter_of_buffer buf in
     let for_path path =
-      try
-        let decl = search_inductive path mlw_file in
-        let defs = List.map (fun (_, id, t) -> id, flatten_implies t) decl.in_def in
-        pp_rules fmt' path defs
-      with Not_found ->
-        eprintf "Could not find %s" (Strings.join "." path) in
+      match search_decl path mlw_file with
+      | [] ->
+          Loc.warning path_not_found "Could not find path %s" (Strings.join "." path)
+      | decls ->
+            List.iter (pp_decl fmt' path) decls
+    in
     List.iter for_path paths;
     Requirements.iter (pp_command_shape ~comment_macros fmt) !requirements;
     pp_print_string fmt (Buffer.contents buf)
@@ -381,6 +456,9 @@ end
 open Format
 open Why3
 
+module Main : functor () -> sig end
+ = functor () -> struct
+
 let filename = ref None
 
 let paths = Queue.create ()
@@ -390,14 +468,6 @@ let add_filename_then_path p =
     filename := Some p
   else
     Queue.add (Strings.split '.' p) paths
-
-type kind = Inductive
-
-let kind = ref None
-
-let set_kind = function
-  | "inductive" -> kind := Some Inductive
-  | _ -> assert false
 
 type output = Latex | Mlw | Sexp | Dep
 
@@ -424,9 +494,6 @@ let spec =
   let format_help = String.concat "|" formats in
   [ KLong "output", Hnd1 (ASymbol formats, set_output),
     "[" ^ format_help ^ "] select output format (default: " ^ List.hd formats ^ ")";
-    KLong "kind", Hnd1 (ASymbol ["inductive"], set_kind),
-    "<category> select syntactic category to be printed (only\n\
-     \"inductive\" for --output=latex)";
     KLong "prefix", Hnd1 (AString, (:=) prefix),
     "<prefix> set prefix for LaTeX macros (default: \"WHY\")";
   ]
@@ -458,7 +525,7 @@ let deps_use fmt filename (modname:string) (q:Ptree.qualid) =
 let deps_decl fmt filename modname d =
   Ptree.(match d with
   | Dtype _ | Dlogic _ | Dind _ | Dprop _ | Dlet _ | Drec _ | Dexn _ | Dmeta _ -> ()
-  | Dcloneexport(_,q,_) | Duseexport q | Dcloneimport(_,_,q,_,_) ->
+  | Dcloneexport(_,q,_) | Duseexport (_,q) | Dcloneimport(_,_,q,_,_) ->
      deps_use fmt filename modname q
   | Duseimport(_,_, mods) ->
      List.iter (fun (q,_) -> deps_use fmt filename modname q) mods
@@ -491,22 +558,26 @@ let () =
     match !filename with
     | Some filename ->
         let mlw_file = parse_mlw_file filename in
-        (match !output, !kind, Queue.length paths with
-         | Latex, Some Inductive, _ ->
+        (match !output, Queue.length paths with
+         | Latex, _ ->
              let paths = List.rev (Queue.fold (fun l x -> x :: l) [] paths) in
              let module Conf = struct let prefix = !prefix let flatten_applies = true let comment_macros = true end in
              let module M = LatexInd(Conf) in
              M.main std_formatter mlw_file paths
-         | Mlw, None, 0 ->
+         | Mlw, 0 ->
             Mlw_printer.pp_mlw_file std_formatter mlw_file
-         | Dep, None, _ ->
+         | Dep, _ ->
             let f = Filename.(chop_extension (basename filename)) in
             deps_file std_formatter true f mlw_file
-         | Sexp, None, 0 ->
+         | Sexp, 0 ->
              let sexp = Why3.Ptree.sexp_of_mlw_file mlw_file in
              Mysexplib.output std_formatter sexp
-         | _, _, _ ->
+         | _, _ ->
              Getopt.handle_exn "invalid arguments"
         )
     | None ->
         Getopt.handle_exn "missing filename"
+
+end
+
+let () = Whyconf.register_command "pp" (module Main)

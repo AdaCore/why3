@@ -125,7 +125,7 @@ let print_result_prov s proofs prov fmt=
                   fprintf fmt "& \\unknown{%.2f} " res.Call_provers.pr_time
 		| Call_provers.Failure _ ->
                   pp_print_string fmt "& \\failure "
-		| Call_provers.HighFailure ->
+		| Call_provers.HighFailure _ ->
                   pp_print_string fmt "& \\highfailure "
 
 	    end

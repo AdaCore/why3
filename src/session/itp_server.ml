@@ -456,8 +456,6 @@ let () =
 
 (* This section is used to get colored source as a function of the task *)
 
-exception No_loc_on_goal
-
 let get_locations (task: Task.task) =
   let list = ref [] in
   let goal_loc = ref None in
@@ -532,9 +530,10 @@ let get_locations (task: Task.task) =
     | None ->
       (* This case can happen when after some transformations: for example, in
          an assert, the new goal asserted is not tagged with locations *)
-      (* This error is harmless but we want to detect it when debugging. *)
-      if Debug.test_flag Debug.stack_trace then
-        raise No_loc_on_goal
+        (* This error is harmless but we want to detect it when debugging. *)
+        (* UPDATE: this is an annoying behavior when stack_trace is enabled *)
+      () (* if Debug.test_flag Debug.stack_trace then
+            raise No_loc_on_goal *)
     | Some loc -> color_loc ~color:Goal_color ~loc in
   let goal_id : Ident.ident = (Task.task_goal task).Decl.pr_name in
   color_goal goal_id.Ident.id_loc;
@@ -1041,7 +1040,7 @@ match pa.proof_state with
      let selected_model = Option.value ~default:Model_parser.empty_model
          (Check_ce.select_model_last_non_empty res.pr_models) in
      let ce_result =
-       Pp.string_of (Model_parser.print_model_human ~filter_similar:true ~print_attrs)
+       Pp.string_of (Model_parser.print_model ~print_attrs)
          selected_model in
      if ce_result = "" then
        let result_pr =
@@ -1232,11 +1231,8 @@ match pa.proof_state with
     | None -> P.notify (Message (Error "Please select a node id"))
     | Some any ->
         let unproven_goals = unproven_goals_below_id d.cont any in
-        List.iter
-          (fun id -> C.schedule_proof_attempt
-                     d.cont id prover
-                     ~limits ~callback
-                     ~notification:(notify_change_proved d.cont))
+        List.iter (fun id -> C.schedule_proof_attempt d.cont id
+            prover ~limits ~callback ~notification:(notify_change_proved d.cont))
           unproven_goals
 
   let schedule_edition (nid: node_ID) (prover: Whyconf.prover) =
@@ -1385,17 +1381,22 @@ match pa.proof_state with
       Not_found ->
       Debug.dprintf debug_strat "[strategy_exec] strategy '%s' not found@." s
 
-  let run_strat_on_task nid s =
+  let run_strat_on_task nid name s args =
     let d = get_server_data () in
     let any = any_from_node_ID nid in
     match any with
     | Some (Session_itp.APn id) ->
-      let callback sts =
-        Debug.dprintf debug_strat "[strategy_exec] strategy status: %a@." print_strategy_status sts
+        let callback sts =
+          match sts with
+          | STSfatal(n,_,e) ->
+              let s = asprintf "@[Strategy@ `%s`@ fatal@ error:@ %a@]" n Exn_printer.exn_printer e in
+              P.notify (Message (Strat_error(nid, s)))
+          | _ ->
+              Debug.dprintf debug_strat "[strategy_exec] strategy status: %a@." print_strategy_status sts
       in
       let callback_pa = callback_update_tree_proof d.cont in
       let callback_tr tr args st = callback_update_tree_transform tr args st in
-      C.run_strat_on_goal d.cont id s
+      C.run_strat_on_goal d.cont id name s args
         ~callback_tr ~callback_pa ~callback ~notification:(notify_change_proved d.cont)
     | _ -> P.notify (Message (Error "Please select a node id"))
 
@@ -1709,7 +1710,9 @@ match pa.proof_state with
          | Transform (s, _t, args) ->
             apply_transform nid s args;
             session_needs_saving := true
-         | Strat (_, s) -> run_strat_on_task nid s
+         | Strat (name, s, args) ->
+            run_strat_on_task nid name s args;
+            session_needs_saving := true
          | Query s                 ->
             P.notify (Message (Query_Info (nid, s)))
          | Prove (p, limit)        ->

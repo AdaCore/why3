@@ -319,16 +319,29 @@ configuration file.
 
 .. code-block:: lisp
 
-     (setq why3-share (if (boundp 'why3-share) why3-share (ignore-errors (car (process-lines "why3" "--print-datadir")))))
+     (setq why3-share
+       (if (boundp 'why3-share) why3-share
+         (ignore-errors (car (process-lines "why3" "--print-datadir")))))
      (setq why3el
-      (let ((f (expand-file-name "emacs/why3.elc" why3-share)))
-        (if (file-readable-p f) f
-          (let ((f (expand-file-name "emacs/site-lisp/why3.elc" opam-share)))
-            (if (file-readable-p f) f nil)))))
-     (when why3el
-       (require 'why3)
-       (autoload 'why3-mode why3el "Major mode for Why3." t)
-       (setq auto-mode-alist (cons '("\\.mlw$" . why3-mode) auto-mode-alist)))
+       (let ((f (expand-file-name "emacs/why3.elc" why3-share)))
+         (if (file-readable-p f) f
+           (when (and opam-share (file-directory-p opam-share))
+             (let ((f (expand-file-name "emacs/site-lisp/why3.elc" opam-share)))
+               (if (file-readable-p f) f nil))))))
+     (when why3el (require 'why3 why3el))
+
+Notice that the code above checks the presence of the file
+:file:`why3.el` in the OPAM repository using the :file:`opam-share`
+variable, which is supposed to be set before, e.g. using
+
+.. code-block:: lisp
+
+     (setq opam-share (if (boundp 'opam-share) opam-share
+       (ignore-errors (car (process-lines "opam" "var" "share")))))
+
+More generally, setting up a proper Emacs environment together with
+OPAM can be done by installing the OPAM package :file:`user-setup` (see
+https://opam.ocaml.org/packages/user-setup/).
 
 Vim
 ~~~

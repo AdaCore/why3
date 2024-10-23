@@ -7,7 +7,7 @@
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/double_projection.mlw", line 19, characters 15-22)
 File "bench/check-ce/double_projection.mlw", line 19, characters 15-22:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Unknown (sat) (185 steps).
+Prover result is: Unknown (sat) (159 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -19,15 +19,15 @@ File int.mlw:
     one = 1
 File double_projection.mlw:
   Line 8:
-    d = fun (bOUND_VARIABLE_3444:t) -> 0
+    d = fun (bOUND_VARIABLE_3404:t) -> 0
   Line 12:
-    c = fun (bOUND_VARIABLE_3444:t) -> 1
+    c = fun (bOUND_VARIABLE_3404:t) -> 1
   Line 17:
     x = epsilon x:t. d x = 0 /\ c x = 1
     x = epsilon x:t. d x = 0 /\ c x = 1
     Execution of main function `f` with env:
-      d = fun (bOUND_VARIABLE_3444:t) -> 0
-      c = fun (bOUND_VARIABLE_3444:t) -> 1
+      d = fun (bOUND_VARIABLE_3404:t) -> 0
+      c = fun (bOUND_VARIABLE_3404:t) -> 1
       x = epsilon x:t. d x = 0 /\ c x = 1
       zero = 0
       one = 1

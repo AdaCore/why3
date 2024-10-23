@@ -383,7 +383,7 @@ let adapt_limits ~interactive ~use_steps limits a =
          | Call_provers.StepLimitExceeded
          | Call_provers.Invalid -> increased_time, increased_mem, steplimit
          | Call_provers.Failure _
-         | Call_provers.HighFailure ->
+         | Call_provers.HighFailure _ ->
             (* correct ? failures are supposed to appear quickly anyway... *)
             timelimit, memlimit, steplimit
        end
@@ -904,8 +904,8 @@ let run_strategy_on_goal
   exec_strategy 0 strat id
 
 let run_strat_on_goal
-    c id strat ~callback_pa ~callback_tr  ~callback ~notification =
-  let rec exec_strategy tree id =
+    c id strat_name strat args ~callback_pa ~callback_tr  ~callback ~notification =
+  let rec exec_tree tree id =
     match tree with
     | Sdo_nothing -> ()
     | Sapply_trans(trname,args,substrats) ->
@@ -920,7 +920,7 @@ let run_strat_on_goal
           | TSdone tid ->
               List.iter2
                 (fun s id ->
-                 let run_next () = exec_strategy s id; false in
+                 let run_next () = exec_tree s id; false in
                  S.idle ~prio:0 run_next)
                 substrats
                 (get_sub_tasks c.controller_session tid)
@@ -935,7 +935,7 @@ let run_strat_on_goal
         | TSfailed(_, NoProgress) -> (* The transformation had no effect, we apply the next strat *)
           let t = get_task c.controller_session id in
           let tree = strat c.controller_env t in
-          exec_strategy tree id;
+          exec_tree tree id;
         | TSfailed(id, e) -> (* transformation failed *)
             callback (STSfatal (trname, id, e))
         | TSscheduled -> ()
@@ -944,7 +944,7 @@ let run_strat_on_goal
               (fun id ->
                let task = get_task c.controller_session id in
                let tree = strat c.controller_env task in
-               let run_next () = exec_strategy tree id; false in
+               let run_next () = exec_tree tree id; false in
                S.idle ~prio:0 run_next)
               (get_sub_tasks c.controller_session tid)
        in
@@ -968,7 +968,7 @@ let run_strat_on_goal
               already_done := !already_done - 1;
               if !already_done = 0 then begin
                 (* proof did not succeed, goto to next step *)
-                let run_next () = exec_strategy strat id; false in
+                let run_next () = exec_tree strat id; false in
                 S.idle ~prio:0 run_next
               end
            (* should not happen *)
@@ -978,9 +978,18 @@ let run_strat_on_goal
         List.iter (fun i -> call_one_prover c i ~callback ~notification id) is
   in
   let t = get_task c.controller_session id in
-  let tree = strat c.controller_env t in
-  exec_strategy tree id;
-  callback STShalt
+  let tree = match strat with
+    | Strat s -> s c.controller_env t
+    | StratWithArgs s ->
+        let _,table = get_task_name_table c.controller_session id in
+        let lang = file_format (get_encapsulating_file c.controller_session (APn id)) in
+        try
+          s args c.controller_env table lang t
+        with
+          e -> callback (STSfatal(strat_name, id, e)); Sdo_nothing
+in
+exec_tree tree id;
+callback STShalt
 
 
 

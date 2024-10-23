@@ -180,10 +180,10 @@ let () =
   let why_prover = Some ("Alt-Ergo,2.5.4",limits) in
   let rac = Pinterp.mk_rac ~ignore_incomplete:false
       (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
-  let model, clsf = Option.get_exn (Failure "No good model found")
+  let model, clsf = Opt.get_exn (Failure "No good model found")
       (Check_ce.select_model ~limits ~check_ce:true rac env pm models) in
   printf "%a@." (Check_ce.print_model_classification env
-                   ~check_ce:true ?verb_lvl:None ?json:None) (model, clsf)
+                   ~check_ce:true ?verb_lvl:None ~json:false) (model, clsf)
 (* END{check_ce} *)
 
 let () = print_endline "\n== RAC execute giant steps\n"
@@ -196,7 +196,7 @@ let () =
   let rac_results = Check_ce.get_rac_results ~limits ~only_giant_step:true
     rac env pm models in
   let strategy = Check_ce.best_non_empty_giant_step_rac_result in
-  let _,res = Option.get_exn (Failure "No good model found")
+  let _,res = Opt.get_exn (Failure "No good model found")
     (Check_ce.select_model_from_giant_step_rac_results ~strategy rac_results) in
   printf "%a@." (Check_ce.print_rac_result ?verb_lvl:None) res
 (* END{check_ce_giant_step} *)

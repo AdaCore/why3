@@ -1,5 +1,6 @@
 theory Test
 
+  use seq.Seq
   clone regexp.Regexp with type char = int
 
   lemma empty_is_empty: forall w: word. not (mem w Empty)
@@ -8,7 +9,7 @@ theory Test
   constant b: int = 1
   constant c: int = 2
 
-  goal G: mem (Cons a (Cons b Nil)) (Concat (Char a) (Star (Char b)))
+  goal G: mem (cons a (cons b empty)) (Concat (Char a) (Star (Char b)))
 
 end
 

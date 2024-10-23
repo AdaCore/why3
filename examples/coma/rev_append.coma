@@ -1,0 +1,26 @@
+use int.Int
+use list.List
+use list.Append
+use list.Reverse
+
+use coma.Std
+use coma.List
+
+-------------------------------------------------------------------------------
+
+let assign_int < 'a > (&r v: 'a) (out [r] {r = v}) = any
+
+let assign_list < 'a > (&r v: list 'a) {} (out [r] {r = v})
+  = [ &r <- v ] out
+
+-------------------------------------------------------------------------------
+
+let rev_append < 'a > (l0 r0: list 'a) {}
+      (out (r: list 'a) { r = reverse l0 ++ r0 })
+= loop
+  [ loop { reverse l ++ r = reverse l0 ++ r0 }
+    = unList < 'a > {l}
+        (fun (h: 'a) (t: list 'a) ->
+          [ &r <- Cons h r | &l <- t ] loop)
+        (-> out {r}) ]
+  [ &r: list 'a = r0 | &l: list 'a = l0 ]

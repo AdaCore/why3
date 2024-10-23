@@ -44,6 +44,7 @@ let available_commands () =
       let w = Re.Str.matched_group 1 v in
       if Re.Str.matched_group 2 v = tools_ext then w :: acc else acc
     else acc) [] commands in
+  let commands = Wstdlib.Hstr.fold (fun s _ acc -> s :: acc) Whyconf.commands commands in
   List.sort String.compare ("help" :: commands)
 
 let do_usage () =
@@ -74,6 +75,12 @@ let command cur =
       Sys.argv.(cur) <- "--help";
       sscmd
     end in
+  Whyconf.Args.first_arg := cur + 1;
+  Whyconf.Args.add_command sscmd;
+  let () =
+    match Wstdlib.Hstr.find Whyconf.commands sscmd with
+    | m -> let open (val m) () in (); exit 0
+    | exception Not_found -> () in
   let cmd =
     let scmd = "why3" ^ sscmd ^ tools_ext in
     let cmd = Filename.concat command_path scmd in
@@ -84,18 +91,21 @@ let command cur =
         exit 1;
       end;
       cmd in
-  Whyconf.Args.first_arg := cur + 1;
-  Whyconf.Args.add_command sscmd;
-  try
+  begin try
     Dynlink.allow_unsafe_modules true;
     Dynlink.loadfile cmd;
-    exit 0
   with
   | Dynlink.Error (Dynlink.Library's_module_initializers_failed e) ->
       Printexc.raise_with_backtrace e (Printexc.get_raw_backtrace ())
   | Dynlink.Error e ->
     Printf.eprintf "Failed to load %s: %s\n%!" cmd (Dynlink.error_message e);
     exit 1
+  end;
+  match Wstdlib.Hstr.find Whyconf.commands sscmd with
+  | m -> let open (val m) () in (); exit 0
+  | exception Not_found ->
+      Printf.eprintf "Command %s not found in %s\n%!" sscmd cmd;
+      exit 1
 
 let () =
   try

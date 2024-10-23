@@ -385,3 +385,98 @@ This gives the following C code.
      }
      return idx;
    }
+
+Not any WhyML code can be extracted to C. Here is a list of supported features and a few rules that your code must follow for extraction to succeed.
+
+* Basic datatypes
+
+   * Integer types declared in ``mach.int`` library are supported for
+     sizes 16, 32 and 64 bits. They are translated into C types of
+     appropriate size and sign, say ``int32_t``, ``uint64_t``, etc.
+
+   * The mathematical integer type ``int`` is not supported.
+
+   * The Boolean type is translated to C type ``int``. The bitwise operators from ``bool.Bool`` are
+     supported.
+
+   * Character and strings are partially supported via the functions
+     declared in ``mach.c.String`` library
+
+   * Floating-point types are not yet supported
+
+* Compound datatypes
+
+   * Record types are supported. When they have no mutable fields,
+     they are translated into C structs, and as such are passed by value and returned by
+     value. For example the WhyML code
+
+     .. code-block:: whyml
+
+        use mach.int.Int32
+        type r = { x : int32; y : int32 }
+        let swap (a : r) : r = { x = a.y ; y = a.x }
+
+     is extracted as
+
+     .. code-block:: c
+
+        #include <stdint.h>
+
+        struct r {
+          int32_t x;
+          int32_t y;
+        };
+
+        struct r swap(struct r a) {
+          struct r r;
+          r.x = a.y;
+          r.y = a.x;
+          return r;
+        }
+
+     On the other hand, records with mutable fields are interpreted as
+     pointers to structs, and are thus passed by reference. For example the WhyML code
+
+     .. code-block:: whyml
+
+        use mach.int.Int32
+        type r = { mutable x : int32; mutable y : int32 }
+        let swap (a : r) : unit =
+           let tmp = a.y in a.y <- a.x; a.x <- tmp
+
+     is extracted as
+
+     .. code-block:: c
+
+        struct r {
+          int32_t x;
+          int32_t y;
+        };
+
+        void swap(struct r * a) {
+          int32_t tmp;
+          tmp = a->y;
+          a->y = a->x;
+          a->x = tmp;
+        }
+
+   * WhyML arrays are not supported
+
+   * Pointer types are supported via the type ``ptr`` declared in
+     library ``mach.c.C``. See above for an example of use.
+
+   * Algebraic datatypes are not supported (even enumerations)
+
+* Pointer aliasing constraints
+
+   The type ``ptr`` from ``mach.c.C`` must be seen as a WhyML mutable
+   type, and as such is subject to the WhyML restrictions regarding
+   aliasing. In particular, two pointers passed as argument to a
+   function are implicitly not aliased.
+
+* Control flow structures
+
+   * Sequences, conditionals, ``while`` loops and ``for`` loops are supported
+   * Pattern matching is not supported
+   * Exception raising and catching is not supported
+   * ``break``, ``continue`` and ``return`` are supported

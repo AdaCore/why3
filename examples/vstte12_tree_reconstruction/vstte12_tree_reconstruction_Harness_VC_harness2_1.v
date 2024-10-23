@@ -68,7 +68,7 @@ Proof.
   rewrite Append.Append_length.
   generalize (IHt1 (d+1))%Z.
   generalize (IHt2 (d+1))%Z.
-  omega.
+  auto with zarith.
 Qed.
 
 (* Why3 goal *)
@@ -78,6 +78,7 @@ Theorem harness2'vc :
      (Init.Datatypes.cons 1%Z
       (Init.Datatypes.cons 3%Z
        (Init.Datatypes.cons 2%Z (Init.Datatypes.cons 2%Z Init.Datatypes.nil))))).
+(* Why3 intros us. *)
 Proof.
 intro result.
 intuition.
@@ -100,7 +101,7 @@ generalize (depths_length result2_2 2).
 generalize (f_equal Length.length H2).
 simpl.
 do 2 (rewrite Append.Append_length).
-omega.
+auto with zarith.
 (* 4 trees, 3 ints *)
 clear H.
 generalize (depths_length result2_1_1_1 4).
@@ -110,7 +111,7 @@ generalize (depths_length result2_2 2).
 generalize (f_equal Length.length H1).
 simpl.
 do 3 (rewrite Append.Append_length).
-omega.
+auto with zarith.
 
 destruct result1_1; simpl in H.
 discriminate H.
@@ -125,6 +126,7 @@ generalize (depths_length result2 1).
 generalize (f_equal Length.length H).
 simpl.
 do 4 (rewrite Append.Append_length).
-omega.
+auto with zarith.
 
 Qed.
+

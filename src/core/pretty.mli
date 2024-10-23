@@ -9,14 +9,14 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** Pretty-printing various objects from Why3's core logic *)
+
 open Ident
 open Ty
 open Term
 open Decl
 open Theory
 open Task
-
-(** {1 Pretty-printing various objects from Why3's core logic} *)
 
 val coercion_attr : Ident.attribute
 (** Attribute to put on unary functions to make them considered as
@@ -32,7 +32,8 @@ val protect_on: bool -> ('a, 'b, 'c, 'd, 'e, 'f) format6 ->
   ('a, 'b, 'c, 'd, 'e, 'f) format6
 (** add parentheses around when first arugment is true. *)
 
-(** {2 specific syntax} *)
+(** {2 Specific syntax} *)
+
 type syntax =
 | Is_array of string
 | Is_getter of string

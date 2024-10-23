@@ -57,7 +57,7 @@ type expr = {
   e_node   : expr_node;
   e_ity    : ity;
   e_mlty   : ty;
-  e_effect : effect;
+  e_effect : effekt;
   e_attrs  : Sattr.t;
 }
 

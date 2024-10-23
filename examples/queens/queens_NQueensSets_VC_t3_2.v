@@ -70,12 +70,14 @@ Axiom no_duplicate :
   sorted s a b -> forall (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z),
   (a <= i)%Z /\ (i < j)%Z /\ (j < b)%Z -> ~ eq_prefix (s i) (s j) n.
 
+Require Import Lia.
+
 (* Why3 goal *)
 Theorem t3'vc :
   forall (col:Numbers.BinNums.Z -> Numbers.BinNums.Z) (k:Numbers.BinNums.Z)
     (sol:Numbers.BinNums.Z -> Numbers.BinNums.Z -> Numbers.BinNums.Z)
-    (s:Numbers.BinNums.Z) (a:set.SetAppInt.set) (b:set.SetAppInt.set)
-    (c:set.SetAppInt.set),
+    (s:Numbers.BinNums.Z),
+  forall (a:set.SetAppInt.set) (b:set.SetAppInt.set) (c:set.SetAppInt.set),
   (0%Z <= k)%Z ->
   ((k + (set.Fset.cardinal (set.SetAppInt.to_fset a)))%Z = n) ->
   (0%Z <= s)%Z ->
@@ -198,11 +200,11 @@ intros col k sol s a b c h1 h2 h3 h4 h5 h6 h7 h8 o h9 o1 h10 h11 f e
         col2 h24 k2 h25 o2 h26 h27 o3 h28 o4 h29 h30 o5 h31 o6 h32 h33 s2
         sol2 k3 col3 h34 h35 h36 h37 h38 h39 f1 h40 k4 h41 e1 h42 h43.
 red; intros i j hij.
-assert (case: (j < s1 \/ s1 <= j)%Z) by omega. destruct case.
-do 2 (rewrite <- h39; try omega).
-apply h17; omega.
-assert (case: (s1 <= i \/ i < s1)%Z) by omega. destruct case.
-apply h36; omega.
+assert (case: (j < s1 \/ s1 <= j)%Z) by lia. destruct case.
+do 2 (rewrite <- h39; try lia).
+apply h17; lia.
+assert (case: (s1 <= i \/ i < s1)%Z) by lia. destruct case.
+apply h36; lia.
 (* s1 <= i < s2 <= j < s3 *)
 red.
 subst k1. (* rename k1 into k.*)
@@ -211,14 +213,14 @@ generalize (Fset.cardinal_nonneg (SetAppInt.to_fset a)).
 generalize (Fset.cardinal_empty (SetAppInt.to_fset a)).
 intros.
 assert (case: (Fset.cardinal (SetAppInt.to_fset a) = 0 \/ 
-              Fset.cardinal (SetAppInt.to_fset a) > 0)%Z) by omega. destruct case.
+              Fset.cardinal (SetAppInt.to_fset a) > 0)%Z) by lia. destruct case.
 absurd (Fset.is_empty (SetAppInt.to_fset a)). auto. intuition.
-omega.
+lia.
 
 assert (ha: eq_prefix col1 (sol1 i) k /\ 
        Fset.mem (sol1 i k) (Fset.diff (SetAppInt.to_fset o1) (SetAppInt.to_fset e))).
   apply (h19 i).
-  omega.
+  lia.
 destruct ha as (ha,hb).
 
 destruct (h37 (sol2 j)) as (_,hj).
@@ -232,27 +234,27 @@ clear h36.
 exists k.
 split. intuition.
 (* eq_prefix ... *)
-rewrite <- h39; try omega.
+rewrite <- h39; try lia.
 split.
 red; intros l hl.
-rewrite <- H3; try omega.
-rewrite <- h38; try omega.
+rewrite <- H3; try lia.
+rewrite <- h38; try lia.
 subst col2.
 generalize (Map.set'def col1 k d l).
 intros (_,h).
 rewrite h.
-rewrite <- ha; omega.
-omega.
+rewrite <- ha; lia.
+lia.
 (* s[i][k] < s[j][k] *)
 apply h18.
-rewrite <- h39; try omega.
+rewrite <- h39; try lia.
 auto.
-rewrite <- H3; try omega.
-rewrite <- h38; try omega.
+rewrite <- H3; try lia.
+rewrite <- h38; try lia.
 subst col2.
 generalize (Map.set'def col1 k d k).
 intros (h,_).
-rewrite h; try omega.
+rewrite h; try lia.
 generalize (set.FsetInt.min_elt_def (SetAppInt.to_fset e)); intuition.
 Qed.
 

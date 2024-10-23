@@ -80,7 +80,7 @@ build/libwmp.a: $(EXTRACTED)
 	ar rcs $@ $(addprefix build/,$(CFILES:.c=.o))
 
 build/tests: tests.c build/libwmp.a
-	$(CC) $(CFLAGS) tests.c -Irandom -Lbuild -lm -lwmp -lgmp -o $@
+	$(CC) $(CFLAGS) $(GMPFLAGS) tests.c -Irandom -Lbuild -lm -lwmp -lgmp -o $@
 
 build/minitests: tests.c build/libwmp.a
 	$(CC) $(CFLAGS) -DCOMPARE_MINI tests.c -Irandom -Imini-gmp -Lbuild -lm -lwmp -o $@
@@ -88,7 +88,7 @@ build/minitests: tests.c build/libwmp.a
 UPPER = $(shell echo $* | tr [:lower:] [:upper:])
 
 build/why3%bench: tests.c build/libwmp.a
-	$(CC) $(CFLAGS) -DTEST_WHY3 -DTEST_$(UPPER) tests.c -Iinclude -Irandom -Lbuild -lm -lwmp -lgmp -o $@
+	$(CC) $(CFLAGS) $(GMPFLAGS) -DTEST_WHY3 -DTEST_$(UPPER) tests.c -Iinclude -Irandom -Lbuild -lm -lwmp -lgmp -o $@
 
 build/gmp%bench: tests.c build/libwmp.a
 	$(CC) $(CFLAGS) $(GMPFLAGS) -DTEST_GMP -DTEST_$(UPPER) tests.c -Iinclude -Irandom -lm -lgmp -o $@
