@@ -745,28 +745,36 @@ and pp_expr ~attr =
         fprintf fmt "@[@[<hv 2>pure {@ %a@] }@]" (pp_term ~attr).marked t
     | Eidpur qid ->
         fprintf fmt "@[<h>{ %a }@]" (pp_qualid ~attr) qid
-    | Eraise (Qident {id_str="'Return"|"'Break"|"'Continue" as str; id_loc; _}, opt_arg) ->
-        let keyword = match str with
-          | "'Return" -> "return"
-          | "'Break" -> "break"
-          | "'Continue" -> "continue"
-          | _ -> assert false in
-        fprintf fmt "@[<hv 2>%a%s%a@]" pp_maybe_marker id_loc keyword
-          (pp_opt ~prefix:" " (pp_expr ~attr).closed) opt_arg
     | Eraise (qid, opt_arg) ->
-        fprintf fmt "raise %a%a" (pp_qualid ~attr) qid
-          (pp_opt ~prefix:" " (pp_expr ~attr).closed) opt_arg
+        begin
+          try
+            match qid with
+            | Qident id ->
+                let keyword =
+                  if id.id_str = Ptree_helpers.return_id then "return" else
+                  if id.id_str = Ptree_helpers.break_id then "break" else
+                  if id.id_str = Ptree_helpers.continue_id then "continue" else
+                    raise Exit
+                in
+                fprintf fmt "@[<hv 2>%a%s%a@]" pp_maybe_marker id.id_loc keyword
+                  (pp_opt ~prefix:" " (pp_expr ~attr).closed) opt_arg
+            | _ -> raise Exit
+          with Exit ->
+            fprintf fmt "raise %a%a" (pp_qualid ~attr) qid
+              (pp_opt ~prefix:" " (pp_expr ~attr).closed) opt_arg
+        end
     | Eexn (id, pty, mask, e) ->
         fprintf fmt "@[%a in@ %a@]" (pp_exn ~attr) (id, pty, mask)
           (pp_expr ~attr).marked e
-    | Eoptexn (id, _mask, e)
-      when List.exists (fun s -> Strings.ends_with id.id_str s) ["'Return"; "'Break"; "'Continue"]
-        && marker id.id_loc = None -> (* Syntactic sugar *)
-        (* TODO mask? *)
+    | Eoptexn (id, _mask, e) when
+        List.exists (fun s -> Strings.ends_with id.id_str s)
+          Ptree_helpers.[return_id; break_id; continue_id]
+        && marker id.id_loc = None ->
+        (* Syntactic sugar *)
         (pp_expr ~attr).marked fmt e
     | Eoptexn (id, mask, e) ->
         if mask <> Ity.MaskVisible then
-          todo fmt "OPTEXN mask<>visible" (* concrete syntax? *)
+          todo fmt "OPTEXN mask<>visible" (* no possible concrete syntax *)
         else
           fprintf fmt "@[<v>exception %a in@ %a@]"
             (pp_id ~attr) id (pp_expr ~attr).marked e

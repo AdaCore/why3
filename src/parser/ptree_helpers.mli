@@ -46,6 +46,10 @@ val pat_var : ?loc:position -> ident -> pattern
 
 (** {2 program expressions} *)
 
+val break_id : string
+val continue_id :string
+val return_id : string
+
 val expr : ?loc:position -> expr_desc -> expr
 
 val econst : ?loc:position -> int -> expr

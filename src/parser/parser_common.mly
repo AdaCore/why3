@@ -70,10 +70,6 @@
     sp_partial = s1.sp_partial || s2.sp_partial;
   }
 
-  let break_id    = "'Break"
-  let continue_id = "'Continue"
-  let return_id   = "'Return"
-
   let apply_return pat sp =
     let apply = function
       | loc, [{pat_desc = Pvar {id_str = "result"; id_loc = l}}, f]
@@ -921,7 +917,7 @@ rec_defn:
 | ghost kind attrs(lident_rich) binders return_opt spec EQUAL spec seq_expr
     { let pat, ty, mask = $5 in
       let spec = apply_return pat (spec_union $6 $8) in
-      let id = mk_id return_id $startpos($7) $endpos($7) in
+      let id = mk_id Ptree_helpers.return_id $startpos($7) $endpos($7) in
       let e = { $9 with expr_desc = Eoptexn (id, mask, $9) } in
       $3, ghost $1, $2, $4, ty, pat, mask, apply_partial_sp $1 spec, e }
 
@@ -929,7 +925,7 @@ fun_defn:
 | binders return_opt spec EQUAL spec seq_expr
     { let pat, ty, mask = $2 in
       let spec = apply_return pat (spec_union $3 $5) in
-      let id = mk_id return_id $startpos($4) $endpos($4) in
+      let id = mk_id Ptree_helpers.return_id $startpos($4) $endpos($4) in
       let e = { $6 with expr_desc = Eoptexn (id, mask, $6) } in
       Efun ($1, ty, pat, mask, spec, e) }
 
@@ -1063,7 +1059,7 @@ single_expr_:
 | LET REC with_list1(rec_defn) IN seq_expr
     { Erec ($3, $5) }
 | FUN binders spec ARROW spec seq_expr
-    { let id = mk_id return_id $startpos($4) $endpos($4) in
+    { let id = mk_id Ptree_helpers.return_id $startpos($4) $endpos($4) in
       let e = { $6 with expr_desc = Eoptexn (id, Ity.MaskVisible, $6) } in
       let p = mk_pat Pwild $startpos $endpos in
       Efun ($2, None, p, Ity.MaskVisible, spec_union $3 $5, e) }
@@ -1103,7 +1099,7 @@ single_expr_:
     { Eexn ($2, fst $3, snd $3, $5) }
 | LABEL id = attrs(uident) IN e = seq_expr
     { let cont e =
-        let id = { id with id_str = id.id_str ^ continue_id } in
+        let id = { id with id_str = id.id_str ^ Ptree_helpers.continue_id } in
         { e with expr_desc = Eoptexn (id, Ity.MaskVisible, e) } in
       let rec over_loop e = { e with expr_desc = over_loop_desc e }
       and over_loop_desc e = match e.expr_desc with
@@ -1115,30 +1111,30 @@ single_expr_:
         | Eoptexn (id, mask, e1) -> Eoptexn (id, mask, over_loop e1)
         | Ewhile (e1, inv, var, e2) ->
             let e = { e with expr_desc = Ewhile (e1, inv, var, cont e2) } in
-            let id = { id with id_str = id.id_str ^ break_id } in
+            let id = { id with id_str = id.id_str ^ Ptree_helpers.break_id } in
             Eoptexn (id, Ity.MaskVisible, e)
         | Efor (i, ef, dir, et, inv, e1) ->
             let e = { e with expr_desc = Efor (i,ef,dir,et,inv,cont e1) } in
-            let id = { id with id_str = id.id_str ^ break_id } in
+            let id = { id with id_str = id.id_str ^ Ptree_helpers.break_id } in
             Eoptexn (id, Ity.MaskVisible, e)
         | d -> d in
       Elabel (id, over_loop e) }
 | WHILE seq_expr DO loop_annotation loop_body DONE
-    { let id_b = mk_id break_id $startpos($3) $endpos($3) in
-      let id_c = mk_id continue_id $startpos($3) $endpos($3) in
+    { let id_b = mk_id Ptree_helpers.break_id $startpos($3) $endpos($3) in
+      let id_c = mk_id Ptree_helpers.continue_id $startpos($3) $endpos($3) in
       let e = { $5 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $5) } in
       let e = mk_expr (Ewhile ($2, fst $4, snd $4, e)) $startpos $endpos in
       Eoptexn (id_b, Ity.MaskVisible, e) }
 | FOR var_binder EQUAL seq_expr for_dir seq_expr DO invariant* loop_body DONE
-    { let id_b = mk_id break_id $startpos($7) $endpos($7) in
-      let id_c = mk_id continue_id $startpos($7) $endpos($7) in
+    { let id_b = mk_id Ptree_helpers.break_id $startpos($7) $endpos($7) in
+      let id_c = mk_id Ptree_helpers.continue_id $startpos($7) $endpos($7) in
       let e = { $9 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $9) } in
       let e = mk_expr (Efor ($2, $4, $5, $6, $8, e)) $startpos $endpos in
       Eoptexn (id_b, Ity.MaskVisible, e) }
 | FOR pattern IN seq_expr WITH uqualid iterator
   DO loop_annotation loop_body DONE
-    { let id_b = mk_id break_id $startpos($8) $endpos($8) in
-      let id_c = mk_id continue_id $startpos($8) $endpos($8) in
+    { let id_b = mk_id Ptree_helpers.break_id $startpos($8) $endpos($8) in
+      let id_c = mk_id Ptree_helpers.continue_id $startpos($8) $endpos($8) in
       let mk d = mk_expr d $startpos $endpos in
       let q s = Qdot ($6, mk_id s $startpos($6) $endpos($6)) in
       let next = mk (Eidapp (q "next", [mk (Eident (Qident $7))])) in
@@ -1157,17 +1153,17 @@ single_expr_:
 | RAISE LEFTPAR uqualid expr_arg? RIGHTPAR
     { Eraise ($3, $4) }
 | RETURN ioption(contract_expr)
-    { let id = mk_id return_id $startpos($1) $endpos($1) in
+    { let id = mk_id Ptree_helpers.return_id $startpos($1) $endpos($1) in
       Eraise (Qident id, $2) }
 | BREAK ioption(uident)
     { let id = match $2 with
-        | Some id -> { id with id_str = id.id_str ^ break_id }
-        | None -> mk_id break_id $startpos($1) $endpos($1) in
+        | Some id -> { id with id_str = id.id_str ^ Ptree_helpers.break_id }
+        | None -> mk_id Ptree_helpers.break_id $startpos($1) $endpos($1) in
       Eraise (Qident id, None) }
 | CONTINUE ioption(uident)
     { let id = match $2 with
-        | Some id -> { id with id_str = id.id_str ^ continue_id }
-        | None -> mk_id continue_id $startpos($1) $endpos($1) in
+        | Some id -> { id with id_str = id.id_str ^ Ptree_helpers.continue_id }
+        | None -> mk_id Ptree_helpers.continue_id $startpos($1) $endpos($1) in
       Eraise (Qident id, None) }
 | TRY seq_expr WITH bar_list1(exn_handler) END
     { Ematch ($2, [], $4) }
