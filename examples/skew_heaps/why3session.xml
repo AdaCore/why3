@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.4.2" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -19,7 +19,7 @@
 </theory>
 <theory name="SkewHeaps" proved="true">
  <goal name="root_is_min&#39;vc" expl="VC for root_is_min" proved="true">
- <proof prover="1"><result status="valid" time="8.661145" steps="52876"/></proof>
+ <proof prover="1"><result status="valid" time="8.661145" steps="52934"/></proof>
  </goal>
  <goal name="empty&#39;vc" expl="VC for empty" proved="true">
  <proof prover="1"><result status="valid" time="0.000000" steps="21"/></proof>
@@ -30,62 +30,62 @@
  <goal name="merge&#39;vc" expl="VC for merge" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="merge&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.060000" steps="5468"/></proof>
+  <proof prover="4"><result status="valid" time="0.060000" steps="5121"/></proof>
   </goal>
   <goal name="merge&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.040000" steps="3730"/></proof>
+  <proof prover="4"><result status="valid" time="0.040000" steps="3516"/></proof>
   </goal>
   <goal name="merge&#39;vc.2" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.070000" steps="5524"/></proof>
+  <proof prover="4"><result status="valid" time="0.070000" steps="5176"/></proof>
   </goal>
   <goal name="merge&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.040000" steps="3734"/></proof>
+  <proof prover="4"><result status="valid" time="0.040000" steps="3520"/></proof>
   </goal>
   <goal name="merge&#39;vc.4" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="merge&#39;vc.4.0" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.030000" steps="3702"/></proof>
+   <proof prover="4"><result status="valid" time="0.030000" steps="3401"/></proof>
    </goal>
    <goal name="merge&#39;vc.4.1" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.040000" steps="4003"/></proof>
+   <proof prover="4"><result status="valid" time="0.040000" steps="3713"/></proof>
    </goal>
    <goal name="merge&#39;vc.4.2" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.040000" steps="4003"/></proof>
+   <proof prover="4"><result status="valid" time="0.040000" steps="3713"/></proof>
    </goal>
    <goal name="merge&#39;vc.4.3" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="1.010611" steps="92499"/></proof>
+   <proof prover="6"><result status="valid" time="1.010611" steps="86343"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="merge&#39;vc.5" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="merge&#39;vc.5.0" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.050000" steps="3927"/></proof>
+   <proof prover="4"><result status="valid" time="0.050000" steps="3626"/></proof>
    </goal>
    <goal name="merge&#39;vc.5.1" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.030000" steps="4214"/></proof>
+   <proof prover="4"><result status="valid" time="0.030000" steps="3924"/></proof>
    </goal>
    <goal name="merge&#39;vc.5.2" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.040000" steps="4214"/></proof>
+   <proof prover="4"><result status="valid" time="0.040000" steps="3924"/></proof>
    </goal>
    <goal name="merge&#39;vc.5.3" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.040000" steps="9977"/></proof>
+   <proof prover="6"><result status="valid" time="0.040000" steps="9774"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="merge&#39;vc.6" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="merge&#39;vc.6.0" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.040000" steps="3938"/></proof>
+   <proof prover="4"><result status="valid" time="0.040000" steps="3637"/></proof>
    </goal>
    <goal name="merge&#39;vc.6.1" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.030000" steps="4211"/></proof>
+   <proof prover="4"><result status="valid" time="0.030000" steps="3921"/></proof>
    </goal>
    <goal name="merge&#39;vc.6.2" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.040000" steps="4211"/></proof>
+   <proof prover="4"><result status="valid" time="0.040000" steps="3921"/></proof>
    </goal>
    <goal name="merge&#39;vc.6.3" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.050000" steps="5100"/></proof>
+   <proof prover="6"><result status="valid" time="0.050000" steps="4974"/></proof>
    </goal>
   </transf>
   </goal>
@@ -126,8 +126,8 @@
   <proof prover="7"><result status="valid" time="0.010000" steps="34"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.8" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.020000" steps="60718"/></proof>
-  <proof prover="4"><result status="valid" time="0.070000" steps="15941"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="58741"/></proof>
+  <proof prover="4"><result status="valid" time="0.070000" steps="15458"/></proof>
   <proof prover="7"><result status="valid" time="0.010000" steps="14"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.9" expl="loop invariant init" proved="true">
@@ -146,7 +146,7 @@
   <proof prover="7"><result status="valid" time="0.010000" steps="30"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.14" expl="loop invariant preservation" proved="true">
-  <proof prover="2" timelimit="1"><result status="valid" time="0.253648" steps="370541"/></proof>
+  <proof prover="2" timelimit="1"><result status="valid" time="1.242218" steps="1647088"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.15" expl="loop invariant preservation" proved="true">
   <proof prover="7"><result status="valid" time="0.020000" steps="50"/></proof>
@@ -155,7 +155,7 @@
   <proof prover="3"><result status="valid" time="0.100000" steps="29125"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.17" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="1.257167" steps="134229"/></proof>
+  <proof prover="0"><result status="valid" time="1.257167" steps="134040"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.18" expl="postcondition" proved="true">
   <proof prover="7"><result status="valid" time="0.010000" steps="68"/></proof>

@@ -9,7 +9,7 @@ let test (b:int) =
   let a : t = safe_mul x z in
   let c : t = (0x1p1023:t) in
   let zer : t = (0.0:t) in
-  let wrong =
+  let _wrong =
     (* wrong tests in parallel to avoid inconsistent context *)
     if b = 0 then safe_div a zer else
     if b = 1 then safe_mul y c else

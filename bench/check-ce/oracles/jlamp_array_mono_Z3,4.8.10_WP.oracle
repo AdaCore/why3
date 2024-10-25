@@ -11,17 +11,19 @@ Prover result is: Valid (355 steps).
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
 File "bench/check-ce/jlamp_array_mono.mlw", line 48, characters 4-16:
 Sub-goal Index in array bounds of goal f'vc.
-Prover result is: Step limit exceeded (3000038 steps).
+Prover result is: Unknown (sat) (444 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_mono.mlw:
+  Line 8:
+    to_int : t -> int = [|{to_int => 3} => 3; _ => 2|]
   Line 11:
-    two :  = "undefined"
+    two : t = {to_int => 2}
   Line 14:
-    three :  = "undefined"
+    three : t = {to_int => 3}
   Line 44:
-    a :  = "undefined"
-    a :  = "undefined"
+    a :  = {elts = [|_ => {to_int => 3}|]; length = 0}
+    a : array = {elts = [|_ => {to_int => 3}|]; length = 0}
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -46,7 +48,7 @@ File jlamp_array_mono.mlw:
 
 File "bench/check-ce/jlamp_array_mono.mlw", line 54, characters 4-16:
 Sub-goal Index in array bounds of goal g'vc.
-Prover result is: Valid (588 steps).
+Prover result is: Valid (336 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -71,7 +73,7 @@ File jlamp_array_mono.mlw:
 
 File "bench/check-ce/jlamp_array_mono.mlw", line 60, characters 4-16:
 Sub-goal Index in array bounds of goal h'vc.
-Prover result is: Valid (588 steps).
+Prover result is: Valid (336 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE

@@ -537,8 +537,8 @@ let create_let_decl ld =
                 t_subst_fmla v t f in
     List.map conv ql in
   let attrs = sattr_w_nce_no in
-  let cty_axiom id cty f axms =
-    if t_equal f t_true then axms else
+  let cty_axiom lsopt id cty f axms metas =
+    if t_equal f t_true then axms, metas else
     (* we do not care about aliases for pure symbols *)
     let add_old o v m = Mvs.add o.pv_vs (t_var v.pv_vs) m in
     let sbs = Mpv.fold add_old cty.cty_oldies Mvs.empty in
@@ -546,38 +546,44 @@ let create_let_decl ld =
     let args = List.map (fun v -> v.pv_vs) cty.cty_args in
     let f = t_forall_close_simp args [] f in
     let f = t_forall_close (Mvs.keys (t_vars f)) [] f in
-    create_prop_decl Paxiom (create_prsymbol id) f :: axms in
-  let post_axioms id nm cty t axms =
+    let pr = create_prsymbol id in
+    let metas = match lsopt with
+      | None -> metas
+      | Some ls -> Theory.(meta_depends,[MApr pr; MAls ls]) :: metas
+    in
+    create_prop_decl Paxiom pr f :: axms, metas
+  in
+  let post_axioms lsopt id nm cty t axms metas =
     let cnt = ref (-1) in
-    let fold f axms =
+    let fold f (axms,metas) =
       let nm =
         if !cnt = -1 then nm else
         Printf.sprintf "%s'%d" nm !cnt
       in
       incr cnt;
-      cty_axiom (id_derive ~attrs nm id) cty f axms
+      cty_axiom lsopt (id_derive ~attrs nm id) cty f axms metas
     in
-    List.fold_right fold (conv_post t cty.cty_post) axms
+    List.fold_right fold (conv_post t cty.cty_post) (axms,metas)
   in
-  let add_rs sm s ({c_cty = cty} as c) (abst,defn,axms) =
+  let add_rs sm s ({c_cty = cty} as c) (abst,defn,axms,metas) =
     match s.rs_logic with
     | RLpv _ -> invalid_arg "Pdecl.create_let_decl"
-    | RLnone -> abst, defn, axms
+    | RLnone -> abst, defn, axms, metas
     | RLlemma ->
-        let axms = if ity_equal cty.cty_result ity_unit then
-          post_axioms s.rs_name s.rs_name.id_string cty t_void axms
+        let axms, metas = if ity_equal cty.cty_result ity_unit then
+          post_axioms None s.rs_name s.rs_name.id_string cty t_void axms metas
         else match cty.cty_post with
           | q::ql ->
               let v, f = open_post q in
               let fl = f :: conv_post (t_var v) ql in
               let f = t_exists_close [v] [] (t_and_simp_l fl) in
-              cty_axiom (id_clone ~attrs s.rs_name) cty f axms
-          | [] -> axms in
-        abst, defn, axms
+              cty_axiom None (id_clone ~attrs s.rs_name) cty f axms metas
+          | [] -> (axms,metas) in
+        abst, defn, axms, metas
     | RLls ({ls_name = id} as ls) ->
         let vl = List.map (fun v -> v.pv_vs) cty.cty_args in
         let hd = t_app ls (List.map t_var vl) ls.ls_value in
-        let axms = post_axioms id (id.id_string ^ "'spec") cty hd axms in
+        let axms, metas = post_axioms (Some ls) id (id.id_string ^ "'spec") cty hd axms metas in
         let c = if Mrs.is_empty sm then c else c_rs_subst sm c in
         begin match c.c_node with
         | Cany | Capp _ | Cpur _ ->
@@ -587,38 +593,38 @@ let create_let_decl ld =
                a definition from it. We only produce definitions via
                term_of_expr from a Cfun, and the user must eta-expand
                to obtain one. *)
-            create_param_decl ls :: abst, defn, axms
+            create_param_decl ls :: abst, defn, axms, metas
         | Cfun e ->
             begin match term_of_expr ~prop:(ls.ls_value = None) e with
             | Some f when cty.cty_pre = [] ->
-                abst, (ls, vl, f) :: defn, axms
+                abst, (ls, vl, f) :: defn, axms, metas
             | Some f ->
                 let f = t_insert hd f and nm = id.id_string ^ "'def" in
-                let axms = cty_axiom (id_derive ~attrs nm id) cty f axms in
-                create_param_decl ls :: abst, defn, axms
+                let axms, metas = cty_axiom (Some ls) (id_derive ~attrs nm id) cty f axms metas in
+                create_param_decl ls :: abst, defn, axms, metas
             | None when cty.cty_post = [] ->
-                let axms = match post_of_expr hd e with
+                let axms, metas = match post_of_expr hd e with
                   | Some f ->
                       let nm = id.id_string ^ "'def" in
-                      cty_axiom (id_derive ~attrs nm id) cty f axms
-                  | None -> axms in
-                create_param_decl ls :: abst, defn, axms
+                      cty_axiom (Some ls) (id_derive ~attrs nm id) cty f axms metas
+                  | None -> axms, metas in
+                create_param_decl ls :: abst, defn, axms, metas
             | None ->
-                create_param_decl ls :: abst, defn, axms
+                create_param_decl ls :: abst, defn, axms, metas
             end
         end in
-  let abst, defn, axms = match ld with
+  let abst, defn, axms, metas = match ld with
     | LDvar ({pv_vs = {vs_name = {id_loc = loc}}},e) ->
         if not (ity_closed e.e_ity) then
           Loc.errorm ?loc "Top-level variables must have monomorphic type";
-        [], [], []
+        [], [], [], []
     | LDrec rdl ->
         let add_rd sm d = Mrs.add d.rec_rsym d.rec_sym sm in
         let sm = List.fold_left add_rd Mrs.empty rdl in
         let add_rd d dl = add_rs sm d.rec_sym d.rec_fun dl in
-        List.fold_right add_rd rdl ([],[],[])
+        List.fold_right add_rd rdl ([],[],[],[])
     | LDsym (s,c) ->
-        add_rs Mrs.empty s c ([],[],[]) in
+        add_rs Mrs.empty s c ([],[],[],[]) in
   let defn = if defn = [] then [] else
     let dl = List.map (fun (s,vl,t) -> make_ls_defn s vl t) defn in
     try [create_logic_decl dl] with Decl.NoTerminationProof _ ->
@@ -630,7 +636,7 @@ let create_let_decl ld =
       let ax = t_forall_close vl [] (t_insert hd t) in
       create_prop_decl Paxiom pr ax in
     abst @ List.map mk_ax defn in
-  mk_decl (PDlet ld) (abst @ defn @ axms)
+  mk_decl_meta metas (PDlet ld) (abst @ defn @ axms)
 
 let create_exn_decl xs =
   if not (ity_closed xs.xs_ity) then Loc.errorm ?loc:xs.xs_name.id_loc

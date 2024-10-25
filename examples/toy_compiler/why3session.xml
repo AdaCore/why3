@@ -2,6 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.5.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -10,39 +11,39 @@
  <goal name="soundness_gen&#39;vc" expl="VC for soundness_gen" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="soundness_gen&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.304260" steps="1047263"/></proof>
+  <proof prover="0"><result status="valid" time="0.023659" steps="83"/></proof>
   </goal>
   <goal name="soundness_gen&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.021553" steps="3219"/></proof>
+  <proof prover="4"><result status="valid" time="0.021553" steps="3021"/></proof>
   </goal>
   <goal name="soundness_gen&#39;vc.2" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.027911" steps="8387"/></proof>
+  <proof prover="4"><result status="valid" time="0.027911" steps="7865"/></proof>
   </goal>
   <goal name="soundness_gen&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.020118" steps="3223"/></proof>
+  <proof prover="4"><result status="valid" time="0.020118" steps="3025"/></proof>
   </goal>
   <goal name="soundness_gen&#39;vc.4" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.026882" steps="8391"/></proof>
+  <proof prover="4"><result status="valid" time="0.026882" steps="7869"/></proof>
   </goal>
   <goal name="soundness_gen&#39;vc.5" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.023366" steps="3223"/></proof>
+  <proof prover="4"><result status="valid" time="0.023366" steps="3025"/></proof>
   </goal>
   <goal name="soundness_gen&#39;vc.6" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.020221" steps="8391"/></proof>
+  <proof prover="4"><result status="valid" time="0.020221" steps="7869"/></proof>
   </goal>
   <goal name="soundness_gen&#39;vc.7" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="soundness_gen&#39;vc.7.0" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.040300" steps="31288"/></proof>
+   <proof prover="4"><result status="valid" time="0.040300" steps="28858"/></proof>
    </goal>
    <goal name="soundness_gen&#39;vc.7.1" expl="postcondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.287982" steps="25493"/></proof>
+   <proof prover="2"><result status="valid" time="0.287982" steps="24803"/></proof>
    </goal>
    <goal name="soundness_gen&#39;vc.7.2" expl="postcondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.292204" steps="25555"/></proof>
+   <proof prover="2"><result status="valid" time="0.292204" steps="24865"/></proof>
    </goal>
    <goal name="soundness_gen&#39;vc.7.3" expl="postcondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.277991" steps="24337"/></proof>
+   <proof prover="2"><result status="valid" time="0.277991" steps="23609"/></proof>
    </goal>
   </transf>
   </goal>
@@ -51,10 +52,10 @@
  <goal name="soundness&#39;vc" expl="VC for soundness" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="soundness&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.041077" steps="26336"/></proof>
+  <proof prover="4"><result status="valid" time="0.041077" steps="24523"/></proof>
   </goal>
   <goal name="soundness&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="30"><result status="valid" time="0.106012" steps="11123"/></proof>
+  <proof prover="2" timelimit="30"><result status="valid" time="0.106012" steps="10679"/></proof>
   </goal>
  </transf>
  </goal>

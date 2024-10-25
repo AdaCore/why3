@@ -642,6 +642,29 @@ let select_model_from_giant_step_rac_results ?strategy models =
         models;
   selected
 
+let select_model_from_verdict models =
+  let classified_models =
+    let add_verdict (i,r,m,normal_res,giant_res) =
+      let verdict = match normal_res,giant_res with
+      | RAC_not_done reason, _ | _, RAC_not_done reason ->
+          INCOMPLETE reason, Log.empty_log
+      | RAC_done (normal_state,normal_log), RAC_done (giant_state,giant_log) ->
+          let vc_term_loc = get_model_term_loc m in
+          let vc_term_attrs = get_model_term_attrs m in
+          classify ~vc_term_loc ~vc_term_attrs
+            ~normal_result:(normal_state,normal_log)
+            ~giant_step_result:(giant_state,giant_log)
+      in
+      i,r,m,normal_res,giant_res,verdict in
+    List.map add_verdict models in
+  let selected, selected_ix =
+    match List.nth_opt (first_good_model classified_models) 0 with
+    | None -> None, None
+    | Some (i,_,m,_,_,s) -> Some (m, s), Some i in
+  if classified_models <> [] then
+    Debug.dprintf debug_check_ce_categorization "Categorizations of models:@ %a@."
+      Pp.(print_list newline (print_dbg_classified_model selected_ix)) classified_models;
+  selected
 
 let get_rac_results ~limits ?verb_lvl ?compute_term
     ?only_giant_step rac env pm models =
@@ -740,8 +763,8 @@ let concrete_string_from_vs vs =
 
 let concrete_of_constant c = (match c with
 | Constant.ConstInt Number.{ il_kind; il_int } ->
-  Const (Integer { int_value = Number.{il_kind; il_int};
-                   int_verbatim = BigInt.to_string il_int })
+  Const (Integer {int_value=Number.{il_kind; il_int};
+                  int_verbatim= BigInt.to_string il_int })
 | Constant.ConstReal rconst ->
   Const (Real
   {real_value = rconst;
@@ -810,7 +833,7 @@ and concrete_term_of_term (m : concrete_syntax_term Mvs.t) =
           let vs,_,t = t_open_lambda tm in
           begin match vs with
           | [v] -> let elts, others = get_array m v t in FunctionLiteral {elts; others}
-          | (_::_) as vs ->
+          | (v::_) as vs ->
             let concrete_vars = List.map concrete_string_from_vs vs in
             let updated_map = List.fold_left (fun acc v -> Mvs.add v (Var (concrete_string_from_vs v)) acc) m vs in
             let function_body = concrete_term_of_term updated_map t in
@@ -865,7 +888,7 @@ let rec model_value v =
     let ns = List.map (fun rs -> id_name rs.rs_name) frs in
     Record (List.combine ns vs)
   (* Why does the Vfun case happen? Also, I didn't see these values show up in the end *)
-  | Vfun (_vars, bvar, e) -> concrete_of_expr Mpv.empty (Mvs.of_list [bvar, Var (concrete_string_from_vs bvar)]) e
+  | Vfun (vars, bvar, e) -> concrete_of_expr Mpv.empty (Mvs.of_list [bvar, Var (concrete_string_from_vs bvar)]) e
   | Vpurefun _  -> failwith "Cannot convert pure fun to model value"
   | Vundefined -> (Const (String "undefined"))
   | Vterm t -> concrete_term_of_term Mvs.empty t
@@ -884,7 +907,6 @@ let rec model_value v =
 (** In case there is no model element in the smt2 model at a LOC that is present in the RAC log,
     this function fills the missing information to create a model element *)
 let model_element_of_unmatched_log_entry ?loc id me_concrete_value ty =
-  ignore loc;
   if id.id_string <> "zero" && id.id_string <> "one" then
     let dummy_term = Term.t_true in
     let dummy_ls = create_lsymbol (Ident.id_clone id) [] (Some ty) in
@@ -914,7 +936,7 @@ let model_of_exec_log ~original_model log =
     let me_value = Term.t_bool_false in
     Some { me_name;me_kind;me_attrs;me_value; me_location = loc; me_concrete_value; me_lsymbol} *)
     Some {me with me_concrete_value = model_value value}
-  | None -> model_element_of_unmatched_log_entry ~loc id (model_value value) value.Value.v_ty
+  | None -> model_element_of_unmatched_log_entry ~loc id (model_value value) value.v_ty
   )
   in
   let me_of_log_entry e = match e.Log.log_loc with
@@ -965,7 +987,6 @@ let select_model_from_verdict models =
     Debug.dprintf debug_check_ce_categorization "Categorizations of models:@ %a@."
       Pp.(print_list newline (print_dbg_classified_model selected_ix)) classified_models;
   selected
-
 
 let select_model ~limits ?verb_lvl ?compute_term ~check_ce
     rac env pm models =

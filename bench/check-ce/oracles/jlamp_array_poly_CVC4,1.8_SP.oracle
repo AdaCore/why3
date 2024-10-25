@@ -7,7 +7,7 @@
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
 File "bench/check-ce/jlamp_array_poly.mlw", line 22, characters 4-16:
 Sub-goal Index in array bounds of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (2874 steps).
+Prover result is: Unknown (unknown + incomplete) (2465 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_poly.mlw:
@@ -16,7 +16,7 @@ File jlamp_array_poly.mlw:
       t
       ->
       int = [|_ =>
-              if (infix = {to_int => 3} bOUND_VARIABLE_6883) then 3 else 2|]
+              if (infix = {to_int => 3} bOUND_VARIABLE_6343) then 3 else 2|]
   Line 11:
     two : t = {to_int => 2}
   Line 14:
@@ -54,7 +54,7 @@ File jlamp_array_poly.mlw:
 
 File "bench/check-ce/jlamp_array_poly.mlw", line 28, characters 4-16:
 Sub-goal Index in array bounds of goal g'vc.
-Prover result is: Valid (2066 steps).
+Prover result is: Valid (1741 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -74,7 +74,7 @@ Sorry, we don't have a good counterexample for you :(
 
 File "bench/check-ce/jlamp_array_poly.mlw", line 34, characters 4-16:
 Sub-goal Index in array bounds of goal h'vc.
-Prover result is: Valid (2105 steps).
+Prover result is: Valid (1780 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
