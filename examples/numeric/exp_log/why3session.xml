@@ -9,10 +9,10 @@
  <goal name="example1&#39;vc" expl="VC for example1" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="example1&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.099935" steps="995"/></proof>
+  <proof prover="0"><result status="valid" time="0.099935" steps="869"/></proof>
   </goal>
   <goal name="example1&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.133523" steps="1147"/></proof>
+  <proof prover="0"><result status="valid" time="0.133523" steps="1138"/></proof>
   </goal>
   <goal name="example1&#39;vc.2" expl="postcondition" proved="true">
   <transf name="assert" proved="true" arg1="let t3 = log (exp (to_real y)) in
@@ -56,10 +56,10 @@ abs (to_real result -. (t4 +. t3))
         <proof prover="0"><result status="valid" time="0.066218" steps="139"/></proof>
         </goal>
         <goal name="example1&#39;vc.2.0.0.0.0.0.2" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.155626" steps="1127"/></proof>
+        <proof prover="0"><result status="valid" time="0.155626" steps="1123"/></proof>
         </goal>
         <goal name="example1&#39;vc.2.0.0.0.0.0.3" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.292973" steps="1224"/></proof>
+        <proof prover="0"><result status="valid" time="0.292973" steps="1211"/></proof>
         </goal>
         <goal name="example1&#39;vc.2.0.0.0.0.0.4" expl="apply premises" proved="true">
         <proof prover="0"><result status="valid" time="0.055604" steps="113"/></proof>
@@ -67,7 +67,7 @@ abs (to_real result -. (t4 +. t3))
        </transf>
        </goal>
        <goal name="example1&#39;vc.2.0.0.0.0.1" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="1.919679" steps="11170"/></proof>
+       <proof prover="0"><result status="valid" time="1.919679" steps="11510"/></proof>
        </goal>
       </transf>
       </goal>
@@ -97,10 +97,10 @@ abs (to_real result -. (t4 +. t3))
         <proof prover="0"><result status="valid" time="0.065825" steps="139"/></proof>
         </goal>
         <goal name="example1&#39;vc.2.0.0.1.0.0.2" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.202765" steps="1120"/></proof>
+        <proof prover="0"><result status="valid" time="0.202765" steps="1119"/></proof>
         </goal>
         <goal name="example1&#39;vc.2.0.0.1.0.0.3" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.216068" steps="1168"/></proof>
+        <proof prover="0"><result status="valid" time="0.216068" steps="1165"/></proof>
         </goal>
         <goal name="example1&#39;vc.2.0.0.1.0.0.4" expl="apply premises" proved="true">
         <proof prover="0"><result status="valid" time="0.090507" steps="113"/></proof>
@@ -108,7 +108,7 @@ abs (to_real result -. (t4 +. t3))
        </transf>
        </goal>
        <goal name="example1&#39;vc.2.0.0.1.0.1" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="2.109322" steps="12947"/></proof>
+       <proof prover="0"><result status="valid" time="2.109322" steps="11407"/></proof>
        </goal>
       </transf>
       </goal>
@@ -130,10 +130,10 @@ abs (to_real result -. (t4 +. t3))
      <proof prover="0"><result status="valid" time="0.044891" steps="113"/></proof>
      </goal>
      <goal name="example1&#39;vc.2.0.0.6" expl="apply premises" proved="true">
-     <proof prover="0"><result status="valid" time="0.135051" steps="775"/></proof>
+     <proof prover="0"><result status="valid" time="0.135051" steps="773"/></proof>
      </goal>
      <goal name="example1&#39;vc.2.0.0.7" expl="apply premises" proved="true">
-     <proof prover="0"><result status="valid" time="0.147596" steps="775"/></proof>
+     <proof prover="0"><result status="valid" time="0.147596" steps="773"/></proof>
      </goal>
      <goal name="example1&#39;vc.2.0.0.8" expl="apply premises" proved="true">
      <proof prover="0"><result status="valid" time="0.053723" steps="113"/></proof>
@@ -141,7 +141,7 @@ abs (to_real result -. (t4 +. t3))
     </transf>
     </goal>
     <goal name="example1&#39;vc.2.0.1" expl="asserted formula" proved="true">
-    <proof prover="0"><result status="valid" time="0.094205" steps="313"/></proof>
+    <proof prover="0"><result status="valid" time="0.094205" steps="314"/></proof>
     </goal>
    </transf>
    </goal>
@@ -155,7 +155,7 @@ abs (to_real result -. (t4 +. t3))
  <goal name="example2&#39;vc" expl="VC for example2" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="example2&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.190269" steps="1804"/></proof>
+  <proof prover="0"><result status="valid" time="0.190269" steps="1639"/></proof>
   </goal>
   <goal name="example2&#39;vc.1" expl="postcondition" proved="true">
   <transf name="assert" proved="true" arg1="let t = log (exp (to_real x) +. exp (to_real y)) in
@@ -194,16 +194,16 @@ abs (to_real result -. t)
        <goal name="example2&#39;vc.1.0.0.0.0.0" expl="asserted formula" proved="true">
        <transf name="apply" proved="true" arg1="uadd_single_error_propagation" arg2="with" arg3="exp_approx x,exp_approx y">
         <goal name="example2&#39;vc.1.0.0.0.0.0.0" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.058112" steps="115"/></proof>
+        <proof prover="0"><result status="valid" time="0.058112" steps="114"/></proof>
         </goal>
         <goal name="example2&#39;vc.1.0.0.0.0.0.1" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.062115" steps="115"/></proof>
+        <proof prover="0"><result status="valid" time="0.062115" steps="114"/></proof>
         </goal>
         <goal name="example2&#39;vc.1.0.0.0.0.0.2" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.151173" steps="992"/></proof>
+        <proof prover="0"><result status="valid" time="0.151173" steps="944"/></proof>
         </goal>
         <goal name="example2&#39;vc.1.0.0.0.0.0.3" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.195041" steps="977"/></proof>
+        <proof prover="0"><result status="valid" time="0.195041" steps="943"/></proof>
         </goal>
         <goal name="example2&#39;vc.1.0.0.0.0.0.4" expl="apply premises" proved="true">
         <proof prover="0"><result status="valid" time="0.052021" steps="106"/></proof>
@@ -228,13 +228,13 @@ abs (to_real result -. t)
       </transf>
       </goal>
       <goal name="example2&#39;vc.1.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.053816" steps="134"/></proof>
+      <proof prover="0"><result status="valid" time="0.053816" steps="132"/></proof>
       </goal>
       <goal name="example2&#39;vc.1.0.0.0.2" expl="apply premises" proved="true">
       <proof prover="0"><result status="valid" time="0.116471" steps="727"/></proof>
       </goal>
       <goal name="example2&#39;vc.1.0.0.0.3" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.205825" steps="1172"/></proof>
+      <proof prover="0"><result status="valid" time="0.205825" steps="1152"/></proof>
       </goal>
       <goal name="example2&#39;vc.1.0.0.0.4" expl="apply premises" proved="true">
       <proof prover="0"><result status="valid" time="0.075268" steps="106"/></proof>
@@ -242,12 +242,12 @@ abs (to_real result -. t)
      </transf>
      </goal>
      <goal name="example2&#39;vc.1.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="1.950455" steps="12505"/></proof>
+     <proof prover="0"><result status="valid" time="1.950455" steps="12497"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="example2&#39;vc.1.0.1" expl="asserted formula" proved="true">
-    <proof prover="0"><result status="valid" time="0.066275" steps="162"/></proof>
+    <proof prover="0"><result status="valid" time="0.066275" steps="164"/></proof>
     </goal>
    </transf>
    </goal>
@@ -261,7 +261,7 @@ abs (to_real result -. t)
  <goal name="example3&#39;vc" expl="VC for example3" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="example3&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.086160" steps="790"/></proof>
+  <proof prover="0"><result status="valid" time="0.086160" steps="588"/></proof>
   </goal>
   <goal name="example3&#39;vc.1" expl="postcondition" proved="true">
   <transf name="assert" proved="true" arg1="let t = log2 (to_real x +. to_real y) in
@@ -286,15 +286,15 @@ abs (to_real result -. t)
       <transf name="assert" proved="true" arg1="abs (to_real (x ++. y) -. (to_real x +. to_real y))
 &lt;=. (eps *. abs (to_real x +. to_real y))">
        <goal name="example3&#39;vc.1.0.0.0.0.0" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="0.138606" steps="1008"/></proof>
+       <proof prover="0"><result status="valid" time="0.138606" steps="773"/></proof>
        </goal>
        <goal name="example3&#39;vc.1.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.060096" steps="124"/></proof>
+       <proof prover="0"><result status="valid" time="0.060096" steps="123"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="example3&#39;vc.1.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.065559" steps="128"/></proof>
+      <proof prover="0"><result status="valid" time="0.065559" steps="127"/></proof>
       </goal>
       <goal name="example3&#39;vc.1.0.0.0.2" expl="apply premises" proved="true">
       <proof prover="0"><result status="valid" time="0.068605" steps="106"/></proof>
@@ -308,17 +308,17 @@ abs (to_real result -. t)
      </transf>
      </goal>
      <goal name="example3&#39;vc.1.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.067871" steps="169"/></proof>
+     <proof prover="0"><result status="valid" time="0.067871" steps="171"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="example3&#39;vc.1.0.1" expl="asserted formula" proved="true">
-    <proof prover="0"><result status="valid" time="0.061491" steps="158"/></proof>
+    <proof prover="0"><result status="valid" time="0.061491" steps="157"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="example3&#39;vc.1.1" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.048102" steps="149"/></proof>
+   <proof prover="0"><result status="valid" time="0.048102" steps="150"/></proof>
    </goal>
   </transf>
   </goal>
@@ -327,7 +327,7 @@ abs (to_real result -. t)
  <goal name="example4&#39;vc" expl="VC for example4" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="example4&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.087385" steps="790"/></proof>
+  <proof prover="0"><result status="valid" time="0.087385" steps="588"/></proof>
   </goal>
   <goal name="example4&#39;vc.1" expl="postcondition" proved="true">
   <transf name="assert" proved="true" arg1="let t = log10 (to_real x +. to_real y) in
@@ -353,15 +353,15 @@ abs (to_real result -. t)
       <transf name="assert" proved="true" arg1="abs (to_real (x ++. y) -. (to_real x +. to_real y))
 &lt;=. (eps *. abs (to_real x +. to_real y))">
        <goal name="example4&#39;vc.1.0.0.0.0.0" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="0.150117" steps="1012"/></proof>
+       <proof prover="0"><result status="valid" time="0.150117" steps="773"/></proof>
        </goal>
        <goal name="example4&#39;vc.1.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.056298" steps="124"/></proof>
+       <proof prover="0"><result status="valid" time="0.056298" steps="123"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="example4&#39;vc.1.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.069932" steps="128"/></proof>
+      <proof prover="0"><result status="valid" time="0.069932" steps="127"/></proof>
       </goal>
       <goal name="example4&#39;vc.1.0.0.0.2" expl="apply premises" proved="true">
       <proof prover="0"><result status="valid" time="0.073209" steps="106"/></proof>
@@ -375,17 +375,17 @@ abs (to_real result -. t)
      </transf>
      </goal>
      <goal name="example4&#39;vc.1.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.069611" steps="169"/></proof>
+     <proof prover="0"><result status="valid" time="0.069611" steps="171"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="example4&#39;vc.1.0.1" expl="asserted formula" proved="true">
-    <proof prover="0"><result status="valid" time="0.058950" steps="158"/></proof>
+    <proof prover="0"><result status="valid" time="0.058950" steps="157"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="example4&#39;vc.1.1" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.039820" steps="149"/></proof>
+   <proof prover="0"><result status="valid" time="0.039820" steps="150"/></proof>
    </goal>
   </transf>
   </goal>
@@ -396,10 +396,10 @@ abs (to_real result -. t)
  <goal name="example1&#39;vc" expl="VC for example1" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="example1&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.103938" steps="995"/></proof>
+  <proof prover="0"><result status="valid" time="0.103938" steps="868"/></proof>
   </goal>
   <goal name="example1&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.136607" steps="1146"/></proof>
+  <proof prover="0"><result status="valid" time="0.136607" steps="1143"/></proof>
   </goal>
   <goal name="example1&#39;vc.2" expl="postcondition" proved="true">
   <transf name="assert" proved="true" arg1="let t3 = log (exp (to_real y)) in
@@ -443,10 +443,10 @@ abs (to_real result -. (t4 +. t3))
         <proof prover="0"><result status="valid" time="0.066207" steps="139"/></proof>
         </goal>
         <goal name="example1&#39;vc.2.0.0.0.0.0.2" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.148397" steps="1126"/></proof>
+        <proof prover="0"><result status="valid" time="0.148397" steps="1125"/></proof>
         </goal>
         <goal name="example1&#39;vc.2.0.0.0.0.0.3" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.237261" steps="1236"/></proof>
+        <proof prover="0"><result status="valid" time="0.237261" steps="1205"/></proof>
         </goal>
         <goal name="example1&#39;vc.2.0.0.0.0.0.4" expl="apply premises" proved="true">
         <proof prover="0"><result status="valid" time="0.081769" steps="113"/></proof>
@@ -454,7 +454,7 @@ abs (to_real result -. (t4 +. t3))
        </transf>
        </goal>
        <goal name="example1&#39;vc.2.0.0.0.0.1" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="2.842958" steps="17730"/></proof>
+       <proof prover="0"><result status="valid" time="1.903047" steps="11502"/></proof>
        </goal>
       </transf>
       </goal>
@@ -484,10 +484,10 @@ abs (to_real result -. (t4 +. t3))
         <proof prover="0"><result status="valid" time="0.083584" steps="139"/></proof>
         </goal>
         <goal name="example1&#39;vc.2.0.0.1.0.0.2" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.170696" steps="1121"/></proof>
+        <proof prover="0"><result status="valid" time="0.170696" steps="1119"/></proof>
         </goal>
         <goal name="example1&#39;vc.2.0.0.1.0.0.3" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.261198" steps="1159"/></proof>
+        <proof prover="0"><result status="valid" time="0.261198" steps="1171"/></proof>
         </goal>
         <goal name="example1&#39;vc.2.0.0.1.0.0.4" expl="apply premises" proved="true">
         <proof prover="0"><result status="valid" time="0.094898" steps="113"/></proof>
@@ -495,7 +495,7 @@ abs (to_real result -. (t4 +. t3))
        </transf>
        </goal>
        <goal name="example1&#39;vc.2.0.0.1.0.1" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="2.108976" steps="11398"/></proof>
+       <proof prover="0"><result status="valid" time="2.108976" steps="12636"/></proof>
        </goal>
       </transf>
       </goal>
@@ -517,10 +517,10 @@ abs (to_real result -. (t4 +. t3))
      <proof prover="0"><result status="valid" time="0.074363" steps="113"/></proof>
      </goal>
      <goal name="example1&#39;vc.2.0.0.6" expl="apply premises" proved="true">
-     <proof prover="0"><result status="valid" time="0.156171" steps="775"/></proof>
+     <proof prover="0"><result status="valid" time="0.156171" steps="774"/></proof>
      </goal>
      <goal name="example1&#39;vc.2.0.0.7" expl="apply premises" proved="true">
-     <proof prover="0"><result status="valid" time="0.145470" steps="775"/></proof>
+     <proof prover="0"><result status="valid" time="0.145470" steps="774"/></proof>
      </goal>
      <goal name="example1&#39;vc.2.0.0.8" expl="apply premises" proved="true">
      <proof prover="0"><result status="valid" time="0.052221" steps="113"/></proof>
@@ -528,7 +528,7 @@ abs (to_real result -. (t4 +. t3))
     </transf>
     </goal>
     <goal name="example1&#39;vc.2.0.1" expl="asserted formula" proved="true">
-    <proof prover="0"><result status="valid" time="0.108821" steps="316"/></proof>
+    <proof prover="0"><result status="valid" time="0.108821" steps="314"/></proof>
     </goal>
    </transf>
    </goal>
@@ -542,7 +542,7 @@ abs (to_real result -. (t4 +. t3))
  <goal name="example2&#39;vc" expl="VC for example2" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="example2&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.180146" steps="1793"/></proof>
+  <proof prover="0"><result status="valid" time="0.180146" steps="1625"/></proof>
   </goal>
   <goal name="example2&#39;vc.1" expl="postcondition" proved="true">
   <transf name="assert" proved="true" arg1="let t = log (exp (to_real x) +. exp (to_real y)) in
@@ -581,16 +581,16 @@ abs (to_real result -. t)
        <goal name="example2&#39;vc.1.0.0.0.0.0" expl="asserted formula" proved="true">
        <transf name="apply" proved="true" arg1="uadd_double_error_propagation" arg2="with" arg3="exp_approx x,exp_approx y">
         <goal name="example2&#39;vc.1.0.0.0.0.0.0" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.047119" steps="115"/></proof>
+        <proof prover="0"><result status="valid" time="0.047119" steps="114"/></proof>
         </goal>
         <goal name="example2&#39;vc.1.0.0.0.0.0.1" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.049479" steps="115"/></proof>
+        <proof prover="0"><result status="valid" time="0.049479" steps="114"/></proof>
         </goal>
         <goal name="example2&#39;vc.1.0.0.0.0.0.2" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.178458" steps="946"/></proof>
+        <proof prover="0"><result status="valid" time="0.178458" steps="942"/></proof>
         </goal>
         <goal name="example2&#39;vc.1.0.0.0.0.0.3" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.179100" steps="984"/></proof>
+        <proof prover="0"><result status="valid" time="0.179100" steps="943"/></proof>
         </goal>
         <goal name="example2&#39;vc.1.0.0.0.0.0.4" expl="apply premises" proved="true">
         <proof prover="0"><result status="valid" time="0.054563" steps="106"/></proof>
@@ -615,13 +615,13 @@ abs (to_real result -. t)
       </transf>
       </goal>
       <goal name="example2&#39;vc.1.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.068558" steps="134"/></proof>
+      <proof prover="0"><result status="valid" time="0.068558" steps="132"/></proof>
       </goal>
       <goal name="example2&#39;vc.1.0.0.0.2" expl="apply premises" proved="true">
       <proof prover="0"><result status="valid" time="0.131529" steps="727"/></proof>
       </goal>
       <goal name="example2&#39;vc.1.0.0.0.3" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.249078" steps="1161"/></proof>
+      <proof prover="0"><result status="valid" time="0.249078" steps="1171"/></proof>
       </goal>
       <goal name="example2&#39;vc.1.0.0.0.4" expl="apply premises" proved="true">
       <proof prover="0"><result status="valid" time="0.053611" steps="106"/></proof>
@@ -629,12 +629,12 @@ abs (to_real result -. t)
      </transf>
      </goal>
      <goal name="example2&#39;vc.1.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="1.835473" steps="12517"/></proof>
+     <proof prover="0"><result status="valid" time="1.835473" steps="12473"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="example2&#39;vc.1.0.1" expl="asserted formula" proved="true">
-    <proof prover="0"><result status="valid" time="0.063839" steps="162"/></proof>
+    <proof prover="0"><result status="valid" time="0.063839" steps="164"/></proof>
     </goal>
    </transf>
    </goal>
@@ -648,7 +648,7 @@ abs (to_real result -. t)
  <goal name="example3&#39;vc" expl="VC for example3" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="example3&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.080734" steps="790"/></proof>
+  <proof prover="0"><result status="valid" time="0.080734" steps="588"/></proof>
   </goal>
   <goal name="example3&#39;vc.1" expl="postcondition" proved="true">
   <transf name="assert" proved="true" arg1="let t = log2 (to_real x +. to_real y) in
@@ -673,15 +673,15 @@ abs (to_real result -. t)
       <transf name="assert" proved="true" arg1="abs (to_real (x ++. y) -. (to_real x +. to_real y))
 &lt;=. (eps *. abs (to_real x +. to_real y))">
        <goal name="example3&#39;vc.1.0.0.0.0.0" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="0.153510" steps="1012"/></proof>
+       <proof prover="0"><result status="valid" time="0.153510" steps="773"/></proof>
        </goal>
        <goal name="example3&#39;vc.1.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.060039" steps="124"/></proof>
+       <proof prover="0"><result status="valid" time="0.060039" steps="123"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="example3&#39;vc.1.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.057203" steps="128"/></proof>
+      <proof prover="0"><result status="valid" time="0.057203" steps="127"/></proof>
       </goal>
       <goal name="example3&#39;vc.1.0.0.0.2" expl="apply premises" proved="true">
       <proof prover="0"><result status="valid" time="0.056627" steps="106"/></proof>
@@ -695,17 +695,17 @@ abs (to_real result -. t)
      </transf>
      </goal>
      <goal name="example3&#39;vc.1.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.074560" steps="169"/></proof>
+     <proof prover="0"><result status="valid" time="0.074560" steps="171"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="example3&#39;vc.1.0.1" expl="asserted formula" proved="true">
-    <proof prover="0"><result status="valid" time="0.072442" steps="158"/></proof>
+    <proof prover="0"><result status="valid" time="0.072442" steps="157"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="example3&#39;vc.1.1" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.067725" steps="149"/></proof>
+   <proof prover="0"><result status="valid" time="0.067725" steps="150"/></proof>
    </goal>
   </transf>
   </goal>
@@ -714,7 +714,7 @@ abs (to_real result -. t)
  <goal name="example4&#39;vc" expl="VC for example4" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="example4&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.099433" steps="790"/></proof>
+  <proof prover="0"><result status="valid" time="0.099433" steps="588"/></proof>
   </goal>
   <goal name="example4&#39;vc.1" expl="postcondition" proved="true">
   <transf name="assert" proved="true" arg1="let t = log10 (to_real x +. to_real y) in
@@ -740,15 +740,15 @@ abs (to_real result -. t)
       <transf name="assert" proved="true" arg1="abs (to_real (x ++. y) -. (to_real x +. to_real y))
 &lt;=. (eps *. abs (to_real x +. to_real y))">
        <goal name="example4&#39;vc.1.0.0.0.0.0" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="0.151494" steps="1016"/></proof>
+       <proof prover="0"><result status="valid" time="0.151494" steps="773"/></proof>
        </goal>
        <goal name="example4&#39;vc.1.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.056304" steps="124"/></proof>
+       <proof prover="0"><result status="valid" time="0.056304" steps="123"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="example4&#39;vc.1.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.053633" steps="128"/></proof>
+      <proof prover="0"><result status="valid" time="0.053633" steps="127"/></proof>
       </goal>
       <goal name="example4&#39;vc.1.0.0.0.2" expl="apply premises" proved="true">
       <proof prover="0"><result status="valid" time="0.067975" steps="106"/></proof>
@@ -762,17 +762,17 @@ abs (to_real result -. t)
      </transf>
      </goal>
      <goal name="example4&#39;vc.1.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.059401" steps="169"/></proof>
+     <proof prover="0"><result status="valid" time="0.059401" steps="171"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="example4&#39;vc.1.0.1" expl="asserted formula" proved="true">
-    <proof prover="0"><result status="valid" time="0.064877" steps="158"/></proof>
+    <proof prover="0"><result status="valid" time="0.064877" steps="157"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="example4&#39;vc.1.1" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.053458" steps="149"/></proof>
+   <proof prover="0"><result status="valid" time="0.053458" steps="150"/></proof>
    </goal>
   </transf>
   </goal>

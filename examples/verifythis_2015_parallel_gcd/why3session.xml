@@ -10,7 +10,7 @@
 <path name=".."/><path name="verifythis_2015_parallel_gcd.mlw"/>
 <theory name="ParallelGCD" proved="true">
  <goal name="gcd_sub" proved="true">
- <proof prover="7"><result status="valid" time="3.528065" steps="218332"/></proof>
+ <proof prover="7"><result status="valid" time="2.863885" steps="218332"/></proof>
  </goal>
  <goal name="parallel_gcd&#39;vc" expl="VC for parallel_gcd" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -52,7 +52,7 @@
 </theory>
 <theory name="Interleaving" proved="true">
  <goal name="gcd_sub" proved="true">
- <proof prover="7"><result status="valid" time="3.600694" steps="218332"/></proof>
+ <proof prover="7"><result status="valid" time="2.807413" steps="218332"/></proof>
  </goal>
  <goal name="step&#39;vc" expl="VC for step" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -144,7 +144,7 @@
   <goal name="parallel_gcd&#39;vc.2" expl="loop variant decrease" proved="true">
   <transf name="inline_all" proved="true" >
    <goal name="parallel_gcd&#39;vc.2.0" expl="loop variant decrease" proved="true">
-   <proof prover="3"><result status="valid" time="0.102546" steps="18283"/></proof>
+   <proof prover="3"><result status="valid" time="0.102546" steps="18206"/></proof>
    </goal>
   </transf>
   </goal>
@@ -157,7 +157,7 @@
   <goal name="parallel_gcd&#39;vc.5" expl="loop variant decrease" proved="true">
   <transf name="inline_all" proved="true" >
    <goal name="parallel_gcd&#39;vc.5.0" expl="loop variant decrease" proved="true">
-   <proof prover="7"><result status="valid" time="0.133862" steps="22762"/></proof>
+   <proof prover="7"><result status="valid" time="0.133862" steps="22637"/></proof>
    </goal>
   </transf>
   </goal>

@@ -11,7 +11,7 @@ Prover result is: Valid (97 steps).
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
 File "bench/check-ce/jlamp_array_mono.mlw", line 48, characters 4-16:
 Sub-goal Index in array bounds of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (540 steps).
+Prover result is: Unknown (unknown + incomplete) (400 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_mono.mlw:
@@ -20,7 +20,7 @@ File jlamp_array_mono.mlw:
       t
       ->
       int = [|_ =>
-              if (infix = {to_int => 3} bOUND_VARIABLE_3953) then 3 else 2|]
+              if (infix = {to_int => 3} bOUND_VARIABLE_3933) then 3 else 2|]
   Line 11:
     two : t = {to_int => 2}
   Line 14:
@@ -60,7 +60,7 @@ File jlamp_array_mono.mlw:
 
 File "bench/check-ce/jlamp_array_mono.mlw", line 54, characters 4-16:
 Sub-goal Index in array bounds of goal g'vc.
-Prover result is: Valid (310 steps).
+Prover result is: Valid (205 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -88,7 +88,7 @@ File jlamp_array_mono.mlw:
 
 File "bench/check-ce/jlamp_array_mono.mlw", line 60, characters 4-16:
 Sub-goal Index in array bounds of goal h'vc.
-Prover result is: Valid (349 steps).
+Prover result is: Valid (244 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE

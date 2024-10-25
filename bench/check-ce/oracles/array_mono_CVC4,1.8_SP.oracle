@@ -11,7 +11,7 @@ Prover result is: Valid (61 steps).
   - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_mono.mlw", line 36, characters 4-8)
 File "bench/check-ce/array_mono.mlw", line 36, characters 4-8:
 Sub-goal Index in array bounds of goal f1'vc.
-Prover result is: Unknown (unknown + incomplete) (358 steps).
+Prover result is: Unknown (unknown + incomplete) (194 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -23,23 +23,23 @@ File int.mlw:
     one = 1
 File array_mono.mlw:
   Line 35:
-    a = {elts= fun (x:int) -> 0; length= 0}
-    a = {elts= fun (x:int) -> 0; length= 0}
+    a = {elts= UNDEFINED; length= 0}
+    a = {elts= UNDEFINED; length= 0}
     Execution of main function `f1` with env:
-      a = {elts= fun (x:int) -> 0; length= 0}
+      a = {elts= UNDEFINED; length= 0}
       zero = 0
       one = 1
   Line 36:
     (giant-step) execution of unimplemented function `([])`
-      a = {elts= fun (x:int) -> 0; length= 0}
+      a = {elts= UNDEFINED; length= 0}
       i = 0
     Property failure at precondition of `([])` with:
-      a = {elts= fun (x:int) -> 0; length= 0}
+      a = {elts= UNDEFINED; length= 0}
       i = 0
 
 File "bench/check-ce/array_mono.mlw", line 41, characters 4-14:
 Sub-goal Index in array bounds of goal f2'vc.
-Prover result is: Valid (259 steps).
+Prover result is: Valid (153 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE

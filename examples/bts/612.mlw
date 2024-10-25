@@ -7,7 +7,7 @@ let f (a: option) : unit
   ensures {
     match a with
     | None -> 1=2
-    | Some a -> 3=3
+    | Some _a -> 3=3
     end
   }
   = ()
