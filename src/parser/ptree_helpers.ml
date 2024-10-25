@@ -44,6 +44,13 @@ let pat_var ?loc id = pat ?loc (Pvar id)
 let tconst ?loc i = term ?loc (Tconst (const i))
 
 
+
+
+let break_id    = "'Break"
+let continue_id = "'Continue"
+let return_id   = "'Return"
+
+
 let expr ?(loc=Loc.dummy_position) e = { expr_desc = e; expr_loc = loc }
 
 let econst ?loc i = expr ?loc (Econst (const i))
