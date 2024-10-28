@@ -318,6 +318,9 @@ let output_task drv fname _tname th task dir =
   Driver.print_task drv (formatter_of_out_channel cout) task;
   close_out cout
 
+(** Warning: when the json option is used, the counterexample model is taken from
+    res (i.e., it is the prover supplied model, printed through Call Prover). Otherwise,
+    the model is taken from ce (i.e., it is the model that went through the RAC pipeline)*)
 let print_result json fmt (fname, loc, goal_name, expls, res, ce) =
   if json then
     begin
@@ -394,6 +397,7 @@ let select_ce env th models =
 
 let debug_print_model_attrs = Debug.lookup_flag "print_model_attrs"
 
+(** TODO rewrite this old function *)
 let print_other_models (m, (c, log)) =
   let print_model fmt m =
     let print_attrs = Debug.test_flag debug_print_model_attrs in

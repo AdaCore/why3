@@ -7,58 +7,23 @@
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
 File "bench/check-ce/jlamp_array_poly.mlw", line 22, characters 4-16:
 Sub-goal Index in array bounds of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (2874 steps).
+Prover result is: Unknown (unknown + incomplete) (2465 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length :
-      ty
-      ->
-      uni
-      ->
-      int = fun bOUND_VARIABLE_5451 bOUND_VARIABLE_5461 -> 0
-    length :
-      ty
-      ->
-      uni
-      ->
-      int = fun bOUND_VARIABLE_5451 bOUND_VARIABLE_5461 -> 0
-    length : array t -> int = [|_ => 0|]
-    length : array t -> int = [|_ => 0|]
-  Line 20:
-    mixfix [] :
-      array
-      t
-      ->
-      int
-      ->
-      t = fun bOUND_VARIABLE_5791 bOUND_VARIABLE_5801 -> {Array.to_int => 3}
-    mixfix [] :
-      array
-      t
-      ->
-      int
-      ->
-      t = fun bOUND_VARIABLE_5791 bOUND_VARIABLE_5801 -> {Array.to_int => 3}
 File jlamp_array_poly.mlw:
   Line 8:
     to_int :
       t
       ->
-      int = fun bOUND_VARIABLE_6881 ->
-             if {Array.to_int => 3} = bOUND_VARIABLE_6881 then 3 else 2
-    to_int :
-      t
-      ->
-      int = fun bOUND_VARIABLE_6881 ->
-             if {Array.to_int => 3} = bOUND_VARIABLE_6881 then 3 else 2
+      int = [|_ =>
+              if (infix = {to_int => 3} bOUND_VARIABLE_6343) then 3 else 2|]
   Line 11:
-    two : t = {Array.to_int => 2}
-    two : t = {Array.to_int => 2}
+    two : t = {to_int => 2}
   Line 14:
-    three : t = {Array.to_int => 3}
-    three : t = {Array.to_int => 3}
+    three : t = {to_int => 3}
+  Line 18:
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -72,53 +37,33 @@ Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown (unknown + incomplete) (3180 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length :
-      ty
-      ->
-      uni
-      ->
-      int = fun bOUND_VARIABLE_6141 bOUND_VARIABLE_6151 -> 0
-    length :
-      ty
-      ->
-      uni
-      ->
-      int = fun bOUND_VARIABLE_6141 bOUND_VARIABLE_6151 -> 0
-    length : array t -> int = [|_ => 0|]
-    length : array t -> int = [|_ => 0|]
 File jlamp_array_poly.mlw:
   Line 8:
     to_int :
       t
       ->
-      int = fun bOUND_VARIABLE_7651 ->
-             if {Array.to_int => 3} = bOUND_VARIABLE_7651 then 3 else 2
-    to_int :
-      t
-      ->
-      int = fun bOUND_VARIABLE_7651 ->
-             if {Array.to_int => 3} = bOUND_VARIABLE_7651 then 3 else 2
+      int = [|_ =>
+              if (infix = {to_int => 3} bOUND_VARIABLE_7653) then 3 else 2|]
   Line 11:
-    two : t = {Array.to_int => 2}
-    two : t = {Array.to_int => 2}
+    two : t = {to_int => 2}
   Line 14:
-    three : t = {Array.to_int => 3}
-    three : t = {Array.to_int => 3}
+    three : t = {to_int => 3}
+  Line 18:
+    a :  = [|_ => epsilon _. true|]
+    a :  = [|_ => epsilon _. true|]
 
 File "bench/check-ce/jlamp_array_poly.mlw", line 28, characters 4-16:
 Sub-goal Index in array bounds of goal g'vc.
-Prover result is: Valid (2066 steps).
+Prover result is: Valid (1741 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
   - Concrete RAC: STUCK (failure in precondition of `g` at "bench/check-ce/jlamp_array_poly.mlw", line 24, characters 6-7)
   - Abstract RAC: STUCK (failure in precondition of `g` at "bench/check-ce/jlamp_array_poly.mlw", line 24, characters 6-7)
-- Selected model 1: BAD_CE
+- Checked model 1: BAD_CE
   - Concrete RAC: STUCK (failure in precondition of `g` at "bench/check-ce/jlamp_array_poly.mlw", line 24, characters 6-7)
   - Abstract RAC: STUCK (failure in precondition of `g` at "bench/check-ce/jlamp_array_poly.mlw", line 24, characters 6-7)
-- Checked model 2: BAD_CE
+- Selected model 2: BAD_CE
   - Concrete RAC: STUCK (failure in precondition of `g` at "bench/check-ce/jlamp_array_poly.mlw", line 24, characters 6-7)
   - Abstract RAC: STUCK (failure in precondition of `g` at "bench/check-ce/jlamp_array_poly.mlw", line 24, characters 6-7)
 File "bench/check-ce/jlamp_array_poly.mlw", line 27, characters 14-27:
@@ -129,7 +74,7 @@ Sorry, we don't have a good counterexample for you :(
 
 File "bench/check-ce/jlamp_array_poly.mlw", line 34, characters 4-16:
 Sub-goal Index in array bounds of goal h'vc.
-Prover result is: Valid (2105 steps).
+Prover result is: Valid (1780 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE

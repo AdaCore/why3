@@ -1,0 +1,217 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for global `a`)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for global `a`)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 12, characters 10-17)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 12, characters 10-17)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 12, characters 10-17)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 12, characters 10-17)
+File "bench/check-ce/log-logic.mlw", line 12, characters 10-17:
+Goal g1.
+Prover result is: Unknown (unknown) (1 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File log-logic.mlw:
+  Line 10:
+    a = 44
+  Line 12:
+    Execution of main function `g1'goal` with env:
+      a = 44
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File log-logic.mlw:
+  Line 12:
+    Property failure at postcondition of `g1'goal1` with:
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for global `a`)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for global `a`)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 26, characters 10-18)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 26, characters 10-18)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 26, characters 10-18)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 26, characters 10-18)
+File "bench/check-ce/log-logic.mlw", line 26, characters 10-18:
+Goal g2.
+Prover result is: Unknown (unknown) (3 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File log-logic.mlw:
+  Line 10:
+    a = 3
+  Line 24:
+    b = 0
+  Line 26:
+    Execution of main function `g2'goal` with env:
+      a = 3
+      b = 0
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File log-logic.mlw:
+  Line 26:
+    Property failure at postcondition of `g2'goal1` with:
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for global `a`)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for global `a`)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 37, characters 24-32)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 37, characters 24-32)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 37, characters 24-32)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 37, characters 24-32)
+File "bench/check-ce/log-logic.mlw", line 37, characters 24-32:
+Goal g3.
+Prover result is: Unknown (unknown) (3 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File log-logic.mlw:
+  Line 10:
+    a = 3
+  Line 37:
+    x = 0
+    x = 0
+    Execution of main function `g3'goal` with env:
+      a = 3
+      x = 0
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File log-logic.mlw:
+  Line 37:
+    Property failure at postcondition of `g3'goal1` with:
+      x = 0
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for global `a`)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for global `a`)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 53, characters 10-19)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 53, characters 10-19)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 53, characters 10-19)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 53, characters 10-19)
+File "bench/check-ce/log-logic.mlw", line 53, characters 10-19:
+Goal g4.
+Prover result is: Unknown (unknown) (2 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File log-logic.mlw:
+  Line 10:
+    a = 0
+  Line 51:
+    f = fun (arg_02:int) -> 44
+  Line 53:
+    Execution of main function `g4'goal` with env:
+      a = 0
+      f = fun (arg_02:int) -> 44
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File log-logic.mlw:
+  Line 53:
+    Property failure at postcondition of `g4'goal1` with:
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for global `a`)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for global `a`)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Not a function symbol: p`)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Not a function symbol: p`)
+- Checked model 2: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Not a function symbol: p`)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Not a function symbol: p`)
+File "bench/check-ce/log-logic.mlw", line 68, characters 10-13:
+Goal g5.
+Prover result is: Unknown (unknown) (3 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for global `a`)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for global `a`)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 80, characters 24-45)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 80, characters 24-45)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 80, characters 24-45)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/log-logic.mlw", line 80, characters 24-45)
+File "bench/check-ce/log-logic.mlw", line 80, characters 24-45:
+Goal g6.
+Prover result is: Unknown (unknown) (6 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File log-logic.mlw:
+  Line 10:
+    a = 45
+  Line 24:
+    b = 0
+  Line 51:
+    f = fun (arg_08:int) -> 0
+  Line 64:
+    p = fun (arg_08:int) -> true
+  Line 80:
+    x = 0
+    x = 0
+    Execution of main function `g6'goal` with env:
+      a = 45
+      b = 0
+      f = fun (arg_08:int) -> 0
+      p = fun (arg_08:int) -> true
+      x = 0
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File log-logic.mlw:
+  Line 80:
+    Property failure at postcondition of `g6'goal1` with:
+      x = 0
+

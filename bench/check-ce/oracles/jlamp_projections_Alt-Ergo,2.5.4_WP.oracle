@@ -19,12 +19,10 @@ The following counterexample model could not be verified
   (both RAC fatal rac error: missing value for return value of call to of_int at "bench/check-ce/jlamp_projections.mlw", line 29, characters 8-18):
 File jlamp_projections.mlw:
   Line 7:
-    to_int : byte -> int = [|{Abstract.to_int => 127} => 127; _ => 1|]
-    to_int : byte -> int = [|{Abstract.to_int => 127} => 127; _ => 1|]
-  Line 18:
-    a : byte = {Abstract.to_int => 1}
+    to_int : byte -> int = [|{to_int => 127} => 127; _ => 1|]
   Line 28:
-    a : byte = {Abstract.to_int => 1}
+    a :  = {to_int => 1}
+    a : byte = {to_int => 1}
 
 File "bench/check-ce/jlamp_projections.mlw", line 42, characters 14-24:
 Sub-goal Precondition of goal p3'vc.
@@ -45,15 +43,12 @@ Sub-goal Integer overflow of goal p3'vc.
 Prover result is: Unknown (unknown) (5 steps).
 The following counterexample model could not be verified
   (both RAC fatal rac error: missing value for return value of call to of_int at "bench/check-ce/jlamp_projections.mlw", line 42, characters 14-24):
-File ref.mlw:
-  Line 18:
-    a : byte = {Abstract.to_int => 1}
 File jlamp_projections.mlw:
   Line 7:
-    to_int : byte -> int = [|{Abstract.to_int => 127} => 127; _ => 1|]
-    to_int : byte -> int = [|{Abstract.to_int => 127} => 127; _ => 1|]
+    to_int : byte -> int = [|{to_int => 127} => 127; _ => 1|]
   Line 41:
-    a : byte = {Abstract.to_int => 1}
+    a :  = {contents = {to_int => 1}}
+    a : byte = {contents = {to_int => 1}}
 
 File "bench/check-ce/jlamp_projections.mlw", line 54, characters 29-39:
 Sub-goal Precondition of goal p4'vc.

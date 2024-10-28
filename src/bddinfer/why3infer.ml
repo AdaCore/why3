@@ -1022,9 +1022,9 @@ let rec mlw_expr_to_simple_expr (* ctx vars *)e =
      unsupported "mlw_expr_to_simple_expr: Efor"
   | Eassert(k,t) -> mk_instr tag (SEassert(k,t))
   (* ad-hoc support for "break" *)
-  | Eraise(xs, _e1) when xs.Ity.xs_name.Ident.id_string = "'Break" ->
+  | Eraise(xs, _e1) when xs.Ity.xs_name.Ident.id_string = Ptree_helpers.break_id ->
      mk_instr tag SEbreak
-  | Eexn(xs, e1) when xs.Ity.xs_name.Ident.id_string = "'Break" ->
+  | Eexn(xs, e1) when xs.Ity.xs_name.Ident.id_string = Ptree_helpers.break_id ->
     let open Ity in
     begin
       match e1.e_node with

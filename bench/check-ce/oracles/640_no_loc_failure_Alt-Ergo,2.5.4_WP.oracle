@@ -7,39 +7,19 @@
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `wrong'goal1` cannot be evaluated)
 File "bench/check-ce/640_no_loc_failure.mlw", line 5, characters 39-65:
 Goal wrong.
-Prover result is: Step limit exceeded (20 steps).
+Prover result is: Step limit exceeded (19 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `wrong'goal1` cannot be evaluated):
 File bv.mlw:
-  Line 320:
-    is_signed_positive :
-      t
-      ->
-      bool = [|{bv.BV64.t'int => 64} => false; _ => true|]
-    is_signed_positive :
-      t
-      ->
-      bool = [|{bv.BV64.t'int => 64} => false; _ => true|]
-  Line 362:
-    size_bv : t = {bv.BV64.t'int => 64}
-    size_bv : t = {bv.BV64.t'int => 64}
-  Line 661:
-    t'int :
-      t
-      ->
-      int = [|{bv.BV64.t'int => 18446744073709551659} => 18446744073709551659;
-            {bv.BV64.t'int => 41} => 41; {bv.BV64.t'int => 1} => 1;
-            {bv.BV64.t'int => 0} => 0; _ => 64|]
-    t'int :
-      t
-      ->
-      int = [|{bv.BV64.t'int => 18446744073709551659} => 18446744073709551659;
-            {bv.BV64.t'int => 41} => 41; {bv.BV64.t'int => 1} => 1;
-            {bv.BV64.t'int => 0} => 0; _ => 64|]
+  Line 321:
+    is_signed_positive : t -> bool = [|{t'int => 64} => False; _ => True|]
+  Line 363:
+    size_bv : t = {t'int => 64}
 File 640_no_loc_failure.mlw:
+  Line 4:
+    x :  = {t'int => 64}
   Line 5:
-    x : t = {bv.BV64.t'int => 64}
-    x : t = {bv.BV64.t'int => 64}
+    x : t = {t'int => 64}
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -50,7 +30,7 @@ File 640_no_loc_failure.mlw:
   - Abstract RAC: NORMAL
 File "bench/check-ce/640_no_loc_failure.mlw", line 12, characters 39-65:
 Goal wrong.
-Prover result is: Step limit exceeded (20 steps).
+Prover result is: Step limit exceeded (19 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -63,7 +43,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: NORMAL
 File "bench/check-ce/640_no_loc_failure.mlw", line 19, characters 22-48:
 Goal wrong.
-Prover result is: Step limit exceeded (20 steps).
+Prover result is: Step limit exceeded (19 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

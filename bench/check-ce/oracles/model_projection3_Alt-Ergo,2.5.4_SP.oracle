@@ -1,28 +1,22 @@
 <check_ce:categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
+- Selected model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (fatal rac error: missing value for global `f`)
   - Abstract RAC: INCOMPLETE (fatal rac error: missing value for global `f`)
 - Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Cannot prove termination for g`)
   - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Cannot prove termination for g`)
-- Selected model 2: INCOMPLETE
+- Checked model 2: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Cannot prove termination for g`)
   - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Cannot prove termination for g`)
 File "bench/check-ce/model_projection3.mlw", line 18, characters 12-56:
 Sub-goal Assertion of goal test'vc.
 Prover result is: Unknown (unknown) (6 steps).
 The following counterexample model could not be verified
-  (both RAC terminated with uncaught exception `Cannot prove termination for g`):
+  (both RAC fatal rac error: missing value for global `f`):
 File model_projection3.mlw:
-  Line 8:
-    f : t -> int = [|_ => 0|]
-    f : t -> int = [|_ => 0|]
-  Line 12:
-    g : t -> int = [|epsilon x. (M.f x) = 0 /\ (M.g x) = 42 => 42; _ => 24|]
-    g : t -> int = [|epsilon x. (M.f x) = 0 /\ (M.g x) = 42 => 42; _ => 24|]
   Line 17:
-    x : t = epsilon x. (M.f x) = 0 /\ (M.g x) = 24
-    x : t = epsilon x. (M.f x) = 0 /\ (M.g x) = 24
-    y : t = epsilon x. (M.f x) = 0 /\ (M.g x) = 24
-    y : t = epsilon x. (M.f x) = 0 /\ (M.g x) = 24
+    x :  = "undefined"
+    x :  = "undefined"
+    y :  = "undefined"
+    y :  = "undefined"
 

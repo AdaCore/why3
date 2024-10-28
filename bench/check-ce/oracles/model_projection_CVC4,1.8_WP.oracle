@@ -22,10 +22,10 @@ File model_projection.mlw:
     to_map = fun (bOUND_VARIABLE_3932:t) ->
               fun (x:int) -> if x = 14 then 42 else 0
   Line 9:
-    get = fun (bOUND_VARIABLE_4002:t) (bOUND_VARIABLE_4012:int) -> 41
+    get = fun (bOUND_VARIABLE_4004:t) (bOUND_VARIABLE_4014:int) -> 41
   Line 13:
-    set = fun (bOUND_VARIABLE_4142:t) (bOUND_VARIABLE_4152:int)
-           (bOUND_VARIABLE_4162:int) -> epsilon x:t.
+    set = fun (bOUND_VARIABLE_4144:t) (bOUND_VARIABLE_4154:int)
+           (bOUND_VARIABLE_4164:int) -> epsilon x:t.
            to_map x = (fun (x1:int) -> if x1 = 14 then 42 else 0)
   Line 19:
     y = {d= epsilon x:t.
@@ -38,9 +38,9 @@ File model_projection.mlw:
     Execution of main function `g1` with env:
       to_map = fun (bOUND_VARIABLE_3932:t) ->
                 fun (x:int) -> if x = 14 then 42 else 0
-      get = fun (bOUND_VARIABLE_4002:t) (bOUND_VARIABLE_4012:int) -> 41
-      set = fun (bOUND_VARIABLE_4142:t) (bOUND_VARIABLE_4152:int)
-             (bOUND_VARIABLE_4162:int) -> epsilon x:t.
+      get = fun (bOUND_VARIABLE_4004:t) (bOUND_VARIABLE_4014:int) -> 41
+      set = fun (bOUND_VARIABLE_4144:t) (bOUND_VARIABLE_4154:int)
+             (bOUND_VARIABLE_4164:int) -> epsilon x:t.
              to_map x = (fun (x1:int) -> if x1 = 14 then 42 else 0)
       y = {d= epsilon x:t.
            to_map x = (fun (x1:int) -> if x1 = 14 then 42 else 0)}

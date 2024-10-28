@@ -262,8 +262,7 @@ val get_model_element_name : attrs:Sattr.t -> string
 
 val get_model_trace_string : name:string -> attrs:Sattr.t -> string
 (** If attrs contain an attribute of the form ["model_trace:mt_string"],
-    return ["mt_string"]. Raises [Not_found] if there is no attribute of
-    the form ["model_trace:*"]. *)
+    return ["mt_string"]. Returns ["name"] otherwise. *)
 
 val get_element_name: attrs:Sattr.t -> string option
 

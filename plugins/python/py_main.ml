@@ -65,10 +65,6 @@ let constant_s ~loc s =
 let len ~loc =
   Qident (mk_id ~loc "len")
 
-let break_id    = "'Break"
-let continue_id = "'Continue"
-let return_id   = "'Return"
-
 let array_make ~loc n v =
   mk_expr ~loc (Eidapp (Qdot (Qident (mk_id ~loc "Python"), mk_id ~loc "make"),
                         [n; v]))
@@ -364,7 +360,7 @@ let rec stmt env {Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } =
   | Py_ast.Sif (e, s1, s2) ->
     mk_expr ~loc (Eif (expr env e, block env ~loc s1, block env ~loc s2))
   | Py_ast.Sreturn e ->
-    mk_expr ~loc (Eraise (Qident (mk_id ~loc return_id), Some (expr env e)))
+    mk_expr ~loc (Eraise (Qident (mk_id ~loc Ptree_helpers.return_id), Some (expr env e)))
   | Py_ast.Sassign (lhs, e) ->
      (*
        r1,...rn = e1,...en ==>
@@ -381,16 +377,16 @@ let rec stmt env {Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } =
   | Py_ast.Sassert (k, t) ->
     mk_expr ~loc (Eassert (k, t))
   | Py_ast.Swhile (e, inv, var, s) ->
-    let id_b = mk_id ~loc break_id in
-    let id_c = mk_id ~loc continue_id in
+    let id_b = mk_id ~loc Ptree_helpers.break_id in
+    let id_c = mk_id ~loc Ptree_helpers.continue_id in
     let body = block env ~loc s in
     let body = mk_expr ~loc (Eoptexn (id_c, Ity.MaskVisible, body)) in
     let loop = mk_expr ~loc (Ewhile (expr env e, inv, var, body)) in
     mk_expr ~loc (Eoptexn (id_b, Ity.MaskVisible, loop))
   | Py_ast.Sbreak ->
-    mk_expr ~loc (Eraise (Qident (mk_id ~loc break_id), None))
+    mk_expr ~loc (Eraise (Qident (mk_id ~loc Ptree_helpers.break_id), None))
   | Py_ast.Scontinue ->
-    mk_expr ~loc (Eraise (Qident (mk_id ~loc continue_id), None))
+    mk_expr ~loc (Eraise (Qident (mk_id ~loc Ptree_helpers.continue_id), None))
   | Py_ast.Slabel _ ->
     mk_unit ~loc (* ignore lonely marks *)
   | Py_ast.Spass (ty, sp) ->
@@ -404,11 +400,11 @@ let rec stmt env {Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } =
     let lb, ub, direction = mk_for_params exps loc env in
     let body = block ~loc (add_var env id) body in
     let body =
-      mk_expr ~loc (Eoptexn (mk_id ~loc continue_id, Ity.MaskVisible, body)) in
+      mk_expr ~loc (Eoptexn (mk_id ~loc Ptree_helpers.continue_id, Ity.MaskVisible, body)) in
     let body = mk_expr ~loc (Elet (set_ref id, false, Expr.RKnone,
                                    mk_ref ~loc (mk_var ~loc id), body)) in
     let loop = mk_expr ~loc (Efor (id, lb, direction, ub, inv, body)) in
-    mk_expr ~loc (Eoptexn (mk_id ~loc break_id, Ity.MaskVisible, loop))
+    mk_expr ~loc (Eoptexn (mk_id ~loc Ptree_helpers.break_id, Ity.MaskVisible, loop))
 
   | Py_ast.Sfor (id, {Py_ast.expr_desc=Ecall ({id_str="range"}, exps)},
                  inv, body)
@@ -416,11 +412,11 @@ let rec stmt env {Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } =
     let lb, ub, direction = mk_for_params exps loc env in
     let body = block ~loc (add_var env id) body in
     let body =
-      mk_expr ~loc (Eoptexn (mk_id ~loc continue_id, Ity.MaskVisible, body)) in
+      mk_expr ~loc (Eoptexn (mk_id ~loc Ptree_helpers.continue_id, Ity.MaskVisible, body)) in
     let body = mk_expr ~loc (Elet (set_ref id, false, Expr.RKnone,
                                    mk_ref ~loc (mk_var ~loc id), body)) in
     let loop = mk_expr ~loc (Efor (id, lb, direction, ub, inv, body)) in
-    mk_expr ~loc (Eoptexn (mk_id ~loc break_id, Ity.MaskVisible, loop))
+    mk_expr ~loc (Eoptexn (mk_id ~loc Ptree_helpers.break_id, Ity.MaskVisible, loop))
   (* otherwise, translate
        for id in e:
          #@ invariant inv
@@ -441,12 +437,12 @@ let rec stmt env {Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } =
     let ub = mk_expr ~loc (Eidapp (infix ~loc "-", [lenl; constant ~loc 1])) in
     let li = mk_expr ~loc (Eidapp (get_op ~loc, [mk_var ~loc l; mk_var ~loc i])) in
     let body = block ~loc (add_var env id) body in
-    let body = mk_expr ~loc (Eoptexn (mk_id ~loc continue_id, Ity.MaskVisible, body)) in
+    let body = mk_expr ~loc (Eoptexn (mk_id ~loc Ptree_helpers.continue_id, Ity.MaskVisible, body)) in
     let body = mk_expr ~loc (Elet (set_ref id, false, Expr.RKnone,
                                    mk_ref ~loc li, body)) in
     let loop = mk_expr ~loc (Efor (i, lb, Expr.To, ub, inv, body)) in
     let loop = mk_expr ~loc (Elet (l, false, Expr.RKnone, e, loop)) in
-    mk_expr ~loc (Eoptexn (mk_id ~loc break_id, Ity.MaskVisible, loop))
+    mk_expr ~loc (Eoptexn (mk_id ~loc Ptree_helpers.break_id, Ity.MaskVisible, loop))
 
 and block env ~loc = function
   | [] ->
@@ -491,7 +487,7 @@ and block env ~loc = function
            let body = block env' ~loc:id.id_loc bl in
            let body =
              let loc = id.id_loc in
-             let id = mk_id ~loc return_id in
+             let id = mk_id ~loc Ptree_helpers.return_id in
              { body with expr_desc = Eoptexn (id, Ity.MaskVisible, body) } in
            let local bl (id, _) =
              let loc = id.id_loc in

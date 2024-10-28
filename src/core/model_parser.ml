@@ -278,6 +278,7 @@ let rec t_and_l_concrete = function
   | f::fl -> Binop (And, f, (t_and_l_concrete fl))
 
 type model_element = {
+
   me_name: string;
   me_kind: model_element_kind;
   me_value: term;
@@ -763,7 +764,7 @@ let json_model_element me =
     | Loop_previous_iteration ->"before_iteration"
     | Loop_current_iteration -> "current_iteration" in
   Record [
-      "name", String me.me_name;
+      "name", String (me.me_name);
       "location", json_loc me.me_location;
       "attrs", json_attrs me.me_attrs;
       "value",

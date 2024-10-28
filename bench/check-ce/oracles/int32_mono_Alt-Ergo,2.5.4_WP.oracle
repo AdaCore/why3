@@ -18,26 +18,16 @@ Prover result is: Unknown (unknown) (10 steps).
 The following counterexample model could not be verified
   (both RAC fatal rac error: missing value for return value of call to (+) at "bench/check-ce/int32_mono.mlw", line 11, characters 11-20):
 File int.mlw:
-  Line 279:
-    int32'int :
-      int32
-      ->
-      int = [|{mach.int.Int32.int32'int => 84} => 84;
-            {mach.int.Int32.int32'int => 42} => 42; _ => 22|]
-    int32'int :
-      int32
-      ->
-      int = [|{mach.int.Int32.int32'int => 84} => 84;
-            {mach.int.Int32.int32'int => 42} => 42; _ => 22|]
+  Line 64:
+    a :  = 42
+    b :  = 42
+    result :  = 0
+  Line 281:
+    min_int32 :  = -2147483648
+  Line 282:
+    max_int32 :  = 2147483647
 File int32_mono.mlw:
   Line 7:
-    r : int32 = {mach.int.Int32.int32'int => 22}
-    r : int32 = {mach.int.Int32.int32'int => 22}
-  Line 9:
-    r : int32 = {mach.int.Int32.int32'int => 84}
-  Line 10:
-    r : int32 = {mach.int.Int32.int32'int => 42}
-    r : int32 = {mach.int.Int32.int32'int => 42}
-  Line 11:
-    r : int32 = {mach.int.Int32.int32'int => 84}
+    r :  = {c = {int32'int => 22}}
+    r : int32 = {c = {int32'int => 22}}
 

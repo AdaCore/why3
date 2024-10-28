@@ -67,10 +67,10 @@
 </theory>
 <theory name="PatienceCode" proved="true">
  <goal name="wf_rev_append_stacks&#39;vc" expl="VC for wf_rev_append_stacks" proved="true">
- <proof prover="3"><result status="valid" time="0.033155" steps="216"/></proof>
+ <proof prover="3"><result status="valid" time="0.033155" steps="217"/></proof>
  </goal>
  <goal name="push_card&#39;vc" expl="VC for push_card" proved="true">
- <proof prover="3"><result status="valid" time="0.034191" steps="215"/></proof>
+ <proof prover="3"><result status="valid" time="0.034191" steps="214"/></proof>
  </goal>
  <goal name="play_cards&#39;vc" expl="VC for play_cards" proved="true">
  <proof prover="3"><result status="valid" time="0.017079" steps="76"/></proof>
@@ -265,12 +265,12 @@
  </transf>
  </goal>
  <goal name="play_cards&#39;vc" expl="VC for play_cards" proved="true">
- <proof prover="3"><result status="valid" time="0.100392" steps="704"/></proof>
+ <proof prover="3"><result status="valid" time="0.100392" steps="705"/></proof>
  </goal>
  <goal name="play_game&#39;vc" expl="VC for play_game" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="play_game&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020100" steps="83"/></proof>
+  <proof prover="3"><result status="valid" time="0.020100" steps="82"/></proof>
   </goal>
   <goal name="play_game&#39;vc.1" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.012665" steps="19"/></proof>
@@ -321,10 +321,10 @@
   <proof prover="3"><result status="valid" time="0.060513" steps="293"/></proof>
   </goal>
   <goal name="play_game&#39;vc.17" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.087585" steps="466"/></proof>
+  <proof prover="3"><result status="valid" time="0.087585" steps="468"/></proof>
   </goal>
   <goal name="play_game&#39;vc.18" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.417761" steps="2283"/></proof>
+  <proof prover="3"><result status="valid" time="0.417761" steps="2622"/></proof>
   </goal>
   <goal name="play_game&#39;vc.19" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.014937" steps="39"/></proof>
@@ -360,7 +360,7 @@
        <goal name="play_game&#39;vc.21.4.0.0.0.1" expl="VC for play_game" proved="true">
        <transf name="replace" proved="true" arg1="(f i)" arg2="(match (positions s)[(seqval sigma)[i]] with x,_ -&gt; x end)">
         <goal name="play_game&#39;vc.21.4.0.0.0.1.0" expl="VC for play_game" proved="true">
-        <proof prover="1"><result status="valid" time="0.077910" steps="16523"/></proof>
+        <proof prover="1"><result status="valid" time="0.077910" steps="16343"/></proof>
         </goal>
         <goal name="play_game&#39;vc.21.4.0.0.0.1.1" expl="equality hypothesis" proved="true">
         <proof prover="3"><result status="valid" time="0.024493" steps="32"/></proof>
@@ -384,13 +384,13 @@
   </transf>
   </goal>
   <goal name="play_game&#39;vc.22" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.109250" steps="574"/></proof>
+  <proof prover="3"><result status="valid" time="0.109250" steps="573"/></proof>
   </goal>
   <goal name="play_game&#39;vc.23" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.016511" steps="39"/></proof>
   </goal>
   <goal name="play_game&#39;vc.24" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.158675" steps="930"/></proof>
+  <proof prover="3"><result status="valid" time="0.158675" steps="921"/></proof>
   </goal>
   <goal name="play_game&#39;vc.25" expl="out of loop bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.018863" steps="19"/></proof>

@@ -9,39 +9,39 @@
 <path name=".."/><path name="proper_cuts.mlw"/>
 <theory name="ProperCut" proved="true">
  <goal name="map&#39;vc" expl="VC for map" proved="true">
- <proof prover="1"><result status="valid" time="0.359301" steps="22501"/></proof>
+ <proof prover="1"><result status="valid" time="0.158023" steps="22349"/></proof>
  </goal>
- <goal name="Ge" proved="true">
- <proof prover="1"><result status="valid" time="0.202015" steps="15650"/></proof>
+ <goal name="Harness.Ge" proved="true">
+ <proof prover="1"><result status="valid" time="0.065857" steps="11734"/></proof>
  </goal>
- <goal name="G3" proved="true">
- <proof prover="1"><result status="valid" time="0.324294" steps="29107"/></proof>
+ <goal name="Harness.G3" proved="true">
+ <proof prover="1"><result status="valid" time="0.154340" steps="24895"/></proof>
  </goal>
  <goal name="cons&#39;vc" expl="VC for cons" proved="true">
- <proof prover="2"><result status="valid" time="0.216445" steps="291233"/></proof>
+ <proof prover="2"><result status="valid" time="0.216445" steps="222537"/></proof>
  </goal>
  <goal name="proper_cuts&#39;vc" expl="VC for proper_cuts" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="proper_cuts&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.038265" steps="9973"/></proof>
+  <proof prover="2"><result status="valid" time="0.038265" steps="5207"/></proof>
   </goal>
   <goal name="proper_cuts&#39;vc.1" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="proper_cuts&#39;vc.1.0" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.224602" steps="17485"/></proof>
+   <proof prover="1"><result status="valid" time="0.067022" steps="11891"/></proof>
    </goal>
    <goal name="proper_cuts&#39;vc.1.1" expl="postcondition" proved="true">
    <transf name="unfold" proved="true" arg1="proper_cuts">
     <goal name="proper_cuts&#39;vc.1.1.0" expl="VC for proper_cuts" proved="true">
     <transf name="split_vc" proved="true" >
      <goal name="proper_cuts&#39;vc.1.1.0.0" expl="VC for proper_cuts" proved="true">
-     <proof prover="2"><result status="valid" time="0.059026" steps="70301"/></proof>
+     <proof prover="2"><result status="valid" time="0.059026" steps="68056"/></proof>
      </goal>
      <goal name="proper_cuts&#39;vc.1.1.0.1" expl="VC for proper_cuts" proved="true">
-     <proof prover="1"><result status="valid" time="0.253669" steps="23366"/></proof>
+     <proof prover="1"><result status="valid" time="0.122922" steps="22602"/></proof>
      </goal>
      <goal name="proper_cuts&#39;vc.1.1.0.2" expl="VC for proper_cuts" proved="true">
-     <proof prover="0"><result status="valid" time="1.312744"/></proof>
+     <proof prover="0"><result status="valid" time="0.684054"/></proof>
      </goal>
     </transf>
     </goal>

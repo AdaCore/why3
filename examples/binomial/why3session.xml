@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -8,58 +8,58 @@
 <path name=".."/><path name="binomial.mlw"/>
 <theory name="Top" proved="true">
  <goal name="infix /&#39;vc" expl="VC for infix /" proved="true">
- <proof prover="0"><result status="valid" time="0.010000" steps="449"/></proof>
+ <proof prover="0"><result status="valid" time="0.010000" steps="6"/></proof>
  </goal>
  <goal name="comb&#39;vc" expl="VC for comb" proved="true">
- <proof prover="0"><result status="valid" time="0.010000" steps="6839"/></proof>
+ <proof prover="0"><result status="valid" time="0.010000" steps="2900"/></proof>
  </goal>
  <goal name="prop1&#39;vc" expl="VC for prop1" proved="true">
- <proof prover="0"><result status="valid" time="0.020000" steps="8961"/></proof>
+ <proof prover="0"><result status="valid" time="0.020000" steps="5222"/></proof>
  </goal>
  <goal name="prop2&#39;vc" expl="VC for prop2" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="prop2&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="6854"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="2339"/></proof>
   </goal>
   <goal name="prop2&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="6872"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="2357"/></proof>
   </goal>
   <goal name="prop2&#39;vc.2" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="7723"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="3208"/></proof>
   </goal>
   <goal name="prop2&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="7750"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="3235"/></proof>
   </goal>
   <goal name="prop2&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.090000" steps="787"/></proof>
+  <proof prover="1"><result status="valid" time="0.090000" steps="785"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="compute&#39;vc" expl="VC for compute" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="compute&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="789"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="317"/></proof>
   </goal>
   <goal name="compute&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="8299"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="3822"/></proof>
   </goal>
   <goal name="compute&#39;vc.2" expl="check division by zero" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="1162"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="508"/></proof>
   </goal>
   <goal name="compute&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="10067"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="9265"/></proof>
   </goal>
   <goal name="compute&#39;vc.4" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="10164"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="8720"/></proof>
   </goal>
   <goal name="compute&#39;vc.5" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.241054" steps="4455488"/></proof>
+  <proof prover="0"><result status="valid" time="0.241054" steps="4243789"/></proof>
   </goal>
   <goal name="compute&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="10098"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="5037"/></proof>
   </goal>
   <goal name="compute&#39;vc.7" expl="VC for compute" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="4018"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="1672"/></proof>
   </goal>
  </transf>
  </goal>
