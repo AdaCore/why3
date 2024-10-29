@@ -20,6 +20,7 @@ module Seq
 
   axiom length_nonnegative:
     forall s: seq 'a. 0 <= length s
+  meta "remove_unused:dependency" axiom length_nonnegative, function length
 
   val function get (seq 'a) int : 'a
     (* FIXME requires { 0 <= i < length s } *)
@@ -136,26 +137,31 @@ module FreeMonoid
     ensures { s1 ++ (s2 ++ s3) = (s1 ++ s2) ++ s3 }
   = if not (s1 ++ s2) ++ s3 == s1 ++ (s2 ++ s3) then absurd
   meta rewrite axiom associative
+  meta "remove_unused:dependency" axiom associative, function (++)
 
   let lemma left_neutral (s:seq 'a)
     ensures { empty ++ s = s }
   = if not empty ++ s == s then absurd
   meta rewrite axiom left_neutral
+  meta "remove_unused:dependency" axiom left_neutral, function (++)
 
   let lemma right_neutral (s:seq 'a)
     ensures { s ++ empty = s }
   = if not s ++ empty == s then absurd
   meta rewrite axiom right_neutral
+  meta "remove_unused:dependency" axiom right_neutral, function (++)
 
   let lemma cons_def (x:'a) (s:seq 'a)
     ensures { cons x s = singleton x ++ s }
   = if not cons x s == singleton x ++ s then absurd
   meta rewrite axiom cons_def
+  meta "remove_unused:dependency" axiom cons_def, function cons
 
   let lemma snoc_def (s:seq 'a) (x:'a)
     ensures { snoc s x = s ++ singleton x }
   = if not snoc s x == s ++ singleton x then absurd
   meta rewrite axiom snoc_def
+  meta "remove_unused:dependency" axiom snoc_def, function snoc
 
   let lemma double_sub_sequence (s:seq 'a) (i j k l:int)
     requires { 0 <= i <= j <= length s }
@@ -168,16 +174,19 @@ module FreeMonoid
   let lemma cons_back (x:'a) (s:seq 'a)
     ensures { (cons x s)[1 ..] = s }
   = if not (cons x s)[1 ..] == s then absurd
+  meta "remove_unused:dependency" axiom cons_back, function cons
 
   let lemma snoc_back (s:seq 'a) (x:'a)
     ensures { (snoc s x)[.. length s] = s }
   = if not (snoc s x)[.. length s] == s then absurd
+  meta "remove_unused:dependency" axiom snoc_back, function snoc
 
   let lemma cat_back (s1 s2:seq 'a)
     ensures { (s1 ++ s2)[.. length s1] = s1 }
     ensures { (s1 ++ s2)[length s1 ..] = s2 }
   = let c = s1 ++ s2 in let l = length s1 in
     if not (c[.. l] == s1 || c[l ..] == s2) then absurd
+  meta "remove_unused:dependency" axiom cat_back, function (++)
 
   (* Decomposing sequences as cons/snoc/catenation/empty/singleton *)
 
@@ -185,26 +194,31 @@ module FreeMonoid
     requires { length s >= 1 }
     ensures  { s = cons s[0] s[1 ..] }
   = if not s == cons s[0] s[1 ..] then absurd
+  meta "remove_unused:dependency" axiom cons_dec, function cons
 
   let lemma snoc_dec (s:seq 'a)
     requires { length s >= 1 }
     ensures  { s = snoc s[.. length s - 1] s[length s - 1] }
   = if not s == snoc s[.. length s - 1] s[length s - 1] then absurd
+  meta "remove_unused:dependency" axiom snoc_dec, function snoc
 
   let lemma cat_dec (s:seq 'a) (i:int)
     requires { 0 <= i <= length s }
     ensures  { s = s[.. i] ++ s[i ..] }
   = if not s == s[.. i] ++ s[i ..] then absurd
+  meta "remove_unused:dependency" axiom cat_dec, function (++)
 
   let lemma empty_dec (s:seq 'a)
     requires { length s = 0 }
     ensures  { s = empty }
   = if not s == empty then absurd
+  meta "remove_unused:dependency" axiom empty_dec, function empty
 
   let lemma singleton_dec (s:seq 'a)
     requires { length s = 1 }
     ensures  { s = singleton s[0] }
   = if not s == singleton s[0] then absurd
+  meta "remove_unused:dependency" axiom singleton_dec, function singleton
 
 end
 
