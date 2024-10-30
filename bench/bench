@@ -790,6 +790,7 @@ fi
 if enabled stackify && test -n "$has_stackify"; then
     echo "=== Checking stackify ==="
     replay examples/stackify --merging-only
+    echo ""
 fi
 
 
@@ -808,6 +809,7 @@ fi
 if enabled realizations; then
     echo "=== Checking realizations ==="
     bench/check_realizations.sh || exit $?
+    echo ""
 fi
 
 if enabled mlwprinter; then
