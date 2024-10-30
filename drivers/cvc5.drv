@@ -35,9 +35,7 @@ end
    these unused-ce-related variables, even in the context.  *)
 transformation "counterexamples_dependent_intros"
 
-transformation "inline_trivial"
-transformation "eliminate_builtin"
-transformation "remove_unused_keep_constants"
+import "common-transformations.gen"
 transformation "detect_polymorphism"
 transformation "eliminate_definition_conditionally"
 transformation "eliminate_inductive"
