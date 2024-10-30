@@ -11,7 +11,7 @@ let only_first_field1 str =
     | _ :: "" :: "content" :: rest | _ :: "content" :: rest
     | "split_fields" :: rest | "split_discrs" :: rest -> aux rest
     | _ -> false in
-  not (String.equal str "") && aux Re.Str.(split (regexp "__") str)
+  aux Re.Str.(split (regexp "__") str)
 
 (** Decide for a list of field names of a record to replace the record with the
     value of the first field. *)

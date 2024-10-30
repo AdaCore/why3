@@ -201,7 +201,10 @@ let maybe_giant_step_rac ctr parent models =
         let res = Check_ce.RAC_done (res_state, res_log) in
         Debug.dprintf Check_ce.debug_check_ce_rac_results "%a@."
           (Check_ce.print_rac_result ?verb_lvl:None) res;
-        (Gnat_counterexamples.post_clean#model m, Some res))
+        let m = Check_ce.model_of_exec_log ~original_model:m res_log in
+        let m = Gnat_counterexamples.post_clean#model m in
+        (* Format.eprintf "Model of exec log:@ %a@." (Model_parser.print_model ~print_attrs:false) m; *)
+        (m, Some res))
   ) models)
 
 let report_messages c check =

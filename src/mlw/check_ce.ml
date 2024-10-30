@@ -907,12 +907,18 @@ let rec model_value v =
 (** In case there is no model element in the smt2 model at a LOC that is present in the RAC log,
     this function fills the missing information to create a model element *)
 let model_element_of_unmatched_log_entry ?loc id me_concrete_value ty =
+  (* Format.eprintf "unmatched log entry for %s@." id.id_string; *)
   if id.id_string <> "zero" && id.id_string <> "one" then
+    begin
+    (* Format.eprintf "crafting a me for id %s (attrs: %a)@." id.id_string Pretty.print_attrs id.id_attrs; *)
     let dummy_term = Term.t_true in
     let dummy_ls = create_lsymbol (Ident.id_clone id) [] (Some ty) in
-    Some {me_name = id_name id; me_concrete_value; me_lsymbol = dummy_ls; me_kind = Other; me_value = dummy_term; me_location = None; me_attrs = Sattr.empty}
+    Some {me_name = id_name id; me_concrete_value; me_lsymbol = dummy_ls; me_kind = Other; me_value = dummy_term; me_location = loc; me_attrs = id.id_attrs}
+    end
   else None
 
+
+let pp_me fmt me =  fprintf fmt "%s -> %a (loc:%a)" me.me_name print_concrete_term me.me_concrete_value (Pp.print_option Loc.pp_position) me.me_location
 
 (** Transform an interpretation log into a prover model.
     TODO fail if the log doesn't fail at the location of the original model *)
@@ -945,7 +951,11 @@ let model_of_exec_log ~original_model log =
         | Log.Val_assumed (id, v) ->
             Option.to_list (me loc id v)
         | Log.Exec_failed (_, mid) ->
-            Mid.fold (fun id v l -> Option.to_list (me loc id v) @ l) mid []
+            (* Format.eprintf "failure at loc %a@." Loc.pp_position loc; *)
+            let res = Mid.fold (fun id v l -> Option.to_list (me loc id v) @ l) mid []
+            in 
+            (* Format.eprintf "res: %a@." (Pp.print_list Pp.newline pp_me) res; *)
+            res
         | Log.Res_assumed (ors,v) -> (* Results are expected to have the special name "result"? TODO: make this match the model element kind *)
             Option.to_list (Option.bind ors (fun rs -> (me loc (Ident.id_register (Ident.id_derive "result" rs.rs_name)) v)))
         | _ -> [])
@@ -957,7 +967,11 @@ let model_of_exec_log ~original_model log =
     let res = Wstdlib.Mint.map_filter me_of_log_line mint in
     if Wstdlib.Mint.is_empty res then None else Some res in
   let model_files = (Wstdlib.Mstr.map_filter me_of_log_lines (Log.sort_log_by_loc log)) in
+  let out_model =
   set_model_files original_model model_files
+  in
+  (* Format.eprintf "Model of exec log:@ %a@." (print_model ~print_attrs:false) out_model; *)
+  out_model
 
 let select_model_from_verdict models =
   let classified_models =
