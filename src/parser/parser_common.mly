@@ -24,9 +24,9 @@
   let add_attr id l = (* id.id_ats is usually nil *)
     { id with id_ats = List.rev_append id.id_ats l }
 
-  let id_anonymous loc = { id_str = "_"; id_ats = []; id_loc = loc }
+  let id_anonymous loc = Ptree_helpers.ident ~loc "_"
 
-  let mk_id id s e = { id_str = id; id_ats = []; id_loc = floc s e }
+  let mk_id id s e = Ptree_helpers.ident ~loc:(floc s e) id
 
   let get_op  q s e = Qident (mk_id (Ident.op_get q) s e)
   let upd_op  q s e = Qident (mk_id (Ident.op_update q) s e)
@@ -34,9 +34,9 @@
   let rcut_op q s e = Qident (mk_id (Ident.op_rcut q) s e)
   let lcut_op q s e = Qident (mk_id (Ident.op_lcut q) s e)
 
-  let mk_pat  d s e = { pat_desc  = d; pat_loc  = floc s e }
-  let mk_term d s e = { term_desc = d; term_loc = floc s e }
-  let mk_expr d s e = { expr_desc = d; expr_loc = floc s e }
+  let mk_pat  d s e = Ptree_helpers.pat ~loc:(floc s e) d
+  let mk_term d s e = Ptree_helpers.term ~loc:(floc s e) d
+  let mk_expr d s e = Ptree_helpers.expr ~loc:(floc s e) d
 
   let variant_union v1 v2 = match v1, v2 with
     | _, [] -> v1
@@ -44,18 +44,7 @@
     | _, ({term_loc = loc},_)::_ -> Loc.errorm ~loc
         "multiple `variant' clauses are not allowed"
 
-  let empty_spec = {
-    sp_pre     = [];
-    sp_post    = [];
-    sp_xpost   = [];
-    sp_reads   = [];
-    sp_writes  = [];
-    sp_alias   = [];
-    sp_variant = [];
-    sp_checkrw = false;
-    sp_diverge = false;
-    sp_partial = false;
-  }
+  let empty_spec = Ptree_helpers.empty_spec
 
   let spec_union s1 s2 = {
     sp_pre     = s1.sp_pre @ s2.sp_pre;
