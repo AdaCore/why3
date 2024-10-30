@@ -587,6 +587,8 @@ let predicate sle (v1 v2 : t) =
     forall x y : t [x == y]. x == y -> x = y
   meta "remove_unused:dependency" axiom Extensionality, predicate (==)
 
+  meta extensionality predicate (==)
+
   val eq (v1 v2 : t) : bool
     ensures { result <-> v1 = v2 }
 
