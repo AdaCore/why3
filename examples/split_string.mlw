@@ -163,7 +163,7 @@ module SplitStringOCaml
     requires { [@expl:index in string bounds] 0 <= i < length s }
     ensures  { result = s[i] }
 
-  let split_string (s: string_) (sep: char) (limit: int63) : (ss: Q.t string_)
+  let partial split_string (s: string_) (sep: char) (limit: int63) : (ss: Q.t string_)
     requires { limit = -1 || limit >= 1 }
     ensures  { length ss >= 1 }
     ensures  { limit = -1 || length ss <= limit }
@@ -197,4 +197,3 @@ module SplitStringOCaml
     return ss
 
 end
-

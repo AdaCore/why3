@@ -38,7 +38,7 @@ let rec length (l: list 'a) : Peano.t
     array [||] when the list is empty, but there is no such empty
     array in Why3's library.)
 *)
-let array_of_list (l: list 'a) : (a: A.array 'a)
+let partial array_of_list (l: list 'a) : (a: A.array 'a)
   requires { l <> Nil }
   ensures  { A.length a = length l }
   ensures  { forall i. 0 <= i < length l -> Some a[i] = nth i l }
@@ -57,8 +57,3 @@ let array_of_list (l: list 'a) : (a: A.array 'a)
   fill 1 ll;
   return a
   end
-
-
-
-
-

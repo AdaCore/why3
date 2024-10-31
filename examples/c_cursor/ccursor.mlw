@@ -100,7 +100,7 @@ module PtrCursor
       c.new <- true;
     end
 
-  let main () : int32
+  let partial main () : int32
   = let c = create_cursor 4 4 in
     for i = 0:int32 to 255 do
       invariant { not c.freed }
@@ -111,5 +111,5 @@ module PtrCursor
     c_assert (not c.new);
     free_cursor c;
     0
-    
+
 end
