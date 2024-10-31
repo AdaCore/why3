@@ -1,0 +1,21 @@
+module RecursiveRecord
+  use mach.java.util.NoSuchElementException
+  use mach.java.util.Optional
+
+
+  type t = {
+    a : bool;
+    next : optional t
+  }
+
+  let get_next (self : t) : t
+    ensures { self.next = Optional.build result } 
+    raises { NoSuchElementException.E -> not is_present self.next } 
+  =
+    Optional.get self.next
+
+  let default_cstr [@java:constructor]() = { a = false; next = empty () }
+
+end
+
+

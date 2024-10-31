@@ -1,0 +1,29 @@
+module Print
+  use int.Int
+  use mach.java.io.PrintStream
+  use mach.java.lang.String
+  use mach.java.lang.System
+  use mach.java.lang.Integer
+  use mach.java.lang.Array
+  
+    let print_array (o : print_stream) (prefix : string) (values : array integer) (i_begin i_end : integer) : unit
+     requires { 0 <= i_begin <= i_end <= values.length }
+  =
+    print o prefix;
+    print o "[";
+    for i = i_begin to i_end - 1 do
+      let fmt = if i <> i_begin then ", %d" else "%d" in
+      print o (String.format_1 fmt values[i]);
+    done;
+    print o "]"
+
+  let main (_: array string) : unit
+  =        
+    let a = Array.make 5 0 in
+    for i = 0 to a.length - 1 do 
+      a[i] <- a.length - i;
+    done;
+    print_array System.out "a = " a 0 a.length;
+    println System.out ()
+
+end

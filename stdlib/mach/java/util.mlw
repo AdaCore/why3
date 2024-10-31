@@ -1,0 +1,355 @@
+(** {1 Modules that mimics some classes from JDK package java.util } *)
+
+(** {2 Exceptions} *)
+
+module NoSuchElementException 
+  exception E
+end
+
+(** {2 java.util.Set} *)
+
+module Set
+  use int.Int
+  use set.Fset as S
+  use mach.java.lang.Integer
+
+  type set [@java:scalar_objects] 'el = private {
+    ghost mutable content : S.fset 'el;
+  } 
+
+  val function size (s : set 'el) : integer
+    ensures { result = Integer.enforced_integer (S.cardinal s.content) }
+
+  val function contains (s : set 'el) (e : 'el) : bool 
+    ensures { result = S.mem e s.content }
+
+  val empty () : set 'el
+    ensures { result.content = S.empty }
+
+  val equals (s s' : set 'el) : bool
+    ensures { result <-> S.(==) s.content s'.content }
+    ensures { result -> S.cardinal s.content = S.cardinal s'.content }
+    ensures { result <->
+              forall e : 'el. (S.mem e s.content <-> S.mem e s'.content) }
+
+  predicate is_subset (included superset : set 'el) =
+     forall e. contains included e -> contains superset e
+
+  let lemma is_subset_card (included superset : set 'el)
+    requires { is_subset included superset }
+    ensures  { size included <= size superset }
+  =
+    assert { S.subset included.content superset.content }
+
+  val add (s : set 'el) (e : 'el) : bool
+    writes { s.content }
+    ensures { result = not contains (old s) e }
+
+    ensures { forall e'. S.mem e' (old s.content) -> S.mem e' s.content }
+    ensures { S.mem e s.content }
+    ensures { contains s e }
+    ensures { not (S.mem e (old s.content)) ->
+              S.cardinal s.content = 1 + S.cardinal (old s.content)}
+    ensures { S.mem e (old s.content) ->
+              S.cardinal s.content = S.cardinal (old s.content)}
+    ensures { s.content = S.add e (old s.content) }
+    ensures { is_subset (old s) s }
+
+  predicate is_add (os s : set 'el) (e : 'el) =
+     not (contains os e)&& (S.(==) s.content (S.add e os.content))
+
+  let lemma is_add_inc_size (os s : set 'el) (e : 'el)
+     requires { size s < max_integer }
+     requires { is_add os s e }
+     ensures { size s = size os + 1 }
+   = ()
+   
+  let lemma is_add_all_in_os_except_e (os s : set 'el) (e : 'el)
+     requires { is_add os s e }
+     ensures { forall e'. contains s e' -> e <> e' -> contains os e' }
+   = ()
+
+  let lemma is_subset_add (s s' : set 'el) (e : 'el) (se se' : set 'el) 
+     requires { is_subset s s' }
+     requires { is_add s se e }
+     requires { is_add s' se' e }
+     ensures { is_subset s' se' }
+   = ()
+
+end
+
+(** {2 java.util.Map} *)
+
+module Map
+   use int.Int
+   use fmap.Fmap as FM
+   use mach.java.lang.Integer
+
+   type map [@java:scalar_objects] 'k 'el = private {
+     ghost mutable content : FM.fmap 'k 'el
+   } 
+
+   val function size (m : map 'k 'el) : integer
+     ensures { result = Integer.enforced_integer (FM.size m.content) }
+
+   val function containsKey (m : map 'k 'el) (key : 'k) : bool
+     ensures { result = FM.mem key m.content }
+
+   val empty () : map 'k 'el
+     ensures { result.content = FM.empty }
+
+   val function get  (m : map 'k 'el) (key : 'k) : 'el
+     requires { FM.mem key m.content }
+     ensures { result = FM.find key m.content }
+
+   val put (m : map 'k 'el) (key : 'k) (value : 'el) : unit
+     writes { m.content }
+     ensures { FM.mem key (old m.content)
+               -> FM.size m.content = FM.size (old m.content)  }
+     ensures { FM.mem key m.content }
+     ensures { FM.find key m.content = value }
+     ensures { m.content = FM.add key value (old m.content) }
+
+end
+
+(** {2 Unmodifiable java.util.List} *)
+
+module UnmodifiableList
+  use int.Int
+  use seq.Seq
+  use mach.java.lang.Integer
+  use mach.java.lang.IndexOutOfBoundsException
+
+  type ulist [@java:scalar_objects] 'el = {
+     ghost content : seq 'el;
+  }
+  
+  meta coercion function content
+
+  val function empty () : ulist 'el
+    ensures { result.content = Seq.empty }
+
+
+  val function size (l : ulist 'el) : integer
+    ensures { result = Integer.enforced_integer (Seq.length l.content) }
+
+  val get  (l : ulist 'el) (i : integer) : 'el
+    ensures { result = Seq.get l.content i }
+    raises { IndexOutOfBoundsException.E -> not (0 <= i < size l) }
+end
+
+(** {2 java.util.List} *)
+ 
+module List
+  use int.Int
+  use seq.Seq
+  use mach.java.lang.Integer
+  use mach.java.lang.IndexOutOfBoundsException
+  use UnmodifiableList
+  
+  type list [@java:scalar_objects] 'el = {
+    mutable ghost content : seq 'el;
+  }
+  
+  meta coercion function content
+
+  val function size (l : list 'el) : integer
+    ensures { result = Integer.enforced_integer (Seq.length l.content) }
+
+  val function empty () : list 'el
+    ensures { result.content = Seq.empty }
+
+  val get  (l : list 'el) (i : integer) : 'el
+    ensures { result = Seq.get l.content i }
+    raises { IndexOutOfBoundsException.E -> not (0 <= i < size l) }
+
+  val add  (l : list 'el) (e : 'el) : bool
+    writes { l.content }
+    ensures { l.content == snoc (old l.content) e }
+    ensures { result = true }
+
+  val insert (l : list 'el) (i : integer) (e : 'el) : unit
+    writes { l.content }
+    ensures { l.content ==
+             (old l.content)[0..i] ++ (cons e (old l.content)[i..]) }
+    ensures { Seq.length l.content = Seq.length (old l.content) + 1}
+    raises { IndexOutOfBoundsException.E -> not (0 <= i <= size l) }
+
+  val set (l : list 'el) (i : integer) (e : 'el) : (res : 'el)
+    writes { l.content }
+    ensures { size l = size (old l) }
+    ensures { res = (old l.content)[i] }
+    ensures { l.content[i] = e }
+    ensures { forall j. 0 <= j < size l -> j <> i
+              -> (old l.content)[j] = l.content[j] }
+    raises { IndexOutOfBoundsException.E -> not (0 <= i < size l) }
+
+  val function copy_of (l : list 'el) : ulist 'el
+    ensures { Seq.length l = Seq.length result }
+    ensures { content l == UnmodifiableList.content result }
+    ensures { forall i : integer. 0 <= i < Seq.length l ->
+               Seq.get l.content i = Seq.get result i }
+
+  predicate swapped (oldl l : list 'el) (i j : int) =
+    ((Seq.length oldl = Seq.length l) /\ 
+     (forall k. 0 <= k < Seq.length l ->
+        k <> i -> k <> j -> oldl.content[k] = l.content[k]) /\
+     (oldl.content[i] = l.content[j]) /\
+     (oldl.content[j] = l.content[i]))
+
+end
+
+(** {2 java.util.Queue} *)
+
+module Queue
+  use int.Int
+  use seq.Seq
+  use mach.java.lang.Integer
+
+  type queue [@java:scalar_objects] 'el = private {
+     mutable ghost content : seq 'el;
+  }
+  
+  meta coercion function content
+
+  val function empty () : queue 'el
+     ensures { result.content = Seq.empty }
+
+  val function size (q : queue 'el) : integer
+    ensures { result = Integer.enforced_integer (Seq.length q.content) }
+
+  val add (q : queue 'el) (el : 'el) : unit
+    writes { q.content }
+    ensures { q.content == snoc (old q.content) el }
+
+  val peek (q : queue 'el) : 'el
+    requires { q.content <> Seq.empty }
+    ensures { result = q.content[0] }
+
+  val poll (q : queue 'el) : 'el
+    requires { q.content <> Seq.empty }
+    writes { q.content }
+    ensures { old q.content == cons result q.content }
+    ensures { result = (old q.content)[0] }
+    ensures { q.content == (old q.content)[1 ..] }
+
+  val function is_empty (q : queue 'el) : bool
+    ensures { result <-> q.content = Seq.empty }
+    ensures { result <-> Seq.length q.content = 0 }
+
+  val function equals (q1 q2 : queue 'el) : bool
+    ensures { result <-> (q1 = q2 \/
+              (Seq.length q1 = Seq.length q2 /\ q1.content == q2.content)) }
+end
+
+(** {2 java.util.PriorityQueue} *)
+
+(** Adapted version from Why3 library. *)
+  
+module PriorityQueue
+
+  use int.Int
+  use mach.java.lang.Integer
+
+  type elt
+  function cmp elt elt : integer
+
+  predicate le (x y : elt) = cmp x y <= 0
+
+  clone export relations.TotalPreOrder
+    with type t = elt, predicate rel = le, axiom .
+
+  use set.Fset
+
+  type t = abstract { mutable elts: fset elt }
+
+  meta coercion function elts
+
+  val create () : t
+    ensures { result = empty }
+
+  val add (q: t) (x: elt) : unit
+    writes  { q.elts }
+    ensures { q = add x (old q) }
+    ensures { Fset.mem x q }
+
+  predicate minimal_elt (x: elt) (s: fset elt) =
+     mem x s /\ forall e: elt. mem e s -> le x e
+
+  val poll (q: t) : elt
+    requires { q.elts <> empty } 
+    writes  { q.elts }
+    ensures { q = remove result (old q) }
+    ensures { minimal_elt result (old q) }
+
+  val peek (q: t) : elt
+    requires { q.elts <> empty }
+    ensures { minimal_elt result q }
+
+  val function is_empty (q: t) : bool
+    ensures { result = (q.elts = empty) }
+
+  val function size (q: t) : integer
+    ensures { result = Integer.enforced_integer (cardinal q) }
+
+end
+
+(** {2 java.util.Optional} *)
+
+module Optional
+  use NoSuchElementException
+  use option.Option
+
+  type optional [@java:scalar_objects] 'elt = { ghost v : option 'elt }
+
+  val function empty () : optional 'elt
+    ensures { result = { v = None } }
+
+  val function build (e : 'elt) : optional 'elt
+    ensures { result = { v = Some e } }
+
+  val function is_present (o : optional 'elt) : bool
+    ensures { result = not is_none o.v }
+
+  val function is_empty (o : optional 'elt) : bool
+    ensures { result = is_none o.v }
+
+  val get (o : optional 'elt) : 'elt 
+    ensures { o.v = Some result }
+    raises { NoSuchElementException.E -> not is_present o }
+    
+  val function get_safe (o : optional 'elt) : 'elt 
+    requires { is_present o }
+    ensures { Some result = o.v }
+
+end
+
+(** {2 java.util.Random} *)
+module Random
+  use int.Int
+  use mach.java.lang.IllegalArgumentException
+  use mach.java.lang.Long
+  use mach.java.lang.Integer
+  
+  type random = private { mutable seed : long }
+
+  val create () : random     
+
+  val create_init (s : long) : random     
+    ensures { result.seed = s}
+
+  val set_seed (r : random) (s : long) : unit
+    ensures { r.seed = s }
+    writes { r.seed}
+
+  val next_boolean (r : random) : bool
+    writes { r.seed }
+  
+  val next_int (r : random) : integer
+    writes { r.seed }
+  
+  val next_bounded_int (r : random) (bound : integer)  : integer
+    writes { r.seed }
+    ensures { 0 <= result < bound }
+    raises { IllegalArgumentException.E -> bound <= 0 }
+end

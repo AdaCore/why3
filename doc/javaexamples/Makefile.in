@@ -1,0 +1,46 @@
+include ../../share/Makefile.config
+
+OUTPUT_JAVA_DIR=../generated
+WHY3 = ../../bin/why3.$(OCAMLBEST)
+
+JAVA_GENERATED_FILES=\
+  ${OUTPUT_JAVA_DIR}/Employee.java \
+  ${OUTPUT_JAVA_DIR}/Directory.java \
+  ${OUTPUT_JAVA_DIR}/EmployeeAlreadyExistsException.java \
+  ${OUTPUT_JAVA_DIR}/CheckedDirectory.java \
+  ${dummy}
+
+WHY3_EXTRACT_JAVA= ${WHY3} extract -D java -L . --modular --recursive
+
+DO_EXTRACTION= \
+  mkdir -p $$(dirname $@); \
+  module=$$(basename $< .mlw).$$(basename $@ .java); \
+  echo "EXTRACT $${module} from $<"; \
+  ${WHY3_EXTRACT_JAVA} -o ${OUTPUT_JAVA_DIR} $${module}
+
+all: extract
+
+#
+#  Extraction of Java classes
+# ----------------------------
+extract : ${JAVA_GENERATED_FILES} 
+
+${OUTPUT_JAVA_DIR}/Employee.java : directory.mlw 
+	@ $(DO_EXTRACTION)
+
+${OUTPUT_JAVA_DIR}/Directory.java : directory.mlw 
+	@ $(DO_EXTRACTION)
+
+${OUTPUT_JAVA_DIR}/EmployeeAlreadyExistsException.java : directory.mlw 
+	@ $(DO_EXTRACTION)
+
+${OUTPUT_JAVA_DIR}/CheckedDirectory.java : directory.mlw 
+	@ $(DO_EXTRACTION)
+
+#
+# Removal of generated files
+# --------------------------
+clean:
+	@ rm -f ${JAVA_GENERATED_FILES} ${JAVA_GENERATED_FILES:%=%.bak}
+
+

@@ -43,7 +43,7 @@ project (ANR-15-CE25-0001), and the `VOCaL`_ ANR project
    technical
    changes
    zebibliography
-   genindex
+   genindex   
 
 .. * :ref:`genindex`
 .. * :ref:`search`

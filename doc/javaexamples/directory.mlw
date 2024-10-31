@@ -1,0 +1,87 @@
+module Employee
+  use mach.java.lang.Integer
+  use mach.java.lang.String
+
+  type service_id = HUMAN_RES | TECHNICAL | BUSINESS
+
+  type t = {
+    name: string;
+    room: integer;
+    phone : string;
+    service : service_id;
+  }
+
+  let create_employee [@java:constructor] (name : string) (room : integer) (phone : string) 
+                                          (service : service_id) = {
+    name = name; room = room; phone = phone; service = service;
+  }
+end
+
+module Directory
+  use int.Int
+  use mach.java.lang.String
+  use mach.java.lang.Integer
+  use mach.java.util.Map
+  use Employee
+
+  type t [@extraction:preserve_single_field]= {		
+    employees [@java:visibility:private] : Map.map string Employee.t
+  } 
+
+  let create_directory [@java:constructor] () : t = {
+    employees = Map.empty()
+  }
+
+  let add_employee (self : t) (name : string) (phone : string) (room : integer)
+                              (service : service_id) : unit 
+    requires { not Map.containsKey self.employees name }
+    ensures { Map.containsKey self.employees name }
+    ensures { let m = Map.get self.employees name in 
+               m.name = name && m.phone = phone && m.room = room  && m.service = service }
+  = 
+    Map.put self.employees name (Employee.create_employee name room phone service) 
+end
+
+module EmployeeAlreadyExistsException [@java:exception:RuntimeException]
+  use mach.java.lang.String
+
+  type t [@extraction:preserve_single_field] = { msg : string }
+
+  exception E t
+  
+  let constructor[@java:constructor](name : string) : t = { 
+    msg = (String.format_1 "Employee '%s' already exists" name)
+  }
+
+  let getMessage(self : t) : string = self.msg
+end
+
+module CheckedDirectory
+  use int.Int
+  use mach.java.lang.String
+  use mach.java.lang.Integer
+  use mach.java.util.Map
+  use Employee
+
+  use EmployeeAlreadyExistsException
+
+  type t [@extraction:preserve_single_field]= {		
+    employees [@java:visibility:private] : Map.map string Employee.t
+  } 
+
+  let create_directory [@java:constructor] () : t = {
+    employees = Map.empty()
+  }
+
+  let add_employee (self : t) (name : string) (phone : string) (room : integer)
+                              (service : service_id) : unit 
+    ensures { Map.containsKey self.employees name }
+    ensures { let m = Map.get self.employees name in 
+               m.name = name && m.phone = phone && m.room = room  && m.service = service }
+    raises { EmployeeAlreadyExistsException.E _ -> Map.containsKey (old self.employees) name } 
+  = 
+    if Map.containsKey self.employees name then 
+      raise (EmployeeAlreadyExistsException.E (constructor name));
+    Map.put self.employees name (Employee.create_employee name room phone service)
+    
+end

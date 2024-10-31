@@ -1,0 +1,202 @@
+(** {1 Modules that mimics some classes from JDK package java.lang } *)
+
+(** {2 java.lang.Short } *)
+ 
+module Short
+  use int.Int
+
+  type short = < range -0x8000 0x7fff >
+
+  let constant min_short : short = - 0x8000
+  let constant max_short : short =   0x7fff
+  function to_int (x : short) : int = short'int x
+
+  clone export mach.int.Bounded_int with
+    type t = short,
+    constant min = short'minInt,
+    constant max = short'maxInt,
+    function to_int = short'int,
+    lemma to_int_in_bounds,
+    lemma extensionality
+end
+
+(** {2 java.lang.Integer } *)
+
+module Integer
+  use int.Int
+
+  type integer = < range -0x8000_0000 0x7fff_ffff >
+
+  let constant min_integer : integer = -0x8000_0000
+  let constant max_integer : integer = 0x7fff_ffff
+  function to_int (x : integer) : int = integer'int x
+
+  clone export mach.int.Bounded_int with
+    type t = integer,
+    constant min = integer'minInt,
+    constant max = integer'maxInt,
+    function to_int = integer'int,
+    lemma to_int_in_bounds,
+    lemma extensionality
+
+  let function from_int (n : int) : integer
+    requires { [@expl:integer overflow] in_bounds n }
+    ensures  { result = n }
+  = of_int n
+
+(** This function is used by modules that mimic Java collections. The
+   size of a collection is represented by a 32 bit integer and if the
+   collection contains Integer.MAX_VALUE or more elements then the
+   `size` method always returns the same value, Integer.MAX_VALUE.
+
+   See for instance the module {h <a href="mach.java.util.html#List_">}`java.util.List`{h </a>.} *)
+  
+  let function enforced_integer (a : int) : integer
+    ensures { result = if min_integer < a < max_integer then a
+                       else if a <= min_integer then min_integer
+                       else max_integer (* a >= max_integer *) }
+  =
+    if to_int min_integer < a < to_int max_integer then from_int a
+    else if a <= to_int min_integer then min_integer
+    else max_integer (* a >= max_integer *)
+end
+
+(** {2 java.lang.Long } *)
+
+module Long
+
+  use int.Int
+  use Integer
+
+  type long = < range -0x8000_0000_0000_0000 0x7fff_ffff_ffff_ffff >
+
+  let constant min_long : long = - 0x8000_0000_0000_0000
+  let constant max_long : long =   0x7fff_ffff_ffff_ffff
+  function to_int (x : long) : int = long'int x
+
+  clone export mach.int.Bounded_int with
+    type t = long,
+    constant min = long'minInt,
+    constant max = long'maxInt,
+    function to_int = long'int,
+    lemma to_int_in_bounds,
+    lemma extensionality
+
+  let function of_integer (x : integer) : long =
+    ensures { to_int result = Integer.to_int x }
+    let x' = Integer.to_int x in
+      of_int x'
+
+  val function int_value (x : long) : integer
+    requires { Integer.in_bounds x }
+    ensures { result = Integer.from_int x }
+end
+
+(** {2 java.lang.String } *)
+
+module String
+  use Integer
+  use Long
+  use export string.String
+    
+  val function equals (self obj : string) : bool
+	  ensures { result <-> self = obj}
+
+  val function hash_code (self : string) : integer
+
+  lemma string_hash_code_distinct:
+	forall o1 o2. hash_code o1 <> hash_code o2 -> not equals o1 o2 
+
+  lemma string_hash_code_equals:
+	forall o1 o2. equals o1 o2 -> hash_code o1 = hash_code o2
+
+  val concat (s1 s2 : string) : string
+
+  val of_integer (i : integer) : string
+
+  val of_long (l : long) : string
+
+  val format_1 (fmt : string) (x0 : 'a) : string
+
+  val format_2 (fmt : string) (x0 : 'a) (x1 : 'b) : string
+
+  val format_3 (fmt : string) (x0 : 'a) (x1 : 'b) (x2 : 'c) : string
+
+  val format_4 (fmt : string) (x0 : 'a) (x1 : 'b) (x2 : 'c) (x3 : 'c) : string
+
+end
+
+
+(** {2 Java arrays} *)
+
+(** This module is used where arrays are used in Java (i.e. with [] syntax). *) 
+
+module Array
+  use int.Int
+  use Integer
+  use map.Map as M
+
+  type array [@extraction:array] 'a = private {
+    mutable ghost elts : int -> 'a;
+                length : integer;
+  } invariant {
+    0 <= length 
+  }
+
+  function ([]) (a: array 'a) (i: int) : 'a = a.elts i
+
+  val ([]) (a: array 'a) (i: integer) : 'a
+    requires { [@expl:index in array bounds] 0 <= i < a.length }
+    ensures  { result = a[i] }
+
+  val ghost function ([<-]) (a: array 'a) (i: int) (v: 'a): array 'a
+    requires { [@expl:index in array bounds] 0 <= i < a.length }
+    ensures { result.length = a.length }
+    ensures { result.elts = M.set a.elts i v }
+
+  val ([]<-) (a: array 'a) (i: integer) (v: 'a) : unit writes {a}
+    requires { [@expl:index in array bounds] 0 <= i < a.length }
+    ensures  { a.elts = M.set (old a.elts) i v }
+    ensures { a = (old a)[i <- v] }
+
+  val function equals (a1 a2: array 'a) : bool
+	  ensures { result <-> (length a1 = length a2 && 
+                          forall i. 0 <= i < length a1 -> a1[i] = a2[i]) }	
+
+  val function hash_code (self : array 'a) : integer
+
+  lemma array_hash_code_distinct:
+	  forall a1 a2 : array 'a. hash_code a1 <> hash_code a2 -> not equals a1 a2 
+
+  lemma array_hash_code_equals:
+	  forall a1 a2 : array 'a. equals a1 a2 -> hash_code a1 = hash_code a2
+
+  val make [@extraction:array_make] (n: integer) (v: 'a) : array 'a
+    requires { [@expl:array creation size] n >= 0 }
+    ensures  { forall i:int. 0 <= i < n -> result[i] = v }
+    ensures  { result.length = n }
+end
+
+(** {2 java.lang.System } *)
+
+module System
+  use export mach.java.io.PrintStream
+
+  val out : print_stream
+
+  val err : print_stream
+end
+
+(** {2 Standard Exceptions } *)
+
+module IndexOutOfBoundsException
+  exception E
+end
+
+module IllegalArgumentException
+  exception E
+end
+
+module ArithmeticException
+  exception E
+end
