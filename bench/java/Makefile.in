@@ -92,30 +92,30 @@ all : extract non-regression compile run
 #
 #  Extraction of Java classes
 # ----------------------------
-extract : ${JAVA_GENERATED_FILES} 
+extract : ${JAVA_GENERATED_FILES}
 
-generated/Print.java : print.mlw 
+generated/Print.java : print.mlw
 	@ $(DO_EXTRACTION)
 
-generated/Unreachable.java : unreach.mlw 
+generated/Unreachable.java : unreach.mlw
 	@ $(DO_EXTRACTION)
 
-generated/UnreachableFixed.java : unreach.mlw 
+generated/UnreachableFixed.java : unreach.mlw
 	@ $(DO_EXTRACTION)
 
-generated/MutRec.java : mutrec.mlw 
+generated/MutRec.java : mutrec.mlw
 	@ $(DO_EXTRACTION)
 
-generated/org/why3/majority/Candidate.java : mjrty.mlw 
+generated/org/why3/majority/Candidate.java : mjrty.mlw
 	@ $(DO_EXTRACTION)
 
-generated/org/why3/majority/Mjrty.java : mjrty.mlw 
+generated/org/why3/majority/Mjrty.java : mjrty.mlw
 	@ $(DO_EXTRACTION)
 
 generated/org/why3/majority/MjrtyNotFoundException.java : mjrty.mlw
 	@ $(DO_EXTRACTION)
 
-generated/Recursive.java : recursive.mlw 
+generated/Recursive.java : recursive.mlw
 	@ $(DO_EXTRACTION)
 
 generated/ExceptionCatch.java : exceptions.mlw generated/ExceptionThrow.java
@@ -209,7 +209,7 @@ generated/EqualsRedef.java-err : generated/EqualsRedef.java
 non-regression : extract ${JAVA_GENERATED_FILES:%=%-nr} ${ERROR_FILES:%=%-nr}
 
 generated/%-nr : generated/%
-	@ echo -n DIFF $< ... 
+	@ echo -n DIFF $< ...
 	@ E="$<"; R="$(<:generated/%=expected/%)"; \
     if cmp -s $$E $$R; then \
       echo "ok" ; \
@@ -230,7 +230,7 @@ non-regression-update : extract
 
 #
 # Compilation of java files
-# ------------------------- 
+# -------------------------
 ifneq (@JAVAC@,no)
 compile : extract ${CLASS_FILES}
 
@@ -255,7 +255,7 @@ endif
 
 #
 # Running java programs
-# --------------------- 
+# ---------------------
 ifneq (@JAVA@,no)
 run : compile
 	@ for cls in ${RUNNABLE_CLASSES}; do \
@@ -269,7 +269,7 @@ run : compile
             fi; \
           fi; \
         done
-else 
+else
 run :
 	@echo "No JVM (java program) found during configuration."
 endif
@@ -279,4 +279,3 @@ endif
 # --------------------------
 clean:
 	@ rm -fr ${GENERATED_FILES} generated
-

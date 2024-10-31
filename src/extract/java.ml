@@ -37,13 +37,13 @@ let () = Exn_printer.register (fun fmt e -> match e with
 let debug_java_extraction =
   Debug.register_info_flag ~desc:"Java extraction" "java_extraction"
 
-let debug fmt = 
+let debug fmt =
   Debug.dprintf debug_java_extraction fmt
 
-let warn_void_result = 
+let warn_void_result =
   Loc.register_warning "w_void_result" "return type is set to void."
 
-let warn_default_method_redef = 
+let warn_default_method_redef =
   Loc.register_warning "w_default_method_redef" "redefinition of default method."
 
 let search_attribute_prefix (attrs : Sattr.t) (prefix: string)
@@ -56,7 +56,7 @@ let search_attribute_prefix (attrs : Sattr.t) (prefix: string)
   in
   Ident.search_attribute_value has_prefix attrs
 
-let array_attr = create_attribute "extraction:array" 
+let array_attr = create_attribute "extraction:array"
 let array_mk_attr = create_attribute "extraction:array_make"
 let java_ignore = create_attribute "java:ignore"
 let java_constructor = create_attribute "java:constructor"
@@ -86,7 +86,7 @@ let camelcase_string (s : string) : string =
 
 let get_module_package_name (m : Pmodule.pmodule) =
   let m_name = m.mod_theory.th_name in
-  search_attribute_prefix m_name.id_attrs java_package_prefix 
+  search_attribute_prefix m_name.id_attrs java_package_prefix
 
 type visibility = PUBLIC | PRIVATE | PACKAGE
 let global_default_visibility = PUBLIC
@@ -120,7 +120,7 @@ type info = {
 }
 
 let mk_info (args : Pdriver.printer_args) m =
-  debug "mkinfo %s@." m.mod_theory.th_name.id_string; 
+  debug "mkinfo %s@." m.mod_theory.th_name.id_string;
   {
     syntax = args.Pdriver.syntax;
     literal = args.Pdriver.literal;
@@ -136,7 +136,7 @@ module JavaAST = struct
   let return_id = "'Return"
   let continue_id = "'Continue"
   let break_id = "'Break"
-  
+
   type type_definition =
     | VoidType
     | TypeFromDrv of string * type_definition list * scalar_objects
@@ -148,19 +148,19 @@ module JavaAST = struct
     bool
 
   let int_type_from_drv = TypeFromDrv ("int", [], false)
-  let boolean_type_from_drv = TypeFromDrv ("boolean", [], false) 
-  let object_type_from_drv = TypeFromDrv ("Object", [], false) 
+  let boolean_type_from_drv = TypeFromDrv ("boolean", [], false)
+  let object_type_from_drv = TypeFromDrv ("Object", [], false)
 
-  
+
   let is_boolean_type = function
     | TypeAlias id when String.equal id.id_string "bool" -> true
     | TypeFromDrv ("boolean", [], false) -> true
     | _ -> false
- 
+
   type unop =
     (* e++ e-- *)
     UnOpPostIncr | UnOpPostDecr |
-    (* ++e --e  *)  
+    (* ++e --e  *)
     (* UnOpPreIncr | UnOpPreDecr | *)
     (* +e -e *)
     (* UnOpPlus | UnOpMinus | *)
@@ -168,25 +168,25 @@ module JavaAST = struct
     (* UnOpBNeg | *)
     (* ! e *)
     UnOpNot
-  
+
   let unop_is_postfix = function
     | UnOpPostIncr | UnOpPostDecr  -> true
     | _ -> false
-  
+
   let unop_precedence = function
     | UnOpPostIncr | UnOpPostDecr -> 1
-(*  
+(*
     | UnOpPreIncr | UnOpPreDecr -> 2
     | UnOpPlus | UnOpMinus -> 2
     | UnOpBNeg -> 3
- *)    
+ *)
     | UnOpNot -> 3
 
-  type binop =    
+  type binop =
     (* multiplicative operators * / % *)
     BinOpMul | (* BinOpDiv | BinOpMod | *)
     (* additive operators + - *)
-    BinOpAdd | BinOpSub | 
+    BinOpAdd | BinOpSub |
     (* shift operators *)
     (*BinOpLShift | BinOpRShift | BinOpURShift | *)
     (* relational operators < > <= >= instanceof *)
@@ -207,36 +207,36 @@ module JavaAST = struct
     (* BinOpBAndAssign | BinOpBXOrAssign | BinOpBOrAssign | *)
     (* <<= >>= >>>= *)
     (* BinOpLShiftAssign | BinOpRShiftAssign | BinOpURShiftAssign   *)
-  
+
   let binop_precedence = function
-    | BinOpMul (* | BinOpDiv | BinOpMod *) -> 4 
+    | BinOpMul (* | BinOpDiv | BinOpMod *) -> 4
     | BinOpAdd | BinOpSub -> 5
 (*    | BinOpLShift | BinOpRShift | BinOpURShift -> 6 *)
 (*    | BinOpLT | BinOpGT *)
     | BinOpLEQ | BinOpGEQ -> 7
 (*    | BinOpInstanceOf -> 7 *)
     | BinOpEQ (*| BinOpNEQ*) -> 8
-(*  
+(*
     | BinOpBAnd -> 9
     | BinOpBXor -> 10
     | BinOpBOr -> 11
- *)    
+ *)
     | BinOpAnd -> 12
     | BinOpOr -> 13
     | BinOpAssign -> 15
-(*  
+(*
     | BinOpAddAssign | BinOpSubAssign -> 15
     | BinOpMulAssign | BinOpDivAssign | BinOpModAssign -> 15
     | BinOpBAndAssign | BinOpBXOrAssign | BinOpBOrAssign -> 15
     | BinOpLShiftAssign | BinOpRShiftAssign | BinOpURShiftAssign -> 15
  *)
-  
+
   let ite_precedence = 14
 
   let is_assignment = function
     | BinOpAssign -> true
     (*
-    | BinOpAddAssign | BinOpSubAssign | BinOpMulAssign -> true      
+    | BinOpAddAssign | BinOpSubAssign | BinOpMulAssign -> true
     | BinOpDivAssign | BinOpModAssign | BinOpBAndAssign -> true
 
     | BinOpBXOrAssign | BinOpBOrAssign | BinOpLShiftAssign -> true
@@ -252,9 +252,9 @@ module JavaAST = struct
   type definition =
     | DeclEnum of visibility * ident * ident list
     | DeclInstanceVar of instance_variable
-    | DeclConstructor of visibility * (ident * type_definition) list * xsymbol list * body 
+    | DeclConstructor of visibility * (ident * type_definition) list * xsymbol list * body
     | DeclMethod of is_final * visibility * is_static * ident * type_definition * (ident * type_definition) list * xsymbol list * body
-    | DeclAbstractMethod of visibility * ident * type_definition * (ident * type_definition) list * xsymbol list 
+    | DeclAbstractMethod of visibility * ident * type_definition * (ident * type_definition) list * xsymbol list
     | DeclLocalVar of type_definition * (ident * expression) list
     | DeclNotImplemented of string
   and statement =
@@ -273,27 +273,27 @@ module JavaAST = struct
     | StmtTODO of string (* ; *)
     | StmtThrow of Ity.xsymbol * expression
     | StmtTry of statement * catch list
-  and catch = 
+  and catch =
     Ity.xsymbol * Ity.pvsymbol option * statement
   and expression =
     | ExprNop
     | ExprAbsurd
     (* | ExprTODO of string *)
     | ExprConst of constant
-    | ExprUnOp of unop * expression 
+    | ExprUnOp of unop * expression
     | ExprBinOp of binop * expression * expression
     | ExprVar of Ident.ident * type_definition
     | ExprThis
     | ExprCast of type_definition * expression
     | ExprArraysEquals of expression * expression
-    | ExprArraysHashCode of expression 
+    | ExprArraysHashCode of expression
     | ExprFromDrv of string * expression list * int list
     | ExprITE of expression * expression * expression
     | ExprFunCall of expression * expression list
 
     (* obj.m (args) or NOP.m (args) *)
     | ExprMethodCall of expression * Ident.ident * expression list
-    
+
     | ExprNewArray of type_definition * expression
     | ExprArrayIndexing of expression * expression (* a[i] *)
     | ExprDot of expression * Ident.ident (* obj.field *)
@@ -309,7 +309,7 @@ module JavaAST = struct
   and body =
     definition list * statement
 
-  let is_void = function 
+  let is_void = function
     | VoidType -> true
     | _ -> false
 
@@ -333,7 +333,7 @@ module JavaAST = struct
     match s with
     | StmtIf _ -> true
     | _ -> false
-  
+
   let rec is_nop (s : statement) =
     match s with
     | StmtNop -> true
@@ -364,14 +364,14 @@ module JavaAST = struct
   let is_true_stmt = function
     | StmtExpr e -> is_true_expr e
     | _ -> false
-    
+
   let false_expr = ExprConst (CstBool false)
   let is_false_expr = function
     | ExprConst (CstBool false) -> true
     | _ -> false
   let is_false_stmt = function
     | StmtExpr e -> is_false_expr e
-    | _ -> false 
+    | _ -> false
 
   let mk_and a b =
     match a, b with
@@ -380,7 +380,7 @@ module JavaAST = struct
     | ExprConst (CstBool false),_ -> false_expr
     | _, ExprConst (CstBool false) -> false_expr
     | _, _ -> ExprBinOp (BinOpAnd, a, b)
-  
+
   let mk_or a b =
     match a, b with
     | ExprConst (CstBool true),_ -> true_expr
@@ -403,10 +403,10 @@ module JavaAST = struct
     match i, t, e with
     | ExprConst (CstBool true), _, _ -> t
     | ExprConst (CstBool false), _, _ -> e
-    | _, ExprConst (CstBool true), _ -> mk_or i e 
+    | _, ExprConst (CstBool true), _ -> mk_or i e
     | _, ExprConst (CstBool false), _ -> mk_and (mk_not i) e
-    | _, _, ExprConst (CstBool true) -> mk_or (mk_not i) t 
-    | _, _, ExprConst (CstBool false) -> mk_and i t 
+    | _, _, ExprConst (CstBool true) -> mk_or (mk_not i) t
+    | _, _, ExprConst (CstBool false) -> mk_and i t
     | _ -> ExprITE (i, t, e)
 
   let mk_if c t e =
@@ -451,7 +451,7 @@ module JavaAST = struct
         StmtWhile (cond, assign v loopstmt)
     | StmtFor (i, it, init, cond, step, loopstmt) ->
         StmtFor (i, it, init, cond, step, assign v loopstmt)
-    | StmtThisConstructor _ ->         
+    | StmtThisConstructor _ ->
         internal_error "try to assign ThisConstructor statement"
     | StmtTry _ ->
         internal_error "try to assign try-catch statement"
@@ -547,10 +547,10 @@ module JavaAST = struct
         elim_nop s
     | StmtBlock (dl, s) ->
         StmtBlock (dl, elim_nop s)
-  
+
     | StmtThisConstructor s ->
         StmtThisConstructor (elim_nop s)
-  
+
     | StmtWhile (cond, loopstmt) ->
         StmtWhile (cond, elim_nop loopstmt)
     | StmtFor (i, it, init, cond, step, loopstmt) ->
@@ -564,18 +564,18 @@ module JavaAST = struct
   let rec simplify_last_statement = function
     | StmtReturn ExprNop -> StmtNop
     | StmtBlock (d, s) -> StmtBlock (d, simplify_last_statement s)
-    | StmtSequence (s1, StmtReturn ExprNop) -> simplify_last_statement s1    
+    | StmtSequence (s1, StmtReturn ExprNop) -> simplify_last_statement s1
     | StmtSequence (s1, s2) -> mk_seq s1 (simplify_last_statement s2)
     | _ as s -> s
 
-  
+
   let simplify_statement stmt =
-    let pass1 = elim_nop stmt in 
-    let pass2 = elim_empty_blocks pass1 in 
+    let pass1 = elim_nop stmt in
+    let pass2 = elim_empty_blocks pass1 in
     let res = match pass2 with
-    | StmtIf (c, t, e) -> 
+    | StmtIf (c, t, e) ->
         mk_if c (simplify_last_statement t) (simplify_last_statement e)
-    | StmtSequence _ as s -> simplify_last_statement s 
+    | StmtSequence _ as s -> simplify_last_statement s
     | StmtBlock ([], s) -> simplify_last_statement s
     | StmtBlock (dl, s) -> StmtBlock (dl, simplify_last_statement s)
     | StmtThisConstructor s ->
@@ -591,18 +591,18 @@ module JavaAST = struct
     | StmtReturn (ExprNop) -> StmtNop
     | StmtThrow _ | StmtNop | StmtBreak | StmtContinue | StmtReturn _
     | StmtTODO _ | StmtExpr _ as s -> s
-  in 
+  in
     res
 
 
-  let rec mk_body ?(simplify=false) (d : definition list) (s : statement) : body =     
+  let rec mk_body ?(simplify=false) (d : definition list) (s : statement) : body =
     let res = match d, s with
     | [], StmtBlock (d, s) -> mk_body ~simplify:simplify d s
     | d, StmtBlock (d', s) -> mk_body ~simplify:simplify (d @ d') s
     | d, StmtSequence (StmtBlock (d', s), s2) ->
         mk_body ~simplify:simplify (d @ d') (mk_seq s s2)
     | _ -> (d, if simplify then simplify_statement s else s)
-    in 
+    in
       res
 
   (* Boolean expr may be encoded with ITE. Restore Boolean
@@ -615,7 +615,7 @@ module JavaAST = struct
           [], simplify_statement t'
         else if is_false_expr c' then
           [], simplify_statement e'
-        else 
+        else
         let _, t' = simplify_cond ([], t') in
         let _, e' = simplify_cond ([], e') in
         begin
@@ -654,7 +654,7 @@ module JavaCompilerInfo = struct
   open Pmodule
   open Ident
   open Pdecl
-  
+
   exception UnknownClass of string
   exception NoSuchEnumType of string
   exception EnumTypeAlreadyDefined of string
@@ -679,7 +679,7 @@ module JavaCompilerInfo = struct
       owner : class_record;
     }
   and class_kind = REGULAR | INTERFACE | ABSTRACT
-  
+
   type enum_type = {
       owner : class_record;
       values : Sid.t;
@@ -714,9 +714,9 @@ module JavaCompilerInfo = struct
       | None | Some "class" -> REGULAR
       | Some s -> Loc.errorm ?loc:clsname.id_loc
                     "invalid class_kind attribute '%s'" s
-  
+
   let init_compiler_info (m : Pmodule.pmodule) : unit =
-    let clsname = m.mod_theory.th_name in 
+    let clsname = m.mod_theory.th_name in
     compinfo.current_class <-
       Some {
           m = m;
@@ -730,7 +730,7 @@ module JavaCompilerInfo = struct
           instance_vars = [];
           methods = Mid.empty;
         };
-    compinfo.default_visibility <- 
+    compinfo.default_visibility <-
       get_visibility
         ~default:global_default_visibility
         m.mod_theory.th_name;
@@ -763,7 +763,7 @@ module JavaCompilerInfo = struct
     Ident.id_equal cls.class_name (get_current_class ()).class_name
 
   let import_module (m : Pmodule.pmodule) =
-    let m_name = m.mod_theory.th_name in 
+    let m_name = m.mod_theory.th_name in
     debug "import module #%d: %s@\n"
       (Sid.cardinal compinfo.imported_modules)
       m_name.id_string;
@@ -772,7 +772,7 @@ module JavaCompilerInfo = struct
   let is_imported_module (m : Pmodule.pmodule) : bool =
     Sid.exists (fun id -> Ident.id_equal id m.mod_theory.th_name)
       compinfo.imported_modules
-  
+
   let set_this_type (id : Ident.ident) (ivs : instance_variable list) =
     let cls = get_current_class () in
     if Option.is_some cls.this_type_id then
@@ -834,7 +834,7 @@ module JavaCompilerInfo = struct
     | None -> raise (NoSuchEnumType id.id_string)
     | Some { owner = cls } -> cls
 
-  let set_enum_values (id : Ident.ident) (values : Sid.t) = 
+  let set_enum_values (id : Ident.ident) (values : Sid.t) =
     if Mid.mem id compinfo.enum_types then
       raise (EnumTypeAlreadyDefined id.id_string)
     else let enum = { owner = get_current_class (); values = values } in
@@ -843,17 +843,17 @@ module JavaCompilerInfo = struct
   exception MethodRedefinition of string
 
   let check_new_method_against_default (mid : Ident.ident) =
-    if not (mid = equals_method_id || mid = hashcode_method_id) then 
-    begin    
-      let ccident = camelcase_string mid.id_string in 
+    if not (mid = equals_method_id || mid = hashcode_method_id) then
+    begin
+      let ccident = camelcase_string mid.id_string in
       if String.equal ccident (camelcase_string equals_method_id.id_string) then
-        Loc.warning warn_default_method_redef ?loc:mid.id_loc "redefinition of default method '%s'." mid.id_string        
+        Loc.warning warn_default_method_redef ?loc:mid.id_loc "redefinition of default method '%s'." mid.id_string
       else if String.equal ccident (camelcase_string hashcode_method_id.id_string) then
-        Loc.errorm ?loc:mid.id_loc "redefinition of default method '%s' is not allowed." mid.id_string        
+        Loc.errorm ?loc:mid.id_loc "redefinition of default method '%s' is not allowed." mid.id_string
     end
 
   let add_method (this_index : int option) (ident : Ident.ident) =
-    let cls = get_current_class () in    
+    let cls = get_current_class () in
     check_new_method_against_default ident;
     match Mid.find_opt ident cls.methods with
     | Some _ -> raise (MethodRedefinition ident.id_string)
@@ -895,7 +895,7 @@ module JavaCompilerInfo = struct
     match get_exception_class_opt exn with
     | None -> raise (UnknownException exn.xs_name.id_string)
     | Some cls -> cls
-  
+
   let is_known_java_exception (info : info) (exn : Ity.xsymbol) : bool =
     match query_syntax info.syntax exn.xs_name, get_exception_class_opt exn
     with
@@ -917,7 +917,7 @@ end
 
 
 module JavaPrint = struct
-  open JavaAST  
+  open JavaAST
   open JavaCompilerInfo
 
   let java_keywords = [
@@ -945,14 +945,14 @@ module JavaPrint = struct
 
   let classname_sanitizer s =
     String.capitalize_ascii (camelcase_sanitizer s)
-  
+
   let instance_names_sanitizer = camelcase_sanitizer
 
   let print_ident_ ~sanitizer pr _ fmt id =
     let s = id_unique ~sanitizer pr id in
     pp_print_string fmt s;
     Ident.forget_id pr id
-  
+
   let print_unique_ident_ ~sanitizer pr _ fmt id =
     let s = id_unique ~sanitizer pr id in
     pp_print_string fmt s
@@ -964,10 +964,10 @@ module JavaPrint = struct
 
   let default_ident_printer = print_unique_ident_
                                 ~sanitizer:camelcase_sanitizer local_names
-  
+
   let enum_ident_printer =  print_ident_ ~sanitizer:enum_sanitizer
                               global_names
-  
+
   let classname_printer =  print_ident_ ~sanitizer:classname_sanitizer
                              global_names
 
@@ -976,7 +976,7 @@ module JavaPrint = struct
 
   let method_names_printer = instance_names_printer
   let instance_vars_names_printer = instance_names_printer
-  
+
   let protect_on ?(boxed=false) cond s =
     if cond then "@[<1>(" ^^ s ^^ ")@]"
     else if not boxed then "@[" ^^ s ^^ "@]"
@@ -986,25 +986,25 @@ module JavaPrint = struct
     | PUBLIC -> fprintf fmt "public "
     | PRIVATE -> fprintf fmt "private "
     | PACKAGE -> ()
-  
+
   let print_unop fmt op =
-    let str_of_op = function 
+    let str_of_op = function
       | UnOpPostIncr (* | UnOpPreInc *) -> "++"
       | UnOpPostDecr (* | UnOpPreDecr *) -> "--"
-(*  
+(*
       | UnOpPlus -> "+"
       | UnOpMinus -> "-"
-      | UnOpBNeg -> "~" 
+      | UnOpBNeg -> "~"
 *)
       | UnOpNot -> "!"
     in pp_print_string fmt (str_of_op op)
-  
-  let print_binop fmt op = 
-    let str_of_op = function 
-      | BinOpMul -> "*" 
+
+  let print_binop fmt op =
+    let str_of_op = function
+      | BinOpMul -> "*"
 (*      | BinOpDiv -> "/" *)
 (*      | BinOpMod -> "%" *)
-      | BinOpAdd -> "+" 
+      | BinOpAdd -> "+"
       | BinOpSub -> "-"
 (*      | BinOpLT -> "<" *)
 (*      | BinOpGT -> ">" *)
@@ -1030,7 +1030,7 @@ module JavaPrint = struct
       | BinOpModAssign -> "%="
       | BinOpBAndAssign -> "&="
       | BinOpBXOrAssign -> "^="
-      | BinOpBOrAssign -> "|=" 
+      | BinOpBOrAssign -> "|="
       | BinOpLShiftAssign -> "<<="
       | BinOpRShiftAssign -> ">>="
       | BinOpURShiftAssign -> ">>>="
@@ -1055,7 +1055,7 @@ module JavaPrint = struct
 
   let print_type_class_name (info : info) fmt (typeid: Ident.ident) =
     print_class_name info fmt (get_class typeid)
-  
+
   let rec print_type (info : info) fmt (t : type_definition) =
     let scalar_to_object (s : string) : string =
       match s with
@@ -1063,21 +1063,21 @@ module JavaPrint = struct
       | "boolean" | "short" | "long" | "float" | "double" ->
          String.capitalize_ascii s
       | _ -> s
-    in 
-  
+    in
+
     let print_from_syntax s typedef_list scalar_objects =
-      let pr fmt t = 
+      let pr fmt t =
         match t with
         | TypeFromDrv (s, [], false) when scalar_objects ->
            fprintf fmt "%s" (scalar_to_object s)
-        | TypeFromDrv (_, [], true) -> 
+        | TypeFromDrv (_, [], true) ->
            internal_error "non parameterized type with scalar_object"
         | _ -> print_type info fmt t
       in
       syntax_arguments s pr fmt typedef_list
     in
     match t with
-    | VoidType -> fprintf fmt "void" 
+    | VoidType -> fprintf fmt "void"
     | TypeFromDrv (s, typedef_list, scalar_objects) ->
        print_from_syntax s typedef_list scalar_objects
     | TypeEnum id ->
@@ -1095,8 +1095,8 @@ module JavaPrint = struct
     | ThisType -> fprintf fmt "%a"
                     (default_ident_printer info) (get_current_class_name ())
   (* | ArrayType t -> fprintf fmt "%a[]" (print_type info) t *)
-  
-  let print_instance_var (info : info) fmt (vis : visibility) (id : ident) 
+
+  let print_instance_var (info : info) fmt (vis : visibility) (id : ident)
         (typedef : type_definition) ~(isfinal : bool) =
     fprintf fmt "@[%a%a%a %a;@]"
       print_visibility vis
@@ -1196,7 +1196,7 @@ module JavaPrint = struct
     and print_this_cstr_call (params : expression list) =
         fprintf fmt (protect_on (prec < 1) "this (%a)")
           (print_list comma (print_expression ~prec:15 info)) params
-  
+
     and print_expr_from_driver (s : string) (args : expression list)
                                 (pl : int list) =
       let s =
@@ -1231,8 +1231,8 @@ module JavaPrint = struct
         | ExprITE (i, t, e) -> print_ite i t e
         | ExprFunCall (f, params) -> print_call f params
         | ExprMethodCall (ctx, m, params) -> print_method_call ctx m params
-        | ExprClassOf e -> 
-            fprintf fmt (protect_on (prec < 1) "%a.getClass()")  (print_expression ~prec:1 info) e       
+        | ExprClassOf e ->
+            fprintf fmt (protect_on (prec < 1) "%a.getClass()")  (print_expression ~prec:1 info) e
        | ExprNewInstance (id, params) -> print_new id params
        | ExprThisConstructorCall (params) -> print_this_cstr_call params
        | ExprVar (vid,_) -> default_ident_printer info fmt vid
@@ -1249,26 +1249,26 @@ module JavaPrint = struct
           fprintf fmt (protect_on (prec < 1) "%a.%a")
             (print_expression ~prec:1 info) structexpr
             (instance_vars_names_printer info) field
-        | ExprCast (t, e) -> 
-          fprintf fmt (protect_on (prec < 1) "(%a) %a")  
+        | ExprCast (t, e) ->
+          fprintf fmt (protect_on (prec < 1) "(%a) %a")
             (print_type info) t
-            (print_expression ~prec:1 info) e  
-        | ExprArraysEquals (a1, a2) -> 
+            (print_expression ~prec:1 info) e
+        | ExprArraysEquals (a1, a2) ->
           (* fprintf fmt (protect_on (prec < 1) "Arrays.deepEquals(%a, %a)")   *)
-          fprintf fmt (protect_on (prec < 1) "(%a).equals(%a)")   
+          fprintf fmt (protect_on (prec < 1) "(%a).equals(%a)")
             (print_expression ~prec:1 info) a1
-            (print_expression ~prec:1 info) a2 
-        | ExprArraysHashCode a -> 
-          fprintf fmt (protect_on (prec < 1) "(%a).hashCode()")          
-            (print_expression ~prec:1 info) a             
+            (print_expression ~prec:1 info) a2
+        | ExprArraysHashCode a ->
+          fprintf fmt (protect_on (prec < 1) "(%a).hashCode()")
+            (print_expression ~prec:1 info) a
        end
   and print_expression_no_par (info : info) fmt (e : expression) =
-    print_expression ~prec:max_int info fmt e 
+    print_expression ~prec:max_int info fmt e
 
   let rec print_statement ?(braces_on=true) (info : info) fmt
             (stmt : statement) =
     match stmt with
-    | StmtTODO s -> 
+    | StmtTODO s ->
        fprintf fmt "/* TODO %s */@." s;
         unsupported "TODO Stmt"
 
@@ -1282,7 +1282,7 @@ module JavaPrint = struct
        begin
          match s1, s2 with
          | StmtNop, _ | _, StmtNop -> assert false
-         | _ -> 
+         | _ ->
             fprintf fmt "%a@\n%a"
               (print_statement ~braces_on:braces_on info) s1
               (print_statement ~braces_on:braces_on info) s2
@@ -1294,12 +1294,12 @@ module JavaPrint = struct
 
     | StmtBlock ([], s) -> print_statement ~braces_on:false info fmt s
     | StmtBlock (decllist, s) ->
-       let fpf = 
-         if braces_on then 
+       let fpf =
+         if braces_on then
            fprintf fmt "@[<2>{@\n%a@\n%a@]@\n}"
          else fprintf fmt "@\n%a@\n%a@\n" in
 
-       fpf 
+       fpf
          (* (pp_print_list ~pp_sep:(fun fmt () -> fprintf fmt "@\n") *)
          (pp_print_list ~pp_sep:newline
             (print_definition info)) decllist
@@ -1307,7 +1307,7 @@ module JavaPrint = struct
 
     | StmtThisConstructor s ->
        print_statement ~braces_on:braces_on info fmt s
-  
+
     | StmtWhile (cond, loopstmt) ->
        fprintf fmt "@[@[<2>while (%a) {@\n%a@]@\n}@]"
          (print_expression_no_par info) cond
@@ -1348,12 +1348,12 @@ module JavaPrint = struct
        if javaex then
          let sopt = query_syntax info.syntax xs.xs_name in
          fprintf fmt "@[catch (%s %a) {@\n%a@]@\n}"
-           (Option.get sopt) (default_ident_printer info) anonymous_exception_id 
+           (Option.get sopt) (default_ident_printer info) anonymous_exception_id
            (print_statement info) st
        else
          fprintf fmt "@[catch (%a %a) {@\n%a@]@\n}"
            (print_class_name info) (get_exception_class xs)
-           (default_ident_printer info) anonymous_exception_id 
+           (default_ident_printer info) anonymous_exception_id
            (print_statement info) st
     | Some p ->
        if javaex then
@@ -1364,7 +1364,7 @@ module JavaPrint = struct
            (default_ident_printer info) p.pv_vs.vs_name
            (print_statement info) st
   and print_if_then_else (info : info) fmt i t e =
-    if is_nop e then 
+    if is_nop e then
       fprintf fmt "@[<hov 2>if (%a) {@\n@[<hov>%a@]@]@\n}"
         (print_expression_no_par info) i
         (print_statement ~braces_on:false info) t
@@ -1374,11 +1374,11 @@ module JavaPrint = struct
            match e with
            | StmtIf (i', t', e') ->
               let first_cond, elses, last = decompose_cascading_ite i' t' e' in
-              (i,t), first_cond:: elses, last 
-           | _ -> (i,t), [] , e 
-         in 
+              (i,t), first_cond:: elses, last
+           | _ -> (i,t), [] , e
+         in
          let print_cascading_ite i t e =
-           let (i,t), elselist, last = decompose_cascading_ite i t e in 
+           let (i,t), elselist, last = decompose_cascading_ite i t e in
            fprintf fmt "@[<hov 2>if (%a) {@\n%a@]@\n"
              (print_expression_no_par info) i
              (print_statement info) t;
@@ -1389,7 +1389,7 @@ module JavaPrint = struct
              fmt elselist;
            fprintf fmt "@\n@[<hov 2>}";
            if is_nop last then
-             fprintf fmt "@]@\n" 
+             fprintf fmt "@]@\n"
            else
              fprintf fmt " else {@\n%a@]@\n}@\n"
                (print_statement ~braces_on:false info) last
@@ -1424,7 +1424,7 @@ module JavaPrint = struct
     if List.length exlist > 0 then
       fprintf fmt "@[ throws %a@]"
         (pp_print_list ~pp_sep:comma print_ex) exlist
- 
+
   and print_method (info : info) fmt (is_final : is_final) (vis : visibility) is_static (id : ident)
         (restype : type_definition)
         (args : (ident * type_definition) list)
@@ -1442,7 +1442,7 @@ module JavaPrint = struct
   and print_abstract_method (info : info) fmt (vis : visibility) (id : ident)
         (restype : type_definition)
         (args : (ident * type_definition) list)
-        (exlist : xsymbol list) = 
+        (exlist : xsymbol list) =
     fprintf fmt "@[%a%a%a %a(@[%a@])%a;@]"
       print_visibility vis
       print_abstract_spec ()
@@ -1453,7 +1453,7 @@ module JavaPrint = struct
 
   and print_constructor (info : info) fmt  (vis : visibility)
                          (args : (ident * type_definition) list)
-                         (exlist : xsymbol list) 
+                         (exlist : xsymbol list)
                          (body : body) =
     fprintf fmt "@[@[<2>%a%a(@[%a@])%a {@\n@[%a@]@]@\n}@]"
       print_visibility vis
@@ -1473,7 +1473,7 @@ module JavaPrint = struct
       (print_type info) tdef
       (pp_print_list ~pp_sep:(fun fmt () -> fprintf fmt ",@ ")
          (print_init info)) idval_list
-  
+
   and print_definition (info : info) fmt (def : JavaAST.definition) =
     match def with
     | DeclEnum (vis, id, ident_list) ->
@@ -1526,7 +1526,7 @@ module MLW2Java = struct
          match (query_syntax info.syntax id) with
          | Some s ->
             let args = List.map (translate_type info) ty_list in
-            let so = Sattr.mem java_scalar_objects id.id_attrs in 
+            let so = Sattr.mem java_scalar_objects id.id_attrs in
             TypeFromDrv (s, args, so)
          | None ->
             if List.length ty_list = 0 then
@@ -1536,7 +1536,7 @@ module MLW2Java = struct
        end
     | Tarrow (ty1, ty2) ->
        let _ = translate_type info ty1 in
-       let _ = translate_type info ty2 in 
+       let _ = translate_type info ty2 in
        unsupported "arrow type"
 
   (**
@@ -1549,7 +1549,7 @@ module MLW2Java = struct
      @raise Unsupported if a conbstructor takes arguments
    *)
   let translate_enum_def (_ : info) (id : ident)
-        (clist : (ident * ty list) list) 
+        (clist : (ident * ty list) list)
       : JavaAST.definition list =
     let get_enum_value (constr_id, constr_args) : ident =
       if List.length constr_args = 0 then
@@ -1558,26 +1558,26 @@ module MLW2Java = struct
         unsupported ("non enum algebraic types (type '" ^ id.id_string ^ "')")
     in
     let enums = List.map get_enum_value clist in
-    let visibility = get_visibility ~default:(get_default_visibility ()) id in 
+    let visibility = get_visibility ~default:(get_default_visibility ()) id in
     set_enum_values id (Sid.of_list enums);
     [ DeclEnum (visibility, id, enums) ]
 
-    
+
   exception EqualsTypeFailure
   let obj_id = Ident.id_register (Ident.id_fresh "obj")
   let obj_var = ExprVar(obj_id, object_type_from_drv)
   let other_id = Ident.id_register (Ident.id_fresh "other")
-  let other_var = ExprVar(other_id, ThisType)  
+  let other_var = ExprVar(other_id, ThisType)
 
-  let is_array_type (tdef : ty) : bool = 
+  let is_array_type (tdef : ty) : bool =
     match tdef with
     | Tapp (id, _) when Sattr.mem array_attr id.id_attrs -> true
-    | _ -> false  
+    | _ -> false
 
-  let add_equals_method (info : info) (fields : (is_mutable * ident * ty) list) : JavaAST.definition = 
+  let add_equals_method (info : info) (fields : (is_mutable * ident * ty) list) : JavaAST.definition =
     let compare_fields ((_ : is_mutable), (id : Ident.ident), (tdef : ty)) : statement =
-      let this_field = ExprDot (ExprThis, id) in 
-      let other_field = ExprDot (other_var, id) in 
+      let this_field = ExprDot (ExprThis, id) in
+      let other_field = ExprDot (other_var, id) in
       let mk_check_null e = mk_ite (mk_eq this_field null_expr) (mk_eq other_field null_expr) e in
       let cond =
         if is_array_type tdef then ExprArraysEquals (this_field, other_field)
@@ -1588,63 +1588,63 @@ module MLW2Java = struct
         | TypeFromDrv _
         | TypeAlias _ -> mk_check_null (ExprMethodCall (this_field, equals_method_id, [other_field]))
         | VoidType
-        | ThisType -> raise EqualsTypeFailure 
+        | ThisType -> raise EqualsTypeFailure
       in mk_if (mk_not cond) (StmtReturn false_expr) (StmtNop)
     in
     let body = mk_seq_of_list [
       mk_if (mk_eq ExprThis obj_var) (StmtReturn true_expr) (StmtNop);
       mk_if (mk_eq obj_var (ExprConst CstNull)) (StmtReturn false_expr) (StmtNop);
       mk_if (mk_neq (ExprClassOf ExprThis) (ExprClassOf obj_var)) (StmtReturn false_expr) (StmtNop);
-      StmtBlock (mk_body 
-        [ DeclLocalVar (ThisType, [ (other_id, ExprCast (ThisType, obj_var)) ]) ] 
+      StmtBlock (mk_body
+        [ DeclLocalVar (ThisType, [ (other_id, ExprCast (ThisType, obj_var)) ]) ]
         (mk_seq_of_list (List.append (List.map compare_fields fields) [ (StmtReturn true_expr)]))
         )
       ]
     in
     let equals_ast = DeclMethod (
       true,
-      PUBLIC, 
+      PUBLIC,
       false, (* not a static method *)
       equals_method_id,  (* method id *)
       boolean_type_from_drv, (* return type *)
       [(obj_id, object_type_from_drv)], (* parameters *)
       [], (* no exception *)
-      mk_body [] body      
+      mk_body [] body
       )
-    in 
+    in
       add_method (Some 0) equals_method_id;
       equals_ast
-        
-  exception HashCodeTypeFailure  
-  let local_hash_value_id = Ident.id_register (Ident.id_fresh "hash_value")
-  let local_hash_value_var = ExprVar(local_hash_value_id, int_type_from_drv)  
 
-  let add_hashcode_method (info : info) (fields : (is_mutable * ident * ty) list) : JavaAST.definition =    
+  exception HashCodeTypeFailure
+  let local_hash_value_id = Ident.id_register (Ident.id_fresh "hash_value")
+  let local_hash_value_var = ExprVar(local_hash_value_id, int_type_from_drv)
+
+  let add_hashcode_method (info : info) (fields : (is_mutable * ident * ty) list) : JavaAST.definition =
     let hash_code_field ((_ : is_mutable), (id : Ident.ident), (tdef : ty)) : statement =
-      let this_field = ExprDot (ExprThis, id) in 
-      let mk_if_not_null e = mk_ite (mk_eq this_field null_expr) zero_expr e in 
+      let this_field = ExprDot (ExprThis, id) in
+      let mk_if_not_null e = mk_ite (mk_eq this_field null_expr) zero_expr e in
       let hvalue =
         if is_array_type tdef then mk_if_not_null (ExprArraysHashCode this_field)
         else
           match translate_type info tdef with
-          | TypeEnum _ -> ExprMethodCall (this_field, hashcode_method_id, [])             
+          | TypeEnum _ -> ExprMethodCall (this_field, hashcode_method_id, [])
           | TypeFromDrv ("int", [], false) -> this_field
           | TypeFromDrv ("boolean", [], false) -> mk_ite this_field one_expr zero_expr
-          | TypeAlias _ 
+          | TypeAlias _
           | TypeFromDrv _ -> mk_if_not_null (ExprMethodCall (this_field, hashcode_method_id, []))
           | VoidType
           | ThisType -> raise HashCodeTypeFailure
-      in 
-        StmtExpr (mk_assign 
+      in
+        StmtExpr (mk_assign
                   local_hash_value_var
                   (mk_add (mk_mul (mk_int 31) local_hash_value_var) hvalue))
     in
-    let body = 
+    let body =
       mk_seq_of_list (List.append (List.map hash_code_field fields) [ (StmtReturn local_hash_value_var)])
     in
     let hashcode_ast = DeclMethod (
       true,
-      PUBLIC, 
+      PUBLIC,
       false, (* not a static method *)
       hashcode_method_id,  (* method id *)
       int_type_from_drv, (* return type *)
@@ -1652,16 +1652,16 @@ module MLW2Java = struct
       [], (* no exception *)
       mk_body
        [DeclLocalVar (int_type_from_drv, [ (local_hash_value_id, one_expr) ])]
-       body      
-      ) 
-    in 
+       body
+      )
+    in
       add_method (Some 0) hashcode_method_id;
       hashcode_ast
-        
+
   let add_default_methods (info : info) (fields : (is_mutable * ident * ty) list) : JavaAST.definition list =
     [
-      add_equals_method info fields; 
-      add_hashcode_method info fields; 
+      add_equals_method info fields;
+      add_hashcode_method info fields;
     ]
 
   (**
@@ -1675,23 +1675,23 @@ module MLW2Java = struct
        record types are defined.
    *)
   let translate_record_def (info : info) (id : ident)
-            (fieldlist : (is_mutable * ident * ty) list) 
+            (fieldlist : (is_mutable * ident * ty) list)
       : JavaAST.definition list =
     if is_static_class () then (* The type of 'this' is not yet defined. *)
       begin
         let visibility =
-          get_visibility ~default:(get_default_visibility ()) id in 
+          get_visibility ~default:(get_default_visibility ()) id in
         let translate_field (not_final, field_ident, field_type)
             : instance_variable =
           let jtype = translate_type info field_type in
           let is_final = not not_final in
-          let fvis = get_visibility ~default:visibility field_ident in 
+          let fvis = get_visibility ~default:visibility field_ident in
           (fvis, is_final, field_ident, jtype)
         in
         let fields = List.map translate_field fieldlist in
 
-        set_this_type id fields;        
-        List.append (List.map (fun iv -> DeclInstanceVar iv) fields) 
+        set_this_type id fields;
+        List.append (List.map (fun iv -> DeclInstanceVar iv) fields)
                                (add_default_methods info fieldlist)
       end
     else
@@ -1709,12 +1709,12 @@ module MLW2Java = struct
       end
     else match Option.get tdef.its_def with
          | Ddata constructor_list ->
-            translate_enum_def info type_id constructor_list 
+            translate_enum_def info type_id constructor_list
          | Drecord field_list ->
             if is_interface () then
               Loc.errorm ?loc:type_id.id_loc
                 "fields are not allowed in interface";
-            translate_record_def info type_id field_list 
+            translate_record_def info type_id field_list
          | Dalias t ->
             let tt = translate_type info t in
             Loc.errorm ?loc:type_id.id_loc "unsupported alias type %a = %a@."
@@ -1744,7 +1744,7 @@ module MLW2Java = struct
               when Ident.id_equal typeid Pmodule.ts_ref.ts_name ->
             unsupported "function with ref arguments"
          | _ ->
-            let jtype = translate_type info ty in 
+            let jtype = translate_type info ty in
             if is_void jtype then
               begin
                 if has_unit then
@@ -1753,7 +1753,7 @@ module MLW2Java = struct
                   unsupported ("non-dummy parameter '" ^ id.id_string ^ "'");
                 aux tl (res @ [ (id, jtype) ]) true this_index
               end
-            else 
+            else
               aux tl (res @ [ (id, jtype) ]) has_unit this_index
     in
     aux vlist [] false None
@@ -1801,7 +1801,7 @@ module MLW2Java = struct
           : body =
     let env = { info = info; is_return = true; in_constructor = cstr } in
     let d, s = translate_expression expr env in
-    mk_body ~simplify:true d s     
+    mk_body ~simplify:true d s
   and translate_constant (cst : expr) (env : translation_env) : body =
     let e = match cst.e_node with
     | Econst (Constant.ConstInt (icst:Number.int_constant)) ->
@@ -1810,14 +1810,14 @@ module MLW2Java = struct
     | Econst (Constant.ConstStr s)  ->
       ExprConst (CstStr s)
     | Econst (Constant.ConstReal _) ->
-       unsupported "floating point values" 
+       unsupported "floating point values"
     | _ -> unreachable "translate_constant"
     in mk_body [] (expr_or_return e env)
   and translate_if cond then_expr else_expr env : body =
     debug "IF@.";
     let cbody =
       translate_expression cond { env with is_return = false } in
-    let cbody = simplify_cond cbody in 
+    let cbody = simplify_cond cbody in
     let tblock = StmtBlock (translate_expression then_expr env) in
     let eblock = StmtBlock (translate_expression else_expr env) in
     begin
@@ -1844,21 +1844,21 @@ module MLW2Java = struct
     let env_nr = { env with is_return = false} in
     let b = StmtBlock (translate_expression loop env_nr) in
     let cdecl, cstmt = simplify_cond (translate_expression cond env_nr) in
-    let whilestmt = 
+    let whilestmt =
       match get_last_expr cstmt with
       | StmtNop, e ->
          StmtWhile (e, b)
-      | stmt, e -> 
+      | stmt, e ->
          StmtWhile (true_expr,
                     mk_seq_of_list [stmt; StmtIf (e, StmtBreak, StmtNop); b ] )
     in
     debug "WHILE Done@.";
-    mk_body cdecl whilestmt  
+    mk_body cdecl whilestmt
 
     and translate_array_make (a_id : Ident.ident) (a_type : type_definition)
                             (n : expr) (v : expr)
                             (env : translation_env) : expression * body =
-    let env_nr = { env with is_return = false } in 
+    let env_nr = { env with is_return = false } in
     let vtype = translate_type env.info v.e_mlty in
     let ndecl, nstmt, n = translate_expression_and_get_last_expr n env_nr in
     let vdecl, vstmt, v = translate_expression_and_get_last_expr v env_nr in
@@ -1867,14 +1867,14 @@ module MLW2Java = struct
     let arr_decl = [DeclLocalVar (a_type, [a_id, ExprNewArray (vtype, n)])] in
     (* Fill a_ with v *)
     let i_id = id_register (id_fresh "i_") in
-    let i_type = int_type_from_drv in 
+    let i_type = int_type_from_drv in
     let filldecl, fillstmt =
       mk_for i_id i_type zero_expr To (ExprBinOp (BinOpSub, n, one_expr))
         (fun iexpr ->
           StmtExpr(ExprBinOp (BinOpAssign, ExprArrayIndexing (arr_var, iexpr),
                               v)))
-    in 
-    arr_var, mk_body 
+    in
+    arr_var, mk_body
                (ndecl @ vdecl @ arr_decl @ filldecl)
                (mk_seq_of_list [nstmt; vstmt; fillstmt])
   and translate_array_constructor (e : expr) (n : expr) (v : expr)
@@ -1892,7 +1892,7 @@ module MLW2Java = struct
       | arg :: tl ->
          let decllist, stmt, e =
            translate_expression_and_get_last_expr arg env in
-         
+
          aux (accdefs@decllist) (mk_seq accstmt stmt) (accparams @ [e]) tl
     in aux [] StmtNop [] args
   and translate_app_call (e : expr) (rs : rsymbol) (params : expression list)
@@ -1924,7 +1924,7 @@ module MLW2Java = struct
                ExprMethodCall (ExprNop, rs.rs_name, params)
             | Some { this_index = Some index } ->
                begin
-                 try 
+                 try
                    let this = List.nth params index in
                    let params =
                      Lists.fold_lefti
@@ -1955,12 +1955,12 @@ module MLW2Java = struct
          | Tapp (id, []) -> id
          | _ -> internal_error "this_constructor: expr has bad type"
        in
-       try 
+       try
          let clsrec = get_class tid in
          let assign_instance_var ((_, _, idv, _) : instance_variable) (value : expression) : statement =
            StmtExpr(ExprBinOp (BinOpAssign, ExprDot (ExprThis, idv), value))
          in
-         let assignments = List.map2 assign_instance_var clsrec.instance_vars params in 
+         let assignments = List.map2 assign_instance_var clsrec.instance_vars params in
          mk_body decls
            (StmtThisConstructor (mk_seq_of_list ([stmt] @ assignments)))
 
@@ -1976,8 +1976,8 @@ module MLW2Java = struct
       unsupported "partial application";
 
     let is_record_cstr =
-      is_constructor env.info rs.rs_name 
-      && query_syntax env.info.syntax rs.rs_name = None in 
+      is_constructor env.info rs.rs_name
+      && query_syntax env.info.syntax rs.rs_name = None in
     match args with
     (* true -> true *)
     | []  when rs_equal rs rs_true  ->
@@ -2004,7 +2004,7 @@ module MLW2Java = struct
     (* ref expr -> expr *)
     | [arg] when rs_equal rs Pmodule.rs_ref ->
        begin
-         try 
+         try
            let env_nr = { env with is_return = false } in
            let e = expr_of_body (translate_expression arg env_nr) in
            mk_body [] (expr_or_return e env)
@@ -2019,7 +2019,7 @@ module MLW2Java = struct
        else
          Loc.errorm "record constructor are allowed as return values only."
 
-    | _ when is_record_cstr && not env.in_constructor  ->       
+    | _ when is_record_cstr && not env.in_constructor  ->
        debug "call record constructor '%s'@." rs.rs_name.id_string;
        unsupported ("record constructor ('" ^ rs.rs_name.id_string ^ "') call out of a java constructor")
     | _ ->
@@ -2062,10 +2062,10 @@ module MLW2Java = struct
        let it_id = it.pv_vs.vs_name in
        let j_it_type = translate_type env.info it_type in
        let ds, ss, es =
-         translate_expression_and_get_last_expr firstval env_nr in 
+         translate_expression_and_get_last_expr firstval env_nr in
        let de, se, ee =
-         translate_expression_and_get_last_expr lastval env_nr in 
-       let sfor = mk_for it_id j_it_type es dir ee 
+         translate_expression_and_get_last_expr lastval env_nr in
+       let sfor = mk_for it_id j_it_type es dir ee
          (fun _ ->
            StmtBlock (translate_expression body env_nr)) in
        mk_body [] (mk_seq_of_list [ (StmtBlock (mk_body ds ss));
@@ -2098,7 +2098,7 @@ module MLW2Java = struct
   and translate_let (ldef : let_def) (inexpr : expr)
                     (env : translation_env) : body =
     debug "LET@.";
-    let env_nr = { env with is_return = false } in 
+    let env_nr = { env with is_return = false } in
     match ldef with
     | Lsym (rs, _, _, _, _) ->
        unsupported ("let '" ^ rs.rs_name.id_string ^ "'")
@@ -2108,7 +2108,7 @@ module MLW2Java = struct
        let id = pv.pv_vs.vs_name in
        debug "let %s \n" id.id_string ;
        let jtype = translate_type env.info le.e_mlty in
-       let arrdecl, initblock = 
+       let arrdecl, initblock =
          match le with
          | { e_node = Eapp (rs, [n; v], _) }
               when Sattr.mem array_mk_attr rs.rs_name.id_attrs ->
@@ -2135,12 +2135,12 @@ module MLW2Java = struct
                                (rv : expr) (env : translation_env) : body =
     debug "assign a mutable field '%a'@."
       (JavaPrint.default_ident_printer env.info) field.rs_name;
-    let env_nr = { env with is_return = false } in 
+    let env_nr = { env with is_return = false } in
     let rvd, rvs, rve = translate_expression_and_get_last_expr rv env_nr in
     let lvd, lvs, lve = translate_expression_and_get_last_expr lv env_nr in
     let field = ExprDot (lve, field.rs_name) in
     let fieldassign = StmtExpr(ExprBinOp (BinOpAssign, field, rve)) in
-    debug "assignment is  %a@." (JavaPrint.print_statement env.info) fieldassign; 
+    debug "assignment is  %a@." (JavaPrint.print_statement env.info) fieldassign;
     mk_body (rvd @ lvd) (mk_seq_of_list [rvs; lvs; fieldassign ])
 
   and translate_assign (assignlist : (expr * ty * rsymbol * expr) list)
@@ -2148,7 +2148,7 @@ module MLW2Java = struct
     match assignlist with
     | [ (e1,ty,rs,e2) ] -> translate_single_assign e1 ty rs e2 env
     | _ -> unsupported "parallel assignment of mutables"
-  
+
   and translate_raise (xs : Ity.xsymbol) (value : expr option)
                       (env : translation_env) : body =
     debug "RAISE %s@." xs.xs_name.id_string;
@@ -2176,14 +2176,14 @@ module MLW2Java = struct
             else
               let env_nr = { env with is_return = false } in
               let dme, sme, me =
-                translate_expression_and_get_last_expr v env_nr in 
+                translate_expression_and_get_last_expr v env_nr in
               mk_body dme (mk_seq sme (StmtThrow (xs, me)))
 
   and translate_catch_clauses (xl : exn_branch list) (env : translation_env)
       : catch list =
     match xl with
     | [] -> []
-    | (xs, pvsl, e)::l ->       
+    | (xs, pvsl, e)::l ->
        debug "catch_clauses %s @." xs.xs_name.id_string;
        if String.equal xs.xs_name.id_string break_id ||
              String.equal xs.xs_name.id_string continue_id ||
@@ -2194,7 +2194,7 @@ module MLW2Java = struct
          let cl = translate_catch_clauses l env in
          let st = StmtBlock (translate_expression e env) in
          debug "catch_clauses II @.";
-         let cc = 
+         let cc =
            match pvsl with
            | [] -> (xs, None, st)
            | [pvs] -> (xs, Some pvs, st)
@@ -2214,15 +2214,15 @@ module MLW2Java = struct
   and translate_match_constructors (mexpr : expr) (patterns : reg_branch list)
       (env : translation_env) : body =
     let enumtype = translate_type env.info mexpr.e_mlty in
-    let enumvalues = match enumtype with        
+    let enumvalues = match enumtype with
       | TypeEnum typeid -> get_enum_values typeid
       | _ -> unsupported "non enum type in pattern matching"
     in
     let env_nr = { env with is_return = false } in
     let dme, sme, me =
-      translate_expression_and_get_last_expr mexpr env_nr in 
+      translate_expression_and_get_last_expr mexpr env_nr in
     let rec pattern_cond (p : pat) =
-      match p with 
+      match p with
       | Pwild -> true_expr
       | Papp (ls, []) when Mid.mem ls.ls_name enumvalues ->
          ExprBinOp (BinOpEQ, me, ExprConst (CstEnum (ls.ls_name, enumtype)))
@@ -2231,15 +2231,15 @@ module MLW2Java = struct
          let p2c = pattern_cond p2 in
          ExprBinOp (BinOpOr, p1c, p2c)
       | _ -> unsupported "non enum in pattern-matching"
-    in 
+    in
     let rec aux (patterns : reg_branch list) =
       match patterns with
       | [] -> StmtNop
       | [(_, pe)] ->
          let bpe = translate_expression pe env in
-         (StmtBlock bpe) 
+         (StmtBlock bpe)
       | (p, pe)::tl ->
-         let tlstmt = aux tl in 
+         let tlstmt = aux tl in
          let bpe = translate_expression pe env in
          let cond = pattern_cond p in
          mk_if cond (StmtBlock bpe) tlstmt
@@ -2247,7 +2247,7 @@ module MLW2Java = struct
     let switch = aux patterns in
     mk_body dme (mk_seq sme switch)
   and translate_match (mexpr : expr) (patterns : reg_branch list)
-                       (xn : exn_branch list)  
+                       (xn : exn_branch list)
                        (env : translation_env) : body =
     match patterns, xn with
     | _::_, [] ->
@@ -2261,11 +2261,11 @@ module MLW2Java = struct
     (* -> match *)
     debug "EEXN@.";
     translate_expression value env
-  
+
   and translate_lambda (_ : var list) (_ : expr)
                        (_ : translation_env) : body =
     unsupported "lambda expressions"
-  
+
   and translate_ignore (e : expr)
                        (env : translation_env) : body =
     let retstmt = if env.is_return then StmtReturn ExprNop else StmtNop in
@@ -2276,7 +2276,7 @@ module MLW2Java = struct
     let vartype = translate_type env.info e.e_mlty in
     let varexpr = match vartype with
     | ThisType when String.equal varid.id_string this_id -> ExprThis
-    | _ -> 
+    | _ ->
       begin
         match query_syntax env.info.syntax varid with
           None ->  ExprVar (varid, vartype)
@@ -2286,7 +2286,7 @@ module MLW2Java = struct
       end
     in
     mk_body [] (expr_or_return varexpr env)
-  
+
   and translate_expression (expr : expr) (env : translation_env) : body =
     match expr.e_node with
     | Econst _ ->
@@ -2350,18 +2350,18 @@ module MLW2Java = struct
 
   let translate_raised_exceptions (info : info) (rs: rsymbol) : xsymbol list =
     let aux xs =
-      let _ = is_known_java_exception info xs in 
+      let _ = is_known_java_exception info xs in
       xs
     in
     List.map aux (Mxs.keys rs.rs_cty.cty_xpost)
- 
+
   let translate_let_decl (info : info) (ldef : let_def)
       : JavaAST.definition list =
     let translate_method_proto ~(is_cstr:bool) rs stv restype varlist =
        let vlist, this_index =
          translate_function_arguments ~is_cstr:is_cstr info varlist stv in
        let visibility = get_visibility
-                          ~default:(get_default_visibility ()) rs.rs_name in 
+                          ~default:(get_default_visibility ()) rs.rs_name in
        let jrestype = match restype with
          | Tvar _ ->
             Loc.warning warn_void_result  "return type of '%s' is set to void."
@@ -2373,7 +2373,7 @@ module MLW2Java = struct
     in
     let translate_lrec (info : info) ({rec_sym = rs; rec_args = varlist; rec_exp = body;
     rec_res = restype; rec_svar = stv } : rdef) : JavaAST.definition =
-      let rsid = rs.rs_name in 
+      let rsid = rs.rs_name in
       if is_interface () then
         Loc.errorm ?loc:rsid.id_loc
        "concrete methods are not allowed in interface";
@@ -2382,10 +2382,10 @@ module MLW2Java = struct
           let vlist, this_index, jrestype, visibility, exlist =
           translate_method_proto ~is_cstr:false rs stv restype varlist in
           add_method this_index rsid;
-          let static = not (Option.is_some this_index) in 
+          let static = not (Option.is_some this_index) in
           let jbody = translate_body ~cstr:false info body in
           debug "method %s is_static=%B@." rsid.id_string static;
-          DeclMethod (false, visibility, static, rsid, jrestype, vlist, exlist, jbody) 
+          DeclMethod (false, visibility, static, rsid, jrestype, vlist, exlist, jbody)
       end
         in
       match ldef with
@@ -2393,7 +2393,7 @@ module MLW2Java = struct
     | Lsym (rs, _, _, _ , _) when  Sattr.mem java_ignore rs.rs_name.id_attrs -> []
     | Lsym (rs, stv, restype, varlist, body) when
            Sattr.mem java_constructor rs.rs_name.id_attrs ->
-       let rsid = rs.rs_name in 
+       let rsid = rs.rs_name in
        if is_interface () then
          Loc.errorm ?loc:rsid.id_loc
            "constructors are not allowed in interface";
@@ -2410,15 +2410,15 @@ module MLW2Java = struct
        end
 
     | Lsym (rs, stv, restype, varlist, body) ->
-       let rsid = rs.rs_name in 
-       if is_interface () then 
+       let rsid = rs.rs_name in
+       if is_interface () then
          Loc.errorm ?loc:rsid.id_loc
            "concrete methods are not allowed in interface";
        begin
          debug "Lsym %s %d@." rsid.id_string (Stv.cardinal stv);
          let vlist, this_index, jrestype, visibility, exlist =
            translate_method_proto ~is_cstr:false rs stv restype varlist in
-         let static = not (Option.is_some this_index) in 
+         let static = not (Option.is_some this_index) in
          let jbody = translate_body ~cstr:false info body in
          add_method this_index rsid;
          debug "method %s is_static=%B@." rsid.id_string static;
@@ -2436,9 +2436,9 @@ module MLW2Java = struct
            rsid.id_string;
        add_method this_index rs.rs_name;
        [ DeclAbstractMethod (visibility, rs.rs_name, jrestype, vlist, exlist) ]
-    | Lrec (rdefs) -> List.map (translate_lrec info) rdefs 
+    | Lrec (rdefs) -> List.map (translate_lrec info) rdefs
 
-  
+
   let translate_val_decl (_ : info) (_ : pvsymbol) (_ : ty) =
     [ DeclNotImplemented "Dval" ]
 
@@ -2467,7 +2467,7 @@ module MLW2Java = struct
       | Dtype [itsdefn] -> translate_type_decl info itsdefn
       | Dtype _ -> unsupported "multiple types declaration"
       | Dlet ldef -> translate_let_decl info ldef
-      | Dval (pv, ty) -> translate_val_decl info pv ty 
+      | Dval (pv, ty) -> translate_val_decl info pv ty
       | Dexn (xs, ty) -> translate_exception_decl info xs ty
       | Dmodule (s, dl) -> translate_module_decl info s dl
     end
@@ -2521,7 +2521,7 @@ module ExtractJava = struct
       in
       let deps = List.filter
                    (fun m -> Option.is_some (get_module_package_name m)) deps
-      in 
+      in
       pp_print_list ~pp_sep:newline print_module_dep fmt deps;
       if List.length deps > 0 then
         fprintf fmt "@\n@\n"
@@ -2532,8 +2532,8 @@ module ExtractJava = struct
                        m.mod_theory.th_name in
     let cls = get_current_class () in
     let clsname = (get_current_class_name ()).id_string in
-    debug "extract module %s@." clsname; 
-    
+    debug "extract module %s@." clsname;
+
     fprintf fmt "%a%a%a%a@[%a%a%s%a%a {@\n@[<2>@\n"
       print_pkg_name m
       print_prelude global_prelude
@@ -2563,7 +2563,7 @@ module ExtractJava = struct
 
   let print_decl_flat _ ?old:_ ?fname:_ _ _ _ =
     unsupported "flat extraction"
-  
+
   let class_footer_printer : Pdriver.border_printer =
     fun _args ?old:_ ?fname:_ fmt _ ->
     Format.fprintf fmt "@]@\n}@]@."
@@ -2594,4 +2594,3 @@ end
 
 let () =
   ExtractJava.register_printer ()
-

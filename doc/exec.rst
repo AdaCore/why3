@@ -452,4 +452,3 @@ Not any WhyML code can be extracted to C. Here is a list of supported features a
    * ``break``, ``continue`` and ``return`` are supported
 
 .. include:: whyml2java.inc
-  
