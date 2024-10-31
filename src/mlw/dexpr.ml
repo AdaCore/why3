@@ -1045,6 +1045,9 @@ let check_spec inr dsp ecty ({e_loc = loc} as e) =
     Loc.errorm ?loc:(e_locate_effect (fun eff -> not (reg_submap
           (Mreg.set_inter eff.eff_writes eeff.eff_writes) ueff.eff_writes)) e)
       "this@ expression@ produces@ an@ unlisted@ write@ effect";
+  if total ueff.eff_oneway && partial eeff.eff_oneway then
+    Loc.errorm ?loc:(e_locate_effect (fun eff -> partial eff.eff_oneway) e)
+      "this@ expression@ may@ fail@ but@ is@ not@ specified@ as@ partial";
   if ecty.cty_args <> [] && bad_raise eeff ueff then Sxs.iter (fun xs ->
     Loc.errorm ?loc:(e_locate_effect (fun eff -> Sxs.mem xs eff.eff_raises) e)
       "this@ expression@ raises@ unlisted@ exception@ %a"

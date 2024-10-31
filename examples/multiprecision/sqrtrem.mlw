@@ -253,7 +253,7 @@ module Sqrt
 
   use toom.Toom
 
-  let rec wmpn_dc_sqrtrem (sp np: ptr limb) (n:int32) (scratch: ptr limb) : limb
+  let rec partial wmpn_dc_sqrtrem (sp np: ptr limb) (n:int32) (scratch: ptr limb) : limb
     requires { valid np (n+n) }
     requires { valid sp n }
     requires { 1 <= n }
@@ -348,7 +348,7 @@ module Sqrt
                     <= 2 * value spl h
                  so value np' h < power radix h
                  so value np' h + value np' h < 2 * value spl h };
-        let ghost b = wmpn_sub_n_in_place np' spl h in
+        let (ghost b) = wmpn_sub_n_in_place np' spl h in
         assert { b = 1 };
         assert { value np' h = r' - value spl h
                  by value np' h - power radix h = value np' h at Sub - value spl h
@@ -415,7 +415,7 @@ module Sqrt
                so sh = c + 2 * q
                so value scratch l = c + 2 * q + radix * st
                   = c + 2 * (q + power 2 (Limb.length - 1) * st) };
-      let ghost r = wmpn_rshift_sep sp scratch l 1 in
+      let (ghost r) = wmpn_rshift_sep sp scratch l 1 in
       label Div2 in
       assert { 2 * value sp l + c = value scratch l
                by r + radix * value sp l = value scratch l * power 2 (Limb.length - 1)
@@ -525,7 +525,7 @@ module Sqrt
                   = n0 + power radix l * value onpl h
                     + power radix l * (power radix h * c) };
       let npn = C.incr_split np n in
-      let ghost _ = wmpn_mul npn sp l sp l 64 in
+      let (ghost _) = wmpn_mul npn sp l sp l 64 in
       let ll = 2 * l in
       assert { value npn ll + power radix ll * q = dq * dq
                by 0 <= q <= 1 so q * q = q
@@ -869,7 +869,7 @@ module Sqrt
              so 0 < power 2 (2 * c) so 0 < (s + 1) * (s + 1) so 0 < n
              so n < (s + 1) * (s + 1) }
 
-  let rec wmpn_sqrtrem (sp rp np: ptr limb) (n: int32) : int32
+  let rec partial wmpn_sqrtrem (sp rp np: ptr limb) (n: int32) : int32
     requires { valid sp (ceilhalf n) }
     requires { valid rp n }
     requires { valid np n }
@@ -987,7 +987,7 @@ module Sqrt
                         + power radix (n-1) * (radix - power 2 (2 * c))
                       = power radix (n-1) * radix = power radix n };
           label Shift in
-          let ghost h = wmpn_lshift_sep tpa np n (2 * c) in
+          let (ghost h) = wmpn_lshift_sep tpa np n (2 * c) in
           value_sub_frame (pelts np) (pure { pelts np at Shift })
                           (offset np) (offset np + int32'int n);
           assert { value np n = value np n at Shift };
@@ -1155,7 +1155,7 @@ module Sqrt
                  so rl - cc > - 1 };
         rl <- rl - cc
       end;
-      let ghost r = wmpn_rshift sp sp tn c in
+      let (ghost r) = wmpn_rshift sp sp tn c in
       let ghost vsq = pure { div vs (power 2 c) } in
       assert { vs = vsq * power 2 c + vs0 };
       assert { value sp tn * radix + r = vs * power 2 (Limb.length - c) };
@@ -1270,7 +1270,7 @@ module Sqrt
         if (not (c2 = 0))
         then begin
           label Shift in
-          let ghost b = wmpn_rshift_sep rp tp tn c2 in
+          let (ghost b) = wmpn_rshift_sep rp tp tn c2 in
           value_sub_frame (pelts tp) (pure { pelts tp at Shift })
                           (offset tp) (offset tp + int32'int tn);
           assert { value tp tn = power 2 c2 * value rp tn

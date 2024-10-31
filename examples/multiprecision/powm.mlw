@@ -346,7 +346,7 @@ module Powm
     if cy <> 0
     then begin
       assert { cy = 1 };
-      let ghost b = wmpn_sub_n_in_place rp mp n in
+      let (ghost b) = wmpn_sub_n_in_place rp mp n in
       assert { value rp n + power radix n * (cy - b)
                = (value rp n at Sub + power radix n * cy) - vm };
       assert { b = 1
@@ -480,7 +480,7 @@ module Powm
     else if eb <= 28161 then 9
     else 10
 
-  let redcify [@extraction:c_static_inline]
+  let partial redcify [@extraction:c_static_inline]
               (rp up: t) (un: int32) (mp: t) (n: int32)
     requires { valid rp n /\ valid up un /\ valid mp n }
     requires { 1 <= n /\ 1 <= un }
@@ -1091,7 +1091,7 @@ module Powm
              = mod (power radix n * (power radix n * a * b)) m };
     unredc c (p * q) (power radix n * (a * b)) n m
 
-  let wmpn_powm (rp bp : t) (bn : int32) (ep : t) (en : int32) (mp : t)
+  let partial wmpn_powm (rp bp : t) (bn : int32) (ep : t) (en : int32) (mp : t)
                 (n : int32) (tp : t) : unit
     requires { valid rp n /\ valid bp bn /\ valid ep en /\ valid mp n }
     requires { valid tp (2*n) }
@@ -1550,7 +1550,7 @@ module Powm
      if (wmpn_cmp rp mp n >= 0)
       then begin
         label Sub in
-        let ghost _b = wmpn_sub_n_in_place rp mp n in
+        let (ghost _b) = wmpn_sub_n_in_place rp mp n in
         assert { _b = 0
                  by value rp n - power radix n * _b
                     = value rp n at Sub - vm

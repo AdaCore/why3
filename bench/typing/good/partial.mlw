@@ -3,10 +3,10 @@ val f (x:int) : unit
 
 use int.Int
 
-let main () =
+let partial main () =
   let r = random () in
   let s = random () in
-  let ghost x = random () in
+  let (ghost x) = random () in
   f x;
   f r;
   f x;

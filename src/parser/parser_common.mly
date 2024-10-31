@@ -75,6 +75,10 @@
 
   let ghost part = (part = Ghost)
 
+  let apply_ghost part e =
+    if part <> Ghost then e else
+    { e with expr_desc = Eghost e }
+
   let apply_partial_sp part sp =
     if part <> Partial then sp else
     { sp with sp_partial = true }
@@ -90,6 +94,9 @@
           Loc.errorm ~loc:e.expr_loc
             "this expression cannot be declared partial" in
     { e with expr_desc = ed }
+
+  let apply_ghost_partial part e =
+    apply_partial part (apply_ghost part e)
 
   let we_attr = Ident.create_attribute "expl:witness existence"
 
@@ -326,7 +333,7 @@
 %nonassoc prec_no_else
 %nonassoc DOT ELSE RETURN
 %nonassoc prec_no_spec
-%nonassoc REQUIRES ENSURES RETURNS RAISES READS WRITES ALIAS DIVERGES VARIANT
+%nonassoc REQUIRES ENSURES RETURNS RAISES READS WRITES ALIAS DIVERGES VARIANT PARTIAL
 %nonassoc below_LARROW
 %nonassoc LARROW
 %nonassoc below_COMMA
@@ -865,19 +872,19 @@ minus_numeral:
 | VAL ghost kind attrs(lident_rich) mk_expr(fun_decl)
     { Dlet ($4, ghost $2, $3, apply_partial $2 $5) }
 | VAL ghost kind sym_binder mk_expr(const_decl)
-    { Dlet ($4, ghost $2, $3, apply_partial $2 $5) }
+    { Dlet ($4, ghost $2, $3, apply_ghost_partial $2 $5) }
 | VAL ghost REF ref_binder mk_expr(const_decl)
     { let rf = mk_expr Eref $startpos($3) $endpos($3) in
       let ee = { $5 with expr_desc = Eapply (rf, $5) } in
-      Dlet ($4, ghost $2, Expr.RKnone, apply_partial $2 ee) }
+      Dlet ($4, ghost $2, Expr.RKnone, apply_ghost_partial $2 ee) }
 | LET ghost kind attrs(lident_rich) mk_expr(fun_defn)
     { Dlet ($4, ghost $2, $3, apply_partial $2 $5) }
 | LET ghost kind sym_binder const_defn
-    { Dlet ($4, ghost $2, $3, apply_partial $2 $5) }
+    { Dlet ($4, ghost $2, $3, apply_ghost_partial $2 $5) }
 | LET ghost REF ref_binder const_defn
     { let rf = mk_expr Eref $startpos($3) $endpos($3) in
       let ee = { $5 with expr_desc = Eapply (rf, $5) } in
-      Dlet ($4, ghost $2, Expr.RKnone, apply_partial $2 ee) }
+      Dlet ($4, ghost $2, Expr.RKnone, apply_ghost_partial $2 ee) }
 | LET REC with_list1(rec_defn)
     { Drec $3 }
 | EXCEPTION attrs(uident_nq)
@@ -1033,10 +1040,15 @@ single_expr_:
         | Por (p,q) -> Por (push p, q)
         | _ -> Pghost pat) in
       let pat = if ghost $2 then push $4 else $4 in
+      let rec ghostify_rhs pat = match pat.pat_desc with
+        | Pghost _ -> { $6 with expr_desc = Eghost $6 }
+        | Pcast (p,_) -> ghostify_rhs p
+        | _ -> $6 in
+      let rhs = apply_partial $2 (ghostify_rhs pat) in
       let loc = floc $startpos($3) $endpos($3) in
-      simplify_let_pattern ~loc $3 (apply_partial $2 $6) pat $8 }
+      simplify_let_pattern ~loc $3 rhs pat $8 }
 | LET ghost kind attrs(lident_op_nq) const_defn IN seq_expr
-    { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
+    { Elet ($4, ghost $2, $3, apply_ghost_partial $2 $5, $7) }
 | LET ghost kind attrs(lident_nq) mk_expr(fun_defn) IN seq_expr
     { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
 | LET ghost kind attrs(lident_op_nq) mk_expr(fun_defn) IN seq_expr
@@ -1044,7 +1056,7 @@ single_expr_:
 | LET ghost REF ref_binder const_defn IN seq_expr
     { let rf = mk_expr Eref $startpos($3) $endpos($3) in
       let ee = { $5 with expr_desc = Eapply (rf, $5) } in
-      Elet ($4, ghost $2, Expr.RKnone, apply_partial $2 ee, $7) }
+      Elet ($4, ghost $2, Expr.RKnone, apply_ghost_partial $2 ee, $7) }
 | LET REC with_list1(rec_defn) IN seq_expr
     { Erec ($3, $5) }
 | FUN binders spec ARROW spec seq_expr
@@ -1071,11 +1083,11 @@ single_expr_:
 | VAL ghost kind attrs(lident_rich) mk_expr(fun_decl) IN seq_expr
     { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
 | VAL ghost kind sym_binder mk_expr(const_decl) IN seq_expr
-    { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
+    { Elet ($4, ghost $2, $3, apply_ghost_partial $2 $5, $7) }
 | VAL ghost REF ref_binder mk_expr(const_decl) IN seq_expr
     { let rf = mk_expr Eref $startpos($3) $endpos($3) in
       let ee = { $5 with expr_desc = Eapply (rf, $5) } in
-      Elet ($4, ghost $2, Expr.RKnone, apply_partial $2 ee, $7) }
+      Elet ($4, ghost $2, Expr.RKnone, apply_ghost_partial $2 ee, $7) }
 | MATCH seq_expr WITH ext_match_cases END
     { let bl, xl = $4 in
       let bl = if bl = [] then
@@ -1298,6 +1310,8 @@ single_spec:
     { { empty_spec with sp_xpost = [floc $startpos($3) $endpos($3), $3] } }
 | DIVERGES
     { { empty_spec with sp_diverge = true } }
+| PARTIAL
+    { { empty_spec with sp_partial = true } }
 | variant
     { { empty_spec with sp_variant = $1 } }
 
