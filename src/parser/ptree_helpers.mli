@@ -67,6 +67,11 @@ val empty_spec : spec
 val use : ?loc:Loc.position -> import:bool -> string list -> decl
 (** [use l] produces the equivalent of ["use (import) path"] where [path] is denoted by [l] *)
 
+val global_var_decl : pty -> string -> ident * decl
+(** [global_var_decl ty id] declares a global mutable variable `id` of
+    type `ty`. It returns both the variable identifier and the
+    declaration itself *)
+
 (** {2 Declarations in top-down style}
 
 The following helpers allows one to create modules, declarations
@@ -92,9 +97,13 @@ module F : sig
 
   val add_prop : state -> Decl.prop_kind -> ?loc:Loc.position -> string -> term -> state
 
-  val begin_let : state -> ?ghost:bool -> ?ret_type:pty -> string -> binder list -> state
+  val add_global_var_decl : state -> pty -> string -> ident * state
+
+  val begin_let : state -> ?ghost:bool -> ?diverges:bool -> ?ret_type:pty -> string -> binder list -> state
 
   val add_pre : state -> term -> state
+
+  val add_writes : state -> term list -> state
 
   val add_post : state -> term -> state
 
@@ -119,9 +128,13 @@ module I : sig
 
   val add_prop : Decl.prop_kind -> ?loc:Loc.position -> string -> term -> unit
 
-  val begin_let : ?ghost:bool -> ?ret_type:pty -> string -> binder list -> unit
+  val add_global_var_decl : pty -> string -> ident
+
+  val begin_let : ?ghost:bool -> ?diverges:bool -> ?ret_type:pty -> string -> binder list -> unit
 
   val add_pre : term -> unit
+
+  val add_writes : term list -> unit
 
   val add_post : term -> unit
 

@@ -157,6 +157,7 @@ let mod_M3 =
 module M4
   let f (a:array int) : unit
     requires { a.length >= 1 }
+    writes { a }
     ensures { a[0] = 42 }
    = a[0] <- 42
 end
@@ -178,7 +179,7 @@ let mod_M4 =
   let use_int_Int = use ~import:false (["int";"Int"]) in
   (* use array.Array *)
   let use_array_Array = use ~import:false (["array";"Array"]) in
-  (* use f *)
+  (* decl f *)
   let f =
     let id_a = ident "a" in
     let pre =
@@ -193,7 +194,7 @@ let mod_M4 =
       sp_post = [Loc.dummy_position,[pat Pwild,post]];
       sp_xpost = [];
       sp_reads = [];
-      sp_writes = [];
+      sp_writes = [tvar (Qident id_a)];
       sp_alias = [];
       sp_variant = [];
       sp_checkrw = false;
@@ -213,8 +214,46 @@ let mod_M4 =
 (* END{code4} *)
 
 (* The following example is not in the manual
+ * it shows how to use Ptree API for global variable declaration
+module Mglob
+  use int.Int
+  val ref x : int
+  let f () : unit = x <- x+1
+end
+*)
+
+let mod_Mglob =
+  (* use int.Int *)
+  let use_int_Int = use ~import:false (["int";"Int"]) in
+  (* x *)
+  let id_x,decl_x = global_var_decl int_type "x" in
+  (* f *)
+  let decl_f =
+    let spec = {
+      sp_pre = [];
+      sp_post = [];
+      sp_xpost = [];
+      sp_reads = [];
+      sp_writes = [tvar (Qident id_x)];
+      sp_alias = [];
+      sp_variant = [];
+      sp_checkrw = false;
+      sp_diverge = false;
+      sp_partial = false;
+    }
+    in
+    let add_int = qualid ["Int";Ident.op_infix "+"] in
+    let xp1 = eapp add_int [evar (Qident id_x) ; econst 1 ] in
+    let body = expr (Eassign [ expr (Easref (Qident id_x)), None, xp1  ]) in
+    let f = Efun(unit_binder (),None,pat Pwild,Ity.MaskVisible,spec,body) in
+    Dlet(ident "f", false, Expr.RKnone, expr f)
+
+  in
+  (ident "Mglob",[use_int_Int ; decl_x; decl_f])
+
+(* The following example is not in the manual
  * it shows how to use Ptree API for scope/import declarations
-module M5
+module Mscope
   scope S
       function f (x : int) : int = x
   end
@@ -224,7 +263,7 @@ module M5
 end
 *)
 
-let mod_M45 =
+let mod_Mscope =
   (* use int.Int *)
   let use_int_Int = use ~import:false (["int";"Int"]) in
   (* scope S *)
@@ -252,18 +291,24 @@ let mod_M45 =
     let goal_term = tapp eq_int [f_of_two ; two] in
     Dprop(Decl.Pgoal,ident "g",goal_term)
   in
-  (ident "M45",[use_int_Int ; scope_S ; import_S ; g])
+  (ident "Mscope",[use_int_Int ; scope_S ; import_S ; g])
 
 (* BEGIN{getmodules} *)
 let mlw_file = Modules [mod_M1 ; mod_M2 ; mod_M3 ; mod_M4]
 (* END{getmodules} *)
+let mlw_file_others = Modules [mod_Mglob ; mod_Mscope]
 
 open Format
 
+(* Printing back the mlw file *)
+(* BEGIN{mlwprinter} *)
 let () = printf "%a@." (Mlw_printer.pp_mlw_file ~attr:true) mlw_file
+(* END{mlwprinter} *)
+
+let () = printf "%a@." (Mlw_printer.pp_mlw_file ~attr:true) mlw_file_others
 
 (* BEGIN{topdownf} *)
-let mlw_file =
+let mlw_file_F =
   let uc = F.create () in
   let uc = F.begin_module uc "M5" in
   let uc = F.use uc ~import:false ["int";"Int"] in
@@ -272,6 +317,7 @@ let mlw_file =
   let id_a = Qident (ident "a") in
   let pre = tapp ge_int [tapp length [tvar id_a]; tconst 1] in
   let uc = F.add_pre uc pre in
+  let uc = F.add_writes uc [tvar id_a] in
   let post =
     tapp eq_symb [tapp array_get [tvar id_a; tconst 0];
                   tconst 42]
@@ -283,10 +329,10 @@ let mlw_file =
   F.get_mlw_file uc
 (* END{topdownf} *)
 
-let () = printf "%a@." (Mlw_printer.pp_mlw_file ~attr:true) mlw_file
+let () = printf "%a@." (Mlw_printer.pp_mlw_file ~attr:true) mlw_file_F
 
 (* BEGIN{topdowni} *)
-let mlw_file =
+let mlw_file_I =
   I.begin_module "M6";
   I.use ~import:false ["int";"Int"];
   I.use ~import:false ["array";"Array"];
@@ -294,6 +340,7 @@ let mlw_file =
   let id_a = Qident (ident "a") in
   let pre = tapp ge_int [tapp length [tvar id_a]; tconst 1] in
   I.add_pre pre;
+  I.add_writes [tvar id_a];
   let post =
     tapp eq_symb [tapp array_get [tvar id_a; tconst 0];
                   tconst 42]
@@ -305,16 +352,14 @@ let mlw_file =
   I.get_mlw_file ()
 (* END{topdowni} *)
 
-
-(* Printing back the mlw file *)
-
-(* BEGIN{mlwprinter} *)
-let () = printf "%a@." (Mlw_printer.pp_mlw_file ~attr:true) mlw_file
-(* END{mlwprinter} *)
+let () = printf "%a@." (Mlw_printer.pp_mlw_file ~attr:true) mlw_file_I
 
 (* BEGIN{typemodules} *)
 let mods = Typing.type_mlw_file env [] "myfile.mlw" mlw_file
 (* END{typemodules} *)
+let mod_F = Typing.type_mlw_file env [] "myFfile.mlw" mlw_file_F
+let mod_I = Typing.type_mlw_file env [] "myIfile.mlw" mlw_file_I
+let mods_others = Typing.type_mlw_file env [] "myotherfile.mlw" mlw_file_others
 
 (* BEGIN{typemoduleserror} *)
 let _mods =

@@ -432,9 +432,9 @@ type decl =
   | Dprop of Decl.prop_kind * ident * term
   (** Propositions: "lemma" or "goal" or "axiom" *)
   | Dlet of ident * ghost * Expr.rs_kind * expr
-  (** Global program variable *)
+  (** Global program variable or function *)
   | Drec of fundef list
-  (** Program functions, mutually recursively defined *)
+  (** set of program functions, defined mutually recursively *)
   | Dexn of ident * pty * Ity.mask
   (** Declaration of global exceptions *)
   | Dmeta of ident * metarg list
