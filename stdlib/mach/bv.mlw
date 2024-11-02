@@ -251,7 +251,6 @@ end
 module BVCheck8
   use export bv.BV8
 
-  constant two_power_size_minus_one : int = 0x80
   constant minus_one : t = 0xFF
   constant min_sint : t = 0x80
   constant max_sint : t = 0x7F
@@ -302,7 +301,6 @@ end
 module BVCheck16
   use export bv.BV16
 
-  constant two_power_size_minus_one : int = 0x8000
   constant minus_one : t = 0xFFFF
   constant min_sint : t = 0x8000
   constant max_sint : t = 0x7FFF
@@ -352,7 +350,6 @@ end
 module BVCheck32
   use export bv.BV32
 
-  constant two_power_size_minus_one : int = 0x8000_0000
   constant minus_one : t = 0xFFFF_FFFF
   constant min_sint : t = 0x8000_0000
   constant max_sint : t = 0x7FFF_FFFF
@@ -402,7 +399,6 @@ end
 module BVCheck64
   use export bv.BV64
 
-  constant two_power_size_minus_one : int = 0x8000_0000_0000_0000
   constant minus_one : t = 0xFFFF_FFFF_FFFF_FFFF
   constant min_sint : t = 0x8000_0000_0000_0000
   constant max_sint : t = 0x7FFF_FFFF_FFFF_FFFF

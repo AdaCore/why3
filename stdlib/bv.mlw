@@ -285,7 +285,7 @@ module BV_Gen
   meta "remove_unused:dependency" lemma lsl_zeros, function lsl
 
   use int.EuclideanDivision
-(*  use int.ComputerDivision as CD*)
+  use int.ComputerDivision as CD
 
   function rotate_right t int : t
 
@@ -307,15 +307,13 @@ module BV_Gen
   use Pow2int
 
   constant two_power_size : int
-(* not needed yet, since sdiv and srem are not yet realized
   constant two_power_size_minus_one : int
-*)
+
   constant max_int : int
 
   axiom two_power_size_val : two_power_size = pow2 size
-(* not needed yet, since sdiv and srem are not yet realized
   axiom two_power_size_minus_one_val : two_power_size_minus_one = pow2 (size-1)
-*)
+
   axiom max_int_val : max_int = two_power_size - 1
 
   predicate is_signed_positive t
@@ -352,13 +350,13 @@ module BV_Gen
   meta "remove_unused:dependency" axiom to_uint_of_int, function to_uint
   meta "remove_unused:dependency" axiom to_uint_of_int, function of_int
 
-(* not yet realized
   axiom to_int_bounds :
     forall v:t. - two_power_size_minus_one <= to_int v < two_power_size_minus_one
+  meta "remove_unused:dependency" axiom to_int_bounds, function to_int
 
   axiom to_int_of_int :
     forall i. - two_power_size_minus_one <= i < two_power_size_minus_one -> to_int (of_int i) = i
-*)
+  meta "remove_unused:dependency" axiom to_int_of_int, function of_int
 
   constant size_bv : t
 
@@ -479,20 +477,19 @@ let predicate sle (v1 v2 : t) =
   meta "remove_unused:dependency" axiom to_uint_urem, function urem
 
   val function sdiv (v1 v2 : t) : t
-(* not yet realized
   axiom to_int_sdiv:
     forall v1 v2. to_int (sdiv v1 v2) = CD.mod (CD.div (to_int v1) (to_int v2)) two_power_size
+  meta "remove_unused:dependency" axiom to_int_sdiv, function sdiv
   axiom to_int_sdiv_bounded:
     forall v1 v2.
     v1 <> (lsl one (size-1)) \/ v2 <> ones ->
     to_int (sdiv v1 v2) = CD.div (to_int v1) (to_int v2)
-*)
+  meta "remove_unused:dependency" axiom to_int_sdiv_bounded, function sdiv
 
   val function srem (v1 v2 : t) : t
-(* not yet realized
   axiom to_int_srem:
     forall v1 v2. to_int (srem v1 v2) = CD.mod (to_int v1) (to_int v2)
-*)
+  meta "remove_unused:dependency" axiom to_int_srem, function srem
 
   (** Bitvector alternatives for shifts, rotations and nth *)
 
@@ -599,7 +596,10 @@ end
 
 module BV256
   constant size           : int = 256
-  constant two_power_size : int = 0x1_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000
+  constant two_power_size : int =
+    0x1_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000
+  constant two_power_size_minus_one : int =
+      0x8000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000
 
   use int.Int as Int (* needed to use range types *)
 
@@ -614,12 +614,14 @@ module BV256
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
+    constant two_power_size_minus_one = two_power_size_minus_one,
     constant max_int = t'maxInt,
     constant zeros = zeros,
     constant one,
     constant ones,
     goal size_pos,
     goal two_power_size_val,
+    goal two_power_size_minus_one_val,
     goal max_int_val,
     axiom . (* should this be "lemma"? "goal"? *)
 
@@ -627,7 +629,10 @@ end
 
 module BV128
   constant size           : int = 128
-  constant two_power_size : int = 0x1_0000_0000_0000_0000_0000_0000_0000_0000
+  constant two_power_size : int =
+    0x1_0000_0000_0000_0000_0000_0000_0000_0000
+  constant two_power_size_minus_one : int =
+      0x8000_0000_0000_0000_0000_0000_0000_0000
 
   use int.Int as Int (* needed to use range types *)
 
@@ -642,12 +647,14 @@ module BV128
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
+    constant two_power_size_minus_one = two_power_size_minus_one,
     constant max_int = t'maxInt,
     constant zeros,
     constant one,
     constant ones,
     goal size_pos,
     goal two_power_size_val,
+    goal two_power_size_minus_one_val,
     goal max_int_val,
     axiom . (* should this be "lemma"? "goal"? *)
 
@@ -656,6 +663,7 @@ end
 module BV64
   constant size           : int = 64
   constant two_power_size : int = 0x1_0000_0000_0000_0000
+  constant two_power_size_minus_one : int = 0x8000_0000_0000_0000
 
   use int.Int as Int (* needed to use range types *)
 
@@ -670,12 +678,14 @@ module BV64
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
+    constant two_power_size_minus_one = two_power_size_minus_one,
     constant max_int = t'maxInt,
     constant zeros,
     constant one,
     constant ones,
     goal size_pos,
     goal two_power_size_val,
+    goal two_power_size_minus_one_val,
     goal max_int_val,
     axiom . (* should this be "lemma"? "goal"? *)
 
@@ -684,6 +694,7 @@ end
 module BV32
   constant size           : int = 32
   constant two_power_size : int = 0x1_0000_0000
+  constant two_power_size_minus_one : int = 0x8000_0000
 
   use int.Int as Int (* needed to use range types *)
 
@@ -698,12 +709,14 @@ module BV32
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
+    constant two_power_size_minus_one = two_power_size_minus_one,
     constant max_int = t'maxInt,
     constant zeros,
     constant one,
     constant ones,
     goal size_pos,
     goal two_power_size_val,
+    goal two_power_size_minus_one_val,
     goal max_int_val,
     axiom . (* should this be "lemma"? "goal"? *)
 
@@ -712,6 +725,7 @@ end
 module BV16
   constant size : int = 16
   constant two_power_size : int = 0x1_0000
+  constant two_power_size_minus_one : int = 0x8000
 
   use int.Int as Int (* needed to use range types *)
 
@@ -726,12 +740,14 @@ module BV16
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
+    constant two_power_size_minus_one = two_power_size_minus_one,
     constant max_int = t'maxInt,
     constant zeros,
     constant one,
     constant ones,
     goal size_pos,
     goal two_power_size_val,
+    goal two_power_size_minus_one_val,
     goal max_int_val,
     axiom . (* should this be "lemma"? "goal"? *)
 
@@ -740,6 +756,7 @@ end
 module BV8
   constant size           : int = 8
   constant two_power_size : int = 0x1_00
+  constant two_power_size_minus_one : int = 0x80
 
   use int.Int as Int (* needed to use range types *)
 
@@ -754,12 +771,14 @@ module BV8
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
+    constant two_power_size_minus_one = two_power_size_minus_one,
     constant max_int = t'maxInt,
     constant zeros,
     constant one,
     constant ones,
     goal size_pos,
     goal two_power_size_val,
+    goal two_power_size_minus_one_val,
     goal max_int_val,
     axiom . (* should this be "lemma"? "goal"? *)
 
