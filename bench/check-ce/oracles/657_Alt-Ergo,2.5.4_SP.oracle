@@ -1,7 +1,7 @@
 <check_ce:categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Precondition of `u` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Precondition of `u` cannot be evaluated)
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
 - Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (fatal rac error: missing value for return value of call to toBig at "bench/check-ce/657.mlw", line 8, characters 29-40)
   - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to toBig at "bench/check-ce/657.mlw", line 8, characters 29-40)
@@ -11,9 +11,9 @@ Prover result is: Step limit exceeded (21 steps).
 The following counterexample model could not be verified
   (both RAC fatal rac error: missing value for return value of call to toBig at "bench/check-ce/657.mlw", line 8, characters 29-40):
 File bv.mlw:
-  Line 321:
-    is_signed_positive : t -> bool = [|{t'int => 64} => False; _ => True|]
-  Line 363:
+  Line 319:
+    is_signed_positive : t -> bool = [|{t'int => 0} => False; _ => True|]
+  Line 361:
     size_bv : t1 = {t'int => 32}
 File 657.mlw:
   Line 8:
@@ -33,9 +33,9 @@ Prover result is: Step limit exceeded (21 steps).
 The following counterexample model could not be verified
   (both RAC fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 10, characters 29-41):
 File bv.mlw:
-  Line 321:
-    is_signed_positive : t -> bool = [|{t'int => 64} => False; _ => True|]
-  Line 363:
+  Line 319:
+    is_signed_positive : t -> bool = [|{t'int => 0} => False; _ => True|]
+  Line 361:
     size_bv : t1 = {t'int => 32}
 File 657.mlw:
   Line 10:
@@ -51,13 +51,13 @@ File 657.mlw:
   - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 13, characters 45-55)
 File "bench/check-ce/657.mlw", line 13, characters 14-40:
 Sub-goal Postcondition of goal ko2'vc.
-Prover result is: Step limit exceeded (20 steps).
+Prover result is: Step limit exceeded (21 steps).
 The following counterexample model could not be verified
   (both RAC fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 13, characters 45-55):
 File bv.mlw:
-  Line 321:
-    is_signed_positive : t -> bool = [|{t'int => 64} => False; _ => True|]
-  Line 363:
+  Line 319:
+    is_signed_positive : t -> bool = [|{t'int => 0} => False; _ => True|]
+  Line 361:
     size_bv : t1 = {t'int => 32}
 File 657.mlw:
   Line 12:

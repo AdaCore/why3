@@ -117,9 +117,12 @@ File threshold.mlw:
 - Checked model 1: NC
   - Concrete RAC: FAILURE (precondition at "bench/check-ce/threshold.mlw", line 30, characters 11-24)
   - Abstract RAC: FAILURE (precondition at "bench/check-ce/threshold.mlw", line 30, characters 11-24)
+- Checked model 2: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
 File "bench/check-ce/threshold.mlw", line 30, characters 11-24:
 Sub-goal Arithmetic overflow of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (7765 steps).
+Prover result is: Step limit exceeded (150121 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -158,9 +161,12 @@ File threshold.mlw:
 - Checked model 1: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/threshold.mlw", line 27, characters 13-45)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/threshold.mlw", line 27, characters 13-45)
+- Checked model 2: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
 File "bench/check-ce/threshold.mlw", line 27, characters 13-45:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (14378 steps).
+Prover result is: Step limit exceeded (150039 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

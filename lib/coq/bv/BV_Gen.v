@@ -19,6 +19,7 @@ Require bool.Bool.
 Require int.Int.
 Require int.Abs.
 Require int.EuclideanDivision.
+Require int.ComputerDivision.
 Require bv.Pow2int.
 
 Require Import Lia.
@@ -1184,6 +1185,12 @@ Definition two_power_size : Numbers.BinNums.Z.
 Defined.
 
 (* Why3 goal *)
+Definition two_power_size_minus_one : Numbers.BinNums.Z.
+Proof.
+  exact (Pow2int.pow2 (size - 1))%Z.
+Defined.
+
+(* Why3 goal *)
 Definition max_int : Numbers.BinNums.Z.
   exact (Pow2int.pow2 size - 1)%Z.
 Defined.
@@ -1191,6 +1198,13 @@ Defined.
 (* Why3 goal *)
 Lemma two_power_size_val : (two_power_size = (bv.Pow2int.pow2 size)).
   trivial.
+Qed.
+
+(* Why3 goal *)
+Lemma two_power_size_minus_one_val :
+  (two_power_size_minus_one = (bv.Pow2int.pow2 (size - 1%Z)%Z)).
+Proof.
+  auto.
 Qed.
 
 (* Why3 goal *)
@@ -1408,6 +1422,24 @@ Lemma to_uint_of_int :
   apply Z2Nat.id; easy.
   rewrite Z2Nat.id; [fold size; fold two_power_size; lia|easy].
 Qed.
+
+(* Why3 goal *)
+Lemma to_int_bounds :
+  forall (v:t),
+  ((-two_power_size_minus_one)%Z <= (to_int v))%Z /\
+  ((to_int v) < two_power_size_minus_one)%Z.
+Proof.
+intros v.
+Admitted.
+
+(* Why3 goal *)
+Lemma to_int_of_int :
+  forall (i:Numbers.BinNums.Z),
+  ((-two_power_size_minus_one)%Z <= i)%Z /\ (i < two_power_size_minus_one)%Z ->
+  ((to_int (of_int i)) = i).
+Proof.
+intros i (h1,h2).
+Admitted.
 
 (* Why3 goal *)
 Definition size_bv : t.
@@ -1919,10 +1951,36 @@ Proof.
 Defined.
 
 (* Why3 goal *)
+Lemma to_int_sdiv :
+  forall (v1:t) (v2:t),
+  ((to_int (sdiv v1 v2)) =
+   (ZArith.BinInt.Z.rem (ZArith.BinInt.Z.quot (to_int v1) (to_int v2))
+    two_power_size)).
+Proof.
+intros v1 v2.
+Admitted.
+
+(* Why3 goal *)
+Lemma to_int_sdiv_bounded :
+  forall (v1:t) (v2:t), ~ (v1 = (lsl one (size - 1%Z)%Z)) \/ ~ (v2 = ones) ->
+  ((to_int (sdiv v1 v2)) = (ZArith.BinInt.Z.quot (to_int v1) (to_int v2))).
+Proof.
+intros v1 v2 h1.
+Admitted.
+
+(* Why3 goal *)
 Definition srem : t -> t -> t.
 Proof.
   exact srem_abstract.
 Defined.
+
+(* Why3 goal *)
+Lemma to_int_srem :
+  forall (v1:t) (v2:t),
+  ((to_int (srem v1 v2)) = (ZArith.BinInt.Z.rem (to_int v1) (to_int v2))).
+Proof.
+intros v1 v2.
+Admitted.
 
 (* Why3 goal *)
 Definition lsr_bv : t -> t -> t.
