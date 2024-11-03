@@ -3,6 +3,7 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.13.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.5.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -24,18 +25,18 @@
   <proof prover="0"><result status="valid" time="0.038416" steps="5152"/></proof>
   </goal>
   <goal name="occurs&#39;vc.4" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="0.029131" steps="79"/></proof>
+  <proof prover="1"><result status="valid" time="0.016733" steps="17077"/></proof>
   </goal>
   <goal name="occurs&#39;vc.5" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.034906" steps="35"/></proof>
   </goal>
   <goal name="occurs&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.044368" steps="344"/></proof>
+  <proof prover="3"><result status="valid" time="0.044368" steps="349"/></proof>
   </goal>
   <goal name="occurs&#39;vc.7" expl="loop invariant preservation" proved="true">
   <transf name="rewrite" proved="true" arg1="&lt;-" arg2="concat_substring">
    <goal name="occurs&#39;vc.7.0" expl="loop invariant preservation" proved="true">
-   <proof prover="3"><result status="valid" time="1.461042" steps="7583"/></proof>
+   <proof prover="3"><result status="valid" time="0.918184" steps="8418"/></proof>
    </goal>
    <goal name="occurs&#39;vc.7.1" expl="rewrite premises" proved="true">
    <proof prover="3"><result status="valid" time="0.027231" steps="37"/></proof>
@@ -177,10 +178,10 @@
   <proof prover="3"><result status="valid" time="0.037955" steps="25"/></proof>
   </goal>
   <goal name="make_table&#39;vc.6" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.038861" steps="174"/></proof>
+  <proof prover="3"><result status="valid" time="0.038861" steps="173"/></proof>
   </goal>
   <goal name="make_table&#39;vc.7" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.134600" steps="797"/></proof>
+  <proof prover="3"><result status="valid" time="0.134600" steps="776"/></proof>
   </goal>
   <goal name="make_table&#39;vc.8" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.127670" steps="14593"/></proof>
@@ -205,7 +206,7 @@
   <proof prover="4"><result status="valid" time="0.039957" steps="60881"/></proof>
   </goal>
   <goal name="shift&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.143545" steps="673"/></proof>
+  <proof prover="3"><result status="valid" time="0.143545" steps="669"/></proof>
   </goal>
   <goal name="shift&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.046974" steps="60095"/></proof>
@@ -213,7 +214,7 @@
   <goal name="shift&#39;vc.3" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="shift&#39;vc.3.0" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.045130" steps="42"/></proof>
+   <proof prover="3"><result status="valid" time="0.045130" steps="41"/></proof>
    </goal>
   </transf>
   </goal>
@@ -286,7 +287,7 @@
   <proof prover="0"><result status="valid" time="0.157758" steps="14487"/></proof>
   </goal>
   <goal name="search&#39;vc.18" expl="loop variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.066340" steps="151"/></proof>
+  <proof prover="3"><result status="valid" time="0.066340" steps="152"/></proof>
   </goal>
   <goal name="search&#39;vc.19" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.090619" steps="14554"/></proof>
