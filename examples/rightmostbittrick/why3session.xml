@@ -2,11 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Z3" version="4.12.2" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.13.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="CVC5" version="1.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="rightmostbittrick.mlw"/>
 <theory name="Rmbt" proved="true">
@@ -16,47 +15,50 @@
   <proof prover="0"><result status="valid" time="0.010000" steps="3729"/></proof>
   </goal>
   <goal name="rightmost_position_set&#39;vc.1" expl="loop variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000" steps="190609"/></proof>
+  <proof prover="4"><result status="valid" time="0.163550" steps="1312"/></proof>
   </goal>
   <goal name="rightmost_position_set&#39;vc.2" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="89984"/></proof>
+  <proof prover="6"><result status="valid" time="0.063741" steps="9102"/></proof>
   </goal>
   <goal name="rightmost_position_set&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="5371"/></proof>
+  <proof prover="6"><result status="valid" time="0.037952" steps="4793"/></proof>
   </goal>
   <goal name="rightmost_position_set&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="769"/></proof>
+  <proof prover="5"><result status="valid" time="0.045391" steps="1281"/></proof>
   </goal>
   <goal name="rightmost_position_set&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="1151"/></proof>
+  <proof prover="6"><result status="valid" time="0.023184" steps="1057"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="rightmost_bit_trick&#39;vc" expl="VC for rightmost_bit_trick" proved="true">
- <transf name="split_goal_right" proved="true" >
+ <transf name="split_vc" proved="true" >
   <goal name="rightmost_bit_trick&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="6"/></proof>
+  <proof prover="5"><result status="valid" time="0.019804" steps="40"/></proof>
   </goal>
   <goal name="rightmost_bit_trick&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="72133"/></proof>
+  <proof prover="0"><result status="valid" time="0.039727" steps="72480"/></proof>
   </goal>
-  <goal name="rightmost_bit_trick&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="34292"/></proof>
+  <goal name="rightmost_bit_trick&#39;vc.2" expl="assertion" proved="true">
+  <proof prover="6"><result status="valid" time="0.070377" steps="15033"/></proof>
   </goal>
   <goal name="rightmost_bit_trick&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="6787"/></proof>
+  <proof prover="6"><result status="valid" time="0.048317" steps="989"/></proof>
   </goal>
   <goal name="rightmost_bit_trick&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.030000" steps="4569"/></proof>
+  <proof prover="6"><result status="valid" time="0.066583" steps="5466"/></proof>
   </goal>
   <goal name="rightmost_bit_trick&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.109770" steps="367834"/></proof>
+  <proof prover="6"><result status="valid" time="0.028366" steps="2284"/></proof>
   </goal>
   <goal name="rightmost_bit_trick&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.821994" steps="296107"/></proof>
+  <proof prover="0"><result status="valid" time="1.161123" steps="3347017"/></proof>
   </goal>
   <goal name="rightmost_bit_trick&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.079153" steps="605"/></proof>
+  <proof prover="0"><result status="valid" time="0.103469" steps="378691"/></proof>
+  </goal>
+  <goal name="rightmost_bit_trick&#39;vc.8" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.131385" steps="918"/></proof>
   </goal>
  </transf>
  </goal>
