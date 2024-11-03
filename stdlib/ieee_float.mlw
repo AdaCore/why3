@@ -265,15 +265,32 @@ module GenericFloat
   constant pow2sb : int (* defined when cloning *)
   axiom pow2sb: pow2sb = pow2 sb
 
-  (* range in which every integer is representable *)
+  (** range in which every integer is representable *)
   predicate in_safe_int_range (i: int) = - pow2sb <= i <= pow2sb
 
-  (* round and integers *)
+  (** {4 round and integers} *)
 
   axiom Exact_rounding_for_integers:
     forall m:mode, i:int.
       in_safe_int_range i ->
         round m (FromInt.from_int i) = FromInt.from_int i
+
+  (** {4 conversion from real to float} *)
+
+  function from_real mode real : t
+
+  axiom from_real_in_range :
+    forall m:mode, r : real. in_range (round m r) ->
+      let f = from_real m r in is_finite f /\ to_real f = round m r
+
+  axiom from_real_large_neg :
+    forall m:mode, r : real. round m r <.  -. max_real ->
+      let f = from_real m r in is_infinite f /\ is_negative f
+
+  axiom from_real_large_pos :
+    forall m:mode, r : real. round m r >. max_real ->
+      let f = from_real m r in is_infinite f /\ is_positive f
+
 
   (** {3 Comparisons} *)
 

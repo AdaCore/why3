@@ -1295,6 +1295,44 @@ apply Zlt_le_weak.
 apply Hsb'.
 Qed.
 
+(* Why3 goal *)
+Definition from_real :
+  ieee_float.RoundingMode.mode -> Reals.Rdefinitions.R -> t.
+Proof.
+  exact r_to_fp. 
+Defined.
+
+(* Why3 goal *)
+Lemma from_real_in_range :
+  forall (m:ieee_float.RoundingMode.mode) (r:Reals.Rdefinitions.R),
+  in_range (round m r) ->
+  let f := from_real m r in is_finite f /\ ((to_real f) = (round m r)).
+Proof.
+intros m r h1 f.
+unfold from_real, round in *.
+unfold is_finite, in_range, to_real in *.
+apply r_to_fp_correct.
+unfold max_real in *.
+Admitted.
+
+(* Why3 goal *)
+Lemma from_real_large_neg :
+  forall (m:ieee_float.RoundingMode.mode) (r:Reals.Rdefinitions.R),
+  ((round m r) < (-max_real)%R)%R ->
+  let f := from_real m r in is_infinite f /\ is_negative f.
+Proof.
+intros m r h1 f.
+Admitted.
+
+(* Why3 goal *)
+Lemma from_real_large_pos :
+  forall (m:ieee_float.RoundingMode.mode) (r:Reals.Rdefinitions.R),
+  (max_real < (round m r))%R ->
+  let f := from_real m r in is_infinite f /\ is_positive f.
+Proof.
+intros m r h1 f.
+Admitted.
+
 Lemma in_safe_int_range_no_overflow : forall m {i}, in_safe_int_range i -> no_overflow m (IZR i).
 Proof.
   intros m i h.
