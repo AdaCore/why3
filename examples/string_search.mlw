@@ -32,7 +32,7 @@ module Occurs
   let partial occurs (pat text: string) (p: int63) : bool
     requires { 0 <= p <= length text - length pat }
     ensures  { result <-> matches pat text p }
-  = let ghost n = pure { length text } in
+  = let (ghost n) = length text in
     let m = length pat in
     for i = 0 to m - 1 do
       invariant { substring text p i == substring pat 0 i }

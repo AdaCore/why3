@@ -16,7 +16,7 @@ shopt -s nullglob
 
 suffix=
 
-categories="badfiles bddinfer drivers execution extraction_ocaml extraction_c goodfiles inferloop invalidgoals list mlwprinter rac realizations replay replay-without-shapes stdlib steplimit memlimit validgoals validsplitgoals stackify"
+categories="badfiles bddinfer drivers execution extraction_ocaml extraction_c extraction_java goodfiles inferloop invalidgoals list mlwprinter rac realizations replay replay-without-shapes stdlib steplimit memlimit validgoals validsplitgoals stackify"
 
 enabled_categories=""
 
@@ -744,9 +744,12 @@ extract_and_test_c examples/multiprecision
 extract_and_test_c examples/c_cursor
 extract_and_test_c bench/extraction/852_int16
 echo ""
+fi
 
+if enabled extraction_java; then
 echo "=== Checking extraction to Java ==="
 extract_and_test_java bench/java
+echo ""
 fi
 
 if enabled replay-without-shapes; then
