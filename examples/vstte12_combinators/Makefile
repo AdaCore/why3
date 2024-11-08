@@ -39,7 +39,7 @@ doc:
 	$(WHY3) session html .
 
 $(MAIN).opt: $(CMX)  $(MAIN).cmx
-	$(OCAMLOPT) $(INCLUDE) $(BIGINTLIB).cmxa -o $@ $^
+	$(OCAMLOPT) $(INCLUDE) zarith.cmxa -o $@ $^
 
 $(MAIN).cmx: $(CMX)
 
@@ -66,7 +66,7 @@ $(JSMAIN).js: $(JSMAIN).byte
 
 $(JSMAIN).byte: $(CMO) jsmain.ml
 #	$(JSOCAMLC) $(INCLUDE) -o $@ -linkpkg $^
-	$(JSOCAMLC) $(INCLUDE) $(BIGINTLIB).cma -o $@ -linkpkg $^
+	$(JSOCAMLC) $(INCLUDE) zarith.cma -o $@ -linkpkg $^
 
 
 %.cmo: %.ml

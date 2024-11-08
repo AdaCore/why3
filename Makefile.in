@@ -104,7 +104,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-EXTINCLUDES = @WHY3INCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @INFERINCLUDE@
+EXTINCLUDES = @WHY3INCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @BIGINTINCLUDE@ @INFERINCLUDE@
 
 # warnings are enabled and non fatal by default, except:
 # - disabled:
@@ -159,8 +159,8 @@ EXTOBJS =
 EXTLIBS = menhirLib
 endif
 
-EXTLIBS += @RELIB@ unix nums dynlink @ZIPLIB@ @WHY3LIB@ @INFERLIB@
-EXTPKGS = menhirLib @RELIB@ unix num dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
+EXTLIBS += @RELIB@ unix zarith dynlink @ZIPLIB@ @WHY3LIB@ @INFERLIB@
+EXTPKGS = menhirLib @RELIB@ unix zarith dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
 
 EXTCMA	= $(addsuffix .cmo,$(EXTOBJS)) $(addsuffix .cma,$(EXTLIBS))
 EXTCMXA = $(addsuffix .cmx,$(EXTOBJS)) $(addsuffix .cmxa,$(EXTLIBS))
@@ -1687,7 +1687,7 @@ src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/trywhy3.con
 		--file=trywhy3.conf:/ \
 		--file=try_alt_ergo.drv:/ \
 	  `find stdlib -name "*.mlw" -exec printf " --file=%s:/%s" {} {} ";"` \
-	+dynlink.js +toplevel.js $<
+	+dynlink.js +toplevel.js +zarith_stubs_js/biginteger.js +zarith_stubs_js/runtime.js $< || rm -f $@
 
 src/trywhy3/why3_worker.byte: $(WHY3CMA) $(PYTHONCMO) $(MICROCCMO) \
 		$(addprefix src/trywhy3/, bindings.cmo worker_proto.cmo why3_worker.cmo)
@@ -1741,7 +1741,7 @@ src/ide/why3_js.byte: lib/why3/why3.cma src/ide/why3_js.cmo
 	$(JSOCAMLCW) $(filter-out -thread,$(BFLAGS)) -o $@ -linkpkg $(BLINKFLAGS) $^
 
 src/ide/why3_js.js: src/ide/why3_js.byte
-	js_of_ocaml +dynlink.js +toplevel.js $<
+	js_of_ocaml --Werror +dynlink.js +toplevel.js +zarith_stubs_js/biginteger.js +zarith_stubs_js/runtime.js $< || rm -f $@
 
 web_ide: src/ide/why3_js.js
 

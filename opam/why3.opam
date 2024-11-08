@@ -31,8 +31,6 @@ build: [
    "--disable-js-of-ocaml"
    "--disable-re"
    "--enable-ocamlfind"
-   "--disable-zarith" {!zarith:installed}
-   "--enable-zarith" {zarith:installed}
    "--disable-mpfr" {!mlmpfr:installed}
    "--enable-mpfr" {mlmpfr:installed}
    "--disable-zip" {!camlzip:installed}
@@ -56,11 +54,10 @@ depends: [
   "ocaml" {>= "4.08.0"}
   "ocamlfind" {build}
   "menhir" {>= "20170418"}
-  "num"
+  "zarith"
 ]
 
 depopts: [
-  "zarith"
   "camlzip"
   "ocamlgraph"
   "sexplib"

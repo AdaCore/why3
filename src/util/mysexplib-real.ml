@@ -12,7 +12,21 @@
 type sexp = Sexplib.Sexp.t
 
 module Std = Sexplib.Std
-module Std_big_int = Sexplib_num.Std.Big_int
+
+module Std_big_int = struct
+
+let big_int_of_sexp sexp =
+  match sexp with
+  | Sexplib.Sexp.Atom str ->
+      begin
+        try Big_int_Z.big_int_of_string str
+        with _ -> Sexplib.Conv.of_sexp_error "big_int_of_sexp" sexp
+      end
+  | _ -> Sexplib.Conv.of_sexp_error "big_int_of_sexp" sexp
+
+let sexp_of_big_int n = Sexplib.Sexp.Atom (Big_int_Z.string_of_big_int n)
+
+end
 
 exception Parse_error of string
 

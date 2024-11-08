@@ -37,10 +37,10 @@ doc:
 	$(WHY3) session html .
 
 $(MAIN).byte: $(CMO)  $(MAIN).cmo
-	ocamlc $(INCLUDE) $(BIGINTLIB).cma -o $@ $^
+	ocamlc $(INCLUDE) zarith.cma -o $@ $^
 
 $(MAIN).opt: $(CMX)  $(MAIN).cmx
-	$(OCAMLOPT) $(INCLUDE) $(BIGINTLIB).cmxa -o $@ $^
+	$(OCAMLOPT) $(INCLUDE) zarith.cmxa -o $@ $^
 
 $(MAIN).cmx: $(CMX)
 

@@ -5,16 +5,13 @@ External users can file bug reports using our [mailing list](mailto:why3-club@li
 
 # Building
 
-To build Why3 locally you will need a functional installation of OCaml (at least 4.08), `menhir`, `num` and `autoconf`. You can set up your developer build using the following commands:
+To build Why3 locally you will need a functional installation of OCaml (at least 4.08), `menhir`, `zarith`, and `autoconf`. You can set up your developer build using the following commands:
 
 ```
 autoconf
 ./configure --enable-local # stores the built binaries under ./bin
 make
 ```
-
-Note: there can be issues around Num, recall and document those.
-
 
 ## Building Documentation
 

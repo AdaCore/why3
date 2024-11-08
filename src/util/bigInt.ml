@@ -10,7 +10,7 @@
 (********************************************************************)
 
 open Mysexplib.Std_big_int [@@warning "-33"]
-open Big_int
+open Big_int_Z
 
 type t = big_int
 [@@deriving sexp]
