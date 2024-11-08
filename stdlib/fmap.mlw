@@ -1,7 +1,11 @@
 
-(** {1 Finite Maps} *)
+(** {1 Finite Domain Maps} *)
 
-(** {2 Polymorphic maps to be used in spec/ghost only} *)
+(** {2 Polymorphic finite domain maps}
+
+To be used in specifications and ghost code only
+
+ *)
 
 module Fmap
 
@@ -52,7 +56,7 @@ module Fmap
   function ([<-]) (m: fmap 'k 'v) (k: 'k) (v: 'v) : fmap 'k 'v =
     add k v m
 
-  (*FIXME? (add k v m).contents = m.contents[k <- v] *)
+  (*** FIXME? (add k v m).contents = m.contents[k <- v] *)
 
   axiom add_contents_k:
     forall k v, m: fmap 'k 'v. (add k v m)[k] = v
@@ -63,7 +67,7 @@ module Fmap
   axiom add_domain:
     forall k v, m: fmap 'k 'v. (add k v m).domain = S.add k m.domain
 
-  (* FIXME? find_opt (k: 'k) (m: fmap 'k 'v) : option 'v *)
+  (*** FIXME? find_opt (k: 'k) (m: fmap 'k 'v) : option 'v *)
 
   function find (k: 'k) (m: fmap 'k 'v) : 'v
 
@@ -80,6 +84,127 @@ module Fmap
 
   function size (m: fmap 'k 'v) : int =
     S.cardinal m.domain
+
+end
+
+
+(** {3 Some additional fmap operators and their properties}
+
+Mainly inspired from set theory a la B
+
+*)
+
+module Fmap_ext
+
+use map.Map
+use set.Fset as S
+use export Fmap
+
+function dom (m: fmap 'k 'v) : S.fset 'k = m.domain
+(** An abbreviation for the domain *)
+
+function apply (m: fmap 'k 'v) (x: 'k): 'v
+(** map application *)
+
+axiom apply_result:
+  forall m: fmap 'k 'v, x.  mem x m -> mapsto x (apply m x) m
+meta "remove_unused:dependency" axiom apply_result, function apply
+
+function remove_set (s: S.fset 'k) (m: fmap 'k 'v) : fmap 'k 'v
+(** domain anti-restriction, `<<|` in B *)
+
+axiom remove_set_contents:
+  forall m: fmap 'k 'v, s: S.fset 'k, x. mem x m -> not(S.mem x s) -> (remove_set s m)[x] = m[x]
+meta "remove_unused:dependency" axiom remove_set_contents, function remove_set
+
+axiom remove_set_domain:
+  forall m: fmap 'k 'v, s: S.fset 'k. (remove_set s m).domain = S.diff m.domain s
+meta "remove_unused:dependency" axiom remove_set_domain, function remove_set
+
+function domain_res (s: S.fset 'k) (m: fmap 'k 'v) : fmap 'k 'v
+(** domain restriction, `<|` in B *)
+
+axiom domain_res_contents:
+  forall m: fmap 'k 'v, s: S.fset 'k, x.
+    mem x m -> S.mem x s -> (domain_res s m)[x] = m[x]
+meta "remove_unused:dependency" axiom domain_res_contents, function domain_res
+
+axiom domain_res_domain:
+    forall m: fmap 'k 'v, s: S.fset 'k. (domain_res s m).domain = S.inter m.domain s
+meta "remove_unused:dependency" axiom domain_res_domain, function domain_res
+
+function override (m1 m2: fmap 'k 'v) : fmap 'k 'v
+(** map override, `<+` in B *)
+
+axiom override_contents_1:
+  forall m1, m2: fmap 'k 'v, x. S.mem x m2.domain -> (override m1 m2)[x] = m2[x]
+meta "remove_unused:dependency" axiom override_contents_1, function override
+
+axiom override_contents_2:
+  forall m1, m2: fmap 'k 'v, x.
+    S.mem x (S.diff m1.domain m2.domain) -> (override m1 m2)[x] = m1[x]
+meta "remove_unused:dependency" axiom override_contents_2, function override
+
+axiom override_domain:
+    forall m1, m2: fmap 'k 'v. (override m1 m2).domain = S.union m1.domain m2.domain
+meta "remove_unused:dependency" axiom override_domain, function override
+
+end
+
+(** {3 Some additional facts about operators above}
+
+They are automatically proven, see session `examples/stdlib/fmap`
+
+*)
+
+module Fmap_ext_facts
+
+use set.Fset as S
+use Fmap_ext
+
+lemma anti_res_1 :
+  forall u :  S.fset 'k , m :  fmap 'k 'v.
+    S.inter m.domain u = S.empty -> remove_set u m == m
+meta "remove_unused:dependency" lemma anti_res_1, function remove_set
+
+lemma anti_res_2 :
+  forall u :  S.fset 'k , m :  fmap 'k 'v.
+    S.subset m.domain u -> remove_set u m == empty
+meta "remove_unused:dependency" lemma anti_res_2, function remove_set
+
+lemma anti_res_3 :
+  forall m :  fmap 'k 'v. remove_set m.domain m == empty
+meta "remove_unused:dependency" lemma anti_res_3, function remove_set
+
+lemma anti_res_4 :
+  forall m :  fmap 'k 'v. remove_set S.empty m == m
+meta "remove_unused:dependency" lemma anti_res_4, function remove_set
+
+lemma anti_res_res :
+  forall u, v :  S.fset 'k , m :  fmap 'k 'v.
+    remove_set u (domain_res v m) == domain_res (S.diff v u) m
+meta "remove_unused:dependency" lemma anti_res_res, function remove_set
+
+lemma anti_res_anti_res :
+  forall u, v :  S.fset 'k , m :  fmap 'k 'v.
+    remove_set u (remove_set v m) == remove_set (S.union v u) m
+meta "remove_unused:dependency" lemma anti_res_anti_res, function remove_set
+
+lemma anti_res_override_res :
+  forall u, m1, m2 :  fmap 'k 'v.
+    remove_set u (override m1 m2) == override (remove_set u m1)  (remove_set u m2)
+meta "remove_unused:dependency" lemma anti_res_override_res, function remove_set
+meta "remove_unused:dependency" lemma anti_res_override_res, function override
+
+lemma remove_remove_set :
+  forall x :  'k , m :  fmap 'k 'v.
+    remove x m == remove_set (S.singleton x) m
+meta "remove_unused:dependency" lemma remove_remove_set, function remove_set
+
+lemma add_override :
+  forall x:  'k , y: 'v, m :  fmap 'k 'v.
+    add x y m == override m (mk (S.singleton x) (fun _ -> y))
+meta "remove_unused:dependency" lemma add_override, function override
 
 end
 

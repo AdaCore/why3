@@ -3,6 +3,10 @@
 Standard library
   * new library `ufloat`: unbounded floating-point numbers
   * new library `coma`: standard library of the plugin Coma
+  * additional operators in finite domain maps
+  * added a bunch of meta annotations for "unused dependencies" that
+    most of the time improve proof automation but very rarely may lose some
+    proofs :x:
 
 Core
   * extended notion of strategies: task-oriented strategies
