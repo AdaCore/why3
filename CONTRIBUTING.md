@@ -1,7 +1,7 @@
 Welcome, contributor, to the Why3 verification platform!
 
-If you wish to contribute, open an issue or otherwise interact with our [Gitlab](https://gitlab.inria.fr/why3/why3), you will need to have an INRIA account.
-External users can file bug reports using our [mailing list](mailto:why3-club@lists.gforge.inria.fr). We're sorry for the inconvenience.
+If you wish to contribute, open an issue or otherwise interact with our [Gitlab](https://gitlab.inria.fr/why3/why3), you will need to have an Inria account.
+External users can file bug reports using our [mailing list](mailto:why3-club@groupes.renater.fr). We are sorry for the inconvenience.
 
 # Building
 
@@ -33,12 +33,13 @@ To execute the Why3 tests run:
 
 ## Running specific tests
 
-You may run specific classes of tests through the `-only` flag, the full listing of classes can be obtained from `-help`.
+You may run specific classes of tests by specifying them on the command line.
+The full listing of classes can be obtained from `-help`.
 
-For example to run the 'good file' tests, use:
+For example to run the 'good file' and 'bad file' tests, use:
 
 ```
-./bench/bench -only goodfiles
+./bench/bench goodfiles badfiles
 ```
 
 ## Gitlab CI

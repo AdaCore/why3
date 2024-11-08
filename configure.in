@@ -1122,16 +1122,8 @@ fi
 # Check presence of java and javac used by whyml2java bench
 if test "$enable_java" = yes; then
    AC_CHECK_PROG(JAVAC,javac,javac,no)
-   if test "$JAVAC" = no ; then
-   AC_MSG_WARN([cannot find javac.])
-   fi
-
    AC_CHECK_PROG(JAVA,java,java,no)
-   if test "$JAVA" = no ; then
-      AC_MSG_WARN([cannot find java.])
-   fi
-else  
-   AC_MSG_NOTICE([java disabled by user])
+else
    JAVAC=no
    JAVA=no
 fi
