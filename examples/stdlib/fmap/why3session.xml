@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC5" version="1.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name=".."/><path name=".."/><path name="stdlib"/>
+<path name="fmap.mlw"/>
+<theory name="Fmap" proved="true">
+ <goal name="mem_mapsto" proved="true">
+ <proof prover="2"><result status="valid" time="0.038518" steps="4409"/></proof>
+ </goal>
+</theory>
+<theory name="MapAppInt" proved="true">
+ <goal name="eq&#39;refn&#39;vc" expl="VC for eq&#39;refn" proved="true">
+ <proof prover="2"><result status="valid" time="0.019663" steps="3699"/></proof>
+ </goal>
+</theory>
+<theory name="MapImpInt" proved="true">
+ <goal name="eq&#39;refn&#39;vc" expl="VC for eq&#39;refn" proved="true">
+ <proof prover="1"><result status="valid" time="0.020956" steps="0"/></proof>
+ </goal>
+</theory>
+<theory name="Fmap_ext_facts" proved="true">
+ <goal name="anti_res_1" proved="true">
+ <proof prover="1"><result status="valid" time="0.040321" steps="122"/></proof>
+ </goal>
+ <goal name="anti_res_2" proved="true">
+ <proof prover="1"><result status="valid" time="0.056497" steps="266"/></proof>
+ </goal>
+ <goal name="anti_res_3" proved="true">
+ <proof prover="1"><result status="valid" time="0.045056" steps="10"/></proof>
+ </goal>
+ <goal name="anti_res_4" proved="true">
+ <proof prover="0"><result status="valid" time="0.032841" steps="47230"/></proof>
+ </goal>
+ <goal name="anti_res_res" proved="true">
+ <proof prover="1"><result status="valid" time="0.114183" steps="910"/></proof>
+ </goal>
+ <goal name="anti_res_anti_res" proved="true">
+ <proof prover="1"><result status="valid" time="0.088690" steps="710"/></proof>
+ </goal>
+ <goal name="anti_res_override_res" proved="true">
+ <proof prover="1"><result status="valid" time="0.103578" steps="875"/></proof>
+ </goal>
+ <goal name="remove_remove_set" proved="true">
+ <proof prover="1"><result status="valid" time="0.060472" steps="445"/></proof>
+ </goal>
+ <goal name="add_override" proved="true">
+ <proof prover="1"><result status="valid" time="0.066662" steps="489"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>
