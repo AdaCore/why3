@@ -20,7 +20,7 @@ endif
 
 
 INCLUDES=$(INCLUDE) -I ../../plugins/tptp
-LIBS=$(BIGINTLIB).cmxa why3.cmxa tptp_typing.cmx tptp_parser.cmx tptp_lexer.cmx
+LIBS=why3.cmxa tptp_typing.cmx tptp_parser.cmx tptp_lexer.cmx
 WHY3FLAGS=-L . --warn-off=unused_variable
 PKGS=$(addprefix -package ,$(EXTPKGS))
 

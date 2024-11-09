@@ -40,12 +40,11 @@ fi
 
 echo "
 OCAMLBEST   = @OCAMLBEST@
-BIGINTLIB   = @BIGINTLIB@
 MPFRLIB     = @MLMPFR@
 INFERLIB    = @INFERLIB@
 STACKIFY    = @enable_stackify@
 INCLUDE     = @BIGINTINCLUDE@ -I $ocamllib
-EXTPKGS     = menhirLib @RELIB@ unix num dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
+EXTPKGS     = menhirLib @RELIB@ unix zarith dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
 " > $makefileconfig
 
 if [ "@enable_ocamlfind@" = "yes" ]; then

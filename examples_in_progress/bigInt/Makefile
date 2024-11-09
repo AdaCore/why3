@@ -35,10 +35,10 @@ all: $(MAIN).$(OCAMLBEST)
 extract: $(ML)
 
 $(MAIN).byte: $(CMO)  $(MAIN).cmo
-	ocamlc $(INCLUDE) $(BIGINTLIB).cma why3extract.cma -o $@ $^
+	ocamlc $(INCLUDE) zarith.cma why3extract.cma -o $@ $^
 
 $(MAIN).opt: $(CMX)  $(MAIN).cmx
-	$(OCAMLOPT) $(INCLUDE) $(BIGINTLIB).cmxa why3extract.cmxa -o $@ $^
+	$(OCAMLOPT) $(INCLUDE) zarith.cmxa why3extract.cmxa -o $@ $^
 
 $(MAIN).cmx: $(CMX)
 
