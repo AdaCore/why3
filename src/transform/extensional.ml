@@ -33,26 +33,44 @@ let trans mts =
 let meta = Theory.register_meta "extensionality" [Theory.MTlsymbol]
   ~desc:"Use the given symbol in place of an equality (if binary predicate),@ or apply it to both sides of an equality (if unary function),@ assuming the resulting expression is well-typed."
 
-let t =
+let compute_mts sls =
+  Sls.fold (fun ls mts ->
+      match ls.ls_args, ls.ls_value with
+      | [{ ty_node = Tyapp (ts, _) }; _], None
+      | [{ ty_node = Tyapp (ts, _) }], Some _ ->
+          Mts.add ts ls mts
+      | _ ->
+          raise (Theory.IllFormedMeta (meta, Format.asprintf "'%a' is neither a binary predicate nor a unary function" Pretty.print_ls ls))
+    ) sls Mts.empty
+
+let rewrite_prop mts p v t =
+  let sign = match p with Paxiom | Plemma -> true | Pgoal -> false in
+  [create_prop_decl p v (trans mts sign t)]
+
+let extensionality_all =
   Trans.on_tagged_ls meta (fun sls ->
-      let mts =
-        Sls.fold (fun ls mts ->
-            match ls.ls_args, ls.ls_value with
-            | [{ ty_node = Tyapp (ts, _) }; _], None
-            | [{ ty_node = Tyapp (ts, _) }], Some _ ->
-                Mts.add ts ls mts
-            | _ ->
-                raise (Theory.IllFormedMeta (meta, Format.asprintf "'%a' is neither a binary predicate nor a unary function" Pretty.print_ls ls))
-          ) sls Mts.empty in
+      let mts = compute_mts sls in
       Trans.decl (fun d ->
           match d.d_node with
-          | Dprop (p, v, t) ->
-              let sign = match p with Paxiom | Plemma -> true | Pgoal -> false in
-              [create_prop_decl p v (trans mts sign t)]
+          | Dprop (p, v, t) -> rewrite_prop mts p v t
+          | _ -> [d]
+        ) None
+    )
+
+let extensionality_goal =
+  Trans.on_tagged_ls meta (fun sls ->
+      let mts = compute_mts sls in
+      Trans.decl (fun d ->
+          match d.d_node with
+          | Dprop (Pgoal, v, t) -> rewrite_prop mts Pgoal v t
           | _ -> [d]
         ) None
     )
 
 let () =
-  Trans.register_transform "extensionality" t
-    ~desc:"Apply an extensionality property@ to some equalities in positive position."
+  Trans.register_transform "extensionality_all" extensionality_all
+    ~desc:"Apply an extensionality property@ to some equalities of the task,@ when they occur in positive position."
+
+let () =
+  Trans.register_transform "extensionality_goal" extensionality_goal
+    ~desc:"Apply an extensionality property@ to goal if it is an equality."
