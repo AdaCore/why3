@@ -20,7 +20,20 @@ let trans mts =
           when not sign && ls_equal fs ps_equ ->
         begin match Mts.find_opt ts mts with
         | Some ls when ls.ls_value = None ->
-            t_attr_copy t (t_app ls tl None)
+           begin try
+               t_attr_copy t (t_app ls tl None)
+             with e ->
+               Format.eprintf "exception: %a@." Exn_printer.exn_printer e;
+               let (libpath,theory,qualid) = Theory.restore_path ls.ls_name in
+               Format.eprintf "ls = %a,@ ls.ls_args = @[%a@]@."
+                 (Pp.print_list Pp.dot Pp.print_string) (libpath @ [theory] @ qualid)
+                 (Pp.print_list Pp.comma Pretty.print_ty) ls.ls_args;
+               Format.eprintf "t1 = %a,@ ty1 = %a@." Pretty.print_term t1
+                 (Pp.print_option Pretty.print_ty) t1.t_ty;
+               Format.eprintf "t2 = %a,@ ty2 = %a@." Pretty.print_term t2
+                 (Pp.print_option Pretty.print_ty) t2.t_ty;
+               assert false;
+           end
         | Some ls ->
             t_attr_copy t (t_equ (t_app_infer ls [t1]) (t_app_infer ls [t2]))
         | None -> t
@@ -36,9 +49,12 @@ let meta = Theory.register_meta "extensionality" [Theory.MTlsymbol]
 let compute_mts sls =
   Sls.fold (fun ls mts ->
       match ls.ls_args, ls.ls_value with
-      | [{ ty_node = Tyapp (ts, _) }; _], None
-      | [{ ty_node = Tyapp (ts, _) }], Some _ ->
-          Mts.add ts ls mts
+      | [{ ty_node = Tyapp (ts, _) }; _], None | [{ ty_node = Tyapp (ts, _) }], Some _ ->
+         if Mts.mem ts mts then
+           raise (Theory.IllFormedMeta (meta, Format.asprintf "Already defined meta for type `%a`"
+                                                Pretty.print_ts ts))
+         else
+           Mts.add ts ls mts
       | _ ->
           raise (Theory.IllFormedMeta (meta, Format.asprintf "'%a' is neither a binary predicate nor a unary function" Pretty.print_ls ls))
     ) sls Mts.empty
