@@ -2,35 +2,34 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
-<prover id="6" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="7" name="CVC4" version="1.8" alternative="strings" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="5" name="CVC5" version="1.1.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="8" name="Z3" version="4.13.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="9" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="stringlemmas.mlw"/>
 <theory name="String_lemmas" proved="true">
  <goal name="in_base_concat&#39;vc" expl="VC for in_base_concat" proved="true">
- <proof prover="6"><result status="valid" time="0.172904" steps="14192"/></proof>
+ <proof prover="3"><result status="valid" time="0.112104" steps="19689"/></proof>
  </goal>
  <goal name="svalue_le_sub&#39;vc" expl="VC for svalue_le_sub" proved="true">
- <proof prover="6"><result status="valid" time="0.040000" steps="11495"/></proof>
+ <proof prover="3"><result status="valid" time="0.077703" steps="16890"/></proof>
  </goal>
  <goal name="svalue_le_sub_tail&#39;vc" expl="VC for svalue_le_sub_tail" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="svalue_le_sub_tail&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.040000" steps="10970"/></proof>
+  <proof prover="5"><result status="valid" time="0.042565" steps="10923"/></proof>
   </goal>
   <goal name="svalue_le_sub_tail&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.080000" steps="10943"/></proof>
+  <proof prover="8"><result status="valid" time="0.016320" steps="55850"/></proof>
   </goal>
   <goal name="svalue_le_sub_tail&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.040000"/></proof>
+  <proof prover="9"><result status="valid" time="0.045460" steps="96"/></proof>
   </goal>
   <goal name="svalue_le_sub_tail&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.070000" steps="10979"/></proof>
+  <proof prover="5"><result status="valid" time="0.034367" steps="10932"/></proof>
   </goal>
   <goal name="svalue_le_sub_tail&#39;vc.4" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.130000"/></proof>
@@ -40,19 +39,19 @@
  <goal name="svalue_le_sub_concat&#39;vc" expl="VC for svalue_le_sub_concat" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="svalue_le_sub_concat&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.090000" steps="11141"/></proof>
+  <proof prover="8"><result status="valid" time="0.008577" steps="4865"/></proof>
   </goal>
   <goal name="svalue_le_sub_concat&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.070000" steps="11177"/></proof>
+  <proof prover="3"><result status="valid" time="0.065267" steps="16872"/></proof>
   </goal>
   <goal name="svalue_le_sub_concat&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.040000" steps="11161"/></proof>
+  <proof prover="8"><result status="valid" time="0.018915" steps="57156"/></proof>
   </goal>
   <goal name="svalue_le_sub_concat&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.180000" steps="14414"/></proof>
+  <proof prover="8"><result status="valid" time="0.022123" steps="63140"/></proof>
   </goal>
   <goal name="svalue_le_sub_concat&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.050000"/></proof>
+  <proof prover="3"><result status="valid" time="0.074258" steps="16893"/></proof>
   </goal>
   <goal name="svalue_le_sub_concat&#39;vc.5" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.260000"/></proof>
@@ -60,69 +59,69 @@
  </transf>
  </goal>
  <goal name="svalue_le_sub_head&#39;vc" expl="VC for svalue_le_sub_head" proved="true">
- <proof prover="6"><result status="valid" time="0.200000" steps="14234"/></proof>
+ <proof prover="3"><result status="valid" time="0.113214" steps="21286"/></proof>
  </goal>
  <goal name="svalue_le_sub_frame&#39;vc" expl="VC for svalue_le_sub_frame" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="svalue_le_sub_frame&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.070000" steps="12055"/></proof>
+  <proof prover="3"><result status="valid" time="0.092816" steps="17793"/></proof>
   </goal>
   <goal name="svalue_le_sub_frame&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.100000" steps="15252"/></proof>
+  <proof prover="3"><result status="valid" time="0.113627" steps="21176"/></proof>
   </goal>
   <goal name="svalue_le_sub_frame&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.260000" steps="136"/></proof>
+  <proof prover="9"><result status="valid" time="0.266835" steps="1771"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="svalue_le_tail&#39;vc" expl="VC for svalue_le_tail" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="svalue_le_tail&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.050000" steps="11896"/></proof>
+  <proof prover="5"><result status="valid" time="0.056288" steps="11849"/></proof>
   </goal>
   <goal name="svalue_le_tail&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.050000" steps="12384"/></proof>
+  <proof prover="8"><result status="valid" time="0.006915" steps="5587"/></proof>
   </goal>
   <goal name="svalue_le_tail&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.080000" steps="11666"/></proof>
+  <proof prover="5"><result status="valid" time="0.054523" steps="11619"/></proof>
   </goal>
   <goal name="svalue_le_tail&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.170000" steps="15518"/></proof>
+  <proof prover="3"><result status="valid" time="0.130848" steps="22931"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="svalue_le_concat&#39;vc" expl="VC for svalue_le_concat" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="svalue_le_concat&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.060000" steps="11927"/></proof>
+  <proof prover="3"><result status="valid" time="0.074018" steps="18001"/></proof>
   </goal>
   <goal name="svalue_le_concat&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.050000" steps="12416"/></proof>
+  <proof prover="8"><result status="valid" time="0.008979" steps="5600"/></proof>
   </goal>
   <goal name="svalue_le_concat&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.060000" steps="11698"/></proof>
+  <proof prover="5"><result status="valid" time="0.042581" steps="11644"/></proof>
   </goal>
   <goal name="svalue_le_concat&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.210000" steps="15838"/></proof>
+  <proof prover="3"><result status="valid" time="0.112994" steps="22515"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="svalue_sub&#39;vc" expl="VC for svalue_sub" proved="true">
- <proof prover="6"><result status="valid" time="0.060000" steps="12616"/></proof>
+ <proof prover="8"><result status="valid" time="0.023063" steps="62076"/></proof>
  </goal>
  <goal name="svalue_sub_tail&#39;vc" expl="VC for svalue_sub_tail" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="svalue_sub_tail&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.070000"/></proof>
+  <proof prover="8"><result status="valid" time="0.020678" steps="31189"/></proof>
   </goal>
   <goal name="svalue_sub_tail&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.100000" steps="12072"/></proof>
+  <proof prover="5"><result status="valid" time="0.049772" steps="12025"/></proof>
   </goal>
   <goal name="svalue_sub_tail&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.200000" steps="18231"/></proof>
+  <proof prover="3"><result status="valid" time="0.107208" steps="23038"/></proof>
   </goal>
   <goal name="svalue_sub_tail&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.040000" steps="12108"/></proof>
+  <proof prover="5"><result status="valid" time="0.049735" steps="12061"/></proof>
   </goal>
   <goal name="svalue_sub_tail&#39;vc.4" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.240000"/></proof>
@@ -132,16 +131,16 @@
  <goal name="svalue_sub_concat&#39;vc" expl="VC for svalue_sub_concat" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="svalue_sub_concat&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.060000" steps="12308"/></proof>
+  <proof prover="8"><result status="valid" time="0.017532" steps="31801"/></proof>
   </goal>
   <goal name="svalue_sub_concat&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.050000" steps="12300"/></proof>
+  <proof prover="5"><result status="valid" time="0.055443" steps="12253"/></proof>
   </goal>
   <goal name="svalue_sub_concat&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.110000" steps="18553"/></proof>
+  <proof prover="9"><result status="valid" time="0.052835" steps="95"/></proof>
   </goal>
   <goal name="svalue_sub_concat&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.090000" steps="12334"/></proof>
+  <proof prover="8"><result status="valid" time="0.009012" steps="7931"/></proof>
   </goal>
   <goal name="svalue_sub_concat&#39;vc.4" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.340000"/></proof>
@@ -149,100 +148,100 @@
  </transf>
  </goal>
  <goal name="svalue_sub_head&#39;vc" expl="VC for svalue_sub_head" proved="true">
- <proof prover="6"><result status="valid" time="0.200000" steps="15405"/></proof>
+ <proof prover="3"><result status="valid" time="0.121801" steps="23283"/></proof>
  </goal>
  <goal name="svalue_sub_frame&#39;vc" expl="VC for svalue_sub_frame" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="svalue_sub_frame&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.120000" steps="13214"/></proof>
+  <proof prover="5"><result status="valid" time="0.077991" steps="13110"/></proof>
   </goal>
   <goal name="svalue_sub_frame&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.120000" steps="105"/></proof>
+  <proof prover="3"><result status="valid" time="0.130208" steps="23083"/></proof>
   </goal>
   <goal name="svalue_sub_frame&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.190000" steps="137"/></proof>
+  <proof prover="9"><result status="valid" time="0.279100" steps="1781"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="svalue_le_sub_lower_bound&#39;vc" expl="VC for svalue_le_sub_lower_bound" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="svalue_le_sub_lower_bound&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.090000" steps="13301"/></proof>
+  <proof prover="9"><result status="valid" time="0.041401" steps="30"/></proof>
   </goal>
   <goal name="svalue_le_sub_lower_bound&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.060000" steps="12679"/></proof>
+  <proof prover="5"><result status="valid" time="0.052818" steps="12632"/></proof>
   </goal>
   <goal name="svalue_le_sub_lower_bound&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.040000" steps="129"/></proof>
+  <proof prover="9"><result status="valid" time="0.097544" steps="601"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="svalue_sub_lower_bound&#39;vc" expl="VC for svalue_sub_lower_bound" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="svalue_sub_lower_bound&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.080000" steps="13368"/></proof>
+  <proof prover="3"><result status="valid" time="0.097005" steps="19711"/></proof>
   </goal>
   <goal name="svalue_sub_lower_bound&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.040000" steps="29"/></proof>
+  <proof prover="8"><result status="valid" time="0.007252" steps="8228"/></proof>
   </goal>
   <goal name="svalue_sub_lower_bound&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.160000" steps="130"/></proof>
+  <proof prover="9"><result status="valid" time="0.146653" steps="1086"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="svalue_le_sub_upper_bound&#39;vc" expl="VC for svalue_le_sub_upper_bound" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="svalue_le_sub_upper_bound&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="1" memlimit="2000"><result status="valid" time="0.020000" steps="61483"/></proof>
+  <proof prover="8"><result status="valid" time="0.023901" steps="67807"/></proof>
   </goal>
   <goal name="svalue_le_sub_upper_bound&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.120000" steps="13268"/></proof>
+  <proof prover="9"><result status="valid" time="0.033749" steps="35"/></proof>
   </goal>
   <goal name="svalue_le_sub_upper_bound&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.060000" steps="12866"/></proof>
+  <proof prover="3"><result status="valid" time="0.077914" steps="19376"/></proof>
   </goal>
   <goal name="svalue_le_sub_upper_bound&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.090000" steps="12966"/></proof>
+  <proof prover="9"><result status="valid" time="0.034332" steps="45"/></proof>
   </goal>
   <goal name="svalue_le_sub_upper_bound&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.080000" steps="12958"/></proof>
+  <proof prover="5"><result status="valid" time="0.040503" steps="12911"/></proof>
   </goal>
   <goal name="svalue_le_sub_upper_bound&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.060000" steps="13654"/></proof>
+  <proof prover="8"><result status="valid" time="0.022059" steps="68502"/></proof>
   </goal>
   <goal name="svalue_le_sub_upper_bound&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.230000" steps="29510"/></proof>
+  <proof prover="3"><result status="valid" time="0.148427" steps="27951"/></proof>
   </goal>
   <goal name="svalue_le_sub_upper_bound&#39;vc.7" expl="assertion" proved="true">
   <proof prover="1" memlimit="2000"><result status="valid" time="0.060000" steps="71025"/></proof>
   </goal>
   <goal name="svalue_le_sub_upper_bound&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.183239" steps="21105"/></proof>
+  <proof prover="5"><result status="valid" time="0.127812" steps="21279"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="svalue_sub_upper_bound&#39;vc" expl="VC for svalue_sub_upper_bound" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="svalue_sub_upper_bound&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.120000" steps="13663"/></proof>
+  <proof prover="5"><result status="valid" time="0.070826" steps="13559"/></proof>
   </goal>
   <goal name="svalue_sub_upper_bound&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.100000" steps="13413"/></proof>
+  <proof prover="9"><result status="valid" time="0.041543" steps="35"/></proof>
   </goal>
   <goal name="svalue_sub_upper_bound&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.080000" steps="13011"/></proof>
+  <proof prover="5"><result status="valid" time="0.056841" steps="12964"/></proof>
   </goal>
   <goal name="svalue_sub_upper_bound&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.060000" steps="13115"/></proof>
+  <proof prover="5"><result status="valid" time="0.057600" steps="13068"/></proof>
   </goal>
   <goal name="svalue_sub_upper_bound&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.090000" steps="13107"/></proof>
+  <proof prover="8"><result status="valid" time="0.009473" steps="8531"/></proof>
   </goal>
   <goal name="svalue_sub_upper_bound&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.170000" steps="13804"/></proof>
+  <proof prover="5"><result status="valid" time="0.074287" steps="13690"/></proof>
   </goal>
   <goal name="svalue_sub_upper_bound&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.234175" steps="30058"/></proof>
+  <proof prover="8"><result status="valid" time="0.034206" steps="80102"/></proof>
   </goal>
   <goal name="svalue_sub_upper_bound&#39;vc.7" expl="assertion" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.020000" steps="71808"/></proof>
@@ -255,101 +254,98 @@
 </theory>
 <theory name="Conversions" proved="true">
  <goal name="lowconcat" proved="true">
- <proof prover="7"><result status="valid" time="0.080000" steps="13211"/></proof>
+ <proof prover="8"><result status="valid" time="0.028553" steps="66780"/></proof>
  </goal>
  <goal name="upconcat" proved="true">
- <proof prover="7"><result status="valid" time="0.090000" steps="13230"/></proof>
+ <proof prover="8"><result status="valid" time="0.028071" steps="66825"/></proof>
  </goal>
  <goal name="digitsublow" proved="true">
- <proof prover="7"><result status="valid" time="0.100000" steps="13251"/></proof>
+ <proof prover="8"><result status="valid" time="0.037308" steps="65180"/></proof>
  </goal>
  <goal name="digitsubup" proved="true">
- <proof prover="7"><result status="valid" time="0.100000" steps="13272"/></proof>
+ <proof prover="8"><result status="valid" time="0.030197" steps="65189"/></proof>
  </goal>
  <goal name="lowsub" proved="true">
- <proof prover="7"><result status="valid" time="0.100000" steps="13293"/></proof>
+ <proof prover="8"><result status="valid" time="0.028437" steps="66358"/></proof>
  </goal>
  <goal name="upsub" proved="true">
- <proof prover="7"><result status="valid" time="0.100000" steps="13314"/></proof>
+ <proof prover="8"><result status="valid" time="0.036758" steps="66471"/></proof>
  </goal>
  <goal name="lowupconcat" proved="true">
- <proof prover="7"><result status="valid" time="0.100000" steps="13333"/></proof>
+ <proof prover="8"><result status="valid" time="0.028170" steps="68964"/></proof>
  </goal>
  <goal name="digitsublowup" proved="true">
- <proof prover="2"><result status="valid" time="0.110000" steps="337"/></proof>
+ <proof prover="5"><result status="valid" time="0.129744" steps="18533"/></proof>
  </goal>
  <goal name="upsublowup" proved="true">
- <proof prover="7"><result status="valid" time="0.100000" steps="13375"/></proof>
+ <proof prover="8"><result status="valid" time="0.028021" steps="66688"/></proof>
  </goal>
  <goal name="lowsublowup" proved="true">
- <proof prover="7"><result status="valid" time="0.080000" steps="13397"/></proof>
+ <proof prover="8"><result status="valid" time="0.033810" steps="66697"/></proof>
  </goal>
  <goal name="digits&#39;vc" expl="VC for digits" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="digits&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.080000" steps="13420"/></proof>
+  <proof prover="8"><result status="valid" time="0.028460" steps="65102"/></proof>
   </goal>
   <goal name="digits&#39;vc.1" expl="assertion" proved="true">
   <transf name="rewrite" proved="true" arg1="Assert">
    <goal name="digits&#39;vc.1.0" expl="assertion" proved="true">
    <transf name="rewrite" proved="true" arg1="substring_get">
     <goal name="digits&#39;vc.1.0.0" expl="assertion" proved="true">
-    <proof prover="2"><result status="valid" time="0.040000" steps="55"/></proof>
-    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.120000" steps="11186"/></proof>
+    <proof prover="8"><result status="valid" time="0.013278" steps="5588"/></proof>
     </goal>
     <goal name="digits&#39;vc.1.0.1" expl="rewrite premises" proved="true">
-    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.480011" steps="59103"/></proof>
+    <proof prover="8"><result status="valid" time="0.014482" steps="5588"/></proof>
     </goal>
     <goal name="digits&#39;vc.1.0.2" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.030000" steps="55"/></proof>
-    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.110000" steps="11174"/></proof>
+    <proof prover="5"><result status="valid" time="0.043871" steps="10455"/></proof>
     </goal>
     <goal name="digits&#39;vc.1.0.3" expl="rewrite premises" proved="true">
-    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.638394" steps="59087"/></proof>
+    <proof prover="8"><result status="valid" time="0.006855" steps="5584"/></proof>
     </goal>
     <goal name="digits&#39;vc.1.0.4" expl="rewrite premises" proved="true">
-    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.120000" steps="11174"/></proof>
+    <proof prover="5"><result status="valid" time="0.045783" steps="10455"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="digits&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.020000" steps="59"/></proof>
+  <proof prover="5"><result status="valid" time="0.097057" steps="15846"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="lower&#39;vc" expl="VC for lower" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="lower&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.100000" steps="13460"/></proof>
+  <proof prover="8"><result status="valid" time="0.037281" steps="65390"/></proof>
   </goal>
   <goal name="lower&#39;vc.1" expl="assertion" proved="true">
   <transf name="rewrite" proved="true" arg1="Assert">
    <goal name="lower&#39;vc.1.0" expl="assertion" proved="true">
    <transf name="rewrite" proved="true" arg1="substring_get">
     <goal name="lower&#39;vc.1.0.0" expl="assertion" proved="true">
-    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="11212"/></proof>
+    <proof prover="9"><result status="valid" time="0.042444" steps="57"/></proof>
     </goal>
     <goal name="lower&#39;vc.1.0.1" expl="rewrite premises" proved="true">
-    <proof prover="7"><result status="valid" time="0.100000" steps="13489"/></proof>
+    <proof prover="8"><result status="valid" time="0.010631" steps="5607"/></proof>
     </goal>
     <goal name="lower&#39;vc.1.0.2" expl="rewrite premises" proved="true">
-    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.080000" steps="11200"/></proof>
+    <proof prover="9"><result status="valid" time="0.028388" steps="57"/></proof>
     </goal>
     <goal name="lower&#39;vc.1.0.3" expl="rewrite premises" proved="true">
-    <proof prover="7"><result status="valid" time="0.090000" steps="13482"/></proof>
+    <proof prover="8"><result status="valid" time="0.007061" steps="5603"/></proof>
     </goal>
     <goal name="lower&#39;vc.1.0.4" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.020000" steps="57"/></proof>
-    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="11200"/></proof>
+    <proof prover="3"><result status="valid" time="0.059981" steps="17019"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="lower&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.020000" steps="61"/></proof>
+  <proof prover="8"><result status="valid" time="0.032439" steps="68140"/></proof>
   </goal>
  </transf>
  </goal>
@@ -358,7 +354,7 @@
   <goal name="upper&#39;vc.0" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="upper&#39;vc.0.0" expl="assertion" proved="true">
-   <proof prover="7"><result status="valid" time="0.080000" steps="13499"/></proof>
+   <proof prover="8"><result status="valid" time="0.032392" steps="65676"/></proof>
    </goal>
   </transf>
   </goal>
@@ -369,165 +365,161 @@
     <goal name="upper&#39;vc.1.0.0" expl="assertion" proved="true">
     <transf name="rewrite" proved="true" arg1="substring_get">
      <goal name="upper&#39;vc.1.0.0.0" expl="assertion" proved="true">
-     <proof prover="2"><result status="valid" time="0.030000" steps="59"/></proof>
-     <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.090000" steps="11220"/></proof>
+     <proof prover="5"><result status="valid" time="0.044416" steps="10483"/></proof>
      </goal>
      <goal name="upper&#39;vc.1.0.0.1" expl="rewrite premises" proved="true">
-     <proof prover="7"><result status="valid" time="0.080000" steps="13528"/></proof>
+     <proof prover="8"><result status="valid" time="0.009457" steps="5624"/></proof>
      </goal>
      <goal name="upper&#39;vc.1.0.0.2" expl="rewrite premises" proved="true">
-     <proof prover="2"><result status="valid" time="0.020000" steps="59"/></proof>
-     <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="11226"/></proof>
+     <proof prover="3"><result status="valid" time="0.072147" steps="17042"/></proof>
      </goal>
      <goal name="upper&#39;vc.1.0.0.3" expl="rewrite premises" proved="true">
-     <proof prover="7"><result status="valid" time="0.100000" steps="13521"/></proof>
+     <proof prover="8"><result status="valid" time="0.003701" steps="5620"/></proof>
      </goal>
      <goal name="upper&#39;vc.1.0.0.4" expl="rewrite premises" proved="true">
-     <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.080000" steps="11226"/></proof>
+     <proof prover="8"><result status="valid" time="0.010664" steps="5628"/></proof>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
    <goal name="upper&#39;vc.1.1" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.020000" steps="59"/></proof>
+   <proof prover="8"><result status="valid" time="0.008720" steps="5624"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="upper&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.030000" steps="64"/></proof>
+  <proof prover="3"><result status="valid" time="0.122535" steps="23160"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="diglow" proved="true">
- <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.090000" steps="11387"/></proof>
+ <proof prover="5"><result status="valid" time="0.046250" steps="11340"/></proof>
  </goal>
  <goal name="digup" proved="true">
- <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.090000" steps="11415"/></proof>
+ <proof prover="8"><result status="valid" time="0.013793" steps="8119"/></proof>
  </goal>
  <goal name="lowup" proved="true">
- <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.090000" steps="11451"/></proof>
+ <proof prover="5"><result status="valid" time="0.045287" steps="11404"/></proof>
  </goal>
  <goal name="tnt_low&#39;vc" expl="VC for tnt_low" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="tnt_low&#39;vc.0" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="tnt_low&#39;vc.0.0" expl="assertion" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.150000" steps="548"/></proof>
+   <proof prover="3"><result status="valid" time="0.136580" steps="25907"/></proof>
    </goal>
    <goal name="tnt_low&#39;vc.0.1" expl="assertion" proved="true">
-   <proof prover="6"><result status="valid" time="0.060000" steps="11410"/></proof>
+   <proof prover="9"><result status="valid" time="0.035753" steps="66"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="tnt_low&#39;vc.1" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="tnt_low&#39;vc.1.0" expl="assertion" proved="true">
-   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.140000" steps="12463"/></proof>
+   <proof prover="8"><result status="valid" time="0.007119" steps="5755"/></proof>
    </goal>
    <goal name="tnt_low&#39;vc.1.1" expl="assertion" proved="true">
    <transf name="rewrite" proved="true" arg1="substring_get">
     <goal name="tnt_low&#39;vc.1.1.0" expl="assertion" proved="true">
-    <proof prover="2"><result status="valid" time="0.020000" steps="70"/></proof>
+    <proof prover="3"><result status="valid" time="0.066132" steps="17268"/></proof>
     </goal>
     <goal name="tnt_low&#39;vc.1.1.1" expl="rewrite premises" proved="true">
-    <proof prover="7"><result status="valid" time="0.110000" steps="13726"/></proof>
+    <proof prover="8"><result status="valid" time="0.007441" steps="5745"/></proof>
     </goal>
     <goal name="tnt_low&#39;vc.1.1.2" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.030000" steps="70"/></proof>
+    <proof prover="8"><result status="valid" time="0.010744" steps="5733"/></proof>
     </goal>
     <goal name="tnt_low&#39;vc.1.1.3" expl="rewrite premises" proved="true">
-    <proof prover="7"><result status="valid" time="0.110000" steps="13719"/></proof>
+    <proof prover="8"><result status="valid" time="0.013740" steps="5741"/></proof>
     </goal>
     <goal name="tnt_low&#39;vc.1.1.4" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.030000" steps="70"/></proof>
+    <proof prover="9"><result status="valid" time="0.040466" steps="70"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="tnt_low&#39;vc.1.2" expl="VC for tnt_low" proved="true">
-   <proof prover="2"><result status="valid" time="0.030000" steps="75"/></proof>
+   <proof prover="5"><result status="valid" time="0.098290" steps="16608"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="tnt_low&#39;vc.2" expl="assertion" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.080000" steps="271"/></proof>
+  <proof prover="5"><result status="valid" time="0.128029" steps="20087"/></proof>
   </goal>
   <goal name="tnt_low&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.100000" steps="270"/></proof>
+  <proof prover="8"><result status="valid" time="0.034693" steps="77991"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="tnt_up&#39;vc" expl="VC for tnt_up" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="tnt_up&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.160000" steps="564"/></proof>
+  <proof prover="5"><result status="valid" time="0.153233" steps="25896"/></proof>
   </goal>
   <goal name="tnt_up&#39;vc.1" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="tnt_up&#39;vc.1.0" expl="assertion" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.040000" steps="70"/></proof>
+   <proof prover="8"><result status="valid" time="0.003619" steps="6022"/></proof>
    </goal>
    <goal name="tnt_up&#39;vc.1.1" expl="assertion" proved="true">
    <transf name="rewrite" proved="true" arg1="substring_get">
     <goal name="tnt_up&#39;vc.1.1.0" expl="assertion" proved="true">
-    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.110000" steps="11744"/></proof>
+    <proof prover="3"><result status="valid" time="0.067517" steps="17786"/></proof>
     </goal>
     <goal name="tnt_up&#39;vc.1.1.1" expl="rewrite premises" proved="true">
-    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.508223" steps="60758"/></proof>
+    <proof prover="8"><result status="valid" time="0.013577" steps="6012"/></proof>
     </goal>
     <goal name="tnt_up&#39;vc.1.1.2" expl="rewrite premises" proved="true">
-    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.090000" steps="11724"/></proof>
+    <proof prover="5"><result status="valid" time="0.046249" steps="10877"/></proof>
     </goal>
     <goal name="tnt_up&#39;vc.1.1.3" expl="rewrite premises" proved="true">
-    <proof prover="7"><result status="valid" time="0.110000" steps="14239"/></proof>
+    <proof prover="8"><result status="valid" time="0.007214" steps="6008"/></proof>
     </goal>
     <goal name="tnt_up&#39;vc.1.1.4" expl="rewrite premises" proved="true">
-    <proof prover="1" timelimit="1"><result status="valid" time="0.020000" steps="16954"/></proof>
-    <proof prover="2"><result status="valid" time="0.030000" steps="70"/></proof>
-    <proof prover="6"><result status="valid" time="0.110000" steps="11749"/></proof>
+    <proof prover="5"><result status="valid" time="0.052616" steps="11702"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="tnt_up&#39;vc.1.2" expl="VC for tnt_up" proved="true">
-   <proof prover="2"><result status="valid" time="0.020000" steps="75"/></proof>
+   <proof prover="8"><result status="valid" time="0.036834" steps="79856"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="tnt_up&#39;vc.2" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="tnt_up&#39;vc.2.0" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.010000" steps="72"/></proof>
+   <proof prover="5"><result status="valid" time="0.063617" steps="13060"/></proof>
    </goal>
    <goal name="tnt_up&#39;vc.2.1" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.030000" steps="74"/></proof>
+   <proof prover="9"><result status="valid" time="0.047982" steps="131"/></proof>
    </goal>
    <goal name="tnt_up&#39;vc.2.2" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.020000" steps="72"/></proof>
+   <proof prover="5"><result status="valid" time="0.062380" steps="13020"/></proof>
    </goal>
    <goal name="tnt_up&#39;vc.2.3" expl="VC for tnt_up" proved="true">
-   <proof prover="2"><result status="valid" time="0.020000" steps="76"/></proof>
+   <proof prover="8"><result status="valid" time="0.034165" steps="79162"/></proof>
    </goal>
    <goal name="tnt_up&#39;vc.2.4" expl="VC for tnt_up" proved="true">
-   <proof prover="2"><result status="valid" time="0.010000" steps="77"/></proof>
+   <proof prover="8"><result status="valid" time="0.030768" steps="79316"/></proof>
    </goal>
    <goal name="tnt_up&#39;vc.2.5" expl="VC for tnt_up" proved="true">
-   <proof prover="2"><result status="valid" time="0.040000" steps="80"/></proof>
+   <proof prover="8"><result status="valid" time="0.035909" steps="122724"/></proof>
    </goal>
    <goal name="tnt_up&#39;vc.2.6" expl="VC for tnt_up" proved="true">
-   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.070000" steps="78"/></proof>
+   <proof prover="3"><result status="valid" time="0.103039" steps="19546"/></proof>
    </goal>
    <goal name="tnt_up&#39;vc.2.7" expl="VC for tnt_up" proved="true">
-   <proof prover="2"><result status="valid" time="0.020000" steps="81"/></proof>
+   <proof prover="3"><result status="valid" time="0.096020" steps="19611"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="tnt_up&#39;vc.3" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="tnt_up&#39;vc.3.0" expl="postcondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.020000" steps="268"/></proof>
+   <proof prover="5"><result status="valid" time="0.124565" steps="20194"/></proof>
    </goal>
    <goal name="tnt_up&#39;vc.3.1" expl="postcondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.040000" steps="74"/></proof>
+   <proof prover="8"><result status="valid" time="0.007138" steps="6097"/></proof>
    </goal>
   </transf>
   </goal>
@@ -536,104 +528,104 @@
  <goal name="tnt_both&#39;vc" expl="VC for tnt_both" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="tnt_both&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.160000" steps="552"/></proof>
+  <proof prover="5"><result status="valid" time="0.133136" steps="20473"/></proof>
   </goal>
   <goal name="tnt_both&#39;vc.1" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="tnt_both&#39;vc.1.0" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.020000" steps="72"/></proof>
+   <proof prover="5"><result status="valid" time="0.066847" steps="13155"/></proof>
    </goal>
    <goal name="tnt_both&#39;vc.1.1" expl="assertion" proved="true">
    <transf name="rewrite" proved="true" arg1="substring_get">
     <goal name="tnt_both&#39;vc.1.1.0" expl="assertion" proved="true">
-    <proof prover="2"><result status="valid" time="0.020000" steps="72"/></proof>
+    <proof prover="3"><result status="valid" time="0.079461" steps="18023"/></proof>
     </goal>
     <goal name="tnt_both&#39;vc.1.1.1" expl="rewrite premises" proved="true">
-    <proof prover="7"><result status="valid" time="0.100000" steps="14483"/></proof>
+    <proof prover="8"><result status="valid" time="0.015097" steps="6150"/></proof>
     </goal>
     <goal name="tnt_both&#39;vc.1.1.2" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.030000" steps="72"/></proof>
+    <proof prover="3"><result status="valid" time="0.064626" steps="17995"/></proof>
     </goal>
     <goal name="tnt_both&#39;vc.1.1.3" expl="rewrite premises" proved="true">
-    <proof prover="7"><result status="valid" time="0.100000" steps="14476"/></proof>
+    <proof prover="8"><result status="valid" time="0.007266" steps="6146"/></proof>
     </goal>
     <goal name="tnt_both&#39;vc.1.1.4" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.020000" steps="72"/></proof>
+    <proof prover="9"><result status="valid" time="0.042148" steps="72"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="tnt_both&#39;vc.1.2" expl="VC for tnt_both" proved="true">
-   <proof prover="2"><result status="valid" time="0.030000" steps="77"/></proof>
+   <proof prover="8"><result status="valid" time="0.027108" steps="85836"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="tnt_both&#39;vc.2" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="tnt_both&#39;vc.2.0" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.020000" steps="74"/></proof>
+   <proof prover="9"><result status="valid" time="0.042871" steps="74"/></proof>
    </goal>
    <goal name="tnt_both&#39;vc.2.1" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.040000" steps="76"/></proof>
+   <proof prover="8"><result status="valid" time="0.032579" steps="92041"/></proof>
    </goal>
    <goal name="tnt_both&#39;vc.2.2" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.030000" steps="74"/></proof>
+   <proof prover="9"><result status="valid" time="0.040240" steps="74"/></proof>
    </goal>
    <goal name="tnt_both&#39;vc.2.3" expl="VC for tnt_both" proved="true">
-   <proof prover="2"><result status="valid" time="0.030000" steps="78"/></proof>
+   <proof prover="5"><result status="valid" time="0.067392" steps="13376"/></proof>
    </goal>
    <goal name="tnt_both&#39;vc.2.4" expl="VC for tnt_both" proved="true">
-   <proof prover="2"><result status="valid" time="0.020000" steps="79"/></proof>
+   <proof prover="3"><result status="valid" time="0.091538" steps="19584"/></proof>
    </goal>
    <goal name="tnt_both&#39;vc.2.5" expl="VC for tnt_both" proved="true">
-   <proof prover="2"><result status="valid" time="0.020000" steps="82"/></proof>
+   <proof prover="9"><result status="valid" time="0.053741" steps="153"/></proof>
    </goal>
    <goal name="tnt_both&#39;vc.2.6" expl="VC for tnt_both" proved="true">
-   <proof prover="2"><result status="valid" time="0.020000" steps="80"/></proof>
+   <proof prover="5"><result status="valid" time="0.069355" steps="13642"/></proof>
    </goal>
    <goal name="tnt_both&#39;vc.2.7" expl="VC for tnt_both" proved="true">
-   <proof prover="2"><result status="valid" time="0.010000" steps="83"/></proof>
+   <proof prover="5"><result status="valid" time="0.075074" steps="14199"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="tnt_both&#39;vc.3" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="tnt_both&#39;vc.3.0" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.020000" steps="74"/></proof>
+   <proof prover="5"><result status="valid" time="0.061694" steps="13180"/></proof>
    </goal>
    <goal name="tnt_both&#39;vc.3.1" expl="assertion" proved="true">
    <transf name="rewrite" proved="true" arg1="substring_get">
     <goal name="tnt_both&#39;vc.3.1.0" expl="assertion" proved="true">
-    <proof prover="2"><result status="valid" time="0.030000" steps="74"/></proof>
+    <proof prover="5"><result status="valid" time="0.039441" steps="11027"/></proof>
     </goal>
     <goal name="tnt_both&#39;vc.3.1.1" expl="rewrite premises" proved="true">
-    <proof prover="7"><result status="valid" time="0.100000" steps="14505"/></proof>
+    <proof prover="8"><result status="valid" time="0.014952" steps="6163"/></proof>
     </goal>
     <goal name="tnt_both&#39;vc.3.1.2" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.030000" steps="74"/></proof>
+    <proof prover="9"><result status="valid" time="0.037269" steps="74"/></proof>
     </goal>
     <goal name="tnt_both&#39;vc.3.1.3" expl="rewrite premises" proved="true">
-    <proof prover="7"><result status="valid" time="0.090000" steps="14498"/></proof>
+    <proof prover="8"><result status="valid" time="0.011299" steps="6159"/></proof>
     </goal>
     <goal name="tnt_both&#39;vc.3.1.4" expl="rewrite premises" proved="true">
-    <proof prover="2"><result status="valid" time="0.030000" steps="74"/></proof>
+    <proof prover="8"><result status="valid" time="0.009423" steps="9087"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="tnt_both&#39;vc.3.2" expl="VC for tnt_both" proved="true">
-   <proof prover="2"><result status="valid" time="0.040000" steps="79"/></proof>
+   <proof prover="9"><result status="valid" time="0.051494" steps="146"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="tnt_both&#39;vc.4" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.090000" steps="275"/></proof>
+  <proof prover="8"><result status="valid" time="0.034790" steps="91796"/></proof>
   </goal>
   <goal name="tnt_both&#39;vc.5" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="tnt_both&#39;vc.5.0" expl="postcondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.040000" steps="268"/></proof>
+   <proof prover="5"><result status="valid" time="0.137942" steps="21475"/></proof>
    </goal>
    <goal name="tnt_both&#39;vc.5.1" expl="postcondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.020000" steps="70"/></proof>
+   <proof prover="5"><result status="valid" time="0.069930" steps="13753"/></proof>
    </goal>
   </transf>
   </goal>
@@ -642,54 +634,54 @@
  <goal name="tnt&#39;vc" expl="VC for tnt" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="tnt&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.040000" steps="76"/></proof>
+  <proof prover="9"><result status="valid" time="0.054108" steps="134"/></proof>
   </goal>
   <goal name="tnt&#39;vc.1" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="tnt&#39;vc.1.0" expl="precondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.020000" steps="74"/></proof>
+   <proof prover="8"><result status="valid" time="0.008921" steps="6450"/></proof>
    </goal>
    <goal name="tnt&#39;vc.1.1" expl="precondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.030000" steps="78"/></proof>
+   <proof prover="9"><result status="valid" time="0.060848" steps="148"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="tnt&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.030000" steps="255"/></proof>
+  <proof prover="3"><result status="valid" time="0.132444" steps="26880"/></proof>
   </goal>
   <goal name="tnt&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.050000" steps="427"/></proof>
+  <proof prover="5"><result status="valid" time="0.113427" steps="20517"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="String_value" proved="true">
  <goal name="abs_value_sub_text&#39;vc" expl="VC for abs_value_sub_text" proved="true">
- <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.069028" steps="17184"/></proof>
+ <proof prover="3"><result status="valid" time="0.106259" steps="24785"/></proof>
  </goal>
  <goal name="text_conversion&#39;vc" expl="VC for text_conversion" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="text_conversion&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.070000" steps="66"/></proof>
+  <proof prover="9"><result status="valid" time="0.052197" steps="66"/></proof>
   </goal>
   <goal name="text_conversion&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.120000" steps="263"/></proof>
+  <proof prover="3"><result status="valid" time="0.195753" steps="39333"/></proof>
   </goal>
   <goal name="text_conversion&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.110000"/></proof>
+  <proof prover="9"><result status="valid" time="1.887949" steps="13764"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="abs_value_sub_text_frame&#39;vc" expl="VC for abs_value_sub_text_frame" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="abs_value_sub_text_frame&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.020000" steps="64"/></proof>
+  <proof prover="8"><result status="valid" time="0.040549" steps="108207"/></proof>
   </goal>
   <goal name="abs_value_sub_text_frame&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.040000" steps="70"/></proof>
+  <proof prover="9"><result status="valid" time="0.057044" steps="116"/></proof>
   </goal>
   <goal name="abs_value_sub_text_frame&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.240000" steps="333"/></proof>
+  <proof prover="9"><result status="valid" time="0.452388" steps="3414"/></proof>
   </goal>
  </transf>
  </goal>
