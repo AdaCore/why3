@@ -36,6 +36,8 @@ module Seq
               forall i: int. 0 <= i < length s1 -> s1[i] = s2[i] }
     ensures { result -> s1 = s2 }
 
+  meta "extensionality" predicate (==)
+
   (** sequence comprehension *)
   val function create (len: int) (f: int -> 'a) : seq 'a
     requires { 0 <= len }

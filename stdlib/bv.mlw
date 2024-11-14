@@ -587,6 +587,12 @@ let predicate sle (v1 v2 : t) =
     forall x y : t [x == y]. x == y -> x = y
   meta "remove_unused:dependency" axiom Extensionality, predicate (==)
 
+(* not a good idea to apply extensionality systematically here, since provers with built-in bitvectors will prefer using `=` directly
+  this meta could be added in drivers though.
+
+  meta extensionality predicate (==)
+*)
+
   val eq (v1 v2 : t) : bool
     ensures { result <-> v1 = v2 }
 

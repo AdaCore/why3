@@ -2,39 +2,29 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC5" version="1.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.13.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name=".."/><path name=".."/><path name="stdlib"/>
 <path name="fmap.mlw"/>
 <theory name="Fmap" proved="true">
  <goal name="mem_mapsto" proved="true">
- <proof prover="2"><result status="valid" time="0.038518" steps="4409"/></proof>
- </goal>
-</theory>
-<theory name="MapAppInt" proved="true">
- <goal name="eq&#39;refn&#39;vc" expl="VC for eq&#39;refn" proved="true">
- <proof prover="2"><result status="valid" time="0.019663" steps="3699"/></proof>
- </goal>
-</theory>
-<theory name="MapImpInt" proved="true">
- <goal name="eq&#39;refn&#39;vc" expl="VC for eq&#39;refn" proved="true">
- <proof prover="1"><result status="valid" time="0.020956" steps="0"/></proof>
+ <proof prover="4"><result status="valid" time="0.048860" steps="8070"/></proof>
  </goal>
 </theory>
 <theory name="Fmap_ext_facts" proved="true">
  <goal name="anti_res_1" proved="true">
- <proof prover="1"><result status="valid" time="0.040321" steps="122"/></proof>
+ <proof prover="4"><result status="valid" time="0.079565" steps="14687"/></proof>
  </goal>
  <goal name="anti_res_2" proved="true">
  <proof prover="1"><result status="valid" time="0.056497" steps="266"/></proof>
  </goal>
  <goal name="anti_res_3" proved="true">
- <proof prover="1"><result status="valid" time="0.045056" steps="10"/></proof>
+ <proof prover="3"><result status="valid" time="0.014714" steps="39232"/></proof>
  </goal>
  <goal name="anti_res_4" proved="true">
- <proof prover="0"><result status="valid" time="0.032841" steps="47230"/></proof>
+ <proof prover="1"><result status="valid" time="0.031720" steps="65"/></proof>
  </goal>
  <goal name="anti_res_res" proved="true">
  <proof prover="1"><result status="valid" time="0.114183" steps="910"/></proof>
@@ -50,6 +40,16 @@
  </goal>
  <goal name="add_override" proved="true">
  <proof prover="1"><result status="valid" time="0.066662" steps="489"/></proof>
+ </goal>
+</theory>
+<theory name="MapAppInt" proved="true">
+ <goal name="eq&#39;refn&#39;vc" expl="VC for eq&#39;refn" proved="true">
+ <proof prover="3"><result status="valid" time="0.004653" steps="2613"/></proof>
+ </goal>
+</theory>
+<theory name="MapImpInt" proved="true">
+ <goal name="eq&#39;refn&#39;vc" expl="VC for eq&#39;refn" proved="true">
+ <proof prover="4"><result status="valid" time="0.041688" steps="7740"/></proof>
  </goal>
 </theory>
 </file>

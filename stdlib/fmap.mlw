@@ -26,6 +26,8 @@ module Fmap
   axiom extensionality:
     forall m1 m2: fmap 'k 'v. m1 == m2 -> m1 = m2
 
+  meta extensionality predicate (==)
+
   predicate mem (k: 'k) (m: fmap 'k 'v) =
     S.mem k m.domain
 

@@ -32,11 +32,16 @@ module Set
   (** membership *)
   predicate mem (x: 'a) (s: set 'a) = s[x]
 
-  (** equality *)
+  use map.MapExt (* this imports extensionality for sets *)
+(*
+(** equality *)
   predicate (==) (s1 s2: set 'a) = forall x: 'a. mem x s1 <-> mem x s2
 
   lemma extensionality:
     forall s1 s2: set 'a. s1 == s2 -> s1 = s2
+
+  meta extensionality predicate (==)
+*)
 
   (** inclusion *)
   predicate subset (s1 s2: set 'a) = forall x : 'a. mem x s1 -> mem x s2
@@ -269,6 +274,8 @@ module Fset
 
   lemma extensionality:
     forall s1 s2: fset 'a. s1 == s2 -> s1 = s2
+
+  meta extensionality predicate (==)
 
   (** inclusion *)
   predicate subset (s1 s2: fset 'a) = forall x : 'a. mem x s1 -> mem x s2
