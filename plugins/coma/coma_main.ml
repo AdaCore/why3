@@ -12,13 +12,17 @@
 open Why3
 open Wstdlib
 open Term
+open Theory
+open Pmodule
 open Coma_logic
 open Coma_syntax
 open Coma_typing
 open Ptree
-open Pmodule
 
-let debug = Debug.register_flag "coma" ~desc:"[coma] plugin debug flag"
+let debug = Debug.register_flag "coma" ~desc:"Coma@ plugin@ debug@ flag."
+
+let debug_no_eval = Debug.register_flag "coma_no_eval"
+  ~desc:"Do@ not@ simplify@ pattern@ matching@ in@ Coma@ proof@ obligations."
 
 let coma_language = Env.register_language Pmodule.mlw_language (Mstr.map snd)
 
@@ -43,9 +47,12 @@ let eval_match = let pr = Decl.create_prsymbol (Ident.id_fresh "dummy'pr") in
         Decl.create_prop_decl Decl.Pgoal pr @@ Term.t_forall_close vl [] f in
       Eval_match.eval_match ~keep_trace:false muc.muc_known f
 
+let eval_match muc vl f =
+  if Debug.test_flag debug_no_eval then f else eval_match muc vl f
+
 let add_def (c,muc) (flat,dfl) =
   Debug.dprintf debug "\n@[%a@]@." Coma_syntax.PP.pp_def_block dfl;
-  let c, gl = vc_defn c flat dfl in
+  let c, gl = vc_defn (c_known c muc.muc_theory.uc_known) flat dfl in
   let add muc ({hs_name = {Ident.id_string = s}}, f) =
     let pr = Decl.create_prsymbol (Ident.id_fresh ("vc_" ^ s)) in
     let d = Decl.create_prop_decl Decl.Pgoal pr (eval_match muc [] f) in
