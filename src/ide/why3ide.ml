@@ -1374,8 +1374,8 @@ let color_loc ?(ce = false) ~color loc =
    to appropriate source files *)
 let apply_loc_on_source (l : (Loc.position * color) list) loc_goal =
   erase_loc_all_view ();
-  List.iter (fun (loc, color) -> color_loc ~color loc) l;
-  scroll_to_loc ~force_tab_switch:false loc_goal
+  scroll_to_loc ~force_tab_switch:false loc_goal;
+  List.iter (fun (loc, color) -> color_loc ~color loc) l
 
 (* Erase the colors and apply the colors given by l (which come from the task)
    to the counterexample tab *)
