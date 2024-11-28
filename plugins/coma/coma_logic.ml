@@ -514,29 +514,36 @@ let rec consume mm c pl bl =
 
 and factorize mm c hl h wr pl kk =
   if Debug.test_flag debug_slow || unmergeable pl then hl,kk else
-  let lz = lazy (let pl = wr_to_pl wr pl in
-    let rec fields v (vz,zl,zv,vt) = let z = c_clone_vs c v in
-      let zl,zv,vt = try let ul,um = Wvs.find record_fields v in
-        let vz,zl,zv,vt = List.fold_right fields ul (Mvs.empty,zl,zv,vt) in
-        let vtoz u = try Mvs.find u vz with Not_found -> assert false in
-        Wvs.set record_fields z (List.map vtoz ul, Mls.map vtoz um); zl,zv,vt
-      with Not_found -> zl,zv,vt in
-      Mvs.add v z vz, z::zl, Mvs.add z v zv, (v, t_var z)::vt in
-    let [@warning "-8"] dup (Pv v|Pr v) (zl,zv,vt,bl) =
-      let _,zl,zv,vt = fields v (Mvs.empty,zl,zv,vt) in
-      zl, zv, vt, Bv (snd (List.hd vt))::bl in
-    let zl,zv,vt,bl = List.fold_right dup pl ([],Mvs.empty,[],[]) in
-    let zw = kk true bl in let nm = not (Shs.mem h mm) || w_solid zw in
-    let h = if nm then h else create_hsymbol (id_clone h.hs_name) in
-    h, zl, zw, fun bl ->
-      let sph f = {wp = t_true; sp = Mhs.singleton h f} in
-      if pl = [] then if nm then zw else sph t_true else
-      let c,ul,_,_ = consume Shs.empty c pl bl in
-      let link (v,t) = t_equ t (c_find_vs c v) in
-      w_forall ul (if nm then w_subst (Mvs.map (c_find_vs c) zv) zw
-                         else sph (t_and_l (List.map link vt)))) in
-  lz::hl, fun go bl ->
-    if go then let lazy (_,_,_,zk) = lz in zk bl else w_true
+  let lz = lazy (prefact (Shs.mem h mm) c h (wr_to_pl wr pl) kk) in
+  lz::hl, fun go bl -> if go then let lazy (_,_,_,zk) = lz in zk bl
+                             else w_true
+
+and prefact mh c h pl kk =
+  let rec fields v (vz,zl,zv,vt) =
+    let z = c_clone_vs c v in
+    let zl,zv,vt = if mh then zl,zv,vt else try
+      let ul,um = Wvs.find record_fields v in
+      let vz,zl,zv,vt = List.fold_right fields ul (Mvs.empty,zl,zv,vt) in
+      let vtoz u = try Mvs.find u vz with Not_found -> assert false in
+      Wvs.set record_fields z (List.map vtoz ul, Mls.map vtoz um); zl,zv,vt
+    with Not_found -> zl,zv,vt in
+    Mvs.add v z vz, z::zl, Mvs.add z v zv, (v, t_var z)::vt in
+  let [@warning "-8"] dup (Pv v|Pr v) (zl,zv,vt,bl) =
+    let _,zl,zv,vt = fields v (Mvs.empty,zl,zv,vt) in
+    zl, zv, vt, Bv (snd (List.hd vt))::bl in
+  let zl,zv,vt,bl = List.fold_right dup pl ([],Mvs.empty,[],[]) in
+  let zw = kk true bl in
+  let abort_mh = mh && w_solid zw in let mh = mh && not abort_mh in
+  let [@warning "-8"] ripe (Pv v|Pr v) = Wvs.mem record_fields v in
+  if abort_mh && List.exists ripe pl then prefact mh c h pl kk else
+  let h = if mh then create_hsymbol (id_clone h.hs_name) else h in
+  h, zl, zw, fun bl ->
+    let sph f = {wp = t_true; sp = Mhs.singleton h f} in
+    if pl = [] then if mh then sph t_true else zw else
+    let c,ul,_,_ = consume Shs.empty c pl bl in
+    let link (v,t) = t_equ t (c_find_vs c v) in
+    w_forall ul (if mh then sph (t_and_l (List.map link vt))
+                 else w_subst (Mvs.map (c_find_vs c) zv) zw)
 
 let close vl hl {wp;sp} =
   let pile (vl,wl,sh) (lazy (h,zl,zw,_)) =  match Mhs.find h sp with
