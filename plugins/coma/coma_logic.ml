@@ -256,7 +256,7 @@ let rec complete_fields kn v =
       let fl = List.map (Opt.get_exn Exit) fl in
       let sb = ty_match_args v.vs_ty in
       let mk_vs f ty =
-        let nm = v.vs_name.id_string ^ f.ls_name.id_string in
+        let nm = v.vs_name.id_string ^ "'" ^ f.ls_name.id_string in
         let vs = create_vsymbol (id_fresh nm) (ty_inst sb ty) in
         complete_fields kn vs; vs in
       let vl = List.map2 mk_vs fl cs.ls_args in
