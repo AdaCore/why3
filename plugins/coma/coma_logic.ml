@@ -262,7 +262,7 @@ let rec complete_fields kn v =
       let vl = List.map2 mk_vs fl cs.ls_args in
       let fm = List.fold_right2 Mls.add fl vl Mls.empty in
       Wvs.set record_fields v (vl,fm)
-  with Exit -> ()
+  with Exit | Not_found -> ()
 
 let complete_fields kn v =
   if not (Wvs.mem record_fields v) then complete_fields kn v
