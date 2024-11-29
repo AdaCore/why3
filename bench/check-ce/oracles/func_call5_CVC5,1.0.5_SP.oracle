@@ -7,21 +7,41 @@ Sub-goal Precondition of goal f1'vc.
 Prover result is: Valid (47 steps).
 
 <check_ce:categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
+- Selected model 0: SW
   - Concrete RAC: NORMAL
-  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
-- Selected model 1: INCOMPLETE
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 15, characters 11-17)
+- Checked model 1: SW
   - Concrete RAC: NORMAL
-  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 15, characters 11-17)
 File "bench/check-ce/func_call5.mlw", line 15, characters 11-17:
 Sub-goal Assertion of goal f1'vc.
 Prover result is: Unknown (unknown + incomplete) (307 steps).
-The following counterexample model could not be verified
-  (abstract RAC fatal rac error: missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14):
+The contracts of the following functions/loops are too weak :
+  - Function 'g1' at "bench/check-ce/func_call5.mlw", line 14, characters 10-14
+, for example during the following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
 File func_call5.mlw:
   Line 11:
-    x :  = 1
-    x : int = 1
+    x = 1
+    x = 1
+    Execution of main function `f1` with env:
+      x = 1
+      zero = 0
+      one = 1
+  Line 14:
+    Giant-step execution of function `g1` with args:
+      y = 1
+    result of `g1` = {contents= 2}
+  Line 15:
+    Property failure at assertion with:
+      x = 1
+      z = {contents= 2}
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
